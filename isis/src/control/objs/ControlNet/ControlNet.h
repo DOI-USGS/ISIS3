@@ -164,6 +164,8 @@ namespace Isis {
    *   @history 2011-10-14 Ken Edmundson Added method ClearJigsawRejected(); to
    *                           set all measure/point JigsawRejected flags to
    *                           false prior to bundle adjustment.
+   *   @history 2012-04-13 Orrin Thomas Added method sortedMeasureList, and functor
+   *                           ControlMeasureLessThanFunctor
    */
   class ControlNet : public QObject {
       Q_OBJECT
@@ -210,6 +212,7 @@ namespace Isis {
       ControlPoint *GetPoint(int index);
       
       const ControlCubeGraphNode *getGraphNode(QString serialNumber) const;
+      ControlCubeGraphNode *getGraphNode(QString serialNumber);
 
       double AverageResidual();
       Isis::Camera *Camera(int index);
@@ -275,12 +278,9 @@ namespace Isis {
       void Shuffle(QList< ControlCubeGraphNode * > & list) const;
       QPair< int, int > CalcBWAndCE(QList< QString > serials) const;
 
-
-    private:
-      class ControlMeasureLessThanFunctor :
-        public std::binary_function<ControlMeasure* const &,
-        ControlMeasure * const &, bool > {
-
+      class ControlMeasureLessThanFunctor : public std::binary_function<
+            ControlMeasure* const &, ControlMeasure * const &, bool >
+        {
           public:
             ControlMeasureLessThanFunctor(double(ControlMeasure::*accessorMethod)() const) {
               m_accessor = accessorMethod;
@@ -289,75 +289,13 @@ namespace Isis {
               this->m_accessor = other.m_accessor;
             }
             ~ControlMeasureLessThanFunctor() {}
-
+            
             bool operator()(ControlMeasure* const &, ControlMeasure* const &);
             ControlMeasureLessThanFunctor & operator=(ControlMeasureLessThanFunctor const &other); 
 
           private:
             double(ControlMeasure::*m_accessor)() const;
         };
-
-
-      /**
-       * Encapsulation of a vertex in a minimum spanning tree.  Can be either a
-       * Control Point or a Graph Node.  Each vertex is connected to another by
-       * a measure.  A vertex without a parent vertex is considered a root node,
-       * or the base of its own tree.
-       */
-      class ControlVertex {
-        public:
-          //! Construct a vertex from a Graph Node
-          ControlVertex(ControlCubeGraphNode *node) {
-            m_node = node;
-            m_point = NULL;
-            m_parent = NULL;
-          }
-
-          //! Construct a vertex from a Control Point
-          ControlVertex(ControlPoint *point) {
-            m_point = point;
-            m_node = NULL;
-            m_parent = NULL;
-          }
-
-          //! Does not own any of its private data
-          ~ControlVertex() {}
-
-          //! Set the parent vertex, removing the root node status.
-          void setParent(ControlVertex *v) { m_parent = v; }
-
-          //! Get the root node, or greatest ancestor
-          ControlVertex * getRoot() {
-            ControlVertex *current = this;
-            while (current->getParent() != NULL)
-              current = current->getParent();
-            return current;
-          }
-
-          //! Get the parent node.  A root node has no parent.
-          ControlVertex * getParent() { return m_parent; }
-
-          //! Get the node representation of this vertex
-          ControlCubeGraphNode * getNode() { return m_node; }
-
-          //! Get the point representation of this vertex
-          ControlPoint * getPoint() { return m_point; }
-
-          //! Join two nodes by setting one root to be the other's parent
-          static void join(ControlVertex *v1, ControlVertex *v2) {
-            v1->getRoot()->setParent(v2->getRoot());
-          }
-
-        private:
-          //! The possibly non-existant graph node
-          ControlCubeGraphNode *m_node;
-
-          //! The possibly non-existant control point
-          ControlPoint *m_point;
-
-          //! The possibly non-existant parent vertex
-          ControlVertex *m_parent;
-      };
 
 
     private: // data

@@ -1,0 +1,212 @@
+<?xml version="1.0"?>
+<application name="cnetwinnow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Sets problem measures to ignored based on an examination of the residual histogram.
+  </brief>
+
+  <description>
+    <p>
+      After <b>jigsaw</b> has done a bundle adjustment on a group of overlapping Isis 3, level 
+      1, <def>cube</def>s every image measure in the network will have associated residuals.
+      A historgram of the residuals is constructed in order to determine the magnitude at which
+      the noise (bad data) starts to dominate the solution.  The points are segregated into three
+      categories in assending order of residual magnitude: inocent, suspect, and guilty.  The
+      progam then attempts to ingore all the suspect and guilty measures based on the criteria
+      for measure rejection provided.  If guilty measures cannot be ingored a report is generated
+      documenting why.  No additional action is taken if suspect measure cannot be elliminated.
+    </p>
+    
+    <h4>Known Issues</h4>
+      <blockquote>
+      Not spliting a network into <b>islands</b> is one of the primary considerations for whether
+      or not a measure can be ingorned.  However, having even a single measure conecting mass of
+      images A to mass of image B is currently considered sufficient for 'connecting' them together
+      as a network.  Obviously this is a necissary, though grossly insufficient requirment.
+      </blockquote>
+  </description>
+
+  <category>
+    <categoryItem>Control Networks</categoryItem>
+  </category>
+
+  <seeAlso>
+    <applications>
+      <item>jigsaw</item>
+      <item>deltack</item>
+      <item>qnet</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="Orrin Thomas" date="2012-04-13">
+      Original version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          cube list
+        </brief>
+        <description>
+          This file contains a list of all <def>cube</def>s in the <def>control network</def>
+        </description>
+        <filter>
+          *.txt *.lis
+        </filter>
+      </parameter>
+      <parameter name="CNET">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input control network
+        </brief>
+        <description>
+          This file is a <def>control network</def> generated from programs such as 
+          <b>autoseed</b> or <b>qnet</b>.  It contains the <def>control point</def>s 
+          and associated measures.
+        </description>
+        <filter>
+          *.net
+        </filter>
+      </parameter>
+      <parameter name="ONET">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output control network
+        </brief>
+        <description>
+          This output file contains the updated <def>control network</def> with
+          the problem measures set to ignor.
+        </description>
+        <filter>
+          *.net
+        </filter>
+      </parameter>
+      <parameter name="FILE_PREFIX">
+            <type>string</type>
+            <internalDefault>none</internalDefault>
+            <brief>output file prefix</brief>
+            <description>
+              2 Reports will be generated:
+              1. FILE_PREFIXGuilty.csv, a report of apparently bad points that could not be set to ignored,
+              2. FILE_PREFIXIgnored.csv, a report of all the measures that were set to ignor.
+            </description>
+        </parameter>
+    </group>
+      
+
+    <group name="Histogram Analysis Parameters--The user is advised to use caution if changing the defualts">
+      <parameter name="BIN_WIDTH">
+        <brief>The width of the histogram bins in unweighted pixels.</brief>
+        <description>
+            The program will build and analyze a histogram of the R^2 residual lengths.
+            This prameter tells the software how wide to make each bin.  Unless the user
+            has studied the behaviour of residuals (particularly with regard to their 
+            networks), we do not advise changing the default.
+        </description>
+        <type>double</type>
+        <default>
+          <item>0.1</item>
+        </default>
+          <minimum inclusive="no">0</minimum>
+      </parameter>
+
+      <parameter name="SUSPECT_BUMP_PERCENT">
+        <brief> The percent that that a local histogram maximum must be greater than a local minimum to be considered suspect.</brief>
+        <description>
+            If all of the measurements in network belong to Gaussian distribution (one of the typical assumptions in
+            least squares analysis) then the residual histogram should be strictly decreasing in the tail.  There should
+            be only one local maxima near the median (a results of using equal distance bins instead of equal area).  All
+            other local maxima are 'bumps' and reveal where the assumption of Gaussian noise is breaking down.  The 
+            SUSPECT_BUMP_PERCENT is the minimum bump height (in percentage of the preceding local minima) for a bump to be
+            considered suspect.  And barring user override will be the boundary between inocent and suspect points.
+            Changing the default is not typically recomended.
+        </description>
+        <type>double</type>
+        <default>
+          <item>5</item>
+        </default>
+        <minimum inclusive="no">0</minimum>
+        <maximum incluseive="yes">100</maximum>
+      </parameter>
+
+      <parameter name="GUILTY_BUMP_PERCENT">
+        <brief> The percent that that a local histogram maximum must be greater than a local minimum to be considered guilty.</brief>
+        <description>
+            If all of the measurements in network belong to Gaussian distribution (one of the typical assumptions in
+            least squares analysis) then the residual histogram should be strictly decreasing in the tail.  There should
+            be only one local maxima near the median (a results of using equal distance bins instead of equal area).  All
+            other local maxima are 'bumps' and reveal where the assumption of Gaussian noise is breaking down.  The 
+            GUILTY_BUMP_PERCENT is the minimum bump height (in percentage of the preceding local minima) for a bump to be
+            considered guilty.  And barring user override will be the boundary between suspect and guilty points.
+            Changing the default is not typically recomended.
+        </description>
+        <type>double</type>
+        <default>
+          <item>10</item>
+        </default>
+        <minimum inclusive="no">0</minimum>
+        <maximum incluseive="yes">100</maximum>
+      </parameter>
+
+      <parameter name="SUSPECT_FLOOR">
+        <brief>There will be no attempt to set residuals smaller than this user defined limit to ignored.</brief>
+        <description>
+            SUSPECT_FLOOR is the lowest that the boundary between inocent and suspect residual magnitudes will slip.
+            Histogram analysis may however result in a higher magnitude boundary.
+        </description>
+        <type>double</type>
+        <default>
+          <item>1.0</item>
+        </default>
+        <minimum inclusive="yes">0.2</minimum>
+      </parameter>
+ 
+      <parameter name="GUILTY_FLOOR">
+        <brief>Every residual greater than user defined GUILTY_FLOOR is guilty</brief>
+        <description>
+            GUILTY_FLOOR is the highest that the boundary between suspect and guilty residual magnitudes will slip.
+            Histogram analysis may however result in a lower magnitude boundary--strickly greater than the inocent-suspect boundary.
+        </description>
+        <type>double</type>
+        <default>
+          <item>2.5</item>
+        </default>
+        <minimum inclusive="yes">1.0</minimum>
+      </parameter>
+   </group>
+
+   <group name="Measure Rejection Criteria">
+      <parameter name="HULL_REDUCTION_PERCENT">
+        <brief>Maximum precent reduction to the area of the convex hull of the measures in an image.</brief>
+        <description>
+          Maximum precent reduction to the area of the convex hull of the measures in an image.
+        </description>
+        <type>double</type>
+        <default>
+          <item>15</item>
+        </default>
+        <minimum inclusive="no">0</minimum>
+        <maximum incluseive="yes">100</maximum>
+      </parameter>
+
+      <parameter name="MEASURE_REDUCTION_PERCENT">
+        <brief>Maximum precent reduction of the measures in an image.</brief>
+        <description>
+          Maximum precent reduction of the measures in an image.
+        </description>
+        <type>double</type>
+        <default>
+          <item>30</item>
+        </default>
+        <minimum inclusive="no">0</minimum>
+        <maximum incluseive="yes">100</maximum>
+      </parameter>
+   </group>
+ </groups>
+</application>

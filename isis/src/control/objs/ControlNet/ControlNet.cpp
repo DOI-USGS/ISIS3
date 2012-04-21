@@ -1745,6 +1745,17 @@ namespace Isis {
     return cubeGraphNodes->value(serialNumber);
   }
 
+  ControlCubeGraphNode *ControlNet::getGraphNode(
+      QString serialNumber) {
+    if (!cubeGraphNodes->contains(serialNumber)) {
+      iString msg = "Serial Number [" + serialNumber + "] does not exist in"
+          " the network.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    return cubeGraphNodes->value(serialNumber);
+  }
+
 
   /**
    * Get the target radii
