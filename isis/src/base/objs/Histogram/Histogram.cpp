@@ -24,6 +24,7 @@
 
 #include <string>
 #include <iostream>
+#include <stdio.h>
 
 #include "Brick.h"
 #include "ControlMeasure.h"
@@ -159,16 +160,16 @@ namespace Isis {
 
    
    //stretch the domain so that it is an even multiple of binWidth
-   double domain = this->ValidMaximum() - this->ValidMinimum();
-   double stretch = domain/binWidth;
-   stretch = (1-fmod(stretch,1.0))*binWidth;
-   domain += stretch;
-   stretch /= 2.0;
-   SetValidRange(this->ValidMinimum()-stretch,this->ValidMaximum()+stretch);
-   SetBinRange  (this->ValidMinimum()        ,this->ValidMaximum()        );
+     //for some reason Histogram makes the end points of the bin range be at the center of
+     //bins.  Thus the +/-0.5 forces it to point the bin range at the ends of the bins.
+   SetBinRange(binWidth*(floor(this->ValidMinimum()/binWidth)+0.5),
+               binWidth*(ceil(this->ValidMaximum()/binWidth)-0.5));
+   SetValidRange(binWidth*floor(this->ValidMinimum()/binWidth),
+                 binWidth*ceil(this->ValidMaximum()/binWidth));
 
    //from the domain of the data and the requested bin width calculate the number of bins
-   int nBins = int ( ceil(domain/binWidth)+1 );
+   double domain = this->ValidMaximum() - this->ValidMinimum();
+   int nBins = int ( ceil(domain/binWidth) );
    SetBins(nBins);
 
    //add all the data to the now setup histogram

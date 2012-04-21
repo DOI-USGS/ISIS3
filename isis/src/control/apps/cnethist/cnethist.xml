@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<application name="hist" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Generates a histogram table and plot of the r^2 Residuals of input netfiles
+  </brief>
+
+  <description>
+
+
+  </description>
+
+  <category>
+    <categoryItem>Math and Statistics</categoryItem>
+  </category>
+
+  <history>
+    <change name="Orrin Thomas" date="2012-04-19">
+      Original version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="NETLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          list of paths to networks with residual data
+        </brief>
+        <description>
+  	  list of paths to networks with residual data.  One per line.
+        </description>
+        <filter>
+          *.lis *.txt
+        </filter>
+      </parameter>
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output text file
+        </brief>
+        <description>
+          Output text file containing the tabular representation
+          of the histogram.
+        </description>
+        <internalDefault>None</internalDefault>
+        <filter>
+          *.txt
+        </filter>
+      </parameter>
+    </group>
+
+
+    <group name="Options">
+      <parameter name="BIN_WIDTH">
+        <type>double</type>
+        <Default>0.01</Default>
+        <brief>
+          With of Histogram Bins
+        </brief>
+        <description>
+          With of Histogram Bins.
+        </description>
+      </parameter>
+      <min>0.0001</min>
+    </group>
+
+    <group name="Plot Options">
+      <parameter name="TITLE">
+        <type>string</type>
+        <brief>
+          Plot Title
+        </brief>
+        <description>
+          This will be the title for the plot of the histogram.  The plot will only be shown in ui mode.
+        </description>
+        <internalDefault>Default</internalDefault>
+      </parameter>
+      <parameter name="XAXIS">
+        <type>string</type>
+        <brief>
+          X-Axis Title
+        </brief>
+        <description>
+          This will be the title for the x axis, which represents the pixel value (or DN), in the plot of the histogram.  The plot will only be shown in ui mode.
+        </description>
+        <internalDefault>Default</internalDefault>
+      </parameter>
+      <parameter name="FREQAXIS">
+        <type>string</type>
+        <brief>
+          Frequency Y-Axis Title
+        </brief>
+        <description>
+          This will be the title for the y axis to the right of the histogram
+          plot, which represents the frequency of the pixel value. The plot will
+          only be shown in GUI mode.
+        </description>
+        <internalDefault>Default</internalDefault>
+      </parameter>
+    </group>
+  </groups>
+</application>
