@@ -7,7 +7,7 @@ commands:
 	$(LS) -1 $(OUTPUT)/*.net > $(OUTPUT)/net.lis;
 	$(APPNAME) netlist=$(OUTPUT)/net.lis \
 	to=hist.txt \
-	bin_width = 0.1;
+	bin_width = 0.1 > /dev/null;
 	cat hist.txt  \
 	  | sed 's/\/[^,]*\/\([^,\/]*\.net\)/\1/g' \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
