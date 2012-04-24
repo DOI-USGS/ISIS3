@@ -316,8 +316,6 @@ namespace Isis {
 
       ControlPointFileEntryV0002_Measure ToProtocolBuffer() const;
 
-      bool residualMagnitudeLessThan(const ControlMeasure *a, const ControlMeasure *b);
-
     private: // methods
       void InitializeToNull();
       void MeasureModified();

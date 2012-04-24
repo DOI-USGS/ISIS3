@@ -1205,10 +1205,6 @@ namespace Isis {
     return protoBufMeasure;
   }
 
-  bool  ControlMeasure::residualMagnitudeLessThan(const ControlMeasure *a, const ControlMeasure *b) {
-    return a->GetResidualMagnitude() < b->GetResidualMagnitude();
-  }
-
 
   void ControlMeasure::MeasureModified() {
     *p_dateTime = "";

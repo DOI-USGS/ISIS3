@@ -76,7 +76,7 @@ void IsisMain() {
   strcat(fileName,"Guilty.csv");
   guiltyFile = fopen(fileName,"w");
   if (guiltyFile == NULL) {
-    string msg = "Unable to open file [" + iString::iString(fileName) + "]";
+    string msg = "Unable to open file [" + iString(fileName) + "]";
     throw IException(IException::User, msg, _FILEINFO_);
     return;
   }
@@ -86,7 +86,7 @@ void IsisMain() {
   strcat(fileName,"Ignored.csv");
   ignoredReport = fopen(fileName,"w");
   if (guiltyFile == NULL) {
-    string msg = "Unable to open file [" + iString::iString(fileName) + "]";
+    string msg = "Unable to open file [" + iString(fileName) + "]";
     throw IException(IException::User, msg, _FILEINFO_);
     return;
   }

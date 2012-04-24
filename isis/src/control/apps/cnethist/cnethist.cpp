@@ -143,7 +143,7 @@ void IsisMain() {
       CubePlotCurve *histCurve = new CubePlotCurve(CubePlotCurve::CubeDN,
                                                 CubePlotCurve::Percentage);
       histCurve->setColor(curveColor(i));
-      iString baseName = Filename::Filename(fList[i]).Basename();
+      iString baseName = Filename(fList[i]).Basename();
       histCurve->setTitle(baseName);
 
  
