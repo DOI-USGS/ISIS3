@@ -60,6 +60,8 @@ namespace Isis {
    *   @history 2012-01-30 Steven Lambright - Fixed a bug added when the
    *                           legendItem() method was removed. This method is
    *                           necessary. Fixes #688.
+   *   @history 2012-03-14 Tracie Sucharski - Added functionality for multiple
+   *                           viewports as a source for plots.
    */
   class CubePlotCurve : public QObject, public PlotCurve {
       Q_OBJECT
@@ -70,14 +72,16 @@ namespace Isis {
 
       bool eventFilter(QObject *o, QEvent *e);
       void paint(CubeViewport *vp, QPainter *painter);
-      QList <QPointF > sourceVertices() const;
+      QList< QList <QPointF> > sourceVertices() const;
       virtual QWidget *legendItem() const;
-      QString sourceCube() const;
+      QStringList sourceCube() const;
 
       void enableAutoRenaming(bool);
       void copySource(const CubePlotCurve &other);
       void setSource(CubeViewport *cvp, QList<QPoint> screenPoints,
                      int band = -1);
+      void setSource(QList<CubeViewport *> cvps,
+                     QList< QList<QPoint> > screenPoints, QList<int> band);
 
     signals:
       /**
@@ -99,6 +103,10 @@ namespace Isis {
       QByteArray toByteArray() const;
       void mousePressEvent(QMouseEvent *e);
 
+      void clearSource();
+      void addSource(CubeViewport *cvp,  QList<QPoint> screenPoints, 
+                     int band = -1);
+
     private:
       //! This is the widget legend item associated with this curve.
       QPointer<QWidget> m_legendItem;
@@ -113,10 +121,10 @@ namespace Isis {
       bool m_renameAutomatically;
 
       //! List of vertices in sample,line coordinates from the rubber band
-      QList <QPointF> m_pointList;
+      QList<QList <QPointF> > m_pointList;
 
       //! The cube that the data is coming from
-      QString m_sourceCube;
+      QStringList m_sourceCube;
   };
 };
 
