@@ -36,6 +36,7 @@
 #include "SpectralPlotTool.h"
 #include "SocketThread.h"
 #include "StatisticsTool.h"
+#include "StereoTool.h"
 #include "StretchTool.h"
 #include "SunShadowTool.h"
 #include "ViewportMainWindow.h"
@@ -191,6 +192,9 @@ int main(int argc, char *argv[]) {
   Tool *statsTool = new StatisticsTool(vw);
   statsTool->addTo(vw);
 
+  Tool *stereoTool = new StereoTool(vw);
+  stereoTool->addTo(vw);
+
   Tool *helpTool = new HelpTool(vw);
   helpTool->addTo(vw);
 
@@ -259,6 +263,7 @@ int main(int argc, char *argv[]) {
   }
 
   delete helpTool;
+  delete stereoTool;
   delete histTool;
   delete spatialPlotTool;
   delete spectralPlotTool;
