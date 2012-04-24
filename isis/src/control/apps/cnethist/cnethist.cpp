@@ -170,38 +170,38 @@ QColor curveColor(int i) {
 
   switch (j) {
   case 0:
-    return QColor::QColor("red");
+    return QColor("red");
   case 6:
-    return QColor::QColor("DeepPink");
+    return QColor("DeepPink");
   case 5:
-    return QColor::QColor("orange");
+    return QColor("orange");
   case 3:
-    return QColor::QColor("black");
+    return QColor("black");
   case 4:
-    return QColor::QColor("Indigo");
+    return QColor("Indigo");
   case 2:
-    return QColor::QColor("green");
+    return QColor("green");
   case 1:
-    return QColor::QColor("Blue");
+    return QColor("Blue");
   case 7:
-    return QColor::QColor("SaddleBrown");
+    return QColor("SaddleBrown");
   case 8:
-    return QColor::QColor("darkred");
+    return QColor("darkred");
   case 9:
-    return QColor::QColor("palevioletred");
+    return QColor("palevioletred");
   case 10:
-    return QColor::QColor("coral");
+    return QColor("coral");
   case 11:
-    return QColor::QColor("darkkhaki");
+    return QColor("darkkhaki");
   case 12:
-    return QColor::QColor("orchid");
+    return QColor("orchid");
   case 13:
-    return QColor::QColor("lime");
+    return QColor("lime");
   case 14:
-    return QColor::QColor("cyan");
+    return QColor("cyan");
   case 15:
-    return QColor::QColor("goldenrod");
+    return QColor("goldenrod");
   }
 
-  return QColor::QColor("olivedrab");
+  return QColor("olivedrab");
 }
