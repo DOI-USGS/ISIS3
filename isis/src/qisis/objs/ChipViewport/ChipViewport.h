@@ -93,7 +93,7 @@ namespace Isis {
       //!  Set chip
       void setChip(Chip *chip, Cube *chipCube);
 
-      //!  Load with another ChipViewport
+      //!  Load with another ChipViewport, used for blinking
       void loadView(ChipViewport &newView);
 
       //!  Return chip
