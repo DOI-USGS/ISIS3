@@ -28,6 +28,9 @@ namespace Isis {
    *
    * @internal
    *   @history 2012-01-20 Steven Lambright - Documentation improved.
+   *   @history 2012-03-14 Tracie Sucharski - Update for change to the
+   *                          CubePlotCurve::sourceCube(), which now
+   *                          returns a QStringList instead of QString.
    */
   class AbstractPlotTool : public Tool {
       Q_OBJECT
