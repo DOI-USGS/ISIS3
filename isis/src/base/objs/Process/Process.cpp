@@ -593,6 +593,29 @@ namespace Isis {
   }
 
   /**
+   * Propagate the tables from the cube with the given filename to the output
+   * cube.  This is done at the time this method is called, not during normal
+   * processing.
+   */
+  void Process::PropagateTables(const std::string &fromName) {
+    Cube *fromCube = new Isis::Cube;
+    fromCube->open(fromName);
+    const Pvl *fromLabels = fromCube->getLabel();
+
+    for (unsigned int i = 0; i < OutputCubes.size(); i++) {
+      for (int j = 0; j < fromLabels->Objects(); j++) {
+        const PvlObject &object = fromLabels->Object(j);
+
+        if (object.IsNamed("Table")) {
+          Blob table((string) object["Name"], object.Name());
+          fromCube->read(table);
+          OutputCubes[i]->write(table);
+        }
+      }
+    }
+  }
+
+  /**
    * This method allows the programmer to propagate input blobs to the output
    * cube (default is true)
    *

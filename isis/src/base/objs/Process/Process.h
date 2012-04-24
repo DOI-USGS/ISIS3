@@ -30,6 +30,7 @@
 #include "Statistics.h"
 
 template <typename T> class QSet;
+template <typename T> class QList;
 
 namespace Isis {
   const int SizeMatch = 1;
@@ -245,6 +246,7 @@ namespace Isis {
       void PropagateLabels(const bool prop);
       void PropagateLabels(const std::string &cube);
       void PropagateTables(const bool prop);
+      void PropagateTables(const std::string &fromName);
       void PropagatePolygons(const bool prop);
       void PropagateHistory(const bool prop);
       void PropagateOriginalLabel(const bool prop);

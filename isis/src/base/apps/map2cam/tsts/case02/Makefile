@@ -7,3 +7,6 @@ commands:
 	match= $(INPUT)/ab102401.cub \
 	to=$(OUTPUT)/map2camTruth2.cub \
 	interp=nearestneighbor> /dev/null;
+
+	catlab from=$(OUTPUT)/map2camTruth2.cub \
+	to=$(OUTPUT)/map2camTruth2.pvl > /dev/null;

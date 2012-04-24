@@ -17,6 +17,9 @@ void BandChange(const int band);
 void IsisMain() {
   // Open the input camera cube that we will be matching and create
   // the camera object
+  UserInterface &ui = Application::GetUserInterface();
+  Filename match = Filename(ui.GetFilename("MATCH"));
+
   Process p;
   mcube = p.SetInputCube("MATCH");
   outcam = mcube->getCamera();
@@ -40,8 +43,8 @@ void IsisMain() {
   rub.SetOutputCube("TO", transform->OutputSamples(),
                     transform->OutputLines(),
                     icube->getBandCount());
-  UserInterface &ui = Application::GetUserInterface();
-  rub.PropagateLabels(ui.GetFilename("MATCH"));
+  rub.PropagateLabels(match.Expanded());
+  rub.PropagateTables(match.Expanded());
 
   // Set up the interpolator
   Interpolator *interp = NULL;
