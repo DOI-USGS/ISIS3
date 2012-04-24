@@ -50,7 +50,7 @@ namespace Isis {
    * @param parentAndChildData A serialized, binary representation of an
    *                           instance of this class.
    */
-  CubePlotCurve::CubePlotCurve(const QByteArray &parentAndChildData) :
+    CubePlotCurve::CubePlotCurve(const QByteArray &parentAndChildData) :
       PlotCurve(Unknown, Unknown) {
     m_legendItem = NULL;
     m_legendItem = PlotCurve::legendItem();
@@ -74,24 +74,36 @@ namespace Isis {
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
-      int sourceCubeSize = *(((int *)(rawClassData + dataPos)));
+      int numSourceCubes = *(((int *)(rawClassData + dataPos)));
       dataPos += sizeof(int);
 
-      m_sourceCube = QString::fromUtf8(classData.data() + dataPos,
-                                       sourceCubeSize);
-      dataPos += sourceCubeSize;
+      for (int i = 0; i < numSourceCubes; i++) {
+        int sourceCubeSize = *(((int *)(rawClassData + dataPos)));
+        dataPos += sizeof(int);
+        QString data = QString::fromUtf8(classData.data() + dataPos,
+                                         sourceCubeSize);
+        m_sourceCube << data;
+        dataPos += sourceCubeSize;
+      }
 
       int pointListSize = *(((int *)(rawClassData + dataPos)));
       dataPos += sizeof(int);
 
       for (int i = 0; i < pointListSize; i ++) {
-        double x = *((double *)(rawClassData + dataPos));
-        dataPos += sizeof(double);
+        int npts = *(((int *)(rawClassData + dataPos)));
+        dataPos += sizeof(int);
 
-        double y = *((double *)(rawClassData + dataPos));
-        dataPos += sizeof(double);
+        QList<QPointF> points;
+        for (int pt = 0; pt < npts; pt++) {
+          double x = *((double *)(rawClassData + dataPos));
+          dataPos += sizeof(double);
 
-        m_pointList.append(QPointF(x, y));
+          double y = *((double *)(rawClassData + dataPos));
+          dataPos += sizeof(double);
+
+          points.append(QPointF(x, y));
+        }
+        m_pointList.append(points);
       }
 
       ASSERT(dataPos == classData.size());
@@ -147,7 +159,8 @@ namespace Isis {
    * @param painter The painter to use for painting onto the viewport
    */
   void CubePlotCurve::paint(CubeViewport *vp, QPainter *painter) {
-    if (m_sourceCube == vp->cube()->getFilename()) {
+    if (m_sourceCube.contains(vp->cube()->getFilename())) {
+      int i = m_sourceCube.indexOf(vp->cube()->getFilename());
       QPen customPen;
       customPen.setColor(pen().color());
       customPen.setWidth(pen().width());
@@ -156,7 +169,8 @@ namespace Isis {
         customPen.setStyle(pen().style());
 
       painter->setPen(customPen);
-      QList <QPointF> points = sourceVertices();
+      QList< QList <QPointF> > allPoints = sourceVertices();
+      QList<QPointF> points = allPoints.at(i);
 
       for (int p = 1; p <= points.size(); p++) {
         int sample1;
@@ -186,7 +200,7 @@ namespace Isis {
    *
    * @return QList<QPoint>
    */
-  QList <QPointF > CubePlotCurve::sourceVertices()  const {
+  QList< QList <QPointF> > CubePlotCurve::sourceVertices()  const {
     return m_pointList;
   }
 
@@ -208,7 +222,7 @@ namespace Isis {
    *
    * @return CubeViewport*
    */
-  QString CubePlotCurve::sourceCube() const {
+  QStringList CubePlotCurve::sourceCube() const {
     return m_sourceCube;
   }
 
@@ -238,6 +252,52 @@ namespace Isis {
   }
 
 
+  void CubePlotCurve::clearSource() {
+
+    if (m_originalName != "" && !m_sourceCube.empty() && m_renameAutomatically) {
+      setTitle(m_originalName);
+    }
+    else if (m_originalName == "") {
+      m_originalName = title().text();
+    }
+
+    m_sourceCube.clear();
+    m_pointList.clear();
+
+  }
+
+
+  void CubePlotCurve::addSource(CubeViewport *cvp, QList<QPoint> screenPoints,
+                                int band) {
+
+    if (cvp) {
+      m_sourceCube << cvp->cube()->getFilename().ToQt();
+
+      if (m_renameAutomatically) {
+        setTitle(title().text() + " - " +
+                 QFileInfo(m_sourceCube.at(m_sourceCube.size()-1)).baseName());
+
+        if (band != -1) {
+          setTitle(title().text() + "+" + iString(band).ToQt());
+        }
+      }
+
+      QList<QPointF> points;
+      foreach (QPoint screenpoint, screenPoints) {
+        double sample = 0.0;
+        double line = 0.0;
+
+        cvp->viewportToCube(screenpoint.x(), screenpoint.y(), sample, line);
+
+        points.append(QPointF(sample, line));
+      }
+      m_pointList.append(points);
+
+      emit needsRepaint();
+    }
+
+  }
+
   /**
    * Tell this plot curve from where its data originated.
    *
@@ -252,38 +312,20 @@ namespace Isis {
    */
   void CubePlotCurve::setSource(CubeViewport *cvp, QList<QPoint> screenPoints,
                                 int band) {
-    if (m_originalName != "" && m_sourceCube != "" && m_renameAutomatically) {
-      setTitle(m_originalName);
+
+    clearSource();
+    addSource(cvp,  screenPoints,  band);
+//    emit needsRepaint();
+  }
+
+
+  void CubePlotCurve::setSource(QList<CubeViewport *> cvps,
+                                QList< QList<QPoint> > screenPoints,
+                                QList<int> band) {
+    for (int i = 0; i < cvps.size(); i++) {
+      addSource(cvps.at(i), screenPoints.at(i), band.at(i));
     }
-    else if (m_originalName == "") {
-      m_originalName = title().text();
-    }
-
-    m_sourceCube = "";
-    m_pointList.clear();
-
-    if (cvp) {
-      m_sourceCube = cvp->cube()->getFilename().ToQt();
-
-      if (m_renameAutomatically) {
-        setTitle(title().text() + " - " + QFileInfo(m_sourceCube).baseName());
-
-        if (band != -1) {
-          setTitle(title().text() + "+" + iString(band).ToQt());
-        }
-      }
-
-      foreach (QPoint screenpoint, screenPoints) {
-        double sample = 0.0;
-        double line = 0.0;
-
-        cvp->viewportToCube(screenpoint.x(), screenpoint.y(), sample, line);
-
-        m_pointList.append(QPointF(sample, line));
-      }
-    }
-
-    emit needsRepaint();
+//    emit needsRepaint();
   }
 
 
@@ -330,20 +372,31 @@ namespace Isis {
     int size = header.size();
     classData.append(header);
 
-    size = m_sourceCube.toUtf8().size();
+    size = m_sourceCube.size();
     classData.append((char *)&size, sizeof(int));
-    classData.append(m_sourceCube.toUtf8());
+    
+    for (int i = 0; i < size; i++) {
+      int sourceCubeSize = m_sourceCube.at(i).toUtf8().size();
+      classData.append((char *)&sourceCubeSize, sizeof(int));
+      classData.append(m_sourceCube.at(i).toUtf8());    
+    }
 
     size = m_pointList.size();
     classData.append((char *)&size, sizeof(int));
 
     for (int i = 0; i < size; i ++) {
-      QPointF data = m_pointList[i];
-      double x = data.x();
-      double y = data.y();
+      QList<QPointF> points = m_pointList[i];
+      int npts = points.size();
+      classData.append((char *)&npts, sizeof(int));
 
-      classData.append((char *)&x, sizeof(double));
-      classData.append((char *)&y, sizeof(double));
+      for (int pt = 0; pt < npts; pt++) {
+        QPointF data = points[pt];
+        double x = data.x();
+        double y = data.y();
+
+        classData.append((char *)&x, sizeof(double));
+        classData.append((char *)&y, sizeof(double));
+      }
     }
 
     return classData;
