@@ -106,6 +106,8 @@ namespace Isis {
     *                          emitted whenever the measure is loaded not just
     *                          when the user initiates the move.  This should be
     *                          cleaned up.
+    *   @history 2012-04-17  Tracie Sucharski - If geom is turned on update the
+    *                          right measure in ::setLeftMeasure.
     */
   class ControlPointEdit : public QWidget {
       Q_OBJECT

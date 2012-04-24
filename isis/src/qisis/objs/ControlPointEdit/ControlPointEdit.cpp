@@ -603,6 +603,8 @@ namespace Isis {
    * @internal
    *   @history 2008-11-19  Tracie Sucharski - If left cube changes, get new
    *                           universalGroundMap.
+   *   @history 2012-04-17  Tracie Sucharski - If geom is turned on update the
+   *                           right measure.
    */
   void ControlPointEdit::setLeftMeasure(ControlMeasure *leftMeasure,
                                         Cube *leftCube, std::string pointId) {
@@ -629,6 +631,7 @@ namespace Isis {
     // Dump into left chipViewport
     p_leftView->setChip(p_leftChip, p_leftCube);
 
+    if (p_geomIt) updateRightGeom();
   }
 
 
@@ -1394,14 +1397,5 @@ namespace Isis {
     p_autoRegFact->FitChip()->Write(fname);
     ProgramLauncher::RunSystemCommand(command);
   }
-
-#if 0
-  void ControlPointEdit::setInterestOp() {
-
-
-
-  }
-#endif
-
 }
 
