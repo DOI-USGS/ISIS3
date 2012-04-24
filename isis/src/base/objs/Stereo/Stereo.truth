@@ -1,0 +1,13 @@
+UnitTest for Stereo
+Radius = 2438706.66
+Radius Error = 327.855578
+Separation Angle = 40.8194376
+Latitude = -56.72577
+Longitude = 314.958799
+Spherical to Rectangular conversion:
+X = 945.420299
+Y = -946.780983
+Z = -2038.89097
+Rectangular to spherical conversion:
+Latitude = -56.72577
+Longitude = 314.958799
