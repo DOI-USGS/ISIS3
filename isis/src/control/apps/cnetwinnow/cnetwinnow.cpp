@@ -176,33 +176,6 @@ void IsisMain() {
        = net.sortedMeasureList(&ControlMeasure::GetResidualMagnitude,inocentSuspectB,DBL_MAX);
 
  
-  //before getting started, we will need a hash of the image original convex hulls and
-    //numbers of measures
-  QHash<QString,QList<double> > originalCubeStats;
-  for (int i=0;i<suspectMeasures.size();i++) {
-    //short list to hold convexHull, and original number of measures, in that order
-    //QList<ControlMeasure *> emptyList;
-    QList<double> hullAndValidMeasures;
-    double area;
-    int validMeasures;
-    iString serialNum = suspectMeasures[i]->GetCubeSerialNumber();
-    //check to see if the convex hull is already calculated for this image
-    if (originalCubeStats.contains(serialNum.ToQt())) continue;
-    //otherwise do the calculations
-    cubeConvexHullAndMeasures(serialNum,net,area,validMeasures);
-    hullAndValidMeasures.push_back(area);
-    hullAndValidMeasures.push_back(validMeasures);
-    //and add it to the map
-    originalCubeStats.insert(serialNum,hullAndValidMeasures);
-  }
-
-  //we will also need to know how many islands we started with
-  int numInitialIslands = net.GetNodeConnections().size();
-
-  //user parameters for allowing measure rejection
-  double hullReductionLimit = ui.GetDouble("HULL_REDUCTION_PERCENT")/100.0;
-  double measureReductionLimit = ui.GetDouble("MEASURE_REDUCTION_PERCENT")/100.0;
-
   //print csv column headers
   fprintf(guiltyFile,/*"Guilty points (Residual Magnitudes > %lf) that could not be ignored.\n"
              "PtID:  Point ID Name\n"
@@ -242,6 +215,17 @@ void IsisMain() {
              "MeasureReduction%%,OrignialNumMeasures,ResultantNumMeasures,NetWouldSplit,Editable,"
              "PtGroupFailure\n");
 
+  //we will need a hash of the image original convex hulls and
+    //numbers of measures, it will be built on the fly
+  QHash<QString,QList<double> > originalCubeStats;
+  
+
+  //we will also need to know how many islands we started with
+  int numInitialIslands = net.GetNodeConnections().size();
+
+  //user parameters for allowing measure rejection
+  double hullReductionLimit = ui.GetDouble("HULL_REDUCTION_PERCENT")/100.0;
+  double measureReductionLimit = ui.GetDouble("MEASURE_REDUCTION_PERCENT")/100.0;
   
 
   //now work through the list from the end to the begining setting measures to ignor if we are able
@@ -267,12 +251,29 @@ void IsisMain() {
     if ( suspectMeasures[i]->Parent()->GetNumValidMeasures() <= 2) {
       QList<ControlMeasure *> tempList = suspectMeasures[i]->Parent()->getMeasures();
       //pull the valid measures out of the list
-      for (int i=0;i<tempList.size();i++) 
-        if(!tempList[i]->IsIgnored())
-          measGroup.push_back(tempList[i]);
+      for (int j=0;j<tempList.size();j++) 
+        if(!tempList[j]->IsIgnored())
+          measGroup.push_back(tempList[j]);
     }
     else
       measGroup.push_back(suspectMeasures[i]);
+
+    //make sure we have initial cube stats for the cubes in the group
+    for (int j=0;j<measGroup.size();j++) {
+      //short list to hold convexHull, and original number of measures, in that order
+      QList<double> hullAndValidMeasures;
+      double area;
+      int validMeasures;
+      iString serialNum = measGroup[j]->GetCubeSerialNumber();
+      //check to see if the initial stats are already calculated for this image
+      if (originalCubeStats.contains(serialNum.ToQt())) continue;
+      //otherwise do the calculations
+      cubeConvexHullAndMeasures(serialNum,net,area,validMeasures);
+      hullAndValidMeasures.push_back(area);
+      hullAndValidMeasures.push_back(validMeasures);
+      //and add it to the map
+      originalCubeStats.insert(serialNum,hullAndValidMeasures);
+    }
 
     //check each measure to see if it can be ignored
     for (int j=0;j<measGroup.size();j++) {
