@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<application name="hist" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="cnethist" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
     Generates a histogram table and plot of the r^2 Residuals of input netfiles
   </brief>
