@@ -4,7 +4,8 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(CP) $(INPUT)/*.net $(OUTPUT) > /dev/null;
-	$(LS) -1 $(OUTPUT)/*.net > $(OUTPUT)/net.lis;
+	$(LS)  $(OUTPUT)/*jigged.net > $(OUTPUT)/net.lis;
+	$(LS)  $(OUTPUT)/*Chen.net >> $(OUTPUT)/net.lis;
 	$(APPNAME) netlist=$(OUTPUT)/net.lis \
 	to=hist.txt \
 	bin_width = 0.1 > /dev/null;
