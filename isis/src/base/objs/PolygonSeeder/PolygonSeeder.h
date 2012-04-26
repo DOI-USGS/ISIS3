@@ -33,6 +33,7 @@
 
 namespace Isis {
   class Pvl;
+  class PvlGroup;
   class PolygonTools;
 
   /**
@@ -48,11 +49,15 @@ namespace Isis {
    *                           geos3.0.0, removed Chip.h include, fixed ifndef
    *   @history 2009-08-05 Travis Addair - Encapsulated group
    *                           creation for seed definition group
-   *   @history 2009-04-15 Eric Hyer - Now stores invalid input
-   *                                 - Added Copy constructor, destructor, and
-   *                                   assignment operator
+   *   @history 2009-04-15 Eric Hyer - Now stores invalid input.  Added Copy
+   *                           constructor, destructor, and assignment operator
    *   @history 2010-04-20 Christopher Austin - adapted for generic/unitless
    *                           seeding
+   *  @history 2012-04-17 Jeannie Backer - Added forward declaration for
+   *                          PvlObject and ordered includes in the
+   *                          implementation file. Added documentation.
+   *                          Moved Algorithm method from header file to
+   *                          implementation file.
    */
   class PolygonSeeder {
     public:
@@ -60,14 +65,20 @@ namespace Isis {
       PolygonSeeder(const PolygonSeeder &other);
       virtual ~PolygonSeeder();
 
-      virtual std::vector<geos::geom::Point *> Seed(const geos::geom::MultiPolygon *mp) = 0;
+      /**
+       * Pure virtual seed method. 
+       *  
+       * @param mp The MultiPolygon object from the geos::geom library. 
+       * @return @b std::vector<geos::geom::Point*> A vector of Point objects 
+       *                from the geos::geom library.
+       */
+      virtual std::vector<geos::geom::Point *> 
+          Seed(const geos::geom::MultiPolygon *mp) = 0;
 
-      std::string Name();
       double MinimumThickness();
       double MinimumArea();
-      inline std::string Algorithm() const {
-        return p_algorithmName;
-      }
+      std::string Algorithm() const;
+
       virtual PvlGroup PluginParameters(std::string grpName);
       Pvl InvalidInput();
 
@@ -79,12 +90,21 @@ namespace Isis {
                                 const geos::geom::Envelope *polyBoundBox);
 
     protected:
-      Pvl *invalidInput;
+      Pvl *invalidInput; /**< The Pvl passed in by the constructor minus what 
+                              was used.*/
 
     private:
-      std::string p_algorithmName;
-      double p_minimumThickness;
-      double p_minimumArea;
+      std::string p_algorithmName; /**< The value for the 'Name' Keyword in the
+                                        PolygonSeederAlgorithm group of the Pvl
+                                        that is passed into the constructor.*/
+      double p_minimumThickness;   /**< The value for the 'MinimumThickness' 
+                                        Keyword in the PolygonSeederAlgorithm 
+                                        group of the Pvl that is passed into 
+                                        the constructor*/
+      double p_minimumArea;        /**< The value for the 'MinimumArea' Keyword 
+                                        in the PolygonSeederAlgorithm group of 
+                                        the Pvl that is passed into the 
+                                        constructor*/
 
   };
 };

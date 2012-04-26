@@ -1,14 +1,14 @@
+#include "PolygonSeeder.h"
+
+#include "Filename.h"
+#include "IException.h"
+#include "LeastSquares.h"
+#include "Plugin.h"
+#include "PolygonTools.h"
+#include "PolynomialBivariate.h"
+#include "ProjectionFactory.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "Plugin.h"
-#include "IException.h"
-#include "PolynomialBivariate.h"
-#include "LeastSquares.h"
-#include "Filename.h"
-#include "ProjectionFactory.h"
-#include "PolygonTools.h"
-
-#include "PolygonSeeder.h"
 
 
 namespace Isis {
@@ -19,7 +19,6 @@ namespace Isis {
    *
    * @param pvl  A pvl object containing a valid PolygonSeeder specification
    *
-   * @todo
    */
   PolygonSeeder::PolygonSeeder(Pvl &pvl) {
     invalidInput = NULL;
@@ -31,7 +30,15 @@ namespace Isis {
   }
 
 
-  //! Copy constructor
+  /**
+   * @brief Copy constructor.
+   *  
+   * Create PolygonSeeder object by copying the algorithm name, the minimum 
+   * thickness, and the minimum area of an existing PolygonSeeder object.
+   *
+   * @param other The other PolygonSeeder object that will be copied.
+   * 
+   */
   PolygonSeeder::PolygonSeeder(const PolygonSeeder &other) {
     p_algorithmName = other.p_algorithmName;
     p_minimumThickness = other.p_minimumThickness;
@@ -39,7 +46,9 @@ namespace Isis {
   }
 
 
-  //! Destroy PolygonSeeder object
+  /**
+   * Destroys the PolygonSeeder object
+   */
   PolygonSeeder::~PolygonSeeder() {
     if(invalidInput) {
       delete invalidInput;
@@ -124,7 +133,8 @@ namespace Isis {
    * @param xyBoundBox The bounding box of the multipoly
    *
    * @return std::string A string with an appropriate message to throw if
-   * a test was unsuccessful or an empty string if all tests passed.
+   *             a test was unsuccessful or an empty string if all tests
+   *             passed.
    */
   std::string PolygonSeeder::StandardTests(const geos::geom::MultiPolygon *xymp,
       const geos::geom::Envelope *xyBoundBox) {
@@ -146,11 +156,22 @@ namespace Isis {
     return "";
   }
 
+  /**
+   * The name of the algorithm, read from the Name Keyword in the 
+   * PolygonSeeder Pvl passed into the constructor. 
+   *  
+   * @return @b std::string The value of the Name Keyword in the Pvl.
+   */
+  std::string PolygonSeeder::Algorithm() const {
+    return p_algorithmName;
+  }
 
   /**
    * Return the minimum allowed thickness of the polygon. This value is set
    * from the "MinimumThickness" keyword in the PVL. The seeding algorithm
    * will not seed polygons that have a thickness ratio less than this
+   *  
+   * @return @b double The value for the minimum thickness allowed. 
    */
   double PolygonSeeder::MinimumThickness() {
     return p_minimumThickness;
@@ -161,11 +182,24 @@ namespace Isis {
    * Return the minimum allowed area of the polygon. This value is set
    * from the "MinimumArea" keyword in the PVL. The seeding algorithm will
    * not seed polygons that have an area less than this.
+   *  
+   * @return @b double The value for the minimum area allowed. 
    */
   double PolygonSeeder::MinimumArea() {
     return p_minimumArea;
   }
 
+  /**
+   * @brief Plugin parameters. 
+   * This method will add the PvlKeyword values for algorithm name, minimum 
+   * thickness, and minimum area of this object to a PvlGroup with the name that
+   * is passed in. 
+   * 
+   * @param grpName A string containing the PvlGroup name.
+   * 
+   * @return @b PvlGroup The PvlGroup with the appropriate parameters added.
+   * 
+   */
   PvlGroup PolygonSeeder::PluginParameters(std::string grpName) {
     PvlGroup pluginInfo(grpName);
 
@@ -182,15 +216,26 @@ namespace Isis {
 
 
   /**
-   * The constructor was passed a pvl (from a def file probably)
-   * Returns a copy of this pvl minus what was used
+   * This method returns a copy of the Pvl passed in by the 
+   * constructor (from a def file probably) minus what was used.
+   *  
+   * @return @b Pvl  A copy of this pvl minus what was used.
    */
   Pvl PolygonSeeder::InvalidInput() {
     return *invalidInput;
   }
 
-
-  //! Assignment operator
+  /**
+   * @brief Assignment operator.
+   * Sets this PolygonSeeder object equal to another by copying the
+   * algorithm name, the minimum thickness, and the minimum area of the other
+   * PolygonSeeder object.
+   * 
+   * @param other The other PolygonSeeder object whose values will be copied.
+   * @return @b PolygonSeeder This PolygonSeeder object, once the other object's
+   *                values have been copied.
+   * 
+   */
   const PolygonSeeder &PolygonSeeder::operator=(const PolygonSeeder &other) {
     p_algorithmName = other.p_algorithmName;
     p_minimumThickness = other.p_minimumThickness;
