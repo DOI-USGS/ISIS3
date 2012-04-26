@@ -4,13 +4,17 @@
 
 #include "Buffer.h"
 #include "Cube.h"
+#include "FileList.h"
+#include "IException.h"
 #include "LineManager.h"
 #include "OverlapNormalization.h"
 #include "OverlapStatistics.h"
 #include "Process.h"
 #include "ProcessByLine.h"
 #include "Projection.h"
-#include "IException.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "Statistics.h"
 
 using std::string;
 using std::vector;
