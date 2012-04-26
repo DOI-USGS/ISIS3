@@ -1,0 +1,174 @@
+Object = ControlNetwork
+  NetworkId    = Test
+  TargetName   = Mars
+  UserName     = TSucharski
+  Created      = 2010-07-10T12:50:15
+  LastModified = 2010-07-10T12:50:55
+  Description  = "UnitTest of ControlNetwork"
+
+  Object = ControlPoint
+    PointType   = Tie
+    PointId     = T0001
+    ChooserName = autoseed
+    DateTime    = 2010-08-27T17:10:06
+    Ignore      = True
+
+    Group = ControlMeasure
+      SerialNumber = id0
+      MeasureType  = Candidate 
+      ChooserName  = cnetref
+      DateTime     = 2010-08-27T17:10:06
+      EditLock     = True
+      Sample       = 0.0
+      Line         = 0.0
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = id1
+      MeasureType    = Candidate
+      ChooserName    = autoseed
+      DateTime       = 2010-08-27T17:10:06
+      Ignore         = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Tie
+    PointId     = T0003
+    ChooserName = autoseed
+    DateTime    = 2010-08-27T17:10:06
+    AprioriXYZSource        = Basemap
+    AprioriXYZSourceFile    = /work1/tsucharski/basemap.cub
+    AprioriRadiusSource     = DEM
+    AprioriRadiusSourceFile = $base/dems/molaMarsPlanetaryRadius0003.cub
+    AprioriX                = -424.024048 <meters>
+    AprioriY                = 734.4311949 <meters>
+    AprioriZ                = 529.919264 <meters>
+    AprioriCovarianceMatrix = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
+    X                       = -423.024048 <meters>
+    Y                       = 754.4311949 <meters>
+    Z                       = 523.919264 <meters>
+    ApostCovarianceMatrix   = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
+
+    Group = ControlMeasure
+      SerialNumber = id0
+      MeasureType  = Candidate 
+      ChooserName  = cnetref
+      DateTime     = 2010-08-27T17:10:06
+      EditLock     = True
+      Sample       = 0.0
+      Line         = 0.0
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = id1
+      MeasureType    = Candidate
+      ChooserName    = autoseed
+      DateTime       = 2010-08-27T17:10:06
+      Ignore         = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Tie
+    PointId     = T0004
+    ChooserName = autoseed
+    DateTime    = 2010-08-27T17:10:06
+    EditLock                = True
+    AprioriRadiusSource     = DEM
+    AprioriRadiusSourceFile = $base/dems/molaMarsPlanetaryRadius0003.cub
+    AprioriX                = -424.024048 <meters>
+    AprioriY                = 734.4311949 <meters>
+    AprioriZ                = 529.919264 <meters>
+    AprioriCovarianceMatrix = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
+    X                       = -424.024048 <meters>
+    Y                       = 734.4311949 <meters>
+    Z                       = 529.919264 <meters>
+    ApostCovarianceMatrix   = (100.0, 0.0, 0.0, 2500.0, 0.0, 400.0)
+
+    Group = ControlMeasure
+      SerialNumber = id0
+      MeasureType  = Candidate 
+      ChooserName  = cnetref
+      DateTime     = 2010-08-27T17:10:06
+      EditLock     = True
+      Sample       = 4.0
+      Line         = 3.0
+      SampleResidual = 1.0 <pixels>
+      LineResidual   = -4.0 <pixels>
+      AprioriSample  = 10.0
+      AprioriLine    = 20.0
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = id1
+      MeasureType    = Candidate
+      ChooserName    = autoseed
+      DateTime       = 2010-08-27T17:10:06
+      Ignore         = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType               = Ground
+    PointId                 = T0000
+    ChooserName             = autoseed
+    DateTime                = 2010-08-27T17:10:06
+    EditLock                = True
+
+    Group = ControlMeasure
+      SerialNumber = id0
+      MeasureType  = Candidate 
+      ChooserName  = cnetref
+      DateTime     = 2010-08-27T17:10:06
+      EditLock     = True
+      Sample       = 2.0
+      Line         = 3.0
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber   = id1
+      MeasureType    = Candidate
+      ChooserName    = autoseed
+      DateTime       = 2010-08-27T17:10:06
+      Ignore         = True
+      Sample         = 1.0
+      Line           = 2.0
+      Diameter       = 15.0
+      AprioriSample  = 2.0
+      AprioriLine    = 5.0
+      SampleSigma    = 0.01 <pixels>
+      LineSigma      = 0.21 <pixels>
+      SampleResidual = -3.0 <pixels>
+      LineResidual   = 4.0 <pixels>
+    End_Group
+  End_Object
+End_Object
+End

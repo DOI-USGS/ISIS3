@@ -6,11 +6,12 @@
 #include <QList>
 #include <QString>
 
-#include "ControlNetVersioner.h"
-#include "ControlNetFile.h"
-#include "ControlNet.h"
-#include "ControlPoint.h"
 #include "ControlMeasure.h"
+#include "ControlNet.h"
+#include "ControlNetDiff.h"
+#include "ControlNetFile.h"
+#include "ControlNetVersioner.h"
+#include "ControlPoint.h"
 #include "IException.h"
 #include "PvlContainer.h"
 #include "PvlGroup.h"
@@ -33,58 +34,85 @@ void Compare(LatestControlNetFile *net1, LatestControlNetFile *net2);
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
-  tolerances = PvlGroup();
-  ignorekeys = PvlGroup();
+  if (ui.GetString("REPORT") == "FIRST") {
+    tolerances = PvlGroup();
+    ignorekeys = PvlGroup();
 
-  differenceReason = "";
-  filesMatch = true;
+    differenceReason = "";
+    filesMatch = true;
 
-  LatestControlNetFile *net1 = ControlNetVersioner::Read(
-      ui.GetFilename("FROM"));
-  LatestControlNetFile *net2 = ControlNetVersioner::Read(
-      ui.GetFilename("FROM2"));
+    LatestControlNetFile *net1 = ControlNetVersioner::Read(
+        ui.GetFilename("FROM"));
+    LatestControlNetFile *net2 = ControlNetVersioner::Read(
+        ui.GetFilename("FROM2"));
 
-  if(ui.WasEntered("DIFF")) {
-    Pvl diffFile(ui.GetFilename("DIFF"));
+    if(ui.WasEntered("DIFF")) {
+      Pvl diffFile(ui.GetFilename("DIFF"));
 
-    if(diffFile.HasGroup("Tolerances")) {
-      tolerances = diffFile.FindGroup("Tolerances");
+      if(diffFile.HasGroup("Tolerances")) {
+        tolerances = diffFile.FindGroup("Tolerances");
+      }
+
+      if(diffFile.HasGroup("IgnoreKeys")) {
+        ignorekeys = diffFile.FindGroup("IgnoreKeys");
+      }
     }
 
-    if(diffFile.HasGroup("IgnoreKeys")) {
-      ignorekeys = diffFile.FindGroup("IgnoreKeys");
+    // Don't want to consider the DateTime of a Point or Measure was set by
+    // default.
+    if(!ignorekeys.HasKeyword("DateTime")) {
+      ignorekeys += PvlKeyword("DateTime", "true");
     }
-  }
 
-  // Don't want to consider the DateTime of a Point or Measure was set by
-  // default.
-  if(!ignorekeys.HasKeyword("DateTime")) {
-    ignorekeys += PvlKeyword("DateTime", "true");
-  }
+    Compare(net1, net2);
 
-  Compare(net1, net2);
+    delete net1;
+    delete net2;
 
-  delete net1;
-  delete net2;
+    PvlGroup differences("Results");
+    if(filesMatch) {
+      differences += PvlKeyword("Compare", "Identical");
+    }
+    else {
+      differences += PvlKeyword("Compare", "Different");
+      differences += PvlKeyword("Reason", differenceReason);
+    }
 
-  PvlGroup differences("Results");
-  if(filesMatch) {
-    differences += PvlKeyword("Compare", "Identical");
+    Application::Log(differences);
+
+    if(ui.WasEntered("TO")) {
+      Pvl out;
+      out.AddGroup(differences);
+      out.Write(ui.GetFilename("TO"));
+    }
+
+    differenceReason = "";
   }
   else {
-    differences += PvlKeyword("Compare", "Different");
-    differences += PvlKeyword("Reason", differenceReason);
+    Filename f1(ui.GetFilename("FROM"));
+    Filename f2(ui.GetFilename("FROM2"));
+
+    ControlNetDiff differencer;
+    if (ui.WasEntered("DIFF")) {
+      Pvl diffFile(ui.GetFilename("DIFF"));
+      differencer.addTolerances(diffFile);
+    }
+
+    Pvl results = differencer.compare(f1, f2);
+    if (ui.WasEntered("TO")) results.Write(ui.GetFilename("TO"));
+
+    PvlGroup log("Results");
+
+    // Get a count of all the differences: just the keywords at the object level
+    // (network data) and the number of objects (different points).  Ignore the
+    // Filename keyword as it's a superficial difference.
+    PvlObject &differences = results.FindObject("Differences");
+    int count = differences.Objects() + differences.Keywords();
+    if (differences.HasKeyword("Filename")) count--;
+
+    log += PvlKeyword("Compare", count > 0 ? "Different" : "Identical");
+    Application::Log(log);
   }
-
-  Application::Log(differences);
-
-  if(ui.WasEntered("TO")) {
-    Pvl out;
-    out.AddGroup(differences);
-    out.Write(ui.GetFilename("TO"));
-  }
-
-  differenceReason = "";
 }
 
 void Compare(LatestControlNetFile *net1, LatestControlNetFile *net2) {

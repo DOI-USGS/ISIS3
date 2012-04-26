@@ -1,0 +1,425 @@
+#include "IsisDebug.h"
+
+#include "ControlNetDiff.h"
+
+#include <QMap>
+#include <QSet>
+#include <QString>
+
+#include "ControlMeasure.h"
+#include "ControlNet.h"
+#include "ControlNetFile.h"
+#include "ControlNetVersioner.h"
+#include "ControlPoint.h"
+#include "Filename.h"
+#include "Pvl.h"
+#include "PvlContainer.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
+#include "PvlObject.h"
+
+
+using std::cerr;
+using std::cout;
+using std::endl;
+
+namespace Isis {
+
+  /**
+   * Create a ControlNetDiff without any tolerances.
+   */
+  ControlNetDiff::ControlNetDiff() {
+    init();
+  }
+
+
+  /**
+   * Create a ControlNetDiff with persistent tolerances.
+   *
+   * @param diffFile The PVL of ignore keywords and tolerance values
+   */
+  ControlNetDiff::ControlNetDiff(Pvl &diffFile) {
+    init();
+    addTolerances(diffFile);
+  }
+
+
+  /**
+   * Destroy the ControlNetDiff.  Does not own any passed-in data.
+   */
+  ControlNetDiff::~ControlNetDiff() {
+    delete m_tolerances;
+    m_tolerances = NULL;
+
+    delete m_ignoreKeys;
+    m_ignoreKeys = NULL;
+  }
+
+
+  /**
+   * Add the given ignore keys and tolerances to the persisent collections of
+   * such values.  Does not clear any previously added ignore keys or
+   * tolerances.  The DateTime keyword is always ignored
+   *
+   * @param diffFile The PVL of ignore keywords and tolerance values
+   */
+  void ControlNetDiff::addTolerances(Pvl &diffFile) {
+    if (diffFile.HasGroup("Tolerances")) {
+      PvlGroup tolerances = diffFile.FindGroup("Tolerances");
+      for (int i = 0; i < tolerances.Keywords(); i++)
+        m_tolerances->insert(QString::fromStdString(tolerances[i].Name()),
+            (double) tolerances[i][0]);
+    }
+
+    if (diffFile.HasGroup("IgnoreKeys")) {
+      PvlGroup ignoreKeys = diffFile.FindGroup("IgnoreKeys");
+      for (int i = 0; i < ignoreKeys.Keywords(); i++)
+        m_ignoreKeys->insert(QString::fromStdString(ignoreKeys[i].Name()));
+    }
+  }
+
+
+  /**
+   * Compare two Control Networks given their file names, and return their
+   * differences.
+   *
+   * @param net1Name Name of the first Control Network
+   * @param net2Name Name of the second Control Network
+   * @return Pvl The collection of all differences
+   */
+  Pvl ControlNetDiff::compare(Filename &net1Name, Filename &net2Name) {
+    Pvl results;
+    PvlObject report("Differences");
+
+    LatestControlNetFile *net1 = ControlNetVersioner::Read(net1Name.Expanded());
+    LatestControlNetFile *net2 = ControlNetVersioner::Read(net2Name.Expanded());
+    diff("Filename", net1Name.Name(), net2Name.Name(), report);
+
+    Pvl net1Pvl(net1->ToPvl());
+    Pvl net2Pvl(net2->ToPvl());
+
+    PvlObject &net1Obj = net1Pvl.FindObject("ControlNetwork");
+    PvlObject &net2Obj = net2Pvl.FindObject("ControlNetwork");
+
+    BigInt net1NumPts = net1Obj.Objects();
+    BigInt net2NumPts = net2Obj.Objects();
+    diff("Points", net1NumPts, net2NumPts, report);
+
+    diff("NetworkId", net1Obj, net2Obj, report);
+    diff("TargetName", net1Obj, net2Obj, report);
+
+    QMap< QString, QMap<int, PvlObject> > pointMap;
+    for (int p = 0; p < net1NumPts; p++) {
+      PvlObject &point = net1Obj.Object(p);
+      pointMap[QString::fromStdString(point.FindKeyword("PointId")[0])].insert(
+          0, point);
+    }
+
+    for (int p = 0; p < net2NumPts; p++) {
+      PvlObject &point = net2Obj.Object(p);
+      pointMap[QString::fromStdString(point.FindKeyword("PointId")[0])].insert(
+          1, point);
+    }
+
+    QList<QString> pointNames = pointMap.keys();
+    for (int i = 0; i < pointNames.size(); i++) {
+      QMap<int, PvlObject> idMap = pointMap[pointNames[i]];
+      if (idMap.size() == 2) {
+        compare(idMap[0], idMap[1], report);
+      }
+      else if (idMap.contains(0)) {
+        addUniquePoint("PointId", idMap[0].FindKeyword("PointId")[0], "N/A", report);
+      }
+      else if (idMap.contains(1)) {
+        addUniquePoint("PointId", "N/A", idMap[1].FindKeyword("PointId")[0], report);
+      }
+    }
+
+    delete net1;
+    delete net2;
+
+    results.AddObject(report);
+    return results;
+  }
+
+
+  /**
+   * Compare two Control Points stored as PvlObjects, and add any differences to
+   * the report object.  A new Point object will only be added to the report if
+   * there were top-level point data differences or measure differences.
+   *
+   * @param point1Pvl Container for the first Control Point
+   * @param point2Pvl Container for the second Control Point
+   * @param report Container for reporting all differences between these points
+   */
+  void ControlNetDiff::compare(PvlObject &point1Pvl, PvlObject &point2Pvl, PvlObject &report) {
+    PvlObject pointReport("Point");
+
+    iString id1 = point1Pvl.FindKeyword("PointId")[0];
+    iString id2 = point2Pvl.FindKeyword("PointId")[0];
+    pointReport.AddKeyword(makeKeyword("PointId", id1, id2));
+
+    int p1Measures = point1Pvl.Groups();
+    int p2Measures = point2Pvl.Groups();
+    diff("Measures", p1Measures, p2Measures, pointReport);
+
+    compareGroups(point1Pvl, point2Pvl, pointReport);
+
+    QMap< QString, QMap<int, PvlGroup> > measureMap;
+    for (int m = 0; m < p1Measures; m++) {
+      PvlGroup &measure = point1Pvl.Group(m);
+      measureMap[QString::fromStdString(measure.FindKeyword("SerialNumber")[0])].insert(
+          0, measure);
+    }
+
+    for (int m = 0; m < p2Measures; m++) {
+      PvlGroup &measure = point2Pvl.Group(m);
+      measureMap[QString::fromStdString(measure.FindKeyword("SerialNumber")[0])].insert(
+          1, measure);
+    }
+
+    QList<QString> measureNames = measureMap.keys();
+    for (int i = 0; i < measureNames.size(); i++) {
+      QMap<int, PvlGroup> idMap = measureMap[measureNames[i]];
+      if (idMap.size() == 2) {
+        compareGroups(idMap[0], idMap[1], pointReport);
+      }
+      else if (idMap.contains(0)) {
+        addUniqueMeasure("SerialNumber", idMap[0].FindKeyword("SerialNumber")[0], "N/A", pointReport);
+      }
+      else if (idMap.contains(1)) {
+        addUniqueMeasure("SerialNumber", "N/A", idMap[1].FindKeyword("SerialNumber")[0], pointReport);
+      }
+    }
+
+    if (pointReport.Keywords() > 2 || pointReport.Groups() > 0)
+      report.AddObject(pointReport);
+  }
+
+
+  /**
+   * Compare two collections, or groupings, of PvlKeywords.  If the container
+   * has the keyword "SerialNumber", we assume it is a Control Measure, and thus
+   * create a PvlGroup to add to our report containing all the differences.
+   * Otherwise we add differences directly to the given report object.  The
+   * measure PvlGroup will only be added if there are data differences.
+   *
+   * @param g1 Container for the first keyword collection
+   * @param g2 Container for the second keyword collection
+   * @param report Container for reporting all differences between these
+   *               groupings
+   */
+  void ControlNetDiff::compareGroups(PvlContainer &g1, PvlContainer &g2, PvlObject &report) {
+    PvlGroup measureReport("Measure");
+    if (g1.HasKeyword("SerialNumber")) {
+      iString sn1 = g1.FindKeyword("SerialNumber")[0];
+      iString sn2 = g1.FindKeyword("SerialNumber")[0];
+      measureReport.AddKeyword(makeKeyword("SerialNumber", sn1, sn2));
+    }
+    PvlContainer &groupReport = g1.HasKeyword("SerialNumber") ?
+        (PvlContainer &) measureReport : (PvlContainer &) report;
+
+    QMap< QString, QMap<int, PvlKeyword> > keywordMap;
+    for (int k = 0; k < g1.Keywords(); k++)
+      keywordMap[QString::fromStdString(g1[k].Name())].insert(0, g1[k]);
+    for (int k = 0; k < g2.Keywords(); k++)
+      keywordMap[QString::fromStdString(g2[k].Name())].insert(1, g2[k]);
+
+    QList<QString> keywordNames = keywordMap.keys();
+    for (int i = 0; i < keywordNames.size(); i++) {
+      QMap<int, PvlKeyword> idMap = keywordMap[keywordNames[i]];
+      if (idMap.size() == 2) {
+        compare(idMap[0], idMap[1], groupReport);
+      }
+      else if (idMap.contains(0)) {
+        iString name = idMap[0].Name();
+        if (!m_ignoreKeys->contains(name))
+          diff(name, idMap[0][0], "N/A", groupReport);
+      }
+      else if (idMap.contains(1)) {
+        iString name = idMap[1].Name();
+        if (!m_ignoreKeys->contains(name))
+          diff(name, "N/A", idMap[1][0], groupReport);
+      }
+    }
+
+    if (measureReport.Keywords() > 1) report.AddGroup(measureReport);
+  }
+
+
+  /**
+   * Compare two keywords and report the differences to the given report
+   * container.  If a tolerance value exists for the keyword name, the
+   * difference will only be reported if the numerical difference magnitude
+   * between the values is greater than the tolerance.  Otherwise, the keywords
+   * must have equal values.  At present, only the first value of the keywords
+   * is compared.  Keywords with multiple values are not considered, nor are
+   * their units.
+   *
+   * @param k1 The first keyword
+   * @param k2 The second keyword
+   * @param report Container for reporting all differences between these
+   *               keywords
+   */
+  void ControlNetDiff::compare(PvlKeyword &k1, PvlKeyword &k2, PvlContainer &report) {
+    iString name = k1.Name();
+    if (m_tolerances->contains(name))
+      diff(name, k1[0], k2[0], (*m_tolerances)[name], report);
+    else
+      diff(name, k1[0], k2[0], report);
+  }
+
+
+  /**
+   * Add a new difference keyword to the given report if the PvlObjects have
+   * different values for the keyword with the given name.
+   *
+   * @param name The name of the keyword to be compared
+   * @param o1 The first object
+   * @param o2 The second object
+   * @param report Container for reporting differences between these objects for
+   *               the keyword with the given name
+   */
+  void ControlNetDiff::diff(iString name, PvlObject &o1, PvlObject &o2, PvlContainer &report) {
+    iString v1 = o1[name][0];
+    iString v2 = o2[name][0];
+    diff(name, v1, v2, report);
+  }
+
+
+  /**
+   * Add a new difference keyword to the given report if the two string are not
+   * equal.  The two value strings represent values of keywords to be directly
+   * compared.  The first name string is the label of the keyword.
+   *
+   * @param name The label of the keyword whose values are being compared
+   * @param v1 The first keyword's value
+   * @param v2 The second keyword's value
+   * @param report Container for reporting differences between these values for
+   *               the keyword with the given name
+   */
+  void ControlNetDiff::diff(iString name, iString v1, iString v2, PvlContainer &report) {
+    if (!m_ignoreKeys->contains(name)) {
+      if (v1 != v2) report.AddKeyword(makeKeyword(name, v1, v2));
+    }
+  }
+
+
+  /**
+   * Create a new keyword with the given label name and the given values.  If
+   * the two values are equal, only add one of them to the keyword.
+   *
+   * @param name The label of the keyword whose values are being compared
+   * @param v1 The first keyword's value
+   * @param v2 The second keyword's value
+   * @return PvlKeyword Container for the two values
+   */
+  PvlKeyword ControlNetDiff::makeKeyword(iString name, iString v1, iString v2) {
+    PvlKeyword keyword(name);
+    keyword.AddValue(v1);
+    if (v1 != v2) keyword.AddValue(v2);
+    return keyword;
+  }
+
+
+  /**
+   * Add a new difference keyword to the given report if the two numerical
+   * values are not equal within the given tolerance.  The two values represent
+   * values of keywords to be directly compared.  The first name string is the
+   * label of the keyword.
+   *
+   * @param name The label of the keyword whose values are being compared
+   * @param v1 The first keyword's value
+   * @param v2 The second keyword's value
+   * @param tol The tolerance to compare against the values
+   * @param report Container for reporting differences between these values for
+   *               the keyword with the given name
+   */
+  void ControlNetDiff::diff(iString name, double v1, double v2, double tol, PvlContainer &report) {
+    if (!m_ignoreKeys->contains(name)) {
+      if (fabs(v1 - v2) > tol) report.AddKeyword(makeKeyword(name, v1, v2, tol));
+    }
+  }
+
+
+  /**
+   * Create a new keyword with the given label name and the given values.  If
+   * the two values are equal within the given tolerance, only add one of them
+   * to the keyword.
+   *
+   * @param name The label of the keyword whose values are being compared
+   * @param v1 The first keyword's value
+   * @param v2 The second keyword's value
+   * @param tol The tolerance to compare against the values
+   * @return PvlKeyword Container for the two values
+   */
+  PvlKeyword ControlNetDiff::makeKeyword(iString name, double v1, double v2, double tol) {
+    PvlKeyword keyword(name);
+    keyword.AddValue(v1);
+    if (fabs(v1 - v2) > tol) {
+      keyword.AddValue(v2);
+      keyword.AddValue(tol);
+    }
+    return keyword;
+  }
+
+
+  /**
+   * Add a new keyword for the given point to the parent object.  It is assumed
+   * that one of the two values provided represents a missing PointId.
+   *
+   * @param name The label of the point uniquely identifying it
+   * @param v1 The first points's value for the unique label
+   * @param v2 The second points's value for the unique label
+   * @param parent Container for the point object
+   */
+  void ControlNetDiff::addUniquePoint(iString label, iString v1, iString v2, PvlObject &parent) {
+    PvlObject point("Point");
+
+    PvlKeyword keyword(label);
+    keyword.AddValue(v1);
+    keyword.AddValue(v2);
+    point.AddKeyword(keyword);
+
+    parent.AddObject(point);
+  }
+
+
+  /**
+   * Add a new keyword for the given measure to the parent object.  It is
+   * assumed that one of the two values provided represents a missing
+   * SerialNumber.
+   *
+   * @param name The label of the measure uniquely identifying it
+   * @param v1 The first measure's value for the unique label
+   * @param v2 The second measure's value for the unique label
+   * @param parent Container for the measure group
+   */
+  void ControlNetDiff::addUniqueMeasure(iString label, iString v1, iString v2, PvlObject &parent) {
+    PvlGroup measure("Measure");
+
+    PvlKeyword keyword(label);
+    keyword.AddValue(v1);
+    keyword.AddValue(v2);
+    measure.AddKeyword(keyword);
+
+    parent.AddGroup(measure);
+  }
+
+
+  /**
+   * Initialize the persistent structures used to maintain the state of this
+   * instance: its ignore keys and tolerances.  Automatically ignore the
+   * "DateTime" keyword.
+   */
+  void ControlNetDiff::init() {
+    m_tolerances = NULL;
+    m_ignoreKeys = NULL;
+
+    m_tolerances = new QMap<QString, double>;
+    m_ignoreKeys = new QSet<QString>;
+
+    m_ignoreKeys->insert("DateTime");
+  }
+}
+

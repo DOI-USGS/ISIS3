@@ -25,6 +25,10 @@
     <change name="Jeannie Backer" date="2011-07-27">
       Added documentation.
     </change>
+    <change name="Travis Addair" date="2012-04-26">
+      Added REPORT radio button allowing users to select the FULL option and get
+      a complete PVL report of all differences between two networks.
+    </change>
   </history>
 
   <category>
@@ -87,8 +91,47 @@
           This will output the differences to a text file.
         </description>
         <filter>
-          *.txt
+          *.txt *.pvl
         </filter>
+      </parameter>
+
+      <parameter name="REPORT">
+        <type>string</type>
+        <default><item>FIRST</item></default>
+        <brief>How verbose the output report should be</brief>
+        <description>
+          <p>
+            By default, this application will report the first difference in
+            encounters between the two network (FIRST).  This is primarily used
+            for application testing by developers.  Users can make use of this
+            application to report a full listing of differences between two
+            networks (FULL).
+          </p>
+          <p>
+            Note that, at present, this option will only consider the first
+            value of a keyword.  It does not compare lists of values or units.
+          </p>
+        </description>
+        <list>
+          <option value="FIRST">
+            <brief>Only report the first difference</brief>
+            <description>
+              Used by automatic application tests to report differences between
+              two networks, only processing to the first difference for
+              performance reasons.
+            </description>
+          </option>
+          <option value="FULL">
+            <brief>Report the full listing of all differences</brief>
+            <description>
+              Users can use this option to get a full list of all the
+              differences between two networks, organized in a PVL structure.
+              Each keyword will have up to three values: the first being the
+              value from the first network, the second the value from the second
+              network, and the third the tolerance that failed (if provided).
+            </description>
+          </option>
+        </list>
       </parameter>
     </group>
   </groups>

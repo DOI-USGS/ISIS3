@@ -1,0 +1,18 @@
+Group = IgnoreKeys
+  AprioriSample = true
+  AprioriLine = true
+  SampleSigma = true
+  LineSigma = true
+  NetworkId = true
+  AprioriXYZSource = true
+  EditLock = true
+  AdjustedZ = true
+EndGroup
+
+Group = Tolerances
+  Sample = 1
+  Line = 1
+  SampleResidual = 5
+  AdjustedX = 3
+  AdjustedY = 3
+EndGroup

@@ -1,0 +1,131 @@
+Testing no differences...
+
+Object = Differences
+End_Object
+End
+
+Object = Differences
+End_Object
+End
+
+
+Testing differences...
+
+Object = Differences
+  Filename   = (cnet.pvl, cnet2.pvl)
+  Points     = (4, 3)
+  NetworkId  = (Test, Test2)
+  TargetName = (Mars, Moon)
+
+  Object = Point
+    PointId  = T0000
+    EditLock = (True, N/A)
+
+    Group = Measure
+      SerialNumber = id0
+      Line         = (3.0, 2.0)
+      Sample       = (2.0, 1.0)
+    End_Group
+
+    Group = Measure
+      SerialNumber   = id1
+      SampleResidual = (-3.0, -1.0)
+    End_Group
+  End_Object
+
+  Object = Point
+    PointId = (T0001, N/A)
+  End_Object
+
+  Object = Point
+    PointId = (N/A, T0002)
+  End_Object
+
+  Object = Point
+    PointId = (T0003, N/A)
+  End_Object
+
+  Object = Point
+    PointId              = T0004
+    Measures             = (2, 3)
+    AdjustedX            = (-424.024048, -423.024048)
+    AdjustedY            = (734.4311949, 754.4311949)
+    AdjustedZ            = (529.919264, 523.919264)
+    AprioriXYZSource     = (N/A, Basemap)
+    AprioriXYZSourceFile = (N/A, /work1/tsucharski/basemap.cub)
+    EditLock             = (True, N/A)
+
+    Group = Measure
+      SerialNumber   = id0
+      AprioriLine    = (20.0, N/A)
+      AprioriSample  = (10.0, N/A)
+      Line           = (3.0, 2.0)
+      LineResidual   = (-4.0, 4.0)
+      LineSigma      = (N/A, 0.21)
+      Sample         = (4.0, 1.0)
+      SampleResidual = (1.0, -10.0)
+      SampleSigma    = (N/A, 0.01)
+    End_Group
+
+    Group = Measure
+      SerialNumber = (id1, N/A)
+    End_Group
+
+    Group = Measure
+      SerialNumber = (N/A, id2)
+    End_Group
+
+    Group = Measure
+      SerialNumber = (N/A, id3)
+    End_Group
+  End_Object
+End_Object
+End
+
+
+Testing differences with tolerances...
+
+Object = Differences
+  Filename   = (cnet.pvl, cnet2.pvl)
+  Points     = (4, 3)
+  TargetName = (Mars, Moon)
+
+  Object = Point
+    PointId = (T0001, N/A)
+  End_Object
+
+  Object = Point
+    PointId = (N/A, T0002)
+  End_Object
+
+  Object = Point
+    PointId = (T0003, N/A)
+  End_Object
+
+  Object = Point
+    PointId              = T0004
+    Measures             = (2, 3)
+    AdjustedY            = (734.4311949, 754.4311949, 3.0)
+    AprioriXYZSourceFile = (N/A, /work1/tsucharski/basemap.cub)
+
+    Group = Measure
+      SerialNumber   = id0
+      LineResidual   = (-4.0, 4.0)
+      Sample         = (4.0, 1.0, 1.0)
+      SampleResidual = (1.0, -10.0, 5.0)
+    End_Group
+
+    Group = Measure
+      SerialNumber = (id1, N/A)
+    End_Group
+
+    Group = Measure
+      SerialNumber = (N/A, id2)
+    End_Group
+
+    Group = Measure
+      SerialNumber = (N/A, id3)
+    End_Group
+  End_Object
+End_Object
+End
