@@ -902,9 +902,6 @@ namespace Isis {
     if (cvp  == NULL)
       return;
     
-    if (cvp->cursorInside())
-      QPoint p = cvp->cursorPosition();
-    
     std::string file = cvp->cube()->getFilename();
     std::string sn;
     try {
