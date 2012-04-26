@@ -25,6 +25,8 @@
 #include "PointPerspective.h"
 #include "IException.h"
 #include "Constants.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
 
 using namespace std;
 namespace Isis {
@@ -370,6 +372,15 @@ namespace Isis {
   }
 } // end namespace isis
 
+/**
+ * This is the function that is called in order to instantiate a 
+ * PointPerspectve object. 
+ *
+ * @param lab The Pvl from the cube labels 
+ * @param allowDefaults Indicates whether defaults are allowed. 
+ *
+ * @return Isis::Projection* PointPerspective
+ */
 extern "C" Isis::Projection *PointPerspectivePlugin(Isis::Pvl &lab,
     bool allowDefaults) {
   return new Isis::PointPerspective(lab, allowDefaults);

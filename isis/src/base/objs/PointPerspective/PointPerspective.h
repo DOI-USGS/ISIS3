@@ -26,6 +26,8 @@
 #include "Constants.h"
 
 namespace Isis {
+  class Pvl;
+  class PvlGroup;
   /**
    * @brief PointPerspective Map Projection
    *
@@ -43,10 +45,13 @@ namespace Isis {
    * @author 2008-06-13 Tracie Sucharski
    *
    * @internal
+   *   @history 2012-04-26 Jeannie Backer - Added forward declarations for Pvl
+   *                           and PvlGroup.  Added includes to these classes in
+   *                           the implementation file.
    */
   class PointPerspective : public Isis::Projection {
     public:
-      PointPerspective(Isis::Pvl &label, bool allowDefaults = false);
+      PointPerspective(Pvl &label, bool allowDefaults = false);
       ~PointPerspective();
       bool SetGround(const double lat, const double lon);
       bool SetCoordinate(const double x, const double y);
