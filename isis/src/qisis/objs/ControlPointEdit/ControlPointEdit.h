@@ -108,6 +108,9 @@ namespace Isis {
     *                          cleaned up.
     *   @history 2012-04-17  Tracie Sucharski - If geom is turned on update the
     *                          right measure in ::setLeftMeasure.
+    *   @history 2012-05-01  Tracie Sucharski - Fix intereface between No Geom, geom
+    *                          and rotate.  Make sure resets are done properly when
+    *                          switching beween the options.
     */
   class ControlPointEdit : public QWidget {
       Q_OBJECT

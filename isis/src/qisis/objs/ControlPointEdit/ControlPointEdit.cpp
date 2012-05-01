@@ -381,7 +381,7 @@ namespace Isis {
     p_leftChip = new Chip(VIEWSIZE, VIEWSIZE);
     p_rightChip = new Chip(VIEWSIZE, VIEWSIZE);
 
-    p_nogeom = new QRadioButton("No geom");
+    p_nogeom = new QRadioButton("No geom/rotate");
     p_nogeom->setChecked(true);
     p_geom   = new QRadioButton("Geom");
     QRadioButton *rotate = new QRadioButton("Rotate");
@@ -1112,9 +1112,34 @@ namespace Isis {
     }
   }
 
-
-  //!  Slot to enable the rotate dial
+  /**
+   * Slot to enable the rotate dial
+   * @internal 
+   *   @history 2012-05-01 Tracie Sucharski - Reset zoom buttons and reload chip
+  */
   void ControlPointEdit::setRotate() {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    //  Text needs to be reset because it was changed to 
+    //  indicate why it's greyed out
+    QString text = "Zoom in 2X";
+    p_rightZoomIn->setEnabled(true);
+    p_rightZoomIn->setWhatsThis(text);
+    p_rightZoomIn->setToolTip("Zoom In");
+    text = "Zoom out 2X";
+    p_rightZoomOut->setEnabled(true);
+    p_rightZoomOut->setWhatsThis(text);
+    p_rightZoomOut->setToolTip("Zoom Out");
+    text = "Zoom 1:1";
+    p_rightZoom1->setEnabled(true);
+    p_rightZoom1->setWhatsThis(text);
+    p_rightZoom1->setToolTip("Zoom 1:1");
+
+    p_geomIt = false;
+    p_rightView->nogeomChip();
+
+    QApplication::restoreOverrideCursor();
+
     p_dial->setEnabled(true);
     p_dialNumber->setEnabled(true);
     p_dial->setNotchesVisible(true);
@@ -1175,10 +1200,12 @@ namespace Isis {
   }
 
 
-  //!  Slot to turn off geom
+  /**
+   * Slot to turn off geom
+   * @internal 
+   *   @history 2012-05-01 Tracie Sucharski - Reset zoom buttons and rotate dial, then reload chip
+  */
   void ControlPointEdit::setNoGeom() {
-
-    if ( p_geomIt == false ) return;
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
