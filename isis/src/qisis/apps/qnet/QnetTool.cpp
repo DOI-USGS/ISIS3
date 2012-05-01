@@ -66,6 +66,7 @@ namespace Isis {
     p_groundCube = NULL;
     p_groundGmap = NULL;
     p_groundOpen = false;
+    p_groundSN = "";
     p_demCube = NULL;
     p_demOpen = false;
     p_createPoint = NULL;
@@ -694,6 +695,13 @@ namespace Isis {
    *   @history 2011-09-22 Tracie Sucharski - When checking ignore status
    *                          on right measure, check both original and edit
    *                          measure.
+   *   @history 2012-04-09 Tracie Sucharski - When checking if left measure
+   *                          editLock has changed, use measure->IsEditLocked()
+   *                          instead of this classes IsMeasureLocked() because
+   *                          it checks the p_editPoint measure instead of
+   *                          the measure loaded into the point editor.
+   *   @history 2012-04-26 Tracie Sucharski - cleaned up, moved reference checking
+   *                          and updating ground surface point to new methods.
    */
   void QnetTool::measureSaved() {
     // Read original measures from the network for comparison with measures
@@ -765,16 +773,70 @@ namespace Isis {
           break;
       }
     }
+
+    //  Only check reference if a ground source is not loaded on the left.
+    if (p_groundOpen && p_leftMeasure->GetCubeSerialNumber() != p_groundSN) checkReference();
+
+    // If this is a fixed or constrained point, and the right measure is the ground source,
+    // update the lat,lon,radius.  Only the right measure can be moved, so only need to update
+    // position if the ground measure is loaded on the right.
+    //  TODO::  Only update if the measure moved
+    if (p_editPoint->GetType() != ControlPoint::Free && (p_groundOpen &&
+        p_rightMeasure->GetCubeSerialNumber() == p_groundSN)) updateGroundPosition();
+
+    // Save the right measure and left (if ignore or edit lock flag changed) to
+    // the editPoint The Ignore flag is the only thing that can change on the left
+    // measure.
+    p_rightMeasure->SetChooserName(Application::UserName());
+    *origRightMeasure = *p_rightMeasure;
+
+    //  Only save the left measure if the ignore flag or editLock has changed
+    if (p_leftMeasure->IsIgnored() != origLeftMeasure->IsIgnored() ||
+        p_leftMeasure->IsEditLocked() != origLeftMeasure->IsEditLocked()) {
+      p_leftMeasure->SetChooserName(Application::UserName());
+      *origLeftMeasure = *p_leftMeasure;
+    }
+
+    // If left measure == right measure, update left
+    if (p_leftMeasure->GetCubeSerialNumber() ==
+        p_rightMeasure->GetCubeSerialNumber()) {
+      *p_leftMeasure = *p_rightMeasure;
+      //  Update left measure of pointEditor
+      p_pointEditor->setLeftMeasure (p_leftMeasure, p_leftCube,
+                                     p_editPoint->GetId());
+    }
+
+    //  Change Save Point button text to red
+    colorizeSaveButton();
+
+    editPointChanged(p_editPoint->GetId());
+
+    // Update measure info
+    updateLeftMeasureInfo();
+    updateRightMeasureInfo();
+    loadMeasureTable();
+  }
+
+
+
+  /*
+  *   Change which measure is the reference.
+  *  
+  * @author 2012-04-26 Tracie Sucharski - moved funcitonality from measureSaved
+  *
+  * @internal
+  *  
+  */
+  void QnetTool::checkReference() {
+
     // Check if ControlPoint has reference measure, if reference Measure is
     // not the same measure that is on the left chip viewport, set left
     // measure as reference.
     if (p_editPoint->IsReferenceExplicit()) {
       ControlMeasure *refMeasure = p_editPoint->GetRefMeasure();
       // Reference Measure not on left.  Ask user if they want to change
-      // the reference measure, but only if it is not the ground source on the left
-      if (refMeasure->GetCubeSerialNumber() !=
-        p_leftMeasure->GetCubeSerialNumber() &&
-        p_leftMeasure->GetCubeSerialNumber() != p_groundSN) {
+      // the reference measure.
+      if (refMeasure->GetCubeSerialNumber() != p_leftMeasure->GetCubeSerialNumber()) {
         QString message = "This point already contains a reference measure.  ";
         message += "Would you like to replace it with the measure on the left?";
         int  response = QMessageBox::question(p_qnetTool,
@@ -833,95 +895,80 @@ namespace Isis {
         }
       }
     }
+    //  There has not been a reference set, set the measure on the left as the reference.
     else {
       p_editPoint->SetRefMeasure(p_leftMeasure->GetCubeSerialNumber());
     }
 
-    // If this is a fixed or constrained point, and either measure (left or
-    // right) is the ground source, update the lat,lon,radius.
-    if (p_editPoint->GetType() != ControlPoint::Free &&
-        (p_leftMeasure->GetCubeSerialNumber() == p_groundSN ||
-         p_rightMeasure->GetCubeSerialNumber() == p_groundSN)) {
+  }
 
-      //  Point is editLocked.  Print warning if the point already exists in the
-      //  network.  If it is a new point with the editLock keyword set, do not
-      //  print warning.
-      if (p_editPoint->IsEditLocked() && g_controlNetwork->ContainsPoint(
-                                          p_editPoint->GetId())) {
-        QString message = "This point is locked for editing.  Do want to set ";
-        message += "EditLock = False?";
-        switch (QMessageBox::question(p_qnetTool, "Qnet Tool Save Measure",
-                                      message, "&Yes", "&No", 0, 0)) {
-          // Yes:  set EditLock=false for the point and save point
-          case 0:
-            p_editPoint->SetEditLock(false);
-            p_lockPoint->setChecked(false);
-          // No:  keep EditLock=true and return
-          case 1:
-            loadPoint();
-            return;
 
-        }
-      }
-      //  TODO:  If groundSource file opened does not match the SurfacePoint Source
-      //  file, print warning.
 
-      // Is ground on right or left?  Use ground measure to update apriori
-      //  surface point.
-      ControlMeasure *groundMeasure = NULL;
-      if (p_leftMeasure->GetCubeSerialNumber() == p_groundSN) {
-        groundMeasure = p_leftMeasure;
-      }
-      else {
-        groundMeasure = p_rightMeasure;
-      }
-      if (!p_groundGmap->SetImage(groundMeasure->GetSample(),
-                                  groundMeasure->GetLine())) {
-        // TODO :  should never happen, either add error check or
-         //      get rid of
-      }
+  /*
+  * Update the position of ground point
+  *  
+  * @author 2012-04-26 Tracie Sucharski - moved functionality from measureSaved
+  *
+  * @internal
+  *  
+  */
+  void QnetTool::updateGroundPosition() {
 
-      double lat = p_groundGmap->UniversalLatitude();
-      double lon = p_groundGmap->UniversalLongitude();
+    //  Point is editLocked.  Print warning if the point already exists in the
+    //  network.  If it is a new point with the editLock keyword set, do not
+    //  print warning.
+    if (p_editPoint->IsEditLocked() && g_controlNetwork->ContainsPoint(
+                                        p_editPoint->GetId())) {
+      QString message = "This point is locked for editing.  Do want to set ";
+      message += "EditLock = False?";
+      switch (QMessageBox::question(p_qnetTool, "Qnet Tool Save Measure",
+                                    message, "&Yes", "&No", 0, 0)) {
+        // Yes:  set EditLock=false for the point and save point
+        case 0:
+          p_editPoint->SetEditLock(false);
+          p_lockPoint->setChecked(false);
+        // No:  keep EditLock=true and return
+        case 1:
+          loadPoint();
+          return;
+
+      }
+    }
+    //  TODO:  If groundSource file opened does not match the SurfacePoint Source
+    //  file, print warning.
+
+    //  This method only called if ground measure is on the right.  Use ground measure to update
+    //  apriori surface point.
+    ControlMeasure *groundMeasure = p_rightMeasure;
+    if (!p_groundGmap->SetImage(groundMeasure->GetSample(),
+                                groundMeasure->GetLine())) {
+      // TODO :  should never happen, either add error check or
+       //      get rid of
+    }
+
+    double lat = p_groundGmap->UniversalLatitude();
+    double lon = p_groundGmap->UniversalLongitude();
 //    cout<<"lat = "<<setprecision(15)<<lat<<endl;
 //    cout<<"lon = "<<lon<<endl;
-      double radius;
-      //  Update radius
-      if (p_demOpen) {
-        radius = demRadius(lat,lon);
-        if (radius == Null) {
-          QString msg = "Could not read radius from DEM, will default to "
-            "local radius of reference measure.";
-          QMessageBox::warning(p_qnetTool, "Warning", msg);
-          if (p_editPoint->GetRefMeasure()->Camera()->SetGround(
-              Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
-            radius =
-              p_editPoint->GetRefMeasure()->Camera()->LocalRadius().meters();
-              p_editPoint->SetAprioriRadiusSource(
-                  ControlPoint::RadiusSource::None);
-              //p_editPoint->SetAprioriRadiusSourceFile(p_radiusSourceFile);
-          }
-          else {
-            QString message = "Error trying to get radius at this pt.  "
-                "Lat/Lon does not fall on the reference measure.  "
-                "Cannot save this measure.";
-            QMessageBox::critical(p_qnetTool,"Error",message);
-            return;
-          }
-        }
-        p_editPoint->SetAprioriRadiusSource(p_groundRadiusSource);
-        p_editPoint->SetAprioriRadiusSourceFile(p_radiusSourceFile);
-      }
-      else {
-        //  Get radius from reference image
+    double radius;
+    //  Update radius, order of precedence
+    //  1.  If a dem has been opened, read radius from dem.
+    //  2.  Get radius from reference measure
+    //        If image has shape model, radius will come from shape model
+    // 
+    if (p_demOpen) {
+      radius = demRadius(lat,lon);
+      if (radius == Null) {
+        QString msg = "Could not read radius from DEM, will default to "
+          "local radius of reference measure.";
+        QMessageBox::warning(p_qnetTool, "Warning", msg);
         if (p_editPoint->GetRefMeasure()->Camera()->SetGround(
-              Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
+            Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
           radius =
-              p_editPoint->GetRefMeasure()->Camera()->LocalRadius().meters();
-//        cout.width(15);
-//        cout.precision(4);
-//        cout<<"Camera Radius = "<<fixed<<radius<<endl;
-          //radius = p_groundGmap->Projection()->LocalRadius();
+            p_editPoint->GetRefMeasure()->Camera()->LocalRadius().meters();
+            p_editPoint->SetAprioriRadiusSource(
+                ControlPoint::RadiusSource::None);
+            //p_editPoint->SetAprioriRadiusSourceFile(p_radiusSourceFile);
         }
         else {
           QString message = "Error trying to get radius at this pt.  "
@@ -931,79 +978,69 @@ namespace Isis {
           return;
         }
       }
-      try {
-        //  Read apriori surface point if it exists so that point is
-        //  replaced, but sigmas are retained.  Save sigmas because the
-        //  SurfacePoint class will change them if the coordinates change.
-        vector<Distance> targetRadii = g_controlNetwork->GetTargetRadii();
-        if (p_editPoint->HasAprioriCoordinates()) {
-          SurfacePoint aprioriPt = p_editPoint->GetAprioriSurfacePoint();
-          aprioriPt.SetRadii(Distance(targetRadii[0]),
-                                Distance(targetRadii[1]),
-                                Distance(targetRadii[2]));
-          Distance latSigma = aprioriPt.GetLatSigmaDistance();
-          Distance lonSigma = aprioriPt.GetLonSigmaDistance();
-          Distance radiusSigma = aprioriPt.GetLocalRadiusSigma();
-          aprioriPt.SetSphericalCoordinates(Latitude(lat, Angle::Degrees),
-                                            Longitude(lon, Angle::Degrees),
-                                            Distance(radius, Distance::Meters));
-          aprioriPt.SetSphericalSigmasDistance(latSigma, lonSigma, radiusSigma);
-          p_editPoint->SetAprioriSurfacePoint(aprioriPt);
-        }
-        else {
-          p_editPoint->SetAprioriSurfacePoint(SurfacePoint(
-                                          Latitude(lat, Angle::Degrees),
-                                          Longitude(lon, Angle::Degrees),
-                                          Distance(radius, Distance::Meters)));
-        }
+      p_editPoint->SetAprioriRadiusSource(p_groundRadiusSource);
+      p_editPoint->SetAprioriRadiusSourceFile(p_radiusSourceFile);
+    }
+    else {
+      //  Get radius from reference image
+      if (p_editPoint->GetRefMeasure()->Camera()->SetGround(
+            Latitude(lat, Angle::Degrees), Longitude(lon, Angle::Degrees))) {
+        radius =
+            p_editPoint->GetRefMeasure()->Camera()->LocalRadius().meters();
+//        cout.width(15);
+//        cout.precision(4);
+//        cout<<"Camera Radius = "<<fixed<<radius<<endl;
+        //radius = p_groundGmap->Projection()->LocalRadius();
       }
-      catch (IException &e) {
-        QString message = "Unable to set Apriori Surface Point.\n";
-        message += "Latitude = " + QString::number(lat);
-        message += "  Longitude = " + QString::number(lon);
-        message += "  Radius = " + QString::number(radius) + "\n";
-        message += e.toString().c_str();
+      else {
+        QString message = "Error trying to get radius at this pt.  "
+            "Lat/Lon does not fall on the reference measure.  "
+            "Cannot save this measure.";
         QMessageBox::critical(p_qnetTool,"Error",message);
+        return;
       }
-      p_editPoint->SetAprioriSurfacePointSource(p_groundSurfacePointSource);
-      p_editPoint->SetAprioriSurfacePointSourceFile(p_groundSourceFile);
-
-      updateSurfacePointInfo ();
     }
-
-    // Save the right measure and left (if ignore or edit lock flag changed) to
-    // the editPoint The Ignore flag is the only thing that can change on the left
-    // measure.
-    p_rightMeasure->SetChooserName(Application::UserName());
-    *origRightMeasure = *p_rightMeasure;
-
-    //  Only save the left measure if the ignore flag or editLock has changed
-    if (p_leftMeasure->IsIgnored() != origLeftMeasure->IsIgnored() ||
-        IsMeasureLocked(p_leftMeasure->GetCubeSerialNumber()) !=
-        IsMeasureLocked(origLeftMeasure->GetCubeSerialNumber())) {
-      p_leftMeasure->SetChooserName(Application::UserName());
-      *origLeftMeasure = *p_leftMeasure;
+    try {
+      //  Read apriori surface point if it exists so that point is
+      //  replaced, but sigmas are retained.  Save sigmas because the
+      //  SurfacePoint class will change them if the coordinates change.
+      vector<Distance> targetRadii = g_controlNetwork->GetTargetRadii();
+      if (p_editPoint->HasAprioriCoordinates()) {
+        SurfacePoint aprioriPt = p_editPoint->GetAprioriSurfacePoint();
+        aprioriPt.SetRadii(Distance(targetRadii[0]),
+                              Distance(targetRadii[1]),
+                              Distance(targetRadii[2]));
+        Distance latSigma = aprioriPt.GetLatSigmaDistance();
+        Distance lonSigma = aprioriPt.GetLonSigmaDistance();
+        Distance radiusSigma = aprioriPt.GetLocalRadiusSigma();
+        aprioriPt.SetSphericalCoordinates(Latitude(lat, Angle::Degrees),
+                                          Longitude(lon, Angle::Degrees),
+                                          Distance(radius, Distance::Meters));
+        aprioriPt.SetSphericalSigmasDistance(latSigma, lonSigma, radiusSigma);
+        p_editPoint->SetAprioriSurfacePoint(aprioriPt);
+      }
+      else {
+        p_editPoint->SetAprioriSurfacePoint(SurfacePoint(
+                                        Latitude(lat, Angle::Degrees),
+                                        Longitude(lon, Angle::Degrees),
+                                        Distance(radius, Distance::Meters)));
+      }
     }
-
-    // If left measure == right measure, update left
-    if (p_leftMeasure->GetCubeSerialNumber() ==
-        p_rightMeasure->GetCubeSerialNumber()) {
-      *p_leftMeasure = *p_rightMeasure;
-      //  Update left measure of pointEditor
-      p_pointEditor->setLeftMeasure (p_leftMeasure, p_leftCube,
-                                     p_editPoint->GetId());
+    catch (IException &e) {
+      QString message = "Unable to set Apriori Surface Point.\n";
+      message += "Latitude = " + QString::number(lat);
+      message += "  Longitude = " + QString::number(lon);
+      message += "  Radius = " + QString::number(radius) + "\n";
+      message += e.toString().c_str();
+      QMessageBox::critical(p_qnetTool,"Error",message);
     }
+    p_editPoint->SetAprioriSurfacePointSource(p_groundSurfacePointSource);
+    p_editPoint->SetAprioriSurfacePointSourceFile(p_groundSourceFile);
 
-    //  Change Save Point button text to red
-    colorizeSaveButton();
+    updateSurfacePointInfo ();
 
-    editPointChanged(p_editPoint->GetId());
-
-    // Update measure info
-    updateLeftMeasureInfo();
-    updateRightMeasureInfo();
-    loadMeasureTable();
   }
+
 
 
   /**
@@ -1156,8 +1193,19 @@ namespace Isis {
    * @internal
    * @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure
    *                        parameter has changed.
+   * @history 2012-04-16 Tracie Sucharski - When attempting to un-lock a measure
+   *                        print error if point is locked.
    */
   void QnetTool::setLockLeftMeasure (bool lock) {
+
+    if (p_editPoint->IsEditLocked()) {
+      p_lockLeftMeasure->setChecked(p_leftMeasure->IsEditLocked());
+      QMessageBox::warning(p_qnetTool, "Point Locked","Point is Edit Locked.  You must un-lock point"
+        " before changing a measure.");
+      p_lockLeftMeasure->setChecked(p_leftMeasure->IsEditLocked());
+      return;
+    }
+
     if (p_leftMeasure != NULL) p_leftMeasure->SetEditLock(lock);
 
     //  If the right chip is the same as the left chip , update the right editLock
@@ -1216,8 +1264,19 @@ namespace Isis {
    * @internal
    * @history 2011-06-27 Tracie Sucharski - emit signal indicating a measure
    *                        parameter has changed.
+   * @history 2012-04-16 Tracie Sucharski - When attempting to un-lock a measure
+   *                        print error if point is locked.
    */
   void QnetTool::setLockRightMeasure (bool lock) {
+
+    if (p_editPoint->IsEditLocked()) {
+      p_lockRightMeasure->setChecked(p_rightMeasure->IsEditLocked());
+      QMessageBox::warning(p_qnetTool, "Point Locked","Point is Edit Locked.  You must un-lock point"
+        " before changing a measure.");
+      p_lockRightMeasure->setChecked(p_rightMeasure->IsEditLocked());
+      return;
+    }
+
     if (p_rightMeasure != NULL) p_rightMeasure->SetEditLock(lock);
 
     //  If the left chip is the same as the right chip , update the left editLock box.
@@ -1664,6 +1723,9 @@ namespace Isis {
         //  Find serial number for this file
         string sn =
         g_serialNumberList->SerialNumber(item->text().toStdString());
+
+        //  If ground, do not add measure, it will be added in loadPoint
+        if (sn == p_groundSN) continue;
         m->SetCubeSerialNumber(sn);
         int camIndex =
                  g_serialNumberList->FilenameIndex(item->text().toStdString());

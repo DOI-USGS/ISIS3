@@ -164,6 +164,14 @@ namespace Isis {
    *                          Constrained points on the ground source viewport.
    *   @history 2012-01-11 Tracie Sucharski - Add error check for invalid lat, 
    *                          lon when creating new control point.
+   *   @history 2012-04-09 Tracie Sucharski - When checking if left measure
+   *                          editLock has changed, use measure->IsEditLocked()
+   *                          instead of this classes IsMeasureLocked().
+   *   @history 2012-04-16 Tracie Sucharski - When attempting to un-lock a measure
+   *                          print error if point is locked.
+   *   @history 2012-04-26 Tracie Sucharski - Cleaned up private slot,measureSaved.
+   *                          Abstracted out checking for a new reference measure
+   *                          and updating the surface point for a ground point.
    */
   class QnetTool : public Tool {
     Q_OBJECT
@@ -251,7 +259,9 @@ namespace Isis {
       void updateLeftMeasureInfo ();
       void updateRightMeasureInfo ();
 
-      void measureSaved ();
+      void measureSaved();
+      void checkReference();
+      void updateGroundPosition();
       void savePoint();
       void colorizeSaveButton();
 
