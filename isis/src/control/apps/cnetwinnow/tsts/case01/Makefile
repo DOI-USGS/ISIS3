@@ -10,11 +10,11 @@ commands:
 	onet=$(OUTPUT)/winnowed.net \
         file_prefix = winnowingReport > /dev/null;
 	cat winnowingReportGuilty.csv \
-          | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
+	  | sed 's/\(,\|: \|^\)\([^,:][^,:]*\/\)\([^,\/:]*\.\)\(net\|cub\)/\1\3\4/g' \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  > $(OUTPUT)/winnowingReportGuilty.csv;
 	cat winnowingReportIgnored.csv \
-          | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
+	  | sed 's/\(,\|: \|^\)\([^,:][^,:]*\/\)\([^,\/:]*\.\)\(net\|cub\)/\1\3\4/g' \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  > $(OUTPUT)/winnowingReportIgnored.txt.csv;
 	# The above command uses sed to do the following (in order):

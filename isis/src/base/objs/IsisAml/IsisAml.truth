@@ -1384,7 +1384,7 @@ The value of G0P1 is /home/user/file1.cub
 Default value of G0P1 is /my/dir/file.cub
 The value of G0P1 is /home/user/file2.dat
 
-The value of G0P1 is /home/user/file2.dat
+The value of G0P1 is /home/user/file2.dat.txt
 
 Default value of G1P1 is 0
 The value of G1P1 is 33

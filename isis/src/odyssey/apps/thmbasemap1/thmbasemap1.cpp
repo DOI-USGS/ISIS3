@@ -66,7 +66,7 @@ void IsisMain(){
     }
     else {
       logFileos.open(logFileName.c_str(),ios::out);
-      logFileos << "FileName," << "Duration," << "Summing,"<< "IncidenceAverage," <<
+      logFileos << "Filename," << "Duration," << "Summing,"<< "IncidenceAverage," <<
               "ResolutionAverage,"<< "IncidenceMinimum," << "IncidenceMaximum," <<  "Gaps,"<<endl;
     }
   }
