@@ -17,9 +17,6 @@
 #include "TableColumn.h"
 
 
-using std::cerr;
-
-
 namespace Isis
 {
   namespace CnetViz

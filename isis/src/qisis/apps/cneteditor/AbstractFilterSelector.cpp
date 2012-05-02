@@ -15,7 +15,6 @@
 #include "PointIdFilter.h"
 
 
-using std::cerr;
 using std::nothrow;
 using std::swap;
 

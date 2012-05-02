@@ -237,7 +237,7 @@ namespace Isis {
       int GetNumValidPoints();
       iString GetTarget() const;
       iString GetUserName() const;
-      QList< ControlPoint * > getPoints() const;
+      QList< ControlPoint * > GetPoints();
       QList< QString > GetPointIds() const;
       std::vector<Distance> GetTargetRadii();
 

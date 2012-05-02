@@ -67,6 +67,7 @@ namespace Isis
       void writeSettings();
       bool okToContinue();
       void load(QString filename);
+      void loadCubeList(QString filename);
       void populateMenus();
       int indexOfActionList(QList< QAction * > actionList, QString actionText);
       void populateToolBars();
@@ -81,12 +82,14 @@ namespace Isis
       void about();
       void setDirty();
       void setSaveAsPvl(int);
+      void setSaveFilteredNetwork(bool);
       void openCubeList();
       void openNet();
       void save();
       void saveAs();
-      void closeNetwork();
+      void closeNetwork(bool promptToSave = true);
       void networkLoaded(ControlNet *);
+      void cubeListLoaded();
 
 
     private: // widgets
@@ -122,10 +125,11 @@ namespace Isis
       ConcurrentControlNetReader * cnetReader;
       CnetEditorWidget * editorWidget;
       QString * curFile;
-//       QString * cubeListFile;
+      QString * cubeListFile;
       QFont * labelFont;
       bool dirty;
       bool saveAsPvl;
+      bool saveFilteredNetwork;
 
 
     private: // constants

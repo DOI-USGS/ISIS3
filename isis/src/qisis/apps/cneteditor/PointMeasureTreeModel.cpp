@@ -23,9 +23,6 @@
 #include <QVariant>
 
 
-using std::cerr;
-
-
 namespace Isis
 {
   namespace CnetViz
@@ -118,7 +115,6 @@ namespace Isis
 
     void PointMeasureTreeModel::rebuildItems()
     {
-  //     cerr << "PointMeasureTreeModel::rebuildItems\n";
       if (!isFrozen())
       {
         emit cancelSort();
@@ -131,12 +127,9 @@ namespace Isis
           futureRoot.cancel();
         }
         
-    //     cerr << "PointMeasureTreeModel::rebulidItems... getPoints has size : "
-    //          << getControlNetwork()->getPoints().size() << "\n";
-
         ASSERT(getControlNetwork());
         futureRoot = QtConcurrent::mappedReduced(
-            getControlNetwork()->getPoints(),
+            getControlNetwork()->GetPoints(),
             CreateRootItemFunctor(this, QThread::currentThread()),
             &CreateRootItemFunctor::addToRootItem,
             QtConcurrent::OrderedReduce | QtConcurrent::SequentialReduce);
@@ -147,7 +140,7 @@ namespace Isis
       {
         queueRebuild();
       }
-  //     cerr << "/PointMeasureTreeModel::rebuildItems\n";
     }
   }
 }
+

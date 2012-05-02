@@ -27,6 +27,7 @@
 #include <QVBoxLayout>
 #include <QWhatsThis>
 
+#include "ControlMeasure.h"
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "IException.h"
@@ -45,9 +46,6 @@
 #include "FilterWidget.h"
 #include "PointMeasureTreeModel.h"
 #include "ImagePointTreeModel.h"
-
-
-using std::cerr;
 
 
 namespace Isis
@@ -78,8 +76,6 @@ namespace Isis
     controlNet = cNet;
     connect(CnetDisplayProperties::getInstance(), SIGNAL(compositionFinished()),
             this, SLOT(rebuildModels()));
-//     connect(controlNet, SIGNAL(networkStructureModified()),
-//         this, SLOT(rebuildModels()));
 
     settingsPath = new QString(pathForSettings);
 
@@ -140,6 +136,15 @@ namespace Isis
     mainSplitter = NULL;
 
     // TODO: null all member widgets!
+    
+    delete pointModel;
+    pointModel = NULL;
+
+    delete imageModel;
+    imageModel = NULL;
+
+    delete connectionModel;
+    connectionModel = NULL;
   }
 
 
@@ -185,10 +190,6 @@ namespace Isis
 
     bool ignoreAll = false;
     foreach (AbstractTreeItem * item, itemsToDelete) {
-//       cerr << "CnetEditorWidget::rebuildModels deleting "
-//            << item->getPointer() << " (type is pt? "
-//            << (item->getPointerType() == AbstractTreeItem::Point)
-//            << ")\n";
       try {
         item->deleteSource();
       }
@@ -650,6 +651,101 @@ namespace Isis
   QMap< QString, QList< QAction * > > CnetEditorWidget::getToolBarActions() {
     ASSERT(toolBarActions);
     return *toolBarActions;
+  }
+
+
+  ControlNet * CnetEditorWidget::getFilteredNetwork() const {
+    ControlNet * filteredCnet = new ControlNet(*controlNet);
+
+    QList<AbstractTreeItem *> networkItems = pointModel->getItems(0, -1,
+        AbstractTreeModel::MeasureItems | AbstractTreeModel::PointItems, true);
+
+    // Iterate through our copy of the cnet, deleting anything that doesn't
+    //   exactly match our networkItems.
+    for (int pointIndex = filteredCnet->GetNumPoints() - 1;
+         pointIndex >= 0;
+         pointIndex--) {
+      if (networkItems.isEmpty()) {
+        ControlPoint *cp = filteredCnet->GetPoint(pointIndex);
+        cp->SetEditLock(false);
+
+        for (int measureIndex = 0;
+             measureIndex < cp->GetNumMeasures();
+             measureIndex++) {
+          cp->GetMeasure(measureIndex)->SetEditLock(false);
+        }
+
+        filteredCnet->DeletePoint(cp);
+      }
+      else if (networkItems.last()->getPointerType() ==
+               AbstractTreeItem::Point) {
+        ControlPoint *networkItemsCp =
+            (ControlPoint *)networkItems.last()->getPointer();
+        ControlPoint *cp = filteredCnet->GetPoint(pointIndex);
+        if (cp->GetId() != networkItemsCp->GetId()) {
+          cp->SetEditLock(false);
+
+          for (int measureIndex = 0;
+               measureIndex < cp->GetNumMeasures();
+               measureIndex++) {
+            cp->GetMeasure(measureIndex)->SetEditLock(false);
+          }
+
+          filteredCnet->DeletePoint(cp);
+        }
+        else {
+          networkItems.removeLast();
+        }
+      }
+      else if (networkItems.last()->getPointerType() ==
+               AbstractTreeItem::Measure) {
+        ControlPoint *cp = filteredCnet->GetPoint(pointIndex);
+        ControlMeasure *networkItemsCm =
+            (ControlMeasure *)networkItems.last()->getPointer();
+
+        if (cp->GetId() != networkItemsCm->Parent()->GetId()) {
+          cp->SetEditLock(false);
+
+          for (int measureIndex = 0;
+               measureIndex < cp->GetNumMeasures();
+               measureIndex++) {
+            cp->GetMeasure(measureIndex)->SetEditLock(false);
+          }
+
+          filteredCnet->DeletePoint(cp);
+        }
+        else {
+          // Our CP stays, figure out which CMs stay.
+          for (int measureIndex = cp->GetNumMeasures() - 1;
+               networkItemsCm && measureIndex >= 0;
+               measureIndex--) {
+            ControlMeasure *cm = cp->GetMeasure(measureIndex);
+            if (cm->GetCubeSerialNumber() !=
+                networkItemsCm->GetCubeSerialNumber()) {
+              cm->SetEditLock(false);
+              cp->Delete(cm);
+            }
+            else {
+              networkItems.removeLast();
+              networkItemsCm = NULL;
+
+              if (networkItems.last()->getPointerType() ==
+                       AbstractTreeItem::Measure) {
+                networkItemsCm =
+                    (ControlMeasure *)networkItems.last()->getPointer();
+              }
+            }
+          }
+
+          // We still need to verify the copied CP at this index... although
+          //   nothing should go wrong, we know things do go wrong so do
+          //   the verify instead of just tossing the last networkItems item.
+          pointIndex++;
+        }
+      }
+    }
+
+    return filteredCnet;
   }
 
 

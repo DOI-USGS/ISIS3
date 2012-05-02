@@ -39,7 +39,7 @@ namespace Isis {
   class ControlCubeGraphNode;
   class Progress;
   class PvlGroup;
-  
+
   /**
    * @brief Control Network Stats
    *
@@ -67,6 +67,11 @@ namespace Isis {
    *                                         including Convex Hull Ratio
    *   @history 2011-12-21 Sharmila Prasad Fixed #634 to include stats of images not in the  ControlNet
    *   @history 2011-12-29 Sharmila Prasad Fixed #652 to include stats of ControlMeasure Log data
+   *   @history 2012-04-26 Jai Rideout, Steven Lambright and Stuart Sides - Fixed results of min,
+   *                           max, average computations. Verified results of convex hull
+   *                           computation. Minor refactoring but needs a lot more. References #619
+   *                           because fixing the order of the cnet caused us to fix some cnet graph
+   *                           node bugs which caused the convex hull tests to fail.
    */
   class ControlNetStatistics {
     public:
@@ -78,16 +83,16 @@ namespace Isis {
 
       //! Destructor
       ~ControlNetStatistics();
-      
+
       //! Enumeration for Point Statistics
       enum ePointDetails { total, ignore, locked, fixed, constrained, freed };
       static const int numPointDetails = 6;
-  
+
       //! Enumeration for Point int stats for counts such as valid points, measures etc.
-      enum ePointIntStats { totalPoints, validPoints, ignoredPoints, fixedPoints, constrainedPoints, freePoints, editLockedPoints, 
+      enum ePointIntStats { totalPoints, validPoints, ignoredPoints, fixedPoints, constrainedPoints, freePoints, editLockedPoints,
                             totalMeasures, validMeasures, ignoredMeasures, editLockedMeasures };
       static const int numPointIntStats = 11;
-  
+
       //! Enumeration for Point stats like Tolerances, PixelShifts which have double data
       enum ePointDoubleStats { avgResidual, minResidual, maxResidual, minLineResidual, maxLineResidual, minSampleResidual, maxSampleResidual,
                                avgPixelShift, minPixelShift, maxPixelShift, minLineShift, maxLineShift, minSampleShift, maxSampleShift,
@@ -95,18 +100,18 @@ namespace Isis {
       static const int numPointDblStats = 20;
 
       //! Enumeration for image stats
-      enum ImageStats { imgSamples, imgLines, imgTotalPoints, imgIgnoredPoints, imgFixedPoints, imgLockedPoints, imgLocked, 
+      enum ImageStats { imgSamples, imgLines, imgTotalPoints, imgIgnoredPoints, imgFixedPoints, imgLockedPoints, imgLocked,
                         imgConstrainedPoints, imgFreePoints, imgConvexHullArea, imgConvexHullRatio };
       static const int numImageStats = 11;
-      
+
       //! Generate stats like Total, Ignored, Fixed Points in an Image
-      void GenerateImageStats(void);
+      void GenerateImageStats();
 
       //! Print the Image Stats into specified output file
       void PrintImageStats(const string &psImageFile);
 
       //! Returns the Image Stats by Serial Number
-      const vector<double> GetImageStatsBySerialNum(string psSerialNum);
+      vector<double> GetImageStatsBySerialNum(string psSerialNum) const;
 
       //! Generate stats like Ignored, Fixed, Total Measures, Ignored by Control Point
       void GeneratePointStats(const string &psPointFile);
@@ -115,151 +120,155 @@ namespace Isis {
       void GenerateControlNetStats(PvlGroup &pStatsGrp);
 
       //! Returns the Number of Valid (Not Ignored) Points in the Control Net
-      int NumValidPoints(){
-          return mPointIntStats[validPoints];
-      };
+      int NumValidPoints() const {
+        return (*mPointIntStats.find(validPoints)).second;
+      }
 
       //! Returns the Number of Fixed Points in the Control Net
-      int NumFixedPoints(){
-          return mPointIntStats[fixedPoints];
-      };
-      
+      int NumFixedPoints() const {
+        return (*mPointIntStats.find(fixedPoints)).second;
+      }
+
       //! Returns the number of Constrained Points in Control Net
-      int NumConstrainedPoints(){
-          return mPointIntStats[constrainedPoints];
-      };
-      
+      int NumConstrainedPoints() const {
+        return (*mPointIntStats.find(constrainedPoints)).second;
+      }
+
       //! Returns the number of Constrained Points in Control Net
-      int NumFreePoints(){
-          return mPointIntStats[freePoints];
-      };
-      
+      int NumFreePoints() const {
+        return (*mPointIntStats.find(freePoints)).second;
+      }
+
       //! Returns the number of ignored points
-      int NumIgnoredPoints(){
-          return mPointIntStats[ignoredPoints];
-      };
-      
+      int NumIgnoredPoints() const {
+        return (*mPointIntStats.find(ignoredPoints)).second;
+      }
+
       //! Returns total number of edit locked points
-      int NumEditLockedPoints() {
-          return mPointIntStats[editLockedPoints];
-      };
+      int NumEditLockedPoints() const {
+        return (*mPointIntStats.find(editLockedPoints)).second;
+      }
 
       //! Returns the total Number of Measures in the Control Net
-      int NumMeasures(){
-          return mPointIntStats[totalMeasures];
-      };
+      int NumMeasures() const {
+        return (*mPointIntStats.find(totalMeasures)).second;
+      }
 
-      //!< Returns the total Number of valid Measures in the Control Net
-      int NumValidMeasures(){
-          return mPointIntStats[validMeasures];
-      };
+      //! Returns the total Number of valid Measures in the Control Net
+      int NumValidMeasures() const {
+        return (*mPointIntStats.find(validMeasures)).second;
+      }
 
       //! Returns the total Number of Ignored Measures in the Control Net
-      int NumIgnoredMeasures(){
-          return mPointIntStats[ignoredMeasures];
-      };
+      int NumIgnoredMeasures() const {
+        return (*mPointIntStats.find(ignoredMeasures)).second;
+      }
 
       //! Returns total number of edit locked measures in the network
-      int NumEditLockedMeasures() {
-          return mPointIntStats[editLockedMeasures];
-      };
-      
+      int NumEditLockedMeasures() const {
+        return (*mPointIntStats.find(editLockedMeasures)).second;
+      }
+
       //! Determine the average error of all points in the network
-      double GetAverageResidual(){
-          return mPointDoubleStats[avgResidual];
-      };
+      double GetAverageResidual() const {
+        return (*mPointDoubleStats.find(avgResidual)).second;
+      }
 
       //! Determine the minimum error of all points in the network
-      double GetMinimumResidual(){
-          return mPointDoubleStats[minResidual];
-      };
+      double GetMinimumResidual() const {
+        return (*mPointDoubleStats.find(minResidual)).second;
+      }
 
       //! Determine the maximum error of all points in the network
-      double GetMaximumResidual(){
-          return mPointDoubleStats[maxResidual];
-      };
+      double GetMaximumResidual() const {
+        return (*mPointDoubleStats.find(maxResidual)).second;
+      }
 
       //! Determine the minimum line error of all points in the network
-      double GetMinLineResidual(){
-          return mPointDoubleStats[minLineResidual];
-      };
+      double GetMinLineResidual() const {
+        return (*mPointDoubleStats.find(minLineResidual)).second;
+      }
 
       //! Determine the minimum sample error of all points in the network
-      double GetMinSampleResidual(){
-          return mPointDoubleStats[minSampleResidual];
-      };
+      double GetMinSampleResidual() const {
+        return (*mPointDoubleStats.find(minSampleResidual)).second;
+      }
 
       //! Determine the maximum line error of all points in the network
-      double GetMaxLineResidual(){
-          return mPointDoubleStats[maxLineResidual];
-      };
+      double GetMaxLineResidual() const {
+        return (*mPointDoubleStats.find(maxLineResidual)).second;
+      }
 
       //! Determine the maximum sample error of all points in the network
-      double GetMaxSampleResidual(){
-          return mPointDoubleStats[maxSampleResidual]; 
-      };
-      
+      double GetMaxSampleResidual() const {
+        return (*mPointDoubleStats.find(maxSampleResidual)).second;
+      }
+
       //! Get Min and Max LineShift
-      double GetMinLineShift(void) {
-          return mPointDoubleStats[minLineShift];
-      };
-      
+      double GetMinLineShift() const {
+        return (*mPointDoubleStats.find(minLineShift)).second;
+      }
+
       //! Get network Max LineShift
-      double GetMaxLineShift(void) {
-      return mPointDoubleStats[maxLineShift];
-      };      
-      
+      double GetMaxLineShift() const {
+        return (*mPointDoubleStats.find(maxLineShift)).second;
+      }
+
       //! Get network Min SampleShift
-      double GetMinSampleShift(){
-          return mPointDoubleStats[minSampleShift]; 
-      };
-            
+      double GetMinSampleShift() const {
+        return (*mPointDoubleStats.find(minSampleShift)).second;
+      }
+
       //! Get network Max SampleShift
-      double GetMaxSampleShift(){
-          return mPointDoubleStats[maxSampleShift]; 
-      };
-      
+      double GetMaxSampleShift() const {
+        return (*mPointDoubleStats.find(maxSampleShift)).second;
+      }
+
       //! Get network Min PixelShift
-      double GetMinPixelShift(){
-          return mPointDoubleStats[minPixelShift]; 
-      };
+      double GetMinPixelShift() const {
+        return (*mPointDoubleStats.find(minPixelShift)).second;
+      }
 
       //! Get network Max PixelShift
-      double GetMaxPixelShift(){
-          return mPointDoubleStats[maxPixelShift]; 
-      };
-      
+      double GetMaxPixelShift() const {
+        return (*mPointDoubleStats.find(maxPixelShift)).second;
+      }
+
       //! Get network Avg PixelShift
-      double GetAvgPixelShift(){
-          return mPointDoubleStats[avgPixelShift]; 
-      };
-      
+      double GetAvgPixelShift() const {
+        return (*mPointDoubleStats.find(avgPixelShift)).second;
+      }
+
     protected:
       SerialNumberList mSerialNumList;           //!< Serial Number List
       ControlNet *mCNet;                         //!< Control Network
       Progress *mProgress;                       //!< Progress state
-      QList< ControlCubeGraphNode * > mCubeGraphNodes;
-      
+      QList<ControlCubeGraphNode *> mCubeGraphNodes;
+
     private:
-      map <int, int> mPointIntStats;           //!< Contains map of different count stats
-      map <int, double> mPointDoubleStats;     //!< Contains map of different computed stats
-      map <string, vector<double> > mImageMap; //!< Contains stats by Image/Serial Num
-      map <string, bool> mSerialNumMap;        //!< Whether serial# is part of ControlNet
-      
+      map<int, int> mPointIntStats;           //!< Contains map of different count stats
+      map<int, double> mPointDoubleStats;     //!< Contains map of different computed stats
+      map<string, vector<double> > mImageMap; //!< Contains stats by Image/Serial Num
+      map<string, bool> mSerialNumMap;        //!< Whether serial# is part of ControlNet
+
       //! Get point count stats
-      void GetPointIntStats(void);
-      
-      //! Get Point stats for Residuals and Shifts 
-      void GetPointDoubleStats(void);
-      
+      void GetPointIntStats();
+
+      //! Get Point stats for Residuals and Shifts
+      void GetPointDoubleStats();
+
+      void UpdateMinMaxStats(const Statistics & stats,
+                             ePointDoubleStats min,
+                             ePointDoubleStats max);
+
       //! Init Pointstats vector
-      void InitPointDoubleStats(void);
-      
+      void InitPointDoubleStats();
+
       //! Init SerialNum map
-      void InitSerialNumMap(void);
-      
+      void InitSerialNumMap();
+
       int numCNetImages;
-      
+
       Statistics mConvexHullStats, mConvexHullRatioStats; //!< min, max, average convex hull stats
   };
 }

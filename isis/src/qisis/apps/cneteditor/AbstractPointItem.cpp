@@ -492,7 +492,6 @@ namespace Isis
 
     void AbstractPointItem::sourceDeleted()
     {
-  //     std::cerr << "Point item - " << point << " lost\n";
       point = NULL;
     }
 

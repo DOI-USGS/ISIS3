@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iostream>
 
+#include <QCoreApplication>
 #include <QDateTime>
 #include <QDebug>
 #include <QFutureWatcher>
@@ -22,9 +23,6 @@
 #include "AbstractTreeModel.h"
 
 
-using std::cerr;
-
-
 namespace Isis
 {
   namespace CnetViz
@@ -39,9 +37,9 @@ namespace Isis
 
       delegate = someDelegate;
 
-      setSortingEnabled(false);
-      setSortLimit(10000);
-      setSorting(false);
+      sortingEnabled = false;
+      m_sortLimit = 10000;
+      sorting = false;
 
       sortedItems = new QList<AbstractTreeItem *>;
       busyItem = new BusyLeafItem;
@@ -55,7 +53,6 @@ namespace Isis
 
       // Signal forwarding
       connect(model, SIGNAL(modelModified()), SLOT(rebuildSort()));
-//       connect(model, SIGNAL(modelModified()), this, SIGNAL(modelModified()));
 
       connect(model, SIGNAL(filterProgressChanged(int)),
               this, SIGNAL(filterProgressChanged(int)));
@@ -190,17 +187,21 @@ namespace Isis
         {
           cancelSort();
         }
-//         else
-        {
-          // sorting is always done on a COPY of the items list
-          QList< AbstractTreeItem * > copy = *sortedItems;
+        else if (!lessThanFunctor) {
+          // Create a new comparison functor to be used in the sort. It will
+          // keep track of the number of comparisons made so that we can make a
+          // guess at the progress of the sort.
+          lessThanFunctor = new LessThanFunctor(
+              columns->getSortingOrder().first());
 
+          // Sorting is always done on a COPY of the items list.
           QFuture< QList< AbstractTreeItem * > > future =
-              QtConcurrent::run(this, &AbstractTableModel::doSort, copy);
+              QtConcurrent::run(this, &AbstractTableModel::doSort,
+                                *sortedItems);
           sortingWatcher->setFuture(future);
-        }
 
-        emit modelModified();
+          emit modelModified();
+        }
       }
     }
 
@@ -345,8 +346,6 @@ namespace Isis
 
     void AbstractTableModel::sortStatusUpdated()
     {
-//       cerr << this << " -- AbstractTableModel::sortStatusUpdated() - "
-//            << lessThanFunctor->getCompareCount() << "\n";
       if (lessThanFunctor)
         emit sortProgressChanged(lessThanFunctor->getCompareCount());
     }
@@ -354,29 +353,36 @@ namespace Isis
 
     void AbstractTableModel::sortFinished()
     {
-      QList< AbstractTreeItem * > newSortedItems = sortingWatcher->result();
-      if (!dataModel->isFiltering() && !dataModel->isRebuilding())
-      {
-        if (newSortedItems.size())
-        {
+      bool interrupted = lessThanFunctor->interrupted();
+      delete lessThanFunctor;
+      lessThanFunctor = NULL;
+
+      if (!interrupted) {
+        QList< AbstractTreeItem * > newSortedItems = sortingWatcher->result();
+
+        if (!dataModel->isFiltering() && !dataModel->isRebuilding()) {
           *sortedItems = newSortedItems;
           emit modelModified();
         }
-        else
-        {
-          sort();
-        }
+      }
+      else {
+        sort();
       }
     }
 
 
     void AbstractTableModel::cancelSort()
     {
-      if (isSorting() && lessThanFunctor)
-      {
+      if (lessThanFunctor) {
         lessThanFunctor->interrupt();
-        while (lessThanFunctor->interrupted());
+        sortingWatcher->waitForFinished();
       }
+    }
+
+
+    void AbstractTableModel::itemsLost() {
+      cancelSort();
+      sortedItems->clear();
     }
 
 
@@ -386,20 +392,11 @@ namespace Isis
       ASSERT(!isSorting());
       if (!isSorting())
       {
-        //     cerr << "AbstractTableModel::sort called\n";
-        //ASSERT(!isSorting());
         setSorting(true);
 
         QList< TableColumn * > columnsToSortOn = columns->getSortingOrder();
         if (sortingOn())
         {
-          // Create a new comparison functor to be used in the sort. It will
-          // keep track of the number of comparisons made so that we can make a
-          // guess at the progress of the sort.
-          delete lessThanFunctor;
-          lessThanFunctor = NULL;
-          lessThanFunctor = new LessThanFunctor(columnsToSortOn.at(0));
-
           // Reset the timer so that it will begin polling the status of the
           // sort.
           sortStatusPoller->start(SORT_UPDATE_FREQUENCY);
@@ -407,10 +404,6 @@ namespace Isis
           // Use n*log2(n) as our estimate of the number of comparisons that it
           // should take to sort the list.
           int numItems = itemsToSort.size();
-//           cerr << this << " -- AbstractTableModel::doSort() about to perform"
-//                << "a new sort!\nSorting " << numItems << " items. Expected "
-//                << "number of comparisons: " << numItems * (int)log2(numItems)
-//                << "\n";
           double a = 1.0;
           double b = 1.0;
           emit sortProgressRangeChanged(0,
@@ -429,14 +422,8 @@ namespace Isis
             emit modelModified();
 
             setSorting(false);
-            lessThanFunctor->reset();
-
             return QList< AbstractTreeItem * >();
           }
-
-    //       for (int i = columnsToSortOn.size() - 1; i >= 0; i--)
-    //         qStableSort(sortedItems->begin(), sortedItems->end(),
-    //                     LessThanFunctor(columnsToSortOn.at(i)));
 
           // The sort is done, so stop emiting status updates and make sure we
           // let the listeners know that the sort is done (since the status
@@ -445,14 +432,9 @@ namespace Isis
           emit sortProgressRangeChanged(0, 0);
           emit sortProgressChanged(0);
           emit modelModified();
-//           cerr << this << " -- AbstractTableModel::doSort() is done with the "
-//                << "sort!\n";
-
         }
 
         setSorting(false);
-
-        //     cerr << "AbstractTableModel::sort done\n";
       }
 
       return itemsToSort;
@@ -469,7 +451,6 @@ namespace Isis
       lessThanFunctor = NULL;
       columns = NULL;
       sortingWatcher = NULL;
-      lessThanFunctor = NULL;
     }
 
 
@@ -481,14 +462,20 @@ namespace Isis
 
     void AbstractTableModel::rebuildSort()
     {
-  //     cerr << "AbstractTableModel::rebuildSort called\n";
       ASSERT(dataModel);
       ASSERT(sortedItems);
+      sortedItems->clear();
+      cancelSort();
 
       if (sortingOn())
       {
         sortingEnabled = false;
         *sortedItems = getItems(0, -1);
+
+        foreach (AbstractTreeItem * item, *sortedItems) {
+          connect(item, SIGNAL(destroyed(QObject *)), this, SLOT(itemsLost()));
+        }
+
         sortingEnabled = true;
         sort();
       }
@@ -562,7 +549,6 @@ namespace Isis
       }
 
       sharedData->incrementCompareCount();
-      //.fetchAndAddRelaxed(1);
 
       QVariant leftData = left->getData(column->getTitle());
       QVariant rightData = right->getData(column->getTitle());
@@ -589,9 +575,6 @@ namespace Isis
       else
       {
         lessThan = leftData.toString() < rightData.toString();
-//         iString msg = "Could not determine the item's type while trying to "
-//                       "compare it to another item";
-//         throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       }
 
       return lessThan ^ column->sortAscending();
@@ -659,3 +642,4 @@ namespace Isis
     }
   }
 }
+

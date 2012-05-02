@@ -19,7 +19,6 @@
 #include "FilterGroup.h"
 
 
-using std::cerr;
 using std::swap;
 using std::nothrow;
 

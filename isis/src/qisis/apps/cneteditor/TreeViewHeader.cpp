@@ -19,8 +19,6 @@
 #include "TreeViewContent.h"
 #include "AbstractTreeModel.h"
 
-using std::cerr;
-
 
 namespace Isis
 {

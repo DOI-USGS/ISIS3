@@ -24,9 +24,6 @@
 #include "AbstractTreeModel.h"
 
 
-using std::cerr;
-
-
 namespace Isis
 {
   namespace CnetViz

@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include <QAction>
+#include <QDebug>
 #include <QLabel>
 #include <QMenu>
 #include <QMessageBox>
@@ -17,6 +18,7 @@
 #include <QSize>
 #include <QStyle>
 #include <QStyleOptionViewItemV4>
+#include <QThread>
 #include <QVBoxLayout>
 
 #include "ControlMeasure.h"
@@ -29,9 +31,6 @@
 #include "TableColumn.h"
 #include "TableColumnList.h"
 #include <ControlPoint.h>
-
-
-using std::cerr;
 
 
 namespace Isis
@@ -66,7 +65,7 @@ namespace Isis
         connect(column, SIGNAL(widthChanged()), this, SLOT(refresh()));
       }
 
-      items = new QList< AbstractTreeItem * >;
+      items = new QList< QPointer<AbstractTreeItem> >;
       mousePressPos = new QPoint;
       activeCell = new QPair<AbstractTreeItem *, int>(NULL, -1);
       rowsWithActiveColumnSelected = new QList<AbstractTreeItem *>;
@@ -185,7 +184,6 @@ namespace Isis
 
     void TableViewContent::refresh()
     {
-  //     cerr << "TableViewContent::refresh called\n";
       if (model)
       {
         if (!model->isFiltering())
@@ -195,8 +193,6 @@ namespace Isis
         }
 
         updateItemList();
-  //      clearActiveCell();
-  //       clearColumnSelection();
         lastDirectlySelectedRow = NULL;
         lastShiftSelection->clear();
 
@@ -209,7 +205,6 @@ namespace Isis
 
         viewport()->update();
       }
-  //     cerr << "TableViewContent::refresh done\n";
     }
 
 
@@ -607,9 +602,6 @@ namespace Isis
               if (itemList.size())
               {
                 AbstractTreeItem * curItem = itemList[0];
-//                 cerr << "curItem: " << qPrintable(curItem->getData(
-//                     columns->getVisibleColumns()[
-//                     activeCell->second]->getTitle())) << "\n";
 
                 if (rowsWithActiveColumnSelected->contains(curItem) ||
                     curItem == activeCell->first)
@@ -662,8 +654,6 @@ namespace Isis
               if (itemList.size())
               {
                 AbstractTreeItem * curItem = itemList[0];
-  //               cerr << "curItem: " << qPrintable(curItem->getData(columns->getVisibleColumns()[activeCell->second]->getTitle())) << "\n";;
-
 
                 if (rowsWithActiveColumnSelected->contains(curItem) ||
                     curItem == activeCell->first)
@@ -1022,7 +1012,6 @@ namespace Isis
 
     void TableViewContent::clearActiveCell()
     {
-      //cerr << "TableViewContent::clearActiveCell called\n";
       activeCell->first = NULL;
       activeCell->second = -1;
     }
@@ -1030,7 +1019,6 @@ namespace Isis
 
     void TableViewContent::clearColumnSelection()
     {
-      //cerr << "TableViewContent::clearColumnSelection called\n";
       ASSERT(lastShiftArrowSelectedCell);
       lastShiftArrowSelectedCell->first = NULL;
       rowsWithActiveColumnSelected->clear();
@@ -1227,7 +1215,6 @@ namespace Isis
     void TableViewContent::paintRow(QPainter * painter, int rowNum,
         QPoint absolutePosition, QPoint relativePosition)
     {
-  //     cerr << "TableViewContent::paintRow called\n";
       ASSERT(items);
       ASSERT(rowNum >= 0 && rowNum < items->size());
 
@@ -1252,8 +1239,6 @@ namespace Isis
 
         ASSERT(columns);
         TableColumnList visibleCols = columns->getVisibleColumns();
-//         cerr << "TableViewContent::paintRow.. visibleCols.size() : "
-//              << visibleCols.size() << "\n";
         for (int i = 0; i < visibleCols.size(); i++)
         {
           // draw text
@@ -1548,7 +1533,10 @@ namespace Isis
       {
         int startRow = verticalScrollBar()->value();
         int rowCount = (int) ceil(viewport()->height() / (double) rowHeight);
-        *items = model->getItems(startRow, startRow + rowCount);
+        items->clear();
+        foreach (AbstractTreeItem * item,
+                 model->getItems(startRow, startRow + rowCount))
+          items->append(item);
 
         viewport()->update();
       }

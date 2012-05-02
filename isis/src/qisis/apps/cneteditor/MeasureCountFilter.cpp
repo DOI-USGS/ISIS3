@@ -18,9 +18,6 @@
 #include "ControlPoint.h"
 
 
-using std::cerr;
-
-
 namespace Isis
 {
   namespace CnetViz

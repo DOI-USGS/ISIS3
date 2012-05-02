@@ -13,7 +13,6 @@
 #include "AbstractFilter.h"
 
 
-using std::cerr;
 using std::swap;
 
 

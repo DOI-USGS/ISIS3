@@ -7,6 +7,7 @@
 #include <sstream>
 
 #include <QtAlgorithms>
+#include <QDebug>
 #include <QPair>
 #include <QQueue>
 #include <QSet>
@@ -63,37 +64,9 @@ namespace Isis {
     cubeGraphNodes = new QHash< QString, ControlCubeGraphNode * >;
     pointIds = new QStringList;
 
-    QHashIterator< QString, ControlPoint * > pointsIterator(*other.points);
-    while (pointsIterator.hasNext()) {
-      pointsIterator.next();
-
-      ControlPoint *newPoint = new ControlPoint(*pointsIterator.value());
-      newPoint->parentNetwork = this;
-      QString newPointId = newPoint->GetId();
-      points->insert(newPointId, newPoint);
-      pointIds->append(newPointId);
-
-      // create graph for non-ignored points and measures
-      if (!newPoint->IsIgnored()) {
-        QList< ControlMeasure * > measures = newPoint->getMeasures();
-        for (int i = 0; i < measures.size(); i++) {
-          ControlMeasure *measure = measures[i];
-          QString serial = measure->GetCubeSerialNumber();
-
-          if (!measure->IsIgnored()) {
-            if (cubeGraphNodes->contains(serial)) {
-              (*cubeGraphNodes)[serial]->addMeasure(measure);
-            }
-            else {
-              ControlCubeGraphNode *newControlCubeGraphNode =
-                new ControlCubeGraphNode(serial);
-
-              newControlCubeGraphNode->addMeasure(measure);
-              cubeGraphNodes->insert(serial, newControlCubeGraphNode);
-            }
-          }
-        }
-      }
+    for (int cpIndex = 0; cpIndex < other.GetNumPoints(); cpIndex++) {
+      ControlPoint *newPoint = new ControlPoint(*other.GetPoint(cpIndex));
+      AddPoint(newPoint);
     }
 
     p_targetName = other.p_targetName;
@@ -1444,9 +1417,15 @@ namespace Isis {
   }
 
 
-  //! Return QList of ControlPoints
-  QList< ControlPoint * > ControlNet::getPoints() const {
-    return points->values();
+  //! Return QList of ControlPoints ordered by point ID
+  QList< ControlPoint * > ControlNet::GetPoints() {
+    QList< ControlPoint * > orderedPoints;
+
+    for (int i = 0; i < pointIds->size(); i++) {
+      orderedPoints.append(GetPoint(i));
+    }
+
+    return orderedPoints;
   }
 
 

@@ -417,7 +417,6 @@ namespace Isis
 
 
     void AbstractMeasureItem::sourceDeleted() {
-  //     std::cerr << "Measure item - " << measure << " lost\n";
       measure = NULL;
     }
 

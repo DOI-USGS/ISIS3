@@ -11,9 +11,6 @@
 #include <QStringList>
 
 
-using std::cerr;
-
-
 namespace Isis
 {
   namespace CnetViz

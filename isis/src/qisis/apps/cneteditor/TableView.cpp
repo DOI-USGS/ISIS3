@@ -15,9 +15,6 @@
 #include <QSettings>
 
 
-using std::cerr;
-
-
 namespace Isis
 {
   namespace CnetViz
@@ -72,13 +69,8 @@ namespace Isis
         columns->setSortingOrder(
             settings.value(key, QStringList()).toStringList());
       }
-      catch (IException &e)
+      catch (IException &)
       {
-//         cerr << "Failed to restore the sorting order!\n\n"
-//                 "Dear programmer,\n"
-//                 "  Did any of the column titles change since the last\n"
-//                 "  time QSettings were saved?  If so this message should\n"
-//                 "  go away after the next successfull save of QSettings.\n"
       }
 
       header = new TableViewHeader(model);

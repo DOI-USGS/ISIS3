@@ -6,7 +6,6 @@
 #include <QString>
 
 
-using std::cerr;
 using std::swap;
 
 

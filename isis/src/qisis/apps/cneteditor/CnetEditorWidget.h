@@ -70,6 +70,8 @@ namespace Isis
       
       QMap< QAction *, QList< QString > > getMenuActions();
       QMap< QString, QList< QAction * > > getToolBarActions();
+
+      ControlNet * getFilteredNetwork() const;
       
       bool measureTableSortingEnabled() const;
       int measureTableSortLimit() const;
@@ -109,10 +111,10 @@ namespace Isis
     private slots:
       void rebuildModels();
       void rebuildModels(QList< CnetViz::AbstractTreeItem * > itemsToDelete);
-      
+
       void pointColToggled();
       void measureColToggled();
-      
+
       void handlePointTableFilterCountsChanged(int visibleRows, int totalRows);
       void handleMeasureTableFilterCountsChanged(int visibleRows,
                                                  int totalRows);

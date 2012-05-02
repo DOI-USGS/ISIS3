@@ -10,9 +10,6 @@
 #include "ControlMeasure.h"
 
 
-using std::cerr;
-
-
 namespace Isis
 {
   namespace CnetViz

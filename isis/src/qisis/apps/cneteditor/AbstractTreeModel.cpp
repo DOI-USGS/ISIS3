@@ -31,8 +31,6 @@
 #include "FilterWidget.h"
 #include "RootItem.h"
 
-using std::cerr;
-
 
 namespace Isis
 {
@@ -427,12 +425,6 @@ namespace Isis
     }
 
 
-  //   FilterWidget * AbstractTreeModel::getFilterWidget() const
-  //   {
-  //     return filter;
-  //   }
-
-
     QFutureWatcher< QAtomicPointer< RootItem > > *
     AbstractTreeModel::getRebuildWatcher() const
     {
@@ -495,7 +487,6 @@ namespace Isis
 
     void AbstractTreeModel::applyFilter()
     {
-  //     cerr << "AbstractTreeModel::applyFilter\n";
       // If filterAgain is true, then this method will be recalled later
       // with filterAgain = false.
       if (!frozen && !filterAgain && guisFilterWidget &&
@@ -512,7 +503,6 @@ namespace Isis
         }
         else
         {
-  //         cerr << "rootItem->getFirstVisibleChild : " << rootItem->getFirstVisibleChild  ( )<< "\n";
           // filterCounts are unknown and invalid and this fact is shared to
           // users of this class by emitting invalid (negative) information.
           emit filterCountsChanged(-1, getTopLevelItemCount());
@@ -539,7 +529,6 @@ namespace Isis
           filterWatcher->setFuture(futureRoot);
         }
       }
-  //     cerr << "/AbstractTreeModel::applyFilter\n";
     }
 
 
@@ -571,20 +560,19 @@ namespace Isis
     bool AbstractTreeModel::itemIsInteresting(AbstractTreeItem * item,
         InterestingItemsFlag flags)
     {
-      AbstractTreeItem::InternalPointerType pointerType = item->getPointerType();
+      AbstractTreeItem::InternalPointerType pointerType =
+          item->getPointerType();
 
       if ((pointerType == AbstractTreeItem::Point &&
-          !flags.testFlag(PointItems)) ||
+           flags.testFlag(PointItems)) ||
           (pointerType == AbstractTreeItem::Measure &&
-          !flags.testFlag(MeasureItems)) ||
+           flags.testFlag(MeasureItems)) ||
           (pointerType == AbstractTreeItem::CubeGraphNode &&
-          !flags.testFlag(SerialItems)))
-      {
-        return false;
-      }
-      else
-      {
+           flags.testFlag(SerialItems))) {
         return true;
+      }
+      else {
+        return false;
       }
     }
 
@@ -655,7 +643,6 @@ namespace Isis
 
     void AbstractTreeModel::rebuildItemsDone()
     {
-  //     cerr << "AbstractTreeModel::rebuildItemsDone called\n";
       clear();
 
       QAtomicPointer< RootItem > newRoot = rebuildWatcher->future();
@@ -677,8 +664,6 @@ namespace Isis
 
       setRebuilding(false);
       emit modelModified();
-
-  //     cerr << "/AbstractTreeModel::rebuildItemsDone done\n";
     }
 
 
@@ -809,3 +794,4 @@ namespace Isis
     }
   }
 }
+

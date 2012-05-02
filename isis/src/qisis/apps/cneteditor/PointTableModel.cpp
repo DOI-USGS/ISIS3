@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+#include <QDebug>
 #include <QList>
 #include <QMessageBox>
 #include <QStringList>
@@ -26,9 +27,6 @@
 #include "AbstractTreeModel.h"
 
 
-using std::cerr;
-
-
 namespace Isis
 {
   namespace CnetViz
@@ -42,8 +40,6 @@ namespace Isis
               SIGNAL(treeSelectionChanged(QList< AbstractTreeItem * >)),
               this,
               SLOT(handleTreeSelectionChanged(QList< AbstractTreeItem * >)));
-
-      setSortingEnabled(true);
     }
 
 

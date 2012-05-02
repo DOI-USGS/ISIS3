@@ -13,11 +13,7 @@
 #include "iString.h"
 
 
-using std::cerr;
-using std::cout;
-
 namespace Isis {
-
   /**
   * Create an empty SerialNumber object.
   */

@@ -28,10 +28,6 @@
 #include "AbstractFilterSelector.h"
 
 
-using std::cerr;
-
-
-
 namespace Isis
 {
   namespace CnetViz

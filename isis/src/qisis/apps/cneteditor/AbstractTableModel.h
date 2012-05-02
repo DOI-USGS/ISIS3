@@ -110,6 +110,7 @@ namespace Isis
 
       private slots:
         void cancelSort();
+        void itemsLost();
         void sortStatusUpdated();
         void sortFinished();
 

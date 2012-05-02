@@ -22,8 +22,6 @@
 #include "AbstractTreeModel.h"
 #include "AbstractTableModel.h"
 
-using std::cerr;
-
 
 namespace Isis
 {
@@ -390,11 +388,9 @@ namespace Isis
 
     void TableViewHeader::paintHeader(QPainter * painter, int rowHeight)
     {
-  //     cerr << "TableViewHeader::paintHeader called\n";
       int visibleColWidth = -horizontalOffset;
       TableColumnList visibleCols = columns->getVisibleColumns();
-//       cerr << "columns: [" << columns << "], " << columns->size()
-//            << "\nvisibleCols->size(): " << visibleCols.size() << "\n";
+
       for (int i = 0; i < visibleCols.size(); i++)
         visibleColWidth += visibleCols[i]->getWidth() - 1;
 
@@ -525,8 +521,6 @@ namespace Isis
         // Move the column rect to the position of the next column.
         columnRect.moveLeft(columnRect.right());
       }
-      
-  //     cerr << "TableViewHeader::paintHeader done\n";
     }
 
 

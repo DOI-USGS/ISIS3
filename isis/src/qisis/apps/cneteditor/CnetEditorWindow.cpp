@@ -35,8 +35,7 @@
 #include "CnetEditorWidget.h"
 
 
-using std::cerr;
-
+using std::endl;
 
 namespace Isis
 {
@@ -73,6 +72,7 @@ namespace Isis
 
     displayProperties = CnetDisplayProperties::getInstance();
     curFile = new QString;
+    cubeListFile = new QString;
     labelFont = new QFont("Sansserif", 9);
     toolBars = new QList< QToolBar * >;
 
@@ -84,14 +84,28 @@ namespace Isis
     readSettings();
 
     setFileState(NoFile, "");
+    setSaveFilteredNetwork(false);
 
     QHBoxLayout * horizontalLayout = new QHBoxLayout;
     QWidget * dummyCentralWidget = new QWidget;
     dummyCentralWidget->setLayout(horizontalLayout);
     setCentralWidget(dummyCentralWidget);
 
-    if (QApplication::arguments().size() > 1)
-      load(QApplication::arguments().at(1));
+    QStringList args = QApplication::arguments();
+    args.removeFirst();
+
+    foreach (QString arg, args) {
+      QString extension = QFileInfo(arg).suffix();
+
+      if (extension == "net")
+        load(arg);
+      else if (extension == "lis")
+        loadCubeList(arg);
+      else
+        QMessageBox::warning(this, tr("Unrecognized Argument"),
+            tr("Could not determine the type of file [%1]. Expected .net or "
+               ".lis.").arg(arg));
+    }
   }
 
 
@@ -130,11 +144,17 @@ namespace Isis
     delete curFile;
     curFile = NULL;
 
+    delete cubeListFile;
+    cubeListFile = NULL;
+
     delete labelFont;
     labelFont = NULL;
 
     delete loadingProgressBar;
     loadingProgressBar = NULL;
+
+    delete cubeListProgressBar;
+    cubeListProgressBar = NULL;
 
     delete toolBars;
     toolBars = NULL;
@@ -150,6 +170,7 @@ namespace Isis
     cnetReader = NULL;
     editorWidget = NULL;
     curFile = NULL;
+    cubeListFile = NULL;
     labelFont = NULL;
 
     openNetAct = NULL;
@@ -166,6 +187,7 @@ namespace Isis
     toolBars = NULL;
 
     loadingProgressBar = NULL;
+    cubeListProgressBar = NULL;
 
     pointTreeDockWidget = NULL;
     serialTreeDockWidget = NULL;
@@ -403,6 +425,12 @@ namespace Isis
   }
 
 
+  void CnetEditorWindow::setSaveFilteredNetwork(bool enabled)
+  {
+    saveFilteredNetwork = enabled;
+  }
+
+
   void CnetEditorWindow::openCubeList()
   {
     QString filename = QFileDialog::getOpenFileName(this,
@@ -410,11 +438,7 @@ namespace Isis
         tr("Cube list files (*.lis);;All files (*)"));
 
     if (filename.size())
-    {
-      ASSERT(displayProperties);
-      displayProperties->setCubeList(filename);
-    }
-
+      loadCubeList(filename);
   }
 
 
@@ -454,6 +478,7 @@ namespace Isis
         closeAct->setEnabled(false);
         setDirty(false);
         saveAsPvl = false;
+        saveFilteredNetwork = false;
         *curFile = "";
         setWindowTitle("cneteditor *BETA VERSION*");
         loadingProgressBar->setVisible(false);
@@ -502,11 +527,80 @@ namespace Isis
   }
 
 
+  void CnetEditorWindow::loadCubeList(QString filename) {
+      ASSERT(displayProperties);
+
+      connect(displayProperties, SIGNAL(composeProgressRangeChanged(int, int)),
+              cubeListProgressBar, SLOT(setRange(int, int)));
+      connect(displayProperties, SIGNAL(composeProgressChanged(int)),
+              cubeListProgressBar, SLOT(setValue(int)));
+      connect(displayProperties, SIGNAL(compositionFinished()),
+              this, SLOT(cubeListLoaded()));
+
+      // Show the cube list progress bar and start loading the cube list.
+      cubeListProgressBar->setValue(cubeListProgressBar->minimum());
+      cubeListProgressBar->setVisible(true);
+      displayProperties->setCubeList(filename);
+      *cubeListFile = filename;
+  }
+
+
   void CnetEditorWindow::save()
   {
     ASSERT(!curFile->isEmpty());
 
-    cnet->Write(*curFile, saveAsPvl);
+    if (saveFilteredNetwork) {
+      QString newCubeListFileName;
+
+      // Get our filtered network and write it to disk.
+      ControlNet * filteredCnet = editorWidget->getFilteredNetwork();
+      filteredCnet->Write(*curFile, saveAsPvl);
+
+      if (cubeListFile->size()) {
+        // Get the path of the new cube list file that we should create from our
+        // filtered network.
+        newCubeListFileName = QFileDialog::getSaveFileName(this,
+            tr("Save the cube list based on the filtered network"), ".",
+            tr("Cube list files (*.lis);;All files (*)"));
+
+        if (newCubeListFileName.size()) {
+          QFile newCubeListFile(newCubeListFileName);
+
+          if (!newCubeListFile.open(QIODevice::WriteOnly | QIODevice::Text |
+                                    QIODevice::Truncate)) {
+            iString msg = "The file [";
+            msg += (iString) newCubeListFileName;
+            msg += "failed to open for writing.\n";
+            throw IException(IException::Programmer, msg, _FILEINFO_);
+          }
+
+          ASSERT(displayProperties);
+          QStringList cubeFileNames =
+              displayProperties->getCubeList(filteredCnet);
+
+          QTextStream ts(&newCubeListFile);
+          foreach (QString cubeFileName, cubeFileNames)
+            ts << cubeFileName << endl;
+          newCubeListFile.close();
+        }
+      }
+
+      // Close the current network and load the new filtered network. We have to
+      // save off our current filename so that we can restore it after the call
+      // to closeNetwork(...).
+      QString currentFile = *curFile;
+      closeNetwork(false);
+      *curFile = currentFile;
+      networkLoaded(filteredCnet);
+
+      if (newCubeListFileName != "")
+        loadCubeList(newCubeListFileName);
+    }
+    else {
+      // Save the entire control network.
+      cnet->Write(*curFile, saveAsPvl);
+    }
+
     setDirty(false);
   }
 
@@ -533,19 +627,30 @@ namespace Isis
     QButtonGroup * buttonGroup = new QButtonGroup;
     buttonGroup->addButton(binButton, 0);
     buttonGroup->addButton(pvlButton, 1);
-    connect(buttonGroup, SIGNAL(buttonClicked(int)), this,
-        SLOT(setSaveAsPvl(int)));
+    connect(buttonGroup, SIGNAL(buttonClicked(int)),
+            this, SLOT(setSaveAsPvl(int)));
 
     if (saveAsPvl)
       pvlButton->click();
     else
       binButton->click();
 
+    // Create a checkbox to allow users to save only their currently filtered
+    // network and its corresponding cube list. We explicitly disable this
+    // action so that the user must select it each time. It wouldn't be a good
+    // idea to have this option default to enabled.
+    setSaveFilteredNetwork(false);
+    QCheckBox * saveFilteredNetworkCheckBox = new QCheckBox(
+        "Save currently filtered network");
+    saveFilteredNetworkCheckBox->setToolTip(
+        "Save only the currently filtered control network");
+    connect(saveFilteredNetworkCheckBox, SIGNAL(toggled(bool)),
+            this, SLOT(setSaveFilteredNetwork(bool)));
+
     QHBoxLayout * buttonLayout = new QHBoxLayout;
-
     buttonLayout->addWidget(binButton);
-
     buttonLayout->addWidget(pvlButton);
+    buttonLayout->addWidget(saveFilteredNetworkCheckBox);
 
     CnetEditorFileDialog * fileDialog = new CnetEditorFileDialog(buttonLayout);
 
@@ -559,12 +664,16 @@ namespace Isis
         save();
       }
     }
+
+    // Reset the 'save filtered network' in all cases as we don't want save() to
+    // save the filtered network unless the user explicitly chose this option.
+    setSaveFilteredNetwork(false);
   }
 
 
-  void CnetEditorWindow::closeNetwork()
+  void CnetEditorWindow::closeNetwork(bool promptToSave)
   {
-    if (okToContinue())
+    if (!promptToSave || okToContinue())
     {
       disconnect(editorWidget, SIGNAL(cnetModified()), this, SLOT(setDirty()));
       delete editorWidget;
@@ -611,6 +720,12 @@ namespace Isis
 
     setFileState(HasFile, *curFile);
     saveAsPvl = !Pvl((iString) *curFile).HasObject("ProtoBuffer");
+  }
+
+
+  void CnetEditorWindow::cubeListLoaded() {
+    ASSERT(cubeListProgressBar);
+    cubeListProgressBar->setVisible(false);
   }
 
 
@@ -692,27 +807,10 @@ namespace Isis
       QString objName = i.key();
       QList< QAction * > actionList = i.value();
 
-//       foreach (QAction * action, actionList)
-//       {
-//         mainToolBar->addAction(action);
-//       }
-
       // if toolbar already exists, just add the actions to it
       int index = indexOfToolBar(objName);
-//       cerr << "index: " << index << "\n";
       if (index != -1)
       {
-//         QToolBar * tb = (*toolBars)[index];
-//         QList< QAction * > tbActions = tb->actions();
-//         for (int i = tbActions.size() - 1; i >= 0; i--)
-//         {
-//           if (actionList.contains(tbActions[i]))
-//           {
-//             delete tbActions[i];
-//             actionList.removeAt(i);
-//           }
-//         }
-
         foreach (QAction * action, actionList)
           (*toolBars)[index]->addAction(action);
       }

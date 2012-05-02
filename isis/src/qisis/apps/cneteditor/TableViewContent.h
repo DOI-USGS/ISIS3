@@ -3,6 +3,8 @@
 
 #include <QAbstractScrollArea>
 
+#include <QPointer>
+
 
 class QAction;
 class QEvent;
@@ -116,7 +118,7 @@ namespace Isis
       private:
         TableView * parentView;
         AbstractTableModel * model;
-        QList< AbstractTreeItem * > * items;
+        QList< QPointer<AbstractTreeItem> > * items;
         TableColumnList * columns;
 
         QPair< AbstractTreeItem *, int > * activeCell;

@@ -77,13 +77,15 @@ namespace Isis {
     measures = new QHash< QString, ControlMeasure * >;
     cubeSerials = new QStringList;
 
-    QHashIterator< QString, ControlMeasure * > i(*other.measures);
+    QListIterator<QString> i(*other.cubeSerials);
     while (i.hasNext()) {
-      i.next();
-      ControlMeasure *newMeasure = new ControlMeasure(*i.value());
+      QString sn = i.next();
+
+      const ControlMeasure *otherCm = other.GetMeasure(sn);
+      ControlMeasure *newMeasure = new ControlMeasure(*otherCm);
       AddMeasure(newMeasure);
 
-      if (other.referenceMeasure == i.value())
+      if (other.referenceMeasure == otherCm)
         SetRefMeasure(newMeasure);
     }
 
@@ -1147,8 +1149,8 @@ namespace Isis {
    * @history 2011-07-01 Debbie A. Cook, Removed editLock check to allow
    *                            BundleAdjust to compute residuals for
    *                            editLocked points
-   * @history 2012-01-18 Debbie A. Cook, Revised to call 
-   *                            ComputeResidualsMillimeters() to avoid 
+   * @history 2012-01-18 Debbie A. Cook, Revised to call
+   *                            ComputeResidualsMillimeters() to avoid
    *                            duplication of code
    */
   ControlPoint::Status ControlPoint::ComputeResiduals() {
@@ -1200,9 +1202,9 @@ namespace Isis {
       }
 
       else {
-        // For radar line is calculated from time in the camera.  Use the 
+        // For radar line is calculated from time in the camera.  Use the
         // closest line to scale the focal plane y (doppler shift) to image line
-        // for computing the line residual.  Get a local ratio 
+        // for computing the line residual.  Get a local ratio
         //     measureLine    =   adjacentLine
         //     ------------       --------------  in both cases, doppler shift
         //     dopplerMLine       dopplerAdjLine  is calculated using SPICE
@@ -1245,12 +1247,12 @@ namespace Isis {
 
         // Now map through the camera steps to take X from slant range to ground
         // range to pixels.  Y just tracks through as 0.
-        if (cam->DistortionMap()->SetUndistortedFocalPlane(computedX, 
+        if (cam->DistortionMap()->SetUndistortedFocalPlane(computedX,
                                                            computedY)){
           double focalPlaneX = cam->DistortionMap()->FocalPlaneX();
           double focalPlaneY = cam->DistortionMap()->FocalPlaneY();
           fpmap->SetFocalPlane(focalPlaneX,focalPlaneY);
-        } 
+        }
         cuSamp = fpmap->DetectorSample();
         cuLine = m->GetLine() + deltaLine;
       }

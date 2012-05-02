@@ -17,13 +17,11 @@
 #include <QTimer>
 #include <QtConcurrentRun>
 
+#include "ControlNet.h"
 #include "Cube.h"
 #include "IException.h"
 #include "iString.h"
 #include "SerialNumber.h"
-
-
-using std::cerr;
 
 
 namespace Isis
@@ -102,9 +100,40 @@ namespace Isis
   }
 
 
-  QString CnetDisplayProperties::getFileName(QString fileName) const
-  {
-    return getShowsFullPaths() ? fileName : QFileInfo(fileName).fileName();
+  /**
+   * TODO comment me
+   *
+   * If a cube list is currently being loaded, this method will return an empty
+   * list. If there is no cube list, it will also return an empty list.
+   *
+   * This method is thread safe.
+   */
+  QList<QString> CnetDisplayProperties::getCubeList(ControlNet * cnet) const {
+    QList<QString> results;
+
+    if (!currentlyComposing()) {
+      foreach (QString serialNumber, cnet->GetCubeSerials()) {
+        QString possibleFileName = getImageName(serialNumber, true);
+
+        if (possibleFileName != serialNumber)
+          results.append(possibleFileName);
+      }
+    }
+
+    return results;
+  }
+
+
+  QString CnetDisplayProperties::getFileName(QString fileName,
+                                             bool forceFullPaths) const {
+    QString result;
+
+    if (forceFullPaths || getShowsFullPaths())
+      result = fileName;
+    else
+      result = QFileInfo(fileName).fileName();
+
+    return result;
   }
 
 
@@ -119,7 +148,8 @@ namespace Isis
    *
    * This method is thread safe!
    */
-  QString CnetDisplayProperties::getImageName(QString cubeSerialNumber) const
+  QString CnetDisplayProperties::getImageName(QString cubeSerialNumber,
+                                              bool forceFullPaths) const
   {
     ASSERT(serialNumberToFileNameMap);
 
@@ -131,11 +161,10 @@ namespace Isis
         serialNumberToFileNameMap->contains(cubeSerialNumber))
     {
       QString value = serialNumberToFileNameMap->value(cubeSerialNumber);
-//       cerr << "CnetDisplayProperties::getImageName called... value: " << qPrintable(value) << "\n";
       readWriteLock->unlock();
 
       if (value.toLower() != "unknown")
-        imageName = getFileName(value);
+        imageName = getFileName(value, forceFullPaths);
     }
     else
     {
@@ -253,7 +282,6 @@ namespace Isis
 
     for (int i = 0; *interruptFlag == 0 && i < fileNames.size(); i++)
     {
-//      cerr << "looping: " << i << "\n";
       iString fileName = fileNames[i];
 
       Cube cube;
@@ -263,14 +291,6 @@ namespace Isis
 
       composedCount->fetchAndAddRelaxed(1);
     }
-
-//     cerr << "just finished composing serial numbers (still in composing thread)...\n";
-//     QMapIterator< QString, QString > i(newMap);
-//     while (i.hasNext())
-//     {
-//       i.next();
-//       cerr << qPrintable(i.key()) << ": " << qPrintable(i.value()) << "\n";
-//     }
 
     return newMap;
   }
@@ -304,14 +324,6 @@ namespace Isis
     {
       readWriteLock->lockForWrite();
       *serialNumberToFileNameMap = composeWatcher->result();
-
-//       cerr << "just finished composing serial numbers...\n";
-//       QMapIterator< QString, QString > i(*serialNumberToFileNameMap);
-//       while (i.hasNext())
-//       {
-//         i.next();
-//         cerr << qPrintable(i.key()) << ": " << qPrintable(i.value()) << "\n";
-//       }
 
       readWriteLock->unlock();
     }

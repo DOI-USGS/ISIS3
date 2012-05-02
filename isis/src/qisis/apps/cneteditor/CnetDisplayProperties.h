@@ -15,6 +15,7 @@ class QTimer;
 
 namespace Isis
 {
+  class ControlNet;
 
   /**
    * @brief Handles how control networks should be displayed to the user
@@ -41,11 +42,13 @@ namespace Isis
       
       bool currentlyComposing() const;
       
-      QString getFileName(QString fileName) const;
-      QString getImageName(QString cubeSerialNumber) const;
+      QList<QString> getCubeList(ControlNet * cnet) const;
+      QString getFileName(QString fileName, bool forceFullPaths=false) const;
+      QString getImageName(QString cubeSerialNumber,
+                           bool forceFullPaths=false) const;
       QString getSerialNumber(QString imageId);
       bool getShowsFullPaths() const;
-      
+
       void setCubeList(QString fileName);
       void setFileNameUsage(bool preferFileNames);
       void setShowsFullPaths(bool newState);
@@ -90,31 +93,8 @@ namespace Isis
       QReadWriteLock * readWriteLock;
     
       static CnetDisplayProperties * instance;
-      
-      
-      
-      // For explicit sharing of the comparison counter between multiple
-      // copies of a LessThanFunctor object. This bypasses the need for a
-      // static member in LessThanFunctor.
-//       class LessThanFunctorData : public QSharedData
-//       {
-//         public:
-//           LessThanFunctorData();
-//           LessThanFunctorData(LessThanFunctorData const &);
-//           ~LessThanFunctorData();
-// 
-//           int getCompareCount() const;
-//           void incrementCompareCount();
-//           
-//           void setInterrupted(bool);
-//           bool interrupted();
-// 
-// 
-//         private:
-//           QAtomicInt compareCount;
-//           QAtomicInt interruptFlag;
-//       };
   };
 }
 
 #endif
+
