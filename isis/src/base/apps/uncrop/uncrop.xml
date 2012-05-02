@@ -37,6 +37,9 @@
     <change name="Sharmila Prasad" date="2011-01-20">
       Updated for changes in ProcessMosaic
     </change>
+    <change name="Steven Lambright" date="2012-05-01">
+      Updated documentation; fixes #458
+    </change>
   </history>
 
   <oldName>
@@ -67,8 +70,9 @@
           Parent output cube
         </brief>
         <description>
-          The output cube. Normally, this would be the cube where the sub-cube
-          came from, although this is not necessary.
+          The output cube, an existing filename is required. The filename can be the original file
+          from which the cropped image was extracted, or it could be a new file created with
+          makecube based on the dimensions found in the AlphaCube label of the cropped image. 
         </description>
         <filter>
           *.cub
