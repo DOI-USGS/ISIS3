@@ -8,20 +8,36 @@
 #include <QHBoxLayout>
 
 #include "AbstractFilter.h"
+#include "AdjustedLatitudeFilter.h"
+#include "AdjustedLatitudeSigmaFilter.h"
+#include "AdjustedLongitudeFilter.h"
+#include "AdjustedLongitudeSigmaFilter.h"
+#include "AdjustedRadiusFilter.h"
+#include "AdjustedRadiusSigmaFilter.h"
+#include "APrioriLatitudeFilter.h"
+#include "APrioriLatitudeSigmaFilter.h"
+#include "APrioriLongitudeFilter.h"
+#include "APrioriLongitudeSigmaFilter.h"
+#include "APrioriRadiusFilter.h"
+#include "APrioriRadiusSigmaFilter.h"
 #include "ChooserNameFilter.h"
 #include "ImageIdFilter.h"
 #include "GoodnessOfFitFilter.h"
 #include "LineFilter.h"
 #include "LineResidualFilter.h"
+#include "LineShiftFilter.h"
 #include "MeasureIgnoredFilter.h"
+#include "MeasureJigsawRejectedFilter.h"
 #include "MeasureTypeFilter.h"
 #include "PointEditLockedFilter.h"
 #include "PointIgnoredFilter.h"
 #include "PointIdFilter.h"
+#include "PointJigsawRejectedFilter.h"
 #include "PointTypeFilter.h"
 #include "ResidualMagnitudeFilter.h"
 #include "SampleFilter.h"
 #include "SampleResidualFilter.h"
+#include "SampleShiftFilter.h"
 
 
 using std::swap;
@@ -38,7 +54,8 @@ namespace Isis
     }
 
 
-    ImagePointFilterSelector::ImagePointFilterSelector(const ImagePointFilterSelector & other)
+    ImagePointFilterSelector::ImagePointFilterSelector(
+        const ImagePointFilterSelector & other)
     {
       createSelector();
       getSelector()->setCurrentIndex(other.getSelector()->currentIndex());
@@ -66,20 +83,36 @@ namespace Isis
 
       getSelector()->addItem("Image ID");
       getSelector()->insertSeparator(getSelector()->count());
+      getSelector()->addItem("Adjusted SP Latitude");
+      getSelector()->addItem("Adjusted SP Latitude Sigma");
+      getSelector()->addItem("Adjusted SP Longitude");
+      getSelector()->addItem("Adjusted SP Longitude Sigma");
+      getSelector()->addItem("Adjusted SP Radius");
+      getSelector()->addItem("Adjusted SP Radius Sigma");
+      getSelector()->addItem("A Priori SP Latitude");
+      getSelector()->addItem("A Priori SP Latitude Sigma");
+      getSelector()->addItem("A Priori SP Longitude");
+      getSelector()->addItem("A Priori SP Longitude Sigma");
+      getSelector()->addItem("A Priori SP Radius");
+      getSelector()->addItem("A Priori SP Radius Sigma");
       getSelector()->addItem("Chooser Name");
       getSelector()->addItem("Edit Locked Points");
       getSelector()->addItem("Ignored Points");
-      getSelector()->addItem("Point Id");
+      getSelector()->addItem("Jigsaw Rejected Points");
+      getSelector()->addItem("Point ID");
       getSelector()->addItem("Point Type");
       getSelector()->insertSeparator(getSelector()->count());
       getSelector()->addItem("Goodness Of Fit");
       getSelector()->addItem("Ignored Measures");
+      getSelector()->addItem("Jigsaw Rejected Measures");
       getSelector()->addItem("Line");
       getSelector()->addItem("Line Residual");
+      getSelector()->addItem("Line Shift");
       getSelector()->addItem("Measure Type");
       getSelector()->addItem("Residual Magnitude");
       getSelector()->addItem("Sample");
       getSelector()->addItem("Sample Residual");
+      getSelector()->addItem("Sample Shift");
     }
 
 
@@ -95,48 +128,110 @@ namespace Isis
             setFilter(new ImageIdFilter(AbstractFilter::Images));
             break;
           case 4:
-            setFilter(new ChooserNameFilter(AbstractFilter::Images |
+            setFilter(new AdjustedLatitudeFilter(AbstractFilter::Images |
                 AbstractFilter::Points, 1));
             break;
           case 5:
-            setFilter(new PointEditLockedFilter(AbstractFilter::Images |
+            setFilter(new AdjustedLatitudeSigmaFilter(AbstractFilter::Images |
                 AbstractFilter::Points, 1));
             break;
           case 6:
-            setFilter(new PointIgnoredFilter(AbstractFilter::Images |
+            setFilter(new AdjustedLongitudeFilter(AbstractFilter::Images |
                 AbstractFilter::Points, 1));
             break;
           case 7:
-            setFilter(new PointIdFilter(AbstractFilter::Images |
+            setFilter(new AdjustedLongitudeSigmaFilter(AbstractFilter::Images |
                 AbstractFilter::Points, 1));
             break;
           case 8:
-            setFilter(new PointTypeFilter(AbstractFilter::Images |
+            setFilter(new AdjustedRadiusFilter(AbstractFilter::Images |
+                AbstractFilter::Points, 1));
+            break;
+          case 9:
+            setFilter(new AdjustedRadiusSigmaFilter(AbstractFilter::Images |
                 AbstractFilter::Points, 1));
             break;
           case 10:
-            setFilter(new GoodnessOfFitFilter(AbstractFilter::Images, 1));
+            setFilter(new APrioriLatitudeFilter(AbstractFilter::Images |
+                AbstractFilter::Points, 1));
             break;
           case 11:
-            setFilter(new MeasureIgnoredFilter(AbstractFilter::Images, 1));
+            setFilter(new APrioriLatitudeSigmaFilter(AbstractFilter::Images |
+                AbstractFilter::Points, 1));
             break;
           case 12:
-            setFilter(new LineFilter(AbstractFilter::Images, 1));
+            setFilter(new APrioriLongitudeFilter(AbstractFilter::Images |
+                AbstractFilter::Points, 1));
             break;
           case 13:
-            setFilter(new LineResidualFilter(AbstractFilter::Images, 1));
+            setFilter(new APrioriLongitudeSigmaFilter(AbstractFilter::Images |
+                AbstractFilter::Points, 1));
             break;
           case 14:
-            setFilter(new MeasureTypeFilter(AbstractFilter::Images, 1));
+            setFilter(new APrioriRadiusFilter(AbstractFilter::Images |
+                AbstractFilter::Points, 1));
             break;
           case 15:
-            setFilter(new ResidualMagnitudeFilter(AbstractFilter::Images, 1));
+            setFilter(new APrioriRadiusSigmaFilter(AbstractFilter::Images |
+                AbstractFilter::Points, 1));
             break;
           case 16:
-            setFilter(new SampleFilter(AbstractFilter::Images, 1));
+            setFilter(new ChooserNameFilter(AbstractFilter::Images |
+                AbstractFilter::Points, 1));
             break;
           case 17:
+            setFilter(new PointEditLockedFilter(AbstractFilter::Images |
+                AbstractFilter::Points, 1));
+            break;
+          case 18:
+            setFilter(new PointIgnoredFilter(AbstractFilter::Images |
+                AbstractFilter::Points, 1));
+            break;
+          case 19:
+            setFilter(new PointJigsawRejectedFilter(AbstractFilter::Images |
+                AbstractFilter::Points, 1));
+            break;
+          case 20:
+            setFilter(new PointIdFilter(AbstractFilter::Images |
+                AbstractFilter::Points, 1));
+            break;
+          case 21:
+            setFilter(new PointTypeFilter(AbstractFilter::Images |
+                AbstractFilter::Points, 1));
+            break;
+          case 23:
+            setFilter(new GoodnessOfFitFilter(AbstractFilter::Images, 1));
+            break;
+          case 24:
+            setFilter(new MeasureIgnoredFilter(AbstractFilter::Images, 1));
+            break;
+          case 25:
+            setFilter(new MeasureJigsawRejectedFilter(
+                AbstractFilter::Images, 1));
+            break;
+          case 26:
+            setFilter(new LineFilter(AbstractFilter::Images, 1));
+            break;
+          case 27:
+            setFilter(new LineResidualFilter(AbstractFilter::Images, 1));
+            break;
+          case 28:
+            setFilter(new LineShiftFilter(AbstractFilter::Images, 1));
+            break;
+          case 29:
+            setFilter(new MeasureTypeFilter(AbstractFilter::Images, 1));
+            break;
+          case 30:
+            setFilter(new ResidualMagnitudeFilter(AbstractFilter::Images, 1));
+            break;
+          case 31:
+            setFilter(new SampleFilter(AbstractFilter::Images, 1));
+            break;
+          case 32:
             setFilter(new SampleResidualFilter(AbstractFilter::Images, 1));
+            break;
+          case 33:
+            setFilter(new SampleShiftFilter(AbstractFilter::Images, 1));
             break;
         }
       }

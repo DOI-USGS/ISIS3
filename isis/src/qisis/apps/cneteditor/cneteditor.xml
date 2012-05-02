@@ -170,5 +170,11 @@
       ability to enable/disable sorting and set table size limits for automatic
       enabling of sorting on either the point or measure table. Fixes #360.
     </change>
+    <change name="Jai Rideout" date="2012-05-02">
+      Added several new filters for filtering points/measures, as well as
+      images/points. The new filters include: a priori/adjuted lat/lon/radius,
+      a priori/adjusted lat/lon/radius sigma, jigsaw rejected points, jigsaw
+      rejected measures, sample and line shift. Fixes #367.
+    </change>
   </history>
 </application>
