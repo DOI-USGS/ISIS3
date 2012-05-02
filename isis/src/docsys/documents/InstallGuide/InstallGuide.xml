@@ -233,8 +233,9 @@ you must <em>not</em> upgrade the Isis Data Files!!!
         <p>
           <strong>Announcing a new service useable by ISIS to retrieve 
           SPICE data for cubes.</strong> Isis can now use a service to 
-          retreive the SPICE data for most instruments Isis supports via
-          the internet. This
+          retrieve the SPICE data for all instruments Isis supports via
+          the internet. To use this service instead of your local SPICE
+          data use "web=yes" when running spiceinit. This
           can significantly reduce the size of the download from our data 
           area. If you want to use this new service and not have to download all the 
           SPICE data add the following argument to the mission-specific rsync commands below:
@@ -263,7 +264,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
         </p>
         <p>
           <b>
-            Required Download
+            Base - Required Download (do not exclude kernels from the base area):
           </b>
         </p>
 <pre>
@@ -272,7 +273,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
 
 
 <p>
-  Apollo Mission:
+  Apollo Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/apollo15 data/
@@ -280,116 +281,116 @@ you must <em>not</em> upgrade the Isis Data Files!!!
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/apollo17 data/
         </pre>
 <p>
-  Cassini Mission:
+  Cassini Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/cassini data/
         </pre>
 <p>
-  Chan1 Mission:
+  Chan1 Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/chan1 data/
         </pre>
 <p>
-  Clementine Mission:
+  Clementine Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/clementine1 data/
         </pre>
 <p>
-  Dawn Mission:
+  Dawn Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/dawn data/
         </pre>
  <p>
-  Galileo Mission:
+  Galileo Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/galileo data/
         </pre>
 <p>
-  Ideal Mission:
+  Ideal Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/ideal data/
         </pre>
 <p>
-  Lunar Orbiter Mission:
+  Lunar Orbiter Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/lo data/
         </pre>
 <p>
-  Lunar Reconnaissance Orbiter Mission:
+  Lunar Reconnaissance Orbiter Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/lro data/
         </pre>
 <p>
-  Mars Exploration Rover Mission:
+  Mars Exploration Rover Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mer data/
         </pre>
 <p>
-  Mariner10 Mission:
+  Mariner10 Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mariner10 data/
         </pre>
 <p>
-  Messenger Mission:
+  Messenger Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/messenger data/
         </pre>
 <p>
-  Mars Express Mission:
+  Mars Express Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mex data/
         </pre>
 <p>
-  Mars Global Surveyor Mission:
+  Mars Global Surveyor Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mgs data/
         </pre>
 <p>
-  Mars Reconnaissance Orbiter Mission:
+  Mars Reconnaissance Orbiter Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/mro data/
         </pre>
 <p>
-  Odyssey Mission:
+  Odyssey Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/odyssey data/
         </pre>
 <p>
-  Rolo Mission:
+  Rolo Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/rolo data/
         </pre>
 <p>
-  Smart1 Mission:
+  Smart1 Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/smart1 data/
         </pre>
 <p>
-  Viking Mission:
+  Viking Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/viking1 data/
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/viking2 data/
         </pre>
 <p>
-  Voyager Mission:
+  Voyager Mission (kernels can be excluded):
 </p>
         <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/voyager1 data/
@@ -470,6 +471,26 @@ you must <em>not</em> upgrade the Isis Data Files!!!
         move the data area you will need to modify the isis3Startup.xxx script.
         </p>
 
+        <h2>Example Isis 3 Download</h2>
+        <p>
+          This is an example of downloading Isis onto a RedHat 6 system using
+          tcsh as your shell.
+        </p>
+        <pre>
+          $ cd /work
+          $ mkdir isis3
+          $ cd isis3
+          $ rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_RHEL6/isis .
+          $ rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/base data/
+          **now pick your missions without kernels**
+          **example MRO**
+          $ rsync -azv --delete --partial --exclude='kernels' isisdist.astrogeology.usgs.gov::isis3data/data/mro data/
+          **example LRO**
+          $ rsync -azv --delete --partial --exclude='kernels' isisdist.astrogeology.usgs.gov::isis3data/data/lro data/
+          for csh users edit your .cshrc and add
+          setenv ISISROOT /work/isis3/isis
+          source $ISISROOT/scripts/isis3Startup.csh
+        </pre>
       </body>
 
       <type>HTML</type>
@@ -499,6 +520,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
     <change name="Stuart Sides" date="2010-03-18">Updated for release 3.2.0</change>
     <change name="Steven Lambright" date="2010-06-25">Updated for release 3.2.1</change>
     <change name="Jai Rideout" date="2011-04-15">Added rsync partial option to rsync commands and added new mission-specific sections</change>
+    <change name="Jai Rideout and Steven Lambright" date="2012-02-06">Updated documentation to be clearer, per Trent Hare's recommendations. References #692.</change>
     <change name="Travis Addair" date="2012-03-14">Added Java installer section</change>
   </history>
 
