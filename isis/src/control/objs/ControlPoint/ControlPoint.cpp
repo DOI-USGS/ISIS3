@@ -1355,7 +1355,7 @@ namespace Isis {
       return chooserName;
     }
     else {
-      return Filename(Application::Name()).Name();
+      return FileName(Application::Name()).name();
     }
   }
 

@@ -1,5 +1,5 @@
 #include "CubeManager.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Cube.h"
 #include "Preference.h"
 
@@ -24,12 +24,12 @@ int main(int argc, char *argv[]) {
   cubes.push_back(CubeManager::Open("$base/testData/isisTruth.cub+1"));
   cubes.push_back(CubeManager::Open("$base/testData/isisTruth.cub+1"));
 
-  // Print Cube Filenames To Verify We Have Correct Ones
+  // Print Cube FileNames To Verify We Have Correct Ones
   std::cout << "Verify proper cubes have been read" << std::endl;
-  std::cout << "Cube Filenames: " << std::endl;
+  std::cout << "Cube FileNames: " << std::endl;
 
   for(int i = 0; i < (int)cubes.size(); i++) {
-    std::cout << "  " << i + 1 << " : " << Filename(cubes[i]->getFilename()).Basename() << std::endl;
+    std::cout << "  " << i + 1 << " : " << FileName(cubes[i]->getFileName()).baseName() << std::endl;
   }
 
   std::cout << std::endl;

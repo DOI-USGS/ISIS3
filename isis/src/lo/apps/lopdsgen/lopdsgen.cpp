@@ -70,9 +70,9 @@ void IsisMain() {
   Pvl &pdsLabel = p.StandardPdsLabel(ProcessExportPds::Image);
 
   // Add PRODUCT_ID keyword, the first part of the output filename
-  Filename outFileNoExt(ui.GetFilename("TO"));
-  outFileNoExt.RemoveExtension();
-  iString productID(outFileNoExt.Basename());
+  FileName outFileNoExt(ui.GetFileName("TO"));
+  outFileNoExt = outFileNoExt.removeExtension();
+  iString productID(outFileNoExt.baseName());
   PvlKeyword productId("PRODUCT_ID", productID.UpCase());
   pdsLabel.AddKeyword(productId);
 
@@ -151,8 +151,8 @@ void IsisMain() {
       pdsLabel.FindObject("IMAGE").AddKeyword(PvlKeyword("MAXIMUM", p.CubeStatistics(0)->Maximum()), Pvl::Replace);
     }
     else {
-      Filename inputFile(ui.GetFilename("FROM"));
-      string msg = "[" + inputFile.Expanded() + "] does not appear to be an LO file.  ";
+      FileName inputFile(ui.GetFileName("FROM"));
+      string msg = "[" + inputFile.expanded() + "] does not appear to be an LO file.  ";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -199,8 +199,8 @@ void IsisMain() {
     bandLab.Auto(pdsLabel);
   }
   else {
-    Filename inputFile(ui.GetFilename("FROM"));
-    string msg = "[" + inputFile.Expanded() + "] does not contain boresight or fiducial information.  ";
+    FileName inputFile(ui.GetFileName("FROM"));
+    string msg = "[" + inputFile.expanded() + "] does not contain boresight or fiducial information.  ";
     msg += "Try ingesting your data with lo2isis first.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -230,9 +230,9 @@ void IsisMain() {
   pdsLabel.SetFormatTemplate(formatDir + "LoExportTemplate.pft");
 
   // Write labels to output file
-  Filename outFile(ui.GetFilename("TO", "img"));
-  string outFilename(outFile.Expanded());
-  ofstream oCube(outFilename.c_str());
+  FileName outFile(ui.GetFileName("TO", "img"));
+  string outFileName(outFile.expanded());
+  ofstream oCube(outFileName.c_str());
   p.OutputLabel(oCube);
   p.StartProcess(oCube);
   oCube.close();

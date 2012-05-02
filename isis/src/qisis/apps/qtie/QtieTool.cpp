@@ -28,7 +28,7 @@
 #include "BundleAdjust.h"
 #include "ControlMeasure.h"
 #include "Distance.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "History.h"
 #include "iString.h"
 #include "iTime.h"
@@ -203,8 +203,8 @@ namespace Isis {
    */
   void QtieTool::createMenus() {
 
-    p_saveNet = new QAction(QIcon(Filename(
-      "$base/icons/mActionFileSaveAs.png").Expanded()), "Save Control Network &As...",
+    p_saveNet = new QAction(QIcon(FileName(
+      "$base/icons/mActionFileSaveAs.png").expanded()), "Save Control Network &As...",
                             p_tieTool);
     p_saveNet->setToolTip("Save current control network to chosen file");
     p_saveNet->setStatusTip("Save current control network to chosen file");
@@ -250,8 +250,8 @@ namespace Isis {
     //    registrationMenu->addAction(interestOp);
 
 
-    p_whatsThis = new QAction(QIcon(Filename(
-      "$base/icons/contexthelp.png").Expanded()),"&Whats's This", p_tieTool);
+    p_whatsThis = new QAction(QIcon(FileName(
+      "$base/icons/contexthelp.png").expanded()),"&Whats's This", p_tieTool);
     p_whatsThis->setShortcut(Qt::SHIFT | Qt::Key_F1);
     p_whatsThis->setToolTip("Activate What's This and click on items on "
                           "user interface to see more information.");
@@ -306,7 +306,7 @@ namespace Isis {
     p_baseSN = SerialNumber::Compose(*p_baseCube, true);
     p_matchSN = SerialNumber::Compose(*p_matchCube);
 
-    p_serialNumberList->Add(matchCube->getFilename());
+    p_serialNumberList->Add(matchCube->getFileName());
 
     //  Save off universal ground maps
     try {
@@ -473,7 +473,7 @@ namespace Isis {
     // ???  do we only allow mouse clicks on level1???
     //    If we allow on both, need to find samp,line on level1 if
     //    they clicked on basemap.
-    std::string file = cvp->cube()->getFilename();
+    std::string file = cvp->cube()->getFileName();
     std::string sn = p_serialNumberList->SerialNumber(file);
 
     double samp, line;
@@ -741,7 +741,7 @@ namespace Isis {
       }
 
       double samp, line;
-      if (vp->cube()->getFilename() == p_baseCube->getFilename()) {
+      if (vp->cube()->getFileName() == p_baseCube->getFileName()) {
         // Draw on left viewport (base)
         samp = p[Base]->GetSample();
         line = p[Base]->GetLine();
@@ -900,7 +900,7 @@ namespace Isis {
     history += PvlKeyword("UserName", Application::UserName());
     PvlGroup results("Results");
     results += PvlKeyword("CameraAnglesUpdated", "True");
-    results += PvlKeyword("BaseMap", p_baseCube->getFilename());
+    results += PvlKeyword("BaseMap", p_baseCube->getFileName());
     history += results;
 
     h.AddEntry(history);
@@ -944,12 +944,12 @@ namespace Isis {
   void QtieTool::viewTemplateFile() {
     try {
       // Get the template file from the ControlPointEditor object
-      Pvl templatePvl(p_pointEditor->templateFilename());
+      Pvl templatePvl(p_pointEditor->templateFileName());
       // Create registration dialog window using PvlEditDialog class
       // to view and/or edit the template
       PvlEditDialog registrationDialog(templatePvl);
       registrationDialog.setWindowTitle("View or Edit Template File: "
-                                        + QString::fromStdString(templatePvl.Filename()));
+                                        + QString::fromStdString(templatePvl.FileName()));
       registrationDialog.resize(550, 360);
       registrationDialog.exec();
     }

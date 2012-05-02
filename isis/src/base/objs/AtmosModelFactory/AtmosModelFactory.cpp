@@ -25,7 +25,7 @@
 #include "AtmosModel.h"
 #include "Plugin.h"
 #include "IException.h"
-#include "Filename.h"
+#include "FileName.h"
 
 namespace Isis {
   /**
@@ -78,8 +78,8 @@ namespace Isis {
 
     // Open the factory plugin file
     Plugin *p = new Plugin;
-    Filename f("AtmosModel.plugin");
-    if(f.Exists()) {
+    FileName f("AtmosModel.plugin");
+    if(f.fileExists()) {
       p->Read("AtmosModel.plugin");
     }
     else {

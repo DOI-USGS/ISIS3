@@ -64,14 +64,14 @@ void IsisMain() {
 
   // Verify Voyager1 spacecraft
   if (inst["SpacecraftName"][0] != "VOYAGER_1") {
-    string msg = "The cube [" + ui.GetFilename("FROM") + "] does not appear" +
+    string msg = "The cube [" + ui.GetFileName("FROM") + "] does not appear" +
                  " to be a Voyager1 image";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Verify has been radiometrically calibrated
   if (!isiscube.HasGroup("Radiometry")) {
-    string msg = "The cube [" + ui.GetFilename("FROM") + "] has not been" +
+    string msg = "The cube [" + ui.GetFileName("FROM") + "] has not been" +
                  "radiometrically corrected, run voycal first";
   }
 
@@ -84,7 +84,7 @@ void IsisMain() {
 
   // From Isis2, the time range is day 64, hours 1-16, inclusive.
   if (time < min || time >= max) {
-    string message = "The cube [" + ui.GetFilename("FROM") + "] has image" +
+    string message = "The cube [" + ui.GetFileName("FROM") + "] has image" +
                      " time [" + time.UTC() + "] outside of allowable" +
                      "range [" + min.UTC() + "] to [" + max.UTC() + "]";
     throw IException(IException::User, message, _FILEINFO_);

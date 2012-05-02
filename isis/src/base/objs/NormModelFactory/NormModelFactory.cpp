@@ -25,7 +25,7 @@
 #include "NormModel.h"
 #include "Plugin.h"
 #include "IException.h"
-#include "Filename.h"
+#include "FileName.h"
 
 namespace Isis {
   /**
@@ -68,8 +68,8 @@ namespace Isis {
 
     // Open the factory plugin file
     Plugin *p = new Plugin;
-    Filename f("NormModel.plugin");
-    if(f.Exists()) {
+    FileName f("NormModel.plugin");
+    if(f.fileExists()) {
       p->Read("NormModel.plugin");
     }
     else {
@@ -124,8 +124,8 @@ namespace Isis {
 
     // Open the factory plugin file
     Plugin *p = new Plugin;
-    Filename f("NormModel.plugin");
-    if(f.Exists()) {
+    FileName f("NormModel.plugin");
+    if(f.fileExists()) {
       p->Read("NormModel.plugin");
     }
     else {

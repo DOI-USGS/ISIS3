@@ -31,7 +31,7 @@
 #include "Instrument.hh"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "Filename.h"
+#include "FileName.h"
 
 using namespace UA::HiRISE;
 using std::string;
@@ -128,8 +128,8 @@ namespace Isis {
     if(jdata.summing != other.summing) {
       ostringstream msg;
       msg << "Summing mode (" << jdata.summing
-          << ") in file " << getFilename() << " is not equal to summing mode ("
-          << other.summing << ") in file " << cube.getFilename() << endl;
+          << ") in file " << getFileName() << " is not equal to summing mode ("
+          << other.summing << ") in file " << cube.getFileName() << endl;
       throw IException(IException::User, msg.str(), _FILEINFO_);
     }
     return;
@@ -152,15 +152,15 @@ namespace Isis {
   void HiJitCube::loadNaifTiming() {
     if(!naifLoaded) {
 //  Load the NAIF kernels to determine timing data
-      Isis::Filename leapseconds("$base/kernels/lsk/naif????.tls");
-      leapseconds.HighestVersion();
+      Isis::FileName leapseconds("$base/kernels/lsk/naif????.tls");
+      leapseconds = leapseconds.highestVersion();
 
-      Isis::Filename sclk("$mro/kernels/sclk/MRO_SCLKSCET.?????.65536.tsc");
-      sclk.HighestVersion();
+      Isis::FileName sclk("$mro/kernels/sclk/MRO_SCLKSCET.?????.65536.tsc");
+      sclk = sclk.highestVersion();
 
 //  Load the kernels
-      string lsk = leapseconds.Expanded();
-      string sClock = sclk.Expanded();
+      string lsk = leapseconds.expanded();
+      string sClock = sclk.expanded();
       furnsh_c(lsk.c_str());
       furnsh_c(sClock.c_str());
 
@@ -225,7 +225,7 @@ namespace Isis {
     Pvl *label(getLabel());
     Isis::PvlGroup inst;
     Isis::PvlGroup idinst;
-    jdata.filename = getFilename();
+    jdata.filename = getFileName();
     Isis::PvlGroup &archive = label->FindGroup("Archive", Isis::Pvl::Traverse);
     jdata.productId = (string) archive["ProductId"];
 
@@ -278,7 +278,7 @@ namespace Isis {
       ostringstream msg;
       msg << "Summing mode (" << jdata.summing
           << ") is illegal (must be > 0) or CPMM number (" << jdata.cpmmNumber
-          << ") is invalid in file " << getFilename() << endl;
+          << ") is invalid in file " << getFileName() << endl;
       throw IException(IException::User, msg.str(), _FILEINFO_);
     }
 
@@ -289,7 +289,7 @@ namespace Isis {
     if((jdata.channelNumber > 2) || (jdata.channelNumber < 0)) {
       ostringstream msg;
       msg << "Channel number (" << jdata.channelNumber
-          << ") is invalid (must be 0, 1 or 2) in file " << getFilename()
+          << ") is invalid (must be 0, 1 or 2) in file " << getFileName()
           << endl;
       throw IException(IException::User, msg.str(), _FILEINFO_);
     }
@@ -319,7 +319,7 @@ namespace Isis {
 
     ostringstream msg;
     msg << "Invalid summing mode (" << summing << ") for file " <<
-        getFilename() << std::endl;
+        getFileName() << std::endl;
     throw IException(IException::User, msg.str(), _FILEINFO_);
   }
 

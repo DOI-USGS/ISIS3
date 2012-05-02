@@ -1,5 +1,5 @@
 #include <cmath>
-#include "Filename.h"
+#include "FileName.h"
 #include "PhotoModel.h"
 #include "Plugin.h"
 #include "Pvl.h"

@@ -34,7 +34,7 @@ void IsisMain() {
   // Setup the input and make sure it is a ctx file
   UserInterface &ui = Application::GetUserInterface();
 
-  Isis::Pvl lab(ui.GetFilename("FROM"));
+  Isis::Pvl lab(ui.GetFileName("FROM"));
   Isis::PvlGroup &inst =
     lab.FindGroup("Instrument", Pvl::Traverse);
 
@@ -48,12 +48,11 @@ void IsisMain() {
 
   Cube flatFile;
   if(ui.WasEntered("FLATFILE")) {
-    flatFile.open(ui.GetFilename("FLATFILE"));
+    flatFile.open(ui.GetFileName("FLATFILE"));
   }
   else {
-    Filename flat("$mro/calibration/ctxFlat_????.cub");
-    flat.HighestVersion();
-    flatFile.open(flat.Expanded());
+    FileName flat = FileName("$mro/calibration/ctxFlat_????.cub").highestVersion();
+    flatFile.open(flat.expanded());
   }
   flat = new Brick(5000, 1, 1, flatFile.getPixelType());
   flat->SetBasePosition(1, 1, 1);
@@ -61,7 +60,7 @@ void IsisMain() {
 
   // If it is already calibrated then complain
   if(icube->hasGroup("Radiometry")) {
-    string msg = "The CTX image [" + icube->getFilename() + "] has already "
+    string msg = "The CTX image [" + icube->getFileName() + "] has already "
                  "been radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -148,7 +147,7 @@ void IsisMain() {
     double w0 = 3660.5;
     double w1 = w0 * ((dist * dist) / (dist1 * dist1));
     if(exposure *w1 == 0.0) {
-      string msg = icube->getFilename() + ": exposure or w1 has value of 0.0 ";
+      string msg = icube->getFileName() + ": exposure or w1 has value of 0.0 ";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     iof = 1.0 / (exposure * w1);
@@ -163,7 +162,7 @@ void IsisMain() {
   // Add the radiometry group
   PvlGroup calgrp("Radiometry");
 
-  calgrp += PvlKeyword("FlatFile", flatFile.getFilename());
+  calgrp += PvlKeyword("FlatFile", flatFile.getFileName());
   calgrp += PvlKeyword("iof", iof);
 
 

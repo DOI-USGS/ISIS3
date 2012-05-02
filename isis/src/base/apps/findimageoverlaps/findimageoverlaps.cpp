@@ -11,7 +11,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   SerialNumberList serialNumbers(true);
 
-  FileList images(ui.GetFilename("FROMLIST"));
+  FileList images(ui.GetFileName("FROMLIST"));
   // list of sns/filenames sorted by serial number
   vector< pair<string, string> > sortedList;
 
@@ -39,8 +39,8 @@ void IsisMain() {
   ImageOverlapSet overlaps(true);
 
   // Use multi-threading to create the overlaps
-  overlaps.FindImageOverlaps(serialNumbers, Filename(ui.GetFilename(
-      "OVERLAPLIST")).Expanded());
+  overlaps.FindImageOverlaps(serialNumbers, FileName(ui.GetFileName(
+      "OVERLAPLIST")).expanded());
 
 
   // This will only occur when "CONTINUE" was true, so we can assume "ERRORS" was
@@ -56,12 +56,12 @@ void IsisMain() {
       if(!filenamesOnly) {
         outFile += errorList[err];
       }
-      else if(errorList[err].HasKeyword("Filenames")) {
+      else if(errorList[err].HasKeyword("FileNames")) {
         PvlGroup origError = errorList[err];
         PvlGroup err("ImageOverlapError");
 
         for(int keyword = 0; keyword < origError.Keywords(); keyword++) {
-          if(origError[keyword].Name() == "Filenames") {
+          if(origError[keyword].Name() == "FileNames") {
             err += origError[keyword];
           }
         }
@@ -70,7 +70,7 @@ void IsisMain() {
       }
     }
 
-    outFile.Write(Filename(ui.GetFilename("ERRORS")).Expanded());
+    outFile.Write(FileName(ui.GetFileName("ERRORS")).expanded());
   }
 
   PvlGroup results("Results");

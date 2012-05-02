@@ -61,7 +61,7 @@ FILE *write_header(int width, int height, FILE *infile, char *outfname)
 
   if(out < 0) {
     i = remove(outfname);
-    if(errno == 0 || errno == 2) out = 1;
+    if(i == 0 || i == 2) out = 1;
     else {
       fprintf(stderr, "can't create %s\n", outfname);
       exit(1);

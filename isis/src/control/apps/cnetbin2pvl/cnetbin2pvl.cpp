@@ -12,10 +12,10 @@ void IsisMain() {
   Progress p;
 
   ControlNet cnet;
-  cnet.ReadControl(ui.GetFilename("FROM"), &p);
+  cnet.ReadControl(ui.GetFileName("FROM"), &p);
   p.SetText("Writing Control Network...");
   p.SetMaximumSteps(1);
   p.CheckStatus();
-  cnet.Write(ui.GetFilename("TO"), true);
+  cnet.Write(ui.GetFileName("TO"), true);
   p.CheckStatus();
 }

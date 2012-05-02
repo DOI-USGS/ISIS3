@@ -42,7 +42,7 @@ namespace Isis {
    * @internal
    *   @history 2009-11-10 Mackenzie Boyd - Refactored to reduce
    *            code duplication in children GuiCubeParameter and
-   *            GuiFilenameParameter, specifically, SelectFile
+   *            GuiFileNameParameter, specifically, SelectFile
    *            method.
    *   @history 2009-12-15 Travis Addair - Moved the SelectFile
    *            method back to children.
@@ -88,7 +88,7 @@ namespace Isis {
       virtual std::vector<std::string> Exclusions();
 
       enum ParameterType { IntegerWidget, DoubleWidget, StringWidget,
-                           ListWidget, FilenameWidget, CubeWidget,
+                           ListWidget, FileNameWidget, CubeWidget,
                            BooleanWidget, ComboWidget
                          };
       ParameterType Type() {

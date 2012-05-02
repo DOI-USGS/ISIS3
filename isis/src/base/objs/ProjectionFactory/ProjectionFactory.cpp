@@ -28,7 +28,7 @@
 #include "Camera.h"
 #include "Cube.h"
 #include "Displacement.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Plugin.h"
 #include "Projection.h"
@@ -65,14 +65,14 @@ namespace Isis {
     // load the system file
     Plugin p;
 
-    if(m_projPlugin.Filename() == "") {
-      Filename localFile("Projection.plugin");
-      if(localFile.Exists())
-        m_projPlugin.Read(localFile.Expanded());
+    if(m_projPlugin.FileName() == "") {
+      FileName localFile("Projection.plugin");
+      if(localFile.fileExists())
+        m_projPlugin.Read(localFile.expanded());
 
-      Filename systemFile("$ISISROOT/lib/Projection.plugin");
-      if(systemFile.Exists())
-        m_projPlugin.Read(systemFile.Expanded());
+      FileName systemFile("$ISISROOT/lib/Projection.plugin");
+      if(systemFile.fileExists())
+        m_projPlugin.Read(systemFile.expanded());
     }
 
     try {
@@ -274,7 +274,7 @@ namespace Isis {
     }
     catch(IException &e) {
       string msg = "Unable to create projection";
-      if(label.Filename() != "") msg += " from file [" + label.Filename() + "]";
+      if(label.FileName() != "") msg += " from file [" + label.FileName() + "]";
       IException finalError(IException::Unknown, msg, _FILEINFO_);
       finalError.append(errors);
       finalError.append(e);
@@ -519,7 +519,7 @@ namespace Isis {
     }
     catch(IException &e) {
       string msg = "Unable to create projection";
-      if(label.Filename() != "") msg += " from file [" + label.Filename() + "]";
+      if(label.FileName() != "") msg += " from file [" + label.FileName() + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     return proj;
@@ -569,7 +569,7 @@ namespace Isis {
     }
     catch (IException &e) {
       string msg = "Unable to initialize cube projection";
-      if(label.Filename() != "") msg += " from file [" + label.Filename() + "]";
+      if(label.FileName() != "") msg += " from file [" + label.FileName() + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     return proj;

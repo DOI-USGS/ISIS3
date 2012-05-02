@@ -1,6 +1,6 @@
 Unit Test for LoCameraFiducialMap...
 Testing medium fiducial fit on a 100 x 100 cropped frame
-Filename: 3083_med_raw.cub
+FileName: 3083_med_raw.cub
 CK Frame: -533002
 
 Upper left corner OK
@@ -10,7 +10,7 @@ Lower right corner OK
 
 -------------------------------------
 Testing high fiducial fit on a full 34530 x 8750 frame
-Filename: 4164H_Full_mirror.cub
+FileName: 4164H_Full_mirror.cub
 CK Frame: -534001
 
 Upper left corner OK

@@ -2,7 +2,7 @@
 
 #include "Isis.h"
 #include "Table.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 #include <sstream>
 
@@ -23,9 +23,9 @@ map <string, void *> GuiHelpers() {
 void IsisMain() {
   // Gather parameters from the UserInterface
   UserInterface &ui = Application::GetUserInterface();
-  Filename file = ui.GetFilename("FROM");
+  FileName file = ui.GetFileName("FROM");
   string tableName = ui.GetString("NAME");
-  Table table(tableName, file.Expanded());
+  Table table(tableName, file.expanded());
 
   // Set the character to separate the entries
   string delimit;
@@ -124,7 +124,7 @@ void IsisMain() {
 
 
   if(ui.WasEntered("TO")) {
-    string outfile(Filename(ui.GetFilename("TO")).Expanded());
+    string outfile(FileName(ui.GetFileName("TO")).expanded());
     ofstream outFile(outfile.c_str());
     outFile << ss.str();
     outFile.close();
@@ -144,8 +144,8 @@ void helperButtonGetTableList() {
   bool match = false;
 
   UserInterface &ui = Application::GetUserInterface();
-  string currentFile = ui.GetFilename("FROM");
-  const Pvl label(Filename(currentFile).Expanded());
+  string currentFile = ui.GetFileName("FROM");
+  const Pvl label(FileName(currentFile).expanded());
 
   // Check to see if the "FILE" parameter has changed since last press
   if(currentFile != previousFile) {

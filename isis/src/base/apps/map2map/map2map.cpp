@@ -25,7 +25,7 @@ void IsisMain() {
 
   // Get the map projection file provided by the user
   UserInterface &ui = Application::GetUserInterface();
-  Pvl userPvl(ui.GetFilename("MAP"));
+  Pvl userPvl(ui.GetFileName("MAP"));
   PvlGroup &userMappingGrp = userPvl.FindGroup("Mapping", Pvl::Traverse);
 
   // Open the input cube and get the projection
@@ -465,7 +465,7 @@ void PrintMap() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFilename("MAP"));
+  userMap.Read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log
@@ -479,7 +479,7 @@ void LoadMapRange() {
   Pvl userMap;
 
   try {
-    userMap.Read(ui.GetFilename("MAP"));
+    userMap.Read(ui.GetFileName("MAP"));
   }
   catch(IException &e) {
   }
@@ -488,7 +488,7 @@ void LoadMapRange() {
   Pvl fromMap;
 
   try {
-    fromMap.Read(ui.GetFilename("FROM"));
+    fromMap.Read(ui.GetFileName("FROM"));
   }
   catch(IException &e) {
   }

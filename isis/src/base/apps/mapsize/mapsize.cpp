@@ -12,7 +12,7 @@ void IsisMain() {
   // Get the output map projection file and create an output projection object
   UserInterface &ui = Application::GetUserInterface();
   Pvl lab;
-  lab.Read(ui.GetFilename("MAP"));
+  lab.Read(ui.GetFileName("MAP"));
 
   int samples, lines;
   Projection *outmap = ProjectionFactory::CreateForCube(lab, samples, lines);
@@ -44,7 +44,7 @@ void IsisMain() {
 
   // Create a label and log it
   PvlGroup results("Results");
-  results += PvlKeyword("Map", ui.GetFilename("MAP"));
+  results += PvlKeyword("Map", ui.GetFileName("MAP"));
   results += PvlKeyword("Scale", scale);
   results += PvlKeyword("Width", width, "inches");
   results += PvlKeyword("Height", height, "inches");
@@ -60,7 +60,7 @@ void IsisMain() {
     Pvl temp;
     temp.AddGroup(results);
     temp.AddGroup(lab.FindGroup("Mapping", Pvl::Traverse));
-    temp.Write(ui.GetFilename("TO", "txt"));
+    temp.Write(ui.GetFileName("TO", "txt"));
   }
 
   Application::Log(lab.FindGroup("Mapping", Pvl::Traverse));

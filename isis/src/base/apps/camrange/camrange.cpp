@@ -26,7 +26,7 @@ void IsisMain() {
   Distance radii[3];
   cam->Radii(radii);
   PvlGroup target("Target");
-  target += PvlKeyword("From", ui.GetFilename("FROM"));
+  target += PvlKeyword("From", ui.GetFileName("FROM"));
   target += PvlKeyword("TargetName", cam->Target());
   target += PvlKeyword("RadiusA", radii[0].meters(), "meters");
   target += PvlKeyword("RadiusB", radii[1].meters(), "meters");
@@ -111,7 +111,7 @@ void IsisMain() {
     temp.AddGroup(pos360);
     temp.AddGroup(pos180);
     temp.AddGroup(neg180);
-    temp.Write(ui.GetFilename("TO", "txt"));
+    temp.Write(ui.GetFileName("TO", "txt"));
   }
 
   p.EndProcess();

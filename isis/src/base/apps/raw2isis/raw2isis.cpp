@@ -5,7 +5,7 @@
 #include "ProcessImport.h"
 
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 
 using namespace std;
 using namespace Isis;
@@ -22,7 +22,7 @@ void IsisMain() {
   p.SetFileHeaderBytes(ui.GetInteger("SKIP"));
   p.SetPixelType(PixelTypeEnumeration(ui.GetString("BITTYPE")));
   p.SetByteOrder(ByteOrderEnumeration(ui.GetString("BYTEORDER")));
-  p.SetInputFile(ui.GetFilename("FROM"));
+  p.SetInputFile(ui.GetFileName("FROM"));
   p.SetOutputCube("TO");
 
   if(ui.GetBoolean("SETNULLRANGE")) {

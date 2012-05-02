@@ -26,7 +26,7 @@
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 #include "iTime.h"
 #include "naif/SpiceUsr.h"
@@ -71,20 +71,20 @@ namespace Isis {
     iString spacecraft = (string)inst["SpacecraftName"];
     iString instId = (string)inst["InstrumentId"];
 
-    iString reseauFilename = "";
+    iString reseauFileName = "";
 
     // These set up which kernel and other files to access,
     if (spacecraft == "VOYAGER_1") {
       p_ckFrameId = -31100;
       p_spkTargetId = -31;
 
-      reseauFilename += "1/reseaus/vg1";
+      reseauFileName += "1/reseaus/vg1";
 
       if (instId == "NARROW_ANGLE_CAMERA") {
-        reseauFilename += "na";
+        reseauFileName += "na";
       }
       else if (instId == "WIDE_ANGLE_CAMERA") {
-        reseauFilename += "wa";
+        reseauFileName += "wa";
       }
       else {
         string msg = "File does not appear to be a Voyager image. InstrumentId ["
@@ -96,13 +96,13 @@ namespace Isis {
       p_ckFrameId = -32100;
       p_spkTargetId = -32;
 
-      reseauFilename += "2/reseaus/vg2";
+      reseauFileName += "2/reseaus/vg2";
 
       if (instId == "NARROW_ANGLE_CAMERA") {
-        reseauFilename += "na";
+        reseauFileName += "na";
       }
       else if (instId == "WIDE_ANGLE_CAMERA") {
-        reseauFilename += "wa";
+        reseauFileName += "wa";
       }
       else {
         string msg = "File does not appear to be a Voyager image. InstrumentId ["
@@ -123,10 +123,10 @@ namespace Isis {
     focalMap->SetDetectorOrigin(500.0, 500.0);
 
     // Master reseau location file
-    reseauFilename = "$voyager" + reseauFilename + "MasterReseaus.pvl";
-    Filename masterReseaus(reseauFilename);
+    reseauFileName = "$voyager" + reseauFileName + "MasterReseaus.pvl";
+    FileName masterReseaus(reseauFileName);
     try {
-      new ReseauDistortionMap(this, lab, masterReseaus.Expanded());
+      new ReseauDistortionMap(this, lab, masterReseaus.expanded());
     } catch (IException &e) {
       e.print();
     }

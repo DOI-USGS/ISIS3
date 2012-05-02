@@ -9,7 +9,7 @@
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "ControlPointGraphicsItem.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -131,11 +131,11 @@ namespace Isis {
          (adjusted.isNull() && initial.isNull())) {
         try {
           QString sn = cp->GetReferenceSN();
-          QString filename = snToFilename(sn);
+          QString filename = snToFileName(sn);
 
           if(filename.size() > 0) {
             if((*m_cubeToGroundMap)[filename] == NULL) {
-              Pvl label(Filename(filename.toStdString()).Expanded());
+              Pvl label(FileName(filename.toStdString()).expanded());
               UniversalGroundMap *groundMap = new UniversalGroundMap(label);
               (*m_cubeToGroundMap)[filename] = groundMap;
             }
@@ -177,13 +177,13 @@ namespace Isis {
   }
 
 
-  QString ControlNetGraphicsItem::snToFilename(QString sn) {
+  QString ControlNetGraphicsItem::snToFileName(QString sn) {
     QString result;
 
     if(m_serialNumbers && m_serialNumbers->Size()) {
       try {
         result = QString::fromStdString(
-            m_serialNumbers->Filename(sn.toStdString()));
+            m_serialNumbers->FileName(sn.toStdString()));
       }
       catch(IException &) {
       }
@@ -227,7 +227,7 @@ namespace Isis {
 
       m_serialNumbers = new SerialNumberList;
 
-      QStringList cubeFiles(m_mosaicScene->cubeFilenames());
+      QStringList cubeFiles(m_mosaicScene->cubeFileNames());
 
       QString filename;
       foreach(filename, cubeFiles) {

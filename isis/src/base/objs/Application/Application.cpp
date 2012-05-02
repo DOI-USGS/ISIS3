@@ -45,7 +45,7 @@ extern int errno;
 #include "Application.h"
 #include "Constants.h"    //is this still used in this class?
 #include "CubeManager.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "Gui.h"  //is this still used?
@@ -115,19 +115,19 @@ namespace Isis {
 
     // Create user interface and log
     try {
-      Filename f(string(argv[0]) + ".xml");
+      FileName f(string(argv[0]) + ".xml");
 
       // Create preferences
-      Preference::Preferences(f.Name() == "unitTest.xml");
+      Preference::Preferences(f.name() == "unitTest.xml");
 
-      if (!f.Exists()) {
-        f = "$ISISROOT/bin/xml/" + f.Name();
-        if (!f.Exists()) {
-          string message = Message::FileOpen(f.Expanded());
+      if (!f.fileExists()) {
+        f = "$ISISROOT/bin/xml/" + f.name();
+        if (!f.fileExists()) {
+          string message = Message::FileOpen(f.expanded());
           throw IException(IException::Io, message, _FILEINFO_);
         }
       }
-      string xmlfile = f.Expanded();
+      string xmlfile = f.expanded();
 
       p_ui = new UserInterface(xmlfile, argc, argv);
       if (!p_ui->IsInteractive()) {
@@ -838,9 +838,8 @@ namespace Isis {
    */
   PvlGroup Application::GetUnameInfo() {
     // Create a temporary file to store console output to
-    Filename temp;
-    temp.Temporary("$temporary/UnameConsoleInfo", "txt");
-    iString tempFile = temp.Expanded();
+    FileName temp = FileName::createTempFile("$temporary/UnameConsoleInfo.txt");
+    iString tempFile = temp.expanded();
 
     // Uname commands output to temp file with each of the following
     // values on its own line in this order:
@@ -919,13 +918,12 @@ namespace Isis {
    */
   PvlGroup Application::GetEnviromentInfo() {
     // Create a temporary file to store console output to
-    Filename temp;
-    temp.Temporary("$temporary/EnviromentInfo", "txt");
-    iString tempFile = temp.Expanded();
+    FileName temp = FileName::createTempFile("$temporary/EnviromentInfo.txt");
+    iString tempFile = temp.expanded();
     PvlGroup envGroup("EnviromentVariables");
     ifstream readTemp;
 
-    string env1 = "printenv SHELL > " + tempFile;
+    string env1 = "printenv SHELL >| " + tempFile;
     string env2 = "printenv HOME >> " + tempFile;
     string env3 = "printenv PWD >> " + tempFile;
     string env5 = "printenv ISISROOT >> " + tempFile;
@@ -961,11 +959,10 @@ namespace Isis {
    * @return iString containing df results
    */
   iString Application::GetSystemDiskSpace() {
-    Filename temp;
-    temp.Temporary("$temporary/SystemDiskSpace", "txt");
-    iString tempFile = temp.Expanded();
+    FileName temp = FileName::createTempFile("$temporary/SystemDiskSpace.txt");
+    iString tempFile = temp.expanded();
     ifstream readTemp;
-    string diskspace = "df > " + tempFile;
+    string diskspace = "df >| " + tempFile;
     ProgramLauncher::RunSystemCommand(diskspace);
     readTemp.open(tempFile.c_str(), ifstream::in);
 
@@ -989,17 +986,16 @@ namespace Isis {
    * @return iString containing application information
    */
   iString Application::GetLibraryDependencies(iString file) {
-    Filename temp;
-    temp.Temporary("$temporary/LibraryDependencies", "txt");
-    iString tempFile = temp.Expanded();
+    FileName temp = FileName::createTempFile("$temporary/LibraryDependencies.txt");
+    iString tempFile = temp.expanded();
     ifstream readTemp;
     string dependencies = "";
 #if defined(__linux__)
-    dependencies = "ldd -v " + file + " > " + tempFile;
+    dependencies = "ldd -v " + file + " >| " + tempFile;
 #elif defined(__APPLE__)
-    dependencies = "otool -L " + file + " > " + tempFile;
+    dependencies = "otool -L " + file + " >| " + tempFile;
 #elif defined (__sun__)
-    dependencies = "ldd -v " + file + " > " + tempFile;
+    dependencies = "ldd -v " + file + " >| " + tempFile;
 #endif
     ProgramLauncher::RunSystemCommand(dependencies);
     readTemp.open(tempFile.c_str(), ifstream::in);

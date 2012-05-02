@@ -129,7 +129,7 @@ namespace Isis {
     }
     else {
       // Place the input in the mosaic
-      Progress()->SetText("Mosaicking " + Filename(inputFile).Name());
+      Progress()->SetText("Mosaicking " + FileName(inputFile).name());
 
       try {
         do {
@@ -143,7 +143,7 @@ namespace Isis {
         while(wrapPossible && outSample < nsMosaic);
       }
       catch(IException &e) {
-        string msg = "Unable to mosaic cube [" + Filename(inputFile).Name() + "]";
+        string msg = "Unable to mosaic cube [" + FileName(inputFile).name() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }

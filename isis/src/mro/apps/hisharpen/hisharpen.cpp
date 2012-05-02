@@ -125,12 +125,12 @@ void CreatePsf(Pipeline &p) {
 
   // calculate the temp file filename
   iString tmpFile = p.TemporaryFolder() + "/";
-  tmpFile += Filename(ui.GetAsString("TO")).Basename();
+  tmpFile += FileName(ui.GetAsString("TO")).baseName();
   tmpFile += ".psf.cub";
 
   // We need the base input and psf cubes to make the temporary psf cube
   Cube fromCube;
-  fromCube.open(ui.GetFilename("FROM"));
+  fromCube.open(ui.GetFileName("FROM"));
 
   // Verify the image looks like a hirise image
   try {
@@ -244,7 +244,7 @@ void CleanPsf() {
   UserInterface &ui = Application::GetUserInterface();
 
   if(!manualPsf) {
-    iString psfTempFile = Filename(ui.GetAsString("PSF")).Expanded();
+    iString psfTempFile = FileName(ui.GetAsString("PSF")).expanded();
 
     if(ui.GetBoolean("CLEANUP")) {
       remove(psfTempFile.c_str());

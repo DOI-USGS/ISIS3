@@ -7,7 +7,7 @@
 
 #include "UserInterface.h"
 #include "CubeAttribute.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iTime.h"
 
@@ -28,15 +28,15 @@ void IsisMain() {
   // Grab the file to import
   ProcessImportPds p;
   UserInterface &ui = Application::GetUserInterface();
-  Filename inFile = ui.GetFilename("FROM");
-  Filename out = ui.GetFilename("TO");
+  FileName inFile = ui.GetFileName("FROM");
+  FileName out = ui.GetFileName("TO");
 
   // Make sure it is a Galileo SSI image
-  Pvl lab(inFile.Expanded());
+  Pvl lab(inFile.expanded());
 
   //Checks if in file is rdr
   if(lab.HasObject("IMAGE_MAP_PROJECTION")) {
-    string msg = "[" + inFile.Name() + "] appears to be an rdr file.";
+    string msg = "[" + inFile.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
@@ -54,7 +54,7 @@ void IsisMain() {
   }
   catch(IException &e) {
     string msg = "Unable to read [DATA_SET_ID] from input file [" +
-                 inFile.Expanded() + "]";
+                 inFile.expanded() + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
@@ -85,7 +85,7 @@ void IsisMain() {
 
   Progress prog;
   Pvl pdsLabel;
-  p.SetPdsFile(inFile.Expanded(), "", pdsLabel);
+  p.SetPdsFile(inFile.expanded(), "", pdsLabel);
 
   //Set up the output file
   Cube *ocube;
@@ -98,7 +98,7 @@ void IsisMain() {
     summedOutput = new Cube();
     summedOutput->setDimensions(p.Samples() / 2, p.Lines() / 2, p.Bands());
     summedOutput->setPixelType(p.PixelType());
-    summedOutput->create(ui.GetFilename("TO"));
+    summedOutput->create(ui.GetFileName("TO"));
     p.StartProcess(TranslateData);
     ocube = summedOutput;
   }
@@ -124,10 +124,10 @@ void TranslateLabels(Pvl &pdsLabel, Cube *ocube) {
 
   // Transfer the instrument group to the output cube
   iString transDir = (string) dataDir["Galileo"];
-  Filename transFile(transDir + "/translations/galileoSsi.trn");
+  FileName transFile(transDir + "/translations/galileoSsi.trn");
 
   // Get the translation manager ready
-  PvlTranslationManager labelXlater(pdsLabel, transFile.Expanded());
+  PvlTranslationManager labelXlater(pdsLabel, transFile.expanded());
   // Pvl outputLabels;
   Pvl *outputLabel = ocube->getLabel();
   labelXlater.Auto(*(outputLabel));

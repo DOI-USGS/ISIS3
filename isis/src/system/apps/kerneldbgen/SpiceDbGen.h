@@ -25,7 +25,7 @@
  */
 
 #include <iostream>
-#include "Filename.h"
+#include "FileName.h"
 #include "Pvl.h"
 #include "iString.h"
 #include "naif/SpiceUsr.h"
@@ -54,8 +54,8 @@ class SpiceDbGen {
                      std::vector<std::string> & filter);
     void FurnishDependencies(string sclk, string fk);
   private:
-    QStringList GetFiles(Filename location, iString filter);
-    PvlGroup AddSelection(Filename fileIn);
+    QStringList GetFiles(FileName location, iString filter);
+    PvlGroup AddSelection(FileName fileIn);
     PvlGroup FormatIntervals(SpiceCell &coverage, string type);
     PvlGroup GetIntervals(SpiceCell &cover);
     //private instance variables

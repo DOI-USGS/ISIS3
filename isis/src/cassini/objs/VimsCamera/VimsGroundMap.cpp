@@ -27,7 +27,7 @@
 
 #include "Camera.h"
 #include "Constants.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "iTime.h"

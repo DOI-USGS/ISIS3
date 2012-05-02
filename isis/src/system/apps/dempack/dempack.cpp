@@ -9,7 +9,7 @@
 #include <QSet>
 #include <QString>
 
-#include "Filename.h"
+#include "FileName.h"
 #include "Preference.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -26,18 +26,17 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Fetch the DEM DB file
-  Filename dbFilename;
+  FileName dbFileName;
   if (ui.WasEntered("FROM")) {
-    dbFilename = ui.GetFilename("FROM");
+    dbFileName = ui.GetFileName("FROM");
   }
   else {
     // If not provided, assume the latest DB file in the data area
     string demFile("$base/dems/kernels.????.db");
-    dbFilename = demFile;
-    dbFilename.HighestVersion();
+    dbFileName = FileName(demFile).highestVersion();
   }
 
-  Pvl dems(dbFilename.Expanded());
+  Pvl dems(dbFileName.expanded());
   PvlObject &demObject = dems.FindObject("Dem");
 
   QMap< QString, QList<QString> > demMap;
@@ -60,8 +59,8 @@ void IsisMain() {
       string pattern = file[1];
 
       // Some DEMs are hardcoded, but others are versioned.
-      Filename demFilename(area + "/" + pattern);
-      if (demFilename.IsVersioned()) demFilename.HighestVersion();
+      FileName demFileName(area + "/" + pattern);
+      if (demFileName.isVersioned()) demFileName = demFileName.highestVersion();
 
       // Find the corresponding Isis Preference if one exists
       if (Preference::Preferences().HasGroup("DataDirectory")) {
@@ -77,7 +76,7 @@ void IsisMain() {
 
       // Construct the relative path with environment variable placeholders in
       // tact for outputting to XML
-      string filePath = area + "/dems/" + demFilename.Name();
+      string filePath = area + "/dems/" + demFileName.name();
 
       // Add this filename to the list of DEMs corresponding to its target.  If
       // that list doesn't already exist, create it first.
@@ -87,9 +86,9 @@ void IsisMain() {
   }
 
   // Prepare to write out the output XML.
-  Filename outFile = ui.GetFilename("TO");
+  FileName outFile = ui.GetFileName("TO");
   ofstream os;
-  os.open(outFile.Expanded().c_str(), ios::out);
+  os.open(outFile.expanded().c_str(), ios::out);
 
   // Write the installation XML
   os << "<packs>";

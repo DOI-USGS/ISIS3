@@ -364,7 +364,7 @@ namespace Isis {
     QList<Cube *> missingXCubes = removeFromList(allXCubes, listedXCubes);
     foreach (Cube *cubeToAdd, missingXCubes) {
       if (m_xAxisCubeCombo->findData(qVariantFromValue(cubeToAdd)) == -1) {
-        QString cubeName = QFileInfo(cubeToAdd->getFilename()).baseName();
+        QString cubeName = QFileInfo(cubeToAdd->getFileName()).baseName();
         m_xAxisCubeCombo->addItem(cubeName, qVariantFromValue(cubeToAdd));
       }
     }
@@ -405,7 +405,7 @@ namespace Isis {
       QList<Cube *> missingYCubes = removeFromList(allYCubes, listedYCubes);
       foreach (Cube *cubeToAdd, missingYCubes) {
         if (m_yAxisCubeCombo->findData(qVariantFromValue(cubeToAdd)) == -1) {
-          QString cubeName = QFileInfo(cubeToAdd->getFilename()).baseName();
+          QString cubeName = QFileInfo(cubeToAdd->getFileName()).baseName();
           m_yAxisCubeCombo->addItem(cubeName, qVariantFromValue(cubeToAdd));
         }
       }

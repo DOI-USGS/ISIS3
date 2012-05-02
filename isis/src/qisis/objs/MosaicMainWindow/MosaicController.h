@@ -139,11 +139,11 @@ namespace Isis {
        *
        * @internal
        */
-      class FilenameToDisplayFunctor : public std::unary_function<
+      class FileNameToDisplayFunctor : public std::unary_function<
           const QString &, CubeDisplayProperties *> {
 
         public:
-          FilenameToDisplayFunctor(QMutex *cameraMutex, QThread *targetThread,
+          FileNameToDisplayFunctor(QMutex *cameraMutex, QThread *targetThread,
               bool openFilled, int defaultAlpha);
           CubeDisplayProperties *operator()(const QString &);
 

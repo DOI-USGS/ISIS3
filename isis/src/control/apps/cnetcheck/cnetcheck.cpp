@@ -28,7 +28,7 @@
 #include "ControlPointList.h"
 #include "CubeManager.h"
 #include "FileList.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 #include "ProjectionFactory.h"
 #include "PvlGroup.h"
@@ -81,7 +81,7 @@ void IsisMain() {
   Progress progress;
   UserInterface &ui = Application::GetUserInterface();
 
-  ControlNet innet(ui.GetFilename("CNET"));
+  ControlNet innet(ui.GetFileName("CNET"));
   iString prefix(ui.GetString("PREFIX"));
   bool ignore = ui.GetBoolean("IGNORE");
 
@@ -100,7 +100,7 @@ void IsisMain() {
   }
 
   // Sets up the list of serial numbers for
-  FileList inlist(ui.GetFilename("FROMLIST"));
+  FileList inlist(ui.GetFileName("FROMLIST"));
   set<iString> inListNums;
   QMap<iString, int> netSerialNumCount;
   QVector<iString> listedSerialNumbers;
@@ -214,7 +214,7 @@ void IsisMain() {
   //  Islands that have no cubes listed in the input list will
   //  not be shown.
   for(int i = 0; i < (int)islands.size(); i++) {
-    iString name(Filename(prefix + "Island." + iString(i + 1)).Expanded());
+    iString name(FileName(prefix + "Island." + iString(i + 1)).expanded());
     ofstream out_stream;
     out_stream.open(name.c_str(), std::ios::out);
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
@@ -249,7 +249,7 @@ void IsisMain() {
   }
   else if(islands.size() == 0) {
     ss << "There are no control points in the provided Control Network [";
-    ss << Filename(ui.GetFilename("CNET")).Name() << "]" << endl;
+    ss << FileName(ui.GetFileName("CNET")).name() << "]" << endl;
   }
   else {
     ss << "The cubes are NOT fully connected by the Control Network." << endl;
@@ -260,7 +260,7 @@ void IsisMain() {
     results.AddKeyword(
       PvlKeyword("SingleMeasure", iString((BigInt)singleMeasureSerialNumbers.size())));
 
-    iString name(Filename(prefix + "SinglePointCubes.txt").Expanded());
+    iString name(FileName(prefix + "SinglePointCubes.txt").expanded());
     WriteOutput(num2cube, name,
                 singleMeasureSerialNumbers, singleMeasureControlPoints);
 
@@ -271,14 +271,14 @@ void IsisMain() {
     ss << ((serials == 1) ? " cube" : " cubes") << " in Control Points with only a single";
     ss << " Control Measure." << endl;
     ss << "The serial numbers of these measures are listed in [";
-    ss <<  Filename(name).Name() + "]" << endl;
+    ss <<  FileName(name).name() + "]" << endl;
   }
 
   if(ui.GetBoolean("NOLATLON")  &&  noLatLonSerialNumbers.size() > 0) {
     results.AddKeyword(
       PvlKeyword("NoLatLonCubes", iString((BigInt)noLatLonSerialNumbers.size())));
 
-    iString name(Filename(prefix + "NoLatLon.txt").Expanded());
+    iString name(FileName(prefix + "NoLatLon.txt").expanded());
     WriteOutput(num2cube, name,
                 noLatLonSerialNumbers, noLatLonControlPoints);
 
@@ -288,7 +288,7 @@ void IsisMain() {
     ss << " serial numbers in the Control Network which are listed in the";
     ss << " input list and cannot compute latitude and longitudes." << endl;
     ss << "These serial numbers, filenames, and control points are listed in [";
-    ss << Filename(name).Name() + "]" << endl;
+    ss << FileName(name).name() + "]" << endl;
   }
 
   // Perform Low Coverage check if it was selected
@@ -298,7 +298,7 @@ void IsisMain() {
     QList< ControlCubeGraphNode * > nodes = innet.GetCubeGraphNodes();
 
     if (nodes.size() > 0) {
-      iString name(Filename(prefix + coverageOp + ".txt").Expanded());
+      iString name(FileName(prefix + coverageOp + ".txt").expanded());
       ofstream out_stream;
       out_stream.open(name.c_str(), std::ios::out);
       out_stream.seekp(0, std::ios::beg); // Start writing from file beginning
@@ -309,7 +309,7 @@ void IsisMain() {
 
         if (num2cube.HasSerialNumber(sn)) {
           // Create a convex hull
-          Cube *cube = cbman.OpenCube(num2cube.Filename(sn));
+          Cube *cube = cbman.OpenCube(num2cube.FileName(sn));
           double controlFitness = getControlFitness(node, tolerance, cube);
 
           if (controlFitness < tolerance) {
@@ -329,7 +329,7 @@ void IsisMain() {
         "input list and Control Network whose convex hulls cover less than " <<
         tolerancePercent << "\% of the image" << endl;
       ss << "The names of these images, along with the failing convex hull "
-        "coverages, are listed in [" << Filename(name).Name() << "]" << endl;
+        "coverages, are listed in [" << FileName(name).name() << "]" << endl;
 
       results.AddKeyword(
           PvlKeyword(coverageOp, iString((BigInt) failedCoverageCheck)));
@@ -341,7 +341,7 @@ void IsisMain() {
   if(ui.GetBoolean("NOCONTROL") && !inListNums.empty()) {
     results.AddKeyword(PvlKeyword("NoControl", iString((BigInt)inListNums.size())));
 
-    iString name(Filename(prefix + "NoControl.txt").Expanded());
+    iString name(FileName(prefix + "NoControl.txt").expanded());
     ofstream out_stream;
     out_stream.open(name.c_str(), std::ios::out);
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
@@ -356,10 +356,10 @@ void IsisMain() {
     ss << "----------------------------------------" \
        "----------------------------------------" << endl;
     ss << "There are " << inListNums.size();
-    ss << " cubes in the input list [" << Filename(ui.GetFilename("FROMLIST")).Name();
+    ss << " cubes in the input list [" << FileName(ui.GetFileName("FROMLIST")).name();
     ss << "] which do not exist or are ignored in the Control Network [";
-    ss << Filename(ui.GetFilename("CNET")).Name() << "]" << endl;
-    ss << "These cubes are listed in [" + Filename(name).Name() + "]" << endl;
+    ss << FileName(ui.GetFileName("CNET")).name() << "]" << endl;
+    ss << "These cubes are listed in [" + FileName(name).name() + "]" << endl;
   }
 
   // In addition, nonListedSerialNumbers should be the SerialNumbers of
@@ -369,7 +369,7 @@ void IsisMain() {
     results.AddKeyword(
       PvlKeyword("NoCube", iString((BigInt)nonListedSerialNumbers.size())));
 
-    iString name(Filename(prefix + "NoCube.txt").Expanded());
+    iString name(FileName(prefix + "NoCube.txt").expanded());
     ofstream out_stream;
     out_stream.open(name.c_str(), std::ios::out);
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
@@ -388,11 +388,11 @@ void IsisMain() {
        "----------------------------------------" << endl;
     ss << "There are " << nonListedSerialNumbers.size();
     ss << " serial numbers in the Control Net [";
-    ss << Filename(ui.GetFilename("CNET")).Basename();
+    ss << FileName(ui.GetFileName("CNET")).baseName();
     ss << "] \nwhich do not exist in the  input list [";
-    ss << Filename(ui.GetFilename("FROMLIST")).Name() << "]" << endl;
+    ss << FileName(ui.GetFileName("FROMLIST")).name() << "]" << endl;
     ss << "These serial numbers are listed in [";
-    ss << Filename(name).Name() + "]" << endl;
+    ss << FileName(name).name() + "]" << endl;
   }
 
   // At this point cubeMeasureCount should be equal to the number of
@@ -411,7 +411,7 @@ void IsisMain() {
       results.AddKeyword(
         PvlKeyword("SingleCube", iString((BigInt)singleMeasureCubes.size())));
 
-      iString name(Filename(prefix + "SingleCube.txt").Expanded());
+      iString name(FileName(prefix + "SingleCube.txt").expanded());
       ofstream out_stream;
       out_stream.open(name.c_str(), std::ios::out);
       out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
@@ -428,10 +428,10 @@ void IsisMain() {
          "----------------------------------------" << endl;
       ss << "There are " << singleMeasureCubes.size();
       ss << " serial numbers in the Control Net [";
-      ss << Filename(ui.GetFilename("CNET")).Basename();
+      ss << FileName(ui.GetFileName("CNET")).baseName();
       ss << "] which only exist in one Control Measure." << endl;
       ss << "These serial numbers are listed in [";
-      ss << Filename(name).Name() + "]" << endl;
+      ss << FileName(name).name() + "]" << endl;
     }
   }
 
@@ -530,7 +530,7 @@ QVector< set<iString> > findIslands(set<iString> & index,
 }
 
 
-// Writes the list of cubes [ SerialNumber, Filename, ControlPoints ] to the output file
+// Writes the list of cubes [ SerialNumber, FileName, ControlPoints ] to the output file
 void WriteOutput(SerialNumberList num2cube, string filename,
                  set<iString> sns, QMap< iString, set<iString> > cps) {
 
@@ -603,7 +603,7 @@ void noLatLonCheck(ControlNet &cnet, CubeManager &manager, Progress &progress,
     iString serialNumber = graphNode->getSerialNumber();
 
     if (num2cube.HasSerialNumber(serialNumber)) {
-      Cube *cube = manager.OpenCube(num2cube.Filename(serialNumber));
+      Cube *cube = manager.OpenCube(num2cube.FileName(serialNumber));
 
       // Try to create
       Camera *cam = NULL;
@@ -643,7 +643,7 @@ void noLatLonCheck(ControlNet &cnet, CubeManager &manager, Progress &progress,
 
 string buildRow(SerialNumberList &serials, string sn) {
   string cubeName = serials.HasSerialNumber(sn) ?
-      Filename(serials.Filename(sn)).Expanded() : "UnknownFilename";
+      FileName(serials.FileName(sn)).expanded() : "UnknownFilename";
   return cubeName + delimiter + sn;
 }
 

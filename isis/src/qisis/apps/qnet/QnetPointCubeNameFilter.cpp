@@ -120,9 +120,9 @@ namespace Isis {
     p_listBox->clear();
 
     for (int i = 0; i < g_serialNumberList->Size(); i++) {
-      Filename filename = Filename(g_serialNumberList->Filename(i));
-      string tempFilename = filename.Name();
-      p_listBox->insertItem(i, tempFilename.c_str());
+      FileName filename = FileName(g_serialNumberList->FileName(i));
+      string tempFileName = filename.name();
+      p_listBox->insertItem(i, tempFileName.c_str());
     }
   }
 }

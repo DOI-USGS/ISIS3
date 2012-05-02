@@ -68,9 +68,9 @@ void IsisMain() {
 
   p.StandardPdsLabel(ProcessExportPds::Image);
 
-  Filename outFile(ui.GetFilename("TO", "img"));
-  string outFilename(outFile.Expanded());
-  ofstream oCube(outFilename.c_str());
+  FileName outFile(ui.GetFileName("TO", "img"));
+  string outFileName(outFile.expanded());
+  ofstream oCube(outFileName.c_str());
   p.OutputLabel(oCube);
   p.StartProcess(oCube);
   oCube.close();

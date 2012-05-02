@@ -13,7 +13,7 @@ void IsisMain() {
   try {
     // Open the cube
     Cube cube;
-    cube.open(ui.GetFilename("FROM"), "rw");
+    cube.open(ui.GetFileName("FROM"), "rw");
 
     //check for existing polygon, if exists delete it
     if(cube.getLabel()->HasObject("Polygon")) {
@@ -23,7 +23,7 @@ void IsisMain() {
     // Get the camera, interpolate to a parabola
     Camera *cam = cube.getCamera();
     if(cam->DetectorMap()->LineRate() == 0.0) {
-      string msg = "[" + ui.GetFilename("FROM") + "] is not a line scan camera";
+      string msg = "[" + ui.GetFileName("FROM") + "] is not a line scan camera";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     cam->InstrumentRotation()->SetPolynomial();
@@ -44,7 +44,7 @@ void IsisMain() {
     cube.close();
   }
   catch(IException &e) {
-    string msg = "Unable to fit pointing for [" + ui.GetFilename("FROM") + "]";
+    string msg = "Unable to fit pointing for [" + ui.GetFileName("FROM") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }

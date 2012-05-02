@@ -17,9 +17,9 @@ int main() {
   // The class being tested
   CameraPointInfo cpi;
 
-  // It is necessary to delete the Filename keyword for the test to pass
+  // It is necessary to delete the FileName keyword for the test to pass
   // this is because the directory it is run from may change
-  // under normal usage Filename is always included
+  // under normal usage FileName is always included
 
   cpi.SetCube("unitTest1.cub");
   PvlGroup *grp = cpi.SetImage(1, 1);
@@ -44,7 +44,7 @@ void LowerPrecision(PvlKeyword &keyword) {
 }
 
 void PrintResults(PvlGroup &grp) {
-  grp.DeleteKeyword("Filename");
+  grp.DeleteKeyword("FileName");
 
   LowerPrecision(grp["NorthAzimuth"]);
   LowerPrecision(grp["SpacecraftAzimuth"]);

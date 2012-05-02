@@ -23,7 +23,7 @@
 #include "CalParameters.h"
 #include "iString.h"
 #include "TextFile.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "LeastSquares.h"
 #include "Pvl.h"
@@ -424,10 +424,10 @@ namespace Isis {
   void CalParameters::CalcSunDist(string t) {
     double sunv[3];
     SpiceDouble lt, et;
-    Filename fname1 = (Filename)"$base/kernels/lsk/naif0007.tls";
-    Filename fname2 = (Filename)"$base/kernels/spk/de405.bsp";
-    string tempfname1 = fname1.Expanded();
-    string tempfname2 = fname2.Expanded();
+    FileName fname1 = (FileName)"$base/kernels/lsk/naif0007.tls";
+    FileName fname2 = (FileName)"$base/kernels/spk/de405.bsp";
+    string tempfname1 = fname1.expanded();
+    string tempfname2 = fname2.expanded();
     furnsh_c(tempfname1.c_str());
     furnsh_c(tempfname2.c_str());
     utc2et_c(t.c_str(), &et);

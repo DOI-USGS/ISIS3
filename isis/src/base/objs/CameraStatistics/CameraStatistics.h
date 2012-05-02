@@ -199,7 +199,7 @@ namespace Isis {
     private:
       void init(Camera *cam, int sinc, int linc, std::string filename);
 
-      //!< Filename of the Cube the Camera was derived from.
+      //!< FileName of the Cube the Camera was derived from.
       std::string m_filename;
       int m_sinc; //!< Sample increment for composing statistics.
       int m_linc; //!< Line increment for composing statistics.

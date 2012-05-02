@@ -1,7 +1,7 @@
 #ifndef TableMainWindow_h
 #define TableMainWindow_h
 #include <QMenu>
-#include "Filename.h"
+#include "FileName.h"
 #include "MainWindow.h"
 
 

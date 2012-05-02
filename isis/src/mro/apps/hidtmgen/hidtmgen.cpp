@@ -1,7 +1,9 @@
 #include "Isis.h"
 
+#include <QDir>
+
 #include "Cube.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 #include "ProcessExportPds.h"
 #include "Projection.h"
@@ -34,7 +36,7 @@ void IsisMain() {
   // Verify HiRISE
   if (inCube->getBandCount() > 1 ||
       inCube->getLabel()->HasObject("Instrument")) {
-    string msg = "Input cube [" + ui.GetFilename("FROM") + "] does not appear"
+    string msg = "Input cube [" + ui.GetFileName("FROM") + "] does not appear"
                + "to be a DTM";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -203,7 +205,7 @@ void IsisMain() {
   pdsLabel.AddKeyword(PvlKeyword("INSTRUMENT_NAME","HIGH RESOLUTION IMAGING SCIENCE EXPERIMENT"));
   pdsLabel.AddKeyword(PvlKeyword("INSTRUMENT_ID","HIRISE"));
 
-  Pvl inputParameters(ui.GetFilename("PARAMSPVL"));
+  Pvl inputParameters(ui.GetFileName("PARAMSPVL"));
 
   // These come from the user, mostly, and are in the order they appear in the output labels.
   pdsLabel.AddKeyword(inputParameters["DATA_SET_ID"]);
@@ -219,12 +221,12 @@ void IsisMain() {
 
   // Will we be using the default names?
   bool defaultNames = ui.GetBoolean("DEFAULTNAMES");
-  Filename ortho1(ui.GetFilename("ORTHO1"));
-  Filename ortho3(ui.GetFilename("ORTHO3"));
+  FileName ortho1(ui.GetFileName("ORTHO1"));
+  FileName ortho3(ui.GetFileName("ORTHO3"));
 
   iString vers; // Version string, will be used in orthos
   if (!defaultNames) {
-    iString pId = ui.GetFilename("DTMTO");
+    iString pId = ui.GetFileName("DTMTO");
     pId.substr(0, pId.find_first_of('.')+1);
     pdsLabel.AddKeyword(PvlKeyword("PRODUCT_ID",ui.GetString("DTM_PRODUCT_ID")));
     pdsLabel.AddKeyword(PvlKeyword("SOURCE_PRODUCT_ID",ui.GetString("SOURCE_PRODUCT_ID")));
@@ -238,8 +240,8 @@ void IsisMain() {
     pId += findScaleLetter(projection.FindKeyword("MAP_SCALE"));
 
     // Product ids of orthos
-    pId += ortho1.Basename().substr(3,12);
-    pId += ortho3.Basename().substr(3,12);
+    pId += ortho1.baseName().substr(3,12);
+    pId += ortho3.baseName().substr(3,12);
     iString producing = inputParameters["PRODUCING_INSTITUTION"][0];
     if (producing.size() > 1) {
       string msg = "PRODUCTING_INSTITUTION value [" + producing + "] must be a single character";
@@ -292,8 +294,8 @@ void IsisMain() {
     pdsLabel.AddKeyword(PvlKeyword("PRODUCT_ID",pId));
 
     // Source product ids
-    iString orthoS1 = ortho1.Basename().substr(0,15);
-    iString orthoS3 = ortho3.Basename().substr(0,15);
+    iString orthoS1 = ortho1.baseName().substr(0,15);
+    iString orthoS3 = ortho3.baseName().substr(0,15);
     iString sourceId = "("+orthoS1+","+orthoS3+")"; // (######_####,######_####)
     pdsLabel.AddKeyword(PvlKeyword("SOURCE_PRODUCT_ID",sourceId));
   } // End scope of defaultNames true
@@ -320,26 +322,26 @@ void IsisMain() {
   image.AddKeyword(PvlKeyword("VALID_MAXIMUM",stat->Maximum()));
 
   // The output directory, will be used for ortho images as well
-  Filename outDir = Filename(ui.GetString("OUTPUTDIR"));
-  if (!outDir.Exists()) {
-    outDir.MakeDirectory();
+  FileName outDir = FileName(ui.GetString("OUTPUTDIR"));
+  if (!outDir.fileExists()) {
+    outDir.dir().mkpath(".");
   }
-  string outDirString = outDir.Expanded();
+  string outDirString = outDir.expanded();
   if (outDirString.substr(outDirString.size()-1, 1) != "/") {
     outDirString += "/";
-    outDir = Filename(outDirString);
+    outDir = FileName(outDirString);
   }
 
   // Output the DTM, it should be ready
-  Filename outFile;
+  FileName outFile;
   if (defaultNames) {
-    string dir = outDir.Expanded();
-    outFile = Filename(dir + pdsLabel.FindKeyword("PRODUCT_ID")[0] + ".IMG");
+    string dir = outDir.expanded();
+    outFile = FileName(dir + pdsLabel.FindKeyword("PRODUCT_ID")[0] + ".IMG");
   }
   else {
-    outFile = Filename(ui.GetFilename("DTMTO"));
+    outFile = FileName(ui.GetFileName("DTMTO"));
   }
-  ofstream oCube(outFile.Expanded().c_str());
+  ofstream oCube(outFile.expanded().c_str());
 
   p.OutputLabel(oCube);
 
@@ -393,7 +395,7 @@ void IsisMain() {
 
     iString orthoOut;
     if (!defaultNames) {
-      orthoOut = ui.GetFilename(ortho);
+      orthoOut = ui.GetFileName(ortho);
     }
     else {
       // Will always be DT, orthos are 1 and 2, can only be Equirectangular
@@ -407,8 +409,8 @@ void IsisMain() {
       orthoOut += findScaleLetter(orthoMap.FindKeyword("MAP_SCALE"));
 
       // continue building name
-      orthoOut += ortho1.Basename().substr(3,12);
-      orthoOut += ortho3.Basename().substr(3,12);
+      orthoOut += ortho1.baseName().substr(3,12);
+      orthoOut += ortho3.baseName().substr(3,12);
       iString producing = inputParameters["PRODUCING_INSTITUTION"][0];
       if (producing.size() > 1) {
         string msg = "PRODUCTING_INSTITUTION value [" + producing + "] must be a single character";
@@ -455,8 +457,8 @@ void IsisMain() {
       orthoLabel.AddKeyword(PvlKeyword("SOURCE_PRODUCT_ID",ui.GetString("SOURCE_PRODUCT_ID")));
     }
     else {
-      iString orthoS1 = ortho1.Basename().substr(0,15);
-      iString orthoS3 = ortho3.Basename().substr(0,15);
+      iString orthoS1 = ortho1.baseName().substr(0,15);
+      iString orthoS3 = ortho3.baseName().substr(0,15);
       iString sourceId = "("+orthoS1+","+orthoS3+")"; // (######_####,######_####)
       orthoLabel.AddKeyword(PvlKeyword("SOURCE_PRODUCT_ID",sourceId));
     }
@@ -489,16 +491,16 @@ void IsisMain() {
     // after this call, known problem with Pvl and vector reallocation.
     orthoLabel.AddObject(viewingParameters);
 
-    Filename orthoFile;
+    FileName orthoFile;
     if (defaultNames) {
-      string dir = outDir.Expanded();
-      orthoFile = Filename(dir + orthoLabel.FindKeyword("PRODUCT_ID")[0] + ".IMG");
+      string dir = outDir.expanded();
+      orthoFile = FileName(dir + orthoLabel.FindKeyword("PRODUCT_ID")[0] + ".IMG");
     }
     else {
-      orthoFile = Filename(ui.GetFilename(ortho + "TO"));
+      orthoFile = FileName(ui.GetFileName(ortho + "TO"));
     }
 
-    ofstream orthoPdsOut(orthoFile.Expanded().c_str());
+    ofstream orthoPdsOut(orthoFile.expanded().c_str());
     p.OutputLabel(orthoPdsOut);
     p.StartProcess(orthoPdsOut);
     orthoPdsOut.close();

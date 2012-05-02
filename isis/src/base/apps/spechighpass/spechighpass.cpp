@@ -31,7 +31,7 @@ void IsisMain() {
     iString msg = "Parameter bands [" + iString(bands) + "] "
                   "exceeds maximum allowable size of ["
                   + iString((cubeBands * 2) - 1) + "] for cube ["
-                  + icube->getFilename() + "]";
+                  + icube->getFileName() + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 

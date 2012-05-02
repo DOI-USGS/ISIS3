@@ -64,7 +64,7 @@ void IsisMain() {
 
   // Run lowpass filter on input
   string lowParams = "";
-  lowParams += "from= " + ui.GetFilename("FROM");
+  lowParams += "from= " + ui.GetFileName("FROM");
   lowParams += " to= dstripe.temporary.cub ";
   lowParams += " samples= " + iString(lowSamples);
   lowParams += " lines= " + iString(lowLines);
@@ -74,8 +74,8 @@ void IsisMain() {
   // Make a copy of the lowpass filter results if the user wants it
   if(!ui.GetBoolean("DELETENOISE")) {
     string lowParams = "";
-    lowParams += "from= " + ui.GetFilename("FROM");
-    lowParams += " to= " + ui.GetFilename("LPFNOISE");
+    lowParams += "from= " + ui.GetFileName("FROM");
+    lowParams += " to= " + ui.GetFileName("LPFNOISE");
     lowParams += " samples= " + iString(lowSamples);
     lowParams += " lines= " + iString(lowLines);
     ProgramLauncher::RunIsisProgram("lowpass", lowParams);
@@ -84,7 +84,7 @@ void IsisMain() {
   // Run highpass filter after lowpass is done, i.e. highpass(lowpass(input))
   string highParams = "";
   highParams += "from= dstripe.temporary.cub ";
-  highParams += " to= " + ui.GetFilename("NOISE") + " ";
+  highParams += " to= " + ui.GetFileName("NOISE") + " ";
   highParams += " samples= " + iString(highSamples);
   highParams += " lines= " + iString(highLines);
 
@@ -97,7 +97,7 @@ void IsisMain() {
   p.StartProcess(difference);
   p.EndProcess();
   if(ui.GetBoolean("DELETENOISE")) {
-    string noiseFile(Filename(ui.GetFilename("NOISE")).Expanded());
+    string noiseFile(FileName(ui.GetFileName("NOISE")).expanded());
     remove(noiseFile.c_str());
   }
 }

@@ -1,6 +1,6 @@
 #include <iomanip>
 
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Preference.h"
 #include "QtImporter.h"
@@ -15,18 +15,18 @@ int main(int argc, char *argv[]) {
 
   try {
     cout << "Testing QtImporter..." << endl << endl;
-    Filename inputName("test.png");
+    FileName inputName("test.png");
 
     cout << "Creating Instance" << endl;
     QtImporter *importer = new QtImporter(inputName);
 
     cout << "Importing" << endl;
-    Filename outputName("test.cub");
+    FileName outputName("test.cub");
     importer->import(outputName);
 
     cout << "Clean-up" << endl;
     delete importer;
-    remove(outputName.Expanded().c_str());
+    remove(outputName.expanded().c_str());
 
     cout << endl << "Done" << endl;
   }

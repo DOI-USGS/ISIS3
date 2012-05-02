@@ -7,7 +7,7 @@
 #include "LineManager.h"
 #include "UserInterface.h"
 #include "CubeAttribute.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iTime.h"
 #include "ProcessByBrick.h"
@@ -28,12 +28,12 @@ void IsisMain() {
   outputCubes.clear();
   frameletLines = 192;
   UserInterface &ui = Application::GetUserInterface();
-  Filename in = ui.GetFilename("FROM");
+  FileName in = ui.GetFileName("FROM");
 
   // Make sure it is a Themis EDR/RDR
   bool projected;
   try {
-    Pvl lab(in.Expanded());
+    Pvl lab(in.expanded());
     projected = lab.HasObject("IMAGE_MAP_PROJECTION");
     iString id;
     id = (string)lab["DATA_SET_ID"];
@@ -46,7 +46,7 @@ void IsisMain() {
     }
   }
   catch(IException &e) {
-    string msg = "Input file [" + in.Expanded() +
+    string msg = "Input file [" + in.expanded() +
                  "] does not appear to be " +
                  "in Themis EDR/RDR format";
     throw IException(IException::Io, msg, _FILEINFO_);
@@ -54,14 +54,14 @@ void IsisMain() {
 
   //Checks if in file is rdr
   if(projected) {
-    string msg = "[" + in.Name() + "] appears to be an rdr file.";
+    string msg = "[" + in.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Ok looks good ... set it as the PDS file
   Pvl pdsLab;
-  p.SetPdsFile(in.Expanded(), "", pdsLab);
+  p.SetPdsFile(in.expanded(), "", pdsLab);
 
   OriginalLabel origLabels(pdsLab);
 
@@ -69,7 +69,7 @@ void IsisMain() {
   TranslateLabels(pdsLab, isis3Lab, p.Bands());
 
   // Set up the output cube
-  Filename outFile(ui.GetFilename("TO"));
+  FileName outFile(ui.GetFileName("TO"));
   PvlGroup &inst = isis3Lab.FindGroup("Instrument", Pvl::Traverse);
 
   if((string)inst["InstrumentId"] == "THEMIS_VIS") {
@@ -81,8 +81,8 @@ void IsisMain() {
     odd->setDimensions(p.Samples(), p.Lines(), p.Bands());
     odd->setPixelType(Isis::Real);
 
-    string evenFile = outFile.Path() + "/" + outFile.Basename() + ".even.cub";
-    string oddFile = outFile.Path() + "/" + outFile.Basename() + ".odd.cub";
+    string evenFile = outFile.path() + "/" + outFile.baseName() + ".even.cub";
+    string oddFile = outFile.path() + "/" + outFile.baseName() + ".odd.cub";
 
     even->create(evenFile);
     odd->create(oddFile);
@@ -97,7 +97,7 @@ void IsisMain() {
     outCube->setDimensions(p.Samples(), p.Lines(), p.Bands());
     outCube->setPixelType(Isis::Real);
 
-    outCube->create(outFile.Expanded());
+    outCube->create(outFile.expanded());
     outputCubes.push_back(outCube);
   }
 

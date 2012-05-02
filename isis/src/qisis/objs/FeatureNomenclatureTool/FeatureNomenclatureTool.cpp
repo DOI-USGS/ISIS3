@@ -24,7 +24,7 @@
 #include <geos/geom/MultiPolygon.h>
 
 #include "Distance.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "ImagePolygon.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -540,7 +540,7 @@ namespace Isis {
 
       foreach (FeatureNomenclature::Feature feature, features) {
         QString displayName = feature.cleanName().ToQt() +
-            " (" + Filename(vp->cube()->getFilename()).Name().ToQt() + ")";
+            " (" + FileName(vp->cube()->getFileName()).name().ToQt() + ")";
 
         QString targetName = feature.target().UpCase().ToQt();
 
@@ -917,9 +917,9 @@ namespace Isis {
    *   method.
    */
   void FeatureNomenclatureTool::readSettings() {
-    Filename config("$HOME/.Isis/qview/nomenclature.config");
+    FileName config("$HOME/.Isis/qview/nomenclature.config");
     QSettings settings(
-        QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
+        QString::fromStdString(config.expanded()), QSettings::NativeFormat);
     m_fontSize = settings.value("fontSize", m_fontSize).toInt();
     *m_fontColor = settings.value("fontColor", *m_fontColor).value<QColor>();
     m_defaultEnabled =
@@ -936,9 +936,9 @@ namespace Isis {
    *   close, so you should call this any time you change the preserved state.
    */
   void FeatureNomenclatureTool::writeSettings() {
-    Filename config("$HOME/.Isis/qview/nomenclature.config");
+    FileName config("$HOME/.Isis/qview/nomenclature.config");
     QSettings settings(
-        QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
+        QString::fromStdString(config.expanded()), QSettings::NativeFormat);
     settings.setValue("fontSize", m_fontSize);
     settings.setValue("fontColor", qVariantFromValue(*m_fontColor));
     settings.setValue("defaultEnabled", m_defaultEnabled);

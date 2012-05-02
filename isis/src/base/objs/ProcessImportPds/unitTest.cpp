@@ -25,7 +25,7 @@ void IsisMain() {
     cout << plab << endl;
     Isis::Process p2;
     Isis::CubeAttributeInput att;
-    string file = Isis::Application::GetUserInterface().GetFilename("TO");
+    string file = Isis::Application::GetUserInterface().GetFileName("TO");
     Isis::Cube *cube = p2.SetInputCube(file, att);
     Isis::Statistics *stat = cube->getStatistics();
     cout << stat->Average() << endl;
@@ -55,7 +55,7 @@ void IsisMain() {
     cout << plab << endl;
     Isis::Process p2;
     Isis::CubeAttributeInput att;
-    string file = Isis::Application::GetUserInterface().GetFilename("TO");
+    string file = Isis::Application::GetUserInterface().GetFileName("TO");
     Isis::Cube *cube = p2.SetInputCube(file, att);
     Isis::Statistics *stat = cube->getStatistics();
     cout << stat->Average() << endl;
@@ -89,7 +89,7 @@ void IsisMain() {
     p.EndProcess();
 
     cout << ilab << endl;
-    string file = Isis::Application::GetUserInterface().GetFilename("TO");
+    string file = Isis::Application::GetUserInterface().GetFileName("TO");
     remove(file.c_str());
   }
   catch(Isis::IException &e) {
@@ -107,7 +107,7 @@ void IsisMain() {
 void ReportError(iString err) {
   iString report = ""; // report will be modified error message
   iString errorLine = ""; // read message one line at a time
-  Filename expandedfile;
+  FileName expandedfile;
   while(err != "") {
     // pull off first line
     errorLine = err.Token("\n");
@@ -119,9 +119,9 @@ void ReportError(iString err) {
           // add message up to and including [
           report += errorLine.Token("[");
           report += "[";
-          // read entire path into Filename object
+          // read entire path into FileName object
           expandedfile = errorLine.Token("]");
-          report += expandedfile.Name(); // only report base name, rather than fully expanded path
+          report += expandedfile.name(); // only report base name, rather than fully expanded path
           report += "]";
         }
         else {

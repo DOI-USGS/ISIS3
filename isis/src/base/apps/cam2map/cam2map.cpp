@@ -40,7 +40,7 @@ void IsisMain() {
   // Get the map projection file provided by the user
   UserInterface &ui = Application::GetUserInterface();
   Pvl userMap;
-  userMap.Read(ui.GetFilename("MAP"));
+  userMap.Read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   // Open the input cube and get the camera
@@ -49,7 +49,7 @@ void IsisMain() {
 
   // Make sure it is not the sky
   if(incam->IsSky()) {
-    string msg = "The image [" + ui.GetFilename("FROM") +
+    string msg = "The image [" + ui.GetFileName("FROM") +
                  "] is targeting the sky, use skymap instead.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -200,7 +200,7 @@ void IsisMain() {
       }
 
       else if(ui.GetString("LONSEAM") == "ERROR") {
-        string msg = "The image [" + ui.GetFilename("FROM") + "] crosses the " +
+        string msg = "The image [" + ui.GetFileName("FROM") + "] crosses the " +
                      "longitude seam";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -373,7 +373,7 @@ void PrintMap() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFilename("MAP"));
+  userMap.Read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log
@@ -386,7 +386,7 @@ void LoadMapRes() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFilename("MAP"));
+  userMap.Read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   // Set resolution
@@ -403,7 +403,7 @@ void LoadMapRes() {
     ui.PutAsString("PIXRES", "MPP");
   }
   else {
-    string msg = "No resolution value found in [" + ui.GetFilename("MAP") + "]";
+    string msg = "No resolution value found in [" + ui.GetFileName("MAP") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }
@@ -411,7 +411,7 @@ void LoadMapRes() {
 //Helper function to get camera resolution.
 void LoadCameraRes() {
   UserInterface &ui = Application::GetUserInterface();
-  string file = ui.GetFilename("FROM");
+  string file = ui.GetFileName("FROM");
 
   // Open the input cube, get the camera object, and the cam map projection
   Cube c;
@@ -434,7 +434,7 @@ void LoadMapRange() {
 
   // Get map file
   Pvl userMap;
-  userMap.Read(ui.GetFilename("MAP"));
+  userMap.Read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   // Set ground range keywords that are found in mapfile
@@ -466,7 +466,7 @@ void LoadMapRange() {
 
   if(count < 4) {
     string msg = "One or more of the values for the ground range was not found";
-    msg += " in [" + ui.GetFilename("MAP") + "]";
+    msg += " in [" + ui.GetFileName("MAP") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }
@@ -474,11 +474,11 @@ void LoadMapRange() {
 //Helper function to load camera range.
 void LoadCameraRange() {
   UserInterface &ui = Application::GetUserInterface();
-  string file = ui.GetFilename("FROM");
+  string file = ui.GetFileName("FROM");
 
   // Get the map projection file provided by the user
   Pvl userMap;
-  userMap.Read(ui.GetFilename("MAP"));
+  userMap.Read(ui.GetFileName("MAP"));
 
   // Open the input cube, get the camera object, and the cam map projection
   Cube c;

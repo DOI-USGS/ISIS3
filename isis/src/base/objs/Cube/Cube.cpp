@@ -26,6 +26,8 @@
 #include <sstream>
 #include <unistd.h>
 
+#include <QFile>
+#include <QFileInfo>
 #include <QMutex>
 
 #include "Application.h"
@@ -35,7 +37,7 @@
 #include "CubeBsqHandler.h"
 #include "CubeTileHandler.h"
 #include "Endian.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Histogram.h"
 #include "IException.h"
 #include "LineManager.h"
@@ -59,8 +61,8 @@ namespace Isis {
     m_camera = NULL;
     m_projection = NULL;
 
-    m_labelFilename = NULL;
-    m_dataFilename = NULL;
+    m_labelFileName = NULL;
+    m_dataFileName = NULL;
     m_tempCube = NULL;
     m_formatTemplateFile = NULL;
     m_label = NULL;
@@ -110,7 +112,7 @@ namespace Isis {
     bool open = (m_ioHandler != NULL);
 
     ASSERT(open == (bool)m_labelFile);
-    ASSERT(open == (bool)m_labelFilename);
+    ASSERT(open == (bool)m_labelFileName);
     ASSERT(open == (bool)m_label);
 
     return open;
@@ -206,12 +208,12 @@ namespace Isis {
    *        Multiplier     1.0
    * @endcode
    *
-   * @param cubeFilename Name of the cube file to open.  If the extenstion
+   * @param cubeFileName Name of the cube file to open.  If the extenstion
    *     ".cub" is not given it will be appended (i.e., the extension of .cub
    *      is forced). Environment variables in the filename will be
    *      automatically expanded as well.
    */
-  void Cube::create(const iString &cubeFilename) {
+  void Cube::create(const iString &cubeFileName) {
     // Already opened?
     if (isOpen()) {
       string msg = "You already have a cube opened";
@@ -240,7 +242,7 @@ namespace Isis {
 
     if (size > maxSizePreference) {
       string msg;
-      msg += "The cube you are attempting to create [" + cubeFilename + "] is ["
+      msg += "The cube you are attempting to create [" + cubeFileName + "] is ["
              + iString(size) + "GB]. This is larger than the current allowed "
              "size of [" + iString(maxSizePreference) + "GB]. The cube "
              "dimensions were (S,L,B) [" + iString(m_samples) + ", " +
@@ -253,29 +255,28 @@ namespace Isis {
     }
 
     // Expand output name
-    Filename cubFile(cubeFilename);
-    cubFile.AddExtension("cub");
+    FileName cubFile(cubeFileName);
+    cubFile = cubFile.addExtension("cub");
 
     // See if we have attached or detached labels
     PvlObject core("Core");
     if (m_attached) {
       // StartByte is 1-based (why!!) so we need to do + 1
       core += PvlKeyword("StartByte", m_labelBytes + 1);
-      m_labelFilename = new iString(cubFile.Expanded());
-      m_dataFilename = new iString(cubFile.Expanded());
-      m_labelFile = new QFile(*m_labelFilename);
+      m_labelFileName = new iString(cubFile.expanded());
+      m_dataFileName = new iString(cubFile.expanded());
+      m_labelFile = new QFile(*m_labelFileName);
     }
     else {
       core += PvlKeyword("StartByte", 1);
-      core += PvlKeyword("^Core", cubFile.Name());
-      m_dataFilename = new iString(cubFile.Expanded());
-      m_dataFile = new QFile(*m_dataFilename);
+      core += PvlKeyword("^Core", cubFile.name());
+      m_dataFileName = new iString(cubFile.expanded());
+      m_dataFile = new QFile(*m_dataFileName);
 
-      Filename labelFilename(cubFile);
-      labelFilename.RemoveExtension();
-      labelFilename.AddExtension("lbl");
-      m_labelFilename = new iString(labelFilename.Expanded());
-      m_labelFile = new QFile(*m_labelFilename);
+      FileName labelFileName(cubFile);
+      labelFileName = labelFileName.setExtension("lbl");
+      m_labelFileName = new iString(labelFileName.expanded());
+      m_labelFile = new QFile(*m_labelFileName);
     }
 
     // Create the size of the core
@@ -310,8 +311,8 @@ namespace Isis {
     const PvlGroup &pref =
         Preference::Preferences().FindGroup("CubeCustomization");
     bool overwrite = pref["Overwrite"][0].UpCase() == "ALLOW";
-    if (!overwrite && m_labelFile->exists()) {
-      string msg = "Cube file [" + *m_labelFilename + "] exists, " +
+    if (!overwrite && m_labelFile->exists() && m_labelFile->size()) {
+      string msg = "Cube file [" + *m_labelFileName + "] exists, " +
                    "user preference does not allow overwrite";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -347,7 +348,7 @@ namespace Isis {
 
 
   void Cube::create(
-      const iString &cubeFilename, const CubeAttributeOutput &att) {
+      const iString &cubeFileName, const CubeAttributeOutput &att) {
 
     setByteOrder(att.ByteOrder());
     setFormat(att.FileFormat());
@@ -356,19 +357,19 @@ namespace Isis {
     setMinMax(att.Minimum(), att.Maximum());
 
     // Allocate the cube
-    create(cubeFilename);
+    create(cubeFileName);
   }
 
 
   /**
    * This method will open an isis sube for reading or reading/writing.
    *
-   * @param[in] cubeFilename Name of the cube file to open. Environment
+   * @param[in] cubeFileName Name of the cube file to open. Environment
    *     variables in the filename will be automatically expanded.
    * @param[in] access (Default value of "r") Defines how the cube will be
    *     accessed. Either read-only "r" or read-write "rw".
    */
-  void Cube::open(const iString &cubeFilename, iString access) {
+  void Cube::open(const iString &cubeFileName, iString access) {
     // Already opened?
     if (isOpen()) {
       string msg = "You already have a cube opened";
@@ -376,11 +377,11 @@ namespace Isis {
     }
 
     // Read the labels
-    Filename realName(cubeFilename);
+    FileName realName(cubeFileName);
 
     try {
-      if (realName.exists()) {
-        m_label = new Pvl(realName.Expanded());
+      if (realName.fileExists()) {
+        m_label = new Pvl(realName.expanded());
         if (!m_label->Objects()) {
           throw IException();
         }
@@ -395,10 +396,10 @@ namespace Isis {
 
     try {
       if (!m_label) {
-        Filename tmp(realName);
-        tmp.AddExtension("cub");
-        if (tmp.exists()) {
-          m_label = new Pvl(tmp.Expanded());
+        FileName tmp(realName);
+        tmp = tmp.addExtension("cub");
+        if (tmp.fileExists()) {
+          m_label = new Pvl(tmp.expanded());
           if (!m_label->Objects()) {
             throw IException();
           }
@@ -415,11 +416,10 @@ namespace Isis {
 
     try {
       if (!m_label) {
-        Filename tmp(realName);
-        tmp.RemoveExtension();
-        tmp.AddExtension("lbl");
-        if (tmp.exists()) {
-          m_label = new Pvl(tmp.Expanded());
+        FileName tmp(realName);
+        tmp = tmp.setExtension("lbl");
+        if (tmp.fileExists()) {
+          m_label = new Pvl(tmp.expanded());
           if (!m_label->Objects()) {
             throw IException();
           }
@@ -435,48 +435,48 @@ namespace Isis {
     }
 
     if (!m_label) {
-      string msg = Message::FileOpen(cubeFilename);
+      string msg = Message::FileOpen(cubeFileName);
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
-    m_labelFilename = new iString(realName.Expanded());
+    m_labelFileName = new iString(realName.expanded());
 
     // See if this is an old Isis cube format.  If so then we will
     // need to internalize a new label
     if (m_label->HasKeyword("CCSD3ZF0000100000001NJPL3IF0PDS200000001")) {
       if (access == "r") {
-        reformatOldIsisLabel(*m_labelFilename);
+        reformatOldIsisLabel(*m_labelFileName);
       }
       else {
         cleanUp(false);
         string msg = "Can not open old cube file format with write access [" +
-                     cubeFilename + "]";
+                     cubeFileName + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
     }
     else {
-      m_labelFile = new QFile(*m_labelFilename);
+      m_labelFile = new QFile(*m_labelFileName);
     }
 
     // Figure out the name of the data file
     try {
       PvlObject &core = m_label->FindObject("IsisCube").FindObject("Core");
       if (core.HasKeyword("^Core")) {
-        Filename temp(core["^Core"][0]);
+        FileName temp(core["^Core"][0]);
 
-        if (temp.OriginalPath() == ".") {
-          m_dataFilename = new iString(realName.Path() + "/" + temp.Name());
+        if (temp.originalPath() == ".") {
+          m_dataFileName = new iString(realName.path() + "/" + temp.name());
         }
         else {
-          m_dataFilename = new iString(temp.Expanded());
+          m_dataFileName = new iString(temp.expanded());
         }
 
         m_attached = false;
 
-        m_dataFile = new QFile(*m_dataFilename);
+        m_dataFile = new QFile(*m_dataFileName);
       }
       else {
-        m_dataFilename = new iString(realName.Expanded());
+        m_dataFileName = new iString(realName.expanded());
         m_attached = true;
       }
     }
@@ -598,7 +598,7 @@ namespace Isis {
     }
 
     // Preserve filename and virtual bands when re-opening
-    iString filename = *m_labelFilename;
+    iString filename = *m_labelFileName;
     QList<int> virtualBandList;
 
     if (m_virtualBandList)
@@ -629,7 +629,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    iString cubeFile = *m_labelFilename;
+    iString cubeFile = *m_labelFileName;
     if (m_tempCube)
       cubeFile = *m_tempCube;
 
@@ -680,7 +680,7 @@ namespace Isis {
 
       // Compute the number of bytes in the cube + label bytes and if the
       // endpos of the file // is not greater than this then seek to that position.
-      fstream stream(m_labelFilename->c_str(),
+      fstream stream(m_labelFileName->c_str(),
                      ios::in | ios::out | ios::binary);
       stream.seekp(0, ios::end);
       streampos endByte = stream.tellp();
@@ -692,25 +692,25 @@ namespace Isis {
 
     // Write a detached blob
     else {
-      Filename blobFilename = getFilename();
-      blobFilename.RemoveExtension();
-      blobFilename.AddExtension(blob.Type());
-      blobFilename.AddExtension(blob.Name());
-      string blobFile(blobFilename.Expanded());
+      FileName blobFileName = getFileName();
+      blobFileName = blobFileName.removeExtension();
+      blobFileName = blobFileName.addExtension(blob.Type());
+      blobFileName = blobFileName.addExtension(blob.Name());
+      string blobFile(blobFileName.expanded());
       ios::openmode flags = ios::in | ios::binary | ios::out | ios::trunc;
       fstream detachedStream;
       detachedStream.open(blobFile.c_str(), flags);
       if (!detachedStream) {
         string message = "Unable to open data file [" +
-                         blobFilename.Expanded() + "]";
+                         blobFileName.expanded() + "]";
         throw IException(IException::Io, message, _FILEINFO_);
       }
 
-// Changed to work with mods to Filename class
-//      blob.Write(p_cube.label,detachedStream,blobFilename.Basename()+"."+
+// Changed to work with mods to FileName class
+//      blob.Write(p_cube.label,detachedStream,blobFileName.baseName()+"."+
 //                 blob.Type()+"."+
-//                 blobFilename.Extension());
-      blob.Write(*m_label, detachedStream, blobFilename.Name());
+//                 blobFileName.extension());
+      blob.Write(*m_label, detachedStream, blobFileName.name());
     }
   }
 
@@ -728,7 +728,7 @@ namespace Isis {
     }
 
     if (isReadOnly()) {
-      string msg = "The cube [" + (iString)QFileInfo(getFilename()).fileName() +
+      string msg = "The cube [" + (iString)QFileInfo(getFileName()).fileName() +
           "] is opened read-only ... you can't write to it";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -982,9 +982,9 @@ namespace Isis {
    *
    * @returns The opened cube's filename
    */
-  iString Cube::getFilename() const {
+  iString Cube::getFileName() const {
     if (isOpen())
-      return *m_labelFilename;
+      return *m_labelFileName;
     else
       return "";
   }
@@ -1470,10 +1470,10 @@ namespace Isis {
     }
 
     if (removeIt) {
-      remove(m_labelFilename->c_str());
+      remove(m_labelFileName->c_str());
 
-      if (*m_labelFilename != *m_dataFilename)
-        remove(m_dataFilename->c_str());
+      if (*m_labelFileName != *m_dataFileName)
+        remove(m_dataFileName->c_str());
     }
 
     if (m_labelFile) {
@@ -1486,14 +1486,14 @@ namespace Isis {
       m_dataFile = NULL;
     }
 
-    if (m_labelFilename) {
-      delete m_labelFilename;
-      m_labelFilename = NULL;
+    if (m_labelFileName) {
+      delete m_labelFileName;
+      m_labelFileName = NULL;
     }
 
-    if (m_dataFilename) {
-      delete m_dataFilename;
-      m_dataFilename = NULL;
+    if (m_dataFileName) {
+      delete m_dataFileName;
+      m_dataFileName = NULL;
     }
 
     if (m_label) {
@@ -1573,9 +1573,9 @@ namespace Isis {
    */
   void Cube::reformatOldIsisLabel(const iString &oldCube) {
     string parameters = "from=" + oldCube;
-    Filename oldName(oldCube);
-    Filename tempCube("Temporary_" + oldName.Name(), "cub");
-    parameters += " to=" + tempCube.Expanded();
+    FileName oldName(oldCube);
+    FileName tempCube = FileName::createTempFile("Temporary_" + oldName.name() + ".cub");
+    parameters += " to=" + tempCube.expanded();
 
     if (iApp == NULL) {
       iString command = "$ISISROOT/bin/pds2isis " + parameters;
@@ -1586,7 +1586,7 @@ namespace Isis {
       ProgramLauncher::RunIsisProgram(prog, parameters);
     }
 
-    m_tempCube = new iString(tempCube.Expanded());
+    m_tempCube = new iString(tempCube.expanded());
     *m_label = Pvl(*m_tempCube);
     m_labelFile = new QFile(*m_tempCube);
   }
@@ -1624,7 +1624,7 @@ namespace Isis {
       else {
         locker2.unlock();
         string msg = "Label space is full in [" +
-            (iString)Filename(*m_labelFilename).fileName() +
+            (iString)FileName(*m_labelFileName).name() +
                      "] unable to write labels";
         cleanUp(false);
         throw IException(IException::Io, msg, _FILEINFO_);
@@ -1633,7 +1633,7 @@ namespace Isis {
 
     // or detached label
     else {
-      m_label->Write(*m_labelFilename);
+      m_label->Write(*m_labelFileName);
     }
   }
 }

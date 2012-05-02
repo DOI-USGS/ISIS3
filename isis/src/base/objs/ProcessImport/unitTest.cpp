@@ -34,7 +34,7 @@ void IsisMain() {
 
   Isis::Process p2;
   Isis::CubeAttributeInput att;
-  string file = Isis::Application::GetUserInterface().GetFilename("TO");
+  string file = Isis::Application::GetUserInterface().GetFileName("TO");
   Isis::Cube *icube = p2.SetInputCube(file, att);
   Isis::Statistics *stat = icube->getStatistics();
   cout << stat->Average() << endl;

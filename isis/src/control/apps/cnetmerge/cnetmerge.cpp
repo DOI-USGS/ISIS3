@@ -70,17 +70,17 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   FileList filelist;
   if (ui.GetString("INPUTTYPE") == "LIST") {
-    filelist = ui.GetFilename("CLIST");
+    filelist = ui.GetFileName("CLIST");
 
     if (ui.WasEntered("BASE")) {
       // User has chosen an explicit base network
-      string baseName = ui.GetFilename("BASE");
-      Filename baseFilename(baseName);
+      string baseName = ui.GetFileName("BASE");
+      FileName baseFileName(baseName);
 
       // Remove the base network from the list if it is present
       for (unsigned int i = 0; i < filelist.size(); i++) {
-        if (Filename(filelist[i]).Expanded() == baseFilename.Expanded()) {
-          // Filenames match, so erase it and move on.  We assume it only
+        if (FileName(filelist[i]).expanded() == baseFileName.expanded()) {
+          // FileNames match, so erase it and move on.  We assume it only
           // appears once.  There are currently no checks for duplicate
           // networks.
           filelist.erase(filelist.begin() + i);
@@ -95,14 +95,14 @@ void IsisMain() {
     else {
       // So there is a record of which file was used as the BASE in the print
       // file
-      ui.PutFilename("BASE", filelist[0]);
+      ui.PutFileName("BASE", filelist[0]);
     }
 
     // Check after taking into account an explicit base network if we have at
     // least two networks to merge
     if (filelist.size() < 2) {
-      string msg = "CLIST [" + ui.GetFilename("CLIST") + "] and BASE [" +
-        (ui.WasEntered("BASE") ? ui.GetFilename("BASE") : "Automatic") +
+      string msg = "CLIST [" + ui.GetFileName("CLIST") + "] and BASE [" +
+        (ui.WasEntered("BASE") ? ui.GetFileName("BASE") : "Automatic") +
         "] must total to at least two distinct filenames: "
         "a base network and a new network";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -110,8 +110,8 @@ void IsisMain() {
   }
   else if (ui.GetString("INPUTTYPE") == "CNETS") {
     // Treat simple case in general way, as a two-cnet list
-    filelist.push_back(ui.GetFilename("BASE"));
-    filelist.push_back(ui.GetFilename("CNET2"));
+    filelist.push_back(ui.GetFileName("BASE"));
+    filelist.push_back(ui.GetFileName("CNET2"));
   }
 
   // Get overwrite options, all false by default, and only useable when in
@@ -135,7 +135,7 @@ void IsisMain() {
   // objects, but it's already memory and computationally cheap as is
   PvlObject conflictLog("Conflicts");
   report = ui.WasEntered("LOG");
-  logName = report ? ui.GetFilename("LOG") : "";
+  logName = report ? ui.GetFileName("LOG") : "";
 
   // Determine whether the user wants to allow merging duplicate points or
   // throw an error
@@ -152,8 +152,8 @@ void IsisMain() {
   }
 
   // Writes out the final Control Net
-  Filename outfile(ui.GetFilename("ONET"));
-  outNet->Write(outfile.Expanded());
+  FileName outfile(ui.GetFileName("ONET"));
+  outNet->Write(outfile.expanded());
   delete outNet;
 }
 
@@ -167,8 +167,8 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
 
     QMap<QString, QString> pointSources;
     for (unsigned int n = 0; n < filelist.size(); n++) {
-      Filename cnetName(filelist[n]);
-      ControlNet network(cnetName.Expanded());
+      FileName cnetName(filelist[n]);
+      ControlNet network(cnetName.expanded());
 
       for (int p = 0; p < network.GetNumPoints(); p++) {
         ControlPoint *point = network.GetPoint(p);
@@ -180,12 +180,12 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
             duplicate.AddKeyword(PvlKeyword("PointId", point->GetId()));
             duplicate.AddKeyword(PvlKeyword(
                   "SourceNetwork", pointSources[point->GetId()].toStdString()));
-            duplicate.AddKeyword(PvlKeyword("AddNetwork", cnetName.Name()));
+            duplicate.AddKeyword(PvlKeyword("AddNetwork", cnetName.name()));
             errors.AddObject(duplicate);
           }
           else {
             // User has disallowed merging points, so throw an error
-            string msg = "Add network [" + cnetName.Name() + "] contains "
+            string msg = "Add network [" + cnetName.name() + "] contains "
               "Control Point with ID [" + point->GetId() + "] already "
               "contained within source network [" +
               pointSources[point->GetId()].toStdString() + "].  "
@@ -194,7 +194,7 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
           }
         }
         else {
-          pointSources.insert(point->GetId(), cnetName.Name());
+          pointSources.insert(point->GetId(), cnetName.name());
         }
       }
     }
@@ -205,7 +205,7 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
       outPvl.Write(logName);
 
       string msg = "Networks contained duplicate points.  See log file [" +
-        Filename(logName).Name() + "] for details.  "
+        FileName(logName).name() + "] for details.  "
         "Set DUPLICATEPOINTS=MERGE to merge conflicting Control Points";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -218,7 +218,7 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
 
   // The original base network is the first in the list, all successive
   // networks will be added to the base in descending order
-  ControlNet *baseNet = new ControlNet(Filename(filelist[0]).Expanded());
+  ControlNet *baseNet = new ControlNet(FileName(filelist[0]).expanded());
   baseNet->SetNetworkId(networkId);
   baseNet->SetUserName(Isis::Application::UserName());
   baseNet->SetCreatedDate(Isis::Application::DateTime());
@@ -230,8 +230,8 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
   // Loop through each network in the list and attempt to merge it into the
   // base
   for (int cnetIndex = 1; cnetIndex < (int) filelist.size(); cnetIndex++) {
-    Filename currentCnetFilename(filelist[cnetIndex]);
-    ControlNet newNet(currentCnetFilename.Expanded());
+    FileName currentCnetFileName(filelist[cnetIndex]);
+    ControlNet newNet(currentCnetFileName.expanded());
 
     // Networks can only be merged if the targets are the same
     if (baseNet->GetTarget().DownCase() != newNet.GetTarget().DownCase()) {

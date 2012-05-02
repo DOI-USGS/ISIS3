@@ -28,7 +28,7 @@
 #include "naif/SpiceZfc.h"
 #include "naif/SpiceZmc.h"
 
-#include "Filename.h"
+#include "FileName.h"
 
 namespace Isis {
   class iString;

@@ -11,7 +11,7 @@ void IsisMain() {
 
   //Get user parameters
   UserInterface &ui = Application::GetUserInterface();
-  Filename inFile = ui.GetFilename("FROM");
+  FileName inFile = ui.GetFileName("FROM");
   int numberOfLines = ui.GetInteger("NL");
   int lineOverlap   = ui.GetInteger("OVERLAP");
 
@@ -22,7 +22,7 @@ void IsisMain() {
 
   //Opens the cube
   Cube cube;
-  cube.open(inFile.Expanded());
+  cube.open(inFile.expanded());
 
   //Loops through, cropping as desired
   int cropNum = 1;
@@ -30,8 +30,8 @@ void IsisMain() {
   bool hasReachedEndOfCube = false;
   while(startLine <= cube.getLineCount()  &&  not hasReachedEndOfCube) {
     //! Sets up the proper paramaters for running the crop program
-    string parameters = "FROM=" + inFile.Expanded() +
-                        " TO=" + inFile.Path() + "/" + inFile.Basename() + ".segment" + iString(cropNum) + ".cub"
+    string parameters = "FROM=" + inFile.expanded() +
+                        " TO=" + inFile.path() + "/" + inFile.baseName() + ".segment" + iString(cropNum) + ".cub"
                         + " LINE=" + iString(startLine) + " NLINES=";
 
     if(startLine + numberOfLines > cube.getLineCount()) {

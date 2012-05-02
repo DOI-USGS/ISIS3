@@ -221,7 +221,7 @@ namespace Isis {
 
     public slots:
       void updateList();
-      void updateNet(QString cNetFilename);
+      void updateNet(QString cNetFileName);
       void createPoint(double lat,double lon);
       void createFixedPoint(double lat,double lon);
       void modifyPoint(ControlPoint *point);
@@ -305,7 +305,7 @@ namespace Isis {
 
       MainWindow *p_qnetTool;
 
-      QString p_cnetFilename;
+      QString p_cnetFileName;
 
       QStringList findPointFiles(double lat, double lon);
 
@@ -337,9 +337,9 @@ namespace Isis {
       QWidget *p_templateEditorWidget;
       bool p_templateModified;
 
-      QLabel *p_templateFilenameLabel;
-      QLabel *p_groundFilenameLabel;
-      QLabel *p_radiusFilenameLabel;
+      QLabel *p_templateFileNameLabel;
+      QLabel *p_groundFileNameLabel;
+      QLabel *p_radiusFileNameLabel;
       QLabel *p_ptIdValue;
       QComboBox *p_pointType;
       QLabel *p_numMeasures;

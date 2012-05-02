@@ -17,11 +17,11 @@ void IsisMain() {
 
   // Open the input cube
   Cube cube;
-  cube.open(ui.GetFilename("FROM"), "rw");
+  cube.open(ui.GetFileName("FROM"), "rw");
 
   //Get the map projection file provided by the user
   Pvl userMap;
-  userMap.Read(ui.GetFilename("MAP"));
+  userMap.Read(ui.GetFileName("MAP"));
   PvlGroup &mapGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   // Error checking to ensure the map projection file provided contains

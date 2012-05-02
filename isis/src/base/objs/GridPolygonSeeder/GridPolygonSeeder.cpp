@@ -415,7 +415,7 @@ namespace Isis {
       }
       else {
         std::string msg = "PVL for GridPolygonSeeder must contain [XSpacing] in [";
-        msg += pvl.Filename() + "]";
+        msg += pvl.FileName() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -428,7 +428,7 @@ namespace Isis {
       }
       else {
         std::string msg = "PVL for GridPolygonSeeder must contain [YSpacing] in [";
-        msg += pvl.Filename() + "]";
+        msg += pvl.FileName() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -441,7 +441,7 @@ namespace Isis {
       }
     }
     catch(IException &e) {
-      std::string msg = "Improper format for PolygonSeeder PVL [" + pvl.Filename() + "]";
+      std::string msg = "Improper format for PolygonSeeder PVL [" + pvl.FileName() + "]";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
 

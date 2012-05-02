@@ -302,7 +302,7 @@ namespace Isis {
 
         // Check for errors and throw them all at the same time
         if (!errs.empty()) {
-            errs += " --> Errors in the input PVL file \"" + pvl.Filename() + "\"";
+            errs += " --> Errors in the input PVL file \"" + pvl.FileName() + "\"";
             throw IException(IException::User, errs, _FILEINFO_);
         }
 

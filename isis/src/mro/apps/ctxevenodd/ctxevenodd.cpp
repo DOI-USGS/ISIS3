@@ -33,7 +33,7 @@ void IsisMain() {
 
   // Make sure we have a ctx cube and it has SpatialSumming of 1
   UserInterface &ui = Application::GetUserInterface();
-  Isis::Pvl lab(ui.GetFilename("FROM"));
+  Isis::Pvl lab(ui.GetFileName("FROM"));
   Isis::PvlGroup &inst =
     lab.FindGroup("Instrument", Pvl::Traverse);
 

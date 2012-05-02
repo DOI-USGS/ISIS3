@@ -11,6 +11,6 @@ void IsisMain() {
   Progress p;
 
   ControlNet cnet;
-  cnet.ReadControl(ui.GetFilename("FROM"), &p);
-  cnet.Write(ui.GetFilename("TO"));
+  cnet.ReadControl(ui.GetFileName("FROM"), &p);
+  cnet.Write(ui.GetFileName("TO"));
 }

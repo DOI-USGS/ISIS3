@@ -16,7 +16,7 @@ void IsisMain() {
   //Get user parameters
   UserInterface &ui = Application::GetUserInterface();
   FileList cubes;
-  cubes.Read(ui.GetFilename("FROMLIST"));
+  cubes.Read(ui.GetFileName("FROMLIST"));
   string PRIORITY = ui.GetString("PRIORITY");
   string HNS1 = ui.GetAsString("HNS1");
   string HNL1 = ui.GetAsString("HNL1");
@@ -35,17 +35,17 @@ void IsisMain() {
   string MATCHBANDBIN = ui.GetAsString("MATCHBANDBIN");
 
   // Sets up the pathName to be used for most application calls
-  string pathName = Filename("$TEMPORARY/").Path() + "/";
-  string cubeListBaseName = pathName + Filename(ui.GetFilename("FROMLIST")).Basename();
+  string pathName = FileName("$TEMPORARY/").path() + "/";
+  string cubeListBaseName = pathName + FileName(ui.GetFileName("FROMLIST")).baseName();
 
   //Creates the first highpass cubes
   std::ofstream firstHighPassList;
   string firstHighPass(cubeListBaseName + "_FirstHighPassList.lis");
   firstHighPassList.open(firstHighPass.c_str());
   for(unsigned i = 0; i < cubes.size(); i++) {
-    Filename inFile = Isis::Filename(cubes[i]);
-    string outParam = pathName + inFile.Basename() + "_hpffirst.cub";
-    string parameters = "FROM=" + inFile.Expanded()
+    FileName inFile = Isis::FileName(cubes[i]);
+    string outParam = pathName + inFile.baseName() + "_hpffirst.cub";
+    string parameters = "FROM=" + inFile.expanded()
                         + " TO=" + outParam
                         + " SAMPLES= " + HNS1
                         + " LINES= " + HNL1;
@@ -60,9 +60,9 @@ void IsisMain() {
   string secondHighPass(cubeListBaseName + "_SecondHighPassList.lis");
   secondHighPassList.open(secondHighPass.c_str());
   for(unsigned i = 0; i < cubes.size(); i++) {
-    Filename inFile = Isis::Filename(cubes[i]);
-    string outParam = pathName + inFile.Basename() + "_hpfsecond.cub";
-    string parameters = "FROM=" + inFile.Expanded()
+    FileName inFile = Isis::FileName(cubes[i]);
+    string outParam = pathName + inFile.baseName() + "_hpfsecond.cub";
+    string parameters = "FROM=" + inFile.expanded()
                         + " TO=" + outParam
                         + " SAMPLES= " + HNS2
                         + " LINES= " + HNL2;
@@ -144,9 +144,9 @@ void IsisMain() {
     remove(lpfmos.c_str());
     remove(untrimmedmoc.c_str());
     for(unsigned i = 0; i < cubes.size(); i++) {
-      Filename inFile = Isis::Filename(cubes[i]);
-      string hpffirst(pathName + inFile.Basename() + "_hpffirst.cub");
-      string hpfsecond(pathName + inFile.Basename() + "_hpfsecond.cub");
+      FileName inFile = Isis::FileName(cubes[i]);
+      string hpffirst(pathName + inFile.baseName() + "_hpffirst.cub");
+      string hpfsecond(pathName + inFile.baseName() + "_hpfsecond.cub");
       remove(hpffirst.c_str());
       remove(hpfsecond.c_str());
     }

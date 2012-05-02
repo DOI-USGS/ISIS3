@@ -1,5 +1,5 @@
-#ifndef Isis_GuiFilenameParameter_h
-#define Isis_GuiFilenameParameter_h
+#ifndef Isis_GuiFileNameParameter_h
+#define Isis_GuiFileNameParameter_h
 
 /**
  * @file
@@ -45,15 +45,15 @@ namespace Isis {
    *                            Updated documentation.
    */
 
-  class GuiFilenameParameter : public GuiParameter {
+  class GuiFileNameParameter : public GuiParameter {
 
       Q_OBJECT
 
     public:
 
-      GuiFilenameParameter(QGridLayout *grid, UserInterface &ui,
+      GuiFileNameParameter(QGridLayout *grid, UserInterface &ui,
                            int group, int param);
-      ~GuiFilenameParameter();
+      ~GuiFileNameParameter();
 
       iString Value();
 

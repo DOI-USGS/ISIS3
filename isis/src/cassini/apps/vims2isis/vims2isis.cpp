@@ -2,7 +2,7 @@
 
 #include "Brick.h"
 #include "EndianSwapper.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "OriginalLabel.h"
@@ -38,14 +38,14 @@ void ProcessBands(Pvl &pdsLab, Cube *vimscube, VimsType vtype);
 //***********************************************************************
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  Filename in = ui.GetFilename("FROM");
-  Filename outIr = ui.GetFilename("IR");
-  Filename outVis = ui.GetFilename("VIS");
-  Pvl lab(in.Expanded());
+  FileName in = ui.GetFileName("FROM");
+  FileName outIr = ui.GetFileName("IR");
+  FileName outVis = ui.GetFileName("VIS");
+  Pvl lab(in.expanded());
 
   //Checks if in file is rdr
   if(lab.HasObject("IMAGE_MAP_PROJECTION")) {
-    string msg = "[" + in.Name() + "] appears to be an rdr file.";
+    string msg = "[" + in.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -64,31 +64,31 @@ void IsisMain() {
     }
   }
   catch(IException &e) {
-    string msg = "Input file [" + in.Expanded() +
+    string msg = "Input file [" + in.expanded() +
                  "] does not appear to be " +
                  "in VIMS EDR/RDR format";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
-  Filename tempname(in.Basename() + ".bsq.cub");
-  Pvl pdsLab(in.Expanded());
+  FileName tempname(in.baseName() + ".bsq.cub");
+  Pvl pdsLab(in.expanded());
 
   // It's VIMS, let's figure out if it has the suffix data or not
   if((int)lab.FindObject("QUBE")["SUFFIX_ITEMS"][0] == 0) {
     // No suffix data, we can use processimportpds
     ProcessImportPds p;
 
-    p.SetPdsFile(in.Expanded(), "", pdsLab);
+    p.SetPdsFile(in.expanded(), "", pdsLab);
     // Set up the temporary output cube
     //The temporary cube is set to Real pixeltype, regardless of input pixel type
     Isis::CubeAttributeOutput outatt = CubeAttributeOutput("+Real");
-    p.SetOutputCube(tempname.Name(), outatt);
+    p.SetOutputCube(tempname.name(), outatt);
     p.StartProcess();
     p.EndProcess();
   }
   else {
     // We do it the hard way
-    ReadVimsBIL(in.Expanded(), lab.FindObject("QUBE")["SUFFIX_ITEMS"], tempname.Name());
+    ReadVimsBIL(in.expanded(), lab.FindObject("QUBE")["SUFFIX_ITEMS"], tempname.name());
   }
 
   // Create holder for original labels
@@ -103,7 +103,7 @@ void IsisMain() {
   const PvlObject &qube = lab.FindObject("Qube");
   if(qube["SAMPLING_MODE_ID"][1] != "N/A") {
     CubeAttributeInput inattvis = CubeAttributeInput("+1-96");
-    l.SetInputCube(tempname.Name(), inattvis);
+    l.SetInputCube(tempname.name(), inattvis);
     Cube *oviscube = l.SetOutputCube("VIS");
     oviscube->write(origLabel);
     l.StartProcess(ProcessCube);
@@ -119,7 +119,7 @@ void IsisMain() {
   //IR cube
   if(qube["SAMPLING_MODE_ID"][0] != "N/A") {
     CubeAttributeInput inattir = CubeAttributeInput("+97-352");
-    l.SetInputCube(tempname.Name(), inattir);
+    l.SetInputCube(tempname.name(), inattir);
     Cube *oircube = l.SetOutputCube("IR");
     oircube->write(origLabel);
     l.StartProcess(ProcessCube);
@@ -135,7 +135,7 @@ void IsisMain() {
   Application::Log(status);
 
   //Clean up
-  string tmp(tempname.Expanded());
+  string tmp(tempname.expanded());
   remove(tmp.c_str());
 }
 
@@ -152,16 +152,16 @@ void IsisMain() {
  *   ProcessImport/ProcessImportPds. Method written by Steven
  *   Lambright.
  *
- * @param inFilename Filename of the input file
- * @param outFile Filename of the output file
+ * @param inFileName FileName of the input file
+ * @param outFile FileName of the output file
  */
-void ReadVimsBIL(std::string inFilename, const PvlKeyword &suffixItems, std::string outFile) {
+void ReadVimsBIL(std::string inFileName, const PvlKeyword &suffixItems, std::string outFile) {
   Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
   string transDir = (string) dataDir["Base"];
 
-  Pvl pdsLabel(inFilename);
-  Isis::Filename transFile(transDir + "/" + "translations/pdsQube.trn");
-  Isis::PvlTranslationManager pdsXlater(pdsLabel, transFile.Expanded());
+  Pvl pdsLabel(inFileName);
+  Isis::FileName transFile(transDir + "/" + "translations/pdsQube.trn");
+  Isis::PvlTranslationManager pdsXlater(pdsLabel, transFile.expanded());
 
 
   TableField sideplaneLine("Line", Isis::TableField::Integer);
@@ -251,10 +251,10 @@ void ReadVimsBIL(std::string inFilename, const PvlKeyword &suffixItems, std::str
 
   ifstream fin;
   // Open input file
-  Isis::Filename inFile(inFilename);
-  fin.open(inFilename.c_str(), ios::in | ios::binary);
+  Isis::FileName inFile(inFileName);
+  fin.open(inFileName.c_str(), ios::in | ios::binary);
   if(!fin.is_open()) {
-    string msg = "Cannot open input file [" + inFilename + "]";
+    string msg = "Cannot open input file [" + inFileName + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
@@ -267,7 +267,7 @@ void ReadVimsBIL(std::string inFilename, const PvlKeyword &suffixItems, std::str
 
   // Check the last io
   if(!fin.good()) {
-    string msg = "Cannot read file [" + inFilename + "]. Position [" +
+    string msg = "Cannot read file [" + inFileName + "]. Position [" +
                  Isis::iString((int)pos) + "]. Byte count [" +
                  Isis::iString(fileHeaderBytes) + "]" ;
     throw IException(IException::Io, msg, _FILEINFO_);
@@ -296,7 +296,7 @@ void ReadVimsBIL(std::string inFilename, const PvlKeyword &suffixItems, std::str
       fin.read(in, readBytes);
 
       if(!fin.good()) {
-        string msg = "Cannot read file [" + inFilename + "]. Position [" +
+        string msg = "Cannot read file [" + inFileName + "]. Position [" +
                      Isis::iString((int)pos) + "]. Byte count [" +
                      Isis::iString(readBytes) + "]" ;
         throw IException(IException::Io, msg, _FILEINFO_);
@@ -369,7 +369,7 @@ void ReadVimsBIL(std::string inFilename, const PvlKeyword &suffixItems, std::str
 
         // Check the last io
         if(!fin.good()) {
-          string msg = "Cannot read file [" + inFilename + "]. Position [" +
+          string msg = "Cannot read file [" + inFileName + "]. Position [" +
                        Isis::iString((int)pos) + "]. Byte count [" +
                        Isis::iString(4) + "]" ;
           throw IException(IException::Io, msg, _FILEINFO_);
@@ -382,7 +382,7 @@ void ReadVimsBIL(std::string inFilename, const PvlKeyword &suffixItems, std::str
 
     // Check the last io
     if(!fin.good()) {
-      string msg = "Cannot read file [" + inFilename + "]. Position [" +
+      string msg = "Cannot read file [" + inFileName + "]. Position [" +
                    Isis::iString((int)pos) + "]. Byte count [" +
                    Isis::iString(4 * (4 * ns + 4)) + "]" ;
       throw IException(IException::Io, msg, _FILEINFO_);
@@ -487,10 +487,10 @@ void TranslateVimsLabels(Pvl &pdsLab, Cube *vimscube, VimsType vType) {
   Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
   string transDir = (string) dataDir["Cassini"];
 
-  Isis::Filename transFile(transDir + "/" + "translations/vimsPds.trn");
+  Isis::FileName transFile(transDir + "/" + "translations/vimsPds.trn");
   PvlObject qube(pdsLab.FindObject("Qube"));
   Pvl pdsLabel(pdsLab);
-  Isis::PvlTranslationManager labelXlater(pdsLabel, transFile.Expanded());
+  Isis::PvlTranslationManager labelXlater(pdsLabel, transFile.expanded());
 
   Pvl outputLabel;
   labelXlater.Auto(outputLabel);

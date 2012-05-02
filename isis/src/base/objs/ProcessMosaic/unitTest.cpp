@@ -29,7 +29,7 @@ void TestOut(int piSamples, int piLines, int piBands, int piOffset, int piPriori
 void TestIn(int iss, int isl, int isb, int ins, int inl, int inb) {
   Isis::Cube cInCube;
   Isis::UserInterface &ui = Isis::Application::GetUserInterface();
-  string sFrom = ui.GetFilename("FROM");
+  string sFrom = ui.GetFileName("FROM");
   cInCube.open(sFrom);
 
   cout << "\n***  Input Image  ***  ";
@@ -78,9 +78,9 @@ void TestOut(int piSamples, int piLines, int piBands, int piOffset, int piPriori
   Isis::UserInterface &ui = Isis::Application::GetUserInterface();
   string sTo;
   if (piPriority == Isis::ProcessMosaic::average)
-    sTo = ui.GetFilename("TO_AVG");
+    sTo = ui.GetFileName("TO_AVG");
   else
-    sTo = ui.GetFilename("TO");
+    sTo = ui.GetFileName("TO");
   cOutCube.open(sTo);
 
   int iBands=cOutCube.getBandCount();

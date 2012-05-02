@@ -11,8 +11,8 @@ using namespace Isis;
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
-  Filename inputName = ui.GetFilename("FROM");
-  ImageImporter *importer = ImageImporter::fromFilename(inputName);
+  FileName inputName = ui.GetFileName("FROM");
+  ImageImporter *importer = ImageImporter::fromFileName(inputName);
 
   // Explicitly set band dimension if a specific color mode is desired
   iString mode = ui.GetString("MODE");
@@ -30,7 +30,7 @@ void IsisMain() {
     importer->setLrsRange(ui.GetDouble("LRSMIN"), ui.GetDouble("LRSMAX"));
 
   // Import the image
-  Filename outputName = ui.GetFilename("TO");
+  FileName outputName = ui.GetFileName("TO");
   CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
   importer->import(outputName, att);
 

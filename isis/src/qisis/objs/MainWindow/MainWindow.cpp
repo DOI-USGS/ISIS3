@@ -64,8 +64,8 @@ namespace Isis {
     }
 
     std::string instanceName = this->windowTitle().toStdString();
-    Filename config("$HOME/.Isis/" + p_appName + "/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
+    FileName config("$HOME/.Isis/" + p_appName + "/" + instanceName + ".config");
+    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
     QPoint pos = settings.value("pos", QPoint(300, 100)).toPoint();
     QSize size = settings.value("size", QSize(900, 500)).toSize();
     resize(size);
@@ -90,8 +90,8 @@ namespace Isis {
     }
 
     std::string instanceName = windowTitle().toStdString();
-    Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
+    FileName config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
+    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
     settings.setValue("pos", pos());
     settings.setValue("size", size());
   }

@@ -26,9 +26,9 @@ void IsisMain() {
   // Basic settings
   p.SetInputCube("FROM");
   p.SetOutputCube("TO");
-  Pvl pvl = Pvl(ui.GetFilename("PVL"));
+  Pvl pvl = Pvl(ui.GetFileName("PVL"));
 
-  cube.open(ui.GetFilename("FROM"));
+  cube.open(ui.GetFileName("FROM"));
 
   try {
     // Get info from the operator group
@@ -42,7 +42,7 @@ void IsisMain() {
     Application::Log(op);
   }
   catch(IException &e) {
-    std::string msg = "Improper format for InterestOperator PVL [" + pvl.Filename() + "]";
+    std::string msg = "Improper format for InterestOperator PVL [" + pvl.FileName() + "]";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 

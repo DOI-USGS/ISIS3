@@ -11,7 +11,7 @@
 #include <QSettings>
 
 #include "CubeDisplayProperties.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "MosaicTreeWidget.h"
 #include "MosaicTreeWidgetItem.h"
@@ -91,12 +91,12 @@ namespace Isis {
           newCubeGrp->setExpanded(expanded);
         }
 
-        for(int cubeFilenameIndex = 0;
-            cubeFilenameIndex < cubes.Keywords();
-            cubeFilenameIndex ++) {
-          if (cubes[cubeFilenameIndex].IsNamed("Cube")) {
-            iString cubeFilename = cubes[cubeFilenameIndex][0];
-            newCubeGrp->addChild(takeItem(cubeFilename, allCubes));
+        for(int cubeFileNameIndex = 0;
+            cubeFileNameIndex < cubes.Keywords();
+            cubeFileNameIndex ++) {
+          if (cubes[cubeFileNameIndex].IsNamed("Cube")) {
+            iString cubeFileName = cubes[cubeFileNameIndex][0];
+            newCubeGrp->addChild(takeItem(cubeFileName, allCubes));
           }
         }
       }

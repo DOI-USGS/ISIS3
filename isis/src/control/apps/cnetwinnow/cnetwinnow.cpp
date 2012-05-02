@@ -43,9 +43,9 @@ void IsisMain() {
   Progress progress;
   
   //read the ControlNet
-  ControlNet net(ui.GetFilename("CNET"),&progress);
+  ControlNet net(ui.GetFileName("CNET"), &progress);
   //read the file list
-  SerialNumberList serialNumList(ui.GetFilename("FROMLIST"),true,&progress);
+  SerialNumberList serialNumList(ui.GetFileName("FROMLIST"), true, &progress);
   //check to make sure all the serial numbers in the net have an associated file name
   QList<QString> cubeSerials = net.GetCubeSerials();
   bool serFlag=true; 
@@ -65,7 +65,7 @@ void IsisMain() {
 
     //make sure there was some residual data in the control network
   if (hist.ValidPixels() < 1) {
-    string msg = "Error no valid residual data found in network [" + ui.GetFilename("CNET") + "]";
+    string msg = "Error no valid residual data found in network [" + ui.GetFileName("CNET") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
     return;
   }
@@ -359,7 +359,7 @@ void IsisMain() {
     for( int j=0;j<measGroup.size();j++) {
       sprintf(line,"%s,%s,%s,%lf,%4.2lf,%4.2lf,%d,%d,%s,%s,%s\n",
                     suspectMeasures[i]->Parent()->GetId().ToQt().toStdString().data(),
-                    serialNumList.Filename(suspectMeasures[i]->GetCubeSerialNumber()
+                    serialNumList.FileName(suspectMeasures[i]->GetCubeSerialNumber()
                       .ToQt().toStdString()).data(),        
                     suspectMeasures[i]->GetCubeSerialNumber().ToQt().toStdString().data(),
                     measGroup[j]->GetResidualMagnitude(),
@@ -395,7 +395,7 @@ void IsisMain() {
 
 
   //save out the winnowed ControlNet
-  net.Write(ui.GetFilename("ONET"));
+  net.Write(ui.GetFileName("ONET"));
 }
 
 

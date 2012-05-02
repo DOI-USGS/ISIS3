@@ -60,11 +60,11 @@ namespace Isis {
       ControlNetFileV0001();
       virtual ~ControlNetFileV0001();
 
-      virtual void Read(const Pvl &header, const Filename &file);
+      virtual void Read(const Pvl &header, const FileName &file);
 
       // We don't need old Write methods... since this wasn't already
       //   implemented I'm not going to bother to implement it now.
-      virtual void Write(const Filename &file) const {};
+      virtual void Write(const FileName &file) const {};
       virtual Pvl ToPvl() const;
 
       /**

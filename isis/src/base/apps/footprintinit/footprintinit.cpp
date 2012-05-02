@@ -15,7 +15,7 @@ using namespace Isis;
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   Cube cube;
-  cube.open(ui.GetFilename("FROM"), "rw");
+  cube.open(ui.GetFileName("FROM"), "rw");
 
   // Make sure cube has been run through spiceinit
   try {
@@ -66,17 +66,17 @@ void IsisMain() {
     poly.Create(cube, sinc, linc, 1, 1, 0, 0, 1, precision);
   }
   catch (IException &e) {
-    string msg = "Cannot generate polygon for [" + ui.GetFilename("FROM") + "]";
+    string msg = "Cannot generate polygon for [" + ui.GetFileName("FROM") + "]";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
   if(ui.GetBoolean("TESTXY")) {
-    Pvl cubeLab(ui.GetFilename("FROM"));
+    Pvl cubeLab(ui.GetFileName("FROM"));
     PvlGroup inst = cubeLab.FindGroup("Instrument", Pvl::Traverse);
     string target = inst["TargetName"];
     PvlGroup radii = Projection::TargetRadii(target);
 
-    Pvl map(ui.GetFilename("MAP"));
+    Pvl map(ui.GetFileName("MAP"));
     PvlGroup &mapping = map.FindGroup("MAPPING");
 
     if(!mapping.HasKeyword("TargetName"))
@@ -120,7 +120,7 @@ void IsisMain() {
           delete xyPoly;
           e.print(); // This should be a NAIF error
           string msg = "Cannot calculate XY for [";
-          msg += ui.GetFilename("FROM") + "]";
+          msg += ui.GetFileName("FROM") + "]";
           throw IException(e, IException::User, msg, _FILEINFO_);
         }
       }

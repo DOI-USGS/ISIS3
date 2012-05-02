@@ -70,10 +70,10 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Input datafile
-  string sInFile = ui.GetFilename("FROM");
+  string sInFile = ui.GetFileName("FROM");
 
   // Output datafile
-  string sOutFile = ui.GetFilename("TO");
+  string sOutFile = ui.GetFileName("TO");
   ofstream outfile;
   outfile.open (sOutFile.c_str());
 
@@ -118,7 +118,7 @@ void IsisMain() {
 
   //datafile':get data file only for photometric functions that need it
   if (sPhotoFunc == "LUNARLAMBERTEMPIRICAL" || sPhotoFunc == "MINNAERTEMPIRICAL") {
-    string sDataFile =  ui.GetFilename("DATAFILE");
+    string sDataFile =  ui.GetFileName("DATAFILE");
   }
 
   // Get Atmospheric Model
@@ -170,8 +170,8 @@ void IsisMain() {
   // or commas) and then parameters read from the words.  The line is
   // rejected if there aren't enough words or if any of them don't make
   // sense as the corresponding parameter.
-  Filename sInFileName(sInFile);
-  TextFile infile(sInFileName.Expanded());
+  FileName sInFileName(sInFile);
+  TextFile infile(sInFileName.expanded());
   iString infileString;
   while (infile.GetLine(infileString)) {
     iString imgId = infileString.Token(" ,");

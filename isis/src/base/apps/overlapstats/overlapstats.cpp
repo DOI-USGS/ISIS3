@@ -25,12 +25,12 @@ std::string FormatString(double input, int head, int tail);
 void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
-  SerialNumberList serialNumbers(ui.GetFilename("FROMLIST"));
+  SerialNumberList serialNumbers(ui.GetFileName("FROMLIST"));
 
   // Find all the overlaps between the images in the FROMLIST
   // The overlap polygon coordinates are in Lon/Lat order
   ImageOverlapSet overlaps;
-  overlaps.ReadImageOverlaps(ui.GetFilename("OVERLAPLIST"));
+  overlaps.ReadImageOverlaps(ui.GetFileName("OVERLAPLIST"));
 
   // Progress
   Progress progress;
@@ -113,7 +113,7 @@ void IsisMain() {
       const geos::geom::MultiPolygon *mpLatLon = overlaps[index]->Polygon();
 
       // Construct a Projection for converting between Lon/Lat and X/Y
-      Pvl cubeLab(serialNumbers.Filename(0));
+      Pvl cubeLab(serialNumbers.FileName(0));
       PvlGroup inst = cubeLab.FindGroup("Instrument", Pvl::Traverse);
       string target = inst["TargetName"];
       PvlGroup radii = Projection::TargetRadii(target);
@@ -161,14 +161,14 @@ void IsisMain() {
           }
           output << delim << overlaps[index]->Size() << pretty;
           output << delim << (*overlaps[index])[0];
-          output << delim << serialNumbers.Filename((*overlaps[index])[0]);
+          output << delim << serialNumbers.FileName((*overlaps[index])[0]);
           for(int sn = 1; sn < overlaps[index]->Size(); sn ++) {
             if(!singleLine) {
               output << endl << pretty << delim << pretty << delim << pretty << delim;
               output << pretty << pretty;
             }
             output << delim << pretty << (*overlaps[index])[sn];
-            output << delim << serialNumbers.Filename((*overlaps[index])[sn]);
+            output << delim << serialNumbers.FileName((*overlaps[index])[sn]);
           }
           output << endl;
         }
@@ -207,9 +207,9 @@ void IsisMain() {
   // Checks if there were overlaps to output results from
   if(overlapnum == 0) {
     std::string msg = "The overlap file [";
-    msg += Filename(ui.GetFilename("OVERLAPLIST")).Name();
+    msg += FileName(ui.GetFileName("OVERLAPLIST")).name();
     msg += "] does not contain any overlaps across the provided cubes [";
-    msg += Filename(ui.GetFilename("FROMLIST")).Name() + "]";
+    msg += FileName(ui.GetFileName("FROMLIST")).name() + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -240,7 +240,7 @@ void IsisMain() {
   // Add non-overlapping cubes to the output
   if(!nooverlap.empty()) {
     for(set<string>::iterator itt = nooverlap.begin(); itt != nooverlap.end(); itt ++) {
-      brief += PvlKeyword("NoOverlap", serialNumbers.Filename(*itt));
+      brief += PvlKeyword("NoOverlap", serialNumbers.FileName(*itt));
     }
   }
 
@@ -249,7 +249,7 @@ void IsisMain() {
 
   //Log the ERRORS file
   if(ui.WasEntered("ERRORS")) {
-    string errorname = ui.GetFilename("ERRORS");
+    string errorname = ui.GetFileName("ERRORS");
     std::ofstream errorsfile;
     errorsfile.open(errorname.c_str());
     errorsfile << errors.str();
@@ -266,13 +266,13 @@ void IsisMain() {
 
   // Display FULL output
   if(full) {
-    string outname = ui.GetFilename("TO");
+    string outname = ui.GetFileName("TO");
     std::ofstream outfile;
     outfile.open(outname.c_str());
     outfile << output.str();
     outfile.close();
     if(outfile.fail()) {
-      iString msg = "Unable to write the statistics to [" + ui.GetFilename("TO") + "]";
+      iString msg = "Unable to write the statistics to [" + ui.GetFileName("TO") + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
   }

@@ -55,10 +55,10 @@ class Validation {
 
       m_test = test;
       m_pointId = registered->Parent()->GetId();
-      m_heldId = Filename(
-          files->Filename(held->GetCubeSerialNumber())).Basename();
-      m_registeredId = Filename(
-          files->Filename(registered->GetCubeSerialNumber())).Basename();
+      m_heldId = FileName(
+          files->FileName(held->GetCubeSerialNumber())).baseName();
+      m_registeredId = FileName(
+          files->FileName(registered->GetCubeSerialNumber())).baseName();
 
       m_aprioriSample = registered->GetSample();
       m_aprioriLine = registered->GetLine();
@@ -226,13 +226,13 @@ void IsisMain() {
 
   // Open the files list in a SerialNumberList for
   // reference by SerialNumber
-  files = new SerialNumberList(ui.GetFilename("FROMLIST"));
+  files = new SerialNumberList(ui.GetFileName("FROMLIST"));
 
   // Create the output ControlNet from the input file
-  ControlNet outNet(ui.GetFilename("CNET"));
+  ControlNet outNet(ui.GetFileName("CNET"));
 
   if (outNet.GetNumPoints() <= 0) {
-    std::string msg = "Control network [" + ui.GetFilename("CNET") + "] ";
+    std::string msg = "Control network [" + ui.GetFileName("CNET") + "] ";
     msg += "contains no points";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -240,7 +240,7 @@ void IsisMain() {
   outNet.SetUserName(Application::UserName());
 
   // Create an AutoReg from the template file
-  Pvl pvl(ui.GetFilename("DEFFILE"));
+  Pvl pvl(ui.GetFileName("DEFFILE"));
   ar = AutoRegFactory::Create(pvl);
 
   Progress progress;
@@ -347,7 +347,7 @@ void IsisMain() {
   // The flatfile is comma seperated and can be imported into an excel
   // spreadsheet
   if (ui.WasEntered("FLATFILE")) {
-    string fFile = Filename(ui.GetFilename("FLATFILE")).Expanded();
+    string fFile = FileName(ui.GetFileName("FLATFILE")).expanded();
 
     ofstream os;
     os.open(fFile.c_str(), ios::out);
@@ -360,7 +360,7 @@ void IsisMain() {
     os << Null << endl;
 
     // Create a ControlNet from the original input file
-    ControlNet inNet(ui.GetFilename("CNET"));
+    ControlNet inNet(ui.GetFileName("CNET"));
 
     for (int i = 0; i < outNet.GetNumPoints(); i++) {
 
@@ -380,8 +380,8 @@ void IsisMain() {
 
           string pointId = outPoint->GetId();
 
-          string fullName = files->Filename(cmTrans->GetCubeSerialNumber());
-          string filename = Filename(fullName).Basename();
+          string fullName = files->FileName(cmTrans->GetCubeSerialNumber());
+          string filename = FileName(fullName).baseName();
 
           string measureType = cmTrans->MeasureTypeToString(
               cmTrans->GetType());
@@ -450,7 +450,7 @@ void IsisMain() {
   }
 
   if (logFalsePositives) {
-    string filename = Filename(ui.GetFilename("FALSEPOSITIVES")).Expanded();
+    string filename = FileName(ui.GetFileName("FALSEPOSITIVES")).expanded();
     ofstream os;
     os.open(filename.c_str(), ios::out);
 
@@ -505,7 +505,7 @@ void IsisMain() {
     Application::Log(validationTemplate);
   }
 
-  outNet.Write(ui.GetFilename("ONET"));
+  outNet.Write(ui.GetFileName("ONET"));
 
   delete ar;
   ar = NULL;
@@ -528,7 +528,7 @@ void registerPoint(ControlPoint *outPoint, ControlMeasure *patternCM,
     string registerMeasures, bool outputFailed) {
 
   Cube &patternCube = *cubeMgr->OpenCube(
-      files->Filename(patternCM->GetCubeSerialNumber()));
+      files->FileName(patternCM->GetCubeSerialNumber()));
 
   ar->PatternChip()->TackCube(patternCM->GetSample(), patternCM->GetLine());
   ar->PatternChip()->Load(patternCube);
@@ -554,9 +554,9 @@ void registerPoint(ControlPoint *outPoint, ControlMeasure *patternCM,
       else if (!measure->IsMeasured() || registerMeasures != "CANDIDATES") {
 
         // refresh pattern cube pointer to ensure it stays valid
-        Cube &patternCube = *cubeMgr->OpenCube(files->Filename(
+        Cube &patternCube = *cubeMgr->OpenCube(files->FileName(
               patternCM->GetCubeSerialNumber()));
-        Cube &searchCube = *cubeMgr->OpenCube(files->Filename(
+        Cube &searchCube = *cubeMgr->OpenCube(files->FileName(
               measure->GetCubeSerialNumber()));
 
         ar->SearchChip()->TackCube(measure->GetSample(), measure->GetLine());
@@ -743,9 +743,9 @@ Validation backRegister(ControlMeasure *reference, ControlMeasure *measure,
   Validation validation(
       "Back-Registration", measure, reference, shiftTolerance);
 
-  Cube &patternCube = *cubeMgr->OpenCube(files->Filename(
+  Cube &patternCube = *cubeMgr->OpenCube(files->FileName(
         measure->GetCubeSerialNumber()));
-  Cube &searchCube = *cubeMgr->OpenCube(files->Filename(
+  Cube &searchCube = *cubeMgr->OpenCube(files->FileName(
         reference->GetCubeSerialNumber()));
 
   double patternRes = getResolution(patternCube, *measure);
@@ -849,7 +849,7 @@ void printTemp() {
 
   // Get template pvl
   Pvl userTemp;
-  userTemp.Read(ui.GetFilename("DEFFILE"));
+  userTemp.Read(ui.GetFileName("DEFFILE"));
 
   //Write template file out to the log
   Isis::Application::GuiLog(userTemp);

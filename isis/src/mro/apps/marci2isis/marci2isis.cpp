@@ -1,6 +1,6 @@
 #include "Isis.h"
 #include "ProcessImportPds.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Brick.h"
 #include "MultivariateStatistics.h"
 #include "OriginalLabel.h"
@@ -44,18 +44,18 @@ void IsisMain() {
   p.SetPixelType(Isis::UnsignedByte);
 
   UserInterface &ui = Application::GetUserInterface();
-  Filename inFile = ui.GetFilename("FROM");
+  FileName inFile = ui.GetFileName("FROM");
 
   //Checks if in file is rdr
-  Pvl lab(inFile.Expanded());
+  Pvl lab(inFile.expanded());
   if(lab.HasObject("IMAGE_MAP_PROJECTION")) {
-    string msg = "[" + inFile.Name() + "] appears to be an rdr file.";
+    string msg = "[" + inFile.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   Pvl pdsLab;
-  p.SetPdsFile(inFile.Expanded(), "", pdsLab);
+  p.SetPdsFile(inFile.expanded(), "", pdsLab);
 
   if((int)pdsLab["SAMPLING_FACTOR"] == 12) {
     throw IException(IException::User, "Summing mode of 12 not supported", _FILEINFO_);
@@ -115,9 +115,9 @@ void IsisMain() {
   outputCubes[0]->setDimensions(numSamples, numLines, numFilters);
   outputCubes[1]->setDimensions(numSamples, numLines, numFilters);
 
-  Filename outputFile(ui.GetFilename("TO"));
-  iString evenFile = outputFile.Path() + "/" + outputFile.Basename() + ".even.cub";
-  iString oddFile = outputFile.Path() + "/" + outputFile.Basename() + ".odd.cub";
+  FileName outputFile(ui.GetFileName("TO"));
+  iString evenFile = outputFile.path() + "/" + outputFile.baseName() + ".even.cub";
+  iString oddFile = outputFile.path() + "/" + outputFile.baseName() + ".odd.cub";
 
   outputCubes[0]->create(evenFile);
   outputCubes[1]->create(oddFile);

@@ -41,7 +41,7 @@ void IsisMain() {
   if(inGap) {
     pvl.AddKeyword(PvlKeyword("ToEndOfBand", lineNum));
   }
-  toDisplay.Write(ui.GetFilename("TO"));
+  toDisplay.Write(ui.GetFileName("TO"));
   toDisplay.Clear();
   inGap = false;
   p.EndProcess();

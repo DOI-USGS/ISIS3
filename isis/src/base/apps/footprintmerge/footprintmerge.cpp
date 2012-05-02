@@ -20,9 +20,9 @@ using namespace Isis;
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   FileList imageList;
-  imageList.Read(ui.GetFilename("FROMLIST"));
+  imageList.Read(ui.GetFileName("FROMLIST"));
   if(imageList.size() < 1) {
-    std::string msg = "The list file [" + ui.GetFilename("FROMLIST") +
+    std::string msg = "The list file [" + ui.GetFileName("FROMLIST") +
                       "] does not contain any data";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -141,7 +141,7 @@ void IsisMain() {
     Application::Log(results);
   }
   else if(mode == "FULL") {
-    string out = ui.GetFilename("TO");
+    string out = ui.GetFileName("TO");
     PvlObject results("Results");
     for(unsigned int p = 0; p < islandPolys.size(); p++) {
       int numFiles = islands[p].size();
@@ -157,7 +157,7 @@ void IsisMain() {
     }
     Pvl temp;
     temp.AddObject(results);
-    if(Filename(out).Exists()) {
+    if(FileName(out).fileExists()) {
       temp.Append(out);
     }
     else {

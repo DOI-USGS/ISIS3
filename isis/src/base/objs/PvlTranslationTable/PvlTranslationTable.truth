@@ -16,7 +16,7 @@ Unit test for Isis::PvlTranslationTable
     **PROGRAMMER ERROR** Unable to find translation group [tttt3] in file [].
 
   Test Translate :
-    Translate ("DataFilename", "tttt4") = tttt4
+    Translate ("DataFileName", "tttt4") = tttt4
     Translate ("CoreByteOrder","MSB_INTEGER") = BigEndian
     Translate ("CorePixelType") = Integer
     Translate ("CorePixelType") = Unknown

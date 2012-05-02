@@ -2,7 +2,7 @@
 
 #include "ProcessImportPds.h"
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "TextFile.h"
 
 using namespace std;
@@ -13,9 +13,9 @@ void IsisMain() {
   Pvl pdsLabel;
   UserInterface &ui = Application::GetUserInterface();
 
-  Filename inFile = ui.GetFilename("FROM");
+  FileName inFile = ui.GetFileName("FROM");
 
-  p.SetPdsFile(inFile.Expanded(), "", pdsLabel);
+  p.SetPdsFile(inFile.expanded(), "", pdsLabel);
   //65535 is set to NULL
   p.SetNull(65535, 65535);
 
@@ -23,7 +23,7 @@ void IsisMain() {
 
   Pvl outLabel;
 
-  Pvl labelPvl(inFile.Expanded());
+  Pvl labelPvl(inFile.expanded());
 
   iString prodType;
 
@@ -57,13 +57,13 @@ void IsisMain() {
         PvlKeyword widths = PvlKeyword("Width");
         iString tablePath = (string)labelPvl.FindKeyword("MRO:WAVELENGTH_FILE_NAME");
         tablePath = tablePath.DownCase();
-        Filename tableFile(inFile.Path() + "/" + tablePath);
+        FileName tableFile(inFile.path() + "/" + tablePath);
         //Check if the wavelength file exists
-        if(tableFile.Exists()) {
-          TextFile *fin = new TextFile(tableFile.Expanded());
+        if(tableFile.fileExists()) {
+          TextFile *fin = new TextFile(tableFile.expanded());
           // Open table file
           if(!fin->OpenChk()) {
-            string msg = "Cannot open wavelength table [" + tableFile.Expanded() + "]";
+            string msg = "Cannot open wavelength table [" + tableFile.expanded() + "]";
             throw IException(IException::Io, msg, _FILEINFO_);
           }
 
@@ -86,7 +86,7 @@ void IsisMain() {
         }
         //Otherwise throw an error
         else {
-          string msg = "Cannot fine wavelength table [" + tableFile.Expanded() + "]";
+          string msg = "Cannot fine wavelength table [" + tableFile.expanded() + "]";
           throw IException(IException::Io, msg, _FILEINFO_);
         }
       }
@@ -132,13 +132,13 @@ void IsisMain() {
   }
 
   // Translate the Instrument group
-  Filename transFile("$mro/translations/crismInstrument.trn");
-  PvlTranslationManager instrumentXlater(labelPvl, transFile.Expanded());
+  FileName transFile("$mro/translations/crismInstrument.trn");
+  PvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
   // Translate the Archive group
   transFile  = "$mro/translations/crismArchive.trn";
-  PvlTranslationManager archiveXlater(labelPvl, transFile.Expanded());
+  PvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   ocube->putGroup(outLabel.FindGroup("Instrument", Pvl::Traverse));

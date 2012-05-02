@@ -33,7 +33,7 @@
 
 #include "SpkSegment.h"
 #include "iString.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Cube.h"
 #include "Camera.h"
 #include "Table.h"
@@ -299,7 +299,7 @@ std::string SpkSegment::getComment() const {
 
   comment <<
 "\n-----------------------------------------------------------------------\n" <<
-"  File:        " << Filename(Source()).Name() << endl <<
+"  File:        " << FileName(Source()).name() << endl <<
 "  Segment ID:  " << Id() << " (ProductId)" << endl <<
 "  StartTime:   " << utcStartTime() << endl <<
 "  EndTime:     " << utcEndTime() << endl <<

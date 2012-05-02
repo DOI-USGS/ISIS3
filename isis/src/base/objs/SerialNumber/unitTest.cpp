@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Filename.h"
+#include "FileName.h"
 #include "Pvl.h"
 #include "SerialNumber.h"
 #include "ObservationNumber.h"
@@ -30,8 +30,8 @@ int main(int argc, char *argv[]) {
   cube.open("$base/testData/isisTruth.cub");
   std::cout << Isis::SerialNumber::Compose(cube, true) << std::endl;
 
-  Isis::Filename file("$lo/testData/3133_h1.cub");
-  Isis::Pvl p1(file.Expanded());
+  Isis::FileName file("$lo/testData/3133_h1.cub");
+  Isis::Pvl p1(file.expanded());
 
   std::cout << Isis::SerialNumber::Compose(p1) << std::endl;
 

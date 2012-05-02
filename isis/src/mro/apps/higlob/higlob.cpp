@@ -2,7 +2,7 @@
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
 #include "LineManager.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Table.h"
 
@@ -30,7 +30,7 @@ void IsisMain() {
 
   // Open the input cube
   UserInterface &ui = Application::GetUserInterface();
-  string from = ui.GetFilename("FROM");
+  string from = ui.GetFileName("FROM");
   cube.open(from);
 
   samples = cube.getSampleCount();

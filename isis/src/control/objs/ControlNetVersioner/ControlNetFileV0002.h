@@ -30,7 +30,7 @@ template <typename A> class QList;
 namespace Isis {
   class ControlNetFileHeaderV0002;
   class ControlPointFileEntryV0002;
-  class Filename;
+  class FileName;
 
   /**
    * @brief Handle Binary Control Network Files version 2
@@ -57,8 +57,8 @@ namespace Isis {
       ControlNetFileV0002();
       virtual ~ControlNetFileV0002();
 
-      virtual void Read(const Pvl &header, const Filename &file);
-      virtual void Write(const Filename &file) const;
+      virtual void Read(const Pvl &header, const FileName &file);
+      virtual void Write(const FileName &file) const;
       virtual Pvl ToPvl() const;
 
       /**

@@ -124,8 +124,8 @@ void IsisMain() {
   else play = 10.0/resolution;
 
   //copy the patternS chip (the entire ApolloPanFiducialMark.cub)
-  Filename fiducialFilename("$apollo15/calibration/ApolloPanFiducialMark.cub");
-  fidC.open(fiducialFilename.Expanded(),"r");
+  FileName fiducialFileName("$apollo15/calibration/ApolloPanFiducialMark.cub");
+  fidC.open(fiducialFileName.expanded(),"r");
   if (!fidC.isOpen()) {
     string msg = "Unable to open the fiducial patternS cube: ApolloPanFiducialMark.cub\n";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -152,8 +152,8 @@ void IsisMain() {
 
   //parameters for maximum correlation autoregestration  see:  file:///usgs/pkgs/isis3nightly2011-09-21/isis/doc/documents/patternSMatch/patternSMatch.html#DistanceTolerance
   //printf("DEBUG1\n");
-  Filename fiducialPvl("$apollo15/templates/apolloPanFiducialFinder.pvl");
-  pvl.Read(fiducialPvl.Expanded());  //read in the autoreg parameters
+  FileName fiducialPvl("$apollo15/templates/apolloPanFiducialFinder.pvl");
+  pvl.Read(fiducialPvl.expanded());  //read in the autoreg parameters
   AutoReg *arS = AutoRegFactory::Create(pvl);
 
   *arS->PatternChip()   = patternS;  //patternS chip is constant
@@ -644,7 +644,7 @@ void IsisMain() {
   //define an output cube
   outputC.setDimensions(int(maxS),int(maxL),1);
   outputC.setPixelType(panC[0]->getPixelType());  //set pixel type
-  tempiString = ui.GetFilename("TO");
+  tempiString = ui.GetFileName("TO");
   outputC.create(tempiString);
   outputC.close();  //closing the output cube so that it can be opened by the mosaic process
   ProcessMosaic mosaic;
@@ -654,8 +654,7 @@ void IsisMain() {
 
   //transform and mosaic the content from each scan
   for(i=0;i<8;i++) {  //for each scan
-    Filename tempFile;
-    tempFile.Temporary("$temporary/tempscan", "cub");
+    FileName tempFile = FileName::createTempFile("$temporary/tempscan.cub");
 
     scanS = panC[i]->getSampleCount();
     scanL = panC[i]->getLineCount();
@@ -671,19 +670,19 @@ void IsisMain() {
     Trans2d3p transform(  trans[i].theta,trans[i].dx,trans[i].dy,  int(sampleTo - sampleFrom),int(maxL));
     //Trans2d3p transform(  trans[i].theta,trans[i].dx,trans[i].dy,  520,int(maxL));  //debug
     rubberS.SetInputCube(panC[i]);
-    rubberS.SetOutputCube(tempFile.Expanded(),att,transform.OutputSamples(),transform.OutputLines(),1);
+    rubberS.SetOutputCube(tempFile.expanded(),att,transform.OutputSamples(),transform.OutputLines(),1);
     rubberS.StartProcess(transform, bilinearInt);
     rubberS.EndProcess();  //end process closes the cubes and deletes the dynamically allocated memory (panC[i])
 
     printf("Mosaicing Scan%d\n",i+1);
     //use process mosaic to add the sub cube to the stiched cube
-    mosaic.SetInputCube(tempFile.Expanded(),attI,1,1,1,transform.OutputSamples(),transform.OutputLines(),1);
+    mosaic.SetInputCube(tempFile.expanded(),attI,1,1,1,transform.OutputSamples(),transform.OutputLines(),1);
     mosaic.StartProcess(int(sampleFrom),1,1);
 
     //clear input cube
     mosaic.ClearInputCubes();
 
-    remove(tempFile.Expanded().c_str());  //delete temporary cube if it exists
+    remove(tempFile.expanded().c_str());  //delete temporary cube if it exists
   }
   mosaic.EndProcess();
 }

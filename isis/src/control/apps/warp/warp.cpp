@@ -20,7 +20,7 @@ void IsisMain() {
 
   // Get the control point file
   UserInterface &ui = Application::GetUserInterface();
-  string cfile = ui.GetFilename("CNET");
+  string cfile = ui.GetFileName("CNET");
   ControlNet cn(cfile);
 
   std::vector<double> inputLine, inputSample, outputLine, outputSample;
@@ -52,7 +52,7 @@ void IsisMain() {
   int onl, ons;
   if (ui.GetString("OSIZE") == "MATCH") {
     Cube c;
-    c.open(iString(ui.GetFilename("CUBE")), "r");
+    c.open(iString(ui.GetFileName("CUBE")), "r");
     onl = c.getLineCount();
     ons = c.getSampleCount();
     c.close();

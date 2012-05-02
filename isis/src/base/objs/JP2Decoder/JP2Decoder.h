@@ -43,7 +43,7 @@ namespace Isis {
    * Here is an example of how to use JP2Decoder
    * @code
    *   JP2Decoder *JP2_decoder;
-   *   JP2_decoder = new JP2Decoder(iString(ui.GetFilename("FROM")));
+   *   JP2_decoder = new JP2Decoder(iString(ui.GetFileName("FROM")));
    *   JP2_decoder->OpenFile();
    *   int nsamps = JP2_decoder->GetSampleDimension();
    *   int nlines = JP2_decoder->GetLineDimension();
@@ -63,10 +63,10 @@ namespace Isis {
    *     }
    *   } else {
    *     throw iException::Message(iException::User,
-   *       "The file [" + ui.GetFilename("FROM") + "] contains unsupported data type.",
+   *       "The file [" + ui.GetFileName("FROM") + "] contains unsupported data type.",
    *       _FILEINFO_);
    *   }
-   *   jp.SetInputFile(iString(ui.GetFilename("FROM")));
+   *   jp.SetInputFile(iString(ui.GetFileName("FROM")));
    *   jp.SetOutputCube("TO");
    *   jp.SetOrganization(ProcessImport::JP2);
    *   jp.StartProcess();

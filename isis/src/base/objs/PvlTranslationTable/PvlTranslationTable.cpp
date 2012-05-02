@@ -40,8 +40,8 @@ namespace Isis {
    *
    * @throws iException::Io
    */
-  PvlTranslationTable::PvlTranslationTable(Isis::Filename transFile) {
-    AddTable(transFile.Expanded());
+  PvlTranslationTable::PvlTranslationTable(Isis::FileName transFile) {
+    AddTable(transFile.expanded());
   }
 
   /**
@@ -65,7 +65,7 @@ namespace Isis {
    * @throws IException::Io
    */
   void PvlTranslationTable::AddTable(const std::string &transFile) {
-    p_trnsTbl.Read(Filename(transFile).Expanded());
+    p_trnsTbl.Read(FileName(transFile).expanded());
   }
 
   /**
@@ -84,7 +84,7 @@ namespace Isis {
       if(!currGrp.HasKeyword("InputKey")) {
         string message = "Unable to find InputKey for group ["
                          + currGrp.Name() + "] in file [" +
-                         p_trnsTbl.Filename() + "]";
+                         p_trnsTbl.FileName() + "]";
         throw IException(IException::User, message, _FILEINFO_);
       }
 
@@ -138,14 +138,14 @@ namespace Isis {
           if(!keywordSizeMismatch) {
             string message = "Keyword [" + currKey.Name();
             message += "] is not a valid keyword.";
-            message += " Error in file [" + p_trnsTbl.Filename() + "]" ;
+            message += " Error in file [" + p_trnsTbl.FileName() + "]" ;
 
             throw IException(IException::User, message, _FILEINFO_);
           }
           else {
             string message = "Keyword [" + currKey.Name();
             message += "] does not have the correct number of elements.";
-            message += " Error in file [" + p_trnsTbl.Filename() + "]" ;
+            message += " Error in file [" + p_trnsTbl.FileName() + "]" ;
 
             throw IException(IException::User, message, _FILEINFO_);
           }
@@ -170,7 +170,7 @@ namespace Isis {
                                         const std::string fValue) const {
     if(!p_trnsTbl.HasGroup(nName)) {
       string msg = "Unable to find translation group [" +
-                   nName + "] in file [" + p_trnsTbl.Filename() + "]";
+                   nName + "] in file [" + p_trnsTbl.FileName() + "]";
 
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -187,7 +187,7 @@ namespace Isis {
         string msg = "No value or default value to translate for ";
         msg += "translation group [";
         msg += nName;
-        msg += "] in file [" + p_trnsTbl.Filename() + "]";
+        msg += "] in file [" + p_trnsTbl.FileName() + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
@@ -216,7 +216,7 @@ namespace Isis {
 
     string msg = "Unable to find a translation value for [" +
                  nName +  ", " + Isis::iString(fValue) + "] in file [" +
-                 p_trnsTbl.Filename() + "]";
+                 p_trnsTbl.FileName() + "]";
 
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
@@ -238,7 +238,7 @@ namespace Isis {
 
     if(!p_trnsTbl.HasGroup(nName)) {
       string msg = "Unable to find translation group [" +
-                   nName + "] in file [" + p_trnsTbl.Filename() + "]";
+                   nName + "] in file [" + p_trnsTbl.FileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -290,7 +290,7 @@ namespace Isis {
       iString msg = "No input position found for translation [";
       msg += nName;
       msg += "] in translation file [";
-      msg += p_trnsTbl.Filename();
+      msg += p_trnsTbl.FileName();
       msg += "]";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }*/
@@ -313,7 +313,7 @@ namespace Isis {
 
     if(!p_trnsTbl.HasGroup(nName)) {
       string msg = "Unable to find translation group [" +
-                   nName + "] in file [" + p_trnsTbl.Filename() + "]";
+                   nName + "] in file [" + p_trnsTbl.FileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -337,7 +337,7 @@ namespace Isis {
 
     if(!p_trnsTbl.HasGroup(nName)) {
       string msg = "Unable to find translation group [" +
-                   nName + "] in file [" + p_trnsTbl.Filename() + "]";
+                   nName + "] in file [" + p_trnsTbl.FileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -350,7 +350,7 @@ namespace Isis {
   bool PvlTranslationTable::IsAuto(const std::string nName) {
     if(!p_trnsTbl.HasGroup(nName)) {
       string msg = "Unable to find translation group [" + nName +
-                   "] in file [" + p_trnsTbl.Filename() + "]";
+                   "] in file [" + p_trnsTbl.FileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -363,7 +363,7 @@ namespace Isis {
   bool PvlTranslationTable::IsOptional(const std::string nName) {
     if(!p_trnsTbl.HasGroup(nName)) {
       string msg = "Unable to find translation group [" + nName +
-                   "] in file [" + p_trnsTbl.Filename() + "]";
+                   "] in file [" + p_trnsTbl.FileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -377,14 +377,14 @@ namespace Isis {
     const std::string nName) {
     if(!p_trnsTbl.HasGroup(nName)) {
       string msg = "Unable to find translation group [" +
-                   nName + "] in file [" + p_trnsTbl.Filename() + "]";
+                   nName + "] in file [" + p_trnsTbl.FileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     Isis::PvlGroup &tgrp = p_trnsTbl.FindGroup(nName);
     if(!tgrp.HasKeyword("OutputPosition")) {
       string msg = "Unable to find translation keyword [OutputPostion] in [" +
-                   nName + "] in file [" + p_trnsTbl.Filename() + "]";
+                   nName + "] in file [" + p_trnsTbl.FileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
 
     }
@@ -396,7 +396,7 @@ namespace Isis {
   string PvlTranslationTable::OutputName(const std::string nName) {
     if(!p_trnsTbl.HasGroup(nName)) {
       string msg = "Unable to find translation group [" + nName +
-                   "] in file [" + p_trnsTbl.Filename() + "]";
+                   "] in file [" + p_trnsTbl.FileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

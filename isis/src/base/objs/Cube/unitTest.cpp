@@ -1,9 +1,11 @@
 #include <iostream>
 
+#include <QFileInfo>
+
 #include "IException.h"
 #include "Brick.h"
 #include "Cube.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "LineManager.h"
 #include "Pvl.h"
 #include "Preference.h"
@@ -575,7 +577,7 @@ int main(int argc, char *argv[]) {
 
 
 void Report(Cube &c) {
-  cerr << "File   = " << iString(QFileInfo(c.getFilename()).fileName()) << endl;
+  cerr << "File   = " << iString(QFileInfo(c.getFileName()).fileName()) << endl;
   cerr << "Samps  = " << c.getSampleCount() << endl;
   cerr << "Lines  = " << c.getLineCount() << endl;
   cerr << "Bands  = " << c.getBandCount() << endl;

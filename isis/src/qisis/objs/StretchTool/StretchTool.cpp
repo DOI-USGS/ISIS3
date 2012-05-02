@@ -1276,17 +1276,17 @@ namespace Isis {
 
     if(p_advancedStretch->isRgbMode())
     {
-      Filename redFilename(filename.toStdString());
-      Filename grnFilename(filename.toStdString());
-      Filename bluFilename(filename.toStdString());
+      FileName redFileName(filename.toStdString());
+      FileName grnFileName(filename.toStdString());
+      FileName bluFileName(filename.toStdString());
 
-      redFilename.AddExtension("red");
-      grnFilename.AddExtension("grn");
-      bluFilename.AddExtension("blu");
+      redFileName.addExtension("red");
+      grnFileName.addExtension("grn");
+      bluFileName.addExtension("blu");
 
-      QFile redFile(QString::fromStdString(redFilename.Expanded()));
-      QFile grnFile(QString::fromStdString(grnFilename.Expanded()));
-      QFile bluFile(QString::fromStdString(bluFilename.Expanded()));
+      QFile redFile(QString::fromStdString(redFileName.expanded()));
+      QFile grnFile(QString::fromStdString(grnFileName.expanded()));
+      QFile bluFile(QString::fromStdString(bluFileName.expanded()));
       bool success = redFile.open(QIODevice::WriteOnly) &&
                      grnFile.open(QIODevice::WriteOnly) &&
                      bluFile.open(QIODevice::WriteOnly);

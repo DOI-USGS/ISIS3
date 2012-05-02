@@ -20,19 +20,26 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#ifndef Filename_h
-#define Filename_h
+#ifndef FileName_H
+#define FileName_H
 
-#include <QFileInfo>
+#include <string>
+#include <QSharedData>
 
-#include "iString.h"
+class QDate;
+class QDir;
+class QString;
+
+template<typename A, typename B> class QPair;
 
 namespace Isis {
+  class iString;
+
   /**
-   * @brief Filename manipulation and expansion.
+   * @brief File name manipulation and expansion.
    *
    * This class is used for manipulating filenames. It allows access to the path,
-   * extension, base name and attributes. A standard Isis filename takes the
+   * extension, base name and Isis attributes. A standard Isis filename takes the
    * form of
    * @code
    * /path/base.extension:attribute
@@ -51,7 +58,7 @@ namespace Isis {
    *   @history 2002-11-27 Stuart Sides - added capability to expand environment
    *                           variables within a filename.
    *   @history 2003-01-27 Jeff Anderson - added a method to allow full file
-   *                           specification to be extracted (includes the 
+   *                           specification to be extracted (includes the
    *                           attributes).
    *   @history 2002-02-12 Stuart Sides - fixed bug with incorrect parsing when
    *                           filename did not have a path.
@@ -70,10 +77,10 @@ namespace Isis {
    *                           filename only
    *                           without any path, extension or attributes.
    *   @history 2004-01-27 ?????? - Tool all references to attributes out.
-   *                           IsisFilename now ignores all cube attributes.
+   *                           IsisFileName now ignores all cube attributes.
    *   @history 2004-01-27 ?????? - Removed the member FullSpecification,
    *                           because FullSpecification without the cube
-   *                           attributes now does the same thing as Filename.
+   *                           attributes now does the same thing as FileName.
    *   @history 2004-01-27 ?????? - Added a new constructor with two parameters.
    *                           This new constructor will create a temporary
    *                           filename using the path from the Preference
@@ -84,7 +91,7 @@ namespace Isis {
    *   @history 2005-07-28 Drew Davidson - added new member NewVersion.
    *   @history 2007-10-03 Steven Koechle - Fixed Temporary() so if a path was
    *                           specified it will have the cwd put on in front of it.
-   *   @history 2009-01-07 Steven Lambright - Expanded() no longer behaves
+   *   @history 2009-01-07 Steven Lambright - expanded() no longer behaves
    *                           differently for unit tests
    *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
    *                           $temporary variable instead of /tmp directory.
@@ -93,103 +100,89 @@ namespace Isis {
    *                           instead of std::string for simplicity when used
    *                           with our GUI applications. Removed extra includes
    *                           and cleaned up code a little.
+   *   @history 2012-04-14 Steven Lambright - Renamed FileName to FileName. No
+   *                           longer inherits QFileInfo, paired down
+   *                           functionality to file name related functionality.
+   *                           Fixed temporary file naming to guarantee unique,
+   *                           unpredictable (safe) names.
    */
-  class Filename : public QFileInfo {
+  class FileName {
     public:
-      // Create an empty filename
-      Filename();
+      FileName();
+      FileName(const char *fileName);
+      FileName(const std::string &fileName);
+      FileName(const iString &fileName);
+      FileName(const QString &fileName);
+      FileName(const FileName &other);
+      ~FileName();
 
-      // Create a new Filename with the string
-      Filename(const iString &filename);
+      iString originalPath() const;
+      iString path() const;
 
-      // Create a new Filename using the users temporary directory
-      // preference with the name and extension specified
-      Filename(const iString &Name, const iString &extension);
+      iString attributes() const;
+      iString baseName() const;
+      iString name() const;
+      iString extension() const;
 
-      // Destroys the Filename Object
-      ~Filename();
+      iString expanded() const;
+      iString original() const;
 
-      // Set the filename to the argument
-      void operator=(const iString &filename);
-      void operator=(const char *filename);
+      FileName addExtension(const iString &extension) const;
+      FileName removeExtension() const;
+      FileName setExtension(const iString &extension) const;
 
-      // Return only the path
-      iString Path() const;
+      bool isVersioned() const;
+      bool isNumericallyVersioned() const;
+      bool isDateVersioned() const;
 
-      // Return the name without the extension or path
-      iString Basename() const;  // equiv to qt baseName
-      // renamed from Name
-
-      // Return only the name with extension and without the path
-      iString Name() const;  // equiv to qt fileName
-      // renamed from Basename
-
-      // Return only the extension (no path, name or ".")
-      iString Extension() const;  // equiv to qt extension
-
-      // Return the expanded filename (path, name & extension)
-      iString Expanded() const;  // mostly qt absFilePath without $ expansion
-
-      // Return the original path without "$" expansion if any
-      iString OriginalPath() const;
-
-      // Add an extension to an existing Filename
-      // Doesn't do anything if an extension already exists
-      void AddExtension(const iString &extension);
-
-      // Remove the extension
-      void RemoveExtension();
-
-      // Find the highest version of a filename
-      void HighestVersion();
-
-      bool IsVersioned() const;
-
-      bool IsNumericallyVersioned() const;
-
-      bool IsDateVersioned() const;
-
-      void SetHighestNumericalVersion();
-
-      void SetHighestDateVersion();
-
-      // Find the highest version + 1 of a filename
-      void NewVersion();
-
-      void SetNewNumericalVersion();
-
-      void SetNewDateVersion();
+      FileName highestVersion() const;
+      FileName newVersion() const;
+      FileName version(long versionNumber) const;
+      FileName version(QDate versionDate) const;
 
       // Return true if the file exists
-      bool Exists();
+      bool fileExists() const;
 
       // Create a directory
-      void MakeDirectory();
+      QDir dir() const;
 
-      // Create a temporary filename using the
-      // Isis::Preference DataDirectory/Temporary
-      // directory with the name and extension of the arguments
-      void Temporary(const iString &name, const iString &extension);
+      static FileName createTempFile(FileName templateFileName = "$TEMPORARY/temp");
+
+      iString toString() const;
+      FileName &operator=(const FileName &rhs);
+      bool operator==(const FileName &rhs);
 
     private:
-      QDir GetDirectory() const;
+      QDate highestVersionDate() const;
+      long highestVersionNum() const;
+      void validateVersioningState() const;
 
-      void CheckVersion() const;
+      QString fileNameQDatePattern() const;
 
-      QString ReplacePattern(QString name, QString version, bool pad=true);
+      QPair<QString, QString> splitNameAroundVersionNum() const;
 
-      QString PadFront(QString string, QString padding, int minLength);
+    private:
+      class Data : public QSharedData {
+        public:
+          Data();
+          Data(const Data &other);
+          ~Data();
 
-      QString GetHighestVersionNumber() const;
+          iString original(bool includeAttributes) const;
+          void setOriginal(const iString &);
 
-      QString GetDatePattern() const;
+          iString expanded(bool includeAttributes) const;
 
-      // Expand any "$xxxx" into Isis preferences and environment variables
-      // THe "DataDirectory" is the only group searched in IsisPreferences
-      iString Expand(const iString &file);
+          // assignment operator is defined in QSharedData
+          // Data &operator=(const Data &rhs);
 
-      iString p_original; //!< The original filename saved at construction
+        private:
+          iString *m_originalFileNameString;
+          iString *m_expandedFileNameString;
+      };
 
+      //! @see QSharedDataPointer
+      QSharedDataPointer<Data> m_d;
   };
 };
 

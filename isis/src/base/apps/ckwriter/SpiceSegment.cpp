@@ -33,7 +33,7 @@
 
 #include "SpiceSegment.h"
 #include "iString.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Cube.h"
 #include "Camera.h"
 #include "CameraFactory.h"
@@ -162,7 +162,7 @@ std::string SpiceSegment::getKeyValue(PvlObject &label,
 
 void SpiceSegment::import(Cube &cube, const std::string &tblname) {
 
-  _fname = cube.getFilename();
+  _fname = cube.getFileName();
 
   //  Extract ISIS CK blob and transform to CK 3 content
   NaifStatus::CheckErrors();
@@ -196,7 +196,7 @@ void SpiceSegment::import(Cube &cube, const std::string &tblname) {
     if ( _name.empty() ) {
       _name = getKeyValue(*label, "ProductId");
       if (_name.empty() ) {
-        _name = Filename(_fname).Basename();
+        _name = FileName(_fname).baseName();
       }
     }
 
@@ -535,11 +535,11 @@ void SpiceSegment::convert(const SpiceSegment::SMatrix &quats,
 std::string SpiceSegment::getComment() const {
   ostringstream comment;
 
-  Filename fname(_fname);
+  FileName fname(_fname);
 
   comment <<
 "\n-----------------------------------------------------------------------\n" <<
-"  File:       " << fname.Name() << endl <<
+"  File:       " << fname.name() << endl <<
 "  ProductId:  " << _name << endl <<
 "  StartTime:  " << _utcStartTime << endl <<
 "  EndTime:    " << _utcEndTime << endl <<

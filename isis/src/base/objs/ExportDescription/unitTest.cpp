@@ -51,10 +51,10 @@ int main() {
   compareEqual("getOutputMaximum()", 32767.0, desc.getOutputMaximum());
   compareEqual("getOutputNull()", -32768.0, desc.getOutputNull());
 
-  QList<Filename> filenames;
-  filenames.append(Filename("red.cub"));
-  filenames.append(Filename("green.cub"));
-  filenames.append(Filename("blue.cub"));
+  QList<FileName> filenames;
+  filenames.append(FileName("red.cub"));
+  filenames.append(FileName("green.cub"));
+  filenames.append(FileName("blue.cub"));
   try {
     CubeAttributeInput att;
     att.Set("+1");
@@ -77,7 +77,7 @@ int main() {
   for (int i = 0; i < desc.channelCount(); i++) {
     const ExportDescription::ChannelDescription &channel = desc.getChannel(i);
     compareEqual(innerName + "::filename()",
-        filenames[i].Name(), channel.filename().Name());
+        filenames[i].name(), channel.filename().name());
     compareEqual(innerName + "::attributes()",
         iString("1"), iString(channel.attributes().BandsStr()));
 

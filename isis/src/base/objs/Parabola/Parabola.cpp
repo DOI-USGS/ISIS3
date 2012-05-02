@@ -22,7 +22,7 @@
 
 #include <iostream>
 #include <sstream>
-#include "Filename.h"
+#include "FileName.h"
 #include "Constants.h"
 #include "IException.h"
 #include "Parabola.h"

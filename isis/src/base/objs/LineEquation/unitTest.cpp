@@ -1,7 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include "LineEquation.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Preference.h"
 #include "Table.h"
 

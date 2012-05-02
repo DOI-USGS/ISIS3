@@ -4,7 +4,7 @@
 #include "ProjectionFactory.h"
 #include "Process.h"
 #include "Brick.h"
-#include "Filename.h"
+#include "FileName.h"
 
 #include "geos/geom/Coordinate.h"
 #include "geos/geom/Polygon.h"
@@ -29,12 +29,12 @@ namespace Isis {
       void SetOutputCube(const std::string &parameter, const int nsamps,
                          const int nlines, int nbands = 1);
 
-      void SetOutputCube(const std::string &avgFilename, const std::string
-                         &countFilename, Isis::CubeAttributeOutput &atts,
+      void SetOutputCube(const std::string &avgFileName, const std::string
+                         &countFileName, Isis::CubeAttributeOutput &atts,
                          const int nsamps, const int nlines, int nbands = 1);
 
-      Isis::Cube *AppendOutputCube(const std::string &avgFilename,
-                                   const std::string &countFilename = "");
+      Isis::Cube *AppendOutputCube(const std::string &avgFileName,
+                                   const std::string &countFileName = "");
 
       void Rasterize(std::vector<double> &samples,
                      std::vector<double> &lines,

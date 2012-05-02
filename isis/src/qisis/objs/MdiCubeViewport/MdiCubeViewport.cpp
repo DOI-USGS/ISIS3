@@ -26,10 +26,11 @@
 #include <iostream>
 #include <string>
 
-#include "Filename.h"
-#include "Tool.h"
+#include "FileName.h"
+#include "iString.h"
 #include "RubberBandTool.h"
 #include "StretchTool.h"
+#include "Tool.h"
 
 
 using namespace std;
@@ -40,7 +41,7 @@ namespace Isis {
       QWidget *parent) : CubeViewport(cube, cdt, parent) {
     p_linked = false;
 
-    string unlinkedIcon = Filename("$base/icons/unlinked.png").Expanded();
+    string unlinkedIcon = FileName("$base/icons/unlinked.png").expanded();
     static QIcon unlinked(unlinkedIcon.c_str());
     parentWidget()->setWindowIcon(unlinked);
 
@@ -70,9 +71,9 @@ namespace Isis {
     if(!parentWidget() || !parentWidget()->parentWidget())
       return;
 
-    string unlinkedIcon = Filename("$base/icons/unlinked.png").Expanded();
+    string unlinkedIcon = FileName("$base/icons/unlinked.png").expanded();
     static QIcon unlinked(unlinkedIcon.c_str());
-    string linkedIcon = Filename("$base/icons/linked.png").Expanded();
+    string linkedIcon = FileName("$base/icons/linked.png").expanded();
     static QIcon linked(linkedIcon.c_str());
 
     bool notify = false;

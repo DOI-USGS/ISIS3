@@ -62,7 +62,7 @@ namespace Isis {
 
       void Write(const std::string &file);
       void Write(Isis::Pvl &pvl, std::fstream &stm,
-                 const std::string &detachedFilename = "");
+                 const std::string &detachedFileName = "");
 
       std::string Type() const {
         return p_type;

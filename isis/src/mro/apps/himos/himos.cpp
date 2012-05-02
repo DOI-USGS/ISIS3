@@ -29,13 +29,13 @@ void IsisMain() {
   // Get the list of cubes to mosaic
 
   UserInterface &ui = Application::GetUserInterface();
-  FileList flist(ui.GetFilename("FROMLIST"));
+  FileList flist(ui.GetFileName("FROMLIST"));
 
 
   vector<Cube *> clist;
   try {
     if(flist.size() < 1) {
-      string msg = "the list file [" + ui.GetFilename("FROMLIST") +
+      string msg = "the list file [" + ui.GetFileName("FROMLIST") +
                    "does not contain any data";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -248,8 +248,8 @@ void IsisMain() {
     clist.clear();
 
     // automos step
-    string list = ui.GetFilename("FROMLIST");
-    string toMosaic = ui.GetFilename("TO");
+    string list = ui.GetFileName("FROMLIST");
+    string toMosaic = ui.GetFileName("TO");
     string MosaicPriority = ui.GetString("PRIORITY");
 
     string parameters = "FROMLIST=" + list + " MOSAIC=" + toMosaic + " PRIORITY=" + MosaicPriority;
@@ -276,7 +276,7 @@ void IsisMain() {
     mos += specialProcessingFlag;
 
     Cube mosCube;
-    mosCube.open(ui.GetFilename("TO"), "rw");
+    mosCube.open(ui.GetFileName("TO"), "rw");
     PvlObject &lab = mosCube.getLabel()->FindObject("IsisCube");
     lab.AddGroup(mos);
     //add orginal label blob to the output cube
@@ -289,7 +289,7 @@ void IsisMain() {
       clist[i]->close();
       delete clist[i];
     }
-    string msg = "The mosaic [" + ui.GetFilename("TO") + "] was NOT created";
+    string msg = "The mosaic [" + ui.GetFileName("TO") + "] was NOT created";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 } // end of isis main

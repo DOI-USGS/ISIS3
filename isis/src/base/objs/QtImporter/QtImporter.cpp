@@ -2,8 +2,9 @@
 
 #include <QImage>
 
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
+#include "iString.h"
 
 using namespace Isis;
 
@@ -14,13 +15,13 @@ namespace Isis {
    *
    * @param inputName The name of the input image
    */
-  QtImporter::QtImporter(Filename inputName) : ImageImporter(inputName) {
+  QtImporter::QtImporter(FileName inputName) : ImageImporter(inputName) {
     m_qimage = NULL;
 
-    m_qimage = new QImage(inputName.Expanded());
+    m_qimage = new QImage(inputName.expanded());
     if (m_qimage->isNull()) {
       throw IException(IException::User,
-          "The file [" + inputName.Expanded() +
+          "The file [" + inputName.expanded() +
           "] does not contain a recognized image format",
           _FILEINFO_);
     }

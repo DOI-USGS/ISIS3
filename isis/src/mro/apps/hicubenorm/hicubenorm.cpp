@@ -44,8 +44,8 @@ void multiply            (Buffer &in, Buffer &out);
 void subtract            (Buffer &in, Buffer &out);
 void pvlOut              (const string &pv);
 void tableOut            (const string &pv);
-void PVLIn               (const Isis::Filename &filename);
-void tableIn             (const Isis::Filename &filename);
+void PVLIn               (const Isis::FileName &filename);
+void tableIn             (const Isis::FileName &filename);
 void keepSame            (int &totalBands, int &rowcol, Mode mode);
 void filterStats         (vector<double> &filter, int &filtsize, bool &pause_crop,int &channel);
 void CorrectCubenormStats(int piFilterSize, bool pbPauseCrop, int piChannelNum, string psMode);
@@ -91,17 +91,17 @@ void IsisMain() {
     p.StartProcess(getStats);
   }
   else if(ui.GetString("STATSOURCE") == "TABLE") {
-    tableIn(ui.GetFilename("FROMSTATS"));
+    tableIn(ui.GetFileName("FROMSTATS"));
   }
   else {
-    PVLIn(ui.GetFilename("FROMSTATS"));
+    PVLIn(ui.GetFileName("FROMSTATS"));
   }
 
   // Check to make sure the first vector has as many elements as the last
   // vector, and that there is a vector element for each row/col
   if(!bNewVersion && band.size() != (unsigned int)(rowcol * totalBands)) {
     string message = "You have entered an invalid input file " +
-                     ui.GetFilename("FROMSTATS");
+                     ui.GetFileName("FROMSTATS");
     throw IException(IException::Io, message, _FILEINFO_);
   }
 
@@ -128,10 +128,10 @@ void IsisMain() {
   if(ui.WasEntered("STATS")) {
     string op = ui.GetString("FORMAT");
     if(op == "PVL"){
-      pvlOut(ui.GetFilename("STATS"));
+      pvlOut(ui.GetFileName("STATS"));
     }
     if(op == "TABLE"){
-      tableOut(ui.GetFilename("STATS"));
+      tableOut(ui.GetFileName("STATS"));
     }
   }
 
@@ -320,9 +320,9 @@ void tableOut(const string &StatFile) {
 //********************************************************
 // Gather statistics from a PVL input file
 //*******************************************************
-void PVLIn(const Isis::Filename &filename) {
+void PVLIn(const Isis::FileName &filename) {
   Pvl pvlFileIn;
-  pvlFileIn.Read(filename.Name());
+  pvlFileIn.Read(filename.name());
   PvlGroup results = pvlFileIn.FindGroup("Results");
   PvlObject::PvlKeywordIterator itr = results.Begin();
 
@@ -349,14 +349,14 @@ void PVLIn(const Isis::Filename &filename) {
 //********************************************************
 // Gather statistics from a table input file
 //*******************************************************
-void tableIn(const Isis::Filename &filename) {
+void tableIn(const Isis::FileName &filename) {
   ifstream in;
-  string expanded(filename.Expanded());
+  string expanded(filename.expanded());
   in.open(expanded.c_str(), std::ios::in);
 
 
   if(!in) {
-    string message = "Error opening " + filename.Expanded();
+    string message = "Error opening " + filename.expanded();
     throw IException(IException::Io, message, _FILEINFO_);
   }
 

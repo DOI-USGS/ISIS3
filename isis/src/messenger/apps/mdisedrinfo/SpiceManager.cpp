@@ -29,7 +29,7 @@
 #include <sstream>
 
 #include "SpiceManager.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "PvlKeyword.h"
 #include "Pvl.h"
 #include "IException.h"
@@ -141,10 +141,10 @@ namespace Isis {
     string kfile(kernfile);
 
     //  Check for versioned file naming
-    Filename efile(kfile);
-    if (efile.IsVersioned()) {
-      efile.HighestVersion();
-      kfile = efile.Expanded();
+    FileName efile(kfile);
+    if (efile.isVersioned()) {
+      efile = efile.highestVersion();
+      kfile = efile.expanded();
     }
 
     //  Add a specific kernel to the list
@@ -170,8 +170,8 @@ namespace Isis {
     std::vector<std::string> flist;
     for(unsigned int i = 0 ; i < _kernlist.size() ; i++) {
       if(removePath) {
-        Filename kfile(_kernlist[i]);
-        flist.push_back(kfile.Name());
+        FileName kfile(_kernlist[i]);
+        flist.push_back(kfile.name());
       }
       else {
         flist.push_back(_kernlist[i]);
@@ -188,11 +188,11 @@ namespace Isis {
       for(unsigned int i = 0 ; i < _kernlist.size() ; i++) {
         /**
         *  Changed to work with hipeaks crappy compiler.
-        *  string kernName(Filename(_kernlist[i]).Expanded());
+        *  string kernName(FileName(_kernlist[i]).expanded());
         *  unload_c(kernName.c_str());
         */
-        Filename f(_kernlist[i]);
-        string kernName(f.Expanded());
+        FileName f(_kernlist[i]);
+        string kernName(f.expanded());
         unload_c(kernName.c_str());
       }
     }
@@ -220,12 +220,12 @@ namespace Isis {
       if(iString(key[i]).UpCase() == "NULL") continue;
       if(iString(key[i]).UpCase() == "NADIR") continue;
       if(iString(key[i]).UpCase() == "TABLE") continue;
-      Isis::Filename file(key[i]);
-      if(!file.exists()) {
-        string msg = "Spice file does not exist [" + file.Expanded() + "]";
+      Isis::FileName file(key[i]);
+      if(!file.fileExists()) {
+        string msg = "Spice file does not exist [" + file.expanded() + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
-      string fileName(file.Expanded());
+      string fileName(file.expanded());
       if(_furnish) furnsh_c(fileName.c_str());
       addKernelName((string)key[i]);
     }

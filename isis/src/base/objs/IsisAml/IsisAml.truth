@@ -1384,7 +1384,7 @@ The value of G0P1 is /home/user/file1.cub
 Default value of G0P1 is /my/dir/file.cub
 The value of G0P1 is /home/user/file2.dat
 
-The value of G0P1 is /home/user/file2.dat.txt
+The value of G0P1 is /home/user/file2.dat
 
 Default value of G1P1 is 0
 The value of G1P1 is 33
@@ -1446,7 +1446,7 @@ Exact and partial name match tests:
 
 **PROGRAMMER ERROR** Parameter [G2P4] is not a string.
 
-  PutFilename:
+  PutFileName:
 **PROGRAMMER ERROR** A value for this parameter [G0P0] has already been saved (possibly by IsisGui). If you need to change the value use "Clear" before the Put.
 
 **PROGRAMMER ERROR** Parameter [G2P4] is not a filename.
@@ -1474,7 +1474,7 @@ Exact and partial name match tests:
   GetAsString:
 **PROGRAMMER ERROR** Parameter [G2P0] has no value.
 
-  GetFilename:
+  GetFileName:
 **USER ERROR** Parameter [G0P0] has no value.
 
 **PROGRAMMER ERROR** Parameter [G2P4] is not a filename.

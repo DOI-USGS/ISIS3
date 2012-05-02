@@ -47,6 +47,6 @@ void IsisMain() {
   if(ui.WasEntered("TO")) {
     Pvl temp;
     temp.AddGroup(results);
-    temp.Write(ui.GetFilename("TO", "txt"));
+    temp.Write(ui.GetFileName("TO", "txt"));
   }
 }

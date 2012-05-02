@@ -27,7 +27,7 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
 
-  string from = ui.GetFilename("FROM");
+  string from = ui.GetFileName("FROM");
   int sinc = ui.GetInteger("SINC");
   int linc = ui.GetInteger("LINC");
   CameraStatistics camStats(cam, sinc, linc, from);
@@ -39,8 +39,8 @@ void IsisMain() {
   }
 
   if(ui.WasEntered("TO")) {
-    string outfile = Filename(ui.GetFilename("TO")).Expanded();
-    bool exists = Filename(outfile).Exists();
+    string outfile = FileName(ui.GetFileName("TO")).expanded();
+    bool exists = FileName(outfile).fileExists();
     bool append = ui.GetBoolean("APPEND");
 
     // If the user chose a format of PVL, then write to the output file ("TO")
@@ -114,7 +114,7 @@ void IsisMain() {
            "NorthAzimuthAverage," <<
            "NorthAzimuthStandardDeviation," << endl;
       }
-      os << Filename(from).Expanded() << ",";
+      os << FileName(from).expanded() << ",";
       //call the function to write out the values for each group
       writeFlat(os, camStats.getLatStat());
       writeFlat(os, camStats.getLonStat());

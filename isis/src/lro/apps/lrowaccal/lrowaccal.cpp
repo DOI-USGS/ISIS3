@@ -64,7 +64,7 @@ void IsisMain () {
   instId.UpCase();
   if (instId != "WAC-VIS" && instId != "WAC-UV") {
     string msg = "This program is intended for use on LROC WAC images only. [";
-    msg += icube->getFilename() + "] does not appear to be a WAC image.";
+    msg += icube->getFileName() + "] does not appear to be a WAC image.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -161,15 +161,15 @@ void IsisMain () {
     if (radFile.Equal("Default") || radFile.length() == 0)
       radFile = "$lro/calibration/WAC_RadiometricResponsivity.????.pvl";
 
-    Filename radFilename(radFile);
-    if (radFilename.IsVersioned())
-      radFilename.HighestVersion();
-    if (!radFilename.Exists()) {
+    FileName radFileName(radFile);
+    if (radFileName.isVersioned())
+      radFileName = radFileName.highestVersion();
+    if (!radFileName.fileExists()) {
       string msg = radFile + " does not exist.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    Pvl radPvl(radFilename.Expanded());
+    Pvl radPvl(radFileName.expanded());
 
     if (g_iof) {
       responsivity = radPvl["IOF"];
@@ -377,21 +377,21 @@ void Calibrate ( Buffer &inCube, Buffer &outCube ) {
 
 void CopyCubeIntoBuffer ( string &fileString, Buffer* &data) {
   Cube cube;
-  Filename filename(fileString);
-  if (filename.IsVersioned())
-    filename.HighestVersion();
-  if (!filename.Exists()) {
+  FileName filename(fileString);
+  if (filename.isVersioned())
+    filename = filename.highestVersion();
+  if (!filename.fileExists()) {
     string msg = fileString + " does not exist.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
-  cube.open(filename.Expanded());
+  cube.open(filename.expanded());
   Brick brick(cube.getSampleCount(), cube.getLineCount(), cube.getBandCount(), cube.getPixelType());
   brick.SetBasePosition(1, 1, 1);
   cube.read(brick);
 
   data = new Buffer(brick);
 
-  fileString = filename.Expanded();
+  fileString = filename.expanded();
 }
 
 double min ( double a, double b ) {
@@ -402,9 +402,9 @@ double min ( double a, double b ) {
 
 void GetDark(string fileString, double temp, double time, Buffer* &data1, Buffer* &data2, double & temp1, double & temp2, string & file1, string & file2) {
   // Find the beginning and end of the "?"s in the versioned filename
-  Filename filename(fileString);
-  string absolutePath = filename.Expanded();
-  string basename = Filename(filename.Basename()).Basename(); // We do it twice to remove the ".????.cub"
+  FileName filename(fileString);
+  string absolutePath = filename.expanded();
+  string basename = FileName(filename.baseName()).baseName(); // We do it twice to remove the ".????.cub"
 
   unsigned int tempIndex = basename.find("*C");
   vector<double> temperatures;
@@ -416,7 +416,7 @@ void GetDark(string fileString, double temp, double time, Buffer* &data1, Buffer
 
   // Loop through all files in the dir and see if they match our name
   for (unsigned int indx=0; indx < dir.count(); indx++) {
-    string file = Filename( Filename(dir[indx].toStdString()).Basename()).Basename(); // We do it twice to remove ".????.cub
+    string file = FileName( FileName(dir[indx].toStdString()).baseName()).baseName(); // We do it twice to remove ".????.cub
 
     size_t fileTempEndIndex = file.find("C", tempIndex);
     size_t fileTimeEndIndex = file.find("T", fileTempEndIndex+1);
@@ -494,14 +494,14 @@ void GetDark(string fileString, double temp, double time, Buffer* &data1, Buffer
   int bestTime = -1;
   for (unsigned int i=0; i<times.size(); i++) {
     try {
-      Filename f1(fileString.substr(0, tempIndex) + iString((int)temp1) + fileString.substr(tempIndex+1, timeIndex-tempIndex-1) + iString(times[i]) + fileString.substr(timeIndex+1));
-      Filename f2(fileString.substr(0, tempIndex) + iString((int)temp2) + fileString.substr(tempIndex+1, timeIndex-tempIndex-1) + iString(times[i]) + fileString.substr(timeIndex+1));
+      FileName f1(fileString.substr(0, tempIndex) + iString((int)temp1) + fileString.substr(tempIndex+1, timeIndex-tempIndex-1) + iString(times[i]) + fileString.substr(timeIndex+1));
+      FileName f2(fileString.substr(0, tempIndex) + iString((int)temp2) + fileString.substr(tempIndex+1, timeIndex-tempIndex-1) + iString(times[i]) + fileString.substr(timeIndex+1));
 
 
-      f1.HighestVersion();
-      f2.HighestVersion();
+      f1 = f1.highestVersion();
+      f2 = f2.highestVersion();
 
-      if ( f1.Exists() && f2.Exists() && abs(times[i] - time) < abs(bestTime - time))
+      if ( f1.fileExists() && f2.fileExists() && abs(times[i] - time) < abs(bestTime - time))
         bestTime = times[i];
     }
     catch ( IException e) {
@@ -523,9 +523,9 @@ void GetDark(string fileString, double temp, double time, Buffer* &data1, Buffer
 
 void GetMask(string &fileString, double temp, Buffer* &data) {
   // Find the beginning and end of the "?"s in the versioned filename
-  Filename filename(fileString);
-  string absolutePath = filename.Expanded();
-  string basename = Filename(filename.Basename()).Basename(); // We do it twice to remove the ".????.cub"
+  FileName filename(fileString);
+  string absolutePath = filename.expanded();
+  string basename = FileName(filename.baseName()).baseName(); // We do it twice to remove the ".????.cub"
 
   unsigned int index = basename.find_first_of("*");
   unsigned int charsAfterVersion = basename.length() - index - 1;
@@ -537,7 +537,7 @@ void GetMask(string &fileString, double temp, Buffer* &data) {
   // Loop through all files in the dir and see if they match our name
   for (unsigned int indx=0; indx < dir.count(); indx++) {
 
-    string file = Filename( Filename(dir[indx].toStdString()).Basename()).Basename(); // We do it twice to remove ".????.cub"
+    string file = FileName( FileName(dir[indx].toStdString()).baseName()).baseName(); // We do it twice to remove ".????.cub"
     bool leftSide = file.substr(0, index) == basename.substr(0, index);
     bool rightSide = ((int)file.length()-(int)charsAfterVersion) >= 0;
     if (rightSide) {

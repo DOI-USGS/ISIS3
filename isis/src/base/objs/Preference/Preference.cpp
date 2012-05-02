@@ -29,7 +29,7 @@
 #include <QThreadPool>
 
 #include "Preference.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 
 using namespace std;
@@ -45,7 +45,7 @@ namespace Isis {
     // Read the input PVL preference file
     Isis::Pvl pvl;
 
-    if(Isis::Filename(file).Exists()) {
+    if(Isis::FileName(file).fileExists()) {
       pvl.Read(file);
     }
 
@@ -99,10 +99,10 @@ namespace Isis {
       p_preference = new Preference();
 
       // Make sure the user has a .Isis directory
-      Isis::Filename setup("$HOME/.Isis");
-      if(!setup.Exists()) {
+      Isis::FileName setup("$HOME/.Isis");
+      if(!setup.fileExists()) {
         QDir dir;
-        QString dirName(iString(setup.Expanded()).ToQt());
+        QString dirName(iString(setup.expanded()).ToQt());
         dir.mkdir(dirName);
       }
 
@@ -114,8 +114,8 @@ namespace Isis {
       else {
         p_preference->Load("$ISISROOT/IsisPreferences");
 
-        Isis::Filename userPref("$HOME/.Isis/IsisPreferences");
-        if(userPref.Exists()) {
+        Isis::FileName userPref("$HOME/.Isis/IsisPreferences");
+        if(userPref.fileExists()) {
           p_preference->Load("$HOME/.Isis/IsisPreferences");
         }
       }

@@ -11,7 +11,7 @@
 
 #include "ControlMeasureLogData.h"
 #include "ControlNetFileV0002.pb.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -48,16 +48,16 @@ namespace Isis {
    *                     point type
    *
    */
-  void ControlNetFileV0002::Read(const Pvl &header, const Filename &file) {
+  void ControlNetFileV0002::Read(const Pvl &header, const FileName &file) {
     const PvlObject &protoBufferInfo = header.FindObject("ProtoBuffer");
     const PvlObject &protoBufferCore = protoBufferInfo.FindObject("Core");
 
     BigInt headerStartPos = protoBufferCore["HeaderStartByte"];
     BigInt headerLength = protoBufferCore["HeaderBytes"];
 
-    fstream input(file.Expanded().c_str(), ios::in | ios::binary);
+    fstream input(file.expanded().c_str(), ios::in | ios::binary);
     if (!input.is_open()) {
-      iString msg = "Failed to open control network file" + file.fileName();
+      iString msg = "Failed to open control network file" + file.name();
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -75,7 +75,7 @@ namespace Isis {
       int oldLimit = headerCodedInStream.PushLimit(headerLength);
       if (!p_networkHeader->ParseFromCodedStream(&headerCodedInStream)) {
         iString msg = "Failed to read input control net file [" +
-            file.fileName() + "]";
+            file.name() + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
       headerCodedInStream.PopLimit(oldLimit);
@@ -99,7 +99,7 @@ namespace Isis {
 
         if(pointInStream == NULL) {
           input.close();
-          input.open(file.Expanded().c_str(), ios::in | ios::binary);
+          input.open(file.expanded().c_str(), ios::in | ios::binary);
           input.seekg(filePos, ios::beg);
 
           pointInStream = new IstreamInputStream(&input);
@@ -142,7 +142,7 @@ namespace Isis {
     }
   }
 
-  void ControlNetFileV0002::Write(const Filename &file) const {
+  void ControlNetFileV0002::Write(const FileName &file) const {
     // We need to populate ControlNetFileHeaderV0002::pointMessageSizes
     p_networkHeader->clear_pointmessagesizes();
     BigInt pointsSize = 0;
@@ -157,7 +157,7 @@ namespace Isis {
     streampos coreHeaderSize = p_networkHeader->ByteSize();
 
     const int labelBytes = 65536;
-    fstream output(file.Expanded().c_str(),
+    fstream output(file.expanded().c_str(),
                    ios::out | ios::trunc | ios::binary);
 
     char *blankLabel = new char[labelBytes];
@@ -169,7 +169,7 @@ namespace Isis {
 
     if (!p_networkHeader->SerializeToOstream(&output)) {
       iString msg = "Failed to write output control network file [" +
-          file.fileName() + "]";
+          file.name() + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
@@ -177,14 +177,14 @@ namespace Isis {
     for(int cpIndex = 0; cpIndex < p_controlPoints->size(); cpIndex ++) {
       if(!p_controlPoints->at(cpIndex).IsInitialized()) {
         iString msg = "Failed to write output control network file [" +
-            file.fileName() + "] because control points are missing required "
+            file.name() + "] because control points are missing required "
             "fields";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
       if(!p_controlPoints->at(cpIndex).SerializeToOstream(&output)) {
         iString msg = "Failed to write output control network file [" +
-            file.fileName() + "] while attempting to write control points";
+            file.name() + "] while attempting to write control points";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 

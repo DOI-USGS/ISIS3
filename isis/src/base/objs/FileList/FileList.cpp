@@ -23,7 +23,7 @@
 #include "FileList.h"
 #include "IException.h"
 #include "Message.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 
 using namespace std;
@@ -63,8 +63,8 @@ namespace Isis {
    */
   void FileList::Read(const std::string &list) {
     // Set up for opening
-    Isis::Filename temp(list);
-    string file = temp.Expanded();
+    Isis::FileName temp(list);
+    string file = temp.expanded();
     ifstream istm;
 
     // Open the file
@@ -173,8 +173,8 @@ namespace Isis {
    */
   void FileList::Write(const std::string &list) {
     // Set up for opening
-    Isis::Filename temp(list);
-    string file = temp.Expanded();
+    Isis::FileName temp(list);
+    string file = temp.expanded();
     ofstream ostm;
 
     // Open the file

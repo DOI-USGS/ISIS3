@@ -18,27 +18,27 @@ Unit test for TextFile
 
 10) Trigger Error messages
   a) Try to open non-existent file
-**I/O ERROR** TextFile:Open:-> Unable to open: [Input]:[../NoSuchDir/TextFile.tmp].
+**I/O ERROR** TextFile:Open:-> Unable to open: [Input]:[./NoSuchDir/TextFile.tmp].
 
 
   b) Try open as output to pre-existing file
-**I/O ERROR** TextFile:Open: -> Output file already exists [Output]:[../TextFile/TextFile.tmp].
+**I/O ERROR** TextFile:Open: -> Output file already exists [Output]:[./TextFile.tmp].
 
 
   c) Open file with bad open mode
-**PROGRAMMER ERROR** TextFile::-> Unknown openmode: (input, output, overwrite, append):[xxxInputxxx]:[../TextFile/TextFile.tmp].
+**PROGRAMMER ERROR** TextFile::-> Unknown openmode: (input, output, overwrite, append):[xxxInputxxx]:[./TextFile.tmp].
 
 
   d) Try to write to Input - Read Only file
-**PROGRAMMER ERROR** TextFile:PutLine: -> Attempt to write to INPUT - Read Only text file: [../TextFile/TextFile.tmp].
+**PROGRAMMER ERROR** TextFile:PutLine: -> Attempt to write to INPUT - Read Only text file: [./TextFile.tmp].
 
 
   e) Try to Write to a closed file
-**PROGRAMMER ERROR** TextFile::-> File not open: [../TextFile/TextFile.tmp].
+**PROGRAMMER ERROR** TextFile::-> File not open: [./TextFile.tmp].
 
 
   f) Try to Read from a closed file
-**PROGRAMMER ERROR** TextFile::-> File not open: [../TextFile/TextFile.tmp].
+**PROGRAMMER ERROR** TextFile::-> File not open: [./TextFile.tmp].
 
 
 testing GetLine for files that do not end in a newline: Passed

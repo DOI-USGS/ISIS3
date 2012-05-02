@@ -27,7 +27,7 @@
 #include <cmath>
 
 #include "CSVReader.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 #include "Spice.h"
 
@@ -73,19 +73,19 @@ namespace Isis {
     static bool _naifLoaded(false);
     if(!_naifLoaded) {
 //  Load the NAIF kernels to determine timing data
-      Isis::Filename leapseconds("$base/kernels/lsk/naif????.tls");
-      leapseconds.HighestVersion();
+      Isis::FileName leapseconds("$base/kernels/lsk/naif????.tls");
+      leapseconds = leapseconds.highestVersion();
 
-      Isis::Filename sclk("$messenger/kernels/sclk/messenger_???.tsc");
-      sclk.HighestVersion();
+      Isis::FileName sclk("$messenger/kernels/sclk/messenger_????.tsc");
+      sclk = sclk.highestVersion();
 
-      Isis::Filename pck("$base/kernels/spk/de???.bsp");
-      pck.HighestVersion();
+      Isis::FileName pck("$base/kernels/spk/de???.bsp");
+      pck = pck.highestVersion();
 
 //  Load the kernels
-      std::string leapsecondsName(leapseconds.Expanded());
-      std::string sclkName(sclk.Expanded());
-      std::string pckName(pck.Expanded());
+      std::string leapsecondsName(leapseconds.expanded());
+      std::string sclkName(sclk.expanded());
+      std::string pckName(pck.expanded());
       furnsh_c(leapsecondsName.c_str());
       furnsh_c(sclkName.c_str());
       furnsh_c(pckName.c_str());
@@ -137,8 +137,8 @@ namespace Isis {
   std::vector<double> loadWACCSV(const std::string &fname, int filter,
                                  int nvalues, bool header = true, int skip = 0) {
     //  Open the CSV file
-    Filename csvfile(fname);
-    CSVReader csv(csvfile.Expanded(), header, skip);
+    FileName csvfile(fname);
+    CSVReader csv(csvfile.expanded(), header, skip);
     for(int i = 0 ; i < csv.rows() ; i++) {
       CSVReader::CSVAxis row = csv.getRow(i);
       if(ToInteger(row[0]) == filter) {
@@ -168,8 +168,8 @@ namespace Isis {
   std::vector<double> loadNACCSV(const std::string &fname, int nvalues,
                                  bool header = true, int skip = 0) {
     //  Open the CSV file
-    Filename csvfile(fname);
-    CSVReader csv(csvfile.Expanded(), header, skip);
+    FileName csvfile(fname);
+    CSVReader csv(csvfile.expanded(), header, skip);
     CSVReader::CSVAxis row = csv.getRow(0);
     if(row.dim1() < nvalues) {
       std::string mess = "Number values (" + iString(row.dim1()) +
@@ -189,14 +189,14 @@ namespace Isis {
   std::vector<double> loadResponsivity(bool isNAC, bool binned, int filter,
                                        std::string &fname) {
 
-    Filename resfile(fname);
+    FileName resfile(fname);
     if(fname.empty()) {
       std::string camstr = (isNAC) ? "NAC" : "WAC";
       std::string binstr = (binned)       ? "_BINNED" : "_NOTBIN";
       std::string base   = "$messenger/calibration/RESPONSIVITY/";
       resfile = base + "MDIS" + camstr + binstr + "_RESP_?.TAB";
-      resfile.HighestVersion();
-      fname = resfile.OriginalPath() + "/" + resfile.Name();
+      resfile = resfile.highestVersion();
+      fname = resfile.originalPath() + "/" + resfile.name();
     }
 
     // Unfortunately NAC has a slightly different format so must do it
@@ -214,13 +214,13 @@ namespace Isis {
   std::vector<double> loadSolarIrr(bool isNAC, bool binned, int filter,
                                    std::string &fname)  {
 
-    Filename solfile(fname);
+    FileName solfile(fname);
     if(fname.empty()) {
       std::string camstr = (isNAC) ? "NAC" : "WAC";
       std::string base   = "$messenger/calibration/SOLAR/";
       solfile = base + "MDIS" + camstr + "_SOLAR_?.TAB";
-      solfile.HighestVersion();
-      fname = solfile.OriginalPath() + "/" + solfile.Name();
+      solfile = solfile.highestVersion();
+      fname = solfile.originalPath() + "/" + solfile.name();
     }
 
     if(isNAC) {
@@ -233,13 +233,13 @@ namespace Isis {
 
   double loadSmearComponent(bool isNAC, int filter, std::string &fname) {
 
-    Filename smearfile(fname);
+    FileName smearfile(fname);
     if(fname.empty()) {
       std::string camstr = (isNAC) ? "NAC" : "WAC";
       std::string base   = "$messenger/calibration/smear/";
       smearfile = base + "MDIS" + camstr + "_FRAME_TRANSFER_??.TAB";
-      smearfile.HighestVersion();
-      fname = smearfile.OriginalPath() + "/" + smearfile.Name();
+      smearfile = smearfile.highestVersion();
+      fname = smearfile.originalPath() + "/" + smearfile.name();
     }
 
     std::vector<double> smear;

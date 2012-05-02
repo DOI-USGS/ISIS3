@@ -230,12 +230,12 @@ void IsisMain() {
 
   // Add the radiometry group
   PvlGroup calgrp("Radiometry");
-  calgrp += PvlKeyword("FlatFieldFile", ffcube->getFilename());
-  calgrp += PvlKeyword("OrbitFlatFieldFile", ofcube->getFilename());
-  calgrp += PvlKeyword("AdditiveFile", afcube->getFilename());
-  calgrp += PvlKeyword("DarkCurrentFile", dccube->getFilename());
-  calgrp += PvlKeyword("BiasFile", biascube->getFilename());
-  calgrp += PvlKeyword("BadPixelFile", bpcube->getFilename());
+  calgrp += PvlKeyword("FlatFieldFile", ffcube->getFileName());
+  calgrp += PvlKeyword("OrbitFlatFieldFile", ofcube->getFileName());
+  calgrp += PvlKeyword("AdditiveFile", afcube->getFileName());
+  calgrp += PvlKeyword("DarkCurrentFile", dccube->getFileName());
+  calgrp += PvlKeyword("BiasFile", biascube->getFileName());
+  calgrp += PvlKeyword("BadPixelFile", bpcube->getFileName());
 
   //Table files
   calgrp += PvlKeyword("ThermalCorrectionTable", thermTbl);

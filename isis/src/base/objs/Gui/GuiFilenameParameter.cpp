@@ -33,8 +33,8 @@
 namespace Isis {
 
   /**
-   * Construct a GuiFilenameParameter object
-   * 
+   * Construct a GuiFileNameParameter object
+   *
    * @param grid Pointer to QGridLayout
    * @param ui User interface object
    * @param group Index of group
@@ -42,7 +42,7 @@ namespace Isis {
    *
    * @internal
    */
-  GuiFilenameParameter::GuiFilenameParameter(QGridLayout *grid, UserInterface &ui,
+  GuiFileNameParameter::GuiFileNameParameter(QGridLayout *grid, UserInterface &ui,
       int group, int param) :
     GuiParameter(grid, ui, group, param) {
     connect(p_lineEdit, SIGNAL(textChanged(const QString &)), this, SIGNAL(ValueChanged()));
@@ -51,7 +51,7 @@ namespace Isis {
     grid->addWidget(p_fileButton, param, 3);
 
     QAction *action = new QAction(this);
-    std::string file = Filename("$ISIS3DATA/base/icons/view_tree.png").Expanded();
+    std::string file = FileName("$ISIS3DATA/base/icons/view_tree.png").expanded();
     action->setIcon(QPixmap((iString)file));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(SelectFile()));
 
@@ -70,32 +70,32 @@ namespace Isis {
     RememberWidget(p_lineEdit);
     RememberWidget(p_fileButton);
 
-    p_type = FilenameWidget;
+    p_type = FileNameWidget;
   }
 
 
   /**
-   * Destructor of GuiFilenameParameter object
+   * Destructor of GuiFileNameParameter object
    */
-  GuiFilenameParameter::~GuiFilenameParameter() {}
+  GuiFileNameParameter::~GuiFileNameParameter() {}
 
 
   /**
    * Sets the line edit text box to value passed in by this method
-   * 
-   * @param newValue  
+   *
+   * @param newValue
    */
-  void GuiFilenameParameter::Set(iString newValue) {
+  void GuiFileNameParameter::Set(iString newValue) {
     p_lineEdit->setText(newValue.ToQt());
   }
 
 
-  /** 
-   * Gets the value found in the line edit text box. 
-   *  
+  /**
+   * Gets the value found in the line edit text box.
+   *
    * @return @b iString Value found in line edit text box
    */
-  iString GuiFilenameParameter::Value() {
+  iString GuiFileNameParameter::Value() {
     return p_lineEdit->text().toStdString();
   }
 
@@ -109,26 +109,26 @@ namespace Isis {
    *   @history  2007-05-16 Tracie Sucharski - For files located in CWD, do not
    *                           include path in the lineEdit.
    *   @history  2007-06-05 Steven Koechle - Corrected problem where output
-   *                           Filename was being opened not saved. Defaulted to
+   *                           FileName was being opened not saved. Defaulted to
    *                           output mode if not specified.
    *   @history  2009-11-02 Mackenzie Boyd - Corrected building of filter string
    *                           to match GuiCubeParameter.cpp and, if no filters
    *                           specified, to specify "Any(*)" not ";;Any(*)" as
    *                           it had been doing.
    *   @history  2010-07-19 Jeannie Walldren - Modified to allow users to
-   *                           view files in the directory. 
+   *                           view files in the directory.
    */
-  void GuiFilenameParameter::SelectFile() {
+  void GuiFileNameParameter::SelectFile() {
     // What directory do we look in?
     QString dir;
     if((p_lineEdit->text().length() > 0) &&
         (p_lineEdit->text().toStdString() != p_ui->ParamInternalDefault(p_group, p_param))) {
-      Isis::Filename fname(p_lineEdit->text().toStdString());
-      dir = (QString)(iString)fname.Expanded();
+      Isis::FileName fname(p_lineEdit->text().toStdString());
+      dir = (QString)(iString)fname.expanded();
     }
     else if(p_ui->ParamPath(p_group, p_param).length() > 0) {
-      Isis::Filename fname(p_ui->ParamPath(p_group, p_param));
-      dir = (QString)(iString)fname.Expanded();
+      Isis::FileName fname(p_ui->ParamPath(p_group, p_param));
+      dir = (QString)(iString)fname.expanded();
     }
 
     // Set up the filter
@@ -159,9 +159,9 @@ namespace Isis {
       fnameQString = QFileDialog::getSaveFileName(p_fileButton, "Select file", dir, filter, 0, options);
     }
     if(fnameQString != "") {
-      Isis::Filename fname(fnameQString.toStdString());
-      if(fname.absoluteDir() == QDir::currentPath()) {
-        fnameQString = (QString)(iString)fname.Name();
+      Isis::FileName fname(fnameQString.toStdString());
+      if(fname.dir() == QDir::currentPath()) {
+        fnameQString = (QString)(iString)fname.name();
       }
       Set(fnameQString.toStdString());
     }

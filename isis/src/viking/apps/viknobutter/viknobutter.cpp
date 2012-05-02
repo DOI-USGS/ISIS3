@@ -15,7 +15,7 @@ void IsisMain() {
   pipeline.KeepTemporaryFiles(!rmv);
 
   // Figure out which masking cube to use
-  Pvl p(ui.GetFilename("FROM"));
+  Pvl p(ui.GetFileName("FROM"));
   PvlGroup &inst = p.FindGroup("Instrument", Pvl::Traverse);
   int spn;
   string scn = (string)inst["SpacecraftName"];

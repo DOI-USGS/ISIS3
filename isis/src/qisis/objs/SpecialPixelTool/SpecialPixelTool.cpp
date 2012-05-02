@@ -13,7 +13,7 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 
-#include "Filename.h"
+#include "FileName.h"
 #include "MainWindow.h"
 #include "MdiCubeViewport.h"
 #include "Stretch.h"
@@ -451,8 +451,8 @@ namespace Isis {
     /*Now read the settings that are specific to this window.*/
     std::string instanceName = p_dialog->windowTitle().toStdString();
 
-    Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
-    p_settings = new QSettings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
+    FileName config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
+    p_settings = new QSettings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
 
     //For each special pixel value, if it exists set it, otherwise set
     //it to the system defaults.
@@ -535,8 +535,8 @@ namespace Isis {
     std::string instanceName = p_dialog->windowTitle().toStdString();
 
     //Write all of the special pixel value colors
-    Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
+    FileName config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
+    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
     settings.setValue("defaultNull", p_nullDefault);
     settings.setValue("defaultLis", p_lisDefault);
     settings.setValue("defaultLrs", p_lrsDefault);

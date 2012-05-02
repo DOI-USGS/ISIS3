@@ -23,7 +23,7 @@
  */
 
 #include <map>
-#include "Filename.h"
+#include "FileName.h"
 
 
 namespace Isis {
@@ -212,8 +212,8 @@ namespace Isis {
       std::vector<WAGO> p_wagos;
       void InitWago();
 
-      Filename p_lsk;
-      Filename p_sclk;
+      FileName p_lsk;
+      FileName p_sclk;
   };
 };
 #endif

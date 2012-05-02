@@ -13,7 +13,7 @@ class QMutex;
 
 namespace Isis {
   class Cube;
-  class Filename;
+  class FileName;
   class Brick;
   class UniversalGroundMap;
 
@@ -56,10 +56,10 @@ namespace Isis {
       CubeDataThread();
       virtual ~CubeDataThread();
 
-      int AddCube(const Filename &fileName,
+      int AddCube(const FileName &fileName,
                   bool mustOpenReadWrite = false);
       int AddCube(Cube *cube);
-      
+
       void RemoveCube(int cubeId);
 
       void AddChangeListener();
@@ -68,10 +68,10 @@ namespace Isis {
       int BricksInMemory();
 
       UniversalGroundMap *GetUniversalGroundMap(int cubeId) const;
-      
+
       const Cube *GetCube(int cubeId) const;
-      int FindCubeId(const Cube *) const; 
-      
+      int FindCubeId(const Cube *) const;
+
     public slots:
       void ReadCube(int cubeId, int startSample, int startLine,
                     int endSample, int endLine, int band, void *caller);
@@ -132,7 +132,7 @@ namespace Isis {
        *            its not)
        */
       CubeDataThread(const CubeDataThread &cdt);
-      
+
       /**
        * Assigning CubeDataThreads to eachother is bad, so this has been
        * intentionally not implemented!
@@ -143,7 +143,7 @@ namespace Isis {
        * @returns would return this if it was implemented :)
        */
       const CubeDataThread &operator=(CubeDataThread rhs);
-      
+
       int OverlapIndex(const Brick *initial, int cubeId,
                        int instanceNum, bool &exact);
 
@@ -199,7 +199,7 @@ namespace Isis {
 
       //! This is the unique id counter for cubes
       unsigned int p_currentId;
-      
+
       //! This is set to help the shutdown process when deleted
       bool p_stopping;
 

@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include <QToolButton>
 
+#include "iString.h"
 #include "MainWindow.h"
 #include "MdiCubeViewport.h"
 #include "ToolPad.h"
@@ -255,15 +256,15 @@ namespace Isis {
   }
 
   void PanTool::writeSettings() {
-    Filename config("$HOME/.Isis/qview/Pan Tool.config");
-    QSettings settings(QString::fromStdString(config.Expanded()),
+    FileName config("$HOME/.Isis/qview/Pan Tool.config");
+    QSettings settings(QString::fromStdString(config.expanded()),
                        QSettings::NativeFormat);
     settings.setValue("rate", p_lineEdit->text());
   }
 
   void PanTool::readSettings() {
-    Filename config("$HOME/.Isis/qview/Pan Tool.config");
-    QSettings settings(QString::fromStdString(config.Expanded()),
+    FileName config("$HOME/.Isis/qview/Pan Tool.config");
+    QSettings settings(QString::fromStdString(config.expanded()),
                        QSettings::NativeFormat);
     QString rate = settings.value("rate", "75").toString();
 

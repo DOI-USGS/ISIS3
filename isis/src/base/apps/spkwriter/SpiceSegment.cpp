@@ -30,7 +30,7 @@
 
 #include "SpiceSegment.h"
 #include "iString.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Cube.h"
 #include "Camera.h"
 #include "iTime.h"
@@ -109,7 +109,7 @@ void SpiceSegment::init(Cube &cube) {
   _kernels.UnLoad();  // Unload all active, owned kernels
   init();            // Init local variables
 
-  _fname = cube.getFilename();
+  _fname = cube.getFileName();
 
   //  Extract ISIS CK blob and transform to CK 3 content
   NaifStatus::CheckErrors();
@@ -126,7 +126,7 @@ void SpiceSegment::init(Cube &cube) {
     if ( _name.empty() ) {
       _name = getKeyValue(*label, "ProductId");
       if (_name.empty() ) {
-        _name = Filename(_fname).Basename();
+        _name = FileName(_fname).baseName();
       }
     }
 

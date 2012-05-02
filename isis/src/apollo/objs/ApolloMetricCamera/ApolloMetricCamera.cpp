@@ -25,7 +25,7 @@
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "iTime.h"

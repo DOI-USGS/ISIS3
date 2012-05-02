@@ -26,7 +26,7 @@
 
 #include "ConcurrentControlNetReader.h"
 #include "ControlNet.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "ProgressBar.h"
 #include "Pvl.h"
@@ -361,8 +361,8 @@ namespace Isis
 
   void CnetEditorWindow::readSettings()
   {
-    QSettings settings(Filename(
-        "$HOME/.Isis/cneteditor/cneteditor.config").Expanded().c_str(),
+    QSettings settings(FileName(
+        "$HOME/.Isis/cneteditor/cneteditor.config").expanded().c_str(),
         QSettings::NativeFormat);
 
     // load window position and size
@@ -379,8 +379,8 @@ namespace Isis
 
   void CnetEditorWindow::writeSettings()
   {
-    QSettings settings(Filename(
-        "$HOME/.Isis/cneteditor/cneteditor.config").Expanded().c_str(),
+    QSettings settings(FileName(
+        "$HOME/.Isis/cneteditor/cneteditor.config").expanded().c_str(),
         QSettings::NativeFormat);
 
     // save window position and size
@@ -701,8 +701,8 @@ namespace Isis
   void CnetEditorWindow::networkLoaded(ControlNet * net)
   {
     cnet = net;
-    editorWidget = new CnetEditorWidget(cnet, Filename(
-        "$HOME/.Isis/cneteditor/cneteditor.config").Expanded().c_str());
+    editorWidget = new CnetEditorWidget(cnet, FileName(
+        "$HOME/.Isis/cneteditor/cneteditor.config").expanded().c_str());
     populateMenus();
     populateToolBars();
     connect(editorWidget, SIGNAL(cnetModified()), this, SLOT(setDirty()));

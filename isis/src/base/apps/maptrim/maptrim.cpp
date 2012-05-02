@@ -22,7 +22,7 @@ Projection *proj;
 void IsisMain() {
   // Get the projection
   UserInterface &ui = Application::GetUserInterface();
-  Pvl pvl(ui.GetFilename("FROM"));
+  Pvl pvl(ui.GetFileName("FROM"));
   proj = ProjectionFactory::CreateFromCube(pvl);
 
   // Determine ground range to crop and/or trim
@@ -59,7 +59,7 @@ void IsisMain() {
 
     // Run external crop
     string cropParams = "";
-    cropParams += "from=\"" + ui.GetFilename("FROM") + "\"";
+    cropParams += "from=\"" + ui.GetFileName("FROM") + "\"";
     if(mode == "CROP") {
       cropParams += " to=\"" + ui.GetAsString("TO") + "\"";
     }

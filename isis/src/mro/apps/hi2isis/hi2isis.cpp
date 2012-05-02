@@ -7,7 +7,7 @@
 #include "ProcessByLine.h"
 
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Preference.h"
@@ -51,7 +51,7 @@ void IsisMain() {
     validCount[i] = 0;
   }
 
-  void TranslateHiriseEdrLabels(Filename & labelFile, Cube *);
+  void TranslateHiriseEdrLabels(FileName & labelFile, Cube *);
   void SaveHiriseCalibrationData(ProcessImportPds & process, Cube *,
                                  Pvl & pdsLabel);
   void SaveHiriseAncillaryData(ProcessImportPds & process, Cube *);
@@ -63,23 +63,23 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Get the input filename and make sure it is a HiRISE EDR
-  Filename inFile = ui.GetFilename("FROM");
+  FileName inFile = ui.GetFileName("FROM");
   iString id;
   bool projected;
   try {
-    Pvl lab(inFile.Expanded());
+    Pvl lab(inFile.expanded());
     id = (string) lab.FindKeyword("DATA_SET_ID");
     projected = lab.HasObject("IMAGE_MAP_PROJECTION");
   }
   catch(IException &e) {
     string msg = "Unable to read [DATA_SET_ID] from input file [" +
-                 inFile.Expanded() + "]";
+                 inFile.expanded() + "]";
     throw IException(e, IException::Io, msg, _FILEINFO_);
   }
 
   //Checks if in file is rdr
   if(projected) {
-    string msg = "[" + inFile.Name() + "] appears to be an rdr file.";
+    string msg = "[" + inFile.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -88,12 +88,12 @@ void IsisMain() {
   id.Compress();
   id.Trim(" ");
   if(id != "MRO-M-HIRISE-2-EDR-V1.0") {
-    string msg = "Input file [" + inFile.Expanded() + "] does not appear to be " +
+    string msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
                  "in HiRISE EDR format. DATA_SET_ID is [" + id + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
-  p.SetPdsFile(inFile.Expanded(), "", pdsLabel);
+  p.SetPdsFile(inFile.expanded(), "", pdsLabel);
 
   // Make sure the data we need for the BLOBs is saved by the Process
   p.SaveFileHeader();
@@ -110,7 +110,7 @@ void IsisMain() {
   outAtt.PixelType(Isis::SignedWord);
   outAtt.Minimum((double)VALID_MIN2);
   outAtt.Maximum((double)VALID_MAX2);
-  Cube *ocube = p.SetOutputCube(ui.GetFilename("TO"), outAtt);
+  Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), outAtt);
   p.StartProcess();
   TranslateHiriseEdrLabels(inFile, ocube);
 
@@ -165,7 +165,7 @@ void IsisMain() {
   // counts
   lsbGap = ui.GetBoolean("LSBGAP");
   ProcessByLine p2;
-  string ioFile = ui.GetFilename("TO");
+  string ioFile = ui.GetFileName("TO");
   CubeAttributeInput att;
   p2.SetInputCube(ioFile, att, ReadWrite);
   p2.Progress()->SetText("Converting special pixels");
@@ -176,7 +176,7 @@ void IsisMain() {
 
   // Log the results of the image conversion
   PvlGroup results("Results");
-  results += PvlKeyword("From", inFile.Expanded());
+  results += PvlKeyword("From", inFile.expanded());
 
   results += PvlKeyword("CalibrationBufferGaps", gapCount[0]);
   results += PvlKeyword("CalibrationBufferLIS", lisCount[0]);
@@ -227,7 +227,7 @@ void IsisMain() {
 }
 
 
-void TranslateHiriseEdrLabels(Filename &labelFile, Cube *ocube) {
+void TranslateHiriseEdrLabels(FileName &labelFile, Cube *ocube) {
 
   //Create a PVL to store the translated labels
   Pvl outLabel;
@@ -237,21 +237,21 @@ void TranslateHiriseEdrLabels(Filename &labelFile, Cube *ocube) {
   iString transDir = (string) dataDir["Mro"] + "/translations/";
 
   // Get a filename for the HiRISE EDR label
-  Pvl labelPvl(labelFile.Expanded());
+  Pvl labelPvl(labelFile.expanded());
 
   // Translate the Instrument group
-  Filename transFile(transDir + "hiriseInstrument.trn");
-  PvlTranslationManager instrumentXlater(labelPvl, transFile.Expanded());
+  FileName transFile(transDir + "hiriseInstrument.trn");
+  PvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
   // Translate the BandBin group
   transFile  = transDir + "hiriseBandBin.trn";
-  PvlTranslationManager bandBinXlater(labelPvl, transFile.Expanded());
+  PvlTranslationManager bandBinXlater(labelPvl, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   // Translate the Archive group
   transFile  = transDir + "hiriseArchive.trn";
-  PvlTranslationManager archiveXlater(labelPvl, transFile.Expanded());
+  PvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   // Create the Instrument group keyword CcdId from the ProductId

@@ -7,7 +7,7 @@
 
 #include "UserInterface.h"
 #include "Table.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "ImportPdsTable.h"
 
 using namespace std;
@@ -19,10 +19,10 @@ void IsisMain ()
   Pvl pdsLabel;
   UserInterface &ui = Application::GetUserInterface();
 
-  Filename inFile = ui.GetFilename("FROM");
+  FileName inFile = ui.GetFileName("FROM");
   string imageFile("");
   if (ui.WasEntered("IMAGE")) {
-    imageFile = ui.GetFilename("IMAGE");
+    imageFile = ui.GetFileName("IMAGE");
   }
 
 
@@ -30,33 +30,33 @@ void IsisMain ()
   string hkLabel("");
   string hkData("");
   if (ui.WasEntered("HKFROM") ) {
-    hkLabel = ui.GetFilename("HKFROM");
+    hkLabel = ui.GetFileName("HKFROM");
   }
   else {
-    hkLabel = inFile.OriginalPath() + "/" + inFile.Basename() + "_HK.LBL";
+    hkLabel = inFile.originalPath() + "/" + inFile.baseName() + "_HK.LBL";
     // Determine the housekeeping file
-    Filename hkFile(hkLabel);
-    if (!hkFile.Exists()) {
+    FileName hkFile(hkLabel);
+    if (!hkFile.fileExists()) {
       hkFile = iString::Replace(hkLabel, "_1B_", "_1A_", false);
-      if (hkFile.Exists()) hkLabel = hkFile.Expanded();
+      if (hkFile.fileExists()) hkLabel = hkFile.expanded();
     }
   }
 
   if (ui.WasEntered("HKTABLE")) {
-    hkData = ui.GetFilename("HKTABLE");
+    hkData = ui.GetFileName("HKTABLE");
   }
 
   iString instid;
   iString missid;
 
   try {
-    Pvl lab(inFile.Expanded());
+    Pvl lab(inFile.expanded());
     instid = (string) lab.FindKeyword ("CHANNEL_ID");
     missid = (string) lab.FindKeyword ("INSTRUMENT_HOST_ID");
   }
   catch (IException &e) {
     string msg = "Unable to read [INSTRUMENT_ID] or [MISSION_ID] from input file [" +
-                 inFile.Expanded() + "]";
+                 inFile.expanded() + "]";
     throw IException(e, IException::Io,msg, _FILEINFO_);
   }
 
@@ -67,7 +67,7 @@ void IsisMain ()
   missid.Compress();
   missid.Trim(" ");
   if (missid != "DAWN" && instid != "VIS" && instid != "IR") {
-    string msg = "Input file [" + inFile.Expanded() + "] does not appear to be a " +
+    string msg = "Input file [" + inFile.expanded() + "] does not appear to be a " +
                  "DAWN Visual and InfraRed Mapping Spectrometer (VIR) EDR or RDR file.";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
@@ -77,14 +77,14 @@ void IsisMain ()
     target = ui.GetString("TARGET");
   }
 
-//  p.SetPdsFile (inFile.Expanded(),imageFile,pdsLabel);
-//  string labelFile = ui.GetFilename("FROM");
-  p.SetPdsFile (inFile.Expanded(),imageFile,pdsLabel);
+//  p.SetPdsFile (inFile.expanded(),imageFile,pdsLabel);
+//  string labelFile = ui.GetFileName("FROM");
+  p.SetPdsFile (inFile.expanded(),imageFile,pdsLabel);
   p.SetOrganization(Isis::ProcessImport::BIP);
   Cube *outcube = p.SetOutputCube ("TO");
 //  p.SaveFileHeader();
 
-  Pvl labelPvl (inFile.Expanded());
+  Pvl labelPvl (inFile.expanded());
 
   p.StartProcess ();
 
@@ -96,18 +96,18 @@ void IsisMain ()
   Pvl outLabel;
 
   // Translate the BandBin group
-  Filename transFile (transDir + "dawnvirBandBin.trn");
-  PvlTranslationManager bandBinXlater (labelPvl, transFile.Expanded());
+  FileName transFile (transDir + "dawnvirBandBin.trn");
+  PvlTranslationManager bandBinXlater (labelPvl, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   // Translate the Archive group
   transFile = transDir + "dawnvirArchive.trn";
-  PvlTranslationManager archiveXlater (labelPvl, transFile.Expanded());
+  PvlTranslationManager archiveXlater (labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   // Translate the Instrument group
   transFile = transDir + "dawnvirInstrument.trn";
-  PvlTranslationManager instrumentXlater (labelPvl, transFile.Expanded());
+  PvlTranslationManager instrumentXlater (labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
   //  Update target if user specifies it
@@ -128,7 +128,7 @@ void IsisMain ()
   } else if (instid == "IR") {
     kerns += PvlKeyword("NaifFrameCode",-203213);
   } else {
-    string msg = "Input file [" + inFile.Expanded() + "] has an invalid " +
+    string msg = "Input file [" + inFile.expanded() + "] has an invalid " +
                  "InstrumentId.";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }

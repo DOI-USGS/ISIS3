@@ -53,7 +53,7 @@ void IsisMain() {
   else {
     mcube = icube = p.SetInputCube("FROM");
   }
-
+  
   Camera *incam = mcube->getCamera();
 
   // Extract Instrument groups from input labels for the output match and noproj'd cubes
@@ -63,15 +63,15 @@ void IsisMain() {
   groupName += (string) inst.FindKeyword("InstrumentId");
 
   // Get Ideal camera specifications
-  Filename specs;
+  FileName specs;
   if((ui.WasEntered("SPECS"))) {
-    specs = ui.GetFilename("SPECS");
+    specs = ui.GetFileName("SPECS");
   }
   else {
     specs = "$base/applications/noprojInstruments???.pvl";
-    specs.HighestVersion();
+    specs = specs.highestVersion();
   }
-  Pvl idealSpecs(specs.Expanded());
+  Pvl idealSpecs(specs.expanded());
   PvlObject obSpecs = idealSpecs.FindObject("IdealInstrumentsSpecifications");
 
   PvlGroup idealGp = obSpecs.FindGroup(groupName);
@@ -275,7 +275,7 @@ void IsisMain() {
   }
 
   key.SetName("MatchedCube");
-  key.SetValue(mcube->getFilename());
+  key.SetValue(mcube->getFileName());
   inst.AddKeyword(key);
 
   ocube->putGroup(inst);
@@ -294,9 +294,9 @@ void IsisMain() {
 
 // And run cam2cam to apply the transformation
   string parameters;
-  parameters += " FROM= " + ui.GetFilename("FROM");
+  parameters += " FROM= " + ui.GetFileName("FROM");
   parameters += " MATCH= " + string("match.cub");
-  parameters += " TO= " + ui.GetFilename("TO");
+  parameters += " TO= " + ui.GetFileName("TO");
   parameters += " INTERP=" + ui.GetString("INTERP");
   ProgramLauncher::RunIsisProgram("cam2cam", parameters);
 
@@ -315,7 +315,7 @@ void IsisMain() {
 
 // Finally finish by adding the OriginalInstrument group to the TO cube
   Cube toCube;
-  toCube.open(ui.GetFilename("TO"), "rw");
+  toCube.open(ui.GetFileName("TO"), "rw");
 // Extract label and create cube object
   Pvl *toLabel = toCube.getLabel();
   PvlObject &o = toLabel->FindObject("IsisCube");
@@ -331,10 +331,10 @@ void LoadMatchSummingMode() {
 
   // Get camera from cube to match
   if((ui.GetString("SOURCE") == "FROMMATCH") && (ui.WasEntered("MATCH"))) {
-    file = ui.GetFilename("MATCH");
+    file = ui.GetFileName("MATCH");
   }
   else {
-    file = ui.GetFilename("FROM");
+    file = ui.GetFileName("FROM");
   }
 
 // Open the input cube and get the camera object
@@ -354,9 +354,9 @@ void LoadMatchSummingMode() {
 void LoadInputSummingMode() {
   UserInterface &ui = Application::GetUserInterface();
 
-// Get camera from cube to match
-  string file = ui.GetFilename("FROM");
-// Open the input cube and get the camera object
+  // Get camera from cube to match
+  string file = ui.GetFileName("FROM");
+  // Open the input cube and get the camera object
   Cube c;
   c.open(file);
   Camera *cam = c.getCamera();

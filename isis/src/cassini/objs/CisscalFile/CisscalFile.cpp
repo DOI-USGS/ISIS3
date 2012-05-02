@@ -22,7 +22,7 @@
 
 #include <string>
 #include "IException.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Message.h"
 #include "CisscalFile.h"
 #include "TextFile.h"
@@ -34,7 +34,7 @@ namespace Isis {
    * Constructs a CisscalFile object and opens the specified file
    * (including path).
    *
-   * @param filename Filename (including path) to be opened by <b>TextFile</b>  object.
+   * @param filename FileName (including path) to be opened by <b>TextFile</b>  object.
    *
    * @param openmode Open Mode of file opened by <b>TextFile</b>  object.
    *                 <UL>

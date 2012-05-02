@@ -231,7 +231,7 @@ namespace Isis {
       double getBase() const;
       ByteOrder getByteOrder() const;
       Camera *getCamera();
-      iString getFilename() const;
+      iString getFileName() const;
       Format getFormat() const;
       Histogram *getHistogram(const int &band = 1,
                                iString msg = "Gathering histogram");
@@ -323,15 +323,15 @@ namespace Isis {
       Projection *m_projection;
 
       //! The full filename of the label file (.lbl or .cub)
-      iString *m_labelFilename;
+      iString *m_labelFileName;
 
       //! The full filename of the data file (.cub)
-      iString *m_dataFilename;
+      iString *m_dataFileName;
 
       /**
        * If open was called with an Isis 2 cube, then this will be
-       *   the name of the imported Isis3 cube. m_labelFilename and
-       *   m_dataFilename will store the Isis 2 cube's information.
+       *   the name of the imported Isis3 cube. m_labelFileName and
+       *   m_dataFileName will store the Isis 2 cube's information.
        */
       iString *m_tempCube;
 

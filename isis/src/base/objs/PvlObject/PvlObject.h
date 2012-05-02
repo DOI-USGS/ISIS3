@@ -190,7 +190,7 @@ namespace Isis {
        */
       void AddGroup(const Isis::PvlGroup &group) {
         p_groups.push_back(group);
-        //p_groups[p_groups.size()-1].SetFilename(Filename());
+        //p_groups[p_groups.size()-1].SetFileName(FileName());
       };
 
       using PvlContainer::operator+=;
@@ -311,7 +311,7 @@ namespace Isis {
        */
       void AddObject(const PvlObject &object) {
         p_objects.push_back(object);
-        p_objects[p_objects.size()-1].SetFilename(Filename());
+        p_objects[p_objects.size()-1].SetFileName(FileName());
       }
 
       void DeleteObject(const std::string &name);

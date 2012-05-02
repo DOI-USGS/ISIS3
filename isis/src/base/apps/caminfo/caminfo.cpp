@@ -6,7 +6,7 @@
 
 #include "CameraStatistics.h"
 #include "CamTools.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "ImagePolygon.h"
 #include "iString.h"
@@ -47,7 +47,7 @@ void IsisMain() {
   BandGeometry *bandGeom = NULL;
 
   // Get input filename
-  Filename in = ui.GetFilename("FROM");
+  FileName in = ui.GetFileName("FROM");
 
   // Get the format
   iString sFormat = ui.GetAsString("FORMAT");
@@ -55,7 +55,7 @@ void IsisMain() {
   // if true then run spiceinit, xml default is FALSE
   // spiceinit will use system kernels
   if(ui.GetBoolean("SPICE")) {
-    string parameters = "FROM=" + in.Expanded();
+    string parameters = "FROM=" + in.expanded();
     ProgramLauncher::RunIsisProgram("spiceinit", parameters);
   }
 
@@ -68,7 +68,7 @@ void IsisMain() {
   general->append(MakePair("IsisVersion", Application::Version()));
   general->append(MakePair("RunDate",     iTime::CurrentGMT()));
   general->append(MakePair("IsisId",      SerialNumber::Compose(*incube)));
-  general->append(MakePair("From",        in.Basename() + ".cub"));
+  general->append(MakePair("From",        in.baseName() + ".cub"));
   general->append(MakePair("Lines",       incube->getLineCount()));
   general->append(MakePair("Samples",     incube->getSampleCount()));
   general->append(MakePair("Bands",       incube->getBandCount()));
@@ -301,7 +301,7 @@ void GeneratePVLOutput(Cube *incube,
 
   // Output the result
   Pvl pout;
-  string outFile = ui.GetFilename("TO");
+  string outFile = ui.GetFileName("TO");
   pout.AddObject(params);
 
   if(ui.GetBoolean("APPEND"))
@@ -330,7 +330,7 @@ void GenerateCSVOutput(Cube *incube,
   // Output the result
   fstream outFile;
   string sOutFile = ui.GetAsString("TO");
-  bool appending = ui.GetBoolean("APPEND") && Filename(sOutFile).Exists();
+  bool appending = ui.GetBoolean("APPEND") && FileName(sOutFile).fileExists();
   if(appending)
     outFile.open(sOutFile.c_str(), std::ios::out | std::ios::app);
   else

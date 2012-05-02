@@ -12,35 +12,35 @@ using namespace std;
 using namespace Isis;
 
 void IsisMain() {
-  void TranslateMerEdrLabels(Filename & labelFile, Cube * ocube);
+  void TranslateMerEdrLabels(FileName & labelFile, Cube * ocube);
 
   UserInterface &ui = Application::GetUserInterface();
 
-  Filename input = Filename(ui.GetFilename("FROM"));
+  FileName input = FileName(ui.GetFileName("FROM"));
 
   //Checks if in file is rdr
-  Pvl lab(input.Expanded());
+  Pvl lab(input.expanded());
   if(lab.HasObject("IMAGE_MAP_PROJECTION")) {
-    string msg = "[" + input.Name() + "] has already been projected.";
+    string msg = "[" + input.name() + "] has already been projected.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   iString output;
   if(ui.WasEntered("TO")) {
-    output = ui.GetFilename("TO");
+    output = ui.GetFileName("TO");
   }
   else {
-    output = input.Path() + input.Basename() + ".cub";
+    output = input.path() + input.baseName() + ".cub";
   }
 
   Pvl inputFile;
 
-  iString paramaters = "FROM=" + input.Expanded();
+  iString paramaters = "FROM=" + input.expanded();
   paramaters += " TO=" + output;
 
   ProcessImportPds p;
-  p.SetPdsFile(input.Expanded(), "", inputFile);
+  p.SetPdsFile(input.expanded(), "", inputFile);
 
   Cube *ocube = p.SetOutputCube("TO");
   p.StartProcess();
@@ -48,7 +48,7 @@ void IsisMain() {
   p.EndProcess();
 }
 
-void TranslateMerEdrLabels(Filename &labelFile, Cube *ocube) {
+void TranslateMerEdrLabels(FileName &labelFile, Cube *ocube) {
   //Create a PVL to store the translated labels
   Pvl outLabel;
 
@@ -58,18 +58,18 @@ void TranslateMerEdrLabels(Filename &labelFile, Cube *ocube) {
   transDir = transDir + "/" + "translations/";
 
   // Get a filename for the MESSENGER EDR label
-  Pvl labelPvl(labelFile.Expanded());
-  Filename transFile;
+  Pvl labelPvl(labelFile.expanded());
+  FileName transFile;
 
   // Translate the Archive group
   transFile = transDir + "merStructure.trn";
-  PvlTranslationManager structXlater(labelPvl, transFile.Expanded());
+  PvlTranslationManager structXlater(labelPvl, transFile.expanded());
   structXlater.Auto(outLabel);
   ocube->putGroup(outLabel.FindGroup("ARCHIVE", Pvl::Traverse));
 
   // Translate the Instrument group
   transFile = transDir + "merInstrument.trn";
-  PvlTranslationManager instrumentXlater(labelPvl, transFile.Expanded());
+  PvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
   ocube->putGroup(outLabel.FindGroup("INSTRUMENT", Pvl::Traverse));
 
@@ -81,13 +81,13 @@ void TranslateMerEdrLabels(Filename &labelFile, Cube *ocube) {
 
   // Translate the Image_Request group
   transFile = transDir + "merImageRequest.trn";
-  PvlTranslationManager imageReqXlater(labelPvl, transFile.Expanded());
+  PvlTranslationManager imageReqXlater(labelPvl, transFile.expanded());
   imageReqXlater.Auto(outLabel);
   ocube->putGroup(outLabel.FindGroup("MER_IMAGE_REQUEST_PARMS", Pvl::Traverse));
 
   // Translate the Subframe group
   transFile = transDir + "merSubframe.trn";
-  PvlTranslationManager subframeXlater(labelPvl, transFile.Expanded());
+  PvlTranslationManager subframeXlater(labelPvl, transFile.expanded());
   subframeXlater.Auto(outLabel);
   ocube->putGroup(outLabel.FindGroup("MER_SUBFRAME_REQUEST_PARMS", Pvl::Traverse));
 }

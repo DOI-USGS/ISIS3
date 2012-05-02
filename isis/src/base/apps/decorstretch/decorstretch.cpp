@@ -16,7 +16,7 @@ void NormalizeAndInvert(Buffer &in, Buffer &out);
 PrincipalComponentAnalysis pca(0);
 vector<GaussianStretch *> stretches;
 
-string tmpFilename = "Temporary_DecorrelationStretch_Transform.cub";
+string tmpFileName = "Temporary_DecorrelationStretch_Transform.cub";
 
 void IsisMain() {
   ProcessByBrick p;
@@ -28,7 +28,7 @@ void IsisMain() {
   Isis::CubeAttributeOutput cao;
   cao.PixelType(Isis::Real);
 
-  p.SetOutputCube(tmpFilename, cao, icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
+  p.SetOutputCube(tmpFileName, cao, icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
 
   // Get the data for the transform matrix
   pca = Isis::PrincipalComponentAnalysis(numDimensions);
@@ -46,7 +46,7 @@ void IsisMain() {
 
   Isis::CubeAttributeInput cai;
 
-  Cube *icube2 = p.SetInputCube(tmpFilename, cai);
+  Cube *icube2 = p.SetInputCube(tmpFileName, cai);
   for(int i = 0; i < numDimensions; i++) {
     stretches.push_back(new GaussianStretch(*(icube2->getHistogram(i + 1))));
   }
@@ -61,7 +61,7 @@ void IsisMain() {
 
   p.EndProcess();
 
-  remove(tmpFilename.c_str());
+  remove(tmpFileName.c_str());
 }
 
 void GetData(Buffer &in) {

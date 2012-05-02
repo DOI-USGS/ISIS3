@@ -69,9 +69,9 @@ namespace Isis {
     // Loop through each image in the filtered list
     // Loop in reverse order since removal list of elements affects index number
     for (int i = g_filteredImages.size() - 1; i >= 0; i--) {
-      string tempFilename = g_serialNumberList->Filename(g_filteredImages[i]);
+      string tempFileName = g_serialNumberList->FileName(g_filteredImages[i]);
       // this name contains the string, keep it in the filtered list
-      if (rx.indexIn(QString(tempFilename.c_str())) != -1) {
+      if (rx.indexIn(QString(tempFileName.c_str())) != -1) {
         continue;
       }
       // if there is no match, remove image from filtered list

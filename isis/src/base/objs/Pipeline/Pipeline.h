@@ -31,7 +31,7 @@
 using namespace std;
 
 namespace Isis {
-  class Filename;
+  class FileName;
 
   /**
    * This class helps to call other Isis Applications in a Pipeline. This object 
@@ -158,16 +158,21 @@ namespace Isis {
       void Prepare();
       void Run();
 
+      void SetInputFile(const char *inputParam);
       void SetInputFile(const iString &inputParam);
+      void SetInputFile(const char *inputParam, const char *virtualBandsParam);
       void SetInputFile(const iString &inputParam, const iString &virtualBandsParam);
+      void SetInputListFile(const char *inputParam);
       void SetInputListFile(const iString &inputParam);
-      void SetInputFile(const Filename &inputFilename);
-      void SetInputListFile(const Filename &inputFilename);
+      void SetInputFile(const FileName &inputFileName);
+      void SetInputListFile(const FileName &inputFileName);
 
+      void SetOutputFile(const char *outputParam);
       void SetOutputFile(const iString &outputParam);
-      void SetOutputFile(const Filename &outputFile);
-      void SetOutputListFile(const iString &outputFilenameParam);
-      void SetOutputListFile(const Filename &outputFilenameList);
+      void SetOutputFile(const FileName &outputFile);
+      void SetOutputListFile(const char *outputFileNameParam);
+      void SetOutputListFile(const iString &outputFileNameParam);
+      void SetOutputListFile(const FileName &outputFileNameList);
       void KeepTemporaryFiles(bool keep);
       //! Returns true if temporary files will not be deleted, false if they will
       bool KeepTemporaryFiles() {

@@ -23,7 +23,7 @@
 #include "ApolloMetricCamera.h"
 #include "Camera.h"
 #include "CameraFactory.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Preference.h"
@@ -46,9 +46,9 @@ int main(void) {
     double knownLat = 12.3153878329695363;
     double knownLon = 67.7810462171458568;
 
-    Pvl p(Filename("$apollo15/testData/AS15-M-0533.cropped.cub").Expanded());
+    Pvl p(FileName("$apollo15/testData/AS15-M-0533.cropped.cub").expanded());
     ApolloMetricCamera *cam = (ApolloMetricCamera *) CameraFactory::Create(p);
-    cout << "Filename: " << Filename(p.Filename()).Name() << endl;
+    cout << "FileName: " << FileName(p.FileName()).name() << endl;
     cout << "CK Frame: " << cam->InstrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

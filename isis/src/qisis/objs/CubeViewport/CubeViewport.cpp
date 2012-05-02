@@ -41,7 +41,7 @@
 #include "CubeDataThread.h"
 #include "IException.h"
 #include "iString.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Histogram.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -172,7 +172,7 @@ namespace Isis {
 
 
     // Setup context sensitive help
-    string cubeFileName = p_cube->getFilename();
+    string cubeFileName = p_cube->getFileName();
     p_whatsThisText = QString("<b>Function: </b>Viewport to ") + cubeFileName.c_str();
 
     p_cubeWhatsThisText =
@@ -973,8 +973,8 @@ namespace Isis {
    *
    */
   void CubeViewport::setCaption() {
-    string cubeFilename = p_cube->getFilename();
-    QString str = QFileInfo(cubeFilename.c_str()).fileName();
+    string cubeFileName = p_cube->getFileName();
+    QString str = QFileInfo(cubeFileName.c_str()).fileName();
     str += QString(" @ ");
     str += QString::number(p_scale * 100.0);
     str += QString("% ");
@@ -1355,7 +1355,7 @@ namespace Isis {
   {
     // Get Cube Info
     PvlObject whatsThisObj = PvlObject("WhatsThis");
-    whatsThisObj += PvlKeyword("Cube", p_cube->getFilename());
+    whatsThisObj += PvlKeyword("Cube", p_cube->getFileName());
 
     PvlGroup cubeGrp("CubeDimensions");
     cubeGrp += PvlKeyword("Samples", p_cube->getSampleCount());

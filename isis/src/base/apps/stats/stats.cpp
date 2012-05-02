@@ -41,7 +41,7 @@ void IsisMain() {
 
     // Construct a label with the results
     PvlGroup results("Results");  
-    results += PvlKeyword("From", icube->getFilename());
+    results += PvlKeyword("From", icube->getFileName());
     results += PvlKeyword("Band", icube->getPhysicalBand(i));
     if(stats->ValidPixels() != 0) {
       results += PvlKeyword("Average", stats->Average());
@@ -74,8 +74,8 @@ void IsisMain() {
   
   // Write the results to the output file if the user specified one
   if(ui.WasEntered("TO")) {
-    string outFile = Filename(ui.GetFilename("TO")).Expanded();
-    bool exists = Filename(outFile).Exists();
+    string outFile = FileName(ui.GetFileName("TO")).expanded();
+    bool exists = FileName(outFile).fileExists();
     bool append = ui.GetBoolean("APPEND");
     ofstream os;
     bool writeHeader = false;

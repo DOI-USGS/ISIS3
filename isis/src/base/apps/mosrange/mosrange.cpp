@@ -64,16 +64,16 @@ void IsisMain() {
   // Get the list of names of input CCD cubes to stitch together
   FileList flist;
   UserInterface &ui = Application::GetUserInterface();
-  flist.Read(ui.GetFilename("FROMLIST"));
+  flist.Read(ui.GetFileName("FROMLIST"));
   if(flist.size() < 1) {
-    string msg = "The list file[" + ui.GetFilename("FROMLIST") +
+    string msg = "The list file[" + ui.GetFileName("FROMLIST") +
                  " does not contain any filenames";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   string projection("Equirectangular");
   if(ui.WasEntered("MAP")) {
-    Pvl mapfile(ui.GetFilename("MAP"));
+    Pvl mapfile(ui.GetFileName("MAP"));
     projection = (string) mapfile.FindGroup("Mapping")["ProjectionName"];
   }
 
@@ -225,13 +225,13 @@ void IsisMain() {
   if(ui.WasEntered("TO")) {
     Pvl temp;
     temp.AddGroup(mapping);
-    temp.Write(ui.GetFilename("TO", "map"));
+    temp.Write(ui.GetFileName("TO", "map"));
   }
 
   if(ui.WasEntered("LOG")) {
     Pvl temp;
     temp.AddObject(fileset);
-    temp.Write(ui.GetFilename("LOG", "log"));
+    temp.Write(ui.GetFileName("LOG", "log"));
   }
 
   p.EndProcess();

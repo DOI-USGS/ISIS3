@@ -1,5 +1,5 @@
 Unit Test for CTXCamera...
-Filename: ctx_pmoi_i_00003.bottom.cub
+FileName: ctx_pmoi_i_00003.bottom.cub
 CK Frame: -74021
 
 Kernel IDs: 
@@ -29,7 +29,7 @@ Latitude OK
 Longitude OK
 
 --------------------------------------------
-Filename: ctx_pmoi_i_00003.top.cub
+FileName: ctx_pmoi_i_00003.top.cub
 CK Frame: -74021
 
 Kernel IDs: 

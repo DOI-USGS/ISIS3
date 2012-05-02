@@ -1,7 +1,7 @@
 #include "Isis.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
-#include "Filename.h"
+#include "FileName.h"
 
 using namespace std;
 using namespace Isis;
@@ -19,12 +19,12 @@ void IsisMain() {
 
   //  Open output text file
   UserInterface &ui = Application::GetUserInterface();
-  string to = ui.GetFilename("TO", "txt");
+  string to = ui.GetFileName("TO", "txt");
   fout.open(to.c_str());
 
   // Print header if needed
   if(ui.GetBoolean("HEADER")) {
-    fout << "Input Cube:  " << icube->getFilename() << endl;
+    fout << "Input Cube:  " << icube->getFileName() << endl;
     fout << "Samples:Lines:Bands:  " << icube->getSampleCount() << ":" <<
          icube->getLineCount() << ":" << icube->getBandCount() << endl;
   }

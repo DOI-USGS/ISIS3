@@ -23,7 +23,7 @@
  */
 
 #include "Cube.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Projection.h"
 #include "MultivariateStatistics.h"
 
@@ -92,7 +92,7 @@ namespace Isis {
        *
        * @return string The name of the first cube
        */
-      Isis::Filename FilenameX() const {
+      Isis::FileName FileNameX() const {
         return p_xFile;
       };
 
@@ -101,7 +101,7 @@ namespace Isis {
        *
        * @return string The name of the second cube
        */
-      Isis::Filename FilenameY() const {
+      Isis::FileName FileNameY() const {
         return p_yFile;
       };
 
@@ -288,8 +288,8 @@ namespace Isis {
     private:
       int p_bands;               //!< Number of bands
       double p_sampPercent;      //!< Percentage of lines sampled
-      Isis::Filename p_xFile;    //!< Filename of X cube
-      Isis::Filename p_yFile;    //!< Filename of Y cube
+      Isis::FileName p_xFile;    //!< FileName of X cube
+      Isis::FileName p_yFile;    //!< FileName of Y cube
       int p_sampRange;           //!< Sample range of overlap
       int p_lineRange;           //!< Line range of overlap
       int p_minSampX;            //!< Starting Sample of overlap in X cube

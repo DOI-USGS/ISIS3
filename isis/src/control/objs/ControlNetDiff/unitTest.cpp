@@ -6,7 +6,7 @@
 #include <QStringList>
 
 #include "ControlNetDiff.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Preference.h"
 
@@ -17,8 +17,8 @@ using namespace Isis;
 int main() {
   Preference::Preferences(true);
 
-  Filename f1("cnet.pvl");
-  Filename f2("cnet2.pvl");
+  FileName f1("cnet.pvl");
+  FileName f2("cnet2.pvl");
 
   ControlNetDiff diff;
 
@@ -34,7 +34,7 @@ int main() {
   cout << results << endl;
 
   cout << "\n\nTesting differences with tolerances...\n\n";
-  Pvl diffFile(Filename("cnet.diff").Expanded());
+  Pvl diffFile(FileName("cnet.diff").expanded());
   diff.addTolerances(diffFile);
   results = diff.compare(f1, f2);
   cout << results << endl;

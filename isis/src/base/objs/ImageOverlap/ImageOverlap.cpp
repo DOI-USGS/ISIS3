@@ -6,7 +6,7 @@
 
 #include "PolygonTools.h"
 #include "IException.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "ImageOverlap.h"
 #include "iString.h"
 

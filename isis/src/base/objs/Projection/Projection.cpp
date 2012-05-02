@@ -30,7 +30,7 @@
 
 #include "Constants.h"
 #include "Displacement.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Longitude.h"
 
@@ -1155,9 +1155,9 @@ namespace Isis {
     }
 
     // Load the most recent target attitude and shape kernel for NAIF
-    Filename kern("$Base/kernels/pck/pck?????.tpc");
-    kern.HighestVersion();
-    string kernName(kern.Expanded());
+    FileName kern("$Base/kernels/pck/pck?????.tpc");
+    kern = kern.highestVersion();
+    string kernName(kern.expanded());
     furnsh_c(kernName.c_str());
 
     // Get the radii from NAIF

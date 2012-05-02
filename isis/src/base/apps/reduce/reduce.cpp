@@ -31,7 +31,7 @@ void IsisMain() {
 
     inCube.setVirtualBands(bands);
 
-    string from = ui.GetFilename("FROM");
+    string from = ui.GetFileName("FROM");
     inCube.open(from);
 
     ins = inCube.getSampleCount();

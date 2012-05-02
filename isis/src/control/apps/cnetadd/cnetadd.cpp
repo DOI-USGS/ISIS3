@@ -23,7 +23,7 @@
 #include "ControlPoint.h"
 #include "CubeManager.h"
 #include "FileList.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "ImagePolygon.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -55,13 +55,13 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
 
-  FileList addList(ui.GetFilename("ADDLIST"));
+  FileList addList(ui.GetFileName("ADDLIST"));
 
   bool log = false;
-  Filename logFile;
+  FileName logFile;
   if (ui.WasEntered("LOG")) {
     log = true;
-    logFile = ui.GetFilename("LOG");
+    logFile = ui.GetFileName("LOG");
   }
   Pvl results;
   results.SetName("cnetadd_Results");
@@ -72,36 +72,36 @@ void IsisMain() {
   bool checkMeasureValidity = ui.WasEntered("DEFFILE");
   ControlNetValidMeasure validator;
   if (checkMeasureValidity) {
-    Pvl deffile(ui.GetFilename("DEFFILE"));
+    Pvl deffile(ui.GetFileName("DEFFILE"));
     validator = ControlNetValidMeasure(deffile);
   }
 
   SerialNumberList *fromSerials = ui.WasEntered("FROMLIST") ?
-    new SerialNumberList(ui.GetFilename("FROMLIST")) : new SerialNumberList();
+    new SerialNumberList(ui.GetFileName("FROMLIST")) : new SerialNumberList();
 
-  ControlNet inNet = ControlNet(ui.GetFilename("CNET"));
+  ControlNet inNet = ControlNet(ui.GetFileName("CNET"));
   inNet.SetUserName(Application::UserName());
   inNet.SetModifiedDate(iTime::CurrentLocalTime()); //This should be done in ControlNet's Write fn
 
   std::string retrievalOpt = ui.GetString("RETRIEVAL");
   PvlKeyword duplicates("DupSerialNumbers");
   if (retrievalOpt == "REFERENCE") {
-    FileList list1(ui.GetFilename("FROMLIST"));
-    SerialNumberList addSerials(ui.GetFilename("ADDLIST"));
+    FileList list1(ui.GetFileName("FROMLIST"));
+    SerialNumberList addSerials(ui.GetFileName("ADDLIST"));
 
     //Check for duplicate files in the lists by serial number
     for (int i = 0; i < addSerials.Size(); i++) {
 
       // Check for duplicate SNs accross the lists
       if (fromSerials->HasSerialNumber(addSerials.SerialNumber(i))) {
-        duplicates.AddValue(addSerials.Filename(i));
+        duplicates.AddValue(addSerials.FileName(i));
       }
 
       // Check for duplicate SNs within the addlist
       for (int j = i + 1; j < addSerials.Size(); j++) {
         if (addSerials.SerialNumber(i) == addSerials.SerialNumber(j)) {
-          std::string msg = "Add list files [" + addSerials.Filename(i) + "] and [";
-          msg += addSerials.Filename(j) + "] share the same serial number.";
+          std::string msg = "Add list files [" + addSerials.FileName(i) + "] and [";
+          msg += addSerials.FileName(j) + "] share the same serial number.";
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }
@@ -127,7 +127,7 @@ void IsisMain() {
     }
   }
 
-  Filename outNetFile(ui.GetFilename("ONET"));
+  FileName outNetFile(ui.GetFileName("ONET"));
 
   Progress progress;
   progress.SetText("Adding Images");
@@ -249,7 +249,7 @@ void IsisMain() {
 
     if (log) {
       PvlKeyword &logKeyword = (imageAdded) ? added : omitted;
-      logKeyword.AddValue(Filename(addList[img]).Basename());
+      logKeyword.AddValue(FileName(addList[img]).baseName());
     }
 
     progress.CheckStatus();
@@ -268,16 +268,16 @@ void IsisMain() {
       results.AddKeyword(duplicates);
     }
 
-    results.Write(logFile.Expanded());
+    results.Write(logFile.expanded());
   }
 
   // List the modified points
   if (ui.WasEntered("MODIFIEDPOINTS")) {
-    Filename pointList(ui.GetFilename("MODIFIEDPOINTS"));
+    FileName pointList(ui.GetFileName("MODIFIEDPOINTS"));
 
     // Set up the output file for writing
     std::ofstream out_stream;
-    out_stream.open(pointList.Expanded().c_str(), std::ios::out);
+    out_stream.open(pointList.expanded().c_str(), std::ios::out);
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
     QList<QString> modifiedPointsList = modifications.keys();
@@ -319,30 +319,30 @@ void IsisMain() {
   if (ui.WasEntered("TOLIST")) {
     SerialNumberList toList;
 
-    SerialNumberList addSerials(ui.GetFilename("ADDLIST"));
+    SerialNumberList addSerials(ui.GetFileName("ADDLIST"));
 
     const QList<QString> snList = inNet.GetCubeSerials();
     for (int i = 0; i < snList.size(); i++) {
       iString sn = snList[i];
 
       if (addSerials.HasSerialNumber(sn))
-        toList.Add(addSerials.Filename(sn));
+        toList.Add(addSerials.FileName(sn));
       else if (fromSerials->HasSerialNumber(sn))
-        toList.Add(fromSerials->Filename(sn));
+        toList.Add(fromSerials->FileName(sn));
     }
 
-    iString name(ui.GetFilename("TOLIST"));
+    iString name(ui.GetFileName("TOLIST"));
     std::fstream out_stream;
     out_stream.open(name.c_str(), std::ios::out);
     out_stream.seekp(0, std::ios::beg); //Start writing from beginning of file
 
     for (int f = 0; f < (int) toList.Size(); f++)
-      out_stream << toList.Filename(f) << std::endl;
+      out_stream << toList.FileName(f) << std::endl;
 
     out_stream.close();
   }
 
-  inNet.Write(outNetFile.Expanded());
+  inNet.Write(outNetFile.expanded());
 
   delete fromSerials;
 }
@@ -367,14 +367,14 @@ void SetControlPointLatLon(SerialNumberList &snl, ControlNet &cnet) {
     ControlPoint *point = cnet.GetPoint(cp);
     ControlMeasure *cm = point->GetRefMeasure();
 
-    Cube *cube = manager.OpenCube(snl.Filename(cm->GetCubeSerialNumber()));
+    Cube *cube = manager.OpenCube(snl.FileName(cm->GetCubeSerialNumber()));
     try {
       cube->getCamera()->SetImage(cm->GetSample(), cm->GetLine());
       surfacePoints[point->GetId()] = cube->getCamera()->GetSurfacePoint();
     }
     catch (IException &e) {
       std::string msg = "Unable to create camera for cube file [";
-      msg += snl.Filename(cm->GetCubeSerialNumber()) + "]";
+      msg += snl.FileName(cm->GetCubeSerialNumber()) + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     cube = NULL; //Do not delete, manager still has ownership
@@ -393,7 +393,7 @@ QList<ControlPoint *> getValidPoints(Cube &cube, STRtree &coordTree) {
   }
   catch (IException &e) {
     std::string msg = "Footprintinit must be run prior to running cnetadd";
-    msg += " with POLYGON=TRUE for cube [" + cube.getFilename() + "]";
+    msg += " with POLYGON=TRUE for cube [" + cube.getFileName() + "]";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 

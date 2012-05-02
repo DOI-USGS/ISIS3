@@ -216,7 +216,7 @@ void IsisMain() {
   p.AddObject(autoreg);
 
   // Write the autoreg group pvl to the output file
-  string output = ui.GetFilename("TO");
+  string output = ui.GetFileName("TO");
   p.Write(output);
 
   Isis::Application::GuiLog(p);

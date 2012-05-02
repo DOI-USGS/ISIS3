@@ -6,7 +6,7 @@
 #include "ProcessImportPds.h"
 
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "IException.h"
 #include "iTime.h"
@@ -16,32 +16,32 @@ using namespace std;
 using namespace Isis;
 
 void IsisMain() {
-  void TranslateMocEdrLabels(Filename & labelFile, Cube * ocube);
+  void TranslateMocEdrLabels(FileName & labelFile, Cube * ocube);
 
   ProcessImportPds p;
   Pvl pdsLabel;
   UserInterface &ui = Application::GetUserInterface();
 
   // Get the input filename and make sure it is a MOC EDR
-  Filename in = ui.GetFilename("FROM");
+  FileName in = ui.GetFileName("FROM");
   iString id;
   bool compressed = false;
   bool projected;
   try {
-    Pvl lab(in.Expanded());
+    Pvl lab(in.expanded());
     id = (string) lab["DATA_SET_ID"];
     if(lab.FindObject("IMAGE").HasKeyword("ENCODING_TYPE")) compressed = true;
     projected = lab.HasObject("IMAGE_MAP_PROJECTION");
   }
   catch(IException &e) {
     string msg = "Unable to read [DATA_SET_ID] from input file [" +
-                 in.Expanded() + "]";
+                 in.expanded() + "]";
     throw IException(e, IException::Io, msg, _FILEINFO_);
   }
 
   //Checks if in file is rdr
   if(projected) {
-    string msg = "[" + in.Name() + "] appears to be an rdr file.";
+    string msg = "[" + in.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -51,32 +51,32 @@ void IsisMain() {
   id.Trim(" ");
   if((id != "MGS-M-MOC-NA/WA-2-DSDP-L0-V1.0") &&
       (id != "MGS-M-MOC-NA/WA-2-SDP-L0-V1.0")) {
-    string msg = "Input file [" + in.Expanded() + "] does not appear to be " +
+    string msg = "Input file [" + in.expanded() + "] does not appear to be " +
                  "in MOC EDR format. DATA_SET_ID [" + id + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
 
   // Get a temporary file for the uncompressed version incase we need it
-  Filename uncompressed(in.Basename(), "img");
+  FileName uncompressed = FileName::createTempFile("$TEMPORARY/" + in.baseName() + ".img");
 
   // Set up conditional transfer of PDS labels to output cube
-  Filename &translbl(in);
+  FileName &translbl(in);
 
   // If the input file is compressed, use "mocuncompress" to uncompress it
   if(compressed) {
-    iString command = "mocuncompress " + in.Expanded() + " " +
-                      uncompressed.Expanded();
+    iString command = "mocuncompress " + in.expanded() + " " +
+                      uncompressed.expanded();
     if(system(command.c_str()) == 1) {
       string msg = "Unable to execute [mocuncompress]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    p.SetPdsFile(uncompressed.Expanded(), "", pdsLabel);
+    p.SetPdsFile(uncompressed.expanded(), "", pdsLabel);
     translbl = uncompressed;
 
   }
   else {
-    p.SetPdsFile(in.Expanded(), "", pdsLabel);
+    p.SetPdsFile(in.expanded(), "", pdsLabel);
   }
 
   Cube *ocube = p.SetOutputCube("TO");
@@ -85,14 +85,14 @@ void IsisMain() {
   p.EndProcess();
 
   if(compressed) {
-    string uncompressedName(uncompressed.Expanded());
+    string uncompressedName(uncompressed.expanded());
     remove(uncompressedName.c_str());
   }
 
   return;
 }
 
-void TranslateMocEdrLabels(Filename &labelFile, Cube *ocube) {
+void TranslateMocEdrLabels(FileName &labelFile, Cube *ocube) {
 
   string startTime, productId, clockCount;
 
@@ -101,11 +101,11 @@ void TranslateMocEdrLabels(Filename &labelFile, Cube *ocube) {
 
   // Transfer the instrument group to the output cube
   iString transDir = (string) dataDir["Mgs"];
-  Filename transFile(transDir + "/" + "translations/mocInstrument.trn");
+  FileName transFile(transDir + "/" + "translations/mocInstrument.trn");
 
   // Get the translation manager ready
-  Pvl labelPvl(labelFile.Expanded());
-  PvlTranslationManager instrumentXlater(labelPvl, transFile.Expanded());
+  Pvl labelPvl(labelFile.expanded());
+  PvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
 
   PvlGroup inst("Instrument");
 
@@ -201,10 +201,10 @@ void TranslateMocEdrLabels(Filename &labelFile, Cube *ocube) {
 
   // Transfer the archive group to the output cube
   transDir = (string) dataDir["Mgs"];
-  Filename transFileArchive(transDir + "/" + "translations/mocArchive.trn");
+  FileName transFileArchive(transDir + "/" + "translations/mocArchive.trn");
 
   // Get the translation manager ready for the archive group
-  PvlTranslationManager archiveXlater(labelPvl, transFileArchive.Expanded());
+  PvlTranslationManager archiveXlater(labelPvl, transFileArchive.expanded());
 
   PvlGroup arch("Archive");
 
@@ -278,10 +278,10 @@ void TranslateMocEdrLabels(Filename &labelFile, Cube *ocube) {
 
   // Create the BandBin Group and populate it
   transDir = (string) dataDir["Mgs"];
-  Filename transFileBandBin(transDir + "/" + "translations/mocBandBin.trn");
+  FileName transFileBandBin(transDir + "/" + "translations/mocBandBin.trn");
 
   // Get the translation manager ready for the BandBin group
-  PvlTranslationManager bandBinXlater(labelPvl, transFileBandBin.Expanded());
+  PvlTranslationManager bandBinXlater(labelPvl, transFileBandBin.expanded());
 
 
 

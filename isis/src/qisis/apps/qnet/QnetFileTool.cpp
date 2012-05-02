@@ -8,7 +8,7 @@
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "Cube.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "MdiCubeViewport.h"
 #include "Progress.h"
 #include "QnetFileTool.h"
@@ -135,8 +135,8 @@ namespace Isis {
       return;
 
     // Find directory and save for use in file dialog for net file
-    Filename file(list.toStdString());
-    QString dir = file.absolutePath();
+    FileName file(list.toStdString());
+    QString dir = file.path();
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
     // Use the list to get serial numbers and polygons
@@ -166,18 +166,18 @@ namespace Isis {
     filter += "Pvl file (*.pvl);;";
     filter += "Text file (*.txt);;";
     filter += "All (*)";
-    cNetFilename = QFileDialog::getOpenFileName((QWidget *)parent(),
+    cNetFileName = QFileDialog::getOpenFileName((QWidget *)parent(),
         "Select a control network",
         dir,
         filter);
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    if (cNetFilename.isEmpty()) {
+    if (cNetFileName.isEmpty()) {
       //  Create new control net
       g_controlNetwork = new ControlNet();
       g_controlNetwork->SetUserName(Application::UserName());
       //  Determine target from first file in cube list
       Cube *cube = new Cube;
-      cube->open(g_serialNumberList->Filename(0));
+      cube->open(g_serialNumberList->FileName(0));
       g_controlNetwork->SetTarget(cube->getCamera()->Target());
       delete cube;
       cube = NULL;
@@ -185,7 +185,7 @@ namespace Isis {
     else {
       try {
         Progress progress;
-        g_controlNetwork = new ControlNet(cNetFilename.toStdString(),
+        g_controlNetwork = new ControlNet(cNetFileName.toStdString(),
                                                 &progress);
       }
       catch (IException &e) {
@@ -217,9 +217,9 @@ namespace Isis {
 
     QApplication::restoreOverrideCursor();
 
-    p_cnetFilename = cNetFilename;
+    p_cnetFileName = cNetFileName;
     emit serialNumberListUpdated();
-    emit controlNetworkUpdated(cNetFilename);
+    emit controlNetworkUpdated(cNetFileName);
     emit newControlNetwork(g_controlNetwork);
     return;
   }
@@ -258,7 +258,7 @@ namespace Isis {
    *
    */
   void QnetFileTool::save() {
-    g_controlNetwork->Write(p_cnetFilename.toStdString());
+    g_controlNetwork->Write(p_cnetFileName.toStdString());
     p_saveNet = false;
   }
 
@@ -297,7 +297,7 @@ namespace Isis {
       QMessageBox::information((QWidget *)parent(),
           "Error", "Saving Aborted");
     }
-    p_cnetFilename = fn;
+    p_cnetFileName = fn;
     emit controlNetworkUpdated(fn);
     p_saveNet = false;
   }
@@ -323,8 +323,8 @@ namespace Isis {
    */
   void QnetFileTool::loadImage(const QString &serialNumber) {
 
-    string tempFilename = g_serialNumberList->Filename(serialNumber.toStdString());
-    QString filename = tempFilename.c_str();
+    string tempFileName = g_serialNumberList->FileName(serialNumber.toStdString());
+    QString filename = tempFileName.c_str();
     QVector< MdiCubeViewport * > * cvpList =
       g_vpMainWindow->workspace()->cubeViewportList();
     bool found = false;

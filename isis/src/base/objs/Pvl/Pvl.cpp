@@ -26,7 +26,7 @@
 #include <locale>
 #include <fstream>
 
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Message.h"
 #include "PvlTokenizer.h"
@@ -75,14 +75,14 @@ namespace Isis {
    */
   void Pvl::Read(const std::string &file) {
     // Expand the filename
-    Isis::Filename temp(file);
-    p_filename = temp.Expanded();
+    Isis::FileName temp(file);
+    p_filename = temp.expanded();
 
     // Open the file
     ifstream istm;
     istm.open(p_filename.c_str(), std::ios::in);
     if(!istm) {
-      string message = Message::FileOpen(temp.Expanded());
+      string message = Message::FileOpen(temp.expanded());
       throw IException(IException::Io, message, _FILEINFO_);
     }
 
@@ -92,12 +92,12 @@ namespace Isis {
     }
     catch(IException &e) {
       istm.close();
-      string message = "Unable to read PVL file [" + temp.Expanded() + "]";
+      string message = "Unable to read PVL file [" + temp.expanded() + "]";
       throw IException(e, IException::Unknown, message, _FILEINFO_);
     }
     catch(...) {
       istm.close();
-      string message = "Unable to read PVL file [" + temp.Expanded() + "]";
+      string message = "Unable to read PVL file [" + temp.expanded() + "]";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
     istm.close();
@@ -115,7 +115,7 @@ namespace Isis {
    */
   void Pvl::Write(const std::string &file) {
     // Expand the filename
-    Isis::Filename temp(file);
+    Isis::FileName temp(file);
 
     // Set up a Formatter
     bool removeFormatter = false;
@@ -126,11 +126,11 @@ namespace Isis {
 
     // Open the file
     ofstream ostm;
-    string tempName(temp.Expanded());
+    string tempName(temp.expanded());
     ostm.open(tempName.c_str(), std::ios::out);
     ostm.seekp(0, std::ios::beg);
     if(!ostm) {
-      string message = Isis::Message::FileCreate(temp.Expanded());
+      string message = Isis::Message::FileCreate(temp.expanded());
       throw IException(IException::Io, message, _FILEINFO_);
     }
 
@@ -141,12 +141,12 @@ namespace Isis {
     }
     catch(IException &e) {
       ostm.close();
-      string message = "Unable to write PVL to file [" + temp.Expanded() + "]";
+      string message = "Unable to write PVL to file [" + temp.expanded() + "]";
       throw IException(e, IException::Io, message, _FILEINFO_);
     }
     catch(...) {
       ostm.close();
-      string message = "Unable to write PVL to file [" + temp.Expanded() + "]";
+      string message = "Unable to write PVL to file [" + temp.expanded() + "]";
       throw IException(IException::Io, message, _FILEINFO_);
     }
 
@@ -169,7 +169,7 @@ namespace Isis {
    */
   void Pvl::Append(const std::string &file) {
     // Set up for opening and writing
-    Isis::Filename temp(file);
+    Isis::FileName temp(file);
 
     // Set up a Formatter
     bool removeFormatter = false;
@@ -180,11 +180,11 @@ namespace Isis {
 
     // Open the file
     ofstream ostm;
-    string tempName(temp.Expanded());
+    string tempName(temp.expanded());
     ostm.open(tempName.c_str(), std::ios::app);
     ostm.seekp(0, std::ios::end);
     if(!ostm) {
-      string message = Message::FileOpen(temp.Expanded());
+      string message = Message::FileOpen(temp.expanded());
       throw IException(IException::Io, message, _FILEINFO_);
     }
 
@@ -196,7 +196,7 @@ namespace Isis {
     catch(...) {
       ostm.close();
       string message = "Unable to append PVL infomation to file [" +
-                       temp.Expanded() + "]";
+                       temp.expanded() + "]";
       throw IException(IException::Io, message, _FILEINFO_);
     }
 
@@ -250,12 +250,12 @@ namespace Isis {
     for(int i = 0; i < outTemplate.Keywords(); i++) {
       if(outTemplate[i].IsNamed("Isis:PvlTemplate:File")) {
         string filename = outTemplate[i];
-        Isis::Filename file(filename);
-        if(!file.Exists()) {
+        Isis::FileName file(filename);
+        if(!file.fileExists()) {
           string message = "Could not open the template file [" + filename + "]";
           throw IException(IException::Io, message, _FILEINFO_);
         }
-        Isis::Pvl include(file.Expanded());
+        Isis::Pvl include(file.expanded());
 
         for(int j = 0; j < include.Keywords(); j++) {
           if(!newTemp.HasKeyword(include[j].Name()))

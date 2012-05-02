@@ -1,5 +1,5 @@
 #include "TextFile.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "Preference.h"
@@ -493,8 +493,8 @@ int main(int argc, char *argv[]) {
 
   // create file that doesn't end in a newline and then test GetLine
   FILE *fp;
-  Filename testFileName(testFile);
-  fp = fopen(testFileName.Expanded().c_str(), "w");
+  FileName testFileName(testFile);
+  fp = fopen(testFileName.expanded().c_str(), "w");
   fprintf(fp, "this file has no newline chars in it!");   //???SEG FAULT HERE!!!!!!!
   fclose(fp);
   TextFile tf;
@@ -523,7 +523,7 @@ int main(int argc, char *argv[]) {
 
   cout << "11) Remove temp file -> " << testFile << " <-\n" << endl;
 
-  if(std::remove(testFileName.Expanded().c_str())) {                    // cleanup tmp file
+  if(std::remove(testFileName.expanded().c_str())) {                    // cleanup tmp file
     cout << "*** Failed to remove tmp file: " << testFile << endl;
   }
 }
@@ -538,7 +538,7 @@ int main(int argc, char *argv[]) {
 void ReportError(iString err) {
   iString report = ""; // report will be modified error message
   iString errorLine = ""; // read message one line at a time
-  Filename expandedfile;
+  FileName expandedfile;
   while(err != "") {
     // pull off first line
     errorLine = err.Token("\n");
@@ -551,16 +551,16 @@ void ReportError(iString err) {
           report += errorLine.Token("[");
           // and including [
           report += "[";
-          // read entire path into Filename object
+          // read entire path into FileName object
           expandedfile = errorLine.Token("]");
           // only keep the name of the immediate directory
-          iString path = expandedfile.OriginalPath();
+          iString path = expandedfile.originalPath();
           while (path.find("/") != string::npos) {
             path.Token("/");
           }
           // only report immediate directory and file name, (rather than fully
           // expanded path since this may differ on each system
-          report += "../" + path + "/" + expandedfile.Name();
+          report += "../" + path + "/" + expandedfile.name();
           report += "]";
         }
         else {

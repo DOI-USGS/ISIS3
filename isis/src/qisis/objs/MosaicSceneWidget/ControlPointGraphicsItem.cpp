@@ -9,7 +9,7 @@
 #include <QMessageBox>
 
 #include "ControlPoint.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
 #include "SerialNumberList.h"
@@ -19,7 +19,7 @@ using namespace std;
 namespace Isis {
   /**
    * Create a CP graphics item. This will colorize and set the appropriate
-   *   toolTip for this control point. 
+   *   toolTip for this control point.
    */
   ControlPointGraphicsItem::ControlPointGraphicsItem(QPointF center,
       QPointF apriori, ControlPoint *cp, SerialNumberList *snList,
@@ -234,7 +234,7 @@ namespace Isis {
 
         if(snList->HasSerialNumber(serialNum)) {
           toolTip +=
-              Filename(snList->Filename(serialNum.toStdString())).fileName();
+              FileName(snList->FileName(serialNum.toStdString())).name().ToQt();
           toolTip += " (" + serialNum + ")";
         }
         else {

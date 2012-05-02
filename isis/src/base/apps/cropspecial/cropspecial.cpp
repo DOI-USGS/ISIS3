@@ -33,7 +33,7 @@ void IsisMain() {
   string from = ui.GetAsString("FROM");
   CubeAttributeInput inAtt(from);
   cube.setVirtualBands(inAtt.Bands());
-  from = ui.GetFilename("FROM");
+  from = ui.GetFileName("FROM");
   cube.open(from);
 
   cropNulls = ui.GetBoolean("NULL");

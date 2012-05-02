@@ -25,7 +25,7 @@
  */
 
 #include "CubeAttribute.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "PixelType.h"
 
 namespace Isis {
@@ -66,12 +66,12 @@ namespace Isis {
        */
       class ChannelDescription {
         public:
-          ChannelDescription(Filename &filename, CubeAttributeInput &att);
+          ChannelDescription(FileName &filename, CubeAttributeInput &att);
 
           //! Destruct the export description.
           virtual ~ChannelDescription() {};
 
-          Filename filename() const;
+          FileName filename() const;
           CubeAttributeInput attributes() const;
 
           void setInputRange(double min, double max);
@@ -81,7 +81,7 @@ namespace Isis {
 
         private:
           //! Input filename of the cube to be treated as a color channel.
-          Filename m_filename;
+          FileName m_filename;
 
           //! Attributes like which band to use from the input cube.
           CubeAttributeInput m_att;
@@ -106,8 +106,8 @@ namespace Isis {
       double getOutputMaximum() const;
       double getOutputNull() const;
 
-      int addChannel(Filename filename, CubeAttributeInput &att);
-      int addChannel(Filename filename, CubeAttributeInput &att,
+      int addChannel(FileName filename, CubeAttributeInput &att);
+      int addChannel(FileName filename, CubeAttributeInput &att,
           double min, double max);
       const ChannelDescription & getChannel(int i) const;
       int channelCount() const;

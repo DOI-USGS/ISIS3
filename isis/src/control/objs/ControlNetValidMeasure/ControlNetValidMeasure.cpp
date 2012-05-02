@@ -181,7 +181,7 @@ namespace Isis {
         measureCamera = pCube->getCamera();
       }
       catch(IException &e) {
-        string msg = "Cannot Create Camera for Image:" + pCube->getFilename();
+        string msg = "Cannot Create Camera for Image:" + pCube->getFileName();
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -925,7 +925,7 @@ namespace Isis {
     }
     catch(IException &e) {
       string msg = "Cannot Create Camera for Image [" +
-          pCube->getFilename() + "]";
+          pCube->getFileName() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }

@@ -379,7 +379,7 @@ namespace Isis {
             listName = Name();
           }
 
-          iString input = p_pipeline->TemporaryFolder() + "/" + Filename(listName).Basename() + ".lis";
+          iString input = p_pipeline->TemporaryFolder() + "/" + FileName(listName).baseName() + ".lis";
           params = ">>LIST " + input + " ";
 
           PipelineApplication * prev = Previous();
@@ -618,22 +618,22 @@ namespace Isis {
     if(!LastApplicationWithOutput()) {
       iString lastOutput = p_pipeline->FinalOutput(branch, false);
       outputFile = outFolder + "/" +
-                   Filename(lastOutput).Basename() + "." + p_outputMod + "." + p_outputExtension;
+                   FileName(lastOutput).baseName() + "." + p_outputMod + "." + p_outputExtension;
 
       if(p_outputMod.empty()) {
         outputFile = outFolder + "/" +
-                     Filename(lastOutput).Basename() + "." + p_outputExtension;
+                     FileName(lastOutput).baseName() + "." + p_outputExtension;
       }
     }
     else {
       outputFile = p_pipeline->FinalOutput(branch, numUsedBranches > 1);
-      outFolder = Filename(outputFile).Path();
+      outFolder = FileName(outputFile).path();
     }
 
     if(!LastApplicationWithOutput() && numUsedBranches != 1 && !p_outputMod.empty()) {
-      Filename outfile(outputFile);
+      FileName outfile(outputFile);
 
-      iString realOut(outFolder + "/" + outfile.Basename() + "." + p_outBranches[branch] + "." + p_outputExtension);
+      iString realOut(outFolder + "/" + outfile.baseName() + "." + p_outBranches[branch] + "." + p_outputExtension);
 
       if(usedBranch) {
 

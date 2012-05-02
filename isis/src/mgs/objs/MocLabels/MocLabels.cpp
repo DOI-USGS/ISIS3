@@ -89,8 +89,8 @@ namespace Isis {
 
     // Get the two kernels for time computations
     PvlGroup &kerns = lab.FindGroup("Kernels", Pvl::Traverse);
-    p_lsk = Filename(kerns["LeapSecond"][0]);
-    p_sclk = Filename(kerns["SpacecraftClock"][0]);
+    p_lsk = FileName(kerns["LeapSecond"][0]);
+    p_sclk = FileName(kerns["SpacecraftClock"][0]);
   }
 
   /**
@@ -215,8 +215,8 @@ namespace Isis {
     InitDetectorMaps();
 
     // Temporarily load some naif kernels
-    string lsk = p_lsk.Expanded();
-    string sclk = p_sclk.Expanded();
+    string lsk = p_lsk.expanded();
+    string sclk = p_sclk.expanded();
     furnsh_c(lsk.c_str());
     furnsh_c(sclk.c_str());
 
@@ -417,15 +417,15 @@ namespace Isis {
     firstTime = false;
 
     // Load naif kernels
-    string lskKern = p_lsk.Expanded();
-    string sclkKern = p_sclk.Expanded();
+    string lskKern = p_lsk.expanded();
+    string sclkKern = p_sclk.expanded();
     furnsh_c(lskKern.c_str());
     furnsh_c(sclkKern.c_str());
 
     //Set up file for reading
-    Filename wagoFile("$mgs/calibration/MGSC_????_wago.tab");
-    wagoFile.HighestVersion();
-    string nameOfFile = wagoFile.Expanded();
+    FileName wagoFile("$mgs/calibration/MGSC_????_wago.tab");
+    wagoFile = wagoFile.highestVersion();
+    string nameOfFile = wagoFile.expanded();
     ifstream temp(nameOfFile.c_str());
     vector<int> wholeFile;
 

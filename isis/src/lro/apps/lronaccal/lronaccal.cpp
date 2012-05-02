@@ -61,7 +61,7 @@ void IsisMain() {
   g_radiometric = ui.GetBoolean("RADIOMETRIC");
   g_iof = (ui.GetString("RADIOMETRICTYPE") == "IOF");
 
-  Isis::Pvl lab(ui.GetFilename("FROM"));
+  Isis::Pvl lab(ui.GetFileName("FROM"));
   Isis::PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
 
   // Check if it is a NAC image
@@ -109,15 +109,15 @@ void IsisMain() {
     if(maskedFile.Equal("Default") || maskedFile.length() == 0)
       maskedFile = "$lro/calibration/" + instId + "_MaskedPixels.????.pvl";
 
-    Filename maskedFilename(maskedFile);
-    if(maskedFilename.IsVersioned())
-      maskedFilename.HighestVersion();
-    if(!maskedFilename.Exists()) {
+    FileName maskedFileName(maskedFile);
+    if(maskedFileName.isVersioned())
+      maskedFileName = maskedFileName.highestVersion();
+    if(!maskedFileName.fileExists()) {
       string msg = maskedFile + " does not exist.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    Pvl maskedPvl(maskedFilename.Expanded());
+    Pvl maskedPvl(maskedFileName.expanded());
     PvlKeyword maskedPixels;
     int cutoff;
     if(g_summed) {
@@ -185,15 +185,15 @@ void IsisMain() {
     if(radFile.Equal("Default") || radFile.length() == 0)
       radFile = "$lro/calibration/NAC_RadiometricResponsivity.????.pvl";
 
-    Filename radFilename(radFile);
-    if(radFilename.IsVersioned())
-      radFilename.HighestVersion();
-    if(!radFilename.Exists()) {
+    FileName radFileName(radFile);
+    if(radFileName.isVersioned())
+      radFileName = radFileName.highestVersion();
+    if(!radFileName.fileExists()) {
       string msg = radFile + " does not exist.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    Pvl radPvl(radFilename.Expanded());
+    Pvl radPvl(radFileName.expanded());
 
     if(g_iof) {
       try {
@@ -327,14 +327,14 @@ void Calibrate(Buffer &in, Buffer &out) {
 
 void CopyCubeIntoArray(string &fileString, vector<double> &data) {
   Cube cube;
-  Filename filename(fileString);
-  if(filename.IsVersioned())
-    filename.HighestVersion();
-  if(!filename.Exists()) {
+  FileName filename(fileString);
+  if(filename.isVersioned())
+    filename = filename.highestVersion();
+  if(!filename.fileExists()) {
     string msg = fileString + " does not exist.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
-  cube.open(filename.Expanded());
+  cube.open(filename.expanded());
   Brick brick(cube.getSampleCount(), cube.getLineCount(), cube.getBandCount(),
               cube.getPixelType());
   brick.SetBasePosition(1, 1, 1);
@@ -343,36 +343,36 @@ void CopyCubeIntoArray(string &fileString, vector<double> &data) {
   for(int i = 0; i < cube.getSampleCount(); i++)
     data.push_back(brick[i]);
 
-  fileString = filename.Expanded();
+  fileString = filename.expanded();
 }
 
 void ReadTextDataFile(string &fileString, vector<double> &data) {
-  Filename filename(fileString);
-  if(filename.IsVersioned())
-    filename.HighestVersion();
-  if(!filename.Exists()) {
+  FileName filename(fileString);
+  if(filename.isVersioned())
+    filename = filename.highestVersion();
+  if(!filename.fileExists()) {
     string msg = fileString + " does not exist.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
-  TextFile file(filename.Expanded());
+  TextFile file(filename.expanded());
   iString lineString;
   unsigned int line = 0;
   while(file.GetLine(lineString)) {
     data.push_back((lineString.Token(" ,;")).ToDouble());
     line++;
   }
-  fileString = filename.Expanded();
+  fileString = filename.expanded();
 }
 
 void ReadTextDataFile(string &fileString, vector<vector<double> > &data) {
-  Filename filename(fileString);
-  if(filename.IsVersioned())
-    filename.HighestVersion();
-  if(!filename.Exists()) {
+  FileName filename(fileString);
+  if(filename.isVersioned())
+    filename = filename.highestVersion();
+  if(!filename.fileExists()) {
     string msg = fileString + " does not exist.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
-  TextFile file(filename.Expanded());
+  TextFile file(filename.expanded());
   iString lineString;
   while(file.GetLine(lineString)) {
     vector<double> line;
@@ -386,7 +386,7 @@ void ReadTextDataFile(string &fileString, vector<vector<double> > &data) {
     data.push_back(line);
   }
 
-  fileString = filename.Expanded();
+  fileString = filename.expanded();
 }
 
 void RemoveMaskedOffset(Buffer &in) {

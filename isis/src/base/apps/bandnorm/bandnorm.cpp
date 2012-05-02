@@ -57,7 +57,7 @@ void IsisMain() {
   }
   else if(avg == "PENCIL") {
     TextFile pencil;
-    pencil.Open(ui.GetFilename("SPECTRUM"));
+    pencil.Open(ui.GetFileName("SPECTRUM"));
     if(pencil.LineCount() - 1 < icube->getBandCount()) {
       string msg = "The spectral pencil file [" + ui.GetAsString("SPECTRUM") +
                    "] does not contain enough data for all bands.";
@@ -80,7 +80,7 @@ void IsisMain() {
       }
     }
     if(column < 0  || (unsigned)column > tokens.size()) {
-      string msg = "The column specified in file [" + ui.GetFilename("SPECTRUM")
+      string msg = "The column specified in file [" + ui.GetFileName("SPECTRUM")
                    + "] was not found.";
       throw IException(IException::User, msg, _FILEINFO_);
     }

@@ -178,7 +178,7 @@ namespace Isis {
       throw IException(e,
                        IException::Programmer,
                        "Exception caught when attempting to show cube "
-                       + cube->getFilename(),
+                       + cube->getFileName(),
                        _FILEINFO_);
     }
 

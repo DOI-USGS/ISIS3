@@ -62,11 +62,11 @@ void IsisMain() {
   // Setup the input and make sure it is a moc file
   UserInterface &ui = Application::GetUserInterface();
   Cube *icube = p.SetInputCube("FROM", OneBand);
-  gbl::moc = new MocLabels(ui.GetFilename("FROM"));
+  gbl::moc = new MocLabels(ui.GetFileName("FROM"));
 
   // If it is already calibrated then complain
   if(icube->hasGroup("Radiometry")) {
-    string msg = "The MOC image [" + icube->getFilename() + "] has already "
+    string msg = "The MOC image [" + icube->getFileName() + "] has already "
                  "been radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -88,7 +88,7 @@ void IsisMain() {
   // and internalize it in a pvl object
   string calKernelFile;
   if(ui.WasEntered("CALKERNEL")) {
-    calKernelFile = ui.GetFilename("CALKERNEL");
+    calKernelFile = ui.GetFileName("CALKERNEL");
   }
   else {
     calKernelFile = p.MissionData("mgs", "/calibration/moccal.ker.???", true);
@@ -183,7 +183,7 @@ void IsisMain() {
   p.EndProcess();
 
   // Now go fix errors around the wago changes
-  gbl::FixWagoLines(ui.GetFilename("TO"));
+  gbl::FixWagoLines(ui.GetFileName("TO"));
 
   // Cleanup
   gbl::pixelGain.clear();

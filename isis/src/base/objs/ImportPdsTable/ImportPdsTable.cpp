@@ -25,7 +25,7 @@
 #include <iomanip>
 #include "ImportPdsTable.h"
 #include "iString.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "TextFile.h"
 
 
@@ -302,7 +302,7 @@ namespace Isis {
 
   //  Get some pertinent information from the label
     PvlObject &tabobj = label.FindObject("TABLE");
-    tblfile = Filename(labfile).Path() + "/" + label["^TABLE"][0];
+    tblfile = FileName(labfile).path() + "/" + label["^TABLE"][0];
 
     m_trows = (int) tabobj.FindKeyword("ROWS");
     int ncols =  (int) tabobj.FindKeyword("COLUMNS");
@@ -350,10 +350,10 @@ namespace Isis {
     //  Vet the filename.  Many PDS files record the filename in uppercase and
     //  in practice, the filename is in lowercase.  Do this check here.
     string tblfile(tabfile);
-    Filename tname(tblfile);
-    if (!tname.Exists()) {
-      tname =  tname.Path() + "/" + iString(tname.Name()).DownCase();
-      tblfile = tname.Expanded();
+    FileName tname(tblfile);
+    if (!tname.fileExists()) {
+      tname =  tname.path() + "/" + iString(tname.name()).DownCase();
+      tblfile = tname.expanded();
     }
 
     TextFile tfile(tblfile);

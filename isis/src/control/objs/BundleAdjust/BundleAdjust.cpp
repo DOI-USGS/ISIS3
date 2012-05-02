@@ -60,7 +60,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_pSnList = new Isis::SerialNumberList(cubeList);
     m_pHeldSnList = NULL;
     m_bPrintSummary = bPrintSummary;
-    m_strCnetFilename = cnetFile;
+    m_strCnetFileName = cnetFile;
     m_strOutputFilePrefix = "";
     m_bDeltack = false;
 
@@ -87,7 +87,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_pSnList = new Isis::SerialNumberList(cubeList);
     m_pHeldSnList = new Isis::SerialNumberList(heldList);
     m_bPrintSummary = bPrintSummary;
-    m_strCnetFilename = cnetFile;
+    m_strCnetFileName = cnetFile;
     m_strOutputFilePrefix = "";
     m_bDeltack = false;
 
@@ -114,7 +114,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_pHeldSnList = NULL;
     m_bPrintSummary = bPrintSummary;
     m_dConvergenceThreshold = 0.;    // This is needed for deltack???
-    m_strCnetFilename = "";
+    m_strCnetFileName = "";
     m_strOutputFilePrefix = "";
     m_bDeltack = true;
 
@@ -140,7 +140,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_pSnList = &snlist;
     m_pHeldSnList = &heldsnlist;
     m_bPrintSummary = bPrintSummary;
-    m_strCnetFilename = "";
+    m_strCnetFileName = "";
     m_strOutputFilePrefix = "";
     m_bDeltack = false;
 
@@ -380,7 +380,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         continue;
 
       nimagesWithInsufficientMeasures++;
-      msg += m_pSnList->Filename(i) + ": " + iString(nMeasures) + "\n";
+      msg += m_pSnList->FileName(i) + ": " + iString(nMeasures) + "\n";
     }
     if ( nimagesWithInsufficientMeasures > 0 ) {
       throw IException(IException::User, msg, _FILEINFO_);
@@ -639,9 +639,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         if (m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(isn)))
           continue;
 
-        std::string msg = "Cube file " + m_pSnList->Filename(isn)
+        std::string msg = "Cube file " + m_pSnList->FileName(isn)
                           + " must be held since it is on the same observation as held cube "
-                          + m_pHeldSnList->Filename(ih);
+                          + m_pHeldSnList->FileName(ih);
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -5671,10 +5671,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   }
 
   //! Return the ith filename in the cube list file given to constructor
-  std::string BundleAdjust::Filename(int i) {
+  std::string BundleAdjust::FileName(int i) {
 //    std::string serialNumber = (*m_pSnList)[i];
-//    return m_pSnList->Filename(serialNumber);
-    return m_pSnList->Filename(i);
+//    return m_pSnList->FileName(serialNumber);
+    return m_pSnList->FileName(i);
   }
 
 
@@ -6024,7 +6024,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       fp_out << buf;
       sprintf(buf, "\n                       Run Time: %s", Isis::iTime::CurrentLocalTime().c_str());
       fp_out << buf;
-      sprintf(buf,"\n               Network Filename: %s", m_strCnetFilename.c_str());
+      sprintf(buf,"\n               Network Filename: %s", m_strCnetFileName.c_str());
       fp_out << buf;
       sprintf(buf,"\n                     Network Id: %s", m_pCnet->GetNetworkId().c_str());
       fp_out << buf;
@@ -6289,12 +6289,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
         if (nUsed == nMeasures)
           sprintf(buf,"%s   %5d of %5d %6.3lf %6.3lf %6.3lf\n",
-                  m_pSnList->Filename(i).c_str(),
+                  m_pSnList->FileName(i).c_str(),
                   (nMeasures-nRejectedMeasures), nMeasures,
                   rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
         else
           sprintf(buf,"%s   %5d of %5d* %6.3lf %6.3lf %6.3lf\n",
-                  m_pSnList->Filename(i).c_str(),
+                  m_pSnList->FileName(i).c_str(),
                   (nMeasures-nRejectedMeasures), nMeasures,
                   rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
         fp_out << buf;
@@ -6392,7 +6392,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
             coefTWI.push_back(angles.at(2));
           }
 
-          sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->Filename(i).c_str());
+          sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->FileName(i).c_str());
           fp_out << buf;
           sprintf(buf, "\nImage Serial Number: %s\n", m_pSnList->SerialNumber(i).c_str());
           fp_out << buf;
@@ -6933,7 +6933,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         coefTWI.push_back(angles.at(2));
       }
 
-      sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->Filename(i).c_str());
+      sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->FileName(i).c_str());
       fp_out << buf;
       sprintf(buf, "\n Image Serial Number: %s\n", m_pSnList->SerialNumber(i).c_str());
       fp_out << buf;
@@ -7395,13 +7395,13 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
         if (measure->IsRejected())
           sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,*\n",
-                  point->GetId().c_str(), m_pSnList->Filename(nImageIndex).c_str(), m_pSnList->SerialNumber(nImageIndex).c_str(),
+                  point->GetId().c_str(), m_pSnList->FileName(nImageIndex).c_str(), m_pSnList->SerialNumber(nImageIndex).c_str(),
                   measure->GetFocalPlaneMeasuredX(), measure->GetFocalPlaneMeasuredY(), measure->GetSample(),
                   measure->GetLine(), measure->GetSampleResidual(), measure->GetLineResidual(),
                   measure->GetResidualMagnitude());
         else
           sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                  point->GetId().c_str(), m_pSnList->Filename(nImageIndex).c_str(), m_pSnList->SerialNumber(nImageIndex).c_str(),
+                  point->GetId().c_str(), m_pSnList->FileName(nImageIndex).c_str(), m_pSnList->SerialNumber(nImageIndex).c_str(),
                   measure->GetFocalPlaneMeasuredX(), measure->GetFocalPlaneMeasuredY(), measure->GetSample(),
                   measure->GetLine(), measure->GetSampleResidual(), measure->GetLineResidual(), measure->GetResidualMagnitude());
         fp_out << buf;
@@ -7678,7 +7678,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         output_columns.clear();
 
         // add filename
-        output_columns.push_back(m_pSnList->Filename(i).c_str());
+        output_columns.push_back(m_pSnList->FileName(i).c_str());
 
         // add rms of sample, line, total image coordinate residuals
         output_columns.push_back(boost::lexical_cast<std::string>

@@ -424,9 +424,9 @@ namespace Isis {
 
   void Equalization::generateOutputs(FileList &outList) {
     for (unsigned int img = 0; img < m_imageList.size(); img++) {
-      Filename file(m_imageList[img]);
-      string filename = file.Path() + "/" + file.Basename() +
-        ".equ." + file.Extension();
+      FileName file(m_imageList[img]);
+      string filename = file.path() + "/" + file.baseName() +
+        ".equ." + file.extension();
       outList.push_back(filename);
     }
   }
@@ -513,7 +513,7 @@ namespace Isis {
       bool foundFile = false;
       for (int j = 1; j < equalInfo.Groups(); j++) {
         PvlGroup &normalization = equalInfo.Group(j);
-        string normFile  = normalization["Filename"][0];
+        string normFile  = normalization["FileName"][0];
         if (fromFile == normFile) {
 
           // Store the index in INPUT STATISTICS file corresponding to the

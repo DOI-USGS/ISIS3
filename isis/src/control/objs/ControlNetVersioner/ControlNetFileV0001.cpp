@@ -7,7 +7,7 @@
 
 #include "ControlNetFileV0001.pb.h"
 #include "ControlMeasureLogData.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Progress.h"
 #include "Pvl.h"
@@ -32,16 +32,16 @@ namespace Isis {
   }
 
 
-  void ControlNetFileV0001::Read(const Pvl &head, const Filename &file) {
+  void ControlNetFileV0001::Read(const Pvl &head, const FileName &file) {
     const PvlObject &protoBufferInfo = head.FindObject("ProtoBuffer");
     const PvlObject &protoBufferCore = protoBufferInfo.FindObject("Core");
 
     BigInt coreStartPos = protoBufferCore["StartByte"];
     BigInt coreLength = protoBufferCore["Bytes"];
 
-    fstream input(file.Expanded().c_str(), ios::in | ios::binary);
+    fstream input(file.expanded().c_str(), ios::in | ios::binary);
     if (!input.is_open()) {
-      iString msg = "Failed to open PB file" + file.fileName();
+      iString msg = "Failed to open PB file" + file.name();
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -55,7 +55,7 @@ namespace Isis {
     // Now stream the rest of the input into the google protocol buffer.
     try {
       if (!p_network->ParseFromCodedStream(&codedInStream)) {
-        iString msg = "Failed to read input PB file " + file.fileName();
+        iString msg = "Failed to read input PB file " + file.name();
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
@@ -83,7 +83,7 @@ namespace Isis {
     // Now stream the rest of the input into the google protocol buffer.
     try {
       if (!p_logData->ParseFromCodedStream(&codedLogInStream)) {
-        iString msg = "Failed to read log data in PB file [" + file.fileName() + "]";
+        iString msg = "Failed to read log data in PB file [" + file.name() + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }

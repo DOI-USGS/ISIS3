@@ -25,7 +25,7 @@ void IsisMain() {
   Cube* info = p.SetInputCube("FROM");
   PvlKeyword &status = info ->getGroup("RESEAUS")["STATUS"];
   UserInterface &ui = Application::GetUserInterface();
-  string in = ui.GetFilename("FROM");
+  string in = ui.GetFileName("FROM");
 
   string spacecraft = (info->getGroup("Instrument")["SpacecraftName"]);
   string instrument = (info->getGroup("Instrument")["InstrumentId"]);
@@ -58,7 +58,7 @@ void IsisMain() {
   dim = apollo.ReseauDimension();
 
   // Get other user entered options
-  string out= ui.GetFilename("TO");
+  string out= ui.GetFileName("TO");
   resvalid = ui.GetBoolean("RESVALID");
   action = ui.GetString("ACTION");
 

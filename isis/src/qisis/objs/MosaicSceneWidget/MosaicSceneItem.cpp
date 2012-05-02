@@ -34,7 +34,7 @@ namespace Isis {
    * MosaicSceneItem constructor
    *
    *
-   * @param cubeFilename
+   * @param cubeFileName
    * @param parent
    */
   MosaicSceneItem::MosaicSceneItem(CubeDisplayProperties *cubeDisplay,

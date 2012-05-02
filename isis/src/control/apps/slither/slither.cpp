@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "ControlNet.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "NumericalApproximation.h"
 #include "ProcessRubberSheet.h"
 #include "SlitherTransform.h"
@@ -23,7 +23,7 @@ void IsisMain() {
 
   // Get the control point file
   UserInterface &ui = Application::GetUserInterface();
-  string cfile = ui.GetFilename("CONTROL");
+  string cfile = ui.GetFileName("CONTROL");
   ControlNet cn(cfile);
 
   //  Set default type to Cubic spline interpolation
@@ -55,12 +55,12 @@ void IsisMain() {
   //  Dump the transform statistics
   if(ui.WasEntered("RESULTS")) {
     // Get the control point file
-    string rFile = Filename(ui.GetFilename("RESULTS")).Expanded();
+    string rFile = FileName(ui.GetFileName("RESULTS")).expanded();
     ofstream os;
     os.open(rFile.c_str(), ios::out);
     os << "#  Slither Transform Results\n"
        << "#  RunDate: " << iTime::CurrentLocalTime() << endl
-       << "#    FROM:     " << icube->getFilename() << endl
+       << "#    FROM:     " << icube->getFileName() << endl
        << "#    CNETFILE: " << cfile << endl << endl;
 
     transform.dumpState(os);

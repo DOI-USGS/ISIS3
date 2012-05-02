@@ -28,7 +28,7 @@ namespace Isis {
   class Buffer;
   class Cube;
   class CubeAttributeOutput;
-  class Filename;
+  class FileName;
   class ImageImporter;
 
   /**
@@ -49,13 +49,13 @@ namespace Isis {
    */
   class ImageImporter {
     public:
-      ImageImporter(Filename inputName);
+      ImageImporter(FileName inputName);
       virtual ~ImageImporter();
 
       void operator()(Buffer &out) const;
 
-      Cube * import(Filename outputName);
-      Cube * import(Filename outputName, CubeAttributeOutput &att);
+      Cube * import(FileName outputName);
+      Cube * import(FileName outputName, CubeAttributeOutput &att);
 
       void setNullRange(double min, double max);
       void setLrsRange(double min, double max);
@@ -69,7 +69,7 @@ namespace Isis {
       int lines() const;
       int bands() const;
 
-      Filename filename() const;
+      FileName filename() const;
 
       /**
        * Pure virtual method for returning true if the image is grayscale.
@@ -92,13 +92,13 @@ namespace Isis {
        */
       virtual bool isArgb() const = 0;
 
-      static ImageImporter * fromFilename(Filename inputName);
+      static ImageImporter * fromFileName(FileName inputName);
 
     protected:
       //! Friendly alias for a method used to get a particular color channel.
       typedef int (ImageImporter::*GetChannelMethod)(int pixel) const;
 
-      Cube * createOutput(Filename outputName, CubeAttributeOutput &att);
+      Cube * createOutput(FileName outputName, CubeAttributeOutput &att);
 
       void setDefaultBands();
       double testSpecial(double pixel) const;
@@ -180,7 +180,7 @@ namespace Isis {
 
     private:
       //! The filename of the input image.
-      Filename *m_inputName;
+      FileName *m_inputName;
 
       //! The owned handle on the output cube to be imported to.
       Cube *m_outCube;

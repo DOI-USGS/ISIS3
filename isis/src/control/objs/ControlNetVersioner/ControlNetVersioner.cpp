@@ -8,7 +8,7 @@
 #include "ControlNetFileV0002.pb.h"
 #include "ControlMeasureLogData.h"
 #include "Distance.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "Latitude.h"
@@ -31,16 +31,16 @@ namespace Isis {
    *   ControlNet but a conversion from binary to pvl can make use out of this
    *   also.
    *
-   * @param networkFilename The filename of the cnet to be read
+   * @param networkFileName The filename of the cnet to be read
    *
    */
   LatestControlNetFile *ControlNetVersioner::Read(
-      const Filename &networkFilename) {
+      const FileName &networkFileName) {
     try {
-      Pvl network(networkFilename.Expanded());
+      Pvl network(networkFileName.expanded());
 
       if(network.HasObject("ProtoBuffer")) {
-        return ReadBinaryNetwork(network, networkFilename);
+        return ReadBinaryNetwork(network, networkFileName);
       }
       else if(network.HasObject("ControlNetwork")) {
         return ReadPvlNetwork(network);
@@ -51,7 +51,7 @@ namespace Isis {
       }
     }
     catch(IException &e) {
-      iString msg = "Reading the control network [" + networkFilename.fileName()
+      iString msg = "Reading the control network [" + networkFileName.name()
           + "] failed";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
@@ -66,10 +66,10 @@ namespace Isis {
    * @param pvl True if the output format should be Pvl, false if not
    *
    */
-  void ControlNetVersioner::Write(const Filename &file,
+  void ControlNetVersioner::Write(const FileName &file,
       const LatestControlNetFile &fileData, bool pvl) {
     if(pvl) {
-      fileData.ToPvl().Write(file.Expanded());
+      fileData.ToPvl().Write(file.expanded());
     }
     else {
       fileData.Write(file);
@@ -395,7 +395,7 @@ namespace Isis {
    * @return In-memory representation of the network
    */
   LatestControlNetFile *ControlNetVersioner::ReadBinaryNetwork(
-      const Pvl &header, const Filename &filename) {
+      const Pvl &header, const FileName &filename) {
     // Find the binary cnet version by any means necessary
     int version = 1;
 

@@ -49,8 +49,8 @@ void multiply(Buffer &in, Buffer &out);
 void subtract(Buffer &in, Buffer &out);
 void pvlOut(const string &pv);
 void tableOut(const string &pv);
-void PVLIn(const Isis::Filename &filename);
-void tableIn(const Isis::Filename &filename);
+void PVLIn(const Isis::FileName &filename);
+void tableIn(const Isis::FileName &filename);
 void subSame();
 void multSame();
 
@@ -94,10 +94,10 @@ void IsisMain() {
     p.StartProcess(getStats);
   }
   else if(ui.GetString("STATSOURCE") == "TABLE") {
-    tableIn(ui.GetFilename("FROMSTATS"));
+    tableIn(ui.GetFileName("FROMSTATS"));
   }
   else {
-    PVLIn(ui.GetFilename("FROMSTATS"));
+    PVLIn(ui.GetFileName("FROMSTATS"));
   }
 
   //check to make sure the first vector has as many elements as the last
@@ -105,15 +105,15 @@ void IsisMain() {
   if((band.size() != (unsigned int)(rowcol * totalBands)) ||
       (st.size() != (unsigned int)(rowcol * totalBands))) {
     string message = "You have entered an invalid input file " +
-                     ui.GetFilename("FROMSTATS");
+                     ui.GetFileName("FROMSTATS");
     throw IException(IException::Io, message, _FILEINFO_);
   }
 
   //If a STATS file was specified then create statistics file
   if(ui.WasEntered("STATS")) {
     string op = ui.GetString("FORMAT");
-    if(op == "PVL")    pvlOut(ui.GetFilename("STATS"));
-    if(op == "TABLE")  tableOut(ui.GetFilename("STATS"));
+    if(op == "PVL")    pvlOut(ui.GetFileName("STATS"));
+    if(op == "TABLE")  tableOut(ui.GetFileName("STATS"));
   }
 
   // If an output file was specified then normalize the cube
@@ -296,9 +296,9 @@ void tableOut(const string &StatFile) {
 //********************************************************
 // Gather statistics from a PVL input file
 //*******************************************************
-void PVLIn(const Isis::Filename &filename) {
+void PVLIn(const Isis::FileName &filename) {
   Pvl pvlFileIn;
-  pvlFileIn.Read(filename.Name());
+  pvlFileIn.Read(filename.name());
   PvlGroup results = pvlFileIn.FindGroup("Results");
   PvlObject::PvlKeywordIterator itr = results.Begin();
 
@@ -335,14 +335,14 @@ void PVLIn(const Isis::Filename &filename) {
 //********************************************************
 // Gather statistics from a table input file
 //*******************************************************
-void tableIn(const Isis::Filename &filename) {
+void tableIn(const Isis::FileName &filename) {
   ifstream in;
-  string expanded(filename.Expanded());
+  string expanded(filename.expanded());
   in.open(expanded.c_str(), std::ios::in);
 
 
   if(!in) {
-    string message = "Error opening " + filename.Expanded();
+    string message = "Error opening " + filename.expanded();
     throw IException(IException::Io, message, _FILEINFO_);
   }
 

@@ -4,7 +4,7 @@
 #include <fstream>
 #include <string>
 
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "NaifStatus.h"
@@ -24,52 +24,52 @@ using namespace std;
 using namespace Isis;
 
 void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube);
-void ConvertComments(Filename file);
+void ConvertComments(FileName file);
 
 void IsisMain() {
   // We should be processing a PDS file
   ProcessImportPds p;
   UserInterface &ui = Application::GetUserInterface();
-  Filename in = ui.GetFilename("FROM");
+  FileName in = ui.GetFileName("FROM");
 
-  string tempName = "$TEMPORARY/" + in.Basename() + ".img";
-  Filename temp(tempName);
+  string tempName = "$TEMPORARY/" + in.baseName() + ".img";
+  FileName temp(tempName);
 
   bool tempFile = false;
 
   // input files are compressed, use vdcomp to decompress
-  iString ext = iString(in.Extension()).UpCase();
+  iString ext = iString(in.extension()).UpCase();
   if(ext == "IMQ") {
     try {
-      string command = "$ISISROOT/bin/vdcomp " + in.Expanded() + " " + temp.Expanded();
+      string command = "$ISISROOT/bin/vdcomp " + in.expanded() + " " + temp.expanded();
       // don't pretend vdcomp is a standard Isis program, just run it
       ProgramLauncher::RunSystemCommand(command);
-      in = temp.Expanded();
+      in = temp.expanded();
       ConvertComments(in);
       tempFile = true;
     }
     catch(IException &e) {
       throw IException(IException::Io,
                        "Unable to decompress input file ["
-                       + in.Name() + "].", _FILEINFO_);
+                       + in.name() + "].", _FILEINFO_);
     }
   }
   else if (ext == "IMG") {
     // Do nothing
   }
   else {
-    string msg = "Input file [" + in.Name() +
+    string msg = "Input file [" + in.name() +
                  "] does not appear to be a Voyager EDR";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   // Convert the pds file to a cube
   Pvl pdsLabel;
   try {
-    p.SetPdsFile(in.Expanded(), "", pdsLabel);
+    p.SetPdsFile(in.expanded(), "", pdsLabel);
   }
   catch(IException &e) {
     string msg = "Unable to set PDS file.  Decompressed input file ["
-                 + in.Name() + "] does not appear to be a PDS product";
+                 + in.name() + "] does not appear to be a PDS product";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -78,7 +78,7 @@ void IsisMain() {
   TranslateVoyagerLabels(pdsLabel, ocube);
   p.EndProcess();
 
-  if(tempFile) remove(temp.Expanded().c_str());
+  if(tempFile) remove(temp.expanded().c_str());
 }
 
 /**
@@ -86,7 +86,7 @@ void IsisMain() {
  * to       #   Some comment
  * without the extra space.
  */
-void ConvertComments(Filename file) {
+void ConvertComments(FileName file) {
   char tmp[10240];
 
   for(unsigned int i = 0; i < sizeof(tmp) / sizeof(char); i++)
@@ -94,7 +94,7 @@ void ConvertComments(Filename file) {
 
   unsigned int lineStartPos = 0;
   fstream stream;
-  iString filename = file.Expanded();
+  iString filename = file.expanded();
   stream.open(filename.c_str(), fstream::in | fstream::out | fstream::binary);
 
   lineStartPos = stream.tellg();
@@ -130,10 +130,10 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   // Get the directory where the Voyager translation tables are
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
   iString missionDir = (string) dataDir[(string)inputLabel["SpacecraftName"]];
-  Filename transFile(missionDir + "/translations/voyager.trn");
+  FileName transFile(missionDir + "/translations/voyager.trn");
 
   // Get the translation manager ready
-  PvlTranslationManager labelXlater(inputLabel, transFile.Expanded());
+  PvlTranslationManager labelXlater(inputLabel, transFile.expanded());
 
   // Pvl output label
   Pvl *outputLabel = ocube->getLabel();
@@ -293,9 +293,9 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   //* 3 *//
   // Leapsecond kernel
   string lsk = "$ISIS3DATA/base/kernels/lsk/naif????.tls";
-  Filename lskName(lsk);
-  lskName.HighestVersion();
-  furnsh_c(lskName.Expanded().c_str());
+  FileName lskName(lsk);
+  lskName = lskName.highestVersion();
+  furnsh_c(lskName.expanded().c_str());
 
   // Spacecraft clock kernel
   string sclk = "$ISIS3DATA/voyager";
@@ -303,9 +303,9 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   sclk.append("/kernels/sclk/vg");
   sclk.append(spacecraftNumber);
   sclk.append("?????.tsc");
-  Filename sclkName(sclk);
-  sclkName.HighestVersion();
-  furnsh_c(sclkName.Expanded().c_str());
+  FileName sclkName(sclk);
+  sclkName = sclkName.highestVersion();
+  furnsh_c(sclkName.expanded().c_str());
 
   // The purpose of the next two steps, getting the spacecraft clock count,
   // are simply to get get the partition, the very first number 1/...

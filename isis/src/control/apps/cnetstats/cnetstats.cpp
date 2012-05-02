@@ -19,15 +19,15 @@ void IsisMain() {
   try {
     // Process all the inputs first, for errors and to satisfy requirements
     UserInterface &ui = Application::GetUserInterface();
-    string sSerialNumFile = ui.GetFilename("FROMLIST");
+    string sSerialNumFile = ui.GetFileName("FROMLIST");
 
     // Get the DefFile
     string sDefFile = "";
     string sOutFile = "";
     Pvl pvlDefFile;
     if (ui.WasEntered("DEFFILE")) {
-      sDefFile = ui.GetFilename("DEFFILE");
-      sOutFile = ui.GetFilename("FLATFILE");
+      sDefFile = ui.GetFileName("DEFFILE");
+      sOutFile = ui.GetFileName("FLATFILE");
       pvlDefFile = Pvl(sDefFile);
 
       // Log the DefFile - Cannot log Object... only by Group
@@ -58,18 +58,18 @@ void IsisMain() {
     // Get the Image Stats File
     string sImageFile= "";
     if (ui.WasEntered("CREATE_IMAGE_STATS") && ui.GetBoolean("CREATE_IMAGE_STATS")) {
-      sImageFile = ui.GetFilename("IMAGE_STATS_FILE");
+      sImageFile = ui.GetFileName("IMAGE_STATS_FILE");
     }
 
     // Get the Point Stats File
     string sPointFile="";
     if (ui.WasEntered("CREATE_POINT_STATS") && ui.GetBoolean("CREATE_POINT_STATS")) {
-      sPointFile = ui.GetFilename("POINT_STATS_FILE");
+      sPointFile = ui.GetFileName("POINT_STATS_FILE");
     }
 
      // Get the original control net internalized
     Progress progress;
-    ControlNet cNet(ui.GetFilename("CNET"), &progress);
+    ControlNet cNet(ui.GetFileName("CNET"), &progress);
 
     Progress statsProgress;
     ControlNetFilter cNetFilter(&cNet, sSerialNumFile, &statsProgress);

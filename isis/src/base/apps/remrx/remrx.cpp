@@ -27,7 +27,7 @@ void IsisMain() {
   Cube *icube = p.SetInputCube("FROM");
   PvlKeyword &status = icube->getGroup("RESEAUS")["STATUS"];
   UserInterface &ui = Application::GetUserInterface();
-  string in = ui.GetFilename("FROM");
+  string in = ui.GetFileName("FROM");
 
   // Check reseau status and make sure it is not nominal or removed
   if((string)status == "Nominal") {
@@ -54,7 +54,7 @@ void IsisMain() {
   ldim = ui.GetInteger("LDIM");
 
   // Get other user entered options
-  string out = ui.GetFilename("TO");
+  string out = ui.GetFileName("TO");
   resvalid = ui.GetBoolean("RESVALID");
   action = ui.GetString("ACTION");
 

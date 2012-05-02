@@ -6,7 +6,8 @@
 
 #include "CubeViewport.h"
 #include "MdiCubeViewport.h"
-#include "Filename.h"
+#include "FileName.h"
+#include "iString.h"
 #include "RubberBandTool.h"
 #include "ToolPad.h"
 #include "Workspace.h"
@@ -27,8 +28,8 @@ namespace Isis {
     p_active = false;
     p_toolPadAction = NULL;
     p_toolBarWidget = NULL;
-    std::string tempFilename = Filename("$base/icons").Expanded();
-    p_toolIconDir = tempFilename.c_str();
+    std::string tempFileName = FileName("$base/icons").expanded();
+    p_toolIconDir = tempFileName.c_str();
   }
 
 

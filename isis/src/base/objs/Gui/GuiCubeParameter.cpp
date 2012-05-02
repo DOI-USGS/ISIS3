@@ -36,7 +36,7 @@
 
 #include "Application.h"
 #include "Cube.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "GuiCubeParameter.h"
 #include "GuiInputAttribute.h"
 #include "GuiOutputAttribute.h"
@@ -58,7 +58,7 @@ namespace Isis {
    */
   GuiCubeParameter::GuiCubeParameter(QGridLayout *grid, UserInterface &ui,
                                      int group, int param) :
-    GuiFilenameParameter(grid, ui, group, param) {
+    GuiFileNameParameter(grid, ui, group, param) {
     p_menu = new QMenu();
 
     QAction *fileAction = new QAction(this);
@@ -112,8 +112,8 @@ namespace Isis {
                    p_ui->ParamName(p_group, p_param),
                    p_fileButton);
       if((status == 1) && (curAtt != newAtt)) {
-        Isis::Filename f(p_lineEdit->text().toStdString());
-        p_lineEdit->setText((iString)(f.Expanded() + newAtt));
+        Isis::FileName f(p_lineEdit->text().toStdString());
+        p_lineEdit->setText((iString)(f.expanded() + newAtt));
       }
     }
     else {
@@ -129,8 +129,8 @@ namespace Isis {
                    allowProp,
                    p_fileButton);
       if((status == 1) && (curAtt != newAtt)) {
-        Isis::Filename f(p_lineEdit->text().toStdString());
-        p_lineEdit->setText((iString)(f.Expanded() + newAtt));
+        Isis::FileName f(p_lineEdit->text().toStdString());
+        p_lineEdit->setText((iString)(f.expanded() + newAtt));
       }
     }
 

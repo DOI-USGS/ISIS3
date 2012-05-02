@@ -60,7 +60,7 @@ void IsisMain() {
   // Get the output projection set up properly
   if(ui.GetBoolean("CREATE")) {
     Cube inCube;
-    inCube.open(ui.GetFilename("FROM"));
+    inCube.open(ui.GetFileName("FROM"));
 
     // Set the create flag
     m.SetCreateFlag(true);
@@ -76,10 +76,10 @@ void IsisMain() {
 
     CubeAttributeOutput oAtt = ui.GetOutputAttribute("MOSAIC");
 
-    m.SetOutputCube(sInputFile, mapGroup, oAtt, ui.GetFilename("MOSAIC"));
+    m.SetOutputCube(sInputFile, mapGroup, oAtt, ui.GetFileName("MOSAIC"));
   }
   else {
-    m.SetOutputCube(ui.GetFilename("MOSAIC"));
+    m.SetOutputCube(ui.GetFileName("MOSAIC"));
   }
 
   
@@ -91,7 +91,7 @@ void IsisMain() {
   if(!m.StartProcess(sInputFile)) {
     // Logs the cube if it falls outside of the given mosaic
     PvlGroup outsiders("Outside");
-    outsiders += PvlKeyword("File", ui.GetFilename("FROM"));
+    outsiders += PvlKeyword("File", ui.GetFileName("FROM"));
     Application::Log(outsiders);
   }
   else {
@@ -99,7 +99,7 @@ void IsisMain() {
     PvlGroup imgPosition("ImageLocation");
     int iStartLine   =  m.GetInputStartLineInMosaic();
     int iStartSample =  m.GetInputStartSampleInMosaic();
-    imgPosition   += PvlKeyword("File", ui.GetFilename("FROM"));
+    imgPosition   += PvlKeyword("File", ui.GetFileName("FROM"));
     imgPosition   += PvlKeyword("StartSample", iStartSample);
     imgPosition   += PvlKeyword("StartLine", iStartLine);
     Application::Log(imgPosition);

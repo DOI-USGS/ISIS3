@@ -25,16 +25,16 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Get the list of cubes to mosaic
-  list.Read(ui.GetFilename("FROMLIST"));
+  list.Read(ui.GetFileName("FROMLIST"));
   if(list.size() < 1) {
-    string msg = "The list file [" + ui.GetFilename("FROMLIST") +"does not contain any data";
+    string msg = "The list file [" + ui.GetFileName("FROMLIST") +"does not contain any data";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   fstream os;
   bool olistFlag = false;
   if (ui.WasEntered("TOLIST")){
-    string olist = ui.GetFilename("TOLIST");
+    string olist = ui.GetFileName("TOLIST");
     olistFlag = true;
     os.open(olist.c_str(), std::ios::out);
   }
@@ -89,10 +89,10 @@ void IsisMain() {
     m.SetOutputCube(list,
                     ui.GetDouble("MINLAT"), ui.GetDouble("MAXLAT"),
                     ui.GetDouble("MINLON"), ui.GetDouble("MAXLON"),
-                    oAtt, ui.GetFilename("MOSAIC"));
+                    oAtt, ui.GetFileName("MOSAIC"));
   }
   else {
-    m.SetOutputCube(list, oAtt, ui.GetFilename("MOSAIC"));
+    m.SetOutputCube(list, oAtt, ui.GetFileName("MOSAIC"));
   }
 
   m.SetHighSaturationFlag(ui.GetBoolean("HIGHSATURATION"));
@@ -142,7 +142,7 @@ void IsisMain() {
 // Function to calculate the ground range from multiple inputs (list of images)
 void calcRange(double &minLat, double &maxLat, double &minLon, double &maxLon) {
   UserInterface &ui = Application::GetUserInterface();
-  FileList list(ui.GetFilename("FROMLIST"));
+  FileList list(ui.GetFileName("FROMLIST"));
   minLat = DBL_MAX;
   maxLat = -DBL_MAX;
   minLon = DBL_MAX;

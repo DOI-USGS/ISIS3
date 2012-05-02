@@ -1,7 +1,7 @@
 #include "Isis.h"
 #include "ProcessImportPds.h"
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "Pvl.h"
@@ -17,7 +17,7 @@ using namespace Isis;
 
 void ResetGlobals();
 void Import(Buffer &buf);
-void TranslateLrocNacLabels(Filename &labelFile, Cube *ocube);
+void TranslateLrocNacLabels(FileName &labelFile, Cube *ocube);
 
 // Global variables for processing functions
 Cube *g_ocube;
@@ -30,22 +30,22 @@ void IsisMain() {
 
   //Check that the file comes from the right camera
   UserInterface &ui = Application::GetUserInterface();
-  Filename inFile = ui.GetFilename("FROM");
+  FileName inFile = ui.GetFileName("FROM");
   iString id;
   try {
-    Pvl lab(inFile.Expanded());
+    Pvl lab(inFile.expanded());
 
     if(lab.HasKeyword("DATA_SET_ID"))
       id = (string) lab.FindKeyword("DATA_SET_ID");
     else {
-      string msg = "Unable to read [DATA_SET_ID] from input file [" + inFile.Expanded() + "]";
+      string msg = "Unable to read [DATA_SET_ID] from input file [" + inFile.expanded() + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     //Checks if in file is rdr
     bool projected = lab.HasObject("IMAGE_MAP_PROJECTION");
     if(projected) {
-      string msg = "[" + inFile.Name() + "] appears to be an rdr file.";
+      string msg = "[" + inFile.name() + "] appears to be an rdr file.";
       msg += " Use pds2isis.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -82,7 +82,7 @@ void IsisMain() {
   id.Compress();
   id.Trim(" ");
   if(id.substr(13, 3) != "EDR") {
-    string msg = "Input file [" + inFile.Expanded() + "] does not appear to be "
+    string msg = "Input file [" + inFile.expanded() + "] does not appear to be "
                  + "in LROC-NAC EDR format. DATA_SET_ID is [" + id + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
@@ -90,7 +90,7 @@ void IsisMain() {
   //Process the file
   Pvl pdsLab;
   ProcessImportPds p;
-  p.SetPdsFile(inFile.Expanded(), "", pdsLab);
+  p.SetPdsFile(inFile.expanded(), "", pdsLab);
 
   // Set the output bit type to Real
   CubeAttributeOutput &outAtt = ui.GetOutputAttribute("TO");
@@ -103,7 +103,7 @@ void IsisMain() {
   if(outAtt.AttachedLabel()) g_ocube->setLabelsAttached(true);
   g_ocube->setDimensions(p.Samples(), p.Lines(), p.Bands());
   g_ocube->setPixelType(Isis::Real);
-  g_ocube->create(ui.GetFilename("TO"));
+  g_ocube->create(ui.GetFileName("TO"));
 
   // Do 8 bit to 12 bit conversion
   // And if NAC-R, flip the frame
@@ -181,31 +181,31 @@ void Import(Buffer &in) {
 }
 
 //Function to translate the labels
-void TranslateLrocNacLabels(Filename &labelFile, Cube *ocube) {
+void TranslateLrocNacLabels(FileName &labelFile, Cube *ocube) {
 
   //Pvl to store the labels
   Pvl outLabel;
   //Set up the directory where the translations are
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
   iString transDir = (string) dataDir["Lro"] + "/translations/";
-  Pvl labelPvl(labelFile.Expanded());
+  Pvl labelPvl(labelFile.expanded());
 
   //Translate the Instrument group
-  Filename transFile(transDir + "lronacInstrument.trn");
-  PvlTranslationManager instrumentXlator(labelPvl, transFile.Expanded());
+  FileName transFile(transDir + "lronacInstrument.trn");
+  PvlTranslationManager instrumentXlator(labelPvl, transFile.expanded());
   instrumentXlator.Auto(outLabel);
 
   //Translate the Archive group
   transFile = transDir + "lronacArchive.trn";
-  PvlTranslationManager archiveXlater(labelPvl, transFile.Expanded());
+  PvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   //Translate the BandBin group
   transFile = transDir + "lronacBandBin.trn";
-  PvlTranslationManager bandBinXlater(labelPvl, transFile.Expanded());
+  PvlTranslationManager bandBinXlater(labelPvl, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
-  Pvl lab(labelFile.Expanded());
+  Pvl lab(labelFile.expanded());
 
   //Set up the Kernels group
   PvlGroup kern("Kernels");

@@ -25,7 +25,7 @@
 #include "AutoReg.h"
 #include "Plugin.h"
 #include "IException.h"
-#include "Filename.h"
+#include "FileName.h"
 
 namespace Isis {
   /**
@@ -65,8 +65,8 @@ namespace Isis {
 
     // Open the factory plugin file
     Plugin p;
-    Filename f("AutoReg.plugin");
-    if(f.Exists()) {
+    FileName f("AutoReg.plugin");
+    if(f.fileExists()) {
       p.Read("AutoReg.plugin");
     }
     else {

@@ -4,7 +4,7 @@
 #include "Cube.h"
 #include "Process.h"
 #include "PvlTranslationManager.h"
-#include "Filename.h"
+#include "FileName.h"
 
 namespace Isis {
   /**
@@ -32,9 +32,9 @@ namespace Isis {
       if(def2filename) {
         //  Try to return the filename if it exists in the label, otherwise use
         //  "Unknown" as a last resort.
-        std::string snTemp = label.Filename();
+        std::string snTemp = label.FileName();
         if(!snTemp.empty()) {
-          sn = Filename(snTemp).Name();
+          sn = FileName(snTemp).name();
         }
         else {
           sn = "Unknown";
@@ -100,12 +100,12 @@ namespace Isis {
 
     if(translationIterator == missionTranslators.end()) {
       // Get the file
-      Filename snFile((std::string) dataDir[mission] + "/translations/" +
+      FileName snFile((std::string) dataDir[mission] + "/translations/" +
                                     instrument + "SerialNumber????.trn");
-      snFile.HighestVersion();
+      snFile = snFile.highestVersion();
 
       // Delets the extra
-      Pvl translation(snFile.Expanded());
+      Pvl translation(snFile.expanded());
       PvlKeyword observationKeys;
       if(translation.HasKeyword("ObservationKeys")) {
         observationKeys = translation["ObservationKeys"];
@@ -114,7 +114,7 @@ namespace Isis {
       // use the translation file to generate keywords
       missionTranslators.insert(
         std::pair<std::string, std::pair<PvlTranslationManager, PvlKeyword> >
-        (key, std::pair<PvlTranslationManager, PvlKeyword>(PvlTranslationManager(snFile.Expanded()), observationKeys))
+        (key, std::pair<PvlTranslationManager, PvlKeyword>(PvlTranslationManager(snFile.expanded()), observationKeys))
       );
 
       translationIterator = missionTranslators.find(key);

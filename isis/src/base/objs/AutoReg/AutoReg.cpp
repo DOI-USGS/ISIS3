@@ -19,7 +19,7 @@
 #include "AutoReg.h"
 #include "Buffer.h"
 #include "Chip.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Histogram.h"
 #include "LeastSquares.h"
 #include "IException.h"
@@ -295,7 +295,7 @@ namespace Isis {
 
     }
     catch(IException &e) {
-      string msg = "Improper format for AutoReg PVL [" + pvl.Filename() + "]";
+      string msg = "Improper format for AutoReg PVL [" + pvl.FileName() + "]";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
     return;
@@ -1366,8 +1366,8 @@ namespace Isis {
    */
   AutoRegItem AutoReg::RegisterInformation() {
     AutoRegItem item;
-    item.setSearchFile(p_searchChip.Filename());
-    item.setPatternFile(p_patternChip.Filename());
+    item.setSearchFile(p_searchChip.FileName());
+    item.setPatternFile(p_patternChip.FileName());
     //item.setStatus(p_registrationStatus);
     item.setGoodnessOfFit(p_goodnessOfFit);
     item.setEccentricity(p_surfaceModelEccentricity);

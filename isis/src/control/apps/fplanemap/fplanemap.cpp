@@ -45,13 +45,13 @@ void IsisMain() {
   CubeAttributeInput &attFrom = ui.GetInputAttribute("FROM");
   vector<string> bandFrom = attFrom.Bands();
   from.setVirtualBands(bandFrom);
-  from.open(ui.GetFilename("FROM"), "r");
+  from.open(ui.GetFileName("FROM"), "r");
   Camera *fcamera = from.getCamera();
   CameraDistortionMap *dmap = fcamera->DistortionMap();
 
 
   // Initialize control point network
-  ControlNet cn(ui.GetFilename("CNETFILE"));
+  ControlNet cn(ui.GetFileName("CNETFILE"));
   bool checkForNulls = ui.GetBoolean("CHECKDN");
 
   double dtol = ui.GetDouble("TOLERANCE");
@@ -161,7 +161,7 @@ void IsisMain() {
   // The flatfile is comma seperated and can be imported into an excel
   // spreadsheet
   if(ui.WasEntered("TO")) {
-    string fFile = Filename(ui.GetFilename("TO")).Expanded();
+    string fFile = FileName(ui.GetFileName("TO")).expanded();
     ofstream os;
     os.open(fFile.c_str(), ios::out);
     os << "OldSample,OldLine,NewSample,NewLine," <<

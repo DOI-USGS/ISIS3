@@ -16,11 +16,11 @@ void IsisMain() {
   // Import cube data & PVL information
   Cube cube;
   UserInterface &ui = Application::GetUserInterface();
-  cube.open(ui.GetFilename("FROM"), "rw");
+  cube.open(ui.GetFileName("FROM"), "rw");
   Pvl *regdef;
   // If regdef was supplied by the user, use it. else, use the template.
   if(ui.WasEntered("REGDEF")) {
-    regdef = new Pvl(ui.GetFilename("REGDEF"));
+    regdef = new Pvl(ui.GetFileName("REGDEF"));
   }
   else {
     regdef = new Pvl("$base/templates/autoreg/findrx.def");

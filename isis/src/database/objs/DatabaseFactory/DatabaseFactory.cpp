@@ -34,7 +34,7 @@ using namespace std;
 #include "DatabaseFactory.h"
 #include "DbAccess.h"
 #include "Preference.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 
 namespace Isis {
@@ -161,8 +161,8 @@ namespace Isis {
    */
   bool DatabaseFactory::addAccessProfile(const std::string &profileFile) {
     try {
-      Filename dbconf(profileFile);
-      if(dbconf.Exists()) {
+      FileName dbconf(profileFile);
+      if(dbconf.fileExists()) {
         DbAccess acp(profileFile);
 
         //  Add the top level one - may be replaced

@@ -27,7 +27,7 @@ Testing Isis::PvlTranslationManager object
     GoodGroupBadKey = 0
 
   Testing Translate member
-    DataFilename = SomeFile.dat
+    DataFileName = SomeFile.dat
     ImageStartByte   = 32
     Lines = 500
 

@@ -161,10 +161,10 @@ void IsisMain() {
 
   // Add the radiometry group
   PvlGroup calgrp("Radiometry");
-  calgrp += PvlKeyword("FlatFieldFile", ffcube->getFilename());
+  calgrp += PvlKeyword("FlatFieldFile", ffcube->getFileName());
 
   if(ui.GetString("DARKCURRENT").compare("DCFILE") == 0) {
-    calgrp += PvlKeyword("DarkCurrentFile", dccube->getFilename());
+    calgrp += PvlKeyword("DarkCurrentFile", dccube->getFileName());
   }
   else {
     calgrp += PvlKeyword("DarkCurrentConstant", dcconst);

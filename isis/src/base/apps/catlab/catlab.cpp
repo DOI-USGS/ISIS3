@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "Filename.h"
+#include "FileName.h"
 #include "Pvl.h"
 #include "UserInterface.h"
 
@@ -14,7 +14,7 @@ void IsisMain() {
 
   // Get filename provided by the user
   UserInterface &ui = Application::GetUserInterface();
-  string file = ui.GetFilename("FROM");
+  string file = ui.GetFileName("FROM");
   
   // Extract label from file
   Pvl label(file);
@@ -22,10 +22,10 @@ void IsisMain() {
   // Output to file if entered
   if(ui.WasEntered("TO")) {
     if (ui.GetBoolean("APPEND")) {
-      label.Append(Filename(ui.GetFilename("TO")).Expanded());
+      label.Append(FileName(ui.GetFileName("TO")).expanded());
     }
     else {
-      label.Write(Filename(ui.GetFilename("TO")).Expanded());
+      label.Write(FileName(ui.GetFileName("TO")).expanded());
     }
   }
 

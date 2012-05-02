@@ -54,7 +54,7 @@ void IsisMain() {
 
   //check if the image is calibrated
   if(pack->hasGroup("Radiometry")) {
-    string msg = "The MI image [" + pack->getFilename() + "] has already "
+    string msg = "The MI image [" + pack->getFileName() + "] has already "
                  "been radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -62,11 +62,11 @@ void IsisMain() {
   //Open the calibration kernel that contains constrnts for each camera
   string calKernelFile;
   if(ui.WasEntered("CALKERNEL")) {
-    calKernelFile = ui.GetFilename("CALKERNEL");
+    calKernelFile = ui.GetFileName("CALKERNEL");
     cout << "use the user kernel" << endl;
   }
   else {
-    calKernelFile = p.MissionData("mer", "/calibration/mical.ker.???", true);
+    calKernelFile = p.MissionData("mer", "calibration/mical.ker.???", true);
     cout << "use the system kernel" << endl;
   }
   Pvl calKernel(calKernelFile);
@@ -120,7 +120,7 @@ void IsisMain() {
   else if(ui.WasEntered("REFPIXIMAGE")) {
     Brick *b;
     Cube ERPfile;
-    ERPfile.open(ui.GetFilename("REFPIXIMAGE"));
+    ERPfile.open(ui.GetFileName("REFPIXIMAGE"));
     b = new Brick(11, 201, 1, ERPfile.getPixelType());
     b->SetBasePosition(4, 412, 1);
     ERPfile.read(*b);
@@ -132,7 +132,7 @@ void IsisMain() {
     gbl::ReferencePixelValue = stat.Average();
 
     calgrp += PvlKeyword("ReferencePixelValueSource", "ERPImage");
-    calgrp += PvlKeyword("ReferencePixelValueImage", ui.GetFilename("REFPIXIMAGE"));
+    calgrp += PvlKeyword("ReferencePixelValueImage", ui.GetFileName("REFPIXIMAGE"));
     calgrp += PvlKeyword("ReferencePixelValue", gbl::ReferencePixelValue);
   }
   else {
@@ -174,7 +174,7 @@ void IsisMain() {
   //
 
   if(ui.WasEntered("FLATFIELD")) {
-    p.SetInputCube(ui.GetFilename("FLATFIELD"), att);
+    p.SetInputCube(ui.GetFileName("FLATFIELD"), att);
     if(stagestop == "FLAT" || stagestop == "IOF") {
       calgrp += PvlKeyword("FlatFieldImage", gbl::mi->FlatImageOpen());
     }
@@ -304,7 +304,7 @@ void helperButtonLogCalKernel() {
   UserInterface &ui = Application::GetUserInterface();
   string calKernelFile;
   if(ui.WasEntered("CALKERNEL")) {
-    calKernelFile = ui.GetFilename("CALKERNEL");
+    calKernelFile = ui.GetFileName("CALKERNEL");
   }
   else {
     //    calKernelFile = p.MissionData("mer","/calibration/mical.ker.???",true);

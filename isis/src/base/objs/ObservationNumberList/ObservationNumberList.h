@@ -69,7 +69,7 @@ namespace Isis {
 
       std::string ObservationNumber(const std::string &filename);
       std::string ObservationNumber(int index);
-      std::vector<std::string> PossibleFilenames(const std::string &on);
+      std::vector<std::string> PossibleFileNames(const std::string &on);
 
     private:
       struct ObservationSet {

@@ -28,7 +28,7 @@
 #include <sstream>
 
 #include "LoadCSV.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 
 using namespace std;
@@ -80,8 +80,8 @@ namespace Isis {
     if (separator[0] == ' ') csv.setSkipEmptyParts();
 
     //  Now read the file
-    Filename csvF(csvfile);
-    csvfile = csvF.Expanded();
+    FileName csvF(csvfile);
+    csvfile = csvF.expanded();
     try {
       csv.read(csvfile);
     } catch (IException &ie) {

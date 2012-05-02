@@ -21,7 +21,7 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
 
-  string from = ui.GetFilename("FROM");
+  string from = ui.GetFileName("FROM");
 
   // Setup to read headers/labels
   ifstream input;
@@ -88,13 +88,13 @@ void IsisMain() {
 
   // Its possible they could have this instead of T, in which case we won't even try
   if(labels["SIMPLE"][0] == "F") {
-    string msg = "The file [" + ui.GetFilename("FROM") + "] does not conform to the FITS standards";
+    string msg = "The file [" + ui.GetFileName("FROM") + "] does not conform to the FITS standards";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   ProcessImport pfits;
 
-  pfits.SetInputFile(ui.GetFilename("FROM"));
+  pfits.SetInputFile(ui.GetFileName("FROM"));
 
   // Header size will be a multiple of 2880
   int multiple = (int)((place + 2881) / 2880);

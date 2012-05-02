@@ -328,7 +328,7 @@ void IsisMain() {
       mainpvl.AddGroup(note);
     }
     mainpvl.AddGroup(results);
-    string sOutFile = ui.GetFilename("TO");
+    string sOutFile = ui.GetFileName("TO");
     bool append = ui.GetBoolean("APPEND");
     ofstream os;
     if (append) {

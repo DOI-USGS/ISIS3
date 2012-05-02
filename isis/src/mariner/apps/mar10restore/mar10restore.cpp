@@ -15,12 +15,12 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
   Cube cube;
-  cube.open(ui.GetFilename("FROM"));
+  cube.open(ui.GetFileName("FROM"));
 
   // Check that it is a Mariner10 cube.
   Pvl * labels = cube.getLabel();
   if ("Mariner_10" != (string)labels->FindKeyword("SpacecraftName", Pvl::Traverse)) {
-    string msg = "The cube [" + ui.GetFilename("FROM") + "] does not appear" +
+    string msg = "The cube [" + ui.GetFileName("FROM") + "] does not appear" +
       " to be a Mariner10 cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -33,7 +33,7 @@ void IsisMain() {
   stats = cp.Statistics();
   // Maximum possible number of good pixels in a 5x5
   if(stats->ValidPixels() > 8) {
-    string msg = "The cube [" + ui.GetFilename("FROM") + "] does not need" +
+    string msg = "The cube [" + ui.GetFileName("FROM") + "] does not need" +
       " reconstruction, try mar10clean instead";
     throw IException(IException::User, msg, _FILEINFO_);
   }

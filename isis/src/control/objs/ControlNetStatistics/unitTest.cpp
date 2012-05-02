@@ -26,13 +26,13 @@ void IsisMain() {
 
   Isis::UserInterface &ui = Isis::Application::GetUserInterface();
 
-  cout << "CNET=" << ui.GetFilename("CNET") << endl;
-  cout << "Serial File=" << ui.GetFilename("FROMLIST") << endl;
+  cout << "CNET=" << ui.GetFileName("CNET") << endl;
+  cout << "Serial File=" << ui.GetFileName("FROMLIST") << endl;
 
-  Isis::ControlNet cnetOrig(ui.GetFilename("CNET"));
+  Isis::ControlNet cnetOrig(ui.GetFileName("CNET"));
   Isis::ControlNet cnet = cnetOrig;
 
-  std::string sSerialFile = ui.GetFilename("FROMLIST");
+  std::string sSerialFile = ui.GetFileName("FROMLIST");
   ControlNetStatistics cnetStats(&cnet, sSerialFile);
 
   PvlGroup statsGrp;

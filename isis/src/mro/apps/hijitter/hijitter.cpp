@@ -20,7 +20,7 @@ vector<iString> redFiles;
 vector<iString> tempFiles;
 int firstFilter;
 int numFiles;
-Filename FindRed(FileList &inList, int n);
+FileName FindRed(FileList &inList, int n);
 void ProcessNoprojFiles(Pipeline &p);
 
 void GetCropLines(const string inFile, double eTime1, double eTime2, int & line1, int & line2, int & numLines);
@@ -66,7 +66,7 @@ void IsisMain() {
   // Get user interface
   UserInterface &ui = Application::GetUserInterface();
 
-  FileList inputList(ui.GetFilename("FROMLIST"));
+  FileList inputList(ui.GetFileName("FROMLIST"));
 
   // We dont actually need all 10... so dont do this exception
   //if(inputList.size() != 10) {
@@ -89,8 +89,8 @@ void IsisMain() {
   Pipeline matchfilePipeline("hijitter - match");
 
   matchfilePipeline.SetInputFile(FindRed(inputList, masterFileNum));
-  matchfilePipeline.SetOutputFile(Filename("$TEMPORARY/matchMaster.cub"));
-  tempFiles.push_back(Filename("$TEMPORARY/matchMaster.cub").Expanded());
+  matchfilePipeline.SetOutputFile(FileName("$TEMPORARY/matchMaster.cub"));
+  tempFiles.push_back(FileName("$TEMPORARY/matchMaster.cub").expanded());
 
   matchfilePipeline.KeepTemporaryFiles(false);
 
@@ -110,11 +110,11 @@ void IsisMain() {
   Pipeline p("hijitter");
 
   p.SetInputListFile("FROM");
-  p.SetOutputFile(Filename("$TEMPORARY/noproj"));
+  p.SetOutputFile(FileName("$TEMPORARY/noproj"));
 
   for(int i = 0; i < numFiles; i++) {
     tempFiles.push_back(
-      Filename("$TEMPORARY/noproj.FROM" + iString(i + 1) + ".noproj.cub").Expanded()
+      FileName("$TEMPORARY/noproj.FROM" + iString(i + 1) + ".noproj.cub").expanded()
     );
   }
 
@@ -137,8 +137,8 @@ void IsisMain() {
 
   p.AddToPipeline("noproj");
   p.Application("noproj").SetInputParameter("FROM", true);
-  p.Application("noproj").AddConstParameter("MATCH", Filename("$TEMPORARY/matchMaster.cub").Expanded());
-  p.Application("noproj").SetOutputParameter("TO", Filename("$TEMPORARY/noproj").Expanded());
+  p.Application("noproj").AddConstParameter("MATCH", FileName("$TEMPORARY/matchMaster.cub").expanded());
+  p.Application("noproj").SetOutputParameter("TO", FileName("$TEMPORARY/noproj").expanded());
 
   p.Prepare();
 
@@ -150,7 +150,7 @@ void IsisMain() {
 
   // the outputs are temporary files
   for(int redNum = 0; redNum < numFiles; redNum++)
-    tempFiles.push_back(Filename("$TEMPORARY/noproj.FROM" + iString(redNum + 1) + ".cub").Expanded());
+    tempFiles.push_back(FileName("$TEMPORARY/noproj.FROM" + iString(redNum + 1) + ".cub").expanded());
 
   // Do some calculations, delete the final outputs from the pipeline
   ProcessNoprojFiles(p);
@@ -166,14 +166,14 @@ void IsisMain() {
   p.Run();
 
   if (ui.WasEntered("JITTERCK")) {
-    iString params = "FROM=" + masterFile + " TO=" + ui.GetFilename("JITTERCK");
+    iString params = "FROM=" + masterFile + " TO=" + ui.GetFileName("JITTERCK");
 
     try {
       ProgramLauncher::RunIsisProgram("ckwriter", params);
     }
     catch(IException &e) {
       iString message = "Creation of the output ck, " +
-        ui.GetFilename("JITTERCK") + " failed.";
+        ui.GetFileName("JITTERCK") + " failed.";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
@@ -199,8 +199,8 @@ void IsisMain() {
       string inFile(p.FinalOutput(i).c_str());
       string outFile = "temp_"+tag+".cub";
 
-      pcrop.SetInputFile(Filename(inFile));
-      pcrop.SetOutputFile(Filename(outFile));
+      pcrop.SetInputFile(FileName(inFile));
+      pcrop.SetOutputFile(FileName(outFile));
 
       pcrop.AddToPipeline("crop", tag);
       pcrop.Application(tag).SetInputParameter ("FROM",   false);
@@ -229,9 +229,9 @@ void IsisMain() {
  * @param inList Input file list
  * @param n Red CCD to return
  *
- * @return Filename Name of the CCD file
+ * @return FileName Name of the CCD file
  */
-Filename FindRed(FileList &inList, int n) {
+FileName FindRed(FileList &inList, int n) {
   iString nonMroFile = "";
 
   if(n > 9 || n < 0) {
@@ -251,8 +251,8 @@ Filename FindRed(FileList &inList, int n) {
   int lastRedNum = -1;
   for(unsigned int i = 0; nonMroFile.empty() && i < inList.size(); i++) {
     try {
-      Filename currentFilename(inList[i]);
-      Pvl labels(currentFilename.Expanded());
+      FileName currentFileName(inList[i]);
+      Pvl labels(currentFileName.expanded());
       PvlGroup &inst = labels.FindGroup("Instrument", Pvl::Traverse);
 
       string redNum = ((string)inst["CcdId"]).substr(3);
@@ -314,12 +314,12 @@ void ProcessNoprojFiles(Pipeline &p) {
   int count = numFiles - 1;
 
   for(int i = 0; i < numFiles - 1; i++) {
-    iString tempDir = Filename("$TEMPORARY").Expanded();
+    iString tempDir = FileName("$TEMPORARY").expanded();
     iString flatFileLoc = tempDir + "/first" + iString(firstFilter + i) + "-" + iString(firstFilter + i + 1) + ".flat";
 
     iString params = "FROM=" + tempDir + "/noproj.FROM" + iString(i + 1) + ".cub";
     params += " MATCH=" + tempDir + "/noproj.FROM" + iString(i + 2) + ".cub";
-    params += " REGDEF=" + ui.GetFilename("REGDEF");
+    params += " REGDEF=" + ui.GetFileName("REGDEF");
     params += " FLAT=" + flatFileLoc;
 
     try {
@@ -382,7 +382,7 @@ void ProcessNoprojFiles(Pipeline &p) {
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
-  Pvl labels(Filename("$TEMPORARY/noproj.FROM1.cub").Expanded());
+  Pvl labels(FileName("$TEMPORARY/noproj.FROM1.cub").expanded());
   Camera *cam = CameraFactory::Create(labels);
 
   double lineRate = cam->DetectorMap()->LineRate();

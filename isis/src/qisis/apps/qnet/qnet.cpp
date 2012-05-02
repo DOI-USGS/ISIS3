@@ -5,7 +5,7 @@
 
 #include "AdvancedTrackTool.h"
 #include "BandTool.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "FindTool.h"
 #include "Gui.h"
 #include "HelpTool.h"
@@ -63,8 +63,8 @@ int main(int argc, char *argv[]) {
     }
 
     // Add the Qt plugin directory to the library path
-    Filename qtpluginpath("$ISISROOT/3rdParty/plugins");
-    QCoreApplication::addLibraryPath(qtpluginpath.Expanded().c_str());
+    FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
+    QCoreApplication::addLibraryPath(qtpluginpath.expanded().c_str());
 
     Qnet::g_vpMainWindow = new ViewportMainWindow("qnet");
 

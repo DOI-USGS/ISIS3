@@ -1,6 +1,6 @@
 #include "JP2Importer.h"
 
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "JP2Decoder.h"
 #include "ProcessImport.h"
@@ -14,13 +14,13 @@ namespace Isis {
    *
    * @param inputName The name of the input image
    */
-  JP2Importer::JP2Importer(Filename inputName) : ImageImporter(inputName) {
+  JP2Importer::JP2Importer(FileName inputName) : ImageImporter(inputName) {
     m_decoder = NULL;
     m_buffer = NULL;
 
     try {
       // Determine if input file is a JPEG2000 file
-      m_decoder = new JP2Decoder(inputName.Expanded());
+      m_decoder = new JP2Decoder(inputName.expanded());
       m_decoder->OpenFile();
       setSamples(m_decoder->GetSampleDimension());
       setLines(m_decoder->GetLineDimension());
@@ -36,7 +36,7 @@ namespace Isis {
       }
       else {
         throw IException(IException::User,
-            "The file [" + filename().Expanded() +
+            "The file [" + filename().expanded() +
             "] contains unsupported data type",
             _FILEINFO_);
       }
@@ -49,7 +49,7 @@ namespace Isis {
     }
     catch (IException &e) {
       throw IException(IException::Programmer,
-          "The file [" + inputName.Expanded() +
+          "The file [" + inputName.expanded() +
           "] cannot be opened as a JPEG 2000 file",
           _FILEINFO_);
     }

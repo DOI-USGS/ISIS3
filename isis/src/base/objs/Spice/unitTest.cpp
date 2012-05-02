@@ -21,7 +21,7 @@
 #include <iomanip>
 
 #include "Distance.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Spice.h"
@@ -90,8 +90,8 @@ int main(int argc, char *argv[]) {
   inst += PvlKeyword("TargetName", "Mard");
 
   PvlGroup kern("Kernels");
-  Filename f("$base/testData/kernels");
-  string dir = f.Expanded() + "/";
+  FileName f("$base/testData/kernels");
+  string dir = f.expanded() + "/";
   kern += PvlKeyword("NaifFrameCode", -94031);
   kern += PvlKeyword("LeapSecond", dir + "naif0007.tls");
   kern += PvlKeyword("SpacecraftClock", dir + "MGS_SCLKSCET.00045.tsc");

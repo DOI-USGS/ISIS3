@@ -226,7 +226,7 @@ namespace Isis {
 
     // Store off the cube address in case someone wants to match
     // this chip
-    p_filename = cube.getFilename();
+    p_filename = cube.getFileName();
   }
 
   /**
@@ -272,7 +272,7 @@ namespace Isis {
 
     // Store off the cube address in case someone wants to match
     // this chip
-    p_filename = cube.getFilename();
+    p_filename = cube.getFileName();
   }
 
 
@@ -329,7 +329,7 @@ namespace Isis {
       }
       catch(IException &error2) {
         string msg = "Can not geom chip.  ";
-        msg += "Match chip cube [" + matchChipCube.getFilename();
+        msg += "Match chip cube [" + matchChipCube.getFileName();
         msg += "] is not a camera or map projection";
 
         IException fullError(IException::User, msg, _FILEINFO_);
@@ -352,7 +352,7 @@ namespace Isis {
       }
       catch(IException &error2) {
         string msg = "Can not geom chip.  ";
-        msg += "Chip cube [" + cube.getFilename();
+        msg += "Chip cube [" + cube.getFileName();
         msg += "] is not a camera or map projection";
 
         IException fullError(IException::User, msg, _FILEINFO_);
@@ -516,8 +516,8 @@ namespace Isis {
 
     if(xp.size() < 3) {
       string msg = "Cannot find enough points to perform Affine transformation.  ";
-      msg += "Unable to load chip from [" + cube.getFilename();
-      msg += "] to match chip from [" + matchChipCube.getFilename() + "].";
+      msg += "Unable to load chip from [" + cube.getFileName();
+      msg += "] to match chip from [" + matchChipCube.getFileName() + "].";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -539,7 +539,7 @@ namespace Isis {
 
     // Store off the cube address in case someone wants to match
     // this chip
-    p_filename = cube.getFilename();
+    p_filename = cube.getFileName();
   }
 
 

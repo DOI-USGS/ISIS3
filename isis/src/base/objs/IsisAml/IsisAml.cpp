@@ -26,7 +26,7 @@
 #include <xercesc/util/TransService.hpp>
 #include <xercesc/sax2/XMLReaderFactory.hpp>
 
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "IsisAml.h"
 #include "IsisXMLChTrans.h"
@@ -208,7 +208,7 @@ void IsisAml::PutString(const string &paramName,
  * @param value The string representation of the value to be placed in the
  * filename's value data member.
  */
-void IsisAml::PutFilename(const string &paramName,
+void IsisAml::PutFileName(const string &paramName,
                           const string &value) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
@@ -250,7 +250,7 @@ void IsisAml::PutFilename(const string &paramName,
  * Use "Clear" to erase all values in the value data member instead of
  * overwriting an existing value.
  */
-void IsisAml::PutFilename(const string &paramName,
+void IsisAml::PutFileName(const string &paramName,
                           const vector<string> &value) {
 
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
@@ -620,7 +620,7 @@ void IsisAml::GetAsString(const string &paramName,
  *
  * @return The value of the parameter.
  */
-Isis::iString IsisAml::GetFilename(const string &paramName, string extension) const {
+Isis::iString IsisAml::GetFileName(const string &paramName, string extension) const {
 
   const IsisParameterData *param = ReturnParam(paramName);
 
@@ -643,9 +643,9 @@ Isis::iString IsisAml::GetFilename(const string &paramName, string extension) co
     value = param->values[0];
   }
 
-  Isis::Filename name(value);
-  if(extension != "") name.AddExtension(extension);
-  value = name.Expanded();
+  Isis::FileName name(value);
+  if(extension != "") name = name.addExtension(extension);
+  value = name.expanded();
 
   return value;
 }
@@ -660,7 +660,7 @@ Isis::iString IsisAml::GetFilename(const string &paramName, string extension) co
  * @param values The value membet of the parameter whose name starts with
  * paramName.
  */
-void IsisAml::GetFilename(const string &paramName,
+void IsisAml::GetFileName(const string &paramName,
                           vector<string> &values) const {
 
   const IsisParameterData *param = ReturnParam(paramName);
@@ -678,15 +678,15 @@ void IsisAml::GetFilename(const string &paramName,
     }
     else {
       for(unsigned int i = 0; i < param->defaultValues.size(); i++) {
-        Isis::Filename name(param->defaultValues[i]);
-        values.push_back(name.Expanded());
+        Isis::FileName name(param->defaultValues[i]);
+        values.push_back(name.expanded());
       }
     }
   }
   else {
     for(unsigned int i = 0; i < param->values.size(); i++) {
-      Isis::Filename name(param->values[i]);
-      values.push_back(name.Expanded());
+      Isis::FileName name(param->values[i]);
+      values.push_back(name.expanded());
     }
   }
 
@@ -2071,10 +2071,10 @@ void IsisAml::Verify(const IsisParameterData *param) {
       // If this is an output file and a file with this name already exists,
       // check user filename customization preferences.
       Isis::iString value(param->values[i]);
-      Isis::Filename name(value);
-      value = name.Expanded();
-      if(name.Exists() && param->fileMode == "output") {
-        CheckFilenamePreference(value, param->name);
+      Isis::FileName name(value);
+      value = name.expanded();
+      if(name.fileExists() && param->fileMode == "output") {
+        CheckFileNamePreference(value, param->name);
       }
     }
     // THIS IS CURRENTLY HANDLED IN THE CUBE CLASS, see CubeIoHandler.cpp
@@ -2082,8 +2082,8 @@ void IsisAml::Verify(const IsisParameterData *param) {
     //
     //  else if(param->type == "cube") {
     //    Isis::iString value(param->values[i]);
-    //    Isis::Filename name(value);
-    //    value = name.Expanded();
+    //    Isis::FileName name(value);
+    //    value = name.expanded();
     //    if (name.Exists() && param->fileMode == "output"
     //        && Isis::Preference::Preferences().FindGroup("CubeCustomization").FindKeyword("Overwrite")[0] == "Error") {
     //      string message = "Invalid output cube for [" + param->name + "]. The cube file [" + value + "] already exists.  " +
@@ -2136,10 +2136,10 @@ void IsisAml::Verify(const IsisParameterData *param) {
       else if(param->type == "filename") {
         // Put something here once we figure out what to do with filenames
         Isis::iString value(param->defaultValues[i]);
-        Isis::Filename name(value);
-        value = name.Expanded();
-        if(name.Exists() && param->fileMode == "output") {
-          CheckFilenamePreference(value, param->name);
+        Isis::FileName name(value);
+        value = name.expanded();
+        if(name.fileExists() && param->fileMode == "output") {
+          CheckFileNamePreference(value, param->name);
         }
       }
     }
@@ -2383,7 +2383,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
  * @internal
  *   @history 2010-07-19 Jeannie Walldren - Original version.
  */
-void IsisAml::CheckFilenamePreference(string filename, string paramname) {
+void IsisAml::CheckFileNamePreference(string filename, string paramname) {
   Isis::PvlGroup fileCustomization = Isis::Preference::Preferences().FindGroup("FileCustomization");
   Isis::iString overwritePreference = fileCustomization.FindKeyword("Overwrite")[0];
   overwritePreference.ConvertWhiteSpace();

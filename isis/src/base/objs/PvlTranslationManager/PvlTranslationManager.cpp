@@ -189,7 +189,7 @@ namespace Isis {
 
     if(anInputGroupFound) {
       string msg = "Unable to find input keyword [" + InputKeywordName(nName) +
-                   "] for output name [" + nName + "] in file [" + TranslationTable().Filename() + "]";
+                   "] for output name [" + nName + "] in file [" + TranslationTable().FileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else {
@@ -202,7 +202,7 @@ namespace Isis {
       }
 
       string msg = "Unable to find input group [" + container +
-                   "] for output name [" + nName + "] in file [" + TranslationTable().Filename() + "]";
+                   "] for output name [" + nName + "] in file [" + TranslationTable().FileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }

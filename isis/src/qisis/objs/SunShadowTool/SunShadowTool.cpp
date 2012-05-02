@@ -13,7 +13,7 @@
 #include "Angle.h"
 #include "Camera.h"
 #include "Distance.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "MdiCubeViewport.h"
@@ -61,7 +61,7 @@ namespace Isis {
     m_tableWin->addToTable(true, "Incidence Angle\n(radians)",
                            "Incidence Angle (radians)");
     m_tableWin->addToTable(false, "Path", "Path");
-    m_tableWin->addToTable(false, "Filename", "Filename");
+    m_tableWin->addToTable(false, "FileName", "FileName");
     m_tableWin->addToTable(false, "Notes", "Notes");
 
     m_tableWin->setStatusMessage("Click, Drag, and Release to Measure a Line");
@@ -402,7 +402,7 @@ namespace Isis {
     }
 
     m_tableWin->table()->item(row, PathIndex)->setText(m_path.c_str());
-    m_tableWin->table()->item(row, FilenameIndex)->setText(m_fileName.c_str());
+    m_tableWin->table()->item(row, FileNameIndex)->setText(m_fileName.c_str());
   }
 
 
@@ -448,8 +448,8 @@ namespace Isis {
     try {
       if (m_startSamp != Null && m_startLine != Null &&
           m_endSamp != Null && m_endLine != Null) {
-        m_path = Filename(cubeViewport()->cube()->getFilename()).Path();
-        m_fileName = Filename(cubeViewport()->cube()->getFilename()).Name();
+        m_path = FileName(cubeViewport()->cube()->getFileName()).path();
+        m_fileName = FileName(cubeViewport()->cube()->getFileName()).name();
 
         //
         // \  |  /

@@ -8,7 +8,7 @@
 #include <QMutexLocker>
 
 #include "Cube.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "ImagePolygon.h"
 #include "PolygonTools.h"
 #include "PvlObject.h"
@@ -25,7 +25,7 @@ namespace Isis {
    *   closeCube().
    *
    *
-   * @param cubeFilename The filename (fully expanded) of the cube file.
+   * @param cubeFileName The filename (fully expanded) of the cube file.
    * @param parent Qt parent object (this is destroyed when parent is destroyed)
    */
   CubeDisplayProperties::CubeDisplayProperties(QString filename,
@@ -238,7 +238,7 @@ namespace Isis {
    * Returns the display name
    */
   QString CubeDisplayProperties::displayName() const {
-    return Filename(m_filename.toStdString()).fileName();
+    return FileName(m_filename.toStdString()).name();
   }
 
 
@@ -289,7 +289,7 @@ namespace Isis {
    */
   PvlObject CubeDisplayProperties::toPvl() const {
     PvlObject output("CubeProperties");
-    output += PvlKeyword("Filename", m_filename);
+    output += PvlKeyword("FileName", m_filename);
 
     QBuffer dataBuffer;
     dataBuffer.open(QIODevice::ReadWrite);

@@ -1,11 +1,12 @@
 #include <cstdlib>
+
 #include <iomanip>
 #include <iostream>
 
 #include "Affine.h"
 #include "Chip.h"
 #include "Cube.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 #include "LineManager.h"
 #include "Preference.h"
@@ -381,7 +382,7 @@ int main() {
 void ReportError(iString err) {
   iString report = ""; // report will be modified error message
   iString errorLine = ""; // read message one line at a time
-  Filename expandedfile;
+  FileName expandedfile;
   while(err != "") {
     // pull off first line
     errorLine = err.Token("\n");
@@ -393,9 +394,9 @@ void ReportError(iString err) {
           // add message up to and including [
           report += errorLine.Token("[");
           report += "[";
-          // read entire path into Filename object
+          // read entire path into FileName object
           expandedfile = errorLine.Token("]");
-          report += expandedfile.Name(); // only report base name, rather than fully expanded path
+          report += expandedfile.name(); // only report base name, rather than fully expanded path
           report += "]";
         }
         else {

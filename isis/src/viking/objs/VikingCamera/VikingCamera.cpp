@@ -27,7 +27,7 @@
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 #include "iTime.h"
 #include "naif/SpiceUsr.h"
@@ -172,8 +172,8 @@ namespace Isis {
     focalMap->SetDetectorOrigin(602.0, 528.0);
 
     // Setup distortion map
-    const string fname = Filename("$viking" + iString(spn) + "/reseaus/vik" + cam
-                                  + "MasterReseaus.pvl").Expanded();
+    const string fname = FileName("$viking" + iString(spn) + "/reseaus/vik" + cam
+                                  + "MasterReseaus.pvl").expanded();
     new ReseauDistortionMap(this, lab, fname);
 
     // Setup the ground and sky map

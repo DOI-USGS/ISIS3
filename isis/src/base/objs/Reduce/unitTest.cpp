@@ -24,7 +24,7 @@ void IsisMain() {
   bands = cai.Bands();
 
   icube.setVirtualBands(bands);
-  icube.open(ui.GetFilename("FROM"));
+  icube.open(ui.GetFileName("FROM"));
   
   double sscale = 3;
   double lscale = 4;

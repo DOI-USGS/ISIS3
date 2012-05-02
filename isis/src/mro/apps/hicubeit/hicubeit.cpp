@@ -11,24 +11,23 @@ using namespace Isis;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  string redFile = ui.GetFilename("RED");
-  string irFile  = ui.GetFilename("IR");
-  string bgFile  = ui.GetFilename("BG");
+  string redFile = ui.GetFileName("RED");
+  string irFile  = ui.GetFileName("IR");
+  string bgFile  = ui.GetFileName("BG");
 
-  Filename tempFile;
-  tempFile.Temporary("hicubeit.temp", "lis");
+  FileName tempFile = FileName::createTempFile("$TEMPORARY/hicubeit.temp.lis");
   TextFile tf;
-  tf.Open(tempFile.Expanded(), "output");
+  tf.Open(tempFile.expanded(), "output");
   tf.PutLine(irFile + "\n");
   tf.PutLine(redFile + "\n");
   tf.PutLine(bgFile + "\n");
   tf.Close();
 
-  string parameters = string(" FROMLIST = ")    + tempFile.Expanded() +
-                      string(" TO = ")      + ui.GetFilename("TO") +
+  string parameters = string(" FROMLIST = ")    + tempFile.expanded() +
+                      string(" TO = ")      + ui.GetFileName("TO") +
                       string(" PROPLAB = ") + redFile;
   ProgramLauncher::RunIsisProgram("cubeit", parameters);
-  remove(tempFile.Expanded().c_str());
+  remove(tempFile.expanded().c_str());
 
   // Get the instrument group from each file
   Pvl redLab(redFile);
@@ -176,7 +175,7 @@ void IsisMain() {
 
   // Add the group to the output cube
   Cube c;
-  c.open(ui.GetFilename("TO"), "rw");
+  c.open(ui.GetFileName("TO"), "rw");
   c.getLabel()->FindObject("IsisCube", Pvl::Traverse).AddGroup(mos);
   c.close();
 }

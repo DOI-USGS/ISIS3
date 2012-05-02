@@ -2,7 +2,7 @@
 #define ControlNetFile_h
 
 namespace Isis {
-  class Filename;
+  class FileName;
   class Pvl;
 
   /**
@@ -36,7 +36,7 @@ namespace Isis {
        * @param header The pvl at the top of the file down to the "End" keyword
        * @param file The filename of the binary file to be read
        */
-      virtual void Read(const Pvl &header, const Filename &file) = 0;
+      virtual void Read(const Pvl &header, const FileName &file) = 0;
 
       /**
        * This writes the binary file that is in memory to disk. The behavior of
@@ -46,7 +46,7 @@ namespace Isis {
        *
        * @param file The filename of the binary file to be written
        */
-      virtual void Write(const Filename &file) const = 0;
+      virtual void Write(const FileName &file) const = 0;
 
       /**
        * Convert the binary representation to Pvl (any pvl version).

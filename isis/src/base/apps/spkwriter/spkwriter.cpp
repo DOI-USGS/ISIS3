@@ -19,8 +19,8 @@ void IsisMain() {
   // Get the list of names of input CCD cubes to stitch together
   FileList flist;
   UserInterface &ui = Application::GetUserInterface();
-  if (ui.WasEntered("FROM")) flist.push_back(ui.GetFilename("FROM"));
-  if (ui.WasEntered("FROMLIST")) flist.Read(ui.GetFilename("FROMLIST"));
+  if (ui.WasEntered("FROM")) flist.push_back(ui.GetFileName("FROM"));
+  if (ui.WasEntered("FROMLIST")) flist.Read(ui.GetFileName("FROMLIST"));
   if (flist.size() < 1) {
     string msg = "Files must be specified in FROM and/or FROMLIST - none found!";
     throw IException(IException::User,msg,_FILEINFO_);
@@ -39,18 +39,18 @@ void IsisMain() {
 
   //  Process CK kernel requests
   string comfile("");
-  if (ui.WasEntered("COMFILE")) comfile = ui.GetFilename("COMFILE");
+  if (ui.WasEntered("COMFILE")) comfile = ui.GetFileName("COMFILE");
 
   SpkKernelWriter kwriter(ui.GetInteger("TYPE"));
 
   // Write the output file if requested
   if (ui.WasEntered("TO")) {
-    kwriter.write(kernel, ui.GetFilename("TO"), comfile);
+    kwriter.write(kernel, ui.GetFileName("TO"), comfile);
   }
 
   // Write a summary of the documentation
   if (ui.WasEntered("SUMMARY")) {
-    string fFile = Filename(ui.GetFilename("SUMMARY")).Expanded();
+    string fFile = FileName(ui.GetFileName("SUMMARY")).expanded();
     ofstream os;
     os.open(fFile.c_str(),ios::out);
     if (!os) {

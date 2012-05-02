@@ -30,7 +30,7 @@
 #include "Pvl.h"
 
 namespace Isis {
-  class Filename;
+  class FileName;
 
   /**
    * @brief Control Point List  generator
@@ -45,12 +45,12 @@ namespace Isis {
    * @internal
    *
    *   @history 2009-08-11 Sharmila Prasad Original Version
-   *   @history 2009-10-04 Steven Lambright Constructor now takes a Filename
+   *   @history 2009-10-04 Steven Lambright Constructor now takes a FileName
    *     instead of a string.
    */
   class ControlPointList {
     public:
-      ControlPointList(const Filename &psFileName);
+      ControlPointList(const FileName &psFileName);
       virtual ~ControlPointList();
 
       std::string ControlPointId(int piIndex);

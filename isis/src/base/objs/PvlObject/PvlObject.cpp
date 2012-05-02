@@ -20,7 +20,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "Filename.h"
+#include "FileName.h"
 #include "Pvl.h"
 #include "IException.h"
 #include "IException.h"
@@ -516,14 +516,14 @@ namespace Isis {
     for(int i = 0; i < outTemplate.Keywords(); i++) {
       if(outTemplate[i].IsNamed("Isis:PvlTemplate:File")) {
         string filename = outTemplate[i];
-        Isis::Filename file(filename);
-        if(!file.Exists()) {
+        Isis::FileName file(filename);
+        if(!file.fileExists()) {
           string message = "Could not open the following PVL template file: ";
           message += filename;
           throw IException(IException::Io, message, _FILEINFO_);
         }
 
-        Isis::Pvl include(file.Expanded());
+        Isis::Pvl include(file.expanded());
 
         for(int j = 0; j < include.Keywords(); j++) {
           if(!newTemp.HasKeyword(include[j].Name()))

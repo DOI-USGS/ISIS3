@@ -8,7 +8,7 @@
 #include <sstream>
 #include <iostream>
 
-#include "Filename.h"
+#include "FileName.h"
 #include "ProcessByLine.h"
 #include "UserInterface.h"
 #include "Pvl.h"
@@ -146,7 +146,7 @@ void IsisMain(){
     }
     else {
       //  Set default to output directory
-      hiconf.add("OPATH", Filename(ocube->getFilename()).Path());
+      hiconf.add("OPATH", FileName(ocube->getFileName()).path());
     }
 
 //  Do I/F output DN conversions
@@ -392,12 +392,12 @@ void IsisMain(){
     // is completely controlled by the configuration file
     if ( hiprof.exists("DumpHistoryFile") ) {
       procStep = "logging/reporting phase";
-      Filename hdump(hiconf.getMatrixSource("DumpHistoryFile",hiprof));
-      string hdumpFile = hdump.Expanded();
+      FileName hdump(hiconf.getMatrixSource("DumpHistoryFile",hiprof));
+      string hdumpFile = hdump.expanded();
       ofstream ofile(hdumpFile.c_str(), ios::out);
       if (!ofile) {
         string mess = "Unable to open/create history dump file " +
-                      hdump.Expanded();
+                      hdump.expanded();
         IException(IException::User, mess, _FILEINFO_).print();
       }
       else {
@@ -406,8 +406,8 @@ void IsisMain(){
         ofile << "Version:  " << hical_version << endl;
         ofile << "Revision: " << hical_revision << endl << endl;
 
-        ofile << "FROM:     " << hifrom->getFilename() << endl;
-        ofile << "TO:       " << ocube->getFilename()  << endl;
+        ofile << "FROM:     " << hifrom->getFileName() << endl;
+        ofile << "TO:       " << ocube->getFileName()  << endl;
         ofile << "CONF:     " << conf_file  << endl << endl;
 
         ofile << "/* " << hical_program << " application equation */\n"

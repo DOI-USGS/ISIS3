@@ -271,7 +271,7 @@ namespace Isis {
     QVector<MdiCubeViewport *> allViewports = *cubeViewportList();
 
     foreach (MdiCubeViewport * viewport, allViewports) {
-      if (pc->sourceCube().contains(viewport->cube()->getFilename().c_str())) {
+      if (pc->sourceCube().contains(viewport->cube()->getFileName())) {
         viewport->repaint();
       }
     }

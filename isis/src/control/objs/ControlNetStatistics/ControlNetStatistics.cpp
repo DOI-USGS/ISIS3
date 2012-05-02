@@ -18,7 +18,7 @@
 #include "ControlCubeGraphNode.h"
 #include "Cube.h"
 #include "CubeManager.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 #include "Progress.h"
 #include "Pvl.h"
@@ -236,7 +236,7 @@ namespace Isis {
 
       // Open the cube to get the dimensions
       iString sn = node->getSerialNumber();
-      Cube *cube = cubeMgr.OpenCube(mSerialNumList.Filename(sn));
+      Cube *cube = cubeMgr.OpenCube(mSerialNumList.FileName(sn));
 
       mSerialNumMap[sn] = true;
       numCNetImages++;
@@ -313,7 +313,7 @@ namespace Isis {
    *
    * @author Sharmila Prasad (9/1/2010)
    *
-   * Header: Filename, SerialNumber, TotalPoints, PointsIgnored, PointsLocked, Fixed, Constrained, Free
+   * Header: FileName, SerialNumber, TotalPoints, PointsIgnored, PointsLocked, Fixed, Constrained, Free
    *
    * @param psImageFile - Output Image Stats File
    */
@@ -324,9 +324,9 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    Filename outFile(psImageFile);
+    FileName outFile(psImageFile);
     ofstream ostm;
-    string outName(outFile.Expanded());
+    string outName(outFile.expanded());
     ostm.open(outName.c_str(), std::ios::out);
 
     //map< string, vector<double> >::iterator it;
@@ -337,7 +337,7 @@ namespace Isis {
     ostm << "Filename, SerialNumber, TotalPoints, PointsIgnored, PointsEditLocked, Fixed, Constrained, Free, ConvexHullRatio" <<  endl;
     //for (it = mImageMap.begin(); it != mImageMap.end(); it++) {
     for (it = mSerialNumMap.begin(); it != mSerialNumMap.end(); it++) {
-        ostm << mSerialNumList.Filename((*it).first) << ", " << (*it).first << ", ";
+        ostm << mSerialNumList.FileName((*it).first) << ", " << (*it).first << ", ";
         bool serialNumExists = (*it).second ;
         if (serialNumExists) {
           vector<double>imgStats = mImageMap[(*it).first] ;
@@ -378,10 +378,10 @@ namespace Isis {
    * @param psPointFile - Output Point Statisitics File
    */
   void ControlNetStatistics::GeneratePointStats(const string &psPointFile) {
-    Isis::Filename outFile(psPointFile);
+    Isis::FileName outFile(psPointFile);
 
     ofstream ostm;
-    string outName(outFile.Expanded());
+    string outName(outFile.expanded());
     ostm.open(outName.c_str(), std::ios::out);
     ostm << " PointId, PointType, PointIgnore, PointEditLock, TotalMeasures, MeasuresValid, MeasuresIgnore, MeasuresEditLock," << endl;
 

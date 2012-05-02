@@ -48,9 +48,9 @@ void PrintPvl() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Write file out to log
-  string inFile(ui.GetFilename("FROMPVL"));
+  string inFile(ui.GetFileName("FROMPVL"));
   Pvl inPvl;
-  inPvl.Read(ui.GetFilename("FROMPVL"));
+  inPvl.Read(ui.GetFileName("FROMPVL"));
   string Ostring = "***** Output of [" + inFile + "] *****";
   Application::GuiLog(Ostring);
   Application::GuiLog(inPvl);
@@ -60,7 +60,7 @@ void PrintPvl() {
 void LoadPvl() {
   std::stringstream os;
   UserInterface &ui = Application::GetUserInterface();
-  string inFile(ui.GetFilename("FROMPVL"));
+  string inFile(ui.GetFileName("FROMPVL"));
   Pvl inPvl;
   inPvl.Read(inFile);
   iString phtName = ui.GetAsString("PHTNAME");
@@ -625,7 +625,7 @@ void IsisMain() {
     Pvl fromNormPvl;
     PvlObject fromNormObj;
     PvlGroup fromNormGrp;
-    string input = ui.GetFilename("FROMPVL");
+    string input = ui.GetFileName("FROMPVL");
     fromNormPvl.Read(input);
     if (fromNormPvl.HasObject("NormalizationModel")) {
       fromNormObj = fromNormPvl.FindObject("NormalizationModel");
@@ -1017,7 +1017,7 @@ void IsisMain() {
       Pvl fromAtmPvl;
       PvlObject fromAtmObj;
       PvlGroup fromAtmGrp;
-      string input = ui.GetFilename("FROMPVL");
+      string input = ui.GetFileName("FROMPVL");
       fromAtmPvl.Read(input);
       if (fromAtmPvl.HasObject("AtmosphericModel")) {
         fromAtmObj = fromAtmPvl.FindObject("AtmosphericModel");
@@ -1199,7 +1199,7 @@ void IsisMain() {
     Pvl fromPhtPvl;
     PvlObject fromPhtObj;
     PvlGroup fromPhtGrp;
-    string input = ui.GetFilename("FROMPVL");
+    string input = ui.GetFileName("FROMPVL");
     fromPhtPvl.Read(input);
     if (fromPhtPvl.HasObject("PhotometricModel")) {
       fromPhtObj = fromPhtPvl.FindObject("PhotometricModel");
@@ -1505,7 +1505,7 @@ void IsisMain() {
   p.SetOutputCube("TO");
 
   Pvl inLabel;
-  inLabel.Read(ui.GetFilename("FROM"));
+  inLabel.Read(ui.GetFileName("FROM"));
 
   // If the source of photometric angles is the center of the image,
   // then get the angles at the center of the image.

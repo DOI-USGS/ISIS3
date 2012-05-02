@@ -99,7 +99,7 @@ void IsisMain() {
   CubeAttributeInput &attLeft = ui.GetInputAttribute("FROM");
   vector<string> bandLeft = attLeft.Bands();
   lhImage.setVirtualBands(bandLeft);
-  lhImage.open(ui.GetFilename("FROM"),"r");
+  lhImage.open(ui.GetFileName("FROM"),"r");
 
   // Open the second cube, it is geomertricallty altered.  We will be matching the
   // first to this one by attempting to compute a sample/line offsets
@@ -107,7 +107,7 @@ void IsisMain() {
   CubeAttributeInput &attRight = ui.GetInputAttribute("MATCH");
   vector<string> bandRight = attRight.Bands();
   rhImage.setVirtualBands(bandRight);
-  rhImage.open(ui.GetFilename("MATCH"),"r");
+  rhImage.open(ui.GetFileName("MATCH"),"r");
 
   // Ensure only single bands
   if (lhImage.getBandCount() != 1 || rhImage.getBandCount() != 1) {
@@ -140,8 +140,8 @@ void IsisMain() {
 
 //  This still precludes band to band registrations.
   if (serialLeft == serialRight) {
-    string sLeft = Filename(lhImage.getFilename()).Name();
-    string sRight = Filename(rhImage.getFilename()).Name();
+    string sLeft = FileName(lhImage.getFileName()).name();
+    string sRight = FileName(rhImage.getFileName()).name();
     if (sLeft == sRight) {
       string msg = "Cube Serial Numbers must be unique - FROM=" + serialLeft +
                    ", MATCH=" + serialRight;
@@ -159,7 +159,7 @@ void IsisMain() {
   BigInt numAttemptedInitialPoints = 0;
 
   //  Declare Gruen matcher
-  SmtkMatcher matcher(ui.GetFilename("REGDEF"), &lhImage, &rhImage);
+  SmtkMatcher matcher(ui.GetFileName("REGDEF"), &lhImage, &rhImage);
 
   // Get line/sample linc/sinc parameters
   int space   = ui.GetInteger("SPACE");
@@ -172,7 +172,7 @@ void IsisMain() {
   SmtkQStack gstack;
   double lastEigen(0.0);
   if (useseed) {
-    ControlNet cnet(ui.GetFilename("CNET"));
+    ControlNet cnet(ui.GetFileName("CNET"));
     prog.SetMaximumSteps(cnet.GetNumPoints());
     prog.CheckStatus();
 
@@ -280,7 +280,7 @@ void IsisMain() {
 
     // If a user wants to see the seed network, write it out here
     if (ui.WasEntered("OSEEDNET")) {
-      WriteCnet(ui.GetFilename("OSEEDNET"), gstack,
+      WriteCnet(ui.GetFileName("OSEEDNET"), gstack,
                 lhCamera->Target(), serialLeft, serialRight);
     }
 
@@ -474,7 +474,7 @@ void IsisMain() {
 
   // If a cnet file was entered, write the ControlNet pvl to the file
   if (ui.WasEntered("ONET")) {
-    WriteCnet(ui.GetFilename("ONET"), bmf, lhCamera->Target(), serialLeft,
+    WriteCnet(ui.GetFileName("ONET"), bmf, lhCamera->Target(), serialLeft,
               serialRight);
   }
 
@@ -510,7 +510,7 @@ void IsisMain() {
 //Helper function to output the regdeft file to log.
 void helperButtonLog () {
   UserInterface &ui = Application::GetUserInterface();
-  string file(ui.GetFilename("REGDEF"));
+  string file(ui.GetFileName("REGDEF"));
   Pvl p;
   p.Read(file);
   Application::GuiLog(p);

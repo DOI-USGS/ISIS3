@@ -261,7 +261,7 @@ void IsisMain() {
   }
 
   if (ui.WasEntered("TO")) {
-    string sOutfile = ui.GetFilename("TO");
+    string sOutfile = ui.GetFileName("TO");
     Pvl mainPvl;
     PvlObject photoObj("PhotometricModel");
     PvlGroup photoGrp("Algorithm");

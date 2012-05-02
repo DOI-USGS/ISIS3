@@ -36,7 +36,7 @@
 #include "CentroidApolloPan.h"
 #include "Chip.h"
 #include "Cube.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 #include "iTime.h"
 #include "JP2Decoder.h"
@@ -116,7 +116,7 @@ void IsisMain() {
   double deg2rad = acos(-1.0)/180.0;
 
   ProcessImport jp;
-  Filename transFile("$apollo15/translations/apollopantranstable.trn");
+  FileName transFile("$apollo15/translations/apollopantranstable.trn");
   PvlTranslationTable transTable(transFile);
   PvlGroup kernels_pvlG;
 
@@ -131,11 +131,11 @@ void IsisMain() {
   insCode = scFrameCode - 230;
 
   try {
-    panCube.open(ui.GetFilename("FROM"),"rw");
+    panCube.open(ui.GetFileName("FROM"),"rw");
   }
   catch (IException &e) {
     throw IException(IException::User,
-                     "Unable to open the file [" + ui.GetFilename("FROM") + "] as a cube.",
+                     "Unable to open the file [" + ui.GetFileName("FROM") + "] as a cube.",
                      _FILEINFO_);
   }
 
@@ -562,8 +562,8 @@ void IsisMain() {
   else play = 10.0/resolution;  //debug
 
   //copy the patternS chip (the entire ApolloPanFiducialMark.cub)
-  Filename fiducialFilename("$apollo15/calibration/ApolloPanFiducialMark.cub");
-  fidC.open(fiducialFilename.Expanded(),"r");
+  FileName fiducialFileName("$apollo15/calibration/ApolloPanFiducialMark.cub");
+  fidC.open(fiducialFileName.expanded(),"r");
   if( !fidC.isOpen() ) {
     string msg = "Unable to open the fiducial patternS cube: ApolloPanFiducialMark.cub\n";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -575,8 +575,8 @@ void IsisMain() {
   patternS.Load(fidC,0,SCALE);
 
   //parameters for maximum correlation autoregestration  see:  file:///usgs/pkgs/isis3nightly2011-09-21/isis/doc/documents/patternSMatch/patternSMatch.html#DistanceTolerance
-  Filename fiducialPvl("$apollo15/templates/apolloPanFiducialFinder.pvl");
-  pvl.Read(fiducialPvl.Expanded());  //read in the autoreg parameters
+  FileName fiducialPvl("$apollo15/templates/apolloPanFiducialFinder.pvl");
+  pvl.Read(fiducialPvl.expanded());  //read in the autoreg parameters
   AutoReg *arS = AutoRegFactory::Create(pvl);
 
   *arS->PatternChip()   = patternS;  //patternS chip is constant
@@ -585,7 +585,7 @@ void IsisMain() {
   CentroidApolloPan centroid(resolution);
   Chip inputChip,selectionChip;
   inputChip.SetSize(int(ceil(200*5.0/resolution)),int(ceil(200*5.0/resolution)));
-  fileName = ui.GetFilename("FROM");
+  fileName = ui.GetFileName("FROM");
   if( panCube.getPixelType() == 1)  //UnsignedByte
     centroid.setDNRange(12,1e99);  //8 bit bright target
   else
@@ -728,12 +728,12 @@ void Load_Kernel(Isis::PvlKeyword &key) {
      if(iString(key[i]).UpCase() == "NULL") break;
      if(iString(key[i]).UpCase() == "NADIR") break;
      if(iString(key[i]).UpCase() == "TABLE") continue;  //Table was left as the first value of these keywords because one is about to be attached, still though it needs to be skipped in this loop
-     Isis::Filename file(key[i]);
-     if(!file.exists()) {
-       string msg = "Spice file does not exist [" + file.Expanded() + "]";
+     Isis::FileName file(key[i]);
+     if(!file.fileExists()) {
+       string msg = "Spice file does not exist [" + file.expanded() + "]";
        throw IException(IException::Io, msg, _FILEINFO_);
      }
-     string fileName(file.Expanded());
+     string fileName(file.expanded());
      furnsh_c(fileName.c_str());
   }
 

@@ -9,7 +9,7 @@
 #include "ProcessByLine.h"
 
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Buffer.h"
@@ -34,7 +34,7 @@ static const double WACValidMaximum = 3600.0;
 static const double NACValidMaximum = 3400.0;
 
 LutTable lut;
-Pvl TranslateMdisEdrLabels(Filename &labelFile, const std::string &target = "");
+Pvl TranslateMdisEdrLabels(FileName &labelFile, const std::string &target = "");
 int CreateFilterSpecs(const std::string &instId, int filter_code,
                       PvlGroup &bandbin, std::string &naifId);
 void UnlutData(Buffer &data);
@@ -67,10 +67,10 @@ void IsisMain() {
   bool needsUnlut = false;
 
   // Get the input filename and make sure it is a MESSENGER/MDIS EDR
-  Filename inFile = ui.GetFilename("FROM");
+  FileName inFile = ui.GetFileName("FROM");
   iString id;
   bool projected;
-  Pvl lab(inFile.Expanded());
+  Pvl lab(inFile.expanded());
 
   try {
     needsUnlut = (int) lab.FindKeyword("MESS:COMP12_8");
@@ -81,13 +81,13 @@ void IsisMain() {
   }
   catch(IException &e) {
     string msg = "Unable to read [MISSION] from input file [" +
-                 inFile.Expanded() + "]";
+                 inFile.expanded() + "]";
     throw IException(e, IException::Io, msg, _FILEINFO_);
   }
 
   //Checks if in file is rdr
   if(projected) {
-    string msg = "[" + inFile.Name() + "] appears to be an rdr file.";
+    string msg = "[" + inFile.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -96,7 +96,7 @@ void IsisMain() {
   id.Compress();
   id.Trim(" ");
   if(id != "MESSENGER") {
-    string msg = "Input file [" + inFile.Expanded() + "] does not appear to be " +
+    string msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
                  "in MESSENGER EDR format. MISSION_NAME is [" + id + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
@@ -107,9 +107,9 @@ void IsisMain() {
   }
 
   // Perform PDS/EDR source keyword translations to ISIS label keywords
-  p.SetPdsFile(inFile.Expanded(), "", pdsLabel);
+  p.SetPdsFile(inFile.expanded(), "", pdsLabel);
   Pvl outLabel = TranslateMdisEdrLabels(inFile, target);
-  PvlKeyword sourceId("SourceProductId", '"' + inFile.Basename() + '"');
+  PvlKeyword sourceId("SourceProductId", '"' + inFile.baseName() + '"');
 
   //  Create YearDoy keyword in Archive group
   iTime stime(outLabel.FindGroup("Instrument", Pvl::Traverse)["StartTime"][0]);
@@ -120,7 +120,7 @@ void IsisMain() {
     // We're not going to unlut the data, so just set output cube
     //   and let ProcessImportPds do the writing for us.
     CubeAttributeOutput &outAtt = ui.GetOutputAttribute("TO");
-    outCube = p.SetOutputCube(ui.GetFilename("TO"), outAtt);
+    outCube = p.SetOutputCube(ui.GetFileName("TO"), outAtt);
 
     // Write the Instrument, BandBin, Archive, and Kernels groups to the output
     // cube label
@@ -151,7 +151,7 @@ void IsisMain() {
 
     outCube = new Cube();
     outCube->setDimensions(p.Samples(), p.Lines(), p.Bands());
-    outCube->create(ui.GetFilename("TO"));
+    outCube->create(ui.GetFileName("TO"));
 
     PvlGroup &group =  outLabel.FindGroup("Instrument", Pvl::Traverse);
     group.AddKeyword(PvlKeyword("Unlutted", true));
@@ -168,7 +168,7 @@ void IsisMain() {
 
     p.StartProcess(UnlutData);
 
-    OriginalLabel ol(Pvl(inFile.Expanded()));
+    OriginalLabel ol(Pvl(inFile.expanded()));
     outCube->write(ol);
     outCube->close();
     delete outCube;
@@ -178,7 +178,7 @@ void IsisMain() {
   p.EndProcess();
 }
 
-Pvl TranslateMdisEdrLabels(Filename &labelFile, const std::string &target) {
+Pvl TranslateMdisEdrLabels(FileName &labelFile, const std::string &target) {
   //Create a PVL to store the translated labels
   Pvl outLabel;
 
@@ -187,21 +187,21 @@ Pvl TranslateMdisEdrLabels(Filename &labelFile, const std::string &target) {
   iString transDir = (string) dataDir["Messenger"] + "/translations/";
 
   // Get a filename for the MESSENGER EDR label
-  Pvl labelPvl(labelFile.Expanded());
+  Pvl labelPvl(labelFile.expanded());
 
   // Translate the Instrument group
-  Filename transFile(transDir + "mdisInstrument.trn");
-  PvlTranslationManager instrumentXlater(labelPvl, transFile.Expanded());
+  FileName transFile(transDir + "mdisInstrument.trn");
+  PvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
   // Translate the BandBin group
   transFile  = transDir + "mdisBandBin.trn";
-  PvlTranslationManager bandBinXlater(labelPvl, transFile.Expanded());
+  PvlTranslationManager bandBinXlater(labelPvl, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   // Translate the Archive group
   transFile  = transDir + "mdisArchive.trn";
-  PvlTranslationManager archiveXlater(labelPvl, transFile.Expanded());
+  PvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   // Create the Kernel Group
@@ -289,9 +289,9 @@ int CreateFilterSpecs(const std::string &instId, int filter_code,
   }
   else if(instId == "MDIS-WAC") {
     //  Set up WAC calibration file
-    Filename calibFile("$messenger/calibration/mdisCalibration????.trn");
-    calibFile.HighestVersion();
-    Pvl config(calibFile.Expanded());
+    FileName calibFile("$messenger/calibration/mdisCalibration????.trn");
+    calibFile = calibFile.highestVersion();
+    Pvl config(calibFile.expanded());
 
     PvlGroup &confgrp = config.FindGroup("FilterWheel");
     int tolerance = confgrp["EncoderTolerance"];
@@ -354,17 +354,17 @@ void UnlutData(Buffer &data) {
 LutTable LoadLut(Pvl &label, std::string &tableused, std::string &froot) {
   int tableToUse = label.FindKeyword("MESS:COMP_ALG");
 
-  Filename tableFile("$messenger/calibration/LUT_INVERT/MDISLUTINV_?.TAB");
-  tableFile.HighestVersion();
-  tableused = tableFile.OriginalPath() + "/" + tableFile.Name();
-  froot = tableFile.Basename();
+  FileName tableFile("$messenger/calibration/LUT_INVERT/MDISLUTINV_?.TAB");
+  tableFile = tableFile.highestVersion();
+  tableused = tableFile.originalPath() + "/" + tableFile.name();
+  froot = tableFile.baseName();
 
-  CSVReader csv(tableFile.Expanded());
+  CSVReader csv(tableFile.expanded());
 
   int nRows = csv.rows();
   if(nRows != 256) {
     std::ostringstream mess;
-    mess << "MDIS LUT Inversion table, " << tableFile.Expanded()
+    mess << "MDIS LUT Inversion table, " << tableFile.expanded()
          << ", should contain 256 rows but has " << nRows;
     throw IException(IException::User, mess.str(), _FILEINFO_);
   }
@@ -372,7 +372,7 @@ LutTable LoadLut(Pvl &label, std::string &tableused, std::string &froot) {
   int nCols = csv.columns();
   if(nCols != 9) {
     std::ostringstream mess;
-    mess << "MDIS LUT Inversion table, " << tableFile.Expanded()
+    mess << "MDIS LUT Inversion table, " << tableFile.expanded()
          << ", should contain 9 columns but has " << nCols;
     throw IException(IException::User, mess.str(), _FILEINFO_);
   }
@@ -390,7 +390,7 @@ LutTable LoadLut(Pvl &label, std::string &tableused, std::string &froot) {
       std::ostringstream mess;
       mess << "Index (" << dn8 << ") at line " << i + 1
            << " is invalid inMDIS LUT Inversion table "
-           << tableFile.Expanded() << " - valid range is 0 <= index < 256!";
+           << tableFile.expanded() << " - valid range is 0 <= index < 256!";
       throw IException(IException::User, mess.str(), _FILEINFO_);
     }
 

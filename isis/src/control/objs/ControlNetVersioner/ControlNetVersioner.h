@@ -32,7 +32,7 @@
 namespace Isis {
   class ControlNetFileV0001;
   class ControlNetFileV0002;
-  class Filename;
+  class FileName;
   class iString;
   class Progress;
   class Pvl;
@@ -118,8 +118,8 @@ namespace Isis {
    */
   class ControlNetVersioner {
     public:
-      static LatestControlNetFile *Read(const Filename &file);
-      static void Write(const Filename &file, const LatestControlNetFile &,
+      static LatestControlNetFile *Read(const FileName &file);
+      static void Write(const FileName &file, const LatestControlNetFile &,
                         bool pvl = false);
 
     private:
@@ -129,7 +129,7 @@ namespace Isis {
 
       // read Binary, convert to Pvl, call ReadPvlNetwork
       static LatestControlNetFile *ReadBinaryNetwork(const Pvl &header,
-                                                     const Filename &file);
+                                                     const FileName &file);
 
       static void ConvertVersion1ToVersion2(PvlObject &network);
       static void ConvertVersion2ToVersion3(PvlObject &network);

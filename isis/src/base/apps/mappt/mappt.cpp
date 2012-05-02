@@ -6,7 +6,7 @@
 #include <cmath>
 
 #include "Brick.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "Process.h"
@@ -75,17 +75,17 @@ void IsisMain() {
 
     // Use the mapping group from a given file
     else if(coordsys == "MAP") {
-      Filename mapFile = ui.GetFilename("MAP");
+      FileName mapFile = ui.GetFileName("MAP");
 
       // Does it exist?
-      if(!mapFile.Exists()) {
-        string msg = "Filename [" + ui.GetFilename("MAP") + "] does not exist";
+      if(!mapFile.fileExists()) {
+        string msg = "Filename [" + ui.GetFileName("MAP") + "] does not exist";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
       // Load it up into a new projection
       Pvl mapPvl;
-      mapPvl.Read(mapFile.Expanded());
+      mapPvl.Read(mapFile.expanded());
       Projection *altmap = ProjectionFactory::CreateFromCube(mapPvl);
 
       // Set lat and lon in its system
@@ -143,7 +143,7 @@ void IsisMain() {
   if(proj->IsGood()) {
     PvlGroup results("Results");
     results += PvlKeyword("Filename",
-                          Filename(ui.GetFilename("FROM")).Expanded());
+                          FileName(ui.GetFileName("FROM")).expanded());
     results += PvlKeyword("Sample", proj->WorldX());
     results += PvlKeyword("Line", proj->WorldY());
     results += PvlKeyword("PixelValue", PixelToString(b[0]));
@@ -245,8 +245,8 @@ void IsisMain() {
     // Write an output label file if necessary
     if(ui.WasEntered("TO")) {
       // Get user params from ui
-      string outFile = Filename(ui.GetFilename("TO")).Expanded();
-      bool exists = Filename(outFile).Exists();
+      string outFile = FileName(ui.GetFileName("TO")).expanded();
+      bool exists = FileName(outFile).fileExists();
       bool append = ui.GetBoolean("APPEND");
 
       // Write the pvl group out to the file
@@ -315,7 +315,7 @@ void PrintMap() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFilename("MAP"));
+  userMap.Read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log

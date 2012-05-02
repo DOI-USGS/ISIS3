@@ -120,21 +120,21 @@ namespace Isis {
         p_encodingType = JP2;
         str = pdsXlater.Translate("PdsCompressedFile");
         if(pdsDataFile.empty()) {
-          Isis::Filename lfile(p_labelFile);
-          Isis::Filename ifile(lfile.Path() + "/" + str);
-          if(ifile.Exists()) {
-            p_jp2File = ifile.Expanded();
+          Isis::FileName lfile(p_labelFile);
+          Isis::FileName ifile(lfile.path() + "/" + str);
+          if(ifile.fileExists()) {
+            p_jp2File = ifile.expanded();
           }
           else {
-            string tmp = ifile.Expanded();
+            string tmp = ifile.expanded();
             str.DownCase();
-            ifile = lfile.Path() + "/" + str;
-            if(ifile.Exists()) {
-              p_jp2File = ifile.Expanded();
+            ifile = lfile.path() + "/" + str;
+            if(ifile.fileExists()) {
+              p_jp2File = ifile.expanded();
             }
             else {
               string msg = "Unable to find input file [" + tmp + "] or [" +
-                           ifile.Expanded() + "]";
+                           ifile.expanded() + "]";
               throw IException(IException::Io, msg, _FILEINFO_);
             }
           }
@@ -191,7 +191,7 @@ namespace Isis {
         units = dataFilePointer.Unit();
         // Successful? we have an offset, means current, p_labelFile
         // is the location of the data as well
-        dataFileName = p_labelFile;
+        dataFileName = FileName(p_labelFile).name();
       }
       catch(IException &e) {
         // Failed to parse to an int, means we have a file name
@@ -226,31 +226,31 @@ namespace Isis {
     // Now, to handle the values we found
     // the filename first, only do so if calcOffsetOnly is false
     if (!calcOffsetOnly) {
-      Isis::Filename labelFile(p_labelFile);
+      Isis::FileName labelFile(p_labelFile);
 
       // If dataFileName isn't empty, and does start at the root, use it
-      Isis::Filename dataFile;
+      Isis::FileName dataFile;
       if (dataFileName.size() != 0 && dataFileName.at(0) == '/')
-        dataFile = Filename(dataFileName);
+        dataFile = FileName(dataFileName);
       // Otherwise, use the path to it and its name
       else
-        dataFile = Filename(labelFile.Path() + "/" + dataFileName);
+        dataFile = FileName(labelFile.path() + "/" + dataFileName);
 
       // If it exists, use it
-      if (dataFile.Exists()) {
-        SetInputFile(dataFile.Expanded());
+      if (dataFile.fileExists()) {
+        SetInputFile(dataFile.expanded());
       }
       // Retry with downcased name, if still no luck, fail
       else {
-        string tmp = dataFile.Expanded();
+        string tmp = dataFile.expanded();
         dataFileName.DownCase();
-        dataFile = Filename(labelFile.Path() + "/" + dataFileName);
-        if (dataFile.Exists()) {
-          SetInputFile(dataFile.Expanded());
+        dataFile = FileName(labelFile.path() + "/" + dataFileName);
+        if (dataFile.fileExists()) {
+          SetInputFile(dataFile.expanded());
         }
         else {
           string msg = "Unable to find input file [" + tmp + "] or [" +
-                       dataFile.Expanded() + "]";
+                       dataFile.expanded() + "]";
           throw IException(IException::Io, msg, _FILEINFO_);
         }
       }
@@ -398,8 +398,8 @@ namespace Isis {
    * @throws Isis::iException::Message
    */
   void ProcessImportPds::ProcessPdsImageLabel(const std::string &pdsDataFile) {
-    Isis::Filename transFile(p_transDir + "/translations/pdsImage.trn");
-    Isis::PvlTranslationManager pdsXlater(p_pdsLabel, transFile.Expanded());
+    Isis::FileName transFile(p_transDir + "/translations/pdsImage.trn");
+    Isis::PvlTranslationManager pdsXlater(p_pdsLabel, transFile.expanded());
 
     Isis::iString str;
 
@@ -497,9 +497,9 @@ namespace Isis {
   void ProcessImportPds::ProcessPdsQubeLabel(const std::string &pdsDataFile,
       const std::string &transFile) {
 
-    Isis::Filename tFile(p_transDir + "/translations/" + transFile);
+    Isis::FileName tFile(p_transDir + "/translations/" + transFile);
 
-    Isis::PvlTranslationManager pdsXlater(p_pdsLabel, tFile.Expanded());
+    Isis::PvlTranslationManager pdsXlater(p_pdsLabel, tFile.expanded());
 
     Isis::iString str;
 
@@ -673,7 +673,7 @@ namespace Isis {
     Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
     Isis::iString transDir = (string) dataDir["Base"];
 
-    Isis::Filename transFile;
+    Isis::FileName transFile;
     if(projType.InputHasKeyword("PdsProjectionTypeImage")) {
       transFile = transDir + "/" + "translations/pdsImageProjection.trn";
     }
@@ -687,7 +687,7 @@ namespace Isis {
       return;
     }
 
-    Isis::PvlTranslationManager pdsXlater(p_pdsLabel, transFile.Expanded());
+    Isis::PvlTranslationManager pdsXlater(p_pdsLabel, transFile.expanded());
 
     ExtractPdsProjection(pdsXlater);
 
@@ -739,9 +739,9 @@ namespace Isis {
     // contain the projection specific translations from PDS to ISIS for each
     // projection
 
-    string projSpecificFilename = "$base/translations/pdsImport";
-    projSpecificFilename += p_projection + ".trn";
-    Isis::PvlTranslationManager specificXlater(p_pdsLabel, projSpecificFilename);
+    string projSpecificFileName = "$base/translations/pdsImport";
+    projSpecificFileName += p_projection + ".trn";
+    Isis::PvlTranslationManager specificXlater(p_pdsLabel, projSpecificFileName);
 
     lab.AddGroup(mapGroup);
     specificXlater.Auto(lab);
@@ -1120,8 +1120,8 @@ namespace Isis {
     Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
     Isis::iString transDir = (string) dataDir["Base"];
 
-    Isis::Filename transFile(transDir + "/" + "translations/isis2bandbin.trn");
-    Isis::PvlTranslationManager isis2Xlater(p_pdsLabel, transFile.Expanded());
+    Isis::FileName transFile(transDir + "/" + "translations/isis2bandbin.trn");
+    Isis::PvlTranslationManager isis2Xlater(p_pdsLabel, transFile.expanded());
 
     // Add all the Isis2 keywords that can be translated to the requested label
     isis2Xlater.Auto(lab);
@@ -1137,8 +1137,8 @@ namespace Isis {
     // Set up a translater for Isis2 labels
     Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
     Isis::iString transDir = (string) dataDir["Base"];
-    Isis::Filename transFile(transDir + "/" + "translations/isis2instrument.trn");
-    Isis::PvlTranslationManager isis2Xlater(p_pdsLabel, transFile.Expanded());
+    Isis::FileName transFile(transDir + "/" + "translations/isis2instrument.trn");
+    Isis::PvlTranslationManager isis2Xlater(p_pdsLabel, transFile.expanded());
 
     // Add all the Isis2 keywords that can be translated to the requested label
     isis2Xlater.Auto(lab);
@@ -1162,8 +1162,8 @@ namespace Isis {
    */
   void ProcessImportPds::TranslatePdsBandBin(Isis::Pvl &lab) {
     // Set up a translater for PDS labels
-    Isis::Filename transFile(p_transDir + "/" + "translations/pdsImageBandBin.trn");
-    Isis::PvlTranslationManager isis2Xlater(p_pdsLabel, transFile.Expanded());
+    Isis::FileName transFile(p_transDir + "/" + "translations/pdsImageBandBin.trn");
+    Isis::PvlTranslationManager isis2Xlater(p_pdsLabel, transFile.expanded());
 
     // Add all the Isis2 keywords that can be translated to the requested label
     isis2Xlater.Auto(lab);
@@ -1177,8 +1177,8 @@ namespace Isis {
    */
   void ProcessImportPds::TranslatePdsArchive(Isis::Pvl &lab) {
     // Set up a translater for PDS labels
-    Isis::Filename transFile(p_transDir + "/" + "translations/pdsImageArchive.trn");
-    Isis::PvlTranslationManager isis2Xlater(p_pdsLabel, transFile.Expanded());
+    Isis::FileName transFile(p_transDir + "/" + "translations/pdsImageArchive.trn");
+    Isis::PvlTranslationManager isis2Xlater(p_pdsLabel, transFile.expanded());
 
     // Add all the Isis2 keywords that can be translated to the requested label
     isis2Xlater.Auto(lab);

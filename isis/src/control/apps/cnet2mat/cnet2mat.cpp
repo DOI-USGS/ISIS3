@@ -28,9 +28,9 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
 
-  FileList list2(ui.GetFilename("LIST2"));
+  FileList list2(ui.GetFileName("LIST2"));
 
-  SerialNumberList snl(ui.GetFilename("LIST3"));
+  SerialNumberList snl(ui.GetFileName("LIST3"));
   for(unsigned int f = 0; f < list2.size(); f++) {
     iString currFile(list2[f]);
     Pvl lab(currFile);
@@ -52,7 +52,7 @@ void IsisMain() {
     snMap.insert(std::pair<string, int>(sn, f));
   }
 
-  ControlNet cnet(ui.GetFilename("CNET"));
+  ControlNet cnet(ui.GetFileName("CNET"));
 
   int mpTotal = 0;
 
@@ -60,7 +60,7 @@ void IsisMain() {
     mpTotal += cnet.GetPoint(i)->GetNumMeasures();
   }
 
-  TextFile mpFile(ui.GetFilename("MATCH"), "Overwrite", "");
+  TextFile mpFile(ui.GetFileName("MATCH"), "Overwrite", "");
 
   ostringstream str;
   iString textLine;

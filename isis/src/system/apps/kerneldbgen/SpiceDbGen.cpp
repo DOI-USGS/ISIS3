@@ -74,7 +74,7 @@ PvlObject SpiceDbGen::Direct(iString quality, iString location,
 
   for(unsigned int i = 0; i < filter.size(); ++i) {
     //Create a list of all of the files matching the current filter
-    QStringList files = GetFiles(Filename(location), filter[i]);
+    QStringList files = GetFiles(FileName(location), filter[i]);
     PvlObject pvlKernel("change");
 
     // Throw an error if no files are being added to this database for
@@ -86,7 +86,7 @@ PvlObject SpiceDbGen::Direct(iString quality, iString location,
     }
 
     for(int fileNum = 0 ; fileNum < files.size() ; fileNum++) {
-      Filename currFile((string) location + "/" + files[fileNum].toStdString());
+      FileName currFile((string) location + "/" + files[fileNum].toStdString());
       PvlGroup selection = AddSelection(currFile);
       selection += PvlKeyword("Type", quality);
       result.AddGroup(selection);
@@ -143,9 +143,9 @@ PvlObject SpiceDbGen::Direct(iString quality, iString location,
   * @return QStringList
   *
   */
-QStringList SpiceDbGen::GetFiles(Filename location, iString filter) {
+QStringList SpiceDbGen::GetFiles(FileName location, iString filter) {
   filter.Remove("\\");
-  QDir dir(location.Expanded().c_str(), filter.c_str(),
+  QDir dir(location.expanded().c_str(), filter.c_str(),
            QDir::Name, QDir::Files);
   return dir.entryList();
 }
@@ -160,12 +160,12 @@ QStringList SpiceDbGen::GetFiles(Filename location, iString filter) {
   *
   * @throws Isis::iException::Message
   */
-PvlGroup SpiceDbGen::AddSelection(Filename fileIn) {
+PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
   NaifStatus::CheckErrors();
 
   //finalize the filename so that it may be used in spice routines
-  std::string tmp = fileIn.Expanded();
-//  const char* file = fileIn.Expanded().c_str();
+  std::string tmp = fileIn.expanded();
+//  const char* file = fileIn.expanded().c_str();
   furnsh_c(tmp.c_str());
   SpiceChar fileType[32], source[2048];
   SpiceInt handle;
@@ -232,8 +232,8 @@ PvlGroup SpiceDbGen::AddSelection(Filename fileIn) {
     }
   }
 
-  iString outFile = fileIn.OriginalPath();
-  result += PvlKeyword("File", outFile + "/" + fileIn.Name());
+  iString outFile = fileIn.originalPath();
+  result += PvlKeyword("File", outFile + "/" + fileIn.name());
 
   NaifStatus::CheckErrors();
 

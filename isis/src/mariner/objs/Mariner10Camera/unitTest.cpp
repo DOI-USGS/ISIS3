@@ -22,7 +22,7 @@
 
 #include "Camera.h"
 #include "CameraFactory.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Mariner10Camera.h"
@@ -72,7 +72,7 @@ int main(void) {
       //    Pvl p("$mariner10/testData/27265.cub");
       Pvl p(files[i]);
       Mariner10Camera *cam = (Mariner10Camera *) CameraFactory::Create(p);
-      cout << "Filename: " << Filename(p.Filename()).Name() << endl;
+      cout << "FileName: " << FileName(p.FileName()).name() << endl;
       cout << "CK Frame: " << cam->InstrumentRotation()->Frame() << endl << endl;
       cout.setf(std::ios::fixed);
       cout << setprecision(9);

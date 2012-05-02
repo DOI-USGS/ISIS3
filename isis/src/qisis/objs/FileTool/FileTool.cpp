@@ -331,7 +331,7 @@ namespace Isis {
     QVector< MdiCubeViewport *> *vwportList = p_workSpace->cubeViewportList();
     QVector<MdiCubeViewport *>::iterator it;
     for (it = vwportList->begin(); it != vwportList->end(); ++it){
-      if(QString((*it)->cube()->getFilename().c_str()) ==  psOutFile) {
+      if(QString((*it)->cube()->getFileName().c_str()) ==  psOutFile) {
         QMessageBox::information((QWidget *)parent(), "Error",
             "Output File is already open\n\""+ psOutFile + "\"");
         return;
@@ -340,7 +340,7 @@ namespace Isis {
 
     //If the filename is the same as the current cube's filename, just save it
     if(p_saveAsDialog->getSaveAsType() == SaveAsDialog::FullImage &&
-       psOutFile.toStdString() == cubeViewport()->cube()->getFilename()) {
+       psOutFile.toStdString() == cubeViewport()->cube()->getFileName()) {
       save();
       return;
     }
@@ -348,7 +348,7 @@ namespace Isis {
     //Save the current cube's changes by reopening it, and open an input cube
     //from the current cube's location
     Cube *icube = new Cube();
-    icube->open(cubeViewport()->cube()->getFilename(), "rw");
+    icube->open(cubeViewport()->cube()->getFileName(), "rw");
     Cube *ocube = NULL;
 
     if(p_saveAsDialog->getSaveAsType() != SaveAsDialog::ExportAsIs) {
@@ -457,7 +457,7 @@ namespace Isis {
     ons = (int)ceil(ins * dScale);
     onl = (int)ceil(inl * dScale);
 
-    CubeAttributeInput cai(icube->getFilename());
+    CubeAttributeInput cai(icube->getFileName());
     vector<string> bands = cai.Bands();
     int inb = bands.size();
 
@@ -484,7 +484,7 @@ namespace Isis {
     }
 
     Cube *tempcube=new Cube;
-    tempcube->open(cubeViewport()->cube()->getFilename(), "r");
+    tempcube->open(cubeViewport()->cube()->getFileName(), "r");
     Nearest *near = new Nearest(tempcube, ins/ons, inl/onl);
     near->setInputBoundary((int)dStartSample, (int)dEndSample, (int)dStartLine, (int)dEndLine);
 

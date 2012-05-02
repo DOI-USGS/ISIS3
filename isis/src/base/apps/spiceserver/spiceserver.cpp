@@ -6,6 +6,7 @@
 #include <QDomDocument>
 #include <QDomElement>
 #include <QDomNode>
+#include <QFile>
 
 #include "Camera.h"
 #include "CameraFactory.h"
@@ -69,7 +70,7 @@ void IsisMain() {
 
     // Get the single line of encoded XML from the input file that the client,
     //   spiceinit, sent us.
-    TextFile inFile(ui.GetFilename("FROM"));
+    TextFile inFile(ui.GetFileName("FROM"));
     iString hexCode;
 
     // GetLine returns false if it was the last line... so we can't check for
@@ -210,7 +211,7 @@ void IsisMain() {
     if (ck.size() == 0) {
       throw IException(IException::Unknown,
                        "No Camera Kernel found for the image [" +
-                        ui.GetFilename("FROM") + "]",
+                        ui.GetFileName("FROM") + "]",
                        _FILEINFO_);
     }
 
@@ -234,14 +235,14 @@ void IsisMain() {
                        _FILEINFO_);
     }
     else {
-      PackageKernels(ui.GetFilename("TO"));
+      PackageKernels(ui.GetFileName("TO"));
     }
 
     p.EndProcess();
   }
   catch (...) {
     // We failed at something, delete the temp files...
-    iString outFile = ui.GetFilename("TO");
+    iString outFile = ui.GetFileName("TO");
     QFile pointingFile(QString::fromStdString(outFile + ".pointing"));
     if (pointingFile.exists()) pointingFile.remove();
 
@@ -380,7 +381,7 @@ bool TryKernels(Pvl &label, Process &p,
       currentKernels.AddKeyword(demKeyword, Pvl::Replace);
       Pvl applicationLog;
       applicationLog += lab.FindGroup("Kernels", Pvl::Traverse);
-      applicationLog.Write(ui.GetFilename("TO") + ".print");
+      applicationLog.Write(ui.GetFileName("TO") + ".print");
     }
     catch (IException &e) {
       Pvl errPvl = e.toPvl();
@@ -400,7 +401,7 @@ bool TryKernels(Pvl &label, Process &p,
     for (int i = 0; i < ckKeyword.Size(); i++)
       ckTable.Label()["Kernels"].AddValue(ckKeyword[i]);
 
-    ckTable.Write(ui.GetFilename("TO") + ".pointing");
+    ckTable.Write(ui.GetFileName("TO") + ".pointing");
 
     Table spkTable = cam->InstrumentPosition()->Cache("InstrumentPosition");
     spkTable.Label() += PvlKeyword("Description", "Created by spiceinit");
@@ -408,7 +409,7 @@ bool TryKernels(Pvl &label, Process &p,
     for (int i = 0; i < spkKeyword.Size(); i++)
       spkTable.Label()["Kernels"].AddValue(spkKeyword[i]);
 
-    spkTable.Write(ui.GetFilename("TO") + ".position");
+    spkTable.Write(ui.GetFileName("TO") + ".position");
 
     Table bodyTable = cam->BodyRotation()->Cache("BodyRotation");
     bodyTable.Label() += PvlKeyword("Description", "Created by spiceinit");
@@ -421,7 +422,7 @@ bool TryKernels(Pvl &label, Process &p,
 
     bodyTable.Label() += PvlKeyword("SolarLongitude",
                                     cam->SolarLongitude().degrees());
-    bodyTable.Write(ui.GetFilename("TO") + ".bodyrot");
+    bodyTable.Write(ui.GetFileName("TO") + ".bodyrot");
 
     Table sunTable = cam->SunPosition()->Cache("SunPosition");
     sunTable.Label() += PvlKeyword("Description", "Created by spiceinit");
@@ -429,7 +430,7 @@ bool TryKernels(Pvl &label, Process &p,
     for (int i = 0; i < targetSpkKeyword.Size(); i++)
       sunTable.Label()["Kernels"].AddValue(targetSpkKeyword[i]);
 
-    sunTable.Write(ui.GetFilename("TO") + ".sun");
+    sunTable.Write(ui.GetFileName("TO") + ".sun");
 
     //  Save original kernels in keyword before changing to Table
     PvlKeyword origCk = currentKernels["InstrumentPointing"];
@@ -451,7 +452,7 @@ bool TryKernels(Pvl &label, Process &p,
     Pvl kernelsLabels;
     kernelsLabels += lab.FindGroup("Kernels", Pvl::Traverse);
     kernelsLabels += cam->getStoredNaifKeywords();
-    kernelsLabels.Write(ui.GetFilename("TO") + ".lab");
+    kernelsLabels.Write(ui.GetFileName("TO") + ".lab");
   }
   catch (IException &) {
     return false;

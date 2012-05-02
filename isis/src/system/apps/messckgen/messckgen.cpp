@@ -10,7 +10,7 @@
 #include <QSet>
 #include <QString>
 
-#include "Filename.h"
+#include "FileName.h"
 #include "iTime.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -47,42 +47,39 @@ void IsisMain() {
   MONTH_TO_STRING[12] = "DEC";
 
   // Fetch the pivot file
-  Filename pivotFilename;
+  FileName pivotFileName;
   if (ui.WasEntered("PIVOT")) {
-    pivotFilename = ui.GetFilename("PIVOT");
+    pivotFileName = ui.GetFileName("PIVOT");
   }
   else {
     // If not provided, assume the latest pivot file in the data area
     string pivotString("$messenger/kernels/ck/pivot_kernels.????.db");
-    pivotFilename = pivotString;
-    pivotFilename.HighestVersion();
+    pivotFileName = FileName(pivotString).highestVersion();
   }
-  Pvl pivot(pivotFilename.Expanded());
+  Pvl pivot(pivotFileName.expanded());
 
   // Fetch the atthist file
-  Filename atthistFilename;
+  FileName atthistFileName;
   if (ui.WasEntered("ATTHIST")) {
-    atthistFilename = ui.GetFilename("ATTHIST");
+    atthistFileName = ui.GetFileName("ATTHIST");
   }
   else {
     // If not provided, assume the latest atthist file in the data area
     string atthistString("$messenger/kernels/ck/atthist_kernels.????.db");
-    atthistFilename = atthistString;
-    atthistFilename.HighestVersion();
+    atthistFileName = FileName(atthistString).highestVersion();
   }
-  Pvl atthist(atthistFilename.Expanded());
+  Pvl atthist(atthistFileName.expanded());
 
   // Open the input file from the GUI or find the latest version of the DB file
-  Filename dbFilename;
+  FileName dbFileName;
   if (ui.WasEntered("FROM")) {
-    dbFilename = ui.GetFilename("FROM");
+    dbFileName = ui.GetFileName("FROM");
   }
   else {
     string dbString("$messenger/kernels/ck/kernels.????.db");
-    dbFilename = dbString;
-    dbFilename.HighestVersion();
+    dbFileName = FileName(dbString).highestVersion();
   }
-  Pvl kernelDb(dbFilename.Expanded());
+  Pvl kernelDb(dbFileName.expanded());
 
   PvlObject &pointing = kernelDb.FindObject("SpacecraftPointing");
   PvlObject &pivotPointing = pivot.FindObject("SpacecraftPointing");
@@ -174,11 +171,11 @@ void IsisMain() {
               string day = coveredTime.DayString();
               if (day.size() < 2) day = "0" + day;
 
-              string bcFilename = "$messenger/kernels/ck/";
-              bcFilename += "msgr" + year + month + day + ".bc";
+              string bcFileName = "$messenger/kernels/ck/";
+              bcFileName += "msgr" + year + month + day + ".bc";
 
               // Check that the current day's BC file exists
-              string bcExpanded = Filename(bcFilename).Expanded();
+              string bcExpanded = FileName(bcFileName).expanded();
               if (!QFile(QString::fromStdString(bcExpanded)).exists()) {
                 string msg = "The BC file [" + bcExpanded + "] does not exist";
                 throw IException(IException::User, msg, _FILEINFO_);
@@ -186,8 +183,8 @@ void IsisMain() {
 
               // If the current day's file isn't already present in the group,
               // then go ahead and add it
-              if ((*itr)[0] != bcFilename) {
-                PvlKeyword bcKeyword("File", bcFilename);
+              if ((*itr)[0] != bcFileName) {
+                PvlKeyword bcKeyword("File", bcFileName);
                 itr = currentGroup->AddKeyword(bcKeyword, itr);
               }
               itr++;
@@ -240,17 +237,16 @@ void IsisMain() {
 
   // Get the output filename, either user-specified or the latest version for
   // the kernels area (as run by makedb)
-  Filename outDBfile;
+  FileName outDBfile;
   if (ui.WasEntered("TO")) {
-    outDBfile = ui.GetFilename("TO");
+    outDBfile = ui.GetFileName("TO");
   }
   else {
-    outDBfile = "$messenger/kernels/ck/kernels.????.db";
-    outDBfile.NewVersion();
+    outDBfile = FileName("$messenger/kernels/ck/kernels.????.db").newVersion();
   }
 
   // Write the updated PVL as the new CK DB file
-  kernelDb.Write(outDBfile.Expanded());
+  kernelDb.Write(outDBfile.expanded());
 }
 
 

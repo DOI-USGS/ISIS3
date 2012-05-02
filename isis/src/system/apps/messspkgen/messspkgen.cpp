@@ -6,7 +6,7 @@
 
 #include <QString>
 
-#include "Filename.h"
+#include "FileName.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
@@ -24,16 +24,15 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Open the input file from the GUI or find the latest version of the DB file
-  Filename dbFilename;
+  FileName dbFileName;
   if (ui.WasEntered("FROM")) {
-    dbFilename = ui.GetFilename("FROM");
+    dbFileName = ui.GetFileName("FROM");
   }
   else {
     string dbString("$messenger/kernels/spk/kernels.????.db");
-    dbFilename = dbString;
-    dbFilename.HighestVersion();
+    dbFileName = FileName(dbString).highestVersion();
   }
-  Pvl kernelDb(dbFilename.Expanded());
+  Pvl kernelDb(dbFileName.expanded());
 
   // Get our main objects
   PvlObject &position = kernelDb.FindObject("SpacecraftPosition");
@@ -65,16 +64,16 @@ void IsisMain() {
 
   // Get the output filename, either user-specified or the latest version for
   // the kernels area (as run by makedb)
-  Filename outDBfile;
+  FileName outDBfile;
   if (ui.WasEntered("TO")) {
-    outDBfile = ui.GetFilename("TO");
+    outDBfile = ui.GetFileName("TO");
   }
   else {
-    outDBfile = dbFilename;
+    outDBfile = dbFileName;
   }
 
   // Write the updated PVL as the new SPK DB file
-  kernelDb.Write(outDBfile.Expanded());
+  kernelDb.Write(outDBfile.expanded());
 }
 
 

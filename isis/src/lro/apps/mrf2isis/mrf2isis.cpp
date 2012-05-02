@@ -6,7 +6,7 @@
 #include "ProcessImportPds.h"
 
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 
 using namespace std;
 using namespace Isis;
@@ -16,17 +16,17 @@ void IsisMain() {
   Pvl label;
   UserInterface &ui = Application::GetUserInterface();
 
-  string labelFile = ui.GetFilename("FROM");
-  Filename inFile = ui.GetFilename("FROM");
+  string labelFile = ui.GetFileName("FROM");
+  FileName inFile = ui.GetFileName("FROM");
   iString id;
-  Pvl lab(inFile.Expanded());
+  Pvl lab(inFile.expanded());
 
   try {
     id = (string) lab.FindKeyword("DATA_SET_ID");
   }
   catch(IException &e) {
     string msg = "Unable to read [DATA_SET_ID] from input file [" +
-                 inFile.Expanded() + "]";
+                 inFile.expanded() + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
@@ -38,7 +38,7 @@ void IsisMain() {
       id != "CH1-ORB-L-MRFFR-5-CDR-MOSAIC-V1.0" &&
       id != "LRO-L-MRFLRO-3-CDR-V1.0" && id != "LRO-L-MRFLRO-5-CDR-MAP-V1.0" &&
       id != "LRO-L-MRFLRO-4-CDR-V1.0" && id != "LRO-L-MRFLRO-5-CDR-MOSAIC-V1.0") {
-    string msg = "Input file [" + inFile.Expanded() + "] does not appear to be " +
+    string msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
                  "in CHANDRAYAAN-1 MINI-RF FORERUNNER level 1 or level 2 format " +
                  "or in LUNAR RECONNAISSANCE ORBITER MINI-RF LRO level 1 or " +
                  "level 2 format. " +
@@ -62,7 +62,7 @@ void IsisMain() {
     p.SetOrganization(Isis::ProcessImport::BIL);
   }
   else {
-    string msg = "Input file [" + inFile.Expanded() + "] has an invalid " +
+    string msg = "Input file [" + inFile.expanded() + "] has an invalid " +
                  "band storage type. BAND_STORAGE_TYPE is [" + bandorder + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
@@ -78,13 +78,13 @@ void IsisMain() {
 
   if(id == "CHAN1-L-MRFFR-5-CDR-MAP-V1.0" || id == "LRO-L-MRFLRO-5-CDR-MAP-V1.0") {
     // Translate the BandBin group
-    Filename transFile(transDir + "mrflev2BandBin.trn");
-    PvlTranslationManager bandBinXlater(label, transFile.Expanded());
+    FileName transFile(transDir + "mrflev2BandBin.trn");
+    PvlTranslationManager bandBinXlater(label, transFile.expanded());
     bandBinXlater.Auto(otherLabels);
 
     // Translate the Archive group
     transFile = transDir + "mrflev2Archive.trn";
-    PvlTranslationManager archiveXlater(label, transFile.Expanded());
+    PvlTranslationManager archiveXlater(label, transFile.expanded());
     archiveXlater.Auto(otherLabels);
 
     // Write the BandBin, Archive, and Mapping groups to the output cube label
@@ -94,23 +94,23 @@ void IsisMain() {
   }
   else {
     // Translate the BandBin group
-    Filename transFile(transDir + "mrflev1BandBin.trn");
-    PvlTranslationManager bandBinXlater(label, transFile.Expanded());
+    FileName transFile(transDir + "mrflev1BandBin.trn");
+    PvlTranslationManager bandBinXlater(label, transFile.expanded());
     bandBinXlater.Auto(otherLabels);
 
     // Translate the Archive group
     transFile = transDir + "mrflev1Archive.trn";
-    PvlTranslationManager archiveXlater(label, transFile.Expanded());
+    PvlTranslationManager archiveXlater(label, transFile.expanded());
     archiveXlater.Auto(otherLabels);
 
     // Translate the Instrument group
     transFile = transDir + "mrflev1Instrument.trn";
-    PvlTranslationManager instrumentXlater(label, transFile.Expanded());
+    PvlTranslationManager instrumentXlater(label, transFile.expanded());
     instrumentXlater.Auto(otherLabels);
 
     // Translate the Image group
     transFile = transDir + "mrflev1Image.trn";
-    PvlTranslationManager imageXlater(label, transFile.Expanded());
+    PvlTranslationManager imageXlater(label, transFile.expanded());
     imageXlater.Auto(otherLabels);
 
     // Write the BandBin, Archive, Instrument, and ImageInfo groups
@@ -127,7 +127,7 @@ void IsisMain() {
       double pheight = instGrp["ScaledPixelHeight"];
       double pwidth = instGrp["ScaledPixelWidth"];
       if(pheight != pwidth) {
-        string msg = "Input file [" + inFile.Expanded() + "] does not have valid " +
+        string msg = "Input file [" + inFile.expanded() + "] does not have valid " +
                      "ScaledPixelHeight and ScaledPixelWidth values. These values " +
                      "must be equivalent or the image is considered to be invalid.";
         throw IException(IException::Io, msg, _FILEINFO_);

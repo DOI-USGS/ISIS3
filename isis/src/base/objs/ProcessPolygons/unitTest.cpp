@@ -64,12 +64,12 @@ void IsisMain() {
 
   CubeAttributeInput atts;
 
-  cout << "Filename: " << output1 << endl;
+  cout << "FileName: " << output1 << endl;
   pbl.SetInputCube(output1, atts, 0);
   pbl.StartProcess(writeAscii);
   pbl.EndProcess();
 
-  cout << "Filename: " << output2 << endl;
+  cout << "FileName: " << output2 << endl;
   pbl.SetInputCube(output2, atts, 0);
   pbl.StartProcess(writeAscii);
   pbl.EndProcess();

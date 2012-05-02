@@ -9,7 +9,7 @@
 #include "NormModelFactory.h"
 #include "NormModel.h"
 #include "Plugin.h"
-#include "Filename.h"
+#include "FileName.h"
 
 namespace Isis {
   /**

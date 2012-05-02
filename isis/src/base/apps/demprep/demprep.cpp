@@ -252,7 +252,7 @@ void IsisMain() {
 
   // We need to create the output file
   ocube = new Cube();
-  ocube->open(Filename(ui.GetFilename("TO")).Expanded(), "rw");
+  ocube->open(FileName(ui.GetFileName("TO")).expanded(), "rw");
 
   p.StartProcess(DoWrap);
 

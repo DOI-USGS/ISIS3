@@ -4,7 +4,7 @@
 #include "ProjectionFactory.h"
 #include "Process.h"
 #include "Brick.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "ProcessPolygons.h"
 #include "UniversalGroundMap.h"
 
@@ -33,16 +33,16 @@ namespace Isis {
       //Determine cube size from the projection map
       void SetOutputCube(const std::string &parameter, Isis::Pvl &map, int bands);
 
-      void SetOutputCube(const std::string &avgFilename, const std::string
-                         &countFilename, Isis::CubeAttributeOutput &atts,
+      void SetOutputCube(const std::string &avgFileName, const std::string
+                         &countFileName, Isis::CubeAttributeOutput &atts,
                          std::string &cube);
 
-      void SetOutputCube(const std::string &avgFilename, const std::string
-                         &countFilename, Isis::CubeAttributeOutput &atts,
+      void SetOutputCube(const std::string &avgFileName, const std::string
+                         &countFileName, Isis::CubeAttributeOutput &atts,
                          Isis::Pvl &map, int bands);
 
-      void AppendOutputCube(std::string &cube, const std::string &avgFilename,
-                            const std::string &countFilename = "");
+      void AppendOutputCube(std::string &cube, const std::string &avgFileName,
+                            const std::string &countFileName = "");
 
       void Rasterize(std::vector<double> &lat,
                      std::vector<double> &lon,

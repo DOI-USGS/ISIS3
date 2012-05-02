@@ -33,7 +33,7 @@ void IsisMain() {
   CubeAttributeOutput cao;
   cao.PixelType(Real);
   p.SetOutputCube(
-      Filename(Application::GetUserInterface().GetAsString("TO")).Expanded(),
+      FileName(Application::GetUserInterface().GetAsString("TO")).expanded(),
       cao, inCube->getSampleCount(), inCube->getLineCount(),
       inCube->getBandCount());
 

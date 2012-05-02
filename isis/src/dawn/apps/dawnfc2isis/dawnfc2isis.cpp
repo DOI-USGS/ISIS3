@@ -6,7 +6,7 @@
 #include "ProcessImportPds.h"
 #include "ProcessBySample.h"
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 
 using namespace std;
 using namespace Isis;
@@ -18,18 +18,18 @@ void IsisMain() {
   Pvl pdsLabel;
   UserInterface &ui = Application::GetUserInterface();
 
-  Filename inFile = ui.GetFilename("FROM");
+  FileName inFile = ui.GetFileName("FROM");
   iString instid;
   iString missid;
 
   try {
-    Pvl lab(inFile.Expanded());
+    Pvl lab(inFile.expanded());
     instid = (string) lab.FindKeyword("INSTRUMENT_ID");
     missid = (string) lab.FindKeyword("MISSION_ID");
   }
   catch(IException &e) {
     string msg = "Unable to read [INSTRUMENT_ID] or [MISSION_ID] from input file [" +
-                 inFile.Expanded() + "]";
+                 inFile.expanded() + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
@@ -40,7 +40,7 @@ void IsisMain() {
   missid.Compress();
   missid.Trim(" ");
   if(missid != "DAWN" && instid != "FC1" && instid != "FC2") {
-    string msg = "Input file [" + inFile.Expanded() + "] does not appear to be " +
+    string msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
                  "a DAWN Framing Camera (FC) EDR or RDR file.";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
@@ -51,22 +51,22 @@ void IsisMain() {
   }
 
 
-  p.SetPdsFile(inFile.Expanded(), "", pdsLabel);
+  p.SetPdsFile(inFile.expanded(), "", pdsLabel);
   p.SetOrganization(Isis::ProcessImport::BSQ);
-  string tmpName = "$TEMPORARY/" + inFile.Basename() + ".tmp.cub";
-  Filename tmpFile(tmpName);
+  string tmpName = "$TEMPORARY/" + inFile.baseName() + ".tmp.cub";
+  FileName tmpFile(tmpName);
   CubeAttributeOutput outatt = CubeAttributeOutput("+Real");
-  p.SetOutputCube(tmpFile.Expanded(), outatt);
+  p.SetOutputCube(tmpFile.expanded(), outatt);
   p.SaveFileHeader();
 
-  Pvl labelPvl(inFile.Expanded());
+  Pvl labelPvl(inFile.expanded());
 
   p.StartProcess();
   p.EndProcess();
 
   ProcessBySample p2;
   CubeAttributeInput inatt;
-  p2.SetInputCube(tmpFile.Expanded(), inatt);
+  p2.SetInputCube(tmpFile.expanded(), inatt);
   Cube *outcube = p2.SetOutputCube("TO");
 
   // Get the directory where the DAWN translation tables are.
@@ -77,18 +77,18 @@ void IsisMain() {
   Pvl outLabel;
 
   // Translate the BandBin group
-  Filename transFile(transDir + "dawnfcBandBin.trn");
-  PvlTranslationManager bandBinXlater(labelPvl, transFile.Expanded());
+  FileName transFile(transDir + "dawnfcBandBin.trn");
+  PvlTranslationManager bandBinXlater(labelPvl, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   // Translate the Archive group
   transFile = transDir + "dawnfcArchive.trn";
-  PvlTranslationManager archiveXlater(labelPvl, transFile.Expanded());
+  PvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   // Translate the Instrument group
   transFile = transDir + "dawnfcInstrument.trn";
-  PvlTranslationManager instrumentXlater(labelPvl, transFile.Expanded());
+  PvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
   //  Update target if user specifies it
@@ -151,7 +151,7 @@ void IsisMain() {
     filtname = "Blue_F8";
   }
   else {
-    string msg = "Input file [" + inFile.Expanded() + "] has an invalid " +
+    string msg = "Input file [" + inFile.expanded() + "] has an invalid " +
                  "FilterNumber. The FilterNumber must fall in the range 1 to 8.";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
@@ -168,7 +168,7 @@ void IsisMain() {
     kerns += PvlKeyword("NaifFrameCode", -203120-filtno);
   }
   else {
-    string msg = "Input file [" + inFile.Expanded() + "] has an invalid " +
+    string msg = "Input file [" + inFile.expanded() + "] has an invalid " +
                  "InstrumentId.";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
@@ -177,7 +177,7 @@ void IsisMain() {
   p2.StartProcess(flipbyline);
   p2.EndProcess();
 
-  string tmp(tmpFile.Expanded());
+  string tmp(tmpFile.expanded());
   remove(tmp.c_str());
 }
 

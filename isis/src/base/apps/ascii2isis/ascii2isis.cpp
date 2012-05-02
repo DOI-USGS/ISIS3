@@ -27,7 +27,7 @@ void IsisMain() {
 
   //  Open input text file
   UserInterface &ui = Application::GetUserInterface();
-  string from = ui.GetFilename("FROM");
+  string from = ui.GetFileName("FROM");
   // Get storage order of data
   order = ui.GetString("ORDER");
 
@@ -67,7 +67,7 @@ void IsisMain() {
   if(order == "BSQ") {
     ProcessByLine p;
 
-    p.SetOutputCube(ui.GetFilename("TO"), att, ns, nl, nb);
+    p.SetOutputCube(ui.GetFileName("TO"), att, ns, nl, nb);
     p.StartProcess(ascii2isis);
     p.EndProcess();
   }
@@ -75,14 +75,14 @@ void IsisMain() {
     ProcessBySpectra p(Isis::ProcessBySpectra::ByLine);
 
     // Set Special Pixel ranges
-    p.SetOutputCube(ui.GetFilename("TO"), att, ns, nl, nb);
+    p.SetOutputCube(ui.GetFileName("TO"), att, ns, nl, nb);
     p.StartProcess(ascii2isis);
     p.EndProcess();
   }
   if(order == "BIP") {
     ProcessBySpectra p(Isis::ProcessBySpectra::PerPixel);
 
-    p.SetOutputCube(ui.GetFilename("TO"), att, ns, nl, nb);
+    p.SetOutputCube(ui.GetFileName("TO"), att, ns, nl, nb);
     p.StartProcess(ascii2isis);
     p.EndProcess();
   }

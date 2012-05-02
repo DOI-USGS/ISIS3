@@ -178,7 +178,7 @@ namespace Isis {
       }
       else {
         std::string msg = "PVL for LimitPolygonSeeder must contain [MajorAxisPoints] in [";
-        msg += pvl.Filename() + "]";
+        msg += pvl.FileName() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -191,12 +191,12 @@ namespace Isis {
       }
       else {
         std::string msg = "PVL for LimitPolygonSeeder must contain [MinorAxisPoints] in [";
-        msg += pvl.Filename() + "]";
+        msg += pvl.FileName() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     catch(IException &e) {
-      std::string msg = "Improper format for PolygonSeeder PVL [" + pvl.Filename() + "]";
+      std::string msg = "Improper format for PolygonSeeder PVL [" + pvl.FileName() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 

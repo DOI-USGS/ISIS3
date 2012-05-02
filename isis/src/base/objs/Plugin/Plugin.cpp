@@ -28,7 +28,7 @@
 #include <QLibrary>
 #include <QStringList>
 
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 
 using namespace std;
@@ -58,21 +58,21 @@ namespace Isis {
     string library = g["Library"];
 
     string path = "./";
-    Isis::Filename libraryFile(path + library);
+    Isis::FileName libraryFile(path + library);
 
     string pluginName = g["Routine"];
 
     // Open the library, resolve the routine name, and return the function
     // address. The function will stay in memory until the application exists
     // so the scope of lib does not matter.
-    QLibrary lib(libraryFile.Expanded().c_str());
+    QLibrary lib(libraryFile.expanded().c_str());
     bool loadedOk = lib.load();
 
     if(!loadedOk) {
       path = "$ISISROOT/lib/";
       libraryFile = path + library;
     }
-    lib.setFileName(libraryFile.Expanded().c_str());
+    lib.setFileName(libraryFile.expanded().c_str());
 
     void *plugin = lib.resolve(pluginName.c_str());
     if(plugin == 0) {

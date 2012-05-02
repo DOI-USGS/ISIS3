@@ -23,7 +23,7 @@ Distance GetRadius(std::string filename, Latitude lat, Longitude lon);
 void IsisMain() {
   // Create a serial number list
   UserInterface &ui = Application::GetUserInterface();
-  string filename = ui.GetFilename("FROM");
+  string filename = ui.GetFileName("FROM");
   SerialNumberList serialNumberList;
   serialNumberList.Add(filename);
 
@@ -39,7 +39,7 @@ void IsisMain() {
     rad1 = Distance(ui.GetDouble("RAD1"), Distance::Meters);
   }
   else {
-    rad1 = GetRadius(ui.GetFilename("FROM"), lat1, lon1);
+    rad1 = GetRadius(ui.GetFileName("FROM"), lat1, lon1);
   }
 
   // In order to use the bundle adjustment class we will need a control
@@ -83,7 +83,7 @@ void IsisMain() {
       rad2 = Distance(ui.GetDouble("RAD2"), Distance::Meters);
     }
     else {
-      rad2 = GetRadius(ui.GetFilename("FROM"), lat2, lon2);
+      rad2 = GetRadius(ui.GetFileName("FROM"), lat2, lon2);
     }
 
     ControlMeasure * m = new ControlMeasure;

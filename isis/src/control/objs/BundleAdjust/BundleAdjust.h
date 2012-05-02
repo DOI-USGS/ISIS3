@@ -159,7 +159,7 @@ namespace Isis {
       Isis::SerialNumberList *SerialNumberList() { return m_pSnList; }
       int Images() const { return m_pSnList->Size(); }
       int Observations() const;
-      std::string Filename(int index);
+      std::string FileName(int index);
       bool IsHeld(int index);
       Table Cmatrix(int index);
       Table SpVector(int index);
@@ -405,7 +405,7 @@ namespace Isis {
       std::vector<double> m_dxKnowns;
       std::vector<double> m_dyKnowns;
 
-      std::string m_strCnetFilename;                         //!< Control Net file specification
+      std::string m_strCnetFileName;                         //!< Control Net file specification
       std::string m_strSolutionMethod;                       //!< solution method string (QR,SVD,SPARSE-LU,SPECIALK)
       std::string m_strOutputFilePrefix;                     //!< output file prefix
 

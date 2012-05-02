@@ -8,7 +8,7 @@
 #include <sstream>
 #include <iostream>
 
-#include "Filename.h"
+#include "FileName.h"
 #include "UserInterface.h"
 #include "Cube.h"
 #include "OriginalLabel.h"
@@ -29,7 +29,7 @@ void IsisMain() {
 //  Input parameters
   UserInterface &ui = Application::GetUserInterface();
   string sourceFile = ui.GetAsString("FROM");    //  Save off source filename
-  Filename from(sourceFile);
+  FileName from(sourceFile);
 
   string to;
   if(ui.WasEntered("TO")) to = ui.GetAsString("TO");
@@ -46,26 +46,25 @@ void IsisMain() {
 
 // Run mdis2isis if necessary.  If this step must be done, we must also
 //  run spiceinit to initialize it with spice.
-  if(iString::UpCase(from.Extension()) != "CUB") {
-    Filename temp;
-    temp.Temporary(from.Basename(), "cub");
-    string params = "from=" + from.Expanded()  + " to=" + temp.Expanded();
+  if(iString::UpCase(from.extension()) != "CUB") {
+    FileName temp = FileName::createTempFile("$TEMPORARY/" + from.baseName() + ".cub");
+    string params = "from=" + from.expanded()  + " to=" + temp.expanded();
 
     try {
       ProgramLauncher::RunIsisProgram("mdis2isis", params);
 
 // Ensure a proper target before initialization
       Cube cube;
-      cube.open(temp.Expanded(), "rw");
+      cube.open(temp.expanded(), "rw");
       Pvl *label = cube.getLabel();
       MdisGeometry::validateTarget(*label, true);
       cube.close();
 
       //  Run spiceinit on it
-      ProgramLauncher::RunIsisProgram("spiceinit", "from=" + temp.Expanded());
+      ProgramLauncher::RunIsisProgram("spiceinit", "from=" + temp.expanded());
     }
     catch(IException &ie) {
-      string tempName(temp.Expanded());
+      string tempName(temp.expanded());
       remove(tempName.c_str());
       throw IException(ie, IException::User,
                        "Failed to execute mdis2isis/spiceinit", _FILEINFO_);
@@ -80,11 +79,11 @@ void IsisMain() {
   try {
 
 //  Get the orginal PDS EDR labels and initialize the keyword map
-    Pvl edrlab = OriginalLabel(from.Expanded()).ReturnLabels();
+    Pvl edrlab = OriginalLabel(from.expanded()).ReturnLabels();
     MdisEdrKeys edrkeys(edrlab);
 
 //  Compute the Geometry
-    MdisGeometry geom(from.Expanded());
+    MdisGeometry geom(from.expanded());
     Pvl geomkeys = geom.getGeometry(sourceFile);
     edrkeys.updateKeys(geomkeys);
 
@@ -92,24 +91,24 @@ void IsisMain() {
 
 //  Only process the PDS EDR keyword mapping if KEYMAP (or TO) is entered.
     if(!keylist.empty()) {
-      Filename kmap(keylist);
-      if(!kmap.Exists()) {
-        string mess = "EDR keyword map source file, " + kmap.Expanded()
+      FileName kmap(keylist);
+      if(!kmap.fileExists()) {
+        string mess = "EDR keyword map source file, " + kmap.expanded()
                       + ", does not exist!";
         throw IException(IException::User, mess.c_str(), _FILEINFO_);
       }
 
       // Get the keylist source line
-      string kmapName(kmap.Expanded());
+      string kmapName(kmap.expanded());
       ifstream ifile(kmapName.c_str(), ios::in);
       if(!ifile) {
-        string mess = "Unable to open key map source file " + kmap.Expanded();
+        string mess = "Unable to open key map source file " + kmap.expanded();
         throw IException(IException::User, mess, _FILEINFO_);
       }
 
       string keystring;
       if(!getline(ifile, keystring)) {
-        string mess = "I/O error reading key map line from  " + kmap.Expanded();
+        string mess = "I/O error reading key map line from  " + kmap.expanded();
         throw IException(IException::User, mess, _FILEINFO_);
       }
 
@@ -122,9 +121,9 @@ void IsisMain() {
 
       if(!to.empty()) {
         //  Now open the output file and write the result
-        Filename tomap(to);
-        string tomapName(tomap.Expanded());
-        bool toExists = tomap.Exists();
+        FileName tomap(to);
+        string tomapName(tomap.expanded());
+        bool toExists = tomap.fileExists();
         ofstream ofile;
         if(toExists) {
           ofile.open(tomapName.c_str(), std::ios::out | std::ios::app);
@@ -163,13 +162,13 @@ void IsisMain() {
     Application::Log(mdiskeys);
   }
   catch(IException &) {
-    string fromName(from.Expanded());
+    string fromName(from.expanded());
     if(delete_from) remove(fromName.c_str());
     throw;
   }
 
 // Delete the from file if it was temporarily created from an EDR
-  string fromName(from.Expanded());
+  string fromName(from.expanded());
   if(delete_from) remove(fromName.c_str());
 }
 

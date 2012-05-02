@@ -3,7 +3,7 @@
 #include "Buffer.h"
 #include "CubeAttribute.h"
 #include "ExportDescription.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "JP2Exporter.h"
 #include "ProcessExport.h"
 #include "QtExporter.h"
@@ -68,12 +68,12 @@ namespace Isis {
    * @param outputName The filename of the output cube
    * @param quality The quality of the output from 0 to 100, defaults to 100
    */
-  void ImageExporter::write(Filename outputName, int quality) {
+  void ImageExporter::write(FileName outputName, int quality) {
     ProcessExport &p = getProcess();
     if (!p.HasInputRange()) p.SetInputRange();
     p.ProcessCubes(*this);
 
-    outputName.AddExtension(m_extension);
+    outputName.addExtension(m_extension);
     createWorldFile(outputName);
   }
 
@@ -244,7 +244,7 @@ namespace Isis {
 
     const ExportDescription::ChannelDescription &channel = desc.getChannel(i);
     Cube *cube = p.SetInputCube(
-        channel.filename().Expanded(), channel.attributes(), Isis::OneBand);
+        channel.filename().expanded(), channel.attributes(), Isis::OneBand);
 
     if (channel.hasCustomRange())
       p.SetInputRange(channel.getInputMinimum(), channel.getInputMaximum(), i);
@@ -258,12 +258,12 @@ namespace Isis {
    *
    * @param outputName Name of the world file
    */
-  void ImageExporter::createWorldFile(Filename outputName) {
-    outputName.RemoveExtension();
-    outputName.AddExtension(m_world);
+  void ImageExporter::createWorldFile(FileName outputName) {
+    outputName.removeExtension();
+    outputName.addExtension(m_world);
 
     ProcessExport &p = getProcess();
-    p.CreateWorldFile(outputName.Expanded());
+    p.CreateWorldFile(outputName.expanded());
     p.EndProcess();
   }
 

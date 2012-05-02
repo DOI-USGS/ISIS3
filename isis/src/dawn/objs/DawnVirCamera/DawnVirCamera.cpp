@@ -72,7 +72,7 @@ namespace Isis {
 
       // Setup detector map
       //  Get the line scan rates/times
-      readHouseKeeping(lab.Filename(), m_scanRate);
+      readHouseKeeping(lab.FileName(), m_scanRate);
       new VariableLineScanCameraDetectorMap(this, m_lineRates);
       DetectorMap()->SetDetectorSampleSumming(m_summing);
 

@@ -25,7 +25,7 @@
 #include "PhotoModel.h"
 #include "Plugin.h"
 #include "IException.h"
-#include "Filename.h"
+#include "FileName.h"
 
 namespace Isis {
   /**
@@ -68,8 +68,8 @@ namespace Isis {
 
     // Open the factory plugin file
     Plugin *p = new Plugin;
-    Filename f("PhotoModel.plugin");
-    if(f.Exists()) {
+    FileName f("PhotoModel.plugin");
+    if(f.fileExists()) {
       p->Read("PhotoModel.plugin");
     }
     else {

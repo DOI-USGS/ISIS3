@@ -76,10 +76,10 @@ void IsisMain() {
   }
 
   // Gets the input parameters
-  ControlNet outNet(ui.GetFilename("CNET"));
+  ControlNet outNet(ui.GetFileName("CNET"));
   FileList inList;
   if(ui.WasEntered("FROMLIST")) {
-    inList = ui.GetFilename("FROMLIST");
+    inList = ui.GetFileName("FROMLIST");
   }
 
   int inputPoints = outNet.GetNumPoints();
@@ -87,7 +87,7 @@ void IsisMain() {
   for (int cp = 0; cp < outNet.GetNumPoints(); cp++)
     inputMeasures += outNet.GetPoint(cp)->GetNumMeasures();
 
-  // Set up the Serial Number to Filename mapping
+  // Set up the Serial Number to FileName mapping
   QMap<iString, iString> sn2filename;
   for(int cubeIndex = 0; cubeIndex < (int)inList.size(); cubeIndex ++) {
     iString sn = SerialNumber::Compose(inList[cubeIndex]);
@@ -117,7 +117,7 @@ void IsisMain() {
   // Set up comparison data
   QVector<iString> serialNumbers;
   if(cubePoints) {
-    FileList cubeList(ui.GetFilename("CUBELIST"));
+    FileList cubeList(ui.GetFileName("CUBELIST"));
     for(int cubeIndex = 0; cubeIndex < (int)cubeList.size(); cubeIndex ++) {
       iString sn = SerialNumber::Compose(cubeList[cubeIndex]);
       serialNumbers.push_back(sn);
@@ -301,7 +301,7 @@ void IsisMain() {
   outProgress.CheckStatus();
 
   // Write the extracted Control Network
-  outNet.Write(ui.GetFilename("ONET"));
+  outNet.Write(ui.GetFileName("ONET"));
 
   outProgress.CheckStatus();
 
@@ -372,81 +372,81 @@ void IsisMain() {
     std::string prefix = ui.GetString("PREFIX");
 
     if(noIgnore) {
-      iString namecp = Filename(prefix + "IgnoredPoints.txt").Expanded();
+      iString namecp = FileName(prefix + "IgnoredPoints.txt").expanded();
       WriteResults(namecp, ignoredPoints);
-      iString namecm = Filename(prefix + "IgnoredMeasures.txt").Expanded();
+      iString namecm = FileName(prefix + "IgnoredMeasures.txt").expanded();
       WriteResults(namecm, ignoredMeasures);
     }
 
     resultsProgress.CheckStatus();
 
     if(noSingleMeasure) {
-      iString name = Filename(prefix + "SingleMeasurePoints.txt").Expanded();
+      iString name = FileName(prefix + "SingleMeasurePoints.txt").expanded();
       WriteResults(name, singleMeasurePoints);
     }
 
     resultsProgress.CheckStatus();
 
     if(noMeasureless) {
-      iString name = Filename(prefix + "MeasurelessPoints.txt").Expanded();
+      iString name = FileName(prefix + "MeasurelessPoints.txt").expanded();
       WriteResults(name, measurelessPoints);
     }
 
     resultsProgress.CheckStatus();
 
     if(noTolerancePoints) {
-      iString name = Filename(prefix + "TolerancePoints.txt").Expanded();
+      iString name = FileName(prefix + "TolerancePoints.txt").expanded();
       WriteResults(name, tolerancePoints);
     }
 
     resultsProgress.CheckStatus();
 
     if(reference) {
-      iString name = Filename(prefix + "NonReferenceMeasures.txt").Expanded();
+      iString name = FileName(prefix + "NonReferenceMeasures.txt").expanded();
       WriteResults(name, nonReferenceMeasures);
     }
 
     resultsProgress.CheckStatus();
 
     if(fixed) {
-      iString name = Filename(prefix + "NonFixedPoints.txt").Expanded();
+      iString name = FileName(prefix + "NonFixedPoints.txt").expanded();
       WriteResults(name, nonFixedPoints);
     }
 
     resultsProgress.CheckStatus();
 
     if(cubePoints) {
-      iString name = Filename(prefix + "NonCubePoints.txt").Expanded();
+      iString name = FileName(prefix + "NonCubePoints.txt").expanded();
       WriteResults(name, nonCubePoints);
     }
 
     resultsProgress.CheckStatus();
 
     if(noMeasurePoints.size() != 0) {
-      iString name = Filename(prefix + "NoMeasurePoints.txt").Expanded();
+      iString name = FileName(prefix + "NoMeasurePoints.txt").expanded();
       WriteResults(name, noMeasurePoints);
     }
 
     resultsProgress.CheckStatus();
 
     if(cubeMeasures) {
-      iString name = Filename(prefix + "NonCubeMeasures.txt").Expanded();
+      iString name = FileName(prefix + "NonCubeMeasures.txt").expanded();
       WriteResults(name, noCubeMeasures);
     }
 
     resultsProgress.CheckStatus();
 
     if(pointsEntered) {
-      iString name = Filename(prefix + "NonListedPoints.txt").Expanded();
+      iString name = FileName(prefix + "NonListedPoints.txt").expanded();
       WriteResults(name, nonListedPoints);
     }
 
     resultsProgress.CheckStatus();
 
     if(latLon) {
-      iString namenon = Filename(prefix + "LatLonOutOfRange.txt").Expanded();
+      iString namenon = FileName(prefix + "LatLonOutOfRange.txt").expanded();
       WriteResults(namenon, nonLatLonPoints);
-      iString namegen = Filename(prefix + "NoLatLonPoints.txt").Expanded();
+      iString namegen = FileName(prefix + "NoLatLonPoints.txt").expanded();
       WriteResults(namegen, cannotGenerateLatLonPoints);
     }
 
@@ -470,7 +470,7 @@ void IsisMain() {
 void ExtractPointList(ControlNet &outNet, QVector<iString> nonListedPoints) {
   UserInterface &ui = Application::GetUserInterface();
 
-  FileList listedPoints(ui.GetFilename("POINTLIST"));
+  FileList listedPoints(ui.GetFileName("POINTLIST"));
 
   for(int cp = outNet.GetNumPoints() - 1; cp >= 0; cp --) {
     ControlPoint *controlpt = outNet.GetPoint(cp);
@@ -703,7 +703,7 @@ void WriteCubeOutList(ControlNet cnet, QMap<iString, iString> sn2file) {
       p.CheckStatus();
     }
 
-    std::string toList = ui.GetFilename("TOLIST");
+    std::string toList = ui.GetFileName("TOLIST");
     std::ofstream out_stream;
     out_stream.open(toList.c_str(), std::ios::out);
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file

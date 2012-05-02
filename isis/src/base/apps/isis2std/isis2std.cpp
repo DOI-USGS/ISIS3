@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 #include "ExportDescription.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "ImageExporter.h"
 #include "UserInterface.h"
 
@@ -51,7 +51,7 @@ void IsisMain() {
     }
   }
 
-  Filename outputName = ui.GetFilename("TO");
+  FileName outputName = ui.GetFileName("TO");
   int quality = ui.GetInteger("QUALITY");
   exporter->write(outputName, quality);
 
@@ -74,7 +74,7 @@ void IsisMain() {
 
   // Write out the results
   PvlGroup results("Results");
-  results += PvlKeyword("OutputFilename", outputName.Expanded());
+  results += PvlKeyword("OutputFileName", outputName.expanded());
 
   if (mode == "GRAYSCALE") {
     addResults(results, exporter, "", 0);
@@ -95,7 +95,7 @@ void IsisMain() {
 
 int addChannel(ExportDescription &desc, iString param, iString mode) {
   UserInterface &ui = Application::GetUserInterface();
-  Filename name = ui.GetFilename(param);
+  FileName name = ui.GetFileName(param);
   CubeAttributeInput &att = ui.GetInputAttribute(param);
 
   int index = -1;

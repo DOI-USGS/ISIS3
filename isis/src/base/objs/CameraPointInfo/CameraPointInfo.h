@@ -89,7 +89,7 @@ namespace Isis {
       CameraPointInfo();
       virtual ~CameraPointInfo();
 
-      void SetCube(const std::string &cubeFilename);
+      void SetCube(const std::string &cubeFileName);
       PvlGroup *SetImage(const double sample, const double line,
                          const bool outside = false, const bool error = false);
       PvlGroup *SetCenter(const bool outside = false, const bool error = false);

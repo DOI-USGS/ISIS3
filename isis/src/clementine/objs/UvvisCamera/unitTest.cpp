@@ -50,7 +50,7 @@ int main(void) {
 
     Pvl p("$clementine1/testData/lub0428b.cub");
     UvvisCamera *cam = (UvvisCamera *) CameraFactory::Create(p);
-    cout << "Filename: " << Filename(p.Filename()).Name() << endl;
+    cout << "FileName: " << FileName(p.FileName()).name() << endl;
     cout << "CK Frame: " << cam->InstrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

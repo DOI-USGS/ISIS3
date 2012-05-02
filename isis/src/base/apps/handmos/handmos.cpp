@@ -31,7 +31,7 @@ void IsisMain() {
   p.SetTrackFlag(bTrack);
   
   string inputFile = ui.GetAsString("FROM");
-  string mosaicFile = ui.GetFilename("MOSAIC");
+  string mosaicFile = ui.GetFileName("MOSAIC");
 
   // Set up the mosaic priority, either the input cube will be
   // placed ontop of the mosaic or beneath it  
@@ -149,7 +149,7 @@ void IsisMain() {
   PvlGroup imgPosition("ImageLocation");
   int iStartLine   = p.GetInputStartLineInMosaic();
   int iStartSample = p.GetInputStartSampleInMosaic();
-  imgPosition += PvlKeyword("File", ui.GetFilename("FROM"));
+  imgPosition += PvlKeyword("File", ui.GetFileName("FROM"));
   imgPosition += PvlKeyword("StartSample", iStartSample);
   imgPosition += PvlKeyword("StartLine", iStartLine);
   Application::Log(imgPosition);

@@ -71,7 +71,7 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
   Pvl userMap;
-  userMap.Read(ui.GetFilename("MAP"));
+  userMap.Read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   // Open the input cube, get the camera object, and the cam map projection
@@ -79,7 +79,7 @@ void IsisMain() {
   icube = p.SetInputCube("FROM");
   incam = icube->getCamera();
 
-// Pvl lab(ui.GetFilename("FROM"));
+// Pvl lab(ui.GetFileName("FROM"));
 // PvlGroup &inst = lab.FindGroup("Instrument",Pvl::Traverse);
   //inst["TargetName"] = "Sky";
 
@@ -267,7 +267,7 @@ void PrintMap() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFilename("MAP"));
+  userMap.Read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log
@@ -280,7 +280,7 @@ void LoadMapRes() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFilename("MAP"));
+  userMap.Read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   // Set resolution
@@ -289,7 +289,7 @@ void LoadMapRes() {
     ui.PutDouble("SCALE", userGrp["Scale"]);
   }
   else {
-    string msg = "Mapfile [" + ui.GetFilename("MAP") +
+    string msg = "Mapfile [" + ui.GetFileName("MAP") +
                  "] does not have [SCALE] keyword to load";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -301,7 +301,7 @@ void LoadCameraRes() {
 
   // Open the input cube, get the camera object, and the cam map projection
   Cube c;
-  c.open(ui.GetFilename("FROM"));
+  c.open(ui.GetFileName("FROM"));
   Camera *cam = c.getCamera();
   double res = cam->RaDecResolution();
 
@@ -320,7 +320,7 @@ void LoadMapRange() {
 
   // Get map file
   Pvl userMap;
-  userMap.Read(ui.GetFilename("MAP"));
+  userMap.Read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   // Set ground range keywords that are found in mapfile
@@ -348,7 +348,7 @@ void LoadMapRange() {
 
   if(count < 4) {
     string msg = "One or more of the values for the sky range was not found";
-    msg += " in [" + ui.GetFilename("MAP") + "]";
+    msg += " in [" + ui.GetFileName("MAP") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }
@@ -359,7 +359,7 @@ void LoadCameraRange() {
 
   // Open the input cube, get the camera object, and the cam map projection
   Cube c;
-  c.open(ui.GetFilename("FROM"));
+  c.open(ui.GetFileName("FROM"));
   Camera *cam = c.getCamera();
 
   // Make the target info match the user mapfile

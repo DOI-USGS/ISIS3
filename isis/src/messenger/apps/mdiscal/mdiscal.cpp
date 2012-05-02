@@ -59,7 +59,7 @@ static double iof(1.0);   //  I/F value for observation
 static DarkModelPixel *model(0);
 
 //  Local functions
-Filename DetermineFlatFieldFile();
+FileName DetermineFlatFieldFile();
 void GatherDarkStatistics(Buffer &in);
 void Calibrate(vector<Buffer *>&in, vector<Buffer *>&out);
 
@@ -76,9 +76,9 @@ void IsisMain() {
   // We will be processing by column in case of a linear dark current fit. This will make the
   //   calibration a one pass system in this case, rather than two.
   ProcessByLine p;
-  Filename calibFile("$messenger/calibration/mdisCalibration????.trn");
-  calibFile.HighestVersion();
-  configFile.Read(calibFile.Expanded());
+  FileName calibFile("$messenger/calibration/mdisCalibration????.trn");
+  calibFile = calibFile.highestVersion();
+  configFile.Read(calibFile.expanded());
 
   // Initialize variables
   calibrationValues.clear();
@@ -308,21 +308,20 @@ void IsisMain() {
   //  Determine if we need to subsample the flat field should pixel binning
   //  occurred
   string reducedFlat("");
-  Filename flatfield = DetermineFlatFieldFile();
+  FileName flatfield = DetermineFlatFieldFile();
   if(pxlBin > 0) {
     iString scale(pxlBin);
-    Filename newflat;
-    newflat.Temporary(flatfield.Basename() + "_reduced", "cub");
-    reducedFlat = newflat.Expanded();
-    string parameters = "FROM=" + flatfield.Expanded() +
-                        " TO="   + newflat.Expanded() +
+    FileName newflat = FileName::createTempFile("$TEMPORARY/" + flatfield.baseName() + "_reduced.cub");
+    reducedFlat = newflat.expanded();
+    string parameters = "FROM=" + flatfield.expanded() +
+                        " TO="   + newflat.expanded() +
                         " MODE=SCALE" +
                         " LSCALE=" + scale +
                         " SSCALE=" + scale;
     try {
     //  iApp->Exec("reduce", parameters);
       ProgramLauncher::RunIsisProgram("reduce", parameters);
-      reducedFlat = newflat.Expanded();
+      reducedFlat = newflat.expanded();
     }
     catch (IException &) {
       remove(reducedFlat.c_str());
@@ -333,7 +332,7 @@ void IsisMain() {
   }
   else {
     CubeAttributeInput att;
-    p.SetInputCube(flatfield.Expanded(), att);
+    p.SetInputCube(flatfield.expanded(), att);
   }
 
   //  Set output file for processing
@@ -369,8 +368,8 @@ void IsisMain() {
   calibrationLog.AddKeyword(PvlKeyword("BinnedImage", isBinnedData));
   calibrationLog.AddKeyword(PvlKeyword("FilterNumber", filterNumber + 1));
   if (g_flatfield) {
-    calibrationLog.AddKeyword(PvlKeyword("FlatFieldFile", flatfield.OriginalPath() + "/" + flatfield.Name()));
-    calibrationLog.AddKeyword(PvlKeyword("CalibrationFile", calibFile.OriginalPath() + "/" + calibFile.Name()));
+    calibrationLog.AddKeyword(PvlKeyword("FlatFieldFile", flatfield.originalPath() + "/" + flatfield.name()));
+    calibrationLog.AddKeyword(PvlKeyword("CalibrationFile", calibFile.originalPath() + "/" + calibFile.name()));
     calibrationLog.AddKeyword(PvlKeyword("ResponsivityFile", respfile));
     calibrationLog.AddKeyword(PvlKeyword("SmearCompFile", smearfile));
     PvlKeyword rspKey("Response", rsp[0]);
@@ -441,13 +440,13 @@ void IsisMain() {
   }
 
   if(!darkCurrentFile.empty()) {
-    key.AddValue(Quote(Filename(darkCurrentFile).Basename()));
+    key.AddValue(Quote(FileName(darkCurrentFile).baseName()));
   }
-  key.AddValue(Quote(flatfield.Basename()));
-  key.AddValue(Quote(Filename(respfile).Basename()));
-  // key.AddValue(Quote(Filename(smearfile).Basename()));
+  key.AddValue(Quote(flatfield.baseName()));
+  key.AddValue(Quote(FileName(respfile).baseName()));
+  // key.AddValue(Quote(FileName(smearfile).baseName()));
   if(iof_is_good) {
-    key.AddValue(Quote(Filename(solirrfile).Basename()));
+    key.AddValue(Quote(FileName(solirrfile).baseName()));
   }
   archive.AddKeyword(key, Pvl::Replace);
 
@@ -457,10 +456,10 @@ void IsisMain() {
   configFile.Clear();
 }
 
-Filename DetermineFlatFieldFile() {
+FileName DetermineFlatFieldFile() {
   string filename = "$messenger/calibration/FLAT/";
 
-  // Filename consists of binned/notbinned, camera, and filter
+  // FileName consists of binned/notbinned, camera, and filter
   filename += "MDIS";
   filename += ((isNarrowAngleCamera) ? "NAC" : "WAC");
   filename += ((isBinnedData) ? "_BINNED_" : "_NOTBIN_");
@@ -477,8 +476,8 @@ Filename DetermineFlatFieldFile() {
     filename += "_?.cub";
   }
 
-  Filename final(filename);
-  final.HighestVersion();
+  FileName final(filename);
+  final = final.highestVersion();
   return final;
 }
 

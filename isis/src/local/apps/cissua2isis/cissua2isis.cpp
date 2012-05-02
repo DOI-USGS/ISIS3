@@ -26,12 +26,12 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Get the input
-  Filename inFile = ui.GetFilename("FROM");
+  FileName inFile = ui.GetFileName("FROM");
   Pvl pdsLabel;
-  p.SetPdsFile(inFile.Expanded(), "", pdsLabel);
+  p.SetPdsFile(inFile.expanded(), "", pdsLabel);
 
   CubeAttributeOutput &outAtt = ui.GetOutputAttribute("TO");
-  Cube *ocube = p.SetOutputCube(ui.GetFilename("TO"), outAtt);
+  Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), outAtt);
 
   // Process
   p.StartProcess();
@@ -93,9 +93,9 @@ void FixDns8(Buffer &buf) {
 
 void CreateStretchPairs() {
   // Set up the strech for the 8 to 12 bit conversion from file
-  Filename *temp = new Filename("$cassini/calibration/cisslog_???.lut");
-  temp->HighestVersion();
-  TextFile *stretchPairs = new TextFile(temp->Expanded());
+  FileName *temp = new FileName("$cassini/calibration/cisslog_???.lut");
+  *temp = temp->highestVersion();
+  TextFile *stretchPairs = new TextFile(temp->expanded());
 
   // Create the stretch pairs
   stretch.ClearPairs();
@@ -125,8 +125,8 @@ void TranslateUoACassiniLabels(Pvl &labelPvl, Cube *ocube) {
   iString transDir = (string) dataDir["Cassini"] + "/translations/";
 
   // Translate
-  Filename transFile(transDir + "cissua2isis.trn");
-  PvlTranslationManager instrumentXlater(labelPvl, transFile.Expanded());
+  FileName transFile(transDir + "cissua2isis.trn");
+  PvlTranslationManager instrumentXlater(labelPvl, transFile.expanded());
   instrumentXlater.Auto((*outLabel));
 
   PvlGroup &inst = outLabel->FindGroup("Instrument", Isis::PvlObject::Traverse);

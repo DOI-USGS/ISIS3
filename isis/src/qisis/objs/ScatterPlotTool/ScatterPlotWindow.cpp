@@ -97,11 +97,11 @@ namespace Isis {
     plot()->enableAxis(QwtPlot::yRight);
 
     plot()->setAxisTitle(QwtPlot::xBottom,
-        QFileInfo(xAxisCube->getFilename()).baseName() + " Band " +
+        QFileInfo(xAxisCube->getFileName()).baseName() + " Band " +
         QString::number(xAxisBand) + " " +
         plot()->axisTitle(QwtPlot::xBottom).text());
     plot()->setAxisTitle(QwtPlot::yLeft,
-        QFileInfo(yAxisCube->getFilename()).baseName() + " Band " +
+        QFileInfo(yAxisCube->getFileName()).baseName() + " Band " +
         QString::number(yAxisBand) + " " +
         plot()->axisTitle(QwtPlot::yLeft).text());
 
@@ -118,21 +118,21 @@ namespace Isis {
 
     m_colorize = new QAction(this);
     m_colorize->setText("Colorize");
-    m_colorize->setIcon(QPixmap(Filename("$base/icons/rgb.png").Expanded()));
+    m_colorize->setIcon(QPixmap(FileName("$base/icons/rgb.png").expanded()));
     connect(m_colorize, SIGNAL(activated()),
             this, SLOT(colorPlot()));
 
     m_contour = new QAction(this);
     m_contour->setText("Hide Contour Lines");
     m_contour->setIcon(
-        QPixmap(Filename("$base/icons/scatterplotcontour.png").Expanded()));
+        QPixmap(FileName("$base/icons/scatterplotcontour.png").expanded()));
     connect(m_contour, SIGNAL(activated()),
             this, SLOT(showHideContour()));
 
     QAction *configureAlarmingAct = new QAction(this);
     configureAlarmingAct->setText("Change Alarming");
     configureAlarmingAct->setIcon(
-        QPixmap(Filename("$base/icons/scatterplotalarming.png").Expanded()));
+        QPixmap(FileName("$base/icons/scatterplotalarming.png").expanded()));
     connect(configureAlarmingAct, SIGNAL(activated()),
             this, SLOT(configureAlarming()));
 
@@ -154,8 +154,8 @@ namespace Isis {
     replot();
 
     std::string instanceName = windowTitle().toStdString();
-    Filename config("$HOME/.Isis/qview/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.Expanded()),
+    FileName config("$HOME/.Isis/qview/" + instanceName + ".config");
+    QSettings settings(QString::fromStdString(config.expanded()),
                        QSettings::NativeFormat);
     m_alarmPlot = settings.value("alarmOntoPlot", true).toBool();
     m_alarmViewport = settings.value("alarmOntoViewport", true).toBool();
@@ -180,8 +180,8 @@ namespace Isis {
 
   ScatterPlotWindow::~ScatterPlotWindow() {
     std::string instanceName = windowTitle().toStdString();
-    Filename config("$HOME/.Isis/qview/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.Expanded()),
+    FileName config("$HOME/.Isis/qview/" + instanceName + ".config");
+    QSettings settings(QString::fromStdString(config.expanded()),
                        QSettings::NativeFormat);
     settings.setValue("alarmOntoPlot", m_alarmPlot);
     settings.setValue("alarmOntoViewport", m_alarmViewport);

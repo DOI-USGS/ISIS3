@@ -20,7 +20,7 @@ void IsisMain() {
 
   // Set up CameraPointInfo and set file
   CameraPointInfo campt;
-  campt.SetCube(ui.GetFilename("FROM") + "+" + ui.GetInputAttribute("FROM").BandsStr());
+  campt.SetCube(ui.GetFileName("FROM") + "+" + ui.GetInputAttribute("FROM").BandsStr());
 
   Progress prog;
   prog.SetMaximumSteps(1);
@@ -62,8 +62,8 @@ void IsisMain() {
 
   if(ui.WasEntered("TO")) {
     // Get user params from ui
-    string outFile = Filename(ui.GetFilename("TO")).Expanded();
-    bool exists = Filename(outFile).Exists();
+    string outFile = FileName(ui.GetFileName("TO")).expanded();
+    bool exists = FileName(outFile).fileExists();
     bool append = ui.GetBoolean("APPEND");
 
     // Write the pvl group out to the file

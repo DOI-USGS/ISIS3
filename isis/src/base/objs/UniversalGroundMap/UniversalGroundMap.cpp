@@ -66,7 +66,7 @@ namespace Isis {
       catch (IException &secondError) {
         p_projection = NULL;
         std::string msg = "Could not create camera or projection for [" +
-                          pvl.Filename() + "]";
+                          pvl.FileName() + "]";
         IException realError(IException::Unknown, msg, _FILEINFO_);
         realError.append(firstError);
         realError.append(secondError);

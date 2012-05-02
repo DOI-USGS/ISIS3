@@ -2,6 +2,7 @@
 
 #include <qwt_double_range.h>
 
+#include "iString.h"
 #include "MdiCubeViewport.h"
 #include "ScatterPlotConfigDialog.h"
 #include "ScatterPlotWindow.h"

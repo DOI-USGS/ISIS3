@@ -48,7 +48,7 @@ void calculateSolarRemove(Cube *, ProcessByLine *);
 
 void calibrate(vector<Buffer *> &in, vector<Buffer *> &out);
 
-iString createCroppedFile(Cube *icube, iString cubeFilename, bool flatFile = false);
+iString createCroppedFile(Cube *icube, iString cubeFileName, bool flatFile = false);
 void GetOffsets(const Pvl &lab, int &finalSampOffset, int &finalLineOffset);
 
 // This is the results group
@@ -188,7 +188,7 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
   }
   catch(IException &e) {
     iString msg = "Unable to create a camera model from [" +
-                  icube->getFilename() + "]. Please run "
+                  icube->getFileName() + "]. Please run "
                   "spiceinit on this file";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
@@ -245,7 +245,7 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
     string msg = "Unable to project image at four corners, center of edges or ";
     msg += "at center. The solar distance can not be calculated, try using";
     msg += " [UNITS=SPECENERGY] on [";
-    msg += icube->Filename() + "]";
+    msg += icube->FileName() + "]";
     throw iException::Message(iException::Camera, msg, _FILEINFO_);
     */
   }
@@ -265,10 +265,10 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
 
   CubeAttributeInput iatt(attributes);
 
-  Filename solarFilename("$cassini/calibration/vims/solar_v????.cub");
-  solarFilename.HighestVersion();
+  FileName solarFileName("$cassini/calibration/vims/solar_v????.cub");
+  solarFileName = solarFileName.highestVersion();
 
-  p->SetInputCube(createCroppedFile(icube, solarFilename.Expanded()), iatt);
+  p->SetInputCube(createCroppedFile(icube, solarFileName.expanded()), iatt);
 }
 
 
@@ -307,17 +307,17 @@ void calculateSpecificEnergy(Cube *icube) {
 
   iString waveCalFile = "$cassini/calibration/vims/wavecal_v????.cub";
 
-  Filename specEnergyFilename(specEnergyFile);
-  specEnergyFilename.HighestVersion();
+  FileName specEnergyFileName(specEnergyFile);
+  specEnergyFileName = specEnergyFileName.highestVersion();
 
-  Filename waveCalFilename(waveCalFile);
-  waveCalFilename.HighestVersion();
+  FileName waveCalFileName(waveCalFile);
+  waveCalFileName = waveCalFileName.highestVersion();
 
   Cube specEnergyCube;
-  specEnergyCube.open(specEnergyFilename.Expanded());
+  specEnergyCube.open(specEnergyFileName.expanded());
 
   Cube waveCalCube;
-  waveCalCube.open(waveCalFilename.Expanded());
+  waveCalCube.open(waveCalFileName.expanded());
 
   LineManager specEnergyMgr(specEnergyCube);
   LineManager waveCalMgr(waveCalCube);
@@ -392,12 +392,12 @@ void calculateVisDarkCurrent(Cube *icube) {
 
   calFile += "_dark_model_v????.tab";
 
-  Filename calFilename(calFile);
-  calFilename.HighestVersion();
+  FileName calFileName(calFile);
+  calFileName = calFileName.highestVersion();
 
-  calibInfo += PvlKeyword("DarkCurrentFile", calFilename.OriginalPath() + "/" + calFilename.Name());
+  calibInfo += PvlKeyword("DarkCurrentFile", calFileName.originalPath() + "/" + calFileName.name());
 
-  calFile = calFilename.Expanded();
+  calFile = calFileName.expanded();
 
   EndianSwapper swapper("LSB");
 
@@ -501,7 +501,7 @@ void calculateIrDarkCurrent(Cube *icube) {
     return;
   }
 
-  Table sideplane("SideplaneIr", ui.GetFilename("FROM"));
+  Table sideplane("SideplaneIr", ui.GetFileName("FROM"));
 
   // If spectal summing is on OR compressor_id isnt N/A then
   //   just return.
@@ -627,13 +627,13 @@ void chooseFlatFile(Cube *icube, ProcessByLine *p) {
     calFile += "flatfield_v????.cub";
   }
 
-  Filename calibrationFilename(calFile);
-  calibrationFilename.HighestVersion();
+  FileName calibrationFileName(calFile);
+  calibrationFileName = calibrationFileName.highestVersion();
 
-  calibInfo += PvlKeyword("FlatFile", calibrationFilename.OriginalPath() + "/" + calibrationFilename.Name());
+  calibInfo += PvlKeyword("FlatFile", calibrationFileName.originalPath() + "/" + calibrationFileName.name());
 
   CubeAttributeInput iatt;
-  p->SetInputCube(createCroppedFile(icube, calibrationFilename.Expanded(), true), iatt);
+  p->SetInputCube(createCroppedFile(icube, calibrationFileName.expanded(), true), iatt);
 }
 
 /**
@@ -641,11 +641,11 @@ void chooseFlatFile(Cube *icube, ProcessByLine *p) {
  * by the swath keywords.
  *
  * @param icube
- * @param cubeFilename
+ * @param cubeFileName
  *
  * @return iString
  */
-iString createCroppedFile(Cube *icube, iString cubeFilename, bool flatFile) {
+iString createCroppedFile(Cube *icube, iString cubeFileName, bool flatFile) {
   int sampOffset = 1;
   int lineOffset = 1;
 
@@ -654,20 +654,20 @@ iString createCroppedFile(Cube *icube, iString cubeFilename, bool flatFile) {
   }
 
 
-  iString appArgs = "from=" + cubeFilename + " ";
+  iString appArgs = "from=" + cubeFileName + " ";
   appArgs += "sample=" + iString(sampOffset) + " ";
   appArgs += "line=" + iString(lineOffset) + " ";
   appArgs += "nsamples=" + iString(icube->getSampleCount()) + " ";
   appArgs += "nlines=" + iString(icube->getLineCount()) + " ";
 
-  Filename tempFile("$TEMPORARY/tmp_" + Filename(cubeFilename).Basename() +
-                    "_" + Filename(icube->getFilename()).Name());
+  FileName tempFile("$TEMPORARY/tmp_" + FileName(cubeFileName).baseName() +
+                    "_" + FileName(icube->getFileName()).name());
 
-  appArgs += "to=" + tempFile.Expanded();
+  appArgs += "to=" + tempFile.expanded();
 
   ProgramLauncher::RunIsisProgram("crop", appArgs);
-  tempFiles.push_back(tempFile.Expanded());
-  return tempFile.Expanded();
+  tempFiles.push_back(tempFile.expanded());
+  return tempFile.expanded();
 }
 
 void GetOffsets(const Pvl &lab, int &finalSampOffset, int &finalLineOffset) {

@@ -4,7 +4,7 @@
 
 #include "IException.h"
 #include "FileList.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "SerialNumber.h"
 #include "ObservationNumber.h"
 #include "iString.h"
@@ -72,7 +72,7 @@ namespace Isis {
   void SerialNumberList::Delete(const std::string &sn)
   {
     int index = SerialNumberIndex(sn);
-    std::string sFileName = Filename(sn);
+    std::string sFileName = FileName(sn);
 
     // Delete the reference to this serial number in the
     // vector and the maps
@@ -100,7 +100,7 @@ namespace Isis {
    */
   void SerialNumberList::Add(const std::string &filename, bool def2filename) {
 
-    Pvl p(Isis::Filename(filename).Expanded());
+    Pvl p(Isis::FileName(filename).expanded());
     PvlObject cubeObj = p.FindObject("IsisCube");
     try {
       // Test the target name if desired
@@ -151,11 +151,11 @@ namespace Isis {
       else if(HasSerialNumber(sn)) {
         int index = SerialNumberIndex(sn);
         std::string msg = "Duplicate, serial number [" + sn + "] from files [";
-        msg += SerialNumberList::Filename(sn) + "] and [" + Filename(index) + "].";
+        msg += SerialNumberList::FileName(sn) + "] and [" + FileName(index) + "].";
         throw IException(IException::User, msg, _FILEINFO_);
       }
       Pair nextpair;
-      nextpair.filename = Isis::Filename(filename).Expanded();
+      nextpair.filename = Isis::FileName(filename).expanded();
       nextpair.serialNumber = sn;
       nextpair.observationNumber = on;
       p_pairs.push_back(nextpair);
@@ -163,7 +163,7 @@ namespace Isis {
       p_fileMap.insert(std::pair<std::string, int>(nextpair.filename, (int)(p_pairs.size() - 1)));
     }
     catch(IException &e) {
-      std::string msg = "File [" + Isis::Filename(filename).Expanded() +
+      std::string msg = "File [" + Isis::FileName(filename).expanded() +
                         "] can not be added to ";
       msg += "serial number list";
       throw IException(e, IException::User, msg, _FILEINFO_);
@@ -216,7 +216,7 @@ namespace Isis {
    * @return std::string The filename matching the input serial
    *         number
    */
-  std::string SerialNumberList::Filename(const std::string &sn) {
+  std::string SerialNumberList::FileName(const std::string &sn) {
     if(HasSerialNumber(sn)) {
       int index = p_serialMap.find(sn)->second;
       return p_pairs[index].filename;
@@ -241,13 +241,13 @@ namespace Isis {
    *                        path before searching list.
    */
   std::string SerialNumberList::SerialNumber(const std::string &filename) {
-    if(p_fileMap.find(Isis::Filename(filename).Expanded()) == p_fileMap.end()) {
+    if(p_fileMap.find(Isis::FileName(filename).expanded()) == p_fileMap.end()) {
       std::string msg = "Requested filename [" +
-                        Isis::Filename(filename).Expanded() + "]";
+                        Isis::FileName(filename).expanded() + "]";
       msg += "does not exist in the list";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    int index = FilenameIndex(filename);
+    int index = FileNameIndex(filename);
     return p_pairs[index].serialNumber;
   }
 
@@ -317,12 +317,12 @@ namespace Isis {
    *  @internal @history 2007-07-11 Stuart Sides - Fixed bug where
    *                        the correct index was not returned.
    */
-  int SerialNumberList::FilenameIndex(const std::string &filename) {
+  int SerialNumberList::FileNameIndex(const std::string &filename) {
 
     std::map<std::string, int>::iterator  pos;
-    if((pos = p_fileMap.find(Isis::Filename(filename).Expanded())) == p_fileMap.end()) {
+    if((pos = p_fileMap.find(Isis::FileName(filename).expanded())) == p_fileMap.end()) {
       std::string msg = "Requested filename [" +
-                        Isis::Filename(filename).Expanded() + "]";
+                        Isis::FileName(filename).expanded() + "]";
       msg += "does not exist in the list";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -336,7 +336,7 @@ namespace Isis {
    *
    * @return std::string The filename at the given index
    */
-  std::string SerialNumberList::Filename(int index) {
+  std::string SerialNumberList::FileName(int index) {
     if(index >= 0 && index < (int) p_pairs.size()) {
       return p_pairs[index].filename;
     }

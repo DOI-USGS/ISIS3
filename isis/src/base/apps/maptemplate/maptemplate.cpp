@@ -63,9 +63,9 @@ void IsisMain() {
   // to the output file, add .map extension if the
   // user didnt enter an extension
   UserInterface &ui = Application::GetUserInterface();
-  Filename out = ui.GetFilename("MAP");
-  string output = ui.GetFilename("MAP");
-  if(out.Extension() == "") {
+  FileName out = ui.GetFileName("MAP");
+  string output = ui.GetFileName("MAP");
+  if(out.extension() == "") {
     output += ".map";
   }
   Pvl p;
@@ -76,7 +76,7 @@ void IsisMain() {
 //Helper function to output map file to log.
 void helperButtonLogMap() {
   UserInterface &ui = Application::GetUserInterface();
-  string mapFile(ui.GetFilename("MAP"));
+  string mapFile(ui.GetFileName("MAP"));
   Pvl p;
   p.Read(mapFile);
   PvlGroup t = p.FindGroup("mapping", Pvl::Traverse);
@@ -89,7 +89,7 @@ void helperButtonLogMap() {
 //Helper 2 function to update GUI with map file values.
 void helperButtonLoadMap() {
   UserInterface &ui = Application::GetUserInterface();
-  string mapFile(ui.GetFilename("MAP"));
+  string mapFile(ui.GetFileName("MAP"));
   Pvl p;
   p.Read(mapFile);
   PvlGroup t = p.FindGroup("mapping", Pvl::Traverse);
@@ -239,7 +239,7 @@ void helperButtonLoadMap() {
 //helper function to output targdef to log
 void helperButtonLogTargDef() {
   UserInterface &ui = Application::GetUserInterface();
-  string targetFile(ui.GetFilename("TARGDEF"));
+  string targetFile(ui.GetFileName("TARGDEF"));
   Pvl p;
   p.Read(targetFile);
   PvlGroup t = p.FindGroup("mapping", Pvl::Traverse);
@@ -252,7 +252,7 @@ void helperButtonLogTargDef() {
 //helper function to load target def. to GUI
 void helperButtonLoadTargDef() {
   UserInterface &ui = Application::GetUserInterface();
-  string targetFile(ui.GetFilename("TARGDEF"));
+  string targetFile(ui.GetFileName("TARGDEF"));
 
 // test if targdef was entered
   Pvl p;
@@ -407,7 +407,7 @@ void addProject(PvlGroup &mapping) {
 void addTarget(PvlGroup &mapping) {
   UserInterface &ui = Application::GetUserInterface();
   if(ui.GetString("TARGOPT") == "SYSTEM") {
-    string targetFile(ui.GetFilename("TARGDEF"));
+    string targetFile(ui.GetFileName("TARGDEF"));
     Pvl p;
     p.Read(targetFile);
     PvlGroup t = p.FindGroup("mapping");
@@ -518,7 +518,7 @@ void addResolution(PvlGroup &mapping) {
 void calcRange(double &minLat, double &maxLat,
                double &minLon, double &maxLon) {
   UserInterface &ui = Application::GetUserInterface();
-  FileList flist(ui.GetFilename("FROMLIST"));
+  FileList flist(ui.GetFileName("FROMLIST"));
   minLat = DBL_MAX;
   maxLat = -DBL_MAX;
   minLon = DBL_MAX;
@@ -528,7 +528,7 @@ void calcRange(double &minLat, double &maxLat,
   Pvl userMap;
   PvlGroup userGrp("Mapping");
   if(ui.GetString("TARGOPT") == "SYSTEM") {
-    userMap.Read(ui.GetFilename("TARGDEF"));
+    userMap.Read(ui.GetFileName("TARGDEF"));
   }
   else if(ui.GetString("TARGOPT") == "USER") {
     userGrp += PvlKeyword("TargetName", ui.GetString("TARGETNAME"));
@@ -606,7 +606,7 @@ void calcRange(double &minLat, double &maxLat,
 //  value will be in meters
 double calcResolution() {
   UserInterface &ui = Application::GetUserInterface();
-  FileList flist(ui.GetFilename("FROMLIST"));
+  FileList flist(ui.GetFileName("FROMLIST"));
   double sumRes = 0.0;
   double highRes = DBL_MAX;
   double lowRes = -DBL_MAX;

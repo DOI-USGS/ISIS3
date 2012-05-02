@@ -36,10 +36,10 @@ void IsisMain() {
   Progress progress;
 
   // Prepare the ISIS2 list of file names
-  FileList list2(ui.GetFilename("LIST2"));
+  FileList list2(ui.GetFileName("LIST2"));
 
   // Prepare the ISIS3 SNs, pass the progress object to SerialNumberList
-  SerialNumberList snl(ui.GetFilename("LIST3"), true, &progress);
+  SerialNumberList snl(ui.GetFileName("LIST3"), true, &progress);
   progress.CheckStatus();
 
   if (list2.size() != (unsigned)snl.Size()) {
@@ -92,7 +92,7 @@ void IsisMain() {
   cnet.SetDescription(ui.GetString("DESCRIPTION"));
 
   // Open the match point file
-  TextFile mpFile(ui.GetFilename("MATCH"));
+  TextFile mpFile(ui.GetFileName("MATCH"));
   iString currLine;
   int inTotalMeas = 0;
 
@@ -294,7 +294,7 @@ void IsisMain() {
   if (ui.GetBoolean("INPUTPPP")) {
     int numRandOnly = 0;
     vector<string> randOnlyIDs;
-    TextFile randFile(ui.GetFilename("PPP"));
+    TextFile randFile(ui.GetFileName("PPP"));
     progress.SetText("Converting RAND PPP file");
     randFile.GetLine(currLine);
     int inTotalLine = (int)(randFile.Size() / (currLine.size()));
@@ -456,11 +456,11 @@ void IsisMain() {
     summaryGroup.AddKeyword(PvlKeyword("RandOnlyPoints", numRandOnly));
 
     bool log;
-    Filename logFile;
+    FileName logFile;
     // if a filename was entered, use it to create the log
     if (ui.WasEntered("LOG")) {
       log = true;
-      logFile = ui.GetFilename("LOG");
+      logFile = ui.GetFileName("LOG");
     }
     // if no filename was entered, but there were some RAND PPP only points,
     // create an log named "pppOnlyPoints" in the current directory
@@ -485,8 +485,8 @@ void IsisMain() {
         summaryGroup.AddComment("Some Point IDs in the RAND PPP file have no "
                                 "measures in the MATCH file.");
         summaryGroup.AddComment("These Point IDs are contained "
-                                "in [" + logFile.Name() + "].");
-        TextFile outlog(logFile.Expanded(), "overwrite", randOnlyIDs);
+                                "in [" + logFile.name() + "].");
+        TextFile outlog(logFile.expanded(), "overwrite", randOnlyIDs);
       }
       else {
         // if there are no RAND PPP only points and user wanted to create a log,
@@ -501,7 +501,7 @@ void IsisMain() {
 
   }
   // Write the control network out
-  cnet.Write(ui.GetFilename("ONET"));
+  cnet.Write(ui.GetFileName("ONET"));
 
 
 }

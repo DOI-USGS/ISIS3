@@ -22,12 +22,14 @@
 
 #include "IException.h"
 #include "IException.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Message.h"
 #include "TextFile.h"
 #include "iString.h"
 
 #include <iostream>
+
+#include <QFileInfo>
 
 using namespace std;
 namespace Isis {
@@ -39,7 +41,7 @@ namespace Isis {
   /**
    * Constructs a TextFile object and opens the specified file (including path).
    *
-   * @param filename Filename (including path) to be opened by TextFile object.
+   * @param filename FileName (including path) to be opened by TextFile object.
    *
    * @param openmode Open Mode of file opened by TextFile object. InputOpens file
    *                 for Input: Read Only, Fails if file does not exist
@@ -64,7 +66,7 @@ namespace Isis {
    * reads or writes file, leaves file open for further use of the rest of the
    * methods
    *
-   * @param filename Filename (including path) to be opened by TextFile object.
+   * @param filename FileName (including path) to be opened by TextFile object.
    *
    * @param openmode Open Mode of file opened by TextFile object. InputOpens file
    *                 for Input: Read Only, Fails if file does not exist
@@ -101,7 +103,7 @@ namespace Isis {
    * reads or writes file, leaves file open for further use of the rest of the
    * methods
    *
-   * @param filename Filename (including path) to be opened by TextFile object.
+   * @param filename FileName (including path) to be opened by TextFile object.
    *
    * @param openmode Open Mode of file opened by TextFile object. InputOpens file
    *                 for Input: Read Only, Fails if file does not exist
@@ -123,8 +125,8 @@ namespace Isis {
   TextFile::TextFile(const char *filename, const char *openmode,
                      std::vector<std::string> &lines, const int &maxLinesToReadWrite,
                      const bool skipComments) {
-    string Filename = filename;
-    TextFile(Filename, openmode, lines, maxLinesToReadWrite, skipComments);
+    string FileName = filename;
+    TextFile(FileName, openmode, lines, maxLinesToReadWrite, skipComments);
   }
 
   /**
@@ -132,7 +134,7 @@ namespace Isis {
    * reads or writes file, leaves file open for further use of the rest of the
    * methods
    *
-   * @param filename Filename (including path) to be opened by TextFile object.
+   * @param filename FileName (including path) to be opened by TextFile object.
    *
    * @param openmode Open Mode of file opened by TextFile object. InputOpens file
    *                 for Input: Read Only, Fails if file does not exist
@@ -171,7 +173,7 @@ namespace Isis {
    * reads or writes file, leaves file open for further use of the rest of the
    * methods
    *
-   * @param filename Filename (including path) to be opened by TextFile object.
+   * @param filename FileName (including path) to be opened by TextFile object.
    *
    * @param openmode Open Mode of file opened by TextFile object. InputOpens file
    *                 for Input: Read Only, Fails if file does not exist
@@ -193,8 +195,8 @@ namespace Isis {
   TextFile::TextFile(const char *filename, const char *openmode,
                      std::string *lines, const int &maxLinesToReadWrite,
                      const bool skipComments) {
-    string Filename = filename;
-    TextFile(Filename, openmode, lines, maxLinesToReadWrite, skipComments);
+    string FileName = filename;
+    TextFile(FileName, openmode, lines, maxLinesToReadWrite, skipComments);
   }
 
 
@@ -209,7 +211,7 @@ namespace Isis {
   /**
    * Opens a text file.
    *
-   * @param filename Filename (including path) to be opened.
+   * @param filename FileName (including path) to be opened.
    *
    * @param openmode Open Mode of file to be opened. There are
    *                 four options, "input", "output", "overwrite",
@@ -250,9 +252,9 @@ namespace Isis {
 
     // Save the filename for error messages
 
-    Isis::Filename filenameTmp(filename);
-    filenameTmp.AddExtension(extension);
-    p_filename = filenameTmp.Expanded();
+    Isis::FileName filenameTmp(filename);
+    filenameTmp.addExtension(extension);
+    p_filename = filenameTmp.expanded();
 
 
     //  input, output, overwrite, append
@@ -283,7 +285,7 @@ namespace Isis {
     // Output
     else if(p_openmode == 2) {
       // first check if file already exists
-      if(filenameTmp.Exists()) {
+      if(filenameTmp.fileExists() && QFileInfo(filenameTmp.toString()).size() > 0) {
         string message = "TextFile:Open: -> Output file already exists ["
                          + string(openmode) + "]:[" + p_filename + "]";
         throw IException(IException::Io, message, _FILEINFO_);
@@ -299,7 +301,7 @@ namespace Isis {
     // Append
     else if(p_openmode == 4) {
       // Open in append if it does exist, otherwise, open in overwrite mode
-      if(filenameTmp.Exists()) {
+      if(filenameTmp.fileExists()) {
         p_stream.open(p_filename.c_str(), fstream::in | fstream::out | fstream::ate);
       }
       else {

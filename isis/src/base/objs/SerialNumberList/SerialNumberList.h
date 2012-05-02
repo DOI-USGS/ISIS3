@@ -59,10 +59,10 @@ namespace Isis {
    *                          modified so that index corresponds
    *                          to order files are input.
    *  @history 2006-08-16 Brendan George Added/fixed error
-   *                          checking in FilenameIndex() and
+   *                          checking in FileNameIndex() and
    *                          SerialNumber(string filename).
    *  @history 2006-08-18 Brendan George Modified to use Expanded
-   *                          Filename on input, allowing for
+   *                          FileName on input, allowing for
    *                          filenames that use environment
    *                          variables
    *  @history 2006-09-13 Steven Koechle Added method to get the
@@ -99,14 +99,14 @@ namespace Isis {
       void Delete(const std::string &sn);
 
       int Size() const;
-      std::string Filename(const std::string &sn);
-      std::string Filename(int index);
+      std::string FileName(const std::string &sn);
+      std::string FileName(int index);
       std::string SerialNumber(const std::string &filename);
       std::string SerialNumber(int index);
       std::string ObservationNumber(int index);
 
       int SerialNumberIndex(const std::string &sn);
-      int FilenameIndex(const std::string &filename);
+      int FileNameIndex(const std::string &filename);
 
       std::vector<std::string> PossibleSerialNumbers(const std::string &on);
 

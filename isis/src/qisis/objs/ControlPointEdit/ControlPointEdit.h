@@ -119,8 +119,8 @@ namespace Isis {
       ControlPointEdit(ControlNet * cnetQ, QWidget *parent = 0,
                        bool allowLeftMouse = false);
       ~ControlPointEdit();
-      std::string templateFilename() {
-        return p_templateFilename;
+      std::string templateFileName() {
+        return p_templateFileName;
       };
       bool setTemplateFile(QString);
       void allowLeftMouse(bool allowMouse);
@@ -167,7 +167,7 @@ namespace Isis {
 
       bool p_allowLeftMouse;
 
-      std::string p_templateFilename;
+      std::string p_templateFileName;
       QLabel *p_leftZoomFactor;
       QLabel *p_rightZoomFactor;
       QLabel *p_leftSampLinePosition;

@@ -220,7 +220,7 @@ void IsisMain() {
     numFrameLines = ui.GetInteger("FRAMELETHEIGHT");
   }
 
-  FileList inList(ui.GetFilename("FROMLIST"));
+  FileList inList(ui.GetFileName("FROMLIST"));
   Progress progress;
 
   tempFileLength = 0;
@@ -256,7 +256,7 @@ void IsisMain() {
      * Read the current cube into memory
      */
     Cube tmp;
-    tmp.open(Filename(inList[currImage]).Expanded());
+    tmp.open(FileName(inList[currImage]).expanded());
 
     /**
      * If we haven't determined how many samples the output
@@ -304,7 +304,7 @@ void IsisMain() {
     //   during pass 2 cleanly
     if((cameraType == Framing || cameraType == PushFrame) && imageValid) {
       string prog = "Calculating Standard Deviation " + iString((int)currImage + 1) + "/";
-      prog += iString((int)inList.size()) + " (" + Filename(inList[currImage]).Name() + ")";
+      prog += iString((int)inList.size()) + " (" + FileName(inList[currImage]).name() + ")";
 
       if(cameraType == Framing) {
         Statistics *stats = tmp.getStatistics(1, prog);
@@ -375,7 +375,7 @@ void IsisMain() {
   ocube->setDimensions(numOutputSamples, tempFileLength, 2);
   PvlGroup &prefs = Preference::Preferences().FindGroup("DataDirectory", Pvl::Traverse);
   iString outTmpName = (string)prefs["Temporary"][0] + "/";
-  outTmpName += Filename(ui.GetFilename("TO")).Basename() + ".tmp.cub";
+  outTmpName += FileName(ui.GetFileName("TO")).baseName() + ".tmp.cub";
   ocube->create(outTmpName);
   oLineMgr = new LineManager(*ocube);
   oLineMgr->SetLine(1);
@@ -397,7 +397,7 @@ void IsisMain() {
     }
 
     PvlObject currFile("Exclusions");
-    currFile += PvlKeyword("Filename", inList[currImage]);
+    currFile += PvlKeyword("FileName", inList[currImage]);
     currFile += PvlKeyword("Tolerance", maxStdev);
 
     if(cameraType == LineScan) {
@@ -423,7 +423,7 @@ void IsisMain() {
     p.SetInputCube(inList[currImage], inAtt);
     iString progText = "Calculating Averages " + iString((int)currImage + 1);
     progText += "/" + iString((int)inList.size());
-    progText += " (" + Filename(inList[currImage]).Name() + ")";
+    progText += " (" + FileName(inList[currImage]).name() + ")";
     p.Progress()->SetText(progText);
 
     p.StartProcess(CreateTemporaryData);
@@ -461,7 +461,7 @@ void IsisMain() {
     ocube->setDimensions(numOutputSamples, tempFileLength, 1);
   }
 
-  ocube->create(Filename(ui.GetFilename("TO")).Expanded());
+  ocube->create(FileName(ui.GetFileName("TO")).expanded());
   oLineMgr = new LineManager(*ocube);
   oLineMgr->SetLine(1);
 
@@ -515,7 +515,7 @@ void IsisMain() {
       excludeFile.AddObject(excludedDetails[i]);
     }
 
-    excludeFile.Write(Filename(ui.GetFilename("EXCLUDE")).Expanded());
+    excludeFile.Write(FileName(ui.GetFileName("EXCLUDE")).expanded());
   }
 
   remove(outTmpName.c_str());

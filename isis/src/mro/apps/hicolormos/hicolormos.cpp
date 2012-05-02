@@ -5,7 +5,7 @@
 #include "CameraFactory.h"
 #include "Cube.h"
 #include "FileList.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "Longitude.h"
@@ -26,13 +26,12 @@ void IsisMain() {
 
   // Get the values for the from 1 cube
   UserInterface &ui = Application::GetUserInterface();
-  string from1 = ui.GetFilename("FROM1");
+  string from1 = ui.GetFileName("FROM1");
 
   // Make a temporary list file for automos
-  Filename tempFile;
-  tempFile.Temporary("hicolormos.temp", "lis");
+  FileName tempFile = FileName::createTempFile("$TEMPORARY/hicolormos.temp.lis");
   TextFile tf;
-  tf.Open(tempFile.Expanded(), "output");
+  tf.Open(tempFile.expanded(), "output");
   tf.PutLine(from1 + "\n");
 
   Pvl from1lab(from1);
@@ -46,7 +45,7 @@ void IsisMain() {
   Pvl from2lab;
   PvlGroup from2Mosaic("Mosaic");
   if(ui.WasEntered("FROM2")) {
-    string from2 = ui.GetFilename("FROM2");
+    string from2 = ui.GetFileName("FROM2");
     //Add from2 file to the temporary automos input list
     tf.PutLine(from2 + "\n");
     from2lab.Read(from2);
@@ -191,7 +190,7 @@ void IsisMain() {
   }
 
   if(runXY) {
-    string tmp(tempFile.Expanded());
+    string tmp(tempFile.expanded());
     remove(tmp.c_str());
     string msg = "Camera did not intersect images to gather stats";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -232,8 +231,8 @@ void IsisMain() {
   // automos step
   string MosaicPriority = ui.GetString("PRIORITY");
 
-  string parameters = "FROMLIST=" + tempFile.Expanded() +
-                      " MOSAIC=" + ui.GetFilename("TO") +
+  string parameters = "FROMLIST=" + tempFile.expanded() +
+                      " MOSAIC=" + ui.GetFileName("TO") +
                       " PRIORITY=" + MosaicPriority;
   ProgramLauncher::RunIsisProgram("automos", parameters);
 
@@ -260,13 +259,13 @@ void IsisMain() {
   from1OrgLab.Blob::Read(from1);
 
   Cube c;
-  c.open(ui.GetFilename("TO"), "rw");
+  c.open(ui.GetFileName("TO"), "rw");
   c.getLabel()->FindObject("IsisCube", Pvl::Traverse).AddGroup(mos);
   c.write(from1OrgLab);
   c.close();
 
   // Clean up the temporary automos list file
-  string tmp(tempFile.Expanded());
+  string tmp(tempFile.expanded());
   remove(tmp.c_str());
 } // end of isis main
 

@@ -42,10 +42,10 @@ using namespace Isis;
 void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
-  SerialNumberList serialNumbers(ui.GetFilename("FROMLIST"));
+  SerialNumberList serialNumbers(ui.GetFileName("FROMLIST"));
 
   // Get the AutoSeed PVL internalized
-  Pvl seedDef(ui.GetFilename("DEFFILE"));
+  Pvl seedDef(ui.GetFileName("DEFFILE"));
 
   PolygonSeeder *seeder = PolygonSeederFactory::Create(seedDef);
   Pvl invalidInput = seeder->InvalidInput();
@@ -138,7 +138,7 @@ void IsisMain() {
 
   // Grab the labels from the first filename in the SerialNumberList to get
   // some info
-  Pvl cubeLab(serialNumbers.Filename(0));
+  Pvl cubeLab(serialNumbers.FileName(0));
 
   // Construct a Projection for converting between Lon/Lat and X/Y
   // This is used inside the seeding algorithms.
@@ -167,7 +167,7 @@ void IsisMain() {
   }
   else if(seedDomain == SampleLine) {
     Cube cube;
-    cube.open(serialNumbers.Filename(0));
+    cube.open(serialNumbers.FileName(0));
     ugmap = new UniversalGroundMap(*cube.getLabel());
   }
 
@@ -184,7 +184,7 @@ void IsisMain() {
   // Find all the overlaps between the images in the FROMLIST
   // The overlap polygon coordinates are in Lon/Lat order
   ImageOverlapSet overlaps;
-  overlaps.ReadImageOverlaps(ui.GetFilename("OVERLAPLIST"));
+  overlaps.ReadImageOverlaps(ui.GetFileName("OVERLAPLIST"));
 
   // Create a Universal Ground Map (UGM) for each image in the list
   int stats_noOverlap = 0;
@@ -193,7 +193,7 @@ void IsisMain() {
   map<std::string, UniversalGroundMap *> gMaps;
   for(int sn = 0; sn < serialNumbers.Size(); ++sn) {
     // Create the UGM for the cube associated with this SN
-    Pvl lab = Pvl(serialNumbers.Filename(sn));
+    Pvl lab = Pvl(serialNumbers.FileName(sn));
     gMaps.insert(std::pair<std::string, UniversalGroundMap *>
                  (serialNumbers.SerialNumber(sn), new UniversalGroundMap(lab)));
   }
@@ -210,7 +210,7 @@ void IsisMain() {
   vector< geos::geom::Point *> points;
   if(previousControlNet) {
 
-    ControlNet precnet(ui.GetFilename("CNET"));
+    ControlNet precnet(ui.GetFileName("CNET"));
 
     Progress progress;
     progress.SetText("Calculating Provided Control Net");
@@ -220,7 +220,7 @@ void IsisMain() {
     for(int i = 0 ; i < precnet.GetNumPoints(); i ++) {
       ControlPoint *cp = precnet.GetPoint(i);
       ControlMeasure *cm = cp->GetRefMeasure();
-      iString c = serialNumbers.Filename(cm->GetCubeSerialNumber());
+      iString c = serialNumbers.FileName(cm->GetCubeSerialNumber());
       Pvl cubepvl(c);
       Camera *cam = CameraFactory::Create(cubepvl);
       cam->SetImage(cm->GetSample(), cm->GetLine());
@@ -392,7 +392,7 @@ void IsisMain() {
         // Check the DNs with the cube, Note: this is costly to do
         if(hasDNRestriction) {
           Cube cube;
-          string c = serialNumbers.Filename((*overlaps[ov])[sn]);
+          string c = serialNumbers.FileName((*overlaps[ov])[sn]);
           cube.open(c);
           Isis::Brick brick(1, 1, 1, cube.getPixelType());
           brick.SetBasePosition((int)gmap->Camera()->Sample(), (int)gmap->Camera()->Line(), (int)gmap->Camera()->Band());
@@ -455,7 +455,7 @@ void IsisMain() {
 
   //Log the ERRORS file
   if(ui.WasEntered("ERRORS") && errorNum > 0) {
-    string errorname = ui.GetFilename("ERRORS");
+    string errorname = ui.GetFileName("ERRORS");
     std::ofstream errorsfile;
     errorsfile.open(errorname.c_str());
     errorsfile << errors.str();
@@ -470,7 +470,7 @@ void IsisMain() {
   }
 
   // Write the control network out
-  cnet.Write(ui.GetFilename("ONET"));
+  cnet.Write(ui.GetFileName("ONET"));
 
   // create SeedDef group and add to print.prt
   PvlGroup pluginInfo = seeder->PluginParameters("SeedDefinition");

@@ -5,7 +5,7 @@
 #include <QTime>
 
 #include "ControlNet.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "Preference.h"
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 
 void TestNetwork(const string &filename, bool printNetwork) {
   cerr << "Reading: " << filename << "...\n\n";
-  Filename networkFilename(filename);
+  FileName networkFileName(filename);
 
   LatestControlNetFile * test = NULL;
   LatestControlNetFile * test2 = NULL;
@@ -45,7 +45,7 @@ void TestNetwork(const string &filename, bool printNetwork) {
     cerr << "Read network..." << endl;
     QTime timer;
     timer.start();
-    test = ControlNetVersioner::Read(networkFilename);
+    test = ControlNetVersioner::Read(networkFileName);
 //     cerr << "Elapsed time to read: " << timer.elapsed() << "ms" << endl;
 
     if(printNetwork) {
@@ -57,12 +57,12 @@ void TestNetwork(const string &filename, bool printNetwork) {
 
     // Test the latest binary read/write and Pvl conversion
     cerr << "Write the network and re-read it..." << endl;
-    ControlNetVersioner::Write(Filename("./tmp"), *test);
+    ControlNetVersioner::Write(FileName("./tmp"), *test);
 
     try {
       QTime timer2;
       timer2.start();
-      test2 = ControlNetVersioner::Read(Filename("./tmp"));
+      test2 = ControlNetVersioner::Read(FileName("./tmp"));
 //       cerr << "Elapsed time to read: " << timer2.elapsed() << "ms" << endl;
     }
     catch(IException &e) {
@@ -83,7 +83,7 @@ void TestNetwork(const string &filename, bool printNetwork) {
       }
     }
 
-    ControlNetVersioner::Write(Filename("./tmp2"), *test2);
+    ControlNetVersioner::Write(FileName("./tmp2"), *test2);
     if(system("cmp ./tmp ./tmp2")) {
       cerr << "Reading/Writing control network results in binary differences!"
            << endl;

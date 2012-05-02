@@ -57,7 +57,7 @@ void IsisMain() {
 
   // Check for projection
   if (incube->isProjected()) {
-    string msg = "The cube [" + ui.GetFilename("FROM") + "] has a projection" +
+    string msg = "The cube [" + ui.GetFileName("FROM") + "] has a projection" +
                  " and cannot be radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -70,7 +70,7 @@ void IsisMain() {
 
   // Verify not radiometrically corrected
   if (isiscube.HasGroup("Radiometry")) {
-    string msg = "Cube [" + ui.GetFilename("FROM") + "] has already been" +
+    string msg = "Cube [" + ui.GetFileName("FROM") + "] has already been" +
                  " radiometrically corrected";
     throw IException(IException::User,msg,_FILEINFO_);
   }
@@ -78,15 +78,15 @@ void IsisMain() {
   // Verify Voyager spacecraft and get number, 1 or 2
   string scNumber = instrument["SpacecraftName"][0];
   if (scNumber != "VOYAGER_1" && scNumber != "VOYAGER_2") {
-    string msg = "The cube [" + ui.GetFilename("FROM") + "] does not appear" +
+    string msg = "The cube [" + ui.GetFileName("FROM") + "] does not appear" +
                  " to be a Voyager image";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   scNumber = scNumber[8];
 
   // Open calibration file to find constants and files
-  Pvl calibra(Filename("$voyager" + scNumber +
-                           "/calibration/voycal.pvl").Expanded());
+  Pvl calibra(FileName("$voyager" + scNumber +
+                           "/calibration/voycal.pvl").expanded());
   PvlObject calib;
   QList<QString> hierarchy;
   try {
@@ -118,11 +118,11 @@ void IsisMain() {
 
   // Get appropriate calibration files
   CubeAttributeInput in1;
-  p.SetInputCube(Filename("$voyager" + scNumber + "/calibration/" +
-                          (string)calib["OffsetCorrectionFile"]).Expanded(), in1);
+  p.SetInputCube(FileName("$voyager" + scNumber + "/calibration/" +
+                          (string)calib["OffsetCorrectionFile"]).expanded(), in1);
   CubeAttributeInput in2;
-  p.SetInputCube(Filename("$voyager" + scNumber + "/calibration/" +
-                          (string)calib["GainCorrectionFile"]).Expanded(), in2);
+  p.SetInputCube(FileName("$voyager" + scNumber + "/calibration/" +
+                          (string)calib["GainCorrectionFile"]).expanded(), in2);
 
   // Constants from voycal.pvl for correction
   omegaNaught = calib["OmegaNaught"];
@@ -134,8 +134,8 @@ void IsisMain() {
   // If we are doing a linear correction as well, go here
   linear = ui.GetBoolean("LINEAR");
   if (linear) {
-    Pvl linearity(Filename("$voyager" + scNumber +
-                     "/calibration/voylin.pvl").Expanded());
+    Pvl linearity(FileName("$voyager" + scNumber +
+                     "/calibration/voylin.pvl").expanded());
 
     PvlObject lin;
     try {

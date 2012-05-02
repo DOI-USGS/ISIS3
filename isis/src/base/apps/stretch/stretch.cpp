@@ -25,10 +25,10 @@ void IsisMain() {
   // first just get the pairs from where ever and worry about
   // whether they are dn values or %'s later
   if(ui.GetBoolean("READFILE")) {
-    Filename pairsFileName = ui.GetFilename("INPUTFILE");
+    FileName pairsFileName = ui.GetFileName("INPUTFILE");
     TextFile pairsFile;
     pairsFile.SetComment("#");
-    pairsFile.Open(pairsFileName.Expanded());
+    pairsFile.Open(pairsFileName.expanded());
 
     // concat all non-comment lines into one string (pairs)
     string line = "";

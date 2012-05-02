@@ -4,7 +4,7 @@
 
 #include "Buffer.h"
 #include "CubeAttribute.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "JP2Decoder.h"
 #include "JP2Importer.h"
 #include "ProcessByLine.h"
@@ -21,11 +21,11 @@ namespace Isis {
    *
    * @param inputName The name of the input image
    */
-  ImageImporter::ImageImporter(Filename inputName) {
+  ImageImporter::ImageImporter(FileName inputName) {
     m_inputName = NULL;
     m_outCube = NULL;
 
-    m_inputName = new Filename(inputName);
+    m_inputName = new FileName(inputName);
     m_outCube = new Cube;
 
     m_nullMin = DBL_MAX;
@@ -85,7 +85,7 @@ namespace Isis {
    *
    * @param outputName The filename of the output cube
    */
-  Cube * ImageImporter::import(Filename outputName) {
+  Cube * ImageImporter::import(FileName outputName) {
     CubeAttributeOutput att;
     return import(outputName, att);
   }
@@ -106,7 +106,7 @@ namespace Isis {
    *
    * @return A handle on the newly imported Isis cube owned by the importer
    */
-  Cube * ImageImporter::import(Filename outputName, CubeAttributeOutput &att) {
+  Cube * ImageImporter::import(FileName outputName, CubeAttributeOutput &att) {
     ProcessByLine p;
     Cube *cube = createOutput(outputName, att);
 
@@ -150,10 +150,10 @@ namespace Isis {
    * @return The newly created cube handle devoid of any data
    */
   Cube * ImageImporter::createOutput(
-      Filename outputName, CubeAttributeOutput &att) {
+      FileName outputName, CubeAttributeOutput &att) {
 
     m_outCube->setDimensions(samples(), lines(), bands());
-    m_outCube->create(outputName.Expanded(), att);
+    m_outCube->create(outputName.expanded(), att);
     return m_outCube;
   }
 
@@ -278,7 +278,7 @@ namespace Isis {
    *
    * @return A copy of the input filename
    */
-  Filename ImageImporter::filename() const {
+  FileName ImageImporter::filename() const {
     return *m_inputName;
   }
 
@@ -390,22 +390,22 @@ namespace Isis {
    *
    * @return A pointer to the instantiated importer owned by the caller
    */
-  ImageImporter * ImageImporter::fromFilename(Filename inputName) {
+  ImageImporter * ImageImporter::fromFileName(FileName inputName) {
     ImageImporter *importer = NULL;
 
-    QString format = QImageReader::imageFormat(inputName.Expanded());
+    QString format = QImageReader::imageFormat(inputName.expanded());
     if (format == "tiff") {
       importer = new TiffImporter(inputName);
     }
     else if (format != "") {
       importer = new QtImporter(inputName);
     }
-    else if (JP2Decoder::IsJP2(inputName.Expanded())) {
+    else if (JP2Decoder::IsJP2(inputName.expanded())) {
       importer = new JP2Importer(inputName);
     }
     else {
       throw IException(IException::Programmer,
-          "Cannot determine image format for [" + inputName.Expanded() + "]",
+          "Cannot determine image format for [" + inputName.expanded() + "]",
           _FILEINFO_);
     }
 

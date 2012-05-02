@@ -13,7 +13,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Get input cube and get camera model for it
-  string channel = ui.GetFilename("FROM");
+  string channel = ui.GetFileName("FROM");
   Cube cube;
   cube.open(channel);
   Camera *cam = cube.getCamera();
@@ -51,7 +51,7 @@ void IsisMain() {
   // Create group with sky position
   PvlGroup sp("SkyPoint");
   {
-    sp += PvlKeyword("Filename", Filename(channel).Expanded());
+    sp += PvlKeyword("Filename", FileName(channel).expanded());
     sp += PvlKeyword("Sample", cam->Sample());
     sp += PvlKeyword("Line", cam->Line());
     sp += PvlKeyword("RightAscension", cam->RightAscension());
@@ -65,8 +65,8 @@ void IsisMain() {
   // Write an output label file if necessary
   if(ui.WasEntered("TO")) {
     // Get user params from ui
-    string outFile = Filename(ui.GetFilename("TO")).Expanded();
-    bool exists = Filename(outFile).Exists();
+    string outFile = FileName(ui.GetFileName("TO")).expanded();
+    bool exists = FileName(outFile).fileExists();
     bool append = ui.GetBoolean("APPEND");
 
     // Write the pvl group out to the file

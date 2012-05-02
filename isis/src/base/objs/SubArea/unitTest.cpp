@@ -25,7 +25,7 @@ void IsisMain() {
   int onl, ons;
 
   p1.SetInputCube("FROM1");
-  string from1 = ui.GetFilename("FROM1");
+  string from1 = ui.GetFileName("FROM1");
   Cube inomapcube;
   inomapcube.open(from1);
   inl = inomapcube.getLineCount();
@@ -75,7 +75,7 @@ void IsisMain() {
   p1.EndProcess();
 
   cout << "Output cube label: " << endl << endl;
-  string file = ui.GetFilename("TO");
+  string file = ui.GetFileName("TO");
   Pvl label(file);
   cout << label.FindObject("IsisCube").FindObject("Core").FindGroup("Dimensions") << endl << endl;
   if(label.FindObject("IsisCube").HasGroup("Instrument")) {
@@ -285,7 +285,7 @@ void IsisMain() {
 
   ProcessByLine p6;
   p6.SetInputCube("FROM2");
-  string from2 = ui.GetFilename("FROM2");
+  string from2 = ui.GetFileName("FROM2");
   Cube imapcube;
   imapcube.open(from2);
   inl = imapcube.getLineCount();

@@ -4,7 +4,7 @@
 
 #include "geos/geom/MultiPolygon.h"
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Cube.h"
 #include "ImagePolygon.h"
 #include "PolygonTools.h"
@@ -18,7 +18,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   Cube cube;
-  cube.open(ui.GetFilename("FROM"));
+  cube.open(ui.GetFileName("FROM"));
   ImagePolygon poly;
   poly.Create(cube);
 
@@ -37,19 +37,19 @@ void IsisMain() {
   string outfile;
   ofstream fout;
   if(ui.WasEntered("TO")) {
-    outfile = ui.GetFilename("TO");
+    outfile = ui.GetFileName("TO");
   }
   else {
-    Filename inputFile = ui.GetFilename("FROM");
-    inputFile.RemoveExtension();
-    inputFile.AddExtension("gml");
-    outfile = inputFile.Name();
+    FileName inputFile = ui.GetFileName("FROM");
+    inputFile.removeExtension();
+    inputFile.addExtension("gml");
+    outfile = inputFile.name();
   }
   fout.open(outfile.c_str());
 
   fout << polyString << endl;
 
-  //      fout.open(Filename(outfile).Expanded().c_str(),ios::out);
+  //      fout.open(FileName(outfile).expanded().c_str(),ios::out);
   fout.close();
 
 

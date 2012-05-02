@@ -26,7 +26,7 @@
 
 #include "PvlContainer.h"
 #include "Pvl.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Message.h"
 #include "PvlFormat.h"
@@ -277,12 +277,12 @@ namespace Isis {
     for(int i = 0; i < outTemplate.Keywords(); i++) {
       if(outTemplate[i].IsNamed("Isis:PvlTemplate:File")) {
         string filename = outTemplate[i];
-        Isis::Filename file(filename);
-        if(!file.Exists()) {
+        Isis::FileName file(filename);
+        if(!file.fileExists()) {
           string message = "Could not open the template file [" + filename + "]";
           throw IException(IException::Io, message, _FILEINFO_);
         }
-        Isis::Pvl include(file.Expanded());
+        Isis::Pvl include(file.expanded());
 
         for(int j = 0; j < include.Keywords(); j++) {
           if(!newTemp.HasKeyword(include[j].Name()))

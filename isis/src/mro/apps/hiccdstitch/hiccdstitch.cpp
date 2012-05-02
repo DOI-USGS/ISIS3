@@ -105,9 +105,9 @@ void IsisMain() {
   // Get the list of names of input CCD cubes to stitch together
   FileList list;
   UserInterface &ui = Application::GetUserInterface();
-  list.Read(ui.GetFilename("FROMLIST"));
+  list.Read(ui.GetFileName("FROMLIST"));
   if(list.size() < 1) {
-    string msg = "The list file[" + ui.GetFilename("FROMLIST") +
+    string msg = "The list file[" + ui.GetFileName("FROMLIST") +
                  " does not contain any filenames";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -116,7 +116,7 @@ void IsisMain() {
 //  Commented out as HiRISE Team is requesting a single file to be processed
 //  to simplify pipeline logic
   if(list.size() == 1) {
-    string msg = "The list file[" + ui.GetFilename("FROMLIST") +
+    string msg = "The list file[" + ui.GetFileName("FROMLIST") +
                  " must contain at least two filenames";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
@@ -140,7 +140,7 @@ void IsisMain() {
 
 //  Open the shift definitions file
   Pvl shiftdef;
-  shiftdef.Read(ui.GetFilename("SHIFTDEF"));
+  shiftdef.Read(ui.GetFileName("SHIFTDEF"));
 
   PvlObject &stitch = shiftdef.FindObject("Hiccdstitch", Pvl::Traverse);
 
@@ -393,7 +393,7 @@ void IsisMain() {
 
 //  Write the object if requested
   if(ui.WasEntered("PLACEMENT")) {
-    std::string placefile = ui.GetFilename("PLACEMENT");
+    std::string placefile = ui.GetFileName("PLACEMENT");
     std::ofstream pfile;
     pfile.open(placefile.c_str(), std::ios::out | std::ios::trunc);
     pfile << results << endl;
@@ -518,7 +518,7 @@ void PlaceCCD(Buffer &buf) {
 //Helper function to output the regdeft file to log.
 void helperButtonLog() {
   UserInterface &ui = Application::GetUserInterface();
-  string file(ui.GetFilename("SHIFTDEF"));
+  string file(ui.GetFileName("SHIFTDEF"));
   Pvl p;
   p.Read(file);
   Application::GuiLog(p);

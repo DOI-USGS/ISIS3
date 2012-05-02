@@ -10,6 +10,7 @@
 #include <QByteArray>
 #include <QClipboard>
 #include <QDataStream>
+#include <QFileInfo>
 #include <QEvent>
 #include <QMenu>
 #include <QMouseEvent>
@@ -20,7 +21,7 @@
 
 #include "Cube.h"
 #include "CubeViewport.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "CubePlotCurveConfigureDialog.h"
@@ -159,8 +160,8 @@ namespace Isis {
    * @param painter The painter to use for painting onto the viewport
    */
   void CubePlotCurve::paint(CubeViewport *vp, QPainter *painter) {
-    if (m_sourceCube.contains(vp->cube()->getFilename())) {
-      int i = m_sourceCube.indexOf(vp->cube()->getFilename());
+    if (m_sourceCube.contains(vp->cube()->getFileName())) {
+      int i = m_sourceCube.indexOf(vp->cube()->getFileName());
       QPen customPen;
       customPen.setColor(pen().color());
       customPen.setWidth(pen().width());
@@ -271,7 +272,7 @@ namespace Isis {
                                 int band) {
 
     if (cvp) {
-      m_sourceCube << cvp->cube()->getFilename().ToQt();
+      m_sourceCube << cvp->cube()->getFileName().ToQt();
 
       if (m_renameAutomatically) {
         setTitle(title().text() + " - " +
@@ -451,7 +452,7 @@ namespace Isis {
       contextMenu.addSeparator();
 
       QString configureIconFile =
-          (iString)Filename("$base/icons/plot_configure.png").Expanded();
+          FileName("$base/icons/plot_configure.png").expanded();
       QAction *configureAct = new QAction(QPixmap(configureIconFile),
                                           "Configure...", this);
       contextMenu.addAction(configureAct);

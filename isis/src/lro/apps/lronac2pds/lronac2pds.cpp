@@ -40,10 +40,10 @@ void IsisMain () {
 
     g_isIof = inCube->getLabel()->FindGroup("Radiometry", Pvl::Traverse).FindKeyword("RadiometricType")[0].Equal("IOF");
 
-    Filename scaledCube = ui.GetFilename("FROM");
-    scaledCube.Temporary(Filename(ui.GetFilename("FROM")).Basename(), "cub");
+    FileName scaledCube = ui.GetFileName("FROM");
+    scaledCube = FileName::createTempFile("$TEMPORARY/" + FileName(ui.GetFileName("FROM")).baseName());
     p.SetOutputCube(
-        scaledCube.Expanded(), CubeAttributeOutput(),
+        scaledCube.expanded(), CubeAttributeOutput(),
         inCube->getSampleCount(), inCube->getLineCount(),
         inCube->getBandCount());
 
@@ -54,7 +54,7 @@ void IsisMain () {
     ProcessExport pe;
 
     // Setup the input cube
-    inCube = pe.SetInputCube(scaledCube.Expanded(), CubeAttributeInput());
+    inCube = pe.SetInputCube(scaledCube.expanded(), CubeAttributeInput());
 
     if (g_isIof) {
         pe.SetOutputType(Isis::SignedWord);
@@ -81,21 +81,21 @@ void IsisMain () {
         pe.SetOutputHrs(Isis::HIGH_REPR_SAT4);
     }
 
-    Filename tempFile(ui.GetFilename("TO"));
-    tempFile.Temporary(Filename(ui.GetFilename("TO")).Basename(), "temp");
-    string tempFilename(tempFile.Expanded());
-    ofstream temporaryFile(tempFilename.c_str());
+    FileName tempFile(ui.GetFileName("TO"));
+    tempFile = FileName::createTempFile("$TEMPORARY/" + FileName(ui.GetFileName("TO")).baseName() + ".temp");
+    string tempFileName(tempFile.expanded());
+    ofstream temporaryFile(tempFileName.c_str());
 
     pe.StartProcess(temporaryFile);
     temporaryFile.close();
 
     // Calculate MD5 Checksum
-    g_md5Checksum = MD5Checksum(tempFilename);
+    g_md5Checksum = MD5Checksum(tempFileName);
 
-    Filename outFile(ui.GetFilename("TO"));
-    string outFilename(outFile.Expanded());
-    ifstream inFile(tempFilename.c_str());
-    ofstream pdsFile(outFilename.c_str());
+    FileName outFile(ui.GetFileName("TO"));
+    string outFileName(outFile.expanded());
+    ifstream inFile(tempFileName.c_str());
+    ofstream pdsFile(outFileName.c_str());
 
     // Output the label
     OutputLabel(pdsFile, inCube);
@@ -107,8 +107,8 @@ void IsisMain () {
 
     pe.EndProcess();
 
-    remove((scaledCube.Expanded()).c_str());
-    remove(tempFilename.c_str());
+    remove((scaledCube.expanded()).c_str());
+    remove(tempFileName.c_str());
     return;
 }
 
@@ -135,7 +135,7 @@ string MD5Checksum ( string filename ) {
 }
 
 void OutputLabel ( std::ofstream &fout, Cube* cube ) {
-    OriginalLabel origLab(cube->getFilename());
+    OriginalLabel origLab(cube->getFileName());
     Pvl labelPvl = origLab.ReturnLabels();
 
     //Pvl to store the labels
@@ -151,8 +151,8 @@ void OutputLabel ( std::ofstream &fout, Cube* cube ) {
     iString pdsLabel = "";
 
     //Translate the Original Pds Label
-    Filename transFile(transDir + "lronacPdsLabelExport.trn");
-    PvlTranslationManager labelXlator(labelPvl, transFile.Expanded());
+    FileName transFile(transDir + "lronacPdsLabelExport.trn");
+    PvlTranslationManager labelXlator(labelPvl, transFile.expanded());
     labelXlator.Auto(outLabel);
 
     // Copy any Translation changes over

@@ -1,4 +1,4 @@
-#include "Filename.h"
+#include "FileName.h"
 #include "GuiEditFile.h"
 #include "UserInterface.h"
 
@@ -16,16 +16,16 @@ using namespace Isis;
 using namespace std;
 
 namespace Isis {
-  
+
   // Singleton
   GuiEditFile* GuiEditFile::m_instance = NULL;
-  
+
   /**
-   * Creates a single instance of the GuiEditFile. If already an instance, 
-   * display the object 
-   * 
+   * Creates a single instance of the GuiEditFile. If already an instance,
+   * display the object
+   *
    * @author Sharmila Prasad (5/20/2011)
-   * 
+   *
    * @param pUI    - User Interface of parent app
    * @param psFile - File to edit
    */
@@ -37,12 +37,12 @@ namespace Isis {
       m_instance->showWindow(psFile);
     }
   }
-  
+
   /**
    * Display the window if there is already an instance of this object
-   * 
+   *
    * @author Sharmila Prasad (5/23/2011)
-   * 
+   *
    * @param psFile - File to edit
    */
   void GuiEditFile::showWindow(std::string psFile) {
@@ -51,34 +51,34 @@ namespace Isis {
     OpenFile(m_fileName);
     m_editWin->show();
   }
-  
+
   /**
    * Constructor
-   * 
+   *
    * @author Sharmila Prasad (5/20/2011)
-   * 
-   * @param pUI 
-   * @param psFile 
+   *
+   * @param pUI
+   * @param psFile
    */
   GuiEditFile::GuiEditFile(UserInterface & pUI, std::string psFile) {
     // Init data members
     m_parent   = pUI.TheGui();
     m_fileName = QString(psFile.c_str());
     m_editFile=NULL;
-    
+
     // Main Window
     m_editWin = new QMainWindow(m_parent, Qt::SubWindow);
     m_editWin->setWindowTitle (m_fileName);
     m_editWin->resize (400, 600);
-    
+
     // Status bar
     QStatusBar *statusBar = new QStatusBar(m_editWin);
     m_editWin->setStatusBar(statusBar);
-  
+
     // Menu bar
     QMenuBar *menuBar = new QMenuBar(m_editWin);
     QMenu *fileMenu = menuBar->addMenu("&File");
-    
+
     // Action File-> Open
     m_open = new QAction(menuBar);
     m_open->setShortcut(Qt::CTRL + Qt::Key_O);
@@ -88,7 +88,7 @@ namespace Isis {
     m_open->setWhatsThis(whatsThis);
     connect(m_open, SIGNAL(activated()), this, SLOT(open()));
     fileMenu->addAction(m_open);
-    
+
     // Action File-> Save
     m_save = new QAction(menuBar);
     m_save->setShortcut(Qt::CTRL + Qt::Key_S);
@@ -97,7 +97,7 @@ namespace Isis {
     m_save->setWhatsThis("Save the current file");
     connect(m_save, SIGNAL(activated()), this, SLOT(saveFile()));
     fileMenu->addAction(m_save);
-    
+
     // Action File->Save As
     m_saveAs = new QAction(menuBar);
     m_saveAs->setText("Save &As...");
@@ -106,7 +106,7 @@ namespace Isis {
     m_saveAs->setWhatsThis("Save the current file into another file");
     connect(m_saveAs, SIGNAL(activated()), this, SLOT(saveAs()));
     fileMenu->addAction(m_saveAs);
-    
+
     // Action File->close
     m_close = new QAction(menuBar);
     m_close->setText("&Close...");
@@ -115,7 +115,7 @@ namespace Isis {
     m_close->setWhatsThis("Close the current file");
     connect(m_close, SIGNAL(activated()), this, SLOT(closeFile()));
     fileMenu->addAction(m_close);
-    
+
     // Action Exit
     m_exit = menuBar->addAction("&Exit");
     m_exit->setShortcut(Qt::CTRL + Qt::Key_E);
@@ -124,7 +124,7 @@ namespace Isis {
     m_exit->setWhatsThis("Exit the Editor");
     //connect(m_exit, SIGNAL(activated()), m_editWin, SLOT(close()));
     connect(m_exit, SIGNAL(activated()), this, SLOT(closeWin()));
-    
+
     m_editWin->setMenuBar(menuBar);
 
     // Text Edit
@@ -137,42 +137,42 @@ namespace Isis {
       OpenFile(m_fileName);
     }
     connect(m_txtEdit, SIGNAL(textChanged()), this, SLOT(setTextChanged()));
-    
-    m_editWin->show(); 
+
+    m_editWin->show();
   }
-  
+
   /**
    * Destructor
-   * 
+   *
    * @author Sharmila Prasad (5/20/2011)
    */
   GuiEditFile::~GuiEditFile() {
     delete m_editFile;
     m_editFile = NULL;
-    
+
     delete m_txtEdit;
     m_txtEdit = NULL;
-    
+
     delete m_editWin;
     m_editWin = NULL;
-    
+
     delete m_instance;
     m_instance = NULL;
   }
-  
+
   /**
    * Action Exit - Close window and clear text editor
-   * 
+   *
    * @author Sharmila Prasad (5/23/2011)
    */
   void GuiEditFile::closeWin() {
     m_editWin->close();
     m_txtEdit->clear();
   }
-  
+
   /**
    * Flag to indicate text has changed
-   * 
+   *
    * @author Sharmila Prasad (5/20/2011)
    */
   void GuiEditFile::setTextChanged() {
@@ -181,7 +181,7 @@ namespace Isis {
 
   /**
    * Action File->Open
-   * 
+   *
    * @author Sharmila Prasad (5/20/2011)
    */
   void GuiEditFile::open() {
@@ -195,7 +195,7 @@ namespace Isis {
         saveFile();
       }
     }
-    
+
     QString sFilterList("All files (*)");
     QDir currDir = QDir::current();
     QString sOpen("Open");
@@ -206,12 +206,12 @@ namespace Isis {
 
   /**
    * Action File->close, close the opened file
-   * 
+   *
    * @author Sharmila Prasad (5/20/2011)
    */
   void GuiEditFile::closeFile(){
     if (m_textChanged) {
-      if(QMessageBox::question((QWidget *)parent(), tr("Save File?"), 
+      if(QMessageBox::question((QWidget *)parent(), tr("Save File?"),
                                tr("Changes have been made to the file. Do you want to Save?"),
                                QMessageBox::Save, QMessageBox::No) == QMessageBox::Save) {
         saveFile();
@@ -222,13 +222,13 @@ namespace Isis {
     m_textChanged = false;
     m_editWin->setWindowTitle(tr(""));
   }
-  
+
   /**
    * Display the selected file
-   * 
+   *
    * @author Sharmila Prasad (5/20/2011)
-   * 
-   * @param psOutFile 
+   *
+   * @param psOutFile
    */
   void GuiEditFile::OpenFile(QString psOutFile){
     //cerr << "Open File " << psOutFile.toStdString() << "\n";
@@ -236,13 +236,13 @@ namespace Isis {
       QMessageBox::information((QWidget *)parent(), "Error", "No output file selected");
       return;
     }
-    
+
     if (m_editFile != NULL) {
       m_txtEdit->clear();
       delete (m_editFile);
     }
     m_editFile = new QFile(psOutFile);
-    //m_editWin->setWindowTitle(Filename(psOutFile.toStdString()).Name().c_str());
+    //m_editWin->setWindowTitle(FileName(psOutFile.toStdString()).Name().c_str());
     windowTitle(psOutFile);
 
     if (m_editFile->open(QIODevice::ReadWrite)){
@@ -262,10 +262,10 @@ namespace Isis {
     }
     m_textChanged = false;
   }
-  
+
   /**
    * Action File->Save
-   * 
+   *
    * @author Sharmila Prasad (5/20/2011)
    */
   void GuiEditFile::saveFile(){
@@ -276,10 +276,10 @@ namespace Isis {
       m_textChanged = false;
     }
   }
-  
+
   /**
    * Action File->Save As
-   * 
+   *
    * @author Sharmila Prasad (5/23/2011)
    */
   void GuiEditFile::saveAs() {
@@ -293,17 +293,17 @@ namespace Isis {
     allPButtons[0]->setText("&Save");
     // Edit the second (Cancel) button title.
     allPButtons[1]->setText("&Close");
-    
+
     saveAsDialog->show();
     connect(saveAsDialog, SIGNAL(fileSelected(QString)), this, SLOT(saveAsFile(QString)));
   }
-  
+
   /**
    * Copy the current file into user selected file
-   * 
+   *
    * @author Sharmila Prasad (5/23/2011)
-   * 
-   * @param psNewFile 
+   *
+   * @param psNewFile
    */
   void GuiEditFile::saveAsFile(QString psNewFile) {
     m_editFile->close();
@@ -313,11 +313,11 @@ namespace Isis {
     saveFile();
     windowTitle(psNewFile);
   }
-  
+
   /**
-   * Delete the contents of the current file - especially if changes are made 
+   * Delete the contents of the current file - especially if changes are made
    * and they are not to be saved.
-   * 
+   *
    * @author Sharmila Prasad (5/23/2011)
    */
   void GuiEditFile::clearFile(){
@@ -327,16 +327,16 @@ namespace Isis {
       m_editFile->open(QFile::ReadWrite | QFile::Truncate);
     }
   }
-  
+
   /**
    * Display only the base name of the file
-   * 
+   *
    * @author Sharmila Prasad (5/23/2011)
-   * 
+   *
    * @param psfile - current file
    */
   void GuiEditFile::windowTitle(QString & psfile) {
-    m_editWin->setWindowTitle(Filename(psfile.toStdString()).Name().c_str());
+    m_editWin->setWindowTitle(FileName(psfile.toStdString()).name().c_str());
   }
-  
+
 }

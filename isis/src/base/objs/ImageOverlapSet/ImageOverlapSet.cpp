@@ -14,7 +14,7 @@
 #include "SerialNumberList.h"
 #include "PolygonTools.h"
 #include "ImagePolygon.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "ImageOverlapSet.h"
 #include "Progress.h"
 
@@ -69,11 +69,11 @@ namespace Isis {
       // Open the cube
       Cube cube;
       try {
-        cube.open(sns.Filename(i));
+        cube.open(sns.FileName(i));
       }
       catch(IException &error) {
         std::string msg = "Unable to open cube for serial number [";
-        msg += sns.SerialNumber(i) + "] filename [" + sns.Filename(i) + "]";
+        msg += sns.SerialNumber(i) + "] filename [" + sns.FileName(i) + "]";
 
         HandleError(error, &sns, msg);
       }
@@ -97,7 +97,7 @@ namespace Isis {
       if(!tmp->isValid()) {
         delete tmp;
         tmp = NULL;
-        iString msg = "The image [" + sns.Filename(sns.SerialNumber(i)) +
+        iString msg = "The image [" + sns.FileName(sns.SerialNumber(i)) +
                       "] has an invalid footprint";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -314,7 +314,7 @@ namespace Isis {
    * @param filename The file to read the image overlaps from
    */
   void ImageOverlapSet::ReadImageOverlaps(const std::string &filename) {
-    iString file = Filename(filename).Expanded();
+    iString file = FileName(filename).expanded();
 
     try {
       // Let's get an istream pointed at our file
@@ -419,7 +419,7 @@ namespace Isis {
    * @param filename The file to write the image overlaps to
    */
   void ImageOverlapSet::WriteImageOverlaps(const std::string &filename) {
-    iString file = Filename(filename).Expanded();
+    iString file = FileName(filename).expanded();
     bool failed = false;
     if(p_threadedCalculate) p_calculatePolygonMutex.lock();
 
@@ -819,14 +819,14 @@ namespace Isis {
 
     if(overlap1 >= 0 && overlap1 < p_lonLatOverlaps.size()) {
       PvlKeyword serialNumbers("PolySerialNumbers");
-      PvlKeyword filename("Filenames");
+      PvlKeyword filename("FileNames");
       PvlKeyword polygon("Polygon");
 
       for(int i = 0; i < p_lonLatOverlaps.at(overlap1)->Size(); i++) {
         serialNumbers += (*p_lonLatOverlaps.at(overlap1))[i];
 
         if(snlist != NULL) {
-          filename += snlist->Filename((*p_lonLatOverlaps.at(overlap1))[i]);
+          filename += snlist->FileName((*p_lonLatOverlaps.at(overlap1))[i]);
         }
       }
       polygon += p_lonLatOverlaps.at(overlap1)->Polygon()->toString();
@@ -842,14 +842,14 @@ namespace Isis {
 
     if(overlap2 >= 0 && overlap1 < p_lonLatOverlaps.size() && overlap2 < p_lonLatOverlaps.size()) {
       PvlKeyword serialNumbers("PolySerialNumbers");
-      PvlKeyword filename("Filenames");
+      PvlKeyword filename("FileNames");
       PvlKeyword polygon("Polygon");
 
       for(int i = 0; i < p_lonLatOverlaps.at(overlap2)->Size(); i++) {
         serialNumbers += (*p_lonLatOverlaps.at(overlap2))[i];
 
         if(snlist != NULL) {
-          filename += snlist->Filename((*p_lonLatOverlaps.at(overlap2))[i]);
+          filename += snlist->FileName((*p_lonLatOverlaps.at(overlap2))[i]);
         }
       }
       polygon += p_lonLatOverlaps.at(overlap2)->Polygon()->toString();
@@ -889,13 +889,13 @@ namespace Isis {
 
     if(overlap1 >= 0 && overlap1 < p_lonLatOverlaps.size()) {
       PvlKeyword serialNumbers("PolySerialNumbers");
-      PvlKeyword filename("Filenames");
+      PvlKeyword filename("FileNames");
 
       for(int i = 0; i < p_lonLatOverlaps.at(overlap1)->Size(); i++) {
         serialNumbers += (*p_lonLatOverlaps.at(overlap1))[i];
 
         if(snlist != NULL) {
-          filename += snlist->Filename((*p_lonLatOverlaps.at(overlap1))[i]);
+          filename += snlist->FileName((*p_lonLatOverlaps.at(overlap1))[i]);
         }
       }
 
@@ -908,13 +908,13 @@ namespace Isis {
 
     if(overlap2 >= 0 && overlap1 < p_lonLatOverlaps.size() && overlap2 < p_lonLatOverlaps.size()) {
       PvlKeyword serialNumbers("PolySerialNumbers");
-      PvlKeyword filename("Filenames");
+      PvlKeyword filename("FileNames");
 
       for(int i = 0; i < p_lonLatOverlaps.at(overlap2)->Size(); i++) {
         serialNumbers += (*p_lonLatOverlaps.at(overlap2))[i];
 
         if(snlist != NULL) {
-          filename += snlist->Filename((*p_lonLatOverlaps.at(overlap2))[i]);
+          filename += snlist->FileName((*p_lonLatOverlaps.at(overlap2))[i]);
         }
       }
 
@@ -957,13 +957,13 @@ namespace Isis {
 
     if(overlap1 >= 0 && overlap1 < p_lonLatOverlaps.size()) {
       PvlKeyword serialNumbers("PolySerialNumbers");
-      PvlKeyword filename("Filenames");
+      PvlKeyword filename("FileNames");
 
       for(int i = 0; i < p_lonLatOverlaps.at(overlap1)->Size(); i++) {
         serialNumbers += (*p_lonLatOverlaps.at(overlap1))[i];
 
         if(snlist != NULL) {
-          filename += snlist->Filename((*p_lonLatOverlaps.at(overlap1))[i]);
+          filename += snlist->FileName((*p_lonLatOverlaps.at(overlap1))[i]);
         }
       }
 
@@ -976,13 +976,13 @@ namespace Isis {
 
     if(overlap2 >= 0 && overlap1 < p_lonLatOverlaps.size() && overlap2 < p_lonLatOverlaps.size()) {
       PvlKeyword serialNumbers("PolySerialNumbers");
-      PvlKeyword filename("Filenames");
+      PvlKeyword filename("FileNames");
 
       for(int i = 0; i < p_lonLatOverlaps.at(overlap2)->Size(); i++) {
         serialNumbers += (*p_lonLatOverlaps.at(overlap2))[i];
 
         if(snlist != NULL) {
-          filename += snlist->Filename((*p_lonLatOverlaps.at(overlap2))[i]);
+          filename += snlist->FileName((*p_lonLatOverlaps.at(overlap2))[i]);
         }
       }
 

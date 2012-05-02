@@ -25,7 +25,7 @@
 #include "Camera.h"
 #include "Plugin.h"
 #include "IException.h"
-#include "Filename.h"
+#include "FileName.h"
 
 using namespace std;
 
@@ -102,14 +102,14 @@ namespace Isis {
 
 
   void CameraFactory::initPlugin() {
-    if(m_cameraPlugin.Filename() == "") {
-      Filename localFile("Camera.plugin");
-      if(localFile.Exists())
-        m_cameraPlugin.Read(localFile.Expanded());
+    if(m_cameraPlugin.FileName() == "") {
+      FileName localFile("Camera.plugin");
+      if(localFile.fileExists())
+        m_cameraPlugin.Read(localFile.expanded());
 
-      Filename systemFile("$ISISROOT/lib/Camera.plugin");
-      if(systemFile.Exists())
-        m_cameraPlugin.Read(systemFile.Expanded());
+      FileName systemFile("$ISISROOT/lib/Camera.plugin");
+      if(systemFile.fileExists())
+        m_cameraPlugin.Read(systemFile.expanded());
     }
   }
 

@@ -345,7 +345,7 @@ namespace Isis {
         cubeNamesFilter, SLOT(createCubeList()));
 
     pointFilters->insertTab(CubeName, cubeNamesFilter, "&Cube Name(s)");
-    pointFilters->setTabToolTip(CubeName, "Filter Points by Cube Filename(s)");
+    pointFilters->setTabToolTip(CubeName, "Filter Points by Cube FileName(s)");
     pointFilters->setTabWhatsThis(CubeName,
         "<b>Function: </b> Filter points list by \
                                      the filenames of cubes. This filter will \
@@ -463,9 +463,9 @@ namespace Isis {
           this, SLOT(load(QListWidgetItem *)));
       //p_listBox->setSelectionMode(QAbstractItemView::ExtendedSelection);
       for (int i = 0; i < g_serialNumberList->Size(); i++) {
-        Filename filename = Filename(g_serialNumberList->Filename(i));
-        string tempFilename = filename.Name();
-        p_listBox->insertItem(i, tempFilename.c_str());
+        FileName filename = FileName(g_serialNumberList->FileName(i));
+        string tempFileName = filename.name();
+        p_listBox->insertItem(i, tempFileName.c_str());
       }
       QString msg = "Filter Count: " + QString::number(p_listBox->count()) +
           " / " + QString::number(g_serialNumberList->Size());
@@ -564,9 +564,9 @@ namespace Isis {
     // We are dealing with images so write out the cube names
     else if (p_listCombo->currentIndex() == Cubes) {
       for (int i = 0; i < g_filteredImages.size(); i++) {
-        Filename filename = Filename(g_serialNumberList->Filename(g_filteredImages[i]));
-        string tempFilename = filename.Name();
-        p_listBox->insertItem(i, tempFilename.c_str());
+        FileName filename = FileName(g_serialNumberList->FileName(g_filteredImages[i]));
+        string tempFileName = filename.name();
+        p_listBox->insertItem(i, tempFileName.c_str());
       }
       QString msg = "Filter Count: " + QString::number(p_listBox->count()) +
           " / " + QString::number(g_serialNumberList->Size());

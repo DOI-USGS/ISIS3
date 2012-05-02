@@ -1,7 +1,7 @@
 #include "Isis.h"
 #include "ProcessImportPds.h"
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Pvl.h"
 #include "IException.h"
 #include "TextFile.h"
@@ -10,23 +10,23 @@
 using namespace std;
 using namespace Isis;
 
-void TranslateLunarLabels(Filename &labelFile, Cube *ocube);
+void TranslateLunarLabels(FileName &labelFile, Cube *ocube);
 
 void IsisMain() {
   ProcessImportPds p;
   Pvl label;
   UserInterface &ui = Application::GetUserInterface();
-  Filename in = ui.GetFilename("FROM");
+  FileName in = ui.GetFileName("FROM");
 
   //Checks if in file is rdr
-  label = in.Expanded();
+  label = in.expanded();
   if(label.HasObject("IMAGE_MAP_PROJECTION")) {
-    string msg = "[" + in.Name() + "] appears to be an rdr file.";
+    string msg = "[" + in.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  p.SetPdsFile(in.Expanded(), "", label);
+  p.SetPdsFile(in.expanded(), "", label);
   Cube *ocube = p.SetOutputCube("TO");
   p.StartProcess();
   TranslateLunarLabels(in, ocube);
@@ -35,16 +35,16 @@ void IsisMain() {
   return;
 }
 
-void TranslateLunarLabels(Filename &labelFile, Cube *ocube) {
+void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
 
   // Get the directory where the Lunar translation tables are.
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
 
   // Transfer the instrument group to the output cube
   iString transDir = (string) dataDir["Lo"] + "/translations/";
-  Pvl inputLabel(labelFile.Expanded());
-  Filename transFile;
-  Filename bandBinTransFile;
+  Pvl inputLabel(labelFile.expanded());
+  FileName transFile;
+  FileName bandBinTransFile;
 
   bool hasFiducial = false;
   // Check to see if file is PDS
@@ -60,12 +60,12 @@ void TranslateLunarLabels(Filename &labelFile, Cube *ocube) {
         bandBinTransFile = transDir + "LoPdsBoresightImport.trn";
       }
       else {
-        string msg = "[" + labelFile.Name() + "] does not contain boresight or fiducial information";
+        string msg = "[" + labelFile.name() + "] does not contain boresight or fiducial information";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else {
-      string msg = "[" + labelFile.Name() + "] contains unknown PDS version [" +
+      string msg = "[" + labelFile.name() + "] contains unknown PDS version [" +
                    pdsVersion + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -80,19 +80,19 @@ void TranslateLunarLabels(Filename &labelFile, Cube *ocube) {
       bandBinTransFile = transDir + "LoIsis2BoresightImport.trn";
     }
     else {
-      string msg = "[" + labelFile.Name() + "] does not contain boresight or fiducial information";
+      string msg = "[" + labelFile.name() + "] does not contain boresight or fiducial information";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
   transFile = transDir + "LoGeneralImport.trn";
   // Get the translation manager ready
-  PvlTranslationManager commonlabelXlater(inputLabel, transFile.Expanded());
+  PvlTranslationManager commonlabelXlater(inputLabel, transFile.expanded());
   // Pvl outputLabels;
   Pvl *outputLabel = ocube->getLabel();
   commonlabelXlater.Auto(*(outputLabel));
 
-  PvlTranslationManager labelXlater(inputLabel, bandBinTransFile.Expanded());
+  PvlTranslationManager labelXlater(inputLabel, bandBinTransFile.expanded());
   labelXlater.Auto(*(outputLabel));
 
   PvlGroup &inst = outputLabel->FindGroup("Instrument", Pvl::Traverse);

@@ -27,13 +27,13 @@ int main(int argc, char *argv[]) {
     cout << "  Bands = " << oStats.Bands() << endl << endl;
 
     cout << "Overlap Areas:" << endl;
-    cout << "  Filename = " << Isis::Filename(oStats.FilenameX()).Name() << endl;
+    cout << "  Filename = " << Isis::FileName(oStats.FileNameX()).name() << endl;
     cout << "    Start Sample = " << oStats.StartSampleX() << endl;
     cout << "    End Sample = " << oStats.EndSampleX() << endl;
     cout << "    Start Line = " << oStats.StartLineX() << endl;
     cout << "    End Line = " << oStats.EndLineX() << endl << endl;
 
-    cout << "  Filename = " << Isis::Filename(oStats.FilenameY()).Name() << endl;
+    cout << "  Filename = " << Isis::FileName(oStats.FileNameY()).name() << endl;
     cout << "    Start Sample = " << oStats.StartSampleY() << endl;
     cout << "    End Sample = " << oStats.EndSampleY() << endl;
     cout << "    Start Line = " << oStats.StartLineY() << endl;

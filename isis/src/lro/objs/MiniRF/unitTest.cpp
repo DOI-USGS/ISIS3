@@ -22,7 +22,7 @@
 
 #include "Camera.h"
 #include "CameraFactory.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Preference.h"
 #include "Pvl.h"
@@ -45,7 +45,7 @@ int main(void) {
 
     Pvl p("$chan1/testData/FSR_CDR_LV1_01801_0R.cub");
     Camera *cam = Isis::CameraFactory::Create(p);
-    cout << "Filename: " << Filename(p.Filename()).Name() << endl;
+    cout << "FileName: " << FileName(p.FileName()).name() << endl;
     cout << "CK Frame: " << cam->InstrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

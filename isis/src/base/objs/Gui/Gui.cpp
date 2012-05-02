@@ -19,7 +19,7 @@
 #include <QWidget>
 
 #include "Application.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "Preference.h"
@@ -270,7 +270,7 @@ namespace Isis {
   // Create the "Begin/Start Processing" action
   QAction *Gui::CreateProcessAction() {
     QAction *processAction = new QAction(this);
-    QString baseDir = (iString)Filename("$BASE/icons").Expanded();
+    QString baseDir = (iString)FileName("$BASE/icons").expanded();
     processAction->setIcon(QPixmap(baseDir + "/guiRun.png"));
     processAction->setText("&Run");
     processAction->setToolTip("Run");
@@ -355,7 +355,7 @@ namespace Isis {
   // Create the "Exit" action
   QAction *Gui::CreateExitAction() {
     QAction *exitAction = new QAction(this);
-    QString baseDir = (iString)Filename("$BASE/icons").Expanded();
+    QString baseDir = (iString)FileName("$BASE/icons").expanded();
     exitAction->setIcon(QPixmap(baseDir + "/guiExit.png"));
     exitAction->setText("&Exit");
     exitAction->setToolTip("Exit");
@@ -370,7 +370,7 @@ namespace Isis {
   // Create the "Reset" action
   QAction *Gui::CreateResetAction() {
     QAction *resetAction = new QAction(this);
-    QString baseDir = (iString)Filename("$BASE/icons").Expanded();
+    QString baseDir = (iString)FileName("$BASE/icons").expanded();
     resetAction->setIcon(QPixmap(baseDir + "/guiReset.png"));
     resetAction->setText("&Reset");
     resetAction->setToolTip("Reset parameters");
@@ -387,7 +387,7 @@ namespace Isis {
   // Create the "Stop" action
   QAction *Gui::CreateStopAction() {
     QAction *stopAction = new QAction(this);
-    QString baseDir = (iString)Filename("$BASE/icons").Expanded();
+    QString baseDir = (iString)FileName("$BASE/icons").expanded();
     stopAction->setIcon(QPixmap(baseDir + "/guiStop.png"));
     stopAction->setText("&Stop");
     stopAction->setToolTip("Stop");
@@ -404,7 +404,7 @@ namespace Isis {
   // Create the "SaveLog" action
   QAction *Gui::CreateSaveLogAction() {
     QAction *saveLogAction = new QAction(this);
-    QString baseDir = (iString)Filename("$BASE/icons").Expanded();
+    QString baseDir = (iString)FileName("$BASE/icons").expanded();
     saveLogAction->setIcon(QPixmap(baseDir + "/guiSaveLog.png"));
     saveLogAction->setText("&Save Log...");
     saveLogAction->setToolTip("Save log");
@@ -420,7 +420,7 @@ namespace Isis {
   // Create the "ClearLog" action
   QAction *Gui::CreateClearLogAction() {
     QAction *clearlogAction = new QAction(this);
-    QString baseDir = (iString)Filename("$BASE/icons").Expanded();
+    QString baseDir = (iString)FileName("$BASE/icons").expanded();
     clearlogAction->setIcon(QPixmap(baseDir + "/guiClearLog.png"));
     clearlogAction->setText("&Clear Log");
     clearlogAction->setToolTip("Clear log");
@@ -437,7 +437,7 @@ namespace Isis {
   // Create the "Previous History" action
   QAction *Gui::CreatePreviousHistoryAction() {
     QAction *previousHistoryAction = new QAction(this);
-    QString baseDir = (iString)Filename("$BASE/icons").Expanded();
+    QString baseDir = (iString)FileName("$BASE/icons").expanded();
     previousHistoryAction->setIcon(QPixmap(baseDir + "/guiPrevHistory.png"));
     previousHistoryAction->setText("&Previous");
     previousHistoryAction->setToolTip("Previous parameters");
@@ -454,7 +454,7 @@ namespace Isis {
   // Create the "Next History" action
   QAction *Gui::CreateNextHistoryAction() {
     QAction *nextHistoryAction = new QAction(this);
-    QString baseDir = (iString)Filename("$BASE/icons").Expanded();
+    QString baseDir = (iString)FileName("$BASE/icons").expanded();
     nextHistoryAction->setIcon(QPixmap(baseDir + "/guiNextHistory.png"));
     nextHistoryAction->setText("&Next");
     nextHistoryAction->setToolTip("Next parameters");
@@ -471,7 +471,7 @@ namespace Isis {
   // Create the Whats Action action
   QAction *Gui::CreateWhatsThisAction() {
     QAction *action = new QAction(this);
-    QString baseDir = (iString)Filename("$BASE/icons").Expanded();
+    QString baseDir = (iString)FileName("$BASE/icons").expanded();
     action->setIcon(QPixmap(baseDir + "/contexthelp.png"));
     action->setText("&What's This");
     action->setToolTip("What's This");
@@ -669,9 +669,9 @@ namespace Isis {
     Preference &p = Preference::Preferences();
 
     PvlGroup &grp = p.FindGroup("UserInterface", Isis::Pvl::Traverse);
-    Isis::Filename progHist(grp["HistoryPath"][0] + "/" + ui.ProgramName() + ".par");
+    Isis::FileName progHist(grp["HistoryPath"][0] + "/" + ui.ProgramName() + ".par");
 
-    if(!progHist.Exists()) {
+    if(!progHist.fileExists()) {
       p_historyEntry = -1;
       QApplication::beep();
       return;
@@ -680,11 +680,11 @@ namespace Isis {
     Isis::Pvl hist;
 
     try {
-      hist.Read(progHist.Expanded());
+      hist.Read(progHist.expanded());
     }
     catch(...) {
       p_historyEntry =  -1;
-      std::string msg = "A corrupt parameter history file [" + progHist.Expanded() +
+      std::string msg = "A corrupt parameter history file [" + progHist.expanded() +
                         "] has been detected. Please fix or remove this file";
       LoadMessage(msg);
       if(ShowWarning()) exit(0);
@@ -771,7 +771,7 @@ namespace Isis {
             cline += value;
           }
         }
-        else if(param.Type() == GuiParameter::FilenameWidget ||
+        else if(param.Type() == GuiParameter::FileNameWidget ||
                 param.Type() == GuiParameter::CubeWidget) {
           cline += value;
         }
@@ -807,7 +807,7 @@ namespace Isis {
 
   // Show help for the current app
   void Gui::AboutProgram() {
-    Isis::Filename file((std::string)
+    Isis::FileName file((std::string)
                         "$ISISROOT/doc/Application/presentation/PrinterFriendly/" +
                         Isis::Application::GetUserInterface().ProgramName() +
                         "/" +
@@ -816,7 +816,7 @@ namespace Isis {
 
     Isis::PvlGroup &uig = Isis::Preference::Preferences().FindGroup("UserInterface");
     std::string command = (std::string) uig["GuiHelpBrowser"] +
-                          (std::string)" file:" + file.Expanded() + " &";
+                          (std::string)" file:" + file.expanded() + " &";
     ProgramLauncher::RunSystemCommand(command);
   }
 

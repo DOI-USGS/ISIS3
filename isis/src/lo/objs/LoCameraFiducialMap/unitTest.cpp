@@ -24,7 +24,7 @@
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "CameraFocalPlaneMap.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Preference.h"
@@ -44,7 +44,7 @@ int main(void) {
     Pvl pm("$lo/testData/3083_med_raw.cub");
     Camera *camm = CameraFactory::Create(pm);
 
-    cout << "Filename: " << Filename(pm.Filename()).Name() << endl;
+    cout << "FileName: " << FileName(pm.FileName()).name() << endl;
     cout << "CK Frame: " << camm->InstrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
@@ -135,7 +135,7 @@ int main(void) {
     Pvl ph("$lo/testData/4164H_Full_mirror.cub");
     Camera *camh = CameraFactory::Create(ph);
 
-    cout << "Filename: " << Filename(ph.Filename()).Name() << endl;
+    cout << "FileName: " << FileName(ph.FileName()).name() << endl;
     cout << "CK Frame: " << camh->InstrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

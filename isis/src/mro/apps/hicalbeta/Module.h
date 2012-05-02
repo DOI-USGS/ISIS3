@@ -144,12 +144,12 @@ namespace Isis {
        * @param fname  Name of file to dump contents to
        */
       void Dump(const std::string &fname) const {
-        Filename dumpc(fname);
-        std::string dumpcFile = dumpc.Expanded();
+        FileName dumpc(fname);
+        std::string dumpcFile = dumpc.expanded();
         std::ofstream ofile(dumpcFile.c_str(), std::ios::out);
         if (!ofile) {
           std::string mess = "Unable to open/create module dump file " +
-                             dumpc.Expanded();
+                             dumpc.expanded();
           throw IException(IException::User, mess, _FILEINFO_);
         }
         ofile << *this;

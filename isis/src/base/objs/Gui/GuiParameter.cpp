@@ -30,7 +30,7 @@
 #include "GuiParameter.h"
 
 #include "Application.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "GuiHelperAction.h"
 #include "UserInterface.h"
 
@@ -264,8 +264,8 @@ namespace Isis {
       GuiHelperAction *action =
         new GuiHelperAction(lo, (iString)p_ui->HelperFunction(p_group, p_param, 0));
       if(p_ui->HelperIcon(p_group, p_param, 0) != "") {
-        iString file = Filename(
-                         p_ui->HelperIcon(p_group, p_param, 0)).Expanded();
+        iString file = FileName(
+                         p_ui->HelperIcon(p_group, p_param, 0)).expanded();
         action->setIcon(QIcon(QPixmap(file)));
       }
       else {
@@ -284,8 +284,8 @@ namespace Isis {
 
       if(p_ui->HelperIcon(p_group, p_param, 0) != "") {
         helper->setText("");
-        iString file = Filename(
-                         p_ui->HelperIcon(p_group, p_param, 0)).Expanded();
+        iString file = FileName(
+                         p_ui->HelperIcon(p_group, p_param, 0)).expanded();
         helper->setIconSize(QSize(22, 22));
         helper->setIcon(QIcon(QPixmap(file)));
       }
@@ -311,8 +311,8 @@ namespace Isis {
       GuiHelperAction *action =
         new GuiHelperAction(lo, (iString)p_ui->HelperFunction(p_group, p_param, 0));
       if(p_ui->HelperIcon(p_group, p_param, 0) != "") {
-        iString file = Filename(
-                         p_ui->HelperIcon(p_group, p_param, 0)).Expanded();
+        iString file = FileName(
+                         p_ui->HelperIcon(p_group, p_param, 0)).expanded();
         action->setIcon(QIcon(QPixmap(file)));
       }
       else {
@@ -336,8 +336,8 @@ namespace Isis {
 
       if(p_ui->HelperIcon(p_group, p_param, 0) != "") {
         helper->setText("");
-        iString file = Filename(
-                         p_ui->HelperIcon(p_group, p_param, 0)).Expanded();
+        iString file = FileName(
+                         p_ui->HelperIcon(p_group, p_param, 0)).expanded();
         helper->setIconSize(QSize(22, 22));
         helper->setIcon(QIcon(QPixmap(file)));
       }

@@ -8,7 +8,7 @@
 #include "PvlTranslationManager.h"
 #include "SpecialPixel.h"
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Preference.h"
@@ -19,19 +19,19 @@ using namespace std;
 using namespace Isis;
 
 void WriteLine(Buffer &b);
-void TranslateLabels(Filename in, Cube *ocube);
+void TranslateLabels(FileName in, Cube *ocube);
 PDSINFO *pdsi;
 
 void IsisMain() {
   // Grab the file to import
   UserInterface &ui = Application::GetUserInterface();
-  Filename in = ui.GetFilename("FROM");
-  Filename out = ui.GetFilename("TO");
+  FileName in = ui.GetFileName("FROM");
+  FileName out = ui.GetFileName("TO");
 
   // Make sure it is a Clementine EDR
   bool projected;
   try {
-    Pvl lab(in.Expanded());
+    Pvl lab(in.expanded());
     projected = lab.HasObject("IMAGE_MAP_PROJECTION");
     iString id;
     id = (string)lab["DATA_SET_ID"];
@@ -44,7 +44,7 @@ void IsisMain() {
     }
   }
   catch(IException &e) {
-    string msg = "Input file [" + in.Expanded() +
+    string msg = "Input file [" + in.expanded() +
                  "] does not appear to be " +
                  "in Clementine EDR format";
     throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -52,7 +52,7 @@ void IsisMain() {
 
   //Checks if in file is rdr
   if(projected) {
-    string msg = "[" + in.Name() + "] appears to be an rdr file.";
+    string msg = "[" + in.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -60,12 +60,12 @@ void IsisMain() {
   //Decompress the file
   long int lines = 0;
   long int samps = 0;
-  iString filename = in.Expanded();
+  iString filename = in.expanded();
   pdsi = PDSR((char *)filename.c_str(), &lines, &samps);
 
   ProcessByLine p;
   CubeAttributeOutput cubeAtt("+unsignedByte+1.0:254.0");
-  Cube *ocube = p.SetOutputCube(ui.GetFilename("TO"), cubeAtt, pdsi->image_ncols, pdsi->image_nrows);
+  Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), cubeAtt, pdsi->image_ncols, pdsi->image_nrows);
   p.StartProcess(WriteLine);
   TranslateLabels(in, ocube);
   p.EndProcess();
@@ -97,16 +97,16 @@ void WriteLine(Buffer &b) {
  *
  */
 
-void TranslateLabels(Filename in, Cube *ocube) {
+void TranslateLabels(FileName in, Cube *ocube) {
   // Get the directory where the Clementine translation tables are.
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
 
   // Transfer the instrument group to the output cube
   iString transDir = (string) dataDir["clementine1"];
-  Filename transFile(transDir + "/translations/clementine.trn");
+  FileName transFile(transDir + "/translations/clementine.trn");
 
-  Pvl pdsLab(in.Expanded());
-  PvlTranslationManager labelXlater(pdsLab, transFile.Expanded());
+  Pvl pdsLab(in.expanded());
+  PvlTranslationManager labelXlater(pdsLab, transFile.expanded());
 
   // Pvl outputLabels;
   Pvl *outputLabel = ocube->getLabel();

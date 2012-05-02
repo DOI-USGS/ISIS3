@@ -4,14 +4,14 @@
 #include <iostream>
 
 #include "IException.h"
-#include "Filename.h" 
+#include "FileName.h" 
 #include "Preference.h" 
 
 using namespace std;
 
 int main() {
   Isis::Preference::Preferences(true);
-  Isis::ControlPointList cpl(Isis::Filename("points.lis")); //list of Control Point Ids in the file
+  Isis::ControlPointList cpl(Isis::FileName("points.lis")); //list of Control Point Ids in the file
 
   int size = cpl.Size();
 

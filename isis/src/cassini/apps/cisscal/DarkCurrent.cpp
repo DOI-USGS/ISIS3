@@ -1045,7 +1045,7 @@ namespace Isis {
       instModeId += "full";
     }
     p_dparamfile = darkDir + instrumentId + "_median_dark_parameters" + "?????" + "." + instModeId + ".cub";
-    p_dparamfile.HighestVersion();
+    p_dparamfile = p_dparamfile.highestVersion();
     return;
   }//end FindDarkFiles
 
@@ -1129,15 +1129,15 @@ namespace Isis {
   vector <vector <double> > DarkCurrent::MakeDarkArray() { //return dark_e
     // this method mimics makedarkarray method of cassimg_subtractdark.pro from idl's cisscal program
     FindDarkFiles();
-    if(!p_dparamfile.Exists()) {
+    if(!p_dparamfile.fileExists()) {
       throw IException(IException::Io,
                        "DarkParameterFile ***"
-                       + p_dparamfile.Expanded() + "*** not found.", _FILEINFO_);
+                       + p_dparamfile.expanded() + "*** not found.", _FILEINFO_);
     }
-    if(p_narrow && (!p_bdpath.Exists())) {
+    if(p_narrow && (!p_bdpath.fileExists())) {
       throw IException(IException::Io,
                        "BiasDistortionFile ***"
-                       + p_bdpath.Expanded() + "*** not found.", _FILEINFO_);
+                       + p_bdpath.expanded() + "*** not found.", _FILEINFO_);
     }
     ComputeTimeArrays();//fill in values for p_startTime, p_endTime, p_duration
     int good = 0;
@@ -1152,7 +1152,7 @@ namespace Isis {
       //read the coefficient cube into a Brick
       Brick *darkCoefficients;
       Cube dparamCube;
-      dparamCube.open(p_dparamfile.Expanded());
+      dparamCube.open(p_dparamfile.expanded());
       darkCoefficients = new Brick(p_samples, p_lines, 8, dparamCube.getPixelType());
       darkCoefficients->SetBasePosition(1, 1, 1);
       dparamCube.read(*darkCoefficients);
@@ -1207,7 +1207,7 @@ namespace Isis {
       }
       // correct for the average bias distortion at the beginning of each line:
       if(p_narrow) {
-        CisscalFile *biasDist = new CisscalFile(p_bdpath.Expanded());
+        CisscalFile *biasDist = new CisscalFile(p_bdpath.expanded());
         vector<double> samp, bias_distortion;
         for(int i = 0; i < biasDist->LineCount(); i++) {
           iString line;

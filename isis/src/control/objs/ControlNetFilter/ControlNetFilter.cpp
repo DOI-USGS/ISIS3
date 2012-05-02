@@ -8,7 +8,7 @@
 #include "ControlNet.h"
 #include "ControlCubeGraphNode.h"
 #include "ControlPoint.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -55,8 +55,8 @@ namespace Isis {
    * @param pbPvl
    */
   void ControlNetFilter::SetOutputFile(string psPrintFile) {
-    Isis::Filename outFile(psPrintFile);
-    string outName(outFile.Expanded());
+    Isis::FileName outFile(psPrintFile);
+    string outName(outFile.expanded());
     mOstm.open(outName.c_str(), std::ios::out);
     mOstm.precision(dbl::digits10);
   }
@@ -151,7 +151,7 @@ namespace Isis {
    * @param pcMeasure - Measure's Cube and Serial #
    */
   void ControlNetFilter::PrintCubeFileSerialNum(const ControlMeasure &pcMeasure) {
-    mOstm << mSerialNumList.Filename(pcMeasure.GetCubeSerialNumber()) << ", ";
+    mOstm << mSerialNumList.FileName(pcMeasure.GetCubeSerialNumber()) << ", ";
     mOstm << pcMeasure.GetCubeSerialNumber();
   }
 
@@ -191,7 +191,7 @@ namespace Isis {
     }
 
     if (pbLastFilter) {
-      mOstm << "PointID, PointType, PointIgnored, PointEditLocked, Filename, SerialNumber, PixelShift, MeasureType, MeasureIgnored, MeasureEditLocked, Reference, ";
+      mOstm << "PointID, PointType, PointIgnored, PointEditLocked, FileName, SerialNumber, PixelShift, MeasureType, MeasureIgnored, MeasureEditLocked, Reference, ";
       mOstm << endl;
     }
 
@@ -267,7 +267,7 @@ namespace Isis {
 
     if (pbLastFilter) {
       PointStatsHeader();
-      mOstm << "Filename, SerialNumber, MeasureType, MeasureIgnored, MeasureEditLocked, Reference" << endl;
+      mOstm << "FileName, SerialNumber, MeasureType, MeasureIgnored, MeasureEditLocked, Reference" << endl;
     }
 
     int iNumPoints = mCNet->GetNumPoints();
@@ -351,7 +351,7 @@ namespace Isis {
    *
    * @author Sharmila Prasad (8/11/2010)
    *
-   * Header: PointID, Type, Ignore, EditLock, Filename, SerialNum, ResidualMagnitude, MeasureIgnore, MeasureLocked, Reference,
+   * Header: PointID, Type, Ignore, EditLock, FileName, SerialNum, ResidualMagnitude, MeasureIgnore, MeasureLocked, Reference,
    *
    * @param pvlGrp - Pvl Group containing the filter info
    * @param pbLastFilter - Flag to indicate whether this is the last filter to print the stats
@@ -375,7 +375,7 @@ namespace Isis {
     }
 
     if (pbLastFilter) {
-      mOstm << "PointID, PointType, PointIgnored, PointEditLocked, Filename, SerialNumber, ResidualMagnitude, MeasureType, MeasureIgnored, MeasureEditLocked, Reference, ";
+      mOstm << "PointID, PointType, PointIgnored, PointEditLocked, FileName, SerialNumber, ResidualMagnitude, MeasureType, MeasureIgnored, MeasureEditLocked, Reference, ";
       mOstm << endl;
     }
 
@@ -513,7 +513,7 @@ namespace Isis {
 
     if (pbLastFilter) {
       PointStatsHeader();
-      mOstm << "Filename, SerialNum, MeasureType, MeasureIgnore, MeasureEditLock, Reference" << endl;
+      mOstm << "FileName, SerialNum, MeasureType, MeasureIgnore, MeasureEditLock, Reference" << endl;
     }
 
     int iNumPoints = mCNet->GetNumPoints();
@@ -667,7 +667,7 @@ namespace Isis {
         const ControlMeasure *cm = cPoint->GetRefMeasure();
 
         string sn = cm->GetCubeSerialNumber();
-        string filename = mSerialNumList.Filename(sn);
+        string filename = mSerialNumList.FileName(sn);
         Pvl pvl(filename);
 
         Camera *camera = CameraFactory::Create(pvl);
@@ -739,7 +739,7 @@ namespace Isis {
 
         if (!surfacePt1.Valid()) {
           string sn1 = cp1RefMeasure->GetCubeSerialNumber();
-          string filename1 = mSerialNumList.Filename(sn1);
+          string filename1 = mSerialNumList.FileName(sn1);
           Pvl pvl1(filename1);
           cam1 = CameraFactory::Create(pvl1);
           if (cam1->SetImage(cp1RefMeasure->GetSample(),
@@ -777,7 +777,7 @@ namespace Isis {
 
           if (!surfacePt2.Valid()) {
             string sn2 = cp2RefMeasure->GetCubeSerialNumber();
-            string filename2 = mSerialNumList.Filename(sn2);
+            string filename2 = mSerialNumList.FileName(sn2);
             Pvl pvl2(filename2);
             cam2 = CameraFactory::Create(pvl2);
 
@@ -966,7 +966,7 @@ namespace Isis {
           if (pbLastFilter) {
             PointStats(*cPoint);
             string sn = cMeasure->GetCubeSerialNumber();
-            mOstm << mSerialNumList.Filename(sn) << ", " << sn << ","
+            mOstm << mSerialNumList.FileName(sn) << ", " << sn << ","
                 << sBoolean[(int) cMeasure->IsIgnored()] << ", "
                 << cMeasure->GetMeasureTypeString() << ", "
                 << sBoolean[cMeasure->IsEditLocked()] << ", "
@@ -1059,7 +1059,7 @@ namespace Isis {
           // Image Details
           string sn = cMeasure->GetCubeSerialNumber();
           vector <double> imgStats = GetImageStatsBySerialNum(sn);
-          mOstm << mSerialNumList.Filename(sn)   << ", " << sn << ", "
+          mOstm << mSerialNumList.FileName(sn)   << ", " << sn << ", "
                 << imgStats[imgTotalPoints] << ", " << imgStats[imgIgnoredPoints] << ", "
                 << imgStats[imgLockedPoints] << ", " << imgStats[imgFixedPoints] << ", "
                 << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", "
@@ -1118,7 +1118,7 @@ namespace Isis {
         mSerialNumFilter.Delete(sSerialNum);
       }
       else if (pbLastFilter) {
-        mOstm << mSerialNumFilter.Filename(sSerialNum) << ", " << sSerialNum << ", "
+        mOstm << mSerialNumFilter.FileName(sSerialNum) << ", " << sSerialNum << ", "
               << imgStats[imgTotalPoints]  << ", " << imgStats[imgIgnoredPoints] << ", " << imgStats[imgLockedPoints] << ", "
               << imgStats[imgFixedPoints] << ", " << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", "
               <<  imgStats[imgConvexHullRatio]<< endl;
@@ -1164,7 +1164,7 @@ namespace Isis {
     }
 
     for (int i = (iNumCubes - 1); i >= 0;  i--) {
-      string sCubeName = mSerialNumFilter.Filename(i);
+      string sCubeName = mSerialNumFilter.FileName(i);
       string sSerialNum = mSerialNumFilter.SerialNumber(i);
       int iPosition = 0;
       for (int j = (iTokenSize - 1); j >= 0; j--) {
@@ -1195,9 +1195,9 @@ namespace Isis {
       for (int i = 0; i < iNumCubes; i++) {
         string sSerialNum = mSerialNumFilter.SerialNumber(i);
 
-        mOstm << mSerialNumFilter.Filename(i) << ", " << sSerialNum << ", ";
+        mOstm << mSerialNumFilter.FileName(i) << ", " << sSerialNum << ", ";
         vector<double> imgStats = GetImageStatsBySerialNum(sSerialNum);
-        mOstm << mSerialNumFilter.Filename(sSerialNum) << ", " << sSerialNum << ", "
+        mOstm << mSerialNumFilter.FileName(sSerialNum) << ", " << sSerialNum << ", "
               << imgStats[imgTotalPoints]  << ", " << imgStats[imgIgnoredPoints] << ", " << imgStats[imgLockedPoints] << ", "
               << imgStats[imgFixedPoints] << ", " << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", "
               << imgStats[imgConvexHullRatio]<< endl;
@@ -1245,7 +1245,7 @@ namespace Isis {
         mSerialNumFilter.Delete(sSerialNum);
       }
       else if (pbLastFilter) {
-        mOstm << mSerialNumFilter.Filename(sSerialNum) << ", " << sSerialNum << ", "
+        mOstm << mSerialNumFilter.FileName(sSerialNum) << ", " << sSerialNum << ", "
               << imgStats[imgTotalPoints]  << ", " << imgStats[imgIgnoredPoints] << ", " << imgStats[imgLockedPoints] << ", "
               << imgStats[imgFixedPoints] << ", " << imgStats[imgConstrainedPoints] << ", " << imgStats[imgFreePoints] << ", "
               <<  imgStats[imgConvexHullRatio] << endl;
@@ -1291,7 +1291,7 @@ namespace Isis {
     int iNumCubes = mSerialNumFilter.Size();
     for (int sn = (iNumCubes - 1); sn >= 0; sn--) {
       string sSerialNum = mSerialNumFilter.SerialNumber(sn);
-      Pvl pvl(mSerialNumList.Filename(sSerialNum));
+      Pvl pvl(mSerialNumList.FileName(sSerialNum));
       Camera *cam = CameraFactory::Create(pvl);
       double dDist = 0;
       bool bMatchDistance = false;
@@ -1428,7 +1428,7 @@ namespace Isis {
       }
       else if (pbLastFilter) {
         vector <double> imgStats = GetImageStatsBySerialNum((sSerialNum));
-        mOstm << mSerialNumList.Filename(sSerialNum) << ", " << sSerialNum << ", "
+        mOstm << mSerialNumList.FileName(sSerialNum) << ", " << sSerialNum << ", "
               << iPointsTotal << ", " << iPointsIgnored << ", " << iPointsLocked << ", "
               << iPointsFixed << ", " << iPointsConstrained << ", " << iPointsFree << ", "
               << imgStats[ imgConvexHullRatio] << ", ";

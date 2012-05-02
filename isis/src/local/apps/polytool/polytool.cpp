@@ -20,25 +20,25 @@ void IsisMain() {
 
   std::string result;
   if(ui.GetString("PROCESS").compare("DESPIKE") == 0) {
-    geos::geom::MultiPolygon *polygon1 = PolygonTools::MakeMultiPolygon(GetPolygon(ui.GetFilename("FROM1")));
+    geos::geom::MultiPolygon *polygon1 = PolygonTools::MakeMultiPolygon(GetPolygon(ui.GetFileName("FROM1")));
 
     geos::geom::MultiPolygon *outpoly = PolygonTools::Despike(polygon1);
 
     result = outpoly->toString();
   }
   else if(ui.GetString("PROCESS").compare("DIFFERENCE") == 0) {
-    geos::geom::Geometry *polygon1 = GetPolygon(ui.GetFilename("FROM1"));
-    geos::geom::Geometry *polygon2 = GetPolygon(ui.GetFilename("FROM2"));
+    geos::geom::Geometry *polygon1 = GetPolygon(ui.GetFileName("FROM1"));
+    geos::geom::Geometry *polygon2 = GetPolygon(ui.GetFileName("FROM2"));
 
     geos::geom::Geometry *outgeom = PolygonTools::Difference(polygon1, polygon2);
 
     result = outgeom->toString();
   }
   else if(ui.GetString("PROCESS").compare("EQUAL") == 0) {
-    geos::geom::Geometry *geom1 = GetPolygon(ui.GetFilename("FROM1"));
+    geos::geom::Geometry *geom1 = GetPolygon(ui.GetFileName("FROM1"));
     geos::geom::MultiPolygon *polygon1 = PolygonTools::MakeMultiPolygon(geom1);
 
-    geos::geom::Geometry *geom2 = GetPolygon(ui.GetFilename("FROM2"));
+    geos::geom::Geometry *geom2 = GetPolygon(ui.GetFileName("FROM2"));
     geos::geom::MultiPolygon *polygon2 = PolygonTools::MakeMultiPolygon(geom2);
 
     PvlGroup grp("Results");
@@ -57,8 +57,8 @@ void IsisMain() {
     Application::Log(grp);
   }
   else if(ui.GetString("PROCESS").compare("INTERSECT") == 0) {
-    geos::geom::Geometry *polygon1 = GetPolygon(ui.GetFilename("FROM1"));
-    geos::geom::Geometry *polygon2 = GetPolygon(ui.GetFilename("FROM2"));
+    geos::geom::Geometry *polygon1 = GetPolygon(ui.GetFileName("FROM1"));
+    geos::geom::Geometry *polygon2 = GetPolygon(ui.GetFileName("FROM2"));
 
     geos::geom::Geometry *outgeom = PolygonTools::Intersect(polygon1, polygon2);
 
@@ -67,7 +67,7 @@ void IsisMain() {
 
   if(!result.empty()) {
     // Output the resultant polygon
-    std::string outname = ui.GetFilename("TO");
+    std::string outname = ui.GetFileName("TO");
     std::ofstream outfile;
     outfile.open(outname.c_str());
     outfile << result;

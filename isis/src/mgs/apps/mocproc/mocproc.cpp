@@ -4,7 +4,7 @@
 
 #include "ProcessImport.h"
 
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Pipeline.h"
@@ -57,7 +57,7 @@ void IsisMain() {
     p.Application("mocevenodd").SetInputParameter("FROM", true);
     p.Application("mocevenodd").SetOutputParameter("TO", "evenodd");
 
-    Pvl inputPvl(Filename(ui.GetFilename("FROM")).Expanded());
+    Pvl inputPvl(FileName(ui.GetFileName("FROM")).expanded());
 
     int summingMode = 0;
     bool isNarrowAngle = false;
@@ -93,7 +93,7 @@ void IsisMain() {
       p.Application("cam2map").AddConstParameter("PIXRES", "MPP");
     }
     else if(ui.WasEntered("MAP")) {
-      Pvl mapPvl(Filename(ui.GetFilename("MAP")).Expanded());
+      Pvl mapPvl(FileName(ui.GetFileName("MAP")).expanded());
       if(mapPvl.FindGroup("Mapping", Pvl::Traverse).HasKeyword("PixelResolution")) {
         p.Application("cam2map").AddConstParameter("PIXRES", "MAP");
       }

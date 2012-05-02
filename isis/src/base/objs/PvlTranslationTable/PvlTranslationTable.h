@@ -26,7 +26,7 @@
 #include <vector>
 #include <string>
 
-#include "Filename.h"
+#include "FileName.h"
 #include "Pvl.h"
 
 namespace Isis {
@@ -126,7 +126,7 @@ namespace Isis {
 
     public:
       // Constructors
-      PvlTranslationTable(Isis::Filename transFile);
+      PvlTranslationTable(Isis::FileName transFile);
       PvlTranslationTable(std::istream &istr);
       PvlTranslationTable();
 

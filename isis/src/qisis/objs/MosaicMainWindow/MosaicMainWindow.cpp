@@ -19,7 +19,7 @@
 namespace Isis {
   MosaicMainWindow::MosaicMainWindow(QString title, QWidget *parent) :
       MainWindow(title, parent),
-      m_settings(Filename("$HOME/.Isis/qmos/qmos.config").Expanded().c_str(),
+      m_settings(FileName("$HOME/.Isis/qmos/qmos.config").expanded().c_str(),
                  QSettings::NativeFormat) {
     m_filename = "";
     m_fileMenu = NULL;
@@ -163,7 +163,7 @@ namespace Isis {
     // Create the file menu
     m_fileMenu = menuBar()->addMenu("&File");
 
-    iString iconDir = Filename("$base/icons").Expanded();
+    iString iconDir = FileName("$base/icons").expanded();
 
     QAction *open = new QAction(this);
     open->setText("Open Cube...");
@@ -240,7 +240,7 @@ namespace Isis {
     QAction *activateWhatsThisAct = new QAction("&What's This", this);
     activateWhatsThisAct->setShortcut(Qt::SHIFT | Qt::Key_F1);
     activateWhatsThisAct->setIcon(
-        QPixmap(Filename("$base/icons/contexthelp.png").Expanded()));
+        QPixmap(FileName("$base/icons/contexthelp.png").expanded()));
     activateWhatsThisAct->setToolTip("Activate What's This and click on parts "
         "this program to see more information about them");
     connect(activateWhatsThisAct, SIGNAL(activated()),

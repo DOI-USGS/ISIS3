@@ -22,7 +22,7 @@ void IsisMain() {
     Progress progress;
 
     // Get the input Control Net
-    ControlNet cNet(ui.GetFilename("CNET"), &progress);
+    ControlNet cNet(ui.GetFileName("CNET"), &progress);
 
     // Get the output file pattern string
     // Set up an automatic id generator for the point ids
@@ -33,10 +33,10 @@ void IsisMain() {
     int numPoints = cNet.GetNumPoints();
 
     if (numOutputFiles > numPoints) {
-      Filename inputNet(ui.GetFilename("CNET"));
+      FileName inputNet(ui.GetFileName("CNET"));
       string msg = "The number of output files is greater than total number of "
                    "Control Points in the given Control Network ["
-                   + ui.GetFilename("CNET") + "].";
+                   + ui.GetFileName("CNET") + "].";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 

@@ -1,7 +1,7 @@
 #include "TiffExporter.h"
 
 #include "Buffer.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 
 using namespace Isis;
@@ -53,9 +53,9 @@ namespace Isis {
    * @param outputName The filename of the output cube
    * @param quality The quality of the output, not used for TIFF
    */
-  void TiffExporter::write(Filename outputName, int quality) {
+  void TiffExporter::write(FileName outputName, int quality) {
     // Open the output image
-    if ((m_image = TIFFOpen(outputName.Expanded().c_str(), "w")) == NULL) {
+    if ((m_image = TIFFOpen(outputName.expanded().c_str(), "w")) == NULL) {
       throw IException(IException::Programmer,
           "Could not open outgoing image", _FILEINFO_);
     }

@@ -75,7 +75,7 @@ void IsisMain() {
   else if(ui.GetString("ENDIAN") == "LSB")
     p.SetOutputEndian(Isis::Lsb);
   // Open the cube for writing
-  string to = ui.GetFilename("TO", "raw");
+  string to = ui.GetFileName("TO", "raw");
   ofstream fout;
   fout.open(to.c_str(), ios::out | ios::binary);
   if(!fout.is_open()) {

@@ -24,7 +24,7 @@
 #include "IException.h"
 #include "CameraFactory.h"
 #include "Preference.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 #include "KernelDb.h"
 #include "PvlObject.h"
@@ -377,70 +377,70 @@ void KernelDb::LoadSystemDb(const std::string &mission) {
   string missionDir = datadir[mission];
 
   // Load the leapsecond DB
-  Isis::Filename lsDb(baseDir + "/" + "kernels/lsk/kernels.????.db");
-  lsDb.HighestVersion();
-  p_kernelData.Read(lsDb.Expanded());
+  Isis::FileName lsDb(baseDir + "/" + "kernels/lsk/kernels.????.db");
+  lsDb = lsDb.highestVersion();
+  p_kernelData.Read(lsDb.expanded());
 
   // Load the target attitude shape DB
-  Isis::Filename tasDbPath(missionDir + "/" + "kernels/pck");
-  if(tasDbPath.Exists()) {
-    Isis::Filename tasDb(missionDir + "/" + "kernels/pck/kernels.????.db");
-    tasDb.HighestVersion();
-    p_kernelData.Read(tasDb.Expanded());
+  Isis::FileName tasDbPath(missionDir + "/" + "kernels/pck");
+  if(tasDbPath.fileExists()) {
+    Isis::FileName tasDb(missionDir + "/" + "kernels/pck/kernels.????.db");
+    tasDb = tasDb.highestVersion();
+    p_kernelData.Read(tasDb.expanded());
   }
   else {
-    Isis::Filename baseTasDb(baseDir + "/" + "kernels/pck/kernels.????.db");
-    baseTasDb.HighestVersion();
-    p_kernelData.Read(baseTasDb.Expanded());
+    Isis::FileName baseTasDb(baseDir + "/" + "kernels/pck/kernels.????.db");
+    baseTasDb = baseTasDb.highestVersion();
+    p_kernelData.Read(baseTasDb.expanded());
   }
 
   // Load the target position DB
-  Isis::Filename tpDbPath(missionDir + "/" + "kernels/tspk");
-  if(tpDbPath.Exists()) {
-    Isis::Filename tpDb(missionDir + "/" + "kernels/tspk/kernels.????.db");
-    tpDb.HighestVersion();
-    p_kernelData.Read(tpDb.Expanded());
+  Isis::FileName tpDbPath(missionDir + "/" + "kernels/tspk");
+  if(tpDbPath.fileExists()) {
+    Isis::FileName tpDb(missionDir + "/" + "kernels/tspk/kernels.????.db");
+    tpDb = tpDb.highestVersion();
+    p_kernelData.Read(tpDb.expanded());
   }
   else {
-    Isis::Filename baseTpDb(baseDir + "/" + "kernels/spk/kernels.????.db");
-    baseTpDb.HighestVersion();
-    p_kernelData.Read(baseTpDb.Expanded());
+    Isis::FileName baseTpDb(baseDir + "/" + "kernels/spk/kernels.????.db");
+    baseTpDb = baseTpDb.highestVersion();
+    p_kernelData.Read(baseTpDb.expanded());
   }
 
   // Load the DEM DB
-  Isis::Filename demDb(baseDir + "/" + "dems/kernels.????.db");
-  demDb.HighestVersion();
-  p_kernelData.Read(demDb.Expanded());
+  Isis::FileName demDb(baseDir + "/" + "dems/kernels.????.db");
+  demDb = demDb.highestVersion();
+  p_kernelData.Read(demDb.expanded());
 
   // Load the mission specific spacecraft pointing DB
-  Isis::Filename spDb(missionDir + "/" + "kernels/ck/kernels.????.db");
-  spDb.HighestVersion();
-  p_kernelData.Read(spDb.Expanded());
+  Isis::FileName spDb(missionDir + "/" + "kernels/ck/kernels.????.db");
+  spDb = spDb.highestVersion();
+  p_kernelData.Read(spDb.expanded());
 
   // Load the mission specific frame DB
-  Isis::Filename fDb(missionDir + "/" + "kernels/fk/kernels.????.db");
-  fDb.HighestVersion();
-  p_kernelData.Read(fDb.Expanded());
+  Isis::FileName fDb(missionDir + "/" + "kernels/fk/kernels.????.db");
+  fDb = fDb.highestVersion();
+  p_kernelData.Read(fDb.expanded());
 
   // Load the mission specific instrument DB
-  Isis::Filename iDb(missionDir + "/" + "kernels/ik/kernels.????.db");
-  iDb.HighestVersion();
-  p_kernelData.Read(iDb.Expanded());
+  Isis::FileName iDb(missionDir + "/" + "kernels/ik/kernels.????.db");
+  iDb = iDb.highestVersion();
+  p_kernelData.Read(iDb.expanded());
 
   // Load the mission specific spacecraft clock DB
-  Isis::Filename scDb(missionDir + "/" + "kernels/sclk/kernels.????.db");
-  scDb.HighestVersion();
-  p_kernelData.Read(scDb.Expanded());
+  Isis::FileName scDb(missionDir + "/" + "kernels/sclk/kernels.????.db");
+  scDb = scDb.highestVersion();
+  p_kernelData.Read(scDb.expanded());
 
   // Load the mission specific spacecraft position DB
-  Isis::Filename sposDb(missionDir + "/" + "kernels/spk/kernels.????.db");
-  sposDb.HighestVersion();
-  p_kernelData.Read(sposDb.Expanded());
+  Isis::FileName sposDb(missionDir + "/" + "kernels/spk/kernels.????.db");
+  sposDb = sposDb.highestVersion();
+  p_kernelData.Read(sposDb.expanded());
 
   // Load the mission specific instrument addendum DB
-  Isis::Filename iakDb(missionDir + "/" + "kernels/iak/kernels.????.db");
-  iakDb.HighestVersion();
-  p_kernelData.Read(iakDb.Expanded());
+  Isis::FileName iakDb(missionDir + "/" + "kernels/iak/kernels.????.db");
+  iakDb = iakDb.highestVersion();
+  p_kernelData.Read(iakDb.expanded());
 }
 
 std::vector<std::string> KernelDb::GetFile(PvlGroup &grp) {
@@ -457,17 +457,17 @@ std::vector<std::string> KernelDb::GetFile(PvlGroup &grp) {
     if(kfile.Size() == 2) {
       string pref = kfile[0];
       string version = kfile[1];
-      Isis::Filename filename("$" + pref + "/" + version);
-      if (filename.IsVersioned())
-        filename.HighestVersion();
-      files.push_back(filename.OriginalPath() + "/" + filename.Name());
+      Isis::FileName filename("$" + pref + "/" + version);
+      if (filename.isVersioned())
+        filename = filename.highestVersion();
+      files.push_back(filename.originalPath() + "/" + filename.name());
     }
     // One value in "File" indicates a full file spec
     else if(kfile.Size() == 1) {
-      Isis::Filename filename(kfile[0]);
-      if (filename.IsVersioned())
-        filename.HighestVersion();
-      files.push_back(filename.OriginalPath() + "/" + filename.Name());
+      Isis::FileName filename(kfile[0]);
+      if (filename.isVersioned())
+        filename = filename.highestVersion();
+      files.push_back(filename.originalPath() + "/" + filename.name());
     }
     else {
       string msg = "Invalid File keyword value in [Group = ";

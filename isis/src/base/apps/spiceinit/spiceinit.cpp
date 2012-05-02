@@ -4,7 +4,7 @@
 
 #include "Camera.h"
 #include "CameraFactory.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "KernelDb.h"
 #include "Longitude.h"
@@ -33,7 +33,7 @@ void IsisMain() {
   Process p;
   UserInterface &ui = Application::GetUserInterface();
   CubeAttributeInput cai;
-  Cube *icube = p.SetInputCube(ui.GetFilename("FROM"), cai, ReadWrite);
+  Cube *icube = p.SetInputCube(ui.GetFileName("FROM"), cai, ReadWrite);
 
   // Make sure at least one CK & SPK quality was selected
   if (!ui.GetBoolean("CKPREDICTED") && !ui.GetBoolean("CKRECON") &&
@@ -151,7 +151,7 @@ void IsisMain() {
 
     if (ck.size() == 0 && !ui.WasEntered("CK")) {
       throw IException(IException::Unknown,
-                       "No Camera Kernel found for the image [" + ui.GetFilename("FROM")
+                       "No Camera Kernel found for the image [" + ui.GetFileName("FROM")
                        + "]",
                        _FILEINFO_);
     }
@@ -521,8 +521,8 @@ void RequestSpice(Cube *icube, Pvl &labels, iString missionName) {
       if (value == "Table" || value == "Null")
         continue;
 
-      iString fullFilename = Filename(value).Expanded();
-      QFile testFile(fullFilename.ToQt());
+      iString fullFileName = FileName(value).expanded();
+      QFile testFile(fullFileName.ToQt());
 
       if (!testFile.exists()) {
         iString msg = "The spice server says you need the kernel [" +

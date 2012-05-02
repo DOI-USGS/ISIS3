@@ -15,7 +15,7 @@
 #include "ControlPoint.h"
 #include "ControlPointList.h"
 #include "Cube.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "MeasureValidationResults.h"
 #include "Progress.h"
 #include "Pvl.h"
@@ -126,7 +126,7 @@ void IsisMain() {
 
   // If the user wants to keep a log, go ahead and populate it with all the
   // existing ignored points and measures
-  ControlNet cnet(ui.GetFilename("CNET"));
+  ControlNet cnet(ui.GetFileName("CNET"));
   if (keepLog && cnet.GetNumPoints() > 0)
     populateLog(cnet, ignore);
 
@@ -135,8 +135,8 @@ void IsisMain() {
   ControlPointList *cpList = NULL;
   if (ui.WasEntered("POINTLIST") && cnet.GetNumPoints() > 0) {
     processPoints = true;
-    string pointlistFilename = ui.GetFilename("POINTLIST");
-    cpList = new ControlPointList((Filename) pointlistFilename);
+    string pointlistFileName = ui.GetFileName("POINTLIST");
+    cpList = new ControlPointList((FileName) pointlistFileName);
   }
 
   // List has Cube file names
@@ -144,8 +144,8 @@ void IsisMain() {
   SerialNumberList *cubeSnl = NULL;
   if (ui.WasEntered("CUBELIST") && cnet.GetNumPoints() > 0) {
     processCubes = true;
-    string ignorelistFilename = ui.GetFilename("CUBELIST");
-    cubeSnl = new SerialNumberList(ignorelistFilename);
+    string ignorelistFileName = ui.GetFileName("CUBELIST");
+    cubeSnl = new SerialNumberList(ignorelistFileName);
   }
 
   // List has Cube file names
@@ -155,7 +155,7 @@ void IsisMain() {
     processMeasures = true;
     editMeasures = new QMap< QString, QSet<QString> * >;
 
-    QFile file(ui.GetFilename("MEASURELIST"));
+    QFile file(ui.GetFileName("MEASURELIST"));
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
       string msg = "Unable to open MEASURELIST [" +
         file.fileName().toStdString() + "]";
@@ -176,8 +176,8 @@ void IsisMain() {
       if (!editMeasures->contains(results[0]))
         editMeasures->insert(results[0], new QSet<QString>);
 
-      Filename cubeName(results[1].toStdString());
-      string sn = SerialNumber::Compose(cubeName.Expanded());
+      FileName cubeName(results[1].toStdString());
+      string sn = SerialNumber::Compose(cubeName.expanded());
       (*editMeasures)[results[0]]->insert(QString::fromStdString(sn));
 
       lineNumber++;
@@ -247,7 +247,7 @@ void IsisMain() {
       validator = NULL;
 
       // First validate DefFile's keywords and value type
-      Pvl defFile(ui.GetFilename("DEFFILE"));
+      Pvl defFile(ui.GetFileName("DEFFILE"));
       Pvl pvlTemplate("$ISIS3DATA/base/templates/cnet_validmeasure/validmeasure.def");
       Pvl pvlResults;
       pvlTemplate.ValidatePvl(defFile, pvlResults);
@@ -262,7 +262,7 @@ void IsisMain() {
 
       // User also provided a list of all serial numbers corresponding to every
       // cube in the control network
-      string cubeList = ui.GetFilename("FROMLIST");
+      string cubeList = ui.GetFileName("FROMLIST");
       checkAllMeasureValidity(cnet, cubeList);
 
       // Delete the validator
@@ -303,8 +303,8 @@ void IsisMain() {
     outputLog.AddObject(ignoredLog);
 
     // Write the log
-    string logFilename = ui.GetFilename("LOG");
-    outputLog.Write(logFilename);
+    string logFileName = ui.GetFileName("LOG");
+    outputLog.Write(logFileName);
 
     // Delete the structures keeping track of the ignored points and measures
     delete ignoredPoints;
@@ -337,7 +337,7 @@ void IsisMain() {
   }
 
   // Write the network
-  cnet.Write(ui.GetFilename("ONET"));
+  cnet.Write(ui.GetFileName("ONET"));
 }
 
 
@@ -848,14 +848,14 @@ void checkAllMeasureValidity(ControlNet &cnet, string cubeList) {
       }
 
       cube = new Cube;
-      cube->open(serialNumbers.Filename(serialNumber));
+      cube->open(serialNumbers.FileName(serialNumber));
 
       if (validator->IsCameraRequired()) {
         try {
           camera = cube->getCamera();
         }
         catch (IException &e) {
-          string msg = "Cannot Create Camera for Image:" + cube->getFilename();
+          string msg = "Cannot Create Camera for Image:" + cube->getFileName();
           throw IException(e, IException::User, msg, _FILEINFO_);
         }
       }
@@ -1009,7 +1009,7 @@ void PrintTemp() {
 
   // Get template PVL
   Pvl userTemp;
-  userTemp.Read(ui.GetFilename("DEFFILE"));
+  userTemp.Read(ui.GetFileName("DEFFILE"));
 
   // Write template file out to the log
   Isis::Application::GuiLog(userTemp);

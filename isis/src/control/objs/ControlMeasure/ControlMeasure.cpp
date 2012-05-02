@@ -613,7 +613,7 @@ namespace Isis {
       return *p_chooserName;
     }
     else {
-      return Filename(Application::Name()).Name();
+      return FileName(Application::Name()).name();
     }
   }
 

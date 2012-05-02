@@ -30,7 +30,7 @@
 #include <sstream>
 
 #include "Kernels.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "PvlKeyword.h"
 #include "Pvl.h"
 #include "IException.h"
@@ -1049,12 +1049,12 @@ namespace Isis {
   Kernels::KernelFile Kernels::examine(const std::string &kfile,
                                        const bool &manage) const {
 
-    Filename kernfile(kfile);
+    FileName kernfile(kfile);
     KernelFile kf;
     kf.pathname = kfile;
-    kf.name = kernfile.Name();
-    kf.fullpath = kernfile.Expanded();
-    kf.exists = kernfile.Exists();
+    kf.name = kernfile.name();
+    kf.fullpath = kernfile.expanded();
+    kf.exists = kernfile.fileExists();
     kf.ktype = "UNKNOWN";
     kf.loaded = false;     // Assumes its not loaded
     kf.managed = manage;
@@ -1107,8 +1107,8 @@ namespace Isis {
    *         "UNKNOWN" is returned.
    */
   std::string Kernels::resolveType(const std::string &kfile) const {
-    Filename kernFile(kfile);
-    string kpath = kernFile.Expanded();
+    FileName kernFile(kfile);
+    string kpath = kernFile.expanded();
     ifstream ifile(kpath.c_str(), ios::in | ios::binary);
     string ktype("UNKNOWN");
     if (ifile) {
@@ -1187,8 +1187,8 @@ namespace Isis {
     string ktype(iktype);  // Set default condition
 
     //  Deciminate file parts
-    Filename kf(kfile);
-    string ext = iString(kf.Extension()).DownCase();
+    FileName kf(kfile);
+    string ext = iString(kf.extension()).DownCase();
 
     //  Check extensions for types
     if (ext == "cub") {
@@ -1197,7 +1197,7 @@ namespace Isis {
     else if (ext == "ti") {
       //  Assume its an instrument kernel but check for ISIS IAK file
       ktype = "IK";
-      string base = iString(kf.Basename()).DownCase();
+      string base = iString(kf.baseName()).DownCase();
       string::size_type idx = base.find("addendum");
       if (idx != string::npos) {   // This is an ISIS IK addendum (IAK)
         ktype = "IAK";

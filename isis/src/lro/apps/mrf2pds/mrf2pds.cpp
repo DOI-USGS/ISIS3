@@ -1,6 +1,6 @@
 #include "Isis.h"
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "Pvl.h"
@@ -27,7 +27,7 @@ static unsigned int iCheckSum = 0;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  Filename inFile = ui.GetFilename("FROM");
+  FileName inFile = ui.GetFileName("FROM");
 
   // Set the processing object
   ProcessExportMiniRFLroPds cProcess;
@@ -37,10 +37,10 @@ void IsisMain() {
   Pvl *cInLabel =  cInCube->getLabel();
 
   // Get the output label file
-  Filename outFile(ui.GetFilename("TO", "lbl"));
-  string outFilename(outFile.Expanded());
+  FileName outFile(ui.GetFileName("TO", "lbl"));
+  string outFileName(outFile.expanded());
 
-  cProcess.SetDetached(true, outFilename);
+  cProcess.SetDetached(true, outFileName);
 
   cProcess.SetExportType(ProcessExportPds::Fixed);
 
@@ -121,14 +121,14 @@ void IsisMain() {
 
   // Get the Sources Product ID if entered for Level2 only as per example
   if(ui.WasEntered("SRC") && bLevel2) {
-    std::string sSrcFile = ui.GetFilename("SRC");
+    std::string sSrcFile = ui.GetFileName("SRC");
     std::string sSrcType = ui.GetString("TYPE");
     GetSourceProductID(sSrcFile, sSrcType, pdsLabel);
   }
 
   // Get the User defined Labels
   if(ui.WasEntered("USERLBL")) {
-    std::string sUserLbl = ui.GetFilename("USERLBL");
+    std::string sUserLbl = ui.GetFileName("USERLBL");
     GetUserLabel(sUserLbl, pdsLabel, bLevel2);
   }
 
@@ -148,9 +148,9 @@ void IsisMain() {
     pdsLabel.SetFormatTemplate("$lro/translations/mrfPdsLevel3.pft");
   }
 
-  size_t iFound = outFilename.find(".lbl");
-  outFilename.replace(iFound, 4, ".img");
-  ofstream oCube(outFilename.c_str());
+  size_t iFound = outFileName.find(".lbl");
+  outFileName.replace(iFound, 4, ".img");
+  ofstream oCube(outFileName.c_str());
   cProcess.OutputDetatchedLabel();
   //cProcess.OutputLabel(oCube);
   cProcess.StartProcess(oCube);

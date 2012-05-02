@@ -32,7 +32,7 @@ class QString;
 
 namespace Isis {
   class ControlNet;
-  class Filename;
+  class FileName;
   class Pvl;
   class PvlContainer;
   class PvlKeyword;
@@ -71,7 +71,7 @@ namespace Isis {
       virtual ~ControlNetDiff();
 
       void addTolerances(Pvl &diffFile);
-      Pvl compare(Filename &net1Name, Filename &net2Name);
+      Pvl compare(FileName &net1Name, FileName &net2Name);
 
 
     protected:

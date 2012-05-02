@@ -2,7 +2,7 @@
 
 #include "Cube.h"
 #include "CubeDisplayProperties.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "SpecialPixel.h"
 #include "Table.h"

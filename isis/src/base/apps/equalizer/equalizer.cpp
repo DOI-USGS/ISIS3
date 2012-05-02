@@ -8,7 +8,7 @@
 #include "CubeAttribute.h"
 #include "Equalization.h"
 #include "FileList.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "LineManager.h"
 #include "MultivariateStatistics.h"
 #include "OverlapNormalization.h"
@@ -35,11 +35,11 @@ void IsisMain() {
     }
   }
 
-  Equalization equalizer(ui.GetFilename("FROMLIST"));
+  Equalization equalizer(ui.GetFileName("FROMLIST"));
 
   // Read hold list if one was entered
   if (ui.WasEntered("HOLD")) {
-    equalizer.addHolds(ui.GetFilename("HOLD"));
+    equalizer.addHolds(ui.GetFileName("HOLD"));
   }
 
   if (processOpt != "APPLY") {
@@ -71,17 +71,17 @@ void IsisMain() {
 
     // Setup the output text file if the user requested one
     if (ui.WasEntered("OUTSTATS")) {
-      equalizer.write(ui.GetFilename("OUTSTATS"));
+      equalizer.write(ui.GetFileName("OUTSTATS"));
     }
   }
   else {
-    equalizer.importStatistics(ui.GetFilename("INSTATS"));
+    equalizer.importStatistics(ui.GetFileName("INSTATS"));
   }
 
   // Apply the correction to the images if the user wants this done
   if (processOpt != "CALCULATE") {
     equalizer.applyCorrection(ui.WasEntered("TOLIST") ?
-        ui.GetFilename("TOLIST") : "");
+        ui.GetFileName("TOLIST") : "");
   }
 }
 

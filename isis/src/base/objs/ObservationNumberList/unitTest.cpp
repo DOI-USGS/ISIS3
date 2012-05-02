@@ -20,11 +20,11 @@ int main(int argc, char *argv[]) {
     cout << "hasXYZ = " << onl.HasObservationNumber("XYZ") << endl;
 
     for(int i = 0; i < onl.Size(); i++) {
-      cout << onl.Filename(i) << " = " << onl.ObservationNumber(i) << endl;
+      cout << onl.FileName(i) << " = " << onl.ObservationNumber(i) << endl;
     }
 
     cout << endl;
-    vector<std::string> filenames = onl.PossibleFilenames(onl.ObservationNumber(2));
+    vector<std::string> filenames = onl.PossibleFileNames(onl.ObservationNumber(2));
     for(unsigned i = 0; i < filenames.size(); i++) {
       cout << "Possible filename for [" << onl.ObservationNumber(2)
            << "]: " << filenames[i] << endl;
@@ -37,9 +37,9 @@ int main(int argc, char *argv[]) {
 
     cout << "File->ON:" << onl.ObservationNumber("$mgs/testData/ab102401.cub") << endl;
 
-    cout << endl << "SN->File (0): " << snl.Filename(0) << endl;
-    cout << "SN->File (1): " << snl.Filename(1) << endl;
-    cout << "SN->File (2): " << snl.Filename(2) << endl << endl;
+    cout << endl << "SN->File (0): " << snl.FileName(0) << endl;
+    cout << "SN->File (1): " << snl.FileName(1) << endl;
+    cout << "SN->File (2): " << snl.FileName(2) << endl << endl;
 
     if(onl.HasObservationNumber("NotAnObservation"))
       cout << "This line shouldn't be showing!" << endl;

@@ -68,10 +68,10 @@ void IsisMain () {
 
     FileList list;
     UserInterface &ui = Application::GetUserInterface();
-    list.Read(ui.GetFilename("FROMLIST"));
+    list.Read(ui.GetFileName("FROMLIST"));
 
     if (list.size() < 1) {
-        string msg = "The list file [" + ui.GetFilename("FROMLIST") + "does not contain any data";
+        string msg = "The list file [" + ui.GetFileName("FROMLIST") + "does not contain any data";
         throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -165,18 +165,17 @@ void IsisMain () {
     out->setDimensions(numSamples, numLines, 1);
     out->setPixelType(Isis::Real);
 
-    Filename mergedCube = ui.GetFilename("TO");
-    mergedCube.Temporary(Filename(ui.GetFilename("TO")).Basename(), "cub");
-
-    out->create(mergedCube.Expanded().c_str());
+    FileName mergedCube = FileName::createTempFile(
+        "$TEMPORARY/" + FileName(ui.GetFileName("TO")).baseName() + ".cub");
+    out->create(mergedCube.expanded().c_str());
 
     mergeFramelets();
 
     /*
 
-     Filename outFile(ui.GetFilename("TO", "img"));
-     string outFilename(outFile.Expanded());
-     ofstream oCube(outFilename.c_str());
+     FileName outFile(ui.GetFileName("TO", "img"));
+     string outFileName(outFile.expanded());
+     ofstream oCube(outFileName.c_str());
      p.OutputLabel(oCube);
      p.StartProcess(oCube);
      oCube.close();
@@ -217,7 +216,7 @@ void IsisMain () {
     ProcessExport pe;
 
     // Setup the input cube
-    Cube *inCube = pe.SetInputCube(mergedCube.Expanded(), CubeAttributeInput());
+    Cube *inCube = pe.SetInputCube(mergedCube.expanded(), CubeAttributeInput());
 
     pe.SetOutputType(Isis::Real);
     pe.SetOutputEndian(Isis::Lsb);
@@ -230,21 +229,21 @@ void IsisMain () {
     pe.SetOutputHis(Isis::HIGH_INSTR_SAT4);
     pe.SetOutputHrs(Isis::HIGH_REPR_SAT4);
 
-    Filename tempFile(ui.GetFilename("TO"));
-    tempFile.Temporary(Filename(ui.GetFilename("TO")).Basename(), "temp");
-    string tempFilename(tempFile.Expanded());
-    ofstream temporaryFile(tempFilename.c_str());
+    FileName tempFile = FileName::createTempFile(
+        "$TEMPORARY/" + FileName(ui.GetFileName("TO")).baseName() + ".temp");
+    string tempFileName(tempFile.expanded());
+    ofstream temporaryFile(tempFileName.c_str());
 
     pe.StartProcess(temporaryFile);
     temporaryFile.close();
 
     // Calculate MD5 Checksum
-    g_md5Checksum = MD5Checksum(tempFilename);
+    g_md5Checksum = MD5Checksum(tempFileName);
 
-    Filename outFile(ui.GetFilename("TO"));
-    string outFilename(outFile.Expanded());
-    ifstream inFile(tempFilename.c_str());
-    ofstream pdsFile(outFilename.c_str());
+    FileName outFile(ui.GetFileName("TO"));
+    string outFileName(outFile.expanded());
+    ifstream inFile(tempFileName.c_str());
+    ofstream pdsFile(outFileName.c_str());
 
     // Output the label
     OutputLabel(pdsFile, inCube, pdsLab);
@@ -256,8 +255,8 @@ void IsisMain () {
 
     pe.EndProcess();
 
-    remove((mergedCube.Expanded()).c_str());
-    remove(tempFilename.c_str());
+    remove((mergedCube.expanded()).c_str());
+    remove(tempFileName.c_str());
     return;
 }
 
@@ -376,8 +375,8 @@ void OutputLabel ( std::ofstream &fout, Cube* cube, Pvl &labelPvl ) {
     iString pdsLabel = "";
 
     //Translate the Original Pds Label
-    Filename transFile(transDir + "lrowacPdsLabelExport.trn");
-    PvlTranslationManager labelXlator(labelPvl, transFile.Expanded());
+    FileName transFile(transDir + "lrowacPdsLabelExport.trn");
+    PvlTranslationManager labelXlator(labelPvl, transFile.expanded());
     labelXlator.Auto(outLabel);
 
     // Copy any Translation changes over

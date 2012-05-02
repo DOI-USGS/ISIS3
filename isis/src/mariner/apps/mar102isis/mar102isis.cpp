@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 #include "Cube.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 #include "iTime.h"
 #include "OriginalLabel.h"
@@ -21,7 +21,7 @@ using namespace std;
 using namespace Isis;
 
 void UpdateLabels(Cube *cube, const string &labels);
-void TranslateIsis2Labels(Filename &labelFile, Cube *oCube);
+void TranslateIsis2Labels(FileName &labelFile, Cube *oCube);
 string EbcdicToAscii(unsigned char *header);
 string DaysToDate(int days);
 
@@ -30,8 +30,8 @@ void IsisMain() {
 
   // Determine whether input is a raw Mariner 10 image or an Isis 2 cube
   bool isRaw = false;
-  Filename inputFile = ui.GetFilename("FROM");
-  Pvl label(inputFile.Expanded());
+  FileName inputFile = ui.GetFileName("FROM");
+  Pvl label(inputFile.expanded());
 
   // If the PVL created from the input labels is empty, then input is raw
   if(label.Groups() + label.Objects() + label.Keywords() == 0) {
@@ -50,7 +50,7 @@ void IsisMain() {
     p.SetByteOrder(Lsb);
     p.SetDataSuffixBytes(136);
 
-    p.SetInputFile(ui.GetFilename("FROM"));
+    p.SetInputFile(ui.GetFileName("FROM"));
     Cube *oCube = p.SetOutputCube("TO");
 
     p.StartProcess();
@@ -69,7 +69,7 @@ void IsisMain() {
     p.SetByteOrder(Lsb);
     p.SetDataSuffixBytes(136);
 
-    p.SetPdsFile(inputFile.Expanded(), "", label);
+    p.SetPdsFile(inputFile.expanded(), "", label);
     Cube *oCube = p.SetOutputCube("TO");
 
     TranslateIsis2Labels(inputFile, oCube);
@@ -321,19 +321,19 @@ void UpdateLabels(Cube *cube, const string &labels) {
 }
 
 // Translate Isis 2 labels into Isis 3 labels.
-void TranslateIsis2Labels(Filename &labelFile, Cube *oCube) {
+void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
   // Get the directory where the Mariner translation tables are.
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
 
   // Transfer the instrument group to the output cube
   iString transDir = (string) dataDir["Mariner10"] + "/translations/";
-  Pvl inputLabel(labelFile.Expanded());
-  Filename transFile;
+  Pvl inputLabel(labelFile.expanded());
+  FileName transFile;
 
   transFile = transDir + "mariner10isis2.trn";
 
   // Get the translation manager ready
-  PvlTranslationManager translation(inputLabel, transFile.Expanded());
+  PvlTranslationManager translation(inputLabel, transFile.expanded());
   Pvl *outputLabel = oCube->getLabel();
   translation.Auto(*(outputLabel));
 

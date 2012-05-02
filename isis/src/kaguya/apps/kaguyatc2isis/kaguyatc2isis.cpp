@@ -6,7 +6,7 @@
 #include "ProcessImportPds.h"
 
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 
 using namespace std;
 using namespace Isis;
@@ -16,17 +16,17 @@ void IsisMain() {
   Pvl label;
   UserInterface &ui = Application::GetUserInterface();
 
-  string labelFile = ui.GetFilename("FROM");
-  Filename inFile = ui.GetFilename("FROM");
+  string labelFile = ui.GetFileName("FROM");
+  FileName inFile = ui.GetFileName("FROM");
   iString id;
-  Pvl lab(inFile.Expanded());
+  Pvl lab(inFile.expanded());
 
   try {
     id = (string) lab.FindKeyword("DATA_SET_ID");
   }
   catch(IException &e) {
     string msg = "Unable to read [DATA_SET_ID] from input file [" +
-                 inFile.Expanded() + "]";
+                 inFile.expanded() + "]";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
 
@@ -34,7 +34,7 @@ void IsisMain() {
   id.Compress();
   id.Trim(" ");
   if(id != "TC_MAP") {
-    string msg = "Input file [" + inFile.Expanded() + "] does not appear to be " +
+    string msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
                  "in Kaguya Terrain Camera level 2 format. " +
                  "DATA_SET_ID is [" + id + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -56,8 +56,8 @@ void IsisMain() {
   iString transDir = (string) dataDir["base"] + "/translations/";
 
   // Translate the Archive group
-  Filename transFile(transDir + "pdsImageArchive.trn");
-  PvlTranslationManager archiveXlater(label, transFile.Expanded());
+  FileName transFile(transDir + "pdsImageArchive.trn");
+  PvlTranslationManager archiveXlater(label, transFile.expanded());
   archiveXlater.Auto(otherLabels);
 
   // Write the Archive and Mapping groups to the output cube label

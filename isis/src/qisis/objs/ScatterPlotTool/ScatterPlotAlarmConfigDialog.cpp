@@ -14,6 +14,7 @@
 #include <QSpinBox>
 
 #include "ScatterPlotWindow.h"
+#include "iString.h"
 
 namespace Isis {
   /**

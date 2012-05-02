@@ -7,7 +7,7 @@
 
 #include "CisscalFile.h"
 #include "Cube.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Preference.h"
 #include "ProcessImportPds.h"
 #include "ProcessByLine.h"
@@ -30,7 +30,7 @@ vector<double> ConvertLinePrefixPixels(unsigned char *data);
 Table CreateLinePrefixTable(vector<char *> prefixData);
 void CreateStretchPairs();
 void FixDns(Buffer &buf);
-void TranslateCassIssLabels(Filename &labelFile, Cube *ocube);
+void TranslateCassIssLabels(FileName &labelFile, Cube *ocube);
 //Global variables
 string compressionType;
 string dataConversionType;
@@ -44,13 +44,13 @@ void IsisMain() {
   ProcessImportPds p;
   Pvl label;
   UserInterface &ui = Application::GetUserInterface();
-  Filename in = ui.GetFilename("FROM");
+  FileName in = ui.GetFileName("FROM");
 
-  p.SetPdsFile(in.Expanded(), "", label);
+  p.SetPdsFile(in.expanded(), "", label);
 
   //Checks if in file is rdr
   if(label.HasObject("IMAGE_MAP_PROJECTION")) {
-    string msg = "[" + in.Name() + "] appears to be an rdr file.";
+    string msg = "[" + in.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -60,7 +60,7 @@ void IsisMain() {
   outAtt.PixelType(SignedWord);
   outAtt.Minimum((double)VALID_MIN2);
   outAtt.Maximum((double)VALID_MAX2);
-  Cube *ocube = p.SetOutputCube(ui.GetFilename("TO"), outAtt);
+  Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), outAtt);
 
   TranslateCassIssLabels(in, ocube);
 
@@ -115,7 +115,7 @@ void IsisMain() {
 
   // PROCESS 2 : Do 8 bit to 12 bit conversion for image ==============================================//
   ProcessByLine p2;
-  string ioFile = ui.GetFilename("TO");
+  string ioFile = ui.GetFileName("TO");
   CubeAttributeInput att;
   p2.SetInputCube(ioFile, att, ReadWrite);
   //if ConversionType == 12Bit or 8LSB, only save off overclocked pixels
@@ -201,8 +201,8 @@ void CreateStretchPairs() {
   // Set up the strech for the 8 to 12 bit conversion from file
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
   iString missionDir = (string) dataDir["Cassini"];
-  Filename *lutFile = new Filename(missionDir + "/calibration/lut/lut.tab");
-  CisscalFile *stretchPairs = new CisscalFile(lutFile->Expanded());
+  FileName *lutFile = new FileName(missionDir + "/calibration/lut/lut.tab");
+  CisscalFile *stretchPairs = new CisscalFile(lutFile->expanded());
   // Create the stretch pairs
   double temp1 = 0, temp2 = 0;
   stretch.ClearPairs();
@@ -259,15 +259,15 @@ void FixDns(Buffer &buf) {
  *                                       Stop and Image Time labels
  *
  */
-void TranslateCassIssLabels(Filename &labelFile, Cube *ocube) {
+void TranslateCassIssLabels(FileName &labelFile, Cube *ocube) {
   // Get the directory where the CISS translation tables are.
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
   iString missionDir = (string) dataDir["Cassini"];
-  Filename transFile(missionDir + "/translations/cassiniIss.trn");
+  FileName transFile(missionDir + "/translations/cassiniIss.trn");
 
   // Get the translation manager ready
-  Pvl inputLabel(labelFile.Expanded());
-  PvlTranslationManager labelXlater(inputLabel, transFile.Expanded());
+  Pvl inputLabel(labelFile.expanded());
+  PvlTranslationManager labelXlater(inputLabel, transFile.expanded());
 
   // Pvl outputLabels;
   Pvl *outputLabel = ocube->getLabel();

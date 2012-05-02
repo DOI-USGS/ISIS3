@@ -32,7 +32,7 @@ void IsisMain(){
   }
   string outFile;
   if (ui.WasEntered("FROMLIST")) {
-    cubes.Read(ui.GetFilename("FROMLIST"));
+    cubes.Read(ui.GetFileName("FROMLIST"));
   }
   else {
     string msg = "Error: FROMLIST file must be specified";
@@ -60,13 +60,13 @@ void IsisMain(){
   // LOG_STATS is true will create a flat file of statistics.
   ofstream logFileos;
   if (logCamStats) {
-    Filename logFile(logFileName);
-    if (logFile.exists()) {
+    FileName logFile(logFileName);
+    if (logFile.fileExists()) {
       logFileos.open(logFileName.c_str(),ios::app);
     }
     else {
       logFileos.open(logFileName.c_str(),ios::out);
-      logFileos << "Filename," << "Duration," << "Summing,"<< "IncidenceAverage," <<
+      logFileos << "FileName," << "Duration," << "Summing,"<< "IncidenceAverage," <<
               "ResolutionAverage,"<< "IncidenceMinimum," << "IncidenceMaximum," <<  "Gaps,"<<endl;
     }
   }
@@ -77,12 +77,12 @@ void IsisMain(){
   bool rmHiIncInput = ui.GetBoolean("RMHIGHINC");
 
   // Create high incidence report file if requested
-  Filename hiIncList;
+  FileName hiIncList;
   ofstream hiIncListos;
   if (rmHiIncInput && reportHiInc) {
-    hiIncList = ui.GetFilename("HIGHINCLIST");
-    iString hiIncListStr = hiIncList.Expanded();
-    if (hiIncList.exists()) {
+    hiIncList = ui.GetFileName("HIGHINCLIST");
+    iString hiIncListStr = hiIncList.expanded();
+    if (hiIncList.fileExists()) {
       hiIncListos.open(hiIncListStr.c_str(),ios::app);
     }
     else {
@@ -92,12 +92,12 @@ void IsisMain(){
   }
 
   // Create missing RDR file report if requested
-  Filename noFileList;
+  FileName noFileList;
   ofstream noFileListos;
   if (reportNoFile) {
-    noFileList = ui.GetFilename("NOFILELIST");
-    iString noFileListStr = noFileList.Expanded();
-    if (noFileList.exists()) {
+    noFileList = ui.GetFileName("NOFILELIST");
+    iString noFileListStr = noFileList.expanded();
+    if (noFileList.fileExists()) {
       noFileListos.open(noFileListStr.c_str(),ios::app);
     }
     else {
@@ -107,12 +107,12 @@ void IsisMain(){
   }
 
   // Create Nadir pointing file report if requested
-  Filename nadirSpcList;
+  FileName nadirSpcList;
   ofstream nadirSpcListos;
   if (reportNadirSpc) {
-    nadirSpcList = ui.GetFilename("NADIRSPCLIST");
-    iString nadirSpcListStr = nadirSpcList.Expanded();
-    if (nadirSpcList.exists()) {
+    nadirSpcList = ui.GetFileName("NADIRSPCLIST");
+    iString nadirSpcListStr = nadirSpcList.expanded();
+    if (nadirSpcList.fileExists()) {
       nadirSpcListos.open(nadirSpcListStr.c_str(),ios::app);
     }
     else {
@@ -122,12 +122,12 @@ void IsisMain(){
   }
 
   // Create image gap file report if requested
-  Filename imageGapList;
+  FileName imageGapList;
   ofstream imageGapListos;
   if (reportImageGap) {
-    imageGapList = ui.GetFilename("IMAGEGAPLIST");
-    iString imageGapListStr = imageGapList.Expanded();
-    if (imageGapList.exists()) {
+    imageGapList = ui.GetFileName("IMAGEGAPLIST");
+    iString imageGapListStr = imageGapList.expanded();
+    if (imageGapList.fileExists()) {
       imageGapListos.open(imageGapListStr.c_str(),ios::app);
     }
     else {
@@ -143,12 +143,12 @@ void IsisMain(){
     pdsSanFile = false;
 
     // Open the input file
-    Filename infile = Filename(cubes[i]);
-    iString inFileStr = infile.Expanded();
+    FileName infile = FileName(cubes[i]);
+    iString inFileStr = infile.expanded();
 
-    if (!infile.Exists()) {
+    if (!infile.fileExists()) {
       if (reportNoFile) {
-        noFileListos << infile.Basename() << " not processed because RDR file is missing" << endl;
+        noFileListos << infile.baseName() << " not processed because RDR file is missing" << endl;
       }
       continue;
     }
@@ -159,7 +159,7 @@ void IsisMain(){
     iString instrumentID = iString(lab["INSTRUMENT_ID"][0]);
     if (instrumentID.UpCase() != "THEMIS") {
       if (reportNoFile) {
-        noFileListos << infile.Basename() << " not processed because is not a THEMIS image" << endl;
+        noFileListos << infile.baseName() << " not processed because is not a THEMIS image" << endl;
       }
       string msg = "Error: Not a Themis Image";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -169,7 +169,7 @@ void IsisMain(){
     iString detectorID = iString(lab["DETECTOR_ID"][0]);
     if (detectorID.UpCase() != "IR") {
       if (reportNoFile) {
-        noFileListos << infile.Basename() << " not processed because is not an IR THEMIS image" << endl;
+        noFileListos << infile.baseName() << " not processed because is not an IR THEMIS image" << endl;
       }
       string msg = "Error: Not an IR Themis Image";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -201,14 +201,14 @@ void IsisMain(){
 
     if (!band12_57) {
       if (reportNoFile) {
-        noFileListos << infile.Basename() << " not processed because is missing filter 12.57" << endl;
+        noFileListos << infile.baseName() << " not processed because is missing filter 12.57" << endl;
       }
       string msg = "Filter 12.57 not found in input file [" + inFileStr + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     // Run thm2isis
-    string output = (infile.Basename()) + ".cub";
+    string output = (infile.baseName()) + ".cub";
     string parameters = "FROM=" + cubes[i] + " TO=" + output;
     ProgramLauncher::RunIsisProgram("thm2isis", parameters);
 
@@ -226,15 +226,15 @@ void IsisMain(){
         }
       }
       if (isNadir) {
-        nadirSpcListos << infile.Basename() << endl;
+        nadirSpcListos << infile.baseName() << endl;
       }
     }
 
     // Create a temporary pvl and fill with camstats used to test incedence
-    Filename tstat1;
-    string tmpcamstats1 = infile.Basename() + "_tmpcamstats1";
-    tstat1.Temporary(tmpcamstats1,"pvl");
-    string tempstat1 = tstat1.Expanded();
+    FileName tstat1;
+    string tmpcamstats1 = infile.baseName() + "_tmpcamstats1";
+    tstat1 = FileName::createTempFile("$TEMPORARY/" + tmpcamstats1 + ".pvl");
+    string tempstat1 = tstat1.expanded();
 
     parameters = "FROM=" + input + " TO=" + tempstat1 + " linc = 100 sinc = 100";
     ProgramLauncher::RunIsisProgram("camstats", parameters);
@@ -244,10 +244,10 @@ void IsisMain(){
 
     // if do not process night and incidence angle > 90, then exit
     if (!processNight && incAngle >= 90) {
-      remove (tstat1.Expanded().c_str());
+      remove (tstat1.expanded().c_str());
       if (rmHiIncInput) {
         if (reportHiInc) {
-          hiIncListos << infile.Basename() << endl;
+          hiIncListos << infile.baseName() << endl;
         }
         if (!pdsSanFile) {
           remove(inFileStr.c_str());
@@ -255,7 +255,7 @@ void IsisMain(){
         }
       }
       if (reportNoFile) {
-        noFileListos << infile.Basename() << " not processed because average incidence angle >= 90 and DAY images requested" << endl;
+        noFileListos << infile.baseName() << " not processed because average incidence angle >= 90 and DAY images requested" << endl;
         remove(output.c_str());
       }
       string msg = "The average incidence angle of [" + cubes[i] + "] is over 90";
@@ -264,10 +264,10 @@ void IsisMain(){
 
     // if process night and incidence angle < 90, then exit
     if (processNight && incAngle < 90) {
-      remove (tstat1.Expanded().c_str());
+      remove (tstat1.expanded().c_str());
       if (rmHiIncInput) {
         if (reportHiInc) {
-          hiIncListos << infile.Basename() << endl;
+          hiIncListos << infile.baseName() << endl;
         }
         if (!pdsSanFile) {
           remove(inFileStr.c_str());
@@ -275,7 +275,7 @@ void IsisMain(){
         }
       }
       if (reportNoFile) {
-        noFileListos << infile.Basename() << " not processed because average incidence angle < 90 and NIGHT images requested" << endl;
+        noFileListos << infile.baseName() << " not processed because average incidence angle < 90 and NIGHT images requested" << endl;
         remove(output.c_str());
       }
       string msg = "The average incidence angle of [" + cubes[i] + "] is over 90";
@@ -286,14 +286,14 @@ void IsisMain(){
     // Perform atmospheric correction using filter 10 or 14.88um wavelength.
     // Note we use wavelength 12.57um in geologic mosaics.
     if (band14_88 && incAngle < 90 && !ignoreAtmCorr)  {
-      output = (infile.Basename()) + "_driftcorr.cub";
+      output = (infile.baseName()) + "_driftcorr.cub";
       parameters = "FROM=" + input + "+" + iString(procBand) +
                    " ATM=" + input + "+" + iString(atmosBand) + " TO=" + output;
       ProgramLauncher::RunIsisProgram("thmdriftcor", parameters);
       remove (input.c_str());
     }
     else {
-      output = (infile.Basename()) + "_no_driftcorr.cub";
+      output = (infile.baseName()) + "_no_driftcorr.cub";
       parameters = "FROM=" + input + "+" + iString(procBand) + " TO=" + output;
       ProgramLauncher::RunIsisProgram("stretch", parameters);
       remove (input.c_str());
@@ -303,7 +303,7 @@ void IsisMain(){
     // if night is true then skip cosi
     if (incAngle < 90) {
       input = output;
-      output = (infile.Basename()) + "_cosi.cub";
+      output = (infile.baseName()) + "_cosi.cub";
       parameters = "FROM=" + input + " TO=" + output;
       ProgramLauncher::RunIsisProgram("cosi", parameters);
       remove (input.c_str());
@@ -311,30 +311,30 @@ void IsisMain(){
 
     // Run cubenorm
     input = output;
-    output = (infile.Basename()) + "cubenorm.cub";
+    output = (infile.baseName()) + "cubenorm.cub";
     parameters = "FROM=" + input + " TO=" + output;
     ProgramLauncher::RunIsisProgram("cubenorm", parameters);
     remove (input.c_str());
 
     //Run lineeq
     input=output;
-    outFile = pathName + infile.Basename() + ".lev1.cub";
+    outFile = pathName + infile.baseName() + ".lev1.cub";
     parameters ="FROM=" + input + " TO=" + outFile;
     ProgramLauncher::RunIsisProgram("lineeq", parameters);
     remove (input.c_str());
 
-    remove (tstat1.Expanded().c_str());
+    remove (tstat1.expanded().c_str());
 
     //************************************
     // Run findgaps
     // Create temporary pvl for gaps
     string sgap = "no";
-    Filename tgaps;
-    string tmpstats1 = infile.Basename() + "_tmpstats1";
-    tgaps.Temporary(tmpstats1,"pvl");
-    string tempgaps = tgaps.Expanded();
+    FileName tgaps;
+    string tmpstats1 = infile.baseName() + "_tmpstats1";
+    tgaps = FileName::createTempFile("$TEMPORARY/" + tmpstats1 + ".pvl");
+    string tempgaps = tgaps.expanded();
 
-    //parameters = "FROM=" + iString(ui.GetFilename("TO")) +
+    //parameters = "FROM=" + iString(ui.GetFileName("TO")) +
     //             " TO=" + tempgaps + " CORTOL=.3";
     //ProgramLauncher::RunIsisProgram("findgaps", parameters);
     parameters = "FROM=" + outFile +
@@ -349,16 +349,16 @@ void IsisMain(){
       cout << tg << endl;
       sgap = "yes";
       if (reportImageGap) {
-        imageGapListos << infile.Basename() << endl;
+        imageGapListos << infile.baseName() << endl;
       }
     }
-    remove (tgaps.Expanded().c_str());
+    remove (tgaps.expanded().c_str());
 
     // Create temporary pvl and fill with camstats
-    Filename tstat2;
-    string tmpcamstats2 = infile.Basename() + "_tmpcamstats2";
-    tstat2.Temporary(tmpcamstats2,"pvl");
-    string tempstat2 = tstat2.Expanded();
+    FileName tstat2;
+    string tmpcamstats2 = infile.baseName() + "_tmpcamstats2";
+    tstat2 = FileName::createTempFile("$TEMPORARY/" + tmpcamstats2 + ".pvl");
+    string tempstat2 = tstat2.expanded();
 
     parameters = "FROM=" + outFile +
                  " TO=" + tempstat2 + " linc = 100 sinc = 100";
@@ -370,11 +370,11 @@ void IsisMain(){
     string  resavg = p2.FindGroup("Resolution",Pvl::Traverse)["ResolutionAverage"];
     string incmin = p2.FindGroup("IncidenceAngle",Pvl::Traverse)["IncidenceMinimum"];
     string incmax = p2.FindGroup("IncidenceAngle",Pvl::Traverse)["IncidenceMaximum"];
-    remove (tstat2.Expanded().c_str());
+    remove (tstat2.expanded().c_str());
 
     double summing = 1;
-    Filename tosum = Filename(outFile);
-    Pvl sumlab(tosum.Expanded());
+    FileName tosum = FileName(outFile);
+    Pvl sumlab(tosum.expanded());
     PvlGroup InstGrp = sumlab.FindGroup("Instrument",Pvl::Traverse);
     if (InstGrp.HasKeyword("SpatialSumming")) {
       summing = InstGrp["SpatialSumming"];
@@ -383,7 +383,7 @@ void IsisMain(){
     // do stuff to build the file that will go into the spreadsheet
     // Add statistics to flat file.
     if (logCamStats) {
-      logFileos << infile.Basename() << "," << duration << "," << summing << "," <<
+      logFileos << infile.baseName() << "," << duration << "," << summing << "," <<
         incavg << "," << resavg << "," << incmin << "," << incmax << "," << sgap << "," <<endl;
     }
 

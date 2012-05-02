@@ -26,7 +26,7 @@
 #include "IException.h"
 #include "Message.h"
 #include "iString.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Constants.h"
 #include "TextFile.h"
 

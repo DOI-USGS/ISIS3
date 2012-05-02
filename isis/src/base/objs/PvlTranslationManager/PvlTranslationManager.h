@@ -25,7 +25,7 @@
 #include <string>
 #include <fstream>
 
-#include "Filename.h"
+#include "FileName.h"
 #include "PvlTokenizer.h"
 #include "PvlTranslationTable.h"
 

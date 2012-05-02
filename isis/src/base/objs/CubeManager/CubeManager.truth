@@ -1,6 +1,6 @@
 CubeManager Unit Test
 Verify proper cubes have been read
-Cube Filenames: 
+Cube FileNames: 
   1 : isisTruth
   2 : isisTruth
   3 : blobTruth

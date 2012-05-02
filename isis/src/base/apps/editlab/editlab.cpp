@@ -14,7 +14,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Extract label from file
-  Pvl *label = new Pvl(ui.GetFilename("FROM"));
+  Pvl *label = new Pvl(ui.GetFileName("FROM"));
   PvlObject *pvl = label;
   string option = ui.GetString("OPTION");
 
@@ -22,13 +22,13 @@ void IsisMain() {
   Cube *cube = NULL;
   if(label->HasObject("IsisCube")) {
     cube = new Cube();
-    cube->open(ui.GetFilename("FROM"), "rw");
+    cube->open(ui.GetFileName("FROM"), "rw");
     pvl = &(cube->getLabel()->FindObject("IsisCube"));
   }
 
   // Add Template File
   if(option == "ADDTEMP") {
-    string tempfile = ui.GetFilename("TEMPFILE");
+    string tempfile = ui.GetFileName("TEMPFILE");
     Pvl tempobj(tempfile);
     for(int i = 0; i < tempobj.Groups(); ++i) {
       pvl->AddGroup(tempobj.Group(i));
@@ -102,7 +102,7 @@ void IsisMain() {
     cube = NULL;
   }
   else {
-    label->Write(ui.GetFilename("FROM"));
+    label->Write(ui.GetFileName("FROM"));
   }
 
   delete label;

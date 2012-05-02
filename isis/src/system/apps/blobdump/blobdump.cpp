@@ -6,7 +6,7 @@
 
 #include "Blob.h"
 #include "Table.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 #include <sstream>
 
@@ -26,12 +26,12 @@ map <string, void *> GuiHelpers() {
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  Filename file = ui.GetFilename("FROM");
+  FileName file = ui.GetFileName("FROM");
   string blobname = ui.GetString("NAME");
   string blobtype = ui.GetString("TYPE");
-  Blob blob(blobname, blobtype, file.Expanded());
-  Filename outfname = ui.GetFilename("TO");
-  blob.Write(outfname.Expanded());
+  Blob blob(blobname, blobtype, file.expanded());
+  FileName outfname = ui.GetFileName("TO");
+  blob.Write(outfname.expanded());
 }
 
 // Function to find the available blob names/types and put them into the GUI
@@ -40,8 +40,8 @@ void helperButtonGetBlobList() {
   bool match = false;
 
   UserInterface &ui = Application::GetUserInterface();
-  string currentFile = ui.GetFilename("FROM");
-  const Pvl label(Filename(currentFile).Expanded());
+  string currentFile = ui.GetFileName("FROM");
+  const Pvl label(FileName(currentFile).expanded());
 
   // Check to see if the "FILE" parameter has changed since last press
   if(currentFile != previousFile) {

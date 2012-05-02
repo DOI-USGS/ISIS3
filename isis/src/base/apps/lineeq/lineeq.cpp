@@ -50,9 +50,9 @@ void IsisMain() {
 
   TextFile *csvOutput = NULL;
   if(ui.GetBoolean("AVERAGES")) {
-    csvOutput = new TextFile(ui.GetFilename("CSV"), "overwrite", "");
+    csvOutput = new TextFile(ui.GetFileName("CSV"), "overwrite", "");
     csvOutput->PutLine("Average,SmoothedAvg");
-    data += PvlKeyword("CsvFile", ui.GetFilename("CSV"));
+    data += PvlKeyword("CsvFile", ui.GetFileName("CSV"));
   }
 
   Application::Log(data);

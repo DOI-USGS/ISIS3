@@ -497,7 +497,7 @@ namespace Isis {
   }
 
 
-  QStringList MosaicSceneWidget::cubeFilenames() {
+  QStringList MosaicSceneWidget::cubeFileNames() {
     QStringList cubes;
 
     MosaicSceneItem *mosaicSceneItem;

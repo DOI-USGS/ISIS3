@@ -164,16 +164,16 @@ namespace Isis {
    * This gives the option to append to the cube
    *
    * @param cube
-   * @param avgFilename
-   * @param countFilename
+   * @param avgFileName
+   * @param countFileName
    */
   void ProcessGroundPolygons::AppendOutputCube(std::string &cube,
-      const std::string &avgFilename,
-      const std::string &countFilename) {
+      const std::string &avgFileName,
+      const std::string &countFileName) {
     /*We need a ground map for converting lat/long to line/sample  see Convert()*/
     Pvl pvl(cube);
     p_groundMap = new UniversalGroundMap(pvl);
-    ProcessPolygons::AppendOutputCube(avgFilename, countFilename);
+    ProcessPolygons::AppendOutputCube(avgFileName, countFileName);
 
   }
 
@@ -181,13 +181,13 @@ namespace Isis {
    * This method creates two cubes and creates a universal ground
    * map using the pvl information of the 'cube of interest'
    *
-   * @param avgFilename
-   * @param countFilename
+   * @param avgFileName
+   * @param countFileName
    * @param outAtts
    * @param cube
    */
-  void ProcessGroundPolygons::SetOutputCube(const std::string &avgFilename,
-      const std::string &countFilename,
+  void ProcessGroundPolygons::SetOutputCube(const std::string &avgFileName,
+      const std::string &countFileName,
       Isis::CubeAttributeOutput &outAtts,
       std::string &cube) {
     /*We need a ground map for converting lat/long to line/sample  see Convert()*/
@@ -201,8 +201,8 @@ namespace Isis {
     int nLines = this->InputCubes[0]->getLineCount();
     int nSamples = this->InputCubes[0]->getSampleCount();
 
-    this->Process::SetOutputCube(avgFilename, outAtts, nSamples, nLines, nBands);
-    this->Process::SetOutputCube(countFilename, outAtts, nSamples, nLines, nBands);
+    this->Process::SetOutputCube(avgFileName, outAtts, nSamples, nLines, nBands);
+    this->Process::SetOutputCube(countFileName, outAtts, nSamples, nLines, nBands);
 
     ClearInputCubes();
 
@@ -222,13 +222,13 @@ namespace Isis {
       std::string &cube) {
 
     std::string avgString =
-      Application::GetUserInterface().GetFilename(parameter);
+      Application::GetUserInterface().GetFileName(parameter);
     CubeAttributeOutput atts =
       Application::GetUserInterface().GetOutputAttribute(parameter);
 
-    Filename file(avgString);
-    std::string path = file.Path();
-    std::string filename = file.Basename();
+    FileName file(avgString);
+    std::string path = file.path();
+    std::string filename = file.baseName();
     std::string countString = path + "/" + filename + "-count-";
 
     SetOutputCube(avgString, countString, atts, cube);
@@ -246,13 +246,13 @@ namespace Isis {
       Isis::Pvl &map, int bands) {
 
     std::string avgString =
-      Application::GetUserInterface().GetFilename(parameter);
+      Application::GetUserInterface().GetFileName(parameter);
     CubeAttributeOutput atts =
       Application::GetUserInterface().GetOutputAttribute(parameter);
 
-    Filename file(avgString);
-    std::string path = file.Path();
-    std::string filename = file.Basename();
+    FileName file(avgString);
+    std::string path = file.path();
+    std::string filename = file.baseName();
     std::string countString = path + "/" + filename + "-count-";
 
     SetOutputCube(avgString, countString, atts, map, bands);
@@ -263,14 +263,14 @@ namespace Isis {
   /**
    *
    *
-   * @param avgFilename
-   * @param countFilename
+   * @param avgFileName
+   * @param countFileName
    * @param atts
    * @param map
    * @param bands
    */
-  void ProcessGroundPolygons::SetOutputCube(const std::string &avgFilename,
-      const std::string &countFilename,
+  void ProcessGroundPolygons::SetOutputCube(const std::string &avgFileName,
+      const std::string &countFileName,
       Isis::CubeAttributeOutput &atts,
       Isis::Pvl &map, int bands) {
     int samples, lines;
@@ -278,7 +278,7 @@ namespace Isis {
     Projection *proj = ProjectionFactory::CreateForCube(map, samples, lines,
                        false);
 
-    this->ProcessPolygons::SetOutputCube(avgFilename, countFilename, atts,
+    this->ProcessPolygons::SetOutputCube(avgFileName, countFileName, atts,
                                          samples, lines, bands);
 
     /*Write the pvl group to the cube files.*/

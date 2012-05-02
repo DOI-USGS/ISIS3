@@ -8,7 +8,7 @@
 #include "Cube.h"
 #include "Process.h"
 #include "PvlTranslationManager.h"
-#include "Filename.h"
+#include "FileName.h"
 
 namespace Isis {
   /**
@@ -27,7 +27,7 @@ namespace Isis {
    * @param label A pvl formatted label to be used to generate the serial number
    * @param def2filename If a serial number could not be found, try to return the filename
    *
-   * @return Calculated SerialNumber or Filename
+   * @return Calculated SerialNumber or FileName
   */
   std::string SerialNumber::Compose(Pvl &label, bool def2filename) {
 
@@ -40,9 +40,9 @@ namespace Isis {
       if(def2filename) {
         //  Try to return the filename if it exists in the label, otherwise use
         //  "Unknown" as a last resort.
-        std::string snTemp = label.Filename();
+        std::string snTemp = label.FileName();
         if(!snTemp.empty()) {
-          sn = Filename(snTemp).Name();
+          sn = FileName(snTemp).name();
         }
         else {
           sn = "Unknown";
@@ -62,7 +62,7 @@ namespace Isis {
    * @param cube An opened Isis cub
    * @param def2filename If a serial number could not be found, try to return the filename
    *
-   * @return Calculated SerialNumber or Filename
+   * @return Calculated SerialNumber or FileName
   */
   std::string SerialNumber::Compose(Cube &cube, bool def2filename) {
     return Compose(*cube.getLabel(), def2filename);
@@ -75,7 +75,7 @@ namespace Isis {
    * @param def2filename If a serial number could not be found, try to return the
    *                     filename
    *
-   * @return Calculated SerialNumber or Filename
+   * @return Calculated SerialNumber or FileName
   */
   std::string SerialNumber::Compose(const std::string &filename, bool def2filename) {
     Pvl p(filename);
@@ -122,13 +122,13 @@ namespace Isis {
     // If we don't succeed, create one
     if(translationIterator == missionTranslators.end()) {
       // Get the file
-      Filename snFile((std::string) dataDir[mission] + "/translations/" +
+      FileName snFile((std::string) dataDir[mission] + "/translations/" +
                                     instrument + "SerialNumber????.trn");
-      snFile.HighestVersion();
+      snFile = snFile.highestVersion();
 
       // use the translation file to generate keywords
       missionTranslators.insert(
-        std::pair<std::string, PvlTranslationManager>(key, PvlTranslationManager(snFile.Expanded()))
+        std::pair<std::string, PvlTranslationManager>(key, PvlTranslationManager(snFile.expanded()))
       );
 
       translationIterator = missionTranslators.find(key);
@@ -169,10 +169,10 @@ namespace Isis {
    * @param def2filename If a serial number could not be found, try to return the
    *                     filename
    *
-   * @return Calculated SerialNumber or Filename
+   * @return Calculated SerialNumber or FileName
   */
   std::string SerialNumber::ComposeObservation(const std::string &sn, SerialNumberList &list, bool def2filename) {
-    std::string filename = list.Filename(sn);
+    std::string filename = list.FileName(sn);
     return ObservationNumber::Compose(filename, def2filename);
   }
 }

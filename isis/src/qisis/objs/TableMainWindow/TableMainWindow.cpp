@@ -1,9 +1,13 @@
+#include "TableMainWindow.h"
+
+#include <iostream>
+
 #include <QStatusBar>
 #include <QDockWidget>
 #include <QMenuBar>
 #include <QSettings>
-#include <iostream>
-#include "TableMainWindow.h"
+
+#include "iString.h"
 
 namespace Isis {
   /**
@@ -512,9 +516,9 @@ namespace Isis {
     //Now read the settings that are specific to this window.
     std::string instanceName = this->windowTitle().toStdString();
 
-    Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
+    FileName config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
     //if(p_settings != 0) delete p_settings;
-    p_settings = new QSettings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
+    p_settings = new QSettings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
     bool docFloats = p_settings->value("docFloat", false).toBool();
     p_dock->setFloating(docFloats);
 
@@ -546,8 +550,8 @@ namespace Isis {
     //Now read the settings that are specific to this window.
     std::string instanceName = this->windowTitle().toStdString();
 
-    Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
+    FileName config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
+    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
 
     QString itemTitle = "item-" + item->text();
     Qt::CheckState state = (Qt::CheckState)settings.value(itemTitle, 0).toInt();
@@ -574,8 +578,8 @@ namespace Isis {
     /*Now read the settings that are specific to this window.*/
     std::string instanceName = this->windowTitle().toStdString();
 
-    Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
+    FileName config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
+    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
 
     settings.setValue("docFloat", p_dock->isFloating());
     settings.setValue("docPos", p_dock->pos());

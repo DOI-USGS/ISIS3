@@ -4,7 +4,7 @@
 #include "PvlKeyword.h"
 #include "PvlGroup.h"
 #include "PvlObject.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Constants.h"
 #include "PvlFormatPds.h"
@@ -20,9 +20,8 @@ int main() {
 
     // Create a temp file for the keyword to type map
     {
-      Isis::Filename fname;
-      fname.Temporary("tempPvlFormatPDSunitTest_", "map");
-      std::string pdsFile = fname.Expanded();
+      Isis::FileName fname = Isis::FileName::createTempFile("tempPvlFormatPDSunitTest_.tmp");
+      std::string pdsFile = fname.expanded();
 
       ofstream out;
       out.open(pdsFile.c_str(), std::ios::out);

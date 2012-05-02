@@ -1,7 +1,7 @@
 #include "ObservationNumberList.h"
 #include "IException.h"
 #include "FileList.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "SerialNumberList.h"
 #include "iString.h"
 #include "Pvl.h"
@@ -201,13 +201,13 @@ namespace Isis {
    *         the input filename
    */
   std::string ObservationNumberList::ObservationNumber(const std::string &filename) {
-    if(p_fileMap.find(Isis::Filename(filename).Expanded()) == p_fileMap.end()) {
+    if(p_fileMap.find(Isis::FileName(filename).expanded()) == p_fileMap.end()) {
       std::string msg = "Requested filename [" +
-                        Isis::Filename(filename).Expanded() + "]";
+                        Isis::FileName(filename).expanded() + "]";
       msg += "does not exist in the list";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    int index = FilenameIndex(filename);
+    int index = FileNameIndex(filename);
     return p_pairs[index].observationNumber;
   }
 
@@ -237,7 +237,7 @@ namespace Isis {
    * @return vector<std::string> The list of possible filenames
    *         matching the input observation number
    */
-  std::vector<std::string> ObservationNumberList::PossibleFilenames(const std::string &on) {
+  std::vector<std::string> ObservationNumberList::PossibleFileNames(const std::string &on) {
     std::vector<std::string> filenames;
     for(unsigned index = 0; index < p_pairs.size(); index++) {
       if(p_pairs[index].observationNumber == on) {

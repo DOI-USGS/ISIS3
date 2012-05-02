@@ -26,7 +26,7 @@
 #include <cmath>
 
 #include "MdisCalUtils.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "CSVReader.h"
 #include "tnt_array1d.h"
 #include "tnt_array1d_utils.h"
@@ -82,18 +82,18 @@ namespace Isis {
 
       std::string loadCoefficients(bool isNac, bool isFpuBinned) {
         std::string filename = "$messenger/calibration/DARK_MODEL/MDIS";
-        // Filename consists of binned/notbinned, camera, and filter
+        // FileName consists of binned/notbinned, camera, and filter
         filename += (isNac) ? "NAC" : "WAC";
         filename += (isFpuBinned) ? "_BINNED_" : "_NOTBIN_";
         filename += "DARKMODEL_?.TAB";
 
-        Filename finalName(filename);
-        finalName.HighestVersion();
-        filename = finalName.OriginalPath() + "/" + finalName.Name();
+        FileName finalName(filename);
+        finalName = finalName.highestVersion();
+        filename = finalName.originalPath() + "/" + finalName.name();
         _filename = filename;
 
         //  Open the CSV file
-        CSVReader csv(finalName.Expanded());
+        CSVReader csv(finalName.expanded());
         DVector coefs(8);
         double ccdTempSqrd = _ccdTemp * _ccdTemp;
         double ccdTempCubed = ccdTempSqrd * _ccdTemp;
@@ -116,7 +116,7 @@ namespace Isis {
         return (filename);
       }
 
-      std::string getFilename() const {
+      std::string getFileName() const {
         return (_filename);
       }
 

@@ -2,7 +2,7 @@
 #include <iomanip>
 #include <cmath>
 #include "SpiceRotation.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Preference.h"
 #include "Table.h"
 
@@ -16,8 +16,8 @@ int main(int argc, char *argv[]) {
   cout << setprecision(8);
   cout << "Unit test for SpiceRotation" << endl;
 
-  Isis::Filename f("$base/testData/kernels");
-  string dir = f.Expanded() + "/";
+  Isis::FileName f("$base/testData/kernels");
+  string dir = f.expanded() + "/";
   string naif(dir + "naif0007.tls");
   string mgs(dir + "MGS_SCLKSCET.00045.tsc");
   string mocti(dir + "moc13.ti");

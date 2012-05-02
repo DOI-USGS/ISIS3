@@ -53,7 +53,7 @@ void IsisMain() {
   Pvl pdsLab;
 
   UserInterface &ui = Application::GetUserInterface();
-  string fromFile = ui.GetFilename("FROM");
+  string fromFile = ui.GetFileName("FROM");
 
   flip = false;//ui.GetBoolean("FLIP");
 
@@ -161,7 +161,7 @@ void IsisMain() {
     }
   }
 
-  Filename baseFilename(ui.GetFilename("TO"));
+  FileName baseFileName(ui.GetFileName("TO"));
 
   if(uveven && uvodd) {
     // padding[1] is max padding for UV
@@ -173,13 +173,13 @@ void IsisMain() {
     uveven->setDimensions(numSamples, numLines, numBands);
     uveven->setPixelType(Isis::Real);
 
-    string filename = baseFilename.Path() + "/" + baseFilename.Basename() + ".uv.even.cub";
+    string filename = baseFileName.path() + "/" + baseFileName.baseName() + ".uv.even.cub";
     uveven->create(filename);
 
     uvodd->setDimensions(numSamples, numLines, numBands);
     uvodd->setPixelType(Isis::Real);
 
-    filename = baseFilename.Path() + "/" + baseFilename.Basename() + ".uv.odd.cub";
+    filename = baseFileName.path() + "/" + baseFileName.baseName() + ".uv.odd.cub";
     uvodd->create(filename);
   }
 
@@ -192,13 +192,13 @@ void IsisMain() {
     viseven->setDimensions(numSamples, numLines, numBands);
     viseven->setPixelType(Isis::Real);
 
-    string filename = baseFilename.Path() + "/" + baseFilename.Basename() + ".vis.even.cub";
+    string filename = baseFileName.path() + "/" + baseFileName.baseName() + ".vis.even.cub";
     viseven->create(filename);
 
     visodd->setDimensions(numSamples, numLines, numBands);
     visodd->setPixelType(Isis::Real);
 
-    filename = baseFilename.Path() + "/" + baseFilename.Basename() + ".vis.odd.cub";
+    filename = baseFileName.path() + "/" + baseFileName.baseName() + ".vis.odd.cub";
     visodd->create(filename);
   }
 
@@ -461,8 +461,8 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
   iString transDir = (string) dataDir["Lro"] + "/translations/";
 
   // Translate the in
-  Filename transFile(transDir + "lrowacInstrument.trn");
-  PvlTranslationManager instrumentXlater(pdsLab, transFile.Expanded());
+  FileName transFile(transDir + "lrowacInstrument.trn");
+  PvlTranslationManager instrumentXlater(pdsLab, transFile.expanded());
   instrumentXlater.Auto(isis3VisEven);
   instrumentXlater.Auto(isis3VisOdd);
   instrumentXlater.Auto(isis3UvEven);
@@ -470,7 +470,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
 
   // Translate the Archive group
   transFile = transDir + "lrowacArchive.trn";
-  PvlTranslationManager archiveXlater(pdsLab, transFile.Expanded());
+  PvlTranslationManager archiveXlater(pdsLab, transFile.expanded());
 
   archiveXlater.Auto(isis3VisEven);
   archiveXlater.Auto(isis3VisOdd);

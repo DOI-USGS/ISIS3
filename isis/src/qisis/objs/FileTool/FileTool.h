@@ -112,7 +112,7 @@ namespace Isis {
       void saveAsFullImage(Cube *icube, Cube *ocube); 
       
       //! Copy input cube details into output file given its dimensions
-      void copyCubeDetails(const QString & psFilename, Cube *icube, 
+      void copyCubeDetails(const QString & psFileName, Cube *icube, 
            Cube *ocube, int piNumSamples, int piNumLines, int piNumBands);
       
       //! Save image AsIs (As viewed in the viewport window) into output file

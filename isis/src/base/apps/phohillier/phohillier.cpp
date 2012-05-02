@@ -33,7 +33,7 @@ void IsisMain() {
   // Set up the user interface
   UserInterface &ui = Application::GetUserInterface();
   // Get the name of the parameter file
-  Pvl par(ui.GetFilename("PHOPAR"));
+  Pvl par(ui.GetFileName("PHOPAR"));
   auto_ptr<Hillier> photom = auto_ptr<Hillier> (new Hillier(par,  *icube));
   pho = photom.get();
 

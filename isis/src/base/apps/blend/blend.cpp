@@ -9,7 +9,7 @@
 #include "Chip.h"
 #include "Cube.h"
 #include "FileList.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "OverlapStatistics.h"
 #include "ProcessByLine.h"
 #include "UserInterface.h"
@@ -129,7 +129,7 @@ void IsisMain() {
   // Get the user interface
   UserInterface &ui = Application::GetUserInterface();
 
-  FileList inputs(ui.GetFilename("FROMLIST"));
+  FileList inputs(ui.GetFileName("FROMLIST"));
   if (inputs.size() < 2) {
     string msg = "FROMLIST must have at least two images to blend";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -137,14 +137,14 @@ void IsisMain() {
 
   FileList outputs;
   ui.WasEntered("TOLIST") ?
-      readOutputs(ui.GetFilename("TOLIST"), inputs, outputs) :
+      readOutputs(ui.GetFileName("TOLIST"), inputs, outputs) :
       generateOutputs(inputs, outputs);
 
   for (unsigned int i = 0; i < inputs.size(); i++) {
-    Filename inputFilename(inputs[i]);
-    Filename outputFilename(outputs[i]);
-    QString input(inputFilename.Expanded());
-    QString output(outputFilename.Expanded());
+    FileName inputFileName(inputs[i]);
+    FileName outputFileName(outputs[i]);
+    QString input(inputFileName.expanded());
+    QString output(outputFileName.expanded());
 
     QFile::remove(output);
     if (!QFile::copy(input, output)) {
@@ -415,9 +415,9 @@ void readOutputs(string outName, const FileList &inputs, FileList &outputs) {
 
 void generateOutputs(const FileList &inputs, FileList &outputs) {
   for (unsigned int i = 0; i < inputs.size(); i++) {
-    Filename file(inputs[i]);
-    iString filename = file.Path() + "/" + file.Basename() +
-      ".blend." + file.Extension();
+    FileName file(inputs[i]);
+    iString filename = file.path() + "/" + file.baseName() +
+      ".blend." + file.extension();
     outputs.push_back(filename);
   }
 }

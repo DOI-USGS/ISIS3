@@ -4,7 +4,7 @@
 
 #include "IException.h"
 #include "FileList.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 
 namespace Isis {
@@ -13,10 +13,10 @@ namespace Isis {
    *
    * @param psListFile The file withe list of control point ids'
    */
-  ControlPointList::ControlPointList(const Filename &psListFile) {
+  ControlPointList::ControlPointList(const FileName &psListFile) {
     try {
       QList<QString> qList;
-      FileList list(psListFile.Expanded());
+      FileList list(psListFile.expanded());
       int size = (int)list.size();
       for(int i = 0; i < size; i++) {
         qList.insert(i, QString(list[i].c_str()));
@@ -29,7 +29,7 @@ namespace Isis {
     }
     catch(IException &e) {
       std::string msg = "Can't open or invalid file list [" +
-          psListFile.Expanded() + "]";
+          psListFile.expanded() + "]";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
   }

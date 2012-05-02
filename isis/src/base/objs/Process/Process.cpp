@@ -27,7 +27,7 @@
 
 #include "SessionLog.h"
 #include "Process.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Message.h"
 #include "IException.h"
 #include "iString.h"
@@ -242,7 +242,7 @@ namespace Isis {
    */
   Isis::Cube *Process::SetInputCube(const std::string &parameter,
                                     const int requirements) {
-    string fname = Application::GetUserInterface().GetFilename(parameter);
+    string fname = Application::GetUserInterface().GetFileName(parameter);
     Isis::CubeAttributeInput &att = Application::GetUserInterface().GetInputAttribute(parameter);
     return SetInputCube(fname, att, requirements);
   }
@@ -309,7 +309,7 @@ namespace Isis {
       throw IException(IException::Programmer, message.str(), _FILEINFO_);
     }
 
-    string fname = Application::GetUserInterface().GetFilename(parameter);
+    string fname = Application::GetUserInterface().GetFileName(parameter);
     Isis::CubeAttributeOutput &atts = Application::GetUserInterface().GetOutputAttribute(parameter);
     return SetOutputCube(fname, atts, ns, nl, nb);
   }
@@ -660,7 +660,7 @@ namespace Isis {
    * @param highestVersion If set to true the method will return the highest
    *                       version number of the given file. Therefore, file must
    *                       contain question marks such as "file???.dat". See the
-   *                       Filename class for more information on versioned
+   *                       FileName class for more information on versioned
    *                       files. Defaults to false.
    */
   string Process::MissionData(const std::string &mission, const std::string &file,
@@ -669,16 +669,16 @@ namespace Isis {
     string dir = dataDir[mission];
 
     // See if the data directory is installed
-    Isis::Filename installed(dir);
-    if(!installed.Exists()) {
+    Isis::FileName installed(dir);
+    if(!installed.fileExists()) {
       string message = "Data directory for mission [" + mission + "] " +
                        "is not installed at your site";
       throw IException(IException::Io, message, _FILEINFO_);
     }
 
-    Isis::Filename expanded(dir + "/" + file);
-    if(highestVersion) expanded.HighestVersion();
-    return expanded.Expanded();
+    Isis::FileName expanded(dir + "/" + file);
+    if(highestVersion) expanded = expanded.highestVersion();
+    return expanded.expanded();
   }
 
   /**

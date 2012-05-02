@@ -16,7 +16,7 @@ void IsisMain() {
   //Get user parameters
   UserInterface &ui = Application::GetUserInterface();
   FileList cubes;
-  cubes.Read(ui.GetFilename("FROMLIST"));
+  cubes.Read(ui.GetFileName("FROMLIST"));
 
   int hns = ui.GetInteger("HNS");
   int hnl = ui.GetInteger("HNL");
@@ -25,7 +25,7 @@ void IsisMain() {
   string match = ui.GetAsString("MATCHBANDBIN");
 
   //Sets upt the pathName to be used for most application calls
-  Filename inFile = Isis::Filename(cubes[0]);
+  FileName inFile = Isis::FileName(cubes[0]);
 
   Pvl &pref = Preference::Preferences();
   string pathName = (string)pref.FindGroup("DataDirectory")["Temporary"] + "/";
@@ -35,7 +35,7 @@ void IsisMain() {
    * so that the failure MATCHBANDBIN causes does not leave
    * highpasses cubes lying around!
   */
-  string parameters = "FROMLIST=" + ui.GetFilename("FROMLIST") +
+  string parameters = "FROMLIST=" + ui.GetFileName("FROMLIST") +
                       " MOSAIC=" + pathName + "OriginalMosaic.cub" +
                       " MATCHBANDBIN=" + match;
   ProgramLauncher::RunIsisProgram("automos", parameters);
@@ -44,9 +44,9 @@ void IsisMain() {
   std::ofstream highPassList;
   highPassList.open("HighPassList.lis");
   for(unsigned i = 0; i < cubes.size(); i++) {
-    inFile = Isis::Filename(cubes[i]);
-    string outParam = pathName + inFile.Basename() + "_highpass.cub";
-    parameters = "FROM=" + inFile.Expanded() +
+    inFile = Isis::FileName(cubes[i]);
+    string outParam = pathName + inFile.baseName() + "_highpass.cub";
+    parameters = "FROM=" + inFile.expanded() +
                  " TO=" + outParam
                  + " SAMPLES=" + iString(hns) + " LINES=" + iString(hnl);
     ProgramLauncher::RunIsisProgram("highpass", parameters);
@@ -69,7 +69,7 @@ void IsisMain() {
   //Finally combines the highpass and lowpass mosaics
   parameters = "FROM=" + pathName + "HighpassMosaic.cub" +
                " FROM2=" + pathName + "LowpassMosaic.cub" +
-               " TO=" + ui.GetFilename("TO") +
+               " TO=" + ui.GetFileName("TO") +
                " OPERATOR= add";
   ProgramLauncher::RunIsisProgram("algebra", parameters);
 
@@ -85,8 +85,8 @@ void IsisMain() {
     remove(file.c_str());
 
     for(unsigned i = 0; i < cubes.size(); i++) {
-      inFile = Isis::Filename(cubes[i]);
-      file = pathName + inFile.Basename() + "_highpass.cub";
+      inFile = Isis::FileName(cubes[i]);
+      file = pathName + inFile.baseName() + "_highpass.cub";
       remove(file.c_str());
     }
   }

@@ -23,7 +23,7 @@
 #include <cmath>
 
 #include "Endian.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "PixelType.h"
@@ -220,8 +220,8 @@ namespace Isis {
       else {
         sImageFile += ".img";
       }
-      Filename outFile(sImageFile);
-      mainPvl += PvlKeyword("^IMAGE", outFile.Name());
+      FileName outFile(sImageFile);
+      mainPvl += PvlKeyword("^IMAGE", outFile.name());
     }
     else {
       mainPvl += PvlKeyword("^IMAGE", "???????", "BYTES");
@@ -250,15 +250,15 @@ namespace Isis {
       string msg = "Labels must be detached for JP2 files";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    Filename outFile(sImageFile);
+    FileName outFile(sImageFile);
     PvlObject cmpObj("COMPRESSED_FILE");
-    cmpObj += PvlKeyword("FILE_NAME", outFile.Name());
+    cmpObj += PvlKeyword("FILE_NAME", outFile.name());
     cmpObj += PvlKeyword("RECORD_TYPE", "UNDEFINED");
     cmpObj += PvlKeyword("ENCODING_TYPE", "JP2");
     cmpObj += PvlKeyword("ENCODING_TYPE_VERSION_NAME", "ISO/IEC15444-1:2004");
     cmpObj += PvlKeyword("INTERCHANGE_FORMAT", "BINARY");
-    Filename infilename(InputCubes[0]->getFilename());
-    cmpObj += PvlKeyword("UNCOMPRESSED_FILE_NAME", infilename.Name());
+    FileName infilename(InputCubes[0]->getFileName());
+    cmpObj += PvlKeyword("UNCOMPRESSED_FILE_NAME", infilename.name());
     int storagebytes = InputCubes[0]->getSampleCount() * InputCubes[0]->getLineCount();
     if(p_pixelType == Isis::Real) {
       string msg = "JPEG2000 does not support floating point data";
@@ -270,7 +270,7 @@ namespace Isis {
     cmpObj += PvlKeyword("REQUIRED_STORAGE_BYTES", storagebytes);
     mainPvl.AddObject(cmpObj);
     PvlObject ucmpObj("UNCOMPRESSED_FILE");
-    ucmpObj += PvlKeyword("FILE_NAME", infilename.Name());
+    ucmpObj += PvlKeyword("FILE_NAME", infilename.name());
     ucmpObj += PvlKeyword("RECORD_TYPE", "FIXED_LENGTH");
     int recordbytes = InputCubes[0]->getSampleCount();
     if(p_pixelType == Isis::UnsignedWord || p_pixelType == Isis::SignedWord) {
@@ -278,7 +278,7 @@ namespace Isis {
     }
     ucmpObj += PvlKeyword("RECORD_BYTES", recordbytes);
     ucmpObj += PvlKeyword("FILE_RECORDS", InputCubes[0]->getLineCount());
-    ucmpObj += PvlKeyword("^IMAGE", infilename.Name());
+    ucmpObj += PvlKeyword("^IMAGE", infilename.name());
     mainPvl.AddObject(ucmpObj);
   }
 
@@ -304,8 +304,8 @@ namespace Isis {
       else {
         sImageFile += ".img";
       }
-      Filename outFile(sImageFile);
-      mainPvl += PvlKeyword("^IMAGE", outFile.Name());
+      FileName outFile(sImageFile);
+      mainPvl += PvlKeyword("^IMAGE", outFile.name());
     }
     else {
       mainPvl += PvlKeyword("^IMAGE", "???");
@@ -334,15 +334,15 @@ namespace Isis {
       string msg = "Labels must be detached for JP2 files";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    Filename outFile(sImageFile);
+    FileName outFile(sImageFile);
     PvlObject cmpObj("COMPRESSED_FILE");
-    cmpObj += PvlKeyword("FILE_NAME", outFile.Name());
+    cmpObj += PvlKeyword("FILE_NAME", outFile.name());
     cmpObj += PvlKeyword("RECORD_TYPE", "UNDEFINED");
     cmpObj += PvlKeyword("ENCODING_TYPE", "JP2");
     cmpObj += PvlKeyword("ENCODING_TYPE_VERSION_NAME", "ISO/IEC15444-1:2004");
     cmpObj += PvlKeyword("INTERCHANGE_FORMAT", "BINARY");
-    Filename infilename(InputCubes[0]->getFilename());
-    cmpObj += PvlKeyword("UNCOMPRESSED_FILE_NAME", infilename.Name());
+    FileName infilename(InputCubes[0]->getFileName());
+    cmpObj += PvlKeyword("UNCOMPRESSED_FILE_NAME", infilename.name());
     int storagebytes = InputCubes[0]->getSampleCount() * InputCubes[0]->getLineCount();
     if(p_pixelType == Isis::Real) {
       string msg = "JPEG2000 does not support floating point data";
@@ -354,7 +354,7 @@ namespace Isis {
     cmpObj += PvlKeyword("REQUIRED_STORAGE_BYTES", storagebytes);
     mainPvl.AddObject(cmpObj);
     PvlObject ucmpObj("UNCOMPRESSED_FILE");
-    ucmpObj += PvlKeyword("FILE_NAME", infilename.Name());
+    ucmpObj += PvlKeyword("FILE_NAME", infilename.name());
     ucmpObj += PvlKeyword("RECORD_TYPE", "FIXED_LENGTH");
     int recordbytes = InputCubes[0]->getSampleCount();
     if(p_pixelType == Isis::UnsignedWord || p_pixelType == Isis::SignedWord) {
@@ -362,7 +362,7 @@ namespace Isis {
     }
     ucmpObj += PvlKeyword("RECORD_BYTES", recordbytes);
     ucmpObj += PvlKeyword("FILE_RECORDS", InputCubes[0]->getLineCount());
-    ucmpObj += PvlKeyword("^IMAGE", infilename.Name());
+    ucmpObj += PvlKeyword("^IMAGE", infilename.name());
     mainPvl.AddObject(ucmpObj);
   }
 
@@ -379,9 +379,9 @@ namespace Isis {
     // Build up an IMAGE object:
     // Auto translate standard keywords for the IMAGE object
     Pvl *inputLabel = InputCubes[0]->getLabel();
-    Filename transfile;
+    FileName transfile;
     transfile = "$base/translations/pdsExportImageImage.trn";
-    PvlTranslationManager Xlator(*inputLabel, transfile.Expanded());
+    PvlTranslationManager Xlator(*inputLabel, transfile.expanded());
     Xlator.Auto(mainPvl);
 
     // Calculate the core base/mult for this cube
@@ -521,9 +521,9 @@ namespace Isis {
     // Build up a JP2 IMAGE object:
     // Auto translate standard keywords for the IMAGE object
     Pvl *inputLabel = InputCubes[0]->getLabel();
-    Filename transfile;
+    FileName transfile;
     transfile = "$base/translations/pdsExportImageJP2.trn";
-    PvlTranslationManager Xlator(*inputLabel, transfile.Expanded());
+    PvlTranslationManager Xlator(*inputLabel, transfile.expanded());
     Xlator.Auto(mainPvl);
 
     // Calculate the core base/mult for this cube

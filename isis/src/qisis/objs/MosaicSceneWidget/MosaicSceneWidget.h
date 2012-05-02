@@ -113,7 +113,7 @@ namespace Isis {
       void preloadFromPvl(const PvlObject &);
 
       QRectF cubesBoundingRect() const;
-      QStringList cubeFilenames();
+      QStringList cubeFileNames();
       QList<CubeDisplayProperties *> cubeDisplays();
 
       QList<QAction *> getExportActions();

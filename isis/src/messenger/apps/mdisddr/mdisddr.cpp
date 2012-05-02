@@ -7,7 +7,7 @@
 
 #include "UserInterface.h"
 #include "Progress.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "ProcessExportPds.h"
 #include "Cube.h"
@@ -108,7 +108,7 @@ void IsisMain() {
   const std::string dataSetID = "MESS-E/V/H-MDIS-6-DDR-GEOMDATA-V1.0";
 
   UserInterface &ui = Application::GetUserInterface();
-  Filename input(ui.GetFilename("FROM"));
+  FileName input(ui.GetFileName("FROM"));
   string to("");
   bool toEntered = ui.WasEntered("TO");
   if(toEntered) {
@@ -124,9 +124,9 @@ void IsisMain() {
   }
 
   //  Generate the image cube that phocube produces for the DDR data
-  Filename phoFile(input.Basename() + "_phocube", "cub");
-  string pfile = phoFile.Expanded();
-  string parameters = "FROM=" + input.Expanded() + " TO=" + pfile +
+  FileName phoFile = FileName::createTempFile("$TEMPORARY/" + input.baseName() + "_phocube.cub");
+  string pfile = phoFile.expanded();
+  string parameters = "FROM=" + input.expanded() + " TO=" + pfile +
                       " LATITUDE=TRUE LONGITUDE=TRUE PHASE=TRUE EMISSION=TRUE INCIDENCE=TRUE";
   ProgramLauncher::RunIsisProgram("phocube", parameters);
 
@@ -187,7 +187,7 @@ void IsisMain() {
     // cube as the phocube output goes into the specification of the
     // output PDS file (required for 5 band IMAGE object).
     Cube from;
-    from.open(input.Expanded());
+    from.open(input.expanded());
     OriginalLabel origBlob;
     from.read(origBlob);
     Pvl origLabel;
@@ -213,7 +213,7 @@ void IsisMain() {
     // Fixes bad keywords
     PvlKeyword &data_set_id = pdsLabel.FindKeyword("DATA_SET_ID", Pvl::Traverse);
     data_set_id.SetValue(dataSetID);
-    string prodid(input.Basename());
+    string prodid(input.baseName());
     PvlKeyword &product_id = pdsLabel.FindKeyword("PRODUCT_ID", Pvl::Traverse);
     if((product_id.Size() == 0) || ((product_id.Size() > 0) && (product_id[0] == "N/A"))) {
       product_id.SetValue(prodid);
@@ -232,9 +232,9 @@ void IsisMain() {
 
     // Now we have enough to establish output file name
     if(!toEntered) to = opath + "/" + prodid;
-    Filename output(to);
-    output.AddExtension("IMG");
-    if(!toEntered) ui.PutFilename("TO", output.Expanded());
+    FileName output(to);
+    output = output.addExtension("IMG");
+    if(!toEntered) ui.PutFileName("TO", output.expanded());
 
     PvlKeyword &product_creation_time = pdsLabel.FindKeyword("PRODUCT_CREATION_TIME", Pvl::Traverse);
     product_creation_time.SetValue(mdisddr_runtime);
@@ -268,8 +268,8 @@ void IsisMain() {
     PvlKeyword &source_product_id = pdsLabel.FindKeyword("SOURCE_PRODUCT_ID", Pvl::Traverse);
     source_product_id.Clear();
     for(unsigned int i = 0; i < kfiles.size(); i++) {
-      Filename kfile(kfiles[i]);
-      source_product_id.AddValue(Quote(kfile.Name()));
+      FileName kfile(kfiles[i]);
+      source_product_id.AddValue(Quote(kfile.name()));
     }
 
     //  Enforce parentheses for scalars
@@ -325,7 +325,7 @@ void IsisMain() {
 
     // All done...write result.
     pdsLabel.SetFormatTemplate("$messenger/templates/labels/mdisPdsDDR.pft");
-    string ofile(output.Expanded());
+    string ofile(output.expanded());
     ofstream outstream(ofile.c_str());
     processPds.OutputLabel(outstream);
 

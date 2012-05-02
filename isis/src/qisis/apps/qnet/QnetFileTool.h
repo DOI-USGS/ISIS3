@@ -83,7 +83,7 @@ namespace Isis {
     public:
       QnetFileTool(QWidget *parent);
       ~QnetFileTool();
-      QString cNetFilename;
+      QString cNetFileName;
 
     signals:
       void serialNumberListUpdated();
@@ -102,7 +102,7 @@ namespace Isis {
       void setSaveNet();
 
     private:
-      QString p_cnetFilename;
+      QString p_cnetFileName;
       bool p_saveNet;
       QAction *p_openGround;
       QAction *p_openDem;

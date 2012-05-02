@@ -22,7 +22,7 @@
 
 #include "Camera.h"
 #include "CameraFactory.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iTime.h"
 #include "MdisCamera.h"
@@ -49,7 +49,7 @@ int main(void) {
     //Pvl p("$mgs/testData/lub0428b.cub");
     Pvl p("$messenger/testData/EW0089570936I.cub");
     MdisCamera *cam = (MdisCamera *) CameraFactory::Create(p);
-    cout << "Filename: " << Filename(p.Filename()).Name() << endl;
+    cout << "FileName: " << FileName(p.FileName()).name() << endl;
     cout << "CK Frame: " << cam->InstrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);

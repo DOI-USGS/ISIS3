@@ -38,7 +38,7 @@ void IsisMain() {
   string spacing = ui.GetString("SPACING");
   if (spacing == "METER") {
     Pvl userMap;
-    userMap.Read(ui.GetFilename("MAP"));
+    userMap.Read(ui.GetFileName("MAP"));
     PvlGroup &mapGroup = userMap.FindGroup("Mapping", Pvl::Traverse);
 
     // Construct a Projection for converting between Lon/Lat and X/Y
@@ -250,7 +250,7 @@ void IsisMain() {
   results += PvlKeyword("NumberControlPoints", cnet.GetNumPoints());
   Application::Log(results);
 
-  cnet.Write(ui.GetFilename("ONET"));
+  cnet.Write(ui.GetFileName("ONET"));
 }
 
 
@@ -308,7 +308,7 @@ void printMap() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFilename("MAP"));
+  userMap.Read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log

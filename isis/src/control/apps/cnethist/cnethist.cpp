@@ -31,7 +31,7 @@ void IsisMain() {
 
   //iString filename = ui.GetFilename("FROM");
 
-  FileList fList(ui.GetFilename("NETLIST")); //empty FileList
+  FileList fList(ui.GetFileName("NETLIST")); //empty FileList
 
   HistogramPlotWindow *plot=NULL;
 
@@ -79,7 +79,7 @@ void IsisMain() {
       string msg = "The [TO] parameter must be entered";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    string outfile = ui.GetFilename("TO");     
+    string outfile = ui.GetFileName("TO");     
     fout.open(outfile.c_str());
   }
 
@@ -143,7 +143,7 @@ void IsisMain() {
       CubePlotCurve *histCurve = new CubePlotCurve(CubePlotCurve::CubeDN,
                                                 CubePlotCurve::Percentage);
       histCurve->setColor(curveColor(i));
-      iString baseName = Filename(fList[i]).Basename();
+      iString baseName = FileName(fList[i]).baseName();
       histCurve->setTitle(baseName);
 
  

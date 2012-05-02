@@ -17,7 +17,7 @@
 #include "ControlNet.h"
 #include "Cube.h"
 #include "CubeDisplayProperties.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "MosaicFileListWidget.h"
 #include "MosaicSceneWidget.h"
@@ -185,7 +185,7 @@ namespace Isis {
    *
    * This method is always called from the GUI thread.
    */
-  MosaicController::FilenameToDisplayFunctor::FilenameToDisplayFunctor(
+  MosaicController::FileNameToDisplayFunctor::FileNameToDisplayFunctor(
       QMutex *cameraMutex, QThread *targetThread, bool openFilled,
       int defaultAlpha) {
     m_mutex = cameraMutex;
@@ -202,11 +202,11 @@ namespace Isis {
    *
    * This method is never called from the GUI thread.
    */
-  CubeDisplayProperties *MosaicController::FilenameToDisplayFunctor::operator()(
+  CubeDisplayProperties *MosaicController::FileNameToDisplayFunctor::operator()(
       const QString &filename) {
     try {
       CubeDisplayProperties *prop = new CubeDisplayProperties(
-          QString(Filename(filename.toStdString()).Expanded().c_str()),
+          QString(FileName(filename.toStdString()).expanded().c_str()),
           m_mutex);
       prop->setShowFill(m_openFilled);
 
@@ -248,7 +248,7 @@ namespace Isis {
       const PvlObject &projectCube) {
     try {
       CubeDisplayProperties *prop = new CubeDisplayProperties(
-          (QString)projectCube["Filename"][0],
+          (QString)projectCube["FileName"][0],
           m_mutex);
       prop->fromPvl(projectCube);
       prop->moveToThread(m_targetThread);
@@ -286,7 +286,7 @@ namespace Isis {
 
         QFuture< CubeDisplayProperties * > displays = QtConcurrent::mapped(
             cubeNames,
-            FilenameToDisplayFunctor(m_mutex, QThread::currentThread(),
+            FileNameToDisplayFunctor(m_mutex, QThread::currentThread(),
               m_openFilled, m_defaultAlpha));
 
         if(m_maxThreads > 1)

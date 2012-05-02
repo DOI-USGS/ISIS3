@@ -35,7 +35,7 @@
 #include "CameraSkyMap.h"
 #include "iString.h"
 #include "iTime.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "NaifStatus.h"
 #include "Pvl.h"
 #include "ReseauDistortionMap.h"
@@ -103,8 +103,8 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    const string fname = Filename("$mariner10/reseaus/mar10" + cam
-                                  + "MasterReseaus.pvl").Expanded();
+    const string fname = FileName("$mariner10/reseaus/mar10" + cam
+                                  + "MasterReseaus.pvl").expanded();
 
     try {
       new ReseauDistortionMap(this, lab, fname);

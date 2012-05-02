@@ -73,7 +73,7 @@ void IsisMain() {
 //  Open the shift definitions file
   Pvl shiftdef;
   if(ui.WasEntered("SHIFTDEF")) {
-    shiftdef.Read(ui.GetFilename("SHIFTDEF"));
+    shiftdef.Read(ui.GetFileName("SHIFTDEF"));
   }
   else {
     shiftdef.AddObject(PvlObject("Hiccdstitch"));
@@ -87,7 +87,7 @@ void IsisMain() {
   CubeAttributeInput &attTrans = ui.GetInputAttribute("FROM");
   vector<string> bandTrans = attTrans.Bands();
   trans.setVirtualBands(bandTrans);
-  trans.OpenCube(ui.GetFilename("FROM"), stitch);
+  trans.OpenCube(ui.GetFileName("FROM"), stitch);
 
 
   // Open the second cube, it is held in place.  We will be matching the
@@ -96,7 +96,7 @@ void IsisMain() {
   CubeAttributeInput &attMatch = ui.GetInputAttribute("MATCH");
   vector<string> bandMatch = attMatch.Bands();
   match.setVirtualBands(bandMatch);
-  match.OpenCube(ui.GetFilename("MATCH"), stitch);
+  match.OpenCube(ui.GetFileName("MATCH"), stitch);
 
 //  Ensure only one band
   if((trans.getBandCount() != 1) || (match.getBandCount() != 1)) {
@@ -135,8 +135,8 @@ void IsisMain() {
   // We need to get a user definition of how to auto correlate around each
   // of the grid points.
   Pvl regdef;
-  Filename regFile(ui.GetFilename("REGDEF"));
-  regdef.Read(regFile.Expanded());
+  FileName regFile(ui.GetFileName("REGDEF"));
+  regdef.Read(regFile.expanded());
   AutoReg *ar = AutoRegFactory::Create(regdef);
 
 
@@ -196,7 +196,7 @@ void IsisMain() {
   jparms.fromJit = trans.GetInfo();
   jparms.matchCorns = mcorns;
   jparms.matchJit = match.GetInfo();
-  jparms.regFile =  regFile.Expanded();
+  jparms.regFile =  regFile.expanded();
   jparms.cols = cols;
   jparms.rows = rows;
   jparms.lSpacing = lSpacing;
@@ -326,16 +326,16 @@ void IsisMain() {
   // The flatfile is comma seperated and can be imported into an excel
   // spreadsheet
   if(ui.WasEntered("FLATFILE")) {
-    string fFile = ui.GetFilename("FLATFILE");
+    string fFile = ui.GetFileName("FLATFILE");
     ofstream os;
-    string fFileExpanded = Filename(fFile).Expanded();
+    string fFileExpanded = FileName(fFile).expanded();
     os.open(fFileExpanded.c_str(), ios::out);
     dumpResults(os, reglist, jparms, *ar);
   }
 
   // If a cnet file was entered, write the ControlNet pvl to the file
   if(ui.WasEntered("CNETFILE")) {
-    cn.Write(ui.GetFilename("CNETFILE"));
+    cn.Write(ui.GetFileName("CNETFILE"));
   }
 
   // Don't need the cubes opened anymore

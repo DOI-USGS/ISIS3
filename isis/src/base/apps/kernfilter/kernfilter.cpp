@@ -20,7 +20,7 @@ void IsisMain() {
 
   // Get information from the input kernel
   UserInterface &ui = Application::GetUserInterface();
-  Pvl pvl(ui.GetFilename("KERNEL"));
+  Pvl pvl(ui.GetFileName("KERNEL"));
 
   // Access the Kernel group section of the input file
   const PvlGroup &kern = pvl.FindGroup("KERNEL");

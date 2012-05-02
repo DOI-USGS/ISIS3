@@ -24,7 +24,7 @@
 
 #include <string>
 #include <vector>
-#include "Filename.h"
+#include "FileName.h"
 
 using namespace std;
 
@@ -59,11 +59,11 @@ namespace Isis {
 
       vector <vector <double> > ComputeDarkDN();
       //! Retrieves the name of the bias distortion table
-      Filename BiasDistortionTable() {
+      FileName BiasDistortionTable() {
         return p_bdpath;
       };      
       //! Retrieves the name of the dark parameters file
-      Filename DarkParameterFile()  {
+      FileName DarkParameterFile()  {
         return p_dparamfile;
       };  
 
@@ -78,8 +78,8 @@ namespace Isis {
 
       int p_lines;            //!< Number of lines in the image.
       int p_samples;          //!< Number of samples in the image.
-      Filename p_bdpath;      //!< Bias distortion table for the image.  Only exists for narrow camera images.
-      Filename p_dparamfile;  //!< Dark parameters file for the image.
+      FileName p_bdpath;      //!< Bias distortion table for the image.  Only exists for narrow camera images.
+      FileName p_dparamfile;  //!< Dark parameters file for the image.
 
       //LABEL VARIABLES
       int p_btsm;                   //!< Value dependent upon <b>PvlKeyword</b> DelayedReadoutFlag. Valid values are: "No"=0, "Yes"=1, "Unknown"=-1.  Called "botsim" or "btsm" in IDL code.

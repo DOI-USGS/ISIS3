@@ -3,7 +3,7 @@
 #include <QFileDialog>
 #include <QtGui>
 #include <QSettings>
-#include "Filename.h"
+#include "FileName.h"
 #include "FileTool.h"
 
 namespace Isis {

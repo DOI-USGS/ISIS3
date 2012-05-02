@@ -42,12 +42,12 @@ void IsisMain() {
     filesMatch = true;
 
     LatestControlNetFile *net1 = ControlNetVersioner::Read(
-        ui.GetFilename("FROM"));
+        ui.GetFileName("FROM"));
     LatestControlNetFile *net2 = ControlNetVersioner::Read(
-        ui.GetFilename("FROM2"));
+        ui.GetFileName("FROM2"));
 
     if(ui.WasEntered("DIFF")) {
-      Pvl diffFile(ui.GetFilename("DIFF"));
+      Pvl diffFile(ui.GetFileName("DIFF"));
 
       if(diffFile.HasGroup("Tolerances")) {
         tolerances = diffFile.FindGroup("Tolerances");
@@ -83,29 +83,29 @@ void IsisMain() {
     if(ui.WasEntered("TO")) {
       Pvl out;
       out.AddGroup(differences);
-      out.Write(ui.GetFilename("TO"));
+      out.Write(ui.GetFileName("TO"));
     }
 
     differenceReason = "";
   }
   else {
-    Filename f1(ui.GetFilename("FROM"));
-    Filename f2(ui.GetFilename("FROM2"));
+    FileName f1(ui.GetFileName("FROM"));
+    FileName f2(ui.GetFileName("FROM2"));
 
     ControlNetDiff differencer;
     if (ui.WasEntered("DIFF")) {
-      Pvl diffFile(ui.GetFilename("DIFF"));
+      Pvl diffFile(ui.GetFileName("DIFF"));
       differencer.addTolerances(diffFile);
     }
 
     Pvl results = differencer.compare(f1, f2);
-    if (ui.WasEntered("TO")) results.Write(ui.GetFilename("TO"));
+    if (ui.WasEntered("TO")) results.Write(ui.GetFileName("TO"));
 
     PvlGroup log("Results");
 
     // Get a count of all the differences: just the keywords at the object level
     // (network data) and the number of objects (different points).  Ignore the
-    // Filename keyword as it's a superficial difference.
+    // FileName keyword as it's a superficial difference.
     PvlObject &differences = results.FindObject("Differences");
     int count = differences.Objects() + differences.Keywords();
     if (differences.HasKeyword("Filename")) count--;

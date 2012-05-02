@@ -61,7 +61,7 @@ void IsisMain() {
     Pvl temp;
     temp.AddGroup(results);
     temp.AddGroup(orient);
-    temp.Write(ui.GetFilename("TO", "txt"));
+    temp.Write(ui.GetFileName("TO", "txt"));
   }
 
   p.EndProcess();

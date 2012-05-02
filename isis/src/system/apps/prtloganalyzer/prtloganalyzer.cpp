@@ -1,7 +1,7 @@
 // $Id$
 #include "Isis.h"
 #include "FileList.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Pvl.h"
 #include "Process.h"
 #include "ProgramAnalyzer.h"
@@ -21,7 +21,7 @@ void IsisMain() {
   //  Add program exclusions
   if (ui.WasEntered("EXCLUDE")) analyzer.setExclude(ui.GetString("EXCLUDE"));
   if (ui.WasEntered("EXCLUDEFROM") ) {
-    FileList elist(ui.GetFilename("EXCLUDEFROM"));
+    FileList elist(ui.GetFileName("EXCLUDEFROM"));
     for (unsigned int i = 0 ; i < elist.size() ; i++ ) {
       analyzer.exclude(elist[i]);
     }
@@ -30,14 +30,14 @@ void IsisMain() {
   // Add program inclusions
   if (ui.WasEntered("INCLUDE")) analyzer.setInclude(ui.GetString("INCLUDE"));
   if (ui.WasEntered("INCLUDEFROM") ) {
-    FileList ilist(ui.GetFilename("INCLUDEFROM"));
+    FileList ilist(ui.GetFileName("INCLUDEFROM"));
     for (unsigned int i = 0 ; i < ilist.size() ; i++ ) {
       analyzer.include(ilist[i]);
     }
   }
 
   // Add the file
-  analyzer.add(ui.GetFilename("FROM"));
+  analyzer.add(ui.GetFileName("FROM"));
 
   //  Log results
   PvlGroup logger = analyzer.review();
@@ -57,14 +57,14 @@ void IsisMain() {
     for (int i = 0 ; i < analyzer.Programs() ; i++) {
       temp.AddGroup(analyzer.summarize(i));
     }
-    temp.Write(ui.GetFilename("SUMMARY"));
+    temp.Write(ui.GetFileName("SUMMARY"));
   }
 
   // Write the output file if requested of CSV formatted data
   if(ui.WasEntered("LOG")) {
    // Set up for opening
-    Filename temp(ui.GetFilename("LOG"));
-    string file = temp.Expanded();
+    FileName temp(ui.GetFileName("LOG"));
+    string file = temp.expanded();
     ofstream ostm;
 
     // Open the file

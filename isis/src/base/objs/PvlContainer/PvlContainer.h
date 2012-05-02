@@ -243,7 +243,7 @@ namespace Isis {
        * was not initialized using a file, this string is empty.
        * @return The filename.
        */
-      std::string Filename() const {
+      std::string FileName() const {
         return p_filename;
       };
 
@@ -312,7 +312,7 @@ namespace Isis {
        *
        * @param filename The new filename to use.
        */
-      void SetFilename(const std::string &filename) {
+      void SetFileName(const std::string &filename) {
         p_filename = filename;
       };
 

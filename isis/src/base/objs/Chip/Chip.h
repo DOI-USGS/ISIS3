@@ -134,7 +134,7 @@ namespace Isis {
 
       //! Returns the expanded filename of the cube from
       //! which this chip was chipped.
-      inline string Filename() const {
+      inline string FileName() const {
         return p_filename;
       };
 
@@ -366,7 +366,7 @@ namespace Isis {
 
       Affine p_affine;                             //!< Transform set by SetTransform.  Used to load cubes into chip
       Interpolator::interpType p_readInterpolator; //!< Interpolator type set by SetReadInterpolator. Used to read cubes into chip.
-      string p_filename;                           //!< Filename of loaded cube
+      string p_filename;                           //!< FileName of loaded cube
   };
 };
 

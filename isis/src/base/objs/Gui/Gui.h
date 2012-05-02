@@ -67,7 +67,7 @@ namespace Isis {
    *  @history 2010-03-17 Stuart Sides - Added the location of the Qt plugins
    *                                     into the library path
    *  @history 2010-07-19 Jeannie Walldren - Modified SelectFile() in
-   *                         GuiFilenameParameter.cpp and removed SelectFile()
+   *                         GuiFileNameParameter.cpp and removed SelectFile()
    *                         from GuiCubeParameter. Cube and File customization
    *                         preferences are now being handled in Cube's
    *                         CubeIoHandler and IsisAml classes.  

@@ -108,7 +108,7 @@ namespace Isis {
   CubeDisplayProperties *MosaicControlNetTool::takeDisplay(
       QString sn, QList<CubeDisplayProperties *> &displays) {
     if (m_controlNet && m_controlNetGraphics) {
-      QString filename = m_controlNetGraphics->snToFilename(sn);
+      QString filename = m_controlNetGraphics->snToFileName(sn);
 
       for(int i = 0; i < displays.size(); i++) {
         CubeDisplayProperties *display = displays[i];
@@ -126,7 +126,7 @@ namespace Isis {
   PvlObject MosaicControlNetTool::toPvl() const {
     PvlObject obj(projectPvlObjectName());
 
-    obj += PvlKeyword("Filename", m_controlNetFile);
+    obj += PvlKeyword("FileName", m_controlNetFile);
     obj += PvlKeyword("Visible",
         m_controlNetGraphics && m_controlNetGraphics->isVisible());
 
@@ -135,7 +135,7 @@ namespace Isis {
 
 
   void MosaicControlNetTool::fromPvl(const PvlObject &obj) {
-    m_controlNetFile = QString::fromStdString(obj["Filename"][0]);
+    m_controlNetFile = QString::fromStdString(obj["FileName"][0]);
     if (m_controlNetFile == "Null")
       m_controlNetFile = "";
 
@@ -367,8 +367,8 @@ namespace Isis {
     // for each mosaic item
     //---------------------------------------------------------------
     if (!netFile.isEmpty()) {
-      Filename controlNetFile(netFile.toStdString());
-      m_controlNetFile = QString::fromStdString(controlNetFile.Expanded());
+      FileName controlNetFile(netFile.toStdString());
+      m_controlNetFile = QString::fromStdString(controlNetFile.expanded());
       loadNetwork();
 
       if (m_displayControlNetButton)

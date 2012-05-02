@@ -15,9 +15,9 @@ void PipeContinue();
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  ui.PutFilename("FROM",  "$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub");
-  ui.PutFilename("FROM2", "$ISIS3DATA/odyssey/testData/I00831002RDR.odd.cub");
-  ui.PutFilename("TO",    "/work1/out.cub");
+  ui.PutFileName("FROM",  "$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub");
+  ui.PutFileName("FROM2", "$ISIS3DATA/odyssey/testData/I00831002RDR.odd.cub");
+  ui.PutFileName("TO",    "/work1/out.cub");
   ui.PutString  ("SHAPE", "ELLIPSOID");
 
   ui.Clear("MAPPING");
@@ -44,21 +44,21 @@ void IsisMain() {
 
   ui.Clear("FROM");
   ui.Clear("TO");
-  ui.PutFilename("FROM", "unitTest.lis");
+  ui.PutFileName("FROM", "unitTest.lis");
   std::cout << "Testing listing methods" << std::endl;
   PipeListed();
   
   ui.Clear("FROM");
   ui.Clear("TO");
-  ui.PutFilename("FROM", "$ISIS3DATA/odyssey/testData/I00831002RDR.cub");
-  ui.PutFilename("TO", "./out.cub");
+  ui.PutFileName("FROM", "$ISIS3DATA/odyssey/testData/I00831002RDR.cub");
+  ui.PutFileName("TO", "./out.cub");
   std::cout << "*** Branching Pipe with a branch disabled ***" << std::endl;
   PipeBranchDisabled();
   
   ui.Clear("TO");
-  ui.PutFilename("TO",   "./out.cub");
+  ui.PutFileName("TO",   "./out.cub");
   std::cout << "\n*** Continue option ***" << endl;
-  cout << "input=" << ui.GetFilename("FROM") << endl;
+  cout << "input=" << ui.GetFileName("FROM") << endl;
   PipeContinue();
 }
 
@@ -336,7 +336,7 @@ void PipeContinue(void)
   // Pipeline level "continue"
   Pipeline pc1("unitTest6");
   
-  pc1.SetInputFile(Filename("$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub"));
+  pc1.SetInputFile(FileName("$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub"));
   pc1.SetOutputFile("TO");
   pc1.SetContinue(true);
   pc1.KeepTemporaryFiles(false);
@@ -364,7 +364,7 @@ void PipeContinue(void)
   cout << "\n*** Application level continue option ***\n";
   Pipeline pc2("unitTest7");
   
-  pc2.SetInputFile(Filename("$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub"));
+  pc2.SetInputFile(FileName("$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub"));
   pc2.SetOutputFile("TO");
   pc2.KeepTemporaryFiles(false);
   

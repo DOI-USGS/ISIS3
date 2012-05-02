@@ -34,7 +34,7 @@ void IsisMain() {
   // Setup the input and make sure it is a mariner10 file
   UserInterface & ui = Application::GetUserInterface();
 
-  Isis::Pvl lab(ui.GetFilename("FROM"));
+  Isis::Pvl lab(ui.GetFileName("FROM"));
   Isis::PvlGroup & inst = lab.FindGroup("Instrument", Pvl::Traverse);
 
   std::string mission = inst["SpacecraftName"];
@@ -47,7 +47,7 @@ void IsisMain() {
 
   // If it is already calibrated then complain
   if (icube->hasGroup("Radiometry")) {
-    string msg = "This Mariner 10 image [" + icube->getFilename() + "] has "
+    string msg = "This Mariner 10 image [" + icube->getFileName() + "] has "
                  "already been radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -111,12 +111,12 @@ void IsisMain() {
   }
 
   if (ui.WasEntered ("COEFCUBE")) {
-    coCube.open(ui.GetFilename("COEFCUBE"));
+    coCube.open(ui.GetFileName("COEFCUBE"));
   }
   else {
-    Filename coFile("$mariner10/calibration/mariner_10_" + filter + "_" +
+    FileName coFile("$mariner10/calibration/mariner_10_" + filter + "_" +
         camera + "_coef.cub");
-    coCube.open(coFile.Expanded());
+    coCube.open(coFile.expanded());
   }
   coef = new Brick(icube->getSampleCount(), 1, 6, coCube.getPixelType());
 
@@ -146,7 +146,7 @@ void IsisMain() {
   if (!camSuccess) {
     throw IException(IException::Unknown,
         "Unable to calculate the Solar Distance on [" +
-        icube->getFilename() + "]", _FILEINFO_);
+        icube->getFileName() + "]", _FILEINFO_);
   }
   sunDist = cam->SolarDistance();
 
@@ -156,11 +156,11 @@ void IsisMain() {
   // Add the radiometry group
   PvlGroup calgrp("Radiometry");
 
-  calgrp += PvlKeyword("DarkCurrentCube", dcCube->getFilename());
+  calgrp += PvlKeyword("DarkCurrentCube", dcCube->getFileName());
   if (useBlem) {
-    calgrp += PvlKeyword("BlemishRemovalCube", blemCube->getFilename());
+    calgrp += PvlKeyword("BlemishRemovalCube", blemCube->getFileName());
   }
-  calgrp += PvlKeyword("CoefficientCube", coCube.getFilename());
+  calgrp += PvlKeyword("CoefficientCube", coCube.getFileName());
   calgrp += PvlKeyword("AbsoluteCoefficient", absCoef);
 
   ocube->putGroup(calgrp);

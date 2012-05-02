@@ -6,7 +6,7 @@
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "Displacement.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "Latitude.h"
@@ -56,8 +56,8 @@ void IsisMain() {
 
   // Get user entered information
   UserInterface & ui = Application::GetUserInterface();
-  ControlNet cnet(ui.GetFilename("CNET"));
-  SerialNumberList serials(ui.GetFilename("FROMLIST"));
+  ControlNet cnet(ui.GetFileName("CNET"));
+  SerialNumberList serials(ui.GetFileName("FROMLIST"));
   append = ui.GetBoolean("APPEND");
 
   if(cnet.GetNumMeasures() == 0) {
@@ -70,17 +70,17 @@ void IsisMain() {
   // If append is true, output will be appended or a new file created
   if (append) {
     // Check to see if its a new file or we open an existing file
-    Filename file(ui.GetFilename("FLATFILE"));
-    if (!file.Exists()) {
+    FileName file(ui.GetFileName("FLATFILE"));
+    if (!file.fileExists()) {
       // It is new, so we aren't appending
       // Set this because it is used elsewhere
       append = false;
     }
-    txt = new TextFile(ui.GetFilename("FLATFILE"), "append");
+    txt = new TextFile(ui.GetFileName("FLATFILE"), "append");
   }
   // Without append, if the files exists it will be overwritten
   else {
-    txt = new TextFile(ui.GetFilename("FLATFILE"), "overwrite");
+    txt = new TextFile(ui.GetFileName("FLATFILE"), "overwrite");
   }
 
   PvlGroup * grp = NULL;
@@ -281,7 +281,7 @@ void IsisMain() {
       const ControlMeasure * cmeasure = (*cpoint)[j];
 
       // Set and then get CameraPointInfo information
-      camPoint.SetCube(serials.Filename(cmeasure->GetCubeSerialNumber()));
+      camPoint.SetCube(serials.FileName(cmeasure->GetCubeSerialNumber()));
 
       grp = camPoint.SetImage(cmeasure->GetSample(), cmeasure->GetLine(), outside, errors);
       // Shouldn't ever happen, but, being safe...

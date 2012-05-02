@@ -1,7 +1,7 @@
 #include "Isis.h"
 #include "Chip.h"
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Pvl.h"
 #include "iString.h"
 #include "IException.h"
@@ -43,12 +43,12 @@ void IsisMain() {
   ProcessImportPds p;
   Pvl pdsLabel;
   UserInterface &ui = Application::GetUserInterface();
-  Filename inFile = ui.GetFilename("FROM");
+  FileName inFile = ui.GetFileName("FROM");
 
-  p.SetPdsFile(inFile.Expanded(), "", pdsLabel);
+  p.SetPdsFile(inFile.expanded(), "", pdsLabel);
 
-  iString filename = Filename(ui.GetFilename("FROM")).Basename();
-  Filename toFile = ui.GetFilename("TO");
+  iString filename = FileName(ui.GetFileName("FROM")).baseName();
+  FileName toFile = ui.GetFileName("TO");
   
   apollo = new Apollo(filename);
 
@@ -57,13 +57,13 @@ void IsisMain() {
   // Setup the output cube attributes for a 16-bit unsigned tiff
   Isis::CubeAttributeOutput cao;
   cao.PixelType(Isis::Real);
-  p.SetOutputCube(toFile.Expanded(), cao);
+  p.SetOutputCube(toFile.expanded(), cao);
 
   // Import image
   p.StartProcess();
   p.EndProcess();
 
-  cube.open(toFile.Expanded(), "rw");
+  cube.open(toFile.expanded(), "rw");
   
   // Once the image is imported, we need to find and decrypt the code
   if (apollo->IsMetric() && FindCode())

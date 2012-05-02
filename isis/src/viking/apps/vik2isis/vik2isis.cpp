@@ -6,7 +6,7 @@
 
 #include "ProcessImportPds.h"
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Pvl.h"
 #include "iString.h"
@@ -20,10 +20,10 @@ void IsisMain() {
   // We should be processing a PDS file
   ProcessImportPds p;
   UserInterface &ui = Application::GetUserInterface();
-  Filename in = ui.GetFilename("FROM");
+  FileName in = ui.GetFileName("FROM");
 
-  string tempName = "$TEMPORARY/" + in.Name() + ".img";
-  Filename temp(tempName);
+  string tempName = "$TEMPORARY/" + in.baseName() + ".img";
+  FileName temp(tempName);
   bool tempFile = false;
 
   // This program handles both compressed and decompressed files.
@@ -31,7 +31,7 @@ void IsisMain() {
   // object.  If this fails then the file must be compressed, so
   // decompress the file using vdcomp.
   try {
-    Pvl compressionTest(in.Expanded());
+    Pvl compressionTest(in.expanded());
 
     if(compressionTest.Groups() == 0 && compressionTest.Objects() == 0 &&
         compressionTest.Keywords() < 2) {
@@ -40,8 +40,8 @@ void IsisMain() {
   }
   catch(IException &e) {
     tempFile = true;
-    string command = "$ISISROOT/bin/vdcomp " + in.Expanded() + " " +
-                     temp.Expanded() + " > /dev/null 2>&1";
+    string command = "$ISISROOT/bin/vdcomp " + in.expanded() + " " +
+                     temp.expanded() + " > /dev/null 2>&1";
     int returnValue = system(command.c_str()) >> 8;
     if(returnValue) {
       string msg = "Error running vdcomp";
@@ -71,25 +71,25 @@ void IsisMain() {
           msg = "vdcomp: Invalid byte count in dcmprs";
           break;
         case 42:
-          msg = "Input file [" + in.Name() + "] has\ninvalid or" +
+          msg = "Input file [" + in.name() + "] has\ninvalid or" +
                 " corrupted line header table!";
           msgTarget = IException::User;
           break;
       }
       throw IException(msgTarget, msg, _FILEINFO_);
     }
-    in = temp.Expanded();
+    in = temp.expanded();
   }
 
   // Convert the pds file to a cube
   Pvl pdsLabel;
   try {
-    p.SetPdsFile(in.Expanded(), "", pdsLabel);
+    p.SetPdsFile(in.expanded(), "", pdsLabel);
   }
   catch(IException &e) {
-    string msg = "Input file [" + in.Name() +
+    string msg = "Input file [" + in.expanded() +
                  "] does not appear to be a Viking PDS product";
-    throw IException(IException::User, msg, _FILEINFO_);
+    throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
   Cube *ocube = p.SetOutputCube("TO");
@@ -97,7 +97,7 @@ void IsisMain() {
   TranslateVikingLabels(pdsLabel, ocube);
   p.EndProcess();
 
-  if(tempFile) remove(temp.Expanded().c_str());
+  if(tempFile) remove(temp.expanded().c_str());
   return;
 }
 

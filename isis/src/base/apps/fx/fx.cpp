@@ -55,8 +55,8 @@ void IsisMain() {
     outCube = p.SetOutputCube("TO");
   }
   else if(ui.GetString("MODE") == "LIST") {
-    string inputFilename = ui.GetFilename("FROMLIST");
-    FileList list(inputFilename);
+    string inputFileName = ui.GetFileName("FROMLIST");
+    FileList list(inputFileName);
 
     // Run through file list and set its entries as input cubes
     for(int i = 0; i < (int)list.size(); i++) {

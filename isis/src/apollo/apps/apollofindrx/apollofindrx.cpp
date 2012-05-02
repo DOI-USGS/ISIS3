@@ -38,7 +38,7 @@ void IsisMain ()
     int patternSize = ui.GetInteger("PATTERNSIZE");
     MAX_DISPX = ui.GetInteger("DELTAX");
     MAX_DISPY = ui.GetInteger("DELTAY");
-    cube.open(ui.GetFilename("FROM"),"rw");
+    cube.open(ui.GetFileName("FROM"),"rw");
 
     PvlGroup &reseaus = cube.getLabel()->FindGroup("Reseaus",Pvl::Traverse);
     string mission = (cube.getLabel()->FindGroup("Instrument",Pvl::Traverse))["SpacecraftName"];

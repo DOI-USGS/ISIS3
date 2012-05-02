@@ -26,10 +26,10 @@ void IsisMain() {
     icube.setVirtualBands(inAtt.Bands());
   }
 
-  icube.open(Filename(ui.GetFilename("FROM")).Expanded());
+  icube.open(FileName(ui.GetFileName("FROM")).expanded());
 
   // Make sure it is a Marci cube
-  Filename inFilename = ui.GetFilename("FROM");
+  FileName inFileName = ui.GetFileName("FROM");
   try {
     if(icube.getGroup("Instrument")["InstrumentID"][0] != "Marci") {
       throw IException();
@@ -41,7 +41,7 @@ void IsisMain() {
   }
   catch(IException &) {
     string msg = "This program is intended for use on MARCI images only. [";
-    msg += inFilename.Expanded() + "] does not appear to be a MARCI image.";
+    msg += inFileName.expanded() + "] does not appear to be a MARCI image.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -51,8 +51,8 @@ void IsisMain() {
   }
 
   // Read in calibration coefficients
-  Filename calFile("$mro/calibration/marci/marciCoefficients_v???.pvl");
-  calFile.HighestVersion();
+  FileName calFile =
+      FileName("$mro/calibration/marci/marciCoefficients_v???.pvl").highestVersion();
 
   vector<double> decimation;
 
@@ -74,9 +74,8 @@ void IsisMain() {
   }
 
   // Get the LUT data
-  Filename temp("$mro/calibration/marcisqroot_???.lut");
-  temp.HighestVersion();
-  TextFile stretchPairs(temp.Expanded());
+  FileName temp = FileName("$mro/calibration/marcisqroot_???.lut").highestVersion();
+  TextFile stretchPairs(temp.expanded());
 
   // Create the stretch pairs
   stretch.ClearPairs();
@@ -91,7 +90,7 @@ void IsisMain() {
   stretchPairs.Close();
 
   // This file stores radiance/spectral distance coefficients
-  Pvl calibrationData(calFile.Expanded());
+  Pvl calibrationData(calFile.expanded());
 
   // This will store the radiance coefficient and solar spectral distance coefficients
   // for each band.
@@ -101,7 +100,7 @@ void IsisMain() {
 
   // Check our coefficient file
   if(calibrationData.Objects() != 7) {
-    iString msg = "Calibration file [" + calFile.Expanded() + "] must contain data for 7 filters in ascending order;";
+    iString msg = "Calibration file [" + calFile.expanded() + "] must contain data for 7 filters in ascending order;";
     msg += " only [" + iString(calibrationData.Objects()) + "] objects were found";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
@@ -111,7 +110,7 @@ void IsisMain() {
     PvlObject &calObj = calibrationData.Object(obj);
 
     if((int)calObj["FilterNumber"] != obj + 1) {
-      iString msg = "Calibration file [" + calFile.Expanded() + "] must have the filters in ascending order";
+      iString msg = "Calibration file [" + calFile.expanded() + "] must have the filters in ascending order";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -143,10 +142,9 @@ void IsisMain() {
     filePattern += "flat_band" + iString(band + 1);
     filePattern += "_summing" + iString(summing) + "_v???.cub";
 
-    Filename flatFile(filePattern);
-    flatFile.HighestVersion();
+    FileName flatFile = FileName(filePattern).highestVersion();
     Cube *fcube = new Cube();
-    fcube->open(flatFile.Expanded());
+    fcube->open(flatFile.expanded());
     flatcubes.push_back(fcube);
 
     LineManager *fcubeMgr = new LineManager(*fcube);
@@ -164,7 +162,7 @@ void IsisMain() {
   ocube.setLabelsAttached(outAtt.AttachedLabel());
   ocube.setPixelType(outAtt.PixelType());
 
-  ocube.create(Filename(ui.GetFilename("TO")).Expanded());
+  ocube.create(FileName(ui.GetFileName("TO")).expanded());
 
   LineManager icubeMgr(icube);
 

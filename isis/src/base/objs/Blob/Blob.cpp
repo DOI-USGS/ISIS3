@@ -27,7 +27,7 @@
 #include <cstring>
 
 #include "Pvl.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Message.h"
 
@@ -65,7 +65,7 @@ namespace Isis {
     p_buffer = NULL;
     p_nbytes = 0;
     p_type = type;
-    p_labelFile = Filename(file).Expanded();
+    p_labelFile = FileName(file).expanded();
 
     Read(file);
   }
@@ -139,7 +139,7 @@ namespace Isis {
    */
   void Blob::Read(const std::string &file) {
     // Expand the filename
-    string temp(Filename(file).Expanded());
+    string temp(FileName(file).expanded());
 
     // Get the pvl
     Pvl pvl;
@@ -157,7 +157,7 @@ namespace Isis {
   void Blob::Read(const std::string &file, const Pvl &pvlLabels) {
 
     // Expand the filename
-    string temp(Filename(file).Expanded());
+    string temp(FileName(file).expanded());
 
     // Open the file
     fstream istm;
@@ -251,7 +251,7 @@ namespace Isis {
       if(p_blobPvl.HasKeyword("^" + p_type)) {
         string path = "";
         if(p_labelFile != "") {
-          path = Filename(p_labelFile).Path() + "/";
+          path = FileName(p_labelFile).path() + "/";
         }
         p_detached = path + (std::string) p_blobPvl["^"+p_type];
         p_blobPvl.DeleteKeyword("^" + p_type);
@@ -345,11 +345,11 @@ namespace Isis {
    * Write the blob data out to a Pvl object.
    * @param pvl The pvl object to update
    * @param stm stream to write data to
-   * @param detachedFilename If the stream is detached from the labels give
+   * @param detachedFileName If the stream is detached from the labels give
    * the name of the file
    */
   void Blob::Write(Pvl &pvl, std::fstream &stm,
-                   const std::string &detachedFilename) {
+                   const std::string &detachedFileName) {
     // Handle 64-bit I/O
     WriteInit();
 
@@ -363,8 +363,8 @@ namespace Isis {
     eofbyte += 1;
 
     // Handle detached blobs
-    if(detachedFilename != "") {
-      p_blobPvl += PvlKeyword("^" + p_type, detachedFilename);
+    if(detachedFileName != "") {
+      p_blobPvl += PvlKeyword("^" + p_type, detachedFileName);
     }
 
     // See if the blob is already in the file
@@ -413,7 +413,7 @@ namespace Isis {
     WriteData(stm);
 
     // Handle detached blobs
-    if(detachedFilename != "") {
+    if(detachedFileName != "") {
       p_blobPvl.DeleteKeyword("^" + p_type);
     }
   }

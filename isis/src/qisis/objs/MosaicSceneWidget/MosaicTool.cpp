@@ -4,7 +4,7 @@
 
 #include <QLabel>
 
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "MosaicSceneWidget.h"
@@ -112,7 +112,7 @@ namespace Isis {
 
 
   QPixmap MosaicTool::getIcon(iString iconName) const {
-    iString path = Filename("$base/icons").Expanded();
+    iString path = FileName("$base/icons").expanded();
     QString fullPathToFile = iString(path + "/" + iconName);
     return QPixmap(fullPathToFile);
   }

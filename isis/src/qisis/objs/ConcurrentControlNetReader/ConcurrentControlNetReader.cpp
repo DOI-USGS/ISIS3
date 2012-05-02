@@ -38,7 +38,7 @@
 #include "ControlNetVersioner.h"
 #include "ControlPoint.h"
 #include "Distance.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Projection.h"
 
 
@@ -179,11 +179,11 @@ namespace Isis {
    * Sets up the ReadNetworkFunctor which provides the binary container for
    * the NetworkBuilder.
    * 
-   * @param someNetworkFilename filename of a ControlNet file.
+   * @param someNetworkFileName filename of a ControlNet file.
    */
   ConcurrentControlNetReader::ReadNetworkFunctor::ReadNetworkFunctor(
-    QString someNetworkFilename) {
-    m_networkFilename = someNetworkFilename;
+    QString someNetworkFileName) {
+    m_networkFileName = someNetworkFileName;
   }
 
 
@@ -192,7 +192,7 @@ namespace Isis {
 
   LatestControlNetFile *
   ConcurrentControlNetReader::ReadNetworkFunctor::operator()() const {
-    return ControlNetVersioner::Read(Filename(m_networkFilename.toStdString()));
+    return ControlNetVersioner::Read(FileName(m_networkFileName.toStdString()));
   }
 
 

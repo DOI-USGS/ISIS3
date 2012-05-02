@@ -67,10 +67,10 @@ namespace Isis {
    * CubeManager is for effeciency when working with control nets
    * where cubes are accesed multiple times.
    *
-   * @param cubeFilename A cube filename
+   * @param cubeFileName A cube filename
    */
-  void CameraPointInfo::SetCube(const std::string   &cubeFilename) {
-    currentCube = usedCubes->OpenCube(cubeFilename);
+  void CameraPointInfo::SetCube(const std::string   &cubeFileName) {
+    currentCube = usedCubes->OpenCube(cubeFileName);
     camera = currentCube->getCamera();
   }
 
@@ -266,7 +266,7 @@ namespace Isis {
       }
       // Set all keywords that still have valid information
       gp->FindKeyword("Error").SetValue(error);
-      gp->FindKeyword("Filename").SetValue(currentCube->getFilename());
+      gp->FindKeyword("FileName").SetValue(currentCube->getFileName());
       gp->FindKeyword("Sample").SetValue(camera->Sample());
       gp->FindKeyword("Line").SetValue(camera->Line());
       gp->FindKeyword("EphemerisTime").SetValue(camera->Time().Et(), "seconds");
@@ -292,7 +292,7 @@ namespace Isis {
       double ssplat, ssplon, sslat, sslon, pwlon, oglat;
 
       {
-        gp->FindKeyword("Filename").SetValue(currentCube->getFilename());
+        gp->FindKeyword("FileName").SetValue(currentCube->getFileName());
         gp->FindKeyword("Sample").SetValue(camera->Sample());
         gp->FindKeyword("Line").SetValue(camera->Line());
         gp->FindKeyword("PixelValue").SetValue(PixelToString(b[0]));

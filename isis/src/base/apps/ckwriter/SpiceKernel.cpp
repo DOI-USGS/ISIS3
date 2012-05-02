@@ -31,7 +31,7 @@
 
 #include "SpiceKernel.h"
 #include "CkKernelWriter.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Pvl.h"
 #include "Cube.h"
 #include "iString.h"

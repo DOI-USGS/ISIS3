@@ -1,6 +1,6 @@
 #include "Isis.h"
 #include "ProcessImportPds.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Brick.h"
 #include "ProcessByBrick.h"
 #include "OriginalLabel.h"
@@ -27,7 +27,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   outputCube = new Isis::Cube();
   outputCube->setDimensions(icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
-  outputCube->create(ui.GetFilename("TO"));
+  outputCube->create(ui.GetFileName("TO"));
 
   if(icube->hasGroup("Instrument")) {
     PvlGroup inst = icube->getGroup("Instrument");

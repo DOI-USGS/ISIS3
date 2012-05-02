@@ -2,7 +2,7 @@
 #include "ProcessImportPds.h"
 #include "ProcessByLine.h"
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Preference.h"
 #include "iString.h"
@@ -19,7 +19,7 @@ using namespace Isis;
 Stretch stretch;
 
 void FixDns8(Buffer &buf);
-void TranslateMroCtxLabels(Filename &labelFile, Cube *ocube);
+void TranslateMroCtxLabels(FileName &labelFile, Cube *ocube);
 void SaveDarkData(ProcessImportPds &process, Cube *ocube, int startPix, int endPix);
 vector<int> ConvertDarkPixels(int samples, Isis::PixelType pixelType,
                               unsigned char *data);
@@ -30,13 +30,13 @@ void IsisMain() {
 
   //Check that the file comes from the right camera
   UserInterface &ui = Application::GetUserInterface();
-  Filename inFile = ui.GetFilename("FROM");
+  FileName inFile = ui.GetFileName("FROM");
   fillGap = false;
   iString id, bitMode;
   int sumMode, editMode;
   bool projected;
   try {
-    Pvl lab(inFile.Expanded());
+    Pvl lab(inFile.expanded());
     id = (string) lab.FindKeyword("DATA_SET_ID");
     projected = lab.HasObject("IMAGE_MAP_PROJECTION");
     if(lab.HasKeyword("SPATIAL_SUMMING")) {
@@ -57,13 +57,13 @@ void IsisMain() {
   }
   catch(IException &e) {
     string msg = "Unable to read [DATA_SET_ID] from input file [" +
-                 inFile.Expanded() + "]";
+                 inFile.expanded() + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
   //Checks if in file is rdr
   if(projected) {
-    string msg = "[" + inFile.Name() + "] appears to be an rdr file.";
+    string msg = "[" + inFile.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -72,7 +72,7 @@ void IsisMain() {
   id.Compress();
   id.Trim(" ");
   if(id != "MRO-M-CTX-2-EDR-L0-V1.0") {
-    string msg = "Input file [" + inFile.Expanded() + "] does not appear to be " +
+    string msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
                  "in MRO-CTX EDR format. DATA_SET_ID is [" + id + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
@@ -85,7 +85,7 @@ void IsisMain() {
 
   //Process the file
   Pvl pdsLab;
-  p.SetPdsFile(inFile.Expanded(), "", pdsLab);
+  p.SetPdsFile(inFile.expanded(), "", pdsLab);
 
   int startPix = 0;
   int endPix = 0;
@@ -151,16 +151,16 @@ void IsisMain() {
   outAtt.PixelType(Isis::SignedWord);
   outAtt.Minimum((double)VALID_MIN2);
   outAtt.Maximum((double)VALID_MAX2);
-  Cube *ocube = p.SetOutputCube(ui.GetFilename("TO"), outAtt);
+  Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), outAtt);
 
   // Translate the labels
   p.StartProcess();
   TranslateMroCtxLabels(inFile, ocube);
 
   // Set up the strech for the 8 to 12 bit conversion from file
-  Filename *temp = new Filename("$mro/calibration/ctxsqroot_???.lut");
-  temp->HighestVersion();
-  TextFile *stretchPairs = new TextFile(temp->Expanded());
+  FileName *temp = new FileName("$mro/calibration/ctxsqroot_???.lut");
+  *temp = temp->highestVersion();
+  TextFile *stretchPairs = new TextFile(temp->expanded());
 
   // Create the stretch pairs
   stretch.ClearPairs();
@@ -180,7 +180,7 @@ void IsisMain() {
   // Do 8 bit to 12 bit conversion
   fillGap = ui.GetBoolean("FILLGAP");
   ProcessByLine p2;
-  string ioFile = ui.GetFilename("TO");
+  string ioFile = ui.GetFileName("TO");
   CubeAttributeInput att;
   p2.SetInputCube(ioFile, att, ReadWrite);
   p2.Progress()->SetText("Converting 8 bit pixels to 16 bit");
@@ -201,23 +201,23 @@ void FixDns8(Buffer &buf) {
 }
 
 //Function to translate the labels
-void TranslateMroCtxLabels(Filename &labelFile, Cube *ocube) {
+void TranslateMroCtxLabels(FileName &labelFile, Cube *ocube) {
 
   //Pvl to store the labels
   Pvl outLabel;
   //Set up the directory where the translations are
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
   iString transDir = (string) dataDir["Mro"] + "/translations/";
-  Pvl labelPvl(labelFile.Expanded());
+  Pvl labelPvl(labelFile.expanded());
 
   //Translate the Instrument group
-  Filename transFile(transDir + "mroctxInstrument.trn");
-  PvlTranslationManager instrumentXlator(labelPvl, transFile.Expanded());
+  FileName transFile(transDir + "mroctxInstrument.trn");
+  PvlTranslationManager instrumentXlator(labelPvl, transFile.expanded());
   instrumentXlator.Auto(outLabel);
 
   //Translate the Archive grooup
   transFile  = transDir + "mroctxArchive.trn";
-  PvlTranslationManager archiveXlater(labelPvl, transFile.Expanded());
+  PvlTranslationManager archiveXlater(labelPvl, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   // Set up the BandBin groups
@@ -230,7 +230,7 @@ void TranslateMroCtxLabels(Filename &labelFile, Cube *ocube) {
   PvlGroup kern("Kernels");
   kern += PvlKeyword("NaifFrameCode", -74021);
 
-  Pvl lab(labelFile.Expanded());
+  Pvl lab(labelFile.expanded());
   int sumMode, startSamp;
   if(lab.HasKeyword("SPATIAL_SUMMING")) {
     sumMode = (int)lab.FindKeyword("SPATIAL_SUMMING");

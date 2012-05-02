@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "CisscalFile.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Preference.h"
 
@@ -146,7 +146,7 @@ int main(int argc, char *argv[]) {
   }
 //-----------------------------------------------------------------------------------
   cout << "2) Remove temp file -> " << testFile << " <-" << endl;
-  if (remove(Filename(testFile).Expanded().c_str())) {
+  if (remove(FileName(testFile).expanded().c_str())) {
     cout << "*** Failed to remove tmp file: " << testFile << endl;
   }
   return 0;

@@ -14,7 +14,7 @@
 
 #include "Brick.h"
 #include "Cube.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "UniversalGroundMap.h"
@@ -116,16 +116,16 @@ namespace Isis {
    * @return int The cube ID necessary for retrieving information about this cube
    *         in the future.
    */
-  int CubeDataThread::AddCube(const Filename &fileName,
+  int CubeDataThread::AddCube(const FileName &fileName,
                               bool mustOpenReadWrite) {
     Cube *newCube = new Cube();
 
     try {
-      newCube->open(fileName.Expanded(), "rw");
+      newCube->open(fileName.expanded(), "rw");
     }
     catch (IException &e) {
       if (!mustOpenReadWrite) {
-        newCube->open(fileName.Expanded(), "r");
+        newCube->open(fileName.expanded(), "r");
       }
       else {
         throw;

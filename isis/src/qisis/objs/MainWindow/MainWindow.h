@@ -3,7 +3,7 @@
 #include <QMainWindow>
 #include <QtGui>
 #include <QSettings>
-#include "Filename.h"
+#include "FileName.h"
 
 namespace Isis {
   /**

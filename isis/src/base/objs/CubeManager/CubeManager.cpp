@@ -1,7 +1,7 @@
 #include "Cube.h"
 #include "CubeAttribute.h"
 #include "CubeManager.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 
 #include <iostream>
@@ -33,15 +33,15 @@ namespace Isis {
    * fail. This method does not guarantee you are the only one with this pointer,
    * nor is it recommended to keep this pointer out of a local (method) scope.
    *
-   * @param cubeFilename The filename of the cube you wish to open
+   * @param cubeFileName The filename of the cube you wish to open
    *
    * @return Cube* A pointer to the cube object that CubeManager retains ownership
    *         to and may delete at any time
    */
-  Cube *CubeManager::OpenCube(const std::string &cubeFilename) {
-    CubeAttributeInput attIn(cubeFilename);
+  Cube *CubeManager::OpenCube(const std::string &cubeFileName) {
+    CubeAttributeInput attIn(cubeFileName);
     iString attri = attIn.BandsStr();
-    iString expName = Filename(cubeFilename).Expanded();
+    iString expName = FileName(cubeFileName).expanded();
 
     // If there are attributes, we need a plus sign on the name
     if(attri.size() > 0) {
@@ -87,10 +87,10 @@ namespace Isis {
    * loaded into memory, nothing happens. This will cause any pointers to this
    * cube, obtained via OpenCube, to be invalid.
    *
-   * @param cubeFilename The filename of the cube to remove from memory
+   * @param cubeFileName The filename of the cube to remove from memory
    */
-  void CubeManager::CleanCubes(const std::string &cubeFilename) {
-    QString fileName((iString)Filename(cubeFilename).Expanded());
+  void CubeManager::CleanCubes(const std::string &cubeFileName) {
+    QString fileName((iString)FileName(cubeFileName).expanded());
     QMap<QString, Cube *>::iterator searchResult = p_cubes.find(fileName);
 
     if(searchResult == p_cubes.end()) {

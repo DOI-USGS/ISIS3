@@ -6,7 +6,7 @@
 #include "ProcessImportPds.h"
 
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Spice.h"
 
 using namespace std;
@@ -17,7 +17,7 @@ void IsisMain() {
   Pvl label;
   UserInterface &ui = Application::GetUserInterface();
 
-  string labelFile = ui.GetFilename("FROM");
+  string labelFile = ui.GetFileName("FROM");
 
   p.SetPdsFile(labelFile, "", label);
   Cube *ocube = p.SetOutputCube("TO");
@@ -33,13 +33,13 @@ void IsisMain() {
   iString transDir = (string) dataDir["Mro"] + "/translations/";
 
   // Translate the BandBin group
-  Filename transFile(transDir + "hiriseRdrBandBin.trn");
-  PvlTranslationManager bandBinXlater(label, transFile.Expanded());
+  FileName transFile(transDir + "hiriseRdrBandBin.trn");
+  PvlTranslationManager bandBinXlater(label, transFile.expanded());
   bandBinXlater.Auto(otherLabels);
 
   // Translate the Mosaic group
   transFile = transDir + "hiriseRdrMosaic.trn";
-  PvlTranslationManager archiveXlater(label, transFile.Expanded());
+  PvlTranslationManager archiveXlater(label, transFile.expanded());
   archiveXlater.Auto(otherLabels);
 
   // Write the BandBin, Archive, and Mapping groups to the output cube label
@@ -70,9 +70,9 @@ void IsisMain() {
   if(iString::UpCase(mapgrp["ProjectionName"]) == "EQUIRECTANGULAR") {
     static bool pckLoaded(false);
     if(!pckLoaded) {
-      Filename pck("$base/kernels/pck/pck?????.tpc");
-      pck.HighestVersion();
-      furnsh_c(pck.Expanded().c_str());
+      FileName pck("$base/kernels/pck/pck?????.tpc");
+      pck = pck.highestVersion();
+      furnsh_c(pck.expanded().c_str());
       pckLoaded = true;
     }
 

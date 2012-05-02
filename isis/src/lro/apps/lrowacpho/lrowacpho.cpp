@@ -55,19 +55,19 @@ void IsisMain () {
 
         CubeAttributeInput cai;
         cai.Set("+" + backplaneCai.Bands()[0]);
-        p.SetInputCube(ui.GetFilename("BACKPLANE"), cai);
+        p.SetInputCube(ui.GetFileName("BACKPLANE"), cai);
         cai.Reset();
         cai.Set("+" + backplaneCai.Bands()[1]);
-        p.SetInputCube(ui.GetFilename("BACKPLANE"), cai);
+        p.SetInputCube(ui.GetFileName("BACKPLANE"), cai);
         cai.Reset();
         cai.Set("+" + backplaneCai.Bands()[2]);
-        p.SetInputCube(ui.GetFilename("BACKPLANE"), cai);
+        p.SetInputCube(ui.GetFileName("BACKPLANE"), cai);
 
         useBackplane = true;
     }
 
     // Get the name of the parameter file
-    Pvl par(ui.GetFilename("PHOPAR"));
+    Pvl par(ui.GetFileName("PHOPAR"));
 
     iString algoName = PhotometricFunction::AlgorithmName(par);
     algoName.UpCase();

@@ -75,7 +75,7 @@ namespace Isis {
     p_tableWin->addToTable(false, "Local Solar Time", "Local Solar iTime");
     p_tableWin->addToTable(false, "UTC", "UTC", -1, Qt::Horizontal, "Internal time in UTC format");
     p_tableWin->addToTable(false, "Path", "Path");
-    p_tableWin->addToTable(false, "Filename", "Filename");
+    p_tableWin->addToTable(false, "FileName", "FileName");
     p_tableWin->addToTable(false, "Serial Number", "Serial Number");
     p_tableWin->addToTable(false, "Track Mosaic Index", "Track Mosaic Index");
     p_tableWin->addToTable(false, "Track Mosaic FileName", "Track Mosaic FileName");
@@ -257,9 +257,9 @@ namespace Isis {
     }
 
     // Write out the path, filename, and serial number
-    Filename fname = Filename(cvp->cube()->getFilename()).Expanded();
-    std::string fnamePath = fname.Path();
-    std::string fnameName = fname.Name();
+    FileName fname = FileName(cvp->cube()->getFileName()).expanded();
+    std::string fnamePath = fname.path();
+    std::string fnameName = fname.name();
     p_tableWin->table()->item(row, PATH)->setText(fnamePath.c_str());
     p_tableWin->table()->item(row, FILENAME)->setText(fnameName.c_str());
     //p_tableWin->table()->item(row,34)->setText(SerialNumber::Compose(*cvp->cube()).c_str());
@@ -328,9 +328,9 @@ namespace Isis {
         p_tableWin->table()->item(row, PHASE)->setText(QString::number(phase));
         p_tableWin->table()->item(row, INCIDENCE)->setText(QString::number(incidence));
         p_tableWin->table()->item(row, EMISSION)->setText(QString::number(emission));
-        
+
         // Write out columns local incidence and emission
-        // Calculates the angles local to the slope for the DEMs, compare against 
+        // Calculates the angles local to the slope for the DEMs, compare against
         // the incidence and emission angles calculated for the sphere
         Angle phaseAngle, incidenceAngle, emissionAngle;
         bool bSuccess=false;
@@ -440,7 +440,7 @@ namespace Isis {
    * @param piLine        - Line Index
    * @param piSample      - Sample Index
    * @param piOrigin      - Contains the Src Index (zero based)
-   * @param psSrcFileName - Contains the Src Filename
+   * @param psSrcFileName - Contains the Src FileName
    * @param psSrcSerialNum- Contains the Src Serial Number
    *
    * @return void

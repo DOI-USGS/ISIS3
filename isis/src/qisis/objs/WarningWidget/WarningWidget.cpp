@@ -1,6 +1,6 @@
 #include "WarningWidget.h"
 #include "iString.h"
-#include "Filename.h"
+#include "FileName.h"
 
 #include <QIcon>
 #include <QPixmap>
@@ -20,7 +20,7 @@ namespace Isis {
   WarningWidget::WarningWidget(QStatusBar *pParent): QObject(pParent) {
     mSBar = pParent;
 
-    std::string sToolIconDir = Filename("$base/icons").Expanded();
+    std::string sToolIconDir = FileName("$base/icons").expanded();
     QString qsIconFile(sToolIconDir.c_str());
 
     // default Action - No warning

@@ -19,20 +19,20 @@ void IsisMain() {
     icube.setVirtualBands(inAtt.Bands());
   }
 
-  icube.open(Filename(ui.GetFilename("FROM")).Expanded());
+  icube.open(FileName(ui.GetFileName("FROM")).expanded());
 
   // Make sure it is a Themis EDR/RDR
-  Filename inFilename = ui.GetFilename("FROM");
+  FileName inFileName = ui.GetFileName("FROM");
   try {
     if(icube.getGroup("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
       string msg = "This program is intended for use on THEMIS VIS images only. [";
-      msg += inFilename.Expanded() + "] does not appear to be a THEMIS VIS image.";
+      msg += inFileName.expanded() + "] does not appear to be a THEMIS VIS image.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   catch(IException &e) {
     string msg = "This program is intended for use on THEMIS VIS images only. [";
-    msg += inFilename.Expanded() + "] does not appear to be a THEMIS VIS image.";
+    msg += inFileName.expanded() + "] does not appear to be a THEMIS VIS image.";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
@@ -44,10 +44,9 @@ void IsisMain() {
     string filePattern = "$odyssey/calibration/flat_filter_";
     filePattern += iString(filt + 1) + "_summing_";
     filePattern += iString(summing) + "_v????.cub";
-    Filename flatFile(filePattern);
-    flatFile.HighestVersion();
+    FileName flatFile = FileName(filePattern).highestVersion();
     Cube *fcube = new Cube();
-    fcube->open(flatFile.Expanded());
+    fcube->open(flatFile.expanded());
     flatcubes.push_back(fcube);
 
     LineManager *fcubeMgr = new LineManager(*fcube);
@@ -64,7 +63,7 @@ void IsisMain() {
   ocube.setLabelsAttached(outAtt.AttachedLabel());
   ocube.setPixelType(outAtt.PixelType());
 
-  ocube.create(Filename(ui.GetFilename("TO")).Expanded());
+  ocube.create(FileName(ui.GetFileName("TO")).expanded());
 
   LineManager icubeMgr(icube);
   vector<int> filter;

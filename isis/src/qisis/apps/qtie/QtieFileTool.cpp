@@ -18,7 +18,7 @@
 #include "Camera.h"
 #include "ControlNet.h"
 #include "Cube.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "MainWindow.h"
 #include "MdiCubeViewport.h"
 #include "SerialNumberList.h"
@@ -81,8 +81,8 @@ namespace Isis {
       }
 
       // Find directory and save for use in file dialog for match cube
-      Filename fname(baseFile.toStdString());
-      dir = fname.absolutePath();
+      FileName fname(baseFile.toStdString());
+      dir = fname.path().ToQt();
 
       //  Make sure base is projected
       try {
@@ -147,8 +147,8 @@ namespace Isis {
     matchCube->close();
 
     // Find directory and save for use in file dialog for match cube
-    Filename fname(matchFile.toStdString());
-    dir = fname.absolutePath();
+    FileName fname(matchFile.toStdString());
+    dir = fname.path().ToQt();
 
     //Open control net
     filter = "Control net (*.net);;";

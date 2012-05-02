@@ -3,6 +3,8 @@
 #include <QMenuBar>
 #include <QMenu>
 #include <QSettings>
+
+#include "iString.h"
 #include "ViewportMainWindow.h"
 #include "Workspace.h"
 #include "TrackTool.h"
@@ -109,8 +111,8 @@ namespace Isis {
     this->MainWindow::readSettings();
     /*Now read the settings that are specific to this window.*/
     std::string instanceName = this->windowTitle().toStdString();
-    Filename config("$HOME/.Isis/" + instanceName + "/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
+    FileName config("$HOME/.Isis/" + instanceName + "/" + instanceName + ".config");
+    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
     QByteArray state = settings.value("state", QByteArray("0")).toByteArray();
     restoreState(state);
   }
@@ -128,8 +130,8 @@ namespace Isis {
     this->MainWindow::writeSettings();
     /*Now write the settings that are specific to this window.*/
     std::string instanceName = this->windowTitle().toStdString();
-    Filename config("$HOME/.Isis/" + instanceName + "/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
+    FileName config("$HOME/.Isis/" + instanceName + "/" + instanceName + ".config");
+    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
     settings.setValue("state", this->saveState());
   }
 

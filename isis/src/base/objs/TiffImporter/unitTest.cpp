@@ -1,6 +1,6 @@
 #include <iomanip>
 
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Preference.h"
 #include "TiffImporter.h"
@@ -15,18 +15,18 @@ int main(int argc, char *argv[]) {
 
   try {
     cout << "Testing TiffImporter..." << endl << endl;
-    Filename inputName("test.tif");
+    FileName inputName("test.tif");
 
     cout << "Creating Instance" << endl;
     TiffImporter *importer = new TiffImporter(inputName);
 
     cout << "Importing" << endl;
-    Filename outputName("test.cub");
+    FileName outputName("test.cub");
     importer->import(outputName);
 
     cout << "Clean-up" << endl;
     delete importer;
-    remove(outputName.Expanded().c_str());
+    remove(outputName.expanded().c_str());
 
     cout << endl << "Done" << endl;
   }

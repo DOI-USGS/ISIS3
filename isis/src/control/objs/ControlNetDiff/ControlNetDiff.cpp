@@ -11,7 +11,7 @@
 #include "ControlNetFile.h"
 #include "ControlNetVersioner.h"
 #include "ControlPoint.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Pvl.h"
 #include "PvlContainer.h"
 #include "PvlGroup.h"
@@ -87,13 +87,13 @@ namespace Isis {
    * @param net2Name Name of the second Control Network
    * @return Pvl The collection of all differences
    */
-  Pvl ControlNetDiff::compare(Filename &net1Name, Filename &net2Name) {
+  Pvl ControlNetDiff::compare(FileName &net1Name, FileName &net2Name) {
     Pvl results;
     PvlObject report("Differences");
 
-    LatestControlNetFile *net1 = ControlNetVersioner::Read(net1Name.Expanded());
-    LatestControlNetFile *net2 = ControlNetVersioner::Read(net2Name.Expanded());
-    diff("Filename", net1Name.Name(), net2Name.Name(), report);
+    LatestControlNetFile *net1 = ControlNetVersioner::Read(net1Name.expanded());
+    LatestControlNetFile *net2 = ControlNetVersioner::Read(net2Name.expanded());
+    diff("Filename", net1Name.name(), net2Name.name(), report);
 
     Pvl net1Pvl(net1->ToPvl());
     Pvl net2Pvl(net2->ToPvl());

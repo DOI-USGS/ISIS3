@@ -1,6 +1,6 @@
 #include "Isis.h"
 
-#include "Filename.h"
+#include "FileName.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "iTime.h"
@@ -12,18 +12,18 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Open the input file from the GUI or find the latest version of the DB file
-  Filename inputName;
+  FileName inputName;
   if (ui.WasEntered("FROM")) {
-    inputName = ui.GetFilename("FROM");
+    inputName = ui.GetFileName("FROM");
   }
   else {
     // Stores highest version
     inputName = "$cassini/kernels/pck/kernels.????.db";
-    inputName.HighestVersion();
+    inputName = inputName.highestVersion();
   }
 
   // Read PCK DB file into a PVL and search the PVL for the main object
-  Pvl db(inputName.Expanded());
+  Pvl db(inputName.expanded());
   PvlObject &main = db.FindObject("TargetAttitudeShape");
 
   // Add a timestamp for when this file was created
@@ -32,9 +32,9 @@ void IsisMain() {
 
   // Add our dependencies, only the Leapsecond Kernel
   PvlGroup dependencies("Dependencies");
-  Filename lskName("$base/kernels/lsk/naif????.tls");
-  lskName.HighestVersion();
-  iString lskString = lskName.OriginalPath() + "/" + lskName.Name();
+  FileName lskName("$base/kernels/lsk/naif????.tls");
+  lskName = lskName.highestVersion();
+  iString lskString = lskName.originalPath() + "/" + lskName.name();
   dependencies += PvlKeyword("LeapsecondKernel", lskString);
   latestMain += dependencies;
 
@@ -51,10 +51,10 @@ void IsisMain() {
       for (int k = 0; k < group.Keywords(); k++) {
         PvlKeyword &keyword = group[k];
         if (keyword.IsNamed("File")) {
-          Filename pckName(keyword[0]);
-          if (pckName.IsDateVersioned()) {
-            pckName.HighestVersion();
-            iString latestPck = pckName.OriginalPath() + "/" + pckName.Name();
+          FileName pckName(keyword[0]);
+          if (pckName.isDateVersioned()) {
+            pckName = pckName.highestVersion();
+            iString latestPck = pckName.originalPath() + "/" + pckName.name();
 
             // Replace the date-versioned filename with the direct path to the
             // latest PCK
@@ -86,18 +86,18 @@ void IsisMain() {
 
   // Determine whether we want to update the data area directly or write to a
   // user-specified location
-  Filename outputName;
+  FileName outputName;
   if (ui.WasEntered("TO")) {
-    outputName = ui.GetFilename("TO");
+    outputName = ui.GetFileName("TO");
   }
   else {
     outputName = "$cassini/kernels/pck/kernels.????.db";
-    outputName.NewVersion();
+    outputName = outputName.newVersion();
   }
 
   // Write the updated PVL as the new PCK DB file
   Pvl latestDb;
   latestDb.AddObject(latestMain);
-  latestDb.Write(outputName.Expanded());
+  latestDb.Write(outputName.expanded());
 }
 

@@ -1489,7 +1489,7 @@ namespace Isis {
     // Open the camera for all the images in the serial number list
     for (int i = 0; i < list.Size(); i++) {
       iString serialNumber = list.SerialNumber(i);
-      iString filename = list.Filename(i);
+      iString filename = list.FileName(i);
       Pvl pvl(filename);
 
       try {

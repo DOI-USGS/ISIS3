@@ -7,7 +7,7 @@
 
 #include "UserInterface.h"
 #include "Progress.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "ProcessExportPds.h"
 #include "Cube.h"
@@ -93,9 +93,9 @@ void IsisMain() {
   const std::string mdis2pds_runtime = Application::DateTime();
 
   UserInterface &ui = Application::GetUserInterface();
-  Filename input(ui.GetFilename("FROM"));
-  Filename output = ui.GetFilename("TO");
-  output.AddExtension("IMG");
+  FileName input(ui.GetFileName("FROM"));
+  FileName output = ui.GetFileName("TO");
+  output = output.addExtension("IMG");
 
   // Set up the export
   ProcessExportPds processPds;
@@ -278,7 +278,7 @@ void IsisMain() {
   data_set_id.SetValue(dataSetID);
   PvlKeyword &product_id = pdsLabel.FindKeyword("PRODUCT_ID", Pvl::Traverse);
   if((product_id.Size() == 0) || ((product_id.Size() > 0) && (product_id[0] == "N/A"))) {
-    product_id.SetValue(output.Basename());
+    product_id.SetValue(output.baseName());
   }
   PvlKeyword &product_creation_time = pdsLabel.FindKeyword("PRODUCT_CREATION_TIME", Pvl::Traverse);
   product_creation_time.SetValue(mdis2pds_runtime);
@@ -358,7 +358,7 @@ void IsisMain() {
   p.CheckStatus();
 
   // All done...write result.
-  ofstream outstream(output.Expanded().c_str());
+  ofstream outstream(output.expanded().c_str());
   processPds.OutputLabel(outstream);
 
   processPds.StartProcess(outstream);

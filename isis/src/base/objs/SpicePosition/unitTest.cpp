@@ -1,7 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include "SpicePosition.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Preference.h"
 #include "Table.h"
 
@@ -15,8 +15,8 @@ int main(int argc, char *argv[]) {
 
   // Test case is taken from moc red wide angle image ab102401
   // sn = MGS/561812335:32/MOC-WA/RED
-  Isis::Filename f("$base/testData/kernels");
-  string dir = f.Expanded() + "/";
+  Isis::FileName f("$base/testData/kernels");
+  string dir = f.expanded() + "/";
   string moc(dir + "moc.bsp");
   string de(dir + "de405.bsp");
   string pck(dir + "pck00006.tpc");

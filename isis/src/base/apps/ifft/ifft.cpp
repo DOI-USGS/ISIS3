@@ -11,8 +11,8 @@ void IFFT1(vector<Buffer *> &in, vector<Buffer *> &out);
 void IFFT2(vector<Buffer *> &in, vector<Buffer *> &out);
 
 FourierTransform fft;
-string tmpMagFilename = "Temporary_IFFT_Magnitude.cub";
-string tmpPhaseFilename = "Temporary_IFFT_Phase.cub";
+string tmpMagFileName = "Temporary_IFFT_Magnitude.cub";
+string tmpPhaseFileName = "Temporary_IFFT_Phase.cub";
 
 void IsisMain() {
   // We will be processing by line first
@@ -22,7 +22,7 @@ void IsisMain() {
   // Get the original cubes dimensions
   UserInterface &ui = Application::GetUserInterface();
   Pvl lab;
-  lab.Read(ui.GetFilename("MAGNITUDE"));
+  lab.Read(ui.GetFileName("MAGNITUDE"));
   AlphaCube acube(lab);
   int initSamples = acube.BetaSamples();
   int initLines = acube.BetaLines();
@@ -50,8 +50,8 @@ void IsisMain() {
 
   Isis::CubeAttributeOutput cao;
 
-  lProc.SetOutputCube(tmpMagFilename, cao, numSamples, numLines, numBands);
-  lProc.SetOutputCube(tmpPhaseFilename, cao, numSamples, numLines, numBands);
+  lProc.SetOutputCube(tmpMagFileName, cao, numSamples, numLines, numBands);
+  lProc.SetOutputCube(tmpPhaseFileName, cao, numSamples, numLines, numBands);
 
   // Start the line processing
   lProc.ProcessCubes(&IFFT2);
@@ -65,8 +65,8 @@ void IsisMain() {
   // Setup the input and output cubes
   Isis::CubeAttributeInput cai;
 
-  sProc.SetInputCube(tmpMagFilename, cai);
-  sProc.SetInputCube(tmpPhaseFilename, cai);
+  sProc.SetInputCube(tmpMagFileName, cai);
+  sProc.SetInputCube(tmpPhaseFileName, cai);
 
   // the final output cube is cropped back to the original size
   sProc.SetOutputCube("TO", initSamples, initLines, numBands);
@@ -75,8 +75,8 @@ void IsisMain() {
   sProc.ProcessCubes(&IFFT1);
   sProc.Finalize();
 
-  remove(tmpMagFilename.c_str());
-  remove(tmpPhaseFilename.c_str());
+  remove(tmpMagFileName.c_str());
+  remove(tmpPhaseFileName.c_str());
 }
 
 // Processing routine for the inverse fft

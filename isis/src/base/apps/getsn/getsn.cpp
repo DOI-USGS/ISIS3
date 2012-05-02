@@ -25,7 +25,7 @@ void IsisMain() {
   // Open the input cube
   UserInterface &ui = Application::GetUserInterface();
   Cube cube;
-  string from = ui.GetFilename("FROM");
+  string from = ui.GetFileName("FROM");
   cube.open(from, "r");
 
   // Determine if output should be written base on parameters
@@ -62,15 +62,15 @@ void IsisMain() {
       Pvl pvl;
       pvl.AddGroup(sn);
       if(ui.GetBoolean("APPEND"))
-        pvl.Append(ui.GetFilename("TO"));
+        pvl.Append(ui.GetFileName("TO"));
       else
-        pvl.Write(ui.GetFilename("TO"));
+        pvl.Write(ui.GetFileName("TO"));
     }
     // FLAT option
     else {
       bool append = ui.GetBoolean("APPEND");
       // Open in append or overwrite
-      TextFile txt(ui.GetFilename("TO"), append ? "append" : "overwrite");
+      TextFile txt(ui.GetFileName("TO"), append ? "append" : "overwrite");
 
       // Build string
       string line = "";

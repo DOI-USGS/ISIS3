@@ -3,7 +3,7 @@
 #include <sstream>
 #include "IsisAml.h"
 
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "Pvl.h"
@@ -165,7 +165,7 @@ int main(void) {
   // Create the aml object
   cout << "Create the aml object" << endl;
   Inheritor *aml;
-  string xmlFile = Isis::Filename("./unitTest.xml").Expanded();
+  string xmlFile = Isis::FileName("./unitTest.xml").expanded();
   try {
     aml = new Inheritor(xmlFile.c_str());
   }
@@ -224,16 +224,16 @@ int main(void) {
     }
 
     cout << "Get/Put/Clear/WasEntered tests" << endl;
-    cout << "Default value of G0P1 is " << aml->GetFilename("G0P1") << endl;
+    cout << "Default value of G0P1 is " << aml->GetFileName("G0P1") << endl;
     cout << "G0P1 WasEntered value " << aml->WasEntered("G0P1") << endl;
     aml->PutAsString("G0P1", "/home/user/file1.cub");
     cout << "G0P1 WasEntered value " << aml->WasEntered("G0P1") << endl;
-    cout << "The value of G0P1 is " << aml->GetFilename("G0P1") << endl;
+    cout << "The value of G0P1 is " << aml->GetFileName("G0P1") << endl;
     aml->Clear("G0P1");
-    cout << "Default value of G0P1 is " << aml->GetFilename("G0P1") << endl;
-    aml->PutFilename("G0P1", "/home/user/file2.dat");
-    cout << "The value of G0P1 is " << aml->GetFilename("G0P1") << endl << endl;
-    cout << "The value of G0P1 is " << aml->GetFilename("G0P1", "txt") << endl << endl;
+    cout << "Default value of G0P1 is " << aml->GetFileName("G0P1") << endl;
+    aml->PutFileName("G0P1", "/home/user/file2.dat");
+    cout << "The value of G0P1 is " << aml->GetFileName("G0P1") << endl << endl;
+    cout << "The value of G0P1 is " << aml->GetFileName("G0P1", "txt") << endl << endl;
     aml->Clear("G0P1");
 
     cout << "Default value of G1P1 is " << aml->GetInteger("G1P1") << endl;
@@ -353,10 +353,10 @@ int main(void) {
       ReportError(error.toString());
     }
 
-    cout << "  PutFilename:" << endl;
+    cout << "  PutFileName:" << endl;
     try { // PARAMETER VALUE ALREADY ENTERED
-      aml->PutFilename("G0P0", "xxxxxxx");
-      aml->PutFilename("G0P0", "yyyyyyy");
+      aml->PutFileName("G0P0", "xxxxxxx");
+      aml->PutFileName("G0P0", "yyyyyyy");
     }
     catch(Isis::IException &error) {
       ReportError(error.toString());
@@ -364,7 +364,7 @@ int main(void) {
     aml->Clear("G0P0");
 
     try { // PARAMETER NOT FILENAME
-      aml->PutFilename("G2P4", "xxxxxx");
+      aml->PutFileName("G2P4", "xxxxxx");
     }
     catch(Isis::IException &error) {
       ReportError(error.toString());
@@ -373,7 +373,7 @@ int main(void) {
     cout << "  Cube tests:" << endl;
 
     try { // UNABLE TO GET INPUT CUBE ATTRIBUTES
-      aml->PutFilename("CUBE2", "xxxxxxx.cub+1,2-4");
+      aml->PutFileName("CUBE2", "xxxxxxx.cub+1,2-4");
       Isis::CubeAttributeInput &att = aml->GetInputAttribute("CUBE2");
       cout << "    " << att.BandsStr() << endl;
     }
@@ -383,7 +383,7 @@ int main(void) {
     aml->Clear("CUBE2");
 
     try { // UNABLE TO GET OUTPUT CUBE ATTRIBUTES
-      aml->PutFilename("CUBE1", "yyyyyyy.cub+8-bit+BSQ+detached");
+      aml->PutFileName("CUBE1", "yyyyyyy.cub+8-bit+BSQ+detached");
       Isis::CubeAttributeOutput &att = aml->GetOutputAttribute("CUBE1");
       string strng;
       att.Write(strng);
@@ -456,16 +456,16 @@ int main(void) {
       ReportError(error.toString());
     }
 
-    cout << "  GetFilename:" << endl;
+    cout << "  GetFileName:" << endl;
     try { // PARAMETER HAS NO VALUE
-      string s = aml->GetFilename("G0P0");
+      string s = aml->GetFileName("G0P0");
     }
     catch(Isis::IException &error) {
       ReportError(error.toString());
     }
 
     try { // PARAMETER NOT FILENAME
-      string s = aml->GetFilename("G2P4");
+      string s = aml->GetFileName("G2P4");
     }
     catch(Isis::IException &error) {
       ReportError(error.toString());
@@ -770,7 +770,7 @@ int main(void) {
 void ReportError(Isis::iString err) {
   Isis::iString report = ""; // report will be modified error message
   Isis::iString errorLine = ""; // read message one line at a time
-  Isis::Filename expandedfile;
+  Isis::FileName expandedfile;
   while(err != "") {
     // pull off first line
     errorLine = err.Token("\n");
@@ -782,9 +782,9 @@ void ReportError(Isis::iString err) {
           // add message up to and including [
           report += errorLine.Token("[");
           report += "[";
-          // read entire path into Filename object
+          // read entire path into FileName object
           expandedfile = errorLine.Token("]");
-          report += expandedfile.Name(); // only report base name, rather than fully expanded path
+          report += expandedfile.name(); // only report base name, rather than fully expanded path
           report += "]";
         }
         else {

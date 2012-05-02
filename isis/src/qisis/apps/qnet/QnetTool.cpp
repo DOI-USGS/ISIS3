@@ -21,7 +21,7 @@
 #include "ControlPoint.h"
 #include "ControlPointEdit.h"
 #include "Distance.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -163,7 +163,7 @@ namespace Isis {
     createMenus();
     createToolBars();
 
-    // create p_pointEditor first since we need to get its templateFilename
+    // create p_pointEditor first since we need to get its templateFileName
     // later
     p_pointEditor = new ControlPointEdit(g_controlNetwork, parent);
     connect(this, SIGNAL(newControlNetwork(ControlNet *)),
@@ -201,37 +201,37 @@ namespace Isis {
     addMeasureLayout->addWidget(p_savePoint);
 //    addMeasureLayout->addStretch();
 
-    p_templateFilenameLabel = new QLabel("Template File: " +
-        QString::fromStdString(p_pointEditor->templateFilename()));
-    p_templateFilenameLabel->setToolTip("Sub-pixel registration template File.");
+    p_templateFileNameLabel = new QLabel("Template File: " +
+        QString::fromStdString(p_pointEditor->templateFileName()));
+    p_templateFileNameLabel->setToolTip("Sub-pixel registration template File.");
 //  QString patternMatchDoc =
-//          Filename("$ISISROOT/doc/documents/PatternMatch/PatternMatch.html").fileName();
-//    p_templateFilenameLabel->setOpenExternalLinks(true);
-    p_templateFilenameLabel->setWhatsThis("Filename of the sub-pixel "
+//          FileName("$ISISROOT/doc/documents/PatternMatch/PatternMatch.html").fileName();
+//    p_templateFileNameLabel->setOpenExternalLinks(true);
+    p_templateFileNameLabel->setWhatsThis("FileName of the sub-pixel "
                   "registration template.  Refer to $ISISROOT/doc/documents/"
                   "PatternMatch/PatternMatch.html for a description of the "
                   "contents of this file.");
 
-    p_groundFilenameLabel = new QLabel("Ground Source File: ");
-    p_groundFilenameLabel->setToolTip("Cube used to create ground control "
+    p_groundFileNameLabel = new QLabel("Ground Source File: ");
+    p_groundFileNameLabel->setToolTip("Cube used to create ground control "
                                "points, either Fixed or Constrained.");
-    p_groundFilenameLabel->setWhatsThis("This cube is used to create ground "
+    p_groundFileNameLabel->setWhatsThis("This cube is used to create ground "
                              "control points, Fixed or Constrained.  This may "
                              "be a Dem, a shaded relief version of a Dem, "
                              "a projected basemap or an unprojected cube with "
                              "corrected camera pointing.  This will be used "
                              "to set the apriori latitude, longitude.");
-    p_radiusFilenameLabel = new QLabel("Radius Source File: ");
-    p_radiusFilenameLabel->setToolTip("Dem used to set the radius of ground "
+    p_radiusFileNameLabel = new QLabel("Radius Source File: ");
+    p_radiusFileNameLabel->setToolTip("Dem used to set the radius of ground "
                              "control points, Fixed or Constrained.  This must "
                              "be a Dem and is strictly used to set the apriori "
                              "radius for ground control points.");
 
     QVBoxLayout * centralLayout = new QVBoxLayout;
 
-    centralLayout->addWidget(p_templateFilenameLabel);
-    centralLayout->addWidget(p_groundFilenameLabel);
-    centralLayout->addWidget(p_radiusFilenameLabel);
+    centralLayout->addWidget(p_templateFileNameLabel);
+    centralLayout->addWidget(p_groundFileNameLabel);
+    centralLayout->addWidget(p_radiusFileNameLabel);
     centralLayout->addWidget(createTopSplitter());
     centralLayout->addStretch();
     centralLayout->addWidget(p_pointEditor);
@@ -597,8 +597,8 @@ namespace Isis {
     connect(p_saveTemplateFileAs, SIGNAL(triggered()), this,
         SLOT(saveTemplateFileAs()));
 
-    p_whatsThis = new QAction(QIcon(Filename(
-      "$base/icons/contexthelp.png").Expanded()),"&Whats's This", p_qnetTool);
+    p_whatsThis = new QAction(QIcon(FileName(
+      "$base/icons/contexthelp.png").expanded()),"&Whats's This", p_qnetTool);
     p_whatsThis->setShortcut(Qt::SHIFT | Qt::Key_F1);
     p_whatsThis->setToolTip("Activate What's This and click on items on "
         "user interface to see more information.");
@@ -847,8 +847,8 @@ namespace Isis {
         if (response == QMessageBox::Yes) {
           //  Update measure file combo boxes:  old reference normal font,
           //    new reference bold font
-          iString file = g_serialNumberList->Filename(p_leftMeasure->GetCubeSerialNumber());
-          QString fname = Filename(file).Name().c_str();
+          iString file = g_serialNumberList->FileName(p_leftMeasure->GetCubeSerialNumber());
+          QString fname = FileName(file).name().c_str();
           int iref = p_leftCombo->findText(fname);
 
           //  Save normal font from new reference measure
@@ -857,8 +857,8 @@ namespace Isis {
           iref = p_rightCombo->findText(fname);
           p_rightCombo->setItemData(iref,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
 
-          file = g_serialNumberList->Filename(refMeasure->GetCubeSerialNumber());
-          fname = Filename(file).Name().c_str();
+          file = g_serialNumberList->FileName(refMeasure->GetCubeSerialNumber());
+          fname = FileName(file).name().c_str();
           iref = p_leftCombo->findText(fname);
           p_leftCombo->setItemData(iref,font,Qt::FontRole);
           iref = p_rightCombo->findText(fname);
@@ -1329,14 +1329,14 @@ namespace Isis {
    * @author 2011-10-31 Tracie Sucharski
    */
   void QnetTool::saveNet() {
-    if (p_cnetFilename.isEmpty()) {
+    if (p_cnetFileName.isEmpty()) {
       QString message = "This is a new network, you must select "
                         "\"Save As\" under the File Menu.";
       QMessageBox::critical(p_qnetTool, "Error", message);
       return;
     }
     emit qnetToolSave();
-    //g_controlNetwork->Write(p_cnetFilename.toStdString());
+    //g_controlNetwork->Write(p_cnetFileName.toStdString());
   }
 
 
@@ -1364,23 +1364,23 @@ namespace Isis {
   /**
    * Updates the Control Network displayed in the Qnet Tool title
    * bar. This slot is connected to QnetFileTool's
-   * controlNetworkUpdated(QString cNetFilename) signal.
+   * controlNetworkUpdated(QString cNetFileName) signal.
    *
-   * @param cNetFilename Filename of the most recently selected
+   * @param cNetFileName FileName of the most recently selected
    *                     control network.
    * @see QnetFileTool
    * @internal
    *   @history Tracie Sucharski - Original version
-   *   @history 2008-11-26 Jeannie Walldren - Added cNetFilename input parameter
+   *   @history 2008-11-26 Jeannie Walldren - Added cNetFileName input parameter
    *                          in order to show the file path in the window's title
    *                          bar.
    *   @history 2011-10-31 Tracie Sucharski - Save filename for implementation
    *                          of Save option.
    */
-  void QnetTool::updateNet(QString cNetFilename) {
-    p_cnetFilename = cNetFilename;
+  void QnetTool::updateNet(QString cNetFileName) {
+    p_cnetFileName = cNetFileName;
     p_qnetTool->setWindowTitle("Qnet Tool - Control Network File: " +
-                               cNetFilename);
+                               cNetFileName);
     //p_pointEditor->setControlNet(*g_controlNetwork);
 
   }
@@ -1434,7 +1434,7 @@ namespace Isis {
     MdiCubeViewport *cvp = cubeViewport();
     if (cvp  == NULL) return;
 
-    iString file = cvp->cube()->getFilename();
+    iString file = cvp->cube()->getFileName();
     iString sn = g_serialNumberList->SerialNumber(file);
 
     double samp,line;
@@ -1463,7 +1463,7 @@ namespace Isis {
       modifyPoint(point);
     }
     else if (s == Qt::MidButton) {
-      if (p_groundOpen && file == p_groundCube->getFilename()) {
+      if (p_groundOpen && file == p_groundCube->getFileName()) {
         QString message = "Cannot select point for deleting on ground source.  Select ";
         message += "point using un-projected images or the Navigator Window.";
         QMessageBox::critical(p_qnetTool, "Error", message);
@@ -1491,7 +1491,7 @@ namespace Isis {
       }
       double lat = gmap->UniversalLatitude();
       double lon = gmap->UniversalLongitude();
-      if (p_groundOpen && file == p_groundCube->getFilename()) {
+      if (p_groundOpen && file == p_groundCube->getFileName()) {
         createFixedPoint (lat,lon);
       }
       else {
@@ -1563,7 +1563,7 @@ namespace Isis {
         double line = cam->Line();
         if (samp >= 1 && samp <= cam->Samples() &&
             line >= 1 && line <= cam->Lines()) {
-          pointFiles<<g_serialNumberList->Filename(i).c_str();
+          pointFiles<<g_serialNumberList->FileName(i).c_str();
         }
       }
     }
@@ -1601,7 +1601,7 @@ namespace Isis {
                   g_serialNumberList->SerialNumber(item->text().toStdString());
         m->SetCubeSerialNumber(sn);
         int camIndex =
-              g_serialNumberList->FilenameIndex(item->text().toStdString());
+              g_serialNumberList->FileNameIndex(item->text().toStdString());
         cam = g_controlNetwork->Camera(camIndex);
         cam->SetUniversalGround(lat,lon);
         m->SetCoordinate(cam->Sample(),cam->Line());
@@ -1630,7 +1630,7 @@ namespace Isis {
       p_qnetTool->raise();
 
       loadTemplateFile(QString::fromStdString(
-          p_pointEditor->templateFilename()));
+          p_pointEditor->templateFileName()));
 
 
       // emit signal so the nave tool refreshes the list
@@ -1676,7 +1676,7 @@ namespace Isis {
         double line = cam->Line();
         if (samp >= 1 && samp <= cam->Samples() &&
             line >= 1 && line <= cam->Lines()) {
-          pointFiles<<g_serialNumberList->Filename(i).c_str();
+          pointFiles<<g_serialNumberList->FileName(i).c_str();
         }
       }
     }
@@ -1728,7 +1728,7 @@ namespace Isis {
         if (sn == p_groundSN) continue;
         m->SetCubeSerialNumber(sn);
         int camIndex =
-                 g_serialNumberList->FilenameIndex(item->text().toStdString());
+                 g_serialNumberList->FileNameIndex(item->text().toStdString());
         cam = g_controlNetwork->Camera(camIndex);
         cam->SetUniversalGround(lat,lon);
         m->SetCoordinate(cam->Sample(),cam->Line());
@@ -1853,7 +1853,7 @@ namespace Isis {
     //  Need all files for this point
     for (int i=0; i<p_editPoint->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*p_editPoint)[i];
-      iString file = g_serialNumberList->Filename(m.GetCubeSerialNumber());
+      iString file = g_serialNumberList->FileName(m.GetCubeSerialNumber());
       deletePointDialog->fileList->addItem(file.c_str());
     }
 
@@ -1926,7 +1926,7 @@ namespace Isis {
         p_qnetTool->raise();
 
         loadTemplateFile(QString::fromStdString(
-            p_pointEditor->templateFilename()));
+            p_pointEditor->templateFileName()));
       }
 
       // emit a signal to alert user to save when exiting
@@ -1989,7 +1989,7 @@ namespace Isis {
     p_qnetTool->setShown(true);
     p_qnetTool->raise();
     loadTemplateFile(QString::fromStdString(
-        p_pointEditor->templateFilename()));
+        p_pointEditor->templateFileName()));
 
     // emit signal so the nav tool can update edit point
     emit editPointChanged(p_editPoint->GetId());
@@ -2100,11 +2100,11 @@ namespace Isis {
     //  Need all files for this point
     for (int i=0; i<p_editPoint->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*p_editPoint)[i];
-      iString file = g_serialNumberList->Filename(m.GetCubeSerialNumber());
+      iString file = g_serialNumberList->FileName(m.GetCubeSerialNumber());
       p_pointFiles<<file;
-      QString tempFilename = Filename(file).Name().c_str();
-      p_leftCombo->addItem(tempFilename);
-      p_rightCombo->addItem(tempFilename);
+      QString tempFileName = FileName(file).name().c_str();
+      p_leftCombo->addItem(tempFileName);
+      p_rightCombo->addItem(tempFileName);
       if (p_editPoint->IsReferenceExplicit() &&
           (QString)m.GetCubeSerialNumber() == p_editPoint->GetReferenceSN()) {
           p_leftCombo->setItemData(i,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
@@ -2130,8 +2130,8 @@ namespace Isis {
     else {
       if (p_editPoint->GetType() == ControlPoint::Free &&
           (p_leftFile.length() != 0)) {
-        iString tempFilename = Filename(p_leftFile).Name();
-        leftIndex = p_leftCombo->findText(tempFilename);
+        iString tempFileName = FileName(p_leftFile).name();
+        leftIndex = p_leftCombo->findText(tempFileName);
       }
     }
 
@@ -2200,7 +2200,7 @@ namespace Isis {
       ControlMeasure &m = *(*p_editPoint)[row];
 
       QString file = QString::fromStdString(
-                       g_serialNumberList->Filename(m.GetCubeSerialNumber()));
+                       g_serialNumberList->FileName(m.GetCubeSerialNumber()));
       QTableWidgetItem *tableItem = new QTableWidgetItem(QString(file));
       p_measureTable->setItem(row,column++,tableItem);
 
@@ -2338,7 +2338,7 @@ namespace Isis {
   QString QnetTool::measureColumnToString(QnetTool::MeasureColumns column) {
     switch (column) {
       case FILENAME:
-        return "Filename";
+        return "FileName";
       case CUBESN:
         return "Serial #";
       case SAMPLE:
@@ -2786,7 +2786,7 @@ namespace Isis {
         double line = cam->Line();
         if (samp >= 1 && samp <= cam->Samples() &&
             line >= 1 && line <= cam->Lines()) {
-          pointFiles<<g_serialNumberList->Filename(i).c_str();
+          pointFiles<<g_serialNumberList->FileName(i).c_str();
         }
       }
     }
@@ -2803,7 +2803,7 @@ namespace Isis {
         iString sn = g_serialNumberList->SerialNumber((iString) item->text());
         m->SetCubeSerialNumber(sn);
         int camIndex =
-              g_serialNumberList->FilenameIndex(item->text().toStdString());
+              g_serialNumberList->FileNameIndex(item->text().toStdString());
         cam = g_controlNetwork->Camera(camIndex);
         cam->SetUniversalGround(lat,lon);
         m->SetCoordinate(cam->Sample(),cam->Line());
@@ -2818,7 +2818,7 @@ namespace Isis {
       p_qnetTool->raise();
 
       loadTemplateFile(QString::fromStdString(
-          p_pointEditor->templateFilename()));
+          p_pointEditor->templateFileName()));
 
 
       // emit signal so the nav tool can update edit point
@@ -3091,7 +3091,7 @@ namespace Isis {
    */
   void QnetTool::loadTemplateFile(QString fn) {
 
-    QFile file(QString::fromStdString(Filename((iString) fn).Expanded()));
+    QFile file(QString::fromStdString(FileName((iString) fn).expanded()));
     if (!file.open(QIODevice::ReadOnly)) {
       QString msg = "Failed to open template file \"" + fn + "\"";
       QMessageBox::warning(p_qnetTool, "IO Error", msg);
@@ -3107,7 +3107,7 @@ namespace Isis {
 
     p_templateModified = false;
     p_saveTemplateFile->setEnabled(false);
-    p_templateFilenameLabel->setText("Template File: " + fn);
+    p_templateFileNameLabel->setText("Template File: " + fn);
   }
 
 
@@ -3125,7 +3125,7 @@ namespace Isis {
       return;
 
     QString filename = QString::fromStdString(
-        p_pointEditor->templateFilename());
+        p_pointEditor->templateFileName());
 
     writeTemplateFile(filename);
   }
@@ -3167,10 +3167,10 @@ namespace Isis {
       return;
     }
 
-    QString expandedFilename(QString::fromStdString(
-        Filename((iString) fn).Expanded()));
+    QString expandedFileName(QString::fromStdString(
+        FileName((iString) fn).expanded()));
 
-    QFile file(expandedFilename);
+    QFile file(expandedFileName);
 
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
       QString msg = "Failed to save template file to \"" + fn + "\"\nDo you "
@@ -3187,7 +3187,7 @@ namespace Isis {
     if (p_pointEditor->setTemplateFile(fn)) {
       p_templateModified = false;
       p_saveTemplateFile->setEnabled(false);
-      p_templateFilenameLabel->setText("Template File: " + fn);
+      p_templateFileNameLabel->setText("Template File: " + fn);
     }
   }
 
@@ -3208,12 +3208,12 @@ namespace Isis {
   void QnetTool::viewTemplateFile() {
     try{
       // Get the template file from the ControlPointEditor object
-      Pvl templatePvl(p_pointEditor->templateFilename());
+      Pvl templatePvl(p_pointEditor->templateFileName());
       // Create registration dialog window using PvlEditDialog class
       // to view and/or edit the template
       PvlEditDialog registrationDialog(templatePvl);
       registrationDialog.setWindowTitle("View or Edit Template File: "
-                                         + QString::fromStdString(templatePvl.Filename()));
+                                         + QString::fromStdString(templatePvl.FileName()));
       registrationDialog.resize(550,360);
       registrationDialog.exec();
     }
@@ -3405,7 +3405,7 @@ namespace Isis {
       MdiCubeViewport *vp;
       for (int i=0; i<(int)cubeViewportList()->size(); i++) {
         vp = (*(cubeViewportList()))[i];
-        if (vp->cube()->getFilename() == ground.toStdString()) {
+        if (vp->cube()->getFileName() == ground.toStdString()) {
           g_vpMainWindow->workspace()->setActiveSubWindow((QMdiSubWindow *)vp->parentWidget());
           QApplication::restoreOverrideCursor();
           return;
@@ -3423,7 +3423,7 @@ namespace Isis {
     try {
       p_groundCube->open(ground.toStdString());
       p_groundGmap = new UniversalGroundMap(*p_groundCube);
-      p_groundFile = Filename(p_groundCube->getFilename()).Name().c_str();
+      p_groundFile = FileName(p_groundCube->getFileName()).name().c_str();
     }
     catch (IException &e) {
       QString message = e.toString();
@@ -3514,8 +3514,8 @@ namespace Isis {
 
     if (p_editPoint != NULL &&
         (p_editPoint->GetType() != ControlPoint::Free)) loadPoint();
-    p_groundFilenameLabel->setText("Ground Source File:  " + p_groundFile);
-    p_radiusFilenameLabel->setText("Radius Source File:  " + p_demFile);
+    p_groundFileNameLabel->setText("Ground Source File:  " + p_groundFile);
+    p_radiusFileNameLabel->setText("Radius Source File:  " + p_demFile);
 
     QApplication::restoreOverrideCursor();
   }
@@ -3573,7 +3573,7 @@ namespace Isis {
 
       try {
         p_demCube->open(demFile.toStdString());
-        p_demFile = Filename(p_demCube->getFilename()).Name().c_str();
+        p_demFile = FileName(p_demCube->getFileName()).name().c_str();
       } catch (IException &e) {
         QString message = e.toString();
         QMessageBox::critical(p_qnetTool, "Error", message);
@@ -3599,8 +3599,8 @@ namespace Isis {
         return;
       }
       p_groundRadiusSource = ControlPoint::RadiusSource::DEM;
-      p_groundFilenameLabel->setText("Ground Source File:  " + p_groundFile);
-      p_radiusFilenameLabel->setText("Radius Source File:  " + p_demFile);
+      p_groundFileNameLabel->setText("Ground Source File:  " + p_groundFile);
+      p_radiusFileNameLabel->setText("Radius Source File:  " + p_demFile);
       p_radiusSourceFile = demFile;
 
       QApplication::restoreOverrideCursor();
@@ -3749,8 +3749,8 @@ namespace Isis {
    *
    */
   void QnetTool::readSettings() {
-    Filename config("$HOME/.Isis/qnet/QnetTool.config");
-    QSettings settings(QString::fromStdString(config.Expanded()),
+    FileName config("$HOME/.Isis/qnet/QnetTool.config");
+    QSettings settings(QString::fromStdString(config.expanded()),
                        QSettings::NativeFormat);
     QPoint pos = settings.value("pos", QPoint(300, 100)).toPoint();
     QSize size = settings.value("size", QSize(900, 500)).toSize();
@@ -3769,8 +3769,8 @@ namespace Isis {
     /*We do not want to write the settings unless the window is
       visible at the time of closing the application*/
     if(!p_qnetTool->isVisible()) return;
-    Filename config("$HOME/.Isis/qnet/QnetTool.config");
-    QSettings settings(QString::fromStdString(config.Expanded()),
+    FileName config("$HOME/.Isis/qnet/QnetTool.config");
+    QSettings settings(QString::fromStdString(config.expanded()),
                        QSettings::NativeFormat);
     settings.setValue("pos", p_qnetTool->pos());
     settings.setValue("size", p_qnetTool->size());

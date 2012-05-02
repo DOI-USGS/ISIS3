@@ -28,9 +28,9 @@ void PrintPvl() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Write file out to log
-  string inFile(ui.GetFilename("FROMPVL"));
+  string inFile(ui.GetFileName("FROMPVL"));
   Pvl inPvl;
-  inPvl.Read(ui.GetFilename("FROMPVL"));
+  inPvl.Read(ui.GetFileName("FROMPVL"));
   string Ostring = "***** Output of [" + inFile + "] *****";
   Application::GuiLog(Ostring);
   Application::GuiLog(inPvl);
@@ -67,7 +67,7 @@ void LoadPvl() {
   std::stringstream os;
   string keyVal;
   UserInterface &ui = Application::GetUserInterface();
-  string inFile(ui.GetFilename("FROMPVL"));
+  string inFile(ui.GetFileName("FROMPVL"));
   Pvl inPvl;
   inPvl.Read(inFile);
   iString phtName = ui.GetAsString("PHTNAME");
@@ -361,9 +361,9 @@ void IsisMain() {
   // Get the output file name from the GUI and write the pvl
   // to the file. If no extension is given, '.pvl' will be used.
   UserInterface &ui = Application::GetUserInterface();
-  Filename out = ui.GetFilename("TOPVL");
-  string output = ui.GetFilename("TOPVL");
-  if(out.Extension() == "") {
+  FileName out = ui.GetFileName("TOPVL");
+  string output = ui.GetFileName("TOPVL");
+  if(out.extension() == "") {
     output += ".pvl";
   }
 
@@ -372,7 +372,7 @@ void IsisMain() {
   Pvl op;
 
   if (ui.WasEntered("FROMPVL")) {
-    string input = ui.GetFilename("FROMPVL");
+    string input = ui.GetFileName("FROMPVL");
     p.Read(input);
   }
 

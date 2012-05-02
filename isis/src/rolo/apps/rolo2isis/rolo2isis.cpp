@@ -1,7 +1,7 @@
 #include "Isis.h"
 #include "ProcessImportPds.h"
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Pvl.h"
 #include "PvlTranslationManager.h"
 
@@ -10,7 +10,7 @@ using namespace Isis;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  string labelFile = ui.GetFilename("FROM");
+  string labelFile = ui.GetFileName("FROM");
 
   ProcessImportPds p;
   Pvl label;
@@ -21,28 +21,28 @@ void IsisMain() {
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
   iString transDir = (string) dataDir["Rolo"];
 
-  Filename transFile;
+  FileName transFile;
   Pvl inputLabel(labelFile);
   Pvl outputLabel;
   PvlTranslationManager *translator;
 
   // translate Mapping group
   transFile = transDir + "/" + "translations/roloMapping.trn";
-  translator = new PvlTranslationManager(inputLabel, transFile.Expanded());
+  translator = new PvlTranslationManager(inputLabel, transFile.expanded());
   translator->Auto(outputLabel);
   delete translator;
   translator = NULL;
 
   // translate Instrument group
   transFile = transDir + "/" + "translations/roloInstrument.trn";
-  translator = new PvlTranslationManager(inputLabel, transFile.Expanded());
+  translator = new PvlTranslationManager(inputLabel, transFile.expanded());
   translator->Auto(outputLabel);
   delete translator;
   translator = NULL;
 
   // translate BandBin group
   transFile = transDir + "/" + "translations/roloBandBin.trn";
-  translator = new PvlTranslationManager(inputLabel, transFile.Expanded());
+  translator = new PvlTranslationManager(inputLabel, transFile.expanded());
   translator->Auto(outputLabel);
   outputLabel.FindGroup("BandBin").FindKeyword("OriginalBand").SetUnits(
     translator->Translate("BandBinUnit"));
@@ -57,7 +57,7 @@ void IsisMain() {
 
   // translate Archive group
   transFile = transDir + "/" + "translations/roloArchive.trn";
-  translator = new PvlTranslationManager(inputLabel, transFile.Expanded());
+  translator = new PvlTranslationManager(inputLabel, transFile.expanded());
   translator->Auto(outputLabel);
   delete translator;
   translator = NULL;

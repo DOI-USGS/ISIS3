@@ -5,7 +5,7 @@
 
 #include "Buffer.h"
 #include "ExportDescription.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 
 using namespace Isis;
@@ -173,15 +173,15 @@ namespace Isis {
    * @param outputName The filename of the output cube
    * @param quality The quality of the output, not used for TIFF
    */
-  void QtExporter::write(Filename outputName, int quality) {
+  void QtExporter::write(FileName outputName, int quality) {
     ImageExporter::write(outputName, quality);
 
     // The return status is wrong for JPEG images, so the code will always
     // continue
-    if (!m_qimage->save(outputName.Expanded().c_str(), m_format.c_str(),
+    if (!m_qimage->save(outputName.expanded().c_str(), m_format.c_str(),
           quality)) {
 
-      iString err = "Unable to save [" + outputName.Expanded() +
+      iString err = "Unable to save [" + outputName.expanded() +
         "] to the disk";
       throw IException(IException::Programmer, err, _FILEINFO_);
     }

@@ -45,7 +45,7 @@ namespace Isis {
    */
   class JP2Importer : public ImageImporter {
     public:
-      JP2Importer(Filename inputName);
+      JP2Importer(FileName inputName);
       virtual ~JP2Importer();
 
       virtual bool isGrayscale() const;

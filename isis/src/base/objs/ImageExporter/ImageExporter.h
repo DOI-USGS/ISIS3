@@ -35,7 +35,7 @@ namespace Isis {
   class Cube;
   class CubeAttributeOutput;
   class ExportDescription;
-  class Filename;
+  class FileName;
   class ImageExporter;
   class ProcessExport;
 
@@ -62,7 +62,7 @@ namespace Isis {
 
       void operator()(vector<Buffer *> &in) const;
 
-      virtual void write(Filename outputName, int quality=100);
+      virtual void write(FileName outputName, int quality=100);
 
       int samples() const;
       int lines() const;
@@ -131,7 +131,7 @@ namespace Isis {
 
     private:
       Cube * addChannel(ExportDescription &desc, int i);
-      void createWorldFile(Filename outputName);
+      void createWorldFile(FileName outputName);
 
     private:
       //! The object that feeds lines to this instance and handles stretching.

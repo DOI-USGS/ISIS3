@@ -119,7 +119,7 @@ namespace Isis {
 
         private:
           //! needed by operator() to do call ControlNetVersioner::Read()
-          QString m_networkFilename;
+          QString m_networkFileName;
       };
 
 

@@ -35,7 +35,7 @@ void IsisMain() {
 
   try {
     UserInterface &ui = Application::GetUserInterface();
-    std::string sSerialNumFile = ui.GetFilename("FROMLIST");
+    std::string sSerialNumFile = ui.GetFileName("FROMLIST");
 
     // get the Criteria option
     std::string sCriteria = ui.GetString("CRITERIA");
@@ -46,7 +46,7 @@ void IsisMain() {
     Pvl pvlTemplate, pvlResults;
     if (ui.WasEntered("DEFFILE")) {
       bDefFile = true;
-      pvlDefFile = new Pvl(ui.GetFilename("DEFFILE"));
+      pvlDefFile = new Pvl(ui.GetFileName("DEFFILE"));
 
       // Log the DefFile
       Application::Log(pvlDefFile->Group(0));
@@ -73,7 +73,7 @@ void IsisMain() {
 
     // Get the original control net internalized
     Progress progress;
-    ControlNet cNet(ui.GetFilename("CNET"), &progress);
+    ControlNet cNet(ui.GetFileName("CNET"), &progress);
 
     if (ui.WasEntered("NETWORKID")) {
       cNet.SetNetworkId(ui.GetString("NETWORKID"));
@@ -89,7 +89,7 @@ void IsisMain() {
     bool bLogFile = false;
     string sLogFile;
     if (ui.WasEntered("LOG")) {
-      sLogFile = ui.GetFilename("LOG");
+      sLogFile = ui.GetFileName("LOG");
       bLogFile = true;
     }
 
@@ -141,7 +141,7 @@ void IsisMain() {
       std::string sOverlapListFile = "";
       if (ui.WasEntered("LIMIT")) {
         if (ui.GetBoolean("LIMIT")) {
-          sOverlapListFile = Filename(ui.GetFilename("OVERLAPLIST")).Expanded();
+          sOverlapListFile = FileName(ui.GetFileName("OVERLAPLIST")).expanded();
         }
       }
 
@@ -163,7 +163,7 @@ void IsisMain() {
     }
 
     // Write the new control network out
-    cNet.Write(ui.GetFilename("ONET"));
+    cNet.Write(ui.GetFileName("ONET"));
 
     // Get Control Net Stats Summary
     PvlGroup statsGrp;
@@ -236,7 +236,7 @@ void ViewDefFile() {
 
   // Get template PVL
   Pvl defFile;
-  defFile.Read(ui.GetFilename("DEFFILE"));
+  defFile.Read(ui.GetFileName("DEFFILE"));
 
   // Write deffile file out to the log
   Isis::Application::GuiLog(defFile);

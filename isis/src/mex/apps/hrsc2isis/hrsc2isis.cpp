@@ -46,12 +46,12 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   try {
-    Pvl temp(ui.GetFilename("FROM"));
+    Pvl temp(ui.GetFileName("FROM"));
     // Check for HRSC file
     if(temp["INSTRUMENT_ID"][0] != "HRSC") throw IException();
   }
   catch(IException &e) {
-    iString msg = "File [" + ui.GetFilename("FROM") +
+    iString msg = "File [" + ui.GetFileName("FROM") +
                   "] does not appear to be a Mars Express HRSC image.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -61,9 +61,9 @@ void IsisMain() {
   lineInFile.clear();
   numLinesSkipped = 0;
 
-  p.SetPdsFile(ui.GetFilename("FROM"), "", label);
+  p.SetPdsFile(ui.GetFileName("FROM"), "", label);
 
-  CubeAttributeOutput outAtt(ui.GetFilename("TO"));
+  CubeAttributeOutput outAtt(ui.GetFileName("TO"));
   outCube = new Cube();
 
   outCube->setByteOrder(outAtt.ByteOrder());
@@ -146,14 +146,14 @@ void IsisMain() {
   }
   else {
     //Checks if in file is rdr
-    Filename inFile = ui.GetFilename("FROM");
-    string msg = "[" + inFile.Name() + "] appears to be an rdr file.";
+    FileName inFile = ui.GetFileName("FROM");
+    string msg = "[" + inFile.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   p.Progress()->SetText("Importing");
-  outCube->create(ui.GetFilename("TO"));
+  outCube->create(ui.GetFileName("TO"));
   p.StartProcess(WriteOutput);
 
   if(hasPrefix) {
@@ -229,8 +229,8 @@ void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {
   iString transDir = (string) dataDir["Mex"] + "/translations/";
 
   // Translate the Instrument group
-  Filename transFile(transDir + "hrscInstrument.trn");
-  PvlTranslationManager instrumentXlater(inLabels, transFile.Expanded());
+  FileName transFile(transDir + "hrscInstrument.trn");
+  PvlTranslationManager instrumentXlater(inLabels, transFile.expanded());
   instrumentXlater.Auto(outLabel);
 
   if(inLabels.HasKeyword("MACROPIXEL_SIZE")) {
@@ -251,12 +251,12 @@ void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {
 
   // Translate the BandBin group
   transFile  = transDir + "hrscBandBin.trn";
-  PvlTranslationManager bandBinXlater(inLabels, transFile.Expanded());
+  PvlTranslationManager bandBinXlater(inLabels, transFile.expanded());
   bandBinXlater.Auto(outLabel);
 
   // Translate the Archive group
   transFile  = transDir + "hrscArchive.trn";
-  PvlTranslationManager archiveXlater(inLabels, transFile.Expanded());
+  PvlTranslationManager archiveXlater(inLabels, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
   std::map<std::string, int> naifIkCodes;

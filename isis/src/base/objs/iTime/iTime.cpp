@@ -25,7 +25,7 @@
 
 #include "Preference.h"
 
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 #include "iTime.h"
 #include "SpecialPixel.h"
@@ -428,10 +428,9 @@ namespace Isis {
     Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
     string baseDir = dataDir["Base"];
     baseDir += "/kernels/lsk/";
-    Filename leapSecond(baseDir + "naif????.tls");
-    leapSecond.HighestVersion();
+    FileName leapSecond(baseDir + "naif????.tls");
 
-    string leapSecondName(leapSecond.Expanded());
+    string leapSecondName(leapSecond.highestVersion().expanded());
     furnsh_c(leapSecondName.c_str());
 
     p_lpInitialized = true;
@@ -442,7 +441,7 @@ namespace Isis {
     // Inorder to improve the speed of iTime comparisons, the leapsecond
     // kernel is loaded only once and left open.
 
-    //string leapSecondName(p_leapSecond.Expanded());
+    //string leapSecondName(p_leapSecond.expanded());
     //unload_c (leapSecondName.c_str());
   }
 

@@ -30,11 +30,11 @@ bool eightBitDarkCube; // Is the dark cube of type unsigned byte?
 bool iof; // Determines output units (i.e. I/F or radiance)
 
 void Calibrate(vector<Buffer *> &in, vector<Buffer *> &out);
-Filename FindDarkFile(Cube *icube);
-Filename FindGainFile(Cube *icube);
-Filename FindShutterFile(Cube *icube);
-Filename ReadWeightTable(Cube *icube);
-Filename GetScaleFactorFile();
+FileName FindDarkFile(Cube *icube);
+FileName FindGainFile(Cube *icube);
+FileName FindShutterFile(Cube *icube);
+FileName ReadWeightTable(Cube *icube);
+FileName GetScaleFactorFile();
 int getGainModeID(Cube *icube);
 void calculateScaleFactor0(Cube *icube, Cube *gaincube);
 
@@ -49,21 +49,21 @@ void IsisMain() {
   // Set up our ProcessByLine
   ProcessByLine p;
   Cube *icube = p.SetInputCube("FROM");
-  std::cout << "Dark File: " << FindDarkFile(icube).Expanded() << std::endl;
-  std::cout << "Gain File: " << FindGainFile(icube).Expanded() << std::endl;
-  std::cout << "Shutter File: " << FindShutterFile(icube).Expanded() << std::endl;
+  std::cout << "Dark File: " << FindDarkFile(icube).expanded() << std::endl;
+  std::cout << "Gain File: " << FindGainFile(icube).expanded() << std::endl;
+  std::cout << "Shutter File: " << FindShutterFile(icube).expanded() << std::endl;
 
   Isis::CubeAttributeInput inAtt1;
-  Filename darkFilename = FindDarkFile(icube);
-  Cube *darkcube = p.SetInputCube(darkFilename.Expanded(), inAtt1);
+  FileName darkFileName = FindDarkFile(icube);
+  Cube *darkcube = p.SetInputCube(darkFileName.expanded(), inAtt1);
   dcScaleFactor = darkcube->getGroup("Instrument")["PicScale"][0];
 
   Isis::CubeAttributeInput inAtt2;
-  Filename gainFilename = FindGainFile(icube);
-  Cube *gaincube = p.SetInputCube(gainFilename.Expanded(), inAtt2);
+  FileName gainFileName = FindGainFile(icube);
+  Cube *gaincube = p.SetInputCube(gainFileName.expanded(), inAtt2);
 
   Isis::CubeAttributeInput inAtt3;
-  p.SetInputCube(FindShutterFile(icube).Expanded(), inAtt3, Isis::AllMatchOrOne);
+  p.SetInputCube(FindShutterFile(icube).expanded(), inAtt3, Isis::AllMatchOrOne);
 
   Cube *ocube = p.SetOutputCube("TO");
 
@@ -93,12 +93,12 @@ void IsisMain() {
   p.StartProcess(Calibrate);
 
   PvlGroup calibrationLog("RadiometricCalibration");
-  calibrationLog.AddKeyword(PvlKeyword("From", (std::string)ui.GetFilename("FROM")));
+  calibrationLog.AddKeyword(PvlKeyword("From", (std::string)ui.GetFileName("FROM")));
 
-  Filename shutterFilename = FindShutterFile(icube);
-  calibrationLog.AddKeyword(PvlKeyword("DarkCurrentFile", darkFilename.OriginalPath() + "/" + darkFilename.Name()));
-  calibrationLog.AddKeyword(PvlKeyword("GainFile", gainFilename.OriginalPath() + "/" + gainFilename.Name()));
-  calibrationLog.AddKeyword(PvlKeyword("ShutterFile", shutterFilename.OriginalPath() + "/" + shutterFilename.Name()));
+  FileName shutterFileName = FindShutterFile(icube);
+  calibrationLog.AddKeyword(PvlKeyword("DarkCurrentFile", darkFileName.originalPath() + "/" + darkFileName.name()));
+  calibrationLog.AddKeyword(PvlKeyword("GainFile", gainFileName.originalPath() + "/" + gainFileName.name()));
+  calibrationLog.AddKeyword(PvlKeyword("ShutterFile", shutterFileName.originalPath() + "/" + shutterFileName.name()));
   calibrationLog.AddKeyword(PvlKeyword("ScaleFactor", scaleFactor));
   calibrationLog.AddKeyword(PvlKeyword("OutputUnits", iof ? "I/F" : "Radiance"));
 
@@ -166,7 +166,7 @@ void Calibrate(vector<Buffer *> &in, vector<Buffer *> &out) {
   }
 }
 
-Filename FindDarkFile(Cube *icube) {
+FileName FindDarkFile(Cube *icube) {
   string file = "$galileo/calibration/gll_dc.sav";
 
   TextFile darkFile(file);
@@ -252,13 +252,13 @@ Filename FindDarkFile(Cube *icube) {
     }
 
     // By process of elimination, we found the dark current file successfully. Return it.
-    return Filename(string("$galileo/calibration/darkcurrent/") + data.Token(" ") + string(".cub"));
+    return FileName(string("$galileo/calibration/darkcurrent/") + data.Token(" ") + string(".cub"));
   }
 
   throw IException(IException::Unknown, "Dark current file could not be determined.", _FILEINFO_);
 }
 
-Filename FindGainFile(Cube *icube) {
+FileName FindGainFile(Cube *icube) {
   string file = "$galileo/calibration/gll_gain.sav";
 
   TextFile gainFile(file);
@@ -295,18 +295,18 @@ Filename FindGainFile(Cube *icube) {
       continue;
     }
 
-    return Filename(string("$galileo/calibration/gain/") + data.Token(" ") + string(".cub"));
+    return FileName(string("$galileo/calibration/gain/") + data.Token(" ") + string(".cub"));
   }
 
   throw IException(IException::Unknown, "Gain file could not be determined.", _FILEINFO_);
 }
 
-Filename ReadWeightTable(Cube *icube) {
+FileName ReadWeightTable(Cube *icube) {
   string file = "$galileo/calibration/weightTables_v???.sav";
 
-  Filename weightFile(file);
-  weightFile.HighestVersion();
-  Pvl weightTables(weightFile.Expanded());
+  FileName weightFile(file);
+  weightFile = weightFile.highestVersion();
+  Pvl weightTables(weightFile.expanded());
   iString group = iString("FrameMode") + (char)icube->getGroup("Instrument")["FrameModeId"][0].at(0);
   PvlGroup &frameGrp = weightTables.FindGroup(group);
   iString keyword = iString("GainState") + ((getGainModeID(icube) < 3) ? iString("12") : iString("34"));
@@ -365,7 +365,7 @@ int getGainModeID(Cube *icube) {
  * if output units are in radiance.
  */
 void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
-  Pvl conversionFactors(GetScaleFactorFile().Expanded());
+  Pvl conversionFactors(GetScaleFactorFile().expanded());
   PvlKeyword fltToRef, fltToRad;
 
   for(int grp = 0; grp < conversionFactors.Groups(); grp++) {
@@ -401,7 +401,7 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
     throw IException(IException::Unknown,
                      "Unable to find matching reflectance and radiance values for target [" +
                      icube->getGroup("Instrument")["TargetName"][0] + "] in [" +
-                     GetScaleFactorFile().Expanded() + "]",
+                     GetScaleFactorFile().expanded() + "]",
                      _FILEINFO_);
   }
 
@@ -415,7 +415,7 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
     if(!camSuccess) {
       throw IException(IException::Unknown,
                        "Unable to calculate the Solar Distance on [" +
-                       icube->getFilename() + "]", _FILEINFO_);
+                       icube->getFileName() + "]", _FILEINFO_);
     }
 
 
@@ -447,17 +447,17 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
   }
 }
 
-Filename GetScaleFactorFile() {
+FileName GetScaleFactorFile() {
   string file = "$galileo/calibration/conversionFactors_v???.sav";
-  Filename scaleFactor(file);
-  scaleFactor.HighestVersion();
+  FileName scaleFactor(file);
+  scaleFactor = scaleFactor.highestVersion();
   return scaleFactor;
 }
 
-Filename FindShutterFile(Cube *icube) {
+FileName FindShutterFile(Cube *icube) {
   string file = "$galileo/calibration/shutter/calibration.so02";
   file += icube->getGroup("Instrument")["FrameModeId"][0].at(0);
   file += ".cub";
-  Filename shutterFile(file);
+  FileName shutterFile(file);
   return shutterFile;
 }

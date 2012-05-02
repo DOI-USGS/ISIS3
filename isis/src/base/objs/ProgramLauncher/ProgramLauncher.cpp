@@ -31,7 +31,7 @@
 #include <QProcess>
 
 #include "Application.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 
@@ -52,16 +52,16 @@ namespace Isis {
    */
   void ProgramLauncher::RunIsisProgram(iString programName,
                                        iString parameters) {
-    Filename program(programName);
-    Filename isisExecutableFilename("$ISISROOT/bin/" + program.Name());
+    FileName program(programName);
+    FileName isisExecutableFileName("$ISISROOT/bin/" + program.name());
     bool isIsisProgram = false;
 
-    if(isisExecutableFilename.Exists()) {
+    if(isisExecutableFileName.fileExists()) {
       isIsisProgram = true;
-      program = isisExecutableFilename;
+      program = isisExecutableFileName;
     }
 
-    iString command = program.Expanded() + " " + parameters +
+    iString command = program.expanded() + " " + parameters +
         " -pid=" + iString(getpid());
 
     if(!isIsisProgram) {

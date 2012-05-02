@@ -40,7 +40,7 @@ void IsisMain() {
   // Check to see if the input cube looks like a HiRISE RDR
   if(icube->getBandCount() > 3) {
     string msg = "Input file [" +
-                 Application::GetUserInterface().GetFilename("FROM") +
+                 Application::GetUserInterface().GetFileName("FROM") +
                  "] does not appear to be a HiRISE RDR product. Number of " +
                  "bands is greater than 3";
     throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -101,9 +101,9 @@ void IsisMain() {
 
   if(enctype.Equal("jp2")) {
     jp2buf = new char* [icube2->getBandCount()];
-    Filename lblFile(ui.GetFilename("TO"));
-    string lblFilename = lblFile.Path() + "/" + lblFile.Basename() + ".lbl";
-    p.SetDetached(true, lblFilename);
+    FileName lblFile(ui.GetFileName("TO"));
+    string lblFileName = lblFile.path() + "/" + lblFile.baseName() + ".lbl";
+    p.SetDetached(true, lblFileName);
     p.SetFormat(ProcessExport::JP2);
   }
 
@@ -497,7 +497,7 @@ void IsisMain() {
   // Open the output PDS file and dump the label and cube data
   if(enctype.Equal("jp2")) {
     p.OutputDetatchedLabel();
-    JP2_encoder = new JP2Encoder(ui.GetFilename("TO"), icube2->getSampleCount(),
+    JP2_encoder = new JP2Encoder(ui.GetFileName("TO"), icube2->getSampleCount(),
                                  icube2->getLineCount(), icube2->getBandCount(), oType);
     JP2_encoder->OpenFile();
     jp2ns = icube2->getSampleCount();
@@ -511,8 +511,8 @@ void IsisMain() {
     }
   }
   else {
-    Filename outFile(ui.GetFilename("TO"));
-    ofstream oCube(outFile.Expanded().c_str());
+    FileName outFile(ui.GetFileName("TO"));
+    ofstream oCube(outFile.expanded().c_str());
     p.OutputLabel(oCube);
     p.StartProcess(oCube);
     oCube.close();

@@ -26,7 +26,7 @@ Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
 #include "Process.h"
 #include "Statistics.h"
 #include "LineManager.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 
 using namespace std;
@@ -41,14 +41,14 @@ ID = "PIRL::hifringe ($Revision: 1.6 $ $Date: 2008/05/14 21:07:24 $)";
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  Isis::Filename fromFile = ui.GetFilename("FROM");
+  Isis::FileName fromFile = ui.GetFileName("FROM");
 
   Isis::Cube inputCube;
-  inputCube.open(fromFile.Expanded());
+  inputCube.open(fromFile.expanded());
 
   //Check to make sure we got the cube properly
   if(!inputCube.isOpen()) {
-    string msg = "Could not open FROM cube" + fromFile.Expanded();
+    string msg = "Could not open FROM cube" + fromFile.expanded();
     throw IException(IException::User, msg, _FILEINFO_);
   }
   Process p;
@@ -171,7 +171,7 @@ void IsisMain() {
   Pvl outputPvl;
   PvlGroup sourceInfo("SourceInfo");
 
-  sourceInfo += PvlKeyword("From", fromFile.Expanded());
+  sourceInfo += PvlKeyword("From", fromFile.expanded());
   sourceInfo += icube->getGroup("Archive")["ProductId"];
   outputPvl.AddGroup(sourceInfo);
   if(numSections > 0) {
@@ -186,7 +186,7 @@ void IsisMain() {
     outputPvl.AddGroup(leftGroup);
     outputPvl.AddGroup(rightGroup);
   }
-  outputPvl.Write(ui.GetFilename("TO"));
+  outputPvl.Write(ui.GetFileName("TO"));
 }
 
 void pvlOut(Statistics stats1, Statistics stats2, string name, int start,

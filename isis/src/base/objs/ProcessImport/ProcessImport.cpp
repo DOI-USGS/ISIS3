@@ -978,7 +978,7 @@ namespace Isis {
       }
     }
 
-    return Process::SetOutputCube(Application::GetUserInterface().GetFilename(parameter), att, p_ns, p_nl, p_nb);
+    return Process::SetOutputCube(Application::GetUserInterface().GetFileName(parameter), att, p_ns, p_nl, p_nb);
   }
 
   /**
@@ -1074,9 +1074,9 @@ namespace Isis {
 
     ifstream fin;
     // Open input file
-    Isis::Filename inFile(p_inFile);
-    string inFilename(inFile.Expanded());
-    fin.open(inFilename.c_str(), ios::in | ios::binary);
+    Isis::FileName inFile(p_inFile);
+    string inFileName(inFile.expanded());
+    fin.open(inFileName.c_str(), ios::in | ios::binary);
     if(!fin.is_open()) {
       string msg = "Cannot open input file [" + p_inFile + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
@@ -1324,9 +1324,9 @@ namespace Isis {
 
     ifstream fin;
     // Open input file
-    Isis::Filename inFile(p_inFile);
-    string inFilename(inFile.Expanded());
-    fin.open(inFilename.c_str(), ios::in | ios::binary);
+    Isis::FileName inFile(p_inFile);
+    string inFileName(inFile.expanded());
+    fin.open(inFileName.c_str(), ios::in | ios::binary);
     if(!fin.is_open()) {
       string msg = "Cannot open input file [" + p_inFile + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
@@ -1554,9 +1554,9 @@ namespace Isis {
 
     ifstream fin;
     // Open input file
-    Isis::Filename inFile(p_inFile);
-    string inFilename(inFile.Expanded());
-    fin.open(inFilename.c_str(), ios::in | ios::binary);
+    Isis::FileName inFile(p_inFile);
+    string inFileName(inFile.expanded());
+    fin.open(inFileName.c_str(), ios::in | ios::binary);
     if(!fin.is_open()) {
       string msg = "Cannot open input file [" + p_inFile + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
@@ -1957,7 +1957,7 @@ namespace Isis {
    */
   void ProcessImport::SetInputFile(const std::string &file) {
     p_inFile = file;
-    if(!Isis::Filename(file).Exists()) {
+    if(!Isis::FileName(file).fileExists()) {
       string msg = "File [" + file + "] does not exist";
       throw IException(IException::User, msg, _FILEINFO_);
     }

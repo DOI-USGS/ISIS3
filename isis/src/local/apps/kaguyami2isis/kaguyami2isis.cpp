@@ -7,7 +7,7 @@
 #include "ProgramLauncher.h"
 
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 
 using namespace std;
 using namespace Isis;
@@ -17,20 +17,20 @@ void IsisMain() {
   Pvl label;
   UserInterface &ui = Application::GetUserInterface();
 
-  Filename inFile = ui.GetFilename("FROM");
+  FileName inFile = ui.GetFileName("FROM");
   iString id;
-  Pvl lab(inFile.Expanded());
+  Pvl lab(inFile.expanded());
 
   try {
     id = (string) lab.FindKeyword("DATA_SET_ID");
   }
   catch(IException &e) {
     string msg = "Unable to read [DATA_SET_ID] from input file [" +
-                 inFile.Expanded() + "]";
+                 inFile.expanded() + "]";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
 
-  p.SetPdsFile(inFile.Expanded(), "", label);
+  p.SetPdsFile(inFile.expanded(), "", label);
   Cube *outcube = p.SetOutputCube("TO");
 
   p.SetOrganization(Isis::ProcessImport::BSQ);
@@ -40,23 +40,23 @@ void IsisMain() {
   // Get the directory where the Kaguya MI translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
   iString transDir = (string) dataDir["Kaguya"] + "/translations/";
-  Pvl inputLabel(inFile.Expanded());
+  Pvl inputLabel(inFile.expanded());
   Pvl *outputLabel = outcube->getLabel();
-  Filename transFile;
+  FileName transFile;
 
   // Translate the Archive group
   transFile = transDir + "kaguyamiArchive.trn";
-  PvlTranslationManager archiveXlater(inputLabel, transFile.Expanded());
+  PvlTranslationManager archiveXlater(inputLabel, transFile.expanded());
   archiveXlater.Auto(*(outputLabel));
 
   // Translate the Instrument group
   transFile = transDir + "kaguyamiInstrument.trn";
-  PvlTranslationManager instrumentXlater(inputLabel, transFile.Expanded());
+  PvlTranslationManager instrumentXlater(inputLabel, transFile.expanded());
   instrumentXlater.Auto(*(outputLabel));
 
   // Translate the BandBin group
   transFile = transDir + "kaguyamiBandBin.trn";
-  PvlTranslationManager bandBinXlater(inputLabel, transFile.Expanded());
+  PvlTranslationManager bandBinXlater(inputLabel, transFile.expanded());
   bandBinXlater.Auto(*(outputLabel));
 
   p.EndProcess();

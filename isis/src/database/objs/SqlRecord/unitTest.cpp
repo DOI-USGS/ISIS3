@@ -1,5 +1,5 @@
 #include "Database.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "SqlQuery.h"
 #include "SqlRecord.h"
 #include "Preference.h"
@@ -11,9 +11,9 @@ int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
   // SQLite
-  Filename dbfile("$TEMPORARY/test.db");
+  FileName dbfile("$TEMPORARY/test.db");
   Database testdb("testdb", "SQLite");
-  string dbfileName(dbfile.Expanded());
+  string dbfileName(dbfile.expanded());
   testdb.setDatabaseName(dbfileName.c_str());
   if(!testdb.open()) {
     throw IException(IException::User, "Connection failed", _FILEINFO_);
@@ -64,6 +64,6 @@ int main(int argc, char *argv[]) {
 
   }
 
-  remove(Filename("$TEMPORARY/test.db").Expanded().c_str());
+  remove(FileName("$TEMPORARY/test.db").expanded().c_str());
   return 0;
 }

@@ -28,22 +28,22 @@ void IsisMain() {
 
   // Get the input file list to make sure it is not empty and the master cube is included
   FileList list;
-  list.Read(ui.GetFilename("FROMLIST"));
+  list.Read(ui.GetFileName("FROMLIST"));
 
   if(list.size() < 1) {
-    string msg = "The input list file [" + ui.GetFilename("FROMLIST") + "is empty";
+    string msg = "The input list file [" + ui.GetFileName("FROMLIST") + "is empty";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   int ifile = 0;
   // Make sure the master file is included in the input file list
-  while(ifile < (int) list.size() && Filename(list[ifile]).Expanded() != Filename(ui.GetFilename("MASTER")).Expanded()) {
+  while(ifile < (int) list.size() && FileName(list[ifile]).expanded() != FileName(ui.GetFileName("MASTER")).expanded()) {
     ifile++;
   }
 
   if(ifile >= (int) list.size()) {
-    string msg = "The master file, [" + Filename(ui.GetFilename("MASTER")).Expanded() + " is not included in " +
-                 "the input list file " + ui.GetFilename("FROMLIST") + "]";
+    string msg = "The master file, [" + FileName(ui.GetFileName("MASTER")).expanded() + " is not included in " +
+                 "the input list file " + ui.GetFileName("FROMLIST") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -55,7 +55,7 @@ void IsisMain() {
   try {
     // Open the master cube
     Cube cube;
-    cube.open(ui.GetFilename("MASTER"), "rw");
+    cube.open(ui.GetFileName("MASTER"), "rw");
 
     //check for existing polygon, if exists delete it
     if(cube.getLabel()->HasObject("Polygon")) {
@@ -65,7 +65,7 @@ void IsisMain() {
     // Get the camera
     Camera *cam = cube.getCamera();
     if(cam->DetectorMap()->LineRate() == 0.0) {
-      string msg = "[" + ui.GetFilename("MASTER") + "] is not a line scan camera image";
+      string msg = "[" + ui.GetFileName("MASTER") + "] is not a line scan camera image";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -91,7 +91,7 @@ void IsisMain() {
     std::vector<double> cacheTime = cam->InstrumentRotation()->GetFullCacheTime();
 
     // Get the jitter in pixels, compute jitter angles, and fit a polynomial to each angle
-    PixelOffset jitter(ui.GetFilename("JITTERFILE"), fl, pixpitch, baseTime, timeScale, degree);
+    PixelOffset jitter(ui.GetFileName("JITTERFILE"), fl, pixpitch, baseTime, timeScale, degree);
     jitter.LoadAngles(cacheTime);
     jitter.SetPolynomial();
 
@@ -101,8 +101,8 @@ void IsisMain() {
 
     // Pull out the pointing cache as a table and write it
     Table cmatrix = crot.Cache("InstrumentPointing");
-    //    cmatrix.Label().AddComment("Corrected using appjit and" + ui.GetFilename("JITTERFILE"));
-    cmatrix.Label() += PvlKeyword("Description", "Corrected using appjit and" + ui.GetFilename("JITTERFILE"));
+    //    cmatrix.Label().AddComment("Corrected using appjit and" + ui.GetFileName("JITTERFILE"));
+    cmatrix.Label() += PvlKeyword("Description", "Corrected using appjit and" + ui.GetFileName("JITTERFILE"));
     cmatrix.Label() += PvlKeyword("Kernels");
     PvlKeyword ckKeyword = crot.InstrumentPointingValue();
 
@@ -125,12 +125,12 @@ void IsisMain() {
 
     cube.putGroup(kernels);
     cube.close();
-    gp += PvlKeyword("StatusMaster", ui.GetFilename("MASTER") + ":  camera pointing updated");
+    gp += PvlKeyword("StatusMaster", ui.GetFileName("MASTER") + ":  camera pointing updated");
 
     // Apply the dejittered pointing to the rest of the files
     step2 = true;
     for(int ifile = 0; ifile < (int) list.size(); ifile++) {
-      if(list[ifile] != ui.GetFilename("MASTER")) {
+      if(list[ifile] != ui.GetFileName("MASTER")) {
         // Open the cube
         cube.open(list[ifile], "rw");
         //check for existing polygon, if exists delete it
@@ -140,7 +140,7 @@ void IsisMain() {
         // Get the camera and make sure it is a line scan camera
         Camera *cam = cube.getCamera();
         if(cam->DetectorMap()->LineRate() == 0.0) {
-          string msg = "[" + ui.GetFilename("FROM") + "] is not a line scan camera";
+          string msg = "[" + ui.GetFileName("FROM") + "] is not a line scan camera";
           throw IException(IException::User, msg, _FILEINFO_);
         }
         // Pull out the pointing cache as a table and write it
@@ -155,7 +155,7 @@ void IsisMain() {
   catch(IException &e) {
     string msg;
     if(!step2) {
-      msg = "Unable to fit pointing for [" + ui.GetFilename("MASTER") + "]";
+      msg = "Unable to fit pointing for [" + ui.GetFileName("MASTER") + "]";
     }
     else {
       msg = "Unable to update pointing for nonMaster file(s)";

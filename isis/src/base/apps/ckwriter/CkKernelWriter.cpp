@@ -29,7 +29,7 @@
 
 #include "CkKernelWriter.h"
 #include "SpiceSegment.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "TextFile.h"
 #include "Pvl.h"
 #include "iString.h"
@@ -89,13 +89,13 @@ namespace Isis {
 
  void CkKernelWriter::open(const std::string &kfile,
                            const std::string &intCkName) {
-   Filename kf(kfile);
-   if ( kf.Exists() ) {
-     string full_kf = kf.Expanded();
+   FileName kf(kfile);
+   if ( kf.fileExists() ) {
+     string full_kf = kf.expanded();
      remove(full_kf.c_str());
    }
    SpiceInt  myHandle;
-   ckopn_c(kf.Expanded().c_str(), intCkName.c_str(), _comSize, &myHandle);
+   ckopn_c(kf.expanded().c_str(), intCkName.c_str(), _comSize, &myHandle);
    _handle = myHandle;
    return;
  }

@@ -13,8 +13,8 @@ void FFT2(vector<Buffer *> &in, vector<Buffer *> &out);
 void getMinMax(Buffer &in);
 
 FourierTransform fft;
-string tmpMagFilename = "Temporary_IFFT_Magnitude.cub";
-string tmpPhaseFilename = "Temporary_IFFT_Phase.cub";
+string tmpMagFileName = "Temporary_IFFT_Magnitude.cub";
+string tmpPhaseFileName = "Temporary_IFFT_Phase.cub";
 double HPixel = 0.0, LPixel = 0.0, NPixel = 0.0;
 
 Statistics stats;
@@ -57,8 +57,8 @@ void IsisMain() {
   Isis::CubeAttributeOutput cao;
   cao.PixelType(Isis::Real);
 
-  sProc.SetOutputCube(tmpMagFilename, cao, numSamples, numLines, numBands);
-  sProc.SetOutputCube(tmpPhaseFilename, cao, numSamples, numLines, numBands);
+  sProc.SetOutputCube(tmpMagFileName, cao, numSamples, numLines, numBands);
+  sProc.SetOutputCube(tmpPhaseFileName, cao, numSamples, numLines, numBands);
 
   // Start the sample processing
   sProc.ProcessCubes(&FFT1);
@@ -73,8 +73,8 @@ void IsisMain() {
   // Setup the input and output cubes
   Isis::CubeAttributeInput cai;
 
-  lProc.SetInputCube(tmpMagFilename, cai);
-  lProc.SetInputCube(tmpPhaseFilename, cai);
+  lProc.SetInputCube(tmpMagFileName, cai);
+  lProc.SetInputCube(tmpPhaseFileName, cai);
 
   Cube *ocube = lProc.SetOutputCube("MAGNITUDE");
   lProc.SetOutputCube("PHASE");
@@ -88,8 +88,8 @@ void IsisMain() {
   // Stop the process and remove the temporary files
   lProc.Finalize();
 
-  remove(tmpMagFilename.c_str());
-  remove(tmpPhaseFilename.c_str());
+  remove(tmpMagFileName.c_str());
+  remove(tmpPhaseFileName.c_str());
 }
 
 // Processing routine for the fft with one input cube

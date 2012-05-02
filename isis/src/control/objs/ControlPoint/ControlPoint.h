@@ -642,7 +642,7 @@ namespace Isis {
       //! Where the apriori surface point originated from
       SurfacePointSource::Source aprioriSurfacePointSource;
 
-      //! Filename where the apriori surface point originated from
+      //! FileName where the apriori surface point originated from
       iString aprioriSurfacePointSourceFile;
 
       /**

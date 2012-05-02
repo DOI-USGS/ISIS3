@@ -1,8 +1,5 @@
 #include "BlinkTool.h"
 
-#include "Filename.h"
-#include "MdiCubeViewport.h"
-
 #include <QDialog>
 #include <QDoubleSpinBox>
 #include <QEvent>
@@ -17,6 +14,10 @@
 #include <QToolBar>
 #include <QToolButton>
 #include <QVBoxLayout>
+
+#include "FileName.h"
+#include "iString.h"
+#include "MdiCubeViewport.h"
 
 namespace Isis {
 
@@ -173,9 +174,9 @@ namespace Isis {
    *
    */
   void BlinkTool::updateTool() {
-    std::string unlinkedIcon = Filename("$base/icons/unlinked.png").Expanded();
+    std::string unlinkedIcon = FileName("$base/icons/unlinked.png").expanded();
     static QIcon unlinked(unlinkedIcon.c_str());
-    std::string linkedIcon = Filename("$base/icons/linked.png").Expanded();
+    std::string linkedIcon = FileName("$base/icons/linked.png").expanded();
     static QIcon linked(linkedIcon.c_str());
     p_listWidget->clear();
     for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
@@ -313,8 +314,8 @@ namespace Isis {
    */
   void BlinkTool::writeSettings() {
     std::string instanceName = p_dialog->windowTitle().toStdString();
-    Filename config("$HOME/.Isis/qview/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
+    FileName config("$HOME/.Isis/qview/" + instanceName + ".config");
+    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
     settings.setValue("rate", p_timeBox->value());
     settings.setValue("size", p_dialog->size());
   }
@@ -328,8 +329,8 @@ namespace Isis {
   void BlinkTool::readSettings() {
 
     std::string instanceName = p_dialog->windowTitle().toStdString();
-    Filename config("$HOME/.Isis/qview/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
+    FileName config("$HOME/.Isis/qview/" + instanceName + ".config");
+    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
     double rate = settings.value("rate", 0.5).toDouble();
     QSize size = settings.value("size", QSize(492, 492)).toSize();
     p_dialog->resize(size);

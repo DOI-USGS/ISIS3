@@ -7,7 +7,7 @@
 #include "Application.h"
 #include "Preference.h"
 #include "TextFile.h"
-#include "Filename.h"
+#include "FileName.h"
 
 using namespace Isis;
 using namespace std;
@@ -214,8 +214,8 @@ namespace Isis {
           // If ">>LIST", then we need to make a list file
           if(special == ">>LIST ") {
             iString cmd = params[j].substr(7);
-            iString listFilename = cmd.Token(" ");
-            TextFile listFile(listFilename, "overwrite");
+            iString listFileName = cmd.Token(" ");
+            TextFile listFile(listFileName, "overwrite");
 
             while(!cmd.empty()) {
               listFile.PutLine(cmd.Token(" "));
@@ -267,12 +267,25 @@ namespace Isis {
    *
    * @param inputParam The parameter to get from the user interface that contains
    *                   the input file
+   */
+  void Pipeline::SetInputFile(const char *inputParam) {
+    SetInputFile(iString(inputParam));
+  }
+
+
+  /**
+   * This method is used to set the original input file. This file is the first
+   * program's input, and the virtual bands will be taken directly from this
+   * parameter.
+   *
+   * @param inputParam The parameter to get from the user interface that contains
+   *                   the input file
    * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array
    *                                       to p_inputBranches
    */
   void Pipeline::SetInputFile(const iString &inputParam) {
     UserInterface &ui = Application::GetUserInterface();
-    p_originalInput.push_back(ui.GetFilename(inputParam));
+    p_originalInput.push_back(ui.GetFileName(inputParam));
     p_inputBranches.push_back(inputParam);
     p_virtualBands.push_back(ui.GetInputAttribute(inputParam).BandsStr());
   }
@@ -287,10 +300,23 @@ namespace Isis {
    * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array
    *                                       to p_inputBranches
    */
-  void Pipeline::SetInputFile(const Filename &inputFile) {
-    p_originalInput.push_back(inputFile.Expanded());
-    p_inputBranches.push_back(inputFile.Expanded());
+  void Pipeline::SetInputFile(const FileName &inputFile) {
+    p_originalInput.push_back(inputFile.expanded());
+    p_inputBranches.push_back(inputFile.expanded());
     p_virtualBands.push_back("");
+  }
+
+
+  /**
+   * This method is used to set the original input files. These files are the
+   * first program's input, a branch will be added for every line in the file, and
+   * the virtual bands will be taken directly from this parameter.
+   *
+   * @param inputParam The parameter to get from the user interface that contains
+   *                   the input file
+   */
+  void Pipeline::SetInputListFile(const char *inputParam) {
+    SetInputListFile(iString(inputParam));
   }
 
 
@@ -307,7 +333,7 @@ namespace Isis {
   void Pipeline::SetInputListFile(const iString &inputParam) {
     UserInterface &ui = Application::GetUserInterface();
 
-    TextFile filelist(Filename(ui.GetFilename(inputParam)).Expanded());
+    TextFile filelist(FileName(ui.GetFileName(inputParam)).expanded());
     string filename;
     int branch = 1;
 
@@ -315,7 +341,7 @@ namespace Isis {
       p_originalInput.push_back(filename);
       p_inputBranches.push_back(inputParam + iString(branch));
       p_virtualBands.push_back("");
-      p_finalOutput.push_back(Filename(filename).Name());
+      p_finalOutput.push_back(FileName(filename).name());
 
       branch ++;
     }
@@ -332,21 +358,37 @@ namespace Isis {
    * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array
    *                                       to p_inputBranches
    */
-  void Pipeline::SetInputListFile(const Filename &inputFilename) {
-    TextFile filelist(inputFilename.Expanded());
+  void Pipeline::SetInputListFile(const FileName &inputFileName) {
+    TextFile filelist(inputFileName.expanded());
     string filename;
     int branch = 1;
 
     while(filelist.GetLineNoFilter(filename)) {
       p_originalInput.push_back(filename);
-      p_inputBranches.push_back(Filename(inputFilename).Expanded() + " " + iString(branch));
-      p_finalOutput.push_back(Filename(filename).Name());
+      p_inputBranches.push_back(FileName(inputFileName).expanded() + " " + iString(branch));
+      p_finalOutput.push_back(FileName(filename).name());
       p_virtualBands.push_back("");
 
       branch ++;
     }
 
     p_outputListNeedsModifiers = true;
+  }
+
+
+  /**
+   * This method is used to set the original input file. This file is the first
+   * program's input.
+   *
+   * @param inputParam The parameter to get from the user interface that contains
+   *                   the input file
+   * @param virtualBandsParam The parameter to get from the user interface that
+   *                          contains the virtual bands list; internal default is
+   *                          supported. Empty string if no virtual bands
+   *                          parameter exists.
+   */
+  void Pipeline::SetInputFile(const char *inputParam, const char *virtualBandsParam) {
+    SetInputFile(iString(inputParam), iString(virtualBandsParam));
   }
 
 
@@ -386,6 +428,20 @@ namespace Isis {
    * @param outputParam The parameter to get from the user interface that contains
    *                    the output file; internal default is supported.
    */
+  void Pipeline::SetOutputFile(const char *outputParam) {
+    SetOutputFile(iString(outputParam));
+  }
+
+
+  /**
+   * This method is used to set the final output file. If no programs generate
+   * output, the final output file will not be used. If the output file was not
+   * entered, one will be generated automatically and placed into the current
+   * working folder.
+   *
+   * @param outputParam The parameter to get from the user interface that contains
+   *                    the output file; internal default is supported.
+   */
   void Pipeline::SetOutputFile(const iString &outputParam) {
     UserInterface &ui = Application::GetUserInterface();
     p_finalOutput.clear();
@@ -404,9 +460,9 @@ namespace Isis {
    *
    * @param outputFile The filename of the output file; NOT the parameter name.
    */
-  void Pipeline::SetOutputFile(const Filename &outputFile) {
+  void Pipeline::SetOutputFile(const FileName &outputFile) {
     p_finalOutput.clear();
-    p_finalOutput.push_back(outputFile.Expanded());
+    p_finalOutput.push_back(outputFile.expanded());
   }
 
 
@@ -415,21 +471,34 @@ namespace Isis {
    * output filenames are specified in the list file. Internal defaults/automatic
    * name calculations are supported.
    *
-   * @param outputFilenameList Parameter name containing the path to the output
+   * @param outputFileNameList Parameter name containing the path to the output
    *                           list file
    */
-  void Pipeline::SetOutputListFile(const iString &outputFilenameParam) {
+  void Pipeline::SetOutputListFile(const char *outputFileNameParam) {
+    SetOutputListFile(iString(outputFileNameParam));
+  }
+
+
+  /**
+   * This method is used to set an output list file. Basically, this means the
+   * output filenames are specified in the list file. Internal defaults/automatic
+   * name calculations are supported.
+   *
+   * @param outputFileNameList Parameter name containing the path to the output
+   *                           list file
+   */
+  void Pipeline::SetOutputListFile(const iString &outputFileNameParam) {
     UserInterface &ui = Application::GetUserInterface();
 
-    if(ui.WasEntered(outputFilenameParam)) {
-      SetOutputListFile(Filename(ui.GetFilename(outputFilenameParam)));
+    if(ui.WasEntered(outputFileNameParam)) {
+      SetOutputListFile(FileName(ui.GetFileName(outputFileNameParam)));
     }
     else {
       p_finalOutput.clear();
 
       // Calculate output files
       for(unsigned int i = 0; i < p_originalInput.size(); i++) {
-        p_finalOutput.push_back(Filename(p_originalInput[i]).Name());
+        p_finalOutput.push_back(FileName(p_originalInput[i]).name());
       }
 
       p_outputListNeedsModifiers = true;
@@ -441,12 +510,12 @@ namespace Isis {
    * This method is used to set an output list file. Basically, this means the
    * output filenames are specified in the list file.
    *
-   * @param outputFilenameList List file with output cube names
+   * @param outputFileNameList List file with output cube names
    */
-  void Pipeline::SetOutputListFile(const Filename &outputFilenameList) {
+  void Pipeline::SetOutputListFile(const FileName &outputFileNameList) {
     p_finalOutput.clear();
 
-    TextFile filelist(outputFilenameList.Expanded());
+    TextFile filelist(outputFileNameList.expanded());
     string filename;
 
     while(filelist.GetLineNoFilter(filename)) {
@@ -748,10 +817,10 @@ namespace Isis {
 
     if(output == "" || p_finalOutput.size() > 1) {
       if(output == "") {
-        output = "./" + Filename(p_originalInput[0]).Basename();
+        output = "./" + FileName(p_originalInput[0]).baseName();
       }
       else {
-        output = "./" + Filename(p_originalInput[branch]).Basename();
+        output = "./" + FileName(p_originalInput[branch]).baseName();
       }
 
       // Base filename off of first input file
@@ -778,8 +847,8 @@ namespace Isis {
       PipelineApplication *last = p_apps[p_apps.size()-1];
       if(!last->Enabled()) last = last->Previous();
 
-      output = Filename(p_finalOutput[0]).Path() + "/" +
-               Filename(p_finalOutput[0]).Basename() + "." +
+      output = FileName(p_finalOutput[0]).path() + "/" +
+               FileName(p_finalOutput[0]).baseName() + "." +
                last->OutputBranches()[branch] + ".";
 
       if(p_finalOutput.size() > 1) {

@@ -1,5 +1,5 @@
 Unit Test for IdealCamera...
-Filename: ab102401_ideal.cub
+FileName: ab102401_ideal.cub
 CK Frame: -94032
 
 For upper left corner ...
@@ -23,7 +23,7 @@ Latitude OK
 Longitude OK
 
 --------------------------------------------
-Filename: f319b18_ideal.cub
+FileName: f319b18_ideal.cub
 CK Frame: -30002
 
 For upper left corner ...

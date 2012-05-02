@@ -23,7 +23,7 @@
 #include <iomanip>
 
 #include "Camera.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "iTime.h"
@@ -103,13 +103,13 @@ namespace Isis {
     //-----------------------------------------------------------------------
     //int code = NaifIkCode();
     //string key = "INS" + iString(code) + "_UNIT_VECTORS";
-    //Filename vectorFile(Spice::GetString(key,0));
+    //FileName vectorFile(Spice::GetString(key,0));
     //tack on _HR or _NY for other summing modes.
     // Get the directory for the unit vector files.
     PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
     iString vecDir = (string) dataDir["Cassini"] + "/unitVectors/";
 
-    Filename vectorFile;
+    FileName vectorFile;
     if(p_channel == "VIS") {
       if(sampMode == "NORMAL") {
         vectorFile = vecDir + "VIS_NORMAL_uv.bin";
@@ -157,8 +157,8 @@ namespace Isis {
     }
 
     ifstream fin;
-    string vectorFilename(vectorFile.Expanded());
-    fin.open(vectorFilename.c_str(), ios::in | ios::binary);
+    string vectorFileName(vectorFile.expanded());
+    fin.open(vectorFileName.c_str(), ios::in | ios::binary);
     if(!fin.is_open()) {
       string msg = "Can't open unit vector file";
       throw IException(IException::Io, msg, _FILEINFO_);

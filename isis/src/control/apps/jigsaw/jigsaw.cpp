@@ -15,15 +15,15 @@ void IsisMain() {
 
   // Get the control network and image list
   UserInterface &ui = Application::GetUserInterface();
-  std::string cnetFile = ui.GetFilename("CNET");
-  std::string cubeList = ui.GetFilename("FROMLIST");
+  std::string cnetFile = ui.GetFileName("CNET");
+  std::string cubeList = ui.GetFileName("FROMLIST");
 
   
   BundleAdjust *b = NULL;
 
   // Get the held list if entered and prep for bundle adjustment, to determine which constructor to use
   if (ui.WasEntered("HELDLIST")) {
-    std::string heldList = ui.GetFilename("HELDLIST");
+    std::string heldList = ui.GetFileName("HELDLIST");
     b = new BundleAdjust(cnetFile, cubeList, heldList);
   }
   else {
@@ -49,7 +49,7 @@ void IsisMain() {
 
   // For now don't use SC_SIGMAS.  This is not fully implemented yet.
   // if (ui.WasEntered("SC_SIGMAS"))
-  //   b->ReadSCSigmas(ui.GetFilename("SC_SIGMAS"));
+  //   b->ReadSCSigmas(ui.GetFileName("SC_SIGMAS"));
 
   b->SetObservationMode(ui.GetBoolean("OBSERVATIONS"));
   b->SetSolutionMethod(ui.GetString("METHOD"));
@@ -179,7 +179,7 @@ void IsisMain() {
     else
       b->Solve();
 
-    b->ControlNet()->Write(ui.GetFilename("ONET"));
+    b->ControlNet()->Write(ui.GetFileName("ONET"));
     PvlGroup gp("JigsawResults");
 
     // Update the cube pointing if requested but ONLY if bundle has converged
@@ -190,7 +190,7 @@ void IsisMain() {
         for (int i = 0; i < b->Images(); i++) {
           Process p;
           CubeAttributeInput inAtt;
-          Cube *c = p.SetInputCube(b->Filename(i), inAtt, ReadWrite);
+          Cube *c = p.SetInputCube(b->FileName(i), inAtt, ReadWrite);
           //check for existing polygon, if exists delete it
           if (c->getLabel()->HasObject("Polygon")) {
             c->getLabel()->DeleteObject("Polygon");
@@ -227,7 +227,7 @@ void IsisMain() {
   }
 
   catch(IException &e) {
-    b->ControlNet()->Write(ui.GetFilename("ONET"));
+    b->ControlNet()->Write(ui.GetFileName("ONET"));
     string msg = "Unable to bundle adjust network [" + cnetFile + "]";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }

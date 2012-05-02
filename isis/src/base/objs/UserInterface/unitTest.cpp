@@ -2,7 +2,7 @@
 #include "UserInterface.h"
 #include "IException.h"
 #include "Preference.h"
-#include "Filename.h"
+#include "FileName.h"
 
 using namespace std;
 
@@ -11,8 +11,8 @@ int main(int argc, char *argv[]) {
 
   cout << "Unit test for Isis::UserInterface ..." << endl;
 
-  Isis::iString unitTestXml = Isis::Filename("unitTest.xml").Expanded();
-  string highpass = Isis::Filename("$ISISROOT/src/base/apps/highpass/highpass.xml").Expanded();
+  Isis::iString unitTestXml = Isis::FileName("unitTest.xml").expanded();
+  string highpass = Isis::FileName("$ISISROOT/src/base/apps/highpass/highpass.xml").expanded();
   char *myArgv[15];// = {"unitTest", "from=input.cub", "to=output.cub"};
 
   for(int i = 0; i < 15; i++)

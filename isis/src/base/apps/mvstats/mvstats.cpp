@@ -28,7 +28,7 @@ void IsisMain() {
     throw IException(IException::User, message, _FILEINFO_);
   }
 
-  string file = ui.GetFilename("FROM");
+  string file = ui.GetFileName("FROM");
 
   //Use a Process to get the number of bands in the input cube
   Process q;
@@ -98,7 +98,7 @@ void IsisMain() {
   }
   //Write the output file(s)
   if(ui.WasEntered("FLATFILE")) {
-    WriteText(bands, ui.GetFilename("FLATFILE"));
+    WriteText(bands, ui.GetFileName("FLATFILE"));
   }
   if(ui.WasEntered("CUBE")) {
     //Set the Band Names
@@ -112,7 +112,7 @@ void IsisMain() {
     ProcessByLine p;
     CubeAttributeOutput set;
     set.PixelType(Real);
-    Cube *ocube = p.SetOutputCube(ui.GetFilename("CUBE"),
+    Cube *ocube = p.SetOutputCube(ui.GetFileName("CUBE"),
                                   set, bands, bands, 2);
     p.StartProcess(WriteCube);
     ocube->putGroup(bandBin);

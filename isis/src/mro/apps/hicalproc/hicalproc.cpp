@@ -41,8 +41,8 @@ void IsisMain() {
     bool bRemoveFurrows = ui.GetBoolean("FURROWS");
 
     // Get the cube info
-    inFile  = ui.GetFilename("FROM");
-    outFile = ui.GetFilename("TO");
+    inFile  = ui.GetFileName("FROM");
+    outFile = ui.GetFileName("TO");
     Pvl cubeLabel;
     if (bIngestion) {
       int sDotPos = outFile.find('.');
@@ -57,8 +57,8 @@ void IsisMain() {
 
     Pipeline p1("hicalproc1");
     p1.SetInputFile("FROM");
-    p1.SetOutputFile(Filename("$TEMPORARY/p1_out.cub"));
-    sTempFiles.push_back(Filename("$TEMPORARY/p1_out.cub").Expanded());
+    p1.SetOutputFile(FileName("$TEMPORARY/p1_out.cub"));
+    sTempFiles.push_back(FileName("$TEMPORARY/p1_out.cub").expanded());
     p1.KeepTemporaryFiles(!bRemoveTempFiles);
 
     // If Raw image convert to Isis format
@@ -121,9 +121,9 @@ void IsisMain() {
 
 
     Pipeline pStats;
-    pStats.SetInputFile(Filename("$TEMPORARY/p1_out.cub"));
-    pStats.SetOutputFile(Filename("$TEMPORARY/statsMask"));
-    sTempFiles.push_back(Filename("$TEMPORARY/statsMask").Expanded());
+    pStats.SetInputFile(FileName("$TEMPORARY/p1_out.cub"));
+    pStats.SetOutputFile(FileName("$TEMPORARY/statsMask"));
+    sTempFiles.push_back(FileName("$TEMPORARY/statsMask").expanded());
     pStats.KeepTemporaryFiles(!bRemoveTempFiles);
 
     pStats.AddToPipeline("cubenorm");
@@ -142,14 +142,14 @@ void IsisMain() {
 
     double dMinDN=0, dMaxDN=0;
     if (bNoiseFilter) {
-      AnalyzeCubenormStats(Filename("$TEMPORARY/statsMask").Expanded(), iSumming, dMinDN, dMaxDN);
+      AnalyzeCubenormStats(FileName("$TEMPORARY/statsMask").expanded(), iSumming, dMinDN, dMaxDN);
     }
 
     Pipeline p2("hicalproc2");
-    p2.SetInputFile(Filename("$TEMPORARY/p1_out.cub"));
+    p2.SetInputFile(FileName("$TEMPORARY/p1_out.cub"));
     if (bNoiseFilter || bHideStripe || bMapping ) {
-      p2.SetOutputFile(Filename("$TEMPORARY/p2_out.cub"));
-      sTempFiles.push_back(Filename("$TEMPORARY/p2_out.cub").Expanded());
+      p2.SetOutputFile(FileName("$TEMPORARY/p2_out.cub"));
+      sTempFiles.push_back(FileName("$TEMPORARY/p2_out.cub").expanded());
     }
     else {
       p2.SetOutputFile("TO");
@@ -194,9 +194,9 @@ void IsisMain() {
     // ********************************************************************************************
     if (bNoiseFilter || bHideStripe) {
       Pipeline p3("hicalproc3");
-      p3.SetInputFile(Filename("$TEMPORARY/p2_out.cub"));
-      p3.SetOutputFile(Filename("$TEMPORARY/StatsCubeNorm1"));
-      sTempFiles.push_back(Filename("$TEMPORARY/StatsCubeNorm1").Expanded());
+      p3.SetInputFile(FileName("$TEMPORARY/p2_out.cub"));
+      p3.SetOutputFile(FileName("$TEMPORARY/StatsCubeNorm1"));
+      sTempFiles.push_back(FileName("$TEMPORARY/StatsCubeNorm1").expanded());
       p3.KeepTemporaryFiles(!bRemoveTempFiles);
 
       // Crop if skip top and bottom lines are defined in the Configuration file
@@ -219,9 +219,9 @@ void IsisMain() {
   #endif
 
       Pipeline p4("hicalproc4");
-      p4.SetInputFile(Filename("$TEMPORARY/p2_out.cub"));
-      p4.SetOutputFile(Filename("$TEMPORARY/StatsCubeNorm2"));
-      sTempFiles.push_back(Filename("$TEMPORARY/StatsCubeNorm2").Expanded());
+      p4.SetInputFile(FileName("$TEMPORARY/p2_out.cub"));
+      p4.SetOutputFile(FileName("$TEMPORARY/StatsCubeNorm2"));
+      sTempFiles.push_back(FileName("$TEMPORARY/StatsCubeNorm2").expanded());
       p4.KeepTemporaryFiles(!bRemoveTempFiles);
 
       p4.AddToPipeline("hicubenorm");
@@ -231,7 +231,7 @@ void IsisMain() {
       p4.Application("hicubenorm").AddConstParameter ("FILTER",       "5");
       p4.Application("hicubenorm").AddConstParameter ("STATSOURCE",   "TABLE");
       p4.Application("hicubenorm").AddConstParameter ("FROMSTATS",
-                                       Filename("$TEMPORARY/StatsCubeNorm1").Expanded());
+                                       FileName("$TEMPORARY/StatsCubeNorm1").expanded());
       p4.Application("hicubenorm").AddConstParameter ("NEW_VERSION",   "TRUE");
       p4.Application("hicubenorm").AddConstParameter ("HIGHPASS_MODE", "HIGHPASS_DIVIDE");
       p4.Application("hicubenorm").AddConstParameter ("PAUSECROP",     "TRUE");
@@ -244,10 +244,10 @@ void IsisMain() {
   #endif
 
       Pipeline p5("hicalproc5");
-      p5.SetInputFile(Filename("$TEMPORARY/p2_out.cub"));
+      p5.SetInputFile(FileName("$TEMPORARY/p2_out.cub"));
       if (bHideStripe || bMapping) {
-        p5.SetOutputFile(Filename("$TEMPORARY/p5_out.cub"));
-        sTempFiles.push_back(Filename("$TEMPORARY/p5_out.cub").Expanded());
+        p5.SetOutputFile(FileName("$TEMPORARY/p5_out.cub"));
+        sTempFiles.push_back(FileName("$TEMPORARY/p5_out.cub").expanded());
       }
       else {
         p5.SetOutputFile("TO");
@@ -260,7 +260,7 @@ void IsisMain() {
       p5.Application("cubenorm").SetOutputParameter("TO",         "cbnorm");
       p5.Application("cubenorm").AddConstParameter ("format",     "TABLE");
       p5.Application("cubenorm").AddConstParameter ("STATSOURCE", "TABLE");
-      p5.Application("cubenorm").AddConstParameter ("FROMSTATS",  Filename("$TEMPORARY/StatsCubeNorm2").Expanded());
+      p5.Application("cubenorm").AddConstParameter ("FROMSTATS",  FileName("$TEMPORARY/StatsCubeNorm2").expanded());
       p5.Application("cubenorm").AddConstParameter ("DIRECTION",  "COLUMN");
       p5.Application("cubenorm").AddConstParameter ("NORMALIZER", "AVERAGE");
       p5.Application("cubenorm").AddConstParameter ("PRESERVE",   "FALSE");
@@ -317,13 +317,13 @@ void IsisMain() {
     // HideStripe Filter
     if (bHideStripe) {
       Pipeline p6("hicalproc6");
-      p6.SetInputFile(Filename("$TEMPORARY/p5_out.cub"));
+      p6.SetInputFile(FileName("$TEMPORARY/p5_out.cub"));
       if (!bMapping) {
         p6.SetOutputFile("TO");
       }
       else {
-        p6.SetOutputFile(Filename("$TEMPORARY/p6_out.cub"));
-        sTempFiles.push_back(Filename("$TEMPORARY/p6_out.cub").Expanded());
+        p6.SetOutputFile(FileName("$TEMPORARY/p6_out.cub"));
+        sTempFiles.push_back(FileName("$TEMPORARY/p6_out.cub").expanded());
       }
       p6.KeepTemporaryFiles(!bRemoveTempFiles);
 
@@ -360,10 +360,10 @@ void IsisMain() {
     if (bMapping) {
       Pipeline p7("hicalproc7");
       if (bHideStripe) {
-        p7.SetInputFile(Filename("$TEMPORARY/p6_out.cub"));
+        p7.SetInputFile(FileName("$TEMPORARY/p6_out.cub"));
       }
       else {
-        p7.SetInputFile(Filename("$TEMPORARY/p2_out.cub"));
+        p7.SetInputFile(FileName("$TEMPORARY/p2_out.cub"));
       }
       p7.SetOutputFile("TO");
       p7.KeepTemporaryFiles(!bRemoveTempFiles);
@@ -482,7 +482,7 @@ void GetCCD_Channel_Coefficients(Pvl & pCubeLabel)
 #endif
 
   // Get the coefficients
-  ReadCoefficientFile(Filename(dCoeffFile).Expanded(), sCcd, iChannel);
+  ReadCoefficientFile(FileName(dCoeffFile).expanded(), sCcd, iChannel);
 }
 
 /**

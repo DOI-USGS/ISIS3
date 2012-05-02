@@ -1,11 +1,12 @@
 #include "PolygonSeeder.h"
 
-#include "Filename.h"
 #include "IException.h"
 #include "LeastSquares.h"
 #include "Plugin.h"
 #include "PolygonTools.h"
 #include "PolynomialBivariate.h"
+#include "LeastSquares.h"
+#include "FileName.h"
 #include "ProjectionFactory.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -117,7 +118,7 @@ namespace Isis {
     }
     catch(IException &e) {
       std::string msg = "Improper format for PolygonSeeder PVL [";
-      msg +=  pvl.Filename() + "]. Location [" + errorSpot + "]";
+      msg +=  pvl.FileName() + "]. Location [" + errorSpot + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 

@@ -42,7 +42,7 @@ namespace Isis {
    *                          documentation
    *  @history 2010-03-30 Mackenzie Boyd - Modified open method append option to
    *                          create the file if it doesn't exist, changed file
-   *                          existence check to use Filename class.
+   *                          existence check to use FileName class.
    *  @history 2011-08-08 Jeannie Backer - Modified unitTest to use $temporary
    *                          variable instead of /tmp directory
    *
@@ -55,7 +55,7 @@ namespace Isis {
       std::fstream p_stream;           //!< File stream handle
       int     p_openmode;              /**< openmode of file: Input, Output,
                                            Overwrite, Append*/
-      std::string  p_filename;         //!< Filename of the opened file.
+      std::string  p_filename;         //!< FileName of the opened file.
       std::string  p_commentString;    /**< 'comment' string used by GetLine and
                                            PutLineComment*/
       std::string  p_newLineString;    /**< 'newline' string used by PutLine and

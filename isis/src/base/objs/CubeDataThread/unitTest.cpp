@@ -6,7 +6,7 @@
 #include "Cube.h"
 #include "CubeDataThread.h"
 #include "CubeDataThreadTester.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "ProgramLauncher.h"
 
 using namespace Isis;
@@ -19,10 +19,10 @@ void IsisMain() {
 
   CubeDataThread *cubeData = new CubeDataThread();
 
-  int readOnly1 = cubeData->AddCube(Filename("$base/testData/isisTruth.cub"));
-  int readOnly2 = cubeData->AddCube(Filename("$base/testData/blobTruth.cub"));
-  int readWrite1 = cubeData->AddCube(Filename("./unitTest2.cub"));
-  int readWrite2 = cubeData->AddCube(Filename("./unitTest3.cub"));
+  int readOnly1 = cubeData->AddCube(FileName("$base/testData/isisTruth.cub"));
+  int readOnly2 = cubeData->AddCube(FileName("$base/testData/blobTruth.cub"));
+  int readWrite1 = cubeData->AddCube(FileName("./unitTest2.cub"));
+  int readWrite2 = cubeData->AddCube(FileName("./unitTest3.cub"));
 
   Cube someCube;
   cubeData->AddCube(&someCube);

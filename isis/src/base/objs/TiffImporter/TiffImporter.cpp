@@ -1,10 +1,8 @@
 #include "TiffImporter.h"
 
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
-
-using namespace Isis;
-
+#include "iString.h"
 
 namespace Isis {
   /**
@@ -12,10 +10,10 @@ namespace Isis {
    *
    * @param inputName The name of the input image
    */
-  TiffImporter::TiffImporter(Filename inputName) : ImageImporter(inputName) {
+  TiffImporter::TiffImporter(FileName inputName) : ImageImporter(inputName) {
     // Open the TIFF image
     m_image = NULL;
-    if ((m_image = TIFFOpen(inputName.Expanded().c_str(), "r")) == NULL) {
+    if ((m_image = TIFFOpen(inputName.expanded().c_str(), "r")) == NULL) {
       throw IException(IException::Programmer,
           "Could not open incoming image", _FILEINFO_);
     }

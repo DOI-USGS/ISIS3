@@ -33,7 +33,7 @@ void IsisMain() {
   // Make sure the cube isn't projected (i.e. level 2). If it is, the user
   // should be using maptrim instead of this program.
   if (icube->hasGroup("Mapping")) {
-    iString msg = "Input cube [" + ui.GetFilename("FROM") + "] is level 2 "
+    iString msg = "Input cube [" + ui.GetFileName("FROM") + "] is level 2 "
         "(projected). This application is only designed to operate on level 1 "
         "(non-projected) cubes. Please use maptrim instead";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -52,7 +52,7 @@ void IsisMain() {
   // lat/lons the user wants
   if(ui.WasEntered("MAP")) {
     Pvl lab;
-    lab.Read(ui.GetFilename("MAP"));
+    lab.Read(ui.GetFileName("MAP"));
     proj = ProjectionFactory::Create(lab);
 
     // add mapping to print.prt

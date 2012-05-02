@@ -29,7 +29,7 @@
 #include "KernelWriter.h"
 #include "SpiceSegment.h"
 #include "SpkSegment.h"
-#include "Filename.h"
+#include "FileName.h"
 namespace Isis {
 
 typedef SpiceKernel<SpkSegment> SpkKernel;
@@ -91,15 +91,15 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
 
   protected:
     int k_open(const std::string &kfile, const int &comsize = 512) {
-      Filename kf(kfile);
-      if ( kf.Exists() ) {
-        std::string full_kf = kf.Expanded();
+      FileName kf(kfile);
+      if ( kf.fileExists() ) {
+        std::string full_kf = kf.expanded();
         std::remove(full_kf.c_str());
       }
       SpiceInt  myHandle;
 
       NaifStatus::CheckErrors();
-      spkopn_c(kf.Expanded().c_str(), "USGS_SPK_FILE", comsize, &myHandle);
+      spkopn_c(kf.expanded().c_str(), "USGS_SPK_FILE", comsize, &myHandle);
       NaifStatus::CheckErrors();
       return (myHandle);
     }

@@ -316,7 +316,7 @@ namespace Isis {
     if(_iRef > fabs(90.0)) {
       ostringstream mess;
       mess << "Invalid incidence angle (" << _iRef
-           << " >= 90.0) provided in PVL config file " << pvl.Filename();
+           << " >= 90.0) provided in PVL config file " << pvl.FileName();
       throw IException(IException::User, mess.str(), _FILEINFO_);
     }
 
@@ -353,7 +353,7 @@ namespace Isis {
 
     // Check for errors and throw them all at the same time
     if(!errs.empty()) {
-      errs += " --> Errors in the input PVL file \"" + pvl.Filename() + "\"";
+      errs += " --> Errors in the input PVL file \"" + pvl.FileName() + "\"";
       throw IException(IException::User, errs, _FILEINFO_);
     }
 

@@ -27,7 +27,7 @@
 
 #include "Brick.h"
 #include "Cube.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "MultivariateStatistics.h"
 #include "Progress.h"
@@ -63,13 +63,13 @@ namespace Isis {
     p_sampPercent = sampPercent;
 
     // Extract filenames and band number from cubes
-    p_xFile = x.getFilename();
-    p_yFile = y.getFilename();
+    p_xFile = x.getFileName();
+    p_yFile = y.getFileName();
 
     // Make sure number of bands match
     if (x.getBandCount() != y.getBandCount()) {
       string msg = "Number of bands do not match between cubes [" +
-                   p_xFile.Name() + "] and [" + p_yFile.Name() + "]";
+                   p_xFile.name() + "] and [" + p_yFile.name() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     p_bands = x.getBandCount();
@@ -82,7 +82,7 @@ namespace Isis {
     // Test to make sure projection parameters match
     if (*projX != *projY) {
       string msg = "Mapping groups do not match between cubes [" +
-                   p_xFile.Name() + "] and [" + p_yFile.Name() + "]";
+                   p_xFile.name() + "] and [" + p_yFile.name() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -230,8 +230,8 @@ namespace Isis {
       gY += stdY;
       gY += varY;
 
-      o += PvlKeyword("File1", FilenameX().Name());
-      o += PvlKeyword("File2", FilenameY().Name());
+      o += PvlKeyword("File1", FileNameX().name());
+      o += PvlKeyword("File2", FileNameY().name());
       o += PvlKeyword("Width", Samples());
       o += PvlKeyword("Height", Lines());
       o += PvlKeyword("SamplingPercent", SampPercent());
@@ -286,8 +286,8 @@ namespace Isis {
       return o;
     }
     catch (IException &e) {
-      string msg = "Trivial overlap between [" + FilenameX().Name();
-      msg += "] and [" + FilenameY().Name() + "]";
+      string msg = "Trivial overlap between [" + FileNameX().name();
+      msg += "] and [" + FileNameY().name() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }

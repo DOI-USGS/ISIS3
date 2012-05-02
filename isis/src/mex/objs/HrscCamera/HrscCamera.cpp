@@ -52,7 +52,7 @@ namespace Isis {
     // Get required keywords from instrument group
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
 
-    ReadLineRates(lab.Filename());
+    ReadLineRates(lab.FileName());
 
     // Setup detector map for transform of image pixels to detector position
     new VariableLineScanCameraDetectorMap(this, p_lineRates);

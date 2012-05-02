@@ -49,11 +49,11 @@ void IsisMain() {
       string msg = "The [TO] parameter must be entered";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    string outfile = ui.GetFilename("TO");
+    string outfile = ui.GetFileName("TO");
     ofstream fout;
     fout.open(outfile.c_str());
 
-    fout << "Cube:           " << ui.GetFilename("FROM") << endl;
+    fout << "Cube:           " << ui.GetFileName("FROM") << endl;
     fout << "Band:           " << icube->getBandCount() << endl;
     fout << "Average:        " << hist.Average() << endl;
     fout << "Std Deviation:  " << hist.StandardDeviation() << endl;
@@ -103,7 +103,7 @@ void IsisMain() {
       title = ui.GetString("TITLE");
     }
     else {
-      title = "Histogram Plot for " + Filename(ui.GetAsString("FROM")).Name();
+      title = "Histogram Plot for " + FileName(ui.GetAsString("FROM")).name();
     }
 
     // Create the QHistogram, set the title & load the Isis::Histogram into it

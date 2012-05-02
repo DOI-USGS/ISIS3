@@ -1,5 +1,5 @@
 Unit Test for VimsCamera...
-Filename: CM_1515951157_1.ir.cub
+FileName: CM_1515951157_1.ir.cub
 CK Frame: -82371
 
 Kernel IDs: 
@@ -28,7 +28,7 @@ For center pixel position ...
 Latitude OK
 Longitude OK
 
-Filename: CM_1514390782_1.ir.cub
+FileName: CM_1514390782_1.ir.cub
 CK Frame: -82371
 
 Kernel IDs: 
@@ -57,7 +57,7 @@ For center pixel position ...
 Latitude OK
 Longitude OK
 
-Filename: CM_1514390782_1.vis.cub
+FileName: CM_1514390782_1.vis.cub
 CK Frame: -82370
 
 Kernel IDs: 
@@ -86,7 +86,7 @@ For center pixel position ...
 Latitude OK
 Longitude OK
 
-Filename: CM_1515945709_1.ir.cub
+FileName: CM_1515945709_1.ir.cub
 CK Frame: -82371
 
 Kernel IDs: 
@@ -115,7 +115,7 @@ For center pixel position ...
 Latitude OK
 Longitude OK
 
-Filename: CM_1515945709_1.vis.cub
+FileName: CM_1515945709_1.vis.cub
 CK Frame: -82370
 
 Kernel IDs: 

@@ -29,7 +29,7 @@
 #include "Constants.h"
 #include "Distance.h"
 #include "EndianSwapper.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iString.h"
 #include "iTime.h"
@@ -290,10 +290,10 @@ namespace Isis {
     // Check to see if we have nadir pointing that needs to be computed &
     // See if we have table blobs to load
     if(kernels["TargetPosition"][0].UpCase() == "TABLE") {
-      Table t("SunPosition", lab.Filename(), lab);
+      Table t("SunPosition", lab.FileName(), lab);
       p_sunPosition->LoadCache(t);
 
-      Table t2("BodyRotation", lab.Filename(), lab);
+      Table t2("BodyRotation", lab.FileName(), lab);
       p_bodyRotation->LoadCache(t2);
       if(t2.Label().HasKeyword("SolarLongitude")) {
         *p_solarLongitude = Longitude(t2.Label()["SolarLongitude"],
@@ -327,7 +327,7 @@ namespace Isis {
       p_instrumentRotation = new SpiceRotation(*p_ikCode, *p_spkBodyCode);
     }
     else if(iString((std::string)kernels["InstrumentPointing"]).UpCase() == "TABLE") {
-      Table t("InstrumentPointing", lab.Filename(), lab);
+      Table t("InstrumentPointing", lab.FileName(), lab);
       p_instrumentRotation->LoadCache(t);
     }
 
@@ -338,7 +338,7 @@ namespace Isis {
     }
 
     if(iString((std::string)kernels["InstrumentPosition"]).UpCase() == "TABLE") {
-      Table t("InstrumentPosition", lab.Filename(), lab);
+      Table t("InstrumentPosition", lab.FileName(), lab);
       p_instrumentPosition->LoadCache(t);
     }
 
@@ -363,12 +363,12 @@ namespace Isis {
       if(iString(key[i]).UpCase() == "NADIR") break;
       if(iString(key[i]).UpCase() == "TABLE" && !noTables) break;
       if(iString(key[i]).UpCase() == "TABLE" && noTables) continue;
-      Filename file(key[i]);
-      if(!file.exists()) {
-        string msg = "Spice file does not exist [" + file.Expanded() + "]";
+      FileName file(key[i]);
+      if(!file.fileExists()) {
+        string msg = "Spice file does not exist [" + file.expanded() + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
-      string fileName(file.Expanded());
+      string fileName(file.expanded());
       furnsh_c(fileName.c_str());
       p_kernels->push_back((string)key[i]);
     }
@@ -479,8 +479,8 @@ namespace Isis {
 
     // Unload the kernels (TODO: Can this be done faster)
     for(int i = 0; p_kernels && i < p_kernels->size(); i++) {
-      Filename file(p_kernels->at(i));
-      string fileName(file.Expanded());
+      FileName file(p_kernels->at(i));
+      string fileName(file.expanded());
       unload_c(fileName.c_str());
     }
 
@@ -597,8 +597,8 @@ namespace Isis {
 
     // Unload the kernels (TODO: Can this be done faster)
     for(int i = 0; i < p_kernels->size(); i++) {
-      Filename file(p_kernels->at(i));
-      string fileName(file.Expanded());
+      FileName file(p_kernels->at(i));
+      string fileName(file.expanded());
       unload_c(fileName.c_str());
     }
 

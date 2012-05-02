@@ -19,7 +19,7 @@
 #include "Cube.h"
 #include "CubePlotCurve.h"
 #include "CubeViewport.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Interpolator.h"
 #include "MainWindow.h"
 #include "MdiCubeViewport.h"
@@ -1032,7 +1032,7 @@ namespace Isis {
       QAction *table = new QAction(m_plot);
       table->setText("Show Table");
       table->setIcon(
-          QPixmap(Filename("$base/icons/plot_table.png").Expanded()));
+          QPixmap(FileName("$base/icons/plot_table.png").expanded()));
       QString text =
           "<b>Function:</b>  Activates the table which displays the data of the "
                             "current plot";
@@ -1051,7 +1051,7 @@ namespace Isis {
       QAction *track = new QAction(m_plot);
       track->setText("Show Mouse &Tracking");
       track->setIcon(
-          QPixmap(Filename("$base/icons/goto.png").Expanded()));
+          QPixmap(FileName("$base/icons/goto.png").expanded()));
       track->setCheckable(true);
       QString text =
           "<b>Function:</b>  Displays the x,y coordinates as the cursor moves "
@@ -1066,7 +1066,7 @@ namespace Isis {
       QAction *backgrdSwitch = new QAction(m_plot);
       backgrdSwitch->setText("White/Black &Background");
       backgrdSwitch->setIcon(
-          QPixmap(Filename("$base/icons/plot_switchBackgrd.png").Expanded()));
+          QPixmap(FileName("$base/icons/plot_switchBackgrd.png").expanded()));
       QString text =
           "<b>Function:</b>  Switch the background color between black and "
                             "white.";
@@ -1081,7 +1081,7 @@ namespace Isis {
       m_showHideGrid = new QAction(m_plot);
       m_showHideGrid->setText("Show Grid");
       m_showHideGrid->setIcon(
-          QPixmap(Filename("$base/icons/plot_grid.png").Expanded()));
+          QPixmap(FileName("$base/icons/plot_grid.png").expanded()));
       QString text =
           "<b>Function:</b>  Display grid lines on the plot.";
       m_showHideGrid->setWhatsThis(text);
@@ -1094,7 +1094,7 @@ namespace Isis {
       QAction *changeLabels = new QAction(m_plot);
       changeLabels->setText("Rename Plot &Labels");
       changeLabels->setIcon(
-          QPixmap(Filename("$base/icons/plot_renameLabels.png").Expanded()));
+          QPixmap(FileName("$base/icons/plot_renameLabels.png").expanded()));
       QString text =
           "<b>Function:</b>  Edit the plot title, x and y axis labels.";
       changeLabels->setWhatsThis(text);
@@ -1109,7 +1109,7 @@ namespace Isis {
       QAction *changeScale = new QAction(m_plot);
       changeScale->setText("Set &Display Range");
       changeScale->setIcon(
-          QPixmap(Filename("$base/icons/plot_setScale.png").Expanded()));
+          QPixmap(FileName("$base/icons/plot_setScale.png").expanded()));
       QString text =
           "<b>Function:</b>  Adjust the scale for the x and y axis on the "
           "plot.";
@@ -1124,7 +1124,7 @@ namespace Isis {
       m_showHideAllCurves = new QAction(m_plot);
       m_showHideAllCurves->setText("Hide All Curves");
       m_showHideAllCurves->setIcon(
-          QPixmap(Filename("$base/icons/plot_showCurves.png").Expanded()));
+          QPixmap(FileName("$base/icons/plot_showCurves.png").expanded()));
       QString text =
           "<b>Function:</b>  Displays or hides all the curves currently "
                             "displayed on the plot.";
@@ -1140,7 +1140,7 @@ namespace Isis {
       m_showHideAllMarkers = new QAction(m_plot);
       m_showHideAllMarkers->setText("Hide All Symbols");
       m_showHideAllMarkers->setIcon(
-          QPixmap(Filename("$base/icons/plot_markers.png").Expanded()));
+          QPixmap(FileName("$base/icons/plot_markers.png").expanded()));
       QString text = "<b>Function:</b>  Displays or hides a symbol for each "
                      "data point plotted on a plot.";
       m_showHideAllMarkers->setWhatsThis(text);
@@ -1154,7 +1154,7 @@ namespace Isis {
       QAction *resetScaleButton = new QAction(m_plot);
       resetScaleButton->setText("Reset Scale");
       resetScaleButton->setIcon(
-          QPixmap(Filename("$base/icons/plot_resetscale.png").Expanded()));
+          QPixmap(FileName("$base/icons/plot_resetscale.png").expanded()));
       QString text =
           "<b>Function:</b>  Reset the plot's scale.";
       resetScaleButton->setWhatsThis(text);
@@ -1166,7 +1166,7 @@ namespace Isis {
       QAction *clear = new QAction(m_plot);
       clear->setText("Clear Plot");
       clear->setIcon(
-          QPixmap(Filename("$base/icons/plot_clear.png").Expanded()));
+          QPixmap(FileName("$base/icons/plot_clear.png").expanded()));
       QString text =
           "<b>Function:</b>  Removes all the curves from the plot.";
       clear->setWhatsThis(text);
@@ -1178,7 +1178,7 @@ namespace Isis {
       QAction *lineFit = new QAction(m_plot);
       lineFit->setText("Create Best Fit Line");
       lineFit->setIcon(
-          QPixmap(Filename("$base/icons/linefit.png").Expanded()));
+          QPixmap(FileName("$base/icons/linefit.png").expanded()));
       QString text = "<b>Function:</b>  Calculates a best fit line from an "
                      "existing curve.";
       lineFit->setWhatsThis(text);
@@ -1542,10 +1542,10 @@ namespace Isis {
     QString appName = QCoreApplication::applicationName();
     /*Now read the settings that are specific to this window.*/
     QString instanceName = windowTitle();
-    Isis::Filename config(
+    Isis::FileName config(
         iString("$HOME/.Isis/" + appName + "/" + instanceName + ".config"));
 
-    QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
+    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
     QByteArray state = settings.value("state", QByteArray("0")).toByteArray();
     restoreState(state);
   }
@@ -1674,9 +1674,9 @@ namespace Isis {
     std::string appName = QCoreApplication::applicationName().toStdString();
     /*Now write the settings that are specific to this window.*/
     std::string instanceName = windowTitle().toStdString();
-    Isis::Filename config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
+    Isis::FileName config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
 
-    QSettings settings(QString::fromStdString(config.Expanded()), QSettings::NativeFormat);
+    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
     settings.setValue("state", saveState());
   }
 

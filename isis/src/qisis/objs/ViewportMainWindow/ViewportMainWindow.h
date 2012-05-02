@@ -4,7 +4,7 @@
 #include <map>
 #include <QToolBar>
 #include <QMenu>
-#include "Filename.h"
+#include "FileName.h"
 #include "MainWindow.h"
 
 namespace Isis {

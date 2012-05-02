@@ -54,7 +54,7 @@ namespace Isis {
    */
   class QtImporter : public ImageImporter {
     public:
-      QtImporter(Filename inputName);
+      QtImporter(FileName inputName);
       virtual ~QtImporter();
 
       virtual bool isGrayscale() const;

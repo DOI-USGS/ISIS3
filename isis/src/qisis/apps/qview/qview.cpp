@@ -17,7 +17,7 @@
 #include "BlinkTool.h"
 #include "EditTool.h"
 #include "FeatureNomenclatureTool.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "FileTool.h"
 #include "FindTool.h"
 #include "Gui.h"
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     strcpy(p_socketName.sun_path, p_socketFile.c_str());
     int p_socket;
 
-    if(((Filename)p_socketFile).Exists()) {
+    if(((FileName)p_socketFile).fileExists()) {
       // Create a socket
       if((p_socket = socket(PF_UNIX, SOCK_STREAM, 0)) >= 0) {
         // Try to connect to the socket
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
                     sizeof(p_socketName))) >= 0) {
           std::string temp;
           for(int i = 1; i < argc; i++) {
-            temp +=  Filename(argv[i]).Expanded() + " ";
+            temp +=  FileName(argv[i]).expanded() + " ";
           }
           temp += "raise ";
 
@@ -123,8 +123,8 @@ int main(int argc, char *argv[]) {
   }
 
   // Add the Qt plugin directory to the library path
-  Filename qtpluginpath("$ISISROOT/3rdParty/plugins");
-  QCoreApplication::addLibraryPath(qtpluginpath.Expanded().c_str());
+  FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
+  QCoreApplication::addLibraryPath(qtpluginpath.expanded().c_str());
 
   ViewportMainWindow *vw = new ViewportMainWindow("qview");
 

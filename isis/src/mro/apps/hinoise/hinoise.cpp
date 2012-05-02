@@ -3,7 +3,7 @@
 #include <string>
 #include <stdio.h>
 #include "CSVReader.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Pipeline.h"
 #include <QList>
@@ -45,7 +45,7 @@ void IsisMain() {
 
     string sInputFile  = ui.GetAsString("FROM");
     string sOutputFile = ui.GetAsString("TO");
-    string sInBaseName = Filename(sInputFile).Basename();
+    string sInBaseName = FileName(sInputFile).baseName();
 
     bool bRemove = ui.GetBoolean("REMOVE");
 
@@ -87,8 +87,8 @@ void IsisMain() {
     Pipeline p1("hinoise1");
     p1.SetInputFile("FROM");
     string sTempHistFile = "$TEMPORARY/" + sInBaseName + "_hist.txt";
-    p1.SetOutputFile(Filename(sTempHistFile));
-    sTempFiles.push_back(Filename(sTempHistFile).Expanded());
+    p1.SetOutputFile(FileName(sTempHistFile));
+    sTempFiles.push_back(FileName(sTempHistFile).expanded());
     p1.KeepTemporaryFiles(!bRemove);
 
     p1.AddToPipeline("hist");
@@ -101,7 +101,7 @@ void IsisMain() {
     p1.Run();
 
     double dLisPer, dMaxDN, dStdDev;
-    GetValuesFromHistogram(Filename(sTempHistFile).Expanded(), dLisPer, dMaxDN, dStdDev);
+    GetValuesFromHistogram(FileName(sTempHistFile).expanded(), dLisPer, dMaxDN, dStdDev);
   #ifdef _DEBUG_
     cerr << "Lis=" << dLisPer << "  MaxDN=" << dMaxDN << " StdDev=" << dStdDev << endl;
   #endif
@@ -109,8 +109,8 @@ void IsisMain() {
     Pipeline p2("hinoise2");
     p2.SetInputFile("FROM");
     string sTempFile2 = "$TEMPORARY/" + sInBaseName + "_cubenorm.txt";
-    p2.SetOutputFile(Filename(sTempFile2));
-    sTempFiles.push_back(Filename(sTempFile2).Expanded());
+    p2.SetOutputFile(FileName(sTempFile2));
+    sTempFiles.push_back(FileName(sTempFile2).expanded());
     p2.KeepTemporaryFiles(!bRemove);
 
     p2.AddToPipeline("cubenorm");
@@ -124,22 +124,22 @@ void IsisMain() {
   #endif
     p2.Run();
 
-    gsCubeStats1 = Filename("$TEMPORARY/" + sInBaseName + "_cubenorm1.txt").Expanded();
-    gsCubeStats2 = Filename("$TEMPORARY/" + sInBaseName + "_cubenorm2.txt").Expanded();
+    gsCubeStats1 = FileName("$TEMPORARY/" + sInBaseName + "_cubenorm1.txt").expanded();
+    gsCubeStats2 = FileName("$TEMPORARY/" + sInBaseName + "_cubenorm2.txt").expanded();
   #ifdef _DEBUG_
     cerr << gsCubeStats1 << "  " << gsCubeStats2 << endl;
   #endif
     sTempFiles.push_back(gsCubeStats1);
     sTempFiles.push_back(gsCubeStats2);
 
-    ProcessCubeNormStats(Filename(sTempFile2).Expanded(), iChannel, iSumming);
+    ProcessCubeNormStats(FileName(sTempFile2).expanded(), iChannel, iSumming);
 
     // Clear the bad colmns for the highpass filter
     Pipeline p3("hinoise3");
     p3.SetInputFile("FROM");
     string sTempFile3 = "$TEMPORARY/" + sInBaseName + "_Temp_p3_out.cub";
-    p3.SetOutputFile(Filename(sTempFile3));
-    sTempFiles.push_back(Filename(sTempFile3).Expanded());
+    p3.SetOutputFile(FileName(sTempFile3));
+    sTempFiles.push_back(FileName(sTempFile3).expanded());
     p3.KeepTemporaryFiles(!bRemove);
   #ifdef _DEBUG_
     cerr << "stats1=" << gsCubeStats1 << endl;
@@ -162,8 +162,8 @@ void IsisMain() {
     Pipeline p4("hinoise4");
     p4.SetInputFile("FROM");
     string sTempFile4 = "$TEMPORARY/" + sInBaseName + "_Temp_p4_out.cub";
-    p4.SetOutputFile(Filename(sTempFile4));
-    sTempFiles.push_back(Filename(sTempFile4).Expanded());
+    p4.SetOutputFile(FileName(sTempFile4));
+    sTempFiles.push_back(FileName(sTempFile4).expanded());
     p4.KeepTemporaryFiles(!bRemove);
 
     p4.AddToPipeline("cubenorm");
@@ -186,9 +186,9 @@ void IsisMain() {
     // a. Lowpass
     Pipeline p5("hinoise5");
     string sTempFile5 = "$TEMPORARY/" + sInBaseName + "_Temp_p5_out.cub";
-    p5.SetInputFile(Filename(sTempFile4));
-    p5.SetOutputFile(Filename(sTempFile5));
-    sTempFiles.push_back(Filename(sTempFile5).Expanded());
+    p5.SetInputFile(FileName(sTempFile4));
+    p5.SetOutputFile(FileName(sTempFile5));
+    sTempFiles.push_back(FileName(sTempFile5).expanded());
     p5.KeepTemporaryFiles(!bRemove);
 
     p5.AddToPipeline("lowpass");
@@ -208,10 +208,10 @@ void IsisMain() {
 
     // b. Highpass
     Pipeline p6("hinoise6");
-    p6.SetInputFile (Filename(sTempFile3));
+    p6.SetInputFile (FileName(sTempFile3));
     string sTempFile6 = "$TEMPORARY/" + sInBaseName + "_Temp_p6_out.cub";
-    p6.SetOutputFile(Filename(sTempFile6));
-    sTempFiles.push_back(Filename(sTempFile6).Expanded());
+    p6.SetOutputFile(FileName(sTempFile6));
+    sTempFiles.push_back(FileName(sTempFile6).expanded());
     p6.KeepTemporaryFiles(!bRemove);
 
     p6.AddToPipeline("highpass");
@@ -229,20 +229,20 @@ void IsisMain() {
 
     // Enter the outputs of lowpass and highpass filenames to a list file
     string sTempListFile = "$TEMPORARY/" + sInBaseName + "_TempList.lis";
-    gsTempFile = Filename(sTempListFile).Expanded();
+    gsTempFile = FileName(sTempListFile).expanded();
     sTempFiles.push_back(gsTempFile);
     fstream ostm;
     ostm.open(gsTempFile.c_str(), std::ios::out);
-    ostm << Filename(sTempFile5).Expanded() << endl;
-    ostm << Filename(sTempFile6).Expanded() << endl;
+    ostm << FileName(sTempFile5).expanded() << endl;
+    ostm << FileName(sTempFile6).expanded() << endl;
     ostm.close();
 
     // c. algebra (lowpass + highpass)
     Pipeline p7("hinoise7");
-    p7.SetInputFile (Filename(sTempListFile));
+    p7.SetInputFile (FileName(sTempListFile));
     string sTempFile7 = "$TEMPORARY/" + sInBaseName + "_Temp_p7_out.cub";
-    p7.SetOutputFile(Filename(sTempFile7));
-    sTempFiles.push_back(Filename(sTempFile7).Expanded());
+    p7.SetOutputFile(FileName(sTempFile7));
+    sTempFiles.push_back(FileName(sTempFile7).expanded());
     p7.KeepTemporaryFiles(!bRemove);
 
     p7.AddToPipeline("fx");
@@ -262,10 +262,10 @@ void IsisMain() {
     // Perform noise filter 3 times
     // ****************************************************************************
     Pipeline p8("hinoise8");
-    p8.SetInputFile (Filename(sTempFile7));
+    p8.SetInputFile (FileName(sTempFile7));
     string sTempFile8 = "$TEMPORARY/" + sInBaseName + "_Temp_p8_out.cub";
-    p8.SetOutputFile(Filename(sTempFile8));
-    sTempFiles.push_back(Filename(sTempFile8).Expanded());
+    p8.SetOutputFile(FileName(sTempFile8));
+    sTempFiles.push_back(FileName(sTempFile8).expanded());
     p8.KeepTemporaryFiles(!bRemove);
 
     if (dLisPer >= gdHardFilter) {
@@ -336,10 +336,10 @@ void IsisMain() {
     // ****************************************************************************
     // a. Lowpass
     Pipeline p9("hinoise9");
-    p9.SetInputFile (Filename(sTempFile8));
+    p9.SetInputFile (FileName(sTempFile8));
     string sTempFile9 = "$TEMPORARY/" + sInBaseName + "_Temp_p9_out.cub";
-    p9.SetOutputFile(Filename(sTempFile9));
-    sTempFiles.push_back(Filename(sTempFile9).Expanded());
+    p9.SetOutputFile(FileName(sTempFile9));
+    sTempFiles.push_back(FileName(sTempFile9).expanded());
     p9.KeepTemporaryFiles(!bRemove);
 
     p9.AddToPipeline("lowpass");
@@ -363,10 +363,10 @@ void IsisMain() {
 
     // b. Highpass
     Pipeline p10("hinoise10");
-    p10.SetInputFile (Filename(sTempFile8));
+    p10.SetInputFile (FileName(sTempFile8));
     string sTempFile10 = "$TEMPORARY/" + sInBaseName + "_Temp_p10_out.cub";
-    p10.SetOutputFile(Filename(sTempFile10));
-    sTempFiles.push_back(Filename(sTempFile10).Expanded());
+    p10.SetOutputFile(FileName(sTempFile10));
+    sTempFiles.push_back(FileName(sTempFile10).expanded());
     p10.KeepTemporaryFiles(!bRemove);
 
     p10.AddToPipeline("highpass");
@@ -383,21 +383,21 @@ void IsisMain() {
     p10.Run();
 
     // Enter the outputs of lowpass and highpass filenames to a list file
-    gsTempFile = Filename(sTempListFile).Expanded();
+    gsTempFile = FileName(sTempListFile).expanded();
     sTempFiles.push_back(gsTempFile);
     ostm.open(gsTempFile.c_str(), std::ios::out);
-    ostm << Filename(sTempFile9).Expanded() << endl;
-    ostm << Filename(sTempFile10).Expanded() << endl;
+    ostm << FileName(sTempFile9).expanded() << endl;
+    ostm << FileName(sTempFile10).expanded() << endl;
     ostm.close();
 
     // c. algebra (lowpass + highpass)
     Pipeline p11("hinoise11");
-    p11.SetInputFile (Filename(sTempListFile));
+    p11.SetInputFile (FileName(sTempListFile));
     string sTempFile11;
     if (sCcdId == "RED") {
       sTempFile11 = "$TEMPORARY/" + sInBaseName + "_Temp_p11_out.cub";
-      p11.SetOutputFile(Filename(sTempFile11));
-      sTempFiles.push_back(Filename(sTempFile11).Expanded());
+      p11.SetOutputFile(FileName(sTempFile11));
+      sTempFiles.push_back(FileName(sTempFile11).expanded());
     }
     else {
       p11.SetOutputFile("TO");
@@ -423,7 +423,7 @@ void IsisMain() {
     if (sCcdId == "RED") {
       int iMin = int( (gdLpfzLines * gdLpfzSamples)/3 );
       Pipeline p12("hinoise12");
-      p12.SetInputFile(Filename(sTempFile11));
+      p12.SetInputFile(FileName(sTempFile11));
       p12.SetOutputFile("TO");
       p12.KeepTemporaryFiles(!bRemove);
 

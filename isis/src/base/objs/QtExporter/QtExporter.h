@@ -62,7 +62,7 @@ namespace Isis {
       virtual void setRgb(ExportDescription &desc);
       virtual void setRgba(ExportDescription &desc);
 
-      virtual void write(Filename outputName, int quality=100);
+      virtual void write(FileName outputName, int quality=100);
 
       static bool canWriteFormat(iString format);
 

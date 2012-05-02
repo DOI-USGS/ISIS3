@@ -117,8 +117,8 @@ int main(void) {
 
     cout << "  Test Translate :" << endl;
 
-    cout << "    Translate (\"DataFilename\", \"tttt4\") = " <<
-         table.Translate("DataFilename", "tttt4") << endl;
+    cout << "    Translate (\"DataFileName\", \"tttt4\") = " <<
+         table.Translate("DataFileName", "tttt4") << endl;
     cout << "    Translate (\"CoreByteOrder\",\"MSB_INTEGER\") = " <<
          table.Translate("CoreByteOrder", "MSB_INTEGER") << endl;
     cout << "    Translate (\"CorePixelType\") = " <<

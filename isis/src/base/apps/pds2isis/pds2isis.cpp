@@ -2,7 +2,7 @@
 #include "ProcessImportPds.h"
 
 #include "UserInterface.h"
-#include "Filename.h"
+#include "FileName.h"
 
 using namespace std;
 using namespace Isis;
@@ -12,10 +12,10 @@ void IsisMain() {
   Pvl label;
   UserInterface &ui = Application::GetUserInterface();
 
-  string labelFile = ui.GetFilename("FROM");
+  string labelFile = ui.GetFileName("FROM");
   string imageFile("");
   if(ui.WasEntered("IMAGE")) {
-    imageFile = ui.GetFilename("IMAGE");
+    imageFile = ui.GetFileName("IMAGE");
   }
 
   p.SetPdsFile(labelFile, imageFile, label);

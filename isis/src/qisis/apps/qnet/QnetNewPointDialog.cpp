@@ -95,7 +95,7 @@ namespace Isis {
     for (int i = 0; i < g_serialNumberList->Size(); i++) {
 
       // build new item...
-      iString label = g_serialNumberList->Filename(i);
+      iString label = g_serialNumberList->FileName(i);
       QListWidgetItem *item = new QListWidgetItem(label);
 
       // if this entry of the SerialNumberList is also in the pointFiles then

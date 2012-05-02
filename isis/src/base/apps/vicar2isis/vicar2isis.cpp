@@ -22,7 +22,7 @@ void IsisMain() {
   }
 
   Pvl vicLab;
-  p.SetVicarFile(ui.GetFilename("FROM"), vicLab);
+  p.SetVicarFile(ui.GetFileName("FROM"), vicLab);
   p.SetOutputCube("TO");
 
   p.StartProcess();

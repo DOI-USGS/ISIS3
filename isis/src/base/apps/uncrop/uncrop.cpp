@@ -25,7 +25,7 @@ void IsisMain() {
 
   // Get the extraction label from the input file
   Pvl lab;
-  lab.Read(ui.GetFilename("FROM"));
+  lab.Read(ui.GetFileName("FROM"));
   AlphaCube acube(lab);
   int outSample = (int)(acube.AlphaSample(0.5) + 0.5);
   int outLine = (int)(acube.AlphaLine(0.5) + 0.5);

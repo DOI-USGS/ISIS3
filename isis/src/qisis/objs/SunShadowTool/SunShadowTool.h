@@ -101,7 +101,7 @@ namespace Isis {
         //! Cube file path table column index
         PathIndex,
         //! Cube file name table column index
-        FilenameIndex
+        FileNameIndex
       };
 
       //! Start sample of the measurement

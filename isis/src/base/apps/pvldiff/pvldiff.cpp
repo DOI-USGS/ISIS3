@@ -28,11 +28,11 @@ void IsisMain() {
   differenceReason = "";
   filesMatch = true;
 
-  const Pvl file1(ui.GetFilename("FROM"));
-  const Pvl file2(ui.GetFilename("FROM2"));
+  const Pvl file1(ui.GetFileName("FROM"));
+  const Pvl file2(ui.GetFileName("FROM2"));
 
   if(ui.WasEntered("DIFF")) {
-    Pvl diffFile(ui.GetFilename("DIFF"));
+    Pvl diffFile(ui.GetFileName("DIFF"));
 
     if(diffFile.HasGroup("Tolerances")) {
       tolerances = diffFile.FindGroup("Tolerances");
@@ -59,7 +59,7 @@ void IsisMain() {
   if(ui.WasEntered("TO")) {
     Pvl out;
     out.AddGroup(differences);
-    out.Write(ui.GetFilename("TO"));
+    out.Write(ui.GetFileName("TO"));
   }
 
   differenceReason = "";

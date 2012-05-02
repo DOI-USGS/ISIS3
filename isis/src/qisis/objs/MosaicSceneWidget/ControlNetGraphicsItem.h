@@ -32,7 +32,7 @@ namespace Isis {
       QRectF boundingRect() const;
       void paint(QPainter *, const QStyleOptionGraphicsItem *,
                  QWidget * widget = 0);
-      QString snToFilename(QString sn);
+      QString snToFileName(QString sn);
 
       void setArrowsVisible(bool visible);
 

@@ -26,7 +26,7 @@ void IsisMain() {
   // Get the list of cubes to stack
   Process p;
   UserInterface &ui = Application::GetUserInterface();
-  FileList cubeList(ui.GetFilename("FROMLIST"));
+  FileList cubeList(ui.GetFileName("FROMLIST"));
 
   // Loop through the list
   int nsamps(0), nlines(0), nbands(0);
@@ -75,7 +75,7 @@ void IsisMain() {
     }
   }
   catch(IException &e) {
-    string msg = "Invalid cube in list file [" + ui.GetFilename("FROMLIST") + "]";
+    string msg = "Invalid cube in list file [" + ui.GetFileName("FROMLIST") + "]";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
@@ -86,18 +86,18 @@ void IsisMain() {
   int index = 0;
   if(ui.WasEntered("PROPLAB")) {
     bool match = false;
-    string fname = (iString)ui.GetFilename("PROPLAB");
+    string fname = (iString)ui.GetFileName("PROPLAB");
     for(int i = 0; i < (int)cubeList.size(); i++) {
-      if(fname == Filename(cubeList[i]).Expanded()) {
+      if(fname == FileName(cubeList[i]).expanded()) {
         index = i;
         match = true;
         break;
       }
     }
     if(!match) {
-      string msg = "Filename [" + ui.GetFilename("PROPLAB") +
+      string msg = "FileName [" + ui.GetFileName("PROPLAB") +
                    "] to propagate labels from is not in the list file [" +
-                   ui.GetFilename("FROMLIST") + "]";
+                   ui.GetFileName("FROMLIST") + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -146,7 +146,7 @@ void NullBand(Buffer &out) {
 //Helper function to output the input file to log.
 void helperButtonLog() {
   UserInterface &ui = Application::GetUserInterface();
-  string file(ui.GetFilename("FROMLIST"));
+  string file(ui.GetFileName("FROMLIST"));
   TextFile text(file);
   string line;
   for(int i = 0; i < text.LineCount(); i++) {

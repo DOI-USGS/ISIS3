@@ -56,7 +56,7 @@ namespace Isis {
    *   p.SetOutputType(Isis::UnsignedByte);
    *   p.SetOutputRange(1.0,255.0);
    *   p.SetOutputNull(0.0);
-   *   JP2_encoder = new JP2Encoder(ui.GetFilename("TO"),icube->Samples(),
+   *   JP2_encoder = new JP2Encoder(ui.GetFileName("TO"),icube->Samples(),
    *                 icube->Lines(),icube->Bands(),Isis::UnsignedByte);
    *   JP2_encoder->OpenFile();
    *   p.StartProcess(toJP2);

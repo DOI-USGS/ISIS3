@@ -28,7 +28,7 @@ namespace Isis {
       p = new GuiCubeParameter(grid, ui, group, param);
     }
     else if(paramType == "filename") {
-      p = new GuiFilenameParameter(grid, ui, group, param);
+      p = new GuiFileNameParameter(grid, ui, group, param);
     }
     else if(paramType == "string") {
       p = new GuiStringParameter(grid, ui, group, param);

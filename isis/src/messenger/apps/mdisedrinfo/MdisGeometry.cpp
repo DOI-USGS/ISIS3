@@ -281,7 +281,7 @@ namespace Isis {
    */
   void MdisGeometry::init(Cube &cube) {
     _label = *cube.getLabel();
-    _orglabel = OriginalLabel(cube.getFilename()).ReturnLabels();
+    _orglabel = OriginalLabel(cube.getFileName()).ReturnLabels();
     _nSubframes = (int) _orglabel.FindKeyword("MESS:SUBFRAME",
                   PvlObject::Traverse);
     _camera = CameraFactory::Create(_label);

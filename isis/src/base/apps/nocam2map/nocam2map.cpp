@@ -129,7 +129,7 @@ void IsisMain() {
   //the column titles to it.
   TextFile oFile;
   if(ui.WasEntered("RESIDUALS")) {
-    oFile.Open(ui.GetFilename("RESIDUALS"), "overwrite");
+    oFile.Open(ui.GetFileName("RESIDUALS"), "overwrite");
     oFile.PutLine("Sample,\tLine,\tX,\tY,\tSample Error,\tLine Error\n");
   }
 
@@ -185,17 +185,17 @@ void IsisMain() {
   if(!ui.GetBoolean("NOWARP")) {
     //Creates the mapping group
     Pvl mapFile;
-    mapFile.Read(ui.GetFilename("MAP"));
+    mapFile.Read(ui.GetFileName("MAP"));
     PvlGroup &mapGrp = mapFile.FindGroup("Mapping", Pvl::Traverse);
 
     //Reopen the lat and long cubes
     latCube = new Cube();
     latCube->setVirtualBands(ui.GetInputAttribute("LATCUB").Bands());
-    latCube->open(ui.GetFilename("LATCUB"));
+    latCube->open(ui.GetFileName("LATCUB"));
 
     lonCube = new Cube();
     lonCube->setVirtualBands(ui.GetInputAttribute("LONCUB").Bands());
-    lonCube->open(ui.GetFilename("LONCUB"));
+    lonCube->open(ui.GetFileName("LONCUB"));
 
     PvlKeyword targetName;
 
@@ -206,7 +206,7 @@ void IsisMain() {
     //Else read the target name from the input cube
     else {
       Pvl fromFile;
-      fromFile.Read(ui.GetFilename("FROM"));
+      fromFile.Read(ui.GetFileName("FROM"));
       targetName = fromFile.FindKeyword("TargetName", Pvl::Traverse);
     }
 
@@ -223,12 +223,12 @@ void IsisMain() {
     }
     //Else read them from the pck
     else {
-      Filename pckFile("$base/kernels/pck/pck?????.tpc");
-      pckFile.HighestVersion();
+      FileName pckFile("$base/kernels/pck/pck?????.tpc");
+      pckFile = pckFile.highestVersion();
 
-      string pckFilename = pckFile.Expanded();
+      string pckFileName = pckFile.expanded();
 
-      furnsh_c(pckFilename.c_str());
+      furnsh_c(pckFileName.c_str());
 
       string target = targetName[0];
       SpiceInt code;
@@ -704,7 +704,7 @@ void PrintMap() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFilename("MAP"));
+  userMap.Read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log
@@ -757,7 +757,7 @@ void LoadMapRes() {
 
   // Get mapping group from map file
   Pvl userMap;
-  userMap.Read(ui.GetFilename("MAP"));
+  userMap.Read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   // Set resolution
@@ -774,7 +774,7 @@ void LoadMapRes() {
     ui.PutAsString("PIXRES", "MPP");
   }
   else {
-    string msg = "No resolution value found in [" + ui.GetFilename("MAP") + "]";
+    string msg = "No resolution value found in [" + ui.GetFileName("MAP") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }
@@ -787,7 +787,7 @@ void ComputeInputRange() {
 
   UserInterface &ui = Application::GetUserInterface();
   Pvl userMap;
-  userMap.Read(ui.GetFilename("MAP"));
+  userMap.Read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   Statistics *latStats = latCub->getStatistics();
@@ -813,12 +813,12 @@ void ComputeInputRange() {
     }
     //Else read them from the pck
     else {
-      Filename pckFile("$base/kernels/pck/pck?????.tpc");
-      pckFile.HighestVersion();
+      FileName pckFile("$base/kernels/pck/pck?????.tpc");
+      pckFile = pckFile.highestVersion();
 
-      string pckFilename = pckFile.Expanded();
+      string pckFileName = pckFile.expanded();
 
-      furnsh_c(pckFilename.c_str());
+      furnsh_c(pckFileName.c_str());
 
       string target;
 
@@ -829,7 +829,7 @@ void ComputeInputRange() {
       //Else read the target name from the input cube
       else {
         Pvl fromFile;
-        fromFile.Read(ui.GetFilename("FROM"));
+        fromFile.Read(ui.GetFileName("FROM"));
         target = (string)fromFile.FindKeyword("TargetName", Pvl::Traverse);
       }
 
@@ -919,7 +919,7 @@ void LoadMapRange() {
 
   // Get map file
   Pvl userMap;
-  userMap.Read(ui.GetFilename("MAP"));
+  userMap.Read(ui.GetFileName("MAP"));
   PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   // Set ground range keywords that are found in mapfile
@@ -951,7 +951,7 @@ void LoadMapRange() {
 
   if(count < 4) {
     string msg = "One or more of the values for the ground range was not found";
-    msg += " in [" + ui.GetFilename("MAP") + "]";
+    msg += " in [" + ui.GetFileName("MAP") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }

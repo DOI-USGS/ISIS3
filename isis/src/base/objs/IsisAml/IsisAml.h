@@ -57,14 +57,14 @@ namespace Isis {
  *   @history 2002-11-05 Stuart Sides - Modified GetString member to return the
  *                                      matching list member (if a list
  *                                      exists) instead of the value itself.
- *   @history 2002-12-10 Stuart Sides - modified GetFilename member to return
+ *   @history 2002-12-10 Stuart Sides - modified GetFileName member to return
  *                                      the filename(s) with environment
  *                                      variables expanded.
  *   @history 2003-01-24 Stuart Sides - took out schema checking for the time
  *                                      being. It will need to be put back in
  *                                      after the user preferences object is
  *                                      finished.
- *   @history 2003-01-27 Stuart Sides - modified GetFilename.
+ *   @history 2003-01-27 Stuart Sides - modified GetFileName.
  *   @history 2003-02-07 Stuart Sides - fixed VerifyAll to better check
  *                                      list/option/includes,excludes
  *   @history 2003-02-13 Stuart Sides - allowed list/option/included parameters
@@ -102,9 +102,9 @@ namespace Isis {
  *   @history 2003-07-03 Stuart Sides - added the members "Brief and
  *                                      Description" to return the application
  *                                      brief and full description.
- *   @history 2003-08-01 Stuart Sides - made get and put Filename work for cubes
+ *   @history 2003-08-01 Stuart Sides - made get and put FileName work for cubes
  *                                      too.
- *   @history 2003-08-26 Jeff Anderson - added extension option to GetFilename
+ *   @history 2003-08-26 Jeff Anderson - added extension option to GetFileName
  *                                       method.
  *   @history 2003-08-27 Stuart Sides - fixed bug where not all parameters would
  *                                      get internalized if there where html
@@ -159,8 +159,8 @@ class IsisAml : protected IsisAmlData {
     void PutAsString(const std::string &paramName, const std::string &value);
     void PutAsString(const std::string &paramName, const std::vector<std::string> &value);
 
-    void PutFilename(const std::string &paramName, const std::string &value);
-    void PutFilename(const std::string &paramName, const std::vector<std::string> &value);
+    void PutFileName(const std::string &paramName, const std::string &value);
+    void PutFileName(const std::string &paramName, const std::vector<std::string> &value);
 
     void PutDouble(const std::string &paramName, const double &value);
     void PutDouble(const std::string &paramName, const std::vector<double> &value);
@@ -177,8 +177,8 @@ class IsisAml : protected IsisAmlData {
     std::string GetAsString(const std::string &paramName) const;
     void GetAsString(const std::string &paramName, std::vector<std::string> &values) const;
 
-    Isis::iString GetFilename(const std::string &paramName, std::string extension = "") const;
-    void GetFilename(const std::string &paramName, std::vector<std::string> &values) const;
+    Isis::iString GetFileName(const std::string &paramName, std::string extension = "") const;
+    void GetFileName(const std::string &paramName, std::vector<std::string> &values) const;
 
     std::string GetString(const std::string &paramName) const;
     void GetString(const std::string &paramName, std::vector<std::string> &values) const;
@@ -355,7 +355,7 @@ class IsisAml : protected IsisAmlData {
 
     void Verify(const IsisParameterData *param);
     
-    void CheckFilenamePreference(std::string filename, std::string paramname);
+    void CheckFileNamePreference(std::string filename, std::string paramname);
 };
 
 

@@ -47,14 +47,14 @@ const int num_phases = 4;
 void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
-  Isis::Filename fromFile = ui.GetFilename("FROM");
+  Isis::FileName fromFile = ui.GetFileName("FROM");
 
   Isis::Cube inputCube;
-  inputCube.open(fromFile.Expanded());
+  inputCube.open(fromFile.expanded());
 
   //Check to make sure we got the cube properly
   if(!inputCube.isOpen()) {
-    string msg = "Could not open FROM cube" + fromFile.Expanded();
+    string msg = "Could not open FROM cube" + fromFile.expanded();
     throw IException(IException::User, msg, _FILEINFO_);
   }
 

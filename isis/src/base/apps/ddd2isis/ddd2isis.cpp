@@ -2,7 +2,7 @@
 #include "ProcessImport.h"
 #include "UserInterface.h"
 #include "SpecialPixel.h"
-#include "Filename.h"
+#include "FileName.h"
 
 using namespace std;
 using namespace Isis;
@@ -10,7 +10,7 @@ using namespace Isis;
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   ProcessImport p;
-  iString from = ui.GetFilename("FROM");
+  iString from = ui.GetFileName("FROM");
   EndianSwapper swp("MSB");
   int nsamples = 0, nlines = 0, nbands = 1;
 
@@ -89,7 +89,7 @@ void IsisMain() {
   p.SetDimensions(nsamples, nlines, nbands);
   p.SetFileHeaderBytes(1024);
   p.SetByteOrder(Isis::Msb);
-  p.SetInputFile(ui.GetFilename("FROM"));
+  p.SetInputFile(ui.GetFileName("FROM"));
   p.SetOutputCube("TO");
 
   p.StartProcess();

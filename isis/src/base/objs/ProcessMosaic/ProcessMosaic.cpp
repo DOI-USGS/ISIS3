@@ -770,7 +770,7 @@ namespace Isis {
    * input pixel is assigned to the output if the origin pixel equals the current
    * input file index
    *
-   * @index     - Filename Index for the origin band (default +
+   * @index     - FileName Index for the origin band (default +
    *                zero based index)
    *
    * @throws Isis::IException::Message
@@ -1078,7 +1078,7 @@ namespace Isis {
    */
   void ProcessMosaic::SetMosaicOrigin(int &index) {
     // Get only the file name
-    std::string sInputFile = Filename(InputCubes[0]->getFilename()).Name();
+    std::string sInputFile = FileName(InputCubes[0]->getFileName()).name();
     std::string sTableName = SRC_IMAGE_TBL;
 
     // Get the serial number
@@ -1091,7 +1091,7 @@ namespace Isis {
     }
 
     // Get output file name
-    std::string sOutputFile = Filename(OutputCubes[0]->getFilename()).Name();
+    std::string sOutputFile = FileName(OutputCubes[0]->getFileName()).name();
 
     Pvl *cPvlOut = OutputCubes[0]->getLabel();
 
@@ -1381,7 +1381,7 @@ namespace Isis {
     // (e.g., "TO") and the cube size from an input cube
     Isis::Cube *cube = new Isis::Cube;
     try {
-      string fname = Application::GetUserInterface().GetFilename(psParameter);
+      string fname = Application::GetUserInterface().GetFileName(psParameter);
       cube->open(fname, "rw");
     }
     catch(IException &) {

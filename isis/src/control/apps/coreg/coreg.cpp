@@ -52,7 +52,7 @@ void IsisMain() {
   CubeAttributeInput &attTrans = ui.GetInputAttribute("FROM");
   std::vector<string> bandTrans = attTrans.Bands();
   trans.setVirtualBands(bandTrans);
-  trans.open(ui.GetFilename("FROM"), "r");
+  trans.open(ui.GetFileName("FROM"), "r");
 
 
   // Open the second cube, it is held in place.  We will be matching the
@@ -61,7 +61,7 @@ void IsisMain() {
   CubeAttributeInput &attMatch = ui.GetInputAttribute("MATCH");
   std::vector<string> bandMatch = attMatch.Bands();
   match.setVirtualBands(bandMatch);
-  match.open(ui.GetFilename("MATCH"), "r");
+  match.open(ui.GetFileName("MATCH"), "r");
 
   // Input cube Lines and Samples must be the same and each must have only
   // one band
@@ -82,8 +82,8 @@ void IsisMain() {
 
 //  This still precludes band to band registrations.
   if(serialTrans == serialMatch) {
-    string sTrans = Filename(trans.getFilename()).Name();
-    string sMatch = Filename(match.getFilename()).Name();
+    string sTrans = FileName(trans.getFileName()).name();
+    string sMatch = FileName(match.getFileName()).name();
     if(sTrans == sMatch) {
       string msg = "Cube Serial Numbers must be unique - FROM=" + serialTrans +
                    ", MATCH=" + serialMatch;
@@ -97,7 +97,7 @@ void IsisMain() {
   // We need to get a user definition of how to auto correlate around each
   // of the control points.
   Pvl regdef;
-  regdef.Read(ui.GetFilename("DEFFILE"));
+  regdef.Read(ui.GetFileName("DEFFILE"));
   AutoReg *ar = AutoRegFactory::Create(regdef);
 
   // We want to create a grid of control points that is N rows by M columns.
@@ -233,14 +233,14 @@ void IsisMain() {
 
   // If a cnet file was entered, write the ControlNet pvl to the file
   if(ui.WasEntered("ONET")) {
-    cn.Write(ui.GetFilename("ONET"));
+    cn.Write(ui.GetFileName("ONET"));
   }
 
   // If flatfile was entered, create the flatfile
   // The flatfile is comma seperated and can be imported into an excel
   // spreadsheet
   if(ui.WasEntered("FLATFILE")) {
-    string fFile = Filename(ui.GetFilename("FLATFILE")).Expanded();
+    string fFile = FileName(ui.GetFileName("FLATFILE")).expanded();
     ofstream os;
     os.open(fFile.c_str(), ios::out);
     os << "Sample,Line,TranslatedSample,TranslatedLine," <<
@@ -265,18 +265,18 @@ void IsisMain() {
   // second input image
   if(ui.WasEntered("TO")) {
     if(ui.GetString("TRANSFORM") == "TRANSLATE") {
-      string params = " from="   + ui.GetFilename("FROM") +
-                      " to="     + ui.GetFilename("TO") +
+      string params = " from="   + ui.GetFileName("FROM") +
+                      " to="     + ui.GetFileName("TO") +
                       " strans=" + iString(sTrans) +
                       " ltrans=" + iString(lTrans) +
                       " interp=" + ui.GetString("INTERP");
       ProgramLauncher::RunIsisProgram("translate", params);
     }
     else {
-      string params = " from="    + ui.GetFilename("FROM") +
-                      " to="     + ui.GetFilename("TO") +
-                      " cube="   + ui.GetFilename("MATCH") +
-                      " cnet="   + ui.GetFilename("ONET") +
+      string params = " from="    + ui.GetFileName("FROM") +
+                      " to="     + ui.GetFileName("TO") +
+                      " cube="   + ui.GetFileName("MATCH") +
+                      " cnet="   + ui.GetFileName("ONET") +
                       " interp=" + ui.GetString("INTERP") +
                       " degree=" + iString(ui.GetInteger("DEGREE"));
       ProgramLauncher::RunIsisProgram("warp", params);
@@ -287,7 +287,7 @@ void IsisMain() {
 //Helper function to output the regdeft file to log.
 void helperButtonLog() {
   UserInterface &ui = Application::GetUserInterface();
-  string file(ui.GetFilename("DEFFILE"));
+  string file(ui.GetFileName("DEFFILE"));
   Pvl p;
   p.Read(file);
   Application::GuiLog(p);

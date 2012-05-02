@@ -23,7 +23,7 @@ void IsisMain() {
 
   // Get Parameters
   table = new Table(ui.GetString("TABLENAME"));
-  table->Read(ui.GetFilename("FROM"));
+  table->Read(ui.GetFileName("FROM"));
 
   field = ui.GetString("FIELD");
   startRecord = ui.GetInteger("STARTREC");

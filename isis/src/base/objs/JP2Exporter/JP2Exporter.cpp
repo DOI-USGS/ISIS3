@@ -1,7 +1,7 @@
 #include "JP2Exporter.h"
 
 #include "Buffer.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "JP2Encoder.h"
 
@@ -53,10 +53,10 @@ namespace Isis {
    * @param outputName The filename of the output cube
    * @param quality The quality of the output, not used for JPEG 2000
    */
-  void JP2Exporter::write(Filename outputName, int quality) {
+  void JP2Exporter::write(FileName outputName, int quality) {
     PixelType type = getPixelType();
     m_encoder = new JP2Encoder(
-        outputName.Expanded(), samples(), lines(), bands(), type);
+        outputName.expanded(), samples(), lines(), bands(), type);
     m_encoder->OpenFile();
 
     ImageExporter::write(outputName, quality);

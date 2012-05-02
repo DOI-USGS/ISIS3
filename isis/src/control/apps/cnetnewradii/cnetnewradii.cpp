@@ -6,7 +6,7 @@
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "Cube.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Interpolator.h"
 #include "Latitude.h"
@@ -23,10 +23,10 @@ enum GetLatLon { Adjusted, Apriori };
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  ControlNet cnet(ui.GetFilename("CNET"));
+  ControlNet cnet(ui.GetFileName("CNET"));
 
   // Get input DEM cube and get ground map for it
-  string demFile = ui.GetFilename("MODEL");
+  string demFile = ui.GetFileName("MODEL");
   Cube demCube;
   demCube.open(demFile);
   UniversalGroundMap *ugm = NULL;
@@ -148,7 +148,7 @@ void IsisMain() {
     }
   }
 
-  cnet.Write(ui.GetFilename("ONET"));
+  cnet.Write(ui.GetFileName("ONET"));
 
   // Write results to Logs
   // Summary group is created with the counts of successes and failures
@@ -160,11 +160,11 @@ void IsisMain() {
   summaryGroup.AddKeyword(PvlKeyword("NumberEditLockedPoints", numLocked));
 
   bool errorlog;
-  Filename errorlogFile;
+  FileName errorlogFile;
   // if a filename was entered, use it to create the log
   if (ui.WasEntered("ERRORS")) {
     errorlog = true;
-    errorlogFile = ui.GetFilename("ERRORS");
+    errorlogFile = ui.GetFileName("ERRORS");
   }
   // if no filename was entered, but there were some failures,
   // create an error log named "failures" in the current directory
@@ -186,14 +186,14 @@ void IsisMain() {
     if (numFailures > 0) {
       // if there are any failures, add comment to the summary log to alert user
       summaryGroup.AddComment("Unable to calculate radius for all points. Point"
-              " IDs for failures contained in [" + errorlogFile.Name() + "].");
+              " IDs for failures contained in [" + errorlogFile.name() + "].");
       PvlGroup failGroup = PvlGroup("Failures");
       failGroup.AddComment("A point fails if we are unable to set universal "
                "ground or if the radius calculated is a special pixel value.");
       failGroup.AddKeyword(PvlKeyword("PointIDs", failedIDs));
       results.AddGroup(failGroup);
     }
-    results.Write(errorlogFile.Expanded());
+    results.Write(errorlogFile.expanded());
   }
   // Write summary to application log
   Application::Log(summaryGroup);

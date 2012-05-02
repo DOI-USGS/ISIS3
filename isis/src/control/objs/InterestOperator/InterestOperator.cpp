@@ -3,7 +3,7 @@
 #include "InterestOperator.h"
 #include "Plugin.h"
 #include "IException.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Statistics.h"
 #include "PolygonTools.h"
 #include "SpecialPixel.h"
@@ -105,7 +105,7 @@ namespace Isis {
 
     }
     catch (IException &e) {
-      std::string msg = "Improper format for InterestOperator PVL [" + pPvl.Filename() + "]";
+      std::string msg = "Improper format for InterestOperator PVL [" + pPvl.FileName() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -156,7 +156,7 @@ namespace Isis {
       // Level 3 images/mosaic or bad image
     {
       std::string msg = "Cannot run interest on images with no camera. Image " +
-                        pCube.getFilename() + " has no Camera";
+                        pCube.getFileName() + " has no Camera";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -296,7 +296,7 @@ namespace Isis {
       }
 
       if (!newMeasure->IsIgnored()) {
-        Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
+        Cube *measureCube = mCubeMgr.OpenCube(mSerialNumbers.FileName(sn));
 
         MeasureValidationResults results =
           ValidStandardOptions(newMeasure, measureCube);
@@ -417,7 +417,7 @@ namespace Isis {
         double dReferenceLat = 0, dReferenceLon = 0;
         if (iBestMeasureIndex >= 0) {
           std::string sn = mtInterestResults[iBestMeasureIndex].msSerialNum;
-          Cube *bestCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
+          Cube *bestCube = mCubeMgr.OpenCube(mSerialNumbers.FileName(sn));
 
           // Get the Camera for the reference image and get the lat/lon from that measurment
           Camera *bestCamera;
@@ -425,7 +425,7 @@ namespace Isis {
             bestCamera = bestCube->getCamera();
           }
           catch (IException &e) {
-            std::string msg = "Cannot Create Camera for Image:" + mSerialNumbers.Filename(sn);
+            std::string msg = "Cannot Create Camera for Image:" + mSerialNumbers.FileName(sn);
             throw IException(IException::User, msg, _FILEINFO_);
           }
 
@@ -458,7 +458,7 @@ namespace Isis {
           // Initialize the UGM of this cube with the reference lat/lon
           if (!newMeasure->IsIgnored() && iBestMeasureIndex >= 0 &&
               mtInterestResults[iBestMeasureIndex].mdInterest != WorstInterest()) {
-            Cube *measureCube =  mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
+            Cube *measureCube =  mCubeMgr.OpenCube(mSerialNumbers.FileName(sn));
 
             // default setting
             newMeasure->SetIgnored(false);
@@ -470,7 +470,7 @@ namespace Isis {
               measureCamera = measureCube->getCamera();
             }
             catch (IException &e) {
-              std::string msg = "Cannot Create Camera for Image:" + mSerialNumbers.Filename(sn);
+              std::string msg = "Cannot Create Camera for Image:" + mSerialNumbers.FileName(sn);
               throw IException(e, IException::User, msg, _FILEINFO_);
             }
 
@@ -671,7 +671,7 @@ namespace Isis {
       // Do not process Ignored Measures
       if (!origMsr->IsIgnored()) {
         InitInterestResults(measure);
-        Cube *inCube = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn));
+        Cube *inCube = mCubeMgr.OpenCube(mSerialNumbers.FileName(sn));
 
         // Set the clipping polygon for this point
         // Convert the lon/lat overlap polygon to samp/line using the UGM for
@@ -787,7 +787,7 @@ namespace Isis {
         camera = pCube.getCamera();
       }
       catch (IException &e) {
-        std::string msg = "Cannot Create Camera for Image:" + mSerialNumbers.Filename(serialNum);
+        std::string msg = "Cannot Create Camera for Image:" + mSerialNumbers.FileName(serialNum);
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -882,12 +882,12 @@ namespace Isis {
 
     // Create Multipolygon for the first Control Measure
     std::string sn1 = pCnetPoint[0]->GetCubeSerialNumber();
-    Cube *inCube1 = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn1));
+    Cube *inCube1 = mCubeMgr.OpenCube(mSerialNumbers.FileName(sn1));
     inCube1->read((Blob &)measPolygon1);
 
     // Create Multipolygon for the Second Control Measure
     std::string sn2 = pCnetPoint[1]->GetCubeSerialNumber();
-    Cube *inCube2 = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn2));
+    Cube *inCube2 = mCubeMgr.OpenCube(mSerialNumbers.FileName(sn2));
     inCube2->read((Blob &)measPolygon2);
 
     // Get the interesection for the first 2 polgons
@@ -896,7 +896,7 @@ namespace Isis {
 
     for (int measureIndex = 2; measureIndex < pCnetPoint.GetNumMeasures(); measureIndex ++) {
       std::string sn3 = pCnetPoint[measureIndex]->GetCubeSerialNumber();
-      Cube *inCube3 = mCubeMgr.OpenCube(mSerialNumbers.Filename(sn3));
+      Cube *inCube3 = mCubeMgr.OpenCube(mSerialNumbers.FileName(sn3));
       inCube3->read((Blob &)measPolygon3);
 
       // Get the intersection of the intersection and the measure Image Polygon

@@ -14,15 +14,15 @@ void IsisMain() {
   //Load the SCLK. If it exists, add its location to the dependency group
   //If there is none, set a flag so that no file is searched for
   bool needSclk = false;
-  Filename sclkFile("");
+  FileName sclkFile("");
   if(ui.WasEntered("SCLK")) {
     iString sclkString = ui.GetAsString("SCLK");
     if(sclkString.length() != 0) {
       sclkString.Trim("\\");
-      sclkFile = Filename(sclkString);
-      if (sclkFile.IsVersioned()) {
-        sclkFile.HighestVersion();
-        sclkString = sclkFile.OriginalPath() + "/" + sclkFile.Name();
+      sclkFile = FileName(sclkString);
+      if (sclkFile.isVersioned()) {
+        sclkFile = sclkFile.highestVersion();
+        sclkString = sclkFile.originalPath() + "/" + sclkFile.name();
       }
       dependency += PvlKeyword("SpacecraftClockKernel", sclkString);
       needSclk = true;
@@ -31,19 +31,19 @@ void IsisMain() {
 
   iString lskString = ui.GetAsString("LSK");
   lskString.Trim("\\");
-  Filename lskFile(lskString);
-  if (lskFile.IsVersioned()) {
-    lskFile.HighestVersion();
-    lskString = lskFile.OriginalPath() + "/" + lskFile.Name();
+  FileName lskFile(lskString);
+  if (lskFile.isVersioned()) {
+    lskFile = lskFile.highestVersion();
+    lskString = lskFile.originalPath() + "/" + lskFile.name();
   }
   dependency += PvlKeyword("LeapsecondKernel", lskString);
   //furnish dependencies with an SCLK
   if(needSclk) {
-    sdg.FurnishDependencies(sclkFile.Expanded(), lskFile.Expanded());
+    sdg.FurnishDependencies(sclkFile.expanded(), lskFile.expanded());
   }
   //Furnish dependencies without an SCLK
   else {
-    sdg.FurnishDependencies("", lskFile.Expanded());
+    sdg.FurnishDependencies("", lskFile.expanded());
   }
 
   //Determine the type of kernel that the user wants a database for. This will
@@ -126,16 +126,16 @@ void IsisMain() {
   }
 
   //specify a name for the output file
-  Filename to("./kernels.????.db");
+  FileName to("./kernels.????.db");
   if(ui.WasEntered("TO")) {
-    to = ui.GetFilename("TO");
+    to = ui.GetFileName("TO");
   }
   //create a new output version if the user specified any version sequence
-  if (to.IsVersioned()) {
-    to.NewVersion();
+  if (to.isVersioned()) {
+    to = to.newVersion();
   }
 
   Pvl writer;
   writer.AddObject(selections);
-  writer.Write(to.Expanded());
+  writer.Write(to.expanded());
 }

@@ -32,7 +32,7 @@ void IsisMain() {
   double lonInc = ui.GetDouble("LONINCREMENT");
 
   // Get mapfile, add values for range and create projection
-  string mapFile = ui.GetFilename("MAPFILE");
+  string mapFile = ui.GetFileName("MAPFILE");
   Pvl p(mapFile);
   PvlGroup &mapping = p.FindGroup("Mapping", Pvl::Traverse);
 
@@ -69,7 +69,7 @@ void IsisMain() {
 
 
   // Write grid to well known text output
-  string out = Filename(ui.GetFilename("TO")).Expanded();
+  string out = FileName(ui.GetFileName("TO")).expanded();
   std::ofstream os;
   os.open(out.c_str(), std::ios::out);
 

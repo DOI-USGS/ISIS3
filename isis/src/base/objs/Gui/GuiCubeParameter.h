@@ -37,7 +37,7 @@ namespace Isis {
    *                          QToolButton and QLineEdit up.
    *   @history 2009-12-15 Travis Addair - Fixed bug with button for opening file
    *                          dialog, made this class a child of
-   *                          GuiFilenameParameter, and moved SelectFile method
+   *                          GuiFileNameParameter, and moved SelectFile method
    *                          back to this class, no longer prompting users to
    *                          confirm overwriting a file.
    *   @history  2010-07-19 Jeannie Walldren - Removed SelectFile() method since
@@ -46,7 +46,7 @@ namespace Isis {
    *                           documentation. Removed unnecessary #includes.
    */
 
-  class GuiCubeParameter : public GuiFilenameParameter {
+  class GuiCubeParameter : public GuiFileNameParameter {
 
       Q_OBJECT
 
@@ -57,7 +57,7 @@ namespace Isis {
       ~GuiCubeParameter();
 
     protected slots:
-      // Method identical to parent method GuiFilenameParameter::SelectFile()
+      // Method identical to parent method GuiFileNameParameter::SelectFile()
       // Removed from this class 2010-07-15
       // Previous documentation:
       //    * @internal

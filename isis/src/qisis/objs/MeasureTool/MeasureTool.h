@@ -111,8 +111,8 @@ namespace Isis {
         AreaM, //!< Area in meters.
         AreaPix, //!< Area in pixels.
         Segments, //!< Segment lengths in kilometers.
-        Path, //!< Filename path
-        Filename, //!< Filename
+        Path, //!< FileName path
+        FileName, //!< FileName
         Notes //!< User input
       };
 
@@ -138,8 +138,8 @@ namespace Isis {
         AreaPixIndex,//!< Area in pixels index
         SegmentsSumIndex,//!< Segment lengths in kilometers
         SegmentNumberIndex, //!< Segment number
-        PathIndex,//!< Filename path index
-        FilenameIndex//!< Filename index
+        PathIndex,//!< FileName path index
+        FileNameIndex//!< FileName index
       };
 
       double m_startSamp;//!< starting sample

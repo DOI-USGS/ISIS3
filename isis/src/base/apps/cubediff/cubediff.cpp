@@ -118,10 +118,10 @@ void IsisMain() {
   if(ui.WasEntered("TO")) {
     Pvl lab;
     lab.AddGroup(results);
-    lab.Write(ui.GetFilename("TO", "txt"));
+    lab.Write(ui.GetFileName("TO", "txt"));
   }
   if(doTable) {
-    string filename = Filename(ui.GetFilename("TO", "txt")).Expanded();
+    string filename = FileName(ui.GetFileName("TO", "txt")).expanded();
     ofstream ofile(filename.c_str(), ios_base::app);
     diffTable(ofile, ui.GetInteger("PRECISION"));
   }

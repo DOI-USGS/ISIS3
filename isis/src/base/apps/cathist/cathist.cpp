@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 #include "History.h"
 #include "Pvl.h"   
@@ -15,18 +15,18 @@ void IsisMain() {
 
   // Get user entered file name & mode
   UserInterface &ui = Application::GetUserInterface();
-  Filename fromfile(ui.GetFilename("FROM"));
+  FileName fromfile(ui.GetFileName("FROM"));
   string mode = ui.GetString("MODE");
 
-  Filename tofile;
+  FileName tofile;
   bool append = false;
   if (ui.WasEntered("TO")) {
-    tofile = Filename(ui.GetFilename("TO"));
+    tofile = FileName(ui.GetFileName("TO"));
     append = ui.GetBoolean("APPEND");
   }
 
   // Extract history from file
-  History hist("IsisCube", fromfile.Expanded());
+  History hist("IsisCube", fromfile.expanded());
   Pvl pvl = hist.ReturnHist();
 
   // Print full history
@@ -36,10 +36,10 @@ void IsisMain() {
     }
     else if (ui.WasEntered("TO")) {
       if (append) {
-        pvl.Append(tofile.Expanded());
+        pvl.Append(tofile.expanded());
       }
       else {
-        pvl.Write(tofile.Expanded());
+        pvl.Write(tofile.expanded());
       }
     }
     else {
@@ -52,10 +52,10 @@ void IsisMain() {
     TextFile * text = NULL;
     if (ui.WasEntered("TO")) {
       if (append) {
-        text = new TextFile(tofile.Expanded(),"append");
+        text = new TextFile(tofile.expanded(),"append");
       }
       else {
-        text = new TextFile(tofile.Expanded(),"overwrite");
+        text = new TextFile(tofile.expanded(),"overwrite");
       }
     }
     for(int i = 0; i < pvl.Objects(); ++i) {

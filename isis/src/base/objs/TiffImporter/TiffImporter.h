@@ -48,7 +48,7 @@ namespace Isis {
    */
   class TiffImporter : public ImageImporter {
     public:
-      TiffImporter(Filename inputName);
+      TiffImporter(FileName inputName);
       virtual ~TiffImporter();
 
       virtual bool isGrayscale() const;

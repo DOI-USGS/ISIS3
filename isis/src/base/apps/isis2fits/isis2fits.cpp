@@ -174,7 +174,7 @@ void IsisMain() {
   for(int i = header.length() % 2880 ; i < 2880 ; i++) header += " ";
 
   // open the cube for writing
-  string to = ui.GetFilename("TO", "fits");
+  string to = ui.GetFileName("TO", "fits");
   ofstream fout;
   fout.open(to.c_str(), ios::out | ios::binary);
   if(!fout.is_open()) {

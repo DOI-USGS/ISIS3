@@ -30,7 +30,7 @@
 #include "HiCalConf.h"
 #include "HiCalUtil.h"
 #include "Pvl.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Cube.h"
 #include "Brick.h"
 #include "SpecialPixel.h"
@@ -98,14 +98,14 @@ bool HiCalConf::_naifLoaded = false;
    * @return string Expanded filename but not the filepath
    */
   string HiCalConf::filepath(const std::string &fname) const {
-    Filename efile(fname);
-    if (efile.IsVersioned()) {
-      string path(efile.OriginalPath());
+    FileName efile(fname);
+    if (efile.isVersioned()) {
+      string path(efile.originalPath());
       if (!path.empty()) path += "/";
 
-      efile.HighestVersion();
+      efile = efile.highestVersion();
 
-      return (path + efile.Name());
+      return (path + efile.name());
     }
     return (fname);
   }
@@ -404,19 +404,19 @@ bool HiCalConf::_naifLoaded = false;
 void HiCalConf::loadNaifTiming( ) {
   if (!_naifLoaded) {
 //  Load the NAIF kernels to determine timing data
-    Isis::Filename leapseconds("$base/kernels/lsk/naif????.tls");
-    leapseconds.HighestVersion();
+    Isis::FileName leapseconds("$base/kernels/lsk/naif????.tls");
+    leapseconds = leapseconds.highestVersion();
 
-    Isis::Filename sclk("$mro/kernels/sclk/MRO_SCLKSCET.?????.65536.tsc");
-    sclk.HighestVersion();
+    Isis::FileName sclk("$mro/kernels/sclk/MRO_SCLKSCET.?????.65536.tsc");
+    sclk = sclk.highestVersion();
 
-    Isis::Filename pck("$base/kernels/spk/de???.bsp");
-    pck.HighestVersion();
+    Isis::FileName pck("$base/kernels/spk/de???.bsp");
+    pck = pck.highestVersion();
 
 //  Load the kernels
-    string lsk = leapseconds.Expanded();
-    string sClock = sclk.Expanded();
-    string pConstants = pck.Expanded();
+    string lsk = leapseconds.expanded();
+    string sClock = sclk.expanded();
+    string pConstants = pck.expanded();
     furnsh_c(lsk.c_str());
     furnsh_c(sClock.c_str());
     furnsh_c(pConstants.c_str());

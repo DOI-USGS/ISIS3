@@ -24,9 +24,11 @@
 #include <sstream>
 #include <vector>
 
+#include <QDir>
+
 #include "Application.h"
 #include "IException.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 #include "Message.h"
 #include "Gui.h"
@@ -61,14 +63,9 @@ namespace Isis {
 
     // Make sure the user has a .Isis and .Isis/history directory
     try {
-      Isis::Filename setup("$HOME/.Isis");
-      if(!setup.Exists()) {
-        setup.MakeDirectory();
-      }
-
-      setup = "$HOME/.Isis/history";
-      if(!setup.Exists()) {
-        setup.MakeDirectory();
+      FileName setup = "$HOME/.Isis/history";
+      if(!setup.fileExists()) {
+        setup.dir().mkpath(".");
       }
     }
     catch(IException &) {
@@ -109,8 +106,8 @@ namespace Isis {
     // The program will be interactive if it has no arguments or
     // if it has the name unitTest
     p_progName = argv[0];
-    Isis::Filename file(p_progName);
-    if((argc == 1) && (file.Name() != "unitTest")) {
+    Isis::FileName file(p_progName);
+    if((argc == 1) && (file.name() != "unitTest")) {
       p_interactive = true;
     }
 
@@ -482,8 +479,8 @@ namespace Isis {
     }
     else if(name == "-LAST") {
       PvlGroup &grp = p.FindGroup("UserInterface", Isis::Pvl::Traverse);
-      iString histFile = grp["HistoryPath"][0] + "/" + Filename(
-                           p_progName).Name() + ".par";
+      iString histFile = grp["HistoryPath"][0] + "/" + FileName(
+                           p_progName).name() + ".par";
 
       LoadHistory(histFile);
     }
@@ -495,8 +492,8 @@ namespace Isis {
                                "UserInterface");
       string command = pref["GuiHelpBrowser"];
       command += " $ISISROOT/doc/Application/presentation/Tabbed/";
-      command += Filename(p_progName).Name() + "/" + Filename(
-                   p_progName).Name() + ".html";
+      command += FileName(p_progName).name() + "/" + FileName(
+                   p_progName).name() + ".html";
       ProgramLauncher::RunSystemCommand(command);
       exit(0);
     }
@@ -675,7 +672,7 @@ namespace Isis {
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
-      if(Filename(p_errList).Exists()) {
+      if(FileName(p_errList).fileExists()) {
         remove(p_errList.c_str());
       }
     }
@@ -795,7 +792,7 @@ namespace Isis {
   /**
    * Loads the previous history for the program
    *
-   * @param file Filename to get the history entry from
+   * @param file FileName to get the history entry from
    *
    * @throws Isis::iException::User - The file does not contain any parameters
    *                                  to restore
@@ -804,10 +801,10 @@ namespace Isis {
    * @throws Isis::iException::User - Parameter history file does not exist
    */
   void UserInterface::LoadHistory(const std::string file) {
-    Isis::Filename hist(file);
-    if(hist.Exists()) {
+    Isis::FileName hist(file);
+    if(hist.fileExists()) {
       try {
-        Isis::Pvl lab(hist.Expanded());
+        Isis::Pvl lab(hist.expanded());
 
         int g = lab.Groups() - 1;
         if(g >= 0 && lab.Group(g).IsNamed("UserParameters")) {
@@ -860,7 +857,7 @@ namespace Isis {
           }
         }
 
-        /*string msg = "[" + hist.Expanded() +
+        /*string msg = "[" + hist.expanded() +
          "] does not contain any parameters to restore";
          throw Isis::iException::Message( Isis::iException::User, msg, _FILEINFO_ );*/
       }
@@ -889,7 +886,7 @@ namespace Isis {
       return;
 
     // Get the current history file
-    Isis::Filename histFile(grp["HistoryPath"][0] + "/" + ProgramName()
+    Isis::FileName histFile(grp["HistoryPath"][0] + "/" + ProgramName()
                             + ".par");
 
     // If a save file is specified, override the default file path
@@ -906,8 +903,8 @@ namespace Isis {
     // leave hist empty such that the history gets
     // overwriten with the new entry.
     try {
-      if(histFile.Exists()) {
-        hist.Read(histFile.Expanded());
+      if(histFile.fileExists()) {
+        hist.Read(histFile.expanded());
       }
     }
     catch(IException &) {
@@ -923,7 +920,7 @@ namespace Isis {
 
     // Write it
     try {
-      hist.Write(histFile.Expanded());
+      hist.Write(histFile.expanded());
     }
     catch(IException &) {
     }
@@ -1024,7 +1021,7 @@ namespace Isis {
   void UserInterface::SetErrorList(int i) {
     if(p_errList != "") {
       std::ofstream os;
-      string fileName(Filename(p_errList).Expanded());
+      string fileName(FileName(p_errList).expanded());
       os.open(fileName.c_str(), std::ios::app);
 
       if(!os.good()) {

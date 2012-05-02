@@ -22,7 +22,7 @@
 
 #include "Angle.h"
 #include "Distance.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Latitude.h"
@@ -57,8 +57,8 @@ int main(int argc, char *argv[]) {
     lab.AddGroup(inst);
 
     Isis::PvlGroup kern("Kernels");
-    Isis::Filename f("$base/testData/kernels");
-    string dir = f.Expanded() + "/";
+    Isis::FileName f("$base/testData/kernels");
+    string dir = f.expanded() + "/";
 
     kern += Isis::PvlKeyword("NaifFrameCode", -94031);
     kern += Isis::PvlKeyword("LeapSecond", dir + "naif0007.tls");

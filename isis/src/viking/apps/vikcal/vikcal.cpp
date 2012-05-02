@@ -28,7 +28,7 @@ void IsisMain() {
   // segment found in the CalParameters documentation to the vikcal.xml file
   linear = false;
 // linear = ui.GetBoolean("LINEAR");
-  const string in = ui.GetFilename("FROM");
+  const string in = ui.GetFileName("FROM");
 
   calParam = new CalParameters(in);
 
@@ -39,15 +39,15 @@ void IsisMain() {
 
   // If the file has already been calibrated, throw an error
   if(icube.hasGroup("Radiometry")) {
-    string msg = "The Viking image [" + icube.getFilename() + "] has already "
+    string msg = "The Viking image [" + icube.getFileName() + "] has already "
         "been radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   CubeAttributeInput dcf;
   CubeAttributeInput fff;
-  const string gainFile = (string)Filename(calParam->GainFile()).Expanded();
-  const string offsetFile = (string)Filename(calParam->OffsetFile()).Expanded();
+  const string gainFile = (string)FileName(calParam->GainFile()).expanded();
+  const string offsetFile = (string)FileName(calParam->OffsetFile()).expanded();
 
   // Setup the input cubes
   p.SetInputCube("FROM");

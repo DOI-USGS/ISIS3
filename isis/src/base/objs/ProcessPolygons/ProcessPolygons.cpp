@@ -346,36 +346,36 @@ namespace Isis {
   /**
    * This gives the option to append to the cube
    *
-   * @param avgFilename
-   * @param countFilename
+   * @param avgFileName
+   * @param countFileName
    *
    * @return Isis::Cube*
    */
-  Isis::Cube *ProcessPolygons::AppendOutputCube(const std::string &avgFilename,
-      const std::string &countFilename) {
+  Isis::Cube *ProcessPolygons::AppendOutputCube(const std::string &avgFileName,
+      const std::string &countFileName) {
 
-    Filename *file = new Filename(avgFilename);
-    std::string path = file->Path();
-    std::string filename = file->Basename();
-    std::string extension = file->Extension();
+    FileName *file = new FileName(avgFileName);
+    std::string path = file->path();
+    std::string filename = file->baseName();
+    std::string extension = file->extension();
 
     /*Open the average file with read/write permission*/
     Cube *averageCube = new Cube();
-    averageCube->open(avgFilename, "rw");
+    averageCube->open(avgFileName, "rw");
     AddOutputCube(averageCube);
 
     /*Now open the count file with read/write permission*/
     Cube *countCube = new Cube();
 
-    if(countFilename == "") {
-      /*if the countFilename was set to nothing, then we use the default count
+    if(countFileName == "") {
+      /*if the countFileName was set to nothing, then we use the default count
       file name.*/
       std::string openFile = path + "/" + filename + "-count-." + extension;
       countCube->open(openFile, "rw");
 
     }
     else {
-      countCube->open(countFilename, "rw");
+      countCube->open(countFileName, "rw");
     }
 
     AddOutputCube(countCube);
@@ -385,20 +385,20 @@ namespace Isis {
   /**
    *
    *
-   * @param avgFilename
-   * @param countFilename
+   * @param avgFileName
+   * @param countFileName
    * @param nsamps
    * @param nlines
    * @param nbands
    */
-  void ProcessPolygons::SetOutputCube(const std::string &avgFilename, const
-                                      std::string &countFilename,
+  void ProcessPolygons::SetOutputCube(const std::string &avgFileName, const
+                                      std::string &countFileName,
                                       Isis::CubeAttributeOutput &atts,
                                       const int nsamps, const int nlines,
                                       const int nbands) {
 
-    this->Process::SetOutputCube(avgFilename, atts, nsamps, nlines, nbands);
-    this->Process::SetOutputCube(countFilename, atts, nsamps, nlines, nbands);
+    this->Process::SetOutputCube(avgFileName, atts, nsamps, nlines, nbands);
+    this->Process::SetOutputCube(countFileName, atts, nsamps, nlines, nbands);
 
     geos::geom::CoordinateArraySequence imagePts;
 
@@ -429,14 +429,14 @@ namespace Isis {
                                       const int nbands) {
 
     std::string avgString =
-      Application::GetUserInterface().GetFilename(parameter);
+      Application::GetUserInterface().GetFileName(parameter);
 
     Isis::CubeAttributeOutput atts =
       Application::GetUserInterface().GetOutputAttribute(parameter);
 
-    Filename *file = new Filename(avgString);
-    std::string path = file->Path();
-    std::string filename = file->Basename();
+    FileName *file = new FileName(avgString);
+    std::string path = file->path();
+    std::string filename = file->baseName();
     std::string countString = path + "/" + filename + "-count";
     SetOutputCube(avgString, countString, atts, nsamps, nlines, nbands);
 

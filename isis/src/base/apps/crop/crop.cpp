@@ -3,7 +3,7 @@
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
 #include "LineManager.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Projection.h"
 #include "AlphaCube.h"
@@ -30,7 +30,7 @@ void IsisMain() {
   string from = ui.GetAsString("FROM");
   CubeAttributeInput inAtt(from);
   cube.setVirtualBands(inAtt.Bands());
-  from = ui.GetFilename("FROM");
+  from = ui.GetFileName("FROM");
   cube.open(from);
 
   // Determine the sub-area to extract

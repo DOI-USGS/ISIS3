@@ -24,7 +24,7 @@
 
 #include "IsisAml.h"
 #include "PvlTokenizer.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Gui.h"
 
 class Gui;
@@ -90,7 +90,7 @@ namespace Isis {
    *                           single valid entry.
    *   @history 2008-01-07 Steven Lambright - Changed unit test and error on
    *                           invalid parameter history files to conform with a
-   *                           Filename class change where Expanded(...) always
+   *                           FileName class change where expanded(...) always
    *                           returns a full path.
    *   @history 2009-08-17 Steven Lambright - Parameters are now more correctly
    *                           interpretted from argv resulting in fewer escape
@@ -200,10 +200,10 @@ namespace Isis {
 
       //! Boolean value representing whether to abort or continue on error
       bool p_abortOnError;
-      std::string p_saveFile;        //!< Filename to save last history to
+      std::string p_saveFile;        //!< FileName to save last history to
       std::string p_progName;        //!< Name of program to run
 
-      //!Filename to write batchlist line that caused error on
+      //!FileName to write batchlist line that caused error on
       std::string p_errList;
 
       //!Vector of batchlist data
@@ -212,7 +212,7 @@ namespace Isis {
       bool p_interactive;  /**< Boolean value representing whether the
                                 program is interactive or not.*/
       bool p_info;  //!< Boolean value representing if its in debug mode.
-      std::string p_infoFileName;  //!< Filename to save debugging info
+      std::string p_infoFileName;  //!< FileName to save debugging info
       Gui *p_gui;                  //!< Pointer to the gui object
   };
 };

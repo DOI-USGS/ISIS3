@@ -1,7 +1,7 @@
 #include "Isis.h"
 #include "ProcessByLine.h"
 #include "IException.h"
-#include "Filename.h"
+#include "FileName.h"
 
 using namespace std;
 using namespace Isis;
@@ -15,11 +15,11 @@ void IsisMain() {
   int samps = icube->getSampleCount();
   int lines = icube->getLineCount();
   int bands = icube->getBandCount();
-  string infile = icube->getFilename();
+  string infile = icube->getFileName();
 
   // We the output filename so we can add attributes and extensions
   UserInterface &ui = Application::GetUserInterface();
-  string outbase = ui.GetFilename("TO");
+  string outbase = ui.GetFileName("TO");
   CubeAttributeOutput &outatt = ui.GetOutputAttribute("TO");
 
   // Loop and extract each band

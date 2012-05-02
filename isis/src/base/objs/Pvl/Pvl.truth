@@ -85,12 +85,12 @@ End
 temp = (a, b, c)
 End
 
-**ERROR** Unable to read PVL file unitTest2.pvl].
+**ERROR** Unable to read PVL file [unitTest2.pvl].
 **ERROR** Error in PVL file on line [9].
 **ERROR** Unable to read PVL keyword [Dog = Big Dog].
 **ERROR** Keyword has extraneous data [Dog] at the end.
 
-**ERROR** Unable to read PVL file unitTest3.pvl].
+**ERROR** Unable to read PVL file [unitTest3.pvl].
 **ERROR** Error in PVL file on line [12].
 **ERROR** Unexpected [EndGroup] in PVL Object [A].
 

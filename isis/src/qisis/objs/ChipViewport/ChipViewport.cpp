@@ -129,7 +129,7 @@ namespace Isis {
 
     // only stretch if the CubeViewport is opened to the same cube as we are,
     // otherwise the signal was meant for a different ChipViewport!
-    if (cvp->cube()->getFilename() == p_chipCube->getFilename()) {
+    if (cvp->cube()->getFileName() == p_chipCube->getFileName()) {
 
       // if user right clicked in the CubeViewport then we get a SIGNAL with a
       // NULL Stretch.  This is used to signify that we need to restretch on our

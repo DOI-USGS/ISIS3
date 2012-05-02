@@ -26,7 +26,7 @@
 #include "ChipViewport.h"
 #include "ControlMeasure.h"
 #include "ControlMeasureLogData.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "iString.h"
 #include "ProgramLauncher.h"
 #include "Pvl.h"
@@ -63,8 +63,8 @@ namespace Isis {
     p_rightGroundMap = 0;
 
     try {
-      p_templateFilename = "$base/templates/autoreg/qnetReg.def";
-      Pvl pvl(p_templateFilename);
+      p_templateFileName = "$base/templates/autoreg/qnetReg.def";
+      Pvl pvl(p_templateFileName);
       p_autoRegFact = AutoRegFactory::Create(pvl);
     }
     catch (IException &e) {
@@ -110,7 +110,7 @@ namespace Isis {
    *                           button events are allowed or not.
    *   @history 2008-12-10  Jeannie Walldren - Set the default
    *                           value of the new private variable,
-   *                           p_templateFilename, to the previously hard-coded
+   *                           p_templateFileName, to the previously hard-coded
    *                           template filename.
    */
   void ControlPointEdit::createPointEditor(QWidget *parent) {
@@ -120,8 +120,8 @@ namespace Isis {
     //  grid row
     int row = 0;
 
-    std::string tempFilename = Filename("$base/icons").Expanded();
-    QString toolIconDir = tempFilename.c_str();
+    std::string tempFileName = FileName("$base/icons").expanded();
+    QString toolIconDir = tempFileName.c_str();
 
     QSize isize(27, 27);
     //  Add zoom buttons
@@ -156,32 +156,32 @@ namespace Isis {
     if ( p_allowLeftMouse ) {
       //  Add arrows for panning
       leftPanUp = new QToolButton(parent);
-      leftPanUp->setIcon(QIcon(Filename("$base/icons/up.png").
-                               Expanded().c_str()));
+      leftPanUp->setIcon(QIcon(FileName("$base/icons/up.png").
+                               expanded().c_str()));
       leftPanUp->setIconSize(isize);
       leftPanUp->setToolTip("Move up 1 screen pixel");
       leftPanUp->setStatusTip("Move up 1 screen pixel");
       leftPanUp->setWhatsThis("Move the left measure up 1 screen pixel.");
 
       leftPanDown = new QToolButton(parent);
-      leftPanDown->setIcon(QIcon(Filename("$base/icons/down.png").
-                                 Expanded().c_str()));
+      leftPanDown->setIcon(QIcon(FileName("$base/icons/down.png").
+                                 expanded().c_str()));
       leftPanDown->setIconSize(isize);
       leftPanDown->setToolTip("Move down 1 screen pixel");
       leftPanDown->setStatusTip("Move down 1 screen pixel");
       leftPanDown->setWhatsThis("Move the left measure down 1 screen pixel.");
 
       leftPanLeft = new QToolButton(parent);
-      leftPanLeft->setIcon(QIcon(Filename("$base/icons/back.png").
-                                 Expanded().c_str()));
+      leftPanLeft->setIcon(QIcon(FileName("$base/icons/back.png").
+                                 expanded().c_str()));
       leftPanLeft->setIconSize(isize);
       leftPanLeft->setToolTip("Move left 1 screen pixel");
       leftPanLeft->setWhatsThis("Move the left measure to the left by 1 screen"
                                 "pixel.");
 
       leftPanRight = new QToolButton(parent);
-      leftPanRight->setIcon(QIcon(Filename("$base/icons/forward.png").
-                                  Expanded().c_str()));
+      leftPanRight->setIcon(QIcon(FileName("$base/icons/forward.png").
+                                  expanded().c_str()));
       leftPanRight->setIconSize(isize);
       leftPanRight->setToolTip("Move right 1 screen pixel");
       leftPanRight->setWhatsThis("Move the left measure to the right by 1"
@@ -203,8 +203,8 @@ namespace Isis {
     p_rightZoomIn->setWhatsThis("Zoom In 2x on right measure.");
 
     p_rightZoomOut = new QToolButton();
-    p_rightZoomOut->setIcon(QIcon(Filename("$base/icons/viewmag-.png").
-                                  Expanded().c_str()));
+    p_rightZoomOut->setIcon(QIcon(FileName("$base/icons/viewmag-.png").
+                                  expanded().c_str()));
     p_rightZoomOut->setIconSize(isize);
     p_rightZoomOut->setToolTip("Zoom Out 2x");
     p_rightZoomOut->setWhatsThis("Zoom Out 2x on right measure.");
@@ -222,30 +222,30 @@ namespace Isis {
 
     //  Add arrows for panning
     QToolButton *rightPanUp = new QToolButton(parent);
-    rightPanUp->setIcon(QIcon(Filename("$base/icons/up.png").
-                              Expanded().c_str()));
+    rightPanUp->setIcon(QIcon(FileName("$base/icons/up.png").
+                              expanded().c_str()));
     rightPanUp->setIconSize(isize);
     rightPanUp->setToolTip("Move up 1 screen pixel");
     rightPanUp->setWhatsThis("Move the right measure up 1 screen pixel.");
 
     QToolButton *rightPanDown = new QToolButton(parent);
-    rightPanDown->setIcon(QIcon(Filename("$base/icons/down.png").
-                                Expanded().c_str()));
+    rightPanDown->setIcon(QIcon(FileName("$base/icons/down.png").
+                                expanded().c_str()));
     rightPanDown->setIconSize(isize);
     rightPanDown->setToolTip("Move down 1 screen pixel");
     rightPanUp->setWhatsThis("Move the right measure down 1 screen pixel.");
 
     QToolButton *rightPanLeft = new QToolButton(parent);
-    rightPanLeft->setIcon(QIcon(Filename("$base/icons/back.png").
-                                Expanded().c_str()));
+    rightPanLeft->setIcon(QIcon(FileName("$base/icons/back.png").
+                                expanded().c_str()));
     rightPanLeft->setIconSize(isize);
     rightPanLeft->setToolTip("Move left 1 screen pixel");
     rightPanLeft->setWhatsThis("Move the right measure to the left by 1 screen"
                               "pixel.");
 
     QToolButton *rightPanRight = new QToolButton(parent);
-    rightPanRight->setIcon(QIcon(Filename("$base/icons/forward.png").
-                                 Expanded().c_str()));
+    rightPanRight->setIcon(QIcon(FileName("$base/icons/forward.png").
+                                 expanded().c_str()));
     rightPanRight->setIconSize(isize);
     rightPanRight->setToolTip("Move right 1 screen pixel");
     rightPanRight->setWhatsThis("Move the right measure to the right by 1"
@@ -1329,7 +1329,7 @@ namespace Isis {
    *   @history 2008-12-10 Jeannie Walldren - Changed name from
    *                          openTemplateFile() and added functionality to set
    *                          new template filename to the private variable,
-   *                          p_templateFilename
+   *                          p_templateFileName
    *   @history 2008-12-15 Jeannie Walldren - Modified code to
    *                          only allow the template file to be modified if
    *                          registration is successfull, otherwise the
@@ -1339,10 +1339,10 @@ namespace Isis {
 
     AutoReg *reg = NULL;
     // save original template filename
-    std::string temp = p_templateFilename;
+    std::string temp = p_templateFileName;
     try {
       // set template filename to user chosen pvl file
-      p_templateFilename = fn.toStdString();
+      p_templateFileName = fn.toStdString();
 
       // Create PVL object with this file
       Pvl pvl(fn.toStdString());
@@ -1353,17 +1353,17 @@ namespace Isis {
         delete p_autoRegFact;
       p_autoRegFact = reg;
 
-      p_templateFilename = fn.toStdString();
+      p_templateFileName = fn.toStdString();
       return true;
     }
     catch (IException &e) {
-      // set templateFilename back to its original value
-      p_templateFilename = temp;
+      // set templateFileName back to its original value
+      p_templateFileName = temp;
       IException fullError(e, IException::Io,
           "Cannot create AutoRegFactory for " +
           fn.toStdString() +
           ".  As a result, current template file will remain set to " +
-          p_templateFilename, _FILEINFO_);
+          p_templateFileName, _FILEINFO_);
       QString message = fullError.toString();
       QMessageBox::information((QWidget *)parent(), "Error", message);
       return false;

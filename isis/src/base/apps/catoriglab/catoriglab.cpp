@@ -9,7 +9,7 @@ void IsisMain() {
 
   // Get user entered file name & mode
   UserInterface &ui = Application::GetUserInterface();
-  string file = ui.GetFilename("FROM");
+  string file = ui.GetFileName("FROM");
 
   // Extract history from file
   OriginalLabel origLab(file);
@@ -19,10 +19,10 @@ void IsisMain() {
   }
   else if (ui.WasEntered("TO")) {
     if (ui.GetBoolean("APPEND")) {
-      pvl.Append(Filename(ui.GetFilename("TO")).Expanded());
+      pvl.Append(FileName(ui.GetFileName("TO")).expanded());
     }
     else {
-      pvl.Write(Filename(ui.GetFilename("TO")).Expanded());
+      pvl.Write(FileName(ui.GetFileName("TO")).expanded());
     }
   } 
   else {

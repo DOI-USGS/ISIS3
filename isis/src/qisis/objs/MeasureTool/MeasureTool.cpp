@@ -15,7 +15,7 @@
 
 #include "Camera.h"
 #include "Distance.h"
-#include "Filename.h"
+#include "FileName.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "MdiCubeViewport.h"
@@ -62,7 +62,7 @@ namespace Isis {
     m_tableWin->addToTable(false, "Segments Sum\nkm", "Segments Sum", -1, Qt::Horizontal, "Sum of Segment lengths in kilometers");
     m_tableWin->addToTable(false, "Segment Number", "Segment Number", -1, Qt::Horizontal, "Segment number of a segmented line");
     m_tableWin->addToTable(false, "Path", "Path");
-    m_tableWin->addToTable(false, "Filename", "Filename");
+    m_tableWin->addToTable(false, "FileName", "FileName");
     m_tableWin->addToTable(false, "Notes", "Notes");
 
     m_tableWin->setStatusMessage("Click, Drag, and Release to Measure a Line");
@@ -405,7 +405,7 @@ namespace Isis {
     }
 
     m_tableWin->table()->item(row, PathIndex)->setText(m_path.c_str());
-    m_tableWin->table()->item(row, FilenameIndex)->setText(m_fname.c_str());
+    m_tableWin->table()->item(row, FileNameIndex)->setText(m_fname.c_str());
   }
 
 
@@ -485,7 +485,7 @@ namespace Isis {
         }
 
         m_tableWin->table()->item(row + i, PathIndex)->setText(m_path.c_str());
-        m_tableWin->table()->item(row + i, FilenameIndex)->setText(m_fname.c_str());
+        m_tableWin->table()->item(row + i, FileNameIndex)->setText(m_fname.c_str());
 
         distanceSum = (Distance(distanceSum, Distance::Kilometers) +
             Distance(m_distanceSegments[i], Distance::Kilometers)).kilometers();
@@ -554,10 +554,10 @@ namespace Isis {
     initData();
 
     // Write out col 8 (the file name)
-    Isis::Filename fname = Isis::Filename(
-        cvp->cube()->getFilename()).Expanded();
-    m_path  = fname.Path();
-    m_fname = fname.Name();
+    Isis::FileName fname = Isis::FileName(
+        cvp->cube()->getFileName()).expanded();
+    m_path  = fname.path();
+    m_fname = fname.name();
 
     m_pixDist = Null;
     m_mDist   = Null;

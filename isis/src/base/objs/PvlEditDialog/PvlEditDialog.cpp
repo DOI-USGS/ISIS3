@@ -30,7 +30,7 @@ namespace Isis {
     fstream input;
 
     // open as input from pvl file
-    input.open(pvl.Filename().c_str(), ios::in);
+    input.open(pvl.FileName().c_str(), ios::in);
     string output;
 
     // read first line of input and write as first output line
@@ -60,7 +60,7 @@ namespace Isis {
     vLayout->addLayout(buttonLayout);
 
     setLayout(vLayout);
-    QString titleBar = "Pvl File: " + QString::fromStdString(pvl.Filename()) ;
+    QString titleBar = "Pvl File: " + QString::fromStdString(pvl.FileName()) ;
     setWindowTitle(titleBar);
 
     // Add functionality to buttons
