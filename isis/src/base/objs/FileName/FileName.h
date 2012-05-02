@@ -162,6 +162,13 @@ namespace Isis {
       QPair<QString, QString> splitNameAroundVersionNum() const;
 
     private:
+      /**
+       * This is the reference-counted data for FileName
+       *
+       * @author 2012-05-02 Steven Lambright
+       *
+       * @internal
+       */
       class Data : public QSharedData {
         public:
           Data();
