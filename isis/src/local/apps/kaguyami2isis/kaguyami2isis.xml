@@ -13,6 +13,19 @@
     <change name="Janet Barrett" date="2011-05-09">
       Original version
     </change>
+    <change name="Janet Barrett" date="2012-05-02">
+      At this time, there is no camera model for the Kaguya MI data. In order to
+      be able to perform photometry on the Kaguya MI data, the SubSolarLongitude
+      and SubSolarLatitude information needed to be calculated. These calculations 
+      are done by using the aaplus library developed by P J Naughter at 
+      http://www.naughter.com. This library can only be distributed in binary form,
+      so it has to stay in the local directory of ISIS where it will not be 
+      distributed. The formulae used to do the calculations were taken from Meeus 
+      "Astronomical Algorithms" (1st Ed). This code can be removed as soon as a camera 
+      model is available for the Kaguya MI camera. The start and stop times for these 
+      images are very close, so the start time is used to calculate the SubSolar lat/lon
+      information.
+    </change>
   </history>
 
   <category>
