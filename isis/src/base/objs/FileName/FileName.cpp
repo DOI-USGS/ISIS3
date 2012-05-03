@@ -279,7 +279,7 @@ namespace Isis {
           _FILEINFO_);
     }
 
-    if (versionNumber >= pow(10, width)) {
+    if (versionNumber >= pow(10.0, width)) {
       throw IException(IException::Unknown,
           QObject::tr("FileName does not support version numbers greater than what would fit in "
                       "the file name, tried to get version [%1] in file named [%2]")
