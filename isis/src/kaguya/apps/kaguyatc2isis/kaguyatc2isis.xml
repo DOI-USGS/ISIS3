@@ -13,6 +13,9 @@
     <change name="Janet Barrett" date="2011-01-24">
       Original version
     </change>
+    <change name="Janet Barrett" date="2012-05-03">
+      Added support for Terrain Camera Ortho TCO_MAP.
+    </change>
   </history>
 
   <category>

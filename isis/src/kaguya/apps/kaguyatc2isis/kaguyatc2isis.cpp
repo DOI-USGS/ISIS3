@@ -33,7 +33,7 @@ void IsisMain() {
   id.ConvertWhiteSpace();
   id.Compress();
   id.Trim(" ");
-  if(id != "TC_MAP") {
+  if(id != "TC_MAP" && id != "TCO_MAP") {
     string msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
                  "in Kaguya Terrain Camera level 2 format. " +
                  "DATA_SET_ID is [" + id + "]";
