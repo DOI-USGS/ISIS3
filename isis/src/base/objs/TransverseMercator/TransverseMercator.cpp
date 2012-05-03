@@ -20,12 +20,16 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include "TransverseMercator.h"
+
 #include <cmath>
 #include <cfloat>
-#include "TransverseMercator.h"
-#include "IException.h"
+
 #include "Constants.h"
+#include "IException.h"
 #include "Projection.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
 
 using namespace std;
 namespace Isis {
@@ -93,7 +97,7 @@ namespace Isis {
       p_centerLatitude *= Isis::PI / 180.0;
       p_centerLongitude *= Isis::PI / 180.0;
 
-      // Compute other necessary variables
+      // Compute other necessary variables. See Snyder, page 61
       p_eccsq = Eccentricity() * Eccentricity();
       p_esp = p_eccsq;
       p_e0 = 1.0 - 0.25 * p_eccsq * (1.0 + p_eccsq / 16.0 * (3.0 + 1.25 * p_eccsq));
@@ -156,8 +160,12 @@ namespace Isis {
       latRadians = ToPlanetographic(p_latitude) * Isis::PI / 180.0;
     }
 
-    double ml = p_equatorialRadius * (p_e0 * latRadians - p_e1 * sin(2.0 * latRadians)
-                                      + p_e2 * sin(4.0 * latRadians) - p_e3 * sin(6.0 * latRadians));
+    // distance along the meridian fromthe Equator to the latitude phi
+    // see equation (3-21) on pages 61, 17.
+    double M = p_equatorialRadius * (p_e0 * latRadians 
+                                      - p_e1 * sin(2.0 * latRadians)
+                                      + p_e2 * sin(4.0 * latRadians) 
+                                      - p_e3 * sin(6.0 * latRadians));
 
     // Declare variables
     const double epsilon = 1.0e-10;
@@ -191,22 +199,27 @@ namespace Isis {
     else {
       if(fabs(Isis::HALFPI - fabs(latRadians)) < epsilon) {
         x = 0.0;
-        y = p_scalefactor * (ml - p_ml0);
+        y = p_scalefactor * (M - p_ml0);
       }
       else {
+        // Define Snyder's variables for ellipsoidal projections, page61
         double sinphi = sin(latRadians);
         double cosphi = cos(latRadians);
-        double al = cosphi * deltaLonRads;
-        double als = al * al;
-        double c = p_esp * cosphi * cosphi;
-        double tq = tan(latRadians);
-        double t = tq * tq;
-        double n = p_equatorialRadius / sqrt(1.0 - p_eccsq * sinphi * sinphi);
-        x = p_scalefactor * n * al * (1.0 + als / 6.0 * (1.0 - t + c + als
-                                      / 20.0 * (5.0 - 18.0 * t + t * t + 72.0 * c - 58.0 * p_esp)));
-        y = p_scalefactor * (ml - p_ml0 + n * tq * (als * (0.5 + als / 24.0 *
-                             (5.0 - t + 9.0 * c + 4.0 * c * c + als / 30.0 *
-                              (61.0 - 58.0 * t + t * t + 600.0 * c - 330.0 * p_esp)))));
+        double A = cosphi * deltaLonRads;        // see equation (8-15), page 61
+        double Asquared = A * A;
+        double C = p_esp * cosphi * cosphi;      // see equation (8-14), page 61
+        double tanphi = tan(latRadians);
+        double T = tanphi * tanphi;              // see equation (8-13), page 61
+        double N = p_equatorialRadius / sqrt(1.0 - p_eccsq * sinphi * sinphi);
+                                                 // see equation (4-20), page 61
+
+        x = p_scalefactor * N * A 
+               * (1.0 + Asquared / 6.0 * (1.0 - T + C + Asquared / 20.0 
+                                 *(5.0 - 18.0*T + T*T + 72.0*C - 58.0*p_esp)));
+        y = p_scalefactor 
+               * (M - p_ml0 + N*tanphi*(Asquared * (0.5 + Asquared / 24.0 *
+                             (5.0 - T + 9.0*C + 4.0*C*C + Asquared / 30.0
+                             *(61.0 - 58.0*T + T*T + 600.0*C - 330.0*p_esp)))));
       }
     }
 
@@ -442,6 +455,20 @@ namespace Isis {
   }
 } // end namespace isis
 
+/** 
+ * This is the function that is called in order to instantiate a 
+ * TransverseMercator object.
+ *  
+ * @param lab Cube labels with appropriate Mapping information.
+ *  
+ * @param allowDefaults Indicates whether CenterLongitude and ScaleFactor 
+ *                      are allowed to be computed using the middle of the
+ *                      longitude range specified in the label, and the
+ *                      scale factor will default to 1.0.
+ * 
+ * @return @b Isis::Projection* Pointer to a TransverseMercator 
+ *                              projection object.
+ */
 extern "C" Isis::Projection *TransverseMercatorPlugin(Isis::Pvl &lab,
     bool allowDefaults) {
   return new Isis::TransverseMercator(lab, allowDefaults);
