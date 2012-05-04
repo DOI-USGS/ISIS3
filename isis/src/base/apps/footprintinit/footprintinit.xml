@@ -28,6 +28,10 @@
       "autoseed" requires the presence to these polygons, while "cnetadd" has a
       significant optimization in place using polygons.
     </p>
+    <p>
+      The application "spiceinit"
+      must be run prior to running this application.
+    </p>
   </description>
   
   <category>
@@ -129,6 +133,10 @@
     </change>
     <change name="Travis Addair, Bob Sucharski, Trent Hare" date="2011-10-07">
       Overhauled documentation.
+    </change>
+    <change name="Tracie Sucharski" date="2012-05-03">
+      Added comment to documenation indicating spiceinit must be run prior to this
+      application.
     </change>
   </history>
   
