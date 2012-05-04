@@ -513,6 +513,23 @@
       file specifies a Normalization model, then you aren't required to specify one through 
       the program interface as well.
     </change>
+    <change name="Janet Barrett" date="2012-05-04">
+      A new BACKPLANE option was added to ANGLESOURCE. This BACKPLANE option allows you
+      to input photometric angle information using separate ISIS cube files. Files 
+      containing geometric, photometric, etc. information pixel by pixel for the input
+      image file are normally referred to as backplanes. This option was added to support
+      image data that does not have a camera model associated with it. If you have a 
+      way to generate the photometric angles for such data, then you will be able to
+      do photometric correction on it. This option is also very useful for speeding up
+      the processing done by photomet. If you have all the photometric information
+      pre-computed, then this information no longer needs to be generated every time
+      the program is run. You can input photometric information using a combination of 
+      files and photometric angle constants. For example, if you have a file containing
+      the phase angle for every pixel, a file containing the incidence angle for every
+      pixel, and you know that the emission angle is 0.0 for every pixel, then you can
+      use the PHASE_ANGLE_FILE, INCIDENCE_ANGLE_FILE, and EMISSION_ANGLE fields to input
+      the 2 file names and the emission angle constant.
+    </change>
   </history>
 
   <category>
@@ -650,6 +667,9 @@
               shape model.
             </description>
             <exclusions>
+              <item>PHASE_ANGLE_FILE</item>
+              <item>INCIDENCE_ANGLE_FILE</item>
+              <item>EMISSION_ANGLE_FILE</item>
               <item>PHASE_ANGLE</item>
               <item>INCIDENCE_ANGLE</item>
               <item>EMISSION_ANGLE</item>
@@ -662,6 +682,9 @@
               model (if one exists in the image labels).
             </description>
             <exclusions>
+              <item>PHASE_ANGLE_FILE</item>
+              <item>INCIDENCE_ANGLE_FILE</item>
+              <item>EMISSION_ANGLE_FILE</item>
               <item>PHASE_ANGLE</item>
               <item>INCIDENCE_ANGLE</item>
               <item>EMISSION_ANGLE</item>
@@ -676,6 +699,9 @@
               angles don't change very much and when you want faster processing.
             </description>
             <exclusions>
+              <item>PHASE_ANGLE_FILE</item>
+              <item>INCIDENCE_ANGLE_FILE</item>
+              <item>EMISSION_ANGLE_FILE</item>
               <item>PHASE_ANGLE</item>
               <item>INCIDENCE_ANGLE</item>
               <item>EMISSION_ANGLE</item>
@@ -690,6 +716,9 @@
               when you want faster processing.
             </description>
             <exclusions>
+              <item>PHASE_ANGLE_FILE</item>
+              <item>INCIDENCE_ANGLE_FILE</item>
+              <item>EMISSION_ANGLE_FILE</item>
               <item>PHASE_ANGLE</item>
               <item>INCIDENCE_ANGLE</item>
               <item>EMISSION_ANGLE</item>
@@ -703,13 +732,67 @@
               the photometric angles don't change very much and when you want faster
               processing.
             </description>
+            <exclusions>
+              <item>PHASE_ANGLE_FILE</item>
+              <item>INCIDENCE_ANGLE_FILE</item>
+              <item>EMISSION_ANGLE_FILE</item>
+            </exclusions>
             <inclusions>
               <item>PHASE_ANGLE</item>
               <item>INCIDENCE_ANGLE</item>
               <item>EMISSION_ANGLE</item>
             </inclusions>
           </option>
+          <option value="BACKPLANE">
+            <brief>Get photometric angles from separate backplane file(s)</brief>
+            <description>
+              The photometric angles are obtained from separate backplane file(s) which 
+              contain the information for each pixel of the input image file. These angles 
+              are then applied to every pixel in the file. This option is good for images 
+              that you will want to run many times with different photometric settings
+              because the photometric angles don't need to be recomputed for every pixel.
+              This option is also good for images that don't have a camera model associated
+              with them. You can either enter a filename that contains the angle for each
+              pixel or enter a single angle to be applied to all pixels.
+            </description>
+          </option>
         </list>
+      </parameter>
+      <parameter name="PHASE_ANGLE_FILE">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>input</fileMode>
+        <internalDefault>No file</internalDefault>
+        <brief>
+          Phase angle backplane cube
+        </brief>
+        <description>
+          This file will contain the phase angle backplane.
+        </description>
+      </parameter>
+      <parameter name="INCIDENCE_ANGLE_FILE">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>input</fileMode>
+        <internalDefault>No file</internalDefault>
+        <brief>
+          Incidence angle backplane cube
+        </brief>
+        <description>
+          This file will contain the incidence angle backplane.
+        </description>
+      </parameter>
+      <parameter name="EMISSION_ANGLE_FILE">
+        <type>cube</type>
+        <pixelType>real</pixelType>
+        <fileMode>input</fileMode>
+        <internalDefault>No file</internalDefault>
+        <brief>
+          Emission angle backplane cube
+        </brief>
+        <description>
+          This file will contain the emission angle backplane.
+        </description>
       </parameter>
       <parameter name="PHASE_ANGLE">
         <type>double</type>

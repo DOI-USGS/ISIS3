@@ -40,7 +40,15 @@ string angleSource;
 double centerPhase;
 double centerIncidence;
 double centerEmission;
+bool useBackplane = false;
+bool usePhasefile = false;
+bool useIncidencefile = false;
+bool useEmissionfile = false;
+double phaseAngle;
+double incidenceAngle;
+double emissionAngle;
 
+void photometWithBackplane(std::vector<Isis::Buffer *> &in, std::vector<Isis::Buffer *> &out);
 void photomet(Buffer &in, Buffer &out);
 
 // Helper function to print the input pvl file to session log
@@ -1525,6 +1533,37 @@ void IsisMain() {
     centerIncidence = ui.GetDouble("INCIDENCE_ANGLE");
     centerEmission = ui.GetDouble("EMISSION_ANGLE");
   }
+  else if (angleSource == "BACKPLANE") {
+    useBackplane = true;
+    CubeAttributeInput cai;
+    CubeAttributeInput phaseCai;
+    CubeAttributeInput incidenceCai;
+    CubeAttributeInput emissionCai;
+    if (ui.WasEntered("PHASE_ANGLE_FILE")) {
+      phaseCai = ui.GetInputAttribute("PHASE_ANGLE_FILE");
+      p.SetInputCube(ui.GetFileName("PHASE_ANGLE_FILE"), phaseCai);
+      usePhasefile = true;
+    } 
+    else {
+      phaseAngle = ui.GetDouble("PHASE_ANGLE");
+    }
+    if (ui.WasEntered("INCIDENCE_ANGLE_FILE")) {
+      incidenceCai = ui.GetInputAttribute("INCIDENCE_ANGLE_FILE");
+      p.SetInputCube(ui.GetFileName("INCIDENCE_ANGLE_FILE"), incidenceCai);
+      useIncidencefile = true;
+    }
+    else {
+      incidenceAngle = ui.GetDouble("INCIDENCE_ANGLE");
+    }
+    if (ui.WasEntered("EMISSION_ANGLE_FILE")) {
+      emissionCai = ui.GetInputAttribute("EMISSION_ANGLE_FILE");
+      p.SetInputCube(ui.GetFileName("EMISSION_ANGLE_FILE"), emissionCai);
+      useEmissionfile = true;
+    }
+    else {
+      emissionAngle = ui.GetDouble("EMISSION_ANGLE");
+    }
+  }
 
   // Get the BandBin Center from the image
   PvlGroup pvlg = inLabel.FindGroup("BandBin", Pvl::Traverse);
@@ -1546,7 +1585,12 @@ void IsisMain() {
   pho->SetPhotomWl(wl);
 
   // Start the processing
-  p.StartProcess(photomet);
+  if (useBackplane) {
+    p.StartProcess(photometWithBackplane);
+  }
+  else {
+    p.StartProcess(photomet);
+  }
   p.EndProcess();
 }
 
@@ -1627,6 +1671,93 @@ void photomet(Buffer &in, Buffer &out) {
       // otherwise, do photometric correction
       else {
         pho->Compute(ellipsoidpha, ellipsoidinc, ellipsoidema, deminc, demema, in[i], out[i], mult, base);
+      }
+    }
+  }
+}
+
+/**
+ * Perform photometric correction with backplanes
+ *
+ * @param in Buffer containing input DN values and backplanes containing
+ *           the associated photometric angles
+ * @param out Buffer containing output DN values
+ * @author Janet Barrett
+ * @internal
+ *   @history 2009-01-08 Jeannie Walldren - Modified to set off
+ *            target pixels to null.  Added check for new maxinc
+ *            and maxema parameters.
+ */
+void photometWithBackplane(std::vector<Isis::Buffer *> &in, std::vector<Isis::Buffer *> &out) {
+
+  Buffer &image = *in[0];
+  int index = 1;
+  Buffer &phasebp = *in[1];
+  if (usePhasefile) {
+    index = index + 1;
+  }
+  Buffer &incidencebp = *in[index];
+  if (useIncidencefile) {
+    index = index + 1;
+  }
+  Buffer &emissionbp = *in[index];
+
+  Buffer &outimage = *out[0];
+    
+  double deminc=0., demema=0., mult=0., base=0.;
+  double ellipsoidpha=0., ellipsoidinc=0., ellipsoidema=0.;
+
+  for (int i = 0; i < image.size(); i++) {
+
+    // if special pixel, copy to output
+    if(!IsValidPixel(image[i])) {
+      outimage[i] = image[i];
+    }
+
+    // if off the target, set to null
+    else if((angleSource == "ELLIPSOID" || angleSource == "DEM" ||
+            angleSource == "CENTER_FROM_IMAGE") &&
+            (!cam->SetImage(image.Sample(i), image.Line(i)))) {
+      outimage[i] = NULL8;
+    }
+
+    // otherwise, compute angle values
+    else {
+      if (usePhasefile) {
+        ellipsoidpha = phasebp[i];
+      }
+      else {
+        ellipsoidpha = phaseAngle;
+      }
+      if (useIncidencefile) {
+        ellipsoidinc = incidencebp[i];
+      }
+      else {
+        ellipsoidinc = incidenceAngle;
+      }
+      if (useEmissionfile) {
+        ellipsoidema = emissionbp[i];
+      }
+      else {
+        ellipsoidema = emissionAngle;
+      } 
+      deminc = ellipsoidinc;
+      demema = ellipsoidema;
+
+      // if invalid angles, set to null
+      if(!IsValidPixel(ellipsoidpha) || !IsValidPixel(ellipsoidinc) || !IsValidPixel(ellipsoidema)) {
+        outimage[i] = NULL8;
+      }
+      else if(deminc >= 90.0 || demema >= 90.0) {
+        outimage[i] = NULL8;
+      }
+      // if angles greater than max allowed by user, set to null
+      else if(deminc > maxinc || demema > maxema) {
+        outimage[i] = NULL8;
+      }
+      // otherwise, do photometric correction
+      else {
+        pho->Compute(ellipsoidpha, ellipsoidinc, ellipsoidema, deminc, demema, image[i], outimage[i], mult, base);
       }
     }
   }
