@@ -18,7 +18,7 @@ commands:
 	lat2=-0.3270664209085 \
 	lon2=355.70986410595 > /dev/null;
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	  | sed 's/\(,\|: \|^\)\([^,:][^,:]*\/\)\([^,\/:]*\.\)\(net\|cub\)/\1\3\4/g' \
+	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
 	  | sed 's/\-0.00000/ 0.00000/' \
@@ -29,7 +29,7 @@ commands:
 	# 2. remove digits beyond the fifth decimal place of decimal numbers
 	# 3. remove date and time
 	cat residuals.csv \
-	  | sed 's/\(,\|: \|^\)\([^,:][^,:]*\/\)\([^,\/:]*\.\)\(net\|cub\)/\1\3\4/g' \
+	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' \
 	  > $(OUTPUT)/residuals.csv
 	$(RM) bundleout.txt > /dev/null;
 	$(RM) residuals.csv  > /dev/null;

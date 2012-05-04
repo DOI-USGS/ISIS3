@@ -26,8 +26,7 @@ commands:
 	camsolve=angles \
 	spsolve=position > /dev/null;
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	  | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
-	  | sed 's/\/[^,]*\/\([^,\/]*\.net\)/\1/g' \
+	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
 	  > $(OUTPUT)/specialK_bundleout.txt
@@ -64,8 +63,7 @@ commands:
 	camsolve=angles \
 	spsolve=position  > /dev/null;
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	  | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
-	  | sed 's/\/[^,]*\/\([^,\/]*\.net\)/\1/g' \
+	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
 	  > $(OUTPUT)/cholmod_bundleout.txt
