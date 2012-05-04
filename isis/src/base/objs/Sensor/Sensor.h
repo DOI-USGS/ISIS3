@@ -168,6 +168,9 @@ namespace Isis {
    *   @history 2011-12-20 Tracie Sucharski - Added  SpacecraftSurfaceVector
    *                           method which returns the vector between the
    *                           spacecraft and the surface point in body-fixed.
+   *   @history 2012-05-04 Steven Lambright - Re-enabled a safety check in the DemRadius() method
+   *                           which was needed due to Projection not uniformly handling Null
+   *                           inputs. Fixes #807.
    */
   class Sensor : public Spice {
     public:

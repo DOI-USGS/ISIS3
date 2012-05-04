@@ -24,6 +24,8 @@
 
 #include <iomanip>
 
+#include <QDebug>
+
 #include "Angle.h"
 #include "Constants.h"
 #include "CubeManager.h"
@@ -1073,7 +1075,7 @@ namespace Isis {
    */
   Distance Sensor::DemRadius(const Latitude &lat, const Longitude &lon) {
     if(!p_hasElevationModel) return Distance();
-    //if(!lat.Valid() || !lon.Valid()) return Distance();
+    if(!lat.isValid() || !lon.isValid()) return Distance();
     p_demProj->SetUniversalGround(lat.degrees(), lon.degrees());
     if(!p_demProj->IsGood()) {
       return Distance();
