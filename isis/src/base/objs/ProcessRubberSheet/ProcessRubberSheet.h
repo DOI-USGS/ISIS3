@@ -95,22 +95,21 @@ namespace Isis {
    *                        implementation example to class documentation
    */
 
-  class ProcessRubberSheet : public Isis::Process {
+  class Brick;
+
+  class ProcessRubberSheet : public Process {
     public:
-      //! Constructs a RubberSheet object
-      ProcessRubberSheet(int startSize = 128, int endSize = 8) {
-        p_bandChangeFunct = NULL;
-        p_forceSamp = Isis::Null;
-        p_forceLine = Isis::Null;
-        p_startQuadSize = startSize;
-        p_endQuadSize = endSize;
-      };
+
+      ProcessRubberSheet(int startSize = 128, int endSize = 8);
 
       //! Destroys the RubberSheet object.
       ~ProcessRubberSheet() {};
 
-      // Line Processing method for one input and output cube
-      void StartProcess(Isis::Transform &trans, Isis::Interpolator &interp);
+      // Output driven processing method for one input and output cube
+      void StartProcess(Transform &trans, Interpolator &interp);
+
+      // Input driven processing method for one input and output cube
+      void processPatchTransform(Transform &trans, Interpolator &interp);
 
       // Register a function to be called when the band number changes
       void BandChange(void (*funct)(const int band));
@@ -133,6 +132,11 @@ namespace Isis {
         p_endQuadSize = end;
       }
 
+      void setPatchParameters(int startSample, int startLine, 
+                              int samples, int lines,
+                              int sampleIncrement, int lineIncrement);
+
+
     private:
 
       /** 
@@ -150,28 +154,45 @@ namespace Isis {
           int esamp;     //!< 
       };
 
-      void ProcessQuad(std::vector<Quad *> &quadTree, Isis::Transform &trans,
+      void ProcessQuad(std::vector<Quad *> &quadTree, Transform &trans,
                        std::vector< std::vector<double> > &lineMap,
                        std::vector< std::vector<double> > &sampMap);
 
       void SplitQuad(std::vector<Quad *> &quadTree);
-      void SlowQuad(std::vector<Quad *> &quadTree, Isis::Transform &trans,
+      void SlowQuad(std::vector<Quad *> &quadTree, Transform &trans,
                     std::vector< std::vector<double> > &lineMap, 
                     std::vector< std::vector<double> > &sampMap);
       double Det4x4(double m[4][4]);
       double Det3x3(double m[3][3]);
 
       // SlowGeom method is never used but saved for posterity
-      void SlowGeom(Isis::TileManager &otile, Isis::Portal &iportal,
-                    Isis::Transform &trans, Isis::Interpolator &interp);
-      void QuadTree(Isis::TileManager &otile, Isis::Portal &iportal,
-                    Isis::Transform &trans, Isis::Interpolator &interp,
+      void SlowGeom(TileManager &otile, Portal &iportal,
+                    Transform &trans, Interpolator &interp);
+      void QuadTree(TileManager &otile, Portal &iportal,
+                    Transform &trans, Interpolator &interp,
                     bool useLastTileMap);
 
-      bool TestLine(Isis::Transform &trans, int ssamp, int esamp, int sline, 
+      bool TestLine(Transform &trans, int ssamp, int esamp, int sline, 
                     int eline, int increment);
 
       void (*p_bandChangeFunct)(const int band);
+
+      void transformPatch (double startingSample, double endingSample, 
+                           double startingLine, double endingLine,
+                           Brick &obrick, Portal &iportal,
+                           Transform &trans, Interpolator &interp);
+
+      void splitPatch (double startingSample, double endingSample, 
+                       double startingLine, double endingLine,
+                       Brick &obrick, Portal &iportal,
+                       Transform &trans, Interpolator &interp);
+#if 0
+      void transformPatch (double startingSample, double endingSample, 
+                           double startingLine, double endingLine);
+
+      void splitPatch (double startingSample, double endingSample, 
+                       double startingLine, double endingLine);
+#endif
 
       std::vector< std::vector<double> > p_sampMap; //!< 
       std::vector< std::vector<double> > p_lineMap; //!< 
@@ -181,6 +202,20 @@ namespace Isis {
 
       int p_startQuadSize; //!< 
       int p_endQuadSize;   //!< 
+
+      int m_patchStartSample;
+      int m_patchStartLine;
+      int m_patchSamples;
+      int m_patchLines;
+      int m_patchSampleIncrement;
+      int m_patchLineIncrement;
+
+#if 0
+      Portal *m_iportal;
+      Brick *m_obrick;
+      Transform *m_transform;
+      Interpolator *m_interpolator;
+#endif
   };
 };
 

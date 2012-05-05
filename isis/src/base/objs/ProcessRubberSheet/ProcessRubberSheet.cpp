@@ -23,15 +23,102 @@
 #include <iostream>
 #include <iomanip>
 
-#include "Portal.h"
-#include "Transform.h"
+#include <QVector>
+
+#include "Affine.h"
+#include "BasisFunction.h"
+#include "Brick.h"
 #include "Interpolator.h"
-#include "TileManager.h"
-#include "ProcessRubberSheet.h"
+#include "LeastSquares.h"
 #include "Portal.h"
+#include "ProcessRubberSheet.h"
+#include "TileManager.h"
+#include "Transform.h"
 
 using namespace std;
 namespace Isis {
+  /**
+   * Constructs a ProcessRubberSheet class with the default tile size range 
+   * 
+   * @param startSize Beginning size of output tiles for reverse driven geom
+   * @param endSize Minimum size of output tiles for reverse driven geom
+   */
+  ProcessRubberSheet::ProcessRubberSheet(int startSize, int endSize) {
+    p_bandChangeFunct = NULL;
+
+    // Information used only in the tile transform method (StartProcess)
+    p_forceSamp = Null;
+    p_forceLine = Null;
+    p_startQuadSize = startSize;
+    p_endQuadSize = endSize;
+
+    // Patch parameters used only in the patch transform (processPatchTransform)
+    m_patchStartSample = 1;  
+    m_patchStartLine = 1;       
+    m_patchSamples = 5;          
+    m_patchLines = 5;            
+    m_patchSampleIncrement = 4;                                      
+    m_patchLineIncrement = 4;
+  };
+
+  /**
+   * This method allows the programmer to override the default values for patch 
+   * parameters used in the patch transform method (processPatchTransform) 
+   * 
+   * @author janderson (3/22/2012)
+   * 
+   * @param startSample The starting sample in the input cube to process the 
+   *                    default is 1.  
+   *  
+   * @param startLine The starting line in the input cube to process the default
+   *                  is 1.  It would unusual to use something other than 1,
+   *                  however, for pushframe cameras it would make sense to use
+   *                  the framelet size + 1 for even cubes and 1 for odd cubes.
+   *  
+   * @param samples The number of samples in each input patch.  The default is 
+   *                five.  Larger values can make the patch algorithm run faster
+   *                at the risk of transforming improperly because an affine
+   *                transform is not necessarily equal to the geometric
+   *                transform defined by the Transform object given to the
+   *                processPatchTransform method.  This is especially important
+   *                to consider during image orthorectification if the DEM is
+   *                high resolution.
+   *  
+   * @param lines   The number of lines in each input patch.  The default is 
+   *                five. Larger values can make the patch algorithm run faster
+   *                at the risk of transforming improperly because an affine
+   *                transform is not necessarily equal to the geometric
+   *                transform defined by the Transform object given to the
+   *                processPatchTransform method.  This is especially important
+   *                to consider during image orthorectification if the DEM is
+   *                high resolution. Also for pushframe cameras the line size
+   *                for patches should divide nicely into the framelet size.  
+   *  
+   * @param sampleIncrement The number of input samples to increment for the 
+   *                        next patch.  The default is 4 which is one less than
+   *                        the default patch size.  This guarantees overlap so
+   *                        that there is not gaps in the output cube.  
+   *  
+   * @param sampleIncrement The number of input lines to increment for the next
+   *                        patch.  The default is 4 which is one less than the
+   *                        default patch size.  This guarantees overlap so that
+   *                        there is not gaps in the output cube.  In rare
+   *                        instances (pushframe cameras) the line increment
+   *                        should be twice the framelet height which will
+   *                        prevent processing of NULL framelets.
+   *  
+   */
+  void ProcessRubberSheet::setPatchParameters(int startSample, int startLine, 
+                             int samples, int lines,
+                             int sampleIncrement, int lineIncrement) {
+    m_patchStartSample = startSample;
+    m_patchStartLine = startLine;
+    m_patchSamples = samples;
+    m_patchLines = lines;
+    m_patchSampleIncrement = sampleIncrement;
+    m_patchLineIncrement = lineIncrement;
+  }
+
   /**
    * Applies a Transform and an Interpolator to every pixel in the output cube.
    * The output cube is written using an Tile and the input cube is read using
@@ -39,17 +126,18 @@ namespace Isis {
    * calling this method. Output pixels which come from outside the input cube
    * are set to NULL8.
    *
-   * @param trans A fully initialized Transform object. The Transform member of
+   * @param trans A fully initialized Transform object. The Transform member of 
    *              this object is used to calculate what input pixel location
    *              should be used to interpolate the output pixel value.
    *
    * @param interp A fully initialized Interpolator object. The Interpolate
-   *               member of this object is used to calculate output pixel values.
+   *               member of this object is used to calculate output pixel
+   *               values.
    *
-   * @throws Isis::IException::Message
+   * @throws IException::Message
    */
-  void ProcessRubberSheet::StartProcess(Isis::Transform &trans,
-                                        Isis::Interpolator &interp) {
+  void ProcessRubberSheet::StartProcess(Transform &trans,
+                                        Interpolator &interp) {
     // Error checks ... there must be one input and one output
     if(InputCubes.size() != 1) {
       string m = "You must specify exactly one input cube";
@@ -70,10 +158,10 @@ namespace Isis {
     }
 
     // Create a tile manager for the output file
-    Isis::TileManager otile(*OutputCubes[0], p_startQuadSize, p_startQuadSize);
+    TileManager otile(*OutputCubes[0], p_startQuadSize, p_startQuadSize);
 
     // Create a portal buffer for the input file
-    Isis::Portal iportal(interp.Samples(), interp.Lines(),
+    Portal iportal(interp.Samples(), interp.Lines(),
                          InputCubes[0]->getPixelType() ,
                          interp.HotSample(), interp.HotLine());
 
@@ -89,7 +177,7 @@ namespace Isis {
         for(int band = 1; band <= OutputCubes[0]->getBandCount(); band++) {
           otile.SetTile(tile, band);
 
-          if(p_startQuadSize == 2) {
+          if(p_startQuadSize <= 2) {
             SlowGeom(otile, iportal, trans, interp);
           }
           else {
@@ -114,7 +202,7 @@ namespace Isis {
           p_bandChangeFunct(lastOutputBand);
         }
 
-        if(p_startQuadSize == 2) {
+        if(p_startQuadSize <= 2) {
           SlowGeom(otile, iportal, trans, interp);
         }
         else {
@@ -143,8 +231,8 @@ namespace Isis {
     p_bandChangeFunct = funct;
   }
 
-  void ProcessRubberSheet::SlowGeom(Isis::TileManager &otile, Isis::Portal &iportal,
-                                    Isis::Transform &trans, Isis::Interpolator &interp) {
+  void ProcessRubberSheet::SlowGeom(TileManager &otile, Portal &iportal,
+                                    Transform &trans, Interpolator &interp) {
     double outputSamp, outputLine;
     double inputSamp, inputLine;
     int outputBand = otile.Band();
@@ -158,23 +246,24 @@ namespace Isis {
         if((inputSamp < 0.5) || (inputLine < 0.5) ||
             (inputLine > InputCubes[0]->getLineCount() + 0.5) ||
             (inputSamp > InputCubes[0]->getSampleCount() + 0.5)) {
-          otile[i] = Isis::NULL8;
+          otile[i] = NULL8;
         }
         else {
           // Set the position of the portal in the input cube
           iportal.SetPosition(inputSamp, inputLine, outputBand);
           InputCubes[0]->read(iportal);
-          otile[i] = interp.Interpolate(inputSamp, inputLine, iportal.DoubleBuffer());
+          otile[i] = interp.Interpolate(inputSamp, inputLine, 
+                                        iportal.DoubleBuffer());
         }
       }
       else {
-        otile[i] = Isis::NULL8;
+        otile[i] = NULL8;
       }
     }
   }
 
-  void ProcessRubberSheet::QuadTree(Isis::TileManager &otile, Isis::Portal &iportal,
-                                    Isis::Transform &trans, Isis::Interpolator &interp,
+  void ProcessRubberSheet::QuadTree(TileManager &otile, Portal &iportal,
+                                    Transform &trans, Interpolator &interp,
                                     bool useLastTileMap) {
     // Initializations
     vector<Quad *> quadTree;
@@ -205,13 +294,14 @@ namespace Isis {
       for(int samp = 0; samp < p_startQuadSize; samp++, i++) {
         double inputLine = p_lineMap[line][samp];
         double inputSamp = p_sampMap[line][samp];
-        if(inputLine != Isis::NULL8) {
+        if(inputLine != NULL8) {
           iportal.SetPosition(inputSamp, inputLine, outputBand);
           InputCubes[0]->read(iportal);
-          otile[i] = interp.Interpolate(inputSamp, inputLine, iportal.DoubleBuffer());
+          otile[i] = interp.Interpolate(inputSamp, inputLine, 
+                                        iportal.DoubleBuffer());
         }
         else {
-          otile[i] = Isis::NULL8;
+          otile[i] = NULL8;
         }
       }
     }
@@ -219,8 +309,9 @@ namespace Isis {
 
 
   /**
-   * This function walks a line (or rectangle) and tests a point every increment pixels. If any of these
-   *   points can transform, then this method will return true. Otherwise, this returns false.
+   * This function walks a line (or rectangle) and tests a point every increment 
+   * pixels. If any of these points can transform, then this method will return 
+   * true. Otherwise, this returns false. 
    *
    * @param trans The Transform object to test on
    * @param ssamp Starting Sample
@@ -229,7 +320,8 @@ namespace Isis {
    * @param eline Ending Line
    * @param increment The increment to step by while walking this line/rectangle
    */
-  bool ProcessRubberSheet::TestLine(Isis::Transform &trans, int ssamp, int esamp, int sline, int eline, int increment) {
+  bool ProcessRubberSheet::TestLine(Transform &trans, int ssamp, int esamp, 
+                                    int sline, int eline, int increment) {
     for(int line = sline; line <= eline; line += increment) {
       for(int sample = ssamp; sample <= esamp; sample += increment) {
         double sjunk = 0.0;
@@ -245,9 +337,10 @@ namespace Isis {
   }
 
   // Process a quad trying to find input positions for output positions
-  void ProcessRubberSheet::ProcessQuad(std::vector<Quad *> &quadTree, Isis::Transform &trans,
-                                       std::vector< std::vector<double> > &lineMap,
-                                       std::vector< std::vector<double> > &sampMap) {
+  void ProcessRubberSheet::ProcessQuad(std::vector<Quad *> &quadTree, 
+                           Transform &trans,
+                           std::vector< std::vector<double> > &lineMap,
+                           std::vector< std::vector<double> > &sampMap) {
     Quad *quad = quadTree[0];
     double oline[4], osamp[4];
     double iline[4], isamp[4];
@@ -289,7 +382,7 @@ namespace Isis {
         SlowQuad(quadTree, trans, lineMap, sampMap);
       }
       else {
-        if(p_forceSamp != Isis::Null && p_forceLine != Isis::Null) {
+        if(p_forceSamp != Null && p_forceLine != Null) {
           if(p_forceSamp >= quad->ssamp && p_forceSamp <= quad->esamp &&
               p_forceLine >= quad->sline && p_forceLine <= quad->eline) {
             SplitQuad(quadTree);
@@ -302,8 +395,9 @@ namespace Isis {
 
         // All 4 corner points have failed tests.
         //
-        // If we find data around the quad by walking around a 2x2 grid in the box, then
-        //   we need to split the quad. Check outside the box and interior crosshair.
+        // If we find data around the quad by walking around a 2x2 grid in the 
+        // box, then we need to split the quad. Check outside the box and 
+        // interior crosshair.
         //
         //   This is what we're walking:
         //                       -----------
@@ -314,17 +408,23 @@ namespace Isis {
         //                       |    |    |
         //                       -----------
         // Top Edge
-        if(TestLine(trans, quad->ssamp + 1, quad->esamp - 1, quad->sline, quad->sline, 4) ||
+        if(TestLine(trans, quad->ssamp + 1, quad->esamp - 1, 
+                    quad->sline, quad->sline, 4) ||
             // Bottom Edge
-            TestLine(trans, quad->ssamp + 1, quad->esamp - 1, quad->eline, quad->eline, 4) ||
+            TestLine(trans, quad->ssamp + 1, quad->esamp - 1, 
+                     quad->eline, quad->eline, 4) ||
             // Left Edge
-            TestLine(trans, quad->ssamp, quad->ssamp, quad->sline + 1, quad->eline - 1, 4) ||
+            TestLine(trans, quad->ssamp, quad->ssamp, 
+                     quad->sline + 1, quad->eline - 1, 4) ||
             // Right Edge
-            TestLine(trans, quad->esamp, quad->esamp, quad->sline + 1, quad->eline - 1, 4) ||
+            TestLine(trans, quad->esamp, quad->esamp, 
+                     quad->sline + 1, quad->eline - 1, 4) ||
             // Center Column
-            TestLine(trans, centerSample, centerSample, quad->sline + 1, quad->eline - 1, 4) ||
+            TestLine(trans, centerSample, centerSample, 
+                     quad->sline + 1, quad->eline - 1, 4) ||
             // Center Row
-            TestLine(trans, quad->ssamp + 1, quad->esamp - 1, centerLine, centerLine, 4)) {
+            TestLine(trans, quad->ssamp + 1, quad->esamp - 1, 
+                     centerLine, centerLine, 4)) {
 
 
           SplitQuad(quadTree);
@@ -334,7 +434,7 @@ namespace Isis {
         //  Nothing in quad, fill with nulls
         for(int i = quad->sline; i <= quad->eline; i++) {
           for(int j = quad->ssamp; j <= quad->esamp; j++) {
-            lineMap[i-quad->slineTile][j-quad->ssampTile] = Isis::NULL8;
+            lineMap[i-quad->slineTile][j-quad->ssampTile] = NULL8;
           }
         }
         delete quad;
@@ -349,7 +449,7 @@ namespace Isis {
     //  if (badCorner == 4) {
     //    for (int i=quad->sline; i<=quad->eline; i++) {
     //      for (int j=quad->ssamp; j<=quad->esamp; j++) {
-    //        lineMap[i-quad->slineTile][j-quad->ssampTile] = Isis::NULL8;
+    //        lineMap[i-quad->slineTile][j-quad->ssampTile] = NULL8;
     //      }
     //    }
     //    delete quad;
@@ -397,8 +497,8 @@ namespace Isis {
       return;
     }
 
-    // Substitute our desired answers into B to get the coefficients for the line
-    // dimension (Cramers Rule!!)
+    // Substitute our desired answers into B to get the coefficients for the 
+    // line dimension (Cramers Rule!!)
     double B[4][4];
     double lineCoef[4];
     for(int j = 0; j < 4; j++) {
@@ -552,9 +652,11 @@ namespace Isis {
 
 
   // Slow quad computation for every output pixel
-  void ProcessRubberSheet::SlowQuad(std::vector<Quad *> &quadTree, Isis::Transform &trans,
+  void ProcessRubberSheet::SlowQuad(std::vector<Quad *> &quadTree, 
+                                    Transform &trans,
                                     std::vector< std::vector<double> > &lineMap,
-                                    std::vector< std::vector<double> > &sampMap) {
+                                    std::vector< std::vector<double> > &sampMap) 
+  {
     // Get the quad
     Quad *quad = quadTree[0];
     double iline, isamp;
@@ -564,7 +666,7 @@ namespace Isis {
       int lineIndex = oline - quad->slineTile;
       for(int osamp = quad->ssamp; osamp <= quad->esamp; osamp++) {
         int sampIndex = osamp - quad->ssampTile;
-        lineMap[lineIndex][sampIndex] = Isis::NULL8;
+        lineMap[lineIndex][sampIndex] = NULL8;
         if(trans.Xform(isamp, iline, (double) osamp, (double) oline)) {
           if((isamp >= 0.5) ||
               (iline >= 0.5) ||
@@ -642,4 +744,327 @@ namespace Isis {
            m[0][2] * m[1][0] * m[2][1] -
            m[0][2] * m[1][1] * m[2][0];
   }
+
+ /**
+ * Applies a Transform and an Interpolator to small patches. The transform 
+ * should define a mapping from input pixel coordinates to output pixel 
+ * coordinates.  The input image will be broken into many small patches (default
+ * 5x5).  The four corners of each input patch will be mapped into the output 
+ * cube using the transform.  This will provide four corresponding output patch 
+ * coordinates. These four coordinates (input and output) will be used to 
+ * compute an affine transform from output coordinate to input coordinates. The 
+ * affine transform is then used to quickly compute input coordinates 
+ * (fractional). This input coordinate is then used in the interp object in 
+ * order to geometrically move input pixels to output pixels. 
+ * 
+ * @param trans A fully initialized Transform object. The Transform member of 
+ *              this object is used to calculate an output pixel location given
+ *              an input pixel location.
+ *
+ * @param interp A fully initialized Interpolator object. The Interpolate
+ *               member of this object is used to calculate output pixel
+ *               values.
+ *
+ * @throws iException::Message
+ */
+
+  void ProcessRubberSheet::processPatchTransform(Transform &trans,
+                                                 Interpolator &interp) {
+    // Error checks ... there must be one input and one output
+    if(InputCubes.size() != 1) {
+      string m = "You must specify exactly one input cube";
+      throw IException(IException::Programmer, m, _FILEINFO_);
+    }
+    else if(OutputCubes.size() != 1) {
+      string m = "You must specify exactly one output cube";
+      throw IException(IException::Programmer, m, _FILEINFO_);
+    }
+
+    // Create a portal buffer for reading from the input file
+    Portal iportal(interp.Samples(), interp.Lines(),
+                   InputCubes[0]->getPixelType() ,
+                   interp.HotSample(), interp.HotLine());
+
+    // Create a buffer for writing to the output file
+    Brick obrick(*OutputCubes[0],1,1,1);
+
+    // Setup the progress meter
+    int patchesPerBand = 0;
+    for (int line = m_patchStartLine; line <= InputCubes[0]->getLineCount(); 
+          line += m_patchLineIncrement) {
+      for (int samp = m_patchStartSample; 
+            samp <= InputCubes[0]->getSampleCount(); 
+            samp += m_patchSampleIncrement) {
+        patchesPerBand++;
+      }
+    }
+
+    int patchCount = InputCubes[0]->getBandCount() * patchesPerBand;
+    p_progress->SetMaximumSteps(patchCount);
+    p_progress->CheckStatus();
+
+    // For each band we will loop through the input file and work on small 
+    // spatial patches (nxm).  The objective is to determine where each patch 
+    // falls in the output file and transform that output patch.  As we loop 
+    // we want some overlap in the input patches which guarantees there will 
+    // be no gaps in the output cube.
+    //
+    // We use the variables m_patchLines and m_patchSamples to define
+    // the patch size
+    //
+    // We use the variables m_patchStartLine and m_patchStartSample to define
+    // where to start in the cube.  In almost all cases these should be (1,1).
+    // An expection would be for PushFrameCameras which which need to have 
+    // a different starting line for the even framed cubes
+    //
+    // We use the variables m_patchLineIncrement and m_patchSampleIncrement
+    // to skip to the next patch.  Typically these are one less than the
+    // patch size which guarantees a pixel of overlap in the patches.  An
+    // expection would be for PushFrameCameras which should increment lines by
+    // twice the framelet height.
+
+    for (int band=1; band <= InputCubes[0]->getBandCount(); band++) {
+      if(p_bandChangeFunct != NULL) p_bandChangeFunct(band);
+      iportal.SetPosition(1,1,band);
+
+      for (int line = m_patchStartLine; line <= InputCubes[0]->getLineCount(); 
+            line += m_patchLineIncrement) {
+        for (int samp = m_patchStartSample; 
+              samp <= InputCubes[0]->getSampleCount(); 
+              samp += m_patchSampleIncrement, p_progress->CheckStatus()) {
+          transformPatch((double)samp, (double)(samp + m_patchSamples - 1),
+                         (double)line, (double)(line + m_patchLines - 1),
+                         obrick, iportal, trans, interp);
+        }
+      }
+    }
+  }
+
+  
+  // Private method to process a small patch of the input cube
+  void ProcessRubberSheet::transformPatch (double ssamp, double esamp, 
+                                           double sline, double eline,
+                                           Brick &obrick, Portal &iportal,
+                                           Transform &trans, 
+                                           Interpolator &interp) {
+    // Let's make sure our patch is contained in the input file
+    // TODO:  Think about the image edges should I be adding 0.5
+    if (esamp > InputCubes[0]->getSampleCount()) {
+      esamp = InputCubes[0]->getSampleCount();
+      if (ssamp == esamp) ssamp = esamp - 1;
+    }
+    if (eline > InputCubes[0]->getLineCount()) {
+      eline = InputCubes[0]->getLineCount();
+      if (sline == eline) sline = eline - 1;
+    }
+
+    // Use these to build a list of four corner control points
+    QVector<double> isamps;
+    QVector<double> ilines;
+    QVector<double> osamps;
+    QVector<double> olines;
+
+    // Upper left control point
+    double tline, tsamp;
+    if (trans.Xform(tsamp,tline,ssamp,sline)) {
+      isamps.push_back(ssamp);
+      ilines.push_back(sline);
+      osamps.push_back(tsamp);
+      olines.push_back(tline);
+    }
+
+    // Upper right control point
+    if (trans.Xform(tsamp,tline,esamp,sline)) {
+      isamps.push_back(esamp);
+      ilines.push_back(sline);
+      osamps.push_back(tsamp);
+      olines.push_back(tline);
+    }
+
+    // Lower left control point
+    if (trans.Xform(tsamp,tline,ssamp,eline)) {
+      isamps.push_back(ssamp);
+      ilines.push_back(eline);
+      osamps.push_back(tsamp);
+      olines.push_back(tline);
+    }
+
+    // Lower right control point
+    if (trans.Xform(tsamp,tline,esamp,eline)) {
+      isamps.push_back(esamp);
+      ilines.push_back(eline);
+      osamps.push_back(tsamp);
+      olines.push_back(tline);
+    }
+
+    // If no points we are lost in space.  It's possible a very small
+    // target could be completely contained in the patch.  Unlikely and if
+    // so why would we be projecting it??
+    if (isamps.size() == 0) return;
+
+    // All four corners must be good.  If not break it down more
+    if (isamps.size() < 4) {
+      splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+      return;
+    }
+    
+    // Get the min/max output line/sample patch
+    int osampMin = (int) osamps[0];
+    int osampMax = (int) (osamps[0] + 0.5);
+    int olineMin = (int) olines[0];
+    int olineMax = (int) (olines[0] + 0.5);
+    for (int i = 1; i < osamps.size(); i++) {
+      if (osamps[i] < osampMin) osampMin = (int) osamps[i];
+      if (osamps[i] > osampMax) osampMax = (int) (osamps[i] + 0.5);
+      if (olines[i] < olineMin) olineMin = (int) olines[i];
+      if (olines[i] > olineMax) olineMax = (int) (olines[i] + 0.5);
+    }
+
+    // Check to see if the output patch is completely outside the image.  No 
+    // sense in computing the affine if we don't have to.
+    if (osampMax < 1) return;
+    if (olineMax < 1) return;
+    if (osampMin > OutputCubes[0]->getSampleCount()) return;
+    if (olineMin > OutputCubes[0]->getLineCount()) return;
+
+    // Adjust our output patch if it extends outside the output cube
+    if (osampMin < 1) osampMin = 1;
+    if (olineMin < 1) olineMin = 1;
+    if (osampMax > OutputCubes[0]->getSampleCount()) {
+      osampMax = OutputCubes[0]->getSampleCount();
+    }
+    if (olineMax > OutputCubes[0]->getLineCount()) {
+      osampMax = OutputCubes[0]->getLineCount();
+    }
+
+    // Can we create an affine transform from output to input coordinates
+    BasisFunction isampFunc("Ax+By+C",3,3);
+    LeastSquares isampLSQ(isampFunc);
+
+    BasisFunction ilineFunc("Dx+Ey+F",3,3);
+    LeastSquares ilineLSQ(ilineFunc);
+
+    try {
+      for (int i=0; i < isamps.size(); i++) {
+        std::vector<double> vars;
+        vars.push_back(osamps[i]);
+        vars.push_back(olines[i]);
+        vars.push_back(1.0);
+
+        isampLSQ.AddKnown(vars,isamps[i]);
+        ilineLSQ.AddKnown(vars,ilines[i]);
+      }
+
+      isampLSQ.Solve(LeastSquares::QRD);
+      ilineLSQ.Solve(LeastSquares::QRD);
+    }
+    catch (IException &e) {
+      splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+      return;
+    }
+
+    // If the fit at any corner isn't good enough break it down
+    for (int i=0; i<isamps.size(); i++) {
+      if (fabs(isampLSQ.Residual(i)) > 0.5) {
+        splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+        return;
+      }
+      if (fabs(ilineLSQ.Residual(i)) > 0.5) {
+        splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+        return;
+      }
+    }
+
+#if 0
+    // What about the center point
+    // TODO:  The patches are so small so maybe we don't care if the
+    //        corners worked
+    double csamp = (ssamp + esamp) / 2.0;
+    double cline = (sline + eline) / 2.0;
+    if (trans.Xform(tsamp,tline,csamp,cline)) {
+      std::vector<double> vars;
+      vars.push_back(tsamp);
+      vars.push_back(tline);
+      vars.push_back(1.0);
+
+      double isamp = isampFunc.Evaluate(vars);
+      double iline = ilineFunc.Evaluate(vars);
+
+      double err = (csamp - isamp) * (csamp - isamp) +
+                   (cline - iline) * (cline - iline);
+      if (err > 0.25) {
+        splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+        return;
+      }
+    }
+    else {
+      splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+      return;
+    }
+#endif
+
+    double A = isampFunc.Coefficient(0);
+    double B = isampFunc.Coefficient(1);
+    double C = isampFunc.Coefficient(2);    
+
+    double D = ilineFunc.Coefficient(0);
+    double E = ilineFunc.Coefficient(1);
+    double F = ilineFunc.Coefficient(2);
+
+    // Now we can do our typical backwards geom.  Loop over the output cube 
+    // coordinates and compute input cube coordinates writing pixels 1-by-1
+    for (int oline = olineMin; oline <= olineMax; oline++) {
+      double isamp = A * osampMin + B * oline + C;
+      double iline = D * osampMin + E * oline + F;
+      double isampChangeWRTosamp = A;
+      double ilineChangeWRTosamp = D;
+      for (int osamp = osampMin; osamp <= osampMax; osamp++,
+           isamp += isampChangeWRTosamp, iline += ilineChangeWRTosamp) {
+
+        // Now read the data around the input coordinate and interpolate a DN
+        iportal.SetPosition(isamp, iline, iportal.Band());
+        InputCubes[0]->read(iportal);
+        double dn = interp.Interpolate(isamp, iline, iportal.DoubleBuffer());
+
+        // Write the output value at the appropriate location
+        if (dn != Null) {
+          obrick.SetBasePosition(osamp,oline,iportal.Band());
+          obrick[0] = dn;
+          OutputCubes[0]->write(obrick);
+        }
+      }
+    }
+  }
+
+  // Private method used to split up input patches if the patch is too big to
+  // process
+  void ProcessRubberSheet::splitPatch (double ssamp, double esamp, 
+                                       double sline, double eline,
+                                       Brick &obrick, Portal &iportal,
+                                       Transform &trans, Interpolator &interp) {
+
+    // Is the input patch too small to even worry about transforming?
+    if ((esamp - ssamp < 0.1) && (eline - sline < 0.1)) return;
+
+    // It's big enough so break it into four pieces
+    double midSamp = (esamp + ssamp) / 2.0;
+    double midLine = (eline + sline) / 2.0;
+
+    transformPatch(ssamp, midSamp,
+                   sline, midLine,
+                   obrick, iportal, trans, interp);      
+    transformPatch(midSamp, esamp, 
+                   sline, midLine,
+                   obrick, iportal, trans, interp);      
+    transformPatch(ssamp, midSamp,
+                   midLine, eline,
+                   obrick, iportal, trans, interp);      
+    transformPatch(midSamp, esamp,
+                   midLine, eline,
+                   obrick, iportal, trans, interp);      
+
+    return;
+  }
+
+
 } // end namespace isis
