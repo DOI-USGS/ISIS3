@@ -7,6 +7,9 @@
 #include "ProcessRubberSheet.h"
 #include "IException.h"
 #include "cam2map.h"
+#include "Pvl.h"
+#include "iString.h"
+#include "PushFrameCameraDetectorMap.h"
 
 using namespace std;
 using namespace Isis;
@@ -227,28 +230,12 @@ void IsisMain() {
     trim = ui.GetBoolean("TRIM");
   }
 
-  int tileStart, tileEnd;
-  incam->GetGeometricTilingHint(tileStart, tileEnd);
-  p.SetTiling(tileStart, tileEnd);
-
   // Output the mapping group used to the Gui session log
   PvlGroup cleanMapping = outmap->Mapping();
   Application::GuiLog(cleanMapping);
 
-  // Set up the transform object which will simply map
-  // output line/samps -> output lat/lons -> input line/samps
-  Transform *transform = new cam2map(icube->getSampleCount(),
-                                     icube->getLineCount(),
-                                     incam,
-                                     samples,
-                                     lines,
-                                     outmap,
-                                     trim);
-
   // Allocate the output cube and add the mapping labels
-  Cube *ocube = p.SetOutputCube("TO", transform->OutputSamples(),
-                                transform->OutputLines(),
-                                icube->getBandCount());
+  Cube *ocube = p.SetOutputCube("TO", samples, lines, icube->getBandCount());
 
   ocube->putGroup(cleanMapping);
 
@@ -271,6 +258,7 @@ void IsisMain() {
 
   //  See if center of input image projects.  If it does, force tile
   //  containing this center to be processed in ProcessRubberSheet.
+  //  TODO:  WEIRD ... why is this needed ... Talk to Tracie ... JAA??
   double centerSamp = icube->getSampleCount() / 2.;
   double centerLine = icube->getLineCount() / 2.;
   if(incam->SetImage(centerSamp, centerLine)) {
@@ -293,8 +281,130 @@ void IsisMain() {
     ocube->putGroup(alpha);
   }
 
-  // Warp the cube
-  p.StartProcess(*transform, *interp);
+  // We will need a transform class
+  Transform *transform = 0;
+  
+  // Okay we need to decide how to apply the rubbersheeting for the transform
+  // Does the user want to define how it is done?
+  if (ui.GetString("WARPALGORITHM") == "FORWARDPATCH") {
+    transform = new cam2mapForward(icube->getSampleCount(),
+                                   icube->getLineCount(), incam, samples,lines,
+                                   outmap, trim);
+
+    if (ui.WasEntered("PATCHSIZE")) {
+      int patchSize = ui.GetInteger("PATCHSIZE");
+      if (patchSize <= 1) patchSize = 3; // Make the patchsize reasonable
+      p.setPatchParameters(1, 1, patchSize, patchSize, 
+                           patchSize-1, patchSize-1);
+    }
+
+    p.processPatchTransform(*transform, *interp);
+  }
+
+  else if (ui.GetString("WARPALGORITHM") == "REVERSEPATCH") {
+    transform = new cam2mapReverse(icube->getSampleCount(),
+                                   icube->getLineCount(), incam, samples,lines,
+                                   outmap, trim);
+
+    if (ui.WasEntered("PATCHSIZE")) {
+      int patchSize = ui.GetInteger("PATCHSIZE");
+      int minPatchSize = 4;
+      if (patchSize < minPatchSize) minPatchSize = patchSize;
+      p.SetTiling(patchSize, minPatchSize);
+    }
+
+    p.StartProcess(*transform, *interp);
+  }
+
+  // The user didn't want to override the program smarts.
+  // Handle framing cameras.  Always process using the backward
+  // driven system (tfile) at every pixel.  It is the fastest option that 
+  // guarantees orthorectification is done correctly and limb images are
+  // properly projected
+  else if (incam->GetCameraType() == Camera::Framing) {
+    transform = new cam2mapReverse(icube->getSampleCount(),
+                                   icube->getLineCount(), incam, samples,lines,
+                                   outmap, trim);
+    p.SetTiling(1, 1);
+    p.StartProcess(*transform, *interp);
+  }
+
+  // The user didn't want to override the program smarts.
+  // Handle linescan cameras.  Always process using the forward
+  // driven patch option. Faster and we get better orthorectification
+  // 
+  // TODO:  For now use the default patch size.  Need to modify
+  // to determine patch size based on 1) if the limb is in the file
+  // or 2) if the DTM is much coarser than the image
+  else if (incam->GetCameraType() == Camera::LineScan) {
+    transform = new cam2mapForward(icube->getSampleCount(),
+                                   icube->getLineCount(), incam, samples,lines,
+                                   outmap, trim);
+
+    p.processPatchTransform(*transform, *interp);
+  }
+
+  // The user didn't want to override the program smarts.
+  // Handle pushframe cameras.  Always process using the forward driven patch 
+  // option.  It is much faster than the tfile method.  We will need to 
+  // determine patch sizes based on the size of the push frame.
+  // 
+  // TODO: What if the user has run crop, enlarge, or shrink on the push
+  // frame cube.  Things probably won't work unless they do it just right
+  // TODO: What about the THEMIS VIS Camera.  Will tall narrow (128x4) patches
+  // work okay?
+  else if (incam->GetCameraType() == Camera::PushFrame) {
+    transform = new cam2mapForward(icube->getSampleCount(),
+                                   icube->getLineCount(), incam, samples,lines,
+                                   outmap, trim);
+
+    // Get the frame height
+    PushFrameCameraDetectorMap *dmap = (PushFrameCameraDetectorMap *) incam->DetectorMap();
+    int frameSize = dmap->frameletHeight() / dmap->LineScaleFactor();
+
+    // Check for even/odd cube to determine starting line
+    PvlGroup &instGrp = icube->getLabel()->FindGroup("Instrument", Pvl::Traverse);
+    int startLine = 1;
+
+    // Get the alpha cube group in case they cropped the image
+    AlphaCube acube(*icube->getLabel());
+    double betaLine = acube.AlphaLine(1.0);
+    if (fabs(betaLine - 1.0) > 0.0000000001) {
+      if (fabs(betaLine - (int) betaLine) > 0.00001) {
+        string msg = "Input file is a pushframe camera cropped at a ";
+        msg += "fractional pixel.  Can not project"; 
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      int offset = (((int) (betaLine + 0.5)) - 1) % frameSize;
+      startLine -= offset;
+    }
+
+    if ((iString((string)instGrp["Framelets"])).UpCase() == "EVEN") {
+      startLine += frameSize;
+    }
+
+    p.setPatchParameters(1, startLine, 5, frameSize,
+                         4, frameSize * 2);
+
+    p.processPatchTransform(*transform, *interp);
+  }
+
+  // The user didn't want to override the program smarts.  The other camera 
+  // types have not be analyized.  This includes Radar and Point.  Continue to
+  // use the reverse geom option with the default tiling hints
+  else {
+    transform = new cam2mapReverse(icube->getSampleCount(),
+                                   icube->getLineCount(), incam, samples,lines,
+                                   outmap, trim);
+
+    int tileStart, tileEnd;
+    incam->GetGeometricTilingHint(tileStart, tileEnd);
+    p.SetTiling(tileStart, tileEnd);
+
+    p.StartProcess(*transform, *interp);
+  }
+
+  // Wrap up the warping process 
   p.EndProcess();
 
   // add mapping to print.prt
@@ -307,10 +417,68 @@ void IsisMain() {
 }
 
 // Transform object constructor
-cam2map::cam2map(const int inputSamples, const int inputLines,
-                 Camera *incam, const int outputSamples,
-                 const int outputLines, Projection *outmap,
-                 bool trim) {
+cam2mapForward::cam2mapForward(const int inputSamples, const int inputLines,
+                               Camera *incam, const int outputSamples,
+                               const int outputLines, Projection *outmap,
+                               bool trim) {
+  p_inputSamples = inputSamples;
+  p_inputLines = inputLines;
+  p_incam = incam;
+
+  p_outputSamples = outputSamples;
+  p_outputLines = outputLines;
+  p_outmap = outmap;
+
+  p_trim = trim;
+}
+
+// Transform method mapping input line/samps to lat/lons to output line/samps
+bool cam2mapForward::Xform(double &outSample, double &outLine,
+                    const double inSample, const double inLine) {
+  // See if the input image coordinate converts to a lat/lon
+  if (!p_incam->SetImage(inSample,inLine)) return false;
+
+  // Does that ground coordinate work in the map projection
+  double lat = p_incam->UniversalLatitude();
+  double lon = p_incam->UniversalLongitude();
+  if(!p_outmap->SetUniversalGround(lat,lon)) return false;
+
+  // See if we should trim
+  if((p_trim) && (p_outmap->HasGroundRange())) {
+    if(p_outmap->Latitude() < p_outmap->MinimumLatitude()) return false;
+    if(p_outmap->Latitude() > p_outmap->MaximumLatitude()) return false;
+    if(p_outmap->Longitude() < p_outmap->MinimumLongitude()) return false;
+    if(p_outmap->Longitude() > p_outmap->MaximumLongitude()) return false;
+  }
+
+  // Get the output sample/line coordinate
+  outSample = p_outmap->WorldX();
+  outLine = p_outmap->WorldY();
+
+  // Make sure the point is inside the output image
+  if(outSample < 0.5) return false;
+  if(outLine < 0.5) return false;
+  if(outSample > p_outputSamples + 0.5) return false;
+  if(outLine > p_outputLines + 0.5) return false;
+
+  // Everything is good
+  return true;
+}
+
+int cam2mapForward::OutputSamples() const {
+  return p_outputSamples;
+}
+
+int cam2mapForward::OutputLines() const {
+  return p_outputLines;
+}
+
+
+// Transform object constructor
+cam2mapReverse::cam2mapReverse(const int inputSamples, const int inputLines,
+                               Camera *incam, const int outputSamples,
+                               const int outputLines, Projection *outmap,
+                               bool trim) {
   p_inputSamples = inputSamples;
   p_inputLines = inputLines;
   p_incam = incam;
@@ -323,8 +491,8 @@ cam2map::cam2map(const int inputSamples, const int inputLines,
 }
 
 // Transform method mapping output line/samps to lat/lons to input line/samps
-bool cam2map::Xform(double &inSample, double &inLine,
-                    const double outSample, const double outLine) {
+bool cam2mapReverse::Xform(double &inSample, double &inLine,
+                           const double outSample, const double outLine) {
   // See if the output image coordinate converts to lat/lon
   if(!p_outmap->SetWorld(outSample, outLine)) return false;
 
@@ -355,11 +523,11 @@ bool cam2map::Xform(double &inSample, double &inLine,
   return true;
 }
 
-int cam2map::OutputSamples() const {
+int cam2mapReverse::OutputSamples() const {
   return p_outputSamples;
 }
 
-int cam2map::OutputLines() const {
+int cam2mapReverse::OutputLines() const {
   return p_outputLines;
 }
 
@@ -377,7 +545,7 @@ void PrintMap() {
   PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log
-  Isis::Application::GuiLog(userGrp);
+  Application::GuiLog(userGrp);
 }
 
 // Helper function to get mapping resolution.

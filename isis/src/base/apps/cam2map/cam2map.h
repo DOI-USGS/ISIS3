@@ -3,15 +3,17 @@
 
 #include "Transform.h"
 
+using namespace Isis;
+
 /**
  * @author ????-??-?? Unknown
  *
  * @internal
  */
-class cam2map : public Isis::Transform {
+class cam2mapReverse : public Transform {
   private:
-    Isis::Camera *p_incam;
-    Isis::Projection *p_outmap;
+    Camera *p_incam;
+    Projection *p_outmap;
     int p_inputSamples;
     int p_inputLines;
     bool p_trim;
@@ -20,12 +22,14 @@ class cam2map : public Isis::Transform {
 
   public:
     // constructor
-    cam2map(const int inputSamples, const int inputLines, Isis::Camera *incam,
-            const int outputSamples, const int outputLines, Isis::Projection *outmap,
-            bool trim);
+    cam2mapReverse(const int inputSamples, const int inputLines, 
+                   Camera *incam,
+                   const int outputSamples, const int outputLines, 
+                   Projection *outmap,
+                   bool trim);
 
     // destructor
-    ~cam2map() {};
+    ~cam2mapReverse() {};
 
     // Implementations for parent's pure virtual members
     bool Xform(double &inSample, double &inLine,
@@ -33,5 +37,39 @@ class cam2map : public Isis::Transform {
     int OutputSamples() const;
     int OutputLines() const;
 };
+
+/**
+ * @author 2012-04-19 Jeff Anderson
+ *
+ * @internal
+ */
+class cam2mapForward : public Transform {
+  private:
+    Camera *p_incam;
+    Projection *p_outmap;
+    int p_inputSamples;
+    int p_inputLines;
+    bool p_trim;
+    int p_outputSamples;
+    int p_outputLines;
+
+  public:
+    // constructor
+    cam2mapForward(const int inputSamples, const int inputLines, 
+                   Camera *incam,
+                   const int outputSamples, const int outputLines, 
+                   Projection *outmap,
+                   bool trim);
+
+    // destructor
+    ~cam2mapForward() {};
+
+    // Implementations for parent's pure virtual members
+    bool Xform(double &outSample, double &outLine,
+               const double inSample, const double inLine);
+    int OutputSamples() const;
+    int OutputLines() const;
+};
+
 
 #endif
