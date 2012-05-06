@@ -18,7 +18,7 @@ commands:
 	spsolve=position | grep -v "100% Processed" | \
 	grep -v "jigsaw" > case2OutLog.txt;
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' \
+	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
 	  > $(OUTPUT)/bundleout.txt
@@ -31,10 +31,10 @@ commands:
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  > $(OUTPUT)/case2OutLog.txt
 	cat residuals.csv \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' \
+	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	  > $(OUTPUT)/residuals.csv
 	cat bundleout_images.csv \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' \
+	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	  > $(OUTPUT)/bundleout_images.csv
 	$(RM) residuals.csv bundleout_images.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/bundleout_points.csv > /dev/null;

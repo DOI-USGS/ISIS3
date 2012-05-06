@@ -16,7 +16,7 @@ commands:
 	camsolve=no | grep -v "100% Processed" | \
 	grep -v "jigsaw" > radarOutLog.txt;
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' \
+	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
 	  > $(OUTPUT)/bundleout.txt
