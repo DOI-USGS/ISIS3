@@ -61,6 +61,9 @@
     <change name="Sharmila Prasad" date="2010-12-08">
       Removed traling 'Z' for Start, Stop and Image Time Pds labels
     </change>
+    <change name="Tracie Sucharski" date="2012-05-04">
+      Added error message when input image does not contain Pds labels.
+    </change>
   </history>
   <liens>
     <item> 

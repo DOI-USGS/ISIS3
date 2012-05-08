@@ -5,9 +5,13 @@
 #include <string>
 #include <vector>
 
+#include <QString>
+
 #include "CisscalFile.h"
 #include "Cube.h"
 #include "FileName.h"
+#include "IException.h"
+#include "iString.h"
 #include "Preference.h"
 #include "ProcessImportPds.h"
 #include "ProcessByLine.h"
@@ -15,10 +19,8 @@
 #include "SpecialPixel.h"
 #include "Stretch.h"
 #include "Table.h"
-#include "UserInterface.h"
 #include "TextFile.h"
-#include "IException.h"
-#include "iString.h"
+#include "UserInterface.h"
 
 
 using namespace std;
@@ -46,7 +48,14 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   FileName in = ui.GetFileName("FROM");
 
-  p.SetPdsFile(in.expanded(), "", label);
+  try {
+    p.SetPdsFile(in.expanded(), "", label);
+  }
+  catch (IException &e) {
+    throw IException(e, IException::User,
+                     QObject::tr("Error reading input file.  Make sure it contains a PDS label."),
+                     _FILEINFO_);
+  }
 
   //Checks if in file is rdr
   if(label.HasObject("IMAGE_MAP_PROJECTION")) {
