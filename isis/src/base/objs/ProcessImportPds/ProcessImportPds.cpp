@@ -19,25 +19,26 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "ProcessImportPds.h"
 
 #include <iostream>
 #include <string>
 #include <sstream>
 
-#include "Preference.h"
+#include <QString>
 
 #include "IException.h"
+#include "iString.h"
 #include "LineManager.h"
+#include "OriginalLabel.h"
+#include "PixelType.h"
+#include "Preference.h"
+#include "Projection.h"
 #include "Pvl.h"
 #include "PvlObject.h"
 #include "PvlTokenizer.h"
-#include "PixelType.h"
 #include "SpecialPixel.h"
-#include "iString.h"
-#include "ProcessImportPds.h"
 #include "UserInterface.h"
-#include "OriginalLabel.h"
-#include "Projection.h"
 
 using namespace std;
 namespace Isis {
@@ -77,7 +78,15 @@ namespace Isis {
                                     Isis::Pvl &pdsLabel) {
 
     // Internalize the PDS label in the PVL that was passed in
-    pdsLabel.Read(pdsLabelFile);
+    try {
+      pdsLabel.Read(pdsLabelFile);
+    }
+    catch (IException &e) {
+      throw IException(IException::User,
+                       QObject::tr("This image does not contain a pds label.  You will need an "
+                                   "image with a PDS label or a detached PDS label for this "
+                                   "image."), _FILEINFO_);
+    }
 
     // Save the label and file for future use
     p_pdsLabel = pdsLabel;

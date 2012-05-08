@@ -896,7 +896,7 @@ FILE_RECORDS                   = 330
 LABEL_RECORDS                  = 170
 
 /* POINTERS TO DATA OBJECTS */
-^QUBE                          = (unitTest.img, 267)
+^QUBE                          = (mer.img, 267)
 
 /* IDENTIFICATION DATA ELEMENTS */
 DATA_SET_ID                    = MER2-M-MI-2-EDR-V1.0
@@ -974,3 +974,6 @@ Group = Instrument
   InstrumentId   = UVVIS
 End_Group
 End
+
+Testing file with invalid Pds label
+**USER ERROR** This image does not contain a pds label.  You will need an image with a PDS label or a detached PDS label for this image.

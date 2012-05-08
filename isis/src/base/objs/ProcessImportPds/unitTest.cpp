@@ -7,6 +7,11 @@
 
 using namespace std;
 using namespace Isis;
+/**
+ * @internal
+ *   @history 2012-05-08 Tracie Sucharski - Moved test data to /usgs/cpks/mer/testData and
+ *                         /usgs/cpkgs/clementine1/testData.  Added test for invalid label.
+ */
 void IsisMain() {
 
   Isis::Preference::Preferences(true);
@@ -17,7 +22,7 @@ void IsisMain() {
     cout << "Testing PDS file containing an ^IMAGE pointer" << endl;
     Isis::ProcessImportPds p;
     Isis::Pvl plab;
-    p.SetPdsFile("unitTest.img", "unitTest.img", plab);
+    p.SetPdsFile("$mer/testData/mer.img", "$mer/testData/mer.img", plab);
     p.SetOutputCube("TO");
     p.StartProcess();
     p.EndProcess();
@@ -46,7 +51,7 @@ void IsisMain() {
     cout << "Testing PDS file containing a ^QUBE pointer" << endl;
     Isis::ProcessImportPds p;
     Isis::Pvl plab;
-    p.SetPdsFile("unitTest.lab", "", plab);
+    p.SetPdsFile("$mer/testData/mer.lab", "", plab);
     p.SetOutputCube("TO");
     p.StartProcess();
     p.OmitOriginalLabel();
@@ -81,7 +86,8 @@ void IsisMain() {
     cout << "Testing Isis2 file" << endl;
     Isis::ProcessImportPds p;
     Isis::Pvl plab;
-    p.SetPdsFile("clemuvvis.cub", "clemuvvis.cub", plab);
+    p.SetPdsFile("$clementine1/testData/clemuvvis_Isis2.cub",
+                 "$clementine1/testData/clemuvvis_Isis2.cub", plab);
     p.SetOutputCube("TO");
     p.StartProcess();
     Isis::Pvl ilab;
@@ -93,6 +99,18 @@ void IsisMain() {
     remove(file.c_str());
   }
   catch(Isis::IException &e) {
+    e.print();
+  }
+
+  //  Test an invalid label file
+  try {
+    cout << endl;
+    cout << "Testing file with invalid Pds label" << endl;
+    Isis::ProcessImportPds p;
+    Isis::Pvl plab;
+    p.SetPdsFile("$galileo/testData/1213r.img", "$galileo/testData/1213r.img", plab);
+  }
+  catch (Isis::IException &e) {
     e.print();
   }
 }

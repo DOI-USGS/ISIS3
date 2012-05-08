@@ -181,6 +181,9 @@ namespace Isis {
    *  @history 2011-04-27 Mackenzie Boyd - Changed ProcessQubeLabels to set BIP 
    *                          for BANDSAMPLELINE axes instead of LINEBANDSAMPLE
    *                          and added exception for unknown storage order.
+   *  @history 2012-05-03 Tracie Sucharski - Added a try/catch in SetPdsFile when attempting
+   *                          to read PDS label.
+   *  
    *  @todo 2005-02-09 Finish documentation-lots of holes with variable
    *                   definitions in .h file and .cpp methods, and  insert
    *                   implementation example
