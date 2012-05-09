@@ -383,7 +383,15 @@ namespace Isis {
 
     p_nogeom = new QRadioButton("No geom/rotate");
     p_nogeom->setChecked(true);
+    p_nogeom->setToolTip("Reset right measure to it's native geometry.");
+    p_nogeom->setWhatsThis("Reset right measure to it's native geometry.  "
+                           "If measure was rotated, set rotation back to 0.  "
+                           "If measure was geomed to match the left measure, "
+                           "reset the geometry back to it's native state.");
     p_geom   = new QRadioButton("Geom");
+    p_geom->setToolTip("Geom right measure to matche geometry of left measure.");
+    p_geom->setWhatsThis("Using an affine transform, geom the right measure to match the "
+                         "geometry of the left measure.");
     QRadioButton *rotate = new QRadioButton("Rotate");
     QButtonGroup *bgroup = new QButtonGroup();
     bgroup->addButton(p_nogeom);
@@ -605,6 +613,10 @@ namespace Isis {
    *                           universalGroundMap.
    *   @history 2012-04-17  Tracie Sucharski - If geom is turned on update the
    *                           right measure.
+   *   @history 2012-05-07  Tracie Sucharski - Last change introduced bug when
+   *                           loading a different control point, so only
+   *                           update the right chip if we're not loading a
+   *                           different control point.
    */
   void ControlPointEdit::setLeftMeasure(ControlMeasure *leftMeasure,
                                         Cube *leftCube, std::string pointId) {
@@ -618,7 +630,6 @@ namespace Isis {
     }
 
     p_leftMeasure = leftMeasure;
-    p_pointId = pointId;
 
     //  get new ground map
     if ( p_leftGroundMap != 0 ) delete p_leftGroundMap;
@@ -631,7 +642,10 @@ namespace Isis {
     // Dump into left chipViewport
     p_leftView->setChip(p_leftChip, p_leftCube);
 
-    if (p_geomIt) updateRightGeom();
+    // Only update right if not loading a new point.  If it's a new point, right measure
+    // hasn't been loaded yet.
+    if (pointId == p_pointId && p_geomIt) updateRightGeom();
+    p_pointId = pointId;
   }
 
 

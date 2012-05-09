@@ -111,6 +111,10 @@ namespace Isis {
     *   @history 2012-05-01  Tracie Sucharski - Fix intereface between No Geom, geom
     *                          and rotate.  Make sure resets are done properly when
     *                          switching beween the options.
+  *   @history 2012-05-07  Tracie Sucharski - Change made on 2012-04-17 introduced bug when
+  *                           loading a different control point, so in setLeftMeasure, only
+  *                           update the right chip if we're not loading a
+  *                           different control point.
     */
   class ControlPointEdit : public QWidget {
       Q_OBJECT
