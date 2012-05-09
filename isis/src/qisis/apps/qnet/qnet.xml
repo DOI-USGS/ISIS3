@@ -497,5 +497,15 @@
     <change name="Tracie Sucharski" date="2012-01-11">
       Add error checking for creating point with invalid latitude, longitude.
     </change>
+    <change name="Tracie Sucharski" date="2012-05-07">
+      Fixed following bugs:  error when attempting to geom when using a ground
+      source as the reference measure, problem un-locking a measure even
+      if the point is un-locked and when changing between geom and rotate options,
+      chips were not resettting correctly.
+    </change>
+    <change name="Tracie Sucharski" date="2012-05-08">
+      Fixed bug that resulted in seg fault when deleting a point by middle clicking
+      on a cubeviewport after creating a ground point.
+    </change>
   </history>
 </application>

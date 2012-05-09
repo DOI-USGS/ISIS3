@@ -702,6 +702,9 @@ namespace Isis {
    *                          the measure loaded into the point editor.
    *   @history 2012-04-26 Tracie Sucharski - cleaned up, moved reference checking
    *                          and updating ground surface point to new methods.
+   *   @history 2012-05-07 Tracie Sucharski - Removed code to re-load left measure if
+   *                          left and right are the same, this is already handled in
+   *                          ControlPointEdit::saveMeasure.
    */
   void QnetTool::measureSaved() {
     // Read original measures from the network for comparison with measures
@@ -797,15 +800,6 @@ namespace Isis {
       *origLeftMeasure = *p_leftMeasure;
     }
 
-    // If left measure == right measure, update left
-    if (p_leftMeasure->GetCubeSerialNumber() ==
-        p_rightMeasure->GetCubeSerialNumber()) {
-      *p_leftMeasure = *p_rightMeasure;
-      //  Update left measure of pointEditor
-      p_pointEditor->setLeftMeasure (p_leftMeasure, p_leftCube,
-                                     p_editPoint->GetId());
-    }
-
     //  Change Save Point button text to red
     colorizeSaveButton();
 
@@ -887,10 +881,6 @@ namespace Isis {
           // No:  keep original reference, return without saving
           case 1:
             loadPoint();
-//          p_pointEditor->setLeftMeasure (p_leftMeasure, p_leftCube,
-//                                         p_editPoint->GetId());
-//          p_pointEditor->setRightMeasure (p_rightMeasure, p_rightCube,
-//                                         p_editPoint->GetId());
             return;
         }
       }
@@ -1428,6 +1418,9 @@ namespace Isis {
    *                          "Save Point To Control Network".
    * @history 2012-01-11 Tracie Sucharski - Add error check for invalid lat, lon
    *                          when creating new control point.
+   * @history 2012-05-08 Tracie Sucharski - Clear p_leftFile, only set if creating 
+   *                          new point. Change p_leftFile from a std::string to
+   *                          a QString.
    *
    */
   void QnetTool::mouseButtonRelease(QPoint p, Qt::MouseButton s) {
@@ -1440,6 +1433,7 @@ namespace Isis {
     double samp,line;
     cvp->viewportToCube(p.x(),p.y(),samp,line);
 
+    p_leftFile.clear();
 
     if (s == Qt::LeftButton) {
       if (sn == p_groundSN) {
@@ -1458,7 +1452,6 @@ namespace Isis {
         QMessageBox::warning(p_qnetTool, "Warning", message);
         return;
       }
-      p_leftFile = file;
 
       modifyPoint(point);
     }
@@ -1482,7 +1475,7 @@ namespace Isis {
       deletePoint(point);
     }
     else if (s == Qt::RightButton) {
-      p_leftFile = file;
+      p_leftFile = file.c_str();
       UniversalGroundMap *gmap = cvp->universalGroundMap();
       if (!gmap->SetImage(samp,line)) {
         QString message = "Invalid latitude or longitude at this point. ";
@@ -1543,6 +1536,7 @@ namespace Isis {
    *   @history 2011-07-19 Tracie Sucharski - Remove call to
    *                           SetAprioriSurfacePoint, this should only be
    *                           done for constrained or fixed points.
+   *   @history 2012-05-08 Tracie Sucharski - p_leftFile changed from std::string to QString. 
    *
    */
   void QnetTool::createPoint(double lat,double lon) {
@@ -1620,10 +1614,12 @@ namespace Isis {
 
       //  If the image that the user clicked on to select the point is not
       //  included, clear out the leftFile value.
-      QString leftFile = p_leftFile.c_str();
-      QList<QListWidgetItem *> leftFileItem =
-        newPointDialog->fileList->findItems(leftFile, Qt::MatchFixedString);
-      if (!(leftFileItem.at(0)->isSelected())) p_leftFile = "";
+      if (!p_leftFile.isEmpty()) {
+        QList<QListWidgetItem *> leftFileItem =
+          newPointDialog->fileList->findItems(p_leftFile, Qt::MatchFixedString);
+        if (!(leftFileItem.at(0)->isSelected())) p_leftFile.clear();
+      }
+
       //  Load new point in QnetTool
       loadPoint();
       p_qnetTool->setShown(true);
@@ -1920,7 +1916,6 @@ namespace Isis {
                 " measures are EditLocked and were not deleted.");
         }
 
-        p_leftFile = "";
         loadPoint();
         p_qnetTool->setShown(true);
         p_qnetTool->raise();
@@ -1984,7 +1979,7 @@ namespace Isis {
 
     //  If navTool modfify button pressed, p_leftFile needs to be reset
     //  TODO: better way - have 2 slots
-    if (sender() != this) p_leftFile = "";
+    if (sender() != this) p_leftFile.clear();
     loadPoint();
     p_qnetTool->setShown(true);
     p_qnetTool->raise();
@@ -2011,7 +2006,7 @@ namespace Isis {
    *                          ground measure-use AprioriSurface point, not lat,lon
    *                          of reference measure unless there is no apriori
    *                          surface point.
-   *
+   *   @history 2012-05-08 Tracie Sucharski - p_leftFile changed from std::string to QString.
    */
   void QnetTool::loadPoint () {
 
@@ -2128,10 +2123,11 @@ namespace Isis {
       leftIndex = p_editPoint->IndexOfRefMeasure();
     }
     else {
-      if (p_editPoint->GetType() == ControlPoint::Free &&
-          (p_leftFile.length() != 0)) {
-        iString tempFileName = FileName(p_leftFile).name();
-        leftIndex = p_leftCombo->findText(tempFileName);
+      if ((p_editPoint->GetType() == ControlPoint::Free) && !p_leftFile.isEmpty()) {
+        QString baseFileName = FileName(p_leftFile).name();
+        leftIndex = p_leftCombo->findText(baseFileName);
+        //  Sanity check
+        if (leftIndex < 0 ) leftIndex = 0;
       }
     }
 

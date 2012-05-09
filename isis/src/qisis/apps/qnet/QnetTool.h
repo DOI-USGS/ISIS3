@@ -172,6 +172,12 @@ namespace Isis {
    *   @history 2012-04-26 Tracie Sucharski - Cleaned up private slot,measureSaved.
    *                          Abstracted out checking for a new reference measure
    *                          and updating the surface point for a ground point.
+   *   @history 2012-05-07 Tracie Sucharski - Removed code in measureSaved to re-load
+   *                          left measure if left and right are the same, this is
+   *                          already handled in ControlPointEdit::saveMeasure.
+   *   @history 2012-05-08 Tracie Sucharski - Fixed bug where p_leftFile was not
+   *                          being reset in mouseButtonRelease.  Change p_leftFile
+   *                          from a std::string to a QString.
    */
   class QnetTool : public Tool {
     Q_OBJECT
@@ -384,7 +390,7 @@ namespace Isis {
 
       QStringList p_pointFiles;
 
-      std::string p_leftFile;
+      QString p_leftFile;
       ControlMeasure *p_leftMeasure;
       ControlMeasure *p_rightMeasure;
       Cube *p_leftCube;
