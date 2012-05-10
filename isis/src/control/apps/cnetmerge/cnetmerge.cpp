@@ -70,7 +70,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   FileList filelist;
   if (ui.GetString("INPUTTYPE") == "LIST") {
-    filelist = ui.GetFileName("CLIST");
+    filelist.read(ui.GetFileName("CLIST"));
 
     if (ui.WasEntered("BASE")) {
       // User has chosen an explicit base network
@@ -78,8 +78,8 @@ void IsisMain() {
       FileName baseFileName(baseName);
 
       // Remove the base network from the list if it is present
-      for (unsigned int i = 0; i < filelist.size(); i++) {
-        if (FileName(filelist[i]).expanded() == baseFileName.expanded()) {
+      for (int i = 0; i < filelist.size(); i++) {
+        if (filelist[i].expanded() == baseFileName.expanded()) {
           // FileNames match, so erase it and move on.  We assume it only
           // appears once.  There are currently no checks for duplicate
           // networks.
@@ -95,7 +95,7 @@ void IsisMain() {
     else {
       // So there is a record of which file was used as the BASE in the print
       // file
-      ui.PutFileName("BASE", filelist[0]);
+      ui.PutFileName("BASE", filelist[0].toString());
     }
 
     // Check after taking into account an explicit base network if we have at
@@ -166,7 +166,7 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
     PvlObject errors("Errors");
 
     QMap<QString, QString> pointSources;
-    for (unsigned int n = 0; n < filelist.size(); n++) {
+    for (int n = 0; n < filelist.size(); n++) {
       FileName cnetName(filelist[n]);
       ControlNet network(cnetName.expanded());
 
@@ -218,7 +218,7 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
 
   // The original base network is the first in the list, all successive
   // networks will be added to the base in descending order
-  ControlNet *baseNet = new ControlNet(FileName(filelist[0]).expanded());
+  ControlNet *baseNet = new ControlNet(filelist[0].toString());
   baseNet->SetNetworkId(networkId);
   baseNet->SetUserName(Isis::Application::UserName());
   baseNet->SetCreatedDate(Isis::Application::DateTime());

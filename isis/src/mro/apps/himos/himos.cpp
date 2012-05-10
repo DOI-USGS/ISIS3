@@ -42,10 +42,10 @@ void IsisMain() {
 
     // open all the cube and place in vector clist
 
-    for(int i = 0; i < (int)flist.size(); i++) {
+    for(int i = 0; i < flist.size(); i++) {
       Cube *c = new Cube();
       clist.push_back(c);
-      c->open(flist[i]);
+      c->open(flist[i].toString());
     }
 
 

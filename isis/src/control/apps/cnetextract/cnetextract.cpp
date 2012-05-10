@@ -79,7 +79,8 @@ void IsisMain() {
   ControlNet outNet(ui.GetFileName("CNET"));
   FileList inList;
   if(ui.WasEntered("FROMLIST")) {
-    inList = ui.GetFileName("FROMLIST");
+    //inList = ui.GetFileName("FROMLIST");
+    inList.read(ui.GetFileName("FROMLIST"));
   }
 
   int inputPoints = outNet.GetNumPoints();
@@ -90,8 +91,8 @@ void IsisMain() {
   // Set up the Serial Number to FileName mapping
   QMap<iString, iString> sn2filename;
   for(int cubeIndex = 0; cubeIndex < (int)inList.size(); cubeIndex ++) {
-    iString sn = SerialNumber::Compose(inList[cubeIndex]);
-    sn2filename[sn] = inList[cubeIndex];
+    iString sn = SerialNumber::Compose(inList[cubeIndex].toString());
+    sn2filename[sn] = inList[cubeIndex].toString();
   }
 
 
@@ -119,7 +120,7 @@ void IsisMain() {
   if(cubePoints) {
     FileList cubeList(ui.GetFileName("CUBELIST"));
     for(int cubeIndex = 0; cubeIndex < (int)cubeList.size(); cubeIndex ++) {
-      iString sn = SerialNumber::Compose(cubeList[cubeIndex]);
+      iString sn = SerialNumber::Compose(cubeList[cubeIndex].toString());
       serialNumbers.push_back(sn);
     }
   }
@@ -476,7 +477,7 @@ void ExtractPointList(ControlNet &outNet, QVector<iString> nonListedPoints) {
     ControlPoint *controlpt = outNet.GetPoint(cp);
     bool isInList = false;
     for(int pointId = 0; pointId < (int)listedPoints.size()  &&  !isInList; pointId ++) {
-      isInList = controlpt->GetId().compare(listedPoints[pointId]) == 0;
+      isInList = controlpt->GetId().compare(listedPoints[pointId].toString()) == 0;
     }
 
     if(!isInList) {

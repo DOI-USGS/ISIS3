@@ -42,7 +42,7 @@ void IsisMain() {
   SerialNumberList snl(ui.GetFileName("LIST3"), true, &progress);
   progress.CheckStatus();
 
-  if (list2.size() != (unsigned)snl.Size()) {
+  if (list2.size() != snl.Size()) {
     iString msg = "Invalid input file number of lines. The ISIS2 file list [";
     msg += ui.GetAsString("LIST2") + "] must contain the same number of lines ";
     msg += "as the ISIS3 file list [" + ui.GetAsString("LIST3") + "]";
@@ -58,9 +58,9 @@ void IsisMain() {
   //   Otherwise, we would be required to write a separate routine for each
   //   mission to determine the corresponding serial number for a given FSC.
   //   Jeannie Backer 2011-06-30
-  for (unsigned int f = 0; f < list2.size(); f++) {
+  for (int f = 0; f < list2.size(); f++) {
     progress.CheckStatus();
-    iString currFile(list2[f]);
+    iString currFile(list2[f].toString());
     Pvl lab(currFile);
     PvlObject qube(lab.FindObject("QUBE"));
 

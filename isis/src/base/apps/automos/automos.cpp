@@ -25,7 +25,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Get the list of cubes to mosaic
-  list.Read(ui.GetFileName("FROMLIST"));
+  list.read(FileName(ui.GetFileName("FROMLIST")));
   if(list.size() < 1) {
     string msg = "The list file [" + ui.GetFileName("FROMLIST") +"does not contain any data";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -107,23 +107,23 @@ void IsisMain() {
   m.SetMatchDEM(ui.GetBoolean("MATCHDEM"));
 
   bool mosaicCreated = false;
-  for(unsigned int i = 0; i < list.size(); i++) {
-    if(!m.StartProcess(list[i])) {
+  for (int i = 0; i < list.size(); i++) {
+    if (!m.StartProcess(list[i].toString())) {
       PvlGroup outsiders("Outside");
-      outsiders += PvlKeyword("File", list[i]);
+      outsiders += PvlKeyword("File", list[i].toString());
       Application::Log(outsiders);
     }
     else {
       PvlGroup imgPosition("ImageLocation");
       int iStartLine   = m.GetInputStartLineInMosaic();
       int iStartSample = m.GetInputStartSampleInMosaic();
-      imgPosition += PvlKeyword("File", list[i]);
+      imgPosition += PvlKeyword("File", list[i].toString());
       imgPosition += PvlKeyword("StartSample", iStartSample);
       imgPosition += PvlKeyword("StartLine", iStartLine);
       Application::Log(imgPosition);
       mosaicCreated = true;
       if(olistFlag) {
-        os << list[i] << endl;
+        os << list[i].toString() << endl;
       }
     }
     if(mosaicCreated) {
@@ -142,7 +142,7 @@ void IsisMain() {
 // Function to calculate the ground range from multiple inputs (list of images)
 void calcRange(double &minLat, double &maxLat, double &minLon, double &maxLon) {
   UserInterface &ui = Application::GetUserInterface();
-  FileList list(ui.GetFileName("FROMLIST"));
+  FileList list(FileName(ui.GetFileName("FROMLIST")));
   minLat = DBL_MAX;
   maxLat = -DBL_MAX;
   minLon = DBL_MAX;
@@ -152,10 +152,10 @@ void calcRange(double &minLat, double &maxLat, double &minLon, double &maxLon) {
   int nbands = 0;
   Projection *firstProj = NULL;
 
-  for(unsigned int i = 0; i < list.size(); i++) {
+  for(int i = 0; i < list.size(); i++) {
     // Open the cube and get the maximum number of band in all cubes
     Cube cube;
-    cube.open(list[i]);
+    cube.open(list[i].toString());
     if(cube.getBandCount() > nbands) nbands = cube.getBandCount();
 
     // See if the cube has a projection and make sure it matches
@@ -165,7 +165,8 @@ void calcRange(double &minLat, double &maxLat, double &minLon, double &maxLon) {
       firstProj = proj;
     }
     else if(*proj != *firstProj) {
-      string msg = "Mapping groups do not match between cubes [" + list[0] + "] and [" + list[i] + "]";
+      string msg = "Mapping groups do not match between cubes [" + list[0].toString() + 
+                   "] and [" + list[i].toString() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 

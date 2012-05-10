@@ -5,6 +5,8 @@
 #include "Preference.h"
 #include "ProcessByLine.h"
 #include "IException.h"
+#include "FileName.h"
+#include "FileList.h"
 
 using namespace std;
 using namespace Isis;
@@ -46,21 +48,21 @@ int main(int argc, char *argv[]) {
   cout << setprecision(9);
 
   try {
-    string fromList = "FromList.lst";
+    FileName fromList("FromList.lst");
     string holdList = "HoldList.lst";
 
     cout << "UnitTest for Equalization" << endl;
-    HiEqualization equalizer(fromList);
+    HiEqualization equalizer(fromList.toString());
     equalizer.addHolds(holdList);
 
     equalizer.calculateStatistics();
 
     // Open input cube
     FileList imageList(fromList);
-    for (unsigned int i = 0; i < imageList.size(); i++) {
+    for (int i = 0; i < imageList.size(); i++) {
       ProcessByLine p;
       CubeAttributeInput att;
-      const string inp = imageList[i];
+      const string inp = imageList[i].toString();
       Cube *inputCube = p.SetInputCube(inp, att);
       TestFunctor func(&equalizer, inputCube->getLineCount(), i);
       p.ProcessCubeInPlace(func, false);

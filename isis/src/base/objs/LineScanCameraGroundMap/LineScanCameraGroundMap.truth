@@ -1,1 +1,3 @@
-This class will be tested by the applications and the individual Camera models.
+This class is mostly tested by the applications and the individual Camera models.
+attempting to back project a point behind the planet into the image (this should throw an error)
+**ERROR** Requested position does not project in camera model; no surface intersection.

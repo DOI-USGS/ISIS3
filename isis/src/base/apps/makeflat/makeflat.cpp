@@ -173,7 +173,7 @@ bool cubeInitialized;
  * the processing methods to determine exclusions and pre-calculated statistics of each
  * image.
  */
-unsigned int currImage;
+int currImage;
 
 /**
  * This is the main method. Makeflat runs in three steps:
@@ -220,7 +220,7 @@ void IsisMain() {
     numFrameLines = ui.GetInteger("FRAMELETHEIGHT");
   }
 
-  FileList inList(ui.GetFileName("FROMLIST"));
+  FileList inList(FileName(ui.GetFileName("FROMLIST")));
   Progress progress;
 
   tempFileLength = 0;
@@ -256,7 +256,7 @@ void IsisMain() {
      * Read the current cube into memory
      */
     Cube tmp;
-    tmp.open(FileName(inList[currImage]).expanded());
+    tmp.open(inList[currImage].toString());
 
     /**
      * If we haven't determined how many samples the output
@@ -304,7 +304,7 @@ void IsisMain() {
     //   during pass 2 cleanly
     if((cameraType == Framing || cameraType == PushFrame) && imageValid) {
       string prog = "Calculating Standard Deviation " + iString((int)currImage + 1) + "/";
-      prog += iString((int)inList.size()) + " (" + FileName(inList[currImage]).name() + ")";
+      prog += iString((int)inList.size()) + " (" + inList[currImage].name() + ")";
 
       if(cameraType == Framing) {
         Statistics *stats = tmp.getStatistics(1, prog);
@@ -397,7 +397,7 @@ void IsisMain() {
     }
 
     PvlObject currFile("Exclusions");
-    currFile += PvlKeyword("FileName", inList[currImage]);
+    currFile += PvlKeyword("FileName", inList[currImage].toString());
     currFile += PvlKeyword("Tolerance", maxStdev);
 
     if(cameraType == LineScan) {
@@ -420,10 +420,10 @@ void IsisMain() {
       p.SetBrickSize(numOutputSamples, 1, 1);
     }
 
-    p.SetInputCube(inList[currImage], inAtt);
+    p.SetInputCube(inList[currImage].toString(), inAtt);
     iString progText = "Calculating Averages " + iString((int)currImage + 1);
     progText += "/" + iString((int)inList.size());
-    progText += " (" + FileName(inList[currImage]).name() + ")";
+    progText += " (" + inList[currImage].name() + ")";
     p.Progress()->SetText(progText);
 
     p.StartProcess(CreateTemporaryData);
@@ -498,7 +498,7 @@ void IsisMain() {
   PvlGroup excludedFiles("ExcludedFiles");
   for(currImage = 0; currImage < inList.size(); currImage++) {
     if(Excluded(currImage)) {
-      excludedFiles += PvlKeyword("File", inList[currImage]);
+      excludedFiles += PvlKeyword("File", inList[currImage].toString());
     }
   }
 

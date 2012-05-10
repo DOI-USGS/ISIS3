@@ -28,7 +28,7 @@ void IsisMain() {
 
   // Get the input file list to make sure it is not empty and the master cube is included
   FileList list;
-  list.Read(ui.GetFileName("FROMLIST"));
+  list.read(ui.GetFileName("FROMLIST"));
 
   if(list.size() < 1) {
     string msg = "The input list file [" + ui.GetFileName("FROMLIST") + "is empty";
@@ -37,11 +37,11 @@ void IsisMain() {
 
   int ifile = 0;
   // Make sure the master file is included in the input file list
-  while(ifile < (int) list.size() && FileName(list[ifile]).expanded() != FileName(ui.GetFileName("MASTER")).expanded()) {
+  while(ifile < (int) list.size() && list[ifile].toString() != FileName(ui.GetFileName("MASTER")).expanded()) {
     ifile++;
   }
 
-  if(ifile >= (int) list.size()) {
+  if(ifile >= list.size()) {
     string msg = "The master file, [" + FileName(ui.GetFileName("MASTER")).expanded() + " is not included in " +
                  "the input list file " + ui.GetFileName("FROMLIST") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -129,10 +129,10 @@ void IsisMain() {
 
     // Apply the dejittered pointing to the rest of the files
     step2 = true;
-    for(int ifile = 0; ifile < (int) list.size(); ifile++) {
-      if(list[ifile] != ui.GetFileName("MASTER")) {
+    for(int ifile = 0; ifile < list.size(); ifile++) {
+      if(list[ifile].toString() != ui.GetFileName("MASTER")) {
         // Open the cube
-        cube.open(list[ifile], "rw");
+        cube.open(list[ifile].toString(), "rw");
         //check for existing polygon, if exists delete it
         if(cube.getLabel()->HasObject("Polygon")) {
           cube.getLabel()->DeleteObject("Polygon");
@@ -147,7 +147,7 @@ void IsisMain() {
         cube.write(cmatrix);
         cube.putGroup(kernels);
         cube.close();
-        gp += PvlKeyword("Status" + iString(ifile), list[ifile] + ":  camera pointing updated");
+        gp += PvlKeyword("Status" + iString(ifile), list[ifile].toString() + ":  camera pointing updated");
       }
     }
     Application::Log(gp);

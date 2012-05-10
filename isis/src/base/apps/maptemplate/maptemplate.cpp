@@ -518,7 +518,7 @@ void addResolution(PvlGroup &mapping) {
 void calcRange(double &minLat, double &maxLat,
                double &minLon, double &maxLon) {
   UserInterface &ui = Application::GetUserInterface();
-  FileList flist(ui.GetFileName("FROMLIST"));
+  FileList flist(FileName(ui.GetFileName("FROMLIST")));
   minLat = DBL_MAX;
   maxLat = -DBL_MAX;
   minLon = DBL_MAX;
@@ -566,14 +566,14 @@ void calcRange(double &minLat, double &maxLat,
     userMap.AddGroup(userGrp);
   }
 
-  for(int i = 0; i < (int)flist.size(); i++) {
+  for(int i = 0; i < flist.size(); i++) {
 // Get the mapping group from the camera
     double camMinLat;
     double camMaxLat;
     double camMinLon;
     double camMaxLon;
     Cube c;
-    c.open(flist[i]);
+    c.open(flist[i].toString());
     Camera *cam = c.getCamera();
     Pvl defaultMap;
     cam->BasicMapping(defaultMap);
@@ -606,14 +606,14 @@ void calcRange(double &minLat, double &maxLat,
 //  value will be in meters
 double calcResolution() {
   UserInterface &ui = Application::GetUserInterface();
-  FileList flist(ui.GetFileName("FROMLIST"));
+  FileList flist(FileName(ui.GetFileName("FROMLIST")));
   double sumRes = 0.0;
   double highRes = DBL_MAX;
   double lowRes = -DBL_MAX;
 // Loop through the from list at get high and low camera resolution
-  for(int i = 0; i < (int)flist.size(); i++) {
+  for(int i = 0; i < flist.size(); i++) {
     Cube c;
-    c.open(flist[i]);
+    c.open(flist[i].toString());
     Camera *cam = c.getCamera();
     double camLowRes = cam->LowestImageResolution();
     double camHighRes = cam->HighestImageResolution();

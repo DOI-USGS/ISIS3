@@ -23,12 +23,12 @@
 #ifndef FileList_h
 #define FileList_h
 
-#include <vector>
-#include <string>
-#include <fstream>
+#include <QList>
 #include <iostream>
 
 namespace Isis {
+  class FileName;
+  class iString;
   /**
    * @brief Internalizes a list of files.
    *
@@ -58,24 +58,26 @@ namespace Isis {
    *                                          files
    *   @history 2007-01-04 Brendan George - Added comment recognition and it now
    *                                          only reads the first column
-   *  @history 2007-02-19 Stacy Alley - modified the Read method
+   *   @history 2007-02-19 Stacy Alley - modified the Read method
    *           such that if a file name and it's attributes are
    *           surround with double quotes, then don't use commas
    *           as a 'end of line' signal.
    */
-  class FileList : public std::vector<std::string> {
+  class FileList : public QList<FileName> {
     public:
-      FileList(const std::string &list);
+      //FileList(iString  listFileString);
+      FileList(FileName listFile);
       FileList(std::istream &in);
       FileList();
 
       //! Destroys the FileList object.
       ~FileList() {};
 
-      void Read(const std::string &list);
-      void Read(std::istream &in);
-      void Write(const std::string &list);
-      void Write(std::ostream &out);
+      void read(FileName listFile);
+      //void read(const std::string &list);
+      void read(std::istream &in);
+      void write(FileName outputFileList);
+      void write(std::ostream &out);
   };
 };
 

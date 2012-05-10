@@ -31,8 +31,8 @@ void IsisMain() {
   FileList list2(ui.GetFileName("LIST2"));
 
   SerialNumberList snl(ui.GetFileName("LIST3"));
-  for(unsigned int f = 0; f < list2.size(); f++) {
-    iString currFile(list2[f]);
+  for (int f = 0; f < list2.size(); f++) {
+    iString currFile(list2[f].toString());
     Pvl lab(currFile);
     PvlObject qube(lab.FindObject("QUBE"));
     string fsc;

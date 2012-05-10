@@ -17,8 +17,8 @@ void IsisMain() {
   // Get the list of names of input CCD cubes to stitch together
   FileList flist;
   UserInterface &ui = Application::GetUserInterface();
-  if (ui.WasEntered("FROM")) flist.push_back(ui.GetFileName("FROM"));
-  if (ui.WasEntered("FROMLIST")) flist.Read(ui.GetFileName("FROMLIST"));
+  if (ui.WasEntered("FROM")) flist.push_back(FileName(ui.GetFileName("FROM")));
+  if (ui.WasEntered("FROMLIST")) flist.read(FileName(ui.GetFileName("FROMLIST")));
   if (flist.size() < 1) {
     string msg = "Files must be specified in FROM and/or FROMLIST - none found!";
     throw IException(IException::User,msg,_FILEINFO_);
@@ -29,9 +29,9 @@ void IsisMain() {
   prog.SetMaximumSteps(flist.size());
   prog.CheckStatus();
 
-  for (unsigned int i = 0 ; i < flist.size() ; i++) {
+  for (int i = 0 ; i < flist.size() ; i++) {
     // Add and process each image
-    kernel.add(flist[i]);
+    kernel.add(flist[i].toString());
     prog.CheckStatus();
   }
 

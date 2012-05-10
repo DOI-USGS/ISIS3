@@ -22,8 +22,8 @@ void IsisMain() {
   if (ui.WasEntered("EXCLUDE")) analyzer.setExclude(ui.GetString("EXCLUDE"));
   if (ui.WasEntered("EXCLUDEFROM") ) {
     FileList elist(ui.GetFileName("EXCLUDEFROM"));
-    for (unsigned int i = 0 ; i < elist.size() ; i++ ) {
-      analyzer.exclude(elist[i]);
+    for (int i = 0 ; i < elist.size() ; i++ ) {
+      analyzer.exclude(elist[i].toString());
     }
   }
 
@@ -31,8 +31,8 @@ void IsisMain() {
   if (ui.WasEntered("INCLUDE")) analyzer.setInclude(ui.GetString("INCLUDE"));
   if (ui.WasEntered("INCLUDEFROM") ) {
     FileList ilist(ui.GetFileName("INCLUDEFROM"));
-    for (unsigned int i = 0 ; i < ilist.size() ; i++ ) {
-      analyzer.include(ilist[i]);
+    for (int i = 0 ; i < ilist.size() ; i++ ) {
+      analyzer.include(ilist[i].toString());
     }
   }
 

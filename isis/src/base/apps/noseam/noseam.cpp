@@ -16,7 +16,7 @@ void IsisMain() {
   //Get user parameters
   UserInterface &ui = Application::GetUserInterface();
   FileList cubes;
-  cubes.Read(ui.GetFileName("FROMLIST"));
+  cubes.read(ui.GetFileName("FROMLIST"));
 
   int hns = ui.GetInteger("HNS");
   int hnl = ui.GetInteger("HNL");
@@ -25,7 +25,7 @@ void IsisMain() {
   string match = ui.GetAsString("MATCHBANDBIN");
 
   //Sets upt the pathName to be used for most application calls
-  FileName inFile = Isis::FileName(cubes[0]);
+  FileName inFile = cubes[0];
 
   Pvl &pref = Preference::Preferences();
   string pathName = (string)pref.FindGroup("DataDirectory")["Temporary"] + "/";
@@ -43,8 +43,8 @@ void IsisMain() {
   //Creates the highpass cubes from the cubes FileList
   std::ofstream highPassList;
   highPassList.open("HighPassList.lis");
-  for(unsigned i = 0; i < cubes.size(); i++) {
-    inFile = Isis::FileName(cubes[i]);
+  for(int i = 0; i < cubes.size(); i++) {
+    inFile = cubes[i];
     string outParam = pathName + inFile.baseName() + "_highpass.cub";
     parameters = "FROM=" + inFile.expanded() +
                  " TO=" + outParam
@@ -84,8 +84,8 @@ void IsisMain() {
     file = pathName + "OriginalMosaic.cub";
     remove(file.c_str());
 
-    for(unsigned i = 0; i < cubes.size(); i++) {
-      inFile = Isis::FileName(cubes[i]);
+    for(int i = 0; i < cubes.size(); i++) {
+      inFile = cubes[i];
       file = pathName + inFile.baseName() + "_highpass.cub";
       remove(file.c_str());
     }

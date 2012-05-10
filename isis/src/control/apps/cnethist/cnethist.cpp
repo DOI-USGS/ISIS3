@@ -26,12 +26,15 @@ QColor curveColor(int i);
 void IsisMain() {
   Process p;
   Progress progress;
-  //Cube *icube = p.SetInputCube("FROM");
+
   UserInterface &ui = Application::GetUserInterface();
 
-  //iString filename = ui.GetFilename("FROM");
-
-  FileList fList(ui.GetFileName("NETLIST")); //empty FileList
+  //prepare the list of net files
+  FileList fList;  //empty FileList
+  if (ui.WasEntered("FROMLIST"))
+    fList.read(ui.GetFileName("FROMLIST"));
+  if (ui.WasEntered("CNET"))
+    fList << ui.GetFileName("CNET");
 
   HistogramPlotWindow *plot=NULL;
 
@@ -84,16 +87,15 @@ void IsisMain() {
   }
 
   //loop throught the control nets writing reports and drawing histograms as needed
-  for (unsigned int i=0;i<fList.size();i++) {
-
-    ControlNet net(fList[i],&progress);
+  for (int i=0;i<fList.size();i++) {  
+    ControlNet net(fList[i].toString(),&progress);
     // Setup the histogram
     Histogram hist(net, &ControlMeasure::GetResidualMagnitude, ui.GetDouble("BIN_WIDTH"));
        
 
     //Tabular Histogram Data 
     if(!ui.IsInteractive() || ui.WasEntered("TO")) {
-      fout << "Network:        " << fList[i] << endl;
+      fout << "Network:        " << fList[i].toString() << endl;
       fout << "Average:        " << hist.Average() << endl;
       fout << "Std Deviation:  " << hist.StandardDeviation() << endl;
       fout << "Variance:       " << hist.Variance() << endl;

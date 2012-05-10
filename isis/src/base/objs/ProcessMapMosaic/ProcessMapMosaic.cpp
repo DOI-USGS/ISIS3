@@ -179,10 +179,10 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    for(unsigned int i = 0; i < propagationCubes.size(); i++) {
+    for(int i = 0; i < propagationCubes.size(); i++) {
       // Open the cube and get the maximum number of band in all cubes
       Cube cube;
-      cube.open(propagationCubes[i]);
+      cube.open(propagationCubes[i].toString());
       bands = max(bands, cube.getBandCount());
 
       // See if the cube has a projection and make sure it matches
@@ -191,7 +191,7 @@ namespace Isis {
           Isis::ProjectionFactory::CreateFromCube(*(cube.getLabel()));
       if((proj != NULL) && (*proj != *projNew)) {
         string msg = "Mapping groups do not match between cubes [" +
-                     propagationCubes[0] + "] and [" + propagationCubes[i] + "]";
+                     propagationCubes[0].toString() + "] and [" + propagationCubes[i].toString() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -223,7 +223,7 @@ namespace Isis {
 
     if(proj) delete proj;
 
-    return SetOutputCube(propagationCubes[0], xmin, xmax, ymin, ymax,
+    return SetOutputCube(propagationCubes[0].toString(), xmin, xmax, ymin, ymax,
                          slat, elat, slon, elon, bands, oAtt, mosaicFile);
   }
 
@@ -239,7 +239,7 @@ namespace Isis {
 
     int samples, lines, bands = 0;
     Pvl label;
-    label.Read(propagationCubes[0]);
+    label.Read(propagationCubes[0].toString());
     PvlGroup mGroup = label.FindGroup("Mapping", Pvl::Traverse);
     mGroup.AddKeyword(PvlKeyword("MinimumLatitude", slat), Pvl::Replace);
     mGroup.AddKeyword(PvlKeyword("MaximumLatitude", elat), Pvl::Replace);
@@ -265,9 +265,9 @@ namespace Isis {
     xmin = mapPvl.FindGroup("Mapping")["UpperLeftCornerX"];
     ymax = mapPvl.FindGroup("Mapping")["UpperLeftCornerY"];
 
-    for(unsigned int i = 0; i < propagationCubes.size(); i++) {
+    for(int i = 0; i < propagationCubes.size(); i++) {
       Cube cube;
-      cube.open(propagationCubes[i]);
+      cube.open(propagationCubes[i].toString());
       bands = max(cube.getBandCount(), bands);
 
       // See if the cube has a projection and make sure it matches
@@ -278,8 +278,8 @@ namespace Isis {
       if(proj == NULL) {
       }
       else if(*proj != *projNew) {
-        string msg = "Mapping groups do not match between cube [" + propagationCubes[i] +
-                     "] and [" + propagationCubes[0] + "]";
+        string msg = "Mapping groups do not match between cube [" + propagationCubes[i].toString() +
+                     "] and [" + propagationCubes[0].toString() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -289,7 +289,7 @@ namespace Isis {
 
     if(proj) delete proj;
 
-    return SetOutputCube(propagationCubes[0], xmin, xmax, ymin, ymax,
+    return SetOutputCube(propagationCubes[0].toString(), xmin, xmax, ymin, ymax,
                          slat, elat, slon, elon, bands, oAtt, mosaicFile);
   }
 

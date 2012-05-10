@@ -32,12 +32,12 @@ void IsisMain() {
   int nsamps(0), nlines(0), nbands(0);
   PvlGroup outBandBin("BandBin");
   try {
-    for(unsigned int i = 0; i < cubeList.size(); i++) {
+    for(int i = 0; i < cubeList.size(); i++) {
       Cube cube;
-      CubeAttributeInput inatt(cubeList[i]);
+      CubeAttributeInput inatt(cubeList[i].toString());
       vector<string> bands = inatt.Bands();
       cube.setVirtualBands(bands);
-      cube.open(cubeList[i]);
+      cube.open(cubeList[i].toString());
       if(i == 0) {
         nsamps = cube.getSampleCount();
         nlines = cube.getLineCount();
@@ -47,7 +47,7 @@ void IsisMain() {
         // Make sure they are all the same size
         if((nsamps != cube.getSampleCount()) || (nlines != cube.getLineCount())) {
           string msg = "Spatial dimensions of cube [" +
-                       cubeList[i] + "] does not match other cubes in list";
+                       cubeList[i].toString() + "] does not match other cubes in list";
           throw IException(IException::User, msg, _FILEINFO_);
         }
         // Get the total number of bands
@@ -87,8 +87,8 @@ void IsisMain() {
   if(ui.WasEntered("PROPLAB")) {
     bool match = false;
     string fname = (iString)ui.GetFileName("PROPLAB");
-    for(int i = 0; i < (int)cubeList.size(); i++) {
-      if(fname == FileName(cubeList[i]).expanded()) {
+    for(int i = 0; i < cubeList.size(); i++) {
+      if(fname == cubeList[i].toString()) {
         index = i;
         match = true;
         break;
@@ -101,7 +101,7 @@ void IsisMain() {
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
-  p2.SetInputCube(cubeList[index], inatt);
+  p2.SetInputCube(cubeList[index].toString(), inatt);
 
 
   // Create the output cube
@@ -119,7 +119,7 @@ void IsisMain() {
 
   // Now loop and mosaic in each cube
   int sband = 1;
-  for(unsigned int i = 0; i < cubeList.size(); i++) {
+  for(int i = 0; i < cubeList.size(); i++) {
     ProcessMosaic m;
     m.SetBandBinMatch(false);
 
@@ -127,8 +127,8 @@ void IsisMain() {
     prog->SetText("Adding band " + iString((int)i + 1) +
                   " of " + iString(nbands));
     m.SetOutputCube("TO");
-    CubeAttributeInput attrib(cubeList[i]);
-    Cube *icube = m.SetInputCube(cubeList[i], attrib);
+    CubeAttributeInput attrib(cubeList[i].toString());
+    Cube *icube = m.SetInputCube(cubeList[i].toString(), attrib);
     m.SetPriority(ProcessMosaic::input);
     m.StartProcess(1, 1, sband);
     sband += icube->getBandCount();

@@ -42,8 +42,8 @@ namespace Isis {
         progress->SetMaximumSteps((int) flist.size() + 1);
         progress->CheckStatus();
       }
-      for(int i = 0; i < (int)flist.size(); i++) {
-        Add(flist[i]);
+      for(int i = 0; i < flist.size(); i++) {
+        Add(flist[i].toString());
         if(progress != NULL) {
           progress->CheckStatus();
         }

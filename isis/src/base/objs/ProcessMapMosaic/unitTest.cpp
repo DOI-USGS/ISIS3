@@ -20,7 +20,7 @@ void IsisMain() {
 
   // Create the temp parent cube
   FileList cubes;
-  cubes.Read("unitTest.lis");
+  cubes.read("unitTest.lis");
 
   cout << "Testing Mosaic 1" << endl;
   ProcessMapMosaic m1;
@@ -32,12 +32,12 @@ void IsisMain() {
   //set priority
   m1.SetPriority(priority);
 
-  for(unsigned int i = 0; i < cubes.size(); i++) {
-    if(m1.StartProcess(cubes[i])) {
-      cout << cubes[i] << " is inside the mosaic" << endl;
+  for(int i = 0; i < cubes.size(); i++) {
+    if(m1.StartProcess(cubes[i].toString())) {
+      cout << cubes[i].toString() << " is inside the mosaic" << endl;
     }
     else {
-      cout << cubes[i] << " is outside the mosaic" << endl;
+      cout << cubes[i].toString() << " is outside the mosaic" << endl;
     }
   }
 
@@ -57,12 +57,12 @@ void IsisMain() {
   //set priority
   m2.SetPriority(priority);
 
-  for(unsigned int i = 0; i < cubes.size(); i++) {
-    if(m2.StartProcess(cubes[i])) {
-      cout << cubes[i] << " is inside the mosaic" << endl;
+  for(int i = 0; i < cubes.size(); i++) {
+    if(m2.StartProcess(cubes[i].toString())) {
+      cout << cubes[i].toString() << " is inside the mosaic" << endl;
     }
     else {
-      cout << cubes[i] << " is outside the mosaic" << endl;
+      cout << cubes[i].toString() << " is outside the mosaic" << endl;
     }
   }
 

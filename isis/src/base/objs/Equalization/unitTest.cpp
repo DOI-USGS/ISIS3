@@ -65,10 +65,10 @@ int main(int argc, char *argv[]) {
 
     // Open input cube
     FileList imageList(fromList);
-    for (unsigned int i = 0; i < imageList.size(); i++) {
+    for (int i = 0; i < imageList.size(); i++) {
       ProcessByLine p;
       CubeAttributeInput att;
-      const string inp = imageList[i];
+      const string inp = imageList[i].toString();
       Cube *inputCube = p.SetInputCube(inp, att);
       TestFunctor func(&equalizer, inputCube->getLineCount(), i);
       p.ProcessCubeInPlace(func, false);

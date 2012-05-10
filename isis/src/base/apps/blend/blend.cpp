@@ -140,9 +140,9 @@ void IsisMain() {
       readOutputs(ui.GetFileName("TOLIST"), inputs, outputs) :
       generateOutputs(inputs, outputs);
 
-  for (unsigned int i = 0; i < inputs.size(); i++) {
-    FileName inputFileName(inputs[i]);
-    FileName outputFileName(outputs[i]);
+  for (int i = 0; i < inputs.size(); i++) {
+    FileName inputFileName=inputs[i];
+    FileName outputFileName=outputs[i];
     QString input(inputFileName.expanded());
     QString output(outputFileName.expanded());
 
@@ -154,19 +154,19 @@ void IsisMain() {
   }
 
   QSet<QString> overlapped;
-  for (unsigned int j = 1; j < outputs.size(); j++) {
+  for (int j = 1; j < outputs.size(); j++) {
     Cube from2;
-    from2.open(outputs[j]);
+    from2.open(outputs[j].toString());
 
-    for (unsigned int i = 0; i < j; i++) {
+    for (int i = 0; i < j; i++) {
       Cube from1;
-      from1.open(outputs[i]);
+      from1.open(outputs[i].toString());
 
       OverlapStatistics oStats(from1, from2);
 
       if (oStats.HasOverlap()) {
-        overlapped.insert(QString::fromStdString(inputs[j]));
-        overlapped.insert(QString::fromStdString(inputs[i]));
+        overlapped.insert(QString::fromStdString(inputs[j].toString()));
+        overlapped.insert(QString::fromStdString(inputs[i].toString()));
 
         i1 = new Chip(oStats.Samples() + 2, oStats.Lines() + 2);
         int from1CenterSample =
@@ -200,7 +200,7 @@ void IsisMain() {
         ProcessByLine p;
         CubeAttributeInput att;
 
-        iString cubeName = outputs[i];
+        iString cubeName = outputs[i].toString();
         p.SetInputCube(cubeName, att, ReadWrite);
 
         p.StartProcess(blend);
@@ -214,7 +214,7 @@ void IsisMain() {
 
         line = 1;
 
-        cubeName = outputs[j];
+        cubeName = outputs[j].toString();
         p.SetInputCube(cubeName, att, ReadWrite);
 
         p.StartProcess(blend);
@@ -235,9 +235,9 @@ void IsisMain() {
 
   // Make sure cube projection overlaps at least one other cube
   if (ui.GetBoolean("ERROR")) {
-    for (unsigned int i = 1; i < inputs.size(); i++) {
-      if (!overlapped.contains(QString::fromStdString(inputs[i]))) {
-        string msg = "Input Cube [" + inputs[i] +
+    for (int i = 1; i < inputs.size(); i++) {
+      if (!overlapped.contains(QString::fromStdString(inputs[i].toString()))) {
+        string msg = "Input Cube [" + inputs[i].toString() +
           "] does not overlap another cube";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -392,7 +392,7 @@ void processNodes(QQueue<Node> &nodes, QVector<int> &ol,
 
 
 void readOutputs(string outName, const FileList &inputs, FileList &outputs) {
-  outputs.Read(outName);
+  outputs.read(outName);
 
   // Make sure each file in the tolist matches a file in the fromlist
   if (outputs.size() != inputs.size()) {
@@ -403,9 +403,9 @@ void readOutputs(string outName, const FileList &inputs, FileList &outputs) {
 
   // Make sure that every output file has a different filename from its
   // corresponding input file
-  for (unsigned i = 0; i < outputs.size(); i++) {
-    if (outputs[i].compare(inputs[i]) == 0) {
-      string msg = "The to list file [" + outputs[i] +
+  for (int i = 0; i < outputs.size(); i++) {
+    if (outputs[i].toString().compare(inputs[i].toString()) == 0) {
+      string msg = "The to list file [" + outputs[i].toString() +
         "] has the same name as its corresponding from list file.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -414,8 +414,8 @@ void readOutputs(string outName, const FileList &inputs, FileList &outputs) {
 
 
 void generateOutputs(const FileList &inputs, FileList &outputs) {
-  for (unsigned int i = 0; i < inputs.size(); i++) {
-    FileName file(inputs[i]);
+  for (int i = 0; i < inputs.size(); i++) {
+    FileName file=inputs[i];
     iString filename = file.path() + "/" + file.baseName() +
       ".blend." + file.extension();
     outputs.push_back(filename);

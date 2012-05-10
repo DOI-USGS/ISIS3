@@ -3,9 +3,8 @@ APPNAME = cnetwinnow
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
-	$(CP) $(INPUT)/*.cub $(OUTPUT) > /dev/null;
-	$(LS) -1 $(OUTPUT)/*.cub > $(OUTPUT)/cube.lis;
-	$(APPNAME) fromlist=$(OUTPUT)/cube.lis \
+	$(LS) -1 $(INPUT)/*.cub > $(INPUT)/cube.lis;
+	$(APPNAME) fromlist=$(INPUT)/cube.lis \
 	cnet=$(INPUT)/inputNet.net \
 	onet=$(OUTPUT)/winnowed.net \
         file_prefix = winnowingReport > /dev/null;
@@ -23,5 +22,4 @@ commands:
 	# 4. remove date and time
 	$(RM) winnowingReportGuilty.csv > /dev/null;
 	$(RM) winnowingReportIgnored.csv > /dev/null;
-	$(RM) $(OUTPUT)/cube.lis > /dev/null;
-	$(RM) $(OUTPUT)/*.cub > /dev/null;
+	$(RM) $(INPUT)/cube.lis > /dev/null;

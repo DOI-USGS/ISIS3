@@ -112,9 +112,9 @@ void IsisMain() {
     progress.CheckStatus();
   }
 
-  for(int index = 0; (unsigned)index < inlist.size(); index ++) {
-    num2cube.Add(inlist[index]);
-    iString st = num2cube.SerialNumber(inlist[index]);
+  for(int index = 0; index < inlist.size(); index ++) {
+    num2cube.Add(inlist[index].toString());
+    iString st = num2cube.SerialNumber(inlist[index].toString());
     inListNums.insert(st);
     listedSerialNumbers.push_back(st);   // Used with nonListedSerialNumbers
     progress.CheckStatus();

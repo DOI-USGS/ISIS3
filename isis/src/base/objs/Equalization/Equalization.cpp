@@ -47,7 +47,7 @@ namespace Isis {
 
   void Equalization::addHolds(string holdListName) {
     FileList holdList;
-    holdList.Read(holdListName);
+    holdList.read(FileName(holdListName));
 
     if (holdList.size() > m_imageList.size()) {
       string msg = "The list of identifiers to be held must be less than or ";
@@ -56,9 +56,9 @@ namespace Isis {
     }
 
     // Make sure each file in the holdlist matches a file in the fromlist
-    for (unsigned int i = 0; i < holdList.size(); i++) {
+    for (int i = 0; i < holdList.size(); i++) {
       bool matched = false;
-      for (unsigned int j = 0; j < m_imageList.size(); j++) {
+      for (int j = 0; j < m_imageList.size(); j++) {
         if (holdList[i] == m_imageList[j]) {
           matched = true;
           m_holdIndices.push_back(j);
@@ -66,7 +66,7 @@ namespace Isis {
         }
       }
       if (!matched) {
-        string msg = "The hold list file [" + holdList[i] +
+        string msg = "The hold list file [" + holdList[i].toString() +
                           "] does not match a file in the from list";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -95,7 +95,7 @@ namespace Isis {
           " of " + iString(m_maxCube);
         p.Progress()->SetText(statMsg);
         CubeAttributeInput att("+" + bandStr);
-        const string inp = m_imageList[img];
+        const string inp = m_imageList[img].toString();
         p.SetInputCube(inp, att);
 
         Statistics *stats = new Statistics();
@@ -116,21 +116,21 @@ namespace Isis {
     // A list for keeping track of which input cubes are known to overlap
     // another
     vector<bool> doesOverlapList;
-    for (unsigned int i = 0; i < m_imageList.size(); i++)
+    for (int i = 0; i < m_imageList.size(); i++)
       doesOverlapList.push_back(false);
 
     // Find overlapping areas and add them to the set of known overlaps for
     // each band shared amongst cubes
     vector<OverlapStatistics> overlapList;
-    for (unsigned int i = 0; i < m_imageList.size(); i++) {
+    for (int i = 0; i < m_imageList.size(); i++) {
       addAdjustment(new ImageAdjustment());
 
       Cube cube1;
-      cube1.open(m_imageList[i]);
+      cube1.open(m_imageList[i].toString());
 
-      for (unsigned int j = (i + 1); j < m_imageList.size(); j++) {
+      for (int j = (i + 1); j < m_imageList.size(); j++) {
         Cube cube2;
-        cube2.open(m_imageList[j]);
+        cube2.open(m_imageList[j].toString());
         iString cubeStr1((int)(i + 1));
         iString cubeStr2((int)(j + 1));
         string statMsg = "Gathering Overlap Statisitcs for Cube " +
@@ -167,10 +167,10 @@ namespace Isis {
     // Print an error if one or more of the images does not overlap another
     {
       string badFiles = "";
-      for (unsigned int img = 0; img < m_imageList.size(); img++) {
+      for (int img = 0; img < m_imageList.size(); img++) {
         // Print the name of each input cube without an overlap
         if (!doesOverlapList[img]) {
-          badFiles += "[" + m_imageList[img] + "] ";
+          badFiles += "[" + m_imageList[img].toString() + "] ";
         }
       }
       if (badFiles != "") {
@@ -228,12 +228,12 @@ namespace Isis {
     gen += PvlKeyword("Weighted", (m_wtopt) ? "true" : "false");
     gen += PvlKeyword("MinCount", m_mincnt);
     equ.AddGroup(gen);
-    for (unsigned int img = 0; img < m_imageList.size(); img++) {
+    for (int img = 0; img < m_imageList.size(); img++) {
       // Format and name information
       PvlGroup norm("Normalization");
       norm.AddComment("Formula: newDN = (oldDN - AVERAGE) * GAIN + AVERAGE + OFFSET");
       norm.AddComment("BandN = (GAIN, OFFSET, AVERAGE)");
-      norm += PvlKeyword("FileName", m_imageList[img]);
+      norm += PvlKeyword("FileName", m_imageList[img].original());
 
       // Band by band statistics
       for (int band = 1; band <= m_maxBand; band++) {
@@ -287,7 +287,7 @@ namespace Isis {
     fillOutList(outList, toListName);
 
     iString maxCubeStr((int) m_imageList.size());
-    for (unsigned int img = 0; img < m_imageList.size(); img++) {
+    for (int img = 0; img < m_imageList.size(); img++) {
       // Set up for progress bar
       ProcessByLine p;
       p.Progress()->SetText("Equalizing Cube " + iString((int) img + 1) +
@@ -295,11 +295,11 @@ namespace Isis {
 
       // Open input cube
       CubeAttributeInput att;
-      const string inp = m_imageList[img];
+      const string inp = m_imageList[img].toString();
       Cube *icube = p.SetInputCube(inp, att);
 
       // Allocate output cube
-      string out = outList[img];
+      string out = outList[img].toString();
       CubeAttributeOutput outAtt;
       p.SetOutputCube(out, outAtt, icube->getSampleCount(),
           icube->getLineCount(), icube->getBandCount());
@@ -322,8 +322,8 @@ namespace Isis {
     results += PvlKeyword("MinCount", m_mincnt);
 
     // Name and band modifiers for each image
-    for (unsigned int img = 0; img < m_imageList.size(); img++) {
-      results += PvlKeyword("FileName", m_imageList[img]);
+    for (int img = 0; img < m_imageList.size(); img++) {
+      results += PvlKeyword("FileName", m_imageList[img].toString());
 
       // Band by band statistics
       for (int band = 1; band <= m_maxBand; band++) {
@@ -358,7 +358,7 @@ namespace Isis {
 
   void Equalization::loadInputs(string fromListName) {
     // Get the list of cubes to mosaic
-    m_imageList.Read(fromListName);
+    m_imageList.read(fromListName);
     m_maxCube = m_imageList.size();
 
     if (m_imageList.size() < 2) {
@@ -368,7 +368,7 @@ namespace Isis {
     }
 
     Cube tempCube;
-    tempCube.open(m_imageList[0]);
+    tempCube.open(m_imageList[0].toString());
     m_maxBand = tempCube.getBandCount();
 
     errorCheck(fromListName);
@@ -392,18 +392,18 @@ namespace Isis {
 
 
   void Equalization::errorCheck(string fromListName) {
-    for (unsigned int i = 0; i < m_imageList.size(); i++) {
+    for (int i = 0; i < m_imageList.size(); i++) {
       Cube cube1;
-      cube1.open(m_imageList[i]);
+      cube1.open(m_imageList[i].toString());
 
-      for (unsigned int j = (i + 1); j < m_imageList.size(); j++) {
+      for (int j = (i + 1); j < m_imageList.size(); j++) {
         Cube cube2;
-        cube2.open(m_imageList[j]);
+        cube2.open(m_imageList[j].toString());
 
         // Make sure number of bands match
         if (m_maxBand != cube2.getBandCount()) {
           string msg = "Number of bands do not match between cubes [" +
-            m_imageList[i] + "] and [" + m_imageList[j] + "]";
+            m_imageList[i].toString() + "] and [" + m_imageList[j].toString() + "]";
           throw IException(IException::User, msg, _FILEINFO_);
         }
 
@@ -414,7 +414,7 @@ namespace Isis {
         // Test to make sure projection parameters match
         if (*proj1 != *proj2) {
           string msg = "Mapping groups do not match between cubes [" +
-            m_imageList[i] + "] and [" + m_imageList[j] + "]";
+            m_imageList[i].toString() + "] and [" + m_imageList[j].toString() + "]";
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }
@@ -423,17 +423,17 @@ namespace Isis {
 
 
   void Equalization::generateOutputs(FileList &outList) {
-    for (unsigned int img = 0; img < m_imageList.size(); img++) {
+    for (int img = 0; img < m_imageList.size(); img++) {
       FileName file(m_imageList[img]);
       string filename = file.path() + "/" + file.baseName() +
         ".equ." + file.extension();
-      outList.push_back(filename);
+      outList.push_back(FileName(filename));
     }
   }
 
 
   void Equalization::loadOutputs(FileList &outList, string toListName) {
-    outList.Read(toListName);
+    outList.read(FileName(toListName));
 
     // Make sure each file in the tolist matches a file in the fromlist
     if (outList.size() != m_imageList.size()) {
@@ -444,9 +444,9 @@ namespace Isis {
 
     // Make sure that all output files do not have the same names as their
     // corresponding input files
-    for (unsigned i = 0; i < outList.size(); i++) {
-      if (outList[i].compare(m_imageList[i]) == 0) {
-        string msg = "The to list file [" + outList[i] +
+    for (int i = 0; i < outList.size(); i++) {
+      if (outList[i].toString().compare(m_imageList[i].toString()) == 0) {
+        string msg = "The to list file [" + outList[i].toString() +
           "] has the same name as its corresponding from list file.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -499,7 +499,7 @@ namespace Isis {
     PvlObject &equalInfo = inStats.FindObject("EqualizationInformation");
 
     // Make sure each file in the instats matches a file in the fromlist
-    if (m_imageList.size() > (unsigned)equalInfo.Groups() - 1) {
+    if (m_imageList.size() > equalInfo.Groups() - 1) {
       string msg = "Each input file in the FROM LIST must have a ";
       msg += "corresponding input file in the INPUT STATISTICS.";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -508,8 +508,8 @@ namespace Isis {
     vector<int> normIndices;
 
     // Check that each file in the FROM LIST is present in the INPUT STATISTICS
-    for (unsigned i = 0; i < m_imageList.size(); i++) {
-      string fromFile = m_imageList[i];
+    for (int i = 0; i < m_imageList.size(); i++) {
+      string fromFile = m_imageList[i].original();
       bool foundFile = false;
       for (int j = 1; j < equalInfo.Groups(); j++) {
         PvlGroup &normalization = equalInfo.Group(j);

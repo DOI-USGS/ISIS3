@@ -1,18 +1,20 @@
 #include "FileList.h"
 #include "IException.h"
 #include "Preference.h"
+#include "FileName.h"
 
 using namespace std;
+using namespace Isis;
 
 int main(void) {
   Isis::Preference::Preferences(true);
-  cout << "Testing on unitTest.list:" << endl;
-  Isis::FileList fl2("unitTest.list");
-  fl2.Write(cout);
+  cerr << "Testing on unitTest.list:" << endl;
+  FileList fl2(FileName("unitTest.list"));
+  fl2.write(cout);
 
-  cout << "Testing on nonexistant file:" << endl;
+  cerr << "Testing on nonexistant file:" << endl;
   try {
-    Isis::FileList fl2("NoWayThisFileExists");
+    FileList fl2(FileName("NoWayThisFileExists"));
   }
   catch(Isis::IException &e) {
 //    e.print();

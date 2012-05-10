@@ -28,6 +28,7 @@
 #include "CubeCalculator.h"
 #include "CubeInfixToPostfix.h"
 #include "FileList.h"
+#include "FileName.h"
 #include "ProcessByLine.h"
 
 
@@ -55,13 +56,12 @@ void IsisMain() {
     outCube = p.SetOutputCube("TO");
   }
   else if(ui.GetString("MODE") == "LIST") {
-    string inputFileName = ui.GetFileName("FROMLIST");
-    FileList list(inputFileName);
+    FileList list(ui.GetFileName("FROMLIST"));
 
     // Run through file list and set its entries as input cubes
-    for(int i = 0; i < (int)list.size(); i++) {
-      CubeAttributeInput att(list[i]);
-      cubes.push_back(p.SetInputCube(list[i], att, Isis::AllMatchOrOne));
+    for(int i = 0; i < list.size(); i++) {
+      CubeAttributeInput att(list[i].toString());
+      cubes.push_back(p.SetInputCube(list[i].toString(), att, Isis::AllMatchOrOne));
     }
     outCube = p.SetOutputCube("TO");
   }

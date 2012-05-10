@@ -16,7 +16,7 @@ void IsisMain() {
   //Get user parameters
   UserInterface &ui = Application::GetUserInterface();
   FileList cubes;
-  cubes.Read(ui.GetFileName("FROMLIST"));
+  cubes.read(ui.GetFileName("FROMLIST"));
   string PRIORITY = ui.GetString("PRIORITY");
   string HNS1 = ui.GetAsString("HNS1");
   string HNL1 = ui.GetAsString("HNL1");
@@ -42,8 +42,8 @@ void IsisMain() {
   std::ofstream firstHighPassList;
   string firstHighPass(cubeListBaseName + "_FirstHighPassList.lis");
   firstHighPassList.open(firstHighPass.c_str());
-  for(unsigned i = 0; i < cubes.size(); i++) {
-    FileName inFile = Isis::FileName(cubes[i]);
+  for (int i = 0; i < cubes.size(); i++) {
+    FileName inFile = cubes[i];
     string outParam = pathName + inFile.baseName() + "_hpffirst.cub";
     string parameters = "FROM=" + inFile.expanded()
                         + " TO=" + outParam
@@ -59,8 +59,8 @@ void IsisMain() {
   std::ofstream secondHighPassList;
   string secondHighPass(cubeListBaseName + "_SecondHighPassList.lis");
   secondHighPassList.open(secondHighPass.c_str());
-  for(unsigned i = 0; i < cubes.size(); i++) {
-    FileName inFile = Isis::FileName(cubes[i]);
+  for(int i = 0; i < cubes.size(); i++) {
+    FileName inFile = cubes[i];
     string outParam = pathName + inFile.baseName() + "_hpfsecond.cub";
     string parameters = "FROM=" + inFile.expanded()
                         + " TO=" + outParam
@@ -143,8 +143,8 @@ void IsisMain() {
     remove(newmosSecond.c_str());
     remove(lpfmos.c_str());
     remove(untrimmedmoc.c_str());
-    for(unsigned i = 0; i < cubes.size(); i++) {
-      FileName inFile = Isis::FileName(cubes[i]);
+    for(int i = 0; i < cubes.size(); i++) {
+      FileName inFile = cubes[i];
       string hpffirst(pathName + inFile.baseName() + "_hpffirst.cub");
       string hpfsecond(pathName + inFile.baseName() + "_hpfsecond.cub");
       remove(hpffirst.c_str());

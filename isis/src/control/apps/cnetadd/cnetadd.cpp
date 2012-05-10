@@ -157,9 +157,9 @@ void IsisMain() {
   }
 
   // Loop through all the images
-  for (unsigned int img = 0; img < addList.size(); img++) {
+  for (int img = 0; img < addList.size(); img++) {
     Cube cube;
-    cube.open(addList[img]);
+    cube.open(addList[img].toString());
     Pvl *cubepvl = cube.getLabel();
     std::string sn = SerialNumber::Compose(*cubepvl);
     Camera *cam = cube.getCamera();
@@ -249,7 +249,7 @@ void IsisMain() {
 
     if (log) {
       PvlKeyword &logKeyword = (imageAdded) ? added : omitted;
-      logKeyword.AddValue(FileName(addList[img]).baseName());
+      logKeyword.AddValue(addList[img].baseName());
     }
 
     progress.CheckStatus();

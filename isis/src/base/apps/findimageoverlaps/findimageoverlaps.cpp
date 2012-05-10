@@ -18,15 +18,15 @@ void IsisMain() {
   // We want to sort the input data by serial number so that the same
   //   results are produced every time this program is run with the same
   //   images. This is a modified insertion sort.
-  for(unsigned int image = 0; image < images.size(); image++) {
+  for(int image = 0; image < images.size(); image++) {
     unsigned int insertPos = 0;
-    string sn = SerialNumber::Compose(images[image]);
+    string sn = SerialNumber::Compose(images[image].toString());
 
     for(insertPos = 0; insertPos < sortedList.size(); insertPos++) {
       if(sn.compare(sortedList[insertPos].first) < 0) break;
     }
 
-    pair<string, string> newPair = pair<string, string>(sn, images[image]);
+    pair<string, string> newPair = pair<string, string>(sn, images[image].toString());
     sortedList.insert(sortedList.begin() + insertPos, newPair);
   }
 

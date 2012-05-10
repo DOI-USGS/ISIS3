@@ -32,7 +32,7 @@ void IsisMain(){
   }
   string outFile;
   if (ui.WasEntered("FROMLIST")) {
-    cubes.Read(ui.GetFileName("FROMLIST"));
+    cubes.read(ui.GetFileName("FROMLIST"));
   }
   else {
     string msg = "Error: FROMLIST file must be specified";
@@ -137,13 +137,13 @@ void IsisMain(){
   }
 
   // Main processing loop
-  for (unsigned i = 0; i < cubes.size(); i++) {
+  for (int i = 0; i < cubes.size(); i++) {
 
   try {
     pdsSanFile = false;
 
     // Open the input file
-    FileName infile = FileName(cubes[i]);
+    FileName infile = cubes[i];
     iString inFileStr = infile.expanded();
 
     if (!infile.fileExists()) {
@@ -209,7 +209,7 @@ void IsisMain(){
 
     // Run thm2isis
     string output = (infile.baseName()) + ".cub";
-    string parameters = "FROM=" + cubes[i] + " TO=" + output;
+    string parameters = "FROM=" + cubes[i].toString() + " TO=" + output;
     ProgramLauncher::RunIsisProgram("thm2isis", parameters);
 
     //Run spiceinit
@@ -258,7 +258,7 @@ void IsisMain(){
         noFileListos << infile.baseName() << " not processed because average incidence angle >= 90 and DAY images requested" << endl;
         remove(output.c_str());
       }
-      string msg = "The average incidence angle of [" + cubes[i] + "] is over 90";
+      string msg = "The average incidence angle of [" + cubes[i].toString() + "] is over 90";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -278,7 +278,7 @@ void IsisMain(){
         noFileListos << infile.baseName() << " not processed because average incidence angle < 90 and NIGHT images requested" << endl;
         remove(output.c_str());
       }
-      string msg = "The average incidence angle of [" + cubes[i] + "] is over 90";
+      string msg = "The average incidence angle of [" + cubes[i].toString() + "] is over 90";
       throw IException(IException::User,msg,_FILEINFO_);
     }
 

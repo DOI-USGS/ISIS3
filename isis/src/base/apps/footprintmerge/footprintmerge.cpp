@@ -20,7 +20,7 @@ using namespace Isis;
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   FileList imageList;
-  imageList.Read(ui.GetFileName("FROMLIST"));
+  imageList.read(ui.GetFileName("FROMLIST"));
   if(imageList.size() < 1) {
     std::string msg = "The list file [" + ui.GetFileName("FROMLIST") +
                       "] does not contain any data";
@@ -37,10 +37,10 @@ void IsisMain() {
   vector<string> files;
   bool conv360 = false;
 
-  for(unsigned int img = 0; img < imageList.size(); img++) {
+  for(int img = 0; img < imageList.size(); img++) {
 
     Cube cube;
-    cube.open(imageList[img]);
+    cube.open(imageList[img].toString());
 
     // Make sure cube has been run through spiceinit
     try {
@@ -48,7 +48,7 @@ void IsisMain() {
     }
     catch(IException &e) {
       string msg = "Spiceinit must be run prior to running footprintmerge";
-      msg += " for cube [" + imageList[img] + "]";
+      msg += " for cube [" + imageList[img].toString() + "]";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
 
@@ -60,7 +60,7 @@ void IsisMain() {
     }
     catch(IException &e) {
       string msg = "Footprintinit must be run prior to running footprintmerge";
-      msg += " for cube [" + imageList[img] + "]";
+      msg += " for cube [" + imageList[img].toString() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -69,7 +69,7 @@ void IsisMain() {
 
     allPolys.push_back(PolygonTools::CopyMultiPolygon(poly->Polys()));
 
-    files.push_back(imageList[img]);
+    files.push_back(imageList[img].toString());
 
     prog.CheckStatus();
 

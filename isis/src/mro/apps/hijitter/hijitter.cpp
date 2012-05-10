@@ -249,7 +249,7 @@ FileName FindRed(FileList &inList, int n) {
   numFiles = 0;
 
   int lastRedNum = -1;
-  for(unsigned int i = 0; nonMroFile.empty() && i < inList.size(); i++) {
+  for (int i = 0; nonMroFile.empty() && i < inList.size(); i++) {
     try {
       FileName currentFileName(inList[i]);
       Pvl labels(currentFileName.expanded());
@@ -259,7 +259,7 @@ FileName FindRed(FileList &inList, int n) {
       int redNumber = (int)(iString)redNum;
 
       if(redNumber < 0 || redNumber > 9) {
-        iString msg = "CcdId value of [" + redNum + "] found in [" + inList[i] + "] not supported";
+        iString msg = "CcdId value of [" + redNum + "] found in [" + inList[i].toString() + "] not supported";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
@@ -277,10 +277,10 @@ FileName FindRed(FileList &inList, int n) {
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
-      redFiles[redNumber] = inList[i];
+      redFiles[redNumber] = inList[i].toString();
     }
     catch(IException &e) {
-      nonMroFile = inList[i];
+      nonMroFile = inList[i].toString();
     }
   }
 

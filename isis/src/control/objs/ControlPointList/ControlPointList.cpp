@@ -16,10 +16,10 @@ namespace Isis {
   ControlPointList::ControlPointList(const FileName &psListFile) {
     try {
       QList<QString> qList;
-      FileList list(psListFile.expanded());
-      int size = (int)list.size();
+      FileList list(psListFile);
+      int size = list.size();
       for(int i = 0; i < size; i++) {
-        qList.insert(i, QString(list[i].c_str()));
+        qList.insert(i, list[i].toString().ToQt());
         mbFound.push_back(false);
       }
       mqCpList = QStringList(qList);

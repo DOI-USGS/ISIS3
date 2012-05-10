@@ -6,7 +6,7 @@ commands:
 	$(CP) $(INPUT)/*.net $(OUTPUT) > /dev/null;
 	$(LS)  $(OUTPUT)/*jigged.net > $(OUTPUT)/net.lis;
 	$(LS)  $(OUTPUT)/*Chen.net >> $(OUTPUT)/net.lis;
-	$(APPNAME) netlist=$(OUTPUT)/net.lis \
+	$(APPNAME) fromlist=$(OUTPUT)/net.lis \
 	to=hist.txt \
 	bin_width = 0.1 > /dev/null;
 	cat hist.txt  \

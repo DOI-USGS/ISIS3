@@ -105,7 +105,7 @@ void IsisMain() {
   // Get the list of names of input CCD cubes to stitch together
   FileList list;
   UserInterface &ui = Application::GetUserInterface();
-  list.Read(ui.GetFileName("FROMLIST"));
+  list.read(ui.GetFileName("FROMLIST"));
   if(list.size() < 1) {
     string msg = "The list file[" + ui.GetFileName("FROMLIST") +
                  " does not contain any filenames";
@@ -152,10 +152,10 @@ void IsisMain() {
   string obsId;     // ObservationId keyword value
   int maxBands = 0;
 
-  for(unsigned int i = 0; i < list.size(); i++) {
+  for(int i = 0; i < list.size(); i++) {
     HiriseCCD CCDinfo;
     Cube *cube = new Cube();
-    cube->open(list[i]);
+    cube->open(list[i].toString());
 
     PvlGroup arch = cube->getLabel()->FindGroup("Archive", Pvl::Traverse);
     if(first) {
@@ -164,7 +164,7 @@ void IsisMain() {
     }
     else {
       if(obsId != (string) arch["ObservationId"]) {
-        string msg = "Input file " + list[i]
+        string msg = "Input file " + list[i].toString()
                      + " has a different ObservationId";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -173,7 +173,7 @@ void IsisMain() {
     PvlGroup inst = cube->getLabel()->FindGroup("Instrument", Pvl::Traverse);
     int chan = inst["ChannelNumber"];
     if(chan != 2) {
-      string msg = "Input file " + list[i] + " contains a single channel";
+      string msg = "Input file " + list[i].toString() + " contains a single channel";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     int cpmm = inst["CpmmNumber"];
@@ -189,7 +189,7 @@ void IsisMain() {
     }
 
     CCDinfo.cube = cube;
-    CCDinfo.filename = list[i];
+    CCDinfo.filename = list[i].toString();
     CCDinfo.ccdName = ccdNames[ccd];
     CCDinfo.ccdNumber = ccd;
     CCDinfo.summing = inst["Summing"];

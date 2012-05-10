@@ -21,9 +21,10 @@
 
   <groups>
     <group name="Files">
-      <parameter name="NETLIST">
+      <parameter name="FROMLIST">
         <type>filename</type>
         <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
         <brief>
           list of paths to networks with residual data
         </brief>
@@ -32,6 +33,20 @@
         </description>
         <filter>
           *.lis *.txt
+        </filter>
+      </parameter>
+      <parameter name="CNET">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          control network with residual data
+        </brief>
+        <description>
+  	  control network with residual data.
+        </description>
+        <filter>
+          *.net
         </filter>
       </parameter>
       <parameter name="TO">
@@ -50,7 +65,6 @@
         </filter>
       </parameter>
     </group>
-
 
     <group name="Options">
       <parameter name="BIN_WIDTH">

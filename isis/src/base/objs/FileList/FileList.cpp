@@ -25,6 +25,8 @@
 #include "Message.h"
 #include "FileName.h"
 #include "iString.h"
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 namespace Isis {
@@ -37,22 +39,22 @@ namespace Isis {
   }
 
   /**
-   * Constructs a FileList from a file.
+   * Constructs a FileList from a stream.
    *
-   * @param list Name of the file containing a list of files.
+   * @param in An input stream containing a list of files.
    */
-  FileList::FileList(const std::string &list) {
-    Read(list);
+  FileList::FileList(FileName listFile) {
+    read(listFile);
   }
 
   /**
    * Constructs a FileList from a stream.
    *
-   * @param in An input stream containing a list of files.
+   * @param path of a file containing a list of files.
    */
-  FileList::FileList(std::istream &in) {
-    Read(in);
-  }
+  /*FileList::FileList(iString  listFileString) {
+    read(FileName(listFileString));
+  }*/
 
   /**
    * Opens and loads the list of files from a file.
@@ -61,29 +63,26 @@ namespace Isis {
    *
    * @throws Isis::iException::Io - Cannot open file
    */
-  void FileList::Read(const std::string &list) {
-    // Set up for opening
-    Isis::FileName temp(list);
-    string file = temp.expanded();
-    ifstream istm;
-
+  void FileList::read(FileName listFile) {
     // Open the file
-    istm.open(file.c_str(), std::ios::in);
+    ifstream istm;
+    istm.open(listFile.toString().c_str(), std::ios::in);
     if(!istm) {
-      string message = Isis::Message::FileOpen(file);
+      string message = Isis::Message::FileOpen(listFile.toString());
       throw IException(IException::Io, message, _FILEINFO_);
     }
 
     // Internalize
     try {
-      Read(istm);
+      read(istm);
 
       // Close the file
       istm.close();
     }
-    catch(IException &e) {
+    catch (IException &e) {
+      printf("debugB\n");
       istm.close();
-      string msg = "File [" + file + "] contains no data";
+      string msg = "File [" + listFile.toString() + "] contains no data";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -99,7 +98,7 @@ namespace Isis {
    * @param in An input stream containing a list of files.
    *
    */
-  void FileList::Read(std::istream &in) {
+  void FileList::read(std::istream &in) {
     // Read each file and put it in the vector
     char buf[65536];
     Isis::iString s;
@@ -107,15 +106,15 @@ namespace Isis {
 
     in.getline(buf, 65536);
     bool isComment = false;
-    while(!in.eof()) {
+    while (!in.eof()) {
       s = buf;
       string::size_type loc = s.find("\"", 0);
 
-      if(loc != string::npos) {
+      if (loc != string::npos) {
         bHasQuotes = true;
       }
 
-      if(bHasQuotes) {
+      if (bHasQuotes) {
         s = s.TrimHead("\"");
         s = s.TrimTail("\"");
       }
@@ -127,8 +126,8 @@ namespace Isis {
         in.getline(buf, 65536);
         continue;
       }
-      for(int index = 0; index < (int)strlen(buf); index++) {
-        if(buf[index] == '#' || (buf[index] == '/' && buf[index+1] == '/')) {
+      for (int index = 0; index < (int)strlen(buf); index++) {
+        if (buf[index] == '#' || (buf[index] == '/' && buf[index+1] == '/')) {
           isComment = true;
           break;
         }
@@ -140,7 +139,7 @@ namespace Isis {
           break;
         }
       }
-      if(isComment) {
+      if (isComment) {
         in.getline(buf, 65536);
         continue;
       }
@@ -157,11 +156,12 @@ namespace Isis {
         in.getline(buf, 65536);
       }
     }
-    if(this->size() == 0) {
+    if (this->size() == 0) {
       string msg = "Input Stream Empty";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
+
 
   /**
    * Writes a list of files to a file.
@@ -171,34 +171,31 @@ namespace Isis {
    *
    * @throws Isis::iException::Io File could not be created.
    */
-  void FileList::Write(const std::string &list) {
-    // Set up for opening
-    Isis::FileName temp(list);
-    string file = temp.expanded();
-    ofstream ostm;
-
+  void FileList::write(FileName outputFileList) {
     // Open the file
-    ostm.open(file.c_str(), std::ios::out);
-    if(!ostm) {
-      string message = Message::FileOpen(file);
+    ofstream ostm;
+    ostm.open(outputFileList.toString().c_str(), std::ios::out);
+    if (!ostm) {
+      string message = Message::FileOpen(outputFileList.toString());
       throw IException(IException::Io, message, _FILEINFO_);
     }
 
     // Internalize
-    Write(ostm);
+    write(ostm);
 
     // Close the file
     ostm.close();
   }
+
 
   /**
    * Writes a list of files to a stream.
    *
    * @param out The list will be written to this output stream.
    */
-  void FileList::Write(std::ostream &out) {
-    for(unsigned int i = 0; i < this->size(); i++) {
-      out << (*this)[i] << endl;
+  void FileList::write(std::ostream &out) {
+    for (int i = 0; i < this->size(); i++) {
+      out << (*this)[i].toString() << endl;
     }
   }
 } // end isis namespace

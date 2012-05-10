@@ -358,10 +358,10 @@ void IsisMain() {
 
     for( int j=0;j<measGroup.size();j++) {
       sprintf(line,"%s,%s,%s,%lf,%4.2lf,%4.2lf,%d,%d,%s,%s,%s\n",
-                    suspectMeasures[i]->Parent()->GetId().ToQt().toStdString().data(),
-                    serialNumList.FileName(suspectMeasures[i]->GetCubeSerialNumber()
+                    measGroup[j]->Parent()->GetId().ToQt().toStdString().data(),
+                    serialNumList.FileName(measGroup[j]->GetCubeSerialNumber()
                       .ToQt().toStdString()).data(),        
-                    suspectMeasures[i]->GetCubeSerialNumber().ToQt().toStdString().data(),
+                    measGroup[j]->GetCubeSerialNumber().ToQt().toStdString().data(),
                     measGroup[j]->GetResidualMagnitude(),
                     hullReduction[j]*100.0,
                     measReduction[j]*100.0,
@@ -392,6 +392,7 @@ void IsisMain() {
 
   //close the report file
   fclose(guiltyFile);
+  fclose(ignoredReport);
 
 
   //save out the winnowed ControlNet

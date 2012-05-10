@@ -1,0 +1,9 @@
+Passing brentsRootFinder two points that don't bound a root (this should throw an error)
+**PROGRAMMER ERROR** The function evaluations of two bounding points passed to Brents Method have the save sign.  Therefore, they don't necessary bound a root.  No root finding will be attempted.
+
+Catching an error thrown by the fucntor.
+**PROGRAMMER ERROR** Function evaluation failed at:0.0.  Function must be continuous and defined for the entire interval inorder to gaurentee brentsRootFinder will work.
+**PROGRAMMER ERROR** This functor always throws an error.
+
+Passing brentsRootFinder two points that do bound a root
+Root Found: 1.12058

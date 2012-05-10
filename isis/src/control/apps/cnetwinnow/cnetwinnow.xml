@@ -131,7 +131,7 @@
         <default>
           <item>5</item>
         </default>
-        <minimum inclusive="no">0</minimum>
+        <minimum inclusive="yes">0</minimum>
         <maximum incluseive="yes">100</maximum>
       </parameter>
 
@@ -150,7 +150,7 @@
         <default>
           <item>10</item>
         </default>
-        <minimum inclusive="no">0</minimum>
+        <minimum inclusive="yes">0</minimum>
         <maximum incluseive="yes">100</maximum>
       </parameter>
 
@@ -164,7 +164,7 @@
         <default>
           <item>1.0</item>
         </default>
-        <minimum inclusive="yes">0.2</minimum>
+        <minimum inclusive="yes">0.0</minimum>
       </parameter>
  
       <parameter name="GUILTY_FLOOR">
@@ -177,7 +177,7 @@
         <default>
           <item>2.5</item>
         </default>
-        <minimum inclusive="yes">1.0</minimum>
+        <minimum inclusive="yes">0.0</minimum>
       </parameter>
    </group>
 
@@ -191,7 +191,7 @@
         <default>
           <item>15</item>
         </default>
-        <minimum inclusive="no">0</minimum>
+        <minimum inclusive="yes">0</minimum>
         <maximum incluseive="yes">100</maximum>
       </parameter>
 
@@ -204,7 +204,7 @@
         <default>
           <item>30</item>
         </default>
-        <minimum inclusive="no">0</minimum>
+        <minimum inclusive="yes">0</minimum>
         <maximum incluseive="yes">100</maximum>
       </parameter>
    </group>

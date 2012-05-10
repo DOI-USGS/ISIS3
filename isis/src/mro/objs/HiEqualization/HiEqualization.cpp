@@ -38,7 +38,7 @@ namespace Isis {
     vector<Statistics *> statsList;
     vector<Statistics *> leftStatsList;
     vector<Statistics *> rightStatsList;
-    for (unsigned int img = 0; img < imageList.size(); img++) {
+    for (int img = 0; img < imageList.size(); img++) {
       Statistics *stats = new Statistics();
       Statistics *statsLeft = new Statistics();
       Statistics *statsRight = new Statistics();
@@ -49,7 +49,7 @@ namespace Isis {
       p.Progress()->SetText("Calculating Statistics for Cube " +
           cubeStr + " of " + maxCubeStr);
       CubeAttributeInput att;
-      const string inp = imageList[img];
+      const string inp = imageList[img].toString();
       p.SetInputCube(inp, att);
       HiCalculateFunctor func(stats, statsLeft, statsRight, 100.0);
       p.ProcessCubeInPlace(func, false);
@@ -64,7 +64,7 @@ namespace Isis {
 
     // Add the known overlaps between two cubes, and apply a weight to each
     // overlap equal the number of pixels in the overlapping area
-    for (unsigned int i = 0; i < imageList.size() - 1; i++) {
+    for (int i = 0; i < imageList.size() - 1; i++) {
       int j = i + 1;
       oNorm.AddOverlap(*rightStatsList[i], i, *leftStatsList[j], j,
           rightStatsList[i]->ValidPixels());
@@ -76,7 +76,7 @@ namespace Isis {
     oNorm.Solve(OverlapNormalization::Both);
 
     clearAdjustments();
-    for (unsigned int img = 0; img < imageList.size(); img++) {
+    for (int img = 0; img < imageList.size(); img++) {
       ImageAdjustment *adjustment = new ImageAdjustment();
       adjustment->addGain(oNorm.Gain(img));
       adjustment->addOffset(oNorm.Offset(img));
@@ -119,10 +119,10 @@ namespace Isis {
 
     // Place ccd in vector, try-catch opening cubes
     vector<int> ccds;
-    for (unsigned int i = 0; i < imageList.size(); i++) {
+    for (int i = 0; i < imageList.size(); i++) {
       try {
         Cube cube1;
-        cube1.open(imageList[i]);
+        cube1.open(imageList[i].toString());
         PvlGroup &from1Instrument = cube1.getGroup("INSTRUMENT");
         int cpmmNumber = from1Instrument["CpmmNumber"];
         ccds.push_back(cpmm2ccd[cpmmNumber]);
@@ -132,21 +132,21 @@ namespace Isis {
         movedIndices.push_back(i);
       }
       catch (IException &e) {
-        string msg = "The [" + imageList[i] +
+        string msg = "The [" + imageList[i].toString() +
           "] file is not a valid HiRise image";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
       catch (...) {
         // If any part of the above didn't work, we can safely assume the
         // current file is not a valid HiRise image
-        string msg = "The [" + imageList[i] +
+        string msg = "The [" + imageList[i].toString() +
           "] file is not a valid HiRise image";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
 
     // Error checking to ensure CCDID types match
-    for (unsigned int i = 0; i < imageList.size() - 1; i++) {
+    for (int i = 0; i < imageList.size() - 1; i++) {
       int id1 = getCCDType(ccds[i]);
       int id2 = getCCDType(ccds[i + 1]);
 
@@ -159,8 +159,8 @@ namespace Isis {
     }
 
     // Insertion sorts a list of filenames by their CCD numbers
-    for (unsigned int i = 1; i < imageList.size(); i++) {
-      string temp = imageList[i];
+    for (int i = 1; i < imageList.size(); i++) {
+      string temp = imageList[i].toString();
       int ccd1 = ccds[i];
       int movedIndex = movedIndices[i];
 
@@ -168,7 +168,7 @@ namespace Isis {
       int ccd2 = ccds[j];
 
       while (j >= 0 && ccd2 > ccd1) {
-        setInput(j + 1, imageList[j]);
+        setInput(j + 1, imageList[j].toString());
         ccds[j + 1] = ccds[j];
         movedIndices[j + 1] = movedIndices[j];
 

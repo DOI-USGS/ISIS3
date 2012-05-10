@@ -68,7 +68,7 @@ void IsisMain () {
 
     FileList list;
     UserInterface &ui = Application::GetUserInterface();
-    list.Read(ui.GetFileName("FROMLIST"));
+    list.read(ui.GetFileName("FROMLIST"));
 
     if (list.size() < 1) {
         string msg = "The list file [" + ui.GetFileName("FROMLIST") + "does not contain any data";
@@ -77,12 +77,12 @@ void IsisMain () {
 
     g_productVersionId = ui.GetString("VERSIONIDSTRING");
 
-    for (unsigned int i = 0; i < list.size(); i++) {
+    for (int i = 0; i < list.size(); i++) {
 
         Pvl tempPvl;
-        tempPvl.Read(list[i]);
+        tempPvl.Read(list[i].toString());
 
-        OriginalLabel origLab(list[i]);
+        OriginalLabel origLab(list[i].toString());
         pdsLab = origLab.ReturnLabels();
 
         iString prodId = pdsLab["PRODUCT_ID"][0];
@@ -102,7 +102,7 @@ void IsisMain () {
 
         if (instId != "WAC-VIS" && instId != "WAC-UV") {
             string msg = "This program is intended for use on LROC WAC images only. [";
-            msg += list[i] + "] does not appear to be a WAC image.";
+            msg += list[i].toString() + "] does not appear to be a WAC image.";
             throw IException(IException::User, msg, _FILEINFO_);
         }
 
@@ -115,19 +115,19 @@ void IsisMain () {
 
         if (instId == "WAC-VIS" && framelets == "Even") {
             viseven = new Cube();
-            viseven->open(list[i]);
+            viseven->open(list[i].toString());
         }
         else if (instId == "WAC-VIS" && framelets == "Odd") {
             visodd = new Cube();
-            visodd->open(list[i]);
+            visodd->open(list[i].toString());
         }
         if (instId == "WAC-UV" && framelets == "Even") {
             uveven = new Cube();
-            uveven->open(list[i]);
+            uveven->open(list[i].toString());
         }
         else if (instId == "WAC-UV" && framelets == "Odd") {
             uvodd = new Cube();
-            uvodd->open(list[i]);
+            uvodd->open(list[i].toString());
         }
     }
 

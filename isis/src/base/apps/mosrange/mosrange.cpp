@@ -64,7 +64,7 @@ void IsisMain() {
   // Get the list of names of input CCD cubes to stitch together
   FileList flist;
   UserInterface &ui = Application::GetUserInterface();
-  flist.Read(ui.GetFileName("FROMLIST"));
+  flist.read(ui.GetFileName("FROMLIST"));
   if(flist.size() < 1) {
     string msg = "The list file[" + ui.GetFileName("FROMLIST") +
                  " does not contain any filenames";
@@ -107,19 +107,19 @@ void IsisMain() {
   double poleRad;
 
   string target("Unknown");
-  for(unsigned int i = 0 ; i < flist.size() ; i++) {
+  for(int i = 0 ; i < flist.size() ; i++) {
     try {
       // Set the input image, get the camera model, and a basic mapping
       // group
       Cube cube;
-      cube.open(flist[i]);
+      cube.open(flist[i].toString());
 
       int lines = cube.getLineCount();
       int samples = cube.getSampleCount();
 
 
       PvlObject fmap("File");
-      fmap += PvlKeyword("Name", flist[i]);
+      fmap += PvlKeyword("Name", flist[i].toString());
       fmap += PvlKeyword("Lines", lines);
       fmap += PvlKeyword("Samples", samples);
 
@@ -173,7 +173,7 @@ void IsisMain() {
       latitudeStat.AddData(&maxlat, 1);
     }
     catch(IException &ie) {
-      string mess = "Problems with file " + flist[i] + "\n" +
+      string mess = "Problems with file " + flist[i].toString() + "\n" +
                      ie.what();
       throw IException(IException::User, mess, _FILEINFO_);
     }
