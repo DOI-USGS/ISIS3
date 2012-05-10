@@ -23,7 +23,8 @@ commands:
 	$(RM) $(OUTPUT)/files.lis $(OUTPUT)/outlist.lis > /dev/null;
 	$(RM) $(OUTPUT)/jitter.bc $(OUTPUT)/red5.cub print.prt > /dev/null;
 #	$(RM) $(OUTPUT)/PSP_007556_2010_RED4.balance.cropped.cub > /dev/null;
-#	$(RM) $(OUTPUT)/PSP_007556_2010_RED5.balance.cropped.cub > /dev/null;
+# Red 6 has special pixel differences so use stats to compare instead for now since ignorespecial option is gone.
+	$(RM) $(OUTPUT)/PSP_007556_2010_RED5.balance.cropped.cub > /dev/null;
 # Red 6 has special pixel differences so use stats to compare instead for now since ignorespecial option is gone.
 	$(RM) $(OUTPUT)/PSP_007556_2010_RED6.balance.cropped.cub > /dev/null;
 #PSP_007556_2010_RED4.balance.cropped.cub.TOLERANCE = .001

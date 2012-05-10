@@ -21,7 +21,7 @@
 
   <groups>
     <group name="Files">
-      <parameter name="FROMLIST">
+      <parameter name="CLIST">
         <type>filename</type>
         <fileMode>input</fileMode>
         <internalDefault>None</internalDefault>

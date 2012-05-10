@@ -31,8 +31,8 @@ void IsisMain() {
 
   //prepare the list of net files
   FileList fList;  //empty FileList
-  if (ui.WasEntered("FROMLIST"))
-    fList.read(ui.GetFileName("FROMLIST"));
+  if (ui.WasEntered("CLIST"))
+    fList.read(ui.GetFileName("CLIST"));
   if (ui.WasEntered("CNET"))
     fList << ui.GetFileName("CNET");
 
@@ -108,7 +108,7 @@ void IsisMain() {
         
       //  Write histogram in tabular format
       fout << endl;
-      fout << "DN,Measures,CumulativePixels,Percent,CumulativePercent" << endl;
+      fout << "ResidualMagnitude,MeasuresInBin,CumulativeMeasures,Percent,CumulativePercent" << endl;
 
       Isis::BigInt total = 0;
       double cumpct = 0.0;
