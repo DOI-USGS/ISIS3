@@ -24,6 +24,7 @@ namespace Isis {
     QHBoxLayout *layout = new QHBoxLayout();
 
     p_tree = new MosaicTreeWidget();
+    p_tree->setObjectName("Tree");
     layout->addWidget(p_tree);
     layout->setContentsMargins(0, 0, 0, 0);
 

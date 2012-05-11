@@ -44,7 +44,6 @@ namespace Isis {
     private:
       bool operator<(const QTreeWidgetItem &other) const;
 
-
       CubeDisplayProperties *p_cubeDisplay;
 
       Qt::CheckState toCheck(QVariant);

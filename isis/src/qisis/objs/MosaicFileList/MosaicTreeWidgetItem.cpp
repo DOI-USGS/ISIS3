@@ -1,5 +1,7 @@
 #include "MosaicTreeWidgetItem.h"
 
+#include <QDebug>
+
 #include "Cube.h"
 #include "CubeDisplayProperties.h"
 #include "FileName.h"

@@ -35,6 +35,7 @@ PROTOS := $(wildcard *.proto)
 
 # Sort removes duplicates... make sure we have proto headers
 INCS   := $(sort $(INCS) $(PROTOS:%.proto=%.pb.h))
+INCS   := $(filter-out %Tester.h, $(INCS))
 
 # Sources include Qt moc files and qrc files
 SRCS  := $(QTRESOURCEFILES) $(QINC:%.h=moc_%.cpp) $(PROTOS:%.proto=%.pb.cc) $(CPPS)
@@ -48,6 +49,7 @@ UIHEADERS := $(UIFILES:%.ui=ui_%.h)
 OBJS  := $(SRCS:%.cpp=%.o)
 OBJS  := $(OBJS:%.cc=%.o)
 OBJS  := $(OBJS:%.c=%.o)
+INSTALLOBJS := $(filter-out %Tester.o, $(OBJS))
 
 include $(ISISROOT)/make/isismake.macros
 
@@ -118,9 +120,9 @@ install: object
 	  cat $(PLUGINS) >> $(ISISROOT)/lib/$(PLUGINS); \
 	  $(MAKE) plugin; \
 	  cp -p $(SHAREDLIB) $(ISISROOT)/lib; \
-	elif [ "$(OBJS)" != "" ]; \
+	elif [ "$(INSTALLOBJS)" != "" ]; \
 	then \
-	  ar $(ISISARFLAGS) -crs $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a $(OBJS); \
+	  ar $(ISISARFLAGS) -crs $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a $(INSTALLOBJS); \
 	  $(RANLIB) $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a; \
 	fi
 
