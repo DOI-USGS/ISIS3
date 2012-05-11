@@ -116,6 +116,7 @@ namespace Isis {
 
     public:
       QnetNavTool(QWidget *parent);
+      ~QnetNavTool();
 
       enum FilterIndex {
         Points,

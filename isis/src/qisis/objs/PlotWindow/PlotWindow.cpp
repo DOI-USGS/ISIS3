@@ -59,6 +59,8 @@ namespace Isis {
     m_allowUserToAddCurves = true;
     m_autoscaleAxes = true;
 
+    setObjectName("Plot Window: " + title);
+
     m_parent = parent;
     m_xAxisUnits = xAxisUnits;
     m_yAxisUnits = yAxisUnits;
@@ -1458,11 +1460,6 @@ namespace Isis {
     bool blockWidgetFromEvent = false;
 
     switch (e->type()) {
-      case QEvent::Close:
-        if (o == this || o == plot())
-          writeSettings();
-        break;
-
       case QEvent::MouseButtonPress:
         if (o == this &&
             childAt(((QMouseEvent *)e)->pos()) != plot()->canvas()) {
@@ -1481,9 +1478,6 @@ namespace Isis {
 
       if (e->type() == QEvent::Close && !stopHandlingEvent) {
         emit closed();
-      }
-      else if (e->type() == QEvent::Hide) {
-        ASSERT(0);
       }
     }
 
@@ -1527,27 +1521,6 @@ namespace Isis {
    */
   QwtPlot *PlotWindow::plot() {
     return m_plot;
-  }
-
-
-  /**
-   * This overridden method is called from the constructor so that
-   * when the mainwindow is created, it knows it's size
-   * and location and the tool bar location.
-   *
-   */
-  void PlotWindow::readSettings() {
-    /*Call the base class function to read the size and location*/
-    MainWindow::readSettings();
-    QString appName = QCoreApplication::applicationName();
-    /*Now read the settings that are specific to this window.*/
-    QString instanceName = windowTitle();
-    Isis::FileName config(
-        iString("$HOME/.Isis/" + appName + "/" + instanceName + ".config"));
-
-    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
-    QByteArray state = settings.value("state", QByteArray("0")).toByteArray();
-    restoreState(state);
   }
 
 
@@ -1658,26 +1631,6 @@ namespace Isis {
     }
 
     return rangeMinMax;
-  }
-
-
-  /**
-   * This overridden method is called when the mainwindow
-   * is closed or hidden to write the size and location settings
-   * (and tool bar location) to a config file in the user's home
-   * directory.
-   *
-   */
-  void PlotWindow::writeSettings() {
-    /*Call the base class function to write the size and location*/
-    MainWindow::writeSettings();
-    std::string appName = QCoreApplication::applicationName().toStdString();
-    /*Now write the settings that are specific to this window.*/
-    std::string instanceName = windowTitle().toStdString();
-    Isis::FileName config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
-
-    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
-    settings.setValue("state", saveState());
   }
 
 

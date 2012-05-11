@@ -72,9 +72,6 @@ namespace Isis {
       };
 
     protected:
-      bool eventFilter(QObject *o, QEvent *e);
-      void readSettings();
-      void writeSettings();
       virtual void closeEvent(QCloseEvent *event);
 
     private:

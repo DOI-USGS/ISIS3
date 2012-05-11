@@ -216,9 +216,32 @@ namespace Isis {
     gridLayout->addLayout(layout, 3, 0, 1, 2);
     p_navDialog->setLayout(gridLayout);
 
-    // View the dialog
+    QSettings settings(FileName("$HOME/.Isis/qnet/NavTool.config").expanded().c_str(),
+        QSettings::NativeFormat);
+    p_navDialog->resize(settings.value("size").toSize());
+    
+    // View the dialog - we need this to get the size of the dialog which we're using
+    //   for positioning it.
     p_navDialog->setShown(true);
+
+    QPoint defaultPos = parent->pos() +
+                        QPoint(parent->size().width() / 2,
+                               parent->size().height() / 2);
+    defaultPos -= QPoint(p_navDialog->size().width() / 2,
+                         p_navDialog->size().height() / 2);
+    p_navDialog->move(settings.value("pos", defaultPos).toPoint());
+
   }
+
+
+  QnetNavTool::~QnetNavTool() {
+    QSettings settings(FileName("$HOME/.Isis/qnet/NavTool.config").expanded().c_str(),
+        QSettings::NativeFormat);
+
+    settings.setValue("size", p_navDialog->size());
+    settings.setValue("pos", p_navDialog->pos());
+  }
+
 
   /**
    * Sets up the tabbed widgets for the different types of filters available

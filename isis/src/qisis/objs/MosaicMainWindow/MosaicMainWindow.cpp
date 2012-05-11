@@ -143,7 +143,7 @@ namespace Isis {
   bool MosaicMainWindow::eventFilter(QObject *o, QEvent *e) {
     switch(e->type()) {
       case QEvent::Close:
-        saveSettings2();
+        closeMosaic();
 
       default:
         return false;
@@ -633,21 +633,6 @@ namespace Isis {
    *
    */
   void MosaicMainWindow::readSettings() {
-    // Call the base class function to read the size and location
-    MainWindow::readSettings();
-
-    m_settings.beginGroup("MosaicMainWindow");
-    QByteArray state = m_settings.value("state", QByteArray("0")).toByteArray();
-    restoreState(state);
-
-    // load window position and size
-    QPoint pos = m_settings.value("pos", QPoint(100, 100)).toPoint();
-    QSize size = m_settings.value("size", QSize(750,
-        600)).toSize();
-    resize(size);
-    move(pos);
-
-    m_settings.endGroup();
   }
 
 
@@ -671,15 +656,6 @@ namespace Isis {
    *
    */
   void MosaicMainWindow::saveSettings2() {
-    // Now write the settings that are specific to this window.
-    m_settings.beginGroup("MosaicMainWindow");
-    m_settings.setValue("state", saveState());
-
-    m_settings.setValue("pos", pos());
-    m_settings.setValue("size", size());
-
-    m_settings.endGroup();
-    closeMosaic();
   }
 
 

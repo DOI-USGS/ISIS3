@@ -14,23 +14,26 @@ namespace Isis {
   * @author ????-??-?? Stacy Alley
   *
   * @internal
+  *   @history 2012-04-05 Steven Lambright - Improved saving and restoring state
+  *                         by making the closeEvent() and hideEvent() actually
+  *                         override the parent's methods and removing the
+  *                         eventFilter. References #593.
   */
   class MainWindow : public QMainWindow {
       Q_OBJECT
     public:
       MainWindow(QString title, QWidget *parent = 0, Qt::WFlags flags = 0);
       virtual ~MainWindow();
-      virtual void closeEvent(QCloseEvent *event);
 
-      virtual void hideEvent(QHideEvent *event);
-      virtual void readSettings();
-      virtual void writeSettings() const;
+      static QString settingsFileName(QString objectTitle);
 
     protected:
-      virtual bool eventFilter(QObject *o, QEvent *e);
+      virtual void closeEvent(QCloseEvent *event);
+      virtual void readSettings(QSize defaultSize = QSize());
+      QString settingsFileName() const;
 
     private:
-      std::string p_appName; //!< Application name.
+      virtual void writeSettings() const;
 
   };
 };

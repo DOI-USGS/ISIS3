@@ -1,7 +1,11 @@
 #ifndef TableMainWindow_h
 #define TableMainWindow_h
+
 #include <QMenu>
-#include "FileName.h"
+
+#include <QListWidgetItem>
+#include <QPointer>
+
 #include "MainWindow.h"
 
 
@@ -31,6 +35,11 @@ namespace Isis {
   class TableMainWindow : public MainWindow {
       Q_OBJECT
     public:
+      TableMainWindow(QString title, QWidget *parent = 0);
+      ~TableMainWindow();
+
+      void clear();
+
       /**
        * Returns the table
        *
@@ -90,7 +99,6 @@ namespace Isis {
         return  p_currentRow;
       };
 
-      TableMainWindow(QString title, QWidget *parent = 0);
       void addToTable(bool setOn, const QString &heading,
                       const QString &menuText = "", int insertAt = -1,
                       Qt::Orientation o = Qt::Horizontal, QString toolTip = "");
@@ -125,8 +133,8 @@ namespace Isis {
     protected:
       bool eventFilter(QObject *o, QEvent *e);
       void createTable();
-      void readSettings();
-      void readItemSettings(QString heading, QListWidgetItem *item);
+      void readItemSettings(QString heading, QListWidgetItem *item,
+                            bool defaultChecked);
 
     private:
       std::string p_appName; //!< The application name
@@ -148,8 +156,6 @@ namespace Isis {
       QList<int>p_startColumn; //!< List of start columns
       QList<int>p_endColumn; //!< List of end columns
       bool p_trackItems; //!< Boolean to track items
-
-      QSettings *p_settings; //!< Settings associated with this object
 
   };
 };

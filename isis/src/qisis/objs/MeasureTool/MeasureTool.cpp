@@ -10,8 +10,8 @@
 #include <QMessageBox>
 #include <QStatusBar>
 
-#include "geos/geom/Geometry.h"
-#include "geos/geom/Point.h"
+#include <geos/geom/Geometry.h>
+#include <geos/geom/Point.h>
 
 #include "Camera.h"
 #include "Distance.h"
@@ -42,7 +42,7 @@ namespace Isis {
     connect(m_action, SIGNAL(triggered()), m_tableWin, SLOT(showTable()));
     connect(m_action, SIGNAL(triggered()), m_tableWin, SLOT(raise()));
     connect(m_action, SIGNAL(triggered()), m_tableWin, SLOT(syncColumns()));
-    m_tableWin->installEventFilter(this);
+    //m_tableWin->installEventFilter(this);
 
     m_tableWin->addToTable(false, "Feature\nName", "Feature Name");
     m_tableWin->addToTable(false, "Feature\nType", "Feature Type");

@@ -38,7 +38,7 @@ namespace Isis {
     m_endSurfacePoint = NULL;
     m_incidenceAngle = NULL;
 
-    m_tableWin = new TableMainWindow("Measurements", parent);
+    m_tableWin = new TableMainWindow("Sun Shadow Measurements", parent);
     m_tableWin->setTrackListItems(true);
     m_tableWin->installEventFilter(this);
 

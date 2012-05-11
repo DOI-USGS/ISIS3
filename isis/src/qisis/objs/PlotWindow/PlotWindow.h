@@ -212,10 +212,6 @@ namespace Isis {
 
       void fillTable();
 
-    protected slots:
-      void writeSettings();
-      void readSettings();
-
     protected:
       void createWidgets(MenuOptions optionsToProvide);
       void disableAxisAutoScale();

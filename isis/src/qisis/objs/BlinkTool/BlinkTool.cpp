@@ -1,5 +1,10 @@
 #include "BlinkTool.h"
 
+#include "FileName.h"
+#include "iString.h"
+#include "MainWindow.h"
+#include "MdiCubeViewport.h"
+
 #include <QDialog>
 #include <QDoubleSpinBox>
 #include <QEvent>
@@ -14,10 +19,6 @@
 #include <QToolBar>
 #include <QToolButton>
 #include <QVBoxLayout>
-
-#include "FileName.h"
-#include "iString.h"
-#include "MdiCubeViewport.h"
 
 namespace Isis {
 
@@ -44,20 +45,20 @@ namespace Isis {
     connect(p_listWidget, SIGNAL(currentRowChanged(int)),
             this, SLOT(updateWindow()));
 
-    QSplitter *splitter = new QSplitter(Qt::Vertical, p_dialog);
-    splitter->addWidget(p_blinkWindow);
-    splitter->addWidget(p_listWidget);
-    splitter->setCollapsible(0, false);
-    splitter->setCollapsible(1, false);
-    splitter->setStretchFactor(0, 0);
-    splitter->setStretchFactor(1, 1);
+    p_splitter = new QSplitter(Qt::Vertical, p_dialog);
+    p_splitter->addWidget(p_blinkWindow);
+    p_splitter->addWidget(p_listWidget);
+    p_splitter->setCollapsible(0, false);
+    p_splitter->setCollapsible(1, false);
+    p_splitter->setStretchFactor(0, 0);
+    p_splitter->setStretchFactor(1, 1);
 
     QWidget *buttons = new QWidget(p_dialog);
 
     QVBoxLayout *layout = new QVBoxLayout();
 //    layout->addWidget(p_blinkWindow,2);
 //    layout->addWidget(p_listWidget,1);
-    layout->addWidget(splitter, 1);
+    layout->addWidget(p_splitter, 1);
     layout->addWidget(buttons, 0);
     p_dialog->setLayout(layout);
 
@@ -313,11 +314,12 @@ namespace Isis {
    *
    */
   void BlinkTool::writeSettings() {
-    std::string instanceName = p_dialog->windowTitle().toStdString();
-    FileName config("$HOME/.Isis/qview/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
+    QSettings settings(MainWindow::settingsFileName("BlinkTool"), QSettings::NativeFormat);
     settings.setValue("rate", p_timeBox->value());
     settings.setValue("size", p_dialog->size());
+    settings.setValue("pos", p_dialog->pos());
+    settings.setValue("geom", p_dialog->saveGeometry());
+    settings.setValue("splitterState", p_splitter->saveState());
   }
 
 
@@ -327,13 +329,17 @@ namespace Isis {
    *
    */
   void BlinkTool::readSettings() {
-
-    std::string instanceName = p_dialog->windowTitle().toStdString();
-    FileName config("$HOME/.Isis/qview/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
+    QSettings settings(MainWindow::settingsFileName("BlinkTool"), QSettings::NativeFormat);
     double rate = settings.value("rate", 0.5).toDouble();
-    QSize size = settings.value("size", QSize(492, 492)).toSize();
-    p_dialog->resize(size);
+
+    p_dialog->restoreGeometry(settings.value("geom").toByteArray());
+    p_splitter->restoreState(settings.value("splitterState").toByteArray());
+
+    if (!settings.value("pos").toPoint().isNull())
+      p_dialog->move(settings.value("pos").toPoint());
+
+    p_dialog->resize(settings.value("size", QSize(492, 492)).toSize());
+
     p_timeBox->setValue(rate);
   }
 

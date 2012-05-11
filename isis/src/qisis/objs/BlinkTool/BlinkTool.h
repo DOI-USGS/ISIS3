@@ -63,6 +63,7 @@ namespace Isis {
       QDoubleSpinBox *p_timeBox;//!< Time selection box
       bool p_timerOn;//!< Is the timer on?
       QDialog *p_dialog;//!< Dialog widget
+      QSplitter *p_splitter;
   };
 };
 

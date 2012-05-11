@@ -291,6 +291,7 @@ namespace Isis {
 
     connect(newPlotWindow, SIGNAL(closed()),
             newPlotWindow, SLOT(deleteLater()));
+    
     QString originalTitle = newPlotWindow->windowTitle();
     QString titleToTry = originalTitle;
     bool titleUsed = false;

@@ -157,7 +157,8 @@ namespace Isis {
    */
   void QnetTool::createQnetTool(QWidget *parent) {
 
-    p_qnetTool = new MainWindow("Qnet Tool",parent);
+    p_qnetTool = new MainWindow("Qnet Tool", parent);
+    p_qnetTool->setObjectName("QnetTool");
 
     createActions();
     createMenus();
@@ -478,6 +479,7 @@ namespace Isis {
   void QnetTool::createTemplateEditorWidget() {
 
     QToolBar *toolBar = new QToolBar("Template Editor ToolBar");
+
     toolBar->addAction(p_openTemplateFile);
     toolBar->addSeparator();
     toolBar->addAction(p_saveTemplateFile);
@@ -639,6 +641,7 @@ namespace Isis {
   void QnetTool::createToolBars() {
 
     QToolBar * toolBar = new QToolBar;
+    toolBar->setObjectName("TemplateEditorToolBar");
     toolBar->setFloatable(false);
     toolBar->addAction(p_saveNet);
     toolBar->addSeparator();

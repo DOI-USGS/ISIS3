@@ -1,7 +1,6 @@
 #include "MainWindow.h"
 
-#include <iostream>
-
+#include "IException.h"
 #include "iString.h"
 
 namespace Isis {
@@ -13,21 +12,18 @@ namespace Isis {
    * @param parent
    * @param flags
    */
-  MainWindow::MainWindow(QString title, QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, flags) {
-    this->setWindowTitle(title);
-    if(parent) {
-      p_appName = parent->windowTitle().toStdString();
-    }
-
-    readSettings();
+  MainWindow::MainWindow(QString title, QWidget *parent, Qt::WFlags flags) :
+      QMainWindow(parent, flags) {
+    setWindowTitle(title);
   }
 
 
   /**
-   *
-   *
+   * Free allocated memory by from this instance.
    */
   MainWindow::~MainWindow() {
+    if (isVisible())
+      close();
   }
 
 
@@ -42,15 +38,38 @@ namespace Isis {
   }
 
 
+  QString MainWindow::settingsFileName(QString objectTitle) {
+    if (QApplication::applicationName() == "") {
+      throw IException(IException::Programmer, "You must set QApplication's "
+          "application name before using the Isis::MainWindow class. Window "
+          "state and geometry can not be saved and restored", _FILEINFO_);
+    }
+
+    if (objectTitle == "") {
+      throw IException(IException::Programmer,
+          tr("You must provide a valid objectTitle to MainWindow::settingsFileName"),
+          _FILEINFO_);
+    }
+
+    QDir homeDir = FileName("$HOME").dir();
+    QDir settingsRoot = homeDir.filePath(".Isis");
+    QDir programSettings =
+        settingsRoot.filePath(QApplication::applicationName());
+    QString windowSettings = programSettings.filePath(objectTitle + ".config");
+
+    return windowSettings;
+  }
+
+
   /**
    * This method ensure that the settings get written even if the
    * Main window was only hidden, not closed.
    *
    * @param event
    */
-  void MainWindow::hideEvent(QHideEvent *event) {
-    writeSettings();
-  }
+//   void MainWindow::hideEvent(QHideEvent *event) {
+//     writeSettings();
+//   }
 
 
   /**
@@ -58,18 +77,42 @@ namespace Isis {
    * Main window is created, it know's it's size and location.
    *
    */
-  void MainWindow::readSettings() {
-    if(p_appName == "") {
-      p_appName = this->windowTitle().toStdString();
+  void MainWindow::readSettings(QSize defaultSize) {
+    QSettings settings(settingsFileName(), QSettings::NativeFormat);
+    restoreGeometry(settings.value("geometry").toByteArray());
+    restoreState(settings.value("windowState").toByteArray());
+
+    // The geom/state isn't enough for main windows to correctly remember
+    //   their position and size, so let's restore those on top of
+    //   the geom and state.
+    if (!settings.value("pos").toPoint().isNull())
+      move(settings.value("pos").toPoint());
+
+    resize(settings.value("size", defaultSize).toSize());
+  }
+
+
+  QString MainWindow::settingsFileName() const {
+    if (QApplication::applicationName() == "") {
+      throw IException(IException::Programmer, "You must set QApplication's "
+          "application name before using the Isis::MainWindow class. Window "
+          "state and geometry can not be saved and restored", _FILEINFO_);
     }
 
-    std::string instanceName = this->windowTitle().toStdString();
-    FileName config("$HOME/.Isis/" + p_appName + "/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
-    QPoint pos = settings.value("pos", QPoint(300, 100)).toPoint();
-    QSize size = settings.value("size", QSize(900, 500)).toSize();
-    resize(size);
-    move(pos);
+    if (objectName() == "") {
+      throw IException(IException::Programmer,
+          tr("You must set the objectName of the widget titled [%1] before "
+          "using the instance. Window state and geometry can not be saved and "
+          "restored").arg(windowTitle()), _FILEINFO_);
+    }
+
+    QDir homeDir = FileName("$HOME").dir();
+    QDir settingsRoot = homeDir.filePath(".Isis");
+    QDir programSettings =
+        settingsRoot.filePath(QApplication::applicationName());
+    QString windowSettings = programSettings.filePath(objectName() + ".config");
+
+    return windowSettings;
   }
 
 
@@ -80,44 +123,12 @@ namespace Isis {
    *
    */
   void MainWindow::writeSettings() const {
-    /*We do not want to write the settings unless the window is
-      visible at the time of closing the application*/
-    if(!isVisible()) return;
-    iString appName = p_appName;
+    QSettings settings(settingsFileName(), QSettings::NativeFormat);
 
-    if(appName == "") {
-      appName = windowTitle().toStdString();
-    }
-
-    std::string instanceName = windowTitle().toStdString();
-    FileName config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
-    settings.setValue("pos", pos());
+    settings.setValue("geometry", saveGeometry());
+    settings.setValue("windowState", saveState());
     settings.setValue("size", size());
-  }
-
-
-  /**
-  * This event filter is installed on the parent of this window.
-  * When the user closes the main window of the application, the
-  * Mainwindow will write their settings even though they did not
-  * receive the close event themselves.
-  *
-  * @param o
-  * @param e
-  *
-  * @return bool
-  */
-  bool MainWindow::eventFilter(QObject *o, QEvent *e) {
-    switch (e->type()) {
-      case QEvent::Close:
-        writeSettings();
-        break;
-
-      default:
-        break;
-    }
-    return QMainWindow::eventFilter(o, e);
+    settings.setValue("pos", pos());
   }
 }
 

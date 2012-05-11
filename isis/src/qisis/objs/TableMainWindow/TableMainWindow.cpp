@@ -1,13 +1,9 @@
-#include "TableMainWindow.h"
-
-#include <iostream>
-
 #include <QStatusBar>
 #include <QDockWidget>
 #include <QMenuBar>
 #include <QSettings>
-
-#include "iString.h"
+#include <iostream>
+#include "TableMainWindow.h"
 
 namespace Isis {
   /**
@@ -25,7 +21,24 @@ namespace Isis {
     p_currentRow = 0;
     p_currentIndex = 0;
     createTable();
-    readSettings();
+
+    setObjectName(title);
+    readSettings(QSize(500, 300));
+  }
+
+
+  TableMainWindow::~TableMainWindow() {
+    close();
+  }
+
+
+  void TableMainWindow::clear() {
+    writeSettings();
+    p_table->clear();
+    p_itemList.clear();
+    p_listWidget->clear();
+    p_table->setRowCount(0);
+    p_table->setColumnCount(0);
   }
 
 
@@ -159,16 +172,14 @@ namespace Isis {
     for(int i = 0; !heading.section(":", i, i).isEmpty(); i++) {
       QString htext = heading.section(":", i, i);
 
-      //if (!htext.contains("\n")) htext = "\n" + htext;
+      int destinationColumn = insertAt;
+
       if(insertAt >= 0) {
         p_table->insertColumn(insertAt);
-        int width = p_settings->value("Col" + QString::number(insertAt), 100).toInt();
-        p_table->setColumnWidth(insertAt, width);
       }
       else {
+        destinationColumn = startCol + i;
         p_table->insertColumn(startCol + i);
-        int width = p_settings->value("Col" + QString::number(startCol + i), 100).toInt();
-        p_table->setColumnWidth(startCol + i, width);
       }
       QTableWidgetItem *header = new QTableWidgetItem(htext);
       if(insertAt >= 0) {
@@ -190,6 +201,8 @@ namespace Isis {
         }
       }
 
+      p_table->setColumnWidth(destinationColumn,
+          qRound(QFontMetrics(header->font()).width(header->text()) + 20));
     }
 
     int endCol = p_table->columnCount() - 1;
@@ -215,16 +228,13 @@ namespace Isis {
 
       item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
 
-      if(p_trackItems) {
-        readItemSettings(menuText, item);
-      }
-      else {
-        item->setCheckState(setOn ? Qt::Checked : Qt::Unchecked);
-      }
+      readItemSettings(menuText, item, setOn);
 
       p_itemList.push_back(item);
       p_startColumn.push_back(startCol);
       p_endColumn.push_back(endCol);
+
+      readItemSettings(heading, item, setOn);
     }
   }
 
@@ -268,25 +278,27 @@ namespace Isis {
    *
    */
   void TableMainWindow::syncRows() {
-    if(this->isHidden()) return;
+    if (!isHidden()) {
+      p_visibleColumns = 0;
+      for (int i = 0; i < p_listWidget->count(); i++) {
+        QListWidgetItem *item = p_listWidget->item(i);
+        int index = p_itemList.indexOf(item);
 
-    p_visibleColumns = 0;
-    for(int i = 0; i < p_listWidget->count(); i++) {
-      QListWidgetItem *item = p_listWidget->item(i);
-      int index = p_itemList.indexOf(item);
+        if (index != -1) {
 
-      if(index != -1) {
+          for (int col = p_startColumn[index];
+               col <= p_endColumn[index];
+               col++) {
 
-        for(int col = p_startColumn[index]; col <= p_endColumn[index]; col++) {
+            if (item->checkState() == Qt::Checked) {
+              p_table->setRowHidden(col, false);
+              p_visibleColumns++;
+            }
+            else {
+              p_table->setRowHidden(col, true);
+            }
 
-          if(item->checkState() == Qt::Checked) {
-            p_table->setRowHidden(col, false);
-            p_visibleColumns++;
           }
-          else {
-            p_table->setRowHidden(col, true);
-          }
-
         }
       }
     }
@@ -299,20 +311,17 @@ namespace Isis {
    * @param item
    */
   void TableMainWindow::deleteColumn(int item) {
-    if(p_table == NULL) {
-      std::cout << "deleteColumn err" << std::endl;
-      return;
+    if(p_table != NULL) {
+      p_itemList.removeAt(item);
+      p_table->setColumnCount(p_table->columnCount() - 1);
+      p_itemList.clear();
+      bool vis = p_table->isVisible();
+      p_table = NULL;
+      p_listWidget = NULL;
+      close();
+
+      if(vis) showTable();
     }
-    p_itemList.removeAt(item);
-    p_table->setColumnCount(p_table->columnCount() - 1);
-    p_itemList.clear();
-    bool vis = p_table->isVisible();
-    p_table = NULL;
-    p_listWidget = NULL;
-    this->close();
-
-    if(vis) showTable();
-
   }
 
 
@@ -501,40 +510,6 @@ namespace Isis {
 
 
   /**
-   * This overriden method is called from the constructor so that
-   * when the Tablemainwindow is created, it know's it's size
-   * and location and the dock widget settings.
-   *
-   */
-  void TableMainWindow::readSettings() {
-    //Call the base class function to read the size and location
-    this->MainWindow::readSettings();
-
-    //Now read the settings that are specific to this window.
-    std::string appName = p_parent->windowTitle().toStdString();
-
-    //Now read the settings that are specific to this window.
-    std::string instanceName = this->windowTitle().toStdString();
-
-    FileName config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
-    //if(p_settings != 0) delete p_settings;
-    p_settings = new QSettings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
-    bool docFloats = p_settings->value("docFloat", false).toBool();
-    p_dock->setFloating(docFloats);
-
-    if(docFloats) {
-      QPoint docPos = p_settings->value("docPos", QPoint(300, 100)).toPoint();
-      QSize docSize = p_settings->value("docSize", QSize(300, 200)).toSize();
-      p_dock->resize(docSize);
-      p_dock->move(docPos);
-      p_dock->setFocus();
-      p_dock->setVisible(true);
-    }
-
-  }
-
-
-  /**
    * This method reads the 'checked' settings on the items listed
    * in the dock area which determine which table columns are
    * visible.  This method is only called if p_trackItems is set
@@ -543,20 +518,15 @@ namespace Isis {
    * @param heading
    * @param item
    */
-  void TableMainWindow::readItemSettings(QString heading, QListWidgetItem *item) {
-    //Now read the settings that are specific to this window.
-    std::string appName = p_parent->windowTitle().toStdString();
-
-    //Now read the settings that are specific to this window.
-    std::string instanceName = this->windowTitle().toStdString();
-
-    FileName config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
+  void TableMainWindow::readItemSettings(QString heading,
+      QListWidgetItem *item, bool defaultChecked) {
+    QSettings settings(settingsFileName(), QSettings::NativeFormat);
 
     QString itemTitle = "item-" + item->text();
-    Qt::CheckState state = (Qt::CheckState)settings.value(itemTitle, 0).toInt();
+    Qt::CheckState defaultState = defaultChecked? Qt::Checked : Qt::Unchecked;
+    Qt::CheckState state = (Qt::CheckState)
+        settings.value(itemTitle, defaultState).toInt();
     item->setCheckState(state);
-
   }
 
 
@@ -568,46 +538,11 @@ namespace Isis {
    *
    */
   void TableMainWindow::writeSettings() {
-    /*Call the base class function to write the size and location*/
-    this->MainWindow::writeSettings();
-    //if(!this->isVisible()) return;
+    QSettings settings(settingsFileName(), QSettings::NativeFormat);
 
-    /*Now read the settings that are specific to this window.*/
-    std::string appName = p_parent->windowTitle().toStdString();
-
-    /*Now read the settings that are specific to this window.*/
-    std::string instanceName = this->windowTitle().toStdString();
-
-    FileName config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
-
-    settings.setValue("docFloat", p_dock->isFloating());
-    settings.setValue("docPos", p_dock->pos());
-    settings.setValue("docSize", p_dock->size());
-
-    /*Save the column width for the table*/
-    for(int c = 0; c < p_table->columnCount(); c++) {
-      QString colWidth = "Col" + QString::number(c);
-      int width = 0;
-
-      if(p_table->columnWidth(c) == 0) {
-        width = 100;
-      }
-      else {
-        width = p_table->columnWidth(c);
-      }
-      settings.setValue(colWidth , width);
-
-    }
-
-    /*This writes the settings for the 'checked' property for the list items
-    in the dock area which determines which columns are visible.*/
-
-    if(p_trackItems) {
-      for(int i = 0; i < p_itemList.size(); i++) {
-        QString itemTitle = "item-" + p_itemList[i]->text();
-        settings.setValue(itemTitle, p_itemList[i]->checkState());
-      }
+    foreach (QListWidgetItem *item, p_itemList) {
+      QString itemTitle = "item-" + item->text();
+      settings.setValue(itemTitle, item->checkState());
     }
   }
 
@@ -810,7 +745,9 @@ namespace Isis {
    * @param event
    */
   void TableMainWindow::closeEvent(QCloseEvent *event) {
-    this->writeSettings();
+    MainWindow::closeEvent(event);
+    writeSettings();
+    event->accept();
   }
 
 
@@ -821,7 +758,7 @@ namespace Isis {
    * @param event
    */
   void TableMainWindow::hideEvent(QHideEvent *event) {
-    this->writeSettings();
+//     this->writeSettings();
   }
 
 
