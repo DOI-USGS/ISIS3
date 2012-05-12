@@ -82,6 +82,7 @@ QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtCore
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtAssistant
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtGui
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtNetwork
+QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtOpenGL
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtScript
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtScriptTools
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtSql
