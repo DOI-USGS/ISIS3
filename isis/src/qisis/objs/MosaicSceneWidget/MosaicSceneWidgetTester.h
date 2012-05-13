@@ -1,14 +1,13 @@
-#ifndef MosaicFileListWidgetTester_H
-#define MosaicFileListWidgetTester_H
+#ifndef MosaicSceneWidgetTester_H
+#define MosaicSceneWidgetTester_H
 
 #include <QtTestGui>
 
 namespace Isis {
-  class MosaicFileListWidgetTester : public QObject {
+  class MosaicSceneWidgetTester : public QObject {
     Q_OBJECT
 
     private slots:
-      void initTestCase();
       void testBasicFunctionality();
       void testSynchronization();
 

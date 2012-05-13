@@ -23,8 +23,7 @@ namespace Isis {
   /**
    * This is a very basic functionality test.
    */
-  void MosaicFileListWidgetTester::testSimpleInstantiation() {
-    // Step 1: Instantiate
+  void MosaicFileListWidgetTester::testBasicFunctionality() {
     QSettings tmp("./testSettings", QSettings::NativeFormat);
 
     MosaicFileListWidget widget(tmp);
@@ -32,7 +31,6 @@ namespace Isis {
     QTest::qWaitForWindowShown(&widget);
     QVERIFY(widget.getProgress());
 
-    // Step 2: Add An Image
     QMutex lock;
     CubeDisplayProperties *image = new CubeDisplayProperties(
         QString("./lub3994m.342.lev1.cub"), &lock);
@@ -51,6 +49,9 @@ namespace Isis {
     QVERIFY2(group1, "The first element in the tree ought to be the initial group for images "
         "to go into; i.e. Group1. There are no groups.");
 
+    // This corresponds to the image we added
+    QTreeWidgetItem *imageTreeItem = group1->child(0);
+    
     for (int i = 0; i < group1->columnCount(); i++) {
       if (i == (int)MosaicTreeWidgetItem::NameColumn) {
         // The text in the name column ought to be Group1
@@ -72,13 +73,11 @@ namespace Isis {
     // Group1 should contain 1 image (as a QTreeWidgetItem)
     QCOMPARE(group1->childCount(), 1);
 
-    // This corresponds to the image we added
-    QTreeWidgetItem *imageTreeItem = group1->child(0);
 
     for (int i = 0; i < imageTreeItem->columnCount(); i++) {
       // Verify the appropriate columns have correct text values
       if (i == (int)MosaicTreeWidgetItem::NameColumn) {
-        QCOMPARE(imageTreeItem->text(i), QString("lub3994m.342.lev1.cub"));
+        QCOMPARE(imageTreeItem->text(i), image->displayName());
         // Image name should have a background fill
         QCOMPARE(imageTreeItem->background(i),
             QBrush(image->getValue(CubeDisplayProperties::Color).value<QColor>()));
@@ -149,5 +148,68 @@ namespace Isis {
     QCOMPARE(group1->isSelected(), false);
     QCOMPARE(imageTreeItem->isSelected(), false);
     QCOMPARE(image->getValue(CubeDisplayProperties::Selected).toBool(), false);
+  }
+  
+  
+  void MosaicFileListWidgetTester::testSynchronization() {
+    QSettings tmp("./testSettings", QSettings::NativeFormat);
+
+    MosaicFileListWidget widget(tmp);
+    widget.show();
+    QTest::qWaitForWindowShown(&widget);
+
+    QList<CubeDisplayProperties *> images;
+    
+    QMutex lock;
+    for (int i = 0; i < 10; i++)
+      images.append(new CubeDisplayProperties(
+        QString("./lub3994m.342.lev1.cub"), &lock));
+
+    widget.addCubes(images);
+
+    foreach (CubeDisplayProperties *image, images) {
+      QCOMPARE(image->supports(CubeDisplayProperties::Selected), true);
+      QCOMPARE(image->supports(CubeDisplayProperties::Color), true);
+    }
+
+    // This widget is set up such that it has a tree; most of the functionality is there
+    MosaicTreeWidget *tree = widget.findChild<MosaicTreeWidget *>("Tree");
+    QTreeWidgetItem *group1 = tree->topLevelItem(0);
+
+    QCOMPARE(images.count(), group1->childCount());
+
+    QList<MosaicTreeWidgetItem *> treeItems;
+    for (int i = 0; i < group1->childCount(); i++) {
+      treeItems.append(dynamic_cast<MosaicTreeWidgetItem *>(group1->child(i)));
+    }
+
+    for (int imgIndex = 0; imgIndex < images.count(); imgIndex++) {
+      int foundTreeIndex = -1;
+      for (int treeIndex = 0; foundTreeIndex == -1 && treeIndex < treeItems.count(); treeIndex++) {
+        if (treeItems[treeIndex]->cubeDisplay() == images[imgIndex])
+          foundTreeIndex = treeIndex;
+      }
+
+      QVERIFY(foundTreeIndex != -1);
+
+      treeItems.insert(imgIndex, treeItems.takeAt(foundTreeIndex));
+      QCOMPARE(treeItems[imgIndex]->cubeDisplay(),
+               images[imgIndex]);
+    }
+
+    foreach (CubeDisplayProperties *image, images) {
+      image->setSelected(true);
+      for (int i = 0; i < images.count(); i++) {
+        QCOMPARE(images[i]->getValue(CubeDisplayProperties::Selected).toBool(),
+                 treeItems[i]->isSelected());
+      }
+
+      image->setColor(CubeDisplayProperties::randomColor());
+
+      for (int i = 0; i < images.count(); i++) {
+        QCOMPARE(images[i]->getValue(CubeDisplayProperties::Color).value<QColor>(),
+                 treeItems[i]->background(MosaicTreeWidgetItem::NameColumn).color());
+      }
+    }
   }
 }
