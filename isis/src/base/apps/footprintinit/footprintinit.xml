@@ -138,6 +138,9 @@
       Added comment to documenation indicating spiceinit must be run prior to this
       application.
     </change>
+    <change name="Steven Lambright" date="2012-05-14">
+      The automatically calculated linc/sinc will now always be >= 1. References #686.
+    </change>
   </history>
   
   <groups>

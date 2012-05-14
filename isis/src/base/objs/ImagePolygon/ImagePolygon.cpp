@@ -27,6 +27,8 @@
 #include <iostream>
 #include <vector>
 
+#include <QDebug>
+
 #include <geos/geom/Geometry.h>
 #include <geos/geom/Polygon.h>
 #include <geos/geom/CoordinateArraySequence.h>
@@ -75,14 +77,22 @@ namespace Isis {
 
   //! Destroys the Polygon object
   ImagePolygon::~ImagePolygon() {
-    if(p_polygons != 0) delete p_polygons;
+    delete p_polygons;
+    p_polygons = NULL;
 
-    if(p_cube) p_cube = NULL;
+    p_cube = NULL;
 
-    if(m_leftCoord) delete m_leftCoord;
-    if(m_rightCoord) delete m_rightCoord;
-    if(m_topCoord) delete m_topCoord;
-    if(m_botCoord) delete m_botCoord;
+    delete m_leftCoord;
+    m_leftCoord = NULL;
+
+    delete m_rightCoord;
+    m_rightCoord = NULL;
+
+    delete m_topCoord;
+    m_topCoord = NULL;
+
+    delete m_botCoord;
+    m_botCoord = NULL;
   }
 
 
@@ -132,7 +142,7 @@ namespace Isis {
         throw polyError;
       }
     }
-    if(cam != NULL) p_isProjected = cam->HasProjection();
+    if (cam != NULL) p_isProjected = cam->HasProjection();
 
     //  Create brick for use in SetImage
     p_brick = new Brick(1, 1, 1, cube.getPixelType());
@@ -143,18 +153,18 @@ namespace Isis {
     p_cubeSamps = cube.getSampleCount();
     p_cubeLines = cube.getLineCount();
 
-    if(ns != 0) {
+    if (ns != 0) {
       p_cubeSamps = std::min(p_cubeSamps, ss + ns);
     }
 
-    if(nl != 0) {
+    if (nl != 0) {
       p_cubeLines = std::min(p_cubeLines, sl + nl);
     }
 
     p_cubeStartSamp = ss;
     p_cubeStartLine = sl;
 
-    if(p_ellipsoid && IsLimb() && p_gMap->Camera()) {
+    if (p_ellipsoid && IsLimb() && p_gMap->Camera()) {
       try {
         p_gMap->Camera()->IgnoreElevationModel(true);
       }
@@ -247,7 +257,7 @@ namespace Isis {
     /  If image contains 0/360 boundary, the polygon needs to be split up
     /  into multi polygons.
     /-----------------------------------------------------------------------*/
-    if(cam) {
+    if (cam) {
       Pvl defaultMap;
       cam->BasicMapping(defaultMap);
     }
@@ -255,9 +265,9 @@ namespace Isis {
     // Create the polygon, fixing if needed
     Fix360Poly();
 
-    if(p_brick != 0) delete p_brick;
+    if (p_brick != 0) delete p_brick;
 
-    if(p_gMap->Camera())
+    if (p_gMap->Camera())
       p_gMap->Camera()->IgnoreElevationModel(false);
   }
 
@@ -286,19 +296,19 @@ namespace Isis {
     geos::geom::Coordinate result;
 
     // Check to see if depth is too deep (walked all the way around and found nothing)
-    if(recursionDepth > 6) {
+    if (recursionDepth > 6) {
       return *currentPoint;
     }
 
     // Check and walk in appropriate direction
-    if(x == 0.0 && y == 0.0) {  // Find the starting point on an image
-      for(int line = -1 * p_lineinc; line <= 1 * p_lineinc; line += p_lineinc) {
-        for(int samp = -1 * p_sampinc; samp <= 1 * p_sampinc; samp += p_sampinc) {
+    if (x == 0.0 && y == 0.0) {  // Find the starting point on an image
+      for (int line = -1 * p_lineinc; line <= 1 * p_lineinc; line += p_lineinc) {
+        for (int samp = -1 * p_sampinc; samp <= 1 * p_sampinc; samp += p_sampinc) {
           double s = currentPoint->x + samp;
           double l = currentPoint->y + line;
           // Try the next left hand rule point if (s,l) does not produce a
           // lat/long or it is not on the image.
-          if(!InsideImage(s, l) || !SetImage(s, l)) {
+          if (!InsideImage(s, l) || !SetImage(s, l)) {
             geos::geom::Coordinate next(s, l);
             return FindNextPoint(currentPoint, next);
           }
@@ -308,80 +318,80 @@ namespace Isis {
       std::string msg = "Unable to create image footprint. Starting point is not on the edge of the image.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    else if(x < 0 && y < 0) {  // current is top left
+    else if (x < 0 && y < 0) {  // current is top left
       geos::geom::Coordinate next(currentPoint->x, currentPoint->y - 1 * p_lineinc);
       MoveBackInsideImage(next.x, next.y, 0, -p_lineinc);
-      if(!recursionDepth || !InsideImage(next.x, next.y) || !SetImage(next.x , next.y)) {
+      if (!recursionDepth || !InsideImage(next.x, next.y) || !SetImage(next.x , next.y)) {
         result = FindNextPoint(currentPoint, next, recursionDepth + 1);
       }
       else {
         result = FindBestPoint(currentPoint, next, lastPoint);
       }
     }
-    else if(x == 0.0 && y < 0) {  // current is top
+    else if (x == 0.0 && y < 0) {  // current is top
       geos::geom::Coordinate next(currentPoint->x + 1 * p_sampinc, currentPoint->y - 1 * p_lineinc);
       MoveBackInsideImage(next.x, next.y, p_sampinc, -p_lineinc);
-      if(!recursionDepth || !InsideImage(next.x, next.y) || !SetImage(next.x , next.y)) {
+      if (!recursionDepth || !InsideImage(next.x, next.y) || !SetImage(next.x , next.y)) {
         result = FindNextPoint(currentPoint, next, recursionDepth + 1);
       }
       else {
         result = FindBestPoint(currentPoint, next, lastPoint);
       }
     }
-    else if(x > 0 && y < 0) {  // current is top right
+    else if (x > 0 && y < 0) {  // current is top right
       geos::geom::Coordinate next(currentPoint->x + 1 * p_sampinc, currentPoint->y);
       MoveBackInsideImage(next.x, next.y, p_sampinc, 0);
-      if(!recursionDepth || !InsideImage(next.x, next.y) || !SetImage(next.x , next.y)) {
+      if (!recursionDepth || !InsideImage(next.x, next.y) || !SetImage(next.x , next.y)) {
         result = FindNextPoint(currentPoint, next, recursionDepth + 1);
       }
       else {
         result = FindBestPoint(currentPoint, next, lastPoint);
       }
     }
-    else if(x > 0 && y == 0.0) {  // current is right
+    else if (x > 0 && y == 0.0) {  // current is right
       geos::geom::Coordinate next(currentPoint->x + 1 * p_sampinc, currentPoint->y + 1 * p_lineinc);
       MoveBackInsideImage(next.x, next.y, p_sampinc, p_lineinc);
-      if(!recursionDepth || !InsideImage(next.x, next.y) || !SetImage(next.x , next.y)) {
+      if (!recursionDepth || !InsideImage(next.x, next.y) || !SetImage(next.x , next.y)) {
         result = FindNextPoint(currentPoint, next, recursionDepth + 1);
       }
       else {
         result = FindBestPoint(currentPoint, next, lastPoint);
       }
     }
-    else if(x > 0 && y > 0) {  // current is bottom right
+    else if (x > 0 && y > 0) {  // current is bottom right
       geos::geom::Coordinate next(currentPoint->x, currentPoint->y + 1 * p_lineinc);
       MoveBackInsideImage(next.x, next.y, 0, p_lineinc);
-      if(!recursionDepth || !InsideImage(next.x, next.y) || !SetImage(next.x , next.y)) {
+      if (!recursionDepth || !InsideImage(next.x, next.y) || !SetImage(next.x , next.y)) {
         result = FindNextPoint(currentPoint, next, recursionDepth + 1);
       }
       else {
         result = FindBestPoint(currentPoint, next, lastPoint);
       }
     }
-    else if(x == 0.0 && y > 0) {  // current is bottom
+    else if (x == 0.0 && y > 0) {  // current is bottom
       geos::geom::Coordinate next(currentPoint->x - 1 * p_sampinc, currentPoint->y + 1 * p_lineinc);
       MoveBackInsideImage(next.x, next.y, -p_sampinc, p_lineinc);
-      if(!recursionDepth || !InsideImage(next.x, next.y) || !SetImage(next.x , next.y)) {
+      if (!recursionDepth || !InsideImage(next.x, next.y) || !SetImage(next.x , next.y)) {
         result = FindNextPoint(currentPoint, next, recursionDepth + 1);
       }
       else {
         result = FindBestPoint(currentPoint, next, lastPoint);
       }
     }
-    else if(x < 0 && y > 0) {   // current is bottom left
+    else if (x < 0 && y > 0) {   // current is bottom left
       geos::geom::Coordinate next(currentPoint->x - 1 * p_sampinc, currentPoint->y);
       MoveBackInsideImage(next.x, next.y, -p_sampinc, 0);
-      if(!recursionDepth || !InsideImage(next.x, next.y) || !SetImage(next.x , next.y)) {
+      if (!recursionDepth || !InsideImage(next.x, next.y) || !SetImage(next.x , next.y)) {
         result = FindNextPoint(currentPoint, next, recursionDepth + 1);
       }
       else {
         result = FindBestPoint(currentPoint, next, lastPoint);
       }
     }
-    else if(x < 0 && y == 0.0) {  // current is left
+    else if (x < 0 && y == 0.0) {  // current is left
       geos::geom::Coordinate next(currentPoint->x - 1 * p_sampinc, currentPoint->y - 1 * p_lineinc);
       MoveBackInsideImage(next.x, next.y, -p_sampinc, -p_lineinc);
-      if(!recursionDepth || !InsideImage(next.x, next.y) || !SetImage(next.x , next.y)) {
+      if (!recursionDepth || !InsideImage(next.x, next.y) || !SetImage(next.x , next.y)) {
         result = FindNextPoint(currentPoint, next, recursionDepth + 1);
       }
       else {
@@ -424,9 +434,9 @@ namespace Isis {
     const double origLine = line - linc;
 
     // We moved left off the image - snap to the edge
-    if(sample < startSample && sinc < 0) {
+    if (sample < startSample && sinc < 0) {
       // don't snap if we started at the edge
-      if(origSample == startSample) {
+      if (origSample == startSample) {
         return;
       }
 
@@ -434,9 +444,9 @@ namespace Isis {
     }
 
     // We moved right off the image - snap to the edge
-    if(sample > endSample && sinc > 0) {
+    if (sample > endSample && sinc > 0) {
       // don't snap if we started at the edge
-      if(origSample == endSample) {
+      if (origSample == endSample) {
         return;
       }
 
@@ -444,9 +454,9 @@ namespace Isis {
     }
 
     // We moved up off the image - snap to the edge
-    if(line < startLine && linc < 0) {
+    if (line < startLine && linc < 0) {
       // don't snap if we started at the edge
-      if(origLine == startLine) {
+      if (origLine == startLine) {
         return;
       }
 
@@ -454,9 +464,9 @@ namespace Isis {
     }
 
     // We moved down off the image - snap to the edge
-    if(line > endLine && linc > 0) {
+    if (line > endLine && linc > 0) {
       // don't snap if we started at the edge
-      if(fabs(origLine - endLine) < 0.5) {
+      if (fabs(origLine - endLine) < 0.5) {
         return;
       }
 
@@ -491,15 +501,15 @@ namespace Isis {
   */
   geos::geom::Coordinate ImagePolygon::FindFirstPoint() {
     // @todo: Brute force method, should be improved
-    for(int sample = p_cubeStartSamp; sample <= p_cubeSamps; sample++) {
-      for(int line = p_cubeStartLine; line <= p_cubeLines; line++) {
-        if(SetImage(sample, line)) {
+    for (int sample = p_cubeStartSamp; sample <= p_cubeSamps; sample++) {
+      for (int line = p_cubeStartLine; line <= p_cubeLines; line++) {
+        if (SetImage(sample, line)) {
           // An outlier check.  Make sure that the pixel we use to start
           // constructing a polygon is not surrounded by a bunch of invalid
           // positions.
           geos::geom::Coordinate firstPoint(sample, line);
           geos::geom::Coordinate lastPoint = firstPoint;
-          if(!firstPoint.equals(FindNextPoint(&firstPoint, lastPoint))) {
+          if (!firstPoint.equals(FindNextPoint(&firstPoint, lastPoint))) {
             return firstPoint;
           }
         }
@@ -517,8 +527,13 @@ namespace Isis {
    * initCube() or Create()
    */
   double ImagePolygon::validSampleDim() {
-    if (not m_leftCoord or not m_rightCoord) calcImageBorderCoordinates();
-    return m_rightCoord->x - m_leftCoord->x + 1;
+    double result = 0.0;
+    
+    calcImageBorderCoordinates();
+    if (m_rightCoord && m_leftCoord)
+      result = m_rightCoord->x - m_leftCoord->x + 1;
+
+    return result; 
   }
 
 
@@ -527,8 +542,13 @@ namespace Isis {
    * initCube() or Create()
    */
   double ImagePolygon::validLineDim() {
-    if (not m_topCoord or not m_botCoord) calcImageBorderCoordinates();
-    return m_botCoord->y - m_topCoord->y + 1;
+    double result = 0.0;
+    
+    calcImageBorderCoordinates();
+    if (m_topCoord && m_botCoord)
+      result = m_botCoord->y - m_topCoord->y + 1;
+
+    return result;
   }
 
 
@@ -542,39 +562,43 @@ namespace Isis {
    */
   void ImagePolygon::calcImageBorderCoordinates() {
     ASSERT(p_cube);
-    ASSERT(p_cubeSamps);
-    ASSERT(p_cubeLines);
-    if (not m_leftCoord) {
-      for(int line = p_cubeStartLine; line <= p_cubeLines; line++)
-        for(int sample = p_cubeStartSamp; sample <= p_cubeSamps; sample++)
-          if(SetImage(sample, line)) {
-            m_leftCoord = new geos::geom::Coordinate(sample, line);
-            break;
-          }
+
+    for (int line = p_cubeStartLine; !m_leftCoord && line <= p_cubeLines; line++) {
+      for (int sample = p_cubeStartSamp; !m_leftCoord && sample <= p_cubeSamps; sample++) {
+        if (SetImage(sample, line)) {
+          m_leftCoord = new geos::geom::Coordinate(sample, line);
+        }
+      }
     }
-    if (not m_rightCoord) {
-      for(int line = p_cubeStartLine; line <= p_cubeLines; line++)
-        for(int sample = p_cube->getSampleCount(); sample >= m_leftCoord->x; sample--)
-          if(SetImage(sample, line)) {
+
+    if (m_leftCoord) {
+      for (int line = p_cubeStartLine; !m_rightCoord && line <= p_cubeLines; line++) {
+        for (int sample = p_cubeSamps; !m_rightCoord && sample >= m_leftCoord->x; sample--) {
+          if (SetImage(sample, line)) {
             m_rightCoord = new geos::geom::Coordinate(sample, line);
-            break;
           }
+        }
+      }
     }
-    if (not m_topCoord) {
-      for(int sample = (int)m_leftCoord->x; sample <= m_rightCoord->x; sample++)
-        for(int line = 1; line <= p_cubeLines; line++)
-          if(SetImage(sample, line)) {
+
+    if (m_leftCoord && m_rightCoord) {
+      for (int sample = (int)m_leftCoord->x; !m_topCoord && sample <= m_rightCoord->x; sample++) {
+        for (int line = 1; !m_topCoord && line <= p_cubeLines; line++) {
+          if (SetImage(sample, line)) {
             m_topCoord = new geos::geom::Coordinate(sample, line);
-            break;
           }
+        }
+      }
     }
-    if (not m_botCoord) {
-      for(int sample = (int)m_leftCoord->x; sample <= m_rightCoord->x; sample++)
-        for(int line = p_cube->getLineCount(); line >= m_topCoord->y; line--)
-          if(SetImage(sample, line)) {
+
+    if (m_leftCoord && m_rightCoord && m_topCoord) {
+      for (int sample = (int)m_leftCoord->x; !m_botCoord && sample <= m_rightCoord->x; sample++) {
+        for (int line = p_cube->getLineCount(); !m_botCoord && line >= m_topCoord->y; line--) {
+          if (SetImage(sample, line)) {
             m_botCoord = new geos::geom::Coordinate(sample, line);
-            break;
           }
+        }
+      }
     }
   }
 
@@ -624,15 +648,15 @@ namespace Isis {
       snapToFirstPoint &= (DistanceSquared(&currentPoint, &firstPoint) < (minStepSize * minStepSize));
 
       // Searches for skipped firstPoint due to a large pixinc, by using a pixinc of 1
-      if(snapToFirstPoint) {
+      if (snapToFirstPoint) {
         tempPoint = firstPoint;
       }
       // If pixinc is greater than line or sample dimention, then we could
       // skip firstPoint. This checks for that case.
-      else if(p_sampinc > p_cubeSamps || p_lineinc > p_cubeLines) {
+      else if (p_sampinc > p_cubeSamps || p_lineinc > p_cubeLines) {
         // This is not expensive because incement must be large
-        for(int pt = 0; pt < (int)points.size(); pt ++) {
-          if(points[pt].equals(tempPoint)) {
+        for (int pt = 0; pt < (int)points.size(); pt ++) {
+          if (points[pt].equals(tempPoint)) {
             tempPoint = firstPoint;
             break;
           }
@@ -640,7 +664,7 @@ namespace Isis {
       }
 
       // Failed to find the next point
-      if(tempPoint.equals(currentPoint)) {
+      if (tempPoint.equals(currentPoint)) {
         geos::geom::Coordinate oldDuplicatePoint = tempPoint;
 
         // Init vars for first run through the loop
@@ -650,7 +674,7 @@ namespace Isis {
 
         // Must be 3 (not 2) to prevent the revisit of the starting point,
         // resulting in an infinite loop
-        if(points.size() < 3) {
+        if (points.size() < 3) {
           std::string msg = "Failed to find next point in the image.";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
@@ -660,7 +684,7 @@ namespace Isis {
 
         tempPoint = FindNextPoint(&currentPoint, lastPoint, 1);
 
-        if(tempPoint.equals(currentPoint) || tempPoint.equals(oldDuplicatePoint)) {
+        if (tempPoint.equals(currentPoint) || tempPoint.equals(oldDuplicatePoint)) {
           std::string msg = "Failed to find next valid point in the image.";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
@@ -668,8 +692,8 @@ namespace Isis {
 
 
       // Check for triangle cycles and try to fix
-      if(p_sampinc > 1  ||  p_lineinc > 1) {
-        if(points[points.size()-3].x == tempPoint.x &&
+      if (p_sampinc > 1  ||  p_lineinc > 1) {
+        if (points[points.size()-3].x == tempPoint.x &&
             points[points.size()-3].y == tempPoint.y) {
           // Remove the triangle from the list
           points.pop_back();
@@ -678,8 +702,8 @@ namespace Isis {
           // Reset the current (to be last) point
           currentPoint = points[points.size()-1];
           // change increment to prevent randomly bad pixels in the image
-          if(p_sampinc > 1) p_sampinc --;
-          if(p_lineinc > 1) p_lineinc --;
+          if (p_sampinc > 1) p_sampinc --;
+          if (p_lineinc > 1) p_lineinc --;
         }
 
         /**
@@ -688,13 +712,13 @@ namespace Isis {
          *
          * "very large" is defined as 250 points
          */
-        if(points.size() > 250) {
+        if (points.size() > 250) {
           int cycleStart = 0;
           int cycleEnd = 0;
 
-          for(unsigned int pt = 1; pt < points.size() && cycleStart == 0; pt ++) {
-            for(unsigned int check = pt + 1; check < points.size() && cycleStart == 0; check ++) {
-              if(points[pt] == points[check]) {
+          for (unsigned int pt = 1; pt < points.size() && cycleStart == 0; pt ++) {
+            for (unsigned int check = pt + 1; check < points.size() && cycleStart == 0; check ++) {
+              if (points[pt] == points[check]) {
                 cycleStart = pt;
                 cycleEnd = check;
               }
@@ -702,9 +726,9 @@ namespace Isis {
           }
 
           // If a cycle was found, make it the polygon
-          if(cycleStart != 0) {
+          if (cycleStart != 0) {
             vector<geos::geom::Coordinate> cyclePoints;
-            for(int pt = cycleStart; pt <= cycleEnd; pt ++) {
+            for (int pt = cycleStart; pt <= cycleEnd; pt ++) {
               cyclePoints.push_back(points[pt]);
             }
 
@@ -720,9 +744,9 @@ namespace Isis {
       points.push_back(currentPoint);
 
     }
-    while(!currentPoint.equals(firstPoint));
+    while (!currentPoint.equals(firstPoint));
 
-    if(points.size() <= 3) {
+    if (points.size() <= 3) {
       std::string msg = "Failed to find enough points on the image.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -734,12 +758,12 @@ namespace Isis {
     // this vector stores crossing points, where the image crosses the
     // meridian. It stores the first coordinate of the pair in its vector
     vector<geos::geom::Coordinate> *crossingPoints = new vector<geos::geom::Coordinate>;
-    for(unsigned int i = 0; i < points.size(); i++) {
+    for (unsigned int i = 0; i < points.size(); i++) {
       geos::geom::Coordinate *temp = &(points.at(i));
       SetImage(temp->x, temp->y);
       lon = p_gMap->UniversalLongitude();
       lat = p_gMap->UniversalLatitude();
-      if(abs(lon - prevLon) >= 180 && i != 0) {
+      if (abs(lon - prevLon) >= 180 && i != 0) {
         crossingPoints->push_back(geos::geom::Coordinate(prevLon, prevLat));
       }
       p_pts->add(geos::geom::Coordinate(lon, lat));
@@ -762,7 +786,7 @@ namespace Isis {
                                     (globalFactory.createLinearRing(tempPts), NULL);
 
     // Remove the last point of the sequence if it produces invalid polygons
-    if(!tempPoly->isValid()) {
+    if (!tempPoly->isValid()) {
       p_pts->deleteAt(p_pts->size() - 2);
     }
 
@@ -788,79 +812,79 @@ namespace Isis {
     bool hasNorthPole = false;
     bool hasSouthPole = false;
 
-    if(p_gMap->SetUniversalGround(90, 0)) {
+    if (p_gMap->SetUniversalGround(90, 0)) {
       double nPoleSample = Null;
       double nPoleLine = Null;
 
-      if(p_gMap->Projection()) {
+      if (p_gMap->Projection()) {
         nPoleSample = p_gMap->Projection()->WorldX();
         nPoleLine = p_gMap->Projection()->WorldY();
       }
-      else if(p_gMap->Camera()) {
+      else if (p_gMap->Camera()) {
         nPoleSample = p_gMap->Camera()->Sample();
         nPoleLine = p_gMap->Camera()->Line();
       }
 
-      if(nPoleSample >= 0.5 && nPoleLine >= 0.5 &&
+      if (nPoleSample >= 0.5 && nPoleLine >= 0.5 &&
          nPoleSample <= p_cube->getSampleCount() + 0.5 &&
          nPoleLine <= p_cube->getLineCount() + 0.5) {
         hasNorthPole = true;
       }
     }
 
-    if(p_gMap->SetUniversalGround(-90, 0)) {
+    if (p_gMap->SetUniversalGround(-90, 0)) {
       double sPoleSample = Null;
       double sPoleLine = Null;
 
-      if(p_gMap->Projection()) {
+      if (p_gMap->Projection()) {
         sPoleSample = p_gMap->Projection()->WorldX();
         sPoleLine = p_gMap->Projection()->WorldY();
       }
-      else if(p_gMap->Camera()) {
+      else if (p_gMap->Camera()) {
         sPoleSample = p_gMap->Camera()->Sample();
         sPoleLine = p_gMap->Camera()->Line();
       }
 
-      if(sPoleSample >= 0.5 && sPoleLine >= 0.5 &&
+      if (sPoleSample >= 0.5 && sPoleLine >= 0.5 &&
          sPoleSample <= p_cube->getSampleCount() + 0.5 &&
          sPoleLine <= p_cube->getLineCount() + 0.5) {
         hasSouthPole = true;
       }
     }
 
-    if(hasNorthPole && hasSouthPole) {
+    if (hasNorthPole && hasSouthPole) {
       std::string msg = "Unable to create image footprint because image has both poles";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    else if(crossingPoints->size() == 0) {
+    else if (crossingPoints->size() == 0) {
       // No crossing points
       return;
     }
 
-    if(hasNorthPole) {
+    if (hasNorthPole) {
       p_gMap->SetUniversalGround(90, 0);
 
       // If the (north) pole is settable but not within proper angles,
       //  then the polygon does not contain the (north) pole when the cube does
-      if(p_gMap->Camera() &&
+      if (p_gMap->Camera() &&
          p_gMap->Camera()->EmissionAngle() > p_emission) {
         return;
       }
-      if(p_gMap->Camera() &&
+      if (p_gMap->Camera() &&
          p_gMap->Camera()->IncidenceAngle() > p_incidence) {
         return;
       }
     }
-    else if(hasSouthPole) {
+    else if (hasSouthPole) {
       p_gMap->SetUniversalGround(-90, 0);
 
       // If the (south) pole is settable but not within proper angles,
       //  then the polygon does not contain the (south) pole when the cube does
-      if(p_gMap->Camera() &&
+      if (p_gMap->Camera() &&
          p_gMap->Camera()->EmissionAngle() > p_emission) {
         return;
       }
-      if(p_gMap->Camera() &&
+      if (p_gMap->Camera() &&
          p_gMap->Camera()->IncidenceAngle() > p_incidence) {
         return;
       }
@@ -870,30 +894,30 @@ namespace Isis {
     geos::geom::Coordinate *pole = NULL;
 
     // Setup the right pole
-    if(hasNorthPole) {
+    if (hasNorthPole) {
       pole = new geos::geom::Coordinate(0, 90);
     }
-    else if(hasSouthPole) {
+    else if (hasSouthPole) {
       pole = new geos::geom::Coordinate(0, -90);
     }
-    else if(crossingPoints->size() % 2 == 1) {
+    else if (crossingPoints->size() % 2 == 1) {
       geos::geom::Coordinate nPole(0, 90);
       double nDist = DBL_MAX;
       geos::geom::Coordinate sPole(0, -90);
       double sDist = DBL_MAX;
 
-      for(unsigned int index = 0; index < p_pts->size(); index ++) {
+      for (unsigned int index = 0; index < p_pts->size(); index ++) {
         double north = DistanceSquared(&nPole, &((*p_pts)[index]));
-        if(north < nDist) {
+        if (north < nDist) {
           nDist = north;
         }
         double south = DistanceSquared(&sPole, &((*p_pts)[index]));
-        if(south < sDist) {
+        if (south < sDist) {
           sDist = south;
         }
       }
 
-      if(sDist < nDist) {
+      if (sDist < nDist) {
         pole = new geos::geom::Coordinate(0, -90);
       }
       else {
@@ -902,19 +926,19 @@ namespace Isis {
     }
 
     // Skip the fix if no pole was determined
-    if(pole == NULL) {
+    if (pole == NULL) {
       return;
     }
 
     // Find where the pole needs to be split
     double closestDistance = DBL_MAX;
-    for(unsigned int i = 0; i < crossingPoints->size(); i++) {
+    for (unsigned int i = 0; i < crossingPoints->size(); i++) {
       geos::geom::Coordinate *temp = &crossingPoints->at(i);
       double tempDistance;
       // Make sure the Lat is as close to 0 as possible for a correct distance
-      if(temp->x > 180) {
+      if (temp->x > 180) {
         double mod = 0.0;
-        while((temp->x - mod) > 180) mod += 360.0;
+        while ((temp->x - mod) > 180) mod += 360.0;
 
         // Create the modified Point, create a pointer to it, and find the distance
         geos::geom::Coordinate modPointMem = geos::geom::Coordinate(temp->x - mod, temp->y);
@@ -924,27 +948,27 @@ namespace Isis {
       else {
         tempDistance = DistanceSquared(temp, pole);
       }
-      if(tempDistance < closestDistance) {
+      if (tempDistance < closestDistance) {
         closestDistance = tempDistance;
         closestPoint = temp;
       }
     }
 
-    if(closestDistance == DBL_MAX) {
+    if (closestDistance == DBL_MAX) {
       std::string msg = "Image contains a pole but did not detect a meridian crossing!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // split image at the pole
     geos::geom::CoordinateSequence *new_points = new geos::geom::CoordinateArraySequence();
-    for(unsigned int i = 0; i < p_pts->size(); i++) {
+    for (unsigned int i = 0; i < p_pts->size(); i++) {
       geos::geom::Coordinate temp = p_pts->getAt(i);
       new_points->add(temp);
-      if(temp.equals(*closestPoint)) {
+      if (temp.equals(*closestPoint)) {
         // Setup direction
-        if(i + 1 != p_pts->size()) { // Prevent overflow exception
+        if (i + 1 != p_pts->size()) { // Prevent overflow exception
           double fromLon, toLon;
-          if((p_pts->getAt(i + 1).x - closestPoint->x) > 0) {
+          if ((p_pts->getAt(i + 1).x - closestPoint->x) > 0) {
             fromLon = 0.0;
             toLon   = 360.0;
           }
@@ -959,14 +983,14 @@ namespace Isis {
           geos::geom::Coordinate sPole(0.0, -90.0);
           double dist = DBL_MAX;
 
-          for(int num = 0; num < 2 && dist > 180.0; num ++) {
+          for (int num = 0; num < 2 && dist > 180.0; num ++) {
             nPole = geos::geom::Coordinate(num * 360.0, 90.0);
             sPole = geos::geom::Coordinate(num * 360.0, -90.0);
 
-            if(temp.x > 0.0  &&  p_pts->getAt(i + 1).x > 0.0) {
+            if (temp.x > 0.0  &&  p_pts->getAt(i + 1).x > 0.0) {
               crossingPoint = geos::geom::Coordinate(p_pts->getAt(i + 1).x - 360.0 + (num * 720.0), p_pts->getAt(i + 1).y);
             }
-            else if(temp.x < 0.0  &&  p_pts->getAt(i + 1).x < 0.0) { // This should never happen
+            else if (temp.x < 0.0  &&  p_pts->getAt(i + 1).x < 0.0) { // This should never happen
               crossingPoint = geos::geom::Coordinate(p_pts->getAt(i + 1).x + 360.0 - (num * 720.0), p_pts->getAt(i + 1).y);
             }
 
@@ -975,28 +999,28 @@ namespace Isis {
 
           lineIntersector.computeIntersection(nPole, sPole, temp, crossingPoint);
 
-          if(lineIntersector.hasIntersection()) {
+          if (lineIntersector.hasIntersection()) {
             const geos::geom::Coordinate &intersection = lineIntersector.getIntersection(0);
 
             // Calculate the latituded of the points along the meridian
-            if(pole->y < intersection.y) {
+            if (pole->y < intersection.y) {
               dist = -dist;
             }
             vector<double> lats;
             double maxLat = std::max(intersection.y, pole->y);
             double minLat = std::min(intersection.y, pole->y);
-            for(double lat = intersection.y + dist; lat < maxLat  &&  lat > minLat; lat += dist) {
+            for (double lat = intersection.y + dist; lat < maxLat  &&  lat > minLat; lat += dist) {
               lats.push_back(lat);
             }
 
             // Add the new points
             new_points->add(geos::geom::Coordinate(fromLon, intersection.y));
-            for(int lat = 0; lat < (int)lats.size(); lat ++) {
+            for (int lat = 0; lat < (int)lats.size(); lat ++) {
               new_points->add(geos::geom::Coordinate(fromLon, lats[lat]));
             }
             new_points->add(geos::geom::Coordinate(fromLon, pole->y));
             new_points->add(geos::geom::Coordinate(toLon, pole->y));
-            for(int lat = lats.size() - 1; lat >= 0; lat --) {
+            for (int lat = lats.size() - 1; lat >= 0; lat --) {
               new_points->add(geos::geom::Coordinate(toLon, lats[lat]));
             }
             new_points->add(geos::geom::Coordinate(toLon, intersection.y));
@@ -1029,19 +1053,19 @@ namespace Isis {
    */
   bool ImagePolygon::SetImage(const double sample, const double line) {
     bool found = false;
-    if(!p_isProjected) {
+    if (!p_isProjected) {
       found = p_gMap->SetImage(sample, line);
-      if(!found) {
+      if (!found) {
         return false;
       }
       else {
         // Check for valid emission and incidence
         try {
-          if(p_gMap->Camera() &&
+          if (p_gMap->Camera() &&
              p_gMap->Camera()->EmissionAngle() > p_emission) {
             return false;
           }
-          if(p_gMap->Camera() &&
+          if (p_gMap->Camera() &&
              p_gMap->Camera()->IncidenceAngle() > p_incidence) {
             return false;
           }
@@ -1073,7 +1097,7 @@ namespace Isis {
       //  geometry.
       p_brick->SetBasePosition((int)sample, (int)line, 1);
       p_cube->read(*p_brick);
-      if(Isis::IsNullPixel((*p_brick)[0])) {
+      if (Isis::IsNullPixel((*p_brick)[0])) {
         return false;
       }
       else {
@@ -1101,23 +1125,23 @@ namespace Isis {
 
     newLonLatPts->add(geos::geom::Coordinate(prevLon, prevLat));
     double dist = 0.0;
-    for(unsigned int i = 1; i < p_pts->getSize(); i++) {
+    for (unsigned int i = 1; i < p_pts->getSize(); i++) {
       lon = p_pts->getAt(i).x;
       lat = p_pts->getAt(i).y;
       // check to see if you just crossed the Meridian
-      if(abs(lon - prevLon) > 180 && (prevLat != 90 && prevLat != -90)) {
+      if (abs(lon - prevLon) > 180 && (prevLat != 90 && prevLat != -90)) {
         newCoords = true;
         // if you were already converting then stop (crossed Meridian even number of times)
-        if(convertLon) {
+        if (convertLon) {
           convertLon = false;
           lonOffset = 0;
         }
         else {   // Need to start converting again, deside how to adjust coordinates
-          if((lon - prevLon) > 0) {
+          if ((lon - prevLon) > 0) {
             lonOffset = -360.;
             negAdjust = true;
           }
-          else if((lon - prevLon) < 0) {
+          else if ((lon - prevLon) < 0) {
             lonOffset = 360.;
             negAdjust = false;
           }
@@ -1128,7 +1152,7 @@ namespace Isis {
       }
 
       // Change to a minimum calculation
-      if(newCoords  &&  dist == 0.0) {
+      if (newCoords  &&  dist == 0.0) {
         double longitude = (lon + lonOffset) - prevLon;
         double latitude = lat - prevLat;
         dist = std::sqrt((longitude * longitude) + (latitude * latitude));
@@ -1143,7 +1167,7 @@ namespace Isis {
     }
 
     // Nothing was done so return
-    if(!newCoords) {
+    if (!newCoords) {
       geos::geom::Polygon *newPoly = globalFactory.createPolygon
                                      (globalFactory.createLinearRing(newLonLatPts), NULL);
       p_polygons = PolygonTools::MakeMultiPolygon(newPoly);
@@ -1164,12 +1188,12 @@ namespace Isis {
 
       // please verify correct if you change these values
       //***************************************************
-      if(negAdjust) {
+      if (negAdjust) {
         pts->add(geos::geom::Coordinate(0., 90.));
         pts->add(geos::geom::Coordinate(-360., 90.));
         pts->add(geos::geom::Coordinate(-360., -90.));
         pts->add(geos::geom::Coordinate(0., -90.));
-        for(double lat = -90.0 + dist; lat < 90.0; lat += dist) {
+        for (double lat = -90.0 + dist; lat < 90.0; lat += dist) {
           pts->add(geos::geom::Coordinate(0.0, lat));
         }
         pts->add(geos::geom::Coordinate(0., 90.));
@@ -1177,7 +1201,7 @@ namespace Isis {
         pts2->add(geos::geom::Coordinate(360., 90.));
         pts2->add(geos::geom::Coordinate(360., -90.));
         pts2->add(geos::geom::Coordinate(0., -90.));
-        for(double lat = -90.0 + dist; lat < 90.0; lat += dist) {
+        for (double lat = -90.0 + dist; lat < 90.0; lat += dist) {
           pts2->add(geos::geom::Coordinate(0.0, lat));
         }
         pts2->add(geos::geom::Coordinate(0., 90.));
@@ -1187,7 +1211,7 @@ namespace Isis {
         pts->add(geos::geom::Coordinate(720., 90.));
         pts->add(geos::geom::Coordinate(720., -90.));
         pts->add(geos::geom::Coordinate(360., -90.));
-        for(double lat = -90.0 + dist; lat < 90.0; lat += dist) {
+        for (double lat = -90.0 + dist; lat < 90.0; lat += dist) {
           pts->add(geos::geom::Coordinate(360.0, lat));
         }
         pts->add(geos::geom::Coordinate(360., 90.));
@@ -1195,7 +1219,7 @@ namespace Isis {
         pts2->add(geos::geom::Coordinate(0., 90.));
         pts2->add(geos::geom::Coordinate(0., -90.));
         pts2->add(geos::geom::Coordinate(360., -90.));
-        for(double lat = -90.0 + dist; lat < 90.0; lat += dist) {
+        for (double lat = -90.0 + dist; lat < 90.0; lat += dist) {
           pts2->add(geos::geom::Coordinate(360.0, lat));
         }
         pts2->add(geos::geom::Coordinate(360., 90.));
@@ -1226,16 +1250,16 @@ namespace Isis {
       vector<geos::geom::Geometry *> *finalpolys = new vector<geos::geom::Geometry *>;
       geos::geom::Geometry *newGeom = NULL;
 
-      for(unsigned int i = 0; i < convertPoly->getNumGeometries(); i++) {
+      for (unsigned int i = 0; i < convertPoly->getNumGeometries(); i++) {
         newGeom = (convertPoly->getGeometryN(i))->clone();
         pts = convertPoly->getGeometryN(i)->getCoordinates();
         geos::geom::CoordinateSequence *newLonLatPts = new geos::geom::CoordinateArraySequence();
         // fix the points
 
-        for(unsigned int k = 0; k < pts->getSize() ; k++) {
+        for (unsigned int k = 0; k < pts->getSize() ; k++) {
           double lon = pts->getAt(k).x;
           double lat = pts->getAt(k).y;
-          if(negAdjust) {
+          if (negAdjust) {
             lon = lon + 360;
           }
           else {
@@ -1250,7 +1274,7 @@ namespace Isis {
       }
 
       // This loop is over polygons that will always be in 0-360 space no need to convert
-      for(unsigned int i = 0; i < convertPoly2->getNumGeometries(); i++) {
+      for (unsigned int i = 0; i < convertPoly2->getNumGeometries(); i++) {
         newGeom = (convertPoly2->getGeometryN(i))->clone();
         finalpolys->push_back(newGeom);
       }
@@ -1300,7 +1324,7 @@ namespace Isis {
 
     streampos sbyte = p_startByte - 1;
     is.seekg(sbyte, std::ios::beg);
-    if(!is.good()) {
+    if (!is.good()) {
       string msg = "Error preparing to read data from " + p_type +
                    " [" + p_blobName + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
@@ -1315,7 +1339,7 @@ namespace Isis {
 
     delete [] buf;
 
-    if(!is.good()) {
+    if (!is.good()) {
       string msg = "Error reading data from " + p_type + " [" +
                    p_blobName + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
@@ -1332,7 +1356,7 @@ namespace Isis {
     geos::io::WKTWriter *wkt = new geos::io::WKTWriter();
 
     // Check to see p_polygons is valid data
-    if(!p_polygons) {
+    if (!p_polygons) {
       string msg = "Cannot write a NULL polygon!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1402,42 +1426,42 @@ namespace Isis {
       geos::geom::Coordinate lastPoint) {
     geos::geom::Coordinate result = newPoint;
     // Use a binary search to snap to the limb when needed
-    if(p_sampinc > 1  ||  p_lineinc > 1) {
+    if (p_sampinc > 1  ||  p_lineinc > 1) {
 
       // Pull the invalid point back inside the image
       double x = lastPoint.x;
       double y = lastPoint.y;
-      if(x < p_cubeStartSamp) {
+      if (x < p_cubeStartSamp) {
         x = p_cubeStartSamp;
       }
-      else if(x > p_cubeSamps) {
+      else if (x > p_cubeSamps) {
         x = p_cubeSamps;
       }
-      if(y < p_cubeStartLine) {
+      if (y < p_cubeStartLine) {
         y = p_cubeStartLine;
       }
-      else if(y > p_cubeLines) {
+      else if (y > p_cubeLines) {
         y = p_cubeLines;
       }
       geos::geom::Coordinate invalid(x, y);
       geos::geom::Coordinate valid(result.x, result.y);
 
       // Find the best valid Coordinate
-      while(!SetImage(invalid.x, invalid.y)) {
+      while (!SetImage(invalid.x, invalid.y)) {
         int x, y;
-        if(invalid.x > valid.x) {
+        if (invalid.x > valid.x) {
           x = (int)invalid.x - 1;
         }
-        else if(invalid.x < valid.x) {
+        else if (invalid.x < valid.x) {
           x = (int)invalid.x + 1;
         }
         else {
           x = (int)invalid.x;
         }
-        if(invalid.y > valid.y) {
+        if (invalid.y > valid.y) {
           y = (int)invalid.y - 1;
         }
-        else if(invalid.y < valid.y) {
+        else if (invalid.y < valid.y) {
           y = (int)invalid.y + 1;
         }
         else {
@@ -1468,43 +1492,43 @@ namespace Isis {
     geos::geom::Coordinate modPoint = newPoint;
 
     // Step Too big
-    if(p_sampinc > p_cubeSamps || p_lineinc > p_cubeLines) {
+    if (p_sampinc > p_cubeSamps || p_lineinc > p_cubeLines) {
       return newPoint;
     }
 
     // An upper left corner
-    else if(currentPoint->x < newPoint.x && currentPoint->y > newPoint.y) {
-      while(newPoint.x >= currentPoint->x && SetImage(newPoint.x, newPoint.y)) {
+    else if (currentPoint->x < newPoint.x && currentPoint->y > newPoint.y) {
+      while (newPoint.x >= currentPoint->x && SetImage(newPoint.x, newPoint.y)) {
         modPoint = newPoint;
         newPoint.x -= 1;
       }
     }
 
     // An upper right corner
-    else if(currentPoint->y < newPoint.y && currentPoint->x < newPoint.x) {
-      while(newPoint.y >= currentPoint->y && SetImage(newPoint.x, newPoint.y)) {
+    else if (currentPoint->y < newPoint.y && currentPoint->x < newPoint.x) {
+      while (newPoint.y >= currentPoint->y && SetImage(newPoint.x, newPoint.y)) {
         modPoint = newPoint;
         newPoint.y -= 1;
       }
     }
 
     // An lower right corner
-    else if(currentPoint->x > newPoint.x && currentPoint->y < newPoint.y) {
-      while(newPoint.x <= currentPoint->x && SetImage(newPoint.x, newPoint.y)) {
+    else if (currentPoint->x > newPoint.x && currentPoint->y < newPoint.y) {
+      while (newPoint.x <= currentPoint->x && SetImage(newPoint.x, newPoint.y)) {
         modPoint = newPoint;
         newPoint.x += 1;
       }
     }
 
     // An lower left corner
-    else if(currentPoint->y > newPoint.y && currentPoint->x > newPoint.x) {
-      while(newPoint.y <= currentPoint->y && SetImage(newPoint.x, newPoint.y)) {
+    else if (currentPoint->y > newPoint.y && currentPoint->x > newPoint.x) {
+      while (newPoint.y <= currentPoint->y && SetImage(newPoint.x, newPoint.y)) {
         modPoint = newPoint;
         newPoint.y += 1;
       }
     }
 
-    if(currentPoint->x == modPoint.x && currentPoint->y == modPoint.y) {
+    if (currentPoint->x == modPoint.x && currentPoint->y == modPoint.y) {
       return originalPoint;
     }
     return modPoint;
@@ -1519,13 +1543,13 @@ namespace Isis {
    * @param points The vector of Coordinate to set to subpixel accuracy
    */
   void ImagePolygon::FindSubpixel(std::vector<geos::geom::Coordinate> & points) {
-    if(p_subpixelAccuracy > 0) {
+    if (p_subpixelAccuracy > 0) {
 
       // Fix the polygon with subpixel accuracy
       geos::geom::Coordinate old = points.at(0);
       bool didStartingPoint = false;
-      for(unsigned int pt = 1; !didStartingPoint; pt ++) {
-        if(pt >= points.size() - 1) {
+      for (unsigned int pt = 1; !didStartingPoint; pt ++) {
+        if (pt >= points.size() - 1) {
           pt = 0;
           didStartingPoint = true;
         }
@@ -1538,9 +1562,9 @@ namespace Isis {
         geos::geom::Coordinate valid = points.at(pt);
         geos::geom::Coordinate invalid(valid.x + stepX, valid.y + stepY);
 
-        for(int itt = 0; itt < p_subpixelAccuracy; itt ++) {
+        for (int itt = 0; itt < p_subpixelAccuracy; itt ++) {
           geos::geom::Coordinate half((valid.x + invalid.x) / 2.0, (valid.y + invalid.y) / 2.0);
-          if(SetImage(half.x, half.y)  &&  InsideImage(half.x, half.y)) {
+          if (SetImage(half.x, half.y)  &&  InsideImage(half.x, half.y)) {
             valid = half;
           }
           else {

@@ -51,6 +51,8 @@ void IsisMain() {
     sinc = linc = (int)(0.5 + (((poly.validSampleDim() * 2) +
                        (poly.validLineDim() * 2) - 3.0) /
                        ui.GetInteger("NUMVERTICES")));
+    if (sinc < 1.0 || linc < 1.0)
+      sinc = linc = 1.0;
   }
   else if (incType.UpCase() == "LINCSINC"){
     sinc = ui.GetInteger("SINC");

@@ -155,6 +155,9 @@ namespace Isis {
    *  @history 2011-07-01 Travis Addair - Added outlier check to
    *           FindFirstPoint() to avoid choosing a first point without any
    *           valid neighbors (i.e., an outlier).
+   *  @history 2012-05-14 Steven Lambright - Added safety to the calcImageBorderCoordinates method,
+   *                          along with the validSampleDim and validLineDim methods. This fixes
+     *                        seg faults. Fixes #686.
    */
 
   class ImagePolygon : public Isis::Blob {
