@@ -51,10 +51,8 @@ namespace Isis {
           _FILEINFO_);
     }
 
-    QDir homeDir = FileName("$HOME").dir();
-    QDir settingsRoot = homeDir.filePath(".Isis");
     QDir programSettings =
-        settingsRoot.filePath(QApplication::applicationName());
+        QDir(FileName("$HOME/.Isis/" + QApplication::applicationName() + "/").path());
     QString windowSettings = programSettings.filePath(objectTitle + ".config");
 
     return windowSettings;
@@ -106,10 +104,8 @@ namespace Isis {
           "restored").arg(windowTitle()), _FILEINFO_);
     }
 
-    QDir homeDir = FileName("$HOME").dir();
-    QDir settingsRoot = homeDir.filePath(".Isis");
     QDir programSettings =
-        settingsRoot.filePath(QApplication::applicationName());
+        QDir(FileName("$HOME/.Isis/" + QApplication::applicationName() + "/").path());
     QString windowSettings = programSettings.filePath(objectName() + ".config");
 
     return windowSettings;
