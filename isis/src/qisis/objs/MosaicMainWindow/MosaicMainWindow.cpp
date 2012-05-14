@@ -26,6 +26,8 @@ namespace Isis {
     m_settingsMenu = NULL;
     m_viewMenu = NULL;
 
+    setObjectName("MosaicMainWindow");
+
     m_controllerVisible = false;
 
     setWindowTitle(title);
@@ -633,6 +635,7 @@ namespace Isis {
    *
    */
   void MosaicMainWindow::readSettings() {
+    MainWindow::readSettings(QSize(800, 600));
   }
 
 
