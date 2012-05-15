@@ -357,6 +357,14 @@
                 Note:  Sparse solver will not work on Sun/Solaris, QRD will be 
                           used.
             </description>
+             <exclusions>
+               <item>MODEL1</item>
+               <item>MODEL2</item>
+               <item>MODEL3</item>
+               <item>MAX_MODEL1_C_QUANTILE</item>
+               <item>MAX_MODEL2_C_QUANTILE</item>
+               <item>MAX_MODEL3_C_QUANTILE</item>
+            </exclusions>
           </option>
         </list>
       </parameter>
