@@ -7,14 +7,15 @@
   </brief>
 
   <description>
-    Converts a Themis VIS or IR PDS spectral cube into an Isis Cube.  Themis IR
-    cube will automatically be converted to 32-bit floating point unless the
-    user specifies differently.  This is done to accommodate different 
-    core/base multiplier values for each band.  Themis VIS cubes will automatically
-    create framelet files. These framelet files will have the name of the TO parameter with
-    a ".frame" followed by the frame number inserted prior to the ".cub" extension.  For example,
-    if the TO parameter was <i>out.cub</i>, the first frame of the output would be named 
-    <i>out.frame1.cub</i>.  If you do not want framelet files, run the cube through pds2isis instead.
+    Converts a Themis VIS or IR PDS spectral cube into an Isis Cube.  The Themis
+    IR cube will automatically be converted to 32-bit floating point unless the
+    user specifies differently by modifying the output files attributes.  This is 
+    done to accommodate different core/base multiplier values for each band.  
+    The output for an ingested Themis VIS cube will be two files, one consisting
+    of even framlets and the other of odd framelets.  These framelet files will 
+    have the name of the TO parameter with ".even" and ".odd" inserted prior to 
+    the ".cub" extension.  For example, if the TO parameter was <i>out.cub</i>, 
+    the even framelet file of the output would be named <i>out.even.cub</i>.
   </description>
 
   <history>
@@ -65,6 +66,9 @@
     <change name="Steven Lambright" date="2008-09-18">
       The original labels are now being preserved in the Isis 3 cube
     </change>
+    <change name="Lynn Weller" date="2012-05-08">
+      Updated documentation text.
+    </change>
   </history>
 
 <!--
@@ -100,7 +104,7 @@
          </brief>
          <description>
            The name of the output Isis cube. If the input cube is a VIS image, the output file will have a 
-          ".frame" and frame number inserted in the output name prior to the ".cub" extension.
+          ".even" and ".odd" inserted in the output name prior to the ".cub" extension.
          </description>
          <filter>
            *.cub
@@ -170,14 +174,14 @@ The TIMEOFFSET parameter on "thm2isis" allows the user to apply a correction for
           <image width="154" height="550" src="assets/images/output1.jpg">
             <brief>The output odd themis vis cube</brief>
             <description>
-              This is the outputted cube "V04860003EDR.odd.cub"
+              This is the odd framelets output cube "V04860003EDR.odd.cub"
             </description>
             <thumbnail width="56" height="200" src="assets/thumbs/output1.jpg" caption="Output Isis Cube (odd)" />
           </image>
           <image width="154" height="550" src="assets/images/output2.jpg">
             <brief>The output even themis vis cube</brief>
             <description>
-              This is the outputted cube "V04860003EDR.even.cub"
+              This is the even framelets output cube "V04860003EDR.even.cub"
             </description>
             <thumbnail width="56" height="200" src="assets/thumbs/output2.jpg" caption="Output Isis Cube (even)" />
           </image>
