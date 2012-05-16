@@ -34,6 +34,7 @@
 #include "ProcessRubberSheet.h"
 #include "TileManager.h"
 #include "Transform.h"
+#include "UniqueIOCachingAlgorithm.h"
 
 using namespace std;
 namespace Isis {
@@ -170,6 +171,10 @@ namespace Isis {
     p_progress->CheckStatus();
 
     if(p_bandChangeFunct == NULL) {
+      // A portal could read up to four chunks so we need to cache four times the number of bands to 
+      // minimize I/O thrashing
+      InputCubes[0]->addCachingAlgorithm(new UniqueIOCachingAlgorithm(4*InputCubes[0]->getBandCount()));
+
       int tilesPerBand = otile.Tiles() / OutputCubes[0]->getBandCount();
 
       for(int tile = 1; tile <= tilesPerBand; tile++) {

@@ -89,6 +89,9 @@ namespace Isis {
    *                           of just the outline of the quad).
    *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
    *                            $temporary variable instead of /tmp directory.
+   *   @history 2012-05-07 Jeff Anderson - Added the forward patch algorithm. 
+   *   @history 2012-05-15 Jeff Anderson - Added UniqueCachingAlgorithm to 
+   *                           reverse patch algorithm (startProcess)
    *  
    *  
    *   @todo 2005-02-11 Stuart Sides - finish documentation and add coded and

@@ -318,14 +318,12 @@ void IsisMain() {
 
   // The user didn't want to override the program smarts.
   // Handle framing cameras.  Always process using the backward
-  // driven system (tfile) at every pixel.  It is the fastest option that 
-  // guarantees orthorectification is done correctly and limb images are
-  // properly projected
+  // driven system (tfile).  
   else if (incam->GetCameraType() == Camera::Framing) {
     transform = new cam2mapReverse(icube->getSampleCount(),
                                    icube->getLineCount(), incam, samples,lines,
                                    outmap, trim);
-    p.SetTiling(1, 1);
+    p.SetTiling(4, 4);
     p.StartProcess(*transform, *interp);
   }
 

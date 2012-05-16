@@ -636,38 +636,58 @@
         </default>
         <brief>Warp algorithm</brief>
         <description>
-          Used to chose the warping algorithm, either the forward patch algorithm or the reverse patch algorith.   The default is to automattcally chose
-          the algorithm based on the input camera type (e.g., framing, linescan, pushframe).
+          Used to choose the warping algorithm, either the forward patch algorithm or the reverse patch 
+          algorithm.   The default is to automattcally choose the algorithm based on the input camera type 
+          (e.g., framing, linescan, pushframe).
         </description>
         <list>
           <option value="FORWARDPATCH">
             <brief>Forward patch warp algorithm</brief>
             <description>
-              Patches are uniformly distributed over the input cube (FROM).  For each patch, the lat/lons of the four corners coordinates of the input patch 
-              are computed using the camera model.  Those four lat/lon coordinates are used by the map projection to determine four output pixel coordinates.   Then the 
-              four output to input image coordinates are fit with two affine transforms.  That is, isamp = f(osamp,oline) and iline=g(osamp,oline).   If the estimated input/sample 
-              line (as computed by the affine transform) at the center of the patch is within a tenth of a pixel of the actual computation using the projection and camera model, 
-              the affine transforms are used to place the calculated input pixels in the output patch (using the specificed INTERPOLATOR).
+              Patches are uniformly distributed over the input cube (FROM).  For each input patch, the lat/lons of 
+              the four corners coordinates are computed using the camera model.  
+              Those four lat/lon coordinates are used by the 
+              map projection to determine four output pixel coordinates.   Then the 
+              four output to input image coordinates are fit with two affine transforms.  
+              That is, isamp=f(osamp,oline) and iline=g(osamp,oline)
+              where f = A+B*osamp+C*oline and similarly for g.
+              If the estimated input/sample 
+              line (as computed by the affine transform) at the center of the patch is within a tenth 
+              of a pixel of the actual computation using the projection and camera model, 
+              the affine transforms are used to place the calculated input pixels in the output patch 
+              (using the specificed INTERPOLATOR).
             </description>
             <inclusions><item>PATCHSIZE</item></inclusions>
           </option>
           <option value="REVERSEPATCH">
             <brief>Reverse patch warp algorithm</brief>
             <description>
-              Patches are uniformly distributed over the output cube (map projected product).  For each patch, the lat/lons of the four corners coordinates of the output patch 
-              are computed using the map projection.  Those four lat/lon coordinates are used by the camera model to determine four input pixel coordinates.   Then the 
-              four output to input image coordinates are fit with two affine transforms.  That is, isamp = f(osamp,oline) and iline=g(osamp,oline).   If the estimated input/sample 
-              line (as computed by the affine transform) at the center of the patch is within a tenth of a pixel of the actual computation using the projection and camera model, 
-              the affine transforms are used to place the calculated input pixels in the output patch (using the specificed INTERPOLATOR).
+              Patches are uniformly distributed over the output cube (map projected product).  For each 
+              output patch, the lat/lons of the four corners coordinates 
+              are computed using the map projection.  Those four lat/lon coordinates are used 
+              by the camera model to determine four input pixel coordinates.   Then the 
+              four output to input image coordinates are fit with two affine transforms.  That is, 
+              isamp=f(osamp,oline) and iline=g(osamp,oline) where f = A+B*osamp+C*oline and similarly for g.
+              If the estimated input/sample 
+              line (as computed by the affine transform) at the center of the patch is within a 
+              tenth of a pixel of the actual computation using the projection and camera model, 
+              the affine transforms are used to place the calculated input pixels in the output patch 
+              (using the specificed INTERPOLATOR).
             </description>
             <inclusions><item>PATCHSIZE</item></inclusions>
           </option>
           <option value="AUTOMATIC">
             <brief>Automatically select warp algorithm</brief>
             <description>
-               The automatic option will choose the appropriate algorithm depending on the camera type of the input cube (TO).  If the cube is a framing camera image, 
-               the reverse algorithm will be used with a PATCHSIZE of 1.  If the cube is a line scan image, the forward algorithm will be used with a PATCHSIZE of 5.  If 
-               the cube is a push frame camera (e.g., LRO WAC, MRO MARCI, or THEMIS VIS) the forward transform with a PATCHSIZE of the pushframe height will be used.  
+               The automatic option will choose the appropriate algorithm depending on the camera type 
+               of the input cube (TO).  If the cube is a framing camera image, 
+               the reverse algorithm will be used with a PATCHSIZE of 4.  If the cube is a line scan image, 
+               the forward algorithm will be used with a PATCHSIZE of 5.  If 
+               the cube is a push frame camera (e.g., LRO WAC, MRO MARCI, or THEMIS VIS) 
+               the forward transform with a PATCHSIZE of the pushframe framelet height will be used.  
+               It is recommended
+               that you always use automatic for push frame cameras to ensure the patch size does not cross
+               multiple framelets.
             </description>
             <exclusions><item>PATCHSIZE</item></exclusions>
           </option>
@@ -678,10 +698,14 @@
         <type>integer</type>
         <brief>Patch size for forward or reverse warping</brief>
         <description>
-          The forward and reverse patch algorithms try to fit an affine tranform between the camera model coordinate and projection coordinate using the four
-          corners of the patches.  Patchs that are too large may run faster at the risk of missing higher resolution information about the DTM.  For example a patch
-          of 256x256 may have the same elevation at the four corners and center of the grid but a crater may exist in one of the four quadrants of the patch.  The crater,
-          up to 128 pixels in diamter may not be properly orthorectified.
+          The forward and reverse patch algorithms try to fit an affine tranform between the 
+          camera model coordinate and projection coordinate using the four
+          corners of the patches.  Patchs that are too large may run faster at the risk of 
+          missing higher resolution information about the DTM.  For example a patch
+          of 256x256 may have the same elevation at the four corners and center of the grid but a 
+          crater may exist in one of the four quadrants of the patch.  The crater,
+          up to 128 pixels in diamter may not be properly orthorectified.  In general, small patch
+          sizes are recommended (e.g., 4, 8).
         </description>
         <minimum inclusive="yes">1</minimum>
       </parameter>
