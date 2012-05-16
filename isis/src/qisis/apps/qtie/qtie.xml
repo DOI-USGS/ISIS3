@@ -190,5 +190,9 @@
         Added links to definitions and made corrections to  documentation
         based on suggestions from Trent Hare.
     </change>
+    <change name="Tracie Sucharski" date="2012-05-15">
+        Fixed bug when opening new sets of files (base,match,cnet).  Moved
+        error checking from QtieTool to QtieFileTool.
+    </change>
   </history>
 </application>

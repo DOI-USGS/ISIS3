@@ -28,6 +28,7 @@
 namespace Isis {
   class ControlNet;
   class Cube;
+  class UniversalGroundMap;
 
   /**
    * @brief Qtie File operations
@@ -39,6 +40,12 @@ namespace Isis {
    * @internal
    * @history 2009-06-10 Tracie Sucharski - Added new signal for opening new
    *                        files.
+   * @history 2012-05-10  Tracie Sucharski - The FileTool::closeAll method no longer 
+   *                        closes viewports, so re-implemented closing of old
+   *                        cube viewports before opening new.
+   * @history 2012-05-15 Tracie Sucharski - Moved much of the error checking out of QtieTool into 
+   *                        this class.  Added new method, checkNet to perform error checking
+   *                        of input control network.
    *
    */
 
@@ -57,6 +64,8 @@ namespace Isis {
       //virtual void exit();
 
     private:
+      bool checkNet(Cube *baseCube, UniversalGroundMap *baseGM, 
+                    Cube *matchCube, UniversalGroundMap *matchGM, ControlNet *cnet);
 
   };
 };

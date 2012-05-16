@@ -1,5 +1,6 @@
 #include "QtieTool.h"
 
+#include <QDebug>
 #include <QApplication>
 #include <QDialog>
 #include <QMenuBar>
@@ -178,8 +179,8 @@ namespace Isis {
                 "coordinate of each sample/line of the control points from "
                 "the \"Match\" level 1 cube with the latitude/longitude from "
                 "the \"Base\" map projected cube.  To solve for all three "
-                "camera angles, select the <strong>Twist</strong> radio "
-                "button.");
+                "camera angles, select the <strong>Twist</strong> check "
+                "box.");
     connect(solve, SIGNAL(clicked()), this, SLOT(solve()));
     gridLayout->addWidget(solve, row++, 0);
 
@@ -330,48 +331,6 @@ namespace Isis {
       return;
     }
 
-    //  If Control Net has points, set the basemap measures, since they are not
-    //  saved in the net file.
-    if (cnet->GetNumPoints() != 0) {
-      for (int i = 0; i < cnet->GetNumPoints(); i++) {
-        ControlPoint &p = *(*cnet)[i];
-        double baseSamp, baseLine;
-
-
-        if (p_baseGM->SetGround(p.GetBestSurfacePoint())) {
-          //  Make sure point on base cube
-          baseSamp = p_baseGM->Sample();
-          baseLine = p_baseGM->Line();
-          if (baseSamp < 1 || baseSamp > p_baseCube->getSampleCount() ||
-              baseLine < 1 || baseLine > p_baseCube->getLineCount()) {
-            // throw error? point not on base
-            QString message = "Error parsing input control net.  Lat/Lon for Point Id: " +
-                              QString::fromStdString(p.GetId()) + " computes to a sample/line off " +
-                              "the edge of the basemap cube.";
-            QMessageBox::critical((QWidget *)parent(), "Control Net Error", message);
-            return;
-          }
-        }
-        else {
-          //  throw error?  point not on base cube
-          QString message = "Error parsing input control net.  Point Id: " +
-                            QString::fromStdString(p.GetId()) + " does not exist on basemap.";
-          QMessageBox::critical((QWidget *)parent(), "Control Net Error", message);
-          clearFiles();
-          return;
-        }
-
-        ControlMeasure *mB = new ControlMeasure;
-        mB->SetCubeSerialNumber(p_baseSN);
-        mB->SetCoordinate(baseSamp, baseLine);
-        mB->SetDateTime();
-        mB->SetChooserName(Application::UserName());
-        mB->SetIgnored(true);
-
-        p.Add(mB);
-      }
-    }
-
   }
 
 
@@ -383,20 +342,31 @@ namespace Isis {
    *                           run on new files.
    * @history  2010-05-11 Tracie Sucharski - Moved the creation of control net
    *                           to the QtieFileTool::open.
+   * @history  2012-05-11 Tracie Sucharski - Delete cubes,  A better solution- rewrite 
+   *                           QtieFileTool::open , to pass in filenames only? 
+   *                            
    */
   void QtieTool::clearFiles() {
     p_tieTool->setShown(false);
-    //  delete p_baseCube;
-    //  delete p_matchCube;
 
     delete p_serialNumberList;
+    p_serialNumberList = NULL;
     p_serialNumberList = new SerialNumberList(false);
 
     delete p_controlNet;
+    p_controlNet = NULL;
 
     delete p_baseGM;
+    p_baseGM = NULL;
     delete p_matchGM;
+    p_matchGM = NULL;
 
+    delete p_baseCube;
+    p_baseCube = NULL;
+    delete p_matchCube;
+    p_matchCube = NULL;
+
+    p_controlPoint = NULL;
   }
 
 
@@ -534,6 +504,8 @@ namespace Isis {
    * @history  2010-05-18 Jeannie Walldren - Modified Point ID
    *                          QInputDialog to return if "Cancel"
    *                          is clicked.
+   * @history 2012-05-10  Tracie Sucharski - If point doesn't exist on 
+   *                          base map, return. 
    */
   void QtieTool::createPoint(double lat, double lon) {
 
@@ -557,6 +529,7 @@ namespace Isis {
         // throw error? point not on base
         QString message = "Point does not exist on base map.";
         QMessageBox::warning((QWidget *)parent(), "Warning", message);
+        return;
       }
     }
     else {
@@ -628,6 +601,7 @@ namespace Isis {
 
     //  Add new control point to control network
     p_controlNet->AddPoint(newPoint);
+
     //  Read newly added point
     p_controlPoint = p_controlNet->GetPoint((QString) newPoint->GetId());
     //  Load new point in QtieTool
@@ -636,6 +610,9 @@ namespace Isis {
     p_tieTool->raise();
 
     emit editPointChanged();
+    //  Call measure Saved to get the initial Apriori values
+    measureSaved();
+
   }
 
 

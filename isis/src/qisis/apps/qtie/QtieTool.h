@@ -49,6 +49,10 @@ namespace Isis {
     *   @history 2010-12-17 Eric Hyer - Code for open dialog for setting the
     *                           registration template now in this class, not in
     *                           ControlPointEdit
+    *   @history 2012-05-10 Tracie Sucharski - Reset pointers to NULL, when creating
+    *                           new control point, if doesn't exist on basemap, return.
+    *   @history 2012-05-15 Tracie Sucharski - Moved much of the error checking out of this class 
+    *                           and into the QtieFileTool class.
     */
   class QtieTool : public Tool {
       Q_OBJECT
@@ -128,8 +132,6 @@ namespace Isis {
       ControlPoint *p_controlPoint;
       int p_ptIdIndex;
 
-      ControlMeasure *p_baseMeasure;
-      ControlMeasure *p_matchMeasure;
       Cube *p_baseCube;
       Cube *p_matchCube;
       std::string p_baseSN;
