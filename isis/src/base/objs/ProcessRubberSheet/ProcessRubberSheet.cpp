@@ -27,6 +27,7 @@
 
 #include "Affine.h"
 #include "BasisFunction.h"
+#include "BoxcarCachingAlgorithm.h"
 #include "Brick.h"
 #include "Interpolator.h"
 #include "LeastSquares.h"
@@ -173,7 +174,8 @@ namespace Isis {
     if(p_bandChangeFunct == NULL) {
       // A portal could read up to four chunks so we need to cache four times the number of bands to 
       // minimize I/O thrashing
-      InputCubes[0]->addCachingAlgorithm(new UniqueIOCachingAlgorithm(4*InputCubes[0]->getBandCount()));
+      InputCubes[0]->addCachingAlgorithm(new UniqueIOCachingAlgorithm(2 * InputCubes[0]->getBandCount()));
+      OutputCubes[0]->addCachingAlgorithm(new BoxcarCachingAlgorithm());
 
       int tilesPerBand = otile.Tiles() / OutputCubes[0]->getBandCount();
 
