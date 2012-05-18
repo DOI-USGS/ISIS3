@@ -100,6 +100,17 @@ namespace Isis {
 
     double dk1 = p_odk[0];
 
+    // Owing to the odd distotion model employed in this senser if |y| is > 116.881145553046
+    //  then there is no root to find.  Further, the greatest y that any measure on the sensor
+    //  will acutally distort to is less than 20.  Thus, if any distorted measure is greater
+    //  that that skip the iterations.  The points isn't in the cube, and exactly how far outside
+    //  the cube is irrelevant.  Just let the camera model know its not in the cube....
+    if (fabs(uy) > 40) {  //if the point is way off the image.....
+      p_focalPlaneX = p_undistortedFocalPlaneX;
+      p_focalPlaneY = 100.0;  //100.0 is >> 20.0, and clearly outside the cube
+      return true;
+    }
+
     // iterating to introduce distortion (in sample only)...
     // we stop when the difference between distorted coordinate
     // in successive iterations is at or below the given tolerance
@@ -115,6 +126,9 @@ namespace Isis {
       // distorted sample
       ydistorted = yt;
 
+      if (yt < -1e121)  //debug
+        break;  //debug
+
       // check for convergence
       if(fabs(yt - yprevious) <= tolerance) {
         bConverged = true;
@@ -123,7 +137,7 @@ namespace Isis {
 
       yprevious = yt;
     }
-
+    
     if(bConverged) {
       p_focalPlaneX = p_undistortedFocalPlaneX;
       p_focalPlaneY = ydistorted;
