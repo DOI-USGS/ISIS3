@@ -1,7 +1,7 @@
 APP1NAME = crop
 APP2NAME = enlarge
 APP3NAME = cam2map
-CropEnlargeCam2mapTruth.cub.TOLERANCE = 0.000001
+CropEnlargeCam2mapTruth.cub.TOLERANCE = 0.00001
 
 include $(ISISROOT)/make/isismake.tsts
 
