@@ -77,6 +77,7 @@ namespace Isis {
 
     // Create the application
     new QApplication(argc, argv);
+    QCoreApplication::setApplicationName(FileName(argv[0]).baseName());
     QApplication::setQuitOnLastWindowClosed(true);
 
 

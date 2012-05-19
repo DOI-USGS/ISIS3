@@ -136,6 +136,7 @@ namespace Isis {
         p_startClock = clock();
 
         new QCoreApplication(argc, argv);
+        QCoreApplication::setApplicationName(FileName(p_appName).baseName());
       }
     }
     catch (IException &e) {
