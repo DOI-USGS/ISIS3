@@ -140,6 +140,7 @@ namespace Isis {
    *                          rejection multiplier member variable, can be set in
    *                          jigsaw interface.
    *   @history 2012-03-26 Orrin Thomas, added maximum likelihood capabilities
+   *   @history 2012-05-21 Debbie A. Cook, Added initialization of m_dRejectionMultiplier
    */
   class BundleAdjust {
     public:

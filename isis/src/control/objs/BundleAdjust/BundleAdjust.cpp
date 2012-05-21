@@ -251,6 +251,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_pLsq = NULL;
     m_dElapsedTimeErrorProp = 0.0;
     m_dElapsedTime = 0.0;
+    m_dRejectionMultiplier = 3.;    
 
     // Get the cameras set up for all images
     m_pCnet->SetImages(*m_pSnList, progress);
