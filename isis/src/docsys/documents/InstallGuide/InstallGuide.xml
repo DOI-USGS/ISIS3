@@ -152,14 +152,14 @@ you must <em>not</em> upgrade the Isis Data Files!!!
 
 
         <p>
-          Example for MacOSX 10.5 32-bit Intel compatible systems:
+          Example for MacOSX 10.6 64-bit Intel compatible systems:
         </p>
 <pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86_darwin_OSX/isis .
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_darwin_OSX/isis .
 </pre>
 
         <p>
-          Example for Fedora 14 Linux x86 64-bit Intel compatible systems:
+          Example for Fedora 16 Linux x86 64-bit Intel compatible systems:
         </p>
 <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_FEDORA/isis .
@@ -170,20 +170,6 @@ you must <em>not</em> upgrade the Isis Data Files!!!
         </p>
 <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_SUSE11/isis .
-</pre>
-
-        <p>
-          Example for RHEL 5.6 Linux x86 64-bit Intel compatible systems:
-        </p>
-<pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_RHEL/isis .
-</pre>
-
-        <p>
-          Example for RHEL 5.6 Linux x86 32-bit Intel compatible systems:
-        </p>
-<pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86_linux_RHEL/isis .
 </pre>
 
         <p>
@@ -201,7 +187,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
 </pre>
 
         <p>
-          Example for RHEL 6.1 Linux x86 64-bit Intel compatible systems:
+          Example for RHEL 6.2 Linux x86 64-bit Intel compatible systems:
         </p>
 <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_RHEL6/isis .
@@ -213,7 +199,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
         <p>
           <i><b>Note:</b> Isis3 can also be downloaded over port 80. To use port 80 change
            isisdist.astrogeology.usgs.gov:: in the previous commands to rsync://isisdist.astrogeology.usgs.gov:80::.
-           Example: <pre>rsync -azv --delete --partial rsync://isisdist.astrogeology.usgs.gov:80::x86-64_linux_RHEL/isis .</pre>
+           Example: <pre>rsync -azv --delete --partial rsync://isisdist.astrogeology.usgs.gov:80::x86-64_linux_RHEL6/isis .</pre>
           </i>
         </p>
 
@@ -522,6 +508,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
     <change name="Jai Rideout" date="2011-04-15">Added rsync partial option to rsync commands and added new mission-specific sections</change>
     <change name="Jai Rideout and Steven Lambright" date="2012-02-06">Updated documentation to be clearer, per Trent Hare's recommendations. References #692.</change>
     <change name="Travis Addair" date="2012-03-14">Added Java installer section</change>
+    <change name="Steven Lambright and Stuart Sides" date="2012-05-21">Updated for release 3.4.0</change>
   </history>
 
   <bibliography>

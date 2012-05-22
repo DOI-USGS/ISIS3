@@ -114,7 +114,7 @@
               <xsl:attribute name="name"><xsl:value-of select="$mission" /></xsl:attribute>
             </a>
             <h2><xsl:value-of select="$mission" /> (detailed)</h2>
-              <xsl:for-each select="$root/isisReleaseNotes/application[count(history/change) > 0]">
+              <xsl:for-each select="$root/isisReleaseNotes/application[count(history/change) > 0 and normalize-space(category/missionItem) = $mission]">
                 <xsl:sort select="@name" />
                 <a>
                   <xsl:attribute name="name"><xsl:value-of select="@name" /></xsl:attribute>
