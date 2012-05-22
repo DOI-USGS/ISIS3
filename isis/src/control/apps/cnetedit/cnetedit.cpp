@@ -91,6 +91,7 @@ bool deleteIgnored;
 bool preservePoints;
 bool retainRef;
 bool keepLog;
+bool ignoreAll;
 
 QMap<string, string> *ignoredPoints;
 QMap<string, PvlGroup> *ignoredMeasures;
@@ -115,6 +116,7 @@ void IsisMain() {
   deleteIgnored = ui.GetBoolean("DELETE");
   preservePoints = ui.GetBoolean("PRESERVE");
   retainRef = ui.GetBoolean("RETAIN_REFERENCE");
+  ignoreAll = ui.GetBoolean("IGNOREALL");
 
   // Data needed to keep track of ignored/deleted points and measures
   keepLog = ui.WasEntered("LOG");
@@ -402,12 +404,18 @@ void ignorePoint(ControlNet &cnet, ControlPoint *point, string cause) {
  */
 void ignoreMeasure(ControlNet &cnet, ControlPoint *point,
                    ControlMeasure *measure, string cause) {
-
   ControlMeasure::Status result = measure->SetIgnored(true);
 
   logResult(
       result == ControlMeasure::Success ? ignoredMeasures : editLockedMeasures,
       point->GetId(), measure->GetCubeSerialNumber(), cause);
+
+  if (ignoreAll && measure->Parent()->GetRefMeasure() == measure) {
+    foreach (ControlMeasure *cm, measure->Parent()->getMeasures()) {
+      if (!cm->IsIgnored())
+        ignoreMeasure(cnet, measure->Parent(), cm, "Reference ignored");
+    }
+  }
 }
 
 

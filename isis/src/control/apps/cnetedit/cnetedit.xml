@@ -68,16 +68,16 @@
       Set the default as FALSE for DELETE Ignored Control Points and Measures
     </change>
     <change name="Christopher Austin" date="2009-08-11">
-      Fixed an out of index bug.                            
+      Fixed an out of index bug.
     </change>
     <change name="Sharmila Prasad" date="2009-08-25">
-      Added parameter LOG to write logs into the file if explicitly stated, 
+      Added parameter LOG to write logs into the file if explicitly stated,
       parameter POINTLIST to read Control Point ID's from a file
       reverted DELETE default to be TRUE
     </change>
     <change name="Sharmila Prasad" date="2009-09-14">
-      Added parameter PRESERVE with default FALSE. If set the Control Points with 
-      Measures equal to one are not deleted  
+      Added parameter PRESERVE with default FALSE. If set the Control Points with
+      Measures equal to one are not deleted
     </change>
     <change name="Travis Addair" date="2010-11-24">
       Added optional measure validity check, removed a redundant deletion
@@ -89,7 +89,7 @@
     </change>
     <change name="Travis Addair" date="2010-11-30">
       Added progress bar for validity checking and automatic logging of the
-      DEFFILE to the print file when entered. 
+      DEFFILE to the print file when entered.
     </change>
     <change name="Travis Addair" date="2010-12-08">
       Added check to ensure that ignored reference measures are not deleted,
@@ -108,10 +108,10 @@
       by sample/line residuals or Residual Magnitude
     </change>
     <change name="Sharmila Prasad" date="2011-05-23">
-      Helper function to be able to edit the Deffile. 
+      Helper function to be able to edit the Deffile.
     </change>
     <change name="Sharmila Prasad" date="2011-06-02">
-      Added option RETAIN_REFERENCE to retain reference even if not validated or 
+      Added option RETAIN_REFERENCE to retain reference even if not validated or
       if it is in the ignore CubeList
     </change>
     <change name="Debbie A. Cook and Tracie Sucharski" date="2011-06-07">
@@ -129,8 +129,11 @@
       and optional operations (unlock, ignore, delete, lock).  Added MEASURELIST
       to allow editing specific measures.  Updated documentation.
     </change>
-  </history> 
-  
+    <change name="Steven Lambright" date="2012-05-03">
+      Added "IGNOREALL" option. Fixes #293.
+    </change>
+  </history>
+
   <category>
     <categoryItem>Control Networks</categoryItem>
   </category>
@@ -164,7 +167,7 @@
         <filter>
           *.net
         </filter>
-      </parameter> 
+      </parameter>
 
       <parameter name="LOG">
         <type>filename</type>
@@ -230,7 +233,7 @@
         <fileMode>input</fileMode>
         <internalDefault>None</internalDefault>
         <brief>
-          List of paired Point IDs and cube filenames 
+          List of paired Point IDs and cube filenames
         </brief>
         <description>
           A file containing a list of paired Point IDs and cube filenames,
@@ -243,7 +246,7 @@
         </filter>
       </parameter>
     </group>
-      
+
     <group name="Edit Operations">
       <parameter name="UNLOCK">
         <type>boolean</type>
@@ -385,7 +388,7 @@
         </helpers>
       </parameter>
     </group>
-      
+
     <group name="Deletion Options">
       <parameter name="PRESERVE">
         <type>boolean</type>
@@ -404,12 +407,25 @@
         <default><item>False</item></default>
         <brief>
           Never delete a reference measure unless the entire point is removed
-        </brief> 
+        </brief>
         <description>
           When enabled, the DELETE operation will retain reference measures
           under all circumstances.  Consequently, if a reference measure is
           ignored, in an edit list, or invalidated, it will still show up in the
           output network.
+        </description>
+      </parameter>
+      <parameter name="IGNOREALL">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>
+          Ignore all measures in the point when the reference measure is ignored
+        </brief>
+        <description>
+          When enabled, any time a point or the reference measure is ignored the remaining measures
+          in a point will also be ignored. Occassionally the reference measure has the highest error
+          and we don't want to retain it, but the rest of the measures are also unreliable so it's
+          helpful to ignore them also.
         </description>
       </parameter>
     </group>
