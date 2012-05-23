@@ -4,7 +4,7 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(LS) $(INPUT)/*.cub > $(OUTPUT)/list.lis;
-	$(CAT) $(INPUT)/measurelist.txt | sed 's/X/$(INPUT)/' \
+	$(CAT) $(INPUT)/measurelist.txt | sed 's#X#$(INPUT)#' \
 	  > $(OUTPUT)/measurelist.txt;
 	$(APPNAME) CNET=$(INPUT)/cnet.net \
 	CUBELIST=$(OUTPUT)/list.lis \
