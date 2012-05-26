@@ -79,10 +79,12 @@ int main(int argc, char *argv[]) {
                     sizeof(p_socketName))) >= 0) {
           std::string temp;
           for(int i = 1; i < argc; i++) {
-            temp +=  FileName(argv[i]).expanded() + " ";
+            temp += QFileInfo(
+                  FileName(argv[i]).expanded()).absoluteFilePath().toStdString()
+                + " ";
           }
           temp += "raise ";
-
+qDebug() << temp.c_str();
           // Try to send data to the socket
           if(send(p_socket, temp.c_str(), temp.size(), 0) >= 0) {
             // Success, the other qview will open this file.

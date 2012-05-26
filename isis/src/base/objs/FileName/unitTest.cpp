@@ -29,8 +29,9 @@ int main(int argc, char *argv[]) {
   filesToFullTest << "/path/base.ext+attr" << "/path1/.path2/base.ext+attr"
                   << "/path1/pat.h2/base+attr" << "/.path1/path2/base"
                   << "/.path1/path2/base.+attr" << "/another/path/base.ex1.exten2.ext3"
-                  << "/$BADENV/base.ext+attr" << "unitTest.cpp" << "./unitTest.cpp"
-                  << "Makefile" << ".cub" << "/$TEMPORARY/unitTest.cpp";
+                  << "/$BADENV/base.ext+attr" << "/.path1/base+attr1+attr2"
+                  << "unitTest.cpp" << "./unitTest.cpp" << "Makefile" << ".cub"
+                  << "/$TEMPORARY/unitTest.cpp";
 
   foreach (QString fileToTest, filesToFullTest) {
     cout << "Running Full Test on [" << qPrintable(fileToTest) << "]" << endl;

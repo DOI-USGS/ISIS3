@@ -187,6 +187,33 @@ Running Full Test on [/$BADENV/base.ext+attr]
 		Original path      /$BADENV
 		Exists             0
 
+Running Full Test on [/.path1/base+attr1+attr2]
+	Testing Basics [/.path1/base+attr1+attr2]
+		Name:              base
+		Base Name:         base
+		Path:              /.path1
+		Original path      /.path1
+		Extension:         
+		Expanded           /.path1/base
+		Exists             0
+
+	Testing Extension change [/.path1/base+attr1+attr2]
+		Before modification:      /.path1/base
+		Removed Extension:        /.path1/base
+		Added Extension [tmp]:    /.path1/base.tmp
+		Added Extension [jpg]:    /.path1/base.tmp.jpg
+		Added Extension [jpg]:    /.path1/base.tmp.jpg
+		Set Extension   [gif]:    /.path1/base.tmp.gif
+		Added Extension [jpg]:    /.path1/base.tmp.gif.jpg
+		Removed Extension:        /.path1/base.tmp.gif
+
+	Testing Expanded [/.path1/base+attr1+attr2]
+		Name:              base
+		Base Name:         base
+		Extension:         
+		Original path      /.path1
+		Exists             0
+
 Running Full Test on [unitTest.cpp]
 	Testing Basics [unitTest.cpp]
 		Name:              unitTest.cpp

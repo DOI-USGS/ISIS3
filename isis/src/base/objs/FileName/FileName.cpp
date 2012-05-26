@@ -106,7 +106,7 @@ namespace Isis {
     QString result;
     QString fileNameWithAttribs = QFileInfo(m_d->original(true)).fileName();
 
-    int attribStartPos = fileNameWithAttribs.lastIndexOf("+");
+    int attribStartPos = fileNameWithAttribs.indexOf("+");
 
     if (attribStartPos != -1)
       result = fileNameWithAttribs.mid(attribStartPos + 1);
@@ -568,7 +568,7 @@ namespace Isis {
 
 
     if (!includeAttributes) {
-      int attributesPos = result.lastIndexOf("+");
+      int attributesPos = result.indexOf("+");
 
       if (attributesPos != -1)
         result = result.left(attributesPos);
@@ -649,7 +649,7 @@ namespace Isis {
 
 
     if (!includeAttributes) {
-      int attributesPos = result.lastIndexOf("+");
+      int attributesPos = result.indexOf("+");
 
       if (attributesPos != -1)
         result = result.left(attributesPos);
