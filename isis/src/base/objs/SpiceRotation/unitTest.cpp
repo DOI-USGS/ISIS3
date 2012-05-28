@@ -16,6 +16,8 @@ int main(int argc, char *argv[]) {
   cout << setprecision(8);
   cout << "Unit test for SpiceRotation" << endl;
 
+  // Test case is taken from moc red wide angle image ab102401
+  // sn = MGS/561812335:32/MOC-WA/RED
   Isis::FileName f("$base/testData/kernels");
   string dir = f.expanded() + "/";
   string naif(dir + "naif0007.tls");
@@ -80,12 +82,15 @@ int main(int argc, char *argv[]) {
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
     cout << "         " << CJ[6] << " " << CJ[7] << " " << CJ[8] << endl;
 
-    if(rot.HasAngularVelocity()) {
+    if (rot.HasAngularVelocity()) {
       std::vector<double> av = rot.AngularVelocity();
       cout << "av(" << i << ") = " << av[0] << " " << av[1] << " " << av[2] << endl;
     }
   }
   cout << endl;
+
+  // Save off cache for polynomial over cache test
+  Isis::Table tab = rot.Cache("TestPolyOver");
 
   // Testing with Functions
   cout << "Testing with functions ... " << endl;
@@ -104,12 +109,82 @@ int main(int argc, char *argv[]) {
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
     cout << "         " << CJ[6] << " " << CJ[7] << " " << CJ[8] << endl;
 
-    if(rot.HasAngularVelocity()) {
+    if (rot.HasAngularVelocity()) {
       std::vector<double> av = rot.AngularVelocity();
       cout << "av(" << i << ") = " << av[0] << " " << av[1] << " " << av[2] << endl;
     }
   }
   cout << endl;
+
+
+  // Testing polynomial over Spice
+  cout << "Testing with polynomial functions over Spice ... " << endl;
+  Isis::SpiceRotation rot2(-94031);
+  rot2.LoadCache(tab);
+  rot2.ComputeBaseTime();
+  abcAng1.clear();
+  abcAng2.clear();
+  abcAng3.clear();
+  rot2.SetPolynomialDegree(2);
+  abcAng1.push_back(0.0030493533013399013);
+  abcAng1.push_back(-0.0027570887651990781);
+  abcAng1.push_back(0.0042922079124063069);
+  abcAng2.push_back(0.0059563322487913659);
+  abcAng2.push_back(0.00050048260885665553);
+  abcAng2.push_back(-0.0035838749526626921);
+  abcAng3.push_back(0.0057982287753588907);
+  abcAng3.push_back(-0.0099666850359987867);
+  abcAng3.push_back(-0.0073237560434568881);
+  rot2.SetPolynomial(abcAng1, abcAng2, abcAng3,
+                     Isis::SpiceRotation::PolyFunctionOverSpice);
+  cout << "Source = " << rot2.GetSource() << endl;
+  for(int i = 0; i < 10; i++) {
+    double t = startTime + (double) i * slope;
+    rot2.SetEphemerisTime(t);
+    vector<double> CJ = rot2.Matrix();
+    cout << "Time           = " << rot2.EphemerisTime() << endl;
+    cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
+    cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
+    cout << "         " << CJ[6] << " " << CJ[7] << " " << CJ[8] << endl;
+
+    if(rot2.HasAngularVelocity()) {
+      std::vector<double> av = rot2.AngularVelocity();
+      cout << "av(" << i << ") = " << av[0] << " " << av[1] << " " << av[2] << endl;
+    }
+  }
+  cout << endl;
+
+
+
+  // Test polynomial over Cache conversion to reduced cache
+  cout << "Test fitting polynomial function over cache to new cache" << endl;
+
+  // Get new cache using existing cache and polynomial
+  Isis::Table tab2 = rot2.Cache("Outputcache");
+  Isis::SpiceRotation rot3(-94031);
+
+
+  // Load tab2 into the object
+  rot3.LoadCache(tab2);
+
+  cout << "Source = " << rot3.GetSource() << endl;
+
+  for(int i = 0; i < 10; i++) {
+    double t = startTime + (double) i * slope;
+    rot3.SetEphemerisTime(t);
+    vector<double> CJ = rot3.Matrix();
+    cout << "Time           = " << rot3.EphemerisTime() << endl;
+    cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
+    cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
+    cout << "         " << CJ[6] << " " << CJ[7] << " " << CJ[8] << endl;
+
+    if(rot3.HasAngularVelocity()) {
+      std::vector<double> av = rot3.AngularVelocity();
+      cout << "av(" << i << ") = " << av[0] << " " << av[1] << " " << av[2] << endl;
+    }
+  }
+  cout << endl;
+
 
   // Testing ToReferencePartial method
   cout << "Testing ToReferencePartial method" << endl;
@@ -155,27 +230,28 @@ int main(int argc, char *argv[]) {
   cout << "Twist partial on A applied to lookJ =:  " << dAtwLookC[0] << " "
        << dAtwLookC[1] << " " << dAtwLookC[2] << endl << endl;
 
+
   cout << "Testing with setting functions ... " << endl;
-  Isis::Table tab = rot.Cache("Test");
-  Isis::SpiceRotation rot3(-94031);
+  Isis::Table tab1 = rot.Cache("Test");
+  Isis::SpiceRotation rot4(-94031);
   Isis::SpiceRotation::Source source = Isis::SpiceRotation::Spice;
-//   rot3.SetSource(source);
-//   rot3.LoadCache(startTime, endTime, 10);
-  rot3.LoadCache(tab);
-//   rot3.SetPolynomial(abcAng1, abcAng2, abcAng3);
-  source = rot3.GetSource();
+//   rot4.SetSource(source);
+//   rot4.LoadCache(startTime, endTime, 10);
+  rot4.LoadCache(tab1);
+//   rot4.SetPolynomial(abcAng1, abcAng2, abcAng3);
+  source = rot4.GetSource();
   cout << "Source = " << source << endl;
   for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    rot3.SetEphemerisTime(t);
-    vector<double> CJ = rot3.Matrix();
-    cout << "Time           = " << rot3.EphemerisTime() << endl;
+    rot4.SetEphemerisTime(t);
+    vector<double> CJ = rot4.Matrix();
+    cout << "Time           = " << rot4.EphemerisTime() << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
     cout << "         " << CJ[6] << " " << CJ[7] << " " << CJ[8] << endl;
 
-    if(rot3.HasAngularVelocity()) {
-      std::vector<double> av = rot3.AngularVelocity();
+    if(rot4.HasAngularVelocity()) {
+      std::vector<double> av = rot4.AngularVelocity();
       cout << "av(" << i << ") = " << av[0] << " " << av[1] << " " << av[2] << endl;
     }
   }
@@ -184,9 +260,9 @@ int main(int argc, char *argv[]) {
 
   // Test LineCache method
   cout << "Testing line cache..." << endl;
-  Isis::Table tab2 = rot3.LineCache("Test5");
+  Isis::Table tab4 = rot4.LineCache("Test5");
   Isis::SpiceRotation rot5(-94031);
-  rot5.LoadCache(tab2);
+  rot5.LoadCache(tab4);
 
   for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
@@ -208,20 +284,20 @@ int main(int argc, char *argv[]) {
   // Test table options
   cout << "Testing tables ... " << endl;
   Isis::Table tab3 = rot.Cache("Test");
-  Isis::SpiceRotation rot2(-94031);
-  rot2.LoadCache(tab2);
+  Isis::SpiceRotation rot6(-94031);
+  rot6.LoadCache(tab3);
   for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    rot2.SetEphemerisTime(t);
-    vector<double> CJ = rot2.Matrix();
-    cout << "Time           = " << rot2.EphemerisTime() << endl;
+    rot6.SetEphemerisTime(t);
+    vector<double> CJ = rot6.Matrix();
+    cout << "Time           = " << rot6.EphemerisTime() << endl;
     cout << "CJ(" << i << ") = " << CJ[0] << " " << CJ[1] << " " << CJ[2] << endl;
     cout << "         " << CJ[3] << " " << CJ[4] << " " << CJ[5] << endl;
     cout << "         " << CJ[6] << " " << CJ[7] << " " << CJ[8] << endl;
 //    cout << "Spacecraft (J) = " << p[0] << " " << p[1] << " " << p[2] << endl;
 
-    if(rot2.HasAngularVelocity()) {
-      std::vector<double> av = rot2.AngularVelocity();
+    if (rot6.HasAngularVelocity()) {
+      std::vector<double> av = rot6.AngularVelocity();
       cout << "av(" << i << ") = " << av[0] << " " << av[1] << " " << av[2] << endl;
     }
   }
@@ -229,14 +305,14 @@ int main(int argc, char *argv[]) {
 
 // Test J2000 and Reference vector methods
   cout << "Testing vector methods" << endl;
-  rot2.SetEphemerisTime(startTime);
+  rot6.SetEphemerisTime(startTime);
   std::vector<double> v(3);
   v[0] = 0.;
   v[1] = 0.;
   v[2] = 1.;
-  std::vector<double> vout = rot2.J2000Vector(v);
+  std::vector<double> vout = rot6.J2000Vector(v);
   std::cout << "v = " << v[0] << " " << v[1] << " " << v[2] << endl;
-  v = rot2.ReferenceVector(vout);
+  v = rot6.ReferenceVector(vout);
 
   // Take care of Solaris round-off problem.  Look for a better way
   if(abs(v[0]) < .00000000000000012) v[0] = 0.;

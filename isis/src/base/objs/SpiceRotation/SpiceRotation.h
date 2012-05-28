@@ -11,7 +11,8 @@
  *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
  *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such
+ *   and related material nor shall the fact of distribution constitute any such@mar12m18j15a12b10
+
  *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
@@ -118,6 +119,19 @@ namespace Isis {
    *  @history 2011-03-25 Debbie A. Cook - Added method GetCenterAngles()
    *  @history 2011-07-20 Kris J Becker - Modified  SpiceRotation::LoadCache(Table &table) to be
    *                        reentrant.  This mod was necessitated by the Dawn VIR instrument.
+   *  @history 2012-05-28 Debbie A. Cook - Programmer notes - A new interpolation algorithm, 
+   *                       PolyFunctionOverSpice, was added and new supporting methods: 
+   *                       SetEphemerisTimePolyOverSpice,  SetEphemerisTimeSpice, 
+   *                       SetEphemerisTimeNadir, SetEphemerisTimeMemcache, and 
+   *                       SetEphemerisTimePolyFunction.  PolyFunctionOverSpice is never output, but
+   *                       is converted to a line cache and reduced.  Methods LineCache and 
+   *                       ReloadCache were modified to do the reduction and a copy constructor was
+   *                       added to support the reduction.  Also an argument was added to 
+   *                       SetPolynomial methods for function type, since PolyFunction 
+   *                       is no longer the only function supported.  These changes help the 
+   *                       BundleAdjust applications to better fit line scan images where the 
+   *                       pointing was not modeled well with a regular polynomial.
+   *
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
    */
   class SpiceRotation {
@@ -128,6 +142,7 @@ namespace Isis {
       We would like to call refchg instead to avoid the strings.  Currently Naif does
       not have refchg_c, but only the f2c'd refchg.c.*/
       SpiceRotation(int frameCode, int targetCode);
+      SpiceRotation(const SpiceRotation &rotToCopy);
 
       //! Destructor
       virtual ~SpiceRotation() { }
@@ -142,10 +157,15 @@ namespace Isis {
 
       void SetTimeBias(double timeBias);
       /**
-       * The rotation can come from one of 3 places for an Isis cube:  Cache,
-       * Naif Spice kernels, or Nadir computations.
+       * The rotation can come from one of 3 places for an Isis cube.  The class
+       * expects function to be after Memcache.
        */
-      enum Source { Spice, Nadir, Memcache, Function};
+      enum Source { Spice,                    //!< Directly from the kernels 
+                    Nadir,                               //!< Nadir pointing
+                    Memcache,                      //!< From cached table
+                    PolyFunction,                   //!< From nth degree polynomial
+                    PolyFunctionOverSpice}; //!< Kernels plus nth degree 
+                                            //   polynomial
 
       enum PartialType {WRT_RightAscension, WRT_Declination, WRT_Twist};
 
@@ -176,6 +196,7 @@ namespace Isis {
 
       std::vector<double> ReferenceVector(const std::vector<double>& jVec);
 
+      std::vector<double> EvaluatePolyFunction();
       //! Set the downsize status
       void MinimizeCache(DownsizeStatus status) {
         p_minimizeCache = status;
@@ -203,11 +224,12 @@ namespace Isis {
         return (p_cache.size() > 0);
       };
 
-      void SetPolynomial();
+      void SetPolynomial(const Source type=PolyFunction);
 
       void SetPolynomial(const std::vector<double>& abcAng1,
                          const std::vector<double>& abcAng2,
-                         const std::vector<double>& abcAng3);
+                         const std::vector<double>& abcAng3,
+                         const Source type = PolyFunction);
 
       void GetPolynomial(std::vector<double>& abcAng1,
                          std::vector<double>& abcAng2,
@@ -286,6 +308,11 @@ namespace Isis {
       int p_axis1;                      //!< Axis of rotation for angle 1 of rotation
       int p_axis2;                      //!< Axis of rotation for angle 2 of rotation
       int p_axis3;                      //!< Axis of rotation for angle 3 of rotation
+      void SetEphemerisTimeMemcache();
+      void SetEphemerisTimeNadir();
+      void SetEphemerisTimeSpice();
+      void SetEphemerisTimePolyFunction();
+      void SetEphemerisTimePolyFunctionOverSpice();
 
     private:
       std::vector<int> p_constantFrames;  //!< Chain of Naif frame codes in constant rotation TC
