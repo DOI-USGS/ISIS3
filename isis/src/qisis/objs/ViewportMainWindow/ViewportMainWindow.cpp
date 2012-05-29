@@ -105,8 +105,13 @@ namespace Isis {
    * @param event
    */
   void ViewportMainWindow::closeEvent(QCloseEvent *event) {
-    emit closeWindow();
-    MainWindow::closeEvent(event);
+    if (p_workspace->confirmClose()) {
+      emit closeWindow();
+      MainWindow::closeEvent(event);
+    }
+    else {
+      event->ignore();
+    }
   }
 }
 

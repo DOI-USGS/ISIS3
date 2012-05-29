@@ -105,6 +105,8 @@ namespace Isis {
    *  @history 2012-03-22 Steven Lambright and Jai Rideout - Fixed bug where
    *                          screenPixelsChanged was not correctly emitted
    *                          on resize.
+   *  @history 2012-05-29 Steven Lambright - Changed destructor to clean up the cube when
+   *                          necessary.
    */
   class CubeViewport : public QAbstractScrollArea {
       Q_OBJECT
@@ -353,6 +355,7 @@ namespace Isis {
       void getCubeArea(double & pdStartSample, double & pdEndSample,
                                      double & pdStartLine, double & pdEndLine);
 
+      bool confirmClose();
 
     signals:
       void viewportUpdated();//!< Emitted when viewport updated.
@@ -365,8 +368,8 @@ namespace Isis {
       void mouseDoubleClick(QPoint);//!< Emitted when double click happens
       void windowTitleChanged();//!< Emitted when window title changes
       void scaleChanged(); //!< Emitted when zoom factor changed just before the repaint event
-      void saveChanges(); //!< Emitted when changes should be saved
-      void discardChanges(); //!< Emitted when changes should be discarded
+      void saveChanges(CubeViewport *); //!< Emitted when changes should be saved
+      void discardChanges(CubeViewport *); //!< Emitted when changes should be discarded
       void screenPixelsChanged(); //!< Emitted when cube pixels that should be on the screen change
 
       /**
@@ -416,7 +419,6 @@ namespace Isis {
 
 
     protected:
-      virtual void closeEvent(QCloseEvent *event);
       void scrollContentsBy(int dx, int dy);
       virtual void resizeEvent(QResizeEvent *e);
       virtual bool eventFilter(QObject *o, QEvent *e);

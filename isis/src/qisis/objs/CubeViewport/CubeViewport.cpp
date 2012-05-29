@@ -25,6 +25,7 @@
 #include <QApplication>
 #include <QCloseEvent>
 #include <QCursor>
+#include <QDebug>
 #include <QIcon>
 #include <QPen>
 #include <QPainter>
@@ -296,77 +297,57 @@ namespace Isis {
    *
    */
   CubeViewport::~CubeViewport() {
-    if(p_redBrick) {
-      delete p_redBrick;
-      p_redBrick = NULL;
-    }
+    delete p_redBrick;
+    p_redBrick = NULL;
 
-    if(p_grnBrick) {
-      delete p_grnBrick;
-      p_grnBrick = NULL;
-    }
+    delete p_grnBrick;
+    p_grnBrick = NULL;
 
-    if(p_bluBrick) {
-      delete p_bluBrick;
-      p_bluBrick = NULL;
-    }
+    delete p_bluBrick;
+    p_bluBrick = NULL;
 
-    if(p_gryBrick) {
-      delete p_gryBrick;
-      p_gryBrick = NULL;
-    }
+    delete p_gryBrick;
+    p_gryBrick = NULL;
 
-    if(p_pntBrick) {
-      delete p_pntBrick;
-      p_pntBrick = NULL;
-    }
+    delete p_pntBrick;
+    p_pntBrick = NULL;
 
-    if(p_groundMap) {
-      delete p_groundMap;
-      p_groundMap = NULL;
-    }
+    delete p_groundMap;
+    p_groundMap = NULL;
 
-    if(p_grayBuffer) {
-      delete p_grayBuffer;
-      p_grayBuffer = NULL;
-    }
+    delete p_grayBuffer;
+    p_grayBuffer = NULL;
 
-    if(p_redBuffer) {
-      delete p_redBuffer;
-      p_redBuffer = NULL;
-    }
+    delete p_redBuffer;
+    p_redBuffer = NULL;
 
-    if(p_greenBuffer) {
-      delete p_greenBuffer;
-      p_greenBuffer = NULL;
-    }
+    delete p_greenBuffer;
+    p_greenBuffer = NULL;
 
-    if(p_blueBuffer) {
-      delete p_blueBuffer;
-      p_blueBuffer = NULL;
-    }
+    delete p_blueBuffer;
+    p_blueBuffer = NULL;
 
     // p_cubeData MUST be deleted AFTER all viewport buffers!!!
     if(p_cubeData) {
       p_cubeData->RemoveChangeListener();
 
-      if(p_thisOwnsCubeData)
+      if(p_thisOwnsCubeData) {
         delete p_cubeData;
+
+        delete p_cube;
+        p_cube = NULL;
+      }
 
       p_cubeData = NULL;
     }
 
     p_cube = NULL;
 
-    if(p_progressTimer) {
-      delete p_progressTimer;
-      p_progressTimer = NULL;
-    }
+    delete p_progressTimer;
+    p_progressTimer = NULL;
 
-    if(p_image) {
-      delete p_image;
-      p_image = NULL;
-    }
+    delete p_image;
+    p_image = NULL;
 
     if(p_pixmapPaintRects) {
       for(int rect = 0; rect < p_pixmapPaintRects->size(); rect++) {
@@ -503,38 +484,40 @@ namespace Isis {
 
 
   /**
-   * This method is called when the viewport recieves a close
-   * event. If changes have been made to this viewport it opens an
-   * information dialog that asks the user if they want to save,
-   * discard changes, or cancel.
+   * This method should be called during a close event that would cause this viewport to
+   *   close. If changes have been made to this viewport it opens an
+   *   information dialog that asks the user if they want to save,
+   *   discard changes, or cancel.
    *
-   * @param event
+   * @return True if closing is OK, false if it needs to be cancelled.
    */
-  void CubeViewport::closeEvent(QCloseEvent *event) {
+  bool CubeViewport::confirmClose() {
+    bool canClose = true;
     if(p_saveEnabled) {
       // Enter == button 0, Escape == button 2
-      switch(QMessageBox::information(this, "Qview",
-                                      "The document contains unsaved changes\n"
-                                      "Do you want to save the changes before exiting?",
-                                      "&Save", "&Discard", "Cancel",
-                                      0,
-                                      2)){
+      switch(QMessageBox::information(this, tr("Confirm Save"),
+        tr("The cube [<font color='red'>%1</font>] contains unsaved changes. "
+           "Do you want to save the changes before exiting?").arg(cube()->getFileName().ToQt()),
+           QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel)) {
         //Save changes and close viewport
-        case 0:
-          emit saveChanges();
-          event->accept();
+        case QMessageBox::Save:
+          emit saveChanges(this);
           break;
+
         //Discard changes and close viewport
-        case 1:
-          emit discardChanges();
-          event->accept();
+        case QMessageBox::Discard:
+          emit discardChanges(this);
           break;
+
         //Cancel, don't close viewport
-        case 2:
-          event->ignore();
+        case QMessageBox::Cancel:
+        default:
+          canClose = false;
           break;
       }
     }
+
+    return canClose;
   }
 
   /**

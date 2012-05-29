@@ -76,5 +76,9 @@
       Added the stereo tool which calculates spot elevations and elevation profiles
       from pairs of stereo images.
     </change>
+    <change name="Steven Lambright" date="2012-05-29">
+      Fixed prompts for saving edited files on closing so they are functional once again.
+      Fixes #854.
+    </change>
   </history>
 </application>

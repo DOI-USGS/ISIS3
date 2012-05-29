@@ -15,9 +15,11 @@ namespace Isis {
   *
   * @internal
   *   @history 2012-04-05 Steven Lambright - Improved saving and restoring state
-  *                         by making the closeEvent() and hideEvent() actually
-  *                         override the parent's methods and removing the
-  *                         eventFilter. References #593.
+  *                           by making the closeEvent() and hideEvent() actually
+  *                           override the parent's methods and removing the
+  *                           eventFilter. References #593.
+  *   @history 2012-05-29 Steven Lambright - Fixed a bug where closeEvent method was
+  *                           not calling the paren't version.
   */
   class MainWindow : public QMainWindow {
       Q_OBJECT

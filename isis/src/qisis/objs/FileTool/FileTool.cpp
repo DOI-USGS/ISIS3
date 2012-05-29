@@ -73,7 +73,7 @@ namespace Isis {
       "<b>Function:</b> Save changes to the current Cube \
        <p><b>Shortcut:</b> Ctrl+S</p>";
     p_save->setWhatsThis(whatsThis);
-    connect(p_save, SIGNAL(activated()), this, SLOT(confirmSave()));
+    connect(p_save, SIGNAL(activated()), this, SLOT(save()));
     p_save->setEnabled(false);
 
     p_saveAs = new QAction(parent);
@@ -228,25 +228,6 @@ namespace Isis {
   }
 
   /**
-   * This method asks the user to confirm if they want to finalize their saved
-   * changes.
-   *
-   */
-  void FileTool::confirmSave() {
-    if(QMessageBox::question(
-          p_parent,
-          tr("Save File?"),
-          tr("Are you sure you want to save this file?"),
-          tr("&Save"), tr("&Cancel"),
-          QString(), 0, 1)) {
-      return;
-    }
-    else {
-      save();
-    }
-  }
-
-  /**
    * This method saves any changes made to the current cube, these
    * changes are finalized! There is no undoing once a save has
    * been made.
@@ -258,13 +239,10 @@ namespace Isis {
       QMessageBox::information((QWidget *)parent(), "Error", "No active cube to save");
       return;
     }
-    //Emit a signal to notify other objects that this cube has been saved
+
     emit saveChanges(cubeViewport());
-    //Disable the save action
     p_save->setEnabled(false);
 
-    //Essentially, closing the cube saves it's changes, and we want to keep it open,
-    //so reopen the current cube!
     cubeViewport()->cube()->reopen("rw");
   }
 
@@ -846,11 +824,7 @@ namespace Isis {
       //Set the current viewport to the one being closed
       setCubeViewport(d);
 
-      //If the user cancels the close operation, delete any viewports
-      //that WERE closed and set the viewportlist to the temp list and return
       if(!d->parentWidget()->close()) {
-        //tempList.erase(tempList.begin(), tempList.begin() + i);
-        //cubeViewportList()->assign(tempList.begin(), tempList.end());
         return false;
       }
     }
@@ -861,15 +835,15 @@ namespace Isis {
    * Exit the program, this slot called when the exit is chosen from the File menu
    *
    * @internal
-   * @history  2007-02-13  Tracie Sucharski,  Close all cubes before exiting
+   *   @history  2007-02-13  Tracie Sucharski,  Close all cubes before exiting
+   *   @history  2012-05-24 Steven Lambright - Just close the main window. This should handle
+   *                            everything automatically.
    */
   void FileTool::exit() {
-    if(closeAll()) {
-      /*This is OK to cast the p_parent because we know it's sub-subclassed from
-       *MainWindow and we know that MainWindow has a close method*/
-      ((MainWindow *)p_parent)->close();
-      qApp->quit();
-    }
+    QWidget *mainWindow = qobject_cast<QWidget *>(p_parent);
+
+    if (mainWindow)
+      mainWindow->close();
   }
 
   /**
@@ -900,8 +874,7 @@ namespace Isis {
       if(p_lastViewport == NULL) {
         //Set the last viewport to the current viewport and connect signals to save and discard
         p_lastViewport = cubeViewport();
-        connect(p_lastViewport, SIGNAL(saveChanges()), this, SLOT(save()));
-        connect(p_lastViewport, SIGNAL(discardChanges()), this, SLOT(discard()));
+        connect(p_lastViewport, SIGNAL(saveChanges(CubeViewport *)), this, SLOT(save()));
       }
       else {
         if(p_lastViewport != cubeViewport()) {

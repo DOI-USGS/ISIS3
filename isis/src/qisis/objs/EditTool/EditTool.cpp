@@ -25,6 +25,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QComboBox>
+#include <QDebug>
 #include <QHBoxLayout>
 #include <QLine>
 #include <QLineEdit>
@@ -40,6 +41,7 @@
 #include "RubberBandTool.h"
 #include "SpecialPixel.h"
 #include "ToolPad.h"
+#include "Workspace.h"
 
 
 namespace Isis {
@@ -52,6 +54,13 @@ namespace Isis {
    */
   EditTool::EditTool(QWidget *parent) : Tool(parent) {
     p_dn = Null;
+  }
+
+  void EditTool::addTo(Workspace *workspace) {
+    Tool::addTo(workspace);
+
+    connect(workspace, SIGNAL(cubeViewportAdded(MdiCubeViewport *)),
+            this, SLOT(listenToViewport(MdiCubeViewport *)));
   }
 
   /**
@@ -87,9 +96,10 @@ namespace Isis {
    * @return QWidget*
    */
   QWidget *EditTool::createToolBarWidget(QStackedWidget *active) {
-    QWidget *hbox = new QWidget(active);
+    QWidget *container = new QWidget(active);
+    container->setObjectName("EditToolActiveToolBarWidget");
 
-    p_shapeComboBox = new QComboBox(hbox);
+    p_shapeComboBox = new QComboBox;
     p_shapeComboBox->setEditable(false);
     p_shapeComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     p_shapeComboBox->addItem("Point");
@@ -107,7 +117,7 @@ namespace Isis {
     p_shapeComboBox->setCurrentIndex(1);
     connect(p_shapeComboBox, SIGNAL(activated(int)), this, SLOT(enableRubberBandTool()));
 
-    p_valTypeComboBox = new QComboBox(hbox);
+    p_valTypeComboBox = new QComboBox;
     p_valTypeComboBox->setEditable(false);
     p_valTypeComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     p_valTypeComboBox->addItem("Dn", UserDnComboValue);
@@ -125,10 +135,7 @@ namespace Isis {
     connect(p_valTypeComboBox, SIGNAL(activated(int)), this,
             SLOT(selectValType(int)));
 
-    //  TODO::  Add validator???
-    //QValidator *valid = new QValidator (hbox);
-
-    p_dnLineEdit = new QLineEdit(hbox);
+    p_dnLineEdit = new QLineEdit;
     p_dnLineEdit->setToolTip("Dn value");
     text =
       "<b>Function:</b> This is the dn used to replace image data";
@@ -136,7 +143,7 @@ namespace Isis {
     p_dnLineEdit->setEnabled(false);
     connect(p_dnLineEdit, SIGNAL(editingFinished()), this, SLOT(changeDn()));
 
-    p_undoButton = new QToolButton(hbox);
+    p_undoButton = new QToolButton;
     p_undoButton->setIcon(QPixmap(toolIconDir() + "/undo.png"));
     p_undoButton->setToolTip("Undo");
     text =
@@ -146,7 +153,7 @@ namespace Isis {
     p_undoButton->setAutoRaise(true);
     p_undoButton->setIconSize(QSize(22, 22));
 
-    p_redoButton = new QToolButton(hbox);
+    p_redoButton = new QToolButton;
     p_redoButton->setIcon(QPixmap(toolIconDir() + "/redo.png"));
     p_redoButton->setToolTip("Redo");
     text =
@@ -157,7 +164,7 @@ namespace Isis {
     p_redoButton->setAutoRaise(true);
     p_redoButton->setIconSize(QSize(22, 22));
 
-    p_saveButton = new QToolButton(hbox);
+    p_saveButton = new QToolButton;
     p_saveButton->setIcon(QPixmap(toolIconDir() + "/filesave.png"));
     p_saveButton->setToolTip("Save");
     text =
@@ -168,7 +175,7 @@ namespace Isis {
     p_saveButton->setAutoRaise(true);
     p_saveButton->setIconSize(QSize(22, 22));
 
-    p_saveAsButton = new QToolButton(hbox);
+    p_saveAsButton = new QToolButton;
     p_saveAsButton->setIcon(QPixmap(toolIconDir() + "/filesaveas.png"));
     p_saveAsButton->setToolTip("Save As");
     text =
@@ -178,7 +185,7 @@ namespace Isis {
     p_saveAsButton->setAutoRaise(true);
     p_saveAsButton->setIconSize(QSize(22, 22));
 
-    QHBoxLayout *layout = new QHBoxLayout(hbox);
+    QHBoxLayout *layout = new QHBoxLayout;
     layout->setMargin(0);
     layout->addWidget(p_shapeComboBox);
     layout->addWidget(p_valTypeComboBox);
@@ -188,10 +195,10 @@ namespace Isis {
     layout->addWidget(p_saveButton);
     layout->addWidget(p_saveAsButton);
     layout->addStretch(1);
-    hbox->setLayout(layout);
+    container->setLayout(layout);
 
-
-    return hbox;
+m_container = container;
+    return container;
   }
 
   /**
@@ -235,13 +242,12 @@ namespace Isis {
    */
   void EditTool::updateTool() {
     MdiCubeViewport *vp = cubeViewport();
+
     if (vp != NULL) {
       //If the current viewport has no undo history
       if (!p_undoEdit.contains(cubeViewport()) || p_undoEdit.value(vp)->empty()) {
         p_undoButton->setEnabled(false);
         p_saveButton->setEnabled(false);
-        connect(vp, SIGNAL(destroyed(QObject *)),
-                this, SLOT(removeViewport(QObject *)));
       }
       //Otherwise enable the undo button and save button
       else {
@@ -251,8 +257,6 @@ namespace Isis {
       //If the current viewport has no redo history
       if (!p_redoEdit.contains(cubeViewport()) || p_redoEdit.value(vp)->empty()) {
         p_redoButton->setEnabled(false);
-        connect(vp, SIGNAL(destroyed(QObject *)),
-                this, SLOT(removeViewport(QObject *)));
       }
       //Otherwise enable the redo button and save button
       else {
@@ -364,6 +368,17 @@ namespace Isis {
     writeToCube(iesamp, issamp, ieline, isline, linePts);
     if (linePts) delete linePts;
   }
+
+  void EditTool::listenToViewport(MdiCubeViewport *newViewport) {
+    connect(newViewport, SIGNAL(saveChanges(CubeViewport *)),
+            this, SLOT(save(CubeViewport *)));
+    connect(newViewport, SIGNAL(discardChanges(CubeViewport *)),
+            this, SLOT(undoAll(CubeViewport *)));
+    connect(newViewport, SIGNAL(destroyed(QObject *)),
+            this, SLOT(removeViewport(QObject *)));
+  }
+
+
   /**
    * This is a slot called when any mouse button is released inside of a
    * viewport.
@@ -628,57 +643,57 @@ namespace Isis {
    *
    * @param vp
    */
-  void EditTool::undoAll(MdiCubeViewport *vp) {
+  void EditTool::undoAll(CubeViewport *vp) {
     try {
-      if (vp == NULL) return;
-
-      //  If cube readonly print error
-      if (vp->cube()->isReadOnly()) {
-        QMessageBox::information((QWidget *)parent(), "Error", "Cube is Read Only");
-        return;
-      }
-
-      QStack<Brick *> *undo;
-      QStack<Brick *> *redo;
-      int marker = 0;
-      //If edits have been made
-      if (p_undoEdit.contains(vp)) {
-        undo = p_undoEdit.value(vp);
-
-        //If a save has been made
-        if (p_saveMarker.contains(vp)) {
-          marker = p_saveMarker.value(vp);
+      if (vp != NULL) {
+        //  If cube readonly print error
+        if (vp->cube()->isReadOnly()) {
+          QMessageBox::information((QWidget *)parent(), "Error", "Cube is Read Only");
+          return;
         }
 
-        //Undo up to the save point
-        for(int i = undo->count() - 1; i >= marker; i--) {
-          Brick *brick = undo->at(i);
+        QStack<Brick *> *undo;
+        QStack<Brick *> *redo;
+        int marker = 0;
+        //If edits have been made
+        if (p_undoEdit.contains(vp)) {
+          undo = p_undoEdit.value(vp);
 
-          //  Write the saved brick to the cube
-          vp->cube()->write(*(brick));
+          //If a save has been made
+          if (p_saveMarker.contains(vp)) {
+            marker = p_saveMarker.value(vp);
+          }
+
+          //Undo up to the save point
+          for(int i = undo->count() - 1; i >= marker; i--) {
+            Brick *brick = undo->at(i);
+            //  Write the saved brick to the cube
+            vp->cube()->write(*(brick));
+          }
+
+          //If undos have been made past the save point, we need to redo them
+          //Set the marker to the correct index
+          marker = marker - undo->count();
         }
 
-        //If undos have been made past the save point, we need to redo them
-        //Set the marker to the correct index
-        marker = marker - undo->count();
-      }
+        //If undos have been made
+        if (p_redoEdit.contains(vp)) {
+          redo = p_redoEdit.value(vp);
 
-      //If undos have been made
-      if (p_redoEdit.contains(vp)) {
-        redo = p_redoEdit.value(vp);
+          //If undos have been made past a save point, we need to redo them
+          for(int i = redo->count() - 1; i >= redo->count() - marker; i--) {
+            Brick *brick = redo->at(i);
 
-        //If undos have been made past a save point, we need to redo them
-        for(int i = redo->count() - 1; i >= redo->count() - marker; i--) {
-          Brick *brick = redo->at(i);
-
-          //  Write the saved brick to the cube
-          vp->cube()->write(*(brick));
+            //  Write the saved brick to the cube
+            vp->cube()->write(*(brick));
+          }
         }
       }
     }
     catch(...) {
       //If the brick failed to initialize due to insufficient memory
-      QMessageBox::information((QWidget *)parent(), "Error", "Not enough memory to complete this operation.");
+      QMessageBox::information((QWidget *)parent(), "Error",
+                               "Not enough memory to complete this operation.");
       return;
     }
   }
@@ -763,22 +778,23 @@ namespace Isis {
    *
    * @param vp
    */
-  void EditTool::save(MdiCubeViewport *vp) {
-    if (vp == NULL) return;
-    //Set the 'save point' for this viewport, if we undo discard any changes
-    //We will only discard to this point
-    int marker;
-    if (p_undoEdit.contains(vp)) {
-      marker = p_undoEdit.value(vp)->count();
-    }
-    else {
-      marker = 0;
-    }
-    p_saveMarker[vp] = marker;
+  void EditTool::save(CubeViewport *vp) {
+    if (vp != NULL) {
+      //Set the 'save point' for this viewport, if we undo discard any changes
+      //We will only discard to this point
+      int marker;
+      if (p_undoEdit.contains(vp)) {
+        marker = p_undoEdit.value(vp)->count();
+      }
+      else {
+        marker = 0;
+      }
+      p_saveMarker[vp] = marker;
 
-    p_saveButton->setEnabled(false);
-    vp->cubeChanged(false);
-    vp->setCaption();
+      p_saveButton->setEnabled(false);
+      vp->cubeChanged(false);
+      vp->setCaption();
+    }
   }
 
 
@@ -909,7 +925,6 @@ namespace Isis {
    *  enabled the RubberBandTool is disabled.
    *
    */
-
   void EditTool::enableRubberBandTool() {
     int index = p_shapeComboBox->currentIndex();
     if (index == 3) {

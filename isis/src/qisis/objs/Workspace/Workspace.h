@@ -63,6 +63,8 @@ namespace Isis {
   *              in the subWindowList instead of the first one
   * @history 2011-09-19 Steven Lambright - Fixed addBrowseView to actually close
   *                         the old viewports instead of hiding them. Fixes #418
+  * @history 2012-05-29 Steven Lambright - Now utilizes ViewportMdiSubWindow instead of
+  *                         QMdiSubWindow. References #854.
   */
   class Workspace : public QMdiArea {
       Q_OBJECT
@@ -73,6 +75,8 @@ namespace Isis {
       virtual ~Workspace();
       QVector< MdiCubeViewport * > * cubeViewportList();
       const Workspace &operator=(Workspace other);
+
+      bool confirmClose();
 
     signals:
       void cubeViewportAdded(MdiCubeViewport *);

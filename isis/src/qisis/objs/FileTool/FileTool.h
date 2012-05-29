@@ -18,6 +18,7 @@ namespace Isis {
 namespace Isis {
   class MdiCubeViewport;
   class SaveAsDialog;
+
   /**
    * @author ????-??-?? Unknown
    *
@@ -27,29 +28,18 @@ namespace Isis {
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport
    *   @history 2011-04-05 Sharmila Prasad - Added SaveInfo option to save
    *              the current cubeviewport's whatsthis info
-   *   @history 2011-05-11 Sharmila Prasad - Added SaveAsDialog to select the output 
+   *   @history 2011-05-11 Sharmila Prasad - Added SaveAsDialog to select the output
    *                   cube and options to save FullImage, ExportAsIs, ExportFullRes
    *   @history  2012-02-01 Sharmila Prasad - Fixed bug #0000681 - reduce in ISIS 3.3.0
-   *                   is ignoring the +N band identifier 
-    </change>
+   *                   is ignoring the +N band identifier
+   *   @history  2012-05-24 Steven Lambright - Minor changes to support prompting to save on exit
+   *                            once again (this has been broken for a very long time). The prompt
+   *                            now appears if you have edited your file but not saved it - not when
+   *                            clicking "Save." This was a minimal fix (I left a lot of problems
+   *                            to be solved at a later date). Fixes #854.
    */
   class FileTool : public Tool {
       Q_OBJECT
-
-    signals:
-      void fileSelected(QString); //!< This signal is called when a file is selected
-      /**
-       * This signal is called when changes should be saved
-       *
-       * @param vp
-       */
-      void saveChanges(MdiCubeViewport *vp);
-      /**
-       * This signal is called when changes should be discarded
-       *
-       * @param vp
-       */
-      void discardChanges(MdiCubeViewport *vp);
 
     public:
       FileTool(QWidget *parent);
@@ -68,11 +58,25 @@ namespace Isis {
       QDir p_dir;               //!< Directory
       QStringList p_fileList;   //!< File list
 
+    signals:
+      void fileSelected(QString); //!< This signal is called when a file is selected
+      /**
+       * This signal is called when changes should be saved
+       *
+       * @param vp
+       */
+      void saveChanges(CubeViewport *vp);
+      /**
+       * This signal is called when changes should be discarded
+       *
+       * @param vp
+       */
+      void discardChanges(CubeViewport *vp);
+
     public slots:
       virtual void open();
       virtual void browse();
       void print();
-      void confirmSave();
       virtual void save();
       virtual void saveAs();
       virtual void saveInfo(); //!< Saves the whatsthis info of the cubeviewport
@@ -107,24 +111,24 @@ namespace Isis {
       Workspace *p_workSpace;          //!< The workspace being used
       MdiCubeViewport *p_lastViewport; //!< The last cubeviewport that was used
       SaveAsDialog *p_saveAsDialog;    //!< SaveAs Dialog with different save options
-      
+
       //! Save Image in its entirety to an output file
-      void saveAsFullImage(Cube *icube, Cube *ocube); 
-      
+      void saveAsFullImage(Cube *icube, Cube *ocube);
+
       //! Copy input cube details into output file given its dimensions
-      void copyCubeDetails(const QString & psFileName, Cube *icube, 
+      void copyCubeDetails(const QString & psFileName, Cube *icube,
            Cube *ocube, int piNumSamples, int piNumLines, int piNumBands);
-      
+
       //! Save image AsIs (As viewed in the viewport window) into output file
       void saveAs_AsIs(Cube *icube, const QString & psOutFile);
-      
+
       //! Save image Full Resolution (image viewed in the viewport window) into output
-      void saveAs_FullResolution(Cube *pInCube, Cube *pOutCube, 
+      void saveAs_FullResolution(Cube *pInCube, Cube *pOutCube,
                                  int pNumSamples, int pNumLines);
-      
+
       //! Save image AsIs Enlarged into output
       void saveAsEnlargedCube(Cube *icube, const QString & psOutFile);
-      
+
       //! Save image AsIs Reduced into output
       void saveAsReducedCube (Cube *icube, const QString & psOutFile);
   };

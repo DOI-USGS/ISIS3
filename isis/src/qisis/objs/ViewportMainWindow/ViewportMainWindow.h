@@ -31,6 +31,8 @@ namespace Isis {
    *           tool's exit method and ignores this class's close method.
    *  @history 2010-18-03 Sharmila Prasad - Added ability to handle exception and display warning status
    *           when exception occured
+   *  @history 2012-05-29 Steven Lambright - Updated closeEvent() to ask the user to save any
+   *                          unsaved modifications to the opened cube. References #854.
    */
   class ViewportMainWindow : public MainWindow {
       Q_OBJECT

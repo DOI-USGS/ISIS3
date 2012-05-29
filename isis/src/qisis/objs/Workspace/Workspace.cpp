@@ -1,6 +1,5 @@
 #include "Workspace.h"
 
-#include <QMdiSubWindow>
 #include <QProgressBar>
 #include <QVBoxLayout>
 #include <QVector>
@@ -10,7 +9,7 @@
 #include "CubeAttribute.h"
 #include "iString.h"
 #include "MdiCubeViewport.h"
-
+#include "ViewportMdiSubWindow.h"
 
 namespace Isis {
 
@@ -73,6 +72,18 @@ namespace Isis {
     }
 
     return p_cubeViewportList;
+  }
+
+  bool Workspace::confirmClose() {
+    QVector< MdiCubeViewport * > viewports = *cubeViewportList();
+
+    bool confirmed = true;
+
+    for (int viewportIndex = 0; confirmed && viewportIndex < viewports.count(); viewportIndex++) {
+      confirmed = viewports[viewportIndex]->confirmClose();
+    }
+
+    return confirmed;
   }
 
   /**
@@ -144,47 +155,28 @@ namespace Isis {
    *          successful.
    */
   MdiCubeViewport *Workspace::addCubeViewport(Cube *cube) {
-    MdiCubeViewport *cvp = NULL;
-
-    QMdiSubWindow *window = new QMdiSubWindow;
-    window->setOption(QMdiSubWindow::RubberBandResize, true);
-    window->setOption(QMdiSubWindow::RubberBandMove, true);
+    MdiCubeViewport *result = NULL;
 
     try {
-      QWidget *centralWidget = new QWidget(this);
-      QVBoxLayout *layout = new QVBoxLayout();
-
-      cvp = new MdiCubeViewport(cube, NULL, centralWidget);
-      QProgressBar *progress = new QProgressBar();
-      connect(cvp, SIGNAL(progressChanged(int)), progress, SLOT(setValue(int)));
-      progress->setRange(0, 100);
-
-      layout->addWidget(cvp);
-      layout->addWidget(progress);
-
-      centralWidget->setLayout(layout);
-
-      window->setWidget(centralWidget);
-
+      ViewportMdiSubWindow *window(new ViewportMdiSubWindow(cube));
       window->setAttribute(Qt::WA_DeleteOnClose);
+
       addSubWindow(window);
 
       window->show();
+
+      result = window->viewport();
+      emit cubeViewportAdded(result);
     }
     catch(IException &e) {
-      // close MdiCubeViewport window
-      cvp->close();
-      // add a new message to the caught exception and throw
       throw IException(e,
                        IException::Programmer,
-                       "Exception caught when attempting to show cube "
-                       + cube->getFileName(),
+                       tr("Error when attempting to show cube [%1]")
+                         .arg(cube->getFileName().ToQt()),
                        _FILEINFO_);
     }
 
-    emit cubeViewportAdded(cvp);
-
-    return cvp;
+    return result;
   }
 
   void Workspace::addBrowseView(QString cubename) {
