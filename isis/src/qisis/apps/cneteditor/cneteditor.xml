@@ -176,5 +176,10 @@
       a priori/adjusted lat/lon/radius sigma, jigsaw rejected points, jigsaw
       rejected measures, sample and line shift. Fixes #367.
     </change>
+    <change name="Steven Lambright and Kim Oyama" date="2012-05-30">
+      Improved user interface for the new sorting options to be (hopefully)
+      extremely obvious what the options are, how they work, and why your
+      tables are not sorting (when they aren't sorting). Fixes #838.
+    </change>
   </history>
 </application>

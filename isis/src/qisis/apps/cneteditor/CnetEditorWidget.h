@@ -17,9 +17,10 @@ class QToolBar;
 namespace Isis
 {
   class ControlNet;
-  
+
   namespace CnetViz
   {
+    class AbstractTableModel;
     class AbstractTreeItem;
     class FilterWidget;
     class ImageImageTreeModel;
@@ -61,18 +62,21 @@ namespace Isis
       void readSettings();
       void writeSettings();
 
-      QWidget * getPointTreeView();
-      QWidget * getSerialTreeView();
-      QWidget * getConnectionTreeView();
-      QWidget * getPointFilterWidget();
-      QWidget * getSerialFilterWidget();
-      QWidget * getConnectionFilterWidget();
-      
-      QMap< QAction *, QList< QString > > getMenuActions();
-      QMap< QString, QList< QAction * > > getToolBarActions();
+      QWidget * pointTreeView();
+      QWidget * serialTreeView();
+      QWidget * connectionTreeView();
+      QWidget * pointFilterWidget();
+      QWidget * serialFilterWidget();
+      QWidget * connectionFilterWidget();
 
-      ControlNet * getFilteredNetwork() const;
-      
+      CnetViz::AbstractTableModel *measureTableModel();
+      CnetViz::AbstractTableModel *pointTableModel();
+
+      QMap< QAction *, QList< QString > > menuActions();
+      QMap< QString, QList< QAction * > > toolBarActions();
+
+      ControlNet * filteredNetwork() const;
+
       bool measureTableSortingEnabled() const;
       int measureTableSortLimit() const;
       bool pointTableSortingEnabled() const;
@@ -82,7 +86,7 @@ namespace Isis
       void setMeasureTableSortLimit(int limit);
       void setPointTableSortingEnabled(bool enabled);
       void setPointTableSortLimit(int limit);
-      
+
 
     public slots:
       void configSorting();
@@ -91,7 +95,7 @@ namespace Isis
 
     signals:
       void cnetModified();
-      
+
 
     private:
       void nullify();
@@ -121,44 +125,42 @@ namespace Isis
 
 
     private: // data
-      bool updatingSelection;
-      ControlNet * controlNet;
-      QByteArray * topSplitterDefault;
-      QString * workingVersion;
+      bool m_updatingSelection;
+      ControlNet * m_controlNet;
+      QString * m_workingVersion;
       static const QString VERSION;
 
 
     private: // widgets
-      CnetViz::TreeView * pointTreeView;
-      CnetViz::TreeView * imageTreeView;
-      CnetViz::TreeView * connectionTreeView;
+      CnetViz::TreeView * m_pointTreeView;
+      CnetViz::TreeView * m_imageTreeView;
+      CnetViz::TreeView * m_connectionTreeView;
 
-      CnetViz::TableView * pointTableView;
-      CnetViz::TableView * measureTableView;
-      
-      QGroupBox * pointTableBox;
-      QGroupBox * measureTableBox;
-      
-      QScrollArea * filterArea;
+      CnetViz::TableView * m_pointTableView;
+      CnetViz::TableView * m_measureTableView;
 
-      QWidget * pointFilterWidget;
-      QWidget * serialFilterWidget;
-      QWidget * connectionFilterWidget;
+      QGroupBox * m_pointTableBox;
+      QGroupBox * m_measureTableBox;
 
-      CnetViz::PointMeasureTreeModel * pointModel;
-      CnetViz::ImagePointTreeModel * imageModel;
-      CnetViz::ImageImageTreeModel * connectionModel;
+      QScrollArea * m_filterArea;
 
-      CnetViz::PointTableModel * pointTableModel;
-      CnetViz::MeasureTableModel * measureTableModel;
+      QWidget * m_pointFilterWidget;
+      QWidget * m_serialFilterWidget;
+      QWidget * m_connectionFilterWidget;
 
-      QSplitter * topSplitter;
-      QSplitter * mainSplitter;
+      CnetViz::PointMeasureTreeModel * m_pointModel;
+      CnetViz::ImagePointTreeModel * m_imageModel;
+      CnetViz::ImageImageTreeModel * m_connectionModel;
 
-      QMap< QAction *, QList< QString > > * menuActions;
-      QMap< QString, QList< QAction * > > * toolBarActions;
+      CnetViz::PointTableModel * m_pointTableModel;
+      CnetViz::MeasureTableModel * m_measureTableModel;
 
-      QString * settingsPath;
+      QSplitter * m_mainSplitter;
+
+      QMap< QAction *, QList< QString > > * m_menuActions;
+      QMap< QString, QList< QAction * > > * m_toolBarActions;
+
+      QString * m_settingsPath;
   };
 }
 

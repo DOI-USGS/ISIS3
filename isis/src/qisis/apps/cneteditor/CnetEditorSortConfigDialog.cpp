@@ -4,7 +4,10 @@
 
 #include <QtGui>
 
+#include "AbstractTableModel.h"
 #include "CnetEditorWidget.h"
+
+using namespace Isis::CnetViz;
 
 namespace Isis {
   /**
@@ -44,6 +47,12 @@ namespace Isis {
     mainLayout->addWidget(m_pointTableLimitSpinBox, row, 2);
     row++;
 
+    m_pointTableWarningsLabel = new QLabel;
+    m_pointTableWarningsLabel->setVisible(false);
+    m_pointTableWarningsLabel->setWordWrap(true);
+    mainLayout->addWidget(m_pointTableWarningsLabel, row, 1, 1, 2);
+    row++;
+
     QLabel * measureTableLabel = new QLabel("<h3>Measure Table</h3>");
     mainLayout->addWidget(measureTableLabel, row, 0, 1, 3);
     row++;
@@ -63,6 +72,12 @@ namespace Isis {
     m_measureTableLimitSpinBox = new QSpinBox;
     m_measureTableLimitSpinBox->setRange(2, std::numeric_limits<int>::max());
     mainLayout->addWidget(m_measureTableLimitSpinBox, row, 2);
+    row++;
+
+    m_measureTableWarningsLabel = new QLabel;
+    m_measureTableWarningsLabel->setVisible(false);
+    m_measureTableWarningsLabel->setWordWrap(true);
+    mainLayout->addWidget(m_measureTableWarningsLabel, row, 1, 1, 2);
     row++;
 
     // Now the buttons area
@@ -92,7 +107,7 @@ namespace Isis {
 
     QWidget *buttonsAreaWidget = new QWidget;
     buttonsAreaWidget->setLayout(buttonsAreaLayout);
-    mainLayout->addWidget(buttonsAreaWidget, row, 1, 1, 3);
+    mainLayout->addWidget(buttonsAreaWidget, row, 0, 1, 3);
 
     readSettings();
     refreshWidgetStates();
@@ -128,13 +143,47 @@ namespace Isis {
    * match.
    */
   void CnetEditorSortConfigDialog::readSettings() {
+    // Point Table
     m_pointSortingCheckBox->setChecked(
         m_cnetWidget->pointTableSortingEnabled());
     m_pointTableLimitSpinBox->setValue(m_cnetWidget->pointTableSortLimit());
 
+    AbstractTableModel *pointModel = m_cnetWidget->pointTableModel();
+    QString disabledWarning = tr("<font color='red'>Sorting is currently disabled because the "
+        "number of visible rows (%L1) exceeds the applied table size limit option (%L2).</font>");
+
+    if (pointModel && m_pointSortingCheckBox->isChecked() &&
+        pointModel->sortLimit() < pointModel->getVisibleRowCount()) {
+      m_pointTableWarningsLabel->setText(
+          disabledWarning.arg(pointModel->getVisibleRowCount()).arg(pointModel->sortLimit()));
+
+      m_pointTableWarningsLabel->setVisible(true);
+    }
+    else {
+      m_pointTableWarningsLabel->setText(tr(""));
+      m_pointTableWarningsLabel->setVisible(false);
+    }
+
+    // Measure Table
     m_measureSortingCheckBox->setChecked(
         m_cnetWidget->measureTableSortingEnabled());
     m_measureTableLimitSpinBox->setValue(m_cnetWidget->measureTableSortLimit());
+
+    AbstractTableModel *measureModel = m_cnetWidget->measureTableModel();
+    if (measureModel && m_measureSortingCheckBox->isChecked() &&
+        measureModel->sortLimit() < measureModel->getVisibleRowCount()) {
+      m_measureTableWarningsLabel->setText(
+          disabledWarning.arg(measureModel->getVisibleRowCount()).arg(measureModel->sortLimit()));
+
+      m_measureTableWarningsLabel->setVisible(true);
+    }
+    else {
+      m_measureTableWarningsLabel->setText(tr(""));
+      m_measureTableWarningsLabel->setVisible(false);
+    }
+
+    // Resize the dialog (for when warnings come and go, for example).
+    adjustSize();
   }
 
 

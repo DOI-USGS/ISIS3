@@ -553,7 +553,7 @@ namespace Isis
       QString newCubeListFileName;
 
       // Get our filtered network and write it to disk.
-      ControlNet * filteredCnet = editorWidget->getFilteredNetwork();
+      ControlNet * filteredCnet = editorWidget->filteredNetwork();
       filteredCnet->Write(*curFile, saveAsPvl);
 
       if (cubeListFile->size()) {
@@ -707,16 +707,16 @@ namespace Isis
     populateToolBars();
     connect(editorWidget, SIGNAL(cnetModified()), this, SLOT(setDirty()));
 
-    pointTreeDockWidget->setWidget(editorWidget->getPointTreeView());
-    serialTreeDockWidget->setWidget(editorWidget->getSerialTreeView());
-    connectionTreeDockWidget->setWidget(editorWidget->getConnectionTreeView());
+    pointTreeDockWidget->setWidget(editorWidget->pointTreeView());
+    serialTreeDockWidget->setWidget(editorWidget->serialTreeView());
+    connectionTreeDockWidget->setWidget(editorWidget->connectionTreeView());
 
     pointFilterDockWidget->setWidget(
-        editorWidget->getPointFilterWidget());
+        editorWidget->pointFilterWidget());
     serialFilterDockWidget->setWidget(
-        editorWidget->getSerialFilterWidget());
+        editorWidget->serialFilterWidget());
     connectionFilterDockWidget->setWidget(
-        editorWidget->getConnectionFilterWidget());
+        editorWidget->connectionFilterWidget());
 
     setFileState(HasFile, *curFile);
     saveAsPvl = !Pvl((iString) *curFile).HasObject("ProtoBuffer");
@@ -732,7 +732,7 @@ namespace Isis
   void CnetEditorWindow::populateMenus()
   {
     QMap< QAction *, QList< QString > > actionMap;
-    actionMap = editorWidget->getMenuActions();
+    actionMap = editorWidget->menuActions();
     QMapIterator< QAction *, QList< QString > > i(actionMap);
 
     QWidget * widget = NULL;
@@ -798,7 +798,7 @@ namespace Isis
   void CnetEditorWindow::populateToolBars()
   {
     QMap< QString, QList< QAction * > > actionMap;
-    actionMap = editorWidget->getToolBarActions();
+    actionMap = editorWidget->toolBarActions();
     QMapIterator< QString, QList< QAction * > > i(actionMap);
 
     while (i.hasNext())

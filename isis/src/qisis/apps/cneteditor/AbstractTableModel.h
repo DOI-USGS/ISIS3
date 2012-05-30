@@ -44,6 +44,12 @@ namespace Isis
         Q_OBJECT
 
       public:
+        enum Warning {
+          None = 0,
+          SortingDisabled,
+          SortingTableSizeLimitReached
+        };
+
         AbstractTableModel(AbstractTreeModel *, AbstractTableDelegate *);
         virtual ~AbstractTableModel();
 
@@ -88,6 +94,7 @@ namespace Isis
         void treeSelectionChanged(QList<AbstractTreeItem *>);
         void tableSelectionChanged(QList<AbstractTreeItem *>);
 
+        void userWarning(AbstractTableModel::Warning);
         
       protected:
         virtual TableColumnList * createColumns() = 0;

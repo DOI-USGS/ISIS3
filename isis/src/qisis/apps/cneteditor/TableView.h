@@ -1,13 +1,13 @@
 #ifndef TableView_H
 #define TableView_H
 
-
 #include <QWidget>
 
+#include "AbstractTableModel.h"
 
+class QLabel;
 template<typename T> class QList;
 class QString;
-
 
 namespace Isis
 {
@@ -48,6 +48,7 @@ namespace Isis
 
 
       public slots:
+        void displayWarning(AbstractTableModel::Warning);
         void handleModelSelectionChanged();
         void handleModelSelectionChanged(QList< AbstractTreeItem * >);
 
@@ -76,6 +77,7 @@ namespace Isis
         TableColumnList * columns;
         AbstractTableModel * model;
         QString * settingsPath;
+        QLabel * warningLabel;
     };
   }
 }

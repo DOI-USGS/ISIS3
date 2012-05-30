@@ -9,6 +9,7 @@
 #include <QLabel>
 #include <QLinearGradient>
 #include <QLocale>
+#include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPen>
@@ -48,9 +49,9 @@ namespace Isis
       clickedColumn = -1;
 
       setMouseTracking(true);
-      
+
       setModel(someModel);
-      
+
       ARROW_HEIGHT = 3;
       ARROW_WIDTH = 5;
     }
@@ -73,14 +74,14 @@ namespace Isis
       /*QFontMetrics(font()).width(text->join("")) + 15,
           QFontMetrics(font()).height() + 6);*/
     }
-    
-    
+
+
     QSize TableViewHeader::sizeHint()
     {
       return minimumSizeHint();
     }
-    
-    
+
+
     void TableViewHeader::setModel(AbstractTableModel * someModel)
     {
       if (model)
@@ -104,9 +105,9 @@ namespace Isis
         disconnect(model, SIGNAL(modelModified()),
                   this, SLOT(update()));
       }
-      
+
       model = someModel;
-      
+
       connect(model, SIGNAL(filterProgressChanged(int)),
               this, SLOT(updateFilterProgress(int)));
       connect(model, SIGNAL(rebuildProgressChanged(int)),
@@ -125,7 +126,7 @@ namespace Isis
               model, SLOT(setGlobalSelection(bool)));
       connect(model, SIGNAL(modelModified()), this, SLOT(update()));
 
-      
+
       if (columns)
       {
         for (int i = 0; i < columns->size(); i++)
@@ -134,9 +135,9 @@ namespace Isis
                       this, SLOT(update()));
         }
       }
-      
+
       columns = model->getColumns();
-      
+
       for (int i = 0; i < columns->size(); i++)
         connect((*columns)[i], SIGNAL(visibilityChanged()), this, SLOT(update()));
     }
@@ -154,7 +155,7 @@ namespace Isis
         for (int i = 0; i < visibleCols.size(); i++)
         {
           TableColumn *& col = visibleCols[i];
-          
+
           if (col->getTitle().isEmpty())
             col->setWidth(QFontMetrics(font()).width(
                 QString::number(visibleCount)) + 22);
@@ -176,13 +177,13 @@ namespace Isis
     void TableViewHeader::mousePressEvent(QMouseEvent * event)
     {
       QPoint mousePos = event->pos();
-      
+
       clickedColumn = getMousedColumn(mousePos);
-      
+
   //     QRect priorityRect = getSortingPriorityRect(clickedColumn);
   //     QRect arrowRect = getSortingArrowRect(clickedColumn);
-      
-      
+
+
       if (event->buttons() == Qt::LeftButton)
       {
         clickedColumnEdge = getMousedColumnEdge(mousePos);
@@ -199,7 +200,7 @@ namespace Isis
   //           {
   //             emit requestedColumnSelection(clickedColumn, true);
   //           }
-            
+
           }
         }
       }
@@ -215,7 +216,7 @@ namespace Isis
         // edge == column that we want to resize
         QRect columnToResizeRect(getColumnRect(clickedColumnEdge));
         columnToResizeRect.setRight(mousePos.x());
-        
+
         TableColumn * col = columns->getVisibleColumns()[clickedColumnEdge];
 
         int newWidth = 1;
@@ -255,7 +256,7 @@ namespace Isis
         if (clickedColumn == getMousedColumn(event->pos()))
         {
           TableColumn * col = columns->getVisibleColumns()[clickedColumn];
-          
+
           TableColumn const * sortCol =
               columns->getVisibleColumns().getSortingOrder()[0];
 
@@ -263,12 +264,20 @@ namespace Isis
             col->setSortAscending(!col->sortAscending());
           else
             columns->raiseToTop(col);
+
+          if (!model->sortingOn()) {
+            QMessageBox::information(this, tr("Sorting Disabled"),
+                tr("Sorting is currently disabled for this table. Please configure your sorting "
+                   "options before trying to sort by [<font color='red'>%1</font>].")
+                  .arg(col->getTitle()),
+                QMessageBox::Ok);
+          }
         }
       }
-      
+
       clickedColumnEdge = -1;
       clickedColumn = -1;
-      
+
       update();
     }
 
@@ -384,7 +393,7 @@ namespace Isis
 
       return isAtColumnEdge;
     }
-    
+
 
     void TableViewHeader::paintHeader(QPainter * painter, int rowHeight)
     {
@@ -439,7 +448,7 @@ namespace Isis
       for (int i = 0; i < visibleCols.size(); i++)
       {
         TableColumn * visibleCol = visibleCols[i];
-        
+
         QString columnText = visibleCol->getTitle();
         QRect columnRect(getColumnRect(visibleCols.indexOf(visibleCol)));
         QPen pen(palette().dark().color().darker(150));
@@ -447,25 +456,25 @@ namespace Isis
         painter->setPen(pen);
         painter->drawLine(columnRect.topLeft() + QPoint(0, 1),
                           columnRect.bottomLeft() + QPoint(0, 1));
-        
+
         painter->drawLine(columnRect.topLeft() + QPoint(1, 0),
                           columnRect.topRight() - QPoint(0, 0));
-        
+
         painter->drawLine(columnRect.topLeft() + QPoint(1, 1),
                           columnRect.topRight() + QPoint(0, 1));
-        
+
         painter->drawLine(columnRect.bottomLeft() + QPoint(1, 1),
                           columnRect.bottomRight() + QPoint(0, 1));
-        
+
         painter->drawLine(columnRect.bottomLeft() + QPoint(1, 1),
                           columnRect.bottomRight() + QPoint(0, 1));
-        
+
         painter->drawLine(columnRect.topRight() + QPoint(0, 1),
                           columnRect.bottomRight() - QPoint(0, 0));
-        
+
         painter->setPen(selected ? palette().highlightedText().color() :
             palette().buttonText().color());
-        
+
         QRect textRect(columnRect.x(),
             columnRect.y(),
             columnRect.width() - (SORT_ARROW_MARGIN * 2 + ARROW_WIDTH),
@@ -477,32 +486,32 @@ namespace Isis
             visibleCol->getWidth() >= SORT_ARROW_MARGIN * 2 + ARROW_WIDTH)
         {
           ASSERT(SORT_ARROW_MARGIN > 0);
-          
+
           QRect arrowRect(textRect.right() + 1,
                           textRect.y(),
                           SORT_ARROW_MARGIN * 2 + ARROW_WIDTH,
                           textRect.height());
-          
+
           ASSERT(arrowRect.width() + textRect.width() == columnRect.width());
           ASSERT(arrowRect.right() == columnRect.right());
-          
-          
+
+
           // assume ascending order (arrow looks like v)
           QPoint left(arrowRect.left() + SORT_ARROW_MARGIN,
                       arrowRect.center().y() - ((ARROW_HEIGHT - 1) / 2));
-          
+
           int yOffSet = ((ARROW_HEIGHT - 1) / 2);
           if (ARROW_HEIGHT % 2 == 0)
             yOffSet++;
           QPoint center(left.x() + ((ARROW_WIDTH - 1) / 2),
                         arrowRect.center().y() + yOffSet);
-          
+
           QPoint right(center.x() + ((ARROW_WIDTH - 1) / 2),
                       arrowRect.center().y() - ((ARROW_HEIGHT - 1) / 2));
-          
+
           ASSERT(right.x() == arrowRect.right() - SORT_ARROW_MARGIN);
           ASSERT(right.x() - center.x() == center.x() - left.x());
-          
+
           if (!visibleCol->sortAscending())
           {
             // flip arrow (to look like ^)
@@ -510,7 +519,7 @@ namespace Isis
             center.setY(right.y());
             right.setY(left.y());
           }
-          
+
           if (model->sortingOn())
           {
             painter->drawLine(left, center);

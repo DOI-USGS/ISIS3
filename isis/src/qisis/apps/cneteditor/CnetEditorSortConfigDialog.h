@@ -6,6 +6,7 @@
 
 class QCheckBox;
 class QComboBox;
+class QLabel;
 class QPushButton;
 class QSpinBox;
 
@@ -46,11 +47,18 @@ namespace Isis {
       //! When less than this number, sorting is enabled on the point table
       QPointer<QSpinBox> m_pointTableLimitSpinBox;
 
+      //! Say (very clearly) if sorting is disabled and why
+      QPointer<QLabel> m_pointTableWarningsLabel;
+
       //! Enable sorting on the measure table
       QPointer<QCheckBox> m_measureSortingCheckBox;
 
       //! When less than this number, sorting is enabled on the measure table
       QPointer<QSpinBox> m_measureTableLimitSpinBox;
+
+      //! Say (very clearly) if sorting is disabled and why
+      QPointer<QLabel> m_measureTableWarningsLabel;
+
   };
 }
 

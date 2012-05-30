@@ -150,7 +150,7 @@ namespace Isis
 
 
     bool AbstractTableModel::sortingOn() const {
-      return (sortingIsEnabled() && (getVisibleRowCount() < sortLimit()));
+      return (sortingIsEnabled() && (getVisibleRowCount() <= sortLimit()));
     }
 
 
@@ -478,11 +478,18 @@ namespace Isis
 
         sortingEnabled = true;
         sort();
+        
+        emit userWarning(None); 
       }
       else
       {
         cancelSort();
         emit modelModified();
+
+        if (!sortingEnabled)
+          emit userWarning(SortingDisabled);
+        else
+          emit userWarning(SortingTableSizeLimitReached); 
       }
     }
 

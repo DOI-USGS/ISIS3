@@ -67,17 +67,17 @@ namespace Isis
       QString pathForSettings) {
     nullify();
 
-    workingVersion = new QString;
-    menuActions = new QMap< QAction *, QList< QString > >;
-    toolBarActions = new QMap< QString, QList< QAction * > >;
+    m_workingVersion = new QString;
+    m_menuActions = new QMap< QAction *, QList< QString > >;
+    m_toolBarActions = new QMap< QString, QList< QAction * > >;
 
-    updatingSelection = false;
+    m_updatingSelection = false;
 
-    controlNet = cNet;
+    m_controlNet = cNet;
     connect(CnetDisplayProperties::getInstance(), SIGNAL(compositionFinished()),
             this, SLOT(rebuildModels()));
 
-    settingsPath = new QString(pathForSettings);
+    m_settingsPath = new QString(pathForSettings);
 
     QBoxLayout * mainLayout = createMainLayout();
     setLayout(mainLayout);
@@ -95,98 +95,98 @@ namespace Isis
   CnetEditorWidget::~CnetEditorWidget() {
     writeSettings();
 
-    delete workingVersion;
-    workingVersion = NULL;
+    delete m_workingVersion;
+    m_workingVersion = NULL;
 
-    delete settingsPath;
-    settingsPath = NULL;
+    delete m_settingsPath;
+    m_settingsPath = NULL;
 
-    delete pointTreeView;
-    pointTreeView = NULL;
+    delete m_pointTreeView;
+    m_pointTreeView = NULL;
 
-    delete imageTreeView;
-    imageTreeView = NULL;
+    delete m_imageTreeView;
+    m_imageTreeView = NULL;
 
-    delete connectionTreeView;
-    connectionTreeView = NULL;
+    delete m_connectionTreeView;
+    m_connectionTreeView = NULL;
 
-    delete pointTableView;
-    pointTableView = NULL;
+    delete m_pointTableView;
+    m_pointTableView = NULL;
 
-    delete measureTableView;
-    measureTableView = NULL;
+    delete m_measureTableView;
+    m_measureTableView = NULL;
 
-    delete pointFilterWidget;
-    pointFilterWidget = NULL;
+    delete m_pointFilterWidget;
+    m_pointFilterWidget = NULL;
 
-    delete serialFilterWidget;
-    serialFilterWidget = NULL;
+    delete m_serialFilterWidget;
+    m_serialFilterWidget = NULL;
 
-    delete connectionFilterWidget;
-    connectionFilterWidget = NULL;
+    delete m_connectionFilterWidget;
+    m_connectionFilterWidget = NULL;
 
-    delete menuActions;
-    menuActions = NULL;
+    delete m_menuActions;
+    m_menuActions = NULL;
 
-    delete toolBarActions;
-    toolBarActions = NULL;
+    delete m_toolBarActions;
+    m_toolBarActions = NULL;
 
-    pointTableBox = NULL;
-    measureTableBox = NULL;
-    mainSplitter = NULL;
+    m_pointTableBox = NULL;
+    m_measureTableBox = NULL;
+    m_mainSplitter = NULL;
 
     // TODO: null all member widgets!
-    
-    delete pointModel;
-    pointModel = NULL;
 
-    delete imageModel;
-    imageModel = NULL;
+    delete m_pointModel;
+    m_pointModel = NULL;
 
-    delete connectionModel;
-    connectionModel = NULL;
+    delete m_imageModel;
+    m_imageModel = NULL;
+
+    delete m_connectionModel;
+    m_connectionModel = NULL;
   }
 
 
   void CnetEditorWidget::nullify() {
-    pointTreeView = NULL;
-    imageTreeView = NULL;
-    connectionTreeView = NULL;
+    m_pointTreeView = NULL;
+    m_imageTreeView = NULL;
+    m_connectionTreeView = NULL;
 
-    pointModel = NULL;
-    imageModel = NULL;
-    connectionModel = NULL;
+    m_pointModel = NULL;
+    m_imageModel = NULL;
+    m_connectionModel = NULL;
 
-    pointTableModel = NULL;
-    measureTableModel = NULL;
+    m_pointTableModel = NULL;
+    m_measureTableModel = NULL;
 
-    pointTableBox = NULL;
-    measureTableBox = NULL;
+    m_pointTableBox = NULL;
+    m_measureTableBox = NULL;
 
-    pointTableView = NULL;
-    measureTableView = NULL;
+    m_pointTableView = NULL;
+    m_measureTableView = NULL;
 
-    mainSplitter = NULL;
+    m_mainSplitter = NULL;
 
-    menuActions = NULL;
-    toolBarActions = NULL;
+    m_menuActions = NULL;
+    m_toolBarActions = NULL;
 
-    filterArea = NULL;
+    m_filterArea = NULL;
 
-    pointFilterWidget = NULL;
-    serialFilterWidget = NULL;
-    connectionFilterWidget = NULL;
+    m_pointFilterWidget = NULL;
+    m_serialFilterWidget = NULL;
+    m_connectionFilterWidget = NULL;
 
-    controlNet = NULL;
-    settingsPath = NULL;
-    workingVersion = NULL;
+    m_controlNet = NULL;
+    m_settingsPath = NULL;
+    m_workingVersion = NULL;
   }
 
 
   void CnetEditorWidget::rebuildModels(QList<AbstractTreeItem *> itemsToDelete) {
-    pointModel->stopWorking();
-    imageModel->stopWorking();
-    connectionModel->stopWorking();
+    m_pointModel->stopWorking();
+    m_imageModel->stopWorking();
+    m_connectionModel->stopWorking();
 
     bool ignoreAll = false;
     foreach (AbstractTreeItem * item, itemsToDelete) {
@@ -217,9 +217,9 @@ namespace Isis
       }
     }
 
-    pointModel->rebuildItems();
-    imageModel->rebuildItems();
-    connectionModel->rebuildItems();
+    m_pointModel->rebuildItems();
+    m_imageModel->rebuildItems();
+    m_connectionModel->rebuildItems();
   }
 
 
@@ -228,48 +228,48 @@ namespace Isis
     createSerialTreeView();
     createConnectionTreeView();
 
-    connect(pointTreeView, SIGNAL(activated()),
-        imageTreeView, SLOT(deactivate()));
-    connect(pointTreeView, SIGNAL(activated()),
-        connectionTreeView, SLOT(deactivate()));
+    connect(m_pointTreeView, SIGNAL(activated()),
+        m_imageTreeView, SLOT(deactivate()));
+    connect(m_pointTreeView, SIGNAL(activated()),
+        m_connectionTreeView, SLOT(deactivate()));
 
-    connect(imageTreeView, SIGNAL(activated()),
-        pointTreeView, SLOT(deactivate()));
-    connect(imageTreeView, SIGNAL(activated()),
-        connectionTreeView, SLOT(deactivate()));
+    connect(m_imageTreeView, SIGNAL(activated()),
+        m_pointTreeView, SLOT(deactivate()));
+    connect(m_imageTreeView, SIGNAL(activated()),
+        m_connectionTreeView, SLOT(deactivate()));
 
-    connect(connectionTreeView, SIGNAL(activated()),
-        pointTreeView, SLOT(deactivate()));
-    connect(connectionTreeView, SIGNAL(activated()),
-        imageTreeView, SLOT(deactivate()));
+    connect(m_connectionTreeView, SIGNAL(activated()),
+        m_pointTreeView, SLOT(deactivate()));
+    connect(m_connectionTreeView, SIGNAL(activated()),
+        m_imageTreeView, SLOT(deactivate()));
 
     createFilterArea();
 
     createPointTableView();
-    pointTableBox = new QGroupBox(tr("Control Point Table"));
+    m_pointTableBox = new QGroupBox(tr("Control Point Table"));
     QHBoxLayout * pointTableLayout = new QHBoxLayout;
-    pointTableLayout->addWidget(pointTableView);
-    pointTableBox->setLayout(pointTableLayout);
+    pointTableLayout->addWidget(m_pointTableView);
+    m_pointTableBox->setLayout(pointTableLayout);
 
     createMeasureTableView();
-    measureTableBox = new QGroupBox(tr("Control Measure Table"));
+    m_measureTableBox = new QGroupBox(tr("Control Measure Table"));
     QHBoxLayout * measureTableLayout = new QHBoxLayout;
-    measureTableLayout->addWidget(measureTableView);
-    measureTableBox->setLayout(measureTableLayout);
+    measureTableLayout->addWidget(m_measureTableView);
+    m_measureTableBox->setLayout(measureTableLayout);
 
-    mainSplitter = new QSplitter(Qt::Vertical);
-    mainSplitter->addWidget(pointTableBox);
-    mainSplitter->addWidget(measureTableBox);
+    m_mainSplitter = new QSplitter(Qt::Vertical);
+    m_mainSplitter->addWidget(m_pointTableBox);
+    m_mainSplitter->addWidget(m_measureTableBox);
 
     QBoxLayout * mainLayout = new QHBoxLayout;
-    mainLayout->addWidget(mainSplitter);
+    mainLayout->addWidget(m_mainSplitter);
 
     return mainLayout;
   }
 
 
   void CnetEditorWidget::createActions() {
-    ASSERT(menuActions);
+    ASSERT(m_menuActions);
 
     QAction * freezeTablesAct = new QAction(QIcon(":ice"),
                                             tr("&Freeze Tables"), this);
@@ -285,7 +285,7 @@ namespace Isis
             this, SLOT(setTablesFrozen(bool)));
     QList< QString > freezeTablesLocation;
     freezeTablesLocation.append(tr("&Tables"));
-    menuActions->insert(freezeTablesAct, freezeTablesLocation);
+    m_menuActions->insert(freezeTablesAct, freezeTablesLocation);
 
     QAction * configureSortAct = new QAction(QIcon(":sort"),
                                              tr("&Sorting Options..."), this);
@@ -298,52 +298,52 @@ namespace Isis
             this, SLOT(configSorting()));
     QList< QString > configureSortLocation;
     configureSortLocation.append(tr("&Tables"));
-    menuActions->insert(configureSortAct, configureSortLocation);
+    m_menuActions->insert(configureSortAct, configureSortLocation);
 
     QAction * whatsThisAct = QWhatsThis::createAction(this);
     QList< QString > whatsThisLocation;
     whatsThisLocation.append(tr("&Help"));
-    menuActions->insert(whatsThisAct, whatsThisLocation);
+    m_menuActions->insert(whatsThisAct, whatsThisLocation);
 
     QList< QAction * > tbActionList;
     tbActionList.append(freezeTablesAct);
     tbActionList.append(configureSortAct);
-    toolBarActions->insert("settingsToolBar", tbActionList);
+    m_toolBarActions->insert("settingsToolBar", tbActionList);
   }
 
 
   void CnetEditorWidget::createPointTreeView() {
-    pointTreeView = new TreeView();
-    pointTreeView->setTitle("Point View");
-    pointModel = new PointMeasureTreeModel(controlNet, pointTreeView, qApp);
-    pointTreeView->setModel(pointModel);
+    m_pointTreeView = new TreeView();
+    m_pointTreeView->setTitle("Point View");
+    m_pointModel = new PointMeasureTreeModel(m_controlNet, m_pointTreeView, qApp);
+    m_pointTreeView->setModel(m_pointModel);
   }
 
 
   void CnetEditorWidget::createSerialTreeView() {
-    imageTreeView = new TreeView();
-    imageTreeView->setTitle("Cube View");
-    imageModel = new ImagePointTreeModel(controlNet, imageTreeView, qApp);
-    imageTreeView->setModel(imageModel);
+    m_imageTreeView = new TreeView();
+    m_imageTreeView->setTitle("Cube View");
+    m_imageModel = new ImagePointTreeModel(m_controlNet, m_imageTreeView, qApp);
+    m_imageTreeView->setModel(m_imageModel);
   }
 
 
   void CnetEditorWidget::createConnectionTreeView() {
-    connectionTreeView = new TreeView();
-    connectionTreeView->setTitle("Cube Connection View");
-    connectionModel = new ImageImageTreeModel(controlNet, connectionTreeView, qApp);
-    connectionTreeView->setModel(connectionModel);
+    m_connectionTreeView = new TreeView();
+    m_connectionTreeView->setTitle("Cube Connection View");
+    m_connectionModel = new ImageImageTreeModel(m_controlNet, m_connectionTreeView, qApp);
+    m_connectionTreeView->setModel(m_connectionModel);
   }
 
 
   void CnetEditorWidget::createFilterArea() {
-    ASSERT(pointModel);
-    ASSERT(imageModel);
-    ASSERT(connectionModel);
+    ASSERT(m_pointModel);
+    ASSERT(m_imageModel);
+    ASSERT(m_connectionModel);
 
     FilterWidget * pointFilter = new FilterWidget("Points and Measures");
-    if (pointModel) {
-      pointModel->setFilter(pointFilter);
+    if (m_pointModel) {
+      m_pointModel->setFilter(pointFilter);
     }
 
     QHBoxLayout * pointFilterLayout = new QHBoxLayout;
@@ -353,11 +353,11 @@ namespace Isis
     QScrollArea * pointFilterScrollArea = new QScrollArea;
     pointFilterScrollArea->setWidget(pointArea);
     pointFilterScrollArea->setWidgetResizable(true);
-    pointFilterWidget = pointFilterScrollArea;
+    m_pointFilterWidget = pointFilterScrollArea;
 
     FilterWidget * serialFilter = new FilterWidget("Images and Points");
-    if (imageModel) {
-      imageModel->setFilter(serialFilter);
+    if (m_imageModel) {
+      m_imageModel->setFilter(serialFilter);
     }
 
     QHBoxLayout * serialFilterLayout = new QHBoxLayout;
@@ -367,11 +367,11 @@ namespace Isis
     QScrollArea * serialFilterScrollArea = new QScrollArea;
     serialFilterScrollArea->setWidget(serialArea);
     serialFilterScrollArea->setWidgetResizable(true);
-    serialFilterWidget = serialFilterScrollArea;
+    m_serialFilterWidget = serialFilterScrollArea;
 
     FilterWidget * connectionFilter = new FilterWidget("Connections");
-    if (connectionModel) {
-      connectionModel->setFilter(connectionFilter);
+    if (m_connectionModel) {
+      m_connectionModel->setFilter(connectionFilter);
     }
 
     QHBoxLayout * connectionFilterLayout = new QHBoxLayout;
@@ -381,31 +381,31 @@ namespace Isis
     QScrollArea * connectionFilterScrollArea = new QScrollArea;
     connectionFilterScrollArea->setWidget(connectionArea);
     connectionFilterScrollArea->setWidgetResizable(true);
-    connectionFilterWidget = connectionFilterScrollArea;
+    m_connectionFilterWidget = connectionFilterScrollArea;
   }
 
 
   void CnetEditorWidget::createPointTableView() {
-    pointTableModel = new PointTableModel(pointModel);
-    pointTableView = new TableView(pointTableModel, *settingsPath,
-        "pointTableView");
-    pointTableView->setWhatsThis("<html>Each row in the table is a control "
+    m_pointTableModel = new PointTableModel(m_pointModel);
+    m_pointTableView = new TableView(m_pointTableModel, *m_settingsPath,
+        "m_pointTableView");
+    m_pointTableView->setWhatsThis("<html>Each row in the table is a control "
         "point.  Each column in the table is an attribute of a control "
         "point.<br/><br/>Cells that are gray are not editable.</html>");
-    connect(pointTableView, SIGNAL(modelDataChanged()),
+    connect(m_pointTableView, SIGNAL(modelDataChanged()),
             this, SIGNAL(cnetModified()));
 
-    connect(pointTreeView, SIGNAL(selectionChanged()),
-            pointTableView, SLOT(handleModelSelectionChanged()));
-    connect(pointTableView, SIGNAL(selectionChanged()),
-            pointTreeView, SLOT(handleModelSelectionChanged()));
+    connect(m_pointTreeView, SIGNAL(selectionChanged()),
+            m_pointTableView, SLOT(handleModelSelectionChanged()));
+    connect(m_pointTableView, SIGNAL(selectionChanged()),
+            m_pointTreeView, SLOT(handleModelSelectionChanged()));
 
-    connect(pointTableView,
+    connect(m_pointTableView,
             SIGNAL(rebuildModels(QList< CnetViz::AbstractTreeItem * >)),
             this,
             SLOT(rebuildModels(QList< CnetViz::AbstractTreeItem * >)));
 
-    connect(pointTableView, SIGNAL(filterCountsChanged(int,int)),
+    connect(m_pointTableView, SIGNAL(filterCountsChanged(int,int)),
             this, SLOT(handlePointTableFilterCountsChanged(int,int)));
 
     for (int i = 0; i < AbstractPointItem::COLS; i++) {
@@ -413,46 +413,46 @@ namespace Isis
           AbstractPointItem::getColumnName((AbstractPointItem::Column) i), this);
       act->setCheckable(true);
       connect(act, SIGNAL(toggled(bool)), this, SLOT(pointColToggled()));
-      pointTableView->getHorizontalHeader()->addAction(act);
+      m_pointTableView->getHorizontalHeader()->addAction(act);
     }
 
-    pointTableView->getHorizontalHeader()->setContextMenuPolicy(
+    m_pointTableView->getHorizontalHeader()->setContextMenuPolicy(
         Qt::ActionsContextMenu);
   }
 
 
   void CnetEditorWidget::createMeasureTableView() {
-    measureTableModel = new MeasureTableModel(pointModel);
-    measureTableView = new TableView(measureTableModel, *settingsPath,
-        "measureTableView");
-    measureTableView->setWhatsThis("<html>Each row in the table is a control "
+    m_measureTableModel = new MeasureTableModel(m_pointModel);
+    m_measureTableView = new TableView(m_measureTableModel, *m_settingsPath,
+        "m_measureTableView");
+    m_measureTableView->setWhatsThis("<html>Each row in the table is a control "
         "measure.  Each column in the table is an attribute of a control "
         "measure.<br/><br/>Rows with bold text are reference measures.  "
         "Cells that are gray are not editable.</html>");
-    ASSERT(pointTableView);
-    connect(pointTableView,
+    ASSERT(m_pointTableView);
+    connect(m_pointTableView,
             SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)),
-            measureTableModel,
+            m_measureTableModel,
             SLOT(handleTreeSelectionChanged(QList<AbstractTreeItem*>)));
 
-    connect(measureTableView,
+    connect(m_measureTableView,
             SIGNAL(tableSelectionChanged(QList< AbstractTreeItem * >)),
-            pointTableModel,
+            m_pointTableModel,
             SLOT(handleTreeSelectionChanged(QList< AbstractTreeItem * >)));
 
 
-    connect(measureTableView, SIGNAL(modelDataChanged()),
+    connect(m_measureTableView, SIGNAL(modelDataChanged()),
             this, SIGNAL(cnetModified()));
-    connect(pointTreeView, SIGNAL(selectionChanged()),
-            measureTableView, SLOT(handleModelSelectionChanged()));
-    connect(measureTableView, SIGNAL(selectionChanged()),
-            pointTreeView, SLOT(handleModelSelectionChanged()));
-    connect(measureTableView,
+    connect(m_pointTreeView, SIGNAL(selectionChanged()),
+            m_measureTableView, SLOT(handleModelSelectionChanged()));
+    connect(m_measureTableView, SIGNAL(selectionChanged()),
+            m_pointTreeView, SLOT(handleModelSelectionChanged()));
+    connect(m_measureTableView,
             SIGNAL(rebuildModels(QList< CnetViz::AbstractTreeItem * >)),
             this,
             SLOT(rebuildModels(QList< CnetViz::AbstractTreeItem * >)));
 
-    connect(measureTableView, SIGNAL(filterCountsChanged(int,int)),
+    connect(m_measureTableView, SIGNAL(filterCountsChanged(int,int)),
             this, SLOT(handleMeasureTableFilterCountsChanged(int,int)));
 
     for (int i = 0; i < AbstractMeasureItem::COLS; i++) {
@@ -460,10 +460,10 @@ namespace Isis
           (AbstractMeasureItem::Column) i), this);
       act->setCheckable(true);
       connect(act, SIGNAL(toggled(bool)), this, SLOT(measureColToggled()));
-      measureTableView->getHorizontalHeader()->addAction(act);
+      m_measureTableView->getHorizontalHeader()->addAction(act);
     }
 
-    measureTableView->getHorizontalHeader()->setContextMenuPolicy(
+    m_measureTableView->getHorizontalHeader()->setContextMenuPolicy(
         Qt::ActionsContextMenu);
   }
 
@@ -475,10 +475,10 @@ namespace Isis
 
   void CnetEditorWidget::pointColToggled() {
     QList< QAction * > actions =
-        pointTableView->getHorizontalHeader()->actions();
+        m_pointTableView->getHorizontalHeader()->actions();
 
     for (int i = 0; i < actions.size(); i++) {
-      pointTableView->setColumnVisible(actions[i]->text(),
+      m_pointTableView->setColumnVisible(actions[i]->text(),
           actions[i]->isChecked());
     }
   }
@@ -486,22 +486,22 @@ namespace Isis
 
   void CnetEditorWidget::measureColToggled() {
     QList< QAction * > actions =
-        measureTableView->getHorizontalHeader()->actions();
+        m_measureTableView->getHorizontalHeader()->actions();
     for (int i = 0; i < actions.size(); i++)
-      measureTableView->setColumnVisible(actions[i]->text(),
+      m_measureTableView->setColumnVisible(actions[i]->text(),
           actions[i]->isChecked());
   }
 
   void CnetEditorWidget::handlePointTableFilterCountsChanged(
       int visibleRows, int totalRows) {
-    handleTableFilterCountsChanged(visibleRows, totalRows, pointTableBox,
+    handleTableFilterCountsChanged(visibleRows, totalRows, m_pointTableBox,
                                    "Control Point Table");
   }
 
 
   void CnetEditorWidget::handleMeasureTableFilterCountsChanged(
       int visibleRows, int totalRows) {
-    handleTableFilterCountsChanged(visibleRows, totalRows, measureTableBox,
+    handleTableFilterCountsChanged(visibleRows, totalRows, m_measureTableBox,
                                    "Control Measure Table");
   }
 
@@ -523,39 +523,39 @@ namespace Isis
 
 
   void CnetEditorWidget::upgradeVersion() {
-    if (*workingVersion == "") {
-      *workingVersion = "0.1";
+    if (*m_workingVersion == "") {
+      *m_workingVersion = "0.1";
     }
 
-    if (*workingVersion != VERSION)
+    if (*m_workingVersion != VERSION)
       upgradeVersion();
   }
 
 
   void CnetEditorWidget::readSettings() {
-    ASSERT(workingVersion);
-    ASSERT(settingsPath);
-    ASSERT(measureTableView);
+    ASSERT(m_workingVersion);
+    ASSERT(m_settingsPath);
+    ASSERT(m_measureTableView);
 
-    QSettings settings(*settingsPath, QSettings::NativeFormat);
-    *workingVersion = settings.value("version", "").toString();
+    QSettings settings(*m_settingsPath, QSettings::NativeFormat);
+    *m_workingVersion = settings.value("version", "").toString();
 
-    mainSplitter->restoreState(settings.value("mainSplitter").toByteArray());
+    m_mainSplitter->restoreState(settings.value("mainSplitter").toByteArray());
 
     QString key;
 
     QList< QAction * > actions =
-        measureTableView->getHorizontalHeader()->actions();
+        m_measureTableView->getHorizontalHeader()->actions();
     for (int i = 0; i < actions.size(); i++) {
-      key = measureTableView->objectName() + " " +
+      key = m_measureTableView->objectName() + " " +
             AbstractMeasureItem::getColumnName((AbstractMeasureItem::Column) i);
       key.replace(" ", "_");
       actions[i]->setChecked(settings.value(key, true).toBool());
     }
 
-    actions = pointTableView->getHorizontalHeader()->actions();
+    actions = m_pointTableView->getHorizontalHeader()->actions();
     for (int i = 0; i < actions.size(); i++) {
-      key = pointTableView->objectName() + " " +
+      key = m_pointTableView->objectName() + " " +
             AbstractPointItem::getColumnName((AbstractPointItem::Column) i);
       key.replace(" ", "_");
       actions[i]->setChecked(settings.value(key, true).toBool());
@@ -574,28 +574,28 @@ namespace Isis
 
 
   void CnetEditorWidget::writeSettings() {
-    ASSERT(mainSplitter);
-    ASSERT(settingsPath);
-    ASSERT(measureTableView);
+    ASSERT(m_mainSplitter);
+    ASSERT(m_settingsPath);
+    ASSERT(m_measureTableView);
 
-    QSettings settings(*settingsPath, QSettings::NativeFormat);
+    QSettings settings(*m_settingsPath, QSettings::NativeFormat);
     settings.setValue("version", VERSION);
-    settings.setValue("mainSplitter", mainSplitter->saveState());
+    settings.setValue("mainSplitter", m_mainSplitter->saveState());
 
     QString key;
 
     QList< QAction * > actions =
-        measureTableView->getHorizontalHeader()->actions();
+        m_measureTableView->getHorizontalHeader()->actions();
     for (int i = 0; i < actions.size(); i++) {
-      key = measureTableView->objectName() + " " +
+      key = m_measureTableView->objectName() + " " +
             AbstractMeasureItem::getColumnName((AbstractMeasureItem::Column) i);
       key.replace(" ", "_");
       settings.setValue(key, actions[i]->isChecked());
     }
 
-    actions = pointTableView->getHorizontalHeader()->actions();
+    actions = m_pointTableView->getHorizontalHeader()->actions();
     for (int i = 0; i < actions.size(); i++) {
-      key = pointTableView->objectName() + " " +
+      key = m_pointTableView->objectName() + " " +
             AbstractPointItem::getColumnName((AbstractPointItem::Column) i);
       key.replace(" ", "_");
       settings.setValue(key, actions[i]->isChecked());
@@ -612,52 +612,62 @@ namespace Isis
                       pointTableSortLimit());
   }
 
-  QWidget * CnetEditorWidget::getPointTreeView() {
-    return pointTreeView;
+  QWidget * CnetEditorWidget::pointTreeView() {
+    return m_pointTreeView;
   }
 
 
-  QWidget * CnetEditorWidget::getSerialTreeView() {
-    return imageTreeView;
+  QWidget * CnetEditorWidget::serialTreeView() {
+    return m_imageTreeView;
   }
 
 
-  QWidget * CnetEditorWidget::getConnectionTreeView() {
-    return connectionTreeView;
+  QWidget * CnetEditorWidget::connectionTreeView() {
+    return m_connectionTreeView;
   }
 
 
-  QWidget * CnetEditorWidget::getPointFilterWidget() {
-    return pointFilterWidget;
+  QWidget * CnetEditorWidget::pointFilterWidget() {
+    return m_pointFilterWidget;
   }
 
 
-  QWidget * CnetEditorWidget::getSerialFilterWidget() {
-    return serialFilterWidget;
+  QWidget * CnetEditorWidget::serialFilterWidget() {
+    return m_serialFilterWidget;
   }
 
 
-  QWidget * CnetEditorWidget::getConnectionFilterWidget() {
-    return connectionFilterWidget;
+  QWidget * CnetEditorWidget::connectionFilterWidget() {
+    return m_connectionFilterWidget;
   }
 
 
-  QMap< QAction *, QList< QString > > CnetEditorWidget::getMenuActions() {
-    ASSERT(menuActions);
-    return *menuActions;
+  CnetViz::AbstractTableModel *CnetEditorWidget::measureTableModel() {
+    return m_measureTableModel;
   }
 
 
-  QMap< QString, QList< QAction * > > CnetEditorWidget::getToolBarActions() {
-    ASSERT(toolBarActions);
-    return *toolBarActions;
+  CnetViz::AbstractTableModel *CnetEditorWidget::pointTableModel() {
+    return m_pointTableModel;
   }
 
 
-  ControlNet * CnetEditorWidget::getFilteredNetwork() const {
-    ControlNet * filteredCnet = new ControlNet(*controlNet);
+  QMap< QAction *, QList< QString > > CnetEditorWidget::menuActions() {
+    ASSERT(m_menuActions);
+    return *m_menuActions;
+  }
 
-    QList<AbstractTreeItem *> networkItems = pointModel->getItems(0, -1,
+
+  QMap< QString, QList< QAction * > > CnetEditorWidget::toolBarActions() {
+    ASSERT(m_toolBarActions);
+    return *m_toolBarActions;
+  }
+
+
+  ControlNet * CnetEditorWidget::filteredNetwork() const {
+    ControlNet * filteredCnet = new ControlNet(*m_controlNet);
+
+    QList<AbstractTreeItem *> networkItems = m_pointModel->getItems(0, -1,
         AbstractTreeModel::MeasureItems | AbstractTreeModel::PointItems, true);
 
     // Iterate through our copy of the cnet, deleting anything that doesn't
@@ -750,42 +760,42 @@ namespace Isis
 
 
   bool CnetEditorWidget::measureTableSortingEnabled() const {
-    return measureTableModel->sortingIsEnabled();
+    return m_measureTableModel->sortingIsEnabled();
   }
 
 
   int CnetEditorWidget::measureTableSortLimit() const {
-    return measureTableModel->sortLimit();
+    return m_measureTableModel->sortLimit();
   }
 
 
   bool CnetEditorWidget::pointTableSortingEnabled() const {
-    return pointTableModel->sortingIsEnabled();
+    return m_pointTableModel->sortingIsEnabled();
   }
 
 
   int CnetEditorWidget::pointTableSortLimit() const {
-    return pointTableModel->sortLimit();
+    return m_pointTableModel->sortLimit();
   }
 
 
   void CnetEditorWidget::setMeasureTableSortingEnabled(bool enabled) {
-    measureTableModel->setSortingEnabled(enabled);
+    m_measureTableModel->setSortingEnabled(enabled);
   }
 
 
   void CnetEditorWidget::setMeasureTableSortLimit(int limit) {
-    measureTableModel->setSortLimit(limit);
+    m_measureTableModel->setSortLimit(limit);
   }
 
 
   void CnetEditorWidget::setPointTableSortingEnabled(bool enabled) {
-    pointTableModel->setSortingEnabled(enabled);
+    m_pointTableModel->setSortingEnabled(enabled);
   }
 
 
   void CnetEditorWidget::setPointTableSortLimit(int limit) {
-    pointTableModel->setSortLimit(limit);
+    m_pointTableModel->setSortLimit(limit);
   }
 
 
@@ -798,14 +808,14 @@ namespace Isis
 
   void CnetEditorWidget::setTablesFrozen(bool freezeTables) {
     if (freezeTables) {
-      connectionModel->setFrozen(true);
-      imageModel->setFrozen(true);
-      pointModel->setFrozen(true);
+      m_connectionModel->setFrozen(true);
+      m_imageModel->setFrozen(true);
+      m_pointModel->setFrozen(true);
     }
     else {
-      pointModel->setFrozen(false);
-      imageModel->setFrozen(false);
-      connectionModel->setFrozen(false);
+      m_pointModel->setFrozen(false);
+      m_imageModel->setFrozen(false);
+      m_connectionModel->setFrozen(false);
     }
   }
 }

@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+#include <QLabel>
 #include <QMargins>
 #include <QVBoxLayout>
 
@@ -28,9 +29,13 @@ namespace Isis
       settingsPath = new QString(pathForSettings);
       setObjectName(objName);
 
+      warningLabel = new QLabel;
+
       model = someModel;
       connect(model, SIGNAL(filterCountsChanged(int,int)),
               this, SIGNAL(filterCountsChanged(int,int)));
+      connect(model, SIGNAL(userWarning(AbstractTableModel::Warning)),
+              this, SLOT(displayWarning(AbstractTableModel::Warning)));
 
       columns = model->getColumns();
 
@@ -99,6 +104,7 @@ namespace Isis
       QVBoxLayout * layout = new QVBoxLayout;
       layout->addWidget(header);
       layout->addWidget(content);
+      layout->addWidget(warningLabel);
       layout->setContentsMargins(0, 0, 0, 0);
       layout->setSpacing(0);
 
@@ -212,6 +218,28 @@ namespace Isis
   //     }
   //   }
 
+    void TableView::displayWarning(AbstractTableModel::Warning warning) {
+      switch (warning) {
+        case AbstractTableModel::SortingDisabled:
+          warningLabel->setText(tr("<font color='red'>Sorting disabled</font>"));
+          warningLabel->setVisible(true);
+          break;
+
+        case AbstractTableModel::SortingTableSizeLimitReached:
+          warningLabel->setText(
+              tr("<font color='red'>Sorting disabled - table row count (%L1) > table size limit"
+                 " (%L2)</font>")
+                .arg(content->getModel()->getVisibleRowCount())
+                .arg(content->getModel()->sortLimit()));
+          warningLabel->setVisible(true);
+          break;
+
+        case AbstractTableModel::None:
+          warningLabel->setText(tr(""));
+          warningLabel->setVisible(false);
+          break;
+      }
+    }
 
     void TableView::handleModelSelectionChanged()
     {
