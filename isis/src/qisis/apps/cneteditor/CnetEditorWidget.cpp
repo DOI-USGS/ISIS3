@@ -565,11 +565,11 @@ namespace Isis
     setMeasureTableSortingEnabled(
         settings.value("measureTableSortingEnabled", true).toBool());
     setMeasureTableSortLimit(
-        settings.value("measureTableSortLimit", 10000).toInt());
+        settings.value("measureTableSortLimit", 500000).toInt());
     setPointTableSortingEnabled(
         settings.value("pointTableSortingEnabled", true).toBool());
     setPointTableSortLimit(
-        settings.value("pointTableSortLimit", 10000).toInt());
+        settings.value("pointTableSortLimit", 100000).toInt());
   }
 
 
