@@ -13,14 +13,16 @@ libs:
 	  if [ "$(HOST_ARCH)" == "Linux" ]; then                             \
 	    for file in $$library; do                                        \
 	      localFile=$(ISISROOT)/3rdParty/lib/`basename $$file`;          \
-	      existingRpath=`$(PATCHELF) --print-rpath "$$localFile" 2>&- |  \
-	          cut -d '/' -f2-4`;                                         \
-	      dollar='$$';                                                   \
-	      newRpath=`echo "$${dollar}ORIGIN"`;                            \
-	      if [ "$$existingRpath" == "usgs/pkgs/local" ]; then            \
-	        echo $(CURTIMESTAMP) "    Patching [" `basename $$file` "]"; \
-	        $(PATCHELF) --set-rpath "$$newRpath" $$localFile;            \
-	      fi                                                             \
+	      if [ ! -L "$$localFile" ]; then                                \
+	        existingRpath=`$(PATCHELF) --print-rpath "$$localFile" 2>&- | \
+	            cut -d '/' -f2-4`;                                       \
+	        dollar='$$';                                                 \
+	        newRpath=`echo "$${dollar}ORIGIN"`;                          \
+	        if [ "$$existingRpath" == "usgs/pkgs/local" ]; then          \
+	          echo $(CURTIMESTAMP) "    Patching [" `basename $$file` "]"; \
+	          $(PATCHELF) --set-rpath "$$newRpath" $$localFile;          \
+	        fi;                                                          \
+	     fi;                                                             \
 	   done;                                                             \
 	  fi;                                                                \
         done;                                                                \
@@ -39,7 +41,7 @@ libs:
              --liblog=DarwinLibs.lis                                         \
 	     --relocdir=$(ISISROOT)/3rdParty/lib:$ISISROOT/3rdParty          \
              --update                                                        \
-	    `find $(ISISROOT)/3rdParty/lib -name '[Qq]*' -print                \
+	    `find $(ISISROOT)/3rdParty/lib -name '[Qq]*' -print              \
 	    -mindepth 3 -maxdepth 4 -type f` > /dev/null;                    \
 	  chmod u-w $(ISISROOT)/3rdParty/lib/libcrypto.*.dylib;              \
 	  chmod u-w $(ISISROOT)/3rdParty/lib/libssl.*.dylib;                 \

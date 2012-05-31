@@ -239,17 +239,50 @@ CHOLMODLIB    = -lcholmod -lamd -lcolamd -llapack
 #---------------------------------------------------------------------------
 
 #  Libraries
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtXmlPatterns.so*[^g]"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtXml.so*[^g]"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtNetwork.so*[^g]"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSql.so*[^g]"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtGui.so*[^g]"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtCore.so*[^g]"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSvg.so*[^g]"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtTest.so*[^g]"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtDBus.so*[^g]"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtWebKit.so*[^g]"
-THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtOpenGL.so*[^g]"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtXmlPatterns.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtXmlPatterns.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtXmlPatterns.so.4.8*[^g]"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtXml.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtXml.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtXml.so.4.8*[^g]"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtNetwork.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtNetwork.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtNetwork.so.4.8*[^g]"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSql.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSql.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSql.so.4.8*[^g]"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtGui.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtGui.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtGui.so.4.8*[^g]"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtCore.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtCore.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtCore.so.4.8*[^g]"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSvg.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSvg.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtSvg.so.4.8*[^g]"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtTest.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtTest.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtTest.so.4.8*[^g]"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtDBus.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtDBus.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtDBus.so.4.8*[^g]"
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtWebKit.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtWebKit.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtWebKit.so.4.9*[^g]" # Qt4.8's webkit is named 4.9
+
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtOpenGL.so"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtOpenGL.so.4"
+THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libQtOpenGL.so.4.8*[^g]"
+
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libqwt.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libprotobuf.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libgeos-*.so"
