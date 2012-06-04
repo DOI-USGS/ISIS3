@@ -208,6 +208,11 @@ namespace Isis {
    *                          law of cosines for sides which comes out of the "CRC
    *                          Standard Mathematical Tables and Formulae 30th Edition on
    *                          page 469.
+   *  @history 2012-06-01 Janet Barrett - Modified the GroundAzimuth method to detect
+   *                          which hemisphere the ground point is in so that the closer
+   *                          pole will be used to obtain the azimuth value. If the closer
+   *                          pole is the South pole, then the azimuth is adjusted to be
+   *                          relative to the North pole.
    */
 
   class Camera : public Sensor {
