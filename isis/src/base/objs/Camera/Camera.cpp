@@ -1378,6 +1378,8 @@ namespace Isis {
    *                         the origin point to the point of interest was being
    *                         unitized before its perpendicular component was being
    *                         calculated. This has been fixed.
+   * @history 2012-06-04  Janet Barrett - Removed redundant calls to Sample(), Line(),
+   *                         and SetImage().
    *
    * @todo Write PushState and PopState method to ensure the
    * internals of the class are set based on SetImage or SetGround
@@ -1390,8 +1392,6 @@ namespace Isis {
     // Need to save the "state" of the camera so we can restore it when the
     // method is done
     bool computed = p_pointComputed;
-    double originalSample = Sample();
-    double originalLine = Line();
 
     NaifStatus::CheckErrors();
 
@@ -1452,10 +1452,7 @@ namespace Isis {
     // TODO:  Write PushState and PopState method to ensure the
     // internals of the class are set based on SetImage or SetGround
 
-    // We now have the information needed to calculate an arctangent, so set the
-    // image back to the origin point (go back to the original "state")
-    SetImage(osample, oline);
-
+    // We now have the information needed to calculate an arctangent
     double deltaSample = nsample - osample;
     double deltaLine = nline - oline;
 
@@ -1479,7 +1476,7 @@ namespace Isis {
 
     // Reset "state" of camera
     if(computed) {
-      SetImage(originalSample, originalLine);
+      SetImage(osample, oline);
     }
     else {
       p_pointComputed = false;

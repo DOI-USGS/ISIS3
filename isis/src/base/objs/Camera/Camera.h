@@ -213,6 +213,8 @@ namespace Isis {
    *                          pole will be used to obtain the azimuth value. If the closer
    *                          pole is the South pole, then the azimuth is adjusted to be
    *                          relative to the North pole.
+   *  @history 2012-06-04 Janet Barrett - Got rid of redundant calls to Sample(), Line(),
+   *                          and SetImage() in the ComputeAzimuth method.
    */
 
   class Camera : public Sensor {
