@@ -95,6 +95,14 @@ namespace Isis {
    *                           were run before the adaptive cache flush size was
    *                           added, which improved performance further.
    *                           References #727.
+   * 
+   *   @history 2012-06-06 Jeff Anderson - The read() method was modified to
+   *                           improve the speed for small buffer sizes as seen
+   *                           in ProcessByBoxcar and ProcessRubbersheet.  The
+   *                           internal cache was always checked to be minimized
+   *                           which is slow for every read.  Now the cache is
+   *                           only mimimized if it changed in size.  
+   *                           Reference #894. 
    */
   class CubeIoHandler {
     public:

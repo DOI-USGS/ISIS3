@@ -242,6 +242,10 @@ namespace Isis {
    * @param bufferToFill The buffer to populate with cube data.
    */
   void CubeIoHandler::read(Buffer &bufferToFill) const {
+    // We need to record the current chunk count size so we can use
+    // it to evaluate if the cache should be minimized
+    int lastChunkCount = m_rawData->size();
+
     if (m_lastOperationWasWrite) {
       // Do the remaining writes
       flushWriteCache(true);
@@ -319,7 +323,10 @@ namespace Isis {
       writeIntoDouble(*fileData, bufferToFill);
     }
 
-    minimizeCache(cubeChunks, bufferToFill);
+    // Minimize the cache if it changed in size
+    if (lastChunkCount != m_rawData->size()) {
+      minimizeCache(cubeChunks, bufferToFill);
+    }
   }
 
 
