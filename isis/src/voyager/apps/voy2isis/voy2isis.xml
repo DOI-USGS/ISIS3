@@ -40,6 +40,9 @@
     <change name="Mackenzie Boyd" date="2011-01-21">
       Added support for .img files. 
     </change>
+    <change name="Stuart Sides" date="2012-05-05">
+      Added Center and Width keywords to the BandBin group. 
+    </change>
   </history>
 
   <category>

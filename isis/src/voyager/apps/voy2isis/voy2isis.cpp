@@ -159,9 +159,24 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
     inst.AddKeyword(PvlKeyword("CameraState2","0"));
   }
 
+  // Translate the band bin group information
+  if((string)inst["InstrumentId"] == "WIDE_ANGLE_CAMERA") {
+    FileName bandBinTransFile(missionDir + "/translations/voyager_wa_bandbin.trn");
+    PvlTranslationManager labelXlater(inputLabel, bandBinTransFile.expanded());
+    labelXlater.Auto(*(outputLabel));
+  }
+  else {
+    FileName bandBinTransFile(missionDir + "/translations/voyager_na_bandbin.trn");
+    PvlTranslationManager labelXlater(inputLabel, bandBinTransFile.expanded());
+    labelXlater.Auto(*(outputLabel));
+  }
+
   // Add units of measurement to keywords from translation table
-  double exposureDuration = inst.FindKeyword("ExposureDuration");
-  inst.FindKeyword("ExposureDuration").SetValue(exposureDuration, "seconds");
+  inst.FindKeyword("ExposureDuration").SetUnits("seconds");
+
+  PvlGroup &bandBin = outputLabel->FindGroup("BandBin", Pvl::Traverse);
+  bandBin.FindKeyword("Center").SetUnits("micrometers");
+  bandBin.FindKeyword("Width").SetUnits("micrometers");
 
   // Setup the kernel group
   PvlGroup kern("Kernels");
