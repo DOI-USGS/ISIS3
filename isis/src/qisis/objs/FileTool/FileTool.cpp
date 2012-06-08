@@ -879,7 +879,7 @@ namespace Isis {
       else {
         if(p_lastViewport != cubeViewport()) {
           //If the viewport has changes made to it enable the save action
-          if(cubeViewport()->windowTitle().endsWith("*")) {
+          if(cubeViewport()->parentWidget()->windowTitle().endsWith("*")) {
             p_save->setEnabled(true);
           }
           //Else disable it
@@ -887,11 +887,11 @@ namespace Isis {
             p_save->setEnabled(false);
           }
           //disconnect signals from the old viewport and connect them to the new viewport
-          disconnect(p_lastViewport, SIGNAL(saveChanges()), this, SLOT(save()));
-          disconnect(p_lastViewport, SIGNAL(discardChanges()), this, SLOT(discard()));
+          disconnect(p_lastViewport, SIGNAL(saveChanges(CubeViewport *)), this, SLOT(save()));
+          disconnect(p_lastViewport, SIGNAL(discardChanges(CubeViewport *)), this, SLOT(discard()));
           p_lastViewport = cubeViewport();
-          connect(p_lastViewport, SIGNAL(saveChanges()), this, SLOT(save()));
-          connect(p_lastViewport, SIGNAL(discardChanges()), this, SLOT(discard()));
+          connect(p_lastViewport, SIGNAL(saveChanges(CubeViewport *)), this, SLOT(save()));
+          connect(p_lastViewport, SIGNAL(discardChanges(CubeViewport *)), this, SLOT(discard()));
         }
       }
       p_print->setEnabled(true);

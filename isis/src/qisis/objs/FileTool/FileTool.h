@@ -37,6 +37,8 @@ namespace Isis {
    *                            now appears if you have edited your file but not saved it - not when
    *                            clicking "Save." This was a minimal fix (I left a lot of problems
    *                            to be solved at a later date). Fixes #854.
+   *   @history  2012-06-04 Steven Lambright - Fixed a problem with the save button. References
+   *                            #854.
    */
   class FileTool : public Tool {
       Q_OBJECT
