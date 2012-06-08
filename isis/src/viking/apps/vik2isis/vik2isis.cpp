@@ -136,13 +136,41 @@ void TranslateVikingLabels(Pvl &pdsLabel, Cube *ocube) {
   bandBin += PvlKeyword("FilterName", filterName);
 
   int filterId;
-  if(filterName == "BLUE") filterId = 1;
-  if(filterName == "MINUS_BLUE") filterId = 2;
-  if(filterName == "VIOLET") filterId = 3;
-  if(filterName == "CLEAR") filterId = 4;
-  if(filterName == "GREEN") filterId = 5;
-  if(filterName == "RED") filterId = 6;
+  double filterCenter = 0.0;
+  double filterWidth = 0.0;
+  if(filterName == "BLUE") {
+    filterId = 1;
+    filterCenter = 0.470000;
+    filterWidth = 0.180000;
+  }
+  if(filterName == "MINUS_BLUE") {
+    filterId = 2;
+    filterCenter = 0.550000;
+    filterWidth = 0.220000;
+  }
+  if(filterName == "VIOLET") {
+    filterId = 3;
+    filterCenter = 0.440000;
+    filterWidth = 0.120000;
+  }
+  if(filterName == "CLEAR") {
+    filterId = 4;
+    filterCenter = 0.520000;
+    filterWidth = 0.350000;
+  }
+  if(filterName == "GREEN") {
+    filterId = 5;
+    filterCenter = 0.530000;
+    filterWidth = 0.100000;
+  }
+  if(filterName == "RED") {
+    filterId = 6;
+    filterCenter = 0.590000;
+    filterWidth = 0.150000;
+  }
   bandBin += PvlKeyword("FilterId", filterId);
+  bandBin += PvlKeyword("Center", filterCenter, "micrometers");
+  bandBin += PvlKeyword("Width", filterWidth, "micrometers");
   ocube->putGroup(bandBin);
 
   // Setup the kernel group

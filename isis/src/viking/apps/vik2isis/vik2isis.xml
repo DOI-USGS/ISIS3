@@ -42,6 +42,9 @@
       Changed redirection method in the vdcomp command string to work on the
       new Ubuntu 10.04 OS.
     </change>
+    <change name="Stuart Sides" date="2012-05-06">
+      Added Center and Width keywords to the BandBin group of the output cube.
+    </change>
   </history>
 
   <category>
