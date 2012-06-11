@@ -19,7 +19,6 @@ class QPushButton;
 template <typename A, typename B> class QMap;
 template <typename A, typename B> class QPair;
 
-
 namespace Isis {
   class iString;
   class MdiCubeViewport;
