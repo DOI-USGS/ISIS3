@@ -178,6 +178,13 @@ namespace Isis {
    *   @history 2012-05-08 Tracie Sucharski - Fixed bug where p_leftFile was not
    *                          being reset in mouseButtonRelease.  Change p_leftFile
    *                          from a std::string to a QString.
+   *   @history 2012-06-12 Tracie Sucharski - Change made to measureSaved on 2012-04-26 caused a
+   *                          bug where if no ground is loaded the checkReference was not being
+   *                          called and reference measure could not be changed and there was no
+   *                          warning printed.  Fix:  Only call checkReference if there is no
+   *                          explicit reference for the point, otherwise simply set reference to
+   *                          left measure.  If ground source is on the left do not print warning
+   *                          about new reference measure.
    */
   class QnetTool : public Tool {
     Q_OBJECT

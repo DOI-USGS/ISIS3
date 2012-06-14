@@ -241,6 +241,7 @@ namespace Isis {
     centralWidget->setLayout(centralLayout);
 
     QScrollArea *scrollArea = new QScrollArea();
+    scrollArea->setObjectName("QnetToolScroll");
     scrollArea->setWidget(centralWidget);
     scrollArea->setWidgetResizable(true);
     centralWidget->adjustSize();
@@ -708,6 +709,10 @@ namespace Isis {
    *   @history 2012-05-07 Tracie Sucharski - Removed code to re-load left measure if
    *                          left and right are the same, this is already handled in
    *                          ControlPointEdit::saveMeasure.
+   *   @history 2012-06-12 Tracie Sucharski - Change made on 2012-04-26 caused a bug where
+   *                          if no ground is loaded the checkReference was not being called and
+   *                          reference measure could not be changed and there was no warning
+   *                          printed.
    */
   void QnetTool::measureSaved() {
     // Read original measures from the network for comparison with measures
@@ -780,8 +785,14 @@ namespace Isis {
       }
     }
 
-    //  Only check reference if a ground source is not loaded on the left.
-    if (p_groundOpen && p_leftMeasure->GetCubeSerialNumber() != p_groundSN) checkReference();
+    //  Only check reference if point contains explicit reference.  Otherwise,
+    //  there has not been a reference set, set the measure on the left as the reference.
+    if (p_editPoint->IsReferenceExplicit()) {
+      checkReference();
+    }
+    else if (p_leftMeasure->GetCubeSerialNumber() != p_groundSN) {
+      p_editPoint->SetRefMeasure(p_leftMeasure->GetCubeSerialNumber());
+    }
 
     // If this is a fixed or constrained point, and the right measure is the ground source,
     // update the lat,lon,radius.  Only the right measure can be moved, so only need to update
@@ -803,6 +814,15 @@ namespace Isis {
       *origLeftMeasure = *p_leftMeasure;
     }
 
+    // If left measure == right measure, update left
+    if (p_leftMeasure->GetCubeSerialNumber() ==
+        p_rightMeasure->GetCubeSerialNumber()) {
+      *p_leftMeasure = *p_rightMeasure;
+      //  Update left measure of pointEditor
+      p_pointEditor->setLeftMeasure (p_leftMeasure, p_leftCube,
+                                     p_editPoint->GetId());
+    }
+
     //  Change Save Point button text to red
     colorizeSaveButton();
 
@@ -817,80 +837,75 @@ namespace Isis {
 
 
   /*
-  *   Change which measure is the reference.
+  * Change which measure is the reference.
   *  
   * @author 2012-04-26 Tracie Sucharski - moved funcitonality from measureSaved
   *
   * @internal
-  *  
+  *   @history 2012-06-12 Tracie Sucharski - Moved check for ground loaded on left from the
+  *                          measureSaved method.
   */
   void QnetTool::checkReference() {
 
     // Check if ControlPoint has reference measure, if reference Measure is
     // not the same measure that is on the left chip viewport, set left
     // measure as reference.
-    if (p_editPoint->IsReferenceExplicit()) {
-      ControlMeasure *refMeasure = p_editPoint->GetRefMeasure();
-      // Reference Measure not on left.  Ask user if they want to change
-      // the reference measure.
-      if (refMeasure->GetCubeSerialNumber() != p_leftMeasure->GetCubeSerialNumber()) {
-        QString message = "This point already contains a reference measure.  ";
-        message += "Would you like to replace it with the measure on the left?";
-        int  response = QMessageBox::question(p_qnetTool,
-                                  "Qnet Tool Save Measure", message,
-                                  QMessageBox::Yes | QMessageBox::No,
-                                  QMessageBox::Yes);
-        // Replace reference measure
-        if (response == QMessageBox::Yes) {
-          //  Update measure file combo boxes:  old reference normal font,
-          //    new reference bold font
-          iString file = g_serialNumberList->FileName(p_leftMeasure->GetCubeSerialNumber());
-          QString fname = FileName(file).name().c_str();
-          int iref = p_leftCombo->findText(fname);
+    ControlMeasure *refMeasure = p_editPoint->GetRefMeasure();
+    if ( (p_leftMeasure->GetCubeSerialNumber() != p_groundSN) &&
+         (refMeasure->GetCubeSerialNumber() != p_leftMeasure->GetCubeSerialNumber()) ) {
+      QString message = "This point already contains a reference measure.  ";
+      message += "Would you like to replace it with the measure on the left?";
+      int  response = QMessageBox::question(p_qnetTool,
+                                "Qnet Tool Save Measure", message,
+                                QMessageBox::Yes | QMessageBox::No,
+                                QMessageBox::Yes);
+      // Replace reference measure
+      if (response == QMessageBox::Yes) {
+        //  Update measure file combo boxes:  old reference normal font,
+        //    new reference bold font
+        iString file = g_serialNumberList->FileName(p_leftMeasure->GetCubeSerialNumber());
+        QString fname = FileName(file).name().c_str();
+        int iref = p_leftCombo->findText(fname);
 
-          //  Save normal font from new reference measure
-          QVariant font = p_leftCombo->itemData(iref,Qt::FontRole);
-          p_leftCombo->setItemData(iref,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
-          iref = p_rightCombo->findText(fname);
-          p_rightCombo->setItemData(iref,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
+        //  Save normal font from new reference measure
+        QVariant font = p_leftCombo->itemData(iref,Qt::FontRole);
+        p_leftCombo->setItemData(iref,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
+        iref = p_rightCombo->findText(fname);
+        p_rightCombo->setItemData(iref,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
 
-          file = g_serialNumberList->FileName(refMeasure->GetCubeSerialNumber());
-          fname = FileName(file).name().c_str();
-          iref = p_leftCombo->findText(fname);
-          p_leftCombo->setItemData(iref,font,Qt::FontRole);
-          iref = p_rightCombo->findText(fname);
-          p_rightCombo->setItemData(iref,font,Qt::FontRole);
+        file = g_serialNumberList->FileName(refMeasure->GetCubeSerialNumber());
+        fname = FileName(file).name().c_str();
+        iref = p_leftCombo->findText(fname);
+        p_leftCombo->setItemData(iref,font,Qt::FontRole);
+        iref = p_rightCombo->findText(fname);
+        p_rightCombo->setItemData(iref,font,Qt::FontRole);
 
-          p_editPoint->SetRefMeasure(p_leftMeasure->GetCubeSerialNumber());
-          // Update reference measure to new reference measure
-          refMeasure = p_editPoint->GetRefMeasure();
+        p_editPoint->SetRefMeasure(p_leftMeasure->GetCubeSerialNumber());
+        // Update reference measure to new reference measure
+        refMeasure = p_editPoint->GetRefMeasure();
 
-        }
-
-            // ??? Need to set rest of measures to Candiate and add more warning. ???//
       }
-      // If the right measure is the reference, make sure they really want
-      // to move the reference.
-      if (refMeasure->GetCubeSerialNumber() == p_rightMeasure->GetCubeSerialNumber()) {
-        QString message = "You are making a change to the reference measure.  You ";
-        message += "may need to move all of the other measures to match the new ";
-        message += " coordinate of the reference measure.  Do you really want to ";
-        message += " change the reference measure? ";
-        switch(QMessageBox::question(p_qnetTool, "Qnet Tool Save Measure",
-                                     message, "&Yes", "&No", 0, 0)){
-          // Yes:  Save measure
-          case 0:
-            break;
-          // No:  keep original reference, return without saving
-          case 1:
-            loadPoint();
-            return;
-        }
-      }
+
+          // ??? Need to set rest of measures to Candiate and add more warning. ???//
     }
-    //  There has not been a reference set, set the measure on the left as the reference.
-    else {
-      p_editPoint->SetRefMeasure(p_leftMeasure->GetCubeSerialNumber());
+
+    // If the right measure is the reference, make sure they really want
+    // to move the reference.
+    if (refMeasure->GetCubeSerialNumber() == p_rightMeasure->GetCubeSerialNumber()) {
+      QString message = "You are making a change to the reference measure.  You ";
+      message += "may need to move all of the other measures to match the new ";
+      message += " coordinate of the reference measure.  Do you really want to ";
+      message += " change the reference measure? ";
+      switch(QMessageBox::question(p_qnetTool, "Qnet Tool Save Measure",
+                                   message, "&Yes", "&No", 0, 0)){
+        // Yes:  Save measure
+        case 0:
+          break;
+        // No:  keep original reference, return without saving
+        case 1:
+          loadPoint();
+          return;
+      }
     }
 
   }
