@@ -20,12 +20,19 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <cmath>
-#include <cfloat>
 #include "ObliqueCylindrical.h"
-#include "IException.h"
+
+#include <cfloat>
+#include <cmath>
+
+#include <naif/SpiceUsr.h>
+
 #include "Constants.h"
-#include "naif/SpiceUsr.h"
+#include "IException.h"
+#include "Projection.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
 
 using namespace std;
 namespace Isis {
@@ -40,38 +47,38 @@ namespace Isis {
    *
    * @param allowDefaults This does nothing currently
    *
-   * @throws Isis::iException::Io
+   * @throws IException
    */
-  ObliqueCylindrical::ObliqueCylindrical(Isis::Pvl &label, bool allowDefaults) :
-    Isis::Projection::Projection(label) {
+  ObliqueCylindrical::ObliqueCylindrical(Pvl &label, bool allowDefaults) :
+    Projection::Projection(label) {
     try {
       // Try to read the mapping group
-      Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
+      PvlGroup &mapGroup = label.FindGroup("Mapping", Pvl::Traverse);
 
-      p_poleLatitude = mapGroup["PoleLatitude"];
+      m_poleLatitude = mapGroup["PoleLatitude"];
 
       // All latitudes must be planetographic
-      if(this->IsPlanetocentric()) {
-        p_poleLatitude = this->ToPlanetographic(p_poleLatitude);
+      if (IsPlanetocentric()) {
+        m_poleLatitude = ToPlanetographic(m_poleLatitude);
       }
 
-      if(p_poleLatitude < -90 || p_poleLatitude > 90) {
+      if (m_poleLatitude < -90 || m_poleLatitude > 90) {
         throw IException(IException::Unknown,
                          "Pole latitude must be between -90 and 90.",
                          _FILEINFO_);
       }
 
-      p_poleLongitude = mapGroup["PoleLongitude"];
+      m_poleLongitude = mapGroup["PoleLongitude"];
 
-      if(p_poleLongitude < -360 || p_poleLongitude > 360) {
+      if (m_poleLongitude < -360 || m_poleLongitude > 360) {
         throw IException(IException::Unknown,
                          "Pole longitude must be between -360 and 360.",
                          _FILEINFO_);
       }
 
-      p_poleRotation = mapGroup["PoleRotation"];
+      m_poleRotation = mapGroup["PoleRotation"];
 
-      if(p_poleRotation < -360 || p_poleRotation > 360) {
+      if (m_poleRotation < -360 || m_poleRotation > 360) {
         throw IException(IException::Unknown,
                          "Pole rotation must be between -360 and 360.",
                          _FILEINFO_);
@@ -80,63 +87,66 @@ namespace Isis {
       bool calculateVectors = false;
 
       // Check vectors for the right array size
-      if(!mapGroup.HasKeyword("XAxisVector") || mapGroup["XAxisVector"].Size() != 3) {
+      if (!mapGroup.HasKeyword("XAxisVector") 
+          || mapGroup["XAxisVector"].Size() != 3) {
         calculateVectors = true;
       }
 
-      if(!mapGroup.HasKeyword("YAxisVector") || mapGroup["YAxisVector"].Size() != 3) {
+      if (!mapGroup.HasKeyword("YAxisVector") 
+          || mapGroup["YAxisVector"].Size() != 3) {
         calculateVectors = true;
       }
 
-      if(!mapGroup.HasKeyword("ZAxisVector") || mapGroup["ZAxisVector"].Size() != 3) {
+      if (!mapGroup.HasKeyword("ZAxisVector") 
+          || mapGroup["ZAxisVector"].Size() != 3) {
         calculateVectors = true;
       }
 
-      if(!calculateVectors) {
+      if (!calculateVectors) {
         // Read in vectors
-        p_xAxisVector.push_back(mapGroup["XAxisVector"][0]);
-        p_xAxisVector.push_back(mapGroup["XAxisVector"][1]);
-        p_xAxisVector.push_back(mapGroup["XAxisVector"][2]);
+        m_xAxisVector.push_back(mapGroup["XAxisVector"][0]);
+        m_xAxisVector.push_back(mapGroup["XAxisVector"][1]);
+        m_xAxisVector.push_back(mapGroup["XAxisVector"][2]);
 
-        p_yAxisVector.push_back(mapGroup["YAxisVector"][0]);
-        p_yAxisVector.push_back(mapGroup["YAxisVector"][1]);
-        p_yAxisVector.push_back(mapGroup["YAxisVector"][2]);
+        m_yAxisVector.push_back(mapGroup["YAxisVector"][0]);
+        m_yAxisVector.push_back(mapGroup["YAxisVector"][1]);
+        m_yAxisVector.push_back(mapGroup["YAxisVector"][2]);
 
-        p_zAxisVector.push_back(mapGroup["ZAxisVector"][0]);
-        p_zAxisVector.push_back(mapGroup["ZAxisVector"][1]);
-        p_zAxisVector.push_back(mapGroup["ZAxisVector"][2]);
+        m_zAxisVector.push_back(mapGroup["ZAxisVector"][0]);
+        m_zAxisVector.push_back(mapGroup["ZAxisVector"][1]);
+        m_zAxisVector.push_back(mapGroup["ZAxisVector"][2]);
       }
       else {
         // Calculate the vectors and store them in the labels
         // The vectors are useful for processing later on, but are
         // not actually used here
-        double rotationAngle = p_poleRotation * (Isis::PI / 180.0);
-        double latitudeAngle = (90.0 - p_poleLatitude) * (Isis::PI / 180.0);
-        double longitudeAngle = (360.0 - p_poleLongitude) * (Isis::PI / 180.0);
+        double rotationAngle = m_poleRotation * (PI / 180.0);
+        double latitudeAngle = (90.0 - m_poleLatitude) * (PI / 180.0);
+        double longitudeAngle = (360.0 - m_poleLongitude) * (PI / 180.0);
         double pvec[3][3];
 
         eul2m_c(rotationAngle, latitudeAngle, longitudeAngle, 3, 2, 3, pvec);
 
         // Reset the vector keywords
-        if(mapGroup.HasKeyword("XAxisVector")) {
+        if (mapGroup.HasKeyword("XAxisVector")) {
           mapGroup.DeleteKeyword("XAxisVector");
         }
-        if(mapGroup.HasKeyword("YAxisVector")) {
+        if (mapGroup.HasKeyword("YAxisVector")) {
           mapGroup.DeleteKeyword("YAxisVector");
         }
-        if(mapGroup.HasKeyword("ZAxisVector")) {
+        if (mapGroup.HasKeyword("ZAxisVector")) {
           mapGroup.DeleteKeyword("ZAxisVector");
         }
 
-        mapGroup += Isis::PvlKeyword("XAxisVector");
-        mapGroup += Isis::PvlKeyword("YAxisVector");
-        mapGroup += Isis::PvlKeyword("ZAxisVector");
+        mapGroup += PvlKeyword("XAxisVector");
+        mapGroup += PvlKeyword("YAxisVector");
+        mapGroup += PvlKeyword("ZAxisVector");
 
         // Store calculations both in vector and PVL
-        for(int i = 0; i < 3; i++) {
-          p_xAxisVector.push_back(pvec[0][i]); //X[i]
-          p_yAxisVector.push_back(pvec[1][i]); //Y[i]
-          p_zAxisVector.push_back(pvec[2][i]); //Z[i]
+        for (int i = 0; i < 3; i++) {
+          m_xAxisVector.push_back(pvec[0][i]); //X[i]
+          m_yAxisVector.push_back(pvec[1][i]); //Y[i]
+          m_zAxisVector.push_back(pvec[2][i]); //Z[i]
 
           mapGroup["XAxisVector"] += pvec[0][i]; //X[i]
           mapGroup["YAxisVector"] += pvec[1][i]; //Y[i]
@@ -157,6 +167,45 @@ namespace Isis {
   }
 
   /**
+   * Compares two Projection objects to see if they are equal
+   *
+   * @param proj Projection object to do comparison on
+   *
+   * @return bool Returns true if the Projection objects are equal, and false if
+   *              they are not
+   */
+  bool ObliqueCylindrical::operator== (const Projection &proj) {
+    if (!Projection::operator==(proj)) return false;
+
+    ObliqueCylindrical *obProjection = (ObliqueCylindrical *) &proj;
+
+    if (obProjection->poleLatitude()  != poleLatitude())  return false;
+    if (obProjection->poleLongitude() != poleLongitude()) return false;
+    if (obProjection->poleRotation()  != poleRotation())  return false;
+
+    return true;
+  }
+
+  /**
+   * Returns the name of the map projection, "ObliqueCylindrical"
+   *
+   * @return string Name of projection, "ObliqueCylindrical"
+   */
+  string ObliqueCylindrical::Name() const {
+    return "ObliqueCylindrical";
+  }
+
+  /**
+   * Returns the version of the map projection
+   *
+   *
+   * @return std::string Version number
+   */
+  string ObliqueCylindrical::Version() const {
+    return "1.0";
+  }
+
+  /**
    * This method is used to set the latitude/longitude (assumed to be of the
    * correct LatitudeType, LongitudeDirection, and LongitudeDomain. The Set
    * forces an attempted calculation of the projection X/Y values. This may or
@@ -173,44 +222,46 @@ namespace Isis {
     double obliqueLat, obliqueLon;    // oblique lat/lon copy
 
     // Store lat,lon
-    p_latitude = lat;
-    p_longitude = lon;
+    m_latitude = lat;
+    m_longitude = lon;
 
     // Use oblat,oblon as radians version of lat,lon now for calculations
-    normalLat = p_latitude * Isis::PI / 180.0;
-    normalLon = p_longitude * Isis::PI / 180.0;
-    if(p_longitudeDirection == PositiveWest) normalLon *= -1.0;
+    normalLat = m_latitude * PI / 180.0;
+    normalLon = m_longitude * PI / 180.0;
+    if (m_longitudeDirection == PositiveWest) normalLon *= -1.0;
 
 
-    /*******************************************************************************
+    /***************************************************************************
     * Calculate the oblique lat/lon from the normal lat/lon
-    *******************************************************************************/
-    double poleLatitude = (p_poleLatitude * Isis::PI / 180.0);
-    double poleLongitude = (p_poleLongitude * Isis::PI / 180.0);
-    double poleRotation = (p_poleRotation * Isis::PI / 180.0);
+    ***************************************************************************/
+    double poleLatitude = (m_poleLatitude * PI / 180.0);
+    double poleLongitude = (m_poleLongitude * PI / 180.0);
+    double poleRotation = (m_poleRotation * PI / 180.0);
 
     obliqueLat = asin(sin(poleLatitude) * sin(normalLat) +
-                      cos(poleLatitude) * cos(normalLat) * cos(normalLon - poleLongitude));
+                      cos(poleLatitude) * cos(normalLat) 
+                      * cos(normalLon - poleLongitude));
 
     obliqueLon = atan2(cos(normalLat) * sin(normalLon - poleLongitude),
-                       sin(poleLatitude) * cos(normalLat) * cos(normalLon - poleLongitude) -
-                       cos(poleLatitude) * sin(normalLat)) - poleRotation;
+                       sin(poleLatitude) * cos(normalLat) 
+                       * cos(normalLon - poleLongitude) -
+                         cos(poleLatitude) * sin(normalLat)) - poleRotation;
 
-    while(obliqueLon < - Isis::PI) {
-      obliqueLon += (2.0 * Isis::PI);
+    while(obliqueLon < - PI) {
+      obliqueLon += (2.0 * PI);
     }
 
-    while(obliqueLon >= Isis::PI) {
-      obliqueLon -= (2.0 * Isis::PI);
+    while(obliqueLon >= PI) {
+      obliqueLon -= (2.0 * PI);
     }
 
     // Compute the coordinate
-    double x = p_equatorialRadius * obliqueLon;
-    double y = p_equatorialRadius * obliqueLat;
+    double x = m_equatorialRadius * obliqueLon;
+    double y = m_equatorialRadius * obliqueLat;
     SetComputedXY(x, y);
 
-    p_good = true;
-    return p_good;
+    m_good = true;
+    return m_good;
   }
 
   /**
@@ -230,49 +281,49 @@ namespace Isis {
     // Save the coordinate
     SetXY(x, y);
 
-    /*******************************************************************************
+    /***************************************************************************
     * Calculate the oblique latitude and check to see if it is outside or equal
     * to [-90,90]. If it is, return with an error.
-    *******************************************************************************/
-    p_latitude = GetY() / p_equatorialRadius;
+    ***************************************************************************/
+    m_latitude = GetY() / m_equatorialRadius;
 
-    if(abs(abs(p_latitude) - Isis::HALFPI) < DBL_EPSILON) {
-      p_good = false;
-      return p_good;
+    if (abs(abs(m_latitude) - HALFPI) < DBL_EPSILON) {
+      m_good = false;
+      return m_good;
     }
 
-    /*******************************************************************************
-    * The check to see if p_equatorialRadius == 0 is done in the init function
-    *******************************************************************************/
-    p_longitude = GetX() / p_equatorialRadius;
+    /***************************************************************************
+    * The check to see if m_equatorialRadius == 0 is done in the init function
+    ***************************************************************************/
+    m_longitude = GetX() / m_equatorialRadius;
 
-    /*******************************************************************************
+    /***************************************************************************
     * Convert the oblique lat/lon to normal lat/lon
-    *******************************************************************************/
+    ***************************************************************************/
     double obliqueLat, obliqueLon;
-    double poleLatitude = (p_poleLatitude * Isis::PI / 180.0);
-    double poleLongitude = (p_poleLongitude * Isis::PI / 180.0);
-    double poleRotation = (p_poleRotation * Isis::PI / 180.0);
+    double poleLatitude = (m_poleLatitude * PI / 180.0);
+    double poleLongitude = (m_poleLongitude * PI / 180.0);
+    double poleRotation = (m_poleRotation * PI / 180.0);
 
-    obliqueLat = asin(sin(poleLatitude) * sin(p_latitude) -
-                      cos(poleLatitude) * cos(p_latitude) * cos(p_longitude + poleRotation));
+    obliqueLat = asin(sin(poleLatitude) * sin(m_latitude) -
+                      cos(poleLatitude) * cos(m_latitude) * cos(m_longitude + poleRotation));
 
-    obliqueLon = atan2(cos(p_latitude) * sin(p_longitude + poleRotation),
-                       sin(poleLatitude) * cos(p_latitude) * cos(p_longitude + poleRotation) +
-                       cos(poleLatitude) * sin(p_latitude)) + poleLongitude;
+    obliqueLon = atan2(cos(m_latitude) * sin(m_longitude + poleRotation),
+                       sin(poleLatitude) * cos(m_latitude) * cos(m_longitude + poleRotation) +
+                       cos(poleLatitude) * sin(m_latitude)) + poleLongitude;
 
-    /*******************************************************************************
-    * Convert the latitude/longitude to degrees and apply target longitude direction
-    * correction to the longitude
-    *******************************************************************************/
-    p_latitude = obliqueLat * 180.0 / Isis::PI;
-    p_longitude = obliqueLon * 180.0 / Isis::PI;
+    /***************************************************************************
+    * Convert the latitude/longitude to degrees and apply target longitude  
+    *  direction correction to the longitude
+    ***************************************************************************/
+    m_latitude = obliqueLat * 180.0 / PI;
+    m_longitude = obliqueLon * 180.0 / PI;
 
     // Cleanup the longitude
-    if(p_longitudeDirection == PositiveWest) p_longitude *= -1.0;
+    if (m_longitudeDirection == PositiveWest) m_longitude *= -1.0;
 
-    p_good = true;
-    return p_good;
+    m_good = true;
+    return m_good;
   }
 
   /**
@@ -286,8 +337,9 @@ namespace Isis {
    *
    * This function works for most cases, especially on smaller areas. However,
    * larger areas are likely to fail due to numerous discontinuities and a lack
-   * of a mathematical algorithm to solve the range. This method works by searching
-   * the boundaries, using DoSearch, and then searching lines tangent to discontinuities.
+   * of a mathematical algorithm to solve the range. This method works by 
+   * searching the boundaries, using DoSearch, and then searching lines tangent 
+   * to discontinuities.
    *
    * @param minX Minimum x projection coordinate which covers the latitude
    *             longitude range specified in the labels.
@@ -305,111 +357,7 @@ namespace Isis {
    */
   bool ObliqueCylindrical::XYRange(double &minX, double &maxX,
                                    double &minY, double &maxY) {
-    // For oblique cylindrical, we'll have to walk all 4 sides to find out min/max x/y values.
-    if(!HasGroundRange()) return false; // Don't have min/max lat/longs, can't continue
-
-    p_specialLatCases.clear();
-    p_specialLonCases.clear();
-
-    // First, search longitude for min X/Y
-    double minFoundX1, minFoundX2;
-    double minFoundY1, minFoundY2;
-
-    doSearch(MinimumLatitude(), MaximumLatitude(), minFoundX1, MinimumLongitude(), true, true, true);
-    doSearch(MinimumLatitude(), MaximumLatitude(), minFoundX2, MaximumLongitude(), true, true, true);
-    doSearch(MinimumLatitude(), MaximumLatitude(), minFoundY1, MinimumLongitude(), false, true, true);
-    doSearch(MinimumLatitude(), MaximumLatitude(), minFoundY2, MaximumLongitude(), false, true, true);
-
-    // Second, search latitude for min X/Y
-    double minFoundX3, minFoundX4;
-    double minFoundY3, minFoundY4;
-
-    doSearch(MinimumLongitude(), MaximumLongitude(), minFoundX3, MinimumLatitude(), true, false, true);
-    doSearch(MinimumLongitude(), MaximumLongitude(), minFoundX4, MaximumLatitude(), true, false, true);
-    doSearch(MinimumLongitude(), MaximumLongitude(), minFoundY3, MinimumLatitude(), false, false, true);
-    doSearch(MinimumLongitude(), MaximumLongitude(), minFoundY4, MaximumLatitude(), false, false, true);
-
-    // We've searched all possible minimums, go ahead and store the lowest
-    double minFoundX5 = min(minFoundX1, minFoundX2);
-    double minFoundX6 = min(minFoundX3, minFoundX4);
-    p_minimumX = min(minFoundX5, minFoundX6);
-
-    double minFoundY5 = min(minFoundY1, minFoundY2);
-    double minFoundY6 = min(minFoundY3, minFoundY4);
-    p_minimumY = min(minFoundY5, minFoundY6);
-
-    // Search longitude for max X/Y
-    double maxFoundX1, maxFoundX2;
-    double maxFoundY1, maxFoundY2;
-
-    doSearch(MinimumLatitude(), MaximumLatitude(), maxFoundX1, MinimumLongitude(), true, true, false);
-    doSearch(MinimumLatitude(), MaximumLatitude(), maxFoundX2, MaximumLongitude(), true, true, false);
-    doSearch(MinimumLatitude(), MaximumLatitude(), maxFoundY1, MinimumLongitude(), false, true, false);
-    doSearch(MinimumLatitude(), MaximumLatitude(), maxFoundY2, MaximumLongitude(), false, true, false);
-
-    // Search latitude for max X/Y
-    double maxFoundX3, maxFoundX4;
-    double maxFoundY3, maxFoundY4;
-
-    doSearch(MinimumLongitude(), MaximumLongitude(), maxFoundX3, MinimumLatitude(), true, false, false);
-    doSearch(MinimumLongitude(), MaximumLongitude(), maxFoundX4, MaximumLatitude(), true, false, false);
-    doSearch(MinimumLongitude(), MaximumLongitude(), maxFoundY3, MinimumLatitude(), false, false, false);
-    doSearch(MinimumLongitude(), MaximumLongitude(), maxFoundY4, MaximumLatitude(), false, false, false);
-
-    // We've searched all possible maximums, go ahead and store the highest
-    double maxFoundX5 = max(maxFoundX1, maxFoundX2);
-    double maxFoundX6 = max(maxFoundX3, maxFoundX4);
-    p_maximumX = max(maxFoundX5, maxFoundX6);
-
-    double maxFoundY5 = max(maxFoundY1, maxFoundY2);
-    double maxFoundY6 = max(maxFoundY3, maxFoundY4);
-    p_maximumY = max(maxFoundY5, maxFoundY6);
-
-    // Look along discontinuities for more extremes
-    std::vector<double> specialLatCases = p_specialLatCases;
-    for(unsigned int specialLatCase = 0; specialLatCase < specialLatCases.size(); specialLatCase ++) {
-      double minX, maxX, minY, maxY;
-
-      doSearch(MinimumLongitude(), MaximumLongitude(), minX, specialLatCases[specialLatCase], true,  false, true);
-      doSearch(MinimumLongitude(), MaximumLongitude(), minY, specialLatCases[specialLatCase], false, false, true);
-      doSearch(MinimumLongitude(), MaximumLongitude(), maxX, specialLatCases[specialLatCase], true,  false, false);
-      doSearch(MinimumLongitude(), MaximumLongitude(), maxY, specialLatCases[specialLatCase], false, false, false);
-
-      p_minimumX = min(minX, p_minimumX);
-      p_maximumX = max(maxX, p_maximumX);
-      p_minimumY = min(minY, p_minimumY);
-      p_maximumY = max(maxY, p_maximumY);
-    }
-
-    std::vector<double> specialLonCases = p_specialLonCases;
-    for(unsigned int specialLonCase = 0; specialLonCase < specialLonCases.size(); specialLonCase ++) {
-      double minX, maxX, minY, maxY;
-
-      doSearch(MinimumLatitude(), MaximumLatitude(), minX, specialLonCases[specialLonCase], true,  true, true);
-      doSearch(MinimumLatitude(), MaximumLatitude(), minY, specialLonCases[specialLonCase], false, true, true);
-      doSearch(MinimumLatitude(), MaximumLatitude(), maxX, specialLonCases[specialLonCase], true,  true, false);
-      doSearch(MinimumLatitude(), MaximumLatitude(), maxY, specialLonCases[specialLonCase], false, true, false);
-
-      p_minimumX = min(minX, p_minimumX);
-      p_maximumX = max(maxX, p_maximumX);
-      p_minimumY = min(minY, p_minimumY);
-      p_maximumY = max(maxY, p_maximumY);
-    }
-
-    p_specialLatCases.clear();
-    p_specialLonCases.clear();
-
-    // Make sure everything is ordered
-    if(p_minimumX >= p_maximumX) return false;
-    if(p_minimumY >= p_maximumY) return false;
-
-    // Return X/Y min/maxs
-    minX = p_minimumX;
-    maxX = p_maximumX;
-    minY = p_minimumY;
-    maxY = p_maximumY;
-
-    return true;
+    return xyRangeOblique(minX, maxX, minY, maxY);
   }
 
 
@@ -421,9 +369,9 @@ namespace Isis {
   PvlGroup ObliqueCylindrical::Mapping() {
     PvlGroup mapping = Projection::Mapping();
 
-    mapping += p_mappingGrp["PoleLatitude"];
-    mapping += p_mappingGrp["PoleLongitude"];
-    mapping += p_mappingGrp["PoleRotation"];
+    mapping += m_mappingGrp["PoleLatitude"];
+    mapping += m_mappingGrp["PoleLongitude"];
+    mapping += m_mappingGrp["PoleRotation"];
 
     return mapping;
   }
@@ -451,176 +399,66 @@ namespace Isis {
   }
 
   /**
-   * Searches for extreme (min/max/discontinuity) values across lat/lons. Discontinuities are
-   * stored in p_specialLatCases and p_specialLonCases so they may be checked again later, which
-   * creates significantly more accuracy in some cases. This method utilizes findExtreme to locate
-   * extreme values.
-   *
-   * @param minBorder Minimum lat or lon to start searching from
-   * @param maxBorder Maximum lat or lon to start searching from
-   * @param extremeVal The resulting global min/max on this line
-   * @param constBorder The lat or lon that stays constant
-   * @param searchLongitude True if you're searching along a longitude (constBorder is a lon, other borders lats).
-   *                        False if you're searching a latitude (constBorder is a lat, other borders lons).
-   * @param findMin True if looking for a minimum, false if looking for a maximum.
+   * Returns the value of the pole latitude.
+   * 
+   * @return @b double The pole latitude.
+   * 
    */
-  void ObliqueCylindrical::doSearch(double minBorder, double maxBorder, double &extremeVal,
-                                    const double constBorder, bool searchX, bool searchLongitude, bool findMin) {
-    const double TOLERANCE = 0.5;
-    const int NUM_ATTEMPTS = (unsigned int)DBL_DIG; // It's unsafe to go past this precision
-
-    double minFoundVal, maxFoundVal;
-    int attempts = 0;
-
-    do {
-      findExtreme(minBorder, maxBorder, minFoundVal, maxFoundVal, constBorder, searchX, searchLongitude, findMin);
-      attempts ++;
-    }
-    while((abs(minFoundVal - maxFoundVal) > TOLERANCE) && (attempts < NUM_ATTEMPTS));
-
-    if(attempts >= NUM_ATTEMPTS) {
-      // We zoomed in on a discontinuity because our range never shrank, this will need to be rechecked later.
-      // *min and max border should be nearly identicle, so it doesnt matter which is used here
-      if(searchLongitude) {
-        p_specialLatCases.push_back(minBorder);
-      }
-      else {
-        p_specialLonCases.push_back(minBorder);
-      }
-    }
-
-    // These values will always be accurate, even over a discontinuity
-    if(findMin) {
-      extremeVal = min(maxFoundVal, minFoundVal);
-    }
-    else {
-      extremeVal = max(maxFoundVal, minFoundVal);
-    }
+  double ObliqueCylindrical::poleLatitude() const {
+        return m_poleLatitude;
   }
 
   /**
-   * Compares two Projection objects to see if they are equal
-   *
-   * @param proj Projection object to do comparison on
-   *
-   * @return bool Returns true if the Projection objects are equal, and false if
-   *              they are not
+   * Returns the value of the pole longitude.
+   * 
+   * @return @b double The pole longitude.
+   * 
    */
-  bool ObliqueCylindrical::operator== (const Isis::Projection &proj) {
-    if(!Isis::Projection::operator==(proj)) return false;
+  double ObliqueCylindrical::poleLongitude() const {
+    return m_poleLongitude;
+  }
 
-    ObliqueCylindrical *obProjection = (ObliqueCylindrical *) &proj;
-
-    if(obProjection->GetPoleLatitude()  != GetPoleLatitude())  return false;
-    if(obProjection->GetPoleLongitude() != GetPoleLongitude()) return false;
-    if(obProjection->GetPoleRotation()  != GetPoleRotation())  return false;
-
-    return true;
+  /**
+   * Returns the value of the pole rotation.
+   * 
+   * @return @b double The pole rotation.
+   * 
+   */
+  double ObliqueCylindrical::poleRotation() const {
+    return m_poleRotation;
   }
 
   void ObliqueCylindrical::init() {
-    /*******************************************************************************
+    /***************************************************************************
     * Apply target correction for longitude direction
-    *******************************************************************************/
-    if(p_longitudeDirection == PositiveWest) p_longitude *= -1.0;
-    if(p_longitudeDirection == PositiveWest) p_poleLongitude *= -1.0;
+    ***************************************************************************/
+    if (m_longitudeDirection == PositiveWest) m_longitude *= -1.0;
+    if (m_longitudeDirection == PositiveWest) m_poleLongitude *= -1.0;
 
-    /*******************************************************************************
-    * Check that p_equatorialRadius isn't zero because we'll divide by it later
-    *******************************************************************************/
-    if(abs(p_equatorialRadius) <= DBL_EPSILON) {
+    /***************************************************************************
+    * Check that m_equatorialRadius isn't zero because we'll divide by it later
+    ***************************************************************************/
+    if (abs(m_equatorialRadius) <= DBL_EPSILON) {
       throw IException(IException::Unknown,
-                       "The input center latitude is too close to a pole which will result in a division by zero.",
+                       "The input center latitude is too close to a pole "
+                       "which will result in a division by zero.",
                        _FILEINFO_);
     }
   }
 
-  /**
-   * Searches for extreme (min/max/discontinuity) values across lat/lons. Discontinuities will cause
-   * the minVal and maxVal to never converge. This works by stepping (10 times) between the minBorder
-   * and maxBorder to find an extreme. Then, the range of this extreme is recorder in minBorder and
-   * maxBorder and the values on these new borders are stored in minVal or maxVal (could be X or Y depending
-   * on searchX). This function should be used by calling it repeatidly until minVal ~= maxVal. If minVal never
-   * comes close to maxVal, then between minBorder and maxBorder is the value of the most extreme value and either
-   * minVal or maxVal will be correct (whichever is smaller or bigger depending on findMin).
-   *
-   * @param minBorder Minimum lat or lon to start searching from, which gets updated to a more precise range
-   * @param maxBorder Maximum lat or lon to start searching from, which gets updated to a more precise range
-   * @param minVal The lower resultant, which is more accurate when nearly equal to maxVal
-   * @param maxVal The higher resultant, which is more accurate when nearly equal to minVal
-   * @param constBorder The lat or lon that stays constant
-   * @param searchX True if searching X Coordinates, False if searching Y Coordinates
-   * @param searchLongitude True if you're searching along a longitude (constBorder is a lon, other borders lats).
-   *                        False if you're searching a latitude (constBorder is a lat, other borders lons).
-   * @param findMin True if looking for a minimum, false if looking for a maximum.
-   */
-  void ObliqueCylindrical::findExtreme(double &minBorder, double &maxBorder,
-                                       double &minVal, double &maxVal, const double constBorder,
-                                       bool searchX, bool searchLongitude, bool findMin) {
-    // Always do 10 steps
-    const double STEP_SIZE = (maxBorder - minBorder) / 10.0;
-    const double LOOP_END = maxBorder + (STEP_SIZE / 2.0); // This ensures we do all of the steps properly
-    double currBorderVal = minBorder;
-
-    SetSearchGround(minBorder, constBorder, searchLongitude);
-    double value1 = (searchX) ? XCoord() : YCoord();
-    double value2 = value1;
-
-    double border1 = minBorder;
-    double border2 = minBorder;
-    double border3 = minBorder;
-
-    double extremeVal2 = value1;
-
-    double extremeBorder1 = minBorder;
-    double extremeBorder3 = minBorder;
-
-    while(currBorderVal <= LOOP_END) {
-      SetSearchGround(currBorderVal, constBorder, searchLongitude);
-
-      value2 = value1;
-      value1 = (searchX) ? XCoord() : YCoord();
-      border3 = border2;
-      border2 = border1;
-      border1 = currBorderVal;
-
-      if((findMin && value2 < extremeVal2) || (!findMin && value2 > extremeVal2)) {
-        extremeVal2 = value2;
-
-        extremeBorder3 = border3;
-        extremeBorder1 = border1;
-      }
-
-      currBorderVal += STEP_SIZE;
-    }
-
-    minBorder = extremeBorder3; // Border 3 is lagging and thus smaller
-    maxBorder = extremeBorder1; // Border 1 is leading and thus larger
-
-    SetSearchGround(minBorder, constBorder, searchLongitude);
-    minVal = (searchX) ? XCoord() : YCoord();
-    SetSearchGround(maxBorder, constBorder, searchLongitude);
-    maxVal = (searchX) ? XCoord() : YCoord();
-  }
-
-  /**
-   * This function sets the ground based on two variables and a boolean. This is meant
-   * for use by DoSearch and findExtreme in order to set the ground correctly each time.
-   *
-   * @param variableBorder The lat/lon that is variable in the search methods
-   * @param constBorder The lat/lon that is constant in the search methods
-   * @param variableIsLat True if variableBorder is a lat, False if variableBorder is a lon
-   */
-  void ObliqueCylindrical::SetSearchGround(const double variableBorder, const double constBorder, bool variableIsLat) {
-    if(variableIsLat) {
-      SetGround(variableBorder, constBorder);
-    }
-    else {
-      SetGround(constBorder, variableBorder);
-    }
-  }
 } // end namespace isis
 
+/** 
+ * This is the function that is called in order to instantiate an 
+ * ObliqueCylindrical object. 
+ *  
+ * @param lab Cube labels with appropriate Mapping information.
+ *  
+ * @param allowDefaults Currently, this parameter is unused.
+ * 
+ * @return @b Isis::Projection* Pointer to an ObliqueCylindrical 
+ *         projection object.
+ */
 extern "C" Isis::Projection *ObliqueCylindricalPlugin(Isis::Pvl &lab,
     bool allowDefaults) {
   return new Isis::ObliqueCylindrical(lab, allowDefaults);

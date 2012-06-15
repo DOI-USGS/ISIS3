@@ -23,20 +23,31 @@
  */
 
 #include "Projection.h"
-#include "Constants.h"
 
 namespace Isis {
+  class Pvl;
+  class PvlGroup;
   /**
    * @brief Mercator Map Projection
    *
    * This class provides methods for the forward and inverse equations of a
-   * Mercator map projection (for an ellipse). The code was converted
-   * to C++ from the C version of the USGS General Cartographic Transformation
-   * Package (GCTP). This class inherits Projection and provides the two virtual
-   * methods SetGround (forward) and SetCoordinate (inverse) and a third virtual
-   * method, XYRange, for obtaining projection coordinate coverage for a
-   * latitude/longitude window. Please see the Projection class for a full
-   * accounting of all the methods available.
+   * Mercator map projection (for an ellipsoid). 
+   *  
+   * The Mercator projection is cylindrical and conformal, preserving angles and
+   * shapes of small objects and distorting the shape of large objects. The 
+   * cylinder wraps the planet along the equator, with the poles at 
+   * infinity. Latitudes and longitudes are straight lines, crossing at right 
+   * angles. However, latitudes are unequally spaced and longitudes are equally 
+   * spaced. 
+   *  
+   * The code was converted to C++ from the C version of the USGS General 
+   * Cartographic Transformation Package (GCTP). This class inherits Projection 
+   * and provides the two virtual methods SetGround (forward) and SetCoordinate 
+   * (inverse) and a third virtual method, XYRange, for obtaining projection 
+   * coordinate coverage for a latitude/longitude window. 
+   *  
+   * Please see the Projection class for a full accounting of all the methods 
+   * available. 
    *
    * @ingroup MapProjection
    *
@@ -44,63 +55,42 @@ namespace Isis {
    *
    * @internal
    *   @history 2005-03-18 Elizabeth Ribelin - added TrueScaleLatitude method to
-   *                                           class and tested in unitTest
-   *   @history 2007-06-29 Steven Lambright - Added Mapping, MappingLatitudes and
-   *                                          MappingLongitudes methods.
-   *   @history 2008-05-09 Steven Lambright - Added Name, Version, IsEquatorialCylindrical methods
+   *                           class and tested in unitTest
+   *   @history 2007-06-29 Steven Lambright - Added Mapping, MappingLatitudes
+   *                           and MappingLongitudes methods.
+   *   @history 2008-05-09 Steven Lambright - Added Name, Version,
+   *                           IsEquatorialCylindrical methods
+   *   @history 2012-06-15 Jeannie Backer - Added documentation.  Added forward
+   *                           declaration of Pvl, PvlGroup to header file.
+   *                           Ordered includes in implementation file.  Moved
+   *                           Name, Version, IsEquatorialCylindrical, and
+   *                           TrueScaleLatitude to the implementation file.
+   *                           Minor modifications to comply with some coding
+                               standards. References #928.
    */
-  class Mercator : public Isis::Projection {
+  class Mercator : public Projection {
     public:
-      Mercator(Isis::Pvl &label, bool allowDefaults = false);
+      Mercator(Pvl &label, bool allowDefaults = false);
       ~Mercator();
+      bool operator== (const Projection &proj);
+
+      std::string Name() const;
+      std::string Version() const;
+      double TrueScaleLatitude() const;
+      bool IsEquatorialCylindrical();
 
       bool SetGround(const double lat, const double lon);
       bool SetCoordinate(const double x, const double y);
       bool XYRange(double &minX, double &maxX, double &minY, double &maxY);
+
       PvlGroup Mapping();
       PvlGroup MappingLatitudes();
       PvlGroup MappingLongitudes();
 
-      bool IsEquatorialCylindrical() {
-        return true;
-      }
-
-      /**
-       * Returns the name of the map projection
-       *
-       * @return string Name of projection
-       */
-      std::string Name() const {
-        return "Mercator";
-      }
-
-      /**
-       * Returns the version of the map projection
-       *
-       *
-       * @return std::string Version number
-       */
-      std::string Version() const {
-        return "1.0";
-      }
-
-      bool operator== (const Isis::Projection &proj);
-
-      /**
-       * Returns the latitude of true scale (in the case of Mercator
-       * it is the center latitude)
-       *
-       * @return double
-       */
-      double TrueScaleLatitude() const {
-        return p_centerLatitude * 180.0 / Isis::PI;
-      };
-
-
     private:
-      double p_centerLongitude; //!<The center longitude for the map projection
-      double p_centerLatitude;  //!<The center latitude for the map projection
-      double p_scalefactor;      //!<Scaling factor
+      double m_centerLongitude; //!< The center longitude for the map projection
+      double m_centerLatitude;  //!< The center latitude for the map projection
+      double m_scalefactor;      //!< Scaling factor
   };
 };
 

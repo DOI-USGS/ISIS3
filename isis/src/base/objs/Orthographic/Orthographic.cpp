@@ -20,11 +20,17 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include "Orthographic.h"
+
 #include <cmath>
 #include <cfloat>
-#include "Orthographic.h"
-#include "IException.h"
+
 #include "Constants.h"
+#include "IException.h"
+#include "Projection.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
 
 using namespace std;
 namespace Isis {
@@ -42,52 +48,52 @@ namespace Isis {
    *                      middle of the longitude range specified in the labels.
    *                      Defaults to false.
    *
-   * @throws Isis::iException::Io
+   * @throws IException
    */
-  Orthographic::Orthographic(Isis::Pvl &label, bool allowDefaults) :
-    Isis::Projection::Projection(label) {
+  Orthographic::Orthographic(Pvl &label, bool allowDefaults) :
+    Projection::Projection(label) {
     try {
       // Try to read the mapping group
-      Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
+      PvlGroup &mapGroup = label.FindGroup("Mapping", Pvl::Traverse);
 
       // Compute and write the default center longitude if allowed and
       // necessary
-      if((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
-        double lon = (p_minimumLongitude + p_maximumLongitude) / 2.0;
-        mapGroup += Isis::PvlKeyword("CenterLongitude", lon);
+      if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
+        double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
+        mapGroup += PvlKeyword("CenterLongitude", lon);
       }
 
       // Compute and write the default center latitude if allowed and
       // necessary
-      if((allowDefaults) && (!mapGroup.HasKeyword("CenterLatitude"))) {
-        double lat = (p_minimumLatitude + p_maximumLatitude) / 2.0;
-        mapGroup += Isis::PvlKeyword("CenterLatitude", lat);
+      if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLatitude"))) {
+        double lat = (m_minimumLatitude + m_maximumLatitude) / 2.0;
+        mapGroup += PvlKeyword("CenterLatitude", lat);
       }
 
       // Get the center longitude  & latitude
-      p_centerLongitude = mapGroup["CenterLongitude"];
-      p_centerLatitude = mapGroup["CenterLatitude"];
-      if(IsPlanetocentric()) {
-        p_centerLatitude = ToPlanetographic(p_centerLatitude);
+      m_centerLongitude = mapGroup["CenterLongitude"];
+      m_centerLatitude = mapGroup["CenterLatitude"];
+      if (IsPlanetocentric()) {
+        m_centerLatitude = ToPlanetographic(m_centerLatitude);
       }
 
       // convert to radians, adjust for longitude direction
-      p_centerLongitude *= Isis::PI / 180.0;
-      p_centerLatitude *= Isis::PI / 180.0;
-      if(p_longitudeDirection == PositiveWest) p_centerLongitude *= -1.0;
+      m_centerLongitude *= PI / 180.0;
+      m_centerLatitude *= PI / 180.0;
+      if (m_longitudeDirection == PositiveWest) m_centerLongitude *= -1.0;
 
       // Calculate sine & cosine of center latitude
-      sinph0 = sin(p_centerLatitude);
-      cosph0 = cos(p_centerLatitude);
+      m_sinph0 = sin(m_centerLatitude);
+      m_cosph0 = cos(m_centerLatitude);
 
       // This projection has a limited lat/lon range (can't do the world)
       //   So let's make sure that our lat/lon range is properly restricted!
-      // The equation: sinph0 * sinphi + cosph0 * cosphi * coslon tells us
+      // The equation: m_sinph0 * sinphi + m_cosph0 * cosphi * coslon tells us
       // if we are inside of the projection.
       //
-      // sinph0 = sin(center lat)
+      // m_sinph0 = sin(center lat)
       // sinphi = sin(lat)
-      // cosph0 = cos(center lat)
+      // m_cosph0 = cos(center lat)
       // cosphi = cos(lat)
       // coslon = cos(lon - centerLon)
       //
@@ -96,10 +102,10 @@ namespace Isis {
 
       // Can we project at the minlat, center lon? If not, then we should move
       // up the min lat to be inside the image.
-      sinphi = sin(p_minimumLatitude * Isis::PI / 180.0);
-      cosphi = cos(p_minimumLatitude * Isis::PI / 180.0);
+      sinphi = sin(m_minimumLatitude * PI / 180.0);
+      cosphi = cos(m_minimumLatitude * PI / 180.0);
       coslon = 1.0; // at lon=centerLon: cos(lon-centerLon) = cos(0) = 1
-      if(sinph0 * sinphi + cosph0 * cosphi * coslon < 1E-10) {
+      if (m_sinph0 * sinphi + m_cosph0 * cosphi * coslon < 1E-10) {
         // solve for x: a * sin(x) + b * cos(x) * 1 = 0
         // a * sin(x) + b * cos(x) = 0
         // a * sin(x) = - b * cos(x)
@@ -108,38 +114,38 @@ namespace Isis {
         // -(b / a) = sin(x) / cos(x)
         // -(b / a) = tan(x)
         // arctan(-(b / a)) = x
-        // arctan(-(cosph0 / sinph0)) = x
-        double newMin = atan2(- cosph0, sinph0) * 180.0 / PI;
-        if(newMin > p_minimumLatitude) {
-          p_minimumLatitude = newMin;
+        // arctan(-(m_cosph0 / m_sinph0)) = x
+        double newMin = atan2(- m_cosph0, m_sinph0) * 180.0 / PI;
+        if (newMin > m_minimumLatitude) {
+          m_minimumLatitude = newMin;
         } // else something else is off (i.e. longitude range)
       }
 
-      sinphi = sin(p_minimumLatitude * Isis::PI / 180.0);
-      cosphi = cos(p_minimumLatitude * Isis::PI / 180.0);
+      sinphi = sin(m_minimumLatitude * PI / 180.0);
+      cosphi = cos(m_minimumLatitude * PI / 180.0);
 
       // Can we project at the maxlat, center lon? If not, then we should move
       // down the max lat to be inside the image.
-      sinphi = sin(p_maximumLatitude * Isis::PI / 180.0);
-      cosphi = cos(p_maximumLatitude * Isis::PI / 180.0);
+      sinphi = sin(m_maximumLatitude * PI / 180.0);
+      cosphi = cos(m_maximumLatitude * PI / 180.0);
       coslon = 1.0; // at lon=centerLon: cos(lon-centerLon) = cos(0) = 1
-      if(sinph0 * sinphi + cosph0 * cosphi * coslon < 1E-10) {
+      if (m_sinph0 * sinphi + m_cosph0 * cosphi * coslon < 1E-10) {
         // see above equations for latitude
-        double newMax = atan2(- cosph0, sinph0) * 180.8 / PI;
-        if(newMax < p_maximumLatitude && newMax > p_minimumLatitude) {
-          p_maximumLatitude = newMax;
+        double newMax = atan2(- m_cosph0, m_sinph0) * 180.8 / PI;
+        if (newMax < m_maximumLatitude && newMax > m_minimumLatitude) {
+          m_maximumLatitude = newMax;
         } // else something else is off (i.e. longitude range)
       }
 
       // If we are looking at the side of the planet (clat = 0), then make sure
       // the longitude range is limited to 90 degrees to either direction
-      if(p_centerLatitude == 0.0) {
-        if(p_maximumLongitude - p_centerLongitude * 180.0 / PI > 90) {
-          p_maximumLongitude = (p_centerLongitude * 180.0 / PI) + 90;
+      if (m_centerLatitude == 0.0) {
+        if (m_maximumLongitude - m_centerLongitude * 180.0 / PI > 90) {
+          m_maximumLongitude = (m_centerLongitude * 180.0 / PI) + 90;
         }
 
-        if(p_centerLongitude * 180.0 / PI - p_minimumLongitude > 90) {
-          p_minimumLongitude = (p_centerLongitude * 180.0 / PI) - 90;
+        if (m_centerLongitude * 180.0 / PI - m_minimumLongitude > 90) {
+          m_minimumLongitude = (m_centerLongitude * 180.0 / PI) - 90;
         }
       }
     }
@@ -152,6 +158,59 @@ namespace Isis {
   //! Destroys the Orthographic object
   Orthographic::~Orthographic() {
   }
+
+  /**
+   * Compares two Projection objects to see if they are equal
+   *
+   * @param proj Projection object to do comparison on
+   *
+   * @return bool Returns true if the Projection objects are equal, and false if
+   *              they are not
+   */
+  bool Orthographic::operator== (const Projection &proj) {
+    if (!Projection::operator==(proj)) return false;
+    // dont do the below it is a recusive plunge
+    //  if (Projection::operator!=(proj)) return false;
+    Orthographic *ortho = (Orthographic *) &proj;
+    if ((ortho->m_centerLongitude != m_centerLongitude) ||
+        (ortho->m_centerLatitude != m_centerLatitude)) return false;
+    return true;
+  }
+
+  /**
+    * Returns the name of the map projection, "Orthographic"
+    *
+    * @return string Name of projection, "Orthographic"
+    */
+   string Orthographic::Name() const {
+     return "Orthographic";
+   }
+
+   /**
+    * Returns the version of the map projection
+    *
+    *
+    * @return string Version number
+    */
+   string Orthographic::Version() const {
+     return "1.0";
+   }
+
+   /**
+    * Returns the center latitude, in degrees. 
+    *  
+    * **NOTE** In the case of Orthographic projections, there is NO latitude 
+    * that is entirely true to scale. The only true scale for this projection is 
+    * at the single point, (center latitude, center longitude). 
+    *
+    * @return double The center latitude.
+    */
+   double Orthographic::TrueScaleLatitude() const {
+     //Snyder pg. 45
+     // no distortion at center of projection (centerLatitude, centerLongitude)
+     return m_centerLatitude * 180.0 / PI;// Change to true scale 
+                                                //coordinate method ???
+   }
 
   /**
    * This method is used to set the latitude/longitude (assumed to be of the
@@ -167,36 +226,36 @@ namespace Isis {
    */
   bool Orthographic::SetGround(const double lat, const double lon) {
     // Convert longitude to radians & clean up
-    p_longitude = lon;
-    double lonRadians = lon * Isis::PI / 180.0;
-    if(p_longitudeDirection == PositiveWest) lonRadians *= -1.0;
+    m_longitude = lon;
+    double lonRadians = lon * PI / 180.0;
+    if (m_longitudeDirection == PositiveWest) lonRadians *= -1.0;
 
     // Now convert latitude to radians & clean up ... it must be planetographic
-    p_latitude = lat;
+    m_latitude = lat;
     double latRadians = lat;
-    if(IsPlanetocentric()) latRadians = ToPlanetographic(latRadians);
-    latRadians *= Isis::PI / 180.0;
+    if (IsPlanetocentric()) latRadians = ToPlanetographic(latRadians);
+    latRadians *= PI / 180.0;
 
     // Compute helper variables
-    double deltaLon = (lonRadians - p_centerLongitude);
+    double deltaLon = (lonRadians - m_centerLongitude);
     double sinphi = sin(latRadians);
     double cosphi = cos(latRadians);
     double coslon = cos(deltaLon);
 
     // Lat/Lon cannot be projected
-    double g =  sinph0 * sinphi + cosph0 * cosphi * coslon;
-    if((g <= 0.0) && (fabs(g) > 1.0e-10)) {
-      p_good = false;
-      return p_good;
+    double g =  m_sinph0 * sinphi + m_cosph0 * cosphi * coslon;
+    if ((g <= 0.0) && (fabs(g) > 1.0e-10)) {
+      m_good = false;
+      return m_good;
     }
 
     // Compute the coordinates
-    double x = p_equatorialRadius * cosphi * sin(deltaLon);
-    double y = p_equatorialRadius * (cosph0 * sinphi - sinph0 * cosphi * coslon);
+    double x = m_equatorialRadius * cosphi * sin(deltaLon);
+    double y = m_equatorialRadius * (m_cosph0 * sinphi - m_sinph0 * cosphi * coslon);
 
     SetComputedXY(x, y);
-    p_good = true;
-    return p_good;
+    m_good = true;
+    return m_good;
   }
 
   /**
@@ -222,59 +281,59 @@ namespace Isis {
     rho = sqrt(GetX() * GetX() + GetY() * GetY());
 
     // Error calculating rho - should be less than equatorial radius
-    if(fabs(rho - p_equatorialRadius) < 1E-10 || rho > p_equatorialRadius) {
-      p_good = false;
-      return p_good;
+    if (fabs(rho - m_equatorialRadius) < 1E-10 || rho > m_equatorialRadius) {
+      m_good = false;
+      return m_good;
     }
 
     // Calculate the latitude and longitude
-    p_longitude = p_centerLongitude;
-    if(fabs(rho) <= epsilon) {
-      p_latitude = p_centerLatitude;
+    m_longitude = m_centerLongitude;
+    if (fabs(rho) <= epsilon) {
+      m_latitude = m_centerLatitude;
     }
     else {
-      con = rho / p_equatorialRadius;
-      if(con > 1.0) con = 1.0;
-      if(con < -1.0) con = -1.0;
+      con = rho / m_equatorialRadius;
+      if (con > 1.0) con = 1.0;
+      if (con < -1.0) con = -1.0;
       z = asin(con);
       sinz = sin(z);
       cosz = cos(z);
-      con = cosz * sinph0 + GetY() * sinz * cosph0 / rho;
-      if(con > 1.0) con = 1.0;
-      if(con < -1.0) con = -1.0;
-      p_latitude = asin(con);
-      con = fabs(p_centerLatitude) - Isis::HALFPI;
-      if(fabs(con) <= epsilon) {
-        if(p_centerLatitude >= 0.0) {
-          p_longitude += atan2(GetX(), -GetY());
+      con = cosz * m_sinph0 + GetY() * sinz * m_cosph0 / rho;
+      if (con > 1.0) con = 1.0;
+      if (con < -1.0) con = -1.0;
+      m_latitude = asin(con);
+      con = fabs(m_centerLatitude) - HALFPI;
+      if (fabs(con) <= epsilon) {
+        if (m_centerLatitude >= 0.0) {
+          m_longitude += atan2(GetX(), -GetY());
         }
         else {
-          p_longitude += atan2(-GetX(), GetY());
+          m_longitude += atan2(-GetX(), GetY());
         }
       }
       else {
-        con = cosz - sinph0 * sin(p_latitude);
-        if((fabs(con) >= epsilon) || (fabs(GetX()) >= epsilon)) {
-          p_longitude += atan2(GetX() * sinz * cosph0, con * rho);
+        con = cosz - m_sinph0 * sin(m_latitude);
+        if ((fabs(con) >= epsilon) || (fabs(GetX()) >= epsilon)) {
+          m_longitude += atan2(GetX() * sinz * m_cosph0, con * rho);
         }
       }
     }
 
     // Convert to degrees
-    p_latitude *= 180.0 / Isis::PI;
-    p_longitude *= 180.0 / Isis::PI;
+    m_latitude *= 180.0 / PI;
+    m_longitude *= 180.0 / PI;
 
     // Cleanup the longitude
-    if(p_longitudeDirection == PositiveWest) p_longitude *= -1.0;
+    if (m_longitudeDirection == PositiveWest) m_longitude *= -1.0;
     // These need to be done for circular type projections
-    p_longitude = To360Domain(p_longitude);
-    if(p_longitudeDomain == 180) p_longitude = To180Domain(p_longitude);
+    m_longitude = To360Domain(m_longitude);
+    if (m_longitudeDomain == 180) m_longitude = To180Domain(m_longitude);
 
     // Cleanup the latitude
-    if(IsPlanetocentric()) p_latitude = ToPlanetocentric(p_latitude);
+    if (IsPlanetocentric()) m_latitude = ToPlanetocentric(m_latitude);
 
-    p_good = true;
-    return p_good;
+    m_good = true;
+    return m_good;
   }
 
   /**
@@ -300,77 +359,78 @@ namespace Isis {
    *
    * @return bool
    */
-  bool Orthographic::XYRange(double &minX, double &maxX, double &minY, double &maxY) {
+  bool Orthographic::XYRange(double &minX, double &maxX, 
+                             double &minY, double &maxY) {
     double lat, lon;
 
     // Check the corners of the lat/lon range
-    XYRangeCheck(p_minimumLatitude, p_minimumLongitude);
-    XYRangeCheck(p_maximumLatitude, p_minimumLongitude);
-    XYRangeCheck(p_minimumLatitude, p_maximumLongitude);
-    XYRangeCheck(p_maximumLatitude, p_maximumLongitude);
+    XYRangeCheck(m_minimumLatitude, m_minimumLongitude);
+    XYRangeCheck(m_maximumLatitude, m_minimumLongitude);
+    XYRangeCheck(m_minimumLatitude, m_maximumLongitude);
+    XYRangeCheck(m_maximumLatitude, m_maximumLongitude);
 
 //cout << " ************ WALK LATITUDE ******************\n";
-//cout << "MIN LAT: " << p_minimumLatitude << " MAX LAT: " << p_maximumLatitude << "\n";
+//cout << "MIN LAT: " << m_minimumLatitude << " MAX LAT: " << m_maximumLatitude << "\n";
     // Walk top and bottom edges
-    for(lat = p_minimumLatitude; lat <= p_maximumLatitude; lat += 0.01) {
+    for (lat = m_minimumLatitude; lat <= m_maximumLatitude; lat += 0.01) {
 //cout << "WALKED A STEP - lat: " << lat << "\n";
       lat = lat;
-      lon = p_minimumLongitude;
+      lon = m_minimumLongitude;
       XYRangeCheck(lat, lon);
 
       lat = lat;
-      lon = p_maximumLongitude;
+      lon = m_maximumLongitude;
       XYRangeCheck(lat, lon);
-//cout << "MIN LAT: " << p_minimumLatitude << " MAX LAT: " << p_maximumLatitude << "\n";
+//cout << "MIN LAT: " << m_minimumLatitude << " MAX LAT: " << m_maximumLatitude << "\n";
     }
 
 //cout << " ************ WALK LONGITUDE ******************\n";
     // Walk left and right edges
-    for(lon = p_minimumLongitude; lon <= p_maximumLongitude; lon += 0.01) {
-      lat = p_minimumLatitude;
+    for (lon = m_minimumLongitude; lon <= m_maximumLongitude; lon += 0.01) {
+      lat = m_minimumLatitude;
       lon = lon;
       XYRangeCheck(lat, lon);
 
-      lat = p_maximumLatitude;
+      lat = m_maximumLatitude;
       lon = lon;
       XYRangeCheck(lat, lon);
     }
 
     // Walk the limb
-    for(double angle = 0.0; angle <= 360.0; angle += 0.01) {
-      double x = p_equatorialRadius * cos(angle * Isis::PI / 180.0);
-      double y = p_equatorialRadius * sin(angle * Isis::PI / 180.0);
-      if(SetCoordinate(x, y) == 0) {
-        if(p_latitude > p_maximumLatitude) {
+    for (double angle = 0.0; angle <= 360.0; angle += 0.01) {
+      double x = m_equatorialRadius * cos(angle * PI / 180.0);
+      double y = m_equatorialRadius * sin(angle * PI / 180.0);
+      if (SetCoordinate(x, y) == 0) {
+        if (m_latitude > m_maximumLatitude) {
           continue;
         }
-        if(p_longitude > p_maximumLongitude) {
+        if (m_longitude > m_maximumLongitude) {
           continue;
         }
-        if(p_latitude < p_minimumLatitude) {
+        if (m_latitude < m_minimumLatitude) {
           continue;
         }
-        if(p_longitude < p_minimumLongitude) {
+        if (m_longitude < m_minimumLongitude) {
           continue;
         }
 
-        if(p_minimumX > x) p_minimumX = x;
-        if(p_maximumX < x) p_maximumX = x;
-        if(p_minimumY > y) p_minimumY = y;
-        if(p_maximumY < y) p_maximumY = y;
-        XYRangeCheck(p_latitude, p_longitude);
+        if (m_minimumX > x) m_minimumX = x;
+        if (m_maximumX < x) m_maximumX = x;
+        if (m_minimumY > y) m_minimumY = y;
+        if (m_maximumY < y) m_maximumY = y;
+        XYRangeCheck(m_latitude, m_longitude);
       }
     }
 
     // Make sure everything is ordered
-    if(p_minimumX >= p_maximumX) return false;
-    if(p_minimumY >= p_maximumY) return false;
+    if (m_minimumX >= m_maximumX) return false;
+    if (m_minimumY >= m_maximumY) return false;
 
     // Return X/Y min/maxs
-    minX = p_minimumX;
-    maxX = p_maximumX;
-    minY = p_minimumY;
-    maxY = p_maximumY;
+    minX = m_minimumX;
+    maxX = m_maximumX;
+    minY = m_minimumY;
+    maxY = m_maximumY;
     return true;
   }
 
@@ -383,8 +443,8 @@ namespace Isis {
   PvlGroup Orthographic::Mapping() {
     PvlGroup mapping = Projection::Mapping();
 
-    mapping += p_mappingGrp["CenterLatitude"];
-    mapping += p_mappingGrp["CenterLongitude"];
+    mapping += m_mappingGrp["CenterLatitude"];
+    mapping += m_mappingGrp["CenterLongitude"];
 
     return mapping;
   }
@@ -397,7 +457,7 @@ namespace Isis {
   PvlGroup Orthographic::MappingLatitudes() {
     PvlGroup mapping = Projection::MappingLatitudes();
 
-    mapping += p_mappingGrp["CenterLatitude"];
+    mapping += m_mappingGrp["CenterLatitude"];
 
     return mapping;
   }
@@ -410,30 +470,25 @@ namespace Isis {
   PvlGroup Orthographic::MappingLongitudes() {
     PvlGroup mapping = Projection::MappingLongitudes();
 
-    mapping += p_mappingGrp["CenterLongitude"];
+    mapping += m_mappingGrp["CenterLongitude"];
 
     return mapping;
   }
-
-  /**
-   * Compares two Projection objects to see if they are equal
-   *
-   * @param proj Projection object to do comparison on
-   *
-   * @return bool Returns true if the Projection objects are equal, and false if
-   *              they are not
-   */
-  bool Orthographic::operator== (const Isis::Projection &proj) {
-    if(!Isis::Projection::operator==(proj)) return false;
-    // dont do the below it is a recusive plunge
-    //  if (Isis::Projection::operator!=(proj)) return false;
-    Orthographic *ortho = (Orthographic *) &proj;
-    if((ortho->p_centerLongitude != this->p_centerLongitude) ||
-        (ortho->p_centerLatitude != this->p_centerLatitude)) return false;
-    return true;
-  }
 } // end namespace isis
 
+/** 
+ * This is the function that is called in order to instantiate an 
+ * Orthographic object.
+ *  
+ * @param lab Cube labels with appropriate Mapping information.
+ *  
+ * @param allowDefaults If the label does not contain the value for 
+ *                      CenterLongitude, this method indicates
+ *                      whether the constructor should compute this value.
+ * 
+ * @return @b Isis::Projection* Pointer to an Orthographic projection 
+ *         object.
+ */
 extern "C" Isis::Projection *OrthographicPlugin(Isis::Pvl &lab,
     bool allowDefaults) {
   return new Isis::Orthographic(lab, allowDefaults);

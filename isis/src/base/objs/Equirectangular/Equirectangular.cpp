@@ -21,10 +21,16 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "Equirectangular.h"
-#include "IException.h"
-#include "Constants.h"
+
 #include <cmath>
 #include <cfloat>
+
+#include "Constants.h"
+#include "IException.h"
+#include "Projection.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
 
 using namespace std;
 namespace Isis {
@@ -44,59 +50,58 @@ namespace Isis {
    *                      label using the middle of the latitude/longitude range
    *                      as specified in the labels.
    *
-   * @throws Isis::iException::Io  An error is thrown if the label does not
-   *                               contain the keyword 'CenterLongtitude' or
-   *                               'CenterLatitude'.
+   * @throw IException  - "Keyword value for CenterLatitude is too close to the pole"
    */
-  Equirectangular::Equirectangular(Isis::Pvl &label, bool allowDefaults) :
-    Isis::Projection::Projection(label) {
+  Equirectangular::Equirectangular(Pvl &label, bool allowDefaults) :
+    Projection::Projection(label) {
     try {
       // Try to read the mapping group
-      Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
+      PvlGroup &mapGroup = label.FindGroup("Mapping", Pvl::Traverse);
 
       // Compute the default value if allowed and needed
-      if((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
+      if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
         double lon = 0.0;
-        mapGroup += Isis::PvlKeyword("CenterLongitude", lon);
+        mapGroup += PvlKeyword("CenterLongitude", lon);
       }
 
-      if((allowDefaults) && (!mapGroup.HasKeyword("CenterLatitude"))) {
-        double lat = (p_minimumLatitude + p_maximumLatitude) / 2.0;
-        if(lat >= 65.0) {
+      if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLatitude"))) {
+        double lat = (m_minimumLatitude + m_maximumLatitude) / 2.0;
+        if (lat >= 65.0) {
           lat = 65.0;
         }
-        else if(lat <= -65.0) {
+        else if (lat <= -65.0) {
           lat = -65.0;
         }
         else {
           lat = 0.0;
         }
-        mapGroup += Isis::PvlKeyword("CenterLatitude", lat);
+        mapGroup += PvlKeyword("CenterLatitude", lat);
       }
 
       // Get the center longitude, convert to radians, adjust for longitude
       // direction
-      p_centerLongitude = mapGroup["CenterLongitude"];
-      p_centerLongitude *= Isis::PI / 180.0;
-      if(p_longitudeDirection == PositiveWest) p_centerLongitude *= -1.0;
+      m_centerLongitude = mapGroup["CenterLongitude"];
+      m_centerLongitude *= PI / 180.0;
+      if (m_longitudeDirection == PositiveWest) m_centerLongitude *= -1.0;
 
       // Get the center latitude, the radius at the clat, and convert to radians
-      p_centerLatitude = mapGroup["CenterLatitude"];
-      p_clatRadius = LocalRadius(p_centerLatitude);
-      p_centerLatitude *= Isis::PI / 180.0;
+      m_centerLatitude = mapGroup["CenterLatitude"];
+      m_clatRadius = LocalRadius(m_centerLatitude);
+      m_centerLatitude *= PI / 180.0;
 
       // This keyword is just for user's information, and was put in for Hirise
-      if(!mapGroup.HasKeyword("CenterLatitudeRadius")) {
+      if (!mapGroup.HasKeyword("CenterLatitudeRadius")) {
         mapGroup += PvlKeyword("CenterLatitudeRadius");
       }
 
-      mapGroup["CenterLatitudeRadius"] = p_clatRadius;
+      mapGroup["CenterLatitudeRadius"] = m_clatRadius;
 
       // Compute cos of the center latitude and make sure it is valid as
       // we will be dividing with it later on
-      p_cosCenterLatitude = cos(p_centerLatitude);
-      if(fabs(p_cosCenterLatitude) < DBL_EPSILON) {
-        string message = "Keyword value for CenterLatitude is too close to the pole";
+      m_cosCenterLatitude = cos(m_centerLatitude);
+      if (fabs(m_cosCenterLatitude) < DBL_EPSILON) {
+        string message = "Keyword value for CenterLatitude is "
+                         "too close to the pole";
         throw IException(IException::Io, message, _FILEINFO_);
       }
     }
@@ -108,6 +113,61 @@ namespace Isis {
 
   //! Destroys the Equirectangular object.
   Equirectangular::~Equirectangular() {
+  }
+
+  /**
+   * Compares two Projection objects to see if they are equal
+   *
+   * @param proj Projection object to do comparison on
+   *
+   * @return bool Returns true if the Projection objects are equal, and false if
+   *              they are not
+   */
+  bool Equirectangular::operator== (const Projection &proj) {
+    if (!Projection::operator==(proj)) return false;
+    // dont do the below it is a recusive plunge
+    //  if (Projection::operator!=(proj)) return false;
+    Equirectangular *equi = (Equirectangular *) &proj;
+    if (equi->m_centerLongitude != m_centerLongitude) return false;
+    if (equi->m_centerLatitude != m_centerLatitude) return false;
+    return true;
+  }
+
+  /**
+   * Returns the name of the map projection, "Equirectangular"
+   *
+   * @return string Name of projection, "Equirectangular"
+   */
+  string Equirectangular::Name() const {
+    return "Equirectangular";
+  }
+
+  /**
+   * Returns the version of the map projection
+   *
+   * @return string Version number
+   */
+  string Equirectangular::Version() const {
+    return "1.0";
+  }
+
+  /**
+   * Returns the latitude of true scale (in the case of Equirectangular it is 
+   * the center latitude).
+   *
+   * @return double The center latitude
+   */
+  double Equirectangular::TrueScaleLatitude() const {
+    return m_centerLatitude * 180.0 / PI;
+  }
+
+  /**
+   * Indicates whether the projection is Equitorial Cylindrical.
+   * 
+   * @return @b bool True if the projection is cylindrical. 
+   */
+  bool Equirectangular::IsEquatorialCylindrical() {
+    return true;
   }
 
   /**
@@ -124,19 +184,19 @@ namespace Isis {
    */
   bool Equirectangular::SetGround(const double lat, const double lon) {
     // Convert to radians
-    p_latitude = lat;
-    p_longitude = lon;
-    double latRadians = lat * Isis::PI / 180.0;
-    double lonRadians = lon * Isis::PI / 180.0;
-    if(p_longitudeDirection == PositiveWest) lonRadians *= -1.0;
+    m_latitude = lat;
+    m_longitude = lon;
+    double latRadians = lat * PI / 180.0;
+    double lonRadians = lon * PI / 180.0;
+    if (m_longitudeDirection == PositiveWest) lonRadians *= -1.0;
 
     // Compute the coordinate
-    double deltaLon = (lonRadians - p_centerLongitude);
-    double x = p_clatRadius * p_cosCenterLatitude * deltaLon;
-    double y = p_clatRadius * latRadians;
+    double deltaLon = (lonRadians - m_centerLongitude);
+    double x = m_clatRadius * m_cosCenterLatitude * deltaLon;
+    double y = m_clatRadius * latRadians;
     SetComputedXY(x, y);
-    p_good = true;
-    return p_good;
+    m_good = true;
+    return m_good;
   }
 
   /**
@@ -157,28 +217,28 @@ namespace Isis {
     SetXY(x, y);
 
     // Compute latitude and make sure it is not above 90
-    p_latitude = GetY() / p_clatRadius;
-    if((fabs(p_latitude) - Isis::HALFPI) > DBL_EPSILON) {
-      p_good = false;
-      return p_good;
+    m_latitude = GetY() / m_clatRadius;
+    if ((fabs(m_latitude) - HALFPI) > DBL_EPSILON) {
+      m_good = false;
+      return m_good;
     }
 
     // Compute longitude
-    p_longitude = p_centerLongitude +
-                  GetX() / (p_clatRadius * p_cosCenterLatitude);
+    m_longitude = m_centerLongitude +
+                  GetX() / (m_clatRadius * m_cosCenterLatitude);
 
     // Convert to degrees
-    p_latitude *= 180.0 / Isis::PI;
-    p_longitude *= 180.0 / Isis::PI;
+    m_latitude *= 180.0 / PI;
+    m_longitude *= 180.0 / PI;
 
     // Cleanup the longitude
-    if(p_longitudeDirection == PositiveWest) p_longitude *= -1.0;
+    if (m_longitudeDirection == PositiveWest) m_longitude *= -1.0;
     // Do these if the projection is circular
-    //  p_longitude = To360Domain (p_longitude);
-    //  if (p_longitudeDomain == 180) p_longitude = To180Domain(p_longitude);
+    //  m_longitude = To360Domain (m_longitude);
+    //  if (m_longitudeDomain == 180) m_longitude = To180Domain(m_longitude);
 
-    p_good = true;
-    return p_good;
+    m_good = true;
+    return m_good;
   }
 
   /**
@@ -207,20 +267,20 @@ namespace Isis {
   bool Equirectangular::XYRange(double &minX, double &maxX,
                                 double &minY, double &maxY) {
     // Check the corners of the lat/lon range
-    XYRangeCheck(p_minimumLatitude, p_minimumLongitude);
-    XYRangeCheck(p_maximumLatitude, p_minimumLongitude);
-    XYRangeCheck(p_minimumLatitude, p_maximumLongitude);
-    XYRangeCheck(p_maximumLatitude, p_maximumLongitude);
+    XYRangeCheck(m_minimumLatitude, m_minimumLongitude);
+    XYRangeCheck(m_maximumLatitude, m_minimumLongitude);
+    XYRangeCheck(m_minimumLatitude, m_maximumLongitude);
+    XYRangeCheck(m_maximumLatitude, m_maximumLongitude);
 
     // Make sure everything is ordered
-    if(p_minimumX >= p_maximumX) return false;
-    if(p_minimumY >= p_maximumY) return false;
+    if (m_minimumX >= m_maximumX) return false;
+    if (m_minimumY >= m_maximumY) return false;
 
     // Return X/Y min/maxs
-    minX = p_minimumX;
-    maxX = p_maximumX;
-    minY = p_minimumY;
-    maxY = p_maximumY;
+    minX = m_minimumX;
+    maxX = m_maximumX;
+    minY = m_minimumY;
+    maxY = m_maximumY;
     return true;
   }
 
@@ -232,8 +292,8 @@ namespace Isis {
   PvlGroup Equirectangular::Mapping() {
     PvlGroup mapping = Projection::Mapping();
 
-    mapping += p_mappingGrp["CenterLatitude"];
-    mapping += p_mappingGrp["CenterLongitude"];
+    mapping += m_mappingGrp["CenterLatitude"];
+    mapping += m_mappingGrp["CenterLongitude"];
 
     return mapping;
   }
@@ -246,7 +306,7 @@ namespace Isis {
   PvlGroup Equirectangular::MappingLatitudes() {
     PvlGroup mapping = Projection::MappingLatitudes();
 
-    mapping += p_mappingGrp["CenterLatitude"];
+    mapping += m_mappingGrp["CenterLatitude"];
 
     return mapping;
   }
@@ -259,40 +319,25 @@ namespace Isis {
   PvlGroup Equirectangular::MappingLongitudes() {
     PvlGroup mapping = Projection::MappingLongitudes();
 
-    mapping += p_mappingGrp["CenterLongitude"];
+    mapping += m_mappingGrp["CenterLongitude"];
 
     return mapping;
   }
 
-  /**
-   * Compares two Projection objects to see if they are equal
-   *
-   * @param proj Projection object to do comparison on
-   *
-   * @return bool Returns true if the Projection objects are equal, and false if
-   *              they are not
-   */
-  bool Equirectangular::operator== (const Isis::Projection &proj) {
-    if(!Isis::Projection::operator==(proj)) return false;
-    // dont do the below it is a recusive plunge
-    //  if (Isis::Projection::operator!=(proj)) return false;
-    Equirectangular *equi = (Equirectangular *) &proj;
-    if(equi->p_centerLongitude != this->p_centerLongitude) return false;
-    if(equi->p_centerLatitude != this->p_centerLatitude) return false;
-    return true;
-  }
-
-  /**
-   * Returns the latitude of true scale (in the case of Equirectangular it is the
-   * center latitude).
-   *
-   * @return double The center latitude
-   */
-  double Equirectangular::TrueScaleLatitude() const {
-    return p_centerLatitude * 180.0 / Isis::PI;
-  }
 }
 
+/** 
+ * This is the function that is called in order to instantiate a 
+ * Equirectangular object.
+ *  
+ * @param lab Cube labels with appropriate Mapping information.
+ *  
+ * @param allowDefaults Indicates whether CenterLongitude and 
+ *                      CenterLatitude are allowed to be computed.
+ * 
+ * @return @b Isis::Projection* Pointer to a Equirectangular 
+ *                              projection object.
+ */
 extern "C" Isis::Projection *EquirectangularPlugin(Isis::Pvl &lab,
     bool allowDefaults) {
   return new Isis::Equirectangular(lab, allowDefaults);

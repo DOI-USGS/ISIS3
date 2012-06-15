@@ -20,12 +20,18 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include "LambertConformal.h"
+
 #include <cmath>
 #include <cfloat>
-#include "LambertConformal.h"
-#include "IException.h"
+
 #include "Constants.h"
+#include "IException.h"
 #include "iString.h"
+#include "Projection.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
 
 using namespace std;
 namespace Isis {
@@ -46,78 +52,78 @@ namespace Isis {
    *                      the middle of the longitude range specified in the
    *                      labels. Defaults to false.
    *
-   * @throws Isis::iException::Io
+   * @throw IException
    */
-  LambertConformal::LambertConformal(Isis::Pvl &label, bool allowDefaults) :
-    Isis::Projection::Projection(label) {
+  LambertConformal::LambertConformal(Pvl &label, bool allowDefaults) :
+    Projection::Projection(label) {
     try {
       // Try to read the mapping group
-      Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
+      PvlGroup &mapGroup = label.FindGroup("Mapping", Pvl::Traverse);
 
       // Compute and write the default center longitude if allowed and
       // necessary
-      if((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
-        double lon = (p_minimumLongitude + p_maximumLongitude) / 2.0;
-        mapGroup += Isis::PvlKeyword("CenterLongitude", lon);
+      if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
+        double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
+        mapGroup += PvlKeyword("CenterLongitude", lon);
       }
 
       // Compute and write the default center latitude if allowed and
       // necessary
-      if((allowDefaults) && (!mapGroup.HasKeyword("CenterLatitude"))) {
-        double lat = (p_minimumLatitude + p_maximumLatitude) / 2.0;
-        mapGroup += Isis::PvlKeyword("CenterLatitude", lat);
+      if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLatitude"))) {
+        double lat = (m_minimumLatitude + m_maximumLatitude) / 2.0;
+        mapGroup += PvlKeyword("CenterLatitude", lat);
       }
 
       // Get the center longitude  & latitude
-      p_centerLongitude = mapGroup["CenterLongitude"];
-      p_centerLatitude = mapGroup["CenterLatitude"];
-      if(this->IsPlanetocentric()) {
-        p_centerLatitude = this->ToPlanetographic(p_centerLatitude);
+      m_centerLongitude = mapGroup["CenterLongitude"];
+      m_centerLatitude = mapGroup["CenterLatitude"];
+      if (IsPlanetocentric()) {
+        m_centerLatitude = ToPlanetographic(m_centerLatitude);
       }
 
       // Test to make sure center longitude is valid
-      if(fabs(p_centerLongitude) > 360.0) {
-        iString message = "Central Longitude [" + iString(p_centerLongitude);
+      if (fabs(m_centerLongitude) > 360.0) {
+        iString message = "Central Longitude [" + iString(m_centerLongitude);
         message += "] must be between -360 and 360";
         throw IException(IException::Unknown, message, _FILEINFO_);
       }
 
       // convert to radians, adjust for longitude direction
-      p_centerLongitude *= Isis::PI / 180.0;
-      if(p_longitudeDirection == PositiveWest) p_centerLongitude *= -1.0;
+      m_centerLongitude *= PI / 180.0;
+      if (m_longitudeDirection == PositiveWest) m_centerLongitude *= -1.0;
 
       // Get the standard parallels & convert them to ographic
-      p_par1 = mapGroup["FirstStandardParallel"];
-      if(this->IsPlanetocentric()) {
-        p_par1 = this->ToPlanetographic(p_par1);
+      m_par1 = mapGroup["FirstStandardParallel"];
+      if (IsPlanetocentric()) {
+        m_par1 = ToPlanetographic(m_par1);
       }
-      p_par2 = mapGroup["SecondStandardParallel"];
-      if(this->IsPlanetocentric()) {
-        p_par2 = this->ToPlanetographic(p_par2);
+      m_par2 = mapGroup["SecondStandardParallel"];
+      if (IsPlanetocentric()) {
+        m_par2 = ToPlanetographic(m_par2);
       }
 
       // Test to make sure standard parallels are valid
-      if(fabs(p_par1) > 90.0 || fabs(p_par2) > 90.0) {
+      if (fabs(m_par1) > 90.0 || fabs(m_par2) > 90.0) {
         string message = "Standard Parallels must between -90 and 90";
         throw IException(IException::Unknown, message, _FILEINFO_);
       }
-      if(fabs(p_par1 + p_par2) < DBL_EPSILON) {
+      if (fabs(m_par1 + m_par2) < DBL_EPSILON) {
         string message = "Standard Parallels cannot be symmetric to the equator";
         throw IException(IException::Unknown, message, _FILEINFO_);
       }
       // Removed because this test only works for northern hemisphere
       // Just reorder the parallels so p1 is at the larger radius of the two
-      //if (p_par1 > p_par2) {
+      //if (m_par1 > m_par2) {
       //  string message = "Standard Parallels must be ordered";
-      //  throw Isis::iException::Message(Isis::iException::Projection,message,_FILEINFO_);
+      //  throw IException::Message(IException::Projection,message,_FILEINFO_);
       //}
 
       // Reorder the parallels so p1 is closer to the equator than p2
       // Therefore p2 is nearest the apex of the cone
-      if(fabs(p_par1) > fabs(p_par2)) {
-        double tmp = p_par2;
-        p_par2 = p_par1;
-        p_par1 = tmp;
+      if (fabs(m_par1) > fabs(m_par2)) {
+        double tmp = m_par2;
+        m_par2 = m_par1;
+        m_par1 = tmp;
       }
 
       // Test to make sure center latitude is valid
@@ -126,50 +132,52 @@ namespace Isis {
       // Given: p2 is closer to the apex than p1, and p2 must be on the same
       // side of the equator as the apex (due to the reording of p1 and p2 above)
       // Test for cone pointed south "v"
-      if((p_par2 < 0.0) && (fabs(90.0 - p_centerLatitude) < DBL_EPSILON)) {
-        iString message = "Center Latitude [" + iString(p_centerLatitude);
-        message += "] is not valid, it projects to infinity for standard parallels [";
-        message += iString(p_par1) + "," + iString(p_par2) + "]";
+      if ((m_par2 < 0.0) && (fabs(90.0 - m_centerLatitude) < DBL_EPSILON)) {
+        iString message = "Center Latitude [" + iString(m_centerLatitude);
+        message += "] is not valid, it projects to infinity "
+                   "for standard parallels [";
+        message += iString(m_par1) + "," + iString(m_par2) + "]";
         throw IException(IException::Unknown, message, _FILEINFO_);
       }
       // Test for cone pointed north "^"
-      else if((p_par2 > 0.0) && (fabs(-90.0 - p_centerLatitude) < DBL_EPSILON)) {
-        iString message = "Center Latitude [" + iString(p_centerLatitude);
-        message += "] is not valid, it projects to infinity for standard parallels [";
-        message += iString(p_par1) + "," + iString(p_par2) + "]";
+      else if ((m_par2 > 0.0) && (fabs(-90.0 - m_centerLatitude) < DBL_EPSILON)) {
+        iString message = "Center Latitude [" + iString(m_centerLatitude);
+        message += "] is not valid, it projects to infinity "
+                   "for standard parallels [";
+        message += iString(m_par1) + "," + iString(m_par2) + "]";
         throw IException(IException::Unknown, message, _FILEINFO_);
       }
       // convert clat to radians
-      p_centerLatitude *= Isis::PI / 180.0;
+      m_centerLatitude *= PI / 180.0;
 
       // Convert standard parallels to radians
-      p_par1 *= Isis::PI / 180.0;
-      p_par2 *= Isis::PI / 180.0;
+      m_par1 *= PI / 180.0;
+      m_par2 *= PI / 180.0;
 
       // Compute the Snyder's m and t values for the standard parallels and the
       // center latitude
-      double sinpar1 = sin(p_par1);
-      double cospar1 = cos(p_par1);
+      double sinpar1 = sin(m_par1);
+      double cospar1 = cos(m_par1);
       double m1 = mCompute(sinpar1, cospar1);
-      double t1 = tCompute(p_par1, sinpar1);
+      double t1 = tCompute(m_par1, sinpar1);
 
-      double sinpar2 = sin(p_par2);
-      double cospar2 = cos(p_par2);
+      double sinpar2 = sin(m_par2);
+      double cospar2 = cos(m_par2);
       double m2 = mCompute(sinpar2, cospar2);
-      double t2 = tCompute(p_par2, sinpar2);
+      double t2 = tCompute(m_par2, sinpar2);
 
-      double sinclat = sin(p_centerLatitude);
-      double tclat = tCompute(p_centerLatitude, sinclat);
+      double sinclat = sin(m_centerLatitude);
+      double tclat = tCompute(m_centerLatitude, sinclat);
 
       // Calculate Snyder's n, f, and rho
-      if(fabs(p_par1 - p_par2) >= DBL_EPSILON) {
-        p_n = log(m1 / m2) / log(t1 / t2);
+      if (fabs(m_par1 - m_par2) >= DBL_EPSILON) {
+        m_n = log(m1 / m2) / log(t1 / t2);
       }
       else {
-        p_n = sinpar1;
+        m_n = sinpar1;
       }
-      p_f = m1 / (p_n * pow(t1, p_n));
-      p_rho = p_equatorialRadius * p_f * pow(tclat, p_n);
+      m_f = m1 / (m_n * pow(t1, m_n));
+      m_rho = m_equatorialRadius * m_f * pow(tclat, m_n);
     }
     catch(IException &e) {
       string message = "Invalid label group [Mapping]";
@@ -179,6 +187,54 @@ namespace Isis {
 
   //! Destroys the LambertConformal object
   LambertConformal::~LambertConformal() {
+  }
+
+  /**
+   * Compares two Projection objects to see if they are equal
+   *
+   * @param proj Projection object to do comparison on
+   *
+   * @return bool Returns true if the Projection objects are equal, and false if
+   *              they are not
+   */
+  bool LambertConformal::operator== (const Projection &proj) {
+    if (!Projection::operator==(proj)) return false;
+    // dont do the below it is a recusive plunge
+    //  if (Projection::operator!=(proj)) return false;
+    LambertConformal *lamb = (LambertConformal *) &proj;
+    if ((lamb->m_centerLongitude != m_centerLongitude) ||
+        (lamb->m_centerLatitude != m_centerLatitude)) return false;
+    return true;
+  }
+
+  /**
+   * Returns the name of the map projection, "LambertConformal"
+   *
+   * @return string Name of projection, "LambertConformal"
+   */
+  string LambertConformal::Name() const {
+    return "LambertConformal";
+  }
+
+  /**
+   * Returns the version of the map projection
+   *
+   *
+   * @return string Version number
+   */
+  string LambertConformal::Version() const {
+    return "1.0";
+  }
+
+  /**
+   * Returns the latitude of true scale (in the case of LambertConformal
+   * it is the smaller of the two standard parallels)
+   *
+   * @return double The true scale latitude, in degrees
+   */
+  double LambertConformal::TrueScaleLatitude() const {
+    if (m_par1 > m_par2) return m_par2 * 180.0 / PI;
+    else return m_par1 * 180.0 / PI;
   }
 
   /**
@@ -195,23 +251,23 @@ namespace Isis {
    */
   bool LambertConformal::SetGround(const double lat, const double lon) {
     // Convert longitude to radians & clean up
-    p_longitude = lon;
-    double lonRadians = lon * Isis::PI / 180.0;
-    if(p_longitudeDirection == PositiveWest) lonRadians *= -1.0;
+    m_longitude = lon;
+    double lonRadians = lon * PI / 180.0;
+    if (m_longitudeDirection == PositiveWest) lonRadians *= -1.0;
 
     // Now convert latitude to radians & clean up ... it must be planetographic
-    p_latitude = lat;
+    m_latitude = lat;
     double latRadians = lat;
-    if(IsPlanetocentric()) latRadians = ToPlanetographic(latRadians);
-    latRadians *= Isis::PI / 180.0;
+    if (IsPlanetocentric()) latRadians = ToPlanetographic(latRadians);
+    latRadians *= PI / 180.0;
 
     // Check for special cases & calculate rh, theta, and snyder t
     double rh;
-    if(fabs(fabs(latRadians) - Isis::HALFPI) < DBL_EPSILON) {
+    if (fabs(fabs(latRadians) - HALFPI) < DBL_EPSILON) {
       // Lat/Lon point cannot be projected
-      if(latRadians *p_n <= 0.0) {
-        p_good = false;
-        return p_good;
+      if (latRadians *m_n <= 0.0) {
+        m_good = false;
+        return m_good;
       }
       else rh = 0.0;
     }
@@ -219,17 +275,17 @@ namespace Isis {
       double sinlat = sin(latRadians);
       // Lat/Lon point cannot be projected
       double t = tCompute(latRadians, sinlat);
-      rh = p_equatorialRadius * p_f * pow(t, p_n);
+      rh = m_equatorialRadius * m_f * pow(t, m_n);
     }
-    double theta = p_n * (lonRadians - p_centerLongitude);
+    double theta = m_n * (lonRadians - m_centerLongitude);
 
     // Compute the coordinate
     double x = rh * sin(theta);
-    double y = p_rho - rh * cos(theta);
+    double y = m_rho - rh * cos(theta);
     SetComputedXY(x, y);
 
-    p_good = true;
-    return p_good;
+    m_good = true;
+    return m_good;
   }
 
   /**
@@ -251,40 +307,40 @@ namespace Isis {
 
     // Get the sign of Snyder's n
     double sign;
-    if(p_n >= 0) sign = 1.0;
+    if (m_n >= 0) sign = 1.0;
     else sign = -1.0;
 
-    double temp = p_rho - GetY();
+    double temp = m_rho - GetY();
     double rh = sign * sqrt(GetX() * GetX() + temp * temp);
 
     double theta;
-    if(rh != 0) theta = atan2(sign * GetX(), sign * temp);
+    if (rh != 0) theta = atan2(sign * GetX(), sign * temp);
     else theta = 0.0;
 
     // Compute latitude and longitude
-    if(rh != 0 || p_n > 0) {
-      double t = pow(rh / (p_equatorialRadius * p_f), 1.0 / p_n);
-      p_latitude = phi2Compute(t);
+    if (rh != 0 || m_n > 0) {
+      double t = pow(rh / (m_equatorialRadius * m_f), 1.0 / m_n);
+      m_latitude = phi2Compute(t);
     }
-    else p_latitude = -Isis::HALFPI;
-    p_longitude = theta / p_n + p_centerLongitude;
+    else m_latitude = -HALFPI;
+    m_longitude = theta / m_n + m_centerLongitude;
 
 
     // Convert to degrees
-    p_latitude *= 180.0 / Isis::PI;
-    p_longitude *= 180.0 / Isis::PI;
+    m_latitude *= 180.0 / PI;
+    m_longitude *= 180.0 / PI;
 
     // Cleanup the longitude
-    if(p_longitudeDirection == PositiveWest) p_longitude *= -1.0;
+    if (m_longitudeDirection == PositiveWest) m_longitude *= -1.0;
     // These need to be done for circular type projections
-    //  p_longitude = To360Domain (p_longitude);
-    //  if (p_longitudeDomain == 180) p_longitude = To180Domain(p_longitude);
+    //  m_longitude = To360Domain (m_longitude);
+    //  if (m_longitudeDomain == 180) m_longitude = To180Domain(m_longitude);
 
     // Cleanup the latitude
-    if(IsPlanetocentric()) p_latitude = ToPlanetocentric(p_latitude);
+    if (IsPlanetocentric()) m_latitude = ToPlanetocentric(m_latitude);
 
-    p_good = true;
-    return p_good;
+    m_good = true;
+    return m_good;
   }
 
   /**
@@ -318,120 +374,124 @@ namespace Isis {
    *                      latitude. It now only tests for the pole opposite the
    *                      apex of the cone.
    */
-  bool LambertConformal::XYRange(double &minX, double &maxX, double &minY, double &maxY) {
+  bool LambertConformal::XYRange(double &minX, double &maxX, 
+                                 double &minY, double &maxY) {
 
     // Test the four corners
-    XYRangeCheck(p_minimumLatitude, p_minimumLongitude);
-    XYRangeCheck(p_minimumLatitude, p_maximumLongitude);
-    XYRangeCheck(p_maximumLatitude, p_minimumLongitude);
-    XYRangeCheck(p_maximumLatitude, p_maximumLongitude);
+    XYRangeCheck(m_minimumLatitude, m_minimumLongitude);
+    XYRangeCheck(m_minimumLatitude, m_maximumLongitude);
+    XYRangeCheck(m_maximumLatitude, m_minimumLongitude);
+    XYRangeCheck(m_maximumLatitude, m_maximumLongitude);
 
     // Decide which pole the apex of the cone is above
-    // Remember p1 is now closest to the equator and p2 is closest to one of the poles
+    // Remember p1 is now closest to the equator and p2 is closest to one of the
+    // poles
     bool north_hemi = true;
     // Stuart Sides 2008-08-15
     // This test was removed because the reordering of p1 and p2 in the
     // constructor made it incorrect
-    //if (fabs(p_par1) > fabs(p_par2)) north_hemi = false;
-    if(p_par2 < 0.0) north_hemi = false;
-    if((p_par1 == p_par2) && (p_par1 < 0.0)) north_hemi = false;
+    //if (fabs(m_par1) > fabs(m_par2)) north_hemi = false;
+    if (m_par2 < 0.0) north_hemi = false;
+    if ((m_par1 == m_par2) && (m_par1 < 0.0)) north_hemi = false;
 
-    double cLonDeg = p_centerLongitude * 180.0 / Isis::PI;
+    double cLonDeg = m_centerLongitude * 180.0 / PI;
 
     //  This is needed because the SetGround class applies the PositiveWest
     //  adjustment which was already done in the constructor.
-    if(p_longitudeDirection == PositiveWest) cLonDeg = cLonDeg * -1.0;
+    if (m_longitudeDirection == PositiveWest) cLonDeg = cLonDeg * -1.0;
 
     double pole_north, min_lat_north, max_lat_north, londiff;
     // North Pole
-    if(north_hemi) {
-      p_latitude = 90.0;
-      p_longitude = cLonDeg;
+    if (north_hemi) {
+      m_latitude = 90.0;
+      m_longitude = cLonDeg;
 
       //Unable to project at the pole
-      if(!SetGround(p_latitude, p_longitude)) {
-        p_good = false;
-        return p_good;
+      if (!SetGround(m_latitude, m_longitude)) {
+        m_good = false;
+        return m_good;
       }
 
       pole_north = YCoord();
-      p_latitude = p_minimumLatitude;
+      m_latitude = m_minimumLatitude;
 
       //Unable to project at the pole
-      if(!SetGround(p_latitude, p_longitude)) {
-        p_good = false;
-        return p_good;
+      if (!SetGround(m_latitude, m_longitude)) {
+        m_good = false;
+        return m_good;
       }
 
       min_lat_north = YCoord();
       double y = min_lat_north + 2.0 * (pole_north - min_lat_north);
 
       //Unable to project opposite the center longitude
-      if(!SetCoordinate(XCoord(), y)) {
-        p_good = false;
-        return p_good;
+      if (!SetCoordinate(XCoord(), y)) {
+        m_good = false;
+        return m_good;
       }
 
-      londiff = fabs(cLonDeg - p_longitude) / 2.0;
-      p_longitude = cLonDeg - londiff;
-      for(int i = 0; i < 3; i++) {
-        if((p_longitude >= p_minimumLongitude) && (p_longitude <= p_maximumLongitude)) {
-          p_latitude = p_minimumLatitude;
-          XYRangeCheck(p_latitude, p_longitude);
+      londiff = fabs(cLonDeg - m_longitude) / 2.0;
+      m_longitude = cLonDeg - londiff;
+      for (int i = 0; i < 3; i++) {
+        if ((m_longitude >= m_minimumLongitude) 
+            && (m_longitude <= m_maximumLongitude)) {
+          m_latitude = m_minimumLatitude;
+          XYRangeCheck(m_latitude, m_longitude);
         }
-        p_longitude += londiff;
+        m_longitude += londiff;
       }
 
     }
     // South Pole
     else {
-      p_latitude = -90.0;
-      p_longitude = cLonDeg;
+      m_latitude = -90.0;
+      m_longitude = cLonDeg;
 
       //Unable to project at the pole
-      if(!SetGround(p_latitude, p_longitude)) {
-        p_good = false;
-        return p_good;
+      if (!SetGround(m_latitude, m_longitude)) {
+        m_good = false;
+        return m_good;
       }
 
       pole_north = YCoord();
-      p_latitude = p_maximumLatitude;
+      m_latitude = m_maximumLatitude;
 
       //Unable to project at the pole
-      if(!SetGround(p_latitude, p_longitude)) {
-        p_good = false;
-        return p_good;
+      if (!SetGround(m_latitude, m_longitude)) {
+        m_good = false;
+        return m_good;
       }
 
       max_lat_north = YCoord();
       double y = max_lat_north - 2.0 * (max_lat_north - pole_north);
 
       //Unable to project opposite the center longitude
-      if(!SetCoordinate(XCoord(), y)) {
-        p_good = false;
-        return p_good;
+      if (!SetCoordinate(XCoord(), y)) {
+        m_good = false;
+        return m_good;
       }
 
-      londiff = fabs(cLonDeg - p_longitude) / 2.0;
-      p_longitude = cLonDeg - londiff;
-      for(int i = 0; i < 3; i++) {
-        if((p_longitude >= p_minimumLongitude) && (p_longitude <= p_maximumLongitude)) {
-          p_latitude = p_maximumLatitude;
-          XYRangeCheck(p_latitude, p_longitude);
+      londiff = fabs(cLonDeg - m_longitude) / 2.0;
+      m_longitude = cLonDeg - londiff;
+      for (int i = 0; i < 3; i++) {
+        if ((m_longitude >= m_minimumLongitude) 
+            && (m_longitude <= m_maximumLongitude)) {
+          m_latitude = m_maximumLatitude;
+          XYRangeCheck(m_latitude, m_longitude);
         }
-        p_longitude += londiff;
+        m_longitude += londiff;
       }
     }
 
     // Make sure everything is ordered
-    if(p_minimumX >= p_maximumX) return false;
-    if(p_minimumY >= p_maximumY) return false;
+    if (m_minimumX >= m_maximumX) return false;
+    if (m_minimumY >= m_maximumY) return false;
 
     // Return X/Y min/maxs
-    minX = p_minimumX;
-    maxX = p_maximumX;
-    minY = p_minimumY;
-    maxY = p_maximumY;
+    minX = m_minimumX;
+    maxX = m_maximumX;
+    minY = m_minimumY;
+    maxY = m_maximumY;
     return true;
   }
 
@@ -444,10 +504,10 @@ namespace Isis {
   PvlGroup LambertConformal::Mapping() {
     PvlGroup mapping = Projection::Mapping();
 
-    mapping += p_mappingGrp["CenterLatitude"];
-    mapping += p_mappingGrp["CenterLongitude"];
-    mapping += p_mappingGrp["FirstStandardParallel"];
-    mapping += p_mappingGrp["SecondStandardParallel"];
+    mapping += m_mappingGrp["CenterLatitude"];
+    mapping += m_mappingGrp["CenterLongitude"];
+    mapping += m_mappingGrp["FirstStandardParallel"];
+    mapping += m_mappingGrp["SecondStandardParallel"];
 
     return mapping;
   }
@@ -460,9 +520,9 @@ namespace Isis {
   PvlGroup LambertConformal::MappingLatitudes() {
     PvlGroup mapping = Projection::MappingLatitudes();
 
-    mapping += p_mappingGrp["CenterLatitude"];
-    mapping += p_mappingGrp["FirstStandardParallel"];
-    mapping += p_mappingGrp["SecondStandardParallel"];
+    mapping += m_mappingGrp["CenterLatitude"];
+    mapping += m_mappingGrp["FirstStandardParallel"];
+    mapping += m_mappingGrp["SecondStandardParallel"];
 
     return mapping;
   }
@@ -475,30 +535,25 @@ namespace Isis {
   PvlGroup LambertConformal::MappingLongitudes() {
     PvlGroup mapping = Projection::MappingLongitudes();
 
-    mapping += p_mappingGrp["CenterLongitude"];
+    mapping += m_mappingGrp["CenterLongitude"];
 
     return mapping;
   }
-
-  /**
-   * Compares two Projection objects to see if they are equal
-   *
-   * @param proj Projection object to do comparison on
-   *
-   * @return bool Returns true if the Projection objects are equal, and false if
-   *              they are not
-   */
-  bool LambertConformal::operator== (const Isis::Projection &proj) {
-    if(!Isis::Projection::operator==(proj)) return false;
-    // dont do the below it is a recusive plunge
-    //  if (Isis::Projection::operator!=(proj)) return false;
-    LambertConformal *lamb = (LambertConformal *) &proj;
-    if((lamb->p_centerLongitude != this->p_centerLongitude) ||
-        (lamb->p_centerLatitude != this->p_centerLatitude)) return false;
-    return true;
-  }
 } // end namespace isis
 
+/** 
+ * This is the function that is called in order to instantiate a 
+ * LambertConformal object.
+ *  
+ * @param lab Cube labels with appropriate Mapping information.
+ *  
+ * @param allowDefaults If the labels do not contain the values for 
+ *                      CenterLongitude, FirstStandardParallel, and
+ *                      SecondStandardParallel, this method indicates
+ *                      whether the constructor should compute these values.
+ * 
+ * @return @b Isis::Projection* Pointer to a LambertConformal projection object.
+ */
 extern "C" Isis::Projection *LambertConformalPlugin(Isis::Pvl &lab,
     bool allowDefaults) {
   return new Isis::LambertConformal(lab, allowDefaults);

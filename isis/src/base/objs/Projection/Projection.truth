@@ -1,67 +1,80 @@
-Unit test for Isis::Projection ...
+Unit test for Projection ...
+
+///////////////////////////////////////////////////////////
+Test Error Throws from the contructor...
 
 Test for missing Mapping Group
-**ERROR** Invalid label group [Mapping].
+**ERROR** Projection failed.  Invalid label group [Mapping].
 **ERROR** Unable to find PVL group [Mapping].
 
-Test for missing Equatorial Radius
-**ERROR** Invalid label group [Mapping].
-**ERROR** No target radii available through keywords [EquatorialRadius and PolarRadius] or [TargetName].
+Test for missing Equatorial Radius in the mapping group
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. No target radii are available through keywords [EquatorialRadius and PolarRadius] or [TargetName].
 
-Test for missing polar radius
-**ERROR** Invalid label group [Mapping].
-**ERROR** No target radii available through keywords [EquatorialRadius and PolarRadius] or [TargetName].
+Test for missing polar radius in the mapping group
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. No target radii are available through keywords [EquatorialRadius and PolarRadius] or [TargetName].
 
-Test for invalid Equatoral Radius
-**ERROR** Invalid label group [Mapping].
-**ERROR** Invalid value for keyword [EquatorialRadius] it must be greater than zero.
+Test for invalid Equatoral Radius value
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. Invalid value for keyword [EquatorialRadius]. It must be greater than zero.
 
-Test for invalid polar radius
-**ERROR** Invalid label group [Mapping].
-**ERROR** Invalid value for keyword [PolarRadius] it must be greater than zero.
+Test for invalid polar radius value
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. Invalid value for keyword [PolarRadius]. It must be greater than zero.
 
-Test for missing latitude type
-**ERROR** Invalid label group [Mapping].
+Test for missing latitude type in the mapping group
+**ERROR** Projection failed.  Invalid label group [Mapping].
 **ERROR** PVL Keyword [LatitudeType] does not exist in [Group = Mapping].
 
-Test for invalid latitude type
-**ERROR** Invalid label group [Mapping].
-**ERROR** Invalid value for keyword [LatitudeType] must be [Planetographic or Planetocentric].
+Test for invalid latitude type value
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. Invalid value for keyword [LatitudeType] must be [Planetographic or Planetocentric].
 
-Test for missing longitude direction
-**ERROR** Invalid label group [Mapping].
+Test for missing longitude direction in the mapping group
+**ERROR** Projection failed.  Invalid label group [Mapping].
 **ERROR** PVL Keyword [LongitudeDirection] does not exist in [Group = Mapping].
 
-Test for invalid longitude direction
-**ERROR** Invalid label group [Mapping].
-**ERROR** Invalid value for keyword [LongitudeDirection] must be [PositiveWest or PositiveEast].
+Test for invalid longitude direction value
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. Invalid value for keyword [LongitudeDirection] must be [PositiveWest or PositiveEast].
 
-Test for missing longitude domain
-**ERROR** Invalid label group [Mapping].
+Test for missing longitude domain in the mapping group
+**ERROR** Projection failed.  Invalid label group [Mapping].
 **ERROR** PVL Keyword [LongitudeDomain] does not exist in [Group = Mapping].
 
-Test for invalid longitude domain
-**ERROR** Invalid label group [Mapping].
-**ERROR** Invalid value for keyword [LongitudeDomain] must be [180 or 360].
+Test for invalid longitude domain value in the mapping group
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. Invalid value for keyword [LongitudeDomain] must be [180 or 360].
+///////////////////////////////////////////////////////////
 
 Projection Specifications
-Equatorial Radius:     1
-Polar Radius:          0.95
-Eccentricity:          0.3122498999199
-Is Planetographic:     1
-Is Planetocentric:     0
-Is PositiveEast:       1
-Is PositiveWest:       0
-Has 360 domain:        1
-Has 180 domain:        0
-Has ground range:      0
-Rotation:              0
+Equatorial Radius:         1
+Polar Radius:              0.95
+Eccentricity:              0.3122498999199
+Is Equatorial Cylindrical: 0
+Latitude Type:             Planetographic
+Is Planetographic:         1
+Is Planetocentric:         0
+Longitude Direction:       PositiveEast
+Is PositiveEast:           1
+Is PositiveWest:           0
+Longitude Domain:          360
+Has 360 domain:            1
+Has 180 domain:            0
+Has ground range:          0
+Rotation:                  0
 
 Testing conversion methods
-Bring -50  into 360 Domain:  310
-Bring  50  into 360 Domain:  50
-Bring   0  into 360 Domain:  0
-Bring 360-e  into 360 Domain:  359.9999999999
+Bring -50   into 360 Domain:  310
+Bring   0-e into 360 Domain:  359.9999999999
+Bring   0   into 360 Domain:  0
+Bring   0+e into 360 Domain:  1e-10
+Bring  50   into 360 Domain:  50
+Bring 360-e into 360 Domain:  359.9999999999
+Bring 360   into 360 Domain:  360
+Bring 360+e into 360 Domain:  360.0000000001
+Bring 380   into 360 Domain:  20
 
 Bring 240  into 180 Domain:  -120
 Bring 140  into 180 Domain:  140
@@ -82,27 +95,40 @@ Change  90 to planetocentric: 90
 ocentric to ographic to ocentric = 45
 ographic to ocentric to ographic = 45
 
+///////////////////////////////////////////////////////////
+Test More Error Throws...
+
 Testing unordered latitude range
-**ERROR** Invalid label group [Mapping].
-**ERROR** [MinimumLatitude,MaximumLatitude] of [45.0,-80.0] are not properly ordered.
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. [MinimumLatitude,MaximumLatitude] of [45.0,-80.0] are not properly ordered.
 
 Testing invalid minimum latitude
-**ERROR** Invalid label group [Mapping].
-**ERROR** [MinimumLatitude] of [-95.0] is outside the range of [-90:90].
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. [MinimumLatitude] of [-95.0] is outside the range of [-90:90].
 
 Testing invalid maximum latitude
-**ERROR** Invalid label group [Mapping].
-**ERROR** [MaximumLatitude] of [95.0] is outside the range of [-90:90].
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. [MaximumLatitude] of [95.0] is outside the range of [-90:90].
 
 Testing unordered longitude range
-**ERROR** Invalid label group [Mapping].
-**ERROR** [MinimumLongitude,MaximumLongitude] of [15.0,-190.0] are not properly ordered.
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. [MinimumLongitude,MaximumLongitude] of [15.0,-190.0] are not properly ordered.
+///////////////////////////////////////////////////////////
 
+Testing xyRange methods...
+
+Get ground range from the labels...  
 Has as longitude range:  1
 Minimum latitude:        45
 Maximum latitude:        80
 Minimum longitude:       15
 Maximum longitude:       190
+Find coordinate range ...  
+Minimum X:              150
+Maximum X:              1900
+Minimum Y:              135
+Maximum Y:              170
+Find coordinate range using xyRangeOblique...  
 Minimum X:              150
 Maximum X:              1900
 Minimum Y:              135
@@ -174,6 +200,7 @@ PositiveEast
 
 Testing Name and comparision routines
 Name:        None
+Version:     1.0
 operator==:  0
 operator!=:  1
 
@@ -186,48 +213,85 @@ Testing radius methods
 1
 0.95
 0.95
+
+///////////////////////////////////////////////////////////
+Test Error Throws for null input for LocalRadius 
+**ERROR** Unable to calculate local radius. The given latitude value [-1.79769313486231e+308] is invalid.
+///////////////////////////////////////////////////////////
+
 Testing compute methods 
-1
-0.4442906125131
-0
-1
-0.7249994335944
-1.050824192444
-1.570796326795
--1.390161104192
--1.552715454644
--1.568988222422
+tCompute(0,sin(0)):             1
+tCompute(pi/4,sin(pi/4)):       0.4442906125131
+tCompute(pi/2,sin(pi/2)):       0
+mCompute(sin(0),cos(0)):        1
+mCompute(sin(pi/4),cos(pi/4)):  0.7249994335944
+e4Compute():                    1.050824192444
+phi2Compute(0):                 1.570796326795
+phi2Compute(10):                -1.390161104192
+phi2Compute(100):               -1.552715454644
+phi2Compute(1000):              -1.568988222422
+qCompute(sin(0)):               0
+
+///////////////////////////////////////////////////////////
+Test Error Throw for compute methods...
+**ERROR** Snyder's q variable should only be computed for ellipsoidal projections.
+///////////////////////////////////////////////////////////
 
 Testing static conversion methods 
-0 degrees in hours: 0
-0 degrees in HMS format: 00h 00m 00.0s
-0 degrees in DMS format: 0 00m 00.0s
-30.5 degrees in hours: 2.033333333333
-30.5 degrees in HMS format: 02h 02m 00.0s
-30.5 degrees in DMS format: 30 30m 00.0s
-40.3472 degrees in hours: 2.689813333333
-40.3472 degrees in HMS format: 02h 41m 23.328s
-40.3472 degrees in DMS format: 40 20m 49.920s
-45 degrees in Hours: 3
-45 degrees in HMS format: 03h 00m 00.0s
-45 degrees in DMS format: 45 00m 00.0s
-180 degrees in Hours: 12
-180 degrees in HMS format: 12h 00m 00.0s
-180 degrees in DMS format: 180 00m 00.0s
-360 degrees in Hours: 24
-360 degrees in HMS format: 24h 00m 00.0s
-360 degrees in DMS format: 360 00m 00.0s
+ 0 degrees in hours: 0
+ 0 degrees in HMS format: 00h 00m 00.0s
+ 0 degrees in DMS format: 0 00m 00.0s
+ 30.5 degrees in hours: 2.033333333333
+ 30.5 degrees in HMS format: 02h 02m 00.0s
+ 30.5 degrees in DMS format: 30 30m 00.0s
+ 40.3472 degrees in hours: 2.689813333333
+ 40.3472 degrees in HMS format: 02h 41m 23.328s
+ 40.3472 degrees in DMS format: 40 20m 49.920s
+ 45 degrees in Hours: 3
+ 45 degrees in HMS format: 03h 00m 00.0s
+ 45 degrees in DMS format: 45 00m 00.0s
+ 180 degrees in Hours: 12
+ 180 degrees in HMS format: 12h 00m 00.0s
+ 180 degrees in DMS format: 180 00m 00.0s
+ 360 degrees in Hours: 24
+ 360 degrees in HMS format: 24h 00m 00.0s
+ 360 degrees in DMS format: 360 00m 00.0s
 -390 To180Domain:          -30
 -390 To360Domain:          330
-50 to Planetocentric (sphere): 50
-50 to Planetographic (sphere): 50
--30 ToPositiveEast (180 domain): 30
-30 ToPositiveWest (360 domain):  330
+ 50 to Planetocentric (sphere): 50
+ 50 to Planetographic (sphere): 50
+-30 ToPositiveEast (180 domain):  30
+ 30 ToPositiveEast (360 domain): 330
+ 30 ToPositiveWest (180 domain): -30
+-30 ToPositiveWest (360 domain):  30
+
+///////////////////////////////////////////////////////////
+Test Error Throws for invalid inputs to conversion methods 
+**ERROR** Unable to convert to 180 degree domain. The given longitude value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert to 360 degree domain. The given longitude value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert to Planetocentric. The given latitude value [-100.0] is invalid.
+**ERROR** Unable to convert to Planetocentric. The given latitude value [100.0] is invalid.
+**ERROR** Unable to convert to Planetocentric. The given latitude value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert to Planetocentric. The given latitude value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert to Planetographic. The given latitude value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert to Planetographic. The given latitude value [-100.0] is invalid.
+**ERROR** Unable to convert to Planetographic. The given latitude value [100.0] is invalid.
+**ERROR** Unable to convert to Planetographic. The given latitude value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert to PositiveEast. The given longitude value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert longitude.  Domain [-2147483648] is not 180 or 360.
+**ERROR** Unable to convert to PositiveWest. The given longitude value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert longitude.  Domain [-2147483648] is not 180 or 360.
+**ERROR** Unable to convert to projection x.  The given x-value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert to projection y.  The given y-value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert to world x.  The given x-value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert to world y.  The given y-value [-1.79769313486231e+308] is invalid.
+///////////////////////////////////////////////////////////
 
 
 Testing other static methods 
 Mars equatorial radius: EquatorialRadius = 3396190.0 <meters>
 Mars polar radius: PolarRadius = 3376200.0 <meters>
+
 Rotation Tests
 Rotation:     90
 Testing Ground coordinate routines

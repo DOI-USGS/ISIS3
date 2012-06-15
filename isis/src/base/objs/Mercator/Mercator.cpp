@@ -20,11 +20,17 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include "Mercator.h"
+
 #include <cmath>
 #include <cfloat>
-#include "Mercator.h"
+
 #include "IException.h"
 #include "Constants.h"
+#include "Projection.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
 
 using namespace std;
 namespace Isis {
@@ -42,45 +48,45 @@ namespace Isis {
    *                      middle of the longitude range specified in the labels.
    *                      Defaults to false.
    *
-   * @throws Isis::iException::Io
+   * @throw IException
    */
-  Mercator::Mercator(Isis::Pvl &label, bool allowDefaults) :
-    Isis::Projection::Projection(label) {
+  Mercator::Mercator(Pvl &label, bool allowDefaults) :
+    Projection::Projection(label) {
     try {
       // Try to read the mapping group
-      Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
+      PvlGroup &mapGroup = label.FindGroup("Mapping", Pvl::Traverse);
 
       // Compute and write the default center longitude if allowed and
       // necessary
-      if((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
-        double lon = (p_minimumLongitude + p_maximumLongitude) / 2.0;
-        mapGroup += Isis::PvlKeyword("CenterLongitude", lon);
+      if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
+        double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
+        mapGroup += PvlKeyword("CenterLongitude", lon);
       }
 
       // Compute and write the default center latitude if allowed and
       // necessary
-      if((allowDefaults) && (!mapGroup.HasKeyword("CenterLatitude"))) {
-        double lat = (p_minimumLatitude + p_maximumLatitude) / 2.0;
-        mapGroup += Isis::PvlKeyword("CenterLatitude", lat);
+      if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLatitude"))) {
+        double lat = (m_minimumLatitude + m_maximumLatitude) / 2.0;
+        mapGroup += PvlKeyword("CenterLatitude", lat);
       }
 
       // Get the center longitude  & latitude
-      p_centerLongitude = mapGroup["CenterLongitude"];
-      p_centerLatitude = mapGroup["CenterLatitude"];
-      if(this->IsPlanetocentric()) {
-        p_centerLatitude = this->ToPlanetographic(p_centerLatitude);
+      m_centerLongitude = mapGroup["CenterLongitude"];
+      m_centerLatitude = mapGroup["CenterLatitude"];
+      if (IsPlanetocentric()) {
+        m_centerLatitude = ToPlanetographic(m_centerLatitude);
       }
 
       // convert to radians, adjust for longitude direction
-      p_centerLongitude *= Isis::PI / 180.0;
-      p_centerLatitude *= Isis::PI / 180.0;
-      if(p_longitudeDirection == PositiveWest) p_centerLongitude *= -1.0;
+      m_centerLongitude *= PI / 180.0;
+      m_centerLatitude *= PI / 180.0;
+      if (m_longitudeDirection == PositiveWest) m_centerLongitude *= -1.0;
 
       // Compute the scale factor
-      double cos_clat = cos(p_centerLatitude);
-      double sin_clat = sin(p_centerLatitude);
-      double p_eccsq = Eccentricity() * Eccentricity();
-      p_scalefactor = cos_clat / sqrt(1.0 - p_eccsq * sin_clat * sin_clat);
+      double cos_clat = cos(m_centerLatitude);
+      double sin_clat = sin(m_centerLatitude);
+      double m_eccsq = Eccentricity() * Eccentricity();
+      m_scalefactor = cos_clat / sqrt(1.0 - m_eccsq * sin_clat * sin_clat);
     }
     catch (IException &e) {
       string message = "Invalid label group [Mapping]";
@@ -90,6 +96,62 @@ namespace Isis {
 
   //! Destroys the Mercator object
   Mercator::~Mercator() {
+  }
+
+  /**
+   * Compares two Projection objects to see if they are equal
+   *
+   * @param proj Projection object to do comparison on
+   *
+   * @return bool Returns true if the Projection objects are equal, and false if
+   *              they are not
+   */
+  bool Mercator::operator== (const Projection &proj) {
+    if (!Projection::operator==(proj)) return false;
+    // don't do the below it is a recusive plunge
+    //  if (Projection::operator!=(proj)) return false;
+    Mercator *merc = (Mercator *) &proj;
+    if ((merc->m_centerLongitude != m_centerLongitude) ||
+        (merc->m_centerLatitude != m_centerLatitude)) return false;
+    return true;
+  }
+
+  /**
+   * Returns the name of the map projection, "Mercator"
+   *
+   * @return string Name of projection, "Mercator"
+   */
+  string Mercator::Name() const {
+    return "Mercator";
+  }
+
+  /**
+   * Returns the version of the map projection
+   *
+   *
+   * @return string Version number
+   */
+  string Mercator::Version() const {
+    return "1.0";
+  }
+
+  /**
+   * Returns the latitude of true scale in degrees.  For 
+   * Mercator projections, it is the center latitude. 
+   *
+   * @return double The center latitude, in degrees.
+   */
+  double Mercator::TrueScaleLatitude() const {
+    return m_centerLatitude * 180.0 / PI;
+  }
+
+  /**
+   * Indicates whether the projection is Equitorial Cylindrical.
+   * 
+   * @return @b bool True if the projection is cylindrical. 
+   */
+  bool Mercator::IsEquatorialCylindrical() {
+    return true;
   }
 
   /**
@@ -106,31 +168,31 @@ namespace Isis {
    */
   bool Mercator::SetGround(const double lat, const double lon) {
     // Convert longitude to radians & clean up
-    p_longitude = lon;
-    double lonRadians = lon * Isis::PI / 180.0;
-    if(p_longitudeDirection == PositiveWest) lonRadians *= -1.0;
+    m_longitude = lon;
+    double lonRadians = lon * PI / 180.0;
+    if (m_longitudeDirection == PositiveWest) lonRadians *= -1.0;
 
     // Now convert latitude to radians & clean up ... it must be planetographic
-    p_latitude = lat;
+    m_latitude = lat;
     double latRadians = lat;
-    if(IsPlanetocentric()) latRadians = ToPlanetographic(latRadians);
-    latRadians *= Isis::PI / 180.0;
+    if (IsPlanetocentric()) latRadians = ToPlanetographic(latRadians);
+    latRadians *= PI / 180.0;
 
     // Make sure latitude value is not too close to either pole
-    if(fabs(fabs(p_latitude) - 90.0) <= DBL_EPSILON) {
-      p_good = false;
-      return p_good;
+    if (fabs(fabs(m_latitude) - 90.0) <= DBL_EPSILON) {
+      m_good = false;
+      return m_good;
     }
 
     // Compute the coordinate
-    double deltaLon = (lonRadians - p_centerLongitude);
-    double x = p_equatorialRadius * deltaLon * p_scalefactor;
+    double deltaLon = (lonRadians - m_centerLongitude);
+    double x = m_equatorialRadius * deltaLon * m_scalefactor;
     double sinphi = sin(latRadians);
     double t = tCompute(latRadians, sinphi);
-    double y = -p_equatorialRadius * p_scalefactor * log(t);
+    double y = -m_equatorialRadius * m_scalefactor * log(t);
     SetComputedXY(x, y);
-    p_good = true;
-    return p_good;
+    m_good = true;
+    return m_good;
   }
 
   /**
@@ -151,48 +213,48 @@ namespace Isis {
     SetXY(x, y);
 
     // Compute Snyder's t
-    double snyders_t = exp(-GetY() / (p_equatorialRadius * p_scalefactor));
+    double snyders_t = exp(-GetY() / (m_equatorialRadius * m_scalefactor));
 
     // Compute latitude and make sure it is not above 90
-    p_latitude = phi2Compute(snyders_t);
-    if(fabs(p_latitude) > Isis::HALFPI) {
-      if(fabs(Isis::HALFPI - fabs(p_latitude)) > DBL_EPSILON) {
-        p_good = false;
-        return p_good;
+    m_latitude = phi2Compute(snyders_t);
+    if (fabs(m_latitude) > HALFPI) {
+      if (fabs(HALFPI - fabs(m_latitude)) > DBL_EPSILON) {
+        m_good = false;
+        return m_good;
       }
-      else if(p_latitude < 0.0) {
-        p_latitude = -Isis::HALFPI;
+      else if (m_latitude < 0.0) {
+        m_latitude = -HALFPI;
       }
       else {
-        p_latitude = Isis::HALFPI;
+        m_latitude = HALFPI;
       }
     }
 
     // Compute longitude
-    double coslat = cos(p_latitude);
-    if(coslat <= DBL_EPSILON) {
-      p_longitude = p_centerLongitude;
+    double coslat = cos(m_latitude);
+    if (coslat <= DBL_EPSILON) {
+      m_longitude = m_centerLongitude;
     }
     else {
-      p_longitude = p_centerLongitude + GetX() /
-                    (p_equatorialRadius * p_scalefactor);
+      m_longitude = m_centerLongitude + GetX() /
+                    (m_equatorialRadius * m_scalefactor);
     }
 
     // Convert to degrees
-    p_latitude *= 180.0 / Isis::PI;
-    p_longitude *= 180.0 / Isis::PI;
+    m_latitude *= 180.0 / PI;
+    m_longitude *= 180.0 / PI;
 
     // Cleanup the longitude
-    if(p_longitudeDirection == PositiveWest) p_longitude *= -1.0;
+    if (m_longitudeDirection == PositiveWest) m_longitude *= -1.0;
     // These need to be done for circular type projections
-    // p_longitude = To360Domain (p_longitude);
-    // if (p_longitudeDomain == 180) p_longitude = To180Domain(p_longitude);
+    // m_longitude = To360Domain (m_longitude);
+    // if (m_longitudeDomain == 180) m_longitude = To180Domain(m_longitude);
 
     // Cleanup the latitude
-    if(IsPlanetocentric()) p_latitude = ToPlanetocentric(p_latitude);
+    if (IsPlanetocentric()) m_latitude = ToPlanetocentric(m_latitude);
 
-    p_good = true;
-    return p_good;
+    m_good = true;
+    return m_good;
   }
 
   /**
@@ -218,22 +280,23 @@ namespace Isis {
    *
    * @return bool
    */
-  bool Mercator::XYRange(double &minX, double &maxX, double &minY, double &maxY) {
+  bool Mercator::XYRange(double &minX, double &maxX, 
+                         double &minY, double &maxY) {
     // Check the corners of the lat/lon range
-    XYRangeCheck(p_minimumLatitude, p_minimumLongitude);
-    XYRangeCheck(p_maximumLatitude, p_minimumLongitude);
-    XYRangeCheck(p_minimumLatitude, p_maximumLongitude);
-    XYRangeCheck(p_maximumLatitude, p_maximumLongitude);
+    XYRangeCheck(m_minimumLatitude, m_minimumLongitude);
+    XYRangeCheck(m_maximumLatitude, m_minimumLongitude);
+    XYRangeCheck(m_minimumLatitude, m_maximumLongitude);
+    XYRangeCheck(m_maximumLatitude, m_maximumLongitude);
 
     // Make sure everything is ordered
-    if(p_minimumX >= p_maximumX) return false;
-    if(p_minimumY >= p_maximumY) return false;
+    if (m_minimumX >= m_maximumX) return false;
+    if (m_minimumY >= m_maximumY) return false;
 
     // Return X/Y min/maxs
-    minX = p_minimumX;
-    maxX = p_maximumX;
-    minY = p_minimumY;
-    maxY = p_maximumY;
+    minX = m_minimumX;
+    maxX = m_maximumX;
+    minY = m_minimumY;
+    maxY = m_maximumY;
     return true;
   }
 
@@ -245,8 +308,8 @@ namespace Isis {
   PvlGroup Mercator::Mapping() {
     PvlGroup mapping = Projection::Mapping();
 
-    mapping += p_mappingGrp["CenterLatitude"];
-    mapping += p_mappingGrp["CenterLongitude"];
+    mapping += m_mappingGrp["CenterLatitude"];
+    mapping += m_mappingGrp["CenterLongitude"];
 
     return mapping;
   }
@@ -259,7 +322,7 @@ namespace Isis {
   PvlGroup Mercator::MappingLatitudes() {
     PvlGroup mapping = Projection::MappingLatitudes();
 
-    mapping += p_mappingGrp["CenterLatitude"];
+    mapping += m_mappingGrp["CenterLatitude"];
 
     return mapping;
   }
@@ -272,30 +335,26 @@ namespace Isis {
   PvlGroup Mercator::MappingLongitudes() {
     PvlGroup mapping = Projection::MappingLongitudes();
 
-    mapping += p_mappingGrp["CenterLongitude"];
+    mapping += m_mappingGrp["CenterLongitude"];
 
     return mapping;
   }
 
-  /**
-   * Compares two Projection objects to see if they are equal
-   *
-   * @param proj Projection object to do comparison on
-   *
-   * @return bool Returns true if the Projection objects are equal, and false if
-   *              they are not
-   */
-  bool Mercator::operator== (const Isis::Projection &proj) {
-    if(!Isis::Projection::operator==(proj)) return false;
-    // dont do the below it is a recusive plunge
-    //  if (Isis::Projection::operator!=(proj)) return false;
-    Mercator *merc = (Mercator *) &proj;
-    if((merc->p_centerLongitude != this->p_centerLongitude) ||
-        (merc->p_centerLatitude != this->p_centerLatitude)) return false;
-    return true;
-  }
 } // end namespace isis
 
+/** 
+ * This is the function that is called in order to instantiate a 
+ * Mercator object.
+ *  
+ * @param lab Cube labels with appropriate Mapping information.
+ *  
+ * @param allowDefaults Indicates whether CenterLongitude are allowed to 
+ *                      be computed using the middle of the longitude
+ *                      range specified in the labels.
+ * 
+ * @return @b Isis::Projection* Pointer to a Mercator projection 
+ *         object.
+ */
 extern "C" Isis::Projection *MercatorPlugin(Isis::Pvl &lab,
     bool allowDefaults) {
   return new Isis::Mercator(lab, allowDefaults);

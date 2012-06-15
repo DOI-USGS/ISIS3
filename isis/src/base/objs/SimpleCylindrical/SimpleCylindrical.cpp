@@ -20,11 +20,17 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include "SimpleCylindrical.h"
+
 #include <cmath>
 #include <cfloat>
-#include "SimpleCylindrical.h"
-#include "IException.h"
+
 #include "Constants.h"
+#include "IException.h"
+#include "Projection.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
 
 using namespace std;
 namespace Isis {
@@ -37,31 +43,31 @@ namespace Isis {
    *              Additionally, the simple cylindrical projection requires the
    *              center longitude to be defined in the keyword CenterLongitude.
    *
-   * @param allowDefaults If set to false the constructor requires that the
+   * @param allowDefaults If set to false, the constructor requires that the
    *                      keyword CenterLongitude exist in the label. Otherwise
    *                      if it does not exist it will be computed and written
    *                      to the label using the middle of the longitude range
    *                      as specified in the labels. Defaults to false
    *
-   * @throws Isis::IException::Io
+   * @throws IException
    */
-  SimpleCylindrical::SimpleCylindrical(Isis::Pvl &label, bool allowDefaults) :
-    Isis::Projection::Projection(label) {
+  SimpleCylindrical::SimpleCylindrical(Pvl &label, bool allowDefaults) :
+    Projection::Projection(label) {
     try {
       // Try to read the mapping group
-      Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
+      PvlGroup &mapGroup = label.FindGroup("Mapping", Pvl::Traverse);
 
       // Compute the default value if allowed and needed
-      if((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
-        double lon = (p_minimumLongitude + p_maximumLongitude) / 2.0;
-        mapGroup += Isis::PvlKeyword("CenterLongitude", lon);
+      if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
+        double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
+        mapGroup += PvlKeyword("CenterLongitude", lon);
       }
 
       // Get the center longitude, convert to radians, adjust for longitude
       // direction
-      p_centerLongitude = mapGroup["CenterLongitude"];
-      p_centerLongitude *= Isis::PI / 180.0;
-      if(p_longitudeDirection == PositiveWest) p_centerLongitude *= -1.0;
+      m_centerLongitude = mapGroup["CenterLongitude"];
+      m_centerLongitude *= PI / 180.0;
+      if (m_longitudeDirection == PositiveWest) m_centerLongitude *= -1.0;
     }
     catch(IException &e) {
       string message = "Invalid label group [Mapping]";
@@ -71,6 +77,50 @@ namespace Isis {
 
   //! Destroys the SimpleCylindrical object
   SimpleCylindrical::~SimpleCylindrical() {
+  }
+
+  /**
+   * Compares two Projection objects to see if they are equal
+   *
+   * @param proj Projection object to do comparison on
+   *
+   * @return bool Returns true if the Projection objects are equal, and false if
+   *              they are not
+   */
+  bool SimpleCylindrical::operator== (const Projection &proj) {
+    if (!Projection::operator==(proj)) return false;
+    // dont do the below it is a recusive plunge
+    //  if (Projection::operator!=(proj)) return false;
+    SimpleCylindrical *simp = (SimpleCylindrical *) &proj;
+    if (simp->m_centerLongitude != m_centerLongitude) return false;
+    return true;
+  }
+
+  /**
+   * Returns the name of the map projection, "SimpleCylindrical"
+   *
+   * @return string Name of projection, "SimpleCylindrical"
+   */
+  string SimpleCylindrical::Name() const {
+    return "SimpleCylindrical";
+  }
+
+  /**
+   * Returns the version of the map projection
+   *
+   * @return std::string Version number
+   */
+  string SimpleCylindrical::Version() const {
+    return "1.0";
+  }
+
+  /**
+   * Indicates whether the projection is Equitorial Cylindrical.
+   * 
+   * @return @b bool True if the projection is cylindrical. 
+   */
+  bool SimpleCylindrical::IsEquatorialCylindrical() {
+    return true;
   }
 
   /**
@@ -87,19 +137,19 @@ namespace Isis {
    */
   bool SimpleCylindrical::SetGround(const double lat, const double lon) {
     // Convert to radians
-    p_latitude = lat;
-    p_longitude = lon;
-    double latRadians = lat * Isis::PI / 180.0;
-    double lonRadians = lon * Isis::PI / 180.0;
-    if(p_longitudeDirection == PositiveWest) lonRadians *= -1.0;
+    m_latitude = lat;
+    m_longitude = lon;
+    double latRadians = lat * PI / 180.0;
+    double lonRadians = lon * PI / 180.0;
+    if (m_longitudeDirection == PositiveWest) lonRadians *= -1.0;
 
     // Compute the coordinate
-    double deltaLon = (lonRadians - p_centerLongitude);
-    double x = p_equatorialRadius * deltaLon;
-    double y = p_equatorialRadius * latRadians;
+    double deltaLon = (lonRadians - m_centerLongitude);
+    double x = m_equatorialRadius * deltaLon;
+    double y = m_equatorialRadius * latRadians;
     SetComputedXY(x, y);
-    p_good = true;
-    return p_good;
+    m_good = true;
+    return m_good;
   }
 
   /**
@@ -120,27 +170,27 @@ namespace Isis {
     SetXY(x, y);
 
     // Compute latitude and make sure it is not above 90
-    p_latitude = GetY() / p_equatorialRadius;
-    if((fabs(p_latitude) - Isis::HALFPI) > DBL_EPSILON) {
-      p_good = false;
-      return p_good;
+    m_latitude = GetY() / m_equatorialRadius;
+    if ((fabs(m_latitude) - HALFPI) > DBL_EPSILON) {
+      m_good = false;
+      return m_good;
     }
 
     // Compute longitude
-    p_longitude = p_centerLongitude + GetX() / p_equatorialRadius;
+    m_longitude = m_centerLongitude + GetX() / m_equatorialRadius;
 
     // Convert to degrees
-    p_latitude *= 180.0 / Isis::PI;
-    p_longitude *= 180.0 / Isis::PI;
+    m_latitude *= 180.0 / PI;
+    m_longitude *= 180.0 / PI;
 
     // Cleanup the longitude
-    if(p_longitudeDirection == PositiveWest) p_longitude *= -1.0;
+    if (m_longitudeDirection == PositiveWest) m_longitude *= -1.0;
     // Do these if the projection is circular
-    //  p_longitude = To360Domain (p_longitude);
-    //  if (p_longitudeDomain == 180) p_longitude = To180Domain(p_longitude);
+    //  m_longitude = To360Domain (m_longitude);
+    //  if (m_longitudeDomain == 180) m_longitude = To180Domain(m_longitude);
 
-    p_good = true;
-    return p_good;
+    m_good = true;
+    return m_good;
   }
 
   /**
@@ -169,20 +219,20 @@ namespace Isis {
   bool SimpleCylindrical::XYRange(double &minX, double &maxX,
                                   double &minY, double &maxY) {
     // Check the corners of the lat/lon range
-    XYRangeCheck(p_minimumLatitude, p_minimumLongitude);
-    XYRangeCheck(p_maximumLatitude, p_minimumLongitude);
-    XYRangeCheck(p_minimumLatitude, p_maximumLongitude);
-    XYRangeCheck(p_maximumLatitude, p_maximumLongitude);
+    XYRangeCheck(m_minimumLatitude, m_minimumLongitude);
+    XYRangeCheck(m_maximumLatitude, m_minimumLongitude);
+    XYRangeCheck(m_minimumLatitude, m_maximumLongitude);
+    XYRangeCheck(m_maximumLatitude, m_maximumLongitude);
 
     // Make sure everything is ordered
-    if(p_minimumX >= p_maximumX) return false;
-    if(p_minimumY >= p_maximumY) return false;
+    if (m_minimumX >= m_maximumX) return false;
+    if (m_minimumY >= m_maximumY) return false;
 
     // Return X/Y min/maxs
-    minX = p_minimumX;
-    maxX = p_maximumX;
-    minY = p_minimumY;
-    maxY = p_maximumY;
+    minX = m_minimumX;
+    maxX = m_maximumX;
+    minY = m_minimumY;
+    maxY = m_maximumY;
     return true;
   }
 
@@ -195,7 +245,7 @@ namespace Isis {
   PvlGroup SimpleCylindrical::Mapping() {
     PvlGroup mapping = Projection::Mapping();
 
-    mapping += p_mappingGrp["CenterLongitude"];
+    mapping += m_mappingGrp["CenterLongitude"];
 
     return mapping;
   }
@@ -219,29 +269,25 @@ namespace Isis {
   PvlGroup SimpleCylindrical::MappingLongitudes() {
     PvlGroup mapping = Projection::MappingLongitudes();
 
-    mapping += p_mappingGrp["CenterLongitude"];
+    mapping += m_mappingGrp["CenterLongitude"];
 
     return mapping;
   }
 
-  /**
-   * Compares two Projection objects to see if they are equal
-   *
-   * @param proj Projection object to do comparison on
-   *
-   * @return bool Returns true if the Projection objects are equal, and false if
-   *              they are not
-   */
-  bool SimpleCylindrical::operator== (const Isis::Projection &proj) {
-    if(!Isis::Projection::operator==(proj)) return false;
-    // dont do the below it is a recusive plunge
-    //  if (Isis::Projection::operator!=(proj)) return false;
-    SimpleCylindrical *simp = (SimpleCylindrical *) &proj;
-    if(simp->p_centerLongitude != this->p_centerLongitude) return false;
-    return true;
-  }
 } // end namespace isis
 
+/** 
+ * This is the function that is called in order to instantiate a 
+ * SimpleCylindrical object.
+ *  
+ * @param lab Cube labels with appropriate Mapping information.
+ *  
+ * @param allowDefaults Indicates whether CenterLongitude is allowed to be 
+ *                      computed.
+ * 
+ * @return @b Isis::Projection* Pointer to a SimpleCylindrical 
+ *                              projection object.
+ */
 extern "C" Isis::Projection *SimpleCylindricalPlugin(Isis::Pvl &lab,
     bool allowDefaults) {
   return new Isis::SimpleCylindrical(lab, allowDefaults);

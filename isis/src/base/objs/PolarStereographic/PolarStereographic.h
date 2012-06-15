@@ -23,43 +23,64 @@
  */
 
 #include "Projection.h"
-#include "Constants.h"
 
 namespace Isis {
+  class Pvl;
+  class PvlGroup;
   /**
-   * @brief Stereographic Map Projection
+   * @brief Stereographic Map Projection for Polar Aspect
    *
-   * This class provides methods for the forward and inverse equations of a Polar
-   * Stereographic map projection (for an ellipsoid). The code was converted to
-   * C++ from the Fortran version of the USGS General Cartographic Transformation
-   * Package (GCTP). This class inherits Projection and provides the two virtual
-   * methods SetGround (forward) and SetCoordinate (inverse) and a third virtual
-   * method, XYRange, for obtaining projection coordinate coverage for a
-   * latitude/longitude window. Please see the Projection class for a full
-   * accounting of all the methods available.
+   * This class provides methods for the forward and inverse equations of a 
+   * Polar Stereographic map projection (for an ellipsoid).
+   *  
+   *  The Stereographic projection is used for polar aspect maps.  This
+   *  projection is azimuthal, conformal, and maps onto a plane. The
+   *  center longitude is a straight line. All other longitudes are represented
+   *  by arcs of circles. The antipodal point can not be projected.
+   *  
+   * The code was converted to C++ from the Fortran version of the USGS General 
+   * Cartographic Transformation Package (GCTP). This class inherits Projection 
+   * and provides the two virtual methods SetGround (forward) and SetCoordinate 
+   * (inverse) and a third virtual method, XYRange, for obtaining projection 
+   * coordinate coverage for a latitude/longitude window. 
+   *  
+   * Please see the Projection class for a full accounting of all the methods 
+   * available. 
    *
    * @ingroup MapProjection
    *
    * @author 2004-02-24 Jeff Anderson
    *
    * @internal
-   *  @history 2004-02-24 Jeff Anderson - Fixed a bug in TrueScaleLatitude and
-   *                                      changed default computation for
-   *                                      CenterLatitude
-   *  @history 2005-03-01 Elizabeth Ribelin - Modified file to support Doxygen
-   *                                          documentation
-   *  @history 2005-03-11 Elizabeth Ribelin - added TrueScaleLatitude method test
-   *                                          to unitTest
-   *  @history 2006-06-14 Elizabeth Miller - Added error check to make sure the
-   *                                         center latitude is not zero
-   *  @history 2007-06-29 Steven Lambright - Added Mapping, MappingLatitudes and
-   *                                          MappingLongitudes methods.
-   *  @history 2008-05-09 Steven Lambright - Added Name, Version methods
+   *   @history 2004-02-24 Jeff Anderson - Fixed a bug in TrueScaleLatitude and
+   *                           changed default computation for CenterLatitude
+   *   @history 2005-03-01 Elizabeth Ribelin - Modified file to support Doxygen
+   *                           documentation
+   *   @history 2005-03-11 Elizabeth Ribelin - added TrueScaleLatitude method 
+   *                           test to unitTest
+   *   @history 2006-06-14 Elizabeth Miller - Added error check to make sure the
+   *                           center latitude is not zero
+   *   @history 2007-06-29 Steven Lambright - Added Mapping, MappingLatitudes 
+   *                           and MappingLongitudes methods.
+   *   @history 2008-05-09 Steven Lambright - Added Name, Version methods
+   *   @history 2012-06-15 Jeannie Backer - Added documentation.  Added forward
+   *                           declaration of Pvl, PvlGroup to header file.
+   *                           Ordered includes in implementation file. Moved
+   *                           Name, Version, and TrueScaleLatitude to the
+   *                           implementation file. Minor modifications to
+   *                           comply with some coding standards. References
+   *                           #928.
    */
-  class PolarStereographic : public Isis::Projection {
+  class PolarStereographic : public Projection {
     public:
-      PolarStereographic(Isis::Pvl &label, bool allowDefaults = false);
+      PolarStereographic(Pvl &label, bool allowDefaults = false);
       ~PolarStereographic();
+      bool operator== (const Projection &proj);
+
+      std::string Name() const;
+      std::string Version() const;
+      double TrueScaleLatitude() const;
+
       bool SetGround(const double lat, const double lon);
       bool SetCoordinate(const double x, const double y);
       bool XYRange(double &minX, double &maxX, double &minY, double &maxY);
@@ -68,46 +89,19 @@ namespace Isis {
       PvlGroup MappingLatitudes();
       PvlGroup MappingLongitudes();
 
-      /**
-       * Returns the name of the map projection
-       *
-       * @return string Name of projection
-       */
-      std::string Name() const {
-        return "PolarStereographic";
-      }
-
-      /**
-       * Returns the version of the map projection
-       *
-       *
-       * @return std::string Version number
-       */
-      std::string Version() const {
-        return "1.0";
-      }
-
-      bool operator== (const Isis::Projection &proj);
-
-      /**
-       * Returns the latitude of true scale (in the case of Polar Stereographic
-       * it is the center latitude)
-       *
-       * @return double
-       */
-      double TrueScaleLatitude() const {
-        return p_centerLatitude * 180.0 / Isis::PI;
-      };
-
     private:
-      double p_centerLongitude;  //!<The center longitude for the map projection
-      double p_centerLatitude;   //!<The center latitude for the map projection
+      double m_centerLongitude; //!< The center longitude for the map projection
+      double m_centerLatitude;  //!< The center latitude for the map projection
 
-      double p_t;
-      double p_m;
-      double p_e4;
-      double p_signFactor;
-      double p_poleFlag;
+      double m_e4;           //!< Convenience variable for calculations.
+      double m_t;            //!< Snyder's t-value from equation (15-19).
+      double m_m;            //!< Snyder's m-value from equation (14-15).
+      double m_signFactor;   /**< If the center latitude is positive, the sign 
+                                  factor is 1.  Otherwise, it is -1.*/
+      double m_poleFlag;     /**< Indicates whether the center latitude is at a
+                                  pole.  If not, the pole flag is set to true.
+                                  If the center latitude is at a pole, this flag
+                                  is set to false.*/
   };
 };
 

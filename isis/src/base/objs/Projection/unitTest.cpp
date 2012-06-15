@@ -1,101 +1,119 @@
-#include <iostream>
-#include <iomanip>
-#include <cmath>
 #include <cfloat>
-#include "Projection.h"
-#include "IException.h"
-#include "WorldMapper.h"
+#include <cmath>
+#include <iomanip>
+#include <iostream>
+
 #include "Constants.h"
-#include "PvlGroup.h"
+#include "IException.h"
 #include "Preference.h"
+#include "Projection.h"
+#include "Pvl.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
+#include "SpecialPixel.h"
+#include "WorldMapper.h"
 
 using namespace std;
-class MyProjection : public Isis::Projection {
+using namespace Isis;
+class MyProjection : public Projection {
   public:
-    MyProjection(Isis::Pvl &lab) :
-      Isis::Projection(lab) {
+    // create a child class
+    MyProjection(Pvl &lab) :
+      Projection(lab) {
+    }
+    // override pure virtual methods
+    string Name() const {
+      return "None";
+    }
+    string Version() const {
+      return "1.0";
+    }
+
+    // override other virtual methods
+    virtual double TrueScaleLatitude() const {
+      return 45.0;
+    }
+    bool SetGround(const double lat, const double lon) {
+      if((lat < -90.0) || (lat > 90.0)) {
+        m_good = false;
+      }
+      else {
+        m_latitude = lat;
+        m_longitude = lon;
+        double x = lon * 10.0;
+        double y = lat + 90.0;
+        SetComputedXY(x, y);
+        m_good = true;
+      }
+      return m_good;
+    }
+    virtual bool SetCoordinate(const double x, const double y) {
+      SetXY(x, y);
+      m_longitude = GetX() / 10.0;
+      m_latitude = GetY() - 90.0;
+      m_good = true;
+      return m_good;
     }
     bool XYRange(double &minX, double &maxX, double &minY, double &maxY) {
       minX = DBL_MAX;
       minY = DBL_MAX;
       maxX = -DBL_MAX;
       maxY = -DBL_MAX;
-      if(!p_groundRangeGood) return false;
-      XYRangeCheck(p_minimumLatitude, p_minimumLongitude);
-      XYRangeCheck(p_minimumLatitude, p_maximumLongitude);
-      XYRangeCheck(p_maximumLatitude, p_minimumLongitude);
-      XYRangeCheck(p_maximumLatitude, p_maximumLongitude);
-      minX = p_minimumX;
-      minY = p_minimumY;
-      maxX = p_maximumX;
-      maxY = p_maximumY;
+      if(!m_groundRangeGood) return false;
+      XYRangeCheck(m_minimumLatitude, m_minimumLongitude);
+      XYRangeCheck(m_minimumLatitude, m_maximumLongitude);
+      XYRangeCheck(m_maximumLatitude, m_minimumLongitude);
+      XYRangeCheck(m_maximumLatitude, m_maximumLongitude);
+      minX = m_minimumX;
+      minY = m_minimumY;
+      maxX = m_maximumX;
+      maxY = m_maximumY;
       return true;
     }
-    bool SetGround(const double lat, const double lon) {
-      if((lat < -90.0) || (lat > 90.0)) {
-        p_good = false;
-      }
-      else {
-        p_latitude = lat;
-        p_longitude = lon;
-        double x = lon * 10.0;
-        double y = lat + 90.0;
-        SetComputedXY(x, y);
-        p_good = true;
-      }
-      return p_good;
-    }
-    virtual bool SetCoordinate(const double x, const double y) {
-      SetXY(x, y);
-      p_longitude = GetX() / 10.0;
-      p_latitude = GetY() - 90.0;
-      p_good = true;
-      return p_good;
+
+    bool testXYRangeOblique(double &minX, double &maxX, 
+                            double &minY, double &maxY) {
+      return xyRangeOblique(minX, maxX, minY, maxY);
     }
 
-    virtual double TrueScaleLatitude() const {
-      return 45.0;
-    }
-
-    std::string Name() const {
-      return "None";
-    }
-    std::string Version() const {
-      return "1.0";
-    }
-
+    // create output method to print results of private methods 
     void Output() const {
-      cout << tCompute(0.0, 0.0) << endl;
-      cout << tCompute(Isis::HALFPI / 2.0, sin(Isis::HALFPI / 2.0)) << endl;
-      cout << tCompute(Isis::HALFPI, sin(Isis::HALFPI)) << endl;
-      cout << mCompute(sin(0.0), cos(0.0)) << endl;
-      cout << mCompute(sin(Isis::HALFPI / 2.0), cos(Isis::HALFPI / 2.0)) << endl;
-      cout << e4Compute() << endl;
-      cout << phi2Compute(0.0) << endl;
-      cout << phi2Compute(10.0) << endl;
-      cout << phi2Compute(100.0) << endl;
-      cout << phi2Compute(1000.0) << endl;
+      cout << "tCompute(0,sin(0)):             " << tCompute(0.0, 0.0) << endl;
+      cout << "tCompute(pi/4,sin(pi/4)):       " << tCompute(HALFPI / 2.0, sin(HALFPI / 2.0)) << endl;
+      cout << "tCompute(pi/2,sin(pi/2)):       " << tCompute(HALFPI, sin(HALFPI)) << endl;
+      cout << "mCompute(sin(0),cos(0)):        " << mCompute(sin(0.0), cos(0.0)) << endl;
+      cout << "mCompute(sin(pi/4),cos(pi/4)):  " << mCompute(sin(HALFPI / 2.0), cos(HALFPI / 2.0)) << endl;
+      cout << "e4Compute():                    " << e4Compute() << endl;
+      cout << "phi2Compute(0):                 " << phi2Compute(0.0) << endl;
+      cout << "phi2Compute(10):                " << phi2Compute(10.0) << endl;
+      cout << "phi2Compute(100):               " << phi2Compute(100.0) << endl;
+      cout << "phi2Compute(1000):              " << phi2Compute(1000.0) << endl;
+      cout << "qCompute(sin(0)):               " << qCompute(0.0) << endl;
+    }
+    double testqCompute(const double sinPhi) const {
+      return qCompute(sinPhi);
     }
 };
 
-class EmptyProjection : public Isis::Projection {
+class EmptyProjection : public Projection {
   public:
-    EmptyProjection(Isis::Pvl &lab) :
-      Isis::Projection(lab) {
+    EmptyProjection(Pvl &lab) :
+      Projection(lab) {
     }
 
-    std::string Name() const {
+    // pure virtuals, must be overriden, no need to test since MyProjection will test these
+    string Name() const {
       return "None";
     }
-    std::string Version() const {
+    string Version() const {
       return "1.0";
     }
 };
 
 
-class MyMapper : public Isis::WorldMapper {
+class MyMapper : public WorldMapper {
   public:
-    MyMapper() : Isis::WorldMapper() {};
+    MyMapper() : WorldMapper() {};
     double ProjectionX(const double worldX) const {
       return worldX / 2.0;
     };
@@ -113,95 +131,113 @@ class MyMapper : public Isis::WorldMapper {
     }
 };
 
-int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
 
-  void Doit(Isis::Pvl & lab);
+
+// unitTest main
+int main(int argc, char *argv[]) {
+  Preference::Preferences(true);
+
+  // create a MyProjection object with the given labels
+  void Doit(Pvl & lab);
 
   cout.precision(13);
-  cout << "Unit test for Isis::Projection ..." << endl << endl;
+  cout << "Unit test for Projection ..." << endl << endl;
+  cout << "///////////////////////////////////////////////////////////" << endl;
+  cout << "Test Error Throws from the contructor...\n" << endl;
 
   cout << "Test for missing Mapping Group" << endl;
-  Isis::Pvl lab;
+  Pvl lab;
   Doit(lab);
   cout << endl;
 
-  cout << "Test for missing Equatorial Radius" << endl;
-  lab.AddGroup(Isis::PvlGroup("Mapping"));
-  Isis::PvlGroup &mg = lab.FindGroup("Mapping");
+  cout << "Test for missing Equatorial Radius in the mapping group" << endl;
+  lab.AddGroup(PvlGroup("Mapping"));
+  PvlGroup &mg = lab.FindGroup("Mapping");
   Doit(lab);
   cout << endl;
 
-  cout << "Test for missing polar radius" << endl;
-  mg += Isis::PvlKeyword("EquatorialRadius", -1.0);
+  cout << "Test for missing polar radius in the mapping group" << endl;
+  mg += PvlKeyword("EquatorialRadius", -1.0);
   Doit(lab);
   cout << endl;
 
-  cout << "Test for invalid Equatoral Radius" << endl;
-  mg += Isis::PvlKeyword("PolarRadius", -0.95);
+  cout << "Test for invalid Equatoral Radius value" << endl;
+  mg += PvlKeyword("PolarRadius", -0.95);
   Doit(lab);
   cout << endl;
 
-  cout << "Test for invalid polar radius" << endl;
+  cout << "Test for invalid polar radius value" << endl;
   mg["EquatorialRadius"] = 1.0;
-  mg += Isis::PvlKeyword("PolarRadius", -0.95);
+  mg += PvlKeyword("PolarRadius", -0.95);
   Doit(lab);
   cout << endl;
 
-  cout << "Test for missing latitude type" << endl;
+  cout << "Test for missing latitude type in the mapping group" << endl;
   mg["PolarRadius"] = 0.95;
   Doit(lab);
   cout << endl;
 
-  cout << "Test for invalid latitude type" << endl;
-  mg += Isis::PvlKeyword("LatitudeType", "Planeto");
+  cout << "Test for invalid latitude type value" << endl;
+  mg += PvlKeyword("LatitudeType", "Planeto");
   Doit(lab);
   cout << endl;
 
-  cout << "Test for missing longitude direction" << endl;
+  cout << "Test for missing longitude direction in the mapping group" << endl;
   mg["LatitudeType"] = "Planetographic";
   Doit(lab);
   cout << endl;
 
-  cout << "Test for invalid longitude direction" << endl;
-  mg += Isis::PvlKeyword("LongitudeDirection", "Up");
+  cout << "Test for invalid longitude direction value" << endl;
+  mg += PvlKeyword("LongitudeDirection", "Up");
   Doit(lab);
   cout << endl;
 
-  cout << "Test for missing longitude domain" << endl;
+  cout << "Test for missing longitude domain in the mapping group" << endl;
   mg["LongitudeDirection"] = "PositiveEast";
   Doit(lab);
   cout << endl;
 
-  cout << "Test for invalid longitude domain" << endl;
-  mg += Isis::PvlKeyword("LongitudeDomain", 75);
+  cout << "Test for invalid longitude domain value in the mapping group" << endl;
+  mg += PvlKeyword("LongitudeDomain", 75);
   Doit(lab);
+  cout << "///////////////////////////////////////////////////////////" << endl;
   cout << endl;
-  mg["LongitudeDomain"] = 360;
 
-  mg += Isis::PvlKeyword("ProjectionName", "MyProjection");
+  mg["LongitudeDomain"] = 360;
+  mg += PvlKeyword("ProjectionName", "MyProjection");
 
   cout << "Projection Specifications" << endl;
   MyProjection p(lab);
-  cout << "Equatorial Radius:     " << p.EquatorialRadius() << endl;
-  cout << "Polar Radius:          " << p.PolarRadius() << endl;
-  cout << "Eccentricity:          " << p.Eccentricity() << endl;
-  cout << "Is Planetographic:     " << p.IsPlanetographic() << endl;
-  cout << "Is Planetocentric:     " << p.IsPlanetocentric() << endl;
-  cout << "Is PositiveEast:       " << p.IsPositiveEast() << endl;
-  cout << "Is PositiveWest:       " << p.IsPositiveWest() << endl;
-  cout << "Has 360 domain:        " << p.Has360Domain() << endl;
-  cout << "Has 180 domain:        " << p.Has180Domain() << endl;
-  cout << "Has ground range:      " << p.HasGroundRange() << endl;
-  cout << "Rotation:              " << p.Rotation() << endl;
+  // test methods that return properties of the target
+  cout << "Equatorial Radius:         " << p.EquatorialRadius() << endl;
+  cout << "Polar Radius:              " << p.PolarRadius() << endl;
+  cout << "Eccentricity:              " << p.Eccentricity() << endl;
+  // test methods that return properties of the projection
+  cout << "Is Equatorial Cylindrical: " << p.IsEquatorialCylindrical() << endl;
+  cout << "Latitude Type:             " << p.LatitudeTypeString() << endl;
+  cout << "Is Planetographic:         " << p.IsPlanetographic() << endl;
+  cout << "Is Planetocentric:         " << p.IsPlanetocentric() << endl;
+  cout << "Longitude Direction:       " << p.LongitudeDirectionString() << endl;
+  cout << "Is PositiveEast:           " << p.IsPositiveEast() << endl;
+  cout << "Is PositiveWest:           " << p.IsPositiveWest() << endl;
+  cout << "Longitude Domain:          " << p.LongitudeDomainString() << endl;
+  cout << "Has 360 domain:            " << p.Has360Domain() << endl;
+  cout << "Has 180 domain:            " << p.Has180Domain() << endl;
+  cout << "Has ground range:          " << p.HasGroundRange() << endl;
+  cout << "Rotation:                  " << p.Rotation() << endl;
   cout << endl;
 
   cout << "Testing conversion methods" << endl;
-  cout << "Bring -50  into 360 Domain:  " << p.To360Domain(-50.0) << endl;
-  cout << "Bring  50  into 360 Domain:  " << p.To360Domain(50.0) << endl;
-  cout << "Bring   0  into 360 Domain:  " << p.To360Domain(0.0) << endl;
-  cout << "Bring 360-e  into 360 Domain:  " << p.To360Domain(360.0 - 1E-10)
-       << endl << endl;
+  cout << "Bring -50   into 360 Domain:  " << p.To360Domain(-50.0) << endl;
+  cout << "Bring   0-e into 360 Domain:  " << p.To360Domain(0.0 - 1E-10) << endl;
+  cout << "Bring   0   into 360 Domain:  " << p.To360Domain(0.0) << endl;
+  cout << "Bring   0+e into 360 Domain:  " << p.To360Domain(0.0 + 1E-10) << endl;
+  cout << "Bring  50   into 360 Domain:  " << p.To360Domain(50.0) << endl;
+  cout << "Bring 360-e into 360 Domain:  " << p.To360Domain(360.0 - 1E-10) << endl;
+  cout << "Bring 360   into 360 Domain:  " << p.To360Domain(360.0) << endl;
+  cout << "Bring 360+e into 360 Domain:  " << p.To360Domain(360.0 + 1E-10) << endl;
+  cout << "Bring 380   into 360 Domain:  " << p.To360Domain(380.0) << endl;
+  cout << endl;
   cout << "Bring 240  into 180 Domain:  " << p.To180Domain(240.0) << endl;
   cout << "Bring 140  into 180 Domain:  " << p.To180Domain(140.0) << endl;
   cout << "Bring -180 into 180 Domain:  " << p.To180Domain(-180.0) << endl;
@@ -225,11 +261,15 @@ int main(int argc, char *argv[]) {
   cout << "ographic to ocentric to ographic = " << p.ToPlanetographic(p.ToPlanetocentric(45.0)) << endl;
   cout << endl;
 
+  //Test exceptions
+
+  cout << "///////////////////////////////////////////////////////////" << endl;
+  cout << "Test More Error Throws...\n" << endl;
   cout << "Testing unordered latitude range" << endl;
-  mg += Isis::PvlKeyword("MinimumLatitude", 45.0);
-  mg += Isis::PvlKeyword("MaximumLatitude", -80.0);
-  mg += Isis::PvlKeyword("MinimumLongitude", 15.0);
-  mg += Isis::PvlKeyword("MaximumLongitude", -190.0);
+  mg += PvlKeyword("MinimumLatitude", 45.0);
+  mg += PvlKeyword("MaximumLatitude", -80.0);
+  mg += PvlKeyword("MinimumLongitude", 15.0);
+  mg += PvlKeyword("MaximumLongitude", -190.0);
   Doit(lab);
   cout << endl;
 
@@ -247,10 +287,14 @@ int main(int argc, char *argv[]) {
   cout << "Testing unordered longitude range" << endl;
   mg["MaximumLatitude"].SetValue(80.0, "units");
   Doit(lab);
+  cout << "///////////////////////////////////////////////////////////" << endl;
   cout << endl;
+
   mg["MaximumLongitude"] = 190.0;
 
+  cout << "Testing xyRange methods...\n" << endl;
   MyProjection p2(lab);
+  cout << "Get ground range from the labels...  " << endl;
   cout << "Has as longitude range:  " << p2.HasGroundRange() << endl;
   cout << "Minimum latitude:        " << p2.MinimumLatitude() << endl;
   cout << "Maximum latitude:        " << p2.MaximumLatitude() << endl;
@@ -259,6 +303,14 @@ int main(int argc, char *argv[]) {
 
   double minX, maxX, minY, maxY;
   p2.XYRange(minX, maxX, minY, maxY);
+  cout << "Find coordinate range ...  " << endl;
+  cout << "Minimum X:              " << minX << endl;
+  cout << "Maximum X:              " << maxX << endl;
+  cout << "Minimum Y:              " << minY << endl;
+  cout << "Maximum Y:              " << maxY << endl;
+
+  p2.testXYRangeOblique(minX,  maxX,  minY,  maxY);
+  cout << "Find coordinate range using xyRangeOblique...  " << endl;
   cout << "Minimum X:              " << minX << endl;
   cout << "Maximum X:              " << maxX << endl;
   cout << "Minimum Y:              " << minY << endl;
@@ -329,7 +381,7 @@ int main(int argc, char *argv[]) {
 
   cout << "Testing IsSky method" << endl;
   cout << p2.IsSky() << endl;
-  mg += Isis::PvlKeyword("TargetName", "SKY");
+  mg += PvlKeyword("TargetName", "SKY");
   Doit(lab);
   MyProjection p3(lab);
   cout << p3.IsSky() << endl;
@@ -343,6 +395,7 @@ int main(int argc, char *argv[]) {
 
   cout << "Testing Name and comparision routines" << endl;
   cout << "Name:        " << p2.Name() << endl;
+  cout << "Version:     " << p2.Version() << endl;
   cout << "operator==:  " << (p == p2) << endl;
   cout << "operator!=:  " << (p != p2) << endl;
 
@@ -362,51 +415,195 @@ int main(int argc, char *argv[]) {
   cout << noproj.LocalRadius(0.0) << endl;
   cout << noproj.LocalRadius(90.0) << endl;
   cout << noproj.LocalRadius(-90.0) << endl;
+  cout << endl;
+  cout << "///////////////////////////////////////////////////////////" << endl;
+  cout << "Test Error Throws for null input for LocalRadius " << endl;
+  double nullLatitude = Null;
+  try {
+    noproj.LocalRadius(nullLatitude);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  cout << "///////////////////////////////////////////////////////////" << endl;
+  cout << endl;
 
   cout << "Testing compute methods " << endl;
   p.Output();
   cout << endl;
+  cout << "///////////////////////////////////////////////////////////" << endl;
+  cout << "Test Error Throw for compute methods..." << endl;
+  // qCompute is not used for spherical targets
+  // set polar radius = equatorial radius
+  mg["PolarRadius"] = 1.0;
+  Doit(lab);
+  MyProjection p3a(lab);
+  try {
+    p3a.testqCompute(0);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  mg["PolarRadius"] = 0.95;
+  cout << "///////////////////////////////////////////////////////////" << endl;
+  cout << endl;
 
   cout << "Testing static conversion methods " << endl;
-  cout << "0 degrees in hours: " << p.ToHours(0.0) << endl;
-  cout << "0 degrees in HMS format: " << p.ToHMS(0.0) << endl;
-  cout << "0 degrees in DMS format: " << p.ToDMS(0.0) << endl;
-  cout << "30.5 degrees in hours: " << p.ToHours(30.5) << endl;
-  cout << "30.5 degrees in HMS format: " << p.ToHMS(30.5) << endl;
-  cout << "30.5 degrees in DMS format: " << p.ToDMS(30.5) << endl;
-  cout << "40.3472 degrees in hours: " << p.ToHours(40.3472) << endl;
-  cout << "40.3472 degrees in HMS format: " << p.ToHMS(40.3472) << endl;
-  cout << "40.3472 degrees in DMS format: " << p.ToDMS(40.3472) << endl;
-  cout << "45 degrees in Hours: " << p.ToHours(45.0) << endl;
-  cout << "45 degrees in HMS format: " << p.ToHMS(45.0) << endl;
-  cout << "45 degrees in DMS format: " << p.ToDMS(45.0) << endl;
-  cout << "180 degrees in Hours: " << p.ToHours(180.0) << endl;
-  cout << "180 degrees in HMS format: " << p.ToHMS(180.0) << endl;
-  cout << "180 degrees in DMS format: " << p.ToDMS(180.0) << endl;
-  cout << "360 degrees in Hours: " << p.ToHours(360.0) << endl;
-  cout << "360 degrees in HMS format: " << p.ToHMS(360.0) << endl;
-  cout << "360 degrees in DMS format: " << p.ToDMS(360.0) << endl;
+  cout << " 0 degrees in hours: " << p.ToHours(0.0) << endl;
+  cout << " 0 degrees in HMS format: " << p.ToHMS(0.0) << endl;
+  cout << " 0 degrees in DMS format: " << p.ToDMS(0.0) << endl;
+  cout << " 30.5 degrees in hours: " << p.ToHours(30.5) << endl;
+  cout << " 30.5 degrees in HMS format: " << p.ToHMS(30.5) << endl;
+  cout << " 30.5 degrees in DMS format: " << p.ToDMS(30.5) << endl;
+  cout << " 40.3472 degrees in hours: " << p.ToHours(40.3472) << endl;
+  cout << " 40.3472 degrees in HMS format: " << p.ToHMS(40.3472) << endl;
+  cout << " 40.3472 degrees in DMS format: " << p.ToDMS(40.3472) << endl;
+  cout << " 45 degrees in Hours: " << p.ToHours(45.0) << endl;
+  cout << " 45 degrees in HMS format: " << p.ToHMS(45.0) << endl;
+  cout << " 45 degrees in DMS format: " << p.ToDMS(45.0) << endl;
+  cout << " 180 degrees in Hours: " << p.ToHours(180.0) << endl;
+  cout << " 180 degrees in HMS format: " << p.ToHMS(180.0) << endl;
+  cout << " 180 degrees in DMS format: " << p.ToDMS(180.0) << endl;
+  cout << " 360 degrees in Hours: " << p.ToHours(360.0) << endl;
+  cout << " 360 degrees in HMS format: " << p.ToHMS(360.0) << endl;
+  cout << " 360 degrees in DMS format: " << p.ToDMS(360.0) << endl;
   cout << "-390 To180Domain:          " << p.To180Domain(-390) << endl;
   cout << "-390 To360Domain:          " << p.To360Domain(-390) << endl;
-  cout << "50 to Planetocentric (sphere): " << p.ToPlanetocentric(50, 180000, 180000) << endl;
-  cout << "50 to Planetographic (sphere): " << p.ToPlanetographic(50, 180000, 180000) << endl;
-  cout << "-30 ToPositiveEast (180 domain): " << p.ToPositiveEast(-30, 180) << endl;
-  cout << "30 ToPositiveWest (360 domain):  " << p.ToPositiveEast(30, 360) << endl;
+  cout << " 50 to Planetocentric (sphere): " << p.ToPlanetocentric(50, 180000, 180000) << endl;
+  cout << " 50 to Planetographic (sphere): " << p.ToPlanetographic(50, 180000, 180000) << endl;
+  cout << "-30 ToPositiveEast (180 domain):  " << p.ToPositiveEast(-30, 180) << endl;
+  cout << " 30 ToPositiveEast (360 domain): " << p.ToPositiveEast(30, 360) << endl;
+  cout << " 30 ToPositiveWest (180 domain): " << p.ToPositiveWest(30, 180) << endl;
+  cout << "-30 ToPositiveWest (360 domain):  " << p.ToPositiveWest(-30, 360) << endl;
+
+  cout << endl;
+  cout << "///////////////////////////////////////////////////////////" << endl;
+  cout << "Test Error Throws for invalid inputs to conversion methods " << endl;
+  double invalidValue = Null;
+  try {
+    Projection::To180Domain(invalidValue);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  try {
+    Projection::To360Domain(invalidValue);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  try {
+    p.ToPlanetocentric(-100);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  try {
+    p.ToPlanetocentric(100);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  try {
+    p.ToPlanetocentric(invalidValue);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  try {
+    Projection::ToPlanetocentric(invalidValue, 1, 1);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  try {
+    p.ToPlanetographic(invalidValue);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  try {
+    p.ToPlanetographic(-100);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  try {
+    p.ToPlanetographic(100);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  try {
+    Projection::ToPlanetographic(invalidValue, 1, 1);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  try {
+    Projection::ToPositiveEast(invalidValue, 180);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  try {
+    Projection::ToPositiveEast(0, invalidValue);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  try {
+    Projection::ToPositiveWest(invalidValue, 360);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  try {
+    Projection::ToPositiveWest(0, invalidValue);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  try {
+    p.ToProjectionX(invalidValue);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  try {
+    p.ToProjectionY(invalidValue);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  try {
+    p.ToWorldX(invalidValue);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  try {
+    p.ToWorldY(invalidValue);
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  cout << "///////////////////////////////////////////////////////////" << endl;
   cout << endl;
   cout << endl;
 
   cout << "Testing other static methods " << endl;
   try {
-    Isis::PvlGroup radii = Isis::Projection::TargetRadii("Mars");
+    PvlGroup radii = Projection::TargetRadii("Mars");
     cout << "Mars equatorial radius: " << radii["EquatorialRadius"] << endl;
-    cout << "Mars polar radius: " << radii["PolarRadius"] << endl;
+    cout << "Mars polar radius: " << radii["PolarRadius"] << endl << endl;
   }
-  catch(Isis::IException &error) {
+  catch(IException &error) {
     error.print();
   }
 
   cout << "Rotation Tests" << endl;
-  mg += Isis::PvlKeyword("Rotation", 90.0);
+  mg += PvlKeyword("Rotation", 90.0);
   mg["LongitudeDirection"] = "PositiveEast";
   MyProjection p4(lab);
   cout << "Rotation:     " << p4.Rotation() << endl;
@@ -438,7 +635,7 @@ int main(int argc, char *argv[]) {
   cout << "WorldY:                              " << p4.WorldY() << endl;
   cout << endl;
 
-  Isis::Pvl mapping;
+  Pvl mapping;
   mapping.AddGroup(p4.Mapping());
   cout << "Testing Mapping() methods" << endl;
   cout << "Mapping() = " << endl;
@@ -453,14 +650,16 @@ int main(int argc, char *argv[]) {
   cout << mapping << endl;
   mapping.DeleteGroup("Mapping");
   cout << endl;
+
+  //SetUpperLeftCorner(Displacement x, Displacement y)
 }
 
 
-void Doit(Isis::Pvl &lab) {
+void Doit(Pvl &lab) {
   try {
     MyProjection p(lab);
   }
-  catch(Isis::IException &error) {
+  catch(IException &error) {
     error.print();
   }
 }

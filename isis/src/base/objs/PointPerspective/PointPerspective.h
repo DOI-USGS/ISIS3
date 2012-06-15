@@ -23,7 +23,6 @@
  */
 
 #include "Projection.h"
-#include "Constants.h"
 
 namespace Isis {
   class Pvl;
@@ -32,13 +31,18 @@ namespace Isis {
    * @brief PointPerspective Map Projection
    *
    * This class provides methods for the forward and inverse equations of an
-   * PointPerspective map projection (for a sphere). The code was converted
-   * to C++ from the C version of the USGS General Cartographic Transformation
-   * Package (GCTP). This class inherits Projection and provides the two virtual
-   * methods SetGround (forward) and SetCoordinate (inverse) and a third virtual
-   * method, XYRange, for obtaining projection coordinate coverage for a
-   * latitude/longitude window. Please see the Projection class for a full
-   * accounting of all the methods available.
+   * PointPerspective map projection (for a sphere). 
+   *  
+   *  
+   *  
+   * The code was converted to C++ from the C version of the USGS General 
+   * Cartographic Transformation Package (GCTP). This class inherits Projection 
+   * and provides the two virtual methods SetGround (forward) and SetCoordinate 
+   * (inverse) and a third virtual method, XYRange, for obtaining projection 
+   * coordinate coverage for a latitude/longitude window. 
+   *  
+   * Please see the Projection class for a full accounting of all the methods 
+   * available. 
    *
    * @ingroup MapProjection
    *
@@ -48,57 +52,34 @@ namespace Isis {
    *   @history 2012-04-26 Jeannie Backer - Added forward declarations for Pvl
    *                           and PvlGroup.  Added includes to these classes in
    *                           the implementation file.
+   *   @history 2012-06-15 Jeannie Backer - Minor modifications to comply with
+   *                           some coding standards. References #928.
    */
-  class PointPerspective : public Isis::Projection {
+  class PointPerspective : public Projection {
     public:
       PointPerspective(Pvl &label, bool allowDefaults = false);
       ~PointPerspective();
+      bool operator== (const Projection &proj);
+
+      std::string Name() const;
+      std::string Version() const;
+      double TrueScaleLatitude() const;
+
       bool SetGround(const double lat, const double lon);
       bool SetCoordinate(const double x, const double y);
       bool XYRange(double &minX, double &maxX, double &minY, double &maxY);
+
       PvlGroup Mapping();
       PvlGroup MappingLatitudes();
       PvlGroup MappingLongitudes();
 
-      /**
-       * Returns the name of the map projection
-       *
-       * @return string Name of projection
-       */
-      std::string Name() const {
-        return "PointPerspective";
-      }
-
-      /**
-       * Returns the version of the map projection
-       *
-       *
-       * @return std::string Version number
-       */
-      std::string Version() const {
-        return "1.0";
-      }
-
-      bool operator== (const Isis::Projection &proj);
-
-      /**
-       * Returns the latitude of true scale (in the case of PointPerspective
-       * it is the center latitude)
-       *
-       * @return double
-       */
-      double TrueScaleLatitude() const {
-        return p_centerLatitude * 180.0 / Isis::PI;
-      };
-
-
     private:
-      double p_centerLongitude;  //!<The center longitude for the map projection
-      double p_centerLatitude;   //!<The center latitude for the map projection
-      double p_distance;         //!<Distance fromp perspective point to planet center
-      double sinph0;             //!<Sin of the center latitude
-      double cosph0;             //!<Cos of the center latitude
-      double p_P;                //!<Perspective Point
+      double m_centerLongitude; //!< The center longitude for the map projection
+      double m_centerLatitude;  //!< The center latitude for the map projection
+      double m_distance;        //!< Distance fromp perspective point to planet center
+      double m_sinph0;          //!< Sine of the center latitude
+      double m_cosph0;          //!< Cosine of the center latitude
+      double m_P;               //!< Perspective Point
 
   };
 };

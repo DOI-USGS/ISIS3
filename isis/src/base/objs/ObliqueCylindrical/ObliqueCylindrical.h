@@ -25,100 +25,92 @@
 #include "Projection.h"
 
 namespace Isis {
+  class Pvl;
+  class PvlGroup;
   /**
    * @brief Oblique Cylindrical Map Projection
    *
-   * This class provides methods for the forward and inverse equations of a Oblique
-   * Cylindrical map projection (for a sphere). The code was converted to C++ from
-   * the Fortran version of the USGS General Cartographic Transformation Package
-   * (GCTP). In particular it was modified from the Simple
-   * Cylindrical code. This class inherits Projection and provides
-   * the four virtual methods Name(), SetGround (forward) and
-   * SetCoordinate (inverse), XYRange (for obtaining projection
-   * coordinate coverage for a latitude/longitude window) and the
-   * == operator. Please see the Projection class for a full
-   * accounting of all the methods available.
+   * This class provides methods for the forward and inverse equations of an 
+   * Oblique Cylindrical map projection (for a sphere).
+   *  
+   * This projection works by moving the north pole of the simple cylindrical 
+   * projection. The pole latitude and longitude are the location of the new 
+   * north pole, and the rotation is the equivalent to the center longitude in 
+   * simple cylindrical.
+   *  
+   * The code was converted to C++ from the Fortran version of the USGS General 
+   * Cartographic Transformation Package (GCTP). In particular it was modified 
+   * from the Simple Cylindrical code. This class inherits Projection and 
+   * provides the four virtual methods Name(), SetGround (forward) and 
+   * SetCoordinate (inverse), XYRange (for obtaining projection coordinate 
+   * coverage for a latitude/longitude window) and the == operator. 
+   *  
+   * Please see the Projection class for a full accounting of all the methods 
+   * available.
    *
-   * This projection works by moving the north pole of the simple cylindrical projection.
-   * The pole latitude and longitude are the location of the new north pole, and the rotation
-   * is the equivalent to the center longitude in simple cylindrical.
+   * 
    *
    * @ingroup MapProjection
    *
    * @author 2000-02-09 Jeff Anderson
    *
    * @internal
-   *   @history 2007-06-19  Steven Lambright, Converted to ISIS3 and created XY Range search implementation
-   *   @history 2007-06-29 Steven Lambright - Added Mapping, MappingLatitudes and
-   *                                          MappingLongitudes methods.
+   *   @history 2007-06-19 Steven Lambright, Converted to ISIS3 and created XY
+   *                           Range search implementation
+   *   @history 2007-06-29 Steven Lambright - Added Mapping, MappingLatitudes
+   *                           and MappingLongitudes methods.
    *   @history 2008-05-09 Steven Lambright - Added Name, Version methods
-   *   @history 2010-02-08 Sharmila Prasad  - Removed testing p_latitude and p_longitude  in operator "=="
+   *   @history 2010-02-08 Sharmila Prasad  - Removed testing m_latitude and
+   *                           m_longitude  in operator "=="
+   *   @history 2012-06-06 Jeannie Backer - Added documentation.  Added forward
+   *                           declaration of Pvl, PvlGroup to header file.
+   *                           Ordered includes in implementation file. Moved
+   *                           Name() and Version() to the implementation file.
+   *                           Minor modifications to comply with some coding
+   *                           standards.
+   *   @history 2012-06-15 Jeannie Backer - Moved the following methods to
+   *                           Projection class for generalized
+   *                           xyRangeOblique() method - doSearch(),
+   *                           findExtreme(), setSearchGround(). Minor
+   *                           modifications to comply with some coding
+   *                           standards. References #928.
    */
   class ObliqueCylindrical : public Isis::Projection {
     public:
       ObliqueCylindrical(Isis::Pvl &label, bool allowDefaults = false);
       ~ObliqueCylindrical();
+      bool operator==(const Isis::Projection &proj);
+
+      std::string Name() const;
+      std::string Version() const;
+
       bool SetGround(const double lat, const double lon);
       bool SetCoordinate(const double x, const double y);
       bool XYRange(double &minX, double &maxX, double &minY, double &maxY);
+
       PvlGroup Mapping();
       PvlGroup MappingLatitudes();
       PvlGroup MappingLongitudes();
 
-      /**
-       * Returns the name of the map projection
-       *
-       * @return string Name of projection
-       */
-      std::string Name() const {
-        return "ObliqueCylindrical";
-      }
-
-      /**
-       * Returns the version of the map projection
-       *
-       *
-       * @return std::string Version number
-       */
-      std::string Version() const {
-        return "1.0";
-      }
-
-      bool operator==(const Isis::Projection &proj);
-
-      double GetPoleLatitude() const {
-        return p_poleLatitude;
-      };
-      double GetPoleLongitude() const {
-        return p_poleLongitude;
-      };
-      double GetPoleRotation() const {
-        return p_poleRotation;
-      };
+      double poleLatitude() const;
+      double poleLongitude() const;
+      double poleRotation() const;
 
     private:
       void init();
 
-      void doSearch(double minBorder, double maxBorder, double &extremeVal, const double constBorder,
-                    bool searchX, bool searchLongitude, bool findMin);
-
-      void findExtreme(double &newMinBorder, double &newMaxBorder, double &minVal, double &maxVal, const double constBorder,
-                       bool searchX, bool searchLongitude, bool findMin);
-      inline void SetSearchGround(const double variableBorder, const double constBorder, bool variableIsLat);
-
       // These are the oblique projection pole values in degrees.
-      double p_poleLatitude;   //!< The Oblique Pole Latitude
-      double p_poleLongitude;  //!< The Oblique Pole Longitude
-      double p_poleRotation;   //!< The Oblique Pole Rotation
-
-      // These are necessary for calculating X/Y range with discontinuity
-      std::vector<double> p_specialLatCases; //!< Constant Latitudes that intersect a discontinuitiy
-      std::vector<double> p_specialLonCases; //!< Constant Longitudes that intersect a discontinuitiy
+      double m_poleLatitude;   //!< The Oblique Pole Latitude
+      double m_poleLongitude;  //!< The Oblique Pole Longitude
+      double m_poleRotation;   //!< The Oblique Pole Rotation
 
       // These vectors are not used by the projection
-      std::vector<double> p_xAxisVector;
-      std::vector<double> p_yAxisVector;
-      std::vector<double> p_zAxisVector;
+      std::vector<double> m_xAxisVector; /**< The x-axis vector, read from the 
+                                               mapping group in the label.*/
+      std::vector<double> m_yAxisVector; /**< The y-axis vector, read from the 
+                                               mapping group in the label.*/
+      std::vector<double> m_zAxisVector; /**< The z-axis vector, read from the 
+                                               mapping group in the label.*/
   };
 };
 

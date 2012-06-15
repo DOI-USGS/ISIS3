@@ -30,6 +30,7 @@
 #include "Projection.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
+#include "PvlKeyword.h"
 
 using namespace std;
 namespace Isis {
@@ -49,76 +50,76 @@ namespace Isis {
    *                      specified in the label, and the scale factor will
    *                      default to 1.0. Defaults to false.
    *
-   * @throws Isis::iException::Io
+   * @throws IException
    */
-  TransverseMercator::TransverseMercator(Isis::Pvl &label, bool allowDefaults) :
-      Isis::Projection::Projection(label) {
+  TransverseMercator::TransverseMercator(Pvl &label, bool allowDefaults) :
+      Projection::Projection(label) {
     try {
       // Try to read the mapping group
-      Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
+      PvlGroup &mapGroup = label.FindGroup("Mapping", Pvl::Traverse);
 
       // Compute and write the default center longitude if allowed and
       // necessary
-      if((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
-        double lon = (p_minimumLongitude + p_maximumLongitude) / 2.0;
-        mapGroup += Isis::PvlKeyword("CenterLongitude", lon);
+      if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
+        double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
+        mapGroup += PvlKeyword("CenterLongitude", lon);
       }
 
       // Compute and write the default center latitude if allowed and
       // necessary
-      if((allowDefaults) && (!mapGroup.HasKeyword("CenterLatitude"))) {
-        double lat = (p_minimumLatitude + p_maximumLatitude) / 2.0;
-        mapGroup += Isis::PvlKeyword("CenterLatitude", lat);
+      if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLatitude"))) {
+        double lat = (m_minimumLatitude + m_maximumLatitude) / 2.0;
+        mapGroup += PvlKeyword("CenterLatitude", lat);
       }
 
       // Get the center longitude  & latitude
-      p_centerLongitude = mapGroup["CenterLongitude"];
-      p_centerLatitude = mapGroup["CenterLatitude"];
+      m_centerLongitude = mapGroup["CenterLongitude"];
+      m_centerLatitude = mapGroup["CenterLatitude"];
 
       // make sure the center latitude value is valid
-      if(fabs(p_centerLatitude) >= 90.0) {
+      if (fabs(m_centerLatitude) >= 90.0) {
         string msg = "Invalid Center Latitude Value. Must be between -90 and 90";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
       // make sure the center longitude value is valid
-      if(fabs(p_centerLongitude) > 360.0) {
+      if (fabs(m_centerLongitude) > 360.0) {
         string msg = "Invalid Center Longitude Value. Must be between -360 and 360";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
       // convert latitude to planetographic if it is planetocentric
-      if(this->IsPlanetocentric()) {
-        p_centerLatitude = this->ToPlanetographic(p_centerLatitude);
+      if (IsPlanetocentric()) {
+        m_centerLatitude = ToPlanetographic(m_centerLatitude);
       }
 
       // convert to radians and adjust for longitude direction
-      if(p_longitudeDirection == PositiveWest) p_centerLongitude *= -1.0;
-      p_centerLatitude *= Isis::PI / 180.0;
-      p_centerLongitude *= Isis::PI / 180.0;
+      if (m_longitudeDirection == PositiveWest) m_centerLongitude *= -1.0;
+      m_centerLatitude *= PI / 180.0;
+      m_centerLongitude *= PI / 180.0;
 
       // Compute other necessary variables. See Snyder, page 61
-      p_eccsq = Eccentricity() * Eccentricity();
-      p_esp = p_eccsq;
-      p_e0 = 1.0 - 0.25 * p_eccsq * (1.0 + p_eccsq / 16.0 * (3.0 + 1.25 * p_eccsq));
-      p_e1 = 0.375 * p_eccsq * (1.0 + 0.25 * p_eccsq * (1.0 + 0.468750 * p_eccsq));
-      p_e2 = 0.058593750 * p_eccsq * p_eccsq * (1.0 + 0.750 * p_eccsq);
-      p_e3 = p_eccsq * p_eccsq * p_eccsq * (35.0 / 3072.0);
-      p_ml0 = p_equatorialRadius * (p_e0 * p_centerLatitude - p_e1 * sin(2.0 * p_centerLatitude) +
-                                    p_e2 * sin(4.0 * p_centerLatitude) - p_e3 * sin(6.0 * p_centerLatitude));
+      m_eccsq = Eccentricity() * Eccentricity();
+      m_esp = m_eccsq;
+      m_e0 = 1.0 - 0.25 * m_eccsq * (1.0 + m_eccsq / 16.0 * (3.0 + 1.25 * m_eccsq));
+      m_e1 = 0.375 * m_eccsq * (1.0 + 0.25 * m_eccsq * (1.0 + 0.468750 * m_eccsq));
+      m_e2 = 0.058593750 * m_eccsq * m_eccsq * (1.0 + 0.750 * m_eccsq);
+      m_e3 = m_eccsq * m_eccsq * m_eccsq * (35.0 / 3072.0);
+      m_ml0 = m_equatorialRadius * (m_e0 * m_centerLatitude - m_e1 * sin(2.0 * m_centerLatitude) +
+                                    m_e2 * sin(4.0 * m_centerLatitude) - m_e3 * sin(6.0 * m_centerLatitude));
 
       // Set flag for sphere or ellipsiod
-      p_sph = true; // Sphere
-      if(Eccentricity() >= .00001) {
-        p_sph = false; // Ellipsoid
-        p_esp = p_eccsq / (1.0 - p_eccsq);
+      m_sph = true; // Sphere
+      if (Eccentricity() >= .00001) {
+        m_sph = false; // Ellipsoid
+        m_esp = m_eccsq / (1.0 - m_eccsq);
       }
 
       // Get the scale factor
-      if((allowDefaults) && (!mapGroup.HasKeyword("ScaleFactor"))) {
-        mapGroup += Isis::PvlKeyword("ScaleFactor", 1.0);
+      if ((allowDefaults) && (!mapGroup.HasKeyword("ScaleFactor"))) {
+        mapGroup += PvlKeyword("ScaleFactor", 1.0);
       }
-      p_scalefactor = mapGroup["ScaleFactor"];
+      m_scalefactor = mapGroup["ScaleFactor"];
     }
     catch(IException &e) {
       string message = "Invalid label group [Mapping]";
@@ -128,6 +129,43 @@ namespace Isis {
 
   //! Destroys the TransverseMercator object
   TransverseMercator::~TransverseMercator() {
+  }
+
+  /**
+   * Compares two Projection objects to see if they are equal
+   *
+   * @param proj Projection object to do comparison on
+   *
+   * @return bool Returns true if the Projection objects are equal, and false if
+   *              they are not
+   */
+  bool TransverseMercator::operator== (const Projection &proj) {
+    if (!Projection::operator==(proj)) return false;
+    // dont do the below it is a recusive plunge
+    //  if (Projection::operator!=(proj)) return false;
+    TransverseMercator *trans = (TransverseMercator *) &proj;
+    if ((trans->m_centerLongitude != m_centerLongitude) ||
+        (trans->m_centerLatitude != m_centerLatitude)) return false;
+    return true;
+  }
+
+  /**
+   * Returns the name of the map projection, "TransverseMercator"
+   *
+   * @return string Name of projection, "TransverseMercator"
+   */
+  string TransverseMercator::Name() const {
+    return "TransverseMercator";
+  }
+
+  /**
+   * Returns the version of the map projection
+   *
+   *
+   * @return string Version number
+   */
+  string TransverseMercator::Version() const {
+    return "1.0";
   }
 
   /**
@@ -144,62 +182,62 @@ namespace Isis {
    */
   bool TransverseMercator::SetGround(const double lat, const double lon) {
     // Get longitude & fix direction
-    p_longitude = lon;
-    if(p_longitudeDirection == PositiveWest) p_longitude *= -1.0;
+    m_longitude = lon;
+    if (m_longitudeDirection == PositiveWest) m_longitude *= -1.0;
 
-    double cLonDeg = p_centerLongitude * 180.0 / Isis::PI;
-    double deltaLon = p_longitude - cLonDeg;
+    double cLonDeg = m_centerLongitude * 180.0 / PI;
+    double deltaLon = m_longitude - cLonDeg;
     while(deltaLon < -360.0) deltaLon += 360.0;
     while(deltaLon > 360.0) deltaLon -= 360.0;
-    double deltaLonRads = deltaLon * Isis::PI / 180.0;
+    double deltaLonRads = deltaLon * PI / 180.0;
 
     // Now convert latitude to radians & clean up ... it must be planetographic
-    p_latitude = lat;
-    double latRadians = p_latitude * Isis::PI / 180.0;
-    if(IsPlanetocentric()) {
-      latRadians = ToPlanetographic(p_latitude) * Isis::PI / 180.0;
+    m_latitude = lat;
+    double latRadians = m_latitude * PI / 180.0;
+    if (IsPlanetocentric()) {
+      latRadians = ToPlanetographic(m_latitude) * PI / 180.0;
     }
 
     // distance along the meridian fromthe Equator to the latitude phi
     // see equation (3-21) on pages 61, 17.
-    double M = p_equatorialRadius * (p_e0 * latRadians 
-                                      - p_e1 * sin(2.0 * latRadians)
-                                      + p_e2 * sin(4.0 * latRadians) 
-                                      - p_e3 * sin(6.0 * latRadians));
+    double M = m_equatorialRadius * (m_e0 * latRadians 
+                                      - m_e1 * sin(2.0 * latRadians)
+                                      + m_e2 * sin(4.0 * latRadians) 
+                                      - m_e3 * sin(6.0 * latRadians));
 
     // Declare variables
     const double epsilon = 1.0e-10;
 
     // Sphere Conversion
     double x, y;
-    if(p_sph) {
+    if (m_sph) {
       double cosphi = cos(latRadians);
       double b = cosphi * sin(deltaLonRads);
 
       // Point projects to infinity
-      if(fabs(fabs(b) - 1.0) <= epsilon) {
-        p_good = false;
-        return p_good;
+      if (fabs(fabs(b) - 1.0) <= epsilon) {
+        m_good = false;
+        return m_good;
       }
-      x = 0.5 * p_equatorialRadius * p_scalefactor * log((1.0 + b) / (1.0 - b));
+      x = 0.5 * m_equatorialRadius * m_scalefactor * log((1.0 + b) / (1.0 - b));
 
       // If arcosine argument is too close to 1, con=0.0 because arcosine(1)=0
       double con = cosphi * cos(deltaLonRads) / sqrt(1.0 - b * b);
-      if(fabs(con) > 1.0) {
+      if (fabs(con) > 1.0) {
         con = 0.0;
       }
       else {
         con = acos(con);
       }
-      if(p_latitude < 0.0) con = -con;
-      y = p_equatorialRadius * p_scalefactor * (con - p_centerLatitude);
+      if (m_latitude < 0.0) con = -con;
+      y = m_equatorialRadius * m_scalefactor * (con - m_centerLatitude);
     }
 
     // Ellipsoid Conversion
     else {
-      if(fabs(Isis::HALFPI - fabs(latRadians)) < epsilon) {
+      if (fabs(HALFPI - fabs(latRadians)) < epsilon) {
         x = 0.0;
-        y = p_scalefactor * (M - p_ml0);
+        y = m_scalefactor * (M - m_ml0);
       }
       else {
         // Define Snyder's variables for ellipsoidal projections, page61
@@ -207,25 +245,25 @@ namespace Isis {
         double cosphi = cos(latRadians);
         double A = cosphi * deltaLonRads;        // see equation (8-15), page 61
         double Asquared = A * A;
-        double C = p_esp * cosphi * cosphi;      // see equation (8-14), page 61
+        double C = m_esp * cosphi * cosphi;      // see equation (8-14), page 61
         double tanphi = tan(latRadians);
         double T = tanphi * tanphi;              // see equation (8-13), page 61
-        double N = p_equatorialRadius / sqrt(1.0 - p_eccsq * sinphi * sinphi);
+        double N = m_equatorialRadius / sqrt(1.0 - m_eccsq * sinphi * sinphi);
                                                  // see equation (4-20), page 61
 
-        x = p_scalefactor * N * A 
+        x = m_scalefactor * N * A 
                * (1.0 + Asquared / 6.0 * (1.0 - T + C + Asquared / 20.0 
-                                 *(5.0 - 18.0*T + T*T + 72.0*C - 58.0*p_esp)));
-        y = p_scalefactor 
-               * (M - p_ml0 + N*tanphi*(Asquared * (0.5 + Asquared / 24.0 *
+                                 *(5.0 - 18.0*T + T*T + 72.0*C - 58.0*m_esp)));
+        y = m_scalefactor 
+               * (M - m_ml0 + N*tanphi*(Asquared * (0.5 + Asquared / 24.0 *
                              (5.0 - T + 9.0*C + 4.0*C*C + Asquared / 30.0
-                             *(61.0 - 58.0*T + T*T + 600.0*C - 330.0*p_esp)))));
+                             *(61.0 - 58.0*T + T*T + 600.0*C - 330.0*m_esp)))));
       }
     }
 
     SetComputedXY(x, y);
-    p_good = true;
-    return p_good;
+    m_good = true;
+    return m_good;
   }
 
   /**
@@ -251,88 +289,89 @@ namespace Isis {
     const double epsilon = 1.0e-10;
 
     // Sphere Conversion
-    if(p_sph) {
-      f = exp(GetX() / (p_equatorialRadius * p_scalefactor));
+    if (m_sph) {
+      f = exp(GetX() / (m_equatorialRadius * m_scalefactor));
       g = 0.5 * (f - 1.0 / f);
-      temp = p_centerLatitude + GetY() / (p_equatorialRadius * p_scalefactor);
+      temp = m_centerLatitude + GetY() / (m_equatorialRadius * m_scalefactor);
       h = cos(temp);
       con = sqrt((1.0 - h * h) / (1.0 + g * g));
-      if(con > 1.0) con = 1.0;
-      if(con < -1.0) con = -1.0;
-      p_latitude = asin(con);
-      if(temp < 0.0) p_latitude = -p_latitude;
-      p_longitude = p_centerLongitude;
-      if(g != 0.0 || h != 0.0) {
-        p_longitude = atan2(g, h) + p_centerLongitude;
+      if (con > 1.0) con = 1.0;
+      if (con < -1.0) con = -1.0;
+      m_latitude = asin(con);
+      if (temp < 0.0) m_latitude = -m_latitude;
+      m_longitude = m_centerLongitude;
+      if (g != 0.0 || h != 0.0) {
+        m_longitude = atan2(g, h) + m_centerLongitude;
       }
     }
 
     // Ellipsoid Conversion
-    else if(!p_sph) {
-      con = (p_ml0 + GetY() / p_scalefactor) / p_equatorialRadius;
+    else if (!m_sph) {
+      con = (m_ml0 + GetY() / m_scalefactor) / m_equatorialRadius;
       phi = con;
-      for(int i = 1; i < 7; i++) {
-        dphi = ((con + p_e1 * sin(2.0 * phi) - p_e2 * sin(4.0 * phi)
-                 + p_e3 * sin(6.0 * phi)) / p_e0) - phi;
+      for (int i = 1; i < 7; i++) {
+        dphi = ((con + m_e1 * sin(2.0 * phi) - m_e2 * sin(4.0 * phi)
+                 + m_e3 * sin(6.0 * phi)) / m_e0) - phi;
         phi += dphi;
-        if(fabs(dphi) <= epsilon) break;
+        if (fabs(dphi) <= epsilon) break;
       }
 
       // Didn't converge
-      if(fabs(dphi) > epsilon) {
-        p_good = false;
-        return p_good;
+      if (fabs(dphi) > epsilon) {
+        m_good = false;
+        return m_good;
       }
-      if(fabs(phi) >= Isis::HALFPI) {
-        if(GetY() >= 0.0) p_latitude = fabs(Isis::HALFPI);
-        if(GetY() < 0.0) p_latitude = - fabs(Isis::HALFPI);
-        p_longitude = p_centerLongitude;
+      if (fabs(phi) >= HALFPI) {
+        if (GetY() >= 0.0) m_latitude = fabs(HALFPI);
+        if (GetY() < 0.0) m_latitude = - fabs(HALFPI);
+        m_longitude = m_centerLongitude;
       }
       else {
         sinphi = sin(phi);
         cosphi = cos(phi);
         tanphi = tan(phi);
-        c = p_esp * cosphi * cosphi;
+        c = m_esp * cosphi * cosphi;
         cs = c * c;
         t = tanphi * tanphi;
         ts = t * t;
-        con = 1.0 - p_eccsq * sinphi * sinphi;
-        n = p_equatorialRadius / sqrt(con);
-        rp = n * (1.0 - p_eccsq) / con;
-        d = GetX() / (n * p_scalefactor);
+        con = 1.0 - m_eccsq * sinphi * sinphi;
+        n = m_equatorialRadius / sqrt(con);
+        rp = n * (1.0 - m_eccsq) / con;
+        d = GetX() / (n * m_scalefactor);
         ds = d * d;
-        p_latitude = phi - (n * tanphi * ds / rp) * (0.5 - ds /
+        m_latitude = phi - (n * tanphi * ds / rp) * (0.5 - ds /
                      24.0 * (5.0 + 3.0 * t + 10.0 * c - 4.0 * cs - 9.0 *
-                             p_esp - ds / 30.0 * (61.0 + 90.0 * t + 298.0 * c +
-                                 45.0 * ts - 252.0 * p_esp - 3.0 * cs)));
+                             m_esp - ds / 30.0 * (61.0 + 90.0 * t + 298.0 * c +
+                                 45.0 * ts - 252.0 * m_esp - 3.0 * cs)));
 
 
         // Latitude cannot be greater than + or - halfpi radians (or 90 degrees)
-        if(fabs(p_latitude) > Isis::HALFPI) {
-          p_good = false;
-          return p_good;
+        if (fabs(m_latitude) > HALFPI) {
+          m_good = false;
+          return m_good;
         }
-        p_longitude = p_centerLongitude + (d * (1.0 - ds / 6.0 *
-                                                (1.0 + 2.0 * t + c - ds / 20.0 * (5.0 - 2.0 * c +
-                                                    28.0 * t - 3.0 * cs + 8.0 * p_esp + 24.0 * ts))) / cosphi);
+        m_longitude = m_centerLongitude 
+                      + (d * (1.0 - ds / 6.0 *
+                              (1.0 + 2.0 * t + c - ds / 20.0 * (5.0 - 2.0 * c +
+                                   28.0 * t - 3.0 * cs + 8.0 * m_esp + 24.0 * ts))) / cosphi);
       }
     }
 
     // Convert to Degrees
-    p_latitude *= 180.0 / Isis::PI;
-    p_longitude *= 180.0 / Isis::PI;
+    m_latitude *= 180.0 / PI;
+    m_longitude *= 180.0 / PI;
 
     // Cleanup the longitude
-    if(p_longitudeDirection == PositiveWest) p_longitude *= -1.0;
+    if (m_longitudeDirection == PositiveWest) m_longitude *= -1.0;
     // These need to be done for circular type projections
-    p_longitude = To360Domain(p_longitude);
-    if(p_longitudeDomain == 180) p_longitude = To180Domain(p_longitude);
+    m_longitude = To360Domain(m_longitude);
+    if (m_longitudeDomain == 180) m_longitude = To180Domain(m_longitude);
 
     // Cleanup the latitude
-    if(IsPlanetocentric()) p_latitude = ToPlanetocentric(p_latitude);
+    if (IsPlanetocentric()) m_latitude = ToPlanetocentric(m_latitude);
 
-    p_good = true;
-    return p_good;
+    m_good = true;
+    return m_good;
   }
 
   /**
@@ -358,39 +397,40 @@ namespace Isis {
    *
    * @return bool
    */
-  bool TransverseMercator::XYRange(double &minX, double &maxX, double &minY, double &maxY) {
+  bool TransverseMercator::XYRange(double &minX, double &maxX, 
+                                   double &minY, double &maxY) {
     // Check the corners of the lat/lon range
-    XYRangeCheck(p_minimumLatitude, p_minimumLongitude);
-    XYRangeCheck(p_maximumLatitude, p_minimumLongitude);
-    XYRangeCheck(p_minimumLatitude, p_maximumLongitude);
-    XYRangeCheck(p_maximumLatitude, p_maximumLongitude);
+    XYRangeCheck(m_minimumLatitude, m_minimumLongitude);
+    XYRangeCheck(m_maximumLatitude, m_minimumLongitude);
+    XYRangeCheck(m_minimumLatitude, m_maximumLongitude);
+    XYRangeCheck(m_maximumLatitude, m_maximumLongitude);
 
     // convert center latitude to degrees & test
-    double clat = p_centerLatitude * 180.0 / Isis::PI;
+    double clat = m_centerLatitude * 180.0 / PI;
 
-    if(clat > p_minimumLatitude &&
-        clat < p_maximumLatitude) {
-      XYRangeCheck(clat, p_minimumLongitude);
-      XYRangeCheck(clat, p_maximumLongitude);
+    if (clat > m_minimumLatitude &&
+        clat < m_maximumLatitude) {
+      XYRangeCheck(clat, m_minimumLongitude);
+      XYRangeCheck(clat, m_maximumLongitude);
     }
 
     // convert center longitude to degrees & test
-    double clon = p_centerLongitude * 180.0 / Isis::PI;
-    if(clon > p_minimumLongitude &&
-        clon < p_maximumLongitude) {
-      XYRangeCheck(p_minimumLatitude, clon);
-      XYRangeCheck(p_maximumLatitude, clon);
+    double clon = m_centerLongitude * 180.0 / PI;
+    if (clon > m_minimumLongitude &&
+        clon < m_maximumLongitude) {
+      XYRangeCheck(m_minimumLatitude, clon);
+      XYRangeCheck(m_maximumLatitude, clon);
     }
 
     // Make sure everything is ordered
-    if(p_minimumX >= p_maximumX) return false;
-    if(p_minimumY >= p_maximumY) return false;
+    if (m_minimumX >= m_maximumX) return false;
+    if (m_minimumY >= m_maximumY) return false;
 
     // Return X/Y min/maxs
-    minX = p_minimumX;
-    maxX = p_maximumX;
-    minY = p_minimumY;
-    maxY = p_maximumY;
+    minX = m_minimumX;
+    maxX = m_maximumX;
+    minY = m_minimumY;
+    maxY = m_maximumY;
     return true;
   }
 
@@ -403,9 +443,9 @@ namespace Isis {
   PvlGroup TransverseMercator::Mapping() {
     PvlGroup mapping = Projection::Mapping();
 
-    mapping += p_mappingGrp["CenterLatitude"];
-    mapping += p_mappingGrp["CenterLongitude"];
-    mapping += p_mappingGrp["ScaleFactor"];
+    mapping += m_mappingGrp["CenterLatitude"];
+    mapping += m_mappingGrp["CenterLongitude"];
+    mapping += m_mappingGrp["ScaleFactor"];
 
     return mapping;
   }
@@ -418,7 +458,7 @@ namespace Isis {
   PvlGroup TransverseMercator::MappingLatitudes() {
     PvlGroup mapping = Projection::MappingLatitudes();
 
-    mapping += p_mappingGrp["CenterLatitude"];
+    mapping += m_mappingGrp["CenterLatitude"];
 
     return mapping;
   }
@@ -431,27 +471,9 @@ namespace Isis {
   PvlGroup TransverseMercator::MappingLongitudes() {
     PvlGroup mapping = Projection::MappingLongitudes();
 
-    mapping += p_mappingGrp["CenterLongitude"];
+    mapping += m_mappingGrp["CenterLongitude"];
 
     return mapping;
-  }
-
-  /**
-   * Compares two Projection objects to see if they are equal
-   *
-   * @param proj Projection object to do comparison on
-   *
-   * @return bool Returns true if the Projection objects are equal, and false if
-   *              they are not
-   */
-  bool TransverseMercator::operator== (const Isis::Projection &proj) {
-    if(!Isis::Projection::operator==(proj)) return false;
-    // dont do the below it is a recusive plunge
-    //  if (Isis::Projection::operator!=(proj)) return false;
-    TransverseMercator *trans = (TransverseMercator *) &proj;
-    if((trans->p_centerLongitude != this->p_centerLongitude) ||
-        (trans->p_centerLatitude != this->p_centerLatitude)) return false;
-    return true;
   }
 } // end namespace isis
 

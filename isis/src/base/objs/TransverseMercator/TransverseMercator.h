@@ -31,13 +31,23 @@ namespace Isis {
    * @brief TransverseMercator Map Projection
    *
    * This class provides methods for the forward and inverse equations of a
-   * TransverseMercator map projection (for a sphere or ellipsoid). The code was
-   * converted to C++ from the C version of the USGS General Cartographic
-   * Transformation Package (GCTP). This class inherits Projection and provides
-   * the two virtual methods SetGround (forward) and SetCoordinate (inverse) and
-   * a third virtual method, XYRange, for obtaining projection coordinate coverage
-   * for a latitude/longitude window. Please see the Projection class for a full
-   * accounting of all the methods available.
+   * TransverseMercator map projection (for a sphere or ellipsoid). 
+   *  
+   * The Transverse Mercator projection is conformal and cylindrical 
+   * (transverse), preserving angles and shapes of small objects and distorting 
+   * the shape of large objects.  The cylinder wraps along a center longitude. 
+   * The equator, center longitude, and longitudes 90 degrees from the center 
+   * longitude are all represented as straight lines. Any other latitude or 
+   * longitude is represented by a complex curve.  The true scale of the 
+   * projection is found along the center longitude or along the other two 
+   * longitudes that are represented as lines. 
+   *  
+   * The code was converted to C++ from the C version of the USGS General 
+   * Cartographic Transformation Package (GCTP). This class inherits Projection 
+   * and provides the two virtual methods SetGround (forward) and SetCoordinate 
+   * (inverse) and a third virtual method, XYRange, for obtaining projection 
+   * coordinate coverage for a latitude/longitude window. Please see the 
+   * Projection class for a full accounting of all the methods available. 
    *
    * @ingroup MapProjection
    *
@@ -53,60 +63,53 @@ namespace Isis {
    *   @history 2008-05-09 Steven Lambright - Added Name, Version methods
    *   @history 2012-05-03 Jeannie Backer - Added documentation.  Moved
    *                           inclusion of Constants.h to implemenatation file.
+   *   @history 2012-06-15 Jeannie Backer - Added more documentation. Moved
+   *                           Name and Version methods to the implementation
+   *                           file. Minor modifications to comply with some
+   *                           coding standards. References #928.
    */
-  class TransverseMercator : public Isis::Projection {
+  class TransverseMercator : public Projection {
     public:
       TransverseMercator(Pvl &label, bool allowDefaults = false);
       ~TransverseMercator();
+      bool operator== (const Projection &proj);
+
+      std::string Name() const;
+      std::string Version() const;
+
       bool SetGround(const double lat, const double lon);
       bool SetCoordinate(const double x, const double y);
+      bool XYRange(double &minX, double &maxX, double &minY, double &maxY);
+
       PvlGroup Mapping();
       PvlGroup MappingLatitudes();
       PvlGroup MappingLongitudes();
 
-      bool XYRange(double &minX, double &maxX, double &minY, double &maxY);
-
-      /**
-       * Returns the name of the map projection
-       *
-       * @return string Name of projection
-       */
-      std::string Name() const {
-        return "TransverseMercator";
-      }
-
-      /**
-       * Returns the version of the map projection
-       *
-       *
-       * @return std::string Version number
-       */
-      std::string Version() const {
-        return "1.0";
-      }
-
-      bool operator== (const Projection &proj);
-
     private:
-      double p_centerLongitude; //!< The center longitude for the map projection
-      double p_centerLatitude;  //!< The center latitude for the map projection
-      double p_scalefactor;     //!< Scale Factor for the projection
-      double p_eccsq;           //!< Eccentricity Squared
-      double p_esp; /**< Snyder's (e')^2 variable from equation (8-12) on page 
+      double m_centerLongitude; //!< The center longitude for the map projection
+      double m_centerLatitude;  //!< The center latitude for the map projection
+      double m_scalefactor;     //!< Scale Factor for the projection
+      double m_eccsq;           //!< Eccentricity Squared
+      double m_esp; /**< Snyder's (e')^2 variable from equation (8-12) on page 
                          61.  If the target body is spherical, this constant is 
                          set to 0. Otherwise, it is 
                          (eccentricity)^2 / (1 - (eccentricity)^2).**/
-      double p_e0;  /**< Eccentricity Constant: e0 = 1 - e^2/4 * (1 + 3e^2/16 * (3 + 5e^2/4))
-                         estimates the value e0 = 1 - e^2/4 - 3e^4/64 - 5e^6/256 - ... **/
-      double p_e1;  /**< Eccentricity Constant: e1 = 3e^2/8 * (1.0 + e^2/4 * (1.0 + 15e^2/32))
-                         estimates the value e1 = 3e^2/8 + 3e^4/32 + 45e^6/1024 + ...**/
-      double p_e2;  /**< Eccentricity Constant: e2 = 15e^4/256 * (1 + 3e^2/4))
-                         estimates the value e2 = 15e^4/256 + 45e^6/1024 + ...**/
-      double p_e3;  /**< Eccentricity Constant: e3 = 35e^6/3072 
+      double m_e0;  /**< Eccentricity Constant: 
+                         e0 = 1 - e^2/4 * (1 + 3e^2/16 * (3 + 5e^2/4))
+                         estimates the value 
+                         e0 = 1 - e^2/4 - 3e^4/64 - 5e^6/256 - ... **/
+      double m_e1;  /**< Eccentricity Constant: 
+                         e1 = 3e^2/8 * (1.0 + e^2/4 * (1.0 + 15e^2/32))
+                         estimates the value 
+                         e1 = 3e^2/8 + 3e^4/32 + 45e^6/1024 + ...**/
+      double m_e2;  /**< Eccentricity Constant: e2 = 15e^4/256 * (1 + 3e^2/4))
+                         estimates the value 
+                         e2 = 15e^4/256 + 45e^6/1024 + ...**/
+      double m_e3;  /**< Eccentricity Constant: e3 = 35e^6/3072 
                          estimates the value e3 = 35e^6/3072 + ...**/
-      double p_ml0; /**< Distance along the meridian from the equator
+      double m_ml0; /**< Distance along the meridian from the equator
                                     to the center latitude.*/
-      bool p_sph;   /**< Flag set to true if sphere, and false if ellipsiod.*/
+      bool m_sph;   /**< Flag set to true if sphere, and false if ellipsiod.*/
   };
 };
 #endif
