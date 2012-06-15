@@ -10,7 +10,7 @@ include $(ISISROOT)/make/isismake.tsts
 commands:
 	$(APPNAME) to=$(OUTPUT)/temp.db.txt \
 	  type=CK \
-	  recondir=\$$mro/kernels/ck \
+	  recondir=$(INPUT) \
 	  reconfilter=mro_sc_2005-12-*.bc \
 	  sclk=\$$mro/kernels/sclk/MRO_SCLKSCET.00006.tsc \
 	  lsk=\$$base/kernels/lsk/naif0008.tls > /dev/null;
