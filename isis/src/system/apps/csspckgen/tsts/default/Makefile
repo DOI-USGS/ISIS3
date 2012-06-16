@@ -1,6 +1,6 @@
 APPNAME = csspckgen
 
-output.db.txt.IGNORELINES = RunTime
+output.db.txt.IGNORELINES = RunTime LeapsecondKernel
 
 include $(ISISROOT)/make/isismake.tsts
 
