@@ -51,8 +51,21 @@ namespace Isis {
     QLabel *showVectorsLabel = new QLabel("Show feature extents");
     settingsAreaLayout->addWidget(showVectorsLabel, row, 0);
 
-    m_showVectorsCheckBox = new QCheckBox;
-    settingsAreaLayout->addWidget(m_showVectorsCheckBox, row, 1);
+    m_showVectorsCombo = new QComboBox;
+
+    m_showVectorsCombo->addItem("None", FeatureNomenclatureTool::None);
+    m_showVectorsCombo->addItem("4 Arrows", FeatureNomenclatureTool::Arrows4);
+    m_showVectorsCombo->addItem("8 Arrows", FeatureNomenclatureTool::Arrows8);
+    m_showVectorsCombo->addItem("Box", FeatureNomenclatureTool::Box);
+    
+    settingsAreaLayout->addWidget(m_showVectorsCombo, row, 1);
+    row++;
+
+    QLabel *showApprovedLabel = new QLabel("Show IAU approved only");
+    settingsAreaLayout->addWidget(showApprovedLabel, row, 0);
+
+    m_showApprovedCheckBox = new QCheckBox;
+    settingsAreaLayout->addWidget(m_showApprovedCheckBox, row, 1);
     row++;
 
     QLabel *defaultOnLabel = new QLabel(
@@ -69,7 +82,7 @@ namespace Isis {
     buttonsAreaWidget->setLayout(buttonsAreaLayout);
 
     buttonsAreaLayout->addStretch();
-
+    
     QPushButton *okayButton = new QPushButton("&Ok");
     okayButton->setIcon(QIcon::fromTheme("dialog-ok"));
     buttonsAreaLayout->addWidget(okayButton);
@@ -113,7 +126,10 @@ namespace Isis {
 
     m_tool->setDefaultEnabled(m_defaultOnCheckBox->isChecked());
 
-    m_tool->setShowVectors(m_showVectorsCheckBox->isChecked());
+    m_tool->setShowApprovedOnly(m_showApprovedCheckBox->isChecked());
+
+    m_tool->setVectorType( (FeatureNomenclatureTool::VectorType)
+        m_showVectorsCombo->itemData(m_showVectorsCombo->currentIndex()).toInt() );
 
     readSettings();
   }
@@ -131,8 +147,11 @@ namespace Isis {
     m_fontColorButton->setPalette(colorPalette);
 
     m_defaultOnCheckBox->setChecked(m_tool->defaultEnabled());
+    
+    m_showApprovedCheckBox->setChecked(m_tool->showApprovedOnly());
 
-    m_showVectorsCheckBox->setChecked(m_tool->showVectors());
+    m_showVectorsCombo->setCurrentIndex(
+      m_showVectorsCombo->findData(m_tool->vectorType()));
   }
 
 

@@ -80,5 +80,10 @@
       Fixed prompts for saving edited files on closing so they are functional once again.
       Fixes #854.
     </change>
+    <change name="Steven Lambright and Kimberly Oyama" date="2012-06-11">
+      Updated the nomenclature tool to include the option to choose from three
+      types of extent displays (4 arrows, 8 arrows, or a box) and the option
+      to display all features or only IAU approved features.
+    </change>
   </history>
 </application>

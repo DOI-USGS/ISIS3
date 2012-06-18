@@ -19,6 +19,7 @@
 #include "Longitude.h"
 
 namespace Isis {
+  
   /**
    * Instantiate a feature nomenclature. This prepares to make network requests.
    */
@@ -28,7 +29,6 @@ namespace Isis {
     m_features = NULL;
 
     m_networkMgr = new QNetworkAccessManager;
-
     connect(m_networkMgr, SIGNAL(finished(QNetworkReply *)),
             this, SLOT(requestFinished(QNetworkReply *)));
 
@@ -97,6 +97,13 @@ namespace Isis {
   void FeatureNomenclature::queryFeatures(iString target,
                                           Latitude startLat, Longitude startLon,
                                           Latitude endLat, Longitude endLon) {
+    startLon = startLon.force360Domain();
+    endLon = endLon.force360Domain();
+
+    if (startLon > endLon) {
+      std::swap(startLon, endLon);
+    }
+    
     QUrl encodedFormData;
 
     // List of XML fields we want from the server
@@ -243,15 +250,17 @@ namespace Isis {
    */
   FeatureNomenclature::Feature::Feature() {
     m_xmlRepresenation = NULL;
+    m_approvalStatus = NoStatus;
   }
 
 
   /**
    * Construct a feature with the data encapsulated inside of the XML.
    */
-  FeatureNomenclature::Feature::Feature(QDomElement searchResultFeature) {
+  FeatureNomenclature::Feature::Feature(QDomElement searchResultFeature, IAUStatus status) {
     m_xmlRepresenation = NULL;
     m_xmlRepresenation = new QDomElement(searchResultFeature);
+    m_approvalStatus = status;
   }
 
 
@@ -263,6 +272,7 @@ namespace Isis {
   FeatureNomenclature::Feature::Feature(const Feature &other) {
     m_xmlRepresenation = NULL;
     // QDomElement does a shallow copy.
+    m_approvalStatus = other.m_approvalStatus;
     m_xmlRepresenation = new QDomElement(*other.m_xmlRepresenation);
   }
 
@@ -339,11 +349,6 @@ namespace Isis {
         &FeatureNomenclature::Feature::originatingEthnicity;
     displayValues.append(displayValue);
 
-    displayValue.first = "Approval Status:";
-    displayValue.second =
-        &FeatureNomenclature::Feature::approvalStatus;
-    displayValues.append(displayValue);
-
     displayValue.first = "Feature Type:";
     displayValue.second =
         &FeatureNomenclature::Feature::featureType;
@@ -382,6 +387,11 @@ namespace Isis {
     displayValue.first = "Approval Date:";
     displayValue.second =
         &FeatureNomenclature::Feature::approvalDate;
+    displayValues.append(displayValue);
+
+    displayValue.first = "Approval Status:";
+    displayValue.second =
+        &FeatureNomenclature::Feature::approvalStatus;
     displayValues.append(displayValue);
 
     displayValue.first = "Last Updated:";
@@ -481,7 +491,7 @@ namespace Isis {
 
     if (nameString != cleanNameString)
       displayNameString = nameString + " (" + cleanNameString + ")";
-
+    
     return displayNameString;
   }
 
@@ -699,7 +709,7 @@ namespace Isis {
    * @return The IAU approval status of the feature.
    */
   iString FeatureNomenclature::Feature::approvalStatus() const {
-    return getTagText("approvalStatus");
+    return getTagText("approvalstatus");
   }
 
 
@@ -707,7 +717,7 @@ namespace Isis {
    * @return The approval date of the feature.
    */
   iString FeatureNomenclature::Feature::approvalDate() const {
-    return getTagText("approvalDate");
+    return getTagText("approvaldate");
   }
 
 
@@ -762,12 +772,22 @@ namespace Isis {
 
 
   /**
+   * @return The feature's enumerated approval status.
+   */
+  FeatureNomenclature::IAUStatus FeatureNomenclature::Feature::status() const {
+    return m_approvalStatus;
+  }
+
+  
+  /**
    * Swap the member data of this feature with another feature.
    *
    * @param other The feature to swap with.
    */
   void FeatureNomenclature::Feature::swap(Feature &other) {
     std::swap(m_xmlRepresenation, other.m_xmlRepresenation);
+    std::swap(m_approvalStatus, other.m_approvalStatus);
+    
   }
 
 
@@ -803,7 +823,7 @@ namespace Isis {
       if (nodes.count())
         text = nodes.at(0).toElement().text().trimmed();
     }
-
+    
     return text;
   }
 
@@ -867,7 +887,7 @@ namespace Isis {
    */
   void FeatureNomenclature::readSearchResults(QDomElement xmlSearchResults) {
     ASSERT(xmlSearchResults.tagName() == "searchresults");
-
+    
     if (!m_features)
       m_features = new QList<Feature>;
 
@@ -875,10 +895,24 @@ namespace Isis {
          !node.isNull();
          node = node.nextSibling()) {
       QDomElement element = node.toElement();
+      QString approvalID = element.childNodes().item(15).toElement().attribute("id");
 
       if (element.tagName() == "feature") {
+        
+        if(approvalID == "5") {
+           m_statusApproval = Approved;
+        }
+        else if(approvalID == "6") {
+          m_statusApproval = Dropped;
+        }
+        else if(approvalID == "7") {
+          m_statusApproval = Unapproved;
+        }
+        else {
+          m_statusApproval = NoStatus;
+        }
 
-        m_features->append(Feature(element));
+        m_features->append(Feature(element, m_statusApproval));
       }
     }
   }

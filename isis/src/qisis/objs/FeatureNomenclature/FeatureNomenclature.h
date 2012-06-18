@@ -36,11 +36,41 @@ namespace Isis {
    * @author 2012-03-14 Steven Lambright
    *
    * @internal
+   *   @history 2012-06-06 Steven Lambright and Kimbelry Oyama - Added an enumerator for the
+   *                           approval status of each feature. Modified queryFeatures() to
+   *                           ensure the correct longitude domain is used.
+   *                           References #852. Fixes #892. Fixes #855.
    */
   class FeatureNomenclature : public QObject {
       Q_OBJECT
 
     public:
+
+      //!Enumeration of approval statuses
+      enum IAUStatus {
+        /**
+         * When this status is assigned to a feature, there will be no status displayed and
+         * the feature will not be shown if the IAU approved only checkbox is checked.
+         */
+        NoStatus, 
+        /**
+         * When this status is assigned to a feature, the displayed status will be "Adopted
+         * by the IAU" and the feature will always be shown.
+         */
+        Approved,
+        /**
+         * When this status is assigned to a feature, the displayed status will be "Dropped,
+         * disallowed" and the feature will not be shown if the IAU approved only checkbox is
+         * checked.
+         */
+        Dropped,
+        /**
+         * When this status is assigned to a feature, the displayed status will be "Never
+         * approved by the IAU" and the feature will not be shown if the IAU approved only
+         * checkbox checked.
+         */
+        Unapproved };
+      
       FeatureNomenclature();
       FeatureNomenclature(const FeatureNomenclature &other);
       ~FeatureNomenclature();
@@ -71,11 +101,14 @@ namespace Isis {
        * @author 2012-03-22 Steven Lambright
        *
        * @internal
+       *   @history 2012 -06-06 Steven Lambright and Kimberly Oyama - Added approval status to the
+       *                            list of characteristics of the feature and added the accessor
+       *                            (status()). Fixes #852. Fixes #892.
        */
       class Feature {
-        public:
+      public:          
           Feature();
-          Feature(QDomElement searchResultFeature);
+          Feature(QDomElement searchResultFeature, IAUStatus status);
           Feature(const Feature &other);
           ~Feature();
 
@@ -112,6 +145,7 @@ namespace Isis {
           iString lastUpdated() const;
           QUrl referenceUrl() const;
           iString referenceUrlString() const;
+          IAUStatus status() const;
 
           void swap(Feature &other);
           Feature &operator=(const Feature &rhs);
@@ -125,6 +159,8 @@ namespace Isis {
            *   this class all parse the XML to get their data on demand.
            */
           QDomElement * m_xmlRepresenation;
+          //!The approval status of the feature
+          IAUStatus  m_approvalStatus;
       };
 
     signals:
@@ -146,6 +182,8 @@ namespace Isis {
 
       //! These are the features identified by the nomenclature database.
       QList<Feature> *m_features;
+      //!The approval status of the feature from the database
+      IAUStatus m_statusApproval;
   };
 
 };

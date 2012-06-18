@@ -35,6 +35,7 @@
 
 
 namespace Isis {
+  
   /**
    * This instantiates a FeatureNomenclatureTool. This will read this tool's
    *   saved settings and potentially automatically enable itself.
@@ -61,9 +62,10 @@ namespace Isis {
     m_fontColor = new QColor(237, 170, 171);
     m_defaultEnabled = false;
     m_disclaimedAlready = false;
-    m_showVectors = false;
+    m_showApprovedOnly = true;
+    m_extentType = None;
 
-    m_disclaimerText = "The nomenclature qview tool will label known features "
+    m_disclaimerText = "The nomenclature qview tool will label named features "
         "in your opened cube files. This tool <strong>requires</strong> an "
         "active internet connection, projection or camera information, and a "
         "calculatable ground range to function. The larger the ground range ("
@@ -74,7 +76,8 @@ namespace Isis {
         "have not properly controlled your images to the control network that "
         "identifies the latitude/longitude values of a feature. Please use the "
         "nomenclature website to verify a label is correct for a feature. "
-        "<br/><br/>See the nomenclature website for more information.<br/>"
+        "<br/><br/>See the IAU Gazetteer of Planetary Nomenclature website for "
+        "more information.<br/>"
         "<a href='http://planetarynames.wr.usgs.gov/'>"
         "http://planetarynames.wr.usgs.gov/</a>";
 
@@ -133,7 +136,7 @@ namespace Isis {
       fontToUse.setPointSize(m_fontSize);
       painter->setFont(fontToUse);
       painter->setPen(QPen(*m_fontColor));
-      display.paint(painter, m_showVectors);
+      display.paint(painter, (m_extentType != None), m_extentType, m_showApprovedOnly);
     }
   }
 
@@ -169,12 +172,22 @@ namespace Isis {
 
 
   /**
+   * Show approved features only?
+   *
+   * @return True if we're showing only approved features.
+   */
+  bool FeatureNomenclatureTool::showApprovedOnly() const {
+    return m_showApprovedOnly;
+  }
+
+
+  /**
    * Draw vectors to the extents of features?
    *
    * @return True if we're drawing vectors to the extents of features.
    */
-  bool FeatureNomenclatureTool::showVectors() const {
-    return m_showVectors;
+  FeatureNomenclatureTool::VectorType FeatureNomenclatureTool::vectorType() const {
+    return m_extentType;
   }
 
 
@@ -226,17 +239,40 @@ namespace Isis {
     }
   }
 
+  
+  /**
+   * Set whether to show approved features and exclude unapproved features.
+   *
+   * @param approvedOnly True to show only appproved features
+   */
+  void FeatureNomenclatureTool::setShowApprovedOnly(bool approvedOnly) {
+    if (m_showApprovedOnly != approvedOnly) {
+      m_showApprovedOnly = approvedOnly;
+      writeSettings();
+      rebuildFeaturesCombo();
+      nomenclaturePositionsOutdated();
 
+      foreach (MdiCubeViewport *vp, *cubeViewportList())
+        vp->viewport()->update();
+    }
+  }
+
+  
   /**
    * Set whether to draw vectors from the feature center to the feature extents
    *   on the viewport. This takes effect immediately.
    *
    * @param show True to show the vectors
    */
-  void FeatureNomenclatureTool::setShowVectors(bool show) {
-    if (m_showVectors != show) {
-      m_showVectors = show;
+  void FeatureNomenclatureTool::setVectorType(VectorType show) {
+    if (m_extentType != show) {
+      m_extentType = show;
       writeSettings();
+
+      for (int i = 0; i < m_foundNomenclature->count(); i++) {
+        (*m_foundNomenclature)[i].applyExtentType(m_extentType);
+      }
+      
       nomenclaturePositionsOutdated();
 
       foreach (MdiCubeViewport *vp, *cubeViewportList())
@@ -296,8 +332,9 @@ namespace Isis {
             this, SLOT(featureSelected()));
 
     m_queryingProgress = new QProgressBar;
+    m_queryingProgress->setObjectName("nomenclatureQueryProgress");
+    m_queryingProgress->setVisible(false);
     m_queryingProgress->setRange(0, 0);
-    m_queryingProgress->setFormat("Querying Database");
 
     QHBoxLayout *layout = new QHBoxLayout;
     layout->setMargin(0);
@@ -328,6 +365,7 @@ namespace Isis {
     action->setIcon(QPixmap(toolIconDir() + "/nomenclature.png"));
     action->setToolTip("Nomenclature (N)");
     action->setShortcut(Qt::Key_N);
+    action->setObjectName("nomenclatureToolButton");
 
     QString text  =
       "<b>Function:</b>  Display nomenclature on the visible images.\n"
@@ -430,7 +468,9 @@ namespace Isis {
     if (vpValid)
       featuresForViewportFound(viewport);
 
-    viewportDone(viewport);
+    if (m_nomenclatureEnabled) {
+      viewportDone(viewport);
+    }
 
     if (vpValid)
       viewport->viewport()->update();
@@ -467,8 +507,10 @@ namespace Isis {
    */
   void FeatureNomenclatureTool::nomenclaturePositionsOutdated() {
     if (m_nomenclatureEnabled) {
-      for (int i = 0; i < m_foundNomenclature->count(); i++)
+
+      for (int i = 0; i < m_foundNomenclature->count(); i++) {
         (*m_foundNomenclature)[i].handleViewChanged(this);
+      }
     }
   }
 
@@ -533,82 +575,110 @@ namespace Isis {
       }
 
       if (!viewportFeatureDisplay(vp)) {
-        m_foundNomenclature->append(ViewportFeatureDisplay(this, vp, features));
+        m_foundNomenclature->append(ViewportFeatureDisplay(this, vp, features, m_extentType));
       }
 
       features = viewportFeatureDisplay(vp)->features();
 
-      foreach (FeatureNomenclature::Feature feature, features) {
-        QString displayName = feature.cleanName().ToQt() +
-            " (" + FileName(vp->cube()->getFileName()).name().ToQt() + ")";
+      QProgressDialog updatingFeaturesProgress(
+          tr("Projecting Features for [%1]").arg(vp->cube()->getFileName().ToQt().section('/',-1)),
+          QString(), 0, 100);
+          
+      updatingFeaturesProgress.setWindowModality(Qt::WindowModal);
 
-        QString targetName = feature.target().UpCase().ToQt();
+      FeatureNomenclature::Feature feature;
 
-        // never insert above the blank (at 0)
-        int insertPos = 1;
+      for (int i = 0; i < features.count(); i++) {
+        feature = features[i];
 
-        bool foundInsertPos = m_foundFeaturesCombo->count() == 0;
+        int progress = floor(100 * (double)i / (double)features.count());
 
-        while (!foundInsertPos) {
-          if (insertPos >= m_foundFeaturesCombo->count()) {
-            foundInsertPos = true;
-          }
-          else {
-            QVariant insetPosData = m_foundFeaturesCombo->itemData(
-                insertPos);
-            QString insertPosTarget = insetPosData.toMap()["Target"].toString();
+        if (progress != updatingFeaturesProgress.value())
+          updatingFeaturesProgress.setValue(progress);
 
-            if (targetName < insertPosTarget) {
+        if (updatingFeaturesProgress.wasCanceled()) {
+          m_nomenclatureSearchers->clear();
+          m_foundNomenclature->clear();
+          m_foundFeaturesCombo->clear();
+          m_findNomenclatureCheckBox->setChecked(false);
+          break;
+        }
+        
+        if ( !m_showApprovedOnly ||
+            (m_showApprovedOnly && feature.status() == FeatureNomenclature::Approved) ) {
+
+          QString displayName = feature.cleanName().ToQt() +
+              " (" + FileName(vp->cube()->getFileName()).name().ToQt() + ")";
+
+          QString targetName = feature.target().UpCase().ToQt();
+
+          // never insert above the blank (at 0)
+          int insertPos = 1;
+
+          bool foundInsertPos = m_foundFeaturesCombo->count() == 0;
+
+          while (!foundInsertPos) {
+            if (insertPos >= m_foundFeaturesCombo->count()) {
               foundInsertPos = true;
             }
-            else if (targetName == insertPosTarget) {
-              if (!insetPosData.toMap()["Viewport"].isNull()) {
-                foundInsertPos = displayName.compare(
-                    m_foundFeaturesCombo->itemText(insertPos),
-                    Qt::CaseInsensitive) < 0;
+            else {
+              QVariant insetPosData = m_foundFeaturesCombo->itemData(
+                  insertPos);
+              QString insertPosTarget = insetPosData.toMap()["Target"].toString();
+
+              if (targetName < insertPosTarget) {
+                foundInsertPos = true;
+              }
+              else if (targetName == insertPosTarget) {
+                if (!insetPosData.toMap()["Viewport"].isNull()) {
+                  foundInsertPos = displayName.compare(
+                      m_foundFeaturesCombo->itemText(insertPos),
+                      Qt::CaseInsensitive) < 0;
+                }
               }
             }
+
+            if (!foundInsertPos)
+              insertPos++;
           }
 
-          if (!foundInsertPos)
+          if (m_foundFeaturesCombo->itemData(insertPos - 1).toMap()[
+                  "Target"].toString() != targetName) {
+            QMap<QString, QVariant> data;
+            data["Target"] = targetName;
+
+            QString controlNet = feature.controlNet();
+            if (controlNet != "")
+              controlNet = " (" + controlNet + ")";
+
+            m_foundFeaturesCombo->insertItem(insertPos,
+                                            targetName + controlNet,
+                                            data);
+            QVariant font = m_foundFeaturesCombo->itemData(insertPos,
+                                                          Qt::ForegroundRole);
+            m_foundFeaturesCombo->setItemData(insertPos, QColor(Qt::gray),
+                                              Qt::ForegroundRole);
             insertPos++;
-        }
 
-        if (m_foundFeaturesCombo->itemData(insertPos - 1).toMap()[
-                "Target"].toString() != targetName) {
+            m_foundFeaturesCombo->insertItem(insertPos,
+                                            "-----------",
+                                            data);
+            m_foundFeaturesCombo->setItemData(insertPos, QColor(Qt::gray),
+                                              Qt::ForegroundRole);
+            insertPos++;
+          }
+
           QMap<QString, QVariant> data;
-          data["Target"] = targetName;
+          data["Feature"] = QVariant::fromValue<FeatureNomenclature::Feature>(
+              feature);
+          data["Viewport"] = qVariantFromValue(vp);
+          data["Target"] = qVariantFromValue(targetName);
 
-          QString controlNet = feature.controlNet();
-          if (controlNet != "")
-            controlNet = " (" + controlNet + ")";
-
-          m_foundFeaturesCombo->insertItem(insertPos,
-                                           targetName + controlNet,
-                                           data);
-          QVariant font = m_foundFeaturesCombo->itemData(insertPos,
-                                                         Qt::ForegroundRole);
-          m_foundFeaturesCombo->setItemData(insertPos, QColor(Qt::gray),
-                                            Qt::ForegroundRole);
-          insertPos++;
-
-          m_foundFeaturesCombo->insertItem(insertPos,
-                                           "-----------",
-                                           data);
-          m_foundFeaturesCombo->setItemData(insertPos, QColor(Qt::gray),
-                                            Qt::ForegroundRole);
-          insertPos++;
+          m_foundFeaturesCombo->insertItem(insertPos, displayName,
+              qVariantFromValue(data));
         }
-
-        QMap<QString, QVariant> data;
-        data["Feature"] = QVariant::fromValue<FeatureNomenclature::Feature>(
-            feature);
-        data["Viewport"] = qVariantFromValue(vp);
-        data["Target"] = qVariantFromValue(targetName);
-
-        m_foundFeaturesCombo->insertItem(insertPos, displayName,
-            qVariantFromValue(data));
       }
+     updatingFeaturesProgress.setValue( features.count() );
     }
   }
 
@@ -830,7 +900,7 @@ namespace Isis {
     if (viewportFeatureDisplay(vp) == NULL) {
       m_foundNomenclature->append(
           ViewportFeatureDisplay(this, vp,
-                                 QList<FeatureNomenclature::Feature>()));
+                                 QList<FeatureNomenclature::Feature>(), m_extentType));
     }
     else {
       connect(vp, SIGNAL(screenPixelsChanged()),
@@ -920,14 +990,17 @@ namespace Isis {
     FileName config("$HOME/.Isis/qview/nomenclature.config");
     QSettings settings(
         QString::fromStdString(config.expanded()), QSettings::NativeFormat);
+    
     m_fontSize = settings.value("fontSize", m_fontSize).toInt();
     *m_fontColor = settings.value("fontColor", *m_fontColor).value<QColor>();
     m_defaultEnabled =
         settings.value("defaultEnabled", m_defaultEnabled).toBool();
     m_disclaimedAlready =
         settings.value("disclaimerShown", m_disclaimedAlready).toBool();
-    m_showVectors =
-        settings.value("vectorsShown", m_showVectors).toBool();
+    m_showApprovedOnly =
+        settings.value("showApprovedOnly", m_showApprovedOnly).toBool();
+    m_extentType =
+        VectorType(settings.value("vectorsShown", m_extentType).toInt());
   }
 
 
@@ -943,7 +1016,8 @@ namespace Isis {
     settings.setValue("fontColor", qVariantFromValue(*m_fontColor));
     settings.setValue("defaultEnabled", m_defaultEnabled);
     settings.setValue("disclaimerShown", m_disclaimedAlready);
-    settings.setValue("vectorsShown", m_showVectors);
+    settings.setValue("showApprovedOnly", m_showApprovedOnly);
+    settings.setValue("vectorsShown", m_extentType);
   }
 
 
@@ -954,6 +1028,7 @@ namespace Isis {
     m_centerLine = Null;
     m_centerSample = Null;
     m_featureEdgeLineSamples = NULL;
+    m_gmap = NULL;
 
     m_featureEdgeLineSamples = new QList< QPair<double, double> >;
   }
@@ -966,53 +1041,28 @@ namespace Isis {
    * @param vp The viewport to use for ground information
    * @param feature The feature with nomenclature database lat/lon values to be
    *            translated into cube line/sample coordinates.
+   * @param vectorType The type of extent vector to display
    */
   FeatureNomenclatureTool::FeaturePosition::FeaturePosition(MdiCubeViewport *vp,
-      FeatureNomenclature::Feature feature) {
+      FeatureNomenclature::Feature feature, VectorType vectorType) {
     m_centerLine = Null;
     m_centerSample = Null;
     m_featureEdgeLineSamples = NULL;
+    m_gmap = NULL;
 
     m_featureEdgeLineSamples = new QList< QPair<double, double> >;
 
     m_feature = feature;
 
     if (vp) {
-      UniversalGroundMap *gmap = vp->universalGroundMap();
+      m_gmap = vp->universalGroundMap();
       Latitude centerLat = m_feature.centerLatitude();
       Longitude centerLon = m_feature.centerLongitude();
-      if (gmap && gmap->SetGround(centerLat, centerLon)) {
-        m_centerSample = gmap->Sample();
-        m_centerLine = gmap->Line();
+      if (m_gmap && m_gmap->SetGround(centerLat, centerLon)) {
+        m_centerSample = m_gmap->Sample();
+        m_centerLine = m_gmap->Line();
 
-        // We're going to permute the edge lats/lons excluding the center, so
-        //   these lists are independent of each other.
-        QList<Latitude> edgeLats;
-        QList<Longitude> edgeLons;
-
-        edgeLats.append(m_feature.northernLatitude());
-        edgeLats.append(m_feature.centerLatitude());
-        edgeLats.append(m_feature.southernLatitude());
-
-        edgeLons.append(m_feature.easternLongitude());
-        edgeLons.append(m_feature.centerLongitude());
-        edgeLons.append(m_feature.westernLongitude());
-
-        int edgeLatCount = edgeLats.count();
-        int edgeLonCount = edgeLons.count();
-        for (int latIndex = 0; latIndex < edgeLatCount; latIndex++) {
-          for (int lonIndex = 0; lonIndex < edgeLonCount; lonIndex++) {
-            Latitude &lat = edgeLats[latIndex];
-            Longitude &lon = edgeLons[lonIndex];
-
-            if (lat.isValid() && lon.isValid() &&
-                (lat != centerLat || lon != centerLon) &&
-                gmap->SetGround(lat, lon)) {
-              m_featureEdgeLineSamples->append(
-                QPair<double, double>(gmap->Sample(), gmap->Line()));
-            }
-          }
-        }
+        applyExtentType(vectorType);
       }
     }
   }
@@ -1028,11 +1078,15 @@ namespace Isis {
     m_centerLine = other.m_centerLine;
     m_centerSample = other.m_centerSample;
     m_featureEdgeLineSamples = NULL;
+    m_gmap = NULL;
 
     m_featureEdgeLineSamples = new QList< QPair<double, double> >(
-        *other.m_featureEdgeLineSamples);;
+        *other.m_featureEdgeLineSamples);
 
     m_feature = other.m_feature;
+
+    if (other.m_gmap)
+      m_gmap = new UniversalGroundMap(*other.m_gmap);
   }
 
 
@@ -1042,6 +1096,7 @@ namespace Isis {
   FeatureNomenclatureTool::FeaturePosition::~FeaturePosition() {
     m_centerLine = Null;
     m_centerSample = Null;
+    m_gmap = NULL;
 
     delete m_featureEdgeLineSamples;
     m_featureEdgeLineSamples = NULL;
@@ -1090,7 +1145,97 @@ namespace Isis {
     return m_feature;
   }
 
+  /**
+   * Applies the type of extents to the feature.
+   *
+   * 4 Arrows - N, S, E, W
+   * 8 Arrows - N, NE, NW, E, W, S, SE, SW
+   * Box - Corners at: NE, NW, SE, SW
+   *
+   * @param vectorType The type of extents that will be drawn with the feature
+   */
+  void FeatureNomenclatureTool::FeaturePosition::applyExtentType(VectorType vectorType) {
 
+    Latitude centerLat = m_feature.centerLatitude();
+    Longitude centerLon = m_feature.centerLongitude();
+
+    m_featureEdgeLineSamples->clear();
+
+    if (vectorType == FeatureNomenclatureTool::Arrows8) {
+
+      // We're going to permute the edge lats/lons excluding the center, so
+      //   these lists are independent of each other.
+      QList<Latitude> edgeLats;
+      QList<Longitude> edgeLons;
+
+      edgeLats.append(m_feature.northernLatitude());
+      edgeLats.append(m_feature.centerLatitude());
+      edgeLats.append(m_feature.southernLatitude());
+
+      edgeLons.append(m_feature.easternLongitude());
+      edgeLons.append(m_feature.centerLongitude());
+      edgeLons.append(m_feature.westernLongitude());
+
+      int edgeLatCount = edgeLats.count();
+      int edgeLonCount = edgeLons.count();
+
+      for (int latIndex = 0; latIndex < edgeLatCount; latIndex++) {
+        for (int lonIndex = 0; lonIndex < edgeLonCount; lonIndex++) {
+          Latitude &lat = edgeLats[latIndex];
+          Longitude &lon = edgeLons[lonIndex];
+
+          if (lat.isValid() && lon.isValid() &&
+              (lat != centerLat || lon != centerLon) &&
+              m_gmap->SetGround(lat, lon)) {
+            m_featureEdgeLineSamples->append(
+              QPair<double, double>(m_gmap->Sample(), m_gmap->Line()));
+          }
+        }
+      }
+    }
+
+    else {
+      QList< QPair<Latitude, Longitude> > edgeLatLons;
+
+      if (vectorType == FeatureNomenclatureTool::Arrows4) {
+        edgeLatLons.append(qMakePair(m_feature.northernLatitude(),
+                                      m_feature.centerLongitude()));
+        edgeLatLons.append(qMakePair(m_feature.centerLatitude(),
+                                      m_feature.westernLongitude()));
+        edgeLatLons.append(qMakePair(m_feature.centerLatitude(),
+                                      m_feature.easternLongitude()));
+        edgeLatLons.append(qMakePair(m_feature.southernLatitude(),
+                                      m_feature.centerLongitude()));
+      }
+
+      if (vectorType == FeatureNomenclatureTool::Box) {
+        edgeLatLons.append(qMakePair(m_feature.northernLatitude(),
+                                      m_feature.easternLongitude()));
+        edgeLatLons.append(qMakePair(m_feature.northernLatitude(),
+                                      m_feature.westernLongitude()));
+        edgeLatLons.append(qMakePair(m_feature.southernLatitude(),
+                                      m_feature.westernLongitude()));
+        edgeLatLons.append(qMakePair(m_feature.southernLatitude(),
+                                      m_feature.easternLongitude()));
+      }
+
+      int edgeLatLonCount = edgeLatLons.count();
+
+      for (int edgeIndex = 0; edgeIndex < edgeLatLonCount; edgeIndex++) {
+        Latitude &lat = edgeLatLons[edgeIndex].first;
+        Longitude &lon = edgeLatLons[edgeIndex].second;
+
+        if (lat.isValid() && lon.isValid() &&
+            (lat != centerLat || lon != centerLon) &&
+            m_gmap->SetGround(lat, lon)) {
+          m_featureEdgeLineSamples->append(
+            QPair<double, double>(m_gmap->Sample(), m_gmap->Line()));
+        }
+      }
+    }
+  }
+
+  
   /**
    * Trade member data with other. This should never throw an exception.
    *
@@ -1101,6 +1246,7 @@ namespace Isis {
     std::swap(m_centerSample, other.m_centerSample);
     std::swap(m_featureEdgeLineSamples, other.m_featureEdgeLineSamples);
     std::swap(m_feature, other.m_feature);
+    std::swap(m_gmap, other.m_gmap);
   }
 
 
@@ -1109,6 +1255,8 @@ namespace Isis {
    *   feature position.
    *
    * @param rhs The FeaturePosition on the right hand side of the '=' operator
+   *
+   * @return *this
    */
   FeatureNomenclatureTool::FeaturePosition &
       FeatureNomenclatureTool::FeaturePosition::operator=(
@@ -1249,6 +1397,8 @@ namespace Isis {
    * Assign the state of rhs to this.This is exception-safe.
    *
    * @param rhs The position on the right hand side of the '=' operator
+   *
+   * @return *this
    */
   FeatureNomenclatureTool::FeatureDisplayPosition &
       FeatureNomenclatureTool::FeatureDisplayPosition::operator=(
@@ -1280,10 +1430,11 @@ namespace Isis {
    * @param tool The tool that has the appropriate view settings
    * @param sourceViewport The viewport that this display will be used for
    * @param features The named features that are in the image in the viewport
+   * @param vectorType The type of extent vector to display
    */
   FeatureNomenclatureTool::ViewportFeatureDisplay::ViewportFeatureDisplay(
       FeatureNomenclatureTool *tool, MdiCubeViewport *sourceViewport,
-      QList<FeatureNomenclature::Feature> features) {
+      QList<FeatureNomenclature::Feature> features, VectorType vectorType) {
     m_sourceViewport = sourceViewport;
     m_features = NULL;
     m_featureScreenAreas = NULL;
@@ -1297,9 +1448,10 @@ namespace Isis {
           &FeatureNomenclature::featureDiameterGreaterThan);
 
     for (int i = 0; i < features.count(); i++) {
-      FeaturePosition display(sourceViewport, features[i]);
-      if (display.isValid())
+      FeaturePosition display(sourceViewport, features[i], vectorType);
+      if (display.isValid()) {
         m_features->append(display);
+      }
     }
 
     handleViewChanged(tool);
@@ -1340,6 +1492,18 @@ namespace Isis {
 
     delete m_viewportCubeRange;
     m_viewportCubeRange = NULL;
+  }
+  
+
+  /**
+   * Apply the extent type to all of the features for the source viewport.
+   *
+   * @param vectorType The type of extents to be drawn
+   */
+  void FeatureNomenclatureTool::ViewportFeatureDisplay::applyExtentType(VectorType vectorType) {
+    for (int i = 0; i < m_features->count(); i++) {
+      (*m_features)[i].applyExtentType(vectorType);
+    }
   }
 
 
@@ -1392,6 +1556,22 @@ namespace Isis {
 
 
   /**
+   * Get the list of feature positions for a given display.
+   *
+   * @return The feature positions of the display.
+   */
+  QList<FeatureNomenclatureTool::FeaturePosition>
+      FeatureNomenclatureTool::ViewportFeatureDisplay::featurePositions() {
+    QList<FeatureNomenclatureTool::FeaturePosition> positionList;
+
+    for (int i = 0; i < m_features->count(); i++)
+      positionList.append((*m_features)[i]);
+
+    return positionList;
+  }
+
+  
+  /**
    * Get the viewport associated with this feature display.
    *
    * @return The viewport that this display is supposed to work with.
@@ -1401,18 +1581,24 @@ namespace Isis {
     return m_sourceViewport;
   }
 
-
+  
   /**
    * Paint features onto the viewport.
    *
    * @param painter The painter to use for painting on the viewport
    * @param showVectors True if we're painting the vectors
+   * @param vectorType The extent type to paint
+   * @param approvedOnly True if only painting approved features
    */
   void FeatureNomenclatureTool::ViewportFeatureDisplay::paint(
-      QPainter *painter, bool showVectors) const {
+      QPainter *painter, bool showVectors, VectorType vectorType, bool approvedOnly) const {
+
     if (viewportCubeRange() == *m_viewportCubeRange) {
+
       for (int i = 0; i < m_features->count() &&
                       i < m_featureScreenAreas->count(); i++) {
+        
+        FeatureNomenclature::Feature feature = (*m_features)[i].feature();
         FeatureDisplayPosition pos = (*m_featureScreenAreas)[i];
         QRect textArea = pos.textArea();
         QRect fullArea = pos.displayArea();
@@ -1427,86 +1613,96 @@ namespace Isis {
           QLineF leftTextBorder(startRect.topLeft(), startRect.bottomLeft());
 
           QList<QLine> vectors;
-          foreach (QPoint point, pos.edgePoints()) {
-            QLineF fullVector(textArea.center(), point);
-            QPoint newVectorStart;
 
-            QPointF intersectionPoint;
+          if (vectorType != Box) {
+            foreach (QPoint point, pos.edgePoints()) {
+              QLineF fullVector(textArea.center(), point);
+              QPoint newVectorStart;
 
-            if (point.y() < textArea.top()) {
-              if (topTextBorder.intersect(fullVector, &intersectionPoint) ==
-                  QLineF::BoundedIntersection) {
-                 newVectorStart = QPoint(qRound(intersectionPoint.x()),
-                                         qRound(intersectionPoint.y()));
+              QPointF intersectionPoint;
+
+              if (point.y() < textArea.top()) {
+                if (topTextBorder.intersect(fullVector, &intersectionPoint) ==
+                    QLineF::BoundedIntersection) {
+                  newVectorStart = QPoint(qRound(intersectionPoint.x()),
+                                          qRound(intersectionPoint.y()));
+                }
+              }
+
+              if (point.x() > textArea.right()) {
+                if (rightTextBorder.intersect(fullVector, &intersectionPoint) ==
+                    QLineF::BoundedIntersection) {
+                  newVectorStart = QPoint(qRound(intersectionPoint.x()),
+                                          qRound(intersectionPoint.y()));
+                }
+              }
+
+              if (point.y() > textArea.bottom()) {
+                if (bottomTextBorder.intersect(fullVector, &intersectionPoint) ==
+                    QLineF::BoundedIntersection) {
+                  newVectorStart = QPoint(qRound(intersectionPoint.x()),
+                                          qRound(intersectionPoint.y()));
+                }
+              }
+
+              if (point.x() < textArea.left()) {
+                if (leftTextBorder.intersect(fullVector, &intersectionPoint) ==
+                    QLineF::BoundedIntersection) {
+                  newVectorStart = QPoint(qRound(intersectionPoint.x()),
+                                          qRound(intersectionPoint.y()));
+                }
+              }
+
+              if (!newVectorStart.isNull() &&
+                  QLineF(newVectorStart, point).length() > 10) {
+                vectors.append(QLine(newVectorStart, point));
               }
             }
+            
+            foreach (QLine vector, vectors) {
+              painter->drawLine(vector);
 
-            if (point.x() > textArea.right()) {
-              if (rightTextBorder.intersect(fullVector, &intersectionPoint) ==
-                  QLineF::BoundedIntersection) {
-                 newVectorStart = QPoint(qRound(intersectionPoint.x()),
-                                         qRound(intersectionPoint.y()));
-              }
-            }
+              //For 4 or 8 arrows
+              Angle normalAngle(-1 * QLineF(vector).normalVector().angle(),
+                                Angle::Degrees);
 
-            if (point.y() > textArea.bottom()) {
-              if (bottomTextBorder.intersect(fullVector, &intersectionPoint) ==
-                  QLineF::BoundedIntersection) {
-                 newVectorStart = QPoint(qRound(intersectionPoint.x()),
-                                         qRound(intersectionPoint.y()));
-              }
-            }
+              int magnitude = 10;
+              double deltaX = magnitude * cos(normalAngle.radians());
+              double deltaY = magnitude * sin(normalAngle.radians());
 
-            if (point.x() < textArea.left()) {
-              if (leftTextBorder.intersect(fullVector, &intersectionPoint) ==
-                  QLineF::BoundedIntersection) {
-                 newVectorStart = QPoint(qRound(intersectionPoint.x()),
-                                         qRound(intersectionPoint.y()));
-              }
-            }
+              QPoint normalStart(vector.x2() + deltaX, vector.y2() + deltaY);
+              QPoint normalEnd(vector.x2() - deltaX, vector.y2() - deltaY);
+              painter->drawLine(normalStart, normalEnd);
 
-            if (!newVectorStart.isNull() &&
-                QLineF(newVectorStart, point).length() > 10) {
-              vectors.append(QLine(newVectorStart, point));
+              Angle arrowheadAngle(30, Angle::Degrees);
+              Angle vectorAngle(-1 * QLineF(vector).angle(), Angle::Degrees);
+              Angle leftHead = vectorAngle - arrowheadAngle;
+              Angle rightHead = vectorAngle + arrowheadAngle;
+
+              int arrowheadMag = 10;
+              deltaX = arrowheadMag * cos(leftHead.radians());
+              deltaY = arrowheadMag * sin(leftHead.radians());
+              painter->drawLine(
+                  vector.p2(), vector.p2() - QPoint(deltaX, deltaY));
+
+              deltaX = arrowheadMag * cos(rightHead.radians());
+              deltaY = arrowheadMag * sin(rightHead.radians());
+              painter->drawLine(
+                  vector.p2(), vector.p2() - QPoint(deltaX, deltaY));
             }
           }
-
-          foreach (QLine vector, vectors) {
-            painter->drawLine(vector);
-
-            Angle normalAngle(-1 * QLineF(vector).normalVector().angle(),
-                              Angle::Degrees);
-
-            int magnitude = 10;
-            double deltaX = magnitude * cos(normalAngle.radians());
-            double deltaY = magnitude * sin(normalAngle.radians());
-
-            QPoint normalStart(vector.x2() + deltaX, vector.y2() + deltaY);
-            QPoint normalEnd(vector.x2() - deltaX, vector.y2() - deltaY);
-            painter->drawLine(normalStart, normalEnd);
-
-            Angle arrowheadAngle(30, Angle::Degrees);
-            Angle vectorAngle(-1 * QLineF(vector).angle(), Angle::Degrees);
-            Angle leftHead = vectorAngle - arrowheadAngle;
-            Angle rightHead = vectorAngle + arrowheadAngle;
-
-            int arrowheadMag = 10;
-            deltaX = arrowheadMag * cos(leftHead.radians());
-            deltaY = arrowheadMag * sin(leftHead.radians());
-            painter->drawLine(
-                vector.p2(), vector.p2() - QPoint(deltaX, deltaY));
-
-            deltaX = arrowheadMag * cos(rightHead.radians());
-            deltaY = arrowheadMag * sin(rightHead.radians());
-            painter->drawLine(
-                vector.p2(), vector.p2() - QPoint(deltaX, deltaY));
+          else {
+            // vector type == Box, draw the box
+            if (pos.edgePoints().count() == 4) {
+              QPolygon boundingPoly(pos.edgePoints().toVector());
+              painter->drawPolygon(boundingPoly);
+            }
           }
         }
 
         if (!textArea.isNull()) {
-          FeatureNomenclature::Feature feature = (*m_features)[i].feature();
-          QString featureName = feature.cleanName();
-           painter->drawText(textArea, featureName);
+          QString featureName = feature.name();
+          painter->drawText(textArea, featureName);
         }
       }
     }
@@ -1588,65 +1784,81 @@ namespace Isis {
 
     for (int i = 0; i < m_features->count(); i++) {
       FeatureNomenclature::Feature feature = (*m_features)[i].feature();
-      double sample = (*m_features)[i].center().first;
-      double line = (*m_features)[i].center().second;
+      
+      m_featureScreenAreas->append(FeatureDisplayPosition());
 
-      int viewportX;
-      int viewportY;
-      m_sourceViewport->cubeToViewport(sample, line,
-                                       viewportX, viewportY);
+      if ( !tool->m_showApprovedOnly ||
+            (tool->m_showApprovedOnly && feature.status() == FeatureNomenclature::Approved) ) {
+      
+        double sample = (*m_features)[i].center().first;
+        double line = (*m_features)[i].center().second;
 
-      QString featureName = feature.cleanName();
-      QRect textDisplayArea(QPoint(viewportX, viewportY),
-                            QSize(fontMetrics.width(featureName) + 4,
-                                  fontMetrics.height()));
-      // Center the text on the viewportX,Y instead of starting it there...
-      textDisplayArea.moveTopLeft(textDisplayArea.topLeft() -
-          QPoint(textDisplayArea.width() / 2, textDisplayArea.height() / 2));
+        int viewportX;
+        int viewportY;
+        m_sourceViewport->cubeToViewport(sample, line,
+                                        viewportX, viewportY);
 
-      bool canDisplay = false;
-      if (textDisplayArea.left() < m_sourceViewport->width() &&
-          textDisplayArea.right() > 0 &&
-          textDisplayArea.top() < m_sourceViewport->height() &&
-          textDisplayArea.bottom() > 0) {
-        canDisplay = true;
-      }
+        QString featureName = feature.name();
+        QRect textDisplayArea(QPoint(viewportX, viewportY),
+                              QSize(fontMetrics.width(featureName) + 4,
+                                    fontMetrics.height()));
+        // Center the text on the viewportX,Y instead of starting it there...
+        textDisplayArea.moveTopLeft(textDisplayArea.topLeft() -
+            QPoint(textDisplayArea.width() / 2, textDisplayArea.height() / 2));
 
-      QRect fullDisplayArea = textDisplayArea;
-      QPair<double, double> edge;
-      QList<QPoint> edgeScreenPoints;
-
-      if (canDisplay && tool->showVectors()) {
-        foreach(edge, (*m_features)[i].edges()) {
-          m_sourceViewport->cubeToViewport(edge.first, edge.second,
-                                           viewportX, viewportY);
-          edgeScreenPoints.append(QPoint(viewportX, viewportY));
-          fullDisplayArea = fullDisplayArea.united(
-              QRect(viewportX - 3, viewportY - 3, 6, 6));
+        bool canDisplay = false;
+        if (textDisplayArea.left() < m_sourceViewport->width() &&
+            textDisplayArea.right() > 0 &&
+            textDisplayArea.top() < m_sourceViewport->height() &&
+            textDisplayArea.bottom() > 0) {
+          canDisplay = true;
         }
-      }
 
-      if (canDisplay) {
-        // If we intersect another feature's text, do not draw
-        foreach (QRect rectToAvoid, rectsToAvoid) {
-          if (canDisplay && fullDisplayArea.intersects(rectToAvoid)) {
-            canDisplay = false;
+        QRect fullDisplayArea = textDisplayArea;
+        QPair<double, double> edge;
+        QList<QPoint> edgeScreenPoints;
+
+        if (canDisplay && tool->vectorType() != None) {
+          QList< QPair<double, double> > edges = (*m_features)[i].edges();
+          foreach (edge, edges) {
+            m_sourceViewport->cubeToViewport(edge.first, edge.second,
+                                            viewportX, viewportY);
+            edgeScreenPoints.append(QPoint(viewportX, viewportY));
+          }
+          
+          if (tool->vectorType() != Box) {
+            foreach (QPoint screenPoint, edgeScreenPoints) {
+              fullDisplayArea = fullDisplayArea.united(
+                  QRect(screenPoint.x() - 3, screenPoint.y() - 3, 6, 6));
+            }
+          }
+          else if (edges.count() == 4) {
+
+            QPolygon boundingPoly(edgeScreenPoints.toVector());
+
+            if (boundingPoly.intersected(textDisplayArea) == QPolygon(textDisplayArea, true)) {
+              fullDisplayArea = boundingPoly.boundingRect();
+            }
           }
         }
-      }
 
-      if (canDisplay) {
-        rectsToAvoid.append(fullDisplayArea);
-        m_featureScreenAreas->append(
-            FeatureDisplayPosition(textDisplayArea, fullDisplayArea,
-                                   edgeScreenPoints));
+        if (canDisplay) {
+          // If we intersect another feature, do not draw
+          foreach (QRect rectToAvoid, rectsToAvoid) {
+            if (canDisplay && fullDisplayArea.intersects(rectToAvoid)) {
+              canDisplay = false;
+            }
+          }
+        }
+
+        if (canDisplay) {
+          rectsToAvoid.append(fullDisplayArea);
+          m_featureScreenAreas->last() =  FeatureDisplayPosition(textDisplayArea, fullDisplayArea,
+                                                                 edgeScreenPoints);
+        }
       }
-      else {
-        m_featureScreenAreas->append(FeatureDisplayPosition());
-      }
+      *m_viewportCubeRange = viewportCubeRange();
     }
-
-    *m_viewportCubeRange = viewportCubeRange();
   }
 
 
@@ -1684,6 +1896,8 @@ namespace Isis {
    * Get the min/max cube line/sample positions of the viewport. This is
    * designed to be used to detect viewport repositioning/screen pixels changing
    * to block painting when we're out of sync.
+   *
+   * @return The pair of minimum coordinates
    */
   QPair<QPointF, QPointF>
       FeatureNomenclatureTool::ViewportFeatureDisplay::viewportCubeRange()
@@ -1699,4 +1913,3 @@ namespace Isis {
     return QPair<QPointF, QPointF>(minValues, maxValues);
   }
 }
-

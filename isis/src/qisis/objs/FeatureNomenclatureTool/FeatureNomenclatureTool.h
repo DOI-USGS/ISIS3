@@ -4,7 +4,7 @@
 #include "Tool.h"
 
 #include <QPointer>
-
+#include <QProgressDialog>
 #include "FeatureNomenclature.h"
 
 class QCheckBox;
@@ -22,6 +22,7 @@ template <typename A, typename B> class QPair;
 namespace Isis {
   class iString;
   class MdiCubeViewport;
+  class UniversalGroundMap;
 
   /**
    * @brief Display nomenclature on MDI Cube Viewports
@@ -37,11 +38,71 @@ namespace Isis {
    * @author 2012-03-22 Steven Lambright and Jai Rideout
    *
    * @internal
+   *   @history 2012-06-12 Steven Lambright and Kimberly Oyama - Implemented multiple extent types
+   *                           (Box, 4 Arrows, 8 Arrows). Added ability to hide unapproved or
+   *                           dropped features. Added appropriate mutators and accessors
+   *                           (showApprovedOnly(), vectorType(), setShowApprovedOnly(),
+   *                           setVectorType()). Added an enumerator for the vector types.
+   *                           Fixes #852. Fixes #892.
+   * 
    */
   class FeatureNomenclatureTool : public Tool {
       Q_OBJECT
 
     public:
+
+      //!Enumeration of extent vector typess
+      enum VectorType {
+        /**
+         * When using this vector (extent) type, no extents will be drawn.
+         */
+        None,
+        /**
+         * When using this vector (extent) type, 4 arrows will be drawn out from the text of
+         *   the feature. If an arrow doesn't extend past the text then it will not be drawn.
+         *   The extents should look something like this:
+         *              ___
+         *               ^
+         *               |
+         *               |
+         *               |
+         *               |
+         *    |<---- Feature Name ------>|
+         *               |
+         *               |
+         *               v
+         *              ___
+         */
+        Arrows4,
+        /**
+         * When using this vector (extent) type, 8 arrows will be drawn out from the text of
+         *   the feature. If an arrow doesn't extend past the text then it will not be drawn.
+         *   The extents would look similar to the 4 arrow version shown above. There would be
+         *   8 arrows extending to the marked points:
+         *                 *
+
+         *          *             *
+         *
+         * 
+         *    *      Feature Name      *
+         *           
+         *           
+         *          *             *
+         * 
+         *                 *
+         */
+        Arrows8,
+        /**
+         * When using this vector (extent) type, 4 arrows will be drawn out from the text of
+         *   the feature. If the arrow doesn't extend past the text then it will not be drawn.
+         *   The extents should look something like this:
+         *     _____________
+         *    |Feature Name |
+         *    |_____________|           
+         */
+        Box       
+      };
+      
       FeatureNomenclatureTool(QWidget *parent);
       ~FeatureNomenclatureTool();
 
@@ -51,12 +112,14 @@ namespace Isis {
       bool defaultEnabled() const;
       QColor fontColor() const;
       int fontSize() const;
-      bool showVectors() const;
+      bool showApprovedOnly() const;
+      VectorType vectorType() const;
 
       void setDefaultEnabled(bool defaultEnabled);
       void setFontColor(QColor color);
       void setFontSize(int newFontSize);
-      void setShowVectors(bool show);
+      void setShowApprovedOnly(bool approvedOnly);
+      void setVectorType(VectorType show);
 
     protected:
       QString menuName() const;
@@ -110,11 +173,15 @@ namespace Isis {
        * @author 2012-03-22 Steven Lambright and Jai Rideout
        *
        * @internal
+       *   @history 2012-06-06 Steven Lambright and Kimberly Oyama - Added support for multiple
+       *                           extent/vector types (FeaturePosition(), applyExtentType()). 
+       *                           Fixes #852. Fixes #892.
+       *                           
        */
       class FeaturePosition {
         public:
           FeaturePosition();
-          FeaturePosition(MdiCubeViewport *, FeatureNomenclature::Feature);
+          FeaturePosition(MdiCubeViewport *, FeatureNomenclature::Feature, VectorType vectorType);
           FeaturePosition(const FeaturePosition &other);
           ~FeaturePosition();
 
@@ -124,7 +191,8 @@ namespace Isis {
           QList< QPair<double, double> > edges() const;
           FeatureNomenclature::Feature &feature();
           const FeatureNomenclature::Feature &feature() const;
-
+          void applyExtentType(VectorType vectorType);
+          
           void swap(FeaturePosition &other);
           FeaturePosition &operator=(const FeaturePosition &rhs);
 
@@ -133,6 +201,9 @@ namespace Isis {
           double m_centerLine;
           //! The cube sample position of the feature center, Null if !isValid()
           double m_centerSample;
+
+          //!The map used to determine the sample, line pair from a lat, lon pair.
+          UniversalGroundMap *m_gmap;
 
           /**
            * The pair is cube sample, line (first and second) respectively. This
@@ -153,6 +224,7 @@ namespace Isis {
        * @author 2012-03-22 Steven Lambright and Jai Rideout
        *
        * @internal
+       * 
        */
       class FeatureDisplayPosition {
         public:
@@ -189,20 +261,27 @@ namespace Isis {
        * @author 2012-03-22 Steven Lambright and Jai Rideout
        *
        * @internal
+       *   @history 2012-06-06 Steven Lambright and Kimberly Oyama - Added support for multiple
+       *                           extent/vector types (ViewportFeatureDisplay(), applyExtentType(),
+       *                           features()). Fixes #852. Fixes #892.
        */
       class ViewportFeatureDisplay {
         public:
           ViewportFeatureDisplay();
           ViewportFeatureDisplay(FeatureNomenclatureTool *tool,
               MdiCubeViewport *sourceViewport,
-              QList<FeatureNomenclature::Feature> features);
+              QList<FeatureNomenclature::Feature> features,
+              VectorType vectorType);
           ViewportFeatureDisplay(const ViewportFeatureDisplay &other);
           ~ViewportFeatureDisplay();
 
+          void applyExtentType(VectorType vectorType);
           void centerFeature(FeatureNomenclature::Feature);
           QList<FeatureNomenclature::Feature> features();
+          QList<FeaturePosition> featurePositions();
           MdiCubeViewport *sourceViewport() const;
-          void paint(QPainter *painter, bool showVectors) const;
+          void paint(QPainter *painter, bool showVectors,
+                     VectorType vectorType, bool approvedOnly)const;
 
           void handleMouseClicked(FeatureNomenclatureTool *tool, QPoint p,
                                   Qt::MouseButton s);
@@ -288,8 +367,10 @@ namespace Isis {
       bool m_defaultEnabled;
       //! Have we ever shown the user our disclaimer?
       bool m_disclaimedAlready;
-      //! Display vectors to feature extents?
-      bool m_showVectors;
+      //! How we need to draw extents (if at all)
+      VectorType m_extentType;
+      //! Only show IAU approved features
+      bool m_showApprovedOnly;
   };
 }
 
