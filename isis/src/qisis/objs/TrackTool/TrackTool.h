@@ -29,6 +29,8 @@ namespace Isis {
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
    *            CubeViewport.  Fixed include issues.
    *   @history 2011-04-25 Steven Lambright - Fixed updates at the bottom right
+   *   @history 2012-06-18 Steven Lambright - Fixed access of viewport DN data to
+   *                           not access out of range data. Fixes #896.
    */
   class TrackTool : public Tool {
       Q_OBJECT

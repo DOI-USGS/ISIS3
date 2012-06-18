@@ -216,8 +216,8 @@ namespace Isis {
       else {
         const QRect rect(grayBuf->bufferXYRect());
 
-        if(p.x() >= 0 && p.x() <= rect.right() &&
-            p.y() >= 0 && p.y() <= rect.bottom()) {
+        if(p.x() >= rect.left() && p.x() <= rect.right() &&
+            p.y() >= rect.top() && p.y() <= rect.bottom()) {
           const int bufX = p.x() - rect.left();
           const int bufY = p.y() - rect.top();
           QString pixelString = iString(PixelToString(
@@ -240,8 +240,8 @@ namespace Isis {
       else {
         const QRect rRect = redBuf->bufferXYRect();
 
-        if(p.x() >= 0 && p.x() < rRect.right() &&
-            p.y() >= 0 && p.y() < rRect.bottom()) {
+        if(p.x() >= rRect.left() && p.x() < rRect.right() &&
+            p.y() >= rRect.top() && p.y() < rRect.bottom()) {
           const int rBufX = p.x() - rRect.left();
           const int rBufY = p.y() - rRect.top();
           QString rLab = "R ";
@@ -259,8 +259,8 @@ namespace Isis {
       else {
         const QRect gRect = greenBuf->bufferXYRect();
 
-        if(p.x() >= 0 && p.x() < gRect.right() &&
-            p.y() >= 0 && p.y() < gRect.bottom()) {
+        if(p.x() >= gRect.left() && p.x() < gRect.right() &&
+            p.y() >= gRect.top() && p.y() < gRect.bottom()) {
           const int gBufX = p.x() - gRect.left();
           const int gBufY = p.y() - gRect.top();
           QString gLab = "G ";
@@ -278,8 +278,8 @@ namespace Isis {
       else {
         const QRect bRect = blueBuf->bufferXYRect();
 
-        if(p.x() >= 0 && p.x() < bRect.right() &&
-            p.y() >= 0 && p.y() < bRect.bottom()) {
+        if(p.x() >= bRect.left() && p.x() < bRect.right() &&
+            p.y() >= bRect.top() && p.y() < bRect.bottom()) {
           const int bBufX = p.x() - bRect.left();
           const int bBufY = p.y() - bRect.top();
           QString bLab = "B ";
