@@ -37,6 +37,12 @@ namespace Isis {
    *                           behavior. This has been fixed by initializing it
    *                           to '.' and updating its value  when a cube is
    *                           opened. Fixes #752. 
+   *   @history 2012-06-18 Steven Lambright - m_lastOpenedFile was being overly
+   *                           aggresively when remembering paths from previously
+   *                           opened files - it followed the cube paths inside of
+   *                           file lists. This is now corrected so that it'll
+   *                           remember the path to the file list instead of the
+   *                           path to the files in the file list. Fixes #848.
    */
   class MosaicMainWindow : public MainWindow {
       Q_OBJECT

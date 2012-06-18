@@ -275,6 +275,7 @@ namespace Isis {
         directory.path(), filterList.join(";;"));
 
     if (!selected.empty()) {
+      m_lastOpenedFile = QFileInfo(selected.last());
       openFiles(selected);
     }
   }
@@ -609,6 +610,7 @@ namespace Isis {
         directory.path(), filterList.join(";;"));
 
     if (selected != "") {
+      m_lastOpenedFile = QFileInfo(selected);
       TextFile fileList((iString) selected);
 
       QStringList filesInList;
@@ -643,7 +645,6 @@ namespace Isis {
     // Create a mosaic widget if we don't have one
     if (!cubeNames.empty()) {
       displayController();
-      m_lastOpenedFile = QFileInfo(cubeNames.last());
     }
 
     if (m_mosaicController)
@@ -704,6 +705,7 @@ namespace Isis {
       QString fn =  QFileDialog::getOpenFileName(this, "Load Project",
                     QDir::currentPath(),
                     "Mosaic (*.mos)");
+      m_lastOpenedFile = QFileInfo(fn);
       loadProject(fn);
     }
   }
