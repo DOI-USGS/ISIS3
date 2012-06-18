@@ -20,15 +20,17 @@ namespace Isis {
   *
   * @internal
   *  @history 2008-06-12 Noah Hilt - Changed the save/load
-  *            functions to work with blank entries.
+  *                          functions to work with blank entries.
   *  @history 2008-06-25 Noah Hilt - Fixed the delete rows method to search the
-  *           entire row for values, rather than just the first column.
+  *                          entire row for values, rather than just the first column.
   *  @history 2008-10-17 Noah Hilt - Added an optional tooltip parameter to the
-  *           addToTable method. This tooltip will be displayed over the checkbox
-  *           that is to be added to the dock area.
+  *                          addToTable method. This tooltip will be displayed over the checkbox
+  *                          that is to be added to the dock area.
   *  @history 2008-11-25 Noah Hilt - Added an action to save the table to a file
-  *           that has been loaded or set with the save as action. This way the
-  *           user does not have to reselect the file to save the table to.
+  *                          that has been loaded or set with the save as action. This way the
+  *                          user does not have to reselect the file to save the table to.
+  *  @history 2012-06-18 Steven Lambright - Gave the mac toolbar an object name for
+  *                          saving and restoring state. Fixes #851."
   */
 
 

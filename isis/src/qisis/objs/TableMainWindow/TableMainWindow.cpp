@@ -119,6 +119,7 @@ namespace Isis {
     //for the table to the tool bar.
 #if defined(__APPLE__)
     QToolBar *toolBar = new QToolBar();
+    toolBar->setObjectName("ToolBar");
     toolBar->addAction(p_save);
     toolBar->addAction(saveas);
     toolBar->addAction(load);
