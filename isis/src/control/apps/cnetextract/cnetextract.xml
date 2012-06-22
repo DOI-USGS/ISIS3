@@ -7,42 +7,125 @@
   </brief>
 
   <description>
-    <p>Extracts Control Points into a new Control Network from a specified Control
-    Network in accordance to specified filters.</p>
+    <p>
+      Extracts Control Points into a new Control Network from a specified 
+      Control Network in accordance to specified filters.
+    </p>
 
-    <p>A summary of the Control Points not extracted, listed by the filter which
-    prevented them from being extracted, can be included in optional report
-    files. See
-    the PREFIX and filter keywords for details.</p>
+    <p>
+      Currently, the filters are divided into four categories: Exclusive 
+      Filters, Inclusive Filters, Cube Filters, and Lat/Lon Filters.
+    </p>
 
-    <p>Currently, the filters are divided into four categories: Exclusive Filters,
-    Inclusive Filters, Cube Filters, and Lat/Lon Filters.</p>
+    <p>
+      <strong>Exclusive Filters</strong> prevent extraction. They are taken 
+      into consideration last and have the highest priority. This means that 
+      if any other filter creates a selected Exclusive Filter condition during 
+      processing, that Exclusive Filter will prevent the extraction. For 
+      example, if the Cube Filters CUBES, CUBELIST, and CUBEMEASURES are used 
+      along with the Exclusive Filter NOSINGLEMEASURES, then an input Control 
+      Point which contains only one cube in the CUBELIST will not be 
+      extracted, regardless of the number of Control Measures it had on input. 
+      This is because NOSINGLEMEASURES will see it as a Control Point with 
+      exactly one Control Measure and prevent its extraction. If only 
+      Exclusive Filters are used, all Control Points/Measures that do not have 
+      an exclusive property will be extracted. 
+    </p>
 
-    <p>Exclusive Filters prevent extraction. They are taken into consideration
-    last and have the highest priority. This means that if any other filter
-    creates a selected Exclusive Filter condition during processing, that
-    Exclusive Filter will prevent the extraction. For example, if the Cube 
-    Filters CUBES, CUBELIST, and CUBEMEASURES are
-    used along with the Exclusive Filter NOSINGLEMEASURES, then an input Control
-    Point which contains only one cube in the CUBELIST will not be extracted,
-    regardless of the number of Control Measures it had on input. This is
-    because NOSINGLEMEASURES will see it as a Control Point with exactly one
-    Control Measure and prevent its extraction.
-    If only Exclusive Filters are used, all Control Points/Measures that do not
-    have an exclusive property will be extracted.</p>
+    <p>
+      <strong>Inclusive Filters</strong> allow extraction. They only extract 
+      Control Points and/or Measures that are included in the Inclusive 
+      Filter. In addition, each Inclusive Filter is associated with an 
+      explicit property of the Control Point/Measure. If more than one 
+      Inclusive Filter is selected, only Control Points/Measures that contain 
+      all inclusive properties will be extracted. 
+    </p>
 
-    <p>Inclusive Filters allow extraction. They only extract Control Points and/or
-    Measures that are included in the Inclusive Filter. In addition, each
-    Inclusive Filter is associated with an explicit property of the Control
-    Point/Measure. If more than one Inclusive Filter is selected, only Control
-    Points/Measures that contain all inclusive properties will be extracted.</p>
+    <p>
+      <strong>Cube Filters</strong> also allow extraction, however, they 
+      pertain to the cubes contained within the Control Points/Measures. 
+      Option RETAIN_REFERENCE will extract the Reference even if not in the 
+      Cube List.  Reports created for cube filters include
+    </p>
 
-    <p>Cube Filters also allow extraction, however, they pertain to the
-    cubes contained within the Control Points/Measures. Option RETAIN_REFERENCE 
-    will extract the Reference even if not in the Cube List.</p>
-
-    <p>Lat/Lon Filters allow extraction as well, however, they only extract
-    Control Points/Measures that lie in the lat/lon bounding box.</p>
+    <p>
+      <strong>Lat/Lon Filters</strong> allow extraction as well, however, they 
+      only extract Control Points/Measures that lie in the lat/lon bounding 
+      box.  Reports created for exclusive filters include
+    </p>
+    <p>
+      A summary of the Control Points not extracted, listed by the filter which
+      prevented them from being extracted, can be included in optional report
+      files. See the PREFIX and filter keywords for more details. These
+      reports include
+      <table border="1">
+        <tr>
+          <th><strong>OutputReport</strong></th>
+          <th><strong>Filter</strong></th>
+          <th><strong>Reason for not extracting the points/measures in this report</strong></th>
+        </tr>
+        <tr>
+          <td align="center"><code>[PREFIX]IgnoredPoints.txt</code></td>
+          <td align="center"><code>NOIGNORE</code></td>
+          <td align="left"><code>These points are set to ignored.</code></td>
+        </tr>
+        <tr>
+          <td align="center"><code>[PREFIX]IgnoredMeasures.txt</code></td>
+          <td align="center"><code>NOIGNORE</code></td>
+          <td align="left"><code>These measures are set to ignored and are not reference measures.</code></td>
+        </tr>
+        <tr>
+          <td align="center"><code>[PREFIX]SingleMeasurePoints.txt</code></td>
+          <td align="center"><code>NOSINGLEMEASURES</code></td>
+          <td align="left"><code>These points have only one measure.</code></td>
+        </tr>
+        <tr>
+          <td align="center"><code>[PREFIX]MeasurelessPoints.txt</code></td>
+          <td align="center"><code>NOMEASURELESS</code></td>
+          <td align="left"><code>These points have no measures.</code></td>
+        </tr>
+        <tr>
+          <td align="center"><code>[PREFIX]NonReferenceMeasures.txt</code></td>
+          <td align="center"><code>REFERENCE</code></td>
+          <td align="left"><code>These measures are not reference measures.</code></td>
+        </tr>
+        <tr>
+          <td align="center"><code>[PREFIX]NonFixedPoints.txt</code></td>
+          <td align="center"><code>FIXED</code></td>
+          <td align="left"><code>These points are not fixed.</code></td>
+        </tr>
+        <tr>
+          <td align="center"><code>[PREFIX]TolerancePoints.txt</code></td>
+          <td align="center"><code>TOLERANCE</code></td>
+          <td align="left"><code>These points have line and/or sample less than the given PIXELTOLERANCE.</code></td>
+        </tr>
+        <tr>
+          <td align="center"><code>[PREFIX]NonListedPoints.txt</code></td>
+          <td align="center"><code>POINTSLIST</code></td>
+          <td align="left"><code>These points are not in the given POINTLIST.</code></td>
+        </tr>
+        <tr>
+          <td align="center"><code>[PREFIX]NonCubePoints.txt</code></td>
+          <td align="center"><code>CUBES</code></td>
+          <td align="left"><code>These points have no measures corresponding to the given CUBELIST.</code></td>
+        </tr>
+        <tr>
+          <td align="center"><code>[PREFIX]NonCubeMeasures.txt</code></td>
+          <td align="center"><code>CUBES, CUBEMEASURES, and RETAIN_REFERENCE</code></td>
+          <td align="left"><code>These measures do not correspond to cubes in the given CUBELIST. If RETAIN_REFERENCE is true, reference measures will not be in this list.</code></td>
+        </tr>
+        <tr>
+          <td align="center"><code>[PREFIX]LatLonOutOfRange.txt</code></td>
+          <td align="center"><code>LATLON</code></td>
+          <td align="left"><code>These points have a latitude and/or longitude that is not in the given MINLAT/MAXLAT or MINLON/MAXLON range.</code></td>
+        </tr>
+        <tr>
+          <td align="center"><code>[PREFIX]NoLatLonPoints.txt</code></td>
+          <td align="center"><code>LATLON</code></td>
+          <td align="left"><code>These points do not have a determineable latitude and/or longitude value.</code></td>
+        </tr>
+      </table>
+    </p>
   </description>
 
   <history>
@@ -123,6 +206,10 @@
     <change name="Stuart Sides" date="2011-10-07">
       Added documentation with Annie Howington-Kraus and Ella Lee.
     </change>
+    <change name="Jeannie Backer" date="2012-06-22">
+      Added and modified documentation for filters and PREFIX report files to 
+      better reflect how the program filters work. References #927.
+    </change>
   </history>
 
   <category>
@@ -137,7 +224,9 @@
           <type>filename</type>
           <fileMode>input</fileMode>
           <internalDefault>No input cube list</internalDefault>
-          <brief>List of ISIS3 cubes in the input Control Network</brief>
+          <brief>
+            List of ISIS3 cubes in the input Control Network
+          </brief>
           <description>
           A text file containing one column of ISIS3 cube file names. Every cube
           used in the input control network should be contained in this list.
@@ -150,7 +239,9 @@
         <parameter name="CNET">
           <type>filename</type>
           <fileMode>input</fileMode>
-          <brief>Input Control Network filename</brief>
+          <brief>
+            Input Control Network filename
+          </brief>
           <description>
             A filename containing control network points and measures to extract
             the ONET from.
@@ -168,7 +259,10 @@
         <type>string</type>
         <internalDefault>Prefix of NO results reports</internalDefault>
         <fileMode>output</fileMode>
-        <brief>A string used to enable output of optional report file(s) of excluded information</brief>
+        <brief>
+          A string used to enable output of optional report file(s) of excluded
+          information
+        </brief>
         <description>
           A short single word string used as a prefix on output report file(s)
           generated based on extraction criteria entered by the user.  If a PREFIX is 
@@ -184,7 +278,9 @@
           <type>filename</type>
           <fileMode>output</fileMode>
           <internalDefault>No output cube list</internalDefault>
-          <brief>List of ISIS3 cubes in the output Control Network file</brief>
+          <brief>
+            List of ISIS3 cubes in the output Control Network file
+          </brief>
           <description>
           This optional output text file contains one column of ISIS3 cube file names associated
           with the ONET. This list can only include cubes that were provided in the FROMLIST.
@@ -197,7 +293,9 @@
         <parameter name="ONET">
           <type>filename</type>
           <fileMode>output</fileMode>
-          <brief>Output Control Network filename</brief>
+          <brief>
+            Output Control Network filename
+          </brief>
           <description>
             The resultant Control Network file extracted from CNET.
             </description>
@@ -238,44 +336,69 @@
       <parameter name="NOIGNORE">
         <type>boolean</type>
         <default><item>False</item></default>
-        <brief>Do not extract ignored Control Points and ignored Control Measures</brief>
+        <brief>
+          Do not extract ignored Control Points and non-referernce ignored 
+          Control Measures
+        </brief>
         <description>
-          <p>When selected, all ignored Control Points and all ignored Control
-          Measures provided by the input Control Net will not be included in
-          the output Control Network.</p>
+          <p>
+            When selected, no ignored Control Points provided by the input 
+            Control Net will be included in the output Control Network. 
+            Furthermore, any ignored Control Measures that are not reference
+            measures will also be excluded from the output Control Network.
+          </p>
 
-          <p>When option PREFIX is used, report files [PREFIX]IgnoredPoints.txt and
-          [PREFIX]IgnoredMeasures.txt will also be created.  These files
-          list which Control Points and Control Measures were not
-          extracted due to this filter.</p>
+          <p>
+            When option PREFIX is used, two report files will be created,
+            [PREFIX]IgnoredPoints.txt and [PREFIX]IgnoredMeasures.txt. 
+            These files list all Control Points and Control Measures from the
+            input Control Network that were not extracted due to this filter.
+            **Note** The [PREFIX]IgnoredMeasures.txt will not include ignored
+            control measures that are reference measures since they will be
+            extracted.
+          </p>
         </description>
       </parameter>
 
       <parameter name="NOMEASURELESS">
         <type>boolean</type>
         <default><item>False</item></default>
-        <brief>Do not extract Control Points with exactly zero Control Measures</brief>
+        <brief>
+          Do not extract Control Points with exactly zero Control Measures
+        </brief>
         <description>
-  	       <p>When selected, all Control Points that are reduced to zero Control
-           Measures (from other selected filters or have zero measures on
-           input) will not be included in the output Control Network.</p>
+  	      <p>
+            When selected, all Control Points that are reduced to zero Control
+            Measures (from other selected filters or have zero measures on
+            input) will not be included in the output Control Network.
+          </p>
 
-          <p>When option PREFIX is used, report file [PREFIX]MeasurelessPoints.txt will also be created. Each Control Point it lists was
-          not extracted due to this filter.</p>
+          <p>
+            When option PREFIX is used, report file [PREFIX]MeasurelessPoints.txt 
+            will also be created. Each Control Point it lists was not extracted
+            due to this filter.
+          </p>
         </description>
       </parameter>
 
       <parameter name="NOSINGLEMEASURES">
         <type>boolean</type>
         <default><item>False</item></default>
-        <brief>Do not extract Control Points with exactly one Control Measure</brief>
+        <brief>
+          Do not extract Control Points with exactly one Control Measure
+        </brief>
         <description>
-  	       <p>When selected, all Control Points that are reduced to one Control
-           Measure (from other selected filters or only have one measure on
-           input) will not be included in the output Control Network.</p>
+  	      <p>
+            When selected, all Control Points that are reduced to one Control
+            Measure (from other selected filters or only have one measure on
+            input) will not be included in the output Control Network.
+          </p>
 
-          <p>When option PREFIX is used, report file [PREFIX]SingleMeasurePoints.txt will also be created. Each Control Point it lists was
-          not extracted due to this filter.</p>
+          <p>
+            When option PREFIX is used, report file [PREFIX]SingleMeasurePoints.txt
+            will also be created. Each Control Point it lists was not extracted 
+            due to this filter.
+          </p>
         </description>
         <exclusions>
           <item>REFERENCE</item>
@@ -289,17 +412,26 @@
       <parameter name="REFERENCE">
         <type>boolean</type>
         <default><item>False</item></default>
-        <brief>Only extract explicit reference Control Measures</brief>
+        <brief>
+          Only extract reference Control Measures
+        </brief>
         <description>
-          <p>When selected, only explicit reference Control Measures will be
-          extracted into the output Control Network.</p>
+          <p>
+            When selected, only reference Control Measures will be
+            extracted into the output Control Network.
+          </p>
 
-          <p>When this filter is used, NOMEASURELESS will be selected
-          automatically, and NOSINGLEMEASURES will be disabled.</p>
+          <p>
+            When this filter is used, NOMEASURELESS will be selected
+            automatically, and NOSINGLEMEASURES will be disabled.
+          </p>
 
-          <p>When option PREFIX is used, report file [PREFIX]NonReferenceMeasures.txt
-          will also be created. Each Control Measure it
-          contains was not extracted due to this filter.</p>
+          <p>
+            When option PREFIX is used, a report file with the name 
+            [PREFIX]NonReferenceMeasures.txt will also be created. This file 
+            will contain each Control Measure that was not extracted due to 
+            this filter.
+          </p>
         </description>
         <exclusions>
           <item>NOSINGLEMEASURES</item>
@@ -309,31 +441,46 @@
       <parameter name="FIXED">
         <type>boolean</type>
         <default><item>False</item></default>
-        <brief>Only extract fixed Control Points</brief>
+        <brief>
+          Only extract fixed Control Points
+        </brief>
         <description>
-          <p>When selected, only fixed Control Points will be extracted into the
-          output Control Network file.</p>
+          <p>
+            When selected, only fixed Control Points will be extracted into the
+            output Control Network file.
+          </p>
 
-          <p>When option PREFIX is used, report file [PREFIX]NonFixedPoints.txt will also be
-          created. Each Control Point it lists was not
-          extracted due to this filter.</p>
+          <p>
+            When option PREFIX is used, report file [PREFIX]NonFixedPoints.txt will also be
+            created. Each Control Point it lists was not
+            extracted due to this filter.
+          </p>
         </description>
       </parameter>
 
       <parameter name="TOLERANCE">
         <type>boolean</type>
         <default><item>False</item></default>
-        <brief>Only extract Control Points with line or sample residual greater than PIXELTOLERANCE</brief>
+        <brief>
+          Only extract Control Points with line or sample residual greater than 
+          PIXELTOLERANCE
+        </brief>
         <description>
-          <p>When selected, extract all Control Points which have a line or a
-          sample residual greater than or equal to the PIXELTOLERANCE value.</p>
+          <p>
+            When selected, extract all Control Points which have a line or a
+            sample residual greater than or equal to the PIXELTOLERANCE value.
+          </p>
 
-          <p>The PIXELTOLERANCE is compared to the keywords LineResidual and
-          SampleResidual in the input Control Network.</p>
+          <p>
+            The PIXELTOLERANCE is compared to the keywords LineResidual and
+            SampleResidual in the input Control Network.
+          </p>
 
-          <p>When option PREFIX is used, report file [PREFIX]TolerancePoints.txt will also be
-          created. Each Control Point it lists was not
-          extracted due to this filter.</p>
+          <p>
+            When option PREFIX is used, report file [PREFIX]TolerancePoints.txt
+            will also be created. Each Control Point it lists was not
+            extracted due to this filter.
+          </p>
         </description>
         <inclusions>
           <item>PIXELTOLERANCE</item>
@@ -342,10 +489,14 @@
       <parameter name="PIXELTOLERANCE">
         <type>double</type>
         <default><item>10.0</item></default>
-        <brief>Only extract Control Points with a line or sample residual greater than this value</brief>
+        <brief>
+          Only extract Control Points with a line or sample residual greater 
+          than this value
+        </brief>
         <description>
           Control Points which contain at least one Control Measure with a line
-          or a sample residual error greater than or equal to this value will be extracted.
+          or a sample residual error greater than or equal to this value will 
+          be extracted.
         </description>
       </parameter>
 
@@ -353,16 +504,22 @@
        <type>filename</type>
        <fileMode>input</fileMode>
        <internalDefault>None</internalDefault>
-       <brief>File containing Control Point Ids which will be extracted</brief>
+       <brief>
+         File containing Control Point Ids which will be extracted
+        </brief>
        <description>
-         <p>Use this parameter to select a text file that contains a list of
-          Control Point Ids. All the Control Points with matching Ids will be extracted
-        as long as another selected filter does not exclude the Control
-        Point.</p>
+         <p>
+           Use this parameter to select a text file that contains a list of
+           Control Point Ids. All the Control Points with matching Ids will be 
+           extracted as long as another selected filter does not exclude the 
+           Control Point.
+         </p>
 
-        <p>When option PREFIX is used, report file [PREFIX]NonListedPoints.txt will also be
-        created. Each Control Point it contains was
-        not extracted due to this filter.</p>
+         <p>
+           When option PREFIX is used, report file [PREFIX]NonListedPoints.txt 
+           will also be created. Each Control Point it contains was not 
+           extracted due to this filter.
+         </p>
        </description>
        <filter>
          *.lis
@@ -376,7 +533,9 @@
       <parameter name="CUBES">
         <type>boolean</type>
         <default><item>False</item></default>
-        <brief>Enable extraction of Control Points/Measures based on listed cubes</brief>
+        <brief>
+          Enable extraction of Control Points/Measures based on listed cubes
+        </brief>
         <description>
           When selected, only Control Points which contain the cubes listed in
           CUBELIST will be extracted.
@@ -390,15 +549,21 @@
       <parameter name="CUBELIST">
         <type>filename</type>
         <fileMode>input</fileMode>
-        <brief>Only extract Control Points containing the listed cubes</brief>
+        <brief>
+          Only extract Control Points containing the listed cubes
+        </brief>
         <description>
-          <p>Use this parameter to select a text file that contains a list of
-          ISIS3 cubes. All the Control Points which contain at least one of these
-          cubes will be extracted.</p>
+          <p>
+            Use this parameter to select a text file that contains a list of
+            ISIS3 cubes. All the Control Points which contain at least one of 
+            these cubes will be extracted.
+          </p>
 
-          <p>When option PREFIX is used, report file [PREFIX]NonCubePoints.txt will also be
-          created. Each Control Point it lists was not
-          extracted due to this filter.</p>
+          <p>
+            When option PREFIX is used, report file [PREFIX]NonCubePoints.txt 
+            will also be created. Each Control Point it lists was not
+            extracted due to this filter.
+          </p>
         </description>
         <filter>
           *.lis
@@ -408,18 +573,26 @@
       <parameter name="CUBEMEASURES">
         <type>boolean</type>
         <default><item>False</item></default>
-        <brief>Only extract Control Measures containing a cube in CUBELIST</brief>
+        <brief>
+          Only extract Control Measures containing a cube in CUBELIST
+        </brief>
         <description>
-          <p>When selected, extract all Control Measures from extracted Control
-          Points that contain a cube in the CUBELIST list.
-          This option can only be used when a file has been provided for CUBELIST.</p>
+          <p>
+            When selected, extract all Control Measures from extracted Control
+            Points that contain a cube in the CUBELIST list. This option can 
+            only be used when a file has been provided for CUBELIST.
+          </p>
 
-          <p>When this filter is used, NOMEASURELESS will be selected
-          automatically.</p>
+          <p>
+            When this filter is used, NOMEASURELESS will be selected
+            automatically.
+          </p>
 
-          <p>When option PREFIX is used, report file [PREFIX]NonCubeMeasures.txt will also be
-          created. Each Control Measure it lists was not
-          extracted due to this filter.</p>
+          <p>
+            When option PREFIX is used with this filter, the report file 
+            [PREFIX]NonCubeMeasures.txt will also be created. Each Control 
+            Measure it lists was not extracted due to this filter.
+          </p>
         </description>
         <inclusions>
           <item>RETAIN_REFERENCE</item>
@@ -429,17 +602,29 @@
       <parameter name="RETAIN_REFERENCE">
         <type>boolean</type>
         <default><item>False</item></default>
-        <brief>Retain Reference even if not in the CUBELIST</brief>
+        <brief>
+          Retain Reference even if not in the CUBELIST
+        </brief>
         <description>
-          <p>When selected, retain the Reference in the extracted Control Points 
-          even if it is not in the  the CUBELIST  list. </p> 
+          <p>
+            When selected, retain the Reference in the extracted Control Points 
+            even if it is not in the  the CUBELIST  list. 
+          </p> 
 
-          <p>When this filter is used, NOMEASURELESS will be selected
-          automatically.</p>
+          <p>
+            When this filter is used, NOMEASURELESS will be selected
+            automatically.
+          </p>
 
-          <p>When option PREFIX is used, report file [PREFIX]NonCubeMeasures.txt 
-          will also be created. It will list the Reference which is not in the list 
-          but retained because this option was selected.</p>
+          <p>
+            When option PREFIX is used with the CUBEMEASURES filter, the 
+            report file [PREFIX]NonCubeMeasures.txt will also be created. This 
+            file will list the the measures that are not extracted.  This will 
+            include non-reference measures that do not correspond to the 
+            cubelist. When RETAIN_REFERENCE is true, reference measures will 
+            not be listed in this file since this option causes all reference 
+            measures to be extracted.
+          </p>
         </description>
       </parameter>
 
@@ -450,28 +635,37 @@
       <parameter name="LATLON">
         <type>boolean</type>
         <default><item>False</item></default>
-        <brief>Only extract Control Points in the lat/lon range</brief>
+        <brief>
+          Only extract Control Points in the lat/lon range
+        </brief>
         <description>
-  	       <p>When selected, all Control Points that are inside of the provided
-           latitude longitude range will be extracted. Control Points whose
-           latitude longitude cannot be computed will not be extracted.</p>
+  	       <p>
+             When selected, all Control Points that are inside of the provided
+             latitude longitude range will be extracted. Control Points whose
+             latitude longitude cannot be computed will not be extracted.
+           </p>
 
-           <p>Fixed Points will use the lat/lon values provided in the CNET
-           while Free Points will calculate their lat/lon from the images
-           provided by the FROMLIST.  These calculated lat/lon values will be
-           added to Free Points in the ONET for reference purposes. No Isis
-           application will use these added lat/lons.</p>
+           <p>
+             Fixed Points will use the lat/lon values provided in the CNET
+             while Free Points will calculate their lat/lon from the images
+             provided by the FROMLIST.  These calculated lat/lon values will be
+             added to Free Points in the ONET for reference purposes. No Isis
+             application will use these added lat/lons.
+           </p>
 
           
-          <p>When option PREFIX is used, report files [PREFIX]LatLonOutOfRange.txt and
-          [PREFIX]NoLatLonPoint.txt will also
-          be created.
-          Each Control Point they list was not extracted due to this filter.</p>
+          <p>
+            When option PREFIX is used, report files [PREFIX]LatLonOutOfRange.txt
+            and [PREFIX]NoLatLonPoint.txt will also be created. Each Control 
+            Point they list was not extracted due to this filter.
+          </p>
 
-          <p>Control Points in [PREFIX]LatLonOutOfRange.txt did not fall within
-          the provided lat/lon bound. Each Control Points listed in
-          [PREFIX]NoLatLonPoint.txt do not have a determinable Latitude or
-          Longitude.</p>
+          <p>
+            Control Points in [PREFIX]LatLonOutOfRange.txt did not fall within
+            the provided lat/lon bound. Each Control Points listed in
+            [PREFIX]NoLatLonPoint.txt do not have a determinable Latitude or
+            Longitude.
+          </p>
 
            <p>Note: This option is expensive.</p>
         </description>
@@ -488,7 +682,9 @@
         <default><item>-90.0</item></default>
         <minimum inclusive="yes">-90.0</minimum>
         <maximum inclusive="yes">90.0</maximum>
-        <brief>Minimum Control Point Latitude</brief>
+        <brief>
+          Minimum Control Point Latitude
+        </brief>
         <description>
           Any Control Point with a latitude less than MINLAT will be removed.
         </description>
@@ -500,7 +696,9 @@
         <minimum inclusive="yes">-90.0</minimum>
         <maximum inclusive="yes">90.0</maximum>
         <greaterThanOrEqual><item>MINLAT</item></greaterThanOrEqual>
-        <brief>Maximum Control Point Latitude</brief>
+        <brief>
+          Maximum Control Point Latitude
+        </brief>
         <description>
           Any Control Point with a latitude greater than MAXLAT will be removed.
         </description>
@@ -511,7 +709,9 @@
         <default><item>0.0</item></default>
         <minimum inclusive="yes">0.0</minimum>
         <maximum inclusive="yes">360.0</maximum>
-        <brief>Minimum Control Point Longitude</brief>
+        <brief>
+          Minimum Control Point Longitude
+        </brief>
         <description>
           <p>
             Any Control Point with a longitude less than MINLON will be
@@ -532,14 +732,20 @@
         <default><item>360.0</item></default>
         <minimum inclusive="yes">0.0</minimum>
         <maximum inclusive="yes">360.0</maximum>
-        <brief>Maximum Control Point Longitude</brief>
+        <brief>
+          Maximum Control Point Longitude
+        </brief>
         <description>
-          <p>Any Control Point with a longitude greater than MAXLON will be
-          removed.</p>
+          <p>
+            Any Control Point with a longitude greater than MAXLON will be 
+            removed.
+          </p>
 
-           <p>If MAXLON is less than MINLON than the longitude range is assumed
-           to cross the 0/360 longitude boundry, where points with longitude
-           greater than MINLON or less than MAXLON will be included.</p>
+          <p>
+            If MAXLON is less than MINLON than the longitude range is assumed
+            to cross the 0/360 longitude boundry, where points with longitude
+            greater than MINLON or less than MAXLON will be included.
+          </p>
         </description>
       </parameter>
 
