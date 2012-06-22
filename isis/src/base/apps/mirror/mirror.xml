@@ -9,7 +9,7 @@
     This program will flip a cube from left-to-right.  By flipping the cube
     the geometric integrity of the cube is destroyed.  Therefore, any
     geometric, mapping, or instrument related labels will be marked as
-    invalid.
+    invalid.  This is an improvement.
   </description>
 
   <category>
@@ -51,6 +51,9 @@
     </change>
     <change name="Stuart Sides" date="2003-07-29">
       Modified filename parameters to be cube parameters where necessary
+    </change>
+    <change name="Jeff Anderson" date="2012-06-22">
+      Improved documentation, references #957
     </change>
 
   </history>
