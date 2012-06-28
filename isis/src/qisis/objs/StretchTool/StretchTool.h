@@ -108,7 +108,7 @@ namespace Isis {
 
       static Stretch stretchBuffer(ViewportBuffer *buffer, QRect rect);
       static Stretch stretchBand(CubeViewport *cvp, StretchBand band);
-      
+
       static Statistics statsFromCube(Cube *cube, int band);
       static Statistics statsFromBuffer(ViewportBuffer *buffer, QRect rect);
       static Histogram histFromCube(Cube *cube, int band,
@@ -117,7 +117,7 @@ namespace Isis {
       static Histogram histFromBuffer(ViewportBuffer *buffer, QRect rect,
                                             double min, double max);
       void updateAdvStretchDialogforAll(void);
-      
+
 
     signals:
       /**
@@ -125,7 +125,7 @@ namespace Isis {
        * associated with it to any ChipViewport's that might be listening
        */
       void stretchChipViewport(Stretch *, CubeViewport *);
-      
+
       /**
        * Shows a warning. This sends a signal (meant for when an
        * exception occurs) to display the error using the warning
@@ -135,7 +135,7 @@ namespace Isis {
        * @param pExStr
        */
       void warningSignal(std::string   &pStr, const std::string pExStr);
-      
+
     public slots:
       void stretchGlobal();
       void stretchGlobal(CubeViewport *);
@@ -179,31 +179,31 @@ namespace Isis {
 
     private:
       void stretchRect(CubeViewport *cvp, QRect rect);
-      
+
     private:
-      AdvancedStretchDialog *p_advancedStretch; //!< The advanced dialog
+      AdvancedStretchDialog *m_advancedStretch; //!< The advanced dialog
 
-      QToolButton *p_copyButton;         //!< Copy Button
-      QToolButton *p_globalButton;       //!< Global Button
-      QToolButton *p_stretchRegionalButton; //!< Regional Stretch Button
-      QPushButton *p_flashButton; //!< Button to press for global stretch
+      QToolButton *m_copyButton;         //!< Copy Button
+      QToolButton *m_globalButton;       //!< Global Button
+      QToolButton *m_stretchRegionalButton; //!< Regional Stretch Button
+      QPushButton *m_flashButton; //!< Button to press for global stretch
 
-      QAction *p_stretchGlobal;          //!< Global stretch action
-      QAction *p_stretchRegional;        //!< Regional stretch action
-      QAction *p_stretchManual;          //!< Manual stretch action
-      QAction *p_copyBands;              //!< Copy band stretch action
+      QAction *m_stretchGlobal;          //!< Global stretch action
+      QAction *m_stretchRegional;        //!< Regional stretch action
+      QAction *m_stretchManual;          //!< Manual stretch action
+      QAction *m_copyBands;              //!< Copy band stretch action
 
-      QComboBox *p_stretchBandComboBox;  //!< Stretch combo box
+      QComboBox *m_stretchBandComboBox;  //!< Stretch combo box
 
-      QLineEdit *p_stretchMinEdit;       //!< Min. line edit
-      QLineEdit *p_stretchMaxEdit;       //!< Max. line edit
+      QLineEdit *m_stretchMinEdit;       //!< Min. line edit
+      QLineEdit *m_stretchMaxEdit;       //!< Max. line edit
 
-      StretchBand p_stretchBand;         //!< Current stretch band
+      StretchBand m_stretchBand;         //!< Current stretch band
 
       //! Stretches before global button pressed
-      Stretch *p_preGlobalStretches;
-      
-      Stretch *p_chipViewportStretch; //!< ChipViewport's stretch
+      Stretch *m_preGlobalStretches;
+
+      Stretch *m_chipViewportStretch; //!< ChipViewport's stretch
   };
 };
 

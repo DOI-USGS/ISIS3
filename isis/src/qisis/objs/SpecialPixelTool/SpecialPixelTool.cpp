@@ -187,6 +187,17 @@ namespace Isis {
   void SpecialPixelTool::addToPermanent(QToolBar *perm) {
     perm->addAction(p_action);
   }
+  
+  
+  /**
+   * 
+   * @param ws
+   */
+  void SpecialPixelTool::addTo(Workspace *ws) {
+    Tool::addTo(ws);
+    connect(ws, SIGNAL(cubeViewportAdded(MdiCubeViewport *)),
+            this, SLOT(apply()));
+  }
 
 
   /**

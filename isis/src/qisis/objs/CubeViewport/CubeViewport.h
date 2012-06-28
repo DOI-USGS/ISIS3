@@ -107,6 +107,8 @@ namespace Isis {
    *                          on resize.
    *  @history 2012-05-29 Steven Lambright - Changed destructor to clean up the cube when
    *                          necessary.
+   *  @history 2012-06-28 Steven Lambright - Stretching gray no longer removes stretch
+   *                          special pixel values from the RGB stretches. References #684.
    */
   class CubeViewport : public QAbstractScrollArea {
       Q_OBJECT

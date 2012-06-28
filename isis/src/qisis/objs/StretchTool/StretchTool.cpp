@@ -33,31 +33,31 @@ namespace Isis {
    * @param parent
    */
   StretchTool::StretchTool(QWidget *parent) : Tool::Tool(parent) {
-    p_chipViewportStretch = NULL;
-    p_preGlobalStretches = NULL;
-    p_advancedStretch = NULL;
+    m_chipViewportStretch = NULL;
+    m_preGlobalStretches = NULL;
+    m_advancedStretch = NULL;
 
-    p_chipViewportStretch = new Stretch;
+    m_chipViewportStretch = new Stretch;
 
-    p_advancedStretch = new AdvancedStretchDialog(parent);
-    connect(p_advancedStretch, SIGNAL(stretchChanged()),
+    m_advancedStretch = new AdvancedStretchDialog(parent);
+    connect(m_advancedStretch, SIGNAL(stretchChanged()),
             this, SLOT(advancedStretchChanged()));
-    connect(p_advancedStretch, SIGNAL(visibilityChanged()),
+    connect(m_advancedStretch, SIGNAL(visibilityChanged()),
             this, SLOT(updateTool()));
 
     QPushButton *hiddenButton = new QPushButton();
     hiddenButton->setVisible(false);
     hiddenButton->setDefault(true);
 
-    p_stretchGlobal = new QAction(parent);
-    p_stretchGlobal->setShortcut(Qt::CTRL + Qt::Key_G);
-    p_stretchGlobal->setText("Global Stretch");
-    connect(p_stretchGlobal, SIGNAL(activated()), this, SLOT(stretchGlobal()));
+    m_stretchGlobal = new QAction(parent);
+    m_stretchGlobal->setShortcut(Qt::CTRL + Qt::Key_G);
+    m_stretchGlobal->setText("Global Stretch");
+    connect(m_stretchGlobal, SIGNAL(activated()), this, SLOT(stretchGlobal()));
 
-    p_stretchRegional = new QAction(parent);
-    p_stretchRegional->setShortcut(Qt::CTRL + Qt::Key_R);
-    p_stretchRegional->setText("Regional Stretch");
-    connect(p_stretchRegional, SIGNAL(activated()), this, SLOT(stretchRegional()));
+    m_stretchRegional = new QAction(parent);
+    m_stretchRegional->setShortcut(Qt::CTRL + Qt::Key_R);
+    m_stretchRegional->setText("Regional Stretch");
+    connect(m_stretchRegional, SIGNAL(activated()), this, SLOT(stretchRegional()));
 
     // Emit a signal when an exception occurs and connect to the Warning object
     // to display Warning icon and the message
@@ -71,11 +71,11 @@ namespace Isis {
    * Destructor
    */
   StretchTool::~StretchTool() {
-    delete [] p_preGlobalStretches;
-    p_preGlobalStretches = NULL;
+    delete [] m_preGlobalStretches;
+    m_preGlobalStretches = NULL;
 
-    delete p_chipViewportStretch;
-    p_chipViewportStretch = NULL;
+    delete m_chipViewportStretch;
+    m_chipViewportStretch = NULL;
   }
 
 
@@ -108,8 +108,8 @@ namespace Isis {
    * @param menu
    */
   void StretchTool::addTo(QMenu *menu) {
-    menu->addAction(p_stretchGlobal);
-    menu->addAction(p_stretchRegional);
+    menu->addAction(m_stretchGlobal);
+    menu->addAction(m_stretchRegional);
   }
 
 
@@ -140,32 +140,32 @@ namespace Isis {
       pixels in the red marquee</p>";
     butt->setWhatsThis(text);
     connect(butt, SIGNAL(clicked()), this, SLOT(stretchRegional()));
-    p_stretchRegionalButton = butt;
+    m_stretchRegionalButton = butt;
 
-    p_stretchBandComboBox = new QComboBox(hbox);
-    p_stretchBandComboBox->setEditable(false);
-    p_stretchBandComboBox->addItem("Red Band", Red);
-    p_stretchBandComboBox->addItem("Green Band", Green);
-    p_stretchBandComboBox->addItem("Blue Band", Blue);
-    p_stretchBandComboBox->addItem("All Bands", All);
-    p_stretchBandComboBox->setToolTip("Select Color");
+    m_stretchBandComboBox = new QComboBox(hbox);
+    m_stretchBandComboBox->setEditable(false);
+    m_stretchBandComboBox->addItem("Red Band", Red);
+    m_stretchBandComboBox->addItem("Green Band", Green);
+    m_stretchBandComboBox->addItem("Blue Band", Blue);
+    m_stretchBandComboBox->addItem("All Bands", All);
+    m_stretchBandComboBox->setToolTip("Select Color");
     text =
       "<b>Function:</b> Selecting the color will allow the appropriate \
       min/max to be seen and/or edited in text fields to the right.";
 
 //      The All option implies the same min/max will be applied
 //      to all three colors (RGB) if either text field is edited";
-    p_stretchBandComboBox->setWhatsThis(text);
-    p_stretchBand = All;
-    p_stretchBandComboBox->setCurrentIndex(
-        p_stretchBandComboBox->findData(p_stretchBand));
-    connect(p_stretchBandComboBox, SIGNAL(currentIndexChanged(int)),
+    m_stretchBandComboBox->setWhatsThis(text);
+    m_stretchBand = All;
+    m_stretchBandComboBox->setCurrentIndex(
+        m_stretchBandComboBox->findData(m_stretchBand));
+    connect(m_stretchBandComboBox, SIGNAL(currentIndexChanged(int)),
             this, SLOT(stretchBandChanged(int)));
 
     QDoubleValidator *dval = new QDoubleValidator(hbox);
-    p_stretchMinEdit = new QLineEdit(hbox);
-    p_stretchMinEdit->setValidator(dval);
-    p_stretchMinEdit->setToolTip("Minimum");
+    m_stretchMinEdit = new QLineEdit(hbox);
+    m_stretchMinEdit->setValidator(dval);
+    m_stretchMinEdit->setToolTip("Minimum");
     text =
       "<b>Function:</b> Shows the current minimum pixel value.  Pixel values \
       below minimum are shown as black.  Pixel values above the maximum \
@@ -174,14 +174,14 @@ namespace Isis {
       linearly between black and white (or color component). \
       <p><b>Hint:</b>  You can manually edit the minimum but it must be \
       less than the maximum.";
-    p_stretchMinEdit->setWhatsThis(text);
-    p_stretchMinEdit->setMaximumWidth(100);
-    connect(p_stretchMinEdit, SIGNAL(returnPressed()),
+    m_stretchMinEdit->setWhatsThis(text);
+    m_stretchMinEdit->setMaximumWidth(100);
+    connect(m_stretchMinEdit, SIGNAL(returnPressed()),
             this, SLOT(changeStretch()));
 
-    p_stretchMaxEdit = new QLineEdit(hbox);
-    p_stretchMaxEdit->setValidator(dval);
-    p_stretchMaxEdit->setToolTip("Maximum");
+    m_stretchMaxEdit = new QLineEdit(hbox);
+    m_stretchMaxEdit->setValidator(dval);
+    m_stretchMaxEdit->setToolTip("Maximum");
     text =
       "<b>Function:</b> Shows the current maximum pixel value.  Pixel values \
       below minimum are shown as black.  Pixel values above the maximum \
@@ -190,17 +190,17 @@ namespace Isis {
       linearly between black and white (or color component). \
       <p><b>Hint:</b>  You can manually edit the maximum but it must be \
       greater than the minimum";
-    p_stretchMaxEdit->setWhatsThis(text);
-    p_stretchMaxEdit->setMaximumWidth(100);
-    connect(p_stretchMaxEdit, SIGNAL(returnPressed()), this, SLOT(changeStretch()));
+    m_stretchMaxEdit->setWhatsThis(text);
+    m_stretchMaxEdit->setMaximumWidth(100);
+    connect(m_stretchMaxEdit, SIGNAL(returnPressed()), this, SLOT(changeStretch()));
 
     // Create the two menus that drop down from the buttons
     QMenu *copyMenu = new QMenu();
     QMenu *globalMenu = new QMenu();
 
-    p_copyBands = new QAction(parent);
-    p_copyBands->setText("to All Bands");
-    connect(p_copyBands, SIGNAL(triggered(bool)), this, SLOT(setStretchAcrossBands()));
+    m_copyBands = new QAction(parent);
+    m_copyBands->setText("to All Bands");
+    connect(m_copyBands, SIGNAL(triggered(bool)), this, SLOT(setStretchAcrossBands()));
 
     QAction *copyAll = new QAction(parent);
     copyAll->setIcon(QPixmap(toolIconDir() + "/copy_stretch.png"));
@@ -208,23 +208,23 @@ namespace Isis {
     connect(copyAll, SIGNAL(triggered(bool)), this, SLOT(setStretchAllViewports()));
 
     copyMenu->addAction(copyAll);
-    copyMenu->addAction(p_copyBands);
+    copyMenu->addAction(m_copyBands);
 
-    p_copyButton = new QToolButton();
-    p_copyButton->setAutoRaise(true);
-    p_copyButton->setIconSize(QSize(22, 22));
-    p_copyButton->setIcon(QPixmap(toolIconDir() + "/copy_stretch.png"));
-    p_copyButton->setPopupMode(QToolButton::MenuButtonPopup);
-    p_copyButton->setMenu(copyMenu);
-    p_copyButton->setDefaultAction(copyAll);
-    p_copyButton->setToolTip("Copy");
+    m_copyButton = new QToolButton();
+    m_copyButton->setAutoRaise(true);
+    m_copyButton->setIconSize(QSize(22, 22));
+    m_copyButton->setIcon(QPixmap(toolIconDir() + "/copy_stretch.png"));
+    m_copyButton->setPopupMode(QToolButton::MenuButtonPopup);
+    m_copyButton->setMenu(copyMenu);
+    m_copyButton->setDefaultAction(copyAll);
+    m_copyButton->setToolTip("Copy");
     text  =
       "<b>Function:</b> Copy the current stretch to all the \
       active viewports. Or use the drop down menu to copy the current stretch \
       to all the  bands in the active viewport. \
       <p><b>Hint:</b>  Can reset the stretch to an automaticaly computed \
       stretch by using the 'Reset' stretch button option. </p>";
-    p_copyButton->setWhatsThis(text);
+    m_copyButton->setWhatsThis(text);
 
     QAction *currentView = new QAction(parent);
     currentView->setText("Active Viewport");
@@ -242,43 +242,43 @@ namespace Isis {
     globalMenu->addAction(globalBands);
     connect(globalBands, SIGNAL(triggered(bool)), this, SLOT(stretchGlobalAllBands()));
 
-    p_globalButton = new QToolButton(); //basically acts as a 'reset'
-    p_globalButton->setAutoRaise(true);
-    p_globalButton->setIconSize(QSize(22, 22));
-    p_globalButton->setPopupMode(QToolButton::MenuButtonPopup);
-    p_globalButton->setMenu(globalMenu);
-    p_globalButton->setDefaultAction(currentView);
-    p_globalButton->setToolTip("Reset");
+    m_globalButton = new QToolButton(); //basically acts as a 'reset'
+    m_globalButton->setAutoRaise(true);
+    m_globalButton->setIconSize(QSize(22, 22));
+    m_globalButton->setPopupMode(QToolButton::MenuButtonPopup);
+    m_globalButton->setMenu(globalMenu);
+    m_globalButton->setDefaultAction(currentView);
+    m_globalButton->setToolTip("Reset");
     text  =
       "<b>Function:</b> Reset the stretch to be automatically computed "
       "using the statisics from the entire image. Use the drop down menu "
       "to reset the stretch for all the bands in the active viewport or "
       "to reset the stretch for all the viewports.";
-    p_globalButton->setWhatsThis(text);
+    m_globalButton->setWhatsThis(text);
 
     QPushButton *advancedButton = new QPushButton("Advanced");
     connect(advancedButton, SIGNAL(clicked()), this, SLOT(showAdvancedDialog()));
 
-    p_flashButton = new QPushButton("Show Global");
+    m_flashButton = new QPushButton("Show Global");
     text  =
       "<b>Function:</b> While this button is pressed down, the visible stretch "
       "will be the automatically computed stretch using the statisics from the "
       "entire image. The original stretch is restored once you let up on this "
       "button.";
-    p_flashButton->setWhatsThis(text);
-    connect(p_flashButton, SIGNAL(pressed()), this, SLOT(stretchChanged()));
-    connect(p_flashButton, SIGNAL(released()), this, SLOT(stretchChanged()));
+    m_flashButton->setWhatsThis(text);
+    connect(m_flashButton, SIGNAL(pressed()), this, SLOT(stretchChanged()));
+    connect(m_flashButton, SIGNAL(released()), this, SLOT(stretchChanged()));
 
     QHBoxLayout *layout = new QHBoxLayout(hbox);
     layout->setMargin(0);
-    layout->addWidget(p_copyButton);
-    layout->addWidget(p_globalButton);
-    layout->addWidget(p_stretchRegionalButton);
-    layout->addWidget(p_stretchBandComboBox);
-    layout->addWidget(p_stretchMinEdit);
-    layout->addWidget(p_stretchMaxEdit);
+    layout->addWidget(m_copyButton);
+    layout->addWidget(m_globalButton);
+    layout->addWidget(m_stretchRegionalButton);
+    layout->addWidget(m_stretchBandComboBox);
+    layout->addWidget(m_stretchMinEdit);
+    layout->addWidget(m_stretchMaxEdit);
     layout->addWidget(advancedButton);
-    layout->addWidget(p_flashButton);
+    layout->addWidget(m_flashButton);
     layout->addStretch(); // Pushes everything else left in the menu bar
     hbox->setLayout(layout);
 
@@ -291,20 +291,20 @@ namespace Isis {
    * if present.
    */
   void StretchTool::updateHistograms() {
-    if(p_advancedStretch->isVisible()) {
+    if(m_advancedStretch->isVisible()) {
       MdiCubeViewport *cvp = cubeViewport();
 
       if(!cvp) return;
 
       if(cvp->isGray() && !cvp->grayBuffer()->working()) {
-        if(p_advancedStretch->isRgbMode()) {
+        if(m_advancedStretch->isRgbMode()) {
           updateTool();
         }
         else {
           Histogram hist(histFromBuffer(cvp->grayBuffer()));
 
           if(hist.ValidPixels() > 0) {
-            p_advancedStretch->updateHistogram(hist);
+            m_advancedStretch->updateHistogram(hist);
           }
         }
       }
@@ -313,7 +313,7 @@ namespace Isis {
               !cvp->redBuffer()->working() &&
               !cvp->greenBuffer()->working() &&
               !cvp->blueBuffer()->working()) {
-        if(!p_advancedStretch->isRgbMode()) {
+        if(!m_advancedStretch->isRgbMode()) {
           updateTool();
         }
         else {
@@ -324,7 +324,7 @@ namespace Isis {
           if(redHist.ValidPixels() > 0 &&
               grnHist.ValidPixels() > 0 &&
               bluHist.ValidPixels() > 0) {
-            p_advancedStretch->updateHistograms(redHist, grnHist, bluHist);
+            m_advancedStretch->updateHistograms(redHist, grnHist, bluHist);
           }
         }
       }
@@ -339,7 +339,7 @@ namespace Isis {
    */
   void StretchTool::updateAdvStretchDialogforAll(void)
   {
-    if(p_advancedStretch->isVisible()) {
+    if(m_advancedStretch->isVisible()) {
       MdiCubeViewport *cvp = cubeViewport();
 
       if(!cvp->isGray() &&
@@ -354,7 +354,7 @@ namespace Isis {
         Stretch grnStretch(cvp->greenStretch());
         Stretch bluStretch(cvp->blueStretch());
 
-        p_advancedStretch->updateForRGBMode(redStretch, redHist,
+        m_advancedStretch->updateForRGBMode(redStretch, redHist,
                                             grnStretch, grnHist,
                                             bluStretch, bluHist);
       }
@@ -375,13 +375,13 @@ namespace Isis {
    * @param cvp
    */
   void StretchTool::setCubeViewport(CubeViewport *cvp) {
-    if(p_advancedStretch->isVisible()) {
-      p_advancedStretch->enable(true);
+    if(m_advancedStretch->isVisible()) {
+      m_advancedStretch->enable(true);
       //If the viewport is in gray mode
       if(cvp->isGray() && !cvp->grayBuffer()->working()) {
         Histogram hist(histFromBuffer(cvp->grayBuffer()));
         Stretch stretch(cvp->grayStretch());
-        p_advancedStretch->enableGrayMode(stretch, hist);
+        m_advancedStretch->enableGrayMode(stretch, hist);
       }
       //Otherwise it is in color mode
       else if(!cvp->isGray() &&
@@ -394,16 +394,16 @@ namespace Isis {
         Stretch redStretch(cvp->redStretch());
         Stretch grnStretch(cvp->greenStretch());
         Stretch bluStretch(cvp->blueStretch());
-        p_advancedStretch->enableRgbMode(redStretch, redHist,
+        m_advancedStretch->enableRgbMode(redStretch, redHist,
                                          grnStretch, grnHist,
                                          bluStretch, bluHist);
       }
       else {
-        p_advancedStretch->enable(false);
+        m_advancedStretch->enable(false);
       }
     }
     else {
-      p_advancedStretch->enable(false);
+      m_advancedStretch->enable(false);
     }
   }
 
@@ -417,40 +417,40 @@ namespace Isis {
 
     if(cvp == NULL) {
       //If the current viewport is NULL and the advanced dialog is visible, hide it
-      if(p_advancedStretch->isVisible()) {
-        p_advancedStretch->hide();
+      if(m_advancedStretch->isVisible()) {
+        m_advancedStretch->hide();
       }
     }
     else {
-      if(!p_advancedStretch->enabled() ||
-          p_advancedStretch->isRgbMode() != !cvp->isGray()) {
+      if(!m_advancedStretch->enabled() ||
+          m_advancedStretch->isRgbMode() != !cvp->isGray()) {
         setCubeViewport(cvp);
       }
     }
 
     if(cvp && cvp->isGray()) {
-      p_copyBands->setEnabled(true);
-      p_stretchBandComboBox->setShown(false);
-      p_stretchMinEdit->show();
-      p_stretchMaxEdit->show();
+      m_copyBands->setEnabled(true);
+      m_stretchBandComboBox->setShown(false);
+      m_stretchMinEdit->show();
+      m_stretchMaxEdit->show();
     }
     else if(cvp) {
-      p_copyBands->setEnabled(true);
-      p_stretchBandComboBox->setShown(true);
+      m_copyBands->setEnabled(true);
+      m_stretchBandComboBox->setShown(true);
       stretchBandChanged(0);
     }
     else {
-      p_copyBands->setEnabled(false);
-      p_stretchBandComboBox->setShown(false);
+      m_copyBands->setEnabled(false);
+      m_stretchBandComboBox->setShown(false);
     }
 
-    if(p_advancedStretch->isVisible()) {
-      p_stretchMinEdit->setEnabled(false);
-      p_stretchMaxEdit->setEnabled(false);
+    if(m_advancedStretch->isVisible()) {
+      m_stretchMinEdit->setEnabled(false);
+      m_stretchMaxEdit->setEnabled(false);
     }
     else {
-      p_stretchMinEdit->setEnabled(true);
-      p_stretchMaxEdit->setEnabled(true);
+      m_stretchMinEdit->setEnabled(true);
+      m_stretchMaxEdit->setEnabled(true);
     }
 
     updateHistograms();
@@ -530,30 +530,30 @@ namespace Isis {
     MdiCubeViewport *cvp = cubeViewport();
     if(cvp == NULL) return;
 
-    if(p_flashButton->isDown()) {
-      if(!p_preGlobalStretches) {
-        p_preGlobalStretches = new Stretch[4];
-        p_preGlobalStretches[0] = cvp->grayStretch();
-        p_preGlobalStretches[1] = cvp->redStretch();
-        p_preGlobalStretches[2] = cvp->greenStretch();
-        p_preGlobalStretches[3] = cvp->blueStretch();
+    if(m_flashButton->isDown()) {
+      if(!m_preGlobalStretches) {
+        m_preGlobalStretches = new Stretch[4];
+        m_preGlobalStretches[0] = cvp->grayStretch();
+        m_preGlobalStretches[1] = cvp->redStretch();
+        m_preGlobalStretches[2] = cvp->greenStretch();
+        m_preGlobalStretches[3] = cvp->blueStretch();
       }
 
       cvp->stretchKnownGlobal();
       return;
     }
-    else if(p_preGlobalStretches) {
+    else if(m_preGlobalStretches) {
       if(cvp->isGray()) {
-        cvp->stretchGray(p_preGlobalStretches[0]);
+        cvp->stretchGray(m_preGlobalStretches[0]);
       }
       else {
-        cvp->stretchRed(p_preGlobalStretches[1]);
-        cvp->stretchGreen(p_preGlobalStretches[2]);
-        cvp->stretchBlue(p_preGlobalStretches[3]);
+        cvp->stretchRed(m_preGlobalStretches[1]);
+        cvp->stretchGreen(m_preGlobalStretches[2]);
+        cvp->stretchBlue(m_preGlobalStretches[3]);
       }
 
-      delete [] p_preGlobalStretches;
-      p_preGlobalStretches = NULL;
+      delete [] m_preGlobalStretches;
+      m_preGlobalStretches = NULL;
     }
 
     double min = 0, max = 0;
@@ -572,36 +572,36 @@ namespace Isis {
       Stretch bstretch = cvp->blueStretch();
 
       //Get the min/max from the current stretch
-      if(p_stretchBand == Red) {
+      if(m_stretchBand == Red) {
         min = rstretch.Input(0);
         max = rstretch.Input(rstretch.Pairs() - 1);
       }
-      else if(p_stretchBand == Green) {
+      else if(m_stretchBand == Green) {
         min = gstretch.Input(0);
         max = gstretch.Input(gstretch.Pairs() - 1);
       }
-      else if(p_stretchBand == Blue) {
+      else if(m_stretchBand == Blue) {
         min = bstretch.Input(0);
         max = bstretch.Input(bstretch.Pairs() - 1);
       }
     }
 
     //Set the min/max text fields
-    if(p_stretchBand != All || cvp->isGray()) {
+    if(m_stretchBand != All || cvp->isGray()) {
       QString strMin;
       strMin.setNum(min);
-      p_stretchMinEdit->setText(strMin);
+      m_stretchMinEdit->setText(strMin);
 
       QString strMax;
       strMax.setNum(max);
-      p_stretchMaxEdit->setText(strMax);
+      m_stretchMaxEdit->setText(strMax);
     }
 
-    if(p_advancedStretch->isVisible()) {
-      if(p_stretchBand == All){
+    if(m_advancedStretch->isVisible()) {
+      if(m_stretchBand == All){
         updateAdvStretchDialogforAll();
       }
-      p_advancedStretch->updateStretch(cvp);
+      m_advancedStretch->updateStretch(cvp);
     }
   }
 
@@ -614,30 +614,30 @@ namespace Isis {
     CubeViewport *cvp = cubeViewport();
     if(cvp == NULL) return;
 
-    if(!p_advancedStretch->isRgbMode()) {
+    if(!m_advancedStretch->isRgbMode()) {
       Stretch grayStretch = cvp->grayStretch();
       grayStretch.ClearPairs();
-      grayStretch.CopyPairs(p_advancedStretch->getGrayStretch());
+      grayStretch.CopyPairs(m_advancedStretch->getGrayStretch());
       cvp->stretchGray(grayStretch);
 
       // send the stretch to any ChipViewports that want to listen
-      *p_chipViewportStretch = grayStretch;
-      emit stretchChipViewport(p_chipViewportStretch, cvp);
+      *m_chipViewportStretch = grayStretch;
+      emit stretchChipViewport(m_chipViewportStretch, cvp);
     }
     else {
       Stretch redStretch = cvp->redStretch();
       redStretch.ClearPairs();
-      redStretch.CopyPairs(p_advancedStretch->getRedStretch());
+      redStretch.CopyPairs(m_advancedStretch->getRedStretch());
       cvp->stretchRed(redStretch);
 
       Stretch grnStretch = cvp->greenStretch();
       grnStretch.ClearPairs();
-      grnStretch.CopyPairs(p_advancedStretch->getGrnStretch());
+      grnStretch.CopyPairs(m_advancedStretch->getGrnStretch());
       cvp->stretchGreen(grnStretch);
 
       Stretch bluStretch = cvp->blueStretch();
       bluStretch.ClearPairs();
-      bluStretch.CopyPairs(p_advancedStretch->getBluStretch());
+      bluStretch.CopyPairs(m_advancedStretch->getBluStretch());
       cvp->stretchBlue(bluStretch);
     }
     stretchChanged();
@@ -655,11 +655,11 @@ namespace Isis {
     if(cvp == NULL) return;
 
     // Make sure the user didn't enter bad min/max and if so fix it
-    double min = p_stretchMinEdit->text().toDouble();
-    double max = p_stretchMaxEdit->text().toDouble();
+    double min = m_stretchMinEdit->text().toDouble();
+    double max = m_stretchMaxEdit->text().toDouble();
 
-    if(min >= max || p_stretchMinEdit->text() == "" ||
-        p_stretchMaxEdit->text() == "") {
+    if(min >= max || m_stretchMinEdit->text() == "" ||
+        m_stretchMaxEdit->text() == "") {
       updateTool();
       return;
     }
@@ -672,8 +672,8 @@ namespace Isis {
       stretch.AddPair(max, 255.0);
 
       // send the stretch to any ChipViewports that want to listen
-      *p_chipViewportStretch = stretch;
-      emit stretchChipViewport(p_chipViewportStretch, cvp);
+      *m_chipViewportStretch = stretch;
+      emit stretchChipViewport(m_chipViewportStretch, cvp);
 
       cvp->stretchGray(stretch);
     }
@@ -683,17 +683,17 @@ namespace Isis {
       Stretch greenStretch = cvp->greenStretch();
       Stretch blueStretch = cvp->blueStretch();
 
-      if(p_stretchBand == Red) {
+      if(m_stretchBand == Red) {
         redStretch.ClearPairs();
         redStretch.AddPair(min, 0.0);
         redStretch.AddPair(max, 255.0);
       }
-      if(p_stretchBand == Green) {
+      if(m_stretchBand == Green) {
         greenStretch.ClearPairs();
         greenStretch.AddPair(min, 0.0);
         greenStretch.AddPair(max, 255.0);
       }
-      if(p_stretchBand == Blue) {
+      if(m_stretchBand == Blue) {
         blueStretch.ClearPairs();
         blueStretch.AddPair(min, 0.0);
         blueStretch.AddPair(max, 255.0);
@@ -713,11 +713,11 @@ namespace Isis {
    *
    */
   void StretchTool::showAdvancedDialog() {
-    if(p_advancedStretch->isVisible()) return;
+    if(m_advancedStretch->isVisible()) return;
 
     if(cubeViewport()) {
-      p_advancedStretch->updateStretch(cubeViewport());
-      p_advancedStretch->show();
+      m_advancedStretch->updateStretch(cubeViewport());
+      m_advancedStretch->show();
     }
 
     updateTool();
@@ -821,43 +821,43 @@ namespace Isis {
    void StretchTool::stretchRect(CubeViewport *cvp, QRect rect) {
      Stretch newStretch;
      if(cvp->isGray()) {
-        newStretch = cvp->grayStretch();
-        newStretch.ClearPairs();
-        newStretch.CopyPairs(stretchBuffer(cvp->grayBuffer(), rect));
-        cvp->stretchGray(newStretch);
+       newStretch = cvp->grayStretch();
+       newStretch.ClearPairs();
+       newStretch.CopyPairs(stretchBuffer(cvp->grayBuffer(), rect));
+       cvp->stretchGray(newStretch);
 
-        // send the stretch to any ChipViewports that want to listen
-        *p_chipViewportStretch = newStretch;
-        emit stretchChipViewport(p_chipViewportStretch, cvp);
-      }
-      else {
-        if (p_stretchBand==Red || p_stretchBand==All) {
-          newStretch = cvp->redStretch();
-          newStretch.ClearPairs();
-          newStretch.CopyPairs(stretchBuffer(cvp->redBuffer(), rect));
-          cvp->stretchRed(newStretch);
-        }
-        if (p_stretchBand==Green || p_stretchBand==All){
-          newStretch = cvp->greenStretch();
-          newStretch.ClearPairs();
-          newStretch.CopyPairs(stretchBuffer(cvp->greenBuffer(), rect));
-          cvp->stretchGreen(newStretch);
-        }
-        if (p_stretchBand==Blue || p_stretchBand==All){
-          newStretch = cvp->blueStretch();
-          newStretch.ClearPairs();
-          newStretch.CopyPairs(stretchBuffer(cvp->blueBuffer(), rect));
-          cvp->stretchBlue(newStretch);
-        }
-        if(p_stretchBand != Red && p_stretchBand != Blue &&
-           p_stretchBand != Green && p_stretchBand != All) {
-            throw IException(IException::Programmer,
-                             "Unknown stretch band",
-                             _FILEINFO_);
-        }
-      }
+       // send the stretch to any ChipViewports that want to listen
+       *m_chipViewportStretch = newStretch;
+       emit stretchChipViewport(m_chipViewportStretch, cvp);
+     }
+     else {
+       if (m_stretchBand==Red || m_stretchBand==All) {
+         newStretch = cvp->redStretch();
+         newStretch.ClearPairs();
+         newStretch.CopyPairs(stretchBuffer(cvp->redBuffer(), rect));
+         cvp->stretchRed(newStretch);
+       }
+       if (m_stretchBand==Green || m_stretchBand==All){
+         newStretch = cvp->greenStretch();
+         newStretch.ClearPairs();
+         newStretch.CopyPairs(stretchBuffer(cvp->greenBuffer(), rect));
+         cvp->stretchGreen(newStretch);
+       }
+       if (m_stretchBand==Blue || m_stretchBand==All){
+         newStretch = cvp->blueStretch();
+         newStretch.ClearPairs();
+         newStretch.CopyPairs(stretchBuffer(cvp->blueBuffer(), rect));
+         cvp->stretchBlue(newStretch);
+       }
+       if(m_stretchBand != Red && m_stretchBand != Blue &&
+          m_stretchBand != Green && m_stretchBand != All) {
+           throw IException(IException::Programmer,
+                            "Unknown stretch band",
+                            _FILEINFO_);
+       }
+     }
 
-      stretchChanged();
+     stretchChanged();
    }
 
 
@@ -906,8 +906,8 @@ namespace Isis {
     CubeViewport *cvp = cubeViewport();
     if(cvp == NULL) return;
 
-    double min = p_stretchMinEdit->text().toDouble();
-    double max = p_stretchMaxEdit->text().toDouble();
+    double min = m_stretchMinEdit->text().toDouble();
+    double max = m_stretchMaxEdit->text().toDouble();
 
     Stretch stretch;
     if(cvp->isGray()) {
@@ -916,7 +916,7 @@ namespace Isis {
       stretch.AddPair(min, 0.0);
       stretch.AddPair(max, 255.0);
     }
-    else if(p_stretchBand == Red) {
+    else if(m_stretchBand == Red) {
       stretch = cvp->redStretch();
       stretch.ClearPairs();
       stretch.AddPair(min, 0.0);
@@ -924,7 +924,7 @@ namespace Isis {
       cvp->stretchGreen(stretch);
       cvp->stretchBlue(stretch);
     }
-    else if(p_stretchBand == Green) {
+    else if(m_stretchBand == Green) {
       stretch = cvp->greenStretch();
       stretch.ClearPairs();
       stretch.AddPair(min, 0.0);
@@ -932,7 +932,7 @@ namespace Isis {
       cvp->stretchRed(stretch);
       cvp->stretchBlue(stretch);
     }
-    else if(p_stretchBand == Blue) {
+    else if(m_stretchBand == Blue) {
       stretch = cvp->blueStretch();
       stretch.ClearPairs();
       stretch.AddPair(min, 0.0);
@@ -1204,17 +1204,17 @@ namespace Isis {
    */
   void StretchTool::stretchBandChanged(int) {
 
-    p_stretchBand = (StretchBand) p_stretchBandComboBox->itemData(
-                      p_stretchBandComboBox->currentIndex()
+    m_stretchBand = (StretchBand) m_stretchBandComboBox->itemData(
+                      m_stretchBandComboBox->currentIndex()
                     ).toInt();
 
-    if(p_stretchBand == All) {
-      p_stretchMinEdit->hide();
-      p_stretchMaxEdit->hide();
+    if(m_stretchBand == All) {
+      m_stretchMinEdit->hide();
+      m_stretchMaxEdit->hide();
     }
     else {
-      p_stretchMinEdit->show();
-      p_stretchMaxEdit->show();
+      m_stretchMinEdit->show();
+      m_stretchMaxEdit->show();
     }
     stretchChanged();
   }
@@ -1229,12 +1229,12 @@ namespace Isis {
   {
     CubeViewport *cvp = cubeViewport(); if(cvp != NULL) {
       if(cvp->isGray()) {
-        p_viewportMap[cvp][cvp->grayBand()-1]->currentStretch = p_viewportMap[cvp][cvp->grayBand()-1]->stretch->stretch();
+        m_viewportMap[cvp][cvp->grayBand()-1]->currentStretch = m_viewportMap[cvp][cvp->grayBand()-1]->stretch->stretch();
       }
       else {
-        p_viewportMap[cvp][cvp->redBand()-1]->currentStretch = p_viewportMap[cvp][cvp->redBand()-1]->stretch->stretch();
-        p_viewportMap[cvp][cvp->greenBand()-1]->currentStretch = p_viewportMap[cvp][cvp->greenBand()-1]->stretch->stretch();
-        p_viewportMap[cvp][cvp->blueBand()-1]->currentStretch = p_viewportMap[cvp][cvp->blueBand()-1]->stretch->stretch();
+        m_viewportMap[cvp][cvp->redBand()-1]->currentStretch = m_viewportMap[cvp][cvp->redBand()-1]->stretch->stretch();
+        m_viewportMap[cvp][cvp->greenBand()-1]->currentStretch = m_viewportMap[cvp][cvp->greenBand()-1]->stretch->stretch();
+        m_viewportMap[cvp][cvp->blueBand()-1]->currentStretch = m_viewportMap[cvp][cvp->blueBand()-1]->stretch->stretch();
       }
 
       //Update the stretch
@@ -1274,7 +1274,7 @@ namespace Isis {
       return;
     }
 
-    if(p_advancedStretch->isRgbMode())
+    if(m_advancedStretch->isRgbMode())
     {
       FileName redFileName(filename.toStdString());
       FileName grnFileName(filename.toStdString());
@@ -1301,9 +1301,9 @@ namespace Isis {
       QTextStream grnStream(&grnFile);
       QTextStream bluStream(&bluFile);
 
-      Stretch red = p_advancedStretch->getRedStretch();
-      Stretch grn = p_advancedStretch->getGrnStretch();
-      Stretch blu = p_advancedStretch->getBluStretch();
+      Stretch red = m_advancedStretch->getRedStretch();
+      Stretch grn = m_advancedStretch->getGrnStretch();
+      Stretch blu = m_advancedStretch->getBluStretch();
 
       redStream << red.Text().c_str() << endl;
       grnStream << grn.Text().c_str() << endl;
@@ -1326,7 +1326,7 @@ namespace Isis {
 
       QTextStream stream(&file);
 
-      Stretch stretch = p_advancedStretch->getGrayStretch();
+      Stretch stretch = m_advancedStretch->getGrayStretch();
 
       //Add the pairs to the file
       stream << stretch.Text().c_str() << endl;

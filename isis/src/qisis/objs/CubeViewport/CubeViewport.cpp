@@ -2131,15 +2131,24 @@ namespace Isis {
    * @param stretch
    */
   void CubeViewport::stretchGray(const Stretch &stretch) {
-    p_gray.setStretch(stretch);
-    p_red.setStretch(stretch);
-    p_green.setStretch(stretch);
-    p_blue.setStretch(stretch);
-
     // Assume first stretch is always the global stretch (and it should be)
-    if((*p_globalStretches)[grayBand() - 1] == NULL) {
-      (*p_globalStretches)[grayBand() - 1] = new Stretch(p_gray.getStretch());
+    if((*p_globalStretches)[grayBand() - 1] == NULL && stretch.Pairs()) {
+      (*p_globalStretches)[grayBand() - 1] = new Stretch(stretch);
     }
+
+    p_gray.setStretch(stretch);
+
+    Stretch newRed(p_red.getStretch());
+    newRed.CopyPairs(stretch);
+    p_red.setStretch(newRed);
+
+    Stretch newGreen(p_green.getStretch());
+    newGreen.CopyPairs(stretch);
+    p_green.setStretch(newGreen);
+
+    Stretch newBlue(p_blue.getStretch());
+    newBlue.CopyPairs(stretch);
+    p_blue.setStretch(newBlue);
 
     paintPixmap();
     viewport()->update();
@@ -2155,7 +2164,7 @@ namespace Isis {
     p_red.setStretch(stretch);
 
     // Assume first stretch is always the global stretch (and it should be)
-    if((*p_globalStretches)[redBand() - 1] == NULL) {
+    if((*p_globalStretches)[redBand() - 1] == NULL && stretch.Pairs()) {
       (*p_globalStretches)[redBand() - 1] = new Stretch(p_red.getStretch());
     }
 
@@ -2173,7 +2182,7 @@ namespace Isis {
     p_green.setStretch(stretch);
 
     // Assume first stretch is always the global stretch (and it should be)
-    if((*p_globalStretches)[greenBand() - 1] == NULL) {
+    if((*p_globalStretches)[greenBand() - 1] == NULL && stretch.Pairs()) {
       (*p_globalStretches)[greenBand() - 1] = new Stretch(p_green.getStretch());
     }
 
@@ -2191,7 +2200,7 @@ namespace Isis {
     p_blue.setStretch(stretch);
 
     // Assume first stretch is always the global stretch (and it should be)
-    if((*p_globalStretches)[blueBand() - 1] == NULL) {
+    if((*p_globalStretches)[blueBand() - 1] == NULL && stretch.Pairs()) {
       (*p_globalStretches)[blueBand() - 1] = new Stretch(p_blue.getStretch());
     }
 

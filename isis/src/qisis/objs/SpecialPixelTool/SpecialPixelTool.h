@@ -30,6 +30,7 @@ namespace Isis {
    *            write default colors for special pixel values.
    *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport instead of
    *            CubeViewport.  Also fixed some include issues.
+   *   @history 2012-06-28 Steven Lambright - Now applies to new viewports
    */
   class SpecialPixelTool : public Tool {
       Q_OBJECT
@@ -38,6 +39,7 @@ namespace Isis {
       SpecialPixelTool(QWidget *parent);
       void addTo(QMenu *menu);
       void addToPermanent(QToolBar *perm);
+      void addTo(Workspace *ws);
 
     protected:
       //! Returns the menu name.
