@@ -1,6 +1,7 @@
 #include "StatisticsTool.h"
 
 #include <QCheckBox>
+#include <QDebug>
 #include <QDialog>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -306,7 +307,7 @@ namespace Isis {
     Brick *brick = new Brick(1, 1, 1, cvp->cube()->getPixelType());
 
 
-    QVector<QVector<double> > pixelData(p_boxLines, QVector<double>(p_boxSamps, 0));
+    QVector<QVector<double> > pixelData(p_boxLines, QVector<double>(p_boxSamps, Null));
 
     double lineDiff = p_boxLines / 2.0;
     double sampDiff = p_boxSamps / 2.0;
@@ -341,10 +342,18 @@ namespace Isis {
 
     p_visualDisplay->setPixelData(pixelData, p_ulSamp, p_ulLine);
 
-    p_minLabel->setText(QString("Minimum: %1").arg(stats.Minimum()));
-    p_maxLabel->setText(QString("Maximum: %1").arg(stats.Maximum()));
-    p_avgLabel->setText(QString("Average: %1").arg(stats.Average()));
-    p_stdevLabel->setText(QString("Standard Dev: %1").arg(stats.StandardDeviation(), 0, 'f', 6));
+    if (stats.ValidPixels()) {
+      p_minLabel->setText(QString("Minimum: %1").arg(stats.Minimum()));
+      p_maxLabel->setText(QString("Maximum: %1").arg(stats.Maximum()));
+      p_avgLabel->setText(QString("Average: %1").arg(stats.Average()));
+      p_stdevLabel->setText(QString("Standard Dev: %1").arg(stats.StandardDeviation(), 0, 'f', 6));
+    }
+    else {
+      p_minLabel->setText(QString("Minimum: n/a"));
+      p_maxLabel->setText(QString("Maximum: n/a"));
+      p_avgLabel->setText(QString("Average: n/a"));
+      p_stdevLabel->setText(QString("Standard Dev: n/a"));
+    }
 
     p_set = true;
 
@@ -428,7 +437,7 @@ namespace Isis {
     p_stretch.SetHrs(255.0);
     p_stretch.SetMinimum(0.0);
     p_stretch.SetMaximum(255.0);
-    p_pixelData = QVector<QVector<double> >(p_boxLines, QVector<double>(p_boxSamps, 0));
+    p_pixelData = QVector<QVector<double> >(p_boxLines, QVector<double>(p_boxSamps, Null));
     paintPixmap();
     setMouseTracking(true);
     setBackgroundRole(QPalette::Dark);
@@ -648,7 +657,9 @@ namespace Isis {
             }
           }
           else {
-            c = QColor((int)p_stretch.Map(dn), (int)p_stretch.Map(dn), (int)p_stretch.Map(dn));
+            double visualValue = p_stretch.Map(dn);
+
+            c = QColor(visualValue, visualValue, visualValue);
           }
         }
         p.save();
@@ -656,7 +667,11 @@ namespace Isis {
 
         if(p_showText) {
           p.drawRect(rect);
-          p.drawText(rect, Qt::AlignCenter, QString("%1").arg(dn));
+
+          if (!IsSpecial(dn))
+            p.drawText(rect, Qt::AlignCenter, QString::number(dn));
+          else
+            p.drawText(rect, Qt::AlignCenter, QString::fromStdString(PixelToString(dn)));
         }
         else {
           p.fillRect(rect, c);

@@ -51,10 +51,10 @@ namespace Isis {
    * @author 2009-10-07 Noah Hilt
    *
    * @internal
-   *
-   *  @history 2009-10-07 Noah Hilt - Original version.
-   *
-   *  @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport
+   *   @history 2009-10-07 Noah Hilt - Original version.
+   *   @history 2010-06-26 Eric Hyer - Now uses MdiCubeViewport
+   *   @history 2012-06-29 Steven Lambright - Improved handling of special pixels so that they
+   *                           are reported correctly. Fixes #199.
    */
   class VisualDisplay : public QWidget {
       Q_OBJECT

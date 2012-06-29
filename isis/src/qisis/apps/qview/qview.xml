@@ -90,5 +90,9 @@
       Also, images that are opened after using this tool will now take on the appropriate
       colors. Fixes #684.
     </change>
+    <change name="Steven Lambright" date="2012-06-29">
+      Improved handling of special pixels in the statistics tool so that they are reported
+      correctly. Fixes #199.
+    </change>
   </history>
 </application>
