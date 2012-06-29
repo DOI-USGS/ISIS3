@@ -1,0 +1,88 @@
+Object = ControlNetwork
+  NetworkId    = NiliFossae
+  TargetName   = Mars
+  UserName     = jwalldren
+  Created      = 2011-09-30T11:10:17
+  LastModified = 2011-09-30T11:10:17
+  Description  = "NiliFossae Jitter - use spicefit"
+  Version      = 3
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = PSP755600004
+    ChooserName = cnetsplit
+    DateTime    = 2011-09-30T11:10:17
+
+    Group = ControlMeasure
+      SerialNumber = MRO/HIRISE/889336232:10964/RED4/2
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2008-06-19T15:31:04
+      Sample       = 2017.0482456316
+      Line         = 268.23033341812
+      Reference    = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = MRO/HIRISE/889336232:10964/RED5/2
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2008-06-19T15:31:04
+      Sample       = 16.85914095714
+      Line         = 267.8967346471
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = PSP755600005
+    ChooserName = cnetsplit
+    DateTime    = 2011-09-30T11:10:17
+
+    Group = ControlMeasure
+      SerialNumber = MRO/HIRISE/889336232:10964/RED4/2
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2008-06-19T15:31:04
+      Sample       = 2044.1054109109
+      Line         = 371.41814410624
+      Reference    = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = MRO/HIRISE/889336232:10964/RED5/2
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2008-06-19T15:31:04
+      Sample       = 43.914972221782
+      Line         = 371.0923469903
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = PSP755600006
+    ChooserName = cnetsplit
+    DateTime    = 2011-09-30T11:10:17
+
+    Group = ControlMeasure
+      SerialNumber = MRO/HIRISE/889336232:10964/RED4/2
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2008-06-19T15:31:04
+      Sample       = 2004.403169377
+      Line         = 366.69783071947
+      Reference    = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = MRO/HIRISE/889336232:10964/RED5/2
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2008-06-19T15:31:04
+      Sample       = 4.2245219795274
+      Line         = 366.35299756514
+    End_Group
+  End_Object
+End_Object
+End
