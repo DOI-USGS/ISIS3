@@ -79,7 +79,7 @@ int main() {
   cout << "Testing SetDataType/SetNumericalValue..." << endl;
   {
     ControlMeasureLogData logData;
-    logData.SetDataType(ControlMeasureLogData::Eccentricity);
+    logData.SetDataType(ControlMeasureLogData::Obsolete_Eccentricity);
     logData.SetNumericalValue(3.14159);
 
     cout << "Valid? " << logData.IsValid() << "\n"

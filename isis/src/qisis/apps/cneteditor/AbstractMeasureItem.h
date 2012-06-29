@@ -43,7 +43,7 @@ namespace Isis
           Ignored = 5,
           Reference = 6,
           Type = 7,
-          Eccentricity = 8,
+          Obsolete_Eccentricity = 8,
           GoodnessOfFit = 9,
           MinPixelZScore = 10,
           MaxPixelZScore = 11,

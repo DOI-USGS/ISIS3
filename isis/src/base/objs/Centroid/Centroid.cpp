@@ -16,7 +16,7 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include "Centroid.h"
+#include "/work/users/othomas/imageReg/SubPixelDevelopemnt/trunk/isis/src/base/objs/Centroid/Centroid.h"
 
 
 using namespace std;
@@ -54,8 +54,9 @@ namespace Isis {
 
     selectionChip->SetSize(samples,lines);
 
-    sample = (samples-1)/2;
-    line = (lines-1)/2;
+    sample = int(inputChip->ChipSample());//(samples-1)/2;
+    line = int(inputChip->ChipLine());//(lines-1)/2;
+    //printf("DEBUG: centroid starting sample line: %d %d\n",sample,line);
 
     //set all values to unselected
     selectionChip->SetAllValues(0.0);  
@@ -65,6 +66,7 @@ namespace Isis {
 
     dn = inputChip->GetValue(sample,line);
     if (dn < m_minDN || dn > m_maxDN) {
+      //printf("DEBUG: seed value doesn't meet criteria min max DN: %lf %lf \n",m_minDN,m_maxDN);
       return 0;  //if the seed value doesn't meet the criteria then the selection is the empty set and the work is done
     }
     else {

@@ -16,14 +16,16 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+
 #include "AutoReg.h"
 #include "Buffer.h"
+#include "Centroid.h"
 #include "Chip.h"
 #include "FileName.h"
 #include "Histogram.h"
-#include "LeastSquares.h"
 #include "IException.h"
 #include "Interpolator.h"
+#include "LeastSquares.h"
 #include "Matrix.h"
 #include "PixelType.h"
 #include "Plugin.h"
@@ -65,10 +67,6 @@ namespace Isis {
    *     <ul>
    *       <li>DistanceTolerance = 1.5
    *       <li>WindowSize = 5
-   *       <li>EccentricityTesting = False
-   *       <li>EccentricityRatio = 2 (2:1)
-   *       <li>ResidualTesting = False
-   *       <li>ResidualTolerance = 0.1
    *     </ul>
    * </ul>
    * The reduced chips are initially set to the same size as their corresponding
@@ -96,13 +94,9 @@ namespace Isis {
     SetTolerance(Isis::Null);
 
     SetSubPixelAccuracy(true);
-    SetEccentricityTesting(false);
-    SetResidualTesting(false);
     SetSurfaceModelDistanceTolerance(1.5);
     SetSurfaceModelWindowSize(5);
 
-    SetSurfaceModelEccentricityRatio(2);  // 2:1
-    SetSurfaceModelResidualTolerance(0.1);
     SetReductionFactor(1);
 
     // Clear statistics
@@ -117,8 +111,6 @@ namespace Isis {
     p_surfaceModelNotEnoughValidDataCount = 0;
     p_surfaceModelSolutionInvalidCount = 0;
     p_surfaceModelDistanceInvalidCount = 0;
-    p_surfaceModelEccentricityRatioNotMetCount = 0;
-    p_surfaceModelResidualToleranceNotMetCount = 0;
 
     p_sampMovement = 0.;
     p_lineMovement = 0.;
@@ -138,11 +130,6 @@ namespace Isis {
     p_zScoreMin = Isis::Null;
     p_zScoreMax = Isis::Null;
     p_goodnessOfFit = Isis::Null;
-    p_wholePixelCorr = Isis::Null;
-    p_subPixelCorr = Isis::Null;
-    p_surfaceModelEccentricity = Isis::Null;
-    p_surfaceModelEccentricityRatio = Isis::Null;
-    p_surfaceModelAvgResidual = Isis::Null;
 
     p_bestSamp = 0;
     p_bestLine = 0;
@@ -278,18 +265,6 @@ namespace Isis {
 
         if(smodel.HasKeyword("WindowSize")) {
           SetSurfaceModelWindowSize((int)smodel["WindowSize"]);
-        }
-
-        // What kind of eccentricity ratio will we tolerate?
-        if(smodel.HasKeyword("EccentricityRatio")) {
-          SetEccentricityTesting(true);
-          SetSurfaceModelEccentricityRatio((double)smodel["EccentricityRatio"]);
-        }
-
-        // What kind of average residual will we tolerate?
-        if(smodel.HasKeyword("ResidualTolerance")) {
-          SetResidualTesting(true);
-          SetSurfaceModelResidualTolerance((double)smodel["ResidualTolerance"]);
         }
       }
 
@@ -522,54 +497,6 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
     p_windowSize = size;
-  }
-
-  /**
-   * A 1:1 ratio represents a perfect circle.  Allowing the user
-   * to set this ratio lets them determine which points to throw
-   * out if the surface model gets too elliptical.
-   *
-   * If this method is not called, the eccentricity ratio defaults to 2:1 in the
-   * AutoReg object constructor.
-   *
-   * @param eccentricityRatio Eccentricity ratio.  Must be greater than or equal
-   *                          to 1.
-   * @throw iException::User - "Invalid value for SurfaceModel
-   *        EccentricityRatio."
-                                                                               */
-  void AutoReg::SetSurfaceModelEccentricityRatio(double eccentricityRatio) {
-    if(eccentricityRatio < 1) {
-      string msg = "Invalid value for SurfaceModel EccentricityRatio ["
-        + iString(eccentricityRatio) + "].  Must greater than or equal to 1.0.";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-    p_surfaceModelEccentricityRatioTolerance = eccentricityRatio;
-    p_surfaceModelEccentricityTolerance = sqrt(eccentricityRatio * eccentricityRatio - 1) / eccentricityRatio;
-  }
-
-  /**
-   * Set the maximum average residual allowed from the surface
-   * model. Changing this tolerance allows the user to throw out
-   * points whose surfaces cannot be modeled well. The average
-   * rersidual is derived from the least squares solution fitting
-   * a surface model to a set of known data points, and computed
-   * by summing the absolute values of all the residuals (computed
-   * z minus actual z) and dividing by the number of residuals.
-   *
-   * If this method is not called, the residual tolerance defaults to 0.1 in the
-   * AutoReg object constructor.
-   *
-   * @param residualTolerance Residual tolerance.  Must be greater than 0.
-   * @throw iException::User - "Invalid value for SurfaceModel
-   *        ResidualTolerance."
-   */
-  void AutoReg::SetSurfaceModelResidualTolerance(double residualTolerance) {
-    if(residualTolerance < 0) {
-      string msg = "Invalid value for SurfaceModel ResidualTolerance ["
-        + iString(residualTolerance) + "].  Must greater than or equal to 0.0.";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-    p_surfaceModelResidualTolerance = residualTolerance;
   }
 
   /**
@@ -830,137 +757,128 @@ namespace Isis {
       p_bestFit = Isis::Null;
     }
 
-    // If the algorithm is adaptive then it expects the pattern and search chip
-    // to be closely registered.  Within a few pixels.  So let it take over
-    // doing the sub-pixel accuracy computation
-    if(IsAdaptive()) {
-      p_registrationStatus = AdaptiveRegistration(gradientSearchChip, gradientPatternChip, p_fitChip,
-                                      startSamp, startLine, endSamp, endLine, bestSearchSamp,
-                                      bestSearchLine);
-      if(p_registrationStatus == AutoReg::SuccessSubPixel) {
-        p_searchChip.SetChipPosition(p_chipSample, p_chipLine);
+    p_registrationStatus = Registration(gradientSearchChip, gradientPatternChip,
+        p_fitChip, startSamp, startLine, endSamp, endLine,
+        bestSearchSamp, bestSearchLine);
 
-        // We need to get the cube position from the gradient search chip that
-        // was modified by the adaptive registration.
-        gradientSearchChip.SetChipPosition(p_chipSample, p_chipLine);
-        p_cubeSample = gradientSearchChip.CubeSample();
-        p_cubeLine   = gradientSearchChip.CubeLine();
-
-        // Save off the gradient search and pattern chips if we used a gradient
-        // filter.
-        if (p_gradientFilterType != None) {
-          p_gradientSearchChip = gradientSearchChip;
-          p_gradientPatternChip = gradientPatternChip;
-        }
-
-        p_goodnessOfFit = p_bestFit;
-        p_wholePixelCorr = p_bestFit;
-        p_subpixelSuccesses++;
-      }
-      return p_registrationStatus;
-    }
-
-    // Not adaptive continue with slower search traverse
-    Match(gradientSearchChip, gradientPatternChip, p_fitChip, startSamp, endSamp, startLine, endLine);
-
-    // Check to see if we went through the fit chip and never got a fit at
-    // any location.
-    if(p_bestFit == Isis::Null) {
-      p_fitChipNoDataCount++;
-      p_registrationStatus = FitChipNoData;
-      return FitChipNoData;
-    }
-
-    // -----------------------------------------------------------------
-    // We had a location in the fit chip.  Save the values even if they
-    // may not meet tolerances.  This is also saves the value in the
-    // event the user does not want a surface model fit
-    // ----------------------------------------------------------------
-    p_goodnessOfFit = p_bestFit;
-    p_wholePixelCorr = p_bestFit;
-    p_searchChip.SetChipPosition(p_bestSamp, p_bestLine);
-    gradientSearchChip.SetChipPosition(p_bestSamp, p_bestLine);
-    p_cubeSample = p_searchChip.CubeSample();
-    p_cubeLine   = p_searchChip.CubeLine();
-
-    // Now see if we satisified the goodness of fit tolerance
-    if(!CompareFits(p_bestFit, Tolerance())) {
-      p_fitChipToleranceNotMetCount++;
-      p_registrationStatus = FitChipToleranceNotMet;
-      return FitChipToleranceNotMet;
-    }
-
-    // Try to fit a model for sub-pixel accuracy if necessary
-    bool computedSubPixel = false;
-    if(p_subpixelAccuracy && !IsIdeal(p_bestFit)) {
-      vector<double> samps, lines, fits;
-      for(int line = p_bestLine - p_windowSize / 2; line <= p_bestLine + p_windowSize / 2; line++) {
-        if(line < 1) continue;
-        if(line > p_fitChip.Lines()) continue;
-        for(int samp = p_bestSamp - p_windowSize / 2; samp <= p_bestSamp + p_windowSize / 2; samp++) {
-          if(samp < 1) continue;
-          if(samp > p_fitChip.Samples()) continue;
-          if(p_fitChip.GetValue(samp, line) == Isis::Null) continue;
-          samps.push_back((double) samp);
-          lines.push_back((double) line);
-          fits.push_back(p_fitChip.GetValue(samp, line));
-        }
-      }
-
-      // -----------------------------------------------------------
-      // Make sure we have enough data for a surface fit.  That is,
-      // we are not too close to the edge of the fit chip
-      // -----------------------------------------------------------
-      if((int)samps.size() < p_windowSize * p_windowSize * 2 / 3 + 1) {
-        p_surfaceModelNotEnoughValidDataCount++;
-        p_registrationStatus = SurfaceModelNotEnoughValidData;
-        return SurfaceModelNotEnoughValidData;
-      }
-
-      // -------------------------------------------------------------------
-      // Now that we know we have enough data to model the surface we call
-      // ModelSurface to get the sub-pixel accuracy we are looking for.
-      // -------------------------------------------------------------------
-      computedSubPixel = ModelSurface(samps, lines, fits);
-      if (!computedSubPixel) {
-        return p_registrationStatus;
-      }
-
-      // ---------------------------------------------------------------------
-      // See if the surface model solution moved too far from our whole pixel
-      // solution
-      // ---------------------------------------------------------------------
-      p_sampMovement = std::fabs(p_bestSamp - p_chipSample);
-      p_lineMovement = std::fabs(p_bestLine - p_chipLine);
-      if(p_sampMovement > p_distanceTolerance ||
-          p_lineMovement > p_distanceTolerance) {
-        p_surfaceModelDistanceInvalidCount++;
-        p_registrationStatus = SurfaceModelDistanceInvalid;
-        return SurfaceModelDistanceInvalid;
-      }
-
-      // Ok we have subpixel fits in chip space so convert to cube space
-      p_searchChip.SetChipPosition(p_chipSample, p_chipLine);
-      gradientSearchChip.SetChipPosition(p_chipSample, p_chipLine);
-      p_cubeSample = p_searchChip.CubeSample();
-      p_cubeLine   = p_searchChip.CubeLine();
-    }
-
-    // Registration succeeded, but did it compute to sub-pixel accuracy?
-    if (computedSubPixel) {
-      p_subpixelSuccesses++;
-      p_registrationStatus = SuccessSubPixel;
-    }
-    else {
-      p_pixelSuccesses++;
-      p_registrationStatus = SuccessPixel;
-    }
+    gradientSearchChip.SetChipPosition(p_chipSample, p_chipLine);
+    p_searchChip.SetChipPosition(p_chipSample, p_chipLine);
+    p_cubeSample = gradientSearchChip.CubeSample();
+    p_cubeLine   = gradientSearchChip.CubeLine();
 
     // Save off the gradient search and pattern chips if we used a gradient
     // filter.
     if (p_gradientFilterType != None) {
       p_gradientSearchChip = gradientSearchChip;
       p_gradientPatternChip = gradientPatternChip;
+    }
+
+    p_goodnessOfFit = p_bestFit;
+
+    if (Success()) {
+      if (p_registrationStatus == AutoReg::SuccessSubPixel)
+        p_subpixelSuccesses++;
+      else
+        p_pixelSuccesses++;
+    }
+
+    return p_registrationStatus;
+  }
+
+
+  /**
+   * Performs matching between the pattern and search at both whole-pixel and
+   * subpixel levels.  For adaptive algorithms, only subpixel matching occurs.
+   * Such algorithms override this method to use their alternative matching
+   * procedures.
+   *
+   * For those algorithms that need it, the best sample and line in the
+   * search chip is provided.  This is either the initial tack sample and
+   * line in the search chip or it is the centered sample and line after the
+   * reduction algorithm is applied (KJB, 2009-08-26).
+   *
+   * @author janderson (6/2/2009)
+   *
+   * @param sChip Search chip
+   * @param pChip Pattern chip
+   * @param fChip Fit chip
+   * @param startSamp Defines the starting sample of the window
+   *                  the algorithm should remain inside
+   *                  this boundary.
+   * @param startLine Defines the starting line of the window
+   *                  the algorithm should remain inside
+   *                  this boundary.
+   * @param endSamp Defines the ending sample of the window
+   *                  the algorithm should remain inside
+   *                  this boundary.
+   * @param endLine Defines the ending line of the window
+   *                  the algorithm should remain inside
+   *                  this boundary.
+   * @param bestSamp Best sample
+   * @param bestLine Best line
+   *
+   * @return @b AutoReg::RegisterStatus  Status of match
+   */
+  AutoReg::RegisterStatus AutoReg::Registration(Chip &sChip, Chip &pChip,
+      Chip &fChip, int startSamp, int startLine, int endSamp, int endLine,
+      int bestSamp, int bestLine) {
+
+    // Not adaptive, continue with slower search traverse
+    Match(sChip, pChip, fChip, startSamp, endSamp, startLine, endLine);
+
+    // Check to see if we went through the fit chip and never got a fit at
+    // any location.
+    if (p_bestFit == Isis::Null) {
+      p_fitChipNoDataCount++;
+      p_registrationStatus = FitChipNoData;
+      return FitChipNoData;
+    }
+
+    // Now see if we satisified the goodness of fit tolerance
+    if (!CompareFits(p_bestFit, Tolerance())) {
+      p_fitChipToleranceNotMetCount++;
+      p_registrationStatus = FitChipToleranceNotMet;
+      return FitChipToleranceNotMet;
+    }
+
+    // Try to fit a model for sub-pixel accuracy if necessary
+    if (p_subpixelAccuracy && !IsIdeal(p_bestFit)) {
+      Chip window(p_windowSize, p_windowSize);
+      fChip.Extract(p_bestSamp, p_bestLine, window);
+      window.SetChipPosition(p_windowSize / 2 + 1, p_windowSize / 2 + 1);
+
+      // Make sure more than 2/3 of the data in the window is valid.  Otherwise,
+      // we are likely too close to the edge.
+      if (!window.IsValid(100.0 * 2.1 / 3.0)) {
+        p_surfaceModelNotEnoughValidDataCount++;
+        p_registrationStatus = SurfaceModelNotEnoughValidData;
+        return SurfaceModelNotEnoughValidData;
+      }
+
+      // Now that we know we have enough data to model the surface we call
+      // SetSubpixelPosition() to get the sub-pixel accuracy we are looking for.
+      bool computedSubPixel = SetSubpixelPosition(window);
+      if (!computedSubPixel)
+        return p_registrationStatus;
+
+      // See if the surface model solution moved too far from our whole pixel
+      // solution
+      p_sampMovement = fabs(p_bestSamp - p_chipSample);
+      p_lineMovement = fabs(p_bestLine - p_chipLine);
+      if (p_sampMovement > p_distanceTolerance ||
+          p_lineMovement > p_distanceTolerance) {
+
+        p_surfaceModelDistanceInvalidCount++;
+        p_registrationStatus = SurfaceModelDistanceInvalid;
+        return SurfaceModelDistanceInvalid;
+      }
+
+      p_registrationStatus = SuccessSubPixel;
+    }
+    else {
+      p_chipSample = p_bestSamp;
+      p_chipLine = p_bestLine;
+      p_registrationStatus = SuccessPixel;
     }
 
     return p_registrationStatus;
@@ -1160,178 +1078,54 @@ namespace Isis {
 
 
   /**
-   * We will model a 2-d surface as:
+   * Set the search chip sample and line to subpixel values if possible.  This
+   * method uses a centroiding method to gravitate the whole pixel best fit to a
+   * subpixel extremum in the continuous image space.  The weights of the
+   * centers of gravity in the centroiding algorithm are modeled by goodness of
+   * fit values within a discrete search window.
    *
-   * z = a + b*x + c*y + d*x**2 + e*x*y + f*y**2
-   *
-   * Then the partial derivatives are two lines:
-   *
-   * dz/dx = b + 2dx + ey
-   * dz/dy = c + ex + 2fy
-   *
-   * We will have a local min/max where dz/dx and dz/dy = 0.
-   * Solve using that condition using linear algebra yields:
-   *
-   * xlocal = (ce - 2bf) / (4df - ee)
-   * ylocal = (be - 2cd) / (4df - ee)
-   *
-   * These will be stored in p_chipSample and p_chipLine respectively.
-   *
-   * @param x   vector of x (sample) values
-   * @param y   vector of y (line) values
-   * @param z   vector of z (goodness-of-fit) values
-   * @return @b bool  Indicates whether the surface model solution is valid
-   *           with residual tolerance and eccentricity ratio is met.
+   * @param window The search window extracted from the fit chip
+   * @return @b bool Returns true if the subpixel solution is valid
    */
-  bool AutoReg::ModelSurface(vector<double> &x,
-                             vector<double> &y,
-                             vector<double> &z) {
-    PolynomialBivariate p(2);
-    LeastSquares lsq(p);
-    for(int i = 0; i < (int)x.size(); i++) {
-      vector<double> xy;
-      xy.push_back(x[i]);
-      xy.push_back(y[i]);
-      lsq.AddKnown(xy, z[i]);
+  bool AutoReg::SetSubpixelPosition(Chip &window) {
+    // Find the greatest edge DN
+    double samples = window.Samples();
+    double lines= window.Lines();
+    double greatestEdgeDn = 0.0;
+    for (int s = 1; s <= samples; s++) {
+      greatestEdgeDn = max(window.GetValue(s, 1), greatestEdgeDn);
+      greatestEdgeDn = max(window.GetValue(s, lines), greatestEdgeDn);
     }
-    try {
-      lsq.Solve();
+    for (int l = 2; l <= lines - 1; l++) {
+      greatestEdgeDn = max(window.GetValue(1, l), greatestEdgeDn);
+      greatestEdgeDn = max(window.GetValue(samples, l), greatestEdgeDn);
     }
-    catch(IException &) {
-      p_registrationStatus = SurfaceModelSolutionInvalid;
+
+    // This is a samll shift so the the centroid doesn't reach the edge, add 20%
+    // of the difference between the hightest edge DN and the max DN
+    double temp = window.GetValue(window.ChipSample(), window.ChipLine());
+    temp = greatestEdgeDn + 0.2 * (temp - greatestEdgeDn);
+
+    Centroid floodFill;
+    floodFill.setDNRange(temp, 1e100);
+
+    Chip selectionChip(window);
+    floodFill.select(&window, &selectionChip);
+
+    double windowSample;
+    double windowLine;
+    floodFill.centerOfMassWeighted(
+        &window, &selectionChip, &windowSample, &windowLine);
+
+    int offsetS = p_bestSamp - window.ChipSample();
+    int offsetL = p_bestLine - window.ChipLine();
+    p_chipSample = windowSample + offsetS;
+    p_chipLine = windowLine + offsetL;
+    if (p_chipSample != p_chipSample) {
       p_surfaceModelSolutionInvalidCount++;
-      return false;
+      return false;  //this should never happen, but just in case...       
     }
-
-    double a = p.Coefficient(0);
-    double b = p.Coefficient(1);
-    double c = p.Coefficient(2);
-    double d = p.Coefficient(3);
-    double e = p.Coefficient(4);
-    double f = p.Coefficient(5);
-
-    //----------------------------------------------------------
-    // Compute eccentricity
-    // For more information see:
-    // http://mathworld.wolfram.com/Ellipse.html
-    // Make sure delta matrix determinant is not equal to zero.
-    // The general quadratic curve
-    // dx^2+2exy+fy^2+2bx+2cy+a=0
-    // is an ellipse when, after defining
-    // Delta    =       |d    e/2   b|
-    //          |e/2  f/2 c/2|
-    //          |b    c/2   a|
-    // J        =       |d   e/2|
-    //      |e/2 f/e|
-    // I        =       d + (f/2)
-    // Delta!=0, J>0, and Delta/I<0. Also assume the ellipse is
-    // nondegenerate (i.e., it is not a circle, so a!=c, and we have already
-    // established is not a point, since J=ac-b^2!=0)
-    // ---------------------------------------------------------
-    if(p_testEccentricity) {
-      bool canComputeEccentricity = true;
-
-      Matrix delta(3, 3);
-      delta[0][0] = d;
-      delta[0][1] = e / 2;
-      delta[0][2] = b / 2;
-      delta[1][0] = e / 2;
-      delta[1][1] = f;
-      delta[1][2] = c / 2;
-      delta[2][0] = b / 2;
-      delta[2][1] = c / 2;
-      delta[2][2] = a;
-      if(delta.Determinant() == 0) {
-        canComputeEccentricity = false;
-      }
-
-      //Make sure J matrix is greater than zero.
-      Matrix J(2, 2);
-      J[0][0] = d;
-      J[0][1] = e / 2;
-      J[1][0] = e / 2;
-      J[1][1] = f;
-      if(J.Determinant() <= 0) {
-        canComputeEccentricity = false;
-      }
-
-      double I = d + (f);
-      if(delta.Determinant() / I >= 0) {
-        canComputeEccentricity = false;
-      }
-
-      if(canComputeEccentricity) {
-        // If the eccentricity can be computed, go ahead and do so
-        // Begin by calculating the semi-axis lengths
-        double eA = sqrt((2 * (d * (c / 2) * (c / 2) + f * (b / 2) * (b / 2) + a * (e / 2) * (e / 2) - 2 * (e / 2) * (b / 2) * (c / 2) - d * f * a)) /
-                         (((e / 2) * (e / 2) - d * f) * (sqrt((d - f) * (d - f) + 4 * (e / 2) * (e / 2)) - (d + f))));
-
-        double eB = sqrt((2 * (d * (c / 2) * (c / 2) + f * (b / 2) * (b / 2) + a * (e / 2) * (e / 2) - 2 * (e / 2) * (b / 2) * (c / 2) - d * f * a)) /
-                         (((e / 2) * (e / 2) - d * f) * (-sqrt((d - f) * (d - f) + 4 * (e / 2) * (e / 2)) - (d + f))));
-
-        // Ensure that eA is always the semi-major axis, and eB the semi-minor
-        if(eB > eA) {
-          double tempVar = eB;
-          eB = eA;
-          eA = tempVar;
-        }
-
-        // Calculate eccentricity
-        p_surfaceModelEccentricity = sqrt(eA * eA - eB * eB) / eA;
-      }
-      else {
-        // If the eccentricity cannot be computed, assume it to be 0
-        p_surfaceModelEccentricity = 0;
-      }
-
-      p_surfaceModelEccentricityRatio = sqrt(1.0 / (1.0 - p_surfaceModelEccentricity * p_surfaceModelEccentricity));
-
-      // Ensure that the eccentricity is less than or equal to the tolerance
-      if(p_surfaceModelEccentricity > p_surfaceModelEccentricityTolerance) {
-        p_registrationStatus = SurfaceModelEccentricityRatioNotMet;
-        p_surfaceModelEccentricityRatioNotMetCount++;
-        return false;
-      }
-    }
-
-    // Check if the user wants to test against the average residual
-    if(p_testResidual) {
-      // Compare the z computed with z actuals
-      double meanAbsError = 0;
-      for(int i = 0; i < (int) lsq.Residuals().size(); i++) {
-        // Aggregate the absolute values of the residuals
-        meanAbsError += fabs(lsq.Residual(i));
-      }
-
-      // The average residual, or mean absolute error
-      meanAbsError = meanAbsError / lsq.Residuals().size();
-
-      p_surfaceModelAvgResidual = meanAbsError;
-
-      // Ensure the average residual is within the tolerance
-      if(meanAbsError > p_surfaceModelResidualTolerance) {
-        p_registrationStatus = SurfaceModelResidualToleranceNotMet;
-        p_surfaceModelResidualToleranceNotMetCount++;
-        return false;
-      }
-    }
-
-    // Compute the determinant
-    double det = 4.0 * d * f - e * e;
-    if(det == 0.0) {
-      p_registrationStatus = SurfaceModelSolutionInvalid;
-      p_surfaceModelSolutionInvalidCount++;
-      return false;
-    }
-
-    // Compute our chip position to sub-pixel accuracy
-    p_chipSample = (c * e - 2.0 * b * f) / det;
-    p_chipLine   = (b * e - 2.0 * c * d) / det;
-    vector<double> temp;
-    temp.push_back(p_chipSample);
-    temp.push_back(p_chipLine);
-    p_goodnessOfFit = lsq.Evaluate(temp);
-    p_subPixelCorr = lsq.Evaluate(temp);
+    
     return true;
   }
 
@@ -1358,40 +1152,6 @@ namespace Isis {
   bool AutoReg::IsIdeal(double fit) {
     return(std::fabs(IdealFit() - fit) < 0.00001);
   }
-
-#if 0
-  /**
-   * This returns an AutoRegItem for each measure.
-   *
-   */
-  AutoRegItem AutoReg::RegisterInformation() {
-    AutoRegItem item;
-    item.setSearchFile(p_searchChip.FileName());
-    item.setPatternFile(p_patternChip.FileName());
-    //item.setStatus(p_registrationStatus);
-    item.setGoodnessOfFit(p_goodnessOfFit);
-    item.setEccentricity(p_surfaceModelEccentricity);
-    item.setZScoreOne(p_zScoreMin);
-    item.setZScoreTwo(p_zScoreMax);
-
-    /*if(p_goodnessOfFit != Isis::Null)item.setGoodnessOfFit(p_goodnessOfFit);
-    if(p_surfaceModelEccentricity != Isis::Null) item.setEccentricity(p_surfaceModelEccentricity);
-    if(p_zScoreMin != Isis::Null)item.setZScoreOne(p_zScoreMin);
-    if(p_zScoreMax != Isis::Null)item.setZScoreTwo(p_zScoreMax);*/
-
-    // Set the autoRegItem's change in line/sample numbers.
-    if(p_registrationStatus == Success) {
-      item.setDeltaSample(p_searchChip.TackSample() - p_searchChip.CubeSample());
-      item.setDeltaLine(p_searchChip.TackLine() - p_searchChip.CubeLine());
-    }
-    else {
-      item.setDeltaSample(Isis::Null);
-      item.setDeltaLine(Isis::Null);
-    }
-
-    return item;
-  }
-#endif
 
 
   /**
@@ -1430,64 +1190,10 @@ namespace Isis {
     PvlGroup model("SurfaceModelFailures");
     model += PvlKeyword("SurfaceModelNotEnoughValidData", p_surfaceModelNotEnoughValidDataCount);
     model += PvlKeyword("SurfaceModelSolutionInvalid", p_surfaceModelSolutionInvalidCount);
-    model += PvlKeyword("SurfaceModelEccentricityRatioNotMet", p_surfaceModelEccentricityRatioNotMetCount);
     model += PvlKeyword("SurfaceModelDistanceInvalid", p_surfaceModelDistanceInvalidCount);
-    model += PvlKeyword("SurfaceModelResidualToleranceNotMet", p_surfaceModelResidualToleranceNotMetCount);
     pvl.AddGroup(model);
 
     return (AlgorithmStatistics(pvl));
-  }
-
-  /**
-   * This virtual method must be written for adaptive pattern
-   * matching algorithms.  Adaptive algorithms are assumed to
-   * compute the registration to sub-pixel accuracy and stay
-   * within the defined window.  A status should be returned
-   * indicating success for subpixel computation or failure and
-   * the reason why via the enumeration, RegisterStatus.  If the
-   * status is returned is success, the programmer needs to set
-   * the sub-pixel chip coordinates using the protected methods
-   * SetChipSample(), SetChipLine().
-   *
-   * For those algorithms that need it, the best sample and line in the search
-   * chip is provided.  This is either the initial tack sample and line in the
-   * search chip or it is the centered sample and line after the reduction
-   * algorithm is applied (KJB, 2009-08-26).
-   *
-   * @author janderson (6/2/2009)
-   *
-   * @param sChip Search chip
-   * @param pChip Pattern chip
-   * @param fChip Fit chip
-   * @param startSamp Defines the starting sample of the window
-   *                  the adaptive algorithm should remain inside
-   *                  this boundary.
-   * @param startLine Defines the starting line of the window
-   *                  the adaptive algorithm should remain inside
-   *                  this boundary.
-   * @param endSamp Defines the ending sample of the window
-   *                  the adaptive algorithm should remain inside
-   *                  this boundary.
-   * @param endLine Defines the ending line of the window
-   *                  the adaptive algorithm should remain inside
-   *                  this boundary.
-   * @param bestSamp Best sample
-   * @param bestLine Best line
-   *
-   * @return @b AutoReg::RegisterStatus  Status of match
-   */
-  AutoReg::RegisterStatus AutoReg::AdaptiveRegistration(Chip &sChip,
-      Chip &pChip,
-      Chip &fChip,
-      int startSamp,
-      int startLine,
-      int endSamp,
-      int endLine,
-      int bestSamp,
-      int bestLine) {
-    string msg = "Programmer needs to write their own virtual AdaptiveRegistration method";
-    throw IException(IException::Programmer, msg, _FILEINFO_);
-    return SuccessSubPixel;
   }
 
   /**
@@ -1553,14 +1259,6 @@ namespace Isis {
       if(smodel.HasKeyword("WindowSize")) {
         reg += PvlKeyword("WindowSize", smodel["WindowSize"][0]);
       }
-
-      if(smodel.HasKeyword("EccentricityRatio")) {
-        reg += PvlKeyword("EccentricityRatio", smodel["EccentricityRatio"][0]);
-      }
-
-      if(smodel.HasKeyword("ResidualTolerance")) {
-        reg += PvlKeyword("ResidualTolerance", smodel["ResidualTolerance"][0]);
-      }
     }
 
     return reg;
@@ -1604,12 +1302,6 @@ namespace Isis {
     if (SubPixelAccuracy()) {
       reg += PvlKeyword("DistanceTolerance", DistanceTolerance());
       reg += PvlKeyword("WindowSize", WindowSize());
-
-      if (p_testEccentricity)
-        reg += PvlKeyword("EccentricityRatio", EccentricityRatioTolerance());
-
-      if (p_testResidual)
-        reg += PvlKeyword("ResidualTolerance", ResidualTolerance());
     }
 
     return reg;

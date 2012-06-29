@@ -156,9 +156,6 @@ void IsisMain() {
       measureLabels += "AveragePixelShift,";
       measureLabels += "MinimumPixelZScore,";
       measureLabels += "AveragePixelZScore,";
-      measureLabels += "MaximumEccentricity,";
-      measureLabels += "MinimumEccentricity,";
-      measureLabels += "AverageEccentricity,";
       measureLabels += "MaximumGoodnessOfFit,";
       measureLabels += "MinimumGoodnessOfFit,";
       measureLabels += "AverageGoodnessOfFit,";
@@ -262,12 +259,6 @@ void IsisMain() {
         ControlMeasureLogData::MaximumPixelZScore).Maximum())) + ",";
     measureInfo += iString(CheckValue(cpoint->GetStatistic(
         ControlMeasureLogData::MinimumPixelZScore).Minimum())) + ",";
-    measureInfo += iString(CheckValue(cpoint->GetStatistic(
-        ControlMeasureLogData::Eccentricity).Maximum())) + ",";
-    measureInfo += iString(CheckValue(cpoint->GetStatistic(
-        ControlMeasureLogData::Eccentricity).Minimum())) + ",";
-    measureInfo += iString(CheckValue(cpoint->GetStatistic(
-        ControlMeasureLogData::Eccentricity).Average())) + ",";
     measureInfo += iString(CheckValue(cpoint->GetStatistic(
         ControlMeasureLogData::GoodnessOfFit).Maximum())) + ",";
     measureInfo += iString(CheckValue(cpoint->GetStatistic(

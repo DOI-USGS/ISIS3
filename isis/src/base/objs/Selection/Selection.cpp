@@ -26,14 +26,14 @@
 //QT libraries if needed if needed
 
 //third party libraries if needed
-#include <Ransac.h>
+#include </work/users/othomas/imageReg/SubPixelDevelopemnt/trunk/isis/src/base/objs/Ransac/Ransac.h>
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_rng.h>
 #include <GSLUtility.h>
 
 
 //Isis Headers if needed
-#include "Selection.h"
+#include "/work/users/othomas/imageReg/SubPixelDevelopemnt/trunk/isis/src/base/objs/Selection/Selection.h"
 
 
 using namespace std;
@@ -198,6 +198,43 @@ namespace Isis {
     return 1;
   }
 
+  int Selection::centerOfMassWeighted(Chip *inputChip, Chip *selectionChip, double *sample, double *line) {
+    //this function computes a center of mass, as the average of the coordiantes of the selected pixels in the selectionChip weighted by the DN in the inputChip
+
+    int samples, lines,i, j;
+    //make sure the two chips are the same size
+    samples = selectionChip->Samples();
+    if (inputChip->Samples() != samples) {
+      //todo messege
+      return 0;
+    }
+
+    lines =   selectionChip->Lines();
+    if (inputChip->Lines() != lines) {
+      //todo messege
+      return 0;
+    }
+       
+    
+    *sample=0.0;
+    *line=0.0;
+    double temp,sumDN=0;
+
+    for (i=1;i<=samples;i++) {
+      for (j=1;j<=lines;j++) {
+        if (selectionChip->GetValue(i,j) == 1) {
+          temp = inputChip->GetValue(i,j);
+          *sample += double(i)*temp;
+          *line   += double(j)*temp;
+          sumDN += temp;
+        }
+      }
+    }
+
+    *sample /= sumDN;
+    *line   /= sumDN;
+    return 1;
+  }
 
 
 

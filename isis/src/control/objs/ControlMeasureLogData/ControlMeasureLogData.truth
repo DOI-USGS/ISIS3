@@ -38,5 +38,5 @@ Testing SetDataType/SetNumericalValue...
 Valid? 1
 Type?  1
 Value? 3.14159
-Keyword: 'Eccentricity = 3.14159'
+Keyword: 'Obsolete_Eccentricity = 3.14159'
 

@@ -24,7 +24,7 @@
  */
 
 #include "Chip.h"
-#include "Selection.h"
+#include "/work/users/othomas/imageReg/SubPixelDevelopemnt/trunk/isis/src/base/objs/Selection/Selection.h"
 #include "Statistics.h"
 
 namespace Isis {
@@ -37,6 +37,8 @@ namespace Isis {
    *                                                                        
    * @internal                                                              
    *   @history 2011-10-12 Orrin Thomas - Original version
+   *   @history 2012-02-14 Orrin Thomas - updated to Centroid::select(..) to start the floodfill algorithim at [Chip::p_chipSample, Chip::p_chipLine].
+   *                                      Thus, the starting pixel of the floodfill/centroid is set by calling the Chip::SetChipPosition() before Centroid::select.
    */        
   class Centroid : public Selection
   {

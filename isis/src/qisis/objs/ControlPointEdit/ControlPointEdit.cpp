@@ -920,7 +920,7 @@ namespace Isis {
           msg += QString::number(p_autoRegFact->Tolerance());
         }
         else if ( status == AutoReg::SurfaceModelNotEnoughValidData ) {
-          msg += "\n\nNot enough points to fit a surface model for sub-pixel ";
+          msg += "\n\nNot enough valid points in the fit chip window for sub-pixel ";
           msg += "accuracy.  Probably too close to edge.\n";
         }
         else if ( status == AutoReg::SurfaceModelSolutionInvalid ) {
@@ -929,7 +929,7 @@ namespace Isis {
         else if ( status == AutoReg::SurfaceModelDistanceInvalid ) {
           double sampDist, lineDist;
           p_autoRegFact->Distance(sampDist, lineDist);
-          msg += "\n\nSurface model moves registartion more than tolerance.\n";
+          msg += "\n\nSub pixel algorithm moves registartion more than tolerance.\n";
           msg += "\nSampleMovement = " + QString::number(sampDist) +
                  "    LineMovement = " + QString::number(lineDist);
           msg += "\nDistanceTolerance = " +
@@ -941,15 +941,6 @@ namespace Isis {
           msg += "\n\nPattern data max or min does not pass z-score test.\n";
           msg += "\nMinimumZScore = " + QString::number(p_autoRegFact->MinimumZScore());
           msg += "\nCalculatedZscores = " + QString::number(score1) + ", " + QString::number(score2);
-        }
-        else if ( status == AutoReg::SurfaceModelEccentricityRatioNotMet ) {
-          msg += "\n\nEccentricity of surface model exceeds tolerance.";
-          QString calcEccentricity = QString::number(p_autoRegFact->EccentricityRatio(), 'f', 5);
-          msg += "\nCalculated Eccentricity Ratio = " +
-                 calcEccentricity + " (" + calcEccentricity + ":1)";
-          QString tolEccentricity = QString::number(p_autoRegFact->EccentricityRatioTolerance(), 'f', 5);
-          msg += "\nEccentricity Ratio Tolerance (i.e., EccentricityRatio) = " +
-                 tolEccentricity + " (" + tolEccentricity + ":1)";
         }
         else if ( status == AutoReg::AdaptiveAlgorithmFailed ) {
           msg += "\n\nError occured in Adaptive algorithm.";
@@ -1037,10 +1028,6 @@ namespace Isis {
         p_rightMeasure->SetLogData(ControlMeasureLogData(
                                ControlMeasureLogData::GoodnessOfFit,
                                p_autoRegFact->GoodnessOfFit()));
-        if (p_autoRegFact->Eccentricity() != Null)
-             p_rightMeasure->SetLogData(ControlMeasureLogData(
-                                 ControlMeasureLogData::Eccentricity,
-                                 p_autoRegFact->Eccentricity()));
         double minZScore, maxZScore;
         p_autoRegFact->ZScores(minZScore,maxZScore);
         p_rightMeasure->SetLogData(ControlMeasureLogData(
@@ -1059,8 +1046,6 @@ namespace Isis {
         p_rightMeasure->SetType(ControlMeasure::Manual);
         p_rightMeasure->DeleteLogData(
                                ControlMeasureLogData::GoodnessOfFit);
-        p_rightMeasure->DeleteLogData(
-                               ControlMeasureLogData::Eccentricity);
         p_rightMeasure->DeleteLogData(
                                ControlMeasureLogData::MinimumPixelZScore);
         p_rightMeasure->DeleteLogData(

@@ -50,6 +50,7 @@ namespace Isis {
    *                                                                        
    * @internal                                                              
    *   @history 2011-10-12 Orrin Thomas - Original version
+   *   @history 2012-02-14 Orrin Thomas - add centerOfMassWeighted routine to support using Selection/Centroid for subpixel registration
    */        
   class Selection {
   public:
@@ -63,6 +64,7 @@ namespace Isis {
 
     //Observation Methods--methods used to reduce a selection to a single sub-pixel observation
     int centerOfMass(Chip *selectionChip, double *sample, double *line);
+    int centerOfMassWeighted(Chip *inputChip, Chip *selectionChip, double *sample, double *line);
 
     //Sub-tasks for elliptical trimming and ellipse fitting
     bool ellipseFrom5Pts(Ellipse *ell,double pts[5][2]);

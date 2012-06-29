@@ -543,10 +543,6 @@ namespace Isis {
           ControlMeasureLogData::GoodnessOfFit);
       UpdateMinMaxStats(gFitStats, minGFit, maxGFit);
 
-      Statistics eccentStats = cp->GetStatistic(
-          ControlMeasureLogData::Eccentricity);
-      UpdateMinMaxStats(eccentStats, minEccentricity, maxEccentricity);
-
       Statistics minPixelZScoreStats = cp->GetStatistic(
           ControlMeasureLogData::MinimumPixelZScore);
 

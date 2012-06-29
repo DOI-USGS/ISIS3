@@ -694,7 +694,7 @@ namespace Isis {
    *         successfully registered, otherwise returns
    *         AutoReg::AdaptiveAlgorithmFailed.
    */
-  AutoReg::RegisterStatus Gruen::AdaptiveRegistration(Chip &sChip, Chip &pChip,
+  AutoReg::RegisterStatus Gruen::Registration(Chip &sChip, Chip &pChip,
       Chip &fChip, int startSamp,
       int startLine, int endSamp,
       int endLine, int bestSamp,
@@ -841,7 +841,7 @@ namespace Isis {
   Pvl Gruen::AlgorithmStatistics(Pvl &pvl) {
     PvlGroup algo("GruenFailures");
     algo += PvlKeyword("Name", AlgorithmName());
-    algo += PvlKeyword("Mode", (IsAdaptive() ? "Adaptive" : "NonAdaptive"));
+    algo += PvlKeyword("Mode", "Adaptive");
 
     //  Log errors
     for (int e = 0 ; e <  m_errors.size() ; e++) {

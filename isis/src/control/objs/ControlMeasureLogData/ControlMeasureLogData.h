@@ -67,31 +67,10 @@ namespace Isis {
         InvalidNumericLogDataType = 0,
 
         /**
-         * Eccentricity is pointreg information for sub-pixel registered
-         * measures based on the algorithm chosen. This does not apply to
-         * adaptive algorithms.
-         *
-         * When computing a registration to sub-pixel accuracy, the eccentricity
-         * of the surface model can be compared to a tolerance to determine if
-         * the registration succeeded or not.
-         *
-         * Eccentricity generally ranges between 0 and 1. A value of 0
-         * represents a perfect circle, while a value of 1 represents a
-         * parabola. Anything in between is an ellipse, while anything greater
-         * than 1 can be considered a hyperbola.
-         *
-         * Eccentricity cannot always be computed, due to the nature of its
-         * calculation, which takes square roots.
-         * If the pointreg algorithm would take the square root of a negative
-         * number, then it assumes the eccentricity to be 0 (a perfect circle)
-         * under the belief that false positives are more acceptable than false
-         * negatives.
-         *
-         * Eccentricity can be reported in any instance where sub-pixel accuracy
-         * is computed (when the keyword "SubpixelAccuracy" in group "Algorithm"
-         * is set to true in pointreg).
+         * Deprecated keyword kept for backwards compatability with older
+         * Control Networks.  DO NOT USE!!
          */
-        Eccentricity              = 1,
+        Obsolete_Eccentricity              = 1,
 
         /**
          * GoodnessOfFit is pointreg information for reference measures.
@@ -122,22 +101,22 @@ namespace Isis {
         PixelShift                = 5,
 
         /**
-         * Goodness of Fit of the whole pixel least-squares solution (surface
-         * model) from automatic registration.
+         * Deprecated keyword kept for backwards compatability with older
+         * Control Networks.  DO NOT USE!!
          */
         WholePixelCorrelation       = 6,
 
         /**
-         * Goodness of Fit of the sub-pixel least-squares solution (surface
-         * model) from automatic registration.
+         * Deprecated keyword kept for backwards compatability with older
+         * Control Networks.  DO NOT USE!!
          */
         SubPixelCorrelation       = 7,
 
         /**
-         * Average Residual of the sub-pixel least squares solution (surface
-         * model) from automatic registration. 
+         * Deprecated keyword kept for backwards compatability with older
+         * Control Networks.  DO NOT USE!!
          */
-        AverageResidual           = 8
+        Obsolete_AverageResidual           = 8
       };
       /**
        * This value must be > the largest enumerated value in this type or

@@ -97,9 +97,6 @@ namespace Isis {
       //! Destructor
       virtual ~Gruen() { }
 
-      /**  Gruen default mode is adaptive  */
-      virtual bool IsAdaptive() { return (true); }
-
       /** Returns the current call count */
       BigInt CallCount() const { return (m_callCount); }
 
@@ -159,7 +156,7 @@ namespace Isis {
       virtual double IdealFit() const {  return (0.0); }
 
       // AutoReg adaptive method
-      virtual AutoReg::RegisterStatus AdaptiveRegistration(Chip &sChip,
+      virtual AutoReg::RegisterStatus Registration(Chip &sChip,
           Chip &pChip,
           Chip &fChip,
           int startSamp,

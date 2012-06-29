@@ -105,16 +105,6 @@ Testing for invalid value for PatternChip WindowSize
 **USER ERROR** Invalid value for SurfaceModel WindowSize [4].  Must be an odd number greater than or equal to 3.
 
 -------------------------------------------
-Testing for invalid value for SurfaceModel EccentricityRatio
--------------------------------------------
-**USER ERROR** Invalid value for SurfaceModel EccentricityRatio [0.5].  Must greater than or equal to 1.0.
-
--------------------------------------------
-Testing for invalid value for SurfaceModel ResidualTolerance
--------------------------------------------
-**USER ERROR** Invalid value for SurfaceModel ResidualTolerance [-1.0].  Must greater than or equal to 0.0.
-
--------------------------------------------
 Testing for invalid value for SurfaceModel DistanceTolerance
 -------------------------------------------
 **USER ERROR** Invalid value for SurfaceModel DistanceTolerance [0.0].  Must greater than 0.0.
@@ -149,11 +139,9 @@ Group = FitChipFailures
 End_Group
 
 Group = SurfaceModelFailures
-  SurfaceModelNotEnoughValidData      = 0
-  SurfaceModelSolutionInvalid         = 0
-  SurfaceModelEccentricityRatioNotMet = 0
-  SurfaceModelDistanceInvalid         = 0
-  SurfaceModelResidualToleranceNotMet = 0
+  SurfaceModelNotEnoughValidData = 0
+  SurfaceModelSolutionInvalid    = 0
+  SurfaceModelDistanceInvalid    = 0
 End_Group
 End
 
@@ -182,11 +170,9 @@ Group = FitChipFailures
 End_Group
 
 Group = SurfaceModelFailures
-  SurfaceModelNotEnoughValidData      = 0
-  SurfaceModelSolutionInvalid         = 0
-  SurfaceModelEccentricityRatioNotMet = 0
-  SurfaceModelDistanceInvalid         = 0
-  SurfaceModelResidualToleranceNotMet = 0
+  SurfaceModelNotEnoughValidData = 0
+  SurfaceModelSolutionInvalid    = 0
+  SurfaceModelDistanceInvalid    = 0
 End_Group
 End
 
@@ -215,11 +201,9 @@ Group = FitChipFailures
 End_Group
 
 Group = SurfaceModelFailures
-  SurfaceModelNotEnoughValidData      = 0
-  SurfaceModelSolutionInvalid         = 0
-  SurfaceModelEccentricityRatioNotMet = 0
-  SurfaceModelDistanceInvalid         = 0
-  SurfaceModelResidualToleranceNotMet = 0
+  SurfaceModelNotEnoughValidData = 0
+  SurfaceModelSolutionInvalid    = 0
+  SurfaceModelDistanceInvalid    = 0
 End_Group
 End
 
@@ -248,11 +232,9 @@ Group = FitChipFailures
 End_Group
 
 Group = SurfaceModelFailures
-  SurfaceModelNotEnoughValidData      = 0
-  SurfaceModelSolutionInvalid         = 0
-  SurfaceModelEccentricityRatioNotMet = 0
-  SurfaceModelDistanceInvalid         = 0
-  SurfaceModelResidualToleranceNotMet = 0
+  SurfaceModelNotEnoughValidData = 0
+  SurfaceModelSolutionInvalid    = 0
+  SurfaceModelDistanceInvalid    = 0
 End_Group
 End
 
@@ -281,77 +263,9 @@ Group = FitChipFailures
 End_Group
 
 Group = SurfaceModelFailures
-  SurfaceModelNotEnoughValidData      = 1
-  SurfaceModelSolutionInvalid         = 0
-  SurfaceModelEccentricityRatioNotMet = 0
-  SurfaceModelDistanceInvalid         = 0
-  SurfaceModelResidualToleranceNotMet = 0
-End_Group
-End
-
-----------------------------------------------------
-Testing Error = SurfaceModelEccentricityRatioNotMet
-----------------------------------------------------
-Group = AutoRegStatistics
-  Total      = 1
-  Successful = 0
-  Failure    = 1
-End_Group
-
-Group = Successes
-  SuccessPixel    = 0
-  SuccessSubPixel = 0
-End_Group
-
-Group = PatternChipFailures
-  PatternNotEnoughValidData = 0
-  PatternZScoreNotMet       = 0
-End_Group
-
-Group = FitChipFailures
-  FitChipNoData          = 0
-  FitChipToleranceNotMet = 0
-End_Group
-
-Group = SurfaceModelFailures
-  SurfaceModelNotEnoughValidData      = 0
-  SurfaceModelSolutionInvalid         = 0
-  SurfaceModelEccentricityRatioNotMet = 1
-  SurfaceModelDistanceInvalid         = 0
-  SurfaceModelResidualToleranceNotMet = 0
-End_Group
-End
-
-----------------------------------------------------
-Testing Error = SurfaceModelResidualToleranceNotMet
-----------------------------------------------------
-Group = AutoRegStatistics
-  Total      = 1
-  Successful = 0
-  Failure    = 1
-End_Group
-
-Group = Successes
-  SuccessPixel    = 0
-  SuccessSubPixel = 0
-End_Group
-
-Group = PatternChipFailures
-  PatternNotEnoughValidData = 0
-  PatternZScoreNotMet       = 0
-End_Group
-
-Group = FitChipFailures
-  FitChipNoData          = 0
-  FitChipToleranceNotMet = 0
-End_Group
-
-Group = SurfaceModelFailures
-  SurfaceModelNotEnoughValidData      = 0
-  SurfaceModelSolutionInvalid         = 0
-  SurfaceModelEccentricityRatioNotMet = 0
-  SurfaceModelDistanceInvalid         = 0
-  SurfaceModelResidualToleranceNotMet = 1
+  SurfaceModelNotEnoughValidData = 1
+  SurfaceModelSolutionInvalid    = 0
+  SurfaceModelDistanceInvalid    = 0
 End_Group
 End
 
@@ -380,11 +294,9 @@ Group = FitChipFailures
 End_Group
 
 Group = SurfaceModelFailures
-  SurfaceModelNotEnoughValidData      = 0
-  SurfaceModelSolutionInvalid         = 0
-  SurfaceModelEccentricityRatioNotMet = 0
-  SurfaceModelDistanceInvalid         = 1
-  SurfaceModelResidualToleranceNotMet = 0
+  SurfaceModelNotEnoughValidData = 0
+  SurfaceModelSolutionInvalid    = 0
+  SurfaceModelDistanceInvalid    = 1
 End_Group
 End
 
@@ -414,18 +326,16 @@ Group = FitChipFailures
 End_Group
 
 Group = SurfaceModelFailures
-  SurfaceModelNotEnoughValidData      = 0
-  SurfaceModelSolutionInvalid         = 0
-  SurfaceModelEccentricityRatioNotMet = 0
-  SurfaceModelDistanceInvalid         = 0
-  SurfaceModelResidualToleranceNotMet = 0
+  SurfaceModelNotEnoughValidData = 0
+  SurfaceModelSolutionInvalid    = 0
+  SurfaceModelDistanceInvalid    = 0
 End_Group
 End
 
 ------------------------
 Testing SuccessSubPixel
 ------------------------
-Position = 70.9806 51.0435
+Position = 70.8828 51.1189
 Group = AutoRegStatistics
   Total      = 1
   Successful = 1
@@ -448,18 +358,16 @@ Group = FitChipFailures
 End_Group
 
 Group = SurfaceModelFailures
-  SurfaceModelNotEnoughValidData      = 0
-  SurfaceModelSolutionInvalid         = 0
-  SurfaceModelEccentricityRatioNotMet = 0
-  SurfaceModelDistanceInvalid         = 0
-  SurfaceModelResidualToleranceNotMet = 0
+  SurfaceModelNotEnoughValidData = 0
+  SurfaceModelSolutionInvalid    = 0
+  SurfaceModelDistanceInvalid    = 0
 End_Group
 End
 
 ---------------------
 Testing Gradient
 ---------------------
-Position = 71.4108 51.4408
+Position = 71.6542 51.3291
 Group = AutoRegStatistics
   Total      = 1
   Successful = 1
@@ -482,11 +390,9 @@ Group = FitChipFailures
 End_Group
 
 Group = SurfaceModelFailures
-  SurfaceModelNotEnoughValidData      = 0
-  SurfaceModelSolutionInvalid         = 0
-  SurfaceModelEccentricityRatioNotMet = 0
-  SurfaceModelDistanceInvalid         = 0
-  SurfaceModelResidualToleranceNotMet = 0
+  SurfaceModelNotEnoughValidData = 0
+  SurfaceModelSolutionInvalid    = 0
+  SurfaceModelDistanceInvalid    = 0
 End_Group
 End
-Goodness of Fit = 0.183328
+Goodness of Fit = 0.200126

@@ -1,5 +1,6 @@
 #ifndef AutoReg_h
 #define AutoReg_h
+
 /**
  * @file
  * $Revision: 1.27 $
@@ -194,8 +195,6 @@ namespace Isis {
         SurfaceModelSolutionInvalid,         //!< Could not model surface for sub-pixel accuracy
         SurfaceModelDistanceInvalid,         //!< Surface model moves registration more than one pixel
         PatternZScoreNotMet,                 //!< Pattern data max or min does not pass the z-score test
-        SurfaceModelEccentricityRatioNotMet, //!< Ellipse eccentricity of the surface model not satisfied
-        SurfaceModelResidualToleranceNotMet, //!< Average residual of the surface model not satisfied
         AdaptiveAlgorithmFailed              //!< Error occured in Adaptive algorithm
       };
 
@@ -267,36 +266,9 @@ namespace Isis {
       void SetSurfaceModelDistanceTolerance(double distance);
       void SetReductionFactor(int reductionFactor);
       void SetPatternZScoreMinimum(double minimum);
-      void SetSurfaceModelEccentricityRatio(double ratioTolerance);
-      void SetSurfaceModelResidualTolerance(double residualTolerance);
       void SetGradientFilterType(const iString& gradientFilterType);
 
       iString GradientFilterString() const;
-
-      /**
-       * Determine if eccentricity tests should be performed during 
-       * registration. 
-       *  
-       * If this method is not called, eccentricity testing defaults to test = 
-       * false in the AutoReg object constructor. 
-       * 
-       * @param test Indicates whether to perform test
-       */
-      inline void SetEccentricityTesting(bool test) {
-        p_testEccentricity = test;
-      };
-
-      /**
-       * Determine  if residual tests should be performed during registration 
-       *  
-       * If this method is not called, residual testing defaults to test = 
-       * false in the AutoReg object constructor. 
-       *  
-       * @param test Indicates whether to perform test
-       */
-      inline void SetResidualTesting(bool test) {
-        p_testResidual = test;
-      };
 
       /**
        * Return whether this object will attempt to register to whole or
@@ -338,16 +310,6 @@ namespace Isis {
         return p_distanceTolerance;
       };
 
-      //! Return eccentricity tolerance represented as the A component in an A;1 ratio
-      double EccentricityRatioTolerance() const {
-        return p_surfaceModelEccentricityRatioTolerance;
-      };
-
-      //! Return residual tolerance
-      double ResidualTolerance() const {
-        return p_surfaceModelResidualTolerance;
-      };
-
       /**
        * Return the distance point moved
        *
@@ -369,31 +331,6 @@ namespace Isis {
       //! Return the goodness of fit of the match algorithm
       inline double GoodnessOfFit() const {
         return p_goodnessOfFit;
-      };
-
-      //! Return the whole-pixel correlation of the match algorithm
-      inline double WholePixelCorrelation() const {
-        return p_wholePixelCorr;
-      };
-
-      //! Return the sub-pixel correlation of the match algorithm
-      inline double SubPixelCorrelation() const {
-        return p_subPixelCorr;
-      };
-
-      //! Return the eccentricity of the surface model, null if not calculated
-      inline double Eccentricity() const {
-        return p_surfaceModelEccentricity;
-      };
-
-      //! Return the eccentricity of the surface model as the A component of an of an A:1 ratio
-      inline double EccentricityRatio() const {
-        return p_surfaceModelEccentricityRatio;
-      };
-
-      //! Return the average residual of the surface model, null if not calculated
-      inline double AverageResidual() const {
-        return p_surfaceModelAvgResidual;
       };
 
       inline bool IsIdeal(double fit);
@@ -434,20 +371,7 @@ namespace Isis {
         score2 = p_zScoreMax;
       }
 
-      //! Return eccentricity tolerance
-      double EccentricityTolerance() const {
-        return p_surfaceModelEccentricityTolerance;
-      };
-
       Pvl RegistrationStatistics();
-
-      /**
-       * Return if the algorithm is an adaptive pattern matching
-       * technique
-       */
-      virtual bool IsAdaptive() {
-        return false;
-      }
 
       /**
        * Minimum tolerance specific to algorithm
@@ -499,19 +423,12 @@ namespace Isis {
         p_bestFit = fit;
       };
 
-      virtual AutoReg::RegisterStatus AdaptiveRegistration(Chip &sChip,
-                                                           Chip &pChip,
-                                                           Chip &fChip,
-                                                           int startSamp,
-                                                           int startLine,
-                                                           int endSamp,
-                                                           int endLine,
-                                                           int bestSamp,
-                                                           int bestLine);
+      virtual AutoReg::RegisterStatus Registration(Chip &sChip, Chip &pChip,
+          Chip &fChip, int startSamp, int startLine, int endSamp, int endLine,
+          int bestSamp, int bestLine);
       void Parse(Pvl &pvl);
       virtual bool CompareFits(double fit1, double fit2);
-      bool ModelSurface(vector<double> &x, vector<double> &y,
-                        vector<double> &z);
+      bool SetSubpixelPosition(Chip &window);
       Chip Reduce(Chip &chip, int reductionFactor);
 
       /**
@@ -581,8 +498,6 @@ namespace Isis {
       Chip p_reducedFitChip;                               //!< Fit Chip with reduction factor
 
       bool p_subpixelAccuracy;                             //!< Indicates whether sub-pixel accuracy is enabled. Default is true.
-      bool p_testEccentricity;                             //!< Indicates whether eccentricity tests should be performed.
-      bool p_testResidual;                                 //!< Indicates whether residual tests should be performed.
 
       //TODO: remove these after control points are refactored.
       int p_totalRegistrations;                            //!< Registration Statistics Total keyword.
@@ -595,8 +510,6 @@ namespace Isis {
       int p_surfaceModelNotEnoughValidDataCount;           //!< Registration statistics SurfaceModelNotEnoughValidData keyword.
       int p_surfaceModelSolutionInvalidCount;              //!< Registration statistics SurfaceModelSolutionInvalid keyword.
       int p_surfaceModelDistanceInvalidCount;              //!< Registration statistics SurfaceModelDistanceInvalid keyword.
-      int p_surfaceModelEccentricityRatioNotMetCount;      //!< Registration statistics SurfaceModelEccentricityRatioNotMet keyword.
-      int p_surfaceModelResidualToleranceNotMetCount;      //!< Registration statistics SurfaceModelResidualToleranceNotMet keyword.
 
       double p_zScoreMin;                                  //!< First Z-Score of pattern chip
       double p_zScoreMax;                                  //!< Second Z-Score of pattern chip
@@ -610,19 +523,11 @@ namespace Isis {
       double p_cubeSample;                                 //!< Cube sample
       double p_cubeLine;                                   //!< Cube line
       double p_goodnessOfFit;                              //!< Goodness of fit of the match algorithm
-      double p_wholePixelCorr;                             //!< Whole-pixel correlation of the match algorithm
-      double p_subPixelCorr;                               //!< Sub-pixel correlation of the match algorithm
       double p_tolerance;                                  //!< Tolerance for acceptable goodness of fit in match algorithm
 
       int p_windowSize;                                    //!< Surface model window size
       double p_distanceTolerance;                          //!< Maximum distance the surface model solution may be from the best whole pixel fit in the fit chip
-      double p_surfaceModelResidualTolerance;              //!< Defaults to 0.1 in case enabled directly by programmer
-      double p_surfaceModelAvgResidual;                    //!< Surface model average residual calculated by ModelSurface()
 
-      double p_surfaceModelEccentricityTolerance;          //!< Surface model eccentricity tolerance. Defaults to 2:1 in case enabled directly by programmer
-      double p_surfaceModelEccentricityRatioTolerance;     //!< Surface model eccentricity ratio tolerance. Defaults to 2:1 in case enabled directly by programmer
-      double p_surfaceModelEccentricity;                   //!< Surface model eccentricity.
-      double p_surfaceModelEccentricityRatio;              //!< Surface model eccentricity ratio.
       double p_bestFit;                                    //!< Goodness of fit for adaptive algorithms.
       int p_bestSamp;                                      //!< Sample value of best fit.
       int p_bestLine;                                      //!< Line value of best fit.

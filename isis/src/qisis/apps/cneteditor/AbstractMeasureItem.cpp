@@ -41,8 +41,8 @@ namespace Isis
           return "Reference";
         case Type:
           return "Measure Type";
-        case Eccentricity:
-          return "Eccentricity";
+        case Obsolete_Eccentricity:
+          return "Obsolete_Eccentricity";
         case GoodnessOfFit:
           return "Goodness of Fit";
         case MinPixelZScore:
@@ -107,7 +107,7 @@ namespace Isis
       columnList->append(new TableColumn(getColumnName(Ignored), false, true));
       columnList->append(new TableColumn(getColumnName(Reference), true, true));
       columnList->append(new TableColumn(getColumnName(Type), false, false));
-      columnList->append(new TableColumn(getColumnName(Eccentricity), true,
+      columnList->append(new TableColumn(getColumnName(Obsolete_Eccentricity), true,
                                             false));
       columnList->append(new TableColumn(getColumnName(GoodnessOfFit), true,
                                             false));
@@ -200,10 +200,10 @@ namespace Isis
           case Type:
             return QVariant(
                 (QString)measure->MeasureTypeToString(measure->GetType()));
-          case Eccentricity:
+          case Obsolete_Eccentricity:
             return QVariant(
                 measure->GetLogData(
-                    ControlMeasureLogData::Eccentricity).GetNumericalValue());
+                    ControlMeasureLogData::Obsolete_Eccentricity).GetNumericalValue());
           case GoodnessOfFit:
             return QVariant(
                 measure->GetLogData(
@@ -295,8 +295,8 @@ namespace Isis
                 CnetDisplayProperties::getInstance()->getSerialNumber(
                 newData)));
             break;
-          case Eccentricity:
-            setLogData(measure, ControlMeasureLogData::Eccentricity, newData);
+          case Obsolete_Eccentricity:
+            setLogData(measure, ControlMeasureLogData::Obsolete_Eccentricity, newData);
             break;
           case GoodnessOfFit:
             setLogData(measure, ControlMeasureLogData::GoodnessOfFit, newData);

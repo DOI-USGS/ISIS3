@@ -255,8 +255,8 @@ namespace Isis {
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
-      case Eccentricity:
-        return "Eccentricity";
+      case Obsolete_Eccentricity:
+        return "Obsolete_Eccentricity";
 
       case GoodnessOfFit:
         return "GoodnessOfFit";
@@ -276,8 +276,8 @@ namespace Isis {
       case SubPixelCorrelation:
         return "SubPixelCorrelation";
 
-      case AverageResidual:
-        return "AverageResidual";
+      case Obsolete_AverageResidual:
+        return "Obsolete_AverageResidual";
     }
 
     iString msg = "Unknown data type [" + iString(type) + "]";

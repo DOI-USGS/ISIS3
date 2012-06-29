@@ -187,26 +187,6 @@ int main() {
   }
   cout << endl;
   cout << "-------------------------------------------" << endl;
-  cout << "Testing for invalid value for SurfaceModel EccentricityRatio" << endl;
-  cout << "-------------------------------------------" << endl;
-  try {
-    p_ar->SetSurfaceModelEccentricityRatio(.5);
-  }
-  catch (IException &e) {
-    e.print();
-  }
-  cout << endl;
-  cout << "-------------------------------------------" << endl;
-  cout << "Testing for invalid value for SurfaceModel ResidualTolerance" << endl;
-  cout << "-------------------------------------------" << endl;
-  try {
-    p_ar->SetSurfaceModelResidualTolerance(-1);
-  }
-  catch (IException &e) {
-    e.print();
-  }
-  cout << endl;
-  cout << "-------------------------------------------" << endl;
   cout << "Testing for invalid value for SurfaceModel DistanceTolerance" << endl;
   cout << "-------------------------------------------" << endl;
   try {
@@ -278,24 +258,6 @@ int main() {
   p_ar->SetSurfaceModelWindowSize(5);
   Doit(obj);
 
-  cout << "\n----------------------------------------------------" << endl;
-  cout << "Testing Error = SurfaceModelEccentricityRatioNotMet" << endl;
-  cout << "----------------------------------------------------" << endl;
-  p_ar->SetSurfaceModelEccentricityRatio(1);
-  DoRegister();
-  //Reset the surface model Eccentricity ratio
-  p_ar->SetSurfaceModelEccentricityRatio(2);
-  Doit(obj);
-
-  cout << "\n----------------------------------------------------" << endl;
-  cout << "Testing Error = SurfaceModelResidualToleranceNotMet" << endl;
-  cout << "----------------------------------------------------" << endl;
-  p_ar->SetSurfaceModelResidualTolerance(0.005);
-  DoRegister();
-  //Reset the surface model residual tolerance
-  p_ar->SetSurfaceModelResidualTolerance(0.1);
-  Doit(obj);
-
   cout << "\n---------------------------------------------" << endl;
   cout << "Testing Error = SurfaceModelDistanceInvalid" << endl;
   cout << "---------------------------------------------" << endl;
@@ -345,8 +307,6 @@ void Doit(Isis::PvlObject &obj) {
     d.open("pattern.cub");
     p_ar->PatternChip()->TackCube(45.0, 45.0);
     p_ar->PatternChip()->Load(d);
-    p_ar->SetEccentricityTesting(true);
-    p_ar->SetResidualTesting(true);
   }
   catch(Isis::IException &error) {
     iString err = error.what();
