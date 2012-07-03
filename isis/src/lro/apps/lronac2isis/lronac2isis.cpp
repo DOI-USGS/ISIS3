@@ -96,11 +96,10 @@ void IsisMain() {
   CubeAttributeOutput &outAtt = ui.GetOutputAttribute("TO");
 
   g_ocube = new Cube();
-  g_ocube->setByteOrder(outAtt.ByteOrder());
-  g_ocube->setFormat(outAtt.FileFormat());
+  g_ocube->setByteOrder(outAtt.byteOrder());
+  g_ocube->setFormat(outAtt.fileFormat());
   g_ocube->setMinMax((double) VALID_MIN2, (double) VALID_MAX2);
-  if(outAtt.DetachedLabel()) g_ocube->setLabelsAttached(false);
-  if(outAtt.AttachedLabel()) g_ocube->setLabelsAttached(true);
+  g_ocube->setLabelsAttached(outAtt.labelAttachment() == AttachedLabel);
   g_ocube->setDimensions(p.Samples(), p.Lines(), p.Bands());
   g_ocube->setPixelType(Isis::Real);
   g_ocube->create(ui.GetFileName("TO"));

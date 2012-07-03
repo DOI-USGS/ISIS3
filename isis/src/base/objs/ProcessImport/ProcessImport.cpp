@@ -938,7 +938,7 @@ namespace Isis {
     CubeAttributeOutput &att =
       Application::GetUserInterface().GetOutputAttribute(parameter);
 
-    if(att.PropagateMinimumMaximum()) {
+    if(att.propagateMinimumMaximum()) {
       double min, max;
       if((p_pixelType == Isis::Real) ||
           (p_base.size() > 1) || (p_mult.size() > 1)) {
@@ -962,19 +962,19 @@ namespace Isis {
                      Isis::PixelTypeName(p_pixelType) + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
-      att.Minimum(min);
-      att.Maximum(max);
+      att.setMinimum(min);
+      att.setMaximum(max);
     }
 
-    if(att.PropagatePixelType()) {
+    if(att.propagatePixelType()) {
       if((p_base.size() > 1) || (p_mult.size() > 1)) {
-        att.PixelType(Isis::Real);
+        att.setPixelType(Isis::Real);
       }
       else if(p_pixelType == Isis::UnsignedWord) {
-        att.PixelType(Isis::Real);
+        att.setPixelType(Isis::Real);
       }
       else {
-        att.PixelType(p_pixelType);
+        att.setPixelType(p_pixelType);
       }
     }
 

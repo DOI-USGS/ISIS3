@@ -66,10 +66,9 @@ void IsisMain() {
   CubeAttributeOutput outAtt(ui.GetFileName("TO"));
   outCube = new Cube();
 
-  outCube->setByteOrder(outAtt.ByteOrder());
-  outCube->setFormat(outAtt.FileFormat());
-  if(outAtt.DetachedLabel()) outCube->setLabelsAttached(false);
-  if(outAtt.AttachedLabel()) outCube->setLabelsAttached(true);
+  outCube->setByteOrder(outAtt.byteOrder());
+  outCube->setFormat(outAtt.fileFormat());
+  outCube->setLabelsAttached(outAtt.labelAttachment() == AttachedLabel);
 
   /**
     * Isis2 mex2isis.pl:

@@ -74,7 +74,7 @@ void IsisMain() {
   vimsPvl.AddGroup(vimsMapping);
 
   CubeAttributeOutput out_atts;
-  out_atts.PixelType(Real);
+  out_atts.setPixelType(Real);
 
   const string output1 = "ProcessGroundPolygonsTest.cub";
   const string output2 = "ProcessGroundPolygonsTest_count.cub";

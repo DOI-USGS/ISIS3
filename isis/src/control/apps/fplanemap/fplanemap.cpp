@@ -43,7 +43,7 @@ void IsisMain() {
   // Open the FROM cube. It must have a camera model associated with it
   Cube from;
   CubeAttributeInput &attFrom = ui.GetInputAttribute("FROM");
-  vector<string> bandFrom = attFrom.Bands();
+  vector<string> bandFrom = attFrom.bands();
   from.setVirtualBands(bandFrom);
   from.open(ui.GetFileName("FROM"), "r");
   Camera *fcamera = from.getCamera();

@@ -190,11 +190,11 @@ void IsisMain() {
 
     //Reopen the lat and long cubes
     latCube = new Cube();
-    latCube->setVirtualBands(ui.GetInputAttribute("LATCUB").Bands());
+    latCube->setVirtualBands(ui.GetInputAttribute("LATCUB").bands());
     latCube->open(ui.GetFileName("LATCUB"));
 
     lonCube = new Cube();
-    lonCube->setVirtualBands(ui.GetInputAttribute("LONCUB").Bands());
+    lonCube->setVirtualBands(ui.GetInputAttribute("LONCUB").bands());
     lonCube->open(ui.GetFileName("LONCUB"));
 
     PvlKeyword targetName;

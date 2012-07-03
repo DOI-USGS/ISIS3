@@ -83,8 +83,8 @@ namespace Isis {
                                     const Isis::CubeAttributeInput &att,
                                     int requirements) {
     Isis::Cube *cube = new Isis::Cube;
-    if(att.Bands().size() != 0) {
-      vector<string> lame = att.Bands();
+    if(att.bands().size() != 0) {
+      vector<string> lame = att.bands();
       cube->setVirtualBands(lame);
     }
 
@@ -347,11 +347,11 @@ namespace Isis {
     Isis::Cube *cube = new Isis::Cube;
     try {
       cube->setDimensions(ns, nl, nb);
-      cube->setByteOrder(att.ByteOrder());
-      cube->setFormat(att.FileFormat());
-      cube->setLabelsAttached(att.AttachedLabel());
+      cube->setByteOrder(att.byteOrder());
+      cube->setFormat(att.fileFormat());
+      cube->setLabelsAttached(att.labelAttachment() == AttachedLabel);
 
-      if(att.PropagatePixelType()) {
+      if(att.propagatePixelType()) {
         if(InputCubes.size() > 0) {
           cube->setPixelType(InputCubes[0]->getPixelType());
         }
@@ -362,10 +362,10 @@ namespace Isis {
         }
       }
       else {
-        cube->setPixelType(att.PixelType());
+        cube->setPixelType(att.pixelType());
       }
 
-      if(att.PropagateMinimumMaximum()) {
+      if(att.propagateMinimumMaximum()) {
         if(cube->getPixelType() == Isis::Real) {
           cube->setBaseMultiplier(0.0, 1.0);
         }
@@ -394,7 +394,7 @@ namespace Isis {
       }
       else {
         // Not propagating so either the user entered or the programmer did
-        cube->setMinMax(att.Minimum(), att.Maximum());
+        cube->setMinMax(att.minimum(), att.maximum());
       }
 
       if(InputCubes.size() > 0) {

@@ -27,7 +27,7 @@ void IsisMain() {
     UserInterface &ui = Application::GetUserInterface();
     string replaceMode = ui.GetAsString("VPER_REPLACE");
     CubeAttributeInput cai(ui.GetAsString("FROM"));
-    bands = cai.Bands();
+    bands = cai.bands();
 
     inCube.setVirtualBands(bands);
 

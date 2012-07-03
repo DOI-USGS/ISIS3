@@ -375,7 +375,7 @@ int main(void) {
     try { // UNABLE TO GET INPUT CUBE ATTRIBUTES
       aml->PutFileName("CUBE2", "xxxxxxx.cub+1,2-4");
       Isis::CubeAttributeInput &att = aml->GetInputAttribute("CUBE2");
-      cout << "    " << att.BandsStr() << endl;
+      cout << "    " << att.toString() << endl;
     }
     catch(Isis::IException &error) {
       ReportError(error.toString());
@@ -385,11 +385,10 @@ int main(void) {
     try { // UNABLE TO GET OUTPUT CUBE ATTRIBUTES
       aml->PutFileName("CUBE1", "yyyyyyy.cub+8-bit+BSQ+detached");
       Isis::CubeAttributeOutput &att = aml->GetOutputAttribute("CUBE1");
-      string strng;
-      att.Write(strng);
+      string strng = att.toString();
       cout << "    Att string  = " << strng << endl;
-      cout << "    File format = " << att.FileFormatStr() << endl;
-      cout << "    Pixel type  = " << Isis::PixelTypeName(att.PixelType()) << endl;
+      cout << "    File format = " << att.fileFormatString() << endl;
+      cout << "    Pixel type  = " << Isis::PixelTypeName(att.pixelType()) << endl;
     }
     catch(Isis::IException &error) {
       ReportError(error.toString());

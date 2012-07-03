@@ -22,8 +22,8 @@ void IsisMain() {
   CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
   Cube icube;
 
-  if(inAtt.Bands().size() != 0) {
-    icube.setVirtualBands(inAtt.Bands());
+  if(inAtt.bands().size() != 0) {
+    icube.setVirtualBands(inAtt.bands());
   }
 
   icube.open(FileName(ui.GetFileName("FROM")).expanded());
@@ -157,10 +157,10 @@ void IsisMain() {
 
   CubeAttributeOutput outAtt = ui.GetOutputAttribute("TO");
   ocube.setDimensions(icube.getSampleCount(), icube.getLineCount(), icube.getBandCount());
-  ocube.setByteOrder(outAtt.ByteOrder());
-  ocube.setFormat(outAtt.FileFormat());
-  ocube.setLabelsAttached(outAtt.AttachedLabel());
-  ocube.setPixelType(outAtt.PixelType());
+  ocube.setByteOrder(outAtt.byteOrder());
+  ocube.setFormat(outAtt.fileFormat());
+  ocube.setLabelsAttached(outAtt.labelAttachment() == AttachedLabel);
+  ocube.setPixelType(outAtt.pixelType());
 
   ocube.create(FileName(ui.GetFileName("TO")).expanded());
 

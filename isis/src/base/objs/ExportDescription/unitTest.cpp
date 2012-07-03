@@ -57,7 +57,7 @@ int main() {
   filenames.append(FileName("blue.cub"));
   try {
     CubeAttributeInput att;
-    att.Set("+1");
+    att.setAttributes("+1");
 
     int index = desc.addChannel(filenames[0], att);
     compareEqual("addChannel()", 0, index);
@@ -79,7 +79,9 @@ int main() {
     compareEqual(innerName + "::filename()",
         filenames[i].name(), channel.filename().name());
     compareEqual(innerName + "::attributes()",
-        iString("1"), iString(channel.attributes().BandsStr()));
+        iString("1"),
+        iString(
+            QString::fromStdString(channel.attributes().toString()).mid(1)));
 
     if (i == 0) {
       compareEqual(innerName + "::hasCustomRange()",

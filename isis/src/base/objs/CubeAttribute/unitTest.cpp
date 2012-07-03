@@ -21,254 +21,281 @@
 
 #include <iostream>
 #include <string>
-#include "IException.h"
-#include "Preference.h"
+
 #include "CubeAttribute.h"
 #include "EndianSwapper.h"
+#include "FileName.h"
+#include "IException.h"
+#include "Preference.h"
 #include "Pvl.h"
+#include "SpecialPixel.h"
 
 using namespace std;
+using namespace Isis;
+
+void reportOutput(const CubeAttributeOutput &att, iString oh);
 
 int main(int argc, char *argv[]) {
+  Preference::Preferences(true);
 
-  void ReportOutput(Isis::CubeAttributeOutput * att, string oh);
-
-  Isis::Preference::Preferences(true);
-
-  cout << "Unit test for Isis::CubeAttribute and its subclasses" << endl << endl;
+  cout << "Unit test for CubeAttribute and its subclasses" << endl << endl;
 
   cout << "Test of invalid attribute \"sometext\"" << endl;
   try {
-    Isis::CubeAttribute *att = new Isis::CubeAttribute("sometext");
-    delete att;
-    cout << endl;
+    CubeAttributeInput att("sometext");
   }
-  catch(Isis::IException &error) {
-    error.print();
+  catch(IException &e) {
+    e.print();
   }
   cout << endl << endl;
 
   cout << "Test of attribute \"+sometext\"" << endl;
   try {
-    Isis::CubeAttribute *att = new Isis::CubeAttribute("+sometext");
-    att->Write(cout);
-    cout << endl;
-    string str;
-    att->Write(str);
-    cout << str << endl;
-    Isis::Pvl pvl;
-    att->Write(pvl);
-    cout << pvl << endl;
-    cout << endl;
+    CubeAttributeInput att("+sometext");
   }
-  catch(Isis::IException &error) {
-    error.print();
+  catch(IException &e) {
+    e.print();
   }
   cout << endl << endl;
 
 
   cout << "Test of system default output cube attributes" << endl;
   try {
-    Isis::CubeAttributeOutput *att = new Isis::CubeAttributeOutput();
-    ReportOutput(att, "SYS");
-    cout << endl << endl;
-    delete att;
+    CubeAttributeOutput att;
+    reportOutput(att, "SYS");
   }
-  catch(Isis::IException &error) {
-    error.print();
+  catch(IException &e) {
+    e.print();
   }
   cout << endl << endl;
 
 
   cout << "Test of output attribute \"+8bit+Tile+0.0:100.1+MSB\"" << endl;
   try {
-    Isis::CubeAttributeOutput *att = new Isis::CubeAttributeOutput("+8bit+Tile+0.0:100.1+MSB");
-    ReportOutput(att, "MSB");
+    CubeAttributeOutput att("+8bit+Tile+0.0:100.1+MSB");
+    reportOutput(att, "MSB");
     cout << endl << endl;
-    delete att;
   }
-  catch(Isis::IException &error) {
-    error.print();
+  catch(IException &e) {
+    e.print();
   }
   cout << endl << endl;
 
 
   cout << "Test of output attribute \"+16bit+Bsq+-10000.0:-100.1+lsb\"" << endl;
   try {
-    Isis::CubeAttributeOutput *att = new Isis::CubeAttributeOutput("+16bit+Bsq+-100000.0:-100.1+lsb");
-    ReportOutput(att, "LSB");
+    CubeAttributeOutput att("+16bit+Bsq+-100000.0:-100.1+lsb");
+    reportOutput(att, "LSB");
     cout << endl << endl;
-    delete att;
   }
-  catch(Isis::IException &error) {
-    error.print();
+  catch(IException &e) {
+    e.print();
   }
   cout << endl << endl;
 
 
-  cout << "Test of output attribute \"+32bit\"" << endl;
+  cout << "Test of output attribute \"+32bit+tile+999:9999\"" << endl;
   try {
-    Isis::CubeAttributeOutput *att = new Isis::CubeAttributeOutput("+32bit+tile+999:9999");
-    ReportOutput(att, "SYS");
+    CubeAttributeOutput att("+32bit+tile+999:9999");
+    reportOutput(att, "SYS");
     cout << endl << endl;
-    delete att;
   }
-  catch(Isis::IException &error) {
-    error.print();
+  catch(IException &e) {
+    e.print();
   }
   cout << endl << endl;
 
 
   cout << "Test of output attribute \"+0.0:100.1+detached\"" << endl;
   try {
-    Isis::CubeAttributeOutput *att = new Isis::CubeAttributeOutput("+0.0:100.1+detached");
-    ReportOutput(att, "SYS");
+    CubeAttributeOutput att("+0.0:100.1+detached");
+    reportOutput(att, "SYS");
     cout << endl << endl;
-    delete att;
   }
-  catch(Isis::IException &error) {
-    error.print();
+  catch(IException &e) {
+    e.print();
   }
   cout << endl << endl;
 
 
   cout << "Test of output attribute \"+8bit+Tile\"" << endl;
   try {
-    Isis::CubeAttributeOutput *att = new Isis::CubeAttributeOutput("+8bit+Tile");
-    ReportOutput(att, "SYS");
+    CubeAttributeOutput att("+8bit+Tile");
+    reportOutput(att, "SYS");
     cout << endl << endl;
-    delete att;
   }
-  catch(Isis::IException &error) {
-    error.print();
+  catch(IException &e) {
+    e.print();
   }
   cout << endl << endl;
 
   cout << "Test of output attribute \"Defaults\" with Set" << endl;
   try {
-    Isis::CubeAttributeOutput *att = new Isis::CubeAttributeOutput();
-    att->Set("+8-bit+Detached");
-    ReportOutput(att, "SYS");
+    CubeAttributeOutput att;
+    att.setAttributes("+8-bit+Detached");
+    reportOutput(att, "SYS");
     cout << endl << endl;
-    delete att;
   }
-  catch(Isis::IException &error) {
-    error.print();
+  catch(IException &e) {
+    e.print();
   }
   cout << endl << endl;
 
 
   cout << "Test of input attribute \"+3\"" << endl;
   try {
-    Isis::CubeAttributeInput *att = new Isis::CubeAttributeInput("+3");
-    att->Write(cout);
-    cout << endl;
-    string str;
-    att->Write(str);
-    cout << str << endl;
-    Isis::Pvl pvl;
-    att->Write(pvl);
-    cout << pvl << endl;
-    delete att;
+    CubeAttributeInput att("+3");
+    cout << att.toString() << endl;
+
+    vector<string> bands = att.bands();
+    cout << "vector[" << bands.size() << "]:" << endl;
+
+    for (unsigned int i = 0; i < bands.size(); i++)
+      cout << "\t" << bands[i] << endl;
   }
-  catch(Isis::IException &error) {
-    error.print();
+  catch(IException &e) {
+    e.print();
   }
   cout << endl << endl;
 
   cout << "Test of input attribute \"+3,5-9,99\"" << endl;
   try {
-    Isis::CubeAttributeInput *att = new Isis::CubeAttributeInput("+3,5-9,99");
-    att->Write(cout);
-    cout << endl;
-    string str;
-    att->Write(str);
-    cout << str << endl;
-    Isis::Pvl pvl;
-    att->Write(pvl);
-    cout << pvl << endl;
-    delete att;
+    CubeAttributeInput att("+3,5-9,99");
+    cout << att.toString() << endl;
+
+    vector<string> bands = att.bands();
+    cout << "vector[" << bands.size() << "]:" << endl;
+
+    for (unsigned int i = 0; i < bands.size(); i++)
+      cout << "\t" << bands[i] << endl;
   }
-  catch(Isis::IException &error) {
-    error.print();
+  catch(IException &e) {
+    e.print();
   }
   cout << endl << endl;
 
   cout << "Test of input attribute \"+7-10\"" << endl;
   try {
-    Isis::CubeAttributeInput *att = new Isis::CubeAttributeInput("+7-10");
-    att->Write(cout);
-    cout << endl;
-    string str;
-    att->Write(str);
-    cout << str << endl;
-    Isis::Pvl pvl;
-    att->Write(pvl);
-    cout << pvl << endl;
-    delete att;
+    CubeAttributeInput att("+7-10");
+    cout << att.toString() << endl;
+
+    vector<string> bands = att.bands();
+    cout << "vector[" << bands.size() << "]:" << endl;
+
+    for (unsigned int i = 0; i < bands.size(); i++)
+      cout << "\t" << bands[i] << endl;
   }
-  catch(Isis::IException &error) {
-    error.print();
+  catch(IException &e) {
+    e.print();
   }
   cout << endl << endl;
 
 
-  cout << "Testing put members (strings)" << endl;
+  cout << "Testing CubeAttributeOutput mutators" << endl;
   try {
-    Isis::CubeAttributeOutput *att = new Isis::CubeAttributeOutput();
-    att->Set("bsq");
-    att->Set("8bit");
-    att->Set("msb");
-    att->Set("dETacHEd");
-    att->Minimum(1.0);
-    att->Maximum(2.0);
-    att->Write(cout);
-    delete att;
+    CubeAttributeOutput att;
+    att.setFileFormat(Cube::Bsq);
+    att.addAttributes(iString("8bit"));
+    att.addAttributes("msb");
+    att.setByteOrder(Msb);
+    att.addAttributes(FileName("+dETacHEd"));
+    att.setMinimum(1.0);
+    att.setMaximum(2.0);
+    att.setPixelType(UnsignedByte);
+    cout << att.toString() << endl;
+
+    att.addAttributes("Attached");
+    att.setMaximum(12.0);
+    att.setPixelType(Real);
+    cout << att.toString() << endl;
+
+    att.setLabelAttachment(DetachedLabel);
+    cout << att.toString() << endl;
+
+    att.setLabelAttachment(ExternalLabel);
+    cout << att.toString() << endl;
   }
-  catch(Isis::IException &error) {
-    error.print();
+  catch (IException &e) {
+    e.print();
   }
   cout << endl << endl;
 
+
+  cout << "Testing CubeAttributeInput mutators" << endl;
+  try {
+    CubeAttributeInput att("+1-3,4,5,6,99-32");
+    vector<string> bandsVector(1, "+1-99");
+    att.setBands(bandsVector);
+    cout << att.toString() << endl;
+  }
+  catch (IException &e) {
+    e.print();
+  }
+  cout << endl << endl;
+
+  cout << "Regression Testing" << endl;
+  {
+    CubeAttributeOutput att;
+    att.setAttributes("+real");
+    att.addAttributes(FileName("output/makecubeTruth5.cub"));
+    cout << att.toString() << endl;
+  }
+
+  // This is a correct result: The +'s are part of the path. This was suspected of being a bug.
+  CubeAttributeOutput att;
+  att.setAttributes("+real+output/makecubeTruth5.cub");
+  if (att.toString() != "") {
+    cout << "Failed to differentiate +'s in path versus +'s in file name" << endl;
+  }
+  
+  try {
+    CubeAttributeOutput att;
+    att.setMinimum(Null);
+    att.setMaximum(52.0);
+    cout << att.toString() << endl;
+  }
+  catch (IException &e) {
+    e.print();
+  }
 }
 
 
 // Function to report everything about an output cube attribute
-void ReportOutput(Isis::CubeAttributeOutput *att, string orderHint) {
-  att->Write(cout);
-  cout << endl;
-  Isis::Pvl pvl;
-  att->Write(pvl);
-  cout << pvl << endl;
-  cout << endl;
-  cout << "Propagate Pixel Type = " << att->PropagatePixelType() << endl;
+void reportOutput(const CubeAttributeOutput &att, iString orderHint) {
+  cout << att.toString() << endl;
+
+//   Pvl pvl;
+//   att.Write(pvl);
+//   cout << pvl << endl;
+//   cout << endl;
+  cout << "Propagate Pixel Type = " << att.propagatePixelType() << endl;
   try {
-    string tmp =   Isis::PixelTypeName(att->PixelType());
+    string tmp =   PixelTypeName(att.pixelType());
     cout << "PixelType            = " << tmp << endl;
   }
-  catch(Isis::IException &error) {
-    error.print();
+  catch(IException &e) {
+    e.print();
   }
-  cout << "Propagate Min/Max    = " << att->PropagateMinimumMaximum() << endl;
-  cout << "Minimum              = " << att->Minimum() << endl;
-  cout << "Maximum              = " << att->Maximum() << endl;
-  cout << "FileFormatStr        = " << att->FileFormatStr() << endl;
+  cout << "Propagate Min/Max    = " << att.propagateMinimumMaximum() << endl;
+  cout << "Minimum              = " << att.minimum() << endl;
+  cout << "Maximum              = " << att.maximum() << endl;
+  cout << "FileFormatStr        = " << att.fileFormatString() << endl;
 
-//  cout << "ByteOrderStr         = " << att->ByteOrderStr() << endl;
-//  cout << "ByteOrder enum       = " << Isis::ByteOrderName(att->ByteOrder()) << endl;
-  Isis::ByteOrder oh;
+//  cout << "ByteOrderStr         = " << att.ByteOrderStr() << endl;
+//  cout << "ByteOrder enum       = " << ByteOrderName(att.ByteOrder()) << endl;
+  ByteOrder oh;
   if(orderHint == "SYS") {
-    if(Isis::IsLsb()) {
-      oh = Isis::Lsb;
+    if(IsLsb()) {
+      oh = Lsb;
     }
     else {
-      oh = Isis::Msb;
+      oh = Msb;
     }
   }
   else {
-    oh = Isis::ByteOrderEnumeration(orderHint);
+    oh = ByteOrderEnumeration(orderHint);
   }
-  Isis::ByteOrder order =  att->ByteOrder();
+  ByteOrder order =  att.byteOrder();
   if(order == oh) {
     cout << "ByteOrder            = ok" << endl;
   }
@@ -277,8 +304,8 @@ void ReportOutput(Isis::CubeAttributeOutput *att, string orderHint) {
   }
 
   cout << "Label attachment     = ";
-  if(att->AttachedLabel()) cout << LabelAttachmentName(Isis::AttachedLabel) << endl;
-  if(att->DetachedLabel()) cout << LabelAttachmentName(Isis::DetachedLabel) << endl;
+  if(att.labelAttachment() == AttachedLabel)  cout << LabelAttachmentName(AttachedLabel) << endl;
+  if(att.labelAttachment() == DetachedLabel) cout << LabelAttachmentName(DetachedLabel) << endl;
 
 #if 0
   fstream stream("CubeAttribute.truth", ios::in | ios::out);
@@ -286,7 +313,7 @@ void ReportOutput(Isis::CubeAttributeOutput *att, string orderHint) {
   if(stream.is_open()) {
     for(int i = 0 ; i < 6 ; i++) {
       stream.seekg(positions[i]);
-      if(Isis::IsLsb())
+      if(IsLsb())
         stream.put('L');
       else
         stream.put('M');

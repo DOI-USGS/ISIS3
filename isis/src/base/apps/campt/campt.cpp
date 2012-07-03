@@ -20,7 +20,7 @@ void IsisMain() {
 
   // Set up CameraPointInfo and set file
   CameraPointInfo campt;
-  campt.SetCube(ui.GetFileName("FROM") + "+" + ui.GetInputAttribute("FROM").BandsStr());
+  campt.SetCube(ui.GetFileName("FROM") + "+" + ui.GetInputAttribute("FROM").toString());
 
   Progress prog;
   prog.SetMaximumSteps(1);

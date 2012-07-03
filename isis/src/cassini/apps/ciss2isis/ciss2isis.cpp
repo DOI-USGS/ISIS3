@@ -66,9 +66,9 @@ void IsisMain() {
 
   // Set the output bit type to SignedWord
   CubeAttributeOutput &outAtt = ui.GetOutputAttribute("TO");
-  outAtt.PixelType(SignedWord);
-  outAtt.Minimum((double)VALID_MIN2);
-  outAtt.Maximum((double)VALID_MAX2);
+  outAtt.setPixelType(SignedWord);
+  outAtt.setMinimum((double)VALID_MIN2);
+  outAtt.setMaximum((double)VALID_MAX2);
   Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), outAtt);
 
   TranslateCassIssLabels(in, ocube);

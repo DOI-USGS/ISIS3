@@ -41,25 +41,25 @@ void IsisMain(){
   // Set properties MIN,MAX, and PixelType for output cube
   CubeAttributeOutput outputProperties;
   if(ui.GetString("CLIP") == "PERCENT"){
-    outputProperties.Maximum(maxper);
-    outputProperties.Minimum(minper);
+    outputProperties.setMaximum(maxper);
+    outputProperties.setMinimum(minper);
     validMax = maxper;
     validMin = minper;
   }
   else{
-    outputProperties.Maximum(max);
-    outputProperties.Minimum(min);
+    outputProperties.setMaximum(max);
+    outputProperties.setMinimum(min);
     validMax = max;
     validMin = min;
   }
   if(ui.GetString("BITTYPE")=="8BIT"){
-    outputProperties.PixelType(UnsignedByte);
+    outputProperties.setPixelType(UnsignedByte);
   }
   else if(ui.GetString("BITTYPE")=="16BIT"){
-    outputProperties.PixelType(SignedWord);
+    outputProperties.setPixelType(SignedWord);
   }
   else {
-    outputProperties.PixelType(Real);
+    outputProperties.setPixelType(Real);
   }    
 
 

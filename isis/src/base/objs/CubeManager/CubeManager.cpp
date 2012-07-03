@@ -40,7 +40,7 @@ namespace Isis {
    */
   Cube *CubeManager::OpenCube(const std::string &cubeFileName) {
     CubeAttributeInput attIn(cubeFileName);
-    iString attri = attIn.BandsStr();
+    iString attri = attIn.toString();
     iString expName = FileName(cubeFileName).expanded();
 
     // If there are attributes, we need a plus sign on the name
@@ -56,7 +56,7 @@ namespace Isis {
       p_cubes.insert(fileName, new Cube());
       searchResult = p_cubes.find(fileName);
       // Bands are the only thing input attributes can affect
-      (*searchResult)->setVirtualBands(attIn.Bands());
+      (*searchResult)->setVirtualBands(attIn.bands());
 
       try {
         (*searchResult)->open(fileName.toStdString());

@@ -1,54 +1,26 @@
-Unit test for Isis::CubeAttribute and its subclasses
+Unit test for CubeAttribute and its subclasses
 
 Test of invalid attribute "sometext"
 
 
-
 Test of attribute "+sometext"
-+sometext
-+sometext
-Group = Attributes
-  Format = +sometext
-End_Group
-End
-
+**ERROR** Attribute [sometext] is not recognized.
 
 
 Test of system default output cube attributes
-+Tile+Lsb+Attached
-Group = OutputCubeAttributes
-  Format    = Tile
-  Minimum   = 0.0
-  Maximum   = 0.0
-  ByteOrder = Lsb
-  LabelType = Attached
-End_Group
-End
 
 Propagate Pixel Type = 1
-**PROGRAMMER ERROR** Request for CubeAttributeOutput::PixelType failed. PixelType has not been set. Use PropagatePixelType or UserPixelType to determine how to set PixelType.
+PixelType            = None
 Propagate Min/Max    = 1
-Minimum              = 0
-Maximum              = 0
+Minimum              = -1.79769e+308
+Maximum              = -1.79769e+308
 FileFormatStr        = Tile
 ByteOrder            = ok
 Label attachment     = Attached
 
 
-
-
 Test of output attribute "+8bit+Tile+0.0:100.1+MSB"
-+UnsignedByte+0.0:100.1+Tile+Msb+Attached
-Group = OutputCubeAttributes
-  Type      = UnsignedByte
-  Format    = Tile
-  Minimum   = 0.0
-  Maximum   = 100.1
-  ByteOrder = Msb
-  LabelType = Attached
-End_Group
-End
-
++8bit+Tile+0.0:100.1+MSB
 Propagate Pixel Type = 0
 PixelType            = UnsignedByte
 Propagate Min/Max    = 0
@@ -62,17 +34,7 @@ Label attachment     = Attached
 
 
 Test of output attribute "+16bit+Bsq+-10000.0:-100.1+lsb"
-+SignedWord+-100000.0:-100.1+BandSequential+Lsb+Attached
-Group = OutputCubeAttributes
-  Type      = SignedWord
-  Format    = BandSequential
-  Minimum   = -100000.0
-  Maximum   = -100.1
-  ByteOrder = Lsb
-  LabelType = Attached
-End_Group
-End
-
++16bit+Bsq+-100000.0:-100.1+lsb
 Propagate Pixel Type = 0
 PixelType            = SignedWord
 Propagate Min/Max    = 0
@@ -85,16 +47,8 @@ Label attachment     = Attached
 
 
 
-Test of output attribute "+32bit"
-+Real+Tile+Lsb+Attached
-Group = OutputCubeAttributes
-  Type      = Real
-  Format    = Tile
-  ByteOrder = Lsb
-  LabelType = Attached
-End_Group
-End
-
+Test of output attribute "+32bit+tile+999:9999"
++32bit+tile+999:9999
 Propagate Pixel Type = 0
 PixelType            = Real
 Propagate Min/Max    = 0
@@ -108,18 +62,9 @@ Label attachment     = Attached
 
 
 Test of output attribute "+0.0:100.1+detached"
-+Tile+Lsb+Detached
-Group = OutputCubeAttributes
-  Format    = Tile
-  Minimum   = 0.0
-  Maximum   = 100.1
-  ByteOrder = Lsb
-  LabelType = Detached
-End_Group
-End
-
++0.0:100.1+detached
 Propagate Pixel Type = 1
-**PROGRAMMER ERROR** Request for CubeAttributeOutput::PixelType failed. PixelType has not been set. Use PropagatePixelType or UserPixelType to determine how to set PixelType.
+PixelType            = None
 Propagate Min/Max    = 0
 Minimum              = 0
 Maximum              = 100.1
@@ -131,22 +76,12 @@ Label attachment     = Detached
 
 
 Test of output attribute "+8bit+Tile"
-+UnsignedByte+0.0:0.0+Tile+Lsb+Attached
-Group = OutputCubeAttributes
-  Type      = UnsignedByte
-  Format    = Tile
-  Minimum   = 0.0
-  Maximum   = 0.0
-  ByteOrder = Lsb
-  LabelType = Attached
-End_Group
-End
-
++8bit+Tile
 Propagate Pixel Type = 0
 PixelType            = UnsignedByte
 Propagate Min/Max    = 1
-Minimum              = 0
-Maximum              = 0
+Minimum              = -1.79769e+308
+Maximum              = -1.79769e+308
 FileFormatStr        = Tile
 ByteOrder            = ok
 Label attachment     = Attached
@@ -155,22 +90,12 @@ Label attachment     = Attached
 
 
 Test of output attribute "Defaults" with Set
-+UnsignedByte+0.0:0.0+Tile+Lsb+Detached
-Group = OutputCubeAttributes
-  Type      = UnsignedByte
-  Format    = Tile
-  Minimum   = 0.0
-  Maximum   = 0.0
-  ByteOrder = Lsb
-  LabelType = Detached
-End_Group
-End
-
++8-bit+Detached
 Propagate Pixel Type = 0
 PixelType            = UnsignedByte
 Propagate Min/Max    = 1
-Minimum              = 0
-Maximum              = 0
+Minimum              = -1.79769e+308
+Maximum              = -1.79769e+308
 FileFormatStr        = Tile
 ByteOrder            = ok
 Label attachment     = Detached
@@ -180,31 +105,42 @@ Label attachment     = Detached
 
 Test of input attribute "+3"
 +3
-+3
-Group = InputAttributes
-  Bands = 3
-End_Group
-End
+vector[1]:
+	3
 
 
 Test of input attribute "+3,5-9,99"
-+3,5,6,7,8,9,99
-+3,5,6,7,8,9,99
-Group = InputAttributes
-  Bands = (3, 5, 6, 7, 8, 9, 99)
-End_Group
-End
++3,5-9,99
+vector[7]:
+	3
+	5
+	6
+	7
+	8
+	9
+	99
 
 
 Test of input attribute "+7-10"
-+7,8,9,10
-+7,8,9,10
-Group = InputAttributes
-  Bands = (7, 8, 9, 10)
-End_Group
-End
++7-10
+vector[4]:
+	7
+	8
+	9
+	10
 
 
-Testing put members (strings)
-+Tile+Lsb+Attached
+Testing CubeAttributeOutput mutators
++BandSequential+UnsignedByte+MSB+dETacHEd+1.0:2.0
++BandSequential+Real+MSB+dETacHEd+1.0:12.0+Attached
++BandSequential+Real+MSB+Detached+1.0:12.0
++BandSequential+Real+MSB+External+1.0:12.0
 
+
+Testing CubeAttributeInput mutators
++1-99
+
+
+Regression Testing
++real
++:52.0

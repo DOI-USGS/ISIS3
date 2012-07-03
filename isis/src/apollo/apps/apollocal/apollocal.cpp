@@ -31,7 +31,7 @@ void IsisMain() {
   p.SetInputCube(missionDir + "/calibration/" + camera + "_flatfield.cub", cai);
 
   CubeAttributeOutput cao;
-  cao.PixelType(Real);
+  cao.setPixelType(Real);
   p.SetOutputCube(
       FileName(Application::GetUserInterface().GetAsString("TO")).expanded(),
       cao, inCube->getSampleCount(), inCube->getLineCount(),

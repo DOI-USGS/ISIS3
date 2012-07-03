@@ -23,6 +23,13 @@
     <change name="Jeff Anderson" date="2007-06-25">
       Added ability to optionally not propagate tables
     </change>
+    <change name="Steven Lambright and Stuart Sides" date="2012-07-03">
+      Cube attributes on EVERY program in Isis have had their behavior modified. If you type an
+      unrecognized attribute (e.g. out.cub+Bsqq instead of out.cub+Bsq), instead of ignoring you
+      an error will be thrown. Please see:
+        http://isis.astrogeology.usgs.gov/documents/CommandLine/CommandLine.html
+      for an explanation of Cube Attributes.
+    </change>
   </history>
 
   <groups>

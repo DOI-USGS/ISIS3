@@ -35,6 +35,7 @@
 #include <QDoubleValidator>
 
 #include "CubeAttribute.h"
+#include "FileName.h"
 #include "GuiOutputAttribute.h"
 
 namespace Isis {
@@ -193,18 +194,18 @@ namespace Isis {
   // Return the attributes in the dialog
   std::string GuiOutputAttribute::GetAttributes() {
     std::string att;
-    if(p_lsb->isChecked()) att += "+lsb";
-    if(p_msb->isChecked()) att += "+msb";
+    if(p_lsb->isChecked()) att += "+Lsb";
+    if(p_msb->isChecked()) att += "+Msb";
 
-    if(p_tiled->isChecked()) att += "+tiled";
-    if(p_bsq->isChecked()) att += "+bsq";
+    if(p_tiled->isChecked()) att += "+Tile";
+    if(p_bsq->isChecked()) att += "+BandSequential";
 
-    if(p_attached->isChecked()) att += "+attached";
-    if(p_detached->isChecked()) att += "+detached";
+    if(p_attached->isChecked()) att += "+Attached";
+    if(p_detached->isChecked()) att += "+Detached";
 
-    if(p_real->isChecked()) att += "+real";
-    if(p_unsignedByte->isChecked()) att += "+8bit";
-    if(p_signedWord->isChecked()) att += "+16bit";
+    if(p_real->isChecked()) att += "+Real";
+    if(p_unsignedByte->isChecked()) att += "+UnsignedByte";
+    if(p_signedWord->isChecked()) att += "+SignedWord";
 
     if(p_unsignedByte->isChecked() || p_signedWord->isChecked()) {
       if((p_minEdit->text() != "") && (p_maxEdit->text() != "")) {
@@ -216,51 +217,50 @@ namespace Isis {
     }
 
     Isis::CubeAttributeOutput catt(att);
-    std::string s;
-    catt.Write(s);
+    std::string s = catt.toString();
     return s;
   }
 
   // Set the attributes in the dialog
   void GuiOutputAttribute::SetAttributes(const std::string &value) {
     Isis::CubeAttributeOutput att(value);
-    if(att.FileFormat() == Cube::Tile) {
+    if(att.fileFormat() == Cube::Tile) {
       p_tiled->setChecked(true);
     }
     else {
       p_bsq->setChecked(true);
     }
 
-    if(att.ByteOrder() == Isis::Lsb) {
+    if(att.byteOrder() == Isis::Lsb) {
       p_lsb->setChecked(true);
     }
     else {
       p_msb->setChecked(true);
     }
 
-    if(att.AttachedLabel()) {
+    if(att.labelAttachment() == AttachedLabel) {
       p_attached->setChecked(true);
     }
     else {
       p_detached->setChecked(true);
     }
 
-    if(att.PropagatePixelType()) {
+    if(att.propagatePixelType()) {
       p_propagate->setChecked(true);
     }
-    else if(att.PixelType() == Isis::UnsignedByte) {
+    else if(att.pixelType() == Isis::UnsignedByte) {
       p_unsignedByte->setChecked(true);
     }
-    else if(att.PixelType() == Isis::SignedWord) {
+    else if(att.pixelType() == Isis::SignedWord) {
       p_signedWord->setChecked(true);
     }
     else {
       p_real->setChecked(true);
     }
 
-    if(!att.PropagateMinimumMaximum()) {
-      p_minEdit->setText(QString::number(att.Minimum()));
-      p_maxEdit->setText(QString::number(att.Maximum()));
+    if(!att.propagateMinimumMaximum()) {
+      p_minEdit->setText(QString::number(att.minimum()));
+      p_maxEdit->setText(QString::number(att.maximum()));
     }
   }
 

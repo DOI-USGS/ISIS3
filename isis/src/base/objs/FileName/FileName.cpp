@@ -187,7 +187,7 @@ namespace Isis {
     return isNumericallyVersioned() || isDateVersioned();
   }
 
-  
+
   bool FileName::isNumericallyVersioned() const {
     return FileName(expanded()).name().ToQt().contains("?");
   }
@@ -356,8 +356,29 @@ namespace Isis {
 
 
   bool FileName::operator==(const FileName &rhs) {
-    return QFileInfo(expanded()).canonicalFilePath() ==
-           QFileInfo(rhs.expanded()).canonicalFilePath();
+    QString expandedOfThis = expanded();
+    QString canonicalOfThis = QFileInfo(expandedOfThis).canonicalFilePath();
+
+    QString expandedOfRhs = rhs.expanded();
+    QString canonicalOfRhs = QFileInfo(expandedOfRhs).canonicalFilePath();
+
+    // Cononical file paths return empty strings if the file does not exist. Either both canonicals
+    //   are valid and the same (equal is initialized to true), or neither canonical is valid but
+    //   the expandeds are the same (equal is set to true when it isn't initialized to true).
+    bool equal = (!canonicalOfThis.isEmpty() && canonicalOfThis == canonicalOfRhs);
+
+    if (!equal) {
+      equal = (canonicalOfThis.isEmpty() && canonicalOfRhs.isEmpty() &&
+               expandedOfThis == expandedOfRhs);
+    }
+
+    return equal;
+  }
+
+
+
+  bool FileName::operator!=(const FileName &rhs) {
+    return !(*this == rhs);
   }
 
 

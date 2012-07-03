@@ -43,7 +43,7 @@ void IsisMain () {
     if (ui.WasEntered("BACKPLANE")) {
         CubeAttributeInput backplaneCai = ui.GetInputAttribute("BACKPLANE");
 
-        if ( backplaneCai.Bands().size() != 3 ) {
+        if ( backplaneCai.bands().size() != 3 ) {
             string msg = "Invalid Backplane: The backplane must be exactly 3 bands";
             throw IException(IException::User, msg, _FILEINFO_);
         }
@@ -54,13 +54,11 @@ void IsisMain () {
         }
 
         CubeAttributeInput cai;
-        cai.Set("+" + backplaneCai.Bands()[0]);
+        cai.setAttributes("+" + backplaneCai.bands()[0]);
         p.SetInputCube(ui.GetFileName("BACKPLANE"), cai);
-        cai.Reset();
-        cai.Set("+" + backplaneCai.Bands()[1]);
+        cai.setAttributes("+" + backplaneCai.bands()[1]);
         p.SetInputCube(ui.GetFileName("BACKPLANE"), cai);
-        cai.Reset();
-        cai.Set("+" + backplaneCai.Bands()[2]);
+        cai.setAttributes("+" + backplaneCai.bands()[2]);
         p.SetInputCube(ui.GetFileName("BACKPLANE"), cai);
 
         useBackplane = true;

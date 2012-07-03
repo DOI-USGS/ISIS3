@@ -123,6 +123,7 @@ namespace Isis {
     SetBaseBand(start_band);
   }
 
+
   /**
    * Returns the sample position associated with a shape buffer index.  The
    * shape buffer is one dimensional.  Let us assume a nsamps=2, nlines=3,
@@ -255,13 +256,13 @@ namespace Isis {
    * @throws Isis::iException::Programmer - Input and Output buffers are not the
    *                                        same size
    */
-  void Buffer::Copy(const Buffer &in) {
+  void Buffer::Copy(const Buffer &in, bool includeRawBuf) {
     if(p_npixels != in.size()) {
       string message = "Input and output buffers are not the same size";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
-    if(p_pixelType != in.PixelType()) {
+    if(includeRawBuf && p_pixelType != in.PixelType()) {
       string message = "Input and output buffers are not the same pixel type";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
@@ -270,9 +271,11 @@ namespace Isis {
     n = n * (size_t) p_npixels;
     memcpy(p_buf, in.p_buf, n);
 
-    n = Isis::SizeOf(p_pixelType);
-    n = n * (size_t) p_npixels;
-    memcpy(p_rawbuf, in.p_rawbuf, n);
+    if (includeRawBuf) {
+      n = Isis::SizeOf(p_pixelType);
+      n = n * (size_t) p_npixels;
+      memcpy(p_rawbuf, in.p_rawbuf, n);
+    }
   }
 
   /**

@@ -56,7 +56,7 @@ void IsisMain() {
   
   // Setup the output cube attributes for a 16-bit unsigned tiff
   Isis::CubeAttributeOutput cao;
-  cao.PixelType(Isis::Real);
+  cao.setPixelType(Isis::Real);
   p.SetOutputCube(toFile.expanded(), cao);
 
   // Import image

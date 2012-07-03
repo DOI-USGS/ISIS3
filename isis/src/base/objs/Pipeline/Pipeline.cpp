@@ -287,7 +287,7 @@ namespace Isis {
     UserInterface &ui = Application::GetUserInterface();
     p_originalInput.push_back(ui.GetFileName(inputParam));
     p_inputBranches.push_back(inputParam);
-    p_virtualBands.push_back(ui.GetInputAttribute(inputParam).BandsStr());
+    p_virtualBands.push_back(ui.GetInputAttribute(inputParam).toString());
   }
 
 

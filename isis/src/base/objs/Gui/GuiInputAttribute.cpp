@@ -32,6 +32,7 @@
 #include <QVBoxLayout>
 
 #include "CubeAttribute.h"
+#include "FileName.h"
 #include "GuiInputAttribute.h"
 
 namespace Isis {
@@ -130,14 +131,14 @@ namespace Isis {
   // Set the attributes in the dialog
   void GuiInputAttribute::SetAttributes(const std::string &value) {
     Isis::CubeAttributeInput att(value);
-    std::vector<std::string> bands = att.Bands();
+    std::vector<std::string> bands = att.bands();
     if(bands.size() == 0) {
       p_buttonGroup->buttons()[0]->setChecked(true);
       p_lineEdit->setText("");
     }
     else {
       p_buttonGroup->buttons()[1]->setChecked(true);
-      p_lineEdit->setText((iString)att.BandsStr());
+      p_lineEdit->setText((iString)att.toString());
     }
   }
 }

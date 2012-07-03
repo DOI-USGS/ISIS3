@@ -111,7 +111,7 @@ void IsisMain() {
     //Set up the Process and the OutputCube, and Process
     ProcessByLine p;
     CubeAttributeOutput set;
-    set.PixelType(Real);
+    set.setPixelType(Real);
     Cube *ocube = p.SetOutputCube(ui.GetFileName("CUBE"),
                                   set, bands, bands, 2);
     p.StartProcess(WriteCube);

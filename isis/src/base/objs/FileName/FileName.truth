@@ -5,18 +5,36 @@ Running Full Test on [/path/base.ext+attr]
 		Path:              /path
 		Original path      /path
 		Extension:         ext
+		Comparison (==):   1
+		Comparison (!=):   0
 		Expanded           /path/base.ext
 		Exists             0
 
 	Testing Extension change [/path/base.ext+attr]
 		Before modification:      /path/base.ext
+			Changed:                0
+			Unchanged:              1
 		Removed Extension:        /path/base
+			Changed:                1
+			Unchanged:              0
 		Added Extension [tmp]:    /path/base.tmp
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /path/base.tmp.jpg
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /path/base.tmp.jpg
+			Changed:                0
+			Unchanged:              1
 		Set Extension   [gif]:    /path/base.tmp.gif
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /path/base.tmp.gif.jpg
+			Changed:                1
+			Unchanged:              0
 		Removed Extension:        /path/base.tmp.gif
+			Changed:                1
+			Unchanged:              0
 
 	Testing Expanded [/path/base.ext+attr]
 		Name:              base.ext
@@ -32,18 +50,36 @@ Running Full Test on [/path1/.path2/base.ext+attr]
 		Path:              /path1/.path2
 		Original path      /path1/.path2
 		Extension:         ext
+		Comparison (==):   1
+		Comparison (!=):   0
 		Expanded           /path1/.path2/base.ext
 		Exists             0
 
 	Testing Extension change [/path1/.path2/base.ext+attr]
 		Before modification:      /path1/.path2/base.ext
+			Changed:                0
+			Unchanged:              1
 		Removed Extension:        /path1/.path2/base
+			Changed:                1
+			Unchanged:              0
 		Added Extension [tmp]:    /path1/.path2/base.tmp
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /path1/.path2/base.tmp.jpg
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /path1/.path2/base.tmp.jpg
+			Changed:                0
+			Unchanged:              1
 		Set Extension   [gif]:    /path1/.path2/base.tmp.gif
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /path1/.path2/base.tmp.gif.jpg
+			Changed:                1
+			Unchanged:              0
 		Removed Extension:        /path1/.path2/base.tmp.gif
+			Changed:                1
+			Unchanged:              0
 
 	Testing Expanded [/path1/.path2/base.ext+attr]
 		Name:              base.ext
@@ -59,18 +95,36 @@ Running Full Test on [/path1/pat.h2/base+attr]
 		Path:              /path1/pat.h2
 		Original path      /path1/pat.h2
 		Extension:         
+		Comparison (==):   1
+		Comparison (!=):   0
 		Expanded           /path1/pat.h2/base
 		Exists             0
 
 	Testing Extension change [/path1/pat.h2/base+attr]
 		Before modification:      /path1/pat.h2/base
+			Changed:                0
+			Unchanged:              1
 		Removed Extension:        /path1/pat.h2/base
+			Changed:                0
+			Unchanged:              1
 		Added Extension [tmp]:    /path1/pat.h2/base.tmp
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /path1/pat.h2/base.tmp.jpg
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /path1/pat.h2/base.tmp.jpg
+			Changed:                0
+			Unchanged:              1
 		Set Extension   [gif]:    /path1/pat.h2/base.tmp.gif
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /path1/pat.h2/base.tmp.gif.jpg
+			Changed:                1
+			Unchanged:              0
 		Removed Extension:        /path1/pat.h2/base.tmp.gif
+			Changed:                1
+			Unchanged:              0
 
 	Testing Expanded [/path1/pat.h2/base+attr]
 		Name:              base
@@ -86,18 +140,36 @@ Running Full Test on [/.path1/path2/base]
 		Path:              /.path1/path2
 		Original path      /.path1/path2
 		Extension:         
+		Comparison (==):   1
+		Comparison (!=):   0
 		Expanded           /.path1/path2/base
 		Exists             0
 
 	Testing Extension change [/.path1/path2/base]
 		Before modification:      /.path1/path2/base
+			Changed:                0
+			Unchanged:              1
 		Removed Extension:        /.path1/path2/base
+			Changed:                0
+			Unchanged:              1
 		Added Extension [tmp]:    /.path1/path2/base.tmp
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /.path1/path2/base.tmp.jpg
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /.path1/path2/base.tmp.jpg
+			Changed:                0
+			Unchanged:              1
 		Set Extension   [gif]:    /.path1/path2/base.tmp.gif
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /.path1/path2/base.tmp.gif.jpg
+			Changed:                1
+			Unchanged:              0
 		Removed Extension:        /.path1/path2/base.tmp.gif
+			Changed:                1
+			Unchanged:              0
 
 	Testing Expanded [/.path1/path2/base]
 		Name:              base
@@ -113,18 +185,36 @@ Running Full Test on [/.path1/path2/base.+attr]
 		Path:              /.path1/path2
 		Original path      /.path1/path2
 		Extension:         
+		Comparison (==):   1
+		Comparison (!=):   0
 		Expanded           /.path1/path2/base.
 		Exists             0
 
 	Testing Extension change [/.path1/path2/base.+attr]
 		Before modification:      /.path1/path2/base.
+			Changed:                0
+			Unchanged:              1
 		Removed Extension:        /.path1/path2/base
+			Changed:                1
+			Unchanged:              0
 		Added Extension [tmp]:    /.path1/path2/base.tmp
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /.path1/path2/base.tmp.jpg
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /.path1/path2/base.tmp.jpg
+			Changed:                0
+			Unchanged:              1
 		Set Extension   [gif]:    /.path1/path2/base.tmp.gif
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /.path1/path2/base.tmp.gif.jpg
+			Changed:                1
+			Unchanged:              0
 		Removed Extension:        /.path1/path2/base.tmp.gif
+			Changed:                1
+			Unchanged:              0
 
 	Testing Expanded [/.path1/path2/base.+attr]
 		Name:              base.
@@ -140,18 +230,36 @@ Running Full Test on [/another/path/base.ex1.exten2.ext3]
 		Path:              /another/path
 		Original path      /another/path
 		Extension:         ext3
+		Comparison (==):   1
+		Comparison (!=):   0
 		Expanded           /another/path/base.ex1.exten2.ext3
 		Exists             0
 
 	Testing Extension change [/another/path/base.ex1.exten2.ext3]
 		Before modification:      /another/path/base.ex1.exten2.ext3
+			Changed:                0
+			Unchanged:              1
 		Removed Extension:        /another/path/base.ex1.exten2
+			Changed:                1
+			Unchanged:              0
 		Added Extension [tmp]:    /another/path/base.ex1.exten2.tmp
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /another/path/base.ex1.exten2.tmp.jpg
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /another/path/base.ex1.exten2.tmp.jpg
+			Changed:                0
+			Unchanged:              1
 		Set Extension   [gif]:    /another/path/base.ex1.exten2.tmp.gif
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /another/path/base.ex1.exten2.tmp.gif.jpg
+			Changed:                1
+			Unchanged:              0
 		Removed Extension:        /another/path/base.ex1.exten2.tmp.gif
+			Changed:                1
+			Unchanged:              0
 
 	Testing Expanded [/another/path/base.ex1.exten2.ext3]
 		Name:              base.ex1.exten2.ext3
@@ -167,18 +275,36 @@ Running Full Test on [/$BADENV/base.ext+attr]
 		Path:              /$BADENV
 		Original path      /$BADENV
 		Extension:         ext
+		Comparison (==):   1
+		Comparison (!=):   0
 		Expanded           /$BADENV/base.ext
 		Exists             0
 
 	Testing Extension change [/$BADENV/base.ext+attr]
 		Before modification:      /$BADENV/base.ext
+			Changed:                0
+			Unchanged:              1
 		Removed Extension:        /$BADENV/base
+			Changed:                1
+			Unchanged:              0
 		Added Extension [tmp]:    /$BADENV/base.tmp
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /$BADENV/base.tmp.jpg
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /$BADENV/base.tmp.jpg
+			Changed:                0
+			Unchanged:              1
 		Set Extension   [gif]:    /$BADENV/base.tmp.gif
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /$BADENV/base.tmp.gif.jpg
+			Changed:                1
+			Unchanged:              0
 		Removed Extension:        /$BADENV/base.tmp.gif
+			Changed:                1
+			Unchanged:              0
 
 	Testing Expanded [/$BADENV/base.ext+attr]
 		Name:              base.ext
@@ -194,18 +320,36 @@ Running Full Test on [/.path1/base+attr1+attr2]
 		Path:              /.path1
 		Original path      /.path1
 		Extension:         
+		Comparison (==):   1
+		Comparison (!=):   0
 		Expanded           /.path1/base
 		Exists             0
 
 	Testing Extension change [/.path1/base+attr1+attr2]
 		Before modification:      /.path1/base
+			Changed:                0
+			Unchanged:              1
 		Removed Extension:        /.path1/base
+			Changed:                0
+			Unchanged:              1
 		Added Extension [tmp]:    /.path1/base.tmp
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /.path1/base.tmp.jpg
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /.path1/base.tmp.jpg
+			Changed:                0
+			Unchanged:              1
 		Set Extension   [gif]:    /.path1/base.tmp.gif
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /.path1/base.tmp.gif.jpg
+			Changed:                1
+			Unchanged:              0
 		Removed Extension:        /.path1/base.tmp.gif
+			Changed:                1
+			Unchanged:              0
 
 	Testing Expanded [/.path1/base+attr1+attr2]
 		Name:              base
@@ -221,18 +365,36 @@ Running Full Test on [unitTest.cpp]
 		Path:              .
 		Original path      .
 		Extension:         cpp
+		Comparison (==):   1
+		Comparison (!=):   0
 		Expanded           unitTest.cpp
 		Exists             1
 
 	Testing Extension change [unitTest.cpp]
 		Before modification:      unitTest.cpp
+			Changed:                0
+			Unchanged:              1
 		Removed Extension:        ./unitTest
+			Changed:                1
+			Unchanged:              0
 		Added Extension [tmp]:    ./unitTest.tmp
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    ./unitTest.tmp.jpg
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    ./unitTest.tmp.jpg
+			Changed:                0
+			Unchanged:              1
 		Set Extension   [gif]:    ./unitTest.tmp.gif
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    ./unitTest.tmp.gif.jpg
+			Changed:                1
+			Unchanged:              0
 		Removed Extension:        ./unitTest.tmp.gif
+			Changed:                1
+			Unchanged:              0
 
 	Testing Expanded [unitTest.cpp]
 		Name:              unitTest.cpp
@@ -248,18 +410,36 @@ Running Full Test on [./unitTest.cpp]
 		Path:              .
 		Original path      .
 		Extension:         cpp
+		Comparison (==):   1
+		Comparison (!=):   0
 		Expanded           ./unitTest.cpp
 		Exists             1
 
 	Testing Extension change [./unitTest.cpp]
 		Before modification:      ./unitTest.cpp
+			Changed:                0
+			Unchanged:              1
 		Removed Extension:        ./unitTest
+			Changed:                1
+			Unchanged:              0
 		Added Extension [tmp]:    ./unitTest.tmp
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    ./unitTest.tmp.jpg
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    ./unitTest.tmp.jpg
+			Changed:                0
+			Unchanged:              1
 		Set Extension   [gif]:    ./unitTest.tmp.gif
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    ./unitTest.tmp.gif.jpg
+			Changed:                1
+			Unchanged:              0
 		Removed Extension:        ./unitTest.tmp.gif
+			Changed:                1
+			Unchanged:              0
 
 	Testing Expanded [./unitTest.cpp]
 		Name:              unitTest.cpp
@@ -275,18 +455,36 @@ Running Full Test on [Makefile]
 		Path:              .
 		Original path      .
 		Extension:         
+		Comparison (==):   1
+		Comparison (!=):   0
 		Expanded           Makefile
 		Exists             1
 
 	Testing Extension change [Makefile]
 		Before modification:      Makefile
+			Changed:                0
+			Unchanged:              1
 		Removed Extension:        ./Makefile
+			Changed:                0
+			Unchanged:              1
 		Added Extension [tmp]:    ./Makefile.tmp
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    ./Makefile.tmp.jpg
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    ./Makefile.tmp.jpg
+			Changed:                0
+			Unchanged:              1
 		Set Extension   [gif]:    ./Makefile.tmp.gif
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    ./Makefile.tmp.gif.jpg
+			Changed:                1
+			Unchanged:              0
 		Removed Extension:        ./Makefile.tmp.gif
+			Changed:                1
+			Unchanged:              0
 
 	Testing Expanded [Makefile]
 		Name:              Makefile
@@ -302,18 +500,36 @@ Running Full Test on [.cub]
 		Path:              .
 		Original path      .
 		Extension:         cub
+		Comparison (==):   1
+		Comparison (!=):   0
 		Expanded           .cub
 		Exists             0
 
 	Testing Extension change [.cub]
 		Before modification:      .cub
+			Changed:                0
+			Unchanged:              1
 		Removed Extension:        ./
+			Changed:                1
+			Unchanged:              0
 		Added Extension [tmp]:    ./.tmp
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    ./.tmp.jpg
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    ./.tmp.jpg
+			Changed:                0
+			Unchanged:              1
 		Set Extension   [gif]:    ./.tmp.gif
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    ./.tmp.gif.jpg
+			Changed:                1
+			Unchanged:              0
 		Removed Extension:        ./.tmp.gif
+			Changed:                1
+			Unchanged:              0
 
 	Testing Expanded [.cub]
 		Name:              .cub
@@ -329,18 +545,36 @@ Running Full Test on [/$TEMPORARY/unitTest.cpp]
 		Path:              /.
 		Original path      /$TEMPORARY
 		Extension:         cpp
+		Comparison (==):   1
+		Comparison (!=):   0
 		Expanded           /./unitTest.cpp
 		Exists             0
 
 	Testing Extension change [/$TEMPORARY/unitTest.cpp]
 		Before modification:      /./unitTest.cpp
+			Changed:                0
+			Unchanged:              1
 		Removed Extension:        /./unitTest
+			Changed:                1
+			Unchanged:              0
 		Added Extension [tmp]:    /./unitTest.tmp
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /./unitTest.tmp.jpg
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /./unitTest.tmp.jpg
+			Changed:                0
+			Unchanged:              1
 		Set Extension   [gif]:    /./unitTest.tmp.gif
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /./unitTest.tmp.gif.jpg
+			Changed:                1
+			Unchanged:              0
 		Removed Extension:        /./unitTest.tmp.gif
+			Changed:                1
+			Unchanged:              0
 
 	Testing Expanded [/$TEMPORARY/unitTest.cpp]
 		Name:              unitTest.cpp
@@ -355,17 +589,35 @@ Running Safe Test on [$base/testData/isisTruth.cub]
 		Base Name:         isisTruth
 		Original path      $base/testData
 		Extension:         cub
+		Comparison (==):   1
+		Comparison (!=):   0
 		Exists             1
 
 	Testing Extension change [$base/testData/isisTruth.cub]
 		Before modification:      $base/testData/isisTruth.cub
+			Changed:                0
+			Unchanged:              1
 		Removed Extension:        $base/testData/isisTruth
+			Changed:                1
+			Unchanged:              0
 		Added Extension [tmp]:    $base/testData/isisTruth.tmp
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    $base/testData/isisTruth.tmp.jpg
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    $base/testData/isisTruth.tmp.jpg
+			Changed:                0
+			Unchanged:              1
 		Set Extension   [gif]:    $base/testData/isisTruth.tmp.gif
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    $base/testData/isisTruth.tmp.gif.jpg
+			Changed:                1
+			Unchanged:              0
 		Removed Extension:        $base/testData/isisTruth.tmp.gif
+			Changed:                1
+			Unchanged:              0
 
 Running Safe Test on [${base}/testData/isisTruth.cub]
 	Testing Basics [${base}/testData/isisTruth.cub]
@@ -373,17 +625,35 @@ Running Safe Test on [${base}/testData/isisTruth.cub]
 		Base Name:         isisTruth
 		Original path      ${base}/testData
 		Extension:         cub
+		Comparison (==):   1
+		Comparison (!=):   0
 		Exists             1
 
 	Testing Extension change [${base}/testData/isisTruth.cub]
 		Before modification:      ${base}/testData/isisTruth.cub
+			Changed:                0
+			Unchanged:              1
 		Removed Extension:        ${base}/testData/isisTruth
+			Changed:                1
+			Unchanged:              0
 		Added Extension [tmp]:    ${base}/testData/isisTruth.tmp
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    ${base}/testData/isisTruth.tmp.jpg
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    ${base}/testData/isisTruth.tmp.jpg
+			Changed:                0
+			Unchanged:              1
 		Set Extension   [gif]:    ${base}/testData/isisTruth.tmp.gif
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    ${base}/testData/isisTruth.tmp.gif.jpg
+			Changed:                1
+			Unchanged:              0
 		Removed Extension:        ${base}/testData/isisTruth.tmp.gif
+			Changed:                1
+			Unchanged:              0
 
 Running Safe Test on [$ISISROOT/src/Makefile]
 	Testing Basics [$ISISROOT/src/Makefile]
@@ -391,17 +661,35 @@ Running Safe Test on [$ISISROOT/src/Makefile]
 		Base Name:         Makefile
 		Original path      $ISISROOT/src
 		Extension:         
+		Comparison (==):   1
+		Comparison (!=):   0
 		Exists             1
 
 	Testing Extension change [$ISISROOT/src/Makefile]
 		Before modification:      $ISISROOT/src/Makefile
+			Changed:                0
+			Unchanged:              1
 		Removed Extension:        $ISISROOT/src/Makefile
+			Changed:                0
+			Unchanged:              1
 		Added Extension [tmp]:    $ISISROOT/src/Makefile.tmp
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    $ISISROOT/src/Makefile.tmp.jpg
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    $ISISROOT/src/Makefile.tmp.jpg
+			Changed:                0
+			Unchanged:              1
 		Set Extension   [gif]:    $ISISROOT/src/Makefile.tmp.gif
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    $ISISROOT/src/Makefile.tmp.gif.jpg
+			Changed:                1
+			Unchanged:              0
 		Removed Extension:        $ISISROOT/src/Makefile.tmp.gif
+			Changed:                1
+			Unchanged:              0
 
 Running Safe Test on [$ISISROOT/src/Makefile.elifekaM]
 	Testing Basics [$ISISROOT/src/Makefile.elifekaM]
@@ -409,17 +697,35 @@ Running Safe Test on [$ISISROOT/src/Makefile.elifekaM]
 		Base Name:         Makefile
 		Original path      $ISISROOT/src
 		Extension:         elifekaM
+		Comparison (==):   1
+		Comparison (!=):   0
 		Exists             0
 
 	Testing Extension change [$ISISROOT/src/Makefile.elifekaM]
 		Before modification:      $ISISROOT/src/Makefile.elifekaM
+			Changed:                0
+			Unchanged:              1
 		Removed Extension:        $ISISROOT/src/Makefile
+			Changed:                1
+			Unchanged:              0
 		Added Extension [tmp]:    $ISISROOT/src/Makefile.tmp
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    $ISISROOT/src/Makefile.tmp.jpg
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    $ISISROOT/src/Makefile.tmp.jpg
+			Changed:                0
+			Unchanged:              1
 		Set Extension   [gif]:    $ISISROOT/src/Makefile.tmp.gif
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    $ISISROOT/src/Makefile.tmp.gif.jpg
+			Changed:                1
+			Unchanged:              0
 		Removed Extension:        $ISISROOT/src/Makefile.tmp.gif
+			Changed:                1
+			Unchanged:              0
 
 Running Safe Test on [/$TEMPORARY/unitTest.cpp]
 	Testing Basics [/$TEMPORARY/unitTest.cpp]
@@ -427,17 +733,35 @@ Running Safe Test on [/$TEMPORARY/unitTest.cpp]
 		Base Name:         unitTest
 		Original path      /$TEMPORARY
 		Extension:         cpp
+		Comparison (==):   1
+		Comparison (!=):   0
 		Exists             0
 
 	Testing Extension change [/$TEMPORARY/unitTest.cpp]
 		Before modification:      /$TEMPORARY/unitTest.cpp
+			Changed:                0
+			Unchanged:              1
 		Removed Extension:        /$TEMPORARY/unitTest
+			Changed:                1
+			Unchanged:              0
 		Added Extension [tmp]:    /$TEMPORARY/unitTest.tmp
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /$TEMPORARY/unitTest.tmp.jpg
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /$TEMPORARY/unitTest.tmp.jpg
+			Changed:                0
+			Unchanged:              1
 		Set Extension   [gif]:    /$TEMPORARY/unitTest.tmp.gif
+			Changed:                1
+			Unchanged:              0
 		Added Extension [jpg]:    /$TEMPORARY/unitTest.tmp.gif.jpg
+			Changed:                1
+			Unchanged:              0
 		Removed Extension:        /$TEMPORARY/unitTest.tmp.gif
+			Changed:                1
+			Unchanged:              0
 
 Testing temporary file name placement
 	Input name and extension : $TEMPORARY/tttt.tmp
@@ -464,48 +788,58 @@ Testing Versioning Missing Problems
 
 Testing Numerical-Only Versioning
 	Testing Versioning Methods [tttt??????]
-		Highest Version Name:       tttt000001
-		Highest Version Orig:       ./tttt000001
-		Highest Version Orig Path:  .
-		New Version Name:           tttt000002
-		New Version Orig:           ./tttt000002
-		New Version Orig Path:      .
+		Highest Version Name:          tttt000001
+		Highest Version Orig:          ./tttt000001
+		Highest Version Orig Path:     .
+		High version changed FileName: 1
+		New Version Name:              tttt000002
+		New Version Orig:              ./tttt000002
+		New Version Orig Path:         .
+		New version changed FileName: 1
 
 	Testing Versioning Methods [tttt??????.tmp]
-		Highest Version Name:       tttt000008.tmp
-		Highest Version Orig:       ./tttt000008.tmp
-		Highest Version Orig Path:  .
-		New Version Name:           tttt000009.tmp
-		New Version Orig:           ./tttt000009.tmp
-		New Version Orig Path:      .
+		Highest Version Name:          tttt000008.tmp
+		Highest Version Orig:          ./tttt000008.tmp
+		Highest Version Orig Path:     .
+		High version changed FileName: 1
+		New Version Name:              tttt000009.tmp
+		New Version Orig:              ./tttt000009.tmp
+		New Version Orig Path:         .
+		New version changed FileName: 1
 
 	Testing Versioning Methods [tttt_?.tmp]
-		Highest Version Name:       tttt_0.tmp
-		Highest Version Orig:       ./tttt_0.tmp
-		Highest Version Orig Path:  .
-		New Version Name:           tttt_1.tmp
-		New Version Orig:           ./tttt_1.tmp
-		New Version Orig Path:      .
+		Highest Version Name:          tttt_0.tmp
+		Highest Version Orig:          ./tttt_0.tmp
+		Highest Version Orig Path:     .
+		High version changed FileName: 1
+		New Version Name:              tttt_1.tmp
+		New Version Orig:              ./tttt_1.tmp
+		New Version Orig Path:         .
+		New version changed FileName: 1
 
 	Testing Versioning Methods [??tttt]
 		Highest Version Failed:     **ERROR** No existing files found with a numerial version matching [??tttt] in [.].
-		New Version Name:           01tttt
-		New Version Orig:           ./01tttt
-		New Version Orig Path:      .
+		New Version Name:              01tttt
+		New Version Orig:              ./01tttt
+		New Version Orig Path:         .
+		New version changed FileName: 1
 
 	Testing Versioning Methods [?tttt000008.tmp]
-		Highest Version Name:       2tttt000008.tmp
-		Highest Version Orig:       ./2tttt000008.tmp
-		Highest Version Orig Path:  .
-		New Version Name:           3tttt000008.tmp
-		New Version Orig:           ./3tttt000008.tmp
-		New Version Orig Path:      .
+		Highest Version Name:          2tttt000008.tmp
+		Highest Version Orig:          ./2tttt000008.tmp
+		Highest Version Orig Path:     .
+		High version changed FileName: 1
+		New Version Name:              3tttt000008.tmp
+		New Version Orig:              ./3tttt000008.tmp
+		New Version Orig Path:         .
+		New version changed FileName: 1
 
 	Testing Versioning Methods [junk?]
 		Highest Version Failed:     **ERROR** No existing files found with a numerial version matching [junk?] in [.].
-		New Version Name:           junk1
-		New Version Orig:           ./junk1
-		New Version Orig Path:      .
+		New Version Name:              junk1
+		New Version Orig:              ./junk1
+		New Version Orig Path:         .
+		New version changed FileName: 1
 
 	Testing Versioning Methods [??tttt??]
 		Highest Version Failed:     **ERROR** Only one numerical version sequence is allowed in a filename; there are multiple in [??tttt??].
@@ -513,22 +847,25 @@ Testing Numerical-Only Versioning
 
 Testing Date-Only Versioning
 	Testing Versioning Methods [tttt{ddMMMyyyy}.tmp]
-		Highest Version Name:       tttt14Apr2010.tmp
-		Highest Version Orig:       ./tttt14Apr2010.tmp
-		Highest Version Orig Path:  .
+		Highest Version Name:          tttt14Apr2010.tmp
+		Highest Version Orig:          ./tttt14Apr2010.tmp
+		Highest Version Orig Path:     .
+		High version changed FileName: 1
 
 	Testing Versioning Methods [tt{MMM}tt{dd}yy{yy}.tmp]
-		Highest Version Name:       ttFebtt04yy01.tmp
-		Highest Version Orig:       ./ttFebtt04yy01.tmp
-		Highest Version Orig Path:  .
+		Highest Version Name:          ttFebtt04yy01.tmp
+		Highest Version Orig:          ./ttFebtt04yy01.tmp
+		Highest Version Orig Path:     .
+		High version changed FileName: 1
 
 	Testing Versioning Methods [tt{d}tt{MMM}.tmp]
 		Highest Version Failed:     **ERROR** No existing files found with a date version matching [tt{d}tt{MMM}.tmp] in [.].
 
 	Testing Versioning Methods [tt{d}tt{MMMM}.tmp]
-		Highest Version Name:       tt2ttDecember.tmp
-		Highest Version Orig:       ./tt2ttDecember.tmp
-		Highest Version Orig Path:  .
+		Highest Version Name:          tt2ttDecember.tmp
+		Highest Version Orig:          ./tt2ttDecember.tmp
+		Highest Version Orig Path:     .
+		High version changed FileName: 1
 
 	Testing Versioning Methods [tt{dd}.tmp]
 		Highest Version Failed:     **ERROR** No existing files found with a date version matching [tt{dd}.tmp] in [.].
@@ -542,9 +879,10 @@ Testing Date-Only Versioning
 
 Testing Date and Numerical Versioning Combined
 	Testing Versioning Methods [$TEMPORARY/{MMM}-{dd}-{yy}_v???.tmp]
-		Highest Version Name:       Apr-22-99_v004.tmp
-		Highest Version Orig:       $TEMPORARY/Apr-22-99_v004.tmp
-		Highest Version Orig Path:  $TEMPORARY
+		Highest Version Name:          Apr-22-99_v004.tmp
+		Highest Version Orig:          $TEMPORARY/Apr-22-99_v004.tmp
+		Highest Version Orig Path:     $TEMPORARY
+		High version changed FileName: 1
 
 Verifying NewVersion for file tttt{dd}tt{yyyy}tt{MMM}.tmp is today
 	Made today's filename successfully? 1

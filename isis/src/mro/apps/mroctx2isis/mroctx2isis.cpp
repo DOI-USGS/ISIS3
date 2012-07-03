@@ -148,9 +148,9 @@ void IsisMain() {
 
   // Set the output bit type to Real
   CubeAttributeOutput &outAtt = ui.GetOutputAttribute("TO");
-  outAtt.PixelType(Isis::SignedWord);
-  outAtt.Minimum((double)VALID_MIN2);
-  outAtt.Maximum((double)VALID_MAX2);
+  outAtt.setPixelType(Isis::SignedWord);
+  outAtt.setMinimum((double)VALID_MIN2);
+  outAtt.setMaximum((double)VALID_MAX2);
   Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), outAtt);
 
   // Translate the labels

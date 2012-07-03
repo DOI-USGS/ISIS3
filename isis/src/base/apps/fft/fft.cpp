@@ -55,7 +55,7 @@ void IsisMain() {
 
   // The output cube with no attributes and real pixel type
   Isis::CubeAttributeOutput cao;
-  cao.PixelType(Isis::Real);
+  cao.setPixelType(Isis::Real);
 
   sProc.SetOutputCube(tmpMagFileName, cao, numSamples, numLines, numBands);
   sProc.SetOutputCube(tmpPhaseFileName, cao, numSamples, numLines, numBands);

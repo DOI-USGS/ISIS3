@@ -105,6 +105,8 @@ namespace Isis {
    *                           functionality to file name related functionality.
    *                           Fixed temporary file naming to guarantee unique,
    *                           unpredictable (safe) names.
+   *   @history 2012-06-04 Steven Lambright and Stuart Sides - Added operator!= and improved unit
+   *                           test to include tests of operator== and operator!=. Fixes #903.
    */
   class FileName {
     public:
@@ -151,6 +153,7 @@ namespace Isis {
       iString toString() const;
       FileName &operator=(const FileName &rhs);
       bool operator==(const FileName &rhs);
+      bool operator!=(const FileName &rhs);
 
     private:
       QDate highestVersionDate() const;

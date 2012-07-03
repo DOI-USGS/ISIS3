@@ -197,12 +197,14 @@ void TestVersioning(iString prefix, iString name, bool containsDate) {
     FileName test(name);
 
     try {
-      cout << prefix << "\tHighest Version Name:       "
+      cout << prefix << "\tHighest Version Name:          "
            << test.highestVersion().name() << endl;
-      cout << prefix << "\tHighest Version Orig:       "
+      cout << prefix << "\tHighest Version Orig:          "
            << test.highestVersion().original() << endl;
-      cout << prefix << "\tHighest Version Orig Path:  "
+      cout << prefix << "\tHighest Version Orig Path:     "
            << test.highestVersion().originalPath() << endl;
+      cout << prefix << "\tHigh version changed FileName: "
+           << (test != test.highestVersion()) << endl;
     }
     catch (IException &e) {
       cout << prefix << "\tHighest Version Failed:     " << e.toString() << endl;
@@ -210,12 +212,14 @@ void TestVersioning(iString prefix, iString name, bool containsDate) {
 
     try {
       if (!containsDate) {
-        cout << prefix << "\tNew Version Name:           "
+        cout << prefix << "\tNew Version Name:              "
              << test.newVersion().name() << endl;
-        cout << prefix << "\tNew Version Orig:           "
+        cout << prefix << "\tNew Version Orig:              "
              << test.newVersion().original() << endl;
-        cout << prefix << "\tNew Version Orig Path:      "
+        cout << prefix << "\tNew Version Orig Path:         "
              << test.newVersion().originalPath() << endl;
+        cout << prefix << "\tNew version changed FileName: "
+             << (test != test.newVersion()) << endl;
       }
     }
     catch (IException &e) {
@@ -251,6 +255,10 @@ void TestGenericAccessors(iString prefix, iString name, bool showExpandedValues)
 
   cout << prefix << "\tExtension:         " << test.extension() << endl;
 
+  cout << prefix << "\tComparison (==):   " << (a == c) << endl;
+
+  cout << prefix << "\tComparison (!=):   " << (a != c) << endl;
+
   if (showExpandedValues)
     cout << prefix << "\tExpanded           " << test.expanded() << endl;
 
@@ -271,25 +279,50 @@ void TestExtensionChanges(iString prefix, iString name, bool showExpandedValues)
 
   iString (FileName::*toStringMethod)() const = &FileName::toString;
 
+  FileName beforeLastChange = test;
+
   if (!showExpandedValues)
     toStringMethod = &FileName::original;
 
   cout << prefix << "Testing Extension change [" << name << "]" << endl;
   cout << prefix << "\tBefore modification:      " << (test.*toStringMethod)() << endl;
+  cout << prefix << "\t\tChanged:                " << (beforeLastChange != test) << endl;
+  cout << prefix << "\t\tUnchanged:              " << (beforeLastChange == test) << endl;
+  beforeLastChange = test;
   test = test.removeExtension();
   cout << prefix << "\tRemoved Extension:        " << (test.*toStringMethod)() << endl;
+  cout << prefix << "\t\tChanged:                " << (beforeLastChange != test) << endl;
+  cout << prefix << "\t\tUnchanged:              " << (beforeLastChange == test) << endl;
+  beforeLastChange = test;
   test = test.addExtension("tmp");
   cout << prefix << "\tAdded Extension [tmp]:    " << (test.*toStringMethod)() << endl;
+  cout << prefix << "\t\tChanged:                " << (beforeLastChange != test) << endl;
+  cout << prefix << "\t\tUnchanged:              " << (beforeLastChange == test) << endl;
+  beforeLastChange = test;
   test = test.addExtension("jpg");
   cout << prefix << "\tAdded Extension [jpg]:    " << (test.*toStringMethod)() << endl;
+  cout << prefix << "\t\tChanged:                " << (beforeLastChange != test) << endl;
+  cout << prefix << "\t\tUnchanged:              " << (beforeLastChange == test) << endl;
+  beforeLastChange = test;
   test = test.addExtension("jpg");
   cout << prefix << "\tAdded Extension [jpg]:    " << (test.*toStringMethod)() << endl;
+  cout << prefix << "\t\tChanged:                " << (beforeLastChange != test) << endl;
+  cout << prefix << "\t\tUnchanged:              " << (beforeLastChange == test) << endl;
+  beforeLastChange = test;
   test = test.setExtension("gif");
   cout << prefix << "\tSet Extension   [gif]:    " << (test.*toStringMethod)() << endl;
+  cout << prefix << "\t\tChanged:                " << (beforeLastChange != test) << endl;
+  cout << prefix << "\t\tUnchanged:              " << (beforeLastChange == test) << endl;
+  beforeLastChange = test;
   test = test.addExtension("jpg");
   cout << prefix << "\tAdded Extension [jpg]:    " << (test.*toStringMethod)() << endl;
+  cout << prefix << "\t\tChanged:                " << (beforeLastChange != test) << endl;
+  cout << prefix << "\t\tUnchanged:              " << (beforeLastChange == test) << endl;
+  beforeLastChange = test;
   test = test.removeExtension();
   cout << prefix << "\tRemoved Extension:        " << (test.*toStringMethod)() << endl;
+  cout << prefix << "\t\tChanged:                " << (beforeLastChange != test) << endl;
+  cout << prefix << "\t\tUnchanged:              " << (beforeLastChange == test) << endl;
   cout << endl;
 }
 

@@ -26,7 +26,7 @@ void IsisMain() {
 
   // The output cube with no attributes and real pixel type
   Isis::CubeAttributeOutput cao;
-  cao.PixelType(Isis::Real);
+  cao.setPixelType(Isis::Real);
 
   p.SetOutputCube(tmpFileName, cao, icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
 

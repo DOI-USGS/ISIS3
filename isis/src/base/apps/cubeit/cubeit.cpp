@@ -35,7 +35,7 @@ void IsisMain() {
     for(int i = 0; i < cubeList.size(); i++) {
       Cube cube;
       CubeAttributeInput inatt(cubeList[i].toString());
-      vector<string> bands = inatt.Bands();
+      vector<string> bands = inatt.bands();
       cube.setVirtualBands(bands);
       cube.open(cubeList[i].toString());
       if(i == 0) {

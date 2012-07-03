@@ -155,9 +155,7 @@ void IsisMain() {
   CubeAttributeOutput cao;
 
   // Can we do a regular label? Didn't work on 12-15-2006
-  cao.Label(Isis::DetachedLabel);
-  cao.Set("PropagateRange");
-  cao.Set("PropagatePixelType");
+  cao.setLabelAttachment(Isis::DetachedLabel);
 
   // Determine the output image size from
   //   1) the idealInstrument pvl if there or

@@ -5,6 +5,7 @@
 #include "IException.h"
 #include "Brick.h"
 #include "Cube.h"
+#include "CubeAttribute.h"
 #include "FileName.h"
 #include "LineManager.h"
 #include "Pvl.h"
@@ -31,7 +32,7 @@ int main(int argc, char *argv[]) {
     // Test create and write methods
     cerr << "Creating 32-bit cube ... " << endl;
     out.setDimensions(150, 200, 2);
-    out.create("IsisCube_01");
+    out.create("IsisCube_00");
     Report(out);
 
     cerr << "Write cube ... " << endl;
@@ -46,6 +47,8 @@ int main(int argc, char *argv[]) {
       out.write(line);
     }
 
+    // Copy returns the resulting Cube, we don't care about it (but we need it to flush) so delete
+    delete out.copy("IsisCube_01", CubeAttributeOutput());
     out.close();
 
     // Test the open and read methods
@@ -200,7 +203,7 @@ int main(int argc, char *argv[]) {
     try {
       in.getHistogram(-1);
     }
-    catch(IException &e) {
+    catch (IException &e) {
       e.print();
     }
 
@@ -230,7 +233,7 @@ int main(int argc, char *argv[]) {
     try {
       in.getStatistics(-1);
     }
-    catch(IException &e) {
+    catch (IException &e) {
       e.print();
     }
 
@@ -432,21 +435,21 @@ int main(int argc, char *argv[]) {
     try {
       in.open("blah");
     }
-    catch(IException &e) {
+    catch (IException &e) {
       e.print();
     }
 
     try {
       in.create("blah");
     }
-    catch(IException &e) {
+    catch (IException &e) {
       e.print();
     }
 
     try {
       in.write(inLine3);
     }
-    catch(IException &e) {
+    catch (IException &e) {
       e.print();
     }
 
@@ -454,21 +457,21 @@ int main(int argc, char *argv[]) {
       Cube in;
       in.open("blah");
     }
-    catch(IException &e) {
+    catch (IException &e) {
       e.print();
     }
 
     try {
       in.getPhysicalBand(2);
     }
-    catch(IException &e) {
+    catch (IException &e) {
       e.print();
     }
 
     try {
       in.getPhysicalBand(0);
     }
-    catch(IException &e) {
+    catch (IException &e) {
       e.print();
     }
 
@@ -476,7 +479,7 @@ int main(int argc, char *argv[]) {
       Cube in;
       in.read(inLine3);
     }
-    catch(IException &e) {
+    catch (IException &e) {
       e.print();
     }
 
@@ -484,7 +487,7 @@ int main(int argc, char *argv[]) {
       Cube in;
       in.write(inLine3);
     }
-    catch(IException &e) {
+    catch (IException &e) {
       e.print();
     }
 
@@ -493,7 +496,7 @@ int main(int argc, char *argv[]) {
       out.create("IsisCube_04");
       out.close();
     }
-    catch(IException &e) {
+    catch (IException &e) {
       e.print();
     }
 
@@ -504,7 +507,7 @@ int main(int argc, char *argv[]) {
       out.create("IsisCube_04");
       out.close();
     }
-    catch(IException &e) {
+    catch (IException &e) {
       e.print();
     }
 
@@ -514,35 +517,35 @@ int main(int argc, char *argv[]) {
       out.create("IsisCube_05");
       out.close();
     }
-    catch(IException &e) {
+    catch (IException &e) {
       e.print();
     }
     try {
       Cube in;
       in.open("IsisCube_01", "a");
     }
-    catch(IException &e) {
+    catch (IException &e) {
       e.print();
     }
     try {
       Cube in;
       in.setDimensions(0, 0, 0);
     }
-    catch(IException &e) {
+    catch (IException &e) {
       e.print();
     }
     try {
       Cube in;
       in.setDimensions(1, 0, 0);
     }
-    catch(IException &e) {
+    catch (IException &e) {
       e.print();
     }
     try {
       Cube in;
       in.setDimensions(1, 1, 0);
     }
-    catch(IException &e) {
+    catch (IException &e) {
       e.print();
     }
 
@@ -550,19 +553,197 @@ int main(int argc, char *argv[]) {
     try {
       in4.open("$base/testData/isisTruth.cub");
     }
-    catch(IException &e) {
+    catch (IException &e) {
       e.print();
     }
+    
     try {
       in4.reopen("rw");
     }
-    catch(IException &e) {
+    catch (IException &e) {
       e.print();
     }
 
+    in4.setPixelType(None);
+    try {
+      in4.setDimensions(1, 1, 1);
+      in4.create("shouldntExist.cub");
+    }
+    catch (IException &e) {
+      e.print();
+    }
   }
-  catch(IException &e) {
+  catch (IException &e) {
     e.print();
+  }
+
+  cerr << endl << "Test creating an ecub" << endl;
+  {
+    Cube externalData;
+    externalData.setExternalDnData("$base/testData/isisTruth.cub");
+    externalData.create("isisTruth_external.ecub");
+    externalData.putGroup(PvlGroup("TestGroup"));
+    cerr << *externalData.getLabel() << endl;
+
+    Brick readBrick(3, 3, 2, externalData.getPixelType());
+    readBrick.SetBasePosition(1, 1, 1);
+    externalData.read(readBrick);
+    for (int index = 0; index < readBrick.size(); index++) {
+      if (readBrick[index] == Null) {
+        cerr << "N ";
+      }
+      else {
+        cerr << readBrick[index] << " ";
+      }
+    }
+    cerr << endl;
+
+    try {
+      externalData.write(readBrick);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+  }
+
+  cerr << endl << "Test creating an ecub from an ecub" << endl;
+  {
+    Cube externalData;
+    externalData.setExternalDnData("isisTruth_external.ecub");
+    externalData.create("isisTruth_external2.ecub");
+    cerr << *externalData.getLabel() << endl;
+
+    Brick readBrick(3, 3, 2, externalData.getPixelType());
+    readBrick.SetBasePosition(1, 1, 1);
+    externalData.read(readBrick);
+    for (int index = 0; index < readBrick.size(); index++) {
+      if (readBrick[index] == Null) {
+        cerr << "N ";
+      }
+      else {
+        cerr << readBrick[index] << " ";
+      }
+    }
+    cerr << endl;
+
+    try {
+      externalData.write(readBrick);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+  }
+
+  cerr << endl << "Test reading an ecub" << endl;
+  {
+    Cube externalData;
+    externalData.open("isisTruth_external");
+    externalData.putGroup(PvlGroup("TestGroup2"));
+    cerr << *externalData.getLabel() << endl;
+
+    Brick readBrick(3, 3, 2, externalData.getPixelType());
+    readBrick.SetBasePosition(1, 1, 1);
+    externalData.read(readBrick);
+    for (int index = 0; index < readBrick.size(); index++) {
+      if (readBrick[index] == Null) {
+        cerr << "N ";
+      }
+      else {
+        cerr << readBrick[index] << " ";
+      }
+    }
+    cerr << endl;
+
+    try {
+      externalData.write(readBrick);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+  }
+
+  cerr << endl << "Test reading an ecub that points to another ecub" << endl;
+  {
+    Cube externalData;
+    externalData.open("isisTruth_external2");
+    cerr << *externalData.getLabel() << endl;
+
+    Brick readBrick(3, 3, 2, externalData.getPixelType());
+    readBrick.SetBasePosition(1, 1, 1);
+    externalData.read(readBrick);
+    for (int index = 0; index < readBrick.size(); index++) {
+      if (readBrick[index] == Null) {
+        cerr << "N ";
+      }
+      else {
+        cerr << readBrick[index] << " ";
+      }
+    }
+    cerr << endl;
+
+    try {
+      externalData.write(readBrick);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+  }
+
+  cerr << endl << "Test reading an ecub that points to detached lbl" << endl;
+  {
+    Cube externalData;
+    externalData.setExternalDnData("IsisCube_02.lbl");
+    externalData.create("isisTruth_external3.ecub");
+    cerr << *externalData.getLabel() << endl;
+
+    Brick readBrick(3, 3, 2, externalData.getPixelType());
+    readBrick.SetBasePosition(1, 1, 1);
+    externalData.read(readBrick);
+    for (int index = 0; index < readBrick.size(); index++) {
+      if (readBrick[index] == Null) {
+        cerr << "N ";
+      }
+      else {
+        cerr << readBrick[index] << " ";
+      }
+    }
+    cerr << endl;
+
+    try {
+      externalData.write(readBrick);
+    }
+    catch (IException &e) {
+      e.print();
+    }
+  }
+
+  cerr << endl << "Test copying an ecub that points to detached lbl" << endl;
+  {
+    Cube externalData;
+    externalData.open("isisTruth_external3.ecub");
+    Cube *copiedCube = externalData.copy("isisTruth_external3.copy.ecub",
+                                         CubeAttributeOutput("+External"));
+    cerr << *copiedCube->getLabel() << endl;
+
+    Brick readBrick(3, 3, 2, copiedCube->getPixelType());
+    readBrick.SetBasePosition(1, 1, 1);
+    copiedCube->read(readBrick);
+    for (int index = 0; index < readBrick.size(); index++) {
+      if (readBrick[index] == Null) {
+        cerr << "N ";
+      }
+      else {
+        cerr << readBrick[index] << " ";
+      }
+    }
+    cerr << endl;
+
+    try {
+      copiedCube->write(readBrick);
+    }
+    catch (IException &e) {
+      e.print();
+    }
   }
 
   remove("IsisCube_01.cub");
@@ -572,6 +753,8 @@ int main(int argc, char *argv[]) {
   remove("IsisCube_04.cub");
   remove("IsisCube_05.cub");
   remove("IsisCube_boundary.cub");
+//   remove("isisTruth_external.ecub");
+
   return 0;
 }
 
@@ -593,7 +776,7 @@ void Report(Cube &c) {
     cerr.flush();
     cerr << c.isReadOnly();
   }
-  catch(IException &e) {
+  catch (IException &e) {
     cerr << "N/A";
   }
 
@@ -604,7 +787,7 @@ void Report(Cube &c) {
     cerr.flush();
     cerr << c.isReadWrite();
   }
-  catch(IException &e) {
+  catch (IException &e) {
     cerr << "N/A";
   }
 

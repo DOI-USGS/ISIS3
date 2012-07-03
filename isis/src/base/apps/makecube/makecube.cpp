@@ -73,21 +73,21 @@ void IsisMain() {
   CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
   if(IsValidPixel(value)) {
     if(value == 0.0) {
-      att.Minimum(value);
-      att.Maximum(value + 1.0);
+      att.setMinimum(value);
+      att.setMaximum(value + 1.0);
     }
     if(value < 0.0) {
-      att.Minimum(value);
-      att.Maximum(-value);
+      att.setMinimum(value);
+      att.setMaximum(-value);
     }
     else {
-      att.Minimum(-value);
-      att.Maximum(value);
+      att.setMinimum(-value);
+      att.setMaximum(value);
     }
   }
   else {
-    att.Minimum(0.0);
-    att.Maximum(1.0);
+    att.setMinimum(0.0);
+    att.setMaximum(1.0);
   }
 
   // Get the size of the cube and create the cube

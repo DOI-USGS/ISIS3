@@ -436,7 +436,7 @@ namespace Isis {
     onl = (int)ceil(inl * dScale);
 
     CubeAttributeInput cai(icube->getFileName());
-    vector<string> bands = cai.Bands();
+    vector<string> bands = cai.bands();
     int inb = bands.size();
 
     if(inb == 0) {
@@ -517,18 +517,18 @@ namespace Isis {
     //Propagate all labels, tables, blobs, etc from the input to output cube
     try {
       ocube->setDimensions(piNumSamples, piNumLines, piNumBands);
-      ocube->setByteOrder(outAtt.ByteOrder());
-      ocube->setFormat(outAtt.FileFormat());
-      ocube->setLabelsAttached(outAtt.AttachedLabel());
+      ocube->setByteOrder(outAtt.byteOrder());
+      ocube->setFormat(outAtt.fileFormat());
+      ocube->setLabelsAttached(outAtt.labelAttachment() == AttachedLabel);
 
-      if(outAtt.PropagatePixelType()) {
+      if(outAtt.propagatePixelType()) {
         ocube->setPixelType(icube->getPixelType());
       }
       else {
-        ocube->setPixelType(outAtt.PixelType());
+        ocube->setPixelType(outAtt.pixelType());
       }
 
-      if(outAtt.PropagateMinimumMaximum()) {
+      if(outAtt.propagateMinimumMaximum()) {
         if(ocube->getPixelType() == Real) {
           ocube->setBaseMultiplier(0.0, 1.0);
         }
@@ -552,7 +552,7 @@ namespace Isis {
       }
       else {
         // Not propagating so either the user entered or the programmer did
-        ocube->setMinMax(outAtt.Minimum(), outAtt.Maximum());
+        ocube->setMinMax(outAtt.minimum(), outAtt.maximum());
       }
 
       int needLabBytes = icube->getLabelSize(true) + (1024 * 6);

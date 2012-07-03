@@ -32,7 +32,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   string from = ui.GetAsString("FROM");
   CubeAttributeInput inAtt(from);
-  cube.setVirtualBands(inAtt.Bands());
+  cube.setVirtualBands(inAtt.bands());
   from = ui.GetFileName("FROM");
   cube.open(from);
 

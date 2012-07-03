@@ -97,7 +97,7 @@ void IsisMain() {
   // Open the first cube.  It is the left hand image.
   Cube lhImage;
   CubeAttributeInput &attLeft = ui.GetInputAttribute("FROM");
-  vector<string> bandLeft = attLeft.Bands();
+  vector<string> bandLeft = attLeft.bands();
   lhImage.setVirtualBands(bandLeft);
   lhImage.open(ui.GetFileName("FROM"),"r");
 
@@ -105,7 +105,7 @@ void IsisMain() {
   // first to this one by attempting to compute a sample/line offsets
   Cube rhImage;
   CubeAttributeInput &attRight = ui.GetInputAttribute("MATCH");
-  vector<string> bandRight = attRight.Bands();
+  vector<string> bandRight = attRight.bands();
   rhImage.setVirtualBands(bandRight);
   rhImage.open(ui.GetFileName("MATCH"),"r");
 

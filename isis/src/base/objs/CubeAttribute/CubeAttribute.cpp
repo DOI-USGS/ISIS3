@@ -20,163 +20,85 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include <iostream>
-
-#include "IException.h"
-#include "IException.h"
-#include "Preference.h"
-
 #include "CubeAttribute.h"
 
+#include <iostream>
+
+#include <QDebug>
+
+#include "FileName.h"
+#include "IException.h"
+#include "Preference.h"
+#include "SpecialPixel.h"
+
+
 using namespace std;
+
 namespace Isis {
-
-  CubeAttribute::CubeAttribute() {
-    p_attribute.clear();
-  }
-
-
-  CubeAttribute::CubeAttribute(const Isis::iString &att) {
-    // Strip off the filename if there is one
-    std::string::size_type pos = att.find('+');
-    if(pos == 0) {
-      p_attribute = att;
-    }
-    else if(pos != std::string::npos) {
-      p_attribute = att.substr(pos - 1);
-    }
-    else if(att.length() == 0) {
-      p_attribute = "";
-    }
-    else if(pos == std::string::npos) {
-      p_attribute = "";
-    }
-    else {
-      string msg = "Invalid cube attribute string [" + att + "]";
-      throw IException(IException::Unknown, msg, _FILEINFO_);
-    }
-  }
-
-
-  CubeAttribute::~CubeAttribute() {}
-
-
-  void CubeAttribute::Write(std::ostream &ostr) const {
-    ostr << p_attribute;
-  }
-
-
-  void CubeAttribute::Write(std::string &str) const {
-    str = p_attribute;
-  }
-
-
-  void CubeAttribute::Write(Isis::Pvl &pvl) const {
-    Isis::PvlGroup atts("Attributes");
-    atts += Isis::PvlKeyword("Format",  p_attribute);
-    pvl.AddGroup(atts);
-  }
-
-
   //---------------------------------------------------------------------------
   // CubeAttributeInput Implementation
   //---------------------------------------------------------------------------
-  CubeAttributeInput::CubeAttributeInput() {
-    p_bands.clear();
+  CubeAttributeInput::CubeAttributeInput() : CubeAttribute<CubeAttributeInput>(testers()) {
   }
 
 
-  CubeAttributeInput::CubeAttributeInput(const Isis::iString &att)
-    : CubeAttribute(att) {
-    p_bands.clear();
-    Parse(p_attribute);
+  CubeAttributeInput::CubeAttributeInput(const FileName &fileName) :
+      CubeAttribute<CubeAttributeInput>(testers(), fileName) {
   }
 
 
-  CubeAttributeInput::~CubeAttributeInput() {}
-
-
-  void CubeAttributeInput::Set(const std::string &att) {
-    Parse(att);
+  CubeAttributeInput::~CubeAttributeInput() {
   }
 
 
-  string CubeAttributeInput::BandsStr() const {
-    string str;
-    for(unsigned int i = 0; i < p_bands.size(); i++) {
-      if(i > 0) str += ",";
-      str += p_bands[i];
-    }
-
-    return str;
-  }
-
-
-  vector<string> CubeAttributeInput::Bands() const {
-    return p_bands;
-  }
-
-
-  void CubeAttributeInput::Bands(const std::vector<std::string> &bands) {
-    p_bands.clear();
-    for(unsigned int i = 0; i < bands.size(); i++) {
-      p_bands.push_back(bands[i]);
-    }
-  }
-
-
-  void CubeAttributeInput::Bands(const std::string &bands) {
-    p_bands.clear();
-    Parse(bands);
-  }
-
-
-  void CubeAttributeInput::Write(std::ostream &ostr) const {
-    string st;
-    Write(st);
-    ostr << st;
-  }
-
-
-  void CubeAttributeInput::Write(std::string &str) const {
-    if(p_bands.size() > 0) {
-      str = "+";
-    }
-    for(unsigned int i = 0; i < p_bands.size(); i++) {
-      if(i > 0) str += ",";
-      str += p_bands[i];
-    }
-  }
+  /**
+   *
+   * Parse the string parameter and populate the private
+   * variable accordinly.
+   *
+   * @param att    A string containing the file attributes. All characters
+   *               before the first "+" are assumed to be the filename
+   *               and are ignored.
+   */
+//   void CubeAttributeInput::Set(const FileName &fileName) {
+//     Reset();
+//
+//     iString str(fileName.attributes());
+//
+//     // Get rid of any white space
+//     str.ConvertWhiteSpace();
+//     str.Compress();
+//     str.Remove(" ");
+//     str.UpCase();
+//
+//     // Look at each comma delimited token
+//     iString commaTok;
+//     while((commaTok = str.Token(",")).length() > 0) {
+//       // Is this token a range of bands
+//       if(commaTok.find('-') != string::npos) {
+//         iString dashTok;
+//         int start = commaTok.Token("-").ToInteger();
+//         int end = commaTok.Token("-").ToInteger();
+//         int direction;
+//         direction = (start <= end) ? 1 : -1;
+//         // Save the entire range of bands
+//         for(int band = start; band != end; band += direction) {
+//           m_bands.push_back(Isis::iString(band));
+//         }
+//         m_bands.push_back(Isis::iString(end));
+//       }
+//       // This token is a single band specification
+//       else {
+//         m_bands.push_back(commaTok);
+//       }
+//     }
+//   }
 
 
-  void CubeAttributeInput::Write(Isis::Pvl &pvl) const {
-    Isis::PvlKeyword bands("Bands");
-    for(unsigned int b = 0; b < p_bands.size(); b++) {
-      bands += p_bands[b];
-    }
-    Isis::PvlGroup inatts("InputAttributes");
-    inatts += bands;
-    pvl.AddGroup(inatts);
-  }
+  vector<string> CubeAttributeInput::bands() const {
+    vector<string> result;
 
-
-  void CubeAttributeInput::Reset() {
-    p_bands.clear();
-  }
-
-
-  void CubeAttributeInput::Parse(const std::string &attStr) {
-
-    Isis::iString str(attStr);
-
-    // Strip off the leading "+" and put the attributes in a temporary
-    std::string::size_type pos = str.find('+');
-    if(pos != std::string::npos) {
-      str = str.substr(pos);
-    }
-    else {
-      str = "";
-    }
+    iString str = toString();
 
     // Get rid of any white space
     str.ConvertWhiteSpace();
@@ -186,292 +108,397 @@ namespace Isis {
     str.TrimHead("+");
 
     // Look at each comma delimited token
-    Isis::iString commaTok;
+    iString commaTok;
     while((commaTok = str.Token(",")).length() > 0) {
       // Is this token a range of bands
-      if(commaTok.find('-') != std::string::npos) {
-        Isis::iString dashTok;
+      if(commaTok.find('-') != string::npos) {
+        iString dashTok;
         int start = commaTok.Token("-").ToInteger();
         int end = commaTok.Token("-").ToInteger();
         int direction;
         direction = (start <= end) ? 1 : -1;
         // Save the entire range of bands
         for(int band = start; band != end; band += direction) {
-          p_bands.push_back(Isis::iString(band));
+          result.push_back(Isis::iString(band));
         }
-        p_bands.push_back(Isis::iString(end));
+        result.push_back(Isis::iString(end));
       }
       // This token is a single band specification
       else {
-        p_bands.push_back(commaTok);
+        result.push_back(commaTok);
       }
     }
+
+    return result;
+  }
+
+
+  iString CubeAttributeInput::bandsString() const {
+    return toString(bands());
+  }
+
+
+  void CubeAttributeInput::setBands(const vector<string> &bands) {
+    setAttributes(toString(bands));
+  }
+
+
+  bool CubeAttributeInput::isBandRange(iString attribute) const {
+    return QRegExp("[0-9,\\-]+").exactMatch(attribute);
+  }
+
+
+  iString CubeAttributeInput::toString(const vector<string> &bands) {
+    iString result;
+    for(unsigned int i = 0; i < bands.size(); i++) {
+      if(i > 0)
+        result += ",";
+
+      result += bands[i];
+    }
+
+    return result;
+  }
+
+
+  QList<bool (CubeAttributeInput::*)(iString) const> CubeAttributeInput::testers() {
+    QList<bool (CubeAttributeInput::*)(iString) const> result;
+
+    result.append(&CubeAttributeInput::isBandRange);
+
+    return result;
   }
 
 
   //---------------------------------------------------------------------------
   // CubeAttributeOutput Implementation
   //---------------------------------------------------------------------------
-  CubeAttributeOutput::CubeAttributeOutput() {
-    Initialize();
+  CubeAttributeOutput::CubeAttributeOutput() : CubeAttribute<CubeAttributeOutput>(testers()) {
   }
 
 
-  CubeAttributeOutput::CubeAttributeOutput(const Isis::iString &att)
-    : CubeAttribute(att) {
-
-    Initialize();
-    p_attribute = att;
-    Parse(p_attribute);
+  CubeAttributeOutput::CubeAttributeOutput(const FileName &fileName)
+      : CubeAttribute<CubeAttributeOutput>(testers(), fileName) {
   }
 
 
-  CubeAttributeOutput::~CubeAttributeOutput() {}
-
-
-  void CubeAttributeOutput::Set(const std::string &att) {
-    Parse(att);
+  CubeAttributeOutput::~CubeAttributeOutput() {
   }
 
 
-  string CubeAttributeOutput::FileFormatStr() const {
-    if(p_format == Cube::Bsq)
-      return "BandSequential";
-    else
-      return "Tile";
+  bool CubeAttributeOutput::propagatePixelType() const {
+    bool result = false;
+
+    QStringList pixelTypeAtts = attributeList(&CubeAttributeOutput::isPixelType);
+
+    if (pixelTypeAtts.isEmpty() || pixelTypeAtts.last() == "PROPAGATE")
+      result = true;
+
+    return result;
   }
 
 
-  Cube::Format CubeAttributeOutput::FileFormat() const {
-    return p_format;
+  bool CubeAttributeOutput::propagateMinimumMaximum() const {
+    return attributeList(&CubeAttributeOutput::isRange).isEmpty();
   }
 
 
-  void CubeAttributeOutput::Format(const Cube::Format &fmt) {
-    p_format = fmt;
-  }
+//   void CubeAttributeOutput::Set(const FileName &fileName) {
+//     Reset();
+//
+//     Isis::iString str(fileName.attributes());
+//
+//     // Remove any white space
+//     str.ConvertWhiteSpace();
+//     str.Compress();
+//     str.Remove(" ");
+//     str.UpCase();
+//     str.TrimHead("+");
+//
+//     // Look at each "+" separate attribute
+//     Isis::iString tok;
+//     while((tok = str.Token("+")).length() > 0) {
+//
+//       // If there is a ":" in this token then it is assumed to be a min:max
+//       if(tok.find(":") != string::npos) {
+//
+//         // Pull out the minimum
+//         Isis::iString colonTok = tok;
+//         Isis::iString min = colonTok.Token(":");
+//         if(min.length() > 0) {
+//           m_minimum = min.ToDouble();
+//         }
+//         else {
+//           m_minimum = 0.0;
+//         }
+//
+//         // Pull out the maximum
+//         Isis::iString max = colonTok.Token(":");
+//         if(max.length() > 0) {
+//           m_maximum = max.ToDouble();
+//         }
+//         else {
+//           m_maximum = 0.0;
+//         }
+//         m_rangeType = RangeSet;
+//       }
+//
+//       // Parse any pixel type attributes
+//       else if(tok == "8BIT" || tok == "8-BIT" || tok == "UNSIGNEDBYTE") {
+//         m_pixelType = Isis::UnsignedByte;
+//         m_pixelTypeDef = "SET";
+//       }
+//       else if(tok == "16BIT" || tok == "16-BIT" || tok == "SIGNEDWORD") {
+//         m_pixelType = Isis::SignedWord;
+//         m_pixelTypeDef = "SET";
+//       }
+//       else if(tok == "32BIT" || tok == "32-BIT" || tok == "REAL") {
+//         m_pixelType = Isis::Real;
+//         m_pixelTypeDef = "SET";
+//       }
+//       else if(tok == "PROPAGATE") {
+//         m_pixelType = Isis::None;
+//         m_pixelTypeDef = "PROPAGATE";
+//       }
+//
+//       // Parse any file formats
+//       else if(tok == "TILE") {
+//         m_format = Cube::Tile;
+//       }
+//       else if(tok == "BSQ" || tok == "BANDSEQUENTIAL") {
+//         m_format = Cube::Bsq;
+//       }
+//
+//       // Parse any byte order
+//       else if(tok == "LSB") {
+//         m_order = Isis::Lsb;
+//       }
+//       else if(tok == "MSB") {
+//         m_order = Isis::Msb;
+//       }
+//
+//       // Parse any label type
+//       else if(tok == "ATTACHED") {
+//         m_labelAttachment = Isis::AttachedLabel;
+//       }
+//       else if(tok == "DETACHED") {
+//         m_labelAttachment = Isis::DetachedLabel;
+//       }
+//     }
+//   }
 
 
-  double CubeAttributeOutput::Minimum() const {
-    return p_minimum;
-  }
+  Cube::Format CubeAttributeOutput::fileFormat() const {
+    Cube::Format result = Cube::Tile;
 
+    QStringList formatList = attributeList(&CubeAttributeOutput::isFileFormat);
 
-  double CubeAttributeOutput::Maximum() const {
-    return p_maximum;
-  }
+    if (!formatList.isEmpty()) {
+      QString formatString = formatList.last();
 
-
-  void CubeAttributeOutput::Minimum(const double min) {
-    p_minimum = min;
-    p_rangeType = RangeSet;
-  }
-
-
-  void CubeAttributeOutput::Maximum(const double max) {
-    p_maximum = max;
-    p_rangeType = RangeSet;
-  }
-
-
-  bool CubeAttributeOutput::HasPixelType() const {
-    return p_pixelType != Isis::None;
-  }
-
-
-  Isis::PixelType CubeAttributeOutput::PixelType() const {
-    if(p_pixelType == Isis::None) {
-      string msg;
-      msg = msg + "Request for CubeAttributeOutput::PixelType failed. " +
-            "PixelType has not been set. Use PropagatePixelType or " +
-            "UserPixelType to determine how to set PixelType.";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-    return p_pixelType;
-  }
-
-
-  void CubeAttributeOutput::PixelType(const Isis::PixelType type) {
-    p_pixelType = type;
-    if(p_pixelType == Isis::None) {
-      p_pixelTypeDef = "PROPAGATE";
-    }
-    else {
-      p_pixelTypeDef = "SET";
-    }
-  }
-
-
-  string CubeAttributeOutput::ByteOrderStr() const {
-    return Isis::ByteOrderName(p_order);
-  }
-
-
-  Isis::ByteOrder CubeAttributeOutput::ByteOrder() const {
-    return p_order;
-  }
-
-
-  void CubeAttributeOutput::Order(const Isis::ByteOrder order) {
-    p_order = order;
-  }
-
-
-  void CubeAttributeOutput::Write(std::ostream &ostr) const {
-    string st;
-    Write(st);
-    ostr << st;
-  }
-
-
-  void CubeAttributeOutput::Write(std::string &str) const {
-    str.clear();
-    if(p_pixelTypeDef != "PROPAGATE") {
-      str += "+" + Isis::PixelTypeName(p_pixelType);
-    }
-    if(p_pixelType != Isis::Real && p_pixelType != Isis::None) {
-      str += "+" + Isis::iString(p_minimum) + ":" + Isis::iString(p_maximum);
-    }
-    str += "+" + FileFormatStr();
-    str += "+" + ByteOrderStr();
-    str += "+" + Isis::LabelAttachmentName(p_labelAttachment);
-  }
-
-
-  void CubeAttributeOutput::Write(Isis::Pvl &pvl) const {
-    Isis::PvlGroup outatt("OutputCubeAttributes");
-
-    if(p_pixelTypeDef != "PROPAGATE") {
-      outatt += Isis::PvlKeyword("Type", PixelTypeName(p_pixelType));
-    }
-    outatt += Isis::PvlKeyword("Format",  FileFormatStr());
-    if(p_pixelType != Isis::Real) {
-      outatt += Isis::PvlKeyword("Minimum", p_minimum);
-      outatt += Isis::PvlKeyword("Maximum", p_maximum);
-    }
-    outatt += Isis::PvlKeyword("ByteOrder", ByteOrderStr());
-    outatt += Isis::PvlKeyword("LabelType", Isis::LabelAttachmentName(p_labelAttachment));
-
-    pvl.AddGroup(outatt);
-  }
-
-
-  void CubeAttributeOutput::Reset() {
-    Initialize();
-  }
-
-
-  void CubeAttributeOutput::Parse(const std::string &att) {
-
-    Isis::iString str(att);
-
-    // Strip off the leading "+" and put the attributes in a temporary
-    std::string::size_type pos = str.find('+');
-    if(pos != std::string::npos) {
-      str = str.substr(pos);
-    }
-    else {
-      str = "";
+      if (formatString == "BSQ" || formatString == "BANDSEQUENTIAL")
+        result = Cube::Bsq;
     }
 
-    // Remove any white space
-    str.ConvertWhiteSpace();
-    str.Compress();
-    str.Remove(" ");
-    str.UpCase();
-    str.TrimHead("+");
-
-    // Look at each "+" separate attribute
-    Isis::iString tok;
-    while((tok = str.Token("+")).length() > 0) {
-
-      // If there is a ":" in this token then it is assumed to be a min:max
-      if(tok.find(":") != std::string::npos) {
-
-        // Pull out the minimum
-        Isis::iString colonTok = tok;
-        Isis::iString min = colonTok.Token(":");
-        if(min.length() > 0) {
-          p_minimum = min.ToDouble();
-        }
-        else {
-          p_minimum = 0.0;
-        }
-
-        // Pull out the maximum
-        Isis::iString max = colonTok.Token(":");
-        if(max.length() > 0) {
-          p_maximum = max.ToDouble();
-        }
-        else {
-          p_maximum = 0.0;
-        }
-        p_rangeType = RangeSet;
-      }
-
-      // Parse any pixel type attributes
-      else if(tok == "8BIT" || tok == "8-BIT" || tok == "UNSIGNEDBYTE") {
-        p_pixelType = Isis::UnsignedByte;
-        p_pixelTypeDef = "SET";
-      }
-      else if(tok == "16BIT" || tok == "16-BIT" || tok == "SIGNEDWORD") {
-        p_pixelType = Isis::SignedWord;
-        p_pixelTypeDef = "SET";
-      }
-      else if(tok == "32BIT" || tok == "32-BIT" || tok == "REAL") {
-        p_pixelType = Isis::Real;
-        p_pixelTypeDef = "SET";
-      }
-      else if(tok == "PROPAGATE") {
-        p_pixelType = Isis::None;
-        p_pixelTypeDef = "PROPAGATE";
-      }
-
-      // Parse any file formats
-      else if(tok == "TILE") {
-        p_format = Cube::Tile;
-      }
-      else if(tok == "BSQ" || tok == "BANDSEQUENTIAL") {
-        p_format = Cube::Bsq;
-      }
-
-      // Parse any byte order
-      else if(tok == "LSB") {
-        p_order = Isis::Lsb;
-      }
-      else if(tok == "MSB") {
-        p_order = Isis::Msb;
-      }
-
-      // Parse any label type
-      else if(tok == "ATTACHED") {
-        p_labelAttachment = Isis::AttachedLabel;
-      }
-      else if(tok == "DETACHED") {
-        p_labelAttachment = Isis::DetachedLabel;
-      }
-    }
+    return result;
   }
 
 
-  void CubeAttributeOutput::Initialize() {
-    p_pixelType = Isis::None;
-    p_pixelTypeDef = "PROPAGATE";
-    p_rangeType = PropagateRange;
-    p_minimum = 0.0;
-    p_maximum = 0.0;
-    p_format = Cube::Tile;
+  iString CubeAttributeOutput::fileFormatString() const {
+    return toString(fileFormat());
+  }
 
-    // The byte order default is dependant on the hardware
-    if(Isis::IsLsb()) {
-      p_order = Isis::Lsb;
+
+  void CubeAttributeOutput::setFileFormat(Cube::Format fmt) {
+    setAttribute((fmt == Cube::Tile)? "Tile" : "BandSequential",
+                 &CubeAttributeOutput::isFileFormat);
+  }
+
+
+  double CubeAttributeOutput::minimum() const {
+    double result = Null;
+
+    if (!propagateMinimumMaximum()) {
+      QString range = attributeList(&CubeAttributeOutput::isRange).last();
+
+      QStringList rangeList = range.split(":");
+      if (rangeList.count() == 2 && rangeList.first() != "")
+        result = iString(rangeList.first()).ToDouble();
+    }
+
+    return result;
+  }
+
+
+  double CubeAttributeOutput::maximum() const {
+    double result = Null;
+
+    if (!propagateMinimumMaximum()) {
+      QString range = attributeList(&CubeAttributeOutput::isRange).last();
+
+      QStringList rangeList = range.split(":");
+      if (rangeList.count() == 2 && rangeList.last() != "")
+        result = iString(rangeList.last()).ToDouble();
+    }
+
+    return result;
+  }
+
+
+  void CubeAttributeOutput::setMinimum(double min) {
+    if (!IsSpecial(min)) {
+      iString newRange = iString(min) + ":";
+
+      if (!IsSpecial(maximum()))
+        newRange += iString(maximum());
+
+      setAttribute(newRange, &CubeAttributeOutput::isRange);
+    }
+    else if (!IsSpecial(maximum())) {
+      setAttribute(":" + iString(maximum()), &CubeAttributeOutput::isRange);
     }
     else {
-      p_order = Isis::Msb;
+      setAttribute("", &CubeAttributeOutput::isRange);
+    }
+  }
+
+
+  void CubeAttributeOutput::setMaximum(double max) {
+    if (!IsSpecial(max)) {
+      iString newRange = ":" + iString(max);
+
+      if (!IsSpecial(minimum()))
+        newRange = iString(minimum()) + newRange;
+
+      setAttribute(newRange, &CubeAttributeOutput::isRange);
+    }
+    else if (!IsSpecial(minimum())) {
+      setAttribute(iString(minimum()) + ":", &CubeAttributeOutput::isRange);
+    }
+    else {
+      setAttribute("", &CubeAttributeOutput::isRange);
+    }
+  }
+
+
+  PixelType CubeAttributeOutput::pixelType() const {
+    PixelType result = None;
+
+    if (!propagatePixelType()) {
+      QString pixelTypeAtt = attributeList(&CubeAttributeOutput::isPixelType).last();
+
+      if(pixelTypeAtt == "8BIT" || pixelTypeAtt == "8-BIT" || pixelTypeAtt == "UNSIGNEDBYTE") {
+        result = UnsignedByte;
+      }
+      else if(pixelTypeAtt == "16BIT" || pixelTypeAtt == "16-BIT" || pixelTypeAtt == "SIGNEDWORD") {
+        result = SignedWord;
+      }
+      else if(pixelTypeAtt == "32BIT" || pixelTypeAtt == "32-BIT" || pixelTypeAtt == "REAL") {
+        result = Real;
+      }
     }
 
-    // The type of label to produce is dependent on the preference file
-    Isis::PvlGroup &cust = Isis::Preference::Preferences().FindGroup("CubeCustomization");
-    p_labelAttachment = Isis::LabelAttachmentEnumeration(cust["Format"]);
+    return result;
+  }
+
+
+  void CubeAttributeOutput::setPixelType(PixelType type) {
+    setAttribute(PixelTypeName(type), &CubeAttributeOutput::isPixelType);
+  }
+
+
+  void CubeAttributeOutput::setLabelAttachment(LabelAttachment attachment) {
+    setAttribute(LabelAttachmentName(attachment), &CubeAttributeOutput::isLabelAttachment);
+  }
+
+
+  LabelAttachment CubeAttributeOutput::labelAttachment() const {
+    LabelAttachment result = AttachedLabel;
+
+    QStringList labelAttachmentAtts = attributeList(&CubeAttributeOutput::isLabelAttachment);
+    if (!labelAttachmentAtts.isEmpty()) {
+      QString labelAttachmentAtt = labelAttachmentAtts.last();
+
+      if (labelAttachmentAtt == "DETACHED")
+        result = DetachedLabel;
+      else if (labelAttachmentAtt == "EXTERNAL")
+        result = ExternalLabel;
+    }
+
+    return result;
+  }
+
+
+  bool CubeAttributeOutput::isByteOrder(iString attribute) const {
+    return QRegExp("(M|L)SB").exactMatch(attribute);
+  }
+
+
+  bool CubeAttributeOutput::isFileFormat(iString attribute) const {
+    return QRegExp("(BANDSEQUENTIAL|BSQ|TILE)").exactMatch(attribute);
+  }
+
+
+  bool CubeAttributeOutput::isLabelAttachment(iString attribute) const {
+    return QRegExp("(ATTACHED|DETACHED|EXTERNAL)").exactMatch(attribute);
+  }
+
+
+  bool CubeAttributeOutput::isPixelType(iString attribute) const {
+    return QRegExp("(8-?BIT|16-?BIT|32-?BIT|UNSIGNEDBYTE|SIGNEDWORD|REAL)").exactMatch(attribute);
+  }
+
+
+
+  bool CubeAttributeOutput::isRange(iString attribute) const {
+    return QRegExp("[\\-+E0-9.]*:[\\-+E0-9.]*").exactMatch(attribute);
+  }
+
+
+  iString CubeAttributeOutput::toString(Cube::Format format) {
+    iString result = "Tile";
+
+    if (format == Cube::Bsq)
+      result = "BandSequential";
+
+    return result;
+  }
+
+
+  ByteOrder CubeAttributeOutput::byteOrder() const {
+    ByteOrder result = IsLsb()? Lsb : Msb;
+
+    QStringList byteOrderAtts = attributeList(&CubeAttributeOutput::isByteOrder);
+
+    if (!byteOrderAtts.isEmpty()) {
+      QString byteOrderAtt = byteOrderAtts.last();
+      result = (byteOrderAtt == "LSB")? Lsb : Msb;
+    }
+
+    return result;
+  }
+
+
+  iString CubeAttributeOutput::byteOrderString() const {
+    return ByteOrderName(byteOrder());
+  }
+
+
+  void CubeAttributeOutput::setByteOrder(ByteOrder order) {
+    setAttribute((order == Msb)? "MSB" : "LSB",
+                 &CubeAttributeOutput::isByteOrder);
+  }
+
+
+  QList<bool (CubeAttributeOutput::*)(iString) const> CubeAttributeOutput::testers() {
+   QList<bool (CubeAttributeOutput::*)(iString) const> result;
+
+    result.append(&CubeAttributeOutput::isByteOrder);
+    result.append(&CubeAttributeOutput::isFileFormat);
+    result.append(&CubeAttributeOutput::isLabelAttachment);
+    result.append(&CubeAttributeOutput::isPixelType);
+    result.append(&CubeAttributeOutput::isRange);
+
+    return result;
   }
 }

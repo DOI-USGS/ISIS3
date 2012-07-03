@@ -7,6 +7,7 @@
 
 #include "Cube.h"
 #include "CubeAttribute.h"
+#include "FileName.h"
 #include "iString.h"
 #include "MdiCubeViewport.h"
 #include "ViewportMdiSubWindow.h"
@@ -116,7 +117,7 @@ namespace Isis {
 
     //Read in the CubeAttribueInput from the cube name
     CubeAttributeInput inAtt(cubename.toStdString());
-    std::vector<std::string> bands = inAtt.Bands();
+    std::vector<std::string> bands = inAtt.bands();
 
     //Set the virtual bands to the bands specified by the input
     cube->setVirtualBands(bands);

@@ -25,12 +25,12 @@ void IsisMain() {
   CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
   if(IsValidPixel(dn1) && IsValidPixel(dn2)) {
     if(dn1 <= dn2) {
-      att.Minimum(dn1);
-      att.Maximum(dn2);
+      att.setMinimum(dn1);
+      att.setMaximum(dn2);
     }
     else {
-      att.Minimum(dn2);
-      att.Maximum(dn1);
+      att.setMinimum(dn2);
+      att.setMaximum(dn1);
     }
   }
   else {

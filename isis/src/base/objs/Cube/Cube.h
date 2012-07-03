@@ -39,6 +39,7 @@ namespace Isis {
   class CubeAttributeOutput;
   class CubeCachingAlgorithm;
   class CubeIoHandler;
+  class FileName;
   class iString;
   class Projection;
   class Pvl;
@@ -131,6 +132,11 @@ namespace Isis {
    *                crashing, references #161
    *   @history 2012-02-17 Steven Lambright - Made the read() method const.
    *                Added mutex lock calls around data file accesses.
+   *   @history 2012-07-02 Steven Lambright and Stuart Sides - Added copy() and added support for
+   *                           external cube label files (.ecub). This was done so that cubes can
+   *                           be imported into projects without copying the DN data. Also, multiple
+   *                           versions of SPICE will be save-able for one cube (multiple ecubs...
+   *                           again, not copying DN data). Fixes #961.
    *
    */
   class Cube {
@@ -206,6 +212,7 @@ namespace Isis {
       bool labelsAttached() const;
 
       void close(bool remove = false);
+      Cube *copy(FileName newFile, const CubeAttributeOutput &newFileAttributes) const;
       void create(const iString &cfile);
       void create(const iString &cfile, const CubeAttributeOutput &att);
       void open(const iString &cfile, iString access = "r");
@@ -220,6 +227,7 @@ namespace Isis {
       void setMinMax(double min, double max);
       void setByteOrder(ByteOrder byteOrder);
       void setDimensions(int ns, int nl, int nb);
+      void setExternalDnData(FileName cubeFileWithDnData);
       void setFormat(Format format);
       void setLabelsAttached(bool attached);
       void setLabelSize(int labelBytes);
@@ -251,6 +259,7 @@ namespace Isis {
       Statistics *getStatistics(const int &band, const double &validMin,
                                  const double &validMax,
                                  iString msg = "Gathering statistics");
+      bool getStoresDnData() const;
 
       void addCachingAlgorithm(CubeCachingAlgorithm *);
       void clearIoCache();
@@ -259,13 +268,18 @@ namespace Isis {
       PvlGroup &getGroup(const iString &group) const;
       bool hasGroup(const iString &group) const;
       bool hasTable(const iString &name);
-      void putGroup(PvlGroup &group);
+      void putGroup(const PvlGroup &group);
 
     private:
+      void applyVirtualBandsToLabel();
       void cleanUp(bool remove);
       QFile *getDataFile() const;
+      FileName getRealDataFileName() const;
       void initialize();
+      void initCoreFromLabel(const Pvl &label);
+      void initLabelFromFile(FileName labelFileName, bool readWrite);
       void openCheck();
+      Pvl realDataFileLabel() const;
       void reformatOldIsisLabel(const iString &oldCube);
       void writeLabels();
 
@@ -323,23 +337,30 @@ namespace Isis {
       Projection *m_projection;
 
       //! The full filename of the label file (.lbl or .cub)
-      iString *m_labelFileName;
+      FileName *m_labelFileName;
 
       //! The full filename of the data file (.cub)
-      iString *m_dataFileName;
+      FileName *m_dataFileName;
 
       /**
        * If open was called with an Isis 2 cube, then this will be
        *   the name of the imported Isis3 cube. m_labelFileName and
        *   m_dataFileName will store the Isis 2 cube's information.
        */
-      iString *m_tempCube;
+      FileName *m_tempCube;
 
       //! Label pvl format template file (describes how to format labels)
-      iString *m_formatTemplateFile;
+      FileName *m_formatTemplateFile;
 
       //! True if labels are attached
       bool m_attached;
+
+      /**
+       * True (most common case) when the cube DN data is inside the file we're writing to. False
+       *   means we're referencing another cube's internal DN data for reading, and writing buffers
+       *   is disallowed.
+       */
+      bool m_storesDnData;
 
       //! The label if IsOpen(), otherwise NULL
       Pvl *m_label;

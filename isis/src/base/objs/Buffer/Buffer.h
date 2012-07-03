@@ -60,9 +60,10 @@ namespace Isis {
    *           any memory if initialized.
    *  @history 2010-06-22 Steven Lambright - "Copy" now ensures pixel types are
    *           the same to prevent going out of memory bounds
-   *  @todo Consider making some of the position methods virtual (Line, Sample,
-   *        Band etc.) to increase speed. This means the derived class, like Line,
-   *        can make faster computations.
+   *  @history 2012-07-02 Steven Lambright and Stuart Sides - Added "includeRawBuf" to
+   *                          Copy(). We did this to simplify implementation
+   *                          in Cube::copy()... this ought to be usable in many other areas
+   *                          also. References #961. 
    */
   class Buffer {
     public:
@@ -152,7 +153,7 @@ namespace Isis {
       inline double *DoubleBuffer() const {
         return (p_buf);
       };
-      void Copy(const Buffer &in);
+      void Copy(const Buffer &in, bool includeRawBuf = true);
 
       /**
        * Returns a void pointer to the raw buffer. Cast this void pointer using

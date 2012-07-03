@@ -630,16 +630,16 @@ void IsisMain() {
   CubeAttributeOutput att;
   CubeAttributeInput  attI;
 
-  attI.Set("some.cub+1"); //will only be processing one band from the input
+  attI.setAttributes("some.cub+1"); //will only be processing one band from the input
 
   //make output attributes match the input
-  att.Format( panC[0]->getFormat() );
-  att.Order(  panC[0]->getByteOrder() );
-  att.PixelType( panC[0]->getPixelType() );
+  att.setFileFormat( panC[0]->getFormat() );
+  att.setByteOrder(  panC[0]->getByteOrder() );
+  att.setPixelType( panC[0]->getPixelType() );
   if (panC[0]->labelsAttached())
-    att.Label(AttachedLabel);
+    att.setLabelAttachment(AttachedLabel);
   else
-    att.Label(DetachedLabel);
+    att.setLabelAttachment(DetachedLabel);
 
   //define an output cube
   outputC.setDimensions(int(maxS),int(maxL),1);

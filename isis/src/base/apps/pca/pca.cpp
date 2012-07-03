@@ -27,7 +27,7 @@ void IsisMain() {
 
   // The output cube with no attributes and real pixel type
   Isis::CubeAttributeOutput cao;
-  cao.PixelType(Isis::Real);
+  cao.setPixelType(Isis::Real);
 
   // Start the sample processing
   if(ui.GetString("MODE") == "TRANSFORM") {

@@ -15,7 +15,7 @@ R/W    = N/A
 Lbytes = 65536
 
 Creating 32-bit cube ... 
-File   = IsisCube_01.cub
+File   = IsisCube_00.cub
 Samps  = 150
 Lines  = 200
 Bands  = 2
@@ -43,7 +43,7 @@ Format = 1
 Open   = 1
 R/O    = 1
 R/W    = 0
-Lbytes = 65536
+Lbytes = 6563
 
 Comparing cube ... 
 
@@ -141,7 +141,7 @@ Format = 1
 Open   = 1
 R/O    = 1
 R/W    = 0
-Lbytes = 65536
+Lbytes = 6563
 
 File   = IsisCube_01.cub
 Samps  = 150
@@ -155,7 +155,7 @@ Format = 1
 Open   = 1
 R/O    = 0
 R/W    = 1
-Lbytes = 65536
+Lbytes = 6563
 
 File   = IsisCube_01.cub
 Samps  = 150
@@ -169,7 +169,7 @@ Format = 1
 Open   = 1
 R/O    = 1
 R/W    = 0
-Lbytes = 65536
+Lbytes = 6563
 
 Testing reading past cube boundaries ... 
 Constructing cube ... 
@@ -206,12 +206,12 @@ Comparing results ...
 Testing errors ... 
 **PROGRAMMER ERROR** You already have a cube opened.
 **PROGRAMMER ERROR** You already have a cube opened.
-**PROGRAMMER ERROR** The cube [IsisCube_01.cub] is opened read-only ... you can't write to it.
+**PROGRAMMER ERROR** Cannot write to the cube [IsisCube_01.cub] because it is opened read-only.
 **I/O ERROR** Unable to open [blah].
 **PROGRAMMER ERROR** Out of array bounds [2].
 **PROGRAMMER ERROR** Out of array bounds [0].
 **PROGRAMMER ERROR** Try opening a file before you read it.
-**PROGRAMMER ERROR** Try opening/creating a file before you write it.
+**PROGRAMMER ERROR** Tried to write to a cube before opening/creating it.
 **PROGRAMMER ERROR** Number of samples [0], lines [0], or bands [0] cannot be less than 1.
 **I/O ERROR** Label space is full in [IsisCube_04.cub] unable to write labels.
 **USER ERROR** The cube you are attempting to create [IsisCube_05] is [33527GB]. This is larger than the current allowed size of [12GB]. The cube dimensions were (S,L,B) [1000000, 1000000, 9] with [4] bytes per pixel. If you still wish to create this cube, the maximum value can be changed in the file [~/.Isis/IsisPreferences] within the group CubeCustomization, keyword MaximumSize.
@@ -220,3 +220,97 @@ Testing errors ...
 **PROGRAMMER ERROR** SetDimensions:  Invalid number of sample, lines or bands.
 **PROGRAMMER ERROR** SetDimensions:  Invalid number of sample, lines or bands.
 **I/O ERROR** Failed to open [/usgs/cpkgs/isis3/data/base/testData/isisTruth.cub] with read/write access.
+**ERROR** Cannot create the cube [shouldntExist.cub] with a pixel type set to None.
+
+Test creating an ecub
+Object = IsisCube
+  Object = Core
+    ^DnFile = $base/testData/isisTruth.cub
+  End_Object
+
+  Group = TestGroup
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+End
+0 0 0 20 20 20 39 39 39 0 20 39 0 20 39 0 20 39 
+**ERROR** The cube [isisTruth_external.ecub] does not support storing DN data because it is using an external file for DNs.
+
+Test creating an ecub from an ecub
+Object = IsisCube
+  Object = Core
+    ^DnFile = isisTruth_external.ecub
+  End_Object
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+End
+0 0 0 20 20 20 39 39 39 0 20 39 0 20 39 0 20 39 
+**ERROR** The cube [isisTruth_external2.ecub] does not support storing DN data because it is using an external file for DNs.
+
+Test reading an ecub
+Object = IsisCube
+  Object = Core
+    ^DnFile = $base/testData/isisTruth.cub
+  End_Object
+
+  Group = TestGroup
+  End_Group
+
+  Group = TestGroup2
+  End_Group
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+End
+0 0 0 20 20 20 39 39 39 0 20 39 0 20 39 0 20 39 
+**PROGRAMMER ERROR** Cannot write to the cube [isisTruth_external.ecub] because it is opened read-only.
+
+Test reading an ecub that points to another ecub
+Object = IsisCube
+  Object = Core
+    ^DnFile = isisTruth_external.ecub
+  End_Object
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+End
+0 0 0 20 20 20 39 39 39 0 20 39 0 20 39 0 20 39 
+**PROGRAMMER ERROR** Cannot write to the cube [isisTruth_external2.ecub] because it is opened read-only.
+
+Test reading an ecub that points to detached lbl
+Object = IsisCube
+  Object = Core
+    ^DnFile = IsisCube_02.lbl
+  End_Object
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+End
+0 0 0 1 1 1 2 2 2 N N N N N N N N N 
+**ERROR** The cube [isisTruth_external3.ecub] does not support storing DN data because it is using an external file for DNs.
+
+Test copying an ecub that points to detached lbl
+Object = IsisCube
+  Object = Core
+    ^DnFile = isisTruth_external3.ecub
+  End_Object
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+End
+0 0 0 1 1 1 2 2 2 N N N N N N N N N 
+**ERROR** The cube [isisTruth_external3.copy.ecub] does not support storing DN data because it is using an external file for DNs.

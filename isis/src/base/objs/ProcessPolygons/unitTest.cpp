@@ -24,7 +24,7 @@ void IsisMain() {
   ProcessByLine pbl;
 
   CubeAttributeOutput out_atts;
-  out_atts.PixelType(Real);
+  out_atts.setPixelType(Real);
 
   const string output1 = "processPolygonsTest.cub";
   const string output2 = "processPolygonsTest_count.cub";

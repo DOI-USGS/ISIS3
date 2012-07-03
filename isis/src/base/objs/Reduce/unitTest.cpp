@@ -21,7 +21,7 @@ void IsisMain() {
   Isis::Cube icube;
 
   Isis::CubeAttributeInput cai(ui.GetAsString("FROM"));
-  bands = cai.Bands();
+  bands = cai.bands();
 
   icube.setVirtualBands(bands);
   icube.open(ui.GetFileName("FROM"));

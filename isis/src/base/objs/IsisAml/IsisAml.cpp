@@ -1866,9 +1866,8 @@ void IsisAml::Clear(const string &paramName) {
   IsisParameterData *param = const_cast <IsisParameterData *>(ReturnParam(paramName));
   param->values.clear();
 
-  param->outCubeAtt.Reset();
-  param->outCubeAtt.Set("+" + param->pixelType);
-  param->inCubeAtt.Reset();
+  param->outCubeAtt.setAttributes("+" + param->pixelType);
+  param->inCubeAtt.setAttributes("");
 
   return;
 }
@@ -1909,8 +1908,7 @@ Isis::CubeAttributeInput &IsisAml::GetInputAttribute(const string &paramName) {
     value = param->values[0];
   }
   if(param->fileMode == "input") {
-    param->inCubeAtt.Reset();
-    param->inCubeAtt.Set(value);
+    param->inCubeAtt.setAttributes(value);
   }
   else {
     string message = "Unable to get input cube attributes.  Parameter ["
@@ -1955,9 +1953,8 @@ Isis::CubeAttributeOutput &IsisAml::GetOutputAttribute(const string &paramName) 
     value = param->values[0];
   }
   if(param->fileMode == "output") {
-    param->outCubeAtt.Reset();
-    param->outCubeAtt.Set("+" + param->pixelType);
-    param->outCubeAtt.Set(value);
+    param->outCubeAtt.setAttributes("+" + param->pixelType);
+    param->outCubeAtt.addAttributes(Isis::FileName(value));
   }
   else {
     string message = "Unable to get output cube attributes.  Parameter ["

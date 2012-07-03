@@ -1,5 +1,8 @@
 APPNAME = isis2pds
 
+s16bitmanualdefault.cub.TOLERANCE = 0.000000001
+s16bitmanualspecialpixels.cub.TOLERANCE = 0.000000001
+
 include $(ISISROOT)/make/isismake.tsts
 
 commands:

@@ -85,7 +85,7 @@ void IsisMain() {
   // Open the first cube.  It will be matched to the second input cube.
   HiJitCube trans;
   CubeAttributeInput &attTrans = ui.GetInputAttribute("FROM");
-  vector<string> bandTrans = attTrans.Bands();
+  vector<string> bandTrans = attTrans.bands();
   trans.setVirtualBands(bandTrans);
   trans.OpenCube(ui.GetFileName("FROM"), stitch);
 
@@ -94,7 +94,7 @@ void IsisMain() {
   // first to this one by attempting to compute a sample/line translation
   HiJitCube match;
   CubeAttributeInput &attMatch = ui.GetInputAttribute("MATCH");
-  vector<string> bandMatch = attMatch.Bands();
+  vector<string> bandMatch = attMatch.bands();
   match.setVirtualBands(bandMatch);
   match.OpenCube(ui.GetFileName("MATCH"), stitch);
 

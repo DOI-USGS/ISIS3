@@ -33,6 +33,13 @@ namespace Isis {
    * @author ????-??-?? Unknown
    *
    * @internal
+   *   @history 2012-07-02 Steven Lambright and Stuart Sides - Modified to
+   *                           have similar display values after the CubeAttribute
+   *                           refactor that better preserves strings that are
+   *                           passsed into CubeAttributeOutput. One of the strings
+   *                           was also invalid - didn't match any attributes, but was
+   *                           the default so there were no symptoms of a bug. This has
+   *                           been fixed. References #961.
    */
   class GuiOutputAttribute : public QDialog {
       Q_OBJECT

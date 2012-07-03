@@ -107,9 +107,9 @@ void IsisMain() {
   // the 8 bit special pixels from changing their value when they are mapped
   // to the 16 bit output.
   CubeAttributeOutput &outAtt = ui.GetOutputAttribute("TO");
-  outAtt.PixelType(Isis::SignedWord);
-  outAtt.Minimum((double)VALID_MIN2);
-  outAtt.Maximum((double)VALID_MAX2);
+  outAtt.setPixelType(Isis::SignedWord);
+  outAtt.setMinimum((double)VALID_MIN2);
+  outAtt.setMaximum((double)VALID_MAX2);
   Cube *ocube = p.SetOutputCube(ui.GetFileName("TO"), outAtt);
   p.StartProcess();
   TranslateHiriseEdrLabels(inFile, ocube);

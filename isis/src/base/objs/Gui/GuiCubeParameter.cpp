@@ -106,7 +106,7 @@ namespace Isis {
   void GuiCubeParameter::SelectAttribute() {
     if(p_ui->ParamFileMode(p_group, p_param) == "input") {
       Isis::CubeAttributeInput att(p_lineEdit->text().toStdString());
-      std::string curAtt = att.BandsStr();
+      std::string curAtt = att.toString();
       std::string newAtt;
       int status = GuiInputAttribute::GetAttributes(curAtt, newAtt,
                    p_ui->ParamName(p_group, p_param),
@@ -118,11 +118,10 @@ namespace Isis {
     }
     else {
       Isis::CubeAttributeOutput att("+" + p_ui->PixelType(p_group, p_param));
-      bool allowProp = att.PropagatePixelType();
-      att.Set(p_lineEdit->text().toStdString());
+      bool allowProp = att.propagatePixelType();
+      att.addAttributes(FileName(p_lineEdit->text()));
 
-      std::string curAtt;
-      att.Write(curAtt);
+      std::string curAtt = att.toString();
       std::string newAtt;
       int status = GuiOutputAttribute::GetAttributes(curAtt, newAtt,
                    p_ui->ParamName(p_group, p_param),
