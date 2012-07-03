@@ -35,6 +35,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2012-01-20 Steven Lambright - Completed documentation.
+   *   @history 2012-07-03 Steven Lambright - Added Meters, Kilometers to the Units enum.
+   *                           References #853.
    */
   class PlotCurve : public QwtPlotCurve {
 
@@ -72,6 +74,14 @@ namespace Isis {
          * The data is a pixel #. For example, it's the nth pixel along a line.
          */
         PixelNumber,
+        /**
+         * The data is in meters. For example, it's the nth meter along a line.
+         */
+        Meters,
+        /**
+         * The data is in kilometers. For example, it's the nth kilometer along a line.
+         */
+        Kilometers,
         /**
          * The data is a wavelength. This is usually associated with a band and
          *   comes from the band bin group.

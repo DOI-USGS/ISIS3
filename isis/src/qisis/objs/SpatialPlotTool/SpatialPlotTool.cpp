@@ -13,17 +13,24 @@
 #include <QStackedWidget>
 
 #include "Brick.h"
+#include "Camera.h"
 #include "Cube.h"
 #include "CubePlotCurve.h"
+#include "Distance.h"
 #include "InterestOperator.h"
+#include "Latitude.h"
+#include "Longitude.h"
 #include "MdiCubeViewport.h"
 #include "PlotWindow.h"
 #include "PolygonTools.h"
+#include "Projection.h"
 #include "Pvl.h"
 #include "RubberBandComboBox.h"
 #include "RubberBandTool.h"
 #include "Statistics.h"
+#include "SurfacePoint.h"
 #include "ToolPad.h"
+#include "UniversalGroundMap.h"
 
 using std::cerr;
 
@@ -40,6 +47,8 @@ namespace Isis {
     m_toolPadAction->setIcon(QPixmap(toolIconDir() + "/spatial_plot.png"));
     //connect(m_toolPadAction, SIGNAL(activated()), this, SLOT(showPlotWindow()));
     connect(this, SIGNAL(viewportChanged()), this, SLOT(viewportSelected()));
+
+    m_xUnitsCombo = new QComboBox;
   }
 
 
@@ -115,6 +124,7 @@ namespace Isis {
     layout->addWidget(new QLabel("Interpolation:"));
     layout->addWidget(m_interpolationCombo);
     layout->addWidget(abstractToolWidgets);
+    layout->addWidget(m_xUnitsCombo);
     layout->addStretch(1);
     wrapper->setLayout(layout);
 
@@ -128,6 +138,32 @@ namespace Isis {
    */
   void SpatialPlotTool::updateTool() {
     AbstractPlotTool::updateTool();
+
+    PlotCurve::Units preferredUnits =
+        (PlotCurve::Units)m_xUnitsCombo->itemData(
+          m_xUnitsCombo->currentIndex()).toInt();
+
+    while (m_xUnitsCombo->count())
+      m_xUnitsCombo->removeItem(0);
+
+    m_xUnitsCombo->addItem("Pixel Number", PlotCurve::PixelNumber);
+
+    bool haveGroundMaps = true;
+    foreach (MdiCubeViewport *cvp, viewportsToPlot()) {
+      haveGroundMaps = haveGroundMaps && cvp->universalGroundMap();
+    }
+
+    if (haveGroundMaps) {
+      m_xUnitsCombo->addItem("Meters", PlotCurve::Meters);
+      m_xUnitsCombo->addItem("Kilometers", PlotCurve::Kilometers);
+    }
+
+    if (m_xUnitsCombo->findData(preferredUnits) != -1) {
+      m_xUnitsCombo->setCurrentIndex(
+        m_xUnitsCombo->findData(preferredUnits));
+    }
+
+    m_xUnitsCombo->setVisible(m_xUnitsCombo->count() > 1);
   }
 
 
@@ -138,7 +174,9 @@ namespace Isis {
    */
   PlotWindow *SpatialPlotTool::createWindow() {
     PlotWindow *window = new PlotWindow(
-        "Spatial " + PlotWindow::defaultWindowTitle(), PlotCurve::PixelNumber,
+        "Spatial " + PlotWindow::defaultWindowTitle(),
+          (PlotCurve::Units)m_xUnitsCombo->itemData(
+            m_xUnitsCombo->currentIndex()).toInt(),
         PlotCurve::CubeDN, qobject_cast<QWidget *>(parent()));
     return window;
   }
@@ -165,7 +203,7 @@ namespace Isis {
       selectedWindow()->raise();
     }
 
-    if(RubberBandTool::isValid()) {
+    if (RubberBandTool::isValid()) {
       refreshPlot();
     }
     else {
@@ -186,6 +224,12 @@ namespace Isis {
     if (activeViewport && RubberBandTool::isValid()) {
       // Find which window we want to paste into
       PlotWindow *targetWindow = selectedWindow(true);
+
+      // if the selected window won't work, create a new one
+      if (targetWindow->xAxisUnits() !=
+          m_xUnitsCombo->itemData(m_xUnitsCombo->currentIndex()).toInt()) {
+        targetWindow = addWindow();
+      }
 
       // get curves for active viewport and also for any linked viewports
       foreach (MdiCubeViewport *viewport, viewportsToPlot()) {
@@ -218,18 +262,41 @@ namespace Isis {
     PlotWindow *targetWindow = selectedWindow();
 
     if (targetWindow) {
+      PlotCurve::Units targetUnits = (PlotCurve::Units)m_xUnitsCombo->itemData(
+            m_xUnitsCombo->currentIndex()).toInt();
+
       QPen spatialPen(Qt::white);
       spatialPen.setWidth(2);
 
       foreach (MdiCubeViewport *viewport, viewportsToPlot()) {
-        if (!(*m_spatialCurves)[viewport]) {
+        if (!(*m_spatialCurves)[viewport] ||
+            (*m_spatialCurves)[viewport]->xUnits() != targetUnits) {
           CubePlotCurve *plotCurve = createCurve("DN Values", spatialPen,
-              CubePlotCurve::PixelNumber, CubePlotCurve::CubeDN);
+              targetUnits, CubePlotCurve::CubeDN);
           m_spatialCurves->insert(viewport, plotCurve);
           targetWindow->add(plotCurve);
         }
       }
     }
+  }
+
+
+  SurfacePoint SpatialPlotTool::resultToSurfacePoint(UniversalGroundMap *groundMap) {
+    SurfacePoint result;
+
+    if (groundMap) {
+      Distance radius;
+
+      if (groundMap->Camera())
+        radius = groundMap->Camera()->LocalRadius();
+      else if (groundMap->Projection())
+        radius = Distance(groundMap->Projection()->LocalRadius(), Distance::Meters);
+
+      result = SurfacePoint(Latitude(groundMap->UniversalLatitude(), Angle::Degrees),
+          Longitude(groundMap->UniversalLongitude(), Angle::Degrees), radius);
+    }
+
+    return result;
   }
 
 
@@ -240,13 +307,15 @@ namespace Isis {
    * @param data
    * @param cvp
    */
-  QVector<QPointF> SpatialPlotTool::getSpatialStatistics(
-      MdiCubeViewport * cvp) {
+  QVector<QPointF> SpatialPlotTool::getSpatialStatistics(MdiCubeViewport *cvp) {
     QList<QPoint> vertices = RubberBandTool::getVertices();
 
     QVector<QPointF> data;
 
-    if(cvp && vertices.size()) {
+    PlotCurve::Units targetUnits = (PlotCurve::Units)m_xUnitsCombo->itemData(
+          m_xUnitsCombo->currentIndex()).toInt();
+
+    if (cvp && vertices.size()) {
       Interpolator interp;
       interp.SetType(
           (Isis::Interpolator::interpType) m_interpolationCombo->itemData(
@@ -257,7 +326,7 @@ namespace Isis {
 
       int band = ((cvp->isGray()) ? cvp->grayBand() : cvp->redBand());
 
-      if(RubberBandTool::getMode() == RubberBandTool::Line) {
+      if (RubberBandTool::getMode() == RubberBandTool::Line) {
         double startSample = Null;
         double endSample = Null;
         double startLine = Null;
@@ -271,27 +340,67 @@ namespace Isis {
         // round to the nearest pixel increment
         int lineLength = qRound(sqrt(pow(startSample - endSample, 2) +
                                      pow(startLine - endLine, 2)));
-        for(int index = 0; index < lineLength; index++) {
-          // % across * delta x + initial = x position of point
-          double x = (index / (double)lineLength) * (endSample - startSample) +
+
+        SurfacePoint startPoint;
+        UniversalGroundMap *groundMap = cvp->universalGroundMap();
+        if (targetUnits != PlotCurve::PixelNumber) {
+          if (groundMap->SetImage(startSample, startLine)) {
+            startPoint = resultToSurfacePoint(groundMap);
+          }
+          else {
+            QMessageBox::warning(qobject_cast<QWidget *>(parent()),
+                tr("Failed to project points along line"),
+                tr("Failed to project (calculate a latitude, longitude, and radius) for the "
+                   "starting point of the line (sample [%1], line [%2]).")
+                  .arg(startSample).arg(startLine));
+            return data;
+          }
+        }
+
+        for(int index = 0; index <= lineLength; index++) {
+          // % across * delta x + initial = x position of point (sample)
+          double sample = (index / (double)lineLength) * (endSample - startSample) +
                      startSample;
           // move back for interpolation
-          x -= (interp.Samples() / 2.0);
+          sample -= (interp.Samples() / 2.0);
 
-          double y = (index / (double)lineLength) * (endLine - startLine) +
+          double line = (index / (double)lineLength) * (endLine - startLine) +
                      startLine;
-          y -= (interp.Lines() / 2.0);
+          line -= (interp.Lines() / 2.0);
 
-          dataReader.SetPosition(x, y, band);
+          dataReader.SetPosition(sample, line, band);
           cvp->cube()->read(dataReader);
-          double result = interp.Interpolate(x, y, dataReader.DoubleBuffer());
+          double result = interp.Interpolate(sample, line, dataReader.DoubleBuffer());
 
-          if(!IsSpecial(result)) {
-            data.append(QPointF(index + 1, result));
+          if (!IsSpecial(result)) {
+            double plotXValue = index + 1;
+
+            if (targetUnits != PlotCurve::PixelNumber) {
+              plotXValue = sample;
+
+              if (groundMap->SetImage(sample, line)) {
+                Distance xDistance = startPoint.GetDistanceToPoint(resultToSurfacePoint(groundMap));
+
+                if (targetUnits == PlotCurve::Meters)
+                  plotXValue = xDistance.meters();
+                else if (targetUnits == PlotCurve::Kilometers)
+                  plotXValue = xDistance.kilometers();
+              }
+              else {
+                QMessageBox::warning(qobject_cast<QWidget *>(parent()),
+                    tr("Failed to project points along line"),
+                    tr("Failed to project (calculate a latitude, longitude, and radius) for a "
+                       "point along the line (sample [%1], line [%2]).")
+                      .arg(startSample).arg(startLine));
+                return data;
+              }
+            }
+
+            data.append(QPointF(plotXValue, result));
           }
         }
       }
-      else if(RubberBandTool::getMode() == RubberBandTool::RotatedRectangle) {
+      else if (RubberBandTool::getMode() == RubberBandTool::RotatedRectangle) {
         /*
          * We have a rotated rectangle:
          *
@@ -338,48 +447,90 @@ namespace Isis {
         double acrossVectorX = acrossSample - clickSample;
         double acrossVectorY = acrossLine - clickLine;
 
-        int numStepsAcross = qRound(sqrt(acrossVectorX * acrossVectorX +
-                                         acrossVectorY * acrossVectorY));
-        double xStepAcross = (1.0 / (double)numStepsAcross) * acrossVectorX;
-        double yStepAcross = (1.0 / (double)numStepsAcross) * acrossVectorY;
+        int acrossLength = qRound(sqrt(acrossVectorX * acrossVectorX +
+                                       acrossVectorY * acrossVectorY));
+        double sampleStepAcross = (1.0 / (double)acrossLength) * acrossVectorX;
+        double lineStepAcross = (1.0 / (double)acrossLength) * acrossVectorY;
 
-        double lengthVectorX = endSample - clickSample;
-        double lengthVectorY = endLine - clickLine;
-        int rectangleLength = qRound(sqrt(lengthVectorX * lengthVectorX +
-                                          lengthVectorY * lengthVectorY));
+        double lengthVectorSample = endSample - clickSample;
+        double lengthVectorLine = endLine - clickLine;
+        int rectangleLength = qRound(sqrt(lengthVectorSample * lengthVectorSample +
+                                          lengthVectorLine * lengthVectorLine));
+
+        SurfacePoint startPoint;
+        UniversalGroundMap *groundMap = cvp->universalGroundMap();
+        if (targetUnits != PlotCurve::PixelNumber) {
+          double midStartSample = (clickSample + acrossSample) / 2.0;
+          double midStartLine = (clickLine + acrossLine) / 2.0;
+          if (groundMap->SetImage(midStartSample, midStartLine)) {
+            startPoint = resultToSurfacePoint(groundMap);
+          }
+          else {
+            QMessageBox::warning(qobject_cast<QWidget *>(parent()),
+                tr("Failed to project points along line"),
+                tr("Failed to project (calculate a latitude, longitude, and radius) for the "
+                   "starting point of the line (sample [%1], line [%2]).")
+                  .arg(midStartSample).arg(midStartLine));
+            return data;
+          }
+        }
 
         // walk the "green" line on the screen
-        for(int index = 0; index < rectangleLength; index++) {
+        for(int index = 0; index <= rectangleLength; index++) {
           Statistics acrossStats;
 
-          // % along length * lengthVectorX + clickSample = x position of point
-          double x = (index / (double)rectangleLength) * lengthVectorX +
+          // % along length * lengthVectorSample + clickSample = x position of point
+          double sample = (index / (double)rectangleLength) * lengthVectorSample +
                      clickSample;
           // move back for interpolation
-          x -= (interp.Samples() / 2.0);
+          sample -= (interp.Samples() / 2.0);
 
-          double y = (index / (double)rectangleLength) * lengthVectorY +
+          double line = (index / (double)rectangleLength) * lengthVectorLine +
                      clickLine;
-          y -= (interp.Lines() / 2.0);
+          line -= (interp.Lines() / 2.0);
+
+          double sampleMid = sample + (acrossLength / 2.0) * sampleStepAcross;
+          double lineMid = line + (acrossLength / 2.0) * lineStepAcross;
 
           for(int acrossPixel = 0;
-              acrossPixel < numStepsAcross;
+              acrossPixel <= acrossLength;
               acrossPixel++) {
-            dataReader.SetPosition(x, y, band);
+            dataReader.SetPosition(sample, line, band);
             cvp->cube()->read(dataReader);
-            double pixelValue = interp.Interpolate(x, y,
+            double pixelValue = interp.Interpolate(sample, line,
                                                    dataReader.DoubleBuffer());
 
-            if(!IsSpecial(pixelValue)) {
+            if (!IsSpecial(pixelValue)) {
               acrossStats.AddData(pixelValue);
             }
 
-            x += xStepAcross;
-            y += yStepAcross;
+            sample += sampleStepAcross;
+            line += lineStepAcross;
           }
 
-          if(!IsSpecial(acrossStats.Average())) {
-            data.append(QPointF(index + 1, acrossStats.Average()));
+          if (!IsSpecial(acrossStats.Average())) {
+            double plotXValue = index + 1;
+
+            if (targetUnits != PlotCurve::PixelNumber) {
+              if (groundMap->SetImage(sampleMid, lineMid)) {
+                Distance xDistance = startPoint.GetDistanceToPoint(resultToSurfacePoint(groundMap));
+
+                if (targetUnits == PlotCurve::Meters)
+                  plotXValue = xDistance.meters();
+                else if (targetUnits == PlotCurve::Kilometers)
+                  plotXValue = xDistance.kilometers();
+              }
+              else {
+                QMessageBox::warning(qobject_cast<QWidget *>(parent()),
+                    tr("Failed to project points along line"),
+                    tr("Failed to project (calculate a latitude, longitude, and radius) for a "
+                       "point along the line (sample [%1], line [%2]).")
+                      .arg(sampleMid).arg(lineMid));
+                return data;
+              }
+            }
+
+            data.append(QPointF(plotXValue, acrossStats.Average()));
           }
         }
       }

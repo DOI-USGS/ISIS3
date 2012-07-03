@@ -63,7 +63,9 @@ namespace Isis {
    *                           loses focus. This works for both histogram and
    *                           plot tools.
    *   @history 2011-09-21 Steven Lambright - Removed the fixed size from the
-   *                          configure curve dialog. Fixes #203.
+   *                           configure curve dialog. Fixes #203.
+   *   @history 2012-07-03 Steven Lambright - Added labels for Meters/Kilometers
+   *                           units.
    */
   class PlotWindow : public MainWindow {
       Q_OBJECT

@@ -15,6 +15,8 @@ namespace Isis {
   class CubePlotCurve;
   class PlotWindow;
   class RubberBandComboBox;
+  class SurfacePoint;
+  class UniversalGroundMap;
 
   /**
    * @brief Spatial Plots
@@ -22,8 +24,8 @@ namespace Isis {
    * This tool provides spatial plots for the user.
    *
    * @author ????-??-?? Stacy Alley
-   *  
-   * @internal 
+   *
+   * @internal
    *   @history 2008-08-18 Christopher Austin - Upgraded to geos3.0.0
    *   @history 2008-09-05 Stacy Alley allowed spectral plotting of a single
    *                           point.
@@ -37,6 +39,8 @@ namespace Isis {
    *   @history 2011-09-20 Steven Lambright - Now handles NULL statistical
    *                           values when graphing by not displaying them.
    *                           Fixes #234.
+   *   @history 2011-07-03 Steven Lambright - Added options for plotting meters/kilometers
+   *                           on the x-axis instead of just pixel number. Fixes #853.
    */
   class SpatialPlotTool : public AbstractPlotTool {
       Q_OBJECT
@@ -61,7 +65,11 @@ namespace Isis {
 
     private:
       QVector<QPointF> getSpatialStatistics(MdiCubeViewport *);
+      static SurfacePoint resultToSurfacePoint(UniversalGroundMap *);
       void validatePlotCurves();
+
+    private:
+      QPointer<QComboBox> m_xUnitsCombo;
 
       //! Plot tool's action
       QPointer<QAction> m_toolPadAction;

@@ -581,7 +581,7 @@ namespace Isis {
 
       for (int startIndex = 0; startIndex < RubberBandTool::getVertices().size() - 1; startIndex++) {
         QPoint start = RubberBandTool::getVertices()[startIndex];
-        QPoint end   = RubberBandTool::getVertices()[startIndex+1];
+        QPoint end   = RubberBandTool::getVertices()[startIndex + 1];
 
         setDistances(cvp, start, end);
 
@@ -753,6 +753,7 @@ namespace Isis {
     }
 
     Distance distance = startPoint.GetDistanceToPoint(endPoint, radiusDist);
+
     m_mDist = distance.meters();
     m_kmDist = distance.kilometers();
   }

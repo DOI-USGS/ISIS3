@@ -89,6 +89,8 @@ namespace Isis {
     unitLabels.insert(PlotCurve::PixelNumber, "Pixel Number");
     unitLabels.insert(PlotCurve::CubeDN, "Pixel Value");
     unitLabels.insert(PlotCurve::Elevation, "Elevation");
+    unitLabels.insert(PlotCurve::Meters, "Meters");
+    unitLabels.insert(PlotCurve::Kilometers, "Kilometers");
     unitLabels.insert(PlotCurve::Wavelength, "Wavelength");
 
     plot()->setAxisTitle(QwtPlot::xBottom, unitLabels[xAxisUnits]);

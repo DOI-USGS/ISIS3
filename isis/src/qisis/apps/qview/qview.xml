@@ -94,5 +94,8 @@
       Improved handling of special pixels in the statistics tool so that they are reported
       correctly. Fixes #199.
     </change>
+    <change name="Steven Lambright" date="2012-07-03">
+      Added M/KM options to the spatial plot tool. Fixes #853.
+    </change>
   </history>
 </application>
