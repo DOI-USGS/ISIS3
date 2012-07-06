@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QMenu>
+#include <QSize>
 
 #include "Angle.h"
 #include "Camera.h"
@@ -46,7 +47,8 @@ namespace Isis {
     p_tableWin->installEventFilter(this);
 
     p_tableWin->addToTable(false, "Id", "Id");
-    p_tableWin->addToTable(true, "Sample:Line", "Sample:Line", -1, Qt::Horizontal, "Sample and Line");
+    p_tableWin->addToTable(true, "Sample:Line", "Sample:Line", -1,
+                           Qt::Horizontal, "Sample and Line");
     p_tableWin->addToTable(false, "Band", "Band");
     p_tableWin->addToTable(true, "Pixel", "Pixel");
     p_tableWin->addToTable(true, "Planetocentric Latitude", "Planetocentric Lat");
@@ -55,10 +57,13 @@ namespace Isis {
     p_tableWin->addToTable(false, "360 Positive West Longitude", "360 West Longitude");
     p_tableWin->addToTable(true, "180 Positive East Longitude", "180 East Longitude");
     p_tableWin->addToTable(false, "180 Positive West Longitude", "180 West Longitude");
-    p_tableWin->addToTable(false, "Projected X:Projected Y", "Projected X:Projected Y", -1, Qt::Horizontal, "X and Y values for a projected image");
+    p_tableWin->addToTable(false, "Projected X:Projected Y", "Projected X:Projected Y", -1,
+                           Qt::Horizontal, "X and Y values for a projected image");
     p_tableWin->addToTable(false, "Local Radius", "Radius");
-    p_tableWin->addToTable(false, "Point X:Point Y:Point Z", "XYZ", -1, Qt::Horizontal, "The X, Y, and Z of surface intersection in body-fixed coordinates");
-    p_tableWin->addToTable(false, "Right Ascension:Declination", "Ra:Dec", -1, Qt::Horizontal, "Right Ascension and Declination");
+    p_tableWin->addToTable(false, "Point X:Point Y:Point Z", "XYZ", -1, Qt::Horizontal,
+                           "The X, Y, and Z of surface intersection in body-fixed coordinates");
+    p_tableWin->addToTable(false, "Right Ascension:Declination", "Ra:Dec", -1, Qt::Horizontal,
+                           "Right Ascension and Declination");
     p_tableWin->addToTable(false, "Resolution", "Resolution");
     p_tableWin->addToTable(false, "Phase", "Phase");
     p_tableWin->addToTable(false, "Incidence", "Incidence");
@@ -68,7 +73,8 @@ namespace Isis {
     p_tableWin->addToTable(false, "North Azimuth", "North Azimuth");
     p_tableWin->addToTable(false, "Sun Azimuth", "Sun Azimuth");
     p_tableWin->addToTable(false, "Solar Longitude", "Solar Longitude");
-    p_tableWin->addToTable(false, "Spacecraft X:Spacecraft Y:Spacecraft Z", "Spacecraft Position", -1, Qt::Horizontal, "The X, Y, and Z of the spacecraft position");
+    p_tableWin->addToTable(false, "Spacecraft X:Spacecraft Y:Spacecraft Z", "Spacecraft Position",
+                           -1, Qt::Horizontal, "The X, Y, and Z of the spacecraft position");
     p_tableWin->addToTable(false, "Spacecraft Azimuth", "Spacecraft Azimuth");
     p_tableWin->addToTable(false, "Slant Distance", "Slant Distance");
     p_tableWin->addToTable(false, "Ephemeris Time", "Ephemeris iTime");
@@ -99,8 +105,23 @@ namespace Isis {
     recordAction->setShortcut(Qt::Key_R);
     parent->addAction(recordAction);
     connect(recordAction, SIGNAL(activated()), this, SLOT(record()));
-    p_tableWin->setStatusMessage("To record press the R key");
+    p_tableWin->setStatusMessage("To record press the R key"
+                                 "  ---  Double click on a cell to enable crtl+c (copy) and"
+                                 " ctrl+v (paste).");
 
+    // Add a help menu to the menu bar
+    QMenuBar *menuBar = p_tableWin->menuBar();
+    QMenu *helpMenu = menuBar->addMenu("&Help");
+    QAction *help = new QAction(p_tableWin);
+    help->setText("&Tool Help");
+    help->setShortcut(Qt::CTRL + Qt::Key_H);
+    connect(help, SIGNAL(activated()), this, SLOT(helpDialog()));
+    helpMenu->addAction(help);
+    p_tableWin->setMenuBar(menuBar);
+    installEventFilter(p_tableWin);
+
+    m_showHelpOnStart = true;
+    readSettings();
   }
 
   /**
@@ -114,6 +135,11 @@ namespace Isis {
   bool AdvancedTrackTool::eventFilter(QObject *o, QEvent *e) {
     if(e->type() == QEvent::Show) {
       activate(true);
+      if (m_showHelpOnStart) {
+        helpDialog();
+        m_showHelpOnStart = false;
+        writeSettings();
+      }
     }
     else if(e->type() == QEvent::Hide) {
       activate(false);
@@ -296,7 +322,8 @@ namespace Isis {
         p_tableWin->table()->item(row, RADIUS)->setText(QString::number(radius, 'f', 15));
 
         /* 180 Positive East Lon. */
-        p_tableWin->table()->item(row, EAST_LON_180)->setText(QString::number(Projection::To180Domain(lon), 'f', 15));
+        p_tableWin->table()->item(row, EAST_LON_180)->
+                             setText(QString::number(Projection::To180Domain(lon), 'f', 15));
 
         // Write out the planetographic and positive west values
         lon = -lon;
@@ -308,7 +335,8 @@ namespace Isis {
         p_tableWin->table()->item(row, WEST_LON_360)->setText(QString::number(lon, 'f', 15));
 
         /*180 Positive West Lon.  */
-        p_tableWin->table()->item(row, WEST_LON_180)->setText(QString::number(Projection::To180Domain(lon), 'f', 15));
+        p_tableWin->table()->item(row, WEST_LON_180)->setText(
+                                  QString::number(Projection::To180Domain(lon), 'f', 15));
 
         // Next write out columns, the x/y/z position of the lat/lon
         double pos[3];
@@ -336,8 +364,10 @@ namespace Isis {
         bool bSuccess=false;
         cvp->camera()->LocalPhotometricAngles(phaseAngle, incidenceAngle, emissionAngle, bSuccess);
         if(bSuccess) {
-          p_tableWin->table()->item(row, LOCAL_INCIDENCE)->setText(QString::number(incidenceAngle.degrees()));
-          p_tableWin->table()->item(row, LOCAL_EMISSION)->setText(QString::number(emissionAngle.degrees()));
+          p_tableWin->table()->item(row, LOCAL_INCIDENCE)->
+                               setText(QString::number(incidenceAngle.degrees()));
+          p_tableWin->table()->item(row, LOCAL_EMISSION)->
+                               setText(QString::number(emissionAngle.degrees()));
         }
         else {
           p_tableWin->table()->item(row, LOCAL_INCIDENCE)->setText("NA");
@@ -397,12 +427,17 @@ namespace Isis {
         }
         else {
           double radius = cvp->projection()->LocalRadius();
-          p_tableWin->table()->item(row, PLANETOCENTRIC_LAT)->setText(QString::number(lat, 'f', 15));
-          p_tableWin->table()->item(row, PLANETOGRAPHIC_LAT)->setText(QString::number(glat, 'f', 15));
-          p_tableWin->table()->item(row, EAST_LON_360)->setText(QString::number(lon, 'f', 15));
-          p_tableWin->table()->item(row, EAST_LON_180)->setText(QString::number(Projection::To180Domain(lon), 'f', 15));
+          p_tableWin->table()->item(row, PLANETOCENTRIC_LAT)->
+                               setText(QString::number(lat, 'f', 15));
+          p_tableWin->table()->item(row, PLANETOGRAPHIC_LAT)->
+                               setText(QString::number(glat, 'f', 15));
+          p_tableWin->table()->item(row, EAST_LON_360)->
+                               setText(QString::number(lon, 'f', 15));
+          p_tableWin->table()->item(row, EAST_LON_180)->
+                               setText(QString::number(Projection::To180Domain(lon), 'f', 15));
           p_tableWin->table()->item(row, WEST_LON_360)->setText(QString::number(wlon, 'f', 15));
-          p_tableWin->table()->item(row, WEST_LON_180)->setText(QString::number(Projection::To180Domain(wlon), 'f', 15));
+          p_tableWin->table()->item(row, WEST_LON_180)->
+                               setText(QString::number(Projection::To180Domain(wlon), 'f', 15));
           p_tableWin->table()->item(row, RADIUS)->setText(QString::number(radius, 'f', 15));
         }
       }
@@ -425,14 +460,15 @@ namespace Isis {
     TrackMosaicOrigin(cvp, iline, isample, iMosaicOrigin, sSrcFileName, sSrcSerialNum);
     p_tableWin->table()->item(row, TRACK_MOSAIC_INDEX)->setText(QString::number(iMosaicOrigin));
     p_tableWin->table()->item(row, TRACK_MOSAIC_FILENAME)->setText(QString(sSrcFileName.c_str()));
-    p_tableWin->table()->item(row, TRACK_MOSAIC_SERIAL_NUM)->setText(QString(sSrcSerialNum.c_str()));
+    p_tableWin->table()->item(row, TRACK_MOSAIC_SERIAL_NUM)->
+                         setText(QString(sSrcSerialNum.c_str()));
   }
 
 
   /**
    * TrackMosaicOrigin - Given the pointer to Cube and line and
-   * sample index, finds the origin of the mosaic if the TRACKING
-   * band and Mosaic Origin Table  exists.
+   *   sample index, finds the origin of the mosaic if the TRACKING
+   *   band and Mosaic Origin Table  exists.
    *
    * @author sprasad (11/16/2009)
    *
@@ -498,6 +534,60 @@ namespace Isis {
     }
   }
 
+
+  /**
+   * This method creates a dialog box that shows help tips. It is displayed when the tool is
+   *   opened the first time (unless the user says otherwise) and when the user opens it through
+   *   the help menu.
+   */
+  void AdvancedTrackTool::helpDialog() {
+
+      QDialog  *helpDialog = new QDialog(p_tableWin);
+
+      QVBoxLayout *dialogLayout = new QVBoxLayout;
+      helpDialog->setLayout(dialogLayout);
+      QLabel *dialogTitle = new QLabel("<h3>Advanced Tracking Tool</h3>");
+      dialogLayout->addWidget(dialogTitle);
+
+      QTabWidget *tabArea = new QTabWidget;
+      dialogLayout->addWidget(tabArea);
+
+      QScrollArea *recordTab = new QScrollArea;
+      QWidget *recordContainer = new QWidget;
+      QVBoxLayout *recordLayout = new QVBoxLayout;
+      recordContainer->setLayout(recordLayout);
+      QLabel *recordText = new QLabel("To record, click on the viewport of interest and"
+                                      " press (r) while the mouse is hovering over the image.");
+      recordText->setWordWrap(true);
+      recordLayout->addWidget(recordText);
+      recordTab->setWidget(recordContainer);
+
+      QScrollArea *helpTab = new QScrollArea;
+      QWidget *helpContainer = new QWidget;
+      QVBoxLayout *helpLayout = new QVBoxLayout;
+      helpContainer->setLayout(helpLayout);
+      QLabel *helpText = new QLabel("In order to use <i>ctrl+c</i> to copy and <i>ctrl+v</i> to"
+                                    " paste, you need to double click on the cell you are copying"
+                                    " from (the text should be highlighted). Then double click on"
+                                    " the cell you are pasting to (you should see a cursor if the"
+                                    " cell is blank). When a cell is in this editing mode, most"
+                                    " keyboard shortcuts work.");
+      helpText->setWordWrap(true);
+      recordText->setWordWrap(true);
+      helpLayout->addWidget(helpText);
+      helpTab->setWidget(helpContainer);
+
+      tabArea->addTab(recordTab, "Record");
+      tabArea->addTab(helpTab, "Table Help");
+
+      QPushButton *okButton = new QPushButton("OK");
+      dialogLayout->addStretch();
+      dialogLayout->addWidget(okButton);
+      helpDialog->show();
+      connect(okButton, SIGNAL(clicked()), helpDialog, SLOT(accept()));
+  }
+
+  
   /**
    * This method records data to the current row.
    *
@@ -519,7 +609,8 @@ namespace Isis {
     }
 
     QApplication::sendPostedEvents(p_tableWin->table(), 0);
-    p_tableWin->table()->scrollToItem(p_tableWin->table()->item(p_tableWin->currentRow(), 0), QAbstractItemView::PositionAtBottom);
+    p_tableWin->table()->scrollToItem(p_tableWin->table()->item(p_tableWin->currentRow(), 0),
+                                      QAbstractItemView::PositionAtBottom);
 
     //Keep track of number times user presses 'R' (record command)
     p_id = p_tableWin->table()->item(p_tableWin->currentRow() - 1, 0)->text().toInt() + 1;
@@ -528,7 +619,7 @@ namespace Isis {
 
   /**
    * This slot updates the row with data from the point given and
-   * records data to the current row.
+   *   records data to the current row.
    *
    * @param p   QPoint from which the row(s) will be updated and
    *            recorded.
@@ -547,6 +638,7 @@ namespace Isis {
     p_tableWin->showTable();
   }
 
+  
   /**
    * This method updates the record ID.
    *
@@ -557,5 +649,50 @@ namespace Isis {
       p_id = 0;
     else
       p_id = p_tableWin->table()->item(p_tableWin->currentRow() - 1, ID)->text().toInt() + 1;
+  }
+
+
+  /**
+   * Read this tool's preserved state. This uses the current state as defaults,
+   *   so please make sure your variables are initialized before calling this
+   *   method.
+   */
+  void AdvancedTrackTool::readSettings() {
+
+    QSettings settings(settingsFilePath() , QSettings::NativeFormat);
+
+    m_showHelpOnStart = settings.value("showHelpOnStart", m_showHelpOnStart).toBool();
+  }
+
+
+  /**
+   * Write out this tool's preserved state between runs. This is NOT called on
+   *   close, so you should call this any time you change the preserved state.
+   */
+  void AdvancedTrackTool::writeSettings() {
+    
+    QSettings settings(settingsFilePath(), QSettings::NativeFormat);
+  
+    settings.setValue("showHelpOnStart", m_showHelpOnStart);
+  }
+
+  
+  /**
+   * Generate the correct path for the config file.
+   *
+   * @return the config file path
+   */
+  QString AdvancedTrackTool::settingsFilePath() const {
+
+    if (QApplication::applicationName() == "") {
+      throw IException(IException::Programmer, "You must set QApplication's "
+          "application name before using the Isis::MainWindow class. Window "
+          "state and geometry can not be saved and restored", _FILEINFO_);
+    }
+    
+    FileName config(FileName("$HOME/.Isis/" + QApplication::applicationName() + "/").path() + "/" +
+                    "advancedTrackTool.config");
+    
+    return config.expanded().ToQt();
   }
 }

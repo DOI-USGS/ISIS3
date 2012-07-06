@@ -59,6 +59,10 @@ namespace Isis {
    *           include issues
    *  @history 2011-02-16 Sharmila Prasad - Added columns for Local Emission and
    *           Incidence Angles
+   *  @history 2012-06-22 Kimberly Oyama and Steven Lambright - Added a help menu to
+   *                          the menu bar and a help dialog that displays when the
+   *                          tool is opened the first time and when the user opens
+   *                          it through the help menu. Fixes #772.
    */
   class AdvancedTrackTool : public Tool {
       Q_OBJECT
@@ -93,8 +97,13 @@ namespace Isis {
       void TrackMosaicOrigin(MdiCubeViewport *cvp, int piLine, int piSample,
                              int &piOrigin, std::string &psSrcFileName,
                              std::string &psSrcSerialNum);
+      void helpDialog();
 
     private:
+      void readSettings();
+      void writeSettings();
+      QString settingsFilePath() const;
+      
       /**
        * Enum for column values
        */
@@ -147,6 +156,7 @@ namespace Isis {
       int p_numRows;                       //!< The number of rows in the table
       int p_id;                            //!< The record id
       TableMainWindow *p_tableWin;  //!< The table window
+      bool m_showHelpOnStart;              //!< True to show dialog When tool is started
 
   };
 
