@@ -1,92 +1,72 @@
-#include "Isis.h"
-#include "ProcessByLine.h"
-#include "SpecialPixel.h"
-#include "iString.h"
+/**
+ * @file
+ * $Revision: 1.19 $
+ * $Date: 2010/03/22 19:44:53 $
+ *
+ *   Unless noted otherwise, the portions of Isis written by the USGS are
+ *   public domain. See individual third-party library and package descriptions
+ *   for intellectual property information, user agreements, and related
+ *   information.
+ *
+ *   Although Isis has been used by the USGS, no warranty, expressed or
+ *   implied, is made by the USGS as to the accuracy and functioning of such
+ *   software and related material nor shall the fact of distribution
+ *   constitute any such warranty, and no responsibility is assumed by the
+ *   USGS in connection therewith.
+ *
+ *   For additional information, launch
+ *   $ISISROOT/doc//documents/Disclaimers/Disclaimers.html
+ *   in a browser or see the Privacy &amp; Disclaimers page on the Isis website,
+ *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
+ *   http://www.usgs.gov/privacy.html.
+ */
 
-#include "Statistics.h"
+#include "Isis.h"
+
+#include <QMessageBox>
+
+#include "FindGapsFunctor.h"
+#include "IException.h"
+#include "iString.h"
 #include "MultivariateStatistics.h"
+#include "ProcessByLine.h"
+#include "ProcessBySample.h"
+#include "SpecialPixel.h"
+#include "Statistics.h"
 
 using namespace std;
 using namespace Isis;
 
-void FindGaps(Buffer &in);
-
-// The Correlation Tollerance variable
-double corTol;
-// Vector to hold the previous line
-std::vector<double> previousLine;
-// The PvlGroup for storing results
-PvlGroup pvl("Gap");
-Pvl toDisplay;
-bool inGap = false;
-int lineNum;  // Used when gaps go to the end of the band
-
-
 void IsisMain() {
-  // Processing by line
-  ProcessByLine p;
 
-  // Setup the input cube and lastLine array
-  Cube *icube = p.SetInputCube("FROM");
-  previousLine.resize(icube->getSampleCount());
-  lineNum = icube->getLineCount();
-
-  // Gets the Correlation Tollerance
   UserInterface &ui = Application::GetUserInterface();
-  corTol = ui.GetDouble("CORTOL");
+  double corTol = ui.GetDouble("CORTOL"); // The correlation tolerance
+  int bufferSizeBeforeGap = ui.GetInteger("ABOVE");
+  int bufferSizeAfterGap = ui.GetInteger("BELOW");
+  bool outputCubeSpecified = (ui.GetAsString("TO") != "none");
+  bool logFileSpecified = (ui.GetAsString("LOG") != "none");
 
-  // Starts the find gaps process
-  p.StartProcess(FindGaps);
-  //In case the last gap runs to the end of the cube
-  if(inGap) {
-    pvl.AddKeyword(PvlKeyword("ToEndOfBand", lineNum));
-  }
-  toDisplay.Write(ui.GetFileName("TO"));
-  toDisplay.Clear();
-  inGap = false;
-  p.EndProcess();
-}
+  if (outputCubeSpecified || logFileSpecified) {
+    ProcessByLine p;
+    Cube *iCube = p.SetInputCube("FROM");
 
-/**
- * Processes the current line with the previous, and acts
- * accordingly, posting bad results in Log.
- * @param in
- */
-void FindGaps(Buffer &in) {
-  // Copys line 1 into previousLine since it is the top of the Band
-  if(in.Line() == 1) {
-    for(int i = 0; i < in.size(); i++) previousLine[i] = in[i];
-    return;
-  }
+    FindGapsFunctor gapsFunctor(iCube->getLineCount(), corTol, bufferSizeBeforeGap,
+                                bufferSizeAfterGap);
+    p.ProcessCubeInPlace(gapsFunctor, false);
 
-  // Uses MultivariateStatistics to compare the last line with the current
-  MultivariateStatistics mSt;
-  mSt.AddData(&previousLine[0], in.DoubleBuffer(), in.size());
-  double correlation = mSt.Correlation();
-  if(std::fabs(correlation) < corTol  ||  correlation == Isis::Null) {
-    // Then current line is a Gap, and acts accordingly
-    if(!inGap) {
-      inGap = true;
-      pvl.AddKeyword(PvlKeyword("NewGapInBand", in.Band()));
-      pvl.AddKeyword(PvlKeyword("StartLine", in.Line()));
-      if(correlation == Isis::Null) {
-        correlation = 0.0;
-      }
-      pvl.AddKeyword(PvlKeyword("Correlation", correlation));
+    if (outputCubeSpecified) {
+      gapsFunctor.setModification("NULL buffers added to output cube");
+      p.SetOutputCube("TO");
+      p.ProcessCube(gapsFunctor, false);
+    }
+
+    if (logFileSpecified) {
+      gapsFunctor.gaps().Write(ui.GetFileName("LOG"));
     }
   }
-  else if(inGap) {
-    // Then it was the last line of the gap 2 lines ago, since this line and its pervious line correlate
-    inGap = false;
-    if(in.Line() - 2 == 0) {
-      pvl.AddKeyword(PvlKeyword("ToEndOfBand", lineNum));
-    }
-    else {
-      pvl.AddKeyword(PvlKeyword("LastGapLine", in.Line() - 2));
-    }
-    toDisplay.AddGroup(pvl);
-    pvl = PvlGroup("Gap");
+  else {
+    throw IException(IException::User,
+                     "At least one form of output (a log file or cube) needs to be entered.",
+                     _FILEINFO_);
   }
-  // Sets upt previousLine for next pass
-  for(int i = 0; i < in.size(); i++) previousLine[i] = in[i];
 }

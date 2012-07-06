@@ -1,12 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<application name="findgaps" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
-   <brief>
+<application name="findgaps" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNmaespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+
+  <brief>
     Finds the gaps in a given Cube.
   </brief>
 
   <description>
-        This program will find any gaps in a Cube and display their beggining and final lines as well as their band.
-        These values will be placed into the file defined by the TO parameter.
+    <p>This program finds gaps in the line direction of an image, and will report the gap
+    information or expand the gap based on user parameters or default settings. Gaps are areas where
+    the entire line consists of NULL pixel values or pixel values statistically below the threshold
+    setting of the CORTOL parameter.  This program ignores single line gaps.If the LOG parameter is
+    specified, the starting and last line    of each gap as well as the band number is recorded and
+    placed into a log filename (.pvl, .txt)    entered by the user. If the output cube or TO
+    parameter is not specified, then the program only    identifies the gaps.</p>
+
+    <p>The CORTOL parameter should be set to "0.0" to only identify an entire line of "NULL" pixels
+    as a gap. If the CORTOL parameter is set to a value greater than "0.0," then the statistics of
+    the current line are compared against the statistics of the previous line to determine if the
+    line should be considered a gap. This option is useful if random lines are much brighter or
+    darker than the adjacent lines.</p>
   </description>
 
   <category>
@@ -20,6 +32,11 @@
     <change name="Steven Lambright" date="2008-05-12">
       Removed references to CubeInfo 
     </change>
+    <change name="Kimberly Oyama and Steven Lambright" date="2012-06-15">
+      Added the option to nullify a gap and add a buffer of null lines above and below each gap and
+      output these results to a cube. If no output cube is specified results will only be output to
+      a log file (.pvl, .prt, or .txt) or vice versa. Neither output affects the other. Fixes #582.
+    </change>
   </history>
 
   <groups>
@@ -28,7 +45,7 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Input cube file.
+          Input cube file
         </brief>
         <description>
           Input cube file to be checked for line gaps.
@@ -37,15 +54,38 @@
           *.cub
         </filter>
       </parameter>
+
       <parameter name="TO">
-        <type>filename</type>
+        <type>cube</type>
         <fileMode>output</fileMode>
+        <default>
+          <item>none</item>
+        </default>
         <brief>
-          The text to append Gap info
+          Output cube file
         </brief>
         <description>
-          The text file in which all of the information about the gaps found in 
-          the input cube is written.
+          The resulting cube with a null buffer above and below each gap. Enter "TO=none"
+          if you do not want to output a modified cube.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="LOG">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <default>
+          <item>none</item>
+        </default>
+        <brief>
+          The output file of the list of gaps (.pvl, .prt, or .txt).
+        </brief>
+        <description>
+          The output file to which all of the gap information is written. If left as the default,
+          no log file will be created/updated. This file will not be affected by the nulled lines
+          that are included in the output cube.
         </description>
         <filter>
           *.txt *.prt *.pvl
@@ -55,65 +95,109 @@
 
      <group name="Correlation Coefficient Tolerance" >
       <parameter name="CORTOL">
-          <type>double</type>
-	  <default><item>0.7</item></default>
-	  <brief>Correlation Tolerance</brief>
-	  <description>
-	      This parameter specifies the tolerance of the correlation coefficient 
-          when running FindGaps.  Default = 0.7
-	  </description>
+        <type>double</type>
+        <default><item>0.0</item></default>
+        <brief>Correlation Tolerance</brief>
+        <description>
+          This parameter determines how similar one line can be to the next and still be considerd
+          part of a gap. A higher tolerance will result in gaps that are
+          more similar to the surrounding area (possibly valid data). A tolerance
+          closer to zero will result in gaps that are more different from the
+          surrounding area (CORTOL=0.0 will give you gaps of null data).
+        </description>
+      </parameter>
+    </group>
+
+     <group name="Buffer Size (Lines)" >
+      <parameter name="ABOVE">
+        <type>integer</type>
+        <default><item>7</item></default>
+        <brief>Number of nulled lines above gaps.</brief>
+        <description>
+          This parameter specifies how many lines above the gap are set to null in the output
+          cube.
+        </description>
+      </parameter>
+
+      <parameter name="BELOW">
+        <type>integer</type>
+        <default><item>7</item></default>
+        <brief>Number of nulled lines below gaps</brief>
+        <description>
+          This parameter specifies how many lines below the gap are set to null in the output
+          cube.
+        </description>
       </parameter>
     </group>
   </groups>
 
-    <examples>
-        <example>
-            <brief>Finds Image Gaps</brief>
-            <description>
-                This example shows how findgaps works on the cube 
-                I11971007RDR_lev1.cub.
-            </description>
-            
-            <terminalInterface>
-                <commandLine>FROM=I11971007RDR_lev1.cub 
-                  TO=results.txt</commandLine>
-                <description>
-                    Searches I11971007RDR_lev1.cub for gaps based on the default 
-                    Correlation Tolerance of CORTOL=0.7
-                </description>
-            </terminalInterface> 
-            
-            <inputImages>
-                <image src="assets/images/I11971007RDR_lev1.jpg" width="320" height="750">
-                    <brief>The image</brief>
-                    <description> 
-                        This is the image I11971007RDR_lev1.cub within which 
-                        line gaps are being found.
-                    </description>
-                    <thumbnail caption="I11971007RDR_lev1.cub" src="assets/images/I11971007RDR_lev1.jpg" width="86" height="200"/>
-                    <parameterName>FROM</parameterName>
-                </image>
-            </inputImages> 
+  <examples>
+    <example>
+      <brief>Finds Image Gaps</brief>
+      <description>
+        This example shows how findgaps works on the cube
+        I02025005RDR.cub.
+      </description>
 
-            <dataFiles>
-                <dataFile path="assets/results.txt">
-                    <brief>results.txt</brief>
-                    <description>
-                        <p> In the case of no gaps, the TO output file 
-                          parameter will be empty. </p>
-                        <p>  When there are gaps in the cube image, then there 
-                        is a pvl display in the TO file. In this example, 
-                        that file is results.txt as shown here. This group
-                        displays the band these gaps were found in, the starting 
-                        line for the particular gap, the correlation coefficient 
-                        that initiated the finding of that gap, as well as the 
-                        last line of the given gap. 
-                        </p>
-                    </description>
-                </dataFile>
-            </dataFiles>
+      <terminalInterface>
+         <commandLine>FROM=I02025005RDR.cub
+           TO=cubeResults.cub
+           LOG=logFileResults.txt
+           ABOVE=10
+           BELOW=10
+        </commandLine>
+        <description>
+          Searches I02025005RDR.cub for gaps based on the default
+          Correlation Tolerance of CORTOL=0.0
+        </description>
+      </terminalInterface>
 
-      </example>
-    </examples>
+      <inputImages>
+        <image src="assets/images/I02025005RDR.jpg" width="320" height="750">
+          <brief>A section of the input cube</brief>
+          <description>
+            This image shows three null gaps.
+          </description>
+          <thumbnail caption="I02025005RDR.cub" src="assets/images/I02025005RDR.jpg"
+                     width="86" height="200"/>
+            <parameterName>FROM</parameterName>
+        </image>
+      </inputImages>
 
+      <outputImages>
+        <image src="assets/images/cubeResults.jpg" width="320" height="750">
+          <brief>The same section as that shown for the input image.</brief>
+          <description>
+            This is the image cubeResults.cub that has null lines above and below each gap. You can
+            see that 10 lines above and below the gap have been nulled out. The narrow strip of
+            valid data in the middle of the image has been set to null due to the ABOVE and BELOW
+            parameter settings. Reduce the value for ABOVE and BELOW to minimize the lines being set
+            to NULL. 
+          </description>
+          <thumbnail caption="cubeResults.cub" src="assets/images/cubeResults.jpg"
+                     width="86" height="200"/>
+            <parameterName>TO</parameterName>
+        </image>
+      </outputImages>
+
+      <dataFiles>
+        <dataFile path="assets/logFileResults.txt">"
+                             "
+          <brief>logFileResults.txt</brief>
+          <description>
+            <p> In the case of no gaps, the LOG output file
+            parameter will be empty. </p>
+            <p> When there are gaps in the cube image, then the gap information is reported in the
+            LOG file if it is specified. In this example, that file is logFileResults.txt, as shown
+            here. Each gap is displayed as a group consisting of the band number, the starting line
+            number, the correlation coefficient that defined the line as gap, and the last line for
+            a particular gap. 
+            </p>
+          </description>
+        </dataFile>
+      </dataFiles>
+      
+    </example>
+  </examples>
+  
 </application>
