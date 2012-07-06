@@ -1,5 +1,50 @@
+Testing realLinearRoots
+Equation: 3*X - 2 = 0.0  One real root
+solutions: 0.666667  
+Equation: 0*X - 2 = 0.0  No roots
+solutions: Empty Set
+Equation: 0*X - 0.0 = 0.0  Infinite roots (should return empty set)
+solutions: Empty Set
+
+Testing realQuadraticRoots
+Equation: 1.0*X^2 + -1.0*X - 2.0 = 0.0  Two real root
+solutions: 2  -1  
+Equation: 1.0*X^2 + -4.0*X + 4.0 = 0.0  one double root
+solutions: 2  
+Equation: 0.0*X^2 + -4.0*X + 4.0 = 0.0  linear equation, one real root
+solutions: 1  
+Equation: 3.0*X^2 + 0.0*X - 12.0 = 0.0  zero linear coeff, two real roots
+solutions: -2  2  
+Equation: 3.0*X^2 + 0.0*X + 0.0 = 0.0  zero linear and const coeff, one double root
+solutions: -0  
+Equation: 3.0*X^2 + -3.0*X + 0.0 = 0.0  zero const coeff, two real roots
+solutions: 1  0  
+
+Testing realCubicRoots
+Equation: 1.0*x^3 - 3.0*X^2 + 0.0*X + 4.0 = 0.0  zero linear coeff, two real roots (one double)
+solutions: -1  2  
+Equation: 1.0*x^3 - 4.0*X^2 + -7.0*X + 10.0 = 0.0  three real roots
+solutions: -2  5  1  
+Equation: 1.0*x^3 + 1.0*X^2 + -2.0*X - 30.0 = 0.0  one real root
+solutions: 3  
+Equation: 1.0*x^3 + 0.0*X^2 + 0.0*X - 8.0 = 0.0  zero quad and linear coeffs, one real root
+solutions: 2  
+Equation: 2.0*x^3 - 8.0*X^2 + -14.0*X + 20.0 = 0.0  three real roots
+solutions: -2  5  1  
+Equation: -2.0*x^3 + -2.0*X^2 + 4.0*X + 60.0 = 0.0  one real root
+solutions: 3  
+Equation: 3.0*x^3 + 0.0*X^2 + 0.0*X - 24.0 = 0.0  zero quad and linear coeffs, one real root
+solutions: 2  
+Equation: -3.0*x^3 + 0.0*X^2 + 0.0*X - 24.0 = 0.0  zero quad and linear coeffs, one real root
+solutions: 2  
+Equation: 0.0*x^3 + 1.0*X^2 + 0.0*X - 4.0 = 0.0  fall back to quadratic math, two real roots
+solutions: -2  2  
+Equation: 0.0*x^3 + 0.0*X^2 + 1.0*X - 4.0 = 0.0  fall back to linear math, one real root
+solutions: 4  
+
+Testing Brent's root finder
 Passing brentsRootFinder two points that don't bound a root (this should throw an error)
-**PROGRAMMER ERROR** The function evaluations of two bounding points passed to Brents Method have the save sign.  Therefore, they don't necessary bound a root.  No root finding will be attempted.
+**PROGRAMMER ERROR** The function evaluations of two bounding points passed to Brents Method have the same sign.  Therefore, they don't necessary bound a root.  No root finding will be attempted.
 
 Catching an error thrown by the fucntor.
 **PROGRAMMER ERROR** Function evaluation failed at:0.0.  Function must be continuous and defined for the entire interval inorder to gaurentee brentsRootFinder will work.

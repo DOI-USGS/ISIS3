@@ -167,6 +167,7 @@ Group = DataDirectory
   Galileo     = $ISIS3DATA/galileo
   Lo          = $ISIS3DATA/lo
   Lro         = $ISIS3DATA/lro
+  Kaguya      = $ISIS3DATA/kaguya
   Mariner10   = $ISIS3DATA/mariner10
   Mer         = $ISIS3DATA/mer
   Mex         = $ISIS3DATA/mex

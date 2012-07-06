@@ -26,8 +26,13 @@
 
 #include "iString.h"
 #include "IException.h"
+#include "Constants.h"
+#include <iostream>
 #include <math.h>
 #include <cfloat>
+#include <QSet>
+
+using namespace std;
 
 namespace Isis {
  /** A collection of tools for mathmatical function root finding, maximization, etc (eventually)
@@ -41,40 +46,158 @@ namespace Isis {
    * @internal
    *
    *   @history 2012-05-07 Orrin Thomas - Original version
-   *
+   *   @history 2012-06-22 Orrin Thomas - Added realLinearRoots, realQuadraticRoots, 
+   *                         and realCubicRoots
    */
   class FunctionTools {
     public:
-      /** Van Wijngaarden-Dekker-Brent Method for root finding on discreetly defined function
-       *  meaning that we can evaluate the function for discreet points, but we lack a global
-       *  function and derivative definitions.  See Numerical Recipes 3rd eddition pages 454-456.
-       *
-       *  This method requires that the root be bounded on the interval [pt1,pt2], and is gaurenteed
-       *  to convege a root (by Brent) in the interval as long the function is continous and 
-       *  can evaluated on that interval.  
-       *
-       *  Note that if there are multiple roots on the interval the function will find one
-       *  of them and there is no particular gaurentee which one.  Note, also that I have changed the
-       *  convergance criteria to enforce the nearness of the function to zero rather than the
-       *  precision of the root.
-       *
-       *  @param func  template parameter that must have a  double operator()(double) defined
-       *  @param pt1   one of the already defined points (x, y) that bracket the root
-       *  @param pt2   one of the already defined points (x, y) that bracket the root
-       *  @param tol   how close to zero the function must come before iterations stop
-       *  @param maxiter  the maximum number of iterations before stoping the root search
-       *  @param root  the returned root (if any)
-       *  @returns bool  true if the solution converged, false otherwise
-       */
+
+
+     /** Find the real roots (0 or 1) of a linear equation
+      *    Form: coeffLinearTerm*X + coeffConstTerm = 0.0
+      *    NOTE: in the case of infinite roots an empty set is returned
+      *   
+      *  @param coefflinearTerm  coefficient of the linear term
+      *  @param coeffConstTerm  coefficient of the constant term
+      */
+    static QList <double> realLinearRoots(const double coeffLinearTerm, const double coeffConstTerm) {
+      double m=coeffLinearTerm, b=coeffConstTerm;
+
+      QList<double> roots;
+
+      //if the slope is zero there are either 0 or infinite roots
+      //  for the present I see no need to handle the infinite roots situation more elegantly...
+      if (m==0.0) 
+        return roots;
+
+      roots << -b/m;
+
+      return roots;    
+    }
+
+     /** The correct way to find the real roots of a quadratic (0, 1, or 2) 
+      *    (according to numerical recipies 3rd edtion page 227).
+      *    Form: coeffQuadTerm*X^2 + coeffLinearTerm*X + coeffConstTerm = 0.0
+      *   
+      *  @param coeffQuadTerm  coefficient of the quadratic term
+      *  @param coefflinearTerm  coefficient of the linear term
+      *  @param coeffConstTerm  coefficient of the constant term
+      */
+    static QList <double> realQuadraticRoots(const double coeffQuadTerm, const double coeffLinearTerm, 
+                                     const double coeffConstTerm) {
+      double A=coeffQuadTerm, B=coeffLinearTerm, C=coeffConstTerm;
+      double disc,q,temp; //helpers on the way to a solution 
+
+      if (A==0.0)
+        return realLinearRoots(coeffLinearTerm, coeffConstTerm);
+
+      QList<double> roots;
+    
+      disc = B*B-4*A*C;
+      if (disc < 0) return roots;  //no solution, return empty set
+      q = -0.5*(B + (B < 0 ? -1.0 : 1.0)*sqrt(disc));
+ 
+      if (q == 0) roots << q/A;
+      else {
+        roots << q/A;
+        //after the first root make sure there are no duplicates
+        temp = C/q;
+        if (!roots.contains(temp)) roots << temp; 
+      }      
+      return roots;
+    }
+
+
+
+    /** Find the real roots of a cubic (1, 2, or 3) 
+      *    (see numerical recipies 3rd edtion page 227)
+      *    Form: coeffCubicTerm*X^3 + coeffQuadTerm*X^2 + coeffLinearTerm*X + coeffConstTerm = 0.0
+      *
+      *  @param coeffCubicTerm  coefficient of the cubic term   
+      *  @param coeffQuadTerm  coefficient of the quadratic term
+      *  @param coefflinearTerm  coefficient of the linear term
+      *  @param coeffConstTerm  coefficient of the constant term
+      */
+    static QList <double> realCubicRoots(const double coeffCubicTerm,  const double coeffQuadTerm, 
+                                 const double coeffLinearTerm, const double coeffConstTerm) {
+      double a=coeffQuadTerm, b=coeffLinearTerm, c=coeffConstTerm;
+      double Q,R; //helpers on the way to a solution 
+
+      //first verify this is really a cubic
+      if (coeffCubicTerm == 0.0) 
+        return realQuadraticRoots(coeffQuadTerm,coeffLinearTerm,coeffConstTerm);
+      
+
+      //algorithm wants the leading coefficient to be 1.0
+      if ( coeffCubicTerm != 1.0) {
+        a /= coeffCubicTerm;
+        b /= coeffCubicTerm;
+        c /= coeffCubicTerm;         
+      }
+      
+      QList<double> roots;  
+
+      Q = (a*a - 3.0*b) / 9.0;
+      R = (2*a*a*a - 9.0*a*b + 27.0*c) / 54.0;
+      //cout << "Q R: " << Q << " " << R << "\n";
+
+      if ( a == 0.0 && b == 0.0 ) { //one simple root
+        roots << (c < 0 ? 1.0 : -1.0)*pow(fabs(c),1.0/3.0);
+      }
+      else if (R*R <= Q*Q*Q) {  //there are three roots (one of them can be a double root)
+        double theta = acos(R/sqrt(Q*Q*Q)),temp;
+        //cout << "three roots, theta: " << theta << "\n";
+        Q = -2.0*sqrt(Q); //just done to save some FLOPs
+        roots << Q*cos(theta/3.0) - a /3.0;
+        //after the first root make sure there are no duplicates
+        temp = Q*cos((theta + TWOPI)/3.0) - a / 3.0;
+        if (!roots.contains(temp)) roots << temp;
+        temp = Q*cos((theta - TWOPI)/3.0) - a / 3.0;
+        if (!roots.contains(temp)) roots << temp;
+      }
+      else {  //there is a single real root
+        double A, B;
+        A = (R < 0 ? 1.0 : -1.0 ) * pow(fabs(R) + sqrt(R*R - Q*Q*Q),1.0/3.0);
+        B = A == 0.0 ? 0.0 : Q / A;
+        
+        roots << (A + B) - a / 3.0;
+      }
+
+      return roots;
+    }
+
+
+
+    /** Van Wijngaarden-Dekker-Brent Method for root finding on discreetly defined function
+     *  meaning that we can evaluate the function for discreet points, but we lack global
+     *  function and derivative definitions.  See Numerical Recipes 3rd eddition pages 454-456.
+     *
+     *  This method requires that the root be bounded on the interval [pt1,pt2], and is gaurenteed
+     *  to convege a root (by Brent) in the interval as long the function is continous and 
+     *  can evaluated on that interval.  
+     *
+     *  Note that if there are multiple roots on the interval the function will find one
+     *  of them and there is no particular gaurentee which one.  Note, also that I have changed the
+     *  convergance criteria to enforce the nearness of the function to zero rather than the
+     *  precision of the root.
+     *
+     *  @param func  template parameter that must have a  double operator()(double) defined
+     *  @param pt1   one of the already defined points (x, y) that bracket the root
+     *  @param pt2   one of the already defined points (x, y) that bracket the root
+     *  @param tol   how close to zero the function must come before iterations stop
+     *  @param maxiter  the maximum number of iterations before stoping the root search
+     *  @param root  the returned root (if any)
+     *  @returns bool  true if the solution converged, false otherwise
+     */
     template <typename Functor> 
     static bool brentsRootFinder(Functor &func, const QList<double> pt1, 
                           const QList<double> pt2, double tol, int maxIter, double &root) {
       double a=pt1[0], b=pt2[0], c, d=0, fa = pt1[1], fb = pt2[1], fc, p, q, r, s, t,tol1, bnew, fbnew, temp, deltaI,deltaF;
 
-      //check to see if the points bracket a root(s), if the signs are equal they don't
+      //check to see if the points bracket a root(s), if the signs are equal they don't necessarily
       if ( (fa > 0) - (fa < 0) == (fb > 0) - (fb < 0) ) {
         iString msg = "The function evaluations of two bounding points passed to Brents Method "
-                      "have the save sign.  Therefore, they don't necessary bound a root.  No "
+                      "have the same sign.  Therefore, they don't necessary bound a root.  No "
                       "root finding will be attempted.\n";
         throw IException(IException::Programmer, msg, _FILEINFO_);
         return false;
@@ -198,13 +321,13 @@ namespace Isis {
     private:
       /** Constructor
        *
-       * This is private and to left undefined so this class cannot be instaniated
+       * This is private and to be left undefined so this class cannot be instaniated
        */
       FunctionTools(); //no definition to be supplied
      
       /** destructor
        *
-       * This is private and to left undefined so this class cannot be instaniated
+       * This is private and to be left undefined so this class cannot be instaniated
        */
       ~FunctionTools(); //no definition to be supplied
    }; //end FuntionTools class definition

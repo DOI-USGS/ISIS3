@@ -6,13 +6,12 @@
 #include <iomanip>
 #include <iostream>
 
-#include "AADate.h"
-#include "AAPhysicalMoon.h"
 #include "ProcessImportPds.h"
 #include "ProgramLauncher.h"
 
 #include "UserInterface.h"
 #include "FileName.h"
+#include "iString.h"
 
 double range(double x);
 
@@ -60,72 +59,57 @@ void IsisMain() {
   transFile = transDir + "kaguyamiInstrument.trn";
   PvlTranslationManager instrumentXlater(inputLabel, transFile.expanded());
   instrumentXlater.Auto(*(outputLabel));
+    //trim trailing z's from the time strings
+  PvlGroup &instGroup(outputLabel->FindGroup("Instrument",Pvl::Traverse));
+  iString timeString;
+    //StartTime 
+  PvlKeyword &startTimeKeyword=instGroup["StartTime"];
+  timeString = startTimeKeyword[0];
+  startTimeKeyword.SetValue( timeString.substr(0,timeString.find_last_of("Z")) );
+    //StartTimeRaw
+  PvlKeyword &startTimeRawKeyword=instGroup["StartTimeRaw"];
+  timeString = startTimeRawKeyword[0];
+  startTimeRawKeyword.SetValue( timeString.substr(0,timeString.find_last_of("Z")) );
+    //StopTime
+  PvlKeyword &stopTimeKeyword=instGroup["StopTime"];
+  timeString = stopTimeKeyword[0];
+  stopTimeKeyword.SetValue( timeString.substr(0,timeString.find_last_of("Z")) );
+    //StopTimeRaw
+  PvlKeyword &stopTimeRawKeyword=instGroup["StopTimeRaw"];
+  timeString = stopTimeRawKeyword[0];
+  stopTimeRawKeyword.SetValue( timeString.substr(0,timeString.find_last_of("Z")) );
+
 
   // Translate the BandBin group
   transFile = transDir + "kaguyamiBandBin.trn";
   PvlTranslationManager bandBinXlater(inputLabel, transFile.expanded());
   bandBinXlater.Auto(*(outputLabel));
 
-  // At the time that this code was added, there was no camera model for the
-  // Kaguya MI data. In order to be able to perform photometry on the Kaguya
-  // MI data, the SubSolarLongitude and SubSolarLatitude information needed to
-  // be calculated. These calculations were taken from the
-  // http://www.lunar-occultations.com/rlo/ephemeris.htm web site. The formulae
-  // used to do the calculations was taken from Meeus "Astronomical Algorithms"
-  // (1st Ed). This code can be removed as soon as a camera model is available
-  // for the Kaguya MI camera. The start and stop times for these images are
-  // very close, so the start time is used to calculate the SubSolar lat/lon
-  // information.
-  PvlGroup &instGrp(outputLabel->FindGroup("Instrument",Pvl::Traverse));
-  string starttime = "N/A";
-  stringstream ss;
-  int year,month,day,hour,minute;
-  CAASelenographicMoonDetails detail;
-  if(instGrp.HasKeyword("CorrectedStartTime")) {
-    starttime = (string) instGrp["CorrectedStartTime"];
+  //Set up the Kernels group
+  PvlGroup kern("Kernels");
+  if      (lab.FindKeyword("INSTRUMENT_ID")[0] == "MI-VIS") {
+    kern += PvlKeyword("NaifFrameCode", -131335);
+    kern += PvlKeyword("NaifCkCode", -131330);
   }
-  if(instGrp.HasKeyword("StartTime") && starttime == "N/A") {
-    starttime = (string) instGrp["StartTime"];
+  else if (lab.FindKeyword("INSTRUMENT_ID")[0] == "MI-NIR") {
+    kern += PvlKeyword("NaifFrameCode", -131341);
+    kern += PvlKeyword("NaifCkCode", -131340);
   }
-  if(starttime != "N/A") {
-    ss << starttime.substr(0,4);
-    ss >> year;
-    ss.clear();
-    ss << starttime.substr(5,2);
-    ss >> month;
-    ss.clear();
-    ss << starttime.substr(8,2);
-    ss >> day;
-    ss.clear();
-    ss << starttime.substr(11,2);
-    ss >> hour;
-    ss.clear();
-    ss << starttime.substr(14,2);
-    ss >> minute;
-    ss.clear();
-    CAADate cd(year, month, day, hour, minute, 0, true);
-    double Jd = cd.Julian();
-    detail = CAAPhysicalMoon::CalculateSelenographicPositionOfSun(Jd);
+
+  //At the time of this writing there was no expectation that Kaguya ever did any binning
+  //  so this is check to make sure an error is thrown if an image was binned
+  if (lab.FindKeyword("INSTRUMENT_ID")[0] == "MI-VIS" && outcube->getSampleCount() != 962 ) {
+    string msg = "Input file [" + inFile.expanded() + "]" + " appears to be binned.  Binning was "
+                 "unexpected, and is unsupported by the camera model";
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
-  if(!(instGrp.HasKeyword("SubSolarLongitude"))) {
-    if(starttime == "N/A") {
-      instGrp.AddKeyword(PvlKeyword("SubSolarLongitude","N/A"));
-    }
-    else {
-      double SubSolarLongitude = detail.l0;
-      instGrp.AddKeyword(PvlKeyword("SubSolarLongitude",SubSolarLongitude));
-    } 
+  if (lab.FindKeyword("INSTRUMENT_ID")[0] == "MI-NIR" && outcube->getSampleCount() != 320 ) {
+    string msg = "Input file [" + inFile.expanded() + "]" + " appears to be binned.  Binning was "
+                 "unexpected, and is unsupported by the camera model";
+    throw IException(IException::Unknown, msg, _FILEINFO_);
   }
-  if(!(instGrp.HasKeyword("SubSolarLatitude"))) {
-    if(starttime == "N/A") {
-      instGrp.AddKeyword(PvlKeyword("SubSolarLatitude","N/A"));
-    }
-    else {
-      double SubSolarLatitude = detail.b0;
-      instGrp.AddKeyword(PvlKeyword("SubSolarLatitude",SubSolarLatitude));
-    }
-  }
-  outcube->putGroup(instGrp);
+
+  outcube->putGroup(kern);
 
   p.EndProcess();
 }

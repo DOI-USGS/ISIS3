@@ -47,12 +47,15 @@ namespace Isis {
    *   @history 2010-05-24 Travis Addair - Added DEG2RAD and
    *                                       RAD2DEG
    *   @history 2010-11-29 Steven Lambright - Isis version constant removed
+   *   @history 2012-06-22 Orrin Thomas - Added TWOPI and coverted DEG2RAD and RAD2DEG
+   *                                      two decimal constants (from division expresions)
    */
   const double E(2.7182818284590452354);    //!<The mathematical constant E
   const double PI(3.14159265358979323846);   //!<The mathematical constant PI
   const double HALFPI(1.57079632679489661923);   //!<The mathematical constant PI/2
-  const double DEG2RAD(PI / 180.0);   //!<Multiplier for converting from degrees to radians
-  const double RAD2DEG(180.0 / PI);   //!<Multiplier for converting from radians to degrees
+  const double TWOPI(6.2831853071795864769253);  // !<Two * PI, a complete revolution
+  const double DEG2RAD(0.017453292519943295769237);   //!<Multiplier for converting from degrees to radians
+  const double RAD2DEG(57.29577951308232087679815481);   //!<Multiplier for converting from radians to degrees
 
 #if (defined(__SunOS__) || defined(__x86_64))
   typedef long int BigInt;

@@ -163,6 +163,7 @@ Group = DataDirectory
   Control     = $ISIS3DATA/control
   Dawn        = $ISIS3DATA/dawn
   Galileo     = $ISIS3DATA/galileo
+  Kaguya      = $ISIS3DATA/kaguya
   Lo          = $ISIS3DATA/lo
   Lro         = $ISIS3DATA/lro
   Mariner10   = $ISIS3DATA/mariner10

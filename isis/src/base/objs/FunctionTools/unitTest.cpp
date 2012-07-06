@@ -1,5 +1,6 @@
 #include "FunctionTools.h"
 #include <iostream>
+#include <QSet>
 #include "Preference.h"
 #include "IException.h"
 #include "iString.h"
@@ -29,6 +30,207 @@ public std::unary_function <double, double> {
 
 
 int main() {
+
+  QList<double> roots;
+  
+  /******************Testing realLinearRoots**************************/
+  cerr << "Testing realLinearRoots\n";
+  cerr << "Equation: 3*X - 2 = 0.0  One real root\n"; 
+  roots = FunctionTools::realLinearRoots(3.0,-2.0);
+  cerr << "solutions: ";
+  if (roots.size() == 0.0) cerr << "Empty Set";
+  else
+    foreach (const double root, roots)
+      cerr << root << "  ";
+    
+  cerr << endl;
+  cerr << "Equation: 0*X - 2 = 0.0  No roots\n"; 
+  roots = FunctionTools::realLinearRoots(0,2);
+  cerr << "solutions: ";
+  if (roots.size() == 0.0) cerr << "Empty Set";
+  else
+    foreach (const double root, roots)
+      cerr << root << "  ";
+
+  cerr << endl;
+  cerr << "Equation: 0*X - 0.0 = 0.0  Infinite roots (should return empty set)\n";
+  roots = FunctionTools::realLinearRoots(0,2);
+  cerr << "solutions: ";
+  if (roots.size() == 0.0) cerr << "Empty Set";
+  else
+    foreach (const double root, roots)
+      cerr << root << "  ";
+
+
+
+  /******************Testing realQuadraticRoots**************************/
+  cerr << endl << endl;
+  cerr << "Testing realQuadraticRoots\n";
+  cerr << "Equation: 1.0*X^2 + -1.0*X - 2.0 = 0.0  Two real root\n"; 
+  roots = FunctionTools::realQuadraticRoots(1.0,-1.0,-2.0);
+  cerr << "solutions: ";
+  if (roots.size() == 0.0) cerr << "Empty Set";
+  else
+    foreach (const double root, roots)
+      cerr << root << "  ";
+
+  cerr << endl;
+  cerr << "Equation: 1.0*X^2 + -4.0*X + 4.0 = 0.0  one double root\n"; 
+  roots = FunctionTools::realQuadraticRoots(1.0,-4.0,4.0);
+  cerr << "solutions: ";
+  if (roots.size() == 0.0) cerr << "Empty Set";
+  else
+    foreach (const double root, roots)
+      cerr << root << "  ";
+
+
+  cerr << endl;
+  cerr << "Equation: 0.0*X^2 + -4.0*X + 4.0 = 0.0  linear equation, one real root\n"; 
+  roots = FunctionTools::realQuadraticRoots(0.0,-4.0,4.0);
+  cerr << "solutions: ";
+  if (roots.size() == 0.0) cerr << "Empty Set";
+  else
+    foreach (const double root, roots)
+      cerr << root << "  ";
+
+  cerr << endl;
+  cerr << "Equation: 3.0*X^2 + 0.0*X - 12.0 = 0.0  zero linear coeff, two real roots\n"; 
+  roots = FunctionTools::realQuadraticRoots(3.0,0.0,-12.0);
+  cerr << "solutions: ";
+  if (roots.size() == 0.0) cerr << "Empty Set";
+  else
+    foreach (const double root, roots)
+      cerr << root << "  ";
+
+  cerr << endl;
+  cerr << "Equation: 3.0*X^2 + 0.0*X + 0.0 = 0.0  zero linear and const coeff, one double root\n"; 
+  roots = FunctionTools::realQuadraticRoots(3.0,0.0,0.0);
+  cerr << "solutions: ";
+  if (roots.size() == 0.0) cerr << "Empty Set";
+  else
+    foreach (const double root, roots)
+      cerr << root << "  ";
+
+  cerr << endl;
+  cerr << "Equation: 3.0*X^2 + -3.0*X + 0.0 = 0.0  zero const coeff, two real roots\n"; 
+  roots = FunctionTools::realQuadraticRoots(3.0,-3.0,0.0);
+  cerr << "solutions: ";
+  if (roots.size() == 0.0) cerr << "Empty Set";
+  else
+    foreach (const double root, roots)
+      cerr << root << "  ";
+
+
+  /******************Testing realCubicRoots**************************/
+  cerr << endl << endl;
+  cerr << "Testing realCubicRoots\n";
+  cerr << "Equation: 1.0*x^3 - 3.0*X^2 + 0.0*X + 4.0 = 0.0"
+           "  zero linear coeff, two real roots (one double)\n"; 
+  roots = FunctionTools::realCubicRoots(1.0,-3.0,0.0,4.0);
+  cerr << "solutions: ";
+  if (roots.size() == 0.0) cerr << "Empty Set";
+  else
+    foreach (const double root, roots)
+      cerr << root << "  ";
+
+
+  cerr << endl;
+  cerr << "Equation: 1.0*x^3 - 4.0*X^2 + -7.0*X + 10.0 = 0.0"
+           "  three real roots\n"; 
+  roots = FunctionTools::realCubicRoots(1.0,-4.0,-7.0,10.0);
+  cerr << "solutions: ";
+  if (roots.size() == 0.0) cerr << "Empty Set";
+  else
+    foreach (const double root, roots)
+      cerr << root << "  ";
+
+  cerr << endl;
+  cerr << "Equation: 1.0*x^3 + 1.0*X^2 + -2.0*X - 30.0 = 0.0"
+           "  one real root\n"; 
+  roots = FunctionTools::realCubicRoots(1.0,1.0,-2.0,-30.0);
+  cerr << "solutions: ";
+  if (roots.size() == 0.0) cerr << "Empty Set";
+  else
+    foreach (const double root, roots)
+      cerr << root << "  ";
+
+  cerr << endl;
+  cerr << "Equation: 1.0*x^3 + 0.0*X^2 + 0.0*X - 8.0 = 0.0"
+           "  zero quad and linear coeffs, one real root\n"; 
+  roots = FunctionTools::realCubicRoots(1.0,0.0,0.0,-8.0);
+  cerr << "solutions: ";
+  if (roots.size() == 0.0) cerr << "Empty Set";
+  else
+    foreach (const double root, roots)
+      cerr << root << "  ";
+
+  //repeating some tests with non-one leading coefficients
+  cerr << endl;
+  cerr << "Equation: 2.0*x^3 - 8.0*X^2 + -14.0*X + 20.0 = 0.0"
+           "  three real roots\n"; 
+  roots = FunctionTools::realCubicRoots(2.0,-8.0,-14.0,20.0);
+  cerr << "solutions: ";
+  if (roots.size() == 0.0) cerr << "Empty Set";
+  else
+    foreach (const double root, roots)
+      cerr << root << "  ";
+
+  cerr << endl;
+  cerr << "Equation: -2.0*x^3 + -2.0*X^2 + 4.0*X + 60.0 = 0.0"
+           "  one real root\n"; 
+  roots = FunctionTools::realCubicRoots(-2.0,-2.0,4.0,60.0);
+  cerr << "solutions: ";
+  if (roots.size() == 0.0) cerr << "Empty Set";
+  else
+    foreach (const double root, roots)
+      cerr << root << "  ";
+
+  cerr << endl;
+  cerr << "Equation: 3.0*x^3 + 0.0*X^2 + 0.0*X - 24.0 = 0.0"
+           "  zero quad and linear coeffs, one real root\n"; 
+  roots = FunctionTools::realCubicRoots(3.0,0.0,0.0,-24.0);
+  cerr << "solutions: ";
+  if (roots.size() == 0.0) cerr << "Empty Set";
+  else
+    foreach (const double root, roots)
+      cerr << root << "  ";
+
+  cerr << endl;
+  cerr << "Equation: -3.0*x^3 + 0.0*X^2 + 0.0*X - 24.0 = 0.0"
+           "  zero quad and linear coeffs, one real root\n"; 
+  roots = FunctionTools::realCubicRoots(-3.0,0.0,0.0,24.0);
+  cerr << "solutions: ";
+  if (roots.size() == 0.0) cerr << "Empty Set";
+  else
+    foreach (const double root, roots)
+      cerr << root << "  ";
+
+
+
+  //fall backs to less complicated polys
+  cerr << endl;
+  cerr << "Equation: 0.0*x^3 + 1.0*X^2 + 0.0*X - 4.0 = 0.0"
+           "  fall back to quadratic math, two real roots\n"; 
+  roots = FunctionTools::realCubicRoots(0.0,1.0,0.0,-4.0);
+  cerr << "solutions: ";
+  if (roots.size() == 0.0) cerr << "Empty Set";
+  else
+    foreach (const double root, roots)
+      cerr << root << "  ";
+
+  cerr << endl;
+  cerr << "Equation: 0.0*x^3 + 0.0*X^2 + 1.0*X - 4.0 = 0.0"
+           "  fall back to linear math, one real root\n"; 
+  roots = FunctionTools::realCubicRoots(0.0,0.0,1.0,-4.0);
+  cerr << "solutions: ";
+  if (roots.size() == 0.0) cerr << "Empty Set";
+  else
+    foreach (const double root, roots)
+      cerr << root << "  ";
+
+
+  /******************Testing BrentsRootFinder**************************/
+  cerr << endl << endl << "Testing Brent's root finder\n";
   Isis::Preference::Preferences(true);
   QList <double> point1, point2;
   CubicFunction func;
