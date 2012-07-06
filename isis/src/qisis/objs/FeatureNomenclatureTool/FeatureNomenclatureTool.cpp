@@ -755,13 +755,9 @@ namespace Isis {
       if (ugm->GroundRange(vp->cube(), minLat, maxLat, minLon, maxLon) &&
           target != "") {
         FeatureNomenclature *searcher = new FeatureNomenclature;
-        connect(searcher,
-                SIGNAL(
-                  featuresIdentified(FeatureNomenclature *)),
-                this,
-                SLOT(
-                  featuresIdentified(FeatureNomenclature *)));
-
+        connect(searcher, SIGNAL(featuresIdentified(FeatureNomenclature *)),
+                this, SLOT(featuresIdentified(FeatureNomenclature *)));
+      
         (*m_nomenclatureSearchers)[vp] = searcher;
         toolStateChanged();
         (*m_nomenclatureSearchers)[vp]->queryFeatures(target.UpCase(),

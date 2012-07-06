@@ -44,20 +44,7 @@ namespace Isis {
    * @param unit  The unit of the initial angle (see Angle::Units)
    */
   Angle::Angle(double angle, Units unit) {
-    switch (unit) {
-      case Radians:
-        m_radians = angle;
-        break;
-
-      case Degrees:
-        m_radians = angle * DEG2RAD;
-        break;
-
-      default:
-        iString msg = "Angle can not interpret the enumerated value ["  +
-          iString(unit) + "] as a unit";
-        throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
+    setAngle(angle, unit);
   }
 
 
@@ -80,7 +67,7 @@ namespace Isis {
     m_radians = Null;
   }
 
-
+  
   /**
    * This indicates whether we have a legitimate angle stored or are in an
    *   unset, or invalid, state.
@@ -89,6 +76,16 @@ namespace Isis {
    */
   bool Angle::isValid() const {
     return m_radians != Null;
+  }
+
+  
+  /**
+   * Makes an angle to represent a full rotation (0-360 or 0-2pi).
+   *
+   * @return the angle of 1 full rotation
+   */
+  Angle Angle::fullRotation() {
+    return Angle(360, Degrees);
   }
 
 

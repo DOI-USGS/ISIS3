@@ -21,6 +21,8 @@
  */
 
 #include "Angle.h"
+#include <QList>
+#include <QPair>
 
 namespace Isis {
   class PvlGroup;
@@ -37,7 +39,10 @@ namespace Isis {
    *
    * @internal
    *   @history 2011-01-25 Steven Lambright - Added a constructor which takes a
-   *                         mapping group.
+   *                           mapping group.
+   *   @history 2012-06-29 Kimberly Oyama and Steven Lambright - added to360Range() to calculate
+   *                           where the longitude range is in 0-360. Also updated the unit
+   *                           tests to test inRange() and to360Range(). References #958.
    */
   class Longitude : public Angle {
     public:
@@ -93,6 +98,7 @@ namespace Isis {
       Longitude force360Domain() const;
 
       bool inRange(Longitude min, Longitude max) const;
+      static QList< QPair<Longitude, Longitude> > to360Range(Longitude startLon, Longitude endLon);
 
       /**
        * Same as positiveEast.

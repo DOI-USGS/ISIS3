@@ -40,6 +40,10 @@ namespace Isis {
    *                           approval status of each feature. Modified queryFeatures() to
    *                           ensure the correct longitude domain is used.
    *                           References #852. Fixes #892. Fixes #855.
+   *   @history 2012-06-29 Steven Lambright and Kimberly Oyama - Separated queryFeatures() into:
+   *                           1) queryFeatures(), which makes sure the longitude range is between
+   *                           0 and 360 and that it is in the 360 domain, and calls the request
+   *                           method, and 2) runQuery(), which makes the request. Fixes #958.
    */
   class FeatureNomenclature : public QObject {
       Q_OBJECT
@@ -74,7 +78,7 @@ namespace Isis {
       FeatureNomenclature();
       FeatureNomenclature(const FeatureNomenclature &other);
       ~FeatureNomenclature();
-
+      
       void queryFeatures(iString target,
                          Latitude startLat, Longitude startLon,
                          Latitude endLat, Longitude endLon);
@@ -175,6 +179,9 @@ namespace Isis {
 
     private:
       void readSearchResults(QDomElement);
+      void runQuery(iString target,
+                         Latitude startLat, Longitude startLon,
+                         Latitude endLat, Longitude endLon);
 
     private:
       QNetworkAccessManager *m_networkMgr; //!< Network manager does request
@@ -184,6 +191,8 @@ namespace Isis {
       QList<Feature> *m_features;
       //!The approval status of the feature from the database
       IAUStatus m_statusApproval;
+      //!True if all queries have finished
+      bool m_lastQuery;
   };
 
 };

@@ -5,10 +5,12 @@
 #include <QDomElement>
 #include <QGridLayout>
 #include <QLabel>
+#include <QList>
 #include <QMessageBox>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QPair>
 #include <QUrl>
 
 #include "Distance.h"
@@ -40,6 +42,7 @@ namespace Isis {
                             "Gecko/20100101 Firefox/6.0");
     m_request->setHeader(QNetworkRequest::ContentTypeHeader,
                          "application/x-www-form-urlencoded");
+    m_lastQuery = true;
   }
 
 
@@ -60,6 +63,7 @@ namespace Isis {
             this, SLOT(requestFinished(QNetworkReply *)));
 
     m_request = new QNetworkRequest;
+    m_lastQuery = other.m_lastQuery;
 
     if (other.m_features)
       m_features = new QList<Feature>(*other.m_features);
@@ -80,13 +84,11 @@ namespace Isis {
     m_features = NULL;
   }
 
-
-  /**
-   * Query the nomenclature database for features inside the given range on the
-   *   target. When the query is done, featuresIdentified() will be emitted.
-   *
-   * You can call query as many times as you'd like, but the results will be
-   *   cumulative. Errors are reported in the form of a message box.
+  
+   /**
+   * Makes sure the longitudinal ranges are correct. If the range intersects with the 0 line the
+   *   range is split into two ranges, the minimum to 360 and 0 to the maximum. Then it runs a
+   *   query on each range.
    *
    * @param target The target for which features might be present
    * @param startLat The minimum latitude of the ground range to search
@@ -97,69 +99,29 @@ namespace Isis {
   void FeatureNomenclature::queryFeatures(iString target,
                                           Latitude startLat, Longitude startLon,
                                           Latitude endLat, Longitude endLon) {
-    startLon = startLon.force360Domain();
-    endLon = endLon.force360Domain();
-
-    if (startLon > endLon) {
-      std::swap(startLon, endLon);
-    }
     
-    QUrl encodedFormData;
+    QList< QPair<Longitude, Longitude> > range = Longitude::to360Range(startLon, endLon);
 
-    // List of XML fields we want from the server
-    encodedFormData.addQueryItem("additionalInfoColumn", "true");
-    encodedFormData.addQueryItem("approvalDateColumn", "true");
-    encodedFormData.addQueryItem("approvalStatusColumn", "true");
-    encodedFormData.addQueryItem("centerLatLonColumn", "true");
-    encodedFormData.addQueryItem("cleanFeatureNameColumn", "true");
-    encodedFormData.addQueryItem("contEthColumn", "true");
-    encodedFormData.addQueryItem("coordSystemColumn", "true");
-    encodedFormData.addQueryItem("diameterColumn", "true");
-    encodedFormData.addQueryItem("featureIDColumn", "true");
-    encodedFormData.addQueryItem("featureNameColumn", "true");
-    encodedFormData.addQueryItem("featureTypeCodeColumn", "true");
-    encodedFormData.addQueryItem("featureTypeColumn", "true");
-    encodedFormData.addQueryItem("lastUpdatedColumn", "true");
-    encodedFormData.addQueryItem("latLonColumn", "true");
-    encodedFormData.addQueryItem("originColumn", "true");
-    encodedFormData.addQueryItem("quadColumn", "true");
-    encodedFormData.addQueryItem("referenceColumn", "true");
-    encodedFormData.addQueryItem("targetColumn", "true");
+    if (!range.isEmpty()) {
+      startLon = range[0].first;
+      endLon = range[0].second;
+    }
+      
+    if (range.size() > 1) {
 
-    // Data units
-    encodedFormData.addQueryItem("is_0_360", "true");
-    encodedFormData.addQueryItem("is_planetographic", "false");
-    encodedFormData.addQueryItem("is_positive_east", "true");
+      Longitude startLon2 = range[1].first;
+      Longitude endLon2 = range[1].second;
+      
+      runQuery(target, startLat, startLon, endLat, endLon);
+      runQuery(target, startLat, startLon2, endLat, endLon2);
 
-    // Format parameters
-    encodedFormData.addQueryItem("displayType", "XML");
-    encodedFormData.addQueryItem("sort_asc", "true");
-    encodedFormData.addQueryItem("sort_column", "name");
-
-    // Search critera (required even if blank)
-    encodedFormData.addQueryItem("approvalStatus", "");
-    encodedFormData.addQueryItem("beginDate", "");
-    encodedFormData.addQueryItem("continent", "");
-    encodedFormData.addQueryItem("endDate", "");
-    encodedFormData.addQueryItem("ethnicity", "");
-    encodedFormData.addQueryItem("feature", "");
-    encodedFormData.addQueryItem("featureType", "");
-    encodedFormData.addQueryItem("minFeatureDiameter", "");
-    encodedFormData.addQueryItem("maxFeatureDiameter", "");
-    encodedFormData.addQueryItem("reference", "");
-    encodedFormData.addQueryItem("system", "");
-
-    encodedFormData.addQueryItem("target", target.UpCase().ToQt());
-    encodedFormData.addQueryItem("easternLongitude",
-                                 QString::number(endLon.degrees()));
-    encodedFormData.addQueryItem("westernLongitude",
-                                 QString::number(startLon.degrees()));
-    encodedFormData.addQueryItem("northernLatitude",
-                                 QString::number(endLat.degrees()));
-    encodedFormData.addQueryItem("southernLatitude",
-                                 QString::number(startLat.degrees()));
-
-    m_networkMgr->post(*m_request, QByteArray(encodedFormData.encodedQuery()));
+      m_lastQuery = false;
+    }
+    else {
+      runQuery(target, startLat, startLon, endLat, endLon);
+      
+      m_lastQuery = true;
+    }
   }
 
 
@@ -875,7 +837,10 @@ namespace Isis {
 
     reply->deleteLater();
 
-    emit featuresIdentified(this);
+    if (m_lastQuery) {
+      emit featuresIdentified(this);
+    }
+    m_lastQuery = true;
   }
 
 
@@ -915,5 +880,82 @@ namespace Isis {
         m_features->append(Feature(element, m_statusApproval));
       }
     }
+  }
+
+  
+   /**
+   * Query the nomenclature database for features inside the given range on the
+   *   target. When the last query for the cube is done, featuresIdentified()
+   *   will be emitted.
+   *
+   * You can call query as many times as you'd like, but the results will be
+   *   cumulative. Errors are reported in the form of a message box.
+   *
+   * @param target The target for which features might be present
+   * @param startLat The minimum latitude of the ground range to search
+   * @param startLon The minimum longitude of the ground range to search
+   * @param endLat The maximum latitude of the ground range to search
+   * @param endLon The maximum longitude of the ground range to search
+   */
+  void FeatureNomenclature::runQuery(iString target,
+                                          Latitude startLat, Longitude startLon,
+                                          Latitude endLat, Longitude endLon) {
+
+    QUrl encodedFormData;
+
+    // List of XML fields we want from the server
+    encodedFormData.addQueryItem("additionalInfoColumn", "true");
+    encodedFormData.addQueryItem("approvalDateColumn", "true");
+    encodedFormData.addQueryItem("approvalStatusColumn", "true");
+    encodedFormData.addQueryItem("centerLatLonColumn", "true");
+    encodedFormData.addQueryItem("cleanFeatureNameColumn", "true");
+    encodedFormData.addQueryItem("contEthColumn", "true");
+    encodedFormData.addQueryItem("coordSystemColumn", "true");
+    encodedFormData.addQueryItem("diameterColumn", "true");
+    encodedFormData.addQueryItem("featureIDColumn", "true");
+    encodedFormData.addQueryItem("featureNameColumn", "true");
+    encodedFormData.addQueryItem("featureTypeCodeColumn", "true");
+    encodedFormData.addQueryItem("featureTypeColumn", "true");
+    encodedFormData.addQueryItem("lastUpdatedColumn", "true");
+    encodedFormData.addQueryItem("latLonColumn", "true");
+    encodedFormData.addQueryItem("originColumn", "true");
+    encodedFormData.addQueryItem("quadColumn", "true");
+    encodedFormData.addQueryItem("referenceColumn", "true");
+    encodedFormData.addQueryItem("targetColumn", "true");
+
+    // Data units
+    encodedFormData.addQueryItem("is_0_360", "true");
+    encodedFormData.addQueryItem("is_planetographic", "false");
+    encodedFormData.addQueryItem("is_positive_east", "true");
+
+    // Format parameters
+    encodedFormData.addQueryItem("displayType", "XML");
+    encodedFormData.addQueryItem("sort_asc", "true");
+    encodedFormData.addQueryItem("sort_column", "name");
+
+    // Search critera (required even if blank)
+    encodedFormData.addQueryItem("approvalStatus", "");
+    encodedFormData.addQueryItem("beginDate", "");
+    encodedFormData.addQueryItem("continent", "");
+    encodedFormData.addQueryItem("endDate", "");
+    encodedFormData.addQueryItem("ethnicity", "");
+    encodedFormData.addQueryItem("feature", "");
+    encodedFormData.addQueryItem("featureType", "");
+    encodedFormData.addQueryItem("minFeatureDiameter", "");
+    encodedFormData.addQueryItem("maxFeatureDiameter", "");
+    encodedFormData.addQueryItem("reference", "");
+    encodedFormData.addQueryItem("system", "");
+
+    encodedFormData.addQueryItem("target", target.UpCase().ToQt());
+    encodedFormData.addQueryItem("easternLongitude",
+                                QString::number(endLon.degrees()));
+    encodedFormData.addQueryItem("westernLongitude",
+                                QString::number(startLon.degrees()));
+    encodedFormData.addQueryItem("northernLatitude",
+                                 QString::number(endLat.degrees()));
+    encodedFormData.addQueryItem("southernLatitude",
+                                 QString::number(startLat.degrees()));
+
+    m_networkMgr->post(*m_request, QByteArray(encodedFormData.encodedQuery()));
   }
 }

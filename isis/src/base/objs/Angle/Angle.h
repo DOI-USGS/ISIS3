@@ -36,6 +36,10 @@ namespace Isis {
    *   @history 2012-02-16 Steven Lambright - Brought up to method and member
    *                           naming standards.
    *   @history 2012-03-22 Steven Lambright - Renamed text() to toString().
+   *   @history 2012-06-29 Steven Lambright and Kimberly Oyama - Removed duplicate
+   *                           code from the contstructor. Added the fullRotation()
+   *                           method which creates an angle of 360 degrees and
+   *                           modified the unit test to exercise this. References #958.
    */
   class Angle {
 
@@ -64,9 +68,9 @@ namespace Isis {
 
     virtual ~Angle();
 
-
     // Class member operator functions
     bool isValid() const;
+    static Angle fullRotation();
 
     /**
      * Assign angle object equal to another

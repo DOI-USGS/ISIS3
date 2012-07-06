@@ -374,74 +374,86 @@ namespace Isis {
           //   extent.
           QList<QPointF> imagePoints;
 
-          /*
+                    /*
            * This is where we're testing:
            *
-           *  |-----------|
-           *  |1    2    3|
-           *  |           |
-           *  |8    9    4|
-           *  |           |
-           *  |7    6    5|
-           *  |-----------|
+           *  |---------------|
+           *  |***************|
+           *  |**     *     **|
+           *  |*  *   *   *  *|
+           *  |*    * * *    *|
+           *  |***************|
+           *  |*    * * *    *|
+           *  |*  *   *   *  *|
+           *  |**     *     **|
+           *  |***************|
+           *  |---------------|
            *
-           * We'll test at the edges and one off to help DEMs work.
+           * We'll test at the edges, a plus (+) and an (X) to help DEMs work.
            */
 
           int sampleCount = cube->getSampleCount();
           int lineCount = cube->getLineCount();
 
-          // 1
-          imagePoints.append(
-              QPointF(0.5, 0.5));
-          imagePoints.append(
-              QPointF(2, 2));
+          int stepsPerLength = 20; //number of steps per length
+          double aspectRatio = (double)lineCount / (double)sampleCount;
+          double xStepSize = sampleCount / stepsPerLength;
+          double yStepSize = xStepSize * aspectRatio;
 
-          // 2
-          imagePoints.append(
-              QPointF((sampleCount / 2) + 0.5, 0.5));
-          imagePoints.append(
-              QPointF((sampleCount / 2) + 0.5, 2));
+          if (lineCount > sampleCount) {
+            aspectRatio = (double)sampleCount / (double)lineCount;
+            yStepSize = lineCount / stepsPerLength;
+            xStepSize = yStepSize * aspectRatio;
+          }
 
-          // 3
-          imagePoints.append(
-              QPointF(sampleCount + 0.5, 0.5));
-          imagePoints.append(
-              QPointF(sampleCount + 0.5, 2));
+          double yWalked = 0.5;
 
-          // 4
-          imagePoints.append(
-              QPointF(sampleCount + 0.5, (lineCount / 2) +  0.5));
-          imagePoints.append(
-              QPointF(sampleCount - 1, (lineCount / 2) + 0.5));
+          //3 vertical lines
+          for (int i = 0; i < 3; i++) {
+            double xValue = 0.5 + ( i * (sampleCount / 2) );
 
-          // 5
-          imagePoints.append(
-              QPointF(sampleCount + 0.5, lineCount + 0.5));
-          imagePoints.append(
-              QPointF(sampleCount - 1, lineCount - 1));
+            while (yWalked <= lineCount) {
+              imagePoints.append( QPointF(xValue, yWalked) );
+              yWalked += yStepSize;
+            }
 
-          // 6
-          imagePoints.append(
-              QPointF((sampleCount / 2) + 0.5, lineCount + 0.5));
-          imagePoints.append(
-              QPointF((sampleCount / 2) + 0.5, lineCount - 1));
+            yWalked = 0.5;
+          }
 
-          // 7
-          imagePoints.append(
-              QPointF(0.5, lineCount + 0.5));
-          imagePoints.append(
-              QPointF(2, lineCount - 1));
+          double xWalked = 0.5;
 
-          // 8
-          imagePoints.append(
-              QPointF(0.5, (lineCount / 2) + 0.5));
-          imagePoints.append(
-              QPointF(2, (lineCount / 2) + 0.5));
+          //3 horizontal lines
+          for (int i = 0; i < 3; i++) {
+            double yValue = 0.5 + ( i * (lineCount / 2) );
 
-          // 9
-          imagePoints.append(
-              QPointF((sampleCount / 2) + 0.5, (lineCount / 2) + 0.5));
+            while (xWalked <= sampleCount) {
+              imagePoints.append( QPointF(xWalked, yValue) );
+              xWalked += xStepSize;
+            }
+
+            xWalked = 0.5;
+          }
+
+          double xDiagonalWalked = 0.5;
+          double yDiagonalWalked = 0.5;
+          xStepSize = sampleCount / stepsPerLength;
+          yStepSize = lineCount / stepsPerLength;
+
+          //Top-Down Diagonal
+          while ( (xDiagonalWalked <= sampleCount) && (yDiagonalWalked <= lineCount) ) {
+            imagePoints.append( QPointF(xDiagonalWalked, yDiagonalWalked) );
+            xDiagonalWalked += xStepSize;
+            yDiagonalWalked += yStepSize;
+          }
+
+          xDiagonalWalked = 0.5;
+
+          //Bottom-Up Diagonal
+          while ( (xDiagonalWalked <= sampleCount) && (yDiagonalWalked >= 0) ) {
+            imagePoints.append( QPointF(xDiagonalWalked, yDiagonalWalked) );
+            xDiagonalWalked += xStepSize;
+            yDiagonalWalked -= yStepSize;
+          }
 
           foreach (QPointF imagePoint, imagePoints) {
             if (p_projection->SetWorld(imagePoint.x(), imagePoint.y())) {

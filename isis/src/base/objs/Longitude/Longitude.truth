@@ -34,20 +34,20 @@ After assignment: 270 degrees
 450 degrees universal
 450 degrees positive east
 2.5*pi radians positive east
-630 degrees positive west
-3.5*pi radians positive west
+-90 degrees positive west
+-0.5*pi radians positive west
 
 -450 degrees is
 -450 degrees universal
 -450 degrees positive east
 -2.5*pi radians positive east
--630 degrees positive west
--3.5*pi radians positive west
+810 degrees positive west
+4.5*pi radians positive west
 
 -450 degrees PW is
--630 degrees universal
--630 degrees positive east
--3.5*pi radians positive east
+810 degrees universal
+810 degrees positive east
+4.5*pi radians positive east
 -450 degrees positive west
 -2.5*pi radians positive west
 
@@ -57,3 +57,327 @@ Test force180Domain
 -90 degrees
 Test force360Domain
 270 degrees
+
+----- Testing Range Methods -----
+
+Test to360Range
+Input Range:  to 
+Input Range (PW):  to 
+	Test inRange
+		0 degrees: 0
+		200 degrees: 0
+		360 degrees: 0
+		-270 degrees: 0
+
+Input Range: 120.0 degrees to 
+Input Range (PW): 240.0 degrees to 
+	Test inRange
+		0 degrees: 0
+		200 degrees: 0
+		360 degrees: 0
+		-270 degrees: 0
+
+Input Range:  to 130.0 degrees
+Input Range (PW):  to 230.0 degrees
+	Test inRange
+		0 degrees: 0
+		200 degrees: 0
+		360 degrees: 0
+		-270 degrees: 0
+
+Input Range: 120.0 degrees to 120.0 degrees
+Input Range (PW): 240.0 degrees to 240.0 degrees
+	Test inRange
+		0 degrees: 0
+		200 degrees: 0
+		360 degrees: 0
+		-270 degrees: 0
+
+Input Range: 315.0 degrees to 0.0 degrees
+Input Range (PW): 45.0 degrees to 360.0 degrees
+	Test inRange
+		0 degrees: 0
+		200 degrees: 0
+		360 degrees: 0
+		-270 degrees: 0
+
+Input Range: 350.0 degrees to 10.0 degrees
+Input Range (PW): 10.0 degrees to 350.0 degrees
+	Test inRange
+		0 degrees: 0
+		200 degrees: 0
+		360 degrees: 0
+		-270 degrees: 0
+
+Input Range: 350.0 degrees to 300.0 degrees
+Input Range (PW): 10.0 degrees to 60.0 degrees
+	Test inRange
+		0 degrees: 0
+		200 degrees: 0
+		360 degrees: 0
+		-270 degrees: 0
+
+Input Range: 120.0 degrees to 130.0 degrees
+Input Range (PW): 240.0 degrees to 230.0 degrees
+	Test inRange
+		0 degrees: 0
+		200 degrees: 0
+		360 degrees: 0
+		-270 degrees: 0
+
+	Output Range: 120.0 degrees to 130.0 degrees
+	Output Range (PW): 240.0 degrees to 230.0 degrees
+	Test inRange
+		0 degrees: 0
+		45 degrees: 0
+		90 degrees: 0
+		273 degrees: 0
+
+Input Range: -10.0 degrees to -5.0 degrees
+Input Range (PW): 370.0 degrees to 365.0 degrees
+	Test inRange
+		0 degrees: 0
+		200 degrees: 0
+		360 degrees: 0
+		-270 degrees: 0
+
+	Output Range: 350.0 degrees to 355.0 degrees
+	Output Range (PW): 10.0 degrees to 5.0 degrees
+	Test inRange
+		0 degrees: 0
+		45 degrees: 0
+		90 degrees: 0
+		273 degrees: 0
+
+Input Range: -200.0 degrees to -190.0 degrees
+Input Range (PW): 560.0 degrees to 550.0 degrees
+	Test inRange
+		0 degrees: 0
+		200 degrees: 0
+		360 degrees: 0
+		-270 degrees: 0
+
+	Output Range: 160.0 degrees to 170.0 degrees
+	Output Range (PW): 200.0 degrees to 190.0 degrees
+	Test inRange
+		0 degrees: 0
+		45 degrees: 0
+		90 degrees: 0
+		273 degrees: 0
+
+Input Range: 0.0 degrees to 360.0 degrees
+Input Range (PW): 360.0 degrees to 0.0 degrees
+	Test inRange
+		0 degrees: 1
+		200 degrees: 1
+		360 degrees: 1
+		-270 degrees: 1
+
+	Output Range: 0.0 degrees to 360.0 degrees
+	Output Range (PW): 360.0 degrees to 0.0 degrees
+	Test inRange
+		0 degrees: 1
+		45 degrees: 1
+		90 degrees: 1
+		273 degrees: 1
+
+Input Range: -180.0 degrees to 180.0 degrees
+Input Range (PW): 540.0 degrees to 180.0 degrees
+	Test inRange
+		0 degrees: 1
+		200 degrees: 1
+		360 degrees: 1
+		-270 degrees: 1
+
+	Output Range: 0.0 degrees to 360.0 degrees
+	Output Range (PW): 360.0 degrees to 0.0 degrees
+	Test inRange
+		0 degrees: 1
+		45 degrees: 1
+		90 degrees: 1
+		273 degrees: 1
+
+Input Range: -180.1 degrees to 180.1 degrees
+Input Range (PW): 180.1 degrees to -180.1 degrees
+	Test inRange
+		0 degrees: 1
+		200 degrees: 1
+		360 degrees: 1
+		-270 degrees: 1
+
+	Output Range: 0.0 degrees to 360.0 degrees
+	Output Range (PW): 360.0 degrees to 0.0 degrees
+	Test inRange
+		0 degrees: 1
+		45 degrees: 1
+		90 degrees: 1
+		273 degrees: 1
+
+Input Range: -180.1 degrees to 160.0 degrees
+Input Range (PW): 540.1 degrees to 200.0 degrees
+	Test inRange
+		0 degrees: 1
+		200 degrees: 1
+		360 degrees: 1
+		-270 degrees: 1
+
+	Output Range: 0.0 degrees to 160.0 degrees
+	Output Range (PW): 360.0 degrees to 200.0 degrees
+	Test inRange
+		0 degrees: 1
+		45 degrees: 1
+		90 degrees: 1
+		273 degrees: 0
+
+	Output Range: 179.9 degrees to 360.0 degrees
+	Output Range (PW): 180.1 degrees to 0.0 degrees
+	Test inRange
+		0 degrees: 1
+		45 degrees: 0
+		90 degrees: 0
+		273 degrees: 1
+
+Input Range: -800.0 degrees to -200.0 degrees
+Input Range (PW): 1160.0 degrees to 560.0 degrees
+	Test inRange
+		0 degrees: 1
+		200 degrees: 1
+		360 degrees: 1
+		-270 degrees: 1
+
+	Output Range: 0.0 degrees to 360.0 degrees
+	Output Range (PW): 360.0 degrees to 0.0 degrees
+	Test inRange
+		0 degrees: 1
+		45 degrees: 1
+		90 degrees: 1
+		273 degrees: 1
+
+Input Range: -1.0e+99 degrees to -200.0 degrees
+Input Range (PW): 1.0e+99 degrees to 560.0 degrees
+	Test inRange
+		0 degrees: 1
+		200 degrees: 1
+		360 degrees: 1
+		-270 degrees: 1
+
+	Output Range: 0.0 degrees to 360.0 degrees
+	Output Range (PW): 360.0 degrees to 0.0 degrees
+	Test inRange
+		0 degrees: 1
+		45 degrees: 1
+		90 degrees: 1
+		273 degrees: 1
+
+Input Range: 100.0 degrees to 20.0 degrees
+Input Range (PW): 260.0 degrees to 340.0 degrees
+	Test inRange
+		0 degrees: 0
+		200 degrees: 0
+		360 degrees: 0
+		-270 degrees: 0
+
+Input Range: 460.0 degrees to 740.0 degrees
+Input Range (PW): -100.0 degrees to -380.0 degrees
+	Test inRange
+		0 degrees: 1
+		200 degrees: 1
+		360 degrees: 1
+		-270 degrees: 0
+
+	Output Range: 0.0 degrees to 20.0 degrees
+	Output Range (PW): 360.0 degrees to 340.0 degrees
+	Test inRange
+		0 degrees: 1
+		45 degrees: 0
+		90 degrees: 0
+		273 degrees: 0
+
+	Output Range: 100.0 degrees to 360.0 degrees
+	Output Range (PW): 260.0 degrees to 0.0 degrees
+	Test inRange
+		0 degrees: 1
+		45 degrees: 0
+		90 degrees: 0
+		273 degrees: 1
+
+Input Range: 100.0 degrees to 465.0 degrees
+Input Range (PW): 260.0 degrees to -105.0 degrees
+	Test inRange
+		0 degrees: 1
+		200 degrees: 1
+		360 degrees: 1
+		-270 degrees: 1
+
+	Output Range: 0.0 degrees to 360.0 degrees
+	Output Range (PW): 360.0 degrees to 0.0 degrees
+	Test inRange
+		0 degrees: 1
+		45 degrees: 1
+		90 degrees: 1
+		273 degrees: 1
+
+Input Range: 300.0 degrees to 465.0 degrees
+Input Range (PW): 60.0 degrees to -105.0 degrees
+	Test inRange
+		0 degrees: 1
+		200 degrees: 0
+		360 degrees: 1
+		-270 degrees: 1
+
+	Output Range: 0.0 degrees to 105.0 degrees
+	Output Range (PW): 360.0 degrees to 255.0 degrees
+	Test inRange
+		0 degrees: 1
+		45 degrees: 1
+		90 degrees: 1
+		273 degrees: 0
+
+	Output Range: 300.0 degrees to 360.0 degrees
+	Output Range (PW): 60.0 degrees to 0.0 degrees
+	Test inRange
+		0 degrees: 1
+		45 degrees: 0
+		90 degrees: 0
+		273 degrees: 0
+
+Input Range: -10.0 degrees to 10.0 degrees
+Input Range (PW): 370.0 degrees to 350.0 degrees
+	Test inRange
+		0 degrees: 1
+		200 degrees: 0
+		360 degrees: 1
+		-270 degrees: 0
+
+	Output Range: 0.0 degrees to 10.0 degrees
+	Output Range (PW): 360.0 degrees to 350.0 degrees
+	Test inRange
+		0 degrees: 1
+		45 degrees: 0
+		90 degrees: 0
+		273 degrees: 0
+
+	Output Range: 350.0 degrees to 360.0 degrees
+	Output Range (PW): 10.0 degrees to 0.0 degrees
+	Test inRange
+		0 degrees: 1
+		45 degrees: 0
+		90 degrees: 0
+		273 degrees: 0
+
+Input Range: -45.0 degrees to 0.0 degrees
+Input Range (PW): 405.0 degrees to 360.0 degrees
+	Test inRange
+		0 degrees: 1
+		200 degrees: 0
+		360 degrees: 1
+		-270 degrees: 0
+
+	Output Range: 315.0 degrees to 360.0 degrees
+	Output Range (PW): 45.0 degrees to 0.0 degrees
+	Test inRange
+		0 degrees: 1
+		45 degrees: 0
+		90 degrees: 0
+		273 degrees: 0
+

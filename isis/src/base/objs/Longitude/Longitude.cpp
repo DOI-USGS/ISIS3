@@ -21,6 +21,9 @@
 
 #include <cmath>
 
+#include <QtCore>
+#include <QDebug>
+
 #include "Constants.h"
 #include "IException.h"
 #include "iString.h"
@@ -168,24 +171,32 @@ namespace Isis {
   double Longitude::positiveWest(Angle::Units units) const {
     double longitude = angle(units);
 
-    if(m_currentDomain == Domain360) {
-      double wrapPoint = unitWrapValue(units);
-      double halfWrap = wrapPoint / 2.0;
+    if (!IsSpecial(longitude)) {
+      if(m_currentDomain == Domain360) {
+        double wrapPoint = unitWrapValue(units);
+        double halfWrap = wrapPoint / 2.0;
 
-      int numPlanetWraps = (int)(longitude / wrapPoint);
+        int numPlanetWraps = qFloor(longitude / wrapPoint);
 
-      // being negative needs an extra increment here to get the value into
-      //   the positive 360 world
-      if (numPlanetWraps < 0) numPlanetWraps --;
+        // If the input is 360, then we want numPlanetWraps == 0. Compare the input to the border
+        //   case (wraps * wrapPoint == longitude) and bring the number of wraps down if it's true.
+        //   If it's false, then the rounding already took care of this border case.
+        if (numPlanetWraps != 0 && qFuzzyCompare(numPlanetWraps * wrapPoint, longitude)) {
+          if (numPlanetWraps > 0)
+            numPlanetWraps--;
+          else
+            numPlanetWraps++;
+        }
 
-      longitude -= numPlanetWraps * wrapPoint;
-      longitude = -(longitude - halfWrap) + halfWrap;
-      longitude += numPlanetWraps * wrapPoint;
-    }
-    else {
-      // 180 domain is just a negation in this conversion,
-      //   no more work needs done
-      longitude = -1 * longitude;
+        longitude -= numPlanetWraps * wrapPoint;
+        longitude = -(longitude - halfWrap) + halfWrap;
+        longitude -= numPlanetWraps * wrapPoint;
+      }
+      else {
+        // 180 domain is just a negation in this conversion,
+        //   no more work needs done
+        longitude = -1 * longitude;
+      }
     }
 
     return longitude;
@@ -216,15 +227,22 @@ namespace Isis {
         double wrapPoint = unitWrapValue(units);
         double halfWrap = wrapPoint / 2.0;
 
-        int numPlanetWraps = (int)(longitude / wrapPoint);
+        int numPlanetWraps = qFloor(longitude / wrapPoint);
 
-        // being negative needs an extra increment here to get the value into
-        //   the positive 360 world
-        if (numPlanetWraps < 0) numPlanetWraps --;
+        // If the input is 360, then we want numPlanetWraps == 0. Compare the input to the border
+        //   case (wraps * wrapPoint == longitude) and bring the number of wraps down if it's true.
+        //   If it's false, then the rounding already took care of this border case.
+        if (numPlanetWraps != 0 && qFuzzyCompare(numPlanetWraps * wrapPoint, longitude)) {
+          if (numPlanetWraps > 0)
+            numPlanetWraps--;
+          else
+            numPlanetWraps++;
+        }
+
 
         longitude -= numPlanetWraps * wrapPoint;
         longitude = -(longitude - halfWrap) + halfWrap;
-        longitude += numPlanetWraps * wrapPoint;
+        longitude -= numPlanetWraps * wrapPoint;
       }
       else {
         // 180 domain is just a negation in this conversion,
@@ -265,7 +283,7 @@ namespace Isis {
     double resultantLongitude = angle(Angle::Degrees);
 
     // Bring the number in the 0 to 360 range
-    resultantLongitude -= 360 * floor(resultantLongitude / 360);
+    resultantLongitude -= 360 * qFloor(resultantLongitude / 360);
 
     return Longitude(resultantLongitude, Angle::Degrees);
   }
@@ -307,56 +325,79 @@ namespace Isis {
    * @return Whether the longitude is in the given range
    */
   bool Longitude::inRange(Longitude min, Longitude max) const {
-    // Get around the "wrapping around the planet" problem by clamping the
-    // longitudes to a strict 0-360 range.  Now we're simply dealing with angles
-    // on a circle from an origin.
-    Longitude adjustedMin = min.force360Domain();
-    Longitude adjustedMax = max.force360Domain();
+    bool result = false;
+    
+    QList< QPair<Longitude, Longitude> > ranges = to360Range(min, max);
 
-    bool inRange = false;
-    if (adjustedMin == adjustedMax && min != max) {
-      // The beginning and end of the range is the same point, but the
-      // originally provided begin and end were nominally different, implying
-      // that the entire 0-360 range is valid.  For example, if the user entered
-      // 0-0 for the range, we assume they mean that only longitude 0 is valid.
-      // If, however, 0-360 was entered, then forcing the 360 results in 0-0,
-      // but we assume that they intended to cover the entire planet, because
-      // 0-360 is inherently an exclusive range in concept, but not in practice.
-      inRange = true;
-    }
-    else {
-      // Define the angle 0 degrees as the origin
-      Angle origin = Angle(0.0, Angle::Degrees);
+    Longitude thisLon = force360Domain();
+    
+    QPair<Longitude, Longitude> range;
+    foreach (range, ranges) {
+      if (thisLon >= range.first && thisLon <= range.second) {
+        result = true;
+      }
 
-      // Define the angle 360 degrees as the maximal, "boundary" angle
-      Angle boundary = Angle(360.0, Angle::Degrees);
+      double thisLonRadians = thisLon.radians();
+      double rangeStartRadians = range.first.radians();
+      double rangeEndRadians = range.second.radians();
+      // Check equality on edges of range
+      if (qFuzzyCompare(thisLonRadians, rangeStartRadians) ||
+          qFuzzyCompare(thisLonRadians, rangeEndRadians)) {
+        result = true;
+      }
 
-      // Find the change in angle from the min to the max
-      Longitude deltaMax = adjustedMax - adjustedMin;
-
-      // Add back the boundary value if the change is less than 0 (the range
-      // crossed over the origin, so offset it to account for this)
-      if (deltaMax < origin)
-        deltaMax += boundary;
-
-      // Add a small amount of wriggle room to the maximum change to account for
-      // precision error
-      deltaMax += Angle(DBL_EPSILON, Angle::Degrees);
-
-      // Clamp this longitude to the same 0-360 domain
-      Longitude adjusted = force360Domain();
-
-      // Apply the same adjustment for the change from the min longitude to this
-      // longitude as was applied to the maximal change
-      Longitude delta = adjusted - adjustedMin;
-      if (delta < origin)
-        delta += boundary;
-
-      // If the change in angle is less than or equal to the maximal change, it
-      // is within the valid range
-      inRange = delta <= deltaMax;
+      // Be very careful at the 0-360 boundary
+      if ((qFuzzyCompare(thisLonRadians, 0.0) || qFuzzyCompare(thisLonRadians, 2.0 * PI)) &&
+          (qFuzzyCompare(rangeStartRadians, 0.0) ||
+           qFuzzyCompare(rangeEndRadians, 2.0 * PI))) {
+        result = true;
+      }
     }
 
-    return inRange;
+    return result;
+  }
+
+  /**
+   * Calculates where the longitude range is in 0-360. This method will return 2 subranges if the
+   *   total range intersects the 0/360 line. For instance, if the input range is -10-10, the output
+   *   ranges will be 350-360 and 0-10. If the longitude range is invalid then an empty list will
+   *   result.
+   *
+   * @param startLon the western edge of the longitude range
+   * @param endLon the eastern edge of the range
+   *
+   * @return a list of longitude pairs (first is the start and second is the end) that represent the
+   *         calculated range(s).
+   */
+  QList< QPair<Longitude, Longitude> > Longitude::to360Range(Longitude startLon, Longitude endLon) {
+
+    QList< QPair<Longitude, Longitude> > range;
+    
+    if (startLon.isValid() && endLon.isValid() && startLon < endLon) {
+        
+      int multiplier = floor(startLon / fullRotation());
+
+      startLon -= multiplier * fullRotation();
+      endLon -= multiplier * fullRotation();
+
+      if (endLon > fullRotation()) {
+
+        Longitude startLon2(0, Angle::Degrees);
+        Longitude endLon2(endLon - fullRotation());
+
+        if (endLon2 < startLon) {
+          range.append(qMakePair(startLon2, endLon2));
+        }
+        else {
+          startLon = Longitude(0, Angle::Degrees);
+        }
+        endLon = Longitude(360, Angle::Degrees);
+      }
+      startLon = Longitude((Angle)startLon);
+      endLon = Longitude((Angle)endLon);
+      
+      range.append(qMakePair(startLon, endLon));
+    }
+    return range;
   }
 }

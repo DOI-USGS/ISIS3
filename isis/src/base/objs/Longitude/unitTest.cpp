@@ -2,6 +2,10 @@
 
 #include <iostream>
 
+#include <QList>
+#include <QListIterator>
+#include <QPair>
+
 #include "IException.h"
 #include "Constants.h"
 #include "Preference.h"
@@ -187,6 +191,86 @@ int main(int argc, char *argv[]) {
 
     cout << "Test force360Domain" << endl;
     cout << lon.force360Domain().degrees() << " degrees" << endl;
+  }
+  catch(IException &e) {
+    e.print();
+  }
+  
+  cout << endl << "----- Testing Range Methods -----" << endl << endl;
+  try {
+    cout << "Test to360Range" << endl;
+    QList< QPair<Longitude, Longitude> > data;
+    data  << qMakePair(Longitude(), Longitude());
+    data  << qMakePair(Longitude(120, Angle::Degrees), Longitude());
+    data  << qMakePair(Longitude(), Longitude(130, Angle::Degrees));
+    data  << qMakePair(Longitude(120, Angle::Degrees), Longitude(120, Angle::Degrees));
+    data  << qMakePair(Longitude(315, Angle::Degrees), Longitude(0, Angle::Degrees));
+    data  << qMakePair(Longitude(350, Angle::Degrees), Longitude(10, Angle::Degrees));
+    data  << qMakePair(Longitude(350, Angle::Degrees), Longitude(300, Angle::Degrees));
+    data  << qMakePair(Longitude(120, Angle::Degrees), Longitude(130, Angle::Degrees));
+    data  << qMakePair(Longitude(-10, Angle::Degrees), Longitude(-5, Angle::Degrees));
+    data  << qMakePair(Longitude(-200, Angle::Degrees), Longitude(-190, Angle::Degrees));
+    data  << qMakePair(Longitude(0, Angle::Degrees), Longitude(360, Angle::Degrees));
+    data  << qMakePair(Longitude(-180, Angle::Degrees), Longitude(180, Angle::Degrees));
+    data  << qMakePair(
+        Longitude(-180.1, Angle::Degrees, Longitude::PositiveEast, Longitude::Domain180),
+        Longitude(180.1, Angle::Degrees, Longitude::PositiveEast, Longitude::Domain180));
+    data  << qMakePair(Longitude(-180.1, Angle::Degrees), Longitude(160, Angle::Degrees));
+    data  << qMakePair(Longitude(-800, Angle::Degrees), Longitude(-200, Angle::Degrees));
+    data  << qMakePair(Longitude(-0.1/1e-100, Angle::Degrees), Longitude(-200, Angle::Degrees));
+    data  << qMakePair(Longitude(100, Angle::Degrees), Longitude(20, Angle::Degrees));
+    data  << qMakePair(Longitude(460, Angle::Degrees), Longitude(740, Angle::Degrees));
+    data  << qMakePair(Longitude(100, Angle::Degrees), Longitude(465, Angle::Degrees));
+    data  << qMakePair(Longitude(300, Angle::Degrees), Longitude(465, Angle::Degrees));
+    data  << qMakePair(Longitude(-10, Angle::Degrees), Longitude(10, Angle::Degrees));
+    data  << qMakePair(Longitude(-45, Angle::Degrees), Longitude(0, Angle::Degrees));
+
+    QPair<Longitude, Longitude> current;
+    foreach(current, data) {
+      QList< QPair<Longitude, Longitude> > results =
+          Longitude::to360Range(current.first, current.second);
+      cout << "Input Range: " << current.first.toString() << " to " << current.second.toString()
+           << endl;
+      cout << "Input Range (PW): "
+            << Angle(current.first.positiveWest(Angle::Degrees), Angle::Degrees).toString()
+            << " to "
+            << Angle(current.second.positiveWest(Angle::Degrees), Angle::Degrees).toString()
+            << endl;
+
+        cout << "\tTest inRange" << endl;
+        cout << "\t\t0 degrees: "
+             << Longitude(0, Angle::Degrees).inRange(current.first, current.second) << endl
+             << "\t\t200 degrees: "
+             << Longitude(200, Angle::Degrees).inRange(current.first, current.second) << endl
+             << "\t\t360 degrees: "
+             << Longitude(360, Angle::Degrees).inRange(current.first, current.second) << endl
+             << "\t\t-270 degrees: "
+             << Longitude(-270, Angle::Degrees).inRange(current.first, current.second) << endl
+             << endl;
+
+      QListIterator< QPair<Longitude, Longitude> > it(results);
+      while (it.hasNext()) {
+        current = it.next();
+        cout << "\tOutput Range: " << current.first.toString() << " to "
+             << current.second.toString() << endl;
+        cout << "\tOutput Range (PW): "
+             << Angle(current.first.positiveWest(Angle::Degrees), Angle::Degrees).toString()
+             << " to "
+             << Angle(current.second.positiveWest(Angle::Degrees), Angle::Degrees).toString()
+             << endl;
+
+        cout << "\tTest inRange" << endl;
+        cout << "\t\t0 degrees: "
+             << Longitude(0, Angle::Degrees).inRange(current.first, current.second) << endl
+             << "\t\t45 degrees: "
+             << Longitude(45, Angle::Degrees).inRange(current.first, current.second) << endl
+             << "\t\t90 degrees: "
+             << Longitude(90, Angle::Degrees).inRange(current.first, current.second) << endl
+             << "\t\t273 degrees: "
+             << Longitude(273, Angle::Degrees).inRange(current.first, current.second) << endl
+             << endl;
+      }   
+    }
   }
   catch(IException &e) {
     e.print();

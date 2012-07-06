@@ -44,6 +44,8 @@ namespace Isis {
    *                           (showApprovedOnly(), vectorType(), setShowApprovedOnly(),
    *                           setVectorType()). Added an enumerator for the vector types.
    *                           Fixes #852. Fixes #892.
+   *   @history 2012-06-26 Kimberly Oyama - Minor refactoring in the findMissingNomenclature()
+   *                           method. References #958.
    * 
    */
   class FeatureNomenclatureTool : public Tool {

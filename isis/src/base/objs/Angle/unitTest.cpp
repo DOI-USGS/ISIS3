@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
   cout << "Testing constructors" << endl;
 
   try {
-    Angle angle;
+    Angle angle(Null);
     cout << "  Default constructor - valid?:  " << angle.isValid() << 
       " values: " << angle.radians() << " and " << angle.degrees() << 
       endl;
