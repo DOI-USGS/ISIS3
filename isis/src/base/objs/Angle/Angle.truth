@@ -3,6 +3,9 @@ UnitTest for Angle
 Testing constructors
   Default constructor - valid?:  0 values: -1.79769313e+308 and -1.79769313e+308
   
+  Null input and degree output:  -1.79769313e+308 degrees
+  Valid? 0
+  
   Degree input and radian output:  0.523598776 radians
   Valid? 1
   30.0 degrees

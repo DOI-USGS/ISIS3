@@ -1,9 +1,10 @@
 #include <iostream>
 #include <iomanip>
+#include "Angle.h"
 #include "Constants.h"
 #include "IException.h"
 #include "Preference.h"
-#include "Angle.h"
+#include "SpecialPixel.h"
 
 using namespace std;
 using Isis::Angle;
@@ -34,10 +35,21 @@ int main(int argc, char *argv[]) {
   cout << "Testing constructors" << endl;
 
   try {
-    Angle angle(Null);
+    Angle angle;
     cout << "  Default constructor - valid?:  " << angle.isValid() << 
       " values: " << angle.radians() << " and " << angle.degrees() << 
       endl;
+    cout << "  " << angle.toString() << endl;
+  }
+  catch(Isis::IException &e) {
+    e.print();
+  }
+
+  try {
+    Angle angle(Isis::Null, Angle::Degrees);
+    cout << "  Null input and degree output:  " << angle.degrees() <<
+      " degrees" <<endl;
+    cout << "  Valid? " << angle.isValid() << endl;
     cout << "  " << angle.toString() << endl;
   }
   catch(Isis::IException &e) {
