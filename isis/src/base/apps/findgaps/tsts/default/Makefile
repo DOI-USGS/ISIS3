@@ -7,8 +7,9 @@ include $(ISISROOT)/make/isismake.tsts
 
 commands:
 	$(APPNAME) from=$(INPUT)/findGapsTest_basedOnI02025005RDR.cub \
-	  log=$(OUTPUT)/cubeIsDefaultLogResults.pvl;                  \
+	  log=$(OUTPUT)/cubeIsDefaultLogResults.pvl                   \
+	  > /dev/null;                                                \
 	                                                              \
 	$(APPNAME) from=$(INPUT)/findGapsTest_basedOnI02025005RDR.cub \
-	  to=$(OUTPUT)/pvlIsDefaultCubeResults.cub;                   \
+	  to=$(OUTPUT)/pvlIsDefaultCubeResults.cub                    \
 	  > /dev/null;
