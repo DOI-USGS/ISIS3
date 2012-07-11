@@ -52,7 +52,7 @@ int main(void) {
     Pvl p("$lo/testData/4164H_Full_mirror.cub");
     LoHighCamera *cam = (LoHighCamera *) CameraFactory::Create(p);
     cout << "FileName: " << FileName(p.FileName()).name() << endl;
-    cout << "CK Frame: " << cam->InstrumentRotation()->Frame() << endl << endl;
+    cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
 

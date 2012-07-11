@@ -42,7 +42,7 @@ namespace Isis {
     std::string odkkey = "INS" + Isis::iString(naifIkCode) + "_DISTORTION_COEFFS";
 
     for(int i = 0; i < 4; i++) {
-      p_odk.push_back(p_camera->GetDouble(odkkey, i));
+      p_odk.push_back(p_camera->getDouble(odkkey, i));
     }
   }
 

@@ -219,7 +219,7 @@ namespace Isis {
       if(p_channel == "VIS") {
         double et = ((double)p_etStart + (((p_irExp * p_swathWidth) - p_visExp) / 2.)) +
                     ((line + 0.5) * p_visExp);
-        p_camera->SetTime(et);
+        p_camera->setTime(et);
       }
 
       for(int samp = 0; samp < p_camera->ParentSamples(); samp++) {
@@ -227,7 +227,7 @@ namespace Isis {
           double et = (double)p_etStart +
                       (line * p_camera->ParentSamples() * p_irExp) +
                       (line * p_interlineDelay) + ((samp + 0.5) * p_irExp);
-          p_camera->SetTime(et);
+          p_camera->setTime(et);
         }
 
         if(p_camera->SetImage((double) samp + 1, (double)line + 1)) {
@@ -302,7 +302,7 @@ namespace Isis {
            (imgLine * p_camera->ParentSamples() * p_irExp) +
            (imgLine * p_interlineDelay) + ((imgSamp + 0.5) * p_irExp);
     }
-    p_camera->SetTime(et);
+    p_camera->setTime(et);
 
     //  get Look Direction
     SpiceDouble lookC[3];
@@ -390,7 +390,7 @@ namespace Isis {
       p_camera->IgnoreProjection(false);
 
       double radii[3];
-      p_camera->Radii(radii);
+      p_camera->radii(radii);
       double degPerSamp =
         1.0 / ((rpd_c() * radii[0] * 1000.) / p_camera->SampleResolution());
       double degPerLine =

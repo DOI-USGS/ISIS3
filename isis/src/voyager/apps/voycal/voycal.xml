@@ -101,6 +101,9 @@ The following linearity equation is used:</p>
     <change name="Mackenzie Boyd" date="2010-08-10">
       Original version - Converted from Isis2
     </change>
+    <change name="Debbie A. Cook" date="2012-07-06">
+       Updated Spice members to be more compliant with Isis coding standards. References #972.
+    </change>
   </history>
 
   <category>

@@ -34,6 +34,8 @@ namespace Isis {
    * @author  2009-09-11 Kris Becker
    *
    * @internal
+   *  @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                     coding standards. References #972.
    */
   class Stereo  {
     public:

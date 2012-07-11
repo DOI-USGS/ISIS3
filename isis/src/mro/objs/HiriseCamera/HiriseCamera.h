@@ -41,13 +41,15 @@ namespace Isis {
    *                                         documentation
    *  @history 2008-08-08 Steven Lambright Made the unit test work with a Sensor
    *           change. Also, now using the new LoadCache(...) method instead of
-   *           CreateCache(...).
+   *           createCache(...).
    *  @history 2009-03-08 Debbie A. Cook Removed reference to obsolete LineScanCameraDetectorMap
    *           method SetXAxisTimeDependent
    *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
    *            inherit directly from Camera
    *   @history 2011-05-03 Jeannie Walldren - Updated unitTest to test for new
    *            methods. Added NAIF error check. Removed Mro namespace.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *            coding standards. References #972.
    */
   class HiriseCamera : public LineScanCamera {
     public:

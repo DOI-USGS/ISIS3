@@ -60,6 +60,8 @@ namespace Isis {
    *   @history 2010-12-07 Steven Lambright - SetGround(double,double) now goes
    *            straight to the radius instead of using SetUniversalGround to
    *            get the radius.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *            coding standards. References #972.
    *
    */
   class LineScanCameraGroundMap : public CameraGroundMap {

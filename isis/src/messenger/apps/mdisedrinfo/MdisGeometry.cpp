@@ -409,14 +409,14 @@ namespace Isis {
 
     // Get sc_target_position_vector and target_center_distance for all targets
     // except Sky
-    if(!_camera->IsSky()) {
-      SpicePosition *scpos = _camera->InstrumentPosition();
+    if(!_camera->isSky()) {
+      SpicePosition *scpos = _camera->instrumentPosition();
       std::vector<double> jVec;
       jVec = scpos->Coordinate();
       geom += format("SC_TARGET_POSITION_VECTOR", jVec, "KM");
 
       //  Compute distances
-      geom += format("TARGET_CENTER_DISTANCE", _camera->TargetCenterDistance(),
+      geom += format("TARGET_CENTER_DISTANCE", _camera->targetCenterDistance(),
                      "KM");
     }
     else if(_doUpdate) {
@@ -716,7 +716,7 @@ namespace Isis {
     // Get NAIF body codes
     SpiceInt scCode(-236), targCode(0);
     SpiceBoolean found;
-    string target(_camera->Target());
+    string target(_camera->target());
     (void) bodn2c_c("MESSENGER", &scCode, &found);
     (void) bodn2c_c(target.c_str(), &targCode, &found);
     if(!found) {
@@ -724,7 +724,7 @@ namespace Isis {
     }
 
     //  Get the target state (starg)
-    SpiceRotation *rotate = _camera->InstrumentRotation();
+    SpiceRotation *rotate = _camera->instrumentRotation();
     SpiceDouble starg[6];  // Position and velocity vector in J2000
     SpiceDouble lt;
     spkez_c(targCode, rotate->EphemerisTime(), "J2000", "LT+S", scCode,
@@ -890,9 +890,9 @@ namespace Isis {
 
     // Get the center ra/dec
     _camera->SetImage(refSamp, refLine);
-    if(!_camera->IsSky()) {
+    if(!_camera->isSky()) {
       double lat, lon;
-      _camera->SubSpacecraftPoint(lat, lon);
+      _camera->subSpacecraftPoint(lat, lon);
       geom += format("SUB_SPACECRAFT_LATITUDE", lat, "DEG");
       geom += format("SUB_SPACECRAFT_LONGITUDE", lon, "DEG");
       geom += format("SPACECRAFT_ALTITUDE", _camera->SpacecraftAltitude(), "KM");
@@ -914,11 +914,11 @@ namespace Isis {
 
     // Compute distance and position from spacecraft to sun
     // This is the J2000 target to sun reference
-    SpicePosition *sunpos = _camera->SunPosition();
+    SpicePosition *sunpos = _camera->sunPosition();
     std::vector<double> jVec = sunpos->Coordinate();
 
     //  J2000 spacecraft to sun reference
-    SpicePosition *campos = _camera->InstrumentPosition();
+    SpicePosition *campos = _camera->instrumentPosition();
     std::vector<double> sVec = campos->Coordinate();
 
     //  Subtract target-sun vector from sc-sun vector and normalize to get
@@ -964,7 +964,7 @@ namespace Isis {
     (void) bodn2c_c("SUN", &sun, &found);
 
     //  Get the Sun to Messenger state matrix
-    SpiceRotation *rotate = _camera->BodyRotation();
+    SpiceRotation *rotate = _camera->bodyRotation();
     SpiceDouble stateJ[6];  // Position and velocity vector in J2000
     SpiceDouble lt;
     spkez_c(sc , rotate->EphemerisTime(), "J2000", "LT+S", sun, stateJ, &lt);
@@ -1008,13 +1008,13 @@ namespace Isis {
     _camera->SetImage(refSamp, refLine);
 
     //  These parameters only require a target other than the Sky
-    if(!_camera->IsSky()) {
+    if(!_camera->isSky()) {
       double sslat, sslon;
-      _camera->SubSolarPoint(sslat, sslon);
+      _camera->subSolarPoint(sslat, sslon);
       geom += format("SUB_SOLAR_LATITUDE", sslat, "DEG");
       geom += format("SUB_SOLAR_LONGITUDE", sslon, "DEG");
 
-      SpicePosition *sunpos = _camera->SunPosition();
+      SpicePosition *sunpos = _camera->sunPosition();
       std::vector<double> jVec = sunpos->Coordinate();
       double solar_dist = vnorm_c(&jVec[0]);
 

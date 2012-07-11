@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
     double endTime = -69382512.0;
     double slope = (endTime - startTime) / (10 - 1);
     Isis::Sensor spi(lab);
-    spi.InstrumentRotation()->SetTimeBias(-1.15);
+    spi.instrumentRotation()->SetTimeBias(-1.15);
 
     double v[3] = { 0.0, 0.0, 1.0 };
     double p[3];
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
     cerr << "Test SetLookDirection using ShapeModel=Null" << endl;
     for(int i = 0; i < 10; i++) {
       double t = startTime + (double) i * slope;
-      spi.SetTime(iTime(t));
+      spi.setTime(iTime(t));
       cerr << "Has Intersection    = " << spi.HasSurfaceIntersection() << endl;
 
       spi.SetLookDirection(v);
@@ -214,14 +214,14 @@ int main(int argc, char *argv[]) {
 
     // Setup
     Isis::Sensor spi2(lab2);
-    spi2.InstrumentRotation()->SetTimeBias(-1.15);
+    spi2.instrumentRotation()->SetTimeBias(-1.15);
 
     // Testing Set Look Direction
     cerr << "Test SetLookDirection using ShapeModel="
             "$ISIS3DATA/base/dems/molaMarsPlanetaryRadius0004.cub" << endl;
     for(int i = 0; i < 10; i++) {
       double t = startTime + (double) i * slope;
-      spi2.SetTime(iTime(t));
+      spi2.setTime(iTime(t));
       cerr << "Has Intersection    = " << spi2.HasSurfaceIntersection() << endl;
 
       spi2.SetLookDirection(v);

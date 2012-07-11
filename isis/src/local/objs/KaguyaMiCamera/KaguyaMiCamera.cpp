@@ -47,8 +47,8 @@ namespace Isis {
 
     SetFocalLength();
     //Kaguya IK kernal uses INS-131???_PIXEL_SIZE instead of PIXEL_PITCH
-    iString ikernKey = "INS" + iString((int)NaifIkCode()) + "_PIXEL_SIZE";
-    SetPixelPitch(GetDouble(ikernKey));
+    iString ikernKey = "INS" + iString((int)naifIkCode()) + "_PIXEL_SIZE";
+    SetPixelPitch(getDouble(ikernKey));
  
 
     // Get the start time from labels
@@ -68,7 +68,7 @@ namespace Isis {
 
     // Get other info from labels
     double lineRate = (double) inst["CorrectedSamplingInterval"] / 1000.0;
-    SetTime(etStart);
+    setTime(etStart);
 
     // Setup detector map
     LineScanCameraDetectorMap *detectorMap = new LineScanCameraDetectorMap(this, etStart, lineRate);
@@ -76,11 +76,11 @@ namespace Isis {
     detectorMap->SetStartingDetectorSample(1.0);
 
     // Setup focal plane map
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
     // Retrieve boresight location from instrument kernel (IK) (addendum?)
-    ikernKey = "INS" + iString((int)NaifIkCode()) + "_CENTER";
-    double sampleBoreSight = GetDouble(ikernKey,0);
-    double lineBoreSight = GetDouble(ikernKey,1)-1.0;
+    ikernKey = "INS" + iString((int)naifIkCode()) + "_CENTER";
+    double sampleBoreSight = getDouble(ikernKey,0);
+    double lineBoreSight = getDouble(ikernKey,1)-1.0;
 
     focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
     focalMap->SetDetectorOffset(0.0, 0.0);
@@ -88,7 +88,7 @@ namespace Isis {
 
     KaguyaMiCameraDistortionMap *distMap = new KaguyaMiCameraDistortionMap(this);
     //LroNarrowAngleDistortionMap *distMap = new LroNarrowAngleDistortionMap(this);
-    distMap->SetDistortion(NaifIkCode());
+    distMap->SetDistortion(naifIkCode());
 
     // Setup the ground and sky map
     new LineScanCameraGroundMap(this);

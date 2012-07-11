@@ -50,7 +50,7 @@ int main(void) {
     Pvl p("$cassini/testData/N1525100863_2.cub");
     IssNACamera *cam = (IssNACamera *) CameraFactory::Create(p);
     cout << "FileName: " << FileName(p.FileName()).name() << endl;
-    cout << "CK Frame: " << cam->InstrumentRotation()->Frame() << endl << endl;
+    cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
 

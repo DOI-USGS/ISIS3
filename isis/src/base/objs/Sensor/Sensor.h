@@ -171,6 +171,8 @@ namespace Isis {
    *   @history 2012-05-04 Steven Lambright - Re-enabled a safety check in the DemRadius() method
    *                           which was needed due to Projection not uniformly handling Null
    *                           inputs. Fixes #807.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    */
   class Sensor : public Spice {
     public:
@@ -178,7 +180,7 @@ namespace Isis {
 
       virtual ~Sensor();
 
-      void SetTime(const iTime &time);
+      void setTime(const iTime &time);
       bool SetLookDirection(const double v[3]);
       bool SetRightAscensionDeclination(const double ra, const double dec);
       bool SetUniversalGround(const double latitude, const double longitude,

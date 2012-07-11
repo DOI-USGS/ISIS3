@@ -56,14 +56,14 @@ namespace Isis {
     std::string naifXKey = "INS" + Isis::iString(naifIkCode) + "_DISTORTION_COEF_X";
     std::string naifYKey = "INS" + Isis::iString(naifIkCode) + "_DISTORTION_COEF_Y";
     for (int i=0; i < m_numDistCoef; i++) {
-      m_distCoefX[i] = p_camera->GetDouble(naifXKey,i);
-      m_distCoefY[i] = p_camera->GetDouble(naifYKey,i);
+      m_distCoefX[i] = p_camera->getDouble(naifXKey,i);
+      m_distCoefY[i] = p_camera->getDouble(naifYKey,i);
     }
 
     //now read the boresights, or what I would typicall call the principal point offsets
     naifXKey = "INS" + Isis::iString(naifIkCode) + "_BORESIGHT";
-    m_boreX = p_camera->GetDouble(naifXKey, 0);
-    m_boreY = p_camera->GetDouble(naifXKey, 1);
+    m_boreX = p_camera->getDouble(naifXKey, 0);
+    m_boreY = p_camera->getDouble(naifXKey, 1);
   }
 
   /** Compute undistorted focal plane x/y

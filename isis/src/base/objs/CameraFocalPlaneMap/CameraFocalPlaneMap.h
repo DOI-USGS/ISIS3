@@ -74,6 +74,8 @@ namespace Isis {
    *                                      SignMostSigY()
    *   @history 2011-05-25 Janet Barrett and Steven Lambright - Spice::GetDouble
    *                                      is no longer static. 
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                                     coding standards. References #972.
    */
   class CameraFocalPlaneMap {
     public:

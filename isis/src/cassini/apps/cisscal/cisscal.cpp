@@ -1435,7 +1435,7 @@ void gbl::FindEfficiencyFactor(string fluxunits) {
       if(!camSuccess) {// the camera was unable to find the planet at the center of the image
         double lat, lon;
         // find values for lat/lon directly below spacecraft
-        cam->SubSpacecraftPoint(lat, lon);
+        cam->subSpacecraftPoint(lat, lon);
         // use these values to set the ground coordinates
         cam->SetUniversalGround(lat, lon);
       }

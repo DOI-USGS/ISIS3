@@ -46,6 +46,8 @@ namespace Isis {
    * @history 2012-05-15 Tracie Sucharski - Moved much of the error checking out of QtieTool into 
    *                        this class.  Added new method, checkNet to perform error checking
    *                        of input control network.
+   * @history 2012-06-20 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                        coding standards. References #972.
    *
    */
 

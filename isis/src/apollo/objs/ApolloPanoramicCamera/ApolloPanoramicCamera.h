@@ -38,6 +38,8 @@ namespace Isis {
      *                                                                        
      * @internal                                                              
      *   @history 2011-09-19 Orrin Thomas - Original version
+     *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+     *                                     coding standards. References #972.
      */        
     class ApolloPanoramicCamera : public LineScanCamera {
     public:

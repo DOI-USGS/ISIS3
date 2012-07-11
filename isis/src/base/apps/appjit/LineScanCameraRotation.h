@@ -98,6 +98,8 @@ namespace Isis {
    *  @history 2010-12-23  Debbie A. Cook Added new method to return InstrumentPointing keyword
    *                        value from kernels group in label and added this value as a class
    *                        member.
+   *  @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    */
   class LineScanCameraRotation : public Isis::SpiceRotation {
     public:

@@ -56,7 +56,7 @@ void IsisMain() {
     sp += PvlKeyword("Line", cam->Line());
     sp += PvlKeyword("RightAscension", cam->RightAscension());
     sp += PvlKeyword("Declination", cam->Declination());
-    sp += PvlKeyword("EphemerisTime", cam->Time().Et());
+    sp += PvlKeyword("EphemerisTime", cam->time().Et());
     sp += PvlKeyword("PixelValue", PixelToString(b[0]));
   }
   //Write the group to the screen

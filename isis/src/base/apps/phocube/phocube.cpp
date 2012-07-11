@@ -365,7 +365,7 @@ void phocube(Buffer &out) {
         if(subSpacecraftGroundAzimuth) {
           double ssplat, ssplon;
           ssplat = ssplon = 0.0;
-          cam->SubSpacecraftPoint(ssplat, ssplon);
+          cam->subSpacecraftPoint(ssplat, ssplon);
           out[index] = cam->GroundAzimuth(cam->UniversalLatitude(),
               cam->UniversalLongitude(), ssplat, ssplon);
           index += 64 * 64;
@@ -373,7 +373,7 @@ void phocube(Buffer &out) {
         if(subSolarGroundAzimuth) {
           double sslat, sslon;
           sslat = sslon = 0.0;
-          cam->SubSolarPoint(sslat,sslon);
+          cam->subSolarPoint(sslat,sslon);
           out[index] = cam->GroundAzimuth(cam->UniversalLatitude(),
               cam->UniversalLongitude(), sslat, sslon);
           index += 64 * 64;

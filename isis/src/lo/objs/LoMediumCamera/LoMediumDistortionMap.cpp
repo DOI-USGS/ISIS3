@@ -92,8 +92,8 @@ namespace Isis {
     double boreS = p_camera->FocalPlaneMap()->DetectorSample();
     double boreL = p_camera->FocalPlaneMap()->DetectorLine();
     string centkey = "INS" + iString(naifIkCode) + "_POINT_OF_SYMMETRY";
-    p_sample0 = boreS - p_camera->Spice::GetDouble(centkey, 0);
-    p_line0 = boreL + p_camera->Spice::GetDouble(centkey, 1);
+    p_sample0 = boreS - p_camera->Spice::getDouble(centkey, 0);
+    p_line0 = boreL + p_camera->Spice::getDouble(centkey, 1);
 
     // Get the distortion coefficients
     CameraDistortionMap::SetDistortion(naifIkCode);

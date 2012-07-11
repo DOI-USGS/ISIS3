@@ -65,21 +65,21 @@ namespace Isis {
     detectorMap->SetStartingDetectorSample(ss);
 
     // Setup focal plane map
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     //  Retrieve boresight location from instrument kernel (IK) (addendum?)
-    iString ikernKey = "INS" + iString((int)NaifIkCode()) + "_BORESIGHT_SAMPLE";
-    double sampleBoreSight = GetDouble(ikernKey);
+    iString ikernKey = "INS" + iString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
+    double sampleBoreSight = getDouble(ikernKey);
 
-    ikernKey = "INS" + iString((int)NaifIkCode()) + "_BORESIGHT_LINE";
-    double lineBoreSight = GetDouble(ikernKey);
+    ikernKey = "INS" + iString((int)naifIkCode()) + "_BORESIGHT_LINE";
+    double lineBoreSight = getDouble(ikernKey);
 
     focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
     focalMap->SetDetectorOffset(0.0, 0.0);
 
     // Setup distortion map
     CameraDistortionMap *distMap = new CameraDistortionMap(this);
-    distMap->SetDistortion(NaifIkCode());
+    distMap->SetDistortion(naifIkCode());
 
     // Setup the ground and sky map
     new LineScanCameraGroundMap(this);

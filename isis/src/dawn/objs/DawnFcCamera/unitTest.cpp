@@ -48,7 +48,7 @@ int main(void) {
     Pvl p("$dawn/testData/FC21B0001010_09049002212F5D.cub");
     DawnFcCamera *cam = (DawnFcCamera *) CameraFactory::Create(p);
     cout << "FileName: " << FileName(p.FileName()).name() << endl;
-    cout << "CK Frame: " << cam->InstrumentRotation()->Frame() << endl << endl;
+    cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
 

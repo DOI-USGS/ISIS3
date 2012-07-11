@@ -63,8 +63,8 @@ namespace Isis {
     // only problem with ISIS is the pixel resolution computation.  This may
     // be something we want to refactor later in case future instrument have
     // non-square detectors.
-    iString keyword = "INS" + (iString)(int)NaifIkCode() + "_PIXEL_SIZE";
-    double pixelPitch = (Spice::GetDouble(keyword, 0) + Spice::GetDouble(keyword, 1)) / 2.0;
+    iString keyword = "INS" + (iString)(int)naifIkCode() + "_PIXEL_SIZE";
+    double pixelPitch = (Spice::getDouble(keyword, 0) + Spice::getDouble(keyword, 1)) / 2.0;
     pixelPitch /= 1000.0;
     SetPixelPitch(pixelPitch);
 
@@ -85,16 +85,16 @@ namespace Isis {
     // Setup focal plane map. The class will read the instrument addendum kernel to pull out the affine tronsforms
     // from detector samp,line to focal plane x,y.  This is where the non-square detector size are read and utilized.
     // The boresight position recorded in the IK is zero-based and therefore needs to be adjusted for ISIS
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
-    double boresightSample = Spice::GetDouble("INS" + (iString)(int)NaifIkCode() + "_CCD_CENTER",0) + 1.0;
-    double boresightLine   = Spice::GetDouble("INS" + (iString)(int)NaifIkCode() + "_CCD_CENTER",1) + 1.0;
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
+    double boresightSample = Spice::getDouble("INS" + (iString)(int)naifIkCode() + "_CCD_CENTER",0) + 1.0;
+    double boresightLine   = Spice::getDouble("INS" + (iString)(int)naifIkCode() + "_CCD_CENTER",1) + 1.0;
     focalMap->SetDetectorOrigin(boresightSample,boresightLine);
 
     // Setup distortion map.  Start by reading the distortion coefficient from the instrument kernel.  Then
     // construct the distortion model.  Note the distortion model code is copied from the RadialDistortionMap
     // class and reversed.  TODO:  Check with Ken Edmundson to see if we can just read from IK and pass 1/K
     // to the original RadialDistortionMap which would allow us to delete the DawnFcDistortionMap
-    double k = Spice::GetDouble("INS" + (iString)(int)NaifIkCode() + "_RAD_DIST_COEFF");
+    double k = Spice::getDouble("INS" + (iString)(int)naifIkCode() + "_RAD_DIST_COEFF");
     new DawnFcDistortionMap(this,k);
 
     // Setup the ground and sky map
@@ -113,7 +113,7 @@ namespace Isis {
     double exposureDuration = (double)inst["ExposureDuration"] / 1000.0;
     pair<iTime, iTime> shuttertimes = ShutterOpenCloseTimes(et, exposureDuration);
     iTime centerTime = et + exposureDuration / 2.0;
-    SetTime(centerTime);
+    setTime(centerTime);
 
     // Internalize all the NAIF SPICE information into memory.
     LoadCache();

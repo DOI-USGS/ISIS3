@@ -47,7 +47,7 @@ namespace Isis {
    *            The distortion map is now being used.
    *   @history 2008-08-08 Steven Lambright Made the unit test work with a Sensor
    *            change. Also, now using the new LoadCache(...) method instead of
-   *            CreateCache(...).
+   *            createCache(...).
    *   @history 2009-03-07 Debbie A. Cook Removed obsolute CameraDetectorMap methods
    *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
    *            inherit directly from Camera
@@ -55,6 +55,8 @@ namespace Isis {
    *            methods. Updated documentation. Removed Mro namespace wrap
    *            inside Isis namespace. Added Isis Disclaimer to files. Added
    *            NAIF error check to constructor.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *            coding standards. References #972.
    */
   class CTXCamera : public LineScanCamera {
     public:

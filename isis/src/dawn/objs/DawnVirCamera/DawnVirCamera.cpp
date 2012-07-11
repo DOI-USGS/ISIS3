@@ -55,10 +55,10 @@ namespace Isis {
         virFrame = (hasArtCK) ? -203213 : -203223;
       }
 
-      InstrumentRotation()->SetFrame(virFrame);
+      instrumentRotation()->SetFrame(virFrame);
 
       // We do not want to downsize the cache
-      InstrumentRotation()->MinimizeCache(SpiceRotation::No);
+      instrumentRotation()->MinimizeCache(SpiceRotation::No);
 
       // Set up the camera info from ik/iak kernels
       SetFocalLength();
@@ -77,14 +77,14 @@ namespace Isis {
       DetectorMap()->SetDetectorSampleSumming(m_summing);
 
       // Setup focal plane map
-      new CameraFocalPlaneMap(this, NaifIkCode());
+      new CameraFocalPlaneMap(this, naifIkCode());
 
       //  Retrieve boresight location from instrument kernel (IK) (addendum?)
-      iString ikernKey = "INS" + iString((int)NaifIkCode()) + "_BORESIGHT_SAMPLE";
-      double sampleBoreSight = GetDouble(ikernKey);
+      iString ikernKey = "INS" + iString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
+      double sampleBoreSight = getDouble(ikernKey);
 
-      ikernKey = "INS" + iString((int)NaifIkCode()) + "_BORESIGHT_LINE";
-      double lineBoreSight = GetDouble(ikernKey);
+      ikernKey = "INS" + iString((int)naifIkCode()) + "_BORESIGHT_LINE";
+      double lineBoreSight = getDouble(ikernKey);
 
       FocalPlaneMap()->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
 
@@ -96,27 +96,27 @@ namespace Isis {
       new LineScanCameraSkyMap(this);
 
       // Set initial start time always (label start time is inaccurate)
-      SetTime(iTime(startTime()));    // Isis3nightly
+      setTime(iTime(startTime()));    // Isis3nightly
 //      SetEphemerisTime(startTime());  // Isis3.2.1
 
       //  Now check to determine if we have a cache already.  If we have a cache
       //  table, we are beyond spiceinit and have already computed the proper
       //  point table from the housekeeping data or articulation kernel.
-      if (!InstrumentRotation()->IsCached() && !hasArtCK) {
+      if (!instrumentRotation()->IsCached() && !hasArtCK) {
 
         // Create new table here prior to creating normal caches
         Table quats = getPointingTable(channelId, virFrame);
 
         // Create all system tables - all kernels closed after this
         LoadCache();
-        InstrumentRotation()->LoadCache(quats);
+        instrumentRotation()->LoadCache(quats);
       }
       else {
         LoadCache();
       }
 
 #if defined(DUMP_INFO)
-      Table cache = InstrumentRotation()->Cache("Loaded");
+      Table cache = instrumentRotation()->Cache("Loaded");
       cout << "Total Records: " << cache.Records() << "\n";
 
       for (int i = 0 ; i < cache.Records() ; i++) {
@@ -236,8 +236,8 @@ namespace Isis {
 
       ScanMirrorInfo smInfo;
       double lineMidTime;
-      //  scs2e_c(NaifSpkCode(), scet.c_str(), &lineMidTime);
-      lineMidTime = getClockTime(scet, NaifSpkCode()).Et();
+      //  scs2e_c(naifSpkCode(), scet.c_str(), &lineMidTime);
+      lineMidTime = getClockTime(scet, naifSpkCode()).Et();
       bool isDark = iString::Equal("closed", shutterMode);
 
       // Add fit data for all open angles
@@ -296,7 +296,7 @@ namespace Isis {
    * @brief Compute the pointing table for each line
    *
    * From the VIR housekeeping data, compute the pointing table for each line
-   *  in the image.  This table is for InstrumentRotation(Table &) to establish
+   *  in the image.  This table is for instrumentRotation(Table &) to establish
    *  line/sample pointing information.
    *
    * @history 2011-07-22 Kris Becker
@@ -379,7 +379,7 @@ namespace Isis {
     quats.Label() += PvlKeyword("CkTableOriginalSize", quats.Records());
 
     // Create the time dependant frames keyword
-    int virZeroId = GetInteger("FRAME_" + virZero);
+    int virZeroId = getInteger("FRAME_" + virZero);
     PvlKeyword tdf("TimeDependentFrames", virZeroId); // DAWN_VIR_{ID}_ZERO
     tdf.AddValue(-203200);  // DAWN_VIR
     tdf.AddValue(-203000);  // DAWN_SPACECRAFT

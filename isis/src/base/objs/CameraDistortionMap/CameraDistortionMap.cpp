@@ -64,7 +64,7 @@ namespace Isis {
   void CameraDistortionMap::SetDistortion(const int naifIkCode) {
     std::string odkkey = "INS" + Isis::iString(naifIkCode) + "_OD_K";
     for(int i = 0; i < 3; ++i) {
-      p_odk.push_back(p_camera->Spice::GetDouble(odkkey, i));
+      p_odk.push_back(p_camera->Spice::getDouble(odkkey, i));
     }
   }
 

@@ -89,7 +89,7 @@ namespace Isis {
     dmap->SetDetectorLineSumming(sumMode);
 
     // Setup focal plane map
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
     focalMap->SetDetectorOrigin(512.5, 512.5);
 
     // Setup distortion map
@@ -113,7 +113,7 @@ namespace Isis {
     Camera::SetBand(vband);
 
     // Set the et
-    SetTime(p_etStart + BandEphemerisTimeOffset(vband));
+    setTime(p_etStart + BandEphemerisTimeOffset(vband));
     PushFrameCameraDetectorMap *dmap = (PushFrameCameraDetectorMap *)this->DetectorMap();
     dmap->SetStartTime(p_etStart + BandEphemerisTimeOffset(vband));
   }

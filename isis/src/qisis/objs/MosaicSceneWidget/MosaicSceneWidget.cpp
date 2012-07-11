@@ -224,9 +224,9 @@ namespace Isis {
       try {
         Camera * cam = cube->getCamera();
         Distance radii[3];
-        cam->Radii(radii);
+        cam->radii(radii);
 
-        mappingGrp += PvlKeyword("TargetName", cam->Target());
+        mappingGrp += PvlKeyword("TargetName", cam->target());
         mappingGrp += PvlKeyword("EquatorialRadius", radii[0].meters(),
                                  "meters");
         mappingGrp += PvlKeyword("PolarRadius", radii[2].meters(),

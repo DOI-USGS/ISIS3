@@ -37,6 +37,9 @@ namespace Isis {
     * @ingroup Visualization Tools
     *
     * @author 2011-12-07 Tracie Sucharski
+    * @internal
+    *  @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+    *                         coding standards. References #972.
     *
     */
   class StereoTool : public AbstractPlotTool {

@@ -38,12 +38,14 @@ namespace Isis {
    *
    * @author 2005-02-01 Jeff Anderson
    *
+   * @internal
    * @history 2008-02-05 Jeff Anderson - Modified to allow for variable focal
    *                                     length
    * @history 2008-02-21 Steven Lambright - Fixed a problem that resulted in infinities
    *                                      and NaNs
+   * @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                                      coding standards. References #972.
    *
-   * @internal
    */
   class CameraDistortionMap {
     public:

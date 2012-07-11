@@ -82,6 +82,8 @@ namespace Isis {
    *                             allowErrors is true.
    *   @history 2010-09-13 Steven Lambright - Corrected units for
    *                             SampleResolution and LineResolution
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    */
   class CameraPointInfo {
 

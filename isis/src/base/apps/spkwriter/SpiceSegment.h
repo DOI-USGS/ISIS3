@@ -56,6 +56,8 @@ namespace Isis {
  * @author 2010-11-10 Kris Becker 
  * @internal 
  * @history 2010-12-09 Kris Becker Added more documentation
+ * @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+ *                          coding standards. References #972.
  * 
  */
 class SpiceSegment {
@@ -80,7 +82,7 @@ class SpiceSegment {
     /** Return name of instrument */
     std::string Instrument() const { return (_instId); }
     /** Return name of target */
-    std::string Target() const { return (_target); }
+    std::string target() const { return (_target); }
 
     /** Start time of segment in ET */
     double startTime() const { return (_startTime); }

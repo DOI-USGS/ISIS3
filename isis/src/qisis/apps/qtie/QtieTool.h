@@ -53,6 +53,8 @@ namespace Isis {
     *                           new control point, if doesn't exist on basemap, return.
     *   @history 2012-05-15 Tracie Sucharski - Moved much of the error checking out of this class 
     *                           and into the QtieFileTool class.
+    *   @history 2012-06-20 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+    *                           coding standards. References #972.
     */
   class QtieTool : public Tool {
       Q_OBJECT

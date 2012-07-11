@@ -45,7 +45,7 @@ namespace Isis {
     //      LoadEulerMounting();
     SetFocalLength();
     SetPixelPitch();
-    InstrumentRotation()->SetTimeBias(-1.15);
+    instrumentRotation()->SetTimeBias(-1.15);
 
     // Get the start time from labels
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
@@ -68,7 +68,7 @@ namespace Isis {
 
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap =
-      new CameraFocalPlaneMap(this, NaifIkCode());
+      new CameraFocalPlaneMap(this, naifIkCode());
     focalMap->SetDetectorOrigin(1024.5, 0.0);
     focalMap->SetDetectorOffset(0.0, 0.0);
 

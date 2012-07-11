@@ -68,6 +68,8 @@ namespace Isis {
    *                           Since the exception is in the constructor the
    *                           error will probably lead to an alternate seg
    *                           fault.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    */
   class VimsGroundMap : public CameraGroundMap {
     public:

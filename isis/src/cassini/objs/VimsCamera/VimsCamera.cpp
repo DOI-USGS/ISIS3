@@ -106,7 +106,7 @@ namespace Isis {
     new CameraDetectorMap(this);
 
     // Setup focal plane map
-    new CameraFocalPlaneMap(this, NaifIkCode());
+    new CameraFocalPlaneMap(this, naifIkCode());
 
     // Setup distortion map
     new CameraDistortionMap(this);
@@ -125,8 +125,8 @@ namespace Isis {
       tol = PixelPitch() * SpacecraftAltitude() / FocalLength() / 1000. / 100.;
     }
 
-    if(channel == "VIS") CreateCache(etStart, etStop, 64 * 64, tol);
-    if(channel == "IR") CreateCache(etStart, etStop, 64 * 64, tol);
+    if(channel == "VIS") createCache(etStart, etStop, 64 * 64, tol);
+    if(channel == "IR") createCache(etStart, etStop, 64 * 64, tol);
 
     //  Call SetImage so that the et is reset to beginning of image w/o
     //   padding.

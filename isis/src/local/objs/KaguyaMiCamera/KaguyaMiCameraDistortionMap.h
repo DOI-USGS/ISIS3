@@ -39,6 +39,8 @@ namespace Isis {
    * @author 2012-06-20 Orrin Thomas
    * @internal
    *   @history 2020-06-20 Orrin Thomas - Original Version
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    */
   class KaguyaMiCameraDistortionMap : public CameraDistortionMap {
     public:

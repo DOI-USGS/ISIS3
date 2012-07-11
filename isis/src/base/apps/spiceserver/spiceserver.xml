@@ -23,6 +23,9 @@
     <change name="Steven Lambright and Jai Rideout" date="2011-09-02">
       Original Version
     </change>
+    <change name="Debbie A. Cook" date="2012-07-06">
+       Updated Spice members to be more compliant with Isis coding standards. References #972.
+    </change>
   </history>
 
   <groups>

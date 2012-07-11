@@ -57,10 +57,10 @@ namespace Isis {
       std::string ixkey = "INS" + Isis::iString(naifIkCode) + "_ITRANSS";
       std::string iykey = "INS" + Isis::iString(naifIkCode) + "_ITRANSL";
       for(int i = 0; i < 3; ++i) {
-        p_transx[i]  = parent->GetDouble(xkey, i);
-        p_transy[i]  = parent->GetDouble(ykey, i);
-        p_itranss[i] = parent->GetDouble(ixkey, i);
-        p_itransl[i] = parent->GetDouble(iykey, i);
+        p_transx[i]  = parent->getDouble(xkey, i);
+        p_transy[i]  = parent->getDouble(ykey, i);
+        p_itranss[i] = parent->getDouble(ixkey, i);
+        p_itransl[i] = parent->getDouble(iykey, i);
       }
     }
     else {
@@ -69,10 +69,10 @@ namespace Isis {
       std::string ixkey = "IDEAL_TRANSS";
       std::string iykey = "IDEAL_TRANSL";
       for(int i = 0; i < 3; ++i) {
-        p_transx[i]  = parent->GetDouble(xkey, i);
-        p_transy[i]  = parent->GetDouble(ykey, i);
-        p_itranss[i] = parent->GetDouble(ixkey, i);
-        p_itransl[i] = parent->GetDouble(iykey, i);
+        p_transx[i]  = parent->getDouble(xkey, i);
+        p_transy[i]  = parent->getDouble(ykey, i);
+        p_itranss[i] = parent->getDouble(ixkey, i);
+        p_itransl[i] = parent->getDouble(iykey, i);
       }
     }
 

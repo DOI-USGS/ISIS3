@@ -149,7 +149,7 @@ void IsisMain() {
   double sample = alpha.BetaSample(.5);
   double line = alpha.BetaLine(.5);
   incam->SetImage(sample, line);
-  double et = incam->Time().Et();
+  double et = incam->time().Et();
 
   // Get the output file name and set its attributes
   CubeAttributeOutput cao;

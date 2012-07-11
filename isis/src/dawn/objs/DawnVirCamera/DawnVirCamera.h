@@ -49,6 +49,8 @@ namespace Isis {
      *   @history 2011-08-23 Kris Becker - Correct length of scan
      *            line to be the EXTERNAL_REPETITION_TIME of the
      *            FRAME_PARAMETER[2] value.
+     *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+     *            coding standards. References #972.
      */
     class DawnVirCamera : public LineScanCamera {
       public:

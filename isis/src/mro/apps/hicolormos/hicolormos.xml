@@ -58,6 +58,9 @@
       We contine to use the latitude and logitude so that we are backwards compatible.  We added this new code because 
       the camera could not find an itersect for some images (polar) if we used projection latitude and longitude to "setGround".
      </change>
+    <change name="Debbie A. Cook" date="2012-07-06">
+       Updated Spice members to be more compliant with Isis coding standards. References #972.
+    </change>
   </history>
 
   <groups>

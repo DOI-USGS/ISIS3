@@ -132,7 +132,7 @@ namespace Isis {
     pB[2] = point.GetZ().kilometers();
 
     // Check for Sky images
-    if(p_camera->IsSky()) {
+    if(p_camera->isSky()) {
       return false;
     }
 
@@ -143,9 +143,9 @@ namespace Isis {
 //    latrec_c(radius / 1000.0, lon * Isis::PI / 180.0, lat * Isis::PI / 180.0, pB);
 
     // Get spacecraft vector in body-fixed coordinates
-    SpiceRotation *bodyRot = p_camera->BodyRotation();
-    SpiceRotation *instRot = p_camera->InstrumentRotation();
-    std::vector<double> sB = bodyRot->ReferenceVector(p_camera->InstrumentPosition()->Coordinate());
+    SpiceRotation *bodyRot = p_camera->bodyRotation();
+    SpiceRotation *instRot = p_camera->instrumentRotation();
+    std::vector<double> sB = bodyRot->ReferenceVector(p_camera->instrumentPosition()->Coordinate());
     std::vector<double> lookB(3);
     for(int ic = 0; ic < 3; ic++)   lookB[ic] = pB[ic] - sB[ic];
 
@@ -170,7 +170,7 @@ namespace Isis {
 
     // Get the look vector in the camera frame and the instrument rotation
     p_lookJ.resize(3);
-    p_lookJ = p_camera->BodyRotation()->J2000Vector(lookB);
+    p_lookJ = p_camera->bodyRotation()->J2000Vector(lookB);
     std::vector <double> lookC(3);
     lookC = instRot->ReferenceVector(p_lookJ);
 
@@ -230,11 +230,11 @@ namespace Isis {
     double fl = p_camera->DistortionMap()->UndistortedFocalPlaneZ();
 
     // Rotate look vector into camera frame
-    SpiceRotation *instRot = p_camera->InstrumentRotation();
+    SpiceRotation *instRot = p_camera->instrumentRotation();
     std::vector <double> lookC(3);
     lookC = instRot->ReferenceVector(p_lookJ);
 
-    SpicePosition *instPos = p_camera->InstrumentPosition();
+    SpicePosition *instPos = p_camera->instrumentPosition();
 
     std::vector<double> d_lookJ = instPos->CoordinatePartial(varType, coefIndex);
     for(int j = 0; j < 3; j++) d_lookJ[j] *= -1.0;
@@ -267,7 +267,7 @@ namespace Isis {
     double fl = p_camera->DistortionMap()->UndistortedFocalPlaneZ();
 
     // Rotate look vector into camera frame
-    SpiceRotation *instRot = p_camera->InstrumentRotation();
+    SpiceRotation *instRot = p_camera->instrumentRotation();
     std::vector <double> lookC(3);
     lookC = instRot->ReferenceVector(p_lookJ);
 
@@ -298,11 +298,11 @@ namespace Isis {
     double fl = p_camera->DistortionMap()->UndistortedFocalPlaneZ();
 
     // Rotate look vector into camera frame
-    SpiceRotation *instRot = p_camera->InstrumentRotation();
+    SpiceRotation *instRot = p_camera->instrumentRotation();
     std::vector <double> lookC(3);
     lookC = instRot->ReferenceVector(p_lookJ);
 
-    SpiceRotation *bodyRot = p_camera->BodyRotation();
+    SpiceRotation *bodyRot = p_camera->bodyRotation();
     std::vector<double> d_lookJ = bodyRot->J2000Vector(d_lookB);
     std::vector<double> d_lookC = instRot->ReferenceVector(d_lookJ);
 

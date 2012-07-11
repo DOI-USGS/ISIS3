@@ -49,7 +49,7 @@ namespace Isis {
     PushFrameCamera(lab) {
     NaifStatus::CheckErrors();
     // Set up the camera characteristics
-    InstrumentRotation()->SetFrame(NaifIkCode());
+    instrumentRotation()->SetFrame(naifIkCode());
     SetFocalLength();
     SetPixelPitch();
 
@@ -103,7 +103,7 @@ namespace Isis {
     bool dataflipped = (inst["DataFlipped"][0].UpCase() == "YES");
 
     //  Now create detector offsets
-    iString instCode = "INS" + iString((int) NaifIkCode());
+    iString instCode = "INS" + iString((int) naifIkCode());
     iString ikernKey = instCode + "_FILTER_BANDCENTER";
     vector<int> fbc = GetVector(ikernKey);
     ikernKey = instCode + "_FILTER_OFFSET";
@@ -153,7 +153,7 @@ namespace Isis {
     dmap->SetFlippedFramelets(flippedFramelets, p_nframelets);
 
     // Setup focal plane map
-    new CameraFocalPlaneMap(this, NaifIkCode());
+    new CameraFocalPlaneMap(this, naifIkCode());
 
     // The line detector origin varies based on instrument mode
     double detectorOriginLine;
@@ -162,10 +162,10 @@ namespace Isis {
     dmap->SetGeometricallyFlippedFramelets(false);
 
     ikernKey = instCode + "_BORESIGHT_SAMPLE";
-    double sampleBoreSight = GetDouble(ikernKey);
+    double sampleBoreSight = getDouble(ikernKey);
 
     ikernKey = instCode + "_BORESIGHT_LINE";
-    double lineBoreSight = GetDouble(ikernKey);
+    double lineBoreSight = getDouble(ikernKey);
 
     //  get instrument-specific sample offset
     iString instModeId = ((iString)(string) inst["InstrumentModeId"]).UpCase();
@@ -178,7 +178,7 @@ namespace Isis {
       p_frameletOffsets[0] = 0;
     }
     ikernKey = instCode + "_" + instModeId + "_SAMPLE_OFFSET";
-    int sampOffset = GetInteger(ikernKey);
+    int sampOffset = getInteger(ikernKey);
 
     detectorOriginSamp = sampleBoreSight + 1;
     detectorOriginLine = lineBoreSight + 1;
@@ -188,7 +188,7 @@ namespace Isis {
     dmap->SetStartingDetectorSample(sampOffset+1);
 
     // Setup distortion map
-    new LroWideAngleCameraDistortionMap(this, NaifIkCode());
+    new LroWideAngleCameraDistortionMap(this, naifIkCode());
 
     // Setup the ground and sky map
     bool evenFramelets = (iString((string) inst["Framelets"][0]).UpCase()
@@ -268,7 +268,7 @@ namespace Isis {
 
     vector<int> parms;
     for(int i = 0 ; i < nvals ; i++) {
-      parms.push_back(GetInteger(key, i));
+      parms.push_back(getInteger(key, i));
     }
 
     return (parms);

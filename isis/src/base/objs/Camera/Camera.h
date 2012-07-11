@@ -215,6 +215,8 @@ namespace Isis {
    *                          relative to the North pole.
    *  @history 2012-06-04 Janet Barrett - Got rid of redundant calls to Sample(), Line(),
    *                          and SetImage() in the ComputeAzimuth method.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    */
 
   class Camera : public Sensor {
@@ -600,13 +602,13 @@ namespace Isis {
        *  
        * The SpkTargetId value is found in the "Target Body" entry (-236). 
        *  
-       * For most cases, this is the NAIF SPK code returned by the NaifSpkCode() 
+       * For most cases, this is the NAIF SPK code returned by the naifSpkCode() 
        * method (in the Spice class).  Some instrument camera models may need to
        * override this method if this is not case. 
        * 
        * @return @b int NAIF code for the SPK target for an instrument
        */
-      virtual int SpkTargetId() const { return  (NaifSpkCode()); }
+      virtual int SpkTargetId() const { return  (naifSpkCode()); }
 
       /**
        * @brief Provides the center of motion body for SPK NAIF kernel 
@@ -639,14 +641,14 @@ namespace Isis {
        *  
        * The SpkCenterId value is found in the "Center Body" entry (2). The 
        * center of motion is most likely the targeted body for the image and 
-       * this is provided by the NaifBodyCode() method (in the Spice class).  If 
+       * this is provided by the naifBodyCode() method (in the Spice class).  If 
        * this is not consistently the case for a particular mission, then camera 
        * models will need to reimplement this method. 
        * 
        * @return @b int NAIF code for SPK center of motion body for an 
        *         instrument
        */
-      virtual int SpkCenterId() const { return (NaifBodyCode()); }
+      virtual int SpkCenterId() const { return (naifBodyCode()); }
 
       /**
        * @brief Provides reference frame for instruments SPK NAIF kernel 

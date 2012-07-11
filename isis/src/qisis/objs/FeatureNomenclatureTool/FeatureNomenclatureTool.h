@@ -46,6 +46,8 @@ namespace Isis {
    *                           Fixes #852. Fixes #892.
    *   @history 2012-06-26 Kimberly Oyama - Minor refactoring in the findMissingNomenclature()
    *                           method. References #958.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972
    * 
    */
   class FeatureNomenclatureTool : public Tool {

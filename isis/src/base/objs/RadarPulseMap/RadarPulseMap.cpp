@@ -40,7 +40,7 @@ namespace Isis {
   bool RadarPulseMap::SetDetector(const double sample,
                                   const double line) {
     if(!CameraDetectorMap::SetDetector(sample, line)) return false;
-    double etDiff = p_camera->Time().Et() - p_etStart;
+    double etDiff = p_camera->time().Et() - p_etStart;
     p_parentLine = etDiff / p_lineRate + 1.0;
     return true;
   }
@@ -64,7 +64,7 @@ namespace Isis {
     // line is really a function of time so set detector line to zero
     p_detectorLine = 0;
     double etLine = p_etStart + p_lineRate * (line - 1.0);
-    p_camera->SetTime(etLine);
+    p_camera->setTime(etLine);
     return true;
   }
 }

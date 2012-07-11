@@ -48,7 +48,7 @@ namespace Isis {
     SetFocalLength();
     SetPixelPitch();
     //LoadFrameMounting("MRO_SPACECRAFT", "MRO_HIRISE_OPTICAL_AXIS");
-    InstrumentRotation()->SetFrame(-74690);
+    instrumentRotation()->SetFrame(-74690);
 
     // Get required keywords from instrument group
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
@@ -116,7 +116,7 @@ namespace Isis {
     // Setup distortion map.  This will read the optical distortion
     // coefficients from the instrument kernel
     CameraDistortionMap *distortionMap = new CameraDistortionMap(this);
-    distortionMap->SetDistortion(NaifIkCode());
+    distortionMap->SetDistortion(naifIkCode());
 
     // Setup the ground and sky map to transform undistorted focal
     // plane x/y to lat/lon or ra/dec respectively.

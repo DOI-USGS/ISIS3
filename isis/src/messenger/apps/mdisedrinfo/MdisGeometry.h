@@ -67,6 +67,8 @@ namespace Isis {
    *                       MdisGeometry
    * @history 2012-04-06 Kris Becker - Corrected TWIST_ANGLE computation to 
    *                       ensure it is restricted to the 0-360 degree domain.
+   * @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                       coding standards.  References #972..
    */
   class MdisGeometry {
     public:

@@ -54,7 +54,7 @@ namespace Isis {
     iString instId = (string)inst["InstrumentId"];
 
     // Turn off the aberration corrections for the instrument position object
-    InstrumentPosition()->SetAberrationCorrection("NONE");
+    instrumentPosition()->SetAberrationCorrection("NONE");
 
     // Get the camera characteristics
     SetFocalLength();
@@ -64,24 +64,24 @@ namespace Isis {
     double time = iTime((string)inst["StartTime"]).Et();
 
     // Setup focal plane map
-    LoCameraFiducialMap fid(inst, NaifIkCode());
+    LoCameraFiducialMap fid(inst, naifIkCode());
 
     // Setup detector map
     new CameraDetectorMap(this);
 
     // Setup focalplane map
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
     // Try (0.,0.)
     focalMap->SetDetectorOrigin(0.0, 0.0);
 
     // Setup distortion map
     LoHighDistortionMap *distortionMap = new LoHighDistortionMap(this);
-    distortionMap->SetDistortion(NaifIkCode());
+    distortionMap->SetDistortion(naifIkCode());
     // Setup the ground and sky map
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    SetTime(time);
+    setTime(time);
     LoadCache();
     NaifStatus::CheckErrors();
   }

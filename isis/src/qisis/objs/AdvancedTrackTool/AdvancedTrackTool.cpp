@@ -329,7 +329,7 @@ namespace Isis {
         lon = -lon;
         while(lon < 0.0) lon += 360.0;
         Distance radii[3];
-        cvp->camera()->Radii(radii);
+        cvp->camera()->radii(radii);
         lat = Projection::ToPlanetographic(lat, radii[0].meters(), radii[2].meters());
         p_tableWin->table()->item(row, PLANETOGRAPHIC_LAT)->setText(QString::number(lat, 'f', 15));
         p_tableWin->table()->item(row, WEST_LON_360)->setText(QString::number(lon, 'f', 15));
@@ -377,7 +377,7 @@ namespace Isis {
         // Write out columns north azimuth, sun azimuth, solar longitude
         double northAzi = cvp->camera()->NorthAzimuth();
         double sunAzi   = cvp->camera()->SunAzimuth();
-        double solarLon = cvp->camera()->SolarLongitude().degrees();
+        double solarLon = cvp->camera()->solarLongitude().degrees();
         p_tableWin->table()->item(row, NORTH_AZIMUTH)->setText(QString::number(northAzi));
         p_tableWin->table()->item(row, SUN_AZIMUTH)->setText(QString::number(sunAzi));
         p_tableWin->table()->item(row, SOLAR_LON)->setText(QString::number(solarLon));
@@ -399,14 +399,14 @@ namespace Isis {
       p_tableWin->table()->item(row, DECLINATION)->setText(QString::number(dec));
 
       // Always write out columns et and utc
-      iTime time(cvp->camera()->Time());
+      iTime time(cvp->camera()->time());
       p_tableWin->table()->item(row, EPHEMERIS_TIME)->setText(QString::number(time.Et(), 'f', 15));
       std::string time_utc = time.UTC();
       p_tableWin->table()->item(row, UTC)->setText(time_utc.c_str());
 
       // Always out columns spacecraft position
       double pos[3];
-      cvp->camera()->InstrumentPosition(pos);
+      cvp->camera()->instrumentPosition(pos);
       p_tableWin->table()->item(row, SPACECRAFT_X)->setText(QString::number(pos[0]));
       p_tableWin->table()->item(row, SPACECRAFT_Y)->setText(QString::number(pos[1]));
       p_tableWin->table()->item(row, SPACECRAFT_Z)->setText(QString::number(pos[2]));

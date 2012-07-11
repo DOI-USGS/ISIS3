@@ -74,6 +74,8 @@ namespace Isis {
    *  @history 2011-07-07 Tracie Sucharski - Disable Open Ground and Open Dem
    *                          until list & net open.
    *  @history 2011-11-01 Tracie Sucharski - Added save slot. 
+   *  @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    *
    */
 

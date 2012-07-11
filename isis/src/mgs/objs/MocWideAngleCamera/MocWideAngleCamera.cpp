@@ -62,7 +62,7 @@ namespace Isis {
       throw IException(IException::User,
                        "Cube file needs to be spiceinit'd with updated iak", _FILEINFO_);
     }
-    InstrumentRotation()->SetTimeBias(-1.15);
+    instrumentRotation()->SetTimeBias(-1.15);
 
     // Get the start time from labels
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
@@ -78,7 +78,7 @@ namespace Isis {
 
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap =
-      new CameraFocalPlaneMap(this, NaifIkCode());
+      new CameraFocalPlaneMap(this, naifIkCode());
     if(isRed) {
       focalMap->SetDetectorOrigin(1674.65, 0.0);
       focalMap->SetDetectorOffset(0.0, 6.7785);

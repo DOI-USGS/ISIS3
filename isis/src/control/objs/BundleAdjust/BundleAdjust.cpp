@@ -335,7 +335,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_BodyRadii[0] = m_BodyRadii[1] = m_BodyRadii[2] = Distance();
     Camera *pCamera = m_pCnet->Camera(0);
     if (pCamera) {
-      pCamera->Radii(m_BodyRadii);  // meters
+      pCamera->radii(m_BodyRadii);  // meters
 
 //      printf("radii: %lf %lf %lf\n",m_BodyRadii[0],m_BodyRadii[1],m_BodyRadii[2]);
 
@@ -853,7 +853,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         // initial coefficient values.  Initialize indices to -1
 
         // Fit the camera pointing to an equation
-        SpiceRotation *pSpiceRot = pCamera->InstrumentRotation();
+        SpiceRotation *pSpiceRot = pCamera->instrumentRotation();
 
         if (!m_bObservationMode) {
           pSpiceRot->SetPolynomialDegree(m_nckDegree);   // Set the ck polynomial fit degree
@@ -863,7 +863,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         else {
           // Index of image to use for initial values is set already so set polynomial to initial values
           if (iIndex >= 0) {
-            SpiceRotation *pOrot = m_pCnet->Camera(iIndex)->InstrumentRotation(); //Observation rotation
+            SpiceRotation *pOrot = m_pCnet->Camera(iIndex)->instrumentRotation(); //Observation rotation
             std::vector<double> anglePoly1, anglePoly2, anglePoly3;
             pOrot->GetPolynomial(anglePoly1, anglePoly2, anglePoly3);
             double baseTime = pOrot->GetBaseTime();
@@ -884,14 +884,14 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
       if (m_spacecraftPositionSolveType != Nothing) {
         // Set the spacecraft position to an equation
-        SpicePosition *pSpicePos = pCamera->InstrumentPosition();
+        SpicePosition *pSpicePos = pCamera->instrumentPosition();
 
         if (!m_bObservationMode)
           pSpicePos->SetPolynomial();
         else {
           // Index of image to use for initial values is set already so set polynomial to initial values
           if (iIndex >= 0) {
-            SpicePosition *pOpos = m_pCnet->Camera(iIndex)->InstrumentPosition(); //Observation position
+            SpicePosition *pOpos = m_pCnet->Camera(iIndex)->instrumentPosition(); //Observation position
             std::vector<double> posPoly1, posPoly2, posPoly3;
             pOpos->GetPolynomial(posPoly1, posPoly2, posPoly3);
             double baseTime = pOpos->GetBaseTime();
@@ -2745,7 +2745,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     int nIndex = 0;
 
     if (m_spacecraftPositionSolveType != Nothing) {
-//      SpicePosition* pInstPos = pCamera->InstrumentPosition();
+//      SpicePosition* pInstPos = pCamera->instrumentPosition();
 
       // Add the partial for the x coordinate of the position (differentiating
       // point(x,y,z) - spacecraftPosition(x,y,z) in J2000
@@ -2960,11 +2960,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //    std::cout << "d_lookB_WRT_RAD" << d_lookB_WRT_RAD << std::endl;
 
 
-    //    SpiceRotation* pBodyRot = pCamera->BodyRotation();
+    //    SpiceRotation* pBodyRot = pCamera->bodyRotation();
 
     // "InstumentPosition()->Coordinate()" returns the instrument coordinate in J2000;
     // then the body rotation "ReferenceVector" rotates that into body-fixed coordinates
-//    sB = pBodyRot->ReferenceVector(pCamera->InstrumentPosition()->Coordinate());
+//    sB = pBodyRot->ReferenceVector(pCamera->instrumentPosition()->Coordinate());
 
 //    lookB[0] = pB[0] - sB[0];
 //    lookB[1] = pB[1] - sB[1];
@@ -2973,11 +2973,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     // get look vector in the camera frame
 //    lookJ = pBodyRot->J2000Vector( lookB );
 
-//    SpiceRotation* pInstRot = pCamera->InstrumentRotation();
+//    SpiceRotation* pInstRot = pCamera->instrumentRotation();
 //    lookC = pInstRot->ReferenceVector(lookJ);
 
     // get J2000 to camera rotation matrix
-//    CJ = pCamera->InstrumentRotation()->Matrix();
+//    CJ = pCamera->instrumentRotation()->Matrix();
 
 //    std::cout << CJ << std::endl;
 
@@ -2992,7 +2992,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     int nIndex = 0;
 
     if (m_spacecraftPositionSolveType != Nothing) {
-//      SpicePosition* pInstPos = pCamera->InstrumentPosition();
+//      SpicePosition* pInstPos = pCamera->instrumentPosition();
 
       // Add the partial for the x coordinate of the position (differentiating
       // point(x,y,z) - spacecraftPosition(x,y,z) in J2000
@@ -3247,7 +3247,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         // initial coefficient values.  Initialize indices to -1
 
         // Fit the camera pointing to an equation
-        SpiceRotation *pSpiceRot = pCamera->InstrumentRotation();
+        SpiceRotation *pSpiceRot = pCamera->instrumentRotation();
 
         if (!m_bObservationMode) {
           pSpiceRot->SetPolynomialDegree(m_nckDegree);   // Set the ck polynomial fit degree
@@ -3257,7 +3257,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         else {
           // Index of image to use for initial values is set already so set polynomial to initial values
           if (iIndex >= 0) {
-            SpiceRotation *pOrot = m_pCnet->Camera(iIndex)->InstrumentRotation(); //Observation rotation
+            SpiceRotation *pOrot = m_pCnet->Camera(iIndex)->instrumentRotation(); //Observation rotation
             std::vector<double> anglePoly1, anglePoly2, anglePoly3;
             pOrot->GetPolynomial(anglePoly1, anglePoly2, anglePoly3);
             double baseTime = pOrot->GetBaseTime();
@@ -3278,14 +3278,14 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
       if (m_spacecraftPositionSolveType != Nothing) {
         // Set the spacecraft position to an equation
-        SpicePosition *pSpicePos = pCamera->InstrumentPosition();
+        SpicePosition *pSpicePos = pCamera->instrumentPosition();
 
         if (!m_bObservationMode)
           pSpicePos->SetPolynomial();
         else {
           // Index of image to use for initial values is set already so set polynomial to initial values
           if (iIndex >= 0) {
-            SpicePosition *pOpos = m_pCnet->Camera(iIndex)->InstrumentPosition(); //Observation position
+            SpicePosition *pOpos = m_pCnet->Camera(iIndex)->instrumentPosition(); //Observation position
             std::vector<double> posPoly1, posPoly2, posPoly3;
             pOpos->GetPolynomial(posPoly1, posPoly2, posPoly3);
             double baseTime = pOpos->GetBaseTime();
@@ -3813,11 +3813,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       }
 
       // May need to do back of planet test here TODO
-//       SpiceRotation *pBodyRot = pCamera->BodyRotation();
+//       SpiceRotation *pBodyRot = pCamera->bodyRotation();
 
       // "InstumentPosition()->Coordinate()" returns the instrument coordinate in J2000;
       // then the body rotation "ReferenceVector" rotates that into body-fixed coordinates
-//       sB = pBodyRot->ReferenceVector(pCamera->InstrumentPosition()->Coordinate());
+//       sB = pBodyRot->ReferenceVector(pCamera->instrumentPosition()->Coordinate());
 
 //       lookB[0] = pB[0] - sB[0];
 //       lookB[1] = pB[1] - sB[1];
@@ -3825,11 +3825,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
       // get look vector in the camera frame
 //       lookJ = pBodyRot->J2000Vector(lookB);
-//       SpiceRotation *pInstRot = pCamera->InstrumentRotation();
+//       SpiceRotation *pInstRot = pCamera->instrumentRotation();
 //       lookC = pInstRot->ReferenceVector(lookJ);
 
       // get J2000 to camera rotation matrix
-//       CJ = pCamera->InstrumentRotation()->Matrix();
+//       CJ = pCamera->instrumentRotation()->Matrix();
 
       // collinearity auxiliaries
 //       NX_C = CJ[0] * lookJ[0] + CJ[1] * lookJ[1] + CJ[2] * lookJ[2];
@@ -3844,7 +3844,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       nIndex = ImageIndex(nIndex);
 
       if (m_spacecraftPositionSolveType != Nothing) {
-//         SpicePosition *pInstPos = pCamera->InstrumentPosition();
+//         SpicePosition *pInstPos = pCamera->instrumentPosition();
 
         // Add the partial for the x coordinate of the position (differentiating
         // point(x,y,z) - spacecraftPosition(x,y,z) in J2000
@@ -4184,9 +4184,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
       pCamera1->SetImage(measure1.GetSample(), measure1.GetLine());
 
-      pCamera1->InstrumentPosition(Camera1Position);
+      pCamera1->instrumentPosition(Camera1Position);
 
-//    double TCD = pCamera1->TargetCenterDistance();
+//    double TCD = pCamera1->targetCenterDistance();
 
       Camera1LookVector[0] =  pDistortionMap1->UndistortedFocalPlaneX();
       Camera1LookVector[1] =  pDistortionMap1->UndistortedFocalPlaneY();
@@ -4211,18 +4211,18 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       dummy1[0] = Camera1LookVector[0];
       dummy1[1] = Camera1LookVector[1];
       dummy1[2] = Camera1LookVector[2];
-      dummy1 = pCamera1->InstrumentRotation()->J2000Vector(dummy1);
+      dummy1 = pCamera1->instrumentRotation()->J2000Vector(dummy1);
 
       // rotate into body-fixed
-      dummy1 = pCamera1->BodyRotation()->ReferenceVector(dummy1);
+      dummy1 = pCamera1->bodyRotation()->ReferenceVector(dummy1);
 
       Camera1LookVector[0] = dummy1[0];
       Camera1LookVector[1] = dummy1[1];
       Camera1LookVector[2] = dummy1[2];
 
       // Get the look vector in the camera frame and the instrument rotation
-//      lookJ = cam->BodyRotation()->J2000Vector( lookB );
-//      SpiceRotation *instRot = cam->InstrumentRotation();
+//      lookJ = cam->bodyRotation()->J2000Vector( lookB );
+//      SpiceRotation *instRot = cam->instrumentRotation();
 //      lookC = instRot->ReferenceVector( lookJ);
 
       for (int j = i + 1; j < nObservations; j++) {
@@ -4240,7 +4240,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
         pCamera2->SetImage(measure2.GetSample(), measure2.GetLine());
 
-        pCamera2->InstrumentPosition(Camera2Position);
+        pCamera2->instrumentPosition(Camera2Position);
 
         Camera2LookVector[0] = pDistortionMap2->UndistortedFocalPlaneX();
         Camera2LookVector[1] = pDistortionMap2->UndistortedFocalPlaneY();
@@ -4264,10 +4264,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         dummy1[0] = Camera2LookVector[0];
         dummy1[1] = Camera2LookVector[1];
         dummy1[2] = Camera2LookVector[2];
-        dummy1 = pCamera2->InstrumentRotation()->J2000Vector(dummy1);
+        dummy1 = pCamera2->instrumentRotation()->J2000Vector(dummy1);
 
         // rotate into body-fixed
-        dummy1 = pCamera2->BodyRotation()->ReferenceVector(dummy1);
+        dummy1 = pCamera2->bodyRotation()->ReferenceVector(dummy1);
 
         Camera2LookVector[0] = dummy1[0];
         Camera2LookVector[1] = dummy1[1];
@@ -4415,7 +4415,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           currentindex = index;
 
       if (m_spacecraftPositionSolveType != Nothing) {
-        SpicePosition *pInstPos = pCamera->InstrumentPosition();
+        SpicePosition *pInstPos = pCamera->instrumentPosition();
         std::vector<double> abcX(3), abcY(3), abcZ(3);
         pInstPos->GetPolynomial(abcX, abcY, abcZ);
 
@@ -4485,7 +4485,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       }
 
       if (m_cmatrixSolveType != None) {
-        SpiceRotation *pInstRot = pCamera->InstrumentRotation();
+        SpiceRotation *pInstRot = pCamera->instrumentRotation();
         std::vector<double> coefRA(m_nNumberCameraCoefSolved),
             coefDEC(m_nNumberCameraCoefSolved),
             coefTWI(m_nNumberCameraCoefSolved);
@@ -4641,7 +4641,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           currentindex = index;
 
       if (m_spacecraftPositionSolveType != Nothing) {
-        SpicePosition *pInstPos = pCamera->InstrumentPosition();
+        SpicePosition *pInstPos = pCamera->instrumentPosition();
         std::vector<double> abcX(3), abcY(3), abcZ(3);
         pInstPos->GetPolynomial(abcX, abcY, abcZ);
 
@@ -4711,7 +4711,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       }
 
       if (m_cmatrixSolveType != None) {
-        SpiceRotation *pInstRot = pCamera->InstrumentRotation();
+        SpiceRotation *pInstRot = pCamera->instrumentRotation();
         std::vector<double> coefRA(m_nNumberCameraCoefSolved),
             coefDEC(m_nNumberCameraCoefSolved),
             coefTWI(m_nNumberCameraCoefSolved);
@@ -5508,7 +5508,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       int index = i;
       index = ImageIndex(index);
       if (m_spacecraftPositionSolveType != Nothing) {
-        SpicePosition *pInstPos = pCamera->InstrumentPosition();
+        SpicePosition *pInstPos = pCamera->instrumentPosition();
         std::vector<double> abcX(3), abcY(3), abcZ(3);
         pInstPos->GetPolynomial(abcX, abcY, abcZ);
 
@@ -5554,7 +5554,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       }
 
       if (m_cmatrixSolveType != None) {
-        SpiceRotation *pInstRot = pCamera->InstrumentRotation();
+        SpiceRotation *pInstRot = pCamera->instrumentRotation();
         std::vector<double> coefRA(m_nNumberCameraCoefSolved),
             coefDEC(m_nNumberCameraCoefSolved),
             coefTWI(m_nNumberCameraCoefSolved);
@@ -5690,13 +5690,13 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   //! Return a table cmatrix for the ith cube in the cube list given to the
   //! constructor
   Table BundleAdjust::Cmatrix(int i) {
-    return m_pCnet->Camera(i)->InstrumentRotation()->Cache("InstrumentPointing");
+    return m_pCnet->Camera(i)->instrumentRotation()->Cache("InstrumentPointing");
   }
 
   //! Return a table spacecraft vector for the ith cube in the cube list given to the
   //! constructor
   Table BundleAdjust::SpVector(int i) {
-    return m_pCnet->Camera(i)->InstrumentPosition()->Cache("InstrumentPosition");
+    return m_pCnet->Camera(i)->instrumentPosition()->Cache("InstrumentPosition");
   }
 
   //! Return the number of observations in list given to the constructor
@@ -6362,11 +6362,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           // ImageIndex(i) retrieves index into the normal equations matrix for Image(i)
           nIndex = ImageIndex(i) ;
 
-          pSpicePosition = pCamera->InstrumentPosition();
+          pSpicePosition = pCamera->instrumentPosition();
           if ( !pSpicePosition )
               continue;
 
-          pSpiceRotation = pCamera->InstrumentRotation();
+          pSpiceRotation = pCamera->instrumentRotation();
           if ( !pSpiceRotation )
               continue;
 
@@ -6897,11 +6897,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
       nIndex = ImageIndex(i);
 
-      pSpicePosition = pCamera->InstrumentPosition();
+      pSpicePosition = pCamera->instrumentPosition();
       if (!pSpicePosition)
         continue;
 
-      pSpiceRotation = pCamera->InstrumentRotation();
+      pSpiceRotation = pCamera->instrumentRotation();
       if (!pSpiceRotation)
         continue;
 
@@ -7640,11 +7640,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         //  Image(i)
         nIndex = ImageIndex(i) ;
 
-        pSpicePosition = pCamera->InstrumentPosition();
+        pSpicePosition = pCamera->instrumentPosition();
         if ( !pSpicePosition )
           continue;
 
-        pSpiceRotation = pCamera->InstrumentRotation();
+        pSpiceRotation = pCamera->instrumentRotation();
         if ( !pSpiceRotation )
             continue;
 

@@ -169,7 +169,7 @@ void IsisMain() {
   // Camera for sun position/distance, so we have to have spice data
   Camera * cam = incube->getCamera();
   double sunPos[3];
-  cam->SunPosition(sunPos);
+  cam->sunPosition(sunPos);
   // Magnitude of sun vector ||s||
   dist1 = sqrt(sunPos[0]*sunPos[0] + sunPos[1]*sunPos[1] + sunPos[2]*sunPos[2]);
 

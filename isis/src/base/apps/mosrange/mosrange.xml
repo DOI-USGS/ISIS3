@@ -100,6 +100,9 @@ End
     <change name="Kris Becker, Lynn Weller" date="2012-01-22">
         Updated the documentation
     </change>
+    <change name="Debbie A. Cook" date="2012-07-06">
+       Updated Spice members to be more compliant with Isis coding standards. References #972.
+    </change>
 </history>
 
   <groups>

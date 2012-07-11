@@ -492,10 +492,10 @@ namespace Isis {
         if (success) {
           *m_startSurfacePoint = cam->GetSurfacePoint();
           double sunPosition[3];
-          cam->SunPosition(sunPosition);
+          cam->sunPosition(sunPosition);
 
           Distance targetRadii[3];
-          cam->Radii(targetRadii);
+          cam->radii(targetRadii);
 
           double origin[3] = {0.0, 0.0, 0.0};
           SpiceBoolean surfptSuccess;

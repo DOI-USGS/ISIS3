@@ -74,6 +74,8 @@ class PvlObject;
  *                                  no code.  This is safe to do since the
  *                                  camera is not being used to manipulate
  *                                  pixels. 
+ * @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+ *                          coding standards. References #972.
  * 
  */
 class SpiceSegment {

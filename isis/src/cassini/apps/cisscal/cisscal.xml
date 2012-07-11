@@ -186,6 +186,9 @@
       Updated documentation in cpp file and moved call to set output cube to 
       top of main method to check user preferences before computations.
     </change>
+    <change name="Debbie A. Cook" date="2012-07-06">
+      Updated Spice members to be more compliant with Isis coding standards. References #972.
+    </change>
   </history>
 
   <category>

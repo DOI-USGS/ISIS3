@@ -208,7 +208,7 @@ void SpiceSegment::import(Cube &cube, const std::string &tblname) {
      _camVersion = _kernels.CameraVersion();
 
     //  Get the SPICE data
-    Table ckCache = camera->InstrumentRotation()->LineCache(tblname);
+    Table ckCache = camera->instrumentRotation()->LineCache(tblname);
     SMatrix spice = load(ckCache);
 
     _quats = getQuaternions(spice);
@@ -230,8 +230,8 @@ void SpiceSegment::import(Cube &cube, const std::string &tblname) {
 
     // Compute small increment to pad each end
     const double Epsilon(3.0e-3);
-    double topSclk = ETtoSCLK(camera->NaifSclkCode(), _times[0] - Epsilon);
-    double botSclk = ETtoSCLK(camera->NaifSclkCode(),
+    double topSclk = ETtoSCLK(camera->naifSclkCode(), _times[0] - Epsilon);
+    double botSclk = ETtoSCLK(camera->naifSclkCode(),
                               _times[size(_times)-1] + Epsilon);
 
     // Pad the top and bottom of the CK data.  This copies the top and bottom
@@ -250,8 +250,8 @@ void SpiceSegment::import(Cube &cube, const std::string &tblname) {
     _avvs =  ckAvvs;
     _times = sclks;
 
-    _startTime = SCLKtoET(camera->NaifSclkCode(),_times[0]);
-    _endTime = SCLKtoET(camera->NaifSclkCode(),_times[size(_times)-1]);
+    _startTime = SCLKtoET(camera->naifSclkCode(),_times[0]);
+    _endTime = SCLKtoET(camera->naifSclkCode(),_times[size(_times)-1]);
 
     _utcStartTime = toUTC(startTime());
     _utcEndTime   = toUTC(endTime());
@@ -452,7 +452,7 @@ void SpiceSegment::getRotationMatrices(Cube &cube, Camera &camera, Table &table,
 
   lmats = lmat;
   rmats = rmat;
-  sclks = convertTimes(camera.NaifSclkCode(), _times);
+  sclks = convertTimes(camera.naifSclkCode(), _times);
 
   return;
 }

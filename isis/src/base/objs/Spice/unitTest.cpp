@@ -41,32 +41,32 @@ using namespace std;
 class MySpice : public Spice {
   public:
     MySpice(Pvl &lab) : Spice(lab) {
-      cout << "BodyCode        = " << NaifBodyCode() << endl;
-      cout << "SpkCode         = " << NaifSpkCode() << endl;
-      cout << "CkCode          = " << NaifCkCode() << endl;
-      cout << "IkCode          = " << NaifIkCode() << endl;
+      cout << "BodyCode        = " << naifBodyCode() << endl;
+      cout << "SpkCode         = " << naifSpkCode() << endl;
+      cout << "CkCode          = " << naifCkCode() << endl;
+      cout << "IkCode          = " << naifIkCode() << endl;
       cout << endl;
     }
 
     int MyInteger(string key) {
-      return GetInteger(key, 0);
+      return getInteger(key, 0);
     }
 
     double MyDouble(string key) {
-      return GetDouble(key, 0);
+      return getDouble(key, 0);
     }
 
     string MyString(string key) {
-      return GetString(key, 0);
+      return getString(key, 0);
     }
 
     void MyOutput() {
       cout << "BJ is " << endl;
-      vector<double> BJ = BodyRotation()->Matrix();
+      vector<double> BJ = bodyRotation()->Matrix();
       for(int i = 0; i < (int)BJ.size(); i++) {
         cout << BJ[i] << endl;
       }
-      vector<double> IJ = InstrumentRotation()->Matrix();
+      vector<double> IJ = instrumentRotation()->Matrix();
       vector<double> BI = IJ;
       mxmt_c((SpiceDouble( *)[3])&BJ[0], (SpiceDouble( *)[3])&IJ[0],
              (SpiceDouble( *)[3])&BI[0]);
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
   temp.AddKeyword(PvlKeyword("TargetName", "Mars"), Pvl::Replace);
   cout << "Creating Spice object ..." << endl;
   MySpice spi(lab);
-  spi.InstrumentRotation()->SetTimeBias(-1.15);
+  spi.instrumentRotation()->SetTimeBias(-1.15);
   cout << endl;
 
   try {
@@ -172,7 +172,7 @@ int main(int argc, char *argv[]) {
   // Testing radius
   cout << "Testing radius ... " << endl;
   Distance radii[3];
-  spi.Radii(radii);
+  spi.radii(radii);
   cout << "Radii[0]:  " << radii[0].kilometers() << endl;
   cout << "Radii[1]:  " << radii[1].kilometers() << endl;
   cout << "Radii[2]:  " << radii[2].kilometers() << endl;
@@ -182,21 +182,21 @@ int main(int argc, char *argv[]) {
   cout << "Testing without cache ... " << endl;
   for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    spi.SetTime(t);
-    cout << "Time           = " << spi.Time().Et() << endl;
+    spi.setTime(t);
+    cout << "Time           = " << spi.time().Et() << endl;
     double p[3];
-    spi.InstrumentPosition(p);
+    spi.instrumentPosition(p);
     cout << "Spacecraft (B) = " << p[0] << " " << p[1] << " " << p[2] << endl;
     double v[3];
-    spi.InstrumentVelocity(v);
+    spi.instrumentVelocity(v);
     cout << "Spacecraft Velocity (B) = " << v[0] << " " << v[1] << " " << v[2] << endl;
-    spi.SunPosition(p);
+    spi.sunPosition(p);
     cout << "Sun        (B) = " << p[0] << " " << p[1] << " " << p[2] << endl;
     spi.MyOutput();
     double lat, lon;
-    spi.SubSpacecraftPoint(lat, lon);
+    spi.subSpacecraftPoint(lat, lon);
     cout << "SubSpacecraft  = " << lat << " " << lon << endl;
-    spi.SubSolarPoint(lat, lon);
+    spi.subSolarPoint(lat, lon);
     cout << "SubSolar       = " << lat << " " << lon << endl;
   }
   cout << endl;
@@ -204,23 +204,23 @@ int main(int argc, char *argv[]) {
   // Testing with cache
   cout << "Testing with cache ... " << endl;
   double tol = .0022; //estimate resolution pixelPitch*alt/fl*1000.
-  spi.CreateCache(startTime + slope, endTime - slope, 10, tol);
+  spi.createCache(startTime + slope, endTime - slope, 10, tol);
   for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
-    spi.SetTime(t);
-    cout << "Time           = " << spi.Time().Et() << endl;
+    spi.setTime(t);
+    cout << "Time           = " << spi.time().Et() << endl;
     double p[3];
-    spi.InstrumentPosition(p);
+    spi.instrumentPosition(p);
     cout << "Spacecraft (B) = " << p[0] << " " << p[1] << " " << p[2] << endl;
     double v[3];
-    spi.InstrumentVelocity(v);
+    spi.instrumentVelocity(v);
     cout << "Spacecraft Velocity (B) = " << v[0] << " " << v[1] << " " << v[2] << endl;
-    spi.SunPosition(p);
+    spi.sunPosition(p);
     cout << "Sun        (B) = " << p[0] << " " << p[1] << " " << p[2] << endl;
     spi.MyOutput();
   }
   cout << endl;
 
   cout << "Testing Utility methods" << endl;
-  cout << "Target Name = " << spi.Target() << endl;
+  cout << "Target Name = " << spi.target() << endl;
 }

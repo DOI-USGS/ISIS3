@@ -97,10 +97,10 @@ namespace Isis {
     // center (point of symmetry of distortion)
     string perskey = "INS" + iString(naifIkCode) + "_PERSPECTIVE_FACTORS";
     string centkey = "INS" + iString(naifIkCode) + "_POINT_OF_SYMMETRY";
-    p_xPerspective = p_camera->Spice::GetDouble(perskey, 0);
-    p_yPerspective = p_camera->Spice::GetDouble(perskey, 1);
-    p_x0 = p_camera->Spice::GetDouble(centkey, 0);
-    p_y0 = p_camera->Spice::GetDouble(centkey, 1);
+    p_xPerspective = p_camera->Spice::getDouble(perskey, 0);
+    p_yPerspective = p_camera->Spice::getDouble(perskey, 1);
+    p_x0 = p_camera->Spice::getDouble(centkey, 0);
+    p_y0 = p_camera->Spice::getDouble(centkey, 1);
 
     // Get the distortion coefficients
     CameraDistortionMap::SetDistortion(naifIkCode);

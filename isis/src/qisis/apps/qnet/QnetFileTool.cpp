@@ -178,7 +178,7 @@ namespace Isis {
       //  Determine target from first file in cube list
       Cube *cube = new Cube;
       cube->open(g_serialNumberList->FileName(0));
-      g_controlNetwork->SetTarget(cube->getCamera()->Target());
+      g_controlNetwork->SetTarget(cube->getCamera()->target());
       delete cube;
       cube = NULL;
     }

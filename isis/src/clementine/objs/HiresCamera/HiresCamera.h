@@ -56,6 +56,8 @@ namespace Isis {
    *                          constructor. Changed centertime in constructor to
    *                          add half exposure duration to start time to
    *                          maintain consistency with other Clementine models.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    */
   class HiresCamera : public FramingCamera {
     public:

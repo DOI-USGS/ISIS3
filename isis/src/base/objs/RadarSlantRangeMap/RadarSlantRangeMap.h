@@ -53,6 +53,8 @@ namespace Isis {
    *                      linear fit is used to obtain the range coefficients
    *                      if the current time falls between 2 points with
    *                      known range coefficients.
+   *  @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                      coding standards. References #972.
    *
    */
   class RadarSlantRangeMap : public CameraDistortionMap {

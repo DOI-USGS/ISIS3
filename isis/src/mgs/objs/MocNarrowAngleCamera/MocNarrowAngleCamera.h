@@ -46,6 +46,8 @@ namespace Isis {
    *            for new methods. Updated documentation. Removed Mgs namespace
    *            wrap inside Isis namespace. Added Isis Disclaimer to files.
    *            Added NAIF error check to constructor.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *            coding standards. References #972.
    */
   class MocNarrowAngleCamera : public LineScanCamera {
     public:

@@ -38,14 +38,14 @@ namespace Isis {
     // Angular tolerance based on radii and
     // slant range (Focal length)
 //    Distance radii[3];
-//    p_camera->Radii(radii);
+//    p_camera->radii(radii);
 //    p_tolerance = p_camera->FocalLength() / radii[2];
 //    p_tolerance *= 180.0 / Isis::PI;
     p_tolerance = .0001;
 
     // Compute a default time tolerance to a 1/20 of a pixel
-    double et1 = p_camera->Spice::CacheStartTime().Et();
-    double et2 = p_camera->Spice::CacheEndTime().Et();
+    double et1 = p_camera->Spice::cacheStartTime().Et();
+    double et2 = p_camera->Spice::cacheEndTime().Et();
     p_timeTolerance = (et2 - et1) / p_camera->Lines() / 20.0;
   }
 
@@ -60,8 +60,8 @@ namespace Isis {
   bool RadarGroundMap::SetFocalPlane(const double ux, const double uy,
                                      double uz) {
 
-    SpiceRotation *bodyFrame = p_camera->BodyRotation();
-    SpicePosition *spaceCraft = p_camera->InstrumentPosition();
+    SpiceRotation *bodyFrame = p_camera->bodyRotation();
+    SpicePosition *spaceCraft = p_camera->instrumentPosition();
 
     // Get spacecraft position and velocity to create a state vector
     std::vector<double> Ssc(6);
@@ -96,7 +96,7 @@ namespace Isis {
 
     // What is the initial guess for R
     Distance radii[3];
-    p_camera->Radii(radii);
+    p_camera->radii(radii);
     SpiceDouble R = radii[0].kilometers();
 
     SpiceDouble lat = DBL_MAX;
@@ -138,7 +138,7 @@ namespace Isis {
     lookB[2] = X[2] - Xsc[2];
 
     std::vector<double> lookJ = bodyFrame->J2000Vector(lookB);
-    SpiceRotation *cameraFrame = p_camera->InstrumentRotation();
+    SpiceRotation *cameraFrame = p_camera->instrumentRotation();
     std::vector<double> lookC = cameraFrame->ReferenceVector(lookJ);
 
     SpiceDouble unitLookC[3];
@@ -238,13 +238,13 @@ namespace Isis {
     surfacePoint.ToNaifArray(X);
 
     // Compute lower bound for Doppler shift
-    double et1 = p_camera->Spice::CacheStartTime().Et();
-    p_camera->Sensor::SetTime(et1);
+    double et1 = p_camera->Spice::cacheStartTime().Et();
+    p_camera->Sensor::setTime(et1);
     double xv1 = ComputeXv(X);
 
     // Compute upper bound for Doppler shift
-    double et2 = p_camera->Spice::CacheEndTime().Et();
-    p_camera->Sensor::SetTime(et2);
+    double et2 = p_camera->Spice::cacheEndTime().Et();
+    p_camera->Sensor::setTime(et2);
     double xv2 = ComputeXv(X);
 
     // Make sure we bound root (xv = 0.0)
@@ -273,7 +273,7 @@ namespace Isis {
 
       // Compute the guessed Doppler shift.  Hopefully
       // this guess converges to zero at some point
-      p_camera->Sensor::SetTime(etGuess);
+      p_camera->Sensor::setTime(etGuess);
       double fGuess = ComputeXv(X);
 
       // Update the bounds
@@ -291,8 +291,8 @@ namespace Isis {
 
       // See if we are done
       if((fabs(delTime) <= p_timeTolerance) || (fGuess == 0.0)) {
-        SpiceRotation *bodyFrame = p_camera->BodyRotation();
-        SpicePosition *spaceCraft = p_camera->InstrumentPosition();
+        SpiceRotation *bodyFrame = p_camera->bodyRotation();
+        SpicePosition *spaceCraft = p_camera->instrumentPosition();
 
         // Get body fixed spacecraft velocity and position
         std::vector<double> Ssc(6);
@@ -335,7 +335,7 @@ namespace Isis {
         lookB[2] = X[2] - Xsc[2];
 
         std::vector<double> lookJ = bodyFrame->J2000Vector(lookB);
-        SpiceRotation *cameraFrame = p_camera->InstrumentRotation();
+        SpiceRotation *cameraFrame = p_camera->instrumentRotation();
         std::vector<double> lookC = cameraFrame->ReferenceVector(lookJ);
 
         SpiceDouble unitLookC[3];
@@ -373,8 +373,8 @@ namespace Isis {
     X[2] = spoint.GetZ().kilometers();
 
     // Compute body-fixed look vector
-    SpiceRotation *bodyFrame = p_camera->BodyRotation();
-    SpicePosition *spaceCraft = p_camera->InstrumentPosition();
+    SpiceRotation *bodyFrame = p_camera->bodyRotation();
+    SpicePosition *spaceCraft = p_camera->instrumentPosition();
 
     std::vector<double> sJ(6);   // Spacecraft state vector (position and velocity) in J2000 frame
     // Load the state into sJ
@@ -406,8 +406,8 @@ namespace Isis {
   double RadarGroundMap::ComputeXv(SpiceDouble X[3]) {
     // Get the spacecraft position (Xsc) and velocity (Vsc) in body fixed
     // coordinates
-    SpiceRotation *bodyFrame = p_camera->BodyRotation();
-    SpicePosition *spaceCraft = p_camera->InstrumentPosition();
+    SpiceRotation *bodyFrame = p_camera->bodyRotation();
+    SpicePosition *spaceCraft = p_camera->instrumentPosition();
 
     // Load the state into Ssc
     std::vector<double> Ssc(6);
@@ -460,8 +460,8 @@ namespace Isis {
   // Load the derivative of the state into d_lookJ
   bool RadarGroundMap::GetdXYdPosition(const SpicePosition::PartialType varType, int coefIndex,
                                        double *dx, double *dy) {
-    SpicePosition *instPos = p_camera->InstrumentPosition();
-    SpiceRotation *bodyRot = p_camera->BodyRotation();
+    SpicePosition *instPos = p_camera->instrumentPosition();
+    SpiceRotation *bodyRot = p_camera->bodyRotation();
 
     std::vector <double> d_lookJ(6);
     vequ_c(&(instPos->CoordinatePartial(varType, coefIndex))[0], &d_lookJ[0]);

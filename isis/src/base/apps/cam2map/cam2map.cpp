@@ -51,7 +51,7 @@ void IsisMain() {
   incam = icube->getCamera();
 
   // Make sure it is not the sky
-  if(incam->IsSky()) {
+  if(incam->isSky()) {
     string msg = "The image [" + ui.GetFileName("FROM") +
                  "] is targeting the sky, use skymap instead.";
     throw IException(IException::User, msg, _FILEINFO_);

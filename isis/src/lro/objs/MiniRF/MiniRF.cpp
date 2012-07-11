@@ -97,9 +97,9 @@ namespace Isis {
     if((std::string)inst["LookDirection"] == "LEFT") {
       ldir = Radar::Left;
     }
-    RadarGroundRangeMap::setTransform(NaifIkCode(), groundRangeResolution,
+    RadarGroundRangeMap::setTransform(naifIkCode(), groundRangeResolution,
                                       this->Samples(), ldir);
-    new RadarGroundRangeMap(this, NaifIkCode());
+    new RadarGroundRangeMap(this, naifIkCode());
 
     // Calculate weighting for focal plane coordinates. This is done
     // because the focal plane coordinates (slant range and Doppler
@@ -130,13 +130,13 @@ namespace Isis {
 
     if(tol < 0.) {
       // Alternative calculation of .01*ground resolution of a pixel
-      SetTime(etMid);
+      setTime(etMid);
       tol = PixelPitch() * SpacecraftAltitude() / FocalLength() / 100.;
     }
-    Spice::CreateCache(etStart, etEnd, this->ParentLines() + 1, tol);
-    SetTime(etMid);
-    SpiceRotation *bodyFrame = this->BodyRotation();
-    SpicePosition *spaceCraft = this->InstrumentPosition();
+    Spice::createCache(etStart, etEnd, this->ParentLines() + 1, tol);
+    setTime(etMid);
+    SpiceRotation *bodyFrame = this->bodyRotation();
+    SpicePosition *spaceCraft = this->instrumentPosition();
 
     SpiceDouble Ssc[6];
     // Load the state into Ssc
@@ -154,7 +154,7 @@ namespace Isis {
     vequ_c(Ssc + 3, Vsc);
 
     Isis::Distance radii[3];
-    this->Radii(radii);
+    this->radii(radii);
     double R = radii[0].kilometers();
     double height = sqrt(Xsc[0] * Xsc[0] + Xsc[1] * Xsc[1] + Xsc[2] * Xsc[2]) - R;
     double speed = vnorm_c(Vsc);

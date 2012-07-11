@@ -168,7 +168,7 @@ namespace Isis {
     new CameraDetectorMap(this);
 
     // Setup focal plane map, and detector origin
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
     focalMap->SetDetectorOrigin(602.0, 528.0);
 
     // Setup distortion map
@@ -180,7 +180,7 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    SetTime(centerTime);
+    setTime(centerTime);
     LoadCache();
     NaifStatus::CheckErrors();
   }

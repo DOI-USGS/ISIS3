@@ -189,7 +189,7 @@ namespace Isis {
     }
 
     // Find target
-    iString target = matchCube->getCamera()->Target();
+    iString target = matchCube->getCamera()->target();
 
     // Find directory and save for use in file dialog for control net
     FileName fname(matchFile.toStdString());
@@ -270,10 +270,10 @@ namespace Isis {
     }
 
     // Make sure targets match
-    if (cnet->GetTarget() != matchCube->getCamera()->Target()) {
+    if (cnet->GetTarget() != matchCube->getCamera()->target()) {
       QString message = tr("Control Net target, [%1], is not the same as the cube target, [%2].")
                         .arg(QString(cnet->GetTarget()))
-                        .arg(QString(matchCube->getCamera()->Target()));
+                        .arg(QString(matchCube->getCamera()->target()));
       QMessageBox::critical((QWidget *)parent(), "Invalid Control Network", message);
       return false;
     }

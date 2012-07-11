@@ -136,6 +136,8 @@ namespace Isis {
    *   @history 2009-08-24 Kris Becker - Added ability to disable use of shape
    *                           model when creating polygons that contains a limb
    *   @history 2011-02-17 Jai Rideout - Replaced pixinc with sinc and linc.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    */
   class BandGeometry {
 

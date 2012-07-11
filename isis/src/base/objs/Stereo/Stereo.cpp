@@ -187,7 +187,7 @@ namespace Isis {
    }
 
    void Stereo::targetToSpacecraft(Camera &camera, double TP[3]) {
-     camera.InstrumentPosition(TP);
+     camera.instrumentPosition(TP);
      return;
    }
 

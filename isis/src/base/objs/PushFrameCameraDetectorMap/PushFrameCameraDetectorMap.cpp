@@ -155,6 +155,6 @@ namespace Isis {
     }
 
     etTime += p_exposureDuration / 2.0;
-    p_camera->SetTime(etTime);
+    p_camera->setTime(etTime);
   }
 }

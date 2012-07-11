@@ -67,7 +67,7 @@ namespace Isis {
     PvlGroup kernels = lab.FindGroup("Kernels", Pvl::Traverse);
     bool hasTables = (kernels["TargetPosition"][0] == "Table");
 
-    Init(lab, !hasTables);
+    init(lab, !hasTables);
   }
 
   /**
@@ -77,7 +77,7 @@ namespace Isis {
    * @param noTables Indicates the use of tables.
    */
   Spice::Spice(Pvl &lab, bool noTables) {
-    Init(lab, noTables);
+    init(lab, noTables);
   }
 
   /**
@@ -93,7 +93,7 @@ namespace Isis {
    * @internal
    *   @history 2011-02-08 Jeannie Walldren - Initialize pointers to null.
    */
-  void Spice::Init(Pvl &lab, bool noTables) {
+  void Spice::init(Pvl &lab, bool noTables) {
     NaifStatus::CheckErrors();
 
     // Initialize members
@@ -136,14 +136,14 @@ namespace Isis {
     PvlGroup kernels = lab.FindGroup("Kernels", Pvl::Traverse);
 
     // Get the time padding first
-    if(kernels.HasKeyword("StartPadding")) {
+    if (kernels.HasKeyword("StartPadding")) {
       *p_startTimePadding = kernels["StartPadding"][0];
     }
     else {
       *p_startTimePadding = 0.0;
     }
 
-    if(kernels.HasKeyword("EndPadding")) {
+    if (kernels.HasKeyword("EndPadding")) {
       *p_endTimePadding  = kernels["EndPadding"][0];
     }
     else {
@@ -157,31 +157,31 @@ namespace Isis {
 //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
 //  missions (e.g., MESSENGER) may augment the s/c SPK with new planet
 //  ephemerides. (2008-02-27 (KJB))
-    if(p_usingNaif) {
-      if(noTables) {
-        Load(kernels["TargetPosition"], noTables);
-        Load(kernels["InstrumentPosition"], noTables);
-        Load(kernels["InstrumentPointing"], noTables);
+    if (p_usingNaif) {
+      if (noTables) {
+        load(kernels["TargetPosition"], noTables);
+        load(kernels["InstrumentPosition"], noTables);
+        load(kernels["InstrumentPointing"], noTables);
       }
 
-      if(kernels.HasKeyword("Frame")) {
-        Load(kernels["Frame"], noTables);
+      if (kernels.HasKeyword("Frame")) {
+        load(kernels["Frame"], noTables);
       }
 
-      Load(kernels["TargetAttitudeShape"], noTables);
-    if(kernels.HasKeyword("Instrument"))
-    Load(kernels["Instrument"], noTables);
+      load(kernels["TargetAttitudeShape"], noTables);
+    if (kernels.HasKeyword("Instrument"))
+    load(kernels["Instrument"], noTables);
       // Always load after instrument
-    if(kernels.HasKeyword("InstrumentAddendum"))
-    Load(kernels["InstrumentAddendum"], noTables);
-      Load(kernels["LeapSecond"], noTables);
-    if( kernels.HasKeyword("SpacecraftClock"))
-    Load(kernels["SpacecraftClock"], noTables);
+    if (kernels.HasKeyword("InstrumentAddendum"))
+    load(kernels["InstrumentAddendum"], noTables);
+      load(kernels["LeapSecond"], noTables);
+    if ( kernels.HasKeyword("SpacecraftClock"))
+    load(kernels["SpacecraftClock"], noTables);
 
 // Modified to load extra kernels last to allow overriding default values
 // (2010-04-07) (DAC)
-      if(kernels.HasKeyword("Extra")) {
-        Load(kernels["Extra"], noTables);
+      if (kernels.HasKeyword("Extra")) {
+        load(kernels["Extra"], noTables);
       }
     }
     else {
@@ -204,7 +204,7 @@ namespace Isis {
     //    Use spkbodycode to read body position from spk
 
     string trykey = "NaifIkCode";
-    if(kernels.HasKeyword("NaifFrameCode")) trykey = "NaifFrameCode";
+    if (kernels.HasKeyword("NaifFrameCode")) trykey = "NaifFrameCode";
     *p_ikCode = (int) kernels[trykey];
 
     *p_spkCode  = *p_ikCode / 1000;
@@ -214,42 +214,42 @@ namespace Isis {
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
     *p_target = inst["TargetName"][0];
 
-    if(iString(*p_target).UpCase() == "SKY") {
+    if (iString(*p_target).UpCase() == "SKY") {
       *p_bodyCode = *p_spkCode;
       p_radii[0] = p_radii[1] = p_radii[2] = Distance(1000.0, Distance::Meters);
       p_sky = true;
     }
     else {
-      *p_bodyCode = NaifBodyCode();
+      *p_bodyCode = naifBodyCode();
       iString radiiKey = "BODY" + iString((BigInt)*p_bodyCode) + "_RADII";
 
-      p_radii[0] = Distance(GetDouble(radiiKey, 0), Distance::Kilometers);
-      p_radii[1] = Distance(GetDouble(radiiKey, 1), Distance::Kilometers);
-      p_radii[2] = Distance(GetDouble(radiiKey, 2), Distance::Kilometers);
+      p_radii[0] = Distance(getDouble(radiiKey, 0), Distance::Kilometers);
+      p_radii[1] = Distance(getDouble(radiiKey, 1), Distance::Kilometers);
+      p_radii[2] = Distance(getDouble(radiiKey, 2), Distance::Kilometers);
 
       p_sky = false;
     }
     *p_spkBodyCode = *p_bodyCode;
 
     // Override them if they exist in the labels
-    if(kernels.HasKeyword("NaifSpkCode"))
+    if (kernels.HasKeyword("NaifSpkCode"))
       *p_spkCode = (int) kernels["NaifSpkCode"];
 
-    if(kernels.HasKeyword("NaifCkCode"))
+    if (kernels.HasKeyword("NaifCkCode"))
       *p_ckCode = (int) kernels["NaifCkCode"];
 
-    if(kernels.HasKeyword("NaifSclkCode"))
+    if (kernels.HasKeyword("NaifSclkCode"))
       *p_sclkCode = (int) kernels["NaifSclkCode"];
 
-    if(kernels.HasKeyword("NaifBodyCode"))
+    if (kernels.HasKeyword("NaifBodyCode"))
       *p_bodyCode = (int) kernels["NaifBodyCode"];
 
-    if(!p_sky) {
-      if(kernels.HasKeyword("NaifSpkBodyCode"))
+    if (!p_sky) {
+      if (kernels.HasKeyword("NaifSpkBodyCode"))
         *p_spkBodyCode = (int) kernels["NaifSpkBodyCode"];
     }
 
-    if(p_sky) {
+    if (p_sky) {
       // Create the identity rotation for sky targets
       // Everything in bodyfixed will really be J2000
       p_bodyRotation = new SpiceRotation(1);
@@ -258,16 +258,16 @@ namespace Isis {
       // JAA - Modified to stored and look for the frame body code in the
       // cube labels
       SpiceInt frameCode;
-      if((p_usingNaif) || (!p_naifKeywords->HasKeyword("BODY_FRAME_CODE"))) {
+      if ((p_usingNaif) || (!p_naifKeywords->HasKeyword("BODY_FRAME_CODE"))) {
         char frameName[32];
         SpiceBoolean found;
         cidfrm_c(*p_spkBodyCode, sizeof(frameName), &frameCode, frameName,
                  &found);
 
-        if(!found) {
+        if (!found) {
           iString naifTarget = "IAU_" + iString(*p_target).UpCase();
           namfrm_c(naifTarget.c_str(), &frameCode);
-          if(frameCode == 0) {
+          if (frameCode == 0) {
             string msg = "Can not find NAIF code for [" + naifTarget + "]";
             throw IException(IException::Io, msg, _FILEINFO_);
           }
@@ -277,7 +277,7 @@ namespace Isis {
         storeValue("BODY_FRAME_CODE",0,SpiceIntType,result);
       }
       else {
-        frameCode = GetInteger("BODY_FRAME_CODE",0);
+        frameCode = getInteger("BODY_FRAME_CODE",0);
       }
 
       p_bodyRotation = new SpiceRotation(frameCode);
@@ -289,18 +289,18 @@ namespace Isis {
 
     // Check to see if we have nadir pointing that needs to be computed &
     // See if we have table blobs to load
-    if(kernels["TargetPosition"][0].UpCase() == "TABLE") {
+    if (kernels["TargetPosition"][0].UpCase() == "TABLE") {
       Table t("SunPosition", lab.FileName(), lab);
       p_sunPosition->LoadCache(t);
 
       Table t2("BodyRotation", lab.FileName(), lab);
       p_bodyRotation->LoadCache(t2);
-      if(t2.Label().HasKeyword("SolarLongitude")) {
+      if (t2.Label().HasKeyword("SolarLongitude")) {
         *p_solarLongitude = Longitude(t2.Label()["SolarLongitude"],
             Angle::Degrees);
       }
       else {
-        SolarLongitude();
+        solarLongitude();
       }
     }
 
@@ -310,7 +310,7 @@ namespace Isis {
     //  Table option, so we don't need to check for Table under the old
     //  keywords.
 
-    if(kernels["InstrumentPointing"].Size() == 0) {
+    if (kernels["InstrumentPointing"].Size() == 0) {
       throw IException(IException::Unknown,
                        "No camera pointing available",
                        _FILEINFO_);
@@ -318,26 +318,26 @@ namespace Isis {
 
     //  2009-03-18  Tracie Sucharski - Removed test for old keywords, any files
     // with the old keywords should be re-run through spiceinit.
-    if(kernels["InstrumentPointing"][0].UpCase() == "NADIR") {
-      if(p_instrumentRotation) {
+    if (kernels["InstrumentPointing"][0].UpCase() == "NADIR") {
+      if (p_instrumentRotation) {
         delete p_instrumentRotation;
         p_instrumentRotation = NULL;
       }
 
       p_instrumentRotation = new SpiceRotation(*p_ikCode, *p_spkBodyCode);
     }
-    else if(iString((std::string)kernels["InstrumentPointing"]).UpCase() == "TABLE") {
+    else if (iString((std::string)kernels["InstrumentPointing"]).UpCase() == "TABLE") {
       Table t("InstrumentPointing", lab.FileName(), lab);
       p_instrumentRotation->LoadCache(t);
     }
 
-    if(kernels["InstrumentPosition"].Size() == 0) {
+    if (kernels["InstrumentPosition"].Size() == 0) {
       throw IException(IException::Unknown,
                        "No instrument position available",
                        _FILEINFO_);
     }
 
-    if(iString((std::string)kernels["InstrumentPosition"]).UpCase() == "TABLE") {
+    if (iString((std::string)kernels["InstrumentPosition"]).UpCase() == "TABLE") {
       Table t("InstrumentPosition", lab.FileName(), lab);
       p_instrumentPosition->LoadCache(t);
     }
@@ -354,17 +354,17 @@ namespace Isis {
    *
    * @throw Isis::IException::Io - "Spice file does not exist."
    */
-  void Spice::Load(PvlKeyword &key, bool noTables) {
+  void Spice::load(PvlKeyword &key, bool noTables) {
     NaifStatus::CheckErrors();
 
-    for(int i = 0; i < key.Size(); i++) {
-      if(key[i] == "") continue;
-      if(iString(key[i]).UpCase() == "NULL") break;
-      if(iString(key[i]).UpCase() == "NADIR") break;
-      if(iString(key[i]).UpCase() == "TABLE" && !noTables) break;
-      if(iString(key[i]).UpCase() == "TABLE" && noTables) continue;
+    for (int i = 0; i < key.Size(); i++) {
+      if (key[i] == "") continue;
+      if (iString(key[i]).UpCase() == "NULL") break;
+      if (iString(key[i]).UpCase() == "NADIR") break;
+      if (iString(key[i]).UpCase() == "TABLE" && !noTables) break;
+      if (iString(key[i]).UpCase() == "TABLE" && noTables) continue;
       FileName file(key[i]);
-      if(!file.fileExists()) {
+      if (!file.fileExists()) {
         string msg = "Spice file does not exist [" + file.expanded() + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
@@ -382,109 +382,109 @@ namespace Isis {
   Spice::~Spice() {
     NaifStatus::CheckErrors();
 
-    if(p_radii != NULL) {
+    if (p_radii != NULL) {
       delete [] p_radii;
       p_radii = NULL;
     }
 
-    if(p_solarLongitude != NULL) {
+    if (p_solarLongitude != NULL) {
       delete p_solarLongitude;
       p_solarLongitude = NULL;
     }
 
-    if(p_et != NULL) {
+    if (p_et != NULL) {
       delete p_et;
       p_et = NULL;
     }
 
-    if(p_target != NULL) {
+    if (p_target != NULL) {
       delete p_target;
       p_target = NULL;
     }
 
-    if(p_startTime != NULL) {
+    if (p_startTime != NULL) {
       delete p_startTime;
       p_startTime = NULL;
     }
 
-    if(p_endTime != NULL) {
+    if (p_endTime != NULL) {
       delete p_endTime;
       p_endTime = NULL;
     }
 
-    if(p_cacheSize != NULL) {
+    if (p_cacheSize != NULL) {
       delete p_cacheSize;
       p_cacheSize = NULL;
     }
 
-    if(p_startTimePadding != NULL) {
+    if (p_startTimePadding != NULL) {
       delete p_startTimePadding;
       p_startTimePadding = NULL;
     }
 
-    if(p_endTimePadding != NULL) {
+    if (p_endTimePadding != NULL) {
       delete p_endTimePadding;
       p_endTimePadding = NULL;
     }
 
-    if(p_instrumentPosition != NULL) {
+    if (p_instrumentPosition != NULL) {
       delete p_instrumentPosition;
       p_instrumentPosition = NULL;
     }
 
-    if(p_instrumentRotation != NULL) {
+    if (p_instrumentRotation != NULL) {
       delete p_instrumentRotation;
       p_instrumentRotation = NULL;
     }
 
-    if(p_sunPosition != NULL) {
+    if (p_sunPosition != NULL) {
       delete p_sunPosition;
       p_sunPosition = NULL;
     }
 
-    if(p_bodyRotation != NULL) {
+    if (p_bodyRotation != NULL) {
       delete p_bodyRotation;
       p_bodyRotation = NULL;
     }
 
-    if(p_bodyCode != NULL) {
+    if (p_bodyCode != NULL) {
       delete p_bodyCode;
       p_bodyCode = NULL;
     }
 
-    if(p_spkCode != NULL) {
+    if (p_spkCode != NULL) {
       delete p_spkCode;
       p_spkCode = NULL;
     }
 
-    if(p_ckCode != NULL) {
+    if (p_ckCode != NULL) {
       delete p_ckCode;
       p_ckCode = NULL;
     }
 
-    if(p_ikCode != NULL) {
+    if (p_ikCode != NULL) {
       delete p_ikCode;
       p_ikCode = NULL;
     }
 
-    if(p_sclkCode != NULL) {
+    if (p_sclkCode != NULL) {
       delete p_sclkCode;
       p_sclkCode = NULL;
     }
 
-    if(p_spkBodyCode != NULL) {
+    if (p_spkBodyCode != NULL) {
       delete p_spkBodyCode;
       p_spkBodyCode = NULL;
     }
 
     // Unload the kernels (TODO: Can this be done faster)
-    for(int i = 0; p_kernels && i < p_kernels->size(); i++) {
+    for (int i = 0; p_kernels && i < p_kernels->size(); i++) {
       FileName file(p_kernels->at(i));
       string fileName(file.expanded());
       unload_c(fileName.c_str());
     }
 
-    if(p_kernels != NULL) {
+    if (p_kernels != NULL) {
       delete p_kernels;
       p_kernels = NULL;
     }
@@ -498,7 +498,7 @@ namespace Isis {
    * allows multiple instances of the Spice object to be created as the NAIF
    * toolkit can clash if multiple sets of SPICE kernels are loaded. Note that
    * the cache size is specified as an argument. Therefore, times requested via
-   * SetTime() which are not directly loaded in the cache will be interpolated.
+   * setTime() which are not directly loaded in the cache will be interpolated.
    * If the instrument position is not cached and cacheSize is greater than 3,
    * the tolerance is passed to the SpicePosition Memcache2HermiteCache()
    * method.
@@ -522,67 +522,67 @@ namespace Isis {
    * @history 2011-04-10 Debbie A. Cook - Updated to only create cache for
    *          instrumentPosition if type is Spice.
    */
-  void Spice::CreateCache(iTime startTime, iTime endTime,
+  void Spice::createCache(iTime startTime, iTime endTime,
       int cacheSize, double tol) {
     NaifStatus::CheckErrors();
 
     // Check for errors
-    if(cacheSize <= 0) {
+    if (cacheSize <= 0) {
       string msg = "Argument cacheSize must be greater than zero";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    if(startTime > endTime) {
+    if (startTime > endTime) {
       string msg = "Argument startTime must be less than or equal to endTime";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    if(*p_cacheSize > 0) {
+    if (*p_cacheSize > 0) {
       string msg = "A cache has already been created";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    if(cacheSize == 1 && (*p_startTimePadding != 0 || *p_endTimePadding != 0)) {
+    if (cacheSize == 1 && (*p_startTimePadding != 0 || *p_endTimePadding != 0)) {
       string msg = "This instrument does not support time padding";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     string abcorr;
-    if(getSpkAbCorrState(abcorr) )
-      InstrumentPosition()->SetAberrationCorrection("NONE");
+    if (getSpkAbCorrState(abcorr) )
+      instrumentPosition()->SetAberrationCorrection("NONE");
 
     iTime avgTime((startTime.Et() + endTime.Et()) / 2.0);
-    ComputeSolarLongitude(avgTime);
+    computeSolarLongitude(avgTime);
 
     // Cache everything
-    if(!p_bodyRotation->IsCached()) {
+    if (!p_bodyRotation->IsCached()) {
       int bodyRotationCacheSize = cacheSize;
-      if(cacheSize > 2) bodyRotationCacheSize = 2;
+      if (cacheSize > 2) bodyRotationCacheSize = 2;
       p_bodyRotation->LoadCache(
           startTime.Et() - *p_startTimePadding,
           endTime.Et() + *p_endTimePadding,
           bodyRotationCacheSize);
     }
 
-    if(p_instrumentRotation->GetSource() < SpiceRotation::Memcache) {
-      if(cacheSize > 3) p_instrumentRotation->MinimizeCache(SpiceRotation::Yes);
+    if (p_instrumentRotation->GetSource() < SpiceRotation::Memcache) {
+      if (cacheSize > 3) p_instrumentRotation->MinimizeCache(SpiceRotation::Yes);
       p_instrumentRotation->LoadCache(
           startTime.Et() - *p_startTimePadding,
           endTime.Et() + *p_endTimePadding,
           cacheSize);
     }
 
-    if(p_instrumentPosition->GetSource() < SpicePosition::Memcache) {
+    if (p_instrumentPosition->GetSource() < SpicePosition::Memcache) {
       p_instrumentPosition->LoadCache(
           startTime.Et() - *p_startTimePadding,
           endTime.Et() + *p_endTimePadding,
           cacheSize);
-      if(cacheSize > 3) p_instrumentPosition->Memcache2HermiteCache(tol);
+      if (cacheSize > 3) p_instrumentPosition->Memcache2HermiteCache(tol);
     }
 
-    if(!p_sunPosition->IsCached()) {
+    if (!p_sunPosition->IsCached()) {
       int sunPositionCacheSize = cacheSize;
-      if(cacheSize > 2) sunPositionCacheSize = 2;
+      if (cacheSize > 2) sunPositionCacheSize = 2;
       p_sunPosition->LoadCache(
           startTime.Et() - *p_startTimePadding,
           endTime.Et() + *p_endTimePadding,
@@ -596,7 +596,7 @@ namespace Isis {
     p_et = NULL;
 
     // Unload the kernels (TODO: Can this be done faster)
-    for(int i = 0; i < p_kernels->size(); i++) {
+    for (int i = 0; i < p_kernels->size(); i++) {
       FileName file(p_kernels->at(i));
       string fileName(file.expanded());
       unload_c(fileName.c_str());
@@ -615,8 +615,8 @@ namespace Isis {
    * @internal
    *   @history 2011-02-09 Steven Lambright - Original version.
    */
-  iTime Spice::CacheStartTime() const {
-    if(p_startTime)
+  iTime Spice::cacheStartTime() const {
+    if (p_startTime)
       return *p_startTime;
 
     return iTime();
@@ -629,8 +629,8 @@ namespace Isis {
    * @internal
    *   @history 2011-02-09 Steven Lambright - Original version.
    */
-  iTime Spice::CacheEndTime() const {
-    if(p_endTime)
+  iTime Spice::cacheEndTime() const {
+    if (p_endTime)
       return *p_endTime;
 
     return iTime();
@@ -647,8 +647,8 @@ namespace Isis {
 //???   *
 //???   * @param time Ephemeris time to cache
 //???   */
-//???  void Spice::CreateCache(double time, double tol) {
-//???    CreateCache(time, time, 1, tol);
+//???  void Spice::createCache(double time, double tol) {
+//???    createCache(time, time, 1, tol);
 //???  }
 
   /**
@@ -665,19 +665,19 @@ namespace Isis {
    *   @history 2011-02-09 Steven Lambright - Changed name from
    *                                        SetEphemerisTime()
    */
-  void Spice::SetTime(const iTime &et) {
+  void Spice::setTime(const iTime &et) {
 
-    if(p_et == NULL) {
+    if (p_et == NULL) {
       p_et = new iTime();
       // Before the Spice is cached, but after the camera aberration correction
       // is set, check to see if the instrument position kernel was created
       // by spkwriter.  If so turn off aberration corrections because the camera
       // set aberration corrections are included in the spk already.
       string abcorr;
-      if(*p_cacheSize == 0) {
-        if(p_startTime->Et() == 0.0  && p_endTime->Et() == 0.0  &&
+      if (*p_cacheSize == 0) {
+        if (p_startTime->Et() == 0.0  && p_endTime->Et() == 0.0  &&
            getSpkAbCorrState(abcorr))
-          InstrumentPosition()->SetAberrationCorrection("NONE");
+          instrumentPosition()->SetAberrationCorrection("NONE");
       }
     }
 
@@ -693,7 +693,7 @@ namespace Isis {
     p_uB[1] = uB[1];
     p_uB[2] = uB[2];
 
-    ComputeSolarLongitude(*p_et);
+    computeSolarLongitude(*p_et);
   }
 
   /**
@@ -701,12 +701,12 @@ namespace Isis {
    *
    * @param p[] Spacecraft position
    *
-   * @see SetTime()
+   * @see setTime()
    *
    * @throw Isis::iException::Programmer - "You must call SetTime first"
    */
-  void Spice::InstrumentPosition(double p[3]) const {
-    if(p_et == NULL) {
+  void Spice::instrumentPosition(double p[3]) const {
+    if (p_et == NULL) {
       std::string msg = "You must call SetTime first";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -723,8 +723,8 @@ namespace Isis {
    *
    * @param v[] Spacecraft velocity
    */
-  void Spice::InstrumentVelocity(double v[3]) const {
-    if(p_et == NULL) {
+  void Spice::instrumentVelocity(double v[3]) const {
+    if (p_et == NULL) {
       std::string msg = "You must call SetTime first";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -742,7 +742,7 @@ namespace Isis {
     *
     * @return double
     */
-  iTime Spice::Time() const {
+  iTime Spice::time() const {
     return *p_et;
   }
 
@@ -752,10 +752,10 @@ namespace Isis {
    *
    * @param p[] Sun position
    *
-   * @see SetTime()
+   * @see setTime()
    */
-  void Spice::SunPosition(double p[3]) const {
-    if(p_et == NULL) {
+  void Spice::sunPosition(double p[3]) const {
+    if (p_et == NULL) {
       std::string msg = "You must call SetTime first";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -769,7 +769,7 @@ namespace Isis {
    *
    * @return double Distance to the center of the target from the spacecraft
    */
-  double Spice::TargetCenterDistance() const {
+  double Spice::targetCenterDistance() const {
     std::vector<double> sB = p_bodyRotation->ReferenceVector(p_instrumentPosition->Coordinate());
     return sqrt(pow(sB[0], 2) + pow(sB[1], 2) + pow(sB[2], 2));
   }
@@ -781,7 +781,7 @@ namespace Isis {
    *
    * @param r[] Radii of the target in kilometers
    */
-  void Spice::Radii(Distance r[3]) const {
+  void Spice::radii(Distance r[3]) const {
     r[0] = p_radii[0];
     r[1] = p_radii[1];
     r[2] = p_radii[2];
@@ -793,11 +793,11 @@ namespace Isis {
    * @return @b SpiceInt NAIF body code
    *
    */
-  SpiceInt Spice::NaifBodyCode() const {
+  SpiceInt Spice::naifBodyCode() const {
     SpiceInt code;
     SpiceBoolean found;
     bodn2c_c(p_target->c_str(), &code, &found);
-    if(!found) {
+    if (!found) {
       string msg = "Could not convert Target [" + *p_target +
                    "] to NAIF code";
       throw IException(IException::Io, msg, _FILEINFO_);
@@ -811,7 +811,7 @@ namespace Isis {
    *
    * @return @b SpiceInt NAIF SPK code
    */
-  SpiceInt Spice::NaifSpkCode() const {
+  SpiceInt Spice::naifSpkCode() const {
     return *p_spkCode;
   }
 
@@ -820,7 +820,7 @@ namespace Isis {
    *
    * @return @b SpiceInt NAIF CK code
    */
-  SpiceInt Spice::NaifCkCode() const {
+  SpiceInt Spice::naifCkCode() const {
     return *p_ckCode;
   }
 
@@ -829,7 +829,7 @@ namespace Isis {
    *
    * @return @b SpiceInt NAIF IK code
    */
-  SpiceInt Spice::NaifIkCode() const {
+  SpiceInt Spice::naifIkCode() const {
     return *p_ikCode;
   }
 
@@ -839,7 +839,7 @@ namespace Isis {
    *
    * @return @b SpiceInt NAIF SCLK code
    */
-  SpiceInt Spice::NaifSclkCode() const {
+  SpiceInt Spice::naifSclkCode() const {
     return *p_sclkCode;
   }
 
@@ -863,7 +863,7 @@ namespace Isis {
    *
    * @throw Isis::iException::Io - "Can not find key in instrument kernels
    */
-  SpiceInt Spice::GetInteger(const iString &key, int index) {
+  SpiceInt Spice::getInteger(const iString &key, int index) {
     return readValue(key, SpiceIntType, index).toInt();
   }
 
@@ -877,7 +877,7 @@ namespace Isis {
    *
    * @throw Isis::iException::Io - "Can not find key in instrument kernels."
    */
-  SpiceDouble Spice::GetDouble(const iString &key, int index) {
+  SpiceDouble Spice::getDouble(const iString &key, int index) {
     return readValue(key, SpiceDoubleType, index).toDouble();
   }
 
@@ -889,15 +889,15 @@ namespace Isis {
    *   called when not using naif.
    */
   iTime Spice::getClockTime(iString clockValue, int sclkCode) {
-    if(sclkCode == -1)
-      sclkCode = NaifSclkCode();
+    if (sclkCode == -1)
+      sclkCode = naifSclkCode();
 
     iTime result;
 
     iString key = "CLOCK_ET_" + iString(sclkCode) + "_" + clockValue;
     QVariant storedClockTime = getStoredResult(key, SpiceDoubleType);
 
-    if(storedClockTime.isNull()) {
+    if (storedClockTime.isNull()) {
       SpiceDouble timeOutput;
       scs2e_c(sclkCode, clockValue.c_str(), &timeOutput);
       storedClockTime = timeOutput;
@@ -923,7 +923,7 @@ namespace Isis {
   QVariant Spice::readValue(iString key, SpiceValueType type, int index) {
     QVariant result;
 
-    if(p_usingNaif) {
+    if (p_usingNaif) {
       NaifStatus::CheckErrors();
 
       // This is the success status of the naif call
@@ -933,26 +933,26 @@ namespace Isis {
       //   Use this variable to make naif happy.
       SpiceInt numValuesRead;
 
-      if(type == SpiceDoubleType) {
+      if (type == SpiceDoubleType) {
         SpiceDouble kernelValue;
         gdpool_c(key.c_str(), (SpiceInt)index, 1,
                  &numValuesRead, &kernelValue, &found);
         result = kernelValue;
       }
-      else if(type == SpiceStringType) {
+      else if (type == SpiceStringType) {
         char kernelValue[512];
         gcpool_c(key.c_str(), (SpiceInt)index, 1, sizeof(kernelValue),
                  &numValuesRead, kernelValue, &found);
         result = kernelValue;
       }
-      else if(type == SpiceIntType) {
+      else if (type == SpiceIntType) {
         SpiceInt kernelValue;
         gipool_c(key.c_str(), (SpiceInt)index, 1, &numValuesRead,
                  &kernelValue, &found);
         result = (int)kernelValue;
       }
 
-      if(!found) {
+      if (!found) {
         string msg = "Can not find [" + key + "] in text kernels";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
@@ -963,7 +963,7 @@ namespace Isis {
       // Read from PvlObject that is our naif keywords
       result = readStoredValue(key, type, index);
 
-      if(result.isNull()) {
+      if (result.isNull()) {
         iString msg = "The camera is requesting spice data [" + key + "] that "
             "was not attached, please re-run spiceinit";
         throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -975,7 +975,7 @@ namespace Isis {
 
 
   void Spice::storeResult(iString name, SpiceValueType type, QVariant value) {
-    if(type == SpiceDoubleType) {
+    if (type == SpiceDoubleType) {
       EndianSwapper swapper("LSB");
 
       double doubleVal = value.toDouble();
@@ -992,14 +992,14 @@ namespace Isis {
   QVariant Spice::getStoredResult(iString name, SpiceValueType type) {
     bool wasDouble = false;
 
-    if(type == SpiceDoubleType) {
+    if (type == SpiceDoubleType) {
       wasDouble = true;
       type = SpiceByteCodeType;
     }
 
     QVariant stored = readStoredValue(name + "_COMPUTED", type, 0);
 
-    if(wasDouble && !stored.isNull()) {
+    if (wasDouble && !stored.isNull()) {
       EndianSwapper swapper("LSB");
       double doubleVal = swapper.Double((void *)QByteArray::fromHex(
           stored.toByteArray()).data());
@@ -1012,7 +1012,7 @@ namespace Isis {
 
   void Spice::storeValue(iString key, int index, SpiceValueType type,
                          QVariant value) {
-    if(!p_naifKeywords->HasKeyword(key))
+    if (!p_naifKeywords->HasKeyword(key))
       p_naifKeywords->AddKeyword(PvlKeyword(key));
 
     PvlKeyword &storedKey = p_naifKeywords->FindKeyword(key);
@@ -1021,16 +1021,16 @@ namespace Isis {
       storedKey.AddValue("");
     }
 
-    if(type == SpiceByteCodeType) {
+    if (type == SpiceByteCodeType) {
       storedKey[index] = iString(value.toByteArray().toHex().data());
     }
-    else if(type == SpiceStringType) {
+    else if (type == SpiceStringType) {
       storedKey[index] = value.toString();
     }
-    else if(type == SpiceDoubleType) {
+    else if (type == SpiceDoubleType) {
       storedKey[index] = value.toDouble();
     }
-    else if(type == SpiceIntType) {
+    else if (type == SpiceIntType) {
       storedKey[index] = value.toInt();
     }
     else {
@@ -1045,18 +1045,18 @@ namespace Isis {
     // Read from PvlObject that is our naif keywords
     QVariant result;
 
-    if(p_naifKeywords->HasKeyword(key) && !p_usingNaif) {
+    if (p_naifKeywords->HasKeyword(key) && !p_usingNaif) {
       PvlKeyword &storedKeyword = p_naifKeywords->FindKeyword(key);
 
       try {
-        if(type == SpiceDoubleType)
+        if (type == SpiceDoubleType)
           result = (double)storedKeyword[index];
-        else if(type == SpiceStringType)
+        else if (type == SpiceStringType)
           result = QString::fromStdString(storedKeyword[index]);
-        else if(type == SpiceByteCodeType || SpiceStringType)
+        else if (type == SpiceByteCodeType || SpiceStringType)
           result = QByteArray(
               string(storedKeyword[index]).c_str());
-        else if(type == SpiceIntType)
+        else if (type == SpiceIntType)
           result = (int)storedKeyword[index];
       }
       catch(IException &) {
@@ -1078,7 +1078,7 @@ namespace Isis {
    *
    * @throw Isis::IException::Io - "Can not find key in instrument kernels."
    */
-  iString Spice::GetString(const iString &key, int index) {
+  iString Spice::getString(const iString &key, int index) {
     return readValue(key, SpiceStringType, index).toString();
   }
 
@@ -1091,14 +1091,14 @@ namespace Isis {
    *
    * @param lon Sub-spacecraft longitude
    *
-   * @see SetTime()
+   * @see setTime()
    * @throw Isis::IException::Programmer - "You must call SetTime
    *             first."
    */
-  void Spice::SubSpacecraftPoint(double &lat, double &lon) {
+  void Spice::subSpacecraftPoint(double &lat, double &lon) {
     NaifStatus::CheckErrors();
 
-    if(p_et == NULL) {
+    if (p_et == NULL) {
       std::string msg = "You must call SetTime first";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1126,7 +1126,7 @@ namespace Isis {
     reclat_c(subB, &a, &mylon, &mylat);
     lat = mylat * 180.0 / PI;
     lon = mylon * 180.0 / PI;
-    if(lon < 0.0) lon += 360.0;
+    if (lon < 0.0) lon += 360.0;
 
     NaifStatus::CheckErrors();
   }
@@ -1138,14 +1138,14 @@ namespace Isis {
    * @param lat Sub-solar latitude
    * @param lon Sub-solar longitude
    *
-   * @see SetTime()
+   * @see setTime()
    * @throw Isis::IException::Programmer - "You must call SetTime
    *             first."
    */
-  void Spice::SubSolarPoint(double &lat, double &lon) {
+  void Spice::subSolarPoint(double &lat, double &lon) {
     NaifStatus::CheckErrors();
 
-    if(p_et == NULL) {
+    if (p_et == NULL) {
       std::string msg = "You must call SetTime first";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1168,7 +1168,7 @@ namespace Isis {
     reclat_c(subB, &a, &mylon, &mylat);
     lat = mylat * 180.0 / PI;
     lon = mylon * 180.0 / PI;
-    if(lon < 0.0) lon += 360.0;
+    if (lon < 0.0) lon += 360.0;
 
     NaifStatus::CheckErrors();
   }
@@ -1179,7 +1179,7 @@ namespace Isis {
     *
     * @return string
     */
-  iString Spice::Target() const {
+  iString Spice::target() const {
     return *p_target;
   }
 
@@ -1190,15 +1190,15 @@ namespace Isis {
    *
    * @param et Ephemeris time
    */
-  void Spice::ComputeSolarLongitude(iTime et) {
+  void Spice::computeSolarLongitude(iTime et) {
     NaifStatus::CheckErrors();
 
-    if(iString(Target()).UpCase() == "SKY") {
+    if (iString(target()).UpCase() == "SKY") {
       *p_solarLongitude = Longitude();
       return;
     }
 
-    if(p_bodyRotation->IsCached()) return;
+    if (p_bodyRotation->IsCached()) return;
 
     double tipm[3][3], npole[3];
     char frameName[32];
@@ -1207,14 +1207,14 @@ namespace Isis {
 
     cidfrm_c(*p_spkBodyCode, sizeof(frameName), &frameCode, frameName, &found);
 
-    if(found) {
+    if (found) {
       pxform_c("J2000", frameName, et.Et(), tipm);
     }
     else {
       tipbod_c("J2000", *p_spkBodyCode, et.Et(), tipm);
     }
 
-    for(int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++) {
       npole[i] = tipm[2][i];
     }
 
@@ -1230,7 +1230,7 @@ namespace Isis {
     ucrss_c(z, x, y);
 
     double trans[3][3];
-    for(int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++) {
       trans[0][i] = x[i];
       trans[1][i] = y[i];
       trans[2][i] = z[i];
@@ -1255,9 +1255,9 @@ namespace Isis {
    *
    * @return @b double The Solar Longitude
    */
-  Longitude Spice::SolarLongitude() {
-    if(p_et) {
-      ComputeSolarLongitude(*p_et);
+  Longitude Spice::solarLongitude() {
+    if (p_et) {
+      computeSolarLongitude(*p_et);
       return *p_solarLongitude;
     }
 
@@ -1272,44 +1272,44 @@ namespace Isis {
    *
    * @return @b bool status of kernel files in the kernel group
    */
-  bool Spice::HasKernels(Pvl &lab) {
+  bool Spice::hasKernels(Pvl &lab) {
 
     // Get the kernel group and check main kernels
     PvlGroup kernels = lab.FindGroup("Kernels", Pvl::Traverse);
     std::vector<string> keywords;
     keywords.push_back("TargetPosition");
 
-    if(kernels.HasKeyword("SpacecraftPosition")) {
+    if (kernels.HasKeyword("SpacecraftPosition")) {
       keywords.push_back("SpacecraftPosition");
     }
     else {
       keywords.push_back("InstrumentPosition");
     }
 
-    if(kernels.HasKeyword("SpacecraftPointing")) {
+    if (kernels.HasKeyword("SpacecraftPointing")) {
       keywords.push_back("SpacecraftPointing");
     }
     else {
       keywords.push_back("InstrumentPointing");
     }
 
-    if(kernels.HasKeyword("Frame")) {
+    if (kernels.HasKeyword("Frame")) {
       keywords.push_back("Frame");
     }
 
-    if(kernels.HasKeyword("Extra")) {
+    if (kernels.HasKeyword("Extra")) {
       keywords.push_back("Extra");
     }
 
     PvlKeyword key;
-    for(int ikey = 0; ikey < (int) keywords.size(); ikey++) {
+    for (int ikey = 0; ikey < (int) keywords.size(); ikey++) {
       key = kernels[ikey];
 
-      for(int i = 0; i < key.Size(); i++) {
-        if(key[i] == "") return false;
-        if(iString(key[i]).UpCase() == "NULL") return false;
-        if(iString(key[i]).UpCase() == "NADIR") return false;
-        if(iString(key[i]).UpCase() == "TABLE") return false;
+      for (int i = 0; i < key.Size(); i++) {
+        if (key[i] == "") return false;
+        if (iString(key[i]).UpCase() == "NULL") return false;
+        if (iString(key[i]).UpCase() == "NADIR") return false;
+        if (iString(key[i]).UpCase() == "TABLE") return false;
       }
     }
     return true;

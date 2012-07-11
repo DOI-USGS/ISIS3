@@ -703,7 +703,7 @@ namespace Isis {
     //  as the current control net.
     if (m_controlNet) {
       if (m_controlNet->GetTarget() !=
-          m_linkedViewports.at(0)->cube()->getCamera()->Target()) {
+          m_linkedViewports.at(0)->cube()->getCamera()->target()) {
         //  Allow opportunity to save current data before clearing for new
         //  target.
         QString message = "You have changed targets.  All data must be re-set";
@@ -720,14 +720,14 @@ namespace Isis {
         clearNetData();
         m_controlNet = new ControlNet();
         m_controlNet->SetTarget(
-                        m_linkedViewports.at(0)->cube()->getCamera()->Target());
+                        m_linkedViewports.at(0)->cube()->getCamera()->target());
         m_serialNumberList = new SerialNumberList(false);
       }
     }
     else {
       m_controlNet = new ControlNet();
       m_controlNet->SetTarget(
-                       m_linkedViewports.at(0)->cube()->getCamera()->Target());
+                       m_linkedViewports.at(0)->cube()->getCamera()->target());
       m_serialNumberList = new SerialNumberList(false);
     }
 

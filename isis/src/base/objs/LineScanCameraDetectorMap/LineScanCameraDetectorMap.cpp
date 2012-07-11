@@ -41,7 +41,7 @@ namespace Isis {
   bool LineScanCameraDetectorMap::SetDetector(const double sample,
       const double line) {
     if(!CameraDetectorMap::SetDetector(sample, line)) return false;
-    double etDiff = p_camera->Time().Et() - p_etStart;
+    double etDiff = p_camera->time().Et() - p_etStart;
     p_parentLine = etDiff / p_lineRate + 0.5;
     return true;
   }
@@ -62,7 +62,7 @@ namespace Isis {
     if(!CameraDetectorMap::SetParent(sample, line)) return false;
     p_detectorLine = p_camera->FocalPlaneMap()->DetectorLineOffset();
     double etLine = p_etStart + p_lineRate * (line - 0.5);
-    p_camera->SetTime(etLine);
+    p_camera->setTime(etLine);
     return true;
   }
 }

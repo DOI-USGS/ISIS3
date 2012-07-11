@@ -138,8 +138,8 @@ void SpiceSegment::init(Cube &cube) {
     if (!value.empty()) { _target = value; }
 
     // Get default times for sorting purposes
-    setStartTime(camera->CacheStartTime().Et());
-    setEndTime(camera->CacheEndTime().Et());
+    setStartTime(camera->cacheStartTime().Et());
+    setEndTime(camera->cacheEndTime().Et());
 
   } catch ( IException &ie  ) {
     ostringstream mess;

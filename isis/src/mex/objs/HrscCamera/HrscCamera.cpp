@@ -47,7 +47,7 @@ namespace Isis {
     // Setup camera characteristics from instrument and frame kernel
     SetFocalLength();
     SetPixelPitch(0.007);
-    InstrumentRotation()->SetFrame(-41210);
+    instrumentRotation()->SetFrame(-41210);
 
     // Get required keywords from instrument group
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
@@ -62,13 +62,13 @@ namespace Isis {
     // focal plane x/y.  This will read the appropriate CCD
     // transformation coefficients from the instrument kernel
 
-    new CameraFocalPlaneMap(this, NaifIkCode());
+    new CameraFocalPlaneMap(this, naifIkCode());
 
-    string ikernKey = "INS" + iString((int)NaifIkCode())  + "_BORESIGHT_SAMPLE";
-    double sampleBoresight = GetDouble(ikernKey);
+    string ikernKey = "INS" + iString((int)naifIkCode())  + "_BORESIGHT_SAMPLE";
+    double sampleBoresight = getDouble(ikernKey);
 
-    ikernKey = "INS" + iString((int)NaifIkCode())  + "_BORESIGHT_LINE";
-    double lineBoresight = GetDouble(ikernKey);
+    ikernKey = "INS" + iString((int)naifIkCode())  + "_BORESIGHT_LINE";
+    double lineBoresight = getDouble(ikernKey);
 
     FocalPlaneMap()->SetDetectorOrigin(sampleBoresight, lineBoresight);
 

@@ -40,6 +40,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2009-03-07 Debbie A. Cook Removed reference to obsolute CameraDetectorMap methods
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    *
    */
   class LineScanCameraDetectorMap : public CameraDetectorMap {

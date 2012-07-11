@@ -47,6 +47,8 @@ namespace Isis {
    *                          Updated documentation. Removed Apollo namespace
    *                          wrap inside Isis namespace. Added Isis Disclaimer
    *                          to files.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards.   References #972.
    */
   class ApolloMetricCamera : public FramingCamera {
     public:

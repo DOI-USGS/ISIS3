@@ -44,6 +44,8 @@ namespace Isis {
    * @internal
    *   @history 2009-07-01 Janet Barrett - Corrected the calculations used to
    *                           convert from line to time and back
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    *
    */
   class RadarPulseMap : public CameraDetectorMap {

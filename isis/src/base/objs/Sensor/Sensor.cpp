@@ -70,12 +70,12 @@ namespace Isis {
     PvlGroup &kernels = lab.FindGroup("Kernels", Pvl::Traverse);
     if(kernels.HasKeyword("ElevationModel") &&
         !kernels["ElevationModel"].IsNull() &&
-        !IsSky()) {
+        !isSky()) {
       demCube = (string) kernels["ElevationModel"];
     }
     else if(kernels.HasKeyword("ShapeModel") &&
             !kernels["ShapeModel"].IsNull() &&
-            !IsSky()) {
+            !isSky()) {
       demCube = (string) kernels["ShapeModel"];
     }
 
@@ -177,8 +177,8 @@ namespace Isis {
   * @param time Ephemeris time (read NAIF documentation for a detailed
   *             description)
   */
-  void Sensor::SetTime(const iTime &time) {
-    Spice::SetTime(time);
+  void Sensor::setTime(const iTime &time) {
+    Spice::setTime(time);
     p_hasIntersection = false;
   }
 
@@ -229,8 +229,8 @@ namespace Isis {
     vector<double> lookC(v, v + 3);
 
     // Convert it to body-fixed
-    const vector<double> &lookJ = InstrumentRotation()->J2000Vector(lookC);
-    const vector<double> &lookB = BodyRotation()->ReferenceVector(lookJ);
+    const vector<double> &lookJ = instrumentRotation()->J2000Vector(lookC);
+    const vector<double> &lookB = bodyRotation()->ReferenceVector(lookJ);
 
     // This memcpy does:
     // p_lookB[0] = lookB[0];
@@ -240,7 +240,7 @@ namespace Isis {
     p_newLookB = true;
 
     // Don't try to intersect the sky
-    if(IsSky()) {
+    if(isSky()) {
       p_hasIntersection = false;
       return p_hasIntersection;
     }
@@ -252,8 +252,8 @@ namespace Isis {
 
     // See if it intersects the planet
     SpiceBoolean found;
-    const vector<double> &sB = BodyRotation()->ReferenceVector(
-        InstrumentPosition()->Coordinate());
+    const vector<double> &sB = bodyRotation()->ReferenceVector(
+        instrumentPosition()->Coordinate());
 
     SpiceDouble pBOutput[3];
     surfpt_c((SpiceDouble *) &sB[0], p_lookB, a, b, c, pBOutput, &found);
@@ -674,7 +674,7 @@ namespace Isis {
    */
   double Sensor::PhaseAngle() const {
     SpiceDouble psB[3], upsB[3], dist;
-    std::vector<double> sB = BodyRotation()->ReferenceVector(InstrumentPosition()->Coordinate());
+    std::vector<double> sB = bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate());
 
     SpiceDouble pB[3];
     pB[0] = p_surfacePoint->GetX().kilometers();
@@ -700,7 +700,7 @@ namespace Isis {
    */
   double Sensor::EmissionAngle() const {
     return EmissionAngle(
-        BodyRotation()->ReferenceVector(InstrumentPosition()->Coordinate()));
+        bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate()));
   }
 
   /**
@@ -767,7 +767,7 @@ namespace Isis {
   bool Sensor::SetUniversalGround(const double latitude,
                                   const double longitude, bool backCheck) {
     // Can't intersect the sky
-    if(IsSky()) {
+    if(isSky()) {
       p_hasIntersection = false;
       return p_hasIntersection;
     }
@@ -805,7 +805,7 @@ namespace Isis {
                                   const double longitude,
                                   const double radius, bool backCheck) {
     // Can't intersect the sky
-    if(IsSky()) {
+    if(isSky()) {
       p_hasIntersection = false;
       return p_hasIntersection;
     }
@@ -834,7 +834,7 @@ namespace Isis {
    */
   bool Sensor::SetGround(const SurfacePoint &surfacePt, bool backCheck) {
     // Can't intersect the sky
-    if(IsSky()) {
+    if(isSky()) {
       p_hasIntersection = false;
       return p_hasIntersection;
     }
@@ -865,7 +865,7 @@ namespace Isis {
     // This is static purely for performance reasons. A significant speedup
     // is achieved here.
     const vector<double> &sB =
-        BodyRotation()->ReferenceVector(InstrumentPosition()->Coordinate());
+        bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate());
 
     p_lookB[0] = p_surfacePoint->GetX().kilometers() - sB[0];
     p_lookB[1] = p_surfacePoint->GetY().kilometers() - sB[1];
@@ -897,8 +897,8 @@ namespace Isis {
     lookB[0] = p_lookB[0];
     lookB[1] = p_lookB[1];
     lookB[2] = p_lookB[2];
-    vector<double> lookJ = BodyRotation()->J2000Vector(lookB);
-    vector<double> lookC = InstrumentRotation()->ReferenceVector(lookJ);
+    vector<double> lookJ = bodyRotation()->J2000Vector(lookB);
+    vector<double> lookC = instrumentRotation()->ReferenceVector(lookJ);
     v[0] = lookC[0];
     v[1] = lookC[1];
     v[2] = lookC[2];
@@ -930,7 +930,7 @@ namespace Isis {
     lookB[0] = p_lookB[0];
     lookB[1] = p_lookB[1];
     lookB[2] = p_lookB[2];
-    vector<double> lookJ = BodyRotation()->J2000Vector(lookB);;
+    vector<double> lookJ = bodyRotation()->J2000Vector(lookB);;
 
     SpiceDouble range;
     recrad_c((SpiceDouble *)&lookJ[0], &range, &p_ra, &p_dec);
@@ -950,7 +950,7 @@ namespace Isis {
     vector<double> lookJ(3);
     radrec_c(1.0, ra * PI / 180.0, dec * PI / 180.0, (SpiceDouble *)&lookJ[0]);
 
-    vector<double> lookC = InstrumentRotation()->ReferenceVector(lookJ);
+    vector<double> lookC = instrumentRotation()->ReferenceVector(lookJ);
     return SetLookDirection((double *)&lookC[0]);
   }
 
@@ -976,7 +976,7 @@ namespace Isis {
     SpiceDouble psB[3], upsB[3];
     SpiceDouble dist;
 
-    std::vector<double> sB = BodyRotation()->ReferenceVector(InstrumentPosition()->Coordinate());
+    std::vector<double> sB = bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate());
 
     SpiceDouble pB[3];
     pB[0] = p_surfacePoint->GetX().kilometers();
@@ -994,7 +994,7 @@ namespace Isis {
    */
   double Sensor::LocalSolarTime() {
     double slat, slon;
-    SubSolarPoint(slat, slon);
+    subSolarPoint(slat, slon);
 
     double lst = UniversalLongitude() - slon + 180.0;
     lst = lst / 15.0;  // 15 degress per hour
@@ -1010,7 +1010,7 @@ namespace Isis {
   double Sensor::SolarDistance() const {
     // Get the sun coord
     double sB[3];
-    Spice::SunPosition(sB);
+    Spice::sunPosition(sB);
 
     // Calc the change
     double xChange = sB[0] - p_surfacePoint->GetX().kilometers();
@@ -1031,11 +1031,11 @@ namespace Isis {
   double Sensor::SpacecraftAltitude() {
     // Get the spacecraft coord
     double spB[3];
-    Spice::InstrumentPosition(spB);
+    Spice::instrumentPosition(spB);
 
     // Get subspacecraft point
     double lat, lon;
-    SubSpacecraftPoint(lat, lon);
+    subSpacecraftPoint(lat, lon);
     double rlat = lat * PI / 180.0;
     double rlon = lon * PI / 180.0;
 

@@ -44,7 +44,7 @@ namespace Isis {
   void LroNarrowAngleDistortionMap::SetDistortion(const int naifIkCode) {
     std::string odkkey = "INS" + Isis::iString(naifIkCode) + "_OD_K";
     p_odk.clear();
-    p_odk.push_back(p_camera->GetDouble(odkkey, 0));
+    p_odk.push_back(p_camera->getDouble(odkkey, 0));
   }
 
   /** Compute undistorted focal plane x/y

@@ -26,7 +26,7 @@ void IsisMain() {
       string msg = "[" + ui.GetFileName("FROM") + "] is not a line scan camera";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    cam->InstrumentRotation()->SetPolynomial();
+    cam->instrumentRotation()->SetPolynomial();
 
     // Get the instrument pointing keyword from the kernels group and update
     // its value to table.
@@ -38,7 +38,7 @@ void IsisMain() {
     cube.putGroup(kernels);
 
     // Pull out the pointing cache as a table and write it
-    Table cmatrix = cam->InstrumentRotation()->Cache("InstrumentPointing");
+    Table cmatrix = cam->instrumentRotation()->Cache("InstrumentPointing");
     cmatrix.Label().AddComment("Smoothed using spicefit");
     cube.write(cmatrix);
     cube.close();

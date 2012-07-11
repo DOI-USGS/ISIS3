@@ -45,6 +45,8 @@ namespace Isis {
    *            what is reported in the calibration document); removed the
    *            GuessDx method as it was not used; updated the UV boresight in
    *            the IK based upon analysis of the VIS and UV.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *            coding standards. References #972.
    */
   class LroWideAngleCameraDistortionMap : public CameraDistortionMap {
     public:

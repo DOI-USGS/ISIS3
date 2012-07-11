@@ -68,7 +68,7 @@ namespace Isis {
     }
 
     // Turn off the aberration corrections for the instrument position object
-    InstrumentPosition()->SetAberrationCorrection("NONE");
+    instrumentPosition()->SetAberrationCorrection("NONE");
 
     // Get the camera characteristics
     SetFocalLength();
@@ -79,8 +79,8 @@ namespace Isis {
 
     // Setup focal plane map
     if(type == Fiducial) {
-      LoCameraFiducialMap fid(inst, NaifIkCode());
-      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
+      LoCameraFiducialMap fid(inst, naifIkCode());
+      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
       // Try (0.,0.)
       focalMap->SetDetectorOrigin(0.0, 0.0);
 
@@ -89,7 +89,7 @@ namespace Isis {
       // Read boresight
       double boresightSample = inst["BoresightSample"];
       double boresightLine = inst["BoresightLine"];
-      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
+      CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
       focalMap->SetDetectorOrigin(boresightSample, boresightLine);
     }
 
@@ -98,12 +98,12 @@ namespace Isis {
 
     // Setup distortion map
     LoMediumDistortionMap *distortionMap = new LoMediumDistortionMap(this);
-    distortionMap->SetDistortion(NaifIkCode());
+    distortionMap->SetDistortion(naifIkCode());
     // Setup the ground and sky map
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    SetTime(time);
+    setTime(time);
     LoadCache();
     NaifStatus::CheckErrors();
   }

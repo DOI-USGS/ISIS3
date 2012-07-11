@@ -50,6 +50,8 @@ namespace Isis {
    *   @history 2011-02-09 Steven Lambright - Major changes to camera classes.
    *   @history 2011-05-03 Jeannie Walldren - Updated documentation. Removed
    *                          Cassini namespace wrap inside Isis namespace.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    */
   class VimsSkyMap : public CameraSkyMap {
     public:

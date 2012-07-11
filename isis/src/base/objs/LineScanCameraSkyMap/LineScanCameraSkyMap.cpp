@@ -42,7 +42,7 @@ namespace Isis {
    */
   bool LineScanCameraSkyMap::SetSky(const double ra, const double dec) {
     // Get beginning bounding time and offset for iterative loop
-    p_camera->Sensor::SetTime(p_camera->Spice::CacheStartTime());
+    p_camera->Sensor::setTime(p_camera->Spice::cacheStartTime());
     p_camera->Sensor::SetRightAscensionDeclination(ra, dec);
 
     double lookC[3];
@@ -61,7 +61,7 @@ namespace Isis {
                          focalMap->DetectorLine();
 
     // Get ending bounding time and offset for iterative loop
-    p_camera->Sensor::SetTime(p_camera->Spice::CacheEndTime());
+    p_camera->Sensor::setTime(p_camera->Spice::cacheEndTime());
     p_camera->Sensor::SetRightAscensionDeclination(ra, dec);
 
     p_camera->Sensor::LookDirection(lookC);
@@ -85,14 +85,14 @@ namespace Isis {
     if(startOffset < endOffset) {
       fl = startOffset;
       fh = endOffset;
-      xl = p_camera->Spice::CacheStartTime().Et();
-      xh = p_camera->Spice::CacheEndTime().Et();
+      xl = p_camera->Spice::cacheStartTime().Et();
+      xh = p_camera->Spice::cacheEndTime().Et();
     }
     else {
       fl = endOffset;
       fh = startOffset;
-      xl = p_camera->Spice::CacheEndTime().Et();
-      xh = p_camera->Spice::CacheStartTime().Et();
+      xl = p_camera->Spice::cacheEndTime().Et();
+      xh = p_camera->Spice::cacheStartTime().Et();
     }
 
     // Iterate to find the time at which the instrument imaged the ground point
@@ -101,7 +101,7 @@ namespace Isis {
     double timeTol = detectorMap->LineRate() / 10.0;
     for(int j = 0; j < 30; j++) {
       double etGuess = xl + (xh - xl) * fl / (fl - fh);
-      p_camera->Sensor::SetTime(etGuess);
+      p_camera->Sensor::setTime(etGuess);
       p_camera->Sensor::SetRightAscensionDeclination(ra, dec);
       p_camera->Sensor::LookDirection(lookC);
       ux = p_camera->FocalLength() * lookC[0] / lookC[2];

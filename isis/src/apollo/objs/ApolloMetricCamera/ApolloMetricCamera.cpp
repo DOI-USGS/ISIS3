@@ -54,17 +54,17 @@ namespace Isis {
     new CameraDetectorMap(this);
 
     // Setup focal plane map
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
     focalMap->SetDetectorOrigin(ParentSamples() / 2.0, ParentLines() / 2.0);
 
-    iString ppKey("INS" + iString((int)NaifIkCode()) + "_PP");
-    iString odkKey("INS" + iString((int)NaifIkCode()) + "_OD_K");
-    iString decenterKey("INS" + iString((int)NaifIkCode()) + "_DECENTER");
+    iString ppKey("INS" + iString((int)naifIkCode()) + "_PP");
+    iString odkKey("INS" + iString((int)naifIkCode()) + "_OD_K");
+    iString decenterKey("INS" + iString((int)naifIkCode()) + "_DECENTER");
 
-    new ApolloMetricDistortionMap(this, GetDouble(ppKey, 0),
-                                  GetDouble(ppKey, 1), GetDouble(odkKey, 0), GetDouble(odkKey, 1),
-                                  GetDouble(odkKey, 2), GetDouble(decenterKey, 0),
-                                  GetDouble(decenterKey, 1), GetDouble(decenterKey, 2));
+    new ApolloMetricDistortionMap(this, getDouble(ppKey, 0),
+                                  getDouble(ppKey, 1), getDouble(odkKey, 0), getDouble(odkKey, 1),
+                                  getDouble(odkKey, 2), getDouble(decenterKey, 0),
+                                  getDouble(decenterKey, 1), getDouble(decenterKey, 2));
 
     // Setup the ground and sky map
     new CameraGroundMap(this);
@@ -99,7 +99,7 @@ namespace Isis {
     // Create a cache and grab spice info since it does not change for
     // a framing camera (fixed spacecraft position and pointing)
     // Convert the start time to et
-    SetTime((string)inst["StartTime"]);
+    setTime((string)inst["StartTime"]);
     LoadCache();
     NaifStatus::CheckErrors();
   }

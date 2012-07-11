@@ -53,6 +53,8 @@ namespace Isis {
    *                          constructor was finished.
    *   @history 2011-05-03 Jeannie Walldren - Updated documentation. Removed Lo
    *                          namespace wrap.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    */
   class LoHighDistortionMap : public CameraDistortionMap {
     public:

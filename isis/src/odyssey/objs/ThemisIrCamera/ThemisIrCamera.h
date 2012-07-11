@@ -53,6 +53,8 @@ namespace Isis {
    *                          wrap inside Isis namespace. Added Isis Disclaimer
    *                          to files. Added NAIF error check to constructor.
    *  
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    */
   class ThemisIrCamera : public LineScanCamera {
     public:

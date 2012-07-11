@@ -67,6 +67,8 @@ namespace Isis {
    *                           getViewActions in order to allow the zooming key
    *                           shortcuts from the zoom tool to take effect when
    *                           the zoom tool wasn't active.
+   *   @history 2012-06-20 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT

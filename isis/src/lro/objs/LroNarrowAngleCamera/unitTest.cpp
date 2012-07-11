@@ -67,7 +67,7 @@ int main(void) {
     Camera *cam = CameraFactory::Create(p);
     
     cout << "FileName: " << FileName(p.FileName()).name() << endl;
-    cout << "CK Frame: " << cam->InstrumentRotation()->Frame() << endl << endl;
+    cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
 

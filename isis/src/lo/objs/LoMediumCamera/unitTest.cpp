@@ -52,7 +52,7 @@ int main(void) {
     Pvl p("$lo/testData/3083_med_tohi.cub");
     LoMediumCamera *cam = (LoMediumCamera *) CameraFactory::Create(p);
     cout << "FileName: " << FileName(p.FileName()).name() << endl;
-    cout << "CK Frame: " << cam->InstrumentRotation()->Frame() << endl << endl;
+    cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
 

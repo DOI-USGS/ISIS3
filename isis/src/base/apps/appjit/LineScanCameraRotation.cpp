@@ -41,7 +41,7 @@ namespace Isis {
     p_spi = new Isis::Spice(lab);
 
     // Make sure the kernels are written to the labels and not just the tables (blobs)
-    if(!p_spi->HasKernels(lab)) {
+    if(!p_spi->hasKernels(lab)) {
       std::string msg = "The master file must contain the kernel files.  Rerun spiceinit with attach=no";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -57,14 +57,14 @@ namespace Isis {
     InitConstantRotation(p_cacheTime[0]);
 
     p_cachesLoaded = false;
-    p_spi->InstrumentRotation()->SetFrame(frameCode);
-    p_crot = p_spi->InstrumentRotation();
-    p_prot = p_spi->BodyRotation();
-    p_spos = p_spi->InstrumentPosition();
+    p_spi->instrumentRotation()->SetFrame(frameCode);
+    p_crot = p_spi->instrumentRotation();
+    p_prot = p_spi->bodyRotation();
+    p_spos = p_spi->instrumentPosition();
     // Load the line scan specific rotation matrix caches before loading the regular Spice caches because
     // the CreateCache method will unload all the kernels after the caches are created
     LoadCache();
-    p_spi->CreateCache(timeCache[0], timeCache[timeCache.size()-1], timeCache.size(), tol);
+    p_spi->createCache(timeCache[0], timeCache[timeCache.size()-1], timeCache.size(), tol);
   }
 
 
@@ -117,8 +117,8 @@ namespace Isis {
     double *velocity;
     std::vector<double> IB(9);
     std::vector<double> CI(9);
-    SpiceRotation *prot = p_spi->BodyRotation();
-    SpiceRotation *crot = p_spi->InstrumentRotation();
+    SpiceRotation *prot = p_spi->bodyRotation();
+    SpiceRotation *crot = p_spi->instrumentRotation();
 
     for(std::vector<double>::iterator i = p_cacheTime.begin(); i < p_cacheTime.end(); i++) {
       double et = *i;
@@ -213,7 +213,7 @@ namespace Isis {
     double CI[3][3];
     double IJ[3][3];
     std::vector<double> rtime;
-    SpiceRotation *prot = p_spi->BodyRotation();
+    SpiceRotation *prot = p_spi->bodyRotation();
     std::vector<double> CJ;
     CJ.resize(9);
 

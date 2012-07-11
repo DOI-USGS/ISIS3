@@ -45,6 +45,8 @@ namespace Isis {
    *                           Sensor::SetRightAscensionDeclination calls. A
    *                           failure indicated we didn't hit the target but we
    *                           don't care here since the target is the sky.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    *
    */
   class LineScanCameraSkyMap : public CameraSkyMap {

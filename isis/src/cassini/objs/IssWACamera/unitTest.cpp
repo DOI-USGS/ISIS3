@@ -48,7 +48,7 @@ int main(void) {
     Pvl p("$cassini/testData/W1525116136_1.cub");
     IssWACamera *cam = (IssWACamera *) CameraFactory::Create(p);
     cout << "FileName: " << FileName(p.FileName()).name() << endl;
-    cout << "CK Frame: " << cam->InstrumentRotation()->Frame() << endl << endl;
+    cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
 

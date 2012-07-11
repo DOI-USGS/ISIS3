@@ -146,7 +146,7 @@ namespace Isis {
       new CameraGroundMap(this);
       new CameraSkyMap(this);
 
-      SetTime(et);
+      setTime(et);
       LoadCache();
     }
     else if(type.UpCase() == "LINESCAN") {

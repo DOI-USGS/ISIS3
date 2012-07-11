@@ -293,6 +293,9 @@
      Made significant changes to Gruen and smtk to better implement the ISIS2 
      version of the application.
    </change>
+    <change name="Debbie A. Cook" date="2012-07-06">
+       Updated Spice members to be more compliant with Isis coding standards. References #972.
+    </change>
   </history>
 
   <groups>

@@ -50,7 +50,7 @@ namespace Isis {
     }
 
     // currEt is our known et time
-    double currEt = p_camera->Time().Et();
+    double currEt = p_camera->time().Et();
     int rateIndex = p_lineRates.size() - 1;
 
     while(rateIndex >= 0 && currEt < p_lineRates[rateIndex].GetStartEt() - 0.5) {
@@ -113,7 +113,7 @@ namespace Isis {
 
     SetLineRate(rate);
 
-    p_camera->SetTime(et);
+    p_camera->setTime(et);
 
     return true;
   }

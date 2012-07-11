@@ -113,7 +113,7 @@ void IsisMain() {
     Cphase = cam->PhaseAngle();
     Cincid = cam->IncidenceAngle();
     ClocalSolTime = cam->LocalSolarTime();
-    CsolarLong = cam->SolarLongitude().degrees();
+    CsolarLong = cam->solarLongitude().degrees();
     CnorthAzimuth = cam->NorthAzimuth();
     CsunAzimuth = cam->SunAzimuth();
     runXY = false;
@@ -125,7 +125,7 @@ void IsisMain() {
       Cphase = cam->PhaseAngle();
       Cincid = cam->IncidenceAngle();
       ClocalSolTime = cam->LocalSolarTime();
-      CsolarLong = cam->SolarLongitude().degrees();
+      CsolarLong = cam->solarLongitude().degrees();
       CnorthAzimuth = cam->NorthAzimuth();
       CsunAzimuth = cam->SunAzimuth();
       runXY = false;
@@ -169,7 +169,7 @@ void IsisMain() {
       Cphase = cam->PhaseAngle();
       Cincid = cam->IncidenceAngle();
       ClocalSolTime = cam->LocalSolarTime();
-      CsolarLong = cam->SolarLongitude().degrees();
+      CsolarLong = cam->solarLongitude().degrees();
       CnorthAzimuth = cam->NorthAzimuth();
       CsunAzimuth = cam->SunAzimuth();
       runXY = false;
@@ -181,7 +181,7 @@ void IsisMain() {
         Cphase = cam->PhaseAngle();
         Cincid = cam->IncidenceAngle();
         ClocalSolTime = cam->LocalSolarTime();
-        CsolarLong = cam->SolarLongitude().degrees();
+        CsolarLong = cam->solarLongitude().degrees();
         CnorthAzimuth = cam->NorthAzimuth();
         CsunAzimuth = cam->SunAzimuth();
         runXY = false;

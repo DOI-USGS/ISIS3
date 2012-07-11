@@ -138,7 +138,7 @@ namespace Isis {
    *                                    will take precidence.
    *  @history 2008-06-23 Steven Lambright - Added NaifStatus error checking
    *  @history 2008-06-25 Debbie A. Cook - Added method InstrumentVelocity to support miniRF
-   *  @history 2008-11-28 Debbie A. Cook - Added method HasKernels()
+   *  @history 2008-11-28 Debbie A. Cook - Added method hasKernels()
    *  @history 2009-03-18 Tracie Sucharski - Cleaned up some unnecessary,obsolete code.  Make sure the
    *                                    table is used if the kernel names follow the "Table" keyword value, due to change
    *                                    made to spiceinit to retain kernel names if the spice is written to blob.
@@ -156,7 +156,7 @@ namespace Isis {
    *  @history 2010-04-09 Debbie A. Cook - Moved the loading of the "extra" kernel(s) from the middle of
    *                                       the loads to the end.
    *  @history 2011-02-08 Jeannie Walldren - Added documentation to methods and private variables. Commented out
-   *                                         CreateCache(double,double) since it appears that this method is not
+   *                                         createCache(double,double) since it appears that this method is not
    *                                         needed. Initialize pointers to NULL in Init() method.
    *  @history 2011-02-09 Steven Lambright - Refactored to use iTime where
    *                                         possible. Changed p_radii to a
@@ -168,7 +168,7 @@ namespace Isis {
    *  @history 2011-02-11 Jeannie Walldren - Changed documentation references to
    *                                         SetEphemerisTime() method (these
    *                                         were replaced with references to
-   *                                         SetTime()). Added missing
+   *                                         setTime()). Added missing
    *                                         documentation to new methods.
    *   @history 2011-05-03 Jeannie Walldren - Added Isis Disclaimer to files.
    *   @history 2011-05-25 Janet Barrett and Steven Lambright - Added API that
@@ -202,6 +202,8 @@ namespace Isis {
    *                                         the camera itself and not read from
    *                                         a kernel.  The camera puts these
    *                                         values into the Naif kernel pool.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    */
   class Spice {
     public:
@@ -213,41 +215,40 @@ namespace Isis {
       ~Spice();
 
       // Methods
-      void SetTime(const iTime &time);
-      void InstrumentPosition(double p[3]) const;
-      void SunPosition(double p[3]) const;
-      double TargetCenterDistance() const;
-      Longitude SolarLongitude();
-      void InstrumentVelocity(double v[3]) const;
+      void setTime(const iTime &time);
+      void instrumentPosition(double p[3]) const;
+      void sunPosition(double p[3]) const;
+      double targetCenterDistance() const;
+      Longitude solarLongitude();
+      void instrumentVelocity(double v[3]) const;
+      iTime time() const;
 
-      iTime Time() const;
+      void radii(Distance r[3]) const;
 
-      void Radii(Distance r[3]) const;
-
-      void CreateCache(iTime startTime, iTime endTime,
+      void createCache(iTime startTime, iTime endTime,
                        const int size, double tol);
         //NO CALL TO THIS METHOD IS FOUND IN ISIS.  COMMENT OUT AND SAVE FOR AT LEAST 3 MONTHS
         //IF NO NEED IS FOUND FOR IT, DELETE METHOD.
         // 2011-02-08 JEANNIE WALLDREN
-//      void CreateCache(const double time, double tol);
-      iTime CacheStartTime() const;
-      iTime CacheEndTime() const;
+//      void createCache(const double time, double tol);
+      iTime cacheStartTime() const;
+      iTime cacheEndTime() const;
 
-      void SubSpacecraftPoint(double &lat, double &lon);
-      void SubSolarPoint(double &lat, double &lon);
+      void subSpacecraftPoint(double &lat, double &lon);
+      void subSolarPoint(double &lat, double &lon);
 
-      iString Target() const;
+      iString target() const;
 
       //! Return if our target is the sky
-      bool IsSky() const {
+      bool isSky() const {
         return p_sky;
       };
 
       iTime getClockTime(iString clockValue,
                          int sclkCode = -1);
-      SpiceDouble GetDouble(const iString &key, int index = 0);
-      SpiceInt GetInteger(const iString &key,   int index = 0);
-      iString GetString(const iString &key,     int index = 0);
+      SpiceDouble getDouble(const iString &key, int index = 0);
+      SpiceInt getInteger(const iString &key,   int index = 0);
+      iString getString(const iString &key,     int index = 0);
 
       /**
        * Accessor method for the sun position.
@@ -256,7 +257,7 @@ namespace Isis {
        * @internal
        *   @history 2011-02-09 Steven Lambright - Original version.
        */
-      SpicePosition *SunPosition() const {
+      SpicePosition *sunPosition() const {
         return p_sunPosition;
       };
 
@@ -267,7 +268,7 @@ namespace Isis {
        * @internal
        *   @history 2011-02-09 Steven Lambright - Original version.
        */
-      SpicePosition *InstrumentPosition() const {
+      SpicePosition *instrumentPosition() const {
         return p_instrumentPosition;
       };
 
@@ -278,7 +279,7 @@ namespace Isis {
        * @internal
        *   @history 2011-02-09 Steven Lambright - Original version.
        */
-      SpiceRotation *BodyRotation() const {
+      SpiceRotation *bodyRotation() const {
         return p_bodyRotation;
       };
 
@@ -289,17 +290,17 @@ namespace Isis {
        * @internal
        *   @history 2011-02-09 Steven Lambright - Original version.
        */
-      SpiceRotation *InstrumentRotation() const {
+      SpiceRotation *instrumentRotation() const {
         return p_instrumentRotation;
       };
 
-      bool HasKernels(Pvl &lab);
+      bool hasKernels(Pvl &lab);
 
-      SpiceInt NaifBodyCode() const;
-      SpiceInt NaifSpkCode() const;
-      SpiceInt NaifCkCode() const;
-      SpiceInt NaifIkCode() const;
-      SpiceInt NaifSclkCode() const;
+      SpiceInt naifBodyCode() const;
+      SpiceInt naifSpkCode() const;
+      SpiceInt naifCkCode() const;
+      SpiceInt naifIkCode() const;
+      SpiceInt naifSclkCode() const;
 
       PvlObject getStoredNaifKeywords() const;
 
@@ -340,10 +341,10 @@ namespace Isis {
 
 
     private:
-      void Init(Pvl &lab, bool noTables);
+      void init(Pvl &lab, bool noTables);
 
-      void Load(PvlKeyword &key, bool notab);
-      void ComputeSolarLongitude(iTime et);
+      void load(PvlKeyword &key, bool notab);
+      void computeSolarLongitude(iTime et);
 
       Longitude *p_solarLongitude; //!< Body rotation solar longitude value
       iTime *p_et; //!< Ephemeris time (read NAIF documentation for a detailed description)
@@ -369,7 +370,7 @@ namespace Isis {
       SpiceInt *p_bodyCode;    /**< The NaifBodyCode value, if it exists in the
                                     labels. Otherwise, if the target is sky,
                                     it's the SPK code and if not sky then it's
-                                    calculated by the NaifBodyCode() method.*/
+                                    calculated by the naifBodyCode() method.*/
       SpiceInt *p_spkCode;     //!< Spacecraft and planet ephemeris kernel (SPK) code
       SpiceInt *p_ckCode;      //!< Camera kernel (CK) code
       SpiceInt *p_ikCode;      //!< Instrument kernel (IK) code

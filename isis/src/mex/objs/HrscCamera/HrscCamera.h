@@ -41,7 +41,7 @@ namespace Isis {
    * @internal
    *   @history 2008-08-08 Steven Lambright Made the unit test work with a Sensor
    *            change. Also, now using the new LoadCache(...) method instead of
-   *            CreateCache(...). Increased the delta line/samp tolerance in the
+   *            createCache(...). Increased the delta line/samp tolerance in the
    *            unit test.
    *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
    *            inherit directly from Camera
@@ -49,6 +49,8 @@ namespace Isis {
    *            for new methods. Updated documentation. Removed Mex
    *            namespace wrap inside Isis namespace. Added Isis Disclaimer to
    *            files. Added NAIF error check to constructor.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    */
   class HrscCamera : public LineScanCamera {
     public:

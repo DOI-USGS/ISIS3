@@ -37,6 +37,8 @@ namespace Isis {
    *   @history 2012-02-28 Tracie Sucharski - Moved from the app, smtk,
    *                          directory, to the base/objs directory path.
    *                          Updated to new coding standards, added unitTest.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    */
   class Stereo  {
     public:

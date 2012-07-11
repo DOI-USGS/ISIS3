@@ -47,6 +47,8 @@ namespace Isis {
    *            results in Version = 2 of the LroNarrowAngleCamera as depicted
    *            in the Camera.plugin for both NAC-L and NAC-R.
    *   @history 2011-05-03 Jeannie Walldren - Removed Lro namespace wrap.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    */
   class LroNarrowAngleDistortionMap : public CameraDistortionMap {
     public:

@@ -41,7 +41,7 @@ namespace Isis {
   LroWideAngleCameraDistortionMap::LroWideAngleCameraDistortionMap(Camera *parent, int naifIkCode) : CameraDistortionMap(parent) {
     std::string odkkey = "INS" + Isis::iString(naifIkCode) + "_OD_K";
     for(int i = 0; i < 2; i++) {
-      p_odk.push_back(p_camera->GetDouble(odkkey, i));
+      p_odk.push_back(p_camera->getDouble(odkkey, i));
     }
   }
 

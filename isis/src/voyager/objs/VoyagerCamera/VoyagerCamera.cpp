@@ -119,7 +119,7 @@ namespace Isis {
     new CameraDetectorMap(this);
 
     // Setup focal plane map, and detector origin
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this,NaifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
     focalMap->SetDetectorOrigin(500.0, 500.0);
 
     // Master reseau location file
@@ -154,7 +154,7 @@ namespace Isis {
 
     // add half the exposure duration to the start time to get the center if the image
     iTime centerTime = shuttertimes.first.Et() + exposureDuration / 2.0;
-    SetTime(centerTime);
+    setTime(centerTime);
 
     LoadCache();
     NaifStatus::CheckErrors();

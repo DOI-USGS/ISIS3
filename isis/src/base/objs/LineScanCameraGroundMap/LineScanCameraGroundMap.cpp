@@ -66,8 +66,8 @@ class LineOffsetFunctor :
       double dx = 0.0, dy = 0.0;
 
       //verify the time is with the cache bounds
-      double startTime = m_camera->CacheStartTime().Et();
-      double endTime = m_camera->CacheEndTime().Et();
+      double startTime = m_camera->cacheStartTime().Et();
+      double endTime = m_camera->cacheEndTime().Et();
       //std::pair <double, double> cacheTimeBounds = m_camera->StartEndEphemerisTimes();
       if (et < startTime || et > endTime) {
         iString msg = "Ephemeris time passed to LineOffsetFunctor is not within the image "
@@ -75,7 +75,7 @@ class LineOffsetFunctor :
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
      
-      m_camera->Sensor::SetTime(et);
+      m_camera->Sensor::setTime(et);
  
       //set ground
       if (!m_camera->Sensor::SetGround(surfacePoint, false)) {
@@ -129,20 +129,20 @@ class SensorSurfacePointDistanceFunctor :
     double operator()(double et) {
       double s[3], p[3];
       //verify the time is with the cache bounds
-      double startTime = m_camera->CacheStartTime().Et();
-      double endTime = m_camera->CacheEndTime().Et();
+      double startTime = m_camera->cacheStartTime().Et();
+      double endTime = m_camera->cacheEndTime().Et();
       //std::pair <double, double> cacheTimeBounds = m_camera->StartEndEphemerisTimes();
       if (et < startTime || et > endTime) {
         iString msg = "Ephemeris time passed to SensorSurfacePointDistanceFunctor is not within the image "
                       "cache bounds";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
-      m_camera->Sensor::SetTime(et);
+      m_camera->Sensor::setTime(et);
       if(!m_camera->Sensor::SetGround(surfacePoint, false)) {
          iString msg = "Sensor::SetGround failed for surface point in LineScanCameraGroundMap.cpp"
                        "SensorSurfacePointDistanceFunctor";
       }
-      m_camera->InstrumentPosition(s);
+      m_camera->instrumentPosition(s);
       m_camera->Coordinate(p);
       return sqrt((s[0] - p[0]) * (s[0] - p[0]) +
                   (s[1] - p[1]) * (s[1] - p[1]) +
@@ -226,8 +226,8 @@ namespace Isis {
     double ux = 0.0, uy = 0.0;
     //double dx = 0.0, dy = 0.0;
     //double s[3], p[3];
-    const double cacheStart = p_camera->Spice::CacheStartTime().Et();
-    const double cacheEnd = p_camera->Spice::CacheEndTime().Et();
+    const double cacheStart = p_camera->Spice::cacheStartTime().Et();
+    const double cacheEnd = p_camera->Spice::cacheEndTime().Et();
     int j=0;   
 
     double lineRate = ((LineScanCameraDetectorMap *)p_camera->DetectorMap())->LineRate(); //line rate
@@ -243,8 +243,8 @@ namespace Isis {
     if (approxLine > 0) {  
       //convert the approxLine to an approximate time and offset
       p_camera->DetectorMap()->SetParent(p_camera->ParentSamples() / 2, approxLine);
-      approxTime = p_camera->Time().Et();
-      /*p_camera->Sensor::SetTime(approxTime);
+      approxTime = p_camera->time().Et();
+      /*p_camera->Sensor::setTime(approxTime);
       if(!p_camera->Sensor::SetGround(surfacePoint, false)) {
         return Failure;
       }
@@ -265,7 +265,7 @@ namespace Isis {
       approxOffset = offsetFunc(approxTime);
 
       if (fabs(approxOffset) < 1e-2) { //no need to iteratively improve this root, it's good enough
-        p_camera->Sensor::SetTime(approxTime);
+        p_camera->Sensor::setTime(approxTime);
         //check to make sure the point isn't behind the planet
         if(!p_camera->Sensor::SetGround(surfacePoint, true)) {
           return Failure;
@@ -289,7 +289,7 @@ namespace Isis {
 
       //starting offsets
       fh = approxOffset;  //the first is already calculated
-      /*p_camera->Sensor::SetTime(xl);
+      /*p_camera->Sensor::setTime(xl);
       if(!p_camera->Sensor::SetGround(surfacePoint, false)) {
         return Failure;
       }
@@ -321,7 +321,7 @@ namespace Isis {
         if (etGuess < cacheStart) etGuess = cacheStart;
         if (etGuess > cacheEnd) etGuess = cacheEnd;
 
-        /*p_camera->Sensor::SetTime(etGuess);
+        /*p_camera->Sensor::setTime(etGuess);
         if(!p_camera->Sensor::SetGround(surfacePoint, false)) {
           return Failure;
         }
@@ -357,7 +357,7 @@ namespace Isis {
         //See if we converged on the point so set up the undistorted
         //  focal plane values and return
         if(fabs(f) < 1e-2) {
-          p_camera->Sensor::SetTime(approxTime);
+          p_camera->Sensor::setTime(approxTime);
           //check to make sure the point isn't behind the planet
           if(!p_camera->Sensor::SetGround(surfacePoint, true)) {
             return Failure;
@@ -396,7 +396,7 @@ namespace Isis {
     double quadPoly[3],temp;
 
     for (int i=0;i<3;i++) {
-      /*p_camera->Sensor::SetTime(timeNodes[i]);
+      /*p_camera->Sensor::setTime(timeNodes[i]);
       if(!p_camera->Sensor::SetGround(surfacePoint, false)) {
         return Failure;
       }
@@ -479,11 +479,11 @@ namespace Isis {
 
 
     for (int i=0;i<root.size();i++) {  //Offset/dist calculation loop
-      /*p_camera->Sensor::SetTime(root[i]);
+      /*p_camera->Sensor::setTime(root[i]);
       if(!p_camera->Sensor::SetGround(surfacePoint, false)) {
         return Failure;
       }
-      p_camera->InstrumentPosition(s);
+      p_camera->instrumentPosition(s);
       p_camera->Coordinate(p);
       dist.push_back( sqrt((s[0] - p[0]) * (s[0] - p[0]) +
                            (s[1] - p[1]) * (s[1] - p[1]) +
@@ -514,7 +514,7 @@ namespace Isis {
     approxOffset = offset[j];  //the offsets are saved to avoid recalculating it later
 
     if (fabs(approxOffset) < 1e-2) { //no need to iteratively improve this root, it's good enough
-      p_camera->Sensor::SetTime(approxTime);
+      p_camera->Sensor::setTime(approxTime);
       //check to make sure the point isn't behind the planet
       if(!p_camera->Sensor::SetGround(surfacePoint, true)) {
         return Failure;
@@ -579,7 +579,7 @@ namespace Isis {
 
     //discard any roots that are looking through the planet
     for (int i = root.size()-1; i>=0; i--) {
-      p_camera->Sensor::SetTime(root[i]);
+      p_camera->Sensor::setTime(root[i]);
       //check to make sure the point isn't behind the planet
       if(!p_camera->Sensor::SetGround(surfacePoint, true)) {
         root.removeAt(i);
@@ -602,7 +602,7 @@ namespace Isis {
       if (dist[i] < dist[j]) j=i;
     }
 
-    p_camera->Sensor::SetTime(root[j]);
+    p_camera->Sensor::setTime(root[j]);
     //no need to make sure the point isn't behind the planet, it was done above
     p_camera->Sensor::LookDirection(lookC);
     ux = p_camera->FocalLength() * lookC[0] / lookC[2];

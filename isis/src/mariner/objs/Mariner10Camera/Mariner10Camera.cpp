@@ -58,8 +58,8 @@ namespace Isis {
     NaifStatus::CheckErrors();
 
     //  Turn off the aberration corrections for instrument position object
-    InstrumentPosition()->SetAberrationCorrection("NONE");
-    InstrumentRotation()->SetFrame(-76000);
+    instrumentPosition()->SetAberrationCorrection("NONE");
+    instrumentRotation()->SetFrame(-76000);
 
     // Set camera parameters
     SetFocalLength();
@@ -71,18 +71,18 @@ namespace Isis {
 
     iTime startTime;
     startTime.setUtc((string)inst["StartTime"]);
-    SetTime(startTime);
+    setTime(startTime);
 
     // Setup detector map
     new CameraDetectorMap(this);
 
     // Setup focal plane map, and detector origin
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
-    iString ikernKey = "INS" + iString((int)NaifIkCode()) + "_BORESIGHT_SAMPLE";
-    double sampleBoresight = GetDouble(ikernKey);
-    ikernKey = "INS" + iString((int)NaifIkCode()) + "_BORESIGHT_LINE";
-    double lineBoresight = GetDouble(ikernKey);
+    iString ikernKey = "INS" + iString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
+    double sampleBoresight = getDouble(ikernKey);
+    ikernKey = "INS" + iString((int)naifIkCode()) + "_BORESIGHT_LINE";
+    double lineBoresight = getDouble(ikernKey);
 
     focalMap->SetDetectorOrigin(sampleBoresight, lineBoresight);
 

@@ -90,29 +90,29 @@ namespace Isis {
     //  Determine filter number.  Only conditional code required for
     //  NAC and WAC support!
     int filterNumber(0);    //  Default appropriate for MDIS-NAC
-    if(NaifIkCode() == MdisWac) {
+    if(naifIkCode() == MdisWac) {
       PvlGroup &bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
       filterNumber = bandBin["Number"];
     }
 
     //  Set up instrument and filter code strings
-    iString ikCode((int) NaifIkCode());
-    int fnCode(NaifIkCode() - filterNumber);
+    iString ikCode((int) naifIkCode());
+    int fnCode(naifIkCode() - filterNumber);
     iString filterCode(fnCode);
     string ikernKey;
 
     // Fetch the frame translations from the instrument kernels
     ikernKey = "INS" + ikCode + "_REFERENCE_FRAME";
-    iString baseFrame = GetString(ikernKey);
+    iString baseFrame = getString(ikernKey);
 
     ikernKey = "INS" + filterCode + "_FRAME";
-    iString ikFrame = GetString(ikernKey);
+    iString ikFrame = getString(ikernKey);
 
     // Set up the camera info from ik/iak kernels
 
     //  Turns out (2008-01-17) the WAC has different focal lengths for
     // each filter.  Added to the instrument kernel (IAK) on this date.
-    double focalLength = GetDouble("INS" + filterCode + "_FOCAL_LENGTH");
+    double focalLength = getDouble("INS" + filterCode + "_FOCAL_LENGTH");
     SetFocalLength(focalLength);
 
     SetPixelPitch();
@@ -140,10 +140,10 @@ namespace Isis {
 
     //  Retrieve boresight location from instrument kernel (IK) (addendum?)
     ikernKey = "INS" + ikCode + "_BORESIGHT_SAMPLE";
-    double sampleBoreSight = GetDouble(ikernKey);
+    double sampleBoreSight = getDouble(ikernKey);
 
     ikernKey = "INS" + ikCode + "_BORESIGHT_LINE";
-    double lineBoreSight = GetDouble(ikernKey);
+    double lineBoreSight = getDouble(ikernKey);
 
     //  Apply the boresight
     focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
@@ -166,11 +166,11 @@ namespace Isis {
     //  apply them to the focal plane mapping.
     if(fpuBinMode == 1) {
       ikernKey = "INS" + ikCode + "_FPUBIN_START_SAMPLE";
-      double fpuStartingSample = GetDouble(ikernKey);
+      double fpuStartingSample = getDouble(ikernKey);
       detMap->SetStartingDetectorSample(fpuStartingSample);
 
       ikernKey = "INS" + ikCode + "_FPUBIN_START_LINE";
-      double fpuStartingLine = GetDouble(ikernKey);
+      double fpuStartingLine = getDouble(ikernKey);
       detMap->SetStartingDetectorLine(fpuStartingLine);
 
       summing *= 2;
@@ -213,7 +213,7 @@ namespace Isis {
     // creating the cache since all kernels are unloaded, essentially
     // clearing the pool and whacking the frames definitions, required to
     iTime centerTime = etStart + (exposureDuration / 2.0);
-    SetTime(centerTime);
+    setTime(centerTime);
     LoadCache();
     NaifStatus::CheckErrors();
   }

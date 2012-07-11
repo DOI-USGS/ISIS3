@@ -253,6 +253,9 @@
      <change name="Jeff Anderson" date="2012-04-30">
        Add forward and reverse patch rubbersheeting parameters.  
      </change>
+     <change name="Debbie A. Cook" date="2012-07-06">
+       Updated Spice members to be more compliant with Isis coding standards. References #972.
+     </change>
   </history>
 
   <oldName>

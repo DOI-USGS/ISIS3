@@ -42,11 +42,14 @@
         Added NothAzimuth, SubSolarAzimuth, and SpecialProcessingFlag keywords
          to the output mosaic group
     </change>
-    <change name="Rovert Sucharski" date="2007-10-18">
+    <change name="Robert Sucharski" date="2007-10-18">
       Added code to get the avg line and sample for gathering camera infomation if using the avg latitude and longitude fails.
       We contine to use the latitude and logitude so that we are backwards compatible.  We added this new code because 
       the camera could not find an itersect for some images (polar) if we used projection latitude and longitude to "setGround".
      </change>
+    <change name="Debbie A. Cook" date="2012-07-06">
+       Updated Spice members to be more compliant with Isis coding standards. References #972.
+    </change>
   </history>
 
   <groups>

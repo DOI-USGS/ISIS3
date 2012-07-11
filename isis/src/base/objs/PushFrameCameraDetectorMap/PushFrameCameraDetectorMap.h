@@ -45,6 +45,8 @@ namespace Isis {
    *   @history 2009-06-02 Steven Lambright Fixed framelet detection in the
    *            forward direction and inside framelet check in the reverse
    *            direction
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *            coding standards. References #972.
    */
   class PushFrameCameraDetectorMap : public CameraDetectorMap {
     public:

@@ -379,7 +379,7 @@ namespace Isis {
   double Camera::DetectorResolution() {
     if(HasSurfaceIntersection()) {
       double sB[3];
-      InstrumentPosition(sB);
+      instrumentPosition(sB);
       double pB[3];
       Coordinate(pB);
       double a = sB[0] - pB[0];
@@ -533,7 +533,7 @@ namespace Isis {
       // better resolution
       double lat, lon;
 
-      SubSpacecraftPoint(lat, lon);
+      subSpacecraftPoint(lat, lon);
       Latitude latitude(lat, Angle::Degrees);
       Longitude longitude(lon, Angle::Degrees);
       Distance radius(LocalRadius(latitude, longitude));
@@ -671,10 +671,10 @@ namespace Isis {
     GroundRangeResolution();
 
     // Get the default radii
-    Distance radii[3];
-    Radii(radii);
-    Distance &a = radii[0];
-    Distance &b = radii[2];
+    Distance localRadii[3];
+    radii(localRadii);
+    Distance &a = localRadii[0];
+    Distance &b = localRadii[2];
 
     // See if the PVL overrides the radii
     PvlGroup map = pvl.FindGroup("Mapping", Pvl::Traverse);
@@ -762,7 +762,7 @@ namespace Isis {
    */
   void Camera::BasicMapping(Pvl &pvl) {
     PvlGroup map("Mapping");
-    map += PvlKeyword("TargetName", Target());
+    map += PvlKeyword("TargetName", target());
     map += PvlKeyword("EquatorialRadius", p_radii[0].meters(), "meters");
     map += PvlKeyword("PolarRadius", p_radii[2].meters(), "meters");
     map += PvlKeyword("LatitudeType", "Planetocentric");
@@ -782,16 +782,16 @@ namespace Isis {
 
   //! Reads the focal length from the instrument kernel
   void Camera::SetFocalLength() {
-    int code = NaifIkCode();
+    int code = naifIkCode();
     string key = "INS" + iString(code) + "_FOCAL_LENGTH";
-    SetFocalLength(Spice::GetDouble(key));
+    SetFocalLength(Spice::getDouble(key));
   }
 
   //! Reads the Pixel Pitch from the instrument kernel
   void Camera::SetPixelPitch() {
-    int code = NaifIkCode();
+    int code = naifIkCode();
     string key = "INS" + iString(code) + "_PIXEL_PITCH";
-    SetPixelPitch(Spice::GetDouble(key));
+    SetPixelPitch(Spice::getDouble(key));
   }
 
   /**
@@ -1024,8 +1024,8 @@ namespace Isis {
 
     // get a normalized surface spacecraft vector
     SpiceDouble surfSpaceVect[3], unitizedSurfSpaceVect[3], dist;
-    std::vector<double> sB = BodyRotation()->ReferenceVector(
-        InstrumentPosition()->Coordinate());
+    std::vector<double> sB = bodyRotation()->ReferenceVector(
+        instrumentPosition()->Coordinate());
 
     SpiceDouble pB[3];
     pB[0] = p_surfacePoint->GetX().kilometers();
@@ -1293,7 +1293,7 @@ namespace Isis {
    */
   double Camera::SunAzimuth() {
     double lat, lon;
-    SubSolarPoint(lat, lon);
+    subSolarPoint(lat, lon);
     return ComputeAzimuth(LocalRadius(lat, lon), lat, lon);
   }
 
@@ -1306,7 +1306,7 @@ namespace Isis {
    */
   double Camera::SpacecraftAzimuth() {
     double lat, lon;
-    SubSpacecraftPoint(lat, lon);
+    subSpacecraftPoint(lat, lon);
     return ComputeAzimuth(LocalRadius(lat, lon), lat, lon);
   }
 
@@ -1496,7 +1496,7 @@ namespace Isis {
     // Get the xyz coordinates for the spacecraft and point we are interested in
     double coord[3], spCoord[3];
     Coordinate(coord);
-    InstrumentPosition(spCoord);
+    instrumentPosition(spCoord);
 
     // Get the angle between the 2 points and convert to degrees
     double a = vsep_c(coord, spCoord) * 180.0 / PI;
@@ -1670,7 +1670,7 @@ namespace Isis {
     if(tol < 0.0) {
       // Alternative calculation of ground resolution of a pixel/100
       double altitudeMeters;
-      if(IsSky()) {   // Use the unit sphere as the target
+      if(isSky()) {   // Use the unit sphere as the target
         altitudeMeters = 1.0;
       }
       else {
@@ -1681,10 +1681,10 @@ namespace Isis {
 
     p_ignoreProjection = projIgnored;
 
-    Spice::CreateCache(ephemerisTimes.first, ephemerisTimes.second,
+    Spice::createCache(ephemerisTimes.first, ephemerisTimes.second,
                        cacheSize, tol);
 
-    SetTime(ephemerisTimes.first);
+    setTime(ephemerisTimes.first);
 
     // Reset to band 1
     SetBand(1);
@@ -1699,12 +1699,12 @@ namespace Isis {
    * left and bottom right pixels in the image. The start time (shutter open
    * time) is the minimum value of those ephemeris times. The end time (shutter
    * close time) is the maximum value of those ephemeris times. This method must
-   * be called before a call to the Spice::CreateCache() method.  It is called
+   * be called before a call to the Spice::createCache() method.  It is called
    * in the LoadCache() method.
    *
    * @throw iException::Programmer - "Unable to find time range for the
    *             spice kernels."
-   * @see CreateCache()
+   * @see createCache()
    * @see LoadCache()
    *
    * @author 2011-02-02 Jeannie Walldren
@@ -1719,10 +1719,10 @@ namespace Isis {
     for(int band = 1; band <= Bands(); band++) {
       SetBand(band);
       SetImage(0.5, 0.5);
-      double etStart = Time().Et();
+      double etStart = time().Et();
       SetImage(p_alphaCube->BetaSamples() + 0.5,
                p_alphaCube->BetaLines() + 0.5);
-      double etEnd = Time().Et();
+      double etEnd = time().Et();
       if(band == 1) {
         startTime = min(etStart, etEnd);
         endTime = max(etStart, etEnd);
@@ -1743,10 +1743,10 @@ namespace Isis {
    * This method calculates the spice cache size. This method finds the number
    * of lines in the beta cube and adds 1, since we need at least 2 points for
    * interpolation. This method must be called before a call to the
-   * Spice::CreateCache() method.  It is called in the LoadCache() method.
+   * Spice::createCache() method.  It is called in the LoadCache() method.
    *
    * @throw iException::Programmer - "A cache has already been created."
-   * @see CreateCache()
+   * @see createCache()
    * @see LoadCache()
    *
    * @author 2011-02-02 Jeannie Walldren

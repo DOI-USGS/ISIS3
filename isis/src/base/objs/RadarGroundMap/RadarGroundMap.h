@@ -98,6 +98,8 @@ namespace Isis {
    *                      would be set to .25.
    *  @history 2012-04-11 Janet Barrett - Removed call to SetLookDirection from the SetGround
    *                      method.
+   *  @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                      coding standards. References #972.
    */
   class RadarGroundMap : public CameraGroundMap {
     public:

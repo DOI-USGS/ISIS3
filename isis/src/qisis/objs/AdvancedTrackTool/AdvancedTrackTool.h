@@ -63,6 +63,8 @@ namespace Isis {
    *                          the menu bar and a help dialog that displays when the
    *                          tool is opened the first time and when the user opens
    *                          it through the help menu. Fixes #772.
+   *  @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *           coding standards. References #972.
    */
   class AdvancedTrackTool : public Tool {
       Q_OBJECT

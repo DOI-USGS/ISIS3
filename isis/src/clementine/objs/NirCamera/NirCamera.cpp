@@ -94,12 +94,12 @@ namespace Isis {
     new CameraDetectorMap(this);
 
     // Setup focal plane map
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     focalMap->SetDetectorOrigin(
-      Spice::GetDouble("INS" + (iString)(int)NaifIkCode() + 
+      Spice::getDouble("INS" + (iString)(int)naifIkCode() + 
                        "_BORESIGHT_SAMPLE"),
-      Spice::GetDouble("INS" + (iString)(int)NaifIkCode() + 
+      Spice::getDouble("INS" + (iString)(int)naifIkCode() + 
                        "_BORESIGHT_LINE"));
 
     // Setup distortion map
@@ -109,7 +109,7 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    SetTime(centerTime);
+    setTime(centerTime);
     LoadCache();
     NaifStatus::CheckErrors();
   }

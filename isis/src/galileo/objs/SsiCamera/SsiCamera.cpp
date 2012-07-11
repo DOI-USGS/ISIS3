@@ -58,14 +58,14 @@ namespace Isis {
     * See "The Direction of the North Pole and the Control Network of Asteroid 951 Gaspra"  Icarus 107, 18-22 (1994)
     */
     if(imageDate < removeCoverDate) {
-      int code = NaifIkCode();
+      int code = naifIkCode();
       string key = "INS" + iString(code) + "_FOCAL_LENGTH_COVER";
-      SetFocalLength(Spice::GetDouble(key));
-      k1 = Spice::GetDouble("INS" + (iString)(int)NaifIkCode() + "_K1_COVER");
+      SetFocalLength(Spice::getDouble(key));
+      k1 = Spice::getDouble("INS" + (iString)(int)naifIkCode() + "_K1_COVER");
     }
     else {
       SetFocalLength();
-      k1 = Spice::GetDouble("INS" + (iString)(int)NaifIkCode() + "_K1");
+      k1 = Spice::getDouble("INS" + (iString)(int)naifIkCode() + "_K1");
     }
 
     SetPixelPitch();
@@ -89,12 +89,12 @@ namespace Isis {
     detectorMap->SetDetectorLineSumming(sumMode);
 
     // Setup focal plane map
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     focalMap->SetDetectorOrigin(
-      Spice::GetDouble("INS" + (iString)(int)NaifIkCode() + 
+      Spice::getDouble("INS" + (iString)(int)naifIkCode() + 
                        "_BORESIGHT_SAMPLE"),
-      Spice::GetDouble("INS" + (iString)(int)NaifIkCode() + 
+      Spice::getDouble("INS" + (iString)(int)naifIkCode() + 
                        "_BORESIGHT_LINE"));
 
     // Setup distortion map
@@ -104,7 +104,7 @@ namespace Isis {
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    SetTime(et);
+    setTime(et);
     LoadCache();
     NaifStatus::CheckErrors();
   }

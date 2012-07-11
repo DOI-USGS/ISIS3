@@ -52,6 +52,8 @@ class PvlObject;
  *  
  * @author 2011-02-12 Kris Becker 
  * @internal 
+ *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+ *                          coding standards. References #972.
  * 
  */
 class SpkSegment : public SpiceSegment {

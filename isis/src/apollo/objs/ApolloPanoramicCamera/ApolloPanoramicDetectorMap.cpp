@@ -10,11 +10,11 @@ namespace Isis {
     {
       //given a detector coordinate and a time (read from the 'parent' camera class) set the image coordinates
       //save the detector coordinates
-      p_detectorLine = line;  //(p_camera->Time().Et() - p_etMiddle)/p_lineRate + line;
+      p_detectorLine = line;  //(p_camera->time().Et() - p_etMiddle)/p_lineRate + line;
       p_detectorSample = sample;
 
       //convert from detector to fiducial coordinants
-      double fidL = (p_camera->Time().Et() - p_etMiddle)/p_lineRate + line;
+      double fidL = (p_camera->time().Et() - p_etMiddle)/p_lineRate + line;
       //double fidS = sample;  //conversion is identity so it is skiped
 
       //convert from fiducial coordinates to parent image coordinates
@@ -33,7 +33,7 @@ namespace Isis {
       io.machine2image(sample,line,&p_detectorSample,&p_detectorLine);
       //convert from fiducial coordinates to detector/time coordinates
       iTime isisTime(p_etMiddle + p_detectorLine*p_lineRate);
-      p_camera->SetTime(isisTime);
+      p_camera->setTime(isisTime);
       p_detectorLine = 0.0;  //This declaration may cause some debate.  Regardless it seems to that that since we model the motion of the camera as continuous smooth motion (not some discretely defined series of 1 pixel or 1 mm wide 'push-frames'), and we calculate the positions, pointings, etc at the specific time implied by the sub-pixel/mm line then the line in the dector will always be the same (in this case zero)
 
       return true;

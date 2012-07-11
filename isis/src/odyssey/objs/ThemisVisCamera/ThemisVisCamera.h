@@ -67,6 +67,8 @@ namespace Isis {
    *                                          namespace wrap. Added Isis
    *                                          Disclaimer to files. Updated
    *                                          unitTest to test for new methods.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    */
   class ThemisVisCamera : public PushFrameCamera {
     public:

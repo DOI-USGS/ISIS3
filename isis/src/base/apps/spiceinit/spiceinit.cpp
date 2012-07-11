@@ -340,7 +340,7 @@ bool TryKernels(Cube *icube, Process &p,
     }
 
     if (ui.GetBoolean("ATTACH")) {
-      Table ckTable = cam->InstrumentRotation()->Cache("InstrumentPointing");
+      Table ckTable = cam->instrumentRotation()->Cache("InstrumentPointing");
       ckTable.Label() += PvlKeyword("Description", "Created by spiceinit");
       ckTable.Label() += PvlKeyword("Kernels");
 
@@ -349,7 +349,7 @@ bool TryKernels(Cube *icube, Process &p,
 
       icube->write(ckTable);
 
-      Table spkTable = cam->InstrumentPosition()->Cache("InstrumentPosition");
+      Table spkTable = cam->instrumentPosition()->Cache("InstrumentPosition");
       spkTable.Label() += PvlKeyword("Description", "Created by spiceinit");
       spkTable.Label() += PvlKeyword("Kernels");
       for (int i = 0; i < spkKeyword.Size(); i++)
@@ -357,7 +357,7 @@ bool TryKernels(Cube *icube, Process &p,
 
       icube->write(spkTable);
 
-      Table bodyTable = cam->BodyRotation()->Cache("BodyRotation");
+      Table bodyTable = cam->bodyRotation()->Cache("BodyRotation");
       bodyTable.Label() += PvlKeyword("Description", "Created by spiceinit");
       bodyTable.Label() += PvlKeyword("Kernels");
       for (int i = 0; i < targetSpkKeyword.Size(); i++)
@@ -367,10 +367,10 @@ bool TryKernels(Cube *icube, Process &p,
         bodyTable.Label()["Kernels"].AddValue(pckKeyword[i]);
 
       bodyTable.Label() += PvlKeyword("SolarLongitude",
-          cam->SolarLongitude().degrees());
+          cam->solarLongitude().degrees());
       icube->write(bodyTable);
 
-      Table sunTable = cam->SunPosition()->Cache("SunPosition");
+      Table sunTable = cam->sunPosition()->Cache("SunPosition");
       sunTable.Label() += PvlKeyword("Description", "Created by spiceinit");
       sunTable.Label() += PvlKeyword("Kernels");
       for (int i = 0; i < targetSpkKeyword.Size(); i++)

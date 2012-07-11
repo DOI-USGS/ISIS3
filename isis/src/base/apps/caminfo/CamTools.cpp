@@ -167,7 +167,7 @@ namespace Isis {
     //  Compute average planetary radius in meters.  This is used as a fallback
     //  to compute surface area if no geoemetry has a center intersect point.
     Distance radii[3];
-    camera.Radii(radii);
+    camera.radii(radii);
     _radius = ((radii[0] + radii[1] + radii[2]) / 3.0).meters();
 
     double cLine = _nLines;
@@ -190,11 +190,11 @@ namespace Isis {
       g.realBand = cube.getPhysicalBand(band + 1);
 
 
-      g.target = camera.Target();
+      g.target = camera.target();
 
-      iTime t1(camera.CacheStartTime());
+      iTime t1(camera.cacheStartTime());
       g.startTime = t1.UTC();
-      iTime t2(camera.CacheEndTime());
+      iTime t2(camera.cacheEndTime());
       g.endTime = t2.UTC();
 
       g.centerLine = centerLine;
@@ -213,21 +213,21 @@ namespace Isis {
         g.sampRes = camera.SampleResolution();
         g.lineRes = camera.LineResolution();
 
-        g.solarLongitude = camera.SolarLongitude().degrees();
+        g.solarLongitude = camera.solarLongitude().degrees();
         g.northAzimuth = camera.NorthAzimuth();
         g.offNader = camera.OffNadirAngle();
         g.subSolarAzimuth = camera.SunAzimuth();
         g.subSpacecraftAzimuth = camera.SpacecraftAzimuth();
         g.localSolartime = camera.LocalSolarTime();
-        g.targetCenterDistance = camera.TargetCenterDistance();
+        g.targetCenterDistance = camera.targetCenterDistance();
         g.slantDistance = camera.SlantDistance();
 
-        camera.SubSolarPoint(g.subSolarLatitude, g.subSolarLongitude);
+        camera.subSolarPoint(g.subSolarLatitude, g.subSolarLongitude);
         g.subSolarGroundAzimuth = camera.GroundAzimuth(g.centerLatitude,
                                   g.centerLongitude,
                                   g.subSolarLatitude,
                                   g.subSolarLongitude);
-        camera.SubSpacecraftPoint(g.subSpacecraftLatitude, g.subSpacecraftLongitude);
+        camera.subSpacecraftPoint(g.subSpacecraftLatitude, g.subSpacecraftLongitude);
         g.subSpacecraftGroundAzimuth = camera.GroundAzimuth(g.centerLatitude,
                                        g.centerLongitude,
                                        g.subSpacecraftLatitude,

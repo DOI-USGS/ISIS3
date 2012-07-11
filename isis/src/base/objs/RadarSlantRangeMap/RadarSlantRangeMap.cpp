@@ -65,7 +65,7 @@ namespace Isis {
     p_focalPlaneX = dx;  // dx is a ground range distance in meters
     p_focalPlaneY = dy;  // dy is Doppler shift in htz and should always be 0
 
-    if(p_et != p_camera->Time().Et()) ComputeA();
+    if(p_et != p_camera->time().Et()) ComputeA();
     double slantRange = p_a[0] + p_a[1] * dx + p_a[2] * dx * dx + p_a[3] * dx * dx * dx; // meters
 
     p_camera->SetFocalLength(slantRange);
@@ -83,7 +83,7 @@ namespace Isis {
     p_undistortedFocalPlaneX = ux * p_rangeSigma;    // ux converts to slant range in meters
     p_undistortedFocalPlaneY = uy * p_dopplerSigma;  // uy converts to Doppler shift in htz and should always be 0
 
-    if(p_et != p_camera->Time().Et()) ComputeA();
+    if(p_et != p_camera->time().Et()) ComputeA();
 
     // Evaluate the ground range at the 2 extremes of the image
     double slant = p_undistortedFocalPlaneX;
@@ -219,7 +219,7 @@ namespace Isis {
    *  ephemeris time to the current ephemeris time.
    */
   void RadarSlantRangeMap::ComputeA() {
-    double currentEt = p_camera->Time().Et();
+    double currentEt = p_camera->time().Et();
 
     std::vector<double>::iterator pos = lower_bound(p_time.begin(), p_time.end(), currentEt);
 

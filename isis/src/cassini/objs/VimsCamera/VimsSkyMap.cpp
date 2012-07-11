@@ -101,9 +101,9 @@ namespace Isis {
     // Set up correct limits for unit vector file,  calculate offsets and
     //  Read unit vectors.
     //-----------------------------------------------------------------------
-    //int code = NaifIkCode();
+    //int code = naifIkCode();
     //string key = "INS" + iString(code) + "_UNIT_VECTORS";
-    //FileName vectorFile(Spice::GetString(key,0));
+    //FileName vectorFile(Spice::getString(key,0));
     //tack on _HR or _NY for other summing modes.
     // Get the directory for the unit vector files.
     PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
@@ -222,7 +222,7 @@ namespace Isis {
       if(p_channel == "VIS") {
         double et = ((double)p_etStart + (((p_irExp * p_swathWidth) - p_visExp) / 2.)) +
                     ((line + 0.5) * p_visExp);
-        p_camera->SetTime(et);
+        p_camera->setTime(et);
       }
 
       for(int samp = 0; samp < p_camera->ParentSamples(); samp++) {
@@ -230,7 +230,7 @@ namespace Isis {
           double et = (double)p_etStart +
                       (line * p_camera->ParentSamples() * p_irExp) +
                       (line * p_interlineDelay) + ((samp + 0.5) * p_irExp);
-          p_camera->SetTime(et);
+          p_camera->setTime(et);
         }
 
         p_camera->SetImage((double) samp + 1, (double)line + 1);
@@ -286,7 +286,7 @@ namespace Isis {
            (imgLine * p_camera->ParentSamples() * p_irExp) +
            (imgLine * p_interlineDelay) + ((imgSamp + 0.5) * p_irExp);
     }
-    p_camera->SetTime(et);
+    p_camera->setTime(et);
 
     // Make sure line/samp fall within unitVector ,if not return false???
     int uvLine = imgLine + p_camLineOffset;

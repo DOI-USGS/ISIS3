@@ -90,7 +90,7 @@ namespace Isis {
     // The focal plane map tells us how to go from detector position
     // to focal plane x/y (distorted).  That is, (sample,time) to (x,y).
     // This is band dependent so it will change in SetBand
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     // The boresight sample in the K-T model was 164.25.  In Duxbury's it is
     // 160.5 or half the detector width.  The detector offset varies by band

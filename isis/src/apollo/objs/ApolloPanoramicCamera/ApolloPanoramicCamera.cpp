@@ -25,17 +25,17 @@ namespace Isis {
               multiplicativeLineTimeError = 0.0;
 
       //following keywords in InstrumentAddendum file
-      iString ikernKey = "INS" + iString((int)NaifIkCode()) + "_CONSTANT_TIME_OFFSET";
-      constantTimeOffset = GetDouble(ikernKey);
+      iString ikernKey = "INS" + iString((int)naifIkCode()) + "_CONSTANT_TIME_OFFSET";
+      constantTimeOffset = getDouble(ikernKey);
 
-      ikernKey = "INS" + iString((int)NaifIkCode()) + "_ADDITIONAL_PREROLL";
-      additionalPreroll = GetDouble(ikernKey);
+      ikernKey = "INS" + iString((int)naifIkCode()) + "_ADDITIONAL_PREROLL";
+      additionalPreroll = getDouble(ikernKey);
 
-      ikernKey = "INS" + iString((int)NaifIkCode()) + "_ADDITIVE_LINE_ERROR";
-      additiveLineTimeError = GetDouble(ikernKey);
+      ikernKey = "INS" + iString((int)naifIkCode()) + "_ADDITIVE_LINE_ERROR";
+      additiveLineTimeError = getDouble(ikernKey);
 
-      ikernKey = "INS" + iString((int)NaifIkCode()) + "_MULTIPLI_LINE_ERROR";
-      multiplicativeLineTimeError = GetDouble(ikernKey);
+      ikernKey = "INS" + iString((int)naifIkCode()) + "_MULTIPLI_LINE_ERROR";
+      multiplicativeLineTimeError = getDouble(ikernKey);
  
       Isis::PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
       iString stime = (string)inst["StartTime"];  
@@ -56,7 +56,7 @@ namespace Isis {
       etStart += additionalPreroll * lineRate;
       etStart += constantTimeOffset;
 
-      SetTime(isisTime);
+      setTime(isisTime);
 
       // Setup detector map
       ApolloPanoramicDetectorMap *detectorMap = new ApolloPanoramicDetectorMap((Camera *)this,(etStart+etStop)/2.0,(double) lineRate, &lab);  //note (etStart+etStop)/2.0 is the time in the middle of image ( line = 0 after interior orientation)
@@ -68,12 +68,12 @@ namespace Isis {
       CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, (int) kernel["NaifFrameCode"]);  
 
       //  Retrieve boresight location from instrument kernel (IK) (addendum?)
-      //ikernKey = "INS" + iString((int)NaifIkCode()) + "_BORESIGHT_SAMPLE";
-      //double sampleBoreSight = GetDouble(ikernKey);
+      //ikernKey = "INS" + iString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
+      //double sampleBoreSight = getDouble(ikernKey);
       double sampleBoreSight = 0.0;  //Presently no NAIF keywords for this sensor
 
-      //ikernKey = "INS" + iString((int)NaifIkCode()) + "_BORESIGHT_LINE";
-      //double lineBoreSight = GetDouble(ikernKey);
+      //ikernKey = "INS" + iString((int)naifIkCode()) + "_BORESIGHT_LINE";
+      //double lineBoreSight = getDouble(ikernKey);
       double lineBoreSight = 0.0;  //Presently no NAIF keywords for this sensor
 
       focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
@@ -81,7 +81,7 @@ namespace Isis {
 
       // Setup distortion map
       new CameraDistortionMap(this,-1.0);
-      //distMap->SetDistortion(NaifIkCode());    Presently no NAIF keywords for this sensor
+      //distMap->SetDistortion(naifIkCode());    Presently no NAIF keywords for this sensor
 
       //Setup the ground and sky map
       new LineScanCameraGroundMap(this);

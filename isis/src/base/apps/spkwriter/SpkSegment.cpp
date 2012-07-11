@@ -106,20 +106,20 @@ void SpkSegment::import(Cube &cube) {
     _refFrame = getNaifName(camera->SpkReferenceId());
 #else
     // This probably covers 95% of the missions - really needs the pure methods
-    _body = camera->NaifSpkCode();
-    _center = camera->NaifBodyCode();
+    _body = camera->naifSpkCode();
+    _center = camera->naifBodyCode();
     _refFrame = getNaifName(1);
 #endif
     _bodyFrame = getNaifName(_body);
     _centerFrame = getNaifName(_center);
 
     //  Get the SPICE data
-//       spkCache = camera->InstrumentPosition()->LineCache("SpkSegment");
-      Table spkCache = camera->InstrumentPosition()->LoadHermiteCache("SpkSegment");
+//       spkCache = camera->instrumentPosition()->LineCache("SpkSegment");
+      Table spkCache = camera->instrumentPosition()->LoadHermiteCache("SpkSegment");
     getStates(*camera, load(spkCache), _states, _epochs, _hasVV);
 
       // Save current time
-    SpicePosition *ipos(camera->InstrumentPosition());
+    SpicePosition *ipos(camera->instrumentPosition());
     double currentTime = ipos->EphemerisTime();
 
 
@@ -408,14 +408,14 @@ SpkSegment::SMatrix SpkSegment::load(Table &table) {
 SpkSegment::SVector SpkSegment::adjustTimes(Camera &camera,
                                             const SVector &epochs) const {
 
-  SpiceInt observer = camera.NaifSpkCode();
+  SpiceInt observer = camera.naifSpkCode();
 
   // Don't adjust the following spacecraft:
   SpiceInt LunarOrbiter(-533), Mariner10(-76);
   if (observer == LunarOrbiter) return (epochs);
   if (observer == Mariner10)    return (epochs);
 
-  SpiceInt target   = camera.NaifBodyCode();
+  SpiceInt target   = camera.naifBodyCode();
   SVector ltEpochs(epochs.dim1());
   for ( int i = 0 ; i < epochs.dim1() ; i++ ) {
     SpiceDouble lt;

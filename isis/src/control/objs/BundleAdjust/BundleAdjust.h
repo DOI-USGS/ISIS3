@@ -141,6 +141,8 @@ namespace Isis {
    *                          jigsaw interface.
    *   @history 2012-03-26 Orrin Thomas, added maximum likelihood capabilities
    *   @history 2012-05-21 Debbie A. Cook, Added initialization of m_dRejectionMultiplier
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    */
   class BundleAdjust {
     public:

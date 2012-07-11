@@ -45,13 +45,13 @@ namespace Isis {
     NaifStatus::CheckErrors();
     PvlGroup bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
     // Get the camera characteristics
-    iString key = string("INS" + (iString)(int)NaifIkCode() + "_") + (string)bandBin["FilterName"] + "_FOCAL_LENGTH";
+    iString key = string("INS" + (iString)(int)naifIkCode() + "_") + (string)bandBin["FilterName"] + "_FOCAL_LENGTH";
     key = key.Convert("/", '_');
-    double focalLength = Spice::GetDouble(key);
+    double focalLength = Spice::getDouble(key);
 
     SetFocalLength(focalLength);
     SetPixelPitch();
-    InstrumentRotation()->SetFrame(Spice::GetInteger("INS_" + (iString)(int)NaifIkCode() + "_FRAME_ID"));
+    instrumentRotation()->SetFrame(Spice::getInteger("INS_" + (iString)(int)naifIkCode() + "_FRAME_ID"));
 
     // Get the start time in et
     PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
@@ -72,20 +72,20 @@ namespace Isis {
     detectorMap->SetDetectorSampleSumming(summingMode);
 
     // Setup focal plane map
-    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, NaifIkCode());
+    CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
-    focalMap->SetDetectorOrigin(Spice::GetDouble("INS" + (iString)(int)NaifIkCode() + "_BORESIGHT_SAMPLE"),
-                                Spice::GetDouble("INS" + (iString)(int)NaifIkCode() + "_BORESIGHT_LINE"));
+    focalMap->SetDetectorOrigin(Spice::getDouble("INS" + (iString)(int)naifIkCode() + "_BORESIGHT_SAMPLE"),
+                                Spice::getDouble("INS" + (iString)(int)naifIkCode() + "_BORESIGHT_LINE"));
 
     // Setup distortion map
-    double k1 = Spice::GetDouble("INS" + (iString)(int)NaifIkCode() + "_K1");
+    double k1 = Spice::getDouble("INS" + (iString)(int)naifIkCode() + "_K1");
     new RadialDistortionMap(this, k1);
 
     // Setup the ground and sky map
     new CameraGroundMap(this);
     new CameraSkyMap(this);
 
-    SetTime(centerTime);
+    setTime(centerTime);
     LoadCache();
     NaifStatus::CheckErrors();
   }

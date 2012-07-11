@@ -35,6 +35,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2012-06-14 Orrin Thomas - original version
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
    */
   class KaguyaMiCamera : public LineScanCamera {
     public:

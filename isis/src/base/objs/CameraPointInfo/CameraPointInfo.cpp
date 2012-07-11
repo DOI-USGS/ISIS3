@@ -269,9 +269,9 @@ namespace Isis {
       gp->FindKeyword("FileName").SetValue(currentCube->getFileName());
       gp->FindKeyword("Sample").SetValue(camera->Sample());
       gp->FindKeyword("Line").SetValue(camera->Line());
-      gp->FindKeyword("EphemerisTime").SetValue(camera->Time().Et(), "seconds");
+      gp->FindKeyword("EphemerisTime").SetValue(camera->time().Et(), "seconds");
       gp->FindKeyword("EphemerisTime").AddComment("Time");
-      string utc = camera->Time().UTC();
+      string utc = camera->time().UTC();
       gp->FindKeyword("UTC").SetValue(utc);
       gp->FindKeyword("SpacecraftPosition").AddComment("Spacecraft Information");
       gp->FindKeyword("SunPosition").AddComment("Sun Information");
@@ -302,7 +302,7 @@ namespace Isis {
 
         // Convert lat to planetographic
         Distance radii[3];
-        camera->Radii(radii);
+        camera->radii(radii);
         oglat = Isis::Projection::ToPlanetographic(camera->UniversalLatitude(),
                 radii[0].kilometers(), radii[2].kilometers());
         gp->FindKeyword("PlanetographicLatitude").SetValue(oglat);
@@ -333,7 +333,7 @@ namespace Isis {
         gp->FindKeyword("SampleResolution").SetValue(camera->SampleResolution(), "meters/pixel");
         gp->FindKeyword("LineResolution").SetValue(camera->LineResolution(), "meters/pixel");
 
-        camera->InstrumentPosition(spB);
+        camera->instrumentPosition(spB);
         gp->FindKeyword("SpacecraftPosition").AddValue(spB[0], "km");
         gp->FindKeyword("SpacecraftPosition").AddValue(spB[1], "km");
         gp->FindKeyword("SpacecraftPosition").AddValue(spB[2], "km");
@@ -341,8 +341,8 @@ namespace Isis {
 
         gp->FindKeyword("SpacecraftAzimuth").SetValue(camera->SpacecraftAzimuth());
         gp->FindKeyword("SlantDistance").SetValue(camera->SlantDistance(), "km");
-        gp->FindKeyword("TargetCenterDistance").SetValue(camera->TargetCenterDistance(), "km");
-        camera->SubSpacecraftPoint(ssplat, ssplon);
+        gp->FindKeyword("TargetCenterDistance").SetValue(camera->targetCenterDistance(), "km");
+        camera->subSpacecraftPoint(ssplat, ssplon);
         gp->FindKeyword("SubSpacecraftLatitude").SetValue(ssplat);
         gp->FindKeyword("SubSpacecraftLongitude").SetValue(ssplon);
         gp->FindKeyword("SpacecraftAltitude").SetValue(camera->SpacecraftAltitude(), "km");
@@ -352,7 +352,7 @@ namespace Isis {
                                             ssplat, ssplon);
         gp->FindKeyword("SubSpacecraftGroundAzimuth").SetValue(subspcgrdaz);
 
-        camera->SunPosition(sB);
+        camera->sunPosition(sB);
         gp->FindKeyword("SunPosition").AddValue(sB[0], "km");
         gp->FindKeyword("SunPosition").AddValue(sB[1], "km");
         gp->FindKeyword("SunPosition").AddValue(sB[2], "km");
@@ -360,7 +360,7 @@ namespace Isis {
 
         gp->FindKeyword("SubSolarAzimuth").SetValue(camera->SunAzimuth());
         gp->FindKeyword("SolarDistance").SetValue(camera->SolarDistance(), "AU");
-        camera->SubSolarPoint(sslat, sslon);
+        camera->subSolarPoint(sslat, sslon);
         gp->FindKeyword("SubSolarLatitude").SetValue(sslat);
         gp->FindKeyword("SubSolarLongitude").SetValue(sslon);
         double subsolgrdaz;
@@ -374,12 +374,12 @@ namespace Isis {
         gp->FindKeyword("Emission").SetValue(camera->EmissionAngle());
         gp->FindKeyword("NorthAzimuth").SetValue(camera->NorthAzimuth());
 
-        gp->FindKeyword("EphemerisTime").SetValue(camera->Time().Et(), "seconds");
+        gp->FindKeyword("EphemerisTime").SetValue(camera->time().Et(), "seconds");
         gp->FindKeyword("EphemerisTime").AddComment("Time");
-        utc = camera->Time().UTC();
+        utc = camera->time().UTC();
         gp->FindKeyword("UTC").SetValue(utc);
         gp->FindKeyword("LocalSolarTime").SetValue(camera->LocalSolarTime(), "hour");
-        gp->FindKeyword("SolarLongitude").SetValue(camera->SolarLongitude().degrees());
+        gp->FindKeyword("SolarLongitude").SetValue(camera->solarLongitude().degrees());
         if(allowErrors) gp->FindKeyword("Error").SetValue("N/A");
       }
     }

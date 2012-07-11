@@ -54,7 +54,7 @@ int main(void) {
     Pvl p("$ISIS3TESTDATA/isis/src/dawn/objs/DawnVirCamera/VIR_VIS_1B_1_362681635_1.cub");
     DawnVirCamera *cam = (DawnVirCamera *) CameraFactory::Create(p);
     cout << "FileName: " << FileName(p.FileName()).name() << endl;
-    cout << "CK Frame: " << cam->InstrumentRotation()->Frame() << endl << endl;
+    cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
     cout.setf(std::ios::fixed);
     cout << setprecision(9);
 
