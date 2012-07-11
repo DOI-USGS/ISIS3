@@ -233,8 +233,9 @@ namespace Isis {
 
     //if DBL_MAX's weren't changed there's a problem
     if (max <= min) {
-      string msg = "The net file appears to have 1 or fewer measures, thus no histogram can be formed";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
+      string msg = "The net file appears to have 1 or fewer measures with residual data, "
+                   "thus no histogram for this net file can be created;";
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     //set up the histogram ranges

@@ -89,22 +89,38 @@ void IsisMain() {
   //loop throught the control nets writing reports and drawing histograms as needed
   for (int i=0;i<fList.size();i++) {  
     ControlNet net(fList[i].toString(),&progress);
+    Histogram *hist;
     // Setup the histogram
-    Histogram hist(net, &ControlMeasure::GetResidualMagnitude, ui.GetDouble("BIN_WIDTH"));
+    try {
+      hist = new Histogram(net, &ControlMeasure::GetResidualMagnitude, ui.GetDouble("BIN_WIDTH"));
+    }
+    catch (IException &e) {
+      string msg = "The follwoing error was thrown while building a histogram from netfile [" + 
+                    fList[i].expanded() + "]: " +e.toString() + "\n";
+      if (ui.IsInteractive())  //if in gui mode print the error message to the terminal
+        Application::GuiLog(msg);
+      if (ui.WasEntered("TO")) //add the msg to the output file if there is one
+        fout << msg << endl << endl << endl;
+
+      Application::Log(e.toPvl().FindGroup("Error"));
+      Application::Log(IException(IException::User,msg, _FILEINFO_).toPvl().FindGroup("Error"));
+
+      continue; //skip to the next next net file
+    }
        
 
     //Tabular Histogram Data 
     if(!ui.IsInteractive() || ui.WasEntered("TO")) {
       fout << "Network:        " << fList[i].toString() << endl;
-      fout << "Average:        " << hist.Average() << endl;
-      fout << "Std Deviation:  " << hist.StandardDeviation() << endl;
-      fout << "Variance:       " << hist.Variance() << endl;
-      fout << "Median:         " << hist.Median() << endl;
-      fout << "Mode:           " << hist.Mode() << endl;
-      fout << "Skew:           " << hist.Skew() << endl;
-      fout << "Minimum:        " << hist.Minimum() << endl;
-      fout << "Maximum:        " << hist.Maximum() << endl;
-      fout << "Total Measures: " << hist.TotalPixels() << endl;
+      fout << "Average:        " << hist->Average() << endl;
+      fout << "Std Deviation:  " << hist->StandardDeviation() << endl;
+      fout << "Variance:       " << hist->Variance() << endl;
+      fout << "Median:         " << hist->Median() << endl;
+      fout << "Mode:           " << hist->Mode() << endl;
+      fout << "Skew:           " << hist->Skew() << endl;
+      fout << "Minimum:        " << hist->Minimum() << endl;
+      fout << "Maximum:        " << hist->Maximum() << endl;
+      fout << "Total Measures: " << hist->TotalPixels() << endl;
         
       //  Write histogram in tabular format
       fout << endl;
@@ -113,14 +129,14 @@ void IsisMain() {
       Isis::BigInt total = 0;
       double cumpct = 0.0;
 
-      for(int j = 0; j < hist.Bins(); j++) {
-        if(hist.BinCount(j) > 0) {
-          total += hist.BinCount(j);
-          double pct = (double)hist.BinCount(j) / hist.ValidPixels() * 100.;
+      for(int j = 0; j < hist->Bins(); j++) {
+        if(hist->BinCount(j) > 0) {
+          total += hist->BinCount(j);
+          double pct = (double)hist->BinCount(j) / hist->ValidPixels() * 100.;
           cumpct += pct;
     
-          fout << hist.BinMiddle(j) << ",";
-          fout << hist.BinCount(j) << ",";
+          fout << hist->BinMiddle(j) << ",";
+          fout << hist->BinCount(j) << ",";
           fout << total << ",";
           fout << pct << ",";
           fout << cumpct << endl;
@@ -136,9 +152,9 @@ void IsisMain() {
     if(ui.IsInteractive()) {
       //Transfer data from histogram to the plotcurve
       QVector<QPointF> binCountData;
-      for(int j = 0; j < hist.Bins(); j++) {
-        if(hist.BinCount(j) > 0) {
-          binCountData.append(QPointF(hist.BinMiddle(j), hist.BinCount(j)));
+      for(int j = 0; j < hist->Bins(); j++) {
+        if(hist->BinCount(j) > 0) {
+          binCountData.append(QPointF(hist->BinMiddle(j), hist->BinCount(j)));
         }
       }
 
@@ -161,6 +177,7 @@ void IsisMain() {
 
       plot->add(histCurve);
     }
+    delete hist;
   }
   if (ui.IsInteractive()) plot->showWindow();
   if (!ui.IsInteractive() || ui.WasEntered("TO")) fout.close();
