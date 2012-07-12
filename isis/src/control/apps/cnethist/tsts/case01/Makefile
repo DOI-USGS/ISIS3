@@ -10,7 +10,9 @@ commands:
 	$(LS)  $(OUTPUT)/*autoseed*.net >> $(OUTPUT)/net.lis;
 	$(APPNAME) clist=$(OUTPUT)/net.lis \
 	to=hist.txt \
-	bin_width = 0.1 >& $(OUTPUT)/error.txt;
+	bin_width = 0.1 >& $(OUTPUT)/temp.txt;
+	cat $(OUTPUT)/temp.txt | grep -v "Processed" | grep -v "Loading Control Points" \
+		| grep -v "Program" > $(OUTPUT)/error.txt;
 	cat hist.txt  \
 	  | sed 's/\/[^,]*\/\([^,\/]*\.net\)/\1/g' \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
@@ -22,4 +24,5 @@ commands:
 	# 4. remove date and time
 	$(RM) $(OUTPUT)/*.net > /dev/null;
 	$(RM) $(OUTPUT)/*.lis > /dev/null;
+	$(RM) $(OUTPUT)/temp.txt > /dev/null;
 	$(RM) hist.txt > /dev/null;
