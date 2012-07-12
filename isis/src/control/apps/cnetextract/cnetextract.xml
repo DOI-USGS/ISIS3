@@ -45,24 +45,30 @@
       <strong>Cube Filters</strong> also allow extraction, however, they 
       pertain to the cubes contained within the Control Points/Measures. 
       Option RETAIN_REFERENCE will extract the Reference even if not in the 
-      Cube List.  Reports created for cube filters include
+      Cube List.
     </p>
 
     <p>
       <strong>Lat/Lon Filters</strong> allow extraction as well, however, they 
       only extract Control Points/Measures that lie in the lat/lon bounding 
-      box.  Reports created for exclusive filters include
+      box.
     </p>
     <p>
       A summary of the Control Points not extracted, listed by the filter which
       prevented them from being extracted, can be included in optional report
-      files. See the PREFIX and filter keywords for more details. These
-      reports include
+      files. See the PREFIX and filter keywords for more details. The following
+      table lists the output file names, the corresponding filter for the 
+      output file, and a description of the contents of the output file.
+      These output files will only be generated if PREFIX has been defined.
       <table border="1">
         <tr>
           <th><strong>OutputReport</strong></th>
           <th><strong>Filter</strong></th>
-          <th><strong>Reason for not extracting the points/measures in this report</strong></th>
+          <th>
+            <strong>
+              Reason for not extracting the points/measures in this report
+            </strong>
+          </th>
         </tr>
         <tr>
           <td align="center"><code>[PREFIX]IgnoredPoints.txt</code></td>
@@ -72,7 +78,13 @@
         <tr>
           <td align="center"><code>[PREFIX]IgnoredMeasures.txt</code></td>
           <td align="center"><code>NOIGNORE</code></td>
-          <td align="left"><code>These measures are set to ignored and are not reference measures.</code></td>
+          <td align="left">
+            <code>
+              These measures are set to ignored. Ignored reference measures are
+              always extracted, however they are still listed in this report 
+              with the note: Ignored measure but extracted since it is Reference.
+            </code>
+          </td>
         </tr>
         <tr>
           <td align="center"><code>[PREFIX]SingleMeasurePoints.txt</code></td>
@@ -81,7 +93,7 @@
         </tr>
         <tr>
           <td align="center"><code>[PREFIX]MeasurelessPoints.txt</code></td>
-          <td align="center"><code>NOMEASURELESS</code></td>
+          <td align="center"><code>NOMEASURELESS and REFERENCE</code></td>
           <td align="left"><code>These points have no measures.</code></td>
         </tr>
         <tr>
@@ -97,22 +109,44 @@
         <tr>
           <td align="center"><code>[PREFIX]TolerancePoints.txt</code></td>
           <td align="center"><code>TOLERANCE</code></td>
-          <td align="left"><code>These points have line and/or sample less than the given PIXELTOLERANCE.</code></td>
+          <td align="left">
+            <code>
+              These points have line and/or sample less than the given 
+              PIXELTOLERANCE.
+            </code>
+          </td>
         </tr>
         <tr>
           <td align="center"><code>[PREFIX]NonListedPoints.txt</code></td>
           <td align="center"><code>POINTSLIST</code></td>
-          <td align="left"><code>These points are not in the given POINTLIST.</code></td>
+          <td align="left">
+            <code>
+              These points are not in the given POINTLIST.
+            </code>
+          </td>
         </tr>
         <tr>
           <td align="center"><code>[PREFIX]NonCubePoints.txt</code></td>
           <td align="center"><code>CUBES</code></td>
-          <td align="left"><code>These points have no measures corresponding to the given CUBELIST.</code></td>
+          <td align="left">
+            <code>
+              These points have no measures corresponding to the given CUBELIST.
+            </code>
+          </td>
         </tr>
         <tr>
           <td align="center"><code>[PREFIX]NonCubeMeasures.txt</code></td>
           <td align="center"><code>CUBES, CUBEMEASURES, and RETAIN_REFERENCE</code></td>
-          <td align="left"><code>These measures do not correspond to cubes in the given CUBELIST. If RETAIN_REFERENCE is true, reference measures will not be in this list.</code></td>
+          <td align="left">
+            <code>
+              These are measures for extracted points that do not correspond to
+              cubes in the given CUBELIST. If RETAIN_REFERENCE is true, 
+              all reference measures for extracted points will be extracted, 
+              however any reference measure that does not correspond to cubes 
+              in the cubelist will still be listed in this report with the note:
+              Reference not in the cubelist but extracted since RETAIN_REFERENCE=true.
+            </code>
+          </td>
         </tr>
         <tr>
           <td align="center"><code>[PREFIX]LatLonOutOfRange.txt</code></td>
@@ -209,6 +243,17 @@
     <change name="Jeannie Backer" date="2012-06-22">
       Added and modified documentation for filters and PREFIX report files to 
       better reflect how the program filters work. References #927.
+    </change>
+    <change name="Jeannie Backer" date="2012-07-11">
+      Modified application to not create empty output files. If a file is not 
+      created, a comment will be printed in the results log. Fixes #253. 
+      Fixed bug in NOMEASURELESS and POINTLIST filters. These were not being 
+      properly handled by the program. Replaced summary keyword NoCubeMeasure
+      with NonCubeMeasures for consitency with NonCubePoints. Modified and 
+      added new appTests to reflect changes. Fixes #955. Added webpage example.
+      Added documentation to Makefiles. Updated xml documentation and clarified
+      output reports for [PREFIX]IgnoredMeasures.txt and 
+      [PREFIX]NonCubeMeasures.txt Fixes #927.
     </change>
   </history>
 
@@ -342,7 +387,7 @@
         </brief>
         <description>
           <p>
-            When selected, no ignored Control Points provided by the input 
+            When selected, no ignored Control Points in the input 
             Control Net will be included in the output Control Network. 
             Furthermore, any ignored Control Measures that are not reference
             measures will also be excluded from the output Control Network.
@@ -353,9 +398,9 @@
             [PREFIX]IgnoredPoints.txt and [PREFIX]IgnoredMeasures.txt. 
             These files list all Control Points and Control Measures from the
             input Control Network that were not extracted due to this filter.
-            **Note** The [PREFIX]IgnoredMeasures.txt will not include ignored
-            control measures that are reference measures since they will be
-            extracted.
+            **Note** The [PREFIX]IgnoredMeasures.txt will include ignored
+            control measures that are reference measures even though they
+            will be extracted.
           </p>
         </description>
       </parameter>
@@ -427,10 +472,11 @@
           </p>
 
           <p>
-            When option PREFIX is used, a report file with the name 
-            [PREFIX]NonReferenceMeasures.txt will also be created. This file 
-            will contain each Control Measure that was not extracted due to 
-            this filter.
+            When option PREFIX is used, report files with the names 
+            [PREFIX]NonReferenceMeasures.txt and  [PREFIX]MeasurelessPoints.txt
+            will also be created. The first file will contain each Control 
+            Measure that was not extracted due to this filter and the latter
+            will list all measurless points not extracted due to this filter.
           </p>
         </description>
         <exclusions>
@@ -619,11 +665,10 @@
           <p>
             When option PREFIX is used with the CUBEMEASURES filter, the 
             report file [PREFIX]NonCubeMeasures.txt will also be created. This 
-            file will list the the measures that are not extracted.  This will 
+            file will list the measures that are not extracted.  This will 
             include non-reference measures that do not correspond to the 
             cubelist. When RETAIN_REFERENCE is true, reference measures will 
-            not be listed in this file since this option causes all reference 
-            measures to be extracted.
+            be listed in this file, even though they will be extracted.
           </p>
         </description>
       </parameter>
@@ -639,20 +684,21 @@
           Only extract Control Points in the lat/lon range
         </brief>
         <description>
-  	       <p>
-             When selected, all Control Points that are inside of the provided
-             latitude longitude range will be extracted. Control Points whose
-             latitude longitude cannot be computed will not be extracted.
-           </p>
+  	      <p>
+            When selected, all Control Points that are inside of the provided
+            latitude and longitude ranges will be extracted. Control Points
+            whose latitude and/or longitude cannot be computed will not be 
+            extracted.
+          </p>
 
-           <p>
-             Fixed Points will use the lat/lon values provided in the CNET
-             while Free Points will calculate their lat/lon from the images
-             provided by the FROMLIST.  These calculated lat/lon values will be
-             added to Free Points in the ONET for reference purposes. No Isis
-             application will use these added lat/lons.
-           </p>
-
+          <p>
+            Fixed Points will use the lat/lon values provided in the input
+            control network, while Free Points will calculate the lat/lon 
+            from the images provided by the FROMLIST. These calculated lat/lon
+            values will be added to Free Points in the output control network
+            for reference purposes. However, no Isis application will use 
+            these lat/lons that are added to Free Points.
+          </p>
           
           <p>
             When option PREFIX is used, report files [PREFIX]LatLonOutOfRange.txt
@@ -667,7 +713,7 @@
             Longitude.
           </p>
 
-           <p>Note: This option is expensive.</p>
+          <p>Note: This option is expensive.</p>
         </description>
         <inclusions>
           <item>MINLAT</item>
@@ -752,5 +798,167 @@
     </group>
 
   </groups>
+  <examples>
+    <example>
+      <brief>
+        Example of cnetextract using the CUBES parameters.
+      </brief>
+
+      <description>
+        This example shows how to use cnetextract to extract points using Cube 
+        filters. This will extract all points that contain at least one measure
+        corresponding to the given cubes in the file list.lis (CUBES=true
+        CUBELIST=list.lis). From these points, the only measures that are 
+        extracted will correspond to the cubelist (CUBEMEASURES=true). 
+        All reference measures will be extracted, whether they correspond to
+        the cubelist or not (RETAIN_REFERENCE=true). Note that the 
+        RETAIN_REFERENCE option overrides the CUBEMEASURES option with 
+        respect to reference measures.
+      </description>
+
+      <terminalInterface>
+        <commandLine>
+          fromlist=list.lis cnet=cnet.net prefix=new tolist=newList.lis 
+          onet=newNet.net networkid=new description=new cubes=true 
+          cubelist=list.lis cubemeasures=true retain_reference=true
+        </commandLine>
+        <description>
+          An example of how to run this program from the command line. 
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="535" height="550" src="assets/images/cubes_535w_550h.jpg">
+          <brief>
+            Example GUI
+          </brief>
+            <description>
+              An example of how to run this program using the GUI. Note that the
+              results summary can be seen in the log window.  
+            </description>
+            <thumbnail width="195" height="200" src="assets/thumbs/cubes_195w_200h.jpg" caption="Example of GUI command"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <dataFiles>
+        <dataFile path="assets/dataFiles/list.lis">
+          <brief>
+            FROMLIST = list.lis
+          </brief>
+          <description>
+            This is the input list containing cubes that can be found in the 
+            input control network. 
+          </description>
+          <parameterName>
+            FROMLIST
+          </parameterName>
+        </dataFile>
+        <dataFile path="assets/dataFiles/cnet.pvl">
+          <brief>
+            CNET = cnet.net
+          </brief>
+          <description>
+            The input control network contains 18 points and a total of 37 
+            measures.
+          </description>
+          <parameterName>
+            CNET
+          </parameterName>
+        </dataFile>
+        <dataFile path="assets/dataFiles/newList.lis">
+          <brief>
+            TOLIST = newList.lis
+          </brief>
+          <description>
+            This is the list of cubes contained in the FROMLIST that can be 
+            found in the output control network. Notice that one of the cubes
+            listed in the FROMLIST is not included in the output TOLIST.
+          </description>
+          <parameterName>
+            TOLIST
+          </parameterName>
+        </dataFile>
+        <dataFile path="assets/dataFiles/newNet.pvl">
+          <brief>
+            ONET = newNet.net
+          </brief>
+          <description>
+            The output control network contains 13 of the original 18 points. 
+            Five points were extracted (test0135 to test0139) since they did 
+            not contain either measures from any of the three cubes in the 
+            cubelist (see list.lis).  Also, notice that 19 of the original
+            37 measures have been extracted. Each of these measures can be 
+            matched to a cube in the cubelist or is reference measure for one
+            of the 13 output points.
+          </description>
+          <parameterName>
+            ONET
+          </parameterName>
+        </dataFile>
+        <dataFile path="assets/dataFiles/list.lis">
+          <brief>
+            CUBELIST = list.lis
+          </brief>
+          <description>
+            This is a list of cubes from which we will filter. 
+          </description>
+          <parameterName>
+            CUBELIST
+          </parameterName>
+        </dataFile>
+        <dataFile path="assets/dataFiles/newNonCubePoints.txt">
+          <brief>
+            newNonCubePoints.txt, created since PREFIX=new and CUBES=true
+          </brief>
+          <description>
+            The output report for the CUBES filter lists the 5 points that were
+            not extracted since they have no measures that correspond to cubes 
+            in the given cubelist. Notice the prefix of the file name "new" is 
+            taken from the value passed into the PREFIX parameter. Also, note 
+            that this file would not be created if the PREFIX parameter was 
+            left blank.
+          </description>
+          <parameterName>
+            PREFIX, CUBES
+          </parameterName>
+        </dataFile>
+        <dataFile path="assets/dataFiles/newNonCubeMeasures.txt">
+          <brief>
+            newNonCubeMeasures.txt, created since PREFIX=new, 
+            CUBEMEASURES=true, RETAIN_REFERENCE=true 
+          </brief>
+          <description>
+            Output report for CUBEMEASURES filter
+            The output report for the CUBEMEASURES and RETAIN_REFERENCE filters
+            lists the 24 measures from extracted points that don't correspond 
+            to cubes in the given cubelist. Notice that, since RETAIN_REFERENCE
+            is selected, the reference measures listed in this report indicate
+            that they are extracted. Also, notice the prefix of the file name 
+            "new" is taken from the value passed into the PREFIX parameter. 
+            This file would not be created if the PREFIX parameter was left 
+            blank.
+          </description>
+          <parameterName>
+            PREFIX, CUBES, CUBEMEASURES, RETAIN_REFERENCE
+          </parameterName>
+        </dataFile>
+        <dataFile path="assets/dataFiles/summaryLog.txt">
+          <brief>
+            Standard output results summary.
+          </brief>
+          <description>
+            If run command line, this summary will be printed in the terminal
+            window. If run in GUI, this summary will be printed in the log area.
+            Notice that the report shows MeasurelessPoints even though the 
+            NOMEASURELESS parameter was not selected. However, this parameter is 
+            automatically selected when CUBEMEASURES is selected.
+          </description>
+        </dataFile>
+      </dataFiles>
+
+    </example>
+  </examples>
 
 </application>

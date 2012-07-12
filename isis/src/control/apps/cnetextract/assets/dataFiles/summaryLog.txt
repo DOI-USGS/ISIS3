@@ -1,0 +1,15 @@
+Group = ResultSummary
+  InputPoints       = 18
+  InputMeasures     = 37
+  OutputPoints      = 13
+  OutputMeasures    = 19
+  MeasurelessPoints = 0
+  NonCubePoints     = 5
+  NonCubeMeasures   = 24
+End_Group
+# The output report [newMeasurelessPoints.txt] was not created. The corresponding filter found no points/measures that would not be extracted.
+# Each keyword represents a filter parameter used. Check the documentation for specific keyword descriptions.
+Group = Results
+  ReportCreated = newNonCubePoints.txt
+  ReportCreated = newNonCubeMeasures.txt
+End_Group

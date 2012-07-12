@@ -1,0 +1,285 @@
+Object = ControlNetwork
+  NetworkId    = new
+  TargetName   = Mars
+  UserName     = jwalldren
+  Created      = 2009-07-07T11:07:34
+  LastModified = 2009-07-07T11:07:34
+  Description  = new
+  Version      = 3
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0140
+    ChooserName = cnetbin2pvl
+    DateTime    = 2012-06-25T17:06:08
+
+    Group = ControlMeasure
+      SerialNumber = MGS/613874641:0/MOC-WA/RED
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2009-07-07T11:07:34
+      Sample       = 192.63711832763
+      Line         = 34.460252524415
+      Reference    = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0141
+    ChooserName = cnetbin2pvl
+    DateTime    = 2012-06-25T17:06:08
+
+    Group = ControlMeasure
+      SerialNumber = MGS/613874641:0/MOC-WA/RED
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2009-07-07T11:07:34
+      Sample       = 389.90664642308
+      Line         = 20.954485556314
+      Reference    = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0142
+    ChooserName = cnetbin2pvl
+    DateTime    = 2012-06-25T17:06:08
+
+    Group = ControlMeasure
+      SerialNumber = MGS/613874641:0/MOC-WA/RED
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2009-07-07T11:07:34
+      Sample       = 47.500074451325
+      Line         = 252.22327116509
+      Reference    = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0143
+    ChooserName = cnetbin2pvl
+    DateTime    = 2012-06-25T17:06:08
+
+    Group = ControlMeasure
+      SerialNumber = MGS/613874641:0/MOC-WA/RED
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2009-07-07T11:07:34
+      Sample       = 245.14513557383
+      Line         = 237.87834001823
+      Reference    = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0144
+    ChooserName = cnetbin2pvl
+    DateTime    = 2012-06-25T17:06:08
+
+    Group = ControlMeasure
+      SerialNumber = MGS/613874641:0/MOC-WA/RED
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2009-07-07T11:07:34
+      Sample       = 440.66034112938
+      Line         = 224.64291946858
+      Reference    = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0145
+    ChooserName = cnetbin2pvl
+    DateTime    = 2012-06-25T17:06:08
+
+    Group = ControlMeasure
+      SerialNumber = MGS/613874641:0/MOC-WA/RED
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2009-07-07T11:07:34
+      Sample       = 100.95373422096
+      Line         = 455.4308316634
+      Reference    = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0146
+    ChooserName = cnetbin2pvl
+    DateTime    = 2012-06-25T17:06:08
+
+    Group = ControlMeasure
+      SerialNumber = MGS/613874641:0/MOC-WA/RED
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2009-07-07T11:07:34
+      Sample       = 298.79046837608
+      Line         = 441.34131388108
+      Reference    = True
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0147
+    ChooserName = cnetbin2pvl
+    DateTime    = 2012-06-25T17:06:08
+
+    Group = ControlMeasure
+      SerialNumber = MGS/610768297:128/MOC-WA/RED
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2009-07-07T11:07:34
+      Sample       = 1010.9575928745
+      Line         = 51.022499971432
+      Reference    = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = MGS/613874641:0/MOC-WA/RED
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2009-07-07T11:07:34
+      Sample       = 16.176177712859
+      Line         = 431.4799759621
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0148
+    ChooserName = cnetbin2pvl
+    DateTime    = 2012-06-25T16:56:16
+
+    Group = ControlMeasure
+      SerialNumber = MGS/611121247:128/MOC-WA/RED
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2009-07-07T11:07:34
+      Sample       = 516.37119338752
+      Line         = 2541.5712911853
+      Reference    = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = MGS/614672446:224/MOC-WA/RED
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2009-07-07T11:07:34
+      Sample       = 173.05268398239
+      Line         = 37.555994151623
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0149
+    ChooserName = cnetbin2pvl
+    DateTime    = 2012-06-25T16:56:16
+
+    Group = ControlMeasure
+      SerialNumber = MGS/611121247:128/MOC-WA/RED
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2009-07-07T11:07:34
+      Sample       = 711.87127766342
+      Line         = 2527.5182959676
+      Reference    = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = MGS/614672446:224/MOC-WA/RED
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2009-07-07T11:07:34
+      Sample       = 368.18121177058
+      Line         = 23.514182164695
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0150
+    ChooserName = cnetbin2pvl
+    DateTime    = 2012-06-25T16:56:16
+
+    Group = ControlMeasure
+      SerialNumber = MGS/611121247:128/MOC-WA/RED
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2009-07-07T11:07:34
+      Sample       = 391.30714343881
+      Line         = 2759.0575576024
+      Reference    = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = MGS/614672446:224/MOC-WA/RED
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2009-07-07T11:07:34
+      Sample       = 47.891607800358
+      Line         = 255.14189317537
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0151
+    ChooserName = cnetbin2pvl
+    DateTime    = 2012-06-25T16:56:16
+
+    Group = ControlMeasure
+      SerialNumber = MGS/611121247:128/MOC-WA/RED
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2009-07-07T11:07:34
+      Sample       = 586.49624737981
+      Line         = 2743.8650413524
+      Reference    = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = MGS/614672446:224/MOC-WA/RED
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2009-07-07T11:07:34
+      Sample       = 243.00531980267
+      Line         = 239.96056064222
+    End_Group
+  End_Object
+
+  Object = ControlPoint
+    PointType   = Free
+    PointId     = test0152
+    ChooserName = cnetbin2pvl
+    DateTime    = 2012-06-25T16:56:16
+
+    Group = ControlMeasure
+      SerialNumber = MGS/611121247:128/MOC-WA/RED
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2009-07-07T11:07:34
+      Sample       = 779.63277351913
+      Line         = 2730.3371313569
+      Reference    = True
+    End_Group
+
+    Group = ControlMeasure
+      SerialNumber = MGS/614672446:224/MOC-WA/RED
+      MeasureType  = Candidate
+      ChooserName  = "Application autoseed"
+      DateTime     = 2009-07-07T11:07:34
+      Sample       = 435.68231652769
+      Line         = 226.46920105382
+    End_Group
+  End_Object
+End_Object
+End

@@ -1,0 +1,24 @@
+test0152,MGS/611121247:128/MOC-WA/RED, Reference not in the cubelist but extracted since RETAIN_REFERENCE=true
+test0151,MGS/611121247:128/MOC-WA/RED, Reference not in the cubelist but extracted since RETAIN_REFERENCE=true
+test0150,MGS/611121247:128/MOC-WA/RED, Reference not in the cubelist but extracted since RETAIN_REFERENCE=true
+test0149,MGS/611121247:128/MOC-WA/RED, Reference not in the cubelist but extracted since RETAIN_REFERENCE=true
+test0148,MGS/611121247:128/MOC-WA/RED, Reference not in the cubelist but extracted since RETAIN_REFERENCE=true
+test0147,MGS/610944772:128/MOC-WA/RED
+test0147,MGS/610768297:128/MOC-WA/RED, Reference not in the cubelist but extracted since RETAIN_REFERENCE=true
+test0146,MGS/610944772:128/MOC-WA/RED
+test0145,MGS/610944772:128/MOC-WA/RED
+test0144,MGS/610944772:128/MOC-WA/RED
+test0143,MGS/610944772:128/MOC-WA/RED
+test0142,MGS/610944772:128/MOC-WA/RED
+test0141,MGS/610944772:128/MOC-WA/RED
+test0140,MGS/610944772:128/MOC-WA/RED
+test0139,MGS/612010874:96/MOC-WA/RED
+test0139,MGS/610591822:96/MOC-WA/RED, Reference not in the cubelist but extracted since RETAIN_REFERENCE=true
+test0138,MGS/612010874:96/MOC-WA/RED
+test0138,MGS/610591822:96/MOC-WA/RED, Reference not in the cubelist but extracted since RETAIN_REFERENCE=true
+test0137,MGS/612010874:96/MOC-WA/RED
+test0137,MGS/610591822:96/MOC-WA/RED, Reference not in the cubelist but extracted since RETAIN_REFERENCE=true
+test0136,MGS/612010874:96/MOC-WA/RED
+test0136,MGS/610591822:96/MOC-WA/RED, Reference not in the cubelist but extracted since RETAIN_REFERENCE=true
+test0135,MGS/612010874:96/MOC-WA/RED
+test0135,MGS/610591822:96/MOC-WA/RED, Reference not in the cubelist but extracted since RETAIN_REFERENCE=true
