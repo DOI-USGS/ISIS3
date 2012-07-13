@@ -1,4 +1,4 @@
-APPNAME = apollopansticher
+APPNAME = apollopanstitcher
 #This test excercises the stiching of 8 apollopanoramic subscans into a single image.
 #  The detection of the fiducial marks is complex and involves a RANSAC algorithm.
 #  For this reason the final stiched cubes are expected to vary slightly.  To address
