@@ -26,14 +26,14 @@
 //QT libraries if needed if needed
 
 //third party libraries if needed
-#include </work/users/othomas/imageReg/SubPixelDevelopemnt/trunk/isis/src/base/objs/Ransac/Ransac.h>
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_rng.h>
 #include <GSLUtility.h>
 
 
 //Isis Headers if needed
-#include "/work/users/othomas/imageReg/SubPixelDevelopemnt/trunk/isis/src/base/objs/Selection/Selection.h"
+#include "Ransac.h"
+#include "Selection.h"
 
 
 using namespace std;
@@ -44,7 +44,7 @@ namespace Isis {
 
   //Reduction methods--methods used to trim off outliers in the selection based on aprior knowledge of the expected shape
   int Selection::elipticalReduction(Chip *selectionChip, double percent_selected, double play, int patience_limit) {
-    /*  This method searchs for the largest elipsoid that has at least percent_selected of the pixels within it selected, and lies entirely within the given chip
+    /* This method searchs for the largest elipsoid that has at least percent_selected of the pixels within it selected, and lies entirely within the given chip
     *  The purpose of this is to trim off 'hairs' and 'danglies' and thus reduce the data to just what is close to being within the range of the ellipse
     *  The method is general (meaning it works for any orientation of any ellipse within the chip) provided enough of the edge of the ellipse is preserved to define it.
     *
@@ -58,7 +58,7 @@ namespace Isis {
     *    7 repeat steps 2 through 6 until pacience_limit consecquitive failures to find a better (larger area) elipse have occured
     */
     
-    int i,j,//=0,k,l,
+    int i, j, //=0,k,l,
         samples,  //samples in selectionChip
         lines;    //lines in selectionChip
 
