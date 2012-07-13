@@ -25,14 +25,15 @@
  */                                                                       
 
 
-#include "apollo_pan_IO.h"
+#include "ApolloPanIO.h"
 #include "LineScanCameraDetectorMap.h"
 #include "Pvl.h"
+#include "PvlGroup.h"
 
 namespace Isis {
-  namespace Apollo {
     /**                                                                       
-     * @brief Convert between parent image (aka encoder aka machine)  coordinates and detector coordinates
+     * @brief Convert between parent image (aka encoder aka machine)  coordinates and detector 
+     *         coordinates
      *                                                                        
      * This class is used to convert between parent image (aka encoder aka machine) coordinates
      * (sample/line) and detector coordinates for a the Apollo Panoramic Image. 
@@ -41,29 +42,29 @@ namespace Isis {
      *                                                                        
      * @internal                                                              
      *   @history 2011-11-21 Orrin Thomas - Original version
+     *   @history 2012-07-10 Orrin Thomas - Updated to current coding standards
      */        
     class ApolloPanoramicDetectorMap : public CameraDetectorMap {
     public:
       /**
        * Construct a detector map for line scan cameras
        *
-       * @param parent The parent Camera Model
-       * @param etStart   starting ephemeris time in seconds
-       *                  the time at the top of the first line (mm)
+       * @param parent    The parent Camera Model
+       * @param etMiddle  Time of the center line, line 0 after interior orientation
        * @param lineRate  the time in seconds between lines (msec)
        * @param lab The labels to use for the camera creation
        *
        */
       ApolloPanoramicDetectorMap(Camera *parent, double etMiddle,
-                                double lineRate, Pvl *lab) :
-      CameraDetectorMap(parent) {
-  p_lineRate = lineRate;
-  p_etMiddle = etMiddle;
-        p_lab = lab;
-  this->Initialize_Interior_Orientation();
+                                double lineRate, Pvl *lab) : CameraDetectorMap(parent) {
+        m_lineRate = lineRate;
+        m_etMiddle = etMiddle;
+        m_lab = lab;
+
+        this->initializeInteriorOrientation();
       }
 
-      //! Destructor
+      //! Destroys ApolloPanoramicDetectorMap object
       virtual ~ApolloPanoramicDetectorMap() {};
 
       virtual bool SetParent(const double sample, const double line);
@@ -79,22 +80,38 @@ namespace Isis {
        *
        */
       void SetLineRate(const double lineRate) {
-        p_lineRate = lineRate;
+        m_lineRate = lineRate;
       };
 
       //! Return the time in seconds between scan lines
       double LineRate() const {
-        return p_lineRate;
+        return m_lineRate;
       };
 
+      //! Mean (average) of interior orientation residual vector lengths, accesor
+      double  meanResidual() { return p_intOri.meanResiduals(); };
+
+      //! Max interior orientation residual vector length, accesor
+      double   maxResidual() { return p_intOri.maxResiduals(); };
+
+      //! Standard deviation of interior orientation residual vector lengths, accesor
+      double stdevResidual() { return p_intOri.stdevResiduals(); };
+
       private:
-  double p_etMiddle;    //time of the middle line
-  double p_lineRate;    //line exposrue duration
-        Pvl *p_lab;
-  Apollo_Pan_IO io;
-  int Initialize_Interior_Orientation();
+        //! Ephemeris time at the middle line
+        double m_etMiddle;  
+
+        //!line exposure duration
+        double m_lineRate;
+
+        //! Image label used to construct camera object    
+        Pvl *m_lab;
+
+        //! Class to preform transformations from cube coordiantes to image coordinates
+        ApolloPanIO p_intOri;
+
+        int initializeInteriorOrientation();
     };
-  };
 };
 #endif
 

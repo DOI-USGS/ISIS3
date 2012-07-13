@@ -1133,7 +1133,7 @@ namespace Isis {
    * of bands in the cube.
    */
   Histogram *Cube::getHistogram(const int &band, const double &validMin,
-                             const double &validMax, iString msg) {
+                                const double &validMax, iString msg) {
     // Make sure band is valid
     if ((band < 0) || (band > getBandCount())) {
       string msg = "Invalid band in [CubeInfo::Histogram]";

@@ -28,11 +28,13 @@
 
 
 namespace Isis {
-  namespace Apollo {
+  class PvlGroup;
     /**                                                                       
-     * @brief Brief coming soon
+     * @brief Apollo Panoramic Camera
      *                                                                        
-     * Description coming soon
+     * Description: Geometric camera model for the Apollo Panoramic Camera
+     *
+     * @ingroup Apollo
      *                                                                        
      * @author 2011-09-19 Orrin Thomas
      *                                                                        
@@ -40,20 +42,23 @@ namespace Isis {
      *   @history 2011-09-19 Orrin Thomas - Original version
      *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
      *                                     coding standards. References #972.
+     *   @history 2012-07-10 Orrin Thomas - Updated to current coding standards
      */        
     class ApolloPanoramicCamera : public LineScanCamera {
     public:
       ApolloPanoramicCamera(Isis::Pvl &lab);
 
+      //! Destorys the ApolloPanoramicCamera object
       ~ApolloPanoramicCamera() {};
 
       /**
-      * CK frame ID -  - Instrument Code from spacit run on CK
+      * CK frame ID -  - Instrument Code 
       *  
       * @return @b int The appropriate instrument code for the "Camera-matrix" 
       *         Kernel Frame ID
       */
-      virtual int CkFrameId() const {return p_CkFrameId; }  //this sensor was used on multiple missions so it is necessary to check which Apollo 
+      //this sensor was used on multiple missions so it is necessary to check which Apollo 
+      virtual int CkFrameId() const {return m_CkFrameId; }  
 
       /** 
       * CK Reference ID - J2000
@@ -70,10 +75,33 @@ namespace Isis {
       *         Kernel Reference ID
       */
       virtual int SpkReferenceId() const { return (1); }
+
+      /** Returns residual summary statistics from interior orientation as a PvlGroup
+       *
+       */
+      PvlGroup intOriResidualsReport();
+
+      //! Max interior orientation residual vector length, accesor
+      double intOriResidualMax()   const { return m_residualMax; }
+
+      //! Mean (average) of interior orientation residual vector length, accesor
+      double intOriResidualMean()  const { return m_residualMean; }
+
+      //! Standard deviation of interior orientation residual vector length, accesor
+      double intOriResidualStdev() const { return m_residualStdev; }
     private:
-      int p_CkFrameId;
+      //! Max interior orientation residual vector length
+      double m_residualMean;
+
+      //! Mean (average) of interior orientation residual vector length
+      double m_residualMax;
+
+      //! Standard deviation of interior orientation residual vector length
+      double m_residualStdev;
+
+      //! CK "Camera Matrix" kernel frame ID
+      int m_CkFrameId;
     };
-  };
 };
 
 #endif

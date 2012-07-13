@@ -16,7 +16,7 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include "/work/users/othomas/imageReg/SubPixelDevelopemnt/trunk/isis/src/base/objs/Centroid/Centroid.h"
+#include "Centroid.h"
 
 
 using namespace std;

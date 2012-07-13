@@ -160,23 +160,27 @@ namespace Isis {
       // Convert to parent coordinate (remove crop, pad, shrink, enlarge)
       double parentSample = p_alphaCube->AlphaSample(sample);
       double parentLine = p_alphaCube->AlphaLine(line);
+      //cout << "\n\n\n\n\n\nCube: " << sample << " " << line << endl;
+      //cout << "alpha cube: " << parentSample << " " << parentLine << endl; //debug
+      //cout.precision(15);
+      //cout << "Time: " << Time().Et() << endl;
       // Convert from parent to detector
       if(p_detectorMap->SetParent(parentSample, parentLine)) {
         double detectorSample = p_detectorMap->DetectorSample();
         double detectorLine   = p_detectorMap->DetectorLine();
-
+        //cout << "detector: " << detectorSample << " " << detectorLine << endl;  //debug
         // Now Convert from detector to distorted focal plane
         if(p_focalPlaneMap->SetDetector(detectorSample, detectorLine)) {
           double focalPlaneX = p_focalPlaneMap->FocalPlaneX();
           double focalPlaneY = p_focalPlaneMap->FocalPlaneY();
-
+          //cout << "focal plane: " << focalPlaneX << " " << focalPlaneY << endl; //debug
           // Remove optical distortion
           if(p_distortionMap->SetFocalPlane(focalPlaneX, focalPlaneY)) {
             // Map to the ground
             double x = p_distortionMap->UndistortedFocalPlaneX();
             double y = p_distortionMap->UndistortedFocalPlaneY();
             double z = p_distortionMap->UndistortedFocalPlaneZ();
-
+            //cout << "Look vector: " << x << " " << y << " " << z << endl; //debug
             p_hasIntersection = p_groundMap->SetFocalPlane(x, y, z);
             return p_hasIntersection;
           }
@@ -301,18 +305,24 @@ namespace Isis {
   bool Camera::RawFocalPlanetoImage() {
     double ux = p_groundMap->FocalPlaneX();
     double uy = p_groundMap->FocalPlaneY();
+    //cout << "undistorted focal plane: " << ux << " " << uy << endl; //debug
+    //cout.precision(15);
+    //cout << "Backward Time: " << Time().Et() << endl;
     // Convert undistorted x/y to distorted x/y
     if(p_distortionMap->SetUndistortedFocalPlane(ux, uy)) {
       double focalPlaneX = p_distortionMap->FocalPlaneX();
       double focalPlaneY = p_distortionMap->FocalPlaneY();
+      //cout << "focal plane: " << focalPlaneX << " " << focalPlaneY << endl; //debug
       // Convert distorted x/y to detector position
       if(p_focalPlaneMap->SetFocalPlane(focalPlaneX, focalPlaneY)) {
         double detectorSample = p_focalPlaneMap->DetectorSample();
         double detectorLine = p_focalPlaneMap->DetectorLine();
+        //cout << "detector: " << detectorSample << " " << detectorLine << endl;
         // Convert detector to parent position
         if(p_detectorMap->SetDetector(detectorSample, detectorLine)) {
           double parentSample = p_detectorMap->ParentSample();
           double parentLine = p_detectorMap->ParentLine();
+          //cout << "cube: " << parentSample << " " << parentLine << endl; //debug
           p_pointComputed = true;
 
           if(p_projection == NULL || p_ignoreProjection) {

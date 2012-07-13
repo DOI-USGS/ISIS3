@@ -179,39 +179,29 @@ namespace Isis {
     l = int(ceil(double(lines  ) - b));
     j=int(floor(b+1.0));
     i=int(floor(a+1.0));
-    //printf("DEBUG: k:%d l:%d i:%d j:%d\n",k,l,i,j);
-    cen_pts.clear();
 
+    cen_pts.clear();
     //inorder to concentrate the search near the center of the chip we'll varry the step size for the center search nodes quadratically from 1*5.0/m_pixelSize at the center to 5.0*5.0/m_pixelSize at the edge
-    double searchStep=1.0*5.0/m_pixelSize;
+    double searchStep = 5.0*5.0/m_pixelSize;
     double aSearch,centerSample,centerLine,delta,cSearch;
-    cSearch = searchStep;
+    cSearch = searchStep/5.0;
     centerSample = double((k+i)/2.0);
     centerLine   = double((l+j)/2.0);
     delta = (centerSample-double(i))*(centerSample-double(i)) + (centerLine  -double(l))*(centerLine  -double(l));  //square of the maximum distance from center of the search space
-    //if (delta > 3.0*patience_limit) 
-    //else aSearch = 0.0;  //there aren't enough search nodes to bother with thinning
-    aSearch = (5.0*5.0/m_pixelSize-cSearch)/delta;
+   
+    aSearch = (searchStep-cSearch)/delta;
 
-    for (pt[0]=floor(a+1.0);pt[0]<k;pt[0]+=searchStep) {
-      for (pt[1]=floor(b+1.0);pt[1]<l;pt[1]+=searchStep) {
+    for (pt[0]=floor(a+1.0); pt[0]<k; pt[0]+=searchStep) {
+      for (pt[1]=floor(b+1.0); pt[1]<l; pt[1]+=searchStep) {
         cen_pts.push_back(pt);
         delta = (centerSample-double(pt[0]))*(centerSample-double(pt[0])) + (centerLine-double(pt[1]))*(centerLine-double(pt[1]));  //square of the distance from center of the search space
         searchStep = aSearch*delta + cSearch;
-        //printf("DEBUG: delta: %lf   searchStep: %lf  aSearch: %lf  cSearch: %lf\n",delta,searchStep,aSearch,cSearch);getchar();
+        if (searchStep > l - pt[1] && l - pt[1] > 1e-4)  //don't jump outside the search area
+          searchStep = l - pt[1];
       }
+      if (searchStep > k - pt[0] && k - pt[0] > 1e-4)  //don't jump outside the search area
+        searchStep = k - pt[0];
     }
-
-    /*for (i=int(floor(a+1.0));i<k;i++) {
-      for (j=int(floor(b+1.0));j<l;j++) {
-        pt[0] = i;
-        pt[1] = j;
-        cen_pts.push_back(pt);
-        delta = (centerSample-double(i))*(centerSample-double(i)) + (centerLine  -double(j))*(centerLine  -double(j));  //square of the distance from center of the search space
-        searchStep = int(floor(aSearch*delta + 1.0));
-      }
-    }*/
-    //printf("DEBUG: searchNodes: %d\n",cen_pts.size());
 
     //STEP 1: finding points along the boundary of the selection
     selectionEdge(selectionChip,&pts);
@@ -228,7 +218,7 @@ namespace Isis {
       randPt = gsl_rng_uniform_int( randGen  ,cen_pts.size() );
       dpt[0] = cen_pts[randPt][0];
       dpt[1] = cen_pts[randPt][1];
-      //printf("DEBUG randPt: %d dpt: %lf %lf\n",randPt,dpt[0],dpt[1]);
+
       cen_pts.erase( cen_pts.begin() + randPt);  //erasing this ellement ensures it will never be chosen again
       //printf("DEBUGB\n");
       //STEP 3: Now define the ellipse

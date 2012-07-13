@@ -30,8 +30,12 @@
 #include "NaifStatus.h"
 
 //Isis Headers if needed
+#include "ApolloPanoramicCamera.h"
+#include "ApolloPanoramicDetectorMap.h"
 #include "AutoReg.h"
 #include "AutoRegFactory.h"
+#include "Camera.h"
+#include "CameraDetectorMap.h"
 #include "Centroid.h"
 #include "CentroidApolloPan.h"
 #include "Chip.h"
@@ -64,23 +68,17 @@
 #define SEARCHc  350.0  //number of samples per edge(in 5-micron-pixels) in each sub-search area
 #define AVERs  5286.0  //average smaples (in 5-micron-pixels) between fiducials
 #define AVERl  23459.0  //average diference (in 5-micron-pixels) between the top and bottom fiducials
-#define TRANS_N 28520.0  //nomimal dx between scan lines, scani x + 28532 = (approx) scani+1 x--also the size of the search area for the first fiducial
+#define TRANS_N 28520.0  //nomimal dx between scan lines, scani x + 28532 = (approx) scani+1 x--also 
+                         //  the size of the search area for the first fiducial
 
 
 
 using namespace std;
 using namespace Isis;
 
-//Initialize values to make special pixels invalid
-/*double null_min = DBL_MAX;
-double null_max = DBL_MIN;
-double hrs_min = DBL_MAX;
-double hrs_max = DBL_MIN;
-double lrs_min = DBL_MAX;
-double lrs_max = DBL_MIN;*/
 
 void Load_Kernel(Isis::PvlKeyword &key);
-void crossp(double v1[3],double v2[3],double v1cv2[3]);
+void crossp(double v1[3], double v2[3], double v1cv2[3]);
 void Geographic2GeocentricLunar(double geographic[3], double geocentric[3]);
 void MfromLeftEulers(double M[3][3], double omega, double phi, double kappa);
 void MfromVecLeftAngle(double M[3][3], double vec[3], double angle);
@@ -170,9 +168,11 @@ void IsisMain() {
   if( ui.WasEntered("V/H_OVERRIDE") )
     fmc = ui.GetDouble("V/H_OVERRIDE")/1000.0;
   else
-    fmc = sqrt(horV*horV + radV*radV)/alti;  //forward motion compensation is directly equivalent to V/H
-  rollV = fmc*ROLLC;        //roll angular velcoity is equal to  V/H * constant    (units rad/sec)
-  led = (2.5*acos(-1.0)/180.0)/rollV/FIDL;  //led = rad/mm * sec/rad = radians(2.5)/FIDL / rollV    (final units: sec/mm)
+    //forward motion compensation is directly equivalent to V/H
+    fmc = sqrt(horV*horV + radV*radV)/alti;  
+  rollV = fmc*ROLLC;  //roll angular velcoity is equal to  V/H * constant    (units rad/sec)
+  //led = rad/mm * sec/rad = radians(2.5)/FIDL / rollV    (final units: sec/mm)
+  led = (2.5*acos(-1.0)/180.0)/rollV/FIDL;  
 
   //use led and the number of mm to determine the start and stop times
   isisTime = ui.GetString("GMT");
@@ -192,7 +192,8 @@ void IsisMain() {
   inst_pvlG.AddKeyword(keyword);
 
   keyword.SetName("LineExposureDuration");
-  keyword.SetValue(iStrTEMP=-led,"sec/mm");  //converted led to msec/mm--negative sign to account for the anti-parallel time and line axes
+  //converted led to msec/mm--negative sign to account for the anti-parallel time and line axes
+  keyword.SetValue(iStrTEMP=-led,"sec/mm");  
   inst_pvlG.AddKeyword(keyword);
 
   panCube.putGroup(inst_pvlG);
@@ -210,19 +211,19 @@ void IsisMain() {
   kernels_pvlG.AddKeyword(keyword);
 
   keyword.SetName("TargetAttitudeShape");
-  keyword.SetValue( transTable.Translate("TargetAttitudeShape","File1") );
-  keyword.AddValue( transTable.Translate("TargetAttitudeShape","File2") );
-  keyword.AddValue( transTable.Translate("TargetAttitudeShape","File3") );
+  keyword.SetValue( transTable.Translate("TargetAttitudeShape", "File1") );
+  keyword.AddValue( transTable.Translate("TargetAttitudeShape", "File2") );
+  keyword.AddValue( transTable.Translate("TargetAttitudeShape", "File3") );
   kernels_pvlG.AddKeyword(keyword);
 
   keyword.SetName("TargetPosition");
-  keyword.SetValue( "Table" );
-  keyword.AddValue( transTable.Translate("TargetPosition","File1") );
-  keyword.AddValue( transTable.Translate("TargetPosition","File2") );
+  keyword.SetValue("Table");
+  keyword.AddValue( transTable.Translate("TargetPosition", "File1") );
+  keyword.AddValue( transTable.Translate("TargetPosition", "File2") );
   kernels_pvlG.AddKeyword(keyword);
 
   keyword.SetName("ShapeModel");
-  keyword.SetValue( transTable.Translate("ShapeModel","File1") );
+  keyword.SetValue( transTable.Translate("ShapeModel", "File1") );
   kernels_pvlG.AddKeyword(keyword);
 
   keyword.SetName("InstrumentPointing");
@@ -248,7 +249,8 @@ void IsisMain() {
   char frameName[32];
   SpiceInt frameCode;
   SpiceBoolean found;
-  cidfrm_c(301, sizeof(frameName), &frameCode, frameName, &found);  //get the framecode from the body code (301=MOON)
+  //get the framecode from the body code (301=MOON)
+  cidfrm_c(301, sizeof(frameName), &frameCode, frameName, &found);  
   if(!found) {
     string naifTarget = string("IAU_MOOM");
     namfrm_c(naifTarget.c_str(), &frameCode);
@@ -258,19 +260,21 @@ void IsisMain() {
     }
   }
   spRot = new SpiceRotation(frameCode);
-  spRot->LoadCache(time0-0.015*(time1-time0),time1+0.015*(time1-time0),NODES);  //create a table from starttime to endtime (streched by 3%) with NODES entries
+  //create a table from starttime to endtime (streched by 3%) with NODES entries
+  spRot->LoadCache(time0-0.015*(time1-time0), time1+0.015*(time1-time0), NODES);  
   Table tableTargetRot = spRot->Cache("BodyRotation");
-  tableTargetRot.Label() += PvlKeyword("Description","Created by apollopaninit");
+  tableTargetRot.Label() += PvlKeyword("Description", "Created by apollopaninit");
   panCube.write(tableTargetRot);
 
 
   //////////////////////////////////////////////////attach a sun position table
   spPos = new SpicePosition(10,301);  //Position of the sun (10) WRT to the MOON (301)
-  spPos->LoadCache(time0-0.015*(time1-time0),time1+0.015*(time1-time0),NODES);  //create a table from starttime to endtime (stretched by 3%) with NODES entries
+  //create a table from starttime to endtime (stretched by 3%) with NODES entries
+  spPos->LoadCache(time0-0.015*(time1-time0), time1+0.015*(time1-time0), NODES);  
   Table tableSunPos = spPos->Cache("SunPosition");
   tableSunPos.Label() += PvlKeyword("SpkTableStartTime", time0-0.015*(time1-time0));
   tableSunPos.Label() += PvlKeyword("SpkTablleEndTime", time1+0.015*(time1-time0));
-  tableSunPos.Label() += PvlKeyword("Description","Created by apollopaninit");
+  tableSunPos.Label() += PvlKeyword("Description", "Created by apollopaninit");
   panCube.write(tableSunPos);  //attach the table to the cube
 
 
@@ -288,73 +292,95 @@ void IsisMain() {
   posJ20.resize(3);
 
   double  temp,
-          vel[3],    //the total velocity vector (combined Horizonatal and normal components) in km/sec
+          vel[3],  //the total velocity vector (combined Horizonatal and normal components) 
+                   //  in km/sec
           M[3][3],    //rotation matrix
-          zdir[] = {0,0,1},  //selenographic Z axis
-          northpn[3],      //normal to the plane containing all the north/south directions, that is plane containing the origin, the z axis, and the primary point of intersection
-          northl[3],    //north direction vector in local horizontal plane
-          azm[3],    //azm direction of the veclocity vector in selenographic coordinates
-          azmp[3],    //azm rotated (partially) and projected into the image plane
-          norm[3],    //normal to the local horizontal plane
-          look[3];    //unit direction vector in the pincipal cameral look direction, parallel to the vector from the center of the moon through the spacecraft
+          zDir[] = {0,0,1},  //selenographic Z axis
+          northPN[3], //normal to the plane containing all the north/south directions, 
+                      //  that is plane containing 
+                      //  the origin, the z axis, and the primary point of intersection
+          northL[3],    //north direction vector in local horizontal plane
+          azm[3],   //azm direction of the veclocity vector in selenographic coordinates
+          azmP[3],  //azm rotated (partially) and projected into the image plane
+          norm[3],  //normal to the local horizontal plane
+          look[3];  //unit direction vector in the pincipal cameral look direction, 
+                    //  parallel to the vector from the center of the moon through the spacecraft
 
   double  pos0[3],  //coordinate of the camera position
-          pint[3]; //coordinate of the principle intersection point
+          pInt[3];  //coordinate of the principle intersection point
 
   /////////////////calculating the camera position for the center (principal scan line)
   pos0[1] = ui.GetDouble("LON_NADIR")*deg2rad;
   pos0[0] = ui.GetDouble("LAT_NADIR")*deg2rad;
   pos0[2] = ui.GetDouble("CRAFT_ALTITUDE");  //units are km
-  Geographic2GeocentricLunar(pos0,pos0);      //function is written so the input can also be the output
+  Geographic2GeocentricLunar(pos0,pos0);    //function is written so the input can also be the 
+                                            //  output
 
   /////////////////////calculating the camera orientation for the center (principal) scan line
-  pint[1] = ui.GetDouble("LON_INT")*deg2rad;
-  pint[0] = ui.GetDouble("LAT_INT")*deg2rad;
-  pint[2] = 0.0;
-  Geographic2GeocentricLunar(pint,pint); //function is written so the input can also be the output
+  pInt[1] = ui.GetDouble("LON_INT")*deg2rad;
+  pInt[0] = ui.GetDouble("LAT_INT")*deg2rad;
+  pInt[2] = 0.0;
+  Geographic2GeocentricLunar(pInt,pInt); //function is written so the input can also be the output
   //calculate the unit look direction vector in object space
-  look[0] = -pos0[0] + pint[0];
-  look[1] = -pos0[1] + pint[1];
-  look[2] = -pos0[2] + pint[2];
+  look[0] = -pos0[0] + pInt[0];
+  look[1] = -pos0[1] + pInt[1];
+  look[2] = -pos0[2] + pInt[2];
   temp = sqrt(look[0]*look[0] + look[1]*look[1] + look[2]*look[2]);
   look[0] /= temp;
   look[1] /= temp;
   look[2] /= temp;
-  //the local normal vector is equal to pint0/|pint0|
-  temp = sqrt(pint[0]*pint[0] + pint[1]*pint[1] + pint[2]*pint[2]);
-  norm[0] = pint[0]/temp;
-  norm[1] = pint[1]/temp;
-  norm[2] = pint[2]/temp;
-  //omega and phi are defined so that M(phi)M(omega)look = [0 0 -1]  leaving only the roation around z axis to be found
-  omega = -atan2(look[1],look[2]);  //omega rotation to zero look[1]
+  //the local normal vector is equal to pInt0/|pInt0|
+  temp = sqrt(pInt[0]*pInt[0] + pInt[1]*pInt[1] + pInt[2]*pInt[2]);
+  norm[0] = pInt[0]/temp;
+  norm[1] = pInt[1]/temp;
+  norm[2] = pInt[2]/temp;
+  //omega and phi are defined so that M(phi)M(omega)look = [0 0 -1]  leaving only the roation 
+  //  around z axis to be found
+  omega = -atan2(look[1], look[2]);  //omega rotation to zero look[1]
   phi   = atan2(-look[0], sin(omega)*look[1] - cos(omega)*look[2]);  //phi rotation to zero look[0]
-  //use the horizontal velocity vector direction to solve for the last rotation; we will make the image x axis parallel to the in-image-plane projection of the horizontal direction of flight
-  crossp(norm,zdir,northpn); // the local normal cross the selenogrpahic z gives northpn, normal to the plane containing all the north/south directions, that is, the plane containing the origin, the z axis, and the primary point of intersection
-  crossp(northpn,norm,northl);   // the normal to the plane containing all the north/south directions cross the local normal direction gives the local north/south direction in the local normal plane
-  if (northl[2] < 0) {  //if by chance we got the south direction change the signs
-    northl[0] = -northl[0];
-    northl[1] = -northl[1];
-    northl[2] = -northl[2];
+  //use the horizontal velocity vector direction to solve for the last rotation; we will make the 
+  //  image x axis parallel to the in-image-plane projection of the horizontal direction of flight.
+  //  The local normal cross the selenogrpahic z gives northPN (normal to the plane containing all 
+  //  the north/south directions), that is, the plane containing the origin, the z axis, and the 
+  //  primary point of intersection.
+  crossp(northPN,norm,northL);   
+  //The normal to the plane containing all the north/south directions cross the local normal 
+  //  direction gives the local north/south direction in the local normal plane
+  crossp(norm, zDir, northPN); 
+  if (northL[2] < 0) {  //if by chance we got the south direction change the signs
+    northL[0] = -northL[0];
+    northL[1] = -northL[1];
+    northL[2] = -northL[2];
   }
-  //define the rotation matrix to convert northl to the azimuth of flight
-  MfromVecLeftAngle(M,norm,ui.GetDouble("VEL_AZM")*deg2rad);    //a left handed rotation of "VEL_AZM" around the positive normal direction will convert northl to azm
-  azm[0] = M[0][0]*northl[0] + M[0][1]*northl[1] + M[0][2]*northl[2];
-  azm[1] = M[1][0]*northl[0] + M[1][1]*northl[1] + M[1][2]*northl[2];
-  azm[2] = M[2][0]*northl[0] + M[2][1]*northl[1] + M[2][2]*northl[2];
+  //define the rotation matrix to convert northL to the azimuth of flight.
+  //  A left handed rotation of "VEL_AZM" around the positive normal direction will convert northL 
+  //  to azm
+  MfromVecLeftAngle(M,norm,ui.GetDouble("VEL_AZM")*deg2rad);    
+  azm[0] = M[0][0]*northL[0] + M[0][1]*northL[1] + M[0][2]*northL[2];
+  azm[1] = M[1][0]*northL[0] + M[1][1]*northL[1] + M[1][2]*northL[2];
+  azm[2] = M[2][0]*northL[0] + M[2][1]*northL[1] + M[2][2]*northL[2];
   //apply the two rotations we already know
   MfromLeftEulers(M,omega,phi,0.0);
-  azmp[0] = M[0][0]*azm[0] + M[0][1]*azm[1] + M[0][2]*azm[2];
-  azmp[1] = M[1][0]*azm[1] + M[1][1]*azm[1] + M[1][2]*azm[2];
-  azmp[2] = M[2][0]*azm[2] + M[2][1]*azm[1] + M[2][2]*azm[2];
-  //subtract that portion of the azm that is perpindicular to the image plane (also the portion which is parallel to look) making azm a vector parrallel to the image plane
-  azmp[2] = 0.0;  //and since we're now rotated into some coordinate system that differs from the image coordinate system by only a kappa rotation making the vector parrallel to the image plan is as simple as zeroing the z component (and as pointless to further calculations as a nat's fart in hurricane) nevertheless it completes the logical transition
-  kappa = -atan2(-azmp[1],azmp[0]);  //finally the kappa rotation that will make azmp parallel (including sign) to the camera x axis
+  azmP[0] = M[0][0]*azm[0] + M[0][1]*azm[1] + M[0][2]*azm[2];
+  azmP[1] = M[1][0]*azm[1] + M[1][1]*azm[1] + M[1][2]*azm[2];
+  azmP[2] = M[2][0]*azm[2] + M[2][1]*azm[1] + M[2][2]*azm[2];
+  //subtract that portion of the azm that is perpindicular to the image plane (also the portion 
+  //  which is parallel to look) making azm a vector parrallel to the image plane
+  //  Further, since we're now rotated into some coordinate system that differs from 
+  //  the image coordinate system by only a kappa rotation making the vector parrallel to the 
+  //  image plan is as simple as zeroing the z component (and as pointless to further calculations 
+  //  as a nat's fart in hurricane) nevertheless it completes the logical transition
+  azmP[2] = 0.0;  
+
+  //finally the kappa rotation that will make azmP parallel (including sign) to the camera x axis                  
+  kappa = -atan2(-azmP[1], azmP[0]);  
 
 
   ////////////////////Add an instrument position table
   //Define the table records
   TableRecord recordPos;  // reacord to be added to table
-  TableField x("J2000X", TableField::Double);  // add x,y,z position labels and ephemeris time et to record
+  // add x,y,z position labels and ephemeris time et to record
+  TableField x("J2000X", TableField::Double);  
   TableField y("J2000Y", TableField::Double);
   TableField z("J2000Z", TableField::Double);
   TableField t("ET", TableField::Double);
@@ -362,12 +388,15 @@ void IsisMain() {
   recordPos += y;
   recordPos += z;
   recordPos += t;
-  Table tablePos("InstrumentPosition",recordPos);
-  //now that the azm and norm vectors are defined the total velocity vector can be calcualted (km/sec)
+  Table tablePos("InstrumentPosition", recordPos);
+  //now that the azm and norm vectors are defined 
+  //  the total velocity vector can be calcualted (km/sec)
   vel[0] = horV*azm[0] + radV * norm[0];
   vel[1] = horV*azm[1] + radV * norm[1];
   vel[2] = horV*azm[2] + radV * norm[2];
-  //we'll provide a two ellement table (more is redundant because the motion is modeled as linear at this point)  we'll extend the nodes 3% beyond the edges of the images to be sure rounding errors don't cause problems
+  //we'll provide a two ellement table (more is redundant because the motion is modeled as linear 
+  //  at this point)  we'll extend the nodes 3% beyond the edges of the images to be sure 
+  //  rounding errors don't cause problems
   temp = 0.515*(time1-time0);  //3% extension
   posSel[0] = pos0[0] - temp*vel[0];    //selenocentric coordinate calculation
   posSel[1] = pos0[1] - temp*vel[1];
@@ -376,8 +405,11 @@ void IsisMain() {
   temp = time0 - 0.005*(time1-time0);  //et just before the first scan line
   spPos->SetEphemerisTime(temp);
   spRot->SetEphemerisTime(temp);
-  //Despite being labeled as J2000, the coordinates for the instrument position are in fact in target centric coordinated rotated to a system centered at the target with aces parallel to J2000, whatever that means
-  posJ20 = spRot->J2000Vector(posSel); //J2000Vector calls rotates the position vector into J2000--completing the transformation
+  //Despite being labeled as J2000, the coordinates for the instrument position are in fact in 
+  //  target centric coordinated rotated to a system centered at the target with aces parallel 
+  //  to J2000, whatever that means
+  posJ20 = spRot->J2000Vector(posSel); //J2000Vector calls rotates the position vector into J2000,
+                                       //  completing the transformation
   recordPos[0] = posJ20[0];
   recordPos[1] = posJ20[1];
   recordPos[2] = posJ20[2];
@@ -393,12 +425,11 @@ void IsisMain() {
   temp = time1 + 0.015*(time1-time0);  //et just after the last scan line
   spPos->SetEphemerisTime(temp);
   spRot->SetEphemerisTime(temp);
-  //sunPos = spRot->ReferenceVector(spPos->Coordinate());    //SpicePostion calculates the vector directions in J2000, the ReferenceVector call converts it to seleocentric
-  //posSel[0] -= sunPos[0];                    //subtracting the position of the sun in seleoncentric coordinates moves the origin to the center of the sun
-  //posSel[1] -= sunPos[1];
-  //posSel[2] -= sunPos[2];
-  //Despite being labeled as J2000, the coordinates for the instrument position are in fact in target centric coordinated rotated to a system centered at the target with aces parallel to J2000, whatever that means
-  posJ20 = spRot->J2000Vector(posSel); //J2000Vector calls rotates the position vector into J2000--completing the transformation
+  //Despite being labeled as J2000, the coordinates for the instrument position are in fact 
+  //  in target centric coordinated rotated to a system centered at the target with aces 
+  //  parallel to J2000, whatever that means
+  posJ20 = spRot->J2000Vector(posSel); //J2000Vector calls rotates the position vector into J2000,
+                                       //  completing the transformation
   recordPos[0] = posJ20[0];
   recordPos[1] = posJ20[1];
   recordPos[2] = posJ20[2];
@@ -410,16 +441,19 @@ void IsisMain() {
   panCube.write(tablePos);  //now attach it to the table
 
   /////////////////////////////attach a camera pointing table
-  double  cacheSlope,    //time between epoches in the table
-          rollc,      //magnitude of roll relative to the center in the middle of the epoch
-          relt,      //relative time at the center of each epoch
+  double  cacheSlope,  //time between epoches in the table
+          rollComb,  //magnitude of roll relative to the center in the middle of the epoch
+          relT,  //relative time at the center of each epoch
           Q[NODES][5],  //NODES four ellement unit quarternions and et (to be calculated).
-          gimVec[3],      //the direction of the gimbal rotation vector (to the cameras persepective this is always changing because the camera is mounted to the roll frame assembly which is mounted to the gimbal)
-          M0[3][3],    //rotation matrix of the previous epoch
+          gimVec[3],  //the direction of the gimbal rotation vector (to the cameras persepective 
+                      //  this is always changing because the camera is mounted to the roll frame 
+                      //  assembly which is mounted to the gimbal)
+          M0[3][3],  //rotation matrix of the previous epoch
           Mtemp1[3][3],  //intermediate step in the multiplication of rotation matricies
           Mtemp2[3][3],  //intermediate step in the multiplication of rotation matricies
-          Mdg[3][3],    //incremental rotation due the the gimbal motion in the camera frame
-          Mdr[3][3];    //the contribution of the roll motion in the camera frame during time cacheSlope
+          Mdg[3][3],  //incremental rotation due the the gimbal motion in the camera frame
+          Mdr[3][3];  //the contribution of the roll motion in the camera frame during time 
+                      //  cacheSlope
   std::vector <double> M_J2toT;  //rotation matrix from J2000 to the target frame
   M_J2toT.resize(9);
   //Table Definition
@@ -435,62 +469,88 @@ void IsisMain() {
   recordRot += q3;
   recordRot += et;
   Table tableRot("InstrumentPointing",recordRot);
-  //From the cameras perspective the gimbal motion is around a constantly changing axis, this is handled by combining a series of incremental rotations
-  MfromLeftEulers(M0,omega,phi,kappa);  //rotation matrix in the center Q[(NOPDES-1)/2]
+  //From the cameras perspective the gimbal motion is around a constantly changing axis, 
+  //  this is handled by combining a series of incremental rotations
+  MfromLeftEulers(M0, omega, phi, kappa);  //rotation matrix in the center Q[(NOPDES-1)/2]
   spRot->SetEphemerisTime(isisTime.Et());
   M_J2toT = spRot->Matrix();   //this actually gives the rotation from J2000 to target centric
-  for(j=0;j<3;j++)    //reformating M_J2toT to a 3x3
-    for(k=0;k<3;k++)
+  for(j=0; j<3; j++)    //reformating M_J2toT to a 3x3
+    for(k=0; k<3; k++)
       Mtemp1[j][k] = M_J2toT[3*j+k];
-  mxm_c(M0,Mtemp1,Mtemp2);
-  M2Q(Mtemp2,Q[(NODES-1)/2]);  //save the middle scan line quarternion
+  mxm_c(M0, Mtemp1, Mtemp2);
+  M2Q(Mtemp2, Q[(NODES-1)/2]);  //save the middle scan line quarternion
 
   Q[(NODES-1)/2][4] = (time1 + time0)/2.0;  //time in the center of the image
-  cacheSlope = 1.03*(time1 - time0)/(NODES-1);    //the total time is scaled up slightly so that nodes will extend just beyond the edge of the image
-  MfromLeftEulers(Mdr,cacheSlope*rollV,0.0,0.0);  //Mdr is constant for all the forward time computations
-  for (i=(NODES-1)/2+1;i<NODES;i++) {    //moving foward in time first
+  //the total time is scaled up slightly so that nodes will extend just beyond the edge of the image
+  cacheSlope = 1.03*(time1 - time0)/(NODES-1);    
+  //Mdr is constant for all the forward time computations
+  MfromLeftEulers(Mdr,cacheSlope*rollV,0.0,0.0);  
+  for (i=(NODES-1)/2+1; i<NODES; i++) {    //moving foward in time first
     Q[i][4] = Q[i-1][4] + cacheSlope;    //new time epoch
-    relt = double(i - (NODES-1)/2 - 0.5)*cacheSlope;  //epoch center time relative to the center line
-    rollc = relt*rollV;
+    //epoch center time relative to the center line
+    relT = double(i - (NODES-1)/2 - 0.5)*cacheSlope;  
+    rollComb = relT*rollV;
     gimVec[0] = 0.0;      //gimbal rotation vector direction in the middle of the epoch
-    gimVec[1] =  cos(rollc);
-    gimVec[2] = -sin(rollc);
-    MfromVecLeftAngle(Mdg,gimVec,fmc*cacheSlope);    //incremental rotation due to the gimbal (forward motion compensation)
-    mtxm_c(Mdg,M0,Mtemp1);  //the new rotation matrix is Transpose(Mdr)*Transpose(Mdg)*M0--NOTE the order swap and transposes are needed because both Mdr and Mdg were caculated in image space and need to be transposed to apply to object space
-    mtxm_c(Mdr,Mtemp1,M0);  //M0 is now what would typically be considered the rotation matrix of an image.  It rotates a vector from the target centric space into camera space.  However, what is standard to include in the cube labels is a rotation from camera space to J2000.  M0 is therefore the transpose of the first part of this rotation.  Transpose(M0) is the rotation from camera space to target centric space
+    gimVec[1] =  cos(rollComb);
+    gimVec[2] = -sin(rollComb);
+    //incremental rotation due to the gimbal (forward motion compensation)
+    MfromVecLeftAngle(Mdg, gimVec, fmc*cacheSlope);    
+    //the new rotation matrix is Transpose(Mdr)*Transpose(Mdg)*M0--NOTE the order swap and 
+    //  transposes are needed because both Mdr and Mdg were caculated in image space and need to be 
+    //  transposed to apply to object space
+    mtxm_c(Mdg, M0, Mtemp1);  
+    //M0 is now what would typically be considered the rotation matrix of an image.  It rotates a 
+    //  vector from the target centric space into camera space.  However, what is standard to 
+    //  include in the cube labels is a rotation from camera space to J2000.  M0 is therefore the 
+    //  transpose of the first part of this rotation.  Transpose(M0) is the rotation from camera 
+    //  space to target centric space
+    mtxm_c(Mdr, Mtemp1, M0);  
     //now adding the rotation from the target frame to J2000
     spRot->SetEphemerisTime(Q[i][4]);
-    M_J2toT = spRot->Matrix();   //this actually gives the rotation from J2000 to target centric--hence the mxmt_c function being used later
-    for(j=0;j<3;j++)  //reformating M_J2toT to a 3x3
-      for(k=0;k<3;k++)
+    //this actually gives the rotation from J2000 to target centric--hence the mxmt_c function being 
+    //  used later
+    M_J2toT = spRot->Matrix();   
+    for(j=0; j<3; j++)  //reformating M_J2toT to a 3x3
+      for(k=0; k<3; k++)
         Mtemp1[j][k] = M_J2toT[3*j+k];
-    mxm_c(M0,Mtemp1,Mtemp2);
-    M2Q(Mtemp2,Q[i]);    //convert to a quarterion
+    mxm_c(M0, Mtemp1, Mtemp2);
+    M2Q(Mtemp2, Q[i]);    //convert to a quarterion
   }
 
-  MfromLeftEulers(M0,omega,phi,kappa);  //rotation matrix in the center Q[(NOPDES-1)/2]
-  MfromLeftEulers(Mdr,-cacheSlope*rollV,0.0,0.0);    //Mdr is constant for all the backward time computations
-  for (i=(NODES-1)/2-1;i>=0;i--) {  //moving backward in time
-    Q[i][4] = Q[i+1][4] - cacheSlope;    //new time epoch
-    relt = double(i  - (NODES-1)/2 + 0.5)*cacheSlope;  //epoch center time relative to the center line
-    rollc = relt*rollV;
+  MfromLeftEulers(M0, omega, phi, kappa);  //rotation matrix in the center Q[(NOPDES-1)/2]
+  //Mdr is constant for all the backward time computations
+  MfromLeftEulers(Mdr, -cacheSlope*rollV, 0.0, 0.0);    
+  for (i=(NODES-1)/2-1; i>=0; i--) {  //moving backward in time
+    Q[i][4] = Q[i+1][4] - cacheSlope;  //new time epoch
+    //epoch center time relative to the center line
+    relT = double(i  - (NODES-1)/2 + 0.5)*cacheSlope;  
+    rollComb = relT*rollV;
     gimVec[0] = 0.0;      //gimbal rotation vector direction in the middle of the epoch
-    gimVec[1] =  cos(rollc);
-    gimVec[2] = -sin(rollc);
-    MfromVecLeftAngle(Mdg,gimVec,-fmc*cacheSlope);    //incremental rotation due to the gimbal (forward motion compensation)
-    mtxm_c(Mdg,M0,Mtemp1);  //the new rotation matrix is Transpose(Mdr)*Transpose(Mdg)*M0    NOTE the order swap and transposes are needed because both Mdr and Mdg were caculated in image space and need to be transposed to apply to object space
-    mtxm_c(Mdr,Mtemp1,M0);  //M0 is now what would typically be considered the rotation matrix of an image.  It rotates a vector from the target centric space into camera space.  However, what is standard to include in the cube labels is a rotation from camera space to J2000.  M0 is therefore the transpose of the first part of this rotation.  Transpose(M0) is the rotation from camera space to target centric space
+    gimVec[1] =  cos(rollComb);
+    gimVec[2] = -sin(rollComb);
+    //incremental rotation due to the gimbal (forward motion compensation)
+    MfromVecLeftAngle(Mdg, gimVec, -fmc*cacheSlope);    
+    //the new rotation matrix is Transpose(Mdr)*Transpose(Mdg)*M0    NOTE the order swap and 
+    //  transposes are needed because both Mdr and Mdg were caculated in image space and need to be
+    //  transposed to apply to object space
+    mtxm_c(Mdg, M0, Mtemp1);  
+    //M0 is now what would typically be considered the rotation matrix of an image.  It rotates a 
+    //  vector from the target centric space into camera space.  However, what is standard to 
+    //  include in the cube labels is a rotation from camera space to J2000.  M0 is therefore the 
+    //  transpose of the first part of this rotation.  Transpose(M0) is the rotation from camera 
+    //  space to target centric space
+    mtxm_c(Mdr, Mtemp1, M0);  
     //now adding the rotation from the target frame to J2000
     spRot->SetEphemerisTime(Q[i][4]);
     M_J2toT = spRot->Matrix();
-    for(j=0;j<3;j++)  //reformating M_J2toT to a 3x3
-      for(k=0;k<3;k++)
+    for(j=0; j<3; j++)  //reformating M_J2toT to a 3x3
+      for(k=0; k<3; k++)
         Mtemp1[j][k] = M_J2toT[3*j+k];
-    mxm_c(M0,Mtemp1,Mtemp2);
-    M2Q(Mtemp2,Q[i]);    //convert to a quarterion
+    mxm_c(M0, Mtemp1, Mtemp2);
+    M2Q(Mtemp2, Q[i]);    //convert to a quarterion
   }
   //fill in the table
-  for (i=0;i<NODES;i++) {
+  for (i=0; i<NODES; i++) {
     recordRot[0] = Q[i][0];
     recordRot[1] = Q[i][1];
     recordRot[2] = Q[i][2];
@@ -498,9 +558,9 @@ void IsisMain() {
     recordRot[4] = Q[i][4];
     tableRot += recordRot;
   }
-  tableRot.Label() += PvlKeyword("CkTableStartTime",Q[0][4]);
-  tableRot.Label() += PvlKeyword("CkTableEndTime",Q[NODES-1][4]);
-  tableRot.Label() += PvlKeyword("Description","Created by appollopan2isis");
+  tableRot.Label() += PvlKeyword("CkTableStartTime", Q[0][4]);
+  tableRot.Label() += PvlKeyword("CkTableEndTime", Q[NODES-1][4]);
+  tableRot.Label() += PvlKeyword("Description", "Created by appollopan2isis");
 
   keyword.SetName("TimeDependentFrames");
   keyword.SetValue(scFrameCode);
@@ -515,17 +575,18 @@ void IsisMain() {
   keyword.SetName("ConstantRotation");
   keyword.SetValue(1);
   for (i=1;i<9;i++)
-    if( i%4 == 0) keyword.AddValue(1);
+    if (i%4 == 0) keyword.AddValue(1);
     else keyword.AddValue(0);
   tableRot.Label() += keyword;
   panCube.write(tableRot);
 
 
-  /////////////////////////////Attach a table with all the measurements of the fiducial mark locations.
+  /////////////////////////Attach a table with all the measurements of the fiducial mark locations.
   Chip patternS,searchS;   //scaled pattern and search chips
   Cube  fidC;  //Fiducial image
 
-  double l=1,s=1,sample,line,sampleInitial=1,lineInitial=1,play;  //line and sample coordinates for looping through the panCube
+  //line and sample coordinates for looping through the panCube
+  double l=1,s=1,sample,line,sampleInitial=1,lineInitial=1,play;  
 
   int  regStatus,
        fidn,
@@ -552,14 +613,16 @@ void IsisMain() {
 
   //read the image resolutions and scale the constants acordingly
   double  resolution = ui.GetDouble("MICRONS"),    //pixel size in microns
-          scale            = SCALE  *5.0/resolution,  //reduction scale for quicker autoregistrations
-          searchHeight     = SEARCHh*5.0/resolution,  //number of lines (in 5-micron-pixels) in search space for the first fiducial
+          scale            = SCALE  *5.0/resolution,  //reduction scale for fast autoregistrations
+          searchHeight     = SEARCHh*5.0/resolution,  //number of lines (in 5-micron-pixels) in 
+                                                      //  search space for the first fiducial
           searchCellSize   = SEARCHc*5.0/resolution,  //height/width of search chips block
           averageSamples   = AVERs  *5.0/resolution,  //scaled smaples between fiducials
-          averageLines     = AVERl  *5.0/resolution;  //scaled average diference between the top and bottom fiducials
+          averageLines     = AVERl  *5.0/resolution;  //scaled average distance between the top and 
+                                                      //bottom fiducials
 
-  if( 10.0/resolution < 0.5) play=0.5;//debug
-  else play = 10.0/resolution;  //debug
+  if( 15.0/resolution < 1.5) play=1.5;
+  else play = 15.0/resolution; 
 
   //copy the patternS chip (the entire ApolloPanFiducialMark.cub)
   FileName fiducialFileName("$apollo15/calibration/ApolloPanFiducialMark.cub");
@@ -570,11 +633,13 @@ void IsisMain() {
   }
   refL = fidC.getLineCount();
   refS = fidC.getSampleCount();
-  patternS.SetSize(int((refS-2)/SCALE),int((refL-2)/SCALE));  //scaled pattern chip for fast matching
-  patternS.TackCube((refS-1)/2,(refL-1)/2);
-  patternS.Load(fidC,0,SCALE);
+  //scaled pattern chip for fast matching
+  patternS.SetSize(int((refS-2)/SCALE), int((refL-2)/SCALE));  
+  patternS.TackCube((refS-1)/2, (refL-1)/2);
+  patternS.Load(fidC, 0, SCALE);
 
-  //parameters for maximum correlation autoregestration  see:  file:///usgs/pkgs/isis3nightly2011-09-21/isis/doc/documents/patternSMatch/patternSMatch.html#DistanceTolerance
+  //parameters for maximum correlation autoregestration  
+  // see:  file:///usgs/pkgs/isis3nightly2011-09-21/isis/doc/documents/patternSMatch/patternSMatch.html#DistanceTolerance
   FileName fiducialPvl("$apollo15/templates/apolloPanFiducialFinder.pvl");
   pvl.Read(fiducialPvl.expanded());  //read in the autoreg parameters
   AutoReg *arS = AutoRegFactory::Create(pvl);
@@ -584,78 +649,87 @@ void IsisMain() {
   //set up a centroid measurer
   CentroidApolloPan centroid(resolution);
   Chip inputChip,selectionChip;
-  inputChip.SetSize(int(ceil(200*5.0/resolution)),int(ceil(200*5.0/resolution)));
+  inputChip.SetSize(int(ceil(200*5.0/resolution)), int(ceil(200*5.0/resolution)));
   fileName = ui.GetFileName("FROM");
   if( panCube.getPixelType() == 1)  //UnsignedByte
-    centroid.setDNRange(12,1e99);  //8 bit bright target
+    centroid.setDNRange(12, 1e99);  //8 bit bright target
   else
-    centroid.setDNRange(3500,1e99);  //16 bit bright target
+    centroid.setDNRange(3500, 1e99);  //16 bit bright target
 
-  //Search for the first fiducial
-  searchS.SetSize(int(searchCellSize/scale),int(searchCellSize/scale));  //search sizes are constanst
+  Progress progress;
+  progress.SetText("Locating Fiducials");
+  progress.SetMaximumSteps(91);
+
+  //Search for the first fiducial, search sizes are constanst
+  searchS.SetSize(int(searchCellSize/scale),int(searchCellSize/scale));  
   //now start searching along a horizontal line for the first fiducial mark
-  for (s=searchCellSize/2;s<averageLines+searchCellSize/2.0 && !foundFirst;s+=searchCellSize-125*5.0/resolution) {
-    for(l = searchCellSize/2;l<searchHeight+searchCellSize/2.0 && !foundFirst;l+=searchCellSize-125*5.0/resolution) {
-      searchS.TackCube(s,l);
-      searchS.Load(panCube,0,scale);
+  for(l = searchCellSize/2;
+      l<searchHeight+searchCellSize/2.0 && !foundFirst;
+      l+=searchCellSize-125*5.0/resolution) {
+    for (s = searchCellSize/2;
+         s < averageSamples + searchCellSize/2.0 && !foundFirst;
+         s += searchCellSize-125*5.0/resolution) {
+      searchS.TackCube(s, l);
+      searchS.Load(panCube, 0, scale);
       *arS->SearchChip() = searchS;
       regStatus = arS->Register();
-      if ( regStatus == AutoReg::SuccessPixel ) {
-        inputChip.TackCube(arS->CubeSample(),arS->CubeLine());
-        inputChip.Load(panCube,0,1);
-        //inputChip.Write("AutoRegSuccess.cub");//debug
-        //printf("DEBUG autoReg success\n");getchar();//debug
-        centroid.selectAdaptive(&inputChip,&selectionChip);    //continuous dynamic range selection
-        //selectionChip.Write("firstselectionTemp.cub");
-        if (centroid.elipticalReduction(&selectionChip,95,play,2000)) {  //elliptical trimming/smoothing
-          //selectionChip.Write("firstselectionTempTrimmed.cub");
-          //printf("elliptical trimming success\n");getchar();//debug
-          centroid.centerOfMass(&selectionChip,&sample,&line);    //center of mass to reduce selection to a single measure
-          inputChip.SetChipPosition(sample,line);
+      if (regStatus == AutoReg::SuccessPixel) {
+        inputChip.TackCube(arS->CubeSample(), arS->CubeLine());
+        inputChip.Load(panCube, 0, 1);
+        inputChip.SetCubePosition(arS->CubeSample(), arS->CubeLine());
+        //continuous dynamic range selection
+        centroid.selectAdaptive(&inputChip, &selectionChip);    
+        //elliptical trimming/smoothing
+        if (centroid.elipticalReduction(&selectionChip, 95, play, 2000)) {  
+          //center of mass to reduce selection to a single measure
+          centroid.centerOfMass(&selectionChip, &sample, &line);    
+          inputChip.SetChipPosition(sample, line);
           sampleInitial = inputChip.CubeSample();
           lineInitial   = inputChip.CubeLine();
-      printf("DEBUG first fid: %lf %lf\n",sampleInitial,lineInitial);
           foundFirst = true;  //once the first fiducial is found stop
         }
       }
     }
   }
   if(s>=averageLines+searchCellSize/2.0) {
-     string msg = "Unable to locate a fiducial mark in the input cube [" + fileName + "].  Check FROM and MICRONS parameters.";
+     string msg = "Unable to locate a fiducial mark in the input cube [" + fileName + 
+                  "].  Check FROM and MICRONS parameters.";
      throw IException(IException::Io, msg, _FILEINFO_);
      return;
   }
-
+  progress.CheckStatus();
 
   //record first fiducial measurement in the table
   recordFid[0] = 0;
   recordFid[1] = sampleInitial;
   recordFid[2] = lineInitial;
   tableFid += recordFid;
-  for (s= sampleInitial, l=lineInitial, fidn=0;s<panS;s+=averageSamples, fidn++) {
+  for (s= sampleInitial, l=lineInitial, fidn=0;  s<panS;  s+=averageSamples, fidn++) {
      //corrections for half spacing of center fiducials
      if (fidn == 22) s -= averageSamples/2.0;
      if (fidn == 23) s -= averageSamples/2.0;
 
      //look for the bottom fiducial
      searchS.TackCube(s,l+averageLines);
-     searchS.Load(panCube,0,scale);
+     searchS.Load(panCube, 0, scale);
      *arS->SearchChip()   = searchS;
      regStatus = arS->Register();
      if (regStatus == AutoReg::SuccessPixel) {
-       inputChip.TackCube( arS->CubeSample(),arS->CubeLine() );
+       inputChip.TackCube(arS->CubeSample(), arS->CubeLine());
+       inputChip.Load(panCube,0,1);
+       inputChip.SetCubePosition(arS->CubeSample(), arS->CubeLine());
      }
      else {  //if autoreg is unsuccessful, a larger window will be used
-       inputChip.TackCube( s, l+averageLines);
+       inputChip.TackCube(s, l+averageLines);
+       inputChip.Load(panCube, 0, 1);
+       inputChip.SetCubePosition(s, l+averageLines);
      }
-     inputChip.Load(panCube,0,1);
-     centroid.selectAdaptive(&inputChip,&selectionChip);          //continuous dynamic range selection
-     //inputChip.Write("inputTemp.cub");//debug
-     //selectionChip.Write("selectionTemp.cub");//debug
-     if (centroid.elipticalReduction(&selectionChip,95,play,2000) != 0 ) {      //elliptical trimming/smoothing... if this fails move on
-       //selectionChip.Write("selectionTempTrimmed.cub");//getchar();//debug
-       centroid.centerOfMass(&selectionChip,&sample,&line);      //center of mass to reduce selection to a single measure
-       inputChip.SetChipPosition(sample,line);
+     centroid.selectAdaptive(&inputChip, &selectionChip);  //continuous dynamic range selection
+     //elliptical trimming/smoothing... if this fails move on
+     if (centroid.elipticalReduction(&selectionChip, 95, play, 2000) != 0 ) {      
+       //center of mass to reduce selection to a single measure
+       centroid.centerOfMass(&selectionChip, &sample, &line);      
+       inputChip.SetChipPosition(sample, line);
        sample = inputChip.CubeSample();
        line   = inputChip.CubeLine();
        recordFid[0] = fidn*2+1;
@@ -663,61 +737,70 @@ void IsisMain() {
        recordFid[2] = line;
        tableFid += recordFid;
      }
-     /*else {  //DEBUG whole else block
-       if (regStatus == AutoReg::SuccessPixel) printf("DEBUG: AutoReg Success: elliptical reduction failed: initialPoint: %lf %lf\n",arS->CubeSample(),arS->CubeLine());
-       else printf("DEBUG: AutoReg Failure:  elliptical reduction failed: initialPoint: %lf %lf\n",s,l+averageLines);
-       selectionChip.Write("selectionChip.cub");
-       getchar();
-     }*/
+     progress.CheckStatus();
 
      //look for the top fiducial
-     if (s == sampleInitial) continue;  //if this is the first time through the loop then the top fiducial was already found
-     searchS.TackCube(s,l);
-     searchS.Load(panCube,0,scale);
+     if (s == sampleInitial) //first time through the loop?
+       continue;  //then the top fiducial was already found
+     searchS.TackCube(s, l);
+     searchS.Load(panCube, 0, scale);
      *arS->SearchChip()   = searchS;
      regStatus = arS->Register();
      if (regStatus == AutoReg::SuccessPixel) {
-       inputChip.TackCube( arS->CubeSample(),arS->CubeLine() );
+       inputChip.TackCube(arS->CubeSample(), arS->CubeLine());
+       inputChip.Load(panCube, 0, 1);
+       inputChip.SetCubePosition(arS->CubeSample(), arS->CubeLine());
      }
      else {  //if autoreg is unsuccessful, a larger window will be used
-       inputChip.TackCube( s, l );
+       inputChip.TackCube(s, l);
+       inputChip.Load(panCube, 0, 1);
+       inputChip.SetCubePosition(s, l);
      }
-     inputChip.Load(panCube,0,1);
-     centroid.selectAdaptive(&inputChip,&selectionChip);//continuous dynamic range selection
+     centroid.selectAdaptive(&inputChip, &selectionChip);//continuous dynamic range selection
      //inputChip.Write("inputTemp.cub");//debug
      //selectionChip.Write("selectionTemp.cub");//debug
-     if (centroid.elipticalReduction(&selectionChip,95,play,2000) !=0) {    //elliptical trimming/smoothing... if this fails move on
-       //selectionChip.Write("selectionTempTrimmed.cub");//getchar();//debug
-       centroid.centerOfMass(&selectionChip,&sample,&line);      //center of mass to reduce selection to a single measure
-       inputChip.SetChipPosition(sample,line);
-       s = inputChip.CubeSample();            //when finding the top fiducial both s and l are refined for a successful measurement, this will help follow trends in the scaned image
+     //elliptical trimming/smoothing... if this fails move on
+     if (centroid.elipticalReduction(&selectionChip, 95, play, 2000) !=0) {    
+       //center of mass to reduce selection to a single measure
+       centroid.centerOfMass(&selectionChip, &sample, &line);  
+       inputChip.SetChipPosition(sample, line);
+       //when finding the top fiducial both s and l are refined for a successful measurement, 
+       //  this will help follow trends in the scaned image
+       s = inputChip.CubeSample(); 
        l = inputChip.CubeLine();
        recordFid[0] = fidn*2;
        recordFid[1] = s;
        recordFid[2] = l;
        tableFid += recordFid;
      }
-     /*else {  //DEBUG whole else block
-       if (regStatus == AutoReg::SuccessPixel) printf("DEBUG: AutoReg Success: elliptical reduction failed: initialPoint: %lf %lf\n",arS->CubeSample(),arS->CubeLine());
-       else printf("DEBUG: AutoReg Failure: elliptical reduction failed: initialPoint: %lf %lf\n",s,l);
-       //printf("DEBUG: elliptical reduction failed: initialPoint: %lf %lf\n",s,l);
-       selectionChip.Write("selectionChip.cub");
-       getchar();
-     }*/
+     progress.CheckStatus();
   }
 
-  printf("%d of 90 fiducial marks found\n",tableFid.Records());
   panCube.write(tableFid);
-
+  //close the new cube
+  panCube.close(false);
+  panCube.open(ui.GetFileName("FROM"),"rw");
+ 
   delete spPos;
   delete spRot;
 
-  //close the new cube
-  panCube.close(false);
+  //now instantiate a camera to make sure all of this is working
+  ApolloPanoramicCamera* cam = (ApolloPanoramicCamera*)(panCube.getCamera());
+  //log the residual report from interior orientation 
+  PvlGroup residualStats("InteriorOrientationStats");
+  residualStats += PvlKeyword("FiducialsFound",  tableFid.Records());
+  residualStats += PvlKeyword("ResidualMax",  cam->intOriResidualMax(),"pixels");
+  residualStats += PvlKeyword("ResidualMean", cam->intOriResidualMean(),"pixels");
+  residualStats += PvlKeyword("ResidualStdev", cam->intOriResidualStdev(),"pixels");
+
+  Application::Log( residualStats ); 
+
+
   return;
 }
 
-//function largely copied from the spice class because it was private and I couldn't access it without shoe-horning the input to please the rest of the Spice::Init() funciton
+//function largely copied from the spice class because it was private and I couldn't access it 
+//  without shoe-horning the input to please the rest of the Spice::Init() funciton
 void Load_Kernel(Isis::PvlKeyword &key) {
 
   //Load all the kernal files (file names are stored as values of the PvlKeyword)
@@ -727,7 +810,9 @@ void Load_Kernel(Isis::PvlKeyword &key) {
      if(key[i] == "") continue;
      if(iString(key[i]).UpCase() == "NULL") break;
      if(iString(key[i]).UpCase() == "NADIR") break;
-     if(iString(key[i]).UpCase() == "TABLE") continue;  //Table was left as the first value of these keywords because one is about to be attached, still though it needs to be skipped in this loop
+     //Table was left as the first value of these keywords because one is about to be attached, 
+     //  still though it needs to be skipped in this loop
+     if(iString(key[i]).UpCase() == "TABLE") continue;  
      Isis::FileName file(key[i]);
      if(!file.fileExists()) {
        string msg = "Spice file does not exist [" + file.expanded() + "]";

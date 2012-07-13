@@ -1,1 +1,25 @@
-Unit test for Isis::ApolloPanoramicCamera
+Unit Test for ApolloCamera...
+FileName: TL.cub
+CK Frame: -915230
+
+Kernel IDs: 
+CK Frame ID = -915000
+CK Reference ID = 1
+SPK Target ID = -915
+SPK Reference ID = 1
+
+For upper left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+For lower left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+For center pixel position ...
+Latitude OK
+Longitude OK

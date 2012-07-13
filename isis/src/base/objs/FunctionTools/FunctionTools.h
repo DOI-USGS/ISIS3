@@ -26,16 +26,11 @@
 
 #include "iString.h"
 #include "IException.h"
-#include "Constants.h"
-#include <iostream>
 #include <math.h>
 #include <cfloat>
-#include <QSet>
-
-using namespace std;
 
 namespace Isis {
- /** A collection of tools for mathmatical function root finding, maximization, etc (eventually)
+  /** A collection of tools for mathmatical function root finding, maximization, etc (eventually)
    * This class contains only static methods, and cannot be instantiated
    *
    * @ingroup Math
@@ -166,35 +161,38 @@ namespace Isis {
       return roots;
     }
 
-
-
-    /** Van Wijngaarden-Dekker-Brent Method for root finding on discreetly defined function
-     *  meaning that we can evaluate the function for discreet points, but we lack global
-     *  function and derivative definitions.  See Numerical Recipes 3rd eddition pages 454-456.
-     *
-     *  This method requires that the root be bounded on the interval [pt1,pt2], and is gaurenteed
-     *  to convege a root (by Brent) in the interval as long the function is continous and 
-     *  can evaluated on that interval.  
-     *
-     *  Note that if there are multiple roots on the interval the function will find one
-     *  of them and there is no particular gaurentee which one.  Note, also that I have changed the
-     *  convergance criteria to enforce the nearness of the function to zero rather than the
-     *  precision of the root.
-     *
-     *  @param func  template parameter that must have a  double operator()(double) defined
-     *  @param pt1   one of the already defined points (x, y) that bracket the root
-     *  @param pt2   one of the already defined points (x, y) that bracket the root
-     *  @param tol   how close to zero the function must come before iterations stop
-     *  @param maxiter  the maximum number of iterations before stoping the root search
-     *  @param root  the returned root (if any)
-     *  @returns bool  true if the solution converged, false otherwise
-     */
+    /** Van Wijngaarden-Dekker-Brent Method for root finding on a discreetly defined function
+      *  meaning that we can evaluate the function for discreet points, but we lack a global
+      *  function and derivative definitions.  See Numerical Recipes 3rd eddition pages 454-456.
+      *
+      *  This method requires that the root be bounded on the interval [pt1,pt2], and is gaurenteed
+      *  to convege a root (by Brent) in the interval as long the function is continous and 
+      *  can evaluated on that interval.  
+      *
+      *  Note that if there are multiple roots on the interval the function will find one
+      *  of them and there is no particular gaurentee which one.  Note, also that I have changed the
+      *  convergance criteria to enforce the nearness of the function to zero rather than the
+      *  precision of the root.
+      *
+      *  @param func  template parameter that must have a  double operator()(double) defined
+      *  @param pt1   one of the already defined points (x, y) that bracket the root
+      *  @param pt2   one of the already defined points (x, y) that bracket the root
+      *  @param tol   how close to zero the function must come before iterations stop
+      *  @param maxiter  the maximum number of iterations before stoping the root search
+      *  @param root  the returned root (if any)
+      *  @returns bool  true if the solution converged, false otherwise
+      */
     template <typename Functor> 
     static bool brentsRootFinder(Functor &func, const QList<double> pt1, 
                           const QList<double> pt2, double tol, int maxIter, double &root) {
       double a=pt1[0], b=pt2[0], c, d=0, fa = pt1[1], fb = pt2[1], fc, p, q, r, s, t,tol1, bnew, fbnew, temp, deltaI,deltaF;
 
-      //check to see if the points bracket a root(s), if the signs are equal they don't necessarily
+      //offset used for improved numerical stability
+      double offset = (a + b) / 2.0;
+      a -= offset;
+      b -= offset;
+
+      //check to see if the points bracket a root(s), if the signs are equal they don't
       if ( (fa > 0) - (fa < 0) == (fb > 0) - (fb < 0) ) {
         iString msg = "The function evaluations of two bounding points passed to Brents Method "
                       "have the same sign.  Therefore, they don't necessary bound a root.  No "
@@ -273,7 +271,7 @@ namespace Isis {
           mflag=false;
         }
         try {
-          fbnew = func(bnew);
+          fbnew = func(bnew + offset);
         } catch (IException e) {
           iString msg = "Function evaluation failed at:" + iString(bnew) + 
                         ".  Function must be continuous and defined for the entire interval "
@@ -284,15 +282,15 @@ namespace Isis {
         c = b;  //thus c always equals the best giess from the previous iteration
         fc = fb;
         
-        deltaF = fabs(b - bnew); //the Final magnitude of the correction
-
         if ( (fa > 0) - (fa < 0) == (fbnew > 0) - (fbnew < 0) ) {
           //if b and bnew bracket the root
+          deltaF = fabs(a - bnew); //the Final magnitude of the correction
           a = bnew;
           fa = fbnew;
         }
         else {
           //a and bnew bracket the root
+          deltaF = fabs(b - bnew); //the Final magnitude of the correction
           b = bnew;
           fb = fbnew;
         }
@@ -306,11 +304,26 @@ namespace Isis {
           fa = fb;
           fb = temp;
         }
-        if (fabs(fb) < tol || deltaF < tol1) {
+        if (fabs(fb) < tol) {
           //if the tolerance is meet
-            //or the root cannot get any better due to numerical limitations
-          root = b;
+          root = b + offset;
           return true;  
+        }
+        else if ( deltaF < tol1 && fabs(b) < 100.0*tol) {
+          //we've reach the numerical limit to how well the root can be defined, and the function
+          //  is at least approaching zero
+          //This was added specifically for the apollo pan camera, the camera classes (and maybe
+          // NAIF as well can not actually converge to zero for the extreme edges of some pan
+          // images (partial derivates WRT to line approach infinity).  They can get close 
+          // 'enough' however
+          root = b + offset;
+          return true;  
+        }
+        else if (deltaF < tol1) {
+          //we've reached the limit of the numerical ability to refine the root and the function
+          // is not near zero.  This is a clasically ill defined root (nearly vertical function)
+          // "This is not the [root] you're looking for"
+          return false;
         }
       }
       //maximum number of iteration exceeded
@@ -321,13 +334,13 @@ namespace Isis {
     private:
       /** Constructor
        *
-       * This is private and to be left undefined so this class cannot be instaniated
+       * This is private and to left undefined so this class cannot be instaniated
        */
       FunctionTools(); //no definition to be supplied
      
       /** destructor
        *
-       * This is private and to be left undefined so this class cannot be instaniated
+       * This is private and to left undefined so this class cannot be instaniated
        */
       ~FunctionTools(); //no definition to be supplied
    }; //end FuntionTools class definition

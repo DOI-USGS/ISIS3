@@ -108,7 +108,7 @@ class LineOffsetFunctor :
 
       //return the offset
       return (m_camera->FocalPlaneMap()->DetectorLineOffset() - 
-              m_camera->FocalPlaneMap()->DetectorLine())/m_camera->PixelPitch();
+              m_camera->FocalPlaneMap()->DetectorLine());///m_camera->PixelPitch();
     }
 
   private:
@@ -244,24 +244,7 @@ namespace Isis {
       //convert the approxLine to an approximate time and offset
       p_camera->DetectorMap()->SetParent(p_camera->ParentSamples() / 2, approxLine);
       approxTime = p_camera->time().Et();
-      /*p_camera->Sensor::setTime(approxTime);
-      if(!p_camera->Sensor::SetGround(surfacePoint, false)) {
-        return Failure;
-      }
-      p_camera->Sensor::LookDirection(lookC);
-      ux = p_camera->FocalLength() * lookC[0] / lookC[2];
-      uy = p_camera->FocalLength() * lookC[1] / lookC[2];
-
-      if(!distortionMap->SetUndistortedFocalPlane(ux, uy)) {
-        return Failure;
-      }
-      dx = distortionMap->FocalPlaneX();
-      dy = distortionMap->FocalPlaneY();
-
-      if(!focalMap->SetFocalPlane(dx, dy)) {
-        return Failure;
-      }
-      approxOffset = focalMap->DetectorLineOffset() - focalMap->DetectorLine();*/
+  
       approxOffset = offsetFunc(approxTime);
 
       if (fabs(approxOffset) < 1e-2) { //no need to iteratively improve this root, it's good enough
@@ -289,28 +272,6 @@ namespace Isis {
 
       //starting offsets
       fh = approxOffset;  //the first is already calculated
-      /*p_camera->Sensor::setTime(xl);
-      if(!p_camera->Sensor::SetGround(surfacePoint, false)) {
-        return Failure;
-      }
-
-      p_camera->Sensor::LookDirection(lookC);
-      ux = p_camera->FocalLength() * lookC[0] / lookC[2];
-      uy = p_camera->FocalLength() * lookC[1] / lookC[2];
-
-      if(!distortionMap->SetUndistortedFocalPlane(ux, uy)) {
-        return Failure;
-      }
-
-      dx = distortionMap->FocalPlaneX();
-      dy = distortionMap->FocalPlaneY();
-
-      if(!focalMap->SetFocalPlane(dx, dy)) { 
-        return Failure;
-      }
-
-      fl = focalMap->DetectorLineOffset() -
-           focalMap->DetectorLine();*/
       fl = offsetFunc(xl);
 
       // Iterate to refine the given approximate time that the instrument imaged the ground point
@@ -321,26 +282,6 @@ namespace Isis {
         if (etGuess < cacheStart) etGuess = cacheStart;
         if (etGuess > cacheEnd) etGuess = cacheEnd;
 
-        /*p_camera->Sensor::setTime(etGuess);
-        if(!p_camera->Sensor::SetGround(surfacePoint, false)) {
-          return Failure;
-        }
-        p_camera->Sensor::LookDirection(lookC);
-        ux = p_camera->FocalLength() * lookC[0] / lookC[2];
-        uy = p_camera->FocalLength() * lookC[1] / lookC[2];
-
-        if(!distortionMap->SetUndistortedFocalPlane(ux, uy)) {
-          return Failure;
-        }
-        dx = distortionMap->FocalPlaneX();
-        dy = distortionMap->FocalPlaneY();
-
-        if(!focalMap->SetFocalPlane(dx, dy)) {
-          return Failure;
-        }
-        double f = focalMap->DetectorLineOffset() -
-                   focalMap->DetectorLine();*/
-          
         double f = offsetFunc(etGuess);
 
 
@@ -396,24 +337,6 @@ namespace Isis {
     double quadPoly[3],temp;
 
     for (int i=0;i<3;i++) {
-      /*p_camera->Sensor::setTime(timeNodes[i]);
-      if(!p_camera->Sensor::SetGround(surfacePoint, false)) {
-        return Failure;
-      }
-      p_camera->Sensor::LookDirection(lookC);
-      ux = p_camera->FocalLength() * lookC[0] / lookC[2];
-      uy = p_camera->FocalLength() * lookC[1] / lookC[2];
-
-      if(!distortionMap->SetUndistortedFocalPlane(ux, uy)) {
-        return Failure;
-      }
-      dx = distortionMap->FocalPlaneX();
-      dy = distortionMap->FocalPlaneY();
-
-      if(!focalMap->SetFocalPlane(dx, dy)) {
-        return Failure;
-      }
-      offsetNodes[i] = focalMap->DetectorLineOffset() - focalMap->DetectorLine();*/
       offsetNodes[i] = offsetFunc(timeNodes[i]);
     }
    
@@ -479,29 +402,6 @@ namespace Isis {
 
 
     for (int i=0;i<root.size();i++) {  //Offset/dist calculation loop
-      /*p_camera->Sensor::setTime(root[i]);
-      if(!p_camera->Sensor::SetGround(surfacePoint, false)) {
-        return Failure;
-      }
-      p_camera->instrumentPosition(s);
-      p_camera->Coordinate(p);
-      dist.push_back( sqrt((s[0] - p[0]) * (s[0] - p[0]) +
-                           (s[1] - p[1]) * (s[1] - p[1]) +
-                           (s[2] - p[2]) * (s[2] - p[2]) ) );  //distance
-      p_camera->Sensor::LookDirection(lookC);
-      ux = p_camera->FocalLength() * lookC[0] / lookC[2];
-      uy = p_camera->FocalLength() * lookC[1] / lookC[2];
-
-      if(!distortionMap->SetUndistortedFocalPlane(ux, uy)) {
-        return Failure;
-      }
-      dx = distortionMap->FocalPlaneX();
-      dy = distortionMap->FocalPlaneY();
-
-      if(!focalMap->SetFocalPlane(dx, dy)) {
-        return Failure;
-      }
-      offset.push_back( focalMap->DetectorLineOffset() - focalMap->DetectorLine() );*/
       dist << distanceFunc(root[i]);
       offset << offsetFunc(root[i]);
     }  //end Offset/dist calculation loop
@@ -572,7 +472,7 @@ namespace Isis {
       //if the signs of the two offsets are not the same they bracket at least one root
       if ( (pts[i-1][1] > 0) - (pts[i-1][1] < 0) != (pts[i][1] > 0) - (pts[i][1] < 0) ) {
         double temp;
-        if (FunctionTools::brentsRootFinder <LineOffsetFunctor> (offsetFunc,pts[i-1],pts[i],1.0e-2,200,temp))
+        if (FunctionTools::brentsRootFinder <LineOffsetFunctor> (offsetFunc,pts[i-1],pts[i],1.0e-3,200,temp))
           root << temp;
       }      
     }

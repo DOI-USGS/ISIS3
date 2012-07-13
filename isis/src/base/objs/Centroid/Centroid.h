@@ -24,7 +24,7 @@
  */
 
 #include "Chip.h"
-#include "/work/users/othomas/imageReg/SubPixelDevelopemnt/trunk/isis/src/base/objs/Selection/Selection.h"
+#include "Selection.h"
 #include "Statistics.h"
 
 namespace Isis {
