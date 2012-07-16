@@ -692,7 +692,7 @@ namespace Isis {
 
 
       // Check for triangle cycles and try to fix
-      if (p_sampinc > 1  ||  p_lineinc > 1) {
+      if ((p_sampinc > 1  ||  p_lineinc > 1) && points.size() >= 3) {
         if (points[points.size()-3].x == tempPoint.x &&
             points[points.size()-3].y == tempPoint.y) {
           // Remove the triangle from the list

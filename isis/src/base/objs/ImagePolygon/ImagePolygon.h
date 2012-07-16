@@ -157,7 +157,11 @@ namespace Isis {
    *           valid neighbors (i.e., an outlier).
    *  @history 2012-05-14 Steven Lambright - Added safety to the calcImageBorderCoordinates method,
    *                          along with the validSampleDim and validLineDim methods. This fixes
-     *                        seg faults. Fixes #686.
+   *                          seg faults. Fixes #686.
+   *  @history 2012-07-16 Steven Lambright - Fixed a bug in WalkPoly() that caused crashing
+   *                          periodically due to accessing a vector outside of it's bounds
+   *                          (negative indices). This was in the 'triangle' (loop) detection code.
+   *                          Fixes #994.
    */
 
   class ImagePolygon : public Isis::Blob {
