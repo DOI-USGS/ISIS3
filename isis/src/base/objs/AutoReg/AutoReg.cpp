@@ -1088,9 +1088,19 @@ namespace Isis {
    * @return @b bool Returns true if the subpixel solution is valid
    */
   bool AutoReg::SetSubpixelPosition(Chip &window) {
-    // Find the greatest edge DN
+    // The best correlation will be at the center of the window
+    //   if it's smaller than the edge DN's invert the chip DNs
     double samples = window.Samples();
     double lines= window.Lines();
+    double bestDN = window.GetValue(window.ChipSample(), window.ChipLine()); 
+    if (bestDN < window.GetValue(1, 1)) {
+      for (int s=1; s <= samples; s++) 
+        for (int l=1; l <= lines; l++)
+          window.SetValue(s, l, 1.0/window.GetValue(s, l)); //invert all the window DN's
+      bestDN = 1 / bestDN;
+    }
+
+    // Find the greatest edge DN
     double greatestEdgeDn = 0.0;
     for (int s = 1; s <= samples; s++) {
       greatestEdgeDn = max(window.GetValue(s, 1), greatestEdgeDn);
@@ -1101,10 +1111,12 @@ namespace Isis {
       greatestEdgeDn = max(window.GetValue(samples, l), greatestEdgeDn);
     }
 
-    // This is a samll shift so the the centroid doesn't reach the edge, add 20%
-    // of the difference between the hightest edge DN and the max DN
-    double temp = window.GetValue(window.ChipSample(), window.ChipLine());
-    temp = greatestEdgeDn + 0.2 * (temp - greatestEdgeDn);
+    //This is a small shift so the the centroid doesn't reach the edge, add 20%
+    //  of the difference between the hightest edge DN and the max DN to the highest edge DN
+    //The 20% shift added here is somewhat arbitrary, but was choosen because it worked well
+    //  for the maximum correlation tests we did.  For new area based algorithms we may want
+    //  to revist this.  Possible make it a function of the match type
+    double temp = greatestEdgeDn + 0.2 * (bestDN - greatestEdgeDn);
 
     Centroid floodFill;
     floodFill.setDNRange(temp, 1e100);
@@ -1121,6 +1133,7 @@ namespace Isis {
     int offsetL = p_bestLine - window.ChipLine();
     p_chipSample = windowSample + offsetS;
     p_chipLine = windowLine + offsetL;
+
     if (p_chipSample != p_chipSample) {
       p_surfaceModelSolutionInvalidCount++;
       return false;  //this should never happen, but just in case...       

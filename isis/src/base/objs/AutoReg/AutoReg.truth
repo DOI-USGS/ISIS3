@@ -396,3 +396,36 @@ Group = SurfaceModelFailures
 End_Group
 End
 Goodness of Fit = 0.200126
+
+---------------------
+Testing Minimum Difference Algorithm
+---------------------
+Position = 50 65
+Group = AutoRegStatistics
+  Total      = 1
+  Successful = 1
+  Failure    = 0
+End_Group
+
+Group = Successes
+  SuccessPixel    = 1
+  SuccessSubPixel = 0
+End_Group
+
+Group = PatternChipFailures
+  PatternNotEnoughValidData = 0
+  PatternZScoreNotMet       = 0
+End_Group
+
+Group = FitChipFailures
+  FitChipNoData          = 0
+  FitChipToleranceNotMet = 0
+End_Group
+
+Group = SurfaceModelFailures
+  SurfaceModelNotEnoughValidData = 0
+  SurfaceModelSolutionInvalid    = 0
+  SurfaceModelDistanceInvalid    = 0
+End_Group
+End
+Goodness of Fit = 0.0137121

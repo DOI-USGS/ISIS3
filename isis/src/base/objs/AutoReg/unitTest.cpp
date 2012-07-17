@@ -290,6 +290,18 @@ int main() {
   DoRegister();
   cout << "Goodness of Fit = " << p_ar->GoodnessOfFit() << endl;
 
+  //reset to minimum difference algorithm
+  cout << "\n---------------------" << endl;
+  cout << "Testing Minimum Difference Algorithm" << endl;
+  cout << "---------------------" << endl;
+  mg = obj.FindGroup("Algorithm");
+  mg["Name"] = "MinimumDifference";
+  Doit(obj);
+  p_ar->SetSubPixelAccuracy(false);
+  DoRegister();
+  cout << "Goodness of Fit = " << p_ar->GoodnessOfFit() << endl;
+  
+
   delete p_ar;
   return 0;
 }
