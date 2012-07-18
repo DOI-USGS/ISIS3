@@ -561,7 +561,9 @@ int main(int argc, char *argv[]) {
       in4.reopen("rw");
     }
     catch (IException &e) {
-      e.print();
+      QString error = QString::fromStdString(e.toString());
+      error = error.replace(QRegExp("\\[[^\\]]*\\]"), "[...]");
+      cerr << error.toStdString() << endl;
     }
 
     in4.setPixelType(None);

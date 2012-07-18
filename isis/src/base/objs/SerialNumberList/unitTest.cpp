@@ -1,9 +1,12 @@
 #include <iostream>
 #include "SerialNumberList.h"
+#include "FileName.h"
 #include "IException.h"
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
+
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
@@ -20,19 +23,20 @@ int main(int argc, char *argv[]) {
     cout << "hasXYZ = " << snl.HasSerialNumber(QString("XYZ")) << endl;
 
     for(int i = 0; i < snl.Size(); i++) {
-      cout << snl.FileName(i) << " = " << snl.SerialNumber(i) << endl;
+      cout << FileName(snl.FileName(i)).name() << " = " << snl.SerialNumber(i) << endl;
     }
 
-    cout << endl << "SN->File: " << snl.FileName("MGS/561812335:32/MOC-WA/RED") << endl
+    cout << endl << "SN->File: " << FileName(snl.FileName("MGS/561812335:32/MOC-WA/RED")).name()
+         << endl
          << "File->SN:" << snl.SerialNumber("$mgs/testData/ab102401.cub") << endl;
 
     for(int i = 0; i < snl.Size(); i++) {
       cout << snl.SerialNumber(i) << " = " << snl.SerialNumberIndex(snl.SerialNumber(i)) << endl;
     }
 
-    cout << endl << "SN->File (0): " << snl.FileName(0) << endl;
-    cout << endl << "SN->File (1): " << snl.FileName(1) << endl;
-    cout << endl << "SN->File (2): " << snl.FileName(1) << endl;
+    cout << endl << "SN->File (0): " << FileName(snl.FileName(0)).name() << endl;
+    cout << endl << "SN->File (1): " << FileName(snl.FileName(1)).name() << endl;
+    cout << endl << "SN->File (2): " << FileName(snl.FileName(2)).name() << endl;
 
     cout << endl << "Index->observationNumber (2):  " << snl.ObservationNumber(2) << endl;
   }
@@ -50,7 +54,8 @@ int main(int argc, char *argv[]) {
     snl.Add("$lo/testData/3133_h1.cub");
   }
   catch(Isis::IException &e) {
-    e.print();
+    QString error = e.toString().ToQt().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
+    cerr << error.toStdString() << endl;
   }
 
 }

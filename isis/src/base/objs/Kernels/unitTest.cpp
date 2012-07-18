@@ -12,6 +12,14 @@ typedef std::vector<std::string>  StrList;
 using namespace std;
 using namespace Isis;
 
+string stripPath(string input) {
+  QString result = QString::fromStdString(input).replace(
+      QRegExp("(.*/)([^/]*/[^/]*/[^/]*/[^/]*$)"),
+      "$\\2");
+
+  return result.toStdString();
+}
+
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
   string inputFile = "$ISIS3DATA/mgs/testData/ab102401.lev2.cub";
@@ -22,6 +30,7 @@ int main(int argc, char *argv[]) {
   Kernels myKernels(inputFile);
   cout << "\nList of kernels found - Total: " << myKernels.size() << "\n";
   StrList kfiles = myKernels.getKernelList();
+  transform(kfiles.begin(), kfiles.end(), kfiles.begin(), &stripPath);
   copy(kfiles.begin(), kfiles.end(), ostream_iterator<std::string>(cout, "\n"));
 
   cout << "\nTypes of kernels found\n";
@@ -33,6 +42,7 @@ int main(int argc, char *argv[]) {
   query.Discover();
   cout << "\nInitial currently loaded kernel files = " << query.size() << "\n";
   StrList kloaded = query.getKernelList();
+  transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   copy(kloaded.begin(), kloaded.end(), ostream_iterator<std::string>(cout, "\n"));
 
   //  Load all the kernels
@@ -40,6 +50,7 @@ int main(int argc, char *argv[]) {
   query.Discover();
   cout << "\nAfter LoadALL option, kernels loaded = " << query.size() << "\n";
   kloaded = query.getKernelList();
+  transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   copy(kloaded.begin(), kloaded.end(), ostream_iterator<std::string>(cout, "\n"));
 
   // Unload and check for proper status
@@ -52,6 +63,7 @@ int main(int argc, char *argv[]) {
   query.Discover();
   cout << "\nLoaded SPK kernels = " << query.size() << "\n";
   kloaded = query.getKernelList();
+  transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   copy(kloaded.begin(), kloaded.end(), ostream_iterator<std::string>(cout, "\n"));
 
   // Load kernels needed for Time manipulation
@@ -60,6 +72,7 @@ int main(int argc, char *argv[]) {
   query.Discover();
   cout << "\nLoad LSK, SCLK for Time manip, unload SPK kernels = " << query.size() << "\n";
   kloaded = query.getKernelList();
+  transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   copy(kloaded.begin(), kloaded.end(), ostream_iterator<std::string>(cout, "\n"));
 
   // Check double load behavior
@@ -76,6 +89,7 @@ int main(int argc, char *argv[]) {
   query.Discover();
   cout << "\nCheck Double-Load of LSK, SCLK = " << query.size() << "\n";
   kloaded = query.getKernelList();
+  transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   copy(kloaded.begin(), kloaded.end(), ostream_iterator<std::string>(cout, "\n"));
 
   // Unload each set
@@ -83,6 +97,7 @@ int main(int argc, char *argv[]) {
   query.Discover();
   cout << "\nUnload the cloned set = " << query.size() << "\n";
   kloaded = query.getKernelList();
+  transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   copy(kloaded.begin(), kloaded.end(), ostream_iterator<std::string>(cout, "\n"));
   clone.UnManage();
 
@@ -92,6 +107,7 @@ int main(int argc, char *argv[]) {
   query.Discover();
   cout << "\nCheck SPK load  (LSK,FK,DAF,SPK)= " << query.size() << "\n";
   kloaded = query.getKernelList();
+  transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   copy(kloaded.begin(), kloaded.end(), ostream_iterator<std::string>(cout, "\n"));
 
   // Now unload SPKs, preserve LSK and load CK stuff
@@ -101,6 +117,7 @@ int main(int argc, char *argv[]) {
   query.Discover();
   cout << "\nCheck CK load  (SCLK,IK,CK) = " << query.size() << "\n";
   kloaded = query.getKernelList();
+  transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   copy(kloaded.begin(), kloaded.end(), ostream_iterator<std::string>(cout, "\n"));
 
   // Now reload all and check
@@ -108,6 +125,7 @@ int main(int argc, char *argv[]) {
   query.Discover();
   cout << "\nCheck CK reload  (LSK,FK,SCLK,IK,CK) = " << query.size() << "\n";
   kloaded = query.getKernelList();
+  transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   copy(kloaded.begin(), kloaded.end(), ostream_iterator<std::string>(cout, "\n"));
 
   //  Clear the pool and start fresh.  Clear all instances and reinitialize NAIF
@@ -139,6 +157,7 @@ int main(int argc, char *argv[]) {
        << ", Missing: "<< myKernels.Missing() << "\n";
   cout << "\nList of kernels in object..\n";
   kfiles = myKernels.getKernelList();
+  transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   copy(kfiles.begin(), kfiles.end(), ostream_iterator<std::string>(cout, "\n"));
 
   cout << "\nList of kernel types\n";
@@ -154,6 +173,7 @@ int main(int argc, char *argv[]) {
   // Load them all
   myKernels.Load();
   kloaded = myKernels.getLoadedList();
+  transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   cout << "\nLoading all, total loaded: " << kloaded.size() << "\n";
   copy(kloaded.begin(), kloaded.end(), ostream_iterator<std::string>(cout, "\n"));
 
@@ -161,6 +181,7 @@ int main(int argc, char *argv[]) {
   query.Discover();
   cout << "\nCheck Load Status = " << query.size() << "\n";
   kloaded = query.getKernelList();
+  transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   copy(kloaded.begin(), kloaded.end(), ostream_iterator<std::string>(cout, "\n"));
 
   // Unload SPK and CKs
@@ -168,6 +189,7 @@ int main(int argc, char *argv[]) {
   query.Discover();
   cout << "\nUnload SPK,CK - Loaded: " << query.size() << "\n";
   kloaded = query.getKernelList();
+  transform(kloaded.begin(), kloaded.end(), kloaded.begin(), &stripPath);
   copy(kloaded.begin(), kloaded.end(), ostream_iterator<std::string>(cout, "\n"));
 
   myKernels.UnLoad();

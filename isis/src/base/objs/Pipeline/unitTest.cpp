@@ -50,7 +50,7 @@ void IsisMain() {
   
   ui.Clear("FROM");
   ui.Clear("TO");
-  ui.PutFileName("FROM", "$ISIS3DATA/odyssey/testData/I00831002RDR.cub");
+  ui.PutAsString("FROM", "$ISIS3DATA/odyssey/testData/I00831002RDR.cub");
   ui.PutFileName("TO", "./out.cub");
   std::cout << "*** Branching Pipe with a branch disabled ***" << std::endl;
   PipeBranchDisabled();
@@ -58,7 +58,7 @@ void IsisMain() {
   ui.Clear("TO");
   ui.PutFileName("TO",   "./out.cub");
   std::cout << "\n*** Continue option ***" << endl;
-  cout << "input=" << ui.GetFileName("FROM") << endl;
+  cout << "input=" << ui.GetAsString("FROM") << endl;
   PipeContinue();
 }
 

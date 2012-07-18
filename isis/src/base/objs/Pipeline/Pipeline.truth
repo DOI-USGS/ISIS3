@@ -451,9 +451,9 @@ rm ./out.add.lis
 PIPELINE -------> unitTest5 <------- PIPELINE
 
 *** Continue option ***
-input=/usgs/cpkgs/isis3/data/odyssey/testData/I00831002RDR.cub
+input=$ISIS3DATA/odyssey/testData/I00831002RDR.cub
 PIPELINE -------> unitTest6 <------- PIPELINE
-mask FROM="/usgs/cpkgs/isis3/data/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.mask.cub" MINIMUM="-3.40282245226481e+38" MAXIMUM="3.40282346638529e+38" PRESERVE="INSIDE" SPIXELS="NONE"
+mask FROM="$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.mask.cub" MINIMUM="-3.40282245226481e+38" MAXIMUM="3.40282346638529e+38" PRESERVE="INSIDE" SPIXELS="NONE"
 lowpass FROM="./out.mask.cub" TO="./out.cub" SAMPLES="3" LINES="3"
 rm ./out.mask.cub
 PIPELINE -------> unitTest6 <------- PIPELINE
@@ -467,7 +467,7 @@ unittest: Working
 
 *** Application level continue option ***
 PIPELINE -------> unitTest7 <------- PIPELINE
-mask FROM="/usgs/cpkgs/isis3/data/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.mask1.cub" MINIMUM="-3.40282245226481e+38" MAXIMUM="3.40282346638529e+38" PRESERVE="INSIDE" SPIXELS="NONE"
+mask FROM="$ISIS3DATA/mro/testData/PSP_001446_1790_BG12_0.cub" TO="./out.mask1.cub" MINIMUM="-3.40282245226481e+38" MAXIMUM="3.40282346638529e+38" PRESERVE="INSIDE" SPIXELS="NONE"
 lowpass FROM="./out.mask1.cub" TO="./out.cub" SAMPLES="3" LINES="3"
 rm ./out.mask1.cub
 PIPELINE -------> unitTest7 <------- PIPELINE

@@ -26,54 +26,54 @@ SPK
 Initial currently loaded kernel files = 0
 
 After LoadALL option, kernels loaded = 8
-/usgs/cpkgs/isis3/data/base/kernels/spk/de405.bsp
-/usgs/cpkgs/isis3/data/mgs/kernels/spk/mgs_ab1.bsp
-/usgs/cpkgs/isis3/data/mgs/kernels/ck/mgs_sc_ab1.bc
-/usgs/cpkgs/isis3/data/base/kernels/pck/pck00008.tpc
-/usgs/cpkgs/isis3/data/mgs/kernels/ik/moc20.ti
-/usgs/cpkgs/isis3/data/mgs/kernels/iak/mocAddendum004.ti
-/usgs/cpkgs/isis3/data/base/kernels/lsk/naif0008.tls
-/usgs/cpkgs/isis3/data/mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc
+$base/kernels/spk/de405.bsp
+$mgs/kernels/spk/mgs_ab1.bsp
+$mgs/kernels/ck/mgs_sc_ab1.bc
+$base/kernels/pck/pck00008.tpc
+$mgs/kernels/ik/moc20.ti
+$mgs/kernels/iak/mocAddendum004.ti
+$base/kernels/lsk/naif0008.tls
+$mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc
 
 UnLoading All, count after = 0
 
 Loaded SPK kernels = 2
-/usgs/cpkgs/isis3/data/base/kernels/spk/de405.bsp
-/usgs/cpkgs/isis3/data/mgs/kernels/spk/mgs_ab1.bsp
+$base/kernels/spk/de405.bsp
+$mgs/kernels/spk/mgs_ab1.bsp
 
 Load LSK, SCLK for Time manip, unload SPK kernels = 2
-/usgs/cpkgs/isis3/data/base/kernels/lsk/naif0008.tls
-/usgs/cpkgs/isis3/data/mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc
+$base/kernels/lsk/naif0008.tls
+$mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc
 
 Number loaded: 0
 
 Check Double-Load of LSK, SCLK = 4
-/usgs/cpkgs/isis3/data/base/kernels/lsk/naif0008.tls
-/usgs/cpkgs/isis3/data/mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc
-/usgs/cpkgs/isis3/data/base/kernels/lsk/naif0008.tls
-/usgs/cpkgs/isis3/data/mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc
+$base/kernels/lsk/naif0008.tls
+$mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc
+$base/kernels/lsk/naif0008.tls
+$mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc
 
 Unload the cloned set = 2
-/usgs/cpkgs/isis3/data/base/kernels/lsk/naif0008.tls
-/usgs/cpkgs/isis3/data/mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc
+$base/kernels/lsk/naif0008.tls
+$mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc
 
 Check SPK load  (LSK,FK,DAF,SPK)= 3
-/usgs/cpkgs/isis3/data/base/kernels/lsk/naif0008.tls
-/usgs/cpkgs/isis3/data/base/kernels/spk/de405.bsp
-/usgs/cpkgs/isis3/data/mgs/kernels/spk/mgs_ab1.bsp
+$base/kernels/lsk/naif0008.tls
+$base/kernels/spk/de405.bsp
+$mgs/kernels/spk/mgs_ab1.bsp
 Unload DAF,SPK
 
 Check CK load  (SCLK,IK,CK) = 4
-/usgs/cpkgs/isis3/data/base/kernels/lsk/naif0008.tls
-/usgs/cpkgs/isis3/data/mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc
-/usgs/cpkgs/isis3/data/mgs/kernels/ik/moc20.ti
-/usgs/cpkgs/isis3/data/mgs/kernels/ck/mgs_sc_ab1.bc
+$base/kernels/lsk/naif0008.tls
+$mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc
+$mgs/kernels/ik/moc20.ti
+$mgs/kernels/ck/mgs_sc_ab1.bc
 
 Check CK reload  (LSK,FK,SCLK,IK,CK) = 4
-/usgs/cpkgs/isis3/data/base/kernels/lsk/naif0008.tls
-/usgs/cpkgs/isis3/data/mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc
-/usgs/cpkgs/isis3/data/mgs/kernels/ik/moc20.ti
-/usgs/cpkgs/isis3/data/mgs/kernels/ck/mgs_sc_ab1.bc
+$base/kernels/lsk/naif0008.tls
+$mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc
+$mgs/kernels/ik/moc20.ti
+$mgs/kernels/ck/mgs_sc_ab1.bc
 
 
 Ensure clean pool...Count: 0
@@ -112,19 +112,19 @@ $clementine1/kernels/spk/SPKMERGE_940219_940504_CLEMV001b.bsp
 $clementine1/kernels/iak/uvvisAddendum003.ti
 
 Check Load Status = 7
-/usgs/cpkgs/isis3/data/base/kernels/lsk/naif0009.tls
-/usgs/cpkgs/isis3/data/base/kernels/spk/de405.bsp
-/usgs/cpkgs/isis3/data/clementine1/kernels/ck/clem_ulcn2005_type2_1sc.bc
-/usgs/cpkgs/isis3/data/clementine1/kernels/fk/clem_v11.tf
-/usgs/cpkgs/isis3/data/clementine1/kernels/sclk/dspse002.tsc
-/usgs/cpkgs/isis3/data/clementine1/kernels/spk/SPKMERGE_940219_940504_CLEMV001b.bsp
-/usgs/cpkgs/isis3/data/clementine1/kernels/iak/uvvisAddendum003.ti
+$base/kernels/lsk/naif0009.tls
+$base/kernels/spk/de405.bsp
+$clementine1/kernels/ck/clem_ulcn2005_type2_1sc.bc
+$clementine1/kernels/fk/clem_v11.tf
+$clementine1/kernels/sclk/dspse002.tsc
+$clementine1/kernels/spk/SPKMERGE_940219_940504_CLEMV001b.bsp
+$clementine1/kernels/iak/uvvisAddendum003.ti
 
 Unload SPK,CK - Loaded: 4
-/usgs/cpkgs/isis3/data/base/kernels/lsk/naif0009.tls
-/usgs/cpkgs/isis3/data/clementine1/kernels/fk/clem_v11.tf
-/usgs/cpkgs/isis3/data/clementine1/kernels/sclk/dspse002.tsc
-/usgs/cpkgs/isis3/data/clementine1/kernels/iak/uvvisAddendum003.ti
+$base/kernels/lsk/naif0009.tls
+$clementine1/kernels/fk/clem_v11.tf
+$clementine1/kernels/sclk/dspse002.tsc
+$clementine1/kernels/iak/uvvisAddendum003.ti
 
 
 All Done - Should be 0 discovered: 0

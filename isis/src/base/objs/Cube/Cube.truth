@@ -219,7 +219,7 @@ Testing errors ...
 **PROGRAMMER ERROR** SetDimensions:  Invalid number of sample, lines or bands.
 **PROGRAMMER ERROR** SetDimensions:  Invalid number of sample, lines or bands.
 **PROGRAMMER ERROR** SetDimensions:  Invalid number of sample, lines or bands.
-**I/O ERROR** Failed to open [/usgs/cpkgs/isis3/data/base/testData/isisTruth.cub] with read/write access.
+**I/O ERROR** Failed to open [...] with read/write access.
 **ERROR** Cannot create the cube [shouldntExist.cub] with a pixel type set to None.
 
 Test creating an ecub
