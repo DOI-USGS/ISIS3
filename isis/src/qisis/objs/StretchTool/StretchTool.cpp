@@ -453,6 +453,7 @@ namespace Isis {
       m_stretchMaxEdit->setEnabled(true);
     }
 
+    stretchChanged();
     updateHistograms();
   }
 

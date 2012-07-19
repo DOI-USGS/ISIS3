@@ -86,6 +86,11 @@ namespace Isis {
    *                          mode when the color mode band selection was set to
    *                          all. Also, fixed layout of stretch options to
    *                          correctly squeeze widgets left. Fixes #640.
+   *  @history 2012-06-11 Steven Lambright - Fixed a bug that caused the stretch
+   *                          pair line edits to not update properly when switching
+   *                          between viewports, and another that caused the stretch
+   *                          to be copied the new viewport if the advanced stretch
+   *                          dialog is active. Fixes #771.
    */
   class StretchTool : public Tool {
       Q_OBJECT
