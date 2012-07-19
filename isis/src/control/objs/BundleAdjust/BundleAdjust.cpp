@@ -410,7 +410,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       m_cm.method[0].ordering = CHOLMOD_AMD;
 
       // set size of sparse block normal equations matrix
-      m_SparseNormals.setNumberOfColumns( Images() );
+      m_SparseNormals.setNumberOfColumns( Observations() );
 
       return true;
   }
@@ -1274,7 +1274,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     formNormals3_CHOLMOD(n1, m_nj);
 
 //    std::cout << m_Normals << std::endl;
-//    m_SparseNormals.print();
+//    m_SparseNormals.print(std::cout);
 
     // update number of unknown parameters
     m_nUnknownParameters = m_nRank + 3 * nGood3DPoints;
