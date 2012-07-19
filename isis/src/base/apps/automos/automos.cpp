@@ -48,41 +48,23 @@ void IsisMain() {
   bool bTrack = ui.GetBoolean("TRACK");
   m.SetTrackFlag(bTrack);
 
-  // Set up the mosaic priority, either the input cubes will be
-  // placed ontop of each other in the mosaic or beneath each other or
-  // placed based on band with "Lesser" or "Greater" criteria
-  // Set up the mosaic priority, either the input cube will be
-  // placed ontop of the mosaic or beneath it
-  ProcessMapMosaic::MosaicPriority priority;
-  string sType;
-  if(ui.GetString("PRIORITY") == "BENEATH") {
-    priority = ProcessMapMosaic::mosaic;
-  }
-  else if(ui.GetString("PRIORITY") == "ONTOP") {
-    priority = ProcessMapMosaic::input;
-  }
-  else if(ui.GetString("PRIORITY") == "AVERAGE") {
-    priority = ProcessMapMosaic::average;
-  }
-  else {
-    priority = ProcessMapMosaic::band;
-    sType = ui.GetString("TYPE");
-    if(sType == "BANDNUMBER") {
+  ProcessMosaic::ImageOverlay overlay = ProcessMosaic::StringToOverlay(
+      ui.GetString("PRIORITY"));
+
+  if (overlay == ProcessMapMosaic::UseBandPlacementCriteria) {
+    if(ui.GetString("TYPE") == "BANDNUMBER") {
       m.SetBandNumber(ui.GetInteger("NUMBER"));
     }
     else {
       // Key name & value
-      m.SetBandKeyWord(ui.GetString("KEYNAME"), ui.GetString("KEYVALUE"));
+      m.SetBandKeyword(ui.GetString("KEYNAME"), ui.GetString("KEYVALUE"));
     }
     // Band Criteria
-    BandCriteria eCriteria = Lesser;
-    if(ui.GetString("CRITERIA") == "GREATER")
-      eCriteria = Greater;
-    m.SetBandCriteria(eCriteria);
+    m.SetBandUseMaxValue( (ui.GetString("CRITERIA") == "GREATER") );
   }
 
   // Priority
-  m.SetPriority(priority);
+  m.SetImageOverlay(overlay);
 
   CubeAttributeOutput &oAtt = ui.GetOutputAttribute("MOSAIC");
   if(ui.GetString("GRANGE") == "USER") {
@@ -165,7 +147,7 @@ void calcRange(double &minLat, double &maxLat, double &minLon, double &maxLon) {
       firstProj = proj;
     }
     else if(*proj != *firstProj) {
-      string msg = "Mapping groups do not match between cubes [" + list[0].toString() + 
+      string msg = "Mapping groups do not match between cubes [" + list[0].toString() +
                    "] and [" + list[i].toString() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }

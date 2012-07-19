@@ -243,15 +243,23 @@
       attributes for the mosaic
     </change>
     <change name="Sharmila Prasad" date="2011-09-07">
-    Fixed bug #0000390 - tracking should continue even if the first image does 
-    not map onto the mosaic  
+      Fixed bug #0000390 - tracking should continue even if the first image does 
+      not map onto the mosaic  
     </change>
     <change name="Sharmila Prasad" date="2011-10-25">
-    Fixed bug #0000464 - add optional list TOLIST containing all the files names 
-    that were added onto the mosaic. 
+      Fixed bug #0000464 - add optional list TOLIST containing all the files names 
+      that were added onto the mosaic. 
     </change>
-    <change name="Sharmila Prasad" date="2011-11-07">Updated documentation for 
-    Average priority. Fixes #553</change>
+    <change name="Sharmila Prasad" date="2011-11-07">
+      Updated documentation for Average priority. Fixes #553
+    </change>
+    <change name="Steven Lambright and Stuart Sides" date="2012-07-16">
+      Fixed a border condition that caused only a few samples of an input image to be put into an
+      output mosaic. The trigger for this condition was an input image that spanned more than the
+      0-360 domain by just a sample or two on the 0 side (started at -0.000?? degrees longitude
+      instead of zero). Other cases of spanning more than the world - or just crossing the seam -
+      could have exhibited problems. Fixes #967.
+    </change>
   </history>
 
   <groups>

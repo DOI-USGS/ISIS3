@@ -23,40 +23,25 @@ void IsisMain() {
 
   // Gets the input file along with attributes
   string sInputFile = ui.GetAsString("FROM");
-  
-  // Set up the mosaic priority, either the input cube will be
-  // placed ontop of the mosaic or beneath it
-  ProcessMapMosaic::MosaicPriority priority;
-  string sType;
-  if(ui.GetString("PRIORITY") == "BENEATH") {
-    priority = ProcessMapMosaic::mosaic;
-  }
-  else if(ui.GetString("PRIORITY") == "ONTOP") {
-    priority = ProcessMapMosaic::input;
-  }
-  else if(ui.GetString("PRIORITY") == "AVERAGE") {
-    priority = ProcessMapMosaic::average;
-  }
-  else {
-    priority = ProcessMapMosaic::band;
-    sType = ui.GetString("TYPE");
-    if(sType == "BANDNUMBER") {
+
+  ProcessMosaic::ImageOverlay overlay = ProcessMosaic::StringToOverlay(
+      ui.GetString("PRIORITY"));
+
+  if (overlay == ProcessMapMosaic::UseBandPlacementCriteria) {
+    if(ui.GetString("TYPE") == "BANDNUMBER") {
       m.SetBandNumber(ui.GetInteger("NUMBER"));
     }
     else {
-      // Key Name & Value
-      m.SetBandKeyWord(ui.GetString("KEYNAME"), ui.GetString("KEYVALUE"));
+      // Key name & value
+      m.SetBandKeyword(ui.GetString("KEYNAME"), ui.GetString("KEYVALUE"));
     }
     // Band Criteria
-    BandCriteria eCriteria = Lesser;
-    if(ui.GetString("CRITERIA") == "GREATER")
-      eCriteria = Greater;
-    m.SetBandCriteria(eCriteria);
+    m.SetBandUseMaxValue( (ui.GetString("CRITERIA") == "GREATER") );
   }
 
-  // Set priority
-  m.SetPriority(priority);
-  
+  // Priority
+  m.SetImageOverlay(overlay);
+
   // Get the output projection set up properly
   if(ui.GetBoolean("CREATE")) {
     Cube inCube;
@@ -82,7 +67,7 @@ void IsisMain() {
     m.SetOutputCube(ui.GetFileName("MOSAIC"));
   }
 
-  
+
   m.SetHighSaturationFlag(ui.GetBoolean("HIGHSATURATION"));
   m.SetLowSaturationFlag(ui.GetBoolean("LOWSATURATION"));
   m.SetNullFlag(ui.GetBoolean("NULL"));

@@ -25,12 +25,12 @@ void IsisMain() {
   cout << "Testing Mosaic 1" << endl;
   ProcessMapMosaic m1;
   CubeAttributeOutput oAtt;
-  ProcessMapMosaic::MosaicPriority priority = ProcessMapMosaic::input;
+  ProcessMosaic::ImageOverlay priority = ProcessMapMosaic::PlaceImagesOnTop;
   m1.SetBandBinMatch(false);
   m1.SetOutputCube(cubes, oAtt, "./unitTest.cub");
 
   //set priority
-  m1.SetPriority(priority);
+  m1.SetImageOverlay(priority);
 
   for(int i = 0; i < cubes.size(); i++) {
     if(m1.StartProcess(cubes[i].toString())) {
@@ -55,7 +55,7 @@ void IsisMain() {
   m2.SetOutputCube(cubes, -6, -4, 29, 31, oAtt, "./unitTest.cub");
 
   //set priority
-  m2.SetPriority(priority);
+  m2.SetImageOverlay(priority);
 
   for(int i = 0; i < cubes.size(); i++) {
     if(m2.StartProcess(cubes[i].toString())) {

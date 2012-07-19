@@ -129,7 +129,7 @@ void IsisMain() {
     m.SetOutputCube("TO");
     CubeAttributeInput attrib(cubeList[i].toString());
     Cube *icube = m.SetInputCube(cubeList[i].toString(), attrib);
-    m.SetPriority(ProcessMosaic::input);
+    m.SetImageOverlay(ProcessMosaic::PlaceImagesOnTop);
     m.StartProcess(1, 1, sband);
     sband += icube->getBandCount();
     m.EndProcess();

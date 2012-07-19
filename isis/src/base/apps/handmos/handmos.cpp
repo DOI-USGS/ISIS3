@@ -29,54 +29,41 @@ void IsisMain() {
 
   bool bTrack = ui.GetBoolean("TRACK");
   p.SetTrackFlag(bTrack);
-  
+
   string inputFile = ui.GetAsString("FROM");
   string mosaicFile = ui.GetFileName("MOSAIC");
 
   // Set up the mosaic priority, either the input cube will be
-  // placed ontop of the mosaic or beneath it  
-  ProcessMosaic::MosaicPriority priority;
-  string sPriority = ui.GetString("PRIORITY");
+  // placed ontop of the mosaic or beneath it
+  ProcessMosaic::ImageOverlay overlay = ProcessMosaic::StringToOverlay(
+      ui.GetString("PRIORITY"));
   string sType;
-  if(sPriority == "BENEATH") {
-    priority = ProcessMosaic::mosaic;
-  }
-  else if(sPriority == "ONTOP") {
-    priority = ProcessMosaic::input;
-  }
-  else if(sPriority == "AVERAGE") {
-    priority = ProcessMosaic::average;
-  }
-  else {
-    priority = ProcessMosaic::band;
-    sType = ui.GetString("TYPE");
-    if(sType == "BANDNUMBER") {
+
+  if (overlay == ProcessMosaic::UseBandPlacementCriteria) {
+    if (ui.GetString("TYPE") == "BANDNUMBER") {
       p.SetBandNumber(ui.GetInteger("NUMBER"));
     }
     else {
-      //keyname & key value
-      p.SetBandKeyWord(ui.GetString("KEYNAME"), ui.GetString("KEYVALUE"));
+      // Key name & value
+      p.SetBandKeyword(ui.GetString("KEYNAME"), ui.GetString("KEYVALUE"));
     }
     // Band Criteria
-    BandCriteria eCriteria = Lesser;
-    if(ui.GetString("CRITERIA") == "GREATER")
-      eCriteria = Greater;
-    p.SetBandCriteria(eCriteria);
+    p.SetBandUseMaxValue( (ui.GetString("CRITERIA") == "GREATER") );
   }
 
-  //set priority
-  p.SetPriority(priority);
-  
-  if(ui.GetString("CREATE") == "YES") {
+  // Priority
+  p.SetImageOverlay(overlay);
+
+  if (ui.GetString("CREATE") == "YES") {
     ns = ui.GetInteger("NSAMPLES");
     nl = ui.GetInteger("NLINES");
     nb = ui.GetInteger("NBANDS");
 
     // Create the origin band if the Track Flag is set
-    if(bTrack) {
+    if (bTrack) {
       nb += 1;
     }
-    else if(priority == ProcessMosaic::average) {
+    else if (overlay == ProcessMosaic::AverageImageWithMosaic) {
       nb *= 2;
     }
     p.SetCreateFlag(true);
@@ -87,7 +74,7 @@ void IsisMain() {
     CubeAttributeInput iAtt(inputFile);
     bl.SetInputCube(inputFile, iAtt);
 
-    if(!ui.GetBoolean("Propagate")) {
+    if (!ui.GetBoolean("Propagate")) {
       bl.PropagateHistory(false);
       bl.PropagateLabels(false);
       bl.PropagateTables(false);
@@ -98,7 +85,7 @@ void IsisMain() {
     CubeAttributeOutput oAtt = ui.GetOutputAttribute("MOSAIC");
     bl.SetOutputCube(mosaicFile, oAtt, ns, nl, nb);
     bl.ClearInputCubes();
-    
+
     // Initialize the mosaic to defaults
     bl.StartProcess(CreateMosaic);
     bl.EndProcess();
@@ -110,10 +97,10 @@ void IsisMain() {
 
   // Get the MatchDEM Flag
   p.SetMatchDEM(ui.GetBoolean("MATCHDEM"));
-  
+
   // Get the value for HS, LS, NULL flags whether to transfer the special pixels
   // onto the mosaic. Holds good for "ontop" and "band" priorities only
-  if(priority == ProcessMosaic::input || priority == ProcessMosaic::band || priority == ProcessMosaic::average) {
+  if (overlay != ProcessMosaic::PlaceImagesBeneath) {
     p.SetHighSaturationFlag(ui.GetBoolean("HIGHSATURATION"));
     p.SetLowSaturationFlag(ui.GetBoolean("LOWSATURATION"));
     p.SetNullFlag(ui.GetBoolean("NULL"));
@@ -137,7 +124,7 @@ void IsisMain() {
   //p.StartProcess(outSample, outLine, outBand, priority);
   p.StartProcess(outSample, outLine, outBand);
 
-  if(bTrack != p.GetTrackFlag()) {
+  if (bTrack != p.GetTrackFlag()) {
     ui.Clear("TRACK");
     ui.PutBoolean("TRACK", p.GetTrackFlag());
   }

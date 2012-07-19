@@ -43,7 +43,7 @@ void IsisMain() {
   // Place the input in the file we just created
   Cube *ocube = p.SetOutputCube("TO");
   p.Progress()->SetText("Inserting cube");
-  p.SetPriority(ProcessMosaic::input);
+  p.SetImageOverlay(ProcessMosaic::PlaceImagesOnTop);
   p.SetBandBinMatch(false);
   p.StartProcess(leftPad + 1, topPad + 1, 1);
 

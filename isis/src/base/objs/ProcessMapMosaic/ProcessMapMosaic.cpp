@@ -334,7 +334,7 @@ namespace Isis {
         nbands += 1;
       }
       // For average priority, get the new band count
-      else if(GetPriority() == average) {
+      else if(GetImageOverlay() == AverageImageWithMosaic) {
         nbands *= 2;
       }
 
@@ -388,7 +388,7 @@ namespace Isis {
         bands += 1;
       }
       // For average priority, get the new band count
-      else if(GetPriority() == average) {
+      else if(GetImageOverlay() == AverageImageWithMosaic) {
         bands *= 2;
       }
 
