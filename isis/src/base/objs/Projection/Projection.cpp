@@ -1634,12 +1634,16 @@ namespace Isis {
     double minFoundX1, minFoundX2;
     double minFoundY1, minFoundY2;
 
+    // Search for minX between minlat and maxlat along minlon
     doSearch(MinimumLatitude(), MaximumLatitude(), 
              minFoundX1, MinimumLongitude(), true, true, true);
+    // Search for minX between minlat and maxlat along maxlon
     doSearch(MinimumLatitude(), MaximumLatitude(), 
              minFoundX2, MaximumLongitude(), true, true, true);
+    // Search for minY between minlat and maxlat along minlon
     doSearch(MinimumLatitude(), MaximumLatitude(), 
              minFoundY1, MinimumLongitude(), false, true, true);
+    // Search for minY between minlat and maxlat along maxlon
     doSearch(MinimumLatitude(), MaximumLatitude(), 
              minFoundY2, MaximumLongitude(), false, true, true);
 
@@ -1647,12 +1651,16 @@ namespace Isis {
     double minFoundX3, minFoundX4;
     double minFoundY3, minFoundY4;
 
+    // Search for minX between minlon and maxlon along minlat
     doSearch(MinimumLongitude(), MaximumLongitude(), 
              minFoundX3, MinimumLatitude(), true, false, true);
+    // Search for minX between minlon and maxlon along maxlat
     doSearch(MinimumLongitude(), MaximumLongitude(), 
              minFoundX4, MaximumLatitude(), true, false, true);
+    // Search for minY between minlon and maxlon along minlat
     doSearch(MinimumLongitude(), MaximumLongitude(), 
              minFoundY3, MinimumLatitude(), false, false, true);
+    // Search for minY between minlon and maxlon along maxlat
     doSearch(MinimumLongitude(), MaximumLongitude(), 
              minFoundY4, MaximumLatitude(), false, false, true);
 
@@ -1669,12 +1677,16 @@ namespace Isis {
     double maxFoundX1, maxFoundX2;
     double maxFoundY1, maxFoundY2;
 
+    // Search for maxX between minlat and maxlat along minlon
     doSearch(MinimumLatitude(), MaximumLatitude(), 
              maxFoundX1, MinimumLongitude(), true, true, false);
+    // Search for maxX between minlat and maxlat along maxlon
     doSearch(MinimumLatitude(), MaximumLatitude(), 
              maxFoundX2, MaximumLongitude(), true, true, false);
+    // Search for maxY between minlat and maxlat along minlon
     doSearch(MinimumLatitude(), MaximumLatitude(), 
              maxFoundY1, MinimumLongitude(), false, true, false);
+    // Search for maxY between minlat and maxlat along maxlon
     doSearch(MinimumLatitude(), MaximumLatitude(), 
              maxFoundY2, MaximumLongitude(), false, true, false);
 
@@ -1682,12 +1694,16 @@ namespace Isis {
     double maxFoundX3, maxFoundX4;
     double maxFoundY3, maxFoundY4;
 
+    // Search for maxX between minlon and maxlon along minlat
     doSearch(MinimumLongitude(), MaximumLongitude(), 
              maxFoundX3, MinimumLatitude(), true, false, false);
+    // Search for maxX between minlon and maxlon along maxlat
     doSearch(MinimumLongitude(), MaximumLongitude(), 
              maxFoundX4, MaximumLatitude(), true, false, false);
+    // Search for maxY between minlon and maxlon along minlat
     doSearch(MinimumLongitude(), MaximumLongitude(), 
              maxFoundY3, MinimumLatitude(), false, false, false);
+    // Search for maxY between minlon and maxlon along maxlat
     doSearch(MinimumLongitude(), MaximumLongitude(), 
              maxFoundY4, MaximumLatitude(), false, false, false);
 
@@ -1707,12 +1723,16 @@ namespace Isis {
         specialLatCase ++) {
       double minX, maxX, minY, maxY;
 
+      // Search for minX between minlon and maxlon along latitude discontinuities
       doSearch(MinimumLongitude(), MaximumLongitude(), 
                minX, specialLatCases[specialLatCase], true,  false, true);
+      // Search for minY between minlon and maxlon along latitude discontinuities
       doSearch(MinimumLongitude(), MaximumLongitude(), 
                minY, specialLatCases[specialLatCase], false, false, true);
+      // Search for maxX between minlon and maxlon along latitude discontinuities
       doSearch(MinimumLongitude(), MaximumLongitude(), 
                maxX, specialLatCases[specialLatCase], true,  false, false);
+      // Search for maxX between minlon and maxlon along latitude discontinuities
       doSearch(MinimumLongitude(), MaximumLongitude(), 
                maxY, specialLatCases[specialLatCase], false, false, false);
 
@@ -1728,12 +1748,16 @@ namespace Isis {
         specialLonCase ++) {
       double minX, maxX, minY, maxY;
 
+      // Search for minX between minlat and maxlat along longitude discontinuities
       doSearch(MinimumLatitude(), MaximumLatitude(), 
                minX, specialLonCases[specialLonCase], true,  true, true);
+      // Search for minY between minlat and maxlat along longitude discontinuities
       doSearch(MinimumLatitude(), MaximumLatitude(), 
                minY, specialLonCases[specialLonCase], false, true, true);
+      // Search for maxX between minlat and maxlat along longitude discontinuities
       doSearch(MinimumLatitude(), MaximumLatitude(), 
                maxX, specialLonCases[specialLonCase], true,  true, false);
+      // Search for maxY between minlat and maxlat along longitude discontinuities
       doSearch(MinimumLatitude(), MaximumLatitude(), 
                maxY, specialLonCases[specialLonCase], false, true, false);
 
@@ -1812,6 +1836,11 @@ namespace Isis {
     do {
       findExtreme(minBorder, maxBorder, minBorderX, minBorderY, maxBorderX, 
                   maxBorderY, constBorder, searchX, searchLongitude, findMin);
+      if (minBorderX == Null && maxBorderX == Null 
+          && minBorderY == Null && maxBorderY == Null ) {
+        attempts = NUM_ATTEMPTS;
+        continue;
+      }
       attempts ++;
     }
     while ((fabs(minBorderX - maxBorderX) > TOLERANCE 
@@ -1911,6 +1940,19 @@ namespace Isis {
                                const double constBorder, bool searchX, 
                                bool searchLongitude, bool findMin) {
     if (minBorder == Null || maxBorder == Null || constBorder == Null) {
+      minBorderX = Null;
+      minBorderY = minBorderX;
+      minBorderX = minBorderX;
+      minBorderY = minBorderX;
+      return;
+    }
+    if (!searchLongitude && (fabs(fabs(constBorder) - 90.0) < DBL_EPSILON)) {
+      // it is impossible to search "along" a pole
+      setSearchGround(minBorder, constBorder, searchLongitude);
+      minBorderX = XCoord();
+      minBorderY = YCoord();
+      maxBorderX = minBorderX;
+      maxBorderY = minBorderY;
       return;
     }
     // Always do 10 steps
@@ -1919,15 +1961,35 @@ namespace Isis {
                                                            // all of the steps
                                                            // properly
     double currBorderVal = minBorder;
-
     setSearchGround(minBorder, constBorder, searchLongitude);
+
+    // this makes sure that the initial currBorderVal is valid before entering
+    // the loop below
+    if (!m_good){
+      // minBorder = currBorderVal+STEP_SIZE < LOOP_END until setGround is good?
+      // then, if still not good return?
+      while (!m_good && currBorderVal <= LOOP_END) {
+        currBorderVal+=STEP_SIZE;
+        if (searchLongitude && (currBorderVal - 90.0 > DBL_EPSILON)) {
+          currBorderVal = 90.0;
+        }
+        setSearchGround(currBorderVal, constBorder, searchLongitude);
+      }
+      if (!m_good) {
+        minBorderX = Null;
+        minBorderY = minBorderX;
+        minBorderX = minBorderX;
+        minBorderY = minBorderX;
+        return;
+      }
+    }
 
     // save the values of three consecutive steps from the minBorder towards
     // the maxBorder along the constBorder. initialize these three border
     // values (the non-constant lat or lon)
-    double border1 = minBorder;
-    double border2 = minBorder;
-    double border3 = minBorder;
+    double border1 = currBorderVal;
+    double border2 = currBorderVal;
+    double border3 = currBorderVal;
 
     // save the coordinate (x or y) values that correspond to the first
     // two borders that are being saved.
@@ -1954,7 +2016,13 @@ namespace Isis {
       if (searchLongitude && (currBorderVal - 90.0 > DBL_EPSILON)) {
         currBorderVal = 90.0;
       }
+
+      // update the current border value along constBorder
+      currBorderVal += STEP_SIZE;
       setSearchGround(currBorderVal, constBorder, searchLongitude);
+      if (!m_good){ 
+        continue;
+      } 
                      
       // update the border and coordinate values 
       border3 = border2;
@@ -1974,24 +2042,36 @@ namespace Isis {
         extremeBorder3 = border3;
         extremeBorder1 = border1;
       }
-
-      // update the current border value along constBorder
-      currBorderVal += STEP_SIZE;
     }
 
     // update min/max border values to the values on either side of the most 
     // extreme coordinate found in this call to this method
+    
     minBorder = extremeBorder3; // Border 3 is lagging and thus smaller
-    maxBorder = extremeBorder1; // Border 1 is leading and thus larger
+
+    // since the loop steps past the original maxBorder, we want to retain 
+    // the original maxBorder value so we don't go outside of the original
+    // min/max range given
+    if (extremeBorder1 <= maxBorder ) {
+      maxBorder = extremeBorder1; // Border 1 is leading and thus larger
+    }
 
     // update minBorder coordinate values
-    setSearchGround(minBorder, constBorder, searchLongitude);      
+    setSearchGround(minBorder, constBorder, searchLongitude);
+    // if (!m_good){
+    //   this should not happen since minBorder has already been verified in 
+    //   the while loop above
+    // }
 
     minBorderX = XCoord();
     minBorderY = YCoord();
 
     // update maxBorder coordinate values
     setSearchGround(maxBorder, constBorder, searchLongitude);
+    // if (!m_good){
+    //   this should not happen since maxBorder has already been verified in
+    //   the while loop above
+    // }
 
     maxBorderX = XCoord();
     maxBorderY = YCoord();

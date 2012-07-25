@@ -141,6 +141,10 @@ namespace Isis {
    *                           findExtreme(), setSearchGround(). Changed member
    *                           variable prefix to m_. Improved unitTest.
    *                           Resolves #928.
+   *   @history 2012-07-25 Jeannie Backer - Modified the new methods related to
+   *                           xyRangeOblique() to verify the validity of the
+   *                           values when setSearchGround() is called.
+   *                           References #954.
    *  
    *   @todo Continue to modify Projection class to comply with coding
    *         standards. Some of these include, but may not be limited to remove
