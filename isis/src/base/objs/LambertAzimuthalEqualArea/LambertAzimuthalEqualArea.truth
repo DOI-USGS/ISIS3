@@ -1,0 +1,1362 @@
+UNIT TEST FOR LambertAzimuthalEqualArea projection
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+			 SPHERICAL-PLANETOGRAPHIC-POSITIVEEAST-EQUATORIAL-180
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+CenterLatitude = 0
+CenterLongitude = 0
+EquatorialRadius = 1.0
+PolarRadius = 1.0
+Eccentricity = 0
+TrueScaleLatitude = 0
+
+
+				/-----------------------------------------/
+
+    Testing SetGround method using Snyder Table 28, page 188
+0.00000/1.41421 0.00000/1.41421 0.00000/1.41421 0.00000/1.41421 0.00000/1.41421 
+0.00000/1.28558 0.03941/1.28702 0.07788/1.29135 0.11448/1.29851 0.14830/1.30842 
+0.00000/1.14715 0.07264/1.14938 0.14391/1.15607 0.21242/1.16725 0.27676/1.18296 
+0.00000/1.00000 0.10051/1.00254 0.19948/1.01021 0.29535/1.02311 0.38649/1.04143 
+0.00000/0.84524 0.12353/0.84776 0.24549/0.85539 0.36430/0.86830 0.47831/0.88680 
+0.00000/0.68404 0.14203/0.68631 0.28254/0.69317 0.41999/0.70483 0.55281/0.72164 
+0.00000/0.51764 0.15624/0.51947 0.31103/0.52504 0.46291/0.53452 0.61040/0.54826 
+0.00000/0.34730 0.16631/0.34858 0.33123/0.35248 0.49337/0.35915 0.65136/0.36883 
+0.00000/0.17431 0.17231/0.17497 0.34329/0.17698 0.51158/0.18041 0.67588/0.18540 
+0.00000/0.00000 0.17431/0.00000 0.34730/0.00000 0.51764/0.00000 0.68404/0.00000 
+
+				/-----------------------------------------/
+
+    Testing SetGround method using Snyder Table 28, page 189
+0.00000/1.41421 0.00000/1.41421 0.00000/1.41421 0.00000/1.41421 0.00000/1.41421 
+0.17843/1.32096 0.20400/1.33594 0.22420/1.35313 0.23828/1.37219 0.24558/1.39273 
+0.33548/1.20323 0.38709/1.22806 0.43006/1.25741 0.46280/1.29114 0.48369/1.32893 
+0.47122/1.06544 0.54772/1.09545 0.61403/1.13179 0.66797/1.17481 0.70711/1.22474 
+0.58579/0.91132 0.68485/0.94244 0.77342/0.98088 0.84909/1.02752 0.90904/1.08335 
+0.67933/0.74411 0.79778/0.77298 0.90620/0.80919 1.00231/0.85401 1.08335/0.90904 
+0.75197/0.56674 0.88604/0.59069 1.01087/0.62108 1.12454/0.65927 1.22474/0.70711 
+0.80380/0.38191 0.94928/0.39896 1.08635/0.42078 1.21347/0.44848 1.32893/0.48369 
+0.83488/0.19217 0.98731/0.20102 1.13192/0.21240 1.26747/0.22694 1.39273/0.24558 
+0.84524/0.00000 1.00000/0.00000 1.14715/0.00000 1.28558/0.00000 1.41421/0.00000 
+
+				/-----------------------------------------/
+
+    Testing SetCoordinate(0.03941, 1.28702)
+    from Snyder Table 28, page 188, line 2 column 2
+Latitude:            79.9997992
+Longitude:           10.0005406
+XCoord:              0.0394100
+YCoord:              1.2870200
+
+				/-----------------------------------------/
+
+    Testing projection to origin and back
+    SetGround(0, 0)
+Latitude:            0.0000000
+Longitude:           0.0000000
+XCoord:              0.0000000
+YCoord:              0.0000000
+    SetCoordinate(0, 0)
+Latitude:            0.0000000
+Longitude:           0.0000000
+XCoord:              0.0000000
+YCoord:              0.0000000
+
+				/-----------------------------------------/
+
+    Testing projection to north pole and back
+    SetGround(90, 0)
+Latitude:            90.0000000
+Longitude:             0.0000000
+XCoord:                0.0000000
+YCoord:                1.4142136
+    SetCoordinate(0, sqrt(2)*sphRad)
+Latitude:             90.0000000
+Longitude:           180.0000000
+XCoord:                0.0000000
+YCoord:                1.4142136
+
+				/-----------------------------------------/
+
+    Testing other known points...
+
+        Comparison Values
+        SphRad (Spherical Radius) = 1.0000000
+        sqrt2*SphRad              = 1.4142136
+        sqrt2*SphRad*sqrt3/2      = 1.2247449
+        sqrt2*SphRad/2            = 0.7071068
+
+    Check known values on hemispherical map
+        FORWARD
+            SetGround(0, 90) returns (x,y) = (1.4142136, 0.0000000)
+            SetGround(90, 0) returns (x,y) = (0.0000000, 1.4142136)
+            SetGround(0, -90) returns (x,y) = (-1.4142136, 0.0000000)
+            SetGround(0, 270) returns (x,y) = (-1.4142136, 0.0000000)
+            SetGround(-90, 0) returns (x,y) = (0.0000000, -1.4142136)
+            SetGround(-45, 90) returns (x,y) = (1.0000000, -1.0000000)
+            SetGround(30, -90) returns (x,y) = (-1.2247449, 0.7071068)
+        BACKWARD
+            SetCoordinate(sqrt2*SphRad, 0) returns lat/lon = 0.00000 / 90.00000
+            SetCoordinate(0, sqrt2*SphRad) returns lat/lon = 90.00000 / 180.00000
+            SetCoordinate(-sqrt2*SphRad, 0) returns lat/lon = 0.00000 / -90.00000
+            SetCoordinate(0, -sqrt2*SphRad) returns lat/lon = -90.00000 / 180.00000
+            SetCoordinate(1, 1) returns lat/lon = 45.00000 / 90.00000
+            SetCoordinate(sqrt6/2*rad, sqrt2/2*rad) returns lat/lon = 30.00000 / 90.00000
+
+
+
+    Check known values on (almost) whole planet map
+        BACKWARD - Project from opposite side of planet 
+        For each of these, expect a value near
+            - centerLatitude / centerLongitude+180 = 0 / 180
+            SetCoordinate(2*SphRad, 0) returns lat/lon = 0.0000000 / 180.0000000
+            SetCoordinate(0, 2*SphRad) returns lat/lon = 0.00000 / 180.00000
+            SetCoordinate(-2*SphRad, 0) returns lat/lon = 0.00000 / 180.00000
+            SetCoordinate(0, -2*SphRad) returns lat/lon = -0.00000 / 180.00000
+            SetCoordinate(sqrt2*SphRad, sqrt2*SphRad) returns lat/lon = 0.00000 / 180.00000
+            SetCoordinate(sqrt3*SphRad, SphRad) returns lat/lon = 0.00000 / 180.00000
+
+				/-----------------------------------------/
+
+    Testing XYRange method
+Given: 
+    Minimum Latitude:  20.0000000
+    Maximum Latitude:  80.0000000
+    Minimum Longitude: -180.0000000
+    Maximum Longitude: 180.0000000
+XYRange method returns
+    Minimum X:  -1.6223191
+    Maximum X:  1.6223191
+    Minimum Y:  0.3472964
+    Maximum Y:  1.9696155
+
+            SetCoordinate(maxX,0) returns lat/lon = 0.0000000 / 108.4187596
+            SetCoordinate(0,maxY) returns lat/lon = 20.0000000 / 180.0000000
+            SetCoordinate(minX,0) returns lat/lon = 0.0000000 / -108.4187596
+            SetCoordinate(0,minY) returns lat/lon = 20.0000001 / 0.0000000
+
+            SetGround(20, 0) returns y min? (x,y) = (0.0000000, 0.3472964)
+            SetGround(20, 180) returns y max? (x,y) = (0.0000000, 1.9696155)
+
+
+Given: 
+    Minimum Latitude:  -90.0000000
+    Maximum Latitude:  90.0000000
+    Minimum Longitude: -179.9999900
+    Maximum Longitude: 179.9999900
+
+XYRange method returns
+    Minimum X:  -1.9999981
+    Maximum X:  1.9999981
+    Minimum Y:  -1.9999998
+    Maximum Y:  1.9999998
+
+            SetCoordinate(maxX,0) returns lat/lon = 0.0000000 / 179.8435687
+            SetCoordinate(0,maxY) returns lat/lon = 0.0493465 / 180.0000000
+            SetCoordinate(minX,0) returns lat/lon = 0.0000000 / -179.8435686
+            SetCoordinate(0,minY) returns lat/lon = -0.0493464 / 180.0000000
+Given: 
+    Minimum Latitude:  -90.0000000
+    Maximum Latitude:  90.0000000
+    Minimum Longitude: -90.0000000
+    Maximum Longitude: 90.0000000
+
+XYRange method returns
+    Minimum X:  -1.4142136
+    Maximum X:  1.4142136
+    Minimum Y:  -1.4142136
+    Maximum Y:  1.4142136
+
+            SetCoordinate(maxX,0) returns lat/lon = 0.0000000 / 89.9999994
+            SetCoordinate(0,maxY) returns lat/lon = 90.0000000 / 180.0000000
+            SetCoordinate(minX,0) returns lat/lon = 0.0000000 / -89.9999994
+            SetCoordinate(0,minY) returns lat/lon = -90.0000000 / 180.0000000
+
+
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+			 SPHERICAL-PLANETOGRAPHIC-POSITIVEEAST-OBLIQUE-360
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+CenterLatitude = 40.0
+CenterLongitude = -100.0
+EquatorialRadius = 3.0000000
+PolarRadius = 3.0000000
+Eccentricity = 0.0000000
+TrueScaleLatitude = 40.0000000
+
+				/-----------------------------------------/
+
+    Testing SetGround(-20, 100) from Snyder pages 332-333
+Latitude:            -20.0000000
+Longitude:           100.0000000
+XCoord:              -4.2339303
+YCoord:              4.0257775
+RelativeScaleLatitude:  4.3912175
+RelativeScaleLongitude: 0.2277273
+
+				/-----------------------------------------/
+
+    Testing SetCoordinate(-4.2339303, 4.0257775) from Snyder pages 332-333
+Latitude:            -19.9999993
+Longitude:           100.0000004
+XCoord:              -4.2339303
+YCoord:              4.0257775
+
+				/-----------------------------------------/
+
+    Testing projection to origin and back
+    SetGround(40, -100)
+Latitude:              40.0000000
+Longitude:           -100.0000000
+XCoord:                 0.0000000
+YCoord:                 0.0000000
+    SetCoordinate(0, 0)
+Latitude:              40.0000000
+Longitude:           260.0000000
+XCoord:                 0.0000000
+YCoord:                 0.0000000
+
+				/-----------------------------------------/
+
+    Testing projection to north pole and back
+    SetGround(90, 0)
+Latitude:            90.0000000
+Longitude:            0.0000000
+XCoord:               0.0000000
+YCoord:               2.5357096
+    SetCoordinate(0, 2.5357096)
+Latitude:            90.0000000
+Longitude:           80.0000000
+XCoord:               0.0000000
+YCoord:               2.5357096
+
+				/-----------------------------------------/
+
+    Testing other known points...
+
+        Comparison Values
+        SphRad (Spherical Radius) = 3.0000000
+        sqrt2*SphRad              = 4.2426407
+
+    Check known values on hemispherical map
+        FORWARD
+            SetGround(0, -10) returns (x,y) = (4.2426407, -0.0000000)
+            SetGround(50, 80) returns (x,y) = (0.0000000, 4.2426407)
+            SetGround(0, -190) returns (x,y) = (-4.2426407, 0.0000000)
+            SetGround(-50, -100) returns (x,y) = (0.0000000, -4.2426407)
+        BACKWARD
+            SetCoordinate(sqrt2*SphRad, 0) returns lat/lon = -0.00000 / 350.00000
+            SetCoordinate(0, sqrt2*SphRad) returns lat/lon = 50.00000 / 80.00000
+            SetCoordinate(-sqrt2*SphRad, 0) returns lat/lon = -0.00000 / 170.00000
+            SetCoordinate(0, -sqrt2*SphRad) returns lat/lon = -50.00000 / 260.00000
+
+
+    Check known values on (almost) whole planet map
+        BACKWARD - Project from opposite side of planet 
+        For each of these, expect a value near
+            - centerLatitude / centerLongitude+180 = -40 / 80
+            SetCoordinate(2*SphRad, 0) returns lat/lon = -40.00000 / 80.00000
+            SetCoordinate(0, 2*SphRad) returns lat/lon = -40.00000 / 80.00000
+            SetCoordinate(-2*SphRad, 0) returns lat/lon = -40.00000 / 80.00000
+            SetCoordinate(0, -2*SphRad) returns lat/lon = -40.00000 / 80.00000
+
+				/-----------------------------------------/
+    Testing XYRange method
+
+Given: 
+    Minimum Latitude:  -90.0000000
+    Maximum Latitude:  90.0000000
+    Minimum Longitude: -279.9999900
+    Maximum Longitude: 79.9999900
+
+XYRange method returns
+    Minimum X:  -5.9999883
+    Maximum X:  5.9999883
+    Minimum Y:  -5.9999996
+    Maximum Y:  5.9999996
+
+            SetCoordinate(maxX,0) returns lat/lon = -40.000 / 79.705
+            SetCoordinate(0,maxY) returns lat/lon = -39.958 / 80.000
+            SetCoordinate(minX,0) returns lat/lon = -40.000 / 80.295
+            SetCoordinate(0,minY) returns lat/lon = -40.042 / 80.000
+
+
+Given: 
+    Minimum Latitude:  -90.0000000
+    Maximum Latitude:  90.0000000
+    Minimum Longitude: -110.0000000
+    Maximum Longitude: 70.0000000
+
+XYRange method returns
+    Minimum X:  -0.5693461
+    Maximum X:  5.9864862
+    Minimum Y:  -5.7660188
+    Maximum Y:  5.4590915
+
+            SetCoordinate(maxX,0) returns lat/lon = -39.5687111 / 70.0002785
+            SetCoordinate(0,maxY) returns lat/lon = 9.0311303 / 80.0000000
+            SetCoordinate(minX,0) returns lat/lon = 39.1395910 / 245.9018801
+            SetCoordinate(0,minY) returns lat/lon = -72.1073168 / 80.0000000
+
+
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+			 SPHERICAL-PLANETOGRAPHIC-POSITIVEEAST-SOUTH POLAR-180
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+CenterLatitude = -90.0
+CenterLongitude = -96.0
+EquatorialRadius = 3.0000000
+PolarRadius = 3.0000000
+Eccentricity = 0.0000000
+TrueScaleLatitude = -90.0000000
+
+				/-----------------------------------------/
+
+    Testing SetGround(-20, 100) from hand calculation
+Latitude:            -20.0000000
+Longitude:           100.0000000
+XCoord:              -0.9485946
+YCoord:              -3.3081423
+RelativeScaleLatitude:  1.2207746
+RelativeScaleLongitude: 0.8191520
+
+				/-----------------------------------------/
+
+    Testing SetCoordinate(-0.9485946, -3.3081423)
+Latitude:            -20.0000008
+Longitude:           100.0000010
+XCoord:              -0.9485946
+YCoord:              -3.3081423
+
+				/-----------------------------------------/
+
+    Testing projection to origin and back
+    SetGround(-90, -96)
+Latitude:            -90.0000000
+Longitude:           -96.0000000
+XCoord:                0.0000000
+YCoord:                0.0000000
+    SetCoordinate(0, 0)
+Latitude:            -90.0000000
+Longitude:           -96.0000000
+XCoord:                0.0000000
+YCoord:                0.0000000
+
+				/-----------------------------------------/
+
+    Testing projection to north pole and back
+    SetGround(90, 0)
+Latitude:            90.0000000
+Longitude:            0.0000000
+XCoord:               5.9671314
+YCoord:              -0.6271708
+    SetCoordinate(2*sphRad, -0.6271708)
+Latitude:            90.0000000
+Longitude:            0.0000000
+XCoord:               6.0000000
+YCoord:              -0.6271708
+
+				/-----------------------------------------/
+
+    Testing other known points...
+
+        Comparison Values
+        SphRad (Spherical Radius) = 3.0000000
+        sqrt2*SphRad              = 4.2426407
+        sqrt2*SphRad*sqrt3/2      = 3.6742346
+        sqrt2*SphRad/2            = 2.1213203
+
+    Check known values on hemispherical map
+        FORWARD
+            SetGround(0, -6) returns (x,y) = (4.2426407, 0.0000000)
+            SetGround(0, -96) returns (x,y) = (0.0000000, 4.2426407)
+            SetGround(0, -186) returns (x,y) = (-4.2426407, 0.0000000)
+            SetGround(0, 84) returns (x,y) = (0.0000000, -4.2426407)
+            SetGround(0, -36) returns (x,y) = (3.6742346, 2.1213203)
+            SetGround(0, 129) returns (x,y) = (-3.0000000, -3.0000000)
+        BACKWARD
+            SetCoordinate(sqrt2*SphRad, 0) returns lat/lon = 0.00000 / -6.00000
+            SetCoordinate(0, sqrt2*SphRad) returns lat/lon = 0.00000 / -96.00000
+            SetCoordinate(-sqrt2*SphRad, 0) returns lat/lon = 0.00000 / 174.00000
+            SetCoordinate(0, -sqrt2*SphRad) returns lat/lon = 0.00000 / 84.00000
+            SetCoordinate(SphRad*sqrt6/2, SphRad*sqrt2/2) returns lat/lon=-0.00000 / -36.00000
+            SetCoordinate(-SphRad, -SphRad) returns lat/lon = -0.00000 / 129.00000
+
+
+        Comparison Values
+        SphRad (Spherical Radius) = 3.0000000
+        2*SphRad*sqrt3/2          = 5.1961524
+        2*SphRad*sqrt2/2          = 4.2426407
+
+    Check known values on whole planet map
+        FORWARD - Project to opposite side of planet 
+            SetGround(90, -6) returns (x,y) = (6.0000000, 0.0000000)
+            SetGround(90, -96) returns (x,y) = (0.0000000, 6.0000000)
+            SetGround(90, 174) returns (x,y) = (-6.0000000, -0.0000000)
+            SetGround(90, 84) returns (x,y) = (0.0000000, -6.0000000)
+            SetGround(90, -36) returns (x,y) = (5.1961524, 3.0000000)
+            SetGround(90, 129) returns (x,y) = (-4.2426407, -4.2426407)
+        BACKWARD - Project from opposite side of planet 
+            SetCoordinate(2*SphRad, 0) returns lat/lon = 90.00000 / -6.00000
+            SetCoordinate(0, 2*SphRad) returns lat/lon = 90.00000 / -96.00000
+            SetCoordinate(-2*SphRad, 0) returns lat/lon = 90.00000 / 174.00000
+            SetCoordinate(0, -2*SphRad) returns lat/lon = 90.00000 / 84.00000
+            SetCoordinate(2*SphRad*sqrt3/2, 2*SphRad*1/2) returns lat/lon=90.00000 / -36.00000
+            SetCoordinate(-SphRad*sqrt2, -SphRad*sqrt2) returns lat/lon = 90.00000 / 129.00000
+
+				/-----------------------------------------/
+
+    Testing XYRange method
+Given: 
+    Minimum Latitude:  -90.0000000
+    Maximum Latitude:  90.0000000
+    Minimum Longitude: -110.0000000
+    Maximum Longitude: 70.0000000
+
+XYRange method returns
+    Minimum X:  -6.0000000
+    Maximum X:  6.0000000
+    Minimum Y:  -6.0000000
+    Maximum Y:  6.0000000
+
+            SetCoordinate(maxX,0) returns lat/lon = 90.0000000 / -6.0000000
+            SetCoordinate(0,maxY) returns lat/lon = 90.0000000 / -96.0000000
+            SetCoordinate(minX,0) returns lat/lon = 90.0000000 / 174.0000000
+            SetCoordinate(0,minY) returns lat/lon = 90.0000000 / 84.0000000
+To check MinimumX: SetGround(90, 90) returns (x,y) = (-0.6271708, -5.9671314)
+To check MaximumY: SetGround(90, -90) returns (x,y) = (0.6271708, 5.9671314)
+
+
+Given: 
+    Minimum Latitude:  -90.0000000
+    Maximum Latitude:  0.0000000
+    Minimum Longitude: -336.0000000
+    Maximum Longitude: -66.0000000
+
+XYRange method returns
+    Minimum X:  -4.2426407
+    Maximum X:  3.6742346
+    Minimum Y:  -4.2426407
+    Maximum Y:  4.2426407
+
+        Comparison Values
+        SphRad (Spherical Radius) = 3.0000000
+        maxX:    sqrt2*SphRad*sqrt3/2  = 3.6742346
+        others:  sqrt2*SphRad          = 4.2426407
+
+        For y = -sqrt2*SphRad/2 = -2.1213203
+            SetCoordinate(maxX, y) returns lat/lon = -0.0000000 / 24.0000000
+            SetCoordinate(0,maxY) returns lat/lon = 0.0000000 / -96.0000000
+            SetCoordinate(minX,0) returns lat/lon = 0.0000000 / 174.0000000
+            SetCoordinate(0,minY) returns lat/lon = 0.0000000 / 84.0000000
+
+
+Given: 
+    Minimum Latitude:  -90.0000000
+    Maximum Latitude:  0.0000000
+    Minimum Longitude: -66.0000000
+    Maximum Longitude: -51.0000000
+
+XYRange method returns
+    Minimum X:  0.0000000
+    Maximum X:  3.0000000
+    Minimum Y:  0.0000000
+    Maximum Y:  3.6742346
+
+        Comparison Values
+        SphRad (Spherical Radius)   = 3.0000000
+        maxX:  sqrt2*SphRad*sqrt2/2 = 3.0000000
+        maxY:  sqrt2*SphRad*sqrt3/2 = 3.6742346
+
+            SetCoordinate(maxX, SphRad) returns lat/lon = -0.0000000 / -51.0000000
+For x = sqrt2*SphRad/2 = 2.1213203
+            SetCoordinate(0,maxY) returns lat/lon = 0.0000000 / -66.0000000
+            SetCoordinate(minX,0) returns lat/lon = -90.0000000 / -96.0000000
+            SetCoordinate(0,minY) returns lat/lon = -90.0000000 / -96.0000000
+
+
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+			 SPHERICAL-PLANETOCENTRIC-POSITIVEWEST-NORTH POLAR-180
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+CenterLatitude = 90.0
+CenterLongitude = -96.0
+EquatorialRadius = 3.0000000
+PolarRadius = 3.0000000
+Eccentricity = 0.0000000
+TrueScaleLatitude = 90.0000000
+
+				/-----------------------------------------/
+
+    Testing SetGround(-20, 100) hand calculation
+Latitude:            -20.0000000
+Longitude:           100.0000000
+XCoord:              1.3547334
+YCoord:              4.7245169
+RelativeScaleLatitude:  1.7434468
+RelativeScaleLongitude: 0.5735764
+
+				/-----------------------------------------/
+
+    Testing SetCoordinate(1.3547334, 4.7245169)
+Latitude:            -19.9999998
+Longitude:           99.9999998
+XCoord:              1.3547334
+YCoord:              4.7245169
+
+				/-----------------------------------------/
+
+    Testing projection to origin and back
+    SetGround(90, -96)
+Latitude:             90.0000000
+Longitude:           -96.0000000
+XCoord:               -0.0000000
+YCoord:                0.0000000
+    SetCoordinate(0, 0)
+Latitude:             90.0000000
+Longitude:           -96.0000000
+XCoord:                0.0000000
+YCoord:                0.0000000
+
+				/-----------------------------------------/
+
+    Testing projection to south pole and back
+    SetGround(-90, 0)
+Latitude:            -90.0000000
+Longitude:             0.0000000
+XCoord:               -5.9671314
+YCoord:                0.6271708
+    SetCoordinate(-2*sphRad, -0.6271708)
+Latitude:            -90.0000000
+Longitude:             0.0000000
+XCoord:                6.0000000
+YCoord:               -0.6271708
+
+				/-----------------------------------------/
+
+    Testing other known points...
+
+        Comparison Values
+        SphRad (Spherical Radius) = 3.0000000
+        sqrt2*SphRad              = 4.2426407
+
+    Check known values on hemispherical map
+        FORWARD
+            SetGround(0, -186) returns (x,y) = (4.2426407, -0.0000000)
+            SetGround(0, 84) returns (x,y) = (-0.0000000, 4.2426407)
+            SetGround(0, -6) returns (x,y) = (-4.2426407, -0.0000000)
+            SetGround(0, -96) returns (x,y) = (0.0000000, -4.2426407)
+            SetGround(0, 129) returns (x,y) = (3.0000000, 3.0000000)
+        BACKWARD
+            SetCoordinate(sqrt2*SphRad, 0) returns lat/lon = -0.00000 / 174.00000
+            SetCoordinate(0, sqrt2*SphRad) returns lat/lon = -0.00000 / 84.00000
+            SetCoordinate(-sqrt2*SphRad, 0) returns lat/lon = -0.00000 / -6.00000
+            SetCoordinate(0, -sqrt2*SphRad) returns lat/lon = -0.00000 / -96.00000
+            SetCoordinate(SphRad, SphRad) returns lat/lon = 0.00000 / 129.00000
+
+
+        Comparison Values
+        SphRad (Spherical Radius) = 3.0000000
+        2*SphRad*sqrt3/2          = 5.1961524
+
+    Check known values on whole planet map
+        FORWARD - Project to opposite side of planet 
+            SetGround(-90, 174) returns (x,y) = (6.0000000, 0.0000000)
+            SetGround(-90, 84) returns (x,y) = (-0.0000000, 6.0000000)
+            SetGround(-90, -6) returns (x,y) = (-6.0000000, -0.0000000)
+            SetGround(-90, -96) returns (x,y) = (0.0000000, -6.0000000)
+            SetGround(-90, -126) returns (x,y) = (3.0000000, -5.1961524)
+        BACKWARD - Project from opposite side of planet 
+            SetCoordinate(2*SphRad, 0) returns lat/lon = -90.00000 / 174.00000
+            SetCoordinate(0, 2*SphRad) returns lat/lon = -90.00000 / 84.00000
+            SetCoordinate(-2*SphRad, 0) returns lat/lon = -90.00000 / -6.00000
+            SetCoordinate(0, -2*SphRad) returns lat/lon = -90.00000 / -96.00000
+            SetCoordinate(SphRad, -SphRad*sqrt3) returns lat/lon = -90.00000 / -126.00000
+
+				/-----------------------------------------/
+
+    Testing XYRange method 
+Given: 
+    Minimum Latitude:  -89.9999900
+    Maximum Latitude:  0.0000000
+    Minimum Longitude: -51.0000000
+    Maximum Longitude: 129.0000000
+
+XYRange method returns
+    Minimum X:  -6.0000000
+    Maximum X:  4.2426407
+    Minimum Y:  -4.2426407
+    Maximum Y:  6.0000000
+
+        Comparison Values
+        SphRad (Spherical Radius)  = 3.0000000
+        maxX, -minY:  sqrt2*SphRad = 4.2426407
+        -minX, maxY:  2*SphRad     = 6.0000000
+
+            SetCoordinate(maxX,sqrt2*SphRad) returns lat/lon = -89.99999 / 129.00000
+            SetCoordinate(0,maxY) returns lat/lon = -89.99999 / 84.00000
+            SetCoordinate(minX,0) returns lat/lon = -89.99999 / -6.00000
+            SetCoordinate(sqrt2*SphRad,minY) returns lat/lon = -89.99999 / -51.00000
+
+
+Given: 
+    Minimum Latitude:  -89.9999900
+    Maximum Latitude:  0.0000000
+    Minimum Longitude: -6.0000000
+    Maximum Longitude: 24.0000000
+
+XYRange method returns
+    Minimum X:  -6.0000000
+    Maximum X:  -3.6742346
+    Minimum Y:  -0.0000000
+    Maximum Y:  3.0000000
+
+        Comparison Values
+        SphRad (Spherical Radius)    = 3.0000000
+        maxX:  -sqrt2*SphRad*sqrt3/2 = -3.6742346
+        maxY:  2*SphRad/2            = 3.0000000
+        minX:  -2*SphRad             = -6.0000000
+
+            SetCoordinate(maxX, sqrt2*SphRad/2) returns lat/lon = 0.00000 / 24.00000
+            SetCoordinate(-2*SphRad*sqrt3/2, maxY) returns lat/lon = -89.99999 / 24.00000
+            SetCoordinate(minX,0) returns lat/lon = -89.99999 / -6.00000
+            SetCoordinate(0,minY) returns lat/lon = 90.00000 / -96.00000
+
+
+Given: 
+    Minimum Latitude:  -90.0000000
+    Maximum Latitude:  0.0000000
+    Minimum Longitude: -6.0000000
+    Maximum Longitude: 24.0000000
+
+XYRange method returns
+    Minimum X:  -6.0000000
+    Maximum X:  6.0000000
+    Minimum Y:  -6.0000000
+    Maximum Y:  6.0000000
+
+        Comparison Values
+        2*SphRad (Spherical Radius)    = 6.0000000
+
+            SetCoordinate(maxX, 0) returns lat/lon = -90.00000 / 174.00000
+            SetCoordinate(0, maxY) returns lat/lon = -90.00000 / 84.00000
+            SetCoordinate(minX, 0) returns lat/lon = -90.00000 / -6.00000
+            SetCoordinate(0, minY) returns lat/lon = -90.00000 / -96.00000
+
+
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+		 	 ELLIPSOIDAL-PLANETOGRAPHIC-POSITIVEEAST-NORTH POLAR-180
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+				/-----------------------------------------/
+
+    Testing SetGround method to find the relative scale factors along the latitudes (k) and along the longitudes (h).
+This table also includes a radius value that represents radius on the projected disk at the computed point. That is, the distance from the pole (center latitude) to the (x,y) coordinate.
+See Snyder Table 29, page 190
+Latitude	Projection Radius	h			k
+90.0			 0.0			1.000000	1.000000
+89.0		111698.4			0.999962	1.000038
+88.0		223387.7			0.999848	1.000152
+87.0		335058.5			0.999657	1.000343
+86.0		446701.8			0.999391	1.000610
+85.0		558308.3			0.999048	1.000953
+84.0		669868.8			0.998630	1.001372
+83.0		781374.2			0.998135	1.001869
+82.0		892815.4			0.997564	1.002442
+81.0		1004183.1			0.996918	1.003092
+80.0		1115468.3			0.996195	1.003820
+79.0		1226661.9			0.995397	1.004625
+78.0		1337754.7			0.994522	1.005508
+77.0		1448737.6			0.993573	1.006469
+76.0		1559601.7			0.992547	1.007509
+75.0		1670337.9			0.991446	1.008628
+74.0		1780937.2			0.990270	1.009826
+73.0		1891390.6			0.989018	1.011104
+72.0		2001689.2			0.987691	1.012462
+71.0		2111824.0			0.986289	1.013902
+70.0		2221786.2			0.984812	1.015422
+
+				/-----------------------------------------/
+
+CenterLatitude = 90.0
+CenterLongitude = -100.0
+EquatorialRadius = 6378388.0000000
+PolarRadius = 6356911.9461994
+Eccentricity = 0.0819919
+TrueScaleLatitude = 90.0000000
+
+				/-----------------------------------------/
+
+    Testing SetGround(80, 5) from Snyder pages 334-335
+Latitude:            80.0000000
+Longitude:           5.0000000
+XCoord:              1077459.6850317
+YCoord:              288704.4524813
+RelativeScaleLatitude:  1.0038196
+RelativeScaleLongitude: 0.9961950
+
+				/-----------------------------------------/
+
+    Testing SetCoordinate(1077459.7, 288704.5) from Snyder pages 336-337
+Latitude:            79.9999998
+Longitude:           5.0000022
+XCoord:              1077459.7000000
+YCoord:              288704.5000000
+
+				/-----------------------------------------/
+
+    Testing projection to origin and back
+    SetGround(90, -100)
+Latitude:              90.0000000
+Longitude:           -100.0000000
+XCoord:                 0.0000000
+YCoord:                -0.0000000
+    SetCoordinate(0, 0)
+Latitude:              90.0000000
+Longitude:             80.0000000
+XCoord:                 0.0000000
+YCoord:                 0.0000000
+
+				/-----------------------------------------/
+
+    Testing projection to south pole and back
+    SetGround(-90, 0)
+Latitude:                 -90.0000000
+Longitude:                  0.0000000
+XCoord:              12548868.8927037
+YCoord:               2212704.1631568
+    SetCoordinate(12548868.8927037, 2212704.1631568)
+Latitude:                 -90.0000000
+Longitude:                 -0.0000000
+XCoord:              12548868.8927037
+YCoord:               2212704.1631568
+
+				/-----------------------------------------/
+
+    Testing other known points...
+
+        Comparison Values
+        poleToEquator = 9010276.6383702
+
+    Check known values on hemispherical map
+        FORWARD
+            SetGround(0, -10) returns (x,y) = (9010276.6383702, -0.0000000)
+            SetGround(0, 80) returns (x,y) = (0.0000000, 9010276.6383702)
+            SetGround(0, -190) returns (x,y) = (-9010276.6383702, 0.0000000)
+            SetGround(0, -100) returns (x,y) = (0.0000000, -9010276.6383702)
+        BACKWARD
+            SetCoordinate(poleToEquator, 0) returns lat/lon = -0.0000000 / -10.0000000
+            SetCoordinate(0, poleToEquator) returns lat/lon = -0.0000000 / 80.0000000
+            SetCoordinate(-poleToEquator, 0) returns lat/lon = -0.0000000 / 170.0000000
+            SetCoordinate(0, -poleToEquator) returns lat/lon = -0.0000000 / -100.0000000
+
+    Check known values on whole planet map
+
+        Comparison Values
+        poleToOppositePole = 12742455.4227165
+
+        FORWARD - Project to opposite side of planet 
+            SetGround(-90, 80) returns (x,y) = (0.0000000, 12742455.4227165)
+            SetGround(-90, -280) returns (x,y) = (-0.0000000, 12742455.4227165)
+        BACKWARD - Project from opposite side of planet 
+            SetCoordinate(poleToOppositePole, 0) returns lat/lon = -90.0000000 / -10.0000000
+            SetCoordinate(0, poleToOppositePole) returns lat/lon = -90.0000000 / 80.0000000
+            SetCoordinate(-poleToOppositePole, 0) returns lat/lon = -90.0000000 / 170.0000000
+            SetCoordinate(0, -poleToOppositePole) returns lat/lon = -90.0000000 / -100.0000000
+
+				/-----------------------------------------/
+
+    Testing XYRange method 
+
+Given: 
+    Minimum Latitude:  -89.9999900
+    Maximum Latitude:  0.0000000
+    Minimum Longitude: -100.0000000
+    Maximum Longitude: 215.0000000
+
+XYRange method returns
+    Minimum X:  -12742455.4227165
+    Maximum X:  12742455.4227165
+    Minimum Y:  -12742455.4227165
+    Maximum Y:  12742455.4227165
+
+        Comparison Values
+        sqrt2*poleToEquator = poleToOppositePole = 12742455.4227165
+
+            SetCoordinate(maxX, 0) returns lat/lon = -90.00000 / -10.00000
+            SetCoordinate(0,maxY) returns lat/lon = -90.00000 / 80.00000
+            SetCoordinate(minX,0) returns lat/lon = -90.00000 / 170.00000
+            SetCoordinate(0,minY) returns lat/lon = -90.00000 / -100.00000
+
+
+Given: 
+    Minimum Latitude:  -89.9999900
+    Maximum Latitude:  0.0000000
+    Minimum Longitude: -55.0000000
+    Maximum Longitude: -10.0000000
+
+XYRange method returns
+    Minimum X:  6371227.7113583
+    Maximum X:  12742455.4227165
+    Minimum Y:  -9010276.6383701
+    Maximum Y:  -0.0000000
+
+        Comparison Values
+        maxX:  poleToOppositePole          = 12742455.4227165
+        minX:  poleToEquator*sqrt2/2       = 6371227.7113583
+        minY:  -poleToOppositePole*sqrt2/2 = -9010276.6383702
+
+            SetCoordinate(maxX, 0) returns lat/lon = -90.0000000 / -10.0000000
+            SetCoordinate(poleToEquator, maxY) returns lat/lon = -0.0000000 / -10.0000000
+            SetCoordinate(minX,-poleToEquator*sqrt2/2) returns lat/lon = -0.0000000 / -55.0000000
+            SetCoordinate(poleToOppositePole*sqrt(2)/2,minY) returns lat/lon = -90.0000000 / -55.0000000
+
+
+
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+		 	 ELLIPSOIDAL-PLANETOGRAPHIC-POSITIVEEAST-SOUTH POLAR-180
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+CenterLatitude = -90.0
+CenterLongitude = -100.0
+EquatorialRadius = 6378388.0000000
+PolarRadius = 6356911.9461994
+Eccentricity = 0.0819919
+TrueScaleLatitude = -90.0000000
+
+				/-----------------------------------------/
+
+    Testing SetGround(-80, -25)
+Latitude:            -80.0000000
+Longitude:           -25.0000000
+XCoord:              1077459.6850317
+YCoord:              288704.4524813
+RelativeScaleLatitude:  1.0038196
+RelativeScaleLongitude: 0.9961950
+
+				/-----------------------------------------/
+
+    Testing SetCoordinate(1077459.7, 288704.5)
+Latitude:            -79.9999998
+Longitude:           -25.0000022
+XCoord:              1077459.7000000
+YCoord:              288704.5000000
+
+				/-----------------------------------------/
+
+    Testing projection to origin and back
+    SetGround(-90, -100)
+Latitude:             -90.0000000
+Longitude:           -100.0000000
+XCoord:                 0.0000000
+YCoord:                 0.0000000
+    SetCoordinate(0, 0)
+Latitude:               -90.0000000
+Longitude:             -100.0000000
+XCoord:                   0.0000000
+YCoord:                   0.0000000
+
+				/-----------------------------------------/
+
+    Testing projection to north pole and back
+    SetGround(90, -100)
+Latitude:                  90.0000000
+Longitude:               -100.0000000
+XCoord:                     0.0000000
+YCoord:              12742455.4227165
+    SetCoordinate(0, 2*eqRad)
+Latitude:                  90.0000000
+Longitude:               -100.0000000
+XCoord:                     0.0000000
+YCoord:              12756776.0000000
+
+				/-----------------------------------------/
+
+    Testing other known points...
+
+        Comparison Values
+        poleToEquator = 9010276.6383702
+
+    Check known values on hemispherical map
+        FORWARD
+            SetGround(0, -10) returns (x,y) = (9010276.6383702, 0.0000000)
+            SetGround(0, 80) returns (x,y) = (0.0000000, 9010276.6383702)
+            SetGround(0, -190) returns (x,y) = (-9010276.6383702, -0.0000000)
+            SetGround(0, -100) returns (x,y) = (0.0000000, -9010276.6383702)
+        BACKWARD
+            SetCoordinate(poleToEquator, 0) returns lat/lon = 0.0000000 / -10.0000000
+            SetCoordinate(0, poleToEquator) returns lat/lon = 0.0000000 / -100.0000000
+            SetCoordinate(-poleToEquator, 0) returns lat/lon = 0.0000000 / 170.0000000
+            SetCoordinate(0, -poleToEquator) returns lat/lon = 0.0000000 / 80.0000000
+
+    Check known values on whole planet map
+
+        Comparison Values
+        poleToOppositePole = 12742455.4227165
+
+        FORWARD - Project to opposite side of planet 
+            SetGround(-90, 80) returns (x,y) = (0.0000000, -12742455.4227165)
+            SetGround(-90, -280) returns (x,y) = (-0.0000000, -12742455.4227165)
+        BACKWARD - Project from opposite side of planet 
+            SetCoordinate(poleToOppositePole, 0) returns lat/lon = 90.0000000 / -10.0000000
+            SetCoordinate(0, poleToOppositePole) returns lat/lon = 90.0000000 / -100.0000000
+            SetCoordinate(-poleToOppositePole, 0) returns lat/lon = 90.0000000 / 170.0000000
+            SetCoordinate(0, -poleToOppositePole) returns lat/lon = 90.0000000 / 80.0000000
+
+				/-----------------------------------------/
+
+    Testing XYRange method 
+
+Given: 
+    Minimum Latitude:  -89.9999900
+    Maximum Latitude:  0.0000000
+    Minimum Longitude: -55.0000000
+    Maximum Longitude: -10.0000000
+
+XYRange method returns
+    Minimum X:  0.7721524
+    Maximum X:  9010276.6383702
+    Minimum Y:  0.0000000
+    Maximum Y:  6371227.7113583
+
+        Comparison Values
+        poleToEquator = 9010276.6383702
+        sqrt(2)/2 * poleToEquator = 6371227.7113583
+
+            SetCoordinate(maxX, 0) returns lat/lon = 0.00000 / -10.00000
+            SetCoordinate(maxY,maxY) returns lat/lon = 0.00000 / -55.00000
+            SetCoordinate(minX,0) returns lat/lon = -90.00000 / -10.00000
+            SetCoordinate(0,minY) returns lat/lon = -90.00000 / -100.00000
+
+
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+			 ELLIPSOIDAL-PLANETOGRAPHIC-POSITIVEEAST-OBLIQUE-180
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+CenterLatitude = 40.0
+CenterLongitude = -100.0
+EquatorialRadius = 6378206.4000000
+PolarRadius = 6356583.7935914
+Eccentricity = 0.0822719
+TrueScaleLatitude = 40.0000000
+
+				/-----------------------------------------/
+
+    Testing SetGround(30, -110) from Snyder pages 333-334
+Latitude:            30.0000000
+Longitude:           -110.0000000
+XCoord:              -965932.1106040
+YCoord:              -1056814.9254147
+
+				/-----------------------------------------/
+
+    Testing SetCoordinate(-965932.1, -1056814.9) from Snyder pages 335-336
+Latitude:            30.0000002
+Longitude:           -109.9999999
+XCoord:              -965932.1000000
+YCoord:              -1056814.9000000
+
+				/-----------------------------------------/
+
+    Testing projection to origin and back
+    SetGround(40, -100)
+Latitude:              40.0000000
+Longitude:           -100.0000000
+XCoord:                 0.0000000
+YCoord:                 0.0000000
+    SetCoordinate(0, 0)
+Latitude:              40.0000000
+Longitude:           -100.0000000
+XCoord:                 0.0000000
+YCoord:                 0.0000000
+
+				/-----------------------------------------/
+
+    Testing projection to north pole and back
+    SetGround(90, 0)
+Latitude:                 90.0000000
+Longitude:                 0.0000000
+XCoord:                    0.0000000
+YCoord:              5394277.8222559
+    SetCoordinate(0, 5394277.8222559)
+Latitude:                 90.0000000
+Longitude:                80.0000000
+XCoord:                    0.0000000
+YCoord:              5394277.8222559
+
+				/-----------------------------------------/
+
+    Testing other known points...
+
+        Comparison Values
+        DistanceToSide              = 9013812.0794587
+        DistanceToTop               = 9004819.1281097
+        DistanceToBottom            = 9004819.1281097
+
+    Check known values on hemispherical map
+        FORWARD
+            SetGround(0, -10) returns (x,y) = (9015945.0191306, -0.0000000)
+            SetGround(50, 80) returns (x,y) = (0.0000000, 9024014.4893592)
+            SetGround(0, -190) returns (x,y) = (-9015945.0191306, 0.0000000)
+            SetGround(-50, -100) returns (x,y) = (0.0000000, -8983861.4797311)
+        BACKWARD
+            SetCoordinate(DistanceToSide, 0) returns lat/lon = 0.0174561 / -10.0208033
+            SetCoordinate(0, DistanceToTop) returns lat/lon = 50.2443852 / 80.0000000
+            SetCoordinate(-DistanceToSide, 0) returns lat/lon = 0.0174561 / 170.0208033
+            SetCoordinate(0, -DistanceToBottom) returns lat/lon = -50.2662269 / -100.0000000
+
+				/-----------------------------------------/
+
+    Testing XYRange method 
+Given: 
+    Minimum Latitude:  -50.0000000
+    Maximum Latitude:  90.0000000
+    Minimum Longitude: -190.0000000
+    Maximum Longitude: -10.0000000
+
+XYRange method returns
+    Minimum X:  -9590683.8360315
+    Maximum X:  9590683.8360315
+    Minimum Y:  -8983861.4797311
+    Maximum Y:  5394277.8222559
+
+            SetGround(90, -100) returns (x,y) = (0.0000000, 5394277.8222559)
+            SetGround(-50, -100) returns (x,y) = (0.0000000, -8983861.4797311)
+
+            SetGround(50, 80) returns (x,y) = (0.0000000, 9024014.4893592)
+
+            SetGround(0, -190) returns (x,y) = (-9015945.0191306, 0.0000000)
+            SetGround(0, -10) returns (x,y) = (9015945.0191306, -0.0000000)
+            SetGround(-40, -190) returns (x,y) = (-9015945.0191306, -5772245.4288845)
+            SetGround(-40, -10) returns (x,y) = (9015945.0191306, -5772245.4288845)
+
+            SetGround(-20, -190) returns (x,y) = (-9588046.2846852, -2662659.2917951)
+            SetGround(-20, -10) returns (x,y) = (9588046.2846852, -2662659.2917951)
+            SetGround(-21.5, -190) returns (x,y) = (-9590653.0861956, -2882473.6383627)
+            SetGround(-21.5, -10) returns (x,y) = (9590653.0861956, -2882473.6383627)
+
+            SetCoordinate(maxX,-2882473.6383627) returns lat/lon = -21.5002243 / -9.9996049
+            SetCoordinate(0,maxY) returns lat/lon = 90.0000000 / -100.0000000
+            SetCoordinate(minX,-2882473.6383627) returns lat/lon = -21.5002243 / 169.9996049
+            SetCoordinate(0,minY) returns lat/lon = -50.0000000 / -100.0000000
+
+
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+			 ELLIPSOIDAL-PLANETOGRAPHIC-POSITIVEEAST-EQUATORIAL-180
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+CenterLatitude = 0
+CenterLongitude = 0
+
+EquatorialRadius = 6378206.4000000
+PolarRadius = 6356583.7935914
+Eccentricity = 0.0822719
+TrueScaleLatitude = 0.0000000
+
+				/-----------------------------------------/
+
+    Testing SetGround(30, -110)
+Latitude:            30.0000000
+Longitude:           -110.0000000
+XCoord:              -8761895.7861122
+YCoord:              5346904.0079749
+TrueScaleLat:           0.0000000
+
+				/-----------------------------------------/
+
+    Testing SetCoordinate(-8761895.7861122, 5346904.00797488)
+Latitude:            30.0000000
+Longitude:           -110.0000000
+XCoord:              -8761895.7861122
+YCoord:              5346904.0079749
+
+				/-----------------------------------------/
+
+    Testing projection to origin and back
+    SetGround(0, 0)
+Latitude:            0.0000000
+Longitude:           0.0000000
+XCoord:              0.0000000
+YCoord:              0.0000000
+    SetCoordinate(0, 0)
+Latitude:            0.0000000
+Longitude:           0.0000000
+XCoord:              0.0000000
+YCoord:              0.0000000
+
+				/-----------------------------------------/
+
+    Testing projection to north pole and back
+    SetGround(90, 0)
+Latitude:                 90.0000000
+Longitude:                 0.0000000
+XCoord:                    0.0000000
+YCoord:              8999766.9300905
+    SetCoordinate(0, distFromEquatorToPole)
+Latitude:                 90.0000000
+Longitude:               180.0000000
+XCoord:                    0.0000000
+YCoord:              8999766.9300905
+
+				/-----------------------------------------/
+
+    Testing other known points...
+
+        Comparison Values
+        sqrt2*EquatorialRadius (EquatorToEquator) = 9020145.9944949
+        EquatorToPole                             = 8999766.9300905
+
+    Check known values on hemispherical map
+        FORWARD
+            SetGround(0, 90) returns (x,y) = (9020145.9944949, 0.0000000)
+            SetGround(90, 0) returns (x,y) = (0.0000000, 8999766.9300905)
+            SetGround(0, -90) returns (x,y) = (-9020145.9944949, 0.0000000)
+            SetGround(-90, 0) returns (x,y) = (0.0000000, -8999766.9300905)
+
+				/-----------------------------------------/
+
+    Testing XYRange method 
+
+Given: 
+    Minimum Latitude:  -90.0000000
+    Maximum Latitude:  90.0000000
+    Minimum Longitude: -90.0000000
+    Maximum Longitude: -10.0000000
+
+XYRange method returns
+    Minimum X:  -9020145.9944949
+    Maximum X:  -0.0000000
+    Minimum Y:  -8999766.9300905
+    Maximum Y:  8999766.9300905
+            SetCoordinate(maxX,0) returns lat/lon = 0.0000000 / 0.0000000
+            SetCoordinate(0,maxY) returns lat/lon = 90.0000000 / 180.0000000
+            SetCoordinate(minX,0) returns lat/lon = 0.0000000 / -90.0000000
+            SetCoordinate(0,minY) returns lat/lon = -90.0000000 / 180.0000000
+
+				/-----------------------------------------/
+
+    Testing XYRange method 
+
+Given: 
+    Minimum Latitude:  -90.0000000
+    Maximum Latitude:  90.0000000
+    Minimum Longitude: -90.0000000
+    Maximum Longitude: 90.0000000
+
+XYRange method returns
+    Minimum X:  -9020145.9944949
+    Maximum X:  9020145.9944949
+    Minimum Y:  -8999766.9300905
+    Maximum Y:  8999766.9300905
+            SetCoordinate(maxX,0) returns lat/lon = 0.0000000 / 90.0000000
+            SetCoordinate(0,maxY) returns lat/lon = 90.0000000 / 180.0000000
+            SetCoordinate(minX,0) returns lat/lon = 0.0000000 / -90.0000000
+            SetCoordinate(0,minY) returns lat/lon = -90.0000000 / 180.0000000
+
+
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+					 TESTING OTHER METHODS          
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Name:                       LambertAzimuthalEqualArea
+Version:                    1.0
+Rotation:                   0.0000000
+TrueScaleLatitude:          0.0000000
+Testing operator==  (True): 1
+Testing operator==  (True): 1
+Testing operator==  (True): 1
+Testing operator==  (False-different CenterLatitude):   0
+Testing operator==  (False-different CenterLongitude):  0
+Testing operator==  (False-different EquatorialRadius): 0
+Testing operator==  (False-different Eccentricity):     0
+
+				/-----------------------------------------/
+
+Testing default computations of CenterLatitude and CenterLongitude by Constructor
+Group = Mapping
+  PolarRadius        = 6378206.4
+  LatitudeType       = Planetographic
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 180
+  MinimumLatitude    = -90
+  MaximumLatitude    = 90.0
+  MinimumLongitude   = -90.0
+  MaximumLongitude   = 90.0
+  ProjectionName     = LambertAzimuthalEqualArea
+  PixelResolution    = 0.001
+  EquatorialRadius   = 6378206.4
+  CenterLongitude    = 0.0 <Degrees>
+  CenterLatitude     = 0.0 <Degrees>
+End_Group
+End
+
+				/-----------------------------------------/
+
+Testing Mapping() methods
+Mapping() = 
+Group = Mapping
+  ProjectionName     = LambertAzimuthalEqualArea
+  EquatorialRadius   = 1.0
+  PolarRadius        = 1.0
+  LatitudeType       = Planetographic
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 180
+  PixelResolution    = 0.001
+  MinimumLatitude    = 20.0
+  MaximumLatitude    = 80.0
+  MinimumLongitude   = -180.0
+  MaximumLongitude   = 180.0
+  CenterLatitude     = 0
+  CenterLongitude    = 0
+End_Group
+End
+MappingLatitudes() = 
+Group = Mapping
+  MinimumLatitude = 20.0
+  MaximumLatitude = 80.0
+  CenterLatitude  = 0
+End_Group
+End
+MappingLongitudes() = 
+Group = Mapping
+  MinimumLongitude = -180.0
+  MaximumLongitude = 180.0
+  CenterLongitude  = 0
+End_Group
+End
+
+
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+									 TESTING    GOOD = FALSE
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Set Ground using invalid Latitude/Longitude value
+SetGround(-91, 0):     0
+SetGround(Null, 0):    0
+SetGround(0, Null):    0
+Antipodal point for center lat/lon = 0/0:
+SetGround(0, 180):     0
+SetGround(0, -180):    0
+SetGround(0, 180):     0
+SetGround(0, -180):    0
+Antipodal point for center lat/lon = 40/-100:
+SetGround(-40,   80):     0
+SetGround(-40, -280):     0
+SetGround(-40,   80):     0
+SetGround(-40, -280):     0
+Set Coordinate using invalid x/y value
+SetCoordinate(Null, 0):    0
+SetCoordinate(0, Null):    0
+Set Coordinate using x/y value off the planet
+SetCoordinate(100, 0):    0
+SetCoordinate(0, -100):   0
+
+				/-----------------------------------------/
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+									 TESTING ERRORS                     
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Error check: Missing center longitude keyword
+**ERROR** Invalid label group [Mapping].
+**ERROR** Cannot project using Lambert Azimuthal equal-area without [CenterLongitude] value.  Keyword does not exist in labels and defaults are not allowed.
+
+				/-----------------------------------------/
+
+Error check: Missing center latitude keyword
+**ERROR** Invalid label group [Mapping].
+**ERROR** Cannot project using Lambert Azimuthal equal-area without [CenterLatitude] value.  Keyword does not exist in labels and defaults are not allowed.
+
+				/-----------------------------------------/
+
+Error check: MinimumLongitude more than 360 degrees from CenterLongitude
+**ERROR** Invalid label group [Mapping].
+**ERROR** [MinimumLongitude,MaximumLongitude] range of [-181.0,270.0] is invalid.  No more than 360 degrees from the CenterLongitude [180.0] is allowed.
+
+				/-----------------------------------------/
+
+Error check: MaximumLongitude more than 360 degrees from CenterLongitude
+**ERROR** Invalid label group [Mapping].
+**ERROR** [MinimumLongitude,MaximumLongitude] range of [-180.0,541.0] is invalid.  No more than 360 degrees from the CenterLongitude [180.0] is allowed.
+
+				/-----------------------------------------/
+
+Error check: Longitude min/max range greater than 360
+**ERROR** Invalid label group [Mapping].
+**ERROR** [MinimumLongitude,MaximumLongitude] range of [-180.0,270.0] is invalid. No more than 360 degree range width is allowed.
+
+				/-----------------------------------------/
+
+Error check: Center longitude out of valid range
+**ERROR** Invalid label group [Mapping].
+**ERROR** CenterLongitude [361.0] is outside the range of [-360, 360].
+
+				/-----------------------------------------/
+
+Error check: Center latitude out of valid range
+**ERROR** Invalid label group [Mapping].
+**ERROR** CenterLatitude [-91.0] is outside the range of [-90, 90].
+
+				/-----------------------------------------/
+
+Error check: Invalid Latitude and Longitude range. Can't project antipodal point for equatorial projections.
+**ERROR** Invalid label group [Mapping].
+**ERROR** Invalid latitude and/or longitude range. Non-polar Lambert Azimuthal equal-area projections can not project the antipodal point on the body.
+
+				/-----------------------------------------/
+
+Error check: Invalid Latitude and Longitude range. Can't project antipodal point for oblique projections.
+**ERROR** Invalid label group [Mapping].
+**ERROR** Invalid latitude and/or longitude range. Non-polar Lambert Azimuthal equal-area projections can not project the antipodal point on the body.
+
+				/-----------------------------------------/
+
+Error check: Relative scale factor. Uncomputed or failed projection.
+**ERROR** Projection failed or ground and coordinates have not been set.  Relative scale factor can not be computed.
+
+				/-----------------------------------------/
+
+Error check: Relative scale factor. Null value.
+**ERROR** Relative scale factor can not be computed.
+
+				/-----------------------------------------/
+
+Error check: Relative scale factor. Ellipsoidal oblique aspect projection.
+**ERROR** For ellipsidal bodies, relative scale factor can only be computed for polar aspect projections.
+
+				/-----------------------------------------/
+
+Error check: Relative scale factor. Polar aspect projection projected at opposite pole.
+**ERROR** Relative scale factor can not be computed for north polar aspect projection when ground is set to latitude -90.
+**ERROR** Relative scale factor can not be computed for south polar aspect projection when ground is set to latitude 90.
+
+
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Much of this unit test was obtained from:
+
+  Map Projections - A Working Manual
+  USGS Professional Paper 1395 by John P. Snyder
+  pages 188-190, 332-337
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
