@@ -941,8 +941,22 @@ namespace Isis {
       osampMax = OutputCubes[0]->getSampleCount();
     }
     if (olineMax > OutputCubes[0]->getLineCount()) {
-      osampMax = OutputCubes[0]->getLineCount();
+      olineMax = OutputCubes[0]->getLineCount();
     }
+
+    // A small input patch should create a small output patch.  If we had
+    // the 0-360 seam (or -180/180) in our patch it could be split across
+    // a cylindrical projection (e.g., equirectangular, simple, etc).  So
+    // If the output patch looks like it will span the full output image,
+    // either lines or sample then resplit the input patch
+    if (osampMax - osampMin + 1.0 > OutputCubes[0]->getSampleCount()*0.99) {
+      splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+      return;
+    } 
+    if (olineMax - olineMin + 1.0 > OutputCubes[0]->getLineCount()*0.99) {
+      splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
+      return;
+    } 
 
     // Can we create an affine transform from output to input coordinates
     BasisFunction isampFunc("Ax+By+C",3,3);
