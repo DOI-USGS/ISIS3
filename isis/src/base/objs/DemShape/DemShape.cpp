@@ -17,7 +17,6 @@
 #include "Longitude.h"
 #include "Portal.h"
 #include "Projection.h"
-//#include "ShapeModel.h"
 #include "SurfacePoint.h"
 #include "IException.h"
 #include "NaifStatus.h"
@@ -145,8 +144,7 @@ namespace Isis {
    * In the future we may want to do a better job handling this special case.
    */
   bool DemShape::intersectSurface(vector<double> observerPos,
-                                  vector<double> lookDirection,
-                                  vector<double> targetPosition ) {
+                                  vector<double> lookDirection) {
 
     // try to intersect the target body ellipsoid as a first approximation
     // for the iterative DEM intersection method

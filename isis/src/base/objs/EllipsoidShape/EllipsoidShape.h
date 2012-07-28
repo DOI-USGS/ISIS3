@@ -59,8 +59,7 @@ namespace Isis {
 
       //! Intersect the shape model
       bool intersectSurface(std::vector<double> observerPos,
-                            std::vector<double> lookDirection,
-                            std::vector<double> targetPosition);
+                            std::vector<double> lookDirection);
 
       //! Get the local radius for a point on the surface
       Distance localRadius(const Latitude &lat, const Longitude &lon);

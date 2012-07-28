@@ -27,9 +27,11 @@
 #include "ProjectionFactory.h"
 #include "Portal.h"
 #include "Interpolator.h"
+#include "ShapeModel.h"
 
 namespace Isis {
   class Distance;
+  class EllipsoidShape;
   class iTime;
   class Latitude;
   class Longitude;
@@ -109,7 +111,7 @@ namespace Isis {
    *   @history 2007-05-18 Jeff Anderson - Modify SpacecraftAltitude method
    *                                       to use DEM
    *   @history 2007-06-11 Debbie A. Cook - Added alternative  method that includes radius
-   *   @history 2007-08-24 Debbie A. Cook - Replaced references to p_sB since it was removed from Spice
+   *   @history 2007-08-24 Debbie A. Cook - Replaced references to m_sB since it was removed from Spice
    *   @history 2007-11-27 Debbie A. Cook - Added overloaded method SetUniversalGround(lat, lon, radius)
    *   @history 2008-05-21 Steven Lambright - CubeManager is now used to speed up DEM Cube I/O
    *   @history 2008-06-18 Debbie A. Cook - Made DemRadius radius public instead of private and added
@@ -199,7 +201,7 @@ namespace Isis {
        *         target.
        */
       inline bool HasSurfaceIntersection() const {
-        return p_hasIntersection;
+        return m_shape->hasIntersection();
       };
 
       void Coordinate(double p[3]) const;
@@ -229,6 +231,11 @@ namespace Isis {
        * Returns the longitude.
        */
       Longitude GetLongitude() const;
+
+      /**
+       * Returns shape
+       */
+      ShapeModel *Shape();
 
       /**
        * Returns the surface point (most efficient accessor).
@@ -261,8 +268,8 @@ namespace Isis {
       double SpacecraftAltitude();
 
       //! Return local radius from dem
-      Distance DemRadius(const SurfacePoint &pt);
-      Distance DemRadius(const Latitude &lat, const Longitude &lon);
+ //     Distance DemRadius(const SurfacePoint &pt);
+ //     Distance DemRadius(const Latitude &lat, const Longitude &lon);
 
       /**
        * Indicates whether the Kernels PvlGroup has an ElevationModel or
@@ -270,9 +277,9 @@ namespace Isis {
        *
        * @return @b bool True if an elevation model exists.
        */
-      bool HasElevationModel() {
-        return p_hasElevationModel;
-      };
+   //   bool HasElevationModel() {
+   //     return m_hasElevationModel;
+   //   };
 
       /**
        * Virtual method that returns the pixel resolution of the sensor in
@@ -284,38 +291,41 @@ namespace Isis {
         return 1.0;
       };
 
-      void IgnoreElevationModel(bool ignore);
+      void IgnoreElevationModel(bool ignore);//DAC TODO manually set to ellipsoid???
 
     protected:
-      bool p_hasIntersection; /**< This indicates if the surface point or look
-                                  direction is valid. It is made protected so
-                                  inheriting classes can change it if
-                                  necessary.*/
-      Cube *p_demCube;         //!< The cube containing the model
-      SurfacePoint *p_surfacePoint; //!< Surface intersection point
+//      bool m_hasIntersection; /**< This indicates if the surface point or look
+//                                  direction is valid. It is made protected so
+//                                  inheriting classes can change it if
+//                                  necessary.*/
+//      Cube *m_demCube;         //!< The cube containing the model
+//      SurfacePoint *m_surfacePoint; //!< Surface intersection point
 
     private:
       //! This version of DemRadius is for SetLookDirection ONLY. Do not call.
-      double DemRadius(double lat, double lon);
+      //DAC TODO Why are next 2 declarations here? Don't move until I know
+//      double DemRadius(double lat, double lon);
       double EmissionAngle(const std::vector<double> & sB) const;
       void CommonInitialize(const std::string &demCube);
 
-      SpiceDouble p_lookB[3];  //!< Look direction in body fixed
+      SpiceDouble m_lookB[3];  //!< Look direction in body fixed
 
-      bool p_newLookB;      //!< flag to indicate we need to recompute ra/dec
-      SpiceDouble p_ra;     //!< Right ascension (sky longitude)
-      SpiceDouble p_dec;    //!< Decliation (sky latitude)
+      bool m_newLookB;      //!< flag to indicate we need to recompute ra/dec
+      SpiceDouble m_ra;     //!< Right ascension (sky longitude)
+      SpiceDouble m_dec;    //!< Decliation (sky latitude)
       void computeRaDec();  //!< Computes the ra/dec from the look direction
 
-      bool p_hasElevationModel;     //!< Does sensor use an elevation model
-      Projection *p_demProj;  //!< The projection of the model
-      Portal *p_portal;       //!< Buffer used to read from the model
-      Interpolator *p_interp; //!< Use bilinear interpolation from dem
+      //      bool m_hasElevationModel;     //!< Does sensor use an elevation model
+      //      Projection *m_demProj;  //!< The projection of the model
+      //      Portal *m_portal;       //!< Buffer used to read from the model
+      //      Interpolator *m_interp; //!< Use bilinear interpolation from dem
       bool SetGroundLocal(bool backCheck);   //!<Computes look vector
 
-      Distance *p_minRadius;  //!< Minimum radius value in DEM file
-      Distance *p_maxRadius;  //!< Maximum radius value in DEM file
-      double p_demScale;   //!< Scale of DEM file in pixels per degree
+      //      Distance *m_minRadius;  //!< Minimum radius value in DEM file
+      //      Distance *m_maxRadius;  //!< Maximum radius value in DEM file
+      //      double m_demScale;      //!< Scale of DEM file in pixels per degree
+      ShapeModel *m_shape;            //!< Shape model
+      EllipsoidShape *m_ellipsoid;        //!< Ellipsoid shape model for target
   };
 };
 

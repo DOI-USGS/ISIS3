@@ -62,11 +62,12 @@ namespace Isis {
 
       //! Intersect the shape model
       virtual bool intersectSurface(std::vector<double> observerPos,
-                                    std::vector<double> lookDirection,
-                                    std::vector<double> targetPosition) = 0;
+                                    std::vector<double> lookDirection)=0;
 
       //! Return the surface intersection
       SurfacePoint *surfaceIntersection();
+
+      bool hasIntersection();
 
       //! Calculate the surface normal of the current intersection point
       void CalculateSurfaceNormal(); 
@@ -84,9 +85,6 @@ namespace Isis {
       double IncidenceAngle();
 
       //! Return local radius from shape model
-      //      Distance LocalRadius(const SurfacePoint &pt);
-      //      Distance LocalRadius(const Latitude &lat, const Longitude &lon);
-      //      Distance LocalRadius() const;
       virtual Distance localRadius(const Latitude &lat, const Longitude &lon) = 0;
 
       //! Set tolerance for acceptance in iterative loops
@@ -95,8 +93,11 @@ namespace Isis {
       //! Return the tolerance
       double tolerance();
 
-      //! Reset m_hasIntersection to false
-      void reset();
+      //! Set m_hasIntersection
+      void setHasSurfaceIntersection(bool b);
+
+      //! Set surface intersection point
+      void setSurfaceIntersectionPoint(const SurfacePoint &surfacePoint);
 
       //! Return triaxial target radii from shape model TODO Put this in Target class
       Distance *targetRadii();
@@ -105,11 +106,10 @@ namespace Isis {
       bool m_hasIntersection;              //!< Flag indicating a successful intersection has been found
       double *m_tolerance;
 
-      bool hasIntersection();
 
       //! Intersect ellipse
       bool intersectEllipsoid(const std::vector<double> observerPosRelativeToTarget,
-                              const std::vector<double> lookDirectionRelativeToTarget);
+                              const std::vector<double> &observerLookVectorToTarget);
 
     private:
       void setRadii(Distance radii[3]);

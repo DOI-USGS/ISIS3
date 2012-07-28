@@ -46,6 +46,7 @@
 #include "NaifStatus.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
+#include "ShapeModel.h"
 #include "SurfacePoint.h"
 
 using namespace std;
@@ -155,6 +156,10 @@ namespace Isis {
     p_childLine = line;
     p_pointComputed = true;
 
+    // get shape
+    // TODO: we need to validate this pointer (somewhere)
+    ShapeModel *shape = Shape();
+
     // Case of no map projection
     if(p_projection == NULL || p_ignoreProjection) {
       // Convert to parent coordinate (remove crop, pad, shrink, enlarge)
@@ -181,8 +186,7 @@ namespace Isis {
             double y = p_distortionMap->UndistortedFocalPlaneY();
             double z = p_distortionMap->UndistortedFocalPlaneZ();
             //cout << "Look vector: " << x << " " << y << " " << z << endl; //debug
-            p_hasIntersection = p_groundMap->SetFocalPlane(x, y, z);
-            return p_hasIntersection;
+            return p_groundMap->SetFocalPlane(x, y, z);
           }
         }
       }
@@ -207,24 +211,24 @@ namespace Isis {
         Latitude lat(p_projection->UniversalLatitude(), Angle::Degrees);
         Longitude lon(p_projection->UniversalLongitude(), Angle::Degrees);
         Distance rad(LocalRadius(lat, lon));
-        if(!rad.isValid()) {
-          p_hasIntersection = false;
-          return p_hasIntersection;
+        if (!rad.isValid()) {
+          shape->setHasSurfaceIntersection(false);
+          return false;
         }
         SurfacePoint surfPt(lat, lon, rad);
-        if(SetGround(surfPt)) {
+        if (SetGround(surfPt)) {
           p_childSample = sample;
           p_childLine = line;
 
-          p_hasIntersection = true;
-          return p_hasIntersection;
+          shape->setHasSurfaceIntersection(true);
+          return true;
         }
       }
     }
 
     // failure
-    p_hasIntersection = false;
-    return p_hasIntersection;
+    shape->setHasSurfaceIntersection(false);
+    return false;
   }
 
   /**
@@ -243,8 +247,8 @@ namespace Isis {
       return RawFocalPlanetoImage();
     }
 
-    p_hasIntersection = false;
-    return p_hasIntersection;
+    Shape()->setHasSurfaceIntersection(false);
+    return false;
   }
 
 
@@ -261,8 +265,8 @@ namespace Isis {
     Distance localRadius(LocalRadius(latitude, longitude));
 
     if(!localRadius.isValid()) {
-      p_hasIntersection = false;
-      return p_hasIntersection;
+      Shape()->setHasSurfaceIntersection(false);
+      return false;
     }
 
     return SetGround(SurfacePoint(latitude, longitude, localRadius));
@@ -281,8 +285,8 @@ namespace Isis {
    */
   bool Camera::SetGround(const SurfacePoint & surfacePt) {
     if(!surfacePt.Valid()) {
-      p_hasIntersection = false;
-      return p_hasIntersection;
+      Shape()->setHasSurfaceIntersection(false);
+      return false;
     }
 
     // Convert lat/lon to undistorted focal plane x/y
@@ -290,8 +294,8 @@ namespace Isis {
       return RawFocalPlanetoImage();
     }
 
-    p_hasIntersection = false;
-    return p_hasIntersection;
+    Shape()->setHasSurfaceIntersection(false);
+    return false;
   }
 
 
@@ -305,6 +309,11 @@ namespace Isis {
   bool Camera::RawFocalPlanetoImage() {
     double ux = p_groundMap->FocalPlaneX();
     double uy = p_groundMap->FocalPlaneY();
+    
+    // get shape
+    // TODO: we need to validate this pointer (somewhere)
+    ShapeModel *shape = Shape();
+   
     //cout << "undistorted focal plane: " << ux << " " << uy << endl; //debug
     //cout.precision(15);
     //cout << "Backward Time: " << Time().Et() << endl;
@@ -328,31 +337,31 @@ namespace Isis {
           if(p_projection == NULL || p_ignoreProjection) {
             p_childSample = p_alphaCube->BetaSample(parentSample);
             p_childLine = p_alphaCube->BetaLine(parentLine);
-            p_hasIntersection = true;
-            return p_hasIntersection;
+            shape->setHasSurfaceIntersection(true);
+            return true;
           }
           else if(p_projection->IsSky()) {
             if(p_projection->SetGround(Declination(), RightAscension())) {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
-              p_hasIntersection = true;
-              return p_hasIntersection;
+              shape->setHasSurfaceIntersection(true);
+              return true;
             }
           }
           else {
             if(p_projection->SetUniversalGround(UniversalLatitude(), UniversalLongitude())) {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
-              p_hasIntersection = true;
-              return p_hasIntersection;
+              shape->setHasSurfaceIntersection(true);
+              return true;
             }
           }
         }
       }
     }
 
-    p_hasIntersection = false;
-    return p_hasIntersection;
+   shape->setHasSurfaceIntersection(false);
+   return false;
   }
 
 
@@ -377,8 +386,8 @@ namespace Isis {
       return RawFocalPlanetoImage();  // sets p_hasIntersection
     }
 
-    p_hasIntersection = false;
-    return p_hasIntersection;
+   Shape()->setHasSurfaceIntersection(false);
+   return false;
   }
 
   /**
@@ -773,8 +782,11 @@ namespace Isis {
   void Camera::BasicMapping(Pvl &pvl) {
     PvlGroup map("Mapping");
     map += PvlKeyword("TargetName", target());
-    map += PvlKeyword("EquatorialRadius", p_radii[0].meters(), "meters");
-    map += PvlKeyword("PolarRadius", p_radii[2].meters(), "meters");
+
+    Distance *radii = Shape()->targetRadii();
+    map += PvlKeyword("EquatorialRadius", radii[0].meters(), "meters");
+    map += PvlKeyword("PolarRadius", radii[2].meters(), "meters");
+    
     map += PvlKeyword("LatitudeType", "Planetocentric");
     map += PvlKeyword("LongitudeDirection", "PositiveEast");
     map += PvlKeyword("LongitudeDomain", "360");
@@ -840,7 +852,7 @@ namespace Isis {
                 return true;
               }
             }
-            else if(p_hasIntersection) {
+            else if(Shape()->hasIntersection()) {
               if(p_projection->SetUniversalGround(UniversalLatitude(),
                                                   UniversalLongitude())) {
                 p_childSample = p_projection->WorldX();
@@ -872,6 +884,8 @@ namespace Isis {
     double samp = Sample();
     double line = Line();
 
+    SurfacePoint surfacePoint = GetSurfacePoint();
+    
     // order of points in vector is top, bottom, left, right
     QList< QPair< double, double > > surroundingPoints;
     surroundingPoints.append(qMakePair(samp, line - 0.5));
@@ -913,9 +927,10 @@ namespace Isis {
         }
       }
 
-      Latitude demLat = p_surfacePoint->GetLatitude();
-      Longitude demLon = p_surfacePoint->GetLongitude();
-      Distance demRadius = DemRadius(demLat, demLon);
+
+      Latitude demLat = surfacePoint.GetLatitude();
+      Longitude demLon = surfacePoint.GetLongitude();
+      Distance demRadius = Shape()->localRadius(demLat, demLon);
 
       latrec_c(demRadius.kilometers(), demLon.radians(),
                demLat.radians(), lookVects[i]);
@@ -981,9 +996,9 @@ namespace Isis {
     // then negate it.
 
     SpiceDouble pB[3];
-    pB[0] = p_surfacePoint->GetX().kilometers();
-    pB[1] = p_surfacePoint->GetY().kilometers();
-    pB[2] = p_surfacePoint->GetZ().kilometers();
+    pB[0] = surfacePoint.GetX().kilometers();
+    pB[1] = surfacePoint.GetY().kilometers();
+    pB[2] = surfacePoint.GetZ().kilometers();
 
     unorm_c(pB, centerLookVect, &mag);
     double dotprod = vdot_c(normal,centerLookVect);
@@ -1006,7 +1021,7 @@ namespace Isis {
 
   /**
    * Calculates LOCAL photometric angles using the DEM (not ellipsoid).  These
-   * calcualtions are more expensive computationally than Sensor's angle getter
+   * calculations are more expensive computationally than Sensor's angle getter
    * methods.  Furthermore, this cost is mostly in calculating the local normal
    * vector, which can be done only once for all angles using this method.
    *
@@ -1038,16 +1053,17 @@ namespace Isis {
         instrumentPosition()->Coordinate());
 
     SpiceDouble pB[3];
-    pB[0] = p_surfacePoint->GetX().kilometers();
-    pB[1] = p_surfacePoint->GetY().kilometers();
-    pB[2] = p_surfacePoint->GetZ().kilometers();
+    SurfacePoint surfacePoint = GetSurfacePoint();
+    pB[0] = surfacePoint.GetX().kilometers();
+    pB[1] = surfacePoint.GetY().kilometers();
+    pB[2] = surfacePoint.GetZ().kilometers();
 
     vsub_c((SpiceDouble *) &sB[0], pB, surfSpaceVect);
     unorm_c(surfSpaceVect, unitizedSurfSpaceVect, &dist);
 
     // get a normalized surface sun vector
     SpiceDouble surfaceSunVect[3];
-    vsub_c(p_uB, pB, surfaceSunVect);
+    vsub_c(m_uB, pB, surfaceSunVect);
     SpiceDouble unitizedSurfSunVect[3];
     unorm_c(surfaceSunVect, unitizedSurfSunVect, &dist);
 

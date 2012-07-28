@@ -51,7 +51,7 @@ namespace Isis {
       //! Destroys the Target
       ~Target();
 
-      void radii(Distance r[3]) const;
+      Distance *radii() const;
       SpiceInt naifBodyCode() const;
       iString name() const;
       void setSky(SpiceInt bodyCode) const;

@@ -73,7 +73,7 @@ namespace Isis {
    * 
    */
   bool ShapeModel::intersectEllipsoid(const std::vector<double> observerBodyFixedPosition,
-                                      const std::vector<double> observerLookVectorToTarget) {
+      const std::vector<double> &observerLookVectorToTarget) {
     SpiceDouble lookB[3];
 
     // This memcpy does:
@@ -133,11 +133,11 @@ namespace Isis {
   // }
 
 
-  /** Reset m_hasIntersection to false;
+  /** Set m_hasIntersection;
    *
    */
-  void ShapeModel::reset() {
-    m_hasIntersection  = false;
+  void ShapeModel::setHasSurfaceIntersection(bool b) {
+    m_hasIntersection  = b;
   }
 
 
@@ -152,6 +152,14 @@ namespace Isis {
   }
 
 
+  /** Set surface intersection point
+   *
+   */
+  void ShapeModel::setSurfaceIntersectionPoint(const SurfacePoint &surfacePoint) {
+    *m_surfacePoint  = surfacePoint;
+  }
+  
+  
   /** Calculate the phase angle at the current intersection point.
    *
    * This method returns the phase angle at the current intersection point.

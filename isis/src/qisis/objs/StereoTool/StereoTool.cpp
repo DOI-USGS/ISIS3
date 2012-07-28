@@ -633,7 +633,7 @@ namespace Isis {
       //  If cubes set, make sure they have an elevation model
       if (m_leftCube) {
         m_leftCube->getCamera()->IgnoreElevationModel(false);
-        if (!m_leftCube->getCamera()->HasElevationModel()) {
+      if (!m_leftCube->getCamera()->HasElevationModel()) {
         QString message = "No valid Dem on cube.  Run <i>spicinit</i> using a "
            "shape model.  The local radius will default back to the ellipsoid.";
         QMessageBox::warning(m_stereoTool, "Warning", message);

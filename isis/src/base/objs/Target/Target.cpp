@@ -107,13 +107,9 @@ namespace Isis {
    * Returns the radii of the body in km. The radii are obtained from the
    * appropriate SPICE kernel for the body specified by TargetName in the
    * Instrument group of the labels.
-   *
-   * @param r[] Radii of the target in kilometers
    */
-  void Target::radii(Distance r[3]) const {
-    r[0] = m_radii[0];
-    r[1] = m_radii[1];
-    r[2] = m_radii[2];
+  Distance *Target::radii() const {
+    return m_radii;
   }
 
   /**
