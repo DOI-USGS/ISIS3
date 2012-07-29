@@ -104,21 +104,11 @@ namespace Isis {
   }
 
 
-  /** Get the shape name
+  /** Return the surface intersection
    *
    */
-  std::string ShapeModel::name() const{
-    return *m_name;
-  }
-
-
-  /** Set the radii
-   *
-   */
-  void ShapeModel::setRadii(Distance radii[3]) {
-    m_radii[0] = radii[0];
-    m_radii[1] = radii[1];
-    m_radii[2] = radii[2];
+  SurfacePoint *ShapeModel::surfaceIntersection() {
+    return m_surfacePoint;
   }
 
 
@@ -130,54 +120,23 @@ namespace Isis {
   }
 
 
-  /** Calculate the surface normal of the current intersection point.
+  /** Return surface point normal status
    *
    */
-  //virtual void ShapeModel::CalculateSurfaceNormal() {
-  //  if ( !m_hasIntersection ) {
-  //    Isis::iString msg = "A valid intersection must be defined before computing the surface normal";
-  //     throw IException(IException::Programmer, msg, _FILEINFO_);
-  //  }
-  // }
-
-
-  /** Set m_hasIntersection;
-   *
-   */
-  void ShapeModel::setHasSurfaceIntersection(bool b) {
-    m_hasIntersection  = b;
+  bool ShapeModel::hasNormal() {
+    return m_hasNormal;
   }
 
 
   /** Return the surface normal of the current intersection point.
    *
    */
-  std::vector<double> ShapeModel::SurfaceNormal() {
-    if ( !m_hasNormal )
-      SurfaceNormal();
-
-    return m_surfaceNormal;
+  std::vector<double> ShapeModel::surfaceNormal() {
+    if ( m_hasNormal )
+      return surfaceNormal();
+    std::string message = "The surface normal has not been computed.";
+    throw IException(IException::Unknown, message, _FILEINFO_);
   }
-
-
-  /** Set surface intersection point
-   *
-   */
-  void ShapeModel::setSurfaceIntersectionPoint(const SurfacePoint &surfacePoint) {
-    *m_surfacePoint  = surfacePoint;
-  }
-  
-  
-  /** Calculate the phase angle at the current intersection point.
-   *
-   * This method returns the phase angle at the current intersection point.
-   *
-   */
-  //virtual double ShapeModel::PhaseAngle() {
-  //  if ( !m_hasNormal ) SurfaceNormal();
-  //  double phaseAngle=0.0;
-  //  return phaseAngle;
-  //}
 
 
   /** Calculate the emission angle at the current intersection point.
@@ -202,29 +161,72 @@ namespace Isis {
   //  double incidenceAngle = 0.0;
   //  return incidenceAngle;
   //}
-
-
-  /** Return the surface intersection
+  
+  
+  /** Calculate the phase angle at the current intersection point.
+   *
+   * This method returns the phase angle at the current intersection point.
    *
    */
-  SurfacePoint *ShapeModel::surfaceIntersection() {
-    return m_surfacePoint;
+  //virtual double ShapeModel::PhaseAngle() {
+  //  if ( !m_hasNormal ) SurfaceNormal();
+  //  double phaseAngle=0.0;
+  //  return phaseAngle;
+  //}
+  
+  
+  /** Calculate the phase angle at the current intersection point.
+   *
+   * This method returns the phase angle at the current intersection point.
+   *
+   */
+
+
+  /** Set the shape name
+   *
+   */
+  void ShapeModel::setName(const std::string name) {
+    *m_name = name;
   }
 
 
-  /** Set the tolerance for acceptance in iterative loops
+  /** Get the shape name
    *
    */
-  Distance *ShapeModel::targetRadii() {
-     return  m_radii;
+  std::string ShapeModel::name() const{
+    return *m_name;
   }
 
 
-  /**
+  /** Set m_hasIntersection;
+   *
+   */
+  void ShapeModel::setHasSurfaceIntersection(bool b) {
+    m_hasIntersection  = b;
+  }
+
+
+  /** Set surface intersection point
+   *
+   */
+  void ShapeModel::setSurfaceIntersectionPoint(const SurfacePoint &surfacePoint) {
+    *m_surfacePoint  = surfacePoint;
+  }
+
+
+  /** Set  tolerance for acceptance in iterative loops
    *
    */
   void ShapeModel::setTolerance(const double tol) {
     *m_tolerance = tol;
+  }
+
+
+  /** Return triaxial target radii from shape model
+   *
+   */
+  Distance *ShapeModel::targetRadii() {
+     return  m_radii;
   }
 
 
@@ -233,6 +235,16 @@ namespace Isis {
    */
   double ShapeModel::tolerance() {
     return *m_tolerance;
+  }
+
+
+  /** Set the radii
+   *
+   */
+  void ShapeModel::setRadii(Distance radii[3]) {
+    m_radii[0] = radii[0];
+    m_radii[1] = radii[1];
+    m_radii[2] = radii[2];
   }
 
 

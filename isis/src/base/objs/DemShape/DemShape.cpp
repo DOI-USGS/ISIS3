@@ -39,10 +39,10 @@ namespace Isis {
     m_demCube = NULL;
     m_interp = NULL;
     m_portal = NULL;
-    m_demCubeFile = "";
+    m_demCubeFile = "";;
 
-    m_samples.resize(4,.0);
-    m_lines.resize(4,0.);
+    // m_samples.resize(4,.0);
+    // m_lines.resize(4,0.);
 
     PvlGroup &kernels = pvl.FindGroup("Kernels", Pvl::Traverse);
 
@@ -100,32 +100,6 @@ namespace Isis {
     }
   }
 
-  /**
-  * Gets the radius from the DEM, if we have one.
-  * @param lat Latitude
-  * @param lon Longitude
-  * @return @b double Local radius from the DEM
-  */
-  Distance DemShape::localRadius(const Latitude &lat, const Longitude &lon) {
-    
-    if (!lat.isValid() || !lon.isValid())
-      return Distance();
-    
-    m_demProj->SetUniversalGround(lat.degrees(), lon.degrees());
-    
-    if (!m_demProj->IsGood())
-      return Distance();
-
-    m_portal->SetPosition(m_demProj->WorldX(), m_demProj->WorldY(), 1);
-
-    m_demCube->read(*m_portal);
-
-    const double &radius = m_interp->Interpolate(m_demProj->WorldX(),
-                                                 m_demProj->WorldY(),
-                                                 m_portal->DoubleBuffer());
-
-    return Distance(radius, Distance::Meters);
-  }
 
   /** Find the intersection point with the DEM
    *
@@ -235,12 +209,121 @@ namespace Isis {
   }
 
 
+  /**
+  * Gets the radius from the DEM, if we have one.
+  * @param lat Latitude
+  * @param lon Longitude
+  * @return @b double Local radius from the DEM
+  */
+  Distance DemShape::localRadius(const Latitude &lat, const Longitude &lon) {
+    
+    if (!lat.isValid() || !lon.isValid())
+      return Distance();
+    
+    m_demProj->SetUniversalGround(lat.degrees(), lon.degrees());
+    
+    if (!m_demProj->IsGood())
+      return Distance();
+
+    m_portal->SetPosition(m_demProj->WorldX(), m_demProj->WorldY(), 1);
+
+    m_demCube->read(*m_portal);
+
+    const double &radius = m_interp->Interpolate(m_demProj->WorldX(),
+                                                 m_demProj->WorldY(),
+                                                 m_portal->DoubleBuffer());
+
+    return Distance(radius, Distance::Meters);
+  }
+
+
   /** Return pixels per degree
    *
    */
     double DemShape::demScale () {
       return m_pixPerDegree;
     }
+
+
+  /**
+  * Removes memory allocated for local area points
+  *
+  */
+  void DemShape::removeLocalAreaPoints() {
+    // Free memory
+    for (int ipt = 0; ipt < m_neighborPoints.size(); ipt++) {
+      if (m_neighborPoints[ipt] != NULL) delete [] m_neighborPoints[ipt];
+      m_neighborPoints[ipt] = NULL;
+    }
+  }
+
+
+  /**
+  * Sets a local area around the current intersection point
+  * @param SurfacePoint *neighborPoints
+  * @return bool success status
+  */
+  void DemShape::setLocalAreaPoint() {
+     // loading order of points in vector should be top, bottom, left, right
+    m_neighborPoints.push_back(NULL);
+    int ipt = m_neighborPoints.size() - 1;
+    m_neighborPoints[ipt] = new double[3];   // TODO Make sure to free this memory
+    surfaceIntersection()->ToNaifArray(m_neighborPoints[ipt]);
+  }
+
+
+  /** Calculate surface normal
+   *
+   */
+  void DemShape::calculateSurfaceNormal () {
+    // subtract bottom from top and left from right and store results
+    double topMinusBottom[3];
+    vsub_c(m_neighborPoints[0], m_neighborPoints[1], topMinusBottom);
+    double rightMinusLeft[3];
+    vsub_c(m_neighborPoints[3],m_neighborPoints [2], rightMinusLeft);
+
+    // take cross product of subtraction results to get normal
+    SpiceDouble normal[3];
+    ucrss_c(topMinusBottom, rightMinusLeft, normal);
+
+    // unitize normal (and do sanity check for magnitude)
+    double mag;
+    unorm_c(normal, normal, &mag);
+
+    if (mag == 0.0) {
+      normal[0] = 0.;
+      normal[1] = 0.;
+      normal[2] = 0.;
+      m_hasNormal = false;
+   }
+    else {
+      m_hasNormal = true;
+    } 
+  
+    memcpy(&m_surfaceNormal[0], normal, sizeof(double) * 3);
+  }
+
+
+  /** Direct surface normal
+   *
+   */
+  void DemShape::directSurfaceNormal () {
+    double centerLookVect[3];
+    // Check to make sure that the normal is pointing outward from the planet
+    // surface. This is done by taking the dot product of the normal and
+    // any one of the unitized xyz vectors. If the normal is pointing inward,
+    // then negate it.
+
+    SpiceDouble pB[3];
+    surfaceIntersection()->ToNaifArray(pB);
+    SpiceDouble mag;
+
+    // Return the normal vector
+    unorm_c(pB, centerLookVect, &mag);
+    double dotprod = vdot_c((SpiceDouble *) &m_surfaceNormal[0], centerLookVect);
+    if (dotprod < 0.0)
+      vminus_c((SpiceDouble *) &m_surfaceNormal[0], (SpiceDouble *) &m_surfaceNormal[0]);
+  }
 
 
 }

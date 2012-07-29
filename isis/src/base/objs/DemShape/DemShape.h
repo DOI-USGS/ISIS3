@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include <QVector>
+
 #include "naif/SpiceUsr.h"
 #include "naif/SpiceZfc.h"
 #include "naif/SpiceZmc.h"
@@ -69,22 +71,40 @@ namespace Isis {
 
       //! Return dem scale in pixels/degree
       double demScale();
+
+      void removeLocalAreaPoints();
+
+      // To compute the surface normal, you must call setLocalAreaPoint on top, bottom, left, and 
+      // right surrounding points in the image.  Then call calculateSurfaceNormal and 
+      // directSurfaceNormal to calculate the normal.  Use removeLOcalAreaPoints to clean up as
+      // needed.  See Camera for an example, or use its GetLocalNormal method.
+      //! Set a local area around the current intersection point 
+      void setLocalAreaPoint();  // Caller handles error checking
+
+      //! Calculate the surface normal of the current intersection point
+      void calculateSurfaceNormal(); 
+
+      //! Set the direction of the surface normal of the current intersection point
+      void directSurfaceNormal(); 
+
     protected:
       Cube *m_demCube;        //!< The cube containing the model  NOTE::  TODO maybe make this a method that returns ptr to cube
       std::string m_demCubeFile;   //!< The file specification of the dem file
       Pvl *m_demLabel;        //!< The label of the dem cube
 
     private:
-      double m_pixPerDegree;  //!< Scale of DEM file in pixels per degree
-      Projection *m_demProj;  //!< The projection of the model
-      Portal *m_portal;       //!< Buffer used to read from the model
-      Interpolator *m_interp; //!< Use bilinear interpolation from dem
+      Projection *m_demProj;                                     //!< The projection of the model
+      QVector<double *>  m_neighborPoints;           //! < Surface points of 4 surrounding pixels of intersection 
+        //      SurfacePoint *m_neighborPoints                       //! < Surface points of 4 surrounding pixels of intersection 
+      double m_pixPerDegree;                                   //!< Scale of DEM file in pixels per degree
+      Portal *m_portal;                                               //!< Buffer used to read from the model
+      Interpolator *m_interp;                                      //!< Use bilinear interpolation from dem
 
       // Aren't these only needed for Isis3EquatorialCylindricalShape model? Are they needed for 
-      //  photometric computations?
-      std::vector<double> m_samples; //!< Shape model sample values of 4 closest
+      //  photometric computations? I think neighborPoints replaces these???
+      //      std::vector<double> m_samples; //!< Shape model sample values of 4 closest
                                      //   points to intersection point
-      std::vector<double> m_lines;   //!< Shape model line values of 4 closest 
+      //      std::vector<double> m_lines;   //!< Shape model line values of 4 closest 
                                      //   points to intersection point
 
       // From Sensor.h

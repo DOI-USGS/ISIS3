@@ -38,6 +38,7 @@
 #include "CameraDistortionMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
+#include "DemShape.h"
 #include "IException.h"
 #include "iString.h"
 #include "iTime.h"
@@ -900,9 +901,12 @@ namespace Isis {
 
     // now we have all four points in the image, so find the same points in the
     // dem
-    QVector< double * > lookVects(4);
-    for (int i = 0; i < lookVects.size(); i++)
-      lookVects[i] = new double[3];
+    // QVector< double * > lookVects(4);
+    // for (int i = 0; i < lookVects.size(); i++)
+    //   lookVects[i] = new double[3];
+
+    // Make sure we have a DemShape TODO
+    DemShape *shape = (DemShape *) Shape();
 
     for (int i = 0; i < surroundingPoints.size(); i ++) {
       if (!(SetImage(surroundingPoints[i].first, surroundingPoints[i].second))) {
@@ -920,20 +924,21 @@ namespace Isis {
           }
 
           // free memory
-          for (int i = 0; i < lookVects.size(); i++)
-            delete [] lookVects[i];
+          // for (int i = 0; i < lookVects.size(); i++)
+          //   delete [] lookVects[i];
+          shape->removeLocalAreaPoints();
 
           return;
         }
       }
 
+      shape->setLocalAreaPoint();
+      // Latitude demLat = surfacePoint.GetLatitude();
+      // Longitude demLon = surfacePoint.GetLongitude();
+      // Distance demRadius = Shape()->localRadius(demLat, demLon);
 
-      Latitude demLat = surfacePoint.GetLatitude();
-      Longitude demLon = surfacePoint.GetLongitude();
-      Distance demRadius = Shape()->localRadius(demLat, demLon);
-
-      latrec_c(demRadius.kilometers(), demLon.radians(),
-               demLat.radians(), lookVects[i]);
+      // latrec_c(demRadius.kilometers(), demLon.radians(),
+      //          demLat.radians(), lookVects[i]);
     }
 
     if ((surroundingPoints[0].first == surroundingPoints[1].first &&
@@ -951,59 +956,65 @@ namespace Isis {
       }
 
       // free memory
-      for (int i = 0; i < lookVects.size(); i++)
-        delete [] lookVects[i];
+      // for (int i = 0; i < lookVects.size(); i++)
+      //   delete [] lookVects[i];
+      shape->removeLocalAreaPoints();
 
       return;
     }
 
+    shape->calculateSurfaceNormal();
     // subtract bottom from top and left from right and store results
-    double topMinusBottom[3];
-    vsub_c(lookVects[0], lookVects[1], topMinusBottom);
-    double rightMinusLeft[3];
-    vsub_c(lookVects[3], lookVects[2], rightMinusLeft);
+    // double topMinusBottom[3];
+    // vsub_c(lookVects[0], lookVects[1], topMinusBottom);
+    // double rightMinusLeft[3];
+    // vsub_c(lookVects[3], lookVects[2], rightMinusLeft);
 
-    // take cross product of subtraction results to get normal
-    ucrss_c(topMinusBottom, rightMinusLeft, normal);
+    // // take cross product of subtraction results to get normal
+    // ucrss_c(topMinusBottom, rightMinusLeft, normal);
 
-    // unitize normal (and do sanity check for magnitude)
-    double mag;
-    unorm_c(normal, normal, &mag);
-    if (mag == 0.0) {
-      normal[0] = 0.;
-      normal[1] = 0.;
-      normal[2] = 0.;
+    // // unitize normal (and do sanity check for magnitude)
+    // double mag;
+    // unorm_c(normal, normal, &mag);
+    // if (mag == 0.0) {
+    //   normal[0] = 0.;
+    //   normal[1] = 0.;
+    //   normal[2] = 0.;
       // restore state
-      if(computed) {
-        SetImage(originalSample, originalLine);
+
+    if (shape->hasNormal()) {
+      if (computed) {
+        // SetImage(originalSample, originalLine);
       } else {
         p_pointComputed = false;
       }
 
       // free memory
-      for (int i = 0; i < lookVects.size(); i++)
-        delete [] lookVects[i];
+      // for (int i = 0; i < lookVects.size(); i++)
+      //   delete [] lookVects[i];
+      shape->removeLocalAreaPoints();
 
       return;
     }
 
-    double centerLookVect[3];
+    // double centerLookVect[3];
     SetImage(originalSample, originalLine);
+    shape->directSurfaceNormal();
 
     // Check to make sure that the normal is pointing outward from the planet
     // surface. This is done by taking the dot product of the normal and
     // any one of the unitized xyz vectors. If the normal is pointing inward,
     // then negate it.
 
-    SpiceDouble pB[3];
-    pB[0] = surfacePoint.GetX().kilometers();
-    pB[1] = surfacePoint.GetY().kilometers();
-    pB[2] = surfacePoint.GetZ().kilometers();
+    // SpiceDouble pB[3];
+    // pB[0] = surfacePoint.GetX().kilometers();
+    // pB[1] = surfacePoint.GetY().kilometers();
+    // pB[2] = surfacePoint.GetZ().kilometers();
 
-    unorm_c(pB, centerLookVect, &mag);
-    double dotprod = vdot_c(normal,centerLookVect);
-    if (dotprod < 0.0)
-      vminus_c(normal, normal);
+    // unorm_c(pB, centerLookVect, &mag);
+    // double dotprod = vdot_c(normal,centerLookVect);
+    // if (dotprod < 0.0)
+    //   vminus_c(normal, normal);
 
     // restore state
     if(computed) {
@@ -1014,8 +1025,10 @@ namespace Isis {
     }
 
     // free memory
-    for (int i = 0; i < lookVects.size(); i++)
-      delete [] lookVects[i];
+    // for (int i = 0; i < lookVects.size(); i++)
+    //   delete [] lookVects[i];
+    shape->removeLocalAreaPoints();
+    memcpy(normal, (double *) &shape->surfaceNormal()[0], sizeof(double) * 3);
   }
 
 

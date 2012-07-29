@@ -68,15 +68,13 @@ namespace Isis {
       SurfacePoint *surfaceIntersection();
 
       bool hasIntersection();
+      bool hasNormal();
 
       //! Calculate the surface normal of the current intersection point
-      void CalculateSurfaceNormal(); 
+      virtual void calculateSurfaceNormal() = 0; 
 
       //! Return the surface normal of the current intersection point
-      std::vector<double> SurfaceNormal();
-
-      //! Calculate the phase angle of the current intersection point
-      double PhaseAngle();
+      std::vector<double> surfaceNormal();
 
       //! Calculate the emission angle of the current intersection point
       double EmissionAngle();
@@ -84,20 +82,17 @@ namespace Isis {
       //! Calculate the incidence angle of the current intersection point
       double IncidenceAngle();
 
+      //! Calculate the phase angle of the current intersection point
+      double PhaseAngle();
+
       //! Return local radius from shape model
       virtual Distance localRadius(const Latitude &lat, const Longitude &lon) = 0;
 
       //! Set shape name
-      virtual void setName(const std::string name);
+      void setName(const std::string name);
 
       //! Get shape name
       std::string name() const;
-
-      //! Set tolerance for acceptance in iterative loops
-      void setTolerance(const double tol);
-
-      //! Return the tolerance
-      double tolerance();
 
       //! Set m_hasIntersection
       void setHasSurfaceIntersection(bool b);
@@ -105,11 +100,19 @@ namespace Isis {
       //! Set surface intersection point
       void setSurfaceIntersectionPoint(const SurfacePoint &surfacePoint);
 
-      //! Return triaxial target radii from shape model TODO Put this in Target class
+      //! Set tolerance for acceptance in iterative loops
+      void setTolerance(const double tol);
+
+      //! Return triaxial target radii from shape model TODO Put this in Target class???
       Distance *targetRadii();
 
+      //! Return the tolerance
+      double tolerance();
+
     protected:
-      bool m_hasIntersection;              //!< Flag indicating a successful intersection has been found
+      bool m_hasIntersection;                          //!< Flag indicating a successful intersection has been found
+      bool m_hasNormal;                                 //!< Flag indicating surface normal has been computed
+      std::vector<double> m_surfaceNormal; //!< Surface normal of current intersection point
       double *m_tolerance;
 
 
@@ -127,8 +130,6 @@ namespace Isis {
       // Are these only needed for Isis3Simp model? Are they needed for photometric computations?
       SurfacePoint *m_surfacePoint;        //!< Current intersection point
       // This needs to get reset by cameras???
-      bool m_hasNormal;                    //!< Flag indicating surface normal has been computed
-      std::vector<double> m_surfaceNormal; //!< Surface normal of current intersection point
   };
 };
 

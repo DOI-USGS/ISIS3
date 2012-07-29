@@ -50,8 +50,36 @@ namespace Isis {
       return m_hasIntersection;
     }
     else {
+      m_hasIntersection = false;
       return false;
     }
+  }
+
+
+  /** Calculate surface normal
+   *
+   */
+  void EllipsoidShape::calculateSurfaceNormal() {
+    // The below code is not truly normal unless the ellipsoid is a sphere.  TODO Should this be
+    // fixed? Send an email asking Jeff and Stuart.  See Naif routine surfnm.c to get the true 
+    // for an ellipsoid.  For testing purposes to match old results do as Isis3 currently does until
+    // Jeff and Stuart respond.
+
+   if ( !m_hasIntersection ) {
+     Isis::iString msg = "A valid intersection must be defined before computing the surface normal";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+   }
+    SpiceDouble pB[3];
+    pB[0] = surfaceIntersection()->GetX().kilometers();
+    pB[1] = surfaceIntersection()->GetY().kilometers();
+    pB[2] = surfaceIntersection()->GetZ().kilometers();
+
+    // Unitize the vector
+    SpiceDouble upB[3];
+    SpiceDouble dist;
+    unorm_c(pB, upB, &dist);
+    memcpy(&m_surfaceNormal[0], upB, sizeof(double) * 3);
+    m_hasNormal = true;
   }
 
 
