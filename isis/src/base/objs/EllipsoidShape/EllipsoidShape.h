@@ -63,6 +63,9 @@ namespace Isis {
 
       //! Get the local radius for a point on the surface
       Distance localRadius(const Latitude &lat, const Longitude &lon);
+
+      //! Set shape name
+      virtual void setName(const std::string);
   };
 };
 

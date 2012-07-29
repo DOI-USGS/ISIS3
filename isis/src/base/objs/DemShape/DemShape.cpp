@@ -34,12 +34,12 @@ namespace Isis {
    */
   DemShape::DemShape(Pvl &pvl) : ShapeModel (pvl) {
     std::cout << "Making Isis3 Dem shape" << std::endl;
+    setName("DemShape");
     m_demProj = NULL;
     m_demCube = NULL;
     m_interp = NULL;
     m_portal = NULL;
     m_demCubeFile = "";
-    m_hasElevationModel = false;
 
     m_samples.resize(4,.0);
     m_lines.resize(4,0.);
@@ -48,7 +48,6 @@ namespace Isis {
 
     if (kernels.HasKeyword("ElevationModel")) {
       m_demCubeFile = (std::string) kernels["ElevationModel"];
-      m_hasElevationModel = true;
     }
     else if(kernels.HasKeyword("ShapeModel")) {
       m_demCubeFile = (std::string) kernels["ShapeModel"];
@@ -108,9 +107,6 @@ namespace Isis {
   * @return @b double Local radius from the DEM
   */
   Distance DemShape::localRadius(const Latitude &lat, const Longitude &lon) {
-    
-    if (!m_hasElevationModel)
-      return Distance();
     
     if (!lat.isValid() || !lon.isValid())
       return Distance();

@@ -94,9 +94,6 @@ namespace Isis {
       /* SpiceDouble p_ra;     //!< Right ascension (sky longitude) */
       /* SpiceDouble p_dec;    //!< Decliation (sky latitude) */
       /* void computeRaDec();  //!< Computes the ra/dec from the look direction */
-
-      bool m_hasElevationModel;     //!< Does sensor use an elevation model
-
       /* bool SetGroundLocal(bool backCheck);   //!<Computes look vector */
   };
 };

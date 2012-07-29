@@ -87,6 +87,12 @@ namespace Isis {
       //! Return local radius from shape model
       virtual Distance localRadius(const Latitude &lat, const Longitude &lon) = 0;
 
+      //! Set shape name
+      virtual void setName(const std::string name);
+
+      //! Get shape name
+      std::string name() const;
+
       //! Set tolerance for acceptance in iterative loops
       void setTolerance(const double tol);
 
@@ -112,6 +118,7 @@ namespace Isis {
                               const std::vector<double> &observerLookVectorToTarget);
 
     private:
+      std::string *m_name;
       void setRadii(Distance radii[3]);
       //void localRadius(const Latitude &lat, const Longitude &lon);  // Is this needed?
       // TODO Should this be a vector? If so add to destructor and modify constructor

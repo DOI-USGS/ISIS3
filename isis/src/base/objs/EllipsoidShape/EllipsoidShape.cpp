@@ -24,6 +24,7 @@ namespace Isis {
    */
   EllipsoidShape::EllipsoidShape(Pvl &pvl) : ShapeModel (pvl) {
     std::cout << "Making ellipsoid shape" << std::endl;
+    setName("Ellipsoid");
   }
 
 
@@ -34,6 +35,7 @@ namespace Isis {
    */
   EllipsoidShape::EllipsoidShape(Distance radii[3]) : ShapeModel (radii) {
     std::cout << "Making ellipsoid shape" << std::endl;
+    setName("Ellipsoid");
   }
   
   
@@ -51,6 +53,7 @@ namespace Isis {
       return false;
     }
   }
+
 
   /** get local radius
    *

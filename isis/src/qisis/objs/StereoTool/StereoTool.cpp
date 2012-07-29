@@ -633,9 +633,9 @@ namespace Isis {
       //  If cubes set, make sure they have an elevation model
       if (m_leftCube) {
         m_leftCube->getCamera()->IgnoreElevationModel(false);
-      if (!m_leftCube->getCamera()->HasElevationModel()) {
+        if (m_leftCube->getCamera()->Shape()->name() == "Ellipsoid") {
         QString message = "No valid Dem on cube.  Run <i>spicinit</i> using a "
-           "shape model.  The local radius will default back to the ellipsoid.";
+           "dem shape model.  The local radius will default back to the ellipsoid.";
         QMessageBox::warning(m_stereoTool, "Warning", message);
         m_radiusBox->setCurrentIndex(0);
 
@@ -1471,7 +1471,7 @@ namespace Isis {
       leftCamera->IgnoreElevationModel(false);
       leftCamera->SetImage((*point)[Left]->GetSample(),
                            (*point)[Left]->GetLine());
-      m_baseRadius = leftCamera->DemRadius(leftCamera->GetLatitude(),
+      m_baseRadius = leftCamera->Shape()->localRadius(leftCamera->GetLatitude(),
                                            leftCamera->GetLongitude());
       if (!m_baseRadius.isValid()) {
         QString message = "Invalid Dem radius, defaulting to ellipsoidal.";
@@ -1758,7 +1758,7 @@ namespace Isis {
           if (m_radiusBox->currentText() == "DEM Radius") {
             shortCube->getCamera()->IgnoreElevationModel(false);
             shortCube->getCamera()->SetImage(shortSamp, shortLine);
-            m_baseRadius = shortCube->getCamera()->DemRadius(
+            m_baseRadius = shortCube->getCamera()->Shape()->localRadius(
                                   shortCube->getCamera()->GetLatitude(),
                                   shortCube->getCamera()->GetLongitude());
             if (!m_baseRadius.isValid()) {

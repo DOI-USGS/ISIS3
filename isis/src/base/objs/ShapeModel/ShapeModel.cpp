@@ -1,6 +1,4 @@
-#include <string>
 #include <algorithm>
-#include <vector>
 #include <cfloat>
 
 #include <cmath>
@@ -45,6 +43,8 @@ namespace Isis {
    * Initialize the ShapeModel private variables.
    */
   void ShapeModel::Initialize() {
+    m_name = new std::string();
+    m_name = NULL;
     m_surfacePoint = NULL;
     m_tolerance = new double();
     *m_tolerance = 0.0;
@@ -101,6 +101,14 @@ namespace Isis {
     }
 
     return true;
+  }
+
+
+  /** Get the shape name
+   *
+   */
+  std::string ShapeModel::name() const{
+    return *m_name;
   }
 
 

@@ -29,6 +29,7 @@ namespace Isis {
    */
   EquatorialCylindricalShape::EquatorialCylindricalShape(Pvl &pvl) : DemShape (pvl) {
     std::cout << "Making Isis3 equatorial cylindrical shape" << std::endl;
+    setName("EquatorialCylindricalShape");
 
     m_minRadius = NULL;
     m_maxRadius = NULL;
