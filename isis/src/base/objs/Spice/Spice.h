@@ -33,7 +33,9 @@
 namespace Isis {
   class iTime;
   class Distance;
+  class EllipsoidShape;
   class Longitude;
+  class ShapeModel;
   class Target;
 
   /**
@@ -239,6 +241,7 @@ namespace Isis {
       void subSolarPoint(double &lat, double &lon);
 
       iString target() const;
+      iString shapeName() const;
 
       //! Return if our target is the sky
       bool isSky() const {
@@ -305,6 +308,8 @@ namespace Isis {
 
       PvlObject getStoredNaifKeywords() const;
 
+      void IgnoreElevationModel(bool bIgnore);
+
     protected:
       enum SpiceValueType {
         SpiceDoubleType,
@@ -321,6 +326,9 @@ namespace Isis {
       void storeValue(iString key, int index, SpiceValueType type,
                       QVariant value);
       QVariant readStoredValue(iString key, SpiceValueType type, int index);
+
+      ShapeModel *Shape() const;
+      EllipsoidShape *Ellipsoid() const;
 
       // Leave these protected so that inheriting classes don't
       // have to convert between double and spicedouble
@@ -368,15 +376,15 @@ namespace Isis {
       bool m_allowDownsizing; //!< Indicates whether to allow downsizing
 
       // Constants
-      SpiceInt *m_bodyCode;    /**< The NaifBodyCode value, if it exists in the
-                                    labels. Otherwise, if the target is sky,
-                                    it's the SPK code and if not sky then it's
-                                    calculated by the naifBodyCode() method.*/
-      SpiceInt *m_spkCode;     //!< Spacecraft and planet ephemeris kernel (SPK) code
-      SpiceInt *m_ckCode;      //!< Camera kernel (CK) code
-      SpiceInt *m_ikCode;      //!< Instrument kernel (IK) code
-      SpiceInt *m_sclkCode;    //!< Spacecraft clock correlation kernel (SCLK) code
-      SpiceInt *m_spkBodyCode; //!< Spacecraft and planet ephemeris kernel (SPK) body code
+      SpiceInt *m_bodyCode;        /**< The NaifBodyCode value, if it exists in the
+                                        labels. Otherwise, if the target is sky,
+                                        it's the SPK code and if not sky then it's
+                                        calculated by the naifBodyCode() method.*/
+      SpiceInt *m_spkCode;         //!< Spacecraft and planet ephemeris kernel (SPK) code
+      SpiceInt *m_ckCode;          //!< Camera kernel (CK) code
+      SpiceInt *m_ikCode;          //!< Instrument kernel (IK) code
+      SpiceInt *m_sclkCode;        //!< Spacecraft clock correlation kernel (SCLK) code
+      SpiceInt *m_spkBodyCode;     //!< Spacecraft and planet ephemeris kernel (SPK) body code
 
       PvlObject *m_naifKeywords;
 
@@ -386,6 +394,9 @@ namespace Isis {
       // Don't allow copies
       Spice(const Spice &other);
       Spice &operator=(const Spice &other);
+
+      ShapeModel *m_shape;         //!< Shape model
+      EllipsoidShape *m_ellipsoid; //!< Ellipsoid shape model for target 
   };
 }
 

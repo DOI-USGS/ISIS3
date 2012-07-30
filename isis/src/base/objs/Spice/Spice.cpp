@@ -28,6 +28,7 @@
 
 #include "Constants.h"
 #include "Distance.h"
+#include "EllipsoidShape.h"
 #include "EndianSwapper.h"
 #include "FileName.h"
 #include "IException.h"
@@ -35,6 +36,7 @@
 #include "iTime.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
+#include "ShapeModelFactory.h"
 #include "Target.h"
 
 #include "getSpkAbCorrState.hpp"
@@ -129,6 +131,12 @@ namespace Isis {
     m_ikCode = new SpiceInt;
     m_sclkCode = new SpiceInt;
     m_spkBodyCode = new SpiceInt;
+
+    // set shape and ellipsoid models
+    m_shape = ShapeModelFactory::Create(lab);
+
+    m_ellipsoid = NULL;
+    m_ellipsoid = new EllipsoidShape(lab);
 
     m_naifKeywords = new PvlObject("NaifKeywords");
 
@@ -483,6 +491,17 @@ namespace Isis {
       m_spkBodyCode = NULL;
     }
 
+    if (m_shape != NULL) {
+      delete m_shape;
+        m_shape = NULL;
+    }
+   
+    if (m_ellipsoid != NULL) {
+      delete m_ellipsoid;
+      m_ellipsoid = NULL;
+    }
+
+
     // Unload the kernels (TODO: Can this be done faster)
     for (int i = 0; m_kernels && i < m_kernels->size(); i++) {
       FileName file(m_kernels->at(i));
@@ -496,6 +515,21 @@ namespace Isis {
     }
 
     NaifStatus::CheckErrors();
+  }
+
+  /**
+   * This allows you to ignore the elevation model
+   *
+   * @param ignore True if the elevation model is ignored
+   **/
+  void Spice::IgnoreElevationModel(bool bIgnore) {
+    
+    if (bIgnore) {
+      if (m_ellipsoid != NULL)
+        delete m_ellipsoid;
+
+      m_ellipsoid = new EllipsoidShape(m_radii);
+    }
   }
 
   /**
@@ -1073,6 +1107,21 @@ namespace Isis {
     return result;
   }
 
+  /**
+   * Returns shape model
+   */
+  ShapeModel *Spice::Shape() const {
+    return m_shape;
+  }
+  
+  
+  /**
+   * Returns ellipsoid
+   */
+  EllipsoidShape *Spice::Ellipsoid() const {
+    return m_ellipsoid;
+  }
+
 
   /**
    * This returns a value from the NAIF text pool. It is a static convience
@@ -1182,6 +1231,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
 
+
   /**
     * Returns the string name of the target
     *
@@ -1189,6 +1239,16 @@ namespace Isis {
     */
   iString Spice::target() const {
     return m_target->name();
+  }
+  
+  
+  /**
+    * Returns the string name of the shape
+    *
+    * @return string
+    */
+  iString Spice::shapeName() const {
+    return m_shape->name();
   }
 
 

@@ -103,6 +103,8 @@ namespace Isis {
     p_groundRangeComputed = false;
     p_raDecRangeComputed = false;
     p_pointComputed = false;
+
+    Shape()->setTolerance(Resolution()/100.0);
   }
 
   //! Destroys the Camera Object

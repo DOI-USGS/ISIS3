@@ -60,31 +60,6 @@ namespace Isis {
 
   //! Destroys the Sensor
   Sensor::~Sensor() {
-    if (m_shape) {
-      delete m_shape;
-      m_shape = NULL;
-    }
-    if (m_ellipsoid) {
-      delete m_ellipsoid;
-      m_ellipsoid = NULL;
-    }
-  }
-
-  /**
-   * This allows you to ignore the elevation model
-   *
-   * @param ignore True if the elevation model is ignored
-   */
-  void Sensor::IgnoreElevationModel(bool ignore) {
-    
-    if (ignore) {
-      Distance *radii = m_shape->targetRadii();
-//      m_shape = EllipsoidShape(radii);
-      if ( m_ellipsoid != NULL )
-        delete m_ellipsoid;
-
-      m_ellipsoid = new EllipsoidShape(radii);
-    }
   }
 
   /**
@@ -167,7 +142,8 @@ namespace Isis {
     const vector<double> &sB = bodyRotation()->ReferenceVector(
         instrumentPosition()->Coordinate());
 
-    return m_shape->intersectSurface(sB, lookB);
+    return Shape()->intersectSurface(sB, lookB);
+//    return m_shape->intersectSurface(sB, lookB);
   }
 
   /**
@@ -176,45 +152,50 @@ namespace Isis {
    * @param p[] The coordinate of the surface intersection
    */
   void Sensor::Coordinate(double p[3]) const {
-    p[0] = m_shape->surfaceIntersection()->GetX().kilometers();
-    p[1] = m_shape->surfaceIntersection()->GetY().kilometers();
-    p[2] = m_shape->surfaceIntersection()->GetZ().kilometers();
+    p[0] = Shape()->surfaceIntersection()->GetX().kilometers();
+    p[0] = Shape()->surfaceIntersection()->GetX().kilometers();
+    p[1] = Shape()->surfaceIntersection()->GetY().kilometers();
+//    p[2] = m_shape->surfaceIntersection()->GetZ().kilometers();
+//    p[1] = m_shape->surfaceIntersection()->GetY().kilometers();
+//    p[2] = m_shape->surfaceIntersection()->GetZ().kilometers();
   }
 
 
   double Sensor::UniversalLatitude() const {
-    return m_shape->surfaceIntersection()->GetLatitude().degrees();
+    return Shape()->surfaceIntersection()->GetLatitude().degrees();
+//    return m_shape->surfaceIntersection()->GetLatitude().degrees();
   }
 
 
   Latitude Sensor::GetLatitude() const {
-    return m_shape->surfaceIntersection()->GetLatitude();
+    return Shape()->surfaceIntersection()->GetLatitude();
+//    return m_shape->surfaceIntersection()->GetLatitude();
   }
 
 
   double Sensor::UniversalLongitude() const {
-    return m_shape->surfaceIntersection()->GetLongitude().degrees();
+    return Shape()->surfaceIntersection()->GetLongitude().degrees();
+//    return m_shape->surfaceIntersection()->GetLongitude().degrees();
   }
 
 
   Longitude Sensor::GetLongitude() const {
-    return m_shape->surfaceIntersection()->GetLongitude();
+    return Shape()->surfaceIntersection()->GetLongitude();
+//    return m_shape->surfaceIntersection()->GetLongitude();
   }
 
-
-  ShapeModel *Sensor::Shape() {
-    return m_shape;
-  }
 
   SurfacePoint Sensor::GetSurfacePoint() const {
-    return *m_shape->surfaceIntersection();
+    return *Shape()->surfaceIntersection();
+//    return *m_shape->surfaceIntersection();
   }
 
 
   Distance Sensor::LocalRadius() const {
     //TODO: We probably need to be validating surface intersect point is not NULL
     // Here? or in ShapeModel? or what, man?
-    return m_shape->surfaceIntersection()->GetLocalRadius();
+    return Shape()->surfaceIntersection()->GetLocalRadius();
+//    return m_shape->surfaceIntersection()->GetLocalRadius();
   }
 
 
@@ -227,7 +208,8 @@ namespace Isis {
    *          lat,lon in meters
    */
   Distance Sensor::LocalRadius(Latitude lat, Longitude lon) {
-    return m_shape->localRadius(lat, lon); 
+    return Shape()->localRadius(lat, lon); 
+//    return m_shape->localRadius(lat, lon); 
   }
 
 
@@ -240,8 +222,10 @@ namespace Isis {
     *          lat,lon in meters
     */
   Distance Sensor::LocalRadius(double lat, double lon) {
-    return m_shape->localRadius(Latitude(lat, Angle::Degrees),
+    return Shape()->localRadius(Latitude(lat, Angle::Degrees),
                                 Longitude(lon, Angle::Degrees));
+//    return m_shape->localRadius(Latitude(lat, Angle::Degrees),
+//                                Longitude(lon, Angle::Degrees));
   }
 
   /**
@@ -254,9 +238,12 @@ namespace Isis {
     std::vector<double> sB = bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate());
 
     SpiceDouble pB[3];
-    pB[0] = m_shape->surfaceIntersection()->GetX().kilometers();
-    pB[1] = m_shape->surfaceIntersection()->GetY().kilometers();
-    pB[2] = m_shape->surfaceIntersection()->GetZ().kilometers();
+    pB[0] = Shape()->surfaceIntersection()->GetX().kilometers();
+    pB[1] = Shape()->surfaceIntersection()->GetY().kilometers();
+    pB[2] = Shape()->surfaceIntersection()->GetZ().kilometers();
+//    pB[0] = m_shape->surfaceIntersection()->GetX().kilometers();
+//    pB[1] = m_shape->surfaceIntersection()->GetY().kilometers();
+//    pB[2] = m_shape->surfaceIntersection()->GetZ().kilometers();
     vsub_c((SpiceDouble *) &sB[0], pB, psB);
     unorm_c(psB, upsB, &dist);
 
@@ -289,9 +276,12 @@ namespace Isis {
     SpiceDouble psB[3], upsB[3], upB[3], dist;
 
     SpiceDouble pB[3];
-    pB[0] = m_shape->surfaceIntersection()->GetX().kilometers();
-    pB[1] = m_shape->surfaceIntersection()->GetY().kilometers();
-    pB[2] = m_shape->surfaceIntersection()->GetZ().kilometers();
+    pB[0] = Shape()->surfaceIntersection()->GetX().kilometers();
+    pB[1] = Shape()->surfaceIntersection()->GetY().kilometers();
+    pB[2] = Shape()->surfaceIntersection()->GetZ().kilometers();
+//    pB[0] = m_shape->surfaceIntersection()->GetX().kilometers();
+//    pB[1] = m_shape->surfaceIntersection()->GetY().kilometers();
+//    pB[2] = m_shape->surfaceIntersection()->GetZ().kilometers();
 
     vsub_c((ConstSpiceDouble *) &sB[0], pB, psB);
     unorm_c(psB, upsB, &dist);
@@ -312,9 +302,12 @@ namespace Isis {
     SpiceDouble puB[3], upuB[3], upB[3], dist;
 
     SpiceDouble pB[3];
-    pB[0] = m_shape->surfaceIntersection()->GetX().kilometers();
-    pB[1] = m_shape->surfaceIntersection()->GetY().kilometers();
-    pB[2] = m_shape->surfaceIntersection()->GetZ().kilometers();
+    pB[0] = Shape()->surfaceIntersection()->GetX().kilometers();
+    pB[1] = Shape()->surfaceIntersection()->GetY().kilometers();
+    pB[2] = Shape()->surfaceIntersection()->GetZ().kilometers();
+//    pB[0] = m_shape->surfaceIntersection()->GetX().kilometers();
+//    pB[1] = m_shape->surfaceIntersection()->GetY().kilometers();
+//    pB[2] = m_shape->surfaceIntersection()->GetZ().kilometers();
 
     vsub_c(m_uB, pB, puB);
     unorm_c(puB, upuB, &dist);
@@ -345,17 +338,21 @@ namespace Isis {
                                   const double longitude, bool backCheck) {
     // Can't intersect the sky
     if (isSky()) {
-      m_shape->setHasSurfaceIntersection(false);
+      Shape()->setHasSurfaceIntersection(false);
+//      m_shape->setHasSurfaceIntersection(false);
       return false;
     }
 
     // Load the latitude/longitude
     Latitude lat(latitude, Angle::Degrees);
     Longitude lon(longitude, Angle::Degrees);
-    m_shape->surfaceIntersection()->SetSpherical(lat, lon, LocalRadius(lat, lon));
+    Shape()->surfaceIntersection()->SetSpherical(lat, lon, LocalRadius(lat, lon));
+//    m_shape->surfaceIntersection()->SetSpherical(lat, lon, LocalRadius(lat, lon));
 
-    if (!m_shape->surfaceIntersection()->Valid()) {
-      m_shape->setHasSurfaceIntersection(false);
+    if (!Shape()->surfaceIntersection()->Valid()) {
+      Shape()->setHasSurfaceIntersection(false);
+//    if (!m_shape->surfaceIntersection()->Valid()) {
+//      m_shape->setHasSurfaceIntersection(false);
       return false;
     }
 
@@ -383,14 +380,16 @@ namespace Isis {
                                   const double radius, bool backCheck) {
     // Can't intersect the sky
     if (isSky()) {
-      m_shape->setHasSurfaceIntersection(false);
+      Shape()->setHasSurfaceIntersection(false);
+//      m_shape->setHasSurfaceIntersection(false);
       return false;
     }
 
     Latitude lat(latitude, Angle::Degrees);
     Longitude lon(longitude, Angle::Degrees);
     Distance rad(radius, Distance::Meters);
-    m_shape->surfaceIntersection()->SetSpherical(lat, lon, rad);
+    Shape()->surfaceIntersection()->SetSpherical(lat, lon, rad);
+//    m_shape->surfaceIntersection()->SetSpherical(lat, lon, rad);
 
     return SetGroundLocal(backCheck);
   }
@@ -412,11 +411,13 @@ namespace Isis {
   bool Sensor::SetGround(const SurfacePoint &surfacePt, bool backCheck) {
     // Can't intersect the sky
     if (isSky()) {
-      m_shape->setHasSurfaceIntersection(false);
+      Shape()->setHasSurfaceIntersection(false);
+//      m_shape->setHasSurfaceIntersection(false);
       return false;
     }
 
-    m_shape->setSurfaceIntersectionPoint(surfacePt);
+    Shape()->setSurfaceIntersectionPoint(surfacePt);
+//    m_shape->setSurfaceIntersectionPoint(surfacePt);
 
     return SetGroundLocal(backCheck);
   }
@@ -444,21 +445,26 @@ namespace Isis {
     const vector<double> &sB =
         bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate());
 
-    m_lookB[0] = m_shape->surfaceIntersection()->GetX().kilometers() - sB[0];
-    m_lookB[1] = m_shape->surfaceIntersection()->GetY().kilometers() - sB[1];
-    m_lookB[2] = m_shape->surfaceIntersection()->GetZ().kilometers() - sB[2];
+    m_lookB[0] = Shape()->surfaceIntersection()->GetX().kilometers() - sB[0];
+    m_lookB[1] = Shape()->surfaceIntersection()->GetY().kilometers() - sB[1];
+    m_lookB[2] = Shape()->surfaceIntersection()->GetZ().kilometers() - sB[2];
+//    m_lookB[0] = m_shape->surfaceIntersection()->GetX().kilometers() - sB[0];
+//    m_lookB[1] = m_shape->surfaceIntersection()->GetY().kilometers() - sB[1];
+//    m_lookB[2] = m_shape->surfaceIntersection()->GetZ().kilometers() - sB[2];
     m_newLookB = true;
 
     // See if the point is on the backside of the target
     if(backCheck) {
       if(fabs(EmissionAngle(sB)) > 90.) {
-        m_shape->setHasSurfaceIntersection(false);
+        Shape()->setHasSurfaceIntersection(false);
+//        m_shape->setHasSurfaceIntersection(false);
         return false;
       }
     }
 
     // return with success
-    m_shape->setHasSurfaceIntersection(true);
+    Shape()->setHasSurfaceIntersection(true);
+//    m_shape->setHasSurfaceIntersection(true);
     
     return true;
   }
@@ -557,9 +563,12 @@ namespace Isis {
     std::vector<double> sB = bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate());
 
     SpiceDouble pB[3];
-    pB[0] = m_shape->surfaceIntersection()->GetX().kilometers();
-    pB[1] = m_shape->surfaceIntersection()->GetY().kilometers();
-    pB[2] = m_shape->surfaceIntersection()->GetZ().kilometers();
+    pB[0] = Shape()->surfaceIntersection()->GetX().kilometers();
+    pB[1] = Shape()->surfaceIntersection()->GetY().kilometers();
+    pB[2] = Shape()->surfaceIntersection()->GetZ().kilometers();
+//    pB[0] = m_shape->surfaceIntersection()->GetX().kilometers();
+//    pB[1] = m_shape->surfaceIntersection()->GetY().kilometers();
+//    pB[2] = m_shape->surfaceIntersection()->GetZ().kilometers();
 
     vsub_c(pB, (SpiceDouble *) &sB[0], psB);
     unorm_c(psB, upsB, &dist);
@@ -591,9 +600,12 @@ namespace Isis {
     Spice::sunPosition(sB);
 
     // Calc the change
-    double xChange = sB[0] - m_shape->surfaceIntersection()->GetX().kilometers();
-    double yChange = sB[1] - m_shape->surfaceIntersection()->GetY().kilometers();
-    double zChange = sB[2] - m_shape->surfaceIntersection()->GetZ().kilometers();
+    double xChange = sB[0] - Shape()->surfaceIntersection()->GetX().kilometers();
+    double yChange = sB[1] - Shape()->surfaceIntersection()->GetY().kilometers();
+    double zChange = sB[2] - Shape()->surfaceIntersection()->GetZ().kilometers();
+//    double xChange = sB[0] - m_shape->surfaceIntersection()->GetX().kilometers();
+//    double yChange = sB[1] - m_shape->surfaceIntersection()->GetY().kilometers();
+//    double zChange = sB[2] - m_shape->surfaceIntersection()->GetZ().kilometers();
 
     // Calc the distance and convert to AU
     double dist = sqrt(pow(xChange, 2) + pow(yChange, 2) + pow(zChange, 2));

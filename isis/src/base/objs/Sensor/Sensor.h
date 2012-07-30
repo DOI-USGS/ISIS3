@@ -201,7 +201,8 @@ namespace Isis {
        *         target.
        */
       inline bool HasSurfaceIntersection() const {
-        return m_shape->hasIntersection();
+        return Shape()->hasIntersection();
+//        return m_shape->hasIntersection();
       };
 
       void Coordinate(double p[3]) const;
@@ -231,11 +232,6 @@ namespace Isis {
        * Returns the longitude.
        */
       Longitude GetLongitude() const;
-
-      /**
-       * Returns shape
-       */
-      ShapeModel *Shape();
 
       /**
        * Returns the surface point (most efficient accessor).
@@ -291,8 +287,6 @@ namespace Isis {
         return 1.0;
       };
 
-      void IgnoreElevationModel(bool ignore);//DAC TODO manually set to ellipsoid???
-
     protected:
 //      bool m_hasIntersection; /**< This indicates if the surface point or look
 //                                  direction is valid. It is made protected so
@@ -324,8 +318,8 @@ namespace Isis {
       //      Distance *m_minRadius;  //!< Minimum radius value in DEM file
       //      Distance *m_maxRadius;  //!< Maximum radius value in DEM file
       //      double m_demScale;      //!< Scale of DEM file in pixels per degree
-      ShapeModel *m_shape;            //!< Shape model
-      EllipsoidShape *m_ellipsoid;        //!< Ellipsoid shape model for target
+      // ShapeModel *m_shape;            //!< Shape model
+      // EllipsoidShape *m_ellipsoid;        //!< Ellipsoid shape model for target
   };
 };
 
