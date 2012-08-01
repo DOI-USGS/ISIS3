@@ -185,6 +185,9 @@ namespace Isis {
    *                          explicit reference for the point, otherwise simply set reference to
    *                          left measure.  If ground source is on the left do not print warning
    *                          about new reference measure.
+   *   @history 2012-07-30 Tracie Sucharski - Fixed bug, program would seg fault when left-clicking
+   *                          on a cube when there were no control points.  Before calling
+   *                          FindClosest, make sure the control net has points.
    */
   class QnetTool : public Tool {
     Q_OBJECT

@@ -511,5 +511,9 @@
       Fix made on 2012-05-07 caused a bug which would not allow a new measure
       to be set as the reference measure.
     </change>
+    <change name="Tracie Sucharski" date="2012-07-30">
+      Fixed bug which caused program to crash when left clicking on a cube when
+      there are no control points.
+    </change>
   </history>
 </application>
