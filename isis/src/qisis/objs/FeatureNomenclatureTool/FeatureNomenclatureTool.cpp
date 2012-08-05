@@ -739,7 +739,7 @@ namespace Isis {
 
       iString target;
       if (vp->camera()) {
-        target = vp->camera()->target();
+        target = vp->camera()->target()->name();
       }
       else if (vp->projection()) {
         PvlGroup mappingGrp = vp->projection()->Mapping();

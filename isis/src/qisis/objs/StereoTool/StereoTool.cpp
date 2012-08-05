@@ -633,7 +633,7 @@ namespace Isis {
       //  If cubes set, make sure they have an elevation model
       if (m_leftCube) {
         m_leftCube->getCamera()->IgnoreElevationModel(false);
-        if (m_leftCube->getCamera()->shapeName() == "Ellipsoid") {
+        if (m_leftCube->getCamera()->target()->shape()->name() == "Ellipsoid") {
         QString message = "No valid Dem on cube.  Run <i>spicinit</i> using a "
            "dem shape model.  The local radius will default back to the ellipsoid.";
         QMessageBox::warning(m_stereoTool, "Warning", message);
@@ -703,7 +703,7 @@ namespace Isis {
     //  as the current control net.
     if (m_controlNet) {
       if (m_controlNet->GetTarget() !=
-          m_linkedViewports.at(0)->cube()->getCamera()->target()) {
+          m_linkedViewports.at(0)->cube()->getCamera()->target()->name()) {
         //  Allow opportunity to save current data before clearing for new
         //  target.
         QString message = "You have changed targets.  All data must be re-set";
@@ -720,14 +720,14 @@ namespace Isis {
         clearNetData();
         m_controlNet = new ControlNet();
         m_controlNet->SetTarget(
-                        m_linkedViewports.at(0)->cube()->getCamera()->target());
+                                m_linkedViewports.at(0)->cube()->getCamera()->target()->name());
         m_serialNumberList = new SerialNumberList(false);
       }
     }
     else {
       m_controlNet = new ControlNet();
       m_controlNet->SetTarget(
-                       m_linkedViewports.at(0)->cube()->getCamera()->target());
+                              m_linkedViewports.at(0)->cube()->getCamera()->target()->name());
       m_serialNumberList = new SerialNumberList(false);
     }
 

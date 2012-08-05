@@ -230,18 +230,15 @@ namespace Isis {
 
       void createCache(iTime startTime, iTime endTime,
                        const int size, double tol);
-        //NO CALL TO THIS METHOD IS FOUND IN ISIS.  COMMENT OUT AND SAVE FOR AT LEAST 3 MONTHS
-        //IF NO NEED IS FOUND FOR IT, DELETE METHOD.
-        // 2011-02-08 JEANNIE WALLDREN
-//      void createCache(const double time, double tol);
       iTime cacheStartTime() const;
       iTime cacheEndTime() const;
 
       void subSpacecraftPoint(double &lat, double &lon);
       void subSolarPoint(double &lat, double &lon);
 
-      iString target() const;
-      iString shapeName() const;
+      Target *target() const;
+      iString targetName() const;
+      //     iString shapeName() const;
 
       //! Return if our target is the sky
       bool isSky() const {
@@ -308,8 +305,6 @@ namespace Isis {
 
       PvlObject getStoredNaifKeywords() const;
 
-      void IgnoreElevationModel(bool bIgnore);
-
     protected:
       enum SpiceValueType {
         SpiceDoubleType,
@@ -327,8 +322,8 @@ namespace Isis {
                       QVariant value);
       QVariant readStoredValue(iString key, SpiceValueType type, int index);
 
-      ShapeModel *Shape() const;
-      EllipsoidShape *Ellipsoid() const;
+      ShapeModel *shape() const;
+      EllipsoidShape *ellipsoid() const;
 
       // Leave these protected so that inheriting classes don't
       // have to convert between double and spicedouble
@@ -376,10 +371,10 @@ namespace Isis {
       bool m_allowDownsizing; //!< Indicates whether to allow downsizing
 
       // Constants
-      SpiceInt *m_bodyCode;        /**< The NaifBodyCode value, if it exists in the
-                                        labels. Otherwise, if the target is sky,
-                                        it's the SPK code and if not sky then it's
-                                        calculated by the naifBodyCode() method.*/
+      //      SpiceInt *m_bodyCode;        /**< The NaifBodyCode value, if it exists in the
+      //                                        labels. Otherwise, if the target is sky,
+      //                                        it's the SPK code and if not sky then it's
+      //                                        calculated by the naifBodyCode() method.*/
       SpiceInt *m_spkCode;         //!< Spacecraft and planet ephemeris kernel (SPK) code
       SpiceInt *m_ckCode;          //!< Camera kernel (CK) code
       SpiceInt *m_ikCode;          //!< Instrument kernel (IK) code
@@ -396,7 +391,7 @@ namespace Isis {
       Spice &operator=(const Spice &other);
 
       ShapeModel *m_shape;         //!< Shape model
-      EllipsoidShape *m_ellipsoid; //!< Ellipsoid shape model for target 
+      //      EllipsoidShape *m_ellipsoid; //!< Ellipsoid shape model for target 
   };
 }
 

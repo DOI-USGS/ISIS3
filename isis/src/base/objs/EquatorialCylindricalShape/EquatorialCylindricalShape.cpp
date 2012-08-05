@@ -27,7 +27,8 @@ namespace Isis {
    *
    * @param pvl Valid Isis3 cube label.
    */
-  EquatorialCylindricalShape::EquatorialCylindricalShape(Pvl &pvl) : DemShape (pvl) {
+  EquatorialCylindricalShape::EquatorialCylindricalShape(Target *target, Pvl &pvl) : 
+                                                                                        DemShape (target, pvl) {
     std::cout << "Making Isis3 equatorial cylindrical shape" << std::endl;
     setName("EquatorialCylindricalShape");
 
@@ -164,6 +165,7 @@ namespace Isis {
       //double dalpha = (PI/180.0)/(2.0*p_demScale);
       double dalpha = MAX(cos(g1lat*DTR),cmin) / (2.0*demScale()*DTR);
       
+      // Previous Sensor version used local version of this method with lat and lon doubles. ..Why Jeff???
       double r1 = (localRadius(Latitude(g1lat, Angle::Degrees),
                                Longitude(g1lon, Angle::Degrees))).kilometers();
       
@@ -221,6 +223,7 @@ namespace Isis {
         if (g2lon < 0.0)
           g2lon += 360.0;
 
+      // Previous Sensor version used local version of this method with lat and lon doubles. ..Why Jeff???
         double r2 = (localRadius(Latitude(g2lat, Angle::Degrees),
                                  Longitude(g2lon, Angle::Degrees))).kilometers();
         
@@ -263,6 +266,7 @@ namespace Isis {
               if (plon > 360.0)
                 plon -= 360.0;
 
+      // Previous Sensor version used local version of this method with lat and lon doubles. ..Why Jeff???
               pradius = (localRadius(Latitude(plat, Angle::Degrees),
                                      Longitude(plon, Angle::Degrees))).kilometers();
 

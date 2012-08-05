@@ -31,6 +31,7 @@
 
 #include "SurfacePoint.h"
 #include "Pvl.h"
+#include "Target.h"
 
 namespace Isis {
   /**
@@ -51,8 +52,9 @@ namespace Isis {
     public:
       //! Constructors
       ShapeModel();
-      ShapeModel(Isis::Pvl &pvl);
-      ShapeModel(Distance radii[3]);
+      ShapeModel(Target *target, Isis::Pvl &pvl);
+      //      ShapeModel(Distance radii[3]);
+      ShapeModel(Target *target);
 
       //! Initialization
       void Initialize();
@@ -65,25 +67,31 @@ namespace Isis {
                                     std::vector<double> lookDirection)=0;
 
       //! Return the surface intersection
-      SurfacePoint *surfaceIntersection();
+      SurfacePoint *surfaceIntersection() const;
 
       bool hasIntersection();
-      bool hasNormal();
+      bool hasNormal() const;
+
+      //! Calculate the default normal of the current intersection point
+      virtual void calculateDefaultNormal() = 0; 
+
+      //! Calculate the surface normal of the current intersection point
+      virtual void calculateLocalNormal(QVector<double *> cornerNeighborPoints) = 0; 
 
       //! Calculate the surface normal of the current intersection point
       virtual void calculateSurfaceNormal() = 0; 
 
-      //! Return the surface normal of the current intersection point
-      std::vector<double> surfaceNormal();
+      //! Return the normal (surface or local) of the current intersection point
+      void normal(std::vector<double>);
 
       //! Calculate the emission angle of the current intersection point
-      double EmissionAngle();
+      virtual double emissionAngle(const std::vector<double> & sB) ;
 
       //! Calculate the incidence angle of the current intersection point
-      double IncidenceAngle();
+      virtual double incidenceAngle(const std::vector<double> &uB);
 
       //! Calculate the phase angle of the current intersection point
-      double PhaseAngle();
+      virtual double phaseAngle(const std::vector<double> &sB, const std::vector<double> &uB);
 
       //! Return local radius from shape model
       virtual Distance localRadius(const Latitude &lat, const Longitude &lon) = 0;
@@ -104,32 +112,36 @@ namespace Isis {
       void setTolerance(const double tol);
 
       //! Return triaxial target radii from shape model TODO Put this in Target class???
-      Distance *targetRadii();
+      //      Distance *targetRadii();
 
       //! Return the tolerance
       double tolerance();
 
     protected:
       bool m_hasIntersection;                          //!< Flag indicating a successful intersection has been found
-      bool m_hasNormal;                                 //!< Flag indicating surface normal has been computed
-      std::vector<double> m_surfaceNormal; //!< Surface normal of current intersection point
+      bool m_hasNormal;                                 //!< Flag indicating normal has been computed
+      std::vector<double> m_normal;             //!< Local normal of current intersection point
+ 
       double *m_tolerance;
 
+      void calculateEllipsoidalSurfaceNormal();
 
       //! Intersect ellipse
       bool intersectEllipsoid(const std::vector<double> observerPosRelativeToTarget,
                               const std::vector<double> &observerLookVectorToTarget);
+      Distance *targetRadii() const;
 
     private:
       std::string *m_name;
-      void setRadii(Distance radii[3]);
+      //      void setRadii(Distance radii[3]);
       //void localRadius(const Latitude &lat, const Longitude &lon);  // Is this needed?
       // TODO Should this be a vector? If so add to destructor and modify constructor
-      Distance m_radii[3];        //!< Radii of target body
+      //      Distance m_radii[3];        //!< Radii of target body
 
-      // Are these only needed for Isis3Simp model? Are they needed for photometric computations?
+     // Are these only needed for Isis3Simp model? Are they needed for photometric computations?
       SurfacePoint *m_surfacePoint;        //!< Current intersection point
       // This needs to get reset by cameras???
+      Target *m_target;
   };
 };
 

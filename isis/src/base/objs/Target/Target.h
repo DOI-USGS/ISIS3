@@ -51,25 +51,32 @@ namespace Isis {
       //! Destroys the Target
       ~Target();
 
-      Distance *radii() const;
+      bool isSky() const;
       SpiceInt naifBodyCode() const;
       iString name() const;
+      Distance *radii() const;
+      void restoreShape();
+      void setShapeEllipsoid();
       void setSky(SpiceInt bodyCode) const;
-      void setRadii(Distance r[3]);
-      bool isSky() const;
+      void setRadii(Distance *radii);
+      ShapeModel *shape() const;
 
 
     private:
-      iString *m_name;   //!< Name of the target
+      SpiceInt lookupNaifBodyCode() const;
       SpiceInt *m_bodyCode;    /**< The NaifBodyCode value, if it exists in the
                                     labels. Otherwise, if the target is sky,
                                     it's the SPK code and if not sky then it's
                                     calculated by the NaifBodyCode() method.*/
+      iString *m_name;   //!< Name of the target
       Distance *m_radii; //!< The radii of the target
-      //      ShapeModel *shape; //!< The shape model of the target
-      bool m_sky; //!< Indicates whether the target of the observation is the sky
-      // TODO should this be an enum(sky or naifBody), created Naif body for sky, or ???
-      // TODO should the target body kernels go in here too bodyRotation and position???
+      ShapeModel *m_originalShape; //!< The shape model of the target
+      ShapeModel *m_shape; //!< The shape model of the target
+      bool *m_sky; //!< Indicates whether the target of the observation is the sky
+      // TODO should this be an enum(ring, sky, or naifBody), created Naif body for sky, or ???
+      // TODO should the target body kernels go in here too bodyRotation and position??? I don't
+      //           think so.  They are SPICE kernels and belong in the Spice class (DAC).  What do others
+      //           think.
   };
 };
 

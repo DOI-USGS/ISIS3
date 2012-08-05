@@ -41,7 +41,7 @@ namespace Isis {
    */
   class ShapeModelFactory {
     public:
-      static ShapeModel *Create(Pvl &pvl);
+    static ShapeModel *Create(Target *target, Pvl &pvl);
 
     private:
       /**

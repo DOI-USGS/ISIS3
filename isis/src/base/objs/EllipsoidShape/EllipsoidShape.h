@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include <QVector>
+
 #include "naif/SpiceUsr.h"
 #include "naif/SpiceZfc.h"
 #include "naif/SpiceZmc.h"
@@ -51,8 +53,9 @@ namespace Isis {
   class EllipsoidShape : public Isis::ShapeModel {
     public:
       //! Constructors
-      EllipsoidShape(Isis::Pvl &pvl);
-      EllipsoidShape(Distance radii[3]);
+    EllipsoidShape(Target *target, Isis::Pvl &pvl);
+      //      EllipsoidShape(Distance radii[3]);
+      EllipsoidShape(Target *target);
 
       //! Destructor
       ~EllipsoidShape() { };
@@ -61,11 +64,20 @@ namespace Isis {
       bool intersectSurface(std::vector<double> observerPos,
                             std::vector<double> lookDirection);
 
+      //! Calculate the default normal of the current intersection point
+      virtual void calculateDefaultNormal(); 
+
+      //! Calculate the local surface normal of the current intersection point
+      void calculateLocalNormal(QVector<double *> cornerNeighborPoints); 
+
       //! Calculate the surface normal of the current intersection point
       void calculateSurfaceNormal(); 
 
       //! Get the local radius for a point on the surface
       Distance localRadius(const Latitude &lat, const Longitude &lon);
+
+
+    private:
   };
 };
 

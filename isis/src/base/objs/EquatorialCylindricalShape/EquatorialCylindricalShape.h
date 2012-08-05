@@ -51,7 +51,7 @@ namespace Isis {
   class EquatorialCylindricalShape : public DemShape {
     public:
       //! Constructor
-      EquatorialCylindricalShape(Isis::Pvl &pvl);
+      EquatorialCylindricalShape(Target *target, Isis::Pvl &pvl);
 
       //! Destructor
       ~EquatorialCylindricalShape();

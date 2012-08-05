@@ -32,7 +32,7 @@ namespace Isis {
    *
    * @param pvl Valid Isis3 cube label.
    */
-  DemShape::DemShape(Pvl &pvl) : ShapeModel (pvl) {
+  DemShape::DemShape(Target *target, Pvl &pvl) : ShapeModel (target, pvl) {
     std::cout << "Making Isis3 Dem shape" << std::endl;
     setName("DemShape");
     m_demProj = NULL;
@@ -167,6 +167,7 @@ namespace Isis {
       if (lonDD < 0)
         lonDD += 360;
 
+      // Previous Sensor version used local version of this method with lat and lon doubles. ..Why Jeff???
       Distance radiusKm = localRadius(Latitude(latDD, Angle::Degrees),
                                       Longitude(lonDD, Angle::Degrees));
 
@@ -237,50 +238,31 @@ namespace Isis {
   }
 
 
-  /** Return pixels per degree
-   *
+  /** 
+   * Return pixels per degree
    */
     double DemShape::demScale () {
       return m_pixPerDegree;
     }
 
 
-  /**
-  * Removes memory allocated for local area points
-  *
-  */
-  void DemShape::removeLocalAreaPoints() {
-    // Free memory
-    for (int ipt = 0; ipt < m_neighborPoints.size(); ipt++) {
-      if (m_neighborPoints[ipt] != NULL) delete [] m_neighborPoints[ipt];
-      m_neighborPoints[ipt] = NULL;
-    }
-  }
-
-
-  /**
-  * Sets a local area around the current intersection point
-  * @param SurfacePoint *neighborPoints
-  * @return bool success status
-  */
-  void DemShape::setLocalAreaPoint() {
-     // loading order of points in vector should be top, bottom, left, right
-    m_neighborPoints.push_back(NULL);
-    int ipt = m_neighborPoints.size() - 1;
-    m_neighborPoints[ipt] = new double[3];   // TODO Make sure to free this memory
-    surfaceIntersection()->ToNaifArray(m_neighborPoints[ipt]);
-  }
-
-
-  /** Calculate surface normal
-   *
+  /** 
+   * Calculate default normal for the DemShape
    */
-  void DemShape::calculateSurfaceNormal () {
+  void DemShape::calculateDefaultNormal()  {
+    calculateEllipsoidalSurfaceNormal();
+  }
+
+
+  /** 
+   * Calculate local normal
+   */
+  void DemShape::calculateLocalNormal (QVector<double *> cornerNeighborPoints) {
     // subtract bottom from top and left from right and store results
     double topMinusBottom[3];
-    vsub_c(m_neighborPoints[0], m_neighborPoints[1], topMinusBottom);
+    vsub_c(cornerNeighborPoints[0], cornerNeighborPoints[1], topMinusBottom);
     double rightMinusLeft[3];
-    vsub_c(m_neighborPoints[3],m_neighborPoints [2], rightMinusLeft);
+    vsub_c(cornerNeighborPoints[3], cornerNeighborPoints [2], rightMinusLeft);
 
     // take cross product of subtraction results to get normal
     SpiceDouble normal[3];
@@ -300,29 +282,27 @@ namespace Isis {
       m_hasNormal = true;
     } 
   
-    memcpy(&m_surfaceNormal[0], normal, sizeof(double) * 3);
-  }
+    memcpy(&m_normal[0], normal, sizeof(double) * 3);
 
-
-  /** Direct surface normal
-   *
-   */
-  void DemShape::directSurfaceNormal () {
-    double centerLookVect[3];
     // Check to make sure that the normal is pointing outward from the planet
     // surface. This is done by taking the dot product of the normal and
     // any one of the unitized xyz vectors. If the normal is pointing inward,
     // then negate it.
-
+    double centerLookVect[3];
     SpiceDouble pB[3];
     surfaceIntersection()->ToNaifArray(pB);
-    SpiceDouble mag;
-
-    // Return the normal vector
     unorm_c(pB, centerLookVect, &mag);
-    double dotprod = vdot_c((SpiceDouble *) &m_surfaceNormal[0], centerLookVect);
+    double dotprod = vdot_c((SpiceDouble *) &m_normal[0], centerLookVect);
     if (dotprod < 0.0)
-      vminus_c((SpiceDouble *) &m_surfaceNormal[0], (SpiceDouble *) &m_surfaceNormal[0]);
+      vminus_c((SpiceDouble *) &m_normal[0], (SpiceDouble *) &m_normal[0]);
+  }
+
+
+  /** 
+   * Calculate surface normal
+   */
+  void DemShape::calculateSurfaceNormal()  {
+    calculateEllipsoidalSurfaceNormal();
   }
 
 

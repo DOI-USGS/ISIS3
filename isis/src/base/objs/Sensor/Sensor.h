@@ -201,7 +201,7 @@ namespace Isis {
        *         target.
        */
       inline bool HasSurfaceIntersection() const {
-        return Shape()->hasIntersection();
+        return target()->shape()->hasIntersection();
 //        return m_shape->hasIntersection();
       };
 
@@ -286,20 +286,12 @@ namespace Isis {
       virtual double Resolution() {
         return 1.0;
       };
-
-    protected:
-//      bool m_hasIntersection; /**< This indicates if the surface point or look
-//                                  direction is valid. It is made protected so
-//                                  inheriting classes can change it if
-//                                  necessary.*/
-//      Cube *m_demCube;         //!< The cube containing the model
-//      SurfacePoint *m_surfacePoint; //!< Surface intersection point
+      void IgnoreElevationModel(bool ignore);
 
     private:
       //! This version of DemRadius is for SetLookDirection ONLY. Do not call.
-      //DAC TODO Why are next 2 declarations here? Don't move until I know
+      //DAC TODO Why is next declaration here? Don't move until I know
 //      double DemRadius(double lat, double lon);
-      double EmissionAngle(const std::vector<double> & sB) const;
       void CommonInitialize(const std::string &demCube);
 
       SpiceDouble m_lookB[3];  //!< Look direction in body fixed
@@ -308,18 +300,7 @@ namespace Isis {
       SpiceDouble m_ra;     //!< Right ascension (sky longitude)
       SpiceDouble m_dec;    //!< Decliation (sky latitude)
       void computeRaDec();  //!< Computes the ra/dec from the look direction
-
-      //      bool m_hasElevationModel;     //!< Does sensor use an elevation model
-      //      Projection *m_demProj;  //!< The projection of the model
-      //      Portal *m_portal;       //!< Buffer used to read from the model
-      //      Interpolator *m_interp; //!< Use bilinear interpolation from dem
       bool SetGroundLocal(bool backCheck);   //!<Computes look vector
-
-      //      Distance *m_minRadius;  //!< Minimum radius value in DEM file
-      //      Distance *m_maxRadius;  //!< Maximum radius value in DEM file
-      //      double m_demScale;      //!< Scale of DEM file in pixels per degree
-      // ShapeModel *m_shape;            //!< Shape model
-      // EllipsoidShape *m_ellipsoid;        //!< Ellipsoid shape model for target
   };
 };
 

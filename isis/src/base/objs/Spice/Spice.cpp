@@ -36,7 +36,7 @@
 #include "iTime.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
-#include "ShapeModelFactory.h"
+// #include "ShapeModelFactory.h"
 #include "Target.h"
 
 #include "getSpkAbCorrState.hpp"
@@ -133,10 +133,10 @@ namespace Isis {
     m_spkBodyCode = new SpiceInt;
 
     // set shape and ellipsoid models
-    m_shape = ShapeModelFactory::Create(lab);
+    // m_shape = ShapeModelFactory::Create(lab);
 
-    m_ellipsoid = NULL;
-    m_ellipsoid = new EllipsoidShape(lab);
+    // m_ellipsoid = NULL;
+    // m_ellipsoid = new EllipsoidShape(lab);
 
     m_naifKeywords = new PvlObject("NaifKeywords");
 
@@ -221,8 +221,8 @@ namespace Isis {
     *m_sclkCode = *m_spkCode;
     *m_ckCode   = *m_ikCode;
 
-    if (m_target->isSky()) 
-      m_target->setSky(*m_spkCode);
+    // if (m_target->isSky()) 
+    //   m_target->setSky(*m_spkCode);
     // PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
     // *m_target = inst["TargetName"][0];
 
@@ -232,16 +232,17 @@ namespace Isis {
     //   m_sky = true;
     // }
     // else {
+    if (!m_target->isSky()) {
       // *m_bodyCode = NaifBodyCode();
-      iString radiiKey = "BODY" + iString((BigInt)m_target->naifBodyCode()) + "_RADII";
-
-      m_radii[0] = Distance(getDouble(radiiKey, 0), Distance::Kilometers);
-      m_radii[1] = Distance(getDouble(radiiKey, 1), Distance::Kilometers);
-      m_radii[2] = Distance(getDouble(radiiKey, 2), Distance::Kilometers);
-
+      iString radiiKey = "BODY" + iString((BigInt) m_target->naifBodyCode()) + "_RADII";
+      Distance radii[3];
+      radii[0] = Distance(getDouble(radiiKey, 0), Distance::Kilometers);
+      radii[1] = Distance(getDouble(radiiKey, 1), Distance::Kilometers);
+      radii[2] = Distance(getDouble(radiiKey, 2), Distance::Kilometers);
+      // m_target doesn't have the getDouble method so Spice gets the radii for it
+      m_target->setRadii(radii);
     //   m_sky = false;
-    // }
-    // *m_spkBodyCode = *m_bodyCode;
+    }
     *m_spkBodyCode = m_target->naifBodyCode();
 
     // Override them if they exist in the labels
@@ -299,7 +300,7 @@ namespace Isis {
 
     m_instrumentRotation = new SpiceRotation(*m_ckCode);
     m_instrumentPosition = new SpicePosition(*m_spkCode, *m_spkBodyCode);
-    m_sunPosition = new SpicePosition(10, *m_bodyCode);
+    m_sunPosition = new SpicePosition(10, m_target->naifBodyCode());
 
     // Check to see if we have nadir pointing that needs to be computed &
     // See if we have table blobs to load
@@ -411,10 +412,10 @@ namespace Isis {
       m_et = NULL;
     }
 
-    // if (m_target != NULL) {
-    //   delete m_target;
-    //   m_target = NULL;
-    // }
+    if (m_target != NULL) {
+      delete m_target;
+      m_target = NULL;
+    }
 
     if (m_startTime != NULL) {
       delete m_startTime;
@@ -491,14 +492,19 @@ namespace Isis {
       m_spkBodyCode = NULL;
     }
 
-    if (m_shape != NULL) {
-      delete m_shape;
-        m_shape = NULL;
-    }
+    // if (m_shape != NULL) {
+    //   delete m_shape;
+    //     m_shape = NULL;
+    // }
    
-    if (m_ellipsoid != NULL) {
-      delete m_ellipsoid;
-      m_ellipsoid = NULL;
+    // if (m_ellipsoid != NULL) {
+    //   delete m_ellipsoid;
+    //   m_ellipsoid = NULL;
+    // }
+ 
+   if (m_target != NULL) {
+      delete m_target;
+        m_target = NULL;
     }
 
 
@@ -517,20 +523,6 @@ namespace Isis {
     NaifStatus::CheckErrors();
   }
 
-  /**
-   * This allows you to ignore the elevation model
-   *
-   * @param ignore True if the elevation model is ignored
-   **/
-  void Spice::IgnoreElevationModel(bool bIgnore) {
-    
-    if (bIgnore) {
-      if (m_ellipsoid != NULL)
-        delete m_ellipsoid;
-
-      m_ellipsoid = new EllipsoidShape(m_radii);
-    }
-  }
 
   /**
    * This method creates an internal cache of spacecraft and sun positions over a
@@ -675,21 +667,6 @@ namespace Isis {
 
     return iTime();
   }
-
-
-  //NO CALL TO THIS METHOD IS FOUND IN ISIS.  COMMENT OUT AND SAVE FOR AT LEAST 3 MONTHS
-  //IF NO NEED IS FOUND FOR IT, DELETE METHOD.
-  // 2011-02-08 JEANNIE WALLDREN
-//???
-//???  /**
-//???   * See previous CreateCache method. This method simply invokes that one with
-//???   * the same start and end time and a cache size of one.
-//???   *
-//???   * @param time Ephemeris time to cache
-//???   */
-//???  void Spice::createCache(double time, double tol) {
-//???    createCache(time, time, 1, tol);
-//???  }
 
   /**
    * Sets the ephemeris time and reads the spacecraft and sun position from the
@@ -1110,17 +1087,17 @@ namespace Isis {
   /**
    * Returns shape model
    */
-  ShapeModel *Spice::Shape() const {
+  ShapeModel *Spice::shape() const {
     return m_shape;
   }
   
   
-  /**
-   * Returns ellipsoid
-   */
-  EllipsoidShape *Spice::Ellipsoid() const {
-    return m_ellipsoid;
-  }
+  // /**
+  //  * Returns ellipsoid
+  //  */
+  // EllipsoidShape *Spice::ellipsoid() const {
+  //   return m_ellipsoid;
+  // }
 
 
   /**
@@ -1233,11 +1210,21 @@ namespace Isis {
 
 
   /**
+    * Returns a pointer to the target object
+    *
+    * @return string
+    */
+  Target *Spice::target() const {
+    return m_target;
+  }
+
+
+  /**
     * Returns the string name of the target
     *
     * @return string
     */
-  iString Spice::target() const {
+  iString Spice::targetName() const {
     return m_target->name();
   }
   
@@ -1247,9 +1234,9 @@ namespace Isis {
     *
     * @return string
     */
-  iString Spice::shapeName() const {
-    return m_shape->name();
-  }
+  // iString Spice::shapeName() const {
+  //   return m_shape->name();
+  // }
 
 
   /**

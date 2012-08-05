@@ -15,6 +15,7 @@ namespace Isis {
    */
   ShapeModel::ShapeModel() {
     Initialize();
+    m_target = NULL;
   }
 
 
@@ -23,19 +24,22 @@ namespace Isis {
    *
    * @param pvl Valid Isis3 cube label.
    */
-  ShapeModel::ShapeModel(Pvl &pvl) {
+  ShapeModel::ShapeModel(Target *target, Pvl &pvl) {
     Initialize();
+    m_target = target;
   }
 
 
   /**
    * Initialize the ShapeModel private variables.
    *
-   * @param pvl Valid Isis3 cube label.
+   * @param target Valid Isis3 target.
    */
-  ShapeModel::ShapeModel(Distance radii[3]) {
+  // ShapeModel::ShapeModel(Distance radii[3]) {
+  ShapeModel::ShapeModel(Target *target) {
     Initialize();
-    setRadii(radii);
+    // setRadii(radii);
+    m_target = target;
   }
 
 
@@ -48,10 +52,10 @@ namespace Isis {
     m_surfacePoint = NULL;
     m_tolerance = new double();
     *m_tolerance = 0.0;
-    m_radii[0] = m_radii[1] = m_radii[2] = Distance();
+    // m_radii new Distance[3];
     m_hasIntersection = false;
     m_hasNormal = false;
-    m_surfaceNormal.resize(3,0.);
+    m_normal.resize(3,0.);
   }
 
   //! Destroys the ShapeModel
@@ -69,6 +73,94 @@ namespace Isis {
   }
 
 
+  /** Calculate ellipsoidal surface normal
+   *
+   */
+  void ShapeModel::calculateEllipsoidalSurfaceNormal()  {
+    // The below code is not truly normal unless the ellipsoid is a sphere.  TODO Should this be
+    // fixed? Send an email asking Jeff and Stuart.  See Naif routine surfnm.c to get the true 
+    // for an ellipsoid.  For testing purposes to match old results do as Isis3 currently does until
+    // Jeff and Stuart respond.
+
+   if ( !m_hasIntersection ) {
+     Isis::iString msg = "A valid intersection must be defined before computing the surface normal";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+   }
+
+   // Get the coordinates of the current surface point
+    SpiceDouble pB[3];
+    pB[0] = surfaceIntersection()->GetX().kilometers();
+    pB[1] = surfaceIntersection()->GetY().kilometers();
+    pB[2] = surfaceIntersection()->GetZ().kilometers();
+
+    // SpiceDouble normal[3];
+    // surfnm_c(kilometers(m_radii[0]), kilometers(m_radii[1]), kilometers(m_radii[2], pB, normal);
+
+    // Unitize the vector
+    SpiceDouble upB[3];
+    SpiceDouble dist;
+    unorm_c(pB, upB, &dist);
+    memcpy(&m_normal[0], upB, sizeof(double) * 3);
+    m_hasNormal = true;
+  }
+
+
+  /**
+   * Returns the emission angle in degrees. 
+   *
+   * @return double
+   */
+  double ShapeModel::emissionAngle(const std::vector<double> & sB)  {
+
+    // Calculate the surface normal if we haven't yet
+    if (!hasNormal()) calculateDefaultNormal();
+
+    // Get vector from center of body to surface point
+    SpiceDouble pB[3];
+    pB[0] = surfaceIntersection()->GetX().kilometers();
+    pB[1] = surfaceIntersection()->GetY().kilometers();
+    pB[2] = surfaceIntersection()->GetZ().kilometers();
+
+    // Get vector from surface point to observer and normalize it
+    SpiceDouble psB[3], upsB[3], dist;
+    vsub_c((ConstSpiceDouble *) &sB[0], pB, psB);
+    unorm_c(psB, upsB, &dist);
+
+    double angle = vdot_c((SpiceDouble *) &m_normal[0], upsB);
+    if(angle > 1.0) return 0.0;
+    if(angle < -1.0) return 180.0;
+    return acos(angle) * 180.0 / PI;
+  }
+
+
+  /**
+   * Returns the incidence angle in degrees. This does not use the surface model.
+   *
+   * @return @b double Incidence angle, in degrees.
+   */
+  double ShapeModel::incidenceAngle(const std::vector<double> &uB) {
+
+    // Calculate the surface normal if we haven't yet.
+    if (!m_hasNormal) calculateDefaultNormal();
+
+    // Get vector from center of body to surface point
+    SpiceDouble pB[3];
+    pB[0] = surfaceIntersection()->GetX().kilometers();
+    pB[1] = surfaceIntersection()->GetY().kilometers();
+    pB[2] = surfaceIntersection()->GetZ().kilometers();
+
+    // Get vector from surface point to sun and normalize it
+    SpiceDouble puB[3], upuB[3], dist;
+    vsub_c((SpiceDouble *) &uB[0], pB, puB);
+    unorm_c(puB, upuB, &dist);
+
+    double angle = vdot_c((SpiceDouble *) &m_normal[0], upuB);
+    if(angle > 1.0) return 0.0;
+    if(angle < -1.0) return 180.0;
+    return acos(angle) * 180.0 / PI;
+  }
+
+
   /** Find the intersection point on the ellipsoid model
    * 
    */
@@ -83,9 +175,10 @@ namespace Isis {
     memcpy(lookB,&observerLookVectorToTarget[0], 3*sizeof(double));
 
     // get target radii
-    SpiceDouble a = m_radii[0].kilometers();
-    SpiceDouble b = m_radii[1].kilometers();
-    SpiceDouble c = m_radii[2].kilometers();
+    Distance *radii = m_target->radii();
+    SpiceDouble a = radii[0].kilometers();
+    SpiceDouble b = radii[1].kilometers();
+    SpiceDouble c = radii[2].kilometers();
 
     // check if observer look vector intersects the target
     SpiceDouble intersectionPoint[3];
@@ -104,10 +197,40 @@ namespace Isis {
   }
 
 
+  /**
+   * Returns the phase angle in degrees.
+   *
+   * @return @b double Phase angle, in degrees.
+   */
+  double ShapeModel::phaseAngle(const std::vector<double> & sB, const std::vector<double> &uB) {
+
+    // Get vector from center of body to surface point
+    SpiceDouble pB[3];
+    pB[0] = surfaceIntersection()->GetX().kilometers();
+    pB[1] = surfaceIntersection()->GetY().kilometers();
+    pB[2] = surfaceIntersection()->GetZ().kilometers();
+
+    // Get vector from surface point to observer and normalize it
+    SpiceDouble psB[3], upsB[3], dist;
+    vsub_c((SpiceDouble *) &sB[0], pB, psB);
+    unorm_c(psB, upsB, &dist);
+
+    // Get vector from surface point to sun and normalize it
+    SpiceDouble puB[3], upuB[3];
+    vsub_c((SpiceDouble *) &uB[0], pB, puB);
+    unorm_c(puB, upuB, &dist);
+
+    double angle = vdot_c(upsB, upuB);
+    if(angle > 1.0) return 0.0;
+    if(angle < -1.0) return 180.0;
+    return acos(angle) * 180.0 / PI;
+  }
+
+
   /** Return the surface intersection
    *
    */
-  SurfacePoint *ShapeModel::surfaceIntersection() {
+  SurfacePoint *ShapeModel::surfaceIntersection() const {
     return m_surfacePoint;
   }
 
@@ -123,63 +246,31 @@ namespace Isis {
   /** Return surface point normal status
    *
    */
-  bool ShapeModel::hasNormal() {
+  bool ShapeModel::hasNormal() const {
     return m_hasNormal;
   }
 
 
-  /** Return the surface normal of the current intersection point.
+  /** Return the local normal of the current intersection point.
    *
    */
-  std::vector<double> ShapeModel::surfaceNormal() {
-    if ( m_hasNormal )
-      return surfaceNormal();
-    std::string message = "The surface normal has not been computed.";
+  void ShapeModel::normal(std::vector<double> normal) {
+    if (m_hasNormal ) {
+      std::vector<double> normal(3);
+      normal = m_normal;
+    }
+
+    std::string message = "The local normal has not been computed.";
     throw IException(IException::Unknown, message, _FILEINFO_);
   }
 
-
-  /** Calculate the emission angle at the current intersection point.
-   *
-   * This method returns the emission angle at the current intersection point.
-   *
+  /**
+   * Returns the radii of the body in km. The radii are obtained from the
+   * target.
    */
-  //virtual double ShapeModel::EmissionAngle() {
-  //  if ( !m_hasNormal ) SurfaceNormal();
-  //  double emissionAngle = 0.0;
-  //  return emissionAngle;
-  //}
-
-
-  /** Calculate the incidence angle at the current intersection point.
-   *
-   * This method returns the incidence angle at the current intersection point.
-   *
-   */
-  //virtual double ShapeModel::IncidenceAngle() {
-  //  if ( !m_hasNormal ) SurfaceNormal();
-  //  double incidenceAngle = 0.0;
-  //  return incidenceAngle;
-  //}
-  
-  
-  /** Calculate the phase angle at the current intersection point.
-   *
-   * This method returns the phase angle at the current intersection point.
-   *
-   */
-  //virtual double ShapeModel::PhaseAngle() {
-  //  if ( !m_hasNormal ) SurfaceNormal();
-  //  double phaseAngle=0.0;
-  //  return phaseAngle;
-  //}
-  
-  
-  /** Calculate the phase angle at the current intersection point.
-   *
-   * This method returns the phase angle at the current intersection point.
-   *
-   */
+  Distance *ShapeModel::targetRadii() const {
+    return m_target->radii();
+  }
 
 
   /** Set the shape name
@@ -214,6 +305,14 @@ namespace Isis {
   }
 
 
+  /** Set surface normal
+   *
+   */
+  // void ShapeModel::setSurfaceNormal(const std::vector<double> normalB) const{
+  //   m_surfaceNormal  = normalB;
+  // }
+
+
   /** Set  tolerance for acceptance in iterative loops
    *
    */
@@ -225,9 +324,9 @@ namespace Isis {
   /** Return triaxial target radii from shape model
    *
    */
-  Distance *ShapeModel::targetRadii() {
-     return  m_radii;
-  }
+  // Distance *ShapeModel::targetRadii() {
+  //    return  m_radii;
+  // }
 
 
   /** Return the tolerance for acceptance in iterative loops
@@ -241,11 +340,11 @@ namespace Isis {
   /** Set the radii
    *
    */
-  void ShapeModel::setRadii(Distance radii[3]) {
-    m_radii[0] = radii[0];
-    m_radii[1] = radii[1];
-    m_radii[2] = radii[2];
-  }
+  // void ShapeModel::setRadii(Distance radii[3]) {
+  //   m_radii[0] = radii[0];
+  //   m_radii[1] = radii[1];
+  //   m_radii[2] = radii[2];
+  // }
 
 
 }

@@ -31,45 +31,42 @@
 #include "IException.h"
 #include "iString.h"
 #include "FileName.h"
-#include "FileName.h"
 #include "Projection.h"
 #include "PvlGroup.h"
 
 namespace Isis {
 
-  ShapeModel *ShapeModelFactory::Create(Pvl &pvl) {
+  ShapeModel *ShapeModelFactory::Create(Target *target, Pvl &pvl) {
     
     // get kernels and instrument Pvl groups
     PvlGroup &kernelsPvlGroup = pvl.FindGroup("Kernels", Pvl::Traverse);
-    PvlGroup &instrumentPvlGroup = pvl.FindGroup("Instrument", Pvl::Traverse);
+    // PvlGroup &instrumentPvlGroup = pvl.FindGroup("Instrument", Pvl::Traverse);
     
     // get target name from instrument Pvl group
-    iString targetName = instrumentPvlGroup["TargetName"][0];
+    // iString targetName = instrumentPvlGroup["TargetName"][0];
+    std::cout << "Target name = " << target->name() << std::endl;
+
 
     // handle "sky" target
     // TODO Deal with sky images.  Stuart suggested dealing with Sky images in a Target class.
-    bool bSkyTarget = false; // TODO Do we need a sky shape model, member variable, or neither?
-    if (targetName.UpCase() == "SKY") {
-      bSkyTarget = true;
+    bool skyTarget = false; // TODO Do we need a sky shape model, member variable, or neither?
+    // if (targetName.UpCase() == "SKY") {
+    if (target->name().UpCase() == "SKY") {
+      skyTarget = true;
 
       // right now, I'm just gonna quit if this is a sky thing
       iString msg =
           "In ShapeModelFactory::Create(Pvl &pvl), SKY target encountered, " \
           "not gonna mess with it for now.";
           throw IException(IException::Unknown, msg, _FILEINFO_);
-
-      // TODO: Do we really need a m_radii member variable here in the shape
-      // model factory?
-      
-      // m_radii[0] = m_radii[1] = m_radii[2] = Distance(1000.0, Distance::Meters);
     }
 
     // Determine if target is a plane??? target name has rings in it? 
     // Another keyword in label to indicate plane? What about lander/rovers?
-    //bool bPlaneTarget = false;
+    // bool planeTarget = false;
     
     // shape model file name
-    std::string shapeModelFilename = "";
+    std::string shapeModelFilenames = "";
 
     // TODO: We differentiate between "Elevation" and "Shape" models on the
     // labels, but we assign either one to the shapeModelFilename. Do we
@@ -77,13 +74,13 @@ namespace Isis {
     // is this historical? Interchangeable?
     if (kernelsPvlGroup.HasKeyword("ElevationModel") &&
         !kernelsPvlGroup["ElevationModel"].IsNull() &&
-        !bSkyTarget) {
-      shapeModelFilename = (std::string) kernelsPvlGroup["ElevationModel"];
+        !skyTarget) {
+      shapeModelFilenames = (std::string) kernelsPvlGroup["ElevationModel"];
     }
     else if(kernelsPvlGroup.HasKeyword("ShapeModel") &&
             !kernelsPvlGroup["ShapeModel"].IsNull() &&
-            !bSkyTarget) {
-      shapeModelFilename = (std::string) kernelsPvlGroup["ShapeModel"];
+            !skyTarget) {
+      shapeModelFilenames = (std::string) kernelsPvlGroup["ShapeModel"];
     }
 
     // Create shape model
@@ -91,18 +88,19 @@ namespace Isis {
 
     // TODO: If there is no shape model filename, the shape model type defaults to an
     // ellipsoid (should it?).
-    if (shapeModelFilename == "") {
-      shapeModel = new EllipsoidShape(pvl);
+    if (shapeModelFilenames == "") {
+      shapeModel = new EllipsoidShape(target);
     }
- //   else if (shape == "Plane") {
- //     shapeModel = new PlaneShape(pvl);
- //}
+    // else if (shapeModelFilenames == "RingPlane") {
+    //  shapeModel = new PlaneShape(target, pvl);
+    // }
     else {
       // Is the shape model an Isis DEM?
+      // TODO Deal with stacks -- this could be a list of DEMs
       try {
         // first, try to open the shape model file as an Isis3 cube
         Isis::Cube shapeModelCube;
-        shapeModelCube.open(shapeModelFilename, "r" );
+        shapeModelCube.open(shapeModelFilenames, "r" );
         
         //Pvl *label = tmpCube.getLabel();
         //PvlGroup &mappingPvlGroup = label->FindGroup("Mapping", Isis::Pvl::Traverse);
@@ -118,12 +116,12 @@ namespace Isis {
 
         // Next, check if ISIS DEM cube is an equatorial cylindrical projection
         if (projection->IsEquatorialCylindrical())
-          shapeModel = new EquatorialCylindricalShape(pvl);
+          shapeModel = new EquatorialCylindricalShape(target, pvl);
         else 
-          shapeModel = new DemShape(pvl);
+          shapeModel = new DemShape(target, pvl);
       }
       catch (IException &e) {
-        iString msg = "Shape file" + shapeModelFilename + " is not supported";
+        iString msg = "Shape file" + shapeModelFilenames + " is not supported";
         throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
     }

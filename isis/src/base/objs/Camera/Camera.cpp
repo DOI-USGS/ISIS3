@@ -104,7 +104,7 @@ namespace Isis {
     p_raDecRangeComputed = false;
     p_pointComputed = false;
 
-    Shape()->setTolerance(Resolution()/100.0);
+    target()->shape()->setTolerance(Resolution()/100.0);
   }
 
   //! Destroys the Camera Object
@@ -161,7 +161,7 @@ namespace Isis {
 
     // get shape
     // TODO: we need to validate this pointer (somewhere)
-    ShapeModel *shape = Shape();
+    ShapeModel *shape = target()->shape();
 
     // Case of no map projection
     if(p_projection == NULL || p_ignoreProjection) {
@@ -250,7 +250,7 @@ namespace Isis {
       return RawFocalPlanetoImage();
     }
 
-    Shape()->setHasSurfaceIntersection(false);
+    target()->shape()->setHasSurfaceIntersection(false);
     return false;
   }
 
@@ -268,7 +268,7 @@ namespace Isis {
     Distance localRadius(LocalRadius(latitude, longitude));
 
     if(!localRadius.isValid()) {
-      Shape()->setHasSurfaceIntersection(false);
+      target()->shape()->setHasSurfaceIntersection(false);
       return false;
     }
 
@@ -287,8 +287,9 @@ namespace Isis {
    *              false if it was not
    */
   bool Camera::SetGround(const SurfacePoint & surfacePt) {
+    ShapeModel *shape = target()->shape();
     if(!surfacePt.Valid()) {
-      Shape()->setHasSurfaceIntersection(false);
+      shape->setHasSurfaceIntersection(false);
       return false;
     }
 
@@ -297,7 +298,7 @@ namespace Isis {
       return RawFocalPlanetoImage();
     }
 
-    Shape()->setHasSurfaceIntersection(false);
+    shape->setHasSurfaceIntersection(false);
     return false;
   }
 
@@ -315,7 +316,7 @@ namespace Isis {
     
     // get shape
     // TODO: we need to validate this pointer (somewhere)
-    ShapeModel *shape = Shape();
+    ShapeModel *shape = target()->shape();
    
     //cout << "undistorted focal plane: " << ux << " " << uy << endl; //debug
     //cout.precision(15);
@@ -389,7 +390,7 @@ namespace Isis {
       return RawFocalPlanetoImage();  // sets p_hasIntersection
     }
 
-   Shape()->setHasSurfaceIntersection(false);
+    target()->shape()->setHasSurfaceIntersection(false);
    return false;
   }
 
@@ -784,9 +785,9 @@ namespace Isis {
    */
   void Camera::BasicMapping(Pvl &pvl) {
     PvlGroup map("Mapping");
-    map += PvlKeyword("TargetName", target());
+    map += PvlKeyword("TargetName", target()->name());
 
-    Distance *radii = Shape()->targetRadii();
+    Distance *radii = target()->radii();
     map += PvlKeyword("EquatorialRadius", radii[0].meters(), "meters");
     map += PvlKeyword("PolarRadius", radii[2].meters(), "meters");
     
@@ -855,7 +856,7 @@ namespace Isis {
                 return true;
               }
             }
-            else if(Shape()->hasIntersection()) {
+            else if(target()->shape()->hasIntersection()) {
               if(p_projection->SetUniversalGround(UniversalLatitude(),
                                                   UniversalLongitude())) {
                 p_childSample = p_projection->WorldX();
@@ -880,15 +881,13 @@ namespace Isis {
    *
    */
   void Camera::GetLocalNormal(double normal[3]) {
+    // TODO ** Can the logic here be simplified???
 
     // As documented in the doxygen above, the goal of this method is to
-    // calculate a normal vector to the surface using the DEM instead of the
-    // ellipsoid
+    // calculate a normal vector to the surface using the 4 corner surrounding points.
     double samp = Sample();
     double line = Line();
 
-    SurfacePoint surfacePoint = GetSurfacePoint();
-    
     // order of points in vector is top, bottom, left, right
     QList< QPair< double, double > > surroundingPoints;
     surroundingPoints.append(qMakePair(samp, line - 0.5));
@@ -896,53 +895,62 @@ namespace Isis {
     surroundingPoints.append(qMakePair(samp - 0.5, line));
     surroundingPoints.append(qMakePair(samp + 0.5, line));
 
-    // save state
+    // save input state to be restored on return
     bool computed = p_pointComputed;
     double originalSample = samp;
     double originalLine = line;
 
-    // now we have all four points in the image, so find the same points in the
-    // dem
-    // QVector< double * > lookVects(4);
-    // for (int i = 0; i < lookVects.size(); i++)
-    //   lookVects[i] = new double[3];
+    // now we have all four points in the image, so find the same points on the surface
+    QVector<double *> cornerNeighborPoints(4);
 
-    // Make sure we have a DemShape TODO
-    DemShape *shape = (DemShape *) Shape();
+    // DemShape *shape = (DemShape *) Shape();
+    for (int i = 0; i < cornerNeighborPoints.size(); i ++)
+      cornerNeighborPoints[i] = new double[3];
 
-    for (int i = 0; i < surroundingPoints.size(); i ++) {
+    Latitude lat;
+    Longitude lon;
+    Distance radius;
+    ShapeModel *shapeModel = shape();
+
+    for (int i = 0; i < cornerNeighborPoints.size(); i ++) {
+      // If a surrounding point fails, set it to the original point
       if (!(SetImage(surroundingPoints[i].first, surroundingPoints[i].second))) {
         surroundingPoints[i].first = samp;
         surroundingPoints[i].second = line;
+
+        // If the original point fails too, we can't get a normal.  Clean up and return.
         if (!(SetImage(surroundingPoints[i].first, surroundingPoints[i].second))) {
           normal[0] = 0.;
           normal[1] = 0.;
           normal[2] = 0.;
-          // restore state
+
+          // restore input state
           if(computed) {
             SetImage(originalSample, originalLine);
-          } else {
+          } 
+          else {
             p_pointComputed = false;
           }
 
           // free memory
-          // for (int i = 0; i < lookVects.size(); i++)
-          //   delete [] lookVects[i];
-          shape->removeLocalAreaPoints();
+          for (int i = 0; i < cornerNeighborPoints.size(); i++)
+            delete [] cornerNeighborPoints[i];
 
           return;
         }
       }
 
-      shape->setLocalAreaPoint();
-      // Latitude demLat = surfacePoint.GetLatitude();
-      // Longitude demLon = surfacePoint.GetLongitude();
-      // Distance demRadius = Shape()->localRadius(demLat, demLon);
+      SurfacePoint surfacePoint = GetSurfacePoint();
+      lat = surfacePoint.GetLatitude();
+      lon = surfacePoint.GetLongitude();
+      radius = LocalRadius(lat, lon);
 
-      // latrec_c(demRadius.kilometers(), demLon.radians(),
-      //          demLat.radians(), lookVects[i]);
+      latrec_c(radius.kilometers(), lon.radians(),
+               lat.radians(), cornerNeighborPoints[i]);
     }
 
+    // if the first 2 surrounding points match or the last 2 surrounding points match, 
+    // we can't get a normal.  Clean up and return. 
     if ((surroundingPoints[0].first == surroundingPoints[1].first &&
         surroundingPoints[0].second == surroundingPoints[1].second) ||
        (surroundingPoints[2].first == surroundingPoints[3].first &&
@@ -950,87 +958,44 @@ namespace Isis {
       normal[0] = 0.;
       normal[1] = 0.;
       normal[2] = 0.;
-      // restore state
-      if(computed) {
+
+      // restore input state
+      if (!computed) {
         SetImage(originalSample, originalLine);
       } else {
         p_pointComputed = false;
       }
 
       // free memory
-      // for (int i = 0; i < lookVects.size(); i++)
-      //   delete [] lookVects[i];
-      shape->removeLocalAreaPoints();
+      for (int i = 0; i < cornerNeighborPoints.size(); i++)
+        delete [] cornerNeighborPoints[i];
 
       return;
     }
 
-    shape->calculateSurfaceNormal();
-    // subtract bottom from top and left from right and store results
-    // double topMinusBottom[3];
-    // vsub_c(lookVects[0], lookVects[1], topMinusBottom);
-    // double rightMinusLeft[3];
-    // vsub_c(lookVects[3], lookVects[2], rightMinusLeft);
-
-    // // take cross product of subtraction results to get normal
-    // ucrss_c(topMinusBottom, rightMinusLeft, normal);
-
-    // // unitize normal (and do sanity check for magnitude)
-    // double mag;
-    // unorm_c(normal, normal, &mag);
-    // if (mag == 0.0) {
-    //   normal[0] = 0.;
-    //   normal[1] = 0.;
-    //   normal[2] = 0.;
-      // restore state
-
-    if (shape->hasNormal()) {
-      if (computed) {
-        // SetImage(originalSample, originalLine);
-      } else {
-        p_pointComputed = false;
-      }
-
-      // free memory
-      // for (int i = 0; i < lookVects.size(); i++)
-      //   delete [] lookVects[i];
-      shape->removeLocalAreaPoints();
-
-      return;
-    }
-
-    // double centerLookVect[3];
+    // Restore input state to original point before calculating normal
     SetImage(originalSample, originalLine);
-    shape->directSurfaceNormal();
+    shapeModel->calculateLocalNormal(cornerNeighborPoints);
 
-    // Check to make sure that the normal is pointing outward from the planet
-    // surface. This is done by taking the dot product of the normal and
-    // any one of the unitized xyz vectors. If the normal is pointing inward,
-    // then negate it.
-
-    // SpiceDouble pB[3];
-    // pB[0] = surfacePoint.GetX().kilometers();
-    // pB[1] = surfacePoint.GetY().kilometers();
-    // pB[2] = surfacePoint.GetZ().kilometers();
-
-    // unorm_c(pB, centerLookVect, &mag);
-    // double dotprod = vdot_c(normal,centerLookVect);
-    // if (dotprod < 0.0)
-    //   vminus_c(normal, normal);
-
-    // restore state
-    if(computed) {
-      SetImage(originalSample, originalLine);
+    // free memory
+    for (int i = 0; i < cornerNeighborPoints.size(); i++)
+      delete [] cornerNeighborPoints[i];
+ 
+    // restore input state if calculation failed and clean up.
+    if (!shapeModel->hasNormal()) {
+       p_pointComputed = false;
+      return;
     }
-    else {
+
+    // restore failed computed state
+    if (!computed) {
       p_pointComputed = false;
     }
 
-    // free memory
-    // for (int i = 0; i < lookVects.size(); i++)
-    //   delete [] lookVects[i];
-    shape->removeLocalAreaPoints();
-    memcpy(normal, (double *) &shape->surfaceNormal()[0], sizeof(double) * 3);
+    // Set the method normal values
+    std::vector<double> localNormal(3);
+    shapeModel->normal(localNormal);
+    memcpy(normal, (double *) &localNormal[0], sizeof(double) * 3);
   }
 
 

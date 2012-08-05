@@ -58,7 +58,7 @@ namespace Isis {
   class DemShape : public ShapeModel {
     public:
       //! Constructor
-      DemShape(Isis::Pvl &pvl);
+      DemShape(Target *target, Isis::Pvl &pvl);
 
       //! Destructor
       ~DemShape();
@@ -69,23 +69,22 @@ namespace Isis {
 
       Distance localRadius(const Latitude &lat, const Longitude &lon);
 
+      //! Calculate the phase angle of the current intersection point
+      double phaseAngle(const std::vector<double> & sB, const std::vector<double> &uB);
+
       //! Return dem scale in pixels/degree
       double demScale();
 
-      void removeLocalAreaPoints();
+      //! Calculate the default normal of the current intersection point
+      virtual void calculateDefaultNormal(); 
 
       // To compute the surface normal, you must call setLocalAreaPoint on top, bottom, left, and 
       // right surrounding points in the image.  Then call calculateSurfaceNormal and 
       // directSurfaceNormal to calculate the normal.  Use removeLOcalAreaPoints to clean up as
       // needed.  See Camera for an example, or use its GetLocalNormal method.
-      //! Set a local area around the current intersection point 
-      void setLocalAreaPoint();  // Caller handles error checking
-
       //! Calculate the surface normal of the current intersection point
-      void calculateSurfaceNormal(); 
-
-      //! Set the direction of the surface normal of the current intersection point
-      void directSurfaceNormal(); 
+     void calculateLocalNormal(QVector<double *> cornerNeighborPoints) ; 
+     void calculateSurfaceNormal(); 
 
     protected:
       Cube *m_demCube;        //!< The cube containing the model  NOTE::  TODO maybe make this a method that returns ptr to cube
@@ -108,7 +107,6 @@ namespace Isis {
                                      //   points to intersection point
 
       // From Sensor.h
-      /* double EmissionAngle(const std::vector<double> & sB) const; */
       /* void CommonInitialize(const std::string &demCube); */
       /* bool p_newLookB;      //!< flag to indicate we need to recompute ra/dec */
       /* SpiceDouble p_ra;     //!< Right ascension (sky longitude) */
