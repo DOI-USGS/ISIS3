@@ -70,7 +70,7 @@ namespace Isis {
       Distance localRadius(const Latitude &lat, const Longitude &lon);
 
       //! Calculate the phase angle of the current intersection point
-      double phaseAngle(const std::vector<double> & sB, const std::vector<double> &uB);
+      //      double phaseAngle(const std::vector<double> & sB, const std::vector<double> &uB);
 
       //! Return dem scale in pixels/degree
       double demScale();

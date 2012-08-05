@@ -760,7 +760,7 @@ namespace Isis {
     //  Create temporary network for solution which will not contain measures for
     //  the basemap.
     ControlNet net;
-    net.SetTarget(p_matchCube->getCamera()->target());
+    net.SetTarget(p_matchCube->getCamera()->target()->name());
 
     // Bundle adjust to solve for new pointing
     try {
@@ -961,7 +961,7 @@ namespace Isis {
             if (pt->GetMeasure(m)->IsIgnored())
               pt->Delete(m);
           }
-          net.SetTarget(p_matchCube->getCamera()->target());
+          net.SetTarget(p_matchCube->getCamera()->target()->name());
           net.SetNetworkId("Qtie");
           net.SetUserName(Application::UserName());
           net.SetCreatedDate(Application::DateTime());

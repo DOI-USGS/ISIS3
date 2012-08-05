@@ -281,7 +281,7 @@ void IsisMain() {
     // If a user wants to see the seed network, write it out here
     if (ui.WasEntered("OSEEDNET")) {
       WriteCnet(ui.GetFileName("OSEEDNET"), gstack,
-                lhCamera->target(), serialLeft, serialRight);
+                lhCamera->target()->name(), serialLeft, serialRight);
     }
 
   }
@@ -474,7 +474,7 @@ void IsisMain() {
 
   // If a cnet file was entered, write the ControlNet pvl to the file
   if (ui.WasEntered("ONET")) {
-    WriteCnet(ui.GetFileName("ONET"), bmf, lhCamera->target(), serialLeft,
+    WriteCnet(ui.GetFileName("ONET"), bmf, lhCamera->target()->name(), serialLeft,
               serialRight);
   }
 
