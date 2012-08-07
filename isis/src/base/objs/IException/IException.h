@@ -91,6 +91,8 @@ namespace Isis {
    *                           an empty exception when using Format = Pvl. It
    *                           should (and must) be an empty string. This is
    *                           fixed -- fixes #755.
+   *   @history 2012-07-30 Jeff Anderson - Updated internal documentation
+   *                           to improve backward compatibility 
    */
   class IException : public std::exception {
     public:
@@ -100,6 +102,17 @@ namespace Isis {
        * indicates that the exception was thrown due to something the user did
        * wrong, such as provide a cube with no SPICE data to an application that
        * needed a spiceinit'd cube as input.
+       */
+
+       /*
+       * WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
+       * If at all possible do not change the enumeration values for the
+       * error codes.  The reason why is it that will change the return 
+       * status of error messages.  Ground data processing groups (e.g.,
+       * HiRISE, LROC, Messenger) will sometime test on the error return
+       * values in their scripts.  By keeping the enumerations the same
+       * we improve backward compatibility.
+       * WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
        */
       enum ErrorType {
         /**

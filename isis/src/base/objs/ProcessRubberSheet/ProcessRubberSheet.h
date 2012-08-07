@@ -92,7 +92,12 @@ namespace Isis {
    *   @history 2012-05-07 Jeff Anderson - Added the forward patch algorithm. 
    *   @history 2012-05-15 Jeff Anderson - Added UniqueCachingAlgorithm to 
    *                           reverse patch algorithm (startProcess)
-   *  
+   *   @history 2012-07-11 Jeff Anderson - Fixed a bug in the reverse patch
+   *                           algorithm.  When an input patch contains the
+   *                           0/360 seam (or -180/180) it caused stripes in
+   *                           certain output projections (cylindrical). 
+   *                           This has been fixed by making sure the output
+   *                           patch size is not too large.
    *  
    *   @todo 2005-02-11 Stuart Sides - finish documentation and add coded and
    *                        implementation example to class documentation

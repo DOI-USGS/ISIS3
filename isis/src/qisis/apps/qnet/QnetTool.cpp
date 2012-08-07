@@ -1460,16 +1460,17 @@ namespace Isis {
         QMessageBox::critical(p_qnetTool, "Error", message);
         return;
       }
-      //  Find closest control point in network
-      iString sn = g_serialNumberList->SerialNumber(file);
-      ControlPoint *point = g_controlNetwork->FindClosest(sn, samp, line);
 
-      if (point == NULL) {
+      if (!g_controlNetwork || g_controlNetwork->GetNumPoints() == 0) {
         QString message = "No points exist for editing.  Create points ";
         message += "using the right mouse button.";
         QMessageBox::warning(p_qnetTool, "Warning", message);
         return;
       }
+
+      //  Find closest control point in network
+      iString sn = g_serialNumberList->SerialNumber(file);
+      ControlPoint *point = g_controlNetwork->FindClosest(sn, samp, line);
 
       modifyPoint(point);
     }
