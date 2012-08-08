@@ -36,38 +36,46 @@ using namespace Isis;
 
 class MyShape : public ShapeModel {
   public:
-    MyShape(Pvl &lab) : Camera(lab) { }
+  MyShape(Target target, Pvl &lab) : ShapeModel (target, lab) { }
 
     bool intersectSurface(std::vector<double> observerPos,
                                     std::vector<double> lookDirection,
-                                    std::vector<double> targetPosition)  {
+                                    double tol=0)  {
       cout << "intersectSurface called with observer position = " << 
         observerPosition[0] << "," << observerPosition[1] << "," <<
         observerPosition[2] << endl << "                             lookDirection = " <<
         lookDirection[0] << "," <<  lookDirection[1] << ","  lookDirection[2] << 
-        endl << "                             targetPosition = " << targetPosition[0] << "," <<
-        targetPosition[1] << "," <<  targetPosition[2] << endl;
+        endl << "                             tolerance= " << tol  << endl;
       return true;
     }
 
-    virtual CameraType GetCameraType() const {
-      return Framing;
+    virtual void calculateDefaultNormal()  {
+      calculateSurfaceNormal();
     }
 
-    virtual int CkFrameId() const { return (-94000); }
-    virtual int CkReferenceId() const { return (1); }
-    virtual int SpkReferenceId() const { return (1); }
+    virtual void calculateLocalNormal(QVector<double *> cornerNeighborPoints) {
+      calculateSurfaceNormal();
+    }
+      
+      virtual void calculateSurfaceNormal() {
+      m_normal[0] = 1.;
+      m_normal[1] = 2;
+      m_normal[2] = 3.;
+    }
 };
 
 int main() {
   Preference::Preferences(true);
-  string inputFile = "$mgs/testData/ab102401.lev2.cub";
+  string inputFile = "$mgs/testData/ab102401.cub";
   Cube cube;
   cube.open(inputFile);
   Camera *c = NULL;
   c = cube.getCamera();
   Pvl pvl = *cube.getLabel();
-  MyCamera cam(pvl);
+  Target targ(pvl);
+  MyShape shape(targ, pvl);
+
+
   double line = 453.0;
   double sample = 534.0;
   Latitude lat(18.221, Angle::Degrees);

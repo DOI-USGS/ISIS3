@@ -58,7 +58,8 @@ namespace Isis {
 
       //! Intersect the shape model
       bool intersectSurface(std::vector<double> observerPos,
-                            std::vector<double> lookDirection);
+                            std::vector<double> lookDirection,
+                            double tol = 0.);
 
     private:
       Distance *m_minRadius;  //!< Minimum radius value in DEM file

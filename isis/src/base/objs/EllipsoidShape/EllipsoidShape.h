@@ -62,7 +62,8 @@ namespace Isis {
 
       //! Intersect the shape model
       bool intersectSurface(std::vector<double> observerPos,
-                            std::vector<double> lookDirection);
+                            std::vector<double> lookDirection,
+                            double tol = 0.);
 
       //! Calculate the default normal of the current intersection point
       virtual void calculateDefaultNormal(); 

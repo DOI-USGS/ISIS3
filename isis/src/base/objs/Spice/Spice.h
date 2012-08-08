@@ -323,7 +323,6 @@ namespace Isis {
       QVariant readStoredValue(iString key, SpiceValueType type, int index);
 
       ShapeModel *shape() const;
-      EllipsoidShape *ellipsoid() const;
 
       // Leave these protected so that inheriting classes don't
       // have to convert between double and spicedouble
@@ -341,7 +340,6 @@ namespace Isis {
                                   space so that conversions between double and
                                   SpiceDouble do not have to occur in inheriting
                                   classes.*/
-      Distance *m_radii; //!< The radii of the target
 
 
     private:
@@ -390,7 +388,6 @@ namespace Isis {
       Spice(const Spice &other);
       Spice &operator=(const Spice &other);
 
-      ShapeModel *m_shape;         //!< Shape model
       //      EllipsoidShape *m_ellipsoid; //!< Ellipsoid shape model for target 
   };
 }

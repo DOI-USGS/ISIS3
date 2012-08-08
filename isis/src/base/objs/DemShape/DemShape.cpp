@@ -114,7 +114,8 @@ namespace Isis {
    * In the future we may want to do a better job handling this special case.
    */
   bool DemShape::intersectSurface(vector<double> observerPos,
-                                  vector<double> lookDirection) {
+                                  vector<double> lookDirection,
+                                  double tol) {
 
     // try to intersect the target body ellipsoid as a first approximation
     // for the iterative DEM intersection method
@@ -143,8 +144,7 @@ namespace Isis {
     newIntersectPt[1] = surfaceIntersection()->GetY().kilometers();
     newIntersectPt[2] = surfaceIntersection()->GetZ().kilometers();
 
-    double tol2 = tolerance();
-    tol2 *= tol2;
+    double tol2 = tol * tol;
 
     while (!done) {
         

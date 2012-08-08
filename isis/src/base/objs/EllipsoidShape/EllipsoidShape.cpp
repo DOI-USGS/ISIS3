@@ -44,7 +44,8 @@ namespace Isis {
    *
    */
   bool EllipsoidShape::intersectSurface (std::vector<double> observerPos,
-                                         std::vector<double> lookDirection) {
+                                         std::vector<double> lookDirection,
+                                         double tol) {
     
       if (intersectEllipsoid(observerPos, lookDirection)) {
       m_hasIntersection = true;

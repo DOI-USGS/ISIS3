@@ -64,7 +64,8 @@ namespace Isis {
 
       //! Intersect the shape model
       virtual bool intersectSurface(std::vector<double> observerPos,
-                                    std::vector<double> lookDirection)=0;
+                                    std::vector<double> lookDirection,
+                                    double tol = 0.)=0;
 
       //! Return the surface intersection
       SurfacePoint *surfaceIntersection() const;
@@ -109,20 +110,20 @@ namespace Isis {
       void setSurfaceIntersectionPoint(const SurfacePoint &surfacePoint);
 
       //! Set tolerance for acceptance in iterative loops
-      void setTolerance(const double tol);
+      //      void setTolerance(const double tol);
 
       //! Return triaxial target radii from shape model TODO Put this in Target class???
       //      Distance *targetRadii();
 
       //! Return the tolerance
-      double tolerance();
+      //      double tolerance();
 
     protected:
       bool m_hasIntersection;                          //!< Flag indicating a successful intersection has been found
       bool m_hasNormal;                                 //!< Flag indicating normal has been computed
       std::vector<double> m_normal;             //!< Local normal of current intersection point
  
-      double *m_tolerance;
+      //      double *m_tolerance;
 
       void calculateEllipsoidalSurfaceNormal();
 

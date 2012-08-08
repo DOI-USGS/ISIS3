@@ -77,9 +77,10 @@ namespace Isis {
    *
    */
   bool EquatorialCylindricalShape::intersectSurface
-      (std::vector<double> observerPos, std::vector<double> lookDirection) {
+  (std::vector<double> observerPos, std::vector<double> lookDirection,
+   double tol) {
     
-    DemShape::intersectSurface(observerPos, lookDirection);
+    DemShape::intersectSurface(observerPos, lookDirection, tol);
 
     if (!m_hasIntersection) {
 

@@ -103,8 +103,6 @@ namespace Isis {
     p_groundRangeComputed = false;
     p_raDecRangeComputed = false;
     p_pointComputed = false;
-
-    target()->shape()->setTolerance(Resolution()/100.0);
   }
 
   //! Destroys the Camera Object
@@ -910,7 +908,7 @@ namespace Isis {
     Latitude lat;
     Longitude lon;
     Distance radius;
-    ShapeModel *shapeModel = shape();
+    ShapeModel *shapeModel = target()->shape();
 
     for (int i = 0; i < cornerNeighborPoints.size(); i ++) {
       // If a surrounding point fails, set it to the original point

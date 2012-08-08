@@ -799,9 +799,7 @@ namespace Isis {
    * @param r[] Radii of the target in kilometers
    */
   void Spice::radii(Distance r[3]) const {
-    r[0] = m_radii[0];
-    r[1] = m_radii[1];
-    r[2] = m_radii[2];
+    r = m_target->radii();
   }
 
   /**
@@ -1084,12 +1082,12 @@ namespace Isis {
     return result;
   }
 
-  /**
-   * Returns shape model
-   */
-  ShapeModel *Spice::shape() const {
-    return m_shape;
-  }
+  // /**
+  //  * Returns shape model
+  //  */
+  // ShapeModel *Spice::shape() const {
+  //   return m_shape;
+  // }
   
   
   // /**

@@ -50,8 +50,8 @@ namespace Isis {
     m_name = new std::string();
     m_name = NULL;
     m_surfacePoint = NULL;
-    m_tolerance = new double();
-    *m_tolerance = 0.0;
+    // m_tolerance = new double();
+    // *m_tolerance = 0.0;
     // m_radii new Distance[3];
     m_hasIntersection = false;
     m_hasNormal = false;
@@ -66,10 +66,10 @@ namespace Isis {
       m_surfacePoint = NULL;
     }
 
-    if (m_tolerance) {
-      delete m_tolerance;
-      m_tolerance = NULL;
-    }
+    // if (m_tolerance) {
+    //   delete m_tolerance;
+    //   m_tolerance = NULL;
+    // }
   }
 
 
@@ -316,9 +316,9 @@ namespace Isis {
   /** Set  tolerance for acceptance in iterative loops
    *
    */
-  void ShapeModel::setTolerance(const double tol) {
-    *m_tolerance = tol;
-  }
+  // void ShapeModel::setTolerance(const double tol) {
+  //   *m_tolerance = tol;
+  // }
 
 
   /** Return triaxial target radii from shape model
@@ -332,9 +332,9 @@ namespace Isis {
   /** Return the tolerance for acceptance in iterative loops
    *
    */
-  double ShapeModel::tolerance() {
-    return *m_tolerance;
-  }
+  // double ShapeModel::tolerance() {
+  //   return *m_tolerance;
+  // }
 
 
   /** Set the radii
