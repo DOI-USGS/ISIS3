@@ -20,10 +20,14 @@
     <change name="Orrin Thomas" date="2012-07-13">
       Application name changed from apollopansticher to apollopanstitcher
     </change>
+    <change name="Raad A. Saleh" date="2012-08-08">
+     Program has been modified to accept long (more than 128 characters) file names without error.
+     This fixes Mantis ticket # 1024. 
+    </change>
   </history>
 
   <category>
-    <categoryItem>Image Processing</categoryItem>
+    <categoryItem>Import and Export</categoryItem>
   </category>
 
    <groups>

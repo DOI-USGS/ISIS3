@@ -104,10 +104,7 @@ void IsisMain() {
   TRANS2d3p trans[8];    //final solutions for the transformations-one for each sub-scan
 
   iString fileName,tempiString;
-  char cfileName[128];  //c file name used for formating strings
-
   std::string fileBaseName, tempString;
-
   UserInterface &ui = Application::GetUserInterface();
 
   double l=1,s=1,sample,line,temp,  //line and sample coordinates for looping through the panC
@@ -152,8 +149,7 @@ void IsisMain() {
   fileBaseName = ui.GetString("FILE_BASE");
   for (i=1; i<=8; i++) {
     panC[i-1] = new Cube;
-    sprintf(cfileName,"%s%s%d.cub", fileBaseName.data(),"-000", i);
-    fileName = cfileName;
+    fileName = fileBaseName + iString("-000") + iString(i) + iString(".cub");
     panC[i-1]->open(fileName, "r");
     if (!panC[i-1]->isOpen()){
       string msg = "Unable to open input cube: " + iString(fileName) + "\n";
