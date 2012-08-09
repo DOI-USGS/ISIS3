@@ -35,3 +35,10 @@ Set to 25 degrees Planetographic with radii
 -15 degrees Planetocentric
 -12.486398292871 degrees planetographic
 
+----- Testing Add Methods -----
+
+Adding an angle to a planetographic latitude with the add methods.
+25 + 30 = 55
+Adding an angle to a planetographic latitude with the + operator.
+25 + 30 = 31.069
+

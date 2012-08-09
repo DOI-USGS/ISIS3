@@ -158,6 +158,41 @@ YCoord:                                        150
 UniversalLatitude:                             57.39200572938
 UniversalLongitude:                            355
 
+PolarStereographic Projection Specifications
+Equatorial Radius:         1737400
+Polar Radius:              1737400
+Eccentricity:              0
+Is Equatorial Cylindrical: 0
+Latitude Type:             Planetocentric
+Is Planetographic:         0
+Is Planetocentric:         1
+Longitude Direction:       PositiveEast
+Is PositiveEast:           1
+Is PositiveWest:           0
+Longitude Domain:          360
+Has 360 domain:            1
+Has 180 domain:            0
+Has ground range:          1
+Rotation:                  0
+
+Setting position to (-90.000000000000767, 0.0)
+Is Good:                                       1
+Latitude:                                      -90
+Longitude:                                     0
+XCoord:                                        0
+YCoord:                                        0
+UniversalLatitude:                             -90
+UniversalLongitude:                            0
+
+Setting position to (90.000000000000767, 0.0)
+Is Good:                                       0
+Latitude:                                      90
+Longitude:                                     0
+XCoord:                                        0
+YCoord:                                        0
+UniversalLatitude:                             90
+UniversalLongitude:                            0
+
 Testing projection coordinate routines
 Setting x/y position to (-2550,15):  1
 Is Good:                             1

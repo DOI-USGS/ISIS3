@@ -69,5 +69,12 @@
       with me to help figure out the best ways to document qmos were Orrin
       Thomas and Trent Hare. Fixes #427
     </change>
+    <change name="Kimberly Oyama and Steven Lambright" date="2012-07-26">
+      Added the 'Auto Grid' functionality, an options dialog, the option to select
+      the source of the latitude and longitude extents, and an 'Auto Apply' option to
+      update the grid as parameters are changed to the grid tool. Also changed the
+      draw and clear grid buttons to a single 'Show Grid' check button. Updated the
+      documentation to include these changes. Fixes #604.
+    </change>
   </history>
 </application>

@@ -7,6 +7,7 @@
 #include "IException.h"
 #include "Preference.h"
 #include "Projection.h"
+#include "ProjectionFactory.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
@@ -343,7 +344,94 @@ int main(int argc, char *argv[]) {
   cout << "UniversalLatitude:                             " << p2.UniversalLatitude() << endl;
   cout << "UniversalLongitude:                            " << p2.UniversalLongitude() << endl;
   cout << endl;
+  
+  /* The following projection is used to test the ToPlanetographic() methods
+   *   at the latitude boundaries (-90 and 90 degrees). qFuzzyCompare() methods
+   *   were added to accommodate for double imprecission. 
+   */
+  Isis::Pvl latRangeTest;
+  latRangeTest.AddGroup(Isis::PvlGroup("Mapping"));
+  Isis::PvlGroup &latTestGroup = latRangeTest.FindGroup("Mapping");
+  latTestGroup += Isis::PvlKeyword("TargetName", "Moon");
+  latTestGroup += Isis::PvlKeyword("ProjectionName", "PolarStereographic");
+  latTestGroup += Isis::PvlKeyword("EquatorialRadius", 1737400.0);
+  latTestGroup += Isis::PvlKeyword("PolarRadius", 1737400.0);
+  latTestGroup += Isis::PvlKeyword("LatitudeType", "Planetocentric");
+  latTestGroup += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
+  latTestGroup += Isis::PvlKeyword("LongitudeDomain", 360);
+  latTestGroup += Isis::PvlKeyword("Scale", 5.0);
+  latTestGroup += Isis::PvlKeyword("MinimumLatitude", -90.0);
+  latTestGroup += Isis::PvlKeyword("MaximumLatitude", -45.0);
+  latTestGroup += Isis::PvlKeyword("MinimumLongitude", 0.0);
+  latTestGroup += Isis::PvlKeyword("MaximumLongitude", 360.0);
+  latTestGroup += Isis::PvlKeyword("CenterLatitude", -90.0);
+  latTestGroup += Isis::PvlKeyword("CenterLongitude", 0.0);
+  Isis::Projection &latTestProjection = *Isis::ProjectionFactory::Create(latRangeTest);
 
+  cout << "PolarStereographic Projection Specifications" << endl;
+  // test methods that return properties of the target
+  cout << "Equatorial Radius:         " << latTestProjection.EquatorialRadius() << endl;
+  cout << "Polar Radius:              " << latTestProjection.PolarRadius() << endl;
+  cout << "Eccentricity:              " << latTestProjection.Eccentricity() << endl;
+  // test methods that return properties of the projection
+  cout << "Is Equatorial Cylindrical: " << latTestProjection.IsEquatorialCylindrical() << endl;
+  cout << "Latitude Type:             " << latTestProjection.LatitudeTypeString() << endl;
+  cout << "Is Planetographic:         " << latTestProjection.IsPlanetographic() << endl;
+  cout << "Is Planetocentric:         " << latTestProjection.IsPlanetocentric() << endl;
+  cout << "Longitude Direction:       " << latTestProjection.LongitudeDirectionString() << endl;
+  cout << "Is PositiveEast:           " << latTestProjection.IsPositiveEast() << endl;
+  cout << "Is PositiveWest:           " << latTestProjection.IsPositiveWest() << endl;
+  cout << "Longitude Domain:          " << latTestProjection.LongitudeDomainString() << endl;
+  cout << "Has 360 domain:            " << latTestProjection.Has360Domain() << endl;
+  cout << "Has 180 domain:            " << latTestProjection.Has180Domain() << endl;
+  cout << "Has ground range:          " << latTestProjection.HasGroundRange() << endl;
+  cout << "Rotation:                  " << latTestProjection.Rotation() << endl << endl;
+  try {
+    cout << "Setting position to (-90.000000000000767, 0.0)" << endl;
+    latTestProjection.SetUniversalGround(-90.000000000000767, 0.0);
+    cout << "Is Good:                                       "
+         << latTestProjection.IsGood() << endl;
+    cout << "Latitude:                                      "
+         << latTestProjection.Latitude() << endl;
+    cout << "Longitude:                                     "
+         << latTestProjection.Longitude() << endl;
+    cout << "XCoord:                                        "
+         << latTestProjection.XCoord() << endl;
+    cout << "YCoord:                                        "
+         << latTestProjection.YCoord() << endl;
+    cout << "UniversalLatitude:                             "
+         << latTestProjection.UniversalLatitude() << endl;
+    cout << "UniversalLongitude:                            "
+         << latTestProjection.UniversalLongitude() << endl;
+    cout << endl;
+  }
+  catch(IException &error) {
+    error.print();
+  }
+
+  try {
+    latTestProjection.SetUniversalGround(90.000000000000767, 0.0);
+    cout << "Setting position to (90.000000000000767, 0.0)" << endl;
+    cout << "Is Good:                                       "
+         << latTestProjection.IsGood() << endl;
+    cout << "Latitude:                                      "
+         << latTestProjection.Latitude() << endl;
+    cout << "Longitude:                                     "
+         << latTestProjection.Longitude() << endl;
+    cout << "XCoord:                                        "
+         << latTestProjection.XCoord() << endl;
+    cout << "YCoord:                                        "
+         << latTestProjection.YCoord() << endl;
+    cout << "UniversalLatitude:                             "
+         << latTestProjection.UniversalLatitude() << endl;
+    cout << "UniversalLongitude:                            "
+         << latTestProjection.UniversalLongitude() << endl;
+    cout << endl;
+  }
+  catch(IException &error) {
+    error.print();
+  }
+  
   cout << "Testing projection coordinate routines" << endl;
   cout << "Setting x/y position to (-2550,15):  " << p2.SetCoordinate(-2250.0, 15.0) << endl;
   cout << "Is Good:                             " << p2.IsGood() << endl;

@@ -4,10 +4,13 @@
 #include <float.h>
 #include <iostream>
 
+#include <QDebug>
 #include <QGraphicsScene>
 
 #include "Angle.h"
+#include "Distance.h"
 #include "GroundGrid.h"
+#include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "MosaicGraphicsView.h"
@@ -20,126 +23,279 @@ using namespace std;
 namespace Isis {
   GridGraphicsItem::GridGraphicsItem(Latitude baseLat, Longitude baseLon,
       Angle latInc, Angle lonInc, MosaicSceneWidget *projectionSrc,
-      int density) {
+      int density, Latitude latMin, Latitude latMax,
+      Longitude lonMin, Longitude lonMax) {
     setZValue(DBL_MAX);
-
+    
     // Walk the grid, creating a QGraphicsLineItem for each line segment.
     Projection *proj = projectionSrc->getProjection();
 
-    if (proj) {
-      PvlGroup mappingGroupForUnits(proj->Mapping());
+    if (proj && lonMin < lonMax && latMin < latMax) {
+      PvlGroup mappingGroup(proj->Mapping());
+
+      Latitude minLat;
+      Latitude maxLat;
+      Latitude startLat;
+      Latitude endLat;
+      
+      if (mappingGroup["LatitudeType"][0] == "Planetographic") {
+
+        Distance equaRad(proj->Mapping()["EquatorialRadius"][0].ToDouble(), Distance::Meters);
+        Distance polRad(proj->Mapping()["PolarRadius"][0].ToDouble(), Distance::Meters);
+
+        minLat = Latitude(latMin.planetographic(Angle::Degrees), mappingGroup,
+                          Angle::Degrees);
+        maxLat = Latitude(latMax.planetographic(Angle::Degrees), mappingGroup,
+                          Angle::Degrees);
+        baseLat = Latitude(baseLat.degrees(), equaRad, polRad,
+                          Latitude::Planetocentric, Angle::Degrees);
+
+        // Make sure our lat increment is non-zero
+        if (!qFuzzyCompare(latInc.radians(), 0.0)) {
+          startLat = baseLat;
+
+          // We need startLat to start above min, and be as close to min as possible
+          try {
+            while (startLat < minLat) {
+              startLat = startLat.add(latInc, mappingGroup);
+            }
+          }
+          catch (IException &) {
+          }
+
+          try {
+            while (startLat.add(latInc * -1, mappingGroup) >= minLat) {
+              startLat = startLat.add(latInc * -1, mappingGroup);
+            }
+          }
+          catch (IException &) {
+            // Do nothing if we hit up against a pole
+          }
+        }
+
+        endLat = baseLat;
+
+        // We need endLat to start below max, and be as close to max as possible
+        try {
+          while (endLat > maxLat) {
+            endLat = endLat.add(latInc * -1, mappingGroup);
+          }
+        }
+        catch (IException &) {
+        }
 
 
-      Latitude minLat(proj->MinimumLatitude(), mappingGroupForUnits,
+        try {
+          while (endLat.add(latInc, mappingGroup) <= maxLat) {
+            endLat = endLat.add(latInc, mappingGroup);
+          }
+        }
+        catch (IException &) {
+          // Do nothing if we hit up against a pole
+        }
+      }
+      else {
+        minLat = Latitude(latMin.degrees(), mappingGroup,
                         Angle::Degrees);
-      Latitude maxLat(proj->MaximumLatitude(), mappingGroupForUnits,
+        maxLat = Latitude(latMax.degrees(), mappingGroup,
                         Angle::Degrees);
-
-      Longitude minLon(proj->MinimumLongitude(), mappingGroupForUnits,
-                        Angle::Degrees);
-      Longitude maxLon(proj->MaximumLongitude(), mappingGroupForUnits,
-                        Angle::Degrees);
-
-      Latitude startLat = Latitude(
-          baseLat - Angle(floor((baseLat - minLat) / latInc) * latInc),
-          mappingGroupForUnits);
-
-      Longitude startLon = Longitude(
-          baseLon - Angle(floor((baseLon - minLon) / lonInc) * lonInc));
-
-      Latitude endLat = Latitude(
+        
+        // Make sure our lat increment is non-zero
+        if (!qFuzzyCompare(latInc.radians(), 0.0)) {
+          startLat = Latitude(
+            baseLat - Angle(floor((baseLat - minLat) / latInc) * latInc), mappingGroup);
+          
+        if (qFuzzyCompare(startLat.degrees(), -90.0))
+          startLat = Latitude(-90.0, mappingGroup, Angle::Degrees);
+        }
+        
+        endLat = Latitude(
           (long)((maxLat - startLat) / latInc) * latInc + startLat,
-          mappingGroupForUnits);
+          mappingGroup);
+        if (qFuzzyCompare(endLat.degrees(), 90.0))
+          endLat = Latitude(90.0, mappingGroup, Angle::Degrees);
+      }
+      
+      Longitude minLon(lonMin.degrees(), mappingGroup,
+                      Angle::Degrees);
+      Longitude maxLon(lonMax.degrees(), mappingGroup,
+                      Angle::Degrees);
+
+      Longitude startLon;
+      // Make sure our lon increment is non-zero
+      if (!qFuzzyCompare(lonInc.radians(), 0.0)) {
+        startLon = Longitude(
+          baseLon - Angle(floor((baseLon - minLon) / lonInc) * lonInc));
+      }
 
       Longitude endLon =
           (long)((maxLon - startLon) / lonInc) * lonInc + startLon;
 
-      int numCurvedLines = (int)ceil(((endLat - startLat) / latInc) + 1);
-      numCurvedLines += (int)ceil(((endLon - startLon) / lonInc) + 1);
-
-      int curvedLineDensity = density / numCurvedLines + 1;
-      Angle latRes((endLon - startLon) / (double)curvedLineDensity);
-      Angle lonRes((endLat - startLat) / (double)curvedLineDensity);
-
-      if (latRes <= Angle(0, Angle::Degrees))
-        latRes = Angle(1E-10, Angle::Degrees);
-
-      if (lonRes <= Angle(0, Angle::Degrees))
-        lonRes = Angle(1E-10, Angle::Degrees);
-
-      // We're looping like this to guarantee we hit the correct end position in
-      //   the loop despite double math.
-      for(Latitude lat = startLat; lat != endLat + latInc; lat += latInc) {
-        if (lat > endLat)
-          lat = endLat;
-
-        double previousX = 0;
-        double previousY = 0;
-        bool havePrevious = false;
-
-        for(Longitude lon = startLon; lon != endLon + latRes; lon += latRes) {
-          if (lon > endLon)
-            lon = endLon;
-
-          double x = 0;
-          double y = 0;
-          bool valid = proj->SetUniversalGround(lat.degrees(),
-                                                lon.degrees());
-          if (valid) {
-            x = proj->XCoord();
-            y = -1 * proj->YCoord();
-
-            if(havePrevious) {
-              if(previousX != x || previousY != y) {
-                new QGraphicsLineItem(QLineF(previousX, previousY, x, y), this);
-              }
-            }
-          }
-
-
-          havePrevious = valid;
-          previousX = x;
-          previousY = y;
-        }
+      if (qFuzzyCompare( (endLon + lonInc).radians(), maxLon.radians() )) {
+        endLon = maxLon;
       }
 
-      for(Longitude lon = startLon; lon != endLon + lonInc; lon += lonInc) {
-        if (lon > endLon)
-          lon = endLon;
+      // Make sure our increments will move our lat/lon values... prevent infinite loops
+      if (!qFuzzyCompare( (startLat + latInc).radians(), startLat.radians() ) &&
+          !qFuzzyCompare( (startLon + lonInc).radians(), startLon.radians() )) {
 
-        double previousX = 0;
-        double previousY = 0;
-        bool havePrevious = false;
+        int numCurvedLines = (int)ceil(((maxLat - minLat) / latInc) + 1);
+        numCurvedLines += (int)ceil(((maxLon - minLon) / lonInc) + 1);
 
-        for(Latitude lat = startLat; lat != endLat + lonRes; lat += lonRes) {
-          if (lat > endLat)
-            lat = endLat;
+        int curvedLineDensity = density / numCurvedLines + 1;
+        Angle latRes((maxLon - minLon) / (double)curvedLineDensity);
+        Angle lonRes((maxLat - minLat) / (double)curvedLineDensity);
+      
+        if (mappingGroup["LatitudeType"][0] == "Planetographic") {
+          lonRes = Angle(
+              (maxLat.planetographic() - minLat.planetographic()) / (double)curvedLineDensity,
+              Angle::Radians);
+        }
 
-          double x = 0;
-          double y = 0;
+        if (latRes <= Angle(0, Angle::Degrees))
+          latRes = Angle(1E-10, Angle::Degrees);
 
-          bool valid = proj->SetUniversalGround(lat.degrees(),
-                                                lon.degrees());
+        if (lonRes <= Angle(0, Angle::Degrees))
+          lonRes = Angle(1E-10, Angle::Degrees);
 
-          if (valid) {
-            x = proj->XCoord();
-            y = -1 * proj->YCoord();
+        bool firstIteration = true;
+        bool atMaxLat = false;
+        bool atMaxLon = false;
 
-            if(havePrevious) {
+        // We're looping like this to guarantee we hit the correct end position in
+        //   the loop despite double math.
+
+
+        Latitude lat = minLat;
+        while(!atMaxLat) {
+          double previousX = 0;
+          double previousY = 0;
+          bool havePrevious = false;
+
+          for(Longitude lon = minLon; lon != maxLon + latRes; lon += latRes) {
+
+            if (lon > maxLon && !atMaxLon) {
+              lon = maxLon;
+              atMaxLon = true;
+            }
+
+            double x = 0;
+            double y = 0;            
+            bool valid = proj->SetUniversalGround(lat.degrees(), lon.degrees());
+
+            if (valid) {
               x = proj->XCoord();
               y = -1 * proj->YCoord();
 
-              if(previousX == x && previousY == y) {
-                continue;
+              if(havePrevious) {
+                if(previousX != x || previousY != y) {
+                  new QGraphicsLineItem(QLineF(previousX, previousY, x, y), this);
+                }
               }
+            }
 
-              new QGraphicsLineItem(QLineF(previousX, previousY, x, y), this);
+            havePrevious = valid;
+            previousX = x;
+            previousY = y;
+          }
+
+//           if (firstIteration) {
+//             if (startLat.planetographic(Angle::Degrees) - latInc.degrees() < -90.0) 
+//               lat = Latitude(-90.0, mappingGroup, Angle::Degrees);
+//             else {
+//               lat = Latitude(startLat.planetographic() - latInc.radians(), mappingGroup,
+//                              Angle::Radians);
+//             }
+//           }
+
+          firstIteration = false;
+          atMaxLon = false;
+
+          Latitude nextLat;
+
+          try {
+            nextLat = lat.add(latInc, mappingGroup);
+          }
+          catch (IException &) {
+            nextLat = maxLat;
+          }
+
+          if (lat == minLat && minLat != startLat) {
+            // If our increment doesn't intersect the lat range, set ourselves to max.
+            if (startLat < minLat || startLat > maxLat) {
+              nextLat = maxLat;
+            }
+            else {
+              // Our increment lands inside the range, go to start and begin incrementing towards end.
+              nextLat = startLat;
+            }
+          }
+          else if (lat >= maxLat) {
+            atMaxLat = true;
+          }
+          else if (nextLat > endLat) {            
+            nextLat = maxLat;
+          }
+
+          lat = nextLat;
+        }
+
+        firstIteration = true;
+        atMaxLat = false;
+        atMaxLon = false;
+        
+        for(Longitude lon = minLon; lon != maxLon + lonInc; lon += lonInc) {
+
+          if (lon > endLon && lon < maxLon) {
+            lon = endLon;
+          }
+          
+          if (lon > maxLon && !atMaxLon) {
+            lon = maxLon;
+            atMaxLon = true;
+          }
+
+          double previousX = 0;
+          double previousY = 0;
+          bool havePrevious = false;
+
+          Latitude lat =  minLat;
+          while (!atMaxLat) {
+            double x = 0;
+            double y = 0;
+            bool valid = proj->SetUniversalGround(lat.degrees(), lon.degrees());
+            
+            if (valid) {
+              x = proj->XCoord();
+              y = -1 * proj->YCoord();
+
+              if(havePrevious) {
+                x = proj->XCoord();
+                y = -1 * proj->YCoord();
+
+                if(previousX != x || previousY != y) {
+                  new QGraphicsLineItem(QLineF(previousX, previousY, x, y), this);
+                }
+              }
+            }
+
+            havePrevious = valid;
+            previousX = x;
+            previousY = y;
+
+            if (lat >= maxLat) {
+              atMaxLat = true;
+            }
+            else {
+              lat = lat.add(lonRes, mappingGroup);
             }
           }
 
-          havePrevious = valid;
-          previousX = x;
-          previousY = y;
+          if (firstIteration)
+            lon = startLon - lonInc;
+
+          firstIteration = false;
+          atMaxLat = false;
         }
       }
     }
@@ -155,7 +311,7 @@ namespace Isis {
   void GridGraphicsItem::paint(QPainter *painter,
       const QStyleOptionGraphicsItem *style,  QWidget * widget) {
   }
-
+  
 
   QRectF GridGraphicsItem::boundingRect() const {
     return m_boundingRect;

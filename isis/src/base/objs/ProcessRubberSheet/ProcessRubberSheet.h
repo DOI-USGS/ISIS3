@@ -98,6 +98,12 @@ namespace Isis {
    *                           certain output projections (cylindrical). 
    *                           This has been fixed by making sure the output
    *                           patch size is not too large.
+   *   @history 2012-08-03 Kimberly Oyama and Steven Lambright - Changed the
+   *                           percentage (from 99% to 50%) of the output cube
+   *                           that a patch can cover before it is split into
+   *                           a smaller patch. The 99% produced unpredictable
+   *                           results on different machines due to double
+   *                           rounding error. References #604.
    *  
    *   @todo 2005-02-11 Stuart Sides - finish documentation and add coded and
    *                        implementation example to class documentation

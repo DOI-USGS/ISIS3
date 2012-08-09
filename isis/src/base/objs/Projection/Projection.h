@@ -145,6 +145,10 @@ namespace Isis {
    *                           xyRangeOblique() to verify the validity of the
    *                           values when setSearchGround() is called.
    *                           References #954.
+   *   @history 2012-08-01 Kimberly Oyama - Added a qFuzzyCompare() to ToPlanetographic() to
+   *                           account for rounding error at the latitude boundaries (-90 and
+   *                           90 degrees). Updated the unit test to exercise this change.
+   *                           References #604.
    *  
    *   @todo Continue to modify Projection class to comply with coding
    *         standards. Some of these include, but may not be limited to remove

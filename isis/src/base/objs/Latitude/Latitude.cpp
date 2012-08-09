@@ -329,6 +329,11 @@ namespace Isis {
         (*m_polarRadius / *m_equatorialRadius) *
         (*m_polarRadius / *m_equatorialRadius));
 
+    // Sometimes the trig functions return the negative of the expected value at the pole.
+    if ((ocentricLatitude > 0) != (inputAngle.radians() > 0)) {
+      ocentricLatitude *= -1;
+    }
+
     setAngle(ocentricLatitude, Angle::Radians);
   }
 
@@ -390,8 +395,65 @@ namespace Isis {
 
     return *this;
   }
+  
 
+  /**
+    * Adds an angle to this latitude. The adding method is determined by the
+    *   latitude type.
+    *
+    * @param angleToAdd the latitude being added to this one
+    * @param mapping the mapping group from a projection
+    * @return The result
+    */
+  Latitude Latitude::add(Angle angleToAdd, PvlGroup mapping) {
 
+    CoordinateType latType;
+    Distance equatorialRadius(mapping["EquatorialRadius"][0], Distance::Meters);
+    Distance polarRadius(mapping["PolarRadius"][0], Distance::Meters);
+
+    if(mapping["LatitudeType"][0] == "Planetocentric")
+      latType = Planetocentric;
+    else if (mapping["LatitudeType"][0] == "Planetographic")
+      latType = Planetographic;
+    else {
+      iString msg = "Latitude type [" + iString(mapping["LatitudeType"][0]) +
+        "] is not recognized";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    return add(angleToAdd, equatorialRadius, polarRadius, latType);
+  }
+
+  
+  /**
+    * Adds another latitude to this one. Handles planetographic latitudes.
+    *
+    * @param angleToAdd the latitude being added to this one
+    * @param equatorialRadius
+    * @param polarRadius
+    * @param latType
+    * @return The result
+    */
+  Latitude Latitude::add(Angle angleToAdd, Distance equatorialRadius, Distance polarRadius,
+                         CoordinateType latType) {
+    Latitude result;
+    
+    switch (latType) {
+      case Planetocentric:
+        result = Latitude(planetocentric() + angleToAdd.radians(), equatorialRadius, polarRadius,
+                          latType, Radians, m_errors);
+        break;
+
+      case Planetographic:
+        result = Latitude(planetographic() + angleToAdd.radians(), equatorialRadius, polarRadius,
+                          latType, Radians, m_errors);
+        break;
+    }
+    
+    return result;
+  }
+
+ 
   /**
    * We're overriding this method in order to do -90/90 degree checking
    *

@@ -22,6 +22,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include <QGlobalStatic>
+
 namespace Isis {
   class iString;
 
@@ -40,6 +42,10 @@ namespace Isis {
    *                           code from the contstructor. Added the fullRotation()
    *                           method which creates an angle of 360 degrees and
    *                           modified the unit test to exercise this. References #958.
+   *   @history 2012-07-26 Steven Lambright and Kimberly Oyama - Modified the < and >
+   *                           operators to make sure they do not return true if the
+   *                           two operands are the same. Updated the unitTest to exercise
+   *                           this change. References #604.
    */
   class Angle {
 
@@ -170,7 +176,7 @@ namespace Isis {
      * @return true if the angle equals the comparision angle
      */
     bool operator==(const Angle& angle2) const {
-      return (angle(Radians) == angle2.angle(Radians));
+      return qFuzzyCompare(angle(Radians), angle2.angle(Radians));
     }
 
 

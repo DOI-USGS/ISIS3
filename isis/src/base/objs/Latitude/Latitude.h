@@ -38,7 +38,12 @@ namespace Isis {
    *
    * @internal
    *   @history 2011-01-25 Steven Lambright - Added a constructor which takes a
-   *                         mapping group.
+   *                           mapping group.
+   *   @history 2012-07-26 Kimberly Oyama and Steven Lambright - Added two add methods to handle
+   *                           planetographic latitudes. The first takes the angle to add and a
+   *                           Pvl mapping group to determine the latitude type and add accordingly.
+   *                           The second takes the angle to add, the equatorial and polar radii,
+   *                           and the latitude type. References #604.
    */
   class Latitude : public Angle {
     public:
@@ -131,7 +136,10 @@ namespace Isis {
       bool inRange(Latitude min, Latitude max) const;
 
       Latitude& operator=(const Latitude & latitudeToCopy);
-    
+      Latitude add(Angle angleToAdd, PvlGroup mapping);
+      Latitude add(Angle angleToAdd, Distance equatorialRadius, Distance polarRadius,
+                   CoordinateType latType);
+
       /**
        * Same as planetocentric.
        *

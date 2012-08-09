@@ -627,14 +627,18 @@ namespace Isis {
    */
   double Projection::ToPlanetographic(double lat,
                                       double eRadius, double pRadius) {
-    if (lat == Null || abs(lat) > 90.0) {
+    //Account for double rounding error.
+    if (qFuzzyCompare(fabs(lat), 90.0)) {
+      lat = qRound(lat);
+    }
+    if (lat == Null || fabs(lat) > 90.0) {
       throw IException(IException::Unknown, 
                        "Unable to convert to Planetographic. The given latitude value [" 
                        + iString(lat) + "] is invalid.", 
                        _FILEINFO_);
     }
     double mylat = lat;
-    if (abs(mylat) < 90.0) {  // So tan doesn't fail
+    if (fabs(mylat) < 90.0) {  // So tan doesn't fail
       mylat *= PI / 180.0;
       mylat = atan(tan(mylat) * (eRadius / pRadius) *
                    (eRadius / pRadius));

@@ -1,5 +1,7 @@
 #include <iostream>
 #include <iomanip>
+#include <limits>
+
 #include "Angle.h"
 #include "Constants.h"
 #include "IException.h"
@@ -166,6 +168,27 @@ int main(int argc, char *argv[]) {
     Angle angle1(30., Angle::Degrees );
     Angle angle2(45., Angle::Degrees);
     cout << "  angle1 <  angle2?  " << (angle1 < angle2) << endl;
+  }
+  catch(Isis::IException &e) {
+    e.print();
+  }
+
+  try {
+    Angle angle1(30., Angle::Degrees );
+    Angle angle2(45., Angle::Degrees);
+    //Angle epsilon((double)numeric_limits<float>::epsilon(), Angle::Degrees);//1.1920929e-07
+    Angle epsilon(1.1920929e-12, Angle::Degrees);//1.1920929e-07
+    cout << "  angle1 <  (angle1 + epsilon)?  " << (angle1 < angle1 + epsilon) << endl;
+  }
+  catch(Isis::IException &e) {
+    e.print();
+  }
+
+  try {
+    Angle angle1(30., Angle::Degrees );
+    Angle angle2(45., Angle::Degrees);
+    Angle epsilon(1.1920929e-12, Angle::Degrees);
+    cout << "  angle2 >  (angle2 - epsilon)?  " << (angle2 > angle2 - epsilon) << endl;
   }
   catch(Isis::IException &e) {
     e.print();
