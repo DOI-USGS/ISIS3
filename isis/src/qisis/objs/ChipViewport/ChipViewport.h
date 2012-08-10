@@ -79,6 +79,8 @@ namespace Isis {
    *                           initiates the move.  This should be cleaned up.
    *   @history 2011-09-14 Tracie Sucharski - Added user option to determine 
    *                           whether control points are drawn.
+   *   @history 2012-07-26 Tracie Sucharski - Added method to return zoom factor and
+   *                           slot to zoom to a specific zoom factor.
    */
   class ChipViewport : public QWidget {
       Q_OBJECT
@@ -120,6 +122,9 @@ namespace Isis {
       double tackSample();
       double tackLine();
 
+      //!  Return the zoom factor
+      double zoomFactor();
+
       //!  Draw X on point
       //void markPoint (double sample, double line);
 
@@ -160,6 +165,7 @@ namespace Isis {
       void zoomIn();
       void zoomOut();
       void zoom1();
+      void zoom(double zoomFactor);
 
       void refreshView(double tackSample, double tackLine);
 
