@@ -109,6 +109,9 @@ namespace Isis {
    *                          necessary.
    *  @history 2012-06-28 Steven Lambright - Stretching gray no longer removes stretch
    *                          special pixel values from the RGB stretches. References #684.
+   *  @history 2012-07-27 Tracie Sucharski - Added viewportClosed signal so that tools
+   *                          can respond to the user closing a viewport rather than when the
+   *                          application exits.
    */
   class CubeViewport : public QAbstractScrollArea {
       Q_OBJECT
@@ -361,6 +364,7 @@ namespace Isis {
 
     signals:
       void viewportUpdated();//!< Emitted when viewport updated.
+      void viewportClosed(CubeViewport *);//!< Emitted when viewport is closed.
       void mouseEnter();//!< Emitted when the mouse enters the viewport
       void mouseMove(QPoint);//!< Emitted when the mouse moves.
       void mouseMove(QPoint, Qt::MouseButton);//!< Emitted when the mouse moves.
