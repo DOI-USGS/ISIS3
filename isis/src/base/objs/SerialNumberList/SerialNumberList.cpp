@@ -80,6 +80,9 @@ namespace Isis {
     p_serialMap.erase(sn);
     p_fileMap.erase(sFileName);
   }
+
+
+
   /**
    * Adds a new filename / serial number pair to the
    * SerialNumberList
@@ -160,6 +163,87 @@ namespace Isis {
       nextpair.observationNumber = on;
       p_pairs.push_back(nextpair);
       p_serialMap.insert(std::pair<std::string, int>(sn, (int)(p_pairs.size() - 1)));
+      p_fileMap.insert(std::pair<std::string, int>(nextpair.filename, (int)(p_pairs.size() - 1)));
+    }
+    catch(IException &e) {
+      std::string msg = "File [" + Isis::FileName(filename).expanded() +
+                        "] can not be added to ";
+      msg += "serial number list";
+      throw IException(e, IException::User, msg, _FILEINFO_);
+    }
+  }
+
+
+  void SerialNumberList::Add(const char *serialNumber, const char *filename) {
+
+    Add((std::string)serialNumber, (std::string)filename);
+  }
+
+
+  /**
+   * Adds a new filename / and pre-composed serial number pair to the SerialNumberList
+   *
+   * @param serialNumber the serial number to be added
+   * @param filename the filename to be added
+   *  
+   * @author 2012-07-12 Tracie Sucharski 
+   *  
+   * @internal
+   */
+  void SerialNumberList::Add(const std::string &serialNumber, const std::string &filename) {
+
+    Pvl p(Isis::FileName(filename).expanded());
+    PvlObject cubeObj = p.FindObject("IsisCube");
+    try {
+      // Test the target name if desired
+      if (p_checkTarget) {
+        iString target;
+        PvlGroup targetGroup;
+        if (cubeObj.HasGroup("Instrument")) {
+          targetGroup = cubeObj.FindGroup("Instrument");
+        }
+        else if (cubeObj.HasGroup("Mapping")) {
+          // No instrument, try Mapping
+          if (cubeObj.HasGroup("Mapping")) {
+            targetGroup = cubeObj.FindGroup("Mapping");
+          }
+        else {
+            std::string msg = "Unable to find Instrument or Mapping group in ";
+            msg += filename + " for comparing target";
+            throw IException(IException::User, msg, _FILEINFO_);
+          }
+        }
+
+        target = targetGroup["TargetName"][0];
+        target.UpCase();
+        if (p_target.empty()) {
+          p_target = target;
+        }
+        else if (p_target != target) {
+          std::string msg = "Target name of [" + target + "] from file [";
+          msg += filename + "] does not match [" + p_target + "]";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
+      }
+
+      std::string observationNumber = "Unknown";
+      if (serialNumber == "Unknown") {
+        std::string msg = "Invalid serial number [Unknown] from file [";
+        msg += filename + "]";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      else if (HasSerialNumber(serialNumber)) {
+        int index = SerialNumberIndex(serialNumber);
+        std::string msg = "Duplicate, serial number [" + serialNumber + "] from files [";
+        msg += SerialNumberList::FileName(serialNumber) + "] and [" + FileName(index) + "].";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      Pair nextpair;
+      nextpair.filename = Isis::FileName(filename).expanded();
+      nextpair.serialNumber = serialNumber;
+      nextpair.observationNumber = observationNumber;
+      p_pairs.push_back(nextpair);
+      p_serialMap.insert(std::pair<std::string, int>(serialNumber, (int)(p_pairs.size() - 1)));
       p_fileMap.insert(std::pair<std::string, int>(nextpair.filename, (int)(p_pairs.size() - 1)));
     }
     catch(IException &e) {

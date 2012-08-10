@@ -1,9 +1,10 @@
-size   = 4
+size   = 5
 hasXYZ = 0
 ab102401.cub = MGS/561812335:32/MOC-WA/RED
 m0402852.cub = MGS/619971158:28/MOC-NA/BROAD_BAND
 3133_h1.cub = LO3/HRC/3133/1
 ab102402.lev2.cub = ab102402.lev2.cub
+m0402852.cub = m0402852.cub
 
 SN->File: ab102401.cub
 File->SN:MGS/561812335:32/MOC-WA/RED
@@ -11,12 +12,17 @@ MGS/561812335:32/MOC-WA/RED = 0
 MGS/619971158:28/MOC-NA/BROAD_BAND = 1
 LO3/HRC/3133/1 = 2
 ab102402.lev2.cub = 3
+m0402852.cub = 4
 
 SN->File (0): ab102401.cub
 
 SN->File (1): m0402852.cub
 
 SN->File (2): 3133_h1.cub
+
+SN->File (3): ab102402.lev2.cub
+
+SN->File (4): m0402852.cub
 
 Index->observationNumber (2):  LO3/HRC/3133
 
