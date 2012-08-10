@@ -40,9 +40,14 @@ namespace Isis {
    * @internal
    *   @history 2011-01-25 Steven Lambright - Added a constructor which takes a
    *                           mapping group.
-   *   @history 2012-06-29 Kimberly Oyama and Steven Lambright - added to360Range() to calculate
-   *                           where the longitude range is in 0-360. Also updated the unit
-   *                           tests to test inRange() and to360Range(). References #958.
+   *   @history 2012-06-29 Kimberly Oyama and Steven Lambright - added to360Range()
+   *                           to calculate where the longitude range is in 0-360.
+   *                           Also updated the unit tests to test inRange() and
+   *                           to360Range(). References #958.
+   *   @history 2012-08-10 Kimberly Oyama - Modified force360Domain() so that if
+   *                           the angle is 360, it is left at 360 instead of being
+   *                           changed to 0. Added a test case to the unit test to
+   *                           exercise this change. Fixes #999.
    */
   class Longitude : public Angle {
     public:
