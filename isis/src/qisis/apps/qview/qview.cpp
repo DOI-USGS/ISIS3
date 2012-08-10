@@ -24,6 +24,7 @@
 #include "HelpTool.h"
 #include "HistogramTool.h"
 #include "iString.h"
+#include "MatchTool.h"
 #include "MeasureTool.h"
 #include "PanTool.h"
 #include "Preference.h"
@@ -192,6 +193,9 @@ int main(int argc, char *argv[]) {
   Tool *stereoTool = new StereoTool(vw);
   stereoTool->addTo(vw);
 
+  Tool *matchTool = new MatchTool(vw);
+  matchTool->addTo(vw);
+
   Tool *helpTool = new HelpTool(vw);
   helpTool->addTo(vw);
 
@@ -256,6 +260,7 @@ int main(int argc, char *argv[]) {
   }
 
   delete helpTool;
+  delete matchTool;
   delete stereoTool;
   delete histTool;
   delete spatialPlotTool;
