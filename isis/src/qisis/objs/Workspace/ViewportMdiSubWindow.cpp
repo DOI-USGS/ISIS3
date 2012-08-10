@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
+#include "CubeViewport.h"
 #include "MdiCubeViewport.h"
 
 namespace Isis {
@@ -26,6 +27,8 @@ namespace Isis {
 
     connect(m_viewport, SIGNAL(progressChanged(int)),
             progressBar, SLOT(setValue(int)));
+    connect(this, SIGNAL(closeViewport(CubeViewport *)),
+            m_viewport, SIGNAL(viewportClosed(CubeViewport *)));
     widget()->layout()->addWidget(progressBar);
 
     setOption(QMdiSubWindow::RubberBandResize, true);
@@ -50,6 +53,7 @@ namespace Isis {
     else {
       e->accept();
       QMdiSubWindow::closeEvent(e);
+      emit closeViewport(m_viewport);
     }
   }
 }
