@@ -239,4 +239,20 @@ Test 9
 Testing point editLock on reference measure
 Reference point ok
 Nonreference point ok
+
+Test 10
+Testing == operator on the same measures
+Measure1 == Measure1   TRUE
+
+Test 11
+Testing == operator on two different measures
+Measure1 == Measure2   FALSE
+
+Test 12
+Testing != operator on the same measures
+Measure1 != Measure1   FALSE
+
+Test 13
+Testing != operator on two different measures
+Measure1 != Measure2   TRUE
 **PROGRAMMER ERROR** Cannot set log data with invalid information stored in the ControlMeasureLogData.

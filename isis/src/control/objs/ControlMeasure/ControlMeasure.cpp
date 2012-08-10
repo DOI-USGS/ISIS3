@@ -44,7 +44,6 @@ namespace Isis {
    */
   ControlMeasure::ControlMeasure() {
     InitializeToNull();
-
     p_serialNumber = new iString;
     p_chooserName = new iString;
     p_dateTime = new iString;
@@ -1107,7 +1106,12 @@ namespace Isis {
    *
    * @author sprasad (4/20/2010)
    *
-   * history 2010-06-24 Tracie Sucharski, Added new keywords
+   * @internal 
+   *   @history 2010-06-24 Tracie Sucharski, Added new keywords
+   *   @history 2012-07-26 Tracie Sucharski, Fixed bug in comparison of chooserName and dateTime,
+   *                          comparison was between the pointers instead of the data and added
+   *                          comparisons for missing member data.
+   *             
    *
    * @param pMeasure - Control Measure to be compared against
    *
@@ -1116,15 +1120,17 @@ namespace Isis {
   bool ControlMeasure::operator==(const Isis::ControlMeasure &pMeasure) const {
     return pMeasure.p_measureType == p_measureType &&
         *pMeasure.p_serialNumber == *p_serialNumber &&
-        pMeasure.p_chooserName == p_chooserName &&
-        pMeasure.p_dateTime == p_dateTime &&
+        *pMeasure.p_chooserName == *p_chooserName &&
+        *pMeasure.p_dateTime == *p_dateTime &&
         pMeasure.p_editLock == p_editLock &&
         pMeasure.p_ignore == p_ignore &&
+        pMeasure.p_jigsawRejected == p_jigsawRejected &&
         pMeasure.p_sample == p_sample &&
         pMeasure.p_line == p_line &&
         pMeasure.p_diameter == p_diameter &&
         pMeasure.p_aprioriSample == p_aprioriSample &&
         pMeasure.p_aprioriLine == p_aprioriLine &&
+        pMeasure.p_computedEphemerisTime == p_computedEphemerisTime &&
         pMeasure.p_sampleSigma ==  p_sampleSigma &&
         pMeasure.p_lineSigma ==  p_lineSigma &&
         pMeasure.p_sampleResidual == p_sampleResidual &&
@@ -1132,7 +1138,8 @@ namespace Isis {
         pMeasure.p_focalPlaneMeasuredX == p_focalPlaneMeasuredX &&
         pMeasure.p_focalPlaneMeasuredY == p_focalPlaneMeasuredY &&
         pMeasure.p_focalPlaneComputedX == p_focalPlaneComputedX &&
-        pMeasure.p_focalPlaneComputedY == p_focalPlaneComputedY;
+        pMeasure.p_focalPlaneComputedY == p_focalPlaneComputedY &&
+        pMeasure.p_measuredEphemerisTime == p_measuredEphemerisTime;
   }
 
 
