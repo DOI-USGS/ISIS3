@@ -49,12 +49,13 @@ namespace Isis {
    *                            creating QMessageBox
    */
   ControlPointEdit::ControlPointEdit(ControlNet * cnet, QWidget *parent,
-                                     bool allowLeftMouse) : QWidget(parent) {
+                                     bool allowLeftMouse, bool useGeometry) : QWidget(parent) {
 
     p_rotation = 0;
     p_timerOn = false;
     p_autoRegFact = NULL;
     p_allowLeftMouse = allowLeftMouse;
+    p_useGeometry = useGeometry;
 
     //  Initialize some pointers
     p_leftCube = 0;
@@ -78,7 +79,7 @@ namespace Isis {
     }
 
     createPointEditor(parent);
-    emit newControlNetwork(cnet);
+    if (cnet != NULL) emit newControlNetwork(cnet);
   }
 
 
@@ -317,6 +318,7 @@ namespace Isis {
     //  the update sample/line label
     connect(p_leftView, SIGNAL(tackPointChanged(double)),
             this, SLOT(updateLeftPositionLabel(double)));
+    
     // we want to allow this connection so that if a changed point is saved
     // and the same image is showing in both viewports, the left will refresh.
     connect(this, SIGNAL(updateLeftView(double, double)),
@@ -380,33 +382,50 @@ namespace Isis {
     //  Create chips for left and right
     p_leftChip = new Chip(VIEWSIZE, VIEWSIZE);
     p_rightChip = new Chip(VIEWSIZE, VIEWSIZE);
-
-    p_nogeom = new QRadioButton("No geom/rotate");
-    p_nogeom->setChecked(true);
-    p_nogeom->setToolTip("Reset right measure to it's native geometry.");
-    p_nogeom->setWhatsThis("Reset right measure to it's native geometry.  "
-                           "If measure was rotated, set rotation back to 0.  "
-                           "If measure was geomed to match the left measure, "
-                           "reset the geometry back to it's native state.");
-    p_geom   = new QRadioButton("Geom");
-    p_geom->setToolTip("Geom right measure to matche geometry of left measure.");
-    p_geom->setWhatsThis("Using an affine transform, geom the right measure to match the "
-                         "geometry of the left measure.");
-    QRadioButton *rotate = new QRadioButton("Rotate");
+    
     QButtonGroup *bgroup = new QButtonGroup();
-    bgroup->addButton(p_nogeom);
-    bgroup->addButton(p_geom);
-    bgroup->addButton(rotate);
-
+    p_nogeom = new QRadioButton();
+    p_nogeom->setChecked(true);
     connect(p_nogeom, SIGNAL(clicked()), this, SLOT(setNoGeom()));
-    connect(p_geom, SIGNAL(clicked()), this, SLOT(setGeom()));
 
+    QCheckBox *linkZoom = NULL;
+    if (p_useGeometry) {
+      p_nogeom->setText("No geom/rotate");
+      p_nogeom->setToolTip("Reset right measure to it's native geometry.");
+      p_nogeom->setWhatsThis("Reset right measure to it's native geometry.  "
+                             "If measure was rotated, set rotation back to 0.  "
+                             "If measure was geomed to match the left measure, "
+                             "reset the geometry back to it's native state.");
+      p_geom   = new QRadioButton("Geom");
+      p_geom->setToolTip("Geom right measure to match geometry of left measure.");
+      p_geom->setWhatsThis("Using an affine transform, geom the right measure to match the "
+                           "geometry of the left measure.");
+      bgroup->addButton(p_geom);
+      connect(p_geom, SIGNAL(clicked()), this, SLOT(setGeom()));
+    }
+    else {
+      linkZoom = new QCheckBox("Link Zoom");
+      linkZoom->setToolTip("Link zooming between the left and right views.");
+      linkZoom->setWhatsThis("When zooming in the left view, the right view will "
+                             "be set to the same zoom factor as the left view.");
+      connect(linkZoom, SIGNAL(toggled(bool)), this, SLOT(setZoomLink(bool)));
+
+      p_nogeom->setText("No rotate");
+      p_nogeom->setToolTip("Reset right measure to it's native geometry.");
+      p_nogeom->setWhatsThis("Reset right measure to it's native geometry.  "
+                             "If measure was rotated, set rotation back to 0.");
+    }
+    bgroup->addButton(p_nogeom);
+
+    QRadioButton *rotate = new QRadioButton("Rotate");
+    bgroup->addButton(rotate);
     //  TODO:  ?? Don't think we need this connection
     connect(rotate, SIGNAL(clicked()), this, SLOT(setRotate()));
 
     //  Set some defaults
     p_geomIt = false;
     p_rotation = 0;
+    p_linkZoom = false;
 
     p_dial = new QDial();
     p_dial->setRange(0, 360);
@@ -462,8 +481,13 @@ namespace Isis {
     p_slider->setWhatsThis("This allows the cirle size to be adjusted.");
 
     QVBoxLayout *vlayout = new QVBoxLayout();
+    if (!p_useGeometry) {
+      vlayout->addWidget(linkZoom);
+    }
     vlayout->addWidget(p_nogeom);
-    vlayout->addWidget(p_geom);
+    if (p_useGeometry) {
+      vlayout->addWidget(p_geom);
+    }
     vlayout->addWidget(rotate);
     vlayout->addWidget(p_dial);
     vlayout->addWidget(p_dialNumber);
@@ -481,13 +505,15 @@ namespace Isis {
     p_rightSampLinePosition->setToolTip("Sample/Line under the crosshair");
     gridLayout->addWidget(p_rightSampLinePosition, row++, 1);
 
-    //  Show lat / lon for measure of chips shown
-    p_leftLatLonPosition = new QLabel();
-    p_leftLatLonPosition->setToolTip("Latitude/Longitude under the crosshair");
-    gridLayout->addWidget(p_leftLatLonPosition, row, 0);
-    p_rightLatLonPosition = new QLabel();
-    p_rightLatLonPosition->setToolTip("Latitude/Longitude under the crosshair");
-    gridLayout->addWidget(p_rightLatLonPosition, row++, 1);
+    if (p_useGeometry) {
+      //  Show lat / lon for measure of chips shown
+      p_leftLatLonPosition = new QLabel();
+      p_leftLatLonPosition->setToolTip("Latitude/Longitude under the crosshair");
+      gridLayout->addWidget(p_leftLatLonPosition, row, 0);
+      p_rightLatLonPosition = new QLabel();
+      p_rightLatLonPosition->setToolTip("Latitude/Longitude under the crosshair");
+      gridLayout->addWidget(p_rightLatLonPosition, row++, 1);
+    }
 
 
     //  Add auto registration extension
@@ -544,24 +570,21 @@ namespace Isis {
     connect(p_blinkTimeBox, SIGNAL(valueChanged(double)),
             this, SLOT(changeBlinkTime(double)));
 
-    QPushButton *find = new QPushButton("Find");
-    find->setToolTip("Move right measure to same Latitude/Longitude as left.");
-    find->setWhatsThis("Find the Latitude/Longitude under the crosshair in the "
-                       "left measure and move the right measure to the same "
-                       "latitude/longitude.");
-
     leftLayout->addWidget(stop);
     leftLayout->addWidget(start);
     leftLayout->addWidget(p_blinkTimeBox);
-    leftLayout->addWidget(find);
+
+    if (p_useGeometry) {
+      QPushButton *find = new QPushButton("Find");
+      find->setToolTip("Move right measure to same Latitude/Longitude as left.");
+      find->setWhatsThis("Find the Latitude/Longitude under the crosshair in the "
+                         "left measure and move the right measure to the same "
+                         "latitude/longitude.");
+      leftLayout->addWidget(find);
+      connect(find, SIGNAL(clicked()), this, SLOT(findPoint()));
+    }
+
     leftLayout->addStretch();
-    //  TODO: Move AutoPick to NewPointDialog
-//    QPushButton *autopick = new QPushButton ("AutoPick");
-//    autopick->setFocusPolicy(Qt::NoFocus);
-//    QPushButton *blink = new QPushButton ("Blink");
-//    blink->setFocusPolicy(Qt::NoFocus);
-//    leftLayout->addWidget(autopick);
-//    leftLayout->addWidget(blink);
     gridLayout->addLayout(leftLayout, row, 0);
 
     QHBoxLayout *rightLayout = new QHBoxLayout();
@@ -572,12 +595,22 @@ namespace Isis {
                        "viewing the results, the option exists to move the "
                        "measure back to the original position by selecting "
                        "<strong>\"Undo Registration\"</strong>.");
-    p_saveMeasure = new QPushButton("Save Measure");
-    p_saveMeasure->setToolTip("Save the right measure to the edit control "
-                              "point (control point currently being edited). "
-                              " <strong>Note: The edit control point "
-                              "will not be save until you select "
-                              "<strong>\"Save Point\"</strong>");
+    if (p_allowLeftMouse) {
+      p_saveMeasure = new QPushButton("Save Measures");
+      p_saveMeasure->setToolTip("Save the both the left and right measure to the edit control "
+                                "point (control point currently being edited). "
+                                " <strong>Note: The edit control point "
+                                "will not be saved to the network until you select "
+                                "<strong>\"Save Point\"</strong>");
+    }
+    else {
+      p_saveMeasure = new QPushButton("Save Measure");
+      p_saveMeasure->setToolTip("Save the right measure to the edit control "
+                                "point (control point currently being edited). "
+                                " <strong>Note: The edit control point "
+                                "will not be saved to the network until you select "
+                                "<strong>\"Save Point\"</strong>");
+    }
     p_saveDefaultPalette = p_saveMeasure->palette();
 
     rightLayout->addWidget(p_autoReg);
@@ -585,7 +618,6 @@ namespace Isis {
     rightLayout->addStretch();
     gridLayout->addLayout(rightLayout, row, 1);
 
-    connect(find, SIGNAL(clicked()), this, SLOT(findPoint()));
     connect(p_autoReg, SIGNAL(clicked()), this, SLOT(registerPoint()));
     connect(p_saveMeasure, SIGNAL(clicked()), this, SLOT(saveMeasure()));
 
@@ -631,13 +663,15 @@ namespace Isis {
 
     p_leftMeasure = leftMeasure;
 
-    //  get new ground map
-    if ( p_leftGroundMap != 0 ) delete p_leftGroundMap;
-    p_leftGroundMap = new UniversalGroundMap(*leftCube);
+    if (p_useGeometry) {
+      //  get new ground map
+      if ( p_leftGroundMap != 0 ) delete p_leftGroundMap;
+      p_leftGroundMap = new UniversalGroundMap(*leftCube);
+    }
     p_leftCube = leftCube;
 
     p_leftChip->TackCube(p_leftMeasure->GetSample(), p_leftMeasure->GetLine());
-    p_leftChip->Load(*p_leftCube);
+    p_leftChip->Load(*p_leftCube, p_leftView->zoomFactor());
 
     // Dump into left chipViewport
     p_leftView->setChip(p_leftChip, p_leftCube);
@@ -685,15 +719,17 @@ namespace Isis {
     p_rightMeasure = rightMeasure;
     p_pointId = pointId;
 
-    //  get new ground map
-    if ( p_rightGroundMap != 0 ) delete p_rightGroundMap;
-    p_rightGroundMap = new UniversalGroundMap(*rightCube);
+    if (p_useGeometry) {
+      //  get new ground map
+      if ( p_rightGroundMap != 0 ) delete p_rightGroundMap;
+      p_rightGroundMap = new UniversalGroundMap(*rightCube);
+    }
     p_rightCube = rightCube;
 
     p_rightChip->TackCube(p_rightMeasure->GetSample(),
                           p_rightMeasure->GetLine());
     if ( p_geomIt == false ) {
-      p_rightChip->Load(*p_rightCube);
+      p_rightChip->Load(*p_rightCube, p_rightView->zoomFactor());
     }
     else {
       try {
@@ -727,25 +763,37 @@ namespace Isis {
    *
    * @param zoomFactor  Input  zoom factor
    *
-   * @author Tracie Sucharski
+   * @author Tracie Sucharski 
+   *  
+   * @internal 
+   *   @history 2012-07-26 Tracie Sucharski - Added ability to link zooming between left and
+   *                          right viewports.  TODO:  Re-think design, should this be put
+   *                          somewhere else.  This was the fastest solution for now.
    */
   void ControlPointEdit::updateLeftPositionLabel(double zoomFactor) {
     QString pos = "Sample: " + QString::number(p_leftView->tackSample()) +
                   "    Line:  " + QString::number(p_leftView->tackLine());
     p_leftSampLinePosition->setText(pos);
 
-    //  Get lat/lon from point in left
-    p_leftGroundMap->SetImage(p_leftView->tackSample(), p_leftView->tackLine());
-    double lat = p_leftGroundMap->UniversalLatitude();
-    double lon = p_leftGroundMap->UniversalLongitude();
+    if (p_useGeometry) {
+      //  Get lat/lon from point in left
+      p_leftGroundMap->SetImage(p_leftView->tackSample(), p_leftView->tackLine());
+      double lat = p_leftGroundMap->UniversalLatitude();
+      double lon = p_leftGroundMap->UniversalLongitude();
 
-    pos = "Latitude: " + QString::number(lat) +
-          "    Longitude:  " + QString::number(lon);
-    p_leftLatLonPosition->setText(pos);
+      pos = "Latitude: " + QString::number(lat) +
+            "    Longitude:  " + QString::number(lon);
+      p_leftLatLonPosition->setText(pos);
+    }
 
     //  Print zoom scale factor
     pos = "Zoom Factor: " + QString::number(zoomFactor);
     p_leftZoomFactor->setText(pos);
+
+    //  If zooms are linked, make right match left
+    if (p_linkZoom) {
+      p_rightView->zoom(p_leftView->zoomFactor());
+    }
 
   }
 
@@ -771,14 +819,16 @@ namespace Isis {
                   "    Line:  " + QString::number(p_rightView->tackLine());
     p_rightSampLinePosition->setText(pos);
 
-    //  Get lat/lon from point in right
-    p_rightGroundMap->SetImage(p_rightView->tackSample(), p_rightView->tackLine());
-    double lat = p_rightGroundMap->UniversalLatitude();
-    double lon = p_rightGroundMap->UniversalLongitude();
+    if (p_useGeometry) {
+      //  Get lat/lon from point in right
+      p_rightGroundMap->SetImage(p_rightView->tackSample(), p_rightView->tackLine());
+      double lat = p_rightGroundMap->UniversalLatitude();
+      double lon = p_rightGroundMap->UniversalLongitude();
 
-    pos = "Latitude: " + QString::number(lat) +
-          "    Longitude:  " + QString::number(lon);
-    p_rightLatLonPosition->setText(pos);
+      pos = "Latitude: " + QString::number(lat) +
+            "    Longitude:  " + QString::number(lon);
+      p_rightLatLonPosition->setText(pos);
+    }
 
     //  Print zoom scale factor
     pos = "Zoom Factor: " + QString::number(zoomFactor);
@@ -891,8 +941,13 @@ namespace Isis {
       p_autoRegFact->SearchChip()->TackCube(
                           p_rightMeasure->GetSample(),
                           p_rightMeasure->GetLine());
-      p_autoRegFact->SearchChip()->Load(*p_rightCube,
-                          *(p_autoRegFact->PatternChip()), *p_leftCube);
+      if (p_useGeometry) {
+        p_autoRegFact->SearchChip()->Load(*p_rightCube,
+                            *(p_autoRegFact->PatternChip()), *p_leftCube);
+      }
+      else {
+        p_autoRegFact->SearchChip()->Load(*p_rightCube);
+      }
     }
     catch (IException &e) {
       QString msg = "Cannot register this point, unable to Load chips.\n";
@@ -929,7 +984,7 @@ namespace Isis {
         else if ( status == AutoReg::SurfaceModelDistanceInvalid ) {
           double sampDist, lineDist;
           p_autoRegFact->Distance(sampDist, lineDist);
-          msg += "\n\nSub pixel algorithm moves registartion more than tolerance.\n";
+          msg += "\n\nSub pixel algorithm moves registration more than tolerance.\n";
           msg += "\nSampleMovement = " + QString::number(sampDist) +
                  "    LineMovement = " + QString::number(lineDist);
           msg += "\nDistanceTolerance = " +
@@ -1060,11 +1115,12 @@ namespace Isis {
     }
 
     if ( p_allowLeftMouse ) {
-      if ( p_leftMeasure != NULL )
+      if ( p_leftMeasure != NULL ) {
         p_leftMeasure->SetCoordinate(p_leftView->tackSample(), p_leftView->tackLine());
-      p_leftMeasure->SetDateTime();
-      p_leftMeasure->SetChooserName(Application::UserName());
-      p_leftMeasure->SetType(ControlMeasure::Manual);
+        p_leftMeasure->SetDateTime();
+        p_leftMeasure->SetChooserName(Application::UserName());
+        p_leftMeasure->SetType(ControlMeasure::Manual);
+      }
     }
 
     //  If the right chip is the same as the left chip, copy right into left and
@@ -1110,6 +1166,36 @@ namespace Isis {
       }
     }
   }
+
+
+
+///**
+// * Slot to update the right ChipViewport for zoom
+// * operations
+// *
+// * @author 2012-07-26 Tracie Sucharski
+// *
+// * @internal
+// */
+//void ControlPointEdit::updateRightZoom() {
+//
+//  if ( p_linkZoom ) {
+//    try {
+//      p_rightView->geomChip(p_leftChip, p_leftCube);
+//
+//    }
+//    catch (IException &e) {
+//      IException fullError(e, IException::User, "Geom failed.", _FILEINFO_);
+//      QString message = fullError.toString();
+//      QMessageBox::information((QWidget *)parent(), "Error", message);
+//      p_geomIt = false;
+//      p_nogeom->setChecked(true);
+//      p_geom->setChecked(false);
+//    }
+//  }
+//}
+
+
 
   /**
    * Slot to enable the rotate dial
@@ -1267,6 +1353,25 @@ namespace Isis {
 
 
 
+  /**
+   * Turn linking of zoom on or off
+   *
+   * @param checked   Input   Turn zoom linking on or off
+   *
+   * @author 2012-07-26 Tracie Sucharski
+   */
+  void ControlPointEdit::setZoomLink(bool checked) {
+
+    if ( checked == p_linkZoom ) return;
+
+    p_linkZoom = checked;
+    if ( p_linkZoom ) {
+      p_rightView->zoom(p_leftView->zoomFactor());
+    }
+  }
+
+
+
   //!  Slot to start blink function
   void ControlPointEdit::blinkStart() {
     if ( p_timerOn ) return;
@@ -1378,6 +1483,23 @@ namespace Isis {
    */
   void ControlPointEdit::allowLeftMouse(bool allowMouse) {
     p_allowLeftMouse = allowMouse;
+
+    if (p_allowLeftMouse) {
+      p_saveMeasure = new QPushButton("Save Measures");
+      p_saveMeasure->setToolTip("Save the both the left and right measure to the edit control "
+                                "point (control point currently being edited). "
+                                " <strong>Note: The edit control point "
+                                "will not be saved to the network until you select "
+                                "<strong>\"Save Point\"</strong>");
+    }
+    else {
+      p_saveMeasure = new QPushButton("Save Measure");
+      p_saveMeasure->setToolTip("Save the right measure to the edit control "
+                                "point (control point currently being edited). "
+                                " <strong>Note: The edit control point "
+                                "will not be saved to the network until you select "
+                                "<strong>\"Save Point\"</strong>");
+    }
   }
 
 
