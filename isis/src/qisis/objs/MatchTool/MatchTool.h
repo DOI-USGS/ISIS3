@@ -189,6 +189,8 @@ namespace Isis {
    *                          explicit reference for the point, otherwise simply set reference to
    *                          left measure.  If ground source is on the left do not print warning
    *                          about new reference measure.
+   *   @history 2012-08-11 Tracie Sucharski - In ::openNet, do not prompt for saving current
+   *                          net if net hasn't changed since last save.
    */
   class MatchTool : public Tool {
     Q_OBJECT

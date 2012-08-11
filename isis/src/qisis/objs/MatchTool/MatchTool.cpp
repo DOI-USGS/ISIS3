@@ -1319,7 +1319,7 @@ namespace Isis {
 
   void MatchTool::openNet() {
     
-    if (m_controlNet && m_controlNet->GetNumPoints() != 0) {
+    if (m_controlNet && m_controlNet->GetNumPoints() != 0 && m_netChanged) {
       QString message = "A control net has already been created.  Do you want to save before "
                         "opening a new control net?";
       int response = QMessageBox::question(m_matchTool, "Save current control net?",
