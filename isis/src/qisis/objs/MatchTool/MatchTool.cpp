@@ -848,16 +848,19 @@ namespace Isis {
       }
     }
 
+    bool savedAMeasure = false;
     //  Error check both measures for edit lock, ignore status and reference
     bool leftChangeOk = validateMeasureChange(m_leftMeasure);
     if (leftChangeOk) {
       m_leftMeasure->SetChooserName(Application::UserName());
       *origLeftMeasure = *m_leftMeasure;
+      savedAMeasure = true;
     }
     bool rightChangeOk = validateMeasureChange(m_rightMeasure);
     if (rightChangeOk) {
       m_rightMeasure->SetChooserName(Application::UserName());
       *origRightMeasure = *m_rightMeasure;
+      savedAMeasure = true;
     }
 
     // If left measure == right measure, update left
@@ -869,7 +872,9 @@ namespace Isis {
     }
 
     //  Change Save Point button text to red
-    colorizeSaveButton();
+    if (savedAMeasure) {
+      colorizeSaveButton();
+    }
 
     emit editPointChanged();
 
@@ -1486,7 +1491,6 @@ namespace Isis {
 
       //  Find closest control point in network
       iString sn = m_serialNumberList->SerialNumber(file);
-//    qDebug()<<"::mouseButtonRelease  sn = "<<sn.ToQt();
       ControlPoint *point = NULL;
       try {
         point = m_controlNet->FindClosest(sn, samp, line);
@@ -2881,7 +2885,6 @@ namespace Isis {
    *
    */
   void MatchTool::refresh() {
-//  qDebug()<<"MatchTool::refresh";
 
     //  Check point being edited, make sure it still exists, if not ???
     //  Update ignored checkbox??
