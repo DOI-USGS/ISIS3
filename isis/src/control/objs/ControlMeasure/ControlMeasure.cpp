@@ -168,6 +168,7 @@ namespace Isis {
     p_diameter = Null;
     p_aprioriSample = Null;
     p_aprioriLine = Null;
+    p_computedEphemerisTime = Null;
     p_sampleSigma = Null;
     p_lineSigma = Null;
     p_sampleResidual = Null;
@@ -178,6 +179,7 @@ namespace Isis {
     p_focalPlaneMeasuredY = Null;
     p_focalPlaneComputedX = Null;
     p_focalPlaneComputedY = Null;
+    p_measuredEphemerisTime = Null;
 
     parentPoint = NULL;
     associatedCSN = NULL;
