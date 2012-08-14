@@ -115,6 +115,8 @@ namespace Isis {
    *                           set PointType=Ground.
    *   @history 2011-05-02 Debbie A. Cook - Created pvl version 3 which added
    *                           point type of constrained.
+   *   @history 2012-08-14 Steven Lambright - Simplified error handling of invalid
+   *                           target names in V1 networks (V1->V2 code).
    */
   class ControlNetVersioner {
     public:

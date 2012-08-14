@@ -463,32 +463,13 @@ namespace Isis {
     // Really... Projection::TargetRadii should be making this call
     NaifStatus::CheckErrors();
 
-    bool error = false;
     PvlGroup radii;
     try {
       radii = Projection::TargetRadii(network["TargetName"]);
     }
     catch(IException &e) {
-      error = true;
-    }
-
-    // If we had an error then the errors aren't flushed
-    bool errorsFlushed = false;
-    IException naifError;
-    while(!errorsFlushed) {
-      try {
-        NaifStatus::CheckErrors();
-        errorsFlushed = true;
-      }
-      catch(IException &e) {
-        error = true;
-        naifError = e;
-      }
-    }
-
-    if(error) {
       iString msg = "The target name is not recognized";
-      throw IException(naifError, IException::Io, msg, _FILEINFO_);
+      throw IException(e, IException::Io, msg, _FILEINFO_);
     }
 
     Distance equatorialRadius(radii["EquatorialRadius"], Distance::Meters);

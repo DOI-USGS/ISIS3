@@ -21,6 +21,8 @@
  */
 #include "Projection.h"
 
+#include <QObject>
+
 #include <cfloat>
 #include <cmath>
 #include <iomanip>
@@ -35,6 +37,7 @@
 #include "IException.h"
 #include "iString.h"
 #include "Longitude.h"
+#include "NaifStatus.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
@@ -447,10 +450,22 @@ namespace Isis {
     furnsh_c(kernName.c_str());
 
     // Get the radii from NAIF
+    NaifStatus::CheckErrors();
     SpiceInt n;
     SpiceDouble radii[3];
     bodvar_c(code, "RADII", &n, radii);
     unload_c(kernName.c_str());
+
+    try {
+      NaifStatus::CheckErrors();
+    }
+    catch (IException &e) {
+      throw IException(e,
+                       IException::Unknown,
+                       QObject::tr("The target name [%1] does not correspond to a target body "
+                                   "with known radii").arg(QString::fromStdString(target)),
+                       _FILEINFO_);
+    }
 
     PvlGroup mapping("Mapping");
     mapping += PvlKeyword("TargetName",  target);

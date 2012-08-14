@@ -327,6 +327,9 @@ Testing other static methods
 Mars equatorial radius: EquatorialRadius = 3396190.0 <meters>
 Mars polar radius: PolarRadius = 3376200.0 <meters>
 
+**ERROR** The target name [Mo] does not correspond to a target body with known radii.
+**ERROR** An unknown NAIF error has been encountered. The short explanation provided by NAIF is [SPICE(KERNELVARNOTFOUND)]. The Naif error is [The variable BODY-94_RADII could not be found in the kernel pool.].
+
 Rotation Tests
 Rotation:     90
 Testing Ground coordinate routines

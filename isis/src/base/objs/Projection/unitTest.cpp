@@ -690,6 +690,14 @@ int main(int argc, char *argv[]) {
     error.print();
   }
 
+  try {
+    Projection::TargetRadii("Mo");
+  }
+  catch (IException &error) {
+    error.print();
+  }
+  cout << endl;
+
   cout << "Rotation Tests" << endl;
   mg += PvlKeyword("Rotation", 90.0);
   mg["LongitudeDirection"] = "PositiveEast";
