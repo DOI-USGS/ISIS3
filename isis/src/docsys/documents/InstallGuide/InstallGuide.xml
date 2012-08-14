@@ -166,7 +166,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
 </pre>
 
         <p>
-          Example for Open SUSE 11.3 Linux x86 64-bit Intel compatible systems:
+          Example for SUSE Linux Enterprise Server 11 Linux x86 64-bit Intel compatible systems:
         </p>
 <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_SUSE11/isis .
@@ -509,6 +509,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
     <change name="Jai Rideout and Steven Lambright" date="2012-02-06">Updated documentation to be clearer, per Trent Hare's recommendations. References #692.</change>
     <change name="Travis Addair" date="2012-03-14">Added Java installer section</change>
     <change name="Steven Lambright and Stuart Sides" date="2012-05-21">Updated for release 3.4.0</change>
+    <change name="Steven Lambright" date="2012-08-14">Replaced Open Suse with SLES</change>
   </history>
 
   <bibliography>
