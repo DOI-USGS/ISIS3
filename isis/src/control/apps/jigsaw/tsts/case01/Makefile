@@ -1,4 +1,4 @@
-APPNAME = jigsaw
+ APPNAME = jigsaw
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -27,7 +27,7 @@ commands:
 	# 3. remove digits beyond the fifth decimal place of decimal numbers
 	# 4. remove date and time
 	cat case01OutLog.txt \
-	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
+	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  > $(OUTPUT)/case01OutLog.txt
 	cat t_residuals.csv | sed 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
 	  > $(OUTPUT)/residuals.csv

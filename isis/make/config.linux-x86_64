@@ -55,7 +55,9 @@ ISISARFLAGS     =
 # Set up local library designations
 #---------------------------------------------------------------------------
 ISIS3SYSINC ?= /usr/include
-ISIS3SYSLIB ?= /usr/lib64
+#ISIS3SYSLIB ?= /usr/lib64
+ISIS3SYSLIB ?= $(shell if [ -d /usr/lib64 ]; then echo "/usr/lib64"; else echo "/usr/lib"; fi;)
+ISIS3ALTSYSLIB ?= $(shell if [ -d /usr/lib/x86_64-linux-gnu ]; then echo "/usr/lib/x86_64-linux-gnu"; else echo "/usr/lib64"; fi;)
 ISIS3LOCAL  ?= /usgs/pkgs/local/$(ISISLOCALVERSION)
 
 #---------------------------------------------------------------------------
@@ -295,7 +297,7 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libamd.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcholmod.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/liblapack.so"
 THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libblas*.so*"
-THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libgfortran.so*"
+THIRDPARTYLIBS    += "$(ISIS3ALTSYSLIB)/libgfortran.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libxerces-c*.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libtiff*.so*"
 THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libgsl*.so*"

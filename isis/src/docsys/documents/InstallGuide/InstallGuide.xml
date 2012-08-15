@@ -173,7 +173,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
 </pre>
 
         <p>
-          Example for Ubuntu 10.04 Linux x86 64-bit Intel compatible systems:
+          Example for Ubuntu 12.04 Linux x86 64-bit Intel compatible systems:
         </p>
 <pre>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_UBUNTU/isis .
