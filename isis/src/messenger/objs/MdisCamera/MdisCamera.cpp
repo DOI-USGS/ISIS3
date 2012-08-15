@@ -19,6 +19,11 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+
+#include <cmath>
+
+#include <QVariant>
+
 #include "MdisCamera.h"
 #include "TaylorCameraDistortionMap.h"
 
@@ -112,8 +117,8 @@ namespace Isis {
 
     //  Turns out (2008-01-17) the WAC has different focal lengths for
     // each filter.  Added to the instrument kernel (IAK) on this date.
-    double focalLength = getDouble("INS" + filterCode + "_FOCAL_LENGTH");
-    SetFocalLength(focalLength);
+    //  Add temperature dependant focal length
+    SetFocalLength(computeFocalLength(filterCode, lab));
 
     SetPixelPitch();
 
@@ -165,6 +170,7 @@ namespace Isis {
     //  FPU binning was performed, retrieve the FPU binning offsets and
     //  apply them to the focal plane mapping.
     if(fpuBinMode == 1) {
+#if defined(USE_FPU_BINNING_OFFSETS)
       ikernKey = "INS" + ikCode + "_FPUBIN_START_SAMPLE";
       double fpuStartingSample = getDouble(ikernKey);
       detMap->SetStartingDetectorSample(fpuStartingSample);
@@ -172,7 +178,7 @@ namespace Isis {
       ikernKey = "INS" + ikCode + "_FPUBIN_START_LINE";
       double fpuStartingLine = getDouble(ikernKey);
       detMap->SetStartingDetectorLine(fpuStartingLine);
-
+#endif
       summing *= 2;
     }
 
@@ -222,16 +228,16 @@ namespace Isis {
   /**
    * Returns the shutter open and close times.  The user should pass in the
    * ExposureDuration keyword value, converted from milliseconds to seconds, and
-   * the SpacecraftClockCount keyword value, converted to ephemeris time. The StartTime keyword
-   * value from the labels represents the shutter open time of the observation.
-   * This method uses the FramingCamera class implementation, returning the
-   * given time value as the shutter open and the sum of the time value and
-   * exposure duration as the shutter close.
+   * the SpacecraftClockCount keyword value, converted to ephemeris time. The 
+   * StartTime keyword value from the labels represents the shutter open time of 
+   * the observation. This method uses the FramingCamera class implementation, 
+   * returning the given time value as the shutter open and the sum of the time 
+   * value and exposure duration as the shutter close. 
    *
    * @param exposureDuration Exposure duration value from the labels, converted
    *                         to seconds.
-   * @param time The SpacecraftClockCount value from the labels, converted to ephemeris
-   *             time
+   * @param time The SpacecraftClockCount value from the labels, converted to 
+   *             ephemeris time
    * @return @b pair < @b iTime, @b iTime > The first value is the shutter
    *         open time and the second is the shutter close time.
    *
@@ -243,6 +249,80 @@ namespace Isis {
   pair <iTime, iTime> MdisCamera::ShutterOpenCloseTimes(double time,
                                                         double exposureDuration) {
     return FramingCamera::ShutterOpenCloseTimes(time, exposureDuration);
+  }
+
+/**
+ * @brief Computes temperature-dependent focal length 
+ *  
+ * This method computes temperature dependent focal lengths based upon a 5th 
+ * order polynomial using the FocalPlaneTemperature keyword value stored in the
+ * ISIS label (it is the FOCAL_PLANE_TEMPERATURE PDS keyword).  At the time of 
+ * this writing, only (the two) linear terms are used. 
+ *  
+ * In addition, this method is initially coded to be backword compatible but 
+ * this feature is likely to be removed when the kernels become fully adopted. 
+ *  
+ * IMPORTANT:  The computed temperature dependent focal length is stored in the 
+ * label of the cube during spiceinit.  This implementation uses the special
+ * recording of keywords as retrieved from kernels and stores them as a string 
+ * value so (SOCET) folks can easily read and apply the focal lengths in their 
+ * environments.  String storage is preferred over storing as double since 
+ * these values are stored in hexidecimal format. 
+ *  
+ * @author Kris Becker (8/13/2012)
+ * 
+ * @param filterCode Integer MDIS instrument/filter code
+ * @param label      Pvl label from cube being initialized where temperature 
+ *                   keywords are extracted from.
+ * 
+ * @return double    Computed temperature dependant focal length
+ */
+  double MdisCamera::computeFocalLength(const std::string &filterCode,
+                                        Pvl &label) {
+
+    double focalLength(0.0);
+    iString tdflKey("INS"+filterCode+"_TEMPDEP_FOCAL_LENGTH");
+
+    //  Determine if the desired value is already computed.  We are interested
+    //  in the temperature dependent value firstly.  Backwartd compatibility
+    //  is considered below.
+    QVariant my_tdfl = getStoredResult(tdflKey, SpiceStringType);
+    if (my_tdfl.isValid()) {
+      focalLength = iString(my_tdfl.toString()).ToDouble();
+    }
+    else {
+      // Hasn't been computed yet (in spiceinit now - maybe) or the proper
+      //  IK containing polynomial parameters is not in use.
+
+    // Original Code ensures backward compatibility
+      focalLength = getDouble("INS" + filterCode + "_FOCAL_LENGTH");
+
+      // Wrap a try clause all around this so that if it fails, will return
+      // default
+      try {
+        PvlGroup &inst = label.FindGroup("Instrument", Pvl::Traverse);      
+        double fpTemp = inst["FocalPlaneTemperature"];
+        double fl(0.0);
+        iString fptCoeffs = "INS" + filterCode + "_FL_TEMP_COEFFS";
+        //  Compute 5th order polynomial
+        for (int i = 0 ; i < 6 ;  i++) {
+          fl += getDouble(fptCoeffs, i) * pow(fpTemp, (double) i);
+        }
+
+        // Store computed focal length
+        focalLength = fl;
+        storeResult(tdflKey, SpiceStringType, iString(focalLength).ToQt());
+      }
+      catch (IException &ie) {
+        // Noop when supporting old IKs
+#if defined(DISABLE_BACKWARD_COMPATIBILITY)
+        throw IException(ie, IException::Programmer,
+                          "Failed to compute temperature-dependent focal length",
+                           _FILEINFO_);
+#endif
+      }
+    }
+     return (focalLength);
   }
 }
 

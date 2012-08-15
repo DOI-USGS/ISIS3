@@ -84,6 +84,8 @@ namespace Isis {
    *            check to constructor.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
    *            coding standards. References #972.
+   *   @history 2012-07-25 Kris Becker - Added temperature dependant focal
+   *            length computation from new IK content.  Fixes #922.
    */
   class MdisCamera : public FramingCamera {
     public:
@@ -121,6 +123,9 @@ namespace Isis {
        *         Kernel Reference ID
        */
       virtual int SpkReferenceId() const { return (1); }
+
+    private:
+      double computeFocalLength(const std::string &filterCode, Pvl &label);
   };
 };
 #endif
