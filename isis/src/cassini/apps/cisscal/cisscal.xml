@@ -87,7 +87,7 @@
         Step 6: Convert DN to Flux
       </strong> 
       This step consists of 4 processes and the user must enter a value of 
-      "intensity" or "I/F" for the parameter "fluxunits".  In the first process, 
+      "intensity" or "I/F" for the parameter "units".  In the first process,
       DNs are <strong>converted to electrons</strong> by multiplying by the true
       gain.  Second, the image is <strong>divided by the exposure time</strong>, 
       correcting for shutter offset effect. Third, the image is                                                          
@@ -188,6 +188,10 @@
     </change>
     <change name="Debbie A. Cook" date="2012-07-06">
       Updated Spice members to be more compliant with Isis coding standards. References #972.
+    </change>
+    <change name="Kimberly Oyama" date="2012-08-16">
+      Changed the parameter FLUXUNITS to UNITS. Changed the default value of the UNITS parameter
+      to I/F (instead of INTENSITY). Fixes #219.
     </change>
   </history>
 
@@ -309,14 +313,14 @@
       </parameter>
     </group>
     <group name = "Input Values">
-      <parameter name = "FLUXUNITS">
+      <parameter name = "UNITS">
         <type>string</type>
         <brief>Options for converted flux units</brief>
         <description>
           A list of the types of units to which user may choose to convert from
           DNs. 
         </description>
-        <default><item>INTENSITY</item></default>
+        <default><item>I/F</item></default>
         <list>
           <option value="INTENSITY">
             <brief>Intensity units </brief>
@@ -346,7 +350,7 @@
       </description>
       <terminalInterface>
         <commandLine> 
-          from=../IN/inputCube.cub to=../OUT/outputCube.cub 
+          from=../IN/inputCube.cub to=../OUT/outputCube.cub units=INTENSITY
         </commandLine>
         <description> 
           Run the <strong>cisscal</strong> application to calibrate the cube.
@@ -359,7 +363,7 @@
             <description>
               Screenshot of GUI with parameters filled in to perform the <strong>cisscal</strong>
               application.  Input and output cubes are always required. The
-              radio button INTENSITY is chosen as default.
+              flux unit Intensity is chosen (default is I/F).
             </description>
             <thumbnail width="180" height="200" caption="Cisscal Gui using intensity" src="assets/thumbs/cisscalGuiThumbEx1.jpg" />
           </image>
@@ -376,7 +380,7 @@
             of the same application run on the example 2 output cube.
           </description>
           <parameterName>
-            FLUXUNITS
+            UNITS
           </parameterName>
         </dataFile>
       </dataFiles>
@@ -419,7 +423,7 @@
       </description>
       <terminalInterface>
         <commandLine> 
-          from=../IN/inputCube.cub to=../OUT/outputCube.cub fluxunits="I/F"
+          from=../IN/inputCube.cub to=../OUT/outputCube.cub
         </commandLine>
         <description> 
           Run the <strong>cisscal</strong> application to calibrate the cube.
@@ -432,7 +436,7 @@
             <description>
               Screenshot of GUI with parameters filled in to perform the <strong>cisscal</strong>
               application.  Input and output cubes are always required. The
-              radio button I/F is chosen.
+              flux unit I/F (default) is chosen.
             </description>
             <thumbnail width="180" height="200" caption="Cisscal Gui using I/F" src="assets/thumbs/cisscalGuiThumbEx2.jpg" />
           </image>
@@ -449,7 +453,7 @@
             of the same application run on the example 1 output cube.
           </description>
           <parameterName>
-            FLUXUNITS
+            UNITS
           </parameterName>
         </dataFile>
       </dataFiles>
