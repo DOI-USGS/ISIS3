@@ -1,5 +1,7 @@
 APPNAME = slpmap
 
+slpmapTruth2.cub.TOLERANCE = .000001
+
 include $(ISISROOT)/make/isismake.tsts
 
 commands:
