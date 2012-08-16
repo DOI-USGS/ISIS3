@@ -4,6 +4,11 @@
 #include <QtTestGui>
 
 namespace Isis {
+  /**
+   * @author 2012-??-?? Steven Lambright
+   *
+   * @internal
+   */
   class MosaicFileListWidgetTester : public QObject {
     Q_OBJECT
 

@@ -51,6 +51,11 @@ using namespace Isis;
 
 bool ptXLessThan(const QList<double> l1, const QList<double> l2);
 
+/**
+ * @author 2012-05-09 Orrin Thomas
+ *
+ * @internal
+ */
 class LineOffsetFunctor : 
   public std::unary_function<double, double > {
   public:
@@ -117,6 +122,11 @@ class LineOffsetFunctor :
 };
 
 
+/**
+ * @author 2012-05-09 Orrin Thomas
+ *
+ * @internal
+ */
 class SensorSurfacePointDistanceFunctor : 
   public std::unary_function<double, double > {
   public:

@@ -278,31 +278,40 @@ namespace Isis {
       void Shuffle(QList< ControlCubeGraphNode * > & list) const;
       QPair< int, int > CalcBWAndCE(QList< QString > serials) const;
 
+      /**
+       * @author 2012-04-13 Orrin Thomas
+       *
+       * @internal
+       */
       class ControlMeasureLessThanFunctor : 
-        public std::binary_function<ControlMeasure* const &,
-        ControlMeasure * const &, bool > {
-          public:
-            ControlMeasureLessThanFunctor(double(ControlMeasure::*accessorMethod)() const) {
-              m_accessor = accessorMethod;
-            }
-            ControlMeasureLessThanFunctor(ControlMeasureLessThanFunctor const &other) {
-              this->m_accessor = other.m_accessor;
-            }
-            ~ControlMeasureLessThanFunctor() {}
+          public std::binary_function<ControlMeasure* const &,
+          ControlMeasure * const &, bool > {
+        public:
+          ControlMeasureLessThanFunctor(double(ControlMeasure::*accessorMethod)() const) {
+            m_accessor = accessorMethod;
+          }
+          ControlMeasureLessThanFunctor(ControlMeasureLessThanFunctor const &other) {
+            this->m_accessor = other.m_accessor;
+          }
+          ~ControlMeasureLessThanFunctor() {}
             
-            bool operator()(ControlMeasure* const &, ControlMeasure* const &);
-            ControlMeasureLessThanFunctor & operator=(ControlMeasureLessThanFunctor const &other); 
+          bool operator()(ControlMeasure* const &, ControlMeasure* const &);
+          ControlMeasureLessThanFunctor & operator=(ControlMeasureLessThanFunctor const &other); 
 
-          private:
-            double(ControlMeasure::*m_accessor)() const;
-        };
+        private:
+          double(ControlMeasure::*m_accessor)() const;
+      };
 
 
-    /**
+      /**
        * Encapsulation of a vertex in a minimum spanning tree.  Can be either a
        * Control Point or a Graph Node.  Each vertex is connected to another by
        * a measure.  A vertex without a parent vertex is considered a root node,
        * or the base of its own tree.
+       *
+       * @author ????-??-?? Unknown
+       *
+       * @internal 
        */
       class ControlVertex {
         public:

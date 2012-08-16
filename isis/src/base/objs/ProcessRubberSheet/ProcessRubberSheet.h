@@ -30,6 +30,8 @@
 #include "TileManager.h"
 
 namespace Isis {
+  class Brick;
+
   /**
    * @brief Derivative of Process, designed for geometric transformations
    *
@@ -108,9 +110,6 @@ namespace Isis {
    *   @todo 2005-02-11 Stuart Sides - finish documentation and add coded and
    *                        implementation example to class documentation
    */
-
-  class Brick;
-
   class ProcessRubberSheet : public Process {
     public:
 

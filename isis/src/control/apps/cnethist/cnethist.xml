@@ -29,7 +29,7 @@
           list of paths to networks with residual data
         </brief>
         <description>
-  	  list of paths to networks with residual data.  One per line.
+          list of paths to networks with residual data.  One per line.
         </description>
         <filter>
           *.lis *.txt
@@ -40,10 +40,10 @@
         <fileMode>input</fileMode>
         <internalDefault>None</internalDefault>
         <brief>
-          control network with residual data
+          Control network with residual data
         </brief>
         <description>
-  	  control network with residual data.
+          Control network with residual data.
         </description>
         <filter>
           *.net
@@ -69,7 +69,7 @@
     <group name="Options">
       <parameter name="BIN_WIDTH">
         <type>double</type>
-        <Default>0.01</Default>
+        <default><item>0.01</item></default>
         <brief>
           With of Histogram Bins
         </brief>
@@ -77,7 +77,6 @@
           With of Histogram Bins.
         </description>
       </parameter>
-      <min>0.0001</min>
     </group>
 
     <group name="Plot Options">

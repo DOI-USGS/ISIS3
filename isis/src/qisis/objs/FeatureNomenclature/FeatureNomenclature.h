@@ -105,7 +105,7 @@ namespace Isis {
        * @author 2012-03-22 Steven Lambright
        *
        * @internal
-       *   @history 2012 -06-06 Steven Lambright and Kimberly Oyama - Added approval status to the
+       *   @history 2012-06-06 Steven Lambright and Kimberly Oyama - Added approval status to the
        *                            list of characteristics of the feature and added the accessor
        *                            (status()). Fixes #852. Fixes #892.
        */

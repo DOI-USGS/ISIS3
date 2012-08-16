@@ -40,7 +40,11 @@ bool revertFalsePositives;
 int expansion;
 double resTolerance;
 
-
+/**
+ * @author 2012-04-06 Travis Addair
+ *
+ * @internal
+ */
 class Validation {
   public:
     enum Result {
