@@ -57,7 +57,8 @@ ISISARFLAGS     =
 ISIS3SYSINC ?= /usr/include
 #ISIS3SYSLIB ?= /usr/lib64
 ISIS3SYSLIB ?= $(shell if [ -d /usr/lib64 ]; then echo "/usr/lib64"; else echo "/usr/lib"; fi;)
-ISIS3ALTSYSLIB ?= $(shell if [ -d /usr/lib/x86_64-linux-gnu ]; then echo "/usr/lib/x86_64-linux-gnu"; else echo "/usr/lib64"; fi;)
+ISIS3ALTSYSLIB ?= $(shell if [ -f /usr/lib/x86_64-linux-gnu/libgfortran.so.3 ]; then \
+    echo "/usr/lib/x86_64-linux-gnu"; else echo "/usr/lib64"; fi;)
 ISIS3LOCAL  ?= /usgs/pkgs/local/$(ISISLOCALVERSION)
 
 #---------------------------------------------------------------------------
