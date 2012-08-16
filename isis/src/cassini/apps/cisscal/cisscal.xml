@@ -189,10 +189,6 @@
     <change name="Debbie A. Cook" date="2012-07-06">
       Updated Spice members to be more compliant with Isis coding standards. References #972.
     </change>
-    <change name="Kimberly Oyama" date="2012-08-16">
-      Changed the default value of the FLUXUNITS parameter to I/F (instead of INTENSITY).
-      Fixes #219.
-    </change>
   </history>
 
   <category>
@@ -320,7 +316,7 @@
           A list of the types of units to which user may choose to convert from
           DNs. 
         </description>
-        <default><item>I/F</item></default>
+        <default><item>INTENSITY</item></default>
         <list>
           <option value="INTENSITY">
             <brief>Intensity units </brief>
