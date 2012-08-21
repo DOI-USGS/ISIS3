@@ -28,6 +28,11 @@ double dcScaleFactor;
 double exposureDuration;
 bool eightBitDarkCube; // Is the dark cube of type unsigned byte?
 bool iof; // Determines output units (i.e. I/F or radiance)
+double s1;
+double s2;
+double rsun;
+double cubeConversion;
+double gainConversion;
 
 void Calibrate(vector<Buffer *> &in, vector<Buffer *> &out);
 FileName FindDarkFile(Cube *icube);
@@ -49,9 +54,6 @@ void IsisMain() {
   // Set up our ProcessByLine
   ProcessByLine p;
   Cube *icube = p.SetInputCube("FROM");
-  std::cout << "Dark File: " << FindDarkFile(icube).expanded() << std::endl;
-  std::cout << "Gain File: " << FindGainFile(icube).expanded() << std::endl;
-  std::cout << "Shutter File: " << FindShutterFile(icube).expanded() << std::endl;
 
   Isis::CubeAttributeInput inAtt1;
   FileName darkFileName = FindDarkFile(icube);
@@ -96,11 +98,30 @@ void IsisMain() {
   calibrationLog.AddKeyword(PvlKeyword("From", (std::string)ui.GetFileName("FROM")));
 
   FileName shutterFileName = FindShutterFile(icube);
-  calibrationLog.AddKeyword(PvlKeyword("DarkCurrentFile", darkFileName.originalPath() + "/" + darkFileName.name()));
-  calibrationLog.AddKeyword(PvlKeyword("GainFile", gainFileName.originalPath() + "/" + gainFileName.name()));
-  calibrationLog.AddKeyword(PvlKeyword("ShutterFile", shutterFileName.originalPath() + "/" + shutterFileName.name()));
+  calibrationLog.AddKeyword(PvlKeyword("DarkCurrentFile", darkFileName.originalPath() + "/" +
+                                       darkFileName.name()));
+  calibrationLog.AddKeyword(PvlKeyword("GainFile", gainFileName.originalPath() + "/" +
+                                       gainFileName.name()));
+  calibrationLog.AddKeyword(PvlKeyword("ShutterFile", shutterFileName.originalPath() + "/" +
+                                       shutterFileName.name()));
   calibrationLog.AddKeyword(PvlKeyword("ScaleFactor", scaleFactor));
   calibrationLog.AddKeyword(PvlKeyword("OutputUnits", iof ? "I/F" : "Radiance"));
+  if (iof) {
+    calibrationLog.AddKeyword(PvlKeyword("S1", s1, "I/F per Ft-Lambert"));
+    calibrationLog.AddKeyword(PvlKeyword("RSUN", rsun, "(Planet-Sun range)/5.2 A.U."));
+    calibrationLog.AddKeyword(PvlKeyword("Scale", scaleFactor, "I/F units per DN"));
+    calibrationLog.AddKeyword(PvlKeyword("GC", cubeConversion, "Cube gain conversion"));
+    calibrationLog.AddKeyword(PvlKeyword("GG", gainConversion, "Gain file gain conversion"));
+    calibrationLog.AddKeyword(PvlKeyword("IOF-SCALE0", scaleFactor0, "(S1/Scale)*(GC/GG)/RSUN**2"));
+  }
+  else {
+    calibrationLog.AddKeyword(PvlKeyword("S2", s2, "Nanowatts per Ft-Lambert"));
+    calibrationLog.AddKeyword(PvlKeyword("Scale", scaleFactor,
+                                         "Nanowatts/cm**2/steradian/nanometer/DN"));
+    calibrationLog.AddKeyword(PvlKeyword("GC", cubeConversion, "Cube gain conversion"));
+    calibrationLog.AddKeyword(PvlKeyword("GG", gainConversion, "Gain file gain conversion"));
+    calibrationLog.AddKeyword(PvlKeyword("Radiance-SCALE0", scaleFactor0, "(S2/Scale)*(GC/GG)"));
+  }
 
   ocube->putGroup(calibrationLog);
   Application::Log(calibrationLog);
@@ -405,8 +426,10 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
                      _FILEINFO_);
   }
 
-  double s1 = fltToRef[filterNumber];
-  double s2 = fltToRad[filterNumber];
+  s1 = fltToRef[filterNumber];
+  s2 = fltToRad[filterNumber];
+  cubeConversion = (double) conversionFactors["GainRatios"][getGainModeID(icube)-1];
+  gainConversion = (double)conversionFactors["GainRatios"][getGainModeID(gaincube)-1];
 
   if (iof) {
     Camera *cam = icube->getCamera();
@@ -419,8 +442,7 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
     }
 
 
-    double rsun = cam->SolarDistance() / 5.2;
-
+    rsun = cam->SolarDistance() / 5.2;
     /*
      * We are calculating I/F, so scaleFactor0 is:
      *
@@ -428,10 +450,7 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
      *      -------- * --- (D/5.2)**2
      *         A1       Ko
      */
-    scaleFactor0 =
-      (s1 * ((double)conversionFactors["GainRatios"][getGainModeID(icube)-1] /
-             (double)conversionFactors["GainRatios"][getGainModeID(gaincube)-1]) *
-       pow(rsun, 2)) / (scaleFactor);
+    scaleFactor0 = (s1 * (cubeConversion / gainConversion) * pow(rsun, 2)) / (scaleFactor);
   }
   else {
     /*
@@ -441,9 +460,7 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
      *      -------- * ---
      *         A2       Ko
      */
-    scaleFactor0 = (s2 / scaleFactor) *
-      ((double)conversionFactors["GainRatios"][getGainModeID(icube)-1] /
-       (double)conversionFactors["GainRatios"][getGainModeID(gaincube)-1]);
+    scaleFactor0 = (s2 / scaleFactor) * (cubeConversion / gainConversion);
   }
 }
 
