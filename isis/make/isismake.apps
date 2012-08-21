@@ -48,6 +48,7 @@ UIHEADERS := $(UIFILES:%.ui=ui_%.h)
 OBJS  := $(SRCS:%.cpp=%.o)
 OBJS  := $(OBJS:%.cc=%.o)
 OBJS  := $(OBJS:%.c=%.o)
+CSMES := $(OBJS:%.o=%.o.csmes)
 
 BINS  := $(shell basename `pwd`)
 
@@ -108,14 +109,15 @@ qrc_%.cpp: %.qrc
 
 clean:  localclean
 	$(RM) $(OBJS) $(BINS) $(PROTOSGEN) $(MOCGEN) `basename $(CURDIR)`.html \
-	  $(UIHEADERS) $(QTRESOURCEFILES);                                     \
+	  $(UIHEADERS) $(QTRESOURCEFILES) *.csexe *.csmes;                     \
+	$(RM) -r scopecoverage scopecoverage.html                              \
+	         linecoverage linecoverage.html                                \
+	         functioncoverage functioncoverage.html;                       \
 	if [ -d "tsts" ];                                                      \
 	then                                                                   \
 	  if [ -f "tsts/Makefile" ];                                           \
 	  then                                                                 \
-	    cd tsts;                                                           \
-	    $(MAKE) clean;                                                     \
-	    cd ..;                                                             \
+	    $(MAKE) --directory=tsts clean;                                    \
 	  fi;                                                                  \
 	fi
 
@@ -170,19 +172,57 @@ docs:
 	chmod -R +w $(ISISROOT)/src/docsys/Application/data/`basename $(CURDIR)`
 
 test:
-	if [ ! -d "tsts" ];          \
-	then                         \
-	  echo "";                   \
-	  printf %-6s "";            \
-	  echo "no tsts folder";     \
-	elif [ -f "tsts/Makefile" ]; \
-	then                         \
-	  cd tsts; $(MAKE) test;     \
-	else                         \
-	  echo "";                   \
-	  printf %-6s "";            \
-	  echo "no makefile";        \
-	fi
+	if [ ! -d "tsts" ];              \
+	then                             \
+	  echo "";                       \
+	  printf %-6s "";                \
+	  echo "no tsts folder";         \
+	elif [ -f "tsts/Makefile" ];     \
+	then                             \
+	  $(MAKE) --directory=tsts test; \
+	else                             \
+	  echo "";                       \
+	  printf %-6s "";                \
+	  echo "no makefile";            \
+	fi;                              \
+	if [ "$(CODE_COVERAGE_BIN_DIR)" != "" ]; then                               \
+	  CSEXEFILES=(`find tsts -name "*.csexe"`);                                 \
+	  for CSMESFILE in $(CSMES); do                                             \
+	    if [ ! -f "$$CSMESFILE" ]; then                                         \
+	      echo "Please build `basename $$PWD` locally with test coverage before"\
+	           "running the test with test coverage";                           \
+	      exit 1;                                                               \
+	   fi;                                                                      \
+	  done;                                                                     \
+	  $(CODE_COVERAGE_BIN_DIR)/cmmerge $(CSMES) -o `basename $$PWD`.csmes;      \
+	  for CSEXEFILE in $${CSEXEFILES[@]}; do                                    \
+	    CASENAME=`echo $$CSEXEFILE | sed 's#\\(.*tsts/\\)\([^/]*\)\(/.*\)#\\2#'`; \
+	    EXETESTNAME="`basename $$PWD` Application Test (case $$CASENAME)";      \
+	    $(CODE_COVERAGE_BIN_DIR)/cmcsexeimport -t "$$EXETESTNAME"               \
+	        -e $$CSEXEFILE -m "`basename $$PWD`.csmes";                         \
+	  done;                                                                     \
+	  $(ECHO) -ne "Scope Coverage:      ";                                      \
+	  $(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
+	      --title="`basename $$PWD` Application Test Scope Coverage"            \
+	      -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
+	      --global=all --method=all --source=all --execution=all                \
+	      --method-sort=coverage --execution-sort=coverage                      \
+	      --source-sort=coverage -h scopecoverage;                              \
+	  $(ECHO) -ne "Line Coverage:       ";                                      \
+	  $(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
+	      --title="`basename $$PWD` Application Test Line Coverage"             \
+	      -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
+	      --global=all --method=all --source=all --execution=all                \
+	      --method-sort=coverage --execution-sort=coverage                      \
+	      --source-sort=coverage --line-coverage -h linecoverage;               \
+	  $(ECHO) -ne "Function Coverage:   ";                                      \
+	  $(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
+	      --title="`basename $$PWD` Application Test Function Coverage"         \
+	      -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
+	      --global=all --method=all --source=all --execution=all                \
+	      --method-sort=coverage --execution-sort=coverage                      \
+	      --source-sort=coverage --function-coverage -h functioncoverage;       \
+	fi; 
 
 testdir:
 	if [ ! -d "tsts" ];                                           \
@@ -202,8 +242,11 @@ help:
 	echo "Isis Make Application Commands"
 	echo "------------------------ "
 	echo "make                            : Builds the Application"
-	echo "make MODE=DEBUG[,CWD,MEMCHECK]  : Builds the Application for stack tracing and "
+	echo "make MODE=DEBUG                 : Builds the Application for stack tracing and"
 	echo "                                    memory debugging"
+	echo "make MODE=TC                    : Builds the Application for generating test"
+	echo "                                    coverage reports. Reports will be generated when"
+	echo "                                    make test MODE=TC is executed."
 	echo "make install                    : Calls the make target and copies the application"
 	echo "                                    to $ISISROOT/bin/"
 	echo "make html                       : Builds the html page for the Application"
@@ -216,5 +259,7 @@ help:
 	echo "make testdir                    : Make the test directory for new applications"
 	echo "make test                       : Run all app tests and print result, remove"
 	echo "                                    output"
+	echo "make test MODE=TC               : Run test, print result, and create test coverage"
+	echo "                                    reports"
 	echo "make test MODE=NOCLEAN          : Run test and print result, leave output"
 

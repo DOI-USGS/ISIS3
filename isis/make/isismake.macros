@@ -8,6 +8,10 @@ else
 .SILENT:
 endif
 
+ifeq ($(findstring TC, $(MODE)),TC)
+  CODE_COVERAGE_BIN_DIR := $(shell if [ -d /opt/SquishCoco/bin ]; then echo "/opt/SquishCoco/bin"; else echo "$$HOME/SquishCoco/bin"; fi;)
+endif
+
 #---------------------------------------------------------------------------
 # Get the machine type and setup its environment
 #---------------------------------------------------------------------------
@@ -41,8 +45,17 @@ endif
 #---------------------------------------------------------------------------
 #  Set up some basic commands
 #---------------------------------------------------------------------------
-CXX            ?= g++
-CC             ?= gcc
+CXX            = g++
+CC             = gcc
+AR             = ar
+
+ifdef CODE_COVERAGE_BIN_DIR
+  CXX            = $(CODE_COVERAGE_BIN_DIR)/csg++ --cs-on --cs-exclude-path=$(ISISROOT)/inc --cs-exclude-file-wildcard='/usgs/pkgs/local/*'
+  CC             = $(CODE_COVERAGE_BIN_DIR)/csgcc --cs-on --cs-exclude-path=$(ISISROOT)/inc --cs-exclude-file-wildcard='/usgs/pkgs/local/*'
+  AR             = $(CODE_COVERAGE_BIN_DIR)/csar
+endif
+
+
 LDSHARED       ?= $(CXX)
 MOC            ?= moc
 PROTOC         ?= protoc

@@ -50,6 +50,7 @@ OBJS  := $(SRCS:%.cpp=%.o)
 OBJS  := $(OBJS:%.cc=%.o)
 OBJS  := $(OBJS:%.c=%.o)
 INSTALLOBJS := $(filter-out %Tester.o, $(OBJS))
+CSMES := $(INSTALLOBJS:%.o=%.o.csmes)
 
 include $(ISISROOT)/make/isismake.macros
 
@@ -89,14 +90,17 @@ ui_%.h: %.ui
 
 #  Its not necessarily $(LIBRARY)!
 .a.so :
-	$(LDSHARED) $(ISISSHAREDFLAGS) $(ISISSHAREDON) -o libisis$(ISISLIBVERSION).$(SHAREDLIBEXT) $? $(ISISSHAREDOFF)
-	$(LN) -f libisis$(ISISLIBVERSION).$(SHAREDLIBEXT) libisis$(ISISMAJOR).$(ISISMINOR).$(SHAREDLIBEXT)
-	$(LN) -f libisis$(ISISMAJOR).$(ISISMINOR).$(SHAREDLIBEXT) libisis$(ISISMAJOR).$(SHAREDLIBEXT)
+	if [ -d csmes ] && [ "$(CODE_COVERAGE_BIN_DIR)" != "" ]; then                                         \
+	  $(CODE_COVERAGE_BIN_DIR)/cmmerge csmes/*.csmes -o libisis$(ISISLIBVERSION).a.csmes; \
+	fi;                                                                                                   \
+	$(LDSHARED) $(ISISSHAREDFLAGS) $(ISISSHAREDON) -o libisis$(ISISLIBVERSION).$(SHAREDLIBEXT) $? $(ISISSHAREDOFF); \
+	$(LN) -f libisis$(ISISLIBVERSION).$(SHAREDLIBEXT) libisis$(ISISMAJOR).$(ISISMINOR).$(SHAREDLIBEXT); \
+	$(LN) -f libisis$(ISISMAJOR).$(ISISMINOR).$(SHAREDLIBEXT) libisis$(ISISMAJOR).$(SHAREDLIBEXT);
 
 #  Its not necessarily $(LIBRARY)!
 .a.dylib :
 	$(RM) -rd .objs;
-	$(MKDIR) .objs && cd .objs && ar x ../$*.a;
+	$(MKDIR) .objs && cd .objs && $(AR) x ../$*.a;
 	$(LDSHARED) $(DYLIBFLAGS) $(ISISSHAREDON) -o $@ \
 	  -install_name $(CURDIR)/$@ $(DYLIBVERSION)  .objs/*.o $(ISISSHAREDOFF)
 	$(LN) -f libisis$(ISISLIBVERSION).$(SHAREDLIBEXT) libisis$(ISISMAJOR).$(ISISMINOR).$(SHAREDLIBEXT)
@@ -120,8 +124,16 @@ install: object
 	  cat $(PLUGINS) >> $(ISISROOT)/lib/$(PLUGINS); \
 	  $(MAKE) plugin; \
 	  cp -p $(SHAREDLIB) $(ISISROOT)/lib; \
-	elif [ "$(INSTALLOBJS)" != "" ]; \
+	elif [ "$(INSTALLOBJS)" != "" ] && [ "$(CODE_COVERAGE_BIN_DIR)" != "" ]; \
 	then \
+	  for CSMESFILE in $(CSMES); do \
+	    if [ -f $$CSMESFILE ]; then \
+	      if [ ! -d "$(ISISROOT)/lib/csmes" ]; then \
+	        $(MKDIR) "$(ISISROOT)/lib/csmes"; \
+	      fi; \
+	      $(CP) $$CSMESFILE "$(ISISROOT)/lib/csmes/"; \
+	    fi; \
+	  done; \
 	  ar $(ISISARFLAGS) -crs $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a $(INSTALLOBJS); \
 	  $(RANLIB) $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a; \
 	fi
@@ -148,8 +160,11 @@ help:
 	echo "Isis Make Object Commands"
 	echo "------------------------ "
 	echo "make                            : Builds the object"
-	echo "make MODE=DEBUG[,CWD,MEMCHECK]  : Builds the object for stack tracing and memory"
+	echo "make MODE=DEBUG                 : Builds the object for stack tracing and memory"
 	echo "                                    debugging"
+	echo "make MODE=TC                    : Builds the object for generating test"
+	echo "                                    coverage reports. Reports will be generated when"
+	echo "                                    make test MODE=TC is executed."
 	echo "make plugin                     : Builds a plugin object if applicable"
 	echo "make install                    : Calls the make target and copies the object and"
 	echo "                                    plugin to $ISISROOT/..."
@@ -160,6 +175,8 @@ help:
 	echo "                                    and TEMP* files"
 	echo "make unitTest                   : Make the unitTest application"
 	echo "make test                       : Runs the unitTests and print result"
+	echo "make test MODE=TC               : Run test, print result, and create test coverage"
+	echo "                                    reports"
 	echo "make test MODE=NOCLEAN          : Run test and print result, leave output" 
 	echo "make truthdata                  : Runs the unitTest and creates <Objectname>.truth"
 	echo "make ostruthdata                : Runs the unitTest and creates OS specific truth"
@@ -206,11 +223,13 @@ html: force
 	echo "View your documentation by opening the file html/index.html in a browser"
 
 clean:  localclean
-	$(RM) $(OBJS) $(PROTOSGEN) $(MOCGEN) unitTest.o unitTest print.prt   \
-	  $(UIHEADERS) $(ARCHIVELIB) $(SHAREDLIB) libisis$(ISISLIBVERSION).a \
-	  libisis$(ISISLIBVERSION).so libisis$(ISISLIBVERSION).dylib         \
-	  unitTest.output;                                                   \
-	$(RM) -rf html .objs
+	$(RM) $(OBJS) $(PROTOSGEN) $(MOCGEN) unitTest.o unitTest print.prt    \
+	  $(UIHEADERS) $(ARCHIVELIB) $(SHAREDLIB) libisis$(ISISLIBVERSION).a  \
+	  libisis$(ISISLIBVERSION).so libisis$(ISISLIBVERSION).dylib          \
+	  unitTest.output;                                                    \
+	$(RM) -rf html scopecoverage scopecoverage.html                       \
+	  linecoverage linecoverage.html functioncoverage                     \
+	  functioncoverage.html .objs *.csexe *.csmes
 
 localclean:
 	if [ "$(findstring cleanlocal,$(shell grep cleanlocal Makefile))" = "cleanlocal" ]; \
@@ -225,29 +244,63 @@ sanitize: clean
 	-$(RM) tttt* junk.* TEMP*
 
 test: unitTest
+	if [ -f unitTest.csexe ]; then              \
+	  $(RM) unitTest.csexe;                     \
+	fi;                                         \
 	$(ISISROOT)/scripts/unitTester $(HOST_OS) ; \
-	temp=$$? ; \
-	if test $$temp -eq 0 ; \
-	then \
-	  echo "Ok"; \
-	elif test $$temp -eq 2 ; \
-	then \
-	  echo "unitTest.cpp not found"; \
-	elif test $$temp -eq 1 ; \
-	then \
+	temp=$$? ;                                  \
+	if test $$temp -eq 0 ;                      \
+	then                                        \
+	  echo "Ok";                                \
+	elif test $$temp -eq 2 ;                    \
+	then                                        \
+	  echo "unitTest.cpp not found";            \
+	elif test $$temp -eq 1 ;                    \
+	then                                        \
 	  echo "`basename $(CURDIR)`.truth not found"; \
-	elif test $$temp -eq 3 ; \
-	then \
-	  echo "Could not make unitTest"; \
-	elif test $$temp -eq 4 ; \
-	then \
-	  echo "UnitTest aborted"; \
-	elif test $$temp -eq 5 ; \
-	then \
-	  echo "Failed"; \
-	else \
-	  echo "Unexpected system error"; \
-	fi
+	elif test $$temp -eq 3 ;                    \
+	then                                        \
+	  echo "Could not make unitTest";           \
+	elif test $$temp -eq 4 ;                    \
+	then                                        \
+	  echo "UnitTest aborted";                  \
+	elif test $$temp -eq 5 ;                    \
+	then                                        \
+	  echo "Failed";                            \
+	else                                        \
+	  echo "Unexpected system error";           \
+	fi;                                         \
+	if [ "$(CODE_COVERAGE_BIN_DIR)" != "" ] && [ -f "unitTest.csexe" ] &&       \
+	   [ "$(CSMES)" != "" ]; then                                               \
+	  PASSFAILARG="-F";                                                         \
+	  if [ "$$temp" == "0" ]; then                                              \
+	    PASSFAILARG="-P";                                                       \
+	  fi;                                                                       \
+	  $(CODE_COVERAGE_BIN_DIR)/cmmerge $(CSMES) -o `basename $$PWD`.csmes;      \
+	  $(CODE_COVERAGE_BIN_DIR)/cmcsexeimport -t "`basename $$PWD` unit test"    \
+	      -e unitTest.csexe -m "`basename $$PWD`.csmes" $$PASSFAILARG;          \
+	  $(ECHO) -ne "Scope Coverage:      ";                                      \
+	  $(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
+	      --title="`basename $$PWD` Unit Test Scope Coverage"                   \
+	      -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
+	      --global=all --method=all --source=all --execution=all                \
+	      --method-sort=coverage --execution-sort=coverage                      \
+	      --source-sort=coverage -h scopecoverage;                              \
+	  $(ECHO) -ne "Line Coverage:       ";                                      \
+	  $(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
+	      --title="`basename $$PWD` Unit Test Line Coverage"                    \
+	      -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
+	      --global=all --method=all --source=all --execution=all                \
+	      --method-sort=coverage --execution-sort=coverage                      \
+	      --source-sort=coverage --line-coverage -h linecoverage;               \
+	  $(ECHO) -ne "Function Coverage:   ";                                      \
+	  $(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
+	      --title="`basename $$PWD` Unit Test Function Coverage"                \
+	      -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
+	      --global=all --method=all --source=all --execution=all                \
+	      --method-sort=coverage --execution-sort=coverage                      \
+	      --source-sort=coverage --function-coverage -h functioncoverage;       \
+	fi; 
 
 # The .a file is copied in Darwin because the ar command does not like
 #   to extract the same archive twice, regardless of permissions or symlink
@@ -255,12 +308,16 @@ unitTest: $(OBJS) unitTest.o
 	if [ "$(HOST_ARCH)" == "Linux" ]; then                                       \
 	  $(CP) $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a                           \
 	      libisis$(ISISLIBVERSION).a;                                            \
-	  ar $(ISISARFLAGS) -crs libisis$(ISISLIBVERSION).a $(OBJS);                 \
+	  if [ -f "$(ISISROOT)/lib/libisis$(ISISLIBVERSION).a.csmes" ]; then         \
+	    $(CP) $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a.csmes                   \
+	      libisis$(ISISLIBVERSION).a.csmes;                                      \
+	  fi;                                                                        \
+	  $(AR) $(ISISARFLAGS) -rs libisis$(ISISLIBVERSION).a $(OBJS);               \
 	  $(RANLIB) libisis$(ISISLIBVERSION).a;                                      \
 	  $(LDSHARED) $(ISISSHAREDFLAGS) $(ISISSHAREDON)                             \
 	      -o libisis$(ISISLIBVERSION).$(SHAREDLIBEXT) libisis$(ISISLIBVERSION).a \
 	      $(ISISSHAREDOFF);                                                      \
-	  $(RM) libisis$(ISISLIBVERSION).a;                                          \
+	  $(RM) libisis$(ISISLIBVERSION).a libisis$(ISISLIBVERSION).a.csmes;         \
 	  dollar='$$';                                                               \
 	  $(CXX) $(ALLLIBDIRS)                                                       \
 	      -Xlinker "-rpath"                                                      \
@@ -270,7 +327,7 @@ unitTest: $(OBJS) unitTest.o
 	  $(MKDIR) .objs;                                                            \
 	  cd .objs;                                                                  \
 	  cp $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a .;                           \
-	  ar x libisis$(ISISLIBVERSION).a;                                           \
+	  $(AR) x libisis$(ISISLIBVERSION).a;                                        \
 	  $(RM) libisis$(ISISLIBVERSION).a;                                          \
 	  cd ..;                                                                     \
 	  if [ "$(OBJS)" != "" ]; then                                               \

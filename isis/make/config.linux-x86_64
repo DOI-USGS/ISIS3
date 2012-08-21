@@ -1,8 +1,7 @@
 #---------------------------------------------------------------------------
 # Compiler options
 #---------------------------------------------------------------------------
-CXX           = g++
-CC            = gcc
+
 ISISCPPFLAGS  = -Wall
 ISISCPPFLAGS += -ansi
 ISISCPPFLAGS += -DISIS_LITTLE_ENDIAN=1
@@ -33,13 +32,13 @@ SHAREDLIBEXT    = so
 
 ISISLDFLAGS  = -Wl,-E -Xlinker '-z' -Xlinker 'origin'
 ISISLDFLAGS += -Xlinker "-rpath" -Xlinker "${ISISROOT}/lib:${ISISROOT}/3rdParty/lib"
-ISISSYSLIBS = 
+ISISSYSLIBS = -pthread 
 ISISSTATIC  = -Wl,-Bstatic
 ISISDYNAMIC = -Wl,-Bdynamic
 
 ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
   ifeq ($(findstring CWD, $(MODE)),CWD)
-    ISISSYSLIBS += -lcwd_r -pthread
+    ISISSYSLIBS += -lcwd_r
   endif
 endif
 

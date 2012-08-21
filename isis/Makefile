@@ -1,12 +1,7 @@
 #include $(ISISROOT)/make/isismake.macros
 CURTIMESTAMP   ?= "[`date +'%Y-%m-%d %H:%M:%S'`]"
-#---------------------------------------------------------------------------
-# Check to see if the programmer wants make to be noisy
-#---------------------------------------------------------------------------
-ifeq ($(findstring LOUD, $(MODE)),LOUD)
-else
-.SILENT:
-endif
+
+include $(ISISROOT)/make/isismake.macros
 
 .NOTPARALLEL:
 
@@ -18,6 +13,7 @@ help:
 	echo "------------------------ "
 	echo "make all       : Build and install the entire system (incs,api,apps,docs)"
 	echo "make config    : Generate preliminary config parameters"
+	echo "make thirdParty: Copy required 3rdParty libraries into distribution"
 	echo "make incs      : Install API include files"
 	echo "make api       : Build and install the Isis API"
 	echo "make apps      : Build and install Isis Applications"
@@ -27,7 +23,7 @@ help:
 	echo "make unitTest  : Build and execute unit tests for Isis API"
 	echo "make appTest   : Build and execute application tests"
 	echo "make catTest   : Build and execute category tests"
-	echo "make thirdParty: Copy required 3rdParty libraries into distribution"
+	echo "make coverage  : Build a test coverage report from generated coverage info"
 
 #----------------------------------------------------------------------------
 # Target = all
@@ -143,6 +139,73 @@ docs:
 	$(MAKE) --directory=src/docsys docs
 	echo $(CURTIMESTAMP) "Finished building Isis Documentation"
 
+
+#----------------------------------------------------------------------------
+# Target = coverage 
+# Dependencies = none
+#
+# This target builds a report on how much of Isis is tested in the automated
+# tests. This is currently excluding applications that run other applications
+# because of the amount of time it takes to generate the report (and that's
+# not how we want to test our applications ideally).
+#----------------------------------------------------------------------------
+coverage:
+	if [ "$(CODE_COVERAGE_BIN_DIR)" == "" ]; then                         \
+	  echo "Make sure you use MODE=TC when building Isis for a coverage"  \
+	       "report.";                                                     \
+	  exit 1;                                                             \
+	fi;                                                                   \
+	$(ECHO) $(CURTIMESTAMP) "Finding coverage information...";            \
+	CSMESFILES=( lib/libisis3.4.1.so.csmes                                \
+	             `find src/*/apps -name "*.o.csmes" | grep -v moc_` );    \
+	CSEXEFILES=(`find src/ -name "*.csexe"`);                             \
+	if [ "$${#CSMESFILES[@]}" == "0" ] ||                                 \
+	   [ "$${#CSEXEFILES[@]}" == "0" ]; then                              \
+	  echo "Please build Isis and run the tests with MODE=TC before "     \
+	       "trying to build a coverage report.";                          \
+	  exit 1;                                                             \
+	fi;                                                                   \
+	$(ECHO) $(CURTIMESTAMP) "Merging source file information into isis.csmes..."; \
+	$(CODE_COVERAGE_BIN_DIR)/cmmerge $${CSMESFILES[@]} -o isis.csmes;     \
+	$(ECHO) $(CURTIMESTAMP) "Adding test execution records into isis.csmes..."; \
+	for CSEXEFILE in $${CSEXEFILES[@]}; do                                \
+	  EXETESTNAME="$$CSEXEFILE";                                          \
+	  APPTESTAPPNAME=`echo $$CSEXEFILE | sed 's#\\(.*/apps/\\)\\([a-zA-Z0-9]*\\)\\(/tsts/\\)\([^/]*\)\(/.*\)#\\2#'`; \
+	  CSEXEAPPNAME=`basename $$CSEXEFILE | sed 's/.csexe//'`;             \
+	  if [ "$$APPTESTAPPNAME" == "$$CSEXEFILE" ] ||                       \
+	     [ "$$APPTESTAPPNAME" == "$$CSEXEAPPNAME" ]; then                 \
+	    EXETESTNAME=`echo $$EXETESTNAME | sed 's#\\(.*/apps/\\)\\([a-zA-Z0-9]*\\)\\(/tsts/\\)\([^/]*\)\(/.*\)#\\2 Application Test (case \\4\\)#'`;      \
+	    EXETESTNAME=`echo $$EXETESTNAME | sed 's#\\(src/\\)\\([a-zA-Z0-9]*\\)\\(/tsts/\\)\\([a-zA-Z0-9]*\\)\\(.*\\)#\\2 Category Test (case \\4\\)#'`; \
+	    EXETESTNAME=`echo $$EXETESTNAME | sed 's#\\(.*/\\)\\([^/]*\\)\\(/unitTest.csexe\\)#\\2 Unit Test#'`;                                           \
+	    $(ECHO) -e $(CURTIMESTAMP) "  Adding [$$EXETESTNAME] `basename $$CSEXEFILE`"; \
+	    $(CODE_COVERAGE_BIN_DIR)/cmcsexeimport -t "$$EXETESTNAME"             \
+	        -e $$CSEXEFILE -m "isis.csmes";                                   \
+	  fi;                                                                     \
+	done;                                                                     \
+	$(ECHO) -ne $(CURTIMESTAMP) "Scope Coverage:      ";                      \
+	$(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
+	    --title="Isis System-Wide Test Scope Coverage"                        \
+	    -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
+	    --global=all --method=all --source=all --execution=all                \
+	    --method-sort=coverage --execution-sort=coverage                      \
+	    --source-sort=coverage -h scopecoverage;                              \
+	$(ECHO) -ne $(CURTIMESTAMP) "Line Coverage:       ";                      \
+	$(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
+	    --title="Isis System-Wide Test Line Coverage"                         \
+	    -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
+	    --global=all --method=all --source=all --execution=all                \
+	    --method-sort=coverage --execution-sort=coverage                      \
+	    --source-sort=coverage --line-coverage -h linecoverage;               \
+	$(ECHO) -ne $(CURTIMESTAMP) "Function Coverage:   ";                      \
+	$(CODE_COVERAGE_BIN_DIR)/cmreport                                         \
+	    --title="Isis System-Wide Test Function Coverage"                     \
+	    -m "`basename $$PWD`.csmes" --select=".*" --bargraph --toc --stat     \
+	    --global=all --method=all --source=all --execution=all                \
+	    --method-sort=coverage --execution-sort=coverage                      \
+	    --source-sort=coverage --function-coverage -h functioncoverage;
+
+
+
 #----------------------------------------------------------------------------
 # Target = clean
 # Dependencies = cleansrc
@@ -157,16 +220,18 @@ docs:
 # This walks the src tree and removes ".o" files and binary files
 #----------------------------------------------------------------------------
 clean:
-	echo $(CURTIMESTAMP) "Cleaning Isis"
-	$(MAKE) cleansrc
-	rm -rf inc
-	rm -rf doc
-	rm -rf bin
-	rm -rf lib
-	rm -rf scripts/tabcomplete.csh
-	$(MAKE) --directory=3rdParty clean
-	$(MAKE) --directory=config -f config.mak clean
-	echo $(CURTIMESTAMP) "Finished cleaning Isis"
+	echo $(CURTIMESTAMP) "Cleaning Isis"; \
+	$(MAKE) cleansrc;                     \
+	rm -rf inc;                           \
+	rm -rf doc;                           \
+	rm -rf bin;                           \
+	rm -rf lib;                           \
+	rm -rf scripts/tabcomplete.csh;       \
+	rm -rf scopecoverage scopecoverage.html linecoverage linecoverage.html \
+	  functioncoverage functioncoverage.html *.csmes *.csexe; \
+	$(MAKE) --directory=3rdParty clean;   \
+	$(MAKE) --directory=config -f config.mak clean; \
+	echo $(CURTIMESTAMP) "Finished cleaning Isis";
 
 cleansrc:
 	$(MAKE) --directory=src clean
