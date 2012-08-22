@@ -52,7 +52,7 @@ OBJS  := $(OBJS:%.c=%.o)
 INSTALLOBJS := $(filter-out %Tester.o, $(OBJS))
 CSMES := $(INSTALLOBJS:%.o=%.o.csmes)
 
-include $(ISISROOT)/make/isismake.macros
+include $(ISISROOT)/make/isismake.os
 
 ROOTINCLUDES = $(addprefix $(ISISROOT)/inc/, $(INCS))
 PLUGINS      = $(strip $(wildcard *.plugin))
@@ -124,16 +124,18 @@ install: object
 	  cat $(PLUGINS) >> $(ISISROOT)/lib/$(PLUGINS); \
 	  $(MAKE) plugin; \
 	  cp -p $(SHAREDLIB) $(ISISROOT)/lib; \
-	elif [ "$(INSTALLOBJS)" != "" ] && [ "$(CODE_COVERAGE_BIN_DIR)" != "" ]; \
+	elif [ "$(INSTALLOBJS)" != "" ]; \
 	then \
-	  for CSMESFILE in $(CSMES); do \
-	    if [ -f $$CSMESFILE ]; then \
-	      if [ ! -d "$(ISISROOT)/lib/csmes" ]; then \
-	        $(MKDIR) "$(ISISROOT)/lib/csmes"; \
+	  if [ "$(CODE_COVERAGE_BIN_DIR)" != "" ]; then \
+	    for CSMESFILE in $(CSMES); do \
+	      if [ -f $$CSMESFILE ]; then \
+	        if [ ! -d "$(ISISROOT)/lib/csmes" ]; then \
+	          $(MKDIR) "$(ISISROOT)/lib/csmes"; \
+	        fi; \
+	        $(CP) $$CSMESFILE "$(ISISROOT)/lib/csmes/"; \
 	      fi; \
-	      $(CP) $$CSMESFILE "$(ISISROOT)/lib/csmes/"; \
-	    fi; \
-	  done; \
+	    done; \
+	  fi; \
 	  ar $(ISISARFLAGS) -crs $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a $(INSTALLOBJS); \
 	  $(RANLIB) $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a; \
 	fi

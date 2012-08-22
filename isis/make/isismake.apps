@@ -53,7 +53,7 @@ CSMES := $(OBJS:%.o=%.o.csmes)
 BINS  := $(shell basename `pwd`)
 
 
-include $(ISISROOT)/make/isismake.macros
+include $(ISISROOT)/make/isismake.os
 
 MOCINC       = $(wildcard *.h)
 MOCGEN       = $(wildcard moc_*.cpp)

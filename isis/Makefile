@@ -1,7 +1,4 @@
-#include $(ISISROOT)/make/isismake.macros
-CURTIMESTAMP   ?= "[`date +'%Y-%m-%d %H:%M:%S'`]"
-
-include $(ISISROOT)/make/isismake.macros
+include $(ISISROOT)/make/isismake.utils
 
 .NOTPARALLEL:
 
