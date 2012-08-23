@@ -46,7 +46,7 @@ ISISRELEASE          := REL_0_0
 # set up HOST_OS
 testFile = $(wildcard /etc/SuSE-release)
 ifeq ($(testFile), /etc/SuSE-release)
-  HOST_OS := $(shell $(GREP) VERSION /etc/SuSE-release | sed 's/.*= *//g' | sed 's/\./_/g')
+  HOST_OS := $(shell grep VERSION /etc/SuSE-release | sed 's/.*= *//g' | sed 's/\./_/g')
   HOST_OS := SUSE$(HOST_OS)
 else
   testFile = $(wildcard /etc/redhat-release)
@@ -59,11 +59,11 @@ else
     else
       testFile = $(wildcard /etc/lsb-release)
       ifeq ($(testFile), /etc/lsb-release)
-        HOST_OS = $(shell $(GREP) DESCRIPTION /etc/lsb-release | sed 's/\([^"]*"\)\([^"]*\)\(.*\)/\2/' | sed 's/\.[^\.]* LTS//' | sed 's/ //g' | sed 's/\./_/g')
+        HOST_OS = $(shell grep DESCRIPTION /etc/lsb-release | sed 's/\([^"]*"\)\([^"]*\)\(.*\)/\2/' | sed 's/\.[^\.]* LTS//' | sed 's/ //g' | sed 's/\./_/g')
       else
         testFile = $(wildcard /etc/debian_version)
         ifeq ($(testFile), /etc/debian_version)
-          HOST_OS := $(shell $(CAT) /etc/debian_version | sed 's/\./_/g')
+          HOST_OS := $(shell cat /etc/debian_version | sed 's/\./_/g')
           HOST_OS := Debian$(HOST_OS)
         endif
       endif
