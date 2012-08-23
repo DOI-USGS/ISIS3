@@ -2,7 +2,7 @@
 # Makefile for running and maintaining tests
 #----------------------------------------------------------------------------
 
-include $(ISISROOT)/make/isismake.utils
+include $(ISISROOT)/make/isismake.os
 
 .NOTPARALLEL:
 
