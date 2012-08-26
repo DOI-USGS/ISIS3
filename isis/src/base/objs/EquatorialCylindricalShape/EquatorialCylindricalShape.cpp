@@ -16,10 +16,7 @@
 #include "SurfacePoint.h"
 #include "Table.h"
 
-
 #define MAX(x,y) (((x) > (y)) ? (x) : (y))
-#define RTD 180.0/PI
-#define DTR PI/180
 
 namespace Isis {
   /**
@@ -28,8 +25,7 @@ namespace Isis {
    * @param pvl Valid Isis3 cube label.
    */
   EquatorialCylindricalShape::EquatorialCylindricalShape(Target *target, Pvl &pvl) : 
-                                                                                        DemShape (target, pvl) {
-    std::cout << "Making Isis3 equatorial cylindrical shape" << std::endl;
+      DemShape (target, pvl) {
     setName("EquatorialCylindricalShape");
 
     m_minRadius = NULL;
@@ -37,7 +33,7 @@ namespace Isis {
 
      // Read in the min/max radius of the DEM file and the Scale of the DEM
      // file in pixels/degree
-    if (!m_demCube->hasTable("ShapeModelStatistics")) {
+    if (!demCube()->hasTable("ShapeModelStatistics")) {
       std::string msg = "The input cube references a ShapeModel that has "
         "not been updated for the new ray tracing algorithm. All DEM "
         "files must now be padded at the poles and contain a "
@@ -48,7 +44,8 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    Table table("ShapeModelStatistics", m_demCubeFile, *m_demLabel);
+    // Table table("ShapeModelStatistics", demCubeFile(), *demCube()->getLabel()));
+    Table table("ShapeModelStatistics", demCube()->getFileName(), *demCube()->getLabel());
 
     // Find minimum and maximum radius
     m_minRadius = new Distance(table[0]["MinimumRadius"], Distance::Kilometers);
@@ -82,10 +79,10 @@ namespace Isis {
     
     DemShape::intersectSurface(observerPos, lookDirection, tol);
 
-    if (!m_hasIntersection) {
+    if (!hasIntersection()) {
 
-      Distance *radii = targetRadii();
-      SpiceDouble a = radii[0].kilometers();
+      // std::vector<Distance> radii = targetRadii();
+      SpiceDouble a = targetRadii()[0].kilometers();
       
       double plen=0.0;
       SpiceDouble plat, plon, pradius;
@@ -93,13 +90,13 @@ namespace Isis {
       double maxRadiusMetersSquared =
           m_maxRadius->kilometers() * m_maxRadius->kilometers();
 
-      double cmin = cos((90.0 - 1.0 / (2.0*demScale())) * DTR);
+      double cmin = cos((90.0 - 1.0 / (2.0*demScale())) * DEG2RAD);
 
       // Separate iteration algorithms are used for different projections -
       // use this iteration for equatorial cylindrical type projections that
       // failed to find an intersection with the DemShape method.
-      // Set hasIntersection flag to true so Resolution can be calculated ??? is this needed
-      m_hasIntersection = true;
+      // Notify the shape model that we have an intersection so Resolution can be calculated ??? is this needed
+      setHasIntersection(true);
       int maxit = 100;
       int it = 0;
       bool done = false;
@@ -126,8 +123,8 @@ namespace Isis {
       // away from the planet and no proper tangent point exists in the
       // direction that the spacecraft is looking
       if (psi0 > PI/2.0) {
-        m_hasIntersection = false;
-        return m_hasIntersection;
+        setHasIntersection(false);
+        return false;
       }
 
       // Calculate the vector to the tangent point
@@ -152,8 +149,8 @@ namespace Isis {
       double g1len = vnorm_c(g1);
       SpiceDouble g1lat, g1lon, g1radius;
       reclat_c(g1,&g1radius,&g1lon,&g1lat);
-      g1lat *= RTD;
-      g1lon *= RTD;
+      g1lat *= RAD2DEG;
+      g1lon *= RAD2DEG;
       
       if (g1lon < 0.0)
         g1lon += 360.0;
@@ -164,15 +161,15 @@ namespace Isis {
 
       // Set dalpha to be half the grid spacing for nyquist sampling
       //double dalpha = (PI/180.0)/(2.0*p_demScale);
-      double dalpha = MAX(cos(g1lat*DTR),cmin) / (2.0*demScale()*DTR);
+      double dalpha = MAX(cos(g1lat*DEG2RAD),cmin) / (2.0*demScale()*DEG2RAD);
       
       // Previous Sensor version used local version of this method with lat and lon doubles. ..Why Jeff???
       double r1 = (localRadius(Latitude(g1lat, Angle::Degrees),
                                Longitude(g1lon, Angle::Degrees))).kilometers();
       
       if (Isis::IsSpecial(r1)) {
-        m_hasIntersection = false;
-        return m_hasIntersection;
+        setHasIntersection(false);
+        return false;
       }
 
       // Set the tolerance to a fraction of the equatorial radius, a
@@ -183,8 +180,8 @@ namespace Isis {
       while (!done) {
         
         if (d > dm) {
-          m_hasIntersection = false;
-          return m_hasIntersection;
+          setHasIntersection(false);
+          return false;
         }
 
         it = 0;
@@ -202,8 +199,8 @@ namespace Isis {
         // be a function of the very low resolution of the Vesta DEM and could
         // improve in the future
         if (dd < tolerance) {
-          m_hasIntersection = false;
-          return m_hasIntersection;
+          setHasIntersection(false);
+          return false;
         }
 
         // Calculate the vector to the current test point from the planet center
@@ -218,8 +215,8 @@ namespace Isis {
         SpiceDouble g2lat, g2lon, g2radius;
         reclat_c(g2,&g2radius,&g2lon,&g2lat);
         
-        g2lat *= RTD;
-        g2lon *= RTD;
+        g2lat *= RAD2DEG;
+        g2lon *= RAD2DEG;
 
         if (g2lon < 0.0)
           g2lon += 360.0;
@@ -230,8 +227,8 @@ namespace Isis {
         
 
         if (Isis::IsSpecial(r2)) {
-          m_hasIntersection = false;
-          return m_hasIntersection;
+          setHasIntersection(false);
+          return false;
         }
 
         // Test for intersection
@@ -247,7 +244,7 @@ namespace Isis {
             // of the solution and the tolerance was too small to detect it.
             double palt;
             if ((g2len*r1/r2 - g1len) == 0.0) {
-              m_hasIntersection = true;
+              setHasIntersection(true);
               plen = pradius;
               palt = 0.0;
               done = true;
@@ -259,8 +256,8 @@ namespace Isis {
               pB[2] = g1[2] + v * dd * ulookB[2];
               plen = vnorm_c(pB);
               reclat_c(pB,&pradius,&plon,&plat);
-              plat *= RTD;
-              plon *= RTD;
+              plat *= RAD2DEG;
+              plon *= RAD2DEG;
               if (plon < 0.0)
                 plon += 360.0;
 
@@ -272,8 +269,8 @@ namespace Isis {
                                      Longitude(plon, Angle::Degrees))).kilometers();
 
               if (Isis::IsSpecial(pradius)) {
-                m_hasIntersection = false;
-                return m_hasIntersection;
+                setHasIntersection(false);
+                return false;
               }
               palt = plen - pradius;
 
@@ -303,15 +300,15 @@ namespace Isis {
               // We are within the tolerance, so the solution has converged
               } 
               else {
-                m_hasIntersection = true;
+                setHasIntersection(true);
                 plen = pradius;
                 palt = 0.0;
                 done = true;
               }
             }
             if (!done && it >= maxit) {
-              m_hasIntersection = false;
-              return m_hasIntersection;
+              setHasIntersection(false);
+              return false;
             }
           }
         }
@@ -331,7 +328,7 @@ namespace Isis {
         // put in a test (above) for dd being smaller than the pixel
         // convergence tolerance.  If so the loop exits without an
         // intersection
-        dalpha = MAX(cos(g2lat*DTR),cmin) / (2.0*demScale()*DTR);
+        dalpha = MAX(cos(g2lat*DEG2RAD),cmin) / (2.0*demScale()*DEG2RAD);
       } // end while
 
       SpiceDouble intersectionPoint[3];
@@ -342,21 +339,21 @@ namespace Isis {
       surfaceIntersection()->FromNaifArray(intersectionPoint);
 
       if (!found) {
-        m_hasIntersection = false;
-        return m_hasIntersection;
+        setHasIntersection(false);
+        return false;
       }
       else {
-        return m_hasIntersection;
+        return hasIntersection();
       }
 
     }
 
-    m_hasIntersection = true;
+    setHasIntersection(true);
     SurfacePoint inpoint;
 
     //return inpoint;
 
-    return m_hasIntersection;
+    return hasIntersection();
   }
 }
 

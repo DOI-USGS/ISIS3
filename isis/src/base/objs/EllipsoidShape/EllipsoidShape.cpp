@@ -23,7 +23,6 @@ namespace Isis {
    * @param pvl Valid Isis3 cube label.
    */
   EllipsoidShape::EllipsoidShape(Target *target, Pvl &pvl) : ShapeModel (target, pvl) {
-    std::cout << "Making ellipsoid shape" << std::endl;
     setName("Ellipsoid");
   }
 
@@ -33,9 +32,19 @@ namespace Isis {
    *
    * @param pvl Valid Isis3 cube label.
    */
-  // EllipsoidShape::EllipsoidShape(Distance radii[3]) : ShapeModel (radii) {
+  // EllipsoidShape::EllipsoidShape(Target *target) : ShapeModel (target) {
   EllipsoidShape::EllipsoidShape(Target *target) : ShapeModel (target) {
-    std::cout << "Making ellipsoid shape" << std::endl;
+    setName("Ellipsoid");
+  }
+
+
+  /**
+   * Initialize the EllipsoidShape.
+   *
+   * @param pvl Valid Isis3 cube label.
+   */
+  // EllipsoidShape::EllipsoidShape() : ShapeModel () {
+  EllipsoidShape::EllipsoidShape() : ShapeModel () {
     setName("Ellipsoid");
   }
   
@@ -48,11 +57,11 @@ namespace Isis {
                                          double tol) {
     
       if (intersectEllipsoid(observerPos, lookDirection)) {
-      m_hasIntersection = true;
-      return m_hasIntersection;
+        setHasIntersection(true);
+      return true;
     }
     else {
-      m_hasIntersection = false;
+      setHasIntersection(false);
       return false;
     }
   }
@@ -87,20 +96,17 @@ namespace Isis {
    */
   Distance EllipsoidShape::localRadius(const Latitude &lat, const Longitude &lon) {
     
-    // Distance *radii = radii();
-    
-    Distance *radii = targetRadii();
+    std::vector<Distance> radii = targetRadii();
     
     double a = radii[0].kilometers();
     double b = radii[1].kilometers();
     double c = radii[2].kilometers();
     
-    double rlat = lat.degrees();
-    double rlon = lon.degrees();
+    double rlat = lat.radians();
+    double rlon = lon.radians();
     
     double xyradius = a * b / sqrt(pow(b * cos(rlon), 2) +
                       pow(a * sin(rlon), 2));
-    
     const double &radius = xyradius * c / sqrt(pow(c * cos(rlat), 2) +
                            pow(xyradius * sin(rlat), 2));
 

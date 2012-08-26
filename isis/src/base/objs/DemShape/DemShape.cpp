@@ -22,8 +22,6 @@
 #include "NaifStatus.h"
 #include "UniqueIOCachingAlgorithm.h"
 
-#define RTD 180.0/PI
-
 using namespace std;
 
 namespace Isis {
@@ -33,30 +31,28 @@ namespace Isis {
    * @param pvl Valid Isis3 cube label.
    */
   DemShape::DemShape(Target *target, Pvl &pvl) : ShapeModel (target, pvl) {
-    std::cout << "Making Isis3 Dem shape" << std::endl;
     setName("DemShape");
     m_demProj = NULL;
     m_demCube = NULL;
     m_interp = NULL;
     m_portal = NULL;
-    m_demCubeFile = "";;
 
     // m_samples.resize(4,.0);
     // m_lines.resize(4,0.);
 
     PvlGroup &kernels = pvl.FindGroup("Kernels", Pvl::Traverse);
 
+    iString demCubeFile;
     if (kernels.HasKeyword("ElevationModel")) {
-      m_demCubeFile = (std::string) kernels["ElevationModel"];
+      demCubeFile = (std::string) kernels["ElevationModel"];
     }
     else if(kernels.HasKeyword("ShapeModel")) {
-      m_demCubeFile = (std::string) kernels["ShapeModel"];
+      demCubeFile = (std::string) kernels["ShapeModel"];
     }
 
-    m_demCube = CubeManager::Open(m_demCubeFile);
+    m_demCube = CubeManager::Open(demCubeFile);
 
-    m_demLabel = m_demCube->getLabel();
-//    Isis::PvlGroup &mapGroup = m_demLabel->FindGroup("Mapping", Isis::Pvl::Traverse);
+//    Isis::PvlGroup &mapGroup = m_demCube->getLabel()->FindGroup("Mapping", Isis::Pvl::Traverse);
     // std::string proj = mapGroup["ProjectionName"];
  
      // This caching algorithm works much better for DEMs than the default,
@@ -67,18 +63,32 @@ namespace Isis {
      //   4 and the next setimage has to re-read the data.
       m_demCube->addCachingAlgorithm(new UniqueIOCachingAlgorithm(5));
       m_demProj = m_demCube->getProjection();
-
       m_interp = new Interpolator(Interpolator::BiLinearType);
       m_portal = new Portal(m_interp->Samples(), m_interp->Lines(),
                             m_demCube->getPixelType(),
                             m_interp->HotSample(), m_interp->HotLine());
 
       // Read in the Scale of the DEM file in pixels/degree
-      const PvlGroup &mapgrp = m_demLabel->FindGroup("Mapping", Pvl::Traverse);
+      const PvlGroup &mapgrp = m_demCube->getLabel()->FindGroup("Mapping", Pvl::Traverse);
 
     // Save map scale in pixels per degree
       m_pixPerDegree = (double) mapgrp["Scale"];
   }
+
+
+  /**
+   * Initialize the Isis3 Dem from projection shape model.
+   *
+   * @param pvl Valid Isis3 cube label.
+   */
+  DemShape::DemShape() : ShapeModel () {
+    setName("DemShape");
+    m_demProj = NULL;
+    m_demCube = NULL;
+    m_interp = NULL;
+    m_portal = NULL;
+  }
+
 
   //! Destroys the DemShape
   DemShape::~DemShape() {
@@ -121,7 +131,7 @@ namespace Isis {
     // for the iterative DEM intersection method
     // (this method is in the ShapeModel base class)
     if (intersectEllipsoid(observerPos, lookDirection))
-      m_hasIntersection = true;
+      setHasIntersection(true);
     else 
       return false;
  
@@ -149,7 +159,7 @@ namespace Isis {
     while (!done) {
         
       if (it > maxit) {
-        m_hasIntersection = false;
+        setHasIntersection(false);
         done = true;
         continue;
       }
@@ -161,8 +171,8 @@ namespace Isis {
       double t = newIntersectPt[0] * newIntersectPt[0] +
           newIntersectPt[1] * newIntersectPt[1];
       
-      latDD = atan2(newIntersectPt[2], sqrt(t)) * RTD;
-      lonDD = atan2(newIntersectPt[1], newIntersectPt[0]) * RTD;
+      latDD = atan2(newIntersectPt[2], sqrt(t)) * RAD2DEG;
+      lonDD = atan2(newIntersectPt[1], newIntersectPt[0]) * RAD2DEG;
        
       if (lonDD < 0)
         lonDD += 360;
@@ -172,8 +182,8 @@ namespace Isis {
                                       Longitude(lonDD, Angle::Degrees));
 
       if (Isis::IsSpecial(radiusKm.kilometers())) {
-        m_hasIntersection = false;
-        return m_hasIntersection;
+        setHasIntersection(false);
+        return false;
       }
 
       // save current surface intersect point for comparison with new, updated
@@ -181,11 +191,13 @@ namespace Isis {
       memcpy(currentIntersectPt, newIntersectPt, 3 * sizeof(double));
       
       double r = radiusKm.kilometers();
+      bool status;
       surfpt_c(&observerPos[0], &lookDirection[0], r, r, r, newIntersectPt,
-               (SpiceBoolean*) &m_hasIntersection);
+               (SpiceBoolean*) &status);
+      setHasIntersection(status);
 
-      if (!m_hasIntersection)
-        return m_hasIntersection;
+      if (!status)
+        return status;
 
       dX = currentIntersectPt[0] - newIntersectPt[0];
       dY = currentIntersectPt[1] - newIntersectPt[1];
@@ -204,9 +216,9 @@ namespace Isis {
     } // end of while loop
 
     surfaceIntersection()->FromNaifArray(newIntersectPt);
-    m_hasIntersection = true;
+    setHasIntersection(true);
 
-    return m_hasIntersection;
+    return true;
   }
 
 
@@ -255,6 +267,14 @@ namespace Isis {
 
 
   /** 
+   * Return the dem Cube object
+   */
+  Cube *DemShape::demCube()  {
+    return m_demCube;
+  }
+
+
+  /** 
    * Calculate local normal
    */
   void DemShape::calculateLocalNormal (QVector<double *> cornerNeighborPoints) {
@@ -265,24 +285,22 @@ namespace Isis {
     vsub_c(cornerNeighborPoints[3], cornerNeighborPoints [2], rightMinusLeft);
 
     // take cross product of subtraction results to get normal
-    SpiceDouble normal[3];
-    ucrss_c(topMinusBottom, rightMinusLeft, normal);
+    std::vector<SpiceDouble> normal(3);
+    ucrss_c(topMinusBottom, rightMinusLeft, (SpiceDouble *) &normal[0]);
 
     // unitize normal (and do sanity check for magnitude)
     double mag;
-    unorm_c(normal, normal, &mag);
+    unorm_c((SpiceDouble *) &normal[0], (SpiceDouble *) &normal[0], &mag);
 
     if (mag == 0.0) {
       normal[0] = 0.;
       normal[1] = 0.;
       normal[2] = 0.;
-      m_hasNormal = false;
+      setHasNormal(false);
    }
     else {
-      m_hasNormal = true;
+      setHasNormal(true);
     } 
-  
-    memcpy(&m_normal[0], normal, sizeof(double) * 3);
 
     // Check to make sure that the normal is pointing outward from the planet
     // surface. This is done by taking the dot product of the normal and
@@ -292,9 +310,11 @@ namespace Isis {
     SpiceDouble pB[3];
     surfaceIntersection()->ToNaifArray(pB);
     unorm_c(pB, centerLookVect, &mag);
-    double dotprod = vdot_c((SpiceDouble *) &m_normal[0], centerLookVect);
+    double dotprod = vdot_c((SpiceDouble *) &normal[0], centerLookVect);
     if (dotprod < 0.0)
-      vminus_c((SpiceDouble *) &m_normal[0], (SpiceDouble *) &m_normal[0]);
+      vminus_c((SpiceDouble *) &normal[0], (SpiceDouble *) &normal[0]);
+  
+    setNormal(normal);
   }
 
 

@@ -26,6 +26,7 @@
 #include "iTime.h"
 #include "Spice.h"
 #include "Preference.h"
+#include "Target.h"
 
 using namespace Isis;
 using namespace std;
@@ -222,5 +223,5 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   cout << "Testing Utility methods" << endl;
-  cout << "Target Name = " << spi.target() << endl;
+  cout << "Target Name = " << spi.target()->name() << endl;
 }

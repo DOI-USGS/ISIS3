@@ -240,11 +240,6 @@ namespace Isis {
       iString targetName() const;
       //     iString shapeName() const;
 
-      //! Return if our target is the sky
-      bool isSky() const {
-        return m_sky;
-      };
-
       iTime getClockTime(iString clockValue,
                          int sclkCode = -1);
       SpiceDouble getDouble(const iString &key, int index = 0);
@@ -381,14 +376,12 @@ namespace Isis {
 
       PvlObject *m_naifKeywords;
 
-      bool m_sky; //!< Indicates whether the target of the observation is the sky.
       bool m_usingNaif;
 
       // Don't allow copies
       Spice(const Spice &other);
       Spice &operator=(const Spice &other);
 
-      //      EllipsoidShape *m_ellipsoid; //!< Ellipsoid shape model for target 
   };
 }
 

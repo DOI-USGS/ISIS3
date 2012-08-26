@@ -40,6 +40,7 @@
 #include "Projection.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 #include "UniqueIOCachingAlgorithm.h"
 
 #define MAX(x,y) (((x) > (y)) ? (x) : (y))
@@ -91,6 +92,7 @@ namespace Isis {
   */
   void Sensor::setTime(const iTime &time) {
     Spice::setTime(time);
+    target()->shape()->clearSurfacePoint();
   }
 
   /**
@@ -151,17 +153,17 @@ namespace Isis {
     m_newLookB = true;
 
     // Don't try to intersect the sky
-    if(isSky()) {
+    if(target()->isSky()) {
+      target()->shape()->setHasIntersection(false);
       return false;
     }
-
 
     // See if it intersects the planet
     const vector<double> &sB = bodyRotation()->ReferenceVector(
         instrumentPosition()->Coordinate());
 
-    return target()->shape()->intersectSurface(sB, lookB);
-//    return m_shape->intersectSurface(sB, lookB);
+    double tolerance = Resolution() / 100.0;
+    return target()->shape()->intersectSurface(sB, lookB, tolerance);
   }
 
   /**
@@ -179,31 +181,26 @@ namespace Isis {
 
   double Sensor::UniversalLatitude() const {
     return target()->shape()->surfaceIntersection()->GetLatitude().degrees();
-//    return m_shape->surfaceIntersection()->GetLatitude().degrees();
   }
 
 
   Latitude Sensor::GetLatitude() const {
     return target()->shape()->surfaceIntersection()->GetLatitude();
-//    return m_shape->surfaceIntersection()->GetLatitude();
   }
 
 
   double Sensor::UniversalLongitude() const {
     return target()->shape()->surfaceIntersection()->GetLongitude().degrees();
-//    return m_shape->surfaceIntersection()->GetLongitude().degrees();
   }
 
 
   Longitude Sensor::GetLongitude() const {
     return target()->shape()->surfaceIntersection()->GetLongitude();
-//    return m_shape->surfaceIntersection()->GetLongitude();
   }
 
 
   SurfacePoint Sensor::GetSurfacePoint() const {
     return *(target()->shape()->surfaceIntersection());
-//    return *m_shape->surfaceIntersection();
   }
 
 
@@ -211,7 +208,6 @@ namespace Isis {
     //TODO: We probably need to be validating surface intersect point is not NULL
     // Here? or in ShapeModel? or what, man?
     return target()->shape()->surfaceIntersection()->GetLocalRadius();
-//    return m_shape->surfaceIntersection()->GetLocalRadius();
   }
 
 
@@ -225,7 +221,6 @@ namespace Isis {
    */
   Distance Sensor::LocalRadius(Latitude lat, Longitude lon) {
     return target()->shape()->localRadius(lat, lon); 
-//    return m_shape->localRadius(lat, lon); 
   }
 
 
@@ -240,8 +235,6 @@ namespace Isis {
   Distance Sensor::LocalRadius(double lat, double lon) {
     return target()->shape()->localRadius(Latitude(lat, Angle::Degrees),
                                 Longitude(lon, Angle::Degrees));
-//    return m_shape->localRadius(Latitude(lat, Angle::Degrees),
-//                                Longitude(lon, Angle::Degrees));
   }
 
   /**
@@ -294,11 +287,12 @@ namespace Isis {
    */
   bool Sensor::SetUniversalGround(const double latitude,
                                   const double longitude, bool backCheck) {
+
     ShapeModel *shape = target()->shape();
+    shape->clearSurfacePoint();
+
     // Can't intersect the sky
-    if (isSky()) {
-      shape->setHasSurfaceIntersection(false);
-//      m_shape->setHasSurfaceIntersection(false);
+    if (target()->isSky()) {
       return false;
     }
 
@@ -306,15 +300,6 @@ namespace Isis {
     Latitude lat(latitude, Angle::Degrees);
     Longitude lon(longitude, Angle::Degrees);
     shape->surfaceIntersection()->SetSpherical(lat, lon, LocalRadius(lat, lon));
-//    m_shape->surfaceIntersection()->SetSpherical(lat, lon, LocalRadius(lat, lon));
-
-    if (!shape->surfaceIntersection()->Valid()) {
-      target()->shape()->setHasSurfaceIntersection(false);
-//    if (!m_shape->surfaceIntersection()->Valid()) {
-//      m_shape->setHasSurfaceIntersection(false);
-      return false;
-    }
-
     return SetGroundLocal(backCheck);
   }
 
@@ -337,18 +322,19 @@ namespace Isis {
   bool Sensor::SetUniversalGround(const double latitude,
                                   const double longitude,
                                   const double radius, bool backCheck) {
-    // Can't intersect the sky
-    if (isSky()) {
-      target()->shape()->setHasSurfaceIntersection(false);
-//      m_shape->setHasSurfaceIntersection(false);
+
+    ShapeModel *shape = target()->shape();
+    shape->clearSurfacePoint();
+
+   // Can't intersect the sky
+    if (target()->isSky()) {
       return false;
     }
 
     Latitude lat(latitude, Angle::Degrees);
     Longitude lon(longitude, Angle::Degrees);
     Distance rad(radius, Distance::Meters);
-    target()->shape()->surfaceIntersection()->SetSpherical(lat, lon, rad);
-//    m_shape->surfaceIntersection()->SetSpherical(lat, lon, rad);
+    shape->surfaceIntersection()->SetSpherical(lat, lon, rad);
 
     return SetGroundLocal(backCheck);
   }
@@ -369,15 +355,14 @@ namespace Isis {
    */
   bool Sensor::SetGround(const SurfacePoint &surfacePt, bool backCheck) {
     ShapeModel *shape = target()->shape();
+    shape->clearSurfacePoint();
+
     // Can't intersect the sky
-    if (isSky()) {
-      shape->setHasSurfaceIntersection(false);
-//      m_shape->setHasSurfaceIntersection(false);
+    if (target()->isSky()) {
       return false;
     }
 
-    shape->setSurfaceIntersectionPoint(surfacePt);
-//    m_shape->setSurfaceIntersectionPoint(surfacePt);
+    shape->setSurfacePoint(surfacePt);
 
     return SetGroundLocal(backCheck);
   }
@@ -399,6 +384,11 @@ namespace Isis {
     // With the 3 spherical value compute the x/y/z coordinate
     //latrec_c(m_radius, (m_longitude * PI / 180.0), (m_latitude * PI / 180.0), m_pB);
 
+
+    if (!(shape->surfaceIntersection()->Valid())) {
+      return false;
+    }
+
     // Make sure the point isn't on the backside of the body
 
     // This is static purely for performance reasons. A significant speedup
@@ -409,23 +399,19 @@ namespace Isis {
     m_lookB[0] = shape->surfaceIntersection()->GetX().kilometers() - sB[0];
     m_lookB[1] = shape->surfaceIntersection()->GetY().kilometers() - sB[1];
     m_lookB[2] = shape->surfaceIntersection()->GetZ().kilometers() - sB[2];
-//    m_lookB[0] = m_shape->surfaceIntersection()->GetX().kilometers() - sB[0];
-//    m_lookB[1] = m_shape->surfaceIntersection()->GetY().kilometers() - sB[1];
-//    m_lookB[2] = m_shape->surfaceIntersection()->GetZ().kilometers() - sB[2];
     m_newLookB = true;
 
     // See if the point is on the backside of the target
+
     if (backCheck) {
       if (fabs(shape->emissionAngle(sB)) > 90.) {
-        shape->setHasSurfaceIntersection(false);
-//        m_shape->setHasSurfaceIntersection(false);
+        shape->setHasIntersection(false);
         return false;
       }
     }
 
     // return with success
-    shape->setHasSurfaceIntersection(true);
-//    m_shape->setHasSurfaceIntersection(true);
+    shape->setHasIntersection(true);
     
     return true;
   }
@@ -528,9 +514,6 @@ namespace Isis {
     pB[0] = shape->surfaceIntersection()->GetX().kilometers();
     pB[1] = shape->surfaceIntersection()->GetY().kilometers();
     pB[2] = shape->surfaceIntersection()->GetZ().kilometers();
-//    pB[0] = m_shape->surfaceIntersection()->GetX().kilometers();
-//    pB[1] = m_shape->surfaceIntersection()->GetY().kilometers();
-//    pB[2] = m_shape->surfaceIntersection()->GetZ().kilometers();
 
     vsub_c(pB, (SpiceDouble *) &sB[0], psB);
     unorm_c(psB, upsB, &dist);
@@ -566,15 +549,13 @@ namespace Isis {
     double xChange = sB[0] - shape->surfaceIntersection()->GetX().kilometers();
     double yChange = sB[1] - shape->surfaceIntersection()->GetY().kilometers();
     double zChange = sB[2] - shape->surfaceIntersection()->GetZ().kilometers();
-//    double xChange = sB[0] - m_shape->surfaceIntersection()->GetX().kilometers();
-//    double yChange = sB[1] - m_shape->surfaceIntersection()->GetY().kilometers();
-//    double zChange = sB[2] - m_shape->surfaceIntersection()->GetZ().kilometers();
 
     // Calc the distance and convert to AU
-    double dist = sqrt(pow(xChange, 2) + pow(yChange, 2) + pow(zChange, 2));
+    double dist = sqrt(xChange*xChange + yChange*yChange + zChange*zChange);
     dist /= 149597870.691;
     return dist;
   }
+
 
   /**
    * Returns the distance from the spacecraft to the subspacecraft point in km.
@@ -605,7 +586,7 @@ namespace Isis {
     double zChange = spB[2] - ssB[2];
 
     // Calc the distance
-    double dist = sqrt(pow(xChange, 2) + pow(yChange, 2) + pow(zChange, 2));
+    double dist = sqrt(xChange*xChange + yChange*yChange + zChange*zChange);
     return dist;
   }
 

@@ -53,9 +53,9 @@ namespace Isis {
   class EllipsoidShape : public Isis::ShapeModel {
     public:
       //! Constructors
-    EllipsoidShape(Target *target, Isis::Pvl &pvl);
-      //      EllipsoidShape(Distance radii[3]);
+      EllipsoidShape(Target *target, Isis::Pvl &pvl);
       EllipsoidShape(Target *target);
+      EllipsoidShape();
 
       //! Destructor
       ~EllipsoidShape() { };

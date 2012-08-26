@@ -53,7 +53,6 @@ namespace Isis {
       //! Constructors
       ShapeModel();
       ShapeModel(Target *target, Isis::Pvl &pvl);
-      //      ShapeModel(Distance radii[3]);
       ShapeModel(Target *target);
 
       //! Initialization
@@ -76,17 +75,17 @@ namespace Isis {
       //! Calculate the default normal of the current intersection point
       virtual void calculateDefaultNormal() = 0; 
 
-      //! Calculate the surface normal of the current intersection point
+      //! Calculate the local normal of the current intersection point (relative to neighbor points)
       virtual void calculateLocalNormal(QVector<double *> cornerNeighborPoints) = 0; 
 
-      //! Calculate the surface normal of the current intersection point
+      //! Calculate the surface normal of the current intersection point (relative to ellipsoid)
       virtual void calculateSurfaceNormal() = 0; 
 
-      //! Return the normal (surface or local) of the current intersection point
-      void normal(std::vector<double>);
+      //! Clear current point
+      void clearSurfacePoint();
 
       //! Calculate the emission angle of the current intersection point
-      virtual double emissionAngle(const std::vector<double> & sB) ;
+      virtual double emissionAngle(const std::vector<double> & sB);
 
       //! Calculate the incidence angle of the current intersection point
       virtual double incidenceAngle(const std::vector<double> &uB);
@@ -97,17 +96,11 @@ namespace Isis {
       //! Return local radius from shape model
       virtual Distance localRadius(const Latitude &lat, const Longitude &lon) = 0;
 
-      //! Set shape name
-      void setName(const std::string name);
-
       //! Get shape name
       std::string name() const;
 
       //! Set m_hasIntersection
-      void setHasSurfaceIntersection(bool b);
-
-      //! Set surface intersection point
-      void setSurfaceIntersectionPoint(const SurfacePoint &surfacePoint);
+      void setHasIntersection(bool b);
 
       //! Set tolerance for acceptance in iterative loops
       //      void setTolerance(const double tol);
@@ -118,10 +111,19 @@ namespace Isis {
       //! Return the tolerance
       //      double tolerance();
 
+      //! Set current surface point
+      void setSurfacePoint(const SurfacePoint &surfacePoint);
+
+      //! Return the normal (surface or local) of the current intersection point
+      std::vector<double>  normal();
+
     protected:
-      bool m_hasIntersection;                          //!< Flag indicating a successful intersection has been found
-      bool m_hasNormal;                                 //!< Flag indicating normal has been computed
-      std::vector<double> m_normal;             //!< Local normal of current intersection point
+
+      //! Set the normal (surface or local) of the current intersection point
+      void setNormal(const std::vector<double>);
+
+      //! Set shape name
+      void setName(const std::string name);
  
       //      double *m_tolerance;
 
@@ -130,9 +132,13 @@ namespace Isis {
       //! Intersect ellipse
       bool intersectEllipsoid(const std::vector<double> observerPosRelativeToTarget,
                               const std::vector<double> &observerLookVectorToTarget);
-      Distance *targetRadii() const;
+      std::vector<Distance> targetRadii() const;
+      void setHasNormal(bool status);
 
     private:
+      bool m_hasIntersection;       //!< indicates good intersection exists
+      bool m_hasNormal;             //!< indicates normal has been computed
+      std::vector<double> m_normal; //!< Local normal of current intersection point
       std::string *m_name;
       //      void setRadii(Distance radii[3]);
       //void localRadius(const Latitude &lat, const Longitude &lon);  // Is this needed?

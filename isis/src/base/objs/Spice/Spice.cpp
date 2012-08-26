@@ -36,7 +36,6 @@
 #include "iTime.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
-// #include "ShapeModelFactory.h"
 #include "Target.h"
 
 #include "getSpkAbCorrState.hpp"
@@ -100,12 +99,10 @@ namespace Isis {
     NaifStatus::CheckErrors();
 
     // Initialize members
-    // m_radii = new Distance[3];
 
     m_solarLongitude = new Longitude;
     m_et = NULL;
     m_kernels = new QVector<iString>;
-    // m_target = new iString;
     m_target = new Target(lab);
 
     m_startTime = new iTime;
@@ -125,18 +122,11 @@ namespace Isis {
 
     m_allowDownsizing = false;
 
-    // m_bodyCode = new SpiceInt;
     m_spkCode = new SpiceInt;
     m_ckCode = new SpiceInt;
     m_ikCode = new SpiceInt;
     m_sclkCode = new SpiceInt;
     m_spkBodyCode = new SpiceInt;
-
-    // set shape and ellipsoid models
-    // m_shape = ShapeModelFactory::Create(lab);
-
-    // m_ellipsoid = NULL;
-    // m_ellipsoid = new EllipsoidShape(lab);
 
     m_naifKeywords = new PvlObject("NaifKeywords");
 
@@ -221,27 +211,14 @@ namespace Isis {
     *m_sclkCode = *m_spkCode;
     *m_ckCode   = *m_ikCode;
 
-    // if (m_target->isSky()) 
-    //   m_target->setSky(*m_spkCode);
-    // PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
-    // *m_target = inst["TargetName"][0];
-
-    // if (iString(*m_target).UpCase() == "SKY") {
-    //   *m_bodyCode = *m_spkCode;
-    //   m_radii[0] = m_radii[1] = m_radii[2] = Distance(1000.0, Distance::Meters);
-    //   m_sky = true;
-    // }
-    // else {
     if (!m_target->isSky()) {
-      // *m_bodyCode = NaifBodyCode();
       iString radiiKey = "BODY" + iString((BigInt) m_target->naifBodyCode()) + "_RADII";
-      Distance radii[3];
+      std::vector<Distance> radii(3,Distance());
       radii[0] = Distance(getDouble(radiiKey, 0), Distance::Kilometers);
       radii[1] = Distance(getDouble(radiiKey, 1), Distance::Kilometers);
       radii[2] = Distance(getDouble(radiiKey, 2), Distance::Kilometers);
       // m_target doesn't have the getDouble method so Spice gets the radii for it
       m_target->setRadii(radii);
-    //   m_sky = false;
     }
     *m_spkBodyCode = m_target->naifBodyCode();
 
@@ -255,15 +232,11 @@ namespace Isis {
     if (kernels.HasKeyword("NaifSclkCode"))
       *m_sclkCode = (int) kernels["NaifSclkCode"];
 
-    // if (kernels.HasKeyword("NaifBodyCode"))
-    //   *m_bodyCode = (int) kernels["NaifBodyCode"];
-
     if (!m_target->isSky()) {
       if (kernels.HasKeyword("NaifSpkBodyCode"))
         *m_spkBodyCode = (int) kernels["NaifSpkBodyCode"];
     }
 
-    // if (m_sky) {
     if (m_target->isSky()) {
       // Create the identity rotation for sky targets
       // Everything in bodyfixed will really be J2000
@@ -397,11 +370,6 @@ namespace Isis {
   Spice::~Spice() {
     NaifStatus::CheckErrors();
 
-    // if (m_radii != NULL) {
-    //   delete [] m_radii;
-    //   m_radii = NULL;
-    // }
-
     if (m_solarLongitude != NULL) {
       delete m_solarLongitude;
       m_solarLongitude = NULL;
@@ -462,11 +430,6 @@ namespace Isis {
       m_bodyRotation = NULL;
     }
 
-    // if (m_bodyCode != NULL) {
-    //   delete m_bodyCode;
-    //   m_bodyCode = NULL;
-    // }
-
     if (m_spkCode != NULL) {
       delete m_spkCode;
       m_spkCode = NULL;
@@ -492,16 +455,6 @@ namespace Isis {
       m_spkBodyCode = NULL;
     }
 
-    // if (m_shape != NULL) {
-    //   delete m_shape;
-    //     m_shape = NULL;
-    // }
-   
-    // if (m_ellipsoid != NULL) {
-    //   delete m_ellipsoid;
-    //   m_ellipsoid = NULL;
-    // }
- 
    if (m_target != NULL) {
       delete m_target;
         m_target = NULL;
@@ -799,7 +752,8 @@ namespace Isis {
    * @param r[] Radii of the target in kilometers
    */
   void Spice::radii(Distance r[3]) const {
-    r = m_target->radii();
+    for (int i = 0; i < 3; i++) 
+       r[i] =m_target->radii()[i];
   }
 
   /**
@@ -809,16 +763,6 @@ namespace Isis {
    *
    */
   SpiceInt Spice::naifBodyCode() const {
-  //   SpiceInt code;
-  //   SpiceBoolean found;
-  //   bodn2c_c(m_target->c_str(), &code, &found);
-  //   if(!found) {
-  //     string msg = "Could not convert Target [" + *m_target +
-  //                  "] to NAIF code";
-  //     throw IException(IException::Io, msg, _FILEINFO_);
-  //   }
-
-  //   return (int) code;
     return (int) m_target->naifBodyCode();
   }
 
@@ -1082,22 +1026,6 @@ namespace Isis {
     return result;
   }
 
-  // /**
-  //  * Returns shape model
-  //  */
-  // ShapeModel *Spice::shape() const {
-  //   return m_shape;
-  // }
-  
-  
-  // /**
-  //  * Returns ellipsoid
-  //  */
-  // EllipsoidShape *Spice::ellipsoid() const {
-  //   return m_ellipsoid;
-  // }
-
-
   /**
    * This returns a value from the NAIF text pool. It is a static convience
    * method
@@ -1142,7 +1070,7 @@ namespace Isis {
     sB[2] = vsB[2];
     unorm_c(sB, usB, &dist);
 
-    Distance *radii = m_target->radii();
+    std::vector<Distance> radii = target()->radii();
     SpiceDouble a = radii[0].kilometers();
     SpiceDouble b = radii[1].kilometers();
     SpiceDouble c = radii[2].kilometers();
@@ -1185,7 +1113,7 @@ namespace Isis {
     SpiceDouble uuB[3], dist;
     unorm_c(m_uB, uuB, &dist);
 
-    Distance *radii = m_target->radii();
+    std::vector<Distance> radii = target()->radii();
     SpiceDouble a = radii[0].kilometers();
     SpiceDouble b = radii[1].kilometers();
     SpiceDouble c = radii[2].kilometers();
@@ -1228,16 +1156,6 @@ namespace Isis {
   
   
   /**
-    * Returns the string name of the shape
-    *
-    * @return string
-    */
-  // iString Spice::shapeName() const {
-  //   return m_shape->name();
-  // }
-
-
-  /**
    * Computes the solar longitude for the given ephemeris time.  If the target
    * is sky, the longitude is set to -999.0.
    *
@@ -1246,7 +1164,6 @@ namespace Isis {
   void Spice::computeSolarLongitude(iTime et) {
     NaifStatus::CheckErrors();
 
-    // if(iString(m_target->name()).UpCase() == "SKY") {
     if (m_target->isSky()) {
       *m_solarLongitude = Longitude();
       return;

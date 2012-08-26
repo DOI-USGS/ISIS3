@@ -132,7 +132,7 @@ namespace Isis {
     pB[2] = point.GetZ().kilometers();
 
     // Check for Sky images
-    if(p_camera->isSky()) {
+    if(p_camera->target()->isSky()) {
       return false;
     }
 

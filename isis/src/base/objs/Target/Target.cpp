@@ -47,22 +47,21 @@ namespace Isis {
 
     // Initialize members
     m_bodyCode = new SpiceInt;
-    m_radii = new Distance[3];
+    m_radii.resize(3);
+    // m_radii.resize(3, Distance());
     m_name = new iString;
-    m_radii = new Distance[3];
     m_shape = NULL;
     m_originalShape = NULL;
-    m_sky = NULL;
+    m_sky = false;
 
-    PvlGroup kernels = lab.FindGroup("Kernels", Pvl::Traverse);
+    PvlGroup &kernels = lab.FindGroup("Kernels", Pvl::Traverse);
 
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
     *m_name = inst["TargetName"][0];
 
-    // if (iString(*m_name).UpCase() == "SKY") {
     if (name().UpCase() == "SKY") {
       m_radii[0] = m_radii[1] = m_radii[2] = Distance(1000.0, Distance::Meters);
-      *m_sky = true;
+      m_sky = true;
       string trykey = "NaifIkCode";
       if (kernels.HasKeyword("NaifFrameCode")) trykey = "NaifFrameCode";
       int ikCode = (int) kernels[trykey];
@@ -82,7 +81,6 @@ namespace Isis {
     // Override it if it exists in the labels
     if (kernels.HasKeyword("NaifBodyCode"))
       *m_bodyCode = (int) kernels["NaifBodyCode"];
-
     m_shape = ShapeModelFactory::Create(this, lab);
   }
 
@@ -102,9 +100,8 @@ namespace Isis {
       m_name = NULL;
     }
 
-    if (m_radii != NULL) {
-      delete [] m_radii;
-      m_radii = NULL;
+    if (m_radii.size() != 0) {
+      m_radii.clear();
     }
 
     if (m_originalShape != NULL) {
@@ -116,17 +113,12 @@ namespace Isis {
       delete m_shape;
       m_shape = NULL;
     }
-
-    if (m_sky != NULL) {
-      delete m_sky;
-      m_sky = NULL;
-    }
   }
 
 
   //! Return if our target is the sky
   bool Target::isSky() const {
-        return *m_sky;
+        return m_sky;
   }
 
 
@@ -172,7 +164,7 @@ namespace Isis {
    * appropriate SPICE kernel for the body specified by TargetName in the
    * Instrument group of the labels.
    */
-  Distance *Target::radii() const {
+  std::vector<Distance> Target::radii() const {
     return m_radii;
   }
 
@@ -219,7 +211,7 @@ namespace Isis {
    *
    * @param r[] Radii of the target in kilometers
    */
-  void Target::setRadii(Distance radii[3]) {
+  void Target::setRadii(std::vector<Distance> radii) {
     m_radii[0] = radii[0];
     m_radii[1] = radii[1];
     m_radii[2] = radii[2];

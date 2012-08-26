@@ -40,25 +40,9 @@ namespace Isis {
     
     // get kernels and instrument Pvl groups
     PvlGroup &kernelsPvlGroup = pvl.FindGroup("Kernels", Pvl::Traverse);
-    // PvlGroup &instrumentPvlGroup = pvl.FindGroup("Instrument", Pvl::Traverse);
-    
-    // get target name from instrument Pvl group
-    // iString targetName = instrumentPvlGroup["TargetName"][0];
-    std::cout << "Target name = " << target->name() << std::endl;
-
-
-    // handle "sky" target
-    // TODO Deal with sky images.  Stuart suggested dealing with Sky images in a Target class.
     bool skyTarget = false; // TODO Do we need a sky shape model, member variable, or neither?
-    // if (targetName.UpCase() == "SKY") {
-    if (target->name().UpCase() == "SKY") {
-      skyTarget = true;
-
-      // right now, I'm just gonna quit if this is a sky thing
-      iString msg =
-          "In ShapeModelFactory::Create(Pvl &pvl), SKY target encountered, " \
-          "not gonna mess with it for now.";
-          throw IException(IException::Unknown, msg, _FILEINFO_);
+    if (target->isSky() ) {
+      return NULL;
     }
 
     // Determine if target is a plane??? target name has rings in it? 

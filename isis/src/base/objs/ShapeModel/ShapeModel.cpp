@@ -7,7 +7,10 @@
 #include "ShapeModel.h"
 #include "SurfacePoint.h"
 #include "IException.h"
+#include "iString.h"
 #include "NaifStatus.h"
+
+using namespace std;
 
 namespace Isis {
   /**
@@ -35,7 +38,6 @@ namespace Isis {
    *
    * @param target Valid Isis3 target.
    */
-  // ShapeModel::ShapeModel(Distance radii[3]) {
   ShapeModel::ShapeModel(Target *target) {
     Initialize();
     // setRadii(radii);
@@ -48,8 +50,7 @@ namespace Isis {
    */
   void ShapeModel::Initialize() {
     m_name = new std::string();
-    m_name = NULL;
-    m_surfacePoint = NULL;
+    m_surfacePoint = new SurfacePoint();
     // m_tolerance = new double();
     // *m_tolerance = 0.0;
     // m_radii new Distance[3];
@@ -82,7 +83,8 @@ namespace Isis {
     // for an ellipsoid.  For testing purposes to match old results do as Isis3 currently does until
     // Jeff and Stuart respond.
 
-   if ( !m_hasIntersection ) {
+   // if ( !m_hasIntersection ) {
+    if (!surfaceIntersection()->Valid()) {
      Isis::iString msg = "A valid intersection must be defined before computing the surface normal";
       throw IException(IException::Programmer, msg, _FILEINFO_);
    }
@@ -106,11 +108,21 @@ namespace Isis {
 
 
   /**
-   * Returns the emission angle in degrees. 
+   * Computes and returns emission angle in degrees given the observer position.
    *
-   * @return double
+   * Emission Angle: The angle between the surface normal vector at the
+   * intersection point and a vector from the intersection point to the
+   * spacecraft. The emission angle varies from 0 degrees when the spacecraft is
+   * viewing the sub-spacecraft point (nadir viewing) to 90 degrees when the
+   * intercept is tangent to the surface of the target body. Thus, higher values
+   * of emission angle indicate more oblique viewing of the target.
+   *
+   * @param sB: Spacecraft position in body-fixed coordinates
+   *
+   * @return Emmision angle in decimal degrees
+   *
    */
-  double ShapeModel::emissionAngle(const std::vector<double> & sB)  {
+  double ShapeModel::emissionAngle(const std::vector<double> & sB) {
 
     // Calculate the surface normal if we haven't yet
     if (!hasNormal()) calculateDefaultNormal();
@@ -125,11 +137,10 @@ namespace Isis {
     SpiceDouble psB[3], upsB[3], dist;
     vsub_c((ConstSpiceDouble *) &sB[0], pB, psB);
     unorm_c(psB, upsB, &dist);
-
     double angle = vdot_c((SpiceDouble *) &m_normal[0], upsB);
     if(angle > 1.0) return 0.0;
     if(angle < -1.0) return 180.0;
-    return acos(angle) * 180.0 / PI;
+    return acos(angle) * RAD2DEG;
   }
 
 
@@ -157,7 +168,7 @@ namespace Isis {
     double angle = vdot_c((SpiceDouble *) &m_normal[0], upuB);
     if(angle > 1.0) return 0.0;
     if(angle < -1.0) return 180.0;
-    return acos(angle) * 180.0 / PI;
+    return acos(angle) * RAD2DEG;
   }
 
 
@@ -175,25 +186,29 @@ namespace Isis {
     memcpy(lookB,&observerLookVectorToTarget[0], 3*sizeof(double));
 
     // get target radii
-    Distance *radii = m_target->radii();
+    std::vector<Distance> radii = targetRadii();
     SpiceDouble a = radii[0].kilometers();
     SpiceDouble b = radii[1].kilometers();
     SpiceDouble c = radii[2].kilometers();
 
     // check if observer look vector intersects the target
     SpiceDouble intersectionPoint[3];
-    SpiceBoolean bIntersected = false;
+    SpiceBoolean intersected = false;
     surfpt_c((SpiceDouble *) &observerBodyFixedPosition[0], lookB, a, b, c,
-             intersectionPoint, &bIntersected);
+             intersectionPoint, &intersected);
 
     NaifStatus::CheckErrors();
     
-    if (bIntersected) {
+    if (intersected) {
       m_surfacePoint = new SurfacePoint(); 
       m_surfacePoint->FromNaifArray(intersectionPoint);
+      m_hasIntersection = true;
     }
-
-    return true;
+    else {
+      m_hasIntersection = false;
+    }
+   
+    return m_hasIntersection;
   }
 
 
@@ -223,7 +238,7 @@ namespace Isis {
     double angle = vdot_c(upsB, upuB);
     if(angle > 1.0) return 0.0;
     if(angle < -1.0) return 180.0;
-    return acos(angle) * 180.0 / PI;
+    return acos(angle) * RAD2DEG;
   }
 
 
@@ -251,25 +266,51 @@ namespace Isis {
   }
 
 
-  /** Return the local normal of the current intersection point.
+  /** Clear or reset the current surface point
    *
    */
-  void ShapeModel::normal(std::vector<double> normal) {
+  void ShapeModel::clearSurfacePoint() {
+    setHasIntersection(false);
+    setHasNormal(false);
+  }
+
+
+  /** Return the local normal of the current intersection point.
+   *
+   * @param returns normal vector if it exists
+   */
+  std::vector<double> ShapeModel::normal() {
     if (m_hasNormal ) {
-      std::vector<double> normal(3);
-      normal = m_normal;
+      return m_normal;
+    }
+    else {
+      std::string message = "The local normal has not been computed.";
+      throw IException(IException::Unknown, message, _FILEINFO_);
     }
 
-    std::string message = "The local normal has not been computed.";
-    throw IException(IException::Unknown, message, _FILEINFO_);
   }
+
 
   /**
    * Returns the radii of the body in km. The radii are obtained from the
    * target.
    */
-  Distance *ShapeModel::targetRadii() const {
+  std::vector<Distance> ShapeModel::targetRadii() const {
     return m_target->radii();
+  }
+
+
+  /** Set the normal for the currect intersection point
+   *
+   */
+  void ShapeModel::setNormal(const std::vector<double> normal) {
+    if (m_hasIntersection) {
+      m_normal = normal;
+    }
+    else {
+      std::string message = "No intersection point in known.  A normal can not be set.";
+      throw IException(IException::Unknown, message, _FILEINFO_);
+    }
   }
 
 
@@ -277,7 +318,7 @@ namespace Isis {
    *
    */
   void ShapeModel::setName(const std::string name) {
-    *m_name = name;
+     *m_name = name;
   }
 
 
@@ -292,7 +333,7 @@ namespace Isis {
   /** Set m_hasIntersection;
    *
    */
-  void ShapeModel::setHasSurfaceIntersection(bool b) {
+  void ShapeModel::setHasIntersection(bool b) {
     m_hasIntersection  = b;
   }
 
@@ -300,8 +341,13 @@ namespace Isis {
   /** Set surface intersection point
    *
    */
-  void ShapeModel::setSurfaceIntersectionPoint(const SurfacePoint &surfacePoint) {
+  void ShapeModel::setSurfacePoint(const SurfacePoint &surfacePoint) {
     *m_surfacePoint  = surfacePoint;
+
+    // Update status of intersection and normal
+    m_hasIntersection  = true;
+    // Set normal as not calculated
+    setHasNormal(false);
   }
 
 
@@ -345,6 +391,14 @@ namespace Isis {
   //   m_radii[1] = radii[1];
   //   m_radii[2] = radii[2];
   // }
+
+
+  /** Set the hasNormal flag
+   *
+   */
+  void ShapeModel::setHasNormal(bool status) {
+    m_hasNormal = status;
+  }
 
 
 }

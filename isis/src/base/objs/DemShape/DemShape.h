@@ -59,6 +59,8 @@ namespace Isis {
     public:
       //! Constructor
       DemShape(Target *target, Isis::Pvl &pvl);
+      //! Constructor
+      DemShape();
 
       //! Destructor
       ~DemShape();
@@ -69,9 +71,6 @@ namespace Isis {
                             double tol);
 
       Distance localRadius(const Latitude &lat, const Longitude &lon);
-
-      //! Calculate the phase angle of the current intersection point
-      //      double phaseAngle(const std::vector<double> & sB, const std::vector<double> &uB);
 
       //! Return dem scale in pixels/degree
       double demScale();
@@ -88,24 +87,14 @@ namespace Isis {
      void calculateSurfaceNormal(); 
 
     protected:
-      Cube *m_demCube;        //!< The cube containing the model  NOTE::  TODO maybe make this a method that returns ptr to cube
-      std::string m_demCubeFile;   //!< The file specification of the dem file
-      Pvl *m_demLabel;        //!< The label of the dem cube
+     Cube *demCube();                 //!< Returns the cube defining the shape model.  
 
     private:
+      Cube *m_demCube;              //!< The cube containing the model  NOTE::  
       Projection *m_demProj;                                     //!< The projection of the model
-      QVector<double *>  m_neighborPoints;           //! < Surface points of 4 surrounding pixels of intersection 
-        //      SurfacePoint *m_neighborPoints                       //! < Surface points of 4 surrounding pixels of intersection 
       double m_pixPerDegree;                                   //!< Scale of DEM file in pixels per degree
       Portal *m_portal;                                               //!< Buffer used to read from the model
       Interpolator *m_interp;                                      //!< Use bilinear interpolation from dem
-
-      // Aren't these only needed for Isis3EquatorialCylindricalShape model? Are they needed for 
-      //  photometric computations? I think neighborPoints replaces these???
-      //      std::vector<double> m_samples; //!< Shape model sample values of 4 closest
-                                     //   points to intersection point
-      //      std::vector<double> m_lines;   //!< Shape model line values of 4 closest 
-                                     //   points to intersection point
 
       // From Sensor.h
       /* void CommonInitialize(const std::string &demCube); */

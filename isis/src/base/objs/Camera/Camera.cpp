@@ -213,7 +213,7 @@ namespace Isis {
         Longitude lon(p_projection->UniversalLongitude(), Angle::Degrees);
         Distance rad(LocalRadius(lat, lon));
         if (!rad.isValid()) {
-          shape->setHasSurfaceIntersection(false);
+          shape->setHasIntersection(false);
           return false;
         }
         SurfacePoint surfPt(lat, lon, rad);
@@ -221,14 +221,14 @@ namespace Isis {
           p_childSample = sample;
           p_childLine = line;
 
-          shape->setHasSurfaceIntersection(true);
+          shape->setHasIntersection(true);
           return true;
         }
       }
     }
 
     // failure
-    shape->setHasSurfaceIntersection(false);
+    shape->setHasIntersection(false);
     return false;
   }
 
@@ -248,7 +248,7 @@ namespace Isis {
       return RawFocalPlanetoImage();
     }
 
-    target()->shape()->setHasSurfaceIntersection(false);
+    target()->shape()->setHasIntersection(false);
     return false;
   }
 
@@ -266,7 +266,7 @@ namespace Isis {
     Distance localRadius(LocalRadius(latitude, longitude));
 
     if(!localRadius.isValid()) {
-      target()->shape()->setHasSurfaceIntersection(false);
+      target()->shape()->setHasIntersection(false);
       return false;
     }
 
@@ -287,7 +287,7 @@ namespace Isis {
   bool Camera::SetGround(const SurfacePoint & surfacePt) {
     ShapeModel *shape = target()->shape();
     if(!surfacePt.Valid()) {
-      shape->setHasSurfaceIntersection(false);
+      shape->setHasIntersection(false);
       return false;
     }
 
@@ -296,7 +296,7 @@ namespace Isis {
       return RawFocalPlanetoImage();
     }
 
-    shape->setHasSurfaceIntersection(false);
+    shape->setHasIntersection(false);
     return false;
   }
 
@@ -339,14 +339,14 @@ namespace Isis {
           if(p_projection == NULL || p_ignoreProjection) {
             p_childSample = p_alphaCube->BetaSample(parentSample);
             p_childLine = p_alphaCube->BetaLine(parentLine);
-            shape->setHasSurfaceIntersection(true);
+            shape->setHasIntersection(true);
             return true;
           }
           else if(p_projection->IsSky()) {
             if(p_projection->SetGround(Declination(), RightAscension())) {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
-              shape->setHasSurfaceIntersection(true);
+              shape->setHasIntersection(true);
               return true;
             }
           }
@@ -354,7 +354,7 @@ namespace Isis {
             if(p_projection->SetUniversalGround(UniversalLatitude(), UniversalLongitude())) {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
-              shape->setHasSurfaceIntersection(true);
+              shape->setHasIntersection(true);
               return true;
             }
           }
@@ -362,7 +362,7 @@ namespace Isis {
       }
     }
 
-   shape->setHasSurfaceIntersection(false);
+   shape->setHasIntersection(false);
    return false;
   }
 
@@ -388,7 +388,7 @@ namespace Isis {
       return RawFocalPlanetoImage();  // sets p_hasIntersection
     }
 
-    target()->shape()->setHasSurfaceIntersection(false);
+    target()->shape()->setHasIntersection(false);
    return false;
   }
 
@@ -785,7 +785,7 @@ namespace Isis {
     PvlGroup map("Mapping");
     map += PvlKeyword("TargetName", target()->name());
 
-    Distance *radii = target()->radii();
+    std::vector<Distance> radii = target()->radii();
     map += PvlKeyword("EquatorialRadius", radii[0].meters(), "meters");
     map += PvlKeyword("PolarRadius", radii[2].meters(), "meters");
     
@@ -901,7 +901,6 @@ namespace Isis {
     // now we have all four points in the image, so find the same points on the surface
     QVector<double *> cornerNeighborPoints(4);
 
-    // DemShape *shape = (DemShape *) Shape();
     for (int i = 0; i < cornerNeighborPoints.size(); i ++)
       cornerNeighborPoints[i] = new double[3];
 
@@ -992,7 +991,7 @@ namespace Isis {
 
     // Set the method normal values
     std::vector<double> localNormal(3);
-    shapeModel->normal(localNormal);
+    localNormal = shapeModel->normal();
     memcpy(normal, (double *) &localNormal[0], sizeof(double) * 3);
   }
 
@@ -1674,7 +1673,7 @@ namespace Isis {
     if(tol < 0.0) {
       // Alternative calculation of ground resolution of a pixel/100
       double altitudeMeters;
-      if(isSky()) {   // Use the unit sphere as the target
+      if(target()->isSky()) {   // Use the unit sphere as the target
         altitudeMeters = 1.0;
       }
       else {
