@@ -1,4 +1,4 @@
-include $(ISISROOT)/make/isismake.macros
+include $(ISISROOT)/make/isismake.os
 
 # ISIS DOCS MAKEFILE
 #   Create XML table of contents for the documents

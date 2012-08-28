@@ -26,7 +26,7 @@ Deborah Lee Soltesz
      likely break the system -->
 
 <xsl:template name="document" match="documentation">
-include $(ISISROOT)/make/isismake.macros
+include $(ISISROOT)/make/isismake.os
 docs:
 <xsl:text>	</xsl:text>echo "          Constructing [<xsl:value-of select="$dirParam"/>]"
 <xsl:for-each select="files/file"><xsl:if test="body"><xsl:choose>
