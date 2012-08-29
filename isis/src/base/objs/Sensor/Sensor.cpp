@@ -405,7 +405,7 @@ namespace Isis {
 
     if (backCheck) {
       if (fabs(shape->emissionAngle(sB)) > 90.) {
-        shape->setHasIntersection(false);
+        shape->clearSurfacePoint();
         return false;
       }
     }

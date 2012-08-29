@@ -126,7 +126,6 @@ namespace Isis {
   bool DemShape::intersectSurface(vector<double> observerPos,
                                   vector<double> lookDirection,
                                   double tol) {
-
     // try to intersect the target body ellipsoid as a first approximation
     // for the iterative DEM intersection method
     // (this method is in the ShapeModel base class)

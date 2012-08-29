@@ -96,13 +96,15 @@ namespace Isis {
     pB[2] = surfaceIntersection()->GetZ().kilometers();
 
     // SpiceDouble normal[3];
-    // surfnm_c(kilometers(m_radii[0]), kilometers(m_radii[1]), kilometers(m_radii[2], pB, normal);
+    // std::vector<Distance> radii = m_target->radii();
+    // surfnm_c(radii[0].kilometers(), radii[1].kilometers(), radii[2].kilometers(), pB, normal);
 
     // Unitize the vector
     SpiceDouble upB[3];
     SpiceDouble dist;
     unorm_c(pB, upB, &dist);
     memcpy(&m_normal[0], upB, sizeof(double) * 3);
+
     m_hasNormal = true;
   }
 
@@ -137,6 +139,7 @@ namespace Isis {
     SpiceDouble psB[3], upsB[3], dist;
     vsub_c((ConstSpiceDouble *) &sB[0], pB, psB);
     unorm_c(psB, upsB, &dist);
+
     double angle = vdot_c((SpiceDouble *) &m_normal[0], upsB);
     if(angle > 1.0) return 0.0;
     if(angle < -1.0) return 180.0;
@@ -177,6 +180,10 @@ namespace Isis {
    */
   bool ShapeModel::intersectEllipsoid(const std::vector<double> observerBodyFixedPosition,
       const std::vector<double> &observerLookVectorToTarget) {
+
+    //Clear out previous surface point and normal
+    clearSurfacePoint();
+
     SpiceDouble lookB[3];
 
     // This memcpy does:
@@ -203,9 +210,6 @@ namespace Isis {
       m_surfacePoint = new SurfacePoint(); 
       m_surfacePoint->FromNaifArray(intersectionPoint);
       m_hasIntersection = true;
-    }
-    else {
-      m_hasIntersection = false;
     }
    
     return m_hasIntersection;
@@ -335,6 +339,7 @@ namespace Isis {
    */
   void ShapeModel::setHasIntersection(bool b) {
     m_hasIntersection  = b;
+    m_hasNormal = false;
   }
 
 

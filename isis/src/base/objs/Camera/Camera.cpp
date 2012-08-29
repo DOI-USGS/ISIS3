@@ -213,7 +213,7 @@ namespace Isis {
         Longitude lon(p_projection->UniversalLongitude(), Angle::Degrees);
         Distance rad(LocalRadius(lat, lon));
         if (!rad.isValid()) {
-          shape->setHasIntersection(false);
+          shape->clearSurfacePoint();
           return false;
         }
         SurfacePoint surfPt(lat, lon, rad);
@@ -228,7 +228,7 @@ namespace Isis {
     }
 
     // failure
-    shape->setHasIntersection(false);
+    shape->clearSurfacePoint();
     return false;
   }
 
@@ -248,7 +248,7 @@ namespace Isis {
       return RawFocalPlanetoImage();
     }
 
-    target()->shape()->setHasIntersection(false);
+    target()->shape()->clearSurfacePoint();
     return false;
   }
 
@@ -266,7 +266,7 @@ namespace Isis {
     Distance localRadius(LocalRadius(latitude, longitude));
 
     if(!localRadius.isValid()) {
-      target()->shape()->setHasIntersection(false);
+      target()->shape()->clearSurfacePoint();
       return false;
     }
 
@@ -287,7 +287,7 @@ namespace Isis {
   bool Camera::SetGround(const SurfacePoint & surfacePt) {
     ShapeModel *shape = target()->shape();
     if(!surfacePt.Valid()) {
-      shape->setHasIntersection(false);
+      shape->clearSurfacePoint();
       return false;
     }
 
@@ -296,7 +296,7 @@ namespace Isis {
       return RawFocalPlanetoImage();
     }
 
-    shape->setHasIntersection(false);
+    shape->clearSurfacePoint();
     return false;
   }
 
@@ -362,7 +362,7 @@ namespace Isis {
       }
     }
 
-   shape->setHasIntersection(false);
+   shape->clearSurfacePoint();
    return false;
   }
 
@@ -388,7 +388,7 @@ namespace Isis {
       return RawFocalPlanetoImage();  // sets p_hasIntersection
     }
 
-    target()->shape()->setHasIntersection(false);
+    target()->shape()->clearSurfacePoint();
    return false;
   }
 

@@ -372,7 +372,7 @@ namespace Isis {
         gp->FindKeyword("Phase").AddComment("Illumination and Other");
         gp->FindKeyword("Incidence").SetValue(camera->IncidenceAngle());
         gp->FindKeyword("Emission").SetValue(camera->EmissionAngle());
-        gp->FindKeyword("NorthAzimuth").SetValue(camera->NorthAzimuth());
+       gp->FindKeyword("NorthAzimuth").SetValue(camera->NorthAzimuth());
 
         gp->FindKeyword("EphemerisTime").SetValue(camera->time().Et(), "seconds");
         gp->FindKeyword("EphemerisTime").AddComment("Time");

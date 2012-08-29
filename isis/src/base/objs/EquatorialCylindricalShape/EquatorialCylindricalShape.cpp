@@ -96,7 +96,7 @@ namespace Isis {
       // use this iteration for equatorial cylindrical type projections that
       // failed to find an intersection with the DemShape method.
       // Notify the shape model that we have an intersection so Resolution can be calculated ??? is this needed
-      setHasIntersection(true);
+      // setHasIntersection(true);
       int maxit = 100;
       int it = 0;
       bool done = false;
