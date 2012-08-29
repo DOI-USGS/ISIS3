@@ -24,69 +24,67 @@ you must <em>not</em> upgrade the Isis Data Files!!!
 -->
 
         <h2>Overview</h2>
-        <h3>Platforms</h3>
-        <p>
-           Isis 3 applications are compiled and linked on our local systems. We 
-           provide copies of some of the necessary third party libraries, but we 
-           can not provide them for all operating system, hardware and 
-           distribution combinations. Other libraries are assumed to be 
-           available from your installation. As we upgrade to new software and 
-           hardware we may introduce incompatibilities with older platforms. In 
-           some cases we will not have the resources to resolve all problems, 
-           but we will attempt to remain compatible within reason and our 
-           resource limits.
-        </p>
 
-        <h3>Finding Disk Space</h3>
-        <p>
-            The current distribution of Isis 3 contains over 300 applications. 
-            It includes the complete source, binaries, documentation, and
-            libraries necessary to run the applications. 
-            Note: This does not include 3rd party binaries and header files 
-            necessary for developing Isis applications. The data area is 
-            available as a seperate download. Be aware, the full data area is 
-            very large (many 10s of GBs). This includes SPICE kernels for 
-            Apollo, 
-            CASSINI, Clementine1, Dawn, Galileo, Lunar Reconnaissance Orbiter,
-            Lunar Orbiter, Mariner10, Messenger, 
-            Mars Global Surveyor, Mars Odyssey, Mars 
-            Reconnaissance Orbiter, Viking, Voyager, and others. Other missions are 
-            included as they become available in Isis. 
-        </p>
-        <p>
-            We suggest you install Isis3 in a work area, away from any existing 
-            Isis2.x installations. Change your current working directory to 
-            where you want isis3 installed and create a directory named isis3. 
-            The rsync commands in step 2 will place all of Isis and the SPICE 
-            kernels under this 
-            directory.
+        <h3>Operating System Requirements</h3>
+        <p>ISIS runs on many Unix variants including:</p>
+        <ul>
+         <li>Ubuntu</li>
+         <li>RHEL</li>
+         <li>Debian</li>
+         <li>Fedora</li>
+         <li>SUSE</li>
+         <li>MacOSX</li>
+        </ul>
+         <p>It does not run on MS Windows.</p>
 
-          If you are looking for Isis 2, please
-        <a href="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/installation.cgi">refer to the Isis 2 Installation
-        Guide</a> for instructions on downloading and installing Isis 2.
-        </p>
+         <h3>Hardware Requirements</h3>
+         <p>ISIS has fairly minimal requirements depending on your needs:</p>
+         <ul>
+         <li>64-bit x86 processors (more cores is better)</li>
+         <lI>2GB memory (more memory is better)</lI>
+         <li>10GB to 180GB disk storage for ISIS installation</li>
+         <li>10GB to many TB disk storage for processing images</li>
+         <li>Quality graphics card (one that support two monitors can be useful)</li>
+         </ul>
 
-        <p>
-        Example:
-        </p>
-<pre>
-        $ cd /work1
-        $ mkdir isis3
-        $ cd isis3
-</pre>
+         <h3>Mission Requirements</h3>
+         <p>ISIS supports many planetary missions; in fact, over 40 different instruments including some
+         flown as early
+         as the 1960's.  Ancillary data is required to process images from these instruments.  For example, translation 
+         definition files to help convert from PDS format to ISIS cubes, dark current and flat file images are used for radiometric 
+         calibration, and large quantities of SPICE files (spacecraft pointing and position) for map projecting images.   
+         If you plan to work with data
+         from all missions then the download will require about 180GB for all the ancillary data.  However, most of this
+         volume is taken up by SPICE files.  We have a SPICE Web service that can be used in lieu of downloading all of the 
+         SPICE files which can reduce the download size to 10GB.  When downloading ISIS you will have the option of 
+         choosing which mission data to acquire as well as if you only want the translation and calibration files and not 
+         SPICE files.
+         </p>
 
-        <h2>Automated Installation</h2>
-        <h3>Java Installer</h3>
+         <h3>DTM Requirements</h3>
+         <p>A strength of ISIS lies in it capabilities for planetary cartography.  
+         The image orthorectification process is improved if a digital
+         terrain model is used (DTM).  The DTMs can be quite large and take time to download.  They can also exist for
+         many planetary bodies (e.g., Moon, Mars, etc). Therefore there are options for selecting which DTMs to download
+         if you are only working with a particular target body.
+         </p>
+
+         <h2>Installation</h2>
+
+        <h3>Recommended Installation Process</h3>
         <p>
-          Isis 3 now features a downloadable Java-based installer.  The
-          installer can be run in both graphical (GUI) and console (command
-          line) modes, and features the ability to create automated installation
-          scripts.  To run the installer, download the isisInstall.sh Bash
-          script from the link below and execute it.  This script will
-          automatically fetch the most recent version of the installer and
-          launch it.
+          Isis 3 now features a downloadable Java-based installer.  The installer provides user options for chosing which mission packages and target DEMS (e.g. Mars, Moon) to download.  
+          It also includes the sizes of the packages.   During the installation process, you can chose to use the ISIS SPICE web service which will eliminate the need to download most of the 
+          SPICE data for a mission.  
         </p>
         <p>
+          To run the installer, download the isisInstall.sh Bashscript from the link below and execute it.  This script will automatically fetch the most recent version of the installer and
+          launch it.  Depending on
+          your browser, you may need to right-click and select "Save Link As..."
+          to download:
+        <pre>
+          <a href="assets/isisInstall.sh" target="_blank">Installation Script</a>
+        </pre>
           After downloading the script, open a terminal in the directory where
           the script was installed.  Give the installation script executable
           permissions and run it by typing the following:
@@ -106,17 +104,154 @@ you must <em>not</em> upgrade the Isis Data Files!!!
             $ISISROOT/src/docsys/documents/InstallGuide/assets/isisInstall.sh
           </pre>
         </p>
+
+        <h3>Alternate Installation Process</h3>
         <p>
-          Follow this link to download the installation script.  Depending on
-          your browser, you may need to right-click and select "Save Link As..."
-          to download:
-        </p>
-        <p>
-          <a href="assets/isisInstall.sh" target="_blank">Installation Script</a>
+          If you are familar with the Unix rsync command and prefer to use the old installation information
+          follow this link:
+          <a href="#rsyncInstallation">Rsync Installation</a>
         </p>
 
+
+
+       <h2>FAQs</h2>
+       <h3>Can't connect to the rsync server</h3>
+       <p>
+         This is one of the biggest issues with downloading ISIS.  Most problems stem from a firewall restriction on 
+         the user's side.   USGS has opened the rsync port to allow access to our server.  Your institution likely has
+         a firewall and may not allow the access to our rsync server.  Start by making sure you can connect to our
+         rsync server.  Type the following command:
+          <pre>
+            rsync isisdist.wr.usgs.gov::
+
+            or
+
+            rsync isisdist.astrogeology.usgs.gov::
+          </pre>
+          This should list the packages available for download.  If you do not receive this list then 1) either both of our servers
+          are down or 2) your firewall does not allow access.  In the former case please post a message on our 
+          <a href="http://isis.astrogeology.usgs.gov/IsisSupport">support board</a>.  In the later case, see you local 
+          system administrator.  </p> 
+
+          <p>
+          You can also try an alternative port number that we have setup (port 80).  This is the
+          standard http port which is open through most firewalls.  However, some institutes have appliances that examine 
+          this traffic and if it doesn't appear to look like web content disconnects or is so slow the download would take forever.
+       </p>
+       <p>
+          Example use of port 80: 
+         <pre>rsync -azv --delete --partial --port=80 isisdist.astrogeology.usgs.gov::x86-64_linux_RHEL6/isis .</pre>
+       </p>
+
+       <p>
+       If you are still running into problems you can try a different network path.  For example, your home network to see if
+       you can make connections to our rsync server.
+    </p>
+
+
+    <h3>How do I know if the rsync commands were successful</h3>
+    <p>
+      Unfortunately rsync sometimes hangs or doesn't complete because of dropped network connections.  The drops can happen
+      on your end, our end, or anywhere in between.  Keep rerunning rsync until the command completes.
+    </p>
+    
+    <h3>How do I get updates to ISIS</h3>
+    <p>
+    Just rerun the the rsync commands or GUI installer (which uses rsync) again.  Rsync only acquires files that have changed or don't 
+    exist in you installation.  The update process will typically be much faster than the original download.
+    </p>
+
+    <h3>How often do you update ISIS</h3>
+    <p>
+      We update our mission data areas often (sometime nightly) as new SPICE files are provided by the active missions.  Our binaries (application programs) are updated
+      on a quarterly schedule.
+    </p>
+
+
+    <h3>How do I install ISIS2</h3>
+    <p>
+         If you are looking for Isis 2, please
+        <a href="http://isis.astrogeology.usgs.gov/Isis2/isis-bin/installation.cgi">refer to the Isis 2 Installation
+        Guide</a> for instructions on downloading and installing Isis 2.
+    </p>
+
+        <p>
+        Isis 3 and Isis 2 will have collisions of executable names (e.g.,
+        pds2isis exists in both systems).  It is best to remove initializations
+        of Isis 2 from your local startup file (e.g., .cshrc) otherwise you may get unpredictable
+        results.
+        </p>
+
+
+        <h3>When will a Windows version be available</h3>
+            <p>
+                Currently we have limited software development staff to support and modify ISIS, which implies directly running on a native Windows 
+                environment is not something that will happen in the near future.  
+             </p>
+
+
+
+             <h3>What operating systems have been dropped</h3>
+             <p>
+               As operating systems and hardware age security flaws are no longer patched and new APIs are not upgraded, which stunts the growth of ISIS on those systems.   
+               Therefore we no longer build ISIS on the following platforms:
+               <pre>
+                 Linux SuSE 9.X, 10.X
+                 RedHat Enterprise 3, 4, 5
+                 Mac OSX with the Power PC processor
+                 Mac OSX 10.4, 10.5
+               </pre>
+             </p>
+
+
+
+             <h3>I just can't get ISIS installed.  What can I do</h3>
+             <p>
+               If you encounter any problems we will be monitoring our discussion
+               board daily and will respond to any questions as best we can.  Other people 
+               have posted problems and may have similar issues to you. 
+             </p>
+             <p>
+               <a href="http://isis.astrogeology.usgs.gov/IsisSupport">Isis Support Center</a>
+             </p>
+
+
+
+
+
+        <A NAME="rsyncInstallation">  </A>
         <h2>Manual Installation</h2>
-        <h3>Downloading Isis 3</h3>
+        <h3>Creating a Download Directory</h3>
+
+
+        <p>
+            We suggest you install Isis3 in a work area. Change your current working directory to 
+            where you want isis3 installed and create a directory named isis3. 
+            The rsync commands in the next step will place all of Isis and the SPICE 
+            kernels under this directory.
+
+            Example:
+       <pre>
+        $ cd /work1
+        $ mkdir isis3
+        $ cd isis3
+       </pre>
+
+        </p>
+
+        <p>
+          <span style="font-size:120%; color:red; font-weight:bold">Warning:<i>
+           You must be in the correct directory as shown above, and you 
+           must type the below rsync commands correctly. If you do not you could
+           remove files not associated with ISIS.  That is ... you could remove
+           personal files on your computer.   Please research and understand
+           the rsync command, especially the --delete option.
+            </i></span>
+        </p>
+
+
+        <h3>Choosing a Rsync Server</h3>
+
         <p>
           We are distributing Isis3 using two rsync servers. If the "rsync" 
           command is is not available on your system please see your system
@@ -127,137 +262,133 @@ you must <em>not</em> upgrade the Isis Data Files!!!
           downloads from the rsync server.</i></strong>
         </p>
         <p>
-          <strong>Announcing our new rsync server mirror.</strong>
-          We have a new rsync server with a much faster connection. The 
-          old system is still up, but we encourage the use of the new one.
-        </p>
+          We have two rsync servers and suggest using the first server as it is a much faster
+          connection.
+         </p>
         <ul>
-          <li>New - isisdist.astrogeology.usgs.gov</li>
-          <li>Old - isisdist.wr.usgs.gov</li>
+          <li>100Mbit/sec - isisdist.astrogeology.usgs.gov</li>
+          <li>10Mbit/sec - isisdist.wr.usgs.gov</li>
         </ul>
         <p>
-          All of the example commands below use the "New" server name. You
-          can use the "Old" server name if you need to.
+          All of the example commands below use the faster server name. You
+          can use the slower server name if you need to through simple substitution.
         </p>
+
+
+
+        <h3>Downloading the ISIS Binaries (Required)</h3>
         <p>
-          <span style="font-size:120%; color:red; font-weight:bold">Warning:</span><i>
-           You must be in the correct directory as shown above, and you 
-           must type the follwing commands correctly. If you do not you could
-           remove files not associated with ISIS.
-            </i>
+        Choose the rsync command for your operating system.  Don't forget to type the "space period" 
+        at the end of the rsync command line or you will only get a listing of the files.
         </p>
 
-
-
-
-
-        <p>
-          Example for MacOSX 10.6 64-bit Intel compatible systems:
-        </p>
 <pre>
+        <b>
+        <u>Example for MacOSX 10.6 64-bit Intel compatible systems:</u>
+        </b>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_darwin_OSX/isis .
 </pre>
 
-        <p>
-          Example for Fedora 16 Linux x86 64-bit Intel compatible systems:
-        </p>
 <pre>
+        <b>
+        <u>Example for Fedora 16 Linux x86 64-bit Intel compatible systems:</u>
+        </b>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_FEDORA/isis .
 </pre>
 
-        <p>
-          Example for SUSE Linux Enterprise Server 11 Linux x86 64-bit Intel compatible systems:
-        </p>
 <pre>
+        <b>
+        <u>Example for SUSE Linux Enterprise Server 11 Linux x86 64-bit Intel compatible systems:</u>
+        </b>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_SUSE11/isis .
 </pre>
 
-        <p>
-          Example for Ubuntu 12.04 Linux x86 64-bit Intel compatible systems:
-        </p>
 <pre>
+        <b>
+        <u>Example for Ubuntu 12.04 Linux x86 64-bit Intel compatible systems:</u>
+        </b>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_UBUNTU/isis .
 </pre>
 
-        <p>
-          Example for Debian 6.0 Linux x86 64-bit Intel compatible systems:
-        </p>
 <pre>
+        <b>
+        <u>Example for Debian 6.0 Linux x86 64-bit Intel compatible systems:</u>
+        </b>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_DEBIAN/isis .
 </pre>
 
-        <p>
-          Example for RHEL 6.2 Linux x86 64-bit Intel compatible systems:
-        </p>
 <pre>
+        <b>
+        <u>Example for RHEL 6.2 Linux x86 64-bit Intel compatible systems:</u>
+        </b>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_RHEL6/isis .
 </pre>
 
 
+<h3>Full Data Download</h3>
+
+<p>
+    If you have the disk space and network speed you may want to download all of the ISIS data areas which
+    includes all missions supported by ISIS.   This takes over 130GB of disk space!!  If you only have a 10Mbps
+    network connection it will take nearly two days to download.  If you want to acquire only certain mission data 
+     <a href="#MissionSpecific">click here</a>.   To download all Isis3 data files continue reading.
+</p>
+<p>
+    Remember to use this followng command from the same directory you ran the previous rsync
+    command. In the example it was "/work1/isis3". 
+</p>
+      <pre>
+      rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data .
+      </pre>
+<p>
+ Note:  The above command downloads all ISIS data including the required base data area and all of the optional mission 
+ data areas.  After completing this step skip to the <a href="#UnixEnvironment">Unix Environment Setup</a>.  If you chose 
+ not to download everything at once then continue below.
+</p>
 
 
+ <A NAME="MissionSpecific"> </A>
+
+        <h3>Partial Download of ISIS3 Base Data (Required)</h3>
         <p>
-          <i><b>Note:</b> Isis3 can also be downloaded over port 80. To use port 80 change
-           isisdist.astrogeology.usgs.gov:: in the previous commands to rsync://isisdist.astrogeology.usgs.gov:80::.
-           Example: <pre>rsync -azv --delete --partial rsync://isisdist.astrogeology.usgs.gov:80::x86-64_linux_RHEL6/isis .</pre>
-          </i>
+            The base data area is separate from the source code. This data area is
+            crucial to Isis3 and must be downloaded.
         </p>
+<pre>
+        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/base data/
+</pre>
 
-        <p>
-          <i>Note: We are no longer building Isis 3 for Linux SuSE 
-            9.X, 10.X, RedHat Enterprise 3, 4 or equivalent systems or Mac OSX
-            with the Power PC processor.
-          </i>
-        </p>
+<h3>Partial Download of Mission Specific Data</h3>
 
 
-        <h3>Downloading Isis 3 Data</h3>
         <p>
-            The data area is separate from the source code. This data area is
-            crucial to Isis3 and some of it must be downloaded.
-        </p>
-        <p>
-          <strong>Announcing a new service useable by ISIS to retrieve 
-          SPICE data for cubes.</strong> Isis can now use a service to 
+          There are many missions supported by ISIS.  If you are only working with a few missions
+          then you should download only those specific data areas.    One way you can save time and space is to not download the SPICE data
+          for the mission you need.  If chose to do so read the next section about the SPICE Web Service that
+          provides instructions for excluding the SPICE kernels.  Otherwise <a href="#ApolloMission">jump</a> to the mission 
+          specific sections.
+         </p>
+
+
+<h3>ISIS SPICE Web Service</h3>
+
+<p>
+          Isis can now use a service to 
           retrieve the SPICE data for all instruments Isis supports via
           the internet. To use this service instead of your local SPICE
           data use "web=yes" when running spiceinit. This
           can significantly reduce the size of the download from our data 
           area. If you want to use this new service and not have to download all the 
           SPICE data add the following argument to the mission-specific rsync commands below:
-        </p>
+ </p>
 <pre>
-  --exclude='kernels'
+            --exclude='kernels'
 </pre>
         <p>
           For example: rsync -azv --exclude='kernels' --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/cassini data/
         </p>
-        <p>
-            Perform this step from the same directory you ran the previous rsync
-            command. In the example it was "/work1/isis3".
-        </p>
-        <p>
-            To download all Isis3 data files use the following command.
-        </p>
-<pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data .
-</pre>
-        <p>
-          <b>Note:</b> The isis3 data area is very large (over 130GB). You may want to 
-          consider downloading only the missions you require. To download 
-            specific Isis3 mission data files use the following commands. 
-          <u>Please note: Regardless of the mission the base data is required.</u>
-        </p>
-        <p>
-          <b>
-            Base - Required Download (do not exclude kernels from the base area):
-          </b>
-        </p>
-<pre>
-        rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/base data/
-</pre>
-
-
+        
+          <A NAME="ApolloMission"> </A>
 <p>
   Apollo Mission (kernels can be excluded):
 </p>
@@ -383,11 +514,37 @@ you must <em>not</em> upgrade the Isis Data Files!!!
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/voyager2 data/
         </pre>
 
-        <h3>Environment Setup</h3>
+
+        <h2>Example Isis 3 Download</h2>
+        <p>
+          This is an example of downloading Isis onto a RedHat 6 system using
+          tcsh as your shell.
+        </p>
+        <pre>
+          $ cd /work
+          $ mkdir isis3
+          $ cd isis3
+          $ rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_RHEL6/isis .
+          $ rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/base data/
+          **now pick your missions without kernels**
+          **example MRO**
+          $ rsync -azv --delete --partial --exclude='kernels' isisdist.astrogeology.usgs.gov::isis3data/data/mro data/
+          **example LRO**
+          $ rsync -azv --delete --partial --exclude='kernels' isisdist.astrogeology.usgs.gov::isis3data/data/lro data/
+          for csh users edit your .cshrc and add
+          setenv ISISROOT /work/isis3/isis
+          source $ISISROOT/scripts/isis3Startup.csh
+        </pre>
+
+        <A NAME="UnixEnvironment"> </A>
+
+        <h2>UNIX Environment Setup</h2>
         <p>
             Isis3 needs to know where all its pieces are located. We use an
-            environment variable called "ISISROOT" to do this. For the above 
-            example set ISISROOT as follows:
+            environment variable called "ISISROOT" to do this. Unix commands must
+            be put into your startup shell scripts.  Assuming you installed ISIS in
+            the directory /work1/isis3 add the following commands to your startup
+            script:
         </p>
 
         <p>
@@ -428,55 +585,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
 
 
 
-        <p>
-          If you encounter any problems we will be monitoring our discussion
-          board daily and will respond to any questions as best we can.
-        </p>
-        <p>
-          <a href="http://isis.astrogeology.usgs.gov/IsisSupport">Isis Support Center</a>
-        </p>
 
-        <h2>Information and Warnings</h2>
-
-        <p>
-        Isis 3 and Isis 2 will have collisions of executable names (e.g.,
-        pds2isis exists in both systems).  It is best to remove initializations
-        of Isis 2 from your startup file otherwise you may get unpredictable
-        results.
-        </p>
-
-        <p>
-        The shell script used to set your environment to run Isis3 modifies the
-        PATH environment variable.
-        </p>
-
-        <p>
-        The installation for Isis 3 does not allow the installer to choose what
-        data sets to install or where to put them. The only control is through
-        the destination directory in the rsync command. If you choose to
-        move the data area you will need to modify the isis3Startup.xxx script.
-        </p>
-
-        <h2>Example Isis 3 Download</h2>
-        <p>
-          This is an example of downloading Isis onto a RedHat 6 system using
-          tcsh as your shell.
-        </p>
-        <pre>
-          $ cd /work
-          $ mkdir isis3
-          $ cd isis3
-          $ rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_RHEL6/isis .
-          $ rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/base data/
-          **now pick your missions without kernels**
-          **example MRO**
-          $ rsync -azv --delete --partial --exclude='kernels' isisdist.astrogeology.usgs.gov::isis3data/data/mro data/
-          **example LRO**
-          $ rsync -azv --delete --partial --exclude='kernels' isisdist.astrogeology.usgs.gov::isis3data/data/lro data/
-          for csh users edit your .cshrc and add
-          setenv ISISROOT /work/isis3/isis
-          source $ISISROOT/scripts/isis3Startup.csh
-        </pre>
       </body>
 
       <type>HTML</type>
@@ -510,6 +619,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
     <change name="Travis Addair" date="2012-03-14">Added Java installer section</change>
     <change name="Steven Lambright and Stuart Sides" date="2012-05-21">Updated for release 3.4.0</change>
     <change name="Steven Lambright" date="2012-08-14">Replaced Open Suse with SLES</change>
+    <change name="Jeff Anderson" date="2012-08-24">Reorganized document format</change>
   </history>
 
   <bibliography>
