@@ -124,10 +124,12 @@ namespace Isis {
       throw IException(e, IException::Unknown, message, _FILEINFO_);
     }
   }
+  
 
   //! Destroys the PolarStereographic object
   PolarStereographic::~PolarStereographic() {
   }
+  
 
   /**
    * Compares two Projection objects to see if they are equal
@@ -146,6 +148,7 @@ namespace Isis {
     if (pola->m_centerLatitude != m_centerLatitude) return false;
     return true;
   }
+  
 
   /**
    * Returns the name of the map projection, "PolarStereographic"
@@ -156,6 +159,7 @@ namespace Isis {
     return "PolarStereographic";
   }
 
+  
   /**
    * Returns the version of the map projection
    *
@@ -166,6 +170,7 @@ namespace Isis {
     return "1.0";
   }
 
+  
   /**
    * Returns the latitude of true scale.  Note that in the case of Polar 
    * Stereographic, the only true scale point is at the pole around 
@@ -178,6 +183,7 @@ namespace Isis {
     return m_centerLatitude * 180.0 / PI;
   }
 
+  
   /**
    * This method is used to set the latitude/longitude (assumed to be of the
    * correct LatitudeType, LongitudeDirection, and LongitudeDomain. The Set
@@ -221,9 +227,15 @@ namespace Isis {
     SetComputedXY(x, y);
 
     m_good = true;
+
+    //So we don't project the wrong pole.
+    if (qFuzzyCompare(lat * m_signFactor, -90.0))
+      m_good = false;
+
     return m_good;
   }
 
+  
   /**
    * This method is used to set the projection x/y. The Set forces an attempted
    * calculation of the corresponding latitude/longitude position. This may or
@@ -286,6 +298,7 @@ namespace Isis {
     return m_good;
   }
 
+  
   /**
    * This method is used to determine the x/y range which completely covers the
    * area of interest specified by the lat/lon range. The latitude/longitude
@@ -341,7 +354,7 @@ namespace Isis {
     maxY = m_maximumY;
     return true;
   }
-
+  
 
   /**
    * This function returns the keywords that this projection uses.
@@ -357,6 +370,7 @@ namespace Isis {
     return mapping;
   }
 
+  
   /**
    * This function returns the latitude keywords that this projection uses
    *
@@ -370,6 +384,7 @@ namespace Isis {
     return mapping;
   }
 
+  
   /**
    * This function returns the longitude keywords that this projection uses
    *
@@ -383,6 +398,7 @@ namespace Isis {
     return mapping;
   }
 }
+
 
 /**
  * This is the function that is called in order to instantiate an 

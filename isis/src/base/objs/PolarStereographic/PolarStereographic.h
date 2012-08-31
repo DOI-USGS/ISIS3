@@ -70,6 +70,10 @@ namespace Isis {
    *                           implementation file. Minor modifications to
    *                           comply with some coding standards. References
    *                           #928.
+   *   @history 2012-08-01 Kimberly Oyama and Steven Lambright - Modified SetGround()
+   *                           so that it returns false when the lat parameter is the
+   *                           pole opposite of the center latitude. Also updated the
+   *                           unit tests to exercise this change. References #604.
    */
   class PolarStereographic : public Projection {
     public:

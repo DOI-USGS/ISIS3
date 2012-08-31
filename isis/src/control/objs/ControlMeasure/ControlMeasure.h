@@ -163,6 +163,11 @@ namespace Isis {
    *   @history 2011-07-29 Jai Rideout, Steven Lambright, and Eric Hyer - Made
    *                           this inherit from QObject to get destroyed()
    *                           signal
+   *   @history 2012-07-26 Tracie Sucharski, Fixed bug in == operator, comparison of chooserName
+   *                           and dateTime, comparison was between the pointers instead of the
+   *                           data and added comparisons for missing member data.
+   *   @history 2012-08-11 Tracie Sucharski, Add computed and measured ephemeris time set to Null
+   *                           in InitializeToNull.
    */
   class ControlMeasure : public QObject {
 

@@ -100,9 +100,15 @@ namespace Isis {
 
     // Initialize members
 
+
+    cout << "Creating Spice object..." << endl;
+
     m_solarLongitude = new Longitude;
     m_et = NULL;
     m_kernels = new QVector<iString>;
+
+    cout << "Creating Target object..." << endl;
+
     m_target = new Target(lab);
 
     m_startTime = new iTime;

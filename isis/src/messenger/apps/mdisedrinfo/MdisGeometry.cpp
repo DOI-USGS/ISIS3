@@ -716,7 +716,7 @@ namespace Isis {
     // Get NAIF body codes
     SpiceInt scCode(-236), targCode(0);
     SpiceBoolean found;
-    string target(_camera->target()->name());
+    string target(_camera->target());
     (void) bodn2c_c("MESSENGER", &scCode, &found);
     (void) bodn2c_c(target.c_str(), &targCode, &found);
     if(!found) {

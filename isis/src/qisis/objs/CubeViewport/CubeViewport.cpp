@@ -516,7 +516,8 @@ namespace Isis {
           break;
       }
     }
-
+    
+//  if (canClose) emit viewportClosed(this);
     return canClose;
   }
 

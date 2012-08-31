@@ -213,7 +213,7 @@ void IsisMain() {
   gbl::DNtoElectrons();
   gbl::FindShutterOffset();
   gbl::DivideByAreaPixel();
-  gbl::FindEfficiencyFactor(ui.GetString("FLUXUNITS"));
+  gbl::FindEfficiencyFactor(ui.GetString("UNITS"));
 
   //Correction Factor
   // Set the remaining necessary input cube files for second pass

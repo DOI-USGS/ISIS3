@@ -1,4 +1,4 @@
-include $(ISISROOT)/make/isismake.macros
+include $(ISISROOT)/make/isismake.os
 
 # ISIS DOCS MAKEFILE
 #   Create tables of contents for the Object

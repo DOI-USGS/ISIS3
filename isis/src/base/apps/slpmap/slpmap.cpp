@@ -1,69 +1,91 @@
 #include <cmath>
 #include "Isis.h"
-#include "ProcessByBoxcar.h"
+
+#include "Angle.h"
 #include "Camera.h"
+#include "Distance.h"
+#include "Latitude.h"
+#include "Longitude.h"
+#include "ProcessByBoxcar.h"
 #include "Projection.h"
+#include "SurfacePoint.h"
+#include "UniversalGroundMap.h"
 
 using namespace std;
 using namespace Isis;
 
-bool degrees;
+UniversalGroundMap *g_groundMap;
+SurfacePoint g_upperLeft;
+SurfacePoint g_lowerLeft;
+double g_conversionFactor;
 
-double resolution[2];
+enum OutputType {
+  Aspect,
+  Slope,
+  PercentSlope
+};
+OutputType g_outputType;
+
+enum Units {
+  Degrees,
+  Radians,
+};
+Units g_units;
+
+double g_resolution;
 
 void createSlpCube(Buffer &in, double &v);
+void createSlpCubeAutomatic(Buffer &in, double &v);
 void createAspectCube(Buffer &in, double &v);
 
 void IsisMain() {
+  // Process using a 3x3 boxcar
   ProcessByBoxcar p;
-
-  UserInterface &ui = Application::GetUserInterface();
-
-  degrees = ui.GetBoolean("DEGREES");
-
-  // as ProcessByBoxcar only allows one input cube and one
-  // output cube, two seperate process must be done
   Cube *icube = p.SetInputCube("FROM");
   p.SetBoxcarSize(3, 3);
+
+  // Get the output type either ASPECT, SLOPE, or SLOPEPERCENT
+  UserInterface &ui = Application::GetUserInterface();
+  if (ui.GetString("OUTPUT") == "ASPECT") {
+    g_outputType = Aspect;
+  }
+  else if (ui.GetString("OUTPUT") == "SLOPE") {
+    g_outputType = Slope;
+  }
+  else if (ui.GetString("OUTPUT") == "PERCENTSLOPE") {
+    g_outputType = PercentSlope;
+  }
+
+  // Get the units for ASPECT or SLOPE output type
+  g_units = Degrees;
+  if (g_outputType != PercentSlope) {
+    if (ui.GetString("UNITS") == "RADIANS") {
+      g_units = Radians;
+    }
+  }
+
+  // Create output cube
   p.SetOutputCube("TO");
 
-  if(ui.GetString("OUTPUT") == "SLOPE") {
-    // For slope we need a resolution
-    // Try to use the camera first
-    try {
-      Camera *cam = icube->getCamera();
-
-      // Really we should be doing this at every point in the image... but for now,
-      //   the center will work.
-      if(!cam->SetImage(icube->getSampleCount() / 2, icube->getLineCount() / 2)) {
-        // Get into the catch(...)
-        throw IException(IException::Programmer, "", _FILEINFO_);
-      }
-
-      // Convert resolution to the DN value's unit (easier)
-      resolution[0] = cam->SampleResolution() / ui.GetDouble("CONVERSION");;
-      resolution[1] = cam->LineResolution()   / ui.GetDouble("CONVERSION");;
-    }
-    catch(IException &) {
-      // Failed at getting the camera, reset our exception and try again with the projection
-
-      Projection *proj = icube->getProjection();
-
-      if(!proj->SetWorld(icube->getSampleCount() / 2, icube->getLineCount() / 2)) {
-        iString message = "Failed to SetWorld at the center of the image";
-        throw IException(IException::Programmer, message, _FILEINFO_);
-      }
-
-      // Convert resolution to the DN value's unit (easier)
-      resolution[0] = proj->Resolution() / ui.GetDouble("CONVERSION");
-      resolution[1] = proj->Resolution() / ui.GetDouble("CONVERSION");
-    }
-
-    p.StartProcess(createSlpCube);
-  }
-  else {
+  g_groundMap = 0;
+  if(g_outputType == Aspect) {
     p.StartProcess(createAspectCube);
   }
+  else if (ui.GetString("PIXRES") == "AUTOMATIC") {
+    g_upperLeft = g_lowerLeft = SurfacePoint();
+    g_groundMap = new UniversalGroundMap(*icube);
+    g_conversionFactor = ui.GetDouble("CONVERSION");
+    p.StartProcess(createSlpCubeAutomatic);
+  }
+  else {
+    g_resolution = ui.GetDouble("RESOLUTION");
+    g_conversionFactor = ui.GetDouble("CONVERSION");
+    p.StartProcess(createSlpCube);
+  }
+
+  // Cleanup
+  delete g_groundMap;
+  g_groundMap = 0;
 
   p.EndProcess();
 }
@@ -82,7 +104,143 @@ void IsisMain() {
  * @param in Input cube data (3x3 matrix)
  * @param v Output value
  */
+void createSlpCubeAutomatic(Buffer &in, double &v) {
+  // Can't do anything if the center pixel is bad
+  if (in[4] == Isis::Null) {
+    g_upperLeft = g_lowerLeft = SurfacePoint();
+    v = Isis::Null;
+    return;
+  }
+
+  // Get the lat/lons of the four corners of the pixel
+  if (!g_upperLeft.Valid()) {
+    if (g_groundMap->SetImage(in.Sample(4)-0.5,in.Line(4)-0.5)) {
+      g_upperLeft.SetSphericalCoordinates(Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
+                                          Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
+                                          Distance(in[4],Distance::Meters));
+    }  
+  }
+
+  if (!g_lowerLeft.Valid()) {
+    if (g_groundMap->SetImage(in.Sample(4)-0.5,in.Line(4)+0.5)) {
+      g_lowerLeft.SetSphericalCoordinates(Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
+                                          Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
+                                          Distance(in[4],Distance::Meters));
+    }  
+  }
+
+  SurfacePoint upperRight;
+  if (g_groundMap->SetImage(in.Sample(4)+0.5,in.Line(4)-0.5)) {
+    upperRight.SetSphericalCoordinates(Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
+                                       Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
+                                       Distance(in[4],Distance::Meters));
+  }  
+
+  SurfacePoint lowerRight;
+  if (g_groundMap->SetImage(in.Sample(4)+0.5,in.Line(4)+0.5)) {
+    lowerRight.SetSphericalCoordinates(Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
+                                       Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
+                                       Distance(in[4],Distance::Meters));
+  }  
+
+  // Are all four corners good?
+  if (!g_upperLeft.Valid() || !g_lowerLeft.Valid() || !upperRight.Valid() || !lowerRight.Valid()) {
+    g_upperLeft = upperRight;
+    g_lowerLeft = lowerRight;
+    v = Isis::Null;
+    return;
+  }
+
+  // Have four good corners so compute the resolutions
+  double xResolution = ((g_upperLeft.GetDistanceToPoint(upperRight)).meters() + 
+                        (g_lowerLeft.GetDistanceToPoint(lowerRight)).meters()) / 2.0;
+  double yResolution = ((g_upperLeft.GetDistanceToPoint(g_lowerLeft)).meters() + 
+                        (upperRight.GetDistanceToPoint(lowerRight)).meters()) / 2.0;
+
+  // Convert the resolutions to meters
+  xResolution /= g_conversionFactor;
+  yResolution /= g_conversionFactor;
+
+  // Pull height values out of 3x3 buffer (in)
+  const double &a = in[0];
+  const double &b = in[1];
+  const double &c = in[2];
+  const double &d = in[3];
+  //const double &e = in[4];
+  const double &f = in[5];
+  const double &g = in[6];
+  const double &h = in[7];
+  const double &i = in[8];
+
+  // If anything we're actually calculating with is special, fail
+  if(Isis::IsSpecial(a) ||
+      Isis::IsSpecial(b) ||
+      Isis::IsSpecial(c) ||
+      Isis::IsSpecial(f) ||
+      Isis::IsSpecial(g) ||
+      Isis::IsSpecial(h) ||
+      Isis::IsSpecial(i)) {
+    g_upperLeft = upperRight;
+    g_lowerLeft = lowerRight;
+
+    v = Isis::Null;
+    return;
+  }
+
+  // [dz/dx] = ((c + 2f + i) - (a + 2d + g)) / (8 * x_cell_size)
+  double changeInX = ((c + 2 * f + i) - (a + 2 * d + g)) / (8 * xResolution);
+
+  // [dz/dy] = ((g + 2h + i) - (a + 2b + c)) / (8 * y_cell_size)
+  double changeInY = ((g + 2 * h + i) - (a + 2 * b + c)) / (8 * yResolution);
+
+  double changeMag = sqrt(changeInX * changeInX + changeInY * changeInY);
+
+  double slopeRadians = atan(changeMag);
+
+  if (g_outputType == PercentSlope) {
+    v = 100.0 * slopeRadians / (Isis::PI / 2.0);
+  }
+  else if (g_units == Degrees) {
+    v = slopeRadians * 180.0 / Isis::PI;
+  }
+  else {
+    v = slopeRadians;
+  }
+
+  g_upperLeft = upperRight;
+  g_lowerLeft = lowerRight;
+}
+
+
+/**
+ * http://webhelp.esri.com/arcgisdesktop/9.3/index.cfm?TopicName=How%20Slope%20(3D%20Analyst)%20works
+ *
+ *  "Conceptually, the Slope function fits a plane to the z-values of a 3 x 3
+ *  cell neighborhood around the processing or center cell. The slope value of
+ *  this plane is calculated using the average maximum technique (see
+ *  References). The direction the plane faces is the aspect for the processing
+ *  cell. The lower the slope value, the flatter the terrain; the higher the
+ *  slope value, the steeper the terrain."
+ *
+ * @param in Input cube data (3x3 matrix)
+ * @param v Output value
+ */
 void createSlpCube(Buffer &in, double &v) {
+  // Can't do anything if the center pixel is bad
+  if (in[4] == Isis::Null) {
+    v = Isis::Null;
+    return;
+  }
+
+  // Provide what the user defined
+  double xResolution = g_resolution;
+  double yResolution = g_resolution;
+
+  // Convert the spatial units to the height units
+  xResolution /= g_conversionFactor;
+  yResolution /= g_conversionFactor;
+
+  // Pull height values out of 3x3 buffer (in)
   const double &a = in[0];
   const double &b = in[1];
   const double &c = in[2];
@@ -106,22 +264,26 @@ void createSlpCube(Buffer &in, double &v) {
   }
 
   // [dz/dx] = ((c + 2f + i) - (a + 2d + g)) / (8 * x_cell_size)
-  double changeInX = ((c + 2 * f + i) - (a + 2 * d + g)) / (8 * resolution[0]);
+  double changeInX = ((c + 2 * f + i) - (a + 2 * d + g)) / (8 * xResolution);
 
   // [dz/dy] = ((g + 2h + i) - (a + 2b + c)) / (8 * y_cell_size)
-  double changeInY = ((g + 2 * h + i) - (a + 2 * b + c)) / (8 * resolution[0]);
+  double changeInY = ((g + 2 * h + i) - (a + 2 * b + c)) / (8 * yResolution);
 
   double changeMag = sqrt(changeInX * changeInX + changeInY * changeInY);
 
   double slopeRadians = atan(changeMag);
 
-  if(!degrees) {
-    v = slopeRadians;
+  if (g_outputType == PercentSlope) {
+    v = 100.0 * slopeRadians / (Isis::PI / 2.0);
   }
-  else {
+  else if (g_units == Degrees) {
     v = slopeRadians * 180.0 / Isis::PI;
   }
+  else {
+    v = slopeRadians;
+  }
 }
+
 
 
 /**
@@ -163,35 +325,18 @@ void createAspectCube(Buffer &in, double &v) {
   // [dz/dy] = ((g + 2h + i) - (a + 2b + c)) / 8
   double changeInY = ((g + 2 * h + i) - (a + 2 * b + c)) / 8;
 
-  // aspect = 57.29578 * atan2 ([dz/dy], -[dz/dx]) = in degrees
+  // aspect = atan2 ([dz/dy], -[dz/dx])
   double aspectRadians = atan2(changeInY, -changeInX);
 
+  // aspect needs to be converted to is 0 north and positive clockwise and 0 to 360
+  aspectRadians = Isis::PI / 2.0 - aspectRadians;
+  if (aspectRadians < 0.0) aspectRadians += 2 * Isis::PI;
 
-  /*
-    The aspect value is then converted to compass direction values (0-360 degrees), according to the following rule:
-    if aspect < 0
-      cell = 90.0 - aspect
-    else if aspect > 90.0
-      cell = 360.0 - aspect + 90.0
-    else
-      cell = 90.0 - aspect
-  */
-
-  if(aspectRadians < 0) {
-    v = Isis::PI / 2.0 - aspectRadians;
-  }
-  else if(aspectRadians > Isis::PI / 2.0) {
-    v = Isis::PI * 2.0 - aspectRadians + Isis::PI / 2.0;
-  }
-  else {
-    v = Isis::PI / 2.0 - aspectRadians;
-  }
-
-  if(!degrees) {
-    v = aspectRadians;
-  }
-  else {
+  // Output in degrees if selected
+  if (g_units == Degrees) {
     v = aspectRadians * 180.0 / Isis::PI;
   }
-
+  else {
+    v = aspectRadians;
+  }
 }

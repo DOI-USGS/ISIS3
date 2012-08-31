@@ -24,12 +24,20 @@ namespace Isis {
    *
    * @internal
    *   @history 2011-05-10 Steven Lambright - Fixed problem with boundingRect()
+   *   @history 2012-07-10 Kimberly Oyama - Added the latitude and longitude extents as parameters
+   *                           to the constructor to support the new grid functionallity of user
+   *                           specified extents (map projection, bounding rectangle of the open
+   *                           cubes, manually entered). Also modified the constructor so it can
+   *                           handle drawing grids for both planetocentric and planetographic
+   *                           latitudes. Fixes #604.
    */
   class GridGraphicsItem : public QGraphicsItem {
     public:
       GridGraphicsItem(Latitude baseLat, Longitude baseLon,
                        Angle latInc, Angle lonInc,
-                       MosaicSceneWidget *projectionSrc, int density);
+                       MosaicSceneWidget *projectionSrc, int density,
+                       Latitude latMin, Latitude latMax,
+                       Longitude lonMin, Longitude lonMax);
       virtual ~GridGraphicsItem();
 
       void paint(QPainter *, const QStyleOptionGraphicsItem *,

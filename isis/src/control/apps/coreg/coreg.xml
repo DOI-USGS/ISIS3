@@ -9,15 +9,15 @@
   <description>
     <p>
       This program co-regsisters two images using an image-wide averaged
-			sample/line translation with the TRANSLATE option or a set of
-			variable sample/line translations with the WARP option.   The program computes local
+      sample/line translation with the TRANSLATE option or a set of variable 
+      sample/line translations with the WARP option.   The program computes local
       translations spaced evenly throughout the image.  The number and spacing
       of local translations is user defined.  This allows for many output
-      options including 1) directly creating the  translated image,  2)
+      options including 1) directly creating the translated image,  2)
       creating a control network which can be used in other programs (e.g.,
-      qnet, warp), especially if the translation is not constant across the
-      image, or 3) creating a flat-field file usable in spreadsheets or
-      plotting packages to visualize magnitude and direction of varying translations.
+      translate, warp and qview-matchtool) or 3) creating a flat-field file 
+      usable in spreadsheets or plotting packages to visualize magnitude and 
+      direction of varying translations.
 
       For the TRANSLATE option, this implies that the internal geometry of both 
       images be nearly the same so that the translation can be computed. That 
@@ -29,18 +29,23 @@
       line/sample shift is not sufficient to register the images, the WARP 
       option is a better choice than TRANSLATE because this uses the local 
       translations to perform a rubber-sheet transformation.  This option must 
-      be used with caution.
+      be used with caution.  It works very well with a well distributed 
+      collection of accurate control points across the image plane.
     </p>
     <p>
-      NOTE:  This program can utilize many different techniques for computing
-      the translation.  It is recommended that you review the 
+      NOTE:  While coreg uses a predefined autoreg parameter template, there are
+      a variety of pattern matching algorithms and parameter settings that can
+      be used to optimize the success and accuracy of the co-registration
+      attempt with the control point measures.   It is recommended that you review the 
       <a href="../../../../documents/PatternMatch/PatternMatch.html">Pattern   
       Matching</a> page from the "Related Objects and Documents" section below.  
       It is essential for using this application to understand how to create a 
-      "registration definition" file and how to size your search and pattern 
+      "registration template" file and how to size your search and pattern 
       chips.  We will continue with the discussion of functionality of this 
       program assuming the reader has a fundamental knowledge of Automatic 
-      Registration.  Below we give an example of a defintion file (DEFFILE):
+      Registration. The user can also refer to the autoregtemplate application
+      that offers a gui interface for creating an autoreg template file.
+      Below we give an example of an autoreg parameter template file (DEFFILE):
     </p>
 
     <pre>
@@ -80,9 +85,9 @@
       This program requires two input cubes, one which will be translated (FROM)
       and the other is held fixed (MATCH).   The images must have the same
       number of samples and lines and can have only one band (use cube
-      attributes if necessary).  A grid will be defined across the held
-      image using either the user parameters, ROWS and COLUMNS, or calculated
-      based on the image size and the search chip size as follows: 
+      attributes to extract a single band if necessary).  A grid will be defined 
+      across the held image using either the user parameters, ROWS and COLUMNS, or 
+      calculated based on the image size and the search chip size as follows: 
       COLUMNS = (image samples - 1) / search chip samples + 1, and similarly for 
       ROWS.  Conceptually, the sparse grid defined by ROWS and COLUMNS will be 
       laid on top of both images with even spacing between the rows (or columns) 
@@ -96,18 +101,17 @@
       be translated (FROM) and centering the pattern chip at the grid
       intersection for the held image (MATCH).  The pattern chip is walked
       through the search chip to find the best registration (if any).  Again,
-			see the <a href="../../../../documents/PatternMatch/PatternMatch.html">
-      Pattern Matching </a> document for further details.  The local translation is recorded at all grid
-      intersections that had a successful registration.  
-      The results are written to a control network and/or flat-file if requested.  The average of the
-      local translations is then used to compute an overall sub-pixel
-      translation which can be applied to the FROM image and written 
-			as the output image (TO).
+      see the <a href="../../../../documents/PatternMatch/PatternMatch.html">
+      Pattern Matching</a> document for further details.  The local translation is 
+      recorded at all grid intersections that had a successful registration.  
+      The results are written to a control network and/or flat-file if requested.  
+      The average of the local translations is then used to compute an overall sub-pixel
+      translation which can be applied to the FROM image and written as the output image (TO).
     </p>
 
     <p>
       Some tips to improve odds of a successful registration are provided.  In 
-			general a small pattern chip size makes registration more difficult.  
+      general a small pattern chip size makes registration more difficult.  
       Depending on your dataset, 20x20 is probably a good starting point.  The    
       larger the translation, the larger the search chip size will need to be;    
       if your translation is only a couple of pixels, you should make the search 
@@ -115,6 +119,12 @@
       However if the translation is large you will need to expand the search 
       area.  For example, if the translation is roughly 45 pixels and your 
       pattern is 20x20 the search area should be, roughly, 20+2*45 or 110x110.
+    </p>
+    <p>
+      The output control point network file (ONET) can be visually overlayed on the
+      the displayed input images using the qview-MatchTool.  The qview image display 
+      application will allow you to evaluate and interactively edit the network within the 
+      MatchTool.
     </p>
    </description>
 
@@ -215,6 +225,13 @@
       Added back GoodnessOfFit to Control Network and flatfile, mistakenly
       removed during binary Control Network conversion.
     </change>
+    <change name="Tracie Sucharski" date="2012-08-02">
+      Set networkId to Coreg in the output control network.
+    </change>
+    <change name="Tammy Becker" date="2012-08-09">
+      Modified the documentation a bit and informed the user of the new
+      qview-MatchTool that will now display the output network.
+    </change>
   </history>
 
   <groups>
@@ -226,7 +243,7 @@
           Input Image to be Translated
         </brief>
         <description>
-          This cube will be translated to match the MATCH cube. 
+          This cube will be translated to register to the MATCH (reference) cube.
         </description>
         <filter>
           *.cub
@@ -237,10 +254,12 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          The input image which will be held as a reference.
+          The input image which will be held as the Reference.
         </brief>
         <description>
-          This cube will be held as the reference and the FROM cube will be translated to match this cube. 
+          This cube will be held as the reference and the FROM cube will be translated to match this cube.
+          The sample/line measurements recorded from this image are basically the defined output coordinates
+          that the FROM image will be mapped to. 
         </description>
         <filter>
           *.cub
@@ -254,9 +273,10 @@
           The Auto Registration template
         </brief>
         <description>
-          The template to use with the AutoReg class. Default will be maximum correlation function
-          with a tolerance of 0.7, a search cube of 50x50 pixels, and a pattern cube of 20x20 pixels.
-          There will also be other templates available in the default directory.
+          The parameter template to use for the Autoregistration functionality. The default template
+          calls the Maximum Correlation pattern matching algorithm with predefined parameter values.
+          There are other templates available in the system autoreg/template directory.  Also, the user
+          can use the 'autoregtemplate' application to create a new template file.  
         </description>
         <helpers>
           <helper name="H1">
@@ -307,7 +327,7 @@
                         Output Translated Image
                     </brief>
                     <description>
-                        Runs the translate application on the input file to get the output file.
+                        Runs the translate application on the input file to create the output file.
                     </description>
                     <exclusions><item>DEGREE</item></exclusions>
                 </option>
@@ -316,7 +336,7 @@
                         Output Warped Image
                     </brief>
                     <description>
-                        Runs the warp application on the input file to get the output file.  If this
+                        Runs the warp application on the input file to create the output file.  If this
                         option is selected, the ONET and DEGREE parameters must also
                         be entered.
                     </description>
@@ -386,9 +406,11 @@
                Pvl file of ControlNet
           </brief>
           <description>
-               This file will contain the ControlNet created in the coreg application.  The data
-               will be in Pvl format.  This option is required if the WARP option is selected for
-               the output file.
+               This file will contain the Control Point network results of coreg in a binary
+               format.  This is required if the WARP option is selected for the output file.  
+               The resulting control points in this file can be viewed using the qview-MatchTool.
+               If the coregistration fails between any measures, the points and measures remain 
+               in this output file with a flag called Ignore=True.   
           </description>
           <internalDefault>None</internalDefault>
           <filter>
@@ -403,10 +425,12 @@
                Text file of coreg data
           </brief>
           <description>
-               This file will contain the data collected from the coreg application.  The data
-               will be comma separated and contain the sample, line position in the first input
-               cube, the sample, line position found in the search cube, and the sample difference
-               and line difference between to two.
+               This file will contain the Control Point network results of coreg in a readable format.  
+               The control point information will be comma separated and contain the sample, line positions 
+               in the first input (FROM) cube, the sample, line position found in the search (MATCH)
+               reference cube, and the sample difference and line difference between the two.
+               This output file will only contain the points and measures that resulted in a successful
+               registration. 
           </description>
           <internalDefault>None</internalDefault>
           <filter>
@@ -420,7 +444,7 @@
                 Number of Rows of Points to use.
             </brief>
             <description>
-                The number of rows of points to use in the coreg process.  If not entered,
+                The number of rows of points to establish in the coreg process.  If not entered,
                 it will default to ROWS = (image lines - 1) / search chip lines + 1.
             </description>
             <internalDefault>Automatic</internalDefault>
@@ -433,7 +457,7 @@
                 Number of Columns of Points to use.
             </brief>
             <description>
-                The number of columns of points to use in the coreg process.  If not entered,
+                The number of columns of points to establish in the coreg process.  If not entered,
                 it will default to COLUMNS = (image samples - 1) / search chip samples + 1.
             </description>
             <internalDefault>Automatic</internalDefault>

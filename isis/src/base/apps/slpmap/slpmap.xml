@@ -7,10 +7,44 @@
   </brief>
 
   <description>
-    This program takes a cube in which the DN values represent elevations. This program
-    will calculate either the slope at every point, or the direction of the slope at
-    every point in radians or degrees. These directions are relative to the image (not
-    relative to north), which can be different in various projections and cameras.
+    This program will compute the slope or aspect of a cube.  Typically a digital terrian model is given as the input but other non-elevation datasets can be provided.  
+    Horne's algorithm is used to compute the slope/aspect.   That is, given a 3x3 kernel:<pre>
+   A  B  C
+   D  E  F
+   G  H  I</pre>
+   it is convolved through the image and each output pixel is computed as follows:
+<pre>
+  <b>SLOPE EQUATION</b>
+   [dz/dx] = ((C + 2F + I) - (A + 2D + G)) / (8 * X_PIXEL_RESOLUTION) 
+   [dz/dy] = ((G + 2H + I) - (A + 2B + C)) / (8 * Y_PIXEL_RESOLUTION)
+
+   slope = ATAN ( SQRT ( [dz/dx]^2 + [dz/dy]^2 ) )
+   percentslope = slope / 90
+
+  <b>ASPECT EQUATION</b>
+   [dz/dx] = ((C + 2F + I) - (A + 2D + G)) / 8
+   [dz/dy] = ((G + 2H + I) - (A + 2B + C)) / 8
+
+   aspect = 90 - ATAN2 ([dz/dy], -[dz/dx])
+   if (aspect &lt; 0) then aspect = aspect + 360
+</pre>
+  Therefore slope is typically a number betwen 0 and 90 degrees which is flat to vertical slope, respectively.  The aspect represents the direction (0 to 360) of the slope in pixel space.  
+  From the center pixel E, 0 degrees is straight towards B, 45 towards C, 90 is towards F, 135 towards I, 180 towards H, and so on.  The user has the opportunity to output the slope in
+  radians, degrees, or percent slope.  The aspect can be in degrees or radians.
+
+  <p>
+    The above slope equation assume the pixels are not square; hence X_PIXEL_RESOLUTION and Y_PIXEL_RESOLUTION.  That is, the x distance across the pixel is not equal to the y distance 
+    from top to 
+    the bottom of the pixel.   By default the program will attempt to remove any scaling difference by using the map projection information (PIXRES=AUTOMATIC).  This computation is done at
+    every pixel so that the correct x-to-y ratio is computed.  This is important for global maps where the ratio deviates as you move away from the latitude and/or longitude of true scale in the 
+    map projection.    If the image lacks a map projection then the user must provide the pixel resolution, assumed to be square via PIXRES=USER.  The user then provides a single value 
+    (RESOLUTION) that will be applied to all pixels in the image and in both directions.  
+  </p>
+  <p>
+    The second assumption is that the xy units are the same as the z (pixel) units.   By default the program assumes the units are the same but allows the user to scale the z units to the xy units
+    using the CONVERSIONFACTOR parameter.
+  </p>
+  
   </description>
 
   <history>
@@ -20,10 +54,17 @@
     <change name="Steven Lambright" date="2008-10-06">
       Changed slope and aspect algorithms
     </change>
+    <change name="Jeff Anderson" date="2012-08-02">
+     Changed the slope algorithm to compute the sample and line resolution
+     at each pixel.  Previously the algorithm used the resolution at the
+     center of the image. In projected images the resolution varies as you
+     move away from the latitude and/or longitude of true scale.   Also, improved the
+     documentation and added user options to output percent slope.
+    </change>
   </history>
 
   <category>
-   <categoryItem>Radiometric and Photometric Correction</categoryItem>
+   <categoryItem>Topography</categoryItem>
   </category>
 
   <groups>
@@ -36,7 +77,7 @@
         </brief>
         <description>
           Use this parameter to select input cube. All bands of the cube within the file
-          will have the shade applied.
+          will have the algorithm applied.
         </description>
         <filter>
           *.cub
@@ -51,111 +92,130 @@
           Output cube
         </brief>
         <description>
-          Output cube for your process.
+          Use this parameter to define the filename of the resultant slope or aspect cube
         </description>
       </parameter>
     </group>
 
-    <group name="Options">
+    <group name="Output Options">
       <parameter name="OUTPUT">
         <type>string</type>
-        <brief>Type of output requested</brief>
-        <default><item>SLOPE</item></default>
+        <brief>Type of output requested, slope, aspect, or percent slope</brief>
+        <default><item>PERCENTSLOPE</item></default>
         <description>
-          This determines the type of output that will be created.
+          This determines the type of output pixels that will be created.  One of slope, aspect, or percent slope.
         </description>
       	<list>
       	  <option value="SLOPE">
-      	    <brief>Create Slope Cube</brief>
+      	    <brief>Create slope cube</brief>
       	    <description>
-      	      This creates a slope cube. In other words, every DN value will
-              be set to its slope. The algorithm is explained 
-              <a href="http://webhelp.esri.com/arcgisdesktop/9.3/index.cfm?TopicName=How%20Slope%20(3D%20Analyst)%20works">here</a>.
-               
+      	      This creates a slope cube.        
       	    </description>
       	  </option>
       	  <option value="ASPECT">
-      	    <brief>Create Aspect Cube</brief>
+      	    <brief>Create aspect cube</brief>
       	    <description>
-      	      This creates an aspect cube. In other words, every DN value will
-              be set to the direction of the slope. The algorithm is explained 
-              <a href="http://webhelp.esri.com/arcgisdesktop/9.3/index.cfm?TopicName=How%20Aspect%20(3D%20Analyst)%20works">here</a>.
+      	      This creates an aspect cube.  That is, the direction/azimuth of the slope.           
       	    </description>
+            <exclusions>
+              <item>PIXRES</item>
+              <item>RESOLUTION</item>
+              <item>CONVERSION</item>
+            </exclusions>
       	  </option>
+          <option value="PERCENTSLOPE">
+            <brief>Create percent slope cube</brief>
+            <description>
+              This creates a slope cube whose pixel values are percentages (slope/90) instead of angles.
+            </description>
+            <exclusions>
+              <item>UNITS</item>
+            </exclusions>
+          </option>
       	</list>
       </parameter>
 
-      <parameter name="DEGREES">
-        <type>boolean</type>
-        <brief>Output in degrees</brief>
-        <default><item>false</item></default>
+      <parameter name="UNITS">
+        <type>string</type>
+        <brief>Units of the output image</brief>
+        <default><item>DEGREES</item></default>
         <description>
-          When set to true, the output image will be in degrees. If this is false,
-          the output image will be in radians.
+          Units of the output pixels 
         </description>
+        <list>
+          <option value="RADIANS">
+            <brief>Output pixels in radians</brief>
+            <description>
+              The output pixels will be in radians, between 0 and PI/2 for slope and 0 and 2PI for aspect.
+            </description>
+          </option>
+          <option value="DEGREES">
+            <brief>Output pixels in degrees</brief>
+            <description>
+              The output pixels wiil be in degrees, between 0 and 90 for slope and 0 and 360 for aspect
+            </description>
+          </option>
+        </list>
       </parameter>
+    </group>
 
+    <group name="Scaling Options">
       <parameter name="CONVERSION">
         <type>double</type>
-        <brief>Conversion factor (resolution to meters)</brief>
+        <brief>Conversion from z units to spatial units</brief>
         <default><item>1.0</item></default>
         <description>
           Since the slope algorithm depends on cancelling out the units, the
-          conversion factor from the input unit to meters should be set. For
-          example, if the input image DN values mean kilometers, then this
-          value should be 1000 because there are 1000m in one kilometer.
+          conversion factor from the z (input pixel) units to the xy (spatial) units needs to be considered.
+
+          For example, if the
+          xy units are meters and the z units are in kilometers the unit conversion factor should be 1000
+          as we are converting z units to xy units.  
+
+          The default is one which presumes the units are the same. 
         </description>
       </parameter>
+
+      <parameter name="PIXRES">
+        <type>string</type>
+        <brief>Defines the pixel resolution (width and height) </brief>
+        <default><item>AUTOMATIC</item></default>
+        <description>
+          This determines the how the resolution of the input pixels will be defined.
+        </description>
+        <list>
+          <option value="AUTOMATIC">
+            <brief>Automatically compute the resolution using the map projection</brief>
+            <description>
+              The program will use the map projection to automatically compute the resolution (X and Y) of each pixel in
+              order to ensure the slope is computed properly.
+            </description>
+            <exclusions>
+              <item>RESOLUTION</item>
+            </exclusions>
+          </option>
+          <option value="USER">
+            <brief>User defined pixel resolution</brief>
+            <description>
+              If the input cube does not have a map projection then this option can be used to define the
+              resolution which is assumed to be square.   A single resolution is used for the entire image in both the
+              X and Y directions.  Note:  If the pixel height varies significantly from the width,
+              the slope will not be computed correctly.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="RESOLUTION">
+        <type>double</type>
+        <brief>Pixel resolution</brief>
+        <description>
+          Defines both the X and Y pixel resolution to be used across the entire image.  Note that if the pixel height varies significantly from the width, the slope
+          will not be computed correctly.
+         </description>
+      </parameter>
+
     </group>
   </groups>
 
-
-  <examples>
-    <example>
-      <brief>Creating an aspect cube</brief>
-      <description>
-        This example creates an aspect (shows the direction of the slope) cube of Vallis Marinaris 
-      </description>
-      <terminalInterface>
-        <commandLine>from=vallis_marinaris.cub to=aspect.cub output=aspect</commandLine>
-        <description>
-          In this examples we will create an aspect cube.
-        </description>
-      </terminalInterface>
-
-      <inputImages>
-        <image src="assets/image/vallis_marinaris.jpg" width="692" height="641">
-          <brief>Image of Vallis Marinaris</brief>
-          <description>
-            This is our input image of Vallis Marinaris. The DN values are the angle, in radians, the slope is facing relative to the image.
-          </description>
-          <thumbnail caption="Input image" src="assets/thumb/vallis_marinaris_thumb.jpg" width="346" height="321"/>
-          <parameterName>FROM</parameterName>
-        </image>
-      </inputImages>
-
-      <outputImages>
-        <image src="assets/image/angle.jpg" width="691" height="639">
-          <brief>The cube holding angle data</brief>
-          <description>
-            This is the cube that holds the angle data.
-          </description>
-          <thumbnail caption="Output image showing angle cube." src="assets/thumb/angle_thumb.jpg" width="346" height="320"/>
-          <parameterName>TO</parameterName>
-        </image>
-      </outputImages>
-
-      <guiInterfaces>
-        <guiInterface>
-          <image width="728" height="416" src="assets/image/angleGUI.jpg">
-            <brief>Example Gui</brief>
-            <description>Screenshot of the GUI with parameters filled in to create a steepest slope cube.
-            </description>
-            <thumbnail width="364" height="208" caption="Angle Gui" src="assets/thumb/angleGUI_thumb.jpg" />
-          </image>
-        </guiInterface>
-      </guiInterfaces>
-    </example>
-  </examples>
 </application>
-

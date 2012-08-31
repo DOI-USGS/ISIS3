@@ -82,6 +82,8 @@ namespace Isis {
    *  @history 2010-11-24 Tracie Sucharski - Added bool def2filename parameter
    *                          to the Add method. This will allow level 2 images
    *                          to be added to a serial number list.
+   *  @history 2012-07-12 Tracie Sucharski - Added new method Add, which takes a pre-composed
+   *                          serial number and a filename.
    */
 
   class SerialNumberList {
@@ -92,6 +94,8 @@ namespace Isis {
       virtual ~SerialNumberList();
 
       void Add(const std::string &filename, bool def2filename = false);
+      void Add(const std::string &serialNumber, const std::string &filename);
+      void Add(const char *serialNumber, const char *filename);
       bool HasSerialNumber(const std::string &sn);
       bool HasSerialNumber(QString sn);
       

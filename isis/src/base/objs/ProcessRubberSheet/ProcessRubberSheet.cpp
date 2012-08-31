@@ -944,16 +944,20 @@ namespace Isis {
       olineMax = OutputCubes[0]->getLineCount();
     }
 
-    // A small input patch should create a small output patch.  If we had
-    // the 0-360 seam (or -180/180) in our patch it could be split across
-    // a cylindrical projection (e.g., equirectangular, simple, etc).  So
-    // If the output patch looks like it will span the full output image,
-    // either lines or sample then resplit the input patch
-    if (osampMax - osampMin + 1.0 > OutputCubes[0]->getSampleCount()*0.99) {
+    /* A small input patch should create a small output patch.  If we had
+     * the 0-360 seam (or -180/180) in our patch it could be split across
+     * a cylindrical projection (e.g., equirectangular, simple, etc).  So
+     * If the output patch looks like it will span the full output image,
+     * either lines or sample then resplit the input patch. When the patch
+     * spans more than 50% (was 99% but there were problems with double
+     * rounding error on different machines) of the image it is split.
+     */
+    
+    if (osampMax - osampMin + 1.0 > OutputCubes[0]->getSampleCount() * 0.50) {
       splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
       return;
     } 
-    if (olineMax - olineMin + 1.0 > OutputCubes[0]->getLineCount()*0.99) {
+    if (olineMax - olineMin + 1.0 > OutputCubes[0]->getLineCount() * 0.50) {
       splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
       return;
     } 

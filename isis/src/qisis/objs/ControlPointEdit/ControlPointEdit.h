@@ -115,13 +115,25 @@ namespace Isis {
     *                          loading a different control point, so in setLeftMeasure, only
     *                          update the right chip if we're not loading a
     *                          different control point.
+    *   @history 2012-06-28  Tracie Sucharski - Add parameter to constructor to indicate
+    *                          whether to use cube geometry.  This allow cubes with no camera
+    *                          or SPICE information to be used.
+    *   @history 2012-07-20  Tracie Sucharski - Change the Save Measure button text and tootip
+    *                          depending on whether movement is allowed on the left chip.
+    *   @history 2012-07-26 Tracie Sucharski - Added ability to link zooming between left and
+    *                          right viewports. Added 2 methods, zoomFactor() which returns a
+    *                          zoom factor and zoom(double zoomFactor).
+    *  
+    *   @todo  Re-think design of the change made on 2012-07-26.  The linking was put into
+    *                          ::updateLeftPositionLabel because it was the fastest solution, but
+    *                          should this be put somewhere else.
     */
   class ControlPointEdit : public QWidget {
       Q_OBJECT
 
     public:
       ControlPointEdit(ControlNet * cnetQ, QWidget *parent = 0,
-                       bool allowLeftMouse = false);
+                       bool allowLeftMouse = false, bool useGeometry = true);
       ~ControlPointEdit();
       std::string templateFileName() {
         return p_templateFileName;
@@ -153,6 +165,7 @@ namespace Isis {
       void setGeom();
       void setRotate();
       void setCircle(bool);
+      void setZoomLink(bool);
 
       void findPoint();
       void registerPoint();
@@ -170,6 +183,7 @@ namespace Isis {
       void createPointEditor(QWidget *parent);
 
       bool p_allowLeftMouse;
+      bool p_useGeometry;
 
       std::string p_templateFileName;
       QLabel *p_leftZoomFactor;
@@ -224,6 +238,7 @@ namespace Isis {
 
       int p_rotation;
       bool p_geomIt;
+      bool p_linkZoom;
   };
 };
 

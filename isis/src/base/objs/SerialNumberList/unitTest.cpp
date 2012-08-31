@@ -18,6 +18,8 @@ int main(int argc, char *argv[]) {
     snl.Add("$lo/testData/3133_h1.cub");
     // Test adding level 2 using filename
     snl.Add("$mgs/testData/ab102402.lev2.cub",true);
+    // Test adding by giving a serial number
+    snl.Add("m0402852.cub", "$mgs/testData/m0402852.cub");
 
     cout << "size   = " << snl.Size() << endl;
     cout << "hasXYZ = " << snl.HasSerialNumber(QString("XYZ")) << endl;
@@ -34,9 +36,9 @@ int main(int argc, char *argv[]) {
       cout << snl.SerialNumber(i) << " = " << snl.SerialNumberIndex(snl.SerialNumber(i)) << endl;
     }
 
-    cout << endl << "SN->File (0): " << FileName(snl.FileName(0)).name() << endl;
-    cout << endl << "SN->File (1): " << FileName(snl.FileName(1)).name() << endl;
-    cout << endl << "SN->File (2): " << FileName(snl.FileName(2)).name() << endl;
+    for(int i = 0; i < snl.Size(); i++) {
+      cout << endl <<"SN->File ("<< i <<"): " << FileName(snl.FileName(i)).name() << endl;
+    }
 
     cout << endl << "Index->observationNumber (2):  " << snl.ObservationNumber(2) << endl;
   }

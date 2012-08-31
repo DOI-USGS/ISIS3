@@ -1,14 +1,6 @@
 SHELL=bash
 
 #---------------------------------------------------------------------------
-# Check to see if the programmer wants make to be noisy
-#---------------------------------------------------------------------------
-ifeq ($(findstring LOUD, $(MODE)),LOUD)
-else
-.SILENT:
-endif
-
-#---------------------------------------------------------------------------
 # Get the machine type and setup its environment
 #---------------------------------------------------------------------------
 HOST_ARCH := $(shell uname -s)
@@ -39,63 +31,44 @@ ifndef ISISCPPFLAGS
 endif
 
 #---------------------------------------------------------------------------
-#  Set up some basic commands
+#  Set up ISIS versioning
 #---------------------------------------------------------------------------
-CXX            ?= g++
-CC             ?= gcc
-LDSHARED       ?= $(CXX)
-MOC            ?= moc
-PROTOC         ?= protoc
-UIC            ?= uic
-XALAN          ?= Xalan
-LS             ?= /bin/ls
-RM             ?= /bin/rm -f
-CP             ?= /bin/cp
-LN             ?= ln -s
-CAT            ?= /bin/cat
-RANLIB         ?= /usr/bin/true
-MACHINE        ?= uname
-DIFF           ?= /usr/bin/diff
-GREP           ?= grep
-EVAL           ?= eval
-WHICH          ?= which
-DD             ?= dd
-MKDIR          ?= mkdir -p
-RMDIR          ?= rmdir -p
-MV             ?= mv
-RSYNC          ?= rsync
-SED            ?= sed
-DATE           ?= /bin/date
-PRINTF         ?= /usr/bin/printf
-ECHO           ?= /bin/echo
-CUT            ?= /usr/bin/cut
-PATCHELF       ?= patchelf
+ISISVERSIONFULL      := $(shell head -n 1 $(ISISROOT)/version | sed 's/\#.*//' | sed 's/ *$$//')
+ISISMAJOR            := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f1)
+ISISMINOR            := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f2)
+ISISMINORMINOR       := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f3)
+ISISMINORMINORMINOR  := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f4)
+ISISVERSION          := $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR).$(ISISMINORMINORMINOR)
+ISISLIBVERSION       := $(shell echo $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR) | sed 's/[a-z].*$$//')
+ISISLOCALVERSION     := $(shell head -n 3 $(ISISROOT)/version | tail -n 1 | sed 's/\#.*//' | sed 's/ *$$//')
+ISISRELEASE          := REL_0_0
 
-CURTIMESTAMP   ?= "[`date +'%Y-%m-%d %H:%M:%S'`]"
-
-#  Third party library/plugin install tool
-INSTALL3P         =  $(RSYNC)
-INSTALL3POPTS     = -aq
-
-ifeq ($(HOST_ARCH),SunOS)
-  TAIL         ?= /usr/xpg4/bin/tail
+# set up HOST_OS
+testFile = $(wildcard /etc/SuSE-release)
+ifeq ($(testFile), /etc/SuSE-release)
+  HOST_OS := $(shell grep VERSION /etc/SuSE-release | sed 's/.*= *//g' | sed 's/\./_/g')
+  HOST_OS := SUSE$(HOST_OS)
 else
-  TAIL         ?= tail 
-endif
-
-ifeq ($(HOST_ARCH),SunOS)
-  AWK         ?= /usr/xpg4/bin/awk
-else
-  AWK         ?= awk
-endif
-
-ifeq ($(HOST_ARCH),Darwin)
-  DOXYGEN     ?= /opt/local/bin/doxygen
-  DOT_PATH    ?= /opt/local/bin
-  LATEX       ?= /opt/local/bin/latex
-else
-  DOXYGEN     ?= doxygen
-  LATEX       ?= latex
+  testFile = $(wildcard /etc/redhat-release)
+  ifeq ($(testFile), /etc/redhat-release)
+    HOST_OS = $(shell cut -d ' ' -f 1,2,7 /etc/redhat-release | sed 's/ //g' | sed 's/\./_/g')
+  else
+    testFile = $(wildcard /usr/bin/sw_vers)
+    ifeq ($(testFile), /usr/bin/sw_vers)
+      HOST_OS = $(shell sw_vers -productVersion | cut -d '.' -f1,2 | sed 's/\./_/g')
+    else
+      testFile = $(wildcard /etc/lsb-release)
+      ifeq ($(testFile), /etc/lsb-release)
+        HOST_OS = $(shell grep DESCRIPTION /etc/lsb-release | sed 's/\([^"]*"\)\([^"]*\)\(.*\)/\2/' | sed 's/\.[^\.]* LTS//' | sed 's/ //g' | sed 's/\./_/g')
+      else
+        testFile = $(wildcard /etc/debian_version)
+        ifeq ($(testFile), /etc/debian_version)
+          HOST_OS := $(shell cat /etc/debian_version | sed 's/\./_/g')
+          HOST_OS := Debian$(HOST_OS)
+        endif
+      endif
+    endif
+  endif
 endif
 
 # Set up Xalan's command-line option names. Some version of Xalan use different
@@ -105,34 +78,6 @@ XALAN_OUTFILE_OPTION := -o
 XALAN_PARAM_OPTION := -p
 XALAN_INFILE_OPTION :=
 XALAN_XSL_OPTION :=
-
-# set up HOST_OS
-testFile = $(wildcard /etc/SuSE-release)
-ifeq ($(testFile), /etc/SuSE-release)
-  HOST_OS := $(shell $(GREP) VERSION /etc/SuSE-release | $(SED) 's/.*= *//g' | $(SED) 's/\./_/g')
-  HOST_OS := SUSE$(HOST_OS)
-else
-  testFile = $(wildcard /etc/redhat-release)
-  ifeq ($(testFile), /etc/redhat-release)
-    HOST_OS = $(shell $(CUT) -d ' ' -f 1,2,7 /etc/redhat-release | $(SED) 's/ //g' | $(SED) 's/\./_/g')
-  else
-    testFile = $(wildcard /usr/bin/sw_vers)
-    ifeq ($(testFile), /usr/bin/sw_vers)
-      HOST_OS = $(shell sw_vers -productVersion | cut -d '.' -f1,2 | $(SED) 's/\./_/g')
-    else
-      testFile = $(wildcard /etc/lsb-release)
-      ifeq ($(testFile), /etc/lsb-release)
-        HOST_OS = $(shell $(GREP) DESCRIPTION /etc/lsb-release | $(SED) 's/\([^"]*"\)\([^"]*\)\(.*\)/\2/' | $(SED) 's/\.[^\.]* LTS//' | $(SED) 's/ //g' | $(SED) 's/\./_/g')
-      else
-        testFile = $(wildcard /etc/debian_version)
-        ifeq ($(testFile), /etc/debian_version)
-          HOST_OS := $(shell $(CAT) /etc/debian_version | $(SED) 's/\./_/g')
-          HOST_OS := Debian$(HOST_OS)
-        endif
-      endif
-    endif
-  endif
-endif
 
 # Ubuntu and Debian have a different executable name for Xalan, and it also
 # does not accept the same command-line argument names as the version of Xalan
@@ -152,27 +97,6 @@ ifneq "$(or $(findstring Fedora, $(HOST_OS)), $(findstring ScientificLinux, $(HO
 endif
 
 #---------------------------------------------------------------------------
-#  Set up ISIS versioning
-#---------------------------------------------------------------------------
-ISISVERSIONFULL      := $(shell head -n 1 $(ISISROOT)/version | $(SED) 's/\#.*//' | $(SED) 's/ *$$//')
-ISISMAJOR            := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f1)
-ISISMINOR            := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f2)
-ISISMINORMINOR       := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f3)
-ISISMINORMINORMINOR  := $(shell $(ECHO) $(ISISVERSIONFULL) | $(CUT) -d"." -f4)
-ISISVERSION          := $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR).$(ISISMINORMINORMINOR)
-ISISLIBVERSION       := $(shell echo $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR) | sed 's/[a-z].*$$//')
-ISISLOCALVERSION     := $(shell head -n 3 $(ISISROOT)/version | tail -n 1 | sed 's/\#.*//' | sed 's/ *$$//')
-ISISRELEASE          := REL_0_0
-
-#---------------------------------------------------------------------------
-# Set up the Isis include and library directories
-#---------------------------------------------------------------------------
-SHAREDEXT ?= so
-ISISINCDIR = -I$(ISISROOT)/inc 
-ISISLIBDIR = -L$(ISISROOT)/lib 
-ISISLIB    = -lisis$(ISISLIBVERSION)
-
-#---------------------------------------------------------------------------
 # Set up for the required elements in Isis makes
 # NOTE: XTRAstuff comes from the make file of specific applications
 #---------------------------------------------------------------------------
@@ -190,11 +114,11 @@ ALLINCDIRS += $(JAMAINCDIR)
 ALLINCDIRS += $(GEOSINCDIR)
 ALLINCDIRS += $(GSLINCDIR)
 ALLINCDIRS += $(GMMINCDIR)
-ALLINCDIRS += $(SUPERLUINCDIR)
 ALLINCDIRS += $(PROTOBUFINCDIR)
 ALLINCDIRS += $(BOOSTINCDIR)
 ALLINCDIRS += $(KAKADUINCDIR)
 ALLINCDIRS += $(CHOLMODINCDIR)
+ALLINCDIRS += $(SUPERLUINCDIR)
 
 ALLLIBDIRS  = -L. 
 ALLLIBDIRS += $(XTRALIBDIRS)
@@ -209,11 +133,11 @@ ALLLIBDIRS += $(JAMALIBDIR)
 ALLLIBDIRS += $(GEOSLIBDIR)
 ALLLIBDIRS += $(GSLLIBDIR)
 ALLLIBDIRS += $(GMMLIBDIR)
-ALLLIBDIRS += $(SUPERLULIBDIR)
 ALLLIBDIRS += $(PROTOBUFLIBDIR)
 ALLLIBDIRS += $(BOOSTLIBDIR)
 ALLLIBDIRS += $(KAKADULIBDIR)
 ALLLIBDIRS += $(CHOLMODLIBDIR)
+ALLLIBDIRS += $(SUPERLULIBDIR)
 
 ALLLIBS  = $(ISISLIB) 
 ifeq ($(findstring STATIC, $(MODE)),STATIC)
@@ -232,8 +156,11 @@ ALLLIBS += $(GEOSLIB)
 ALLLIBS += $(GSLLIB)
 ALLLIBS += $(X11LIB)
 ALLLIBS += $(GMMLIB)
-ALLLIBS += $(SUPERLULIB)
 ALLLIBS += $(PROTOBUFLIB)
 ALLLIBS += $(BOOSTLIB)
 ALLLIBS += $(KAKADULIB)
 ALLLIBS += $(CHOLMODLIB)
+ALLLIBS += $(SUPERLULIB)
+
+include $(ISISROOT)/make/isismake.utils
+

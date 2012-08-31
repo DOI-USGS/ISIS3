@@ -60,6 +60,9 @@ namespace Isis {
     *m_name = inst["TargetName"][0];
 
     if (name().UpCase() == "SKY") {
+
+      cout << "In SKY code in Target" << endl;
+
       m_radii[0] = m_radii[1] = m_radii[2] = Distance(1000.0, Distance::Meters);
       m_sky = true;
       string trykey = "NaifIkCode";
@@ -71,6 +74,9 @@ namespace Isis {
         *m_bodyCode = (int) kernels["NaifSpkCode"];
     }
     else {
+
+      cout << "Something is wrong with target name...Missed target=Sky" << endl;
+
       *m_bodyCode = lookupNaifBodyCode();
       m_sky = false;
       // iString radiiKey = "BODY" + iString((BigInt) naifBodyCode()) + "_RADII";

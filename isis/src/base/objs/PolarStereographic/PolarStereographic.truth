@@ -14,10 +14,25 @@ Test invalid center latitude keyword ...
 
 Test SetGround method ... 
 Setting ground to (-75,150)
+Successful (1-yes, 0-no): 1
 Latitude:               -75
 Longitude:              150
 XCoord:                 -1540033.6209707
 YCoord:                 -560526.39780253
+
+Setting ground to (-90.0, 0.0)
+Successful (1-yes, 0-no): 1
+Latitude:               -90
+Longitude:              0
+XCoord:                 0
+YCoord:                 -0
+
+Setting ground to (90.0, 0.0)
+Successful (1-yes, 0-no): 0
+Latitude:               90
+Longitude:              0
+XCoord:                 0
+YCoord:                 -0
 
 Test SetCoordinate method ... 
 Setting coordinate to (-1540033.620970689,-560526.3978025292)

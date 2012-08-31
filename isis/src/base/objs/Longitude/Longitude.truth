@@ -57,6 +57,7 @@ Test force180Domain
 -90 degrees
 Test force360Domain
 270 degrees
+Force 360 to the 360 domain: 360 degrees
 
 ----- Testing Range Methods -----
 

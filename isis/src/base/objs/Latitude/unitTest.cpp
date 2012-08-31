@@ -1,5 +1,6 @@
 #include "Latitude.h"
 
+#include <iomanip>
 #include <iostream>
 
 #include "IException.h"
@@ -156,6 +157,43 @@ int main(int argc, char *argv[]) {
     cout << lat.planetocentric(Angle::Degrees) << " degrees Planetocentric"
          << endl;
     cout << lat.planetographic(Angle::Degrees) << " degrees planetographic"
+         << endl;
+  }
+  catch(IException &e) {
+    e.print();
+  }
+
+  cout << endl << "----- Testing Add Methods -----" << endl << endl;
+
+  try {
+    Isis::Pvl latRangeTest;
+    latRangeTest.AddGroup(Isis::PvlGroup("Mapping"));
+    Isis::PvlGroup &latTestGroup = latRangeTest.FindGroup("Mapping");
+    latTestGroup += Isis::PvlKeyword("ProjectionName", "Equirectangular");
+    latTestGroup += Isis::PvlKeyword("EquatorialRadius", 5000.0);
+    latTestGroup += Isis::PvlKeyword("PolarRadius", 1000.0);
+    latTestGroup += Isis::PvlKeyword("LatitudeType", "Planetographic");
+    latTestGroup += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
+    latTestGroup += Isis::PvlKeyword("LongitudeDomain", 360);
+    latTestGroup += Isis::PvlKeyword("Scale", 5.0);
+    latTestGroup += Isis::PvlKeyword("MinimumLatitude", -90.0);
+    latTestGroup += Isis::PvlKeyword("MaximumLatitude", 90.0);
+    latTestGroup += Isis::PvlKeyword("MinimumLongitude", 0.0);
+    latTestGroup += Isis::PvlKeyword("MaximumLongitude", 360.0);
+    latTestGroup += Isis::PvlKeyword("CenterLatitude", 0.0);
+    latTestGroup += Isis::PvlKeyword("CenterLongitude", 0.0);
+  
+    Latitude ographicLat(25, latTestGroup, Angle::Degrees);
+    Angle ographicAngle(30, Angle::Degrees);
+    cout << "Adding an angle to a planetographic latitude with the add methods." << endl
+         << ographicLat.planetographic(Angle::Degrees) << " + "
+         << ographicAngle.degrees()
+         << " = " << ographicLat.add(ographicAngle, latTestGroup).planetographic(Angle::Degrees)
+         << endl;
+    cout << "Adding an angle to a planetographic latitude with the + operator." << endl
+         << ographicLat.planetographic(Angle::Degrees) << " + "
+         << ographicAngle.degrees()
+         << " = " << std::setprecision(5) << (ographicLat + ographicAngle).degrees()
          << endl;
   }
   catch(IException &e) {

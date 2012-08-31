@@ -191,6 +191,9 @@ int main(int argc, char *argv[]) {
 
     cout << "Test force360Domain" << endl;
     cout << lon.force360Domain().degrees() << " degrees" << endl;
+    lon.setPositiveEast(360.0, Angle::Degrees);
+    cout << "Force " << lon.degrees() << " to the 360 domain: "
+         << lon.force360Domain().degrees() << " degrees" << endl;
   }
   catch(IException &e) {
     e.print();

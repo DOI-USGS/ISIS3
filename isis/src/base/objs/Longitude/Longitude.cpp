@@ -283,7 +283,12 @@ namespace Isis {
     double resultantLongitude = angle(Angle::Degrees);
 
     // Bring the number in the 0 to 360 range
-    resultantLongitude -= 360 * qFloor(resultantLongitude / 360);
+    if (qFuzzyCompare(degrees(), 360.0)) {
+      resultantLongitude = 360.0;
+    }
+    else {
+      resultantLongitude -= 360 * qFloor(resultantLongitude / 360);
+    }
 
     return Longitude(resultantLongitude, Angle::Degrees);
   }

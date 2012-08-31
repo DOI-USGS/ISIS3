@@ -1,8 +1,7 @@
 #---------------------------------------------------------------------------
 # Compiler options
 #---------------------------------------------------------------------------
-CXX           = g++
-CC            = gcc
+
 ISISCPPFLAGS  = -Wall
 ISISCPPFLAGS += -ansi
 ISISCPPFLAGS += -DISIS_LITTLE_ENDIAN=1
@@ -33,13 +32,13 @@ SHAREDLIBEXT    = so
 
 ISISLDFLAGS  = -Wl,-E -Xlinker '-z' -Xlinker 'origin'
 ISISLDFLAGS += -Xlinker "-rpath" -Xlinker "${ISISROOT}/lib:${ISISROOT}/3rdParty/lib"
-ISISSYSLIBS = 
+ISISSYSLIBS = -pthread 
 ISISSTATIC  = -Wl,-Bstatic
 ISISDYNAMIC = -Wl,-Bdynamic
 
 ifeq ($(findstring DEBUG, $(MODE)),DEBUG)
   ifeq ($(findstring CWD, $(MODE)),CWD)
-    ISISSYSLIBS += -lcwd_r -pthread
+    ISISSYSLIBS += -lcwd_r
   endif
 endif
 
@@ -55,7 +54,10 @@ ISISARFLAGS     =
 # Set up local library designations
 #---------------------------------------------------------------------------
 ISIS3SYSINC ?= /usr/include
-ISIS3SYSLIB ?= /usr/lib64
+#ISIS3SYSLIB ?= /usr/lib64
+ISIS3SYSLIB ?= $(shell if [ -d /usr/lib64 ]; then echo "/usr/lib64"; else echo "/usr/lib"; fi;)
+ISIS3ALTSYSLIB ?= $(shell if [ -f /usr/lib/x86_64-linux-gnu/libgfortran.so.3 ]; then \
+    echo "/usr/lib/x86_64-linux-gnu"; else echo "/usr/lib64"; fi;)
 ISIS3LOCAL  ?= /usgs/pkgs/local/$(ISISLOCALVERSION)
 
 #---------------------------------------------------------------------------
@@ -294,8 +296,8 @@ THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcolamd.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libamd.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcholmod.so"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/liblapack.so"
-THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libblas.so.*"
-THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libgfortran.so*"
+THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libblas*.so*"
+THIRDPARTYLIBS    += "$(ISIS3ALTSYSLIB)/libgfortran.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libxerces-c*.so*"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libtiff*.so*"
 THIRDPARTYLIBS    += "$(ISIS3SYSLIB)/libgsl*.so*"

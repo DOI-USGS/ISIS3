@@ -23,7 +23,7 @@ Deborah Lee Soltesz
      likely break the system -->
 
 <xsl:template match="news">
-include $(ISISROOT)/make/isismake.macros
+include $(ISISROOT)/make/isismake.os
 all: <xsl:for-each select="newsItem[info/item = '3' or info/item = 'both']"><xsl:sort select="newsDate" order="descending"/>Isis3-<xsl:value-of select="normalize-space(newsDate)"/>_<xsl:value-of select="position()"/>.html </xsl:for-each> <xsl:for-each select="newsItem[info/item = '2' or info/item = 'both']"><xsl:sort select="newsDate" order="descending"/>Isis2-<xsl:value-of select="normalize-space(newsDate)"/>_<xsl:value-of select="position()"/>.html </xsl:for-each>
 <xsl:text>&#xa;</xsl:text>
 

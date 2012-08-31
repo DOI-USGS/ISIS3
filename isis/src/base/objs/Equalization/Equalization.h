@@ -46,7 +46,7 @@ namespace Isis {
    * @author ????-??-?? Unknown
    *
    * @internal
-   *   @history 2012 04-26 Jeannie Backer - Added includes to Filelist, Pvl,
+   *   @history 2012-04-26 Jeannie Backer - Added includes to Filelist, Pvl,
    *                           PvlGroup, and Statistics classes to the
    *                           implementation file.
    */

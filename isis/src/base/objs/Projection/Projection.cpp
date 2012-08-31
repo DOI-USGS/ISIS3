@@ -21,6 +21,8 @@
  */
 #include "Projection.h"
 
+#include <QObject>
+
 #include <cfloat>
 #include <cmath>
 #include <iomanip>
@@ -35,6 +37,7 @@
 #include "IException.h"
 #include "iString.h"
 #include "Longitude.h"
+#include "NaifStatus.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
@@ -447,10 +450,22 @@ namespace Isis {
     furnsh_c(kernName.c_str());
 
     // Get the radii from NAIF
+    NaifStatus::CheckErrors();
     SpiceInt n;
     SpiceDouble radii[3];
     bodvar_c(code, "RADII", &n, radii);
     unload_c(kernName.c_str());
+
+    try {
+      NaifStatus::CheckErrors();
+    }
+    catch (IException &e) {
+      throw IException(e,
+                       IException::Unknown,
+                       QObject::tr("The target name [%1] does not correspond to a target body "
+                                   "with known radii").arg(QString::fromStdString(target)),
+                       _FILEINFO_);
+    }
 
     PvlGroup mapping("Mapping");
     mapping += PvlKeyword("TargetName",  target);
@@ -627,14 +642,18 @@ namespace Isis {
    */
   double Projection::ToPlanetographic(double lat,
                                       double eRadius, double pRadius) {
-    if (lat == Null || abs(lat) > 90.0) {
+    //Account for double rounding error.
+    if (qFuzzyCompare(fabs(lat), 90.0)) {
+      lat = qRound(lat);
+    }
+    if (lat == Null || fabs(lat) > 90.0) {
       throw IException(IException::Unknown, 
                        "Unable to convert to Planetographic. The given latitude value [" 
                        + iString(lat) + "] is invalid.", 
                        _FILEINFO_);
     }
     double mylat = lat;
-    if (abs(mylat) < 90.0) {  // So tan doesn't fail
+    if (fabs(mylat) < 90.0) {  // So tan doesn't fail
       mylat *= PI / 180.0;
       mylat = atan(tan(mylat) * (eRadius / pRadius) *
                    (eRadius / pRadius));

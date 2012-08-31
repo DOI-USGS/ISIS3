@@ -61,6 +61,8 @@ namespace Isis {
        *
        * @ingroup HighLevelCubeIO
        *
+       * @author 2012-04-03 Travis Addair
+       *
        * @internal
        *
        */

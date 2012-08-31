@@ -67,8 +67,12 @@ namespace Isis {
    *                           getViewActions in order to allow the zooming key
    *                           shortcuts from the zoom tool to take effect when
    *                           the zoom tool wasn't active.
-   *   @history 2012-06-20 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *                          coding standards. References #972.
+   *   @history 2012-06-20 Debbie A. Cook, Updated Spice members to be more compliant with Isis
+   *                           coding standards. References #972.
+   *   @history 2012-07-26 Kimberly Oyama - Updated the help documentation for
+   *                           the grid tool to include tips for the options
+   *                           dialog and the new 'Auto Grid' functionality.
+   *                           References #604.
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT

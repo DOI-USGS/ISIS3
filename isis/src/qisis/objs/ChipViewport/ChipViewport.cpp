@@ -106,7 +106,6 @@ namespace Isis {
     p_image = new QImage(chip->Samples(), chip->Lines(), QImage::Format_RGB32);
 
     autoStretch();
-
     emit tackPointChanged(p_zoomFactor);
   }
 
@@ -400,6 +399,19 @@ namespace Isis {
     p_zoomFactor = 1.0;
     reloadChip();
   }
+
+
+  void ChipViewport::zoom(double zoomFactor) {
+    p_zoomFactor = zoomFactor;
+    reloadChip();
+  }
+
+
+
+  double ChipViewport::zoomFactor() {
+    return p_zoomFactor;
+  }
+
 
 
   //!<  Slot to refresh viewport , point has changed

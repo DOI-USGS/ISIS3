@@ -130,6 +130,7 @@ void IsisMain() {
   // Initialize control point network and set target name (only required
   // field)
   ControlNet cn;
+  cn.SetNetworkId("Coreg");
   if (match.hasGroup("Instrument")) {
     PvlGroup inst = match.getGroup("Instrument");
     PvlKeyword &targname = inst.FindKeyword("TargetName");

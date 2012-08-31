@@ -105,5 +105,9 @@
     <change name="Steven Lambright" date="2012-07-03">
       Added M/KM options to the spatial plot tool. Fixes #853.
     </change>
+    <change name="Tracie Sucharski" date="2012-07-30">
+      Added the match tool which allows registration (control points) to be edited
+      between cubes without a camera model.
+    </change>
   </history>
 </application>

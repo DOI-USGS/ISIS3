@@ -41,6 +41,11 @@ namespace Isis {
    * @internal
    *   @history  2009-04-02 Debbie A. Cook Removed obsolete methods IsXAxisTimeDependent,IsYAxisTimeDependent,
    *              XAxisDirection, YAxisDirection, SetXAxisDirection, and SetYAxisDirection
+   *   @history  2012-07-25 Kris Becker - Corrected bug in
+   *             SetStartingDetectorLine() method in that it applied this value
+   *             to the sample starting detector rather than the line starting
+   *             detector.  It appeared to only affect the MESSENGER/MDIS camera
+   *             model, however.
    *
    */
   class CameraDetectorMap {
@@ -96,7 +101,7 @@ namespace Isis {
        *
        */
       inline void SetStartingDetectorLine(const double line) {
-        p_startingDetectorSample = line;
+        p_startingDetectorLine = line;
         Compute();
       };
 

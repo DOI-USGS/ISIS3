@@ -26,6 +26,7 @@ int main(int argc, char *argv[]) {
   mg += Isis::PvlKeyword("MaximumLongitude", 180.0);
   mg += Isis::PvlKeyword("ProjectionName", "PolarStereographic");
 
+
   cout << "Test missing center longitude keyword ..." << endl;
   try {
     Isis::PolarStereographic p(lab);
@@ -61,13 +62,30 @@ int main(int argc, char *argv[]) {
 
     cout << "Test SetGround method ... " << endl;
     cout << "Setting ground to (-75,150)" << endl;
-    p.SetGround(-75.0, 150.0);
+    cout << "Successful (1-yes, 0-no): " << p.SetGround(-75.0, 150.0) << endl;
+    cout << "Latitude:               " << p.Latitude() << endl;
+    cout << "Longitude:              " << p.Longitude() << endl;
+    cout << "XCoord:                 " << p.XCoord() << endl;
+    cout << "YCoord:                 " << p.YCoord() << endl;
+    cout << endl;
+    
+    cout << "Setting ground to (-90.0, 0.0)" << endl;
+
+    cout << "Successful (1-yes, 0-no): " << p.SetGround(-90.0, 0.0) << endl;
     cout << "Latitude:               " << p.Latitude() << endl;
     cout << "Longitude:              " << p.Longitude() << endl;
     cout << "XCoord:                 " << p.XCoord() << endl;
     cout << "YCoord:                 " << p.YCoord() << endl;
     cout << endl;
 
+    cout << "Setting ground to (90.0, 0.0)" << endl;
+
+    cout << "Successful (1-yes, 0-no): " << p.SetGround(90.0, 0.0) << endl;
+    cout << "Latitude:               " << p.Latitude() << endl;
+    cout << "Longitude:              " << p.Longitude() << endl;
+    cout << "XCoord:                 " << p.XCoord() << endl;
+    cout << "YCoord:                 " << p.YCoord() << endl;
+    cout << endl;
 
     cout << "Test SetCoordinate method ... " << endl;
     cout << "Setting coordinate to (-1540033.620970689,-560526.3978025292)" << endl;

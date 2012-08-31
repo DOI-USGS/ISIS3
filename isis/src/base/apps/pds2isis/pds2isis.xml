@@ -69,6 +69,10 @@
       Fixed problem with special pixel range functionality and documentation.
       Added HIS and LIS range options.
     </change>
+    <change name="Stuart Sides" date="2012-08-08">
+      Added translations for BAND_BIN_CENTER, BAND_BIN_WIDTH, and BAND_BIN_FILTER_NUMBER from
+      NIMS RDR products fixes #1029.
+    </change>
   </history>
 
   <category>

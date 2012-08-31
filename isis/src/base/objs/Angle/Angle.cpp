@@ -192,7 +192,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    return (angle(Radians) < angle2.angle(Radians));
+    return (angle(Radians) < angle2.angle(Radians)) && *this != angle2;
   }
 
 
@@ -209,7 +209,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    return (angle(Radians) > angle2.angle(Radians));
+    return (angle(Radians) > angle2.angle(Radians)) && *this != angle2;
   }
 
 

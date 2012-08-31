@@ -35,6 +35,8 @@ Testing logical operators
   angle1 == angle2?  1
   angle1 == angle2?  0
   angle1 <  angle2?  1
+  angle1 <  (angle1 + epsilon)?  0
+  angle2 >  (angle2 - epsilon)?  0
   angle1 <= angle2?  1
 **PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator.
 **PROGRAMMER ERROR** Cannot compare a invalid angles with the < operator.
