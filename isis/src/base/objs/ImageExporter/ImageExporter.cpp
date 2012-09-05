@@ -73,7 +73,7 @@ namespace Isis {
     if (!p.HasInputRange()) p.SetInputRange();
     p.ProcessCubes(*this);
 
-    outputName.addExtension(m_extension);
+    outputName = outputName.addExtension(m_extension);
     createWorldFile(outputName);
   }
 
@@ -259,8 +259,8 @@ namespace Isis {
    * @param outputName Name of the world file
    */
   void ImageExporter::createWorldFile(FileName outputName) {
-    outputName.removeExtension();
-    outputName.addExtension(m_world);
+    outputName = outputName.removeExtension();
+    outputName = outputName.addExtension(m_world);
 
     ProcessExport &p = getProcess();
     p.CreateWorldFile(outputName.expanded());
