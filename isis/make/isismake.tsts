@@ -808,7 +808,7 @@ copyOutTruth: FORCE
 release: FORCE clean
 	proceedWithRelease="true";                                                 \
 	                                                                           \
-	for i in $(notdir $(filter-out CVS Makefile print.prt  $(OUTPUT),          \
+	for i in $(notdir $(filter-out suites CVS Makefile print.prt  $(OUTPUT),   \
 	    $(wildcard *))); do                                                    \
 	                                                                           \
 	  $(DIFF) -r $$i $(TESTDATA_PATH)/$$i >& /dev/null;                        \
@@ -838,7 +838,7 @@ release: FORCE clean
 	done;                                                                      \
 	                                                                           \
 	if [ "$$proceedWithRelease" = "true" ]; then                               \
-	  for i in $(notdir $(filter-out CVS Makefile print.prt  $(OUTPUT),        \
+	  for i in $(notdir $(filter-out suites CVS Makefile print.prt  $(OUTPUT), \
 	      $(wildcard *))); do                                                  \
 	    $(RM) -r $$i;                                                          \
 	  done;                                                                    \

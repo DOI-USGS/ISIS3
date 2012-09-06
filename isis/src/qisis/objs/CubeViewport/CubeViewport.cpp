@@ -110,6 +110,7 @@ namespace Isis {
     setAttribute(Qt::WA_DeleteOnClose);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    viewport()->setObjectName("viewport");
     viewport()->setCursor(QCursor(Qt::CrossCursor));
     viewport()->installEventFilter(this);
     viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
@@ -297,57 +298,77 @@ namespace Isis {
    *
    */
   CubeViewport::~CubeViewport() {
-    delete p_redBrick;
-    p_redBrick = NULL;
+    if(p_redBrick) {
+      delete p_redBrick;
+      p_redBrick = NULL;
+    }
 
-    delete p_grnBrick;
-    p_grnBrick = NULL;
+    if(p_grnBrick) {
+      delete p_grnBrick;
+      p_grnBrick = NULL;
+    }
 
-    delete p_bluBrick;
-    p_bluBrick = NULL;
+    if(p_bluBrick) {
+      delete p_bluBrick;
+      p_bluBrick = NULL;
+    }
 
-    delete p_gryBrick;
-    p_gryBrick = NULL;
+    if(p_gryBrick) {
+      delete p_gryBrick;
+      p_gryBrick = NULL;
+    }
 
-    delete p_pntBrick;
-    p_pntBrick = NULL;
+    if(p_pntBrick) {
+      delete p_pntBrick;
+      p_pntBrick = NULL;
+    }
 
-    delete p_groundMap;
-    p_groundMap = NULL;
+    if(p_groundMap) {
+      delete p_groundMap;
+      p_groundMap = NULL;
+    }
 
-    delete p_grayBuffer;
-    p_grayBuffer = NULL;
+    if(p_grayBuffer) {
+      delete p_grayBuffer;
+      p_grayBuffer = NULL;
+    }
 
-    delete p_redBuffer;
-    p_redBuffer = NULL;
+    if(p_redBuffer) {
+      delete p_redBuffer;
+      p_redBuffer = NULL;
+    }
 
-    delete p_greenBuffer;
-    p_greenBuffer = NULL;
+    if(p_greenBuffer) {
+      delete p_greenBuffer;
+      p_greenBuffer = NULL;
+    }
 
-    delete p_blueBuffer;
-    p_blueBuffer = NULL;
+    if(p_blueBuffer) {
+      delete p_blueBuffer;
+      p_blueBuffer = NULL;
+    }
 
     // p_cubeData MUST be deleted AFTER all viewport buffers!!!
     if(p_cubeData) {
       p_cubeData->RemoveChangeListener();
 
-      if(p_thisOwnsCubeData) {
+      if(p_thisOwnsCubeData)
         delete p_cubeData;
-
-        delete p_cube;
-        p_cube = NULL;
-      }
 
       p_cubeData = NULL;
     }
 
     p_cube = NULL;
 
-    delete p_progressTimer;
-    p_progressTimer = NULL;
+    if(p_progressTimer) {
+      delete p_progressTimer;
+      p_progressTimer = NULL;
+    }
 
-    delete p_image;
-    p_image = NULL;
+    if(p_image) {
+      delete p_image;
+      p_image = NULL;
+    }
 
     if(p_pixmapPaintRects) {
       for(int rect = 0; rect < p_pixmapPaintRects->size(); rect++) {

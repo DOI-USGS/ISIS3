@@ -42,7 +42,11 @@ namespace Isis {
 
     p_visualBox = new QGroupBox("Visual Display");
 
-    p_visualDisplay = new VisualDisplay;
+    p_visualScroll = new QScrollArea;
+    p_visualScroll->setBackgroundRole(QPalette::Dark);
+    
+    p_visualDisplay = new VisualDisplay(p_visualScroll);
+    p_visualDisplay->setObjectName("dnDisplay");
 
     QCheckBox *checkBox = new QCheckBox("Hide Display");
     connect(checkBox, SIGNAL(toggled(bool)), this, SLOT(hideDisplay(bool)));
@@ -69,8 +73,6 @@ namespace Isis {
     slider->setTickPosition(QSlider::TicksBelow);
     connect(slider, SIGNAL(valueChanged(int)), p_visualDisplay, SLOT(setBoxSize(int)));
     connect(slider, SIGNAL(valueChanged(int)), this, SLOT(resizeScrollbars()));
-    p_visualScroll = new QScrollArea;
-    p_visualScroll->setBackgroundRole(QPalette::Dark);
     p_visualScroll->setWidget(p_visualDisplay);
 
     QGroupBox *displayMode = new QGroupBox("Display Mode");
@@ -177,7 +179,7 @@ namespace Isis {
    * @return QAction*
    */
   QAction *StatisticsTool::toolPadAction(ToolPad *toolpad) {
-    QAction *action = new QAction(toolpad);
+    QAction *action = new QAction("Statistics", toolpad);
     action->setIcon(QPixmap(toolIconDir() + "/statistics.png"));
     action->setToolTip("Statistics");
     QObject::connect(action, SIGNAL(activated()), p_dialog, SLOT(show()));

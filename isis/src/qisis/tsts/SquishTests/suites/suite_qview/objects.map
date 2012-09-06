@@ -1,0 +1,138 @@
+:Active Tool.Apply_QPushButton	{text='Apply' type='QPushButton' unnamed='1' visible='1' window=':Active Tool_Isis::NomenclatureToolConfigDialog'}
+:Active Tool.Cancel_QPushButton	{text='Cancel' type='QPushButton' unnamed='1' visible='1' window=':Active Tool_Isis::NomenclatureToolConfigDialog'}
+:Active Tool.Font Color_QLabel	{text='Font Color' type='QLabel' unnamed='1' visible='1' window=':Active Tool_Isis::NomenclatureToolConfigDialog'}
+:Active Tool.Font Color_QPushButton	{leftWidget=':Active Tool.Font Color_QLabel' type='QPushButton' unnamed='1' visible='1' window=':Active Tool_Isis::NomenclatureToolConfigDialog'}
+:Active Tool.Font Size_QComboBox	{leftWidget=':Active Tool.Font Size_QLabel' type='QComboBox' unnamed='1' visible='1' window=':Active Tool_Isis::NomenclatureToolConfigDialog'}
+:Active Tool.Font Size_QLabel	{text='Font Size' type='QLabel' unnamed='1' visible='1' window=':Active Tool_Isis::NomenclatureToolConfigDialog'}
+:Active Tool.Ok_QPushButton	{text='Ok' type='QPushButton' unnamed='1' visible='1' window=':Active Tool_Isis::NomenclatureToolConfigDialog'}
+:Active Tool.Show IAU approved only_QCheckBox	{leftWidget=':Active Tool.Show IAU approved only_QLabel' type='QCheckBox' unnamed='1' visible='1' window=':Active Tool_Isis::NomenclatureToolConfigDialog'}
+:Active Tool.Show IAU approved only_QLabel	{text='Show IAU approved only' type='QLabel' unnamed='1' visible='1' window=':Active Tool_Isis::NomenclatureToolConfigDialog'}
+:Active Tool.Show feature extents_QComboBox	{leftWidget=':Active Tool.Show feature extents_QLabel' type='QComboBox' unnamed='1' visible='1' window=':Active Tool_Isis::NomenclatureToolConfigDialog'}
+:Active Tool.Show feature extents_QLabel	{text='Show feature extents' type='QLabel' unnamed='1' visible='1' window=':Active Tool_Isis::NomenclatureToolConfigDialog'}
+:Active Tool_Isis::NomenclatureToolConfigDialog	{aboveWidget=':qview.Active Tool_QToolBar' type='Isis::NomenclatureToolConfigDialog' unnamed='1' visible='1'}
+:Advanced Tracking_Isis::TableMainWindow	{name='Advanced Tracking' type='Isis::TableMainWindow' visible='0' windowTitle='Advanced Tracking'}
+:Basic colors_QWellArray	{buddy=':Select Color.Basic colors_QLabel' type='QWellArray' unnamed='1' visible='1'}
+:Blink Comparator_QDialog	{type='QDialog' unnamed='1' visible='0' windowTitle='Blink Comparator'}
+:Display Mode.Show Pixel Values_QRadioButton	{container=':Visual Display.Display Mode_QGroupBox' text='Show Pixel Values' type='QRadioButton' unnamed='1' visible='1'}
+:Elevation Calculator (via stereo pairs).Options_QMenu	{title='Options' type='QMenu' unnamed='1' visible='0' window=':Elevation Calculator (via stereo pairs)_QMainWindow'}
+:Elevation Calculator (via stereo pairs)_QMainWindow	{type='QMainWindow' unnamed='1' visible='0' windowTitle='Elevation Calculator (via stereo pairs)'}
+:File.&Browse..._QAction	{container=':qview.File_QMenu' text='&Browse...' type='QAction' unnamed='1' visible='true'}
+:File.&Close All..._QAction	{container=':qview.File_QMenu' text='&Close All...' type='QAction' unnamed='1' visible='true'}
+:File.&Open..._QAction	{container=':qview.File_QMenu' text='&Open...' type='QAction' unnamed='1' visible='true'}
+:File.&Print..._QAction	{container=':qview.File_QMenu' text='&Print...' type='QAction' unnamed='1' visible='true'}
+:File.&Save_QAction	{container=':qview.File_QMenu' text='&Save' type='QAction' unnamed='1' visible='true'}
+:File.E&xit_QAction	{container=':qview.File_QMenu' text='E&xit' type='QAction' unnamed='1' visible='true'}
+:File.Export View_QAction	{container=':qview.File_QMenu' text='Export View' type='QAction' unnamed='1' visible='true'}
+:File.Save &As..._QAction	{container=':qview.File_QMenu' text='Save &As...' type='QAction' unnamed='1' visible='true'}
+:File.Save &Info..._QAction	{container=':qview.File_QMenu' text='Save &Info...' type='QAction' unnamed='1' visible='true'}
+:Find Latitude/Longitude Coordinate_QDialog	{type='QDialog' unnamed='1' visible='0' windowTitle='Find Latitude/Longitude Coordinate'}
+:Measurements_Isis::TableMainWindow	{name='Measurements' type='Isis::TableMainWindow' visible='0' windowTitle='Measurements'}
+:Nomenclature Disclaimer.OK_QPushButton	{text='OK' type='QPushButton' unnamed='1' visible='1' window=':Nomenclature Disclaimer_QMessageBox'}
+:Nomenclature Disclaimer.The nomenclature qview tool will label named features in your opened cube files. This tool <strong>requires</strong> an active internet connection, projection or camera information, and a calculatable ground range to function. The larger the ground range (covered area on a planet), the longer it will take to populate the nomenclature for a particular cube.<br/><br/><font color='red'>**WARNING**</font> The accuracy of this tool is not perfect, features <strong>can and will be mislabeled</strong> if you have not properly controlled your images to the control network that identifies the latitude/longitude values of a feature. Please use the nomenclature website to verify a label is correct for a feature. <br/><br/>See the IAU Gazetteer of Planetary Nomenclature website for more information.<br/><a href='http://planetarynames.wr.usgs.gov/'>http://planetarynames.wr.usgs.gov/</a>_QLabel	{name='qt_msgbox_label' text='The nomenclature qview tool will label named features in your opened cube files. This tool <strong>requires</strong> an active internet connection, projection or camera information, and a calculatable ground range to function. The larger the ground range (covered area on a planet), the longer it will take to populate the nomenclature for a particular cube.<br/><br/><font color=\\'red\\'>**WARNING**</font> The accuracy of this tool is not perfect, features <strong>can and will be mislabeled</strong> if you have not properly controlled your images to the control network that identifies the latitude/longitude values of a feature. Please use the nomenclature website to verify a label is correct for a feature. <br/><br/>See the IAU Gazetteer of Planetary Nomenclature website for more information.<br/><a href=\\'http://planetarynames.wr.usgs.gov/\\'>http://planetarynames.wr.usgs.gov/</a>' type='QLabel' visible='1' window=':Nomenclature Disclaimer_QMessageBox'}
+:Nomenclature Disclaimer_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Nomenclature Disclaimer'}
+:Open.File name:_QLabel	{name='fileNameLabel' text='File name:' type='QLabel' visible='1' window=':Open_Isis::FileDialog'}
+:Open.Open_QPushButton	{text='Open' type='QPushButton' unnamed='1' visible='1' window=':Open_Isis::FileDialog'}
+:Open.splitter_QSplitter	{name='splitter' type='QSplitter' visible='1' window=':Open_Isis::FileDialog'}
+:Open_Isis::FileDialog	{name='QFileDialog' type='Isis::FileDialog' visible='1' windowTitle='Open'}
+:Options.&Blink ..._QAction	{container=':qview.Options_QMenu' text='&Blink ...' type='QAction' unnamed='1' visible='true'}
+:Options.&Find Point_QAction	{container=':qview.Options_QMenu' text='&Find Point' type='QAction' unnamed='1' visible='true'}
+:Options.&Special Pixel Tool ..._QAction	{container=':qview.Options_QMenu' text='&Special Pixel Tool ...' type='QAction' unnamed='1' visible='true'}
+:Options.Measuring ..._QAction	{container=':qview.Options_QMenu' text='Measuring ...' type='QAction' unnamed='1' visible='true'}
+:Options.Registration_QMenu	{title='Registration' type='QMenu' unnamed='1' visible='0' window=':Elevation Calculator (via stereo pairs).Options_QMenu'}
+:Options.Show Nomenclature_QAction	{container=':qview.Options_QMenu' text='Show Nomenclature' type='QAction' unnamed='1' visible='true'}
+:Options.Tracking ..._QAction	{container=':qview.Options_QMenu' text='Tracking ...' type='QAction' unnamed='1' visible='true'}
+:ProgressDialog	{type='QProgressDialog'}
+:Select Color.Basic colors_QColorPicker	{leftWidget=':Basic colors_QWellArray' type='QColorPicker' unnamed='1' visible='1' window=':Select Color_QColorDialog'}
+:Select Color.Basic colors_QLabel	{text='Basic colors' type='QLabel' unnamed='1' visible='1' window=':Select Color_QColorDialog'}
+:Select Color.OK_QPushButton	{text='OK' type='QPushButton' unnamed='1' visible='1' window=':Select Color_QColorDialog'}
+:Select Color_QColorDialog	{type='QColorDialog' unnamed='1' visible='1' windowTitle='Select Color'}
+:Special Pixel Tool_QDialog	{type='QDialog' unnamed='1' visible='0' windowTitle='Special Pixel Tool'}
+:Statistics.Average_QLabel	{container=':Statistics.Statistics_QGroupBox' text~='Average.*' type='QLabel' unnamed='1' visible='1'}
+:Statistics.Hide Display_QCheckBox	{text='Hide Display' type='QCheckBox' unnamed='1' visible='1' window=':Statistics_QDialog'}
+:Statistics.Maximum_QLabel	{container=':Statistics.Statistics_QGroupBox' text~='Maximum.*' type='QLabel' unnamed='1' visible='1'}
+:Statistics.Minimum_QLabel	{container=':Statistics.Statistics_QGroupBox' text~='Minimum.*' type='QLabel' unnamed='1' visible='1'}
+:Statistics.Standard Dev_QLabel	{container=':Statistics.Statistics_QGroupBox' text~='Standard Dev.*' type='QLabel' unnamed='1' visible='1'}
+:Statistics.Statistics_QGroupBox	{title='Statistics' type='QGroupBox' unnamed='1' visible='1' window=':Statistics_QDialog'}
+:Statistics.Visual Display_QGroupBox	{title='Visual Display' type='QGroupBox' unnamed='1' visible='1' window=':Statistics_QDialog_2'}
+:Statistics.dnDisplay	{type='Isis::VisualDisplay'}
+:Statistics_QDialog	{type='QDialog' unnamed='1' windowTitle='Statistics'}
+:Statistics_QDialog_2	{type='QDialog' unnamed='1' visible='1' windowTitle='Statistics'}
+:Sun Shadow Measurements_Isis::TableMainWindow	{name='Sun Shadow Measurements' type='Isis::TableMainWindow' visible='0' windowTitle='Sun Shadow Measurements'}
+:View.&Actual Pixels_QAction	{container=':qview.View_QMenu' text='&Actual Pixels' type='QAction' unnamed='1' visible='true'}
+:View.&Fit in Window_QAction	{container=':qview.View_QMenu' text='&Fit in Window' type='QAction' unnamed='1' visible='true'}
+:View.&Pan Down_QAction	{container=':qview.View_QMenu' text='&Pan Down' type='QAction' unnamed='1' visible='true'}
+:View.&Pan Left_QAction	{container=':qview.View_QMenu' text='&Pan Left' type='QAction' unnamed='1' visible='true'}
+:View.&Pan Right_QAction	{container=':qview.View_QMenu' text='&Pan Right' type='QAction' unnamed='1' visible='true'}
+:View.&Pan Up_QAction	{container=':qview.View_QMenu' text='&Pan Up' type='QAction' unnamed='1' visible='true'}
+:View.Global Stretch_QAction	{container=':qview.View_QMenu' text='Global Stretch' type='QAction' unnamed='1' visible='true'}
+:View.Regional Stretch_QAction	{container=':qview.View_QMenu' text='Regional Stretch' type='QAction' unnamed='1' visible='true'}
+:View.Zoom In_QAction	{container=':qview.View_QMenu' text='Zoom In' type='QAction' unnamed='1' visible='true'}
+:View.Zoom Out_QAction	{container=':qview.View_QMenu' text='Zoom Out' type='QAction' unnamed='1' visible='true'}
+:Visual Display.Display Mode_QGroupBox	{container=':Statistics.Visual Display_QGroupBox' title='Display Mode' type='QGroupBox' unnamed='1' visible='1'}
+:Window.&Cascade_QAction	{container=':qview.Window_QMenu' text='&Cascade' type='QAction' unnamed='1' visible='true'}
+:Window.&Link All_QAction	{container=':qview.Window_QMenu' text='&Link All' type='QAction' unnamed='1' visible='true'}
+:Window.&Link_QAction	{container=':qview.Window_QMenu' text='&Link' type='QAction' unnamed='1' visible='true'}
+:Window.&Next_QAction	{container=':qview.Window_QMenu' text='&Next' type='QAction' unnamed='1' visible='true'}
+:Window.&Prev_QAction	{container=':qview.Window_QMenu' text='&Prev' type='QAction' unnamed='1' visible='true'}
+:Window.&Tile_QAction	{container=':qview.Window_QMenu' text='&Tile' type='QAction' unnamed='1' visible='true'}
+:Window.&Unlink All_QAction	{container=':qview.Window_QMenu' text='&Unlink All' type='QAction' unnamed='1' visible='true'}
+:Window.Change cursor to arrow._QAction	{container=':qview.Window_QMenu' text='Change cursor to arrow.' type='QAction' unnamed='1' visible='true'}
+:Window.Close All_QAction	{container=':qview.Window_QMenu' text='Close All' type='QAction' unnamed='1' visible='true'}
+:Window.Close_QAction	{container=':qview.Window_QMenu' text='Close' type='QAction' unnamed='1' visible='true'}
+:Window.Resize_QAction	{container=':qview.Window_QMenu' text='Resize' type='QAction' unnamed='1' visible='true'}
+:_Isis::AdvancedStretchDialog	{type='Isis::AdvancedStretchDialog' unnamed='1' visible='0'}
+:_Isis::NomenclatureToolConfigDialog	{type='Isis::NomenclatureToolConfigDialog' unnamed='1' visible='1'}
+:_QListView	{type='QListView' unnamed='1' visible='1'}
+:_QWebView	{type='QWebView' unnamed='1' visible='1'}
+:fileNameEdit_QLineEdit	{buddy=':Open.File name:_QLabel' name='fileNameEdit' type='QLineEdit' visible='1'}
+:frame.stackedWidget_QStackedWidget	{container=':splitter.frame_QFrame' name='stackedWidget' type='QStackedWidget' visible='1'}
+:nomenclatureToolButton	{toolTip='Nomenclature (N)' type='QToolButton' visible='true'}
+:qview.Active Tool_QToolBar	{name='Active' type='QToolBar' visible='1' window=':qview_Isis::ViewportMainWindow' windowTitle='Active Tool'}
+:qview.Disclaimer_QPushButton	{text='Disclaimer' type='QPushButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview.File_QMenu	{title='File' type='QMenu' unnamed='1' visible='0' window=':qview_Isis::ViewportMainWindow'}
+:qview.Gray_QRadioButton	{text='Gray' type='QRadioButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview.Open_QToolButton	{text='Open' type='QToolButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview.Options_QMenu	{title='Options' type='QMenu' unnamed='1' visible='0' window=':qview_Isis::ViewportMainWindow'}
+:qview.RGB_QRadioButton	{text='RGB' type='QRadioButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview.Spatial Plot Tool_QToolButton	{text='Spatial Plot Tool' type='QToolButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview.Spectral Plot Tool_QToolButton	{text='Spectral Plot Tool' type='QToolButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview.Tool Options_QPushButton	{text='Tool Options' type='QPushButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview.Tool Pad_Isis::ToolPad	{name='ViewportMainWindow' type='Isis::ToolPad' visible='1' window=':qview_Isis::ViewportMainWindow' windowTitle='Tool Pad'}
+:qview.Tracking_QToolButton	{text='Tracking' type='QToolButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview.View_QMenu	{title='View' type='QMenu' unnamed='1' visible='0' window=':qview_Isis::ViewportMainWindow'}
+:qview.Window_QMenu	{title='Window' type='QMenu' unnamed='1' visible='0' window=':qview_Isis::ViewportMainWindow'}
+:qview.lub0388c.342.lev1.cub @ 129.167% (Gray = 1)_QMdiSubWindow	{type='QMdiSubWindow' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow' windowTitle='lub0388c.342.lev1.cub @ 129.167% (Gray = 1)'}
+:qview.nomenclatureQueryProgress	{name='nomenclatureQueryProgress' type='QProgressBar' window=':qview_Isis::ViewportMainWindow'}
+:qview.to All Viewports_QStackedWidget	{leftWidget=':qview.to All Viewports_QToolButton' type='QStackedWidget' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview.to All Viewports_QToolButton	{text='to All Viewports' type='QToolButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview_Isis::MdiCubeViewport	{occurrence='3' type='Isis::MdiCubeViewport' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview_Isis::MdiCubeViewport_2	{occurrence='2' type='Isis::MdiCubeViewport' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview_Isis::ViewportMainWindow	{name='MainWindow' type='Isis::ViewportMainWindow' visible='1' windowTitle='qview'}
+:qview_QComboBox	{type='QComboBox' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview_QLabel	{occurrence='12' type='QLabel' unnamed='1' visible='0' window=':qview_Isis::ViewportMainWindow'}
+:qview_QLabel_2	{occurrence='13' type='QLabel' unnamed='1' visible='0' window=':qview_Isis::ViewportMainWindow'}
+:qview_QLabel_3	{occurrence='14' type='QLabel' unnamed='1' visible='0' window=':qview_Isis::ViewportMainWindow'}
+:qview_QLineEdit	{occurrence='2' type='QLineEdit' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview_QSpinBox	{type='QSpinBox' unnamed='1' visible='0' window=':qview_Isis::ViewportMainWindow'}
+:qview_QSpinBox_2	{occurrence='2' type='QSpinBox' unnamed='1' visible='0' window=':qview_Isis::ViewportMainWindow'}
+:qview_QSpinBox_3	{occurrence='3' type='QSpinBox' unnamed='1' visible='0' window=':qview_Isis::ViewportMainWindow'}
+:qview_QStackedWidget	{type='QStackedWidget' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview_QStackedWidget_2	{occurrence='3' type='QStackedWidget' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview_QWidget	{occurrence='2' type='QWidget' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview_bandToolButton	{toolTip='Band Selection (B)' type='QToolButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview_statisticsToolButton	{toolTip='Statistics' type='QToolButton' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:splitter.frame_QFrame	{container=':Open.splitter_QSplitter' name='frame' type='QFrame' visible='1'}
+:splitter.sidebar_QSidebar	{container=':Open.splitter_QSplitter' name='sidebar' type='QSidebar' visible='1'}
+:stackedWidget.treeView_QTreeView	{container=':frame.stackedWidget_QStackedWidget' name='treeView' type='QTreeView' visible='1'}
+:viewport1	{occurrence='1' type='Isis::MdiCubeViewport' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:viewport1_contents	{name='viewport' type='QWidget' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:viewport1_progress	{parent=':viewport1' type='QProgressBar'}
+:viewport2	{occurrence='2' type='Isis::MdiCubeViewport' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:viewport2_contents	{name='viewport' occurrence='2' type='QWidget' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:viewport2_progress	{parent=':viewport2' type='QProgressBar'}
+:viewport3	{occurrence='3' type='Isis::MdiCubeViewport' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:viewport3_contents	{name='viewport' occurrence='3' type='QWidget' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:viewport3_progress	{parent=':viewport3' type='QProgressBar'}
+:viewport4	{occurrence='4' type='Isis::MdiCubeViewport' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:viewport4_contents	{name='viewport' occurrence='4' type='QWidget' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:viewport4_progress	{parent=':viewport4' type='QProgressBar'}
