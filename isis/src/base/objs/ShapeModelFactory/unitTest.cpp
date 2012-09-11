@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "Preference.h"
 #include "CameraFactory.h"
+#include "Target.h"
 
 using namespace std;
 using namespace Isis;
@@ -18,7 +19,8 @@ int main() {
   vector<Distance> radii(3,Distance());
   radii = c->target()->radii();
   Pvl pvl = *cube.getLabel();
-  Target targ(pvl);
+  Spice spi(pvl);
+  Target targ(&spi, pvl);
   targ.setRadii(radii);
   ShapeModel *sm = ShapeModelFactory::Create(&targ, pvl);
   cout << "Successfully created shape " << sm->name() << endl;
@@ -31,7 +33,8 @@ int main() {
   c = cube.getCamera();
   radii = c->target()->radii();
   pvl = *cube.getLabel();
-  Target targ2(pvl);
+  Spice spi2(pvl);
+  Target targ2(&spi2, pvl);
   targ2.setRadii(radii);
   sm = ShapeModelFactory::Create(&targ2, pvl);
   cout << "Successfully created shape " << sm->name() << endl;

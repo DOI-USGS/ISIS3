@@ -99,17 +99,10 @@ namespace Isis {
     NaifStatus::CheckErrors();
 
     // Initialize members
-
-
-    cout << "Creating Spice object..." << endl;
-
     m_solarLongitude = new Longitude;
     m_et = NULL;
     m_kernels = new QVector<iString>;
-
-    cout << "Creating Target object..." << endl;
-
-    m_target = new Target(lab);
+    m_target = new Target(this, lab);
 
     m_startTime = new iTime;
     m_endTime = new iTime;

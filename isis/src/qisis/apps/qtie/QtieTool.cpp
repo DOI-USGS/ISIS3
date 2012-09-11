@@ -42,6 +42,7 @@
 #include "Projection.h"
 #include "QIsisApplication.h"
 #include "SerialNumber.h"
+#include "Target.h"
 #include "ToolPad.h"
 #include "UniversalGroundMap.h"
 

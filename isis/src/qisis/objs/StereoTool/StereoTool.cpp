@@ -36,6 +36,7 @@
 #include "SerialNumber.h"
 #include "Stereo.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 #include "ToolPad.h"
 #include "UniversalGroundMap.h"
 

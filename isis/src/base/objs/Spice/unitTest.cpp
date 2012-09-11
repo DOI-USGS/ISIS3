@@ -77,6 +77,10 @@ class MySpice : public Spice {
         cout << BI[i] << endl;
       }
     }
+
+    double Resolution() {
+      return 1.;
+    }
 };
 
 

@@ -22,6 +22,7 @@
 #include "SmtkPoint.h"
 #include "Statistics.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 #include "TileManager.h"
 #include "UserInterface.h"
 

@@ -10,6 +10,7 @@
 #include "Pvl.h"
 #include "iString.h"
 #include "PushFrameCameraDetectorMap.h"
+#include "Target.h"
 
 using namespace std;
 using namespace Isis;

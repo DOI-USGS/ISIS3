@@ -36,6 +36,7 @@ namespace Isis {
   class Latitude;
   class Longitude;
   class SurfacePoint;
+  class Target;
 
   /**
    * @brief Class for computing sensor ground coordinates
@@ -190,21 +191,7 @@ namespace Isis {
       bool SetUniversalGround(const double latitude, const double longitude,
                               const double radius, bool backCheck = true);
       bool SetGround(const SurfacePoint &surfacePt, bool backCheck = true);
-
-      /**
-       * Returns if the last call to either SetLookDirection or
-       * SetUniversalGround had a valid intersection with the target. If so then
-       * other methods such as Coordinate, UniversalLatitude, UniversalLongitude,
-       * etc can be used with confidence.
-       *
-       * @return @b bool True if the look direction intersects with the
-       *         target.
-       */
-      inline bool HasSurfaceIntersection() const {
-        return target()->shape()->hasIntersection();
-//        return m_shape->hasIntersection();
-      };
-
+      bool HasSurfaceIntersection() const;
       void Coordinate(double p[3]) const;
 
       /**

@@ -74,10 +74,9 @@ namespace Isis {
    *
    */
   bool EquatorialCylindricalShape::intersectSurface
-  (std::vector<double> observerPos, std::vector<double> lookDirection,
-   double tol) {
+  (std::vector<double> observerPos, std::vector<double> lookDirection) {
     
-    DemShape::intersectSurface(observerPos, lookDirection, tol);
+    DemShape::intersectSurface(observerPos, lookDirection);
 
     if (!hasIntersection()) {
 
@@ -349,10 +348,6 @@ namespace Isis {
     }
 
     setHasIntersection(true);
-    SurfacePoint inpoint;
-
-    //return inpoint;
-
     return hasIntersection();
   }
 }

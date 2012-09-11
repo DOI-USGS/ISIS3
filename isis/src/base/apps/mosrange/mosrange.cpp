@@ -9,6 +9,7 @@
 #include "Process.h"
 #include "Pvl.h"
 #include "Statistics.h"
+#include "Target.h"
 
 using namespace std;
 using namespace Isis;

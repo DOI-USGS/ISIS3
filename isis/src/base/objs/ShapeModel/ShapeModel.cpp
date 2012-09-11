@@ -9,6 +9,8 @@
 #include "IException.h"
 #include "iString.h"
 #include "NaifStatus.h"
+#include "Spice.h"
+#include "Target.h"
 
 using namespace std;
 
@@ -40,7 +42,6 @@ namespace Isis {
    */
   ShapeModel::ShapeModel(Target *target) {
     Initialize();
-    // setRadii(radii);
     m_target = target;
   }
 
@@ -51,9 +52,6 @@ namespace Isis {
   void ShapeModel::Initialize() {
     m_name = new std::string();
     m_surfacePoint = new SurfacePoint();
-    // m_tolerance = new double();
-    // *m_tolerance = 0.0;
-    // m_radii new Distance[3];
     m_hasIntersection = false;
     m_hasNormal = false;
     m_normal.resize(3,0.);
@@ -62,15 +60,15 @@ namespace Isis {
   //! Destroys the ShapeModel
   ShapeModel::~ShapeModel() {
 
+    if (m_name) {
+      delete m_name;
+      m_name = NULL;
+    }
+
     if (m_surfacePoint) {
       delete m_surfacePoint;
       m_surfacePoint = NULL;
     }
-
-    // if (m_tolerance) {
-    //   delete m_tolerance;
-    //   m_tolerance = NULL;
-    // }
   }
 
 
@@ -211,6 +209,9 @@ namespace Isis {
       m_surfacePoint->FromNaifArray(intersectionPoint);
       m_hasIntersection = true;
     }
+    else {
+      m_hasIntersection = false;
+    }
    
     return m_hasIntersection;
   }
@@ -275,7 +276,6 @@ namespace Isis {
    */
   void ShapeModel::clearSurfacePoint() {
     setHasIntersection(false);
-    setHasNormal(false);
   }
 
 
@@ -403,6 +403,20 @@ namespace Isis {
    */
   void ShapeModel::setHasNormal(bool status) {
     m_hasNormal = status;
+  }
+
+
+  /** Convenience method to get pixel resolution (m/pix) at current intersection point
+   *
+   */
+  double ShapeModel::Resolution() {
+    if (m_hasIntersection) {
+      return m_target->spice()->Resolution();
+    }
+    else {
+      std::string message = "No valid intersection point for computing resolution.";
+      throw IException(IException::Programmer, message, _FILEINFO_);
+    }
   }
 
 

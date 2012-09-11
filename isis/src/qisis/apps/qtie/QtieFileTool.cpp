@@ -24,6 +24,7 @@
 #include "MainWindow.h"
 #include "MdiCubeViewport.h"
 #include "SerialNumber.h"
+#include "Target.h"
 #include "UniversalGroundMap.h"
 #include "Workspace.h"
 

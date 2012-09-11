@@ -33,6 +33,7 @@
 #include "FileName.h"
 #include "Projection.h"
 #include "PvlGroup.h"
+#include "Target.h"
 
 namespace Isis {
 
@@ -40,10 +41,7 @@ namespace Isis {
     
     // get kernels and instrument Pvl groups
     PvlGroup &kernelsPvlGroup = pvl.FindGroup("Kernels", Pvl::Traverse);
-    bool skyTarget = false; // TODO Do we need a sky shape model, member variable, or neither?
-    if (target->isSky() ) {
-      return NULL;
-    }
+    bool skyTarget = target->isSky(); // TODO Do we need a sky shape model, member variable, or neither?
 
     // Determine if target is a plane??? target name has rings in it? 
     // Another keyword in label to indicate plane? What about lander/rovers?

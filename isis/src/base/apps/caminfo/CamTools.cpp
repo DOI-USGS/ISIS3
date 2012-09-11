@@ -51,6 +51,7 @@
 #include "ProjectionFactory.h"
 #include "Statistics.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 
 using namespace std;
 

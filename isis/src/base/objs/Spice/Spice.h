@@ -27,6 +27,7 @@
 #include "naif/SpiceZfc.h"
 #include "naif/SpiceZmc.h"
 #include "Pvl.h"
+#include "ShapeModel.h"
 #include "SpicePosition.h"
 #include "SpiceRotation.h"
 
@@ -35,7 +36,6 @@ namespace Isis {
   class Distance;
   class EllipsoidShape;
   class Longitude;
-  class ShapeModel;
   class Target;
 
   /**
@@ -300,6 +300,16 @@ namespace Isis {
 
       PvlObject getStoredNaifKeywords() const;
 
+      /**
+       * Pure virtual method that returns the pixel resolution of the sensor in
+       * meters/pix.
+       *
+       * @return @b double Resolution value of 1.0
+       */
+      virtual double Resolution() {
+        return 1.;
+          };
+
     protected:
       enum SpiceValueType {
         SpiceDoubleType,
@@ -317,7 +327,7 @@ namespace Isis {
                       QVariant value);
       QVariant readStoredValue(iString key, SpiceValueType type, int index);
 
-      ShapeModel *shape() const;
+      //      ShapeModel *shape() const;
 
       // Leave these protected so that inheriting classes don't
       // have to convert between double and spicedouble

@@ -31,9 +31,11 @@
 
 #include "SurfacePoint.h"
 #include "Pvl.h"
-#include "Target.h"
+//#include "Target.h"
 
 namespace Isis {
+  class Spice;
+  class Target;
   /**
    * @brief Define shapes and provide utilities for Isis3 targets
    *
@@ -63,8 +65,8 @@ namespace Isis {
 
       //! Intersect the shape model
       virtual bool intersectSurface(std::vector<double> observerPos,
-                                    std::vector<double> lookDirection,
-                                    double tol = 0.)=0;
+                                    std::vector<double> lookDirection)=0;
+      //                                    double tol = 0.)=0;
 
       //! Return the surface intersection
       SurfacePoint *surfaceIntersection() const;
@@ -134,19 +136,15 @@ namespace Isis {
                               const std::vector<double> &observerLookVectorToTarget);
       std::vector<Distance> targetRadii() const;
       void setHasNormal(bool status);
+      double Resolution();
 
     private:
       bool m_hasIntersection;       //!< indicates good intersection exists
       bool m_hasNormal;             //!< indicates normal has been computed
       std::vector<double> m_normal; //!< Local normal of current intersection point
       std::string *m_name;
-      //      void setRadii(Distance radii[3]);
-      //void localRadius(const Latitude &lat, const Longitude &lon);  // Is this needed?
-      // TODO Should this be a vector? If so add to destructor and modify constructor
-      //      Distance m_radii[3];        //!< Radii of target body
-
-     // Are these only needed for Isis3Simp model? Are they needed for photometric computations?
       SurfacePoint *m_surfacePoint;        //!< Current intersection point
+
       // This needs to get reset by cameras???
       Target *m_target;
   };

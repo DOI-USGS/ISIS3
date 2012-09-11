@@ -124,16 +124,14 @@ namespace Isis {
    * In the future we may want to do a better job handling this special case.
    */
   bool DemShape::intersectSurface(vector<double> observerPos,
-                                  vector<double> lookDirection,
-                                  double tol) {
+                                  vector<double> lookDirection) {
     // try to intersect the target body ellipsoid as a first approximation
     // for the iterative DEM intersection method
     // (this method is in the ShapeModel base class)
-    if (intersectEllipsoid(observerPos, lookDirection))
-      setHasIntersection(true);
-    else 
+    if (!intersectEllipsoid(observerPos, lookDirection))
       return false;
  
+    double tol = Resolution()/100;  // 1/100 of a pixel
     static const int maxit = 100;
     int it = 1;
     double dX, dY, dZ, dist2;
@@ -191,7 +189,7 @@ namespace Isis {
       
       double r = radiusKm.kilometers();
       bool status;
-      surfpt_c(&observerPos[0], &lookDirection[0], r, r, r, newIntersectPt,
+      surfpt_c((SpiceDouble *) &observerPos[0], &lookDirection[0], r, r, r, newIntersectPt,
                (SpiceBoolean*) &status);
       setHasIntersection(status);
 
@@ -203,21 +201,21 @@ namespace Isis {
       dZ = currentIntersectPt[2] - newIntersectPt[2];
       dist2 = (dX*dX + dY*dY + dZ*dZ) * 1000 * 1000;
 
-      // Getting resolution is a problem **TODO** How do we update the tolerance?
-      // if (dist < tolerance * tolerance) {
-      //   // Now recompute tolerance at updated surface point and recheck
-      //   p_surfacePoint->FromNaifArray(pBOutput);
-      //   tolerance = Resolution() / 100.0;
-      if (dist2 < tol2)
-        done = true;
+      // Now recompute tolerance at updated surface point and recheck
+      if (dist2 < tol2) {
+        surfaceIntersection()->FromNaifArray(newIntersectPt);
+        tol = Resolution() / 100.0;
+        tol2 = tol * tol;
+        if (dist2 < tol2) {
+          setHasIntersection(true);
+          done = true;
+        }
+      }
 
       it ++;
     } // end of while loop
 
-    surfaceIntersection()->FromNaifArray(newIntersectPt);
-    setHasIntersection(true);
-
-    return true;
+    return hasIntersection();
   }
 
 

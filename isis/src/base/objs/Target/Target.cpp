@@ -43,16 +43,11 @@ namespace Isis {
    */
 
   // TODO: what is needed to initialize?
-  Target::Target(Pvl &lab) {
+  Target::Target(Spice *spice, Pvl &lab) {
 
     // Initialize members
-    m_bodyCode = new SpiceInt;
-    m_radii.resize(3);
-    // m_radii.resize(3, Distance());
-    m_name = new iString;
-    m_shape = NULL;
-    m_originalShape = NULL;
-    m_sky = false;
+    init();
+    m_spice = spice;
 
     PvlGroup &kernels = lab.FindGroup("Kernels", Pvl::Traverse);
 
@@ -60,9 +55,6 @@ namespace Isis {
     *m_name = inst["TargetName"][0];
 
     if (name().UpCase() == "SKY") {
-
-      cout << "In SKY code in Target" << endl;
-
       m_radii[0] = m_radii[1] = m_radii[2] = Distance(1000.0, Distance::Meters);
       m_sky = true;
       string trykey = "NaifIkCode";
@@ -74,9 +66,6 @@ namespace Isis {
         *m_bodyCode = (int) kernels["NaifSpkCode"];
     }
     else {
-
-      cout << "Something is wrong with target name...Missed target=Sky" << endl;
-
       *m_bodyCode = lookupNaifBodyCode();
       m_sky = false;
       // iString radiiKey = "BODY" + iString((BigInt) naifBodyCode()) + "_RADII";
@@ -89,6 +78,37 @@ namespace Isis {
       *m_bodyCode = (int) kernels["NaifBodyCode"];
     m_shape = ShapeModelFactory::Create(this, lab);
   }
+
+
+  /**
+   * Constructs an empty Target object
+   *
+   * @internal
+   * @history 2012-08-29 Debbie A. Cook - Original version
+   */
+
+  Target::Target() {
+    init();
+    m_spice = NULL;
+  }
+
+  /**
+   * Initialize member variables
+   *
+   * @internal
+   * @history 2012-08-31 Debbie A. Cook - Original version
+   */
+  void Target::init() {
+    m_bodyCode = new SpiceInt;
+    // m_radii.resize(3);
+    m_radii.resize(3, Distance());
+    m_name = new iString;
+    m_shape = NULL;
+    m_originalShape = NULL;
+    m_sky = false;
+  }
+
+
 
   /**
    * Destroys the Target object
@@ -183,10 +203,10 @@ namespace Isis {
       // Nothing to do
       return;
     }
-    // We must currently have an ellipsoidal shape
+    // If we don't have a saved original shape, just stick to the current shape
     else if (m_originalShape == NULL) {
-      string msg = "No shape has been saved to be restored";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
+      // Nothing to do
+      return;
     }
     m_shape = m_originalShape;
     m_originalShape = NULL;
@@ -229,5 +249,13 @@ namespace Isis {
    */
   ShapeModel *Target::shape() const {
     return m_shape;
+  }
+
+
+  /**
+   * Return the spice object  
+   */
+  Spice *Target::spice() const {
+    return m_spice;
   }
 }

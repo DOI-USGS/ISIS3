@@ -31,6 +31,7 @@
 #include "MdiCubeViewport.h"
 #include "NomenclatureToolConfigDialog.h"
 #include "PolygonTools.h"
+#include "Target.h"
 #include "ToolPad.h"
 
 

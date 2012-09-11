@@ -162,9 +162,24 @@ namespace Isis {
     const vector<double> &sB = bodyRotation()->ReferenceVector(
         instrumentPosition()->Coordinate());
 
-    double tolerance = Resolution() / 100.0;
-    return target()->shape()->intersectSurface(sB, lookB, tolerance);
+    // double tolerance = Resolution() / 100.0;
+    // return target()->shape()->intersectSurface(sB, lookB, tolerance);
+    return target()->shape()->intersectSurface(sB, lookB);
   }
+
+  /**
+   * Returns if the last call to either SetLookDirection or
+   * SetUniversalGround had a valid intersection with the target. If so then
+   * other methods such as Coordinate, UniversalLatitude, UniversalLongitude,
+   * etc can be used with confidence.
+   *
+   * @return @b bool True if the look direction intersects with the
+   *         target.
+   */
+  bool Sensor::HasSurfaceIntersection() const {
+    return target()->shape()->hasIntersection();
+  }
+
 
   /**
    * Returns the x,y,z of the surface intersection in BodyFixed km.

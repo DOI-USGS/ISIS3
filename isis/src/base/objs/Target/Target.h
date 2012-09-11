@@ -34,6 +34,7 @@ namespace Isis {
   class iString;
   class Pvl;
   class ShapeModel;
+  class Spice;
 
   /**
    * This class is used to create and store valid Isis3 targets.
@@ -45,12 +46,14 @@ namespace Isis {
    */
   class Target {
     public:
-      // constructor
-      Target(Pvl &label);
+      // constructors
+      Target(Spice *spice, Pvl &label);
+      Target();
 
       //! Destroys the Target
       ~Target();
 
+      void init();
       bool isSky() const;
       SpiceInt naifBodyCode() const;
       iString name() const;
@@ -60,6 +63,7 @@ namespace Isis {
       void setSky(SpiceInt bodyCode) const;
       void setRadii(std::vector<Distance> radii);
       ShapeModel *shape() const;
+      Spice *spice() const;
 
 
     private:
@@ -77,6 +81,7 @@ namespace Isis {
       // TODO should the target body kernels go in here too bodyRotation and position??? I don't
       //           think so.  They are SPICE kernels and belong in the Spice class (DAC).  What do others
       //           think.
+      Spice *m_spice;     //!< The parent Spice object.  This is needed to get pixel resolution in ShapeModels
   };
 };
 

@@ -93,16 +93,18 @@ int main(int argc, char *argv[]) {
   lab1.AddGroup(inst1);
   lab1.AddGroup(kern1);
 
+  // Create a Spice object to test radii
+  Spice spi(lab1);
+
   // Test good target
-  Target tGood(lab1);
+  Target tGood(&spi, lab1);
   cout << endl;
   cout << "  Good target test..." << endl;
   cout << "     NaifBodyCode = " << tGood.naifBodyCode() << endl;
   cout << "     TargetName = " << tGood.name() << endl;
   cout << "     IsSky = " << tGood.isSky() << endl;
 
-  // Create a Spice object to test radii
-  Spice spi(lab1);
+  // Use a Spice object to test radii
   vector<Distance> r(3);
   r = spi.target()->radii();
   cout << "     Target radii = " << r[0].kilometers() << "/" << r[1].kilometers() << "/" << r[2].kilometers();
@@ -112,7 +114,7 @@ int main(int argc, char *argv[]) {
   Pvl lab2;
   lab2.AddGroup(inst2);
   lab2.AddGroup(kern1);
-  Target tSky(lab2);
+  Target tSky(&spi, lab2);
   cout << endl;
   cout << "  Testing Sky..." << endl;
   cout << "     IsSky = " << tSky.isSky() << endl;
@@ -129,7 +131,7 @@ int main(int argc, char *argv[]) {
     cout << endl;
     cout << "  Testing no instrument group ..." << endl;
     lab3.AddGroup(kern2);
-    Target tNoInstrument(lab3);
+    Target tNoInstrument(&spi2, lab3);
   }
   catch(IException &e) {
     e.print();
@@ -143,7 +145,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl;
     cout << "  Testing no kernels group ..." << endl;
-    Target tNoKernels(lab4);
+    Target tNoKernels(&spi2, lab4);
   }
   catch(IException &e) {
     e.print();
@@ -154,7 +156,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl;
     cout << "  Testing unknown target ..." << endl;
-    Target tUnknownTarget(lab3);
+    Target tUnknownTarget(&spi, lab3);
   }
   catch(IException &e) {
     e.print();
@@ -164,7 +166,7 @@ int main(int argc, char *argv[]) {
   // Test case with override of body code
   lab4.AddGroup(inst2);
   lab4.AddGroup(kern2);
-  Target tOverrideBodyCode(lab4);
+  Target tOverrideBodyCode(&spi, lab4);
   cout << endl;
   cout << "  Testing case with bodycode override" << endl;
   cout << "     NaifBodyCode = " << tOverrideBodyCode.naifBodyCode() << endl;

@@ -49,6 +49,7 @@
 #include "ProjectionFactory.h"
 #include "ShapeModel.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 
 using namespace std;
 
@@ -186,7 +187,6 @@ namespace Isis {
             double x = p_distortionMap->UndistortedFocalPlaneX();
             double y = p_distortionMap->UndistortedFocalPlaneY();
             double z = p_distortionMap->UndistortedFocalPlaneZ();
-            //cout << "Look vector: " << x << " " << y << " " << z << endl; //debug
             return p_groundMap->SetFocalPlane(x, y, z);
           }
         }

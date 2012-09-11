@@ -14,6 +14,7 @@
 #include "QnetFileTool.h"
 #include "SerialNumber.h"
 #include "SerialNumberList.h"
+#include "Target.h"
 #include "Workspace.h"
 
 #include "qnet.h"

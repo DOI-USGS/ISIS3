@@ -33,6 +33,7 @@
 #include "Pvl.h"
 #include "ShapeModel.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 
 using namespace std;
 using namespace Isis;
@@ -44,13 +45,11 @@ class MyShape : public ShapeModel {
  }
 
    bool intersectSurface(std::vector<double> observerPos,
-                                    std::vector<double> lookDirection,
-                                    double tol=0)  {
+                                    std::vector<double> lookDirection)  {
       cout << "intersectSurface called with observer position = " << 
         observerPos[0] << ", " << observerPos[1] << ", " <<
         observerPos[2] << endl << "                             lookDirection = " <<
-        lookDirection[0] << ", " <<  lookDirection[1] << ", " << lookDirection[2] << 
-        endl << "                             tolerance= " << tol << endl;
+        lookDirection[0] << ", " <<  lookDirection[1] << ", " << lookDirection[2] << endl;
       SpiceDouble intersectionPoint[3] = {-2123.362258286, -2380.3717812236, 1194.6783966636};
       
       surfaceIntersection()->FromNaifArray(intersectionPoint);
@@ -106,12 +105,14 @@ class MyShape : public ShapeModel {
 int main() {
   Preference::Preferences(true);
   string inputFile = "$mgs/testData/ab102401.cub";
+  // string inputFile = "ab102401.cub";
   Cube cube;
   cube.open(inputFile);
   Camera *c = cube.getCamera();
   std::vector<Distance> radii = c->target()->radii();
   Pvl pvl = *cube.getLabel();
-  Target targ(pvl);
+  Spice spi(pvl);
+  Target targ(&spi, pvl);
   targ.setRadii(radii);
 
   cout << "Begin testing Shape Model base class...." << endl;
@@ -139,7 +140,7 @@ Local normal = -0.581842, -0.703663, 0.407823
   Emission                   = 46.966269013795
   */
   cout << "Testing pure virtual method intersectSurface..." << endl; 
-  if (!shape.intersectSurface(sB, lookB, 1)) { 
+  if (!shape.intersectSurface(sB, lookB)) { 
       cout << "...  intersectSurface method failed" << endl;
       return -1;
   }
@@ -190,11 +191,9 @@ Local normal = -0.581842, -0.703663, 0.407823
   shape.setSurfacePoint(*sp);
   cout << "   Do we have an intersection? " << shape.hasIntersection() << endl;
   cout << "   surface point = (" << sp->GetX().kilometers() << ", " << 
-    sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << endl;
+    sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << ")" << endl;
 
   // TODO 
   // Test alternate constructors ShapeModel() and ShapeModel(target)
-
-
   cube.close();
 }

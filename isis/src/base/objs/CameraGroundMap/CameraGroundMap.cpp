@@ -28,6 +28,7 @@
 #include "SurfacePoint.h"
 #include "Latitude.h"
 #include "Longitude.h"
+#include "Target.h"
 
 using namespace std;
 

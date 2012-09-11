@@ -4,6 +4,7 @@
 #include "Distance.h"
 #include "Process.h"
 #include "Pvl.h"
+#include "Target.h"
 
 using namespace std;
 using namespace Isis;

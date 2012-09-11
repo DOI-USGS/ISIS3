@@ -39,9 +39,10 @@
 #include "OriginalLabel.h"
 #include "Projection.h"
 #include "Pvl.h"
+#include "Projection.h"
 #include "SpecialPixel.h"
 #include "SpiceManager.h"
-#include "Projection.h"
+#include "Target.h"
 
 using namespace std;
 
@@ -111,6 +112,9 @@ namespace Isis {
 
     //  Get the target and check for validity
     PvlKeyword &target = label.FindKeyword("TargetName", PvlObject::Traverse);
+
+    cout << "Target name = " << target << endl;
+
     SpiceInt tcode;
     SpiceBoolean found;
     (void) bodn2c_c(target[0].c_str(), &tcode, &found);
@@ -119,6 +123,9 @@ namespace Isis {
     if(makeValid) {
       target.SetValue("Sky");
     }
+
+    cout << "Target name = " << target << endl;
+
     return (false);
   }
 

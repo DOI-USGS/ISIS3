@@ -42,6 +42,7 @@
 #include "PvlObject.h"
 #include "Pvl.h"
 #include "TextFile.h"
+#include "Target.h"
 #include "ToolPad.h"
 
 namespace Isis {
