@@ -89,6 +89,11 @@
     <change name="Travis Addair" date="2012-04-03">
       Added support for exporting cubes greater than 2GB to TIFFs.
     </change>
+    <change name="Steven Lambright" date="2012-08-28">
+      Fixed some problems with the big tiff exports that caused
+      corrupt outputs. The 2GB limitation should be removed
+      completely now. References #579.
+    </change>
   </history>
 
   <category>

@@ -53,7 +53,9 @@ namespace Isis {
    *
    * @internal
    *   @history 2012-04-04 Travis Addair - Added documentation.
-   *
+   *   @history 2012-08-28 Steven Lambright - The world file should no longer
+   *                           overwrite the output image. This is related to #832/#970.
+   *                           References #579.
    */
   class ImageExporter {
     public:

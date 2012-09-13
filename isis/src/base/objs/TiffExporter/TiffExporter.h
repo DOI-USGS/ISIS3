@@ -41,6 +41,11 @@ namespace Isis {
    *
    * @internal
    *   @history 2012-04-04 Travis Addair - Added documentation.
+   *   @history 2012-08-28 Steven Lambright - Fixed some problems with memory
+   *                         allocations/deallocations and a flag on the tiff
+   *                         files was not being set, but it was necessary to
+   *                         successfully write out tiff files (TIFFTAG_ROWSPERSTRIP),
+   *                         References #579.
    *
    */
   class TiffExporter : public StreamExporter {
@@ -63,7 +68,7 @@ namespace Isis {
       TIFF *m_image;
 
       //! Array containing all color channels for a line
-      char *m_raster;
+      unsigned char *m_raster;
   };
 };
 

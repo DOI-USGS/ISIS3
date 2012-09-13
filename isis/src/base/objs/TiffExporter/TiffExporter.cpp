@@ -1,5 +1,7 @@
 #include "TiffExporter.h"
 
+#include <QDebug>
+
 #include "Buffer.h"
 #include "FileName.h"
 #include "IException.h"
@@ -23,11 +25,13 @@ namespace Isis {
    * Destruct the exporter.
    */
   TiffExporter::~TiffExporter() {
-    _TIFFfree(m_raster);
-    m_raster = NULL;
+    if (m_image) {
+      TIFFClose(m_image);
+      m_image = NULL;
+    }
 
-    TIFFClose(m_image);
-    m_image = NULL;
+    delete [] m_raster;
+    m_raster = NULL;
   }
 
 
@@ -39,8 +43,12 @@ namespace Isis {
     PixelType type = getPixelType();
     int mult = (type == Isis::UnsignedByte) ? 1 : 2;
     int size = samples() * bands() * mult;
-    if ((m_raster = (char *) malloc(sizeof(char) * size)) == NULL) {
-      throw IException(IException::Programmer,
+
+    try {
+      m_raster = new unsigned char[size];
+    }
+    catch (...) {
+      throw IException(IException::Unknown,
           "Could not allocate enough memory", _FILEINFO_);
     }
   }
@@ -55,13 +63,16 @@ namespace Isis {
    */
   void TiffExporter::write(FileName outputName, int quality) {
     // Open the output image
-    if ((m_image = TIFFOpen(outputName.expanded().c_str(), "w")) == NULL) {
+    m_image = TIFFOpen(outputName.expanded().c_str(), "w");
+
+    if (m_image == NULL) {
       throw IException(IException::Programmer,
-          "Could not open outgoing image", _FILEINFO_);
+          "Could not open output image", _FILEINFO_);
     }
 
     TIFFSetField(m_image, TIFFTAG_IMAGEWIDTH, samples());
     TIFFSetField(m_image, TIFFTAG_IMAGELENGTH, lines());
+    TIFFSetField(m_image, TIFFTAG_ROWSPERSTRIP, 1);
     TIFFSetField(m_image, TIFFTAG_COMPRESSION, COMPRESSION_DEFLATE);
     TIFFSetField(m_image, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
 
@@ -89,9 +100,10 @@ namespace Isis {
   void TiffExporter::setBuffer(int s, int b, int dn) const {
     PixelType type = getPixelType();
     int index = s * bands() + b;
+    
     switch (type) {
       case UnsignedByte:
-        ((unsigned char *) m_raster)[index] = (unsigned char) dn;
+        m_raster[index] = (unsigned char) dn;
         break;
       case SignedWord:
         ((short int *) m_raster)[index] = (short int) dn;
