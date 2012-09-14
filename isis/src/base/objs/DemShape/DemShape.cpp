@@ -168,13 +168,19 @@ namespace Isis {
       double t = newIntersectPt[0] * newIntersectPt[0] +
           newIntersectPt[1] * newIntersectPt[1];
       
-      latDD = atan2(newIntersectPt[2], sqrt(t)) * RAD2DEG;
-      lonDD = atan2(newIntersectPt[1], newIntersectPt[0]) * RAD2DEG;
+      latDD = atan2(newIntersectPt[2], sqrt(t)) * 180.0 / PI;
+      // START DEBUG CODE
+      // latDD = atan2(newIntersectPt[2], sqrt(t)) * RAD2DEG;
+      lonDD = atan2(newIntersectPt[1], newIntersectPt[0]) * 180.0 / PI;
+      // END DEBUG CODE
+      // lonDD = atan2(newIntersectPt[1], newIntersectPt[0]) * RAD2DEG;
        
       if (lonDD < 0)
         lonDD += 360;
 
-      // Previous Sensor version used local version of this method with lat and lon doubles. ..Why Jeff???
+      // Previous Sensor version used local version of this method with lat and lon doubles. ..Why Jeff??? 
+      // Steven made the change to improve speed.  We will try using the primitives and see what differences
+      // the users notice in their time tests.  
       Distance radiusKm = localRadius(Latitude(latDD, Angle::Degrees),
                                       Longitude(lonDD, Angle::Degrees));
 

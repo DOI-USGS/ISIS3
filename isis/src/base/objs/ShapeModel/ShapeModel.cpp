@@ -205,7 +205,6 @@ namespace Isis {
     NaifStatus::CheckErrors();
     
     if (intersected) {
-      m_surfacePoint = new SurfacePoint(); 
       m_surfacePoint->FromNaifArray(intersectionPoint);
       m_hasIntersection = true;
     }
