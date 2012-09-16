@@ -1,0 +1,27 @@
+Unit test for Isis::Target
+
+  Good target test...
+     NaifBodyCode = 499
+     TargetName = Mars
+     IsSky = 0
+     Target radii = 3397/3397/3375
+
+  Testing Sky...
+     IsSky = 1
+     Sky Target radii = 1/1/1
+     NaifBodyCode = -94
+
+  Testing no instrument group ...
+**ERROR** Unable to find PVL group [Instrument].
+
+
+  Testing no kernels group ...
+**ERROR** Unable to find PVL group [Kernels].
+
+
+  Testing unknown target ...
+**I/O ERROR** Could not convert Target [Mard] to NAIF code.
+
+
+  Testing case with bodycode override
+     NaifBodyCode = 499
