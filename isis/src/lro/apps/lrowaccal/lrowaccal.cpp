@@ -3,12 +3,14 @@
 #include <vector>
 
 #include <QDir>
+#include <QRegExp>
 
 #include "Brick.h"
 #include "Camera.h"
 #include "Constants.h"
 #include "Cube.h"
 #include "CubeAttribute.h"
+#include "Message.h"
 #include "ProcessByBrick.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
@@ -41,7 +43,7 @@ vector<double> g_radianceResponsivity;
 bool g_dark = true, g_flatfield = true, g_radiometric = true, g_iof = true, g_specpix = true;
 
 double g_exposure; // Exposure duration
-double g_solarDistance = 1.01; // average distance in [AU]
+double g_solarDistance = 1.01; //!< average distance in [AU]
 double g_startTemperature, g_endTemperature;
 double g_temp1, g_temp2;
 
@@ -150,6 +152,11 @@ void IsisMain () {
       flatFile += "_Flatfield.????.cub";
     }
     CopyCubeIntoBuffer(flatFile, g_flatCube);
+
+    // invert the flat-field data here so we don't have to divide for every pixel of the wac
+    for (int i = 0; i < g_flatCube->size(); i++) {
+      (*g_flatCube)[i] = 1.0 / (*g_flatCube)[i];
+    }
   }
 
   PvlKeyword responsivity;
@@ -242,7 +249,7 @@ void IsisMain () {
   g_exposure = inst["ExposureDuration"];
 
   Cube *ocube = p.SetOutputCube("TO");
-  p.StartProcess(Calibrate);
+  p.ProcessCube(Calibrate, false);
 
   // Add an output group with the appropriate information
   PvlGroup calgrp("Radiometry");
@@ -274,7 +281,6 @@ void IsisMain () {
     calgrp += PvlKeyword("SpecialPixelsFile", specpixFile);
   ocube->putGroup(calgrp);
 
-  p.EndProcess();
 }
 
 void ResetGlobals () {
@@ -313,22 +319,58 @@ void Calibrate ( Buffer &inCube, Buffer &outCube ) {
     outCube[i] = inCube[i];
 
   if (g_dark) {
+    // Calculate a temperature factor for the current frame (this is done to avoid doing this for each pixel
+    double frameTemp = (g_endTemperature - g_startTemperature)/g_numFrames * frame + g_startTemperature;
+    double tempFactor = (frameTemp - g_temp2) / (g_temp1-g_temp2);
+
     for ( int b=0; b<inCube.BandDimension(); b++) {
       // We find the index of the corresponding dark frame band as the offset
       int offset = g_darkCube1->Index(1, frameHeight * (int) min(frame, g_darkCube1->LineDimension()/frameHeight - 1) + 1, b+1);
 
-      for (int i = 0; i < frameSize; i++) {
-        // Calculate the temperature for the current frame
-        double temp = (g_endTemperature - g_startTemperature)/g_numFrames * frame + g_startTemperature;
+      // We're bypassing Buffer::at for speed, so we need to make sure our
+      // index will not overrun the buffer
+      if(offset + frameSize > g_darkCube1->size()) {
+        string message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Dark cube 1)";
+        throw IException(IException::Programmer, message, _FILEINFO_);
+      }
+      if(offset + frameSize > g_darkCube2->size()) {
+        string message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Dark cube 2)";
+        throw IException(IException::Programmer, message, _FILEINFO_);
+      }
 
+      for (int i = 0; i < frameSize; i++) {
+        double dark1Pixel = (*g_darkCube1)[offset + i];
+        double dark2Pixel = (*g_darkCube2)[offset + i];
+        double &outputPixel = outCube[i + b*frameSize];
         // Interpolate between the two darks with the current temperaturube1
-        if (IsSpecial(g_darkCube1->at(offset + i)) || IsSpecial(g_darkCube2->at(offset + i)) || IsSpecial(outCube[i + b*frameSize]))
-          outCube[i + b*frameSize] = Isis::Null;
+        if (!IsSpecial(dark1Pixel) && !IsSpecial(dark2Pixel) && !IsSpecial(outputPixel)) {
+          if (g_temp1 != g_temp2) {
+            // Dark correction formula:
+            //
+            //    (dark1Pixel - dark2Pixel)
+            //    -------------------------   *   (frameTemp - dark2Temp)   +   dark2Pixel
+            //     (dark1Temp - dark2Temp)
+            //
+            // frameTemp:
+            //
+            //    (WAC end temp - WAC start temp)
+            //    -------------------------------   *   frame   +   WAC start temp
+            //         (WAC num framelets)
+            //
+            // tempFactor (calculated outside the loops for speed):
+            //
+            //    (frameTemp - dark2Temp)
+            //    -----------------------
+            //    (dark1Temp - dark2Temp)
+            //
+            outputPixel -= (dark1Pixel - dark2Pixel) * tempFactor + dark2Pixel;
+          }
+          else {
+            outputPixel -= dark1Pixel;
+          }
+        }
         else {
-          if (g_temp1 != g_temp2)
-            outCube[i + b*frameSize] -= (g_darkCube1->at(offset + i) - g_darkCube2->at(offset + i))/(g_temp1-g_temp2) * (temp - g_temp2) + g_darkCube2->at(offset + i);
-          else
-            outCube[i+b*frameSize] -= g_darkCube1->at(offset + i);
+          outputPixel = Isis::Null;
         }
       }
     }
@@ -339,11 +381,22 @@ void Calibrate ( Buffer &inCube, Buffer &outCube ) {
       // We find the index of the corresponding flat frame band as the offset
       int offset = g_flatCube->Index(1, frameHeight * (int) min(frame, (g_flatCube->LineDimension()-1) / frameHeight)+1, b+1);
 
+      // We're bypassing Buffer::at for speed, so we need to make sure our
+      // index will not overrun the buffer
+      if(offset + frameSize > g_flatCube->size()) {
+        string message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Flat-field cube)";
+        throw IException(IException::Programmer, message, _FILEINFO_);
+      }
+
+      int outFrameOffset = b*frameSize;
       for (int i = 0; i < frameSize; i++) {
-        if (g_flatCube->at(offset + i) <= 0 || IsSpecial(g_flatCube->at(offset + i)) || IsSpecial(outCube[i + b*frameSize]))
-          outCube[i+b*frameSize] = Isis::Null;
+        double flatPixel = (*g_flatCube)[offset + i];
+        double &outputPixel = outCube[i + outFrameOffset];
+
+        if (flatPixel > 0.0 && !IsSpecial(flatPixel) && !IsSpecial(outputPixel))
+          outputPixel *= flatPixel; // The flat-field data was inverted during load so we don't have to divide here.
         else
-          outCube[i+b*frameSize] /= g_flatCube->at(offset + i);
+          outputPixel = Isis::Null;
       }
     }
   }
@@ -400,183 +453,205 @@ double min ( double a, double b ) {
   return b;
 }
 
+/**
+ * Structure for store list of available dark file temps/times.
+ */
+struct DarkFileInfo {
+  double temp;
+  int time;
+
+  DarkFileInfo(double temp, int time)
+  {
+    this->temp = temp;
+    this->time = time;
+  }
+};
+
+/**
+ * @brief DarkFileInfo comparison object.
+ *
+ * Used for sorting DarkFileInfo objects. Sort first by difference from WAC temp, then difference from WAC time
+ *
+ */
+struct DarkComp {
+  double wacTemp;
+  int wacTime;
+
+  DarkComp(double wacTemp, int wacTime)
+  {
+    this->wacTemp = wacTemp;
+    this->wacTime = wacTime;
+  }
+
+  // sort dark files by distance from wac temp, then distance from wac time
+  bool operator() (const DarkFileInfo &A, const DarkFileInfo &B) {
+    if (abs(wacTemp - A.temp) < abs(wacTemp - B.temp)) return true;
+    if (abs(wacTemp - A.temp) > abs(wacTemp - B.temp)) return false;
+    if (abs(wacTime - A.time) < abs(wacTime - B.time)) return true;
+    return false;
+  }
+};
+
+/**
+ * Finds 2 best dark files for WAC calibration.
+ *
+ * GetDark will find the 2 closest available dark file tempuratures matching the given file name
+ * patter. Then find the dark file at each tempurature with the time closest to the WAC tempurature.
+ * If there is only one tempurature, it will pick the 2 closest times at that tempurature.
+ *
+ *
+ * @param fileString String pattern defining dark files to search (ie. $lro/calibration/wac_darks/WAC_COLOR_Offset68_*C_*T_Dark.????.cub)
+ * @param temp Tempurature of WAC being calibrated
+ * @param time Time of WAC being calibrated
+ * @param data1 Buffer to hold dark file 1 cub data
+ * @param data2 Buffer to hold dark file 2 cub data
+ * @param temp1 Tempurature of dark file 1
+ * @param temp2 Tempurature of dark file 2
+ * @param file1 Filename of dark file 1
+ * @param file2 Filename of dark file 2
+ */
 void GetDark(string fileString, double temp, double time, Buffer* &data1, Buffer* &data2, double & temp1, double & temp2, string & file1, string & file2) {
-  // Find the beginning and end of the "?"s in the versioned filename
   FileName filename(fileString);
-  string absolutePath = filename.expanded();
   string basename = FileName(filename.baseName()).baseName(); // We do it twice to remove the ".????.cub"
 
-  unsigned int tempIndex = basename.find("*C");
-  vector<double> temperatures;
+  // create a regular expression to capture the temp and time from filenames
+  QString regexPattern(basename.c_str());
+  regexPattern.replace("*", "([0-9\\.-]*)");
+  QRegExp regex(regexPattern);
 
-  unsigned int timeIndex = basename.find("*T");
-  vector<int> times;
+  // create a filter for the QDir to only load files matching our name
+  QString filter(basename.c_str());
+  filter.append(".*");
 
-  QDir dir( (QString)(iString)(absolutePath.substr(0, absolutePath.find_last_of("/"))) );
+  // get a list of dark files that match our basename
+  QDir dir( (QString)filename.path().c_str(), filter );
 
-  // Loop through all files in the dir and see if they match our name
+  vector<DarkFileInfo> darkFiles;
+  darkFiles.reserve(dir.count());
+
+  // Loop through all files in the dir that match our basename and extract time and temp
   for (unsigned int indx=0; indx < dir.count(); indx++) {
-    string file = FileName( FileName(dir[indx].toStdString()).baseName()).baseName(); // We do it twice to remove ".????.cub
-
-    size_t fileTempEndIndex = file.find("C", tempIndex);
-    size_t fileTimeEndIndex = file.find("T", fileTempEndIndex+1);
-    size_t fileTimeIndex = file.find_last_not_of("0123456789", fileTimeEndIndex-1) + 1;
-    if (fileTempEndIndex == string::npos || fileTimeEndIndex == string::npos || fileTimeIndex == string::npos)
-      continue;
-
-    bool matches = file.substr(0, tempIndex) == basename.substr(0,tempIndex);
-    matches = matches && ( file.substr(fileTempEndIndex, fileTimeIndex-fileTempEndIndex) == basename.substr(tempIndex+1, timeIndex-tempIndex-1) );
-    matches = matches && ( file.substr(fileTimeEndIndex) == basename.substr(timeIndex+1) );
-
-    if (matches) {
-      // Extract all available temperatures
-      Isis::iString tempStr = file.substr(tempIndex, fileTempEndIndex - tempIndex);
-
-      if ((tempStr.length() > 0) &&
-          (tempStr.find_first_not_of("0123456789.-") == string::npos)) {
-        // Make sure it isn't already included, otherwise add it
-        bool add = true;
-        for (unsigned int j=0; j<temperatures.size(); j++)
-          if (temperatures[j] == tempStr.ToDouble())
-            add = false;
-        if (add)
-          temperatures.push_back( tempStr.ToDouble());
-      }
-
-      // Extract all available times
-      Isis::iString timeStr = file.substr(fileTimeIndex, fileTimeEndIndex - fileTimeIndex);
-      if ((timeStr.length() > 0) &&
-          (timeStr.find_first_not_of("0123456789.-") == string::npos)) {
-        // Make sure it isn't already included, otherwise add it
-        bool add = true;
-        for (unsigned int j=0; j<times.size(); j++)
-          if (times[j] == timeStr.ToDouble())
-            add = false;
-        if (add)
-          times.push_back( timeStr.ToInteger());
-      }
+    // match against our regular expression
+    int pos = regex.indexIn(dir[indx]);
+    if (pos == -1) {
+      continue; // filename did not match basename regex (time or temp contain non-digit)
     }
 
+    // Get a list of regex matches. Item 0 should be the full string, item 1
+    // is temp and item 2 is time.
+    QStringList texts = regex.capturedTexts();
+    if (texts.size() < 3) {
+      continue; // could not find time and/or temp
+    }
+
+    // extract time/temp from regex texts
+    bool tempOK, timeOK;
+    double fileTemp = texts[1].toDouble(&tempOK);
+    int fileTime = texts[2].toInt(&timeOK);
+    if (!tempOK || !timeOK) {
+      continue; // time or temp was not a valid numeric value
+    }
+
+    DarkFileInfo info(fileTemp, fileTime);
+    darkFiles.push_back(info);
   }
 
-  // Now that we have all the available temperatures, we need to find the nearest two temperatures and interpolate (or extrapolate) between them
-  if (temperatures.size() == 0) {
-    string msg = "No Dark files exist for these image options [" + basename + "]";
-    throw IException(IException::User, msg, _FILEINFO_);
-  }
-  else if ( temperatures.size() > 2) {
-    if (abs(temp - temperatures[0]) < abs(temp - temperatures[1])){
-      temp1 = temperatures[0];
-      temp2 = temperatures[1];
-    }
-    else {
-      temp1 = temperatures[1];
-      temp2 = temperatures[0];
-    }
-    for (unsigned int i=2; i<temperatures.size(); i++){
-      if (abs(temp - temperatures[i]) < abs(temp - temp1)) {
-        temp2 = temp1;
-        temp1 = temperatures[i];
-      }
-      else if (abs(temp - temperatures[i]) < abs(temp - temp2)) {
-        temp2 = temperatures[i];
-      }
-    }
-  }
-  else {
-    temp1=temperatures[0];
-    temp2=temp1;
-  }
-
-  tempIndex = fileString.find("*C");
-  timeIndex = fileString.find("*T");
-  // And then find the latest available time
-  int bestTime = -1;
-  for (unsigned int i=0; i<times.size(); i++) {
-    try {
-      FileName f1(fileString.substr(0, tempIndex) + iString((int)temp1) + fileString.substr(tempIndex+1, timeIndex-tempIndex-1) + iString(times[i]) + fileString.substr(timeIndex+1));
-      FileName f2(fileString.substr(0, tempIndex) + iString((int)temp2) + fileString.substr(tempIndex+1, timeIndex-tempIndex-1) + iString(times[i]) + fileString.substr(timeIndex+1));
-
-
-      f1 = f1.highestVersion();
-      f2 = f2.highestVersion();
-
-      if ( f1.fileExists() && f2.fileExists() && abs(times[i] - time) < abs(bestTime - time))
-        bestTime = times[i];
-    }
-    catch ( IException e) {
-      // We ignore exceptions as we expect them every time there is not a file with the given temperature and time
-    }
-  }
-
-  if (bestTime == -1) {
-    string msg = "No Dark files exist for these image options [" + basename + "]\n no matching times";
+  // we require at least 2 different dark files to interpolate/extrapolate
+  if (darkFiles.size() < 2) {
+    string msg = "Not enough Dark files exist for these image options [" + basename + "]. Need at least 2 files with different temperatures\n";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  file1 = fileString.substr(0, tempIndex) + iString((int)temp1) + fileString.substr(tempIndex+1, timeIndex-tempIndex-1) + iString(bestTime) + fileString.substr(timeIndex+1);
-  file2 = fileString.substr(0, tempIndex) + iString((int)temp2) + fileString.substr(tempIndex+1, timeIndex-tempIndex-1) + iString(bestTime) + fileString.substr(timeIndex+1);
+  // sort the files by distance from wac temp and time
+  DarkComp darkComp(temp, (int)time);
+  sort(darkFiles.begin(), darkFiles.end(), darkComp);
+
+  size_t temp1Index = 0;
+  size_t temp2Index;
+
+  temp1 = darkFiles[temp1Index].temp;
+
+  for (temp2Index = temp1Index+1; temp2Index < darkFiles.size(); temp2Index++) {
+    if (darkFiles[temp2Index].temp != temp1) {
+      break;
+    }
+  }
+
+  if (temp2Index >= darkFiles.size()) {
+    temp2Index = 1;
+  }
+
+  temp2 = darkFiles[temp2Index].temp;
+
+  int time1 = darkFiles[temp1Index].time;
+  int time2 = darkFiles[temp2Index].time;
+
+  unsigned int tempIndex = fileString.find("*C");
+  unsigned int timeIndex = fileString.find("*T");
+
+  file1 = fileString;
+  file1.replace(timeIndex, 1, iString(time1));
+  file1.replace(tempIndex, 1, iString((int)temp1));
+
+  file2 = fileString;
+  file2.replace(timeIndex, 1, iString(time2));
+  file2.replace(tempIndex, 1, iString((int)temp2));
 
   CopyCubeIntoBuffer ( file1, data1 );
   CopyCubeIntoBuffer ( file2, data2 );
 }
 
 void GetMask(string &fileString, double temp, Buffer* &data) {
-  // Find the beginning and end of the "?"s in the versioned filename
   FileName filename(fileString);
-  string absolutePath = filename.expanded();
   string basename = FileName(filename.baseName()).baseName(); // We do it twice to remove the ".????.cub"
 
   unsigned int index = basename.find_first_of("*");
-  unsigned int charsAfterVersion = basename.length() - index - 1;
 
-  vector<double> temperatures;
+  // create a filter for the QDir to only load files matching our name
+  QString filter(basename.c_str());
+  filter.append(".*");
 
-  QDir dir( (QString)(iString)(absolutePath.substr(0, absolutePath.find_last_of("/"))) );
+  QDir dir( (QString)filename.path().c_str(), filter );
 
-  // Loop through all files in the dir and see if they match our name
+  // create a regular expression to capture the temp and time from filenames
+  QString regexPattern(basename.c_str());
+  regexPattern.replace("*", "([0-9\\.-]*)");
+  QRegExp regex(regexPattern);
+
+  double bestTemp = DBL_MAX;
   for (unsigned int indx=0; indx < dir.count(); indx++) {
-
-    string file = FileName( FileName(dir[indx].toStdString()).baseName()).baseName(); // We do it twice to remove ".????.cub"
-    bool leftSide = file.substr(0, index) == basename.substr(0, index);
-    bool rightSide = ((int)file.length()-(int)charsAfterVersion) >= 0;
-    if (rightSide) {
-      rightSide = rightSide &&
-        (file.substr(file.length()-charsAfterVersion) == basename.substr(index+1));
+    // match against our regular expression
+    int pos = regex.indexIn(dir[indx]);
+    if (pos == -1) {
+      continue; // filename did not match basename regex (temp contain non-digit)
     }
 
-    if (leftSide && rightSide) {
+    // Get a list of regex matches. Item 0 should be the full string, item 1 is temp
+    QStringList texts = regex.capturedTexts();
+    if (texts.size() < 2) {
+      continue; // could not find temp
+    }
 
-      Isis::iString version = file.substr(index, file.length()-charsAfterVersion-index);
+    // extract time/temp from regex texts
+    bool tempOK;
+    double fileTemp = texts[1].toDouble(&tempOK);
+    if (!tempOK) {
+      continue; // temp was not a valid numeric value
+    }
 
-      if ((version.length() > 0) &&
-          (version.find_first_not_of("0123456789.-") == string::npos)) {
-        // Make sure it isn't already included, otherwise add it
-        bool add = true;
-        for (unsigned int j=0; j<temperatures.size(); j++)
-          if (temperatures[j] == version.ToDouble())
-            add = false;
-        if (add)
-          temperatures.push_back( version.ToDouble());
-      }
+    if (abs(temp - fileTemp) < abs(temp - bestTemp)) {
+      bestTemp = fileTemp;
     }
   }
 
-  // Now that we have all the available temperatures, we need to find the nearest temperature
-  if (temperatures.size() == 0) {
-    string msg = "No Dark files exist for these image options [" + basename + "]";
+  if (bestTemp == DBL_MAX) {
+    string msg = "No files exist for these mask options [" + basename + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  double bestTemp = temperatures[0];
-  for (unsigned int i=1; i< temperatures.size(); i++) {
-    if (abs(temp - temperatures[i]) < abs(temp - bestTemp))
-      bestTemp = temperatures[i];
-  }
   index = fileString.find_first_of("*");
+  fileString.replace(index, 1, iString((int)bestTemp));
 
-  string file = fileString.substr(0, index) + iString((int)bestTemp) + fileString.substr(index+1);
-  CopyCubeIntoBuffer ( file, data );
-  fileString = file;
+  CopyCubeIntoBuffer ( fileString, data );
 }
 
