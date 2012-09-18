@@ -7,9 +7,124 @@
   </brief>
 
   <description>
-    This program applies a dark and flat-field correction for each framelet based on the 
-    band's filter number. In order to output in I/F units, the cube must have spice
-    data.
+    <p>
+      This program applies a dark, flat-field and radiometric correction for each framelet based on the
+      band's filter number. There is also an optional mask to replace special pixels in the calibrated image. In order to output in I/F units, the cube must have spice
+      data.
+    </p>
+
+    <p>
+      Correction is applied in the following order: <b>Dark</b>, <b>Flat-field</b>, <b>Radiometric</b>, <b>Special pixel mask</b>
+    </p>
+
+    <h3>Dark Correction:</h3>
+    <p>
+      If DarkFile parameter is set, the given file(s) will be used for calibration. If DarkFile is set to
+      "Default" or not set the dark files will be looked up based on the time and temperature in the WAC being calibrated.
+      <code>MiddleTemperatureFpa</code> is used for temperature and <code>StartTime</code> for time. lrowaccal will attempt
+      to find the 2 dark files with closest time/temperature and interpolate/extrapolate from them. The method for finding dark
+      files is as follows:
+      <ul>
+      <li>Create filename template based on WAC image offset and type (UV, BW, etc). example: WAC_UV_Offset68_*C_*T_Dark.????.cub</li>
+      <li>Look in $lro/calibration/wac_darks for matching files.</li>
+      <li>Sort files on to factors:
+        <ol>
+          <li>abs(dark temp - WAC temp)</li>
+          <li>abs(dark time - WAC time)</li>
+        </ol>
+        <li>
+          Example:
+          <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+            WAC Temp = 23.33 and WAC Time = 314264519.932493<br/>
+            <br/>
+            WAC_UV_Offset68_-10C_319412928T_Dark.0005.cub<br/>
+            WAC_UV_Offset68_-15C_319412928T_Dark.0005.cub<br/>
+            WAC_UV_Offset68_-20C_311632116T_Dark.0005.cub<br/>
+            WAC_UV_Offset68_-20C_319412928T_Dark.0005.cub<br/>
+            WAC_UV_Offset68_-25C_319412928T_Dark.0005.cub<br/>
+            WAC_UV_Offset68_-30C_311632116T_Dark.0005.cub<br/>
+            <br/>
+            becomes<br/>
+            <br/>
+            WAC_UV_Offset68_-25C_319412928T_Dark.0005.cub<br/>
+            WAC_UV_Offset68_-20C_311632116T_Dark.0005.cub<br/>
+            WAC_UV_Offset68_-20C_319412928T_Dark.0005.cub<br/>
+            WAC_UV_Offset68_-30C_311632116T_Dark.0005.cub<br/>
+            WAC_UV_Offset68_-15C_319412928T_Dark.0005.cub<br/>
+            WAC_UV_Offset68_-10C_319412928T_Dark.0005.cub<br/>
+          </div>
+        </li>
+      </li>
+      <li>Take the 2 closest tempuratures (-25C and -20C in the example).</li>
+      <li>Select the closest time for each tempurature.
+        <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+          Example result:<br/>
+          <br/>
+          WAC_UV_Offset68_-25C_319412928T_Dark.0005.cub<br/>
+          WAC_UV_Offset68_-20C_311632116T_Dark.0005.cub<br/>
+        </div>
+      </li>
+      <li>
+        If only one tempurature is available, the 2 times closest to the WAC time will be chosen. This will
+        allow WACs to always be calibrated against something, instead of just failing.
+        <div style="font-size:90%; font-family:monospace; margin:5px; margin-left:30px;">
+          Example result:<br/>
+          <br/>
+          WAC_UV_Offset68_-20C_311632116T_Dark.0005.cub<br/>
+          WAC_UV_Offset68_-20C_319412928T_Dark.0005.cub<br/>
+        </div>
+      </li>
+      </ul>
+    </p>
+    <p>
+      Once the dark files are found, the correction is applied:
+      <pre>
+        output[pixel] -= (dark1[pixel] - dark2[pixel])/(dark1Temp - dark2Temp)*(frameTemp-dark2Temp) + dark2[pixel]
+      </pre>
+        where
+      <pre>
+        dark1, dark2 = dark file cubes
+        dark1Temp, dark2Temp = temperature of dark1 file and dark2 file
+        frameTemp = (WAC EndTemperatureFpa - WAC BeginTemperatureFpa)/WAC NumFramelets * frame + WAC BeginTemperatureFpa
+      </pre>
+    </p>
+
+    <h3>Flat-field Correction:</h3>
+    <p>
+      <pre>
+        output[pixel] /= flatfield[pixel]
+      </pre>
+
+      If FlatfieldFile is not set, flat-field cube is loaded from $lro/calibration/wac_flats/WAC_&lt;wac mode&gt;_Flatfield.????.cub
+    </p>
+
+    <h3>Radiometric Correction:</h3>
+    <p>
+      <pre>
+      output[pixel] /= WAC ExposureDuration
+      if radiometricType == iof
+        output[pixel] *= solarDistance<sup>2</sup> / iofResponsivity[band]
+      else
+        output[pixel] /= radianceResponsivity[band]
+      </pre>
+      where
+      <pre>
+        solarDistance is distance from the Moon to the Sun
+      </pre>
+
+      If RadiometricFile is not set, radiometric responsivity is loaded from $lro/calibration/WAC_RadiometricResponsivity.????.pvl
+    </p>
+
+    <h3>Special Pixel Mask:</h3>
+    <p>
+      <pre>
+      for each framelet in output cube
+        if specialPixelMask[pixel] is special
+          outputFramelet[pixel] = specialPixelMask[pixel]
+      </pre>
+
+      If SpecialPixelsFile is not set, special pixel mask is loaded from $lro/calibration/wac_masks/WAC_&lt;wac mode&gt;_&lt;temp&gt;C_SpecialPixels.????.cub. temp is closest temperature to WAC MiddleTemperatureFpa.
+    </p>
   </description>
 
   <category>
@@ -19,6 +134,17 @@
   <history>
     <change name="Jacob Danton" date="2009-07-01">
       Original version
+    </change>
+    <change name="Dan Clarke" date="2012-08-13">
+      Updated use of deprecated methods (use ProcessCube instead 
+      of Start/EndProcess). Updated documentation/comments. 
+      Optimized/cleaned up code in Calibrate, GetDark, and GetMask.
+      Changed the algorithm for finding dark files in GetDark. 
+      GetDark will now find the two closest available dark file 
+      temperatures matching the input WAC cube. Then, it will find
+      the dark file at each temperature with the time closest to the 
+      WAC time. This should prevent failed calibrations from missing 
+      darks.
     </change>
   </history>
 
