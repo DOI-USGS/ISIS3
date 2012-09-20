@@ -31,7 +31,10 @@ namespace Isis {
    * @brief Format ascii tables
    *
    * This class takes in a series of string vectors and writes them out to a
-   * file as a table. Formatting options are up to the user.
+   * file as a table. Formatting options are up to the user. This was developed for
+   * cubediff's table output option, and is being utilized by the WriteTabular class
+   * (which currently resides in the cubediff folder).
+   * 
    *
    * @ingroup Utility
    *
@@ -39,9 +42,12 @@ namespace Isis {
    *
    * @internal
    *   @history 2007-06-18 Brendan George Fixed error message outputs and
-   *           unitTest
+   *                           unitTest
    *   @history 2009-10-14 Eric Hyer Added documentation;
-   *                                 Moved from base/apps/cubediff to base/objs;
+   *                           Moved from base/apps/cubediff to base/objs;
+   *   @history 2012-09-20 Steven Lambright - Improved unit test, fixed bug where uninitialized
+   *                           member variables were causing errors to be thrown sometimes.
+   *                           Fixes #1125.
    */
   class Column {
     public:
@@ -75,27 +81,12 @@ namespace Isis {
       void SetAlignment(Column::Align alignment);
       void SetPrecision(unsigned int precision);
 
-      //! get the Column's name
-      std::string Name() {
-        return p_name;
-      };
+      std::string Name() const; 
+      unsigned int Width() const;
+      Column::Type DataType() const;
+      Column::Align Alignment() const;
+      unsigned int Precision() const;
 
-      //! get the Column's width
-      unsigned int Width() {
-        return p_width;
-      };
-
-      Column::Type DataType();
-
-      //! get the Column's alignment
-      Column::Align Alignment() {
-        return p_align;
-      };
-
-      //! get the Column's precision
-      unsigned int Precision() {
-        return p_precision;
-      };
 
     private:
       //! Name of the Column
