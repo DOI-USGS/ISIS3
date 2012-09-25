@@ -1,6 +1,12 @@
 APPNAME = jigsaw
-#This test exercises a framing camera, cholmod solution method, solving for radius, solving for twist, using a two tier M estimator approach
-#and spsolve=position.
+# This test exercises the bundle adjustment of images from the Apollo frame camera.
+# sparse (cholmod) method, solving for position, angles (with twist), and radius; with error propagation; using a two tier M-estimator approach.
+
+# The "cat bundleout.txt" command in these tests uses sed to do the following (in order):
+# 1. remove cube filename paths
+# 2. remove net filename paths
+# 3. remove digits beyond the fifth decimal place of decimal numbers
+# 4. remove date and time
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -23,7 +29,7 @@ commands:
 	output_csv=yes \
 	residuals_csv=yes \
 	ckdegree=2 \
-	solvedegree=2 \
+	cksolvedegree=2 \
 	camsolve=angles \
 	spsolve=position  > /dev/null;
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
@@ -31,11 +37,6 @@ commands:
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
 	  > $(OUTPUT)/mEstimator_bundleout.txt
-	# The above command uses sed to do the following (in order):
-	# 1. remove cube filename paths
-	# 2. remove net filename paths
-	# 3. remove digits beyond the fifth decimal place of decimal numbers
-	# 4. remove date and time
 	cat residuals.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g'\
 	  > $(OUTPUT)/mEstimator_residuals.csv
 	cat bundleout_images.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \

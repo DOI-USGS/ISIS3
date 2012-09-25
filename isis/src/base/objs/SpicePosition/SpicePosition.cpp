@@ -842,6 +842,7 @@ namespace Isis {
                                     const std::vector<double>& YC,
                                     const std::vector<double>& ZC,
                                     const Source type) {
+
     Isis::PolynomialUnivariate function1(p_degree);
     Isis::PolynomialUnivariate function2(p_degree);
     Isis::PolynomialUnivariate function3(p_degree);
@@ -1236,7 +1237,7 @@ namespace Isis {
 
     // Evaluate the polynomials at current et to get position;
     p_coordinate[0] = functionX.Evaluate(rtime);
-    p_coordinate[1] = functionY.Evaluate(rtime) ;
+    p_coordinate[1] = functionY.Evaluate(rtime);
     p_coordinate[2] = functionZ.Evaluate(rtime);
 
     if(p_hasVelocity) {
@@ -1269,6 +1270,9 @@ namespace Isis {
   void SpicePosition::SetEphemerisTimePolyFunctionOverHermiteConstant() {
     SetEphemerisTimeHermiteCache();
     std::vector<double> hermiteCoordinate = p_coordinate;
+
+//    std::cout << hermiteCoordinate << std::endl;
+
     std::vector<double> hermiteVelocity = p_velocity;
     SetEphemerisTimePolyFunction();
 

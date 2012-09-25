@@ -34,7 +34,8 @@
 #include "ObservationNumberList.h"
 #include "Camera.h"
 #include "Statistics.h"
-#include "SpicePosition.h"
+//#include "SpicePosition.h"
+//#include "SpiceRotation.h"
 #include "Progress.h"
 #include "CameraGroundMap.h"
 #include "ControlMeasure.h"
@@ -139,6 +140,9 @@ namespace Isis {
    *   @history 2011-12-20 Ken Edmundson, Fixes to outlier rejection. Added
    *                          rejection multiplier member variable, can be set in
    *                          jigsaw interface.
+   *   @history 2012-02-02 Debbie A. Cook, Added SetSolvePolyOverHermite method
+   *                          and members m_bSolvePolyOverHermite and 
+   *                          m_nPositionType. 
    *   @history 2012-03-26 Orrin Thomas, added maximum likelihood capabilities
    *   @history 2012-05-21 Debbie A. Cook, Added initialization of m_dRejectionMultiplier
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
@@ -146,10 +150,14 @@ namespace Isis {
    */
   class BundleAdjust {
     public:
-      BundleAdjust(const std::string &cnetFile, const std::string &cubeList,                                     bool printSummary = true);
-      BundleAdjust(const std::string &cnetFile, const std::string &cubeList,        const std::string &heldList, bool printSummary = true);
-      BundleAdjust( Isis::ControlNet &cnet,  Isis::SerialNumberList &snlist,                                     bool printSummary = true);
-      BundleAdjust( Isis::ControlNet &cnet,  Isis::SerialNumberList &snlist, Isis::SerialNumberList &heldsnlist, bool printSummary = true);
+      BundleAdjust(const std::string &cnetFile, const std::string &cubeList,
+                   bool printSummary = true);
+      BundleAdjust(const std::string &cnetFile, const std::string &cubeList,
+                   const std::string &heldList, bool printSummary = true);
+      BundleAdjust(Isis::ControlNet &cnet, Isis::SerialNumberList &snlist,
+                   bool printSummary = true);
+      BundleAdjust(Isis::ControlNet &cnet, Isis::SerialNumberList &snlist,
+                   Isis::SerialNumberList &heldsnlist, bool printSummary = true);
       ~BundleAdjust();
 
       bool ReadSCSigmas(const std::string &scsigmasList);
@@ -169,6 +177,12 @@ namespace Isis {
 
       void SetSolveTwist(bool solve) { m_bSolveTwist = solve; ComputeNumberPartials(); }
       void SetSolveRadii(bool solve) { m_bSolveRadii = solve; }
+      void SetSolvePolyOverHermite(bool b) { m_bSolvePolyOverHermite = b;
+        if( b ) m_nPositionType = SpicePosition::PolyFunctionOverHermiteConstant; }
+
+      void SetSolvePolyOverPointing(bool b) { m_bSolvePolyOverPointing = b;
+        if( b ) m_nPointingType = SpiceRotation::PolyFunctionOverSpice; }
+
       void SetErrorPropagation(bool b) { m_bErrorPropagation = b; }
       void SetOutlierRejection(bool b) { m_bOutlierRejection = b; }
       void SetRejectionMultiplier(double d) { m_dRejectionMultiplier = d; }
@@ -181,13 +195,17 @@ namespace Isis {
 //    void SetGlobalSurfaceYAprioriSigma(double d) { m_dGlobalSurfaceYAprioriSigma = d; }
 //    void SetGlobalSurfaceZAprioriSigma(double d) { m_dGlobalSurfaceZAprioriSigma = d; }
 //
-      void SetGlobalSpacecraftPositionAprioriSigma(double d) { m_dGlobalSpacecraftPositionAprioriSigma = d; }
-      void SetGlobalSpacecraftVelocityAprioriSigma(double d) { m_dGlobalSpacecraftVelocityAprioriSigma = d; }
-      void SetGlobalSpacecraftAccelerationAprioriSigma(double d) { m_dGlobalSpacecraftAccelerationAprioriSigma = d; }
+//      void SetGlobalSpacecraftPositionAprioriSigma(double d) { m_dGlobalSpacecraftPositionAprioriSigma = d; }
+//      void SetGlobalSpacecraftVelocityAprioriSigma(double d) { m_dGlobalSpacecraftVelocityAprioriSigma = d; }
+//      void SetGlobalSpacecraftAccelerationAprioriSigma(double d) { m_dGlobalSpacecraftAccelerationAprioriSigma = d; }
 
-      void SetGlobalCameraAnglesAprioriSigma(double d) {  if( m_nNumberCameraCoefSolved < 1 ) return; m_dGlobalCameraAnglesAprioriSigma[0] = d; }
-      void SetGlobalCameraAngularVelocityAprioriSigma(double d) { if( m_nNumberCameraCoefSolved < 2 ) return; m_dGlobalCameraAnglesAprioriSigma[1] = d; }
-      void SetGlobalCameraAngularAccelerationAprioriSigma(double d) { if( m_nNumberCameraCoefSolved < 3 ) return; m_dGlobalCameraAnglesAprioriSigma[2] = d; }
+      void SetGlobalSpacecraftPositionAprioriSigma(double d) { if( m_nNumberCamPosCoefSolved < 1 ) return; m_dGlobalSpacecraftPositionAprioriSigma[0] = d; }
+      void SetGlobalSpacecraftVelocityAprioriSigma(double d) { if( m_nNumberCamPosCoefSolved < 2 ) return; m_dGlobalSpacecraftPositionAprioriSigma[1] = d; }
+      void SetGlobalSpacecraftAccelerationAprioriSigma(double d) { if( m_nNumberCamPosCoefSolved < 3 ) return; m_dGlobalSpacecraftPositionAprioriSigma[2] = d; }
+
+      void SetGlobalCameraAnglesAprioriSigma(double d) {  if( m_nNumberCamAngleCoefSolved < 1 ) return; m_dGlobalCameraAnglesAprioriSigma[0] = d; }
+      void SetGlobalCameraAngularVelocityAprioriSigma(double d) { if( m_nNumberCamAngleCoefSolved < 2 ) return; m_dGlobalCameraAnglesAprioriSigma[1] = d; }
+      void SetGlobalCameraAngularAccelerationAprioriSigma(double d) { if( m_nNumberCamAngleCoefSolved < 3 ) return; m_dGlobalCameraAnglesAprioriSigma[2] = d; }
 
 //    void SetGlobalCameraAngularVelocityAprioriSigma(double d) { m_dGlobalCameraAngularVelocityAprioriSigma = d; }
 //    void SetGlobalCameraAngularAccelerationAprioriSigma(double d) { m_dGlobalCameraAngularAccelerationAprioriSigma = d; }
@@ -208,14 +226,15 @@ namespace Isis {
         AnglesOnly,
         AnglesVelocity,
         AnglesVelocityAcceleration,
-        All
+        CKAll
       };
 
       enum SpacecraftPositionSolveType {
         Nothing,
         PositionOnly,
         PositionVelocity,
-        PositionVelocityAcceleration
+        PositionVelocityAcceleration,
+        SPKAll
       };
 
       struct SpacecraftWeights {
@@ -227,13 +246,20 @@ namespace Isis {
       void SetDecompositionMethod(DecompositionMethod method);
 
       void SetSolveCmatrix(CmatrixSolveType type);
-      void SetSolveSpacecraftPosition(SpacecraftPositionSolveType type) { m_spacecraftPositionSolveType = type; }
+      void SetSolveSpacecraftPosition(SpacecraftPositionSolveType type);
 
       //! Set the degree of the polynomial to fit to the camera angles
-      void SetCkDegree(int degree) { m_nckDegree = degree; }
+      void SetCKDegree(int degree) { m_nCKDegree = degree; }
 
       //! Set the degree of the polynomial to adjust in the solution
-      void SetSolveCamDegree(int degree) { m_nsolveCamDegree = degree; }
+      void SetSolveCKDegree(int degree) { m_nsolveCKDegree = degree; }
+
+      //! Set the degree of the polynomial to fit to the camera position
+      void SetSPKDegree(int degree) { m_nSPKDegree = degree; }
+
+      //! Set the degree of the camera position polynomial to adjust in the
+      //! solution
+      void SetSolveSPKDegree(int degree) { m_nsolveSPKDegree = degree; }
 
       int BasisColumns();
       int ComputeConstrainedParameters();
@@ -302,6 +328,8 @@ namespace Isis {
                                                              //!< flags...
       bool m_bSolveTwist;                                    //!< to solve for "twist" angle
       bool m_bSolveRadii;                                    //!< to solve for point radii
+      bool m_bSolvePolyOverHermite;                          //!< to fit polynomial over existing Hermite
+      bool m_bSolvePolyOverPointing;                         //!< to fit polynomial over existing pointing
       bool m_bObservationMode;                               //!< for observation mode (explain this somewhere)
       bool m_bErrorPropagation;                              //!< to perform error propagation
       bool m_bOutlierRejection;                              //!< to perform automatic outlier detection/rejection
@@ -333,12 +361,16 @@ namespace Isis {
       int m_nIgnoredPoints;                                  //!< number of ignored points
       int m_nHeldImages;                                     //!< number of 'held' images (define)
       int m_nHeldObservations;                               //!< number of 'held' observations (define)
-      int m_nckDegree;                                       //!< ck degree (define)
-      int m_nsolveCamDegree;                                 //!< solve cad degree (define)
-      int m_nNumberCameraCoefSolved;                         //!< number of camera angle coefficients in solution
+      int m_nCKDegree;                                       //!< ck degree (define)
+      int m_nsolveCKDegree;                                  //!< solve cad degree (define)
+      int m_nNumberCamAngleCoefSolved;                         //!< number of camera angle coefficients in solution
+      int m_nSPKDegree;                                      //!< spk degree (define)
+      int m_nsolveSPKDegree;                                 //!< solve spk degree (define)
+      int m_nNumberCamPosCoefSolved;                         //!< number of camera position coefficients in solution
       int m_nUnknownParameters;                              //!< total number of parameters to solve for
       int m_nBasisColumns;                                   //!< number of columns (parameters) in normal equations
-
+      SpicePosition::Source m_nPositionType;                 //!< type of SpicePosition interpolation
+      SpiceRotation::Source m_nPointingType;                 //!< type of SpiceRotation interpolation
       std::vector<int> m_nPointIndexMap;                     //!< index into normal equations of point parameter positions
       std::vector<int> m_nImageIndexMap;                     //!< index into normal equations of image parameter positions
 
@@ -379,11 +411,12 @@ namespace Isis {
       double m_dGlobalSurfaceYAprioriSigma;                  //!< surface point y apriori sigma
       double m_dGlobalSurfaceZAprioriSigma;                  //!< surface point z apriori sigma
 
-      double m_dGlobalSpacecraftPositionAprioriSigma;        //!< spacecraft coordinates apriori sigmas
-      double m_dGlobalSpacecraftVelocityAprioriSigma;        //!< spacecraft coordinate velocities apriori sigmas
-      double m_dGlobalSpacecraftAccelerationAprioriSigma;    //!< spacecraft coordinate accelerations apriori sigmas
+      std::vector<double> m_dGlobalSpacecraftPositionAprioriSigma; //!< camera position apriori sigmas: size is # camera position coefficients solved
+//      double m_dGlobalSpacecraftPositionAprioriSigma;        //!< spacecraft coordinates apriori sigmas
+//      double m_dGlobalSpacecraftVelocityAprioriSigma;        //!< spacecraft coordinate velocities apriori sigmas
+//      double m_dGlobalSpacecraftAccelerationAprioriSigma;    //!< spacecraft coordinate accelerations apriori sigmas
 
-      std::vector<double> m_dGlobalCameraAnglesAprioriSigma;              //!< camera angles apriori sigmas: size is # camera coefficients solved
+      std::vector<double> m_dGlobalCameraAnglesAprioriSigma; //!< camera angles apriori sigmas: size is # camera angle coefficients solved
 //      double m_dGlobalCameraAnglesAprioriSigma;              //!< camera angles apriori sigmas
 //      double m_dGlobalCameraAngularVelocityAprioriSigma;     //!< camera angular velocities apriori sigmas
 //      double m_dGlobalCameraAngularAccelerationAprioriSigma; //!< camera angular accelerations apriori sigmas

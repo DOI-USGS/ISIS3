@@ -1073,10 +1073,10 @@ namespace Isis {
             continue;
 
           // TODO: What do we do
-          iString msg = "Cannot compute lat/lon/radius (x/y/z) for "
-              "ControlPoint [" + GetId() + "], measure [" +
-              m->GetCubeSerialNumber() + "]";
-          throw IException(IException::User, msg, _FILEINFO_);
+//          iString msg = "Cannot compute lat/lon/radius (x/y/z) for "
+//              "ControlPoint [" + GetId() + "], measure [" +
+//              m->GetCubeSerialNumber() + "]";
+//          throw IException(IException::User, msg, _FILEINFO_);
 
           // m->SetFocalPlaneMeasured(?,?);
         }

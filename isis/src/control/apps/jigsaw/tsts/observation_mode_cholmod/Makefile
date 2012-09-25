@@ -1,5 +1,12 @@
 APPNAME = jigsaw
-#This test exercises observation mode using the CHOLMOD solution on HiRISE images, with update=yes
+# This test exercises the bundle adjustment of HiRISE images with observation mode, updating cubes.
+# sparse (cholmod) method, solving for angles (3rd degree polynomial), updating cubes.
+
+# The "cat bundleout.txt" command in these tests uses sed to do the following (in order):
+# 1. remove cube filename paths
+# 2. remove net filename paths
+# 3. remove digits beyond the fifth decimal place of decimal numbers
+# 4. remove date and time
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -11,7 +18,7 @@ commands:
 	onet=$(OUTPUT)/obsmode_cholmod_out.net \
 	observations=yes \
 	method=sparse \
-	solvedegree=3 \
+	cksolvedegree=3 \
 	camsolve=all \
 	update=yes \
 	twist=no > /dev/null;
@@ -20,11 +27,6 @@ commands:
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
 	  > $(OUTPUT)/obsmode_cholmod_bundleout.txt
-	# The above command uses sed to do the following (in order):
-	# 1. remove cube filename paths
-	# 2. remove net filename paths
-	# 3. remove digits beyond the fifth decimal place of decimal numbers
-	# 4. remove date and time
 	cat residuals.csv | sed 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
 	  > $(OUTPUT)/obsmode_cholmod_residuals.csv
 	cat bundleout_images.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \

@@ -12,7 +12,8 @@
 #include "CameraFocalPlaneMap.h"
 #include "CameraDistortionMap.h"
 #include "ControlPoint.h"
-#include "SpicePosition.h"
+//#include "SpicePosition.h"
+//#include "SpiceRotation.h"
 #include "Application.h"
 #include "Camera.h"
 #include "CSVReader.h"
@@ -242,7 +243,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //printf("BOOST_UBLAS_TYPE_CHECK = %d\n", BOOST_UBLAS_TYPE_CHECK);
 
 //    m_pProgressBar = progress;
-
+    
     m_dError = DBL_MAX;
     m_bSimulatedData = true;
     m_bObservationMode = false;
@@ -291,13 +292,18 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_bMaxIterationsReached = false;
     m_cmatrixSolveType = AnglesOnly;
     m_spacecraftPositionSolveType = Nothing;
-    m_nckDegree = 2;
-    m_nsolveCamDegree = m_nckDegree;
-    m_nNumberCameraCoefSolved = 1;
+    m_nCKDegree = 2;
+    m_nsolveCKDegree = m_nCKDegree;
+    m_nSPKDegree = 2;
+    m_nsolveSPKDegree = m_nSPKDegree;
+    m_nNumberCamAngleCoefSolved = 1;
+    m_nNumberCamPosCoefSolved = 1;
     m_nUnknownParameters = 0;
     m_bOutputStandard = true;
     m_bOutputCSV = true;
     m_bOutputResiduals = true;
+    m_nPositionType = SpicePosition::PolyFunction;
+    m_nPointingType = SpiceRotation::PolyFunction;
 
     m_dGlobalLatitudeAprioriSigma = 1000.0;
     m_dGlobalLongitudeAprioriSigma = 1000.0;
@@ -305,9 +311,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //    m_dGlobalSurfaceXAprioriSigma = 1000.0;
 //    m_dGlobalSurfaceYAprioriSigma = 1000.0;
 //    m_dGlobalSurfaceZAprioriSigma = 1000.0;
-    m_dGlobalSpacecraftPositionAprioriSigma = -1.0;
-    m_dGlobalSpacecraftVelocityAprioriSigma = -1.0;
-    m_dGlobalSpacecraftAccelerationAprioriSigma = -1.0;
+//    m_dGlobalSpacecraftPositionAprioriSigma = -1.0;
+//    m_dGlobalSpacecraftVelocityAprioriSigma = -1.0;
+//    m_dGlobalSpacecraftAccelerationAprioriSigma = -1.0;
 
 //    m_dGlobalCameraAnglesAprioriSigma = -1.0;
 //    m_dGlobalCameraAngularVelocityAprioriSigma = -1.0;
@@ -352,7 +358,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     // the control net (when we start adding software to remove points with high
     // residuals) and ?.  For "deltack" a single measure on a point is allowed
     // so skip the test.
-    if (!m_bDeltack) validateNetwork();
+    if (!m_bDeltack)
+      validateNetwork();
   }
 
   /**
@@ -386,6 +393,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     if ( nimagesWithInsufficientMeasures > 0 ) {
       throw IException(IException::User, msg, _FILEINFO_);
     }
+
+    printf("Validation complete!...\n");
 
     return true;
   }
@@ -488,7 +497,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
    * This method determines the number of partials per image and
    * per point.  It is based on the variables to be solved for
    * (e.g., twist, radii, cmatrix velocity, cmatrix acceleration,
-   * etc)
+   * degree of camera position polynomial, etc)
    */
   void BundleAdjust::ComputeNumberPartials() {
     m_nNumImagePartials = 0;
@@ -502,24 +511,23 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         m_nNumImagePartials++;
 
       // Do we solve for angles only, +velocity, or +velocity and acceleration, or all coefficients
-      m_nNumImagePartials *= m_nNumberCameraCoefSolved;
-      /*      if (m_cmatrixSolveType == AnglesVelocity) {
-              m_nNumImagePartials *= 2;
-            }
-            else if (m_cmatrixSolveType == AnglesVelocityAcceleration) {
-              m_nNumImagePartials *= 3;
-            }*/
+      m_nNumImagePartials *= m_nNumberCamAngleCoefSolved;
     }
 
     if (m_spacecraftPositionSolveType != Nothing) {
-      // Solve for position always.
-      m_nNumImagePartials += 3;
 
       // Do we solve for position and velocity, position, velocity and acceleration, or position only
-      if (m_spacecraftPositionSolveType == PositionVelocity)
-        m_nNumImagePartials += 3;
-      else if (m_spacecraftPositionSolveType == PositionVelocityAcceleration)
-        m_nNumImagePartials += 6;
+//      if (m_spacecraftPositionSolveType == Position)
+//        nImagePosPartials = 3;
+//      else if (m_spacecraftPositionSolveType == PositionVelocity)
+//        nImagePosPartials = 6;
+//      else if (m_spacecraftPositionSolveType == PositionVelocityAcceleration)
+//        nImagePosPartials = 9;
+
+      // account for number of coefficients in "solve" polynomial
+      m_nNumImagePartials += 3.0*m_nNumberCamPosCoefSolved;
+
+//      m_nNumImagePartials += nImagePosPartials;
     }
 
     // Revised to solve for x/y/z always
@@ -527,7 +535,6 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     // 2010-03-01 KLE now always solving for all 3 coordinates,
     // but now, we "hold", "fix", or constrain via weights
     m_nNumPointPartials = 3;
-
 
     // Test code to match old test runs which don't solve for radius
     if ( m_strSolutionMethod != "SPECIALK"  &&
@@ -566,7 +573,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       m_dImageParameterWeights[5] = m_dGlobalSpacecraftVelocityWeight;
       nIndex += 6;
     }
-    else if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
+    else if (m_spacecraftPositionSolveType >= PositionVelocityAcceleration) {
       m_dImageParameterWeights[0] = m_dGlobalSpacecraftPositionWeight;
       m_dImageParameterWeights[1] = m_dGlobalSpacecraftVelocityWeight;
       m_dImageParameterWeights[2] = m_dGlobalSpacecraftAccelerationWeight;
@@ -665,30 +672,67 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     switch (type) {
       case BundleAdjust::AnglesOnly:
-        m_nNumberCameraCoefSolved = 1;
+        m_nNumberCamAngleCoefSolved = 1;
         break;
       case BundleAdjust::AnglesVelocity:
-        m_nNumberCameraCoefSolved = 2;
+        m_nNumberCamAngleCoefSolved = 2;
         break;
       case BundleAdjust::AnglesVelocityAcceleration:
-        m_nNumberCameraCoefSolved = 3;
+        m_nNumberCamAngleCoefSolved = 3;
         break;
-      case BundleAdjust::All:
-        m_nNumberCameraCoefSolved = m_nsolveCamDegree + 1;
+      case BundleAdjust::CKAll:
+        m_nNumberCamAngleCoefSolved = m_nsolveCKDegree + 1;
         break;
       default:
-        m_nNumberCameraCoefSolved = 0;
+        m_nNumberCamAngleCoefSolved = 0;
         break;
     }
 
-    m_dGlobalCameraAnglesAprioriSigma.resize(m_nNumberCameraCoefSolved);
-    for( int i = 0; i < m_nNumberCameraCoefSolved; i++ )
+    m_dGlobalCameraAnglesAprioriSigma.resize(m_nNumberCamAngleCoefSolved);
+    for( int i = 0; i < m_nNumberCamAngleCoefSolved; i++ )
         m_dGlobalCameraAnglesAprioriSigma[i] = -1.0;
 
     // Make sure the degree of the polynomial the user selected for
     // the camera angles fit is sufficient for the selected CAMSOLVE
-    if (m_nNumberCameraCoefSolved > m_nsolveCamDegree + 1) {
-      std::string msg = "Selected SolveCameraDegree " + iString(m_nsolveCamDegree)
+    if (m_nNumberCamAngleCoefSolved > m_nsolveCKDegree + 1) {
+      std::string msg = "Selected SolveCameraDegree " + iString(m_nsolveCKDegree)
+                        + " is not sufficient for the CAMSOLVE";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+  }
+
+  /**
+   * For which camera position coefficients do we solve?
+   */
+  void BundleAdjust::SetSolveSpacecraftPosition(SpacecraftPositionSolveType type) {
+    m_spacecraftPositionSolveType = type;
+
+    switch (type) {
+      case BundleAdjust::PositionOnly:
+        m_nNumberCamPosCoefSolved = 1;
+        break;
+      case BundleAdjust::PositionVelocity:
+        m_nNumberCamPosCoefSolved = 2;
+        break;
+      case BundleAdjust::PositionVelocityAcceleration:
+        m_nNumberCamPosCoefSolved = 3;
+        break;
+      case BundleAdjust::SPKAll:
+        m_nNumberCamPosCoefSolved = m_nsolveSPKDegree + 1;
+        break;
+      default:
+        m_nNumberCamPosCoefSolved = 0;
+        break;
+    }
+
+    m_dGlobalSpacecraftPositionAprioriSigma.resize(m_nNumberCamPosCoefSolved);
+    for( int i = 0; i < m_nNumberCamPosCoefSolved; i++ )
+        m_dGlobalSpacecraftPositionAprioriSigma[i] = -1.0;
+
+    // Make sure the degree of the polynomial the user selected for
+    // the camera position fit is sufficient for the selected CAMSOLVE
+    if (m_nNumberCamPosCoefSolved > m_nsolveSPKDegree + 1) {
+      std::string msg = "Selected SolveCameraPositionDegree " + iString(m_nsolveSPKDegree)
                         + " is not sufficient for the CAMSOLVE";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -772,38 +816,57 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
   void BundleAdjust::SetSpaceCraftWeights() {
 
-    if (m_dGlobalSpacecraftPositionAprioriSigma > 0.0) {
-      m_dGlobalSpacecraftPositionWeight
-      = 1.0 / (m_dGlobalSpacecraftPositionAprioriSigma * m_dGlobalSpacecraftPositionAprioriSigma * 1.0e-6);
+//    if (m_dGlobalSpacecraftPositionAprioriSigma > 0.0) {
+//      m_dGlobalSpacecraftPositionWeight
+//      = 1.0 / (m_dGlobalSpacecraftPositionAprioriSigma * m_dGlobalSpacecraftPositionAprioriSigma * 1.0e-6);
+//    }
+//
+//    if (m_dGlobalSpacecraftVelocityAprioriSigma > 0.0) {
+//      m_dGlobalSpacecraftVelocityWeight
+//      = 1.0 / (m_dGlobalSpacecraftVelocityAprioriSigma * m_dGlobalSpacecraftVelocityAprioriSigma * 1.0e-6);
+//    }
+//
+//    if (m_dGlobalSpacecraftAccelerationAprioriSigma > 0.0) {
+//      m_dGlobalSpacecraftAccelerationWeight
+//      = 1.0 / (m_dGlobalSpacecraftAccelerationAprioriSigma * m_dGlobalSpacecraftAccelerationAprioriSigma * 1.0e-6);
+//    }
+
+    if ( m_nNumberCamPosCoefSolved >= 1 ) {
+        if ( m_dGlobalSpacecraftPositionAprioriSigma[0] > 0.0 ) {
+            m_dGlobalSpacecraftPositionWeight
+                    = 1.0 / (m_dGlobalSpacecraftPositionAprioriSigma[0] * m_dGlobalSpacecraftPositionAprioriSigma[0] * 1.0e-6);
+        }
     }
 
-    if (m_dGlobalSpacecraftVelocityAprioriSigma > 0.0) {
-      m_dGlobalSpacecraftVelocityWeight
-      = 1.0 / (m_dGlobalSpacecraftVelocityAprioriSigma * m_dGlobalSpacecraftVelocityAprioriSigma * 1.0e-6);
+    if ( m_nNumberCamPosCoefSolved >= 2 ) {
+        if ( m_dGlobalSpacecraftPositionAprioriSigma[1] > 0.0 ) {
+            m_dGlobalSpacecraftVelocityWeight
+                    = 1.0 / (m_dGlobalSpacecraftPositionAprioriSigma[1]  * m_dGlobalSpacecraftPositionAprioriSigma[1] * 1.0e-6);
+        }
     }
 
-    if (m_dGlobalSpacecraftAccelerationAprioriSigma > 0.0) {
-      m_dGlobalSpacecraftAccelerationWeight
-      = 1.0 / (m_dGlobalSpacecraftAccelerationAprioriSigma * m_dGlobalSpacecraftAccelerationAprioriSigma * 1.0e-6);
+    if ( m_nNumberCamPosCoefSolved >= 3 ) {
+        if( m_dGlobalSpacecraftPositionAprioriSigma[2] > 0.0 ) {
+            m_dGlobalSpacecraftAccelerationWeight
+                    = 1.0 / (m_dGlobalSpacecraftPositionAprioriSigma[2]  * m_dGlobalSpacecraftPositionAprioriSigma[2] * 1.0e-6);
+        }
     }
 
-    if ( m_nNumberCameraCoefSolved >= 1 ) {
+    if ( m_nNumberCamAngleCoefSolved >= 1 ) {
         if ( m_dGlobalCameraAnglesAprioriSigma[0] > 0.0 ) {
             m_dGlobalCameraAnglesWeight
                     = 1.0 / (m_dGlobalCameraAnglesAprioriSigma[0] * m_dGlobalCameraAnglesAprioriSigma[0] * DEG2RAD * DEG2RAD);
         }
     }
 
-//    if (m_dGlobalCameraAngularVelocityAprioriSigma > 0.0) {
-    if ( m_nNumberCameraCoefSolved >= 2 ) {
+    if ( m_nNumberCamAngleCoefSolved >= 2 ) {
         if ( m_dGlobalCameraAnglesAprioriSigma[1] > 0.0 ) {
             m_dGlobalCameraAngularVelocityWeight
                     = 1.0 / (m_dGlobalCameraAnglesAprioriSigma[1]  * m_dGlobalCameraAnglesAprioriSigma[1]  * DEG2RAD * DEG2RAD);
         }
     }
 
-//    if (m_dGlobalCameraAngularAccelerationAprioriSigma > 0.0) {
-    if ( m_nNumberCameraCoefSolved >= 3 ) {
+    if ( m_nNumberCamAngleCoefSolved >= 3 ) {
         if( m_dGlobalCameraAnglesAprioriSigma[2] > 0.0 ) {
             m_dGlobalCameraAngularAccelerationWeight
                     = 1.0 / (m_dGlobalCameraAnglesAprioriSigma[2]  * m_dGlobalCameraAnglesAprioriSigma[2]  * DEG2RAD * DEG2RAD);
@@ -827,6 +890,19 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
    *                        met an iException will be thrown.
    */
   bool BundleAdjust::SolveCholesky() {
+
+    // throw error if a frame camera is included AND if m_bSolvePolyOverHermite
+    // is set to true (can only use for line scan or radar)
+    if (m_bSolvePolyOverHermite == true) {
+      int nImages = Images();
+      for (int i = 0; i < nImages; i++) {
+        if (m_pCnet->Camera(i)->GetCameraType() == 0) {
+          std::string msg = "At least one sensor is a frame camera. Spacecraft Option OVERHERMITE is not valid for frame cameras\n";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
+      }
+    }
+
 //   double averageError;
     std::vector<int> observationInitialValueIndex;  // image index for observation inital values
     int iIndex = -1;                                // image index for initial spice for an observation
@@ -854,11 +930,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
         // Fit the camera pointing to an equation
         SpiceRotation *pSpiceRot = pCamera->instrumentRotation();
-
         if (!m_bObservationMode) {
-          pSpiceRot->SetPolynomialDegree(m_nckDegree);   // Set the ck polynomial fit degree
-          pSpiceRot->SetPolynomial();
-          pSpiceRot->SetPolynomialDegree(m_nsolveCamDegree);   // Update to the solve polynomial fit degree
+          pSpiceRot->SetPolynomialDegree(m_nCKDegree);   // Set the ck polynomial fit degree
+          pSpiceRot->SetPolynomial(m_nPointingType);
+          pSpiceRot->SetPolynomialDegree(m_nsolveCKDegree);   // Update to the solve polynomial fit degree
         }
         else {
           // Index of image to use for initial values is set already so set polynomial to initial values
@@ -868,15 +943,15 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
             pOrot->GetPolynomial(anglePoly1, anglePoly2, anglePoly3);
             double baseTime = pOrot->GetBaseTime();
             double timeScale = pOrot->GetTimeScale();
-            pSpiceRot->SetPolynomialDegree(m_nsolveCamDegree);   // Update to the solve polynomial fit degree
+            pSpiceRot->SetPolynomialDegree(m_nsolveCKDegree);   // Update to the solve polynomial fit degree
             pSpiceRot->SetOverrideBaseTime(baseTime, timeScale);
-            pSpiceRot->SetPolynomial(anglePoly1, anglePoly2, anglePoly3);
+            pSpiceRot->SetPolynomial(anglePoly1, anglePoly2, anglePoly3, m_nPointingType);
           }
           else {
-            // Index of image to use for inital observation values has not been assigned yet so use this image
-            pSpiceRot->SetPolynomialDegree(m_nckDegree);
-            pSpiceRot->SetPolynomial();
-            pSpiceRot->SetPolynomialDegree(m_nsolveCamDegree);   // Update to the solve polynomial fit degree
+            // Index of image to use for initial observation values has not been assigned yet so use this image
+            pSpiceRot->SetPolynomialDegree(m_nCKDegree);
+            pSpiceRot->SetPolynomial(m_nPointingType);
+            pSpiceRot->SetPolynomialDegree(m_nsolveCKDegree);   // Update to the solve polynomial fit degree
             observationInitialValueIndex[oIndex] = i;
           }
         }
@@ -886,8 +961,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         // Set the spacecraft position to an equation
         SpicePosition *pSpicePos = pCamera->instrumentPosition();
 
-        if (!m_bObservationMode)
-          pSpicePos->SetPolynomial();
+        if (!m_bObservationMode) {
+          pSpicePos->SetPolynomialDegree(m_nSPKDegree); // Set the SPK polynomial fit degree
+          pSpicePos->SetPolynomial(m_nPositionType);
+          pSpicePos->SetPolynomialDegree(m_nsolveSPKDegree);   // Update to the solve polynomial fit degree
+        }
         else {
           // Index of image to use for initial values is set already so set polynomial to initial values
           if (iIndex >= 0) {
@@ -896,13 +974,16 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
             pOpos->GetPolynomial(posPoly1, posPoly2, posPoly3);
             double baseTime = pOpos->GetBaseTime();
             double timeScale = pOpos->GetTimeScale();
-            pSpicePos->SetPolynomial();
+            pSpicePos->SetPolynomialDegree(m_nsolveSPKDegree); // Set the SPK polynomial fit degree
+//            pSpicePos->SetPolynomial();
             pSpicePos->SetOverrideBaseTime(baseTime, timeScale);
-            pSpicePos->SetPolynomial(posPoly1, posPoly2, posPoly3);
+            pSpicePos->SetPolynomial(posPoly1, posPoly2, posPoly3, m_nPositionType);
           }
           else {
             // Index of image to use for inital observation values has not been assigned yet so use this image
-            pSpicePos->SetPolynomial();
+            pSpicePos->SetPolynomialDegree(m_nSPKDegree); // Set the SPK polynomial fit degree
+            pSpicePos->SetPolynomial(m_nPositionType);
+            pSpicePos->SetPolynomialDegree(m_nsolveSPKDegree);   // Update to the solve polynomial fit degree
             observationInitialValueIndex[oIndex] = i;
           }
         }
@@ -2749,15 +2830,17 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
       // Add the partial for the x coordinate of the position (differentiating
       // point(x,y,z) - spacecraftPosition(x,y,z) in J2000
-      for (int icoef = 0; icoef < m_spacecraftPositionSolveType; icoef++) {
+      for (int icoef = 0; icoef < m_nNumberCamPosCoefSolved; icoef++) {
         pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_X, icoef,
                                               &coeff_image(0, nIndex),
                                               &coeff_image(1, nIndex));
         nIndex++;
       }
 
+//      std::cout << coeff_image << std::endl;
+
       // Add the partial for the y coordinate of the position
-      for (int icoef = 0; icoef < m_spacecraftPositionSolveType; icoef++) {
+      for (int icoef = 0; icoef < m_nNumberCamPosCoefSolved; icoef++) {
         pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Y, icoef,
                                               &coeff_image(0, nIndex),
                                               &coeff_image(1, nIndex));
@@ -2765,7 +2848,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       }
 
       // Add the partial for the z coordinate of the position
-      for (int icoef = 0; icoef < m_spacecraftPositionSolveType; icoef++) {
+      for (int icoef = 0; icoef < m_nNumberCamPosCoefSolved; icoef++) {
         pCamera->GroundMap()->GetdXYdPosition(SpicePosition::WRT_Z, icoef,
                                               &coeff_image(0, nIndex),
                                               &coeff_image(1, nIndex));
@@ -2777,16 +2860,15 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     if (m_cmatrixSolveType != None) {
 
       // Add the partials for ra
-      for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+      for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
         pCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_RightAscension,
                                                  icoef, &coeff_image(0, nIndex),
                                                  &coeff_image(1, nIndex));
         nIndex++;
       }
 
-
       // Add the partials for dec
-      for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+      for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
         pCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Declination,
                                                  icoef, &coeff_image(0, nIndex),
                                                  &coeff_image(1, nIndex));
@@ -2795,7 +2877,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
       // Add the partial for twist if necessary
       if (m_bSolveTwist) {
-        for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+        for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
           pCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Twist,
                                                    icoef, &coeff_image(0, nIndex),
                                                    &coeff_image(1, nIndex));
@@ -3250,9 +3332,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         SpiceRotation *pSpiceRot = pCamera->instrumentRotation();
 
         if (!m_bObservationMode) {
-          pSpiceRot->SetPolynomialDegree(m_nckDegree);   // Set the ck polynomial fit degree
-          pSpiceRot->SetPolynomial();
-          pSpiceRot->SetPolynomialDegree(m_nsolveCamDegree);   // Update to the solve polynomial fit degree
+          pSpiceRot->SetPolynomialDegree(m_nCKDegree);   // Set the ck polynomial fit degree
+          pSpiceRot->SetPolynomial(m_nPointingType);
+          pSpiceRot->SetPolynomialDegree(m_nsolveCKDegree);   // Update to the solve polynomial fit degree
         }
         else {
           // Index of image to use for initial values is set already so set polynomial to initial values
@@ -3262,15 +3344,15 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
             pOrot->GetPolynomial(anglePoly1, anglePoly2, anglePoly3);
             double baseTime = pOrot->GetBaseTime();
             double timeScale = pOrot->GetTimeScale();
-            pSpiceRot->SetPolynomialDegree(m_nsolveCamDegree);   // Update to the solve polynomial fit degree
+            pSpiceRot->SetPolynomialDegree(m_nsolveCKDegree);   // Update to the solve polynomial fit degree
             pSpiceRot->SetOverrideBaseTime(baseTime, timeScale);
-            pSpiceRot->SetPolynomial(anglePoly1, anglePoly2, anglePoly3);
+            pSpiceRot->SetPolynomial(anglePoly1, anglePoly2, anglePoly3, m_nPointingType);
           }
           else {
             // Index of image to use for inital observation values has not been assigned yet so use this image
-            pSpiceRot->SetPolynomialDegree(m_nckDegree);
-            pSpiceRot->SetPolynomial();
-            pSpiceRot->SetPolynomialDegree(m_nsolveCamDegree);   // Update to the solve polynomial fit degree
+            pSpiceRot->SetPolynomialDegree(m_nCKDegree);
+            pSpiceRot->SetPolynomial(m_nPointingType);
+            pSpiceRot->SetPolynomialDegree(m_nsolveCKDegree);   // Update to the solve polynomial fit degree
             observationInitialValueIndex[oIndex] = i;
           }
         }
@@ -3280,8 +3362,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         // Set the spacecraft position to an equation
         SpicePosition *pSpicePos = pCamera->instrumentPosition();
 
-        if (!m_bObservationMode)
-          pSpicePos->SetPolynomial();
+        if (!m_bObservationMode) {
+          pSpicePos->SetPolynomialDegree(m_nSPKDegree); // Set the SPK polynomial fit degree
+          pSpicePos->SetPolynomial(m_nPositionType);
+          pSpicePos->SetPolynomialDegree(m_nsolveSPKDegree);   // Update to the solve polynomial fit degree
+        }
         else {
           // Index of image to use for initial values is set already so set polynomial to initial values
           if (iIndex >= 0) {
@@ -3290,13 +3375,15 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
             pOpos->GetPolynomial(posPoly1, posPoly2, posPoly3);
             double baseTime = pOpos->GetBaseTime();
             double timeScale = pOpos->GetTimeScale();
-            pSpicePos->SetPolynomial();
+            pSpicePos->SetPolynomialDegree(m_nsolveSPKDegree); // Set the SPK polynomial fit degree
             pSpicePos->SetOverrideBaseTime(baseTime, timeScale);
-            pSpicePos->SetPolynomial(posPoly1, posPoly2, posPoly3);
+            pSpicePos->SetPolynomial(posPoly1, posPoly2, posPoly3, m_nPositionType);
           }
           else {
             // Index of image to use for inital observation values has not been assigned yet so use this image
-            pSpicePos->SetPolynomial();
+            pSpicePos->SetPolynomialDegree(m_nSPKDegree); // Set the SPK polynomial fit degree
+            pSpicePos->SetPolynomial(m_nPositionType);
+            pSpicePos->SetPolynomialDegree(m_nsolveSPKDegree);   // Update to the solve polynomial fit degree
             observationInitialValueIndex[oIndex] = i;
           }
         }
@@ -3637,20 +3724,20 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       if (m_cmatrixSolveType != None) {
 
         // Add the partials for ra
-        for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+        for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
           pCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_RightAscension, icoef, &px[nIndex], &py[nIndex]);
           nIndex++;
         }
 
         // Add the partials for dec
-        for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+        for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
           pCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Declination, icoef, &px[nIndex], &py[nIndex]);
           nIndex++;
         }
 
         // Add the partial for twist if necessary
         if (m_bSolveTwist) {
-          for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+          for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
             pCamera->GroundMap()->GetdXYdOrientation(SpiceRotation::WRT_Twist, icoef, &px[nIndex], &py[nIndex]);
             nIndex++;
           }
@@ -4416,83 +4503,49 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
       if (m_spacecraftPositionSolveType != Nothing) {
         SpicePosition *pInstPos = pCamera->instrumentPosition();
-        std::vector<double> abcX(3), abcY(3), abcZ(3);
-        pInstPos->GetPolynomial(abcX, abcY, abcZ);
+        std::vector<double> coefX(m_nNumberCamPosCoefSolved),
+            coefY(m_nNumberCamPosCoefSolved),
+            coefZ(m_nNumberCamPosCoefSolved);
+        pInstPos->GetPolynomial(coefX, coefY, coefZ);
 
 //        printf("X0:%20.10lf X1:%20.10lf X2:%20.10lf\n",abcX[0],abcX[1],abcX[2]);
 
         // Update the X coordinate coefficient(s) and sum parameter correction
-        abcX[0] += m_Image_Solution(index);
-        if ( !bsameindex )
-            m_Image_Corrections(index) += m_Image_Solution(index);
-        index++;
-
-        if (m_spacecraftPositionSolveType > PositionOnly) {
-          abcX[1] += m_Image_Solution(index);
+        for (int icoef = 0; icoef < m_nNumberCamPosCoefSolved; icoef++) {
+          coefX[icoef] += m_Image_Solution(index);
           if ( !bsameindex )
               m_Image_Corrections(index) += m_Image_Solution(index);
           index++;
-
-          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
-            abcX[2] += m_Image_Solution(index);
-            if ( !bsameindex )
-                m_Image_Corrections(index) += m_Image_Solution(index);
-            index++;
-          }
         }
 
         // Update the Y coordinate coefficient(s)
-        abcY[0] += m_Image_Solution(index);
-        if ( !bsameindex )
-            m_Image_Corrections(index) += m_Image_Solution(index);
-        index++;
-
-        if (m_spacecraftPositionSolveType > PositionOnly) {
-          abcY[1] += m_Image_Solution(index);
+        for (int icoef = 0; icoef < m_nNumberCamPosCoefSolved; icoef++) {
+          coefY[icoef] += m_Image_Solution(index);
           if ( !bsameindex )
               m_Image_Corrections(index) += m_Image_Solution(index);
           index++;
-
-          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
-            abcY[2] += m_Image_Solution(index);
-            if ( !bsameindex )
-                m_Image_Corrections(index) += m_Image_Solution(index);
-            index++;
-          }
         }
 
         // Update the Z coordinate coefficient(s)
-        abcZ[0] += m_Image_Solution(index);
-        if ( !bsameindex )
-            m_Image_Corrections(index) += m_Image_Solution(index);
-        index++;
-
-        if (m_spacecraftPositionSolveType > PositionOnly) {
-          abcZ[1] += m_Image_Solution(index);
+        for (int icoef = 0; icoef < m_nNumberCamPosCoefSolved; icoef++) {
+          coefZ[icoef] += m_Image_Solution(index);
           if ( !bsameindex )
               m_Image_Corrections(index) += m_Image_Solution(index);
           index++;
-
-          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
-            abcZ[2] += m_Image_Solution(index);
-            if ( !bsameindex )
-                m_Image_Corrections(index) += m_Image_Solution(index);
-            index++;
-          }
         }
 
-        pInstPos->SetPolynomial(abcX, abcY, abcZ);
+        pInstPos->SetPolynomial(coefX, coefY, coefZ, m_nPositionType);
       }
 
       if (m_cmatrixSolveType != None) {
         SpiceRotation *pInstRot = pCamera->instrumentRotation();
-        std::vector<double> coefRA(m_nNumberCameraCoefSolved),
-            coefDEC(m_nNumberCameraCoefSolved),
-            coefTWI(m_nNumberCameraCoefSolved);
+        std::vector<double> coefRA(m_nNumberCamAngleCoefSolved),
+            coefDEC(m_nNumberCamAngleCoefSolved),
+            coefTWI(m_nNumberCamAngleCoefSolved);
         pInstRot->GetPolynomial(coefRA, coefDEC, coefTWI);
 
         // Update right ascension coefficient(s)
-        for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+        for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
           coefRA[icoef] += m_Image_Solution(index);
           if ( !bsameindex )
               m_Image_Corrections(index) += m_Image_Solution(index);
@@ -4500,7 +4553,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         }
 
         // Update declination coefficient(s)
-        for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+        for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
           coefDEC[icoef] += m_Image_Solution(index);
           if ( !bsameindex )
               m_Image_Corrections(index) += m_Image_Solution(index);
@@ -4509,7 +4562,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
         if (m_bSolveTwist) {
           // Update twist coefficient(s)
-          for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+          for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
             coefTWI[icoef] += m_Image_Solution(index);
             if ( !bsameindex )
                 m_Image_Corrections(index) += m_Image_Solution(index);
@@ -4517,7 +4570,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           }
         }
 
-        pInstRot->SetPolynomial(coefRA, coefDEC, coefTWI);
+        pInstRot->SetPolynomial(coefRA, coefDEC, coefTWI, m_nPointingType);
       }
     }
 
@@ -4642,83 +4695,49 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
       if (m_spacecraftPositionSolveType != Nothing) {
         SpicePosition *pInstPos = pCamera->instrumentPosition();
-        std::vector<double> abcX(3), abcY(3), abcZ(3);
-        pInstPos->GetPolynomial(abcX, abcY, abcZ);
+        std::vector<double> coefX(m_nNumberCamPosCoefSolved),
+            coefY(m_nNumberCamPosCoefSolved),
+            coefZ(m_nNumberCamPosCoefSolved);
+        pInstPos->GetPolynomial(coefX, coefY, coefZ);
 
 //        printf("X0:%20.10lf X1:%20.10lf X2:%20.10lf\n",abcX[0],abcX[1],abcX[2]);
 
         // Update the X coordinate coefficient(s) and sum parameter correction
-        abcX[0] += m_Image_Solution(index);
-        if ( !bsameindex )
-            m_Image_Corrections(index) += m_Image_Solution(index);
-        index++;
-
-        if (m_spacecraftPositionSolveType > PositionOnly) {
-          abcX[1] += m_Image_Solution(index);
+        for (int icoef = 0; icoef < m_nNumberCamPosCoefSolved; icoef++) {
+          coefX[icoef] += m_Image_Solution(index);
           if ( !bsameindex )
               m_Image_Corrections(index) += m_Image_Solution(index);
           index++;
-
-          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
-            abcX[2] += m_Image_Solution(index);
-            if ( !bsameindex )
-                m_Image_Corrections(index) += m_Image_Solution(index);
-            index++;
-          }
         }
 
         // Update the Y coordinate coefficient(s)
-        abcY[0] += m_Image_Solution(index);
-        if ( !bsameindex )
-            m_Image_Corrections(index) += m_Image_Solution(index);
-        index++;
-
-        if (m_spacecraftPositionSolveType > PositionOnly) {
-          abcY[1] += m_Image_Solution(index);
+        for (int icoef = 0; icoef < m_nNumberCamPosCoefSolved; icoef++) {
+          coefY[icoef] += m_Image_Solution(index);
           if ( !bsameindex )
               m_Image_Corrections(index) += m_Image_Solution(index);
           index++;
-
-          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
-            abcY[2] += m_Image_Solution(index);
-            if ( !bsameindex )
-                m_Image_Corrections(index) += m_Image_Solution(index);
-            index++;
-          }
         }
 
         // Update the Z coordinate coefficient(s)
-        abcZ[0] += m_Image_Solution(index);
-        if ( !bsameindex )
-            m_Image_Corrections(index) += m_Image_Solution(index);
-        index++;
-
-        if (m_spacecraftPositionSolveType > PositionOnly) {
-          abcZ[1] += m_Image_Solution(index);
+        for (int icoef = 0; icoef < m_nNumberCamPosCoefSolved; icoef++) {
+          coefZ[icoef] += m_Image_Solution(index);
           if ( !bsameindex )
               m_Image_Corrections(index) += m_Image_Solution(index);
           index++;
-
-          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
-            abcZ[2] += m_Image_Solution(index);
-            if ( !bsameindex )
-                m_Image_Corrections(index) += m_Image_Solution(index);
-            index++;
-          }
         }
 
-        pInstPos->SetPolynomial(abcX, abcY, abcZ);
+        pInstPos->SetPolynomial(coefX, coefY, coefZ, m_nPositionType);
       }
 
       if (m_cmatrixSolveType != None) {
         SpiceRotation *pInstRot = pCamera->instrumentRotation();
-        std::vector<double> coefRA(m_nNumberCameraCoefSolved),
-            coefDEC(m_nNumberCameraCoefSolved),
-            coefTWI(m_nNumberCameraCoefSolved);
+        std::vector<double> coefRA(m_nNumberCamAngleCoefSolved),
+            coefDEC(m_nNumberCamAngleCoefSolved),
+            coefTWI(m_nNumberCamAngleCoefSolved);
         pInstRot->GetPolynomial(coefRA, coefDEC, coefTWI);
 
         // Update right ascension coefficient(s)
-        for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+        for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
           coefRA[icoef] += m_Image_Solution(index);
           if ( !bsameindex )
               m_Image_Corrections(index) += m_Image_Solution(index);
@@ -4726,7 +4745,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         }
 
         // Update declination coefficient(s)
-        for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+        for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
           coefDEC[icoef] += m_Image_Solution(index);
           if ( !bsameindex )
               m_Image_Corrections(index) += m_Image_Solution(index);
@@ -4735,7 +4754,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
         if (m_bSolveTwist) {
           // Update twist coefficient(s)
-          for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+          for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
             coefTWI[icoef] += m_Image_Solution(index);
             if ( !bsameindex )
                 m_Image_Corrections(index) += m_Image_Solution(index);
@@ -4743,7 +4762,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           }
         }
 
-        pInstRot->SetPolynomial(coefRA, coefDEC, coefTWI);
+        pInstRot->SetPolynomial(coefRA, coefDEC, coefTWI, m_nPointingType);
       }
     }
 
@@ -4837,6 +4856,15 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     } // end loop over point corrections
   }
 
+  /**
+   * This method computes the focal plane residuals for the measures.
+   *
+   * @history 2012-01-18 Debbie A. Cook - Fixed the computation of vx
+   *                            and vy to make sure they are focal
+   *                            plane x and y residuals instead of 
+   *                            image sample and line residuals.
+   *
+   */
   double BundleAdjust::ComputeResiduals() {
     double vtpv = 0.0;
     double vtpv_control = 0.0;
@@ -5509,78 +5537,62 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       index = ImageIndex(index);
       if (m_spacecraftPositionSolveType != Nothing) {
         SpicePosition *pInstPos = pCamera->instrumentPosition();
-        std::vector<double> abcX(3), abcY(3), abcZ(3);
-        pInstPos->GetPolynomial(abcX, abcY, abcZ);
+        std::vector<double> coefX(m_nNumberCamPosCoefSolved),
+            coefY(m_nNumberCamPosCoefSolved),
+            coefZ(m_nNumberCamPosCoefSolved);
+        pInstPos->GetPolynomial(coefX, coefY, coefZ);
 
 //        printf("X0:%20.10lf X1:%20.10lf X2:%20.10lf\n",abcX[0],abcX[1],abcX[2]);
 
         // Update the X coordinate coefficient(s)
-        abcX[0] += basis.Coefficient(index);
-        index++;
-        if (m_spacecraftPositionSolveType > PositionOnly) {
-          abcX[1] += basis.Coefficient(index);
+        for (int icoef = 0; icoef < m_nNumberCamPosCoefSolved; icoef++) {
+          coefX[icoef] += basis.Coefficient(index);
           index++;
-          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
-            abcX[2] += basis.Coefficient(index);
-          index++;
-          }
         }
 
         // Update the Y coordinate coefficient(s)
-        abcY[0] += basis.Coefficient(index);
-        index++;
-        if (m_spacecraftPositionSolveType > PositionOnly) {
-          abcY[1] += basis.Coefficient(index);
+        for (int icoef = 0; icoef < m_nNumberCamPosCoefSolved; icoef++) {
+          coefY[icoef] += basis.Coefficient(index);
           index++;
-          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
-            abcY[2] += basis.Coefficient(index);
-            index++;
-          }
         }
 
         // Update the Z coordinate cgoefficient(s)
-        abcZ[0] += basis.Coefficient(index);
-        index++;
-        if (m_spacecraftPositionSolveType > PositionOnly) {
-          abcZ[1] += basis.Coefficient(index);
+        for (int icoef = 0; icoef < m_nNumberCamPosCoefSolved; icoef++) {
+          coefZ[icoef] += basis.Coefficient(index);
           index++;
-          if (m_spacecraftPositionSolveType == PositionVelocityAcceleration) {
-            abcZ[2] += basis.Coefficient(index);
-            index++;
-          }
         }
 
-        pInstPos->SetPolynomial(abcX, abcY, abcZ);
+        pInstPos->SetPolynomial(coefX, coefY, coefZ, m_nPositionType);
       }
 
       if (m_cmatrixSolveType != None) {
         SpiceRotation *pInstRot = pCamera->instrumentRotation();
-        std::vector<double> coefRA(m_nNumberCameraCoefSolved),
-            coefDEC(m_nNumberCameraCoefSolved),
-            coefTWI(m_nNumberCameraCoefSolved);
+        std::vector<double> coefRA(m_nNumberCamAngleCoefSolved),
+            coefDEC(m_nNumberCamAngleCoefSolved),
+            coefTWI(m_nNumberCamAngleCoefSolved);
         pInstRot->GetPolynomial(coefRA, coefDEC, coefTWI);
 
         // Update right ascension coefficient(s)
-        for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+        for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
           coefRA[icoef] += basis.Coefficient(index);
           index++;
         }
 
         // Update declination coefficient(s)
-        for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+        for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
           coefDEC[icoef] += basis.Coefficient(index);
           index++;
         }
 
         if (m_bSolveTwist) {
           // Update twist coefficient(s)
-          for (int icoef = 0; icoef < m_nNumberCameraCoefSolved; icoef++) {
+          for (int icoef = 0; icoef < m_nNumberCamAngleCoefSolved; icoef++) {
             coefTWI[icoef] += basis.Coefficient(index);
             index++;
           }
         }
 
-        pInstRot->SetPolynomial(coefRA, coefDEC, coefTWI);
+        pInstRot->SetPolynomial(coefRA, coefDEC, coefTWI, m_nPointingType);
       }
     }
 
@@ -5805,7 +5817,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         gp += PvlKeyword("TotalElapsedTime", m_dElapsedTime);
 
         if ( m_bErrorPropagation )
-            gp += PvlKeyword("ErrorPropationElapsedTime", m_dElapsedTimeErrorProp);
+            gp += PvlKeyword("ErrorPropagationElapsedTime", m_dElapsedTimeErrorProp);
     }
 
     std::ostringstream ostr;
@@ -6098,8 +6110,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         case BundleAdjust::AnglesVelocityAcceleration:
           sprintf(buf,"\n                       CAMSOLVE: ANGLES, VELOCITIES, ACCELERATIONS");
           break;
-        case BundleAdjust::All:
-          sprintf(buf,"\n                       CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",m_nsolveCamDegree);
+        case BundleAdjust::CKAll:
+          sprintf(buf,"\n                       CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",m_nsolveCKDegree);
           break;
       case BundleAdjust::None:
           sprintf(buf,"\n                       CAMSOLVE: NONE");
@@ -6126,10 +6138,18 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         case PositionVelocityAcceleration:
           sprintf(buf,"\n                        SPSOLVE: POSITION, VELOCITIES, ACCELERATIONS");
           break;
+        case BundleAdjust::SPKAll:
+          sprintf(buf,"\n                       CAMSOLVE: ALL POLYNOMIAL COEFFICIENTS (%d)",m_nsolveSPKDegree);
+          break;
         default:
           break;
       }
       fp_out << buf;
+
+      m_bSolvePolyOverHermite ? sprintf(buf, "\n POLYNOMIAL OVER HERMITE SPLINE: ON"):
+                sprintf(buf, "\nPOLYNOMIAL OVER HERMITE SPLINE : OFF");
+      fp_out << buf;
+
       sprintf(buf, "\n\nINPUT: GLOBAL IMAGE PARAMETER UNCERTAINTIES\n===========================================\n");
       fp_out << buf;
       (m_dGlobalLatitudeAprioriSigma == -1) ? sprintf(buf,"\n               POINT LATITUDE SIGMA: N/A"):
@@ -6141,29 +6161,39 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       (m_dGlobalRadiusAprioriSigma == -1) ? sprintf(buf,"\n                 POINT RADIUS SIGMA: N/A"):
               sprintf(buf,"\n                 POINT RADIUS SIGMA: %lf (meters)",m_dGlobalRadiusAprioriSigma);
       fp_out << buf;
-      (m_dGlobalSpacecraftPositionAprioriSigma == -1) ? sprintf(buf,"\n          SPACECRAFT POSITION SIGMA: N/A"):
-              sprintf(buf,"\n          SPACECRAFT POSITION SIGMA: %lf (meters)",m_dGlobalSpacecraftPositionAprioriSigma);
-      fp_out << buf;
-      (m_dGlobalSpacecraftVelocityAprioriSigma == -1) ? sprintf(buf,"\n          SPACECRAFT VELOCITY SIGMA: N/A"):
-              sprintf(buf,"\n          SPACECRAFT VELOCITY SIGMA: %lf (m/s)",m_dGlobalSpacecraftVelocityAprioriSigma);
-      fp_out << buf;
-      (m_dGlobalSpacecraftAccelerationAprioriSigma == -1) ? sprintf(buf,"\n      SPACECRAFT ACCELERATION SIGMA: N/A"):
-              sprintf(buf,"\n      SPACECRAFT ACCELERATION SIGMA: %lf (m/s/s)",m_dGlobalSpacecraftAccelerationAprioriSigma);
+
+      if (m_nNumberCamPosCoefSolved < 1 || m_dGlobalSpacecraftPositionAprioriSigma[0] == -1)
+        sprintf(buf,"\n          SPACECRAFT POSITION SIGMA: N/A");
+      else
+        sprintf(buf,"\n          SPACECRAFT POSITION SIGMA: %lf (meters)",m_dGlobalSpacecraftPositionAprioriSigma[0]);
       fp_out << buf;
 
-      if (m_nNumberCameraCoefSolved < 1 || m_dGlobalCameraAnglesAprioriSigma[0] == -1)
+      if (m_nNumberCamPosCoefSolved < 2 || m_dGlobalSpacecraftPositionAprioriSigma[1] == -1)
+        sprintf(buf,"\n          SPACECRAFT VELOCITY SIGMA: N/A");
+      else
+        sprintf(buf,"\n          SPACECRAFT VELOCITY SIGMA: %lf (m/s)",m_dGlobalSpacecraftPositionAprioriSigma[1]);
+      fp_out << buf;
+
+      if (m_nNumberCamPosCoefSolved < 3 || m_dGlobalSpacecraftPositionAprioriSigma[2] == -1)
+        sprintf(buf,"\n      SPACECRAFT ACCELERATION SIGMA: N/A");
+      else
+        sprintf(buf,"\n      SPACECRAFT ACCELERATION SIGMA: %lf (m/s/s)",m_dGlobalSpacecraftPositionAprioriSigma[2]);
+      fp_out << buf;
+
+
+      if (m_nNumberCamAngleCoefSolved < 1 || m_dGlobalCameraAnglesAprioriSigma[0] == -1)
         sprintf(buf,"\n                CAMERA ANGLES SIGMA: N/A");
       else
         sprintf(buf,"\n                CAMERA ANGLES SIGMA: %lf (dd)",m_dGlobalCameraAnglesAprioriSigma[0]);
       fp_out << buf;
 
-      if (m_nNumberCameraCoefSolved < 2 || m_dGlobalCameraAnglesAprioriSigma[1] == -1)
+      if (m_nNumberCamAngleCoefSolved < 2 || m_dGlobalCameraAnglesAprioriSigma[1] == -1)
         sprintf(buf,"\n      CAMERA ANGULAR VELOCITY SIGMA: N/A");
       else
         sprintf(buf,"\n      CAMERA ANGULAR VELOCITY SIGMA: %lf (dd/s)",m_dGlobalCameraAnglesAprioriSigma[1]);
       fp_out << buf;
 
-      if (m_nNumberCameraCoefSolved < 3 || m_dGlobalCameraAnglesAprioriSigma[2] == -1)
+      if (m_nNumberCamAngleCoefSolved < 3 || m_dGlobalCameraAnglesAprioriSigma[2] == -1)
         sprintf(buf,"\n  CAMERA ANGULAR ACCELERATION SIGMA: N/A");
       else
         sprintf(buf,"\n  CAMERA ANGULAR ACCELERATION SIGMA: %lf (dd/s/s)",m_dGlobalCameraAnglesAprioriSigma[2]);
@@ -6319,12 +6349,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
       char buf[1056];
       //bool bHeld = false;
-      std::vector<double> PosX(3);
-      std::vector<double> PosY(3);
-      std::vector<double> PosZ(3);
-      std::vector<double> coefRA(m_nNumberCameraCoefSolved);
-      std::vector<double> coefDEC(m_nNumberCameraCoefSolved);
-      std::vector<double> coefTWI(m_nNumberCameraCoefSolved);
+      std::vector<double> coefX(m_nNumberCamPosCoefSolved);
+      std::vector<double> coefY(m_nNumberCamPosCoefSolved);
+      std::vector<double> coefZ(m_nNumberCamPosCoefSolved);
+      std::vector<double> coefRA(m_nNumberCamAngleCoefSolved);
+      std::vector<double> coefDEC(m_nNumberCamAngleCoefSolved);
+      std::vector<double> coefTWI(m_nNumberCamAngleCoefSolved);
       std::vector<double> angles;
       Camera *pCamera = NULL;
       SpicePosition *pSpicePosition = NULL;
@@ -6374,13 +6404,13 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           // and orientation angles). For others (linescan, radar) we retrieve the polynomial
           // coefficients from which the Exterior Orientation parameters are derived.
           if ( m_spacecraftPositionSolveType > 0 )
-              pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
+              pSpicePosition->GetPolynomial(coefX, coefY, coefZ);
           else { // not solving for position
               std::vector <double> coordinate(3);
               coordinate = pSpicePosition->GetCenterCoordinate();
-              PosX[0] = coordinate[0];
-              PosY[0] = coordinate[1];
-              PosZ[0] = coordinate[2];
+              coefX.push_back(coordinate[0]);
+              coefY.push_back(coordinate[1]);
+              coefZ.push_back(coordinate[2]);
           }
 
           if ( m_cmatrixSolveType > 0 )
@@ -6401,188 +6431,110 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
                   "Parameter         Value              Correction            Value             Accuracy          Accuracy\n");
           fp_out << buf;
 
-          if ( m_spacecraftPositionSolveType == 0 ) {
-              sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", PosX[0], 0.0, PosX[0], 0.0, "N/A");
-              fp_out << buf;
-              sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", PosY[0], 0.0, PosY[0], 0.0, "N/A");
-              fp_out << buf;
-              sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", PosZ[0], 0.0, PosZ[0], 0.0, "N/A");
-              fp_out << buf;
-          }
-          else if ( m_spacecraftPositionSolveType == 1 ) {
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-
-              sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      PosX[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                      PosX[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      PosY[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                      PosY[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      PosZ[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                      PosZ[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-              fp_out << buf;
-              nIndex++;
-          }
-          else if (m_spacecraftPositionSolveType == 2) {
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      PosX[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                      PosX[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "       Xv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      PosX[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                      PosX[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      PosY[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                      PosY[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "       Yv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      PosY[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                      PosY[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      PosZ[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                      PosZ[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "       Zv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      PosZ[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                      PosZ[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
-              fp_out << buf;
-              nIndex++;
-          }
-          else if ( m_spacecraftPositionSolveType == 3 ) {
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      PosX[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                      PosX[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "       Xv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      PosX[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                      PosX[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "       Xa%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      PosX[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                      PosX[2], m_dGlobalSpacecraftAccelerationAprioriSigma, dSigma);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "        Y%17.8f%21.8f%20.8f%18.8lf%18.8lf\n",
-                      PosY[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                      PosY[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "       Yv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      PosY[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                      PosY[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "       Ya%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      PosY[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                      PosY[2], m_dGlobalSpacecraftAccelerationAprioriSigma, dSigma);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "        Z%17.8f%21.8f%20.8f%18.8lf%18.8lf\n",
-                      PosZ[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                      PosZ[0], m_dGlobalSpacecraftPositionAprioriSigma, dSigma);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "       Zv%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      PosZ[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                      PosZ[1], m_dGlobalSpacecraftVelocityAprioriSigma, dSigma);
-              fp_out << buf;
-              nIndex++;
-              if( bSolveSparse )
-                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-              sprintf(buf, "       Za%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
-                      PosZ[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex),
-                      PosZ[2], m_dGlobalSpacecraftAccelerationAprioriSigma, dSigma);
-              fp_out << buf;
-              nIndex++;
-          }
-
-          if( m_nNumberCameraCoefSolved > 0 ) {
-              char strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
+          if( m_nNumberCamPosCoefSolved > 0 ) {
+              char strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
               std::ostringstream ostr;
-              for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+              for( int i = 0; i < m_nNumberCamPosCoefSolved; i++ ) {
+                  if( i ==0 )
+                      ostr << "  " << strcoeff;
+                  else if ( i == 1 )
+                      ostr << " " << strcoeff << "t";
+                  else
+                      ostr << strcoeff << "t" << i;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  if( i == 0 ) {
+                    sprintf(buf, "  X (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                            ostr.str().c_str(),coefX[i] - m_Image_Corrections(nIndex),
+                            m_Image_Corrections(nIndex), coefX[i],
+                            m_dGlobalSpacecraftPositionAprioriSigma[i], dSigma);
+                  }
+                  else {
+                      sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                              ostr.str().c_str(),coefX[i] - m_Image_Corrections(nIndex),
+                              m_Image_Corrections(nIndex), coefX[i],
+                              m_dGlobalSpacecraftPositionAprioriSigma[i], dSigma);
+                  }
+                  fp_out << buf;
+                  ostr.str("");
+                  strcoeff--;
+                  nIndex++;
+              }
+              strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
+              for( int i = 0; i < m_nNumberCamPosCoefSolved; i++ ) {
+                  if( i ==0 )
+                      ostr << "  " << strcoeff;
+                  else if ( i == 1 )
+                      ostr << " " << strcoeff << "t";
+                  else
+                      ostr << strcoeff << "t" << i;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  if( i == 0 ) {
+                    sprintf(buf, "  Y (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                            ostr.str().c_str(),coefY[i] - m_Image_Corrections(nIndex),
+                            m_Image_Corrections(nIndex), coefY[i],
+                            m_dGlobalSpacecraftPositionAprioriSigma[i], dSigma);
+                  }
+                  else {
+                      sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                              ostr.str().c_str(),coefY[i] - m_Image_Corrections(nIndex),
+                              m_Image_Corrections(nIndex), coefY[i],
+                              m_dGlobalSpacecraftPositionAprioriSigma[i], dSigma);
+                  }
+                  fp_out << buf;
+                  ostr.str("");
+                  strcoeff--;
+                  nIndex++;
+              }
+              strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
+              for( int i = 0; i < m_nNumberCamPosCoefSolved; i++ ) {
+                  if( i ==0 )
+                      ostr << "  " << strcoeff;
+                  else if ( i == 1 )
+                      ostr << " " << strcoeff << "t";
+                  else
+                      ostr << strcoeff << "t" << i;
+                  if( bSolveSparse )
+                      dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                  else
+                      dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+                  if( i == 0 ) {
+                    sprintf(buf, "  Z (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                            ostr.str().c_str(),coefZ[i] - m_Image_Corrections(nIndex),
+                            m_Image_Corrections(nIndex), coefZ[i],
+                            m_dGlobalSpacecraftPositionAprioriSigma[i], dSigma);
+                  }
+                  else {
+                      sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18.8lf\n",
+                              ostr.str().c_str(),coefZ[i] - m_Image_Corrections(nIndex),
+                              m_Image_Corrections(nIndex), coefZ[i],
+                              m_dGlobalSpacecraftPositionAprioriSigma[i], dSigma);
+                  }
+                  fp_out << buf;
+                  ostr.str("");
+                  strcoeff--;
+                  nIndex++;
+              }
+          }
+
+          else {
+            sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", coefX[0], 0.0, coefX[0], 0.0, "N/A");
+            fp_out << buf;
+            sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", coefY[0], 0.0, coefY[0], 0.0, "N/A");
+            fp_out << buf;
+            sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18s\n", coefZ[0], 0.0, coefZ[0], 0.0, "N/A");
+            fp_out << buf;
+          }
+
+          if( m_nNumberCamAngleCoefSolved > 0 ) {
+              char strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
+              std::ostringstream ostr;
+              for( int i = 0; i < m_nNumberCamAngleCoefSolved; i++ ) {
                   if( i ==0 )
                       ostr << "  " << strcoeff;
                   else if ( i == 1 )
@@ -6610,8 +6562,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
                   strcoeff--;
                   nIndex++;
               }
-              strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
-              for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+              strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
+              for( int i = 0; i < m_nNumberCamAngleCoefSolved; i++ ) {
                   if( i ==0 )
                       ostr << "  " << strcoeff;
                   else if ( i == 1 )
@@ -6645,8 +6597,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
                   fp_out << buf;
               }
               else {
-                  strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
-                  for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+                  strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
+                  for( int i = 0; i < m_nNumberCamAngleCoefSolved; i++ ) {
                       if( i ==0 )
                           ostr << "  " << strcoeff;
                       else if ( i == 1 )
@@ -6677,7 +6629,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               }
           }
 
-          else{
+          else {
               sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
                       coefRA[0]*RAD2DEG, 0.0, coefRA[0]*RAD2DEG, 0.0, "N/A");
               fp_out << buf;
@@ -6869,12 +6821,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       char buf[1056];
 
     //bool bHeld = false;
-    std::vector<double> PosX(3);
-    std::vector<double> PosY(3);
-    std::vector<double> PosZ(3);
-    std::vector<double> coefRA(m_nNumberCameraCoefSolved);
-    std::vector<double> coefDEC(m_nNumberCameraCoefSolved);
-    std::vector<double> coefTWI(m_nNumberCameraCoefSolved);
+    std::vector<double> coefX(m_nNumberCamPosCoefSolved);
+    std::vector<double> coefY(m_nNumberCamPosCoefSolved);
+    std::vector<double> coefZ(m_nNumberCamPosCoefSolved);
+    std::vector<double> coefRA(m_nNumberCamAngleCoefSolved);
+    std::vector<double> coefDEC(m_nNumberCamAngleCoefSolved);
+    std::vector<double> coefTWI(m_nNumberCamAngleCoefSolved);
     std::vector<double> angles;
     Camera *pCamera = NULL;
     SpicePosition *pSpicePosition = NULL;
@@ -6913,14 +6865,14 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       // Exterior Orientation parameters are derived.  For framing cameras, a single
       // coefficient for each coordinate is returned.
       if ( m_spacecraftPositionSolveType > 0 )
-          pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
+          pSpicePosition->GetPolynomial(coefX,coefY,coefZ);
       //      else { // frame camera
       else { // This is for m_spacecraftPositionSolveType = None and no polynomial fit has occurred
           std::vector <double> coordinate(3);
           coordinate = pSpicePosition->GetCenterCoordinate();
-          PosX[0] = coordinate[0];
-          PosY[0] = coordinate[1];
-          PosZ[0] = coordinate[2];
+          coefX.push_back(coordinate[0]);
+          coefY.push_back(coordinate[1]);
+          coefZ.push_back(coordinate[2]);
       }
 
       if ( m_cmatrixSolveType > 0 ) {
@@ -6942,97 +6894,97 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               "Parameter         Value              Correction            Value             Accuracy          Accuracy\n");
       fp_out << buf;
 
-      if (m_spacecraftPositionSolveType == 0) {
-        sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18s%18s\n", PosX[0], 0.0, PosX[0], "N/A", "N/A");
-        fp_out << buf;
-        sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18s%18s\n", PosY[0], 0.0, PosY[0], "N/A", "N/A");
-        fp_out << buf;
-        sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18s%18s\n", PosZ[0], 0.0, PosZ[0], "N/A", "N/A");
-        fp_out << buf;
+      if( m_nNumberCamPosCoefSolved > 0 ) {
+          char strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
+          std::ostringstream ostr;
+          for( int i = 0; i < m_nNumberCamPosCoefSolved; i++ ) {
+              if( i ==0 )
+                  ostr << "  " << strcoeff;
+              else if ( i == 1 )
+                  ostr << " " << strcoeff << "t";
+              else
+                  ostr << strcoeff << "t" << i;
+              if( i == 0 ) {
+                sprintf(buf, "  X (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                        ostr.str().c_str(), coefX[i] - m_Image_Corrections(nIndex),
+                        m_Image_Corrections(nIndex), coefX[i],
+                        m_dGlobalSpacecraftPositionAprioriSigma[i], "N/A");
+              }
+              else {
+                sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                        ostr.str().c_str(), coefX[i] - m_Image_Corrections(nIndex),
+                        m_Image_Corrections(nIndex), coefX[i],
+                        m_dGlobalSpacecraftPositionAprioriSigma[i], "N/A");
+              }
+              fp_out << buf;
+              ostr.str("");
+              strcoeff--;
+              nIndex++;
+          }
+          strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
+          for( int i = 0; i < m_nNumberCamPosCoefSolved; i++ ) {
+              if( i ==0 )
+                  ostr << "  " << strcoeff;
+              else if ( i == 1 )
+                  ostr << " " << strcoeff << "t";
+              else
+                  ostr << strcoeff << "t" << i;
+              if( i == 0 ) {
+                sprintf(buf, "  Y (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                        ostr.str().c_str(), coefY[i] - m_Image_Corrections(nIndex),
+                        m_Image_Corrections(nIndex), coefY[i],
+                        m_dGlobalSpacecraftPositionAprioriSigma[i], "N/A");
+              }
+              else {
+                sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                        ostr.str().c_str(), coefY[i] - m_Image_Corrections(nIndex),
+                        m_Image_Corrections(nIndex), coefY[i],
+                        m_dGlobalSpacecraftPositionAprioriSigma[i], "N/A");
+              }
+              fp_out << buf;
+              ostr.str("");
+              strcoeff--;
+              nIndex++;
+          }
+          strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
+          for( int i = 0; i < m_nNumberCamPosCoefSolved; i++ ) {
+              if( i ==0 )
+                  ostr << "  " << strcoeff;
+              else if ( i == 1 )
+                  ostr << " " << strcoeff << "t";
+              else
+                  ostr << strcoeff << "t" << i;
+              if( i == 0 ) {
+                sprintf(buf, "  Z (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                        ostr.str().c_str(), coefZ[i] - m_Image_Corrections(nIndex),
+                        m_Image_Corrections(nIndex), coefZ[i],
+                        m_dGlobalSpacecraftPositionAprioriSigma[i], "N/A");
+              }
+              else {
+                sprintf(buf, "    (%s)%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
+                        ostr.str().c_str(), coefZ[i] - m_Image_Corrections(nIndex),
+                        m_Image_Corrections(nIndex), coefZ[i],
+                        m_dGlobalSpacecraftPositionAprioriSigma[i], "N/A");
+              }
+              fp_out << buf;
+              ostr.str("");
+              strcoeff--;
+              nIndex++;
+          }
       }
-      else if (m_spacecraftPositionSolveType == 1) {
-        sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                PosX[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosX[0], m_dGlobalSpacecraftPositionAprioriSigma, "N/A");
+      else {
+        sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18s%18s\n", coefX[0], 0.0, coefX[0], "N/A", "N/A");
         fp_out << buf;
-        nIndex++;
-        sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                PosY[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosY[0], m_dGlobalSpacecraftPositionAprioriSigma, "N/A");
+        sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18s%18s\n", coefY[0], 0.0, coefY[0], "N/A", "N/A");
         fp_out << buf;
-        nIndex++;
-        sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                PosZ[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosZ[0], m_dGlobalSpacecraftPositionAprioriSigma, "N/A");
+        sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18s%18s\n", coefZ[0], 0.0, coefZ[0], "N/A", "N/A");
         fp_out << buf;
-        nIndex++;
-      }
-      else if (m_spacecraftPositionSolveType == 2) {
-        sprintf(buf, "        X%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                PosX[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosX[0], m_dGlobalSpacecraftPositionAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "       Xv%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                PosX[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosX[1], m_dGlobalSpacecraftVelocityAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "        Y%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                PosY[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosY[0], m_dGlobalSpacecraftPositionAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "       Yv%17.8lf%21.8lf%20.8lf%18.8lf%18.s\n",
-                PosY[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosY[1], m_dGlobalSpacecraftVelocityAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "        Z%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                PosZ[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosZ[0], m_dGlobalSpacecraftPositionAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "       Zv%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                PosZ[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosZ[1], m_dGlobalSpacecraftVelocityAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-      }
-      else if (m_spacecraftPositionSolveType == 3) {
-        sprintf(buf, "       X0%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                PosX[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosX[0], m_dGlobalSpacecraftPositionAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "       X1%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                PosX[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosX[1], m_dGlobalSpacecraftVelocityAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "       X2%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                PosX[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosX[2], m_dGlobalSpacecraftAccelerationAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "       Y0%17.8f%21.8f%20.8f%18.8lf%18s\n",
-                PosY[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosY[0], m_dGlobalSpacecraftPositionAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "       Y1%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                PosY[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosY[1], m_dGlobalSpacecraftVelocityAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "       Y2%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                PosY[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosY[2], m_dGlobalSpacecraftAccelerationAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "       Z0%17.8f%21.8f%20.8f%18.8lf%18s\n",
-                PosZ[0] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosZ[0], m_dGlobalSpacecraftPositionAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "       Z1%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                PosZ[1] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosZ[1], m_dGlobalSpacecraftVelocityAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
-        sprintf(buf, "       Z2%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
-                PosZ[2] - m_Image_Corrections(nIndex), m_Image_Corrections(nIndex), PosZ[2], m_dGlobalSpacecraftAccelerationAprioriSigma, "N/A");
-        fp_out << buf;
-        nIndex++;
       }
 
-      if( m_nNumberCameraCoefSolved > 0 ) {
-          char strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
+      if( m_nNumberCamAngleCoefSolved > 0 ) {
+          char strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
           std::ostringstream ostr;
-          for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+          for( int i = 0; i < m_nNumberCamAngleCoefSolved; i++ ) {
               if( i ==0 )
                   ostr << "  " << strcoeff;
               else if ( i == 1 )
@@ -7056,8 +7008,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               strcoeff--;
               nIndex++;
           }
-          strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
-          for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+          strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
+          for( int i = 0; i < m_nNumberCamAngleCoefSolved; i++ ) {
               if( i ==0 )
                   ostr << "  " << strcoeff;
               else if ( i == 1 )
@@ -7087,8 +7039,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               fp_out << buf;
           }
           else {
-              strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
-              for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+              strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
+              for( int i = 0; i < m_nNumberCamAngleCoefSolved; i++ ) {
                   if( i ==0 )
                       ostr << "  " << strcoeff;
                   else if ( i == 1 )
@@ -7114,7 +7066,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               }
           }
       }
-      else{
+      else {
           sprintf(buf, "       RA%17.8lf%21.8lf%20.8lf%18.8lf%18s\n",
                   coefRA[0]*RAD2DEG, 0.0, coefRA[0]*RAD2DEG, 0.0, "N/A");
           fp_out << buf;
@@ -7437,52 +7389,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       output_columns.push_back("rms,");
       output_columns.push_back("rms,");
 
-      if ( m_spacecraftPositionSolveType <= 1 ) {
-          for(int i = 0; i < 5; i++ )
-              output_columns.push_back("X,");
-          for(int i = 0; i < 5; i++ )
-              output_columns.push_back("Y,");
-          for(int i = 0; i < 5; i++ )
-              output_columns.push_back("Z,");
-      }
-      else if ( m_spacecraftPositionSolveType == 2 ) {
-          for(int i = 0; i < 5; i++ )
-              output_columns.push_back("X,");
-          for(int i = 0; i < 5; i++ )
-              output_columns.push_back("Xv,");
-          for(int i = 0; i < 5; i++ )
-              output_columns.push_back("Y,");
-          for(int i = 0; i < 5; i++ )
-              output_columns.push_back("Yv,");
-          for(int i = 0; i < 5; i++ )
-              output_columns.push_back("Z,");
-          for(int i = 0; i < 5; i++ )
-              output_columns.push_back("Zv,");
-      }
-      else if ( m_spacecraftPositionSolveType == 3 ) {
-          for(int i = 0; i < 5; i++ )
-              output_columns.push_back("X,");
-          for(int i = 0; i < 5; i++ )
-              output_columns.push_back("Xv,");
-          for(int i = 0; i < 5; i++ )
-              output_columns.push_back("Xa,");
-          for(int i = 0; i < 5; i++ )
-              output_columns.push_back("Y,");
-          for(int i = 0; i < 5; i++ )
-              output_columns.push_back("Yv,");
-          for(int i = 0; i < 5; i++ )
-              output_columns.push_back("Ya,");
-          for(int i = 0; i < 5; i++ )
-              output_columns.push_back("Z,");
-          for(int i = 0; i < 5; i++ )
-              output_columns.push_back("Zv,");
-          for(int i = 0; i < 5; i++ )
-              output_columns.push_back("Za,");
-      }
-
-      char strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
+      char strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
       std::ostringstream ostr;
-      for( int i = 0; i < m_nNumberCameraCoefSolved; i++) {
+      for( int i = 0; i < m_nNumberCamPosCoefSolved; i++) {
           if( i ==0 )
               ostr << strcoeff;
           else if ( i == 1 )
@@ -7490,7 +7399,78 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           else
               ostr << strcoeff << "t" << i;
           for( int j = 0; j < 5; j++ ) {
-              if( m_nNumberCameraCoefSolved == 1 )
+              if( m_nNumberCamAngleCoefSolved == 1 )
+                  output_columns.push_back("X,");
+              else {
+                  std::string str = "X(";
+                  str += ostr.str().c_str();
+                  str += "),";
+                  output_columns.push_back(str);
+              }
+          }
+          ostr.str("");
+          strcoeff--;
+      }
+      strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
+      for( int i = 0; i < m_nNumberCamPosCoefSolved; i++) {
+          if( i ==0 )
+              ostr << strcoeff;
+          else if ( i == 1 )
+              ostr << strcoeff << "t";
+          else
+              ostr << strcoeff << "t" << i;
+          for( int j = 0; j < 5; j++ ) {
+              if( m_nNumberCamAngleCoefSolved == 1 )
+                  output_columns.push_back("Y,");
+              else {
+                  std::string str = "Y(";
+                  str += ostr.str().c_str();
+                  str += "),";
+                  output_columns.push_back(str);
+              }
+          }
+          ostr.str("");
+          strcoeff--;
+      }
+      strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
+
+      for ( int i = 0; i < m_nNumberCamPosCoefSolved; i++) {
+
+        if ( i ==0 )
+          ostr << strcoeff;
+        else if ( i == 1 )
+          ostr << strcoeff << "t";
+        else
+          ostr << strcoeff << "t" << i;
+
+        for ( int j = 0; j < 5; j++ ) {
+
+          if ( m_nNumberCamAngleCoefSolved == 1 || !m_bSolveTwist) {
+            output_columns.push_back("Z,");
+          }
+          else {
+            std::string str = "Z(";
+            str += ostr.str().c_str();
+            str += "),";
+            output_columns.push_back(str);
+          }
+        }
+
+        ostr.str("");
+        strcoeff--;
+        if (!m_bSolveTwist) break;
+      }
+
+      strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
+      for( int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
+          if( i ==0 )
+              ostr << strcoeff;
+          else if ( i == 1 )
+              ostr << strcoeff << "t";
+          else
+              ostr << strcoeff << "t" << i;
+          for( int j = 0; j < 5; j++ ) {
+              if( m_nNumberCamAngleCoefSolved == 1 )
                   output_columns.push_back("RA,");
               else {
                   std::string str = "RA(";
@@ -7502,8 +7482,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           ostr.str("");
           strcoeff--;
       }
-      strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
-      for( int i = 0; i < m_nNumberCameraCoefSolved; i++) {
+      strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
+      for( int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
           if( i ==0 )
               ostr << strcoeff;
           else if ( i == 1 )
@@ -7511,7 +7491,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           else
               ostr << strcoeff << "t" << i;
           for( int j = 0; j < 5; j++ ) {
-              if( m_nNumberCameraCoefSolved == 1 )
+              if( m_nNumberCamAngleCoefSolved == 1 )
                   output_columns.push_back("DEC,");
               else {
                   std::string str = "DEC(";
@@ -7523,9 +7503,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           ostr.str("");
           strcoeff--;
       }
-      strcoeff = 'a' + m_nNumberCameraCoefSolved -1;
+      strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
 
-      for ( int i = 0; i < m_nNumberCameraCoefSolved; i++) {
+      for ( int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
 
         if ( i ==0 )
           ostr << strcoeff;
@@ -7536,7 +7516,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
         for ( int j = 0; j < 5; j++ ) {
 
-          if ( m_nNumberCameraCoefSolved == 1 || !m_bSolveTwist) {
+          if ( m_nNumberCamAngleCoefSolved == 1 || !m_bSolveTwist) {
             output_columns.push_back("TWIST,");
           }
           else {
@@ -7578,7 +7558,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           nparams = 9;
       int numCameraAnglesSolved = 2;
       if (m_bSolveTwist) numCameraAnglesSolved++;
-      nparams += numCameraAnglesSolved*m_nNumberCameraCoefSolved;
+      nparams += numCameraAnglesSolved*m_nNumberCamAngleCoefSolved;
       if (!m_bSolveTwist) nparams += 1; // Report on twist only
       for(int i = 0; i < nparams; i++ ) {
           output_columns.push_back("Initial,");
@@ -7607,12 +7587,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       int nIndex = 0;
       bool bSolveSparse = false;
       //bool bHeld = false;
-      std::vector<double> PosX(3);
-      std::vector<double> PosY(3);
-      std::vector<double> PosZ(3);
-      std::vector<double> coefRA(m_nNumberCameraCoefSolved);
-      std::vector<double> coefDEC(m_nNumberCameraCoefSolved);
-      std::vector<double> coefTWI(m_nNumberCameraCoefSolved);
+      std::vector<double> coefX(m_nNumberCamPosCoefSolved);
+      std::vector<double> coefY(m_nNumberCamPosCoefSolved);
+      std::vector<double> coefZ(m_nNumberCamPosCoefSolved);
+      std::vector<double> coefRA(m_nNumberCamAngleCoefSolved);
+      std::vector<double> coefDEC(m_nNumberCamAngleCoefSolved);
+      std::vector<double> coefTWI(m_nNumberCamAngleCoefSolved);
       std::vector<double> angles;
 
       output_columns.clear();
@@ -7653,14 +7633,14 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         //  we retrieve the polynomial coefficients from which the Exterior
         // Orientation parameters are derived.
         if ( m_spacecraftPositionSolveType > 0 )
-          pSpicePosition->GetPolynomial(PosX, PosY, PosZ);
+          pSpicePosition->GetPolynomial(coefX, coefY, coefZ);
         else { // not solving for position so report state at center of image
           std::vector <double> coordinate(3);
           coordinate = pSpicePosition->GetCenterCoordinate();
 
-          PosX[0] = coordinate[0];
-          PosY[0] = coordinate[1];
-          PosZ[0] = coordinate[2];
+          coefX.push_back(coordinate[0]);
+          coefY.push_back(coordinate[1]);
+          coefZ.push_back(coordinate[2]);
         }
 
         if ( m_cmatrixSolveType > 0 )
@@ -7689,163 +7669,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         output_columns.push_back(boost::lexical_cast<std::string>
             (m_rmsImageResiduals[i].Rms()));
 
-        // add all XYZ(J2000) spacecraft position parameters to column vector
-        if ( m_spacecraftPositionSolveType == 0 ) {
-            output_columns.push_back(boost::lexical_cast<std::string>(PosX[0]));
-            output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-            output_columns.push_back(boost::lexical_cast<std::string>(PosX[0]));
-            output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-            output_columns.push_back("N/A");
-            output_columns.push_back(boost::lexical_cast<std::string>(PosY[0]));
-            output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-            output_columns.push_back(boost::lexical_cast<std::string>(PosY[0]));
-            output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-            output_columns.push_back("N/A");
-            output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0]));
-            output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-            output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0]));
-            output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-            output_columns.push_back("N/A");
-        }
-        else if ( m_spacecraftPositionSolveType == 1 ) {
-          if ( m_bErrorPropagation && m_bConverged ) {
-            if ( bSolveSparse )
-              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-            else
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          }
-
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosX[0] - m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosX[0]));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_dGlobalSpacecraftPositionAprioriSigma));
-
-          if ( m_bErrorPropagation && m_bConverged )
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (dSigma));
-          else
-            output_columns.push_back("N/A");
-
-          nIndex++;
-          if ( m_bErrorPropagation && m_bConverged ) {
-            if (bSolveSparse )
-              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-            else
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          }
-
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosY[0] - m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosY[0]));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_dGlobalSpacecraftPositionAprioriSigma));
-
-          if ( m_bErrorPropagation && m_bConverged )
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (dSigma));
-          else
-            output_columns.push_back("N/A");
-
-          nIndex++;
-          if ( m_bErrorPropagation && m_bConverged ) {
-            if (bSolveSparse )
-              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-            else
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          }
-
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosZ[0] - m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0]));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_dGlobalSpacecraftPositionAprioriSigma));
-
-          if ( m_bErrorPropagation && m_bConverged )
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (dSigma));
-          else
-            output_columns.push_back("N/A");
-          nIndex++;
-        }
-        else if (m_spacecraftPositionSolveType == 2) {
-
-          if ( m_bErrorPropagation && m_bConverged ) {
-            if (bSolveSparse )
-              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-            else
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          }
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosX[0] - m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosX[0]));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_dGlobalSpacecraftPositionAprioriSigma));
-
-          if ( m_bErrorPropagation && m_bConverged )
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (dSigma));
-          else
-            output_columns.push_back("N/A");
-
-          nIndex++;
-
-          if ( m_bErrorPropagation && m_bConverged ) {
-            if (bSolveSparse )
-              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-            else
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          }
-
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosX[1] - m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosX[1]));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_dGlobalSpacecraftVelocityAprioriSigma));
-
-          if ( m_bErrorPropagation && m_bConverged )
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (dSigma));
-          else
-            output_columns.push_back("N/A");
-            nIndex++;
-
-            if ( m_bErrorPropagation && m_bConverged ) {
-              if (bSolveSparse )
-                dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-            }
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (PosY[0] - m_Image_Corrections(nIndex)));
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (m_Image_Corrections(nIndex)));
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (PosY[0]));
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (m_dGlobalSpacecraftPositionAprioriSigma));
-
-            if ( m_bErrorPropagation && m_bConverged )
-              output_columns.push_back(boost::lexical_cast<std::string>
-                  (dSigma));
-            else
-              output_columns.push_back("N/A");
-
-            nIndex++;
+        if ( m_nNumberCamPosCoefSolved > 0 ) {
+          for ( int i = 0; i < m_nNumberCamPosCoefSolved; i++ ) {
 
             if ( m_bErrorPropagation && m_bConverged ) {
               if (bSolveSparse )
@@ -7855,36 +7680,13 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
             }
 
             output_columns.push_back(boost::lexical_cast<std::string>
-                (PosY[1] - m_Image_Corrections(nIndex)));
+                (coefX[0] - m_Image_Corrections(nIndex)));
             output_columns.push_back(boost::lexical_cast<std::string>
                 (m_Image_Corrections(nIndex)));
             output_columns.push_back(boost::lexical_cast<std::string>
-                (PosY[1]));
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (m_dGlobalSpacecraftVelocityAprioriSigma));
-
-            if ( m_bErrorPropagation && m_bConverged )
-              output_columns.push_back(boost::lexical_cast<std::string>
-                  (dSigma));
-            else
-              output_columns.push_back("N/A");
-
-            nIndex++;
-
-            if ( m_bErrorPropagation && m_bConverged ) {
-              if (bSolveSparse )
-                dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-              else
-                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-            }
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (PosZ[0] - m_Image_Corrections(nIndex)));
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (m_Image_Corrections(nIndex)));
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (PosZ[0]));
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (m_dGlobalSpacecraftPositionAprioriSigma));
+                (coefX[i]));
+            output_columns.push_back(boost::lexical_cast<std::string>(
+                m_dGlobalSpacecraftPositionAprioriSigma[i]));
 
             if ( m_bErrorPropagation && m_bConverged )
               output_columns.push_back(boost::lexical_cast<std::string>
@@ -7892,6 +7694,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
             else
               output_columns.push_back("N/A");
             nIndex++;
+          }
+          for ( int i = 0; i < m_nNumberCamPosCoefSolved; i++ ) {
 
             if ( m_bErrorPropagation && m_bConverged ) {
               if (bSolveSparse )
@@ -7901,13 +7705,13 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
             }
 
             output_columns.push_back(boost::lexical_cast<std::string>
-                (PosZ[1] - m_Image_Corrections(nIndex)));
+                (coefY[0] - m_Image_Corrections(nIndex)));
             output_columns.push_back(boost::lexical_cast<std::string>
                 (m_Image_Corrections(nIndex)));
             output_columns.push_back(boost::lexical_cast<std::string>
-                (PosZ[1]));
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (m_dGlobalSpacecraftVelocityAprioriSigma));
+                (coefY[i]));
+            output_columns.push_back(boost::lexical_cast<std::string>(
+                m_dGlobalSpacecraftPositionAprioriSigma[i]));
 
             if ( m_bErrorPropagation && m_bConverged )
               output_columns.push_back(boost::lexical_cast<std::string>
@@ -7915,210 +7719,53 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
             else
               output_columns.push_back("N/A");
             nIndex++;
+          }
+          for ( int i = 0; i < m_nNumberCamPosCoefSolved; i++ ) {
+
+            if ( m_bErrorPropagation && m_bConverged ) {
+              if (bSolveSparse )
+                dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+            }
+
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (coefZ[0] - m_Image_Corrections(nIndex)));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (m_Image_Corrections(nIndex)));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (coefZ[i]));
+            output_columns.push_back(boost::lexical_cast<std::string>(
+                m_dGlobalSpacecraftPositionAprioriSigma[i]));
+
+            if ( m_bErrorPropagation && m_bConverged )
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  (dSigma));
+            else
+              output_columns.push_back("N/A");
+            nIndex++;
+          }
         }
-        else if ( m_spacecraftPositionSolveType == 3 ) {
-          if ( m_bErrorPropagation && m_bConverged ) {
-            if (bSolveSparse )
-              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-            else
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          }
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosX[0] - m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosX[0]));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_dGlobalSpacecraftPositionAprioriSigma));
-
-          if ( m_bErrorPropagation && m_bConverged )
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (dSigma));
-          else
-            output_columns.push_back("N/A");
-          nIndex++;
-
-          if ( m_bErrorPropagation && m_bConverged ) {
-            if (bSolveSparse )
-              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-            else
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          }
-
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosX[1] - m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosX[1]));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_dGlobalSpacecraftVelocityAprioriSigma));
-
-          if ( m_bErrorPropagation && m_bConverged )
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (dSigma));
-          else
-            output_columns.push_back("N/A");
-          nIndex++;
-
-          if ( m_bErrorPropagation && m_bConverged ) {
-            if (bSolveSparse )
-              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-            else
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          }
-
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosX[2] - m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>(PosX[2]));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_dGlobalSpacecraftAccelerationAprioriSigma));
-
-          if ( m_bErrorPropagation && m_bConverged )
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (dSigma));
-          else
-            output_columns.push_back("N/A");
-          nIndex++;
-
-          if ( m_bErrorPropagation && m_bConverged ) {
-            if (bSolveSparse )
-              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-            else
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          }
-
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosY[0] - m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosY[0]));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_dGlobalSpacecraftPositionAprioriSigma));
-
-          if ( m_bErrorPropagation && m_bConverged )
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (dSigma));
-          else
-            output_columns.push_back("N/A");
-          nIndex++;
-
-          if ( m_bErrorPropagation && m_bConverged ) {
-            if (bSolveSparse )
-              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-            else
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          }
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosY[1] - m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>(PosY[1]));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_dGlobalSpacecraftVelocityAprioriSigma));
-
-          if ( m_bErrorPropagation && m_bConverged )
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (dSigma));
-          else
-            output_columns.push_back("N/A");
-          nIndex++;
-
-          if ( m_bErrorPropagation && m_bConverged ) {
-            if (bSolveSparse )
-              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-            else
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          }
-
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosY[2] - m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>(PosY[2]));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_dGlobalSpacecraftAccelerationAprioriSigma));
-
-          if ( m_bErrorPropagation && m_bConverged )
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (dSigma));
-          else
-            output_columns.push_back("N/A");
-          nIndex++;
-
-          if ( m_bErrorPropagation && m_bConverged ) {
-            if (bSolveSparse )
-              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-            else
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          }
-
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosZ[0] - m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>(PosZ[0]));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_dGlobalSpacecraftPositionAprioriSigma));
-
-          if ( m_bErrorPropagation && m_bConverged )
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (dSigma));
-          else
-            output_columns.push_back("N/A");
-          nIndex++;
-
-          if ( m_bErrorPropagation && m_bConverged ) {
-            if (bSolveSparse )
-              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-            else
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          }
-
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosZ[1] - m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>(PosZ[1]));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_dGlobalSpacecraftVelocityAprioriSigma));
-
-          if ( m_bErrorPropagation && m_bConverged )
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (dSigma));
-          else
-            output_columns.push_back("N/A");
-          nIndex++;
-
-          if (m_bErrorPropagation) {
-            if (bSolveSparse )
-              dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
-            else
-              dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
-          }
-
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (PosZ[2] - m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_Image_Corrections(nIndex)));
-          output_columns.push_back(boost::lexical_cast<std::string>(PosZ[2]));
-          output_columns.push_back(boost::lexical_cast<std::string>
-              (m_dGlobalSpacecraftAccelerationAprioriSigma));
-
-          if ( m_bErrorPropagation && m_bConverged )
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (dSigma));
-          else
-            output_columns.push_back("N/A");
-          nIndex++;
+        else {
+          output_columns.push_back(boost::lexical_cast<std::string>(coefX[0]));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back(boost::lexical_cast<std::string>(coefX[0]));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back("N/A");
+          output_columns.push_back(boost::lexical_cast<std::string>(coefY[0]));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back(boost::lexical_cast<std::string>(coefY[0]));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back("N/A");
+          output_columns.push_back(boost::lexical_cast<std::string>(coefZ[0]));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back(boost::lexical_cast<std::string>(coefZ[0]));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back("N/A");
         }
 
-        if ( m_nNumberCameraCoefSolved > 0 ) {
-          for ( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+        if ( m_nNumberCamAngleCoefSolved > 0 ) {
+          for ( int i = 0; i < m_nNumberCamAngleCoefSolved; i++ ) {
 
             if ( m_bErrorPropagation && m_bConverged ) {
               if (bSolveSparse )
@@ -8143,7 +7790,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               output_columns.push_back("N/A");
             nIndex++;
           }
-          for ( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+          for ( int i = 0; i < m_nNumberCamAngleCoefSolved; i++ ) {
 
             if ( m_bErrorPropagation && m_bConverged ) {
               if (bSolveSparse )
@@ -8178,7 +7825,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
             output_columns.push_back("N/A");
           }
           else {
-            for( int i = 0; i < m_nNumberCameraCoefSolved; i++ ) {
+            for( int i = 0; i < m_nNumberCamAngleCoefSolved; i++ ) {
 
               if ( m_bErrorPropagation && m_bConverged ) {
                 if (bSolveSparse )
@@ -8259,40 +7906,39 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     FillPointIndexMap();
   }
 
- /**  This method steps up the maximum likelihood estimation solution.  Zero to three successive solutions models are available.
-  */
-  void BundleAdjust::maximumLikelihoodSetup( QList<std::string> models, QList<double> quantiles ) {
-    m_wFunc[0]=m_wFunc[1]=m_wFunc[2]=NULL;  //initialize to NULL
-    m_maxLikelihoodFlag[0]=m_maxLikelihoodFlag[1]=m_maxLikelihoodFlag[2]=false; //NULL flag by defualt
-    if (models.size() == 0) {  //MaximumLikeliHood Estimation not being used, so leave everything NULL
-      m_cumPro=NULL;    
-    }
-    else {
-      m_cumPro = new StatCumProbDistDynCalc;
-      m_cumPro->initialize(101);  //set up the cum probibility solver to have a node at every percent of the distribution
-      for (int i=0;i<models.size() && i<3;i++) {
-        m_maxLikelihoodFlag[i] = true;
-        m_wFunc[i] = new MaximumLikelihoodWFunctions;
-        if ( models[i].compare("HUBER") == 0 )
-          m_wFunc[i]->setModel(MaximumLikelihoodWFunctions::Huber);
-        else if ( models[i].compare("HUBER_MODIFIED") == 0 )
-          m_wFunc[i]->setModel(MaximumLikelihoodWFunctions::HuberModified);
-        else if ( models[i].compare("WELSCH") == 0 )
-          m_wFunc[i]->setModel(MaximumLikelihoodWFunctions::Welsch);
-        else if ( models[i].compare("CHEN") == 0 )
-          m_wFunc[i]->setModel(MaximumLikelihoodWFunctions::Chen);
-        else {
-           std::string msg = "Unsuported Maximum Likelihood estimation model: " + models[i] + "\n";
-           m_maxLikelihoodFlag[i] = false;
-           throw IException(IException::Io, msg, _FILEINFO_);
-        }
-      }  
-    }
-    for (int i=0;i<quantiles.size() && i<3;i++) m_maxLikelihoodQuan[i] = quantiles[i];
+  /**  This method steps up the maximum likelihood estimation solution.  Zero to three successive solutions models are available.
+   */
+   void BundleAdjust::maximumLikelihoodSetup( QList<std::string> models, QList<double> quantiles ) {
+     m_wFunc[0]=m_wFunc[1]=m_wFunc[2]=NULL;  //initialize to NULL
+     m_maxLikelihoodFlag[0]=m_maxLikelihoodFlag[1]=m_maxLikelihoodFlag[2]=false; //NULL flag by defualt
+     if (models.size() == 0) {  //MaximumLikeliHood Estimation not being used, so leave everything NULL
+       m_cumPro=NULL;
+     }
+     else {
+       m_cumPro = new StatCumProbDistDynCalc;
+       m_cumPro->initialize(101);  //set up the cum probibility solver to have a node at every percent of the distribution
+       for (int i=0;i<models.size() && i<3;i++) {
+         m_maxLikelihoodFlag[i] = true;
+         m_wFunc[i] = new MaximumLikelihoodWFunctions;
+         if ( models[i].compare("HUBER") == 0 )
+           m_wFunc[i]->setModel(MaximumLikelihoodWFunctions::Huber);
+         else if ( models[i].compare("HUBER_MODIFIED") == 0 )
+           m_wFunc[i]->setModel(MaximumLikelihoodWFunctions::HuberModified);
+         else if ( models[i].compare("WELSCH") == 0 )
+           m_wFunc[i]->setModel(MaximumLikelihoodWFunctions::Welsch);
+         else if ( models[i].compare("CHEN") == 0 )
+           m_wFunc[i]->setModel(MaximumLikelihoodWFunctions::Chen);
+         else {
+            std::string msg = "Unsuported Maximum Likelihood estimation model: " + models[i] + "\n";
+            m_maxLikelihoodFlag[i] = false;
+            throw IException(IException::Io, msg, _FILEINFO_);
+         }
+       }
+     }
+     for (int i=0;i<quantiles.size() && i<3;i++) m_maxLikelihoodQuan[i] = quantiles[i];
 
-    //maximum likelihood estimation tiered solutions requiring multiple convergeances are support, this index keeps track
-    // of which tier the solution is in
-    m_maxLikelihoodIndex=0;
-  }
-
+     //maximum likelihood estimation tiered solutions requiring multiple convergeances are support, this index keeps track
+     // of which tier the solution is in
+     m_maxLikelihoodIndex=0;
+   }
 }

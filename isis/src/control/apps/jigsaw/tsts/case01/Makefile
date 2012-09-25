@@ -1,4 +1,13 @@
- APPNAME = jigsaw
+APPNAME = jigsaw
+
+# This test exercises the bundle adjustment of images from the HiRISE camera onboard MRO.
+# oldsparse method with observation mode; solving for angles (3rd degree polynomial).
+
+# The "cat t_bundleout.txt" command in these tests uses sed to do the following (in order):
+# 1. remove cube filename paths
+# 2. remove net filename paths
+# 3. remove digits beyond the fifth decimal place of decimal numbers
+# 4. remove date and time
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -10,7 +19,7 @@ commands:
 	onet=$(OUTPUT)/case01OutNet.net \
 	observations=yes \
 	method=oldsparse \
-	solvedegree=3 \
+	cksolvedegree=3 \
 	camsolve=all \
 	update=yes \
 	file_pre=t \
@@ -21,11 +30,6 @@ commands:
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
 	  > $(OUTPUT)/bundleout.txt
-	# The above command uses sed to do the following (in order):
-	# 1. remove cube filename paths
-	# 2. remove net filename paths
-	# 3. remove digits beyond the fifth decimal place of decimal numbers
-	# 4. remove date and time
 	cat case01OutLog.txt \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  > $(OUTPUT)/case01OutLog.txt
