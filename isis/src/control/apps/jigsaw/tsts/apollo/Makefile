@@ -33,22 +33,21 @@ commands:
 	spsolve=position | grep -v "100% Processed" | \
 	grep -v "jigsaw" > apollo_specialk_outLog.txt; \
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	  | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
-	  | sed 's/\/[^,]*\/\([^,\/]*\.net\)/\1/g' \
-	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
+	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	  > $(OUTPUT)/apollo_specialK_bundleout.txt
+	  > $(OUTPUT)/apollo_specialK_bundleout.txt;
 	cat apollo_specialk_outLog.txt | grep -v "Elapsed Time:" | grep -v "TotalElapsedTime" | grep -v "ErrorPropagationElapsedTime" \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	  > $(OUTPUT)/apollo_specialk_outLog.txt
+	  > $(OUTPUT)/apollo_specialk_outLog.txt;
 	cat residuals.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
-	  > $(OUTPUT)/apollo_specialK_residuals.csv
+	  > $(OUTPUT)/apollo_specialK_residuals.csv;
 	cat bundleout_images.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
-	  > $(OUTPUT)/apollo_specialK_bundleout_images.csv
+	  > $(OUTPUT)/apollo_specialK_bundleout_images.csv;
 	$(RM) bundleout_images.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/apollo_specialK_bundleout_points.csv > /dev/null;
-	$(RM) bundleout.txt print.prt > /dev/null
-	$(RM) apollo_specialk_outLog.txt > /dev/null
+	$(RM) bundleout.txt print.prt > /dev/null;
+	$(RM) apollo_specialk_outLog.txt > /dev/null;
 	$(RM) residuals.csv > /dev/null;
 	$(APPNAME) fromlist=$(OUTPUT)/cube.lis  \
 	cnet=$(INPUT)/Ames_5-ImageLSTest_USGS_combined.net \
@@ -72,17 +71,17 @@ commands:
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	  > $(OUTPUT)/apollo_cholmod_bundleout.txt
+	  > $(OUTPUT)/apollo_cholmod_bundleout.txt;
 	cat apollo_cholmod_outLog.txt | grep -v "Elapsed Time:" | grep -v "TotalElapsedTime" | grep -v "ErrorPropagationElapsedTime" \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	  > $(OUTPUT)/apollo_cholmod_outLog.txt
+	  > $(OUTPUT)/apollo_cholmod_outLog.txt;
 	cat residuals.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g'\
-	  > $(OUTPUT)/apollo_cholmod_residuals.csv
+	  > $(OUTPUT)/apollo_cholmod_residuals.csv;
 	cat bundleout_images.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
-	  > $(OUTPUT)/apollo_cholmod_bundleout_images.csv
+	  > $(OUTPUT)/apollo_cholmod_bundleout_images.csv;
 	$(RM) bundleout_images.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/apollo_cholmod_bundleout_points.csv > /dev/null;
-	$(RM) bundleout.txt print.prt > /dev/null
-	$(RM) apollo_cholmod_outLog.txt > /dev/null
+	$(RM) bundleout.txt print.prt > /dev/null;
+	$(RM) apollo_cholmod_outLog.txt > /dev/null;
 	$(RM) residuals.csv > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis print.prt > /dev/null;
