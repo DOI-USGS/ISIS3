@@ -25,20 +25,21 @@ commands:
 	camsolve=no | grep -v "100% Processed" | \
 	grep -v "jigsaw" > radar_specialk_outLog.txt;
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	  | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
-	  | sed 's/\/[^,]*\/\([^,\/]*\.net\)/\1/g' \
-	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
+	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	  > $(OUTPUT)/radar_specialk_bundleout.txt
+	  > $(OUTPUT)/radar_specialk_bundleout.txt;
 	cat radar_specialk_outLog.txt | grep -v "Elapsed Time:" | grep -v "TotalElapsedTime" | grep -v "ErrorPropagationElapsedTime" \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  > $(OUTPUT)/radar_specialk_outLog.txt
-	cat residuals.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g'\
-	  > $(OUTPUT)/specialk_residuals.csv
-	cat bundleout_images.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
-	  > $(OUTPUT)/specialk_bundleout_images.csv
+	cat residuals.csv | sed 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
+	  > $(OUTPUT)/radar_specialk_residuals.csv;
+	cat bundleout_images.csv \
+	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	  | sed 's/\([0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9]*\)/\1/g' \
+	  > $(OUTPUT)/radar_specialk_bundleout_images.csv;
 	$(RM) bundleout_images.csv > /dev/null;
-	$(MV) bundleout_points.csv $(OUTPUT)/bundleout_points.csv > /dev/null;
+	$(MV) bundleout_points.csv $(OUTPUT)/radar_specialk_bundleout_points.csv > /dev/null;
 	$(RM) bundleout.txt print.prt > /dev/null;
 	$(RM) radar_specialk_outLog.txt > /dev/null;
 	$(RM) residuals.csv  > /dev/null;
@@ -55,20 +56,21 @@ commands:
 	camsolve=no | grep -v "100% Processed" | \
 	grep -v "jigsaw" > radar_sparse_outLog.txt;
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
-	  | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
-	  | sed 's/\/[^,]*\/\([^,\/]*\.net\)/\1/g' \
-	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
+	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	  > $(OUTPUT)/radar_sparse_bundleout.txt
+	  > $(OUTPUT)/radar_sparse_bundleout.txt;
 	cat radar_sparse_outLog.txt | grep -v "Elapsed Time:" | grep -v "TotalElapsedTime" | grep -v "ErrorPropagationElapsedTime" \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	  > $(OUTPUT)/radar_sparse_outLog.txt
-	cat residuals.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g'\
+	  > $(OUTPUT)/radar_sparse_outLog.txt;
+	cat residuals.csv | sed 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
 	  > $(OUTPUT)/radar_sparse_residuals.csv
-	cat bundleout_images.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
+	cat bundleout_images.csv \
+	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
+	  | sed 's/\([0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9]*\)/\1/g' \
 	  > $(OUTPUT)/radar_sparse_bundleout_images.csv
 	$(RM) bundleout_images.csv > /dev/null;
-	$(MV) bundleout_points.csv $(OUTPUT)/bundleout_points.csv > /dev/null;
+	$(MV) bundleout_points.csv $(OUTPUT)/radar_sparse_bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis > /dev/null;
 	$(RM) bundleout.txt print.prt > /dev/null;
 	$(RM) radar_sparse_outLog.txt > /dev/null;
