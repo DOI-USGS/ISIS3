@@ -26,11 +26,11 @@ commands:
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	  > $(OUTPUT)/obsmode_cholmod_bundleout.txt
-	cat residuals.csv | sed 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
-	  > $(OUTPUT)/obsmode_cholmod_residuals.csv
-	cat bundleout_images.csv | sed 's/\/[^,]*\/\([^,\/]*\.cub\)/\1/g' \
-	  > $(OUTPUT)/obsmode_cholmod_bundleout_images.csv
+	  > $(OUTPUT)/obsmode_cholmod_bundleout.txt;
+	cat residuals.csv | sed 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g' \
+	  > $(OUTPUT)/obsmode_cholmod_residuals.csv;
+	cat bundleout_images.csv | sed 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g' \
+	  > $(OUTPUT)/obsmode_cholmod_bundleout_images.csv;
 	$(RM) residuals.csv bundleout_images.csv > /dev/null;
 	$(MV) bundleout_points.csv $(OUTPUT)/obsmode_cholmod_bundleout_points.csv > /dev/null;
 	$(RM) $(OUTPUT)/cube.lis > /dev/null;
