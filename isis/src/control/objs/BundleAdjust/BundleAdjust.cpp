@@ -304,6 +304,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_bOutputResiduals = true;
     m_nPositionType = SpicePosition::PolyFunction;
     m_nPointingType = SpiceRotation::PolyFunction;
+    m_bSolvePolyOverHermite = false;
 
     m_dGlobalLatitudeAprioriSigma = 1000.0;
     m_dGlobalLongitudeAprioriSigma = 1000.0;
