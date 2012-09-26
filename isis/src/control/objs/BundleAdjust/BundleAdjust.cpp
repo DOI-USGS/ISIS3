@@ -893,15 +893,15 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     // throw error if a frame camera is included AND if m_bSolvePolyOverHermite
     // is set to true (can only use for line scan or radar)
-    if (m_bSolvePolyOverHermite == true) {
-      int nImages = Images();
-      for (int i = 0; i < nImages; i++) {
-        if (m_pCnet->Camera(i)->GetCameraType() == 0) {
-          std::string msg = "At least one sensor is a frame camera. Spacecraft Option OVERHERMITE is not valid for frame cameras\n";
-          throw IException(IException::User, msg, _FILEINFO_);
-        }
-      }
-    }
+//    if (m_bSolvePolyOverHermite == true) {
+//      int nImages = Images();
+//      for (int i = 0; i < nImages; i++) {
+//        if (m_pCnet->Camera(i)->GetCameraType() == 0) {
+//          std::string msg = "At least one sensor is a frame camera. Spacecraft Option OVERHERMITE is not valid for frame cameras\n";
+//          throw IException(IException::User, msg, _FILEINFO_);
+//        }
+//      }
+//    }
 
 //   double averageError;
     std::vector<int> observationInitialValueIndex;  // image index for observation inital values
