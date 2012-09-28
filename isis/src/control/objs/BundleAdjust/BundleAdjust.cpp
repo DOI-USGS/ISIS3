@@ -7392,7 +7392,80 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
       char strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
       std::ostringstream ostr;
-      for( int i = 0; i < m_nNumberCamPosCoefSolved; i++) {
+      int ncoeff = 1;
+      if ( m_nNumberCamPosCoefSolved > 0 )
+        ncoeff = m_nNumberCamPosCoefSolved;
+
+      for( int i = 0; i < ncoeff; i++) {
+          if( i ==0 )
+              ostr << strcoeff;
+          else if ( i == 1 )
+              ostr << strcoeff << "t";
+          else
+              ostr << strcoeff << "t" << i;
+          for( int j = 0; j < 5; j++ ) {
+              if( ncoeff == 1 )
+                  output_columns.push_back("X,");
+              else {
+                  std::string str = "X(";
+                  str += ostr.str().c_str();
+                  str += "),";
+                  output_columns.push_back(str);
+              }
+          }
+          ostr.str("");
+          strcoeff--;
+      }
+      strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
+      for( int i = 0; i < ncoeff; i++) {
+          if( i ==0 )
+              ostr << strcoeff;
+          else if ( i == 1 )
+              ostr << strcoeff << "t";
+          else
+              ostr << strcoeff << "t" << i;
+          for( int j = 0; j < 5; j++ ) {
+              if( ncoeff == 1 )
+                  output_columns.push_back("Y,");
+              else {
+                  std::string str = "Y(";
+                  str += ostr.str().c_str();
+                  str += "),";
+                  output_columns.push_back(str);
+              }
+          }
+          ostr.str("");
+          strcoeff--;
+      }
+      strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
+      for ( int i = 0; i < ncoeff; i++) {
+
+        if ( i ==0 )
+          ostr << strcoeff;
+        else if ( i == 1 )
+          ostr << strcoeff << "t";
+        else
+          ostr << strcoeff << "t" << i;
+
+        for ( int j = 0; j < 5; j++ ) {
+          if ( ncoeff ==   1) {
+            output_columns.push_back("Z,");
+          }
+          else {
+            std::string str = "Z(";
+            str += ostr.str().c_str();
+            str += "),";
+            output_columns.push_back(str);
+          }
+        }
+
+        ostr.str("");
+        strcoeff--;
+        if (!m_bSolveTwist) break;
+      }
+
+      strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
+      for( int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
           if( i ==0 )
               ostr << strcoeff;
           else if ( i == 1 )
@@ -7401,6 +7474,465 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               ostr << strcoeff << "t" << i;
           for( int j = 0; j < 5; j++ ) {
               if( m_nNumberCamAngleCoefSolved == 1 )
+                  output_columns.push_back("RA,");
+              else {
+                  std::string str = "RA(";
+                  str += ostr.str().c_str();
+                  str += "),";
+                  output_columns.push_back(str);
+              }
+          }
+          ostr.str("");
+          strcoeff--;
+      }
+      strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
+      for( int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
+          if( i ==0 )
+              ostr << strcoeff;
+          else if ( i == 1 )
+              ostr << strcoeff << "t";
+          else
+              ostr << strcoeff << "t" << i;
+          for( int j = 0; j < 5; j++ ) {
+              if( m_nNumberCamAngleCoefSolved == 1 )
+                  output_columns.push_back("DEC,");
+              else {
+                  std::string str = "DEC(";
+                  str += ostr.str().c_str();
+                  str += "),";
+                  output_columns.push_back(str);
+              }
+          }
+          ostr.str("");
+          strcoeff--;
+      }
+      strcoeff = 'a' + m_nNumberCamAngleCoefSolved -1;
+
+      for ( int i = 0; i < m_nNumberCamAngleCoefSolved; i++) {
+
+        if ( i ==0 )
+          ostr << strcoeff;
+        else if ( i == 1 )
+          ostr << strcoeff << "t";
+        else
+          ostr << strcoeff << "t" << i;
+
+        for ( int j = 0; j < 5; j++ ) {
+
+          if ( m_nNumberCamAngleCoefSolved == 1 || !m_bSolveTwist) {
+            output_columns.push_back("TWIST,");
+          }
+          else {
+            std::string str = "TWIST(";
+            str += ostr.str().c_str();
+            str += "),";
+            output_columns.push_back(str);
+          }
+        }
+
+        ostr.str("");
+        strcoeff--;
+        if (!m_bSolveTwist) break;
+      }
+
+      // print first column header to buffer and output to file
+      int ncolumns = output_columns.size();
+      for ( int i = 0; i < ncolumns; i++) {
+          std::string str = output_columns.at(i);
+          sprintf(buf, "%s", (const char*)str.c_str());
+          fp_out << buf;
+      }
+      sprintf(buf, "\n");
+      fp_out << buf;
+
+      output_columns.clear();
+      output_columns.push_back("Filename,");
+
+      output_columns.push_back("sample res,");
+      output_columns.push_back("line res,");
+      output_columns.push_back("total res,");
+
+      int nparams = 3;
+      if (m_nNumberCamPosCoefSolved)
+        nparams = 3 * m_nNumberCamPosCoefSolved;
+
+      int numCameraAnglesSolved = 2;
+      if (m_bSolveTwist) numCameraAnglesSolved++;
+      nparams += numCameraAnglesSolved*m_nNumberCamAngleCoefSolved;
+      if (!m_bSolveTwist) nparams += 1; // Report on twist only
+      for(int i = 0; i < nparams; i++ ) {
+          output_columns.push_back("Initial,");
+          output_columns.push_back("Correction,");
+          output_columns.push_back("Final,");
+          output_columns.push_back("Apriori Sigma,");
+          output_columns.push_back("Adj Sigma,");
+      }
+
+      // print second column header to buffer and output to file
+      ncolumns = output_columns.size();
+      for( int i = 0; i < ncolumns; i++) {
+          std::string str = output_columns.at(i);
+          sprintf(buf, "%s", (const char*)str.c_str());
+          fp_out << buf;
+      }
+      sprintf(buf, "\n");
+      fp_out << buf;
+
+      Camera *pCamera = NULL;
+      SpicePosition *pSpicePosition = NULL;
+      SpiceRotation *pSpiceRotation = NULL;
+
+      int nImages = Images();
+      double dSigma = 0.;
+      int nIndex = 0;
+      bool bSolveSparse = false;
+      //bool bHeld = false;
+      std::vector<double> coefX(m_nNumberCamPosCoefSolved);
+      std::vector<double> coefY(m_nNumberCamPosCoefSolved);
+      std::vector<double> coefZ(m_nNumberCamPosCoefSolved);
+      std::vector<double> coefRA(m_nNumberCamAngleCoefSolved);
+      std::vector<double> coefDEC(m_nNumberCamAngleCoefSolved);
+      std::vector<double> coefTWI(m_nNumberCamAngleCoefSolved);
+      std::vector<double> angles;
+
+      output_columns.clear();
+
+      gmm::row_matrix<gmm::rsvector<double> > lsqCovMatrix;
+      if (m_strSolutionMethod == "OLDSPARSE" && m_bErrorPropagation) {
+//      Get reference to the covariance matrix from the least-squares object
+        lsqCovMatrix = m_pLsq->GetCovarianceMatrix();
+        bSolveSparse = true;
+      }
+
+      std::vector<double> BFP(3);
+
+      for ( int i = 0; i < nImages; i++ ) {
+
+        //if (m_nHeldImages > 0 &&
+        //    m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(i)) )
+        //  bHeld = true;
+
+        pCamera = m_pCnet->Camera(i);
+        if ( !pCamera )
+          continue;
+
+        // ImageIndex(i) retrieves index into the normal equations matrix for
+        //  Image(i)
+        nIndex = ImageIndex(i) ;
+
+        pSpicePosition = pCamera->instrumentPosition();
+        if ( !pSpicePosition )
+          continue;
+
+        pSpiceRotation = pCamera->instrumentRotation();
+        if ( !pSpiceRotation )
+            continue;
+
+        // for frame cameras we directly retrieve the J2000 Exterior Orientation
+        // (i.e. position and orientation angles). For others (linescan, radar)
+        //  we retrieve the polynomial coefficients from which the Exterior
+        // Orientation parameters are derived.
+        if ( m_spacecraftPositionSolveType > 0 )
+          pSpicePosition->GetPolynomial(coefX, coefY, coefZ);
+        else { // not solving for position so report state at center of image
+          std::vector <double> coordinate(3);
+          coordinate = pSpicePosition->GetCenterCoordinate();
+
+          coefX.push_back(coordinate[0]);
+          coefY.push_back(coordinate[1]);
+          coefZ.push_back(coordinate[2]);
+        }
+
+        if ( m_cmatrixSolveType > 0 )
+          pSpiceRotation->GetPolynomial(coefRA,coefDEC,coefTWI);
+//          else { // frame camera
+        else if (pCamera->GetCameraType() != 3) {
+// This is for m_cmatrixSolveType = None (except Radar which has no pointing)
+// and no polynomial fit has occurred
+          angles = pSpiceRotation->GetCenterAngles();
+          coefRA.push_back(angles.at(0));
+          coefDEC.push_back(angles.at(1));
+          coefTWI.push_back(angles.at(2));
+        }
+
+        // clear column vector
+        output_columns.clear();
+
+        // add filename
+        output_columns.push_back(m_pSnList->FileName(i).c_str());
+
+        // add rms of sample, line, total image coordinate residuals
+        output_columns.push_back(boost::lexical_cast<std::string>
+            (m_rmsImageSampleResiduals[i].Rms()));
+        output_columns.push_back(boost::lexical_cast<std::string>
+            (m_rmsImageLineResiduals[i].Rms()));
+        output_columns.push_back(boost::lexical_cast<std::string>
+            (m_rmsImageResiduals[i].Rms()));
+
+        if ( m_nNumberCamPosCoefSolved > 0 ) {
+          for ( int i = 0; i < m_nNumberCamPosCoefSolved; i++ ) {
+
+            if ( m_bErrorPropagation && m_bConverged ) {
+              if (bSolveSparse )
+                dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+            }
+
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (coefX[0] - m_Image_Corrections(nIndex)));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (m_Image_Corrections(nIndex)));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (coefX[i]));
+            output_columns.push_back(boost::lexical_cast<std::string>(
+                m_dGlobalSpacecraftPositionAprioriSigma[i]));
+
+            if ( m_bErrorPropagation && m_bConverged )
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  (dSigma));
+            else
+              output_columns.push_back("N/A");
+            nIndex++;
+          }
+          for ( int i = 0; i < m_nNumberCamPosCoefSolved; i++ ) {
+
+            if ( m_bErrorPropagation && m_bConverged ) {
+              if (bSolveSparse )
+                dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+            }
+
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (coefY[0] - m_Image_Corrections(nIndex)));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (m_Image_Corrections(nIndex)));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (coefY[i]));
+            output_columns.push_back(boost::lexical_cast<std::string>(
+                m_dGlobalSpacecraftPositionAprioriSigma[i]));
+
+            if ( m_bErrorPropagation && m_bConverged )
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  (dSigma));
+            else
+              output_columns.push_back("N/A");
+            nIndex++;
+          }
+          for ( int i = 0; i < m_nNumberCamPosCoefSolved; i++ ) {
+
+            if ( m_bErrorPropagation && m_bConverged ) {
+              if (bSolveSparse )
+                dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+            }
+
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (coefZ[0] - m_Image_Corrections(nIndex)));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (m_Image_Corrections(nIndex)));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (coefZ[i]));
+            output_columns.push_back(boost::lexical_cast<std::string>(
+                m_dGlobalSpacecraftPositionAprioriSigma[i]));
+
+            if ( m_bErrorPropagation && m_bConverged )
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  (dSigma));
+            else
+              output_columns.push_back("N/A");
+            nIndex++;
+          }
+        }
+        else {
+          output_columns.push_back(boost::lexical_cast<std::string>(coefX[0]));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back(boost::lexical_cast<std::string>(coefX[0]));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back("N/A");
+          output_columns.push_back(boost::lexical_cast<std::string>(coefY[0]));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back(boost::lexical_cast<std::string>(coefY[0]));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back("N/A");
+          output_columns.push_back(boost::lexical_cast<std::string>(coefZ[0]));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back(boost::lexical_cast<std::string>(coefZ[0]));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back("N/A");
+        }
+
+        if ( m_nNumberCamAngleCoefSolved > 0 ) {
+          for ( int i = 0; i < m_nNumberCamAngleCoefSolved; i++ ) {
+
+            if ( m_bErrorPropagation && m_bConverged ) {
+              if (bSolveSparse )
+                dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+            }
+
+            output_columns.push_back(boost::lexical_cast<std::string>
+                ((coefRA[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (m_Image_Corrections(nIndex) * RAD2DEG));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (coefRA[i] * RAD2DEG));
+            output_columns.push_back(boost::lexical_cast<std::string>(
+                m_dGlobalCameraAnglesAprioriSigma[i]));
+
+            if ( m_bErrorPropagation && m_bConverged )
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  (dSigma * RAD2DEG));
+            else
+              output_columns.push_back("N/A");
+            nIndex++;
+          }
+          for ( int i = 0; i < m_nNumberCamAngleCoefSolved; i++ ) {
+
+            if ( m_bErrorPropagation && m_bConverged ) {
+              if (bSolveSparse )
+                dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+              else
+                dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+            }
+
+            output_columns.push_back(boost::lexical_cast<std::string>
+                ((coefDEC[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (m_Image_Corrections(nIndex) * RAD2DEG));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (coefDEC[i] * RAD2DEG));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (m_dGlobalCameraAnglesAprioriSigma[i]));
+
+            if ( m_bErrorPropagation && m_bConverged )
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  (dSigma * RAD2DEG));
+            else
+              output_columns.push_back("N/A");
+            nIndex++;
+          }
+          if ( !m_bSolveTwist ) {
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (coefTWI[0]*RAD2DEG));
+            output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+            output_columns.push_back(boost::lexical_cast<std::string>
+                (coefTWI[0]*RAD2DEG));
+            output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+            output_columns.push_back("N/A");
+          }
+          else {
+            for( int i = 0; i < m_nNumberCamAngleCoefSolved; i++ ) {
+
+              if ( m_bErrorPropagation && m_bConverged ) {
+                if (bSolveSparse )
+                  dSigma = sqrt((double)(lsqCovMatrix(nIndex, nIndex)));
+                else
+                  dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
+              }
+
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  ((coefTWI[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  (m_Image_Corrections(nIndex) * RAD2DEG));
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  (coefTWI[i] * RAD2DEG));
+              output_columns.push_back(boost::lexical_cast<std::string>
+                  (m_dGlobalCameraAnglesAprioriSigma[i]));
+
+              if ( m_bErrorPropagation && m_bConverged )
+                output_columns.push_back(boost::lexical_cast<std::string>
+                    (dSigma * RAD2DEG));
+              else
+                output_columns.push_back("N/A");
+              nIndex++;
+            }
+          }
+        }
+
+        else if ( pCamera->GetCameraType() != 3 ) {
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (coefRA[0]*RAD2DEG));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (coefRA[0]*RAD2DEG));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back("N/A");
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (coefDEC[0]*RAD2DEG));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (coefDEC[0]*RAD2DEG));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back("N/A");
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (coefTWI[0]*RAD2DEG));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back(boost::lexical_cast<std::string>
+              (coefTWI[0]*RAD2DEG));
+          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back("N/A");
+        }
+
+        // print column vector to buffer and output to file
+        int ncolumns = output_columns.size();
+        for ( int i = 0; i < ncolumns; i++) {
+          std::string str = output_columns.at(i);
+
+          if (i < ncolumns-1)
+            sprintf(buf, "%s,", (const char*)str.c_str());
+          else
+            sprintf(buf, "%s", (const char*)str.c_str());
+          fp_out << buf;
+        }
+        sprintf(buf, "\n");
+        fp_out << buf;
+      }
+
+      fp_out.close();
+
+      return true;
+  }
+
+
+  /**
+   * output image data to csv file
+   */
+/*
+  bool BundleAdjust::OutputImagesCSV() {
+      char buf[1056];
+
+      std:: string ofname("bundleout_images.csv");
+      if( !m_strOutputFilePrefix.empty() )
+          ofname = m_strOutputFilePrefix + "_" + ofname;
+
+      std::ofstream fp_out(ofname.c_str(), std::ios::out);
+      if (!fp_out)
+          return false;
+
+      // setup column headers
+      std::vector<std::string> output_columns;
+
+      output_columns.push_back("Image,");
+
+      output_columns.push_back("rms,");
+      output_columns.push_back("rms,");
+      output_columns.push_back("rms,");
+
+      char strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
+      std::ostringstream ostr;
+      for( int i = 0; i < m_nNumberCamPosCoefSolved; i++) {
+          if( i ==0 )
+              ostr << strcoeff;
+          else if ( i == 1 )
+              ostr << strcoeff << "t";
+          else
+              ostr << strcoeff << "t" << i;
+          for( int j = 0; j < 5; j++ ) {
+              if( m_nNumberCamPosCoefSolved == 1 )
                   output_columns.push_back("X,");
               else {
                   std::string str = "X(";
@@ -7421,7 +7953,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           else
               ostr << strcoeff << "t" << i;
           for( int j = 0; j < 5; j++ ) {
-              if( m_nNumberCamAngleCoefSolved == 1 )
+              if( m_nNumberCamPosCoefSolved == 1 )
                   output_columns.push_back("Y,");
               else {
                   std::string str = "Y(";
@@ -7434,7 +7966,6 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           strcoeff--;
       }
       strcoeff = 'a' + m_nNumberCamPosCoefSolved -1;
-
       for ( int i = 0; i < m_nNumberCamPosCoefSolved; i++) {
 
         if ( i ==0 )
@@ -7445,8 +7976,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           ostr << strcoeff << "t" << i;
 
         for ( int j = 0; j < 5; j++ ) {
-
-          if ( m_nNumberCamAngleCoefSolved == 1 || !m_bSolveTwist) {
+          if ( m_nNumberCamPosCoefSolved ==   1) {
             output_columns.push_back("Z,");
           }
           else {
@@ -7897,7 +8427,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
       return true;
   }
-
+*/
   /**
    * This method sets the solution method for solving the matrix and fills
    * the point index map, which is dependent on the solution method.

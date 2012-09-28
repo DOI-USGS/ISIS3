@@ -15,7 +15,7 @@ commands:
 	$(LS) -1 $(INPUT)/*.cub > $(OUTPUT)/cube.lis;
 	$(APPNAME) fromlist=$(OUTPUT)/cube.lis \
 	cnet=$(INPUT)/Cabeus_Orbit400_withSS_AprioriPts.net \
-	onet=$(OUTPUT)/out.net \
+	onet=$(OUTPUT)/radar_specialk_out.net \
 	method=specialk \
 	maxits=5 \
 	sigma0=1.0e-5 \
@@ -45,7 +45,7 @@ commands:
 	$(RM) residuals.csv  > /dev/null;
 	$(APPNAME) fromlist=$(OUTPUT)/cube.lis \
 	cnet=$(INPUT)/Cabeus_Orbit400_withSS_AprioriPts.net \
-	onet=$(OUTPUT)/out.net \
+	onet=$(OUTPUT)/radar_sparse_out.net \
 	method=sparse \
 	maxits=10 \
 	sigma0=1.0e-10 \
