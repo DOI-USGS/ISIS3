@@ -147,6 +147,10 @@ namespace Isis {
    *   @history 2012-05-21 Debbie A. Cook, Added initialization of m_dRejectionMultiplier
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
    *                          coding standards. References #972.
+   *   @history 2012-09-28 Ken Edmundson, Initialized variables for bundle
+   *                         statistic computations;bundleout.txt modifed to
+   *                         show N/A for RMS, Min, Max of Radius Sigmas when
+   *                         not solving for radius. References #783.
    */
   class BundleAdjust {
     public:

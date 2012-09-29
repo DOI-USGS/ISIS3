@@ -15,33 +15,34 @@ commands:
 	$(LS) -1 $(INPUT)/*.cub > $(OUTPUT)/cube.lis;
 	$(APPNAME) fromlist=$(OUTPUT)/cube.lis \
 	cnet=$(INPUT)/Cabeus_Orbit400_withSS_AprioriPts.net \
-	onet=$(OUTPUT)/radar_specialk_out.net \
-	method=specialk \
-	maxits=5 \
-	sigma0=1.0e-5 \
+	onet=$(OUTPUT)/radar_sparse_poh_out.net \
+	method=sparse \
+	maxits=10 \
+	sigma0=1.0e-10 \
 	update=no \
 	errorprop=yes \
-	spsolve=position \
+	spsolve=accelerations \
+	overhermite=no \
 	camsolve=no | grep -v "100% Processed" | \
-	grep -v "jigsaw" > radar_specialk_outLog.txt;
+	grep -v "jigsaw" > radar_sparse_poh_outLog.txt;
 	cat bundleout.txt  | grep -v "Run Time:" | grep -v "Elapsed Time:" \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
-	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
+	  | sed 's/\([0-9][0-9]*\.[0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
-	  > $(OUTPUT)/radar_specialk_bundleout.txt;
-	cat radar_specialk_outLog.txt | grep -v "Elapsed Time:" | grep -v "TotalElapsedTime" | grep -v "ErrorPropagationElapsedTime" \
+	  > $(OUTPUT)/radar_sparse_poh_bundleout.txt;
+	cat radar_sparse_poh_outLog.txt | grep -v "Elapsed Time:" | grep -v "TotalElapsedTime" | grep -v "ErrorPropagationElapsedTime" \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
-	  > $(OUTPUT)/radar_specialk_outLog.txt
+	  > $(OUTPUT)/radar_sparse_poh_outLog.txt
 	cat residuals.csv | sed 's/,[^,]*\/\([^,\/]*\.cub\)/,\1/g'\
-	  > $(OUTPUT)/radar_specialk_residuals.csv;
+	  > $(OUTPUT)/radar_sparse_poh_residuals.csv;
 	cat bundleout_images.csv \
 	  | perl -pe 's/(^|,|: )([^,:]+\/)([^,\/:]*\.)(net|cub)/\1\3\4/g' 2>/dev/null \
 	  | sed 's/\([0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9]*\)/\1/g' \
-	  > $(OUTPUT)/radar_specialk_bundleout_images.csv;
+	  > $(OUTPUT)/radar_sparse_poh_bundleout_images.csv;
 	$(RM) bundleout_images.csv > /dev/null;
-	$(MV) bundleout_points.csv $(OUTPUT)/radar_specialk_bundleout_points.csv > /dev/null;
+	$(MV) bundleout_points.csv $(OUTPUT)/radar_sparse_poh_bundleout_points.csv > /dev/null;
 	$(RM) bundleout.txt print.prt > /dev/null;
-	$(RM) radar_specialk_outLog.txt > /dev/null;
+	$(RM) radar_sparse_poh_outLog.txt > /dev/null;
 	$(RM) residuals.csv  > /dev/null;
 	$(APPNAME) fromlist=$(OUTPUT)/cube.lis \
 	cnet=$(INPUT)/Cabeus_Orbit400_withSS_AprioriPts.net \
