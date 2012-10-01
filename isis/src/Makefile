@@ -10,6 +10,7 @@ endif
 PACKAGES = $(filter-out Makefile docsys CVS IsisObjectConvert.xsl, $(wildcard *))
 
 PACKAGESCLEAN := $(PACKAGES:%=%-clean)
+PACKAGESQUICKCLEAN := $(PACKAGES:%=%-quickclean)
 PACKAGESINCS := $(PACKAGES:%=%-includes)
 PACKAGESOBJS := $(PACKAGES:%=%-objects)
 PACKAGESAPPS := $(PACKAGES:%=%-apps)
@@ -53,6 +54,13 @@ documentation: $(PACKAGESDOCS)
 	PACKAGE=`$(ECHO) $@ | $(SED) 's/-docs//'`; \
 	echo $(CURTIMESTAMP) "  Working on Package [$$PACKAGE]"; \
 	$(MAKE) --directory=$$PACKAGE documentation;
+
+quickclean: $(PACKAGESQUICKCLEAN)
+
+%-quickclean:
+	PACKAGE=`$(ECHO) $@ | $(SED) 's/-quickclean//'`; \
+	echo $(CURTIMESTAMP) "  Working on Package [$$PACKAGE]"; \
+	$(MAKE) --directory=$$PACKAGE quickclean;
 
 clean: $(PACKAGESCLEAN)
 	$(MAKE) --directory=docsys clean;

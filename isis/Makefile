@@ -8,19 +8,20 @@ include $(ISISROOT)/make/isismake.utils
 help:
 	echo "Isis Make System Commands"
 	echo "------------------------ "
-	echo "make all       : Build and install the entire system (incs,api,apps,docs)"
-	echo "make config    : Generate preliminary config parameters"
-	echo "make thirdParty: Copy required 3rdParty libraries into distribution"
-	echo "make incs      : Install API include files"
-	echo "make api       : Build and install the Isis API"
-	echo "make apps      : Build and install Isis Applications"
-	echo "make docs      : Build Isis Web Documentation"
-	echo "make cleansrc  : Clean binaries from source tree"
-	echo "make clean     : Clean source tree and install area"
-	echo "make unitTest  : Build and execute unit tests for Isis API"
-	echo "make appTest   : Build and execute application tests"
-	echo "make catTest   : Build and execute category tests"
-	echo "make coverage  : Build a test coverage report from generated coverage info"
+	echo "make all        : Build and install the entire system (incs,api,apps,docs)"
+	echo "make config     : Generate preliminary config parameters"
+	echo "make thirdParty : Copy required 3rdParty libraries into distribution"
+	echo "make incs       : Install API include files"
+	echo "make api        : Build and install the Isis API"
+	echo "make apps       : Build and install Isis Applications"
+	echo "make docs       : Build Isis Web Documentation"
+	echo "make quickclean : Clean binaries from source tree but not app test areas"
+	echo "make cleansrc   : Clean binaries from source tree"
+	echo "make clean      : Clean source tree and install area"
+	echo "make unitTest   : Build and execute unit tests for Isis API"
+	echo "make appTest    : Build and execute application tests"
+	echo "make catTest    : Build and execute category tests"
+	echo "make coverage   : Build a test coverage report from generated coverage info"
 
 #----------------------------------------------------------------------------
 # Target = all
@@ -202,13 +203,38 @@ coverage:
 	    --source-sort=coverage --function-coverage -h functioncoverage;
 
 
+#----------------------------------------------------------------------------
+# Target = quickclean
+#
+# This target cleans the entire Isis system enough for a recompile.  It cleans ".o" files and
+# binary executables from the source tree.  It also, clears the running
+# areas under $ISISROOT (inc, doc, bini, bin/xml, and lib)
+#
+# Target = quickclean 
+# Dependencies = none
+#
+# This walks the src tree and removes ".o" files and binary files
+#----------------------------------------------------------------------------
+quickclean:
+	echo $(CURTIMESTAMP) "Cleaning Isis (quick)"; \
+	$(MAKE) --directory=src quickclean;   \
+	rm -rf inc;                           \
+	rm -rf doc;                           \
+	rm -rf bin;                           \
+	rm -rf lib;                           \
+	rm -rf scripts/tabcomplete.csh;       \
+	rm -rf scopecoverage scopecoverage.html linecoverage linecoverage.html \
+	  functioncoverage functioncoverage.html *.csmes *.csexe; \
+	$(MAKE) --directory=3rdParty clean;   \
+	$(MAKE) --directory=config -f config.mak clean; \
+	echo $(CURTIMESTAMP) "Finished cleaning Isis";
 
 #----------------------------------------------------------------------------
 # Target = clean
 # Dependencies = cleansrc
 #
 # This target cleans the entire Isis system.  It cleans ".o" files and
-# binary executables from the source tree.  It also, clears the running
+# binary executables from the source tree.  It also clears the running
 # areas under $ISISROOT (inc, doc, bini, bin/xml, and lib)
 #
 # Target = cleansrc

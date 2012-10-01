@@ -107,6 +107,13 @@ moc_%.cpp: %.h
 qrc_%.cpp: %.qrc
 	$(RCC) $(RCCDEFINES) -o $@ $(<F);
 
+quickclean:  localclean
+	$(RM) $(OBJS) $(BINS) $(PROTOSGEN) $(MOCGEN) `basename $(CURDIR)`.html \
+	  $(UIHEADERS) $(QTRESOURCEFILES) *.csexe *.csmes;                     \
+	$(RM) -r scopecoverage scopecoverage.html                              \
+	         linecoverage linecoverage.html                                \
+	         functioncoverage functioncoverage.html;
+
 clean:  localclean
 	$(RM) $(OBJS) $(BINS) $(PROTOSGEN) $(MOCGEN) `basename $(CURDIR)`.html \
 	  $(UIHEADERS) $(QTRESOURCEFILES) *.csexe *.csmes;                     \
@@ -252,6 +259,7 @@ help:
 	echo "make html                       : Builds the html page for the Application"
 	echo "make docs                       : Copies the .xml and assets folder to docsys area"
 	echo "                                    for full documentation building"
+	echo "make quickclean                 : Removes the application, *.html and *.o files."
 	echo "make clean                      : Removes the application, *.html and *.o files."
 	echo "                                    Also cleans the test directories"
 	echo "make sanitize                   : Calls the clean target then removes tttt* junk.*"

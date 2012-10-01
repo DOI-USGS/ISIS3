@@ -12,6 +12,7 @@ APPLICATIONS = $(filter-out $(CVS), $(DIRONLY))
 # by parallelizing non-dependant targets. To accomplish our task, let's set up
 # the arrays of dependencies for some of our build types.
 APPSCLEAN := $(APPLICATIONS:%=%-clean)
+APPSQUICKCLEAN := $(APPLICATIONS:%=%-quickclean)
 APPSBUILD := $(APPLICATIONS:%=%-build)
 APPSTEST  := $(APPLICATIONS:%=%-test)
 APPSDOCS  := $(APPLICATIONS:%=%-docs)
@@ -113,6 +114,18 @@ documentation: $(APPSDOCS)
 	$(MAKE) --directory=$$APPNAME docs                               \
 	  1>>.$$APPNAME-doc.stdout.log 2>.$$APPNAME-doc.stderr.log;      \
 	$(MAKE) $$APPNAME-doc-print;
+
+# Do the same for this as we did docs.
+quickclean: $(APPSQUICKCLEAN)
+
+%-quickclean:
+	APPNAME=`$(ECHO) $@ | $(SED) 's/-quickclean//'`;            \
+	$(MAKE) $$APPNAME-cln-cleanupprint;                         \
+	echo $(CURTIMESTAMP) "    Cleaning [$$APPNAME]"             \
+	  > .$$APPNAME-cln.stdout.log;                              \
+	$(MAKE) --directory=$$APPNAME quickclean                    \
+	  1>>.$$APPNAME-cln.stdout.log 2>.$$APPNAME-cln.stderr.log; \
+	$(MAKE) $$APPNAME-cln-print;
 
 # Do the same for this as we did docs.
 clean: $(APPSCLEAN)

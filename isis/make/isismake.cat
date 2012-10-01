@@ -40,6 +40,17 @@ documentation:
 	  echo $(CURTIMESTAMP) "    $(NOAPPS)";     \
 	fi
 
+quickclean:
+	if [ "$(OBJECTS)" != "" ];             \
+	then                                   \
+	  $(MAKE) --directory=objs clean;      \
+	fi;                                    \
+	                                       \
+	if [ "$(APPS)" != "" ];                \
+	then                                   \
+	  $(MAKE) --directory=apps quickclean; \
+	fi
+
 clean:
 	if [ "$(OBJECTS)" != "" ];          \
 	then                                \
