@@ -62,6 +62,10 @@
     <change name="Steven Lambright" date="2010-11-23">
       Added an option to not do dark current correction
     </change>
+    <change name="Steven Lambright" date="2012-09-28">
+      Fixed the default value for the solar remove coefficient. Without this fix, some resulting
+      files had I/F values much larger than 1.0. Fixes #1143.
+    </change>
   </history>
 
   <category>

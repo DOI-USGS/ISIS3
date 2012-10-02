@@ -240,7 +240,7 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
 
   // Default to original vimscal's solar distance if we can't find a target
   if(solarRemoveCoefficient < 0) {
-    solarRemoveCoefficient = 81.595089 * 81.595089;
+    solarRemoveCoefficient = 81.595089;
     /*
     string msg = "Unable to project image at four corners, center of edges or ";
     msg += "at center. The solar distance can not be calculated, try using";
