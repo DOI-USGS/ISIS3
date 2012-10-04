@@ -109,5 +109,9 @@
       Added the match tool which allows registration (control points) to be edited
       between cubes without a camera model.
     </change>
+    <change name="Tracie Sucharski" date="2012-10-01">
+      Fixed bug in the match tool which caused qview to to print error messages and possibly
+      crash when closing cube viewports either individually or from the File Menu.
+    </change>
   </history>
 </application>
