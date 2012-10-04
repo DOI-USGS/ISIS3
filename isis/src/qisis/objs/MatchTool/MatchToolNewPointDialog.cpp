@@ -10,7 +10,6 @@
 
 namespace Isis {
   // initialize static variable
-  QString MatchToolNewPointDialog::lastPtIdValue = "";
 
   /**
    * MatchToolNewPointDialog constructor
@@ -26,41 +25,43 @@ namespace Isis {
    *                          id, do not disable "ok" button.  This allows
    *                          user to use the same id from a previous point
    *                          creation if the point was never saved.
+   *   @history 2012-10-03 Tracie Sucharski - Corrected help which said to left instead of right
+   *                          click to create measures.
    *
    */
-  MatchToolNewPointDialog::MatchToolNewPointDialog(const ControlNet &cnet, QWidget *parent) : QDialog(parent) {
+  MatchToolNewPointDialog::MatchToolNewPointDialog(const ControlNet &cnet, QString defaultPointId,
+      QWidget *parent) : QDialog(parent) {
 
-    ptIdValue = NULL;
-    fileList = NULL;
-    m_ptIdLabel = NULL;
+    ptIdLineEdit = NULL;
+    m_fileList = NULL;
     m_doneButton = NULL;
 
-    m_ptIdLabel = new QLabel("Point ID:");
-    ptIdValue = new QLineEdit;
-    m_ptIdLabel->setBuddy(ptIdValue);
-    ptIdValue->setText(lastPtIdValue);
-    ptIdValue->selectAll();
-    connect(ptIdValue, SIGNAL(textChanged(const QString &)),
+    QLabel *ptIdLabel = new QLabel("Point ID:");
+    ptIdLineEdit = new QLineEdit;
+    ptIdLineEdit->setText(defaultPointId);
+    ptIdLineEdit->selectAll();
+    ptIdLabel->setBuddy(ptIdLineEdit);
+    connect(ptIdLineEdit, SIGNAL(textChanged(const QString &)),
             this, SLOT(enableDoneButton(const QString &)));
 
     QLabel *listLabel = new QLabel("Displayed Cubes / Selected measures:  \n"
-                                   "Left click on the cube viewport to select approximate measure "
+                                   "Right click on the cube viewport to select approximate measure "
                                    "location.\nCubes will be highlighted below as you select "
                                    "measure locations.");
 
-    fileList = new QListWidget;
-    fileList->setSelectionMode(QAbstractItemView::NoSelection);
+    m_fileList = new QListWidget;
+    m_fileList->setSelectionMode(QAbstractItemView::NoSelection);
 
     //  Create Done & Cancel buttons
     m_doneButton = new QPushButton("Done selecting measures");
     m_doneButton->setToolTip("All measures have been selected.  Load the new point into the "
                              "control point editor for refinement.");
-    m_doneButton->setWhatsThis("You have left-clicked on all cube viewports you want to create "
+    m_doneButton->setWhatsThis("You have right-clicked on all cube viewports you want to create "
                                "as a control measure.  The new point will be loaded into the "
                                "control point editor for refinement.");
     //  If the last point id used was never saved to network, do not set ok
     //  button to faslse
-    if (lastPtIdValue.isEmpty() || cnet.ContainsPoint(lastPtIdValue)) {
+    if (defaultPointId.isEmpty() || cnet.ContainsPoint(defaultPointId)) {
       m_doneButton->setEnabled(false);
     }
     QPushButton *cancelButton = new QPushButton("Cancel");
@@ -76,13 +77,13 @@ namespace Isis {
     connect(cancelButton, SIGNAL(clicked()), this, SIGNAL(newPointCanceled()));
 
     QHBoxLayout *ptIdLayout = new QHBoxLayout;
-    ptIdLayout->addWidget(m_ptIdLabel);
-    ptIdLayout->addWidget(ptIdValue);
+    ptIdLayout->addWidget(ptIdLabel);
+    ptIdLayout->addWidget(ptIdLineEdit);
 
     QVBoxLayout *vLayout = new QVBoxLayout;
     vLayout->addLayout(ptIdLayout);
     vLayout->addWidget(listLabel);
-    vLayout->addWidget(fileList);
+    vLayout->addWidget(m_fileList);
     vLayout->addLayout(buttonLayout);
 
     setLayout(vLayout);
@@ -101,7 +102,7 @@ namespace Isis {
    */
   void MatchToolNewPointDialog::setFiles(QStringList pointFiles) {
 
-    fileList->addItems(pointFiles);
+    m_fileList->addItems(pointFiles);
 
   }
 
@@ -109,12 +110,18 @@ namespace Isis {
 
   void MatchToolNewPointDialog::highlightFile(QString file) {
 
-    QList<QListWidgetItem *> found = fileList->findItems(file, Qt::MatchFixedString);
+    QList<QListWidgetItem *> found = m_fileList->findItems(file, Qt::MatchFixedString);
     if (!found.isEmpty()) {
-      fileList->setSelectionMode(QAbstractItemView::ExtendedSelection);
+      m_fileList->setSelectionMode(QAbstractItemView::ExtendedSelection);
       found.at(0)->setSelected(true);
-      fileList->setSelectionMode(QAbstractItemView::NoSelection);
+      m_fileList->setSelectionMode(QAbstractItemView::NoSelection);
     }
+  }
+
+
+
+  QString MatchToolNewPointDialog::pointId() const {
+    return ptIdLineEdit->text();
   }
 
 
@@ -127,7 +134,6 @@ namespace Isis {
    *            to the m_ptIdValue
    */
   void MatchToolNewPointDialog::enableDoneButton(const QString &text) {
-    MatchToolNewPointDialog::lastPtIdValue = ptIdValue->text();
     m_doneButton->setEnabled(!text.isEmpty());
   }
 
