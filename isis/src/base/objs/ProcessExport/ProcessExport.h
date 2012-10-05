@@ -58,56 +58,63 @@ namespace Isis {
    * @author 2003-03-31 Jeff Anderson
    *
    * @internal
+   *  @history 2003-04-03 Jeff Anderson - Added unit test
+   *  @history 2003-04-04 Jeff Anderson - Updated documentation for 
+   *                          SetInputRange methods
+   *  @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
+   *                          isis.astrogeology...
+   *  @history 2005-01-07 Stuart Sides - Added CreateWorldFile method
+   *  @history 2005-02-08 Elizabeth Ribelin - Modified file to support Doxygen
+   *                          documentation
+   *  @history 2005-06-14 Drew Davidson - Overloaded StartProcess method to output
+   *                          directly to a stream.
+   *  @history 2005-06-15 Drew Davidson - Updated to support multi-band output.
+   *  @history 2006-02-27 Jacob Danton - Added Multiple input cube support
+   *  @history 2006-05-08 Elizabeth Miller - Modified SetInputRange() to get the
+   *                          min and max percent values from the userinterface
+   *                          (0.5 and 99.5 are still the default values)
+   *  @history 2006-05-15 Jeff Anderson - Fixed bug with multiple input cube
+   *                          support when the programmer didn't set a input
+   *                          minimum/maximum
+   *  @history 2006-05-23 Jacob Danton - Added seperate MIN/MAX values for each
+   *                          input channel
+   *  @history 2006-08-30 Jeff Anderson - Fixed memory leak
+   *  @history 2007-12-17 Christopher Austin - Added processes for BIL
+   *                          and BIP, leaving BSQ as the default, as well as
+   *                          fixed rounding accuracy.
+   *  @history 2008-05-12 Steven Lambright - Removed references to CubeInfo
+   *  @history 2008-06-18 Steven Koechle - Fixed Documentation Errors
+   *  @history 2008-08-14 Christopher Austin - Added the Destructor to fix
+   *                          memory leaks, as well as changed the
+   *                          EndianSwapper::Float() call to
+   *                          EndianSwapper::ExportFloat() in isisOut32() to fix
+   *                          bad float casting.
+   *  @history 2008-12-17 Steven Lambright - Changed SetOutputRange calls to use
+   *                          constants (i.e. instead of 65535 VALID_MAX2 is used).
+   *  @history 2009-07-27 Steven Lambright - Piecewise stretch backs off to linear
+   *                          if Median() == MINPCT or Median() == MAXPCT
+   *  @history 2010-02-24 Janet Barrett - Added code to support JPEG2000
+   *  @history 2012-10-04 Jeannie Backer - Added documentation and fixed
+   *                          indentation of history entries. No mantis ticket.
+   *  
+   *  
+   *  
    *  @todo 2005-02-09 Stuart Sides - write documentation for CreateWorldFile
    *                                  method
    *  @todo 2005-02-09 Jeff Anderson - add coded example to class file and
    *                                   implementation examples
-   *  @history 2003-04-03 Jeff Anderson - Added unit test
-   *  @history 2003-04-04 Jeff Anderson - Updated documentation for SetInputRange
-   *                                      methods
-   *  @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
-   *                                     isis.astrogeology...
-   *  @history 2005-01-07 Stuart Sides - Added CreateWorldFile method
-   *  @history 2005-02-08 Elizabeth Ribelin - Modified file to support Doxygen
-   *                                          documentation
-   *  @history 2005-06-14 Drew Davidson - Overloaded StartProcess method to output
-   *                                      directly to a stream.
-   *  @history 2005-06-15 Drew Davidson - Updated to support multi-band output.
-   *
-   *  @history 2006-02-27 Jacob Danton - Added Multiple input cube support
-   *  @history 2006-05-08 Elizabeth Miller - Modified SetInputRange() to get the
-   *                                         min and max percent values from the
-   *                                         userinterface (0.5 and 99.5 are still
-   *                                         the default values)
-   *  @history 2006-05-15 Jeff Anderson - Fixed bug with multiple input cube
-   *                                      support when the programmer didn't
-   *                                      set a input minimum/maximum
-   *
-   * @history 2006-05-23 Jacob Danton - Added seperate MIN/MAX
-   * values for each input channel
-   *
-   * @history 2006-08-30 Jeff Anderson - Fixed memory leak
-   * @history 2007-12-17 Christopher Austin - Added processes for BIL
-   *           and BIP, leaving BSQ as the default, as well as
-   *           fixed rounding accuracy.
-   * @history 2008-05-12 Steven Lambright - Removed references to CubeInfo
-   * @history 2008-06-18 Steven Koechle - Fixed Documentation Errors
-   * @history 2008-08-14 Christopher Austin - Added the Destructor to fix
-   *           memory leaks, as well as changed the EndianSwapper::Float()
-   *           call to EndianSwapper::ExportFloat() in isisOut32() to fix bad
-   *           float casting.
-   * @history 2008-12-17 Steven Lambright - Changed SetOutputRange calls to use
-   *           constants (i.e. instead of 65535 VALID_MAX2 is used).
-   * @history 2009-07-27 Steven Lambright - Piecewise stretch backs off to linear
-   *           if Median() == MINPCT or Median() == MAXPCT
-   * @history 2010-02-24 Janet Barrett - Added code to support JPEG2000
    */
   class ProcessExport : public Isis::Process {
 
     public:
 
       //! Storage order enumeration
-      enum ExportFormat { BSQ, BIL, BIP, JP2 };
+      enum ExportFormat { 
+        BSQ, //!< Band sequential 
+        BIL, //!< Band interleaved by line
+        BIP, //!< Band interleaved by pixel
+        JP2  //!< Compressed JPEG2000
+      };
 
       ProcessExport();
       ~ProcessExport();
@@ -195,38 +202,42 @@ namespace Isis {
       std::vector<BufferManager *> GetBuffersBIL();
       std::vector<BufferManager *> GetBuffersBIP();
 
-      double p_outputMinimum; //!<Desired minimum pixel value in the Buffer
-      double p_outputMiddle;  /**<Middle pixel value (minimum+maximun)/2.0 in
-                                  the Buffer */
-      double p_outputMaximum; //!<Desired maximum pixel value in the Buffer
+      double p_outputMinimum; //!< Desired minimum pixel value in the Buffer
+      double p_outputMiddle;  /**< Middle pixel value (minimum+maximun)/2.0 in
+                                   the Buffer */
+      double p_outputMaximum; //!< Desired maximum pixel value in the Buffer
 
-      std::vector<double> p_inputMinimum;  /**<Minimum pixel value in the input cube to be
-                                  mapped to the minimum value in the Buffer */
-      std::vector<double> p_inputMiddle;   /**<Middle pixel value in the input cube to be
-                                  mapped to the (minimum+maximum)/2.0 value in
-                                  the Buffer */
-      std::vector<double> p_inputMaximum;  /**<Maximum pixel value in the input cube to be
-                                  mapped to the maximum value in the Buffer */
-      EndianSwapper *p_endianSwap; /**<Object to swap the endianness of the
-                                  raw output to either MSB or LSB */
-      ByteOrder p_endianType; //! The byte order of the output file
+      std::vector<double> p_inputMinimum; /**< Minimum pixel value in the input
+                                          cube to be mapped to the minimum 
+                                          value in the Buffer */
+      std::vector<double> p_inputMiddle;  /**< Middle pixel value in the input 
+                                          cube to be mapped to the 
+                                          (minimum+maximum)/2.0 value in the 
+                                          Buffer */
+      std::vector<double> p_inputMaximum; /**< Maximum pixel value in the input 
+                                          cube to be mapped to the maximum 
+                                          value in the Buffer */
+      EndianSwapper *p_endianSwap; /**< Object to swap the endianness of the
+                                        raw output to either MSB or LSB */
+      ByteOrder p_endianType; //!< The byte order of the output file
 
-      PixelType p_pixelType;  /**<The bits per pixel of the output image*/
+      PixelType p_pixelType;  /**< The bits per pixel of the output image*/
 
-      std::vector<Stretch *> p_str;       /**<Stretch object to ensure a reasonable range
-                                    of pixel values in the output data**/
+      std::vector<Stretch *> p_str; /**< Stretch object to ensure a reasonable
+                                         range of pixel values in the output 
+                                         data**/
 
-      double p_Null; //! Holds the output NULL value
-      double p_Lis;  //! Holds the output LIS value
-      double p_Lrs;  //! Holds the output LRS value
-      double p_His;  //! Holds the output HIS value
-      double p_Hrs;  //! Holds the output HRS value
+      double p_Null; //!< Holds the output NULL value
+      double p_Lis;  //!< Holds the output LIS value
+      double p_Lrs;  //!< Holds the output LRS value
+      double p_His;  //!< Holds the output HIS value
+      double p_Hrs;  //!< Holds the output HRS value
 
-      bool p_Null_Set; //! Indicates if p_Null has been set or not
-      bool p_Lis_Set; //! Indicates if p_Lis has been set or not
-      bool p_Lrs_Set; //! Indicates if p_Lrs has been set or not
-      bool p_His_Set; //! Indicates if p_His has been set or not
-      bool p_Hrs_Set; //! Indicates if p_Hrs has been set or not
+      bool p_Null_Set; //!< Indicates if p_Null has been set or not
+      bool p_Lis_Set;  //!< Indicates if p_Lis has been set or not
+      bool p_Lrs_Set;  //!< Indicates if p_Lrs has been set or not
+      bool p_His_Set;  //!< Indicates if p_His has been set or not
+      bool p_Hrs_Set;  //!< Indicates if p_Hrs has been set or not
 
     private:
       //!Method for writing 8-bit unsigned pixel data to a file stream
