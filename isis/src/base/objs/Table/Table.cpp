@@ -20,19 +20,28 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include "Table.h"
+
 #include <fstream>
 #include <string>
-#include "Table.h"
-#include "IException.h"
+
 #include "Endian.h"
+#include "IException.h"
+#include "Pvl.h"
+#include "TableField.h"
 
 using namespace std;
 namespace Isis {
+
   /**
-   * Constructor for creating a table
+   * This constructor creates a new table using the given name and record. The 
+   * Table::Association is set to None, the ByteOrder keyword in the labels is
+   * set to NULL, and the record information is added to the table. 
+   *  
+   * This constructor also calls the parent constructor 
+   * Blob(tableName, "Table").
    *
    * @param tableName Name of the Table to be read
-   *
    * @param rec Name of the TableRecord to be read into the Table
    */
   Table::Table(const std::string &tableName, Isis::TableRecord &rec) :
@@ -40,16 +49,40 @@ namespace Isis {
     p_assoc = Table::None;
     p_blobPvl += Isis::PvlKeyword("Records", 0);
     p_blobPvl += Isis::PvlKeyword("ByteOrder", "NULL");
-    for(int f = 0; f < rec.Fields(); f++) p_blobPvl.AddGroup(rec[f].PvlGroup());
+    for (int f = 0; f < rec.Fields(); f++) p_blobPvl.AddGroup(rec[f].pvlGroup());
     p_record = rec;
   }
 
   /**
-   * Constructor for reading a table
+   * This constructor creates an empty table from an existing table name 
+   * to be read in when the Read() method is called. It should not be 
+   * used to construct a new table object whose data will be filled 
+   * in later since the record size will be set to 0. This constructor 
+   * sets the Table::Association to None. 
+   *  
+   * This constructor also calls the parent constructor 
+   * Blob(tableName, "Table").
    *
    * @param tableName Name of the Table to be read
-   *
-   * @param file Name of the file to be read into the Table
+   */
+  Table::Table(const std::string &tableName) :
+    Isis::Blob(tableName, "Table") {
+    p_assoc = Table::None;
+  }
+
+  /**
+   * This constructor reads an existing table using the given table name and 
+   * file containing the table. This constructor sets the Table::Association
+   * to the Association keyword value in the Blob Pvl read from the file, if
+   * the keyword exists.
+   *  
+   * This constructor also calls the parent constructor 
+   * Blob(tableName, "Table").
+   *  
+   * @param tableName Name of the Table to be read
+   * @param file Name of the file to be read into the Table 
+   *  
+   * @see Blob::Read() 
    */
   Table::Table(const std::string &tableName, const std::string &file) :
     Blob(tableName, "Table") {
@@ -57,7 +90,21 @@ namespace Isis {
     Read(file);
   }
 
-
+  /**
+   * This constructor reads an existing table using the given table name and 
+   * file containing the table and pvl labels. This constructor sets the 
+   * Table::Association to the Association keyword value in the Blob Pvl 
+   * read from the file, if the keyword exists. 
+   *  
+   * This constructor also calls the parent constructor 
+   * Blob(tableName, "Table").
+   *
+   * @param tableName The name of the Table to be read
+   * @param file The name of the file to be read into the Table
+   * @param fileHeader Pvl labels.
+   *  
+   * @see Blob::Read() 
+   */
   Table::Table(const std::string &tableName, const std::string &file,
       const Pvl &fileHeader) : Blob(tableName, "Table") {
     p_assoc = Table::None;
@@ -66,7 +113,8 @@ namespace Isis {
 
 
   /**
-   * Copy constructor for table
+   * Copy constructor for an Table object.  This constructor copies TableRecords
+   * and the member variable values for record, records, assoc, and swap. 
    *
    * @param other The table to copy from
    */
@@ -76,17 +124,26 @@ namespace Isis {
     p_assoc = other.p_assoc;
     p_swap = other.p_swap;
 
-    for(unsigned int i = 0; i < other.p_recbufs.size(); i++) {
+    for (unsigned int i = 0; i < other.p_recbufs.size(); i++) {
       char *data = new char[RecordSize()];
 
-      for(int j = 0; j < RecordSize(); j++) {
+      for (int j = 0; j < RecordSize(); j++) {
         data[j] = other.p_recbufs[i][j];
       }
 
       p_recbufs.push_back(data);
     }
-  };
+  }
 
+  /**
+   * Sets the Table equal to the input Table object.  This method copies 
+   * TableRecords and the member variable values for record, records, assoc, and 
+   * swap. 
+   *
+   * @param other The table to copy from 
+   *  
+   * @return @b Table The copied table.
+   */
   Table &Table::operator=(const Isis::Table &other) {
     *((Isis::Blob *)this) = *((Isis::Blob *)&other);
     p_record = other.p_record;
@@ -94,10 +151,10 @@ namespace Isis {
     p_assoc = other.p_assoc;
     p_swap = other.p_swap;
 
-    for(unsigned int i = 0; i < other.p_recbufs.size(); i++) {
+    for (unsigned int i = 0; i < other.p_recbufs.size(); i++) {
       char *data = new char[RecordSize()];
 
-      for(int j = 0; j < RecordSize(); j++) {
+      for (int j = 0; j < RecordSize(); j++) {
         data[j] = other.p_recbufs[i][j];
       }
 
@@ -107,19 +164,75 @@ namespace Isis {
     return *this;
   }
 
-  /**
-   * Constructor for reading a table
-   *
-   * @param tableName Name of the Table to be read
-   */
-  Table::Table(const std::string &tableName) :
-    Isis::Blob(tableName, "Table") {
-    p_assoc = Table::None;
-  }
-
   //! Destroys the Table object
   Table::~Table() {
     Clear();
+  }
+
+  /**
+   * Sets the association to the input parameter
+   *
+   * @param assoc Association type
+   */
+  void Table::SetAssociation(const Table::Association assoc) {
+    p_assoc = assoc;
+  }
+
+  /**
+   * Checks to see if association is Samples
+   *
+   * @return @b bool Returns true if association is Samples, and false if it is 
+   *         not
+   */
+  bool Table::IsSampleAssociated() {
+    return (p_assoc == Table::Samples);
+  }
+
+  /**
+   * Checks to see if association is Lines
+   *
+   * @return @b bool Returns true if association is Lines, and false if it is 
+   *         not
+   */
+  bool Table::IsLineAssociated() {
+    return (p_assoc == Table::Lines);
+  }
+
+  /**
+   * Checks to see if association is Bands
+   *
+   * @return @b bool Returns true if association is Bands, and false if it is 
+   *         not
+   */
+  bool Table::IsBandAssociated() {
+    return (p_assoc == Table::Bands);
+  }
+
+  /**
+   * Returns the number of records
+   *
+   * @return @b int Number of records
+   */
+  int Table::Records() const {
+    return p_recbufs.size();
+  }
+
+  /**
+   * Returns the number of fields per record
+   *
+   * @return @b int Number of fields
+   */
+  int Table::RecordFields() const {
+    return p_record.Fields();
+  }
+
+  /**
+   * Returns the number of bytes per record
+   *
+   * @return @b int Number of bytes per record
+   */
+  int Table::RecordSize() const {
+    return p_record.RecordSize();
   }
 
   /**
@@ -140,6 +253,32 @@ namespace Isis {
    * @param rec The record to be added to the table
    */
   void Table::operator+=(Isis::TableRecord &rec) {
+    if (RecordSize() == 0) {
+      iString msg = "Unable to add records to Isis Table [" 
+                    + p_blobName + "]. Bytes per record = [0 bytes].";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
+
+    // TODO: Determine why this error message causes mapmos to fail.  
+    // The call comes from ProcessMapMosaic::StartProcess >>
+    // ProcessMosaic::StartProcess when the InputImages table is
+    // being filled  (see ProcessMosaic lines 704 - 732)
+    // if (RecordSize() != rec.RecordSize()) {
+    // iString msg = "Unable to add the given record with size = [" 
+    //               + iString(rec.RecordSize()) + " bytes] to to Isis Table [" 
+    //               + p_blobName + "] with record size = [" 
+    //               + iString(RecordSize()) + " bytes]. Record sizes must match.";
+    //   throw IException(IException::Unknown, msg, _FILEINFO_);
+    // }
+    // Temporary substitution?
+    if (RecordSize() < rec.RecordSize()) {
+      iString msg = "Unable to add the given record with size = [" 
+                    + iString(rec.RecordSize()) + " bytes] to to Isis Table [" 
+                    + p_blobName + "] with record size = [" 
+                    + iString(RecordSize()) + " bytes]. Added record size can "
+                    "not exceed table record size.";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
     char *newbuf = new char[RecordSize()];
     rec.Pack(newbuf);
     p_recbufs.push_back(newbuf);
@@ -149,7 +288,6 @@ namespace Isis {
    * Updates a TableRecord
    *
    * @param rec TableRecord to update old TableRecord with
-   *
    * @param index Index of TableRecord to be updated
    */
   void Table::Update(const Isis::TableRecord &rec, const int index) {
@@ -163,9 +301,17 @@ namespace Isis {
    */
   void Table::Delete(const int index) {
     vector<char *>::iterator it = p_recbufs.begin();
-    for(int i = 0; i < index; i++, it++);
+    for (int i = 0; i < index; i++, it++);
     delete [] p_recbufs[index];
     p_recbufs.erase(it);
+  }
+
+  /**
+   * Clear the table of all records
+   */
+  void Table::Clear() {
+    for (int i = 0; i < (int)p_recbufs.size(); i++) delete [] p_recbufs[i];
+    p_recbufs.clear();
   }
 
   //! Virtual function to validate PVL table information
@@ -173,8 +319,8 @@ namespace Isis {
     p_records = p_blobPvl["Records"];
 
     Isis::TableRecord rec;
-    for(int g = 0; g < p_blobPvl.Groups(); g++) {
-      if(p_blobPvl.Group(g).IsNamed("Field")) {
+    for (int g = 0; g < p_blobPvl.Groups(); g++) {
+      if (p_blobPvl.Group(g).IsNamed("Field")) {
         Isis::TableField f(p_blobPvl.Group(g));
         rec += f;
       }
@@ -182,19 +328,19 @@ namespace Isis {
 
     p_record = rec;
 
-    if(p_blobPvl.HasKeyword("Association")) {
+    if (p_blobPvl.HasKeyword("Association")) {
       Isis::iString temp = (string) p_blobPvl["Association"];
       temp.UpCase();
-      if(temp == "SAMPLES") p_assoc = Table::Samples;
-      if(temp == "LINES") p_assoc = Table::Lines;
-      if(temp == "BANDS") p_assoc = Table::Bands;
+      if (temp == "SAMPLES") p_assoc = Table::Samples;
+      if (temp == "LINES") p_assoc = Table::Lines;
+      if (temp == "BANDS") p_assoc = Table::Bands;
     }
 
     // Determine if we need to swap stuff when we read the data
     Isis::ByteOrder bo = Isis::ByteOrderEnumeration(p_blobPvl["ByteOrder"]);
     p_swap = false;
-    if(Isis::IsLsb() && (bo == Isis::Msb)) p_swap = true;
-    if(Isis::IsMsb() && (bo == Isis::Lsb)) p_swap = true;
+    if (Isis::IsLsb() && (bo == Isis::Msb)) p_swap = true;
+    if (Isis::IsMsb() && (bo == Isis::Lsb)) p_swap = true;
 
     // Cleanup in case of a re-read
     Clear();
@@ -208,11 +354,11 @@ namespace Isis {
    * @throws Isis::IException::Io - Error reading or preparing to read a record
    */
   void Table::ReadData(std::istream &stream) {
-    for(int rec = 0; rec < p_records; rec++) {
+    for (int rec = 0; rec < p_records; rec++) {
       streampos sbyte = (streampos)(p_startByte - 1) +
                         (streampos)(rec * RecordSize());
       stream.seekg(sbyte, std::ios::beg);
-      if(!stream.good()) {
+      if (!stream.good()) {
         string msg = "Error preparing to read record [" + Isis::iString(rec + 1) +
                      "] from Table [" + p_blobName + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
@@ -220,13 +366,13 @@ namespace Isis {
 
       char *buf = new char[RecordSize()];
       stream.read(buf, RecordSize());
-      if(!stream.good()) {
+      if (!stream.good()) {
         string msg = "Error reading record [" + Isis::iString(rec + 1) +
                      "] from Table [" + p_blobName + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
-      if(p_swap) p_record.Swap(buf);
+      if (p_swap) p_record.Swap(buf);
       p_recbufs.push_back(buf);
     }
   }
@@ -236,23 +382,23 @@ namespace Isis {
     p_blobPvl["Records"] = Records();
     p_nbytes = Records() * RecordSize();
 
-    if(Isis::IsLsb()) {
+    if (Isis::IsLsb()) {
       p_blobPvl["ByteOrder"] = Isis::iString(Isis::ByteOrderName(Isis::Lsb));
     }
     else {
       p_blobPvl["ByteOrder"] = Isis::iString(Isis::ByteOrderName(Isis::Msb));
     }
 
-    if(p_blobPvl.HasKeyword("Association")) {
+    if (p_blobPvl.HasKeyword("Association")) {
       p_blobPvl.DeleteKeyword("Association");
     }
-    if(p_assoc == Samples) {
+    if (p_assoc == Samples) {
       p_blobPvl += Isis::PvlKeyword("Association", "Samples");
     }
-    else if(p_assoc == Lines) {
+    else if (p_assoc == Lines) {
       p_blobPvl += Isis::PvlKeyword("Association", "Lines");
     }
-    else if(p_assoc == Bands) {
+    else if (p_assoc == Bands) {
       p_blobPvl += Isis::PvlKeyword("Association", "Bands");
     }
   }
@@ -263,16 +409,9 @@ namespace Isis {
    * @param os Outputstream to write the data to
    */
   void Table::WriteData(std::fstream &os) {
-    for(int rec = 0; rec < Records(); rec++) {
+    for (int rec = 0; rec < Records(); rec++) {
       os.write(p_recbufs[rec], RecordSize());
     }
   }
 
-  /**
-   * Clear the table of all records
-   */
-  void Table::Clear() {
-    for(int i = 0; i < (int)p_recbufs.size(); i++) delete [] p_recbufs[i];
-    p_recbufs.clear();
-  }
 }

@@ -1,4 +1,4 @@
-#if !defined(Table_h)
+#ifndef Table_h
 #define Table_h
 /**
  * @file
@@ -23,20 +23,25 @@
  */
 
 #include "Blob.h"
+#include <vector>
 #include "TableRecord.h"
 
 namespace Isis {
+  class Pvl;
   /**
-   * @brief Read table blobs
+   * @brief Class for storing Table blobs information.
    *
-   * This class reads table blobs from the cubes (or detached
-   * tables).  It is record based, N records in a table.  Each
-   * record will have the same number of fields, F. The fields can
-   * be of different types including integer, string, and double.
-   * See the classes TableRecord and TableField for more
-   * information.  The class uses PVL to store the structure of
-   * the table N, F, and Field types and binary to store the table
-   * data.
+   * This class can create new Tables or read table blobs from files. In 
+   * general, records correspond to rows and fields correspond to columns. Thus 
+   * the TableRecord class corresponds to a vector of row entries and 
+   * TableField class corresponds to a specific entry of the table for a given 
+   * record. Isis3 Table objects are record based, N records in a table. Each 
+   * record will have the same number of fields, F. The fields can be of 
+   * different types including Integer, Double, Text, and Real. The class 
+   * uses PVL to store the structure of the table N, F, and Field types and 
+   * binary to store the table data.
+   *  
+   * See the classes TableRecord and TableField for more information.
    *
    * If you would like to see Table being used in implementation, see histats.cpp
    *
@@ -45,101 +50,76 @@ namespace Isis {
    * @author 2004-09-01 Jeff Anderson
    *
    * @internal
-   * @history 2005-03-18 Elizabeth Ribelin - Added documentation
-   *          to class
-   * @history 2006-09-19 Jeff Anderson - Added clear method
-   * @history 2006-09-19 Jeff Anderson - Fixed bug in ReadInit
-   *          method which needed to cleanup pointers to records
-   *          if a re-read occurred.
-   * @history 2009-02-18 Steven Lambright - Added copy constructor and
-   *          assignment operator.
-   * @history 2011-05-25 Janet Barrett and Steven Lambright Added a Constructor
-   *          that takes the pvl labels so they do not have to be
-   *          re-read, which is a very expensive operation.
+   *   @history 2005-03-18 Elizabeth Ribelin - Added documentation to class
+   *   @history 2006-09-19 Jeff Anderson - Added clear method
+   *   @history 2006-09-19 Jeff Anderson - Fixed bug in ReadInit method which 
+   *                           needed to cleanup pointers to records if a
+   *                           re-read occurred.
+   *   @history 2009-02-18 Steven Lambright - Added copy constructor and
+   *                           assignment operator.
+   *   @history 2011-05-25 Janet Barrett and Steven Lambright Added a
+   *                           Constructor that takes the pvl labels so they do
+   *                           not have to be re-read, which is a very expensive
+   *                           operation.
+   *   @history 2012-10-04 Jeannie Backer Changed references to TableField
+   *                           methods to lower camel case. Ordered includes.
+   *                           Added documentation. Added error check to
+   *                           operator+=(TableRecord) if the Table's record
+   *                           size does not match the added TableRecord's size.
+   *                           Fixed header definition statement. Added forward
+   *                           declaration and includes. Fixed indentation of
+   *                           history entries. Moved method implementation to
+   *                           cpp file. Ordered includes in unitTest. Added
+   *                           RecordFields() accessor method. Improved test
+   *                           coverage in all categories. Added padding to
+   *                           control statements. References #1169.
    */
   class Table : public Isis::Blob {
     public:
+      /** 
+       *  
+       */ 
+      enum Association { 
+             None, 
+             Samples, 
+             Lines, 
+             Bands 
+      };
+
       // Constructors and Destructors
-      Table(const std::string &tableName);
-      Table(const std::string &tableName, Isis::TableRecord &rec);
+      Table(const std::string &tableName, TableRecord &rec);
+      Table(const std::string &tableName);// Only use this constructor for reading in an existing table
       Table(const std::string &tableName, const std::string &file);
       Table(const std::string &tableName, const std::string &file,
             const Pvl &fileHeader);
       Table(const Table &other);
+      Table &operator=(const Isis::Table &other);
 
       ~Table();
 
+      void SetAssociation(const Table::Association assoc);
+      bool IsSampleAssociated();
+      bool IsLineAssociated();
+      bool IsBandAssociated();
+
+      int Records() const;
+      int RecordFields() const;
+      int RecordSize() const;
+
       // Read a record
-      Isis::TableRecord &operator[](const int index);
+      TableRecord &operator[](const int index);
 
       // Add a record
-      void operator+=(Isis::TableRecord &rec);
-
-      Table &operator=(const Isis::Table &other);
+      void operator+=(TableRecord &rec);
 
       // Update a record
-      void Update(const Isis::TableRecord &rec, const int index);
+      void Update(const TableRecord &rec, const int index);
 
       // Delete a record
       void Delete(const int index);
 
-      /**
-       * Returns the number of records
-       *
-       * @return Number of records
-       */
-      inline int Records() const {
-        return p_recbufs.size();
-      };
-
-      /**
-       * Returns the number of bytes per record
-       *
-       * @return Number of bytes per record
-       */
-      inline int RecordSize() const {
-        return p_record.RecordSize();
-      };
-
-      enum Association { None, Samples, Lines, Bands };
-
-      /**
-       * Sets the association to the input parameter
-       *
-       * @param assoc Association type
-       */
-      void SetAssociation(const Table::Association assoc) {
-        p_assoc = assoc;
-      }
-
-      /**
-       * Checks to see if association is Samples
-       *
-       * @return Returns true if association is Samples, and false if it is not
-       */
-      bool IsSampleAssociated() {
-        return (p_assoc == Table::Samples);
-      };
-
-      /**
-       * Checks to see if association is Lines
-       *
-       * @return Returns true if association is Lines, and false if it is not
-       */
-      bool IsLineAssociated() {
-        return (p_assoc == Table::Lines);
-      };
-
-      /**
-       * Checks to see if association is Bands
-       *
-       * @return Returns true if association is Bands, and false if it is not
-       */
-      bool IsBandAssociated() {
-        return (p_assoc == Table::Bands);
-      };
-
       void Clear();
+
 
     protected:
       void ReadInit();
@@ -147,10 +127,10 @@ namespace Isis {
       void WriteInit();
       void WriteData(std::fstream &os);
 
-      Isis::TableRecord p_record;    //!<
-      std::vector<char *> p_recbufs; //!<
+      TableRecord p_record;          //!< The current table record
+      std::vector<char *> p_recbufs; //!< Buffers containing record values
 
-      int p_records; /**<Holds record count read from labels, may differ from
+      int p_records; /**< Holds record count read from labels, may differ from
                          the size of p_recbufs.*/
 
       Association p_assoc; //!< Association Type of the table

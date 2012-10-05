@@ -26,105 +26,108 @@
 #include <vector>
 #include <string>
 
-#include "IException.h"
-#include "iString.h"
-#include "Pvl.h"
-#include "Table.h"
-
 namespace Isis {
-/**
- * @brief Import a PDS table file with a label description
- *
- * This class ingests a PDS table and converts it to an ISIS Table
- * object.
- *
- * The PDS label file (*.LBL) should completely define the contents of a
- * text file (*.TAB).  The name of the text file is determined from a label
- * keyword ^TABLE keyword.  Programmers can provide a different name for the
- * text table file.
- *
- * @ingroup Utility
- *
- * @author 2011-07-20 Kris Becker
- *
- * @internal
- *   @history 2011-08-02 Kris Becker Modified to ensure the proper size of strings are
- *                         exported to the TableRecord
- *
- */
-class ImportPdsTable {
-  public:
-    ImportPdsTable();
-    ImportPdsTable(const std::string &labfile);
-    ImportPdsTable(const std::string &labfile, const std::string &tabfile);
-    ~ImportPdsTable() {}
+  class iString;
+  class Table;
+  class TableField;
+  class TableRecord;
+  class PvlObject;
+  /**
+   * @brief Import a PDS table file with a label description
+   *
+   * This class ingests a PDS table and converts it to an ISIS Table
+   * object. This class can handle importing PDS tables whose data is BINARY 
+   * or ASCII format.
+   * The PDS label file (*.LBL) should completely define the contents of a
+   * text file (*.TAB).  The name of the text file is determined from a label
+   * keyword ^TABLE keyword.  Programmers can provide a different name for the
+   * text table file.
+   *
+   * @ingroup Utility
+   *
+   * @author 2011-07-20 Kris Becker
+   *
+   * @internal 
+   *   @history 2011-08-02 Kris Becker Modified to ensure the proper size of strings are
+   *                         exported to the TableRecord
+   *   @history 2012-10-04 Jeannie Backer Changed references to TableField
+   *                           methods to lower camel case. Added and ordered
+   *                           includes. Moved method implementation to cpp.
+   *                           References #1169.
+   */
+  class ImportPdsTable {
+    public:
+      ImportPdsTable();
+      ImportPdsTable(const std::string &labfile);
+      ImportPdsTable(const std::string &labfile, const std::string &tabfile);
+      ~ImportPdsTable() {}
 
 
-    /** Return the number of columns */
-    int columns() const { return (m_coldesc.size()); }
+      /** Return the number of columns */
+      int columns() const;
 
-    /** Return numnber of rows */
-    int rows() const { return (m_rows.size()); }
+      /** Return numnber of rows */
+      int rows() const;
 
-    void load(const std::string &labfile, const std::string &tabfile = "");
+      void load(const std::string &labfile, const std::string &tabfile = "");
+  
+      bool hasColumn(const std::string &colName) const;
+      std::string getColumnName(const int &index = 0, const bool &formatted = true)
+                               const;
+      std::vector<std::string> getColumnNames(const bool &formatted = true) const;
+  
+      std::string getType(const std::string &colName) const;
+      bool setType(const std::string &colName, const std::string &dtype);
+  
+      Table exportAsTable(const std::string &tname) const;
+      Table exportAsTable(const std::string &colNames,
+                          const std::string &tname) const;
+      Table exportAsTable(const std::vector<std::string> &colNames,
+                          const std::string &tname) const;
 
-    bool hasColumn(const std::string &colName) const;
-    std::string getColumnName(const int &index = 0, const bool &formatted = true)
-                             const;
-    std::vector<std::string> getColumnNames(const bool &formatted = true) const;
+    private:
+      struct ColumnDescr {
+        std::string m_name;       //!< Name of column
+        int         m_colnum;     //!< Column number
+        std::string m_type;       //!< Type of column
+        int         m_sbyte;      //!< Starting byte of data
+        int         m_nbytes;     //!< Number bytes in column
+      };
 
-    std::string getType(const std::string &colName) const;
-    bool setType(const std::string &colName, const std::string &dtype);
+      typedef std::vector<ColumnDescr> ColumnTypes;
+      typedef std::vector<iString>     Columns;
+      typedef std::vector<Columns>     Rows;
 
-    Table exportAsTable(const std::string &tname) const;
-    Table exportAsTable(const std::string &colNames,
-                        const std::string &tname) const;
-    Table exportAsTable(const std::vector<std::string> &colNames,
-                        const std::string &tname) const;
+      //private instance variables
+      int         m_trows;      //!< Number rows in table according to label
+      ColumnTypes m_coldesc;    //!< Column descriptions
+      Rows        m_rows;       //!<  Table data
 
-  private:
-    struct ColumnDescr {
-      std::string m_name;    // Name of column
-      int         m_colnum;  // Column number
-      std::string m_type;    // Type of column
-      int         m_sbyte;   // Starting byte of data
-      int         m_nbytes;  // Number bytes in column
-    };
+      void init();
 
-    typedef std::vector<ColumnDescr> ColumnTypes;
-    typedef std::vector<iString>     Columns;
-    typedef std::vector<Columns>     Rows;
+      void loadLabel(const std::string &labfile, std::string &tblfile);
+      void loadTable(const std::string &tabfile);
 
-  //private instance variables
-    int         m_trows;      // Number rows in table according to label
-    ColumnTypes m_coldesc;    // Column descriptions
-    Rows        m_rows;       //  Table data
+      ColumnDescr getColumnDescription(PvlObject &colobj, int nth) const;
+      ColumnDescr *findColumn(const std::string &colName);
+      const ColumnDescr *findColumn(const std::string &colName) const;
 
-    void init();
+      std::string getColumnValue(const std::string &tline,
+                                 const ColumnDescr &cdesc) const;
+      std::string getFormattedName(const std::string &colname) const;
+      std::string getGenericType(const std::string &ttype) const;
 
-    void loadLabel(const std::string &labfile, std::string &tblfile);
-    void loadTable(const std::string &tabfile);
+      TableField makeField(const ColumnDescr &cdesc) const;
+      TableRecord makeRecord(const ColumnTypes &ctypes) const;
 
-    ColumnDescr getColumnDescription(PvlObject &colobj, int nth) const;
-    ColumnDescr *findColumn(const std::string &colName);
-    const ColumnDescr *findColumn(const std::string &colName) const;
+      TableField &extract(const Columns &columns, const ColumnDescr &cdesc,
+                          TableField &field) const;
+      TableRecord &extract(const Columns &columns, const ColumnTypes &ctypes,
+                           TableRecord &record) const;
 
-    std::string getColumnValue(const std::string &tline,
-                               const ColumnDescr &cdesc) const;
-    std::string getFormattedName(const std::string &colname) const;
-    std::string getGenericType(const std::string &ttype) const;
-
-    TableField makeField(const ColumnDescr &cdesc) const;
-    TableRecord makeRecord(const ColumnTypes &ctypes) const;
-
-    TableField &extract(const Columns &columns, const ColumnDescr &cdesc,
-                        TableField &field) const;
-    TableRecord &extract(const Columns &columns, const ColumnTypes &ctypes,
-                         TableRecord &record) const;
-
-    void fillTable(Table &table, const ColumnTypes &columns,
-                   TableRecord &record) const;
-};
+      void fillTable(Table &table, const ColumnTypes &columns,
+                     TableRecord &record) const;
+  };
 
 }
 #endif

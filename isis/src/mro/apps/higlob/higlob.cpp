@@ -1,23 +1,24 @@
 #include "Isis.h"
-#include "ProcessByLine.h"
-#include "SpecialPixel.h"
-#include "LineManager.h"
+
 #include "FileName.h"
 #include "IException.h"
+#include "LineManager.h"
+#include "ProcessByLine.h"
+#include "SpecialPixel.h"
 #include "Table.h"
 
 using namespace std;
 using namespace Isis;
 
 // Globals and prototypes
-Cube cube;
-LineManager *in;
+Cube g_cube;
+LineManager *g_in;
 
 Table hifix("HiRISE Ancillary");
 Table calfix("HiRISE Calibration Ancillary");
 Table calimg("HiRISE Calibration Image");
 
-bool flip;
+bool g_flip;
 void glob(Buffer &out);
 
 void IsisMain() {
@@ -31,11 +32,11 @@ void IsisMain() {
   // Open the input cube
   UserInterface &ui = Application::GetUserInterface();
   string from = ui.GetFileName("FROM");
-  cube.open(from);
+  g_cube.open(from);
 
-  samples = cube.getSampleCount();
-  lines = cube.getLineCount();
-  bands = cube.getBandCount();
+  samples = g_cube.getSampleCount();
+  lines = g_cube.getLineCount();
+  bands = g_cube.getBandCount();
 
   // Get a cube packet to the input file
   Cube *icube = p.SetInputCube("FROM");
@@ -50,19 +51,19 @@ void IsisMain() {
   icube->read(calimg);
 
   // Add the number of buffer pixels and dark pixels to the ouput NS
-  samples += hifix[0]["BufferPixels"].Size() + hifix[0]["DarkPixels"].Size();
+  samples += hifix[0]["BufferPixels"].size() + hifix[0]["DarkPixels"].size();
 
   // Add the number of lines in the calibration image to the output NL
   lines += calimg.Records();
 
   // Decide if the calibration and observation data should be flipped.
-  flip = false;
+  g_flip = false;
   PvlGroup &ins = icube->getGroup("Instrument");
   int chan = ins["ChannelNumber"];
 
   iString flipChan = ui.GetString("FLIP");
-  if(flipChan.UpCase() != "NONE") {
-    if(flipChan.ToInteger() == chan) flip = true;
+  if (flipChan.UpCase() != "NONE") {
+    if (flipChan.ToInteger() == chan) g_flip = true;
   }
 
   // Allocate the output file and make sure things get propogated nicely
@@ -71,15 +72,15 @@ void IsisMain() {
   p.ClearInputCubes();
 
   // Create a buffer for reading the input cube
-  in = new LineManager(cube);
+  g_in = new LineManager(g_cube);
 
   // Crop the input cube
   p.StartProcess(glob);
 
   // Cleanup
   p.EndProcess();
-  delete in;
-  cube.close();
+  delete g_in;
+  g_cube.close();
 }
 
 // Line processing routine
@@ -87,31 +88,31 @@ void glob(Buffer &out) {
   double int2ToDouble(int value);
 
   // Transfer the calibration buffer, image, and dark pixels
-  if(out.Line() <= calimg.Records()) {
+  if (out.Line() <= calimg.Records()) {
     int outPos = 0;
 
     // Buffer pixels
     vector<int> buf = calfix[out.Line()-1]["BufferPixels"];
-    for(int i = 0; i < (int)buf.size(); i++) {
+    for (int i = 0; i < (int)buf.size(); i++) {
       out[outPos++] = int2ToDouble(buf[i]);
     }
 
     // Main calibration pixels
     vector<int> cal = calimg[out.Line()-1]["Calibration"];
-    if(flip) {
-      for(int i = (int)cal.size() - 1; i >= 0; i--) {
+    if (g_flip) {
+      for (int i = (int)cal.size() - 1; i >= 0; i--) {
         out[outPos++] = int2ToDouble(cal[i]);
       }
     }
     else {
-      for(int i = 0; i < (int)cal.size(); i++) {
+      for (int i = 0; i < (int)cal.size(); i++) {
         out[outPos++] = int2ToDouble(cal[i]);
       }
     }
 
     // Dark pixels
     vector<int> dark = calfix[out.Line()-1]["DarkPixels"];
-    for(int i = 0; i < (int)dark.size(); i++) {
+    for (int i = 0; i < (int)dark.size(); i++) {
       out[outPos++] = int2ToDouble(dark[i]);
     }
 
@@ -124,28 +125,28 @@ void glob(Buffer &out) {
 
     // Buffer pixels
     vector<int> buf = hifix[out.Line()-calimg.Records()-1]["BufferPixels"];
-    for(int i = 0; i < (int)buf.size(); i++) {
+    for (int i = 0; i < (int)buf.size(); i++) {
       out[outPos++] = int2ToDouble(buf[i]);
     }
 
     // Main observation pixels
-    in->SetLine(out.Line() - calimg.Records(), 1);
-    cube.read(*in);
+    g_in->SetLine(out.Line() - calimg.Records(), 1);
+    g_cube.read(*g_in);
 
-    if(flip) {
-      for(int i = in->size() - 1; i >= 0; i--) {
-        out[outPos++] = (*in)[i];
+    if (g_flip) {
+      for (int i = g_in->size() - 1; i >= 0; i--) {
+        out[outPos++] = (*g_in)[i];
       }
     }
     else {
-      for(int i = 0; i < in->size(); i++) {
-        out[outPos++] = (*in)[i];
+      for (int i = 0; i < g_in->size(); i++) {
+        out[outPos++] = (*g_in)[i];
       }
     }
 
     // Dark pixels
     vector<int> dark = hifix[out.Line()-calimg.Records()-1]["DarkPixels"];
-    for(int i = 0; i < (int)dark.size(); i++) {
+    for (int i = 0; i < (int)dark.size(); i++) {
       out[outPos++] = int2ToDouble(dark[i]);
     }
 
@@ -153,11 +154,11 @@ void glob(Buffer &out) {
 } // End function
 
 double int2ToDouble(int value) {
-  if(value == NULL2) return NULL8;
-  else if(value == LOW_REPR_SAT2) return LOW_REPR_SAT8;
-  else if(value == LOW_INSTR_SAT2) return LOW_INSTR_SAT8;
-  else if(value == HIGH_INSTR_SAT2) return HIGH_INSTR_SAT8;
-  else if(value == HIGH_REPR_SAT2) return HIGH_REPR_SAT8;
+  if (value == NULL2) return NULL8;
+  else if (value == LOW_REPR_SAT2) return LOW_REPR_SAT8;
+  else if (value == LOW_INSTR_SAT2) return LOW_INSTR_SAT8;
+  else if (value == HIGH_INSTR_SAT2) return HIGH_INSTR_SAT8;
+  else if (value == HIGH_REPR_SAT2) return HIGH_REPR_SAT8;
   else return value;
 
 }

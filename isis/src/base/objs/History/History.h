@@ -1,4 +1,4 @@
-#if !defined(History_h)
+#ifndef History_h
 #define History_h
 
 /**
@@ -25,8 +25,10 @@
  */
 
 #include "Blob.h"
+#include "Pvl.h"
 
 namespace Isis {
+  class PvlObject;
   /**
    * @author ????-??-?? Unknown
    *
@@ -38,8 +40,12 @@ namespace Isis {
    *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
    *                           $temporary variable instead of /tmp directory.
    *                           Added some documentation to methods.
-   *
-   * @internal
+   *   @history 2012-10-04 Jeannie Backer - Replaced if! defined with ifndef.
+   *                           Added forward declaration for PvlObject and
+   *                           include for Pvl since the include for Pvl was
+   *                           removed from Blob.h. Added padding to control
+   *                           statements. References #1169
+   *  
    * @todo This class needs documentation.
   */
   class History : public Isis::Blob {

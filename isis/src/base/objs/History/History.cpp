@@ -77,19 +77,19 @@ namespace Isis {
    */
   void History::WriteInit() {
     ostringstream ostr;
-    if(p_nbytes > 0) ostr << std::endl;
+    if (p_nbytes > 0) ostr << std::endl;
     ostr << p_history;
     string histStr = ostr.str();
     int bytes = histStr.size();
 
     char *temp = p_buffer;
     p_buffer = new char[p_nbytes+bytes];
-    if(temp != NULL) memcpy(p_buffer, temp, p_nbytes);
+    if (temp != NULL) memcpy(p_buffer, temp, p_nbytes);
     const char *ptr = histStr.c_str();
     memcpy(&p_buffer[p_nbytes], (void *)ptr, bytes);
     p_nbytes += bytes;
 
-    if(temp != NULL) delete [] temp;
+    if (temp != NULL) delete [] temp;
   }
 
   /**
@@ -100,7 +100,7 @@ namespace Isis {
   Pvl History::ReturnHist() {
     Pvl pvl;
     stringstream os;
-    for(int i = 0; i < p_nbytes; i++) os << p_buffer[i];
+    for (int i = 0; i < p_nbytes; i++) os << p_buffer[i];
     os >> pvl;
     return pvl;
   }
@@ -115,7 +115,7 @@ namespace Isis {
     try {
       Blob::Read(pvl, is);
     }
-    catch(IException &e) {
+    catch (IException &e) {
     }
   }
 }

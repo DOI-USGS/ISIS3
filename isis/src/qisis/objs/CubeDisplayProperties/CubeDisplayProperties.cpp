@@ -63,46 +63,46 @@ namespace Isis {
         for (int j = 0; j < table[i].Fields(); j++) {
           QString label;
 
-          if (table[i][j].IsText()) {
+          if (table[i][j].isText()) {
             label = QString::fromStdString((std::string)table[i][j]);
             label.truncate(10);
           }
 
           // Get the average resolution for this mosaic item.
-          if (table[i][j].IsText() && label.compare("Resolution") == 0) {
+          if (table[i][j].isText() && label.compare("Resolution") == 0) {
             if (j + 3 < table[i].Fields()) {
-              if (table[i][j+3].IsInteger()) {
+              if (table[i][j+3].isInteger()) {
               }
-              else if (table[i][j+3].IsDouble()) {
+              else if (table[i][j+3].isDouble()) {
                 m_resolution = (double)table[i][j+3];
               }
-              else if (table[i][j+3].IsText()) {
+              else if (table[i][j+3].isText()) {
               }
             }
           }
 
           // Get the average emission angle for this mosaic item.
-          if (table[i][j].IsText() && label.compare("EmissionAn") == 0) {
+          if (table[i][j].isText() && label.compare("EmissionAn") == 0) {
             if (j + 3 < table[i].Fields()) {
-              if (table[i][j+3].IsInteger()) {
+              if (table[i][j+3].isInteger()) {
               }
-              else if (table[i][j+3].IsDouble()) {
+              else if (table[i][j+3].isDouble()) {
                 m_emissionAngle = (double)table[i][j+3];
               }
-              else if (table[i][j+3].IsText()) {
+              else if (table[i][j+3].isText()) {
               }
             }
           }
 
           // Get the average incidence angle for this mosaic item.
-          if (table[i][j].IsText() && label.compare("IncidenceA") == 0) {
+          if (table[i][j].isText() && label.compare("IncidenceA") == 0) {
             if (j + 3 < table[i].Fields()) {
-              if (table[i][j+3].IsInteger()) {
+              if (table[i][j+3].isInteger()) {
               }
-              else if (table[i][j+3].IsDouble()) {
+              else if (table[i][j+3].isDouble()) {
                 m_incidenceAngle = (double)table[i][j+3];
               }
-              else if (table[i][j+3].IsText()) {
+              else if (table[i][j+3].isText()) {
               }
             }
           }
@@ -110,7 +110,7 @@ namespace Isis {
         } // end for table[i].Fields
       } // end for table.Records
     }
-    catch(IException &e) {
+    catch (IException &e) {
       IException error(
           e,
           IException::Io,
@@ -130,7 +130,7 @@ namespace Isis {
   CubeDisplayProperties::~CubeDisplayProperties() {
     closeCube();
 
-    if(m_gMap) {
+    if (m_gMap) {
       delete m_gMap;
       m_gMap = NULL;
     }
@@ -151,10 +151,10 @@ namespace Isis {
    * @param prop The property you are adding support for
    */
   void CubeDisplayProperties::addSupport(Property prop) {
-    if(m_propertyUsed->size() <= prop)
+    if (m_propertyUsed->size() <= prop)
       m_propertyUsed->resize((int)(prop + 1));
 
-    if(!m_propertyUsed->testBit(prop)) {
+    if (!m_propertyUsed->testBit(prop)) {
       m_propertyUsed->setBit(prop);
       emit supportAdded(prop);
     }
@@ -169,12 +169,12 @@ namespace Isis {
    */
   bool CubeDisplayProperties::allSupport(Property prop,
       QList<CubeDisplayProperties *> displays) {
-    if(displays.empty())
+    if (displays.empty())
       return false;
 
     CubeDisplayProperties *display;
     foreach(display, displays) {
-      if(!display->supports(prop))
+      if (!display->supports(prop))
         return false;
     }
 
@@ -189,7 +189,7 @@ namespace Isis {
    * @returns True if the property has support, false otherwise
    */
   bool CubeDisplayProperties::supports(Property prop) {
-    if(m_propertyUsed->size() <= prop)
+    if (m_propertyUsed->size() <= prop)
       return false;
 
     return m_propertyUsed->testBit(prop);
@@ -211,7 +211,7 @@ namespace Isis {
    *   the Cube * if one is not already present.
    */
   Cube *CubeDisplayProperties::cube() {
-    if(!m_cube) {
+    if (!m_cube) {
       m_cube = new Cube;
       m_cube->open(m_filename.toStdString());
     }
@@ -225,7 +225,7 @@ namespace Isis {
    *   This will allocate the pointer if one is not already present.
    */
   UniversalGroundMap *CubeDisplayProperties::groundMap() {
-    if(m_gMap == NULL) {
+    if (m_gMap == NULL) {
       Pvl lab(m_filename.toStdString());
       m_gMap = new UniversalGroundMap(lab);
     }
@@ -247,7 +247,7 @@ namespace Isis {
    *   with the Cube because the OS will limit how many of these we have open.
    */
   void CubeDisplayProperties::closeCube() {
-    if(m_cube) {
+    if (m_cube) {
       delete m_cube;
       m_cube = NULL;
     }
@@ -259,7 +259,7 @@ namespace Isis {
    *   with the Cube because the OS will limit how many of these we have open.
    */
   geos::geom::MultiPolygon *CubeDisplayProperties::footprint(QMutex *lock) {
-    if(!m_footprint) {
+    if (!m_footprint) {
       try {
         ImagePolygon poly;
         cube()->read(poly);
@@ -269,7 +269,7 @@ namespace Isis {
         try {
           createManualFootprint(lock);
         }
-        catch(IException &e) {
+        catch (IException &e) {
           iString msg = "Could not read the footprint from cube [" +
               displayName() + "]. Please make "
               "sure footprintinit has been run";
@@ -312,7 +312,7 @@ namespace Isis {
       QList<CubeDisplayProperties *> cubeDisplays) {
     QList<QAction *> actions;
 
-    if(allSupport(Color, cubeDisplays)) {
+    if (allSupport(Color, cubeDisplays)) {
 
       QAction *alphaAction = new QAction("Change Transparency",
                                          cubeDisplays[0]);
@@ -341,9 +341,9 @@ namespace Isis {
     }
 
 
-    if(allSupport(ShowLabel, cubeDisplays)) {
+    if (allSupport(ShowLabel, cubeDisplays)) {
       QAction *labelVisibleAction;
-      if(!cubeDisplays[0]->getValue(ShowLabel).toBool())
+      if (!cubeDisplays[0]->getValue(ShowLabel).toBool())
         labelVisibleAction = new QAction("Show Label", cubeDisplays[0]);
       else
         labelVisibleAction = new QAction("Hide Label", cubeDisplays[0]);
@@ -356,9 +356,9 @@ namespace Isis {
     }
 
 
-    if(allSupport(ShowFill, cubeDisplays)) {
+    if (allSupport(ShowFill, cubeDisplays)) {
       QAction *fillAction;
-      if(!cubeDisplays[0]->getValue(ShowFill).toBool())
+      if (!cubeDisplays[0]->getValue(ShowFill).toBool())
         fillAction = new QAction("Show Filled", cubeDisplays[0]);
       else
         fillAction = new QAction("Show Unfilled", cubeDisplays[0]);
@@ -370,9 +370,9 @@ namespace Isis {
     }
 
 
-    if(allSupport(ShowDNs, cubeDisplays)) {
+    if (allSupport(ShowDNs, cubeDisplays)) {
       QAction *cubeDataAction;
-      if(!cubeDisplays[0]->getValue(ShowDNs).toBool())
+      if (!cubeDisplays[0]->getValue(ShowDNs).toBool())
         cubeDataAction = new QAction("Show Cube Data", cubeDisplays[0]);
       else
         cubeDataAction = new QAction("Hide Cube Data", cubeDisplays[0]);
@@ -384,9 +384,9 @@ namespace Isis {
     }
 
 
-    if(allSupport(ShowOutline, cubeDisplays)) {
+    if (allSupport(ShowOutline, cubeDisplays)) {
       QAction *outlineAction;
-      if(!cubeDisplays[0]->getValue(ShowOutline).toBool())
+      if (!cubeDisplays[0]->getValue(ShowOutline).toBool())
         outlineAction = new QAction("Show Outline", cubeDisplays[0]);
       else
         outlineAction = new QAction("Hide Outline", cubeDisplays[0]);
@@ -409,7 +409,7 @@ namespace Isis {
       QList<CubeDisplayProperties *> cubeDisplays) {
     QList<QAction *> actions;
 
-    if(allSupport(ZOrdering, cubeDisplays)) {;
+    if (allSupport(ZOrdering, cubeDisplays)) {;
       QAction *moveTop = new QAction("Bring to Front", cubeDisplays[0]);
       QAction *moveUp = new QAction("Bring Forward", cubeDisplays[0]);
       QAction *moveBottom = new QAction("Send to Back", cubeDisplays[0]);
@@ -445,7 +445,7 @@ namespace Isis {
       QList<CubeDisplayProperties *> cubeDisplays) {
     QList<QAction *> actions;
 
-    if(cubeDisplays.size() == 1 && allSupport(Zooming, cubeDisplays)) {
+    if (cubeDisplays.size() == 1 && allSupport(Zooming, cubeDisplays)) {
       QAction *zoomFit = new QAction("Zoom Fit", cubeDisplays[0]);
       connect(zoomFit, SIGNAL(triggered()),
               cubeDisplays[0], SIGNAL(zoomFit()));
@@ -467,7 +467,7 @@ namespace Isis {
     int blue = 0;
 
     // Generate dark
-    while(red + green + blue < 300) {
+    while (red + green + blue < 300) {
       red   = rand() % 256;
       green = rand() % 256;
       blue  = rand() % 256;
@@ -539,7 +539,7 @@ namespace Isis {
         "Values are 0 (invisible) to 255 (solid)",
         getValue(Color).value<QColor>().alpha(), 0, 255, 1, &ok);
 
-    if(ok) {
+    if (ok) {
       CubeDisplayProperties *display;
       foreach(display, displays) {
         QColor displayColor = display->getValue(Color).value<QColor>();
@@ -563,7 +563,7 @@ namespace Isis {
         "Cube Display Color",
         QColorDialog::ShowAlphaChannel);
 
-    if(newColor.isValid()) {
+    if (newColor.isValid()) {
       CubeDisplayProperties *display;
       foreach(display, displays) {
         display->setColor(newColor);
@@ -660,10 +660,10 @@ namespace Isis {
    *   change it and emit propertyChanged if its different and supported.
    */
   void CubeDisplayProperties::setValue(Property prop, QVariant value) {
-    if((*m_propertyValues)[prop] != value) {
+    if ((*m_propertyValues)[prop] != value) {
       (*m_propertyValues)[prop] = value;
 
-      if(supports(prop)) {
+      if (supports(prop)) {
         emit propertyChanged(this);
       }
     }
@@ -678,11 +678,11 @@ namespace Isis {
       QObject *senderObj) {
     QList<CubeDisplayProperties *> data;
 
-    if(senderObj) {
+    if (senderObj) {
       QAction *caller = (QAction *)senderObj;
       QVariant callerData = caller->data();
 
-      if(callerData.canConvert< QList<CubeDisplayProperties *> >() ) {
+      if (callerData.canConvert< QList<CubeDisplayProperties *> >() ) {
         data = callerData.value< QList<CubeDisplayProperties *> >();
       }
     }
@@ -698,10 +698,10 @@ namespace Isis {
     ImagePolygon imgPoly;
 
     int sampleStepSize = cube()->getSampleCount() / 10;
-    if(sampleStepSize <= 0) sampleStepSize = 1;
+    if (sampleStepSize <= 0) sampleStepSize = 1;
 
     int lineStepSize = cube()->getLineCount() / 10;
-    if(lineStepSize <= 0) lineStepSize = 1;
+    if (lineStepSize <= 0) lineStepSize = 1;
 
     imgPoly.Create(*cube(), sampleStepSize, lineStepSize);
 

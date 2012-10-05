@@ -1,23 +1,29 @@
 #include <iostream>
-#include "Table.h"
+
 #include "IException.h"
 #include "Preference.h"
+#include "Table.h"
+#include "TableField.h"
+#include "TableRecord.h"
 
 using namespace std;
+using namespace Isis;
+
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   try {
-    Isis::TableField f1("Column1", Isis::TableField::Integer);
-    Isis::TableField f2("Column2", Isis::TableField::Double);
-    Isis::TableField f3("Column3", Isis::TableField::Text, 10);
-    Isis::TableField f4("Column2", Isis::TableField::Double);
-    Isis::TableRecord rec;
+    TableField f1("Column1", TableField::Integer);
+    TableField f2("Column2", TableField::Double);
+    TableField f3("Column3", TableField::Text, 10);
+    TableField f4("Column4", TableField::Double);
+    TableRecord rec;
     rec += f1;
     rec += f2;
     rec += f3;
     rec += f4;
-    Isis::Table t("UNITTEST", rec);
+    cout << "Testing Table(name, record) constructor and Write(filename) method..." << endl << endl;
+    Table t("UNITTEST", rec);
 
     rec[0] = 5;
     rec[1] = 3.14;
@@ -31,18 +37,33 @@ int main(int argc, char *argv[]) {
     rec[3] = -0.55;
     t += rec;
 
+    // write first table to tTest
     t.Write("tTest");
 
-    Isis::Table t2("UnitTest", "tTest");
-    cout << (int) t2[0][0] << endl;
-    cout << (double) t2[0][1] << endl;
-    cout << (string) t2[0][2] << endl;
-    cout << (double) t2[0][3] << endl;
-    cout << (int) t2[1][0] << endl;
-    cout << (double) t2[1][1] << endl;
-    cout << (string) t2[1][2] << endl;
-    cout << (double) t2[1][3] << endl;
-    cout << endl << "Number of Records = " << t2.Records() << endl;
+    // Use constructor that takes existing file name - case insensitive
+    cout << "Testing Table(name) constructor and Read(filename) method..." << endl;
+    Table t2("UnitTest");
+    // Read table from tTest file
+    t2.Read("tTest");
+    for (int i = 0; i < t2.Records(); i++) {
+      for (int j = 0; j < t2.RecordFields(); j++) {
+        if (j == 0) {
+          cout << (int) t2[i][j] << "\t";
+        }
+        else if (j == 1 || j == 3) {
+          cout << (double) t2[i][j] << "\t";
+        }
+        else if (j == 2) {
+          cout << std::string(t2[i][j]) << "\t";
+        }
+      }
+      cout << endl;
+    }
+    cout << endl;
+
+    cout << "Testing accessor methods..." << endl;
+    cout << "Number of Records = " << t2.Records() << endl;
+    cout << "Number of Fields  = " << t2.RecordFields() << endl;
     cout << "Record Size = " << t2.RecordSize() << endl;
 
     rec[0] = 19;
@@ -50,7 +71,7 @@ int main(int argc, char *argv[]) {
     rec[2] = "Blob";
     rec[3] = 4.4;
     t2.Update(rec, 0);
-    t2.SetAssociation(Isis::Table::Lines);
+    t2.SetAssociation(Table::Lines);
     t2.Write("tTest");
 
     cout << endl << "Testing Association Checks" << endl;
@@ -59,57 +80,89 @@ int main(int argc, char *argv[]) {
     cout << "Band Associated?   " << t2.IsBandAssociated() << endl;
     cout << endl;
 
-    Isis::Table t3("UnitTest", "tTest");
-    cout << (int) t3[0][0] << endl;
-    cout << (double) t3[0][1] << endl;
-    cout << (string) t3[0][2] << endl;
-    cout << (double) t3[0][3] << endl;
-    cout << (int) t3[1][0] << endl;
-    cout << (double) t3[1][1] << endl;
-    cout << (string) t3[1][2] << endl;
-    cout << (double) t3[0][3] << endl << endl;
-
-    cout << "Testing Record Delete method..." << endl;
-    cout << "Number of Records = " << t3.Records() << endl;
-    cout << "Deleted Record at Index 0" << endl;
-    t3.Delete(0);
-    cout << "Number of Records = " << t3.Records() << endl << endl;
-
-    cout << "Testing Clear  method..." << endl;
-    t3.Clear();
-    cout << "Number of Records = " << t3.Records() << endl << endl;
-    remove("tTest");
-
-    string name1 = "InstrumentPointing";
-    Isis::Table table1(name1, "truth.cub");
-    for(int i = 0; i < table1.Records(); i++) {
-      for(int j = 0; j < table1[i].Fields(); j++) {
-        if(table1[i][j].IsText()) {
-          cout << (string)table1[i][j] << ",";
+    // use constructor that takes name and file 
+    cout << "Testing Table(name, filename) constructor and Update(record, index) method..." << endl;
+    Table t3("UnitTest", "tTest");
+    for (int i = 0; i < t3.Records(); i++) {
+      for (int j = 0; j < t3.RecordFields(); j++) {
+        if (j == 0) {
+          cout << (int) t3[i][j] << "\t";
         }
-        else if(table1[i][j].IsDouble()) {
-          cout << (double)table1[i][j] << ",";
+        else if (j == 1 || j == 3) {
+          cout << (double) t3[i][j] << "\t";
+        }
+        else if (j == 2) {
+          cout << std::string(t3[i][j]) << "\t";
         }
       }
       cout << endl;
     }
-    string name2 = "CameraStatistics";
-    Isis::Table table2(name2, "truth.cub");
-    for(int i = 0; i < table2.Records(); i++) {
-      for(int j = 0; j < table2[i].Fields(); j++) {
-        if(table2[i][j].IsText()) {
-          cout << (string)table2[i][j] << ",";
+    cout << endl;
+
+    cout << "Testing Record Delete method..." << endl;
+    cout << "Number of Records Before Delete = " << t3.Records() << endl;
+    cout << "Number of Fields  Before Delete = " << t3.RecordFields() << endl;
+    t3.Delete(0);
+    cout << "Number of Records After Delete = " << t3.Records() << endl;
+    cout << "Number of Fields  After Delete = " << t3.RecordFields() << endl << endl;
+
+    // use operator=
+    Table t4 = t3;
+    cout << "Testing operator= method..." << endl;
+    for (int i = 0; i < t4.Records(); i++) {
+      for (int j = 0; j < t4.RecordFields(); j++) {
+        if (j == 0) {
+          cout << (int) t4[i][j] << "\t";
         }
-        else if(table2[i][j].IsDouble()) {
-          cout << (double)table2[i][j] << ",";
+        else if (j == 1 || j == 3) {
+          cout << (double) t4[i][j] << "\t";
+        }
+        else if (j == 2) {
+          cout << std::string(t4[i][j]) << "\t";
+        }
+      }
+      cout << endl;
+    }
+    cout << endl;
+
+    cout << "Testing Clear  method..." << endl;
+    t4.Clear();
+    cout << "Number of Records = " << t4.Records() << endl;
+    cout << "Number of Fields  = " << t4.RecordFields() << endl << endl;
+    remove("tTest");
+
+    cout << "InstrumentPointing Table..." << endl;
+    string name1 = "InstrumentPointing";
+    Table instPoint(name1, "truth.cub");
+    for(int i = 0; i < instPoint.Records(); i++) {
+      for(int j = 0; j < instPoint[i].Fields(); j++) {
+        if(instPoint[i][j].isText()) {
+          cout << (string)instPoint[i][j] << ",  ";
+        }
+        else if(instPoint[i][j].isDouble()) {
+          cout << (double)instPoint[i][j] << ",  ";
+        }
+      }
+      cout << endl;
+    }
+    cout << endl;
+    cout << "Camera Statistics Table..." << endl;
+    string name2 = "CameraStatistics";
+    Table camStats(name2, "truth.cub");
+    for(int i = 0; i < camStats.Records(); i++) {
+      for(int j = 0; j < camStats[i].Fields(); j++) {
+        if(camStats[i][j].isText()) {
+          cout << (string)camStats[i][j] << ",  ";
+        }
+        else if(camStats[i][j].isDouble()) {
+          cout << (double)camStats[i][j] << ",  ";
         }
       }
       cout << endl;
     }
 
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 }
-

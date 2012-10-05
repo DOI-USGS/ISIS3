@@ -19,13 +19,22 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
+#include "ImportPdsTable.h"
+
 #include <cctype>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <iomanip>
-#include "ImportPdsTable.h"
-#include "iString.h"
+#include <string>
+
+#include "EndianSwapper.h"
 #include "FileName.h"
+#include "iString.h"
+#include "Pvl.h"
+#include "PvlObject.h"
+#include "Table.h"
+#include "TableField.h"
+#include "TableRecord.h"
 #include "TextFile.h"
 
 
@@ -36,6 +45,7 @@ namespace Isis {
 
   /** Default constructor */
   ImportPdsTable::ImportPdsTable() {
+    // just inititalize the member variables
     init();
   }
 
@@ -43,8 +53,8 @@ namespace Isis {
    * @brief Constructor accepts the name of the label file
    *
    * This constructor takes the name of the label file describing the PDS table.
-   * It will extract the description of the columns and the name of the table data
-   * file.  The table data file is also read and internalized.
+   * It will extract the description of the columns and the name of the table 
+   * data file.  The table data file is also read and internalized.
    *
    * @param labfile Name of table label file
    */
@@ -54,11 +64,11 @@ namespace Isis {
   }
 
   /**
-   * @brief Constructor accepts the name of the label and table files
+   * @brief Constructor automatically loads the label and table files 
    *
    * This constructor takes the name of the label file describing the PDS table
-   * and the table data file name.  It will extract the description of the columns
-   * and read the contents of the table data file.
+   * and the table data file name.  It will extract the description of the 
+   * columns and read the contents of the table data file.
    *
    * @param labfile Name of table label file
    * @param tabfile Name of table data file
@@ -103,11 +113,11 @@ namespace Isis {
   /**
    * @brief Return the name of the specifed column
    *
-   * This method will return the name of a specified column by index. It also has
-   * the option to format the column name to Camel-Case.  This will remove all
-   * left and right parens, convert white space to spaces, compress consecutive
-   * spaces to only one space.  It then removes the spaces converting the next
-   * character to uppercase.
+   * This method will return the name of a specified column by index. It also 
+   * has the option to format the column name to Camel-Case.  This will remove 
+   * all left and right parens, convert white space to spaces, compress 
+   * consecutive spaces to only one space.  It then removes the spaces 
+   * converting the next character to uppercase.
    *
    * @param index      Index of colunm name to get.
    * @param formatted  Specifies to convert the name to Camel-Case if true,
@@ -156,8 +166,8 @@ namespace Isis {
   /**
    * @brief Get the type associated with the specified column
    *
-   * This method returns the datatype associated with the specfied column.  If the
-   * column does not exist, an empty string is returned.
+   * This method returns the datatype associated with the specfied column.  If 
+   * the column does not exist, an empty string is returned.
    *
    * @author kbecker (6/27/2011)
    *
@@ -271,6 +281,7 @@ namespace Isis {
 
   /** Initialize object variables */
   void ImportPdsTable::init() {
+
     m_trows = 0;
     m_coldesc.clear();
     m_rows.clear();
@@ -320,14 +331,14 @@ namespace Isis {
 
     //  Test to ensure columns match the number listed in the label
     if (ncols != (int) m_coldesc.size()) {
-      ostringstream mess;
-      mess << "Number of columns in the COLUMNS label keyword (" << ncols
+      ostringstream msg;
+      msg << "Number of columns in the COLUMNS label keyword (" << ncols
            << ") does not match number of COLUMN objects found ("
            << m_coldesc.size() << ")";
   #if 0
-      throw iException::Message(iException::Programmer, mess.str(), _FILEINFO_);
+      throw iException::Message(iException::Programmer, msg.str(), _FILEINFO_);
   #else
-       cout << mess.str() << "\n";
+       cout << msg.str() << "\n";
   #endif
     }
     return;
@@ -336,12 +347,13 @@ namespace Isis {
   /**
    * @brief Loads the contents of a PDS table data file
    *
-   * This method open and read the contents of a PDS table data file.  Values for
-   * each column are extracted from each row according to the label description.
-   * The entire table contents are stored internally.
+   * This method open and read the contents of a PDS table data file.  Values 
+   * for each column are extracted from each row according to the label 
+   * description. The entire table contents are stored internally. 
    *
-   * Note that the table label description must already be loaded in this object.
-   * See loadLabel().
+   * Note that the table label description must already be loaded in this 
+   * object. 
+   * @see loadLabel().
    *
    * @param tabfile Name of PDS table data file
    */
@@ -403,8 +415,8 @@ namespace Isis {
   /**
    * @brief Searches internal column descriptors for a named column
    *
-   * This method converts the column names to a formatted name for consistency and
-   * then checks for the given name - with case insensitivity.  If found, a
+   * This method converts the column names to a formatted name for consistency 
+   * and then checks for the given name - with case insensitivity.  If found, a
    * pointer to the column description is returned, otherwise NULL.
    *
    *
@@ -413,7 +425,8 @@ namespace Isis {
    * @return ImportPdsTable::ColumnDescr* Pointer to column description is
    *         returned if found otherwise, NULL is returned.
    */
-  ImportPdsTable::ColumnDescr *ImportPdsTable::findColumn(const std::string &colName) {
+  ImportPdsTable::ColumnDescr *ImportPdsTable::findColumn(
+      const std::string &colName) {
     string cName = getFormattedName(colName);
     ColumnTypes::iterator col = m_coldesc.begin();
     while (col != m_coldesc.end()) {
@@ -427,8 +440,8 @@ namespace Isis {
   /**
    * @brief Searches internal column descriptors for a named column
    *
-   * This method converts the column names to a formatted name for consistency and
-   * then checks for the given name - with case insensitivity.  If found, a
+   * This method converts the column names to a formatted name for consistency 
+   * and then checks for the given name - with case insensitivity.  If found, a
    * pointer to the column description is returned, otherwise NULL.
    *
    *
@@ -437,7 +450,8 @@ namespace Isis {
    * @return ImportPdsTable::ColumnDescr* Pointer to column description is
    *         returned if found otherwise, NULL is returned.
    */
-  const ImportPdsTable::ColumnDescr *ImportPdsTable::findColumn(const std::string &colName) const {
+  const ImportPdsTable::ColumnDescr *ImportPdsTable::findColumn(
+      const std::string &colName) const {
     string cName = getFormattedName(colName);
     ColumnTypes::const_iterator col = m_coldesc.begin();
     while (col != m_coldesc.end()) {
@@ -467,26 +481,27 @@ namespace Isis {
    * @brief Converts a column name to a camel-case after it has been cleansed
    *
    * This method will convert a column name to camel-case after some character
-   * cleaning is performed.  All white space characters as defined by the iString
-   * class are converted to spaces.  Spaces are then compressed to one space.
-   * Any left/right parens are removed.  Then the conversion to camel-case is
-   * performed.
+   * cleaning is performed.  All white space characters as defined by the 
+   * iString class are converted to spaces.  Spaces are then compressed to one 
+   * space. Any left/right parens are removed.  Then the conversion to 
+   * camel-case is performed.
    *
-   * Camel case always converts the first character in a string to uppercase.  Any
-   * space or '_' character are removed and the following character is converted
-   * to uppercase.  All other characters are converted to lowercase.
+   * Camel case always converts the first character in a string to uppercase. 
+   * Any space or '_' character are removed and the following character is 
+   * converted to uppercase.  All other characters are converted to lowercase. 
    *
    * @param colname Column name to converty
    *
    * @return std::string Returns the formatted keyword
    */
-  std::string  ImportPdsTable::getFormattedName(const std::string &colname) const {
+  std::string  ImportPdsTable::getFormattedName(
+      const std::string &colname) const {
 
     iString cname = iString::ConvertWhiteSpace(colname);
     cname.Remove("(,)");
     cname.Compress();
 
-    bool uppercase(true);
+    bool uppercase = true;
     string ostring;
     for (unsigned int i = 0 ; i < cname.size() ; i++) {
       if (uppercase) {
@@ -559,10 +574,10 @@ namespace Isis {
   /**
    * @brief Creates a TableRecord for columns
    *
-   * This method creates a TableRecord for each column in the table.  This record
-   * should be provided when creating the ISIS Table object.  It can also be used
-   * to populate the table.  TableFields are added in the order provided in
-   * ctypes.
+   * This method creates a TableRecord for each column in the table.  This 
+   * record should be provided when creating the ISIS Table object.  It can also 
+   * be used to populate the table.  TableFields are added in the order provided 
+   * in ctypes. 
    *
    * @param ctypes  Columns to create fields for and add to record
    *
@@ -596,23 +611,23 @@ namespace Isis {
     int ith = cdesc.m_colnum;
     try {
       iString data(columns[ith]);
-      if (tfield.IsInteger()) {
+      if (tfield.isInteger()) {
         data.Trim(" \t\r\n");
         tfield = data.ToInteger();
       }
-      else if (tfield.IsDouble()) {
+      else if (tfield.isDouble()) {
         data.Trim(" \t\r\n");
         tfield = data.ToDouble();
       }
       else {  // Its a text field
-        string str(tfield.Size(), ' ');
+        string str(tfield.size(), ' ');
         str.insert(0, data.Trim(" \t\r\n"));
         tfield = str;
       }
     }
-    catch (IException &ie) {
+    catch (IException &e) {
       string mess = "Conversion failure of column " + cdesc.m_name;
-      throw IException(IException::Programmer, mess, _FILEINFO_);
+      throw IException(e, IException::Programmer, mess, _FILEINFO_);
     }
 
     return (tfield);
@@ -657,14 +672,21 @@ namespace Isis {
       try {
         table += extract(m_rows[i], columns, record);
       }
-      catch (IException &ie) {
+      catch (IException &e) {
         string mess = "Failed to convert data in row " + iString((int) i);
-        throw IException(IException::Programmer, mess, _FILEINFO_);
+        throw IException(e, IException::Programmer, mess, _FILEINFO_);
       }
     }
     return;
   }
 
+  int ImportPdsTable::columns() const { 
+    return (m_coldesc.size()); 
+  }
+
+  int ImportPdsTable::rows() const { 
+    return (m_rows.size()); 
+  }
 
 }  //  namespace Isis
 

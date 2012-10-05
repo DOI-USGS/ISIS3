@@ -1,4 +1,4 @@
-#if !defined(TableRecord_h)
+#ifndef TableRecord_h
 #define TableRecord_h
 /**
  * @file
@@ -23,6 +23,7 @@
  */
 
 
+#include <vector>
 #include "TableField.h"
 
 namespace Isis {
@@ -38,59 +39,39 @@ namespace Isis {
    * @internal
    *   @history 2005-03-18 Elizabeth Ribelin - Added documentation to class
    *   @history 2007-05-28 Steven Lambright - Added 4 byte float
-   *            capablilities.
+   *                           capablilities.
    *   @history 2008-06-19 Christopher Austin - Fixed the Packing of text
-   *            TableFields
+   *                           TableFields
    *   @history 2008-06-25 Christopher Austin - Fixed the swapping of text
+   *   @history 2012-10-04 Jeannie Backer Changed references to TableField
+   *                           methods in implementation and unitTest files to
+   *                           lower camel case. Added and ordered includes.
+   *                           Moved method implementation to cpp. Fixed header
+   *                           definition statement. Fixed indentation of
+   *                           history entries. Ordered methods in cpp file.
+   *                           Improved test coverage in all categories. Added
+   *                           padding to control statements. References #1169.
+   *  
    *   @todo Finish class documentation
    */
   class TableRecord {
     public:
-      //! Constructs a TableRecord object
-      TableRecord() {};
+      TableRecord();
+      ~TableRecord();
 
-      //! Destroys the TableRecord object
-      ~TableRecord() {};
+      void operator+=(Isis::TableField &field);
+      TableField &operator[](const int field);
+      TableField &operator[](const std::string &field);
 
-      /**
-       * Returns the number of fields that are in the record
-       *
-       * @return The number of fields in the record
-       */
-      int Fields() const {
-        return p_fields.size();
-      };
-
-      /**
-       * Adds a TableField to a TableRecord
-       *
-       * @param field - TableField to be added to the record
-       */
-      void operator+=(Isis::TableField &field) {
-        p_fields.push_back(field);
-      };
-
+      int Fields() const;
       int RecordSize() const;
-
-      /**
-       *  Returns the TableField at the specified location in the TableRecord
-       *
-       * @param field  Index of desired field
-       *
-       * @return The TableField at specified location in the record
-       */
-      Isis::TableField &operator[](const int field) {
-        return p_fields[field];
-      };
-
-      Isis::TableField &operator[](const std::string &field);
 
       void Pack(char *buf) const;
       void Unpack(const char *buf);
       void Swap(char *buf) const;
 
     private:
-      std::vector<Isis::TableField> p_fields; /**<Vector of TableFields in the
+      std::vector<TableField> p_fields; /**< Vector of TableFields in the
                                                   record. */
   };
 };

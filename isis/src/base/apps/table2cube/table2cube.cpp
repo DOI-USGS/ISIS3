@@ -1,19 +1,20 @@
 #include "Isis.h"
-#include "Table.h"
-#include "ProcessByLine.h"
-#include "iString.h"
-#include <Table.h>
+
 #include <cmath>
+
+#include "iString.h"
+#include "ProcessByLine.h"
+#include "Table.h"
 
 using namespace std;
 using namespace Isis;
 
-Table *table;
-iString field;
-int startRecord;
-int numRecords;
-int startElement;
-int numElements;
+Table *g_table;
+iString g_field;
+int g_startRecord;
+int g_numRecords;
+int g_startElement;
+int g_numElements;
 
 void readTable(Isis::Buffer &outcube);
 
@@ -22,50 +23,50 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Get Parameters
-  table = new Table(ui.GetString("TABLENAME"));
-  table->Read(ui.GetFileName("FROM"));
+  g_table = new Table(ui.GetString("TABLENAME"));
+  g_table->Read(ui.GetFileName("FROM"));
 
-  field = ui.GetString("FIELD");
-  startRecord = ui.GetInteger("STARTREC");
-  startElement = ui.GetInteger("STARTELEM");
+  g_field = ui.GetString("FIELD");
+  g_startRecord = ui.GetInteger("STARTREC");
+  g_startElement = ui.GetInteger("STARTELEM");
 
-  if(ui.WasEntered("NUMREC")) {
-    numRecords = ui.GetInteger("NUMREC");
+  if (ui.WasEntered("NUMREC")) {
+    g_numRecords = ui.GetInteger("NUMREC");
   }
   else {
-    numRecords = table->Records() - (startRecord - 1);
+    g_numRecords = g_table->Records() - (g_startRecord - 1);
   }
 
-  if(ui.WasEntered("NUMELEM")) {
-    numElements = ui.GetInteger("NUMELEM");
+  if (ui.WasEntered("NUMELEM")) {
+    g_numElements = ui.GetInteger("NUMELEM");
   }
   else {
-    numElements = (*table)[startRecord][field].Size() - (startElement - 1);
+    g_numElements = (*g_table)[g_startRecord][g_field].size() - (g_startElement - 1);
   }
 
-  p.SetOutputCube("TO", numElements, numRecords);
-  p.SetBrickSize(numElements, numRecords, 1);
+  p.SetOutputCube("TO", g_numElements, g_numRecords);
+  p.SetBrickSize(g_numElements, g_numRecords, 1);
   p.StartProcess(readTable);
   p.EndProcess();
 
-  delete table;
+  delete g_table;
 }
 
 void readTable(Isis::Buffer &outcube) {
-  for(int record = startRecord; record < startRecord + numRecords; record ++) {
-    for(int element = startElement; element < startElement + numElements; element ++) {
-      int index = (numElements * (record - 1)) + (element - startElement);
+  for (int record = g_startRecord; record < g_startRecord + g_numRecords; record ++) {
+    for (int element = g_startElement; element < g_startElement + g_numElements; element ++) {
+      int index = (g_numElements * (record - 1)) + (element - g_startElement);
 
-      if((*table)[record-1][field].IsReal()) {
-        std::vector<float> data = (*table)[record-1][field];
+      if ((*g_table)[record-1][g_field].isReal()) {
+        std::vector<float> data = (*g_table)[record-1][g_field];
         outcube[index] = data.at(element - 1);
       }
-      else if((*table)[record-1][field].IsInteger()) {
-        std::vector<int> data = (*table)[record-1][field];
+      else if ((*g_table)[record-1][g_field].isInteger()) {
+        std::vector<int> data = (*g_table)[record-1][g_field];
         outcube[index] = data.at(element - 1);
       }
-      else if((*table)[record-1][field].IsDouble()) {
-        std::vector<double> data = (*table)[record-1][field];
+      else if ((*g_table)[record-1][g_field].isDouble()) {
+        std::vector<double> data = (*g_table)[record-1][g_field];
         outcube[index] = data.at(element - 1);
       }
     }

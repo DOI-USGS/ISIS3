@@ -699,9 +699,8 @@ namespace Isis {
                 return;
               }
 
-              // To initialise the new table, on the first file name comparison,
-              // check the size of the existing table record with the size of the new record being
-              // added
+              // To initialize the new table, on the first file name comparison, check the size of
+              // the existing table record with the size of the new record being added
               if (!i) {
                 if (iString(cFieldKey[0]).ToInteger() < iFieldLength) {
                   TableRecord cFileRecordUpdate;
@@ -722,7 +721,7 @@ namespace Isis {
               }
 
               // Add the existing records into the new table
-              cFileTable += cFileTable_Copy[i];
+              cFileTable += cFileTable_Copy[i]; // what if record size was resized above??? new record does not match table record size
             }
             // Get the current image file index
             index += iRecs;

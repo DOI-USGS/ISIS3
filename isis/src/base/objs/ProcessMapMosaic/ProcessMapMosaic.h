@@ -40,93 +40,84 @@ namespace Isis {
    * @author 2003-04-28 Stuart Sides
    *
    * @internal
-   *  @history 2003-04-28 Stuart Sides - Modified unitTest.cpp to do a better test
+   *  @history 2003-04-28 Stuart Sides - Modified unitTest.cpp to do a better
+   *                          test
    *  @history 2003-09-04 Jeff Anderson - Added SetInputWorkCube method
    *  @history 2005-02-11 Elizabeth Ribelin - Modified file to support Doxygen
-   *                                          documentation
+   *                          documentation
    *  @history 2006-09-01 Elizabeth Miller - Added BandBinMatch option to
-   *                                         propagate the bandbin group to the
-   *                                         mosaic and make sure the input cube
-   *                                         bandbin groups match the mosaics
-   *                                         bandbin group
+   *                          propagate the bandbin group to the mosaic and make
+   *                          sure the input cube bandbin groups match the
+   *                          mosaics bandbin group
    *  @history 2006-10-20 Stuart Sides - Fixed bug BandBin group did not get
-   *                                     copied to the output mosaic.
+   *                          copied to the output mosaic.
    *  @history 2008-10-03 Steven Lambright - Fixed problem where return values
-   *                                     from SetUniversalGround were not checked
+   *                          from SetUniversalGround were not checked
    *  @history 2008-11-18 Christopher Austin - Added the first cube's history to
-   *           the mosaic's history along with the history object of the
-   *           application which did the mosaic.
+   *                          the mosaic's history along with the history object
+   *                          of the application which did the mosaic.
    *  @history 2008-12-08 Steven Lambright - Fixed one of the SetOutputCube(...)
-   *           methods, a lat/lon range was specified but CreateFromCube was still
-   *           being used (needed CreateFromCube because no cubes existed with the
-   *           correct range).
+   *                          methods, a lat/lon range was specified but
+   *                          CreateFromCube was still being used (needed
+   *                          CreateFromCube because no cubes existed with the
+   *                          correct range).
    *  @history 2008-12-08 Steven Lambright - MinimumLatitude,MaximumLatitude,
-   *           MinimumLongitude,MaximumLongitude keywords no longer required to
-   *           exist if passed into SetOutputCube
+   *                          MinimumLongitude,MaximumLongitude keywords no
+   *                          longer required to exist if passed into
+   *                          SetOutputCube
    *  @history 2010-10-27 Sharmila Prasad - Read input file attributes
-   *  @history 2011-01-18 Sharmila Prasad - Added "Average" priority feature, to double
-   *           the number of mosaic bands to get Count info
+   *  @history 2011-01-18 Sharmila Prasad - Added "Average" priority feature,
+   *                          to double the number of mosaic bands to get Count
+   *                          info
    *  @history 2011-06-28 Jai Rideout and Steven Lambright - Now uses a
    *                          different caching algorithm.
-   *  @history 2011-09-08 Sharmila Prasad - Fixed Bug #406, Additional boundary checks similar to
-   *            ProcessMosaic so that there will be no interruption for applications like automos
+   *  @history 2011-09-08 Sharmila Prasad - Fixed Bug #406, Additional boundary
+   *                          checks similar to ProcessMosaic so that there will
+   *                          be no interruption for applications like automos
+   *  @history 2012-10-05 Jeannie Backer - Fixed indentation of history entries.
+   *                          Added caught exception to new thrown exception.
+   *                          Moved method implementation to cpp. References
+   *                          #1169.
    *
-   *  @todo 2005-02-11 Stuart Sides - add coded example and implementation example
-   *                                  to class documentation
+   *  @todo 2005-02-11 Stuart Sides - add coded example and implementation
+   *                          example to class documentation
    */
 
   class ProcessMapMosaic : public Isis::ProcessMosaic {
 
     public:
 
-      //! Constructs a Mosaic object
       ProcessMapMosaic();
 
-      //! Destructor
-      ~ProcessMapMosaic() { };
-
-      //! Set the output cube to specified file name and specified input images
-      //! and output attributes
+      ~ProcessMapMosaic();
       Isis::Cube *SetOutputCube(FileList &propagationCubes, CubeAttributeOutput &oAtt,
                                 const std::string &mosaicFile);
 
-      //! Set the output cube to specified file name and specified input images
-      //! and output attributes and lat,lons
       Isis::Cube *SetOutputCube(FileList &propagationCubes,
                                 double slat, double elat, double slon, double elon,
                                 CubeAttributeOutput &oAtt, const std::string &mosaicFile);
 
-      //! Set the output cube to specified file name and specified input images
-      //! and output attributes and lat,lons
       Isis::Cube *SetOutputCube(const std::string &inputFile,
                                 double xmin, double xmax, double ymin, double ymax,
                                 double slat, double elat, double slon, double elon, int nbands,
                                 CubeAttributeOutput &oAtt, const std::string &mosaicFile);
 
-      //! Set the output cube to specified file name and specified input images
-      //! and output attributes and lat,lons
       Isis::Cube *SetOutputCube(const std::string &inputFile, PvlGroup mapping,
                                 CubeAttributeOutput &oAtt, const std::string &mosaicFile);
 
-      //! Mosaic output method for Mosaic Processing Method, this will use an existing mosaic
       Isis::Cube *SetOutputCube(const std::string &mosaicFile);
 
-      //! Input cube cannot be set here
-      Isis::Cube *SetInputCube() {
-        throw IException(IException::Programmer,
-                         "ProcessMapMosaic does not support the SetInputCube method",
-                         _FILEINFO_);
-      }
+      Isis::Cube *SetInputCube();
 
-      //! Mosaic Processing method, returns false if the cube is not inside the mosaic
       bool StartProcess(std::string inputFile);
 
     private:
-      //! Reset the buffer with NULL pixels
       static void FillNull(Buffer &data);
 
-      //! Internal use; SetOutputMosaic (const std::string &) sets to false to
-      //! not attempt creation when using SetOutputMosaic
+     /**
+      * Internal use; SetOutputMosaic (const std::string &) sets to false to
+      * not attempt creation when using SetOutputMosaic
+      */
       bool p_createMosaic;
   };
 };

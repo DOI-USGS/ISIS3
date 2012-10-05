@@ -1,20 +1,25 @@
 #include <iostream>
-#include "TableRecord.h"
-#include "IException.h"
+
 #include "Buffer.h"
+#include "IException.h"
 #include "Preference.h"
+#include "PvlGroup.h"
+#include "TableField.h"
+#include "TableRecord.h"
 
 using namespace std;
+using namespace Isis;
+
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   cout << "Testing Isis::TableRecord" << endl;
-  Isis::TableField f1("One", Isis::TableField::Integer);
-  Isis::TableField f2("Two", Isis::TableField::Double);
-  Isis::TableField f3("Three", Isis::TableField::Text, 50);
-  Isis::TableField f4("Four", Isis::TableField::Real);
+  TableField f1("One", TableField::Integer);
+  TableField f2("Two", TableField::Double);
+  TableField f3("Three", TableField::Text, 50);
+  TableField f4("Four", TableField::Real);
 
-  Isis::TableRecord rec;
+  TableRecord rec;
   rec += f1;
   rec += f2;
   rec += f3;
@@ -33,26 +38,26 @@ int main(int argc, char *argv[]) {
   cout << "Unpacking..." << endl;
   rec.Unpack(buf);
   for(int i = 0; i <= 3; i++) {
-    Isis::TableField &f = rec[i];
-    Isis::PvlGroup g = f.PvlGroup();
+    TableField &f = rec[i];
+    PvlGroup g = f.pvlGroup();
     cout << g << endl;
   }
 
   cout << "-----" << endl;
-  Isis::TableField &f = rec[2];
-  Isis::PvlGroup g = f.PvlGroup();
+  TableField &f = rec[2];
+  PvlGroup g = f.pvlGroup();
   cout << g << endl;
 
   cout << "-----" << endl;
   f = rec["TWO"];
-  g = f.PvlGroup();
+  g = f.pvlGroup();
   cout << g << endl;
 
   cout << "-----" << endl;
   try {
     f = rec["Five"];
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 }

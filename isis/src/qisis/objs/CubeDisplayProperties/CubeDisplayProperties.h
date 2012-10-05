@@ -53,9 +53,13 @@ namespace Isis {
    *
    * @internal
    *   @history 2011-05-11 Steven Lambright - Added accessors for data that is
-   *                       complicated to get or expensive (i.e. Camera
-   *                       statistics and the footprint).
-   *   @history 2011-05-18 Steven Lambright - Fixed the second constructor 
+   *                           complicated to get or expensive (i.e. Camera
+   *                           statistics and the footprint).
+   *   @history 2011-05-18 Steven Lambright - Fixed the second constructor
+   *   @history 2012-10-04 Jeannie Backer Changed references to TableField
+   *                           methods to lower camel case. Fixed history
+   *                           entry indentation. Added padding to control
+   *                           statements. References #1169.
    */
   class CubeDisplayProperties : public QObject {
       Q_OBJECT

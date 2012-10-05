@@ -1,5 +1,6 @@
 Testing integer singleton
 Name      = Test
+Type      = 0
 IsInteger = 1
 IsDouble  = 0
 IsText    = 0
@@ -13,8 +14,10 @@ Group = Field
   Size = 1
 End_Group
 ----------------------------------------
+
 Testing double singleton
 Name      = Test
+Type      = 1
 IsInteger = 0
 IsDouble  = 1
 IsText    = 0
@@ -28,8 +31,10 @@ Group = Field
   Size = 1
 End_Group
 ----------------------------------------
+
 Testing text singleton
 Name      = Test
+Type      = 2
 IsInteger = 0
 IsDouble  = 0
 IsText    = 1
@@ -43,8 +48,10 @@ Group = Field
   Size = 20
 End_Group
 ----------------------------------------
+
 Testing real singleton
 Name      = Test
+Type      = 3
 IsInteger = 0
 IsDouble  = 0
 IsText    = 0
@@ -58,8 +65,10 @@ Group = Field
   Size = 1
 End_Group
 ----------------------------------------
+
 Testing integer array
 Name      = Test
+Type      = 0
 IsInteger = 1
 IsDouble  = 0
 IsText    = 0
@@ -73,8 +82,10 @@ Group = Field
   Size = 3
 End_Group
 ----------------------------------------
+
 Testing double array
 Name      = Test
+Type      = 1
 IsInteger = 0
 IsDouble  = 1
 IsText    = 0
@@ -88,8 +99,10 @@ Group = Field
   Size = 3
 End_Group
 ----------------------------------------
+
 Testing real array
 Name      = Test
+Type      = 3
 IsInteger = 0
 IsDouble  = 0
 IsText    = 0
@@ -103,6 +116,7 @@ Group = Field
   Size = 3
 End_Group
 ----------------------------------------
+
 Testing integer constructor
 Group = Field
   Name = Test
@@ -110,6 +124,7 @@ Group = Field
   Size = 20
 End_Group
 ----------------------------------------
+
 Testing double constructor
 Group = Field
   Name = Test
@@ -117,6 +132,7 @@ Group = Field
   Size = 20
 End_Group
 ----------------------------------------
+
 Testing text constructor
 Group = Field
   Name = Test
@@ -124,6 +140,7 @@ Group = Field
   Size = 20
 End_Group
 ----------------------------------------
+
 Testing real constructor
 Group = Field
   Name = Test
@@ -131,9 +148,67 @@ Group = Field
   Size = 20
 End_Group
 ----------------------------------------
+
 Testing erroneous type constructor
 **PROGRAMMER ERROR** Field [Test] has invalid type.
 ----------------------------------------
+
 Testing erroneous size constructor
 **ERROR** Failed to convert string [-7.3] to an integer.
 ----------------------------------------
+
+Test casting errors...
+     operator int()
+**PROGRAMMER ERROR** Field [Test] is not Integer.
+**PROGRAMMER ERROR** Field [Test] has multiple Integer values. Use std::vector<int>().
+
+     operator double()
+**PROGRAMMER ERROR** Field [Test] is not a Double.
+**PROGRAMMER ERROR** Field [Test] has multiple Double values. Use std::vector<double>().
+
+     operator std::string() 
+**PROGRAMMER ERROR** Field [Test] is not Text.
+
+     operator float()
+**PROGRAMMER ERROR** Field [Test] is not Real.
+**PROGRAMMER ERROR** Field [Test] has multiple Real values. Use std::vector<float>().
+
+     operator std::vector<int>() 
+**PROGRAMMER ERROR** Field [Test] is not an Integer array.
+
+     operator std::vector<double>() 
+**PROGRAMMER ERROR** Field [Test] is not a Double array.
+
+     operator std::vector<float>() 
+**PROGRAMMER ERROR** Field [Test] is not a Real array.
+----------------------------------------
+
+Test setting errors...
+     operator=(const int value)
+**PROGRAMMER ERROR** Unable to set field to the given int value. Field [Test] Type is not Integer.
+**PROGRAMMER ERROR** Unable to set field to the given int value. Field [Test] has [3] Integer values. Use operator=(vector<int>).
+
+     operator=(const double value)
+**PROGRAMMER ERROR** Unable to set field to the given double value. Field [Test] Type is not Double.
+**PROGRAMMER ERROR** Unable to set field to the given double value. Field [Test] has [3] Double values. Use operator=(vector<double>).
+
+     operator=(const std::string &value)
+**PROGRAMMER ERROR** Unable to set field to the given string value. Field [Test] Type is not Text.
+
+     operator=(const float value)
+**PROGRAMMER ERROR** Unable to set field to the given float value. Field [Test] Type is not Real.
+**PROGRAMMER ERROR** Unable to set field to the given float value. Field [Test] has [3] Real values. Use operator=(vector<float>).
+
+     operator=(const std::vector<int> &values)
+**PROGRAMMER ERROR** Unable to set field to the given vector of int values. Field [Test] values has size [3].
+**PROGRAMMER ERROR** Unable to set field to the given vector of int values. Field [Test] Type is not Integer.
+
+     operator=(const std::vector<double> &values)
+**PROGRAMMER ERROR** Unable to set field to the given vector of double values. Field [Test] values has size [3].
+**PROGRAMMER ERROR** Unable to set field to the given vector of double values. Field [Test] Type is not Double.
+
+     operator=(const std::vector<float> &value)
+**PROGRAMMER ERROR** Unable to set field to the given vector of float values. Field [Test] values has size [3].
+**PROGRAMMER ERROR** Unable to set field to the given vector of float values. Field [Test] Type is not Real.
+----------------------------------------
+

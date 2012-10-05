@@ -60,6 +60,10 @@
     <change name="Steven Lambright" date="2008-05-13">
       Removed references to CubeInfo 
     </change>
+    <change name="Jeannie Backer" date="2012-10-04">
+      PROG: Changed references to TableField methods to lower camel case. Ordered includes. 
+      Added g_ prefix to global variables. References #1169.
+    </change>
   </history>
 
   <groups>

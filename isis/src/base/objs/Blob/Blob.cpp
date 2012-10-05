@@ -22,14 +22,14 @@
  */
 #include "Blob.h"
 
+#include <cstring>
 #include <fstream>
 #include <sstream>
-#include <cstring>
 
-#include "Pvl.h"
 #include "FileName.h"
 #include "IException.h"
 #include "Message.h"
+#include "Pvl.h"
 
 using namespace std;
 namespace Isis {
@@ -60,7 +60,8 @@ namespace Isis {
    * @param type The blob type
    * @param file The filename to read from.
    */
-  Blob::Blob(const std::string &name, const std::string &type, const std::string &file) {
+  Blob::Blob(const std::string &name, const std::string &type, 
+             const std::string &file) {
     p_blobName = name;
     p_buffer = NULL;
     p_nbytes = 0;
@@ -73,7 +74,7 @@ namespace Isis {
   /**
    * This copies the blob object.
    *
-   * @param other
+   * @param other Blob to be copied
    */
   Blob::Blob(const Blob &other) {
     p_blobPvl = other.p_blobPvl;
@@ -86,26 +87,21 @@ namespace Isis {
 
     p_buffer = NULL;
 
-    if(other.p_buffer) {
+    if (other.p_buffer) {
       p_buffer = new char[p_nbytes];
 
-      for(int i = 0; i < p_nbytes; i++) {
+      for (int i = 0; i < p_nbytes; i++) {
         p_buffer[i] = other.p_buffer[i];
       }
     }
   }
 
-  //! Destroys the Blob object.
-  Blob::~Blob() {
-    if(p_buffer != NULL) delete [] p_buffer;
-  }
-
   /**
    * This makes the two blob objects exactly the same (copies the blob)
    *
-   * @param other
+   * @param other Blob to be copied
    *
-   * @return Blob&
+   * @return Copied Blob 
    */
   Blob &Blob::operator=(const Blob &other) {
     p_blobPvl = other.p_blobPvl;
@@ -118,10 +114,10 @@ namespace Isis {
 
     p_buffer = NULL;
 
-    if(other.p_buffer) {
+    if (other.p_buffer) {
       p_buffer = new char[p_nbytes];
 
-      for(int i = 0; i < p_nbytes; i++) {
+      for (int i = 0; i < p_nbytes; i++) {
         p_buffer[i] = other.p_buffer[i];
       }
     }
@@ -129,8 +125,114 @@ namespace Isis {
     return *this;
   }
 
+  //! Destroys the Blob object.
+  Blob::~Blob() {
+    if (p_buffer != NULL) delete [] p_buffer;
+  }
+
+  /** 
+   *  Accessor method that returns a string containing the Blob type.
+   *  
+   *  @return @b string Type of blob.
+   */ 
+  std::string Blob::Type() const {
+    return p_type;
+  }
+
+  /** 
+   *  Accessor method that returns a string containing the Blob name.
+   *  
+   *  @return @b string The name of the blob.
+   */ 
+  std::string Blob::Name() const {
+    return p_blobName;
+  }
+
+  /** 
+   *  Accessor method that returns the number of bytes in the blob data.
+   *  
+   *  @return @b int Number of bytes in the blob data.
+   */ 
+  int Blob::Size() const {
+    return p_nbytes;
+  }
+
+  /** 
+   *  Accessor method that returns a PvlObject containing the Blob label.
+   *  
+   *  @return @b PvlObject The label of the blob.
+   */ 
+  PvlObject &Blob::Label() {
+    return p_blobPvl;
+  }
+
+  /** 
+   *  This method searches the given Pvl for the Blob by the Blob's type and
+   *  name. If found, the start byte, number of bytes are read from the Pvl.
+   *  Also, if a keyword label pointer is found, the filename for the detached
+   *  blob is stored and the pointer is removed from the blob pvl.
+   *  
+   *  @param pvl The Pvl to be searched
+   */ 
+  void Blob::Find(const Pvl &pvl) {
+    bool found = false;
+    try {
+      // Search for the blob name
+      iString blobName = p_blobName;
+      blobName.UpCase();
+      for (int o = 0; o < pvl.Objects(); o++) {
+        const PvlObject &obj = pvl.Object(o);
+        if (obj.IsNamed(p_type)) {
+          iString curName = (string) obj["Name"];
+          curName.UpCase();
+          if (blobName == curName) {
+            p_blobPvl = obj;
+            found = true;
+            break;
+          }
+          else {
+            if (p_type == "OriginalLabel" && curName == "ORIGINALLABEL") {
+              p_blobPvl = obj;
+              found = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+    catch (IException &e) {
+      string msg = "Invalid " + p_type + " label format";
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
+    }
+
+    // Did we find it?
+    if (!found) {
+      string msg = "Unable to find " + p_type + " [" + p_blobName + "]";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    // Ok the blob exists so we need to prep for reading the binary data
+    try {
+      p_startByte = p_blobPvl["StartByte"];
+      p_nbytes = p_blobPvl["Bytes"];
+      p_detached = "";
+      if (p_blobPvl.HasKeyword("^" + p_type)) {
+        string path = "";
+        if (p_labelFile != "") {
+          path = FileName(p_labelFile).path() + "/";
+        }
+        p_detached = path + (std::string) p_blobPvl["^"+p_type];
+        p_blobPvl.DeleteKeyword("^" + p_type);
+      }
+    }
+    catch (IException &e) {
+      string msg = "Invalid " + p_type + " label format";
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
+    }
+  }
+
   /**
-   * This reads Pvl values from a specified file.
+   * This method reads Pvl values from a specified file.
    *
    * @param file The filename to read from.
    *
@@ -146,7 +248,7 @@ namespace Isis {
     try {
       pvl.Read(temp);
     }
-    catch(IException &e) {
+    catch (IException &e) {
       string msg = "Invalid " + p_type + " label format";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
@@ -154,6 +256,14 @@ namespace Isis {
     Read(file, pvl);
   }
 
+  /**
+   * This method reads the given a file and labels.
+   *
+   * @param file The filename to read from.
+   * @param pvlLabels A Pvl containing the label information.
+   *
+   * @throws iException::Io - Unable to open file
+   */
   void Blob::Read(const std::string &file, const Pvl &pvlLabels) {
 
     // Expand the filename
@@ -162,7 +272,7 @@ namespace Isis {
     // Open the file
     fstream istm;
     istm.open(temp.c_str(), std::ios::in);
-    if(!istm) {
+    if (!istm) {
       string message = Message::FileOpen(temp);
       throw IException(IException::Io, message, _FILEINFO_);
     }
@@ -171,7 +281,7 @@ namespace Isis {
       // Check pvl and read from the stream
       Read(pvlLabels, istm);
     }
-    catch(IException &e) {
+    catch (IException &e) {
       istm.close();
       string msg = "Unable to open " + p_type + " [" + p_blobName +
                    "] in file [" + temp + "]";
@@ -181,15 +291,22 @@ namespace Isis {
     istm.close();
   }
 
-  // Read blob from an open file (probably a cube)
+  /**
+   * This method reads the Blob data from an open input file stream. 
+   *
+   * @param pvl A Pvl containing the label information.
+   * @param istm The input file stream containing the blob data to be read.
+   *
+   * @throws iException::Io - Unable to open file
+   */
   void Blob::Read(const Pvl &pvl, std::istream &istm) {
     try {
       Find(pvl);
       ReadInit();
-      if(p_detached != "") {
+      if (p_detached != "") {
         fstream dstm;
         dstm.open(p_detached.c_str(), std::ios::in);
-        if(!dstm) {
+        if (!dstm) {
           string message = Message::FileOpen(p_detached);
           throw IException(IException::Io, message, _FILEINFO_);
         }
@@ -199,72 +316,21 @@ namespace Isis {
         ReadData(istm);
       }
     }
-    catch(IException &e) {
+    catch (IException &e) {
       string msg = "Unable to read " + p_type + " [" + p_blobName + "]";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
   }
 
-  // Search PVL for the desire blob
-  void Blob::Find(const Pvl &pvl) {
-    bool found = false;
-    try {
-      // Search for the blob name
-      iString blobName = p_blobName;
-      blobName.UpCase();
-      for(int o = 0; o < pvl.Objects(); o++) {
-        const PvlObject &obj = pvl.Object(o);
-        if(obj.IsNamed(p_type)) {
-          iString curName = (string) obj["Name"];
-          curName.UpCase();
-          if(blobName == curName) {
-            p_blobPvl = obj;
-            found = true;
-            break;
-          }
-          else {
-            if(p_type == "OriginalLabel" && curName == "ORIGINALLABEL") {
-              p_blobPvl = obj;
-              found = true;
-              break;
-            }
-          }
-        }
-      }
-    }
-    catch(IException &e) {
-      string msg = "Invalid " + p_type + " label format";
-      throw IException(e, IException::Unknown, msg, _FILEINFO_);
-    }
-
-    // Did we find it?
-    if(!found) {
-      string msg = "Unable to find " + p_type + " [" + p_blobName + "]";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-    }
-
-    // Ok the blob exists so we need to prep for reading the binary data
-    try {
-      p_startByte = p_blobPvl["StartByte"];
-      p_nbytes = p_blobPvl["Bytes"];
-      p_detached = "";
-      if(p_blobPvl.HasKeyword("^" + p_type)) {
-        string path = "";
-        if(p_labelFile != "") {
-          path = FileName(p_labelFile).path() + "/";
-        }
-        p_detached = path + (std::string) p_blobPvl["^"+p_type];
-        p_blobPvl.DeleteKeyword("^" + p_type);
-      }
-    }
-    catch(IException &e) {
-      string msg = "Invalid " + p_type + " label format";
-      throw IException(e, IException::Unknown, msg, _FILEINFO_);
-    }
+ /**
+  * This virtual method for classes that inherit Blob. It is not defined in 
+  * the Blob class.
+  */ 
+  void Blob::ReadInit(){
   }
 
   /**
-   * Read binary data from an input stream into the Blob.
+   * Read binary data from an input stream into the Blob object.
    *
    * @param stream The input stream to read from.
    *
@@ -272,19 +338,19 @@ namespace Isis {
    */
   void Blob::ReadData(std::istream &stream) {
     // Read the binary data
-    if(p_buffer != NULL) delete [] p_buffer;
+    if (p_buffer != NULL) delete [] p_buffer;
     p_buffer = new char[p_nbytes];
 
     streampos sbyte = p_startByte - 1;
     stream.seekg(sbyte, std::ios::beg);
-    if(!stream.good()) {
+    if (!stream.good()) {
       string msg = "Error preparing to read data from " + p_type +
                    " [" + p_blobName + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     stream.read(p_buffer, p_nbytes);
-    if(!stream.good()) {
+    if (!stream.good()) {
       string msg = "Error reading data from " + p_type + " [" + p_blobName + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
@@ -318,14 +384,14 @@ namespace Isis {
       fstream stream;
       ios::openmode flags = std::ios::in | std::ios::binary | std::ios::out;
       stream.open(file.c_str(), flags);
-      if(!stream) {
+      if (!stream) {
         string message = "Unable to open [" + file + "]";
         throw IException(IException::Io, message, _FILEINFO_);
       }
 
       streampos sbyte = p_startByte - 1;
       stream.seekp(sbyte, std::ios::beg);
-      if(!stream.good()) {
+      if (!stream.good()) {
         stream.close();
         string msg = "Error preparing to write data to " +
                      p_type + " [" + p_blobName + "]";
@@ -335,7 +401,7 @@ namespace Isis {
       WriteData(stream);
       stream.close();
     }
-    catch(IException &e) {
+    catch (IException &e) {
       string msg = "Unable to create " + p_type + " file [" + file + "]";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
@@ -363,7 +429,7 @@ namespace Isis {
     eofbyte += 1;
 
     // Handle detached blobs
-    if(detachedFileName != "") {
+    if (detachedFileName != "") {
       p_blobPvl += PvlKeyword("^" + p_type, detachedFileName);
     }
 
@@ -372,23 +438,23 @@ namespace Isis {
     p_blobPvl["Bytes"] = p_nbytes;
 
     bool found = false;
-    for(int i = 0; i < pvl.Objects(); i++) {
-      if(pvl.Object(i).Name() == p_blobPvl.Name()) {
+    for (int i = 0; i < pvl.Objects(); i++) {
+      if (pvl.Object(i).Name() == p_blobPvl.Name()) {
         PvlObject &obj = pvl.Object(i);
-        if((string) obj["Name"] == (string) p_blobPvl["Name"]) {
+        if ((string) obj["Name"] == (string) p_blobPvl["Name"]) {
           found = true;
 
           BigInt oldSbyte = obj["StartByte"];
           int oldNbytes = (int) obj["Bytes"];
 
           // Does it fit in the old space
-          if(p_nbytes <= oldNbytes) {
+          if (p_nbytes <= oldNbytes) {
             p_blobPvl["StartByte"] = obj["StartByte"];
             sbyte = oldSbyte;
           }
 
           // Was the old space at the end of the file
-          else if(((oldSbyte + oldNbytes) == eofbyte) &&
+          else if (((oldSbyte + oldNbytes) == eofbyte) &&
                   (eofbyte >= sbyte)) {
             p_blobPvl["StartByte"] = obj["StartByte"];
             sbyte = oldSbyte;
@@ -405,7 +471,7 @@ namespace Isis {
     }
 
     // Didn't find the same blob so add it to the labels
-    if(!found) {
+    if (!found) {
       pvl.AddObject(p_blobPvl);
     }
 
@@ -413,9 +479,16 @@ namespace Isis {
     WriteData(stm);
 
     // Handle detached blobs
-    if(detachedFileName != "") {
+    if (detachedFileName != "") {
       p_blobPvl.DeleteKeyword("^" + p_type);
     }
+  }
+
+  /**
+   * This virtual method for classes that inherit Blob. It is not defined in 
+   * the Blob class.
+   */ 
+  void Blob::WriteInit(){
   }
 
   /**
@@ -427,11 +500,12 @@ namespace Isis {
    */
   void Blob::WriteData(std::fstream &stream) {
     stream.write(p_buffer, p_nbytes);
-    if(!stream.good()) {
+    if (!stream.good()) {
       string msg = "Error writing data to " + p_type + " [" + p_blobName + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
+
 
   /**
    * Checks pvl object and returns whether or not it is a Blob
@@ -441,7 +515,7 @@ namespace Isis {
    * @return bool Returns true if the object is a blob, and false if it is not
    */
   bool IsBlob(PvlObject &obj) {
-    if(obj.IsNamed("TABLE")) return true;
+    if (obj.IsNamed("TABLE")) return true;
     return false;
   }
 } // end namespace isis

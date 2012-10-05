@@ -22,21 +22,44 @@
 
 
 #include "TableRecord.h"
-#include "iString.h"
+
+#include <iostream>
+#include <string>
+#include <vector>
+
 #include "IException.h"
+#include "iString.h"
+#include "TableField.h"
 
 using namespace std;
 namespace Isis {
+  //! Constructs an empty TableRecord object. No member variables are set.
+  TableRecord::TableRecord(){
+  }
+
+  //! Destroys the TableRecord object
+  TableRecord::~TableRecord() {
+  }
+
 
   /**
-   * Returns the number of bytes per record
+   * Adds a TableField to a TableRecord
    *
-   * @return Number of bytes per record
+   * @param field - TableField to be added to the record
    */
-  int TableRecord::RecordSize() const {
-    int bytes = 0;
-    for(int i = 0; i < (int)p_fields.size(); i++) bytes += p_fields[i].Bytes();
-    return bytes;
+  void TableRecord::operator+=(Isis::TableField &field) {
+    p_fields.push_back(field);
+  }
+
+  /**
+   *  Returns the TableField at the specified location in the TableRecord
+   *
+   * @param field  Index of desired field
+   *
+   * @return The TableField at specified location in the record
+   */
+  Isis::TableField &TableRecord::operator[](const int field) {
+    return p_fields[field];
   }
 
   /**
@@ -50,13 +73,13 @@ namespace Isis {
    * @throws Isis::IException::Programmer - The field does not exist in the
    *                                        record
    */
-  Isis::TableField &TableRecord::operator[](const std::string &field) {
+  TableField &TableRecord::operator[](const std::string &field) {
     Isis::iString upTemp = field;
     upTemp.UpCase();
-    for(int i = 0; i < (int)p_fields.size(); i++) {
-      Isis::iString upField = p_fields[i].Name();
+    for (int i = 0; i < (int)p_fields.size(); i++) {
+      Isis::iString upField = p_fields[i].name();
       upField.UpCase();
-      if(upTemp == upField) return p_fields[i];
+      if (upTemp == upField) return p_fields[i];
     }
 
     string msg = "Field [" + field + "] does not exist in record";
@@ -64,36 +87,56 @@ namespace Isis {
   }
 
   /**
+    * Returns the number of fields that are currently in the record
+    *
+    * @return The number of fields in the record
+    */
+   int TableRecord::Fields() const {
+     return p_fields.size();
+   }
+
+  /**
+   * Returns the number of bytes per record
    *
+   * @return Number of bytes per record
+   */
+  int TableRecord::RecordSize() const {
+    int bytes = 0;
+    for (int i = 0; i < (int)p_fields.size(); i++) bytes += p_fields[i].bytes();
+    return bytes;
+  }
+
+  /**
+   * Writes record information into the binary buffer.
    *
-   * @param buf
+   * @param buf Buffer to fill with binary record information.
    *
    * @throws Isis::IException::Programmer - Invalid field type
    */
   void TableRecord::Pack(char *buf) const {
     int sbyte = 0;
-    for(int f = 0; f < Fields(); f++) {
+    for (int f = 0; f < Fields(); f++) {
       const Isis::TableField &field = p_fields[f];
-      if(field.IsDouble()) {
+      if (field.isDouble()) {
         vector<double> vals = field;
-        for(unsigned int i = 0; i < vals.size(); i++) {
+        for (unsigned int i = 0; i < vals.size(); i++) {
           //*((double *)(buf+sbyte)) = vals[i];
           memmove(buf + sbyte, &vals[i], 8);
           sbyte += sizeof(double);
         }
       }
-      else if(field.IsInteger()) {
+      else if (field.isInteger()) {
         vector<int> vals = field;
-        for(unsigned int i = 0; i < vals.size(); i++) {
+        for (unsigned int i = 0; i < vals.size(); i++) {
           //*((int *)(buf+sbyte)) = vals[i];
           memmove(buf + sbyte, &vals[i], 4);
           sbyte += sizeof(int);
         }
       }
-      else if(field.IsText()) {
+      else if (field.isText()) {
         string val = (string)field;
-        for(int i = 0; i < field.Size(); i++) {
-          if(i < (int)val.length()) {
+        for (int i = 0; i < field.size(); i++) {
+          if (i < (int)val.length()) {
             buf[sbyte] = val[i];
           }
           else {
@@ -102,9 +145,9 @@ namespace Isis {
           sbyte++;
         }
       }
-      else if(field.IsReal()) {
+      else if (field.isReal()) {
         vector<float> vals = field;
-        for(unsigned int i = 0; i < vals.size(); i++) {
+        for (unsigned int i = 0; i < vals.size(); i++) {
           //*((int *)(buf+sbyte)) = vals[i];
           memmove(buf + sbyte, &vals[i], 4);
           sbyte += sizeof(float);
@@ -118,32 +161,32 @@ namespace Isis {
   }
 
   /**
+   * Reads record information from the binary buffer.
    *
-   *
-   * @param buf
+   * @param buf Buffer from which to read record field values.
    */
   void TableRecord::Unpack(const char *buf) {
     int sbyte = 0;
-    for(int f = 0; f < Fields(); f++) {
+    for (int f = 0; f < Fields(); f++) {
       Isis::TableField &field = p_fields[f];
       field = (void *)&buf[sbyte];
-      sbyte += field.Bytes();
+      sbyte += field.bytes();
     }
   }
 
   /**
+   * Swaps bytes of the buffer, depending on the TableField::Type
    *
-   *
-   * @param buf
+   * @param buf Buffer containing record values to be swapped.
    *
    * @throws Isis::iException::Programmer - Invalid field type
    */
   void TableRecord::Swap(char *buf) const {
     int sbyte = 0;
-    for(int f = 0; f < Fields(); f++) {
+    for (int f = 0; f < Fields(); f++) {
       const Isis::TableField &field = p_fields[f];
-      if(field.IsDouble()) {
-        for(int i = 0; i < field.Size(); i++) {
+      if (field.isDouble()) {
+        for (int i = 0; i < field.size(); i++) {
           char *swap = &buf[sbyte];
           char temp;
           temp = swap[0];
@@ -162,8 +205,8 @@ namespace Isis {
           sbyte += sizeof(double);
         }
       }
-      else if(field.IsInteger()) {
-        for(int i = 0; i < field.Size(); i++) {
+      else if (field.isInteger()) {
+        for (int i = 0; i < field.size(); i++) {
           char *swap = &buf[sbyte];
           char temp;
           temp = swap[0];
@@ -175,11 +218,11 @@ namespace Isis {
           sbyte += sizeof(int);
         }
       }
-      else if(field.IsText()) {
-        sbyte += field.Bytes();
+      else if (field.isText()) {
+        sbyte += field.bytes();
       }
-      else if(field.IsReal()) {
-        for(int i = 0; i < field.Size(); i++) {
+      else if (field.isReal()) {
+        for (int i = 0; i < field.size(); i++) {
           char *swap = &buf[sbyte];
           char temp;
           temp = swap[0];
@@ -192,7 +235,7 @@ namespace Isis {
         }
       }
       else {
-        string msg = "Invalid field type";
+        string msg = "Unable to swap bytes. Invalid field type";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
