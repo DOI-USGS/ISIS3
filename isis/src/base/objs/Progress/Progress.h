@@ -40,11 +40,14 @@ namespace Isis {
    * @internal
    *  @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
    *                                     isis.astrogeology...
-   *  @history 2004-02-29 Jeff Anderson - Added ability to send progress status to
-   *                                      the parent process
+   *  @history 2004-02-29 Jeff Anderson - Added ability to send progress status 
+   *                          to the parent process
    *  @history 2005-02-11 Elizabeth Ribelin - Modified file to support Doxygen
-   *                                          documentation
+   *                          documentation
    *  @history 2005-10-03 Elizabeth Miller - Changed @ingroup tag
+   *  @history 2012-10-04 Jeannie Backer - Removed documentation reference to 
+   *                          the now non-existant CubeInfo class. No mantis
+   *                          ticket related to this change.
    *
    *  @todo 2005-02-11 Jeff Anderson - add coded and implementation example to
    *                                   class documentation

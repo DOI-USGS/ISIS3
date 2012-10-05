@@ -80,8 +80,7 @@ namespace Isis {
   /**
    * Returns the text to output. Generally, this in not needed except rare
    * circumstances where an application has multiple steps and the text string
-   * needs to be saved and restored. For an example, see the Histogram method in
-   * the CubeInfo class.
+   * needs to be saved and restored.
    *
    * @return string
    */
