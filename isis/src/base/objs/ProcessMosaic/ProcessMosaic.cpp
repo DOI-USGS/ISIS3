@@ -166,6 +166,12 @@ namespace Isis {
       inl = OutputCubes[0]->getLineCount() - m_osl + 1;
     }
 
+    PvlGroup imgPosition("ImageLocation");
+    imgPosition += PvlKeyword("File", InputCubes[0]->getFileName());
+    imgPosition += PvlKeyword("StartSample", m_oss);
+    imgPosition += PvlKeyword("StartLine", m_osl);
+    m_imagePositions += imgPosition;
+          
     // Tests for completly off the mosaic
     if ((ins < 1) || (inl < 1)) {
       string m = "The input cube does not overlap the mosaic";
@@ -387,7 +393,17 @@ namespace Isis {
     }
   } // End StartProcess
 
+  
+  /**
+   * Accessor for the placed images and their locations.
+   *
+   * @return The list of placed images
+   */
+  PvlObject ProcessMosaic::imagePositions() {
+    return m_imagePositions;
+  }
 
+  
   /**
    * Opens an input cube specified by the user. This method is overloaded and
    * adds the requirement that only one input cube can be specified.

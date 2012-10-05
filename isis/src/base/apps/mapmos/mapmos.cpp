@@ -81,14 +81,11 @@ void IsisMain() {
   }
   else {
     // Logs the input file location in the mosaic
-    PvlGroup imgPosition("ImageLocation");
-    int iStartLine   =  m.GetInputStartLineInMosaic();
-    int iStartSample =  m.GetInputStartSampleInMosaic();
-    imgPosition   += PvlKeyword("File", ui.GetFileName("FROM"));
-    imgPosition   += PvlKeyword("StartSample", iStartSample);
-    imgPosition   += PvlKeyword("StartLine", iStartLine);
-    Application::Log(imgPosition);
+    for (int i = 0; i < m.imagePositions().Groups(); i++) {
+      Application::Log(m.imagePositions().Group(i));
+    }
   }
+
 
   if(bTrack != m.GetTrackFlag()) {
     ui.Clear("TRACK");

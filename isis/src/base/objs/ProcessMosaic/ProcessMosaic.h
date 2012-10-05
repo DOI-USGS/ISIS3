@@ -125,39 +125,35 @@ namespace Isis {
    *   @history 2003-04-28 Stuart Sides  - Modified unitTest.cpp to do a better test
    *   @history 2003-09-04 Jeff Anderson - Added SetInputWorkCube method
    *   @history 2005-02-11 Elizabeth Ribelin - Modified file to support Doxygen
-   *                                           documentation
+   *                           documentation
    *   @history 2006-09-01 Elizabeth Miller - Added BandBinMatch option to
-   *                                          propagate the bandbin group to the
-   *                                          mosaic and make sure the input cube
-   *                                          bandbin groups match the mosaics
-   *                                          bandbin group
+   *                           propagate the bandbin group to the mosaic and make sure the input
+   *                           cube bandbin groups match the mosaics bandbin group
    *   @history 2006-10-20 Stuart Sides - Fixed bug BandBin group did not get
-   *                                      copied to the output mosaic.
+   *                           copied to the output mosaic.
    *   @history 2008-10-03 Steven Lambright - Fixed problem where member variables
-   *                                          could be corrupted
+   *                           could be corrupted
    *   @history 2009-09-30 Sharmila Prasad - Added capability to track the pixel origin.
-   *                                         Priorities Top and Beneath can track origin
-   *                                         for a single band input image only. Band
-   *                                         priority can track origin of a multi-band
-   *                                         input image based on a particular band.
-   *                                         Also Band placement is flexible and any bands
-   *                                         from the input cube can fit within the output
-   *                                         mosaic. Also ability to allow HS, LS or NULL pixels
-   *                                         from input to the mosaic(output). Added table for
-   *                                         Origin Default values based on pixel type
+   *                           Priorities Top and Beneath can track origin for a single
+   *                           band input image only. Band priority can track origin of a
+   *                           multi-band input image based on a particular band. Also Band
+   *                           placement is flexible and any bands from the input cube can
+   *                           fit within the output mosaic. Also ability to allow HS, LS
+   *                           or NULL pixels from input to the mosaic(output). Added table
+   *                           for Origin Default values based on pixel type
    *   @history 2010-02-25 Sharmila Prasad - Changed stricmp to use iString function "Equal"
    *   @history 2010-10-21 Sharmila Prasad - The BandBin group must be carried thru to the mosaic
-   *                                         at creation time regardless of matchbandbin flag
+   *                           at creation time regardless of matchbandbin flag
    *   @history 2011-01-18 Sharmila Prasad - Added "Average" priority feature, to double
-   *            the number of mosaic bands to get Count info
+   *                           the number of mosaic bands to get Count info
    *   @history 2011-01-24 Sharmila Prasad - API to match DEM and also to add new group "mosaic"
-   *            to hold ShapeModel attributes for the mosaic if Flag is Enabled
+   *                           to hold ShapeModel attributes for the mosaic if Flag is Enabled
    *   @history 2011-09-23 Steven Lambright - Fixed table resizing code to not
    *                           do nothing and eventually cause very, very bad
    *                           things to happen (writing out of array bounds).
    *                           Fixes #410.
    *   @history 2011-10-20 Sharmila Prasad - Fixes #0000462, allow Band Priority even if Tracking
-   *                                         is not enabled
+   *                           is not enabled
    *   @history 2011-12-30 Sharmila Prasad - Fixed #00587, Disable Tracking for multiband mosaic for
    *                       ontop or beneath priority
    *   @history 2012-01-05 Sharmila Prasad - Fixed #00586 Allow Band Priority with no Tracking
@@ -168,6 +164,11 @@ namespace Isis {
    *                           flaws in the design that made it difficult to not carry over
    *                           erroneous state from past method calls and cause difficult to
    *                           reproduce problems. Fixes #967.
+   *   @history 2012-08-16 Kimberly Oyama - Added a PvlObject, m_imagePositions, to store the image
+   *                           information (file name, start sample, and start line). An accessor,
+   *                           imagePositions(), for the PvlObject was also added. The image
+   *                           information is used as log output by automos, handmos, and mapmos.
+   *                           Fixes #976.
    */
 
   class ProcessMosaic : public Process {
@@ -199,6 +200,9 @@ namespace Isis {
 
       //! Line Processing method for one input and output cube
       void StartProcess(const int &piOutSample, const int &piOutLine, const int &piOutBand);
+
+      //! Accessor for the placed images.
+      PvlObject imagePositions();
 
       //! Set input cube to specified image name at the starting and count of
       //! samples, lines, bands
@@ -325,6 +329,8 @@ namespace Isis {
       bool m_enforceMatchDEM;
 
       ImageOverlay m_imageOverlay;
+      
+      PvlObject m_imagePositions; //! List of images placed on the mosaic.
 
       /*
        * Set the Special Pixels Flags to True/False.

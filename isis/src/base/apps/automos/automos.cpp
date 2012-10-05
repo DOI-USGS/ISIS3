@@ -96,13 +96,6 @@ void IsisMain() {
       Application::Log(outsiders);
     }
     else {
-      PvlGroup imgPosition("ImageLocation");
-      int iStartLine   = m.GetInputStartLineInMosaic();
-      int iStartSample = m.GetInputStartSampleInMosaic();
-      imgPosition += PvlKeyword("File", list[i].toString());
-      imgPosition += PvlKeyword("StartSample", iStartSample);
-      imgPosition += PvlKeyword("StartLine", iStartLine);
-      Application::Log(imgPosition);
       mosaicCreated = true;
       if(olistFlag) {
         os << list[i].toString() << endl;
@@ -112,6 +105,10 @@ void IsisMain() {
       // Mosaic is already created, use the existing mosaic
       m.SetCreateFlag(false);
     }
+  }
+  // Logs the input file location in the mosaic
+  for (int i = 0; i < m.imagePositions().Groups(); i++) {
+    Application::Log(m.imagePositions().Group(i));
   }
 
   if(olistFlag) {
