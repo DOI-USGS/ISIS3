@@ -1,0 +1,9 @@
+  Group = ImageLocation
+    File        = input/lub4618n.342.lev2.cub
+    StartSample = 1119
+    StartLine   = 124
+  End_Group
+  Group = ImageLocation
+    File        = input/lub4618n.342.lev2.cub
+    StartSample = 87519
+    StartLine   = 124

@@ -1,0 +1,4 @@
+  Group = ImageLocation
+    File        = input/ab102401.lev2.cub
+    StartSample = 1
+    StartLine   = 1
