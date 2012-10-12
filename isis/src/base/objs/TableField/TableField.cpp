@@ -363,7 +363,7 @@ namespace Isis {
     }
     if (m_size > 1) {
       string msg = "Unable to set field to the given int value. "
-                   "Field [" + m_name + "] has [" + iString(m_size) + "] "
+                   "Field [" + m_name + "] has [" + IString(m_size) + "] "
                   "Integer values. Use operator=(vector<int>).";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -387,7 +387,7 @@ namespace Isis {
     }
     if (m_size > 1) {
       string msg = "Unable to set field to the given double value. "
-                   "Field [" + m_name + "] has [" + iString(m_size) + "] "
+                   "Field [" + m_name + "] has [" + IString(m_size) + "] "
                    "Double values. Use operator=(vector<double>).";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -411,7 +411,7 @@ namespace Isis {
     }
     if (m_size > 1) {
       string msg = "Unable to set field to the given float value. "
-                   "Field [" + m_name + "] has [" + iString(m_size) + "] "
+                   "Field [" + m_name + "] has [" + IString(m_size) + "] "
                    "Real values. Use operator=(vector<float>).";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -452,7 +452,7 @@ namespace Isis {
     else if ((int) values.size() != m_size) {
       string msg = "Unable to set field to the given vector of int values. "
                    "Field [" + m_name + "] values has size [" 
-                   + iString(m_size) + "].";
+                   + IString(m_size) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     m_ivalues = values;
@@ -476,7 +476,7 @@ namespace Isis {
     else if ((int) values.size() != m_size) {
       string msg = "Unable to set field to the given vector of double values. "
                    "Field [" + m_name + "] values has size [" 
-                   + iString(m_size) + "].";
+                   + IString(m_size) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     m_dvalues = values;
@@ -501,7 +501,7 @@ namespace Isis {
     else if ((int) values.size() != m_size) {
       string msg = "Unable to set field to the given vector of float values. "
                    "Field [" + m_name + "] values has size [" 
-                   + iString(m_size) + "].";
+                   + IString(m_size) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     m_rvalues = values;
@@ -551,7 +551,7 @@ namespace Isis {
       }
     }
     else {
-      string msg = "Undefined field type [" + iString(m_type) + "].";
+      string msg = "Undefined field type [" + IString(m_type) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }

@@ -28,7 +28,7 @@
 #include <iomanip>
 
 #include "PhotometricFunction.h"
-#include "iString.h"
+#include "IString.h"
 #include "Camera.h"
 #include "DbProfile.h"
 #include "SpecialPixel.h"
@@ -79,7 +79,7 @@ namespace Isis {
         double b0, b1, a0, a1, a2, a3, a4;  //<! Hillier parameters
         double wavelength;                  //<! Wavelength for correction
         double tolerance;                   //<! Wavelenght Range/Tolerance
-        iString units;                      //<! Phase units of Hiller eq.
+        IString units;                      //<! Phase units of Hiller eq.
         double phaUnit;  // 1 for degrees, Pi/180 for radians
         int band;                           //<! Cube band parameters
         double phoStd;                      //<! Computed photometric std.

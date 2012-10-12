@@ -146,7 +146,7 @@ void compute(vector<double> centers, vector<double> widths,
       small = (double)centers[i] - (double)widths[i] / 2.0;
     }
   }
-  pvlCenter.SetValue(iString((large - small) / 2 + small), centerUnit);
+  pvlCenter.SetValue(IString((large - small) / 2 + small), centerUnit);
   if(hasWidth) {
     PvlKeyword &pvlWidth  = pvlg.FindKeyword("Width");
     pvlWidth.SetValue(large - small, pvlWidth.Unit());

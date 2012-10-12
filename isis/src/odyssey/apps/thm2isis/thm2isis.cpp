@@ -35,7 +35,7 @@ void IsisMain() {
   try {
     Pvl lab(in.expanded());
     projected = lab.HasObject("IMAGE_MAP_PROJECTION");
-    iString id;
+    IString id;
     id = (string)lab["DATA_SET_ID"];
     id.ConvertWhiteSpace();
     id.Compress();

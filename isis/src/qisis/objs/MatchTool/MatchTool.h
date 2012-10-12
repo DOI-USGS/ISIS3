@@ -34,7 +34,7 @@ namespace Isis {
   class ControlMeasure;
   class ControlNet;
   class Cube;
-  class iString;
+  class IString;
   class MatchToolNewPointDialog;
   class Stretch;
   class UniversalGroundMap;
@@ -314,7 +314,7 @@ namespace Isis {
       void createTemplateEditorWidget();
       void loadTemplateFile(QString);
       bool okToContinue();
-      bool IsMeasureLocked(iString serialNumber);
+      bool IsMeasureLocked(IString serialNumber);
       void addMeasure(MdiCubeViewport *mvp, double sample, double line);
       bool validateMeasureChange(ControlMeasure *m);
 
@@ -338,7 +338,7 @@ namespace Isis {
       QString m_cnetFileName;
       QLabel *m_cnetFileNameLabel;
       bool m_coregNet;
-      iString m_coregReferenceSN;
+      IString m_coregReferenceSN;
       bool m_netChanged;
 
       QAction *m_createPoint;

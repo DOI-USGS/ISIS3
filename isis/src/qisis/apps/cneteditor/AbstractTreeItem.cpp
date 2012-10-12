@@ -10,7 +10,7 @@
 #include <QVariant>
 
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "SpecialPixel.h"
 
 #include "AbstractTableModel.h"
@@ -171,7 +171,7 @@ namespace Isis
     {
       if (dataWidth == 0)
       {
-        iString msg = "Children of AbstractTreeItem must call setDataWidth "
+        IString msg = "Children of AbstractTreeItem must call setDataWidth "
             "with a non-zero width";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -198,7 +198,7 @@ namespace Isis
 
     void AbstractTreeItem::setLastVisibleFilteredItem(AbstractTreeItem * item)
     {
-      iString msg = "This tree item does not keep track of visible filtered "
+      IString msg = "This tree item does not keep track of visible filtered "
           "items";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -215,7 +215,7 @@ namespace Isis
     {
       if (avgCharWidth <= 0)
       {
-        iString msg = "calcDataWidth() expects a positive non-zero value.";
+        IString msg = "calcDataWidth() expects a positive non-zero value.";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 

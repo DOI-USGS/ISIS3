@@ -47,17 +47,17 @@ void IsisMain() {
   Cube *ocube = p.SetOutputCube("TO");
   Cube *ffcube, *ofcube, *afcube, *dccube, *biascube, *bpcube;
 
-  iString filter = (string)(icube->getGroup("BandBin"))["FilterName"];
+  IString filter = (string)(icube->getGroup("BandBin"))["FilterName"];
   filter = filter.DownCase();
-  iString productID = (string)(icube->getGroup("Archive"))["ProductID"];
-  iString orbit = productID.substr(productID.find('.') + 1, productID.length() - 1);
+  IString productID = (string)(icube->getGroup("Archive"))["ProductID"];
+  IString orbit = productID.substr(productID.find('.') + 1, productID.length() - 1);
 
   // If hemisphere code greater than 'I' set to 'n' else set to 's'
   char hemisphereCode = (productID[productID.find('.')-1] > 'I') ? 'n' : 's';
-  iString compressionType = (string)(icube->getGroup("Instrument"))["EncodingFormat"];
+  IString compressionType = (string)(icube->getGroup("Instrument"))["EncodingFormat"];
   offsetModeID = (icube->getGroup("Instrument"))["OffsetModeID"];
   int gainModeID = (icube->getGroup("Instrument"))["GainModeID"];
-  iString gainModeIDStr = gainModeID;
+  IString gainModeIDStr = gainModeID;
   double exposureDuration = (double)(icube->getGroup("Instrument"))["ExposureDuration"];
   optimalExposureDuration = (exposureDuration * 0.984675) + 0.233398;
   cryocoolerDuration = (icube->getGroup("Instrument"))["CryocoolerDuration"];
@@ -93,7 +93,7 @@ void IsisMain() {
     TextFile aFFileTable(afFileTableLoc);
     int numLines = aFFileTable.LineCount();
     for(int i = 0; i < numLines; i++) {
-      iString line;
+      IString line;
       aFFileTable.GetLine(line, true);
       line = line.Compress();
       if(orbit.compare(line.Token(" ")) == 0 &&
@@ -112,14 +112,14 @@ void IsisMain() {
       affileLoc = "zeros.cub";
     }
 
-    iString gainFactorDef = "$clementine1/calibration/nir/";
+    IString gainFactorDef = "$clementine1/calibration/nir/";
     gainFactorDef += "clemnircal.def";
     Pvl gainFactorData(gainFactorDef);
-    iString group = "GainModeID";
-    group += (iString)gainModeID;
+    IString group = "GainModeID";
+    group += (IString)gainModeID;
 
     if(!gainFactorData.HasGroup(group)) {
-      iString err = "The Gain Factor for Gain Mode ID [";
+      IString err = "The Gain Factor for Gain Mode ID [";
       err += gainModeID;
       err += "] could not be found in clemnircal.def";
       throw IException(IException::Programmer, err, _FILEINFO_);
@@ -128,7 +128,7 @@ void IsisMain() {
     gainFactor = (gainFactorData.FindGroup(group))["GAIN"];
 
     if(abs(gainFactor) < DBL_EPSILON) {
-      iString err = "The Gain Factor for Gain Mode ID [";
+      IString err = "The Gain Factor for Gain Mode ID [";
       err += gainModeID;
       err += "] can not be zero.";
       throw IException(IException::Programmer, err, _FILEINFO_);
@@ -190,12 +190,12 @@ void IsisMain() {
   }
 
   // We need thermal data
-  iString thermTbl = "$clementine1/calibration/nir/";
+  IString thermTbl = "$clementine1/calibration/nir/";
   thermTbl += "nir" + filter + ".therm.dat";
 
   TextFile thermTable(thermTbl);
   int numLines = thermTable.LineCount();
-  iString line;
+  IString line;
   for(int i = 0; i < numLines; i++) {
     thermTable.GetLine(line);
 
@@ -221,7 +221,7 @@ void IsisMain() {
   }
 
   if(numCoefficients == 0) {
-    iString err = "The orbit [" + orbit + "] could not be located in the thermal corrections table [" + thermTbl + "].";
+    IString err = "The orbit [" + orbit + "] could not be located in the thermal corrections table [" + thermTbl + "].";
     throw IException(IException::Unknown, err, _FILEINFO_);
   }
 

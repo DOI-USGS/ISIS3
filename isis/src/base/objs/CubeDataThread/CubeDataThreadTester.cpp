@@ -9,7 +9,7 @@
 #include <QVector>
 
 #include "CubeDataThread.h"
-#include "iString.h"
+#include "IString.h"
 #include "FileName.h"
 #include "Brick.h"
 #include "Cube.h"

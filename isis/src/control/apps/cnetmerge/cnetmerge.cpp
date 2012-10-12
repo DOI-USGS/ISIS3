@@ -20,7 +20,7 @@ using namespace Isis;
 
 
 ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
-    iString networkId, iString description);
+    IString networkId, IString description);
 void mergeNetwork(ControlNet &baseNet, ControlNet &newNet, PvlObject &cnetLog);
 
 ControlPoint * mergePoint(
@@ -48,8 +48,8 @@ PvlObject createNetworkLog(ControlNet &cnet);
 PvlObject createPointLog(ControlPoint *point);
 PvlGroup createMeasureLog();
 
-void reportConflict(PvlObject &pointLog, iString conflict);
-void reportConflict(PvlGroup &measureLog, iString cn, iString conflict);
+void reportConflict(PvlObject &pointLog, IString conflict);
+void reportConflict(PvlGroup &measureLog, IString cn, IString conflict);
 
 void addLog(PvlObject &conflictLog, PvlObject &cnetLog);
 void addLog(PvlObject &cnetLog, PvlObject &pointLog, PvlGroup &measureLog);
@@ -159,7 +159,7 @@ void IsisMain() {
 
 
 ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
-    iString networkId, iString description) {
+    IString networkId, IString description) {
 
   if (!mergePoints) {
     bool hasDuplicates = false;
@@ -488,7 +488,7 @@ PvlGroup createMeasureLog() {
 }
 
 
-void reportConflict(PvlObject &pointLog, iString conflict) {
+void reportConflict(PvlObject &pointLog, IString conflict) {
   // Add a point conflict message to the point log if we're reporting these
   // conflicts to a log file
   if (report) {
@@ -498,7 +498,7 @@ void reportConflict(PvlObject &pointLog, iString conflict) {
 }
 
 
-void reportConflict(PvlGroup &measureLog, iString sn, iString conflict) {
+void reportConflict(PvlGroup &measureLog, IString sn, IString conflict) {
   // Add a measure conflict message to the measure log if we're reporting these
   // conflicts to a log file
   if (report) {

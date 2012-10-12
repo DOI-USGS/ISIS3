@@ -21,7 +21,7 @@
  */
 #include "PvlToken.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Message.h"
 
 using namespace std;
@@ -51,7 +51,7 @@ namespace Isis {
   /**
    * Set the token keyword.
    *
-   * @param k iString to load into the token keyword
+   * @param k IString to load into the token keyword
    */
   void PvlToken::SetKey(const std::string &k) {
     key = k;
@@ -97,7 +97,7 @@ namespace Isis {
    * Adds a value to the value-vector. Successive calls add values to the end of
    * the vector.
    *
-   * @param v iString add to the value-vector list
+   * @param v IString add to the value-vector list
    */
   void PvlToken::AddValue(const std::string &v) {
     value.push_back(v);

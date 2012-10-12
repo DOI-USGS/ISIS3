@@ -78,7 +78,7 @@ void IsisMain() {
   outfile.open (sOutFile.c_str());
 
   // Get Hapke function and parameters
-  iString sPhotoFunc = ui.GetAsString("PHTNAME");
+  IString sPhotoFunc = ui.GetAsString("PHTNAME");
   sPhotoFunc = sPhotoFunc.UpCase();
 
   // Should contains parameter names matching GUI not to be inclusiond
@@ -123,7 +123,7 @@ void IsisMain() {
 
   // Get Atmospheric Model
   // Order of approximation in atmospheric scatter model
-  iString sAsmType = ui.GetAsString("ATMNAME");
+  IString sAsmType = ui.GetAsString("ATMNAME");
   sAsmType = sAsmType.UpCase();
 
   AtmosModel *asmModel=NULL;
@@ -172,9 +172,9 @@ void IsisMain() {
   // sense as the corresponding parameter.
   FileName sInFileName(sInFile);
   TextFile infile(sInFileName.expanded());
-  iString infileString;
+  IString infileString;
   while (infile.GetLine(infileString)) {
-    iString imgId = infileString.Token(" ,");
+    IString imgId = infileString.Token(" ,");
     double inc    = infileString.Token(" ,").ToDouble();
     double ema    = infileString.Token(" ,").ToDouble();
     double phase  = infileString.Token(" ,").ToDouble();

@@ -7,7 +7,7 @@
 #include <QComboBox>
 
 #include "Stretch.h"
-#include "iString.h"
+#include "IString.h"
 #include "IException.h"
 #include "StretchType.h"
 #include "LinearStretchType.h"

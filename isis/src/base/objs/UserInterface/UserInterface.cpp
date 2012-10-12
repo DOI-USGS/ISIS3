@@ -29,7 +29,7 @@
 #include "Application.h"
 #include "IException.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include "Message.h"
 #include "Gui.h"
 #include "Preference.h"
@@ -143,7 +143,7 @@ namespace Isis {
 
       GetNextParameter(currArgument, paramName, paramValue);
 
-      paramName = ((iString) paramName).UpCase();
+      paramName = ((IString) paramName).UpCase();
 
       // -LAST needs to be evaluated first to prevent incorrect errors from IsisAml
       if(paramName == "-LAST") {
@@ -160,7 +160,7 @@ namespace Isis {
 
       // we now have a name,value pair
       if(paramName[0] == '-') {
-        paramName = ((iString) paramName).UpCase();
+        paramName = ((IString) paramName).UpCase();
 
         // Prevent double handling of conflicting parameters handled in first pass
         if(paramName == "-LAST") {
@@ -193,7 +193,7 @@ namespace Isis {
           string msg = "Invalid Reserve Parameter Option ["
                        + paramName + "]. Choices are ";
 
-          iString msgOptions;
+          IString msgOptions;
           for(int option = 0; option < (int) options.size() - 1; option ++) {
             // Make sure not to show -PID as an option
             if(options[option].compare("-PID") != 0) {
@@ -218,7 +218,7 @@ namespace Isis {
           usedDashLast = true;
         }
 
-        iString realValue = "";
+        IString realValue = "";
 
         if(paramValue.size())
           realValue = paramValue[0];
@@ -266,8 +266,8 @@ namespace Isis {
    */
   void UserInterface::GetNextParameter(unsigned int &curPos,
                                        std::string &name, std::vector< std::string > &value) {
-    iString paramName = p_cmdline[curPos];
-    iString paramValue = "";
+    IString paramName = p_cmdline[curPos];
+    IString paramValue = "";
 
     // we need to split name and value, they can either be in 1, 2 or 3 arguments,
     //   try to see if "=" is end of argument to distinguish. Some options have no
@@ -349,14 +349,14 @@ namespace Isis {
    *
    * @return std::vector<std::string> Values in the array string
    */
-  std::vector< std::string > UserInterface::ReadArray(iString arrayString) {
+  std::vector< std::string > UserInterface::ReadArray(IString arrayString) {
     std::vector< std::string > values;
 
     bool inDoubleQuotes = false;
     bool inSingleQuotes = false;
     bool arrayClosed = false;
     bool nextElementStarted = false;
-    iString currElement = "";
+    IString currElement = "";
 
     for(unsigned int strPos = 0; strPos < arrayString.size(); strPos ++) {
       if(strPos == 0) {
@@ -479,7 +479,7 @@ namespace Isis {
     }
     else if(name == "-LAST") {
       PvlGroup &grp = p.FindGroup("UserInterface", Isis::Pvl::Traverse);
-      iString histFile = grp["HistoryPath"][0] + "/" + FileName(
+      IString histFile = grp["HistoryPath"][0] + "/" + FileName(
                            p_progName).name() + ".par";
 
       LoadHistory(histFile);
@@ -662,7 +662,7 @@ namespace Isis {
       exit(0);
     }
     else if(name == "-PID") {
-      p_parentId = iString(value).ToInteger();
+      p_parentId = IString(value).ToInteger();
     }
     else if(name == "-ERRLIST") {
       p_errList = value;
@@ -677,11 +677,11 @@ namespace Isis {
       }
     }
     else if(name == "-ONERROR") {
-      if(iString(value).UpCase() == "CONTINUE") {
+      if(IString(value).UpCase() == "CONTINUE") {
         p_abortOnError = false;
       }
 
-      else if(iString(value).UpCase() == "ABORT") {
+      else if(IString(value).UpCase() == "ABORT") {
         p_abortOnError = true;
       }
 
@@ -748,7 +748,7 @@ namespace Isis {
     p_batchList.resize(temp.LineCount());
 
     for(int i = 0; i < temp.LineCount(); i ++) {
-      iString t;
+      IString t;
       temp.GetLine(t);
 
       // Convert tabs to spaces but leave tabs inside quotes alone
@@ -762,7 +762,7 @@ namespace Isis {
       // Convert all spaces to "," the use "," as delimiter
       t.Replace(" ", ",", true);
       int j = 0;
-      iString token = t.Token(",");
+      IString token = t.Token(",");
 
       while(token != "") {
         // removes quotes from tokens. NOTE: also removes escaped quotes.
@@ -955,15 +955,15 @@ namespace Isis {
           continue;
 
         for(unsigned int value = 0; value < paramValue.size(); value ++) {
-          iString thisValue = paramValue[value];
+          IString thisValue = paramValue[value];
 
           string token = thisValue.Token("$");
-          iString newValue;
+          IString newValue;
 
           while(thisValue != "") {
             newValue += token;
             try {
-              int j = iString(thisValue.substr(0, 1)).ToInteger() - 1;
+              int j = IString(thisValue.substr(0, 1)).ToInteger() - 1;
               newValue += p_batchList[i][j];
               thisValue.replace(0, 1, "");
               token = thisValue.Token("$");

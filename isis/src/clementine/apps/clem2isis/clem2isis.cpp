@@ -12,7 +12,7 @@
 #include "IException.h"
 #include "iTime.h"
 #include "Preference.h"
-#include "iString.h"
+#include "IString.h"
 #include "OriginalLabel.h"
 
 using namespace std;
@@ -33,7 +33,7 @@ void IsisMain() {
   try {
     Pvl lab(in.expanded());
     projected = lab.HasObject("IMAGE_MAP_PROJECTION");
-    iString id;
+    IString id;
     id = (string)lab["DATA_SET_ID"];
     id.ConvertWhiteSpace();
     id.Compress();
@@ -60,7 +60,7 @@ void IsisMain() {
   //Decompress the file
   long int lines = 0;
   long int samps = 0;
-  iString filename = in.expanded();
+  IString filename = in.expanded();
   pdsi = PDSR((char *)filename.c_str(), &lines, &samps);
 
   ProcessByLine p;
@@ -102,7 +102,7 @@ void TranslateLabels(FileName in, Cube *ocube) {
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
 
   // Transfer the instrument group to the output cube
-  iString transDir = (string) dataDir["clementine1"];
+  IString transDir = (string) dataDir["clementine1"];
   FileName transFile(transDir + "/translations/clementine.trn");
 
   Pvl pdsLab(in.expanded());

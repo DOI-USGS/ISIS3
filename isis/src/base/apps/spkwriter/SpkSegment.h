@@ -32,7 +32,7 @@
 #include <sstream>
 
 #include "SpiceSegment.h"
-#include "iString.h"
+#include "IString.h"
 #include "IException.h"
 
 

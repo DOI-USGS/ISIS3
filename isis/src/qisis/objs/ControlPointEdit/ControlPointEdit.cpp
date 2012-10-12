@@ -27,7 +27,7 @@
 #include "ControlMeasure.h"
 #include "ControlMeasureLogData.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include "ProgramLauncher.h"
 #include "Pvl.h"
 #include "UniversalGroundMap.h"
@@ -1530,10 +1530,10 @@ namespace Isis {
 
     //  Save chips - pattern, search and fit
     std::string baseFile = p_pointId + "_" +
-                           iString((int)(p_leftMeasure ->GetSample())) + "_" +
-                           iString((int)(p_leftMeasure ->GetLine()))   + "_" +
-                           iString((int)(p_rightMeasure->GetSample())) + "_" +
-                           iString((int)(p_rightMeasure->GetLine()))   + "_";
+                           IString((int)(p_leftMeasure ->GetSample())) + "_" +
+                           IString((int)(p_leftMeasure ->GetLine()))   + "_" +
+                           IString((int)(p_rightMeasure->GetSample())) + "_" +
+                           IString((int)(p_rightMeasure->GetLine()))   + "_";
     std::string fname = baseFile + "Search.cub";
     std::string command = "$ISISROOT/bin/qview " + fname;
     p_autoRegFact->RegistrationSearchChip()->Write(fname);

@@ -17,7 +17,7 @@
 #include "Statistics.h"
 #include "UserInterface.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 
 using namespace std;
@@ -179,7 +179,7 @@ void IsisMain() {
       }
 
       // Add the measures to a control point
-      string str = "Row " + iString(r) + " Column " + iString(c);
+      string str = "Row " + IString(r) + " Column " + IString(c);
       ControlPoint * cp = new ControlPoint(str);
       cp->SetType(ControlPoint::Free);
       cp->Add(cmTrans);
@@ -268,8 +268,8 @@ void IsisMain() {
     if(ui.GetString("TRANSFORM") == "TRANSLATE") {
       string params = " from="   + ui.GetFileName("FROM") +
                       " to="     + ui.GetFileName("TO") +
-                      " strans=" + iString(sTrans) +
-                      " ltrans=" + iString(lTrans) +
+                      " strans=" + IString(sTrans) +
+                      " ltrans=" + IString(lTrans) +
                       " interp=" + ui.GetString("INTERP");
       ProgramLauncher::RunIsisProgram("translate", params);
     }
@@ -279,7 +279,7 @@ void IsisMain() {
                       " cube="   + ui.GetFileName("MATCH") +
                       " cnet="   + ui.GetFileName("ONET") +
                       " interp=" + ui.GetString("INTERP") +
-                      " degree=" + iString(ui.GetInteger("DEGREE"));
+                      " degree=" + IString(ui.GetInteger("DEGREE"));
       ProgramLauncher::RunIsisProgram("warp", params);
     }
   }

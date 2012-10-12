@@ -32,7 +32,7 @@ using std::ostringstream;
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlObject.h"
-#include "iString.h"
+#include "IString.h"
 
 namespace Isis {
 

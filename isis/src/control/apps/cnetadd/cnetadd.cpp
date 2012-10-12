@@ -323,7 +323,7 @@ void IsisMain() {
 
     const QList<QString> snList = inNet.GetCubeSerials();
     for (int i = 0; i < snList.size(); i++) {
-      iString sn = snList[i];
+      IString sn = snList[i];
 
       if (addSerials.HasSerialNumber(sn))
         toList.Add(addSerials.FileName(sn));
@@ -331,7 +331,7 @@ void IsisMain() {
         toList.Add(fromSerials->FileName(sn));
     }
 
-    iString name(ui.GetFileName("TOLIST"));
+    IString name(ui.GetFileName("TOLIST"));
     std::fstream out_stream;
     out_stream.open(name.c_str(), std::ios::out);
     out_stream.seekp(0, std::ios::beg); //Start writing from beginning of file

@@ -29,7 +29,7 @@
 #include <sstream>
 
 #include "ZeroBufferFit.h"
-#include "iString.h"
+#include "IString.h"
 #include "HiCalTypes.h"
 #include "HiCalUtil.h"
 #include "HiCalConf.h"

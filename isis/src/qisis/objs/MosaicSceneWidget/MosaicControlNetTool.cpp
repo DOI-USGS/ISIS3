@@ -9,7 +9,7 @@
 #include "CubeDisplayProperties.h"
 #include "FileDialog.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "MosaicSceneWidget.h"
 #include "PvlObject.h"
 
@@ -148,7 +148,7 @@ namespace Isis {
   }
 
 
-  iString MosaicControlNetTool::projectPvlObjectName() const {
+  IString MosaicControlNetTool::projectPvlObjectName() const {
     return "MosaicControlNetTool";
   }
 

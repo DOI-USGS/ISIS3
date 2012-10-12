@@ -35,7 +35,7 @@ using namespace std;
 #include "DbAccess.h"
 #include "Preference.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 
 namespace Isis {
 
@@ -291,7 +291,7 @@ namespace Isis {
     if(!drivers.exists(dbname)) {
       return (false);
     }
-    return (QSqlDatabase::isDriverAvailable(iString::ToQt(drivers.get(dbname))));
+    return (QSqlDatabase::isDriverAvailable(IString::ToQt(drivers.get(dbname))));
   }
 
   /**
@@ -327,7 +327,7 @@ namespace Isis {
     if(name.empty()) {
       name = _defDatabase;
     }
-    return (QSqlDatabase::contains(iString::ToQt(name)));
+    return (QSqlDatabase::contains(IString::ToQt(name)));
   }
 
   /**
@@ -376,8 +376,8 @@ namespace Isis {
 
     //  Create the database with the specified driver and name
     Drivers drivers = getResourceList(true, false);
-    return (QSqlDatabase::addDatabase(iString::ToQt(drivers.get(driver)),
-                                      iString::ToQt(dbname)));
+    return (QSqlDatabase::addDatabase(IString::ToQt(drivers.get(driver)),
+                                      IString::ToQt(dbname)));
   }
 
   /**
@@ -443,7 +443,7 @@ namespace Isis {
    */
   void DatabaseFactory::destroy(const std::string &name) {
     remove(name);
-    QSqlDatabase::removeDatabase(iString::ToQt(name));
+    QSqlDatabase::removeDatabase(IString::ToQt(name));
     return;
   }
 
@@ -459,7 +459,7 @@ namespace Isis {
   void DatabaseFactory::remove(const std::string &name) {
     _dbList.remove(name);
 #if 0
-    if(iString::Equal(name, _defDatabase)) {
+    if(IString::Equal(name, _defDatabase)) {
       _defDatabase = "";
     }
 #endif
@@ -530,7 +530,7 @@ namespace Isis {
     if(connections) dblist += QSqlDatabase::connectionNames();
     Drivers dbDrivers;
     for(int i = 0 ; i < dblist.size() ; i++) {
-      string dbname(iString::ToStd(dblist.at(i)));
+      string dbname(IString::ToStd(dblist.at(i)));
       dbDrivers.add(dbname, dbname);
     }
 

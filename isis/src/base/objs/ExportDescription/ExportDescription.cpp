@@ -56,7 +56,7 @@ namespace Isis {
         break;
       default:
         throw IException(IException::Programmer,
-            "Invalid export pixel type [" + iString(type) + "]",
+            "Invalid export pixel type [" + IString(type) + "]",
             _FILEINFO_);
     }
   }

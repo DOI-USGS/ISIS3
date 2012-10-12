@@ -81,7 +81,7 @@ void WriteCnet(const std::string &netfile, SmtkQStack &points,
   cn.SetCreatedDate(iTime::CurrentLocalTime());
   SmtkQStackIter pnt = points.begin();
   for (int i = 0 ; pnt != points.end() ; i++, ++pnt) {
-    string pntid = "Point_" + iString(i);
+    string pntid = "Point_" + IString(i);
     cn.AddPoint(new ControlPoint(CreatePoint(pnt.value(), pntid, lcn, rcn)));
   }
 

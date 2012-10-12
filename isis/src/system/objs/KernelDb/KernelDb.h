@@ -29,7 +29,7 @@
 
 #include "Pvl.h"
 #include "iTime.h"
-#include "iString.h"
+#include "IString.h"
 
 namespace spiceInit {
 
@@ -41,7 +41,7 @@ namespace spiceInit {
   };
 
   inline kernelTypes kernelTypeEnum(const std::string &type) {
-    Isis::iString strng = type;
+    Isis::IString strng = type;
     strng.ConvertWhiteSpace();
     strng.Compress();
     strng.Trim(" ");

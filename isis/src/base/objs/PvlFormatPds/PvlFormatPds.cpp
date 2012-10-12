@@ -25,7 +25,7 @@
 
 #include "IException.h"
 #include "Message.h"
-#include "iString.h"
+#include "IString.h"
 #include "FileName.h"
 #include "Constants.h"
 #include "TextFile.h"
@@ -81,10 +81,10 @@ namespace Isis {
   */
   std::string PvlFormatPds::FormatValue(const PvlKeyword &keyword, int num) {
 
-    iString name = keyword.Name();
+    IString name = keyword.Name();
     name.UpCase();
     if(name == "OBJECT" || (name == "GROUP")) {
-      iString val = (string)keyword;
+      IString val = (string)keyword;
       return val.UpCase();
     }
 
@@ -142,7 +142,7 @@ namespace Isis {
   */
   std::string PvlFormatPds::FormatString(const PvlKeyword &keyword, int num) {
 
-    iString val;
+    IString val;
     val.clear();
     bool singleUnit = false;
 
@@ -152,7 +152,7 @@ namespace Isis {
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
-    iString tmp = keyword[num];
+    IString tmp = keyword[num];
     tmp.UpCase();
     if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
@@ -170,7 +170,7 @@ namespace Isis {
 
     // Add the units to this value
     if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      iString unit = keyword.Unit(num);
+      IString unit = keyword.Unit(num);
       // For now PDS units are case sensitive, so we should not UpCase them
       //      unit.UpCase();
       val += " <" + unit + ">";
@@ -188,7 +188,7 @@ namespace Isis {
     // Add the units to the end if all values have the same units
     if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
-      iString unit = keyword.Unit(num);
+      IString unit = keyword.Unit(num);
       // For now PDS units are case sensitive, so we should not UpCase them
       //      unit.UpCase();
       val += " <" + unit + ">";
@@ -207,7 +207,7 @@ namespace Isis {
   std::string PvlFormatPds::FormatReal(const PvlKeyword &keyword, int num,
                                        int places) {
 
-    iString val;
+    IString val;
     val.clear();
     bool singleUnit = false;
 
@@ -222,7 +222,7 @@ namespace Isis {
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
-    iString tmp = keyword[num];
+    IString tmp = keyword[num];
     tmp.UpCase();
     if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
@@ -238,7 +238,7 @@ namespace Isis {
 
     // Add the units to this value
     if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      iString unit = keyword.Unit(num);
+      IString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -255,7 +255,7 @@ namespace Isis {
     // Add the units to the end if all values have the same units
     if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
-      iString unit = keyword.Unit(num);
+      IString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -272,7 +272,7 @@ namespace Isis {
   */
   std::string PvlFormatPds::FormatEnum(const PvlKeyword &keyword, int num) {
 
-    iString val;
+    IString val;
     val.clear();
     bool singleUnit = false;
 
@@ -287,7 +287,7 @@ namespace Isis {
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
-    iString tmp = keyword[num];
+    IString tmp = keyword[num];
     tmp.UpCase();
     if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
@@ -298,7 +298,7 @@ namespace Isis {
 
     // Add the units to this value
     if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      iString unit = keyword.Unit(num);
+      IString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -315,7 +315,7 @@ namespace Isis {
     // Add the units to the end if all values have the same units
     if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
-      iString unit = keyword.Unit(num);
+      IString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -337,7 +337,7 @@ namespace Isis {
   */
   std::string PvlFormatPds::FormatUnknown(const PvlKeyword &keyword, int num) {
 
-    iString val;
+    IString val;
     val.clear();
     bool singleUnit = false;
 
@@ -347,7 +347,7 @@ namespace Isis {
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
-    iString tmp = keyword[num];
+    IString tmp = keyword[num];
     tmp.UpCase();
     if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
@@ -365,7 +365,7 @@ namespace Isis {
 
     // Add the units to this value
     if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      iString unit = keyword.Unit(num);
+      IString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -382,7 +382,7 @@ namespace Isis {
     // Add the units to the end if all values have the same units
     if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
-      iString unit = keyword.Unit(num);
+      IString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -399,7 +399,7 @@ namespace Isis {
   */
   std::string PvlFormatPds::FormatInteger(const PvlKeyword &keyword, int num, int bytes) {
 
-    iString val;
+    IString val;
     val.clear();
     bool singleUnit = false;
 
@@ -414,7 +414,7 @@ namespace Isis {
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
-    iString tmp = keyword[num];
+    IString tmp = keyword[num];
     tmp.UpCase();
     if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
@@ -425,7 +425,7 @@ namespace Isis {
 
     // Add the units to this value
     if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      iString unit = keyword.Unit(num);
+      IString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -442,7 +442,7 @@ namespace Isis {
     // Add the units to the end if all values have the same units
     if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
-      iString unit = keyword.Unit(num);
+      IString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -459,7 +459,7 @@ namespace Isis {
   */
   std::string PvlFormatPds::FormatBinary(const PvlKeyword &keyword, int num, int bits) {
 
-    iString val;
+    IString val;
     val.clear();
     bool singleUnit = false;
 
@@ -475,7 +475,7 @@ namespace Isis {
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
-    iString tmp = keyword[num];
+    IString tmp = keyword[num];
     tmp.UpCase();
     if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
@@ -497,7 +497,7 @@ namespace Isis {
 
     // Add the units to this value
     if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      iString unit = keyword.Unit(num);
+      IString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -514,7 +514,7 @@ namespace Isis {
     // Add the units to the end if all values have the same units
     if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
-      iString unit = keyword.Unit(num);
+      IString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -533,7 +533,7 @@ namespace Isis {
 
   std::string PvlFormatPds::FormatHex(const PvlKeyword &keyword, int num, int bytes) {
 
-    iString val;
+    IString val;
     val.clear();
     bool singleUnit = false;
 
@@ -548,7 +548,7 @@ namespace Isis {
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
-    iString tmp = keyword[num];
+    IString tmp = keyword[num];
     tmp.UpCase();
     if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
@@ -564,14 +564,14 @@ namespace Isis {
       else {
         ss << hex << (BigInt)keyword[num];
       }
-      iString h = ss.str();
+      IString h = ss.str();
       h.UpCase();
       val += "16#" + h + "#";
     }
 
     // Add the units to this value
     if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      iString unit = keyword.Unit(num);
+      IString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -588,7 +588,7 @@ namespace Isis {
     // Add the units to the end if all values have the same units
     if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
-      iString unit = keyword.Unit(num);
+      IString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -605,7 +605,7 @@ namespace Isis {
   */
   std::string PvlFormatPds::FormatBool(const PvlKeyword &keyword, int num) {
 
-    iString val;
+    IString val;
     val.clear();
 
     // Create a Null value if the value index is greater than the number of values
@@ -619,7 +619,7 @@ namespace Isis {
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
-    iString tmp = keyword[num];
+    IString tmp = keyword[num];
     tmp.UpCase();
     if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
@@ -649,7 +649,7 @@ namespace Isis {
   * @param keyword The keyword (i.e., the Object or Group)
   */
   std::string PvlFormatPds::FormatName(const PvlKeyword &keyword) {
-    iString text = keyword.Name();
+    IString text = keyword.Name();
     text.UpCase();
     return text;
   };
@@ -663,10 +663,10 @@ namespace Isis {
   */
   std::string PvlFormatPds::FormatEnd(const std::string name,
                                       const PvlKeyword &keyword) {
-    iString left = name;
+    IString left = name;
     left.UpCase();
     left += " = ";
-    iString right = (string)keyword;
+    IString right = (string)keyword;
     right.UpCase();
     return left + right;
   };

@@ -24,7 +24,7 @@
 
 #include <string>
 
-#include "iString.h"
+#include "IString.h"
 #include "CubeCalculator.h"
 #include "CubeInfixToPostfix.h"
 #include "FileList.h"

@@ -22,7 +22,7 @@
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "LineScanCameraDetectorMap.h"
 #include "LineScanCameraGroundMap.h"

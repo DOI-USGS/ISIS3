@@ -2,7 +2,7 @@
 #include "CubeAttribute.h"
 #include "CubeManager.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 
 #include <iostream>
 
@@ -40,15 +40,15 @@ namespace Isis {
    */
   Cube *CubeManager::OpenCube(const std::string &cubeFileName) {
     CubeAttributeInput attIn(cubeFileName);
-    iString attri = attIn.toString();
-    iString expName = FileName(cubeFileName).expanded();
+    IString attri = attIn.toString();
+    IString expName = FileName(cubeFileName).expanded();
 
     // If there are attributes, we need a plus sign on the name
     if(attri.size() > 0) {
       expName += "+";
     }
 
-    iString fullName = expName + attri;
+    IString fullName = expName + attri;
     QString fileName(fullName);
     QMap<QString, Cube *>::iterator searchResult = p_cubes.find(fileName);
 
@@ -90,7 +90,7 @@ namespace Isis {
    * @param cubeFileName The filename of the cube to remove from memory
    */
   void CubeManager::CleanCubes(const std::string &cubeFileName) {
-    QString fileName((iString)FileName(cubeFileName).expanded());
+    QString fileName((IString)FileName(cubeFileName).expanded());
     QMap<QString, Cube *>::iterator searchResult = p_cubes.find(fileName);
 
     if(searchResult == p_cubes.end()) {

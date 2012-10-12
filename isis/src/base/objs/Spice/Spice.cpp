@@ -31,7 +31,7 @@
 #include "EndianSwapper.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
@@ -101,8 +101,8 @@ namespace Isis {
 
     p_solarLongitude = new Longitude;
     p_et = NULL;
-    p_kernels = new QVector<iString>;
-    p_target = new iString;
+    p_kernels = new QVector<IString>;
+    p_target = new IString;
 
     p_startTime = new iTime;
     p_endTime = new iTime;
@@ -212,14 +212,14 @@ namespace Isis {
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
     *p_target = inst["TargetName"][0];
 
-    if (iString(*p_target).UpCase() == "SKY") {
+    if (IString(*p_target).UpCase() == "SKY") {
       *p_bodyCode = *p_spkCode;
       p_radii[0] = p_radii[1] = p_radii[2] = Distance(1000.0, Distance::Meters);
       p_sky = true;
     }
     else {
       *p_bodyCode = naifBodyCode();
-      iString radiiKey = "BODY" + iString((BigInt)*p_bodyCode) + "_RADII";
+      IString radiiKey = "BODY" + IString((BigInt)*p_bodyCode) + "_RADII";
 
       p_radii[0] = Distance(getDouble(radiiKey, 0), Distance::Kilometers);
       p_radii[1] = Distance(getDouble(radiiKey, 1), Distance::Kilometers);
@@ -263,7 +263,7 @@ namespace Isis {
                  &found);
 
         if (!found) {
-          iString naifTarget = "IAU_" + iString(*p_target).UpCase();
+          IString naifTarget = "IAU_" + IString(*p_target).UpCase();
           namfrm_c(naifTarget.c_str(), &frameCode);
           if (frameCode == 0) {
             string msg = "Can not find NAIF code for [" + naifTarget + "]";
@@ -324,7 +324,7 @@ namespace Isis {
 
       p_instrumentRotation = new SpiceRotation(*p_ikCode, *p_spkBodyCode);
     }
-    else if (iString((std::string)kernels["InstrumentPointing"]).UpCase() == "TABLE") {
+    else if (IString((std::string)kernels["InstrumentPointing"]).UpCase() == "TABLE") {
       Table t("InstrumentPointing", lab.FileName(), lab);
       p_instrumentRotation->LoadCache(t);
     }
@@ -335,7 +335,7 @@ namespace Isis {
                        _FILEINFO_);
     }
 
-    if (iString((std::string)kernels["InstrumentPosition"]).UpCase() == "TABLE") {
+    if (IString((std::string)kernels["InstrumentPosition"]).UpCase() == "TABLE") {
       Table t("InstrumentPosition", lab.FileName(), lab);
       p_instrumentPosition->LoadCache(t);
     }
@@ -357,10 +357,10 @@ namespace Isis {
 
     for (int i = 0; i < key.Size(); i++) {
       if (key[i] == "") continue;
-      if (iString(key[i]).UpCase() == "NULL") break;
-      if (iString(key[i]).UpCase() == "NADIR") break;
-      if (iString(key[i]).UpCase() == "TABLE" && !noTables) break;
-      if (iString(key[i]).UpCase() == "TABLE" && noTables) continue;
+      if (IString(key[i]).UpCase() == "NULL") break;
+      if (IString(key[i]).UpCase() == "NADIR") break;
+      if (IString(key[i]).UpCase() == "TABLE" && !noTables) break;
+      if (IString(key[i]).UpCase() == "TABLE" && noTables) continue;
       FileName file(key[i]);
       if (!file.fileExists()) {
         string msg = "Spice file does not exist [" + file.expanded() + "]";
@@ -861,7 +861,7 @@ namespace Isis {
    *
    * @throw Isis::iException::Io - "Can not find key in instrument kernels
    */
-  SpiceInt Spice::getInteger(const iString &key, int index) {
+  SpiceInt Spice::getInteger(const IString &key, int index) {
     return readValue(key, SpiceIntType, index).toInt();
   }
 
@@ -875,7 +875,7 @@ namespace Isis {
    *
    * @throw Isis::iException::Io - "Can not find key in instrument kernels."
    */
-  SpiceDouble Spice::getDouble(const iString &key, int index) {
+  SpiceDouble Spice::getDouble(const IString &key, int index) {
     return readValue(key, SpiceDoubleType, index).toDouble();
   }
 
@@ -886,13 +886,13 @@ namespace Isis {
    * Use this when possible because naif calls (such as scs2e_c) cannot be
    *   called when not using naif.
    */
-  iTime Spice::getClockTime(iString clockValue, int sclkCode) {
+  iTime Spice::getClockTime(IString clockValue, int sclkCode) {
     if (sclkCode == -1)
       sclkCode = naifSclkCode();
 
     iTime result;
 
-    iString key = "CLOCK_ET_" + iString(sclkCode) + "_" + clockValue;
+    IString key = "CLOCK_ET_" + IString(sclkCode) + "_" + clockValue;
     QVariant storedClockTime = getStoredResult(key, SpiceDoubleType);
 
     if (storedClockTime.isNull()) {
@@ -918,7 +918,7 @@ namespace Isis {
    * @param type The naif value's primitive type
    * @param index The index into the naif keyword array to read
    */
-  QVariant Spice::readValue(iString key, SpiceValueType type, int index) {
+  QVariant Spice::readValue(IString key, SpiceValueType type, int index) {
     QVariant result;
 
     if (p_usingNaif) {
@@ -962,7 +962,7 @@ namespace Isis {
       result = readStoredValue(key, type, index);
 
       if (result.isNull()) {
-        iString msg = "The camera is requesting spice data [" + key + "] that "
+        IString msg = "The camera is requesting spice data [" + key + "] that "
             "was not attached, please re-run spiceinit";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -972,7 +972,7 @@ namespace Isis {
   }
 
 
-  void Spice::storeResult(iString name, SpiceValueType type, QVariant value) {
+  void Spice::storeResult(IString name, SpiceValueType type, QVariant value) {
     if (type == SpiceDoubleType) {
       EndianSwapper swapper("LSB");
 
@@ -987,7 +987,7 @@ namespace Isis {
   }
 
 
-  QVariant Spice::getStoredResult(iString name, SpiceValueType type) {
+  QVariant Spice::getStoredResult(IString name, SpiceValueType type) {
     bool wasDouble = false;
 
     if (type == SpiceDoubleType) {
@@ -1008,7 +1008,7 @@ namespace Isis {
   }
 
 
-  void Spice::storeValue(iString key, int index, SpiceValueType type,
+  void Spice::storeValue(IString key, int index, SpiceValueType type,
                          QVariant value) {
     if (!p_naifKeywords->HasKeyword(key))
       p_naifKeywords->AddKeyword(PvlKeyword(key));
@@ -1020,7 +1020,7 @@ namespace Isis {
     }
 
     if (type == SpiceByteCodeType) {
-      storedKey[index] = iString(value.toByteArray().toHex().data());
+      storedKey[index] = IString(value.toByteArray().toHex().data());
     }
     else if (type == SpiceStringType) {
       storedKey[index] = value.toString();
@@ -1032,13 +1032,13 @@ namespace Isis {
       storedKey[index] = value.toInt();
     }
     else {
-      iString msg = "Unable to store variant in labels for key [" + key + "]";
+      IString msg = "Unable to store variant in labels for key [" + key + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
 
 
-  QVariant Spice::readStoredValue(iString key, SpiceValueType type,
+  QVariant Spice::readStoredValue(IString key, SpiceValueType type,
                                   int index) {
     // Read from PvlObject that is our naif keywords
     QVariant result;
@@ -1076,7 +1076,7 @@ namespace Isis {
    *
    * @throw Isis::IException::Io - "Can not find key in instrument kernels."
    */
-  iString Spice::getString(const iString &key, int index) {
+  IString Spice::getString(const IString &key, int index) {
     return readValue(key, SpiceStringType, index).toString();
   }
 
@@ -1177,7 +1177,7 @@ namespace Isis {
     *
     * @return string
     */
-  iString Spice::target() const {
+  IString Spice::target() const {
     return *p_target;
   }
 
@@ -1191,7 +1191,7 @@ namespace Isis {
   void Spice::computeSolarLongitude(iTime et) {
     NaifStatus::CheckErrors();
 
-    if (iString(target()).UpCase() == "SKY") {
+    if (IString(target()).UpCase() == "SKY") {
       *p_solarLongitude = Longitude();
       return;
     }
@@ -1305,9 +1305,9 @@ namespace Isis {
 
       for (int i = 0; i < key.Size(); i++) {
         if (key[i] == "") return false;
-        if (iString(key[i]).UpCase() == "NULL") return false;
-        if (iString(key[i]).UpCase() == "NADIR") return false;
-        if (iString(key[i]).UpCase() == "TABLE") return false;
+        if (IString(key[i]).UpCase() == "NULL") return false;
+        if (IString(key[i]).UpCase() == "NADIR") return false;
+        if (IString(key[i]).UpCase() == "TABLE") return false;
       }
     }
     return true;

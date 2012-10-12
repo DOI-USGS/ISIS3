@@ -929,7 +929,7 @@ namespace Isis {
           if (response == QMessageBox::Yes) {
             //  Update measure file combo boxes:  old reference normal font,
             //    new reference bold font
-            iString file = serialNumberList().FileName(m_leftMeasure->GetCubeSerialNumber());
+            IString file = serialNumberList().FileName(m_leftMeasure->GetCubeSerialNumber());
             QString fname = FileName(file).name().c_str();
             int iref = m_leftCombo->findText(fname);
 
@@ -992,7 +992,7 @@ namespace Isis {
       if (response == QMessageBox::Yes) {
         //  Update measure file combo boxes:  old reference normal font,
         //    new reference bold font
-        iString file = serialNumberList().FileName(m_leftMeasure->GetCubeSerialNumber());
+        IString file = serialNumberList().FileName(m_leftMeasure->GetCubeSerialNumber());
         QString fname = FileName(file).name().c_str();
         int iref = m_leftCombo->findText(fname);
 
@@ -1409,8 +1409,8 @@ namespace Isis {
     MdiCubeViewport *mvp = cubeViewport();
     if (mvp  == NULL) return;
 
-    iString file = mvp->cube()->getFileName();
-    iString sn = serialNumberList().SerialNumber(file);
+    IString file = mvp->cube()->getFileName();
+    IString sn = serialNumberList().SerialNumber(file);
 
     double samp,line;
     mvp->viewportToCube(p.x(),p.y(),samp,line);
@@ -1425,7 +1425,7 @@ namespace Isis {
       }
 
       //  Find closest control point in network
-      iString sn = serialNumberList().SerialNumber(file);
+      IString sn = serialNumberList().SerialNumber(file);
       ControlPoint *point = NULL;
       try {
         point = m_controlNet->FindClosest(sn, samp, line);
@@ -1686,12 +1686,12 @@ namespace Isis {
     }
 
     MatchToolDeletePointDialog *deletePointDialog = new MatchToolDeletePointDialog;
-    iString CPId = m_editPoint->GetId();
+    IString CPId = m_editPoint->GetId();
     deletePointDialog->pointIdValue->setText(CPId.c_str());
     //  Need all files for this point
     for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*m_editPoint)[i];
-      iString file;
+      IString file;
       if (serialNumberList().HasSerialNumber(m.GetCubeSerialNumber())) {
         file = serialNumberList().FileName(m.GetCubeSerialNumber());
       }
@@ -1865,7 +1865,7 @@ namespace Isis {
   void MatchTool::loadPoint () {
 
     //  Write pointId
-    iString CPId = m_editPoint->GetId();
+    IString CPId = m_editPoint->GetId();
     QString ptId("Point ID:  ");
     ptId += (QString) CPId;
     m_ptIdValue->setText(ptId);
@@ -1889,7 +1889,7 @@ namespace Isis {
     //  Need all files for this point
     for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*m_editPoint)[i];
-      iString file = serialNumberList().FileName(m.GetCubeSerialNumber());
+      IString file = serialNumberList().FileName(m.GetCubeSerialNumber());
       m_pointFiles<<file;
       QString tempFileName = FileName(file).name().c_str();
       m_leftCombo->addItem(tempFileName);
@@ -2169,9 +2169,9 @@ namespace Isis {
    *                          make sure old measure is retained. 
    */
   void MatchTool::selectLeftMeasure(int index) {
-    iString file = m_pointFiles[index];
+    IString file = m_pointFiles[index];
 
-    iString serial;
+    IString serial;
     try {
       serial = serialNumberList().SerialNumber(file);
     }
@@ -2182,7 +2182,7 @@ namespace Isis {
 
       //  Set index of combo back to what it was before user selected new.  Find the index
       //  of current left measure.
-      iString file = serialNumberList().FileName(m_leftMeasure->GetCubeSerialNumber());
+      IString file = serialNumberList().FileName(m_leftMeasure->GetCubeSerialNumber());
       int i = m_leftCombo->findText(FileName(file).name().c_str());
       if (i < 0) i = 0;
       m_leftCombo->setCurrentIndex(i);
@@ -2225,9 +2225,9 @@ namespace Isis {
    */
   void MatchTool::selectRightMeasure(int index) {
 
-    iString file = m_pointFiles[index];
+    IString file = m_pointFiles[index];
 
-    iString serial;
+    IString serial;
     try {
       serial = serialNumberList().SerialNumber(file);
     }
@@ -2238,7 +2238,7 @@ namespace Isis {
 
       //  Set index of combo back to what it was before user selected new.  Find the index
       //  of current left measure.
-      iString file = serialNumberList().FileName(m_rightMeasure->GetCubeSerialNumber());
+      IString file = serialNumberList().FileName(m_rightMeasure->GetCubeSerialNumber());
       int i = m_rightCombo->findText(FileName(file).name().c_str());
       if (i < 0) i = 0;
       m_rightCombo->setCurrentIndex(i);
@@ -2648,7 +2648,7 @@ namespace Isis {
    */
   void MatchTool::loadTemplateFile(QString fn) {
 
-    QFile file(QString::fromStdString(FileName((iString) fn).expanded()));
+    QFile file(QString::fromStdString(FileName((IString) fn).expanded()));
     if (!file.open(QIODevice::ReadOnly)) {
       QString msg = "Failed to open template file \"" + fn + "\"";
       QMessageBox::warning(m_matchTool, "IO Error", msg);
@@ -2729,7 +2729,7 @@ namespace Isis {
     }
 
     QString expandedFileName(QString::fromStdString(
-        FileName((iString) fn).expanded()));
+        FileName((IString) fn).expanded()));
 
     QFile file(expandedFileName);
 
@@ -2908,7 +2908,7 @@ namespace Isis {
    *
    * @author 2011-07-06 Tracie Sucharski
    */
-  bool MatchTool::IsMeasureLocked (iString serialNumber) {
+  bool MatchTool::IsMeasureLocked (IString serialNumber) {
 
     if (m_editPoint == NULL) return false;
 

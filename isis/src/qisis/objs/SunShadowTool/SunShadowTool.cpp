@@ -565,11 +565,11 @@ namespace Isis {
       switch (displayUnits) {
         case Distance::Meters:
           m_shadowHeightLineEdit->setText(
-            iString(m_shadowHeight->meters()));
+            IString(m_shadowHeight->meters()));
           break;
         case Distance::Kilometers:
           m_shadowHeightLineEdit->setText(
-            iString(m_shadowHeight->kilometers()));
+            IString(m_shadowHeight->kilometers()));
           break;
         case Distance::Pixels:
           m_shadowHeightLineEdit->setText("Not Supported");

@@ -11,7 +11,7 @@
 
 #include "UserInterface.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 
 double range(double x);
 
@@ -24,7 +24,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   FileName inFile = ui.GetFileName("FROM");
-  iString id;
+  IString id;
   Pvl lab(inFile.expanded());
 
   try {
@@ -45,7 +45,7 @@ void IsisMain() {
 
   // Get the directory where the Kaguya MI translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  iString transDir = (string) dataDir["Kaguya"] + "/translations/";
+  IString transDir = (string) dataDir["Kaguya"] + "/translations/";
   Pvl inputLabel(inFile.expanded());
   Pvl *outputLabel = outcube->getLabel();
   FileName transFile;
@@ -61,7 +61,7 @@ void IsisMain() {
   instrumentXlater.Auto(*(outputLabel));
     //trim trailing z's from the time strings
   PvlGroup &instGroup(outputLabel->FindGroup("Instrument",Pvl::Traverse));
-  iString timeString;
+  IString timeString;
     //StartTime 
   PvlKeyword &startTimeKeyword=instGroup["StartTime"];
   timeString = startTimeKeyword[0];

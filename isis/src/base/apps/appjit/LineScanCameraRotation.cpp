@@ -12,7 +12,7 @@
 #include "LeastSquares.h"
 #include "BasisFunction.h"
 #include "PolynomialUnivariate.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "IException.h"
 #include "Table.h"

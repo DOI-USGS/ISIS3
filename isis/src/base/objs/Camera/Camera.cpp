@@ -39,7 +39,7 @@
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -699,7 +699,7 @@ namespace Isis {
     minlat = p_minlat;
     maxlat = p_maxlat;
     if(map.HasKeyword("LatitudeType")) {
-      iString latType = (string) map["LatitudeType"];
+      IString latType = (string) map["LatitudeType"];
       if(latType.UpCase() == "PLANETOGRAPHIC") {
         if(abs(minlat) < 90.0) {  // So tan doesn't fail
           minlat *= PI / 180.0;
@@ -720,7 +720,7 @@ namespace Isis {
     maxlon = p_maxlon;
     bool domain360 = true;
     if(map.HasKeyword("LongitudeDomain")) {
-      iString lonDomain = (string) map["LongitudeDomain"];
+      IString lonDomain = (string) map["LongitudeDomain"];
       if(lonDomain.UpCase() == "180") {
         minlon = p_minlon180;
         maxlon = p_maxlon180;
@@ -730,7 +730,7 @@ namespace Isis {
 
     // Convert to the proper longitude direction
     if(map.HasKeyword("LongitudeDirection")) {
-      iString lonDirection = (string) map["LongitudeDirection"];
+      IString lonDirection = (string) map["LongitudeDirection"];
       if(lonDirection.UpCase() == "POSITIVEWEST") {
         double swap = minlon;
         minlon = -maxlon;
@@ -793,14 +793,14 @@ namespace Isis {
   //! Reads the focal length from the instrument kernel
   void Camera::SetFocalLength() {
     int code = naifIkCode();
-    string key = "INS" + iString(code) + "_FOCAL_LENGTH";
+    string key = "INS" + IString(code) + "_FOCAL_LENGTH";
     SetFocalLength(Spice::getDouble(key));
   }
 
   //! Reads the Pixel Pitch from the instrument kernel
   void Camera::SetPixelPitch() {
     int code = naifIkCode();
-    string key = "INS" + iString(code) + "_PIXEL_PITCH";
+    string key = "INS" + IString(code) + "_PIXEL_PITCH";
     SetPixelPitch(Spice::getDouble(key));
   }
 
@@ -1085,7 +1085,7 @@ namespace Isis {
   bool Camera::RaDecRange(double &minra, double &maxra,
                           double &mindec, double &maxdec) {
     if(p_projection != NULL && !p_projection->IsSky()) {
-      iString msg = "Camera::RaDecRange can not calculate a right ascension, declination range";
+      IString msg = "Camera::RaDecRange can not calculate a right ascension, declination range";
       msg += " for projected images which are not projected to sky";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1230,7 +1230,7 @@ namespace Isis {
    */
   double Camera::RaDecResolution() {
     if(p_projection != NULL && !p_projection->IsSky()) {
-      iString msg = "Camera::RaDecResolution can not calculate a right ascension, declination resolution";
+      IString msg = "Camera::RaDecResolution can not calculate a right ascension, declination resolution";
       msg += " for projected images which are not projected to sky";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1802,12 +1802,12 @@ namespace Isis {
     }
 
     if(endSize > startSize) {
-      iString message = "Camera::SetGeometricTilingHint End size must be smaller than the start size";
+      IString message = "Camera::SetGeometricTilingHint End size must be smaller than the start size";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     if(startSize < 4) {
-      iString message = "Camera::SetGeometricTilingHint Start size must be at least 4";
+      IString message = "Camera::SetGeometricTilingHint Start size must be at least 4";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
@@ -1820,12 +1820,12 @@ namespace Isis {
     // Didnt find a solution, the integer became negative first, must not be
     //   a power of 2
     if(powerOf2 < 0) {
-      iString message = "Camera::SetGeometricTilingHint Start size must be a power of 2";
+      IString message = "Camera::SetGeometricTilingHint Start size must be a power of 2";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     if(!foundEnd) {
-      iString message = "Camera::SetGeometricTilingHint End size must be a power of 2 less than the start size, but greater than 2";
+      IString message = "Camera::SetGeometricTilingHint End size must be a power of 2 less than the start size, but greater than 2";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 

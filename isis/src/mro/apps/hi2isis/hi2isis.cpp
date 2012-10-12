@@ -64,7 +64,7 @@ void IsisMain() {
 
   // Get the input filename and make sure it is a HiRISE EDR
   FileName inFile = ui.GetFileName("FROM");
-  iString id;
+  IString id;
   bool projected;
   try {
     Pvl lab(inFile.expanded());
@@ -234,7 +234,7 @@ void TranslateHiriseEdrLabels(FileName &labelFile, Cube *ocube) {
 
   // Get the directory where the MRO HiRISE translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  iString transDir = (string) dataDir["Mro"] + "/translations/";
+  IString transDir = (string) dataDir["Mro"] + "/translations/";
 
   // Get a filename for the HiRISE EDR label
   Pvl labelPvl(labelFile.expanded());
@@ -257,7 +257,7 @@ void TranslateHiriseEdrLabels(FileName &labelFile, Cube *ocube) {
   // Create the Instrument group keyword CcdId from the ProductId
   // SCS 28-03-06 Do it in the instrument translation table instead of here
 //  PvlGroup &archiveGroup(outLabel.FindGroup("Archive", Pvl::Traverse));
-//  iString productId = (string)archiveGroup.FindKeyword("ProductId");
+//  IString productId = (string)archiveGroup.FindKeyword("ProductId");
 //  productId.Token("_");
 //  productId.Token("_");
 //  productId = productId.Token("_");

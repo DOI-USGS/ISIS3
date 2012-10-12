@@ -2,7 +2,7 @@
 
 #include "Cube.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "OriginalLabel.h"
 #include "PixelType.h"
@@ -91,47 +91,47 @@ void UpdateLabels(Cube *cube, const string &labels) {
   key = "FDS=";
   keyPosition = labels.find(key);
   consumeChars = labels.find("IM-1") - keyPosition - key.length();
-  iString fds(labels.substr(keyPosition + key.length(), consumeChars));
+  IString fds(labels.substr(keyPosition + key.length(), consumeChars));
   fds.Trim(" ");
 
   // Year the image was taken
   key = "YR=";
   keyPosition = labels.find(key);
   consumeChars = labels.find("DAY") - keyPosition - key.length();
-  iString yr(labels.substr(keyPosition + key.length(), consumeChars));
+  IString yr(labels.substr(keyPosition + key.length(), consumeChars));
   yr.Trim(" ");
 
   // Day the image was taken
   key = "DAY=";
   keyPosition = labels.find(key);
   consumeChars = labels.find("GMT") - keyPosition - key.length();
-  iString day(labels.substr(keyPosition + key.length(), consumeChars));
+  IString day(labels.substr(keyPosition + key.length(), consumeChars));
   day.Trim(" ");
 
   // Greenwich Mean Time
   key = "GMT=";
   keyPosition = labels.find(key);
   consumeChars = labels.find("CCAMERA") - keyPosition - key.length();
-  iString gmt(labels.substr(keyPosition + key.length(), consumeChars));
+  IString gmt(labels.substr(keyPosition + key.length(), consumeChars));
   gmt.Trim(" ");
 
   // Which of the two cameras took the image
   key = "CCAMERA=";
   keyPosition = labels.find(key);
   consumeChars = labels.find("FILTER") - keyPosition - key.length();
-  iString ccamera(labels.substr(keyPosition + key.length(), consumeChars));
+  IString ccamera(labels.substr(keyPosition + key.length(), consumeChars));
   ccamera.Trim(" ");
 
   // Filter number
   key = "FILTER=";
   keyPosition = labels.find(key);
   consumeChars = labels.find("(") - keyPosition - key.length();
-  iString filterNum(labels.substr(keyPosition + key.length(), consumeChars));
+  IString filterNum(labels.substr(keyPosition + key.length(), consumeChars));
   filterNum.Trim(" ");
 
   // Filter name
   consumeChars = labels.find(")") - keyPosition - key.length() - consumeChars;
-  iString filterName(labels.substr(labels.find("(") + 1, consumeChars));
+  IString filterName(labels.substr(labels.find("(") + 1, consumeChars));
   filterName.Trim(" ");
 
   // Center wavelength
@@ -164,7 +164,7 @@ void UpdateLabels(Cube *cube, const string &labels) {
   key = "EXPOSURE=";
   keyPosition = labels.find(key);
   consumeChars = labels.find("MSEC") - keyPosition - key.length();
-  iString exposure(labels.substr(keyPosition + key.length(), consumeChars));
+  IString exposure(labels.substr(keyPosition + key.length(), consumeChars));
   exposure.Trim(" ");
 
   // Create the instrument group
@@ -174,10 +174,10 @@ void UpdateLabels(Cube *cube, const string &labels) {
 
   // Get the date
   int days = day.ToInteger();
-  iString date = DaysToDate(days);
+  IString date = DaysToDate(days);
 
   // Get the time
-  iString time = gmt;
+  IString time = gmt;
   time = time.Replace("/", ":");
 
   // Construct the Start Time in yyyy-mm-ddThh:mm:ss format
@@ -189,19 +189,19 @@ void UpdateLabels(Cube *cube, const string &labels) {
 
   int year = yr.ToInteger();
   year += 1900;
-  string fullGMT = iString(year) + ":" + day + ":" + time;
+  string fullGMT = IString(year) + ":" + day + ":" + time;
   archive += PvlKeyword("GMT", fullGMT);
   archive += PvlKeyword("ImageNumber", fds);
 
   // Create the band bin group
   PvlGroup bandBin("BandBin");
-  iString filter = filterName;
+  IString filter = filterName;
   filter = filter.Replace(")", "");
   bandBin += PvlKeyword("FilterName", filter);
-  iString number = filterNum;
+  IString number = filterNum;
   bandBin += PvlKeyword("FilterNumber", number);
   bandBin += PvlKeyword("OriginalBand", "1");
-  iString center = filterCenter;
+  IString center = filterCenter;
   bandBin += PvlKeyword("Center", center);
   bandBin.FindKeyword("Center").SetUnits("micrometers");
 
@@ -264,7 +264,7 @@ void UpdateLabels(Cube *cube, const string &labels) {
 
   // Camera dependent information
   string camera = "";
-  if(iString("M10_VIDICON_A") == inst["InstrumentId"][0]) {
+  if(IString("M10_VIDICON_A") == inst["InstrumentId"][0]) {
     templ = "$mariner10/reseaus/mar10a.template.cub";
     naif += "-76110";
     camera = "M10_VIDICON_A_RESEAUS";
@@ -326,7 +326,7 @@ void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
 
   // Transfer the instrument group to the output cube
-  iString transDir = (string) dataDir["Mariner10"] + "/translations/";
+  IString transDir = (string) dataDir["Mariner10"] + "/translations/";
   Pvl inputLabel(labelFile.expanded());
   FileName transFile;
 
@@ -344,7 +344,7 @@ void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
   instrumentId.SetValue("M10_VIDICON_" + instrumentId[0]);
 
   PvlKeyword &targetName = inst.FindKeyword("TargetName");
-  iString targetTail(targetName[0].substr(1));
+  IString targetTail(targetName[0].substr(1));
   targetTail = targetTail.DownCase();
   targetName.SetValue(targetName[0].at(0) + targetTail);
 
@@ -353,7 +353,7 @@ void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
 
   PvlGroup &archive = outputLabel->FindGroup("Archive", Pvl::Traverse);
   PvlKeyword &imgNo = archive.FindKeyword("ImageNumber");
-  iString ino = imgNo[0];
+  IString ino = imgNo[0];
   ino.Trim(" ");
   imgNo.SetValue(ino);
 
@@ -395,7 +395,7 @@ void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
 
   // Camera dependent information
   string camera = "";
-  if(iString("M10_VIDICON_A") == inst["InstrumentId"][0]) {
+  if(IString("M10_VIDICON_A") == inst["InstrumentId"][0]) {
     templ = "$mariner10/reseaus/mar10a.template.cub";
     kernels.FindKeyword("NaifFrameCode").SetValue("-76110");
     camera = "M10_VIDICON_A_RESEAUS";
@@ -477,8 +477,8 @@ string DaysToDate(int days) {
     }
     days--;
   }
-  iString year = currentYear;
-  iString month = (currentMonth < 10) ? "0" + iString(currentMonth) : iString(currentMonth);
-  iString day = (currentDay < 10) ? "0" + iString(currentDay) : iString(currentDay);
+  IString year = currentYear;
+  IString month = (currentMonth < 10) ? "0" + IString(currentMonth) : IString(currentMonth);
+  IString day = (currentDay < 10) ? "0" + IString(currentDay) : IString(currentDay);
   return year + "-" + month + "-" + day;
 }

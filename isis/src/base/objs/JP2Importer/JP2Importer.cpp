@@ -231,7 +231,7 @@ namespace Isis {
         break;
       default:
         throw IException(IException::Programmer,
-            "Unknown pixel type [" + iString(m_pixelType) + "]",
+            "Unknown pixel type [" + IString(m_pixelType) + "]",
             _FILEINFO_);
     }
 

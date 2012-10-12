@@ -96,7 +96,7 @@ int main() {
                                  proj->UniversalLatitude())));
         }
         else {
-          iString msg = "Unable to convert to a (lon,lat)";
+          IString msg = "Unable to convert to a (lon,lat)";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }

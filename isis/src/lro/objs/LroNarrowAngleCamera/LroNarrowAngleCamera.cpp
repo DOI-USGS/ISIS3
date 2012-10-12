@@ -23,7 +23,7 @@
 
 #include "CameraFocalPlaneMap.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "LineScanCameraDetectorMap.h"
 #include "LineScanCameraGroundMap.h"
@@ -52,21 +52,21 @@ namespace Isis {
            additiveLineTimeError = 0.0,
            multiplicativeLineTimeError = 0.0;
 
-    iString ikernKey = "INS" + iString((int)naifIkCode()) + "_CONSTANT_TIME_OFFSET";
+    IString ikernKey = "INS" + IString((int)naifIkCode()) + "_CONSTANT_TIME_OFFSET";
     constantTimeOffset = getDouble(ikernKey);
 
-    ikernKey = "INS" + iString((int)naifIkCode()) + "_ADDITIONAL_PREROLL";
+    ikernKey = "INS" + IString((int)naifIkCode()) + "_ADDITIONAL_PREROLL";
     additionalPreroll = getDouble(ikernKey);
 
-    ikernKey = "INS" + iString((int)naifIkCode()) + "_ADDITIVE_LINE_ERROR";
+    ikernKey = "INS" + IString((int)naifIkCode()) + "_ADDITIVE_LINE_ERROR";
     additiveLineTimeError = getDouble(ikernKey);
 
-    ikernKey = "INS" + iString((int)naifIkCode()) + "_MULTIPLI_LINE_ERROR";
+    ikernKey = "INS" + IString((int)naifIkCode()) + "_MULTIPLI_LINE_ERROR";
     multiplicativeLineTimeError = getDouble(ikernKey);
 
     // Get the start time from labels
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
-    iString stime = (string)inst["SpacecraftClockPrerollCount"];
+    IString stime = (string)inst["SpacecraftClockPrerollCount"];
     SpiceDouble etStart;
 
     if(stime != "NULL") {
@@ -98,10 +98,10 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     //  Retrieve boresight location from instrument kernel (IK) (addendum?)
-    ikernKey = "INS" + iString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
+    ikernKey = "INS" + IString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
     double sampleBoreSight = getDouble(ikernKey);
 
-    ikernKey = "INS" + iString((int)naifIkCode()) + "_BORESIGHT_LINE";
+    ikernKey = "INS" + IString((int)naifIkCode()) + "_BORESIGHT_LINE";
     double lineBoreSight = getDouble(ikernKey);
 
     focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight);

@@ -115,7 +115,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2007-06-05 Brendan George - Modified to work with
-   *                           iString/StringTool merge
+   *                           IString/StringTool merge
    */
   class DbAccess : public DbProfile {
     private:

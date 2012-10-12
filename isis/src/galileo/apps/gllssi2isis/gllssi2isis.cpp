@@ -123,7 +123,7 @@ void TranslateLabels(Pvl &pdsLabel, Cube *ocube) {
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
 
   // Transfer the instrument group to the output cube
-  iString transDir = (string) dataDir["Galileo"];
+  IString transDir = (string) dataDir["Galileo"];
   FileName transFile(transDir + "/translations/galileoSsi.trn");
 
   // Get the translation manager ready
@@ -141,7 +141,7 @@ void TranslateLabels(Pvl &pdsLabel, Cube *ocube) {
   arch.AddKeyword(PvlKeyword("CalTargetCode", CTCout));
 
   // Add to the Instrument Group
-  iString itest = (string) inst.FindKeyword("StartTime");
+  IString itest = (string) inst.FindKeyword("StartTime");
   itest.Remove("Z");
   inst.FindKeyword("StartTime").SetValue(itest);
   //change exposure duration to seconds

@@ -5,7 +5,7 @@
 #include <sstream>
 
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include "Table.h"
 
 using namespace Isis;
@@ -51,7 +51,7 @@ void IsisMain() {
         j += table[0][i].bytes();
       }
       else if (table[0][i].size() > 1) {
-        title += "(" + iString(j) + ")";
+        title += "(" + IString(j) + ")";
       }
       if (i == table[0].Fields() - 1 && j == table[0][i].size() - 1) {
         // We've reached the last field, omit the delimiter
@@ -73,10 +73,10 @@ void IsisMain() {
       // cast and output accordingly
       if (table[i][j].size() == 1) {
         if (table[i][j].isInteger()) {
-          ss << iString((int)table[i][j]);
+          ss << IString((int)table[i][j]);
         }
         else if (table[i][j].isDouble()) {
-          ss << iString((double)table[i][j]);
+          ss << IString((double)table[i][j]);
         }
         else if (table[i][j].isText()) {
           ss << (string)table[i][j];

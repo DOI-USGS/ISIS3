@@ -29,7 +29,7 @@ void IsisMain() {
   bool even = true;
   PvlGroup &arch = p.FindGroup("Archive", Pvl::Traverse);
   string id = (string)arch["ProductId"];
-  int num = iString(id.substr(5, 1)).ToInteger();
+  int num = IString(id.substr(5, 1)).ToInteger();
   if(num == 1 || num == 3 || num == 5 || num == 7 || num == 9) even = false;
 
   // Run a standard deviation filter on the cube
@@ -59,8 +59,8 @@ void IsisMain() {
   pipeline.Application("mask").SetInputParameter("FROM", false);
   pipeline.Application("mask").SetOutputParameter("TO", "step3");
 
-  iString maskParameter = "$ISIS3DATA/viking" + iString(spn) +
-    "/calibration/vik" + iString(spn);
+  IString maskParameter = "$ISIS3DATA/viking" + IString(spn) +
+    "/calibration/vik" + IString(spn);
   if(even) maskParameter += "evenMask.cub";
   else maskParameter += "oddMask.cub";
   pipeline.Application("mask").AddConstParameter("mask", maskParameter);

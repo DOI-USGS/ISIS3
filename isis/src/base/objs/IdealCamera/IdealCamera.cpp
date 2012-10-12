@@ -30,7 +30,7 @@
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "LineScanCameraDetectorMap.h"
 #include "LineScanCameraGroundMap.h"
@@ -202,7 +202,7 @@ namespace Isis {
     }
 
     // Create correct camera type
-    iString type = (string) inst["InstrumentType"];
+    IString type = (string) inst["InstrumentType"];
     if (type.UpCase() == "FRAMING") {
       p_framing = true;
       new CameraDetectorMap(this);

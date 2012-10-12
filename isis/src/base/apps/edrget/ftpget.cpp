@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "ftpget.h"
-#include "iString.h"
+#include "IString.h"
 #include "IException.h"
 #include "Progress.h"
 #include  "Application.h"
@@ -75,7 +75,7 @@ namespace Isis {
   void FtpGet::ftpDone(bool error) {
     if(error) {
       p_error = true;
-      iString msg = p_ftp.errorString().toStdString();
+      IString msg = p_ftp.errorString().toStdString();
       msg.Remove("\n");
 //       iException::Message(iException::User, msg, _FILEINFO_);
     }

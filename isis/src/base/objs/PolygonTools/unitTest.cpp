@@ -155,7 +155,7 @@ int main() {
 
     cout << "GML Thickness:" << endl;
     double th = PolygonTools::Thickness(mPolygon);
-    cout << iString(th) << endl;
+    cout << IString(th) << endl;
 
     cout << endl << endl;
 

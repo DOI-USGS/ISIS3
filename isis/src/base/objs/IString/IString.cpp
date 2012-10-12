@@ -28,75 +28,370 @@
 #include <cmath>
 #include <algorithm>
 #include <iomanip>
-#include "iString.h"
+#include "IString.h"
 #include "IException.h"
 #include "SpecialPixel.h"
 
 using namespace std;
 namespace Isis {
+  /**
+   * Convert from a string to a boolean. Known string values include anything that remotely looks
+   *   like a true or false.
+   *
+   * @return The boolean equivalent to the string
+   */
+  bool toBool(const QString &string) {
+    QStringList trues;
+    trues.append("true");
+    trues.append("yes");
+    trues.append("y");
+    trues.append("on");
+    trues.append("1");
+
+    QStringList falses;
+    falses.append("false");
+    falses.append("no");
+    falses.append("n");
+    falses.append("off");
+    falses.append("0");
+
+    bool result = true;
+    bool foundMatch = false;
+
+    QListIterator<QString> truesIterator(trues);
+    while (!foundMatch && truesIterator.hasNext()) {
+      foundMatch = (string.compare(truesIterator.next(), Qt::CaseInsensitive) == 0);
+    }
+
+    if (!foundMatch) {
+      result = false;
+
+      QListIterator<QString> falsesIterator(falses);
+      while (!foundMatch && falsesIterator.hasNext()) {
+        foundMatch = (string.compare(falsesIterator.next(), Qt::CaseInsensitive) == 0);
+      }
+    }
+
+    if (!foundMatch) {
+      qSort(trues);
+      qSort(falses);
+      IString message = QObject::tr("Failed to convert string [%1] to a boolean. "
+          "Please specify one of [%2] for true, or one of [%3] for false.")
+            .arg(string).arg(trues.join(", ")).arg(falses.join(", "));
+      throw IException(IException::Unknown, message, _FILEINFO_);
+    }
+
+    return result;
+  }
+
 
   /**
-   * Constructs an empty iString object
+   * Convert from a string to an integer.
+   *
+   * @return The integer equivalent to the string
    */
-  iString::iString() : string() {
+  int toInt(const QString &string) {
+    bool ok = true;
+
+    int result = string.toInt(&ok);
+
+    if (!ok) {
+      IString message = QObject::tr("Failed to convert string [%1] to an integer").arg(string);
+      throw IException(IException::Unknown, message, _FILEINFO_);
+    }
+
+    return result;
+  }
+
+
+  /**
+   * Convert from a string to a "big" integer.
+   *
+   * @return The BigInt equivalent to the string
+   */
+  BigInt toBigInt(const QString &string) {
+    BigInt result;
+
+    try {
+      std::stringstream s;
+      s << string.toStdString();            // Put the string into a stream
+      s.seekg(0, std::ios::beg);     // Move the input pointer to the beginning
+      s >> result;               // read/get "type T" out of the stream
+      std::ios::iostate state = s.rdstate();
+      if((state & std::ios::failbit) || (state & std::ios::badbit) ||
+          (!(state & std::ios::eofbit))) {  // Make sure the stream is empty
+        throw (int)-1;
+      }
+    }
+    catch(...) {
+      IString message = QObject::tr("Failed to convert string [%1] to a big integer").arg(string);
+      throw IException(IException::Unknown, message, _FILEINFO_);
+    }
+
+    return result;
+  }
+
+
+  /**
+   * Convert from a string to a double.
+   *
+   * @return The double equivalent to the string
+   */
+  double toDouble(const QString &string) {
+    bool ok = true;
+
+    double result = string.toDouble(&ok);
+
+    if (!ok) {
+      IString message = QObject::tr("Failed to convert string [%1] to a double").arg(string);
+      throw IException(IException::Unknown, message, _FILEINFO_);
+    }
+
+    return result;
+  }
+
+
+  /**
+   * Convert a boolean to a string. The resulting string will be "Yes" (true) or "No" (false).
+   */
+  QString toString(bool boolToConvert) {
+    return boolToConvert? "Yes" : "No";
+  }
+
+
+  /**
+   * Convert a character to a string. The resulting string will be a string with length 1 which
+   *   contains only the given ASCII character.
+   */
+  QString toString(char charToConvert) {
+    QString result;
+    result += QChar(charToConvert);
+    return result;
+  }
+
+
+  /**
+   * Convert an integer to a string.
+   */
+  QString toString(const int &num) {
+    return QString::number(num);
+  }
+
+
+  /**
+   * Convert a big integer to a string.
+   */
+  QString toString(const BigInt &num) {
+    return QString::number(num);
+  }
+
+
+  /**
+   * Convert a double to a string with the given precision (significant figures).
+   *
+   * The conversion is handled in the following manner:
+   *   If (log10(num) < -3.0) it is presented in scientific notation
+   *   If (log10(num) > 13.0) it is presented in scientific notation
+   *   If (log10(num) >= -3 && log10(num) <= 13) it is presented in normal notation
+   *   Trailing zeros are removed such that 5.000 is presented as 5.0
+   */
+  QString toString(double num, int precision) {
+    // If number is zero, then it is not valid to do a log10 on it. To avoid this,
+    // check for zero ahead of time and handle it.
+    QString result;
+
+    if(num == 0.0) {
+      result = "0.0";
+    }
+    else if(isnan(num)) {
+      result = "nan";
+    }
+
+    if(num > DBL_MAX) {
+      num = DBL_MAX;
+    }
+
+    if(num < -DBL_MAX) {
+      num = -DBL_MAX;
+    }
+
+    if (result == "") {
+      // First determine the number of digits preceding the decimal point
+      // Numbers of the form 0.ABCDEFG where A is non-zero are assumed to
+      // have a leading digit of zero.  Numbers of the form 0.0ABCDEFG,
+      // 0.00ABCEFEG and so on are not considered to have a leading digit
+      // (pre = 0).
+      double temp = qAbs(num);
+      int pre = (int)(log10(temp)) + 1;
+
+      // If preceding number of digits is too large then we will need to create a
+      // scientific notation string.  We will need 14 spaces for numbers, 2 spaces
+      // for exponents, 2 spaces for signs, and 1 for the letter E, 1 for a decimal
+      // place, and 1 extra in case of a leading 0.  A grand total
+      // of 21 spaces is required.  Therefore our format can be %22e
+
+      // If the preceding number of digits is zero then we likely have a
+      // really small number (e.g., 0.000331236236). So let's put those in
+      // scientific notation as well
+
+      // Finally, remove any zeroes before the E and if the exponent is zero
+      // then strip it off as well.
+
+      char doubleString[23];
+
+      if((log10(temp) > 13.0) || (log10(temp) < -3.0)) {
+        char format[8], buffer[8];
+        snprintf(buffer, 8, "%de", precision);
+        strcpy(format, "%21.");
+        strcat(format, buffer);
+        snprintf(doubleString, 23, format, num);
+
+        char *e = strchr(doubleString, 'e');
+        char *sptr = e - 1;
+
+        while(*sptr == '0') {
+          sptr--;
+        }
+
+        if(*sptr == '.') {
+          sptr++;
+        }
+
+        sptr++;
+        char tmp[22];
+        strcpy(tmp, e);
+        strcpy(sptr, tmp);
+
+        e = strchr(doubleString, 'e');
+        int allzero = 1;
+
+        for(sptr = e + 2; *sptr; sptr++) {
+          if(*sptr != '0') {
+            allzero = 0;
+          }
+        }
+
+        if(allzero) {
+          *e = 0;
+        }
+      }
+      else {
+        // Ok it can be presented as a normal floating point num.  So we will need
+        // 14 spaces for nums, 1 for the sign, 1 for the decimal, and 1 more
+        // for a possible leading 0.  A grand total of 17 spaces.  Therefore our
+        // format can be "%17.postf".  Finally remove any trailing zeroes.
+
+        if(temp < 1.0) {
+          pre--;
+        }
+        int post = precision - pre;
+
+        char tempStr[3], format[8];
+        strcpy(format, "%17.");
+        snprintf(tempStr, 3, "%d", post);
+        strcat(format, tempStr);
+        strcat(format, "f");
+
+        snprintf(doubleString, 23, format, num);
+
+        if(post > 0) {
+          char *sptr = doubleString + strlen(doubleString) - 1;
+          while((*sptr == '0') && (*(sptr - 1) != '.')) {
+            *sptr = 0;
+            sptr--;
+          }
+        }
+      }
+
+      while(doubleString[0] == ' ') {
+        for(unsigned int i = 0; i < strlen(doubleString); i++) {
+          doubleString[i] = doubleString[i + 1];
+        }
+      }
+
+      result = QString(doubleString);
+    }
+
+    return result;
+  }
+
+
+  /**
+   * Constructs an empty IString object
+   *
+   * @deprecated
+   */
+  IString::IString() : string() {
   }
 
   /**
-   * Constructs a iString object with initial value set to the string
+   * Constructs a IString object with initial value set to the string
    * argument.
    *
-   * @param str The initial value of the iString
-   */
-  iString::iString(const std::string &str) : string(str) {
-  }
-
-  /**
-   * Constructs a iString with initial value set to the iString argument.
+   * @deprecated
    *
-   * @param str The initial value of the iString
+   * @param str The initial value of the IString
    */
-  iString::iString(const iString &str) : string(str) {
+  IString::IString(const std::string &str) : string(str) {
   }
 
   /**
-   * Constructs a iString with initial value set to the argument
+   * Constructs a IString with initial value set to the IString argument.
    *
-   * @param str The inital value of the iString
+   * @deprecated
+   *
+   * @param str The initial value of the IString
    */
-  iString::iString(const char *str) : string(str) {
+  IString::IString(const IString &str) : string(str) {
   }
 
   /**
-   * Constructs a iString object with its initial value set to the string
+   * Constructs a IString with initial value set to the argument
+   *
+   * @deprecated
+   *
+   * @param str The inital value of the IString
+   */
+  IString::IString(const char *str) : string(str) {
+  }
+
+  /**
+   * Constructs a IString object with its initial value set to the string
    * representation of the int argument.
    *
-   * @param num The initial value of the iString. The integer value is
+   * @deprecated
+   *
+   * @param num The initial value of the IString. The integer value is
    *            converted to a string representation and stored as the value.
    */
-  iString::iString(const int &num) : string() {
+  IString::IString(const int &num) : string() {
     ostringstream str;
     str << num;
     assign(str.str());
   }
 
   /**
-   * Constructs a iString object with its initial value set to the string
+   * Constructs a IString object with its initial value set to the string
    * representation of the BigInt argument.
    *
-   * @param num The initial value of the iString. The integer value is
+   * @deprecated
+   *
+   * @param num The initial value of the IString. The integer value is
    *            converted to a string representation and stored as the value.
    */
-  iString::iString(const BigInt &num) : string() {
+  IString::IString(const BigInt &num) : string() {
     ostringstream str;
     str << num;
     assign(str.str());
   }
 
   /**
-   * Constructs a iString object with its initial value set to the string
+   * Constructs a IString object with its initial value set to the string
    * representation of the double argument.
    *
-   * @param num The initial value of the iString. The double value is converted to
+   * @deprecated
+   *
+   * @param num The initial value of the IString. The double value is converted to
    *            a string representation and stored as the value. The conversion
    *            is handled in the following manner: If (abs(num) < 0.1) it is
    *            presented in scientific notation If (abs(log10(num)) < 16) it is
@@ -104,152 +399,51 @@ namespace Isis {
    *            presented in scientific notation Trailing zeros are removed such
    *            that 5.000 is presented as 5.0
    */
-  iString::iString(const double &num, const int piPrecision) : string() {
+  IString::IString(const double &num, const int piPrecision) : string() {
     SetDouble(num, piPrecision);
   }
 
 
   /**
    * Performs the conversion necessary to represent a floating-point value as a
-   * string. See iString (const double &num) for details
+   * string. See IString (const double &num) for details
+   *
+   * @deprecated
    *
    * @param num The input value to be stored
    */
-  void iString::SetDouble(const double &num, const int piPrecision) {
-    // This is the original code and was replaced by the good stuff below
-    //  ostringstream str;
-    //  str << num;
-    //  assign (str.str());
-
-    // If num is zero, then it is not valid to do a log10 on it. To avoid this,
-    // check for zero ahead of time and handle it.
-    if(num == 0.0) {
-      assign("0.0");
-      return;
-    }
-
-    if(num > DBL_MAX) {
-      SetDouble(DBL_MAX, piPrecision);
-      return;
-    }
-
-    if(num < -DBL_MAX) {
-      SetDouble(-DBL_MAX, piPrecision);
-      return;
-    }
-
-    if(isnan(num)) {
-      assign("nan");
-      return;
-    }
-
-    // First determine the number of digits preceding the decimal point
-    // Numbers of the form 0.ABCDEFG where A is non-zero are assumed to
-    // have a leading digit of zero.  Numbers of the form 0.0ABCDEFG,
-    // 0.00ABCEFEG and so on are not considered to have a leading digit
-    // (pre = 0).
-
-    //cout << "istring\n";
-    //printf("%.15f\n",num);
-
-    double temp = abs(num);
-    int pre = (int)(log10(temp)) + 1;
-
-    //printf("%.15f\n",temp);
-    //cout << "tempI " << iString(temp) << endl;
-
-    // If preceding number of digits is too large then we will need to create a
-    // scientific notation string.  We will need 14 spaces for numbers, 2 spaces
-    // for exponents, 2 spaces for signs, and 1 for the letter E, 1 for a decimal
-    // place, and 1 extra in case of a leading 0.  A grand total
-    // of 21 spaces is required.  Therefore our format can be %22e
-
-    // If the preceding number of digits is zero then we likely have a
-    // really small number (e.g., 0.000331236236). So let's put those in
-    // scientific notation as well
-
-    // Finally, remove any zeroes before the E and if the exponent is zero
-    // then strip it off as well.
-
-    char dblstr[23];
-
-    if((log10(temp) > 13.0) || (log10(temp) < -3.0)) {
-      char fmt[8], buff[8];
-      sprintf(buff, "%de", piPrecision);
-      strcpy(fmt, "%21.");
-      strcat(fmt, buff);
-      sprintf(dblstr, fmt, num);
-
-      char *e = strchr(dblstr, 'e');
-      char *sptr = e - 1;
-
-      while(*sptr == '0') sptr--;
-      if(*sptr == '.') sptr++;
-      sptr++;
-      char tmp[22];
-      strcpy(tmp, e);
-      strcpy(sptr, tmp);
-
-      e = strchr(dblstr, 'e');
-      int allzero = 1;
-      for(sptr = e + 2; *sptr; sptr++) if(*sptr != '0') allzero = 0;
-
-      if(allzero) *e = 0;
-    }
-
-    // Ok it can be presented as a normal floating point number.  So we will need
-    // 14 spaces for numbers, 1 for the sign, 1 for the decimal, and 1 more
-    // for a possible leading 0.  A grand total of 17 spaces.  Therefore our
-    // format can be "%17.postf".  Finally remove any trailing zeroes.
-
-    else {
-      if(temp < 1.0) pre--;
-      int post = piPrecision - pre;
-
-      char tempstr[3], fmt[8];
-      strcpy(fmt, "%17.");
-      sprintf(tempstr, "%d", post);
-      strcat(fmt, tempstr);
-      strcat(fmt, "f");
-
-      sprintf(dblstr, fmt, num);
-
-      if(post > 0) {
-        char *sptr = dblstr + strlen(dblstr) - 1;
-        while((*sptr == '0') && (*(sptr - 1) != '.')) *sptr-- = 0;
-      }
-    }
-
-    while(dblstr[0] == ' ') {
-      for(unsigned int i = 0; i < strlen(dblstr); i++) {
-        dblstr[i] = dblstr[i+1];
-      }
-    }
-    assign(dblstr);
+  void IString::SetDouble(const double &num, const int piPrecision) {
+    *this = toString(num, piPrecision).toStdString();
   }
 
   /**
-   * Constructs a iString object with initial value set to the input QString
+   * Constructs a IString object with initial value set to the input QString
+   *
+   * @deprecated
    * @param str
    */
-  iString::iString(const QString &str) : string() {
+  IString::IString(const QString &str) : string() {
     assign(str.toStdString());
   }
 
   /**
    * Destructor
+   *
+   * @deprecated
    */
-  iString::~iString() {}
+  IString::~IString() {}
 
   /**
-   * Removes characters from the beginning and end of the iString. The order
+   * Removes characters from the beginning and end of the IString. The order
    * of the characters makes no difference.
+   *
+   * @deprecated
    *
    * @param chars The string of characters to be trimmed
    *
-   * @return iString
+   * @return IString
    */
-  iString iString::Trim(const std::string &chars) {
+  IString IString::Trim(const std::string &chars) {
     TrimHead(chars);
     TrimTail(chars);
     return *this;
@@ -259,6 +453,8 @@ namespace Isis {
    * Removes all occurences of the input characters from the beginning and
    * end of the input string
    *
+   * @deprecated
+   *
    * @param chars The string of characters to be removed. Order makes no
    * difference
    *
@@ -266,19 +462,21 @@ namespace Isis {
    *
    * @return string The result of the trimming operation
    */
-  std::string iString::Trim(const std::string &chars, const std::string &str) {
+  std::string IString::Trim(const std::string &chars, const std::string &str) {
     //string result = str;
     //result.replace (0,str.find_first_not_of (chars), "");
     return TrimTail(chars, TrimHead(chars, str));
   }
 
   /**
-   * Trims The input characters from the beginning of the object iString
+   * Trims The input characters from the beginning of the object IString
+   *
+   * @deprecated
    *
    * @param chars The string of characters to be trimmed. Order makes no
    *              difference
    */
-  iString iString::TrimHead(const std::string &chars) {
+  IString IString::TrimHead(const std::string &chars) {
     *this = replace(0, find_first_not_of(chars), "");
     return *this;
   }
@@ -286,30 +484,36 @@ namespace Isis {
   /**
    * Trims the input characters from the beginning of the input string
    *
+   * @deprecated
+   *
    * @param chars The input characters to be removed. Order makes no difference
    * @param str The string to be trimmed
    *
    * @return string The resulting string
    */
-  std::string iString::TrimHead(const std::string &chars, const std::string &str) {
+  std::string IString::TrimHead(const std::string &chars, const std::string &str) {
     string result = str;
     result.replace(0, str.find_first_not_of(chars), "");
     return result;
   }
 
   /**
-   * Trims the input characters from the end of the object iString
+   * Trims the input characters from the end of the object IString
+   *
+   * @deprecated
    *
    * @param chars The string of characters to be removed. Order is irrelevant
    *
    */
-  iString iString::TrimTail(const std::string &chars) {
+  IString IString::TrimTail(const std::string &chars) {
     *this = erase(find_last_not_of(chars) + 1);
     return *this;
   }
 
   /**
    * Trims the input characters from the end of the input string
+   *
+   * @deprecated
    *
    * @param chars The characters to be removed from the input string. Order does
    *              not matter, all characters are treated individually.
@@ -318,18 +522,20 @@ namespace Isis {
    *
    * @return string The result of the trimming
    */
-  std::string iString::TrimTail(const std::string &chars, const std::string &str) {
+  std::string IString::TrimTail(const std::string &chars, const std::string &str) {
     string result = str;
     result.erase(str.find_last_not_of(chars) + 1);
     return result;
   }
 
   /**
-   * Converst any lower case characters in the object iString with uppercase
+   * Converst any lower case characters in the object IString with uppercase
    * characters
    *
+   * @deprecated
+   *
    */
-  iString iString::UpCase() {
+  IString IString::UpCase() {
     string temp = *this;
     *this = UpCase(temp);
     return *this;
@@ -338,22 +544,25 @@ namespace Isis {
   /**
    * Converts lower case characters in the input string to upper case characters
    *
+   * @deprecated
+   *
    * @param str The string to be converted
    *
    * @return string The result of the conversion
    */
-  std::string iString::UpCase(const std::string &str) {
+  std::string IString::UpCase(const std::string &str) {
     string sOut(str);
     transform(str.begin(), str.end(), sOut.begin(), (int ( *)(int)) toupper);
     return(sOut);
   }
 
   /**
-   * Converts all upper case letters in the object iString into lower case
+   * Converts all upper case letters in the object IString into lower case
    * characters
    *
+   * @deprecated
    */
-  iString iString::DownCase() {
+  IString IString::DownCase() {
     *this = DownCase((string) * this);
     return *this;
   }
@@ -362,11 +571,13 @@ namespace Isis {
    * Converts all upper case letters in the input string into lower case
    * characters
    *
+   * @deprecated
+   *
    * @param str
    *
    * @return string
    */
-  std::string iString::DownCase(const std::string &str) {
+  std::string IString::DownCase(const std::string &str) {
     string sOut(str);
     transform(str.begin(), str.end(), sOut.begin(), (int ( *)(int))tolower);
     return sOut;
@@ -378,6 +589,8 @@ namespace Isis {
    * case.  This is used in the STL @b equal function to compare the contents
    * of two STL strings.
    *
+   * @deprecated
+   *
    * @param c1 First character to compare
    * @param c2 Second character to compare
    * @return true if the two characters are the same, false otherwise
@@ -387,13 +600,15 @@ namespace Isis {
   }
 
   /**
-   * Compare a string to the object iString
+   * Compare a string to the object IString
+   *
+   * @deprecated
    *
    * @param str The string with which the comparison is made
    *
    * @return bool True if they are equal, false if they are not.
    */
-  bool iString::Equal(const std::string &str) const {
+  bool IString::Equal(const std::string &str) const {
     string temp = *this;
     return Equal(str, temp);
   }
@@ -401,12 +616,14 @@ namespace Isis {
   /**
    * Compare two strings, case-insensitive
    *
+   * @deprecated
+   *
    * @param str1 [in] The first string to compare
    * @param str2 [in] The second string to compare
    *
    * @return True if the two input strings are identical otherwise false
    */
-  bool iString::Equal(const std::string &str1, const std::string &str2) {
+  bool IString::Equal(const std::string &str1, const std::string &str2) {
     if(str1.size() != str2.size()) return(false);
     return(std::equal(str1.begin(), str1.end(), str2.begin(), nocase_compare));
   }
@@ -415,20 +632,24 @@ namespace Isis {
   /**
    * Returns the object string as an integer.
    *
+   * @deprecated
+   *
    * @return int The integer te string represents
    */
-  int iString::ToInteger() const {
+  int IString::ToInteger() const {
     return ToInteger(*this);
   }
 
   /**
    * Returns the integer representation of the input string
    *
+   * @deprecated
+   *
    * @param str The string representing an integer value
    *
    * @return int The integer value represented by the string
    */
-  int iString::ToInteger(const std::string &str) {
+  int IString::ToInteger(const std::string &str) {
     int v_out;
     try {
       stringstream s;
@@ -449,22 +670,26 @@ namespace Isis {
   }
 
   /**
-   * Returns the BigInt representation of the object iString
+   * Returns the BigInt representation of the object IString
    *
-   * @return BigInt The Big Integer representation of the iString
+   * @deprecated
+   *
+   * @return BigInt The Big Integer representation of the IString
    */
-  BigInt iString::ToBigInteger() const {
+  BigInt IString::ToBigInteger() const {
     return ToBigInteger(*this);
   }
 
   /**
    * Returns the Big Integer representation of the input string
    *
+   * @deprecated
+   *
    * @param str The string representing an integer value
    *
    * @return BigInt The string as a BigInt
    */
-  BigInt iString::ToBigInteger(const std::string &str) {
+  BigInt IString::ToBigInteger(const std::string &str) {
     BigInt v_out;
     try {
       stringstream s;
@@ -486,22 +711,26 @@ namespace Isis {
   }
 
   /**
-   * Returns the floating point value the iString represents
+   * Returns the floating point value the IString represents
    *
-   * @return double The iString as a double
+   * @deprecated
+   *
+   * @return double The IString as a double
    */
-  double iString::ToDouble() const {
+  double IString::ToDouble() const {
     return ToDouble(*this);
   }
 
   /**
    * Returns the floating-point value represented by the input string
    *
+   * @deprecated
+   *
    * @param str The string representing the numeric value
    *
    * @return double The number the string represents
    */
-  double iString::ToDouble(const std::string &str) {
+  double IString::ToDouble(const std::string &str) {
 
     double v_out;
 
@@ -555,33 +784,39 @@ namespace Isis {
 
   /**
    * Retuns the object string as a QString
+   *
+   * @deprecated
    */
-  QString iString::ToQt() const {
+  QString IString::ToQt() const {
     return QString::fromStdString(*this);
   }
 
   /**
-   * Resturns the input string as a QString
+   * Returns the input string as a QString
+   *
+   * @deprecated
    *
    * @param s [in] The standard string to be converted to a Qt string
    */
-  QString iString::ToQt(const std::string &s) {
+  QString IString::ToQt(const std::string &s) {
     return(QString::fromStdString(s));
   }
 
   /**
-   * Returns the first token in the iString. A token is defined as a string of
+   * Returns the first token in the IString. A token is defined as a string of
    * characters from the beginning of the string to, but not including, the first
    * character matching any character in the separator string. The token is
    * removed from the original string along with the separator.
    *
+   * @deprecated
+   *
    * @param separator The string of characters used to separate tokens. The order
    *                  of the characters is not important.
    *
-   * @return iString
+   * @return IString
    */
-  iString iString::Token(const iString &separator) {
-    iString retstr = "" ;
+  IString IString::Token(const IString &separator) {
+    IString retstr = "" ;
 
     for(unsigned int i = 0; i < size(); i++) {
       for(unsigned int sep = 0; sep < separator.size(); sep++) {
@@ -612,6 +847,8 @@ namespace Isis {
    * result in the number of separator characters less one empty strings returned
    * to the caller.
    *
+   * @deprecated
+   *
    * @param separator  A single character that separates each substring
    * @param str  The string to break into separate fields or tokens
    * @param tokens  A vector of strings that will receive the tokens as separated
@@ -621,7 +858,7 @@ namespace Isis {
    *                          characters result in empty strings/tokens.
    * @return int The number of fields/tokens found in str
    */
-  int iString::Split(const char separator, const std::string &str,
+  int IString::Split(const char separator, const std::string &str,
                      std::vector<std::string> &tokens,
                      bool allowEmptyEntries) {
     string::size_type idx(0), idx2(0);
@@ -649,11 +886,13 @@ namespace Isis {
   /**
    * Collapses multiple spaces into single spaces
    *
+   * @deprecated
+   *
    * @param force Determines whether to compress inside quotes (single and
    *              double)
    *
    */
-  iString iString::Compress(bool force) {
+  IString IString::Compress(bool force) {
     *this =  Compress((string) * this, force);
     return *this;
   }
@@ -661,13 +900,15 @@ namespace Isis {
   /**
    * Returns the input string with multiple spaces collapsed into single spaces
    *
+   * @deprecated
+   *
    * @param str The string to be compressed
    *
    * @param force Determines whether to compress inside quotes
    *
    * @return string The compressed version of the input string
    */
-  std::string iString::Compress(const std::string &str, bool force) {
+  std::string IString::Compress(const std::string &str, bool force) {
     string result(str);
     if(force == false) {
       int spaces = 0;
@@ -704,17 +945,19 @@ namespace Isis {
    * Replaces all instances of the first input string with the second input
    * string
    *
-   * For more information, see iString::Replace(const string, const string,
+   * For more information, see IString::Replace(const string, const string,
    * const string, int)
    *
+   * @deprecated
+   *
    * @param from Search string that when found in str, it is replaced with to
-   * @param to iString that will replace every occurance of from in str.
+   * @param to IString that will replace every occurance of from in str.
    * @param maxReplaceCount  Maximum number of replacements to allow per call
    *
    */
-  iString iString::Replace(const std::string &from, const std::string &to,
+  IString IString::Replace(const std::string &from, const std::string &to,
                            int maxReplaceCount) {
-    *this = iString(Replace((string) * this, from, to, maxReplaceCount));
+    *this = IString(Replace((string) * this, from, to, maxReplaceCount));
     return *this;
   }
 
@@ -737,12 +980,12 @@ namespace Isis {
    *   string pntDist  = "distance(giscpt,UPCPoint(%longitude,%latitude))";
    *   string pntQuery = "SELECT pointid, latitude, longitude, radius, "
    *                     " %distance AS Distance FROM "  + pntTable +
-   *                     " WHERE (%distance <= " + iString(maxDist) + ")";
+   *                     " WHERE (%distance <= " + IString(maxDist) + ")";
    *
    * SqlQuery finder;  // Uses whatever the default database is
    * while (!theEndOfTime()) {
-   *    iString longitude(source.getLongitude());
-   *    iString latitude(source.getLatitude());
+   *    IString longitude(source.getLongitude());
+   *    IString latitude(source.getLatitude());
    *
    *    string qDist = StringTools::replace(pntDist,"%longitude", longitude);
    *    qDist = StringTools::replace(qDist,"%latitude", latitude);
@@ -757,14 +1000,16 @@ namespace Isis {
    * To prevent infinite recursion, where the replace string contains the search
    * string, use the \b maxReplaceCount to adjust appropriately.
    *
+   * @deprecated
+   *
    * @param str Input string to search and replace substrings
    * @param from Search string that when found in str, it is replaced with to
-   * @param to iString that will replace every occurance of from in str.
+   * @param to IString that will replace every occurance of from in str.
    * @param maxReplaceCount  Maximum number of replacements to allow per call
    *
    * @return std::string NEw string with from replaced with to
    */
-  std::string iString::Replace(const std::string &str, const std::string &from,
+  std::string IString::Replace(const std::string &str, const std::string &from,
                                const std::string &to, int maxReplaceCount) {
     if(str.empty()) return(str);
     if(from.empty()) return(str);
@@ -784,17 +1029,19 @@ namespace Isis {
    * Replaces all instances of the first input string with the second input
    * string. Honoring quotes if requested by the boolean
    *
+   * @deprecated
+   *
    * @param from Search string that when found in str, it is
    *                replaced with to.
-   * @param to iString that will replace every occurance of
+   * @param to IString that will replace every occurance of
    *          from in str.
    * @param honorquotes  Set to true to honor quotes and not
    *                     replace inside them
    *
-   * @return iString New string with subTarg replaced with subRep
+   * @return IString New string with subTarg replaced with subRep
    *
    */
-  iString iString::Replace(const std::string &from, const std::string &to,
+  IString IString::Replace(const std::string &from, const std::string &to,
                            bool honorquotes) {
     *this = Replace((string) * this, from, to, honorquotes);
     return *this;
@@ -805,18 +1052,20 @@ namespace Isis {
    * quotes if requested. This routine is case sensitive and will only replace
    * exact matches.
    *
+   * @deprecated
+   *
    * @param str Input string to search and replace substrings in
    * @param from Search string that when found in str, it is
    *                replaced with to.
-   * @param to iString that will replace every occurance of
+   * @param to IString that will replace every occurance of
    *          from in str.
    * @param honorquotes  Set to true to honor quotes and not
    *                     replace inside them
    *
-   * @return iString New string with subTarg replaced with
+   * @return IString New string with subTarg replaced with
    *         subRep
    */
-  iString iString::Replace(const std::string &str, const std::string &from,
+  IString IString::Replace(const std::string &str, const std::string &from,
                            const std::string &to , bool honorquotes) {
 
     string result = str;
@@ -841,14 +1090,14 @@ namespace Isis {
           quote = result.find_first_of("\"\'", nextquote);
         }
       }
-      return (iString) result;
+      return (IString) result;
     }
     else {
       int instances = 0;
       while((instances = result.find(from, instances)) >= 0) {
         result.replace(instances, from.length(), to);
       }
-      return (iString) result;
+      return (IString) result;
     }
   }
 
@@ -856,14 +1105,16 @@ namespace Isis {
    * Returns the string with all occurrences of any character in the "from"
    * argument converted to the "to" argument. The original string is modified.
    *
+   * @deprecated
+   *
    * @param listofchars The string of characters to be replaced. The order of the
    *             characters is not important.
    *
    * @param to The single character used as the replacement.
    *
-   * @return iString
+   * @return IString
    */
-  iString iString::Convert(const std::string &listofchars, const char &to) {
+  IString IString::Convert(const std::string &listofchars, const char &to) {
     *this = Convert((string) * this, listofchars, to);
     return *this;
   }
@@ -871,6 +1122,8 @@ namespace Isis {
   /**
    * Converts all occurences in the input string of any character in the "from"
    * string to the "to" character
+   *
+   * @deprecated
    *
    * @param str The input string
    *
@@ -881,7 +1134,7 @@ namespace Isis {
    *
    * @return string The converted string (the input string is unmodified)
    */
-  string iString::Convert(const std::string &str, const std::string &listofchars,
+  string IString::Convert(const std::string &str, const std::string &listofchars,
                           const char &to) {
     std::string::size_type pos = 0;
     string result = str;
@@ -899,9 +1152,11 @@ namespace Isis {
    * feeds", "vertical tabs" and "back spaces" converted to single spaces. All
    * quotes are ignored. The original string is modified.
    *
-   * @return iString
+   * @deprecated
+   *
+   * @return IString
    */
-  iString iString::ConvertWhiteSpace() {
+  IString IString::ConvertWhiteSpace() {
     *this = ConvertWhiteSpace((string) * this);
     return *this;
   }
@@ -909,23 +1164,27 @@ namespace Isis {
   /**
    * Converts all forms of whitespace in the input string into single spaces
    *
+   * @deprecated
+   *
    * @param str
    *
    * @return string
    */
-  std::string iString::ConvertWhiteSpace(const std::string &str) {
+  std::string IString::ConvertWhiteSpace(const std::string &str) {
     return Convert(str, "\n\r\t\f\v\b", ' ');
   }
 
   /**
-   * Remove all instances of any character in the string from the iString
+   * Remove all instances of any character in the string from the IString
    *
-   * @param del The characters to be removed from the iString. The character is
+   * @deprecated
+   *
+   * @param del The characters to be removed from the IString. The character is
    *            unimportant
    *
-   * @return iString
+   * @return IString
    */
-  iString iString::Remove(const std::string &del) {
+  IString IString::Remove(const std::string &del) {
     std::string::size_type pos;
     while((pos = find_first_of(del)) != npos) this->erase(pos, 1);
     return *this;
@@ -935,6 +1194,8 @@ namespace Isis {
    * Remove all instances of any character in the "del" argument from the input
    * string
    *
+   * @deprecated
+   *
    * @param str The string from which characters are to be removed
    *
    * @param del The string of characters to be removed. Order is unimportant.
@@ -942,7 +1203,7 @@ namespace Isis {
    * @return string The string with the characters removed. The original string
    *         is unmodified
    */
-  std::string iString::Remove(const std::string &str, const std::string &del) {
+  std::string IString::Remove(const std::string &str, const std::string &del) {
     string::size_type pos;
     string result(str);
     while((pos = result.find_first_of(del)) != npos) result.erase(pos, 1);
@@ -952,11 +1213,13 @@ namespace Isis {
   /**
    * Attempts to convert a 32 bit integer into its string representation
    *
+   * @deprecated
+   *
    * @param value [in] The 32 bit integer to be converted to a string
    *
-   * @return The Isis::iString representation of the int
+   * @return The Isis::IString representation of the int
    */
-  iString &iString::operator= (const int &value) {
+  IString &IString::operator= (const int &value) {
     ostringstream str;
     str << value;
     assign(str.str());
@@ -966,11 +1229,13 @@ namespace Isis {
   /**
    * Attempts to convert a 64 bit integer into its string representation
    *
+   * @deprecated
+   *
    * @param value [in] The 64 bit integer to be converted to a string
    *
-   * @return The Isis::iString representation of the BigInt
+   * @return The Isis::IString representation of the BigInt
    */
-  iString &iString::operator= (const BigInt &value) {
+  IString &IString::operator= (const BigInt &value) {
     ostringstream str;
     str << value;
     assign(str.str());
@@ -980,22 +1245,26 @@ namespace Isis {
   /**
    * Converts a Qt string into a std::string
    *
+   * @deprecated
+   *
    * @param str [in] The Qt string to be converted to a std::string
    *
    * @return The std::string representation of the Qt string
    */
-  std::string iString::ToStd(const QString &str) {
+  std::string IString::ToStd(const QString &str) {
     return(str.toStdString());
   }
 
   /**
    * Converts a vector of strings into a QStringList
    *
+   * @deprecated
+   *
    * @param sl STL vector of strings
    *
    * @return QStringList
    */
-  QStringList iString::ToQt(const std::vector<std::string> &sl) {
+  QStringList IString::ToQt(const std::vector<std::string> &sl) {
     QStringList Qsl;
     for(unsigned int i = 0 ; i < sl.size() ; i++) {
       Qsl << ToQt(sl[i]);
@@ -1006,16 +1275,50 @@ namespace Isis {
   /**
    * Converts a QStringList into a vector of strings
    *
+   * @deprecated
+   *
    * @param sl
    *
    * @return vector<string>
    */
-  std::vector<std::string> iString::ToStd(const QStringList &sl) {
+  std::vector<std::string> IString::ToStd(const QStringList &sl) {
     std::vector<std::string> Stdsl;
     for(int i = 0 ; i < sl.size() ; i++) {
       Stdsl.push_back(ToStd(sl.at(i)));
     }
 
     return(Stdsl);
+  }
+
+
+  /**
+   * Print an ASCII representation of the given QString to a stl stream (most commonly cout, cerr).
+   *
+   * This is provided for convenience. No extra formatting is done; please see qDebug for a better
+   *   way of printing out debug statements.
+   *
+   * @param outputStream The stream to write the string to
+   * @param string The string to put into the stream
+   *
+   * @return The modified output stream
+   */
+  std::ostream &operator<<(std::ostream &outputStream, const QString &string) {
+    return (outputStream << string.toAscii().data());
+  }
+
+
+  /**
+   * Print an ASCII representation of the given QStringRef to a stl stream (most commonly cout, cerr).
+   *
+   * This is provided for convenience. No extra formatting is done; please see qDebug for a better
+   *   way of printing out debug statements.
+   *
+   * @param outputStream The stream to write the string to
+   * @param string The string to put into the stream
+   *
+   * @return The modified output stream
+   */
+  std::ostream &operator<<(std::ostream &outputStream, const QStringRef &string) {
+    return (outputStream << string.toAscii().data());
   }
 }

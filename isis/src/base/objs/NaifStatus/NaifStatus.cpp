@@ -22,7 +22,7 @@
 #include "NaifStatus.h"
 #include "naif/SpiceUsr.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Pvl.h"
 #include "PvlTranslationManager.h"
 #include <iostream>
@@ -77,7 +77,7 @@ namespace Isis {
     getmsg_c("LONG", LONG_DESC_LEN, naifLong);
 
     // Search for known naif errors...
-    iString errMsg;
+    IString errMsg;
 
     Pvl error;
     PvlGroup errorDescription("ErrorDescription");
@@ -106,8 +106,8 @@ namespace Isis {
     }
 
     errMsg += " The short explanation ";
-    errMsg += "provided by NAIF is [" + iString(naifShort) + "]. ";
-    errMsg += "The Naif error is [" + iString(naifLong) + "]";
+    errMsg += "provided by NAIF is [" + IString(naifShort) + "]. ";
+    errMsg += "The Naif error is [" + IString(naifLong) + "]";
 
     throw IException(IException::Unknown, errMsg, _FILEINFO_);
   }

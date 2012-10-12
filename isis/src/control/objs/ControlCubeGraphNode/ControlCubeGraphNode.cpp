@@ -10,17 +10,17 @@
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 
 namespace Isis {
   /**
   * Create an empty SerialNumber object.
   */
-  ControlCubeGraphNode::ControlCubeGraphNode(iString sn) {
+  ControlCubeGraphNode::ControlCubeGraphNode(IString sn) {
     nullify();
 
-    serialNumber = new iString(sn);
+    serialNumber = new IString(sn);
     measures = new QHash<ControlPoint *, ControlMeasure *>;
     connections = new QHash < ControlCubeGraphNode *, QList< ControlPoint * > >;
   }
@@ -29,7 +29,7 @@ namespace Isis {
   ControlCubeGraphNode::ControlCubeGraphNode(const ControlCubeGraphNode &other) {
     nullify();
 
-    serialNumber = new iString(*other.serialNumber);
+    serialNumber = new IString(*other.serialNumber);
     measures = new QHash<ControlPoint *, ControlMeasure *>;
     connections = new QHash < ControlCubeGraphNode *, QList< ControlPoint * > >;
 
@@ -84,7 +84,7 @@ namespace Isis {
     ASSERT(measure);
 
     if (measure->GetCubeSerialNumber() != *serialNumber) {
-      iString msg = "Attempted to add Control Measure with Cube Serial Number ";
+      IString msg = "Attempted to add Control Measure with Cube Serial Number ";
       msg += "[" + measure->GetCubeSerialNumber() + "] does not match Serial ";
       msg += "Number [" + *serialNumber + "]";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -144,7 +144,7 @@ namespace Isis {
   }
 
 
-  iString ControlCubeGraphNode::getSerialNumber() const {
+  IString ControlCubeGraphNode::getSerialNumber() const {
     return *serialNumber;
   }
 
@@ -179,8 +179,8 @@ namespace Isis {
 
   ControlMeasure *ControlCubeGraphNode::getMeasure(ControlPoint *point) {
     if (!measures->contains(point)) {
-      iString msg = "point [";
-      msg += (iString) point->GetId();
+      IString msg = "point [";
+      msg += (IString) point->GetId();
       msg += "] not found in the ControlCubeGraphNode";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -192,8 +192,8 @@ namespace Isis {
   const ControlMeasure *ControlCubeGraphNode::getMeasure(
     ControlPoint *point) const {
     if (!measures->contains(point)) {
-      iString msg = "point [";
-      msg += (iString) point->GetId();
+      IString msg = "point [";
+      msg += (IString) point->GetId();
       msg += "] not found in the ControlCubeGraphNode";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -233,7 +233,7 @@ namespace Isis {
       connections = NULL;
     }
 
-    serialNumber = new iString;
+    serialNumber = new IString;
     measures = new QHash< ControlPoint *, ControlMeasure *>;
     connections = new QHash< ControlCubeGraphNode *, QList< ControlPoint * > >;
 

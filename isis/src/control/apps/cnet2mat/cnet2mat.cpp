@@ -10,7 +10,7 @@
 #include "ControlPoint.h"
 #include "FileList.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Pvl.h"
 #include "PvlObject.h"
 #include "SerialNumberList.h"
@@ -32,7 +32,7 @@ void IsisMain() {
 
   SerialNumberList snl(ui.GetFileName("LIST3"));
   for (int f = 0; f < list2.size(); f++) {
-    iString currFile(list2[f].toString());
+    IString currFile(list2[f].toString());
     Pvl lab(currFile);
     PvlObject qube(lab.FindObject("QUBE"));
     string fsc;
@@ -47,7 +47,7 @@ void IsisMain() {
       msg += fsc + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    iString sn(snl.SerialNumber(f));
+    IString sn(snl.SerialNumber(f));
     fscMap.insert(std::pair<int, string>(f, fsc));
     snMap.insert(std::pair<string, int>(sn, f));
   }
@@ -63,10 +63,10 @@ void IsisMain() {
   TextFile mpFile(ui.GetFileName("MATCH"), "Overwrite", "");
 
   ostringstream str;
-  iString textLine;
+  IString textLine;
 
   textLine = "Matchpoint total =    ";
-  textLine += iString(mpTotal);
+  textLine += IString(mpTotal);
   mpFile.PutLine(textLine);
   str.clear();
   str.str("");
@@ -187,7 +187,7 @@ void IsisMain() {
       formatter.str("");
       formatter.width(16);
       formatter.setf(ios::right);
-      iString diam;
+      IString diam;
       if(currMeas->GetDiameter() == Isis::Null) {
         diam = 0.0;
       }

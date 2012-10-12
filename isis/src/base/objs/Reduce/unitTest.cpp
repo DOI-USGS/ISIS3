@@ -1,5 +1,5 @@
 #include "Isis.h"
-#include "iString.h"
+#include "IString.h"
 #include "ProcessByLine.h"
 #include "Cube.h"
 #include "CubeAttribute.h"

@@ -165,7 +165,7 @@ namespace Isis {
     */
   void TopoAtm::SetNormPharef(const double pharef) {
     if(pharef < 0.0 || pharef >= 180.0) {
-      std::string msg = "Invalid value of normalization pharef [" + iString(pharef) + "]";
+      std::string msg = "Invalid value of normalization pharef [" + IString(pharef) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -183,7 +183,7 @@ namespace Isis {
     */
   void TopoAtm::SetNormIncref(const double incref) {
     if(incref < 0.0 || incref >= 90.0) {
-      std::string msg = "Invalid value of normalization incref [" + iString(incref) + "]";
+      std::string msg = "Invalid value of normalization incref [" + IString(incref) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -201,7 +201,7 @@ namespace Isis {
     */
   void TopoAtm::SetNormEmaref(const double emaref) {
     if(emaref < 0.0 || emaref >= 90.0) {
-      std::string msg = "Invalid value of normalization emaref [" + iString(emaref) + "]";
+      std::string msg = "Invalid value of normalization emaref [" + IString(emaref) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 

@@ -28,7 +28,7 @@
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "naif/SpiceUsr.h"
 #include "naif/SpiceZfc.h"
@@ -60,8 +60,8 @@ namespace Isis {
     // Find out what camera is being used, and set the focal length, altinstcode,
     // raster orientation, cone, crosscone, and camera
     PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
-    iString spacecraft = (string)inst["SPACECRAFTNAME"];
-    iString instId = (string)inst["INSTRUMENTID"];
+    IString spacecraft = (string)inst["SPACECRAFTNAME"];
+    IString instId = (string)inst["INSTRUMENTID"];
     string cam;
     int spn;
     double raster, cone, crosscone;
@@ -172,7 +172,7 @@ namespace Isis {
     focalMap->SetDetectorOrigin(602.0, 528.0);
 
     // Setup distortion map
-    const string fname = FileName("$viking" + iString(spn) + "/reseaus/vik" + cam
+    const string fname = FileName("$viking" + IString(spn) + "/reseaus/vik" + cam
                                   + "MasterReseaus.pvl").expanded();
     new ReseauDistortionMap(this, lab, fname);
 

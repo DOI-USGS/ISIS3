@@ -32,7 +32,7 @@
 #include <QTextStream>
 
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Camera.h"
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
@@ -75,7 +75,7 @@ class LineOffsetFunctor :
       double endTime = m_camera->cacheEndTime().Et();
       //std::pair <double, double> cacheTimeBounds = m_camera->StartEndEphemerisTimes();
       if (et < startTime || et > endTime) {
-        iString msg = "Ephemeris time passed to LineOffsetFunctor is not within the image "
+        IString msg = "Ephemeris time passed to LineOffsetFunctor is not within the image "
                       "cache bounds";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -84,7 +84,7 @@ class LineOffsetFunctor :
  
       //set ground
       if (!m_camera->Sensor::SetGround(surfacePoint, false)) {
-        iString msg = "Sensor::SetGround failed for surface point in LineScanCameraGroundMap.cpp"
+        IString msg = "Sensor::SetGround failed for surface point in LineScanCameraGroundMap.cpp"
                       " LineOffsetFunctor";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -96,7 +96,7 @@ class LineOffsetFunctor :
 
       //set the undistorted focal plane coordinates
       if (!m_camera->DistortionMap()->SetUndistortedFocalPlane(ux, uy)) {
-        iString msg = "DistortionMap::SetUndistoredFocalPlane failed for surface point in "
+        IString msg = "DistortionMap::SetUndistoredFocalPlane failed for surface point in "
                       "LineScanCameraGroundMap.cpp LineOffsetFunctor";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -106,7 +106,7 @@ class LineOffsetFunctor :
       dy = m_camera->DistortionMap()->FocalPlaneY();
 
       if (!m_camera->FocalPlaneMap()->SetFocalPlane(dx, dy)) {
-        iString msg = "FocalPlaneMap::SetFocalPlane failed for surface point in "
+        IString msg = "FocalPlaneMap::SetFocalPlane failed for surface point in "
                       "LineScanCameraGroundMap.cpp LineOffsetFunctor";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }     
@@ -143,13 +143,13 @@ class SensorSurfacePointDistanceFunctor :
       double endTime = m_camera->cacheEndTime().Et();
       //std::pair <double, double> cacheTimeBounds = m_camera->StartEndEphemerisTimes();
       if (et < startTime || et > endTime) {
-        iString msg = "Ephemeris time passed to SensorSurfacePointDistanceFunctor is not within the image "
+        IString msg = "Ephemeris time passed to SensorSurfacePointDistanceFunctor is not within the image "
                       "cache bounds";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
       m_camera->Sensor::setTime(et);
       if(!m_camera->Sensor::SetGround(surfacePoint, false)) {
-         iString msg = "Sensor::SetGround failed for surface point in LineScanCameraGroundMap.cpp"
+         IString msg = "Sensor::SetGround failed for surface point in LineScanCameraGroundMap.cpp"
                        "SensorSurfacePointDistanceFunctor";
       }
       m_camera->instrumentPosition(s);

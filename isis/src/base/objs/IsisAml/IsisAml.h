@@ -31,11 +31,11 @@
 
 #include "IsisXMLApplication.h"
 #include "IsisAmlData.h"
-#include "iString.h"
+#include "IString.h"
 #include "Pvl.h"
 
 namespace Isis {
-  class iString;
+  class IString;
 }
 
 /**
@@ -177,7 +177,7 @@ class IsisAml : protected IsisAmlData {
     std::string GetAsString(const std::string &paramName) const;
     void GetAsString(const std::string &paramName, std::vector<std::string> &values) const;
 
-    Isis::iString GetFileName(const std::string &paramName, std::string extension = "") const;
+    Isis::IString GetFileName(const std::string &paramName, std::string extension = "") const;
     void GetFileName(const std::string &paramName, std::vector<std::string> &values) const;
 
     std::string GetString(const std::string &paramName) const;
@@ -332,7 +332,7 @@ class IsisAml : protected IsisAmlData {
     // Test all parameters for valid values and conditions
     void VerifyAll();
 
-    bool StringToBool(Isis::iString value) const;
+    bool StringToBool(Isis::IString value) const;
 
     void CommandLine(Isis::Pvl &lab) const;
 

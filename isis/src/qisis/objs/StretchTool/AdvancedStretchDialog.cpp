@@ -266,7 +266,7 @@ namespace Isis {
       return p_grayStretch->getStretch();
     }
     else {
-      iString msg = "Gray mode not enabled, cannot get gray stretch";
+      IString msg = "Gray mode not enabled, cannot get gray stretch";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -282,7 +282,7 @@ namespace Isis {
       return p_redStretch->getStretch();
     }
     else {
-      iString msg = "RGB mode not enabled, cannot get red stretch";
+      IString msg = "RGB mode not enabled, cannot get red stretch";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -298,7 +298,7 @@ namespace Isis {
       return p_grnStretch->getStretch();
     }
     else {
-      iString msg = "RGB mode not enabled, cannot get green stretch";
+      IString msg = "RGB mode not enabled, cannot get green stretch";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -314,7 +314,7 @@ namespace Isis {
       return p_bluStretch->getStretch();
     }
     else {
-      iString msg = "RGB mode not enabled, cannot get blue stretch";
+      IString msg = "RGB mode not enabled, cannot get blue stretch";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }

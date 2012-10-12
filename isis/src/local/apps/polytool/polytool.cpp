@@ -73,7 +73,7 @@ void IsisMain() {
     outfile << result;
     outfile.close();
     if(outfile.fail()) {
-      iString msg = "Unable to write the polygon to [" + outname + "]";
+      IString msg = "Unable to write the polygon to [" + outname + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
   }

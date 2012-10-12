@@ -29,7 +29,7 @@
 #include <vector>
 
 #include "PhotometricFunction.h"
-#include "iString.h"
+#include "IString.h"
 #include "Camera.h"
 #include "DbProfile.h"
 #include "SpecialPixel.h"
@@ -85,7 +85,7 @@ namespace Isis {
                     std::vector<double> bTerms; //<! b-terms for exponential in form a*e^(b*x)
                     double wavelength; //<! Wavelength for correction
                     double tolerance; //<! Wavelength Range/Tolerance
-                    iString units; //<! Phase units of Hiller eq.
+                    IString units; //<! Phase units of Hiller eq.
                     double phaUnit; // 1 for degrees, Pi/180 for radians
                     int band; //<! Cube band parameters
                     double phoStd; //<! Computed photometric std.

@@ -1,6 +1,6 @@
 #include "Isis.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "ProcessByLine.h"
 #include "Reduce.h"
 
@@ -90,7 +90,7 @@ void IsisMain() {
     throw;
   }
   catch (std::exception const &se) {
-    string message = "std::exception: " + (iString)se.what();
+    string message = "std::exception: " + (IString)se.what();
     throw IException(IException::User, message, _FILEINFO_);
   }
   catch (...) {

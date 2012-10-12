@@ -28,7 +28,7 @@
 #include <QString>
 
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "LineManager.h"
 #include "OriginalLabel.h"
 #include "PixelType.h"
@@ -122,7 +122,7 @@ namespace Isis {
     Isis::PvlTranslationManager pdsXlater(p_pdsLabel, trnsStrm);
 
     // Check to see if we are dealing with a JPEG2000 file
-    Isis::iString str;
+    Isis::IString str;
     if(pdsXlater.InputHasKeyword("PdsEncodingType")) {
       str = pdsXlater.Translate("PdsEncodingType");
       if(str == "JP2") {
@@ -185,9 +185,9 @@ namespace Isis {
   void ProcessImportPds::ProcessDataFilePointer(Isis::PvlTranslationManager & pdsXlater, const bool & calcOffsetOnly) {
     const PvlKeyword & dataFilePointer = pdsXlater.InputKeyword("DataFilePointer");
 
-    Isis::iString dataFileName;
-    Isis::iString units;
-    Isis::iString str;
+    Isis::IString dataFileName;
+    Isis::IString units;
+    Isis::IString str;
     int offset = -1;
 
     // If only size 1, we either have a file name or an offset
@@ -214,7 +214,7 @@ namespace Isis {
     // Expection ("filname", <offset>)
     else if (dataFilePointer.Size() == 2) {
       dataFileName = pdsXlater.Translate("DataFilePointer", 0);
-      offset = iString(pdsXlater.Translate("DataFilePointer", 1)).ToInteger();
+      offset = IString(pdsXlater.Translate("DataFilePointer", 1)).ToInteger();
       units = dataFilePointer.Unit(1);
     }
     // Error, no value
@@ -271,7 +271,7 @@ namespace Isis {
       SetFileHeaderBytes(offset - 1);
     }
     else {
-      Isis::iString recSize = pdsXlater.Translate("DataFileRecordBytes");
+      Isis::IString recSize = pdsXlater.Translate("DataFileRecordBytes");
       SetFileHeaderBytes((offset - 1) * recSize.ToInteger());
     }
   }
@@ -281,7 +281,7 @@ namespace Isis {
    * Calls SetPixelType with the correct values
    */
   void ProcessImportPds::ProcessPixelBitandType(Isis::PvlTranslationManager & pdsXlater) {
-    iString str;
+    IString str;
     str = pdsXlater.Translate("CoreBitsPerPixel");
     int bitsPerPixel = str.ToInteger();
     str = pdsXlater.Translate("CorePixelType");
@@ -311,7 +311,7 @@ namespace Isis {
     }
     else {
       string msg = "Invalid PixelType and BitsPerPixel combination [" + str +
-                   ", " + Isis::iString(bitsPerPixel) + "]";
+                   ", " + Isis::IString(bitsPerPixel) + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
@@ -320,7 +320,7 @@ namespace Isis {
    * Handles all special pixel setting, ultimately, calls SetSpecialValues.
    */
   void ProcessImportPds::ProcessSpecialPixels(Isis::PvlTranslationManager & pdsXlater, const bool & isQube) {
-    iString str;
+    IString str;
     // Set any special pixel values
     double pdsNull = Isis::NULL8;
     if(pdsXlater.InputHasKeyword("CoreNull")) {
@@ -410,7 +410,7 @@ namespace Isis {
     Isis::FileName transFile(p_transDir + "/translations/pdsImage.trn");
     Isis::PvlTranslationManager pdsXlater(p_pdsLabel, transFile.expanded());
 
-    Isis::iString str;
+    Isis::IString str;
 
     str = pdsXlater.Translate("CoreLinePrefixBytes");
     SetDataPrefixBytes(str.ToInteger());
@@ -510,7 +510,7 @@ namespace Isis {
 
     Isis::PvlTranslationManager pdsXlater(p_pdsLabel, tFile.expanded());
 
-    Isis::iString str;
+    Isis::IString str;
 
     // Find the organization of the image data
     // Save off which axis the samples, lines and bands are on
@@ -518,7 +518,7 @@ namespace Isis {
     int samplePos = 0;
     int bandPos = 0;
     int val = pdsXlater.InputKeyword("CoreOrganization").Size();
-    Isis::iString tmp = "";
+    Isis::IString tmp = "";
     for(int i = 0; i < val; i++) {
       str = pdsXlater.Translate("CoreOrganization", i);
       tmp += str;
@@ -680,7 +680,7 @@ namespace Isis {
 
     // Set up the correct projection translation table for this label
     Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
-    Isis::iString transDir = (string) dataDir["Base"];
+    Isis::IString transDir = (string) dataDir["Base"];
 
     Isis::FileName transFile;
     if(projType.InputHasKeyword("PdsProjectionTypeImage")) {
@@ -800,7 +800,7 @@ namespace Isis {
    */
   void ProcessImportPds::ExtractPdsProjection(Isis::PvlTranslationManager &pdsXlater) {
 
-    Isis::iString str;
+    Isis::IString str;
 
     if(pdsXlater.InputHasKeyword("ProjectionName")) {
       p_projection = pdsXlater.Translate("ProjectionName");
@@ -1127,7 +1127,7 @@ namespace Isis {
   void ProcessImportPds::TranslateIsis2BandBin(Isis::Pvl &lab) {
     // Set up a translater for Isis2 labels
     Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
-    Isis::iString transDir = (string) dataDir["Base"];
+    Isis::IString transDir = (string) dataDir["Base"];
 
     Isis::FileName transFile(transDir + "/" + "translations/isis2bandbin.trn");
     Isis::PvlTranslationManager isis2Xlater(p_pdsLabel, transFile.expanded());
@@ -1145,7 +1145,7 @@ namespace Isis {
   void ProcessImportPds::TranslateIsis2Instrument(Isis::Pvl &lab) {
     // Set up a translater for Isis2 labels
     Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
-    Isis::iString transDir = (string) dataDir["Base"];
+    Isis::IString transDir = (string) dataDir["Base"];
     Isis::FileName transFile(transDir + "/" + "translations/isis2instrument.trn");
     Isis::PvlTranslationManager isis2Xlater(p_pdsLabel, transFile.expanded());
 
@@ -1157,7 +1157,7 @@ namespace Isis {
 
     if(inst.HasKeyword("StartTime")) {
       Isis::PvlKeyword &stkey = inst["StartTime"];
-      Isis::iString stime = stkey[0];
+      Isis::IString stime = stkey[0];
       stime = stime.Trim("Zz");
       stkey = stime;
     }

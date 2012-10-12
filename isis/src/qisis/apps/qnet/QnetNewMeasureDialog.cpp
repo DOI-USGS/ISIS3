@@ -6,7 +6,7 @@
 #include <QtGui>
 
 #include "ControlPoint.h"
-#include "iString.h"
+#include "IString.h"
 #include "SerialNumberList.h"
 
 #include "qnet.h"
@@ -70,14 +70,14 @@ namespace Isis {
     //  Add all entries in the SerialNumberList
     for (int i = 0; i < g_serialNumberList->Size(); i++) {
 
-      iString curSerialNum = g_serialNumberList->SerialNumber(i);
+      IString curSerialNum = g_serialNumberList->SerialNumber(i);
 
       //  Don't add if already in this point
       if (point.HasSerialNumber(curSerialNum))
         continue;
 
       // build new item...
-      iString label(g_serialNumberList->FileName(i));
+      IString label(g_serialNumberList->FileName(i));
       QListWidgetItem *item = new QListWidgetItem(label);
 
       // if this entry of the SerialNumberList is also in the pointFiles then

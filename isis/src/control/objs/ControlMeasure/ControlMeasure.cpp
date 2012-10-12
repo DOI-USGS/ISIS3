@@ -31,7 +31,7 @@
 #include "ControlNet.h"
 #include "ControlPoint.h"
 #include "ControlCubeGraphNode.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "ControlNetFileV0002.pb.h"
 #include "SpecialPixel.h"
@@ -44,9 +44,9 @@ namespace Isis {
    */
   ControlMeasure::ControlMeasure() {
     InitializeToNull();
-    p_serialNumber = new iString;
-    p_chooserName = new iString;
-    p_dateTime = new iString;
+    p_serialNumber = new IString;
+    p_chooserName = new IString;
+    p_dateTime = new IString;
     p_loggedData = new QVector<ControlMeasureLogData>();
 
     p_measureType = Candidate;
@@ -69,9 +69,9 @@ namespace Isis {
       const ControlPointFileEntryV0002_Measure &protoBuf) {
     InitializeToNull();
 
-    p_serialNumber = new iString(protoBuf.serialnumber());
-    p_chooserName = new iString(protoBuf.choosername());
-    p_dateTime = new iString(protoBuf.datetime());
+    p_serialNumber = new IString(protoBuf.serialnumber());
+    p_chooserName = new IString(protoBuf.choosername());
+    p_dateTime = new IString(protoBuf.datetime());
     p_loggedData = new QVector<ControlMeasureLogData>();
 
     switch (protoBuf.type()) {
@@ -134,9 +134,9 @@ namespace Isis {
   ControlMeasure::ControlMeasure(const ControlMeasure &other) {
     InitializeToNull();
 
-    p_serialNumber = new iString(*other.p_serialNumber);
-    p_chooserName = new iString(*other.p_chooserName);
-    p_dateTime = new iString(*other.p_dateTime);
+    p_serialNumber = new IString(*other.p_serialNumber);
+    p_chooserName = new IString(*other.p_chooserName);
+    p_dateTime = new IString(*other.p_dateTime);
 
     p_loggedData = new QVector<ControlMeasureLogData>(*other.p_loggedData);
 
@@ -265,7 +265,7 @@ namespace Isis {
    * @return Status Success or MeasureLocked
    *
    */
-  ControlMeasure::Status ControlMeasure::SetCubeSerialNumber(iString newSerialNumber) {
+  ControlMeasure::Status ControlMeasure::SetCubeSerialNumber(IString newSerialNumber) {
     if (IsEditLocked())
       return MeasureLocked;
     *p_serialNumber = newSerialNumber;
@@ -283,7 +283,7 @@ namespace Isis {
 
 
   //! Set the chooser name to an application that last changed the coordinate
-  ControlMeasure::Status ControlMeasure::SetChooserName(iString name) {
+  ControlMeasure::Status ControlMeasure::SetChooserName(IString name) {
     if (IsEditLocked())
       return MeasureLocked;
     *p_chooserName = name;
@@ -332,7 +332,7 @@ namespace Isis {
 
 
   //! Set date/time the coordinate was last changed to specified date/time
-  ControlMeasure::Status ControlMeasure::SetDateTime(iString datetime) {
+  ControlMeasure::Status ControlMeasure::SetDateTime(IString datetime) {
     if (IsEditLocked())
       return MeasureLocked;
     *p_dateTime = datetime;
@@ -504,7 +504,7 @@ namespace Isis {
    */
   void ControlMeasure::SetLogData(ControlMeasureLogData data) {
     if (!data.IsValid()) {
-      iString msg = "Cannot set log data with invalid information stored in "
+      IString msg = "Cannot set log data with invalid information stored in "
           "the ControlMeasureLogData";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -584,7 +584,7 @@ namespace Isis {
     }
 
     if (!updated) {
-      iString msg = "Unable to update the log data for [" +
+      IString msg = "Unable to update the log data for [" +
           newLogData.DataTypeToName(newLogData.GetDataType()) + "] because this"
           " control measure does not have log data for this value. Please use "
           "SetLogData instead";
@@ -609,7 +609,7 @@ namespace Isis {
 
 
   //! Return the chooser name
-  iString ControlMeasure::GetChooserName() const {
+  IString ControlMeasure::GetChooserName() const {
     if (*p_chooserName != "") {
       return *p_chooserName;
     }
@@ -620,13 +620,13 @@ namespace Isis {
 
 
   //! Return the serial number of the cube containing the coordinate
-  iString ControlMeasure::GetCubeSerialNumber() const {
+  IString ControlMeasure::GetCubeSerialNumber() const {
     return *p_serialNumber;
   }
 
 
   //! Return the date/time the coordinate was last changed
-  iString ControlMeasure::GetDateTime() const {
+  IString ControlMeasure::GetDateTime() const {
     if (*p_dateTime != "") {
       return *p_dateTime;
     }
@@ -738,8 +738,8 @@ namespace Isis {
     }
 
     if (!validField) {
-      iString msg = "Cannot test IsStatisticallyRelevant on Measure Data ["
-          + iString(field) + "]";
+      IString msg = "Cannot test IsStatisticallyRelevant on Measure Data ["
+          + IString(field) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -796,7 +796,7 @@ namespace Isis {
 
   QString ControlMeasure::GetPointId() const {
     if (parentPoint == NULL) {
-      iString msg = "Measure has no containing point";
+      IString msg = "Measure has no containing point";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -843,7 +843,7 @@ namespace Isis {
 
 
   //! One Getter to rule them all
-  double ControlMeasure::GetMeasureData(iString data) const {
+  double ControlMeasure::GetMeasureData(IString data) const {
     if (data == "SampleResidual")
       return p_sampleResidual;
     else if (data == "LineResidual")
@@ -857,15 +857,15 @@ namespace Isis {
     else if (data == "Ignore")
       return p_ignore;
     else {
-      iString msg = data + " passed to GetMeasureData but is invalid";
+      IString msg = data + " passed to GetMeasureData but is invalid";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
 
 
   //! Returns a list of all valid options to pass to GetMeasureData
-  QVector< iString > ControlMeasure::GetMeasureDataNames() {
-    QVector< iString > names;
+  QVector< IString > ControlMeasure::GetMeasureDataNames() {
+    QVector< IString > names;
 
     names.push_back("SampleResidual");
     names.push_back("LineResidual");
@@ -952,8 +952,8 @@ namespace Isis {
    */
   ControlMeasure::MeasureType ControlMeasure::StringToMeasureType(QString str) {
 
-    iString err = "String [";
-    err += iString(str) + "] can not be converted to a MeasureType";
+    IString err = "String [";
+    err += IString(str) + "] can not be converted to a MeasureType";
 
     str = str.toLower();
     MeasureType measureType;
@@ -983,8 +983,8 @@ namespace Isis {
    *                                        added exception.
    *   @history 2010-12-08 Tracie Sucharski - Added measure type of Ground.
    */
-  iString ControlMeasure::MeasureTypeToString(MeasureType type) {
-    iString sPrintable;
+  IString ControlMeasure::MeasureTypeToString(MeasureType type) {
+    IString sPrintable;
 
     switch (type) {
       case ControlMeasure::Candidate:
@@ -1005,7 +1005,7 @@ namespace Isis {
     }
 
     if (sPrintable == "") {
-      iString msg = "Measure type [" + iString(type) + "] cannot be converted "
+      IString msg = "Measure type [" + IString(type) + "] cannot be converted "
           "to a string";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1018,7 +1018,7 @@ namespace Isis {
    *
    * @return A string representation of the MeasureType
    */
-  iString ControlMeasure::GetMeasureTypeString() const {
+  IString ControlMeasure::GetMeasureTypeString() const {
     return MeasureTypeToString(p_measureType);
   }
 
@@ -1053,9 +1053,9 @@ namespace Isis {
       p_loggedData = NULL;
     }
 
-    p_serialNumber = new iString;
-    p_chooserName = new iString;
-    p_dateTime = new iString;
+    p_serialNumber = new IString;
+    p_chooserName = new IString;
+    p_dateTime = new IString;
     p_loggedData = new QVector<ControlMeasureLogData>();
 
     *p_serialNumber = *other.p_serialNumber;

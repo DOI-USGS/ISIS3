@@ -89,7 +89,7 @@ void IsisMain() {
       tokens.clear();
       pencil.GetLine(st);
       Tokenize(st, tokens, ", \"");
-      normalizer.push_back(Isis::iString(tokens[column]).ToDouble());
+      normalizer.push_back(Isis::IString(tokens[column]).ToDouble());
     }
   }
   else {  // avg == "CUBE"

@@ -3,7 +3,7 @@
 #include "Chip.h"
 #include "Cube.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Pipeline.h"
 #include "Statistics.h"
 #include "UserInterface.h"

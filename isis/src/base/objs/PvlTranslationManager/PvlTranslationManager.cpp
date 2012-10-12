@@ -20,7 +20,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "iString.h"
+#include "IString.h"
 #include "Message.h"
 #include "IException.h"
 #include "PvlTranslationManager.h"

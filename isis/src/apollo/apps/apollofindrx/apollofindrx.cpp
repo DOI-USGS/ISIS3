@@ -53,20 +53,20 @@ void IsisMain ()
     int nres = reseaus["Line"].Size();
     if (nres != reseaus["Sample"].Size()) {
       string msg = "Sample size incorrect [Sample size " +
-                    iString(reseaus["Sample"].Size()) + " != " + " Line size " +
-                    iString(reseaus["Line"].Size()) + "]";
+                    IString(reseaus["Sample"].Size()) + " != " + " Line size " +
+                    IString(reseaus["Line"].Size()) + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     if (nres != reseaus["Type"].Size()) {
       string msg = "Type size incorrect [Type size " +
-                    iString(reseaus["Type"].Size()) + " != " + " Line size " +
-                    iString(reseaus["Line"].Size()) + "]";
+                    IString(reseaus["Type"].Size()) + " != " + " Line size " +
+                    IString(reseaus["Line"].Size()) + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     if (nres != reseaus["Valid"].Size()) {
       string msg = "Valid size incorrect [Valid size " +
-                    iString(reseaus["Valid"].Size()) + " != " + " Line size " +
-                    iString(reseaus["Line"].Size()) + "]";
+                    IString(reseaus["Valid"].Size()) + " != " + " Line size " +
+                    IString(reseaus["Line"].Size()) + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 

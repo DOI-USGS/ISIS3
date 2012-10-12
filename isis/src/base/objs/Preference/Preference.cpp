@@ -72,7 +72,7 @@ namespace Isis {
     if (HasGroup("Performance")) {
       PvlGroup &performance = FindGroup("Performance");
       if (performance.HasKeyword("GlobalThreads")) {
-        iString threadsPreference = performance["GlobalThreads"][0];
+        IString threadsPreference = performance["GlobalThreads"][0];
 
         if (threadsPreference.DownCase() != "optimized") {
           // We need a no-iException conversion here
@@ -102,7 +102,7 @@ namespace Isis {
       Isis::FileName setup("$HOME/.Isis");
       if(!setup.fileExists()) {
         QDir dir;
-        QString dirName(iString(setup.expanded()).ToQt());
+        QString dirName(IString(setup.expanded()).ToQt());
         dir.mkdir(dirName);
       }
 

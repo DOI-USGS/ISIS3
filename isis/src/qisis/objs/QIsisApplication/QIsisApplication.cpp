@@ -10,7 +10,7 @@
 
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 namespace Isis {
   /**

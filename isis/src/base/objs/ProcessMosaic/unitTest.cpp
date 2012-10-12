@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 #include "Application.h"
-#include "iString.h"
+#include "IString.h"
 #include "Portal.h"
 #include "ProcessMosaic.h"
 #include "Table.h"

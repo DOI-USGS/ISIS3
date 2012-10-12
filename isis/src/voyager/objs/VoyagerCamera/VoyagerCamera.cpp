@@ -27,7 +27,7 @@
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "naif/SpiceUsr.h"
 #include "NaifStatus.h"
@@ -68,10 +68,10 @@ namespace Isis {
     // Find out what camera is being used, and set the focal length, altinstcode,
     // and camera
     PvlGroup inst = lab.FindGroup ("Instrument",Pvl::Traverse);
-    iString spacecraft = (string)inst["SpacecraftName"];
-    iString instId = (string)inst["InstrumentId"];
+    IString spacecraft = (string)inst["SpacecraftName"];
+    IString instId = (string)inst["InstrumentId"];
 
-    iString reseauFileName = "";
+    IString reseauFileName = "";
 
     // These set up which kernel and other files to access,
     if (spacecraft == "VOYAGER_1") {

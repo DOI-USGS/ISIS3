@@ -20,7 +20,7 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include "iString.h"
+#include "IString.h"
 #include "CameraDistortionMap.h"
 
 namespace Isis {
@@ -62,7 +62,7 @@ namespace Isis {
    * @todo Add latex equation to the documentation
    */
   void CameraDistortionMap::SetDistortion(const int naifIkCode) {
-    std::string odkkey = "INS" + Isis::iString(naifIkCode) + "_OD_K";
+    std::string odkkey = "INS" + Isis::IString(naifIkCode) + "_OD_K";
     for(int i = 0; i < 3; ++i) {
       p_odk.push_back(p_camera->Spice::getDouble(odkkey, i));
     }

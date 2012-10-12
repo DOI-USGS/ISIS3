@@ -141,7 +141,7 @@ namespace Isis {
    *                           fit within the output mosaic. Also ability to allow HS, LS
    *                           or NULL pixels from input to the mosaic(output). Added table
    *                           for Origin Default values based on pixel type
-   *   @history 2010-02-25 Sharmila Prasad - Changed stricmp to use iString function "Equal"
+   *   @history 2010-02-25 Sharmila Prasad - Changed stricmp to use IString function "Equal"
    *   @history 2010-10-21 Sharmila Prasad - The BandBin group must be carried thru to the mosaic
    *                           at creation time regardless of matchbandbin flag
    *   @history 2011-01-18 Sharmila Prasad - Added "Average" priority feature, to double
@@ -228,7 +228,7 @@ namespace Isis {
       void SetMosaicOrigin(int &piIndex);
 
 
-      void SetBandKeyword(iString bandPriorityKeyName, iString bandPriorityKeyValue);
+      void SetBandKeyword(IString bandPriorityKeyName, IString bandPriorityKeyValue);
       void SetBandNumber(int bandPriorityBandNumber);
       void SetBandUseMaxValue(bool useMax);
       void SetCreateFlag(bool createOutputMosaic);
@@ -249,8 +249,8 @@ namespace Isis {
       int GetInputStartSampleInMosaic() const;
       int GetInputStartBandInMosaic() const;
 
-      static iString OverlayToString(ImageOverlay);
-      static ImageOverlay StringToOverlay(iString);
+      static IString OverlayToString(ImageOverlay);
+      static ImageOverlay StringToOverlay(IString);
 
     private:
       //! Get the file index offset to be saved in the band by pixel type
@@ -302,8 +302,8 @@ namespace Isis {
       bool m_trackingEnabled;
       bool m_createOutputMosaic;
       int  m_bandPriorityBandNumber;
-      iString m_bandPriorityKeyName;
-      iString m_bandPriorityKeyValue;
+      IString m_bandPriorityKeyName;
+      IString m_bandPriorityKeyValue;
       bool m_bandPriorityUseMaxValue;
 
 

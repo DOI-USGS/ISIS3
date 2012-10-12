@@ -21,8 +21,8 @@ void IsisMain() {
   PvlGroup &dataDir =
       Preference::Preferences().FindGroup("DataDirectory");
   PvlTranslationTable tTable(
-      (iString)p.MissionData("base", "translations/MissionName2DataDir.trn"));
-  iString missionDir = dataDir[tTable.Translate("MissionName",
+      (IString)p.MissionData("base", "translations/MissionName2DataDir.trn"));
+  IString missionDir = dataDir[tTable.Translate("MissionName",
       (inCube->getGroup("Instrument")).FindKeyword("SpacecraftName")[0])][0];
   string camera =
       (inCube->getGroup("Instrument")).FindKeyword("InstrumentId")[0];

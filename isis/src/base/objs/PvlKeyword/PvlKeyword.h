@@ -29,7 +29,7 @@
 #include <QVariant>
 #include <QVarLengthArray>
 
-#include "iString.h"
+#include "IString.h"
 #include "Constants.h"
 
 namespace Isis {
@@ -95,7 +95,7 @@ namespace Isis {
     public:
       PvlKeyword();
       PvlKeyword(const std::string &name);
-      PvlKeyword(const std::string &name, const Isis::iString value,
+      PvlKeyword(const std::string &name, const Isis::IString value,
                  const std::string unit = "");
       PvlKeyword(const PvlKeyword &other);
       ~PvlKeyword();
@@ -123,15 +123,15 @@ namespace Isis {
         return StringEqual(name, Name());
       };
 
-      void SetValue(const Isis::iString value, const std::string unit = "");
+      void SetValue(const Isis::IString value, const std::string unit = "");
 
-      void SetUnits(const iString &units);
-      void SetUnits(const iString &value, const iString &units);
+      void SetUnits(const IString &units);
+      void SetUnits(const IString &value, const IString &units);
 
-      PvlKeyword &operator=(const Isis::iString value);
+      PvlKeyword &operator=(const Isis::IString value);
 
-      void AddValue(const Isis::iString value, const std::string unit = "");
-      PvlKeyword &operator+=(const Isis::iString value);
+      void AddValue(const Isis::IString value, const std::string unit = "");
+      PvlKeyword &operator+=(const Isis::IString value);
 
       //! Returns the number of values stored in this keyword
       int Size() const {
@@ -163,8 +163,8 @@ namespace Isis {
 
       operator QString() const;
 
-      const Isis::iString &operator[](const int index) const;
-      Isis::iString &operator[](const int index);
+      const Isis::IString &operator[](const int index) const;
+      Isis::IString &operator[](const int index);
       std::string Unit(const int index = 0) const;
 
       void AddComment(const std::string &comment);
@@ -281,7 +281,7 @@ namespace Isis {
        *   of the time we have one value per keyword so that is what we're
        *   allocating by default with this variable.
        */
-      QVarLengthArray<Isis::iString, 1> p_values;
+      QVarLengthArray<Isis::IString, 1> p_values;
 
       //! The units for the values.
       std::vector<std::string> *p_units;

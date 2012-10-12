@@ -20,7 +20,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "MiniRF.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "IException.h"
 #include "RadarPulseMap.h"

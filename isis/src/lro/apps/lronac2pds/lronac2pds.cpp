@@ -25,7 +25,7 @@ string g_md5Checksum;
 
 bool g_isIof;
 
-iString g_productVersionId = "N/A";
+IString g_productVersionId = "N/A";
 
 void IsisMain () {
     ResetGlobals();
@@ -145,10 +145,10 @@ void OutputLabel ( std::ofstream &fout, Cube* cube ) {
     labelPvl.SetTerminator("END");
     //Set up the directory where the translations are
     PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-    iString transDir = (string) dataDir["Lro"] + "/translations/";
+    IString transDir = (string) dataDir["Lro"] + "/translations/";
 
     stringstream stream;
-    iString pdsLabel = "";
+    IString pdsLabel = "";
 
     //Translate the Original Pds Label
     FileName transFile(transDir + "lronacPdsLabelExport.trn");
@@ -213,7 +213,7 @@ void OutputLabel ( std::ofstream &fout, Cube* cube ) {
         imageObject += PvlKeyword("HIGH_REPR_SATURATION", "16#FF7FFFFF#");
         imageObject += PvlKeyword("UNIT", "W / (m**2 micrometer sr)");
     }
-    imageObject += PvlKeyword("MD5_CHECKSUM", (iString) g_md5Checksum);
+    imageObject += PvlKeyword("MD5_CHECKSUM", (IString) g_md5Checksum);
 
     stream << labelPvl;
 

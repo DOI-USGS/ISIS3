@@ -27,7 +27,7 @@
 #include <QApplication>
 
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "MainWindow.h"
 #include "MdiCubeViewport.h"
 #include "RubberBandTool.h"
@@ -627,7 +627,7 @@ namespace Isis {
       IException fullError(e,
                            IException::User,
                            "Unable to rescale image to ["
-                           + iString(newScale*100) + "]",
+                           + IString(newScale*100) + "]",
                            _FILEINFO_);
       QString message = fullError.toString();
       QMessageBox::warning((QWidget *)parent(), "Warning", message);
@@ -670,7 +670,7 @@ namespace Isis {
     catch (IException &e) {
       IException fullError(e, IException::User,
                            "Unable to rescale image to ["
-                           + iString(newScale * 100) + "]",
+                           + IString(newScale * 100) + "]",
                            _FILEINFO_);
       QString message = fullError.toString();
       QMessageBox::warning((QWidget *)parent(), "Warning", message);
@@ -713,7 +713,7 @@ namespace Isis {
       IException fullError(e,
                            IException::User,
                            "Unable to rescale image to ["
-                           + iString(newScale*100) + "]",
+                           + IString(newScale*100) + "]",
                            _FILEINFO_);
       QString message = fullError.toString();
       QMessageBox::warning((QWidget *)parent(), "Warning", message);

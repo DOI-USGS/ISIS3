@@ -136,7 +136,7 @@ namespace Isis {
   void Mixed::SetNormPharef(const double pharef) {
     if(pharef < 0.0 || pharef >= 180.0) {
       std::string msg = "Invalid value of normalization pharef [" +
-                        iString(pharef) + "]";
+                        IString(pharef) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -155,7 +155,7 @@ namespace Isis {
   void Mixed::SetNormIncref(const double incref) {
     if(incref < 0.0 || incref >= 90.0) {
       std::string msg = "Invalid value of normalization incref [" +
-                        iString(incref) + "]";
+                        IString(incref) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -174,7 +174,7 @@ namespace Isis {
   void Mixed::SetNormEmaref(const double emaref) {
     if(emaref < 0.0 || emaref >= 90.0) {
       std::string msg = "Invalid value of normalization emaref [" +
-                        iString(emaref) + "]";
+                        IString(emaref) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -194,7 +194,7 @@ namespace Isis {
   void Mixed::SetNormPhamat(const double phamat) {
     if(phamat < 0.0 || phamat >= 180.0) {
       std::string msg = "Invalid value of normalization phamat [" +
-                        iString(phamat) + "]";
+                        IString(phamat) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -214,7 +214,7 @@ namespace Isis {
   void Mixed::SetNormIncmat(const double incmat) {
     if(incmat < 0.0 || incmat >= 90.0) {
       std::string msg = "Invalid value of normalization incmat [" +
-                        iString(incmat) + "]";
+                        IString(incmat) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -234,7 +234,7 @@ namespace Isis {
   void Mixed::SetNormEmamat(const double emamat) {
     if(emamat < 0.0 || emamat >= 90.0) {
       std::string msg = "Invalid value of normalization emamat [" +
-                        iString(emamat) + "]";
+                        IString(emamat) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 

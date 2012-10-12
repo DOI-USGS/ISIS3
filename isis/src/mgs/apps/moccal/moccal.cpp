@@ -259,7 +259,7 @@ void gbl::LoadCoefficients(const string &file, int ns) {
   vector<double> gainCoef;
   vector<double> offsetCoef;
   TextFile coef(file);
-  iString record, tok;
+  IString record, tok;
   coef.GetLine(record, true);
   int numCoefs = record.ToInteger();
   for(int i = 0; i < numCoefs; i++) {
@@ -276,7 +276,7 @@ void gbl::LoadCoefficients(const string &file, int ns) {
   // match the number of detectors in the NA or WA camera
   if((int)gainCoef.size() != gbl::moc->Detectors()) {
     string msg = "Coefficient file [" + file + "] size is wrong ... should have [";
-    msg += iString(gbl::moc->Detectors()) + "] gain/offset entries";
+    msg += IString(gbl::moc->Detectors()) + "] gain/offset entries";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 

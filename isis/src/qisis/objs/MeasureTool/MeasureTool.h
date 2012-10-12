@@ -7,7 +7,7 @@
 #include <QAction>
 #include "RubberBandComboBox.h"
 #include "TableMainWindow.h"
-#include "iString.h"
+#include "IString.h"
 
 
 class QDialog;
@@ -16,7 +16,7 @@ class QLineEdit;
 class QComboBox;
 
 namespace Isis {
-  class iString;
+  class IString;
 }
 
 namespace Isis {
@@ -172,8 +172,8 @@ namespace Isis {
 
 
       int m_numLinked;//!< number of linked viewports
-      iString m_path;//!< filename path
-      iString m_fname;//!< filename
+      IString m_path;//!< filename path
+      IString m_fname;//!< filename
 
       TableMainWindow *m_tableWin;//!< table window
       RubberBandComboBox *m_rubberBand;//!< rubberband combo box

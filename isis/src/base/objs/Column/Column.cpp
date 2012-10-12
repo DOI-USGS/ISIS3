@@ -25,7 +25,7 @@
 
 #include "Column.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 namespace Isis {
 
@@ -69,7 +69,7 @@ namespace Isis {
    */
   void Column::SetName(std::string name) {
     if (p_width != 0 && name.length() > p_width) {
-      iString message = "Name[" + name + "] is wider than width";
+      IString message = "Name[" + name + "] is wider than width";
       throw IException(IException::User, message, _FILEINFO_);
     }
     p_name = name;

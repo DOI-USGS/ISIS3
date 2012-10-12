@@ -48,7 +48,7 @@ void IsisMain() {
     string outParam = pathName + inFile.baseName() + "_highpass.cub";
     parameters = "FROM=" + inFile.expanded() +
                  " TO=" + outParam
-                 + " SAMPLES=" + iString(hns) + " LINES=" + iString(hnl);
+                 + " SAMPLES=" + IString(hns) + " LINES=" + IString(hnl);
     ProgramLauncher::RunIsisProgram("highpass", parameters);
     //Reads the just created highpass cube into a list file for automos
     highPassList << outParam << endl;
@@ -63,7 +63,7 @@ void IsisMain() {
   //Does a lowpass on the original mosaic
   parameters = "FROM=" + pathName + "OriginalMosaic.cub"
                + " TO=" + pathName + "LowpassMosaic.cub"
-               + " SAMPLES=" + iString(lns) + " LINES=" + iString(lnl);
+               + " SAMPLES=" + IString(lns) + " LINES=" + IString(lnl);
   ProgramLauncher::RunIsisProgram("lowpass", parameters);
 
   //Finally combines the highpass and lowpass mosaics

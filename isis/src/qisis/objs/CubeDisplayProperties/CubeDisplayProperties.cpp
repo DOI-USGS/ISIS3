@@ -270,7 +270,7 @@ namespace Isis {
           createManualFootprint(lock);
         }
         catch (IException &e) {
-          iString msg = "Could not read the footprint from cube [" +
+          IString msg = "Could not read the footprint from cube [" +
               displayName() + "]. Please make "
               "sure footprintinit has been run";
           throw IException(e, IException::Io, msg, _FILEINFO_);

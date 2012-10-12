@@ -29,7 +29,7 @@ namespace Isis {
   class Brick;
   class Buffer;
   class Cube;
-  class iString;
+  class IString;
   class Pvl;
   class PvlGroup;
 
@@ -56,7 +56,7 @@ namespace Isis {
       PvlGroup gap();
       Pvl gaps();
 
-      void setModification(iString newModValue);
+      void setModification(IString newModValue);
 
       // Processors
       void operator() (Buffer &in) const;

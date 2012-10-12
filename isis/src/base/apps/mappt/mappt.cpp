@@ -8,7 +8,7 @@
 #include "Brick.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Process.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
@@ -51,12 +51,12 @@ void IsisMain() {
     // Make sure we have a valid latitude value
     if(fabs(lat) > 90.0) {
       string msg = "Invalid value for LATITUDE ["
-                   + iString(lat) + "] outside range of ";
+                   + IString(lat) + "] outside range of ";
       msg += "[-90,90]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    iString coordsys = ui.GetString("COORDSYS");
+    IString coordsys = ui.GetString("COORDSYS");
     coordsys.UpCase();
 
     // All of these ifs will finish by setting the ground in the projection,

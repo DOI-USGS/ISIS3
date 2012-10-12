@@ -41,7 +41,7 @@ void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
 
   // Transfer the instrument group to the output cube
-  iString transDir = (string) dataDir["Lo"] + "/translations/";
+  IString transDir = (string) dataDir["Lo"] + "/translations/";
   Pvl inputLabel(labelFile.expanded());
   FileName transFile;
   FileName bandBinTransFile;
@@ -49,7 +49,7 @@ void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
   bool hasFiducial = false;
   // Check to see if file is PDS
   if(inputLabel.HasKeyword("PDS_VERSION_ID", Pvl::None)) {
-    iString pdsVersion = inputLabel.FindKeyword("PDS_VERSION_ID", Pvl::None)[0];
+    IString pdsVersion = inputLabel.FindKeyword("PDS_VERSION_ID", Pvl::None)[0];
 
     if(pdsVersion == "PDS3") {
       if(inputLabel.HasKeyword("LO:FIDUCIAL_ID", Pvl::Traverse)) {
@@ -99,10 +99,10 @@ void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
 
   //Creates FiducialCoordinateMicron with the proper units
   if(!inputLabel.HasKeyword("LO:BORESIGHT_SAMPLE", Pvl::Traverse)) {
-    iString fcm = (string) inst.FindKeyword("FiducialCoordinateMicron");
-    iString fcmUnits = fcm;
-    fcmUnits = iString::TrimHead("0123456789.", fcmUnits);
-    fcm = iString::TrimTail("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", fcm);
+    IString fcm = (string) inst.FindKeyword("FiducialCoordinateMicron");
+    IString fcmUnits = fcm;
+    fcmUnits = IString::TrimHead("0123456789.", fcmUnits);
+    fcm = IString::TrimTail("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", fcm);
     inst.FindKeyword("FiducialCoordinateMicron").SetValue((int)fcm, fcmUnits);
   }
 
@@ -142,7 +142,7 @@ void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
 
   //Determines the NaifFrameCode
   PvlGroup kerns("Kernels");
-  iString frameCode;
+  IString frameCode;
   if(spacecraftName.compare("Lunar Orbiter 3") == 0) {
     frameCode = "-533";
   }
@@ -161,8 +161,8 @@ void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
   }
 
   //Create subframe and frame keywords
-  iString imgNumber = (string) inst.FindKeyword("ImageNumber");
-  int subFrame = ((iString)imgNumber.substr(5)).ToInteger();
+  IString imgNumber = (string) inst.FindKeyword("ImageNumber");
+  int subFrame = ((IString)imgNumber.substr(5)).ToInteger();
 
   inst.AddKeyword(PvlKeyword("SubFrame", subFrame));
   //ImageNumber is auto translated, and no longer needed

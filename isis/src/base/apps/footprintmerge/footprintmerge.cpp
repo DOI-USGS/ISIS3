@@ -145,7 +145,7 @@ void IsisMain() {
     PvlObject results("Results");
     for(unsigned int p = 0; p < islandPolys.size(); p++) {
       int numFiles = islands[p].size();
-      string isle = "FootprintIsland_" + iString((int)p + 1);
+      string isle = "FootprintIsland_" + IString((int)p + 1);
       PvlGroup island(isle);
       island += PvlKeyword("NumberFiles", numFiles);
       PvlKeyword files("Files");

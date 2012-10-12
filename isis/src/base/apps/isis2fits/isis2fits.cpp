@@ -7,7 +7,7 @@
 #include <sstream>
 
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "ProcessExport.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -21,9 +21,9 @@ using namespace Isis;
 // Global variables
 int headerBytes = 0;
 
-string FitsKeyword(string keyword, bool isVal, Isis::iString value, Isis::iString unit = "");
+string FitsKeyword(string keyword, bool isVal, Isis::IString value, Isis::IString unit = "");
 
-string WritePvl(string fitsKey, string group, iString key, Cube *icube, bool isString);
+string WritePvl(string fitsKey, string group, IString key, Cube *icube, bool isString);
 
 // Main program
 void IsisMain() {
@@ -100,16 +100,16 @@ void IsisMain() {
     axes = 3;
   }
 
-  header += FitsKeyword("NAXIS", true, iString(axes));
+  header += FitsKeyword("NAXIS", true, IString(axes));
 
   // specify the limit on data axis 1 (number of samples)
-  header += FitsKeyword("NAXIS1", true, iString(icube->getSampleCount()));
+  header += FitsKeyword("NAXIS1", true, IString(icube->getSampleCount()));
 
   // specify the limit on data axis 2 (number of lines)
-  header += FitsKeyword("NAXIS2", true, iString(icube->getLineCount()));
+  header += FitsKeyword("NAXIS2", true, IString(icube->getLineCount()));
 
   if(axes == 3) {
-    header += FitsKeyword("NAXIS3", true, iString(icube->getBandCount()));
+    header += FitsKeyword("NAXIS3", true, IString(icube->getBandCount()));
   }
 
   header += FitsKeyword("BZERO", true,  base);
@@ -118,7 +118,7 @@ void IsisMain() {
 
   // Sky and All cases
   if(ui.GetString("INFO") == "SKY" || ui.GetString("INFO") == "ALL") {
-    iString msg = "cube has not been skymapped";
+    IString msg = "cube has not been skymapped";
     PvlGroup map;
 
     if(icube->hasGroup("mapping")) {
@@ -135,10 +135,10 @@ void IsisMain() {
       midDec = ((double)map["MaximumLatitude"] +
                 (double)map["MinimumLatitude"]) / 2;
 
-      header += FitsKeyword("OBJCTRA", true, iString(midRa));
+      header += FitsKeyword("OBJCTRA", true, IString(midRa));
 
       // Specify the Declination
-      header += FitsKeyword("OBJCTDEC", true, iString(midDec));
+      header += FitsKeyword("OBJCTDEC", true, IString(midDec));
 
     }
 
@@ -198,7 +198,7 @@ void IsisMain() {
   p.EndProcess();
 }
 
-string FitsKeyword(string key, bool isValue, Isis::iString value, Isis::iString unit) {
+string FitsKeyword(string key, bool isValue, Isis::IString value, Isis::IString unit) {
   // pad the keyword with space
   for(int i = key.length() ; i < 8 ; i++)
     key += " ";
@@ -234,14 +234,14 @@ string FitsKeyword(string key, bool isValue, Isis::iString value, Isis::iString 
   return key;
 }
 
-string WritePvl(string fitsKey, string group, iString key, Cube *icube, bool isString) {
+string WritePvl(string fitsKey, string group, IString key, Cube *icube, bool isString) {
   if(icube->hasGroup(group)) {
     PvlGroup theGroup = icube->getGroup(group);
-    iString name = (string)theGroup[key];
+    IString name = (string)theGroup[key];
     if(isString) {
       name = "'" + name + "'";
     }
-    iString unit = theGroup[key].Unit();
+    IString unit = theGroup[key].Unit();
     return FitsKeyword(fitsKey, true, name, unit);
   }
   return NULL;

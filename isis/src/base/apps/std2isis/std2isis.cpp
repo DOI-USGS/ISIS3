@@ -15,7 +15,7 @@ void IsisMain() {
   ImageImporter *importer = ImageImporter::fromFileName(inputName);
 
   // Explicitly set band dimension if a specific color mode is desired
-  iString mode = ui.GetString("MODE");
+  IString mode = ui.GetString("MODE");
   if (mode != "AUTO") {
     int bands = mode == "GRAYSCALE" ? 1 : mode == "ARGB" ? 4 : 3;
     importer->setBands(bands);

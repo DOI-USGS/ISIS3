@@ -24,7 +24,7 @@ void IsisMain() {
 
   // Get the input filename and make sure it is a MOC EDR
   FileName in = ui.GetFileName("FROM");
-  iString id;
+  IString id;
   bool compressed = false;
   bool projected;
   try {
@@ -65,7 +65,7 @@ void IsisMain() {
 
   // If the input file is compressed, use "mocuncompress" to uncompress it
   if(compressed) {
-    iString command = "mocuncompress " + in.expanded() + " " +
+    IString command = "mocuncompress " + in.expanded() + " " +
                       uncompressed.expanded();
     if(system(command.c_str()) == 1) {
       string msg = "Unable to execute [mocuncompress]";
@@ -100,7 +100,7 @@ void TranslateMocEdrLabels(FileName &labelFile, Cube *ocube) {
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
 
   // Transfer the instrument group to the output cube
-  iString transDir = (string) dataDir["Mgs"];
+  IString transDir = (string) dataDir["Mgs"];
   FileName transFile(transDir + "/" + "translations/mocInstrument.trn");
 
   // Get the translation manager ready
@@ -189,7 +189,7 @@ void TranslateMocEdrLabels(FileName &labelFile, Cube *ocube) {
   }
 
   if(instrumentXlater.InputHasKeyword("FirstLineSample")) {
-    iString str = instrumentXlater.Translate("FirstLineSample");
+    IString str = instrumentXlater.Translate("FirstLineSample");
     int num = str.ToInteger();
     num++;
     inst += PvlKeyword("FirstLineSample", num);
@@ -291,7 +291,7 @@ void TranslateMocEdrLabels(FileName &labelFile, Cube *ocube) {
   string frameCode;
 
   if(bandBinXlater.InputHasKeyword("FilterName")) {
-    iString str = bandBinXlater.Translate("FilterName");
+    IString str = bandBinXlater.Translate("FilterName");
     str.UpCase();
 
     if(str == "BLUE") {

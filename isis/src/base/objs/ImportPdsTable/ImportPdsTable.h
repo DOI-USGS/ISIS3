@@ -27,7 +27,7 @@
 #include <string>
 
 namespace Isis {
-  class iString;
+  class IString;
   class Table;
   class TableField;
   class TableRecord;
@@ -95,7 +95,7 @@ namespace Isis {
       };
 
       typedef std::vector<ColumnDescr> ColumnTypes;
-      typedef std::vector<iString>     Columns;
+      typedef std::vector<IString>     Columns;
       typedef std::vector<Columns>     Rows;
 
       //private instance variables

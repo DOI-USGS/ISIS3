@@ -21,7 +21,7 @@
 
 #include "Displacement.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "SpecialPixel.h"
 
 namespace Isis {
@@ -164,11 +164,11 @@ namespace Isis {
    *
    * @return XXX meters (or empty string if not valid).
    */
-  iString Distance::toString() const {
-    iString string;
+  IString Distance::toString() const {
+    IString string;
 
     if (isValid())
-      string = iString(meters()) + " meters";
+      string = IString(meters()) + " meters";
 
     return string;
   }
@@ -193,7 +193,7 @@ namespace Isis {
     */
   bool Distance::operator >(const Distance &otherDistance) const {
     if(!isValid() || !otherDistance.isValid()) {
-      iString msg = "Distance has not been initialized, you must initialize "
+      IString msg = "Distance has not been initialized, you must initialize "
           "it first before comparing with another distance using [>]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -211,7 +211,7 @@ namespace Isis {
     */
   bool Distance::operator <(const Distance &otherDistance) const {
     if(!isValid() || !otherDistance.isValid()) {
-      iString msg = "Distance has not been initialized, you must initialize "
+      IString msg = "Distance has not been initialized, you must initialize "
           "it first before comparing with another distance using [<]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -408,15 +408,15 @@ namespace Isis {
         break;
 
       case Pixels:
-        iString msg = "Cannot call distance() with pixels, ask for another "
+        IString msg = "Cannot call distance() with pixels, ask for another "
                       "unit";
         throw IException(IException::Programmer, msg, _FILEINFO_);
         break;
     }
 
     if(resultingDistance == Null) {
-      iString msg = "Distance does not understand the enumerated value [" +
-          iString(distanceUnit) + "] as a unit";
+      IString msg = "Distance does not understand the enumerated value [" +
+          IString(distanceUnit) + "] as a unit";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -452,21 +452,21 @@ namespace Isis {
         break;
 
       case Pixels:
-        iString msg = "Cannot setDistance with pixels, must convert to another "
+        IString msg = "Cannot setDistance with pixels, must convert to another "
             "unit first";
         throw IException(IException::Programmer, msg, _FILEINFO_);
         break;
     }
 
     if(distanceInMeters == Null) {
-      iString msg = "Distance does not understand the enumerated value [" +
-        iString(distanceUnit) + "] as a unit";
+      IString msg = "Distance does not understand the enumerated value [" +
+        IString(distanceUnit) + "] as a unit";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (distanceInMeters < 0.0) {
-      iString msg = "Negative distances are not supported, the value [" +
-        iString(distanceInMeters) + " meters] cannot be stored in the Distance "
+      IString msg = "Negative distances are not supported, the value [" +
+        IString(distanceInMeters) + " meters] cannot be stored in the Distance "
         "class";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

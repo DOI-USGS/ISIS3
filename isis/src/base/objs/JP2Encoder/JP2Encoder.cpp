@@ -26,7 +26,7 @@
 #include <sstream>
 
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "JP2Encoder.h"
 #include "JP2Error.h"
 

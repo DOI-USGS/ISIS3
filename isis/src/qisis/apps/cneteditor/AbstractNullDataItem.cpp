@@ -6,7 +6,7 @@
 #include <QVariant>
 
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 
 namespace Isis
@@ -38,7 +38,7 @@ namespace Isis
 
     void AbstractNullDataItem::setData(QString const & columnTitle, QString const & newData)
     {
-      iString msg = "Cannot set data on an AbstractNullDataItem";
+      IString msg = "Cannot set data on an AbstractNullDataItem";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -50,7 +50,7 @@ namespace Isis
 
     void AbstractNullDataItem::deleteSource()
     {
-      iString msg = "deleteSource called on an AbstractNullDataItem";
+      IString msg = "deleteSource called on an AbstractNullDataItem";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -69,7 +69,7 @@ namespace Isis
 
     bool AbstractNullDataItem::operator<(AbstractTreeItem const & other) const
     {
-      iString msg = "operator<() called on an AbstractNullDataItem";
+      IString msg = "operator<() called on an AbstractNullDataItem";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

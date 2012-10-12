@@ -283,7 +283,7 @@ namespace Isis {
    * @param gradientFilterType the gradient filter type to use
    * @throw iException::User - "Invalid Gradient type."
    */
-  void AutoReg::SetGradientFilterType(const iString& gradientFilterType) {
+  void AutoReg::SetGradientFilterType(const IString& gradientFilterType) {
     if (gradientFilterType == "None") {
       p_gradientFilterType = None;
     }
@@ -299,7 +299,7 @@ namespace Isis {
   }
 
 
-  iString AutoReg::GradientFilterString() const {
+  IString AutoReg::GradientFilterString() const {
     switch (p_gradientFilterType) {
       case None: return "None";
       case Sobel: return "Sobel";
@@ -352,7 +352,7 @@ namespace Isis {
   void AutoReg::SetPatternValidPercent(const double percent) {
     if((percent <= 0.0) || (percent > 100.0)) {
       string msg = "Invalid value for PatternChip ValidPercent ["
-        + iString(percent)
+        + IString(percent)
         + "].  Must be greater than 0.0 and less than or equal to 100.0 (Default is 50.0).";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -380,7 +380,7 @@ namespace Isis {
   void AutoReg::SetSubsearchValidPercent(const double percent) {
     if((percent <= 0.0) || (percent > 100.0)) {
       string msg = "Invalid value for SearchChip SubchipValidPercent ["
-        + iString(percent) + "]"
+        + IString(percent) + "]"
         + "].  Must be greater than 0.0 and less than or equal to 100.0 (Default is 50.0).";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -407,7 +407,7 @@ namespace Isis {
   void AutoReg::SetPatternZScoreMinimum(double minimum) {
     if(minimum <= 0.0) {
       string msg = "Invalid value for PatternChip MinimumZScore ["
-        + iString(minimum)
+        + IString(minimum)
         + "].  Must be greater than 0.0. (Default is 1.0).";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -450,7 +450,7 @@ namespace Isis {
    * @internal
    *   @history 2010-06-15 Jeannie Walldren - Original version.
    */
-  void AutoReg::SetChipInterpolator(const iString& interpolator) {
+  void AutoReg::SetChipInterpolator(const IString& interpolator) {
 
     Isis::Interpolator::interpType itype;
     if(interpolator == "NearestNeighborType") {
@@ -493,7 +493,7 @@ namespace Isis {
   void AutoReg::SetSurfaceModelWindowSize(int size) {
     if(size % 2 != 1 || size < 3) {
       string msg = "Invalid value for SurfaceModel WindowSize ["
-        + iString(size) + "].  Must be an odd number greater than or equal to 3";
+        + IString(size) + "].  Must be an odd number greater than or equal to 3";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     p_windowSize = size;
@@ -514,7 +514,7 @@ namespace Isis {
   void AutoReg::SetSurfaceModelDistanceTolerance(double distance) {
     if(distance <= 0.0) {
       string msg = "Invalid value for SurfaceModel DistanceTolerance ["
-        + iString(distance) + "].  Must greater than 0.0.";
+        + IString(distance) + "].  Must greater than 0.0.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     p_distanceTolerance = distance;
@@ -534,7 +534,7 @@ namespace Isis {
   void AutoReg::SetReductionFactor(int factor) {
     if(factor < 1) {
       string msg = "Invalid value for Algorithm ReductionFactor ["
-        + iString(factor) + "].  Must greater than or equal to 1.";
+        + IString(factor) + "].  Must greater than or equal to 1.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     p_reduceFactor = factor;
@@ -604,17 +604,17 @@ namespace Isis {
 
     if(p_searchChip.Samples() < p_patternChip.Samples() + N) {
       string msg = "Search chips samples [";
-      msg += iString(p_searchChip.Samples()) + "] must be at ";
-      msg += "least [" + iString(N) + "] pixels wider than the pattern chip samples [";
-      msg += iString(p_patternChip.Samples()) + "] for successful surface modeling";
+      msg += IString(p_searchChip.Samples()) + "] must be at ";
+      msg += "least [" + IString(N) + "] pixels wider than the pattern chip samples [";
+      msg += IString(p_patternChip.Samples()) + "] for successful surface modeling";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if(p_searchChip.Lines() < p_patternChip.Lines() + N) {
       string msg = "Search chips lines [";
-      msg += iString(p_searchChip.Lines()) + "] must be at ";
-      msg += "least [" + iString(N) + "] pixels taller than the pattern chip lines [";
-      msg += iString(p_patternChip.Lines()) + "] for successful surface modeling";
+      msg += IString(p_searchChip.Lines()) + "] must be at ";
+      msg += "least [" + IString(N) + "] pixels taller than the pattern chip lines [";
+      msg += IString(p_patternChip.Lines()) + "] for successful surface modeling";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -1034,9 +1034,9 @@ namespace Isis {
   void AutoReg::Match(Chip &sChip, Chip &pChip, Chip &fChip, int startSamp, int endSamp, int startLine, int endLine) {
     // Sanity check.  Should have been caught by the two previous tests
     if(startSamp == endSamp && startLine == endLine) {
-      string msg = "StartSample [" + iString(startSamp) + "] = EndSample ["
-        + iString(endSamp) + "] and StartLine [" + iString(startLine) + " = EndLine ["
-        + iString(endLine) + "].";
+      string msg = "StartSample [" + IString(startSamp) + "] = EndSample ["
+        + IString(endSamp) + "] and StartLine [" + IString(startLine) + " = EndLine ["
+        + IString(endLine) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

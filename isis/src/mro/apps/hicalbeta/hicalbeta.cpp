@@ -13,7 +13,7 @@
 #include "UserInterface.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "iString.h"
+#include "IString.h"
 #include "HiCalConf.h"
 #include "CollectorMap.h"
 #include "HiCalTypes.h"

@@ -28,7 +28,7 @@
 #include "SpecialPixel.h"
 #include "UniversalGroundMap.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 enum SeedDomain {
   XY,
@@ -122,7 +122,7 @@ void IsisMain() {
   // Get seed domain for unit conversion, no keyword == XY
   SeedDomain seedDomain = XY;
   if(seedDef.HasKeyword("SeedDomain", Pvl::Traverse)) {
-    iString domain = (std::string) seedDef.FindKeyword("SeedDomain", Pvl::Traverse);
+    IString domain = (std::string) seedDef.FindKeyword("SeedDomain", Pvl::Traverse);
     if(unusedDefKeywords.HasKeyword("SeedDomain"))
       unusedDefKeywords.DeleteKeyword("SeedDomain");
 
@@ -130,7 +130,7 @@ void IsisMain() {
       seedDomain = SampleLine;
     }
     else if(domain.UpCase() != "XY") {
-      iString msg = "Invalid value provided for keywork [SeedDomain]";
+      IString msg = "Invalid value provided for keywork [SeedDomain]";
       msg += " Possible values include [XY, SampleLine]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -220,7 +220,7 @@ void IsisMain() {
     for(int i = 0 ; i < precnet.GetNumPoints(); i ++) {
       ControlPoint *cp = precnet.GetPoint(i);
       ControlMeasure *cm = cp->GetRefMeasure();
-      iString c = serialNumbers.FileName(cm->GetCubeSerialNumber());
+      IString c = serialNumbers.FileName(cm->GetCubeSerialNumber());
       Pvl cubepvl(c);
       Camera *cam = CameraFactory::Create(cubepvl);
       cam->SetImage(cm->GetSample(), cm->GetLine());
@@ -326,7 +326,7 @@ void IsisMain() {
                                                   proj->UniversalLatitude())));
         }
         else {
-          iString msg = "Unable to convert from X/Y to a (lon,lat)";
+          IString msg = "Unable to convert from X/Y to a (lon,lat)";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
       }
@@ -340,7 +340,7 @@ void IsisMain() {
                                                   ugmap->UniversalLatitude())));
         }
         else {
-          iString msg = "Unable to convert from Sample/Line to a (lon,lat)";
+          IString msg = "Unable to convert from Sample/Line to a (lon,lat)";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
       }
@@ -493,10 +493,10 @@ void IsisMain() {
   }
 
   // create Results group and add to print.prt
-  PvlKeyword cpCountKeyword("ControlPointCount", iString(cpCount));
-  PvlKeyword msCountKeyword("ControlMeasureCount", iString(msCount));
-  PvlKeyword cpIgnoredCountKeyword("ControlPointsIgnored", iString(cpIgnoredCount));
-  PvlKeyword cmIgnoredCountKeyword("ControlMeasuresIgnored", iString(cmIgnoredCount));
+  PvlKeyword cpCountKeyword("ControlPointCount", IString(cpCount));
+  PvlKeyword msCountKeyword("ControlMeasureCount", IString(msCount));
+  PvlKeyword cpIgnoredCountKeyword("ControlPointsIgnored", IString(cpIgnoredCount));
+  PvlKeyword cmIgnoredCountKeyword("ControlMeasuresIgnored", IString(cmIgnoredCount));
 
   PvlGroup resultsGrp("Results");
   resultsGrp.AddKeyword(cpCountKeyword);

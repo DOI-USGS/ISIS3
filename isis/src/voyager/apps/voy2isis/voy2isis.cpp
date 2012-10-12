@@ -6,7 +6,7 @@
 
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "NaifStatus.h"
 #include "ProcessImportPds.h"
 #include "ProgramLauncher.h"
@@ -38,7 +38,7 @@ void IsisMain() {
   bool tempFile = false;
 
   // input files are compressed, use vdcomp to decompress
-  iString ext = iString(in.extension()).UpCase();
+  IString ext = IString(in.extension()).UpCase();
   if(ext == "IMQ") {
     try {
       string command = "$ISISROOT/bin/vdcomp " + in.expanded() + " " + temp.expanded();
@@ -94,13 +94,13 @@ void ConvertComments(FileName file) {
 
   unsigned int lineStartPos = 0;
   fstream stream;
-  iString filename = file.expanded();
+  IString filename = file.expanded();
   stream.open(filename.c_str(), fstream::in | fstream::out | fstream::binary);
 
   lineStartPos = stream.tellg();
   stream.getline(tmp, sizeof(tmp) / sizeof(char));
-  while(iString(tmp).find("END") != 0 && stream.good()) {
-    iString lineOfData(tmp);
+  while(IString(tmp).find("END") != 0 && stream.good()) {
+    IString lineOfData(tmp);
 
     if(lineOfData.find("/*") != string::npos &&
         lineOfData.find("*/") == string::npos) {
@@ -129,7 +129,7 @@ void ConvertComments(FileName file) {
 void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   // Get the directory where the Voyager translation tables are
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
-  iString missionDir = (string) dataDir[(string)inputLabel["SpacecraftName"]];
+  IString missionDir = (string) dataDir[(string)inputLabel["SpacecraftName"]];
   FileName transFile(missionDir + "/translations/voyager.trn");
 
   // Get the translation manager ready
@@ -180,9 +180,9 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
 
   // Setup the kernel group
   PvlGroup kern("Kernels");
-  iString spacecraftNumber;
+  IString spacecraftNumber;
   int spacecraftCode = 0;
-  iString instId = (string) inst.FindKeyword("InstrumentId");
+  IString instId = (string) inst.FindKeyword("InstrumentId");
   if((string) inst.FindKeyword("SpacecraftName") == "VOYAGER_1") {
     spacecraftNumber = "1";
     if(instId == "NARROW_ANGLE_CAMERA") {
@@ -227,14 +227,14 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   ocube->putGroup(kern);
 
   // Modify time to remove Z from end
-  iString time = inst.FindKeyword("StartTime")[0];
+  IString time = inst.FindKeyword("StartTime")[0];
   time.Remove("Z");
   inst.FindKeyword("StartTime").SetValue(time);
 
   // Fix image number - remove the period, if Wide angle camera and one of two
   // shutter modes, we must fix the wide angle image number for use below.
   // Before #####.##     After #######
-  iString imgNumber = inst["SpacecraftClockCount"][0];
+  IString imgNumber = inst["SpacecraftClockCount"][0];
   imgNumber.Replace(".", "");
   // Save this change
   inst["SpacecraftClockCount"] = imgNumber;
@@ -252,14 +252,14 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   if((inst["ShutterModeId"][0] == "BSIMAN" ||
       inst["ShutterModeId"][0] == "BOTSIM") &&
       inst["InstrumentId"][0] == "WIDE_ANGLE_CAMERA") {
-    iString scanId = inst["ScanModeId"][0];
-    int scanNum = iString(scanId.substr(0, 1)).ToInteger();
+    IString scanId = inst["ScanModeId"][0];
+    int scanNum = IString(scanId.substr(0, 1)).ToInteger();
     int imgNum = imgNumber.ToInteger();
 
     // We'll use this later, however, we do not write it to the labels.
     // if we didn't get in here, we'll be using the original image number,
     // otherwise, we'll use this modified image number.
-    imgNumber = iString((imgNum - scanNum));
+    imgNumber = IString((imgNum - scanNum));
   }
 
   // This next section handles modifying the starttime slightly and requires
@@ -352,7 +352,7 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
    */
 
   // Get first digit and the /
-  iString newClockCount = string(approxSpacecraftClock).substr(0, 2);
+  IString newClockCount = string(approxSpacecraftClock).substr(0, 2);
   // Get first five digits of imgNumber and append
   newClockCount.append(imgNumber.substr(0, 5));
   // I'll stop commenting now, you can read code as well as me
@@ -366,7 +366,7 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   char utcOut[25];
   et2utc_c(approxEphemeris, "ISOC", 3, 26, utcOut);
   NaifStatus::CheckErrors();
-  inst["StartTime"].SetValue(iString(utcOut));
+  inst["StartTime"].SetValue(IString(utcOut));
 
   // Set up the nominal reseaus group
   PvlGroup res("Reseaus");

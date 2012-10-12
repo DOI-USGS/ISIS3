@@ -182,7 +182,7 @@ namespace Isis {
 
     catch(geos::util::IllegalArgumentException *ill) {
       std::string msg = "ERROR! geos exception 1 [";
-      msg += (iString)ill->what() + "]";
+      msg += (IString)ill->what() + "]";
       delete ill;
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }/*end catch*/
@@ -314,7 +314,7 @@ namespace Isis {
 
     catch(geos::util::IllegalArgumentException *ill) {
       std::string msg = "ERROR! geos exception 1 [";
-      msg += (iString)ill->what() + "]";
+      msg += (IString)ill->what() + "]";
       delete ill;
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }/*end catch*/

@@ -240,18 +240,18 @@ namespace Isis {
       void subSpacecraftPoint(double &lat, double &lon);
       void subSolarPoint(double &lat, double &lon);
 
-      iString target() const;
+      IString target() const;
 
       //! Return if our target is the sky
       bool isSky() const {
         return p_sky;
       };
 
-      iTime getClockTime(iString clockValue,
+      iTime getClockTime(IString clockValue,
                          int sclkCode = -1);
-      SpiceDouble getDouble(const iString &key, int index = 0);
-      SpiceInt getInteger(const iString &key,   int index = 0);
-      iString getString(const iString &key,     int index = 0);
+      SpiceDouble getDouble(const IString &key, int index = 0);
+      SpiceInt getInteger(const IString &key,   int index = 0);
+      IString getString(const IString &key,     int index = 0);
 
       /**
        * Accessor method for the sun position.
@@ -315,14 +315,14 @@ namespace Isis {
         SpiceByteCodeType
       };
 
-      QVariant readValue(iString key, SpiceValueType type, int index = 0);
+      QVariant readValue(IString key, SpiceValueType type, int index = 0);
 
-      void storeResult(iString name, SpiceValueType type, QVariant value);
-      QVariant getStoredResult(iString name, SpiceValueType type);
+      void storeResult(IString name, SpiceValueType type, QVariant value);
+      QVariant getStoredResult(IString name, SpiceValueType type);
 
-      void storeValue(iString key, int index, SpiceValueType type,
+      void storeValue(IString key, int index, SpiceValueType type,
                       QVariant value);
-      QVariant readStoredValue(iString key, SpiceValueType type, int index);
+      QVariant readStoredValue(IString key, SpiceValueType type, int index);
 
       // Leave these protected so that inheriting classes don't
       // have to convert between double and spicedouble
@@ -351,8 +351,8 @@ namespace Isis {
 
       Longitude *p_solarLongitude; //!< Body rotation solar longitude value
       iTime *p_et; //!< Ephemeris time (read NAIF documentation for a detailed description)
-      QVector<iString> * p_kernels; //!< Vector containing kernels filenames
-      iString *p_target; //!< Target of the observation
+      QVector<IString> * p_kernels; //!< Vector containing kernels filenames
+      IString *p_target; //!< Target of the observation
 
       // cache stuff
       iTime *p_startTime; //!< Corrected start (shutter open) time of the observation.

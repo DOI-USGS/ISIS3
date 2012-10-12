@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 
-#include "iString.h"
+#include "IString.h"
 #include "HiCalTypes.h"
 #include "HiCalUtil.h"
 #include "HiCalConf.h"

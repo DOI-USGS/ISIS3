@@ -55,7 +55,7 @@ namespace Isis {
    */
   class QtExporter : public ImageExporter {
     public:
-      QtExporter(iString format);
+      QtExporter(IString format);
       virtual ~QtExporter();
 
       virtual void setGrayscale(ExportDescription &desc);
@@ -64,7 +64,7 @@ namespace Isis {
 
       virtual void write(FileName outputName, int quality=100);
 
-      static bool canWriteFormat(iString format);
+      static bool canWriteFormat(IString format);
 
     protected:
       virtual void writeGrayscale(vector<Buffer *> &in) const;
@@ -78,7 +78,7 @@ namespace Isis {
       QImage *m_qimage;
 
       //! The lowercase abbreviated format of the output image.
-      iString m_format;
+      IString m_format;
   };
 };
 

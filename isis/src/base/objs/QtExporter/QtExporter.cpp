@@ -17,7 +17,7 @@ namespace Isis {
    *
    * @param format The format to export to
    */
-  QtExporter::QtExporter(iString format) : ImageExporter() {
+  QtExporter::QtExporter(IString format) : ImageExporter() {
     m_qimage = NULL;
     m_format = format;
 
@@ -113,7 +113,7 @@ namespace Isis {
       //  the following if statement does it informally.
       m_qimage->setPixel(s, l, dn);
       if (!m_qimage->valid(s, l)) {
-        iString msg = "QT has detected your file size as exceeding 2GB.";
+        IString msg = "QT has detected your file size as exceeding 2GB.";
         msg += " While your image might be under 2GB, your image labels are more";
         msg += " than likely pushing the file size over 2GB.";
         throw IException(IException::User, msg, _FILEINFO_);
@@ -181,7 +181,7 @@ namespace Isis {
     if (!m_qimage->save(outputName.expanded().c_str(), m_format.c_str(),
           quality)) {
 
-      iString err = "Unable to save [" + outputName.expanded() +
+      IString err = "Unable to save [" + outputName.expanded() +
         "] to the disk";
       throw IException(IException::Programmer, err, _FILEINFO_);
     }
@@ -202,8 +202,8 @@ namespace Isis {
 
     BigInt size = samples * lines * bands;
     if (size >= maxSize) {
-      iString gigaBytes = size / (1024.0 * 1024.0 * 1024.0);
-      iString msg = "Cube exceeds max size of 2GB. Qimage cannot support ";
+      IString gigaBytes = size / (1024.0 * 1024.0 * 1024.0);
+      IString msg = "Cube exceeds max size of 2GB. Qimage cannot support ";
       msg += "that much raw data. Your cube is " + gigaBytes + " GB.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -217,7 +217,7 @@ namespace Isis {
    *
    * @return True if supported in Qt, false otherwise
    */
-  bool QtExporter::canWriteFormat(iString format) {
+  bool QtExporter::canWriteFormat(IString format) {
     bool supported = false;
     QList<QByteArray> list = QImageWriter::supportedImageFormats();
     QList<QByteArray>::Iterator it = list.begin();

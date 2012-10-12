@@ -29,7 +29,7 @@
 #include "PvlGroup.h"
 #include "IException.h"
 #include "PolygonTools.h"
-#include "iString.h"
+#include "IString.h"
 
 #include "GridPolygonSeeder.h"
 
@@ -235,8 +235,8 @@ namespace Isis {
                   proj->UniversalLatitude())));
             }
             else {
-              iString msg = "Unable to convert [(" + iString(x) + ",";
-              msg += iString(y) + ")] to a (lon,lat)";
+              IString msg = "Unable to convert [(" + IString(x) + ",";
+              msg += IString(y) + ")] to a (lon,lat)";
               throw iException::Message(iException::Programmer, msg, _FILEINFO_);
             }*/
             points.push_back(Isis::globalFactory.createPoint(
@@ -434,7 +434,7 @@ namespace Isis {
 
       p_subGrid = false;
       if(algo.HasKeyword("SubGrid")) {
-        p_subGrid = iString((std::string)algo["SubGrid"]).UpCase() != "FALSE";
+        p_subGrid = IString((std::string)algo["SubGrid"]).UpCase() != "FALSE";
         if(invalgo.HasKeyword("SubGrid")) {
           invalgo.DeleteKeyword("SubGrid");
         }
@@ -446,11 +446,11 @@ namespace Isis {
     }
 
     if(p_Xspacing <= 0.0) {
-      iString msg = "X Spacing must be greater that 0.0 [(" + iString(p_Xspacing) + "]";
+      IString msg = "X Spacing must be greater that 0.0 [(" + IString(p_Xspacing) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     if(p_Yspacing <= 0.0) {
-      iString msg = "Y Spacing must be greater that 0.0 [(" + iString(p_Yspacing) + "]";
+      IString msg = "Y Spacing must be greater that 0.0 [(" + IString(p_Yspacing) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }

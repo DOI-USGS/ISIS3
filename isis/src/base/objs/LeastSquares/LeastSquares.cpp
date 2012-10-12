@@ -30,7 +30,7 @@
 #include <string>
 #include "LeastSquares.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 namespace Isis {
   /**
@@ -185,7 +185,7 @@ namespace Isis {
   std::vector<double> LeastSquares::GetInput(int row) const {
     if((row >= Rows()) || (row < 0)) {
       std::string msg = "Index out of bounds ";
-      msg += "[Given = " + Isis::iString(row) + "]";
+      msg += "[Given = " + Isis::IString(row) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_input[row];
@@ -201,7 +201,7 @@ namespace Isis {
   double LeastSquares::GetExpected(int row) const {
     if((row >= Rows()) || (row < 0)) {
       std::string msg = "Index out of bounds ";
-      msg += "[Given = " + Isis::iString(row) + "]";
+      msg += "[Given = " + Isis::IString(row) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_expected[row];
@@ -328,8 +328,8 @@ namespace Isis {
     if (coefs.dim1() < p_basis->Coefficients()) {
       std::string msg = "No solution available ... ";
       msg += "Not enough knowns or knowns are co-linear ... ";
-      msg += "[Unknowns = " + Isis::iString(p_basis->Coefficients()) + "] ";
-      msg += "[Knowns = " + Isis::iString(coefs.dim1()) + "]";
+      msg += "[Unknowns = " + Isis::IString(p_basis->Coefficients()) + "] ";
+      msg += "[Knowns = " + Isis::IString(coefs.dim1()) + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 

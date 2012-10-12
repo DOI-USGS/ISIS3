@@ -737,7 +737,7 @@ namespace Isis {
       if (!ugm)
         throw IException();
 
-      iString target;
+      IString target;
       if (vp->camera()) {
         target = vp->camera()->target();
       }
@@ -1511,7 +1511,7 @@ namespace Isis {
    */
   void FeatureNomenclatureTool::ViewportFeatureDisplay::centerFeature(
       FeatureNomenclature::Feature feature) {
-    iString displayName = feature.displayName();
+    IString displayName = feature.displayName();
 
     int foundIndex = -1;
     for (int i = 0; foundIndex == -1 && i < m_features->count(); i++) {

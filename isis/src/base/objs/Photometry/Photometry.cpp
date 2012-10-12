@@ -1,5 +1,5 @@
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Pvl.h"
 #include "Photometry.h"
 #include "PhotoModelFactory.h"
@@ -238,7 +238,7 @@ namespace Isis {
       double w = xb - ((xb -xc) * tmp2 - (xb - xa) * tmp1) / denom;
       double wlim = xb + GrowLimit * (xc - xb);
       if (iter > maxiter) {
-        iString msg = "Maximum iterations exceeded in minimum bracketing ";
+        IString msg = "Maximum iterations exceeded in minimum bracketing ";
         msg += "algorithm (minbracket) - root cannot be bracketed";
         throw IException(IException::User, msg, _FILEINFO_);
       }

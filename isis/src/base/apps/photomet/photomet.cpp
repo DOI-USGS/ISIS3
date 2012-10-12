@@ -71,11 +71,11 @@ void LoadPvl() {
   string inFile(ui.GetFileName("FROMPVL"));
   Pvl inPvl;
   inPvl.Read(inFile);
-  iString phtName = ui.GetAsString("PHTNAME");
+  IString phtName = ui.GetAsString("PHTNAME");
   phtName = phtName.UpCase();
-  iString atmName = ui.GetAsString("ATMNAME");
+  IString atmName = ui.GetAsString("ATMNAME");
   atmName = atmName.UpCase();
-  iString nrmName = ui.GetAsString("NORMNAME");
+  IString nrmName = ui.GetAsString("NORMNAME");
   nrmName = nrmName.UpCase();
   if (phtName == "NONE" && atmName == "NONE" && nrmName == "NONE") {
     string message = "A photometric or atmospheric or normalization model must be specified before it can be loaded from the PVL";
@@ -84,7 +84,7 @@ void LoadPvl() {
   if (phtName != "NONE") {
     if (inPvl.HasObject("PhotometricModel")) {
       PvlObject phtObj = inPvl.FindObject("PhotometricModel");
-      iString phtVal;
+      IString phtVal;
       if (phtObj.HasGroup("Algorithm")) {
         PvlObject::PvlGroupIterator phtGrp = phtObj.BeginGroup();
         bool wasFound = false;
@@ -255,7 +255,7 @@ void LoadPvl() {
     }
   }
 
-  iString nrmVal;
+  IString nrmVal;
 //  if (nrmName == "NONE") {
 //    string message = "A normalization model must be specified before it can be loaded from the PVL";
 //    throw IException(IException::User, message, _FILEINFO_);
@@ -496,7 +496,7 @@ void LoadPvl() {
   if (atmName != "NONE") {
     if (inPvl.HasObject("AtmosphericModel")) {
       PvlObject atmObj = inPvl.FindObject("AtmosphericModel");
-      iString atmVal;
+      IString atmVal;
       if (atmObj.HasGroup("Algorithm")) {
         PvlObject::PvlGroupIterator atmGrp = atmObj.BeginGroup();
         bool wasFound = false;
@@ -625,11 +625,11 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   Pvl toNormPvl;
-  iString normName = ui.GetAsString("NORMNAME");
+  IString normName = ui.GetAsString("NORMNAME");
   normName = normName.UpCase();
   bool wasFound = false;
   if (ui.WasEntered("FROMPVL")) {
-    iString normVal;
+    IString normVal;
     Pvl fromNormPvl;
     PvlObject fromNormObj;
     PvlGroup fromNormGrp;
@@ -704,7 +704,7 @@ void IsisMain() {
 
   if (normName == "ALBEDO" || normName == "MIXED") {
     if (ui.WasEntered("INCREF")) {
-      iString keyval = ui.GetString("INCREF");
+      IString keyval = ui.GetString("INCREF");
       double incref = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("INCREF",incref),Pvl::Replace);
@@ -716,7 +716,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("INCMAT")) {
-      iString keyval = ui.GetString("INCMAT");
+      IString keyval = ui.GetString("INCMAT");
       double incmat = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("INCMAT",incmat),Pvl::Replace);
@@ -729,7 +729,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("THRESH")) {
-      iString keyval = ui.GetString("THRESH");
+      IString keyval = ui.GetString("THRESH");
       double thresh = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("THRESH",thresh),Pvl::Replace);
@@ -741,7 +741,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("ALBEDO")) {
-      iString keyval = ui.GetString("ALBEDO");
+      IString keyval = ui.GetString("ALBEDO");
       double albedo = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("ALBEDO",albedo),Pvl::Replace);
@@ -755,7 +755,7 @@ void IsisMain() {
     }
   } else if (normName == "MOONALBEDO") {
     if (ui.WasEntered("D")) {
-      iString keyval = ui.GetString("D");
+      IString keyval = ui.GetString("D");
       double d = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("D",d),Pvl::Replace);
@@ -768,7 +768,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("E")) {
-      iString keyval = ui.GetString("E");
+      IString keyval = ui.GetString("E");
       double e = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("E",e),Pvl::Replace);
@@ -781,7 +781,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("F")) {
-      iString keyval = ui.GetString("F");
+      IString keyval = ui.GetString("F");
       double f = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("F",f),Pvl::Replace);
@@ -794,7 +794,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("G2")) {
-      iString keyval = ui.GetString("G2");
+      IString keyval = ui.GetString("G2");
       double g2 = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("G2",g2),Pvl::Replace);
@@ -807,7 +807,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("XMUL")) {
-      iString keyval = ui.GetString("XMUL");
+      IString keyval = ui.GetString("XMUL");
       double xmul = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("XMUL",xmul),Pvl::Replace);
@@ -820,7 +820,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("WL")) {
-      iString keyval = ui.GetString("WL");
+      IString keyval = ui.GetString("WL");
       double wl = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("WL",wl),Pvl::Replace);
@@ -833,7 +833,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("H")) {
-      iString keyval = ui.GetString("H");
+      IString keyval = ui.GetString("H");
       double h = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("H",h),Pvl::Replace);
@@ -846,7 +846,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("BSH1")) {
-      iString keyval = ui.GetString("BSH1");
+      IString keyval = ui.GetString("BSH1");
       double bsh1 = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("BSH1",bsh1),Pvl::Replace);
@@ -859,7 +859,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("XB1")) {
-      iString keyval = ui.GetString("XB1");
+      IString keyval = ui.GetString("XB1");
       double xb1 = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("XB1",xb1),Pvl::Replace);
@@ -872,7 +872,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("XB2")) {
-      iString keyval = ui.GetString("XB2");
+      IString keyval = ui.GetString("XB2");
       double xb2 = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("XB2",xb2),Pvl::Replace);
@@ -886,7 +886,7 @@ void IsisMain() {
     }
   } else if (normName == "SHADE") {
     if (ui.WasEntered("INCREF")) {
-      iString keyval = ui.GetString("INCREF");
+      IString keyval = ui.GetString("INCREF");
       double incref = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("INCREF",incref),Pvl::Replace);
@@ -899,7 +899,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("ALBEDO")) {
-      iString keyval = ui.GetString("ALBEDO");
+      IString keyval = ui.GetString("ALBEDO");
       double albedo = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("ALBEDO",albedo),Pvl::Replace);
@@ -912,7 +912,7 @@ void IsisMain() {
     }
   } else if (normName == "TOPO") {
     if (ui.WasEntered("INCREF")) {
-      iString keyval = ui.GetString("INCREF");
+      IString keyval = ui.GetString("INCREF");
       double incref = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("INCREF",incref),Pvl::Replace);
@@ -924,7 +924,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("THRESH")) {
-      iString keyval = ui.GetString("THRESH");
+      IString keyval = ui.GetString("THRESH");
       double thresh = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("THRESH",thresh),Pvl::Replace);
@@ -937,7 +937,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("ALBEDO")) {
-      iString keyval = ui.GetString("ALBEDO");
+      IString keyval = ui.GetString("ALBEDO");
       double albedo = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("ALBEDO",albedo),Pvl::Replace);
@@ -950,7 +950,7 @@ void IsisMain() {
     }
   } else if (normName == "ALBEDOATM") {
     if (ui.WasEntered("INCREF")) {
-      iString keyval = ui.GetString("INCREF");
+      IString keyval = ui.GetString("INCREF");
       double incref = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("INCREF",incref),Pvl::Replace);
@@ -963,7 +963,7 @@ void IsisMain() {
     }
   } else if (normName == "SHADEATM") {
     if (ui.WasEntered("INCREF")) {
-      iString keyval = ui.GetString("INCREF");
+      IString keyval = ui.GetString("INCREF");
       double incref = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("INCREF",incref),Pvl::Replace);
@@ -975,7 +975,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("ALBEDO")) {
-      iString keyval = ui.GetString("ALBEDO");
+      IString keyval = ui.GetString("ALBEDO");
       double albedo = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("ALBEDO",albedo),Pvl::Replace);
@@ -988,7 +988,7 @@ void IsisMain() {
     }
   } else if (normName == "TOPOATM") {
     if (ui.WasEntered("INCREF")) {
-      iString keyval = ui.GetString("INCREF");
+      IString keyval = ui.GetString("INCREF");
       double incref = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("INCREF",incref),Pvl::Replace);
@@ -1000,7 +1000,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("ALBEDO")) {
-      iString keyval = ui.GetString("ALBEDO");
+      IString keyval = ui.GetString("ALBEDO");
       double albedo = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("ALBEDO",albedo),Pvl::Replace);
@@ -1014,14 +1014,14 @@ void IsisMain() {
   }
 
   Pvl toAtmPvl;
-  iString atmName = ui.GetAsString("ATMNAME");
+  IString atmName = ui.GetAsString("ATMNAME");
   atmName = atmName.UpCase();
   // Check to make sure that an atmospheric model was specified (if the
   // normalization model requires it)
   if (normName == "ALBEDOATM" || normName == "SHADEATM" || normName == "TOPOATM") {
     wasFound = false;
     if (ui.WasEntered("FROMPVL")) {
-      iString atmVal;
+      IString atmVal;
       Pvl fromAtmPvl;
       PvlObject fromAtmObj;
       PvlGroup fromAtmGrp;
@@ -1098,7 +1098,7 @@ void IsisMain() {
         atmName == "HAPKEATM1" || atmName == "HAPKEATM2" ||
         atmName == "ISOTROPIC1" || atmName == "ISOTROPIC2") {
       if (ui.WasEntered("HNORM")) {
-        iString keyval = ui.GetString("HNORM");
+        IString keyval = ui.GetString("HNORM");
         double hnorm = keyval.ToDouble();
         toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                  AddKeyword(PvlKeyword("HNORM",hnorm),Pvl::Replace);
@@ -1111,7 +1111,7 @@ void IsisMain() {
         }
       }
       if (ui.WasEntered("TAU")) {
-        iString keyval = ui.GetString("TAU");
+        IString keyval = ui.GetString("TAU");
         double tau = keyval.ToDouble();
         toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("TAU",tau),Pvl::Replace);
@@ -1124,7 +1124,7 @@ void IsisMain() {
         }
       }
       if (ui.WasEntered("TAUREF")) {
-        iString keyval = ui.GetString("TAUREF");
+        IString keyval = ui.GetString("TAUREF");
         double tauref = keyval.ToDouble();
         toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("TAUREF",tauref),Pvl::Replace);
@@ -1137,7 +1137,7 @@ void IsisMain() {
         }
       }
       if (ui.WasEntered("WHA")) {
-        iString keyval = ui.GetString("WHA");
+        IString keyval = ui.GetString("WHA");
         double wha = keyval.ToDouble();
         toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("WHA",wha),Pvl::Replace);
@@ -1167,7 +1167,7 @@ void IsisMain() {
 
     if (atmName == "ANISOTROPIC1" || atmName == "ANISOTROPIC2") {
       if (ui.WasEntered("BHA")) {
-        iString keyval = ui.GetString("BHA");
+        IString keyval = ui.GetString("BHA");
         double bha = keyval.ToDouble();
         toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("BHA",bha),Pvl::Replace);
@@ -1182,7 +1182,7 @@ void IsisMain() {
     }
     if (atmName == "HAPKEATM1" || atmName == "HAPKEATM2") {
       if (ui.WasEntered("HGA")) {
-        iString keyval = ui.GetString("HGA");
+        IString keyval = ui.GetString("HGA");
         double hga = keyval.ToDouble();
         toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                 AddKeyword(PvlKeyword("HGA",hga),Pvl::Replace);
@@ -1199,11 +1199,11 @@ void IsisMain() {
 
 
   Pvl toPhtPvl;
-  iString phtName = ui.GetAsString("PHTNAME");
+  IString phtName = ui.GetAsString("PHTNAME");
   phtName = phtName.UpCase();
   wasFound = false;
   if (ui.WasEntered("FROMPVL")) {
-    iString phtVal;
+    IString phtVal;
     Pvl fromPhtPvl;
     PvlObject fromPhtObj;
     PvlGroup fromPhtGrp;
@@ -1278,7 +1278,7 @@ void IsisMain() {
 
   if (phtName == "HAPKEHEN" || phtName == "HAPKELEG") {
     if (ui.WasEntered("THETA")) {
-      iString keyval = ui.GetString("THETA");
+      IString keyval = ui.GetString("THETA");
       double theta = keyval.ToDouble();
       toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                AddKeyword(PvlKeyword("THETA",theta),Pvl::Replace);
@@ -1291,7 +1291,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("WH")) {
-      iString keyval = ui.GetString("WH");
+      IString keyval = ui.GetString("WH");
       double wh = keyval.ToDouble();
       toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                AddKeyword(PvlKeyword("WH",wh),Pvl::Replace);
@@ -1304,7 +1304,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("HH")) {
-      iString keyval = ui.GetString("HH");
+      IString keyval = ui.GetString("HH");
       double hh = keyval.ToDouble();
       toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                AddKeyword(PvlKeyword("HH",hh),Pvl::Replace);
@@ -1317,7 +1317,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("B0")) {
-      iString keyval = ui.GetString("B0");
+      IString keyval = ui.GetString("B0");
       double b0 = keyval.ToDouble();
       toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                AddKeyword(PvlKeyword("B0",b0),Pvl::Replace);
@@ -1345,7 +1345,7 @@ void IsisMain() {
     }
     if (phtName == "HAPKEHEN") {
       if (ui.WasEntered("HG1")) {
-        iString keyval = ui.GetString("HG1");
+        IString keyval = ui.GetString("HG1");
         double hg1 = keyval.ToDouble();
         toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                  AddKeyword(PvlKeyword("HG1",hg1),Pvl::Replace);
@@ -1358,7 +1358,7 @@ void IsisMain() {
         }
       }
       if (ui.WasEntered("HG2")) {
-        iString keyval = ui.GetString("HG2");
+        IString keyval = ui.GetString("HG2");
         double hg2 = keyval.ToDouble();
         toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                  AddKeyword(PvlKeyword("HG2",hg2),Pvl::Replace);
@@ -1372,7 +1372,7 @@ void IsisMain() {
       }
     } else {
       if (ui.WasEntered("BH")) {
-        iString keyval = ui.GetString("BH");
+        IString keyval = ui.GetString("BH");
         double bh = keyval.ToDouble();
         toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                  AddKeyword(PvlKeyword("BH",bh),Pvl::Replace);
@@ -1385,7 +1385,7 @@ void IsisMain() {
         }
       }
       if (ui.WasEntered("CH")) {
-        iString keyval = ui.GetString("CH");
+        IString keyval = ui.GetString("CH");
         double ch = keyval.ToDouble();
         toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                  AddKeyword(PvlKeyword("CH",ch),Pvl::Replace);
@@ -1400,7 +1400,7 @@ void IsisMain() {
     }
   } else if (phtName == "LUNARLAMBERTEMPIRICAL" || phtName == "MINNAERTEMPIRICAL") {
     if (ui.WasEntered("PHASELIST")) {
-      iString keyval = ui.GetString("PHASELIST");
+      IString keyval = ui.GetString("PHASELIST");
       toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                AddKeyword(PvlKeyword("PHASELIST",keyval),Pvl::Replace);
     } else {
@@ -1411,7 +1411,7 @@ void IsisMain() {
       }
     }
     if (ui.WasEntered("PHASECURVELIST")) {
-      iString keyval = ui.GetString("PHASECURVELIST");
+      IString keyval = ui.GetString("PHASECURVELIST");
       toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                AddKeyword(PvlKeyword("PHASECURVELIST",keyval),Pvl::Replace);
     } else {
@@ -1423,7 +1423,7 @@ void IsisMain() {
     }
     if (phtName == "LUNARLAMBERTEMPIRICAL") {
       if (ui.WasEntered("LLIST")) {
-        iString keyval = ui.GetString("LLIST");
+        IString keyval = ui.GetString("LLIST");
         toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                  AddKeyword(PvlKeyword("LLIST",keyval),Pvl::Replace);
       } else {
@@ -1435,7 +1435,7 @@ void IsisMain() {
       }
     } else {
       if (ui.WasEntered("KLIST")) {
-        iString keyval = ui.GetString("KLIST");
+        IString keyval = ui.GetString("KLIST");
         toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                  AddKeyword(PvlKeyword("KLIST",keyval),Pvl::Replace);
       } else {
@@ -1448,7 +1448,7 @@ void IsisMain() {
     }
   } else if (phtName == "LUNARLAMBERT") {
     if (ui.WasEntered("L")) {
-      iString keyval = ui.GetString("L");
+      IString keyval = ui.GetString("L");
       double l = keyval.ToDouble();
       toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                AddKeyword(PvlKeyword("L",l),Pvl::Replace);
@@ -1462,7 +1462,7 @@ void IsisMain() {
     }
   } else if (phtName == "MINNAERT") {
     if (ui.WasEntered("K")) {
-      iString keyval = ui.GetString("K");
+      IString keyval = ui.GetString("K");
       double k = keyval.ToDouble();
       toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                AddKeyword(PvlKeyword("K",k),Pvl::Replace);

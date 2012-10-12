@@ -34,7 +34,7 @@ void IsisMain() {
   PvlGroup dependencies("Dependencies");
   FileName lskName("$base/kernels/lsk/naif????.tls");
   lskName = lskName.highestVersion();
-  iString lskString = lskName.originalPath() + "/" + lskName.name();
+  IString lskString = lskName.originalPath() + "/" + lskName.name();
   dependencies += PvlKeyword("LeapsecondKernel", lskString);
   latestMain += dependencies;
 
@@ -54,7 +54,7 @@ void IsisMain() {
           FileName pckName(keyword[0]);
           if (pckName.isDateVersioned()) {
             pckName = pckName.highestVersion();
-            iString latestPck = pckName.originalPath() + "/" + pckName.name();
+            IString latestPck = pckName.originalPath() + "/" + pckName.name();
 
             // Replace the date-versioned filename with the direct path to the
             // latest PCK
@@ -73,7 +73,7 @@ void IsisMain() {
         latestMain.AddGroup(group);
 
         // Add comment specifying that this PCK is hardcoded for legacy support
-        iString comment = "This PCK is hardcoded to support versions of "
+        IString comment = "This PCK is hardcoded to support versions of "
           "Isis prior to v3.3.2";
         latestGroup.AddComment(comment);
 

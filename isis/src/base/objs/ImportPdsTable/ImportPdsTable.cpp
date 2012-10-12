@@ -29,7 +29,7 @@
 
 #include "EndianSwapper.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include "Pvl.h"
 #include "PvlObject.h"
 #include "Table.h"
@@ -203,7 +203,7 @@ namespace Isis {
                                const std::string &dtype) {
     ColumnDescr *column = findColumn(colName);
     if (column != 0) {
-      column->m_type = iString(dtype).UpCase();
+      column->m_type = IString(dtype).UpCase();
     }
     return (column != 0);
   }
@@ -242,7 +242,7 @@ namespace Isis {
   Table ImportPdsTable::exportAsTable(const std::string &colnames,
                                       const std::string &tname) const {
     std::vector<std::string> cols;
-    iString::Split(',', colnames, cols);
+    IString::Split(',', colnames, cols);
     return (exportAsTable(cols, tname));
   }
 
@@ -364,7 +364,7 @@ namespace Isis {
     string tblfile(tabfile);
     FileName tname(tblfile);
     if (!tname.fileExists()) {
-      tname =  tname.path() + "/" + iString(tname.name()).DownCase();
+      tname =  tname.path() + "/" + IString(tname.name()).DownCase();
       tblfile = tname.expanded();
     }
 
@@ -406,7 +406,7 @@ namespace Isis {
     ColumnDescr cd;
     cd.m_name = colobj["NAME"][0];
     cd.m_colnum = nth;
-    cd.m_type = iString(getGenericType(colobj["DATA_TYPE"][0])).UpCase();
+    cd.m_type = IString(getGenericType(colobj["DATA_TYPE"][0])).UpCase();
     cd.m_sbyte = ((int) colobj["START_BYTE"]) - 1;   // 0-based indexing
     cd.m_nbytes = (int) colobj["BYTES"];
     return (cd);
@@ -431,7 +431,7 @@ namespace Isis {
     ColumnTypes::iterator col = m_coldesc.begin();
     while (col != m_coldesc.end()) {
       string c = getFormattedName(col->m_name);
-      if (iString::Equal(c, cName)) { return (&(*col));  }
+      if (IString::Equal(c, cName)) { return (&(*col));  }
       col++;
     }
     return (0);
@@ -456,7 +456,7 @@ namespace Isis {
     ColumnTypes::const_iterator col = m_coldesc.begin();
     while (col != m_coldesc.end()) {
       string c = getFormattedName(col->m_name);
-      if (iString::Equal(c, cName)) { return (&(*col));  }
+      if (IString::Equal(c, cName)) { return (&(*col));  }
       col++;
     }
     return (0);
@@ -482,7 +482,7 @@ namespace Isis {
    *
    * This method will convert a column name to camel-case after some character
    * cleaning is performed.  All white space characters as defined by the 
-   * iString class are converted to spaces.  Spaces are then compressed to one 
+   * IString class are converted to spaces.  Spaces are then compressed to one 
    * space. Any left/right parens are removed.  Then the conversion to 
    * camel-case is performed.
    *
@@ -497,7 +497,7 @@ namespace Isis {
   std::string  ImportPdsTable::getFormattedName(
       const std::string &colname) const {
 
-    iString cname = iString::ConvertWhiteSpace(colname);
+    IString cname = IString::ConvertWhiteSpace(colname);
     cname.Remove("(,)");
     cname.Compress();
 
@@ -537,7 +537,7 @@ namespace Isis {
    */
   std::string ImportPdsTable::getGenericType(const std::string &ttype) const {
     vector<string> parts;
-    int n = iString::Split('_', ttype, parts);
+    int n = IString::Split('_', ttype, parts);
     return (parts[n-1]);
   }
 
@@ -610,7 +610,7 @@ namespace Isis {
                                       TableField &tfield) const {
     int ith = cdesc.m_colnum;
     try {
-      iString data(columns[ith]);
+      IString data(columns[ith]);
       if (tfield.isInteger()) {
         data.Trim(" \t\r\n");
         tfield = data.ToInteger();
@@ -673,7 +673,7 @@ namespace Isis {
         table += extract(m_rows[i], columns, record);
       }
       catch (IException &e) {
-        string mess = "Failed to convert data in row " + iString((int) i);
+        string mess = "Failed to convert data in row " + IString((int) i);
         throw IException(e, IException::Programmer, mess, _FILEINFO_);
       }
     }

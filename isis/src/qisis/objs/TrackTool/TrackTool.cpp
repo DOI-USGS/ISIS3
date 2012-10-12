@@ -220,7 +220,7 @@ namespace Isis {
             p.y() >= rect.top() && p.y() <= rect.bottom()) {
           const int bufX = p.x() - rect.left();
           const int bufY = p.y() - rect.top();
-          QString pixelString = iString(PixelToString(
+          QString pixelString = IString(PixelToString(
                                                 grayBuf->getLine(bufY)[bufX])).ToQt();
           p_grayLabel->setText(pixelString);
         }
@@ -245,7 +245,7 @@ namespace Isis {
           const int rBufX = p.x() - rRect.left();
           const int rBufY = p.y() - rRect.top();
           QString rLab = "R ";
-          rLab += iString(PixelToString(
+          rLab += IString(PixelToString(
                                   redBuf->getLine(rBufY)[rBufX])).ToQt();
           p_redLabel->setText(rLab);
         }
@@ -264,7 +264,7 @@ namespace Isis {
           const int gBufX = p.x() - gRect.left();
           const int gBufY = p.y() - gRect.top();
           QString gLab = "G ";
-          gLab += iString(PixelToString(
+          gLab += IString(PixelToString(
                                   greenBuf->getLine(gBufY)[gBufX])).ToQt();
           p_grnLabel->setText(gLab);
         }
@@ -283,7 +283,7 @@ namespace Isis {
           const int bBufX = p.x() - bRect.left();
           const int bBufY = p.y() - bRect.top();
           QString bLab = "B ";
-          bLab += iString(PixelToString(
+          bLab += IString(PixelToString(
                                   blueBuf->getLine(bBufY)[bBufX])).ToQt();
           p_bluLabel->setText(bLab);
         }

@@ -25,7 +25,7 @@
 #include <numeric>
 #include <iostream>
 #include <sstream>
-#include "iString.h"
+#include "IString.h"
 #include "CSVReader.h"
 #include "CollectorMap.h"
 #include "IException.h"
@@ -279,9 +279,9 @@ namespace Isis {
   CSVReader::CSVAxis CSVReader::getColumn(const std::string &hname) const {
     //  Get the header
     CSVAxis header(getHeader());
-    std::string head = iString(hname).Trim(" ");
+    std::string head = IString(hname).Trim(" ");
     for(int i = 0 ; i < header.dim() ; i++) {
-      if(iString::Equal(head, iString(header[i]).Trim(" "))) {
+      if(IString::Equal(head, IString(header[i]).Trim(" "))) {
         return (getColumn(i));
       }
     }

@@ -41,7 +41,7 @@ namespace Isis {
     bool printPercent;
     Isis::PvlGroup &group = Isis::Preference::Preferences().FindGroup("UserInterface");
     percent = group["ProgressBarPercent"];
-    Isis::iString temp = (string) group["ProgressBar"];
+    Isis::IString temp = (string) group["ProgressBar"];
     printPercent = temp.UpCase() == "ON";
 
     // Check for an error

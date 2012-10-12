@@ -170,7 +170,7 @@ void IsisMain() {
       QString line = in.readLine();
       QStringList results = line.split(",");
       if (results.size() < 2) {
-        string msg = "Line " + iString(lineNumber) + " in the MEASURELIST does "
+        string msg = "Line " + IString(lineNumber) + " in the MEASURELIST does "
           "not contain a Point ID and a cube filename separated by a comma";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -844,7 +844,7 @@ void checkAllMeasureValidity(ControlNet &cnet, string cubeList) {
 
   for (int sn = 0; sn < graphNodes.size(); sn++) {
     ControlCubeGraphNode *graphNode = graphNodes[sn];
-    iString serialNumber = graphNode->getSerialNumber();
+    IString serialNumber = graphNode->getSerialNumber();
 
     Cube *cube = NULL;
     Camera *camera = NULL;

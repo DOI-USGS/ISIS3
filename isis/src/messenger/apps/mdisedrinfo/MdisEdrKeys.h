@@ -213,7 +213,7 @@ namespace Isis {
         int nbad(0);
         IException errors;
         for(unsigned int i = 0 ; i < keylist.size() ; i++) {
-          iString keyname(keylist[i]);
+          IString keyname(keylist[i]);
           keyname.Trim(" \n\t");
           try {
             PvlKeyword &key = _keys.get(keyname);
@@ -319,7 +319,7 @@ namespace Isis {
         //  all SUBFRAME[12345]_PARAMETERS since they are unsupported.
         PvlObject::PvlObjectIterator objIter = obj.BeginObject();
         for(; objIter != obj.EndObject() ; ++objIter) {
-          iString objname(objIter->Name());
+          IString objname(objIter->Name());
           objname.UpCase();
           std::string::size_type gotSubframe = objname.find("SUBFRAME");
           if(gotSubframe != std::string::npos) {

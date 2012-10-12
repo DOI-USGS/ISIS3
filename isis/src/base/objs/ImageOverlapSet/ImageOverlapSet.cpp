@@ -97,7 +97,7 @@ namespace Isis {
       if(!tmp->isValid()) {
         delete tmp;
         tmp = NULL;
-        iString msg = "The image [" + sns.FileName(sns.SerialNumber(i)) +
+        IString msg = "The image [" + sns.FileName(sns.SerialNumber(i)) +
                       "] has an invalid footprint";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -314,7 +314,7 @@ namespace Isis {
    * @param filename The file to read the image overlaps from
    */
   void ImageOverlapSet::ReadImageOverlaps(const std::string &filename) {
-    iString file = FileName(filename).expanded();
+    IString file = FileName(filename).expanded();
 
     try {
       // Let's get an istream pointed at our file
@@ -328,12 +328,12 @@ namespace Isis {
       inStream.close();
     }
     catch(IException &e) {
-      iString msg = "The overlap file [" + filename + "] does not contain a "
+      IString msg = "The overlap file [" + filename + "] does not contain a "
                     "valid list of image overlaps";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     catch(...) {
-      iString msg = "The overlap file [" + filename + "] does not contain a "
+      IString msg = "The overlap file [" + filename + "] does not contain a "
                     "valid list of image overlaps";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -419,12 +419,12 @@ namespace Isis {
    * @param filename The file to write the image overlaps to
    */
   void ImageOverlapSet::WriteImageOverlaps(const std::string &filename) {
-    iString file = FileName(filename).expanded();
+    IString file = FileName(filename).expanded();
     bool failed = false;
     if(p_threadedCalculate) p_calculatePolygonMutex.lock();
 
     if(p_lonLatOverlaps.size() == 0) {
-      iString msg = "No overlaps were found.";
+      IString msg = "No overlaps were found.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -480,7 +480,7 @@ namespace Isis {
     }
 
     if(failed) {
-      iString msg = "Unable to write the image overlap list to [" + filename + "]";
+      IString msg = "Unable to write the image overlap list to [" + filename + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
@@ -814,7 +814,7 @@ namespace Isis {
    * @param overlap1 First problematic overlap
    * @param overlap2 Second problematic overlap
    */
-  void ImageOverlapSet::HandleError(IException &e, SerialNumberList *snlist, iString msg, int overlap1, int overlap2) {
+  void ImageOverlapSet::HandleError(IException &e, SerialNumberList *snlist, IString msg, int overlap1, int overlap2) {
     PvlGroup err("ImageOverlapError");
 
     if(overlap1 >= 0 && overlap1 < p_lonLatOverlaps.size()) {
@@ -884,7 +884,7 @@ namespace Isis {
    * @param overlap1 First problematic overlap
    * @param overlap2 Second problematic overlap
    */
-  void ImageOverlapSet::HandleError(geos::util::GEOSException *exc, SerialNumberList *snlist, iString msg, int overlap1, int overlap2) {
+  void ImageOverlapSet::HandleError(geos::util::GEOSException *exc, SerialNumberList *snlist, IString msg, int overlap1, int overlap2) {
     PvlGroup err("ImageOverlapError");
 
     if(overlap1 >= 0 && overlap1 < p_lonLatOverlaps.size()) {
@@ -925,7 +925,7 @@ namespace Isis {
       }
     }
 
-    err += PvlKeyword("Error", iString(exc->what()));
+    err += PvlKeyword("Error", IString(exc->what()));
 
     if(!msg.empty()) {
       err += PvlKeyword("Description", msg);
@@ -952,7 +952,7 @@ namespace Isis {
    * @param overlap1 First problematic overlap
    * @param overlap2 Second problematic overlap
    */
-  void ImageOverlapSet::HandleError(SerialNumberList *snlist, iString msg, int overlap1, int overlap2) {
+  void ImageOverlapSet::HandleError(SerialNumberList *snlist, IString msg, int overlap1, int overlap2) {
     PvlGroup err("ImageOverlapError");
 
     if(overlap1 >= 0 && overlap1 < p_lonLatOverlaps.size()) {

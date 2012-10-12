@@ -3,7 +3,7 @@
 #include "Cube.h"
 #include "CubeAttribute.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "ProcessByLine.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
@@ -25,14 +25,14 @@ void IsisMain() {
 
   // Check for filter type of A-D
   Pvl *label = input->getLabel();
-  iString wave = (string)label->FindGroup("BandBin", Pvl::Traverse)["FilterName"];
+  IString wave = (string)label->FindGroup("BandBin", Pvl::Traverse)["FilterName"];
   if((wave != "A") && (wave != "B") && (wave != "C") && (wave != "D")) {
     string message = "Invalid FilterName [" + wave + "], can only handle A-D filters";
     throw IException(IException::Unknown, message, _FILEINFO_);
   }
   // Determine and load calibration flat field file
   wave.DownCase();
-  iString flatFile("$Clementine1/calibration/hires/lh" +
+  IString flatFile("$Clementine1/calibration/hires/lh" +
                    wave + "_flat.cub");
   CubeAttributeInput cubeAtt;
   p.SetInputCube(flatFile, cubeAtt);

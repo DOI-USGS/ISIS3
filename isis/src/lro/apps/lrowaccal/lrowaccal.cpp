@@ -62,7 +62,7 @@ void IsisMain () {
 
   // Make sure it is a WAC cube
   Isis::PvlGroup &inst = icube->getLabel()->FindGroup("Instrument", Pvl::Traverse);
-  iString instId = (string) inst["InstrumentId"];
+  IString instId = (string) inst["InstrumentId"];
   instId.UpCase();
   if (instId != "WAC-VIS" && instId != "WAC-UV") {
     string msg = "This program is intended for use on LROC WAC images only. [";
@@ -88,9 +88,9 @@ void IsisMain () {
   g_specpix = ui.GetBoolean("SPECIALPIXELS");
 
   // Determine the dark/flat files to use
-  iString offset = (string) inst["BackgroundOffset"];
-  iString mode = (string) inst["Mode"];
-  iString instModeId = (string) inst["InstrumentModeId"];
+  IString offset = (string) inst["BackgroundOffset"];
+  IString mode = (string) inst["Mode"];
+  IString instModeId = (string) inst["InstrumentModeId"];
   instModeId.UpCase();
 
   if (instModeId == "COLOR" && (string) inst["InstrumentId"] == "WAC-UV")
@@ -105,9 +105,9 @@ void IsisMain () {
 
   vector<string> darkFiles;
   ui.GetAsString("DARKFILE", darkFiles);
-  iString flatFile = ui.GetAsString("FLATFIELDFILE");
-  iString radFile = ui.GetAsString("RADIOMETRICFILE");
-  iString specpixFile = ui.GetAsString("SPECIALPIXELSFILE");
+  IString flatFile = ui.GetAsString("FLATFIELDFILE");
+  IString radFile = ui.GetAsString("RADIOMETRICFILE");
+  IString specpixFile = ui.GetAsString("SPECIALPIXELSFILE");
 
   // Figure out which bands are input
   for (int i = 1; i <= icube->getBandCount(); i++) {
@@ -115,7 +115,7 @@ void IsisMain () {
   }
 
   Isis::PvlGroup &bandBin = icube->getLabel()->FindGroup("BandBin", Pvl::Traverse);
-  iString filter = (string) bandBin["Center"][0];
+  IString filter = (string) bandBin["Center"][0];
 
   if (g_dark) {
     if (darkFiles.size() == 0 || darkFiles[0] =="Default" || darkFiles[0].length() == 0) {
@@ -137,10 +137,10 @@ void IsisMain () {
     else {
       CopyCubeIntoBuffer(darkFiles[0], g_darkCube1);
       int index = darkFiles[0].find_last_of("_");
-      g_temp1 = iString(darkFiles[0].substr( darkFiles[0].find_last_of("_", index-1), index)).ToDouble();
+      g_temp1 = IString(darkFiles[0].substr( darkFiles[0].find_last_of("_", index-1), index)).ToDouble();
       CopyCubeIntoBuffer(darkFiles[1], g_darkCube2);
       index = darkFiles[1].find_last_of("_");
-      g_temp2 = iString(darkFiles[1].substr( darkFiles[1].find_last_of("_", index-1), index)).ToDouble();
+      g_temp2 = IString(darkFiles[1].substr( darkFiles[1].find_last_of("_", index-1), index)).ToDouble();
     }
   }
 
@@ -590,12 +590,12 @@ void GetDark(string fileString, double temp, double time, Buffer* &data1, Buffer
   unsigned int timeIndex = fileString.find("*T");
 
   file1 = fileString;
-  file1.replace(timeIndex, 1, iString(time1));
-  file1.replace(tempIndex, 1, iString((int)temp1));
+  file1.replace(timeIndex, 1, IString(time1));
+  file1.replace(tempIndex, 1, IString((int)temp1));
 
   file2 = fileString;
-  file2.replace(timeIndex, 1, iString(time2));
-  file2.replace(tempIndex, 1, iString((int)temp2));
+  file2.replace(timeIndex, 1, IString(time2));
+  file2.replace(tempIndex, 1, IString((int)temp2));
 
   CopyCubeIntoBuffer ( file1, data1 );
   CopyCubeIntoBuffer ( file2, data2 );
@@ -650,7 +650,7 @@ void GetMask(string &fileString, double temp, Buffer* &data) {
   }
 
   index = fileString.find_first_of("*");
-  fileString.replace(index, 1, iString((int)bestTemp));
+  fileString.replace(index, 1, IString((int)bestTemp));
 
   CopyCubeIntoBuffer ( fileString, data );
 }

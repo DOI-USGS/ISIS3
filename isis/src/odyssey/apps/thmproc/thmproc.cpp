@@ -17,7 +17,7 @@ void IsisMain() {
   if(ui.GetBoolean("INGESTION")) {
     Pvl labels(ui.GetFileName("FROM"));
 
-    if((iString)labels["DETECTOR_ID"][0] == "VIS") {
+    if((IString)labels["DETECTOR_ID"][0] == "VIS") {
       if(((string)labels["DATA_SET_ID"]).find("RDR") != string::npos) {
         ProcessVis(true);
       }

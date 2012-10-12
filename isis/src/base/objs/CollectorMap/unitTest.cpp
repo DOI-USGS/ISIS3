@@ -2,7 +2,7 @@
 #include <sstream>
 #include <iostream>
 #include <iomanip>
-#include "iString.h"
+#include "IString.h"
 #include "CollectorMap.h"
 #include "Preference.h"
 
@@ -61,8 +61,8 @@ class TestCollector {
       cout << "Double list size = " << _flist.size() << "\n";
 
       cout << "Adding " << t.Ident() << " to string list\n";
-      _slist.add(iString(t.Ident()), t);
-      cout << "iString list size = " << _slist.size() << "\n";
+      _slist.add(IString(t.Ident()), t);
+      cout << "IString list size = " << _slist.size() << "\n";
 
       return;
     }
@@ -79,7 +79,7 @@ class TestCollector {
     }
 
     ClassTest &findInString(double n) {
-      string sN = iString(n);
+      string sN = IString(n);
       cout << "Exists in int list?: " << _slist.exists(sN) << endl;
       return(_slist.get(sN));
     }
@@ -89,7 +89,7 @@ class TestCollector {
       const ClassTest &t = _list.get(n);
       exists = _flist.exists(n);
       const ClassTest &ft = _flist.get(n);
-      exists = _slist.exists(iString(n));
+      exists = _slist.exists(IString(n));
       cout << "Got element " << t.Ident() << " and " << ft.Ident()
            << " - In string?: " << exists << endl;
       return;
@@ -99,7 +99,7 @@ class TestCollector {
       const ClassTest &t = _list.getNth(i);
       bool exists = _flist.exists(t.Ident());
       const ClassTest &ft = _flist.getNth(i);
-      exists = _slist.exists(iString(t.Ident()));
+      exists = _slist.exists(IString(t.Ident()));
       cout << "Got element " << t.Ident() << " and " << ft.Ident()
            << " - In string? " << exists << endl;
       return;

@@ -41,7 +41,7 @@
 #include <geos/operation/distance/DistanceOp.h>
 
 #include "ImagePolygon.h"
-#include "iString.h"
+#include "IString.h"
 #include "SpecialPixel.h"
 #include "PolygonTools.h"
 
@@ -1289,19 +1289,19 @@ namespace Isis {
     }
     catch(geos::util::IllegalArgumentException *geosIll) {
       std::string msg = "Unable to create image footprint (Fix360Poly) due to ";
-      msg += "geos illegal argument [" + iString(geosIll->what()) + "]";
+      msg += "geos illegal argument [" + IString(geosIll->what()) + "]";
       delete geosIll;
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     catch(geos::util::GEOSException *geosExc) {
       std::string msg = "Unable to create image footprint (Fix360Poly) due to ";
-      msg += "geos exception [" + iString(geosExc->what()) + "]";
+      msg += "geos exception [" + IString(geosExc->what()) + "]";
       delete geosExc;
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     catch(IException &e) {
       std::string msg = "Unable to create image footprint (Fix360Poly) due to ";
-      msg += "isis operation exception [" + iString(e.what()) + "]";
+      msg += "isis operation exception [" + IString(e.what()) + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
     catch(...) {

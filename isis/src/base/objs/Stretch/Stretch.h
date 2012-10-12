@@ -88,7 +88,7 @@ namespace Isis {
       double p_minimum; //!<By default this value is set to p_lrs
       double p_maximum; //!<By default this value is set to p_hrs
 
-      std::pair<double, double> NextPair(Isis::iString &pairs);
+      std::pair<double, double> NextPair(Isis::IString &pairs);
 
     public:
       Stretch();

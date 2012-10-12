@@ -217,9 +217,9 @@ namespace Isis {
   void SpiceManager::loadKernel(PvlKeyword &key) {
     for(int i = 0; i < key.Size(); i++) {
       if(key[i] == "") continue;
-      if(iString(key[i]).UpCase() == "NULL") continue;
-      if(iString(key[i]).UpCase() == "NADIR") continue;
-      if(iString(key[i]).UpCase() == "TABLE") continue;
+      if(IString(key[i]).UpCase() == "NULL") continue;
+      if(IString(key[i]).UpCase() == "NADIR") continue;
+      if(IString(key[i]).UpCase() == "TABLE") continue;
       Isis::FileName file(key[i]);
       if(!file.fileExists()) {
         string msg = "Spice file does not exist [" + file.expanded() + "]";
@@ -244,15 +244,15 @@ namespace Isis {
    */
   void SpiceManager::loadKernelFromTable(PvlKeyword &key,
                                          const std::string &tblname, Pvl &pvl) {
-    if(iString::UpCase(key[0]) != "TABLE") {
+    if(IString::UpCase(key[0]) != "TABLE") {
       loadKernel(key);
     }
     else {
       PvlObject::PvlObjectIterator objIter;
       for(objIter = pvl.BeginObject() ; objIter != pvl.EndObject() ; ++objIter) {
-        if(iString::UpCase(objIter->Name()) == "TABLE") {
+        if(IString::UpCase(objIter->Name()) == "TABLE") {
           if(objIter->HasKeyword("Name")) {
-            if(iString::Equal(objIter->FindKeyword("Name")[0], tblname)) {
+            if(IString::Equal(objIter->FindKeyword("Name")[0], tblname)) {
               loadKernel(objIter->FindKeyword("Kernels"));
               return;
             }

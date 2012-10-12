@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "EndianSwapper.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "LeastSquares.h"
 #include "LineManager.h"
 #include "PolynomialUnivariate.h"
@@ -48,7 +48,7 @@ void calculateSolarRemove(Cube *, ProcessByLine *);
 
 void calibrate(vector<Buffer *> &in, vector<Buffer *> &out);
 
-iString createCroppedFile(Cube *icube, iString cubeFileName, bool flatFile = false);
+IString createCroppedFile(Cube *icube, IString cubeFileName, bool flatFile = false);
 void GetOffsets(const Pvl &lab, int &finalSampOffset, int &finalLineOffset);
 
 // This is the results group
@@ -80,12 +80,12 @@ void IsisMain() {
   }
 
   if(!isVims) {
-    iString msg = "The input cube [" + iString(ui.GetAsString("FROM")) + "] is not a Cassini VIMS cube";
+    IString msg = "The input cube [" + IString(ui.GetAsString("FROM")) + "] is not a Cassini VIMS cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(icube->getLabel()->FindObject("IsisCube").HasGroup("AlphaCube")) {
-    iString msg = "The input cube [" + iString(ui.GetAsString("FROM")) + "] has had its dimensions modified and can not be calibrated";
+    IString msg = "The input cube [" + IString(ui.GetAsString("FROM")) + "] has had its dimensions modified and can not be calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -187,7 +187,7 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
     cam = icube->getCamera();
   }
   catch(IException &e) {
-    iString msg = "Unable to create a camera model from [" +
+    IString msg = "Unable to create a camera model from [" +
                   icube->getFileName() + "]. Please run "
                   "spiceinit on this file";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
@@ -253,7 +253,7 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
   bool vis = (icube->getLabel()->
               FindGroup("Instrument", Pvl::Traverse)["Channel"][0] != "IR");
 
-  iString attributes;
+  IString attributes;
 
   // vis is bands 1-96, ir is bands 97-352 in this calibration file
   if(vis) {
@@ -296,7 +296,7 @@ void calculateSpecificEnergy(Cube *icube) {
     coefficient /= ((double)inst["ExposureDuration"][0]) / 1000.0 - 0.004;
   }
 
-  iString specEnergyFile = "$cassini/calibration/vims/";
+  IString specEnergyFile = "$cassini/calibration/vims/";
 
   if(vis) {
     specEnergyFile += "vis_perf_v????.cub";
@@ -305,7 +305,7 @@ void calculateSpecificEnergy(Cube *icube) {
     specEnergyFile += "ir_perf_v????.cub";
   }
 
-  iString waveCalFile = "$cassini/calibration/vims/wavecal_v????.cub";
+  IString waveCalFile = "$cassini/calibration/vims/wavecal_v????.cub";
 
   FileName specEnergyFileName(specEnergyFile);
   specEnergyFileName = specEnergyFileName.highestVersion();
@@ -381,7 +381,7 @@ void calculateVisDarkCurrent(Cube *icube) {
 
   // This is the dark current corrections for VIS
   bool hires = ((inst["SamplingMode"][0] == "HIGH") || (inst["SamplingMode"][0] == "HI-RES"));
-  iString calFile = "$cassini/calibration/vims/vis_";
+  IString calFile = "$cassini/calibration/vims/vis_";
 
   if(hires) {
     calFile += "hires";
@@ -611,7 +611,7 @@ void chooseFlatFile(Cube *icube, ProcessByLine *p) {
   bool vis = (inst["Channel"][0] != "IR");
   bool hires = ((inst["SamplingMode"][0] == "HIGH") || (inst["SamplingMode"][0] == "HI-RES"));
 
-  iString calFile = "$cassini/calibration/vims/flatfield/";
+  IString calFile = "$cassini/calibration/vims/flatfield/";
 
   if(vis) {
     calFile += "vis_";
@@ -643,9 +643,9 @@ void chooseFlatFile(Cube *icube, ProcessByLine *p) {
  * @param icube
  * @param cubeFileName
  *
- * @return iString
+ * @return IString
  */
-iString createCroppedFile(Cube *icube, iString cubeFileName, bool flatFile) {
+IString createCroppedFile(Cube *icube, IString cubeFileName, bool flatFile) {
   int sampOffset = 1;
   int lineOffset = 1;
 
@@ -654,11 +654,11 @@ iString createCroppedFile(Cube *icube, iString cubeFileName, bool flatFile) {
   }
 
 
-  iString appArgs = "from=" + cubeFileName + " ";
-  appArgs += "sample=" + iString(sampOffset) + " ";
-  appArgs += "line=" + iString(lineOffset) + " ";
-  appArgs += "nsamples=" + iString(icube->getSampleCount()) + " ";
-  appArgs += "nlines=" + iString(icube->getLineCount()) + " ";
+  IString appArgs = "from=" + cubeFileName + " ";
+  appArgs += "sample=" + IString(sampOffset) + " ";
+  appArgs += "line=" + IString(lineOffset) + " ";
+  appArgs += "nsamples=" + IString(icube->getSampleCount()) + " ";
+  appArgs += "nlines=" + IString(icube->getLineCount()) + " ";
 
   FileName tempFile("$TEMPORARY/tmp_" + FileName(cubeFileName).baseName() +
                     "_" + FileName(icube->getFileName()).name());
@@ -685,7 +685,7 @@ void GetOffsets(const Pvl &lab, int &finalSampOffset, int &finalLineOffset) {
   finalSampOffset = sampOffset;
   finalLineOffset = lineOffset;
 
-  string samplingMode = iString((string)inst ["SamplingMode"]).UpCase();
+  string samplingMode = IString((string)inst ["SamplingMode"]).UpCase();
   if(vis) {
     if(samplingMode == "NORMAL") {
       finalSampOffset = sampOffset - 1;

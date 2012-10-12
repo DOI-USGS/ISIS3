@@ -4,7 +4,7 @@
 #include <algorithm>
 
 #include "ControlNet.h"
-#include "iString.h"
+#include "IString.h"
 #include "SerialNumberList.h"
 
 

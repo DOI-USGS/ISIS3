@@ -32,7 +32,7 @@
 #include "Endian.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "PixelType.h"
 
 class QStringList;
@@ -72,7 +72,7 @@ namespace Isis {
     if(labelType == DetachedLabel) return "Detached";
     if(labelType == ExternalLabel) return "External";
 
-    std::string msg = "Invalid label attachment type [" + iString(labelType) + "]";
+    std::string msg = "Invalid label attachment type [" + IString(labelType) + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -86,7 +86,7 @@ namespace Isis {
    * @return The RangeType enum corresponding to the string parameter
    */
   inline LabelAttachment LabelAttachmentEnumeration(const std::string &labelType) {
-    iString temp(labelType);
+    IString temp(labelType);
     temp = temp.UpCase();
     if(temp == "ATTACHED") return AttachedLabel;
     if(temp == "DETACHED") return DetachedLabel;
@@ -137,7 +137,7 @@ namespace Isis {
     public:
 
       //! Constructs an empty CubeAttribute
-      CubeAttribute(QList< bool (ChildClass::*)(iString) const > testers) {
+      CubeAttribute(QList< bool (ChildClass::*)(IString) const > testers) {
         m_attributeTypeTesters = testers;
       }
 
@@ -153,7 +153,7 @@ namespace Isis {
        *               before the first "+" are assumed to be the filename
        *               and are ignored.
        */
-      CubeAttribute(QList< bool (ChildClass::*)(iString) const > testers,
+      CubeAttribute(QList< bool (ChildClass::*)(IString) const > testers,
                     const FileName &fileName) {
         m_attributeTypeTesters = testers;
         setAttributes(fileName);
@@ -173,8 +173,8 @@ namespace Isis {
        *
        * @return The cube attributes in string form
        */
-      iString toString() const {
-        iString result;
+      IString toString() const {
+        IString result;
 
         if (!m_attributes.isEmpty())
           result = "+" + m_attributes.join("+");
@@ -193,8 +193,8 @@ namespace Isis {
        *
        * @param attribute The attribute we're adding to the current cube attributes
        */
-      void addAttribute(iString attribute) {
-        iString upcaseAtt = iString(attribute).UpCase();
+      void addAttribute(IString attribute) {
+        IString upcaseAtt = IString(attribute).UpCase();
 
         if (attribute.ToQt().contains("+")) {
           throw IException(IException::Unknown,
@@ -206,7 +206,7 @@ namespace Isis {
 
         // Verify this attribute is legal
         bool legal = false;
-        bool (ChildClass::*tester)(iString) const;
+        bool (ChildClass::*tester)(IString) const;
         foreach (tester, m_attributeTypeTesters) {
           if ( (static_cast<const ChildClass *>(this)->*tester)(upcaseAtt) ) {
             if (legal) {
@@ -251,7 +251,7 @@ namespace Isis {
        *                         "+Bsq+Real" or "Bsq+Real"
        */
       void addAttributes(const char *attributesString) {
-        addAttributes(iString(attributesString));
+        addAttributes(IString(attributesString));
       }
 
 
@@ -263,7 +263,7 @@ namespace Isis {
        * @param attributesString A string of recognizable attributes, for example
        *                         "+Bsq+Real" or "Bsq+Real"
        */
-      void addAttributes(const iString &attributesString) {
+      void addAttributes(const IString &attributesString) {
         setAttributes(toString() + "+" + attributesString);
       }
 
@@ -295,11 +295,11 @@ namespace Isis {
        * @param tester A method that determines whether the attribute should be returned/is relevant
        * @return A list of attributes for which the tester returns true on.
        */
-      QStringList attributeList(bool (ChildClass::*tester)(iString) const) const {
+      QStringList attributeList(bool (ChildClass::*tester)(IString) const) const {
         QStringList relevantAttributes;
 
         foreach (QString attribute, m_attributes) {
-          iString upcaseAtt = iString(attribute).UpCase();
+          IString upcaseAtt = IString(attribute).UpCase();
           if ( (static_cast<const ChildClass *>(this)->*tester)(upcaseAtt) ) {
             relevantAttributes.append(upcaseAtt);
           }
@@ -320,14 +320,14 @@ namespace Isis {
        * @param tester A method that determines if an attribute is of the same type of newValue, so
        *               that existing attributes can be overwritten.
        */
-      void setAttribute(iString newValue, bool (ChildClass::*tester)(iString) const) {
+      void setAttribute(IString newValue, bool (ChildClass::*tester)(IString) const) {
         QMutableListIterator<QString> it(m_attributes);
 
         bool found = false;
         while (it.hasNext()) {
           QString &attribute = it.next();
 
-          iString upcaseAtt = iString(attribute).UpCase();
+          IString upcaseAtt = IString(attribute).UpCase();
           if ( (static_cast<const ChildClass *>(this)->*tester)(upcaseAtt) ) {
             if (found || newValue == "") {
               // already found one (remove the duplicate) or just deleting it
@@ -363,7 +363,7 @@ namespace Isis {
        *   and only one data type (is unambiguous and is known). This list will not change after
        *   this class is instantiated.
        */
-      QList< bool (ChildClass::*)(iString) const > m_attributeTypeTesters;
+      QList< bool (ChildClass::*)(IString) const > m_attributeTypeTesters;
   };
 
 
@@ -432,7 +432,7 @@ namespace Isis {
        *
        * @return A comma delimited string of all bands from the input attribute
        */
-      iString bandsString() const;
+      IString bandsString() const;
 
       //! Set the band attribute according to the list of bands
       void setBands(const std::vector<std::string> &bands);
@@ -440,10 +440,10 @@ namespace Isis {
       using CubeAttribute<CubeAttributeInput>::toString;
 
     private:
-      bool isBandRange(iString attribute) const;
+      bool isBandRange(IString attribute) const;
 
-      static iString toString(const std::vector<std::string> &bands);
-      static QList<bool (CubeAttributeInput::*)(iString) const> testers();
+      static IString toString(const std::vector<std::string> &bands);
+      static QList<bool (CubeAttributeInput::*)(IString) const> testers();
 
     private:
       std::vector<std::string> m_bands; //!< A list of the specified bands
@@ -520,7 +520,7 @@ namespace Isis {
       Cube::Format fileFormat() const;
 
       //! Return the file format as a string
-      iString fileFormatString() const;
+      IString fileFormatString() const;
 
       //! Set the format to the fmt parameter
       void setFileFormat(Cube::Format fmt);
@@ -529,7 +529,7 @@ namespace Isis {
       ByteOrder byteOrder() const;
 
       //! Return the byte order as a string
-      iString byteOrderString() const;
+      IString byteOrderString() const;
 
       //! Set the order according to the parameter order
       void setByteOrder(ByteOrder order);
@@ -561,13 +561,13 @@ namespace Isis {
 
 
     private:
-      bool isByteOrder(iString attribute) const;
-      bool isFileFormat(iString attribute) const;
-      bool isLabelAttachment(iString attribute) const;
-      bool isPixelType(iString attribute) const;
-      bool isRange(iString attribute) const;
+      bool isByteOrder(IString attribute) const;
+      bool isFileFormat(IString attribute) const;
+      bool isLabelAttachment(IString attribute) const;
+      bool isPixelType(IString attribute) const;
+      bool isRange(IString attribute) const;
 
-      static iString toString(Cube::Format);
+      static IString toString(Cube::Format);
 
       /**
        * @brief Output cube range tracker
@@ -580,7 +580,7 @@ namespace Isis {
         RangeSet,       //!< The range has been set
       };
 
-      static QList<bool (CubeAttributeOutput::*)(iString) const> testers();
+      static QList<bool (CubeAttributeOutput::*)(IString) const> testers();
   };
 };
 

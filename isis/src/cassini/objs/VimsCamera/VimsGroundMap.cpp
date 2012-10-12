@@ -29,7 +29,7 @@
 #include "Constants.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "Latitude.h"
 #include "LeastSquares.h"
@@ -66,7 +66,7 @@ namespace Isis {
     p_lonMap = new QVector< QVector<Longitude> >(64, QVector<Longitude>(64));
 
     if (parent->ParentSamples() > 64 || parent->ParentLines() > 64) {
-      iString msg = "The Vims ground map does not understand cubes that "
+      IString msg = "The Vims ground map does not understand cubes that "
                     "initially have more than 64 lines or 64 samples.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -139,7 +139,7 @@ namespace Isis {
     //  Vis or IR
     p_channel = (string) inst ["Channel"];
     // Get the start time in et
-    iString stime = (string) inst ["NativeStartTime"];
+    IString stime = (string) inst ["NativeStartTime"];
     string intTime = stime.Token(".");
 
     p_etStart = p_camera->getClockTime(intTime).Et();
@@ -154,7 +154,7 @@ namespace Isis {
       (double) inst ["InterlineDelayDuration"] / 1000.;
 
     // Get summation mode
-    string sampMode = iString((string)inst ["SamplingMode"]).UpCase();
+    string sampMode = IString((string)inst ["SamplingMode"]).UpCase();
 
     //  Get sample/line offsets
     int sampOffset = inst ["XOffset"];

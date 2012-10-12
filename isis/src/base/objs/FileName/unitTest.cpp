@@ -15,10 +15,10 @@
 using namespace std;
 using namespace Isis;
 
-void TestVersioning(iString prefix, iString name, bool containsDate = false);
-void TestExpanded(iString prefix, iString name);
-void TestExtensionChanges(iString prefix, iString name, bool showExpandedValues);
-void TestGenericAccessors(iString prefix, iString name, bool showExpandedValues);
+void TestVersioning(IString prefix, IString name, bool containsDate = false);
+void TestExpanded(IString prefix, IString name);
+void TestExtensionChanges(IString prefix, IString name, bool showExpandedValues);
+void TestGenericAccessors(IString prefix, IString name, bool showExpandedValues);
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
@@ -54,14 +54,14 @@ int main(int argc, char *argv[]) {
 
   // Test temp files thoroughly
   cout << "Testing temporary file name placement" << endl;
-  iString tempFileNameTestStr = "$TEMPORARY/tttt.tmp";
+  IString tempFileNameTestStr = "$TEMPORARY/tttt.tmp";
   FileName n = FileName::createTempFile(tempFileNameTestStr);
   cout << "\tInput name and extension : " << tempFileNameTestStr << endl;
   cout << "\tExtension:               : " << n.extension() << endl;
   cout << "\tOriginal Path:           : " << n.originalPath() << endl;
   cout << "\tExists:                  : " << n.fileExists() << endl;
   cout << "\tName (cleaned):          : " <<
-      iString(n.name().ToQt().mid(0, 4) +
+      IString(n.name().ToQt().mid(0, 4) +
               QString("%1").arg("", n.name().size() - 8, '?') +
               n.name().ToQt().mid(n.name().size() - 4)) << endl;
   cout << endl;
@@ -190,7 +190,7 @@ int main(int argc, char *argv[]) {
 }
 
 
-void TestVersioning(iString prefix, iString name, bool containsDate) {
+void TestVersioning(IString prefix, IString name, bool containsDate) {
   cout << prefix << "Testing Versioning Methods [" << name << "]" << endl;
 
   try {
@@ -234,7 +234,7 @@ void TestVersioning(iString prefix, iString name, bool containsDate) {
 }
 
 
-void TestGenericAccessors(iString prefix, iString name, bool showExpandedValues) {
+void TestGenericAccessors(IString prefix, IString name, bool showExpandedValues) {
   FileName a(name);
 
   // Test our assignment & copy construct every time
@@ -267,7 +267,7 @@ void TestGenericAccessors(iString prefix, iString name, bool showExpandedValues)
 }
 
 
-void TestExtensionChanges(iString prefix, iString name, bool showExpandedValues) {
+void TestExtensionChanges(IString prefix, IString name, bool showExpandedValues) {
   FileName a(name);
 
   // Test our assignment & copy construct every time
@@ -277,7 +277,7 @@ void TestExtensionChanges(iString prefix, iString name, bool showExpandedValues)
   FileName test;
   test = c;
 
-  iString (FileName::*toStringMethod)() const = &FileName::toString;
+  IString (FileName::*toStringMethod)() const = &FileName::toString;
 
   FileName beforeLastChange = test;
 
@@ -327,7 +327,7 @@ void TestExtensionChanges(iString prefix, iString name, bool showExpandedValues)
 }
 
 
-void TestExpanded(iString prefix, iString name) {
+void TestExpanded(IString prefix, IString name) {
   FileName a(name);
 
   // Test our assignment & copy construct every time

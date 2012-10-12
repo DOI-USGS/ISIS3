@@ -5,7 +5,7 @@
 #include "FileName.h"
 #include "IException.h"
 #include "Preference.h"
-#include "iString.h"
+#include "IString.h"
 #include "Pvl.h"
 #include "Table.h"
 #include "Stretch.h"
@@ -32,7 +32,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   FileName inFile = ui.GetFileName("FROM");
   fillGap = false;
-  iString id, bitMode;
+  IString id, bitMode;
   int sumMode, editMode;
   bool projected;
   try {
@@ -165,7 +165,7 @@ void IsisMain() {
   // Create the stretch pairs
   stretch.ClearPairs();
   for(int i = 0; i < stretchPairs->LineCount(); i++) {
-    iString line;
+    IString line;
     stretchPairs->GetLine(line, true);
     int temp1 = line.Token(" ");
     int temp2 = line.Trim(" ");
@@ -207,7 +207,7 @@ void TranslateMroCtxLabels(FileName &labelFile, Cube *ocube) {
   Pvl outLabel;
   //Set up the directory where the translations are
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  iString transDir = (string) dataDir["Mro"] + "/translations/";
+  IString transDir = (string) dataDir["Mro"] + "/translations/";
   Pvl labelPvl(labelFile.expanded());
 
   //Translate the Instrument group

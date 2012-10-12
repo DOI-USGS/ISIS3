@@ -19,7 +19,7 @@
 #include "FileName.h"
 #include "History.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -679,12 +679,12 @@ namespace Isis {
     }
 
     if (m_linkedViewports.size() < 2) {
-      iString message = "Two cube viewports containing a stereo pair "
+      IString message = "Two cube viewports containing a stereo pair "
                         "need to be linked.";
       throw IException(IException::User, message, _FILEINFO_);
     }
     if (m_linkedViewports.size() > 2) {
-      iString message = "Only two cube viewports containing a stereo pair "
+      IString message = "Only two cube viewports containing a stereo pair "
                         "may be linked.";
       throw IException(IException::User, message, _FILEINFO_);
     }
@@ -1164,7 +1164,7 @@ namespace Isis {
         rightLine = m_rightGM->Line();
         if (rightSamp < 1 || rightSamp > m_rightCube->getSampleCount() ||
             rightLine < 1 || rightLine > m_rightCube->getLineCount()) {
-          iString message = "Point does not exist on cube, " +
+          IString message = "Point does not exist on cube, " +
                             m_rightCube->getFileName() + ".";
           throw IException(IException::User, message, _FILEINFO_);
 //        QString message = "Point does not exist on cube, " +
@@ -1174,7 +1174,7 @@ namespace Isis {
         }
       }
       else {
-        iString message = "Point does not exist on cube, " +
+        IString message = "Point does not exist on cube, " +
                           m_rightCube->getFileName() + ".";
         throw IException(IException::User, message, _FILEINFO_);
 //      QString message = "Point does not exist on cube, " +
@@ -1184,7 +1184,7 @@ namespace Isis {
       }
     }
     else {
-      iString message = "Point does not exist on cube, " +
+      IString message = "Point does not exist on cube, " +
                         m_leftCube->getFileName() + ".";
       throw IException(IException::User, message, _FILEINFO_);
 //    QString message = "Point does not exist on cube, " +
@@ -1218,7 +1218,7 @@ namespace Isis {
         newPoint = new ControlPoint(id.toStdString());
         if (m_controlNet->GetNumPoints() > 0 &&
             m_controlNet->ContainsPoint(newPoint->GetId())) {
-          iString message = "A ControlPoint with Point Id = [" +
+          IString message = "A ControlPoint with Point Id = [" +
                             newPoint->GetId() +
                             "] already exists.  Re-enter unique Point Id.";
           QMessageBox::warning(m_stereoTool, "Unique Point Id", message);
@@ -1323,7 +1323,7 @@ namespace Isis {
                                    m_rightCube, m_editPoint->GetId());
 
     //  Write pointId
-    iString ptId = "Point ID:  " + m_editPoint->GetId();
+    IString ptId = "Point ID:  " + m_editPoint->GetId();
     m_ptIdValue->setText(ptId);
 
     updateLabels();

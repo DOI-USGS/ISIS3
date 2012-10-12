@@ -55,17 +55,17 @@ void IsisMain() {
     for(int j = i ; j <= bands ; j++) {
       //Reset Stat accumulators and set the Progress Display Text
       stats.Reset();
-      string progText = "Band " + iString(i) +
+      string progText = "Band " + IString(i) +
                         " vs. " +
-                        "Band " +  iString(j);
+                        "Band " +  IString(j);
 
       //Cube will be processed by line
       ProcessByLine p;
 
       //Set CubeAttributeInputs to tell the ProcessByLine which
       //bands to compare
-      CubeAttributeInput band_a("d+" + iString(icube->getPhysicalBand(i)));
-      CubeAttributeInput band_b("d+" + iString(icube->getPhysicalBand(j)));
+      CubeAttributeInput band_a("d+" + IString(icube->getPhysicalBand(i)));
+      CubeAttributeInput band_b("d+" + IString(icube->getPhysicalBand(j)));
 
       //Set Input files and process, to accumulate the statistics
       p.SetInputCube(file, band_a);
@@ -137,7 +137,7 @@ void WriteText(int size, string filename) {
   outputFile << "Correlation:" << endl << endl;
   for(int i = 0; i < size; ++i) {
     for(int j = 0; j < size; ++j) {
-      line += " " + iString(correlation[i][j]) + " ";
+      line += " " + IString(correlation[i][j]) + " ";
     }
     outputFile << line << endl;
     line = " ";
@@ -146,7 +146,7 @@ void WriteText(int size, string filename) {
   outputFile << endl << endl << "Covariance:" << endl << endl;
   for(int i = 0; i < size; ++i) {
     for(int j = 0; j < size; ++j) {
-      line += " " + iString(covariance[i][j]) + " ";
+      line += " " + IString(covariance[i][j]) + " ";
     }
     outputFile << line << endl;
     line = " ";

@@ -58,7 +58,7 @@ void IsisMain() {
     dccube = p.SetInputCube(dcfileloc, cubeAtt);
   }
 
-  iString filter = (string)(icube->getGroup("BandBin"))["FilterName"];
+  IString filter = (string)(icube->getGroup("BandBin"))["FilterName"];
   filter = filter.DownCase();
 
   Cube *ffcube;
@@ -88,7 +88,7 @@ void IsisMain() {
 
   avgFF = uvvisDef.FindGroup("Filter" + filter.UpCase())["AVGFF"];
   cr = uvvisDef.FindGroup("Filter" + filter.UpCase())["CO"];
-  gain = uvvisDef.FindGroup(iString("GainModeID") + iString(icube->getGroup("Instrument")["GainModeID"][0]))["GAIN"];
+  gain = uvvisDef.FindGroup(IString("GainModeID") + IString(icube->getGroup("Instrument")["GainModeID"][0]))["GAIN"];
 
   useDcconst = ui.WasEntered("DCCONST");
   if(useDcconst) {

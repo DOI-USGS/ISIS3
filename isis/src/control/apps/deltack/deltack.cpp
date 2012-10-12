@@ -164,7 +164,7 @@ Distance GetRadius(std::string filename, Latitude lat, Longitude lon) {
   Distance radius = sensor.LocalRadius();
   if(!radius.isValid()) {
     string msg = "Could not determine radius from DEM at lat/lon [";
-    msg += iString(lat.degrees()) + "," + iString(lon.degrees()) + "]";
+    msg += IString(lat.degrees()) + "," + IString(lon.degrees()) + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
   return radius;

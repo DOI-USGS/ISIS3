@@ -76,7 +76,7 @@ namespace Isis {
    *
    * @return bool True if it looks valid, false if it's not known
    */
-  bool CubeInfixToPostfix::isKnownSymbol(iString representation) {
+  bool CubeInfixToPostfix::isKnownSymbol(IString representation) {
     for(int i = 0; i < p_operators.size(); i++) {
       if(representation.compare(p_operators[i]->inputString()) == 0) {
         return true;
@@ -96,7 +96,7 @@ namespace Isis {
     return isFunction;
   }
 
-  InfixOperator *CubeInfixToPostfix::findOperator(iString representation) {
+  InfixOperator *CubeInfixToPostfix::findOperator(IString representation) {
     try {
       return InfixToPostfix::findOperator(representation);
     }

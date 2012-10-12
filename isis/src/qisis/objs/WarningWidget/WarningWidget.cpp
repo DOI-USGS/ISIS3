@@ -1,5 +1,5 @@
 #include "WarningWidget.h"
-#include "iString.h"
+#include "IString.h"
 #include "FileName.h"
 
 #include <QIcon>

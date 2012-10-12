@@ -80,6 +80,13 @@
             <li><a href="#methodOrdering">Method Order in Implementation File</a></li>
           </ol>
 
+          <li><a href="#string">Strings</a></li>
+          <ol type="A">
+            <li><a href="#IString">IString</a></li>
+            <li><a href="#QString">QString</a></li>
+            <li><a href="#std::string">std::string</a></li>
+            <li><a href="#otherStrings">Other Strings</a></li>
+          </ol>
           <li><a href="#todo">To Do</a></li>
         </ol>
         <hr />
@@ -1162,6 +1169,80 @@
             Return to Table of Contents
           </font></a></p>
 
+        <h2><a name="strings">Strings</a></h2>
+        <h3><a name="IString">IString</a></h3>
+        <p>
+          Instantiating the IString class is no longer recommended. This class may be given
+          a couple of static methods that operate with QStrings in the future, but for all
+          other purposes consider IString to be deprecated. IString should never be in the
+          public API of new code.
+        </p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+        <h3><a name="QString">QString</a></h3>
+        <p>
+          The QString class does most of what "iString" used to do for us. QString is the
+          string we should always expect in our public API, with any conversions for the
+          purposes with interfacing with other APIs to be done inside of the methods which
+          interact with the other APIs. Please use QString wherever possible and reasonable.
+
+          This was motivated by the following:
+          <ul>
+            <li>
+              There is minimal compatibility with the Qt inteface, despite operators to QString and
+              a constructor that converts from QString.
+            </li>
+            <li>
+              There was no obvious choice for which string class to use in new classes (in many
+              cases) because if you are writing a qisis app, you want QStrings, but most
+              of Isis uses std::string and we should choose iString most of the time because we
+              implemented it.
+            </li>
+            <li>
+              There have been multiple instances of taking 3 lines of code to get a string from type
+              A to type B in qisis code -- a rediculous amount of effort for what was needed.
+            </li>
+            <li>
+              Ambiguous conversions because of the implicit casting operators in iString which
+              have shown themselves to be an issue in cases like PvlKeyword - getting the API
+              correct is overly difficult, and it's no longer transparent what you're doing when you
+              do something like m_vector.push_back(someIString) -- m_vector could be a vector of
+              bools, ints, doubles, strings, etc...
+            </li>
+            <li>
+              Large parts of our string-related code is extremely over-complicated due to the
+              limited parsing API we provided.
+            </li>
+          </ul>
+        </p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+        <h3><a name="std::string">std::string</a></h3>
+        <p>
+          The STL string class doesn't provide an easy to use, intuitive interface for our purposes
+          (parsing methods are global functions and cryptic, no unicode support without going to
+          std::wstring, no arg(), split()/join(), tr(), etc... available). Many APIs expect
+          std::string or const char * as input. If your class is interfacing with one of these APIs,
+          please have your class take QStrings as arguments and convert to a std::string with
+          QString::toStdString(). If you need to convert to a const char *, you can also
+          use QString().toAscii().data().
+        </p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+        <h3><a name="otherStrings">Other Strings</a></h3>
+        <p>
+          Other string classes should be handled like we're handing std::string, but a function may
+          be created in the IString file to convert to the new type. For example, if there was a
+          "somelib::AString" class, providing: somelib::AString toAString(QString) in IString.h is
+          okay.
+        </p>
+        <p align="right"><a href="#top"><font size="1">
+          Return to Table of Contents
+        </font></a></p>
+
         <h2><a name="todo">TO DO</a></h2>
           <ul>
           <li> Improve examples </li>
@@ -1251,6 +1332,9 @@
     </change>
     <change name="Steven Lambright and Stuart Sides" date="2012-07-31">
       Added Pointers and References under formatting
+    </change>
+    <change name="Steven Lambright" date="2012-10-10">
+      Added Strings section
     </change>
   </history>
 

@@ -61,7 +61,7 @@ namespace Isis {
       algorithm = std::string(algo["Name"]);
     }
     else {
-      iString msg = "Keyword [Name] or keyword [NormName] must ";
+      IString msg = "Keyword [Name] or keyword [NormName] must ";
       msg += "exist in [Group = Algorithm]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -117,7 +117,7 @@ namespace Isis {
       algorithm = std::string(algo["Name"]);
     }
     else {
-      iString msg = "Keyword [Name] or keyword [NormName] must ";
+      IString msg = "Keyword [Name] or keyword [NormName] must ";
       msg += "exist in [Group = Algorithm]";
       throw IException(IException::User, msg, _FILEINFO_);
     }

@@ -92,7 +92,7 @@ namespace Isis {
    *  finder.setThrowOnFailure();
    *  string pntDist  = "distance(giscpt,UPCPoint(%longitude,%latitude))";
    *  string pntQuery = "SELECT pointid, latitude, longitude, radius FROM "
-   *                    + pntTable + " WHERE (%distance <= " + iString(maxDist) +
+   *                    + pntTable + " WHERE (%distance <= " + IString(maxDist) +
    *                    ")";
    *
    *  Progress progress;
@@ -102,15 +102,15 @@ namespace Isis {
    *    CSVReader::CSVAxis pntR = pnts.getRow(row);
    *
    *    // Convert longitude to proper system if requested
-   *    double longitude = iString(pntR[1]).ToDouble();
+   *    double longitude = IString(pntR[1]).ToDouble();
    *    if ((make360) && (longitude < 0.0)) { longitude += 360.0; }
-   *    double latitude = iString(pntR[0]).ToDouble();
-   *    double radius = iString(pntR[2]).ToDouble();
+   *    double latitude = IString(pntR[0]).ToDouble();
+   *    double radius = IString(pntR[2]).ToDouble();
    *
    *    // Prepare the query, converting the longitude
-   *    string dcheck(iString::Replace(pntDist, "%longitude",
-   *    iString(longitude))); dcheck = iString::Replace(dcheck, "%latitude",
-   *    iString(latitude)); string query = iString::Replace(pntQuery, "%distance",
+   *    string dcheck(IString::Replace(pntDist, "%longitude",
+   *    IString(longitude))); dcheck = IString::Replace(dcheck, "%latitude",
+   *    IString(latitude)); string query = IString::Replace(pntQuery, "%distance",
    *    dcheck);
    *
    *    finder.exec(query);
@@ -120,10 +120,10 @@ namespace Isis {
    *      while (finder.next()) {
    *        SqlRecord record = finder.getRecord();
    *        OutPoint point;
-   *        point.latitude = iString(record.getValue("latitude")).ToDouble(),
-   *        point.longitude = iString(record.getValue("longitude")).ToDouble(),
-   *        point.radius = iString(record.getValue("radius")).ToDouble(),
-   *        point.pointid = iString(record.getValue("pointid")),
+   *        point.latitude = IString(record.getValue("latitude")).ToDouble(),
+   *        point.longitude = IString(record.getValue("longitude")).ToDouble(),
+   *        point.radius = IString(record.getValue("radius")).ToDouble(),
+   *        point.pointid = IString(record.getValue("pointid")),
    *        stats.AddData(&point.radius, 1);
    *        pointList.push_back(point);
    *      }
@@ -133,7 +133,7 @@ namespace Isis {
    *
    * @endcode
    *
-   * @see iString
+   * @see IString
    *
    * @ingroup Database
    *
@@ -144,7 +144,7 @@ namespace Isis {
    *                                    to first try lastQuery(), then
    *                                    executedQuery().
    *  @history 2007-06-05 Brendan George - Modified to work with
-   *           iString/StringTools merge
+   *           IString/StringTools merge
    *   @history 2008-10-30 Steven Lambright - tossQueryError now accepts a const
    *            char* for a filename, issue pointed out by "novus0x2a" (Support
    *            Board Member)

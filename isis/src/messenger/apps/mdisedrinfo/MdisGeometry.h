@@ -182,7 +182,7 @@ namespace Isis {
       PvlKeyword format(const std::string &name,
                         const std::vector<std::string> &values,
                         const std::string &unit = "") const;
-      iString DoubleToString(const double &value) const;
+      IString DoubleToString(const double &value) const;
   };
 
 }     // namespace Isis

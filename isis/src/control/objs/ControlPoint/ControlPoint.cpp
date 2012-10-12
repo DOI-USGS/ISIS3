@@ -26,7 +26,7 @@
 #include "SerialNumberList.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
-#include "iString.h"
+#include "IString.h"
 
 using boost::numeric::ublas::symmetric_matrix;
 using boost::numeric::ublas::upper;
@@ -151,7 +151,7 @@ namespace Isis {
         type = Fixed;
         break;
       default:
-        iString msg = "Point type is invalid.";
+        IString msg = "Point type is invalid.";
         throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -317,7 +317,7 @@ namespace Isis {
    *
    * @param id Control Point Id
    */
-  ControlPoint::ControlPoint(const iString &newId) : invalid(false) {
+  ControlPoint::ControlPoint(const IString &newId) : invalid(false) {
     parentNetwork = NULL;
     measures = NULL;
     referenceMeasure = NULL;
@@ -430,7 +430,7 @@ namespace Isis {
     // Make sure measure is unique
     foreach(ControlMeasure * m, measures->values()) {
       if (m->GetCubeSerialNumber() == measure->GetCubeSerialNumber()) {
-        iString msg = "The SerialNumber is not unique. A measure with "
+        IString msg = "The SerialNumber is not unique. A measure with "
             "serial number [" + measure->GetCubeSerialNumber() + "] already "
             "exists for ControlPoint [" + GetId() + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -469,9 +469,9 @@ namespace Isis {
    *
    * @param sn The serial number of the measure to validate
    */
-  void ControlPoint::ValidateMeasure(iString serialNumber) const {
+  void ControlPoint::ValidateMeasure(IString serialNumber) const {
     if (!measures->contains(serialNumber)) {
-      iString msg = "No measure with serial number [" + serialNumber +
+      IString msg = "No measure with serial number [" + serialNumber +
           "] is owned by this point";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -484,7 +484,7 @@ namespace Isis {
    *
    * @param serialNumber The serial number of the measure to delete
    */
-  int ControlPoint::Delete(iString serialNumber) {
+  int ControlPoint::Delete(IString serialNumber) {
     ValidateMeasure(serialNumber);
     ControlMeasure *cm = (*measures)[serialNumber];
 
@@ -543,7 +543,7 @@ namespace Isis {
    */
   int ControlPoint::Delete(int index) {
     if (index < 0 || index >= cubeSerials->size()) {
-      iString msg = "index [" + iString(index) + "] out of bounds";
+      IString msg = "index [" + IString(index) + "] out of bounds";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -578,7 +578,7 @@ namespace Isis {
    * @param serialNumber serial number of measure to get
    * @returns control measure with matching serial number
    */
-  ControlMeasure *ControlPoint::GetMeasure(iString serialNumber) {
+  ControlMeasure *ControlPoint::GetMeasure(IString serialNumber) {
     ValidateMeasure(serialNumber);
     return (*measures)[serialNumber];
   }
@@ -590,7 +590,7 @@ namespace Isis {
    * @param serialNumber serial number of measure to get
    * @returns const control measure with matching serial number
    */
-  const ControlMeasure *ControlPoint::GetMeasure(iString serialNumber) const {
+  const ControlMeasure *ControlPoint::GetMeasure(IString serialNumber) const {
     ValidateMeasure(serialNumber);
     return measures->value(serialNumber);
   }
@@ -598,7 +598,7 @@ namespace Isis {
 
   const ControlMeasure *ControlPoint::GetMeasure(int index) const {
     if (index < 0 || index >= cubeSerials->size()) {
-      iString msg = "Index [" + iString(index) + "] out of range";
+      IString msg = "Index [" + IString(index) + "] out of range";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -608,7 +608,7 @@ namespace Isis {
 
   ControlMeasure *ControlPoint::GetMeasure(int index) {
     if (index < 0 || index >= cubeSerials->size()) {
-      iString msg = "Index [" + iString(index) + "] out of range";
+      IString msg = "Index [" + IString(index) + "] out of range";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -623,7 +623,7 @@ namespace Isis {
    */
   const ControlMeasure *ControlPoint::GetRefMeasure() const {
     if (referenceMeasure == NULL) {
-      iString msg = "Control point [" + GetId() + "] has no reference measure!";
+      IString msg = "Control point [" + GetId() + "] has no reference measure!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -636,7 +636,7 @@ namespace Isis {
    */
   ControlMeasure *ControlPoint::GetRefMeasure() {
     if (referenceMeasure == NULL) {
-      iString msg = "Control point [" + GetId() + "] has no reference measure!";
+      IString msg = "Control point [" + GetId() + "] has no reference measure!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -651,7 +651,7 @@ namespace Isis {
    *
    * @param name The username of the person who last modified this control point
    */
-  ControlPoint::Status ControlPoint::SetChooserName(iString name) {
+  ControlPoint::Status ControlPoint::SetChooserName(IString name) {
     if (editLock)
       return PointLocked;
     chooserName = name;
@@ -667,7 +667,7 @@ namespace Isis {
    *
    * @param newDateTime The date and time this control point was last modified
    */
-  ControlPoint::Status ControlPoint::SetDateTime(iString newDateTime) {
+  ControlPoint::Status ControlPoint::SetDateTime(IString newDateTime) {
     if (editLock)
       return PointLocked;
     dateTime = newDateTime;
@@ -711,10 +711,10 @@ namespace Isis {
    *
    * @return  (int) status Success or PointLocked
    */
-  ControlPoint::Status ControlPoint::SetId(iString newId) {
+  ControlPoint::Status ControlPoint::SetId(IString newId) {
     if (editLock)
       return PointLocked;
-    iString oldId = id;
+    IString oldId = id;
     id = newId;
     if (parentNetwork)
       parentNetwork->UpdatePointReference(this, oldId);
@@ -747,7 +747,7 @@ namespace Isis {
       return PointLocked;
 
     if (index < 0 || index >= cubeSerials->size()) {
-      iString msg = "Index [";
+      IString msg = "Index [";
       msg += index + "] out of range";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -762,12 +762,12 @@ namespace Isis {
    *
    * @param sn The serial number of the new reference measure
    */
-  ControlPoint::Status ControlPoint::SetRefMeasure(iString sn) {
+  ControlPoint::Status ControlPoint::SetRefMeasure(IString sn) {
     if (editLock)
       return PointLocked;
 
     if (!cubeSerials->contains(sn)) {
-      iString msg = "Point [" + id + "] has no measure with serial number [" +
+      IString msg = "Point [" + id + "] has no measure with serial number [" +
           sn + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -865,7 +865,7 @@ namespace Isis {
    */
   ControlPoint::Status ControlPoint::SetType(PointType newType) {
     if (type != Fixed && type != Free && type != Constrained) {
-      iString msg = "Invalid Point Enumeration, [" + iString(type) + "], for "
+      IString msg = "Invalid Point Enumeration, [" + IString(type) + "], for "
           "Control Point [" + GetId() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -904,7 +904,7 @@ namespace Isis {
    * @param source Where the radius came from
    */
   ControlPoint::Status ControlPoint::SetAprioriRadiusSourceFile(
-    iString sourceFile) {
+    IString sourceFile) {
     if (editLock)
       return PointLocked;
     PointModified();
@@ -971,7 +971,7 @@ namespace Isis {
    * @param sourceFile Where the surface point came from
    */
   ControlPoint::Status ControlPoint::SetAprioriSurfacePointSourceFile(
-    iString sourceFile) {
+    IString sourceFile) {
     if (editLock)
       return PointLocked;
     PointModified();
@@ -1020,7 +1020,7 @@ namespace Isis {
     // it exists!
     if (GetType() == Fixed) {
       if (!aprioriSurfacePoint.Valid()) {
-        iString msg = "ControlPoint [" + GetId() + "] is a fixed point ";
+        IString msg = "ControlPoint [" + GetId() + "] is a fixed point ";
         msg += "and requires an apriori x/y/z";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -1050,7 +1050,7 @@ namespace Isis {
       else {
         Camera *cam = m->Camera();
         if (cam == NULL) {
-          iString msg = "The Camera must be set prior to calculating apriori";
+          IString msg = "The Camera must be set prior to calculating apriori";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
         if (cam->SetImage(m->GetSample(), m->GetLine())) {
@@ -1073,7 +1073,7 @@ namespace Isis {
             continue;
 
           // TODO: What do we do
-//          iString msg = "Cannot compute lat/lon/radius (x/y/z) for "
+//          IString msg = "Cannot compute lat/lon/radius (x/y/z) for "
 //              "ControlPoint [" + GetId() + "], measure [" +
 //              m->GetCubeSerialNumber() + "]";
 //          throw IException(IException::User, msg, _FILEINFO_);
@@ -1096,7 +1096,7 @@ namespace Isis {
 
     // Did we have any measures?
     if (goodMeasures == 0) {
-      iString msg = "ControlPoint [" + GetId() + "] has no measures which "
+      IString msg = "ControlPoint [" + GetId() + "] has no measures which "
           "project to lat/lon/radius (x/y/z)";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -1191,7 +1191,7 @@ namespace Isis {
         // FocalPlaneMap which takes x/y to detector s/l.  We will bypass the
         // distortion map and have residuals in undistorted pixels.
         if (!fpmap->SetFocalPlane(m->GetFocalPlaneComputedX(), m->GetFocalPlaneComputedY())) {
-          iString msg = "Sanity check #1 for ControlPoint [" + GetId() +
+          IString msg = "Sanity check #1 for ControlPoint [" + GetId() +
               "], ControlMeasure [" + m->GetCubeSerialNumber() + "]";
           throw IException(IException::Programmer, msg, _FILEINFO_);
           // This error shouldn't happen but check anyways
@@ -1263,7 +1263,7 @@ namespace Isis {
       if (cam->GetCameraType()  !=  Isis::Camera::Radar) {
         // Again we will bypass the distortion map and have residuals in undistorted pixels.
         if (!fpmap->SetFocalPlane(m->GetFocalPlaneMeasuredX(), m->GetFocalPlaneMeasuredY())) {
-          iString msg = "Sanity check #2 for ControlPoint [" + GetId() +
+          IString msg = "Sanity check #2 for ControlPoint [" + GetId() +
               "], ControlMeasure [" + m->GetCubeSerialNumber() + "]";
           throw IException(IException::Programmer, msg, _FILEINFO_);
           // This error shouldn't happen but check anyways
@@ -1350,7 +1350,7 @@ namespace Isis {
     return Success;
   }
 
-  iString ControlPoint::GetChooserName() const {
+  IString ControlPoint::GetChooserName() const {
     if (chooserName != "") {
       return chooserName;
     }
@@ -1360,7 +1360,7 @@ namespace Isis {
   }
 
 
-  iString ControlPoint::GetDateTime() const {
+  IString ControlPoint::GetDateTime() const {
     if (dateTime != "") {
       return dateTime;
     }
@@ -1402,7 +1402,7 @@ namespace Isis {
    *
    * @return Control Point Id
    */
-  iString ControlPoint::GetId() const {
+  IString ControlPoint::GetId() const {
     return id;
   }
 
@@ -1429,8 +1429,8 @@ namespace Isis {
    *
    *  @returns A string representation of type
    */
-  iString ControlPoint::PointTypeToString(PointType pointType) {
-    iString str;
+  IString ControlPoint::PointTypeToString(PointType pointType) {
+    IString str;
 
     switch (pointType) {
       case Fixed:
@@ -1456,12 +1456,12 @@ namespace Isis {
    *  @returns the PointType for the given string
    */
   ControlPoint::PointType ControlPoint::StringToPointType(
-      iString pointTypeString) {
+      IString pointTypeString) {
 
     //  On failure assume Free
     ControlPoint::PointType type = ControlPoint::Free;
 
-    iString errMsg  = "There is no PointType that has a string representation"
+    IString errMsg  = "There is no PointType that has a string representation"
                       " of \"";
             errMsg += pointTypeString;
             errMsg += "\".";
@@ -1484,7 +1484,7 @@ namespace Isis {
    *
    * @return A string representation of the PointType
    */
-  iString ControlPoint::GetPointTypeString() const {
+  IString ControlPoint::GetPointTypeString() const {
     return PointTypeToString(GetType());
   }
 
@@ -1505,8 +1505,8 @@ namespace Isis {
    *
    *  @returns A string representation of RadiusSource
    */
-  iString ControlPoint::RadiusSourceToString(RadiusSource::Source source) {
-    iString str;
+  IString ControlPoint::RadiusSourceToString(RadiusSource::Source source) {
+    IString str;
 
     switch (source) {
       case RadiusSource::None:
@@ -1567,7 +1567,7 @@ namespace Isis {
    *
    * @return A string representation of the RadiusSource
    */
-  iString ControlPoint::GetRadiusSourceString() const {
+  IString ControlPoint::GetRadiusSourceString() const {
     return RadiusSourceToString(aprioriRadiusSource);
   }
 
@@ -1579,10 +1579,10 @@ namespace Isis {
    *
    *  @returns A string representation of SurfacePointSource
    */
-  iString ControlPoint::SurfacePointSourceToString(
+  IString ControlPoint::SurfacePointSourceToString(
     SurfacePointSource::Source source) {
 
-    iString str;
+    IString str;
 
     switch (source) {
       case SurfacePointSource::None:
@@ -1643,7 +1643,7 @@ namespace Isis {
    *
    * @return A string representation of the SurfacePointSource
    */
-  iString ControlPoint::GetSurfacePointSourceString() const {
+  IString ControlPoint::GetSurfacePointSourceString() const {
     return SurfacePointSourceToString(aprioriSurfacePointSource);
   }
 
@@ -1692,7 +1692,7 @@ namespace Isis {
     return constraintStatus.count();
   }
 
-  iString ControlPoint::GetAprioriRadiusSourceFile() const {
+  IString ControlPoint::GetAprioriRadiusSourceFile() const {
     return aprioriRadiusSourceFile;
   }
 
@@ -1702,7 +1702,7 @@ namespace Isis {
   }
 
 
-  iString ControlPoint::GetAprioriSurfacePointSourceFile() const {
+  IString ControlPoint::GetAprioriSurfacePointSourceFile() const {
     return aprioriSurfacePointSourceFile;
   }
 
@@ -1749,7 +1749,7 @@ namespace Isis {
    *  @param serialNumber  The serial number
    *  @return True if point contains serial number, false if not
    */
-  bool ControlPoint::HasSerialNumber(iString serialNumber) const {
+  bool ControlPoint::HasSerialNumber(IString serialNumber) const {
     return cubeSerials->contains(serialNumber);
   }
 
@@ -1768,7 +1768,7 @@ namespace Isis {
    */
   QString ControlPoint::GetReferenceSN() const {
     if (referenceMeasure == NULL) {
-      iString msg = "There is no reference measure set in the ControlPoint [" +
+      IString msg = "There is no reference measure set in the ControlPoint [" +
           GetId() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1799,11 +1799,11 @@ namespace Isis {
    * @returns The index of the measure with serial number matching sn,
    *          or -1 on failure if throws is false.
    */
-  int ControlPoint::IndexOf(iString sn, bool throws) const {
+  int ControlPoint::IndexOf(IString sn, bool throws) const {
     int index = cubeSerials->indexOf(sn);
 
     if (throws && index == -1) {
-      iString msg = "ControlMeasure [" + sn + "] does not exist in point [" +
+      IString msg = "ControlMeasure [" + sn + "] does not exist in point [" +
           id + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1822,7 +1822,7 @@ namespace Isis {
    */
   int ControlPoint::IndexOfRefMeasure() const {
     if (!referenceMeasure) {
-      iString msg = "There is no reference measure for point [" + id + "]."
+      IString msg = "There is no reference measure for point [" + id + "]."
           "  This also means of course that the point is empty!";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1901,7 +1901,7 @@ namespace Isis {
    *
    *  @returns const version of the measure which has the provided serial number
    */
-  const ControlMeasure *ControlPoint::operator[](iString serialNumber) const {
+  const ControlMeasure *ControlPoint::operator[](IString serialNumber) const {
     return GetMeasure(serialNumber);
   }
 
@@ -1913,7 +1913,7 @@ namespace Isis {
    *
    *  @returns The measure which has the provided serial number
    */
-  ControlMeasure *ControlPoint::operator[](iString serialNumber) {
+  ControlMeasure *ControlPoint::operator[](IString serialNumber) {
     return GetMeasure(serialNumber);
   }
 

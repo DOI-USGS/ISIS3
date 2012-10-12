@@ -27,7 +27,7 @@
 
 #include "FindGapsFunctor.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "MultivariateStatistics.h"
 #include "ProcessByLine.h"
 #include "ProcessBySample.h"

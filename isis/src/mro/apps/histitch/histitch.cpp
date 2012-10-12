@@ -140,8 +140,8 @@ void IsisMain() {
   fromData[0].add = HiVector(icube1->getLineCount(), 0.0);
 
   if(seamSize + skipSize > icube1->getSampleCount()) {
-    string msg = "SEAMSIZE [" + iString(seamSize) + "] + SKIP [" + iString(skipSize) + "] must ";
-    msg += " be less than the number of samples [" + iString(icube1->getSampleCount()) + "] in ";
+    string msg = "SEAMSIZE [" + IString(seamSize) + "] + SKIP [" + IString(skipSize) + "] must ";
+    msg += " be less than the number of samples [" + IString(icube1->getSampleCount()) + "] in ";
     msg += "[" + ui.GetAsString("FROM1") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -173,8 +173,8 @@ void IsisMain() {
     fromData[1].add = HiVector(icube2->getLineCount(), 0.0);
 
     if(seamSize + skipSize > icube2->getSampleCount()) {
-      string msg = "SEAMSIZE [" + iString(seamSize) + "] + SKIP [" + iString(skipSize) + "] must ";
-      msg += " be less than the number of samples [" + iString(icube2->getSampleCount()) + " in ";
+      string msg = "SEAMSIZE [" + IString(seamSize) + "] + SKIP [" + IString(skipSize) + "] must ";
+      msg += " be less than the number of samples [" + IString(icube2->getSampleCount()) + " in ";
       msg += "[" + ui.GetAsString("FROM2") + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -237,7 +237,7 @@ void IsisMain() {
     InstrumentOut += PvlKeyword("StitchedProductIds", stitchedProductIds);
   }
   else {
-    InstrumentOut += PvlKeyword("StitchedChannels", iString(fromData[0].ChnNumber));
+    InstrumentOut += PvlKeyword("StitchedChannels", IString(fromData[0].ChnNumber));
     InstrumentOut += PvlKeyword("StitchedProductIds", stitchedProductIds);
   }
 

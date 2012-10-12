@@ -15,7 +15,7 @@
 #include "QHistogram.h"
 #include "HistogramPlotWindow.h"
 #include "HistogramItem.h"
-#include "iString.h"
+#include "IString.h"
 #include "CubePlotCurve.h"
 
 using namespace std;
@@ -161,7 +161,7 @@ void IsisMain() {
       CubePlotCurve *histCurve = new CubePlotCurve(CubePlotCurve::CubeDN,
                                                 CubePlotCurve::Percentage);
       histCurve->setColor(curveColor(i));
-      iString baseName = FileName(fList[i]).baseName();
+      IString baseName = FileName(fList[i]).baseName();
       histCurve->setTitle(baseName);
 
  

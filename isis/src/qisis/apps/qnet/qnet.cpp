@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
         "UserInterface");
     if (uiPref.HasKeyword("GuiStyle")) {
       string style = uiPref["GuiStyle"];
-      QApplication::setStyle((iString) style);
+      QApplication::setStyle((IString) style);
     }
 
     // Add the Qt plugin directory to the library path

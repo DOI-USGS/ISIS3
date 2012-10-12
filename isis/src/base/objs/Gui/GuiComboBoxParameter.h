@@ -22,9 +22,9 @@ namespace Isis {
                        int group, int param);
       ~GuiComboBoxParameter();
 
-      iString Value();
+      IString Value();
 
-      void Set(iString newValue);
+      void Set(IString newValue);
 
       virtual std::vector<std::string> Exclusions();
 

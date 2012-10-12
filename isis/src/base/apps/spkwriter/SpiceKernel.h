@@ -33,7 +33,7 @@
 #include <functional>
 #include <algorithm>
 
-#include "iString.h"
+#include "IString.h"
 #include "IException.h"
 #include "SpiceSegment.h"
 

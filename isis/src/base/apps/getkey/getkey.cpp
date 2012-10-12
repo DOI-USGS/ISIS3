@@ -74,7 +74,7 @@ void IsisMain() {
     }
   }
 
-  iString value;
+  IString value;
   if(ui.WasEntered("KEYINDEX")) {
     int i = ui.GetInteger("KEYINDEX");
 
@@ -88,11 +88,11 @@ void IsisMain() {
     else value = key[i-1];
   }
   else {
-    // Push the whole list into a iString and clean it up before returning it
+    // Push the whole list into a IString and clean it up before returning it
     if(key.Size() > 1) {
       ostringstream os;
       os << key;
-      iString temp = os.str();
+      IString temp = os.str();
       temp.Token("(");
       value = temp.Token(")");
       value = value.ConvertWhiteSpace();

@@ -7,7 +7,7 @@
 #include "ControlCubeGraphNode.h"
 #include "ControlMeasure.h"
 #include "ControlPoint.h"
-#include "iString.h"
+#include "IString.h"
 
 
 namespace Isis

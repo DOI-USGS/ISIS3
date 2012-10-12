@@ -3,7 +3,7 @@
 #include <QVariant>
 
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 #include "AbstractTreeItem.h"
 

@@ -377,7 +377,7 @@ namespace Isis {
       PvlObject zOrders("ZOrdering");
       foreach(MosaicSceneItem * mosaicSceneItem, *m_mosaicSceneItems) {
         PvlKeyword zValue("ZValue");
-        zValue += (iString)mosaicSceneItem->cubeDisplay()->fileName();
+        zValue += (IString)mosaicSceneItem->cubeDisplay()->fileName();
         zValue += mosaicSceneItem->zValue();
         zOrders += zValue;
       }
@@ -492,7 +492,7 @@ namespace Isis {
         return mosaicSceneItem;
     }
 
-    iString msg = "Cube is not in the mosaic";
+    IString msg = "Cube is not in the mosaic";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -1371,10 +1371,10 @@ namespace Isis {
         mosaicSceneItem->reproject();
       }
       catch(IException &e) {
-        iString msg = "The file [";
+        IString msg = "The file [";
 
         if(mosaicSceneItem->cubeDisplay())
-          msg += (iString)mosaicSceneItem->cubeDisplay()->displayName();
+          msg += (IString)mosaicSceneItem->cubeDisplay()->displayName();
 
         msg += "] is being removed due to not being able to project";
 

@@ -3,7 +3,7 @@
 #include "Affine.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace std;
 
@@ -107,7 +107,7 @@ namespace Isis {
     transy.insert(transy.begin(), transy[2]);
     transy.pop_back();
 
-    string icode = "INS" + iString(p_naifIkCode);
+    string icode = "INS" + IString(p_naifIkCode);
     string icodex = icode + "_TRANSX";
     string icodey = icode + "_TRANSY";
     pdpool_c(icodex.c_str(), 3, (double( *)) &transx[0]);

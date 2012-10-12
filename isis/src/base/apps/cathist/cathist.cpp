@@ -3,7 +3,7 @@
 #include <sstream>
 
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include "History.h"
 #include "Pvl.h"   
 #include "TextFile.h"
@@ -66,7 +66,7 @@ void IsisMain() {
         os << user[j];
         string temp = os.str();
         int index = temp.find("=");
-        iString temp1(temp.substr(0, index - 1));
+        IString temp1(temp.substr(0, index - 1));
         string temp2 = temp.substr(index + 2);
         all += temp1.DownCase() + "=" + temp2 + " ";
       }

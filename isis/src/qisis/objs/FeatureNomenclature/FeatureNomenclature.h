@@ -18,7 +18,7 @@ template <typename T> class QList;
 
 namespace Isis {
   class Distance;
-  class iString;
+  class IString;
   class iTime;
   class Latitude;
   class Longitude;
@@ -79,7 +79,7 @@ namespace Isis {
       FeatureNomenclature(const FeatureNomenclature &other);
       ~FeatureNomenclature();
       
-      void queryFeatures(iString target,
+      void queryFeatures(IString target,
                          Latitude startLat, Longitude startLon,
                          Latitude endLat, Longitude endLon);
 
@@ -118,44 +118,44 @@ namespace Isis {
 
           QWidget *toWidget() const;
 
-          iString id() const;
-          iString name() const;
-          iString cleanName() const;
-          iString controlNet() const;
-          iString displayName() const;
-          iString target() const;
-          iString system() const;
+          IString id() const;
+          IString name() const;
+          IString cleanName() const;
+          IString controlNet() const;
+          IString displayName() const;
+          IString target() const;
+          IString system() const;
           Distance diameter() const;
-          iString diameterString() const;
+          IString diameterString() const;
           Latitude centerLatitude() const;
-          iString centerLatitudeString() const;
+          IString centerLatitudeString() const;
           Longitude centerLongitude() const;
-          iString centerLongitudeString() const;
+          IString centerLongitudeString() const;
           Latitude northernLatitude() const;
-          iString northernLatitudeString() const;
+          IString northernLatitudeString() const;
           Latitude southernLatitude() const;
-          iString southernLatitudeString() const;
+          IString southernLatitudeString() const;
           Longitude easternLongitude() const;
-          iString easternLongitudeString() const;
+          IString easternLongitudeString() const;
           Longitude westernLongitude() const;
-          iString westernLongitudeString() const;
-          iString originatingContinent() const;
-          iString originatingEthnicity() const;
-          iString approvalStatus() const;
-          iString approvalDate() const;
-          iString featureType() const;
-          iString referenceString() const;
-          iString origin() const;
-          iString lastUpdated() const;
+          IString westernLongitudeString() const;
+          IString originatingContinent() const;
+          IString originatingEthnicity() const;
+          IString approvalStatus() const;
+          IString approvalDate() const;
+          IString featureType() const;
+          IString referenceString() const;
+          IString origin() const;
+          IString lastUpdated() const;
           QUrl referenceUrl() const;
-          iString referenceUrlString() const;
+          IString referenceUrlString() const;
           IAUStatus status() const;
 
           void swap(Feature &other);
           Feature &operator=(const Feature &rhs);
 
         private:
-          iString getTagText(iString tagName) const;
+          IString getTagText(IString tagName) const;
 
         private:
           /**
@@ -179,7 +179,7 @@ namespace Isis {
 
     private:
       void readSearchResults(QDomElement);
-      void runQuery(iString target,
+      void runQuery(IString target,
                          Latitude startLat, Longitude startLon,
                          Latitude endLat, Longitude endLon);
 

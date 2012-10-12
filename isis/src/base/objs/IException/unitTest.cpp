@@ -137,7 +137,7 @@ int main(void) {
 
   cerr << "Test Preference 'FileLine'\n";
   {
-    iString &fileLineValue = errorPrefs["FileLine"][0];
+    IString &fileLineValue = errorPrefs["FileLine"][0];
 
     fileLineValue = "On";
 
@@ -162,7 +162,7 @@ int main(void) {
 
   cerr << "Test Preference 'Format'\n";
   {
-    iString &formatValue = errorPrefs["Format"][0];
+    IString &formatValue = errorPrefs["Format"][0];
 
     formatValue = "Standard";
 

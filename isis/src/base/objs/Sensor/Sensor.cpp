@@ -31,7 +31,7 @@
 #include "CubeManager.h"
 #include "Distance.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "Latitude.h"
 #include "Longitude.h"

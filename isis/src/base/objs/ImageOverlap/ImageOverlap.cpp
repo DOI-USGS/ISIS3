@@ -8,7 +8,7 @@
 #include "IException.h"
 #include "FileName.h"
 #include "ImageOverlap.h"
-#include "iString.h"
+#include "IString.h"
 
 namespace Isis {
 
@@ -48,8 +48,8 @@ namespace Isis {
     std::string fileData;
     getline(inputStream, fileData);
 
-    iString serialNums = fileData;
-    iString serialNum;
+    IString serialNums = fileData;
+    IString serialNum;
     while((serialNum = serialNums.Token(",")) != "") {
       Add(serialNum);
     }
@@ -122,7 +122,7 @@ namespace Isis {
   void ImageOverlap::Write(std::ostream &outputStream) {
     geos::io::WKBWriter geosWriter;
 
-    iString serialNums;
+    IString serialNums;
 
     for(unsigned int sn = 0; sn < p_serialNumbers.size(); sn++) {
       if(sn != 0) {

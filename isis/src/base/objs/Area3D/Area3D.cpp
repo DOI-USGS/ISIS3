@@ -28,7 +28,7 @@
 #include "Displacement.h"
 #include "Distance.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 namespace Isis {
   /**
@@ -608,23 +608,23 @@ namespace Isis {
     }
     else {
       if(startXValid && endXValid && startX > endX) {
-        iString msg = "Cannot have a 3D area with inverted X coordinates of ["
-            + iString(startX.meters()) + " meters] to ["
-            + iString(endX.meters()) + " meters]";
+        IString msg = "Cannot have a 3D area with inverted X coordinates of ["
+            + IString(startX.meters()) + " meters] to ["
+            + IString(endX.meters()) + " meters]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       if(startYValid && endYValid && startY > endY) {
-        iString msg = "Cannot have a 3D area with inverted Y coordinates of ["
-            + iString(startY.meters()) + " meters] to ["
-            + iString(endY.meters()) + " meters]";
+        IString msg = "Cannot have a 3D area with inverted Y coordinates of ["
+            + IString(startY.meters()) + " meters] to ["
+            + IString(endY.meters()) + " meters]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       if(startZValid && endZValid && startZ > endZ) {
-        iString msg = "Cannot have a 3D area with inverted Z coordinates of ["
-            + iString(startZ.meters()) + " meters] to ["
-            + iString(endZ.meters()) + " meters]";
+        IString msg = "Cannot have a 3D area with inverted Z coordinates of ["
+            + IString(startZ.meters()) + " meters] to ["
+            + IString(endZ.meters()) + " meters]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 

@@ -178,12 +178,12 @@ namespace Isis {
     bool found = false;
     try {
       // Search for the blob name
-      iString blobName = p_blobName;
+      IString blobName = p_blobName;
       blobName.UpCase();
       for (int o = 0; o < pvl.Objects(); o++) {
         const PvlObject &obj = pvl.Object(o);
         if (obj.IsNamed(p_type)) {
-          iString curName = (string) obj["Name"];
+          IString curName = (string) obj["Name"];
           curName.UpCase();
           if (blobName == curName) {
             p_blobPvl = obj;

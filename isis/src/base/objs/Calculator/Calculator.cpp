@@ -449,7 +449,7 @@ namespace Isis {
   void Calculator::LeftShift() {
     QVector<double> y = Pop();
     if(y.size() != 1) {
-      iString msg = "When trying to do a left shift calculation, a non-scalar "
+      IString msg = "When trying to do a left shift calculation, a non-scalar "
                     "shift value was encountered. Shifting requires scalars.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -457,7 +457,7 @@ namespace Isis {
       QVector<double> x = Pop();
 
       if((int)y[0] > (int)x.size()) {
-        iString msg = "When trying to do a left shift calculation, a shift "
+        IString msg = "When trying to do a left shift calculation, a shift "
                       "value greater than the data size was encountered. "
                       "Shifting by this value would erase all of the data.";
         throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -488,7 +488,7 @@ namespace Isis {
   void Calculator::RightShift() {
     QVector<double> y = Pop();
     if(y.size() != 1) {
-      iString msg = "When trying to do a right shift calculation, a non-scalar "
+      IString msg = "When trying to do a right shift calculation, a non-scalar "
                     "shift value was encountered. Shifting requires scalars.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -496,7 +496,7 @@ namespace Isis {
       QVector<double> x = Pop();
 
       if((int)y[0] > (int)x.size()) {
-        iString msg = "When trying to do a right shift calculation, a shift "
+        IString msg = "When trying to do a right shift calculation, a shift "
                       "value greater than the data size was encountered. "
                       "Shifting by this value would erase all of the data.";
         throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -954,7 +954,7 @@ namespace Isis {
     QVector<double> top;
 
     if(p_valStack->empty()) {
-      iString msg = "Math calculator stack is empty, cannot perform any "
+      IString msg = "Math calculator stack is empty, cannot perform any "
                     "more operations.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -1068,7 +1068,7 @@ namespace Isis {
                                     double operation(double, double)) {
     if(arg1End - arg1Start != 1 && arg2End - arg2Start != 1 &&
         arg1End - arg1Start != arg2End - arg2Start) {
-      iString msg = "The stack based calculator cannot operate on vectors "
+      IString msg = "The stack based calculator cannot operate on vectors "
                     "of differing sizes.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

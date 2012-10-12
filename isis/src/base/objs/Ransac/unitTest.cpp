@@ -3,7 +3,7 @@
 #include "Ransac.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 #include "Preference.h"
 

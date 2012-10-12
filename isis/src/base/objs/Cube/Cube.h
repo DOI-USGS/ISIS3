@@ -40,7 +40,7 @@ namespace Isis {
   class CubeCachingAlgorithm;
   class CubeIoHandler;
   class FileName;
-  class iString;
+  class IString;
   class Projection;
   class Pvl;
   class PvlGroup;
@@ -213,10 +213,10 @@ namespace Isis {
 
       void close(bool remove = false);
       Cube *copy(FileName newFile, const CubeAttributeOutput &newFileAttributes) const;
-      void create(const iString &cfile);
-      void create(const iString &cfile, const CubeAttributeOutput &att);
-      void open(const iString &cfile, iString access = "r");
-      void reopen(iString access = "r");
+      void create(const IString &cfile);
+      void create(const IString &cfile, const CubeAttributeOutput &att);
+      void open(const IString &cfile, IString access = "r");
+      void reopen(IString access = "r");
 
       void read(Blob &blob) const;
       void read(Buffer &rbuf) const;
@@ -232,20 +232,20 @@ namespace Isis {
       void setLabelsAttached(bool attached);
       void setLabelSize(int labelBytes);
       void setPixelType(PixelType pixelType);
-      void setVirtualBands(const QList<iString> &vbands);
+      void setVirtualBands(const QList<IString> &vbands);
       void setVirtualBands(const std::vector<std::string> &vbands);
 
       int getBandCount() const;
       double getBase() const;
       ByteOrder getByteOrder() const;
       Camera *getCamera();
-      iString getFileName() const;
+      IString getFileName() const;
       Format getFormat() const;
       Histogram *getHistogram(const int &band = 1,
-                               iString msg = "Gathering histogram");
+                               IString msg = "Gathering histogram");
       Histogram *getHistogram(const int &band, const double &validMin,
                                const double &validMax,
-                               iString msg = "Gathering histogram");
+                               IString msg = "Gathering histogram");
       Pvl *getLabel() const;
       int getLabelSize(bool actual = false) const;
       int getLineCount() const;
@@ -255,19 +255,19 @@ namespace Isis {
       Projection *getProjection();
       int getSampleCount() const;
       Statistics *getStatistics(const int &band = 1,
-                                 iString msg = "Gathering statistics");
+                                 IString msg = "Gathering statistics");
       Statistics *getStatistics(const int &band, const double &validMin,
                                  const double &validMax,
-                                 iString msg = "Gathering statistics");
+                                 IString msg = "Gathering statistics");
       bool getStoresDnData() const;
 
       void addCachingAlgorithm(CubeCachingAlgorithm *);
       void clearIoCache();
-      bool deleteBlob(iString BlobType, iString BlobName);
-      void deleteGroup(const iString &group);
-      PvlGroup &getGroup(const iString &group) const;
-      bool hasGroup(const iString &group) const;
-      bool hasTable(const iString &name);
+      bool deleteBlob(IString BlobType, IString BlobName);
+      void deleteGroup(const IString &group);
+      PvlGroup &getGroup(const IString &group) const;
+      bool hasGroup(const IString &group) const;
+      bool hasTable(const IString &name);
       void putGroup(const PvlGroup &group);
 
     private:
@@ -280,7 +280,7 @@ namespace Isis {
       void initLabelFromFile(FileName labelFileName, bool readWrite);
       void openCheck();
       Pvl realDataFileLabel() const;
-      void reformatOldIsisLabel(const iString &oldCube);
+      void reformatOldIsisLabel(const IString &oldCube);
       void writeLabels();
 
     private:

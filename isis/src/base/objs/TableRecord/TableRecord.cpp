@@ -28,7 +28,7 @@
 #include <vector>
 
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "TableField.h"
 
 using namespace std;
@@ -74,10 +74,10 @@ namespace Isis {
    *                                        record
    */
   TableField &TableRecord::operator[](const std::string &field) {
-    Isis::iString upTemp = field;
+    Isis::IString upTemp = field;
     upTemp.UpCase();
     for (int i = 0; i < (int)p_fields.size(); i++) {
-      Isis::iString upField = p_fields[i].name();
+      Isis::IString upField = p_fields[i].name();
       upField.UpCase();
       if (upTemp == upField) return p_fields[i];
     }

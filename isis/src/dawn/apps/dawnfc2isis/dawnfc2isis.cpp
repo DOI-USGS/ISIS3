@@ -19,8 +19,8 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   FileName inFile = ui.GetFileName("FROM");
-  iString instid;
-  iString missid;
+  IString instid;
+  IString missid;
 
   try {
     Pvl lab(inFile.expanded());
@@ -71,7 +71,7 @@ void IsisMain() {
 
   // Get the directory where the DAWN translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  iString transDir = (string) dataDir["Dawn"] + "/translations/";
+  IString transDir = (string) dataDir["Dawn"] + "/translations/";
 
   // Create a PVL to store the translated labels in
   Pvl outLabel;
@@ -94,7 +94,7 @@ void IsisMain() {
   //  Update target if user specifies it
   if (!target.empty()) {
     PvlGroup &igrp = outLabel.FindGroup("Instrument",Pvl::Traverse);
-    igrp["TargetName"] = iString(target);
+    igrp["TargetName"] = IString(target);
   }
 
   // Write the BandBin, Archive, and Instrument groups

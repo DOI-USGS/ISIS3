@@ -1,7 +1,7 @@
 #include "Isis.h"
 #include "ProcessImportPds.h"
 #include "Application.h"
-#include "iString.h"
+#include "IString.h"
 #include "OriginalLabel.h"
 #include "Statistics.h"
 
@@ -15,7 +15,7 @@ using namespace Isis;
 void IsisMain() {
 
   Isis::Preference::Preferences(true);
-  void ReportError(iString err);
+  void ReportError(IString err);
 
   // Test an IMAGE file
   try {
@@ -122,9 +122,9 @@ void IsisMain() {
  * @internal
  *   @history 2011-08-05 Jeannie Backer - Copied from Cube class.
  */
-void ReportError(iString err) {
-  iString report = ""; // report will be modified error message
-  iString errorLine = ""; // read message one line at a time
+void ReportError(IString err) {
+  IString report = ""; // report will be modified error message
+  IString errorLine = ""; // read message one line at a time
   FileName expandedfile;
   while(err != "") {
     // pull off first line

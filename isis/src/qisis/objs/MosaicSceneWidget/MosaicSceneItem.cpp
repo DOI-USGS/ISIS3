@@ -16,7 +16,7 @@
 #include "CubeDisplayProperties.h"
 #include "FileDialog.h"
 #include "Histogram.h"
-#include "iString.h"
+#include "IString.h"
 #include "ImagePolygon.h"
 #include "LineManager.h"
 #include "MosaicGraphicsView.h"
@@ -147,7 +147,7 @@ namespace Isis {
       catch(IException &e) {
         m_cubeDisplay->deleteLater();
 
-        iString msg = "Could not project the footprint from cube [" +
+        IString msg = "Could not project the footprint from cube [" +
             m_cubeDisplay->displayName() + "]";
         throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }

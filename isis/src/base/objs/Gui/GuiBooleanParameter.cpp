@@ -11,7 +11,7 @@ namespace Isis {
       int group, int param) :
     GuiParameter(grid, ui, group, param) {
 
-    p_checkBox = new QCheckBox((iString)ui.ParamBrief(group, param));
+    p_checkBox = new QCheckBox((IString)ui.ParamBrief(group, param));
 
     grid->addWidget(p_checkBox, param, 2);
 
@@ -29,13 +29,13 @@ namespace Isis {
   GuiBooleanParameter::~GuiBooleanParameter() {}
 
 
-  void GuiBooleanParameter::Set(iString newValue) {
+  void GuiBooleanParameter::Set(IString newValue) {
     p_checkBox->setChecked(p_ui->StringToBool(newValue));
     emit ValueChanged();
   }
 
 
-  iString GuiBooleanParameter::Value() {
+  IString GuiBooleanParameter::Value() {
     return p_checkBox->isChecked() ? "YES" : "NO";
   }
 
@@ -62,7 +62,7 @@ namespace Isis {
   //! Return if the parameter value is different from the default value
   bool GuiBooleanParameter::IsModified() {
     if(!IsEnabled()) return false;
-    iString value;
+    IString value;
     if(p_ui->ParamDefault(p_group, p_param).size() > 0) {
       value = p_ui->ParamDefault(p_group, p_param);
     }

@@ -26,7 +26,7 @@
 #include <sstream>
 
 #include "WriteTabular.h"
-#include "iString.h"
+#include "IString.h"
 #include "Message.h"
 #include "IException.h"
 #include "SpecialPixel.h"
@@ -68,7 +68,7 @@ namespace Isis {
 
       if(thisTitle.length() > thisCol.Width()) {
         std::string message = "Column header [" + thisTitle + "] is wider " +
-                              "than the set width for column [" + iString((int)index) + "]";
+                              "than the set width for column [" + IString((int)index) + "]";
         throw IException(IException::User, message, _FILEINFO_);
       }
 
@@ -143,7 +143,7 @@ namespace Isis {
       std::string message = "Wrong data type for this Column";
       throw IException(IException::User, message, _FILEINFO_);
     }
-    iString thisItem(item);
+    IString thisItem(item);
     if(thisItem.length() > thisCol.Width()) {
       thisItem = "*";
       while(thisItem.length() < thisCol.Width()) {
@@ -259,7 +259,7 @@ namespace Isis {
       }
     }
 
-    iString thisItem(item);
+    IString thisItem(item);
 
 
     if(thisCol.Alignment() == Column::Decimal) {
@@ -267,8 +267,8 @@ namespace Isis {
       //Format and round the number
 
       //First, split the number at the decimal point
-      iString tempString = thisItem;
-      iString intPart = tempString.Token(".");
+      IString tempString = thisItem;
+      IString intPart = tempString.Token(".");
       //Make the fractional portion appear as such, so the iomanipulators
       //handle it properly
       if(tempString != "") {
@@ -285,11 +285,11 @@ namespace Isis {
 
       //if the rounding causes a rollover (i.e. the decimal portion is greater
       //than 0.95) increment the integer portion
-      if(iString(b.str()).ToDouble() >= 1) {
-        intPart = iString(intPart.ToInteger() + 1);
+      if(IString(b.str()).ToDouble() >= 1) {
+        intPart = IString(intPart.ToInteger() + 1);
       }
 
-      //Put it back into an iString, for easier manipulation
+      //Put it back into an IString, for easier manipulation
       tempString = b.str();
       tempString.Token(".");
       //Add any zeros necessary to pad the number

@@ -11,7 +11,7 @@ namespace Isis {
 
 namespace Isis {
   class Cube;
-  class iString;
+  class IString;
   class MosaicController;
 
   /**

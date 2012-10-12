@@ -33,7 +33,7 @@
 using namespace std;
 using namespace Isis;
 
-void reportOutput(const CubeAttributeOutput &att, iString oh);
+void reportOutput(const CubeAttributeOutput &att, IString oh);
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
   try {
     CubeAttributeOutput att;
     att.setFileFormat(Cube::Bsq);
-    att.addAttributes(iString("8bit"));
+    att.addAttributes(IString("8bit"));
     att.addAttributes("msb");
     att.setByteOrder(Msb);
     att.addAttributes(FileName("+dETacHEd"));
@@ -261,7 +261,7 @@ int main(int argc, char *argv[]) {
 
 
 // Function to report everything about an output cube attribute
-void reportOutput(const CubeAttributeOutput &att, iString orderHint) {
+void reportOutput(const CubeAttributeOutput &att, IString orderHint) {
   cout << att.toString() << endl;
 
 //   Pvl pvl;

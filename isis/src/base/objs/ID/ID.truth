@@ -15,7 +15,7 @@ Test 2: No '?' test
 **USER ERROR** No replacement set in string [Serial].
 
 Test 3: Broken replacement string
-**USER ERROR** iString [Serial??Number??] contains more than one replacement set.
+**USER ERROR** IString [Serial??Number??] contains more than one replacement set.
 
 Test 4: differing start numbers
 Test00

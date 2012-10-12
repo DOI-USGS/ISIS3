@@ -23,7 +23,7 @@
 #include <iostream>
 #include "BasisFunction.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 namespace Isis {
 
@@ -55,7 +55,7 @@ namespace Isis {
    */
   void BasisFunction::SetCoefficients(const std::vector<double> &coefs) {
     if((int)coefs.size() != p_numCoefs) {
-      iString msg = "[coefs] does not match number of coefficients ";
+      IString msg = "[coefs] does not match number of coefficients ";
       msg += "in the basis equation";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

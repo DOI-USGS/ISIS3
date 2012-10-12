@@ -301,7 +301,7 @@ namespace Isis {
       void clone(const GVector &alpha) {
         if ( alpha.dim1() != 8 ) {
           std::string mess = "Alpha array for AffineRadio must have 8 elements "
-                             " but has " + iString(alpha.dim1());
+                             " but has " + IString(alpha.dim1());
           throw IException(IException::Programmer, mess, _FILEINFO_);
         }
         m_affine = Affine::getIdentity();

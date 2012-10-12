@@ -35,7 +35,7 @@
 
 #include "CameraFactory.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "OriginalLabel.h"
 #include "Projection.h"
 #include "Pvl.h"
@@ -553,7 +553,7 @@ namespace Isis {
 
     //  Now compute the reticle points of all subframes if they exist
     for(int i = 1 ; i <= 5 ; i++) {
-      iString n(i);
+      IString n(i);
       string object = "SUBFRAME" + n + "_PARAMETERS/";
 
       double sample, line, width, height;
@@ -662,7 +662,7 @@ namespace Isis {
     }
     else {
       //  It does exist, extract coordinates from original image label
-      iString n(frameno);
+      IString n(frameno);
       sample  = (double) _orglabel.FindKeyword("MESS:SUBF_X" + n,
                 PvlObject::Traverse);
       line    = (double) _orglabel.FindKeyword("MESS:SUBF_Y" + n,
@@ -744,14 +744,14 @@ namespace Isis {
     //  Determine instrument ID (inst)
     PvlKeyword &key = _label.FindKeyword("NaifIkCode", PvlObject::Traverse);
     SpiceInt inst = (int) key;
-    iString iCode((int) inst);
+    IString iCode((int) inst);
     key = _label.FindKeyword("Number", PvlObject::Traverse);
     inst -= (int) key;
 
     // Get CK time tolerance (tol)
     SpiceDouble tol;
     SpiceInt tmp;
-    gdpool_c(iString("INS" + iCode + "_CK_TIME_TOLERANCE").c_str(),
+    gdpool_c(IString("INS" + iCode + "_CK_TIME_TOLERANCE").c_str(),
              0, 1, &tmp, &tol, &found);
 
     // Finally get av
@@ -1147,18 +1147,18 @@ namespace Isis {
    *
    * @param value Double value to convert to string
    *
-   * @return iString Returns the converted string
+   * @return IString Returns the converted string
    */
-  iString MdisGeometry::DoubleToString(const double &value) const {
+  IString MdisGeometry::DoubleToString(const double &value) const {
     if(IsSpecial(value)) {
-      return (iString(_NullDefault));
+      return (IString(_NullDefault));
     }
 
     //  Format the string to specs
     ostringstream strcnv;
     strcnv.setf(std::ios::fixed);
     strcnv << setprecision(_digitsPrecision) << value;
-    return (iString(strcnv.str()));
+    return (IString(strcnv.str()));
   }
 }  // namespace Isis
 

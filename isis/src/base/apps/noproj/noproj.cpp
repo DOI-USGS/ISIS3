@@ -32,7 +32,7 @@ map <string, void *> GuiHelpers() {
 }
 
 void storeSpice(PvlGroup *instrumentGroup, PvlObject *naifKeywordsObject,
-                iString oldName, iString spiceName,
+                IString oldName, IString spiceName,
                 double constantCoeff, double multiplierCoeff, bool putMultiplierInX);
 
 void IsisMain() {
@@ -200,11 +200,11 @@ void IsisMain() {
   inst.AddKeyword(key);
 
   key.SetName("SampleDetectors");
-  key.SetValue(Isis::iString(detectorSamples));
+  key.SetValue(Isis::IString(detectorSamples));
   inst.AddKeyword(key);
 
   key.SetName("LineDetectors");
-  key.SetValue(Isis::iString(detectorLines));
+  key.SetValue(Isis::IString(detectorLines));
   inst.AddKeyword(key);
 
   key.SetName("InstrumentType");
@@ -268,7 +268,7 @@ void IsisMain() {
   }
 
   key.SetName("EphemerisTime");
-  key.SetValue(Isis::iString(et), "seconds");
+  key.SetValue(Isis::IString(et), "seconds");
   inst.AddKeyword(key);
 
   key.SetName("StartTime");
@@ -313,7 +313,7 @@ void IsisMain() {
 
   if(instType == "LINESCAN") {
     key.SetName("ExposureDuration");
-    key.SetValue(Isis::iString(incam->DetectorMap()->LineRate() * 1000.), "milliseconds");
+    key.SetValue(Isis::IString(incam->DetectorMap()->LineRate() * 1000.), "milliseconds");
     inst.AddKeyword(key);
   }
 
@@ -394,7 +394,7 @@ void LoadMatchSummingMode() {
 
 
 void storeSpice(PvlGroup *instrumentGroup, PvlObject *naifKeywordsObject,
-                iString oldName, iString spiceName,
+                IString oldName, IString spiceName,
                 double constantCoeff, double multiplierCoeff, bool putMultiplierInX) {
   if(constantCoeff != 0 && !naifKeywordsObject && instrumentGroup) {
     instrumentGroup->AddKeyword(PvlKeyword(oldName, constantCoeff));

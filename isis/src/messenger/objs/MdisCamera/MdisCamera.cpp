@@ -33,7 +33,7 @@
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "NaifStatus.h"
 
@@ -101,17 +101,17 @@ namespace Isis {
     }
 
     //  Set up instrument and filter code strings
-    iString ikCode((int) naifIkCode());
+    IString ikCode((int) naifIkCode());
     int fnCode(naifIkCode() - filterNumber);
-    iString filterCode(fnCode);
+    IString filterCode(fnCode);
     string ikernKey;
 
     // Fetch the frame translations from the instrument kernels
     ikernKey = "INS" + ikCode + "_REFERENCE_FRAME";
-    iString baseFrame = getString(ikernKey);
+    IString baseFrame = getString(ikernKey);
 
     ikernKey = "INS" + filterCode + "_FRAME";
-    iString ikFrame = getString(ikernKey);
+    IString ikFrame = getString(ikernKey);
 
     // Set up the camera info from ik/iak kernels
 
@@ -281,14 +281,14 @@ namespace Isis {
                                         Pvl &label) {
 
     double focalLength(0.0);
-    iString tdflKey("INS"+filterCode+"_TEMPDEP_FOCAL_LENGTH");
+    IString tdflKey("INS"+filterCode+"_TEMPDEP_FOCAL_LENGTH");
 
     //  Determine if the desired value is already computed.  We are interested
     //  in the temperature dependent value firstly.  Backwartd compatibility
     //  is considered below.
     QVariant my_tdfl = getStoredResult(tdflKey, SpiceStringType);
     if (my_tdfl.isValid()) {
-      focalLength = iString(my_tdfl.toString()).ToDouble();
+      focalLength = IString(my_tdfl.toString()).ToDouble();
     }
     else {
       // Hasn't been computed yet (in spiceinit now - maybe) or the proper
@@ -303,7 +303,7 @@ namespace Isis {
         PvlGroup &inst = label.FindGroup("Instrument", Pvl::Traverse);      
         double fpTemp = inst["FocalPlaneTemperature"];
         double fl(0.0);
-        iString fptCoeffs = "INS" + filterCode + "_FL_TEMP_COEFFS";
+        IString fptCoeffs = "INS" + filterCode + "_FL_TEMP_COEFFS";
         //  Compute 5th order polynomial
         for (int i = 0 ; i < 6 ;  i++) {
           fl += getDouble(fptCoeffs, i) * pow(fpTemp, (double) i);
@@ -311,7 +311,7 @@ namespace Isis {
 
         // Store computed focal length
         focalLength = fl;
-        storeResult(tdflKey, SpiceStringType, iString(focalLength).ToQt());
+        storeResult(tdflKey, SpiceStringType, IString(focalLength).ToQt());
       }
       catch (IException &ie) {
         // Noop when supporting old IKs

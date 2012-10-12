@@ -50,10 +50,10 @@ namespace Isis {
    *  @history 2010-08-10 Sharmila Prasad - Original version
    *  @history 2010-09-16 Sharmila Prasad - Modified prototype for GetImageStatsBySerialNum API
    *                                        in sync with the ControlNetStatistics class
-   *  @history 2010-09-27 Sharmila Prasad - Moved ParseExpression functionality to iString class
+   *  @history 2010-09-27 Sharmila Prasad - Moved ParseExpression functionality to IString class
    *                                        Verify the DefFile in the PVL Class
    *  @history 2010-09-27 Sharmila Prasad - Made changes for the Binary Control Network
-   *  @history 2010-10-04 Sharmila Prasad - Use iString's Token method instead of ParseExpression
+   *  @history 2010-10-04 Sharmila Prasad - Use IString's Token method instead of ParseExpression
    *  @history 2010-10-15 Sharmila Prasad - Display error on bad filter values
    *  @history 2010-11-09 Sharmila Prasad - Point_MeasureProperties,process 'All' measuretype
    *  @history 2011-01-17 Eric Hyer - Fixed breakages caused by ControlNet api

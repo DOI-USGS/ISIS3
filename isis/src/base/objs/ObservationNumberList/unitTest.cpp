@@ -3,7 +3,7 @@
 #include "ObservationNumberList.h"
 #include "SerialNumberList.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "FileName.h"
 
 using namespace Isis;

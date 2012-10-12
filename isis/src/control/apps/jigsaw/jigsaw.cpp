@@ -209,7 +209,7 @@ void IsisMain() {
           for (int iobj = 0; iobj < c->getLabel()->Objects(); iobj++) {
             PvlObject obj = c->getLabel()->Object(iobj);
             if (obj.Name() != "Table") continue;
-            if (obj["Name"][0] != iString("CameraStatistics")) continue;
+            if (obj["Name"][0] != IString("CameraStatistics")) continue;
             c->getLabel()->DeleteObject(iobj);
             break;
           }

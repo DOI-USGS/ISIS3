@@ -35,7 +35,7 @@
 #include "Pvl.h"
 #include "SpecialPixel.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace std;
 namespace Isis {
@@ -270,7 +270,7 @@ namespace Isis {
     //time due to 680ms erase
     int line = lline - 1;       //lline is from 1 to 1024 => line is from 0 to 1023
     if(line < 0 || line > 1023) {
-      iString msg = "DarkCurrent: For ComputeLineTime(lline), lline must be between 1 and 1024." + iString(lline) + " out of range";
+      IString msg = "DarkCurrent: For ComputeLineTime(lline), lline must be between 1 and 1024." + IString(lline) + " out of range";
       throw IException(IException::Programmer, msg.c_str() , _FILEINFO_);
     }
 
@@ -1025,10 +1025,10 @@ namespace Isis {
   void DarkCurrent::FindDarkFiles() {
     // Get the directory where the CISS darkcurrent directory is
     PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
-    iString missionDir = (string) dataDir["Cassini"];
-    iString darkDir(missionDir + "/calibration/darkcurrent/");
+    IString missionDir = (string) dataDir["Cassini"];
+    IString darkDir(missionDir + "/calibration/darkcurrent/");
 
-    iString instrumentId("");
+    IString instrumentId("");
 
     if(p_narrow) {
       instrumentId += "nac";
@@ -1037,7 +1037,7 @@ namespace Isis {
     else {
       instrumentId += "wac";
     }
-    iString instModeId("");
+    IString instModeId("");
     if(p_sum.ToInteger() > 1) {
       instModeId = instModeId + "sum" + p_sum;
     }
@@ -1210,7 +1210,7 @@ namespace Isis {
         CisscalFile *biasDist = new CisscalFile(p_bdpath.expanded());
         vector<double> samp, bias_distortion;
         for(int i = 0; i < biasDist->LineCount(); i++) {
-          iString line;
+          IString line;
           biasDist->GetLine(line);  //assigns value to line
           line = line.ConvertWhiteSpace();
           line = line.Compress();

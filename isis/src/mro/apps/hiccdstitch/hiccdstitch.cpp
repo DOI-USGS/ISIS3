@@ -222,8 +222,8 @@ void IsisMain() {
 
     //  Determine if a shift of the CCD exists in the definitions file
     //  Combine summing/tdi into a string
-    std::string sumTdi = Isis::iString(CCDinfo.summing) + "/" +
-                         Isis::iString(CCDinfo.tdi);
+    std::string sumTdi = Isis::IString(CCDinfo.summing) + "/" +
+                         Isis::IString(CCDinfo.tdi);
 
     std::string ccdId = ccdNames[ccd];
     if(stitch.HasObject(ccdId)) {

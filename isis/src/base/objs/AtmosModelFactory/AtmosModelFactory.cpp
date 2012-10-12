@@ -71,7 +71,7 @@ namespace Isis {
       algorithm = std::string(algo["Name"]);
     }
     else {
-      iString msg = "Keyword [Name] or keyword [AtmName] must ";
+      IString msg = "Keyword [Name] or keyword [AtmName] must ";
       msg += "exist in [Group = Algorithm]";
       throw IException(IException::User, msg, _FILEINFO_);
     }

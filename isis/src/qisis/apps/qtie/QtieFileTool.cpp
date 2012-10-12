@@ -189,7 +189,7 @@ namespace Isis {
     }
 
     // Find target
-    iString target = matchCube->getCamera()->target();
+    IString target = matchCube->getCamera()->target();
 
     // Find directory and save for use in file dialog for control net
     FileName fname(matchFile.toStdString());

@@ -7,7 +7,7 @@
 #include "CubeViewport.h"
 #include "MdiCubeViewport.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include "RubberBandTool.h"
 #include "ToolPad.h"
 #include "Workspace.h"

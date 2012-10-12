@@ -23,7 +23,7 @@
 
 #include "ControlMeasure.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 #include "AbstractTableDelegate.h"
 #include "AbstractTableModel.h"
@@ -148,7 +148,7 @@ namespace Isis
   //   {
   //     if (!someModel)
   //     {
-  //       iString msg = "Attempted to set a NULL model!";
+  //       IString msg = "Attempted to set a NULL model!";
   //       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
   //     }
   //

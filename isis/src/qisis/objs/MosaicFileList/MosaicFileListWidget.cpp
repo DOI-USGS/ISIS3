@@ -52,7 +52,7 @@ namespace Isis {
       MosaicTreeWidgetItem::TreeColumn col =
           MosaicTreeWidgetItem::FootprintColumn;
       while(col < MosaicTreeWidgetItem::BlankColumn) {
-        iString key = MosaicTreeWidgetItem::treeColumnToString(col) + "Visible";
+        IString key = MosaicTreeWidgetItem::treeColumnToString(col) + "Visible";
         key = key.Convert(" ", '_');
 
         bool visible = (int)pvl[key][0];
@@ -96,7 +96,7 @@ namespace Isis {
             cubeFileNameIndex < cubes.Keywords();
             cubeFileNameIndex ++) {
           if (cubes[cubeFileNameIndex].IsNamed("Cube")) {
-            iString cubeFileName = cubes[cubeFileNameIndex][0];
+            IString cubeFileName = cubes[cubeFileNameIndex][0];
             newCubeGrp->addChild(takeItem(cubeFileName, allCubes));
           }
         }
@@ -105,7 +105,7 @@ namespace Isis {
       if(allCubes.size()) {
         p_tree->topLevelItem(0)->addChildren(allCubes);
 
-        iString msg = "Mosaic file list did not have a location for "
+        IString msg = "Mosaic file list did not have a location for "
             "all of the cubes. Putting them in the first group";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -123,7 +123,7 @@ namespace Isis {
     MosaicTreeWidgetItem::TreeColumn col =
         MosaicTreeWidgetItem::FootprintColumn;
     while(col < MosaicTreeWidgetItem::BlankColumn) {
-      iString key = MosaicTreeWidgetItem::treeColumnToString(col) + "Visible";
+      IString key = MosaicTreeWidgetItem::treeColumnToString(col) + "Visible";
       key = key.Convert(" ", '_');
       bool visible = !p_tree->isColumnHidden(col);
 

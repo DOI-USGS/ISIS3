@@ -41,16 +41,16 @@ void IsisMain() {
 
   // Set the tolerance
   double tol = ui.GetDouble("TOLERANCE");
-  algorithm += PvlKeyword("Tolerance", iString(tol));
+  algorithm += PvlKeyword("Tolerance", IString(tol));
 
   // Set the reduction factor if the user entered it
   if(ui.WasEntered("REDUCTIONFACTOR")) {
     int reduction = ui.GetInteger("REDUCTIONFACTOR");
-    algorithm += PvlKeyword("ReductionFactor", iString(reduction));
+    algorithm += PvlKeyword("ReductionFactor", IString(reduction));
 
     if(reduction < 1) {
       string msg = "Invalid value for [REDUCTIONFACTOR] entered ["
-        + iString(reduction) + "].  Must be greater than or equal to 1 (Default = 1)";
+        + IString(reduction) + "].  Must be greater than or equal to 1 (Default = 1)";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -60,7 +60,7 @@ void IsisMain() {
 
   // Set the chip interpolator type
   if(ui.GetBoolean("CHIPINTERPOLATOR")) {
-    iString itype = ui.GetString("INTERPOLATORTYPE");
+    IString itype = ui.GetString("INTERPOLATORTYPE");
     if(itype == "NEARESTNEIGHBORTYPE") {
       algorithm += PvlKeyword("ChipInterpolator", "NearestNeighborType");
     }
@@ -107,21 +107,21 @@ void IsisMain() {
 
   // Set up the pattern chip group
   PvlGroup patternChip("PatternChip");
-  patternChip += PvlKeyword("Samples", iString(psamp));
-  patternChip += PvlKeyword("Lines", iString(pline));
+  patternChip += PvlKeyword("Samples", IString(psamp));
+  patternChip += PvlKeyword("Lines", IString(pline));
   if(ui.WasEntered("PMIN")) {
-    patternChip += PvlKeyword("ValidMinimum", iString(ui.GetInteger("PMIN")));
+    patternChip += PvlKeyword("ValidMinimum", IString(ui.GetInteger("PMIN")));
   }
   if(ui.WasEntered("PMAX")) {
-    patternChip += PvlKeyword("ValidMaximum", iString(ui.GetInteger("PMAX")));
+    patternChip += PvlKeyword("ValidMaximum", IString(ui.GetInteger("PMAX")));
   }
   if(ui.WasEntered("MINIMUMZSCORE")) {
     double minimum = ui.GetDouble("MINIMUMZSCORE");
-    patternChip += PvlKeyword("MinimumZScore", iString(minimum));
+    patternChip += PvlKeyword("MinimumZScore", IString(minimum));
 
     if(minimum <= 0.0) {
       string msg = "Invalid value for [MINIMUMZSCORE] entered ["
-        + iString(minimum) + "].  Must be greater than 0.0 (Default = 1.0)";
+        + IString(minimum) + "].  Must be greater than 0.0 (Default = 1.0)";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -129,30 +129,30 @@ void IsisMain() {
     double percent = ui.GetDouble("PVALIDPERCENT");
     if((percent <= 0.0) || (percent > 100.0)) {
       string msg = "Invalid value for [PVALIDPERCENT] entered ["
-        + iString(percent) + "].  Must be greater than 0.0 and less than or equal to 100.0 (Default = 50.0)";
+        + IString(percent) + "].  Must be greater than 0.0 and less than or equal to 100.0 (Default = 50.0)";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    patternChip += PvlKeyword("ValidPercent", iString(percent));
+    patternChip += PvlKeyword("ValidPercent", IString(percent));
   }
 
   // Set up the search chip group
   PvlGroup searchChip("SearchChip");
-  searchChip += PvlKeyword("Samples", iString(ssamp));
-  searchChip += PvlKeyword("Lines", iString(sline));
+  searchChip += PvlKeyword("Samples", IString(ssamp));
+  searchChip += PvlKeyword("Lines", IString(sline));
   if(ui.WasEntered("SMIN")) {
-    searchChip += PvlKeyword("ValidMinimum", iString(ui.GetInteger("SMIN")));
+    searchChip += PvlKeyword("ValidMinimum", IString(ui.GetInteger("SMIN")));
   }
   if(ui.WasEntered("SMAX")) {
-    searchChip += PvlKeyword("ValidMaximum", iString(ui.GetInteger("SMAX")));
+    searchChip += PvlKeyword("ValidMaximum", IString(ui.GetInteger("SMAX")));
   }
   if(ui.WasEntered("SSUBCHIPVALIDPERCENT")) {
     double percent = ui.GetDouble("SSUBCHIPVALIDPERCENT");
     if((percent <= 0.0) || (percent > 100.0)) {
       string msg = "Invalid value for [SSUBCHIPVALIDPERCENT] entered ["
-        + iString(percent) + "].  Must be greater than 0.0 and less than or equal to 100.0 (Default = 50.0)";
+        + IString(percent) + "].  Must be greater than 0.0 and less than or equal to 100.0 (Default = 50.0)";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    searchChip += PvlKeyword("SubchipValidPercent", iString(percent));
+    searchChip += PvlKeyword("SubchipValidPercent", IString(percent));
   }
 
   // Add groups to the autoreg object
@@ -164,48 +164,48 @@ void IsisMain() {
     PvlGroup surfaceModel("SurfaceModel");
 
     double distanceTol = ui.GetDouble("DISTANCETOLERANCE");
-    surfaceModel += PvlKeyword("DistanceTolerance", iString(distanceTol));
+    surfaceModel += PvlKeyword("DistanceTolerance", IString(distanceTol));
 
     if(distanceTol <= 0.0) {
       string msg = "Invalid value for [DISTANCETOLERANCE] entered ["
-        + iString(distanceTol) + "].  Must be greater than 0.0 (Default = 1.5)";
+        + IString(distanceTol) + "].  Must be greater than 0.0 (Default = 1.5)";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     int winSize = ui.GetInteger("WINDOWSIZE");
-    surfaceModel += PvlKeyword("WindowSize", iString(winSize));
+    surfaceModel += PvlKeyword("WindowSize", IString(winSize));
 
     // Make sure the window size is at least 3
     if(winSize < 3) {
       string msg = "Invalid value for [WINDOWSIZE] entered ["
-        + iString(winSize) + "].  Must be greater than or equal to 3 (Default = 5)";
+        + IString(winSize) + "].  Must be greater than or equal to 3 (Default = 5)";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Make sure the window size is odd
     if(winSize % 2 == 0) {
       string msg = "Invalid value for [WINDOWSIZE] entered ["
-        + iString(winSize) + "].  Must be an odd number (Default = 5)";
+        + IString(winSize) + "].  Must be an odd number (Default = 5)";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if(ui.GetBoolean("ECCENTRICITYTESTING")) {
       double eccRatio = ui.GetDouble("ECCENTRICITYRATIO");
-      surfaceModel += PvlKeyword("EccentricityRatio", iString(eccRatio));
+      surfaceModel += PvlKeyword("EccentricityRatio", IString(eccRatio));
 
       if(eccRatio < 1) {
         string msg = "Invalid value for [ECCENTRICITYRATIO] entered ["
-          + iString(eccRatio) + "].  Must be 1.0 or larger (Default = 2.0)";
+          + IString(eccRatio) + "].  Must be 1.0 or larger (Default = 2.0)";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     if(ui.GetBoolean("RESIDUALTESTING")) {
       double residualTol = ui.GetDouble("RESIDUALTOLERANCE");
-      surfaceModel += PvlKeyword("ResidualTolerance", iString(residualTol));
+      surfaceModel += PvlKeyword("ResidualTolerance", IString(residualTol));
 
       if(residualTol < 0) {
         string msg = "Invalid value for [RESIDUALTOLERANCE] entered ["
-          + iString(residualTol) + "].  Must be 0.0 or larger (Default = 0.1)";
+          + IString(residualTol) + "].  Must be 0.0 or larger (Default = 0.1)";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }

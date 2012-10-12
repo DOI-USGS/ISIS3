@@ -9,7 +9,7 @@
 #include "FileName.h"
 #include "IException.h"
 #include "Pvl.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace std;
 using namespace Isis;
@@ -118,7 +118,7 @@ void TranslateVikingLabels(Pvl &pdsLabel, Cube *ocube) {
   inst += PvlKeyword("InstrumentId", (string)pdsLabel["INSTRUMENT_NAME"]);
   inst += PvlKeyword("TargetName", (string)pdsLabel["TARGET_NAME"]);
 
-  iString stime = (string) pdsLabel["IMAGE_TIME"];
+  IString stime = (string) pdsLabel["IMAGE_TIME"];
   stime.Trim("Z");
   inst += PvlKeyword("StartTime", stime);
 
@@ -200,7 +200,7 @@ void TranslateVikingLabels(Pvl &pdsLabel, Cube *ocube) {
 
   // Set up the nominal reseaus group
   PvlGroup res("Reseaus");
-  Pvl nomRes("$viking" + iString(spn) + "/reseaus/nominal.pvl");
+  Pvl nomRes("$viking" + IString(spn) + "/reseaus/nominal.pvl");
   PvlKeyword samps, lines, type, valid;
   lines = PvlKeyword("Line");
   samps = PvlKeyword("Sample");

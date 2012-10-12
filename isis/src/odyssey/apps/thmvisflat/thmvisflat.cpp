@@ -42,8 +42,8 @@ void IsisMain() {
 
   for(int filt = 0; filt < 5; filt++) {
     string filePattern = "$odyssey/calibration/flat_filter_";
-    filePattern += iString(filt + 1) + "_summing_";
-    filePattern += iString(summing) + "_v????.cub";
+    filePattern += IString(filt + 1) + "_summing_";
+    filePattern += IString(summing) + "_v????.cub";
     FileName flatFile = FileName(filePattern).highestVersion();
     Cube *fcube = new Cube();
     fcube->open(flatFile.expanded());

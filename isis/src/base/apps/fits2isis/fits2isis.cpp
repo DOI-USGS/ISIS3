@@ -2,7 +2,7 @@
 
 #include "Cube.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "OriginalLabel.h"
 #include "ProcessImport.h"
 #include "Pvl.h"
@@ -34,7 +34,7 @@ void IsisMain() {
   }
 
   char reading[81];
-  iString line = "";
+  IString line = "";
   unsigned int place = 0;
   PvlGroup labels("OriginalLabels");
 
@@ -59,7 +59,7 @@ void IsisMain() {
       }
       else {
         // Access the data without the comment if there is one
-        iString value = line.Token("/");
+        IString value = line.Token("/");
         // Clear to end of data, including single quotes
         value.TrimTail(" '");
         label += value;

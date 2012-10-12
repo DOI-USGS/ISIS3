@@ -153,7 +153,7 @@ namespace Isis {
   std::string SerialNumber::CreateSerialNumber(PvlGroup &snGroup, int keys) {
     std::string sn = snGroup["Keyword1"][0];
     for(int i = 2; i <= keys; i++) {
-      iString keyword = "Keyword" + (iString)i;
+      IString keyword = "Keyword" + (IString)i;
       sn += "/" + snGroup[keyword][0];
     }
     return sn;

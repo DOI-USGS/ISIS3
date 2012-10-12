@@ -35,7 +35,7 @@ template <typename T> class QList;
 #define _FILEINFO_ __FILE__,__LINE__
 
 namespace Isis {
-  class iString;
+  class IString;
   class Pvl;
 
   /**
@@ -166,7 +166,7 @@ namespace Isis {
       IException(ErrorType type, const char *message,
                  const char *fileName, int lineNumber);
 
-      IException(ErrorType type, const iString &message,
+      IException(ErrorType type, const IString &message,
                  const char *fileName, int lineNumber);
 
       IException(const IException &caughtException,
@@ -174,7 +174,7 @@ namespace Isis {
                  const char *fileName, int lineNumber);
 
       IException(const IException &caughtException,
-                 ErrorType newExceptionType, const iString &message,
+                 ErrorType newExceptionType, const IString &message,
                  const char *fileName, int lineNumber);
 
       IException(const IException &other);
@@ -189,16 +189,16 @@ namespace Isis {
       void print() const;
       void print(bool printFileInfo) const;
       Pvl toPvl() const;
-      iString toString() const;
-      iString toString(bool printFileInfo) const;
+      IString toString() const;
+      IString toString(bool printFileInfo) const;
 
       void swap(IException &other);
       IException &operator=(const IException &rhs);
 
     private:
       static IException createStackTrace();
-      static iString errorTypeToString(ErrorType t);
-      static ErrorType stringToErrorType(const iString &s);
+      static IString errorTypeToString(ErrorType t);
+      static ErrorType stringToErrorType(const IString &s);
       char *buildWhat() const;
       void deleteEmptyMemberStrings();
 
@@ -221,12 +221,12 @@ namespace Isis {
        * The message associated with this exception. This will be NULL if the
        *   message is empty (or only contained whitespace).
        */
-      iString * m_message;
+      IString * m_message;
 
       /**
        * The source code file that threw this exception.
        */
-      iString * m_fileName;
+      IString * m_fileName;
 
       /**
        * The line in the source code file that threw this exception.

@@ -12,7 +12,7 @@
 #include "CubeViewport.h"
 #include "Histogram.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "MainWindow.h"
 #include "MdiCubeViewport.h"
 #include "RubberBandTool.h"
@@ -1186,8 +1186,8 @@ namespace Isis {
     }
     catch(IException &e) {
       // get the min and max DN values of the data area
-      iString sMin(min);
-      iString sMax(max);
+      IString sMin(min);
+      IString sMax(max);
       std::string msg = "Insufficient data Min [" + sMin + "], Max [" + sMax + "]";
       msg += " in the stretch area.";
 

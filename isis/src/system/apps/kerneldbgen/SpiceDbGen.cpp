@@ -38,7 +38,7 @@ const char *SpiceDbGen::calForm = "YYYY MON DD HR:MN:SC.### TDB ::TDB";
  *
  * @param type The type of kernel to be processed. Either, "SPK" or "CK.
 */
-SpiceDbGen::SpiceDbGen(iString type) {
+SpiceDbGen::SpiceDbGen(IString type) {
   p_type = type;
 //  calForm = "YYYY MON DD HR:MN:SC.### TDB ::TDB";
 }
@@ -67,10 +67,10 @@ SpiceDbGen::SpiceDbGen(iString type) {
  *
  * @throws Isis::iException::Message
 */
-PvlObject SpiceDbGen::Direct(iString quality, iString location,
+PvlObject SpiceDbGen::Direct(IString quality, IString location,
                              std::vector<std::string> &filter) {
   PvlObject result;
-  iString type = "none";
+  IString type = "none";
 
   for(unsigned int i = 0; i < filter.size(); ++i) {
     //Create a list of all of the files matching the current filter
@@ -143,7 +143,7 @@ PvlObject SpiceDbGen::Direct(iString quality, iString location,
   * @return QStringList
   *
   */
-QStringList SpiceDbGen::GetFiles(FileName location, iString filter) {
+QStringList SpiceDbGen::GetFiles(FileName location, IString filter) {
   filter.Remove("\\");
   QDir dir(location.expanded().c_str(), filter.c_str(),
            QDir::Name, QDir::Files);
@@ -172,7 +172,7 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
 
   SpiceBoolean found;
   kinfo_c(tmp.c_str(), 32, 2048, fileType, source, &handle, &found);
-  iString currFile = fileType;
+  IString currFile = fileType;
 
   //create a spice cell capable of containing all the objects in the kernel.
   SPICEINT_CELL(currCell, 1000);
@@ -232,7 +232,7 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
     }
   }
 
-  iString outFile = fileIn.originalPath();
+  IString outFile = fileIn.originalPath();
   result += PvlKeyword("File", outFile + "/" + fileIn.name());
 
   NaifStatus::CheckErrors();

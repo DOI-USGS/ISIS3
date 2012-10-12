@@ -863,7 +863,7 @@ namespace Isis {
       if (response == QMessageBox::Yes) {
         //  Update measure file combo boxes:  old reference normal font,
         //    new reference bold font
-        iString file = g_serialNumberList->FileName(p_leftMeasure->GetCubeSerialNumber());
+        IString file = g_serialNumberList->FileName(p_leftMeasure->GetCubeSerialNumber());
         QString fname = FileName(file).name().c_str();
         int iref = p_leftCombo->findText(fname);
 
@@ -1445,8 +1445,8 @@ namespace Isis {
     MdiCubeViewport *cvp = cubeViewport();
     if (cvp  == NULL) return;
 
-    iString file = cvp->cube()->getFileName();
-    iString sn = g_serialNumberList->SerialNumber(file);
+    IString file = cvp->cube()->getFileName();
+    IString sn = g_serialNumberList->SerialNumber(file);
 
     double samp,line;
     cvp->viewportToCube(p.x(),p.y(),samp,line);
@@ -1469,7 +1469,7 @@ namespace Isis {
       }
 
       //  Find closest control point in network
-      iString sn = g_serialNumberList->SerialNumber(file);
+      IString sn = g_serialNumberList->SerialNumber(file);
       ControlPoint *point = g_controlNetwork->FindClosest(sn, samp, line);
 
       modifyPoint(point);
@@ -1591,7 +1591,7 @@ namespace Isis {
       // If this ControlPointId already exists, message box pops up and user is
       // asked to enter a new value.
       if (g_controlNetwork->ContainsPoint(newPoint->GetId())) {
-        iString message = "A ControlPoint with Point Id = [" + newPoint->GetId();
+        IString message = "A ControlPoint with Point Id = [" + newPoint->GetId();
         message += "] already exists.  Re-enter Point Id for this ControlPoint.";
         QMessageBox::warning(p_qnetTool, "New Point Id", message.c_str());
         pointFiles.clear();
@@ -1610,7 +1610,7 @@ namespace Isis {
         //  Create measure for any file selected
         ControlMeasure *m = new ControlMeasure;
         //  Find serial number for this file
-        iString sn =
+        IString sn =
                   g_serialNumberList->SerialNumber(item->text().toStdString());
         m->SetCubeSerialNumber(sn);
         int camIndex =
@@ -1863,12 +1863,12 @@ namespace Isis {
     emit editPointChanged(p_editPoint->GetId());
 
     QnetDeletePointDialog *deletePointDialog = new QnetDeletePointDialog;
-    iString CPId = p_editPoint->GetId();
+    IString CPId = p_editPoint->GetId();
     deletePointDialog->pointIdValue->setText(CPId.c_str());
     //  Need all files for this point
     for (int i=0; i<p_editPoint->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*p_editPoint)[i];
-      iString file = g_serialNumberList->FileName(m.GetCubeSerialNumber());
+      IString file = g_serialNumberList->FileName(m.GetCubeSerialNumber());
       deletePointDialog->fileList->addItem(file.c_str());
     }
 
@@ -2030,7 +2030,7 @@ namespace Isis {
   void QnetTool::loadPoint () {
 
     //  Write pointId
-    iString CPId = p_editPoint->GetId();
+    IString CPId = p_editPoint->GetId();
     QString ptId("Point ID:  ");
     ptId += (QString) CPId;
     p_ptIdValue->setText(ptId);
@@ -2114,7 +2114,7 @@ namespace Isis {
     //  Need all files for this point
     for (int i=0; i<p_editPoint->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*p_editPoint)[i];
-      iString file = g_serialNumberList->FileName(m.GetCubeSerialNumber());
+      IString file = g_serialNumberList->FileName(m.GetCubeSerialNumber());
       p_pointFiles<<file;
       QString tempFileName = FileName(file).name().c_str();
       p_leftCombo->addItem(tempFileName);
@@ -2518,9 +2518,9 @@ namespace Isis {
    *                          reference, lock the measure.
    */
   void QnetTool::selectLeftMeasure(int index) {
-    iString file = p_pointFiles[index];
+    IString file = p_pointFiles[index];
 
-    iString serial = g_serialNumberList->SerialNumber(file);
+    IString serial = g_serialNumberList->SerialNumber(file);
 
     // Make sure to clear out leftMeasure before making a copy of the selected
     // measure.
@@ -2556,9 +2556,9 @@ namespace Isis {
    */
   void QnetTool::selectRightMeasure(int index) {
 
-    iString file = p_pointFiles[index];
+    IString file = p_pointFiles[index];
 
-    iString serial = g_serialNumberList->SerialNumber(file);
+    IString serial = g_serialNumberList->SerialNumber(file);
 
     // Make sure to clear out rightMeasure before making a copy of the selected
     // measure.
@@ -2815,7 +2815,7 @@ namespace Isis {
         //  Create measure for any file selected
         ControlMeasure *m = new ControlMeasure;
         //  Find serial number for this file
-        iString sn = g_serialNumberList->SerialNumber((iString) item->text());
+        IString sn = g_serialNumberList->SerialNumber((IString) item->text());
         m->SetCubeSerialNumber(sn);
         int camIndex =
               g_serialNumberList->FileNameIndex(item->text().toStdString());
@@ -3106,7 +3106,7 @@ namespace Isis {
    */
   void QnetTool::loadTemplateFile(QString fn) {
 
-    QFile file(QString::fromStdString(FileName((iString) fn).expanded()));
+    QFile file(QString::fromStdString(FileName((IString) fn).expanded()));
     if (!file.open(QIODevice::ReadOnly)) {
       QString msg = "Failed to open template file \"" + fn + "\"";
       QMessageBox::warning(p_qnetTool, "IO Error", msg);
@@ -3183,7 +3183,7 @@ namespace Isis {
     }
 
     QString expandedFileName(QString::fromStdString(
-        FileName((iString) fn).expanded()));
+        FileName((IString) fn).expanded()));
 
     QFile file(expandedFileName);
 
@@ -3740,7 +3740,7 @@ namespace Isis {
    *
    * @author 2011-07-06 Tracie Sucharski
    */
-  bool QnetTool::IsMeasureLocked (iString serialNumber) {
+  bool QnetTool::IsMeasureLocked (IString serialNumber) {
 
     if (p_editPoint == NULL) return false;
 

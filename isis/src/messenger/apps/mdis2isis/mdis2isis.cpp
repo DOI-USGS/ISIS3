@@ -52,11 +52,11 @@ double validMaxDn = WACValidMaximum;  //  Assumes the WAC
  * @return double Converted value
  */
 template <typename T> double ToDouble(const T &value) {
-  return (iString(value).Trim(" \r\t\n").ToDouble());
+  return (IString(value).Trim(" \r\t\n").ToDouble());
 }
 
 template <typename T> int ToInteger(const T &value) {
-  return (iString(value).Trim(" \r\t\n").ToInteger());
+  return (IString(value).Trim(" \r\t\n").ToInteger());
 }
 
 
@@ -68,7 +68,7 @@ void IsisMain() {
 
   // Get the input filename and make sure it is a MESSENGER/MDIS EDR
   FileName inFile = ui.GetFileName("FROM");
-  iString id;
+  IString id;
   bool projected;
   Pvl lab(inFile.expanded());
 
@@ -184,7 +184,7 @@ Pvl TranslateMdisEdrLabels(FileName &labelFile, const std::string &target) {
 
   // Get the directory where the MESSENGER/MDIS translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  iString transDir = (string) dataDir["Messenger"] + "/translations/";
+  IString transDir = (string) dataDir["Messenger"] + "/translations/";
 
   // Get a filename for the MESSENGER EDR label
   Pvl labelPvl(labelFile.expanded());
@@ -221,10 +221,10 @@ Pvl TranslateMdisEdrLabels(FileName &labelFile, const std::string &target) {
 //  something so the camera will always work
   if(instGrp.FindKeyword("TargetName").IsNull() || (!target.empty())) {
     if(!target.empty()) {
-      instGrp["TargetName"] = iString(target);
+      instGrp["TargetName"] = IString(target);
     }
     else {
-      instGrp["TargetName"] = iString("Sky");
+      instGrp["TargetName"] = IString("Sky");
     }
   }
 
@@ -298,7 +298,7 @@ int CreateFilterSpecs(const std::string &instId, int filter_code,
 
     naifCode =  "-236800";
     for(int filterTry = 1; filterTry <= 12 ; filterTry++) {
-      int idealPosition = confgrp[iString("EncoderPosition") + iString(filterTry)];
+      int idealPosition = confgrp[IString("EncoderPosition") + IString(filterTry)];
       if((filter_code <= (idealPosition + tolerance)) &&
           (filter_code >= (idealPosition - tolerance))) {
         int fno = filterTry - 1;
@@ -340,7 +340,7 @@ void UnlutData(Buffer &data) {
     if(dnvalue < 0 || dnvalue > 255) {
       throw IException(IException::User,
                        "In the input file a value of [" +
-                       iString(data[i]) +
+                       IString(data[i]) +
                        "] was found. Unlutted images should only contain values 0 to 255.",
                        _FILEINFO_);
     }

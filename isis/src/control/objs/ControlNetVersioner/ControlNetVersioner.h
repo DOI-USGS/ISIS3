@@ -33,7 +33,7 @@ namespace Isis {
   class ControlNetFileV0001;
   class ControlNetFileV0002;
   class FileName;
-  class iString;
+  class IString;
   class Progress;
   class Pvl;
   class PvlContainer;
@@ -145,23 +145,23 @@ namespace Isis {
 
     private:
       // helper methods for LatestPvlToBinary
-      static void Copy(PvlContainer &container, iString keyName,
+      static void Copy(PvlContainer &container, IString keyName,
           ControlPointFileEntryV0002 &point,
           void (ControlPointFileEntryV0002::*setter)(bool));
       static void Copy(PvlContainer &container,
-          iString keyName, ControlPointFileEntryV0002 &point,
+          IString keyName, ControlPointFileEntryV0002 &point,
           void (ControlPointFileEntryV0002::*setter)(double));
       static void Copy(PvlContainer &container,
-          iString keyName, ControlPointFileEntryV0002 &point,
+          IString keyName, ControlPointFileEntryV0002 &point,
           void (ControlPointFileEntryV0002::*setter)(const std::string&));
 
-      static void Copy(PvlContainer &container, iString keyName,
+      static void Copy(PvlContainer &container, IString keyName,
           ControlPointFileEntryV0002::Measure &measure,
           void (ControlPointFileEntryV0002::Measure::*setter)(bool));
-      static void Copy(PvlContainer &container, iString keyName,
+      static void Copy(PvlContainer &container, IString keyName,
           ControlPointFileEntryV0002::Measure &measure,
           void (ControlPointFileEntryV0002::Measure::*setter)(double));
-      static void Copy(PvlContainer &container, iString keyName,
+      static void Copy(PvlContainer &container, IString keyName,
           ControlPointFileEntryV0002::Measure &measure,
           void (ControlPointFileEntryV0002::Measure::*setter)
             (const std::string &));

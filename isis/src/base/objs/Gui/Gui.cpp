@@ -21,7 +21,7 @@
 #include "Application.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Preference.h"
 #include "ProgramLauncher.h"
 #include "PvlObject.h"
@@ -86,7 +86,7 @@ namespace Isis {
     // Here we check to see if this has been done and force the style if needed.
     if(uiPref.HasKeyword("GuiStyle")) {
       std::string style = uiPref["GuiStyle"];
-      QApplication::setStyle((iString)style);
+      QApplication::setStyle((IString)style);
     }
 
     // Create the main window
@@ -271,7 +271,7 @@ namespace Isis {
   // Create the "Begin/Start Processing" action
   QAction *Gui::CreateProcessAction() {
     QAction *processAction = new QAction(this);
-    QString baseDir = (iString)FileName("$BASE/icons").expanded();
+    QString baseDir = (IString)FileName("$BASE/icons").expanded();
     processAction->setIcon(QPixmap(baseDir + "/guiRun.png"));
     processAction->setText("&Run");
     processAction->setToolTip("Run");
@@ -307,7 +307,7 @@ namespace Isis {
       GuiParameter &param = *(p_parameters[p]);
       ui.Clear(param.Name());
       if(param.IsEnabled() && param.IsModified()) {
-        Isis::iString value = param.Value();
+        Isis::IString value = param.Value();
         value.ConvertWhiteSpace();
         value.Compress();
         value.Trim(" ");
@@ -356,7 +356,7 @@ namespace Isis {
   // Create the "Exit" action
   QAction *Gui::CreateExitAction() {
     QAction *exitAction = new QAction(this);
-    QString baseDir = (iString)FileName("$BASE/icons").expanded();
+    QString baseDir = (IString)FileName("$BASE/icons").expanded();
     exitAction->setIcon(QPixmap(baseDir + "/guiExit.png"));
     exitAction->setText("&Exit");
     exitAction->setToolTip("Exit");
@@ -371,7 +371,7 @@ namespace Isis {
   // Create the "Reset" action
   QAction *Gui::CreateResetAction() {
     QAction *resetAction = new QAction(this);
-    QString baseDir = (iString)FileName("$BASE/icons").expanded();
+    QString baseDir = (IString)FileName("$BASE/icons").expanded();
     resetAction->setIcon(QPixmap(baseDir + "/guiReset.png"));
     resetAction->setText("&Reset");
     resetAction->setToolTip("Reset parameters");
@@ -388,7 +388,7 @@ namespace Isis {
   // Create the "Stop" action
   QAction *Gui::CreateStopAction() {
     QAction *stopAction = new QAction(this);
-    QString baseDir = (iString)FileName("$BASE/icons").expanded();
+    QString baseDir = (IString)FileName("$BASE/icons").expanded();
     stopAction->setIcon(QPixmap(baseDir + "/guiStop.png"));
     stopAction->setText("&Stop");
     stopAction->setToolTip("Stop");
@@ -405,7 +405,7 @@ namespace Isis {
   // Create the "SaveLog" action
   QAction *Gui::CreateSaveLogAction() {
     QAction *saveLogAction = new QAction(this);
-    QString baseDir = (iString)FileName("$BASE/icons").expanded();
+    QString baseDir = (IString)FileName("$BASE/icons").expanded();
     saveLogAction->setIcon(QPixmap(baseDir + "/guiSaveLog.png"));
     saveLogAction->setText("&Save Log...");
     saveLogAction->setToolTip("Save log");
@@ -421,7 +421,7 @@ namespace Isis {
   // Create the "ClearLog" action
   QAction *Gui::CreateClearLogAction() {
     QAction *clearlogAction = new QAction(this);
-    QString baseDir = (iString)FileName("$BASE/icons").expanded();
+    QString baseDir = (IString)FileName("$BASE/icons").expanded();
     clearlogAction->setIcon(QPixmap(baseDir + "/guiClearLog.png"));
     clearlogAction->setText("&Clear Log");
     clearlogAction->setToolTip("Clear log");
@@ -438,7 +438,7 @@ namespace Isis {
   // Create the "Previous History" action
   QAction *Gui::CreatePreviousHistoryAction() {
     QAction *previousHistoryAction = new QAction(this);
-    QString baseDir = (iString)FileName("$BASE/icons").expanded();
+    QString baseDir = (IString)FileName("$BASE/icons").expanded();
     previousHistoryAction->setIcon(QPixmap(baseDir + "/guiPrevHistory.png"));
     previousHistoryAction->setText("&Previous");
     previousHistoryAction->setToolTip("Previous parameters");
@@ -455,7 +455,7 @@ namespace Isis {
   // Create the "Next History" action
   QAction *Gui::CreateNextHistoryAction() {
     QAction *nextHistoryAction = new QAction(this);
-    QString baseDir = (iString)FileName("$BASE/icons").expanded();
+    QString baseDir = (IString)FileName("$BASE/icons").expanded();
     nextHistoryAction->setIcon(QPixmap(baseDir + "/guiNextHistory.png"));
     nextHistoryAction->setText("&Next");
     nextHistoryAction->setToolTip("Next parameters");
@@ -472,7 +472,7 @@ namespace Isis {
   // Create the Whats Action action
   QAction *Gui::CreateWhatsThisAction() {
     QAction *action = new QAction(this);
-    QString baseDir = (iString)FileName("$BASE/icons").expanded();
+    QString baseDir = (IString)FileName("$BASE/icons").expanded();
     action->setIcon(QPixmap(baseDir + "/contexthelp.png"));
     action->setText("&What's This");
     action->setToolTip("What's This");
@@ -492,7 +492,7 @@ namespace Isis {
     QGridLayout *gridLayout = NULL;
     if(!p_grids.contains(ui.GroupName(group))) {
       // Create a new groupbox and add it to the scroll layout
-      QGroupBox *groupBox = new QGroupBox((iString)ui.GroupName(group));
+      QGroupBox *groupBox = new QGroupBox((IString)ui.GroupName(group));
       p_scrollLayout->addWidget(groupBox);
       groupBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
       groupBox->setAlignment(Qt::AlignHCenter);
@@ -520,7 +520,7 @@ namespace Isis {
 
   //! Change progress text
   void Gui::ProgressText(const std::string &text) {
-    p_statusText->setText((iString)text);
+    p_statusText->setText((IString)text);
     qApp->processEvents();  // Needed when programs run programs
   }
 
@@ -559,14 +559,14 @@ namespace Isis {
         indx = m.find("]", indx) + 1;
       }
     }
-    p_errorString += (QString)(iString)m;
+    p_errorString += (QString)(IString)m;
   }
 
   //! Show an error message and return if the user wants to continue/abort
   int Gui::ShowWarning() {
     Isis::UserInterface &ui = Isis::iApp->GetUserInterface();
     int status = QMessageBox::warning(this,
-                                      (iString)ui.ProgramName(),
+                                      (IString)ui.ProgramName(),
                                       p_errorString,
                                       "Ok", "Abort", "", 0, 1);
     p_errorString.clear();
@@ -575,7 +575,7 @@ namespace Isis {
 
   //! Write text to the gui log
   void Gui::Log(const std::string &text) {
-    QString s = (iString)text;
+    QString s = (IString)text;
     p_log->Write(s);
   }
 
@@ -596,7 +596,7 @@ namespace Isis {
 
     Isis::UserInterface &ui = Application::GetUserInterface();
     switch(QMessageBox::information(this,
-                                    (iString)ui.ProgramName(),
+                                    (IString)ui.ProgramName(),
                                     QString("Program suspended, choose to ") +
                                     QString("continue processing, stop ") +
                                     QString("processing or exit the program"),
@@ -759,11 +759,11 @@ namespace Isis {
       GuiParameter &param = *(p_parameters[p]);
       if(param.IsEnabled() && param.IsModified()) {
         cline += " ";
-        iString name = param.Name();
+        IString name = param.Name();
         name.DownCase();
         cline += name;
         cline += "=";
-        iString value = param.Value();
+        IString value = param.Value();
         if(param.Type() == GuiParameter::StringWidget) {
           if(value.find(" ") != std::string::npos) {
             cline += "\"" + value + "\"";
@@ -832,7 +832,7 @@ namespace Isis {
         GuiParameter &param = *(p_parameters[p]);
         ui.Clear(param.Name());
         if(param.IsEnabled() && param.IsModified()) {
-          Isis::iString value = param.Value();
+          Isis::IString value = param.Value();
           value.ConvertWhiteSpace();
           value.Compress();
           value.Trim(" ");

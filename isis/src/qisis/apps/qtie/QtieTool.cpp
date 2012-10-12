@@ -31,7 +31,7 @@
 #include "Distance.h"
 #include "FileName.h"
 #include "History.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -567,7 +567,7 @@ namespace Isis {
         // Make sure Id doesn't already exist
         newPoint = new ControlPoint(id.toStdString());
         if (p_controlNet->ContainsPoint(newPoint->GetId())) {
-          iString message = "A ControlPoint with Point Id = [" +
+          IString message = "A ControlPoint with Point Id = [" +
                             newPoint->GetId() +
                             "] already exists.  Re-enter unique Point Id.";
           QMessageBox::warning((QWidget *)parent(), "Unique Point Id", message);
@@ -674,7 +674,7 @@ namespace Isis {
                                    p_matchCube, p_controlPoint->GetId());
 
     //  Write pointId
-    iString ptId = "Point ID:  " + p_controlPoint->GetId();
+    IString ptId = "Point ID:  " + p_controlPoint->GetId();
     p_ptIdValue->setText(ptId);
   }
 

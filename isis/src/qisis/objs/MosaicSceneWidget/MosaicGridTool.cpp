@@ -596,7 +596,7 @@ namespace Isis {
    *
    * @return The name in string form.
    */
-  iString MosaicGridTool::projectPvlObjectName() const {
+  IString MosaicGridTool::projectPvlObjectName() const {
     return "MosaicGridTool";
   }
 
@@ -738,7 +738,7 @@ namespace Isis {
     m_drawGridCheckBox->blockSignals(false);
 
     if (!getWidget()->getProjection()) {
-      iString msg = "Please set the mosaic scene's projection before trying to "
+      IString msg = "Please set the mosaic scene's projection before trying to "
                     "draw a grid. This means either open a cube (a projection "
                     "will be calculated) or set the projection explicitly";
       throw IException(IException::User, msg, _FILEINFO_);

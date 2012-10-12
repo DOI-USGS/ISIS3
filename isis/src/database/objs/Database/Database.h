@@ -76,7 +76,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2007-06-05 Brendan George - Modified to work with
-   *          iString/StringTools merge
+   *          IString/StringTools merge
    *   @history 2008-10-30 Steven Lambright - tossDbError now accepts a const
    *            char* for a filename, issue pointed out by "novus0x2a" (Support
    *            Board Member)

@@ -23,7 +23,7 @@
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "NaifStatus.h"
 #include "RadialDistortionMap.h"
@@ -46,7 +46,7 @@ namespace Isis {
   NirCamera::NirCamera(Pvl &lab) : FramingCamera(lab) {
     NaifStatus::CheckErrors();
     // Get the camera characteristics
-    iString filter = (string)(lab.FindGroup("BandBin", Pvl::Traverse))["FilterName"];
+    IString filter = (string)(lab.FindGroup("BandBin", Pvl::Traverse))["FilterName"];
     filter = filter.UpCase();
 
     if(filter.compare("A") == 0) {
@@ -97,9 +97,9 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     focalMap->SetDetectorOrigin(
-      Spice::getDouble("INS" + (iString)(int)naifIkCode() + 
+      Spice::getDouble("INS" + (IString)(int)naifIkCode() + 
                        "_BORESIGHT_SAMPLE"),
-      Spice::getDouble("INS" + (iString)(int)naifIkCode() + 
+      Spice::getDouble("INS" + (IString)(int)naifIkCode() + 
                        "_BORESIGHT_LINE"));
 
     // Setup distortion map

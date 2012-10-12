@@ -23,7 +23,7 @@
 #include <iostream>
 #include "Stretch.h"
 #include "Histogram.h"
-#include "iString.h"
+#include "IString.h"
 #include "SpecialPixel.h"
 #include "IException.h"
 #include "Pvl.h"
@@ -154,11 +154,11 @@ namespace Isis {
   * @return std::pair of doubles where first is the first input and
   *         second is the first output
   */
-  std::pair<double, double> Stretch::NextPair(Isis::iString &pairs) {
+  std::pair<double, double> Stretch::NextPair(Isis::IString &pairs) {
     std::pair<double, double> io;
 
     // do input side
-    Isis::iString temp = pairs.Token(":");
+    Isis::IString temp = pairs.Token(":");
     temp.Trim(" \t\r\n\v\f");
     io.first = temp.ToDouble();
 
@@ -194,7 +194,7 @@ namespace Isis {
     p_output.clear();
     p_pairs = 0;
 
-    Isis::iString p(pairs);
+    Isis::IString p(pairs);
     std::pair<double, double> pear;
 
     p.TrimHead(" \t\r\n\v\f");
@@ -229,7 +229,7 @@ namespace Isis {
     p_output.clear();
     p_pairs = 0;
 
-    Isis::iString p(pairs);
+    Isis::IString p(pairs);
     std::pair<double, double> pear;
 
     // need to save the input dn values in order to
@@ -278,9 +278,9 @@ namespace Isis {
 
     if(p_pairs < 0) return "";
 
-    Isis::iString p("");
+    Isis::IString p("");
     for(int i = 0; i < p_pairs; i++) {
-      p += Isis::iString(p_input[i]) + ":" + Isis::iString(p_output[i]) + " ";
+      p += Isis::IString(p_input[i]) + ":" + Isis::IString(p_output[i]) + " ";
     }
     return p.TrimTail(" ");
   }

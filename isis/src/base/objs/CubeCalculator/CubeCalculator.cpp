@@ -23,7 +23,7 @@
 #include <QVector>
 
 #include "CubeCalculator.h"
-#include "iString.h"
+#include "IString.h"
 #include "Statistics.h"
 #include "Camera.h"
 #include "Distance.h"
@@ -191,16 +191,16 @@ namespace Isis {
    * @param inCubes The input cubes
    * @param outCube The output cube
    */
-  void CubeCalculator::prepareCalculations(iString equation,
+  void CubeCalculator::prepareCalculations(IString equation,
       QVector<Cube *> &inCubes,
       Cube *outCube) {
     Clear();
 
     m_outputSamples = outCube->getSampleCount();
 
-    iString eq = equation;
+    IString eq = equation;
     while (eq != "") {
-      iString token = eq.Token(" ");
+      IString token = eq.Token(" ");
 
       // Step through every part of the postfix equation and set up the appropriate
       // action list based on the current token. Attempting to order if-else conditions
@@ -215,7 +215,7 @@ namespace Isis {
       // File, e.g. F1 = first file in list. Must come after any functions starting with 'f' that
       //   is not a cube.
       else if (token[0] == 'f') {
-        iString tok(token.substr(1));
+        IString tok(token.substr(1));
         int file = tok.ToInteger() - 1;
         if (file < 0 || file >= (int)inCubes.size()) {
           std::string msg = "Invalid file number [" + tok + "]";
@@ -521,7 +521,7 @@ namespace Isis {
         }
         else {
           string msg = "Unable to compute illumination angles at image center for operator [";
-          msg += token + "] using input file [f" + iString(cubeIndex + 1) + "]";
+          msg += token + "] using input file [f" + IString(cubeIndex + 1) + "]";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
       }

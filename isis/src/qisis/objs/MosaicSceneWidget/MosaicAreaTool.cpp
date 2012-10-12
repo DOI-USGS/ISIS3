@@ -16,7 +16,7 @@
 
 #include "Angle.h"
 #include "Distance.h"
-#include "iString.h"
+#include "IString.h"
 #include "FindSpotGraphicsItem.h"
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
@@ -110,9 +110,9 @@ namespace Isis {
 
 
     if(latValid && lonValid && areaValid) {
-      double lat = iString(latitude.toStdString()).ToDouble();
-      double lon = iString(longitude.toStdString()).ToDouble();
-      double area = iString(areaString.toStdString()).ToDouble();
+      double lat = IString(latitude.toStdString()).ToDouble();
+      double lon = IString(longitude.toStdString()).ToDouble();
+      double area = IString(areaString.toStdString()).ToDouble();
 
       Projection *projection = getWidget()->getProjection();
 
@@ -312,7 +312,7 @@ namespace Isis {
   }
 
 
-  iString MosaicAreaTool::projectPvlObjectName() const {
+  IString MosaicAreaTool::projectPvlObjectName() const {
     return "MosaicAreaTool";
   }
 

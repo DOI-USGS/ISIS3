@@ -14,7 +14,7 @@ class QSslError;
 template <typename A> class QList;
 
 namespace Isis {
-  class iString;
+  class IString;
   class Pvl;
   class PvlGroup;
   class PvlObject;
@@ -29,10 +29,10 @@ namespace Isis {
       Q_OBJECT
 
     public:
-      SpiceClient(iString url, int port, Pvl &cubeLabel,
+      SpiceClient(IString url, int port, Pvl &cubeLabel,
                   bool ckSmithed, bool ckRecon, bool ckPredicted, bool ckNadir,
                   bool spkSmithed, bool spkRecon, bool spkPredicted,
-                  iString shape, double startPad, double endPad);
+                  IString shape, double startPad, double endPad);
       virtual ~SpiceClient();
 
       void blockUntilComplete();
@@ -55,18 +55,18 @@ namespace Isis {
       void sslErrors(QNetworkReply *, const QList<QSslError> &);
 
     private:
-      static iString yesNo(bool boolVal);
-      Table *readTable(iString xmlName, iString tableName);
+      static IString yesNo(bool boolVal);
+      Table *readTable(IString xmlName, IString tableName);
       QDomElement rootXMLElement();
-      QDomElement findTag(QDomElement currentElement, iString name);
+      QDomElement findTag(QDomElement currentElement, IString name);
       QString elementContents(QDomElement element);
       void checkErrors();
 
     private:
-      iString *p_error;
-      iString *p_xml; //!< XML Sent to server
-      iString *p_rawResponse;  //!< Server raw response
-      iString *p_response;  //!< Server decoded response
+      IString *p_error;
+      IString *p_xml; //!< XML Sent to server
+      IString *p_rawResponse;  //!< Server raw response
+      IString *p_response;  //!< Server decoded response
       QNetworkAccessManager *p_networkMgr; //!< Network manager does request
       QNetworkRequest *p_request; //!< Network request sent
   };

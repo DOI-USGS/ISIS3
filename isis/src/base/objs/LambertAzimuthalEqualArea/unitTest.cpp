@@ -1187,7 +1187,7 @@ int main(int argc, char *argv[]) {
     double projDiskRadius = sqrt(p5Lamb.XCoord()*p5Lamb.XCoord() 
                                  + p5Lamb.YCoord()*p5Lamb.YCoord());
     cout << std::setprecision(1);
-    cout << iString(90.0) << "\t\t\t " << projDiskRadius ;
+    cout << IString(90.0) << "\t\t\t " << projDiskRadius ;
     cout << std::setprecision(6);
     cout << "\t\t\t" << p5Lamb.relativeScaleFactorLongitude()
          << "\t" << p5Lamb.relativeScaleFactorLatitude() << endl;
@@ -1196,7 +1196,7 @@ int main(int argc, char *argv[]) {
       projDiskRadius = sqrt(p5Lamb.XCoord()*p5Lamb.XCoord() 
                                    + p5Lamb.YCoord()*p5Lamb.YCoord());
       cout << std::setprecision(1);
-      cout << iString(lat) << "\t\t" << projDiskRadius ;
+      cout << IString(lat) << "\t\t" << projDiskRadius ;
       cout << std::setprecision(6);
       cout << "\t\t\t" << p5Lamb.relativeScaleFactorLongitude()
            << "\t" << p5Lamb.relativeScaleFactorLatitude() << endl;

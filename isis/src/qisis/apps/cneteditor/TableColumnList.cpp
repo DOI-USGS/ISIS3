@@ -60,8 +60,8 @@ namespace Isis
         if (cols->at(i)->getTitle() == title)
           return (*cols)[i];
 
-      iString msg = "There is no column with a title of [";
-      msg += iString(title);
+      IString msg = "There is no column with a title of [";
+      msg += IString(title);
       msg += "] inside this column list";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -71,7 +71,7 @@ namespace Isis
     {
       if (!newCol)
       {
-        iString msg = "Attempted to add NULL column to the columnlist";
+        IString msg = "Attempted to add NULL column to the columnlist";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
@@ -294,7 +294,7 @@ namespace Isis
 
       if (index < 0 || index >= cols->size())
       {
-        iString msg = "index [";
+        IString msg = "index [";
         msg += index;
         msg += "] is out of range.  Size of list is: ";
         msg += cols->size();

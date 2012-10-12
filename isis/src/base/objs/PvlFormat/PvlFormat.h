@@ -53,7 +53,7 @@ namespace Isis {
   */
   inline KeywordType ToKeywordType(const std::string type) {
 
-    iString t(type);
+    IString t(type);
     t.Remove("_- \r\n\f\t\v\"\'");
     t.UpCase();
 

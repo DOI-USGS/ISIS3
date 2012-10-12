@@ -11,7 +11,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 
-#include "iString.h"
+#include "IString.h"
 #include "FindSpotGraphicsItem.h"
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
@@ -61,8 +61,8 @@ namespace Isis {
       return;
     }
 
-    double lat = iString(latitude.toStdString()).ToDouble();
-    double lon = iString(longitude.toStdString()).ToDouble();
+    double lat = IString(latitude.toStdString()).ToDouble();
+    double lon = IString(longitude.toStdString()).ToDouble();
 
     Projection *projection = getWidget()->getProjection();
 
@@ -182,7 +182,7 @@ namespace Isis {
   }
 
 
-  iString MosaicFindTool::projectPvlObjectName() const {
+  IString MosaicFindTool::projectPvlObjectName() const {
     return "MosaicFindTool";
   }
 

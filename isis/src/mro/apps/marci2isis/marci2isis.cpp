@@ -116,8 +116,8 @@ void IsisMain() {
   outputCubes[1]->setDimensions(numSamples, numLines, numFilters);
 
   FileName outputFile(ui.GetFileName("TO"));
-  iString evenFile = outputFile.path() + "/" + outputFile.baseName() + ".even.cub";
-  iString oddFile = outputFile.path() + "/" + outputFile.baseName() + ".odd.cub";
+  IString evenFile = outputFile.path() + "/" + outputFile.baseName() + ".even.cub";
+  IString oddFile = outputFile.path() + "/" + outputFile.baseName() + ".odd.cub";
 
   outputCubes[0]->create(evenFile);
   outputCubes[1]->create(oddFile);
@@ -140,7 +140,7 @@ void IsisMain() {
   // Add original labels
   OriginalLabel origLabel(pdsLab);
 
-  std::vector<iString> framelets;
+  std::vector<IString> framelets;
 
   framelets.push_back("Even");
   framelets.push_back("Odd");
@@ -300,15 +300,15 @@ void translateMarciLabels(Pvl &pdsLabel, Pvl &cubeLabel) {
   inst += PvlKeyword("SpacecraftClockCount", (string)pdsLabel["SPACECRAFT_CLOCK_START_COUNT"]);
   inst += PvlKeyword("DataFlipped", (flip == 1));
   inst += PvlKeyword("ColorOffset", colorOffset);
-  inst += PvlKeyword("InterframeDelay", (iString)((double)pdsLabel["INTERFRAME_DELAY"]), "seconds");
-  inst += PvlKeyword("ExposureDuration", (iString)((double)pdsLabel["LINE_EXPOSURE_DURATION"] / 1000.0), "seconds");
+  inst += PvlKeyword("InterframeDelay", (IString)((double)pdsLabel["INTERFRAME_DELAY"]), "seconds");
+  inst += PvlKeyword("ExposureDuration", (IString)((double)pdsLabel["LINE_EXPOSURE_DURATION"] / 1000.0), "seconds");
 
   PvlGroup bandBin("BandBin");
   PvlKeyword filterName("FilterName");
   PvlKeyword origBands("OriginalBand");
   for(int filter = 0; filter < pdsLabel["FILTER_NAME"].Size(); filter++) {
     filterName += pdsLabel["FILTER_NAME"][filter];
-    origBands += iString(filter + 1);
+    origBands += IString(filter + 1);
   }
 
   bandBin += filterName;

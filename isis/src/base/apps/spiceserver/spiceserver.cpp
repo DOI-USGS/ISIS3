@@ -11,7 +11,7 @@
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "Cube.h"
-#include "iString.h"
+#include "IString.h"
 #include "KernelDb.h"
 #include "Longitude.h"
 #include "Process.h"
@@ -32,7 +32,7 @@ bool spkRecon = false;
 bool spkPredicted = false;
 double startPad = 0.0;
 double endPad = 0.0;
-iString shapeKernelStr;
+IString shapeKernelStr;
 
 bool TryKernels(Pvl &labels, Process &p,
                 Kernel lk, Kernel pck,
@@ -43,13 +43,13 @@ bool TryKernels(Pvl &labels, Process &p,
                 Kernel exk);
 
 //! Combines all the temp files into one final output file
-void PackageKernels(iString toFile);
+void PackageKernels(IString toFile);
 
 //! Read the spiceinit parameters
 void ParseParameters(QDomElement parametersElement);
 
 //! Convert a table into an xml tag
-iString TableToXml(iString tableName, iString file);
+IString TableToXml(IString tableName, IString file);
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
@@ -71,18 +71,18 @@ void IsisMain() {
     // Get the single line of encoded XML from the input file that the client,
     //   spiceinit, sent us.
     TextFile inFile(ui.GetFileName("FROM"));
-    iString hexCode;
+    IString hexCode;
 
     // GetLine returns false if it was the last line... so we can't check for
     //   problems really
     inFile.GetLine(hexCode);
 
     Pvl label;
-    iString otherVersion;
+    IString otherVersion;
 
     if (!hexCode.empty()) {
       // Convert HEX to XML
-      iString xml(QByteArray::fromHex(QByteArray(hexCode.c_str())).constData());
+      IString xml(QByteArray::fromHex(QByteArray(hexCode.c_str())).constData());
 
       // Parse the XML with Qt's XML parser... kindof convoluted, I'm sorry
       QDomDocument document;
@@ -101,7 +101,7 @@ void IsisMain() {
           if (element.tagName() == "isis_version") {
             QString encoded = element.firstChild().toText().data();
             otherVersion =
-                iString(QByteArray::fromHex(encoded.toAscii()).constData());
+                IString(QByteArray::fromHex(encoded.toAscii()).constData());
           }
           else if (element.tagName() == "parameters") {
             // Read the spiceinit parameters
@@ -112,26 +112,26 @@ void IsisMain() {
             QString encoded = element.firstChild().toText().data();
             stringstream labStream;
             labStream <<
-                iString(QByteArray::fromHex(encoded.toAscii()).constData());
+                IString(QByteArray::fromHex(encoded.toAscii()).constData());
             labStream >> label;
           }
         }
       }
       else {
-        iString err = "Unable to read XML. The reason given was [";
+        IString err = "Unable to read XML. The reason given was [";
         err += error.toStdString();
-        err += "] on line [" + iString(errorLine) + "] column [";
-        err += iString(errorCol) + "]";
+        err += "] on line [" + IString(errorLine) + "] column [";
+        err += IString(errorCol) + "]";
         throw IException(IException::Io, err, _FILEINFO_);
       }
     }
     else {
-      iString msg = "Unable to read input file";
+      IString msg = "Unable to read input file";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if (otherVersion != Application::Version()) {
-      iString msg = "The SPICE server only supports the latest Isis version [" +
+      IString msg = "The SPICE server only supports the latest Isis version [" +
                     Application::Version() + "], version [" + otherVersion +
                     "] is not compatible";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -242,7 +242,7 @@ void IsisMain() {
   }
   catch (...) {
     // We failed at something, delete the temp files...
-    iString outFile = ui.GetFileName("TO");
+    IString outFile = ui.GetFileName("TO");
     QFile pointingFile(QString::fromStdString(outFile + ".pointing"));
     if (pointingFile.exists()) pointingFile.remove();
 
@@ -462,18 +462,18 @@ bool TryKernels(Pvl &label, Process &p,
 }
 
 
-iString TableToXml(iString tableName, iString file) {
-  iString xml;
+IString TableToXml(IString tableName, IString file) {
+  IString xml;
   xml += "    <" + tableName + ">\n";
 
   QFile tableFile(file);
   if (!tableFile.open(QIODevice::ReadOnly)) {
-    iString msg = "Unable to read temporary file [" + file + "]";
+    IString msg = "Unable to read temporary file [" + file + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   QByteArray data = tableFile.readAll();
-  xml += iString(data.toHex().constData()) + "\n";
+  xml += IString(data.toHex().constData()) + "\n";
   tableFile.close();
   // we should now be completely done with this temp file
   tableFile.remove();
@@ -543,31 +543,31 @@ void ParseParameters(QDomElement parametersElement) {
 }
 
 
-void PackageKernels(iString toFile) {
-  iString xml;
+void PackageKernels(IString toFile) {
+  IString xml;
   xml += "<spice_data>\n";
 
   xml += "  <application_log>\n";
 
-  iString logFile(toFile + ".print");
+  IString logFile(toFile + ".print");
   Pvl logMessage(logFile);
   remove(logFile.c_str());
   stringstream logStream;
   logStream << logMessage;
   xml +=
-      iString(QByteArray(logStream.str().c_str()).toHex().constData()) + "\n";
+      IString(QByteArray(logStream.str().c_str()).toHex().constData()) + "\n";
   xml += "  </application_log>\n";
 
   xml += "  <kernels_label>\n";
 
-  iString kernLabelsFile(toFile + ".lab");
+  IString kernLabelsFile(toFile + ".lab");
   Pvl kernLabels(kernLabelsFile);
   remove(kernLabelsFile.c_str());
   stringstream labelStream;
   labelStream << kernLabels;
 
   xml +=
-      iString(QByteArray(labelStream.str().c_str()).toHex().constData()) + "\n";
+      IString(QByteArray(labelStream.str().c_str()).toHex().constData()) + "\n";
 
   xml += "  </kernels_label>\n";
 
@@ -579,7 +579,7 @@ void PackageKernels(iString toFile) {
 
   xml += "  </tables>\n";
   xml += "</spice_data>\n";
-  iString encodedXml(QByteArray(xml.c_str()).toHex().constData());
+  IString encodedXml(QByteArray(xml.c_str()).toHex().constData());
 
   QFile finalOutput(toFile);
   finalOutput.open(QIODevice::WriteOnly);

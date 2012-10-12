@@ -25,7 +25,7 @@
 #include "Endian.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "PixelType.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
@@ -667,7 +667,7 @@ namespace Isis {
     xlatGenProj.Auto(outputPvl);
 
     // Translate the projection specific keywords for a PDS IMAGE_MAP_PROJECTION
-    iString projName = ProjectionName(*inputLabel);
+    IString projName = ProjectionName(*inputLabel);
     PvlTranslationManager xlatSpecProj(*inputLabel,
                                        "$base/translations/pdsExport" + projName + ".trn");
     xlatSpecProj.Auto(outputPvl);
@@ -685,7 +685,7 @@ namespace Isis {
 
     // Modify the radii to be km
     PvlKeyword &aRadius = pdsMapObj["A_AXIS_RADIUS"];
-    iString unit = aRadius.Unit();
+    IString unit = aRadius.Unit();
     if(unit.UpCase() == "METERS") {
       double dValue = (double)aRadius;
       dValue /= 1000.0;
@@ -728,7 +728,7 @@ namespace Isis {
 
     // Add the EASTERNMOST AND WESTERNMOST LONGITUDE keywords
     PvlKeyword &isisLonDir = inputMapping.FindKeyword("LongitudeDirection");
-    iString lonDir = isisLonDir[0];
+    IString lonDir = isisLonDir[0];
     lonDir.UpCase();
     if(lonDir == "POSITIVEEAST") {
       double maxLon = inputMapping.FindKeyword("MaximumLongitude");
@@ -853,9 +853,9 @@ namespace Isis {
     // corresponding lines in the StandardImageRoot member
     if(p_exportType == Stream) {
       if(p_pdsFileType != ProcessExportPds::JP2Image) {
-        (*p_label)["LABEL_RECORDS"].SetValue(iString(labSize), "BYTES");
+        (*p_label)["LABEL_RECORDS"].SetValue(IString(labSize), "BYTES");
         if(!p_detachedLabel) {
-          (*p_label)["^IMAGE"].SetValue(iString(labSize + 1), "BYTES");
+          (*p_label)["^IMAGE"].SetValue(IString(labSize + 1), "BYTES");
         }
       }
       if(p_label->GetFormat() != NULL) {
@@ -874,18 +874,18 @@ namespace Isis {
       int labelRecords;
       if(p_pdsFileType != ProcessExportPds::JP2Image) {
         lineBytes = LineBytes();
-        (*p_label)["RECORD_BYTES"].SetValue(iString(lineBytes));
+        (*p_label)["RECORD_BYTES"].SetValue(IString(lineBytes));
 
         // The number of label records is dependent on the number of label bytes
         // and the lint bytes
         labelRecords = (int)ceil((double)labSize / (double)lineBytes);
         if(p_label->HasKeyword("LABEL_RECORDS")) { //LRO MRF doesn't have this keyword
-          (*p_label)["LABEL_RECORDS"].SetValue(iString(labelRecords));
+          (*p_label)["LABEL_RECORDS"].SetValue(IString(labelRecords));
         }
-        (*p_label)["FILE_RECORDS"].SetValue(iString(labelRecords + (InputCubes[0])->getLineCount() *
+        (*p_label)["FILE_RECORDS"].SetValue(IString(labelRecords + (InputCubes[0])->getLineCount() *
                                             InputCubes[0]->getBandCount()));
         if(!p_detachedLabel) {
-          (*p_label)["^IMAGE"].SetValue(iString(labelRecords + 1));
+          (*p_label)["^IMAGE"].SetValue(IString(labelRecords + 1));
         }
       }
       if(p_label->GetFormat() != NULL) {

@@ -16,7 +16,7 @@
 #include "Cube.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "UniversalGroundMap.h"
 
 namespace Isis {
@@ -423,8 +423,8 @@ namespace Isis {
                                 void *caller) {
 
     if(!p_managedCubes->contains(cubeId)) {
-      iString msg = "cube ID [";
-      msg += iString(cubeId);
+      IString msg = "cube ID [";
+      msg += IString(cubeId);
       msg += "] is not a valid cube ID";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -457,8 +457,8 @@ namespace Isis {
                                      int startLine, int endSample, int endLine,
                                      int band, void *caller) {
     if(!p_managedCubes->contains(cubeId)) {
-      iString msg = "cube ID [";
-      msg += iString(cubeId);
+      IString msg = "cube ID [";
+      msg += IString(cubeId);
       msg += "] is not a valid cube ID";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -598,7 +598,7 @@ namespace Isis {
       //   write lock make note of it.
       if (!(*p_managedData)[index].first->tryLockForRead()) {
         if (writeLock) {
-          iString msg = "Overlapping data had write locks";
+          IString msg = "Overlapping data had write locks";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
@@ -607,7 +607,7 @@ namespace Isis {
       // A read lock was in place, undo the lock we just made
       else {
         if (writeLock) {
-          iString msg = "Overlapping data had write locks";
+          IString msg = "Overlapping data had write locks";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
@@ -744,7 +744,7 @@ namespace Isis {
   UniversalGroundMap *CubeDataThread::GetUniversalGroundMap(int cubeId) const {
     if (!p_managedCubes->contains(cubeId)) {
       throw IException(IException::Programmer,
-                       "Invalid Cube ID [" + iString(cubeId) + "]",
+                       "Invalid Cube ID [" + IString(cubeId) + "]",
                        _FILEINFO_);
     }
 
@@ -761,7 +761,7 @@ namespace Isis {
   const Cube *CubeDataThread::GetCube(int cubeId) const {
     if (!p_managedCubes->contains(cubeId)) {
       throw IException(IException::Programmer,
-                       "Invalid Cube ID [" + iString(cubeId) + "]",
+                       "Invalid Cube ID [" + IString(cubeId) + "]",
                        _FILEINFO_);
     }
 

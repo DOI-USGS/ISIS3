@@ -101,10 +101,10 @@ void IsisMain() {
   if(iCube->getStatistics()->Maximum() > 1000)
     g_maskedLeftOnly = true;
 
-  iString darkFile, flatFile, offsetFile, coefficientFile;
+  IString darkFile, flatFile, offsetFile, coefficientFile;
 
   if(g_masked) {
-    iString maskedFile = ui.GetAsString("MASKEDFILE");
+    IString maskedFile = ui.GetAsString("MASKEDFILE");
 
     if(maskedFile.Equal("Default") || maskedFile.length() == 0)
       maskedFile = "$lro/calibration/" + instId + "_MaskedPixels.????.pvl";
@@ -180,7 +180,7 @@ void IsisMain() {
   }
 
   if(g_radiometric) {
-    iString radFile = ui.GetAsString("RADIOMETRICFILE");
+    IString radFile = ui.GetAsString("RADIOMETRICFILE");
 
     if(radFile.Equal("Default") || radFile.length() == 0)
       radFile = "$lro/calibration/NAC_RadiometricResponsivity.????.pvl";
@@ -355,7 +355,7 @@ void ReadTextDataFile(string &fileString, vector<double> &data) {
     throw IException(IException::User, msg, _FILEINFO_);
   }
   TextFile file(filename.expanded());
-  iString lineString;
+  IString lineString;
   unsigned int line = 0;
   while(file.GetLine(lineString)) {
     data.push_back((lineString.Token(" ,;")).ToDouble());
@@ -373,7 +373,7 @@ void ReadTextDataFile(string &fileString, vector<vector<double> > &data) {
     throw IException(IException::User, msg, _FILEINFO_);
   }
   TextFile file(filename.expanded());
-  iString lineString;
+  IString lineString;
   while(file.GetLine(lineString)) {
     vector<double> line;
     lineString.ConvertWhiteSpace();

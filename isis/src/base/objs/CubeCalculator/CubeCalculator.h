@@ -71,7 +71,7 @@ namespace Isis {
        */
       void Clear();
 
-      void prepareCalculations(iString equation,
+      void prepareCalculations(IString equation,
                                QVector<Cube *> &inCubes,
                                Cube *outCube);
 

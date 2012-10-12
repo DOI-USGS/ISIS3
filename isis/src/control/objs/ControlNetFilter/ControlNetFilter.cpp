@@ -9,7 +9,7 @@
 #include "ControlCubeGraphNode.h"
 #include "ControlPoint.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "PvlGroup.h"
@@ -223,7 +223,7 @@ namespace Isis {
           const ControlMeasure *measure = cPoint->GetMeasure(j);
           PrintCubeFileSerialNum(*measure);
           double dPixelShift = measure->GetPixelShift();
-          mOstm << ", " <<  (dPixelShift == Null ? "Null" : iString(dPixelShift)) << ", "
+          mOstm << ", " <<  (dPixelShift == Null ? "Null" : IString(dPixelShift)) << ", "
                 << measure->GetMeasureTypeString() << ", "
                 << sBoolean[measure->IsIgnored()] << ", "
                 << sBoolean[measure->IsEditLocked()] << ", "
@@ -313,7 +313,7 @@ namespace Isis {
     bool editLock = false;
 
     if (pvlGrp.HasKeyword("EditLock")) {
-      if(pvlGrp["EditLock"][0] == "1" || iString(pvlGrp["EditLock"][0]).DownCase() == "true")
+      if(pvlGrp["EditLock"][0] == "1" || IString(pvlGrp["EditLock"][0]).DownCase() == "true")
         editLock = true;
     }
 
@@ -408,7 +408,7 @@ namespace Isis {
           const ControlMeasure *measure = cPoint->GetMeasure(j);
           PrintCubeFileSerialNum(*measure);
           double dResMag = measure->GetResidualMagnitude();
-          mOstm << ", " << (dResMag == Null ? "Null" : iString(dResMag) ) << ", "
+          mOstm << ", " << (dResMag == Null ? "Null" : IString(dResMag) ) << ", "
                 << measure->GetMeasureTypeString() << ", "
                 << sBoolean[measure->IsIgnored()] << ", "
                 << sBoolean[measure->IsEditLocked()] << ", "
@@ -433,8 +433,8 @@ namespace Isis {
    */
   void ControlNetFilter::PointIDFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
     std::vector<string> strTokens;
-    iString sPointIDExpr = pvlGrp["Expression"][0];
-    iString sSeparator("*");
+    IString sPointIDExpr = pvlGrp["Expression"][0];
+    IString sSeparator("*");
 
     string strToken = sPointIDExpr.Token(sSeparator);
     while (strToken != "") {
@@ -555,8 +555,8 @@ namespace Isis {
   void ControlNetFilter::PointPropertiesFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
     bool bIgnoredFlag = false;
     int iSetIgnoreFlag = 0;
-    iString sType = "";
-    iString sTemp = "";
+    IString sType = "";
+    IString sTemp = "";
 
     if (pvlGrp.HasKeyword("PointType")) {
       sType = pvlGrp["PointType"][0];
@@ -891,7 +891,7 @@ namespace Isis {
               << sBoolean[cPoint->IsIgnored()] << ", " << sBoolean[cPoint->IsEditLocked()] << ", "
               << iNumMeasures << ", " << iNumMsIgnored << ", " << cPoint->GetNumLockedMeasures() << ", ";
             PrintCubeFileSerialNum(*measure);
-            mOstm << ", " <<  (dMsrGFit == Null ? "NA" : iString(dMsrGFit)) << ", "
+            mOstm << ", " <<  (dMsrGFit == Null ? "NA" : IString(dMsrGFit)) << ", "
               << measure->GetMeasureTypeString() << ", "
               << sBoolean[measure->IsIgnored()] << ", "
               << sBoolean[measure->IsEditLocked()] << ", "
@@ -917,16 +917,16 @@ namespace Isis {
   void ControlNetFilter::PointMeasurePropertiesFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
     int iIgnoredFlag = -1;
     string sType = "";
-    iString isType;
+    IString isType;
 
     if (pvlGrp.HasKeyword("Ignore")) {
       iIgnoredFlag = 0;
-      if (iString(pvlGrp["Ignore"][0]).DownCase() == "true")
+      if (IString(pvlGrp["Ignore"][0]).DownCase() == "true")
         iIgnoredFlag = 1;
     }
 
     if (pvlGrp.HasKeyword("MeasureType")) {
-      sType = iString(pvlGrp["MeasureType"][0]).DownCase();
+      sType = IString(pvlGrp["MeasureType"][0]).DownCase();
     }
 
     if (pbLastFilter) {
@@ -1139,13 +1139,13 @@ namespace Isis {
    * @param pbLastFilter - Flag to indicate whether this is the last filter to print the stats
    */
   void ControlNetFilter::CubeNameExpressionFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
-    iString sCubeExpr("");
+    IString sCubeExpr("");
     if (pvlGrp.HasKeyword("Expression")) {
-      sCubeExpr = iString(pvlGrp["Expression"][0]);
+      sCubeExpr = IString(pvlGrp["Expression"][0]);
     }
 
     vector <string> strTokens;
-    iString sSeparator("*");
+    IString sSeparator("*");
     string strToken = sCubeExpr.Token(sSeparator);
     while (strToken != "") {
       strTokens.push_back(strToken);
@@ -1433,7 +1433,7 @@ namespace Isis {
               << iPointsFixed << ", " << iPointsConstrained << ", " << iPointsFree << ", "
               << imgStats[ imgConvexHullRatio] << ", ";
         for (int j = 0; j < (int)sPointIndex1.size(); j++) {
-          iString sPointIDDist(dPointDistance[j]);
+          IString sPointIDDist(dPointDistance[j]);
           sPointIDDist += "#";
           sPointIDDist += (*mCNet)[sPointIndex1[j]]->GetId();
           sPointIDDist += "#";

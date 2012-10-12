@@ -84,7 +84,7 @@ namespace Isis {
       virtual double IdealFit() const {
         return 0.0;
       };
-      virtual iString AlgorithmName() const {
+      virtual IString AlgorithmName() const {
         return "MinimumDifference";
       };
 

@@ -87,7 +87,7 @@ namespace Isis
           return (Column) i;
       }
 
-      iString msg = "Column title [" + columnTitle + "] does not match any of "
+      IString msg = "Column title [" + columnTitle + "] does not match any of "
           "the defined column types";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -372,19 +372,19 @@ namespace Isis
       if (measure)
       {
         if (measure->Parent()->IsEditLocked()) {
-          iString msg = "Measures in point [" +
+          IString msg = "Measures in point [" +
               getFormattedData(getColumnName(PointId)) +
               "] cannot be deleted because point is edit locked";
           throw IException(IException::User, msg, _FILEINFO_);
         }
         else if (measure->IsEditLocked()) {
-          iString msg = "Measure [" + getFormattedData() + "] in point [" +
+          IString msg = "Measure [" + getFormattedData() + "] in point [" +
               getFormattedData(getColumnName(PointId)) +
               "] cannot be deleted because measure is edit locked";
           throw IException(IException::User, msg, _FILEINFO_);
         }
   //       else if (measure->Parent()->GetRefMeasure() == measure) {
-  //         iString msg = "Measure [" + getData() + "] in point [" +
+  //         IString msg = "Measure [" + getData() + "] in point [" +
   //             getData(getColumnName(PointId)) + "] cannot be deleted because "
   //             "it is the reference";
   //         throw iException::Message(iException::User, msg, _FILEINFO_);

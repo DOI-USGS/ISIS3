@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "httpget.h"
-#include "iString.h"
+#include "IString.h"
 #include "IException.h"
 #include "Progress.h"
 

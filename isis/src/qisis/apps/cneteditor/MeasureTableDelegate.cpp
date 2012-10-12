@@ -14,7 +14,7 @@
 #include "ControlMeasure.h"
 #include "ControlMeasure.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 #include "AbstractMeasureItem.h"
 #include "AbstractTreeItem.h"
@@ -69,7 +69,7 @@ namespace Isis
           }
       }
 
-      iString msg = "Could not create delegate widget for column ["
+      IString msg = "Could not create delegate widget for column ["
           + col->getTitle() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

@@ -43,7 +43,7 @@
 #include "Pvl.h"
 #include "SpecialPixel.h"
 #include "iTime.h"
-#include "iString.h"
+#include "IString.h"
 #include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -79,7 +79,7 @@ namespace Isis {
    * @return double Converted value
    */
   template <typename T> double ToDouble(const T &value) {
-    return (iString(value).Trim(" \r\t\n").ToDouble());
+    return (IString(value).Trim(" \r\t\n").ToDouble());
   }
 
   /**
@@ -91,7 +91,7 @@ namespace Isis {
    * @return string Converted value
    */
   template <typename T> std::string ToString(const T &value) {
-    return (iString(value).Trim(" \r\t\n"));
+    return (IString(value).Trim(" \r\t\n"));
   }
 
 

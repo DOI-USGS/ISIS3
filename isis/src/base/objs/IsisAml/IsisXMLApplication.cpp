@@ -32,7 +32,7 @@ using namespace std;
 #include "IsisXMLApplication.h"
 #include "IsisXMLChTrans.h"
 
-#include "iString.h"
+#include "IString.h"
 
 // Constructors
 IsisXMLApplication::IsisXMLApplication(char *PencodingName,
@@ -96,7 +96,7 @@ void IsisXMLApplication::startElement(const XMLCh *const uri,
                                       const XERCES::Attributes &attributes) {
 
   if((string)XERCES::XMLString::transcode(localname) == (string)"application")  {
-    Isis::iString name = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
+    Isis::IString name = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
     appData->name = name.DownCase();
   }
   else if((string)XERCES::XMLString::transcode(localname) == (string)"brief")  {

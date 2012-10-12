@@ -869,9 +869,9 @@ namespace Isis {
   std::vector<std::string> Kernels::getTypes(const std::string &ktypes) const {
    // Find types and return requested types
     vector<string> tlist;
-    iString::Split(',', ktypes, tlist);
+    IString::Split(',', ktypes, tlist);
     for (unsigned int k = 0 ; k < tlist.size() ; k++) {
-      tlist[k] = iString(tlist[k]).Trim(" \r\n\t\v\b\f").UpCase();
+      tlist[k] = IString(tlist[k]).Trim(" \r\n\t\v\b\f").UpCase();
     }
     return (tlist);
   }
@@ -916,7 +916,7 @@ namespace Isis {
       PvlKeyword &kkey = kernels[kname];
       for (int i = 0 ; i < kkey.Size() ; i++) {
         if (!kkey.IsNull(i)) {
-          if (!iString::Equal(kkey[i], "Table")) {
+          if (!IString::Equal(kkey[i], "Table")) {
             klist.push_back(examine(kkey[i], manage));
           }
         }
@@ -994,8 +994,8 @@ namespace Isis {
    * @return bool True if it is a NAIF kernel type
    */
   bool Kernels::IsNaifType(const std::string &ktype) const {
-    if (iString::Equal(ktype, "UNKNOWN")) return (false);
-    if (iString::Equal(ktype, "DEM")) return (false);
+    if (IString::Equal(ktype, "UNKNOWN")) return (false);
+    if (IString::Equal(ktype, "DEM")) return (false);
     return (true);
   }
   /**
@@ -1074,7 +1074,7 @@ namespace Isis {
         if (found == SPICETRUE) {
           kf.loaded = true;
           kf.managed = false;
-          kf.ktype = iString(ktype).UpCase();
+          kf.ktype = IString(ktype).UpCase();
         }
       }
     }
@@ -1120,10 +1120,10 @@ namespace Isis {
 
       // See if the file is a known NAIF type.  Assume it has been
       // extracted from a NAIF compliant kernel
-      string istr = iString(ibuf).Trim(" \n\r\f\t\v\b");
+      string istr = IString(ibuf).Trim(" \n\r\f\t\v\b");
       if (!istr.empty()) {
         vector<string> parts;
-        iString::Split('/', istr, parts);
+        IString::Split('/', istr, parts);
         if (parts.size() > 1) {
           ktype = parts[parts.size()-1];
         }
@@ -1188,7 +1188,7 @@ namespace Isis {
 
     //  Deciminate file parts
     FileName kf(kfile);
-    string ext = iString(kf.extension()).DownCase();
+    string ext = IString(kf.extension()).DownCase();
 
     //  Check extensions for types
     if (ext == "cub") {
@@ -1197,7 +1197,7 @@ namespace Isis {
     else if (ext == "ti") {
       //  Assume its an instrument kernel but check for ISIS IAK file
       ktype = "IK";
-      string base = iString(kf.baseName()).DownCase();
+      string base = IString(kf.baseName()).DownCase();
       string::size_type idx = base.find("addendum");
       if (idx != string::npos) {   // This is an ISIS IK addendum (IAK)
         ktype = "IAK";
@@ -1249,7 +1249,7 @@ namespace Isis {
     // Check for the keyword
     if (kernels.HasKeyword("CameraVersion")) {
       PvlKeyword &kkey = kernels["CameraVersion"];
-      cv = iString(kkey[0]).ToInteger();
+      cv = IString(kkey[0]).ToInteger();
     }
     return (cv);
   }

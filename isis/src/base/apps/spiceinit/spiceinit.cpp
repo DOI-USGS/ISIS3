@@ -25,7 +25,7 @@ bool TryKernels(Cube *icube, Process &p,
                 Kernel iak, Kernel dem,
                 Kernel exk);
 
-void RequestSpice(Cube *icube, Pvl &labels, iString missionName);
+void RequestSpice(Cube *icube, Pvl &labels, IString missionName);
 void GetUserEnteredKernel(const string &param, Kernel &kernel);
 
 void IsisMain() {
@@ -418,10 +418,10 @@ bool TryKernels(Cube *icube, Process &p,
       while (i < label->Objects()) {
         PvlObject currObj = label->Object(i);
         if (currObj.IsNamed("Table")) {
-          if (currObj["Name"][0] == iString("InstrumentPointing") ||
-              currObj["Name"][0] == iString("InstrumentPosition") ||
-              currObj["Name"][0] == iString("BodyRotation") ||
-              currObj["Name"][0] == iString("SunPosition")) {
+          if (currObj["Name"][0] == IString("InstrumentPointing") ||
+              currObj["Name"][0] == IString("InstrumentPosition") ||
+              currObj["Name"][0] == IString("BodyRotation") ||
+              currObj["Name"][0] == IString("SunPosition")) {
             label->DeleteObject(i);
           }
           else {
@@ -447,13 +447,13 @@ bool TryKernels(Cube *icube, Process &p,
   return true;
 }
 
-void RequestSpice(Cube *icube, Pvl &labels, iString missionName) {
+void RequestSpice(Cube *icube, Pvl &labels, IString missionName) {
   UserInterface &ui = Application::GetUserInterface();
 
-  iString instrumentId =
+  IString instrumentId =
       labels.FindGroup("Instrument", Pvl::Traverse)["InstrumentId"][0];
 
-  iString url       = ui.GetString("URL") + "?mission=" + missionName +
+  IString url       = ui.GetString("URL") + "?mission=" + missionName +
                                             "&instrument=" + instrumentId;
   int port          = ui.GetInteger("PORT");
   bool ckSmithed    = ui.GetBoolean("CKSMITHED");
@@ -463,10 +463,10 @@ void RequestSpice(Cube *icube, Pvl &labels, iString missionName) {
   bool spkSmithed   = ui.GetBoolean("SPKSMITHED");
   bool spkRecon     = ui.GetBoolean("SPKRECON");
   bool spkPredicted = ui.GetBoolean("SPKPREDICTED");
-  iString shape     = iString(ui.GetString("SHAPE")).DownCase();
+  IString shape     = IString(ui.GetString("SHAPE")).DownCase();
 
   if (shape == "user") {
-    shape = iString(ui.GetAsString("MODEL"));
+    shape = IString(ui.GetAsString("MODEL"));
 
     // Test for valid labels with mapping group at least
     Pvl shapeTest(shape);
@@ -517,15 +517,15 @@ void RequestSpice(Cube *icube, Pvl &labels, iString missionName) {
     }
 
     /*for (int valueIndex = 0; valueIndex < curKeyword.Size(); valueIndex ++) {
-      iString value = curKeyword[valueIndex];
+      IString value = curKeyword[valueIndex];
       if (value == "Table" || value == "Null")
         continue;
 
-      iString fullFileName = FileName(value).expanded();
+      IString fullFileName = FileName(value).expanded();
       QFile testFile(fullFileName.ToQt());
 
       if (!testFile.exists()) {
-        iString msg = "The spice server says you need the kernel [" +
+        IString msg = "The spice server says you need the kernel [" +
           value + "] which is not present. " +
           "Please update your spice kernels";
         throw iException::Message(iException::Spice, msg, _FILEINFO_);

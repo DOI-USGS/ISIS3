@@ -141,7 +141,7 @@ void IsisMain() {
   if (!convertDarkToNull) nSampsToNull = 0;
 
 
-  iString darkCurr = ui.GetString("DARKCURRENT");
+  IString darkCurr = ui.GetString("DARKCURRENT");
   g_flatfield = ui.GetBoolean("FLATFIELD");
   g_radiometric = ui.GetBoolean("RADIOMETRIC");
 
@@ -310,7 +310,7 @@ void IsisMain() {
   string reducedFlat("");
   FileName flatfield = DetermineFlatFieldFile();
   if(pxlBin > 0) {
-    iString scale(pxlBin);
+    IString scale(pxlBin);
     FileName newflat = FileName::createTempFile("$TEMPORARY/" + flatfield.baseName() + "_reduced.cub");
     reducedFlat = newflat.expanded();
     string parameters = "FROM=" + flatfield.expanded() +
@@ -358,7 +358,7 @@ void IsisMain() {
   calibrationLog.AddKeyword(PvlKeyword("DarkCurrentModel", darkCurr));
 
   if(darkCurrentMode == DarkCurrentLinear) {
-    iString equation = "Y = " + iString(calibrationValues[0]) + iString(" + ") + iString(calibrationValues[1]) + iString("x");
+    IString equation = "Y = " + IString(calibrationValues[0]) + IString(" + ") + IString(calibrationValues[1]) + IString("x");
     calibrationLog.AddKeyword(PvlKeyword("DarkCurrentEquation", (string)equation));
   }
   else if(darkCurrentMode == DarkCurrentModel) {
@@ -422,8 +422,8 @@ void IsisMain() {
   //  Handle updates of ProductId and SourceProduct Id keywords
   PvlGroup &archive = ocube->getGroup("Archive");
   PvlKeyword key = archive["ProductId"];
-  iString orgProdId = key[0];
-  iString newProdId = orgProdId + "_" + calibType + "_" + iString(cdr_version);
+  IString orgProdId = key[0];
+  IString newProdId = orgProdId + "_" + calibType + "_" + IString(cdr_version);
   newProdId[0] = 'C';
   key.SetValue(Quote(newProdId));
   archive.AddKeyword(key, Pvl::Replace);
@@ -472,7 +472,7 @@ FileName DetermineFlatFieldFile() {
     // add a zero if the filter is 1-digit
     filename += "_FIL";
     if(filterNumber < 9) filename += "0";
-    filename += iString(filterNumber + 1);
+    filename += IString(filterNumber + 1);
     filename += "_?.cub";
   }
 

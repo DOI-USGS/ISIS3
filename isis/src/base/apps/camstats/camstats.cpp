@@ -4,7 +4,7 @@
 #include "CameraStatistics.h"
 #include "Cube.h"
 #include "Distance.h"
-#include "iString.h"
+#include "IString.h"
 #include "UserInterface.h"
 #include "Process.h"
 #include "Progress.h"
@@ -189,6 +189,6 @@ string valueToString(const double &value) {
     return (string("NULL"));
   }
   else {
-    return ((string) iString(value));
+    return ((string) IString(value));
   }
 }

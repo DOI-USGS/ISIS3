@@ -125,7 +125,7 @@ namespace Isis {
     }
     else {
       throw IException(IException::Programmer,
-          "Cannot interpret BandBin for [" + iString(bands()) + "] band image",
+          "Cannot interpret BandBin for [" + IString(bands()) + "] band image",
           _FILEINFO_);
     }
     bandBin += name;
@@ -236,7 +236,7 @@ namespace Isis {
   void ImageImporter::setBands(int b) {
     if (b == 2 || b > 4)
       throw IException(IException::Programmer,
-          "Cannot create an image with [" + iString(b) + "] bands",
+          "Cannot create an image with [" + IString(b) + "] bands",
           _FILEINFO_);
 
     m_bands = b;
@@ -346,7 +346,7 @@ namespace Isis {
           break;
         default:
           throw IException(IException::Programmer,
-              "Cannot determine channel for band [" + iString(band) + "]",
+              "Cannot determine channel for band [" + IString(band) + "]",
               _FILEINFO_);
       }
     }

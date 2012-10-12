@@ -21,7 +21,7 @@
 
 #include "Distance.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "SpecialPixel.h"
 
 namespace Isis {
@@ -166,7 +166,7 @@ namespace Isis {
     */
   bool Displacement::operator >(const Displacement &otherDisplacement) const {
     if(!isValid() || !otherDisplacement.isValid()) {
-      iString msg = "Displacement has not been initialized, you must initialize "
+      IString msg = "Displacement has not been initialized, you must initialize "
           "it first before comparing with another displacement using [>]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -185,7 +185,7 @@ namespace Isis {
     */
   bool Displacement::operator <(const Displacement &otherDisplacement) const {
     if(!isValid() || !otherDisplacement.isValid()) {
-      iString msg = "Displacement has not been initialized, you must initialize "
+      IString msg = "Displacement has not been initialized, you must initialize "
           "it first before comparing with another displacement using [<]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -384,15 +384,15 @@ namespace Isis {
         break;
 
       case Pixels:
-        iString msg = "Cannot call displacement with pixels, ask for another "
+        IString msg = "Cannot call displacement with pixels, ask for another "
             "unit";
         throw IException(IException::Programmer, msg, _FILEINFO_);
         break;
     }
 
     if(resultingDisplacement == Null) {
-      iString msg = "Displacement does not understand the enumerated value [" +
-        iString(displacementUnit) + "] as a unit";
+      IString msg = "Displacement does not understand the enumerated value [" +
+        IString(displacementUnit) + "] as a unit";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -428,15 +428,15 @@ namespace Isis {
         break;
 
       case Pixels:
-        iString msg = "Cannot setDisplacement with pixels, must convert to "
+        IString msg = "Cannot setDisplacement with pixels, must convert to "
             "another unit first";
         throw IException(IException::Programmer, msg, _FILEINFO_);
         break;
     }
 
     if(displacementInMeters == Null) {
-      iString msg = "Displacement does not understand the enumerated value [" +
-        iString(displacementUnit) + "] as a unit";
+      IString msg = "Displacement does not understand the enumerated value [" +
+        IString(displacementUnit) + "] as a unit";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

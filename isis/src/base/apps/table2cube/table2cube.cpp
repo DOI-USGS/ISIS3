@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "iString.h"
+#include "IString.h"
 #include "ProcessByLine.h"
 #include "Table.h"
 
@@ -10,7 +10,7 @@ using namespace std;
 using namespace Isis;
 
 Table *g_table;
-iString g_field;
+IString g_field;
 int g_startRecord;
 int g_numRecords;
 int g_startElement;

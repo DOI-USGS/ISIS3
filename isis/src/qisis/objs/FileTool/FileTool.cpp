@@ -442,7 +442,7 @@ namespace Isis {
     if(inb == 0) {
       inb = cubeViewport()->cube()->getBandCount();
       for(int i = 1; i <= inb; i++) {
-        bands.push_back((iString)i);
+        bands.push_back((IString)i);
       }
     }
 

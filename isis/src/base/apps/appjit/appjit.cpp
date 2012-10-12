@@ -5,7 +5,7 @@
 #include "LineScanCameraRotation.h"
 #include "PixelOffset.h"
 #include "SpiceRotation.h"
-#include "iString.h"
+#include "IString.h"
 #include "FileList.h"
 #include "IException.h"
 #include "CameraDetectorMap.h"
@@ -147,7 +147,7 @@ void IsisMain() {
         cube.write(cmatrix);
         cube.putGroup(kernels);
         cube.close();
-        gp += PvlKeyword("Status" + iString(ifile), list[ifile].toString() + ":  camera pointing updated");
+        gp += PvlKeyword("Status" + IString(ifile), list[ifile].toString() + ":  camera pointing updated");
       }
     }
     Application::Log(gp);

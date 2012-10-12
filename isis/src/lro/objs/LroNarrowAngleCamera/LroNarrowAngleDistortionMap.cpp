@@ -19,7 +19,7 @@
  */
 #include <cmath>
 
-#include "iString.h"
+#include "IString.h"
 #include "LroNarrowAngleDistortionMap.h"
 
 namespace Isis {
@@ -42,7 +42,7 @@ namespace Isis {
    * @param naifIkCode 
    */
   void LroNarrowAngleDistortionMap::SetDistortion(const int naifIkCode) {
-    std::string odkkey = "INS" + Isis::iString(naifIkCode) + "_OD_K";
+    std::string odkkey = "INS" + Isis::IString(naifIkCode) + "_OD_K";
     p_odk.clear();
     p_odk.push_back(p_camera->getDouble(odkkey, 0));
   }

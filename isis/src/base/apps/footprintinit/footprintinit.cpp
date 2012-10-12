@@ -45,7 +45,7 @@ void IsisMain() {
 
   int sinc = 1;
   int linc = 1;
-  iString incType = ui.GetString("INCTYPE");
+  IString incType = ui.GetString("INCTYPE");
   if(incType.UpCase() == "VERTICES") {
     poly.initCube(cube);
     sinc = linc = (int)(0.5 + (((poly.validSampleDim() * 2) +

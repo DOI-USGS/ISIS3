@@ -27,7 +27,7 @@
 #include "CameraSkyMap.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "NaifStatus.h"
 #include "ReseauDistortionMap.h"
@@ -57,9 +57,9 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
     focalMap->SetDetectorOrigin(ParentSamples() / 2.0, ParentLines() / 2.0);
 
-    iString ppKey("INS" + iString((int)naifIkCode()) + "_PP");
-    iString odkKey("INS" + iString((int)naifIkCode()) + "_OD_K");
-    iString decenterKey("INS" + iString((int)naifIkCode()) + "_DECENTER");
+    IString ppKey("INS" + IString((int)naifIkCode()) + "_PP");
+    IString odkKey("INS" + IString((int)naifIkCode()) + "_OD_K");
+    IString decenterKey("INS" + IString((int)naifIkCode()) + "_DECENTER");
 
     new ApolloMetricDistortionMap(this, getDouble(ppKey, 0),
                                   getDouble(ppKey, 1), getDouble(odkKey, 0), getDouble(odkKey, 1),

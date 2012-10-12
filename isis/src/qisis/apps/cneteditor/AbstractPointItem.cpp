@@ -89,7 +89,7 @@ namespace Isis
           return (Column)i;
       }
 
-      iString msg = "Column title [" + columnTitle + "] does not match any of "
+      IString msg = "Column title [" + columnTitle + "] does not match any of "
           "the defined column types";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -326,17 +326,17 @@ namespace Isis
                 Distance(catchNull(newData), Distance::Meters)));
             break;
           case AdjustedSPLatSigma: {
-            iString msg = "Cannot set adjusted surface point latitude sigma";
+            IString msg = "Cannot set adjusted surface point latitude sigma";
             throw IException(IException::Programmer, msg, _FILEINFO_);
             break;
           }
           case AdjustedSPLonSigma: {
-            iString msg = "Cannot set adjusted surface point longitude sigma";
+            IString msg = "Cannot set adjusted surface point longitude sigma";
             throw IException(IException::Programmer, msg, _FILEINFO_);
             break;
           }
           case AdjustedSPRadiusSigma: {
-            iString msg = "Cannot set adjusted surface point radius sigma";
+            IString msg = "Cannot set adjusted surface point radius sigma";
             throw IException(IException::Programmer, msg, _FILEINFO_);
             break;
           }
@@ -456,12 +456,12 @@ namespace Isis
       if (point)
       {
         if (point->IsEditLocked()) {
-          iString msg = "Point [" + getFormattedData() + "] is edit locked and "
+          IString msg = "Point [" + getFormattedData() + "] is edit locked and "
               "cannot be deleted";
           throw IException(IException::User, msg, _FILEINFO_);
         }
         else if (point->GetNumLockedMeasures() > 0) {
-          iString msg = "Point [" + getFormattedData() + "] has at least one "
+          IString msg = "Point [" + getFormattedData() + "] has at least one "
               "edit locked measure and cannot be deleted";
           throw IException(IException::User, msg, _FILEINFO_);
         }

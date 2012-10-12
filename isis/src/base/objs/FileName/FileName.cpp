@@ -34,7 +34,7 @@
 
 #include "Preference.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace std;
 
@@ -58,7 +58,7 @@ namespace Isis {
   }
 
 
-  FileName::FileName(const iString &file) {
+  FileName::FileName(const IString &file) {
     m_d = new Data;
     m_d->setOriginal(file);
   }
@@ -79,7 +79,7 @@ namespace Isis {
   }
 
 
-  iString FileName::originalPath() const {
+  IString FileName::originalPath() const {
     return QFileInfo(m_d->original(false)).path();
   }
 
@@ -97,12 +97,12 @@ namespace Isis {
    *   "/home/me/img"
    * </pre>
    */
-  iString FileName::path() const {
+  IString FileName::path() const {
     return QFileInfo(expanded()).path();
   }
 
 
-  iString FileName::attributes() const {
+  IString FileName::attributes() const {
     QString result;
     QString fileNameWithAttribs = QFileInfo(m_d->original(true)).fileName();
 
@@ -115,36 +115,36 @@ namespace Isis {
   }
 
 
-  iString FileName::baseName() const {
+  IString FileName::baseName() const {
     return QFileInfo(m_d->original(false)).completeBaseName();
   }
 
 
-  iString FileName::name() const {
+  IString FileName::name() const {
     return QFileInfo(m_d->original(false)).fileName();
   }
 
 
-  iString FileName::extension() const {
+  IString FileName::extension() const {
     return QFileInfo(m_d->original(false)).suffix();
   }
 
 
-  iString FileName::expanded() const {
+  IString FileName::expanded() const {
     return m_d->expanded(false);
   }
 
 
-  iString FileName::original() const {
+  IString FileName::original() const {
     return m_d->original(true);
   }
 
 
-  FileName FileName::addExtension(const iString &newExtension) const {
+  FileName FileName::addExtension(const IString &newExtension) const {
     FileName result = *this;
 
     if (result.extension() != newExtension) {
-      iString attributesStr = result.attributes().ToQt();
+      IString attributesStr = result.attributes().ToQt();
 
       if (attributesStr == "")
         result = FileName(result.originalPath() + "/" + result.name() + "." + newExtension);
@@ -158,7 +158,7 @@ namespace Isis {
 
 
   FileName FileName::removeExtension() const {
-    iString attributesStr = attributes().ToQt();
+    IString attributesStr = attributes().ToQt();
 
     FileName result;
     if (attributesStr == "")
@@ -170,7 +170,7 @@ namespace Isis {
   }
 
 
-  FileName FileName::setExtension(const iString &newExtension) const {
+  FileName FileName::setExtension(const IString &newExtension) const {
     FileName result = *this;
 
     if (extension() != newExtension) {
@@ -338,7 +338,7 @@ namespace Isis {
   }
 
 
-  iString FileName::toString() const {
+  IString FileName::toString() const {
     return expanded();
   }
 
@@ -561,8 +561,8 @@ namespace Isis {
     m_originalFileNameString = NULL;
     m_expandedFileNameString = NULL;
 
-    m_originalFileNameString = new iString;
-    m_expandedFileNameString = new iString;
+    m_originalFileNameString = new IString;
+    m_expandedFileNameString = new IString;
   }
 
 
@@ -570,8 +570,8 @@ namespace Isis {
     m_originalFileNameString = NULL;
     m_expandedFileNameString = NULL;
 
-    m_originalFileNameString = new iString(*other.m_originalFileNameString);
-    m_expandedFileNameString = new iString(*other.m_expandedFileNameString);
+    m_originalFileNameString = new IString(*other.m_originalFileNameString);
+    m_expandedFileNameString = new IString(*other.m_expandedFileNameString);
   }
 
 
@@ -584,7 +584,7 @@ namespace Isis {
   }
 
 
-  iString FileName::Data::original(bool includeAttributes) const {
+  IString FileName::Data::original(bool includeAttributes) const {
     QString result = *m_originalFileNameString;
 
 
@@ -599,7 +599,7 @@ namespace Isis {
   }
 
 
-  void FileName::Data::setOriginal(const iString &originalStr) {
+  void FileName::Data::setOriginal(const IString &originalStr) {
     *m_originalFileNameString = originalStr;
 
     // Expand the file name and store that too.
@@ -630,7 +630,7 @@ namespace Isis {
           if(Preference::Preferences().HasGroup("DataDirectory")) {
             PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
             if(dataDir.HasKeyword(varName.toStdString())) {
-              varValue = ((iString)dataDir[varName.toStdString().c_str()][0]).ToQt();
+              varValue = ((IString)dataDir[varName.toStdString().c_str()][0]).ToQt();
             }
           }
 
@@ -665,7 +665,7 @@ namespace Isis {
   }
 
 
-  iString FileName::Data::expanded(bool includeAttributes) const {
+  IString FileName::Data::expanded(bool includeAttributes) const {
     QString result = *m_expandedFileNameString;
 
 

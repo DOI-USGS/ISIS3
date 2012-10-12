@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Preference.h"
 #include "ProgramLauncher.h"
 

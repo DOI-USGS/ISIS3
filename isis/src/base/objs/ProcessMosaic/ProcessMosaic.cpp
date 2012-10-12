@@ -25,7 +25,7 @@
 
 #include "Application.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Portal.h"
 #include "ProcessMosaic.h"
 #include "Pvl.h"
@@ -464,7 +464,7 @@ namespace Isis {
     Pvl *cInPvl = InputCubes[0]->getLabel();
     if (cInPvl->FindGroup("Dimensions", Pvl::Traverse).HasKeyword("Bands")) {
       PvlKeyword &cBandKey = cInPvl->FindGroup("Dimensions", Pvl::Traverse).FindKeyword("Bands");
-      iString sStr(cBandKey[0]);
+      IString sStr(cBandKey[0]);
       if (sStr.ToInteger() < nb) {
         string m = "The parameter number of input bands exceeds the actual number of bands in the "
                    "input cube";
@@ -535,7 +535,7 @@ namespace Isis {
     Pvl *cInPvl = InputCubes[0]->getLabel();
     if (cInPvl->FindGroup("Dimensions", Pvl::Traverse).HasKeyword("Bands")) {
       PvlKeyword &cBandKey = cInPvl->FindGroup("Dimensions", Pvl::Traverse).FindKeyword("Bands");
-      iString sStr(cBandKey[0]);
+      IString sStr(cBandKey[0]);
       if (sStr.ToInteger() < nb) {
         string m = "The parameter number of input bands exceeds the actual number of bands in the input cube";
         throw IException(IException::Programmer, m, _FILEINFO_);
@@ -718,7 +718,7 @@ namespace Isis {
               // To initialize the new table, on the first file name comparison, check the size of
               // the existing table record with the size of the new record being added
               if (!i) {
-                if (iString(cFieldKey[0]).ToInteger() < iFieldLength) {
+                if (IString(cFieldKey[0]).ToInteger() < iFieldLength) {
                   TableRecord cFileRecordUpdate;
                   TableField cFileFieldUpdate("FileName", TableField::Text, iFieldLength);
                   cFileFieldUpdate = (std::string)cFileTable_Copy[i][0];
@@ -767,7 +767,7 @@ namespace Isis {
   /**
    * Set the keyword/value to use for comparing when using band priority.
    */
-  void ProcessMosaic::SetBandKeyword(iString bandPriorityKeyName, iString bandPriorityKeyValue) {
+  void ProcessMosaic::SetBandKeyword(IString bandPriorityKeyName, IString bandPriorityKeyValue) {
     m_bandPriorityKeyName = bandPriorityKeyName;
     m_bandPriorityKeyValue = bandPriorityKeyValue;
   }
@@ -910,8 +910,8 @@ namespace Isis {
    * Convert an ImageOverlay to a string. This is used to translate between
    *   mapmos, handmos, and automos' interfaces into an ImageOverlay.
    */
-  iString ProcessMosaic::OverlayToString(ImageOverlay imageOverlay) {
-    iString result;
+  IString ProcessMosaic::OverlayToString(ImageOverlay imageOverlay) {
+    IString result;
 
     switch (imageOverlay) {
       case PlaceImagesOnTop:
@@ -936,7 +936,7 @@ namespace Isis {
 
     if (result == "") {
       throw IException(IException::Unknown,
-                       "Cannot convert overlay [" + iString((int)imageOverlay) + "] to a string",
+                       "Cannot convert overlay [" + IString((int)imageOverlay) + "] to a string",
                        _FILEINFO_);
     }
 
@@ -948,8 +948,8 @@ namespace Isis {
    * Convert a string to an ImageOverlay (case-insensitive). This is used to translate between
    *   mapmos, handmos, and automos' interfaces into an ImageOverlay.
    */
-  ProcessMosaic::ImageOverlay ProcessMosaic::StringToOverlay(iString imageOverlayString) {
-    iString imageOverlayStringUpper = imageOverlayString.UpCase();
+  ProcessMosaic::ImageOverlay ProcessMosaic::StringToOverlay(IString imageOverlayString) {
+    IString imageOverlayStringUpper = imageOverlayString.UpCase();
     for (int i = 0; i < NumImageOverlayOptions; i++) {
       if (OverlayToString((ImageOverlay)i).UpCase() == imageOverlayStringUpper)
         return (ImageOverlay)i;
@@ -1237,7 +1237,7 @@ namespace Isis {
       // Check for units and make sure output keyword units value is set to input
       // keyword units value
       if (cOutKey.Unit() != cInKey.Unit()) {
-        cOutKey.SetUnits((iString)(cInKey.Unit()));
+        cOutKey.SetUnits((IString)(cInKey.Unit()));
       }
 
       cOutBin += cOutKey;
@@ -1311,7 +1311,7 @@ namespace Isis {
         cKeyOrigBand = cPvlLabel.FindGroup("BandBin", Pvl::Traverse).FindKeyword("OriginalBand");
       }
       int iSize = cKeyOrigBand.Size();
-      iString buff = m_bandPriorityBandNumber;
+      IString buff = m_bandPriorityBandNumber;
       for (int i = 0; i < iSize; i++) {
         if (buff == cKeyOrigBand[i]) {
           iBandIndex = i + 1; //1 based get band index
@@ -1328,7 +1328,7 @@ namespace Isis {
       }
       int iSize = cKeyName.Size();
       for (int i = 0; i < iSize; i++) {
-        if (iString::Equal(m_bandPriorityKeyValue.c_str(), cKeyName[i].c_str())) {
+        if (IString::Equal(m_bandPriorityKeyValue.c_str(), cKeyName[i].c_str())) {
           iBandIndex = i + 1; //1 based get key value index
           bFound = true;
           break;

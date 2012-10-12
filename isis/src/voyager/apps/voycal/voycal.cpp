@@ -14,7 +14,7 @@
 #include "PvlObject.h"
 #include "SpecialPixel.h"
 #include "UserInterface.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace std;
 using namespace Isis;
@@ -22,7 +22,7 @@ using namespace Isis;
 void calibration(vector<Buffer *> &in,
                  vector<Buffer *> &out);
 PvlObject fetchCoefficients(Pvl &calibration, QList<QString> &hierarchy);
-void checkCoefficient(PvlObject &coefficients, iString keyName);
+void checkCoefficient(PvlObject &coefficients, IString keyName);
 
 // Linearity correction
 bool linear;
@@ -94,12 +94,12 @@ void IsisMain() {
     hierarchy.append(instrument.FindKeyword("SpacecraftName")[0]);
     hierarchy.append(instrument.FindKeyword("InstrumentId")[0]);
     hierarchy.append(
-        iString("ShutterMode" + instrument.FindKeyword("CameraState2")[0]));
+        IString("ShutterMode" + instrument.FindKeyword("CameraState2")[0]));
     hierarchy.append(archive.FindKeyword("MissionPhaseName")[0]);
     hierarchy.append(
-        iString("ScanRate" + instrument.FindKeyword("CameraState1")[0]));
+        IString("ScanRate" + instrument.FindKeyword("CameraState1")[0]));
     hierarchy.append(
-        iString(bandbin["FilterName"][0] + "_" + bandbin["FilterNumber"][0]));
+        IString(bandbin["FilterName"][0] + "_" + bandbin["FilterNumber"][0]));
 
     calib = fetchCoefficients(calibra, hierarchy);
 
@@ -289,7 +289,7 @@ PvlObject fetchCoefficients(Pvl &calibration, QList<QString> &hierarchy) {
   bool validHierarchy = true;
   PvlObject *parent = &calibration;
   for (int o = 0; o < hierarchy.size() && validHierarchy; o++) {
-    iString objectName = hierarchy[o].toStdString();
+    IString objectName = hierarchy[o].toStdString();
 
     if (parent->HasObject(objectName)) {
       // The object named in the hierarchy exists in the calibration file, so
@@ -328,7 +328,7 @@ PvlObject fetchCoefficients(Pvl &calibration, QList<QString> &hierarchy) {
 }
 
 
-void checkCoefficient(PvlObject &coefficients, iString keyName) {
+void checkCoefficient(PvlObject &coefficients, IString keyName) {
   if (!coefficients.HasKeyword(keyName))
     throw IException(
         IException::Programmer,

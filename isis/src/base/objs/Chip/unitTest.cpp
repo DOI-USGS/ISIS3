@@ -7,7 +7,7 @@
 #include "Chip.h"
 #include "Cube.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include "LineManager.h"
 #include "Preference.h"
 #include "SpecialPixel.h"
@@ -22,7 +22,7 @@ using namespace Isis;
 
 int main() {
   Preference::Preferences(true);
-  void ReportError(iString err);
+  void ReportError(IString err);
   Chip chip(51, 50);
   cout << "Test basics" << endl;
   cout << chip.Samples() << endl;
@@ -379,9 +379,9 @@ int main() {
  * @internal
  *   @history 2010-06-15 Jeannie Walldren - Original version.
  */
-void ReportError(iString err) {
-  iString report = ""; // report will be modified error message
-  iString errorLine = ""; // read message one line at a time
+void ReportError(IString err) {
+  IString report = ""; // report will be modified error message
+  IString errorLine = ""; // read message one line at a time
   FileName expandedfile;
   while(err != "") {
     // pull off first line

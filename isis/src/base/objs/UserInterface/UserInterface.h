@@ -196,7 +196,7 @@ namespace Isis {
       void EvaluateOption(const std::string name, const std::string value);
       void GetNextParameter(unsigned int &curPos,
                             std::string &name, std::vector<std::string> &value);
-      std::vector<std::string> ReadArray(iString arrayString);
+      std::vector<std::string> ReadArray(IString arrayString);
 
       //! Boolean value representing whether to abort or continue on error
       bool p_abortOnError;

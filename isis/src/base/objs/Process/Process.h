@@ -77,7 +77,7 @@ namespace Isis {
    *  @history 2003-02-04 Jeff Anderson - Added PropagateLabels method
    *  @history 2003-02-04 Jeff Anderson - Fixed bug in propagation of input labels
    *                                      to output cube
-   *  @history 2003-02-07 Jeff Anderson - Integrated iString class into the Log
+   *  @history 2003-02-07 Jeff Anderson - Integrated IString class into the Log
    *                                      methods
    *  @history 2003-04-23 Jeff Anderson - Made accomodations for the updated
    *                                      Preference class

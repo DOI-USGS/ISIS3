@@ -5,7 +5,7 @@
 #include <QCoreApplication>
 
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "TextFile.h"
 
 
@@ -16,10 +16,10 @@ namespace Isis {
     // Set the Qt plugin directory
     QStringList pluginPaths;
 
-    iString root = getEnvironmentValue("ISISROOT", "");
+    IString root = getEnvironmentValue("ISISROOT", "");
 
     if (root != "") {
-      iString thirdPartyPluginPath = root + "/3rdParty/plugins";
+      IString thirdPartyPluginPath = root + "/3rdParty/plugins";
       pluginPaths << thirdPartyPluginPath.ToQt();
       QCoreApplication::setLibraryPaths(pluginPaths);
     }
@@ -29,7 +29,7 @@ namespace Isis {
   /**
    * @Returns the user name. Returns 'Unknown' if it cannot find the user name.
    */
-  iString Environment::userName() {
+  IString Environment::userName() {
     return getEnvironmentValue("USER", "Unknown");
   }
   
@@ -37,7 +37,7 @@ namespace Isis {
   /**
    * @returns the host name.  Returns 'Unknown' if it cannot find the host name.
    */
-  iString Environment::hostName() {
+  IString Environment::hostName() {
     return getEnvironmentValue("HOST", "Unknown");
   }
   
@@ -49,10 +49,10 @@ namespace Isis {
    *
    * @returns The value for the environment variable requested.
    */
-  iString Environment::getEnvironmentValue(iString variable,
-      iString defaultValue) {
+  IString Environment::getEnvironmentValue(IString variable,
+      IString defaultValue) {
       
-    iString value = defaultValue;
+    IString value = defaultValue;
     
     char *envValue = getenv(variable.c_str());
     if (envValue)
@@ -65,9 +65,9 @@ namespace Isis {
   /**
    * @returns the Isis version in the format isis?.?.?.?qualifier | date
    */
-  iString Environment::isisVersion() {
+  IString Environment::isisVersion() {
     TextFile versionFile("$ISISROOT/version");
-    iString line1, line2, line3, line4;
+    IString line1, line2, line3, line4;
     versionFile.GetLine(line1);
     versionFile.GetLine(line2);
     versionFile.GetLine(line3);
@@ -78,7 +78,7 @@ namespace Isis {
       line1 = validPartOfLine.cap();
     }
     else {
-      iString msg = "$ISISROOT/version line 1, no valid text found";
+      IString msg = "$ISISROOT/version line 1, no valid text found";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -86,7 +86,7 @@ namespace Isis {
       line2 = validPartOfLine.cap();
     }
     else {
-      iString msg = "$ISISROOT/version line 2, no valid text found";
+      IString msg = "$ISISROOT/version line 2, no valid text found";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -94,7 +94,7 @@ namespace Isis {
       line4 = validPartOfLine.cap();
     }
     else {
-      iString msg = "$ISISROOT/version line 4, no valid text found";
+      IString msg = "$ISISROOT/version line 4, no valid text found";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

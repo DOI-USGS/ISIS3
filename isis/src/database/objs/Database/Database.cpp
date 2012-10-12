@@ -25,7 +25,7 @@
 #include "DbProfile.h"
 #include "Database.h"
 #include "DatabaseFactory.h"
-#include "iString.h"
+#include "IString.h"
 
 #include <QStringList>
 #include <QSqlError>
@@ -157,7 +157,7 @@ namespace Isis {
    * @param newName New name of the cloned database (it can't be the same name)
    */
   Database::Database(const QSqlDatabase &other, const std::string &newName) :
-    QSqlDatabase(QSqlDatabase::cloneDatabase(other, iString::ToQt(newName))),
+    QSqlDatabase(QSqlDatabase::cloneDatabase(other, IString::ToQt(newName))),
     _name(newName) {  }
 
 
@@ -467,24 +467,24 @@ namespace Isis {
    */
   void Database::configureAccess(QSqlDatabase &db, const DbProfile &profile) {
     if(profile.exists("Host")) {
-      db.setHostName(iString::ToQt(profile("Host")));
+      db.setHostName(IString::ToQt(profile("Host")));
     }
 
     if(profile.exists("DbName")) {
-      db.setDatabaseName(iString::ToQt(profile("DbName")));
+      db.setDatabaseName(IString::ToQt(profile("DbName")));
     }
 
     if(profile.exists("User")) {
-      db.setUserName(iString::ToQt(profile("User")));
+      db.setUserName(IString::ToQt(profile("User")));
     }
 
     if(profile.exists("Password")) {
-      db.setPassword(iString::ToQt(profile("Password")));
+      db.setPassword(IString::ToQt(profile("Password")));
     }
 
     if(profile.exists("Port")) {
       bool ok;
-      db.setPort(iString::ToQt(profile("Port")).toInt(&ok));
+      db.setPort(IString::ToQt(profile("Port")).toInt(&ok));
       if(!ok) {
         ostringstream mess;
         mess << "Invalid port number [" << profile("Port") << "] in profile "
@@ -494,7 +494,7 @@ namespace Isis {
     }
 
     if(profile.exists("Options")) {
-      db.setConnectOptions(iString::ToQt(profile("Options")));
+      db.setConnectOptions(IString::ToQt(profile("Options")));
     }
     return;
   }
@@ -522,7 +522,7 @@ namespace Isis {
    * @return std::vector<std::string>  List of tables in the database
    */
   std::vector<std::string> Database::getTables() const {
-    return (iString::ToStd(tables(QSql::Tables)));
+    return (IString::ToStd(tables(QSql::Tables)));
   }
 
   /**
@@ -535,7 +535,7 @@ namespace Isis {
    *         database
    */
   std::vector<std::string> Database::getViews() const {
-    return (iString::ToStd(tables(QSql::Views)));
+    return (IString::ToStd(tables(QSql::Views)));
   }
 
   /**
@@ -547,7 +547,7 @@ namespace Isis {
    * @return std::vector<std::string>  List of system tables with the database
    */
   std::vector<std::string> Database::getSystemTables() const {
-    return (iString::ToStd(tables(QSql::SystemTables)));
+    return (IString::ToStd(tables(QSql::SystemTables)));
   }
 
   /**
@@ -562,7 +562,7 @@ namespace Isis {
    */
   void Database::tossDbError(const std::string &message, const char *f, int l) const {
     string errmess = message + " - DatabaseError = " +
-                     iString::ToStd(lastError().text());
+                     IString::ToStd(lastError().text());
     throw IException(IException::Programmer, errmess, f, l);
   }
 

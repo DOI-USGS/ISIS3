@@ -19,7 +19,7 @@
 #include "Cube.h"
 #include "CubeManager.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include "Progress.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
@@ -132,76 +132,76 @@ namespace Isis {
     pStatsGrp += PvlKeyword("EditLockMeasures",  mCNet->GetNumEditLockMeasures());
 
     double dValue = GetAverageResidual();
-    pStatsGrp += PvlKeyword("AvgResidual",       (dValue == Null ? "Null" : iString(dValue)));
+    pStatsGrp += PvlKeyword("AvgResidual",       (dValue == Null ? "Null" : IString(dValue)));
 
     dValue = GetMinimumResidual();
-    pStatsGrp += PvlKeyword("MinResidual",       (dValue == Null ? "Null" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MinResidual",       (dValue == Null ? "Null" : IString(dValue)));
 
     dValue = GetMaximumResidual();
-    pStatsGrp += PvlKeyword("MaxResidual",       (dValue == Null ? "Null" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MaxResidual",       (dValue == Null ? "Null" : IString(dValue)));
 
     dValue = GetMinLineResidual();
-    pStatsGrp += PvlKeyword("MinLineResidual",   (dValue == Null ? "Null" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MinLineResidual",   (dValue == Null ? "Null" : IString(dValue)));
 
     dValue = GetMaxLineResidual();
-    pStatsGrp += PvlKeyword("MaxLineResidual",   (dValue == Null ? "Null" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MaxLineResidual",   (dValue == Null ? "Null" : IString(dValue)));
 
     dValue = GetMinSampleResidual();
-    pStatsGrp += PvlKeyword("MinSampleResidual", (dValue == Null ? "Null" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MinSampleResidual", (dValue == Null ? "Null" : IString(dValue)));
 
     dValue = GetMaxSampleResidual();
-    pStatsGrp += PvlKeyword("MaxSampleResidual", (dValue == Null ? "Null" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MaxSampleResidual", (dValue == Null ? "Null" : IString(dValue)));
 
     // Shifts - Line, Sample, Pixel
     dValue = GetMinLineShift();
-    pStatsGrp += PvlKeyword("MinLineShift",      (dValue == Null ? "Null" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MinLineShift",      (dValue == Null ? "Null" : IString(dValue)));
 
     dValue = GetMaxLineShift();
-    pStatsGrp += PvlKeyword("MaxLineShift",      (dValue == Null ? "Null" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MaxLineShift",      (dValue == Null ? "Null" : IString(dValue)));
 
     dValue = GetMinSampleShift();
-    pStatsGrp += PvlKeyword("MinSampleShift",    (dValue == Null ? "Null" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MinSampleShift",    (dValue == Null ? "Null" : IString(dValue)));
 
     dValue = GetMaxSampleShift();
-    pStatsGrp += PvlKeyword("MaxSampleShift",    (dValue == Null ? "Null" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MaxSampleShift",    (dValue == Null ? "Null" : IString(dValue)));
 
     dValue = GetAvgPixelShift();
-    pStatsGrp += PvlKeyword("AvgPixelShift",     (dValue == Null ? "NA" : iString(dValue)));
+    pStatsGrp += PvlKeyword("AvgPixelShift",     (dValue == Null ? "NA" : IString(dValue)));
 
     dValue = GetMinPixelShift();
-    pStatsGrp += PvlKeyword("MinPixelShift",     (dValue == Null ? "NA" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MinPixelShift",     (dValue == Null ? "NA" : IString(dValue)));
 
     dValue = GetMaxPixelShift();
-    pStatsGrp += PvlKeyword("MaxPixelShift",     (dValue == Null ? "NA" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MaxPixelShift",     (dValue == Null ? "NA" : IString(dValue)));
 
     dValue = mPointDoubleStats[minGFit];
-    pStatsGrp += PvlKeyword("MinGoodnessOfFit",  (dValue == Null ? "NA" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MinGoodnessOfFit",  (dValue == Null ? "NA" : IString(dValue)));
 
     dValue = mPointDoubleStats[maxGFit];
-    pStatsGrp += PvlKeyword("MaxGoodnessOfFit",  (dValue == Null ? "NA" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MaxGoodnessOfFit",  (dValue == Null ? "NA" : IString(dValue)));
 
     dValue = mPointDoubleStats[minEccentricity];
-    pStatsGrp += PvlKeyword("MinEccentricity",   (dValue == Null ? "NA" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MinEccentricity",   (dValue == Null ? "NA" : IString(dValue)));
 
     dValue = mPointDoubleStats[maxEccentricity];
-    pStatsGrp += PvlKeyword("MaxEccentricity",   (dValue == Null ? "NA" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MaxEccentricity",   (dValue == Null ? "NA" : IString(dValue)));
 
     dValue = mPointDoubleStats[minPixelZScore];
-    pStatsGrp += PvlKeyword("MinPixelZScore",    (dValue == Null ? "NA" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MinPixelZScore",    (dValue == Null ? "NA" : IString(dValue)));
 
     dValue = mPointDoubleStats[maxPixelZScore];
-    pStatsGrp += PvlKeyword("MaxPixelZScore",    (dValue == Null ? "NA" : iString(dValue)));
+    pStatsGrp += PvlKeyword("MaxPixelZScore",    (dValue == Null ? "NA" : IString(dValue)));
 
     // Convex Hull
     if (mSerialNumList.Size()) {
       dValue = mConvexHullRatioStats.Minimum();
-      pStatsGrp += PvlKeyword("MinConvexHullRatio", (dValue == Null ? "Null" : iString(dValue)));
+      pStatsGrp += PvlKeyword("MinConvexHullRatio", (dValue == Null ? "Null" : IString(dValue)));
 
       dValue = mConvexHullRatioStats.Maximum();
-      pStatsGrp += PvlKeyword("MaxConvexHullRatio", (dValue == Null ? "Null" : iString(dValue)));
+      pStatsGrp += PvlKeyword("MaxConvexHullRatio", (dValue == Null ? "Null" : IString(dValue)));
 
       dValue = mConvexHullRatioStats.Average();
-      pStatsGrp += PvlKeyword("AvgConvexHullRatio", (dValue == Null ? "Null" : iString(dValue)));
+      pStatsGrp += PvlKeyword("AvgConvexHullRatio", (dValue == Null ? "Null" : IString(dValue)));
     }
   }
 
@@ -235,7 +235,7 @@ namespace Isis {
       vector<double> imgStats(numImageStats, 0);
 
       // Open the cube to get the dimensions
-      iString sn = node->getSerialNumber();
+      IString sn = node->getSerialNumber();
       Cube *cube = cubeMgr.OpenCube(mSerialNumList.FileName(sn));
 
       mSerialNumMap[sn] = true;

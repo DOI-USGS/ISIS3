@@ -3,7 +3,7 @@
 #include "UserInterface.h"
 #include "FileName.h"
 #include "Pvl.h"
-#include "iString.h"
+#include "IString.h"
 #include "IException.h"
 #include "iTime.h"
 #include "Apollo.h"
@@ -20,12 +20,12 @@ bool FindCode();
 void CalculateTransform();
 void RefineCodeLocation();
 void TranslateCode();
-void TranslateApolloLabels (iString filename, Cube *pack);
+void TranslateApolloLabels (IString filename, Cube *pack);
 bool IsValidCode();
-iString FrameTime();
+IString FrameTime();
 int Altitude();
 double ShutterInterval();
-iString FMC();
+IString FMC();
 
 int codeSample, codeLine;
 bool code[4][32];
@@ -33,7 +33,7 @@ bool codeFound = true;
 
 Cube cube;
 Apollo *apollo;
-iString utcTime;
+IString utcTime;
 
 int RADIUS = 46;
 double rotation, sampleTranslation, lineTranslation;
@@ -47,7 +47,7 @@ void IsisMain() {
 
   p.SetPdsFile(inFile.expanded(), "", pdsLabel);
 
-  iString filename = FileName(ui.GetFileName("FROM")).baseName();
+  IString filename = FileName(ui.GetFileName("FROM")).baseName();
   FileName toFile = ui.GetFileName("TO");
   
   apollo = new Apollo(filename);
@@ -217,7 +217,7 @@ void TranslateCode() {
 // Populate cube label using filname and film code
 // Code decrypted as specified in film decoder document (July 23, 1971 Revision)
 //     available at ASU Apollo Resources archive
-void TranslateApolloLabels (iString filename, Cube *opack) {
+void TranslateApolloLabels (IString filename, Cube *opack) {
   //Instrument group
   PvlGroup inst("Instrument");
   PvlGroup kern("Kernels");
@@ -231,7 +231,7 @@ void TranslateApolloLabels (iString filename, Cube *opack) {
     PvlGroup error("ERROR");
     error.AddComment("The decrypted code is invalid.");
     for (int i=0; i<4; i++) {
-      PvlKeyword keyword("Column"+iString(i+1));
+      PvlKeyword keyword("Column"+IString(i+1));
       for (int j=0; j<32; j++) {
         keyword += code[i][j];
       }
@@ -250,7 +250,7 @@ void TranslateApolloLabels (iString filename, Cube *opack) {
     }
     
     for (int i=0; i<4; i++) {
-      PvlKeyword keyword("Column"+iString(i+1));
+      PvlKeyword keyword("Column"+IString(i+1));
       for (int j=0; j<32; j++) {
         keyword += code[i][j];
       }
@@ -270,8 +270,8 @@ void TranslateApolloLabels (iString filename, Cube *opack) {
   Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
   Process p;
   PvlTranslationTable tTable(
-      (iString)p.MissionData("base", "translations/MissionName2DataDir.trn"));
-  iString missionDir = dataDir[tTable.Translate("MissionName", apollo->SpacecraftName())][0];
+      (IString)p.MissionData("base", "translations/MissionName2DataDir.trn"));
+  IString missionDir = dataDir[tTable.Translate("MissionName", apollo->SpacecraftName())][0];
   Pvl resTemplate(missionDir + "/reseaus/" + apollo->InstrumentId() + "_NOMINAL.pvl");
   PvlGroup *reseaus = &resTemplate.FindGroup("Reseaus");
   
@@ -306,7 +306,7 @@ bool IsValidCode() {
                                                    !code[3][22] || !code[3][23] || !code[3][24] || !code[3][25] || !code[3][26] || !code[3][27] || !code[3][28] || !code[3][30] || code[3][31]));
 }
 
-iString FrameTime() {
+IString FrameTime() {
   iTime launch = apollo->LaunchDate();
     int year = launch.Year(),
         month = launch.Month(),
@@ -362,17 +362,17 @@ iString FrameTime() {
       month += 1;
     }
   
-    iString sTime = iString(year) + "-";
+    IString sTime = IString(year) + "-";
     if (month < 10) sTime += "0";
-    sTime += iString(month)+ "-";
+    sTime += IString(month)+ "-";
     if (days <10) sTime += "0";
-    sTime += iString(days) + "T";
+    sTime += IString(days) + "T";
     if (hours <10) sTime += "0";
-    sTime += iString(hours) + ":";
+    sTime += IString(hours) + ":";
     if (minutes <10) sTime += "0";
-    sTime += iString(minutes) + ":";
+    sTime += IString(minutes) + ":";
     if (seconds <10) sTime += "0";
-    sTime += iString(seconds);
+    sTime += IString(seconds);
     
     return sTime;
 }
@@ -394,7 +394,7 @@ double ShutterInterval() {
   return 0.1*shutterInterval;
 }
 
-iString FMC() {
+IString FMC() {
   if (code[3][29]) return "True";
   return "False";
 }

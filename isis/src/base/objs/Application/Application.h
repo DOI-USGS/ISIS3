@@ -117,7 +117,7 @@ namespace Isis {
       static void GuiLog(Pvl &results);
       static void GuiLog(PvlGroup &results);
       static void GuiLog(std::string &results);
-      static iString Name();
+      static IString Name();
 
       /**
        * @param helpers
@@ -135,10 +135,10 @@ namespace Isis {
 
       void GuiReportError(IException &e);
 
-      static iString UserName();
-      static iString HostName();
-      static iString DateTime(time_t *curtime = 0);
-      static iString Version();
+      static IString UserName();
+      static IString HostName();
+      static IString DateTime(time_t *curtime = 0);
+      static IString Version();
 
       static bool HasParent();
 
@@ -165,8 +165,8 @@ namespace Isis {
 
       static Isis::PvlGroup GetUnameInfo();
       static Isis::PvlGroup GetEnviromentInfo();
-      static Isis::iString GetSystemDiskSpace();
-      static Isis::iString GetLibraryDependencies(iString file);
+      static Isis::IString GetSystemDiskSpace();
+      static Isis::IString GetLibraryDependencies(IString file);
 
       friend class Gui;
       void FunctionCleanup();
@@ -189,7 +189,7 @@ namespace Isis {
 
       pid_t p_pid;                                //!<
       std::map<std::string, void *> p_guiHelpers; //!<
-      static iString p_appName;                   //!<
+      static IString p_appName;                   //!<
   };
 
   extern Application *iApp;

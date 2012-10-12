@@ -25,7 +25,7 @@
 #include "FileName.h"
 #include "Message.h"
 #include "TextFile.h"
-#include "iString.h"
+#include "IString.h"
 
 #include <iostream>
 
@@ -76,7 +76,7 @@ namespace Isis {
    *                 AppendOpens file for Append: Read / Write - Creates file,
    *                 Appends if file exists. Defaults to "input"
    *
-   * @param lines iString Vector to fill if reading or put to file if writing
+   * @param lines IString Vector to fill if reading or put to file if writing
    *
    * @param maxLinesToReadWrite Limits the maximum lines read or written; 0=read
    *                            entire file or write entire vectorDefaults to 0
@@ -259,7 +259,7 @@ namespace Isis {
 
     //  input, output, overwrite, append
 
-    string chkOpenmode = Isis::iString(openmode).DownCase();
+    string chkOpenmode = Isis::IString(openmode).DownCase();
     if(chkOpenmode == "input")      {
       p_openmode = 1;
     }
@@ -519,7 +519,7 @@ namespace Isis {
   /**
    * Writes string to file and appends a 'newline' string. See SetNewLine method.
    *
-   * @param line iString to be written to file. Defaults to ""
+   * @param line IString to be written to file. Defaults to ""
    */
   void TextFile::PutLine(const std::string &line) {
     PutLine(line.c_str());
@@ -560,7 +560,7 @@ namespace Isis {
    * Writes string to file,  prepends a 'comment' string and appends a 'newline'
    * string.  See SetComment method and SetNewLine method.
    *
-   * @param line iString to be written to file.Defaults to ""
+   * @param line IString to be written to file.Defaults to ""
    */
   void TextFile::PutLineComment(const std::string &line) {
     PutLine(p_commentString + line);

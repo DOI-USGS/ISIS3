@@ -166,7 +166,7 @@ void IsisMain() {
     dataSetID += "0";
   }
   else {
-    string msg = "[" + iString(nbits) + "] is not a supported bit length.";
+    string msg = "[" + IString(nbits) + "] is not a supported bit length.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   dataSetID += "-CDR-CALDATA-V1.0";
@@ -262,7 +262,7 @@ void IsisMain() {
 
     try {
       if(darkStripMean.Size() > 0) {
-        darkStripMean[0] = iString(SetRound(darkStripMean[0], 16));
+        darkStripMean[0] = IString(SetRound(darkStripMean[0], 16));
       }
     }
     catch(IException &) {
@@ -342,7 +342,7 @@ void IsisMain() {
 
   //  Now address nested keywords in SUBFRAME groups
   for(int i = 1 ; i <= 5 ; i++) {
-    iString n(i);
+    IString n(i);
     string group = "SUBFRAME" + n + "_PARAMETERS";
     if(pdsLabel.HasGroup(group)) {
       PvlGroup &grp = pdsLabel.FindGroup(group);

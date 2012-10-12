@@ -26,7 +26,7 @@
 #include "Preference.h"
 
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "SpecialPixel.h"
 
@@ -201,7 +201,7 @@ namespace Isis {
    * @return string
    */
   string iTime::YearString() const {
-    Isis::iString sYear(Year());
+    Isis::IString sYear(Year());
     return sYear;
   }
 
@@ -215,7 +215,7 @@ namespace Isis {
 
     // Populate the private year member
     timout_c(p_et, "YYYY", 5, out);
-    return iString(out).ToInteger();
+    return IString(out).ToInteger();
   }
 
   /**
@@ -224,7 +224,7 @@ namespace Isis {
    * @return string
    */
   string iTime::MonthString() const {
-    Isis::iString sMonth(Month());
+    Isis::IString sMonth(Month());
     return sMonth;
   }
 
@@ -238,7 +238,7 @@ namespace Isis {
 
     // Populate the private year member
     timout_c(p_et, "MM", 3, out);
-    return iString(out).ToInteger();
+    return IString(out).ToInteger();
   }
 
   /**
@@ -247,7 +247,7 @@ namespace Isis {
    * @return string
    */
   string iTime::DayString() const {
-    Isis::iString sDay(Day());
+    Isis::IString sDay(Day());
     return sDay;
   }
 
@@ -261,7 +261,7 @@ namespace Isis {
 
     // Populate the private year member
     timout_c(p_et, "DD", 3, out);
-    return iString(out).ToInteger();
+    return IString(out).ToInteger();
   }
 
   /**
@@ -270,7 +270,7 @@ namespace Isis {
    * @return string
    */
   string iTime::HourString() const {
-    Isis::iString sHour(Hour());
+    Isis::IString sHour(Hour());
     return sHour;
   }
 
@@ -284,7 +284,7 @@ namespace Isis {
 
     // Populate the private year member
     timout_c(p_et, "HR", 3, out);
-    return iString(out).ToInteger();
+    return IString(out).ToInteger();
   }
 
   /**
@@ -293,7 +293,7 @@ namespace Isis {
    * @return string
    */
   string iTime::MinuteString() const {
-    Isis::iString sMinute(Minute());
+    Isis::IString sMinute(Minute());
     return sMinute;
   }
 
@@ -307,7 +307,7 @@ namespace Isis {
 
     // Populate the private year member
     timout_c(p_et, "MN", 3, out);
-    return iString(out).ToInteger();
+    return IString(out).ToInteger();
   }
 
   /**
@@ -319,7 +319,7 @@ namespace Isis {
     ostringstream osec;
     osec.setf(ios::fixed);
     osec << setprecision(8) << Second();
-    iString sSeconds(osec.str());
+    IString sSeconds(osec.str());
     sSeconds.TrimTail("0");
     sSeconds.TrimTail(".");
     if(sSeconds.empty()) sSeconds = "0";
@@ -336,7 +336,7 @@ namespace Isis {
 
     // Populate the private year member
     timout_c(p_et, "SC.#######::RND", 256, out);
-    return iString(out).ToDouble();
+    return IString(out).ToDouble();
   }
 
   /**
@@ -345,7 +345,7 @@ namespace Isis {
    * @return string
    */
   string iTime::DayOfYearString() const {
-    Isis::iString sDayOfYear(DayOfYear());
+    Isis::IString sDayOfYear(DayOfYear());
     return sDayOfYear;
   }
 
@@ -359,7 +359,7 @@ namespace Isis {
 
     // Populate the private year member
     timout_c(p_et, "DOY", 4, out);
-    return iString(out).ToInteger();
+    return IString(out).ToInteger();
   }
 
   /**
@@ -369,7 +369,7 @@ namespace Isis {
    * @return string
    */
   string iTime::EtString() const {
-    Isis::iString sEt(p_et);
+    Isis::IString sEt(p_et);
     return sEt;
   }
 
@@ -405,7 +405,7 @@ namespace Isis {
       p_et = 0.0;
   }
 
-  void iTime::setUtc(iString utcString) {
+  void iTime::setUtc(IString utcString) {
     LoadLeapSecondKernel();
 
     double et;

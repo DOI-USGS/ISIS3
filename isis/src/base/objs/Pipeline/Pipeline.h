@@ -25,7 +25,7 @@
 
 #include <vector>
 
-#include "iString.h"
+#include "IString.h"
 #include "PipelineApplication.h"
 
 using namespace std;
@@ -134,7 +134,7 @@ namespace Isis {
    *            application names, branched original input, branching from
    *            branches, partial branch merging (discontinuing branches*)
    *   @history 2008-10-28 The input no longer has to have virtual bands if the
-   *            SetInputFile(iString,iString) has an empty parameter name for the
+   *            SetInputFile(IString,IString) has an empty parameter name for the
    *            virtual bands parameter. SetInputListFile(...) method added.
    *   @history 2008-12-19 List files are now fully supported, along with output
    *            list files.
@@ -152,26 +152,26 @@ namespace Isis {
    */
   class Pipeline {
     public:
-      Pipeline(const iString &procAppName = "");
+      Pipeline(const IString &procAppName = "");
       ~Pipeline();
 
       void Prepare();
       void Run();
 
       void SetInputFile(const char *inputParam);
-      void SetInputFile(const iString &inputParam);
+      void SetInputFile(const IString &inputParam);
       void SetInputFile(const char *inputParam, const char *virtualBandsParam);
-      void SetInputFile(const iString &inputParam, const iString &virtualBandsParam);
+      void SetInputFile(const IString &inputParam, const IString &virtualBandsParam);
       void SetInputListFile(const char *inputParam);
-      void SetInputListFile(const iString &inputParam);
+      void SetInputListFile(const IString &inputParam);
       void SetInputFile(const FileName &inputFileName);
       void SetInputListFile(const FileName &inputFileName);
 
       void SetOutputFile(const char *outputParam);
-      void SetOutputFile(const iString &outputParam);
+      void SetOutputFile(const IString &outputParam);
       void SetOutputFile(const FileName &outputFile);
       void SetOutputListFile(const char *outputFileNameParam);
-      void SetOutputListFile(const iString &outputFileNameParam);
+      void SetOutputListFile(const IString &outputFileNameParam);
       void SetOutputListFile(const FileName &outputFileNameList);
       void KeepTemporaryFiles(bool keep);
       //! Returns true if temporary files will not be deleted, false if they will
@@ -180,18 +180,18 @@ namespace Isis {
       }
 
       void AddPause();
-      void AddToPipeline(const iString &appname);
-      void AddToPipeline(const iString &appname, const iString &identifier);
-      PipelineApplication &Application(const iString &identifier);
+      void AddToPipeline(const IString &appname);
+      void AddToPipeline(const IString &appname, const IString &identifier);
+      PipelineApplication &Application(const IString &identifier);
       PipelineApplication &Application(const int &index);
 
-      void SetFirstApplication(const iString &appname);
-      void SetLastApplication(const iString &appname);
+      void SetFirstApplication(const IString &appname);
+      void SetLastApplication(const IString &appname);
 
       friend ostream &operator<<(ostream &os, Pipeline &pipeline);
 
       //! Returns the name of the pipeline
-      iString Name() const {
+      IString Name() const {
         return p_procAppName;
       }
       //! Returns the number of applications in the pipeline
@@ -204,9 +204,9 @@ namespace Isis {
        *
        * @param branch Branch of the original input to get the filename from
        *
-       * @return iString Name of the original input file
+       * @return IString Name of the original input file
        */
-      iString OriginalInput(unsigned int branch) {
+      IString OriginalInput(unsigned int branch) {
         return ((branch < p_originalInput.size()) ? p_originalInput[branch] : "");
       }
       
@@ -232,15 +232,15 @@ namespace Isis {
       
       //! Returns the names of the original branches of the pipeline 
       //! (input files * branches if any)
-      vector<iString> OriginalBranches() {
+      vector<IString> OriginalBranches() {
         if (p_originalBranches.size() > 0){
           return p_originalBranches;
         }
         return p_inputBranches;
       }
       
-      iString FinalOutput(int branch = 0, bool addModifiers = true);
-      iString TemporaryFolder();
+      IString FinalOutput(int branch = 0, bool addModifiers = true);
+      IString TemporaryFolder();
 
       void EnableAllApplications();
       
@@ -251,7 +251,7 @@ namespace Isis {
        * 
        * @param branch - Branch name to be added
        */
-      void AddOriginalBranch(iString branch){
+      void AddOriginalBranch(IString branch){
         int size = (int)p_inputBranches.size();
         if (size == 1) {
           p_originalBranches.push_back(branch);
@@ -276,16 +276,16 @@ namespace Isis {
 
     private:
       int p_pausePosition;
-      iString p_procAppName; //!< The name of the pipeline
-      vector<iString> p_originalInput; //!< The original input file
-      vector<iString> p_inputBranches; //!< Branches for input list
-      vector<iString> p_originalBranches; //!< The input file(s) + original branches from pipeline
-      vector<iString> p_finalOutput; //!< The final output file (empty if needs calculated)
-      vector<iString> p_virtualBands;//!< The virtual bands string
+      IString p_procAppName; //!< The name of the pipeline
+      vector<IString> p_originalInput; //!< The original input file
+      vector<IString> p_inputBranches; //!< Branches for input list
+      vector<IString> p_originalBranches; //!< The input file(s) + original branches from pipeline
+      vector<IString> p_finalOutput; //!< The final output file (empty if needs calculated)
+      vector<IString> p_virtualBands;//!< The virtual bands string
       bool p_keepTemporary; //!< True if keeping temporary files
       bool p_addedCubeatt; //!< True if the "cubeatt" program was added
       vector< PipelineApplication * > p_apps; //!< The pipeline applications
-      vector< iString > p_appIdentifiers; //!< The strings to identify the pipeline applications
+      vector< IString > p_appIdentifiers; //!< The strings to identify the pipeline applications
       bool p_outputListNeedsModifiers;
       bool p_continue; //!< continue the execution even if exception is encountered.
   };

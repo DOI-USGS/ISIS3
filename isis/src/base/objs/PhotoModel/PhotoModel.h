@@ -200,7 +200,7 @@ namespace Isis {
       double p_photoTant;
       double p_photoSr;
       double p_photoOsr;
-      iString p_algName;
+      IString p_algName;
       std::string p_photo0B0Standard;
       double p_photoWh;
       double p_photoHh;

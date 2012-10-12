@@ -95,7 +95,7 @@ namespace Isis {
 
       //Processors
       void fromPvl(const PvlObject &obj);
-      iString projectPvlObjectName() const;
+      IString projectPvlObjectName() const;
       PvlObject toPvl() const;
 
     signals:

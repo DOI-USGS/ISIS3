@@ -51,7 +51,7 @@ void IsisMain() {
     if(temp["INSTRUMENT_ID"][0] != "HRSC") throw IException();
   }
   catch(IException &e) {
-    iString msg = "File [" + ui.GetFileName("FROM") +
+    IString msg = "File [" + ui.GetFileName("FROM") +
                   "] does not appear to be a Mars Express HRSC image.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -225,7 +225,7 @@ void WriteOutput(Isis::Buffer &buf) {
 void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {
   // Get the directory where the MRO HiRISE translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  iString transDir = (string) dataDir["Mex"] + "/translations/";
+  IString transDir = (string) dataDir["Mex"] + "/translations/";
 
   // Translate the Instrument group
   FileName transFile(transDir + "hrscInstrument.trn");
@@ -240,11 +240,11 @@ void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {
   }
 
   // Remove 'Z' from times
-  iString startTime = outLabel.FindGroup("Instrument", Pvl::Traverse)["StartTime"][0];
+  IString startTime = outLabel.FindGroup("Instrument", Pvl::Traverse)["StartTime"][0];
   startTime = startTime.substr(0, startTime.size() - 1);
   outLabel.FindGroup("Instrument", Pvl::Traverse)["StartTime"] = startTime;
 
-  iString stopTime = outLabel.FindGroup("Instrument", Pvl::Traverse)["StopTime"][0];
+  IString stopTime = outLabel.FindGroup("Instrument", Pvl::Traverse)["StopTime"][0];
   stopTime = stopTime.substr(0, stopTime.size() - 1);
   outLabel.FindGroup("Instrument", Pvl::Traverse)["StopTime"] = stopTime;
 

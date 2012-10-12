@@ -68,11 +68,11 @@ void IsisMain() {
     PvlKeyword lutKeyword = pdsLab["LRO:LOOKUP_CONVERSION_TABLE"];
 
     for(int i = 0; i < lutKeyword.Size(); i ++) {
-      iString lutPair = lutKeyword[i];
+      IString lutPair = lutKeyword[i];
       lutPair.ConvertWhiteSpace();
       lutPair.Remove("() ");
-      iString outValueMin = lutPair.Token(" ,");
-      iString outValueMax = lutPair.Token(" ,");
+      IString outValueMin = lutPair.Token(" ,");
+      IString outValueMax = lutPair.Token(" ,");
       lookupTable.AddPair(i, ((double)outValueMin + (double)outValueMax) / 2.0);
     }
   }
@@ -458,7 +458,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
 
   // Get the directory where the translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  iString transDir = (string) dataDir["Lro"] + "/translations/";
+  IString transDir = (string) dataDir["Lro"] + "/translations/";
 
   // Translate the in
   FileName transFile(transDir + "lrowacInstrument.trn");
@@ -671,62 +671,62 @@ void ValidateInputLabels(Pvl &pdsLab) {
     PvlKeyword &lut = pdsLab["LRO:LOOKUP_CONVERSION_TABLE"];
 
     if(lut.Size() != 256) {
-      iString msg = "Keyword [LRO:LOOKUP_CONVERSION_TABLE] has the wrong number of values";
+      IString msg = "Keyword [LRO:LOOKUP_CONVERSION_TABLE] has the wrong number of values";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     PvlKeyword &missionName = pdsLab["MISSION_NAME"];
 
     if(missionName.Size() != 1 || missionName[0] != "LUNAR RECONNAISSANCE ORBITER") {
-      iString msg = "Keyword [MISSION_NAME] does not have a value of [LUNAR RECONNAISSANCER ORBITER]";
+      IString msg = "Keyword [MISSION_NAME] does not have a value of [LUNAR RECONNAISSANCER ORBITER]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     PvlKeyword &instrumentId = pdsLab["INSTRUMENT_ID"];
 
     if(instrumentId.Size() != 1 || instrumentId[0] != "LROC") {
-      iString msg = "Keyword [INSTRUMENT_ID] does not have a value of [LROC]";
+      IString msg = "Keyword [INSTRUMENT_ID] does not have a value of [LROC]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     // Make sure CENTER_FILTER_WAVELENGTH/FILTER_NUMBER makes sense
     if(pdsLab["FILTER_NUMBER"].Size() != pdsLab["CENTER_FILTER_WAVELENGTH"].Size()) {
-      iString msg = "Keywords [FILTER_NUMBER,CENTER_FILTER_WAVELENGTH] must have the same number of values";
+      IString msg = "Keywords [FILTER_NUMBER,CENTER_FILTER_WAVELENGTH] must have the same number of values";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     if(pdsLab["INSTRUMENT_MODE_ID"][0] == "BW" && pdsLab["FILTER_NUMBER"].Size() != 1) {
-      iString msg = "Keyword [FILTER_NUMBER] must have size 1 if [INSTRUMENT_MODE_ID] is [BW]";
+      IString msg = "Keyword [FILTER_NUMBER] must have size 1 if [INSTRUMENT_MODE_ID] is [BW]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     else if(pdsLab["INSTRUMENT_MODE_ID"][0] == "COLOR" && (pdsLab["FILTER_NUMBER"].Size() < 5
             || pdsLab["FILTER_NUMBER"].Size() > 7 || pdsLab["FILTER_NUMBER"].Size() == 6)) {
-      iString msg = "Keyword [FILTER_NUMBER] must have size 5 or 7 if [INSTRUMENT_MODE_ID] is [COLOR]";
+      IString msg = "Keyword [FILTER_NUMBER] must have size 5 or 7 if [INSTRUMENT_MODE_ID] is [COLOR]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     else if(pdsLab["INSTRUMENT_MODE_ID"][0] == "UV" && pdsLab["FILTER_NUMBER"].Size() != 2) {
-      iString msg = "Keyword [FILTER_NUMBER] must have size 2 if [INSTRUMENT_MODE_ID] is [UV]";
+      IString msg = "Keyword [FILTER_NUMBER] must have size 2 if [INSTRUMENT_MODE_ID] is [UV]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     else if(pdsLab["INSTRUMENT_MODE_ID"][0] == "VIS" && pdsLab["FILTER_NUMBER"].Size() != 5) {
-      iString msg = "Keyword [FILTER_NUMBER] must have size 5 if [INSTRUMENT_MODE_ID] is [VIS]";
+      IString msg = "Keyword [FILTER_NUMBER] must have size 5 if [INSTRUMENT_MODE_ID] is [VIS]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     else if(pdsLab["INSTRUMENT_MODE_ID"][0] != "BW" && pdsLab["INSTRUMENT_MODE_ID"][0] != "COLOR" &&
             pdsLab["INSTRUMENT_MODE_ID"][0] != "UV" && pdsLab["INSTRUMENT_MODE_ID"][0] != "VIS") {
-      iString msg = "The value of keyword [INSTRUMENT_MODE_ID] is not recognized";
+      IString msg = "The value of keyword [INSTRUMENT_MODE_ID] is not recognized";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     // number/bandwidth matches for filters
-    vector< pair<int, iString> > filters;
-    filters.push_back(pair<int, iString>(1, "321"));
-    filters.push_back(pair<int, iString>(2, "360"));
-    filters.push_back(pair<int, iString>(3, "415"));
-    filters.push_back(pair<int, iString>(4, "566"));
-    filters.push_back(pair<int, iString>(5, "604"));
-    filters.push_back(pair<int, iString>(6, "643"));
-    filters.push_back(pair<int, iString>(7, "689"));
+    vector< pair<int, IString> > filters;
+    filters.push_back(pair<int, IString>(1, "321"));
+    filters.push_back(pair<int, IString>(2, "360"));
+    filters.push_back(pair<int, IString>(3, "415"));
+    filters.push_back(pair<int, IString>(4, "566"));
+    filters.push_back(pair<int, IString>(5, "604"));
+    filters.push_back(pair<int, IString>(6, "643"));
+    filters.push_back(pair<int, IString>(7, "689"));
 
     for(int i = 0; i < pdsLab["FILTER_NUMBER"].Size(); i++) {
       bool found = false;
@@ -740,24 +740,24 @@ void ValidateInputLabels(Pvl &pdsLab) {
       }
 
       if(found && !match) {
-        iString msg = "The [FILTER_NUMBER] and [CENTER_FILTER_WAVELENGTH] keywords do not correspond properly";
+        IString msg = "The [FILTER_NUMBER] and [CENTER_FILTER_WAVELENGTH] keywords do not correspond properly";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
       if(!found) {
-        iString msg = "The value of the keyword [FILTER_NUMBER] is invalid";
+        IString msg = "The value of the keyword [FILTER_NUMBER] is invalid";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
 
     // Now make sure keywords that shouldn't exist dont
-    iString invalidKeywords[] = {
+    IString invalidKeywords[] = {
       "SPACECRAFT_CLOCK_CNT_PARTITION"
     };
 
-    for(unsigned int i = 0; i < sizeof(iString) / sizeof(invalidKeywords); i++) {
+    for(unsigned int i = 0; i < sizeof(IString) / sizeof(invalidKeywords); i++) {
       if(pdsLab.HasKeyword(invalidKeywords[i])) {
-        iString msg = "Keyword [";
+        IString msg = "Keyword [";
         msg += invalidKeywords[i];
         msg += "] must not exist";
         throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -769,13 +769,13 @@ void ValidateInputLabels(Pvl &pdsLab) {
     QRegExp integerRegex("[0-9]+");
 
     if(orbitNumber.Size() != 1 || !integerRegex.exactMatch(orbitNumber[0])) {
-      iString msg = "The value of keyword [ORBIT_NUMBER] is not valid";
+      IString msg = "The value of keyword [ORBIT_NUMBER] is not valid";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     // Check for keywords that must be doubles or integers
     QRegExp numberRegex("[-+]{0,1}([0-9]*\\.[0-9]+)|([0-9]+\\.[0-9]*)|([0-9]+)");
-    iString numericKeywords[] = {
+    IString numericKeywords[] = {
       "LRO:BEGIN_TEMPERATURE_SCS",
       "LRO:MIDDLE_TEMPERATURE_SCS",
       "LRO:END_TEMPERATURE_SCS",
@@ -786,9 +786,9 @@ void ValidateInputLabels(Pvl &pdsLab) {
       "EXPOSURE_DURATION"
     };
 
-    for(unsigned int i = 0; i < sizeof(numericKeywords) / sizeof(iString); i++) {
+    for(unsigned int i = 0; i < sizeof(numericKeywords) / sizeof(IString); i++) {
       if(pdsLab[numericKeywords[i]].Size() != 1 || !numberRegex.exactMatch(pdsLab[numericKeywords[i]][0])) {
-        iString msg = "The value of keyword [";
+        IString msg = "The value of keyword [";
         msg += numericKeywords[i];
         msg += "] is not valid";
         throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -797,14 +797,14 @@ void ValidateInputLabels(Pvl &pdsLab) {
 
     // Now check for keywords that must be dateTtime
     QRegExp timeRegex("[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]*");
-    iString timeKeywords[] = {
+    IString timeKeywords[] = {
       "START_TIME",
       "STOP_TIME"
     };
 
-    for(unsigned int i = 0; i < sizeof(timeKeywords) / sizeof(iString); i++) {
+    for(unsigned int i = 0; i < sizeof(timeKeywords) / sizeof(IString); i++) {
       if(pdsLab[timeKeywords[i]].Size() != 1 || !timeRegex.exactMatch(pdsLab[timeKeywords[i]][0])) {
-        iString msg = "The value of keyword [";
+        IString msg = "The value of keyword [";
         msg += timeKeywords[i];
         msg += "] is not valid";
         throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -813,14 +813,14 @@ void ValidateInputLabels(Pvl &pdsLab) {
 
     // Now check keywords that must be clock counts
     QRegExp clockRegex("[0-9]+/[0-9]+:[0-9]+\\.{0,1}[0-9]*");
-    iString clockKeywords[] = {
+    IString clockKeywords[] = {
       "SPACECRAFT_CLOCK_START_COUNT",
       "SPACECRAFT_CLOCK_STOP_COUNT"
     };
 
-    for(unsigned int i = 0; i < sizeof(clockKeywords) / sizeof(iString); i++) {
+    for(unsigned int i = 0; i < sizeof(clockKeywords) / sizeof(IString); i++) {
       if(pdsLab[clockKeywords[i]].Size() != 1 || !clockRegex.exactMatch(pdsLab[clockKeywords[i]][0])) {
-        iString msg = "The value of keyword [";
+        IString msg = "The value of keyword [";
         msg += clockKeywords[i];
         msg += "] is not valid";
         throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -828,7 +828,7 @@ void ValidateInputLabels(Pvl &pdsLab) {
     }
   }
   catch(IException &e) {
-    iString msg = "The input product is out of date and has invalid labels. Please get an up to date version from the ASU LROC Team";
+    IString msg = "The input product is out of date and has invalid labels. Please get an up to date version from the ASU LROC Team";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
 }

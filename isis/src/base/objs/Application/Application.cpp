@@ -47,7 +47,7 @@ extern int errno;
 #include "CubeManager.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Gui.h"  //is this still used?
 #include "Message.h"
 #include "Preference.h"
@@ -100,7 +100,7 @@ namespace Isis {
     putenv(env);
 
     // Verify ISISROOT was set
-    if (getenv("ISISROOT") == NULL || iString(getenv("ISISROOT")) == "") {
+    if (getenv("ISISROOT") == NULL || IString(getenv("ISISROOT")) == "") {
       string message = "Please set ISISROOT before running any Isis "
           "applications";
       cerr << message << endl;
@@ -150,8 +150,8 @@ namespace Isis {
     if (GetUserInterface().ParentId()) {
       p_connectionToParent = new QLocalSocket;
 
-      iString serverName = "isis_" + UserName() +
-          "_" + iString(iApp->GetUserInterface().ParentId());
+      IString serverName = "isis_" + UserName() +
+          "_" + IString(iApp->GetUserInterface().ParentId());
 
       p_connectionToParent->connectToServer(serverName);
       if (!p_connectionToParent->waitForConnected()) {
@@ -496,10 +496,10 @@ namespace Isis {
       const string &message) {
     // See if we need to connect to the parent
     if (p_connectionToParent == NULL) {
-      iString msg = "This process (program) was executed by an existing Isis 3 "
+      IString msg = "This process (program) was executed by an existing Isis 3 "
           "process. However, we failed to establish a communication channel "
           "with the parent (launcher) process. The parent process has a PID of "
-          "[" + iString(iApp->GetUserInterface().ParentId()) + "]";
+          "[" + IString(iApp->GetUserInterface().ParentId()) + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
@@ -511,11 +511,11 @@ namespace Isis {
     data += '\n';
 
     if (p_connectionToParent->write(data.c_str(), data.size()) == -1) {
-      iString msg = "This process (program) was executed by an exiting Isis 3 "
+      IString msg = "This process (program) was executed by an exiting Isis 3 "
           "process. A communication channel was established with the parent "
           "(launcher) process, but when we tried to send data to the parent "
           "process an error occurred. The parent process has a PID of [" +
-          iString(iApp->GetUserInterface().ParentId()) + "]";
+          IString(iApp->GetUserInterface().ParentId()) + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
@@ -555,7 +555,7 @@ namespace Isis {
     if (p_ui->GetInfoFlag()) {
       string filename = p_ui->GetInfoFileName();
       Pvl log;
-      iString app = (iString)QCoreApplication::applicationDirPath() + "/" + p_appName;
+      IString app = (IString)QCoreApplication::applicationDirPath() + "/" + p_appName;
       if (p_BatchlistPass == 0) {
         stringstream ss ;
         ss << SessionLog::TheLog();
@@ -641,7 +641,7 @@ namespace Isis {
     if (p_ui->GetInfoFlag()) {
       string filename = p_ui->GetInfoFileName();
       Pvl log;
-      iString app = (iString)QCoreApplication::applicationDirPath() + "/" + p_appName;
+      IString app = (IString)QCoreApplication::applicationDirPath() + "/" + p_appName;
       if (p_BatchlistPass == 0) {
         stringstream ss ;
         ss << SessionLog::TheLog();
@@ -702,7 +702,7 @@ namespace Isis {
    * @param e The Isis::iException
    */
   void Application::GuiReportError(IException &e) {
-    iString errorMessage = e.toString();
+    IString errorMessage = e.toString();
     if (errorMessage == "") {
       p_ui->TheGui()->ProgressText("Stopped");
     }
@@ -715,14 +715,14 @@ namespace Isis {
       exit(0);
   }
 
-  iString Application::p_appName("Unknown"); //!<
+  IString Application::p_appName("Unknown"); //!<
   /**
    * Returns the name of the application.  Returns 'Unknown' if the application
    * or gui equal NULL
    *
    * @return string The application name
    */
-  iString Application::Name() {
+  IString Application::Name() {
     return p_appName;
   }
 
@@ -757,7 +757,7 @@ namespace Isis {
    */
   void Application::UpdateProgress(int percent, bool print) {
     if (HasParent() && print) {
-      string data = iString(percent);
+      string data = IString(percent);
       iApp->SendParentData(string("PROGRESS"), data);
     }
     else if (p_ui->IsInteractive()) {
@@ -795,7 +795,7 @@ namespace Isis {
    *
    * @return string The date and time
    */
-  iString Application::DateTime(time_t *curtime) {
+  IString Application::DateTime(time_t *curtime) {
     time_t startTime = time(NULL);
     if (curtime != 0) *curtime = startTime;
     struct tm *tmbuf = localtime(&startTime);
@@ -809,7 +809,7 @@ namespace Isis {
    *
    * @return string User Name
    */
-  iString Application::UserName() {
+  IString Application::UserName() {
     return userName();
   }
 
@@ -818,16 +818,16 @@ namespace Isis {
    *
    * @return string Host Name
    */
-  iString Application::HostName() {
+  IString Application::HostName() {
     return hostName();
   }
 
   /**
    * The Isis Version for this application.
-   * @return @b iString
+   * @return @b IString
    *
    */
-  iString Application::Version() {
+  IString Application::Version() {
     return isisVersion();
   }
 
@@ -840,7 +840,7 @@ namespace Isis {
   PvlGroup Application::GetUnameInfo() {
     // Create a temporary file to store console output to
     FileName temp = FileName::createTempFile("$temporary/UnameConsoleInfo.txt");
-    iString tempFile = temp.expanded();
+    IString tempFile = temp.expanded();
 
     // Uname commands output to temp file with each of the following
     // values on its own line in this order:
@@ -920,7 +920,7 @@ namespace Isis {
   PvlGroup Application::GetEnviromentInfo() {
     // Create a temporary file to store console output to
     FileName temp = FileName::createTempFile("$temporary/EnviromentInfo.txt");
-    iString tempFile = temp.expanded();
+    IString tempFile = temp.expanded();
     PvlGroup envGroup("EnviromentVariables");
     ifstream readTemp;
 
@@ -949,7 +949,7 @@ namespace Isis {
     envGroup.AddKeyword(PvlKeyword("ISIS3DATA", value));
 
     // remove temp file and return
-    iString cleanup = "rm -f " + tempFile;
+    IString cleanup = "rm -f " + tempFile;
     ProgramLauncher::RunSystemCommand(cleanup);
     return envGroup;
   }
@@ -957,17 +957,17 @@ namespace Isis {
   /**
    * Runs df to see the disk space availability
    *
-   * @return iString containing df results
+   * @return IString containing df results
    */
-  iString Application::GetSystemDiskSpace() {
+  IString Application::GetSystemDiskSpace() {
     FileName temp = FileName::createTempFile("$temporary/SystemDiskSpace.txt");
-    iString tempFile = temp.expanded();
+    IString tempFile = temp.expanded();
     ifstream readTemp;
     string diskspace = "df >| " + tempFile;
     ProgramLauncher::RunSystemCommand(diskspace);
     readTemp.open(tempFile.c_str(), ifstream::in);
 
-    iString results = "";
+    IString results = "";
     char tmp[512];
     while (!readTemp.eof()) {
       readTemp.getline(tmp, 512);
@@ -976,7 +976,7 @@ namespace Isis {
     }
 
     // remove temp file and return
-    iString cleanup = "rm -f " + tempFile;
+    IString cleanup = "rm -f " + tempFile;
     ProgramLauncher::RunSystemCommand(cleanup);
     return results;
   }
@@ -984,11 +984,11 @@ namespace Isis {
   /**
    * Runs ldd on linux and sun and otool on macs to get information about the applicaiton run
    *
-   * @return iString containing application information
+   * @return IString containing application information
    */
-  iString Application::GetLibraryDependencies(iString file) {
+  IString Application::GetLibraryDependencies(IString file) {
     FileName temp = FileName::createTempFile("$temporary/LibraryDependencies.txt");
-    iString tempFile = temp.expanded();
+    IString tempFile = temp.expanded();
     ifstream readTemp;
     string dependencies = "";
 #if defined(__linux__)
@@ -1001,7 +1001,7 @@ namespace Isis {
     ProgramLauncher::RunSystemCommand(dependencies);
     readTemp.open(tempFile.c_str(), ifstream::in);
 
-    iString results = "";
+    IString results = "";
     char tmp[512];
     while (!readTemp.eof()) {
       readTemp.getline(tmp, 512);
@@ -1010,7 +1010,7 @@ namespace Isis {
     }
 
     // remove temp file and return
-    iString cleanup = "rm -f " + tempFile;
+    IString cleanup = "rm -f " + tempFile;
     ProgramLauncher::RunSystemCommand(cleanup);
     return results;
   }

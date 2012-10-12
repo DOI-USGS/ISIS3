@@ -30,7 +30,7 @@
 #include "IException.h"
 #include "IsisAml.h"
 #include "IsisXMLChTrans.h"
-#include "iString.h"
+#include "IString.h"
 #include "Preference.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -306,7 +306,7 @@ void IsisAml::PutInteger(const string &paramName,
   }
 
   param->values.clear();
-  param->values.push_back(Isis::iString(value));
+  param->values.push_back(Isis::IString(value));
 
   Verify(param);
 }
@@ -348,7 +348,7 @@ void IsisAml::PutInteger(const string &paramName,
 
   param->values.resize(value.size());
   for(unsigned int i = 0; i < value.size(); i++) {
-    param->values[i] = Isis::iString(value[i]);
+    param->values[i] = Isis::IString(value[i]);
   }
 
   Verify(param);
@@ -392,7 +392,7 @@ void IsisAml::PutDouble(const string &paramName,
   }
 
   param->values.clear();
-  param->values.push_back(Isis::iString(value));
+  param->values.push_back(Isis::IString(value));
 
   Verify(param);
 }
@@ -434,7 +434,7 @@ void IsisAml::PutDouble(const string &paramName,
 
   param->values.resize(value.size());
   for(unsigned int i = 0; i < value.size(); i++) {
-    param->values[i] = Isis::iString(value[i]);
+    param->values[i] = Isis::IString(value[i]);
   }
 
   Verify(param);
@@ -620,7 +620,7 @@ void IsisAml::GetAsString(const string &paramName,
  *
  * @return The value of the parameter.
  */
-Isis::iString IsisAml::GetFileName(const string &paramName, string extension) const {
+Isis::IString IsisAml::GetFileName(const string &paramName, string extension) const {
 
   const IsisParameterData *param = ReturnParam(paramName);
 
@@ -708,7 +708,7 @@ void IsisAml::GetFileName(const string &paramName,
 string IsisAml::GetString(const string &paramName) const {
 
   const IsisParameterData *param = ReturnParam(paramName);
-  Isis::iString value;
+  Isis::IString value;
 
   if(param->type != "string" && param->type != "combo") {
     string message = "Parameter [" + paramName + "] is not a string.";
@@ -732,7 +732,7 @@ string IsisAml::GetString(const string &paramName) const {
       value = value.UpCase();
       int found = -1;
       for(unsigned int p = 0; p < param->listOptions.size(); p++) {
-        Isis::iString option = param->listOptions[p].value;
+        Isis::IString option = param->listOptions[p].value;
         option = option.UpCase();
         if(value == option) {
           return value;
@@ -823,7 +823,7 @@ int IsisAml::GetInteger(const string &paramName) const {
     throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
-  Isis::iString value;
+  Isis::IString value;
   if(param->values.size() == 0) {
     if(param->defaultValues.size() == 0) {
       string message = "Parameter [" + paramName + "] has no value.";
@@ -864,7 +864,7 @@ void IsisAml::GetInteger(const string &paramName,
   }
 
   values.clear();
-  Isis::iString value;
+  Isis::IString value;
   if(param->values.size() == 0) {
     if(param->defaultValues.size() == 0) {
       string message = "Parameter [" + paramName + "] has no value.";
@@ -907,7 +907,7 @@ double IsisAml::GetDouble(const string &paramName) const {
     throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
-  Isis::iString value;
+  Isis::IString value;
   if(param->values.size() == 0) {
     if(param->defaultValues.size() == 0) {
       string message = "Parameter [" + paramName + "] has no value.";
@@ -947,7 +947,7 @@ void IsisAml::GetDouble(const string &paramName,
   }
 
   values.clear();
-  Isis::iString value;
+  Isis::IString value;
   if(param->values.size() == 0) {
     if(param->defaultValues.size() == 0) {
       string message = "Parameter [" + paramName + "] has no value.";
@@ -989,7 +989,7 @@ bool IsisAml::GetBoolean(const string &paramName) const {
     throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
   }
 
-  Isis::iString value;
+  Isis::IString value;
   if(param->values.size() == 0) {
     if(param->defaultValues.size() == 0) {
       string message = "Parameter [" + paramName + "] has no value.";
@@ -1032,7 +1032,7 @@ void IsisAml::GetBoolean(const string &paramName,
 
   values.clear();
   vector <string> value;
-  Isis::iString tmp;
+  Isis::IString tmp;
   if(param->values.size() == 0) {
     if(param->defaultValues.size() == 0) {
       string message = "Parameter [" + paramName + "] has no value.";
@@ -1123,7 +1123,7 @@ string IsisAml::GroupName(const int &index) const {
  */
 int IsisAml::GroupIndex(const string & grpName) const {
   for(int i=0; i<(int)groups.size(); i++) {
-    if(Isis::iString(grpName).DownCase() == Isis::iString(groups[i].name).DownCase()) {
+    if(Isis::IString(grpName).DownCase() == Isis::IString(groups[i].name).DownCase()) {
       return i;
     }
   }
@@ -1163,7 +1163,7 @@ void IsisAml::CreatePVL(Isis::Pvl &pvlDef , string guiGrpName, string pvlObjName
     string paramName = ParamName(grpIndex, i);
 
     if(IsParamInPvlInclude(paramName,include)) {
-      Isis::iString paramType = Isis::iString(ParamType(grpIndex, i)).DownCase();
+      Isis::IString paramType = Isis::IString(ParamType(grpIndex, i)).DownCase();
       if(paramType == "double") {
         grp += Isis::PvlKeyword(paramName, GetDouble(paramName));
       }
@@ -1203,7 +1203,7 @@ void IsisAml::CreatePVL(Isis::Pvl &pvlDef , string guiGrpName, string pvlObjName
 bool IsisAml::IsParamInPvlInclude(string & paramName, vector<string> & include) {
 
   for(int i=0; i<(int)include.size(); i++) {
-    if(Isis::iString(paramName).DownCase() == Isis::iString(include[i]).DownCase()) {
+    if(Isis::IString(paramName).DownCase() == Isis::IString(include[i]).DownCase()) {
       return true;
     }
   }
@@ -1975,12 +1975,12 @@ Isis::CubeAttributeOutput &IsisAml::GetOutputAttribute(const string &paramName) 
  * @throws iException::User (Unknown Parameter)
  */
 const IsisParameterData *IsisAml::ReturnParam(const string &paramName) const {
-  Isis::iString pn = paramName;
+  Isis::IString pn = paramName;
   pn.UpCase();
   int found = 0;
   bool exact = false;
   const IsisParameterData *param = NULL;
-  Isis::iString cur_pn;
+  Isis::IString cur_pn;
 
   for(unsigned int g = 0; g < groups.size(); g++) {
     for(unsigned int p = 0; p < groups[g].parameters.size(); p++) {
@@ -2032,7 +2032,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
   for(unsigned int i = 0; i < param->values.size(); i++) {
     if(param->type == "integer") {
       try {
-        Isis::iString value(param->values[i]);
+        Isis::IString value(param->values[i]);
         value.ToInteger();
       }
       catch(Isis::IException &e) {
@@ -2043,7 +2043,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
     }
     else if(param->type == "double") {
       try {
-        Isis::iString value(param->values[i]);
+        Isis::IString value(param->values[i]);
         value.ToDouble();
       }
       catch(Isis::IException &e) {
@@ -2053,7 +2053,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
       }
     }
     else if(param->type == "boolean") {
-      Isis::iString v = param->values[i];
+      Isis::IString v = param->values[i];
       v.UpCase();
 
       try {
@@ -2067,7 +2067,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
     else if(param->type == "filename") {
       // If this is an output file and a file with this name already exists,
       // check user filename customization preferences.
-      Isis::iString value(param->values[i]);
+      Isis::IString value(param->values[i]);
       Isis::FileName name(value);
       value = name.expanded();
       if(name.fileExists() && param->fileMode == "output") {
@@ -2078,7 +2078,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
     // 2010-07-15 Jeannie Walldren
     //
     //  else if(param->type == "cube") {
-    //    Isis::iString value(param->values[i]);
+    //    Isis::IString value(param->values[i]);
     //    Isis::FileName name(value);
     //    value = name.expanded();
     //    if (name.Exists() && param->fileMode == "output"
@@ -2097,7 +2097,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
       // correct type
       if(param->type == "integer") {
         try {
-          Isis::iString value(param->defaultValues[i]);
+          Isis::IString value(param->defaultValues[i]);
           value.ToInteger();
         }
         catch(Isis::IException &e) {
@@ -2108,7 +2108,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
       }
       else if(param->type == "double") {
         try {
-          Isis::iString value(param->defaultValues[i]);
+          Isis::IString value(param->defaultValues[i]);
           value.ToDouble();
         }
         catch(Isis::IException &e) {
@@ -2118,7 +2118,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
         }
       }
       else if(param->type == "boolean") {
-        Isis::iString v = param->defaultValues[i];
+        Isis::IString v = param->defaultValues[i];
         v.UpCase();
 
         try {
@@ -2132,7 +2132,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
       }
       else if(param->type == "filename") {
         // Put something here once we figure out what to do with filenames
-        Isis::iString value(param->defaultValues[i]);
+        Isis::IString value(param->defaultValues[i]);
         Isis::FileName name(value);
         value = name.expanded();
         if(name.fileExists() && param->fileMode == "output") {
@@ -2145,12 +2145,12 @@ void IsisAml::Verify(const IsisParameterData *param) {
   // Check the values against the values list if there is one
   if(param->listOptions.size() > 0) {
     for(unsigned int i = 0; i < param->values.size(); i++) {
-      Isis::iString value = param->values[i];
+      Isis::IString value = param->values[i];
       value = value.UpCase();
       int partial = 0;
       bool exact = false;
       for(unsigned int p = 0; p < param->listOptions.size(); p++) {
-        Isis::iString option = param->listOptions[p].value;
+        Isis::IString option = param->listOptions[p].value;
         option = option.UpCase();
         // Check to see if the value matches the list option exactly
         if(value == option) {
@@ -2190,10 +2190,10 @@ void IsisAml::Verify(const IsisParameterData *param) {
 
   // Check the values against the minimum
   if(param->minimum.length() > 0) {
-    Isis::iString incl = param->minimum_inclusive;
+    Isis::IString incl = param->minimum_inclusive;
     for(unsigned int i = 0; i < param->values.size(); i++) {
       if(param->type == "integer") {
-        Isis::iString value(param->values[i]);
+        Isis::IString value(param->values[i]);
         int temp = value.ToInteger();
         value = param->minimum;
         int min = value.ToInteger();
@@ -2209,7 +2209,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
         }
       }
       else if(param->type == "double") {
-        Isis::iString value(param->values[i]);
+        Isis::IString value(param->values[i]);
         double temp = value.ToDouble();
         value = param->minimum;
         double min = value.ToDouble();
@@ -2228,7 +2228,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
     if(param->values.size() == 0) {
       for(unsigned int i = 0; i < param->defaultValues.size(); i++) {
         if(param->type == "integer") {
-          Isis::iString value(param->defaultValues[i]);
+          Isis::IString value(param->defaultValues[i]);
           int temp = value.ToInteger();
           value = param->minimum;
           int min = value.ToInteger();
@@ -2244,7 +2244,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
           }
         }
         else if(param->type == "double") {
-          Isis::iString value(param->defaultValues[i]);
+          Isis::IString value(param->defaultValues[i]);
           double temp = value.ToDouble();
           value = param->minimum;
           double min = value.ToDouble();
@@ -2265,11 +2265,11 @@ void IsisAml::Verify(const IsisParameterData *param) {
 
   // Check the values against the maximum
   if(param->maximum.length() > 0) {
-    Isis::iString incl = param->maximum_inclusive;
+    Isis::IString incl = param->maximum_inclusive;
     incl.DownCase();
     for(unsigned int i = 0; i < param->values.size(); i++) {
       if(param->type == "integer") {
-        Isis::iString value(param->values[i]);
+        Isis::IString value(param->values[i]);
         int temp = value.ToInteger();
         value = param->maximum;
         int max = value.ToInteger();
@@ -2285,7 +2285,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
         }
       }
       else if(param->type == "double") {
-        Isis::iString value(param->values[i]);
+        Isis::IString value(param->values[i]);
         double temp = value.ToDouble();
         value = param->maximum;
         double max = value.ToDouble();
@@ -2304,7 +2304,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
     if(param->values.size() == 0) {
       for(unsigned int i = 0; i < param->defaultValues.size(); i++) {
         if(param->type == "integer") {
-          Isis::iString value(param->defaultValues[i]);
+          Isis::IString value(param->defaultValues[i]);
           int temp = value.ToInteger();
           value = param->maximum;
           int max = value.ToInteger();
@@ -2320,7 +2320,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
           }
         }
         else if(param->type == "double") {
-          Isis::iString value(param->defaultValues[i]);
+          Isis::IString value(param->defaultValues[i]);
           double temp = value.ToDouble();
           value = param->maximum;
           double max = value.ToDouble();
@@ -2340,7 +2340,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
   }
 
   // Check the value for an odd test
-  Isis::iString odd = param->odd;
+  Isis::IString odd = param->odd;
   odd.DownCase();
 
   if((odd != "") || StringToBool(odd)) {
@@ -2351,7 +2351,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
     }
     else {
       for(unsigned int i = 0; i < param->values.size(); i++) {
-        Isis::iString value(param->values[i]);
+        Isis::IString value(param->values[i]);
         if((value.ToInteger() % 2) != 1) {
           string message = "Value for [" + param->name + "] must be odd.";
           throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
@@ -2382,7 +2382,7 @@ void IsisAml::Verify(const IsisParameterData *param) {
  */
 void IsisAml::CheckFileNamePreference(string filename, string paramname) {
   Isis::PvlGroup fileCustomization = Isis::Preference::Preferences().FindGroup("FileCustomization");
-  Isis::iString overwritePreference = fileCustomization.FindKeyword("Overwrite")[0];
+  Isis::IString overwritePreference = fileCustomization.FindKeyword("Overwrite")[0];
   overwritePreference.ConvertWhiteSpace();
   overwritePreference.Compress();
   overwritePreference.Trim(" ");
@@ -2714,7 +2714,7 @@ void IsisAml::VerifyAll() {
       // the excluded parameter has NO value
       if(((param->values.size() > 0) || (param->defaultValues.size())) > 0) {
         for(unsigned int o2 = 0; o2 < param->listOptions.size(); o2++) {
-          Isis::iString value, option;
+          Isis::IString value, option;
           if(param->type == "string"  || param->type == "combo") {
             value = GetString(param->name);
             value = value.UpCase();
@@ -2747,7 +2747,7 @@ void IsisAml::VerifyAll() {
       // the included parameter has a value
       if(((param->values.size() > 0) || (param->defaultValues.size())) > 0) {
         for(unsigned int o2 = 0; o2 < param->listOptions.size(); o2++) {
-          Isis::iString value, option;
+          Isis::IString value, option;
           if(param->type == "string"  || param->type == "combo") {
             value = GetString(param->name);
             value = value.UpCase();
@@ -2883,7 +2883,7 @@ void IsisAml::VerifyAll() {
  *
  * @throws iException::Programmer (Invalid boolean value)
  */
-bool IsisAml::StringToBool(Isis::iString value) const {
+bool IsisAml::StringToBool(Isis::IString value) const {
 
   value.UpCase();
   if(value == "") {
@@ -2965,7 +2965,7 @@ void IsisAml::CommandLine(Isis::Pvl &cont) const {
 
       if(((param->values.size() > 0) || (param->defaultValues.size())) > 0) {
         for(unsigned int o2 = 0; o2 < param->listOptions.size(); o2++) {
-          Isis::iString value, option;
+          Isis::IString value, option;
           if(param->type == "string"  || param->type == "combo") {
             value = GetAsString(param->name);
             value = value.UpCase();

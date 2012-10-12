@@ -28,7 +28,7 @@
 
 #include <QObject>
 
-#include "iString.h"
+#include "IString.h"
 #include "SurfacePoint.h"
 
 template< typename A, typename B > class QHash;
@@ -209,7 +209,7 @@ namespace Isis {
    *                           operator now relies on QVector's comparison
    *                           operator instead of looping itself. Added private
    *                           helper methods:
-   *                             int FindMeasureIndex(iString serialNumber)
+   *                             int FindMeasureIndex(IString serialNumber)
    *                                 const
    *                             void PointModified();
    *                           Updated documentation extensively. Removed
@@ -429,7 +429,7 @@ namespace Isis {
 
       ControlPoint();
       ControlPoint(const ControlPoint &);
-      ControlPoint(const iString &id);
+      ControlPoint(const IString &id);
       ControlPoint(const ControlPointFileEntryV0002 &fileEntry,
           const Distance &majorRad, const Distance &minorRad,
           const Distance &polarRad);
@@ -441,12 +441,12 @@ namespace Isis {
 
       void Add(ControlMeasure *measure);
       int Delete(ControlMeasure *measure);
-      int Delete(iString serialNumber);
+      int Delete(IString serialNumber);
       int Delete(int index);
       Status ResetApriori();
 
-      const ControlMeasure *GetMeasure(iString serialNumber) const;
-      ControlMeasure *GetMeasure(iString serialNumber);
+      const ControlMeasure *GetMeasure(IString serialNumber) const;
+      ControlMeasure *GetMeasure(IString serialNumber);
 
       const ControlMeasure *GetMeasure(int index) const;
       ControlMeasure *GetMeasure(int index);
@@ -454,23 +454,23 @@ namespace Isis {
       const ControlMeasure *GetRefMeasure() const;
       ControlMeasure *GetRefMeasure();
 
-      Status SetChooserName(iString name);
-      Status SetDateTime(iString newDateTime);
+      Status SetChooserName(IString name);
+      Status SetDateTime(IString newDateTime);
       Status SetEditLock(bool editLock);
-      Status SetId(iString id);
+      Status SetId(IString id);
       Status SetRefMeasure(ControlMeasure *cm);
       Status SetRefMeasure(int index);
-      Status SetRefMeasure(iString sn);
+      Status SetRefMeasure(IString sn);
       Status SetRejected(bool rejected);
       Status SetIgnored(bool newIgnoreStatus);
       Status SetAdjustedSurfacePoint(SurfacePoint newSurfacePoint);
       Status SetType(PointType newType);
 
       Status SetAprioriRadiusSource(RadiusSource::Source source);
-      Status SetAprioriRadiusSourceFile(iString sourceFile);
+      Status SetAprioriRadiusSourceFile(IString sourceFile);
       Status SetAprioriSurfacePoint(SurfacePoint aprioriSP);
       Status SetAprioriSurfacePointSource(SurfacePointSource::Source source);
-      Status SetAprioriSurfacePointSourceFile(iString sourceFile);
+      Status SetAprioriSurfacePointSourceFile(IString sourceFile);
 
 //    Status UpdateSphericalPointCoordinates(const Latitude &lat, const Longitude &lon,
 //                                      const Distance &radius);
@@ -481,11 +481,11 @@ namespace Isis {
 
       SurfacePoint GetAdjustedSurfacePoint() const;
       SurfacePoint GetBestSurfacePoint() const;
-      iString GetChooserName() const;
-      iString GetDateTime() const;
+      IString GetChooserName() const;
+      IString GetDateTime() const;
       bool IsEditLocked() const;
       bool IsRejected() const;
-      iString GetId() const;
+      IString GetId() const;
       bool IsIgnored() const;
       bool IsValid() const;
       bool IsInvalid() const;
@@ -498,31 +498,31 @@ namespace Isis {
       bool IsRadiusConstrained();
       int NumberOfConstrainedCoordinates();
 
-      static iString PointTypeToString(PointType type);
-      static PointType StringToPointType(iString pointTypeString);
+      static IString PointTypeToString(PointType type);
+      static PointType StringToPointType(IString pointTypeString);
 
-      iString GetPointTypeString() const;
+      IString GetPointTypeString() const;
       PointType GetType() const;
 
-      static iString RadiusSourceToString(RadiusSource::Source source);
+      static IString RadiusSourceToString(RadiusSource::Source source);
       static RadiusSource::Source StringToRadiusSource(QString str);
-      iString GetRadiusSourceString() const;
-      static iString SurfacePointSourceToString(SurfacePointSource::Source source);
+      IString GetRadiusSourceString() const;
+      static IString SurfacePointSourceToString(SurfacePointSource::Source source);
       static SurfacePointSource::Source StringToSurfacePointSource(QString str);
-      iString GetSurfacePointSourceString() const;
+      IString GetSurfacePointSourceString() const;
 
       SurfacePoint GetAprioriSurfacePoint() const;
       RadiusSource::Source GetAprioriRadiusSource() const;
-      iString GetAprioriRadiusSourceFile() const;
+      IString GetAprioriRadiusSourceFile() const;
       SurfacePointSource::Source GetAprioriSurfacePointSource() const;
-      iString GetAprioriSurfacePointSourceFile() const;
+      IString GetAprioriSurfacePointSourceFile() const;
 
       int GetNumMeasures() const;
       int GetNumValidMeasures() const;
       int GetNumLockedMeasures() const;
-      bool HasSerialNumber(iString serialNumber) const;
+      bool HasSerialNumber(IString serialNumber) const;
       int IndexOf(ControlMeasure *, bool throws = true) const;
-      int IndexOf(iString sn, bool throws = true) const;
+      int IndexOf(IString sn, bool throws = true) const;
       int IndexOfRefMeasure() const;
       bool IsReferenceExplicit() const;
       QString GetReferenceSN() const;
@@ -533,8 +533,8 @@ namespace Isis {
       QList< ControlMeasure * > getMeasures(bool excludeIgnored = false) const;
       QList< QString > getCubeSerialNumbers() const;
 
-      const ControlMeasure *operator[](iString serialNumber) const;
-      ControlMeasure *operator[](iString serialNumber);
+      const ControlMeasure *operator[](IString serialNumber) const;
+      ControlMeasure *operator[](IString serialNumber);
 
       const ControlMeasure *operator[](int index) const;
       ControlMeasure *operator[](int index);
@@ -556,7 +556,7 @@ namespace Isis {
 
     private:
       void SetExplicitReference(ControlMeasure *measure);
-      void ValidateMeasure(iString serialNumber) const;
+      void ValidateMeasure(IString serialNumber) const;
       void AddMeasure(ControlMeasure *measure);
       void PointModified();
 
@@ -576,7 +576,7 @@ namespace Isis {
        *   identifier for control points. This often has a number in it, and
        *   looks like "T0052" where the next one is "T0053" and so on.
        */
-      iString id;
+      IString id;
 
       /**
        * This is the user name of the person who last modified this control
@@ -586,13 +586,13 @@ namespace Isis {
        *   be updated. This is an empty string if we need to dynamically
        *   get the username of the caller when asked for (or written to file).
        */
-      iString chooserName;
+      IString chooserName;
 
       /**
        * This is the last modified date and time. This is updated automatically
        *   and works virtually in the same way as chooserName.
        */
-      iString dateTime;
+      IString dateTime;
 
       /**
        * What this control point is tying together.
@@ -643,7 +643,7 @@ namespace Isis {
       SurfacePointSource::Source aprioriSurfacePointSource;
 
       //! FileName where the apriori surface point originated from
-      iString aprioriSurfacePointSourceFile;
+      IString aprioriSurfacePointSourceFile;
 
       /**
        * Where the apriori surface point's radius originated from, most commonly
@@ -654,7 +654,7 @@ namespace Isis {
       /**
        * The name of the file that derives the apriori surface point's radius
        */
-      iString aprioriRadiusSourceFile;
+      IString aprioriRadiusSourceFile;
 
       /**
        * The apriori surface point. This is the "known truth" or trustworthy

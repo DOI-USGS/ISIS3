@@ -278,14 +278,14 @@ namespace Isis {
       if (!IsSpecial(a) && !IsSpecial(b)) {
         canDeriveEquation = true;
         m_equationLabel->setText(
-            iString("y = " + iString(b) + "x + " + iString(a)).ToQt());
+            IString("y = " + IString(b) + "x + " + IString(a)).ToQt());
 
         double correlation = m_curveMultivariateStats->Correlation();
 
         if (!IsSpecial(correlation)) {
-          m_correlationLabel->setText(iString(correlation).ToQt());
+          m_correlationLabel->setText(IString(correlation).ToQt());
           m_determinationLabel->setText(
-              iString(correlation * correlation).ToQt());
+              IString(correlation * correlation).ToQt());
         }
         else {
           m_correlationLabel->setText("Undefined");

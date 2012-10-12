@@ -266,7 +266,7 @@ namespace Isis {
 
       for (int band = 1; band <= Bands(); band++) {
         if (HasOverlap(band)) {
-          iString bandNum(band);
+          IString bandNum(band);
           std::string bandStr = "LinearRegression" + bandNum;
           PvlKeyword LinReg(bandStr);
           double a, b;

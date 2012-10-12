@@ -26,7 +26,7 @@
 #include "Message.h"
 #include "CisscalFile.h"
 #include "TextFile.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace std;
 namespace Isis {

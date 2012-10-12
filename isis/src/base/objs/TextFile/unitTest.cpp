@@ -1,7 +1,7 @@
 #include "TextFile.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Preference.h"
 #include <iostream>
 #include <stdio.h>
@@ -12,7 +12,7 @@ using namespace Isis;
 
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
-  void ReportError(iString err);
+  void ReportError(IString err);
 
   cout << "Unit test for TextFile" << endl << endl;
 
@@ -120,9 +120,9 @@ int main(int argc, char *argv[]) {
 
     for(int i = 0; i <= 19; i++) {                       // compare data read to orig data
       if(linesIn[i] != testLines[i]) {
-        cout << " *** Failed iString Comparison Test *** " << endl;
+        cout << " *** Failed IString Comparison Test *** " << endl;
         cout << i
-             << " Original iString =>" << testLines[i]
+             << " Original IString =>" << testLines[i]
              << "<= Vector read =>"   << linesIn[i]
              << "<=" << endl;
       }
@@ -535,9 +535,9 @@ int main(int argc, char *argv[]) {
  * @internal
  *   @history 2011-08-05 Jeannie Backer - Copied from Cube class.
  */
-void ReportError(iString err) {
-  iString report = ""; // report will be modified error message
-  iString errorLine = ""; // read message one line at a time
+void ReportError(IString err) {
+  IString report = ""; // report will be modified error message
+  IString errorLine = ""; // read message one line at a time
   FileName expandedfile;
   while(err != "") {
     // pull off first line
@@ -554,7 +554,7 @@ void ReportError(iString err) {
           // read entire path into FileName object
           expandedfile = errorLine.Token("]");
           // only keep the name of the immediate directory
-          iString path = expandedfile.originalPath();
+          IString path = expandedfile.originalPath();
           while (path.find("/") != string::npos) {
             path.Token("/");
           }

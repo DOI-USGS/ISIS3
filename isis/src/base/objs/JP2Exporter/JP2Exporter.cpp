@@ -84,7 +84,7 @@ namespace Isis {
         break;
       default:
         throw IException(IException::Programmer,
-            "Invalid pixel type for data [" + iString(type) + "]",
+            "Invalid pixel type for data [" + IString(type) + "]",
             _FILEINFO_);
     }
   }
@@ -111,7 +111,7 @@ namespace Isis {
    *
    * @return True if "jp2", false otherwise
    */
-  bool JP2Exporter::canWriteFormat(iString format) {
+  bool JP2Exporter::canWriteFormat(IString format) {
     return format == "jp2";
   }
 };

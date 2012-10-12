@@ -26,7 +26,7 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  iString output;
+  IString output;
   if(ui.WasEntered("TO")) {
     output = ui.GetFileName("TO");
   }
@@ -36,7 +36,7 @@ void IsisMain() {
 
   Pvl inputFile;
 
-  iString paramaters = "FROM=" + input.expanded();
+  IString paramaters = "FROM=" + input.expanded();
   paramaters += " TO=" + output;
 
   ProcessImportPds p;
@@ -54,7 +54,7 @@ void TranslateMerEdrLabels(FileName &labelFile, Cube *ocube) {
 
   // Get the directory where the MER translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  iString transDir = (string) dataDir["Mer"];
+  IString transDir = (string) dataDir["Mer"];
   transDir = transDir + "/" + "translations/";
 
   // Get a filename for the MESSENGER EDR label
@@ -109,11 +109,11 @@ void MiFixLab(PvlGroup &instGroup) {
 
   //Code to remove "Z" from the StartTime and StopTime keywords
   //StartTime code
-  iString Newstarttime = (string)instGroup.FindKeyword("StartTime");
+  IString Newstarttime = (string)instGroup.FindKeyword("StartTime");
   Newstarttime.Remove("Z");
   instGroup.FindKeyword("StartTime").SetValue(Newstarttime);
   //StopTime code
-  iString Newstoptime = (string)instGroup.FindKeyword("StopTime");
+  IString Newstoptime = (string)instGroup.FindKeyword("StopTime");
   Newstoptime.Remove("Z");
   instGroup.FindKeyword("StopTime").SetValue(Newstoptime);
 }

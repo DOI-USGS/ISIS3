@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 
-#include "iString.h"
+#include "IString.h"
 #include "Module.h"
 #include "NumericalApproximation.h"
 #include "SpecialPixel.h"
@@ -84,7 +84,7 @@ namespace Isis {
       int   _filled;         //!< Number values replaced
 
       std::string formHistory() {
-        iString cfilled(_filled);
+        IString cfilled(_filled);
         return (std::string("SplineFill(Cubic,Filled[" + cfilled + "])"));
       }
 

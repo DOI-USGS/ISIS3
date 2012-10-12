@@ -22,7 +22,7 @@
 #include <string>
 #include "Statistics.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace std;
 namespace Isis {
@@ -135,8 +135,8 @@ namespace Isis {
 
     if(p_validMaximum < p_validMinimum) {
       // get the min and max DN values in the chosen range
-      iString sMin(minimum);
-      iString sMax(maximum);
+      IString sMin(minimum);
+      IString sMax(maximum);
       std::string m = "Invalid Range: Minimum [" + sMin + "] must be less than the Maximum [" + sMax + "]";
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
@@ -448,7 +448,7 @@ namespace Isis {
       if(value == Maximum()) return 0;
       else {
         string m = "Undefined Z-score. Standard deviation is zero and";
-        m += " the input value[" + Isis::iString(value) + "] is out of range [" + Isis::iString(Maximum()) + "].";
+        m += " the input value[" + Isis::IString(value) + "] is out of range [" + Isis::IString(Maximum()) + "].";
         throw IException(IException::Programmer, m, _FILEINFO_);
       }
     }

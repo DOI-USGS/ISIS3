@@ -404,7 +404,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         continue;
 
       nimagesWithInsufficientMeasures++;
-      msg += m_pSnList->FileName(i) + ": " + iString(nMeasures) + "\n";
+      msg += m_pSnList->FileName(i) + ": " + IString(nMeasures) + "\n";
     }
     if ( nimagesWithInsufficientMeasures > 0 ) {
       throw IException(IException::User, msg, _FILEINFO_);
@@ -711,7 +711,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     // Make sure the degree of the polynomial the user selected for
     // the camera angles fit is sufficient for the selected CAMSOLVE
     if (m_nNumberCamAngleCoefSolved > m_nsolveCKDegree + 1) {
-      std::string msg = "Selected SolveCameraDegree " + iString(m_nsolveCKDegree)
+      std::string msg = "Selected SolveCameraDegree " + IString(m_nsolveCKDegree)
                         + " is not sufficient for the CAMSOLVE";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -748,7 +748,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     // Make sure the degree of the polynomial the user selected for
     // the camera position fit is sufficient for the selected CAMSOLVE
     if (m_nNumberCamPosCoefSolved > m_nsolveSPKDegree + 1) {
-      std::string msg = "Selected SolveCameraPositionDegree " + iString(m_nsolveSPKDegree)
+      std::string msg = "Selected SolveCameraPositionDegree " + IString(m_nsolveSPKDegree)
                         + " is not sufficient for the CAMSOLVE";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -1101,7 +1101,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       else if (m_bDeltack && m_nDegreesOfFreedom == 0)
         m_dSigma0 = dvtpv;
       else {
-        std::string msg = "Degrees of Freedom " + iString(m_nDegreesOfFreedom)
+        std::string msg = "Degrees of Freedom " + IString(m_nDegreesOfFreedom)
             + " is invalid (&lt;= 0)!";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
@@ -1204,8 +1204,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     return true;
 
     std::string msg = "Need to return something here, or just change the whole darn thing? [";
-//    msg += iString(tol) + "] in less than [";
-//    msg += iString(m_nMaxIterations) + "] iterations";
+//    msg += IString(tol) + "] in less than [";
+//    msg += IString(m_nMaxIterations) + "] iterations";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -2054,7 +2054,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //      }
 //      catch (iException &e) {
 //        std::string msg = "Required target radii not available for converting lat/lon sigmas from meters ";
-//        msg += "for control point " + Isis::iString(point->GetId());
+//        msg += "for control point " + Isis::IString(point->GetId());
 //        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
 //    }
 //
@@ -3535,9 +3535,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       }
       catch (IException &e) {
         std::string msg = "Unable to solve in BundleAdjust, ";
-        msg += "Iteration " + Isis::iString(m_nIteration) + " of ";
-        msg += Isis::iString(m_nMaxIterations) + ", Sigma0 = ";
-        msg += Isis::iString(m_dConvergenceThreshold);
+        msg += "Iteration " + Isis::IString(m_nIteration) + " of ";
+        msg += Isis::IString(m_nMaxIterations) + ", Sigma0 = ";
+        msg += Isis::IString(m_dConvergenceThreshold);
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
@@ -3583,8 +3583,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     }
 
     std::string msg = "Did not converge to Sigma0 criteria [";
-    msg += iString(m_dConvergenceThreshold) + "] in less than [";
-    msg += iString(m_nMaxIterations) + "] iterations";
+    msg += IString(m_dConvergenceThreshold) + "] in less than [";
+    msg += IString(m_nMaxIterations) + "] iterations";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -5800,7 +5800,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   void BundleAdjust::IterationSummary(double avErr, double sigmaXY, double sigmaHat,
                                       double sigmaX, double sigmaY) {
     //Add this iteration to the summary pvl
-    std::string itlog = "Iteration" + iString(m_nIteration);
+    std::string itlog = "Iteration" + IString(m_nIteration);
     PvlGroup gp(itlog);
 
     gp += PvlKeyword("MaximumError", m_dError, "pixels");
@@ -5823,9 +5823,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   void BundleAdjust::SpecialKIterationSummary() {
     std::string itlog;
     if ( m_bConverged )
-        itlog = "Iteration" + iString(m_nIteration) + ": Final";
+        itlog = "Iteration" + IString(m_nIteration) + ": Final";
     else
-        itlog = "Iteration" + iString(m_nIteration);
+        itlog = "Iteration" + IString(m_nIteration);
     PvlGroup gp(itlog);
 
     gp += PvlKeyword("Sigma0", m_dSigma0);

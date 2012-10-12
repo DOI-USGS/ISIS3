@@ -24,7 +24,7 @@
 #include "PvlTokenizer.h"
 #include "IException.h"
 #include "Message.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace std;
 namespace Isis {
@@ -57,7 +57,7 @@ namespace Isis {
    * @throws Isis::iException::Parse
    */
   void PvlTokenizer::Load(std::istream &stream, const std::string &terminator) {
-    Isis::iString upTerminator(terminator);
+    Isis::IString upTerminator(terminator);
     upTerminator.UpCase();
     string s;
     int c;
@@ -305,11 +305,11 @@ namespace Isis {
 
     std::string::size_type pos = s.find_first_of("\n\r");
     while(pos != std::string::npos) {
-      Isis::iString first = s.substr(0, pos);
+      Isis::IString first = s.substr(0, pos);
       bool addspace = false;
       if(first[pos-1] == ' ') addspace = true;
       first.TrimTail(" \t\n\r\f\0");
-      Isis::iString second = s.substr(pos + 1);
+      Isis::IString second = s.substr(pos + 1);
       if(second[0] == ' ') addspace = true;
       if(second[0] == '\r') addspace = true;
       if(second[0] == '\n') addspace = true;
@@ -342,11 +342,11 @@ namespace Isis {
 
     std::string::size_type pos = s.find_first_of("\n\r");
     while(pos != std::string::npos) {
-      Isis::iString first = s.substr(0, pos);
+      Isis::IString first = s.substr(0, pos);
       bool addspace = false;
       if(first[pos-1] == ' ') addspace = true;
       first.TrimTail(" \t\n\r\f\0");
-      Isis::iString second = s.substr(pos + 1);
+      Isis::IString second = s.substr(pos + 1);
       if(second[0] == ' ') addspace = true;
       if(second[0] == '\r') addspace = true;
       if(second[0] == '\n') addspace = true;
@@ -455,7 +455,7 @@ namespace Isis {
    *
    * @param t Token to load the comma separated list
    *
-   * @param cl iString containing comma separated list
+   * @param cl IString containing comma separated list
    */
   void PvlTokenizer::ParseCommaList(Isis::PvlToken &t, const std::string &cl) {
     stringstream stream(cl);

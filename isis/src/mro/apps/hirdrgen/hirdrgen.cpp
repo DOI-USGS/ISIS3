@@ -5,7 +5,7 @@
 
 #include "Histogram.h"
 #include "iTime.h"
-#include "iString.h"
+#include "IString.h"
 #include "JP2Encoder.h"
 #include "LineManager.h"
 #include "OriginalLabel.h"
@@ -53,7 +53,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Determine if the data is to be converted to JPEG2000
-  iString enctype = ui.GetString("ENCODING_TYPE");
+  IString enctype = ui.GetString("ENCODING_TYPE");
   enctype.DownCase();
 
   for(int band = 1; band <= icube->getBandCount(); ++band) {
@@ -206,7 +206,7 @@ void IsisMain() {
   pdsLabel += PvlKeyword("NOT_APPLICABLE_CONSTANT", -9998);
 
   // Add SOFTWARE_NAME to the ROOT
-  iString sfname;
+  IString sfname;
   sfname.clear();
   sfname += "Isis " + Application::Version() + " " +
             Application::GetUserInterface().ProgramName();
@@ -237,7 +237,7 @@ void IsisMain() {
     ccdFlag.AddValue(cpmmFlag[cpmmByCcd[ccd]]);
     ccdBin.AddValue(cpmmBin[cpmmByCcd[ccd]] != "Null" ? cpmmBin[cpmmByCcd[ccd]] : "-9998");
     ccdTdi.AddValue(cpmmTdi[cpmmByCcd[ccd]] != "Null" ? cpmmTdi[cpmmByCcd[ccd]] : "-9998");
-    iString tmp = cpmmSpecial[cpmmByCcd[ccd]];
+    IString tmp = cpmmSpecial[cpmmByCcd[ccd]];
     tmp.Trim("\"");
     ccdSpecial.AddValue(tmp);
   }
@@ -335,7 +335,7 @@ void IsisMain() {
     PvlKeyword &oldFilterNamejp2 = imagejp2["FILTER_NAME"];
     PvlKeyword newFilterName("FILTER_NAME");
     for(int val = 0; val < oldFilterNamejp2.Size(); ++val) {
-      iString  filtname(oldFilterNamejp2[val].UpCase());
+      IString  filtname(oldFilterNamejp2[val].UpCase());
       if(filtname == "BLUEGREEN") filtname = "BLUE-GREEN";
       else if(filtname == "NEARINFRARED") filtname = "NEAR-INFRARED";
       newFilterName.AddValue(filtname);
@@ -345,7 +345,7 @@ void IsisMain() {
     PvlKeyword &oldCenterjp2 = imagejp2["CENTER_FILTER_WAVELENGTH"];
     PvlKeyword newCenter("CENTER_FILTER_WAVELENGTH");
     for(int val = 0; val < oldCenterjp2.Size(); ++val) {
-      if(((iString)(oldCenterjp2.Unit(val))).UpCase() == "NANOMETERS") {
+      if(((IString)(oldCenterjp2.Unit(val))).UpCase() == "NANOMETERS") {
         newCenter.AddValue(oldCenterjp2[val], "NM");
       }
       else {
@@ -357,7 +357,7 @@ void IsisMain() {
     PvlKeyword &oldBandWidthjp2 = imagejp2["BAND_WIDTH"];
     PvlKeyword newBandWidth("BAND_WIDTH");
     for(int val = 0; val < oldBandWidthjp2.Size(); ++val) {
-      if(((iString)(oldBandWidthjp2.Unit(val))).UpCase() == "NANOMETERS") {
+      if(((IString)(oldBandWidthjp2.Unit(val))).UpCase() == "NANOMETERS") {
         newBandWidth.AddValue(oldBandWidthjp2[val], "nm");
       }
       else {
@@ -402,7 +402,7 @@ void IsisMain() {
     PvlKeyword &oldFilterName = image["FILTER_NAME"];
     PvlKeyword newFilterName("FILTER_NAME");
     for(int val = 0; val < oldFilterName.Size(); ++val) {
-      iString  filtname(oldFilterName[val].UpCase());
+      IString  filtname(oldFilterName[val].UpCase());
       if(filtname == "BLUEGREEN") filtname = "BLUE-GREEN";
       else if(filtname == "NEARINFRARED") filtname = "NEAR-INFRARED";
       newFilterName.AddValue(filtname);
@@ -412,7 +412,7 @@ void IsisMain() {
     PvlKeyword &oldCenter = image["CENTER_FILTER_WAVELENGTH"];
     PvlKeyword newCenter("CENTER_FILTER_WAVELENGTH");
     for(int val = 0; val < oldCenter.Size(); ++val) {
-      if(((iString)(oldCenter.Unit(val))).UpCase() == "NANOMETERS") {
+      if(((IString)(oldCenter.Unit(val))).UpCase() == "NANOMETERS") {
         newCenter.AddValue(oldCenter[val], "NM");
       }
       else {
@@ -424,7 +424,7 @@ void IsisMain() {
     PvlKeyword &oldBandWidth = image["BAND_WIDTH"];
     PvlKeyword newBandWidth("BAND_WIDTH");
     for(int val = 0; val < oldBandWidth.Size(); ++val) {
-      if(((iString)(oldBandWidth.Unit(val))).UpCase() == "NANOMETERS") {
+      if(((IString)(oldBandWidth.Unit(val))).UpCase() == "NANOMETERS") {
         newBandWidth.AddValue(oldBandWidth[val], "nm");
       }
       else {
@@ -451,7 +451,7 @@ void IsisMain() {
 //    PvlGroup &viewGroup = pdsLabel.FindGroup("VIEWING_PARAMETERS");
 
 //    PvlKeyword &incidence = viewGroup["INCIDENCE_ANGLE"];
-//    iString tstr = incidence.Unit();
+//    IString tstr = incidence.Unit();
 //    if (tstr.UpCase() == "DEG") incidence.SetValue((string)incidence, "deg");
 
 //    PvlKeyword &emission = viewGroup["EMISSION_ANGLE"];

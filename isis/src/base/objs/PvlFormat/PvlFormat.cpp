@@ -22,7 +22,7 @@
 
 #include "IException.h"
 #include "Message.h"
-#include "iString.h"
+#include "IString.h"
 #include "FileName.h"
 #include "PvlKeyword.h"
 #include "TextFile.h"
@@ -106,9 +106,9 @@ namespace Isis {
   void PvlFormat::Add(Pvl &pvl) {
     for(int i = 0; i < pvl.Keywords(); ++i) {
       PvlKeyword &key = pvl[i];
-      iString name = key.Name();
+      IString name = key.Name();
       name.UpCase();
-      iString type = key[0];
+      IString type = key[0];
       type.UpCase();
       PvlKeyword newKey(name, type);
       for(int j = 1; j < key.Size(); ++j) newKey.AddValue(key[j]);
@@ -127,7 +127,7 @@ namespace Isis {
   * @param keyword The PvlKeyword to have its type returned
   */
   KeywordType PvlFormat::Type(const PvlKeyword &keyword) {
-    iString name = keyword.Name();
+    IString name = keyword.Name();
     name.UpCase();
     if(p_keywordMap.HasKeyword(name)) {
       PvlKeyword &key = p_keywordMap.FindKeyword(name);
@@ -146,7 +146,7 @@ namespace Isis {
   *         available in keyword map return -1.
   */
   int PvlFormat::Accuracy(const PvlKeyword &keyword) {
-    iString name = keyword.Name();
+    IString name = keyword.Name();
     name.UpCase();
     if(p_keywordMap.HasKeyword(name)) {
       PvlKeyword &key = p_keywordMap.FindKeyword(name);

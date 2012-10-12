@@ -24,7 +24,7 @@
 #include "Constants.h"
 #include "Distance.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "PvlGroup.h"
 #include "SpecialPixel.h"
 
@@ -109,7 +109,7 @@ namespace Isis {
       setPlanetocentric(latitude.radians(), Radians);
     }
     else {
-      iString msg = "Latitude type [" + iString(mapping["LatitudeType"][0]) +
+      IString msg = "Latitude type [" + IString(mapping["LatitudeType"][0]) +
         "] is not recognized";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -149,7 +149,7 @@ namespace Isis {
       setPlanetocentric(latitude, latitudeUnits);
     }
     else {
-      iString msg = "Latitude type [" + iString(mapping["LatitudeType"][0]) +
+      IString msg = "Latitude type [" + IString(mapping["LatitudeType"][0]) +
         "] is not recognized";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -189,7 +189,7 @@ namespace Isis {
       setPlanetographic(latitude, latitudeUnits);
     }
     else {
-      iString msg = "Enumeration value [" + iString(latType) + "] is not a "
+      IString msg = "Enumeration value [" + IString(latType) + "] is not a "
         "valid CoordinateType";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -267,7 +267,7 @@ namespace Isis {
    */
   double Latitude::planetographic(Angle::Units units) const {
     if (m_equatorialRadius == NULL || m_polarRadius == NULL) {
-      iString msg = "Latitude [" + iString(degrees()) + " degrees] cannot "
+      IString msg = "Latitude [" + IString(degrees()) + " degrees] cannot "
           "be converted to Planetographic without the planetary radii, please "
           "use the other Latitude constructor";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -275,13 +275,13 @@ namespace Isis {
 
     if (*this > Angle(90.0, Angle::Degrees) ||
         *this < Angle(-90.0, Angle::Degrees)) {
-      iString msg = "Latitudes outside of the -90/90 range cannot be converted "
+      IString msg = "Latitudes outside of the -90/90 range cannot be converted "
           "between Planetographic and Planetocentric";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(!isValid()) {
-      iString msg = "Invalid planetographic latitudes are not currently "
+      IString msg = "Invalid planetographic latitudes are not currently "
           "supported";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -304,7 +304,7 @@ namespace Isis {
    */
   void Latitude::setPlanetographic(double latitude, Angle::Units units) {
     if (m_equatorialRadius == NULL || m_polarRadius == NULL) {
-      iString msg = "Latitude [" + iString(latitude) + "] cannot be "
+      IString msg = "Latitude [" + IString(latitude) + "] cannot be "
           "converted to Planetocentic without the planetary radii, please use "
           "the other Latitude constructor";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -314,13 +314,13 @@ namespace Isis {
 
     if (inputAngle > Angle(90.0, Angle::Degrees) ||
         inputAngle < Angle(-90.0, Angle::Degrees)) {
-      iString msg = "Latitudes outside of the -90/90 range cannot be converted "
+      IString msg = "Latitudes outside of the -90/90 range cannot be converted "
           "between Planetographic and Planetocentric";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(IsSpecial(latitude)) {
-      iString msg = "Invalid planetographic latitudes are not currently "
+      IString msg = "Invalid planetographic latitudes are not currently "
           "supported";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -352,9 +352,9 @@ namespace Isis {
   bool Latitude::inRange(Latitude min, Latitude max) const {
     // Validity check on the range
     if (min > max) {
-      iString msg = "Minimum latitude [" + iString(min.degrees()) +
+      IString msg = "Minimum latitude [" + IString(min.degrees()) +
         "] degrees is greater than maximum latitude [" +
-        iString(max.degrees()) + "] degrees";
+        IString(max.degrees()) + "] degrees";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -416,7 +416,7 @@ namespace Isis {
     else if (mapping["LatitudeType"][0] == "Planetographic")
       latType = Planetographic;
     else {
-      iString msg = "Latitude type [" + iString(mapping["LatitudeType"][0]) +
+      IString msg = "Latitude type [" + IString(mapping["LatitudeType"][0]) +
         "] is not recognized";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -466,8 +466,8 @@ namespace Isis {
       Angle tmpAngle(angle, units);
       if(tmpAngle > Angle(90, Angle::Degrees) ||
          tmpAngle < Angle(-90, Angle::Degrees)) {
-        iString msg = "Latitudes past 90 degrees are not valid. The latitude "
-            "[" + iString(tmpAngle.degrees()) + " degrees] is not allowed";
+        IString msg = "Latitudes past 90 degrees are not valid. The latitude "
+            "[" + IString(tmpAngle.degrees()) + " degrees] is not allowed";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }

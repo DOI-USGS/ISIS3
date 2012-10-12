@@ -86,7 +86,7 @@ void IsisMain() {
   int index = 0;
   if(ui.WasEntered("PROPLAB")) {
     bool match = false;
-    string fname = (iString)ui.GetFileName("PROPLAB");
+    string fname = (IString)ui.GetFileName("PROPLAB");
     for(int i = 0; i < cubeList.size(); i++) {
       if(fname == cubeList[i].toString()) {
         index = i;
@@ -124,8 +124,8 @@ void IsisMain() {
     m.SetBandBinMatch(false);
 
     Progress *prog = m.Progress();
-    prog->SetText("Adding band " + iString((int)i + 1) +
-                  " of " + iString(nbands));
+    prog->SetText("Adding band " + IString((int)i + 1) +
+                  " of " + IString(nbands));
     m.SetOutputCube("TO");
     CubeAttributeInput attrib(cubeList[i].toString());
     Cube *icube = m.SetInputCube(cubeList[i].toString(), attrib);

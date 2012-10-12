@@ -33,7 +33,7 @@ class QString;
 template<typename A, typename B> class QPair;
 
 namespace Isis {
-  class iString;
+  class IString;
 
   /**
    * @brief File name manipulation and expansion.
@@ -96,7 +96,7 @@ namespace Isis {
    *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
    *                           $temporary variable instead of /tmp directory.
    *                           Added some documentation to methods.
-   *   @history 2011-08-24 Steven Lambright and Tracie Sucharski - Uses iString
+   *   @history 2011-08-24 Steven Lambright and Tracie Sucharski - Uses IString
    *                           instead of std::string for simplicity when used
    *                           with our GUI applications. Removed extra includes
    *                           and cleaned up code a little.
@@ -113,25 +113,25 @@ namespace Isis {
       FileName();
       FileName(const char *fileName);
       FileName(const std::string &fileName);
-      FileName(const iString &fileName);
+      FileName(const IString &fileName);
       FileName(const QString &fileName);
       FileName(const FileName &other);
       ~FileName();
 
-      iString originalPath() const;
-      iString path() const;
+      IString originalPath() const;
+      IString path() const;
 
-      iString attributes() const;
-      iString baseName() const;
-      iString name() const;
-      iString extension() const;
+      IString attributes() const;
+      IString baseName() const;
+      IString name() const;
+      IString extension() const;
 
-      iString expanded() const;
-      iString original() const;
+      IString expanded() const;
+      IString original() const;
 
-      FileName addExtension(const iString &extension) const;
+      FileName addExtension(const IString &extension) const;
       FileName removeExtension() const;
-      FileName setExtension(const iString &extension) const;
+      FileName setExtension(const IString &extension) const;
 
       bool isVersioned() const;
       bool isNumericallyVersioned() const;
@@ -150,7 +150,7 @@ namespace Isis {
 
       static FileName createTempFile(FileName templateFileName = "$TEMPORARY/temp");
 
-      iString toString() const;
+      IString toString() const;
       FileName &operator=(const FileName &rhs);
       bool operator==(const FileName &rhs);
       bool operator!=(const FileName &rhs);
@@ -178,17 +178,17 @@ namespace Isis {
           Data(const Data &other);
           ~Data();
 
-          iString original(bool includeAttributes) const;
-          void setOriginal(const iString &);
+          IString original(bool includeAttributes) const;
+          void setOriginal(const IString &);
 
-          iString expanded(bool includeAttributes) const;
+          IString expanded(bool includeAttributes) const;
 
           // assignment operator is defined in QSharedData
           // Data &operator=(const Data &rhs);
 
         private:
-          iString *m_originalFileNameString;
-          iString *m_expandedFileNameString;
+          IString *m_originalFileNameString;
+          IString *m_expandedFileNameString;
       };
 
       //! @see QSharedDataPointer

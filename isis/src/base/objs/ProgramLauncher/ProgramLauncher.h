@@ -26,7 +26,7 @@
 
 namespace Isis {
   class IException;
-  class iString;
+  class IString;
 
   /**
    * @brief Execute External Programs and Commands
@@ -43,11 +43,11 @@ namespace Isis {
    */
   class ProgramLauncher {
     public:
-      static void RunIsisProgram(iString isisProgramName, iString arguments);
-      static void RunSystemCommand(iString commandLine);
+      static void RunIsisProgram(IString isisProgramName, IString arguments);
+      static void RunSystemCommand(IString commandLine);
 
     private:
-      static IException ProcessIsisMessageFromChild(iString code, iString msg);
+      static IException ProcessIsisMessageFromChild(IString code, IString msg);
 
     private:
       //! Construction is not allowed

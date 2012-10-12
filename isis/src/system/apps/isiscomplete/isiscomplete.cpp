@@ -1,7 +1,7 @@
 #include "Application.h"
 #include "UserInterface.h"
 #include "FileList.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace std;
 using namespace Isis;
@@ -78,7 +78,7 @@ void MakeCompletion(const string &appName) {
 
   for(int grp = 0; grp < ui.NumGroups(); grp++) {
     for(int param = 0; param < ui.NumParams(grp); param++) {
-      paramList += " " + iString(ui.ParamName(grp, param)).DownCase();
+      paramList += " " + IString(ui.ParamName(grp, param)).DownCase();
       paramDetails.push_back(GetParamCompletion(grp, param));
     }
   }

@@ -321,12 +321,12 @@ void Doit(Isis::PvlObject &obj) {
     p_ar->PatternChip()->Load(d);
   }
   catch(Isis::IException &error) {
-    iString err = error.what();
+    IString err = error.what();
 
     // We need to get rid of the contents of the second [] on each line to
     // ensure file paths do not persist.
-    iString thisLine;
-    iString formattedErr;
+    IString thisLine;
+    IString formattedErr;
 
     while((thisLine = err.Token("\n")) != "") {
       formattedErr += thisLine.Token("[");

@@ -28,7 +28,7 @@
 
 #include "CSVReader.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include "Spice.h"
 
 namespace Isis {
@@ -41,11 +41,11 @@ namespace Isis {
    * @return double Converted value
    */
   template <typename T> double ToDouble(const T &value) {
-    return (iString(value).Trim(" \r\t\n").ToDouble());
+    return (IString(value).Trim(" \r\t\n").ToDouble());
   }
 
   template <typename T> int ToInteger(const T &value) {
-    return (iString(value).Trim(" \r\t\n").ToInteger());
+    return (IString(value).Trim(" \r\t\n").ToInteger());
   }
 
   template <typename T> inline T MIN(const T &A, const T &B) {
@@ -143,10 +143,10 @@ namespace Isis {
       CSVReader::CSVAxis row = csv.getRow(i);
       if(ToInteger(row[0]) == filter) {
         if((row.dim1() - 1) < nvalues) {
-          std::string mess = "Number values (" + iString(row.dim1() - 1) +
+          std::string mess = "Number values (" + IString(row.dim1() - 1) +
                              ") in file " + fname +
                              " less than number requested (" +
-                             iString(nvalues) + ")!";
+                             IString(nvalues) + ")!";
           throw IException(IException::User, mess.c_str(), _FILEINFO_);
         }
         std::vector<double> rsp;
@@ -172,9 +172,9 @@ namespace Isis {
     CSVReader csv(csvfile.expanded(), header, skip);
     CSVReader::CSVAxis row = csv.getRow(0);
     if(row.dim1() < nvalues) {
-      std::string mess = "Number values (" + iString(row.dim1()) +
+      std::string mess = "Number values (" + IString(row.dim1()) +
                          ") in file " + fname + " less than number requested (" +
-                         iString(nvalues) + ")!";
+                         IString(nvalues) + ")!";
       throw IException(IException::User, mess.c_str(), _FILEINFO_);
 
     }

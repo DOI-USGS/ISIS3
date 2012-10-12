@@ -30,7 +30,7 @@ void IsisMain() {
 
   // Get the directory where the MRO HiRISE RDR translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  iString transDir = (string) dataDir["Mro"] + "/translations/";
+  IString transDir = (string) dataDir["Mro"] + "/translations/";
 
   // Translate the BandBin group
   FileName transFile(transDir + "hiriseRdrBandBin.trn");
@@ -67,7 +67,7 @@ void IsisMain() {
 //  Modify the output Mosaic group if the Projection is of type
 //  Equirectangular.
   PvlGroup mapgrp = otherLabels.FindGroup("Mapping");
-  if(iString::UpCase(mapgrp["ProjectionName"]) == "EQUIRECTANGULAR") {
+  if(IString::UpCase(mapgrp["ProjectionName"]) == "EQUIRECTANGULAR") {
     static bool pckLoaded(false);
     if(!pckLoaded) {
       FileName pck("$base/kernels/pck/pck?????.tpc");
@@ -97,8 +97,8 @@ void IsisMain() {
       clatrad.SetName("CenterLatitudeRadius");
 
       //  Assign the proper radii to the group keywords
-      eqRadius.SetValue(iString(radii[0] * 1000.0), "meters");
-      polRadius.SetValue(iString(radii[2] * 1000.0), "meters");
+      eqRadius.SetValue(IString(radii[0] * 1000.0), "meters");
+      polRadius.SetValue(IString(radii[2] * 1000.0), "meters");
       mapgrp += clatrad;  // Don't do this before updating the above
       // keyword references!  Bad things happen!
     }

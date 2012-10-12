@@ -6,7 +6,7 @@
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "LineScanCameraDetectorMap.h"
 #include "LineScanCameraGroundMap.h"
@@ -35,20 +35,20 @@ namespace Isis {
 
 
       //following keywords in InstrumentAddendum file
-      iString ikernKey = "INS" + iString((int)naifIkCode()) + "_CONSTANT_TIME_OFFSET";
+      IString ikernKey = "INS" + IString((int)naifIkCode()) + "_CONSTANT_TIME_OFFSET";
       constantTimeOffset = getDouble(ikernKey);
 
-      ikernKey = "INS" + iString((int)naifIkCode()) + "_ADDITIONAL_PREROLL";
+      ikernKey = "INS" + IString((int)naifIkCode()) + "_ADDITIONAL_PREROLL";
       additionalPreroll = getDouble(ikernKey);
 
-      ikernKey = "INS" + iString((int)naifIkCode()) + "_ADDITIVE_LINE_ERROR";
+      ikernKey = "INS" + IString((int)naifIkCode()) + "_ADDITIVE_LINE_ERROR";
       additiveLineTimeError = getDouble(ikernKey);
 
-      ikernKey = "INS" + iString((int)naifIkCode()) + "_MULTIPLI_LINE_ERROR";
+      ikernKey = "INS" + IString((int)naifIkCode()) + "_MULTIPLI_LINE_ERROR";
       multiplicativeLineTimeError = getDouble(ikernKey);
  
       Isis::PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
-      iString stime = (string)inst["StartTime"];  
+      IString stime = (string)inst["StartTime"];  
       SpiceDouble etStart;
       str2et_c(stime.c_str(), &etStart);
       stime = (string) inst["StopTime"];

@@ -28,7 +28,7 @@
 #include "ControlMeasureLogData.h"
 #include "Statistics.h"
 #include "CollectorMap.h"
-#include "iString.h"
+#include "IString.h"
 #include <gsl/gsl_math.h>
 
 namespace Isis {
@@ -235,7 +235,7 @@ namespace Isis {
           return (computeStats(_rowList.getNth(i)));
         }
         catch(IException &oor) {
-          std::string msg = "Requested value (" + iString(i) +  ") not found";
+          std::string msg = "Requested value (" + IString(i) +  ") not found";
           throw IException(oor, IException::User, msg, _FILEINFO_);
         }
       }

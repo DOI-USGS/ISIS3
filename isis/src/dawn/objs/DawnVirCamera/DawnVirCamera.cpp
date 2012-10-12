@@ -9,7 +9,7 @@
 #include "DawnVirCamera.h"
 #include "Camera.h"
 #include "NaifStatus.h"
-#include "iString.h"
+#include "IString.h"
 #include "IException.h"
 #include "iTime.h"
 #include "LineScanCameraDetectorMap.h"
@@ -80,10 +80,10 @@ namespace Isis {
       new CameraFocalPlaneMap(this, naifIkCode());
 
       //  Retrieve boresight location from instrument kernel (IK) (addendum?)
-      iString ikernKey = "INS" + iString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
+      IString ikernKey = "INS" + IString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
       double sampleBoreSight = getDouble(ikernKey);
 
-      ikernKey = "INS" + iString((int)naifIkCode()) + "_BORESIGHT_LINE";
+      ikernKey = "INS" + IString((int)naifIkCode()) + "_BORESIGHT_LINE";
       double lineBoreSight = getDouble(ikernKey);
 
       FocalPlaneMap()->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
@@ -238,7 +238,7 @@ namespace Isis {
       double lineMidTime;
       //  scs2e_c(naifSpkCode(), scet.c_str(), &lineMidTime);
       lineMidTime = getClockTime(scet, naifSpkCode()).Et();
-      bool isDark = iString::Equal("closed", shutterMode);
+      bool isDark = IString::Equal("closed", shutterMode);
 
       // Add fit data for all open angles
       if ( ! isDark ) {  angFit.AddData(lineno, optAng);   }
@@ -475,7 +475,7 @@ namespace Isis {
     QRegExp virCk("*dawn_vir_?????????_?.bc");
     virCk.setPatternSyntax(QRegExp::Wildcard);
     for (unsigned int i = 0 ; i < cks.size() ; i++) {
-      if ( virCk.exactMatch(iString::ToQt(cks[i])) ) return (true);
+      if ( virCk.exactMatch(IString::ToQt(cks[i])) ) return (true);
     }
     return (false);
   }

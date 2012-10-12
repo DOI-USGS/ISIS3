@@ -27,7 +27,7 @@
 #include <vector>
 #include <fstream>
 #include "tnt/tnt_array1d.h"
-#include "iString.h"
+#include "IString.h"
 #include "CollectorMap.h"
 #include "IException.h"
 
@@ -51,7 +51,7 @@ namespace Isis {
    * own list.
    *
    * This is a templated class that allows the user to select the token storage
-   * type.  This type, which defaults to the Isis::iString class (I will explain
+   * type.  This type, which defaults to the Isis::IString class (I will explain
    * the reason for this shortly), must provide a few features that are
    * explicitly used in providing support for tokenization.
    *
@@ -74,10 +74,10 @@ namespace Isis {
    *
    * @internal
    *   @history 2007-06-05 Brendan George - Modified to work with
-   *                           iString/StringTools merge
+   *                           IString/StringTools merge
    *   @history 2008-06-18 Christopher Austin - Fixed documentation
    */
-  template <typename TokenStore = iString>
+  template <typename TokenStore = IString>
   class CSVParser {
     public:
       typedef TokenStore              TokenType;  //!< Token storage type
@@ -95,7 +95,7 @@ namespace Isis {
        * words and indicate whether successive occurances of the delimiter
        * translates into a single value or they are taken as empty tokens.
        *
-       * @param str  iString to parse
+       * @param str  IString to parse
        * @param delimiter Character that separates individual tokens in the string
        * @param keepEmptyParts Specifies the occurance of successive tokens is to
        *                       treated as one token (false) or each delimiter
@@ -135,7 +135,7 @@ namespace Isis {
        * construction of this lightweight class, but this allows the same instance
        * to be resued.
        *
-       * @param str iString to parse into tokens separated by the delimiter
+       * @param str IString to parse into tokens separated by the delimiter
        * @param delimiter Character that separates each token in str
        * @param keepEmptyParts Specifies the occurance of successive tokens is to
        *                       treated as one token (false) or each delimiter
@@ -146,7 +146,7 @@ namespace Isis {
       int parse(const std::string &str, const char &delimiter = ',',
                 bool keepEmptyParts = true) {
         std::vector<std::string> tokens;
-        iString::Split(delimiter, str, tokens, keepEmptyParts);
+        IString::Split(delimiter, str, tokens, keepEmptyParts);
         TokenList slist(tokens.size());
         for(unsigned int i = 0 ; i < tokens.size() ; i++) {
           slist[i] = TokenType(tokens[i]);
@@ -248,7 +248,7 @@ namespace Isis {
   class CSVReader {
 
     private:
-      typedef CSVParser<iString> Parser;    //!<  Defines single line parser
+      typedef CSVParser<IString> Parser;    //!<  Defines single line parser
 
     public:
       friend std::istream &operator>>(std::istream &is, CSVReader &csv);
@@ -511,9 +511,9 @@ namespace Isis {
    *   CSVReader::CSVDblVector dcol = csv.convert<double>(scol);
    * @endcode
    *
-   * At present, this class uses the Isis iString class as its token storage type
+   * At present, this class uses the Isis IString class as its token storage type
    * (TokenType).  All that is required is that it have a cast operator for a
-   * given type.  If the Isis iString class has the operator, it can be invoked
+   * given type.  If the Isis IString class has the operator, it can be invoked
    * for that type.  The precise statement used to convert the token to the
    * explict type is:
    * @code

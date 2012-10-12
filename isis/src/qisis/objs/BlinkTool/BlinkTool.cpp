@@ -1,7 +1,7 @@
 #include "BlinkTool.h"
 
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include "MainWindow.h"
 #include "MdiCubeViewport.h"
 

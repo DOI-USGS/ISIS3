@@ -32,7 +32,7 @@ namespace Isis {
   void HiEqualization::calculateStatistics() {
     // TODO member variable
     const FileList &imageList = getInputs();
-    iString maxCubeStr((int) imageList.size());
+    IString maxCubeStr((int) imageList.size());
 
     // Adds statistics for whole and side regions of every cube
     vector<Statistics *> statsList;
@@ -43,7 +43,7 @@ namespace Isis {
       Statistics *statsLeft = new Statistics();
       Statistics *statsRight = new Statistics();
 
-      iString cubeStr((int) img + 1);
+      IString cubeStr((int) img + 1);
 
       ProcessByLine p;
       p.Progress()->SetText("Calculating Statistics for Cube " +

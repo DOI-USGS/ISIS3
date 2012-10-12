@@ -52,7 +52,7 @@ void IsisMain() {
 
   lineWidth = ui.GetInteger("LINEWIDTH") / 2;
 
-  iString lval = iString::UpCase(ui.GetString("LINEVALUE"));
+  IString lval = IString::UpCase(ui.GetString("LINEVALUE"));
   if (lval == "HRS") {
     lineValue = Isis::Hrs;
   }
@@ -71,7 +71,7 @@ void IsisMain() {
     }
   }
   else {
-    iString msg = "Invalid LINEVALUE string [" + ui.GetString("LINEVALUE");
+    IString msg = "Invalid LINEVALUE string [" + ui.GetString("LINEVALUE");
     msg += "], must be one of HRS, LRS, NULL, or DN.";
     throw IException(IException::User, msg, _FILEINFO_);
   }

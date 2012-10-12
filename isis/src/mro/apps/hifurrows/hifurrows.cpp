@@ -240,7 +240,7 @@ void RemoveFurrows_Version_1_42(void)
 #endif
 
   // apply trim filter if furrows found
-  iString sTempFile("./FixFurrows.cub");
+  IString sTempFile("./FixFurrows.cub");
   if(bFurrowsFound) {
     Pipeline p;
     p.SetInputFile(FileName(ui.GetFileName("TO")));

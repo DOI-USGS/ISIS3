@@ -1032,7 +1032,7 @@ namespace Isis {
       derivative = 1;
     }
     else {
-      Isis::iString msg = "Coeff index, " + Isis::iString(coeffIndex) +
+      Isis::IString msg = "Coeff index, " + Isis::IString(coeffIndex) +
         " exceeds degree of polynomial";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
