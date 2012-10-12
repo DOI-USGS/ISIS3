@@ -203,7 +203,10 @@ namespace Isis {
    *                                         a kernel.  The camera puts these
    *                                         values into the Naif kernel pool.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *                          coding standards. References #972.
+   *                           coding standards. References #972.
+   *   @history 2012-09-10 Steven Lambright - Undid Debbie's change on 2012-09-19 because the
+   *                           Ideal camera now supports putting those keywords in the label
+   *                           on the fly. References #1094.
    */
   class Spice {
     public:

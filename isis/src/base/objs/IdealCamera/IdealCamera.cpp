@@ -25,6 +25,8 @@
 #include <iomanip>
 #include <string>
 
+#include <QDebug>
+
 #include "CameraDistortionMap.h"
 #include "CameraFocalPlaneMap.h"
 #include "IException.h"
@@ -55,15 +57,14 @@ namespace Isis {
    *   ExposureDuration = nnn.nn <milliseconds>
    *
    *   InstrumentType = Framing | Linescan
-   *   FocalLength    = nnn.n <millimeters>
-   *   PixelPitch      = nn.n <millimeters>
+   *   FocalLength    = nnn.n <millimeters> [ALTERNATIVE: IDEAL_FOCAL_LENGTH in NaifKeywords]
+   *   PixelPitch      = nn.n <millimeters> [ALTERNATIVE: IDEAL_PIXEL_PITCH in NaifKeywords]
    *   SampleDetectors = nnnn
    *   LineDetectors   = nnnn
    * End_Group
    *
    * \endcode
-   * Note boresight is assumed to be at the center of the
-   * detectors
+   * Note boresight is assumed to be at the center of the detectors
    *
    * @param lab Pvl label from the image
    * @internal
@@ -75,68 +76,134 @@ namespace Isis {
     NaifStatus::CheckErrors();
     // Get required keywords from instrument group
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
-    double focalLength      = inst["FocalLength"];
-    double pixelPitch       = inst["PixelPitch"];
-    double et               = inst["EphemerisTime"];
-    double exposureDuration = 0.;
-    if(inst.HasKeyword("ExposureDuration")) exposureDuration = (double) inst["ExposureDuration"] / 1000.0;
-    double sampleDetectors  = inst["SampleDetectors"];
-    double lineDetectors    = inst["LineDetectors"];
 
-    int yDependency;
-    int xDependency = inst["FocalPlaneXDependency"];
-    double xdir, ydir, sdir, ldir; // Pixel direction
+    // Setup camera characteristics from instrument
 
-    xdir = 1.;
-    if(inst.HasKeyword("TransX")) xdir = inst["TransX"];
-    ydir = 1.;
-    if(inst.HasKeyword("TransY")) ydir = inst["TransY"];
-
-    if(xDependency == CameraFocalPlaneMap::Sample) {
-      yDependency = CameraFocalPlaneMap::Line;
-      sdir = xdir;
-      ldir = ydir;
+    if (inst.HasKeyword("FocalLength")) {
+      SetFocalLength(inst["FocalLength"]);
     }
     else {
+      SetFocalLength(readValue("IDEAL_FOCAL_LENGTH", SpiceDoubleType).toDouble());
+    }
+
+    if (inst.HasKeyword("PixelPitch")) {
+      SetPixelPitch(inst["PixelPitch"]);
+    }
+    else {
+      SetPixelPitch(readValue("IDEAL_PIXEL_PITCH", SpiceDoubleType).toDouble());
+    }
+
+    double et = inst["EphemerisTime"];
+
+    double exposureDuration = 0.0;
+    if (inst.HasKeyword("ExposureDuration")) {
+      exposureDuration = ((double) inst["ExposureDuration"]) / 1000.0;
+    }
+
+    double sampleDetectors = inst["SampleDetectors"];
+    double lineDetectors   = inst["LineDetectors"];
+
+    // These variables are used for maintaining compatibility with older versions of the
+    //   ideal camera (noproj before it modified the naif keywords group) and for cubes without the
+    //   naif keywords group at all.
+    int xDependency = inst["FocalPlaneXDependency"];
+    int yDependency = CameraFocalPlaneMap::Line;
+    // Pixel direction
+    double xdir = 1.0;
+    double ydir = 1.0;
+    double sdir = xdir;
+    double ldir = ydir;
+
+    if (inst.HasKeyword("TransX")) xdir = inst["TransX"];
+    if (inst.HasKeyword("TransY")) ydir = inst["TransY"];
+
+    if (xDependency == CameraFocalPlaneMap::Line) {
       yDependency = CameraFocalPlaneMap::Sample;
       sdir = ydir;
       ldir = xdir;
     }
-    double keyval[3];
 
     // Put the translation coefficients into the Naif kernel pool so the
     // CameraFocalPlaneClass can find them
-    keyval[0] = 0.;
-    if(inst.HasKeyword("TransX0")) keyval[0] = inst["TransX0"];
-    keyval[xDependency] = pixelPitch * xdir;
-    keyval[yDependency] = 0.;
-    pdpool_c("IDEAL_TRANSX", 3, keyval);
+    try {
+      readValue("IDEAL_TRANSX", SpiceDoubleType);
+    }
+    catch (IException &) {
+      double keyval[3];
+      keyval[0] = 0.;
+      if (inst.HasKeyword("TransX0")) {
+        keyval[0] = inst["TransX0"];
+      }
 
-    keyval[0] = 0.;
-    if(inst.HasKeyword("TransY0")) keyval[0] = inst["TransY0"];
-    keyval[yDependency] = pixelPitch * ydir;
-    keyval[xDependency] = 0.;
-    pdpool_c("IDEAL_TRANSY", 3, keyval);
+      keyval[xDependency] = PixelPitch() * xdir;
+      keyval[yDependency] = 0.;
 
-    keyval[0] = 0.;
-    if(inst.HasKeyword("TransS0")) keyval[0] = inst["TransS0"];
-    keyval[xDependency] = 1 / pixelPitch * sdir;
-    keyval[yDependency] = 0.;
-    pdpool_c("IDEAL_TRANSS", 3, keyval);
+      storeValue("IDEAL_TRANSX", 0, SpiceDoubleType, keyval[0]);
+      storeValue("IDEAL_TRANSX", 1, SpiceDoubleType, keyval[1]);
+      storeValue("IDEAL_TRANSX", 2, SpiceDoubleType, keyval[2]);
+      pdpool_c("IDEAL_TRANSX", 3, keyval);
+    }
 
-    keyval[0] = 0.;
-    if(inst.HasKeyword("TransL0")) keyval[0] = inst["TransL0"];
-    keyval[yDependency] = 1 / pixelPitch * ldir;
-    keyval[xDependency] = 0.;
-    pdpool_c("IDEAL_TRANSL", 3, keyval);
+    try {
+      readValue("IDEAL_TRANSY", SpiceDoubleType);
+    }
+    catch (IException &) {
+      double keyval[3];
+      keyval[0] = 0.;
+      if (inst.HasKeyword("TransY0")) {
+        keyval[0] = inst["TransY0"];
+      }
 
-    // Setup camera characteristics from instrument
-    SetFocalLength(focalLength);
-    SetPixelPitch(pixelPitch);
+      keyval[yDependency] = PixelPitch() * ydir;
+      keyval[xDependency] = 0.;
+
+      storeValue("IDEAL_TRANSY", 0, SpiceDoubleType, keyval[0]);
+      storeValue("IDEAL_TRANSY", 1, SpiceDoubleType, keyval[1]);
+      storeValue("IDEAL_TRANSY", 2, SpiceDoubleType, keyval[2]);
+      pdpool_c("IDEAL_TRANSY", 3, keyval);
+    }
+
+    try {
+      readValue("IDEAL_TRANSS", SpiceDoubleType);
+    }
+    catch (IException &) {
+      double keyval[3];
+      keyval[0] = 0.;
+      if (inst.HasKeyword("TransS0")) {
+        keyval[0] = inst["TransS0"];
+      }
+
+      keyval[xDependency] = 1 / PixelPitch() * sdir;
+      keyval[yDependency] = 0.;
+
+      storeValue("IDEAL_TRANSS", 0, SpiceDoubleType, keyval[0]);
+      storeValue("IDEAL_TRANSS", 1, SpiceDoubleType, keyval[1]);
+      storeValue("IDEAL_TRANSS", 2, SpiceDoubleType, keyval[2]);
+      pdpool_c("IDEAL_TRANSS", 3, keyval);
+    }
+
+    try {
+      readValue("IDEAL_TRANSL", SpiceDoubleType);
+    }
+    catch (IException &) {
+      double keyval[3];
+      keyval[0] = 0.;
+      if (inst.HasKeyword("TransL0")) {
+        keyval[0] = inst["TransL0"];
+      }
+
+      keyval[yDependency] = 1 / PixelPitch() * ldir;
+      keyval[xDependency] = 0.0;
+
+      storeValue("IDEAL_TRANSL", 0, SpiceDoubleType, keyval[0]);
+      storeValue("IDEAL_TRANSL", 1, SpiceDoubleType, keyval[1]);
+      storeValue("IDEAL_TRANSL", 2, SpiceDoubleType, keyval[2]);
+      pdpool_c("IDEAL_TRANSL", 3, keyval);
+    }
 
     // Create correct camera type
     iString type = (string) inst["InstrumentType"];
-    if(type.UpCase() == "FRAMING") {
+    if (type.UpCase() == "FRAMING") {
       p_framing = true;
       new CameraDetectorMap(this);
       CameraFocalPlaneMap *fmap = new CameraFocalPlaneMap(this, 0);
@@ -149,7 +216,7 @@ namespace Isis {
       setTime(et);
       LoadCache();
     }
-    else if(type.UpCase() == "LINESCAN") {
+    else if (type.UpCase() == "LINESCAN") {
       p_framing = false;
       new LineScanCameraDetectorMap(this, et, exposureDuration);
       CameraFocalPlaneMap *fmap = new CameraFocalPlaneMap(this, 0);

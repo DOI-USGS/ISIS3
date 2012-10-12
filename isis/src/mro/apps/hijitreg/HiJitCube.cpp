@@ -242,7 +242,12 @@ namespace Isis {
     jdata.summing = inst["Summing"];
     if(label->FindObject("IsisCube").HasGroup("Instrument") && originst) {
       idinst = label->FindGroup("Instrument", Isis::Pvl::Traverse);
-      jdata.pixpitch = idinst["PixelPitch"];
+      if (idinst.HasKeyword("PixelPitch")) {
+        jdata.pixpitch = idinst["PixelPitch"];
+      }
+      else {
+        jdata.pixpitch = label->FindObject("NaifKeywords")["IDEAL_PIXEL_PITCH"];
+      }
       jdata.summing = (int)(jdata.pixpitch / .012);
     }
     if(originst && jdata.summing != 1 && !sampinit) {

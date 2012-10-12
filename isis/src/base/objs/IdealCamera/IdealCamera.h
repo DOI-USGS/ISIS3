@@ -36,23 +36,34 @@ namespace Isis {
    * @author  2006-10-17 Jeff Anderson and Debbie Cook
    *
    * @internal
-   *  @history 2007-10-18 Debbie A. Cook  -Corrected coding error with TransS0
-   *                         and TransL0 and added ldir and sdir.
-   *  @history 2008-06-18 Stuart Sides - Fixed doc error
-   *  @history 2008-08-08 Steven Lambright - Made the unit test work with a
-   *                         Sensor change. Also, now using the new
-   *                         LoadCache(...) method instead of CreateCache(...).
+   *   @history 2007-10-18 Debbie A. Cook  -Corrected coding error with TransS0
+   *                           and TransL0 and added ldir and sdir.
+   *   @history 2008-06-18 Stuart Sides - Fixed doc error
+   *   @history 2008-08-08 Steven Lambright - Made the unit test work with a
+   *                           Sensor change. Also, now using the new
+   *                           LoadCache(...) method instead of CreateCache(...).
    *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
-   *                          inherit directly from Camera
+   *                           inherit directly from Camera
    *   @history 2010-09-16 Jeannie Walldren - Modified test cube to run properly
-   *                          with ShapeModel changes to Sensor class and
-   *                          updated unitTest known lat/lon values.
+   *                           with ShapeModel changes to Sensor class and
+   *                           updated unitTest known lat/lon values.
    *   @history 2011-05-03 Jeannie Walldren - Updated unitTest to test for new
-   *                          methods. Updated documentation. Added Isis
-   *                          Disclaimer to files. Added NAIF error check to
-   *                          constructor.
+   *                           methods. Updated documentation. Added Isis
+   *                           Disclaimer to files. Added NAIF error check to
+   *                           constructor.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *                          coding standards. References #972.
+   *                           coding standards. References #972.
+   *   @history 2012-09-10 Steven Lambright - Added support for reading ideal information from
+   *                           the NaifKeywords object (via readValue()). This camera now
+   *                           works in 3 ways: detached spice (ideal keywords, e.g. TransX0, must
+   *                           be in the instrument group), legacy attached spice (ideal keywords
+   *                           are in the instrument group, but spice is attached so kernels will
+   *                           not be furnished), and attached spice (ideal keywords are already in
+   *                           the NaifKeywords object). The first method (detached spice) works by
+   *                           pushing the ideal keywords into the naif kernel pool. The second
+   *                           method (legacy attached spice) works by pushing the keywords on the
+   *                           fly into the NaifKeywords object (kernels won't need to be
+   *                           furnished). The third method works automatically. References #1094.
    *  
    */
   class IdealCamera : public Camera {

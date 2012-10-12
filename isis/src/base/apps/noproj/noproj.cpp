@@ -31,6 +31,10 @@ map <string, void *> GuiHelpers() {
   return helper;
 }
 
+void storeSpice(PvlGroup *instrumentGroup, PvlObject *naifKeywordsObject,
+                iString oldName, iString spiceName,
+                double constantCoeff, double multiplierCoeff, bool putMultiplierInX);
+
 void IsisMain() {
 
   // Create a process so we can output the noproj'd labels without overwriting
@@ -53,7 +57,7 @@ void IsisMain() {
   else {
     mcube = icube = p.SetInputCube("FROM");
   }
-  
+
   Camera *incam = mcube->getCamera();
 
   // Extract Instrument groups from input labels for the output match and noproj'd cubes
@@ -207,14 +211,61 @@ void IsisMain() {
   key.SetValue(instType);
   inst.AddKeyword(key);
 
-  key.SetName("FocalLength");
-  key.SetValue(Isis::iString(incam->FocalLength()), "millimeters");
-  inst.AddKeyword(key);
+  Pvl &ocubeLabel = *ocube->getLabel();
+  PvlObject *naifKeywordsObject = NULL;
 
-  key.SetName("PixelPitch");
-  key.SetValue(Isis::iString(incam->PixelPitch()*
-                             ui.GetDouble("SUMMINGMODE")), "millimeters");
-  inst.AddKeyword(key);
+  if (ocubeLabel.HasObject("NaifKeywords")) {
+    naifKeywordsObject = &ocubeLabel.FindObject("NaifKeywords");
+
+    // Clean up the naif keywords object... delete everything that isn't a radii
+    for (int keyIndex = naifKeywordsObject->Keywords() - 1; keyIndex >= 0; keyIndex--) {
+      QString keyName = QString::fromStdString(
+          (*naifKeywordsObject)[keyIndex].Name());
+      
+      if (!keyName.contains("RADII")) {
+        naifKeywordsObject->DeleteKeyword(keyIndex);
+      }
+    }
+
+    // Clean up the kernels group... delete everything that isn't internalized or the orig frame
+    //   code
+    PvlGroup &kernelsGroup = ocube->getGroup("Kernels");
+    for (int keyIndex = kernelsGroup.Keywords() - 1; keyIndex >= 0; keyIndex--) {
+      PvlKeyword &kernelsKeyword = kernelsGroup[keyIndex];
+
+      bool isTable = false;
+      bool isFrameCode = kernelsKeyword.IsNamed("NaifFrameCode") ||
+                         kernelsKeyword.IsNamed("NaifIkCode");
+      bool isShapeModel = kernelsKeyword.IsNamed("ShapeModel");
+
+      for (int keyValueIndex = 0; keyValueIndex < kernelsKeyword.Size(); keyValueIndex++) {
+        if (kernelsKeyword[keyValueIndex] == "Table") {
+          isTable = true;
+        }
+      }
+
+      if (!isTable && !isFrameCode && !isShapeModel) {
+        kernelsGroup.DeleteKeyword(keyIndex);
+      }
+    }
+  }
+
+  if (naifKeywordsObject) {
+    naifKeywordsObject->AddKeyword(PvlKeyword("IDEAL_FOCAL_LENGTH", incam->FocalLength()),
+                                   Pvl::Replace);
+  }
+  else {
+    inst.AddKeyword(PvlKeyword("FocalLength", incam->FocalLength(), "millimeters"));
+  }
+
+  double newPixelPitch = incam->PixelPitch() * ui.GetDouble("SUMMINGMODE");
+  if (naifKeywordsObject) {
+    naifKeywordsObject->AddKeyword(PvlKeyword("IDEAL_PIXEL_PITCH", newPixelPitch),
+                                   Pvl::Replace);
+  }
+  else {
+    inst.AddKeyword(PvlKeyword("PixelPitch", newPixelPitch, "millimeters"));
+  }
 
   key.SetName("EphemerisTime");
   key.SetValue(Isis::iString(et), "seconds");
@@ -234,37 +285,31 @@ void IsisMain() {
   key.SetValue(incam->FocalPlaneMap()->FocalPlaneXDependency());
   inst.AddKeyword(key);
 
-  if(transx != 0) {
-    key.SetName("TransX0");
-    key.SetValue(transx);
-    inst.AddKeyword(key);
+  int xDependency = incam->FocalPlaneMap()->FocalPlaneXDependency();
+
+  double newInstrumentTransX = incam->FocalPlaneMap()->SignMostSigX();
+  inst.AddKeyword(PvlKeyword("TransX", newInstrumentTransX));
+
+  double newInstrumentTransY = incam->FocalPlaneMap()->SignMostSigY();
+  inst.AddKeyword(PvlKeyword("TransY", newInstrumentTransY));
+
+  storeSpice(&inst, naifKeywordsObject, "TransX0", "IDEAL_TRANSX", transx,
+             newPixelPitch * newInstrumentTransX, (xDependency == CameraFocalPlaneMap::Sample));
+
+  storeSpice(&inst, naifKeywordsObject, "TransY0", "IDEAL_TRANSY", transy,
+             newPixelPitch * newInstrumentTransY, (xDependency == CameraFocalPlaneMap::Line));
+
+  double transSXCoefficient = 1.0 / newPixelPitch * newInstrumentTransX;
+  double transLXCoefficient = 1.0 / newPixelPitch * newInstrumentTransY;
+
+  if (xDependency == CameraFocalPlaneMap::Line) {
+    swap(transSXCoefficient, transLXCoefficient);
   }
 
-  if(transy != 0) {
-    key.SetName("TransY0");
-    key.SetValue(transy);
-    inst.AddKeyword(key);
-  }
-
-  if(transs != 0) {
-    key.SetName("TransS0");
-    key.SetValue(transs);
-    inst.AddKeyword(key);
-  }
-
-  if(transl != 0) {
-    key.SetName("TransL0");
-    key.SetValue(transl);
-    inst.AddKeyword(key);
-  }
-
-  key.SetName("TransX");
-  key.SetValue(incam->FocalPlaneMap()->SignMostSigX());
-  inst.AddKeyword(key);
-
-  key.SetName("TransY");
-  key.SetValue(incam->FocalPlaneMap()->SignMostSigY());
-  inst.AddKeyword(key);
+  storeSpice(&inst, naifKeywordsObject, "TransS0", "IDEAL_TRANSS",
+             transs, transSXCoefficient, (xDependency == CameraFocalPlaneMap::Sample));
+  storeSpice(&inst, naifKeywordsObject, "TransL0", "IDEAL_TRANSL",
+             transl, transLXCoefficient, (xDependency == CameraFocalPlaneMap::Line));
 
   if(instType == "LINESCAN") {
     key.SetName("ExposureDuration");
@@ -345,6 +390,30 @@ void LoadMatchSummingMode() {
 
   ui.Clear("SOURCE");
   ui.PutAsString("SOURCE", "FROMUSER");
+}
+
+
+void storeSpice(PvlGroup *instrumentGroup, PvlObject *naifKeywordsObject,
+                iString oldName, iString spiceName,
+                double constantCoeff, double multiplierCoeff, bool putMultiplierInX) {
+  if(constantCoeff != 0 && !naifKeywordsObject && instrumentGroup) {
+    instrumentGroup->AddKeyword(PvlKeyword(oldName, constantCoeff));
+  }
+  else if (naifKeywordsObject) {
+    PvlKeyword spiceKeyword(spiceName);
+    spiceKeyword += constantCoeff;
+
+    if (putMultiplierInX) {
+      spiceKeyword += multiplierCoeff;
+      spiceKeyword += 0.0;
+    }
+    else {
+      spiceKeyword += 0.0;
+      spiceKeyword += multiplierCoeff;
+    }
+
+    naifKeywordsObject->AddKeyword(spiceKeyword, Pvl::Replace);
+  }
 }
 
 

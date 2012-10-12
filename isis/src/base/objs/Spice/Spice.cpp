@@ -150,9 +150,7 @@ namespace Isis {
       *p_endTimePadding = 0.0;
     }
 
-    // p_usingNaif = !lab.HasObject("NaifKeywords") || noTables;
-    p_usingNaif = !lab.HasObject("NaifKeywords") || noTables
-      || lab.FindObject("IsisCube").HasGroup("OriginalInstrument");
+    p_usingNaif = !lab.HasObject("NaifKeywords") || noTables;
 
 //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
 //  missions (e.g., MESSENGER) may augment the s/c SPK with new planet

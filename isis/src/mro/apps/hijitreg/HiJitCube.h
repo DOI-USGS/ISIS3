@@ -49,6 +49,8 @@ namespace Isis {
    * @author 2006-05-04 Kris Becker
    *
    * @internal
+   *   @history 2012-09-25 Steven Lambright - Pixel pitch value can now come from either the
+   *                           instrument group or the naif keywords group. References #1094.
    */
   class HiJitCube : public Cube {
     public:
