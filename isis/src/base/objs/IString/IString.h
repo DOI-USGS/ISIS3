@@ -164,6 +164,7 @@ namespace Isis {
    *                            Compress() - Please use QString::trimmed(), QString::simplified()
    *                                         or QString::replace(). If you need to respect quotes,
    *                                         please create a standard-compliant static method.
+   *  @history 2012-10-12 Kris Becker - Fixed compatability issue with Qt on MacOSX
    */
   class IString : public std::string {
     public:
