@@ -1319,6 +1319,6 @@ namespace Isis {
    * @return The modified output stream
    */
   std::ostream &operator<<(std::ostream &outputStream, const QStringRef &string) {
-    return (outputStream << string.toAscii().data());
+    return (outputStream << string.string()->toAscii().data());
   }
 }
