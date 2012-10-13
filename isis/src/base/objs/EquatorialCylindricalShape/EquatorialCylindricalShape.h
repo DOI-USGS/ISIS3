@@ -30,10 +30,11 @@
 #include "naif/SpiceZmc.h"
 
 #include "DemShape.h"
-#include "SurfacePoint.h"
-#include "Pvl.h"
+//#include "SurfacePoint.h"
+//#include "Pvl.h"
 
 namespace Isis {
+  class Pvl;
   /**
    * @brief Define shapes and provide utilities for Isis3 targets
    *

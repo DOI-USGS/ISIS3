@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iomanip>
 
+#include "Distance.h"
 #include "ShapeModel.h"
 #include "SurfacePoint.h"
 #include "IException.h"
@@ -25,7 +26,7 @@ namespace Isis {
 
 
   /**
-   * Initialize the ShapeModel private variables.
+   * Construct and load a shape model from a pvl
    *
    * @param pvl Valid Isis3 cube label.
    */
@@ -36,7 +37,7 @@ namespace Isis {
 
 
   /**
-   * Initialize the ShapeModel private variables.
+   * Construct and load a shape model from a target only
    *
    * @param target Valid Isis3 target.
    */
@@ -82,7 +83,7 @@ namespace Isis {
     // Jeff and Stuart respond.
 
    // if ( !m_hasIntersection ) {
-    if (!surfaceIntersection()->Valid()) {
+    if (!surfaceIntersection()->Valid() || !m_hasIntersection) {
      Isis::iString msg = "A valid intersection must be defined before computing the surface normal";
       throw IException(IException::Programmer, msg, _FILEINFO_);
    }
@@ -240,6 +241,8 @@ namespace Isis {
     unorm_c(puB, upuB, &dist);
 
     double angle = vdot_c(upsB, upuB);
+
+    // How can these lines be tested???
     if(angle > 1.0) return 0.0;
     if(angle < -1.0) return 180.0;
     return acos(angle) * RAD2DEG;

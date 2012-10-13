@@ -29,12 +29,18 @@
 #include "naif/SpiceZfc.h"
 #include "naif/SpiceZmc.h"
 
-#include "SurfacePoint.h"
-#include "Pvl.h"
-//#include "Target.h"
+#include <QVector>
+
+//#include "SurfacePoint.h"
+//#include "Pvl.h"
 
 namespace Isis {
+  class Distance;
+  class Latitude;
+  class Longitude;
+  class Pvl;
   class Spice;
+  class SurfacePoint;
   class Target;
   /**
    * @brief Define shapes and provide utilities for Isis3 targets

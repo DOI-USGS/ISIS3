@@ -36,6 +36,7 @@
 #include "iTime.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
+#include "ShapeModel.h"
 #include "Target.h"
 
 #include "getSpkAbCorrState.hpp"
@@ -377,11 +378,6 @@ namespace Isis {
     if (m_et != NULL) {
       delete m_et;
       m_et = NULL;
-    }
-
-    if (m_target != NULL) {
-      delete m_target;
-      m_target = NULL;
     }
 
     if (m_startTime != NULL) {

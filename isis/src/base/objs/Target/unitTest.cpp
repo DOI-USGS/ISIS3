@@ -28,6 +28,15 @@
 #include "Target.h"
 #include "Preference.h"
 
+  /**
+   * This application tests the Target class.
+   *
+   * @author 2012-03-20 Debbie A. Cook
+   *
+   * @internal
+   *   @history
+   */
+
 using namespace Isis;
 using namespace std;
 
@@ -56,7 +65,9 @@ int main(int argc, char *argv[]) {
   // These are not part of the Target class funtionality except to test missing body code
   PvlGroup kern1("Kernels");
   FileName f("$base/testData/kernels");
+  FileName f2("$base/dems");
   string dir = f.expanded() + "/";
+  string dir2 = f2.expanded() + "/";
   kern1 += PvlKeyword("NaifFrameCode", -94031);
   kern1 += PvlKeyword("LeapSecond", dir + "naif0007.tls");
   kern1 += PvlKeyword("SpacecraftClock", dir + "MGS_SCLKSCET.00045.tsc");
@@ -69,7 +80,7 @@ int main(int argc, char *argv[]) {
   kern1 += PvlKeyword("Frame", "");
 
   PvlGroup kern2("Kernels");
-  kern2 += PvlKeyword("NaifFrameCode", -94031);
+  kern2 += PvlKeyword("NaifIkCode", -94031);
   kern2 += PvlKeyword("LeapSecond", dir + "naif0007.tls");
   kern2 += PvlKeyword("SpacecraftClock", dir + "MGS_SCLKSCET.00045.tsc");
   kern2 += PvlKeyword("TargetPosition", dir + "de405.bsp");
@@ -80,6 +91,9 @@ int main(int argc, char *argv[]) {
   kern2 += PvlKeyword("InstrumentPointing", dir + "moc.bc");
   kern2 += PvlKeyword("Frame", "");
   kern2 += PvlKeyword("NaifBodyCode", 499);
+
+  PvlGroup kern3 = kern2;
+  kern3 += PvlKeyword("ShapeModel", dir2  + "molaMarsPlanetaryRadius0005.cub");
 
   // Time Setup
   double startTime = -69382819.0;
@@ -120,32 +134,43 @@ int main(int argc, char *argv[]) {
   cout << "     IsSky = " << tSky.isSky() << endl;
   r = tSky.radii();
   cout << "     Sky Target radii = " << r[0].kilometers() << "/" << r[1].kilometers() << "/" << r[2].kilometers() << endl;
+  cout << "     NaifBodyCode = " << tSky.naifBodyCode() << endl;
 
-  // Create a Spice object to test setSky
-  Spice spi2(lab2);
-  cout << "     NaifBodyCode = " << spi2.target()->naifBodyCode() << endl;
-
+  // Test Sky with NaifSpkCode override
+  PvlGroup kern4 = kern1;
+  kern4 += PvlKeyword("NaifSpkCode", "-93");
   Pvl lab3;
+  lab3.AddGroup(inst2);
+  lab3.AddGroup(kern4);
+  Target tSky2(&spi, lab3);
+  cout << endl;
+  cout << "  Testing Sky with NaifSpkCode..." << endl;
+  cout << "     IsSky = " << tSky.isSky() << endl;
+  cout << "     NaifBodyCode = " << tSky2.naifBodyCode() << endl;
+  r = tSky2.radii();
+  cout << "     Sky Target radii = " << r[0].kilometers() << "/" << r[1].kilometers() << "/" << r[2].kilometers() << endl;
+
+  Pvl lab4;
   // Test without instrument group
   try {
     cout << endl;
     cout << "  Testing no instrument group ..." << endl;
-    lab3.AddGroup(kern2);
-    Target tNoInstrument(&spi2, lab3);
+    lab4.AddGroup(kern2);
+    Target tNoInstrument(&spi, lab4);
   }
   catch(IException &e) {
     e.print();
     cout << endl;
   }
   
-  Pvl lab4;
-  lab3.AddGroup(inst3);
+  Pvl lab5;
+  lab4.AddGroup(inst3);
 
   // Test without kernels group
   try {
     cout << endl;
     cout << "  Testing no kernels group ..." << endl;
-    Target tNoKernels(&spi2, lab4);
+    Target tNoKernels(&spi, lab5);
   }
   catch(IException &e) {
     e.print();
@@ -156,7 +181,7 @@ int main(int argc, char *argv[]) {
   try {
     cout << endl;
     cout << "  Testing unknown target ..." << endl;
-    Target tUnknownTarget(&spi, lab3);
+    Target tUnknownTarget(&spi, lab4);
   }
   catch(IException &e) {
     e.print();
@@ -164,10 +189,28 @@ int main(int argc, char *argv[]) {
   }
 
   // Test case with override of body code
-  lab4.AddGroup(inst2);
-  lab4.AddGroup(kern2);
-  Target tOverrideBodyCode(&spi, lab4);
-  cout << endl;
-  cout << "  Testing case with bodycode override" << endl;
-  cout << "     NaifBodyCode = " << tOverrideBodyCode.naifBodyCode() << endl;
+  // lab5.AddGroup(inst2);
+  // lab5.AddGroup(kern4);
+  // Target tOverrideBodyCode(&spi, lab5);
+  // cout << endl;
+  // cout << "  Testing case with bodycode override" << endl;
+  // cout << "     NaifBodyCode = " << tOverrideBodyCode.naifBodyCode() << endl;
+
+  // Test methods setShapeEllipsoid and restoreShape
+  Pvl lab6;
+  lab6.AddGroup(inst1);
+  lab6.AddGroup(kern3);
+  Spice spi3(lab6);
+  cout << endl << "  Testing methods setShapeEllipsoid and restoreShape..." << endl;
+  cout << "    Original shape is " << spi3.target()->shape()->name() << endl;
+  spi3.target()->setShapeEllipsoid();
+  cout << "    Shape changed to  " << spi3.target()->shape()->name() << endl;
+  spi3.target()->restoreShape();
+  cout << "    Shape restored to  " << spi3.target()->shape()->name() << endl;
+
+  //Test the default constructor
+  Target defaultTarget;
+  cout << endl << "  Testing default constructor..." << endl << "    Is it Sky? "  << defaultTarget.isSky() << endl;
+  cout << "    Number of radii = " << defaultTarget.radii().size() << endl;
+
 }

@@ -38,8 +38,10 @@ namespace Isis {
    *
    * @param lab Label containing Instrument and Kernels groups.
    *
+   * @author 2012-03-20 Debbie A. Cook
+   *
    * @internal
-   * @history 2005-11-29 Debbie A. Cook - Original version
+   * @history 2012-10-11 Debbie A. Cook - Original version
    */
 
   // TODO: what is needed to initialize?
@@ -47,18 +49,22 @@ namespace Isis {
 
     // Initialize members
     init();
+    m_bodyCode = new SpiceInt;
+    m_radii.resize(3, Distance());
     m_spice = spice;
 
+    // If we get this far, we know we have a kernels group.  Spice requires it.
     PvlGroup &kernels = lab.FindGroup("Kernels", Pvl::Traverse);
 
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
+    m_name = new iString;
     *m_name = inst["TargetName"][0];
+    string trykey = "NaifIkCode";
+    if (kernels.HasKeyword("NaifFrameCode")) trykey = "NaifFrameCode";
 
     if (name().UpCase() == "SKY") {
       m_radii[0] = m_radii[1] = m_radii[2] = Distance(1000.0, Distance::Meters);
       m_sky = true;
-      string trykey = "NaifIkCode";
-      if (kernels.HasKeyword("NaifFrameCode")) trykey = "NaifFrameCode";
       int ikCode = (int) kernels[trykey];
       *m_bodyCode  = ikCode / 1000;
       // Check for override in kernel group
@@ -76,33 +82,36 @@ namespace Isis {
     // Override it if it exists in the labels
     if (kernels.HasKeyword("NaifBodyCode"))
       *m_bodyCode = (int) kernels["NaifBodyCode"];
-    m_shape = ShapeModelFactory::Create(this, lab);
+    m_shape = ShapeModelFactory::create(this, lab);
   }
 
 
   /**
    * Constructs an empty Target object
    *
+   * @author 2012-03-20 Debbie A. Cook
+   *
    * @internal
    * @history 2012-08-29 Debbie A. Cook - Original version
    */
 
   Target::Target() {
-    init();
+    m_bodyCode = NULL;
+    m_name = NULL;
     m_spice = NULL;
-  }
+    init();
+ }
+
 
   /**
    * Initialize member variables
+   *
+   * @author 2012-03-20 Debbie A. Cook
    *
    * @internal
    * @history 2012-08-31 Debbie A. Cook - Original version
    */
   void Target::init() {
-    m_bodyCode = new SpiceInt;
-    // m_radii.resize(3);
-    m_radii.resize(3, Distance());
-    m_name = new iString;
     m_shape = NULL;
     m_originalShape = NULL;
     m_sky = false;
@@ -227,9 +236,9 @@ namespace Isis {
    * This sets the NAIF body code of a "SKY" target to the observing spacecraft.
    *
    */
-  void Target::setSky(SpiceInt bodyCode) const {
-      *m_bodyCode = bodyCode;  // TODO Is this the best way for now???
-  }
+  // void Target::setSky(SpiceInt bodyCode) const {
+  //     *m_bodyCode = bodyCode;  // TODO Is this the best way for now???
+  // }
 
 
   /**

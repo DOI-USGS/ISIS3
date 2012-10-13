@@ -41,7 +41,8 @@ using namespace Isis;
 
 int main() {
   Preference::Preferences(true);
-  string inputFile = "$mgs/testData/ab102401.cub";
+  // string inputFile = "$mgs/testData/ab102401.cub";
+  string inputFile = "/work/projects/isis/latest/m00775/test/M123149061RE.lev1.cub";
   Cube cube;
   cube.open(inputFile);
   Camera *c = cube.getCamera();
@@ -60,8 +61,10 @@ int main() {
   cout << "Testing method intersectSurface..." << endl; 
   cout << "  Do we have an intersection? " << shape.hasIntersection() << endl;
   cout << " Set a pixel in the image and check again." << endl;
-  double line = 453.0;
-  double sample = 534.0;
+  // double line = 453.0;
+  // double sample = 534.0;
+  double line = 1255.62;
+  double sample = 26112.5;
   c->SetImage(sample, line);
   std::vector<double> sB(3);
   c->instrumentPosition((double *) &sB[0]);

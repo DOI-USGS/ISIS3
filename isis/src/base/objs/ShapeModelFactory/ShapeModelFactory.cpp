@@ -32,12 +32,13 @@
 #include "iString.h"
 #include "FileName.h"
 #include "Projection.h"
+#include "Pvl.h"
 #include "PvlGroup.h"
 #include "Target.h"
 
 namespace Isis {
 
-  ShapeModel *ShapeModelFactory::Create(Target *target, Pvl &pvl) {
+  ShapeModel *ShapeModelFactory::create(Target *target, Pvl &pvl) {
     
     // get kernels and instrument Pvl groups
     PvlGroup &kernelsPvlGroup = pvl.FindGroup("Kernels", Pvl::Traverse);
@@ -54,14 +55,15 @@ namespace Isis {
     // labels, but we assign either one to the shapeModelFilename. Do we
     // need a shapeModelFilename AND an elevationModelFilename?
     // is this historical? Interchangeable?
-    if (kernelsPvlGroup.HasKeyword("ElevationModel") &&
-        !kernelsPvlGroup["ElevationModel"].IsNull() &&
-        !skyTarget) {
+    if (skyTarget) {
+      // Sky targets are ellipsoid shapes
+    }
+    else if (kernelsPvlGroup.HasKeyword("ElevationModel") &&
+             !kernelsPvlGroup["ElevationModel"].IsNull())  {//&&
       shapeModelFilenames = (std::string) kernelsPvlGroup["ElevationModel"];
     }
-    else if(kernelsPvlGroup.HasKeyword("ShapeModel") &&
-            !kernelsPvlGroup["ShapeModel"].IsNull() &&
-            !skyTarget) {
+    else if (kernelsPvlGroup.HasKeyword("ShapeModel") &&
+             !kernelsPvlGroup["ShapeModel"].IsNull()) {//&&
       shapeModelFilenames = (std::string) kernelsPvlGroup["ShapeModel"];
     }
 
@@ -77,33 +79,37 @@ namespace Isis {
     //  shapeModel = new PlaneShape(target, pvl);
     // }
     else {
-      // Is the shape model an Isis DEM?
-      // TODO Deal with stacks -- this could be a list of DEMs
       try {
-        // first, try to open the shape model file as an Isis3 cube
+        // Is the shape model an Isis DEM?
+        // TODO Deal with stacks -- this could be a list of DEMs
         Isis::Cube shapeModelCube;
-        shapeModelCube.open(shapeModelFilenames, "r" );
+        try {
+          // first, try to open the shape model file as an Isis3 cube
+          shapeModelCube.open(shapeModelFilenames, "r" );
+        }
+        catch (IException &e) {
+          iString msg = "Shape file" + shapeModelFilenames + " does not exist or is not an Isis cube";
+          throw IException(e, IException::Unknown, msg, _FILEINFO_);
+        }
         
-        //Pvl *label = tmpCube.getLabel();
-        //PvlGroup &mappingPvlGroup = label->FindGroup("Mapping", Isis::Pvl::Traverse);
-        // std::string proj = mapGroup["ProjectionName"];
-        
-        // get projection of shape model cube
-        Projection *projection = shapeModelCube.getProjection();
-        if (projection == NULL) {
-          iString msg = "Shape model cube must be a DEM file, meaning it must" \
-                        "be map projected. This cube is NOT map projected.";
+        try {
+          // get projection of shape model cube
+          Projection *projection = shapeModelCube.getProjection();
+
+          // Next, check if ISIS DEM cube is an equatorial cylindrical projection
+          if (projection->IsEquatorialCylindrical())
+            shapeModel = new EquatorialCylindricalShape(target, pvl);
+          else 
+            shapeModel = new DemShape(target, pvl);
+        }
+        catch (IException &e) {
+          iString msg = "Shape model cube must be an Isis DEM file, meaning it must " \
+                        "be map-projected. This cube is NOT map projected.";
           throw IException(IException::User, msg, _FILEINFO_);
         }
-
-        // Next, check if ISIS DEM cube is an equatorial cylindrical projection
-        if (projection->IsEquatorialCylindrical())
-          shapeModel = new EquatorialCylindricalShape(target, pvl);
-        else 
-          shapeModel = new DemShape(target, pvl);
       }
       catch (IException &e) {
-        iString msg = "Shape file" + shapeModelFilenames + " is not supported";
+        iString msg = "Failed opening shape file" + shapeModelFilenames;
         throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
     }

@@ -26,18 +26,28 @@
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "Cube.h"
+#include "DemShape.h"
 #include "EllipsoidShape.h"
 #include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "Preference.h"
 #include "Pvl.h"
-#include "DemShape.h"
 #include "SurfacePoint.h"
 #include "Target.h"
 
 using namespace std;
 using namespace Isis;
+ 
+ /**
+   * This application tests the DemShape base class
+   *
+   *
+   * @author 2010-10-11 Debbie A. Cook
+   *
+   * @internal
+   *  @history
+   */
 
 class MyShape : public DemShape {
   public:
@@ -48,7 +58,7 @@ class MyShape : public DemShape {
    void testDemCube()  {
      // Cube *demCube();
      iString fileName = demCube()->getFileName();
-     cout << "Using dem cube file = " << demCube()->getFileName() << endl;
+     cout << "    Using dem cube file = " << demCube()->getFileName() << endl;
    }
 };
 
@@ -67,13 +77,16 @@ int main() {
 
   cout << "Begin testing Dem Shape Model class...." << endl;
 
+  cout << endl << "  Testing constructors..." << endl;
   DemShape shape(&targ, pvl);
+  DemShape defaultShape;
 
-  cout << "Shape name is " << shape.name() << endl;
+  cout << "    Shape name is " << shape.name() << endl;
+  cout << "    Shape name is " << defaultShape.name() << endl;
 
-  cout << "Testing method intersectSurface..." << endl; 
-  cout << "  Do we have an intersection? " << shape.hasIntersection() << endl;
-  cout << " Set a pixel in the image and check again." << endl;
+  cout << endl << "  Testing method intersectSurface..." << endl; 
+  cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
+  cout << "    Set a pixel in the image and check again." << endl;
   double line = 453.0;
   double sample = 534.0;
   c->SetImage(sample, line);
@@ -92,15 +105,15 @@ Local normal = -0.581842, -0.703663, 0.407823
   Emission                   = 46.966269013795
   */
   if (!shape.intersectSurface(sB, lookB)) { 
-      cout << "...  intersectSurface method failed" << endl;
+      cout << "    ...  intersectSurface method failed" << endl;
       return -1;
   }
-  cout << "  Do we have an intersection? " << shape.hasIntersection() << endl;
+  cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
   SurfacePoint *sp = shape.surfaceIntersection();
-  cout << "   surface point = (" << sp->GetX().kilometers() << ", " << 
+  cout << "    surface point = (" << sp->GetX().kilometers() << ", " << 
     sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << endl;
 
-  cout << "Testing class method calculateLocalNormal..." << endl;
+  cout << endl << "  Testing class method calculateLocalNormal with correction for inward pointing vector" << endl;
   QVector<double *>  neighborPoints(4);
 
 // neighbor 0 -2123.07 -2380.15 1195.48
@@ -123,46 +136,90 @@ Local normal = -0.581842, -0.703663, 0.407823
   neighborPoints[3][1]  = -2380.79;
   neighborPoints[3][2]  = 1194.63;
 
-  // TODO ** Fill in values for neighborPoints
   shape.calculateLocalNormal(neighborPoints);
   vector<double> myNormal(3);
   myNormal = shape.normal();
-  cout << "  local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
+  cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
-  cout << "Testing class method calculateSurfaceNormal..." << endl;
+  cout << endl << "  Testing class method calculateSurfaceNormal..." << endl;
   shape.calculateSurfaceNormal(); 
   myNormal = shape.normal();
-  cout << "  surface normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
+  cout << "    surface normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
-  cout << "Testing class method calculateDefaultNormal..." << endl;
+  cout << endl << "  Testing class method calculateDefaultNormal..." << endl;
   shape.calculateDefaultNormal();
   myNormal = shape.normal();
-  cout << "  default normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
+  cout << "    default normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
-  cout << "Testing localRadius method ..." << endl;
-  cout  << "Local radius = " << shape.localRadius(Latitude(20.532461495381, Angle::Degrees),
+  cout << endl << "  Testing localRadius method with good lat/lon values..." << endl;
+  cout  << "    Local radius = " << shape.localRadius(Latitude(20.532461495381, Angle::Degrees),
                                                   Longitude(228.26609149754, Angle::Degrees)).kilometers() << endl;
   // Mars radii = 3397.      3397.         3375.
 
-  cout << "Testing setHasIntersection method" << endl;
-  shape.setHasIntersection(false);
-  cout << "  Do we have an intersection? " << shape.hasIntersection() << endl;
+  cout << endl << "  Testing localRadius method with bad lat/lon values..." << endl;
+  cout  << "    Local radius = " << shape.localRadius(Latitude(Null, Angle::Degrees),
+                                                  Longitude(228.26609149754, Angle::Degrees)).kilometers() << endl;
 
-  cout << "Testing setSurfacePoint method ..." << endl;
+  cout << endl << "  Testing setHasIntersection method" << endl;
+  shape.setHasIntersection(false);
+  cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
+
+  cout << endl << "  Testing setSurfacePoint method ..." << endl;
   shape.setSurfacePoint(*sp);
-  cout << "   Do we have an intersection? " << shape.hasIntersection() << endl;
-  cout << "   surface point = (" << sp->GetX().kilometers() << ", " << 
+  cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
+  cout << "    surface point = (" << sp->GetX().kilometers() << ", " << 
     sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << endl;
 
-  cout << "Testing demScale method..." << endl;
-  cout << "   The map scale of the dem file is " << shape.demScale() << " pixels/degree" << endl;
+  cout << endl << "  Testing demScale method..." << endl;
+  cout << "    The map scale of the dem file is " << shape.demScale() << " pixels/degree" << endl;
 
-  cout << "Testing protected methods demCube ..." << endl;
+  cout << endl << "  Testing protected methods demCube ..." << endl;
 
   MyShape shape2(&targ, pvl);
   shape2.testDemCube();
-  // TODO 
-  // Test alternate constructors DemShape() and DemShape(target)
+
+  // Test pvl with ElevationModel instead of ShapeModel
+  cout << endl << "  Testing input of dem file with keyword ElevationModel" << endl;
+  try {
+    Pvl elPvl;
+    PvlGroup kernels = pvl.FindGroup("Kernels", Pvl::Traverse);
+    iString demCubeFile;
+    demCubeFile = (std::string) kernels["ShapeModel"];
+    kernels.DeleteKeyword("ShapeModel");
+    PvlKeyword shapeKey("ElevationModel", demCubeFile);
+    kernels.AddKeyword(shapeKey);
+    elPvl.AddGroup(kernels);
+    DemShape elShape (&targ, elPvl);
+  }
+  catch(Isis::IException &e) {
+    e.print();
+  }
+
+
+  // Test calculateLocalNormal with dotprod > 0
+  neighborPoints[2][0]  = -2123.07;
+  neighborPoints[2][1]  = -2380.15;
+  neighborPoints[2][2]  = 1195.48;
+  neighborPoints[3][0]  = 2123.66;
+  neighborPoints[3][1]  = 2380.59;
+  neighborPoints[3][2]  = 1193.88;
+  cout << endl << "  Testing method calculateLocalNormal with vector pointing outward" << endl;
+  shape.calculateLocalNormal(neighborPoints);
+  myNormal = shape.normal();
+  cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
+
+  // Test calculateLocalNormal with magnitude = 0
+  try {
+  neighborPoints[3][0]  = -2123.66;
+  neighborPoints[3][1]  = -2380.59;
+  cout << endl << "  Testing method calculateLocalNormal with magnitude = 0" << endl;
+  shape.calculateLocalNormal(neighborPoints);
+  myNormal = shape.normal();
+  cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
+  }
+  catch(Isis::IException &e) {
+    e.print();
+  }
 
 
   cube.close();

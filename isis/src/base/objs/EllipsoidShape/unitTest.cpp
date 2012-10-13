@@ -34,6 +34,7 @@
 #include "Pvl.h"
 #include "ShapeModel.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 
 using namespace std;
 using namespace Isis;
@@ -47,26 +48,41 @@ int main() {
   Camera *c = cube.getCamera();
   std::vector<Distance> radii = c->target()->radii();
   Pvl pvl = *cube.getLabel();
-  Target targ(pvl);
+  Spice spi(pvl);
+  Target targ(&spi, pvl);
   targ.setRadii(radii);
 
   cout << "Begin testing Ellipsoid Shape Model class...." << endl;
 
+  cout << endl << "  Testing constructors..."  << endl;
   EllipsoidShape shape(&targ, pvl);
+  EllipsoidShape shape2(&targ);
+  EllipsoidShape shape3;
 
-  cout << "Shape name is " << shape.name() << endl;
+  cout << "    Shape1  name is " << shape.name() << endl;
+  cout << "    Shape2  name is " << shape2.name() << endl;
+  cout << "    Shape3  name is " << shape3.name() << endl;
 
-  cout << "Testing method intersectSurface..." << endl; 
-  cout << "  Do we have an intersection? " << shape.hasIntersection() << endl;
-  cout << " Set a pixel in the image and check again." << endl;
+  std::vector<double> sB(3);
+  sB[0] = -2399.54;
+  sB[1] = -2374.03;
+  sB[2] = 1277.68;
+  std::vector<double> lookB(3, 1.);
+  lookB[0] = -1.;
+  cout << endl << "  Testing method intersectSurface with failure..." << endl; 
+  cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
+  shape.intersectSurface(sB, lookB);
+  if (!shape.hasIntersection()) cout << "    Intersection failed " << endl;
+
+  cout << endl << "Testing method intersectSurface..." << endl; 
+  cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
+  cout << "   Set a pixel in the image and check again." << endl;
   double line = 453.0;
   double sample = 534.0;
   c->SetImage(sample, line);
-  std::vector<double> sB(3);
   c->instrumentPosition((double *) &sB[0]);
   std::vector<double> uB(3);
   c->sunPosition((double *) &uB[0]);
-  std::vector<double> lookB(3);
   c->SpacecraftSurfaceVector((double *) &lookB[0]);
   /*
 Sample/Line = 534/453
@@ -76,16 +92,16 @@ Local normal = -0.581842, -0.703663, 0.407823
   Incidence                  = 85.341094499768
   Emission                   = 46.966269013795
   */
-  if (!shape.intersectSurface(sB, lookB, 1)) { 
-      cout << "...  intersectSurface method failed" << endl;
+  if (!shape.intersectSurface(sB, lookB)) { 
+      cout << "    ...  intersectSurface method failed" << endl;
       return -1;
   }
-  cout << "  Do we have an intersection? " << shape.hasIntersection() << endl;
+  cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
   SurfacePoint *sp = shape.surfaceIntersection();
-  cout << "   surface point = (" << sp->GetX().kilometers() << ", " << 
+  cout << "     surface point = (" << sp->GetX().kilometers() << ", " << 
     sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << endl;
 
-  cout << "Testing class method calculateLocalNormal..." << endl;
+  cout << endl << "  Testing class method calculateLocalNormal..." << endl;
   QVector<double *>  notUsed(4);
 
   for (int i = 0; i < notUsed.size(); i ++)
@@ -94,36 +110,32 @@ Local normal = -0.581842, -0.703663, 0.407823
   shape.calculateLocalNormal(notUsed);
   vector<double> myNormal(3);
   myNormal = shape.normal();
-  cout << "  local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
+  cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
-  cout << "Testing class method calculateSurfaceNormal..." << endl;
+  cout << endl << "  Testing class method calculateSurfaceNormal..." << endl;
   shape.calculateSurfaceNormal(); 
   myNormal = shape.normal();
-  cout << "  surface normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
+  cout << "    surface normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
-  cout << "Testing class method calculateDefaultNormal..." << endl;
+  cout << endl << "  Testing class method calculateDefaultNormal..." << endl;
   shape.calculateDefaultNormal();
   myNormal = shape.normal();
-  cout << "  default normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
+  cout << "    default normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
 
-  cout << "Testing localRadius method ..." << endl;
-  cout  << "Local radius = " << shape.localRadius(Latitude(20.532461495381, Angle::Degrees),
+  cout << endl << "  Testing localRadius method ..." << endl;
+  cout  << "    Local radius = " << shape.localRadius(Latitude(20.532461495381, Angle::Degrees),
                                                   Longitude(228.26609149754, Angle::Degrees)).kilometers() << endl;
   // Mars radii = 3397.      3397.         3375.
 
-  cout << "Testing setHasIntersection method" << endl;
+  cout << endl << "  Testing setHasIntersection method" << endl;
   shape.setHasIntersection(false);
-  cout << "  Do we have an intersection? " << shape.hasIntersection() << endl;
+  cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
 
-  cout << "Testing setSurfacePoint method ..." << endl;
+  cout << endl << "  Testing setSurfacePoint method ..." << endl;
   shape.setSurfacePoint(*sp);
-  cout << "   Do we have an intersection? " << shape.hasIntersection() << endl;
-  cout << "   surface point = (" << sp->GetX().kilometers() << ", " << 
+  cout << "     Do we have an intersection? " << shape.hasIntersection() << endl;
+  cout << "     surface point = (" << sp->GetX().kilometers() << ", " << 
     sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << endl;
-
-  // TODO 
-  // Test alternate constructors EllipsoidShape() and EllipsoidShape(target)
-
 
   cube.close();
 }

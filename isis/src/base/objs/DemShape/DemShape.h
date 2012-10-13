@@ -32,8 +32,6 @@
 #include "naif/SpiceZmc.h"
 
 #include "ShapeModel.h"
-#include "SurfacePoint.h"
-#include "Pvl.h"
 
 namespace Isis {
   class Cube;

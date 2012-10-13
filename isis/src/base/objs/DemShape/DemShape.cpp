@@ -6,7 +6,6 @@
 #include <cmath>
 #include <iomanip>
 
-//#include "SimpShape.h"
 #include "Cube.h"
 #include "CubeManager.h"
 #include "DemShape.h"
@@ -15,11 +14,12 @@
 #include "Interpolator.h"
 #include "Latitude.h"
 #include "Longitude.h"
+#include "NaifStatus.h"
 #include "Portal.h"
 #include "Projection.h"
+#include "Pvl.h"
 #include "SurfacePoint.h"
-#include "IException.h"
-#include "NaifStatus.h"
+//#include "IException.h"
 #include "UniqueIOCachingAlgorithm.h"
 
 using namespace std;
@@ -238,8 +238,9 @@ namespace Isis {
     
     m_demProj->SetUniversalGround(lat.degrees(), lon.degrees());
     
-    if (!m_demProj->IsGood())
-      return Distance();
+    // The next if statement attempts to do the same as the previous one, but not as well 
+    // if (!m_demProj->IsGood())
+    //   return Distance();
 
     m_portal->SetPosition(m_demProj->WorldX(), m_demProj->WorldY(), 1);
 
@@ -280,12 +281,12 @@ namespace Isis {
   /** 
    * Calculate local normal
    */
-  void DemShape::calculateLocalNormal (QVector<double *> cornerNeighborPoints) {
+  void DemShape::calculateLocalNormal (QVector<double *> neighborPoints) {
     // subtract bottom from top and left from right and store results
     double topMinusBottom[3];
-    vsub_c(cornerNeighborPoints[0], cornerNeighborPoints[1], topMinusBottom);
+    vsub_c(neighborPoints[0], neighborPoints[1], topMinusBottom);
     double rightMinusLeft[3];
-    vsub_c(cornerNeighborPoints[3], cornerNeighborPoints [2], rightMinusLeft);
+    vsub_c(neighborPoints[3], neighborPoints [2], rightMinusLeft);
 
     // take cross product of subtraction results to get normal
     std::vector<SpiceDouble> normal(3);

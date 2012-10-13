@@ -11,6 +11,11 @@ Unit test for Isis::Target
      Sky Target radii = 1/1/1
      NaifBodyCode = -94
 
+  Testing Sky with NaifSpkCode...
+     IsSky = 1
+     NaifBodyCode = -93
+     Sky Target radii = 1/1/1
+
   Testing no instrument group ...
 **ERROR** Unable to find PVL group [Instrument].
 
@@ -23,5 +28,11 @@ Unit test for Isis::Target
 **I/O ERROR** Could not convert Target [Mard] to NAIF code.
 
 
-  Testing case with bodycode override
-     NaifBodyCode = 499
+  Testing methods setShapeEllipsoid and restoreShape...
+    Original shape is EquatorialCylindricalShape
+    Shape changed to  Ellipsoid
+    Shape restored to  EquatorialCylindricalShape
+
+  Testing default constructor...
+    Is it Sky? 0
+    Number of radii = 0

@@ -173,8 +173,8 @@ namespace Isis {
    *                                         were replaced with references to
    *                                         setTime()). Added missing
    *                                         documentation to new methods.
-   *   @history 2011-05-03 Jeannie Walldren - Added Isis Disclaimer to files.
-   *   @history 2011-05-25 Janet Barrett and Steven Lambright - Added API that
+   *  @history 2011-05-03 Jeannie Walldren - Added Isis Disclaimer to files.
+   *  @history 2011-05-25 Janet Barrett and Steven Lambright - Added API that
    *                                         stores naif values and arbitrary
    *                                         computations so that the text
    *                                         kernels do not have to be
@@ -183,21 +183,21 @@ namespace Isis {
    *                                         quicker. Text kernels are no longer
    *                                         furnished when their data has been
    *                                         stored in the labels.
-   *   @history 2011-05-26 Debbie A. Cook -  Put back the code for spkwriter that
+   *  @history 2011-05-26 Debbie A. Cook -  Put back the code for spkwriter that
    *                                         was checked in May 25 but disappeared
    *                                         in the May 26 build.  This code turns
    *                                         aberration corrections off for the
    *                                         instrument position if the spk file
    *                                         was created by spkwriter.
-   *   @history 2011-07-08 Jeff Anderson  -  Fixed Init method to record the
+   *  @history 2011-07-08 Jeff Anderson  -  Fixed Init method to record the
    *                                         integer body frame code in the labels
    *                                         of the cube. Vesta exposed this
    *                                         problem because it was not a
    *                                         instrinsic body in the NAIF toolkit
    *                                         version 63.
-   *   @history 2011-07-11 Jeff Anderson  -  Added private copy constructors and
+   *  @history 2011-07-11 Jeff Anderson  -  Added private copy constructors and
    *                                         operator= methods
-   *   @history 2011-09-19 Debbie Cook    -  Added cubes with Ideal Cameras to the
+   *  @history 2011-09-19 Debbie Cook -  Added cubes with Ideal Cameras to the
    *                                         exclusion list for reading instrument
    *                                         keywords from the label.  The Ideal
    *                                         Camera has variable values for the
@@ -205,8 +205,13 @@ namespace Isis {
    *                                         the camera itself and not read from
    *                                         a kernel.  The camera puts these
    *                                         values into the Naif kernel pool.
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *  @history 2012-07-06 Debbie A. Cook - Updated Spice members to be more compliant with Isis 
    *                          coding standards. References #972.
+   *  @history 2012-10-11 Debbie A. Cook - Deleted deprecated createCache code already commented
+   *                                         out for over a year.  Updated to use new Target and ShapeModel classes.
+   *                                         Added Resolution method needed for Target and its ShapeModel.
+   *                                         Changed private member names from p_ to m_ to comply with coding
+   *                                         standards.  References Mantis tickets #775 and #1114.
    */
   class Spice {
     public:

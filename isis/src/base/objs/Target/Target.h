@@ -60,7 +60,7 @@ namespace Isis {
       std::vector<Distance> radii() const;
       void restoreShape();
       void setShapeEllipsoid();
-      void setSky(SpiceInt bodyCode) const;
+      //      void setSky(SpiceInt bodyCode) const;
       void setRadii(std::vector<Distance> radii);
       ShapeModel *shape() const;
       Spice *spice() const;

@@ -7,6 +7,7 @@
 #include "FileList.h"
 #include "ProjectionFactory.h"
 #include "ProcessRubberSheet.h"
+#include "Target.h"
 
 #include "IException.h"
 #include "vims2map.h"
@@ -67,7 +68,7 @@ void IsisMain() {
     incam = icube->getCamera();
 
     // Make sure it is not the sky
-    if (incam->isSky()) {
+    if (incam->target()->isSky()) {
       string msg = "The image [" + list[i].toString() +
                    "] is targeting the sky, use skymap instead.";
       throw IException(IException::User, msg, _FILEINFO_);

@@ -215,8 +215,10 @@ namespace Isis {
    *                          relative to the North pole.
    *  @history 2012-06-04 Janet Barrett - Got rid of redundant calls to Sample(), Line(),
    *                          and SetImage() in the ComputeAzimuth method.
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *  @history 2012-07-06 Debbie A. Cook - Updated Spice members to be more compliant with Isis 
    *                          coding standards. References #972.
+   *  @history 2012-10-12 Debbie A. Cook - Updated to use new Target and ShapeModel classes.
+   *                          References Mantis ticket #775 and #1114.
    */
 
   class Camera : public Sensor {

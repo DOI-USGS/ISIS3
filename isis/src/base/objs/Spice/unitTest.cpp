@@ -16,6 +16,11 @@
  *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
+ *
+ * @author 2003-03-13 Jeff Anderson?
+ *
+ * @internal
+ *  @history 2012-10-11 Debbie A. Cook - Updated to use new Target and Shape Model classes.
  */
 #include <iostream>
 #include <iomanip>

@@ -38,6 +38,7 @@
 #include "Longitude.h"
 #include "NaifStatus.h"
 #include "Projection.h"
+#include "ShapeModel.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
 #include "Target.h"
@@ -419,8 +420,11 @@ namespace Isis {
     // See if the point is on the backside of the target
 
     if (backCheck) {
+      // Assume the intersection point is good in order to get the emission angle
+      shape->setHasIntersection(true);
       if (fabs(shape->emissionAngle(sB)) > 90.) {
         shape->clearSurfacePoint();
+        shape->setHasIntersection(false);
         return false;
       }
     }

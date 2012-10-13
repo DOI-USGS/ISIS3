@@ -296,6 +296,9 @@
     <change name="Debbie A. Cook" date="2012-07-06">
        Updated Spice members to be more compliant with Isis coding standards. References #972.
     </change>
+    <change name="Debbie A. Cook" date="2012-10-11">
+       Updated to use new Target class. References Mantis numbers #775 and #1114.
+    </change>
   </history>
 
   <groups>

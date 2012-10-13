@@ -27,7 +27,6 @@
 #include "ProjectionFactory.h"
 #include "Portal.h"
 #include "Interpolator.h"
-#include "ShapeModel.h"
 
 namespace Isis {
   class Distance;
@@ -35,6 +34,7 @@ namespace Isis {
   class iTime;
   class Latitude;
   class Longitude;
+  class ShapeModel;
   class SurfacePoint;
   class Target;
 
@@ -174,8 +174,12 @@ namespace Isis {
    *   @history 2012-05-04 Steven Lambright - Re-enabled a safety check in the DemRadius() method
    *                           which was needed due to Projection not uniformly handling Null
    *                           inputs. Fixes #807.
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *   @history 2012-07-06 Debbie A. Cook - Updated Spice members to be more compliant with Isis 
    *                          coding standards. References #972.
+   *   @history 2012-10-10 Debbie A. Cook - Moved the functionality related to the shape model into 
+   *                          new classes:  ShapeModel, EllipsoidShape, DemShape, and 
+   *                          EquatorialCylindricalShape.  Also modified to use new Target class.  References 
+   *                          #775 and #1114
    */
   class Sensor : public Spice {
     public:
