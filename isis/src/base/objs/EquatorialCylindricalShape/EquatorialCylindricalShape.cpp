@@ -79,7 +79,6 @@ namespace Isis {
     DemShape::intersectSurface(observerPos, lookDirection);
 
     if (!hasIntersection()) {
-    std::cout << "We're in!!!" << std::endl;
 
       // std::vector<Distance> radii = targetRadii();
       SpiceDouble a = targetRadii()[0].kilometers();
