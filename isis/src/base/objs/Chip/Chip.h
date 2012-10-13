@@ -331,7 +331,7 @@ namespace Isis {
         }
         // Interpolator::None is not valid type
         string msg = "Invalid Interpolator type.  Cannot use [";
-        msg += iString(type) + "] to read cube into chip.";
+        msg += IString(type) + "] to read cube into chip.";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 

@@ -32,7 +32,7 @@
 
 
 #include "SpkSegment.h"
-#include "iString.h"
+#include "IString.h"
 #include "FileName.h"
 #include "Cube.h"
 #include "Camera.h"

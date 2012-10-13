@@ -12,7 +12,7 @@
 #include <QScrollBar>
 #include <QToolButton>
 
-#include "iString.h"
+#include "IString.h"
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
 #include "Projection.h"

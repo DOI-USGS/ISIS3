@@ -14,7 +14,7 @@
 #include <QSpinBox>
 
 #include "ScatterPlotWindow.h"
-#include "iString.h"
+#include "IString.h"
 
 namespace Isis {
   /**
@@ -235,15 +235,15 @@ namespace Isis {
       m_alarmOntoViewportHeight->value());
 
     m_window->setAlarmViewportDnBoxSize(
-      iString(m_alarmOntoViewportXDnSize->text()).ToDouble(),
-      iString(m_alarmOntoViewportYDnSize->text()).ToDouble());
+      IString(m_alarmOntoViewportXDnSize->text()).ToDouble(),
+      IString(m_alarmOntoViewportYDnSize->text()).ToDouble());
 
     QPair<double, double> alarmViewportDnBoxSize =
         m_window->alarmViewportDnBoxSize();
     m_alarmOntoViewportXDnSize->setText(
-        iString(alarmViewportDnBoxSize.first).ToQt());
+        IString(alarmViewportDnBoxSize.first).ToQt());
     m_alarmOntoViewportYDnSize->setText(
-        iString(alarmViewportDnBoxSize.second).ToQt());
+        IString(alarmViewportDnBoxSize.second).ToQt());
 
     QPair<int, int> alarmViewportScreenBoxSize =
         m_window->alarmViewportScreenBoxSize();
@@ -275,9 +275,9 @@ namespace Isis {
     QPair<double, double> alarmViewportDnBoxSize =
         m_window->alarmViewportDnBoxSize();
     m_alarmOntoViewportXDnSize->setText(
-        iString(alarmViewportDnBoxSize.first).ToQt());
+        IString(alarmViewportDnBoxSize.first).ToQt());
     m_alarmOntoViewportYDnSize->setText(
-        iString(alarmViewportDnBoxSize.second).ToQt());
+        IString(alarmViewportDnBoxSize.second).ToQt());
 
     QPair<int, int> alarmViewportScreenBoxSize =
         m_window->alarmViewportScreenBoxSize();

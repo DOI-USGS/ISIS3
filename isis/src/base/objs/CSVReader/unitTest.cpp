@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     cout.setf(ios::fixed);
     cout << "Size of column 0/1: " << scol.dim() << endl;
     for(int i = 0 ; i < dcol.dim() ; i++) {
-      cout << "iString: " << setw(10) << scol[i]
+      cout << "IString: " << setw(10) << scol[i]
            << " \tDouble: " << setprecision(4) << dcol[i] << endl;
     }
 

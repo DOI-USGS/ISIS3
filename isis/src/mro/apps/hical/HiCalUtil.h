@@ -31,7 +31,7 @@
 
 #include "HiCalTypes.h"
 #include "DbProfile.h"
-#include "iString.h"
+#include "IString.h"
 #include "Statistics.h"
 #include "PvlKeyword.h"
 #include "NumericalApproximation.h"
@@ -85,7 +85,7 @@ inline int InValidCount(const HiVector &v) {
 inline int CpmmToCcd(int cpmm) {
   const int cpmm2ccd[] = {0,1,2,3,12,4,10,11,5,13,6,7,8,9};
   if ( (cpmm < 0) || (cpmm >= (int)(sizeof(cpmm2ccd)/sizeof(int))) ) {
-    std::string mess = "CpmmToCdd: Bad CpmmNumber (" + iString(cpmm) + ")";
+    std::string mess = "CpmmToCdd: Bad CpmmNumber (" + IString(cpmm) + ")";
     throw IException(IException::User, mess.c_str(), _FILEINFO_);
   }
   return (cpmm2ccd[cpmm]);
@@ -99,7 +99,7 @@ inline int CpmmToCcd(int cpmm) {
  */
 inline std::string CcdToFilter(int ccd) {
   if ( (ccd < 0) || (ccd > 13) ) {
-    std::string mess = "CcdToFilter: Bad Ccd Number (" + iString(ccd) + ")";
+    std::string mess = "CcdToFilter: Bad Ccd Number (" + IString(ccd) + ")";
     throw IException(IException::User, mess.c_str(), _FILEINFO_);
   }
 
@@ -220,7 +220,7 @@ template <typename T>
             int index = 0) {
   if (!conf.exists(keyname)) { return (defval); }
   if (conf.count(keyname) < index) { return (defval); }
-  iString iValue(conf.value(keyname, index));
+  IString iValue(conf.value(keyname, index));
   T value = iValue;  // This makes it work with a string?
   return (value);
 }
@@ -234,7 +234,7 @@ template <typename T>
  * @return int Converted value
  */
 template <typename T> int ToInteger(const T &value) {
-    return (iString(value).Trim(" \r\t\n").ToInteger());
+    return (IString(value).Trim(" \r\t\n").ToInteger());
 }
 
 /**
@@ -246,7 +246,7 @@ template <typename T> int ToInteger(const T &value) {
  * @return double Converted value
  */
 template <typename T> double ToDouble(const T &value) {
-    return (iString(value).Trim(" \r\t\n").ToDouble());
+    return (IString(value).Trim(" \r\t\n").ToDouble());
 }
 
 /**
@@ -258,7 +258,7 @@ template <typename T> double ToDouble(const T &value) {
  * @return string Converted value
  */
 template <typename T> std::string ToString(const T &value) {
-    return (iString(value).Trim(" \r\t\n"));
+    return (IString(value).Trim(" \r\t\n"));
 }
 
 /**
@@ -270,7 +270,7 @@ template <typename T> std::string ToString(const T &value) {
  * @return bool True if they are equal w/o regard to case
  */
 inline bool IsEqual(const std::string &v1, const std::string &v2 = "TRUE") {
-    return (iString::UpCase(v1) == iString::UpCase(v2));
+    return (IString::UpCase(v1) == IString::UpCase(v2));
 }
 
 /**
@@ -464,9 +464,9 @@ inline void RemoveHiBlobs(Pvl &label) {
   for ( int blob = 0 ; blob < label.Objects() ; blob++ ) {
     if ( label.Object(blob).IsNamed("Table") ) {
       std::string name = label.Object(blob)["Name"][0];
-      if ( iString::Equal(name,"HiRISE Calibration Ancillary") ||
-           iString::Equal(name,"HiRISE Calibration Image")  ||
-           iString::Equal(name,"HiRISE Ancillary") ) {
+      if ( IString::Equal(name,"HiRISE Calibration Ancillary") ||
+           IString::Equal(name,"HiRISE Calibration Image")  ||
+           IString::Equal(name,"HiRISE Ancillary") ) {
         label.DeleteObject(blob);
         blob--;
       }

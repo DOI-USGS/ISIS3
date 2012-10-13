@@ -1,5 +1,5 @@
-#ifndef Isis_GuiStringParameter_h
-#define Isis_GuiStringParameter_h
+#ifndef Isis_GuIStringParameter_h
+#define Isis_GuIStringParameter_h
 
 #include <QLineEdit>
 
@@ -24,9 +24,9 @@ namespace Isis {
                          int group, int param);
       ~GuiStringParameter();
 
-      iString Value();
+      IString Value();
 
-      void Set(iString newValue);
+      void Set(IString newValue);
 
     private:
       QLineEdit *p_lineEdit;

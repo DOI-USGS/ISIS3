@@ -29,7 +29,7 @@
 #include <sstream>
 
 #include "ProgramAnalyzer.h"
-#include "iString.h"
+#include "IString.h"
 #include "Pvl.h"
 #include "PvlObject.h"
 
@@ -71,7 +71,7 @@ ProgramAnalyzer::ProgramAnalyzer(const std::string &logfile) {
 void ProgramAnalyzer::setExclude(const std::string &name) {
 
   vector<string> names;
-  iString::Split(',', name, names);
+  IString::Split(',', name, names);
   for ( unsigned i = 0 ; i < names.size() ; i++ ) {
     exclude(names[i]);
   }
@@ -93,7 +93,7 @@ void ProgramAnalyzer::setExclude(const std::string &name) {
  * @param name  Name of file containing program list to exclude
  */
 void ProgramAnalyzer::exclude(const std::string &name) {
-  string prog = iString(name).Trim(" \t\n");
+  string prog = IString(name).Trim(" \t\n");
   if ( !_excludes.exists(prog) ) {
     _excludes.add(prog, 0);
   }
@@ -123,7 +123,7 @@ void ProgramAnalyzer::exclude(const std::string &name) {
  */
 void ProgramAnalyzer::setInclude(const std::string &name) {
   vector<string> names;
-  iString::Split(',', name, names);
+  IString::Split(',', name, names);
   for ( unsigned i = 0 ; i < names.size() ; i++ ) {
     include(names[i]);
   }
@@ -150,7 +150,7 @@ void ProgramAnalyzer::setInclude(const std::string &name) {
  * @param name  Name of file containing program list to include
  */
 void ProgramAnalyzer::include(const std::string &name) {
-  string prog = iString(name).Trim(" \t\n");
+  string prog = IString(name).Trim(" \t\n");
   if ( !_includes.exists(prog) ) {
     _includes.add(prog, 0);
   }
@@ -409,7 +409,7 @@ ProgramAnalyzer::Status ProgramAnalyzer::convertTime(const std::string &atime,
                                                      double &dtime) const {
   if ( atime.empty() ) return (BADDATA);
   vector<string> t;
-  iString::Split(':', atime, t);
+  IString::Split(':', atime, t);
   if ( t.size() != 3 ) {
     return (BADDATA);
   }
@@ -418,7 +418,7 @@ ProgramAnalyzer::Status ProgramAnalyzer::convertTime(const std::string &atime,
   double toSeconds(3600.0);
   dtime = 0.0;
   for ( unsigned int i = 0 ; i < 3 ; i++ ) {
-    dtime += iString(t[i]).ToDouble() * toSeconds;
+    dtime += IString(t[i]).ToDouble() * toSeconds;
     toSeconds /= 60.0;
   }
 
@@ -536,10 +536,10 @@ PvlGroup ProgramAnalyzer::toPvl(const RunTimeStats &stats,
  * 
  * @param s  String to test for content
  * 
- * @return iString Returns existing content if present, NULL if empty
+ * @return IString Returns existing content if present, NULL if empty
  */
-iString ProgramAnalyzer::format(const std::string &s) const {
- if ( s.empty() )  return (iString("NULL"));
+IString ProgramAnalyzer::format(const std::string &s) const {
+ if ( s.empty() )  return (IString("NULL"));
  return (s);
 }
 
@@ -553,19 +553,19 @@ iString ProgramAnalyzer::format(const std::string &s) const {
    *
    * @param value Double value to convert to string
    *
-   * @return iString Returns the converted string
+   * @return IString Returns the converted string
    */
-  iString ProgramAnalyzer::DblToStr(const double &value, const int precision) 
+  IString ProgramAnalyzer::DblToStr(const double &value, const int precision) 
                                     const {
     if(IsSpecial(value)) {
-      return (iString("0.0"));
+      return (IString("0.0"));
     }
 
     //  Format the string to specs
     ostringstream strcnv;
     strcnv.setf(std::ios::fixed);
     strcnv << setprecision(precision) << value;
-    return (iString(strcnv.str()));
+    return (IString(strcnv.str()));
   }
 
   /**

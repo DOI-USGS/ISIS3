@@ -1,5 +1,12 @@
 APPNAME = jigsaw
-#This test exercises the held image option, sparse solution method, and spsolve=position.
+# This test exercises the bundle adjustment of one image each from the MOC-WA camera and Viking Orbiter-1 B Camera.
+# oldsparse method with held image option; solving for position.
+
+# The "cat t_bundleout.txt" command in these tests uses sed to do the following (in order):
+# 1. remove cube filename paths
+# 2. remove net filename paths
+# 3. remove digits beyond the fifth decimal place of decimal numbers
+# 4. remove date and time
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -22,11 +29,6 @@ commands:
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  | sed s/`date +%Y-%m-%dT`\[0-2\]\[0-9\]:\[0-5\]\[0-9\]:\[0-5\]\[0-9\]/date/ \
 	  > $(OUTPUT)/bundleout.txt
-	# The above command uses sed to do the following (in order):
-	# 1. remove cube filename paths
-	# 2. remove net filename paths
-	# 3. remove digits beyond the fifth decimal place of decimal numbers
-	# 4. remove date and time
 	cat case2OutLog.txt \
 	  | sed 's/\([0-9][0-9]*\.[0-9][0-9][0-9][0-9]\)\([0-9][0-9]*\)/\1/g' \
 	  > $(OUTPUT)/case2OutLog.txt

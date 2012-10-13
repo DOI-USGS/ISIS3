@@ -67,7 +67,7 @@ void IsisMain () {
     // Get the name of the parameter file
     Pvl par(ui.GetFileName("PHOPAR"));
 
-    iString algoName = PhotometricFunction::AlgorithmName(par);
+    IString algoName = PhotometricFunction::AlgorithmName(par);
     algoName.UpCase();
 
     if (algoName == "HILLIER") {

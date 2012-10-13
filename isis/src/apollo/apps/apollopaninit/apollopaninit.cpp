@@ -41,7 +41,7 @@
 #include "Chip.h"
 #include "Cube.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "JP2Decoder.h"
 #include "ProcessImport.h"
@@ -100,7 +100,7 @@ void IsisMain() {
 
   Cube  panCube;
   iTime  isisTime;
-  iString iStrTEMP;
+  IString iStrTEMP;
 
   int i,j,k,scFrameCode,insCode;
 
@@ -597,7 +597,7 @@ void IsisMain() {
 
   bool foundFirst=false;
 
-  iString fileName;
+  IString fileName;
 
   panS = panCube.getSampleCount();
 
@@ -808,11 +808,11 @@ void Load_Kernel(Isis::PvlKeyword &key) {
 
   for(int i = 0; i < key.Size(); i++) {
      if(key[i] == "") continue;
-     if(iString(key[i]).UpCase() == "NULL") break;
-     if(iString(key[i]).UpCase() == "NADIR") break;
+     if(IString(key[i]).UpCase() == "NULL") break;
+     if(IString(key[i]).UpCase() == "NADIR") break;
      //Table was left as the first value of these keywords because one is about to be attached, 
      //  still though it needs to be skipped in this loop
-     if(iString(key[i]).UpCase() == "TABLE") continue;  
+     if(IString(key[i]).UpCase() == "TABLE") continue;  
      Isis::FileName file(key[i]);
      if(!file.fileExists()) {
        string msg = "Spice file does not exist [" + file.expanded() + "]";

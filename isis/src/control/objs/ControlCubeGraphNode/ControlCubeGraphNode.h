@@ -33,7 +33,7 @@ class QString;
 namespace Isis {
   class ControlMeasure;
   class ControlPoint;
-  class iString;
+  class IString;
 
   /**
    * @brief Serial Number with added functionality for Control Networks
@@ -70,7 +70,7 @@ namespace Isis {
       Q_OBJECT
 
     public:
-      explicit ControlCubeGraphNode(iString sn);
+      explicit ControlCubeGraphNode(IString sn);
       ControlCubeGraphNode(const ControlCubeGraphNode &other);
       virtual ~ControlCubeGraphNode();
 
@@ -80,7 +80,7 @@ namespace Isis {
       void removeConnection(ControlCubeGraphNode *, ControlPoint *);
 
       bool contains(ControlPoint *point) const;
-      iString getSerialNumber() const;
+      IString getSerialNumber() const;
       int getMeasureCount() const;
       QList< ControlMeasure * > getMeasures() const;
       QList< ControlMeasure * > getValidMeasures() const;
@@ -102,7 +102,7 @@ namespace Isis {
 
 
     private:
-      iString *serialNumber;
+      IString *serialNumber;
 
       //! ControlMeasures hashed by ControlPoint
       QHash< ControlPoint *, ControlMeasure * > * measures;

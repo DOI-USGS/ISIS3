@@ -128,7 +128,7 @@ void IsisMain() {
   overlapSize = FrameletOverlapSize();
 
   if(overlapSize == 0) {
-    iString msg = "There must be overlap to remove seams";
+    IString msg = "There must be overlap to remove seams";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 

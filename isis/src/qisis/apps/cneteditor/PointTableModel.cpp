@@ -14,7 +14,7 @@
 #include "ControlPoint.h"
 #include "Distance.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "SpecialPixel.h"

@@ -29,7 +29,7 @@ namespace Isis {
       p_photoAlgorithmName = string(algorithm["Name"]);
     }
     else {
-      iString msg = "Keyword [Name] or keyword [PhtName] must ";
+      IString msg = "Keyword [Name] or keyword [PhtName] must ";
       msg += "exist in [Group = Algorithm]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -208,7 +208,7 @@ namespace Isis {
 //  void PhotoModel::SetPhotoK(const double k) {
 //    if(k < 0.0) {
 //      std::string msg = "Invalid value of Minnaert k [" +
-//                        iString(k) + "]";
+//                        IString(k) + "]";
 //      throw iException::Message(iException::User, msg, _FILEINFO_);
 //    }
 //    p_photoK = k;

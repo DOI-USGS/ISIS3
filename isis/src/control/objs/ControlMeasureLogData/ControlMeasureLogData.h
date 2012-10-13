@@ -26,7 +26,7 @@
 class QVariant;
 
 namespace Isis {
-  class iString;
+  class IString;
   class ControlNetLogDataProtoV0001_Point_Measure_DataEntry;
   class ControlPointFileEntryV0002_Measure_MeasureLogData;
   class PvlKeyword;
@@ -148,8 +148,8 @@ namespace Isis {
       ControlPointFileEntryV0002_Measure_MeasureLogData
           ToProtocolBuffer() const;
 
-      NumericLogDataType NameToDataType(iString name) const;
-      iString DataTypeToName(NumericLogDataType) const;
+      NumericLogDataType NameToDataType(IString name) const;
+      IString DataTypeToName(NumericLogDataType) const;
 
     private:
       void Init();

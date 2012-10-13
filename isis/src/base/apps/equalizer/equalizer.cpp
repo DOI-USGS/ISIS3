@@ -15,7 +15,7 @@
 #include "OverlapStatistics.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace Isis;
 using namespace std;

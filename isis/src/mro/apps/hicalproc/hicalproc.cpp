@@ -2,7 +2,7 @@
 #include "IException.h"
 
 #include "CSVReader.h"
-#include "iString.h"
+#include "IString.h"
 #include "UserInterface.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -22,10 +22,10 @@ CSVReader::CSVAxis csvArr;
 void GetCCD_Channel_Coefficients(Pvl & pCubeLabel);
 void ReadCoefficientFile(string psCoeffile, string psCcd, int piChannel);
 void AnalyzeCubenormStats(string psStatsFile, int piSumming, double & pdMinDN, double & pdMaxDN);
-void CleanUp(vector<iString> & psTempFiles, string psInfile);
+void CleanUp(vector<IString> & psTempFiles, string psInfile);
 
 void IsisMain() {
-  vector<iString> sTempFiles;
+  vector<IString> sTempFiles;
   string inFile, outFile;
 
   try {
@@ -160,8 +160,8 @@ void IsisMain() {
     p2.Application("mask").SetContinue(true);
     p2.Application("mask").SetInputParameter("FROM",     false);
     p2.Application("mask").SetOutputParameter("TO",      "mask2");
-    p2.Application("mask").AddConstParameter("MINIMUM",  iString(dMinDN));
-    p2.Application("mask").AddConstParameter("MAXIMUM",  iString(dMaxDN));
+    p2.Application("mask").AddConstParameter("MINIMUM",  IString(dMinDN));
+    p2.Application("mask").AddConstParameter("MAXIMUM",  IString(dMaxDN));
     p2.Application("mask").AddConstParameter("PRESERVE", "INSIDE");
     p2.Application("mask").AddConstParameter("SPIXELS",  "NONE");
     if (!bNoiseFilter) {
@@ -179,7 +179,7 @@ void IsisMain() {
     p2.Application("fx").SetInputParameter("F1", false);
     p2.Application("fx").SetOutputParameter("TO", "gnfx");
     p2.Application("fx").AddConstParameter("MODE", "CUBES");
-    iString sEquation = "\\((F1/(" + csvArr[R0]+ "+( " + csvArr[R1] + "*line)+(" + csvArr[R2];
+    IString sEquation = "\\((F1/(" + csvArr[R0]+ "+( " + csvArr[R1] + "*line)+(" + csvArr[R2];
     sEquation += "*line*line))) *(line<" + csvArr[MAX_LINE]+ ") + (F1*(line>=" + csvArr[MAX_LINE] + ")))";
     p2.Application("fx").AddConstParameter("EQUATION", sEquation);
 #ifdef _DEBUG_
@@ -272,7 +272,7 @@ void IsisMain() {
         p5.AddToPipeline("hinoise");
         p5.Application("hinoise").SetInputParameter ("FROM", false);
         p5.Application("hinoise").SetOutputParameter("TO",   "hinoise");
-        p5.Application("hinoise").AddConstParameter ("REMOVE", iString(bRemoveTempFiles));
+        p5.Application("hinoise").AddConstParameter ("REMOVE", IString(bRemoveTempFiles));
 
         // Values got from HiCal configuration file
         // Lowpass options
@@ -391,7 +391,7 @@ void IsisMain() {
   }
   catch(std::exception const &se) {
     CleanUp(sTempFiles, inFile);
-    string message = "std::exception: " + (iString)se.what();
+    string message = "std::exception: " + (IString)se.what();
     throw IException(IException::User, message, _FILEINFO_);
   }
   catch(...) {
@@ -406,7 +406,7 @@ void IsisMain() {
  *
  * @author Sharmila Prasad (2/14/2011)
  */
-void CleanUp(vector<iString> & psTempFiles, string psInfile)
+void CleanUp(vector<IString> & psTempFiles, string psInfile)
 {
   // more clean up
   for (int i=0; i<(int)psTempFiles.size(); i++) {
@@ -475,8 +475,8 @@ void GetCCD_Channel_Coefficients(Pvl & pCubeLabel)
   }
 
   // Get the coefficient file name
-  iString dCoeffFile = "$mro/calibration/HiRISE_Gain_Drift_Correction_Bin" + iString(iSumming) + ".0001.csv";
-  //iString dCoeffFile = "/home/sprasad/isis3/isis/src/mro/apps/hicalproc/HiRISE_Gain_Drift_Correction_Bin" + iString(iSumming) + ".0001.csv";
+  IString dCoeffFile = "$mro/calibration/HiRISE_Gain_Drift_Correction_Bin" + IString(iSumming) + ".0001.csv";
+  //IString dCoeffFile = "/home/sprasad/isis3/isis/src/mro/apps/hicalproc/HiRISE_Gain_Drift_Correction_Bin" + IString(iSumming) + ".0001.csv";
 #ifdef _DEBUG_
   cout << dCoeffFile << endl;
 #endif
@@ -499,7 +499,7 @@ void ReadCoefficientFile(string psCoeffile, string psCcd, int piChannel)
   int iRows = coefFile.rows();
   int iRowIndex = -1;
 
-  iString sColName = psCcd + "_" + iString(piChannel);
+  IString sColName = psCcd + "_" + IString(piChannel);
 #ifdef _DEBUG_
   cout << endl << "Col name=" << sColName <<  "Rows=" << iRows << endl;
 #endif
@@ -517,10 +517,10 @@ void ReadCoefficientFile(string psCoeffile, string psCcd, int piChannel)
     for (int i=1; i<iArrSize; i++) {
       csvArr[i].TrimHead(" \n,");
       csvArr[i].TrimTail(" \n,\t\r");
-      dCoeff[i] = iString(csvArr[i]).ToDouble();
+      dCoeff[i] = IString(csvArr[i]).ToDouble();
       if (dCoeff[i] < 0) {
         dCoeff[i] *= -1;
-        csvArr[i] = iString(dCoeff[i]) ;
+        csvArr[i] = IString(dCoeff[i]) ;
       }
     }
   }
@@ -557,7 +557,7 @@ void AnalyzeCubenormStats(string psStatsFile, int piSumming, double & pdMinDN, d
       //cerr << "  " << j << "." << csvArr[j];
       if (j==2) {
         iValidPoints.push_back(csvArr[j]);
-        int iCurrValidPoints = iString(csvArr[j]).ToInteger();
+        int iCurrValidPoints = IString(csvArr[j]).ToInteger();
         if (iCurrValidPoints > iMaxValidPoints) {
           iMaxValidPoints = iCurrValidPoints;
         }

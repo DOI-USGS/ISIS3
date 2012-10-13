@@ -19,7 +19,7 @@ void IsisMain() {
   p.StartProcess();
 
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
-  iString transDir = (string) dataDir["Rolo"];
+  IString transDir = (string) dataDir["Rolo"];
 
   FileName transFile;
   Pvl inputLabel(labelFile);

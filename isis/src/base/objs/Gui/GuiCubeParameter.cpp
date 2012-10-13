@@ -113,7 +113,7 @@ namespace Isis {
                    p_fileButton);
       if((status == 1) && (curAtt != newAtt)) {
         Isis::FileName f(p_lineEdit->text().toStdString());
-        p_lineEdit->setText((iString)(f.expanded() + newAtt));
+        p_lineEdit->setText((IString)(f.expanded() + newAtt));
       }
     }
     else {
@@ -129,7 +129,7 @@ namespace Isis {
                    p_fileButton);
       if((status == 1) && (curAtt != newAtt)) {
         Isis::FileName f(p_lineEdit->text().toStdString());
-        p_lineEdit->setText((iString)(f.expanded() + newAtt));
+        p_lineEdit->setText((IString)(f.expanded() + newAtt));
       }
     }
 
@@ -152,7 +152,7 @@ namespace Isis {
         temp.close();
 
         // Open the cube in Qview
-        iString command = "$ISISROOT/bin/qview " + cubeName + " &";
+        IString command = "$ISISROOT/bin/qview " + cubeName + " &";
         ProgramLauncher::RunSystemCommand(command);
       }
       // Throw an error if no cube name was entered

@@ -33,7 +33,7 @@
 #include "Application.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace std;
 
@@ -50,8 +50,8 @@ namespace Isis {
    * @param programName The Isis program name to be run (i.e. catlab, cubeatt)
    * @param parameters The arguments to give to the program that is being run
    */
-  void ProgramLauncher::RunIsisProgram(iString programName,
-                                       iString parameters) {
+  void ProgramLauncher::RunIsisProgram(IString programName,
+                                       IString parameters) {
     FileName program(programName);
     FileName isisExecutableFileName("$ISISROOT/bin/" + program.name());
     bool isIsisProgram = false;
@@ -61,17 +61,17 @@ namespace Isis {
       program = isisExecutableFileName;
     }
 
-    iString command = program.expanded() + " " + parameters +
-        " -pid=" + iString(getpid());
+    IString command = program.expanded() + " " + parameters +
+        " -pid=" + IString(getpid());
 
     if(!isIsisProgram) {
-      iString msg = "Program [" + programName + "] does not appear to be a "
+      IString msg = "Program [" + programName + "] does not appear to be a "
           "valid Isis 3 program";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
-    iString serverName = "isis_" + Application::UserName() +
-        "_" + iString(getpid());
+    IString serverName = "isis_" + Application::UserName() +
+        "_" + IString(getpid());
 
     QLocalServer server;
     server.listen(serverName);
@@ -91,7 +91,7 @@ namespace Isis {
     }
 
     if(!connected) {
-      iString msg = "Isis child process failed to communicate with parent";
+      IString msg = "Isis child process failed to communicate with parent";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -103,8 +103,8 @@ namespace Isis {
       bool insideCode = true;
       bool messageDone = false;
 
-      iString code;
-      iString message;
+      IString code;
+      IString message;
       QByteArray lineData;
 
       if(childSocket->waitForReadyRead(1000)) {
@@ -144,8 +144,8 @@ namespace Isis {
     childProcess.waitForFinished();
 
     if(childProcess.exitCode() != 0) {
-      iString msg = "Running Isis program [" + programName + "] failed with "
-                    "return status [" + iString(childProcess.exitCode()) + "]";
+      IString msg = "Running Isis program [" + programName + "] failed with "
+                    "return status [" + IString(childProcess.exitCode()) + "]";
       throw IException(errors, IException::Unknown, msg, _FILEINFO_);
     }
   }
@@ -162,7 +162,7 @@ namespace Isis {
    *            parameter.
    */
   IException
-      ProgramLauncher::ProcessIsisMessageFromChild(iString code, iString msg) {
+      ProgramLauncher::ProcessIsisMessageFromChild(IString code, IString msg) {
     IException errors;
 
     if(code == "PROGRESSTEXT" && iApp) {
@@ -220,12 +220,12 @@ namespace Isis {
    * @param fullCommand A string containing the command formatted like what
    *                    you would type in a terminal
    */
-  void ProgramLauncher::RunSystemCommand(iString fullCommand) {
+  void ProgramLauncher::RunSystemCommand(IString fullCommand) {
     int status = system(fullCommand.c_str());
 
     if(status != 0) {
-      iString msg = "Executing command [" + fullCommand +
-                    "] failed with return status [" + iString(status) + "]";
+      IString msg = "Executing command [" + fullCommand +
+                    "] failed with return status [" + IString(status) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }

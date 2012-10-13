@@ -18,7 +18,7 @@ void IsisMain() {
 
   string labelFile = ui.GetFileName("FROM");
   FileName inFile = ui.GetFileName("FROM");
-  iString id;
+  IString id;
   Pvl lab(inFile.expanded());
 
   try {
@@ -49,7 +49,7 @@ void IsisMain() {
   p.SetPdsFile(labelFile, "", label);
   Cube *outcube = p.SetOutputCube("TO");
 
-  iString bandorder;
+  IString bandorder;
   bandorder = (string) lab.FindObject("IMAGE").FindKeyword("BAND_STORAGE_TYPE");
   bandorder.UpCase();
   if(bandorder == "BAND_SEQUENTIAL") {
@@ -74,7 +74,7 @@ void IsisMain() {
 
   // Get the directory where the MiniRF level 2 translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  iString transDir = (string) dataDir["Lro"] + "/translations/";
+  IString transDir = (string) dataDir["Lro"] + "/translations/";
 
   if(id == "CHAN1-L-MRFFR-5-CDR-MAP-V1.0" || id == "LRO-L-MRFLRO-5-CDR-MAP-V1.0") {
     // Translate the BandBin group

@@ -3,7 +3,7 @@
 
 #include "Buffer.h"
 #include "Cube.h"
-#include "iString.h"
+#include "IString.h"
 #include "Portal.h"
 
 #include <cmath>

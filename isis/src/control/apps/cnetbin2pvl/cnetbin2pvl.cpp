@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 #include "ControlNet.h"
-#include "iString.h"
+#include "IString.h"
 #include "Progress.h"
 
 using namespace Isis;

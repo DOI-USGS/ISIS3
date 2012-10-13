@@ -15,7 +15,7 @@
 #include "ProgramLauncher.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
-#include "iString.h"
+#include "IString.h"
 
 #include "MdisGeometry.h"
 #include "MdisEdrKeys.h"
@@ -46,7 +46,7 @@ void IsisMain() {
 
 // Run mdis2isis if necessary.  If this step must be done, we must also
 //  run spiceinit to initialize it with spice.
-  if(iString::UpCase(from.extension()) != "CUB") {
+  if(IString::UpCase(from.extension()) != "CUB") {
     FileName temp = FileName::createTempFile("$TEMPORARY/" + from.baseName() + ".cub");
     string params = "from=" + from.expanded()  + " to=" + temp.expanded();
 
@@ -116,7 +116,7 @@ void IsisMain() {
 
       //  Split the line using semi-colons as the delimiter
       vector<string> keys;
-      iString::Split(';', keystring, keys);
+      IString::Split(';', keystring, keys);
       std::string keyvalues = edrkeys.extract(keys, geom.getNull(), &mdiskeys);
 
       if(!to.empty()) {

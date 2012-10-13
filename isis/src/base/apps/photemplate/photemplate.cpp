@@ -4,7 +4,7 @@
 #include <sstream>
 #include "PvlGroup.h"
 #include "UserInterface.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace std;
 using namespace Isis;
@@ -55,11 +55,11 @@ void OutputKeyValue(PvlKeyword & key, string val){
   key.Clear();
   size_t found = val.find(",");
   while(found != string::npos) {
-    key += iString(val.substr(0, found)).ToDouble();
+    key += IString(val.substr(0, found)).ToDouble();
     val = val.substr(found+1);
     found = val.find(",");
   }
-  key += iString(val.substr(0, found)).ToDouble();
+  key += IString(val.substr(0, found)).ToDouble();
 }
 
 // Helper function to load the input pvl file into the GUI
@@ -70,9 +70,9 @@ void LoadPvl() {
   string inFile(ui.GetFileName("FROMPVL"));
   Pvl inPvl;
   inPvl.Read(inFile);
-  iString phtName = ui.GetAsString("PHTNAME");
+  IString phtName = ui.GetAsString("PHTNAME");
   phtName = phtName.UpCase();
-  iString atmName = ui.GetAsString("ATMNAME");
+  IString atmName = ui.GetAsString("ATMNAME");
   atmName = atmName.UpCase();
   if (phtName == "NONE" && atmName == "NONE") {
     string message = "A photometric model or an atmospheric model must be specified before it can be loaded from the PVL";
@@ -81,7 +81,7 @@ void LoadPvl() {
   if (phtName != "NONE") {
     if (inPvl.HasObject("PhotometricModel")) {
       PvlObject phtObj = inPvl.FindObject("PhotometricModel");
-      iString phtVal;
+      IString phtVal;
       if (phtObj.HasGroup("Algorithm")) {
         PvlObject::PvlGroupIterator phtGrp = phtObj.BeginGroup();
         bool wasFound = false;
@@ -238,7 +238,7 @@ void LoadPvl() {
   }
   if (inPvl.HasObject("AtmosphericModel")) {
     PvlObject atmObj = inPvl.FindObject("AtmosphericModel");
-    iString atmVal;
+    IString atmVal;
     if (atmObj.HasGroup("Algorithm")) {
       PvlObject::PvlGroupIterator atmGrp = atmObj.BeginGroup();
       bool wasFound = false;
@@ -399,9 +399,9 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
   UserInterface &ui = Application::GetUserInterface();
 
   bool wasFound = false;
-  iString phtName = ui.GetAsString("PHTNAME");
+  IString phtName = ui.GetAsString("PHTNAME");
   phtName = phtName.UpCase();
-  iString phtVal;
+  IString phtVal;
   PvlObject pvlObj;
   PvlGroup pvlGrp;
   if (pvl.HasObject("PhotometricModel")) {
@@ -661,9 +661,9 @@ void addAtmosModel(Pvl &pvl, Pvl &outPvl) {
   UserInterface &ui = Application::GetUserInterface();
 
   bool wasFound = false;
-  iString atmName = ui.GetAsString("ATMNAME");
+  IString atmName = ui.GetAsString("ATMNAME");
   atmName = atmName.UpCase();
-  iString atmVal;
+  IString atmVal;
   PvlObject pvlObj;
   PvlGroup pvlGrp;
   if (pvl.HasObject("AtmosphericModel")) {

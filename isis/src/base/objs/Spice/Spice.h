@@ -207,6 +207,9 @@ namespace Isis {
    *                                         values into the Naif kernel pool.
    *  @history 2012-07-06 Debbie A. Cook - Updated Spice members to be more compliant with Isis 
    *                          coding standards. References #972.
+   *  @history 2012-09-10 Steven Lambright - Undid Debbie's change on 2012-09-19 because the
+   *                           Ideal camera now supports putting those keywords in the label
+   *                           on the fly. References #1094.
    *  @history 2012-10-11 Debbie A. Cook - Deleted deprecated createCache code already commented
    *                                         out for over a year.  Updated to use new Target and ShapeModel classes.
    *                                         Added Resolution method needed for Target and its ShapeModel.
@@ -242,14 +245,13 @@ namespace Isis {
       void subSolarPoint(double &lat, double &lon);
 
       Target *target() const;
-      iString targetName() const;
-      //     iString shapeName() const;
+      IString targetName() const;
 
-      iTime getClockTime(iString clockValue,
+      iTime getClockTime(IString clockValue,
                          int sclkCode = -1);
-      SpiceDouble getDouble(const iString &key, int index = 0);
-      SpiceInt getInteger(const iString &key,   int index = 0);
-      iString getString(const iString &key,     int index = 0);
+      SpiceDouble getDouble(const IString &key, int index = 0);
+      SpiceInt getInteger(const IString &key,   int index = 0);
+      IString getString(const IString &key,     int index = 0);
 
       /**
        * Accessor method for the sun position.
@@ -323,16 +325,14 @@ namespace Isis {
         SpiceByteCodeType
       };
 
-      QVariant readValue(iString key, SpiceValueType type, int index = 0);
+      QVariant readValue(IString key, SpiceValueType type, int index = 0);
 
-      void storeResult(iString name, SpiceValueType type, QVariant value);
-      QVariant getStoredResult(iString name, SpiceValueType type);
+      void storeResult(IString name, SpiceValueType type, QVariant value);
+      QVariant getStoredResult(IString name, SpiceValueType type);
 
-      void storeValue(iString key, int index, SpiceValueType type,
+      void storeValue(IString key, int index, SpiceValueType type,
                       QVariant value);
-      QVariant readStoredValue(iString key, SpiceValueType type, int index);
-
-      //      ShapeModel *shape() const;
+      QVariant readStoredValue(IString key, SpiceValueType type, int index);
 
       // Leave these protected so that inheriting classes don't
       // have to convert between double and spicedouble
@@ -360,7 +360,7 @@ namespace Isis {
 
       Longitude *m_solarLongitude; //!< Body rotation solar longitude value
       iTime *m_et; //!< Ephemeris time (read NAIF documentation for a detailed description)
-      QVector<iString> * m_kernels; //!< Vector containing kernels filenames
+      QVector<IString> * m_kernels; //!< Vector containing kernels filenames
       Target *m_target; //!< Target of the observation
 
       // cache stuff

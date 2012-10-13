@@ -52,10 +52,10 @@ namespace Isis {
     p_camera = parent;
 
     if(naifIkCode != 0) {
-      std::string xkey  = "INS" + Isis::iString(naifIkCode) + "_TRANSX";
-      std::string ykey  = "INS" + Isis::iString(naifIkCode) + "_TRANSY";
-      std::string ixkey = "INS" + Isis::iString(naifIkCode) + "_ITRANSS";
-      std::string iykey = "INS" + Isis::iString(naifIkCode) + "_ITRANSL";
+      std::string xkey  = "INS" + Isis::IString(naifIkCode) + "_TRANSX";
+      std::string ykey  = "INS" + Isis::IString(naifIkCode) + "_TRANSY";
+      std::string ixkey = "INS" + Isis::IString(naifIkCode) + "_ITRANSS";
+      std::string iykey = "INS" + Isis::IString(naifIkCode) + "_ITRANSL";
       for(int i = 0; i < 3; ++i) {
         p_transx[i]  = parent->getDouble(xkey, i);
         p_transy[i]  = parent->getDouble(ykey, i);

@@ -12,7 +12,7 @@
 #include <QTimer>
 
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 #include "AbstractTableDelegate.h"
 #include "AbstractTableModel.h"
@@ -286,7 +286,7 @@ namespace Isis
 
         if (!start)
         {
-          iString msg = "Could not find the first item";
+          IString msg = "Could not find the first item";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
@@ -315,7 +315,7 @@ namespace Isis
 
         if (currentIndex >= sortedItems->size())
         {
-          iString msg = "Could not find the second item";
+          IString msg = "Could not find the second item";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
@@ -546,7 +546,7 @@ namespace Isis
     {
       if (left->getPointerType() != right->getPointerType())
       {
-        iString msg = "Tried to compare apples to oranges";
+        IString msg = "Tried to compare apples to oranges";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 

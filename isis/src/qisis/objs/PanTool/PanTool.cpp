@@ -9,7 +9,7 @@
 #include <QMessageBox>
 #include <QToolButton>
 
-#include "iString.h"
+#include "IString.h"
 #include "MainWindow.h"
 #include "MdiCubeViewport.h"
 #include "ToolPad.h"

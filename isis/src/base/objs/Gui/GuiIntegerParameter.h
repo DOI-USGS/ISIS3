@@ -25,9 +25,9 @@ namespace Isis {
                           int group, int param);
       ~GuiIntegerParameter();
 
-      iString Value();
+      IString Value();
 
-      void Set(iString newValue);
+      void Set(IString newValue);
 
     private:
       QLineEdit *p_lineEdit;

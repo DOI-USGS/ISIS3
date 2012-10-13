@@ -29,7 +29,7 @@
 #include "EllipsoidShape.h"
 #include "EquatorialCylindricalShape.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "FileName.h"
 #include "Projection.h"
 #include "Pvl.h"
@@ -88,7 +88,7 @@ namespace Isis {
           shapeModelCube.open(shapeModelFilenames, "r" );
         }
         catch (IException &e) {
-          iString msg = "Shape file" + shapeModelFilenames + " does not exist or is not an Isis cube";
+          IString msg = "Shape file" + shapeModelFilenames + " does not exist or is not an Isis cube";
           throw IException(e, IException::Unknown, msg, _FILEINFO_);
         }
         
@@ -103,13 +103,13 @@ namespace Isis {
             shapeModel = new DemShape(target, pvl);
         }
         catch (IException &e) {
-          iString msg = "Shape model cube must be an Isis DEM file, meaning it must " \
+          IString msg = "Shape model cube must be an Isis DEM file, meaning it must " \
                         "be map-projected. This cube is NOT map projected.";
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }
       catch (IException &e) {
-        iString msg = "Failed opening shape file" + shapeModelFilenames;
+        IString msg = "Failed opening shape file" + shapeModelFilenames;
         throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
     }
@@ -117,7 +117,7 @@ namespace Isis {
     // TODO Add Naif DSK shape and stack?
 
     if (shapeModel == NULL) {
-      iString msg = "Unsupported shape model type";
+      IString msg = "Unsupported shape model type";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

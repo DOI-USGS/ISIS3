@@ -27,7 +27,7 @@
 
 #include "Constants.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Projection.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -83,7 +83,7 @@ namespace Isis {
 
       // Test to make sure center longitude is valid
       if (fabs(m_centerLongitude) > 360.0) {
-        iString message = "Central Longitude [" + iString(m_centerLongitude);
+        IString message = "Central Longitude [" + IString(m_centerLongitude);
         message += "] must be between -360 and 360";
         throw IException(IException::Unknown, message, _FILEINFO_);
       }
@@ -133,18 +133,18 @@ namespace Isis {
       // side of the equator as the apex (due to the reording of p1 and p2 above)
       // Test for cone pointed south "v"
       if ((m_par2 < 0.0) && (fabs(90.0 - m_centerLatitude) < DBL_EPSILON)) {
-        iString message = "Center Latitude [" + iString(m_centerLatitude);
+        IString message = "Center Latitude [" + IString(m_centerLatitude);
         message += "] is not valid, it projects to infinity "
                    "for standard parallels [";
-        message += iString(m_par1) + "," + iString(m_par2) + "]";
+        message += IString(m_par1) + "," + IString(m_par2) + "]";
         throw IException(IException::Unknown, message, _FILEINFO_);
       }
       // Test for cone pointed north "^"
       else if ((m_par2 > 0.0) && (fabs(-90.0 - m_centerLatitude) < DBL_EPSILON)) {
-        iString message = "Center Latitude [" + iString(m_centerLatitude);
+        IString message = "Center Latitude [" + IString(m_centerLatitude);
         message += "] is not valid, it projects to infinity "
                    "for standard parallels [";
-        message += iString(m_par1) + "," + iString(m_par2) + "]";
+        message += IString(m_par1) + "," + IString(m_par2) + "]";
         throw IException(IException::Unknown, message, _FILEINFO_);
       }
       // convert clat to radians

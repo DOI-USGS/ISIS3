@@ -29,7 +29,7 @@ void IsisMain() {
   cam = icube->getCamera();
   p.SetOutputCube("TO");
 
-  iString format = ui.GetString("FORMAT");
+  IString format = ui.GetString("FORMAT");
 
   if(format == "LAT") {
     OutputFormat = Lat;

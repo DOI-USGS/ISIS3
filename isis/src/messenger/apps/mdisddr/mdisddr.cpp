@@ -94,7 +94,7 @@ inline void FixLabels(PvlObject &obj) {
 inline void WriteBand(ProcessExportPds &process, ofstream &out,
                       const std::string &fname, int band)  {
   process.ClearInputCubes();
-  (void) process.SetInputCube(fname, CubeAttributeInput("+" + iString(band)));
+  (void) process.SetInputCube(fname, CubeAttributeInput("+" + IString(band)));
   process.StartProcess(out);
   return;
 }
@@ -308,7 +308,7 @@ void IsisMain() {
 
     //  Now address nested keywords in SUBFRAME groups
     for(int i = 1 ; i <= 5 ; i++) {
-      iString n(i);
+      IString n(i);
       string group = "SUBFRAME" + n + "_PARAMETERS";
       if(pdsLabel.HasGroup(group)) {
         PvlGroup &grp = pdsLabel.FindGroup(group);

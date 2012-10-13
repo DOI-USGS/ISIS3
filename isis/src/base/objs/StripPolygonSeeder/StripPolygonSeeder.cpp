@@ -165,11 +165,11 @@ namespace Isis {
     }
 
     if(p_Xspacing <= 0.0) {
-      iString msg = "X Spacing must be greater that 0.0 [(" + iString(p_Xspacing) + "]";
+      IString msg = "X Spacing must be greater that 0.0 [(" + IString(p_Xspacing) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     if(p_Yspacing <= 0.0) {
-      iString msg = "Y Spacing must be greater that 0.0 [(" + iString(p_Yspacing) + "]";
+      IString msg = "Y Spacing must be greater that 0.0 [(" + IString(p_Yspacing) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }

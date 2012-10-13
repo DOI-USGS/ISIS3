@@ -117,7 +117,7 @@ namespace Isis {
   // Return the attributes in the dialog
   std::string GuiInputAttribute::GetAttributes() {
     if(p_lineEdit->isEnabled()) {
-      Isis::iString s = p_lineEdit->text().toStdString();
+      Isis::IString s = p_lineEdit->text().toStdString();
       s.Remove(" ");
       s.Trim("+");
       if(s == "") return s;
@@ -138,7 +138,7 @@ namespace Isis {
     }
     else {
       p_buttonGroup->buttons()[1]->setChecked(true);
-      p_lineEdit->setText((iString)att.toString());
+      p_lineEdit->setText((IString)att.toString());
     }
   }
 }

@@ -13,7 +13,7 @@
 #include "LeastSquares.h"
 #include "BasisFunction.h"
 #include "PolynomialUnivariate.h"
-#include "iString.h"
+#include "IString.h"
 #include "IException.h"
 #include "Table.h"
 #include "NaifStatus.h"
@@ -94,7 +94,7 @@ namespace Isis {
     p_fullCacheSize = 0;
 
     // Determine the axis for the velocity vector
-    std::string key = "INS" + Isis::iString(frameCode) + "_TRANSX";
+    std::string key = "INS" + Isis::IString(frameCode) + "_TRANSX";
     SpiceDouble transX[2];
     SpiceInt number;
     SpiceBoolean found;
@@ -1118,7 +1118,7 @@ namespace Isis {
       derivative = 1;
     }
     else {
-      Isis::iString msg = "Coeff index, " + Isis::iString(coeffIndex) + " exceeds degree of polynomial";
+      Isis::IString msg = "Coeff index, " + Isis::IString(coeffIndex) + " exceeds degree of polynomial";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return derivative;
@@ -1321,7 +1321,7 @@ namespace Isis {
 
       if(p_fullCacheSize != (int) p_cache.size()) {
 
-        Isis::iString msg = "Full cache size does NOT match cache size in LoadTimeCache -- should never happen";
+        Isis::IString msg = "Full cache size does NOT match cache size in LoadTimeCache -- should never happen";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
@@ -1557,7 +1557,7 @@ namespace Isis {
           break;
         }
 
-        std::string msg = "The frame" + iString((int) frameCodes[frmidx]) + " is not supported by Naif";
+        std::string msg = "The frame" + IString((int) frameCodes[frmidx]) + " is not supported by Naif";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
@@ -1577,7 +1577,7 @@ namespace Isis {
             break;
           }
 
-          std::string msg = "The ck rotation from frame " + iString(frameCodes[frmidx]) + " can not be found"
+          std::string msg = "The ck rotation from frame " + IString(frameCodes[frmidx]) + " can not be found"
                             + " due to no pointing available at requested time or a problem with the frame";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
@@ -1585,7 +1585,7 @@ namespace Isis {
       else if(type == TK) {
         tkfram_((SpiceInt *) &typid, (double *) matrix, &nextFrame, (logical *) &found);
         if(!found) {
-          std::string msg = "The tk rotation from frame " + iString(frameCodes[frmidx]) + " can not be found";
+          std::string msg = "The tk rotation from frame " + IString(frameCodes[frmidx]) + " can not be found";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
@@ -1600,8 +1600,8 @@ namespace Isis {
       }
 
       else {
-        std::string msg = "The frame " + iString(frameCodes[frmidx]) +
-                          " has a type " + iString(type) + " not supported by your version of Naif Spicelib." +
+        std::string msg = "The frame " + IString(frameCodes[frmidx]) +
+                          " has a type " + IString(type) + " not supported by your version of Naif Spicelib." +
                           "You need to update.";
         throw IException(IException::Programmer, msg, _FILEINFO_);
 
@@ -1985,14 +1985,14 @@ namespace Isis {
        reset_c();  // Reset Naif error system to allow caller to recover
 
        if (eqstr_c(naifstr, "SPICE(UNKNOWNFRAME)")) {
-         Isis::iString msg = Isis::iString((int) p_constantFrames[0]) + " is an unrecognized " +
+         Isis::IString msg = Isis::IString((int) p_constantFrames[0]) + " is an unrecognized " +
                              "reference frame code.  Has the mission frames kernel been loaded?";
          throw IException(IException::Io, msg, _FILEINFO_);
        }
        else {
-         Isis::iString msg = "No pointing available at requested time [" +
-                             Isis::iString(p_et + p_timeBias) + "] for frame code [" +
-                             Isis::iString((int) p_constantFrames[0]) + "]";
+         Isis::IString msg = "No pointing available at requested time [" +
+                             Isis::IString(p_et + p_timeBias) + "] for frame code [" +
+                             Isis::IString((int) p_constantFrames[0]) + "]";
          throw IException(IException::Io, msg, _FILEINFO_);
        }
      }

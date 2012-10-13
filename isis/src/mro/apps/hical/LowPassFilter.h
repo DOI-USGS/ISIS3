@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 
-#include "iString.h"
+#include "IString.h"
 #include "HiCalUtil.h"
 #include "Module.h"
 #include "QuickFilter.h"

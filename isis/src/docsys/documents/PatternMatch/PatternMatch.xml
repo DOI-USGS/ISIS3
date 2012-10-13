@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:noNamespaceSchemaLocation=
-  "http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
+<documentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Documentation/documentation.xsd">
 
   <files>
     <file>
@@ -27,7 +25,7 @@
             <li><a href="#MaximumCorrelation">Maximum Correlation</a></li>
             <li><a href="#MinimumDifference">Minimum Difference</a></li>
             <li><a href="#Gruen">Gruen</a></li>
-            <li><a href="#Tolerance">Tolerance</a></li>
+            <li><a href="#Tolerance">Algorithm Tolerance Parameter</a></li>
           </ol>
 
           <li><a href="#CreatingFitChip">Creating a Fit Chip</a></li>
@@ -37,14 +35,9 @@
 
           <li><a href="#SubPixelAccuracy">Sub-Pixel Accuracy</a></li>
           <ol type="i">
-            <li><a href="#SurfaceModeling">Surface Modeling</a></li>
-            <li>
-              <a href="#FindingLocalMinMax">Finding a Local Minimum/Maximum</a>
-            </li>
+            <li><a href="#SurfaceModeling (Subpixel Algorithm)">Surface Modeling</a></li>
             <li><a href="#DistanceTolerance">Distance Tolerance</a></li>
             <li><a href="#WindowSize">Window Size</a></li>
-            <li><a href="#EccentricityRatio">Eccentricity Ratio</a></li>
-            <li><a href="#ResidualTolerance">Residual Tolerance</a></li>
           </ol>
 
           <li><a href="#AdvancedFeatures">Advanced Features</a></li>
@@ -109,14 +102,14 @@
         <h2><a name="Chips">Chips</a></h2>
         <p>
           In the simplest terms, automatic registration attempts to find some
-          sub-area of a cube (or "pattern") inside some subarea of another cube
-          (or "search" window).  In ISIS, these "generally" small sub-areas of
-          a cube are called "chips".  There are two chips used in automatic
+          sub-area of a cube (or "pattern" window) inside some subarea of another 
+          cube (or "search" window).  In ISIS, these "generally" small sub-areas 
+          of a cube are called "chips".  There are two chips used in automatic
           registration, the "pattern" chip and the "search" chip, corresponding
           to the two sub-areas discussed above.   We will discuss each in more
           detail within the following sections, but for now we describe the
           basic elements of a chip.  That is, an NxM chip is defined to be an N
-          sample by M line region of a cube.  Some key elements of a chip are
+          samples by M lines region of a cube.  Some key elements of a chip are
           as follows:
 
           <ol>
@@ -124,11 +117,6 @@
             <li>Like cubes, chip coordinates are sample/line based and indexed from 1</li>
             <li>The center of the chip is (N-1)/2 + 1 and (M-1)/2 + 1.</li>
           </ol>
-
-          Because a chip is a region of a cube, there must be a technique to
-          "load" the chip.  The most common method for accomplishing this is to
-          specify a cube coordinate (a sample and line) to be loaded as the
-          center pixel of the chip.
         </p>
 
         <h3><a name="PatternChip">Pattern Chip</a></h3>
@@ -253,7 +241,7 @@
             GOF = |R|
           </pre>
 
-          In this algorithm, the goodness of fit will range from no correlation
+          In this algorithm, the "one pixel accuracy" goodness of fit will range from no correlation
           (zero) to perfect correlation (one).  Example PVL for this algorithm
           would as follows:
 
@@ -278,7 +266,7 @@
 
         <h3><a name="MinimumDifference">Minimum Difference</a></h3>
         <p>
-          This match algorithm defines goodness-of-fit as the average absolute
+          This match algorithm defines goodness-of-fit (one pixel accuracy) as the average absolute
           difference per pixel between the pattern chip and the search
           sub-region.  Specifically, it sums the pixel differences within the
           pattern chip and search sub-region and divides by the total pixel
@@ -318,157 +306,158 @@
 
         <h3><a name="Gruen">Gruen</a></h3>
         <p>
-					A modification to the Adaptive Least Squares Correlation algorithm
-					was introduced by A.W. Gruen as a flexible technique for image data
-					matching.  It allows for simultaneous radiometric corrections and local
-					geometrical image shaping in which the system parameters are
-					automatically assessed, corrected, and thus optimized during the least
-					squares iterations.  The tools of least squares estimation are utilized
-					for the assessment of the correlation quality.  The algorithm allows for
-					stabilization and improvement of the correlation procedure through the
-					simultaneous consideration of geometrical constraints.
+          A modification to the Adaptive Least Squares Correlation algorithm
+          was introduced by A.W. Gruen as a flexible technique for image data
+          matching.  It allows for simultaneous radiometric corrections and local
+          geometrical image shaping in which the system parameters are
+          automatically assessed, corrected, and thus optimized during the least
+          squares iterations.  The tools of least squares estimation are utilized
+          for the assessment of the correlation quality.  The algorithm allows for
+          stabilization and improvement of the correlation procedure through the
+          simultaneous consideration of geometrical constraints.
 
-					Within ISIS, this algorithm provides adaptive image (chip) registration
-					using an Affine transform to iteratively adjust the search chip at each
-					iteration.  Each iteration solves for new adjustments to the Affine
-					transform until the 6 affine parameters fall below the tolerances as
-					specified by the following parameters:
+          Within ISIS, this algorithm provides adaptive image (chip) registration
+          using an Affine transform to iteratively adjust the search chip at each
+          iteration.  Each iteration solves for new adjustments to the Affine
+          transform until the 6 affine parameters fall below the tolerances as
+          specified by the following parameters:
         </p>
         <p>
-					 <br><h1 align="center">Gruen AutoReg Parameters</h1></br>
-    		<TABLE BORDER="1">
-          <CAPTION>
-          </CAPTION>
-        <TR>
-          <TH>Parameter</TH>
-          <TH>Description</TH>
-        </TR>
-        <TR>
-            <TD>Name</TD>
-            <TD>
-              Name of the algorithm that the set of parameters description apply
-              to.  This should be <em>AdaptiveGruen</em>.
-            </TD>
-        </TR>
-        <TR>
-            <TD>Tolerance</TD>
-            <TD>
-              This constrains the eigenvalues of the registration result.
-              Registrations with <b>GoodnessOfFit</b> larger than this value are
-              rejected.  It is highly recommended this value be utilized as it
-              will result in better fits.  (Default: Unbounded)
-            </TD>
-        </TR>
-      <TR>
-        <TD>MaximumIterations</TD>
-        <TD>
-          Maximum number of iterations allowed for the registration processing
-          to converge.  (Default: 30)
-        </TD>
-      </TR>
-      <TR>
-        <TD>AffineTolerance</TD>
-        <TD>
-          The amount of offset in pixels an Affine derived points is allowed to
-          deviate from the orginal match point. (Default: Unbounded)
-        </TD>
-      </TR>
-      <TR>
-        <TD>SpiceTolerance</TD>
-        <TD>
-          The amount of offset in pixels a registration is allowed to deviate
-          from a registered point. (Default: Unbounded)
-        </TD>
-      </TR>
-      <TR>
-        <TD>AffineTranslationTolerance</TD>
-        <TD>
-          Specifies the threshold convergence value of the Affine translation
-          shift in line/sample between each Gruen match iteration.  If the
-          amout of this value computed in the Gruen algorithm is less than this
-          value, it is deemed a match point concerning the translation portion
-          of the registered point.  (Default: 0.1)
-        </TD>
-      </TR>
-      <TR>
-        <TD>AffineScaleTolerance</TD>
-        <TD>
-          Specifies the threshold convergence value of the Affine scale in
-          line/sample between each Gruen match iteration.  If the amout of this
-          value computed in the Gruen algorithm is less than this value, it is
-          deemed a match point concerning the scaling portion of the registered
-          point. (Default: 0.3)
-        </TD>
-      </TR>
-      <TR>
-        <TD>AffineShearTolerance</TD>
-        <TD>
-          Specifies the threshold convergence value of the Affine shear in
-          line/sample between each Gruen match iteration.  If the amout of this
-          value computed in the Gruen algorithm is less than this value, it is
-          deemed a match point concerning the shearing portion of the registered
-          point. (Default: AffineScaleTolerance)
-        </TD>
-      </TR>
-      <TR>
-        <TD>RadioShiftTolerance</TD>
-        <TD>
-          Specifies the threshold convergence value for the radiometric shift of
-          the pixel value between each Gruen match iteration.  If the amout of this
-          value computed in the Gruen algorithm is less than this value, it is
-          deemed a match point concerning the radiometric shift portion of the
-          registered point. (Default: Unbounded)
-        </TD>
-      </TR>
-      <TR>
-        <TD>RadioGainMinTolerance</TD>
-        <TD>
-          Specifes the threshold convergence minimum value for the radiometric
-          gain of the pixel value between each Gruen match iteration.  If the amout of this
-          value computed in the Gruen algorithm is greater than this value and
-          less than RadioGainMaxTolerance, it is deemed a match point concerning
-           the radiometric gain portion of the registered point. (Default:
-           Unbounded)
-        </TD>
-      </TR>
-      <TR>
-        <TD>RadioGainMaxTolerance</TD>
-        <TD>
-          Specifes the threshold convergence maximum value for the radiometric
-          gain of the pixel value between each Gruen match iteration.  If the amout of this
-          value computed in the Gruen algorithm is less than this value and
-          greater than RadioGainMinTolerance, it is deemed a match point
-          concerning the radiometric gain portion of the registered point.
-          (Default: Unbounded)
-        </TD>
-      </TR>
-      <TR>
-        <TD>DefaultRadioShift</TD>
-        <TD>
-          Sets the default value for the radiometric shift value used as a
-          starting point in the Gruen algorithm.  (Default: 0)
-        </TD>
-      </TR>
-      <TR>
-        <TD>DefaultRadioGain</TD>
-        <TD>
-          Sets the default value for the radiometric gain value used as a
-          starting point in the Gruen algorithm.  (Default: 0)
-        </TD>
-      </TR>
-    </TABLE>
+          <br><h1 align="center">Gruen AutoReg Parameters</h1></br>
+          <TABLE BORDER="1">
+            <CAPTION>
+            </CAPTION>
+            <TR>
+              <TH>Parameter</TH>
+              <TH>Description</TH>
+            </TR>
+            <TR>
+              <TD>Name</TD>
+              <TD>
+                Name of the algorithm that the set of parameters description apply
+                to.  This should be <em>AdaptiveGruen</em>.
+              </TD>
+            </TR>
+            <TR>
+              <TD>Tolerance</TD>
+              <TD>
+                This constrains the eigenvalues of the registration result.
+                Registrations with <b>GoodnessOfFit</b> larger than this value are
+                rejected.  It is highly recommended this value be utilized as it
+                will result in better fits.  A low GOF value near zero represents
+                a good fit. (Default: Unbounded)
+              </TD>
+            </TR>
+            <TR>
+              <TD>MaximumIterations</TD>
+              <TD>
+                Maximum number of iterations allowed for the registration processing
+                to converge.  (Default: 30)
+              </TD>
+            </TR>
+            <TR>
+              <TD>AffineTolerance</TD>
+              <TD>
+                The amount of offset in pixels an Affine derived points is allowed to
+                deviate from the orginal match point. (Default: Unbounded)
+              </TD>
+            </TR>
+            <TR>
+              <TD>SpiceTolerance</TD>
+              <TD>
+                The amount of offset in pixels a registration is allowed to deviate
+                from a registered point. (Default: Unbounded)
+              </TD>
+            </TR>
+            <TR>
+              <TD>AffineTranslationTolerance</TD>
+              <TD>
+                Specifies the threshold convergence value of the Affine translation
+                shift in line/sample between each Gruen match iteration.  If the
+                amout of this value computed in the Gruen algorithm is less than this
+                value, it is deemed a match point concerning the translation portion
+                of the registered point.  (Default: 0.1)
+              </TD>
+            </TR>
+            <TR>
+              <TD>AffineScaleTolerance</TD>
+              <TD>
+                Specifies the threshold convergence value of the Affine scale in
+                line/sample between each Gruen match iteration.  If the amout of this
+                value computed in the Gruen algorithm is less than this value, it is
+                deemed a match point concerning the scaling portion of the registered
+                point. (Default: 0.3)
+              </TD>
+            </TR>
+            <TR>
+              <TD>AffineShearTolerance</TD>
+              <TD>
+                Specifies the threshold convergence value of the Affine shear in
+                line/sample between each Gruen match iteration.  If the amout of this
+                value computed in the Gruen algorithm is less than this value, it is
+                deemed a match point concerning the shearing portion of the registered
+                point. (Default: AffineScaleTolerance)
+              </TD>
+            </TR>
+            <TR>
+              <TD>RadioShiftTolerance</TD>
+              <TD>
+                Specifies the threshold convergence value for the radiometric shift of
+                the pixel value between each Gruen match iteration.  If the amout of this
+                value computed in the Gruen algorithm is less than this value, it is
+                deemed a match point concerning the radiometric shift portion of the
+                registered point. (Default: Unbounded)
+              </TD>
+            </TR>
+            <TR>
+              <TD>RadioGainMinTolerance</TD>
+              <TD>
+                Specifes the threshold convergence minimum value for the radiometric
+                gain of the pixel value between each Gruen match iteration.  If the amout of this
+                value computed in the Gruen algorithm is greater than this value and
+                less than RadioGainMaxTolerance, it is deemed a match point concerning
+                the radiometric gain portion of the registered point. (Default:
+                Unbounded)
+              </TD>
+            </TR>
+            <TR>
+              <TD>RadioGainMaxTolerance</TD>
+              <TD>
+                Specifes the threshold convergence maximum value for the radiometric
+                gain of the pixel value between each Gruen match iteration.  If the amout of this
+                value computed in the Gruen algorithm is less than this value and
+                greater than RadioGainMinTolerance, it is deemed a match point
+                concerning the radiometric gain portion of the registered point.
+                (Default: Unbounded)
+              </TD>
+            </TR>
+            <TR>
+              <TD>DefaultRadioShift</TD>
+              <TD>
+                Sets the default value for the radiometric shift value used as a
+                starting point in the Gruen algorithm.  (Default: 0)
+              </TD>
+            </TR>
+            <TR>
+              <TD>DefaultRadioGain</TD>
+              <TD>
+                Sets the default value for the radiometric gain value used as a
+                starting point in the Gruen algorithm.  (Default: 0)
+              </TD>
+            </TR>
+          </TABLE>
         </p>
 
         <h3><a name="Tolerance">Tolerance</a></h3>
         <p>
           In all algorithms we will want to define a tolerance for goodness of
           fit.   The tolerance test must be made by the plugin as the direction
-          of the test is dependent on the algorithm.  In our examples,
+          of the test is dependent on the algorithm.  In our examples, the goodness of
+          fit and Tolerance represent a one pixel accuracy level.  The
           MinimumDifference would use a test for "less than" Tolerance,
           MaximumCorrelation would use "greater than" Tolerance, and GruenAdaptive
-					would use "less than" Tolerance.  This is represented in PVL in the
-					following fashion:
-
+          would use "less than" Tolerance (the goodness of fit for Gruen is at 
+          a sub-pixel accuracy). This is represented in PVL in the following fashion:
           <pre style="padding-left:4em;">
             Object = AutoRegistration
               Group = PatternChip
@@ -486,20 +475,6 @@
                 Tolerance = 0.7
               End_Group
             End_Object
-          </pre>
-
-          In fact, the plugin will have significant control such that one, two,
-          or more tolerances or test conditions must be satisfied to accept the
-          match.  For example:
-
-          <pre style="padding-left:4em;">
-            Group = Algorithm
-              Name      = SuperSpecialRegistration
-              Tolerance = 0.7
-              ChiSquare = 2.5
-              R         = 0.6
-              T         = 95.0
-            End_Group
           </pre>
         </p>
 
@@ -542,66 +517,13 @@
         <p>
           Upon walking the pattern chip through the search chip we will have
           created the fit chip.  The highest (or lowest) goodness of fit value
-          generally represents the position that best matched between the
-          pattern and search area.  It is however only good to one pixel
-          accuracy.
+          generally represents the whole pixel position that best matched between the
+          pattern and search area. 
         </p>
         <p>
-          In many cases, the actual registration may lie somewhere between two
-          pixels. This is due to the fact that we are using a set of finite data
-          to estimate something that is in fact continuous.
-        </p>
-
-        <h3><a name="SurfaceModeling">Surface Modeling</a></h3>
-        <p>
-          To get around the problem of a true best fit lying somewhere between
-          two pixels, we can model a continuous mathematical surface based on
-          the data in the fit chip. By using a
-          <a href="http://en.wikipedia.org/wiki/Least-squares">
-            least squares fit
-          </a>
-          to generate a 2nd degree 2-dimentional polynomial given an NxN
-          window of points, we have a reasonable approximation under a given
-          tolerance of the underlying structure. We can then estimate the true
-          registration position of the chip on that surface.
-        </p>
-        <p>
-          Optionally, the window size and tolerance may be supplied through PVL:
-
-          <pre style="padding-left:4em;">
-            Group = SurfaceModel
-              DistanceTolerance = 2.5
-              WindowSize        = 7
-              EccentricityRatio = 50.0
-              ResidualTolerance = 0.05
-            End_Group
-          </pre>
-
-          The distance tolerance in pixels must be greater than 0 and is
-          defaulted to 1.0. The window size must be an odd number greater than 2
-          and is defaulted to 3.
-        </p>
-        <p>
-          The eccentricity ratio and residual tolerance correspond to the
-          optional eccentricity and average residual tests.  By default, neither
-          test is performed during surface model construction.  However, if the
-          SurfaceModel PVL group contains one of both of those keywords, it will
-          enable the respective test(s) with the given tolerance(s).
-        </p>
-
-        <h3><a name="FindingLocalMinMax">Finding a Local Minimum/Maximum</a></h3>
-        <p>
-          After a surface is modeled over the data, we can use a number of
-          techniques to calculate the local extreme. For example, when using the
-          MinimumDifference algorithm the registration occurs at the minimal
-          value on the surface. The result should fall within one pixel of the
-          best calculated fit.
-        </p>
-        <p>
-          It is important to note that while the surface modeling option is on
-          by default it is possible to turn it off by using the SubpixelAccuracy
-          keyword. Example:
-
+          The Subpixel Algorithm option is on by default (SubpixelAccuracy=True), 
+          it is possible to turn it off by using the SubpixelAccuracy keyword. 
+          Example:
           <pre style="padding-left:4em;">
             Group = Algorithm
               Name             = MaximumCorrelation
@@ -612,13 +534,61 @@
 
           In this case, the whole pixel with the best fit is returned.
         </p>
+
         <p>
-          Also, if an ideal goodness of fit is found (e.g. 0.0 for
-          MinimumDifference or 1.0 for MaximumCorrelation), we have a perfect
-          fit and, thus, know it is in the best position. In this case, the
-          sub-pixel accuracy phase is omitted.
+           As of isis3.4.0, the subpixel algorithm was replaced with the algorithm
+           described under SurfaceModeling. To estimate the true registration postion,
+           the previous algorithm used a least squares fit to generate a 2nd degree 
+           2-dimentional polynomial given an NxN window of points from the fit chip.
+           This previous algorithm optionally applied two parameter tolerances that 
+           are no longer needed and have been removed, Eccentricity Ratio and Residual Tolerance.
+           If a PVL definition file includes these parameters when applying the new subpixel 
+           algorithm, they will simply be ignored.
         </p>
 
+        <h3><a name="SurfaceModeling">Surface Modeling</a></h3>
+        <p>
+           When enabled, the subpixel accuracy algorithm analyzes a window size
+           (WindowSize x WindowSize) block containing fit chip pixel values centered 
+           at the whole pixel with the best registration (local extreme value of the fit chip; 
+           the highest or the lowest value). 
+        </p>
+        <p>
+           The fit chip analysis is performed by using an adaptive flood fill and weighted average
+           algorithm as follows:  (The figure below is based on a 5x5 WindowSize block of
+           a fit chip returned by the Maximum Correlation algorithm).  The best registration 
+           among the border pixels of the WindowSize block (light orange colored pixel cells) 
+           is found (0.76 in the example below).  A continuous flood fill is done selecting all
+           continuous pixels with registration values on the interval (0.76,1.0)-(the green
+           colored cells).  An average of the selected cell coordinates is then computed
+           (weighting each coordinate by it's registration value) to reduce the selection
+           to a single location.
+         </p> 
+         <p>
+          <img src="assets/fitchip_windowsize.png" alt="WindowSize Block of a FIT Chip"/>
+         </p>
+         <p>
+           It is required that 95% of the pixels within the fit chip block be valid.  Thus,
+           in a 5x5 block, only one pixel could be invalid.  This is enforced primarily to
+           avoid false positive registrations on image edges.
+         </p>
+         <p>
+           The dimensions of the WindowSize fit chip block must be an odd number in order 
+           to have a center pixel. Also, the dimensions of the WindowSize fit chip block cannot 
+           be less than 5, but can be as large as the original fit chip 
+           (though this is not recommended). Recommended dimensions for 
+           (MaximumCorrelation and MinimumDifference) range from 5, 7, 9, 11, to 15.  
+         </p>
+         <p>
+           Optionally, the window size and tolerance may be supplied through PVL:
+  
+           <pre style="padding-left:4em;">
+             Group = SurfaceModel
+               DistanceTolerance = 0.75
+               WindowSize        = 5
+             End_Group
+           </pre>
+         </p>
         <h3><a name="DistanceTolerance">Distance Tolerance</a></h3>
         <p>
           The result of a sub-pixel accuracy computation is likely to move the
@@ -627,7 +597,8 @@
           of the match.  This tolerance value thus specifies the max number of
           pixels (with sub-pixel granularity) the sub-pixel accuracy
           computation can move the best fit before the registration is rejected
-          entirely.
+          entirely. The distance tolerance in pixels must be greater than 0 and is
+          defaulted to 1.0. 
         </p>
         <p>
           For example:
@@ -640,106 +611,52 @@
 
           Here a registration will be rejected if the new position is more than
           3.5 pixels away from the original whole-pixel result.
+          The recommended value is 0.5 or 0.75, this assumes that the orignal 
+          starting position at the whole pixel level is accurate.
+          This distance test is not a 2D check, but rather, two single dimension
+          checks (line direction and sample direction).  
         </p>
 
         <h3><a name="WindowSize">Window Size</a></h3>
         <p>
           When refining a whole-pixel match to sub-pixel accuracy, it's
           important to consider how much area around that best whole-pixel fit
-          to sample for constructing a surface model.  The WindowSize keyword
+          to sample for subpixel analysis.  The WindowSize keyword
           defines the size of the window, centered on the best whole-pixel
-          match, that will be used for modelling the surface.  Values for
+          match, that will be used for subpixel refinement.  Values for
           WindowSize specify the N of an NxN chip, and must be odd numbers
-          greater than or equal to 3.  By default, this window size is 5x5
+          greater than or equal to 5.  By default, this window size is 5x5
           pixels, but can be specified in the SurfaceModel group as follows:
 
           <pre style="padding-left:4em;">
             Group = SurfaceModel
-              WindowSize = 3
+              WindowSize = 5
             End_Group
           </pre>
 
-          Here we define our window to be 3x3 pixels around the best
-          whole-pixel match, and the resulting surface will be modelled with
+          Here we define our window to be 5x5 pixels around the best
+          whole-pixel match, and the resulting surface will be modeled with
           the data in this chip.
         </p>
 
-        <h3><a name="EccentricityRatio">Eccentricity Ratio</a></h3>
+         <p>
+           It is required that 95% of the pixels within the fit chip block be valid.  Thus,
+           in a 5x5 block, only one pixel could be invalid.  This is enforced primarily to
+           avoid false positive registrations on image edges.   An invalid pixel is defined
+           as any 'Special Pixel' (NULL,HRS,LRS,etc) or if it is a value that falls
+           outside the user specified 'ValidMinimum/ValidMaximum' parameter values.
+         </p>
+         <p>
+           The dimensions of the WindowSize fit chip block must be an odd number in order 
+           to have a center pixel. Also, the dimensions of the WindowSize fit chip block cannot 
+           be less than 5, but can be as large as the original fit chip (though this is not recommended).  
+           Recommended dimensions for (MaximumCorrelation and MinimumDifference) range 
+           from 5, 7, 9, 11, to 15.  
+         </p>
         <p>
-          After the least squares fit is performed to model a surface, the
-          ideal result is a circular formation of goodness-of-fit values
-          improving towards the center of the surface.  The less circular, or
-          more "eccentric", the formation of goodness-of-fit values, the less
-          likely the modelling result is accurate.  The conditions under which
-          a high ratio occurs is when there are primiarily linear features in
-          the search and pattern chips.
-        </p>
-        <p>
-          In an attempt to let the user define what constitutes a tolerable
-          amount of eccentricity in their surface models, we introduce the
-          notion of an "Eccentricity Ratio".  Here we think of eccentricity
-          as a ratio between the semi-major and semi-minor axes of an
-          ellipse (we recognize that this does not conform to the usual
-					definition of eccentricity).  The value specified by the
-					EccentricityRatio keyword then represents the user's tolerance for
-					this ratio.  In other words, the EccentricityRatio keyword tells
-					us how much bigger than the semi-minor axis the semi-major axis
-					can be before we reject the result.
-        </p>
-        <p>
-          For example, consider the following PVL:
-
-          <pre style="padding-left:4em;">
-            Group = SurfaceModel
-              EccentricityRatio = 5.0
-            End_Group
-          </pre>
-          In this instance, if the length of the semi-major axis of the
-          computed surface model is greater than 5 times the length of the
-          semi-minor axis, then the surface model will be thrown out and the
-          registration will fail for that point.
-        </p>
-        <p>
-          Sometimes the eccentricity can not be computed for a given surface
-          model because the math simply doesn't work out (negative numbers
-          appear in square root calculations).  In this case the eccentricity
-          (in mathematical terms) is assumed to be 0, or perfectly circular.
-        </p>
-        <p>
-          If the user does not wish to perform the eccentricity test on their
-          surface models, the keyword can be optionally left out of the
-          definition file and the test will be completely skipped.
-        </p>
-
-        <h3><a name="ResidualTolerance">Residual Tolerance</a></h3>
-        <p>
-          The least squares fit performed to construct the surface model takes
-          discrete data from the whole-pixels around the best-fit (as defined
-          by WindowSize).  When this discrete data is fit with a continuous
-          function, there is likely going to be some amount of error between
-          the original value for some pixel and its interpolated value in the
-          least squares solution.  The ResidualTolerance keyword thus allows
-          the user to specify the maximum average residual, or
-          <a href="http://en.wikipedia.org/wiki/Mean_absolute_error">
-            mean absolute error
-          </a>,
-          for all pixels in the surface model area, that will be tolerated
-          before the sub-pixel accuracy computation is rejected and the
-          registration fails for that point.
-        </p>
-        <p>
-          An example of using this keyword in PVL:
-
-          <pre style="padding-left:4em;">
-            Group = SurfaceModel
-              ResidualTolerance = 0.1
-            End_Group
-          </pre>
-
-          With the ResidualTolerance set here to 0.1, if the average residual
-          of the surface model is greater than 0.1, the sub-pixel accuracy
-          computation will be rejected and the registration will fail for that
-          point.
+          If an ideal goodness of fit is found (e.g. 0.0 for MinimumDifference or 1.0 for 
+          MaximumCorrelation), we have a perfect fit and, thus, know it is in the best position. 
+          In this case, the sub-pixel accuracy phase is omitted.
         </p>
 
         <!-- Advanced Features -->
@@ -820,12 +737,12 @@
           before attempting to walk the pattern chip through the search chip
           looking for a match, the algorithm will first perform a "reduced
           match".  In other words, new pattern and search chips will be
-					derived from the original chips with dimensions equal to the original
-					chip dimensions divided by the ReductionFactor, in a manner similar to
-					the reduce program, and a match will be performed on them first to help
-					refine the general match to a smaller search area.  For example, a
-					common reduction factor is 2, and can be specified in the definition file
-					as follows:
+          derived from the original chips with dimensions equal to the original
+          chip dimensions divided by the ReductionFactor, in a manner similar to
+          the reduce program, and a match will be performed on them first to help
+          refine the general match to a smaller search area.  For example, a
+          common reduction factor is 2, and can be specified in the definition file
+          as follows:
 
           <pre style="padding-left:4em;">
             Object = AutoRegistration
@@ -917,7 +834,7 @@
         </p>
         <p>
           Adaptive algorithms will make additional use the "best" sample and
-          line dervied from the reduced match when setting up affine
+          line derived from the reduced match when setting up affine
           transformations.
         </p>
 
@@ -1175,22 +1092,6 @@
             <td>[3, infinity) odd</td>
             <td>5</td>
           </tr>
-          <tr>
-            <td><a href="#EccentricityRatio"><strong>EccentricityRatio</strong></a></td>
-            <td>SurfaceModel</td>
-            <td>All</td>
-            <td>Real</td>
-            <td>[1.0, infinity]</td>
-            <td><span style="color:red;">No Eccentricity Test</span></td>
-          </tr>
-          <tr>
-            <td><a href="#ResidualTolerance"><strong>ResidualTolerance</strong></a></td>
-            <td>SurfaceModel</td>
-            <td>All</td>
-            <td>Real</td>
-            <td>[0.0, infinity]</td>
-            <td><span style="color:red;">No Residual Test</span></td>
-          </tr>
 
           <!-- Gruen -->
           <tr>
@@ -1339,6 +1240,12 @@
     <change name="Jai Rideout" date="2011-10-14">
       Removed references to Roberts gradient because it has been removed from
       AutoReg.
+    </change>
+    <change name="Tammy Becker" date="2012-08-15">
+      Modified the description of the subpixel algorithm to Orrin Thomas's
+      centroid/adaptive method.  Removed references to Eccentricity Ratio
+      and Residual Tolerance. Added the 'fitchip' WindowSize box figure.
+      A few minor additional corrections or modications throughout. Fixes #969.
     </change>
   </history>
 </documentation>

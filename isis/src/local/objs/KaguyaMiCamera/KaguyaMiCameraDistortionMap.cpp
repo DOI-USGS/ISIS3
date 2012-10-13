@@ -20,7 +20,7 @@
 #include <cmath>
 #include <iostream>
 
-#include "iString.h"
+#include "IString.h"
 #include "Constants.h"
 #include "FunctionTools.h"
 #include "KaguyaMiCameraDistortionMap.h"
@@ -53,15 +53,15 @@ namespace Isis {
     else                       m_numDistCoef = 4;  //NIR camera has 4 distortion coefs
     
     //read the distortion coefs from the NAIF Kernels
-    std::string naifXKey = "INS" + Isis::iString(naifIkCode) + "_DISTORTION_COEF_X";
-    std::string naifYKey = "INS" + Isis::iString(naifIkCode) + "_DISTORTION_COEF_Y";
+    std::string naifXKey = "INS" + Isis::IString(naifIkCode) + "_DISTORTION_COEF_X";
+    std::string naifYKey = "INS" + Isis::IString(naifIkCode) + "_DISTORTION_COEF_Y";
     for (int i=0; i < m_numDistCoef; i++) {
       m_distCoefX[i] = p_camera->getDouble(naifXKey,i);
       m_distCoefY[i] = p_camera->getDouble(naifYKey,i);
     }
 
     //now read the boresights, or what I would typicall call the principal point offsets
-    naifXKey = "INS" + Isis::iString(naifIkCode) + "_BORESIGHT";
+    naifXKey = "INS" + Isis::IString(naifIkCode) + "_BORESIGHT";
     m_boreX = p_camera->getDouble(naifXKey, 0);
     m_boreY = p_camera->getDouble(naifXKey, 1);
   }

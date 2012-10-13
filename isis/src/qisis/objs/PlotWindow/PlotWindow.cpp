@@ -66,7 +66,7 @@ namespace Isis {
     m_yAxisUnits = yAxisUnits;
 
     if (!m_parent) {
-      iString msg = "PlotWindow cannot be instantiated with a NULL parent";
+      IString msg = "PlotWindow cannot be instantiated with a NULL parent";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -1391,7 +1391,7 @@ namespace Isis {
       double xAxisValue = xAxisPoints[row];
 
       QTableWidgetItem *xAxisItem = new QTableWidgetItem(
-          iString(xAxisValue).ToQt());
+          IString(xAxisValue).ToQt());
       m_tableWindow->table()->setItem(row, 0, xAxisItem);
 
       if (row == m_tableWindow->table()->rowCount() - 1) {
@@ -1417,7 +1417,7 @@ namespace Isis {
         if (IsSpecial(y))
           item = new QTableWidgetItem(QString("N/A"));
         else
-          item = new QTableWidgetItem(iString(y).ToQt());
+          item = new QTableWidgetItem(IString(y).ToQt());
 
         m_tableWindow->table()->setItem(row, col, item);
 

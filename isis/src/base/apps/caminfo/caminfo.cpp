@@ -9,7 +9,7 @@
 #include "FileName.h"
 #include "IException.h"
 #include "ImagePolygon.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "LineManager.h"
 #include "OriginalLabel.h"
@@ -27,30 +27,30 @@
 using namespace std;
 using namespace Isis;
 
-QPair<iString, iString> MakePair(iString key, iString val);
+QPair<IString, IString> MakePair(IString key, IString val);
 void GeneratePVLOutput(Cube *incube,
-                       QList< QPair<iString, iString> > *general,
-                       QList< QPair<iString, iString> > *camstats,
-                       QList< QPair<iString, iString> > *statistics,
+                       QList< QPair<IString, IString> > *general,
+                       QList< QPair<IString, IString> > *camstats,
+                       QList< QPair<IString, IString> > *statistics,
                        BandGeometry *bandGeom);
 void GenerateCSVOutput(Cube *incube,
-                       QList< QPair<iString, iString> > *general,
-                       QList< QPair<iString, iString> > *camstats,
-                       QList< QPair<iString, iString> > *statistics,
+                       QList< QPair<IString, IString> > *general,
+                       QList< QPair<IString, IString> > *camstats,
+                       QList< QPair<IString, IString> > *statistics,
                        BandGeometry *bandGeom);
 
 void IsisMain() {
   const string caminfo_program  = "caminfo";
   UserInterface &ui = Application::GetUserInterface();
 
-  QList< QPair<iString, iString> > *general = NULL, *camstats = NULL, *statistics = NULL;
+  QList< QPair<IString, IString> > *general = NULL, *camstats = NULL, *statistics = NULL;
   BandGeometry *bandGeom = NULL;
 
   // Get input filename
   FileName in = ui.GetFileName("FROM");
 
   // Get the format
-  iString sFormat = ui.GetAsString("FORMAT");
+  IString sFormat = ui.GetAsString("FORMAT");
 
   // if true then run spiceinit, xml default is FALSE
   // spiceinit will use system kernels
@@ -63,7 +63,7 @@ void IsisMain() {
   Cube *incube = p.SetInputCube("FROM");
 
   // General data gathering
-  general = new QList< QPair<iString, iString> >;
+  general = new QList< QPair<IString, IString> >;
   general->append(MakePair("Program",     caminfo_program));
   general->append(MakePair("IsisVersion", Application::Version()));
   general->append(MakePair("RunDate",     iTime::CurrentGMT()));
@@ -77,7 +77,7 @@ void IsisMain() {
   // another camstats will be run for each band and output
   // for each band.
   if(ui.GetBoolean("CAMSTATS")) {
-    camstats = new QList< QPair<iString, iString> >;
+    camstats = new QList< QPair<IString, IString> >;
 
     string filename = ui.GetAsString("FROM");
     int sinc = ui.GetInteger("SINC");
@@ -116,7 +116,7 @@ void IsisMain() {
 
   // Compute statistics for entire cube
   if(ui.GetBoolean("STATISTICS")) {
-    statistics = new QList< QPair<iString, iString> >;
+    statistics = new QList< QPair<IString, IString> >;
 
     LineManager iline(*incube);
     Statistics stats;
@@ -157,7 +157,7 @@ void IsisMain() {
   if(doGeometry || doPolygon) {
     Camera *cam = incube->getCamera();
 
-    iString incType = ui.GetString("INCTYPE");
+    IString incType = ui.GetString("INCTYPE");
     int polySinc, polyLinc;
     if(doPolygon && incType.UpCase() == "VERTICES") {
       ImagePolygon poly;
@@ -230,8 +230,8 @@ void IsisMain() {
 /**
  * Convience method for gracefully staying in 80 characters
  */
-QPair<iString, iString> MakePair(iString key, iString val) {
-  return QPair<iString, iString>(key, val);
+QPair<IString, IString> MakePair(IString key, IString val) {
+  return QPair<IString, IString>(key, val);
 }
 
 
@@ -239,9 +239,9 @@ QPair<iString, iString> MakePair(iString key, iString val) {
  * Get the output in PVL format
  */
 void GeneratePVLOutput(Cube *incube,
-                       QList< QPair<iString, iString> > *general,
-                       QList< QPair<iString, iString> > *camstats,
-                       QList< QPair<iString, iString> > *statistics,
+                       QList< QPair<IString, IString> > *general,
+                       QList< QPair<IString, IString> > *camstats,
+                       QList< QPair<IString, IString> > *statistics,
                        BandGeometry *bandGeom) {
   UserInterface &ui = Application::GetUserInterface();
 
@@ -316,16 +316,16 @@ void GeneratePVLOutput(Cube *incube,
  * CamStats, Stats, Geometry are info are recorded.
  */
 void GenerateCSVOutput(Cube *incube,
-                       QList< QPair<iString, iString> > *general,
-                       QList< QPair<iString, iString> > *camstats,
-                       QList< QPair<iString, iString> > *statistics,
+                       QList< QPair<IString, IString> > *general,
+                       QList< QPair<IString, IString> > *camstats,
+                       QList< QPair<IString, IString> > *statistics,
                        BandGeometry *bandGeom) {
   UserInterface &ui = Application::GetUserInterface();
 
   // Create the vars for holding the info
-  iString keys;
-  iString values;
-  const iString delim = ",";
+  IString keys;
+  IString values;
+  const IString delim = ",";
 
   // Output the result
   fstream outFile;

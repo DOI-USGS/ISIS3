@@ -168,6 +168,10 @@
     <change name="Ken Edmundson" date="2011-12-20">
       Added REJECTION_MULTIPLIER to interface, part of Mantis issue #637.
     </change>
+    <change name="Ken Edmundson" date="2012-01-19">
+      Added SPKDEGEE and SPKSOLVEDEGREE; changed name of SOLVEDEGREE to
+      CKSOLVEDEGREE.
+    </change>
   </history>
 
   <groups>
@@ -639,7 +643,7 @@
                 iteration.
         </description>
       </parameter>
-      <parameter name="SOLVEDEGREE">
+      <parameter name="CKSOLVEDEGREE">
         <type>integer</type>
         <minimum inclusive="yes">0</minimum>
         <default>
@@ -651,11 +655,11 @@
         <description>
                The degree of the polynomial being fit to in the bundle adjust 
                solution.  This polynomial can be different from the one used to 
-               generate the <def>a priori</def> camera angles used in the first iteration.  
-               In the case of an instrument with a jitter problem, a higher 
-               degree polynomial fit to each of the camera angles might provide 
-               a better solution (smaller errors).  For framing cameras, the application
-               automatically sets degree to 0. 
+               generate the <def>a priori</def> camera angles used in the first
+               iteration. In the case of an instrument with a jitter problem, a
+               higher degree polynomial fit to each of the camera angles might
+               provide a better solution (smaller errors).  For framing cameras,
+               the application automatically sets degree to 0.
         </description>
       </parameter>
       <parameter name="CAMSOLVE">
@@ -675,6 +679,12 @@
                    If this option is selected, no camera pointing parameters  
                    will be adjusted.
             </description>
+          <exclusions>
+            <item>CKDEGREE</item>
+            <item>CKSOLVEDEGREE</item>
+            <item>TWIST</item>
+            <item>OVEREXISTING</item>
+          </exclusions>
           </option>
 
           <option value="ANGLES">
@@ -687,7 +697,7 @@
                    camera angles translates images in sample and line.  Adding the third
                    angle to the solution (TWIST option) allows for rotation corrections.
                    Adjustments are not applied unless the solution converges and UPDATE is 
-                   selected. Solving for angles only is equivalent to using SOLVEDEGREE=0.
+                   selected. Solving for angles only is equivalent to using CKSOLVEDEGREE=0.
             </description>
           </option>
 
@@ -696,7 +706,7 @@
             <description>
                    Camera angles and their angular velocities will be adjusted in the
                    solution.  Solving for angles and velocities is equivalent to using 
-                   SOLVEDEGREE=1.
+                   CKSOLVEDEGREE=1.
             </description>
           </option>
 
@@ -705,7 +715,7 @@
             <description>
                    Camera angles, their angular velocities, and accelerations will be 
                    adjusted in the solution.  Solving for angles, angular velocities, and 
-                   accelerations is equivalent to using SOLVEDEGREE=2.
+                   accelerations is equivalent to using CKSOLVEDEGREE=2.
             </description>
           </option>
 
@@ -713,7 +723,7 @@
             <brief>Solve for all coefficients in the polynomials fit to the camera angles.</brief>
             <description>
                    If this option is selected, all coefficients of the solve
-                   equation will be adjusted in the solution (SOLVEDEGREE+1 
+                   equation will be adjusted in the solution (CKSOLVEDEGREE+1
                    coefficients)
             </description>
           </option>
@@ -731,9 +741,60 @@
           <item>Yes</item>
         </default>
       </parameter>
+      <parameter name="OVEREXISTING">
+        <brief> Fit polynomial over the existing pointing</brief>
+        <description>
+            This option will fit a polynomial over the existing pointing data.
+            This data is held constant in the adjustment, and the
+            initial value for the each of the coefficients in the polynomials
+            is 0.
+
+            When this option is used, the current pointing is used as a priori
+            in the adjustment.
+        </description>
+        <type>boolean</type>
+        <default>
+          <item>No</item>
+        </default>
+      </parameter>
     </group>
 
     <group name="Spacecraft Options">
+    <parameter name="SPKDEGREE">
+      <type>integer</type>
+      <minimum inclusive="yes">0</minimum>
+      <default>
+        <item>2</item>
+      </default>
+      <brief>
+        Degree of polynomial fit to original camera position
+      </brief>
+      <description>
+              The degree of the polynomial fit to the original camera position
+              and used to generate <def>a priori</def> camera positions for the
+              first iteration.
+      </description>
+    </parameter>
+    <parameter name="SPKSOLVEDEGREE">
+      <type>integer</type>
+      <minimum inclusive="yes">0</minimum>
+      <default>
+        <item>2</item>
+      </default>
+      <brief>
+        The degree of the camera position polynomial being fit to in the bundle
+        adjustment.
+      </brief>
+      <description>
+             The degree of the polynomial being fit to in the bundle adjust
+             solution.  This polynomial can be different from the one used to
+             generate the <def>a priori</def> camera positions used in the first
+             iteration. In the case of an instrument with a jitter problem, a
+             higher degree polynomial fit for the camera position might provide
+             a better solution (smaller errors). For framing cameras, the
+             application automatically sets degree to 0.
+      </description>
+    </parameter>
       <parameter name="SPSOLVE">
         <type>string</type>
         <brief> Spacecraft position parameters to include in the adjustment</brief>
@@ -750,6 +811,11 @@
             <description>
                    No spacecraft position parameters will be adjusted.
             </description>
+            <exclusions>
+              <item>SPKDEGREE</item>
+              <item>SPKSOLVEDEGREE</item>
+              <item>OVERHERMITE</item>
+            </exclusions>
           </option>
 
           <option value="POSITION">
@@ -776,7 +842,32 @@
                    instance.
             </description>
           </option>
+          <option value="ALL">
+            <brief>Solve for all coefficients in the polynomials fit to the camera position.</brief>
+            <description>
+                   If this option is selected, all coefficients of the solve
+                   equation will be adjusted in the solution (SPKSOLVEDEGREE+1
+                   coefficients)
+            </description>
+          </option>
         </list>
+      </parameter>
+      <parameter name="OVERHERMITE">
+        <brief> Fit polynomial over the existing Hermite spline</brief>
+        <description>
+            This option will fit a polynomial over the existing Hermite cubic
+            spline used to interpolate the coordinates of the spacecraft 
+            position. The spline is held constant in the adjustment, and the
+            initial value for the each of the coefficients in the polynomials
+            is 0. 
+
+            When this option is used, the current positions are used as a priori
+            in the adjustment.  
+        </description>
+        <type>boolean</type>
+        <default>
+          <item>No</item>
+        </default>
       </parameter>
       </group>
 

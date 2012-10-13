@@ -55,7 +55,7 @@ namespace Isis {
     // Set up the camera characteristics
     SetFocalLength();
 
-    string pixelPitchKey = "INS" + iString((int)naifIkCode()) + "_PIXEL_SIZE";
+    string pixelPitchKey = "INS" + IString((int)naifIkCode()) + "_PIXEL_SIZE";
     SetPixelPitch(getDouble(pixelPitchKey));
 
     // Get necessary variables
@@ -139,7 +139,7 @@ namespace Isis {
       FocalPlaneMap()->SetDetectorOrigin(512.5, 288.5);
     }
     else {
-      string msg = "Unrecognized NaifIkCode [" + iString((int) naifIkCode()) + "]";
+      string msg = "Unrecognized NaifIkCode [" + IString((int) naifIkCode()) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

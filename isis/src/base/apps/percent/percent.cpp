@@ -7,7 +7,7 @@
 #include "Pvl.h"
 #include "PvlFormat.h"
 #include "Histogram.h"
-#include "iString.h"
+#include "IString.h"
 
 
 using namespace std;
@@ -25,13 +25,13 @@ void IsisMain() {
   string sPercentage;
   sPercentage = ui.GetString("PERCENTAGE");
   vector <string>tokens;
-  iString::Split(',', sPercentage, tokens, true);
+  IString::Split(',', sPercentage, tokens, true);
   PvlGroup results("Results");
   PvlKeyword kwPercent("Percentage");
   PvlKeyword kwValue("Value");
 
   for(unsigned int i = 0; i < tokens.size(); i++) {
-    double percentage = iString::ToDouble(tokens[i]);
+    double percentage = IString::ToDouble(tokens[i]);
     // Obtain the Histogram and the value at the percentage
     Histogram *hist = icube->getHistogram();
     double value = hist->Percent(percentage);

@@ -29,7 +29,7 @@
 
 #include "Constants.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Matrix.h"
 
 namespace Isis {

@@ -45,7 +45,7 @@
 #include "Endian.h"
 #include "EndianSwapper.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "PixelType.h"
 #include "Preference.h"
 #include "Pvl.h"
@@ -90,7 +90,7 @@ namespace Isis {
 
     try {
       if (!dataFile) {
-        iString msg = "Cannot create a CubeIoHandler with a NULL data file";
+        IString msg = "Cannot create a CubeIoHandler with a NULL data file";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
@@ -98,7 +98,7 @@ namespace Isis {
 
       PvlGroup &performancePrefs =
           Preference::Preferences().FindGroup("Performance");
-      iString cubeWritePerfOpt = performancePrefs["CubeWriteThread"][0];
+      IString cubeWritePerfOpt = performancePrefs["CubeWriteThread"][0];
       m_useOptimizedCubeWrite = (cubeWritePerfOpt.DownCase() == "optimized");
       if ((m_useOptimizedCubeWrite && !alreadyOnDisk) ||
            cubeWritePerfOpt.DownCase() == "always") {
@@ -122,7 +122,7 @@ namespace Isis {
       const PvlObject &core = label.FindObject("IsisCube").FindObject("Core");
       const PvlGroup &pixelGroup = core.FindGroup("Pixels");
 
-      iString byteOrderStr = pixelGroup.FindKeyword("ByteOrder")[0];
+      IString byteOrderStr = pixelGroup.FindKeyword("ByteOrder")[0];
       m_byteSwapper = new EndianSwapper(
           byteOrderStr.UpCase());
       m_base = pixelGroup.FindKeyword("Base");
@@ -155,11 +155,11 @@ namespace Isis {
       setVirtualBands(virtualBandList);
     }
     catch(IException &e) {
-      iString msg = "Constructing CubeIoHandler failed";
+      IString msg = "Constructing CubeIoHandler failed";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
     catch(...) {
-      iString msg = "Constructing CubeIoHandler failed";
+      IString msg = "Constructing CubeIoHandler failed";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -639,22 +639,22 @@ namespace Isis {
   void CubeIoHandler::setChunkSizes(
       int numSamples, int numLines, int numBands) {
     bool success = false;
-    iString msg;
+    IString msg;
 
     if(m_samplesInChunk != -1 || m_linesInChunk != -1 || m_bandsInChunk != -1) {
-      iString msg = "You cannot change the chunk sizes once set";
+      IString msg = "You cannot change the chunk sizes once set";
     }
     else if(numSamples < 1) {
       msg = "Negative and zero chunk sizes are not supported, samples per chunk"
-          " cannot be [" + iString(numSamples) + "]";
+          " cannot be [" + IString(numSamples) + "]";
     }
     else if(numLines < 1) {
       msg = "Negative and zero chunk sizes are not supported, lines per chunk "
-            "cannot be [" + iString(numLines) + "]";
+            "cannot be [" + IString(numLines) + "]";
     }
     else if(numBands < 1) {
       msg = "Negative and zero chunk sizes are not supported, lines per chunk "
-            "cannot be [" + iString(numBands) + "]";
+            "cannot be [" + IString(numBands) + "]";
     }
     else {
       success = true;
@@ -670,10 +670,10 @@ namespace Isis {
       }
       else if(m_dataFile->size() < getDataStartByte() + getDataSize()) {
         success = false;
-        msg = "File size [" + iString((BigInt)m_dataFile->size()) +
+        msg = "File size [" + IString((BigInt)m_dataFile->size()) +
             " bytes] not big enough to hold data [" +
-            iString(getDataStartByte() + getDataSize()) + " bytes] where the "
-            "offset to the cube data is [" + iString(getDataStartByte()) +
+            IString(getDataStartByte() + getDataSize()) + " bytes] where the "
+            "offset to the cube data is [" + IString(getDataStartByte()) +
             " bytes]";
       }
     }
@@ -1684,7 +1684,7 @@ namespace Isis {
    */
   void CubeIoHandler::writeNullDataToDisk() const {
     if(!m_dataIsOnDiskMap) {
-      iString msg = "Cannot call CubeIoHandler::writeNullDataToDisk unless "
+      IString msg = "Cannot call CubeIoHandler::writeNullDataToDisk unless "
           "data is not already on disk (Cube::Create was called)";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

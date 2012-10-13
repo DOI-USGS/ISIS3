@@ -25,7 +25,7 @@
 #include "CameraFactory.h"
 #include "Preference.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include "KernelDb.h"
 #include "PvlObject.h"
 #include "PvlGroup.h"
@@ -163,7 +163,7 @@ std::priority_queue< Kernel > KernelDb::FindAll(const std::string &entry,
     // If the group name isn't selection, skip it.
     if(!grp.IsNamed("Selection")) continue;
 
-    iString type = "";
+    IString type = "";
 
     // Make sure the type is better
     if(grp.HasKeyword("Type")) {
@@ -292,11 +292,11 @@ const bool KernelDb::Matches(Pvl &lab, PvlGroup &kernelDbGrp,
     }
     else if(key.IsNamed("Match")) {
       try {
-        iString matchGroup = key[0];
-        iString matchKey   = key[1];
-        iString matchValue = key[2];
+        IString matchGroup = key[0];
+        IString matchKey   = key[1];
+        IString matchValue = key[2];
 
-        iString cubeValue = (string)cube.FindGroup(matchGroup)[matchKey];
+        IString cubeValue = (string)cube.FindGroup(matchGroup)[matchKey];
         cubeValue.ConvertWhiteSpace();
         cubeValue.Compress();
         cubeValue.Trim(" ");
@@ -324,12 +324,12 @@ const bool KernelDb::Matches(Pvl &lab, PvlGroup &kernelDbGrp,
             camVersionKeyIndex++) {
 
           bool versionMatch = false;
-          iString val = (std::string)key[camVersionKeyIndex];
-          iString commaTok;
+          IString val = (std::string)key[camVersionKeyIndex];
+          IString commaTok;
 
           while((commaTok = val.Token(",")).length() > 0) {
             if(commaTok.find('-') != std::string::npos) {
-              iString dashTok;
+              IString dashTok;
               int start = commaTok.Token("-").ToInteger();
               int end = commaTok.Token("-").ToInteger();
               int direction;

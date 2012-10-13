@@ -7,7 +7,7 @@
 #include "MocLabels.h"
 #include "IException.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "mocxtrack.h"
 #include "TextFile.h"
@@ -118,13 +118,13 @@ namespace Isis {
     if(p_mocNA) {
       if((p_crosstrackSumming < 1) || (p_crosstrackSumming > 8)) {
         string msg = "MOC-NA keyword [CrosstrackSumming] must be between ";
-        msg += "1 and 8, but is [" + iString(p_crosstrackSumming) + "]";
+        msg += "1 and 8, but is [" + IString(p_crosstrackSumming) + "]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
       if((p_downtrackSumming < 1) || (p_downtrackSumming > 8)) {
         string msg = "MOC-NA keyword [DowntrackSumming] must be between ";
-        msg += "1 and 8, but is [" + iString(p_downtrackSumming) + "]";
+        msg += "1 and 8, but is [" + IString(p_downtrackSumming) + "]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
@@ -133,13 +133,13 @@ namespace Isis {
     if((p_mocRedWA) || (p_mocBlueWA)) {
       if((p_crosstrackSumming < 1) || (p_crosstrackSumming > 127)) {
         string msg = "MOC-WA keyword [CrosstrackSumming] must be between ";
-        msg += "1 and 127, but is [" + iString(p_crosstrackSumming) + "]";
+        msg += "1 and 127, but is [" + IString(p_crosstrackSumming) + "]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
       if((p_downtrackSumming < 1) || (p_downtrackSumming > 127)) {
         string msg = "MOC-WA keyword [DowntrackSumming] must be between ";
-        msg += "1 and 127, but is [" + iString(p_downtrackSumming) + "]";
+        msg += "1 and 127, but is [" + IString(p_downtrackSumming) + "]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
@@ -442,7 +442,7 @@ namespace Isis {
     int low = 1;
     int high = wholeFile.size() / 35;
     int middle;
-    iString line, filter, sclk, gainId, offsetId;
+    IString line, filter, sclk, gainId, offsetId;
     WAGO wago;
 
     //Binary search. This determines the middle of the current range and

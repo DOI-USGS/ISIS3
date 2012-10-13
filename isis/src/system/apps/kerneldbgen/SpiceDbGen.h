@@ -27,7 +27,7 @@
 #include <iostream>
 #include "FileName.h"
 #include "Pvl.h"
-#include "iString.h"
+#include "IString.h"
 #include "naif/SpiceUsr.h"
 #include "qstringlist.h"
 #include "KernelDb.h"
@@ -49,17 +49,17 @@ using namespace Isis;
 class SpiceDbGen {
 
   public:
-    SpiceDbGen(iString type);
-    PvlObject Direct(iString quality, iString location,
+    SpiceDbGen(IString type);
+    PvlObject Direct(IString quality, IString location,
                      std::vector<std::string> & filter);
     void FurnishDependencies(string sclk, string fk);
   private:
-    QStringList GetFiles(FileName location, iString filter);
+    QStringList GetFiles(FileName location, IString filter);
     PvlGroup AddSelection(FileName fileIn);
     PvlGroup FormatIntervals(SpiceCell &coverage, string type);
     PvlGroup GetIntervals(SpiceCell &cover);
     //private instance variables
-    iString p_type;
+    IString p_type;
     static const char *calForm;
 };
 

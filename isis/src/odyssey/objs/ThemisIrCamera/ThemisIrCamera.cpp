@@ -127,7 +127,7 @@ namespace Isis {
     if(HasReferenceBand()) {
       band = ReferenceBand();
       if((band < 1) || (band > 10)) {
-        string msg = "Invalid Reference Band [" + iString(band) + "]";
+        string msg = "Invalid Reference Band [" + IString(band) + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }

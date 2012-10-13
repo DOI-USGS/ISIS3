@@ -7,7 +7,7 @@
 #include "ftpget.h"
 #include "UserInterface.h"
 #include "ProgramLauncher.h"
-#include "iString.h"
+#include "IString.h"
 #include "IException.h"
 
 using namespace Isis;
@@ -17,8 +17,8 @@ void IsisMain() {
 
   // Get the file name from the GUI
   UserInterface &ui = Application::GetUserInterface();
-  iString guiURL = ui.GetString("URL");
-  iString guiPath;
+  IString guiURL = ui.GetString("URL");
+  IString guiPath;
   if(ui.WasEntered("TOPATH")) {
     guiPath = ui.GetString("TOPATH");
   }
@@ -50,7 +50,7 @@ void IsisMain() {
         localFileName +=  QFileInfo(qurl.path()).fileName();
         string localFileNameStr(localFileName.toStdString());
         remove(localFileNameStr.c_str());
-        iString msg = "Could not acquire [" + guiURL + "]";
+        IString msg = "Could not acquire [" + guiURL + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -80,14 +80,14 @@ void IsisMain() {
         }
         string localFileNameStr(localFileName.toStdString());
         remove(localFileNameStr.c_str());
-        iString msg = "Could not acquire [" + guiURL + "]";
+        IString msg = "Could not acquire [" + guiURL + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
   }
   //if scheme is not ftp or http throw error
   else {
-    iString msg = "Scheme [" + qurl.scheme().toStdString() + "] not found, must be 'ftp' or 'http'";
+    IString msg = "Scheme [" + qurl.scheme().toStdString() + "] not found, must be 'ftp' or 'http'";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }

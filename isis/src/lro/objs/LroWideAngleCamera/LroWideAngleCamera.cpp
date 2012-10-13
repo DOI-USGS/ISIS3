@@ -65,7 +65,7 @@ namespace Isis {
     p_etStart = et + ((p_exposureDur / 1000.0) / 2.0);
 
     // Compute the framelet size and number of framelets
-    iString instId = iString((string) inst["InstrumentId"]).UpCase();
+    IString instId = IString((string) inst["InstrumentId"]).UpCase();
 
     int frameletSize = 14;
     int sumMode = 1;
@@ -103,8 +103,8 @@ namespace Isis {
     bool dataflipped = (inst["DataFlipped"][0].UpCase() == "YES");
 
     //  Now create detector offsets
-    iString instCode = "INS" + iString((int) naifIkCode());
-    iString ikernKey = instCode + "_FILTER_BANDCENTER";
+    IString instCode = "INS" + IString((int) naifIkCode());
+    IString ikernKey = instCode + "_FILTER_BANDCENTER";
     vector<int> fbc = GetVector(ikernKey);
     ikernKey = instCode + "_FILTER_OFFSET";
     vector<int> foffset = GetVector(ikernKey);
@@ -168,7 +168,7 @@ namespace Isis {
     double lineBoreSight = getDouble(ikernKey);
 
     //  get instrument-specific sample offset
-    iString instModeId = ((iString)(string) inst["InstrumentModeId"]).UpCase();
+    IString instModeId = ((IString)(string) inst["InstrumentModeId"]).UpCase();
     // For BW mode, add the mode (0,1 (non-polar) or 2,3 (polar)) used to
     // acquire image
     if (instModeId == "BW") {
@@ -191,7 +191,7 @@ namespace Isis {
     new LroWideAngleCameraDistortionMap(this, naifIkCode());
 
     // Setup the ground and sky map
-    bool evenFramelets = (iString((string) inst["Framelets"][0]).UpCase()
+    bool evenFramelets = (IString((string) inst["Framelets"][0]).UpCase()
                           == "EVEN");
 
     new PushFrameCameraGroundMap(this, evenFramelets);

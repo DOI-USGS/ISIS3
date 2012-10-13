@@ -23,7 +23,7 @@
 #include <math.h>
 #include <float.h>
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 namespace Isis {
 
@@ -77,7 +77,7 @@ namespace Isis {
   double StatCumProbDistDynCalc::max() {
      //if there isn't even as much data as there are quantiles to track return DBL_MAX
      if (m_nObs<m_nQuan) {
-       iString msg = "StatCumDistDynCalc will return no data until there has been at least m_nQuan observations added";
+       IString msg = "StatCumDistDynCalc will return no data until there has been at least m_nQuan observations added";
        throw IException(IException::Programmer, msg, _FILEINFO_);
        return DBL_MAX;
      } 
@@ -95,7 +95,7 @@ namespace Isis {
    double StatCumProbDistDynCalc::min() { 
      //if there isn't even as much data as there are quantiles to track return -DBL_MAX
      if (m_nObs<m_nQuan) {
-       iString msg = "StatCumDistDynCalc will return no data until there has been at least m_nQuan observations added";
+       IString msg = "StatCumDistDynCalc will return no data until there has been at least m_nQuan observations added";
        throw IException(IException::Programmer, msg, _FILEINFO_);
        return -DBL_MAX;
      }
@@ -119,14 +119,14 @@ namespace Isis {
 
      //if there isn't even as much data as there are quantiles to track return DBL_MAX
      if (m_nObs<m_nQuan) {
-       iString msg = "StatCumDistDynCalc will return no data until there has been at least m_nQuan observations added";
+       IString msg = "StatCumDistDynCalc will return no data until there has been at least m_nQuan observations added";
        throw IException(IException::Programmer, msg, _FILEINFO_);
        return DBL_MAX;
      }
 
      //if the requested cumProb is outside [0,1] return DBL_MAX
      if (cumProb < 0.0 || cumProb > 1.0) {
-       iString msg = "Argument to StatCumProbDistDynCalc::value(double cumProb) must be on the domain [0,1]";
+       IString msg = "Argument to StatCumProbDistDynCalc::value(double cumProb) must be on the domain [0,1]";
        throw IException(IException::Programmer, msg, _FILEINFO_);
        return DBL_MAX;
      }
@@ -212,7 +212,7 @@ namespace Isis {
      //given a value return the cumulative probility
 
      if (m_nObs<m_nQuan) {
-       iString msg = "StatCumDistDynCalc will return no data until there has been at least m_nQuan observations added";
+       IString msg = "StatCumDistDynCalc will return no data until there has been at least m_nQuan observations added";
        throw IException(IException::Programmer, msg, _FILEINFO_);
        return DBL_MAX;
      }

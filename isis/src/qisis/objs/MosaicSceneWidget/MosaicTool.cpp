@@ -6,7 +6,7 @@
 
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "MosaicSceneWidget.h"
 #include "PvlObject.h"
 #include "ToolPad.h"
@@ -106,14 +106,14 @@ namespace Isis {
   }
 
 
-  iString MosaicTool::projectPvlObjectName() const {
+  IString MosaicTool::projectPvlObjectName() const {
     return "";
   }
 
 
-  QPixmap MosaicTool::getIcon(iString iconName) const {
-    iString path = FileName("$base/icons").expanded();
-    QString fullPathToFile = iString(path + "/" + iconName);
+  QPixmap MosaicTool::getIcon(IString iconName) const {
+    IString path = FileName("$base/icons").expanded();
+    QString fullPathToFile = IString(path + "/" + iconName);
     return QPixmap(fullPathToFile);
   }
 

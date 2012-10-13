@@ -25,7 +25,7 @@ void IsisMain() {
 
   Pvl labelPvl(inFile.expanded());
 
-  iString prodType;
+  IString prodType;
 
   if(labelPvl.HasKeyword("PRODUCT_TYPE")) {
     prodType = (string)labelPvl.FindKeyword("PRODUCT_TYPE");
@@ -36,7 +36,7 @@ void IsisMain() {
   }
 
   if(prodType.Equal("MAP_PROJECTED_MULTISPECTRAL_RDR")) {
-    iString prodId;
+    IString prodId;
     if(labelPvl.HasKeyword("PRODUCT_ID")) {
       prodId = (string)labelPvl.FindKeyword("PRODUCT_ID");
       prodId = prodId.substr(prodId.find("_") + 1, prodId.find("_"));
@@ -55,7 +55,7 @@ void IsisMain() {
         PvlGroup bandBin = PvlGroup("BandBin");
         PvlKeyword origBand = PvlKeyword("OriginalBand");
         PvlKeyword widths = PvlKeyword("Width");
-        iString tablePath = (string)labelPvl.FindKeyword("MRO:WAVELENGTH_FILE_NAME");
+        IString tablePath = (string)labelPvl.FindKeyword("MRO:WAVELENGTH_FILE_NAME");
         tablePath = tablePath.DownCase();
         FileName tableFile(inFile.path() + "/" + tablePath);
         //Check if the wavelength file exists
@@ -69,7 +69,7 @@ void IsisMain() {
 
           //For each line in the wavelength table, add the width to
           //The band bin group
-          iString st;
+          IString st;
           int band = 1;
           while(fin->GetLine(st)) {
             st.Token(",");

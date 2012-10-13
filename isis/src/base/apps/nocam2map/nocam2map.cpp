@@ -7,7 +7,7 @@
 #include "PolynomialBivariate.h"
 #include "LeastSquares.h"
 #include "ProcessRubberSheet.h"
-#include "iString.h"
+#include "IString.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
 #include "Statistics.h"
@@ -147,18 +147,18 @@ void IsisMain() {
   if(ui.WasEntered("RESIDUALS")) {
     for(int i = 0; i < sampSol.Rows(); i++) {
       vector<double> data = sampSol.GetInput(i);
-      iString tmp = "";
-      tmp += iString(sampSol.GetExpected(i));
+      IString tmp = "";
+      tmp += IString(sampSol.GetExpected(i));
       tmp += ",\t";
-      tmp += iString(lineSol.GetExpected(i));
+      tmp += IString(lineSol.GetExpected(i));
       tmp += ",\t";
-      tmp += iString(data[0]);
+      tmp += IString(data[0]);
       tmp += ",\t";
-      tmp += iString(data[1]);
+      tmp += IString(data[1]);
       tmp += ",\t";
-      tmp += iString(sampResiduals[i]);
+      tmp += IString(sampResiduals[i]);
       tmp += ",\t";
-      tmp += iString(lineResiduals[i]);
+      tmp += IString(lineResiduals[i]);
       oFile.PutLine(tmp + "\n");
     }
   }

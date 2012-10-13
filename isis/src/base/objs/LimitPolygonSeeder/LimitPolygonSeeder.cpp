@@ -201,12 +201,12 @@ namespace Isis {
     }
 
     if(p_majorAxisPts < 1.0) {
-      iString msg = "Major axis points must be greater that 0.0 [(" + iString(p_majorAxisPts) + "]";
+      IString msg = "Major axis points must be greater that 0.0 [(" + IString(p_majorAxisPts) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if(p_minorAxisPts <= 0.0) {
-      iString msg = "Minor axis points must be greater that 0.0 [(" + iString(p_minorAxisPts) + "]";
+      IString msg = "Minor axis points must be greater that 0.0 [(" + IString(p_minorAxisPts) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }

@@ -65,7 +65,7 @@ namespace Isis {
       void SetVicarFile(const std::string &vicarFile, Pvl &vicarLab);
 
     private:
-      iString ExtractPvlLabel(const int startPos, std::ifstream &vicarFile) const;
+      IString ExtractPvlLabel(const int startPos, std::ifstream &vicarFile) const;
   };
 };
 

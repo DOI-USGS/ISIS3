@@ -143,7 +143,7 @@ namespace Isis {
           return despikedPoly;
         }
         catch(IException &e) {
-          iString msg = "Unable to convert polygon from Lat/Lon to X/Y";
+          IString msg = "Unable to convert polygon from Lat/Lon to X/Y";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
@@ -236,7 +236,7 @@ namespace Isis {
           return despikedPoly;
         }
         catch(IException &e) {
-          iString msg = "Unable to convert polygon from X/Y to Lat/Lon";
+          IString msg = "Unable to convert polygon from X/Y to Lat/Lon";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
@@ -330,7 +330,7 @@ namespace Isis {
           return despikedPoly;
         }
         catch(IException &e) {
-          iString msg = "Unable to convert polygon from Lat/Lon to Sample/Line";
+          IString msg = "Unable to convert polygon from Lat/Lon to Sample/Line";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
@@ -518,13 +518,13 @@ namespace Isis {
       return fixedResult;
     }
     catch(geos::util::GEOSException *exc) {
-      iString msg = "Conversion to 180 failed. The reason given was [" +
-          iString(exc->what()) + "]";
+      IString msg = "Conversion to 180 failed. The reason given was [" +
+          IString(exc->what()) + "]";
       delete exc;
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     catch(...) {
-      iString msg = "Conversion to 180 failed. Could not determine the reason";
+      IString msg = "Conversion to 180 failed. Could not determine the reason";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -658,13 +658,13 @@ namespace Isis {
     if(!mp->isValid() || mp->isEmpty()) {
       delete mp;
       mp = NULL;
-      iString msg = "Despike failed to correct the polygon";
+      IString msg = "Despike failed to correct the polygon";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // if multipoly area changes more than 25% we did something bad to the multipolygon
     if(fabs((mp->getArea() / multiPoly->getArea()) - 1.0) > 0.50) {
-      iString msg = "Despike failed to correct the polygon " + mp->toString();
+      IString msg = "Despike failed to correct the polygon " + mp->toString();
       delete mp;
 
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -879,16 +879,16 @@ namespace Isis {
       return Operate(geom1, geom2, (unsigned int)geos::operation::overlay::OverlayOp::opINTERSECTION);
     }
     catch(geos::util::GEOSException *exc) {
-      iString msg = "Intersect operation failed. The reason given was [" + iString(exc->what()) + "]";
+      IString msg = "Intersect operation failed. The reason given was [" + IString(exc->what()) + "]";
       delete exc;
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     catch(IException &e) {
-      iString msg = "Intersect operation failed";
+      IString msg = "Intersect operation failed";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
     catch(...) {
-      iString msg = "Intersect operation failed for an unknown reason";
+      IString msg = "Intersect operation failed for an unknown reason";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -931,12 +931,12 @@ namespace Isis {
       }
       catch(...) {
         if(precision == minPrecision) {
-          iString msg = "An unknown geos error occurred";
+          IString msg = "An unknown geos error occurred";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
         if(!failed) {
-          iString msg = "An unknown geos error occurred when attempting to clone a geometry";
+          IString msg = "An unknown geos error occurred when attempting to clone a geometry";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
@@ -968,7 +968,7 @@ namespace Isis {
           delete newResult;
           delete result;
 
-          iString msg = "Operation [" + iString((int)opcode) + "] failed";
+          IString msg = "Operation [" + IString((int)opcode) + "] failed";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
@@ -976,13 +976,13 @@ namespace Isis {
         result = newResult;
       }
       catch(IException &e) {
-        iString msg = "Operation [" + iString((int)opcode) + "] failed";
+        IString msg = "Operation [" + IString((int)opcode) + "] failed";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
 
     if(result == NULL) {
-      iString msg = "Operation [" + iString((int)opcode) + " failed";
+      IString msg = "Operation [" + IString((int)opcode) + " failed";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -1013,7 +1013,7 @@ namespace Isis {
       return FixGeometry(MakeMultiPolygon(geom));
     }
     else {
-      iString msg = "PolygonTools::FixGeometry does not support [" + GetGeometryName(geom) + "]";
+      IString msg = "PolygonTools::FixGeometry does not support [" + GetGeometryName(geom) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -1068,7 +1068,7 @@ namespace Isis {
         holes->push_back(newHole);
       }
       catch (IException &e) {
-        iString msg = "Failed when attempting to fix interior ring of multipolygon";
+        IString msg = "Failed when attempting to fix interior ring of multipolygon";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     } // end num holes in polygon loop
@@ -1083,14 +1083,14 @@ namespace Isis {
         newExterior = FixGeometry((geos::geom::LinearRing *)exterior);
       }
       else {
-        iString msg = "Failed when attempting to fix exterior ring of polygon. The exterior ring is not simple and closed";
+        IString msg = "Failed when attempting to fix exterior ring of polygon. The exterior ring is not simple and closed";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       return globalFactory.createPolygon(newExterior, holes);
     }
     catch (IException &e) {
-      iString msg = "Failed when attempting to fix exterior ring of polygon";
+      IString msg = "Failed when attempting to fix exterior ring of polygon";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -1180,12 +1180,12 @@ namespace Isis {
       delete exc;
       exc = NULL;
 
-      iString msg = "Error when attempting to fix linear ring";
+      IString msg = "Error when attempting to fix linear ring";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(newRing && !newRing->isValid() && ring->isValid()) {
-      iString msg = "Failed when attempting to fix linear ring";
+      IString msg = "Failed when attempting to fix linear ring";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else if(!newRing || !newRing->isValid()) {
@@ -1244,16 +1244,16 @@ namespace Isis {
       return Operate(geom1, geom2, (unsigned int)geos::operation::overlay::OverlayOp::opDIFFERENCE);
     }
     catch(geos::util::GEOSException *exc) {
-      iString msg = "Difference operation failed. The reason given was [" + iString(exc->what()) + "]";
+      IString msg = "Difference operation failed. The reason given was [" + IString(exc->what()) + "]";
       delete exc;
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     catch(IException &e) {
-      iString msg = "Difference operation failed";
+      IString msg = "Difference operation failed";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
     catch(...) {
-      iString msg = "Difference operation failed for an unknown reason";
+      IString msg = "Difference operation failed for an unknown reason";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -1484,7 +1484,7 @@ namespace Isis {
       return ReducePrecision(MakeMultiPolygon(geom), precision);
     }
     else {
-      iString msg = "PolygonTools::ReducePrecision does not support [" + GetGeometryName(geom) + "]";
+      IString msg = "PolygonTools::ReducePrecision does not support [" + GetGeometryName(geom) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -1556,7 +1556,7 @@ namespace Isis {
 
       }
       catch(IException &e) {
-        iString msg = "Failed when attempting to fix interior ring of multipolygon";
+        IString msg = "Failed when attempting to fix interior ring of multipolygon";
         throw IException(e, IException::Programmer, msg, _FILEINFO_);
       }
     } // end num holes in polygon loop
@@ -1571,14 +1571,14 @@ namespace Isis {
         newExterior = ReducePrecision((geos::geom::LinearRing *)exterior, precision);
       }
       else {
-        iString msg = "Failed when attempting to fix exterior ring of polygon. The exterior ring is not simple and closed";
+        IString msg = "Failed when attempting to fix exterior ring of polygon. The exterior ring is not simple and closed";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       return globalFactory.createPolygon(newExterior, holes);
     }
     catch(IException &e) {
-      iString msg = "Failed when attempting to fix exterior ring of polygon";
+      IString msg = "Failed when attempting to fix exterior ring of polygon";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -1626,7 +1626,7 @@ namespace Isis {
       delete exc;
       exc = NULL;
 
-      iString msg = "Error when attempting to reduce precision of linear ring";
+      IString msg = "Error when attempting to reduce precision of linear ring";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -1640,7 +1640,7 @@ namespace Isis {
     }
 
     if(!newRing->isValid()) {
-      iString msg = "Failed when attempting to reduce precision of linear ring";
+      IString msg = "Failed when attempting to reduce precision of linear ring";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

@@ -66,7 +66,7 @@ void IsisMain() {
   }
 
   // Get Hapke function and parameters
-  iString sHapkeFunc = ui.GetAsString("PHTNAME");
+  IString sHapkeFunc = ui.GetAsString("PHTNAME");
   sHapkeFunc = sHapkeFunc.UpCase();
 
   // Should contains parameter names matching GUI to be included in the Pvl defFile
@@ -100,7 +100,7 @@ void IsisMain() {
   PhotoModel *hapkeModel = PhotoModelFactory::Create(hapkePvl);
 
   // Type of photometric function to fit (lunar-lambert, Minnaert) to the Hapke Model
-  iString sEmpirical = ui.GetAsString("MODEL");
+  IString sEmpirical = ui.GetAsString("MODEL");
   sEmpirical = sEmpirical.UpCase();
 
   PvlKeyword limbValue;
@@ -122,7 +122,7 @@ void IsisMain() {
 
   // Order of approximation in atmospheric scatter model
   bool doAsm = false;
-  iString sAsmType = ui.GetAsString("ATMNAME");
+  IString sAsmType = ui.GetAsString("ATMNAME");
   sAsmType = sAsmType.UpCase();
   if (sAsmType != "NONE") {
     doAsm = true;

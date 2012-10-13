@@ -67,7 +67,7 @@ namespace Isis {
     std::string command = (std::string) uig["GuiHelpBrowser"] +
                           (std::string)" file:" + file.expanded() + " &";
     if(system(command.c_str()) != 0) {
-      iString msg = "Failed to execute [" + command + "]";
+      IString msg = "Failed to execute [" + command + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }

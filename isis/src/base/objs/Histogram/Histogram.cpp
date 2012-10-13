@@ -249,7 +249,7 @@ namespace Isis {
       double endSample, double endLine) {
     // Make sure band is valid, 0 is valid (means all bands)
     if ((statsBand < 0) || (statsBand > cube.getBandCount())) {
-      string msg = "Cannot gather histogram for band [" + iString(statsBand) +
+      string msg = "Cannot gather histogram for band [" + IString(statsBand) +
           "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -283,7 +283,7 @@ namespace Isis {
       }
     }
     else {
-      iString msg = "Unsupported pixel type";
+      IString msg = "Unsupported pixel type";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -357,8 +357,8 @@ namespace Isis {
 
   void Histogram::SetBinRange(double binStart, double binEnd) {
     if (binEnd < binStart) {
-      string msg = "The binning range start [" + iString(binStart) +
-                   " must be less than the end [" + iString(binEnd) + ".";
+      string msg = "The binning range start [" + IString(binStart) +
+                   " must be less than the end [" + IString(binEnd) + ".";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

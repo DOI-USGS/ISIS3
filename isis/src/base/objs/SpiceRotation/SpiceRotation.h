@@ -11,8 +11,7 @@
  *
  *   Although Isis has been used by the USGS, no warranty, expressed or implied,
  *   is made by the USGS as to the accuracy and functioning of such software
- *   and related material nor shall the fact of distribution constitute any such@mar12m18j15a12b10
-
+ *   and related material nor shall the fact of distribution constitute any such
  *   warranty, and no responsibility is assumed by the USGS in connection
  *   therewith.
  *
@@ -160,10 +159,10 @@ namespace Isis {
        * The rotation can come from one of 3 places for an Isis cube.  The class
        * expects function to be after Memcache.
        */
-      enum Source { Spice,                    //!< Directly from the kernels 
-                    Nadir,                               //!< Nadir pointing
-                    Memcache,                      //!< From cached table
-                    PolyFunction,                   //!< From nth degree polynomial
+      enum Source { Spice,                  //!< Directly from the kernels 
+                    Nadir,                  //!< Nadir pointing
+                    Memcache,               //!< From cached table
+                    PolyFunction,           //!< From nth degree polynomial
                     PolyFunctionOverSpice}; //!< Kernels plus nth degree 
                                             //   polynomial
 

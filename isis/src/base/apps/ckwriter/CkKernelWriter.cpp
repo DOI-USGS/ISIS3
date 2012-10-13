@@ -32,7 +32,7 @@
 #include "FileName.h"
 #include "TextFile.h"
 #include "Pvl.h"
-#include "iString.h"
+#include "IString.h"
 #include "IException.h"
 
 #include "naif/SpiceUsr.h"
@@ -63,7 +63,7 @@ namespace Isis {
 
  void CkKernelWriter::setType(const int cktype) {
    if ( (cktype < 1) || (cktype > 3) ) {
-     string mess = "Invalid CK kernel type: " + iString(cktype);
+     string mess = "Invalid CK kernel type: " + IString(cktype);
      throw IException(IException::Programmer, mess, _FILEINFO_);
    }
  }
@@ -112,7 +112,7 @@ namespace Isis {
        writeCk3(segment);
        break;
      default:
-       string mess = "Selected CK type (" + iString(_ckType) +
+       string mess = "Selected CK type (" + IString(_ckType) +
                      ") invalid - must be 1, 2 or 3";
        throw IException(IException::Programmer, mess, _FILEINFO_);
    }

@@ -21,7 +21,7 @@
  */
 
 #include "CalParameters.h"
-#include "iString.h"
+#include "IString.h"
 #include "TextFile.h"
 #include "FileName.h"
 #include "IException.h"
@@ -45,8 +45,8 @@ namespace Isis {
       PvlGroup &instrument = pvl.FindGroup("INSTRUMENT", Pvl::Traverse);
 
       // Make sure it is a viking mission
-      iString spacecraft = (string)instrument["SPACECRAFTNAME"];
-      iString mission = spacecraft.Token("_");
+      IString spacecraft = (string)instrument["SPACECRAFTNAME"];
+      IString mission = spacecraft.Token("_");
       if(mission != "VIKING") {
         string msg = "Invalid Keyword [SpacecraftName]. " +  spacecraft +
                      "must start with 'VIKING'";
@@ -61,7 +61,7 @@ namespace Isis {
         throw IException(IException::User, msg, _FILEINFO_);
       }
       double clock = instrument["SPACECRAFTCLOCKCOUNT"];
-      iString instId = (string)instrument["INSTRUMENTID"];
+      IString instId = (string)instrument["INSTRUMENTID"];
       int cam;
       // Camera State 4 is used to indicate an extended mission. This is
       // necessary because the dust spot changed position during the extended
@@ -133,15 +133,15 @@ namespace Isis {
     vector<string> line;
 
     // Read in vikcal.sav calibration file
-    TextFile cal("$viking" + iString(spn) + "/calibration/vikcal.sav",
+    TextFile cal("$viking" + IString(spn) + "/calibration/vikcal.sav",
                  "input", line, 0, true);
 
     // Search for a line in the vikcal.sav file that matches our data from the
     // input label
     for(int i = 0; i < (int)line.size(); i++) {
-      iString temp = line[i];
+      IString temp = line[i];
       temp.ConvertWhiteSpace();
-      iString token = temp.Token(" ");
+      IString token = temp.Token(" ");
       temp.TrimHead(" ");
       if(token != mission) continue;
       token = temp.Token(" ");
@@ -179,10 +179,10 @@ namespace Isis {
       temp.TrimHead(" ");
       p_exp = temp.Token(" ");
       temp.TrimHead(" ");
-      p_gainFile = "$viking" + iString(spn) + "/calibration/" + temp.Token(" ")
+      p_gainFile = "$viking" + IString(spn) + "/calibration/" + temp.Token(" ")
                    + ".cub";
       temp.TrimHead(" ");
-      p_offsetFile = "$viking" + iString(spn) + "/calibration/" +
+      p_offsetFile = "$viking" + IString(spn) + "/calibration/" +
                      temp.Token(" ") + ".cub";
       return;
     }
@@ -233,13 +233,13 @@ namespace Isis {
                                   int cam, string wav, int cs1, int cs2, int cs3, int cs4) {
 
     vector<string> line;
-    TextFile lin("$viking" + iString(spn) + "/calibration/viklin.sav",
+    TextFile lin("$viking" + IString(spn) + "/calibration/viklin.sav",
                  "input", line, 0, true);
 
     for(int i = 0; i < (int)line.size(); i++) {
-      iString temp = line[i];
+      IString temp = line[i];
       temp.ConvertWhiteSpace();
-      iString token = temp.Token(" ");
+      IString token = temp.Token(" ");
       temp.TrimHead(" ");
       if(token != mission) continue;
       token = temp.Token(" ");
@@ -293,8 +293,8 @@ namespace Isis {
 
     // Get the correct offset file - depends on which camera the input image is
     // from
-    string fname = "$viking" + iString(spn) + "/calibration/vikoffcam" +
-                   iString(cam) + ".sav";
+    string fname = "$viking" + IString(spn) + "/calibration/vikoffcam" +
+                   IString(cam) + ".sav";
     TextFile off(fname, "input", line, 0, true);
     vector<double> pp[5], off3;
     double pp1_off[5], pp2_off[5], pp_off[5];
@@ -302,10 +302,10 @@ namespace Isis {
     double frm1 = -1.0;
     double frm2 = -1.0;
     for(int i = 0; i < (int)line.size(); i++) {
-      iString temp = line[i];
+      IString temp = line[i];
       temp.ConvertWhiteSpace();
       temp.TrimHead(" ");
-      iString token = temp.Token(" ");
+      IString token = temp.Token(" ");
       temp.TrimHead(" ");
 
       // Go through the first line of the offset file and set all the principle

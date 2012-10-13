@@ -293,9 +293,9 @@ namespace Isis {
 
   int LoadCSV::getAxisIndex(const std::string &name,
                             const CSVReader::CSVAxis &header) const {
-    std::string head = iString(name).Trim(" \r\n\t");
+    std::string head = IString(name).Trim(" \r\n\t");
     for (int i = 0 ; i < header.dim() ; i++) {
-      if (iString::Equal(head,iString(header[i]).Trim(" \r\n\t"))) {
+      if (IString::Equal(head,IString(header[i]).Trim(" \r\n\t"))) {
         return (i);
       }
     }

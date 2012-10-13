@@ -64,10 +64,10 @@ namespace Isis {
 
     new CameraFocalPlaneMap(this, naifIkCode());
 
-    string ikernKey = "INS" + iString((int)naifIkCode())  + "_BORESIGHT_SAMPLE";
+    string ikernKey = "INS" + IString((int)naifIkCode())  + "_BORESIGHT_SAMPLE";
     double sampleBoresight = getDouble(ikernKey);
 
-    ikernKey = "INS" + iString((int)naifIkCode())  + "_BORESIGHT_LINE";
+    ikernKey = "INS" + IString((int)naifIkCode())  + "_BORESIGHT_LINE";
     double lineBoresight = getDouble(ikernKey);
 
     FocalPlaneMap()->SetDetectorOrigin(sampleBoresight, lineBoresight);
@@ -92,7 +92,7 @@ namespace Isis {
   /**
    * @param filename
    */
-  void HrscCamera::ReadLineRates(iString filename) {
+  void HrscCamera::ReadLineRates(IString filename) {
     Table timesTable("LineScanTimes", filename);
 
     if(timesTable.Records() <= 0) {

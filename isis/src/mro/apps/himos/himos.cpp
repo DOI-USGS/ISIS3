@@ -6,7 +6,7 @@
 #include "FileList.h"
 #include "IException.h"
 #include "Pvl.h"
-#include "iString.h"
+#include "IString.h"
 #include "Longitude.h"
 #include "OriginalLabel.h"
 #include "Process.h"
@@ -66,7 +66,7 @@ void IsisMain() {
         }
       }
       ProdId = (string)pmatch->FindGroup("Archive", Pvl::Traverse)["ObservationId"];
-      iString bandname = (string)pmatch->FindGroup("BandBin", Pvl::Traverse)["Name"];
+      IString bandname = (string)pmatch->FindGroup("BandBin", Pvl::Traverse)["Name"];
       bandname = bandname.UpCase();
       ProdId = ProdId + "_" + bandname;
     }

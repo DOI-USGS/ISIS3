@@ -2,7 +2,7 @@
 #include "Apollo.h"
 #include "IException.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 
 #include "Preference.h"
 
@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
 
     cout << "Unit test for Isis::Apollo" << endl;
 
-    Isis::iString fname("AS15-M-1450");
+    Isis::IString fname("AS15-M-1450");
 
     Isis::Apollo *apollo;
 

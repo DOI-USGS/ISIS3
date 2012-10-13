@@ -23,7 +23,7 @@
 #include "Pvl.h"
 #include "PvlFormat.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "FileName.h"
 #include "PvlFormatPds.h"
 #include "ProcessExportMiniRFLroPds.h"

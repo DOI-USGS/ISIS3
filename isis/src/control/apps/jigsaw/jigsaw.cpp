@@ -58,8 +58,8 @@ void IsisMain() {
   b->SetOutlierRejection(ui.GetBoolean("OUTLIER_REJECTION"));
   b->SetRejectionMultiplier(ui.GetDouble("REJECTION_MULTIPLIER"));
 
-  b->SetCkDegree(ui.GetInteger("CKDEGREE"));
-  b->SetSolveCamDegree(ui.GetInteger("SOLVEDEGREE"));
+  b->SetCKDegree(ui.GetInteger("CKDEGREE"));
+  b->SetSolveCKDegree(ui.GetInteger("CKSOLVEDEGREE"));
   std::string camsolve = ui.GetString("CAMSOLVE");
 
   if (camsolve == "NONE") {
@@ -75,11 +75,15 @@ void IsisMain() {
     b->SetSolveCmatrix(BundleAdjust::AnglesVelocityAcceleration);
   }
   else {
-    b->SetSolveCmatrix(BundleAdjust::All);
+    b->SetSolveCmatrix(BundleAdjust::CKAll);
   }
 
   b->SetSolveTwist(ui.GetBoolean("TWIST"));
 
+  b->SetSolvePolyOverPointing(ui.GetBoolean("OVEREXISTING"));
+
+  b->SetSPKDegree(ui.GetInteger("SPKDEGREE"));
+  b->SetSolveSPKDegree(ui.GetInteger("SPKSOLVEDEGREE"));
   std::string spsolve = ui.GetString("SPSOLVE");
   if(spsolve == "NONE") {
     b->SetSolveSpacecraftPosition(BundleAdjust::Nothing);
@@ -90,9 +94,14 @@ void IsisMain() {
   else if(spsolve == "VELOCITIES") {
     b->SetSolveSpacecraftPosition(BundleAdjust::PositionVelocity);
   }
-  else {
+  else if(spsolve == "ACCELERATIONS") {
     b->SetSolveSpacecraftPosition(BundleAdjust::PositionVelocityAcceleration);
   }
+  else {
+    b->SetSolveSpacecraftPosition(BundleAdjust::SPKAll);
+  }
+
+  b->SetSolvePolyOverHermite(ui.GetBoolean("OVERHERMITE"));
 
   // global parameter uncertainties
   if( ui.WasEntered("POINT_LATITUDE_SIGMA") )
@@ -200,7 +209,7 @@ void IsisMain() {
           for (int iobj = 0; iobj < c->getLabel()->Objects(); iobj++) {
             PvlObject obj = c->getLabel()->Object(iobj);
             if (obj.Name() != "Table") continue;
-            if (obj["Name"][0] != iString("CameraStatistics")) continue;
+            if (obj["Name"][0] != IString("CameraStatistics")) continue;
             c->getLabel()->DeleteObject(iobj);
             break;
           }

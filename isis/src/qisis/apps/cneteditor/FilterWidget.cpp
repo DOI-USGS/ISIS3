@@ -14,7 +14,7 @@
 #include <QVBoxLayout>
 
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 #include "FilterGroup.h"
 
@@ -153,7 +153,7 @@ namespace Isis
           }
         }
 
-        iString msg = "Assignment of FilterWidget failed";
+        IString msg = "Assignment of FilterWidget failed";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 

@@ -6,7 +6,7 @@
 // FIXME: remove these includes
 #include <QAction>
 #include "TableMainWindow.h"
-#include "iString.h"
+#include "IString.h"
 
 class QDialog;
 class QMenu;
@@ -16,7 +16,7 @@ class QComboBox;
 namespace Isis {
   class Angle;
   class Distance;
-  class iString;
+  class IString;
   class MdiCubeViewport;
   class SurfacePoint;
 
@@ -129,9 +129,9 @@ namespace Isis {
       Distance *m_shadowLength;
 
       //! Current cube file path
-      iString m_path;
+      IString m_path;
       //! Current cube file name
-      iString m_fileName;
+      IString m_fileName;
 
       //! Table window for displaying all of the table information
       TableMainWindow *m_tableWin;

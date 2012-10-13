@@ -587,25 +587,25 @@ namespace Isis {
         int iComment = 0;
 
         if (numMeasures == 0) {
-          iString sComment = "Comment";
-          sComment += iString(++iComment);
+          IString sComment = "Comment";
+          sComment += IString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "No Measures in the Point");
         }
 
         if (newPnt->IsIgnored()) {
-          iString sComment = "Comment";
-          sComment += iString(++iComment);
+          IString sComment = "Comment";
+          sComment += IString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Point was originally Ignored");
         }
 
         if (newPnt->GetType() == ControlPoint::Fixed) {
-          iString sComment = "Comment";
-          sComment += iString(++iComment);
+          IString sComment = "Comment";
+          sComment += IString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Fixed Point");
         }
         else if (newPnt->GetType() == ControlPoint::Constrained) {
-          iString sComment = "Comment";
-          sComment += iString(++iComment);
+          IString sComment = "Comment";
+          sComment += IString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Constrained Point");
         }
 
@@ -846,7 +846,7 @@ namespace Isis {
            measureIndex ++) {
         if (measureIndex == numMatches) {
           const ControlMeasure &controlMeasure = *pCnetPoint[measureIndex];
-          iString serialNum = controlMeasure.GetCubeSerialNumber();
+          IString serialNum = controlMeasure.GetCubeSerialNumber();
           if (overlap->HasSerialNumber(serialNum)) {
             numMatches++;
           }

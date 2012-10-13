@@ -36,9 +36,9 @@ int main(int argc, char *argv[]) {
 
     while(create.next()) {
       SqlRecord r = create.getRecord();
-      cout << "v1: " << iString(r.getValue(0)) << endl;
-      cout << "v2: " << iString(r.getValue(1)) << endl;
-      cout << "v3: " << iString(r.getValue(2)) << endl;
+      cout << "v1: " << IString(r.getValue(0)) << endl;
+      cout << "v2: " << IString(r.getValue(1)) << endl;
+      cout << "v3: " << IString(r.getValue(2)) << endl;
       cout << "Is null (v1): " << r.isNull("v1") << endl;
       cout << "Is null (blank): " << r.isNull("") << endl;
     }
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
        "the mac systems will need OS truth data." << endl;
 
   for(int i = 0; i < record.size(); i++) {
-    iString value = record.getValue(i);
+    IString value = record.getValue(i);
     cout << "Col " << i << ") " << "Name: " << record.getFieldName(i) <<
          ", Type: " << record.getType(i) << endl;
 

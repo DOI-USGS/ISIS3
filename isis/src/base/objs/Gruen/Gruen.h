@@ -137,7 +137,7 @@ namespace Isis {
 
     protected:
       /** Returns the default name of the algorithm as Gruen */
-      virtual iString AlgorithmName() const {
+      virtual IString AlgorithmName() const {
         return ("Gruen");
       }
 
@@ -263,7 +263,7 @@ namespace Isis {
         if(conf.count(keyname) < index) {
           return (defval);
         }
-        iString iValue(conf.value(keyname, index));
+        IString iValue(conf.value(keyname, index));
         T value = iValue;  // This makes it work with a string?
         return (value);
       };

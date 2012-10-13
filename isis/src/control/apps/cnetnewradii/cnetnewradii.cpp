@@ -34,7 +34,7 @@ void IsisMain() {
     ugm = new UniversalGroundMap(demCube);
   }
   catch (IException &e) {
-    iString msg = "Cannot initalize UniversalGroundMap for DEM cube [" +
+    IString msg = "Cannot initalize UniversalGroundMap for DEM cube [" +
                    demFile + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -50,7 +50,7 @@ void IsisMain() {
 
 
   GetLatLon newRadiiSource;
-  iString getLatLon = iString(ui.GetAsString("GETLATLON")).UpCase();
+  IString getLatLon = IString(ui.GetAsString("GETLATLON")).UpCase();
   if (getLatLon == "ADJUSTED") {
     newRadiiSource = Adjusted;
   }

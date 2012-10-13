@@ -4,7 +4,7 @@
 
 #include <QMenu>
 
-#include "iString.h"
+#include "IString.h"
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
 

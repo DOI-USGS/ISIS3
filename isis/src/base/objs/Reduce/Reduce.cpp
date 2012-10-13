@@ -1,5 +1,5 @@
 #include "Reduce.h"
-#include "iString.h"
+#include "IString.h"
 #include "SpecialPixel.h"
 #include "SubArea.h"
 

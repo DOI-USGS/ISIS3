@@ -8,7 +8,7 @@
 #include "IException.h"
 #include "cam2map.h"
 #include "Pvl.h"
-#include "iString.h"
+#include "IString.h"
 #include "PushFrameCameraDetectorMap.h"
 #include "Target.h"
 
@@ -378,7 +378,7 @@ void IsisMain() {
       startLine -= offset;
     }
 
-    if ((iString((string)instGrp["Framelets"])).UpCase() == "EVEN") {
+    if ((IString((string)instGrp["Framelets"])).UpCase() == "EVEN") {
       startLine += frameSize;
     }
 

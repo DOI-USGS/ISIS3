@@ -12,7 +12,7 @@
 #include "Application.h"
 #include "Constants.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Pvl.h"
 #include "Table.h"
 
@@ -38,10 +38,10 @@ namespace Isis {
    * @param startPad
    * @param endPad
    */
-  SpiceClient::SpiceClient(iString url, int port, Pvl &cubeLabel,
+  SpiceClient::SpiceClient(IString url, int port, Pvl &cubeLabel,
       bool ckSmithed, bool ckRecon, bool ckNadir, bool ckPredicted,
       bool spkSmithed, bool spkRecon, bool spkPredicted,
-      iString shape, double startPad, double endPad) : QThread() {
+      IString shape, double startPad, double endPad) : QThread() {
     p_xml = NULL;
     p_networkMgr = NULL;
     p_request = NULL;
@@ -49,14 +49,14 @@ namespace Isis {
     p_rawResponse = NULL;
     p_error = NULL;
 
-    iString raw;
-    p_xml = new iString();
+    IString raw;
+    p_xml = new IString();
 
     raw = "<input_label>\n";
     raw += "  <isis_version>\n";
-    iString version = Application::Version();
+    IString version = Application::Version();
     QByteArray isisVersionRaw(version.c_str());
-    raw += iString(isisVersionRaw.toHex().constData()) + "\n";
+    raw += IString(isisVersionRaw.toHex().constData()) + "\n";
     raw += "  </isis_version>\n";
 
     raw += "  <parameters>\n";
@@ -68,22 +68,22 @@ namespace Isis {
     raw += "    <spkrecon value='" + yesNo(spkRecon) + "' />\n";
     raw += "    <spkpredicted value='" + yesNo(spkPredicted) + "' />\n";
     raw += "    <shape value='" + shape + "' />\n";
-    raw += "    <startpad time='" + iString(startPad) + "' />\n";
-    raw += "    <endpad time='" + iString(endPad) + "' />\n";
+    raw += "    <startpad time='" + IString(startPad) + "' />\n";
+    raw += "    <endpad time='" + IString(endPad) + "' />\n";
     raw += "  </parameters>\n";
 
     raw += "  <label>\n";
     stringstream str;
     str << cubeLabel;
-    raw += iString(QByteArray(str.str().c_str()).toHex().constData()) + "\n";
+    raw += IString(QByteArray(str.str().c_str()).toHex().constData()) + "\n";
 
     raw += "  </label>\n";
     raw += "</input_label>";
 
-    *p_xml = iString(QByteArray(raw.c_str()).toHex().constData());
+    *p_xml = IString(QByteArray(raw.c_str()).toHex().constData());
 
     int contentLength = p_xml->length();
-    iString contentLengthStr = iString((BigInt)contentLength);
+    IString contentLengthStr = IString((BigInt)contentLength);
 
     p_request = new QNetworkRequest();
     p_request->setUrl(QUrl(url));
@@ -155,20 +155,20 @@ namespace Isis {
    * @param reply
    */
   void SpiceClient::replyFinished(QNetworkReply *reply) {
-    p_rawResponse = new iString(QString(reply->readAll()).toStdString());
+    p_rawResponse = new IString(QString(reply->readAll()).toStdString());
 
     // Decode the response
-    p_response = new iString();
+    p_response = new IString();
 
     try {
-      *p_response = iString(
+      *p_response = IString(
           QByteArray::fromHex(QByteArray(p_rawResponse->c_str())).constData());
 
       // Make sure we can get the log out of it before continuing
       applicationLog();
     }
     catch(IException &) {
-      p_error = new iString();
+      p_error = new IString();
 
       // Well, the XML is bad, maybe it's PVL
       try {
@@ -312,8 +312,8 @@ namespace Isis {
    */
   void SpiceClient::authenticationRequired(QNetworkReply *, QAuthenticator *) {
     if(!p_response) {
-      p_rawResponse = new iString();
-      p_response = new iString();
+      p_rawResponse = new IString();
+      p_response = new IString();
     }
 
     *p_error = "Server expects authentication which is not currently ";
@@ -327,8 +327,8 @@ namespace Isis {
    */
   void SpiceClient::proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *) {
     if(!p_response) {
-      p_rawResponse = new iString();
-      p_response = new iString();
+      p_rawResponse = new IString();
+      p_response = new IString();
     }
 
     *p_error = "Server expects authentication which is not currently ";
@@ -344,8 +344,8 @@ namespace Isis {
   void SpiceClient::sslErrors(QNetworkReply *reply,
                               const QList<QSslError> & err) {
     if(!p_response) {
-      p_rawResponse = new iString();
-      p_response = new iString();
+      p_rawResponse = new IString();
+      p_response = new IString();
     }
 
     *p_error = "Server expects authentication which is not currently ";
@@ -363,7 +363,7 @@ namespace Isis {
    */
   QDomElement SpiceClient::rootXMLElement() {
     if(!p_response || !p_rawResponse) {
-      iString error = "No server response available";
+      IString error = "No server response available";
       throw IException(IException::Io, error, _FILEINFO_);
     }
 
@@ -377,7 +377,7 @@ namespace Isis {
       return document.firstChild().toElement();
     }
     else {
-      iString msg = "Unexpected response from spice server [";
+      IString msg = "Unexpected response from spice server [";
       msg += *p_rawResponse;
       msg += "]";
       throw IException(IException::Io, msg, _FILEINFO_);
@@ -394,7 +394,7 @@ namespace Isis {
    *
    * @return QDomElement
    */
-  QDomElement SpiceClient::findTag(QDomElement currentElement, iString name) {
+  QDomElement SpiceClient::findTag(QDomElement currentElement, IString name) {
     QString qtName = name.ToQt();
     for(QDomNode node = currentElement.firstChild();
         !node .isNull();
@@ -406,7 +406,7 @@ namespace Isis {
       }
     }
 
-    iString msg = "Server response missing XML Tag [" + name + "]";
+    IString msg = "Server response missing XML Tag [" + name + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
@@ -423,7 +423,7 @@ namespace Isis {
     QDomElement kernelsLabel = findTag(root, "kernels_label");
     QString kernelsLabels = elementContents(kernelsLabel);
 
-    iString unencoded(QByteArray::fromHex(kernelsLabels.toAscii()).constData());
+    IString unencoded(QByteArray::fromHex(kernelsLabels.toAscii()).constData());
 
     stringstream pvlStream;
     pvlStream << unencoded;
@@ -447,7 +447,7 @@ namespace Isis {
     QDomElement logLabel = findTag(root, "application_log");
     QString logLabels = elementContents(logLabel);
 
-    iString unencoded(QByteArray::fromHex(logLabels.toAscii()).constData());
+    IString unencoded(QByteArray::fromHex(logLabels.toAscii()).constData());
 
     stringstream pvlStream;
     pvlStream << unencoded;
@@ -543,7 +543,7 @@ namespace Isis {
     QDomElement kernelsLabel = findTag(root, "kernels_label");
     QString kernelsLabels = elementContents(kernelsLabel);
 
-    iString unencoded(QByteArray::fromHex(kernelsLabels.toAscii()).constData());
+    IString unencoded(QByteArray::fromHex(kernelsLabels.toAscii()).constData());
 
     stringstream pvlStream;
     pvlStream << unencoded;
@@ -560,9 +560,9 @@ namespace Isis {
    *
    * @param boolVal
    *
-   * @return iString
+   * @return IString
    */
-  iString SpiceClient::yesNo(bool boolVal) {
+  IString SpiceClient::yesNo(bool boolVal) {
     if(boolVal)
       return "yes";
     else
@@ -570,7 +570,7 @@ namespace Isis {
   }
 
 
-  Table *SpiceClient::readTable(iString xmlName, iString tableName) {
+  Table *SpiceClient::readTable(IString xmlName, IString tableName) {
     checkErrors();
 
     QDomElement root = rootXMLElement();

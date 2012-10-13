@@ -109,7 +109,7 @@ namespace Isis {
         p_table->selectedRanges();
 
     if (selectedRanges.empty()) {
-      iString msg = "You must select a row to delete";
+      IString msg = "You must select a row to delete";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 

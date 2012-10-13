@@ -15,11 +15,15 @@
      So, a field with an array of size three and twenty records will produce a 3 sample by 20 line cube. 
   </description>
 
-<history>
+  <history>
     <change name="Steve Koechle and Steven Lambright" date="2007-06-15">
       Original Version
     </change>
- </history>
+    <change name="Jeannie Backer" date="2012-10-04">
+      PROG: Changed references to TableField methods to lower camel case. Ordered includes. 
+      Added g_ prefix to global variables. References #1169.
+    </change>
+  </history>
 
   <groups>
     <group name="Files">

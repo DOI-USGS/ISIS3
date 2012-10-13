@@ -1,7 +1,7 @@
 #include <cmath>
 #include <string>
 #include "Pvl.h"
-#include "iString.h"
+#include "IString.h"
 #include "AtmosModel.h"
 #include "NumericalApproximation.h"
 #include "NumericalAtmosApprox.h"
@@ -240,7 +240,7 @@ namespace Isis {
     if(x <= 0.0) {
       throw IException(IException::Programmer,
                        "AtmosModel::Ei() - Invalid argument. Definition requires x > 0.0. Entered x = "
-                       + iString(x),
+                       + IString(x),
                        _FILEINFO_);
     }
     if(x < fpmin) {  //special case: avoid failure of convergence test because underflow
@@ -260,7 +260,7 @@ namespace Isis {
       }
       throw IException(IException::Unknown,
                        "AtmosModel::Ei() - Power series failed to converge in "
-                       + iString(maxit) + " iterations. Unable to calculate exponential integral.",
+                       + IString(maxit) + " iterations. Unable to calculate exponential integral.",
                        _FILEINFO_);
     }
     else { // Use asymptotic series
@@ -384,9 +384,9 @@ namespace Isis {
 
     nm1 = n - 1;
     if(n < 0 || x < 0.0 || (x == 0.0 && (n == 0 || n == 1))) {
-      iString msg = "AtmosModel::En() - Invalid arguments. ";
+      IString msg = "AtmosModel::En() - Invalid arguments. ";
       msg += "Definition requires (x > 0.0 and n >=0 ) or (x >= 0.0 and n > 1). ";
-      msg += "Entered x = " + iString(x) + " and n = " + iString((int) n);
+      msg += "Entered x = " + IString(x) + " and n = " + IString((int) n);
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else if(n == 0) {  // special case, this implies x > 0 by logic above
@@ -414,7 +414,7 @@ namespace Isis {
       }
       throw IException(IException::Unknown,
                        "AtmosModel::En() - Continued fraction failed to converge in "
-                       + iString(maxit) + " iterations. Unable to calculate exponential integral.",
+                       + IString(maxit) + " iterations. Unable to calculate exponential integral.",
                        _FILEINFO_);
     }
     else { // evaluate series
@@ -444,7 +444,7 @@ namespace Isis {
       }
       throw IException(IException::Unknown,
                        "AtmosModel::En() - Series representation failed to converge in "
-                       + iString(maxit) + " iterations. Unable to calculate exponential integral.",
+                       + IString(maxit) + " iterations. Unable to calculate exponential integral.",
                        _FILEINFO_);
     }
     return(result);
@@ -548,7 +548,7 @@ namespace Isis {
       p_atmosMunot = cos((PI / 180.0) * p_atmosInc);
       p_atmosSini = sin((PI / 180.0) * p_atmosInc);
 
-      iString phtName = p_atmosPM->AlgorithmName();
+      IString phtName = p_atmosPM->AlgorithmName();
       phtName.UpCase();
       if(p_atmosInc == 90.0) {
         p_atmosAhTable[inccnt] = 0.0;
@@ -772,7 +772,7 @@ namespace Isis {
   */
   void AtmosModel::SetAtmosAtmSwitch(const int atmswitch) {
     if(atmswitch < 0 || atmswitch > 3) {
-      string msg = "Invalid value of atmospheric atmswitch [" + iString(atmswitch) + "]";
+      string msg = "Invalid value of atmospheric atmswitch [" + IString(atmswitch) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -793,7 +793,7 @@ namespace Isis {
   void AtmosModel::SetAtmosBha(const double bha) {
     if(bha < -1.0 || bha > 1.0) {
       string msg = "Invalid value of Anisotropic atmospheric bha [" +
-                   iString(bha) + "]";
+                   IString(bha) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -813,7 +813,7 @@ namespace Isis {
    */
   void AtmosModel::SetAtmosHga(const double hga) {
     if(hga <= -1.0 || hga >= 1.0) {
-      string msg = "Invalid value of Hapke atmospheric hga [" + iString(hga) + "]";
+      string msg = "Invalid value of Hapke atmospheric hga [" + IString(hga) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -832,7 +832,7 @@ namespace Isis {
    */
   void AtmosModel::SetAtmosInc(const double inc) {
     if(inc < 0.0 || inc > 90.0) {
-      string msg = "Invalid value of atmospheric inc [" + iString(inc) + "]";
+      string msg = "Invalid value of atmospheric inc [" + IString(inc) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -853,7 +853,7 @@ namespace Isis {
    *
    */
   void AtmosModel::SetAtmosNulneg(const string nulneg) {
-    iString temp(nulneg);
+    IString temp(nulneg);
     temp = temp.UpCase();
 
     if(temp != "NO" && temp != "YES") {
@@ -877,7 +877,7 @@ namespace Isis {
    */
   void AtmosModel::SetAtmosPhi(const double phi) {
     if(phi < 0.0 || phi > 360.0) {
-      string msg = "Invalid value of atmospheric phi [" + iString(phi) + "]";
+      string msg = "Invalid value of atmospheric phi [" + IString(phi) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -896,7 +896,7 @@ namespace Isis {
    */
   void AtmosModel::SetAtmosTau(const double tau) {
     if(tau < 0.0) {
-      string msg = "Invalid value of Atmospheric tau [" + iString(tau) + "]";
+      string msg = "Invalid value of Atmospheric tau [" + IString(tau) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -915,7 +915,7 @@ namespace Isis {
    */
   void AtmosModel::SetAtmosTauref(const double tauref) {
     if(tauref < 0.0) {
-      string msg = "Invalid value of Atmospheric tauref [" + iString(tauref) + "]";
+      string msg = "Invalid value of Atmospheric tauref [" + IString(tauref) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -934,7 +934,7 @@ namespace Isis {
    */
   void AtmosModel::SetAtmosWha(const double wha) {
     if(wha <= 0.0 || wha > 1.0) {
-      string msg = "Invalid value of Atmospheric wha [" + iString(wha) + "]";
+      string msg = "Invalid value of Atmospheric wha [" + IString(wha) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -961,7 +961,7 @@ namespace Isis {
    */
   void AtmosModel::SetAtmosHnorm(const double hnorm) {
     if(hnorm < 0.0) {
-      std::string msg = "Invalid value of Atmospheric hnorm [" + iString(hnorm) + "]";
+      std::string msg = "Invalid value of Atmospheric hnorm [" + IString(hnorm) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     p_atmosHnorm = hnorm;
@@ -975,7 +975,7 @@ namespace Isis {
    * @param offset true/false
    */
   void AtmosModel::SetAtmosIord(const string offset) {
-    iString temp(offset);
+    IString temp(offset);
     temp = temp.UpCase();
 
     if(temp != "NO" && temp != "YES") {
@@ -994,7 +994,7 @@ namespace Isis {
    * @param esttau true/false
    */
   void AtmosModel::SetAtmosEstTau(const string esttau) {
-    iString temp(esttau);
+    IString temp(esttau);
     temp = temp.UpCase();
 
     if(temp != "NO" && temp != "YES") {

@@ -22,7 +22,7 @@
  */
 #include "RadarSlantRangeMap.h"
 
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "PvlSequence.h"
 
@@ -201,7 +201,7 @@ namespace Isis {
     seq = keyword;
     for(int i = 0; i < seq.Size(); i++) {
       // TODO:  Test array size to be 4 if not throw error
-      std::vector<iString> array = seq[i];
+      std::vector<IString> array = seq[i];
       double et;
       utc2et_c(array[0].c_str(), &et);
       p_time.push_back(et);

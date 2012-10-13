@@ -352,7 +352,7 @@ void tableIn(const Isis::FileName &filename) {
 
   //read it
   StaticStats newStat;
-  iString inString;
+  IString inString;
   while(in >> inString) {
     band.push_back(inString);
     in >> inString;

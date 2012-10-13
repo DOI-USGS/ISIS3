@@ -50,7 +50,7 @@ namespace Isis {
     if(p_dialog == 0) {
       p_dialog = new GuiOutputAttribute(parent);
     }
-    p_dialog->setWindowTitle((iString)title);
+    p_dialog->setWindowTitle((IString)title);
     p_dialog->SetPropagation(allowProp);
 
     // Load default attributes and then get the new ones

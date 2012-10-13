@@ -16,7 +16,7 @@ void IsisMain() {
   bool needSclk = false;
   FileName sclkFile("");
   if(ui.WasEntered("SCLK")) {
-    iString sclkString = ui.GetAsString("SCLK");
+    IString sclkString = ui.GetAsString("SCLK");
     if(sclkString.length() != 0) {
       sclkString.Trim("\\");
       sclkFile = FileName(sclkString);
@@ -29,7 +29,7 @@ void IsisMain() {
     }
   }
 
-  iString lskString = ui.GetAsString("LSK");
+  IString lskString = ui.GetAsString("LSK");
   lskString.Trim("\\");
   FileName lskFile(lskString);
   if (lskFile.isVersioned()) {
@@ -63,7 +63,7 @@ void IsisMain() {
   /* Removed because Nadir is not done using this*/
   //if (ui.GetString("NADIRFILTER") != "none" &&
   //    ui.GetString("NADIRDIR") != "none"){
-  //  iString location = "";
+  //  IString location = "";
   //  location = ui.GetString("NADIRDIR");
   //  location.Trim("\\");
   //  std::vector<std::string> filter;
@@ -74,7 +74,7 @@ void IsisMain() {
   //}
   if(ui.GetString("PREDICTFILTER") != "none" &&
       ui.GetString("PREDICTDIR") != "none") {
-    iString location = "";
+    IString location = "";
     location = ui.GetString("PREDICTDIR");
     location.Trim("\\");
     std::vector<std::string> filter;
@@ -89,7 +89,7 @@ void IsisMain() {
 
   if(ui.GetString("RECONDIR") != "none" &&
       ui.GetString("RECONFILTER") != "none") {
-    iString location = "";
+    IString location = "";
     location = ui.GetString("RECONDIR");
     location.Trim("\\");
     std::vector<std::string> filter;
@@ -104,7 +104,7 @@ void IsisMain() {
 
   if(ui.GetString("SMITHEDDIR") != "none" &&
       ui.GetString("SMITHEDFILTER") != "none") {
-    iString location = "";
+    IString location = "";
     location = ui.GetString("SMITHEDDIR");
     location.Trim("\\");
     std::vector<std::string> filter;

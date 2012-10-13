@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "ProcessByBoxcar.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -30,19 +30,19 @@ void IsisMain() {
 
   // Error check kernel input for impossible boxcar sizes
   if(lines <= 0) {
-    iString msg = "Your kernel must specify lines count greater than 0";
+    IString msg = "Your kernel must specify lines count greater than 0";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   if(samples <= 0) {
-    iString msg = "Your kernel must specify samples count greater than 0";
+    IString msg = "Your kernel must specify samples count greater than 0";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Error check kernel for proper amount of data - lines*samples
   if(lines *samples != kern["data"].Size()) {
-    iString msg = "Your kernel does not specify the correct amount of data, must";
+    IString msg = "Your kernel does not specify the correct amount of data, must";
     msg += " be equal to lines * samples [";
-    msg += iString(lines * samples);
+    msg += IString(lines * samples);
     msg += "] pieces of data";
     throw IException(IException::User, msg, _FILEINFO_);
   }

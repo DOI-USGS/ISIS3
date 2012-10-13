@@ -24,7 +24,7 @@
 #include <iostream>
 #include "DbProfile.h"
 #include "Database.h"
-#include "iString.h"
+#include "IString.h"
 #include "SqlQuery.h"
 #include "SqlRecord.h"
 #include <QString>
@@ -80,7 +80,7 @@ namespace Isis {
    * for other queries until it goes out of scope.
    *
    *
-   * @param query iString containing a valid SQL query to execute
+   * @param query IString containing a valid SQL query to execute
    * @param db    An optional database object to issue the query to.  This
    *              database now becomes the one used in all subsequent queries
    *              using this SqlQuery object.
@@ -123,7 +123,7 @@ namespace Isis {
    *         iException is thrown if it fails.
    */
   bool SqlQuery::exec(const std::string &query) {
-    bool ok = this->QSqlQuery::exec(iString::ToQt(query));
+    bool ok = this->QSqlQuery::exec(IString::ToQt(query));
     if((!ok) && isThrowing()) {
       string mess = "Query \'" + query + "\' failed to execute";
       tossQueryError(mess, _FILEINFO_);
@@ -144,8 +144,8 @@ namespace Isis {
    *         undefined, an empty string is returned.
    */
   std::string SqlQuery::getQuery() const {
-    std::string lastq = iString::ToStd(lastQuery());
-    if(lastq.empty()) lastq = iString::ToStd(executedQuery());
+    std::string lastq = IString::ToStd(lastQuery());
+    if(lastq.empty()) lastq = IString::ToStd(executedQuery());
     return (lastq);
   }
 
@@ -177,7 +177,7 @@ namespace Isis {
    * @return std::string Name of column at given index
    */
   std::string SqlQuery::fieldName(int index) const {
-    return (iString::ToStd(record().fieldName(index)));
+    return (IString::ToStd(record().fieldName(index)));
   }
 
   /**
@@ -192,7 +192,7 @@ namespace Isis {
    * @return int Zero-based index of named column
    */
   int SqlQuery::fieldIndex(const std::string &name) const {
-    return(record().indexOf(iString::ToQt(name)));
+    return(record().indexOf(IString::ToQt(name)));
   }
 
   /**
@@ -212,7 +212,7 @@ namespace Isis {
     std::vector<std::string> fields;
     QSqlRecord rec = record();
     for(int i = 0 ; i < rec.count() ; i++) {
-      fields.push_back(iString::ToStd(rec.fieldName(i)));
+      fields.push_back(IString::ToStd(rec.fieldName(i)));
     }
     return (fields);
   }
@@ -223,7 +223,7 @@ namespace Isis {
    * After a query has been issued, this method will return the types of all
    * fields/columns.  These types are defined by the SqlRecord::getType() method.
    *
-   * @return std::vector<std::string> iString vector of all field types.
+   * @return std::vector<std::string> IString vector of all field types.
    */
   std::vector<std::string> SqlQuery::fieldTypeList() const {
     std::vector<std::string> types;
@@ -290,7 +290,7 @@ namespace Isis {
    */
   void SqlQuery::tossQueryError(const std::string &message, const char *f, int l) const {
     string errmess = message + " - QueryError = " +
-                     iString::ToStd(lastError().text());
+                     IString::ToStd(lastError().text());
     throw IException(IException::User, errmess, f, l);
   }
 

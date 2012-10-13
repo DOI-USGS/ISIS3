@@ -84,10 +84,10 @@ void IsisMain() {
   }
 
   // Set the Output Storage Format
-  if(Isis::iString(ui.GetString("STORAGEORDER")).DownCase()  == "bil") {
+  if(Isis::IString(ui.GetString("STORAGEORDER")).DownCase()  == "bil") {
     p.SetFormat(ProcessExport::BIL);
   }
-  else if(Isis::iString(ui.GetString("STORAGEORDER")).DownCase()  == "bip") {
+  else if(Isis::IString(ui.GetString("STORAGEORDER")).DownCase()  == "bip") {
     p.SetFormat(ProcessExport::BIP);
   }
 
@@ -116,7 +116,7 @@ void IsisMain() {
 void checkRange(UserInterface &ui, double &min, double &max) {
   if(ui.WasEntered("OMIN")) {
     if(ui.GetDouble("OMIN") < min) {
-      string message = "OMIN [" + iString(min) + "] is too small for the provided BITTYPE [";
+      string message = "OMIN [" + IString(min) + "] is too small for the provided BITTYPE [";
       message += ui.GetString("BITTYPE") + "]";
       throw IException(IException::User, message, _FILEINFO_);
     }
@@ -126,7 +126,7 @@ void checkRange(UserInterface &ui, double &min, double &max) {
   }
   if(ui.WasEntered("OMAX")) {
     if(ui.GetDouble("OMAX") > max) {
-      string message = "OMAX [" + iString(max) + "] is too large for the provided BITTYPE [";
+      string message = "OMAX [" + IString(max) + "] is too large for the provided BITTYPE [";
       message += ui.GetString("BITTYPE") + "]";
       throw IException(IException::User, message, _FILEINFO_);
     }
@@ -135,8 +135,8 @@ void checkRange(UserInterface &ui, double &min, double &max) {
     }
   }
   if(min >= max) {
-    string message = "OMIN [" + iString(min) + "] cannot be greater than or equal to OMAX [";
-    message += iString(max) + "]";
+    string message = "OMIN [" + IString(min) + "] cannot be greater than or equal to OMAX [";
+    message += IString(max) + "]";
     throw IException(IException::User, message, _FILEINFO_);
   }
 }

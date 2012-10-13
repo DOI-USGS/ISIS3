@@ -63,7 +63,7 @@ void IsisMain() {
   if(numSpecPixKept > 0) {
     PvlGroup mLog("Messages");
     mLog += PvlKeyword("Warning",
-                       "Unable to fill " + iString(numSpecPixKept) + " special pixels.");
+                       "Unable to fill " + IString(numSpecPixKept) + " special pixels.");
     Application::Log(mLog);
   }
   return;

@@ -27,7 +27,7 @@
 #include "PvlKeyword.h"
 #include "IException.h"
 #include "Message.h"
-#include "iString.h"
+#include "IString.h"
 #include "PvlSequence.h"
 #include "PvlFormat.h"
 
@@ -58,7 +58,7 @@ namespace Isis {
    * @param value The keyword values.
    * @param unit The units the values are given in.
    */
-  PvlKeyword::PvlKeyword(const std::string &name, const Isis::iString value,
+  PvlKeyword::PvlKeyword(const std::string &name, const Isis::IString value,
                          const std::string unit) {
     Init();
     SetName(name);
@@ -133,7 +133,7 @@ namespace Isis {
    * @param name The new keyword name.
    */
   void PvlKeyword::SetName(const std::string &name) {
-    iString final(name);
+    IString final(name);
     final.Trim("\n\r\t\f\v\b ");
     if(final.find_first_of("\n\r\t\f\v\b ") != std::string::npos) {
       string msg = "[" + name + "] is invalid. Keyword name cannot ";
@@ -167,7 +167,7 @@ namespace Isis {
    * @see operator=
    * @see operator+=
    */
-  void PvlKeyword::SetValue(const Isis::iString value, const std::string unit) {
+  void PvlKeyword::SetValue(const Isis::IString value, const std::string unit) {
     Clear();
     AddValue(value, unit);
   }
@@ -178,7 +178,7 @@ namespace Isis {
    *
    * @param units New units to be assigned.
    */
-  void PvlKeyword::SetUnits(const iString &units) {
+  void PvlKeyword::SetUnits(const IString &units) {
     if(!p_units) {
       p_units = new std::vector<std::string>();
     }
@@ -199,7 +199,7 @@ namespace Isis {
    *
    * @throws Isis::iException::Programmer - Given value must exist
    */
-  void PvlKeyword::SetUnits(const iString &value, const iString &units) {
+  void PvlKeyword::SetUnits(const IString &value, const IString &units) {
 
     bool found = false;
     int i = -1;
@@ -222,7 +222,7 @@ namespace Isis {
       (*p_units)[i] = units;
     }
     else {
-      iString msg = "PvlKeyword::SetUnits called with value [" + value +
+      IString msg = "PvlKeyword::SetUnits called with value [" + value +
                     "] which does not exist in this Keyword";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -243,7 +243,7 @@ namespace Isis {
    * @see SetValue()
    * @see operator+=
    */
-  PvlKeyword &PvlKeyword::operator=(const Isis::iString value) {
+  PvlKeyword &PvlKeyword::operator=(const Isis::IString value) {
     Clear();
     AddValue(value);
     return *this;
@@ -264,7 +264,7 @@ namespace Isis {
    * @see operator=
    * @see operator+=
    */
-  void PvlKeyword::AddValue(const Isis::iString value, const std::string unit) {
+  void PvlKeyword::AddValue(const Isis::IString value, const std::string unit) {
     p_values.append(value);
 
     if(unit != "") {
@@ -297,7 +297,7 @@ namespace Isis {
    * @see SetValue()
    * @see operator=
    */
-  PvlKeyword &PvlKeyword::operator+=(const Isis::iString value) {
+  PvlKeyword &PvlKeyword::operator+=(const Isis::IString value) {
     AddValue(value);
     return *this;
   }
@@ -325,12 +325,12 @@ namespace Isis {
    * array of values at the specified index.
    *
    * @param index The index of the value.
-   * @return <B>iString</B> The value at the index.
+   * @return <B>IString</B> The value at the index.
    * @throws iException ArraySubscriptNotInRange (index) Index out of bounds.
    *
    * @see const operator[]
    */
-  Isis::iString &PvlKeyword::operator[](const int index) {
+  Isis::IString &PvlKeyword::operator[](const int index) {
     if(index < 0 || index >= (int)p_values.size()) {
       string msg = (Message::ArraySubscriptNotInRange(index)) +
                    "for Keyword [" + string(p_name) + "]";
@@ -346,12 +346,12 @@ namespace Isis {
    * array of values at the specified index.
    *
    * @param index The index of the value.
-   * @return <b>iString</b> The value at the index.
+   * @return <b>IString</b> The value at the index.
    * @throws iException ArraySubscriptNotInRange (index) Index out of bounds.
    *
    * @see operator[]
    */
-  const Isis::iString &PvlKeyword::operator[](const int index) const {
+  const Isis::IString &PvlKeyword::operator[](const int index) const {
     if(index < 0 || index >= (int)p_values.size()) {
       string msg = Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -422,7 +422,7 @@ namespace Isis {
    * @see ClearComments()
    */
   void PvlKeyword::AddCommentWrapped(const std::string &comment) {
-    iString cmt = comment;
+    IString cmt = comment;
     string token = cmt.Token(" ");
     while(cmt != "") {
       string temp = token;
@@ -478,7 +478,7 @@ namespace Isis {
       Isis::PvlGroup &g = Isis::Preference::Preferences().FindGroup(
                             "UserInterface", Isis::Pvl::Traverse);
 
-      Isis::iString s = (string) g["PvlFormat"];
+      Isis::IString s = (string) g["PvlFormat"];
       s.UpCase();
       if(s == "PVL") iPVL = false;
     }
@@ -548,8 +548,8 @@ namespace Isis {
    */
   bool PvlKeyword::StringEqual(const std::string &string1,
                                const std::string &string2) {
-    Isis::iString s1(string1);
-    Isis::iString s2(string2);
+    Isis::IString s1(string1);
+    Isis::IString s2(string2);
 
     s1.ConvertWhiteSpace();
     s2.ConvertWhiteSpace();
@@ -754,7 +754,7 @@ namespace Isis {
       }
 
       //if(mismatchQuote) {
-      //  iString msg = "Pvl keyword values [" + textToWrite +
+      //  IString msg = "Pvl keyword values [" + textToWrite +
       //    "] can not have embedded quotes";
       //  throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       //}
@@ -914,7 +914,7 @@ namespace Isis {
   std::istream &operator>>(std::istream &is, PvlKeyword &result) {
     result = PvlKeyword();
     string line;
-    iString keywordString;
+    IString keywordString;
 
     bool keywordDone = false;
     bool multiLineComment = false;
@@ -956,7 +956,7 @@ namespace Isis {
           if(line[1] == '*') {
             multiLineComment = true;
             keywordString += line.substr(0, 2);
-            line = iString(line.substr(2)).Trim(" \r\n\t");
+            line = IString(line.substr(2)).Trim(" \r\n\t");
           }
         }
       }
@@ -965,7 +965,7 @@ namespace Isis {
         comment = true;
 
         if(line.find("/*") != string::npos) {
-          iString msg = "Error when reading a pvl: Cannot have ['/*'] inside a "
+          IString msg = "Error when reading a pvl: Cannot have ['/*'] inside a "
                         "multi-line comment";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
@@ -973,7 +973,7 @@ namespace Isis {
         if(line.find("*/") != string::npos) {
           multiLineComment = false;
 
-          line = iString(
+          line = IString(
                    line.substr(0, line.find("*/"))
                  ).Trim(" \r\n\t") + " */";
         }
@@ -1140,7 +1140,7 @@ namespace Isis {
     bool explicitIncomplete = false;
 
     // Possible (known) comment starts in pvl
-    iString comments[] = {
+    IString comments[] = {
       "#",
       "//"
     };
@@ -1191,7 +1191,7 @@ namespace Isis {
           }
 
           string comment = keyword.substr(0, keyword.find("\n"));
-          comment = iString(comment).Trim(" \r\n\t");
+          comment = IString(comment).Trim(" \r\n\t");
 
           // Set these to true if too small, false if not (they need if
           //   cant currently fit).
@@ -1240,7 +1240,7 @@ namespace Isis {
           keywordComments.push_back(comment);
 
           if(keyword.find("\n") != string::npos) {
-            keyword = iString(
+            keyword = IString(
                         keyword.substr(keyword.find("\n") + 1)
                       ).Trim(" \r\n\t");
           }
@@ -1258,7 +1258,7 @@ namespace Isis {
         //   Find longest
         unsigned int longest = 0;
         for(unsigned int index = 0; index < keywordComments.size(); index++) {
-          iString comment = keywordComments[index];
+          IString comment = keywordComments[index];
 
           if(comment.size() > longest)
             longest = comment.size();
@@ -1266,7 +1266,7 @@ namespace Isis {
 
         // Now make all the sizes match longest
         for(unsigned int index = 0; index < keywordComments.size(); index++) {
-          iString comment = keywordComments[index];
+          IString comment = keywordComments[index];
 
           while(comment.size() < longest) {
             // This adds a space to the end of the comment
@@ -1280,19 +1280,19 @@ namespace Isis {
 
       // Search for single line comments
       for(unsigned int commentType = 0;
-          commentType < sizeof(comments) / sizeof(iString);
+          commentType < sizeof(comments) / sizeof(IString);
           commentType++) {
 
         if(keywordStart.find(comments[commentType]) == 0) {
           // Found a comment start; strip this line out and store it as a
           // comment!
           string comment = keyword.substr(0, keyword.find("\n"));
-          keywordComments.push_back(iString(comment).Trim(" \r\n\t"));
+          keywordComments.push_back(IString(comment).Trim(" \r\n\t"));
 
           noneStripped = false;
 
           if(keyword.find("\n") != string::npos) {
-            keyword = iString(
+            keyword = IString(
                         keyword.substr(keyword.find("\n") + 1)
                       ).Trim(" \r\n\t");
           }
@@ -1303,8 +1303,8 @@ namespace Isis {
       //                              mment*/ ?
       if(noneStripped && keyword.find("/*") != string::npos &&
           keyword.find("*/") != string::npos) {
-        iString firstPart = keyword.substr(0, keyword.find("\n"));
-        iString lastPart = keyword.substr(keyword.find("\n") + 1);
+        IString firstPart = keyword.substr(0, keyword.find("\n"));
+        IString lastPart = keyword.substr(keyword.find("\n") + 1);
 
         keyword = firstPart.Trim(" \r\n\t") + " " + lastPart.Trim(" \r\n\t");
         noneStripped = false;
@@ -1360,7 +1360,7 @@ namespace Isis {
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
-    keyword = iString(keyword.substr(1)).Trim(" \t");
+    keyword = IString(keyword.substr(1)).Trim(" \t");
 
     if(keyword.empty()) {
       return false;
@@ -1387,7 +1387,7 @@ namespace Isis {
 
       // strip '(' - onetime, this makes every element in the array the same
       // (except the last)
-      keyword = iString(keyword.substr(1)).Trim(" \t");
+      keyword = IString(keyword.substr(1)).Trim(" \t");
 
       // handle empty arrays: KEYWORD = ()
       if(!keyword.empty() && keyword[0] == closingParen) {
@@ -1433,7 +1433,7 @@ namespace Isis {
         // Now we should* have a comma, strip it
         if(!keyword.empty() && keyword[0] == ',') {
           foundComma = true;
-          keyword = iString(keyword.substr(1)).Trim(" \t");
+          keyword = IString(keyword.substr(1)).Trim(" \t");
         }
 
         // No comma and nothing more in string - we found
@@ -1480,7 +1480,7 @@ namespace Isis {
 
       // Trim off the closing paren
       if(!keyword.empty()) {
-        keyword = iString(keyword.substr(1)).Trim(" \t");
+        keyword = IString(keyword.substr(1)).Trim(" \t");
       }
 
       // Read units here if they exist and apply them
@@ -1584,7 +1584,7 @@ namespace Isis {
 
     // This method ignores spaces except as delimiters; let's trim the string
     // to start
-    keyword = iString(keyword).Trim(" \t");
+    keyword = IString(keyword).Trim(" \t");
 
     if(keyword.empty()) {
       return "";
@@ -1672,7 +1672,7 @@ namespace Isis {
       }
 
       // Make sure we dont have padding
-      keyword = iString(keyword).Trim(" \t");
+      keyword = IString(keyword).Trim(" \t");
 
       if(keepQuotes) {
         value = startQuote + value + quoteEnd;
@@ -1713,7 +1713,7 @@ namespace Isis {
    * @return std::string The first encountered line of data
    */
   std::string PvlKeyword::ReadLine(std::istream &is, bool insideComment) {
-    iString lineOfData;
+    IString lineOfData;
 
     while(is.good() && lineOfData.empty()) {
 
@@ -1886,11 +1886,11 @@ namespace Isis {
   {
     int iSize = pvlKwrd.Size();
 
-    string sType = iString::DownCase(p_values[0]);
+    string sType = IString::DownCase(p_values[0]);
 
     // Value type
     if(psValueType.length()) {
-      psValueType = iString::DownCase(psValueType);
+      psValueType = IString::DownCase(psValueType);
     }
 
     double dRangeMin=0, dRangeMax=0;
@@ -1913,11 +1913,11 @@ namespace Isis {
     // Type integer
     if(sType == "integer") {
       for(int i=0; i<iSize; i++) {
-        string sValue = iString::DownCase(pvlKwrd[i]);
+        string sValue = IString::DownCase(pvlKwrd[i]);
         if(sValue != "null"){
           int iValue=0;
           try {
-            iValue = iString::ToInteger(sValue);
+            iValue = IString::ToInteger(sValue);
           } catch(IException & e) {
             string sErrMsg = "\"" +pvlKwrd.Name() +"\" expects an Integer value";
             throw IException(e, IException::User, sErrMsg, _FILEINFO_);
@@ -1954,9 +1954,9 @@ namespace Isis {
     // Type double
     if(sType == "double") {
       for(int i=0; i<iSize; i++) {
-        string sValue = iString::DownCase(pvlKwrd[i]);
+        string sValue = IString::DownCase(pvlKwrd[i]);
         if(sValue != "null"){
-          double dValue = iString::ToDouble(sValue);
+          double dValue = IString::ToDouble(sValue);
           if(bRange && (dValue < dRangeMin || dValue > dRangeMax)) {
             string sErrMsg = "\"" +pvlKwrd.Name() +"\" is not in the specified Range";
             throw IException(IException::User, sErrMsg, _FILEINFO_);
@@ -1989,7 +1989,7 @@ namespace Isis {
     // Type boolean
     if(sType == "boolean") {
       for(int i=0; i<iSize; i++) {
-        string sValue = iString::DownCase(pvlKwrd[i]);
+        string sValue = IString::DownCase(pvlKwrd[i]);
         if(sValue != "null" && sValue != "true" && sValue != "false"){
           string sErrMsg = "Wrong Type of value in the Keyword \"" + Name() + "\" \n";
           throw IException(IException::User, sErrMsg, _FILEINFO_);
@@ -2001,11 +2001,11 @@ namespace Isis {
     // Type String
     if(sType == "string") {
       for(int i=0; i<iSize; i++) {
-        string sValue = iString::DownCase(pvlKwrd[i]);
+        string sValue = IString::DownCase(pvlKwrd[i]);
         if(bValue) {
           bool bValFound = false;
           for(int i=0; i<pvlKwrdValue->Size(); i++) {
-            if(sValue == iString::DownCase((*pvlKwrdValue)[i])) {
+            if(sValue == IString::DownCase((*pvlKwrdValue)[i])) {
               bValFound = true;
               break;
             }

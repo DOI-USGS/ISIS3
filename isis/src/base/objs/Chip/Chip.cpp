@@ -143,8 +143,8 @@ namespace Isis {
    */
   void Chip::SetSize(const int samples, const int lines) {
     if(samples <= 0.0 || lines <= 0.0) {
-      string msg = "Unable to set chip size to [" + iString(samples);
-      msg += ", " + iString(lines) + "].  Samples and lines must be greater than zero.";
+      string msg = "Unable to set chip size to [" + IString(samples);
+      msg += ", " + IString(lines) + "].  Samples and lines must be greater than zero.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     p_chipSamples = samples;
@@ -710,8 +710,8 @@ namespace Isis {
    */
   void Chip::SetValidRange(const double minimum, const double maximum) {
     if(minimum >= maximum) {
-      string msg = "Unable to set valid chip range to [" + iString(minimum);
-      msg += ", " + iString(maximum) + "].  First parameter must be smaller than the second.";
+      string msg = "Unable to set valid chip range to [" + IString(minimum);
+      msg += ", " + IString(maximum) + "].  First parameter must be smaller than the second.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -777,9 +777,9 @@ namespace Isis {
    */
   Chip Chip::Extract(int samples, int lines, int samp, int line) {
     if(samples > Samples() || lines > Lines()) {
-      string msg = "Cannot extract sub-chip of size [" + iString(samples);
-      msg += ", " + iString(lines) + "] from chip of size [" + iString(Samples());
-      msg += ", " + iString(Lines()) + "]";
+      string msg = "Cannot extract sub-chip of size [" + IString(samples);
+      msg += ", " + IString(lines) + "] from chip of size [" + IString(Samples());
+      msg += ", " + IString(Lines()) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

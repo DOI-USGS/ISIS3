@@ -310,7 +310,7 @@ void IsisMain() {
       }
 
       // Add the measures to a control point
-      string str = "Row " + iString(r) + " Column " + iString(c);
+      string str = "Row " + IString(r) + " Column " + IString(c);
       ControlPoint * cp = new ControlPoint(str);
       cp->SetType(ControlPoint::Free);
       cp->Add(cmTrans);

@@ -365,7 +365,7 @@ void tableIn(const Isis::FileName &filename) {
 
 
   //read it
-  iString inString;
+  IString inString;
   while(in >> inString) {
     band.push_back(inString);
     in >> inString;

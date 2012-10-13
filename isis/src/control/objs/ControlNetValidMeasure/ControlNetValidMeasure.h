@@ -2,7 +2,7 @@
 #define _ControlNetValidMeasure_h_
 
 #include "CubeManager.h"
-#include "iString.h"
+#include "IString.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "Progress.h"
@@ -169,8 +169,8 @@ namespace Isis {
       };
 
       //! API to display location in the form "Sample,Line"
-      iString LocationString(double pdSample, double pdLine) const {
-        return iString((int)pdSample) + "," + iString((int)pdLine);
+      IString LocationString(double pdSample, double pdLine) const {
+        return IString((int)pdSample) + "," + IString((int)pdLine);
       };
 
       //! Test for a point to be user defined number of pixels from the edge

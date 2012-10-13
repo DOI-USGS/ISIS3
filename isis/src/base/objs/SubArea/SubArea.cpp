@@ -30,7 +30,7 @@
 #include "Projection.h"
 #include "ProjectionFactory.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace std;
 namespace Isis {

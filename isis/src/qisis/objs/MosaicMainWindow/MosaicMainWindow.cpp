@@ -105,7 +105,7 @@ namespace Isis {
         }
         else if (cubeListName.exactMatch(argument)) {
           TextFile fileList(argument.toStdString());
-          iString line;
+          IString line;
 
           while(fileList.GetLine(line)) {
             filesToOpen.append(line);
@@ -165,7 +165,7 @@ namespace Isis {
     // Create the file menu
     m_fileMenu = menuBar()->addMenu("&File");
 
-    iString iconDir = FileName("$base/icons").expanded();
+    IString iconDir = FileName("$base/icons").expanded();
 
     QAction *open = new QAction(this);
     open->setText("Open Cube...");
@@ -611,17 +611,17 @@ namespace Isis {
 
     if (selected != "") {
       m_lastOpenedFile = QFileInfo(selected);
-      TextFile fileList((iString) selected);
+      TextFile fileList((IString) selected);
 
       QStringList filesInList;
-      iString line;
+      IString line;
 
       while(fileList.GetLine(line)) {
         filesInList.append(line);
       }
 
       if (filesInList.empty()) {
-        iString msg = "No files were found inside the file list";
+        IString msg = "No files were found inside the file list";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 

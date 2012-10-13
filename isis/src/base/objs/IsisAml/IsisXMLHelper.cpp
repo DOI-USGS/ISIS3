@@ -33,7 +33,7 @@ using namespace std;
 #include "IsisXMLHelper.h"
 #include "IsisXMLChTrans.h"
 
-#include "iString.h"
+#include "IString.h"
 
 namespace XERCES = XERCES_CPP_NAMESPACE;
 

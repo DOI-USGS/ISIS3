@@ -256,8 +256,8 @@ namespace Isis {
     }
 
 
-    iString msg = "Bin at index [" + iString(index) + "] not found. "
-                  "There are [" + iString(numberOfBins()) + "] bins";
+    IString msg = "Bin at index [" + IString(index) + "] not found. "
+                  "There are [" + IString(numberOfBins()) + "] bins";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -450,8 +450,8 @@ namespace Isis {
     int xIndex = binIndex;
 
     if (xIndex < 0 || yIndex < 0 || xIndex >= xSize || yIndex >= ySize) {
-      iString msg = "Bin at index [" + iString(binIndex) + "] not found. "
-                    "There are [" + iString(numberOfBins()) + "] bins";
+      IString msg = "Bin at index [" + IString(binIndex) + "] not found. "
+                    "There are [" + IString(numberOfBins()) + "] bins";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

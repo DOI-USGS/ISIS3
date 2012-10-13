@@ -24,7 +24,7 @@
 #include <QMapIterator>
 #include <QListIterator>
 
-#include "iString.h"
+#include "IString.h"
 
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
@@ -162,7 +162,7 @@ void SparseBlockColumnMatrix::print(std::ostream& outstream) {
          outstream << it.key() << std::endl << *(it.value()) << std::endl
                    << std::endl;
        else
-         outstream << "NULL block pointer at row[" << iString(it.key())
+         outstream << "NULL block pointer at row[" << IString(it.key())
                    << "]!" << std::endl;
    }
 }
@@ -303,7 +303,7 @@ void SparseBlockRowMatrix::print(std::ostream& outstream) {
        outstream << it.key() << std::endl << *(it.value()) << std::endl
                  << std::endl;
      else
-       outstream << "NULL block pointer at column[" << iString(it.key())
+       outstream << "NULL block pointer at column[" << IString(it.key())
                  << "]!" << std::endl;
    }
 }
@@ -523,7 +523,7 @@ void SparseBlockMatrix::print(std::ostream& outstream) {
     if ( column )
       column->print(outstream);
     else
-      outstream << "NULL column pointer at column[" << iString(i)
+      outstream << "NULL column pointer at column[" << IString(i)
                 << "]!" << std::endl;
   }
 }

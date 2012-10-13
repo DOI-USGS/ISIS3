@@ -16,7 +16,7 @@ namespace Isis {
    * @param pipe The pipeline
    * @history 2010-12-20 Sharmila Prasad Initialise & enable the branches
    */
-  PipelineApplication::PipelineApplication(iString appName, Pipeline *pipe) {
+  PipelineApplication::PipelineApplication(IString appName, Pipeline *pipe) {
     p_name = appName;
     p_enabled = true;
     p_previous = NULL;
@@ -46,7 +46,7 @@ namespace Isis {
    * @param previous The previously last pipeline application
    * @history 2010-12-20 Sharmila Prasad Initialise & enable the branches
    */
-  PipelineApplication::PipelineApplication(iString appName, PipelineApplication *previous) {
+  PipelineApplication::PipelineApplication(IString appName, PipelineApplication *previous) {
     p_name = appName;
     p_enabled = true;
     p_previous = previous;
@@ -70,7 +70,7 @@ namespace Isis {
    * @param inputParamName Name of the input parameter, typically "FROM"
    * @param supportsVirtualBands True if this application supports virtual bands
    */
-  void PipelineApplication::SetInputParameter(const iString &inputParamName, bool supportsVirtualBands) {
+  void PipelineApplication::SetInputParameter(const IString &inputParamName, bool supportsVirtualBands) {
     p_input.clear();
     p_input.push_back(PipelineParameter(inputParamName));
     p_supportsVirtualBands = supportsVirtualBands;
@@ -87,7 +87,7 @@ namespace Isis {
    *              SetInputParameter instead of specifying LastOutput
    * @param supportsVirtualBands True if this application supports virtual bands
    */
-  void PipelineApplication::SetInputParameter(const iString &inputParamName, CustomParameterValue value, bool supportsVirtualBands) {
+  void PipelineApplication::SetInputParameter(const IString &inputParamName, CustomParameterValue value, bool supportsVirtualBands) {
     if(value == LastAppOutputList) {
       // Merge
       p_outBranches.clear();
@@ -113,8 +113,8 @@ namespace Isis {
    * @param outNameModifier Modifier to add to the cube name, such as "lev1"
    * @param outFileExtension Extension of the output file (usually "cub" for cube)
    */
-  void PipelineApplication::SetOutputParameter(const iString &branch, const iString &outputParamName,
-      const iString &outNameModifier, const iString &outFileExtension) {
+  void PipelineApplication::SetOutputParameter(const IString &branch, const IString &outputParamName,
+      const IString &outNameModifier, const IString &outFileExtension) {
     p_output.push_back(PipelineParameter(FindBranch(branch, false), outputParamName));
     p_outputMod = outNameModifier;
     p_outputExtension = outFileExtension;
@@ -128,7 +128,7 @@ namespace Isis {
    * @param outNameModifier Modifier to add to the cube name, such as "lev1"
    * @param outFileExtension Extension of the output file (usually "cub" for cube)
    */
-  void PipelineApplication::SetOutputParameter(const iString &outputParamName, const iString &outNameModifier, const iString &outFileExtension) {
+  void PipelineApplication::SetOutputParameter(const IString &outputParamName, const IString &outNameModifier, const IString &outFileExtension) {
     p_output.clear();
     p_output.push_back(PipelineParameter(outputParamName));
     p_outputMod = outNameModifier;
@@ -154,7 +154,7 @@ namespace Isis {
    * @param type Modifier type; currently only supports constant strings
    * @history 2010-12-20 Sharmila Prasad Enable the branch at the time of creation
    */
-  void PipelineApplication::AddBranch(const iString &modString, NameModifierType type) {
+  void PipelineApplication::AddBranch(const IString &modString, NameModifierType type) {
     if(modString == "") {
       string msg = "Can not add empty branch to pipeline";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -201,7 +201,7 @@ namespace Isis {
    * @param inputParamName Parameter in the proc program
    * @param appParamName Parameter in this application
    */
-  void PipelineApplication::AddParameter(const iString &inputParamName, const iString &appParamName) {
+  void PipelineApplication::AddParameter(const IString &inputParamName, const IString &appParamName) {
     UserInterface &ui = Application::GetUserInterface();
 
     if(ui.WasEntered(inputParamName)) {
@@ -219,7 +219,7 @@ namespace Isis {
    * @param inputParamName Parameter in the proc program
    * @param appParamName Parameter in the this application
    */
-  void PipelineApplication::AddParameter(const iString &branch, const iString &inputParamName, const iString &appParamName) {
+  void PipelineApplication::AddParameter(const IString &branch, const IString &inputParamName, const IString &appParamName) {
     UserInterface &ui = Application::GetUserInterface();
 
     if(ui.WasEntered(inputParamName)) {
@@ -235,7 +235,7 @@ namespace Isis {
    * @param appParamName Name of the parameter
    * @param appParamValue Value of the parameter
    */
-  void PipelineApplication::AddConstParameter(const iString &appParamName, const iString &appParamValue) {
+  void PipelineApplication::AddConstParameter(const IString &appParamName, const IString &appParamValue) {
     bool added = false;
 
     for(unsigned int i = 0; !added && i < p_params.size(); i++) {
@@ -261,7 +261,7 @@ namespace Isis {
    * @param appParamName Name of the parameter
    * @param appParamValue Value of the parameter
    */
-  void PipelineApplication::AddConstParameter(const iString &branch, const iString &appParamName, const iString &appParamValue) {
+  void PipelineApplication::AddConstParameter(const IString &branch, const IString &appParamName, const IString &appParamValue) {
     p_params.push_back(PipelineParameter(FindBranch(branch, false), appParamName, appParamValue));
   }
 
@@ -273,7 +273,7 @@ namespace Isis {
    * @param appParamName Parameter name
    * @param value Value type
    */
-  void PipelineApplication::AddParameter(const iString &appParamName, CustomParameterValue value) {
+  void PipelineApplication::AddParameter(const IString &appParamName, CustomParameterValue value) {
     p_params.push_back(PipelineParameter(appParamName, value));
   }
 
@@ -286,7 +286,7 @@ namespace Isis {
    * @param appParamName Parameter name
    * @param value Value type
    */
-  void PipelineApplication::AddParameter(const iString &branch, const iString &appParamName, CustomParameterValue value) {
+  void PipelineApplication::AddParameter(const IString &branch, const IString &appParamName, CustomParameterValue value) {
     p_params.push_back(PipelineParameter(FindBranch(branch, false), appParamName, value));
   }
 
@@ -309,7 +309,7 @@ namespace Isis {
     // These are used if the pipeline needs a list file; must be out here in case multiple branches use
     //   the list file.
     bool needList = false;
-    iString listFile;
+    IString listFile;
 
     bool runOnce = Merges() && !Branches();
 
@@ -343,16 +343,16 @@ namespace Isis {
       }
 
       if(!BranchEnabled(branch)) {
-        iString tmpBranch(branch);
+        IString tmpBranch(branch);
         p_outputs.push_back(p_name + "." +tmpBranch + ".blank");
         continue;
       }
 
 
       // Figure out the input file; could throw an exception if the user didnt set it
-      iString inputFile = CalculateInputFile(branch);
+      IString inputFile = CalculateInputFile(branch);
       // Figure out the output file; This adds the output to the output list*
-      iString outputFile = CalculateOutputFile(branch);
+      IString outputFile = CalculateOutputFile(branch);
       // This parameter gives us more detail about the input parameter
       PipelineParameter &inputParam = GetInputParameter(branch);
 
@@ -370,7 +370,7 @@ namespace Isis {
         // If we need a list file, create a parameter that starts with ">>LIST" to say it's a list file.
         //   The first element is the list file, the rest is the contents of the list file.
         if(needList) {
-          iString listName = outputFile;
+          IString listName = outputFile;
 
           if(listName.empty()) {
             // This might have to become more robust in the future, we
@@ -379,7 +379,7 @@ namespace Isis {
             listName = Name();
           }
 
-          iString input = p_pipeline->TemporaryFolder() + "/" + FileName(listName).baseName() + ".lis";
+          IString input = p_pipeline->TemporaryFolder() + "/" + FileName(listName).baseName() + ".lis";
           params = ">>LIST " + input + " ";
 
           PipelineApplication * prev = Previous();
@@ -440,7 +440,7 @@ namespace Isis {
                 params += " " + p_output[outParam].Name() + "=\"" + p_outputs[outBranch] + "\"";
 
                 if(outputSet) {
-                  iString message = "Application [" + Name() + "] in the pipeline branches with an ";
+                  IString message = "Application [" + Name() + "] in the pipeline branches with an ";
                   message += "output parameter for each branch, but branch [" + p_outBranches[outBranch];
                   message += "] has multiple output files specified.";
                   throw IException(IException::Programmer, message, _FILEINFO_);
@@ -451,7 +451,7 @@ namespace Isis {
             }
 
             if(!outputSet) {
-              iString message = "Application [" + Name() + "] in the pipeline branches with an ";
+              IString message = "Application [" + Name() + "] in the pipeline branches with an ";
               message += "output parameter for each branch, but branch [" + p_outBranches[outBranch];
               message += "] has no output files specified.";
               throw IException(IException::Programmer, message, _FILEINFO_);
@@ -489,7 +489,7 @@ namespace Isis {
       }
 
       if(inputFile.empty()) {
-        iString message = "There was a problem with calculating the inputs for program [" + Name();
+        IString message = "There was a problem with calculating the inputs for program [" + Name();
         message += "]. Please verify your program is not setting outputs for branches that ";
         message += "don't have input.";
         throw IException(IException::Programmer, message, _FILEINFO_);
@@ -506,12 +506,12 @@ namespace Isis {
    *
    * @param branch Branch this input file affects
    *
-   * @return iString Input filename
+   * @return IString Input filename
    * @history 2010-12-20 Sharmila Prasad Get the right input for this branch if previous
    *          branch is disabled.
    */
-  iString PipelineApplication::CalculateInputFile(int branch) {
-    iString file = "";
+  IString PipelineApplication::CalculateInputFile(int branch) {
+    IString file = "";
 
     PipelineApplication *prev = Previous();
 
@@ -529,7 +529,7 @@ namespace Isis {
              }
           }
           /*   else {
-               vector<iString> inputs = prev->GetInputs();
+               vector<IString> inputs = prev->GetInputs();
                if((int)inputs.size() > branch) {
                  file = inputs[branch];
                }
@@ -579,11 +579,11 @@ namespace Isis {
    *
    * @param branch Branch this output file is for
    *
-   * @return iString The output file
+   * @return IString The output file
    */
-  iString PipelineApplication::CalculateOutputFile(int branch) {
-    iString outputFile;
-    iString outFolder = p_pipeline->TemporaryFolder();
+  IString PipelineApplication::CalculateOutputFile(int branch) {
+    IString outputFile;
+    IString outFolder = p_pipeline->TemporaryFolder();
 
     // We need to know this to know if we actually need to add modifiers to the
     //   output name
@@ -616,7 +616,7 @@ namespace Isis {
     if(!usedBranch) return "";
 
     if(!LastApplicationWithOutput()) {
-      iString lastOutput = p_pipeline->FinalOutput(branch, false);
+      IString lastOutput = p_pipeline->FinalOutput(branch, false);
       outputFile = outFolder + "/" +
                    FileName(lastOutput).baseName() + "." + p_outputMod + "." + p_outputExtension;
 
@@ -633,7 +633,7 @@ namespace Isis {
     if(!LastApplicationWithOutput() && numUsedBranches != 1 && !p_outputMod.empty()) {
       FileName outfile(outputFile);
 
-      iString realOut(outFolder + "/" + outfile.baseName() + "." + p_outBranches[branch] + "." + p_outputExtension);
+      IString realOut(outFolder + "/" + outfile.baseName() + "." + p_outBranches[branch] + "." + p_outputExtension);
 
       if(usedBranch) {
 
@@ -750,7 +750,7 @@ namespace Isis {
    *
    * @return int Branch index
    */
-  int PipelineApplication::FindBranch(iString name, bool input) {
+  int PipelineApplication::FindBranch(IString name, bool input) {
     int branchIndex = 0;
     bool found = false;
 
@@ -788,10 +788,10 @@ namespace Isis {
    * This method returns a list of the temporary files generated by this program
    *
    *
-   * @return vector<iString> The temporary files
+   * @return vector<IString> The temporary files
    */
-  vector<iString> PipelineApplication::TemporaryFiles() {
-    vector<iString> tmp;
+  vector<IString> PipelineApplication::TemporaryFiles() {
+    vector<IString> tmp;
 
     if(!LastApplicationWithOutput()) {
       for(int i = 0; i < (int)p_outputs.size(); i++) {
@@ -814,9 +814,9 @@ namespace Isis {
    * @param skipOne Skip the very last output; this is used to skip the output of
    *                the current run
    *
-   * @return iString The last output file
+   * @return IString The last output file
    */
-  iString PipelineApplication::GetRealLastOutput(bool skipOne) {
+  IString PipelineApplication::GetRealLastOutput(bool skipOne) {
     if(!skipOne) {
       return GetOutputs()[GetOutputs().size()-1];
     }
@@ -847,12 +847,12 @@ namespace Isis {
    * @param bands The virtual bands string, excluding the "+". For example,
    *              "2,4-5,8"
    */
-  void PipelineApplication::SetVirtualBands(vector<iString> bands) {
+  void PipelineApplication::SetVirtualBands(vector<IString> bands) {
     p_virtualBands = bands;
   }
 
   //! This returns this application's output files. Only valid after BuildParamString is called.
-  vector<iString> &PipelineApplication::GetOutputs() {
+  vector<IString> &PipelineApplication::GetOutputs() {
     if(Enabled() && p_outputs.size() != 0) {
       return p_outputs;
     }

@@ -106,7 +106,7 @@ namespace Isis {
     }
 
     if(!success) {
-      iString msg = "Reading from the file [" + dataFile->fileName() + "] "
+      IString msg = "Reading from the file [" + dataFile->fileName() + "] "
           "failed with reading [" +
           QString::number(chunkToFill.getByteCount()) +
           "] bytes at position [" + QString::number(startByte) + "]";
@@ -129,7 +129,7 @@ namespace Isis {
     }
 
     if(!success) {
-      iString msg = "Writing to the file [" + dataFile->fileName() + "] "
+      IString msg = "Writing to the file [" + dataFile->fileName() + "] "
           "failed with writing [" +
           QString::number(chunkToWrite.getByteCount()) +
           "] bytes at position [" + QString::number(startByte) + "]";

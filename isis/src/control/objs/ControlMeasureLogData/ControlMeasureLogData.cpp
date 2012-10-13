@@ -51,7 +51,7 @@ namespace Isis {
   ControlMeasureLogData::ControlMeasureLogData(PvlKeyword keywordRep) {
     Init();
 
-    iString name = keywordRep.Name();
+    IString name = keywordRep.Name();
     p_dataType = NameToDataType(name);
     if (p_dataType != InvalidNumericLogDataType)
       p_numericalValue = keywordRep[0];
@@ -203,7 +203,7 @@ namespace Isis {
   ControlPointFileEntryV0002_Measure_MeasureLogData
       ControlMeasureLogData::ToProtocolBuffer() const {
     if(!IsValid()) {
-      iString msg = "Cannot write an invalid log data entry to binary format";
+      IString msg = "Cannot write an invalid log data entry to binary format";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -223,11 +223,11 @@ namespace Isis {
    * @param name The string to convert to data type
    * @return The data type converted from a string
    */
-  ControlMeasureLogData::NumericLogDataType ControlMeasureLogData::NameToDataType(iString name) const {
+  ControlMeasureLogData::NumericLogDataType ControlMeasureLogData::NameToDataType(IString name) const {
     for (int i = InvalidNumericLogDataType + 1;
          i < MaximumNumericLogDataType; i++) {
       try {
-        iString thisTypeName = DataTypeToName((NumericLogDataType) i);
+        IString thisTypeName = DataTypeToName((NumericLogDataType) i);
 
         if (name == thisTypeName) {
           return (NumericLogDataType) i;
@@ -248,10 +248,10 @@ namespace Isis {
    *
    * @param type The data type to convert to a string
    */
-  iString ControlMeasureLogData::DataTypeToName(NumericLogDataType type) const {
+  IString ControlMeasureLogData::DataTypeToName(NumericLogDataType type) const {
     switch(type) {
       case InvalidNumericLogDataType: {
-          iString msg = "Cannot convert an invalid data type to a string";
+          IString msg = "Cannot convert an invalid data type to a string";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
@@ -280,7 +280,7 @@ namespace Isis {
         return "Obsolete_AverageResidual";
     }
 
-    iString msg = "Unknown data type [" + iString(type) + "]";
+    IString msg = "Unknown data type [" + IString(type) + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 }

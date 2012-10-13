@@ -66,8 +66,8 @@ void IsisMain() {
   string lowParams = "";
   lowParams += "from= " + ui.GetFileName("FROM");
   lowParams += " to= dstripe.temporary.cub ";
-  lowParams += " samples= " + iString(lowSamples);
-  lowParams += " lines= " + iString(lowLines);
+  lowParams += " samples= " + IString(lowSamples);
+  lowParams += " lines= " + IString(lowLines);
 
   ProgramLauncher::RunIsisProgram("lowpass", lowParams);
 
@@ -76,8 +76,8 @@ void IsisMain() {
     string lowParams = "";
     lowParams += "from= " + ui.GetFileName("FROM");
     lowParams += " to= " + ui.GetFileName("LPFNOISE");
-    lowParams += " samples= " + iString(lowSamples);
-    lowParams += " lines= " + iString(lowLines);
+    lowParams += " samples= " + IString(lowSamples);
+    lowParams += " lines= " + IString(lowLines);
     ProgramLauncher::RunIsisProgram("lowpass", lowParams);
   }
 
@@ -85,8 +85,8 @@ void IsisMain() {
   string highParams = "";
   highParams += "from= dstripe.temporary.cub ";
   highParams += " to= " + ui.GetFileName("NOISE") + " ";
-  highParams += " samples= " + iString(highSamples);
-  highParams += " lines= " + iString(highLines);
+  highParams += " samples= " + IString(highSamples);
+  highParams += " lines= " + IString(highLines);
 
   ProgramLauncher::RunIsisProgram("highpass", highParams);
   remove("dstripe.temporary.cub");

@@ -60,7 +60,7 @@ namespace Isis {
     double HapkeExponential::photometry ( double i, double e, double g, int band ) const {
         // Test for valid band
         if ((band <= 0) || (band > (int) _bandpho.size())) {
-            std::string mess = "Provided band " + iString(band) + " out of range.";
+            std::string mess = "Provided band " + IString(band) + " out of range.";
             throw IException(IException::Programmer, mess, _FILEINFO_);
         }
         double ph = photometry(_bandpho[band - 1], i, e, g);
@@ -146,9 +146,9 @@ namespace Isis {
         std::vector<PvlKeyword> aTermKeywords;
         std::vector<PvlKeyword> bTermKeywords;
         for (unsigned int i = 0; i < _bandpho[0].aTerms.size(); i++)
-            aTermKeywords.push_back(PvlKeyword("A" + iString((int) i+1)));
+            aTermKeywords.push_back(PvlKeyword("A" + IString((int) i+1)));
         for (unsigned int i = 0; i < _bandpho[0].bTerms.size(); i++)
-            bTermKeywords.push_back(PvlKeyword("B" + iString((int) i+1)));
+            bTermKeywords.push_back(PvlKeyword("B" + IString((int) i+1)));
 
         for (unsigned int i = 0; i < _bandpho.size(); i++) {
             Parameters &p = _bandpho[i];
@@ -232,16 +232,16 @@ namespace Isis {
         Parameters pars;
 
         for (int i=1; i<=4; i++)
-            pars.aTerms.push_back(ConfKey(p, "A" + iString(i), 0.0));
+            pars.aTerms.push_back(ConfKey(p, "A" + IString(i), 0.0));
 
         for (int i=1; i<=2; i++)
-            pars.bTerms.push_back(ConfKey(p, "B" + iString(i), 0.0));
+            pars.bTerms.push_back(ConfKey(p, "B" + IString(i), 0.0));
 
         pars.wavelength = ConfKey(p, "BandBinCenter", Null);
         pars.tolerance = ConfKey(p, "BandBinCenterTolerance", Null);
         //  Determine equation units - defaults to Radians
-        pars.units = ConfKey(p, "HapkeExponentialUnits", iString("Radians"));
-        pars.phaUnit = (iString::Equal(pars.units, "Degrees")) ? 1.0 : rpd_c();
+        pars.units = ConfKey(p, "HapkeExponentialUnits", IString("Radians"));
+        pars.phaUnit = (IString::Equal(pars.units, "Degrees")) ? 1.0 : rpd_c();
         return (pars);
     }
 
@@ -274,7 +274,7 @@ namespace Isis {
         DbProfile phoProf = DbProfile(phoObj);
         PvlObject::PvlGroupIterator algo = phoObj.BeginGroup();
         while (algo != phoObj.EndGroup()) {
-            if (iString::Equal(algo->Name(), "Algorithm")) {
+            if (IString::Equal(algo->Name(), "Algorithm")) {
                 _profiles.push_back(DbProfile(phoProf, DbProfile(*algo)));
             }
             ++algo;

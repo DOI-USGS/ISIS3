@@ -30,7 +30,7 @@
 #include "FileName.h"
 #include "Message.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Preference.h"
 #include "Application.h"
 #include "History.h"
@@ -557,7 +557,7 @@ namespace Isis {
    * This method allows the programmer to propagate labels from a specific
    * secondary cube.
    *
-   * @param cube iString containing the name of the cube containing the labels
+   * @param cube IString containing the name of the cube containing the labels
    *             to propagate.
    */
   void Process::PropagateLabels(const std::string &cube) {
@@ -730,8 +730,8 @@ namespace Isis {
       int bandStop = cube->getBandCount();
       int maxSteps = cube->getLineCount() * cube->getBandCount();
 
-      iString cubeNumStr((int)cubeNum + 1);
-      iString totalCubes((int)InputCubes.size());
+      IString cubeNumStr((int)cubeNum + 1);
+      IString totalCubes((int)InputCubes.size());
       string msg = "Calculating statistics for cube " + cubeNumStr + " of " + totalCubes;
 
       Isis::Progress progress;

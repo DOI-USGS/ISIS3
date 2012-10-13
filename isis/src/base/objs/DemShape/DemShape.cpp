@@ -42,7 +42,7 @@ namespace Isis {
 
     PvlGroup &kernels = pvl.FindGroup("Kernels", Pvl::Traverse);
 
-    iString demCubeFile;
+    IString demCubeFile;
     if (kernels.HasKeyword("ElevationModel")) {
       demCubeFile = (std::string) kernels["ElevationModel"];
     }

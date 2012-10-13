@@ -22,7 +22,7 @@ using namespace std;
 using namespace Isis;
 
 bool filesMatch;
-iString differenceReason;
+IString differenceReason;
 PvlGroup tolerances;
 PvlGroup ignorekeys;
 
@@ -127,14 +127,14 @@ void Compare(LatestControlNetFile *net1, LatestControlNetFile *net2) {
 
   if(net1NumPts != net2NumPts) {
     differenceReason = "The number of control points in the networks, [" +
-                       iString(net1NumPts) + "] and [" +
-                       iString(net2NumPts) + ", differ";
+                       IString(net1NumPts) + "] and [" +
+                       IString(net2NumPts) + ", differ";
     filesMatch = false;
     return;
   }
 
-  iString id1 = net1Obj["NetworkId"][0];
-  iString id2 = net2Obj["NetworkId"][0];
+  IString id1 = net1Obj["NetworkId"][0];
+  IString id2 = net2Obj["NetworkId"][0];
 
   if(id1 != id2) {
     differenceReason = "The network IDs [" +
@@ -144,8 +144,8 @@ void Compare(LatestControlNetFile *net1, LatestControlNetFile *net2) {
     return;
   }
 
-  iString target1 = net1Obj["TargetName"][0];
-  iString target2 = net2Obj["TargetName"][0];
+  IString target1 = net1Obj["TargetName"][0];
+  IString target2 = net2Obj["TargetName"][0];
 
   if(target1 != target2) {
     differenceReason = "The targets [" +
@@ -175,7 +175,7 @@ void Compare(LatestControlNetFile *net1, LatestControlNetFile *net2) {
 void Compare(const PvlObject &point1Pvl, const PvlObject &point2Pvl) {
   // both names must be at least equal, should be named ControlPoint
   if(point1Pvl.Name() != point2Pvl.Name()) {
-    iString msg = "The control points' CreatePvlOject method returned an "
+    IString msg = "The control points' CreatePvlOject method returned an "
                   "unexpected result";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
@@ -183,8 +183,8 @@ void Compare(const PvlObject &point1Pvl, const PvlObject &point2Pvl) {
   if(point1Pvl.Groups() != point2Pvl.Groups()) {
     filesMatch = false;
     differenceReason = "The number of control measures, [" +
-                       iString(point1Pvl.Groups()) + "] and [" +
-                       iString(point2Pvl.Groups()) + "] does not match";
+                       IString(point1Pvl.Groups()) + "] and [" +
+                       IString(point2Pvl.Groups()) + "] does not match";
   }
 
   // Start by comparing top level control point keywords.
@@ -247,7 +247,7 @@ void CompareGroups(const PvlContainer &pvl1, const PvlContainer &pvl2) {
 
 void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
   if(pvl1.Name().compare(pvl2.Name()) != 0) {
-    iString msg = "CompareKeywords should always be called with keywords that "
+    IString msg = "CompareKeywords should always be called with keywords that "
                   "have the same name";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
@@ -275,10 +275,10 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
   }
 
   for(int i = 0; i < pvl1.Size() && filesMatch; i++) {
-    iString val1 = pvl1[i];
-    iString val2 = pvl2[i];
-    iString unit1 = pvl1.Unit(i);
-    iString unit2 = pvl2.Unit(i);
+    IString val1 = pvl1[i];
+    IString val2 = pvl2[i];
+    IString unit1 = pvl1.Unit(i);
+    IString unit2 = pvl2.Unit(i);
 
     int ignoreIndex = 0;
     if(ignorekeys.HasKeyword(pvl1.Name()) && ignorekeys[pvl1.Name()].Size() > 1) {
@@ -307,14 +307,14 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
           filesMatch = false;
           if(pvl1.Size() == 1) {
             differenceReason = "Value [" + pvl1.Name() + "] difference is " +
-                               iString(difference);
+                               IString(difference);
           }
           else {
             differenceReason = "Value [" + pvl1.Name() + "] at index " +
-                               iString(i) + ": difference is " + iString(difference);
+                               IString(i) + ": difference is " + IString(difference);
           }
-          differenceReason += " (values are [" + iString(val1) + "] and [" +
-                              iString(val2) + "], tolerance is [" + iString(tolerance) + "])";
+          differenceReason += " (values are [" + IString(val1) + "] and [" +
+                              IString(val2) + "], tolerance is [" + IString(tolerance) + "])";
         }
       }
     }

@@ -420,7 +420,7 @@ namespace Isis {
    double ProcessExport::GetInputMinimum(unsigned int n) const {
      if (n >= p_inputMinimum.size())
        throw IException(IException::Programmer,
-           "There is no input minimum for channel " + iString((int) n),
+           "There is no input minimum for channel " + IString((int) n),
            _FILEINFO_);
 
      return p_inputMinimum[n];
@@ -431,7 +431,7 @@ namespace Isis {
    double ProcessExport::GetInputMaximum(unsigned int n) const {
      if (n >= p_inputMaximum.size())
        throw IException(IException::Programmer,
-           "There is no input maximum for channel " + iString((int) n),
+           "There is no input maximum for channel " + IString((int) n),
            _FILEINFO_);
 
      return p_inputMaximum[n];

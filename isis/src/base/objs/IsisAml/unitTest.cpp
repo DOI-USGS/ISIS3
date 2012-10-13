@@ -5,7 +5,7 @@
 
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Pvl.h"
 #include "Preference.h"
 #include "TextFile.h"
@@ -14,7 +14,7 @@
 using namespace std;
 
 
-void ReportError(Isis::iString err);
+void ReportError(Isis::IString err);
 
 class Inheritor : public IsisAml {
   public:
@@ -476,7 +476,7 @@ int main(void) {
       string s = aml->GetCube("CUBE1");
     }
     catch(Isis::IException &error) {
-      ReportError(Isis::iString(error.Errors()));
+      ReportError(Isis::IString(error.Errors()));
       error.Clear();
     }
 
@@ -485,7 +485,7 @@ int main(void) {
       string s = aml->GetCube("G2P4");
     }
     catch(Isis::IException &error) {
-      ReportError(Isis::iString(error.Errors()));
+      ReportError(Isis::IString(error.Errors()));
       error.Clear();
     }
 #endif
@@ -766,9 +766,9 @@ int main(void) {
  * @internal
  *   @history 2010-07-26 Jeannie Walldren - Original version.
  */
-void ReportError(Isis::iString err) {
-  Isis::iString report = ""; // report will be modified error message
-  Isis::iString errorLine = ""; // read message one line at a time
+void ReportError(Isis::IString err) {
+  Isis::IString report = ""; // report will be modified error message
+  Isis::IString errorLine = ""; // read message one line at a time
   Isis::FileName expandedfile;
   while(err != "") {
     // pull off first line

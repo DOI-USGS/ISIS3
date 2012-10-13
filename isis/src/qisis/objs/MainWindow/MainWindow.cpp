@@ -1,7 +1,7 @@
 #include "MainWindow.h"
 
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 namespace Isis {
   /**

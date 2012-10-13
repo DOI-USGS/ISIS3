@@ -26,7 +26,7 @@
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "NaifStatus.h"
 #include "Pvl.h"
@@ -59,13 +59,13 @@ namespace Isis {
     */
     if(imageDate < removeCoverDate) {
       int code = naifIkCode();
-      string key = "INS" + iString(code) + "_FOCAL_LENGTH_COVER";
+      string key = "INS" + IString(code) + "_FOCAL_LENGTH_COVER";
       SetFocalLength(Spice::getDouble(key));
-      k1 = Spice::getDouble("INS" + (iString)(int)naifIkCode() + "_K1_COVER");
+      k1 = Spice::getDouble("INS" + (IString)(int)naifIkCode() + "_K1_COVER");
     }
     else {
       SetFocalLength();
-      k1 = Spice::getDouble("INS" + (iString)(int)naifIkCode() + "_K1");
+      k1 = Spice::getDouble("INS" + (IString)(int)naifIkCode() + "_K1");
     }
 
     SetPixelPitch();
@@ -92,9 +92,9 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     focalMap->SetDetectorOrigin(
-      Spice::getDouble("INS" + (iString)(int)naifIkCode() + 
+      Spice::getDouble("INS" + (IString)(int)naifIkCode() + 
                        "_BORESIGHT_SAMPLE"),
-      Spice::getDouble("INS" + (iString)(int)naifIkCode() + 
+      Spice::getDouble("INS" + (IString)(int)naifIkCode() + 
                        "_BORESIGHT_LINE"));
 
     // Setup distortion map

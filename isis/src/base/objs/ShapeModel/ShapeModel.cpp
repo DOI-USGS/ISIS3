@@ -8,7 +8,7 @@
 #include "ShapeModel.h"
 #include "SurfacePoint.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "NaifStatus.h"
 #include "Spice.h"
 #include "Target.h"
@@ -84,7 +84,7 @@ namespace Isis {
 
    // if ( !m_hasIntersection ) {
     if (!surfaceIntersection()->Valid() || !m_hasIntersection) {
-     Isis::iString msg = "A valid intersection must be defined before computing the surface normal";
+     Isis::IString msg = "A valid intersection must be defined before computing the surface normal";
       throw IException(IException::Programmer, msg, _FILEINFO_);
    }
 

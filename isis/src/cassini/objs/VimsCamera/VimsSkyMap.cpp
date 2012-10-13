@@ -25,7 +25,7 @@
 #include "Camera.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "LeastSquares.h"
 #include "PolynomialBivariate.h"
@@ -71,7 +71,7 @@ namespace Isis {
     //  Vis or IR
     p_channel = (string) inst ["Channel"];
     // Get the start time in et
-    iString stime = (string) inst ["NativeStartTime"];
+    IString stime = (string) inst ["NativeStartTime"];
     string intTime = stime.Token(".");
 
     p_etStart = p_camera->getClockTime(intTime).Et();
@@ -87,7 +87,7 @@ namespace Isis {
       (double) inst ["InterlineDelayDuration"] / 1000.;
 
     // Get summation mode
-    string sampMode = iString((string)inst ["SamplingMode"]).UpCase();
+    string sampMode = IString((string)inst ["SamplingMode"]).UpCase();
 
     //  Get sample/line offsets
     int sampOffset = inst ["XOffset"];
@@ -102,12 +102,12 @@ namespace Isis {
     //  Read unit vectors.
     //-----------------------------------------------------------------------
     //int code = naifIkCode();
-    //string key = "INS" + iString(code) + "_UNIT_VECTORS";
+    //string key = "INS" + IString(code) + "_UNIT_VECTORS";
     //FileName vectorFile(Spice::getString(key,0));
     //tack on _HR or _NY for other summing modes.
     // Get the directory for the unit vector files.
     PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
-    iString vecDir = (string) dataDir["Cassini"] + "/unitVectors/";
+    IString vecDir = (string) dataDir["Cassini"] + "/unitVectors/";
 
     FileName vectorFile;
     if(p_channel == "VIS") {

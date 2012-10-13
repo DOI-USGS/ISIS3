@@ -31,7 +31,7 @@ namespace Isis {
   class ControlMeasure;
   class ControlNet;
   class Cube;
-  class iString;
+  class IString;
   class Stretch;
   class UniversalGroundMap;
 }
@@ -314,7 +314,7 @@ namespace Isis {
       void initDem(QString demFile);
       double demRadius(double latitude, double longitude);
       void clearGroundSource();
-      bool IsMeasureLocked(iString serialNumber);
+      bool IsMeasureLocked(IString serialNumber);
 
       void readSettings();
       void writeSettings() const;
@@ -408,7 +408,7 @@ namespace Isis {
 
       QString p_groundFile;
       Cube *p_groundCube;
-      iString p_groundSN;
+      IString p_groundSN;
       UniversalGroundMap *p_groundGmap;
       bool p_groundOpen;
       ControlPoint::SurfacePointSource::Source p_groundSurfacePointSource;
@@ -416,8 +416,8 @@ namespace Isis {
       //  TODO:  Combine the following p_groundSourceFile, p_radiusSourceFile
       //           with p_groundFile and p_demFile.  Is it just a matter of
       //           full path vs filename only?
-      iString p_groundSourceFile;
-      iString p_radiusSourceFile;
+      IString p_groundSourceFile;
+      IString p_radiusSourceFile;
       QString p_demFile;
       bool p_demOpen;
       Cube *p_demCube;

@@ -26,7 +26,7 @@
 
 #include <vector>
 #include "PvlKeyword.h"
-#include "iString.h"
+#include "IString.h"
 
 namespace Isis {
   /**
@@ -78,7 +78,7 @@ namespace Isis {
       PvlSequence &operator+=(std::vector<double> &array);
 
       //! Return the ith Array of the sequence
-      std::vector<iString> &operator[](int i) {
+      std::vector<IString> &operator[](int i) {
         return p_sequence[i];
       };
 
@@ -93,7 +93,7 @@ namespace Isis {
       };
 
     private:
-      std::vector<std::vector<iString> > p_sequence; /**<A vector of Strings
+      std::vector<std::vector<IString> > p_sequence; /**<A vector of Strings
                                                         that contains the values
                                                         for the keyword. */
 

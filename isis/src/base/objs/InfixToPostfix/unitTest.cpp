@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
   cout << "Test InfixToPostfix" << endl;
 
   const int NUM_EQUATIONS = 25;
-  iString equations[NUM_EQUATIONS] = {
+  IString equations[NUM_EQUATIONS] = {
     "-4",
     "1*2",
     "((1)+(1))",
@@ -49,9 +49,9 @@ int main(int argc, char *argv[]) {
     cout << endl << endl << equation + 1 << ": Convert '" << equations[equation] << "' to postfix" << endl;
 
     try {
-      iString tokenized = converter.tokenizeEquation(equations[equation]);
+      IString tokenized = converter.tokenizeEquation(equations[equation]);
       cout << "   Tokenized equation: '" << tokenized << "'" << endl;
-      iString postfix = converter.convert(equations[equation]);
+      IString postfix = converter.convert(equations[equation]);
       cout << "   Postfix: '" << postfix << "'" << endl;
     }
     catch(IException e) {

@@ -153,8 +153,8 @@ namespace Isis {
       bool accounting(PvlObject &obj, ProgramData &data) const;
       bool analyze(const ProgramData &data);
 
-      iString format(const std::string &s) const;
-      iString DblToStr(const double &value, const int precision = 2) const;
+      IString format(const std::string &s) const;
+      IString DblToStr(const double &value, const int precision = 2) const;
       PvlGroup toPvl(const RunTimeStats &stats, const std::string &name = "") const;
       int LimitTotals(const LogList &limit) const;
   };

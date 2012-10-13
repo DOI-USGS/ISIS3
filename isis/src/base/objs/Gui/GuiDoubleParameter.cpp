@@ -29,12 +29,12 @@ namespace Isis {
   GuiDoubleParameter::~GuiDoubleParameter() {}
 
 
-  void GuiDoubleParameter::Set(iString newValue) {
+  void GuiDoubleParameter::Set(IString newValue) {
     p_lineEdit->setText(newValue.c_str());
   }
 
 
-  iString GuiDoubleParameter::Value() {
+  IString GuiDoubleParameter::Value() {
     return p_lineEdit->text().toStdString();
   }
 

@@ -63,7 +63,7 @@ namespace Isis {
 //   void CubeAttributeInput::Set(const FileName &fileName) {
 //     Reset();
 //
-//     iString str(fileName.attributes());
+//     IString str(fileName.attributes());
 //
 //     // Get rid of any white space
 //     str.ConvertWhiteSpace();
@@ -72,20 +72,20 @@ namespace Isis {
 //     str.UpCase();
 //
 //     // Look at each comma delimited token
-//     iString commaTok;
+//     IString commaTok;
 //     while((commaTok = str.Token(",")).length() > 0) {
 //       // Is this token a range of bands
 //       if(commaTok.find('-') != string::npos) {
-//         iString dashTok;
+//         IString dashTok;
 //         int start = commaTok.Token("-").ToInteger();
 //         int end = commaTok.Token("-").ToInteger();
 //         int direction;
 //         direction = (start <= end) ? 1 : -1;
 //         // Save the entire range of bands
 //         for(int band = start; band != end; band += direction) {
-//           m_bands.push_back(Isis::iString(band));
+//           m_bands.push_back(Isis::IString(band));
 //         }
-//         m_bands.push_back(Isis::iString(end));
+//         m_bands.push_back(Isis::IString(end));
 //       }
 //       // This token is a single band specification
 //       else {
@@ -98,7 +98,7 @@ namespace Isis {
   vector<string> CubeAttributeInput::bands() const {
     vector<string> result;
 
-    iString str = toString();
+    IString str = toString();
 
     // Get rid of any white space
     str.ConvertWhiteSpace();
@@ -108,20 +108,20 @@ namespace Isis {
     str.TrimHead("+");
 
     // Look at each comma delimited token
-    iString commaTok;
+    IString commaTok;
     while((commaTok = str.Token(",")).length() > 0) {
       // Is this token a range of bands
       if(commaTok.find('-') != string::npos) {
-        iString dashTok;
+        IString dashTok;
         int start = commaTok.Token("-").ToInteger();
         int end = commaTok.Token("-").ToInteger();
         int direction;
         direction = (start <= end) ? 1 : -1;
         // Save the entire range of bands
         for(int band = start; band != end; band += direction) {
-          result.push_back(Isis::iString(band));
+          result.push_back(Isis::IString(band));
         }
-        result.push_back(Isis::iString(end));
+        result.push_back(Isis::IString(end));
       }
       // This token is a single band specification
       else {
@@ -133,7 +133,7 @@ namespace Isis {
   }
 
 
-  iString CubeAttributeInput::bandsString() const {
+  IString CubeAttributeInput::bandsString() const {
     return toString(bands());
   }
 
@@ -143,13 +143,13 @@ namespace Isis {
   }
 
 
-  bool CubeAttributeInput::isBandRange(iString attribute) const {
+  bool CubeAttributeInput::isBandRange(IString attribute) const {
     return QRegExp("[0-9,\\-]+").exactMatch(attribute);
   }
 
 
-  iString CubeAttributeInput::toString(const vector<string> &bands) {
-    iString result;
+  IString CubeAttributeInput::toString(const vector<string> &bands) {
+    IString result;
     for(unsigned int i = 0; i < bands.size(); i++) {
       if(i > 0)
         result += ",";
@@ -161,8 +161,8 @@ namespace Isis {
   }
 
 
-  QList<bool (CubeAttributeInput::*)(iString) const> CubeAttributeInput::testers() {
-    QList<bool (CubeAttributeInput::*)(iString) const> result;
+  QList<bool (CubeAttributeInput::*)(IString) const> CubeAttributeInput::testers() {
+    QList<bool (CubeAttributeInput::*)(IString) const> result;
 
     result.append(&CubeAttributeInput::isBandRange);
 
@@ -206,7 +206,7 @@ namespace Isis {
 //   void CubeAttributeOutput::Set(const FileName &fileName) {
 //     Reset();
 //
-//     Isis::iString str(fileName.attributes());
+//     Isis::IString str(fileName.attributes());
 //
 //     // Remove any white space
 //     str.ConvertWhiteSpace();
@@ -216,15 +216,15 @@ namespace Isis {
 //     str.TrimHead("+");
 //
 //     // Look at each "+" separate attribute
-//     Isis::iString tok;
+//     Isis::IString tok;
 //     while((tok = str.Token("+")).length() > 0) {
 //
 //       // If there is a ":" in this token then it is assumed to be a min:max
 //       if(tok.find(":") != string::npos) {
 //
 //         // Pull out the minimum
-//         Isis::iString colonTok = tok;
-//         Isis::iString min = colonTok.Token(":");
+//         Isis::IString colonTok = tok;
+//         Isis::IString min = colonTok.Token(":");
 //         if(min.length() > 0) {
 //           m_minimum = min.ToDouble();
 //         }
@@ -233,7 +233,7 @@ namespace Isis {
 //         }
 //
 //         // Pull out the maximum
-//         Isis::iString max = colonTok.Token(":");
+//         Isis::IString max = colonTok.Token(":");
 //         if(max.length() > 0) {
 //           m_maximum = max.ToDouble();
 //         }
@@ -304,7 +304,7 @@ namespace Isis {
   }
 
 
-  iString CubeAttributeOutput::fileFormatString() const {
+  IString CubeAttributeOutput::fileFormatString() const {
     return toString(fileFormat());
   }
 
@@ -323,7 +323,7 @@ namespace Isis {
 
       QStringList rangeList = range.split(":");
       if (rangeList.count() == 2 && rangeList.first() != "")
-        result = iString(rangeList.first()).ToDouble();
+        result = IString(rangeList.first()).ToDouble();
     }
 
     return result;
@@ -338,7 +338,7 @@ namespace Isis {
 
       QStringList rangeList = range.split(":");
       if (rangeList.count() == 2 && rangeList.last() != "")
-        result = iString(rangeList.last()).ToDouble();
+        result = IString(rangeList.last()).ToDouble();
     }
 
     return result;
@@ -347,15 +347,15 @@ namespace Isis {
 
   void CubeAttributeOutput::setMinimum(double min) {
     if (!IsSpecial(min)) {
-      iString newRange = iString(min) + ":";
+      IString newRange = IString(min) + ":";
 
       if (!IsSpecial(maximum()))
-        newRange += iString(maximum());
+        newRange += IString(maximum());
 
       setAttribute(newRange, &CubeAttributeOutput::isRange);
     }
     else if (!IsSpecial(maximum())) {
-      setAttribute(":" + iString(maximum()), &CubeAttributeOutput::isRange);
+      setAttribute(":" + IString(maximum()), &CubeAttributeOutput::isRange);
     }
     else {
       setAttribute("", &CubeAttributeOutput::isRange);
@@ -365,15 +365,15 @@ namespace Isis {
 
   void CubeAttributeOutput::setMaximum(double max) {
     if (!IsSpecial(max)) {
-      iString newRange = ":" + iString(max);
+      IString newRange = ":" + IString(max);
 
       if (!IsSpecial(minimum()))
-        newRange = iString(minimum()) + newRange;
+        newRange = IString(minimum()) + newRange;
 
       setAttribute(newRange, &CubeAttributeOutput::isRange);
     }
     else if (!IsSpecial(minimum())) {
-      setAttribute(iString(minimum()) + ":", &CubeAttributeOutput::isRange);
+      setAttribute(IString(minimum()) + ":", &CubeAttributeOutput::isRange);
     }
     else {
       setAttribute("", &CubeAttributeOutput::isRange);
@@ -429,34 +429,34 @@ namespace Isis {
   }
 
 
-  bool CubeAttributeOutput::isByteOrder(iString attribute) const {
+  bool CubeAttributeOutput::isByteOrder(IString attribute) const {
     return QRegExp("(M|L)SB").exactMatch(attribute);
   }
 
 
-  bool CubeAttributeOutput::isFileFormat(iString attribute) const {
+  bool CubeAttributeOutput::isFileFormat(IString attribute) const {
     return QRegExp("(BANDSEQUENTIAL|BSQ|TILE)").exactMatch(attribute);
   }
 
 
-  bool CubeAttributeOutput::isLabelAttachment(iString attribute) const {
+  bool CubeAttributeOutput::isLabelAttachment(IString attribute) const {
     return QRegExp("(ATTACHED|DETACHED|EXTERNAL)").exactMatch(attribute);
   }
 
 
-  bool CubeAttributeOutput::isPixelType(iString attribute) const {
+  bool CubeAttributeOutput::isPixelType(IString attribute) const {
     return QRegExp("(8-?BIT|16-?BIT|32-?BIT|UNSIGNEDBYTE|SIGNEDWORD|REAL)").exactMatch(attribute);
   }
 
 
 
-  bool CubeAttributeOutput::isRange(iString attribute) const {
+  bool CubeAttributeOutput::isRange(IString attribute) const {
     return QRegExp("[\\-+E0-9.]*:[\\-+E0-9.]*").exactMatch(attribute);
   }
 
 
-  iString CubeAttributeOutput::toString(Cube::Format format) {
-    iString result = "Tile";
+  IString CubeAttributeOutput::toString(Cube::Format format) {
+    IString result = "Tile";
 
     if (format == Cube::Bsq)
       result = "BandSequential";
@@ -479,7 +479,7 @@ namespace Isis {
   }
 
 
-  iString CubeAttributeOutput::byteOrderString() const {
+  IString CubeAttributeOutput::byteOrderString() const {
     return ByteOrderName(byteOrder());
   }
 
@@ -490,8 +490,8 @@ namespace Isis {
   }
 
 
-  QList<bool (CubeAttributeOutput::*)(iString) const> CubeAttributeOutput::testers() {
-   QList<bool (CubeAttributeOutput::*)(iString) const> result;
+  QList<bool (CubeAttributeOutput::*)(IString) const> CubeAttributeOutput::testers() {
+   QList<bool (CubeAttributeOutput::*)(IString) const> result;
 
     result.append(&CubeAttributeOutput::isByteOrder);
     result.append(&CubeAttributeOutput::isFileFormat);

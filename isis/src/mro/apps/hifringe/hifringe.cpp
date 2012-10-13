@@ -27,7 +27,7 @@ Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
 #include "Statistics.h"
 #include "LineManager.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace std;
 using namespace Isis;
@@ -149,7 +149,7 @@ void IsisMain() {
   // Write the results to the output file if the user specified one
   PvlObject leftSide("LeftSide"), rightSide("RightSide");
   for(int i = 0 ; i < numSections ; i++) {
-    iString sectionNumber = i + 1;
+    IString sectionNumber = i + 1;
     string sectionName = "Section" + sectionNumber;
     pvlOut(sections[i][0], //Stats to add to the left Object
            sections[i][1], //Stats to add to the right Object

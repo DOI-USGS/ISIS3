@@ -9,7 +9,7 @@
 #include "Cube.h"
 #include "FileList.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
 #include "PvlGroup.h"
@@ -104,7 +104,7 @@ void helperButtonLoadMap() {
   ui.Clear("PROT");
 
   if(t.HasKeyword("ProjectionName")) {
-    iString projIn = (string)t["ProjectionName"];
+    IString projIn = (string)t["ProjectionName"];
     projIn.UpCase();
     ui.Clear("PROJECTION");
     ui.PutAsString("PROJECTION", projIn);
@@ -169,12 +169,12 @@ void helperButtonLoadMap() {
     ui.Clear("TARGETNAME");
     ui.PutAsString("TARGETNAME", tNameIn);
 
-    iString LTIn = (string)t["LatitudeType"];
+    IString LTIn = (string)t["LatitudeType"];
     LTIn.UpCase();
     ui.Clear("LATTYPE");
     ui.PutAsString("LATTYPE", LTIn);
 
-    iString LDIn = (string)t["LongitudeDirection"];
+    IString LDIn = (string)t["LongitudeDirection"];
     LDIn.UpCase();
     ui.Clear("LONDIR");
     ui.PutAsString("LONDIR", LDIn);
@@ -268,13 +268,13 @@ void helperButtonLoadTargDef() {
     ui.PutAsString("TARGETNAME", tNameIn);
   }
   if(t.HasKeyword("LatitudeType")) {
-    iString LTIn = (string)t["LatitudeType"];
+    IString LTIn = (string)t["LatitudeType"];
     LTIn.UpCase();
     ui.Clear("LATTYPE");
     ui.PutAsString("LATTYPE", LTIn);
   }
   if(t.HasKeyword("LongitudeDirection")) {
-    iString LDIn = (string)t["LongitudeDirection"];
+    IString LDIn = (string)t["LongitudeDirection"];
     LDIn.UpCase();
     ui.Clear("LONDIR");
     ui.PutAsString("LONDIR", LDIn);
@@ -300,7 +300,7 @@ void helperButtonLoadTargDef() {
 //Helper function to show system radius in log.
 void helperButtonLogRadius() {
   UserInterface &ui = Application::GetUserInterface();
-  iString targetName = ui.GetString("TARGETNAME");
+  IString targetName = ui.GetString("TARGETNAME");
   Pvl tMap;
 //call function to get system radius
   PvlGroup tGrp = Projection::TargetRadii(targetName);
@@ -354,9 +354,9 @@ double helperButtonCalcResolution() {
 // Function to Add the projection information to the Mapping PVL
 void addProject(PvlGroup &mapping) {
   UserInterface &ui = Application::GetUserInterface();
-  iString projName = ui.GetString("PROJECTION");
+  IString projName = ui.GetString("PROJECTION");
 //setup a look up table for projection names
-  map <iString, iString> projLUT;
+  map <IString, IString> projLUT;
   projLUT ["SINUSOIDAL"] = "Sinusoidal";
   projLUT ["MERCATOR"] = "Mercator";
   projLUT ["TRANSVERSEMERCATOR"] = "TransverseMercator";
@@ -430,7 +430,7 @@ void addTarget(PvlGroup &mapping) {
 // if TARGOPT is user and no radii enter the run TargetRadii to get
 // the system radii for target name.
   else if(ui.GetString("TARGOPT") == "USER") {
-    iString targetName = ui.GetString("TARGETNAME");
+    IString targetName = ui.GetString("TARGETNAME");
     PvlGroup grp = Projection::TargetRadii(targetName);
     double equatorialRad = grp["EquatorialRadius"];
     double polarRad = grp["PolarRadius"];
@@ -441,21 +441,21 @@ void addTarget(PvlGroup &mapping) {
     if(ui.WasEntered("POLRADIUS")) {
       polarRad = ui.GetDouble("POLRADIUS");
     }
-    iString latType = ui.GetString("LATTYPE");
+    IString latType = ui.GetString("LATTYPE");
     if(latType == "PLANETOCENTRIC") {
       latType = "Planetocentric";
     }
     else if(latType == "PLANETOGRAPHIC") {
       latType = "Planetographic";
     }
-    iString lonDir = ui.GetString("LONDIR");
+    IString lonDir = ui.GetString("LONDIR");
     if(lonDir == "POSITIVEEAST") {
       lonDir = "PositiveEast";
     }
     else if(lonDir == "POSITIVEWEST") {
       lonDir = "PositiveWest";
     }
-    iString lonDom = ui.GetString("LONDOM");
+    IString lonDom = ui.GetString("LONDOM");
 //Add targdef values to the mapping pvl
     mapping += PvlKeyword("TargetName", targetName);
     mapping += PvlKeyword("EquatorialRadius", equatorialRad, "meters");
@@ -501,11 +501,11 @@ void addResolution(PvlGroup &mapping) {
   UserInterface &ui = Application::GetUserInterface();
   if(ui.GetString("RESOPT") == "PPD") {
     double res = ui.GetDouble("RESOLUTION");
-    mapping += PvlKeyword("Scale", iString(res), "pixels/degree");
+    mapping += PvlKeyword("Scale", IString(res), "pixels/degree");
   }
   else if(ui.GetString("RESOPT") == "MPP") {
     double res = ui.GetDouble("RESOLUTION");
-    mapping += PvlKeyword("PixelResolution", iString(res), "meters/pixel");
+    mapping += PvlKeyword("PixelResolution", IString(res), "meters/pixel");
   }
   else if(ui.GetString("RESOPT") == "CALC") {
 // run the function to calculate the resolution
@@ -532,7 +532,7 @@ void calcRange(double &minLat, double &maxLat,
   }
   else if(ui.GetString("TARGOPT") == "USER") {
     userGrp += PvlKeyword("TargetName", ui.GetString("TARGETNAME"));
-    iString targetName = ui.GetString("TARGETNAME");
+    IString targetName = ui.GetString("TARGETNAME");
     PvlGroup grp = Projection::TargetRadii(targetName);
     double equatorialRad = grp["EquatorialRadius"];
     double polarRad = grp["PolarRadius"];

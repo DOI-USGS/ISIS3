@@ -19,7 +19,7 @@
 #include "ID.h"
 #include "IException.h"
 #include "Message.h"
-#include "iString.h"
+#include "IString.h"
 #include <iostream>
 using namespace std;
 namespace Isis {
@@ -43,7 +43,7 @@ namespace Isis {
     std::string sub = p_namebase.substr(p_numStart, p_numLength);
     for(int i = 0; i < (int)sub.length(); i++) {
       if(sub[i] != '?') {
-        std::string msg = "iString [" + p_namebase + "] contains more than one replacement set";
+        std::string msg = "IString [" + p_namebase + "] contains more than one replacement set";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -62,7 +62,7 @@ namespace Isis {
    * @return std::string The next ID in the sequence
    */
   std::string ID::Next() {
-    iString num(p_current);
+    IString num(p_current);
     if((int)num.size() > p_numLength) {
       std::string replacement = "?";
       while((int)replacement.size() < p_numLength) {

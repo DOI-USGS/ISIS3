@@ -30,7 +30,7 @@
 #include <sstream>
 #include <iomanip>
 #include <exception>
-#include "iString.h"
+#include "IString.h"
 #include "IException.h"
 #include <gsl/gsl_math.h>
 
@@ -78,7 +78,7 @@ namespace Isis {
      * @return bool Returns true if v1 is less than v2 in string format
      */
     bool operator()(const K &v1, const K &v2) const {
-      return (iString::DownCase(v1) < iString::DownCase(v2));
+      return (IString::DownCase(v1) < IString::DownCase(v2));
     }
 
   };

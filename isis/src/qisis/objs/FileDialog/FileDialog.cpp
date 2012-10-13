@@ -5,7 +5,7 @@
 #include <QFile>
 
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 
 namespace Isis {
   FileDialog::FileDialog(QString title, QStringList &filterList, QDir &directory, QWidget *parent) :

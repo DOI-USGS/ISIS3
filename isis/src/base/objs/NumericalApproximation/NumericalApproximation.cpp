@@ -9,7 +9,7 @@
 
 #include "SpecialPixel.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace std;
 namespace Isis {
@@ -404,7 +404,7 @@ namespace Isis {
     }
     throw IException(IException::Programmer,
                      "MinPoints() - Invalid argument. Unknown interpolation type: "
-                     + iString(NumericalApproximation::InterpType(itype)),
+                     + IString(NumericalApproximation::InterpType(itype)),
                      _FILEINFO_);
   }
 
@@ -860,7 +860,7 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "Evaluate() - Unable to evaluate the function at the point a = "
-                       + iString(a),
+                       + IString(a),
                        _FILEINFO_);
     }
   }
@@ -1019,15 +1019,15 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "GslFirstDerivative() - Unable to compute the first derivative at a = "
-                       + iString(a) + " using the GSL interpolation",
+                       + IString(a) + " using the GSL interpolation",
                        _FILEINFO_);
     }
     if(!InsideDomain(a)) {
       ReportException(IException::Programmer, "GslFirstDerivative()",
                       "Invalid argument. Value entered, a = "
-                      + iString(a) + ", is outside of domain = ["
-                      + iString(DomainMinimum()) + ", "
-                      + iString(DomainMaximum()) + "]",
+                      + IString(a) + ", is outside of domain = ["
+                      + IString(DomainMinimum()) + ", "
+                      + IString(DomainMaximum()) + "]",
                       _FILEINFO_);
     }
     if(!GslInterpType(p_itype)) {
@@ -1045,7 +1045,7 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "GslFirstDerivative() - Unable to compute the first derivative at a = "
-                       + iString(a) + ". GSL integrity check failed",
+                       + IString(a) + ". GSL integrity check failed",
                        _FILEINFO_);
     }
   }
@@ -1154,17 +1154,17 @@ namespace Isis {
     if(!InsideDomain(a)) {
       ReportException(IException::Programmer, "BackwardFirstDifference()",
                       "Invalid argument. Value entered, a = "
-                      + iString(a) + ", is outside of domain = ["
-                      + iString(DomainMinimum()) + ", "
-                      + iString(DomainMaximum()) + "]",
+                      + IString(a) + ", is outside of domain = ["
+                      + IString(DomainMinimum()) + ", "
+                      + IString(DomainMaximum()) + "]",
                       _FILEINFO_);
     }
     if(!InsideDomain(a - (n - 1)*h)) {
       ReportException(IException::Programmer, "BackwardFirstDifference()",
                       "Formula steps outside of domain. For "
-                      + iString((int) n) + "-point backward difference, a-(n-1)h = "
-                      + iString(a - (n - 1)*h) + " is smaller than domain min = "
-                      + iString(DomainMinimum())
+                      + IString((int) n) + "-point backward difference, a-(n-1)h = "
+                      + IString(a - (n - 1)*h) + " is smaller than domain min = "
+                      + IString(DomainMinimum())
                       + ".  Try forward difference or use smaller value for h or n",
                       _FILEINFO_);
     }
@@ -1181,7 +1181,7 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "BackwardFirstDifference() - Unable to calculate backward first difference for (a, n, h) = ("
-                       + iString(a) + ", " + iString((int) n) + ", " + iString(h) + ")",
+                       + IString(a) + ", " + IString((int) n) + ", " + IString(h) + ")",
                        _FILEINFO_);
     }
     switch(n) {
@@ -1192,7 +1192,7 @@ namespace Isis {
       default:
         throw IException(IException::Programmer,
                          "BackwardFirstDifference() - Invalid argument. There is no "
-                         + iString((int) n) + "-point backward difference formula in use",
+                         + IString((int) n) + "-point backward difference formula in use",
                          _FILEINFO_);
     }
   }
@@ -1243,17 +1243,17 @@ namespace Isis {
     if(!InsideDomain(a)) {
       ReportException(IException::Programmer, "ForwardFirstDifference()",
                       "Invalid argument. Value entered, a = "
-                      + iString(a) + ", is outside of domain = ["
-                      + iString(DomainMinimum()) + ", "
-                      + iString(DomainMaximum()) + "]",
+                      + IString(a) + ", is outside of domain = ["
+                      + IString(DomainMinimum()) + ", "
+                      + IString(DomainMaximum()) + "]",
                       _FILEINFO_);
     }
     if(!InsideDomain(a + (n - 1)*h)) {
       ReportException(IException::Programmer, "ForwardFirstDifference()",
                       "Formula steps outside of domain. For "
-                      + iString((int) n) + "-point forward difference, a+(n-1)h = "
-                      + iString(a + (n - 1)*h) + " is greater than domain max = "
-                      + iString(DomainMaximum())
+                      + IString((int) n) + "-point forward difference, a+(n-1)h = "
+                      + IString(a + (n - 1)*h) + " is greater than domain max = "
+                      + IString(DomainMaximum())
                       + ".  Try backward difference or use smaller value for h or n",
                       _FILEINFO_);
     }
@@ -1270,7 +1270,7 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "ForwardFirstDifference() - Unable to calculate forward first difference for (a, n, h) = ("
-                       + iString(a) + ", " + iString((int) n) + ", " + iString(h) + ")",
+                       + IString(a) + ", " + IString((int) n) + ", " + IString(h) + ")",
                        _FILEINFO_);
     }
     switch(n) {
@@ -1281,7 +1281,7 @@ namespace Isis {
       default:
         throw IException(IException::Programmer,
                          "ForwardFirstDifference() - Invalid argument. There is no "
-                         + iString((int) n) + "-point forward difference formula in use",
+                         + IString((int) n) + "-point forward difference formula in use",
                          _FILEINFO_);
     }
   }
@@ -1333,18 +1333,18 @@ namespace Isis {
     if(!InsideDomain(a)) {
       ReportException(IException::Programmer, "CenterFirstDifference()",
                       "Invalid argument. Value entered, a = "
-                      + iString(a) + ", is outside of domain = ["
-                      + iString(DomainMinimum()) + ", "
-                      + iString(DomainMaximum()) + "]",
+                      + IString(a) + ", is outside of domain = ["
+                      + IString(DomainMinimum()) + ", "
+                      + IString(DomainMaximum()) + "]",
                       _FILEINFO_);
     }
     if(!InsideDomain(a + (n - 1)*h) || !InsideDomain(a - (n - 1)*h)) {
       ReportException(IException::Programmer, "CenterFirstDifference()",
                       "Formula steps outside of domain. For "
-                      + iString((int) n) + "-point center difference, a-(n-1)h = "
-                      + iString(a - (n - 1)*h) + " or a+(n-1)h = "
-                      + iString(a + (n - 1)*h) + " is out of domain = ["
-                      + iString(DomainMinimum()) + ", " + iString(DomainMaximum())
+                      + IString((int) n) + "-point center difference, a-(n-1)h = "
+                      + IString(a - (n - 1)*h) + " or a+(n-1)h = "
+                      + IString(a + (n - 1)*h) + " is out of domain = ["
+                      + IString(DomainMinimum()) + ", " + IString(DomainMaximum())
                       + "].  Use smaller value for h or n",
                       _FILEINFO_);
     }
@@ -1361,7 +1361,7 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "CenterFirstDifference() - Unable to calculate center first difference for (a, n, h) = ("
-                       + iString(a) + ", " + iString((int) n) + ", " + iString(h) + ")",
+                       + IString(a) + ", " + IString((int) n) + ", " + IString(h) + ")",
                        _FILEINFO_);
     }
     switch(n) {
@@ -1372,7 +1372,7 @@ namespace Isis {
       default:
         throw IException(IException::Programmer,
                          "CenterFirstDifference() - Invalid argument. There is no "
-                         + iString((int) n) + "-point center difference formula in use",
+                         + IString((int) n) + "-point center difference formula in use",
                          _FILEINFO_);
     }
   }
@@ -1421,15 +1421,15 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "GslSecondDerivative() - Unable to compute the second derivative at a = "
-                       + iString(a) + " using the GSL interpolation",
+                       + IString(a) + " using the GSL interpolation",
                        _FILEINFO_);
     }
     if(!InsideDomain(a))
       ReportException(IException::Programmer, "GslSecondDerivative()",
                       "Invalid argument. Value entered, a = "
-                      + iString(a) + ", is outside of domain = ["
-                      + iString(DomainMinimum()) + ", "
-                      + iString(DomainMaximum()) + "]",
+                      + IString(a) + ", is outside of domain = ["
+                      + IString(DomainMinimum()) + ", "
+                      + IString(DomainMaximum()) + "]",
                       _FILEINFO_);
     if(!GslInterpType(p_itype))
       ReportException(IException::Programmer, "GslSecondDerivative()",
@@ -1447,7 +1447,7 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "GslSecondDerivative() - Unable to compute the second derivative at a = "
-                       + iString(a) + ". GSL integrity check failed",
+                       + IString(a) + ". GSL integrity check failed",
                        _FILEINFO_);
     }
   }
@@ -1541,17 +1541,17 @@ namespace Isis {
     if(!InsideDomain(a)) {
       ReportException(IException::Programmer, "BackwardSecondDifference()",
                       "Invalid argument. Value entered, a = "
-                      + iString(a) + ", is outside of domain = ["
-                      + iString(DomainMinimum()) + ", "
-                      + iString(DomainMaximum()) + "]",
+                      + IString(a) + ", is outside of domain = ["
+                      + IString(DomainMinimum()) + ", "
+                      + IString(DomainMaximum()) + "]",
                       _FILEINFO_);
     }
     if(!InsideDomain(a - (n - 1)*h)) {
       ReportException(IException::Programmer, "BackwardSecondDifference()",
                       "Formula steps outside of domain. For "
-                      + iString((int) n) + "-point backward difference, a-(n-1)h = "
-                      + iString(a - (n - 1)*h) + " is smaller than domain min = "
-                      + iString(DomainMinimum())
+                      + IString((int) n) + "-point backward difference, a-(n-1)h = "
+                      + IString(a - (n - 1)*h) + " is smaller than domain min = "
+                      + IString(DomainMinimum())
                       + ".  Try forward difference or use smaller value for h or n",
                       _FILEINFO_);
     }
@@ -1568,7 +1568,7 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "BackwardSecondDifference() - Unable to calculate backward second difference for (a, n, h) = ("
-                       + iString(a) + ", " + iString((int) n) + ", " + iString(h) + ")",
+                       + IString(a) + ", " + IString((int) n) + ", " + IString(h) + ")",
                        _FILEINFO_);
     }
     switch(n) {
@@ -1577,7 +1577,7 @@ namespace Isis {
       default:
         throw IException(IException::Programmer,
                          "BackwardSecondDifference() - Invalid argument. There is no "
-                         + iString((int) n) + "-point backward second difference formula in use",
+                         + IString((int) n) + "-point backward second difference formula in use",
                          _FILEINFO_);
     }
   }
@@ -1623,17 +1623,17 @@ namespace Isis {
     if(!InsideDomain(a)) {
       ReportException(IException::Programmer, "ForwardSecondDifference()",
                       "Invalid argument. Value entered, a = "
-                      + iString(a) + ", is outside of domain = ["
-                      + iString(DomainMinimum()) + ", "
-                      + iString(DomainMaximum()) + "]",
+                      + IString(a) + ", is outside of domain = ["
+                      + IString(DomainMinimum()) + ", "
+                      + IString(DomainMaximum()) + "]",
                       _FILEINFO_);
     }
     if(!InsideDomain(a + (n - 1)*h)) {
       ReportException(IException::Programmer, "ForwardSecondDifference()",
                       "Formula steps outside of domain. For "
-                      + iString((int) n) + "-point forward difference, a+(n-1)h = "
-                      + iString(a + (n - 1)*h) + " is greater than domain max = "
-                      + iString(DomainMaximum())
+                      + IString((int) n) + "-point forward difference, a+(n-1)h = "
+                      + IString(a + (n - 1)*h) + " is greater than domain max = "
+                      + IString(DomainMaximum())
                       + ".  Try backward difference or use smaller value for h or n",
                       _FILEINFO_);
     }
@@ -1650,7 +1650,7 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "ForwardSecondDifference() - Unable to calculate forward second difference for (a, n, h) = ("
-                       + iString(a) + ", " + iString((int) n) + ", " + iString(h) + ")",
+                       + IString(a) + ", " + IString((int) n) + ", " + IString(h) + ")",
                        _FILEINFO_);
     }
     switch(n) {
@@ -1659,7 +1659,7 @@ namespace Isis {
       default:
         throw IException(IException::Programmer,
                          "ForwardSecondDifference() - Invalid argument. There is no "
-                         + iString((int) n) + "-point forward second difference formula in use",
+                         + IString((int) n) + "-point forward second difference formula in use",
                          _FILEINFO_);
     }
   }
@@ -1711,18 +1711,18 @@ namespace Isis {
     if(!InsideDomain(a)) {
       ReportException(IException::Programmer, "CenterSecondDifference()",
                       "Invalid argument. Value entered, a = "
-                      + iString(a) + ", is outside of domain = ["
-                      + iString(DomainMinimum()) + ", "
-                      + iString(DomainMaximum()) + "]",
+                      + IString(a) + ", is outside of domain = ["
+                      + IString(DomainMinimum()) + ", "
+                      + IString(DomainMaximum()) + "]",
                       _FILEINFO_);
     }
     if(!InsideDomain(a + (n - 1)*h) || !InsideDomain(a - (n - 1)*h)) {
       ReportException(IException::Programmer, "CenterSecondDifference()",
                       "Formula steps outside of domain. For "
-                      + iString((int) n) + "-point center difference, a-(n-1)h = "
-                      + iString(a - (n - 1)*h) + " or a+(n-1)h = "
-                      + iString(a + (n - 1)*h) + " is out of domain = ["
-                      + iString(DomainMinimum()) + ", " + iString(DomainMaximum())
+                      + IString((int) n) + "-point center difference, a-(n-1)h = "
+                      + IString(a - (n - 1)*h) + " or a+(n-1)h = "
+                      + IString(a + (n - 1)*h) + " is out of domain = ["
+                      + IString(DomainMinimum()) + ", " + IString(DomainMaximum())
                       + "].  Use smaller value for h or n",
                       _FILEINFO_);
     }
@@ -1739,7 +1739,7 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "CenterSecondDifference() - Unable to calculate center second difference for (a, n, h) = ("
-                       + iString(a) + ", " + iString((int) n) + ", " + iString(h) + ")",
+                       + IString(a) + ", " + IString((int) n) + ", " + IString(h) + ")",
                        _FILEINFO_);
     }
     switch(n) {
@@ -1750,7 +1750,7 @@ namespace Isis {
       default:
         throw IException(IException::Programmer,
                          "CenterSecondDifference() - Invalid argument. There is no "
-                         + iString((int) n) + "-point center second difference formula in use",
+                         + IString((int) n) + "-point center second difference formula in use",
                          _FILEINFO_);
     }
   }
@@ -1796,23 +1796,23 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "GslIntegral() - Unable to compute the integral on the interval (a,b) = ("
-                       + iString(a) + ", " + iString(b)
+                       + IString(a) + ", " + IString(b)
                        + ") using the GSL interpolation",
                        _FILEINFO_);
     }
     if(a > b) {
       ReportException(IException::Programmer, "GslIntegral()",
                       "Invalid interval entered: [a,b] = ["
-                      + iString(a) + ", " + iString(b) + "]",
+                      + IString(a) + ", " + IString(b) + "]",
                       _FILEINFO_);
     }
     if(!InsideDomain(a) || !InsideDomain(b)) {
       ReportException(IException::Programmer, "GslIntegral()",
                       "Invalid arguments. Interval entered ["
-                      + iString(a) + ", " + iString(b)
+                      + IString(a) + ", " + IString(b)
                       + "] is not contained within domain ["
-                      + iString(DomainMinimum()) + ", "
-                      + iString(DomainMaximum()) + "]",
+                      + IString(DomainMinimum()) + ", "
+                      + IString(DomainMaximum()) + "]",
                       _FILEINFO_);
     }
     if(!GslInterpType(p_itype)) {
@@ -1830,7 +1830,7 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "GslIntegral() - Unable to compute the integral on the interval (a,b) = ("
-                       + iString(a) + ", " + iString(b)
+                       + IString(a) + ", " + IString(b)
                        + "). GSL integrity check failed",
                        _FILEINFO_);
     }
@@ -1879,7 +1879,7 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "TrapezoidalRule() - Unable to calculate the integral on the interval (a,b) = ("
-                       + iString(a) + ", " + iString(b)
+                       + IString(a) + ", " + IString(b)
                        + ") using the trapeziodal rule",
                        _FILEINFO_);
     }
@@ -1930,7 +1930,7 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "Simpsons3PointRule() - Unable to calculate the integral on the interval (a,b) = ("
-                       + iString(a) + ", " + iString(b)
+                       + IString(a) + ", " + IString(b)
                        + ") using Simpson's 3 point rule",
                        _FILEINFO_);
     }
@@ -1982,7 +1982,7 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "Simpsons4PointRule() - Unable to calculate the integral on the interval (a,b) = ("
-                       + iString(a) + ", " + iString(b)
+                       + IString(a) + ", " + IString(b)
                        + ") using Simpson's 4 point rule",
                        _FILEINFO_);
     }
@@ -2037,7 +2037,7 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "BoolesRule() - Unable to calculate the integral on the interval (a,b) = ("
-                       + iString(a) + ", " + iString(b)
+                       + IString(a) + ", " + IString(b)
                        + ") using Boole's rule",
                        _FILEINFO_);
     }
@@ -2130,7 +2130,7 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "RefineExtendedTrap() - Unable to calculate the integral on the interval (a,b) = ("
-                       + iString(a) + ", " + iString(b)
+                       + IString(a) + ", " + IString(b)
                        + ") using the extended trapeziodal rule",
                        _FILEINFO_);
     }
@@ -2215,13 +2215,13 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "RombergsMethod() - Unable to calculate the integral on the interval (a,b) = ("
-                       + iString(a) + ", " + iString(b)
+                       + IString(a) + ", " + IString(b)
                        + ") using Romberg's method",
                        _FILEINFO_);
     }
     throw IException(IException::Programmer,
                      "RombergsMethod() - Unable to calculate the integral using RombergsMethod() - Failed to converge in "
-                     + iString(maxits) + " iterations",
+                     + IString(maxits) + " iterations",
                      _FILEINFO_);
   }
 
@@ -2326,7 +2326,7 @@ namespace Isis {
     else if(itype > 9) {    // there are currently 9 interpolation types
       ReportException(IException::Programmer, "SetInterpType()",
                       "Invalid argument. Unknown interpolation type: "
-                      + iString(NumericalApproximation::InterpType(itype)),
+                      + IString(NumericalApproximation::InterpType(itype)),
                       _FILEINFO_);
     }
     // p_x, p_y are kept and p_itype is replaced
@@ -2489,7 +2489,7 @@ namespace Isis {
     if(fItr == p_interpFunctors.end()) {
       ReportException(IException::Programmer, "GslFunctor()",
                       "Invalid argument. Unable to find GSL interpolator with id = "
-                      + iString(NumericalApproximation::InterpType(itype)),
+                      + IString(NumericalApproximation::InterpType(itype)),
                       _FILEINFO_);
     }
     return (fItr->second);
@@ -2558,8 +2558,8 @@ namespace Isis {
     if((int) Size() < MinPoints()) {
       ReportException(IException::Programmer, "ValidateDataSet()",
                       Name() + " interpolation requires a minimum of "
-                      + iString(MinPoints()) + " data points - currently have "
-                      + iString((int) Size()),
+                      + IString(MinPoints()) + " data points - currently have "
+                      + IString((int) Size()),
                       _FILEINFO_);
     }
     for(unsigned int i = 1; i < Size(); i++) {
@@ -2567,8 +2567,8 @@ namespace Isis {
       if(p_x[i-1] == p_x[i]) {
         ReportException(IException::Programmer, "ValidateDataSet()",
                         "Invalid data set, x-values must be unique: \n\t\tp_x["
-                        + iString((int) i - 1) + "] = " + iString(p_x[i-1])
-                        + " = p_x[" + iString((int) i) + "]",
+                        + IString((int) i - 1) + "] = " + IString(p_x[i-1])
+                        + " = p_x[" + IString((int) i) + "]",
                         _FILEINFO_);
       }
       if(p_x[i-1] > p_x[i]) {
@@ -2578,8 +2578,8 @@ namespace Isis {
           ReportException(IException::Programmer, "ValidateDataSet()",
                           "Invalid data set, x-values must be in ascending order for "
                           + Name() + " interpolation: \n\t\tx["
-                          + iString((int) i - 1) + "] = " + iString(p_x[i-1]) + " > x["
-                          + iString((int) i) + "] = " + iString(p_x[i]),
+                          + IString((int) i - 1) + "] = " + IString(p_x[i-1]) + " > x["
+                          + IString((int) i) + "] = " + IString(p_x[i]),
                           _FILEINFO_);
         }
       }
@@ -2825,9 +2825,9 @@ namespace Isis {
     if(etype == NumericalApproximation::ThrowError) {
       ReportException(IException::Programmer, "Evaluate()",
                       "Invalid argument. Value entered, a = "
-                      + iString(a) + ", is outside of domain = ["
-                      + iString(DomainMinimum()) + ", "
-                      + iString(DomainMaximum()) + "]",
+                      + IString(a) + ", is outside of domain = ["
+                      + IString(DomainMinimum()) + ", "
+                      + IString(DomainMaximum()) + "]",
                       _FILEINFO_);
     }
     if(etype == NumericalApproximation::NearestEndpoint) {
@@ -2913,7 +2913,7 @@ namespace Isis {
       throw IException(e,
                        e.errorType(),
                        "EvaluateCubicNeighborhood() - Unable to evaluate cubic neighborhood interpolation at a = "
-                       + iString(a),
+                       + IString(a),
                        _FILEINFO_);
     }
   }
@@ -3301,16 +3301,16 @@ namespace Isis {
     if(a > b) {
       ReportException(IException::Programmer, "EvaluatedForIntegration()",
                       "Invalid interval entered: [a,b] = ["
-                      + iString(a) + ", " + iString(b) + "]",
+                      + IString(a) + ", " + IString(b) + "]",
                       _FILEINFO_);
     }
     if(!InsideDomain(a) || !InsideDomain(b)) {
       ReportException(IException::Programmer, "EvaluateForIntegration()",
                       "Invalid arguments. Interval entered ["
-                      + iString(a) + ", " + iString(b)
+                      + IString(a) + ", " + IString(b)
                       + "] is not contained within domain ["
-                      + iString(DomainMinimum()) + ", "
-                      + iString(DomainMaximum()) + "]",
+                      + IString(DomainMinimum()) + ", "
+                      + IString(DomainMaximum()) + "]",
                       _FILEINFO_);
     }
     vector <double> f;

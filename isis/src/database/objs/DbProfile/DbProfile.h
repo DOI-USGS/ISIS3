@@ -104,7 +104,7 @@ namespace Isis {
       /**
        * Set the name of this profile
        *
-       * @param name iString used to set the name of this profile
+       * @param name IString used to set the name of this profile
        */
       void setName(const std::string &name) {
         _name = name;

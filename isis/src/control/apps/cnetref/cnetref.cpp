@@ -188,12 +188,12 @@ void IsisMain() {
     throw;
   }
   catch (geos::util::GEOSException *exc) {
-    string message = "GEOS Exception: " + (iString)exc->what();
+    string message = "GEOS Exception: " + (IString)exc->what();
     delete exc;
     throw IException(IException::User, message, _FILEINFO_);
   }
   catch (std::exception const &se) {
-    string message = "std::exception: " + (iString)se.what();
+    string message = "std::exception: " + (IString)se.what();
     throw IException(IException::User, message, _FILEINFO_);
   }
   catch (...) {

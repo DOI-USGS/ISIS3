@@ -2,7 +2,7 @@
 #include "UserInterface.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Pvl.h"
 #include "ProcessExportMiniRFLroPds.h"
 #include "PvlTranslationManager.h"
@@ -370,9 +370,9 @@ void FixLabel(Pvl &pcPdsLbl, bool &pbLevel2) {
         // Get the X,Y,Z values from Proj X Axis Vector
         PvlKeyword cKeyObXProj = cProjectionObject.FindKeyword("OBLIQUE_PROJ_X_AXIS_VECTOR");
         double x, y, z;
-        x = iString(cKeyObXProj[0]).ToDouble();
-        y = iString(cKeyObXProj[1]).ToDouble();
-        z = iString(cKeyObXProj[2]).ToDouble();
+        x = IString(cKeyObXProj[0]).ToDouble();
+        y = IString(cKeyObXProj[1]).ToDouble();
+        z = IString(cKeyObXProj[2]).ToDouble();
 
         // Calculate Reference Latitude and Longitude
         // angle in degrees = angle in radians * 180 / Pi
@@ -387,13 +387,13 @@ void FixLabel(Pvl &pcPdsLbl, bool &pbLevel2) {
         dLat = atan(z / (sqrt(pow(x, 2) + pow(y, 2)))) * (180 / Isis::PI);
 
         PvlKeyword cKeyRefLon("REFERENCE_LONGITUDE");
-        iString iStr(dLon, 6);
+        IString iStr(dLon, 6);
         iStr += " <DEG>";
         cKeyRefLon.SetValue((std::string)iStr);
         cProjectionObject.AddKeyword(cKeyRefLon);
 
         PvlKeyword cKeyRefLat("REFERENCE_LATITUDE");
-        iStr = iString(dLat, 6);
+        iStr = IString(dLat, 6);
         iStr += " <DEG>";
         cKeyRefLat.SetValue(iStr);
         cProjectionObject.AddKeyword(cKeyRefLat);

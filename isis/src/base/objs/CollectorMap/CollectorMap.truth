@@ -70,7 +70,7 @@ Int list size = 1
 Adding 10 to double list
 Double list size = 1
 Adding 10 to string list
-iString list size = 1
+IString list size = 1
 
 
 Adding Class 11!
@@ -79,7 +79,7 @@ Int list size = 2
 Adding 11 to double list
 Double list size = 2
 Adding 11 to string list
-iString list size = 2
+IString list size = 2
 Got element 10 and 10 - In string?: 1
 Exists in double list?: 1
 Got element 11 and 11 - In string? 1

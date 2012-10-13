@@ -25,7 +25,7 @@
 #include <QGlobalStatic>
 
 namespace Isis {
-  class iString;
+  class IString;
 
   /**
    * @brief Defines an angle and provides unit conversions
@@ -249,7 +249,7 @@ namespace Isis {
      */
     void setDegrees(double degrees) { setAngle(degrees, Degrees); }
 
-    virtual iString toString(bool includeUnits = true) const;
+    virtual IString toString(bool includeUnits = true) const;
 
   protected:
     double unitWrapValue(const Units& unit) const;

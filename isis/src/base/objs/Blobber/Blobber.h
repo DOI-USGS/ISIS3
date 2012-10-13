@@ -24,12 +24,10 @@
  */
 
 #include <string>
-#include "tnt/tnt_array2d.h"
+#include <tnt/tnt_array2d.h>
 
 namespace Isis {
-
   class Cube;
-  class CubeInfo;
   class Table;
 
   /**
@@ -100,8 +98,14 @@ namespace Isis {
    * @author 2005-12-16 Kris Becker
    *
    * @internal
-   *  @history 2008-05-12 Steven Lambright - Removed references to CubeInfo
-   *  @history 2008-06-18 Christopher Austin - Fixed documentation errors
+   *   @history 2008-05-12 Steven Lambright - Removed references to CubeInfo
+   *   @history 2008-06-18 Christopher Austin - Fixed documentation errors
+   *   @history 2012-10-04 Jeannie Backer Changed references to TableField
+   *                           methods to lower camel case. Ordered includes, 
+   *                           put third party tnt includes inside angle braces,
+   *                           and added padding to control statements to fit
+   *                           coding standards. Added padding to control
+   *                           statements. References #1169.
    */
   class Blobber {
     public:

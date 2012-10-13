@@ -4,7 +4,7 @@
 #include "PvlGroup.h"
 #include "SpecialPixel.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace std;
 namespace Isis {
@@ -80,7 +80,7 @@ namespace Isis {
     p_imageNumber           = (double) arch["ImageNumber"];
     // Get values out of the bandbin group
     PvlGroup &bandbin = lab.FindGroup("BandBin", Pvl::Traverse);
-    iString filter = (string) bandbin["FilterName"];
+    IString filter = (string) bandbin["FilterName"];
     p_filter.push_back(filter.Token("/"));
     p_filter.push_back(filter);
   }

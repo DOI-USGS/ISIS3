@@ -57,7 +57,7 @@ namespace Isis {
     PvlGroup &kernels = lab.FindGroup("Kernels", Pvl::Traverse);
 
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
-    m_name = new iString;
+    m_name = new IString;
     *m_name = inst["TargetName"][0];
     string trykey = "NaifIkCode";
     if (kernels.HasKeyword("NaifFrameCode")) trykey = "NaifFrameCode";
@@ -74,7 +74,7 @@ namespace Isis {
     else {
       *m_bodyCode = lookupNaifBodyCode();
       m_sky = false;
-      // iString radiiKey = "BODY" + iString((BigInt) naifBodyCode()) + "_RADII";
+      // IString radiiKey = "BODY" + IString((BigInt) naifBodyCode()) + "_RADII";
       // m_radii[0] = Distance(getDouble(radiiKey, 0), Distance::Kilometers);
       // m_radii[1] = Distance(getDouble(radiiKey, 1), Distance::Kilometers);
       // m_radii[2] = Distance(getDouble(radiiKey, 2), Distance::Kilometers);
@@ -189,7 +189,7 @@ namespace Isis {
 
 
   //! Return target name
-  iString Target::name() const {
+  IString Target::name() const {
         return *m_name;
       }
 

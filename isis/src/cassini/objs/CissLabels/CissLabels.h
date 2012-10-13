@@ -24,7 +24,7 @@
 
 #include <string>
 #include <vector>
-#include "iString.h"
+#include "IString.h"
 namespace Isis {
   class Pvl;
   /**
@@ -102,12 +102,12 @@ namespace Isis {
        *  Finds the ratio of the expected image size to the actual
        *  size.  Valid values include any real number or
        *  "NotCompressed". This method returns an
-       *  @b Isis::iString so that values other than
+       *  @b Isis::IString so that values other than
        *  "NotCompressed" may be converted to @b double.
        *
-       *  @returns @b iString CompressionRatio
+       *  @returns @b IString CompressionRatio
        */
-      inline iString         CompressionRatio()      const {
+      inline IString         CompressionRatio()      const {
         return p_compressionRatio;
       };
 
@@ -120,9 +120,9 @@ namespace Isis {
        *  "Lossless" (a.k.a Rice), or "Lossy" (a.k.a. Discrete Cosine
        *  Transform).
        *
-       *   @returns @b iString CompressionType
+       *   @returns @b IString CompressionType
        */
-      inline iString         CompressionType()       const {
+      inline IString         CompressionType()       const {
         return p_compressionType;
       };
 
@@ -135,9 +135,9 @@ namespace Isis {
        *  "Table" (converted using look-up table), or "8LSB" (kept the
        *  8 least significant bits only).
        *
-       *  @returns @b iString DataConversionType
+       *  @returns @b IString DataConversionType
        */
-      inline iString         DataConversionType()    const {
+      inline IString         DataConversionType()    const {
         return p_dataConversionType;
       };
 
@@ -149,9 +149,9 @@ namespace Isis {
        *  performing a readout.  Valid values include "Yes", "No", or
        *  "Unknown".
        *
-       *  @returns @b iString DelayedReadoutFlag
+       *  @returns @b IString DelayedReadoutFlag
        */
-      inline iString         DelayedReadoutFlag()    const {
+      inline IString         DelayedReadoutFlag()    const {
         return p_delayedReadoutFlag;
       };
 
@@ -194,9 +194,9 @@ namespace Isis {
        *   </UL>
        * </UL>
        *
-       *  @returns @b vector @b \<iString\> The optical filter names.
+       *  @returns @b vector @b \<IString\> The optical filter names.
        */
-      std::vector <iString>       FilterName()              const {
+      std::vector <IString>       FilterName()              const {
         return p_filter;
       };
 
@@ -222,12 +222,12 @@ namespace Isis {
        *
        *  Retrieves the flight software version used for this image.
        *  Valid values include 1.2, 1.3, 1.4, or "Unknown". This
-       *  method returns an @b Isis::iString so that any value other
+       *  method returns an @b Isis::IString so that any value other
        *  than "Unknown" may be converted to @b double.
        *
-       *  @returns @b iString FlightSoftwareVersion
+       *  @returns @b IString FlightSoftwareVersion
        */
-      inline iString         FlightSoftwareVersion() const {
+      inline IString         FlightSoftwareVersion() const {
         return p_flightSoftwareVersion;
       };
 
@@ -312,9 +312,9 @@ namespace Isis {
        *  (also called "NAC" or "narrow-angle") or "ISSWA" (also
        *  called "WAC" or "wide-angle").
        *
-       *  @returns @b iString InstrumentId
+       *  @returns @b IString InstrumentId
        */
-      inline iString         InstrumentId()          const {
+      inline IString         InstrumentId()          const {
         return p_instrumentId;
       };
 
@@ -332,7 +332,7 @@ namespace Isis {
        *  @returns @b double lower-cased InstrumentModeId
        *  @see SummingMode()
        */
-      inline iString         InstrumentModeId()      {
+      inline IString         InstrumentModeId()      {
         return p_instrumentModeId.DownCase();
       };
 
@@ -342,13 +342,13 @@ namespace Isis {
        *
        *  Finds the index associated with the image in the Readout
        *  Cycle table.  Valid values are "Unknown" or in the range
-       *  0-15. This method returns an @b Isis::iString so that any
+       *  0-15. This method returns an @b Isis::IString so that any
        *  value not equal to "Unknown" may be converted to
        *  @b int.
        *
-       *  @returns @b iString ReadoutCycleIndex
+       *  @returns @b IString ReadoutCycleIndex
        */
-      inline iString         ReadoutCycleIndex()     const {
+      inline IString         ReadoutCycleIndex()     const {
         return p_readoutCycleIndex;
       };
 
@@ -378,9 +378,9 @@ namespace Isis {
        *  "BothSim", "NacOnly", "WacOnly",
        *  or "Unknown".
        *
-       *  @returns @b iString ShutterModeId
+       *  @returns @b IString ShutterModeId
        */
-      inline iString         ShutterModeId()         const {
+      inline IString         ShutterModeId()         const {
         return p_shutterModeId;
       };
 
@@ -430,21 +430,21 @@ namespace Isis {
       //! Indicates whether camera is narrow-angle
       bool p_cissNA;
       //! Value of the PDS keyword CompressionRatio in the cube's labels
-      iString p_compressionRatio;
+      IString p_compressionRatio;
       //! Value of the PDS keyword CompressionType in the cube's labels
-      iString p_compressionType;
+      IString p_compressionType;
       //! Value of the PDS keyword DataConversionType in the cube's labels
-      iString p_dataConversionType;
+      IString p_dataConversionType;
       //! Value of the PDS keyword DelayedReadoutFlag in the cube's labels
-      iString p_delayedReadoutFlag;
+      IString p_delayedReadoutFlag;
       //! Value of the PDS keyword ExposureDuration in the cube's labels
       double p_exposureDuration;
       //! Two-element array of optical filters used for this image
-      std::vector <iString> p_filter;
+      std::vector <IString> p_filter;
       //! Two-element array of filter indices corresponding to optical filters
       std::vector <int> p_filterIndex;
       //! Value of the PDS keyword FlightSoftwareVersion in the cube's labels
-      iString p_flightSoftwareVersion;
+      IString p_flightSoftwareVersion;
       //! Value of the PDS keyword OpticsTemperature[0] in the cube's labels
       double p_frontOpticsTemp;
       //! Value of the PDS keyword GainModeId in the cube's labels
@@ -456,15 +456,15 @@ namespace Isis {
       //! Value of the PDS keyword ImageTime in the cube's labels
       double p_instrumentDataRate;
       //! Value of the PDS keyword InstrumentId in the cube's labels
-      iString p_instrumentId;
+      IString p_instrumentId;
       //! Value of the PDS keyword InstrumentModeId in the cube's labels
-      iString p_instrumentModeId;
+      IString p_instrumentModeId;
       //! Value of the PDS keyword ReadoutCycleIndex in the cube's labels
-      iString p_readoutCycleIndex;
+      IString p_readoutCycleIndex;
       //! Value of the PDS keyword ReadoutOrder in the cube's labels
       int p_readoutOrder;
       //! Value of the PDS keyword ShutterModeId in the cube's labels
-      iString p_shutterModeId;
+      IString p_shutterModeId;
       //! Value of the PDS keyword SummingMode in the cube's labels
       int p_summingMode;
   };

@@ -5,7 +5,7 @@
 #include "IException.h"
 #include "FileList.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 
 namespace Isis {
   /**
@@ -83,7 +83,7 @@ namespace Isis {
       return (mqCpList.value(piIndex).toStdString());
     }
     else {
-      iString num = iString(piIndex);
+      IString num = IString(piIndex);
       std::string msg = "Index [" + (std::string) num + "] is invalid";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

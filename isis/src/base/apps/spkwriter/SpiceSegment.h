@@ -38,7 +38,7 @@
 #include "tnt/tnt_array2d_utils.h"
 
 #include "Kernels.h"
-#include "iString.h"
+#include "IString.h"
 #include "Cube.h"
 #include "IException.h"
 

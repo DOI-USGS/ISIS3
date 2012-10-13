@@ -1,210 +1,407 @@
 #include <iostream>
-#include "TableField.h"
+
 #include "IException.h"
 #include "Preference.h"
+#include "PvlGroup.h"
+#include "PvlKeyword.h"
+#include "TableField.h"
 
 using namespace std;
+using namespace Isis;
 
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   cout << "Testing integer singleton" << endl;
-  Isis::TableField f1("Test", Isis::TableField::Integer);
-  cout << "Name      = " << f1.Name() << endl;
-  cout << "IsInteger = " << f1.IsInteger() << endl;
-  cout << "IsDouble  = " << f1.IsDouble() << endl;
-  cout << "IsText    = " << f1.IsText() << endl;
-  cout << "IsReal    = " << f1.IsReal() << endl;
-  cout << "Size      = " << f1.Size() << endl;
-  cout << "Bytes     = " << f1.Bytes() << endl;
-  f1 = 15;
-  cout << "Value     = " << (int)f1 << endl;
-  Isis::PvlGroup g = f1.PvlGroup();
+  TableField intSingletonField("Test", TableField::Integer);
+  cout << "Name      = " << intSingletonField.name() << endl;
+  cout << "Type      = " << intSingletonField.type() << endl;
+  cout << "IsInteger = " << intSingletonField.isInteger() << endl;
+  cout << "IsDouble  = " << intSingletonField.isDouble() << endl;
+  cout << "IsText    = " << intSingletonField.isText() << endl;
+  cout << "IsReal    = " << intSingletonField.isReal() << endl;
+  cout << "Size      = " << intSingletonField.size() << endl;
+  cout << "Bytes     = " << intSingletonField.bytes() << endl;
+  intSingletonField = 15;
+  cout << "Value     = " << (int)intSingletonField << endl;
+  PvlGroup g = intSingletonField.pvlGroup();
   cout << g << endl;
-  cout << "----------------------------------------" << endl;
+  cout << "----------------------------------------" << endl << endl;
   cout << "Testing double singleton" << endl;
-  Isis::TableField f2("Test", Isis::TableField::Double);
-  cout << "Name      = " << f2.Name() << endl;
-  cout << "IsInteger = " << f2.IsInteger() << endl;
-  cout << "IsDouble  = " << f2.IsDouble() << endl;
-  cout << "IsText    = " << f2.IsText() << endl;
-  cout << "IsReal    = " << f2.IsReal() << endl;
-  cout << "Size      = " << f2.Size() << endl;
-  cout << "Bytes     = " << f2.Bytes() << endl;
-  f2 = -3.14;
-  cout << "Value     = " << (double)f2 << endl;
-  g = f2.PvlGroup();
+  TableField dblSingletonField("Test", TableField::Double);
+  cout << "Name      = " << dblSingletonField.name() << endl;
+  cout << "Type      = " << dblSingletonField.type() << endl;
+  cout << "IsInteger = " << dblSingletonField.isInteger() << endl;
+  cout << "IsDouble  = " << dblSingletonField.isDouble() << endl;
+  cout << "IsText    = " << dblSingletonField.isText() << endl;
+  cout << "IsReal    = " << dblSingletonField.isReal() << endl;
+  cout << "Size      = " << dblSingletonField.size() << endl;
+  cout << "Bytes     = " << dblSingletonField.bytes() << endl;
+  dblSingletonField = -3.14;
+  cout << "Value     = " << (double)dblSingletonField << endl;
+  g = dblSingletonField.pvlGroup();
   cout << g << endl;
-  cout << "----------------------------------------" << endl;
+  cout << "----------------------------------------" << endl << endl;
   cout << "Testing text singleton" << endl;
-  Isis::TableField f3("Test", Isis::TableField::Text, 20);
-  cout << "Name      = " << f3.Name() << endl;
-  cout << "IsInteger = " << f3.IsInteger() << endl;
-  cout << "IsDouble  = " << f3.IsDouble() << endl;
-  cout << "IsText    = " << f3.IsText() << endl;
-  cout << "IsReal    = " << f3.IsReal() << endl;
-  cout << "Size      = " << f3.Size() << endl;
-  cout << "Bytes     = " << f3.Bytes() << endl;
-  f3 = "Bah humbug";
-  cout << "Value     = " << (string)f3 << endl;
-  g = f3.PvlGroup();
+  TableField textField("Test", TableField::Text, 20);
+  cout << "Name      = " << textField.name() << endl;
+  cout << "Type      = " << textField.type() << endl;
+  cout << "IsInteger = " << textField.isInteger() << endl;
+  cout << "IsDouble  = " << textField.isDouble() << endl;
+  cout << "IsText    = " << textField.isText() << endl;
+  cout << "IsReal    = " << textField.isReal() << endl;
+  cout << "Size      = " << textField.size() << endl;
+  cout << "Bytes     = " << textField.bytes() << endl;
+  textField = (string) "Bah humbug";
+  cout << "Value     = " << (string)textField << endl;
+  g = textField.pvlGroup();
   cout << g << endl;
-  cout << "----------------------------------------" << endl;
+  cout << "----------------------------------------" << endl << endl;
   cout << "Testing real singleton" << endl;
-  Isis::TableField f4("Test", Isis::TableField::Real);
-  cout << "Name      = " << f4.Name() << endl;
-  cout << "IsInteger = " << f4.IsInteger() << endl;
-  cout << "IsDouble  = " << f4.IsDouble() << endl;
-  cout << "IsText    = " << f4.IsText() << endl;
-  cout << "IsReal    = " << f4.IsReal() << endl;
-  cout << "Size      = " << f4.Size() << endl;
-  cout << "Bytes     = " << f4.Bytes() << endl;
-  f4 = (float)15.542;
-  cout << "Value     = " << (float)f4 << endl;
-  g = f4.PvlGroup();
+  TableField realSingletonField("Test", TableField::Real);
+  cout << "Name      = " << realSingletonField.name() << endl;
+  cout << "Type      = " << realSingletonField.type() << endl;
+  cout << "IsInteger = " << realSingletonField.isInteger() << endl;
+  cout << "IsDouble  = " << realSingletonField.isDouble() << endl;
+  cout << "IsText    = " << realSingletonField.isText() << endl;
+  cout << "IsReal    = " << realSingletonField.isReal() << endl;
+  cout << "Size      = " << realSingletonField.size() << endl;
+  cout << "Bytes     = " << realSingletonField.bytes() << endl;
+  realSingletonField = (float)15.542;
+  cout << "Value     = " << (float)realSingletonField << endl;
+  g = realSingletonField.pvlGroup();
   cout << g << endl;
-  cout << "----------------------------------------" << endl;
+  cout << "----------------------------------------" << endl << endl;
   cout << "Testing integer array" << endl;
-  Isis::TableField f5("Test", Isis::TableField::Integer, 3);
-  cout << "Name      = " << f5.Name() << endl;
-  cout << "IsInteger = " << f5.IsInteger() << endl;
-  cout << "IsDouble  = " << f5.IsDouble() << endl;
-  cout << "IsText    = " << f5.IsText() << endl;
-  cout << "IsReal    = " << f5.IsReal() << endl;
-  cout << "Size      = " << f5.Size() << endl;
-  cout << "Bytes     = " << f5.Bytes() << endl;
+  TableField intVectorField3("Test", TableField::Integer, 3);
+  cout << "Name      = " << intVectorField3.name() << endl;
+  cout << "Type      = " << intVectorField3.type() << endl;
+  cout << "IsInteger = " << intVectorField3.isInteger() << endl;
+  cout << "IsDouble  = " << intVectorField3.isDouble() << endl;
+  cout << "IsText    = " << intVectorField3.isText() << endl;
+  cout << "IsReal    = " << intVectorField3.isReal() << endl;
+  cout << "Size      = " << intVectorField3.size() << endl;
+  cout << "Bytes     = " << intVectorField3.bytes() << endl;
   vector<int> temp;
   temp.push_back(3);
   temp.push_back(2);
   temp.push_back(1);
-  f5 = temp;
+  intVectorField3 = temp;
   temp.clear();
-  temp = f5;
+  temp = intVectorField3;
   cout << "Value     = " << temp[0] << " " << temp[1] << " " << temp[2] << endl;
-  g = f5.PvlGroup();
+  g = intVectorField3.pvlGroup();
   cout << g << endl;
-  cout << "----------------------------------------" << endl;
+  cout << "----------------------------------------" << endl << endl;
   cout << "Testing double array" << endl;
-  Isis::TableField f6("Test", Isis::TableField::Double, 3);
-  cout << "Name      = " << f6.Name() << endl;
-  cout << "IsInteger = " << f6.IsInteger() << endl;
-  cout << "IsDouble  = " << f6.IsDouble() << endl;
-  cout << "IsText    = " << f6.IsText() << endl;
-  cout << "IsReal    = " << f6.IsReal() << endl;
-  cout << "Size      = " << f6.Size() << endl;
-  cout << "Bytes     = " << f6.Bytes() << endl;
+  TableField dblVectorField3("Test", TableField::Double, 3);
+  cout << "Name      = " << dblVectorField3.name() << endl;
+  cout << "Type      = " << dblVectorField3.type() << endl;
+  cout << "IsInteger = " << dblVectorField3.isInteger() << endl;
+  cout << "IsDouble  = " << dblVectorField3.isDouble() << endl;
+  cout << "IsText    = " << dblVectorField3.isText() << endl;
+  cout << "IsReal    = " << dblVectorField3.isReal() << endl;
+  cout << "Size      = " << dblVectorField3.size() << endl;
+  cout << "Bytes     = " << dblVectorField3.bytes() << endl;
   vector<double> tmp;
   tmp.push_back(1.3);
   tmp.push_back(2.4);
   tmp.push_back(-9.2);
-  f6 = tmp;
+  dblVectorField3 = tmp;
   tmp.clear();
-  tmp = f6;
+  tmp = dblVectorField3;
   cout << "Value     = " << tmp[0] << " " << tmp[1] << " " << tmp[2] << endl;
-  g = f6.PvlGroup();
+  g = dblVectorField3.pvlGroup();
   cout << g << endl;
-  cout << "----------------------------------------" << endl;
+  cout << "----------------------------------------" << endl << endl;
   cout << "Testing real array" << endl;
-  Isis::TableField f7("Test", Isis::TableField::Real, 3);
-  cout << "Name      = " << f7.Name() << endl;
-  cout << "IsInteger = " << f7.IsInteger() << endl;
-  cout << "IsDouble  = " << f7.IsDouble() << endl;
-  cout << "IsText    = " << f7.IsText() << endl;
-  cout << "IsReal    = " << f7.IsReal() << endl;
-  cout << "Size      = " << f7.Size() << endl;
-  cout << "Bytes     = " << f7.Bytes() << endl;
+  TableField realVectorField3("Test", TableField::Real, 3);
+  cout << "Name      = " << realVectorField3.name() << endl;
+  cout << "Type      = " << realVectorField3.type() << endl;
+  cout << "IsInteger = " << realVectorField3.isInteger() << endl;
+  cout << "IsDouble  = " << realVectorField3.isDouble() << endl;
+  cout << "IsText    = " << realVectorField3.isText() << endl;
+  cout << "IsReal    = " << realVectorField3.isReal() << endl;
+  cout << "Size      = " << realVectorField3.size() << endl;
+  cout << "Bytes     = " << realVectorField3.bytes() << endl;
   vector<float> tmp2;
   tmp2.push_back(1.3);
   tmp2.push_back(2.4);
   tmp2.push_back(-9.2);
-  f7 = tmp2;
+  realVectorField3 = tmp2;
   tmp2.clear();
-  tmp2 = f7;
+  tmp2 = realVectorField3;
   cout << "Value     = " << tmp2[0] << " " << tmp2[1] << " " << tmp2[2] << endl;
-  g = f7.PvlGroup();
+  g = realVectorField3.pvlGroup();
   cout << g << endl;
-  cout << "----------------------------------------" << endl;
+  cout << "----------------------------------------" << endl << endl;
 
   cout << "Testing integer constructor" << endl ;
-  Isis::PvlGroup group1("Field");
+  PvlGroup group1("Field");
 
-  group1 += Isis::PvlKeyword("name", "Test");
-  group1 += Isis::PvlKeyword("type", "Integer");
-  group1 += Isis::PvlKeyword("size", 20);
+  group1 += PvlKeyword("name", "Test");
+  group1 += PvlKeyword("type", "Integer");
+  group1 += PvlKeyword("size", 20);
 
-  Isis::TableField f8(group1);
-  g = f8.PvlGroup();
+  TableField intVectorField20(group1);
+  g = intVectorField20.pvlGroup();
   cout << g << endl;
-  cout << "----------------------------------------" << endl;
+  cout << "----------------------------------------" << endl << endl;
 
   cout << "Testing double constructor" << endl ;
-  Isis::PvlGroup group2("Field");
+  PvlGroup group2("Field");
 
-  group2 += Isis::PvlKeyword("name", "Test");
-  group2 += Isis::PvlKeyword("type", "Double");
-  group2 += Isis::PvlKeyword("size", 20);
+  group2 += PvlKeyword("name", "Test");
+  group2 += PvlKeyword("type", "Double");
+  group2 += PvlKeyword("size", 20);
 
-  Isis::TableField f9(group2);
-  g = f9.PvlGroup();
+  TableField dblVectorField20(group2);
+  g = dblVectorField20.pvlGroup();
   cout << g << endl;
-  cout << "----------------------------------------" << endl;
+  cout << "----------------------------------------" << endl << endl;
 
   cout << "Testing text constructor" << endl ;
-  Isis::PvlGroup group3("Field");
+  PvlGroup group3("Field");
 
-  group3 += Isis::PvlKeyword("name", "Test");
-  group3 += Isis::PvlKeyword("type", "Text");
-  group3 += Isis::PvlKeyword("size", 20);
+  group3 += PvlKeyword("name", "Test");
+  group3 += PvlKeyword("type", "Text");
+  group3 += PvlKeyword("size", 20);
 
-  Isis::TableField f10(group3);
-  g = f10.PvlGroup();
+  TableField textField20(group3);
+  g = textField20.pvlGroup();
   cout << g << endl;
-  cout << "----------------------------------------" << endl;
+  cout << "----------------------------------------" << endl << endl;
 
   cout << "Testing real constructor" << endl ;
-  Isis::PvlGroup group4("Field");
+  PvlGroup group4("Field");
 
-  group4 += Isis::PvlKeyword("name", "Test");
-  group4 += Isis::PvlKeyword("type", "Real");
-  group4 += Isis::PvlKeyword("size", 20);
+  group4 += PvlKeyword("name", "Test");
+  group4 += PvlKeyword("type", "Real");
+  group4 += PvlKeyword("size", 20);
 
-  Isis::TableField f11(group4);
-  g = f11.PvlGroup();
+  TableField realVectorField20(group4);
+  g = realVectorField20.pvlGroup();
   cout << g << endl;
-  cout << "----------------------------------------" << endl;
+  cout << "----------------------------------------" << endl << endl;
 
   cout << "Testing erroneous type constructor" << endl ;
   try {
-    Isis::PvlGroup group5("Field");
+    PvlGroup group5("Field");
 
-    group5 += Isis::PvlKeyword("name", "Test");
-    group5 += Isis::PvlKeyword("type", "BLAH");
-    group5 += Isis::PvlKeyword("size", 20);
+    group5 += PvlKeyword("name", "Test");
+    group5 += PvlKeyword("type", "BLAH");
+    group5 += PvlKeyword("size", 20);
 
-    Isis::TableField f12(group5);
-    g = f12.PvlGroup();
+    TableField unknownTypeField(group5);
+    g = unknownTypeField.pvlGroup();
     cout << g << endl;
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
-  cout << "----------------------------------------" << endl;
+  cout << "----------------------------------------" << endl << endl;
 
   cout << "Testing erroneous size constructor" << endl ;
   try {
-    Isis::PvlGroup group6("Field");
+    PvlGroup group6("Field");
 
-    group6 += Isis::PvlKeyword("name", "Test");
-    group6 += Isis::PvlKeyword("type", "Integer");
-    group6 += Isis::PvlKeyword("size", -7.3);
+    group6 += PvlKeyword("name", "Test");
+    group6 += PvlKeyword("type", "Integer");
+    group6 += PvlKeyword("size", -7.3);
 
-    Isis::TableField f13(group6);
-    g = f13.PvlGroup();
+    TableField invalidSizeField(group6);
+    g = invalidSizeField.pvlGroup();
     cout << g << endl;
 
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
-  cout << "----------------------------------------" << endl;
+
+  cout << "----------------------------------------" << endl << endl;
+  cout << "Test casting errors..." << endl;
+  cout << "     operator int()" << endl;
+  try {
+    cout << int(dblSingletonField) << endl; // try to cast a non-Integer type
+  }
+  catch (IException e) {
+    e.print();
+  }
+  try {
+    cout << int(intVectorField3); // try to cast an Integer type with multiple values
+  }
+  catch (IException e) {
+    e.print();
+  }
+
+  cout << endl;
+  cout << "     operator double()" << endl;
+  try {
+    cout << double(textField); // try to cast a non-Double type
+  }
+  catch (IException e) {
+    e.print();
+  }
+  try {
+    cout << double(dblVectorField3); // try to cast a Double type with multiple values
+  }
+  catch (IException e) {
+    e.print();
+  }
+
+  cout << endl;
+  cout << "     operator std::string() " << endl;
+  try {
+    cout << std::string(realSingletonField); // try to cast a non-Text type
+  }
+  catch (IException e) {
+    e.print();
+  }
+
+  cout << endl;
+  cout << "     operator float()" << endl;
+  try {
+    cout << float(intSingletonField); // try to cast a non-Real type
+  }
+  catch (IException e) {
+    e.print();
+  }
+  try {
+    cout << float(realVectorField3); // try to cast a Real type with multiple values
+  }
+  catch (IException e) {
+    e.print();
+  }
+
+  cout << endl;
+  cout << "     operator std::vector<int>() " << endl;
+  try {
+    vector<int> error = dblSingletonField; // try to cast a non Integer type
+  }
+  catch (IException e) {
+    e.print();
+  }
+
+  cout << endl;
+  cout << "     operator std::vector<double>() " << endl;
+  try {
+    vector<double> error = realSingletonField; // try to cast a non Double type
+  }
+  catch (IException e) {
+    e.print();
+  }
+
+  cout << endl;
+  cout << "     operator std::vector<float>() " << endl;
+  try {
+    vector<float> error = intVectorField3; // try to cast a non Real type
+  }
+  catch (IException e) {
+    e.print();
+  }
+
+  cout << "----------------------------------------" << endl << endl;
+  cout << "Test setting errors..." << endl ;
+  cout << "     operator=(const int value)" << endl;
+  try {
+    realSingletonField = (int) 1; // try to set Real type to non-float value
+  }
+  catch (IException e) {
+    e.print();
+  }
+  try {
+    intVectorField3 = (int) 1; // try to set single value to vector Field
+  }
+  catch (IException e) {
+    e.print();
+  }
+
+  cout << endl;
+  cout << "     operator=(const double value)" << endl;
+  try {
+    intSingletonField = (double) 3.14; // try to set Integer type to non-integer value
+  }
+  catch (IException e) {
+    e.print();
+  }
+  try {
+    dblVectorField3 = (double) 3.14; // try to set single value to vector Field
+  }
+  catch (IException e) {
+    e.print();
+  }
+
+  cout << endl;
+  cout << "     operator=(const std::string &value)" << endl;
+  try {
+    dblSingletonField = std::string("Error"); // try to set Double type to non-double value
+  }
+  catch (IException e) {
+    e.print();
+  }
+
+  cout << endl;
+  cout << "     operator=(const float value)" << endl;
+  try {
+    textField = (float) 3.14; // try to set Text type to non-string value
+  }
+  catch (IException e) {
+    e.print();
+  }
+  try {
+    realVectorField3 = (float) 3.14; // try to set single value to vector Field
+  }
+  catch (IException e) {
+    e.print();
+  }
+
+  int size = 2;
+  vector<int> intVector2(size, 1);
+  vector<double> doubleVector2(size, 3.14);
+  vector<float> floatVector2(size, 3.14);
+  cout << endl;
+  cout << "     operator=(const std::vector<int> &values)" << endl;
+  try {
+    intVectorField3 = intVector2; // try to set wrong size vector
+  }
+  catch (IException e) {
+    e.print();
+  }
+  try {
+    realVectorField3 = intVector2;  // try to set float vector to intVector
+  }
+  catch (IException e) {
+    e.print();
+  }
+
+  cout << endl;
+  cout << "     operator=(const std::vector<double> &values)" << endl;
+  try {
+    dblVectorField3 = doubleVector2; // try to set wrong size vector
+  }
+  catch (IException e) {
+    e.print();
+  }
+  try {
+    intVectorField3 = doubleVector2;  // try to set int vector to double vector
+  }
+  catch (IException e) {
+    e.print();
+  }
+
+  cout << endl;
+  cout << "     operator=(const std::vector<float> &value)" << endl;
+  try {
+    realVectorField3 = floatVector2;  // try to set wrong size vector
+  }
+  catch (IException e) {
+    e.print();
+  }
+  try {
+    dblVectorField3 = floatVector2;  // try to set double vector to float vector
+  }
+  catch (IException e) {
+    e.print();
+  }
+  cout << "----------------------------------------" << endl << endl;
 }

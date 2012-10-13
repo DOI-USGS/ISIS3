@@ -25,8 +25,8 @@ void IsisMain() {
 
   // This is the equation that hisharpen needs to perform
   // Final magnitude/phase equations
-  iString magniEq = "sqrt( oreal^2 + oimag^2 )";
-  iString phaseEq = "atan2( oimag , oreal )";
+  IString magniEq = "sqrt( oreal^2 + oimag^2 )";
+  IString phaseEq = "atan2( oimag , oreal )";
 
   // Insert oreal/oimag
   magniEq.Replace("oreal", "((real*freal + imag*fimag)/(freal*freal + fimag*fimag))");
@@ -124,7 +124,7 @@ void CreatePsf(Pipeline &p) {
   UserInterface &ui = Application::GetUserInterface();
 
   // calculate the temp file filename
-  iString tmpFile = p.TemporaryFolder() + "/";
+  IString tmpFile = p.TemporaryFolder() + "/";
   tmpFile += FileName(ui.GetAsString("TO")).baseName();
   tmpFile += ".psf.cub";
 
@@ -135,30 +135,30 @@ void CreatePsf(Pipeline &p) {
   // Verify the image looks like a hirise image
   try {
     const PvlGroup &instGrp = fromCube.getLabel()->FindGroup("Instrument", Pvl::Traverse);
-    iString instrument = (std::string)instGrp["InstrumentId"];
+    IString instrument = (std::string)instGrp["InstrumentId"];
 
     if(instrument != "HIRISE") {
-      iString message = "This program is meant to be run on HiRISE images only, found "
+      IString message = "This program is meant to be run on HiRISE images only, found "
                         "[InstrumentId] to be [" + instrument + "] and was expecting [HIRISE]";
       throw IException(IException::User, message, _FILEINFO_);
     }
   }
   catch(IException &e) {
-    iString message = "The [FROM] file is not a valid HIRISE cube. "
+    IString message = "The [FROM] file is not a valid HIRISE cube. "
                       "Please make sure it was imported using hi2isis.";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
   if(fromCube.getLineCount() != fromCube.getSampleCount()) {
-    iString message = "This program only works on square cubes, the number of samples [" +
-                      iString(fromCube.getSampleCount()) + "] must match the number of lines [" +
-                      iString(fromCube.getLineCount()) + "]";
+    IString message = "This program only works on square cubes, the number of samples [" +
+                      IString(fromCube.getSampleCount()) + "] must match the number of lines [" +
+                      IString(fromCube.getLineCount()) + "]";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
   // Let's figure out which point spread function we're supposed to be using
-  iString psfFile = "$mro/calibration/psf/PSF_";
-  iString filter = (std::string)fromCube.getLabel()->FindGroup("Instrument", Pvl::Traverse)["CcdId"];
+  IString psfFile = "$mro/calibration/psf/PSF_";
+  IString filter = (std::string)fromCube.getLabel()->FindGroup("Instrument", Pvl::Traverse)["CcdId"];
 
   if(filter.find("RED") != string::npos) {
     psfFile += "RED";
@@ -170,7 +170,7 @@ void CreatePsf(Pipeline &p) {
     psfFile += "IR";
   }
   else {
-    iString message = "The filter [" + filter + "] does not have a default point spread function. Please provide one using the [PSF] parameter.";
+    IString message = "The filter [" + filter + "] does not have a default point spread function. Please provide one using the [PSF] parameter.";
     throw IException(IException::Programmer, message, _FILEINFO_);
   }
 
@@ -180,14 +180,14 @@ void CreatePsf(Pipeline &p) {
   psfCube.open(psfFile);
 
   if(psfCube.getLineCount() > fromCube.getLineCount()) {
-    iString message = "The input cube dimensions must be at least [" + iString(psfCube.getLineCount());
+    IString message = "The input cube dimensions must be at least [" + IString(psfCube.getLineCount());
     message += "] pixels in the line and sample dimensions";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
   if(!IsPowerOf2(fromCube.getLineCount())) {
-    iString message = "The input cube dimensions must be a power of 2 (found [" +
-                      iString(fromCube.getLineCount()) + "])";
+    IString message = "The input cube dimensions must be a power of 2 (found [" +
+                      IString(fromCube.getLineCount()) + "])";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
@@ -244,7 +244,7 @@ void CleanPsf() {
   UserInterface &ui = Application::GetUserInterface();
 
   if(!manualPsf) {
-    iString psfTempFile = FileName(ui.GetAsString("PSF")).expanded();
+    IString psfTempFile = FileName(ui.GetAsString("PSF")).expanded();
 
     if(ui.GetBoolean("CLEANUP")) {
       remove(psfTempFile.c_str());

@@ -25,12 +25,12 @@ namespace Isis {
 
   GuiStringParameter::~GuiStringParameter() {}
 
-  void GuiStringParameter::Set(iString newValue) {
-    p_lineEdit->setText((iString)newValue);
+  void GuiStringParameter::Set(IString newValue) {
+    p_lineEdit->setText((IString)newValue);
   }
 
 
-  iString GuiStringParameter::Value() {
+  IString GuiStringParameter::Value() {
     return p_lineEdit->text().toStdString();
   }
 

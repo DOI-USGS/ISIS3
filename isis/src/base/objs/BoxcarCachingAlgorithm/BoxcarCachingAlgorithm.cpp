@@ -27,7 +27,7 @@
 #include <QQueue>
 
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "RawCubeChunk.h"
 
 namespace Isis {

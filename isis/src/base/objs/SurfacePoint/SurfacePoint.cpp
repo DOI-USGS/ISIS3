@@ -3,7 +3,7 @@
 #include <naif/SpiceUsr.h>
 
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Latitude.h"
 #include "Longitude.h"
 
@@ -254,7 +254,7 @@ namespace Isis {
       const Displacement &y, const Displacement &z) {
 
     if (!x.isValid() || !y.isValid() || !z.isValid()) {
-      iString msg = "x, y, and z must be set to valid displacements.  One or "
+      IString msg = "x, y, and z must be set to valid displacements.  One or "
         "more coordinates have been set to an invalid displacement.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -337,7 +337,7 @@ namespace Isis {
                                           const Distance &zSigma) {
     // Is this error checking necessary or should we just use Distance?????
     if (!xSigma.isValid() || !ySigma.isValid() || !zSigma.isValid()) {
-      iString msg = "x sigma, y sigma , and z sigma must be set to valid "
+      IString msg = "x sigma, y sigma , and z sigma must be set to valid "
         "distances.  One or more sigmas have been set to an invalid distance.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -362,7 +362,7 @@ namespace Isis {
        const symmetric_matrix<double, upper> &covar) {
     // Make sure the point is set first
     if (!Valid()) {
-      iString msg = "A point must be set before a variance/covariance matrix "
+      IString msg = "A point must be set before a variance/covariance matrix "
         "can be set.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -436,7 +436,7 @@ namespace Isis {
                                        const Distance  &radius) {
 // Is error checking necessary or does Latitude, Longitude, and Distance handle it?????
     if (!lat.isValid()  ||  !lon.isValid()  ||  !radius.isValid()) {
-      iString msg = "Latitude, longitude, or radius is an invalid value.";
+      IString msg = "Latitude, longitude, or radius is an invalid value.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -557,14 +557,14 @@ namespace Isis {
 
     if (!p_majorAxis || !p_minorAxis || !p_polarAxis || !p_majorAxis->isValid() ||
         !p_minorAxis->isValid() || !p_polarAxis->isValid()) {
-      iString msg = "In order to use sigmas in meter units, the equitorial "
+      IString msg = "In order to use sigmas in meter units, the equitorial "
         "radius must be set with a call to SetRadii or an appropriate "
         "constructor";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (!Valid()) {
-      iString msg = "Cannot set spherical sigmas on an invalid surface point";
+      IString msg = "Cannot set spherical sigmas on an invalid surface point";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -588,7 +588,7 @@ namespace Isis {
 
     // Make sure the point is set first
     if (!Valid()) {
-      iString msg = "A point must be set before a variance/covariance matrix "
+      IString msg = "A point must be set before a variance/covariance matrix "
         "can be set.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -672,7 +672,7 @@ namespace Isis {
       naifOutput[2] = p_z->kilometers();
     }
     else {
-      iString msg = "Cannot convert an invalid surface point to a naif array";
+      IString msg = "Cannot convert an invalid surface point to a naif array";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -714,7 +714,7 @@ namespace Isis {
     if (!majorRadius.isValid()  ||
         !minorRadius.isValid()  ||
         !polarRadius.isValid()) {
-      iString msg = "Radii must be set to valid distances.  One or more radii "
+      IString msg = "Radii must be set to valid distances.  One or more radii "
         "have been set to an invalid distance.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -751,13 +751,13 @@ namespace Isis {
   void SurfacePoint::ResetLocalRadius(const Distance &radius) {
 
     if (!radius.isValid()) {
-      iString msg = "Radius value must be a valid Distance.";
+      IString msg = "Radius value must be a valid Distance.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (!p_x || !p_y || !p_z || !p_x->isValid() || !p_y->isValid() ||
         !p_z->isValid()) {
-        iString msg = "In order to reset the local radius, a Surface Point must "
+        IString msg = "In order to reset the local radius, a Surface Point must "
           "already be set.";
         throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -925,7 +925,7 @@ namespace Isis {
 
         if (latSigma.isValid()) {
           if (!p_majorAxis || !p_majorAxis->isValid()) {
-            iString msg = "In order to calculate sigmas in meter units, the "
+            IString msg = "In order to calculate sigmas in meter units, the "
               "equitorial radius must be set with a call to SetRadii.";
             throw IException(IException::Programmer, msg, _FILEINFO_);
           }
@@ -951,7 +951,7 @@ namespace Isis {
 
       if (lonSigma.isValid()) {
         if (!p_majorAxis || !p_majorAxis->isValid()) {
-          iString msg = "In order to calculate sigmas in meter units, the "
+          IString msg = "In order to calculate sigmas in meter units, the "
             "equitorial radius must be set with a call to SetRadii.";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
@@ -997,7 +997,7 @@ namespace Isis {
     double dlatSigma = GetLatSigma().radians();
 
       if( dlatSigma <= 0.0 ) {
-          iString msg = "SurfacePoint::GetLatWeight(): Sigma <= 0.0";
+          IString msg = "SurfacePoint::GetLatWeight(): Sigma <= 0.0";
           throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
@@ -1013,7 +1013,7 @@ namespace Isis {
     double dlonSigma = GetLonSigma().radians();
 
         if( dlonSigma <= 0.0 ) {
-            iString msg = "SurfacePoint::GetLonWeight(): Sigma <= 0.0";
+            IString msg = "SurfacePoint::GetLonWeight(): Sigma <= 0.0";
             throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
@@ -1030,7 +1030,7 @@ namespace Isis {
     double dlocalRadiusSigma = GetLocalRadiusSigma().kilometers();
 
         if (dlocalRadiusSigma <= 0.0 ) {
-            iString msg = "SurfacePoint::GetRadWeight(): Sigma <= 0.0";
+            IString msg = "SurfacePoint::GetRadWeight(): Sigma <= 0.0";
             throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
@@ -1046,7 +1046,7 @@ namespace Isis {
   Distance SurfacePoint::GetDistanceToPoint(const SurfacePoint &other) const {
     if(p_majorAxis || p_minorAxis || p_polarAxis ||
        other.p_majorAxis || other.p_minorAxis || other.p_polarAxis) {
-      iString msg = "SurfacePoint::GetDistanceToPoint not yet implemented for "
+      IString msg = "SurfacePoint::GetDistanceToPoint not yet implemented for "
           "ellipsoids";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

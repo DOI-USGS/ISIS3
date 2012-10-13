@@ -32,7 +32,7 @@
 #include "Constants.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "NaifStatus.h"
 #include "SpecialPixel.h"
@@ -66,7 +66,7 @@ namespace Isis {
       //LoadFrameMounting ("CASSINI_SC_COORD","CASSINI_VIMS_V");
 
       SetFocalLength(143.0);
-      if(iString((string)inst["SamplingMode"]).UpCase() == "NORMAL") {
+      if(IString((string)inst["SamplingMode"]).UpCase() == "NORMAL") {
         SetPixelPitch(3 * .024);
       }
       else {
@@ -81,7 +81,7 @@ namespace Isis {
     }
 
     // Get the start time in et
-    iString stime = (string) inst ["NativeStartTime"];
+    IString stime = (string) inst ["NativeStartTime"];
     string intTime = stime.Token(".");
 
     double etStart = getClockTime(intTime).Et();
@@ -92,7 +92,7 @@ namespace Isis {
     etStart += stime.ToDouble() / 15959.0 - 2.;
 
     // Get the end time in et
-    iString etime = (string) inst ["NativeStopTime"];
+    IString etime = (string) inst ["NativeStopTime"];
     intTime = etime.Token(".");
 
     double etStop = getClockTime(intTime).Et();

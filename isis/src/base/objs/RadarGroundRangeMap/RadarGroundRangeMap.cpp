@@ -58,7 +58,7 @@ namespace Isis {
     transl[1] = 0.0;
     transl[2] = 0.0;
 
-    std::string icode = "INS" + iString(naifIkCode);
+    std::string icode = "INS" + IString(naifIkCode);
     pdpool_c((icode + "_TRANSX").c_str(), 3, transx);
     pdpool_c((icode + "_TRANSY").c_str(), 3, transy);
     pdpool_c((icode + "_ITRANSS").c_str(), 3, transs);

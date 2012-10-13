@@ -30,7 +30,7 @@
 
 #include "Constants.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Projection.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -94,7 +94,7 @@ namespace Isis {
           mapGroup += PvlKeyword("CenterLongitude", centerLon, "Degrees");
         }
         else {
-          iString message = "Cannot project using Lambert Azimuthal equal-area";
+          IString message = "Cannot project using Lambert Azimuthal equal-area";
           message += " without [CenterLongitude] value.  Keyword does not exist";
           message += " in labels and defaults are not allowed.";
           throw IException(IException::Unknown, message, _FILEINFO_);
@@ -109,7 +109,7 @@ namespace Isis {
           mapGroup += PvlKeyword("CenterLatitude", centerLat, "Degrees");
         }
         else {
-          iString message = "Cannot project using Lambert Azimuthal equal-area";
+          IString message = "Cannot project using Lambert Azimuthal equal-area";
           message += " without [CenterLatitude] value.  Keyword does not exist";
           message += " in labels and defaults are not allowed.";
           throw IException(IException::Unknown, message, _FILEINFO_);
@@ -122,17 +122,17 @@ namespace Isis {
 
       if (fabs(MinimumLongitude() - centerLongitude) > 360.0 ||
           fabs(MaximumLongitude() - centerLongitude) > 360.0) {
-        iString message = "[MinimumLongitude,MaximumLongitude] range of [";
-        message += iString(MinimumLongitude())+","+iString(MaximumLongitude());
+        IString message = "[MinimumLongitude,MaximumLongitude] range of [";
+        message += IString(MinimumLongitude())+","+IString(MaximumLongitude());
         message += "] is invalid.  No more than 360 degrees from the "
-                   "CenterLongitude [" + iString(centerLongitude) + "] is allowed.";
+                   "CenterLongitude [" + IString(centerLongitude) + "] is allowed.";
         throw IException(IException::Unknown, message, _FILEINFO_);
       }
 
       if (MaximumLongitude() - MinimumLongitude() > 360.0) {
-        iString message = "[MinimumLongitude,MaximumLongitude] range of ["  
-                        + iString(MinimumLongitude()) + "," 
-                        + iString(MaximumLongitude()) + "] is invalid. "
+        IString message = "[MinimumLongitude,MaximumLongitude] range of ["  
+                        + IString(MinimumLongitude()) + "," 
+                        + IString(MaximumLongitude()) + "] is invalid. "
                         "No more than 360 degree range width is allowed.";
         throw IException(IException::Unknown, message, _FILEINFO_);
       }
@@ -141,7 +141,7 @@ namespace Isis {
       init(centerLatitude, centerLongitude);
     }
     catch(IException &e) {
-      iString message = "Invalid label group [Mapping]";
+      IString message = "Invalid label group [Mapping]";
       throw IException(e, IException::Unknown, message, _FILEINFO_);
     }
   }
@@ -257,14 +257,14 @@ namespace Isis {
 
     // Test to make sure center longitude is valid
     if (fabs(centerLongitude) > 360.0) {
-      iString message = "CenterLongitude [" + iString(centerLongitude);
+      IString message = "CenterLongitude [" + IString(centerLongitude);
       message += "] is outside the range of [-360, 360]";
       throw IException(IException::Unknown, message, _FILEINFO_);
     } 
  
     // Test to make sure center lat is valid
     if (fabs(centerLatitude) > 90.0) {
-      iString message = "CenterLatitude [" + iString(centerLatitude);
+      IString message = "CenterLatitude [" + IString(centerLatitude);
       message += "] is outside the range of [-90, 90]";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
@@ -351,7 +351,7 @@ namespace Isis {
                  MaximumLongitude() >= centerLongitude - 180)
              || (MinimumLongitude() <= centerLongitude + 180 &&
                  MaximumLongitude() >= centerLongitude + 180)  ) ) {
-        iString message = "Invalid latitude and/or longitude range. ";
+        IString message = "Invalid latitude and/or longitude range. ";
         message += "Non-polar Lambert Azimuthal equal-area "
                    "projections can not project the antipodal point on "
                    "the body.";
@@ -1150,9 +1150,9 @@ namespace Isis {
       outerLatitude = MaximumLatitude();
     }
     else {
-      iString message = "checkLongitude() should only be called for a "
+      IString message = "checkLongitude() should only be called for a "
                     "polar aspect projection. CenterLatitude is [";
-      message = message + iString(centerLatDeg) + "] degrees.";
+      message = message + IString(centerLatDeg) + "] degrees.";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
@@ -1378,29 +1378,29 @@ namespace Isis {
    */
   void LambertAzimuthalEqualArea::validateRelativeScaleFactor() const {
     if (!m_good) {
-      iString message = "Projection failed or ground and coordinates have not "
+      IString message = "Projection failed or ground and coordinates have not "
                         "been set.  Relative scale factor can not be computed.";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
     if (!m_spherical && !(m_northPolarAspect || m_southPolarAspect)) {
-      iString message = "For ellipsidal bodies, relative scale factor can only "
+      IString message = "For ellipsidal bodies, relative scale factor can only "
                         "be computed for polar aspect projections.";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
     if (m_northPolarAspect && qFuzzyCompare(-90.0, m_latitude)) {
-        iString message = "Relative scale factor can not be computed for north "
+        IString message = "Relative scale factor can not be computed for north "
                           "polar aspect projection when ground is set to "
                           "latitude -90.";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
     if (m_southPolarAspect && qFuzzyCompare(90.0, m_latitude)) {
-        iString message = "Relative scale factor can not be computed for south "
+        IString message = "Relative scale factor can not be computed for south "
                           "polar aspect projection when ground is set to "
                           "latitude 90.";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
     if (m_k == Null || m_h == Null) {
-      iString message = "Relative scale factor can not be computed.";
+      IString message = "Relative scale factor can not be computed.";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
   }

@@ -31,7 +31,7 @@
 #include "FileName.h"
 
 namespace Isis {
-  class iString;
+  class IString;
 
   /**
    * @brief Parse and return pieces of a time string
@@ -133,7 +133,7 @@ namespace Isis {
       static std::string CurrentLocalTime();
       
       void setEt(double et);
-      void setUtc(iString utcString);
+      void setUtc(IString utcString);
 
     private:
       double p_et;     /**<The ephemeris representaion of the original string

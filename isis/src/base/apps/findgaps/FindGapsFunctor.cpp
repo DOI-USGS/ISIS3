@@ -24,7 +24,7 @@
 #include "FindGapsFunctor.h"
 
 #include "Buffer.h"
-#include "iString.h"
+#include "IString.h"
 #include "MultivariateStatistics.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
@@ -114,7 +114,7 @@ namespace Isis {
    *
    * @return Pvl group of gaps to be displayed
    */
-  void FindGapsFunctor::setModification(iString newModValue) {
+  void FindGapsFunctor::setModification(IString newModValue) {
     m_gaps->FindKeyword("Modification").SetValue(newModValue.ToQt());
   }
 

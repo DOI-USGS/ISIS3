@@ -12,7 +12,7 @@ using namespace std;
 using namespace Isis;
 
 bool filesMatch;
-iString differenceReason;
+IString differenceReason;
 PvlGroup tolerances;
 PvlGroup ignorekeys;
 
@@ -94,10 +94,10 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
   }
 
   for(int i = 0; i < pvl1.Size() && filesMatch; i++) {
-    iString val1 = pvl1[i];
-    iString val2 = pvl2[i];
-    iString unit1 = pvl1.Unit(i);
-    iString unit2 = pvl2.Unit(i);
+    IString val1 = pvl1[i];
+    IString val2 = pvl2[i];
+    IString unit1 = pvl1.Unit(i);
+    IString unit2 = pvl2.Unit(i);
 
     int ignoreIndex = 0;
     if(ignorekeys.HasKeyword(pvl1.Name()) && ignorekeys[pvl1.Name()].Size() > 1) {
@@ -126,13 +126,13 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
           filesMatch = false;
           if(pvl1.Size() == 1) {
             differenceReason = "Keyword '" + pvl1.Name() + "': difference is " +
-                               iString(difference);
+                               IString(difference);
           }
           else {
             differenceReason = "Keyword '" + pvl1.Name() + "' at index " +
-                               iString(i) + ": difference is " + iString(difference);
+                               IString(i) + ": difference is " + IString(difference);
           }
-          differenceReason += " (tolerance is " + iString(tolerance) + ")";
+          differenceReason += " (tolerance is " + IString(tolerance) + ")";
         }
       }
     }

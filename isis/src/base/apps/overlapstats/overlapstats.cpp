@@ -46,7 +46,7 @@ void IsisMain() {
     for (int j = 0; j < currOverlap->Size(); j++) {
       string currSerialNum = (*currOverlap)[j];
       if (!serialNumbers.HasSerialNumber(currSerialNum)) {
-        iString msg = "Found serial number [" + currSerialNum + "] in overlap "
+        IString msg = "Found serial number [" + currSerialNum + "] in overlap "
             "list that was not in the provided cube list. Please ensure that "
             "the cube list is the same one used to generate your overlap list "
             "file.";
@@ -259,7 +259,7 @@ void IsisMain() {
   //Log error num in print.prt if there were errors
   if(errorNum > 0) {
     PvlGroup grp("OverlapStats");
-    PvlKeyword key("ErrorNumber", iString(errorNum));
+    PvlKeyword key("ErrorNumber", IString(errorNum));
     grp.AddKeyword(key);
     Application::Log(grp);
   }
@@ -272,7 +272,7 @@ void IsisMain() {
     outfile << output.str();
     outfile.close();
     if(outfile.fail()) {
-      iString msg = "Unable to write the statistics to [" + ui.GetFileName("TO") + "]";
+      IString msg = "Unable to write the statistics to [" + ui.GetFileName("TO") + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
@@ -294,11 +294,11 @@ void IsisMain() {
  */
 std::string FormatString(double input, int head, int tail) {
 
-  iString result(input);
+  IString result(input);
 
   int point = result.find_first_of(".");
-  iString resultHead(result.substr(0, point));
-  iString resultTail(result.substr(point + 1, result.size() - point - 1));
+  IString resultHead(result.substr(0, point));
+  IString resultTail(result.substr(point + 1, result.size() - point - 1));
 
   for(int place = resultHead.size(); place < head; place ++) {
     resultHead = " " + resultHead;

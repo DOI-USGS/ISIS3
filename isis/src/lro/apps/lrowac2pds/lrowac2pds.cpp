@@ -49,9 +49,9 @@ Cube *visodd = NULL;
 
 Cube* out = NULL;
 
-iString instrumentModeId = "";
-iString productId = "";
-iString g_productVersionId = "N/A";
+IString instrumentModeId = "";
+IString productId = "";
+IString g_productVersionId = "N/A";
 
 string g_md5Checksum;
 
@@ -85,7 +85,7 @@ void IsisMain () {
         OriginalLabel origLab(list[i].toString());
         pdsLab = origLab.ReturnLabels();
 
-        iString prodId = pdsLab["PRODUCT_ID"][0];
+        IString prodId = pdsLab["PRODUCT_ID"][0];
         if (productId == "")
             productId = prodId;
 
@@ -96,9 +96,9 @@ void IsisMain () {
         }
 
         Isis::PvlGroup &inst = tempPvl.FindGroup("Instrument", Pvl::Traverse);
-        iString instId = (string) inst["InstrumentId"];
-        iString framelets = (string) inst["Framelets"];
-        iString numFrames = (int) inst["NumFramelets"];
+        IString instId = (string) inst["InstrumentId"];
+        IString framelets = (string) inst["Framelets"];
+        IString numFrames = (int) inst["NumFramelets"];
 
         if (instId != "WAC-VIS" && instId != "WAC-UV") {
             string msg = "This program is intended for use on LROC WAC images only. [";
@@ -106,7 +106,7 @@ void IsisMain () {
             throw IException(IException::User, msg, _FILEINFO_);
         }
 
-        iString instModeId = (string) inst["InstrumentModeId"];
+        IString instModeId = (string) inst["InstrumentModeId"];
         if (instrumentModeId == "")
             instrumentModeId = instModeId;
         if (numFramelets == 0)
@@ -369,10 +369,10 @@ void OutputLabel ( std::ofstream &fout, Cube* cube, Pvl &labelPvl ) {
     labelPvl.SetTerminator("END");
     //Set up the directory where the translations are
     PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-    iString transDir = (string) dataDir["Lro"] + "/translations/";
+    IString transDir = (string) dataDir["Lro"] + "/translations/";
 
     stringstream stream;
-    iString pdsLabel = "";
+    IString pdsLabel = "";
 
     //Translate the Original Pds Label
     FileName transFile(transDir + "lrowacPdsLabelExport.trn");
@@ -426,7 +426,7 @@ void OutputLabel ( std::ofstream &fout, Cube* cube, Pvl &labelPvl ) {
         imageObject += PvlKeyword("UNIT", "\"I/F\"");
     else
     imageObject += PvlKeyword("UNIT", "W / (m**2 micrometer sr)");
-    imageObject += PvlKeyword("MD5_CHECKSUM", (iString) g_md5Checksum);
+    imageObject += PvlKeyword("MD5_CHECKSUM", (IString) g_md5Checksum);
 
     stream << labelPvl;
 

@@ -3,7 +3,7 @@
 #include "UserInterface.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Pvl.h"
 #include "OriginalLabel.h"
 #include "History.h"
@@ -31,7 +31,7 @@ void IsisMain() {
   //Check that the file comes from the right camera
   UserInterface &ui = Application::GetUserInterface();
   FileName inFile = ui.GetFileName("FROM");
-  iString id;
+  IString id;
   try {
     Pvl lab(inFile.expanded());
 
@@ -186,7 +186,7 @@ void TranslateLrocNacLabels(FileName &labelFile, Cube *ocube) {
   Pvl outLabel;
   //Set up the directory where the translations are
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  iString transDir = (string) dataDir["Lro"] + "/translations/";
+  IString transDir = (string) dataDir["Lro"] + "/translations/";
   Pvl labelPvl(labelFile.expanded());
 
   //Translate the Instrument group

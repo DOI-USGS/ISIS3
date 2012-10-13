@@ -199,7 +199,7 @@ namespace Isis
 
         if (!start)
         {
-          iString msg = "The first item passed to getItems(AbstractTreeItem*, "
+          IString msg = "The first item passed to getItems(AbstractTreeItem*, "
               "AbstractTreeItem*) is not visible in this model's tree";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
@@ -228,7 +228,7 @@ namespace Isis
 
         if (!curItem)
         {
-          iString msg = "The second item passed to getItems(AbstractTreeItem*, "
+          IString msg = "The second item passed to getItems(AbstractTreeItem*, "
               "AbstractTreeItem*) is not visible in this model's tree";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }

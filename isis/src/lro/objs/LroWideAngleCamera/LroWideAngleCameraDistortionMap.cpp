@@ -22,7 +22,7 @@
  */
 #include <cmath>
 
-#include "iString.h"
+#include "IString.h"
 #include "LroWideAngleCameraDistortionMap.h"
 
 namespace Isis {
@@ -39,7 +39,7 @@ namespace Isis {
    *
    */
   LroWideAngleCameraDistortionMap::LroWideAngleCameraDistortionMap(Camera *parent, int naifIkCode) : CameraDistortionMap(parent) {
-    std::string odkkey = "INS" + Isis::iString(naifIkCode) + "_OD_K";
+    std::string odkkey = "INS" + Isis::IString(naifIkCode) + "_OD_K";
     for(int i = 0; i < 2; i++) {
       p_odk.push_back(p_camera->getDouble(odkkey, i));
     }

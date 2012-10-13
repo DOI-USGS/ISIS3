@@ -25,7 +25,7 @@
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "NaifStatus.h"
 
@@ -66,9 +66,9 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     focalMap->SetDetectorOrigin(
-      Spice::getDouble("INS" + (iString)(int)naifIkCode() + 
+      Spice::getDouble("INS" + (IString)(int)naifIkCode() + 
                        "_BORESIGHT_SAMPLE"),
-      Spice::getDouble("INS" + (iString)(int)naifIkCode() + 
+      Spice::getDouble("INS" + (IString)(int)naifIkCode() + 
                        "_BORESIGHT_LINE"));
 
     // Setup distortion map

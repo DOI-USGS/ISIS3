@@ -23,7 +23,7 @@
 #include "CubeViewport.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "CubePlotCurveConfigureDialog.h"
 
 namespace Isis {
@@ -70,7 +70,7 @@ namespace Isis {
                                            headerKeySize);
       dataPos += headerKeySize;
       if (givenKey != expectedHeader) {
-        iString msg = "The given byte array does not contain the required "
+        IString msg = "The given byte array does not contain the required "
             "header";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -110,7 +110,7 @@ namespace Isis {
       ASSERT(dataPos == classData.size());
     }
     else {
-      iString msg = "The given byte array is not large enough to contain the "
+      IString msg = "The given byte array is not large enough to contain the "
           "required header";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -279,7 +279,7 @@ namespace Isis {
                  QFileInfo(m_sourceCube.at(m_sourceCube.size()-1)).baseName());
 
         if (band != -1) {
-          setTitle(title().text() + "+" + iString(band).ToQt());
+          setTitle(title().text() + "+" + IString(band).ToQt());
         }
       }
 

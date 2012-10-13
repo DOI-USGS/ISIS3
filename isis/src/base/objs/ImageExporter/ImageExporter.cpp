@@ -154,7 +154,7 @@ namespace Isis {
    *
    * @param extension The extension for the output image
    */
-  void ImageExporter::setExtension(iString extension) {
+  void ImageExporter::setExtension(IString extension) {
     m_extension = extension;
 
     // World file extension is the first and last characters of the extension
@@ -187,7 +187,7 @@ namespace Isis {
         break;
       default:
         throw IException(IException::Programmer,
-            "Cannot export an image with [" + iString(desc.channelCount()) +
+            "Cannot export an image with [" + IString(desc.channelCount()) +
             "] channels",
             _FILEINFO_);
     }
@@ -284,7 +284,7 @@ namespace Isis {
    *
    * @return A pointer to the instantiated exporter owned by the caller
    */
-  ImageExporter * ImageExporter::fromFormat(iString format) {
+  ImageExporter * ImageExporter::fromFormat(IString format) {
     ImageExporter *exporter = NULL;
 
     format.DownCase();

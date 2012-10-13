@@ -57,7 +57,7 @@ namespace Isis {
 
     fstream input(file.expanded().c_str(), ios::in | ios::binary);
     if (!input.is_open()) {
-      iString msg = "Failed to open control network file" + file.name();
+      IString msg = "Failed to open control network file" + file.name();
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -74,7 +74,7 @@ namespace Isis {
       filePos += headerLength;
       int oldLimit = headerCodedInStream.PushLimit(headerLength);
       if (!p_networkHeader->ParseFromCodedStream(&headerCodedInStream)) {
-        iString msg = "Failed to read input control net file [" +
+        IString msg = "Failed to read input control net file [" +
             file.name() + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
@@ -168,7 +168,7 @@ namespace Isis {
     streampos startCoreHeaderPos = output.tellp();
 
     if (!p_networkHeader->SerializeToOstream(&output)) {
-      iString msg = "Failed to write output control network file [" +
+      IString msg = "Failed to write output control network file [" +
           file.name() + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
@@ -176,14 +176,14 @@ namespace Isis {
     streampos curPosition = startCoreHeaderPos + coreHeaderSize;
     for(int cpIndex = 0; cpIndex < p_controlPoints->size(); cpIndex ++) {
       if(!p_controlPoints->at(cpIndex).IsInitialized()) {
-        iString msg = "Failed to write output control network file [" +
+        IString msg = "Failed to write output control network file [" +
             file.name() + "] because control points are missing required "
             "fields";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
       if(!p_controlPoints->at(cpIndex).SerializeToOstream(&output)) {
-        iString msg = "Failed to write output control network file [" +
+        IString msg = "Failed to write output control network file [" +
             file.name() + "] while attempting to write control points";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
@@ -196,12 +196,12 @@ namespace Isis {
 
     PvlObject protoCore("Core");
     protoCore.AddKeyword(PvlKeyword("HeaderStartByte",
-                         iString((BigInt) startCoreHeaderPos)));
-    protoCore.AddKeyword(PvlKeyword("HeaderBytes", iString((BigInt) coreHeaderSize)));
+                         IString((BigInt) startCoreHeaderPos)));
+    protoCore.AddKeyword(PvlKeyword("HeaderBytes", IString((BigInt) coreHeaderSize)));
     protoCore.AddKeyword(PvlKeyword("PointsStartByte",
-        iString((BigInt) ( startCoreHeaderPos + coreHeaderSize))));
+        IString((BigInt) ( startCoreHeaderPos + coreHeaderSize))));
     protoCore.AddKeyword(PvlKeyword("PointsBytes",
-        (BigInt) iString(pointsSize)));
+        (BigInt) IString(pointsSize)));
     protoObj.AddObject(protoCore);
 
     PvlGroup netInfo("ControlNetworkInfo");
@@ -266,7 +266,7 @@ namespace Isis {
         pvlRadii = Projection::TargetRadii(target);
       }
       catch(IException &e) {
-        iString msg = "The target name, " + target + ", is not recognized.";
+        IString msg = "The target name, " + target + ", is not recognized.";
         throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
     }
@@ -363,13 +363,13 @@ namespace Isis {
                 Displacement(binaryPoint.aprioriy(),Displacement::Meters),
                 Displacement(binaryPoint.aprioriz(),Displacement::Meters));
         pvlPoint.FindKeyword("AprioriX").AddComment("AprioriLatitude = " +
-                                 iString(apriori.GetLatitude().degrees()) +
+                                 IString(apriori.GetLatitude().degrees()) +
                                  " <degrees>");
         pvlPoint.FindKeyword("AprioriY").AddComment("AprioriLongitude = " +
-                                 iString(apriori.GetLongitude().degrees()) +
+                                 IString(apriori.GetLongitude().degrees()) +
                                  " <degrees>");
         pvlPoint.FindKeyword("AprioriZ").AddComment("AprioriRadius = " +
-                                 iString(apriori.GetLocalRadius().meters()) +
+                                 IString(apriori.GetLocalRadius().meters()) +
                                  " <meters>");
 
         if(binaryPoint.aprioricovar_size()) {
@@ -397,12 +397,12 @@ namespace Isis {
             covar(1, 2) = binaryPoint.aprioricovar(4);
             covar(2, 2) = binaryPoint.aprioricovar(5);
             apriori.SetRectangularMatrix(covar);
-            iString sigmas = "AprioriLatitudeSigma = " +
-                             iString(apriori.GetLatSigmaDistance().meters()) +
+            IString sigmas = "AprioriLatitudeSigma = " +
+                             IString(apriori.GetLatSigmaDistance().meters()) +
                              " <meters>  AprioriLongitudeSigma = " +
-                             iString(apriori.GetLonSigmaDistance().meters()) +
+                             IString(apriori.GetLonSigmaDistance().meters()) +
                              " <meters>  AprioriRadiusSigma = " +
-                             iString(apriori.GetLocalRadiusSigma().meters()) +
+                             IString(apriori.GetLocalRadiusSigma().meters()) +
                              " <meters>";
             pvlPoint.FindKeyword("AprioriCovarianceMatrix").AddComment(sigmas);
           }
@@ -430,13 +430,13 @@ namespace Isis {
                 Displacement(binaryPoint.adjustedy(),Displacement::Meters),
                 Displacement(binaryPoint.adjustedz(),Displacement::Meters));
         pvlPoint.FindKeyword("AdjustedX").AddComment("AdjustedLatitude = " +
-                                 iString(adjusted.GetLatitude().degrees()) +
+                                 IString(adjusted.GetLatitude().degrees()) +
                                  " <degrees>");
         pvlPoint.FindKeyword("AdjustedY").AddComment("AdjustedLongitude = " +
-                                 iString(adjusted.GetLongitude().degrees()) +
+                                 IString(adjusted.GetLongitude().degrees()) +
                                  " <degrees>");
         pvlPoint.FindKeyword("AdjustedZ").AddComment("AdjustedRadius = " +
-                                 iString(adjusted.GetLocalRadius().meters()) +
+                                 IString(adjusted.GetLocalRadius().meters()) +
                                  " <meters>");
 
         if(binaryPoint.adjustedcovar_size()) {
@@ -464,12 +464,12 @@ namespace Isis {
             covar(1, 2) = binaryPoint.adjustedcovar(4);
             covar(2, 2) = binaryPoint.adjustedcovar(5);
             adjusted.SetRectangularMatrix(covar);
-            iString sigmas = "AdjustedLatitudeSigma = " +
-                             iString(adjusted.GetLatSigmaDistance().meters()) +
+            IString sigmas = "AdjustedLatitudeSigma = " +
+                             IString(adjusted.GetLatSigmaDistance().meters()) +
                              " <meters>  AdjustedLongitudeSigma = " +
-                             iString(adjusted.GetLonSigmaDistance().meters()) +
+                             IString(adjusted.GetLonSigmaDistance().meters()) +
                              " <meters>  AdjustedRadiusSigma = " +
-                             iString(adjusted.GetLocalRadiusSigma().meters()) +
+                             IString(adjusted.GetLocalRadiusSigma().meters()) +
                              " <meters>";
             pvlPoint.FindKeyword("AdjustedCovarianceMatrix").AddComment(sigmas);
           }

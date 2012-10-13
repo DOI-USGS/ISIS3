@@ -23,7 +23,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "iString.h"
+#include "IString.h"
 #include "Camera.h"
 #include "DbProfile.h"
 #include "SpecialPixel.h"
@@ -86,7 +86,7 @@ namespace Isis {
                 _camera = cam;
             }
 
-            static iString AlgorithmName ( const PvlObject &pvl ) {
+            static IString AlgorithmName ( const PvlObject &pvl ) {
                 return pvl.FindObject("PhotometricModel").FindGroup("Algorithm", Pvl::Traverse).FindKeyword("Name")[0];
             }
 
@@ -171,7 +171,7 @@ namespace Isis {
                 if (conf.count(keyname) < index) {
                     return (defval);
                 }
-                iString iValue(conf.value(keyname, index));
+                IString iValue(conf.value(keyname, index));
                 T value = iValue; // This makes it work with a string?
                 return (value);
             }

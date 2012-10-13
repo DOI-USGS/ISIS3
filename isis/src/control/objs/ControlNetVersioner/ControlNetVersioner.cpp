@@ -10,7 +10,7 @@
 #include "Distance.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
@@ -46,12 +46,12 @@ namespace Isis {
         return ReadPvlNetwork(network);
       }
       else {
-        iString msg = "Could not determine the control network file type";
+        IString msg = "Could not determine the control network file type";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
     }
     catch(IException &e) {
-      iString msg = "Reading the control network [" + networkFileName.name()
+      IString msg = "Reading the control network [" + networkFileName.name()
           + "] failed";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
@@ -118,7 +118,7 @@ namespace Isis {
           break;
 
         default:
-          iString msg = "The Pvl file version [" + iString(version) + "] is not"
+          IString msg = "The Pvl file version [" + IString(version) + "] is not"
               " supported";
           throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -126,7 +126,7 @@ namespace Isis {
       version = network["Version"][0];
 
       if(version == previousVersion) {
-        iString msg = "Cannot update from version [" + iString(version) + "] "
+        IString msg = "Cannot update from version [" + IString(version) + "] "
             "to any other version";
           throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -163,7 +163,7 @@ namespace Isis {
     header.add_pointmessagesizes(0); // Just to pass the "IsInitialized" test
 
     if(!header.IsInitialized()) {
-      iString msg = "There is missing required information in the network "
+      IString msg = "There is missing required information in the network "
           "header";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
@@ -217,7 +217,7 @@ namespace Isis {
         point.set_type(ControlPointFileEntryV0002::Free);
 
       if (object.HasKeyword("AprioriXYZSource")) {
-        iString source = object["AprioriXYZSource"][0];
+        IString source = object["AprioriXYZSource"][0];
 
         if (source == "None") {
           point.set_apriorisurfpointsource(ControlPointFileEntryV0002::None);
@@ -242,13 +242,13 @@ namespace Isis {
               ControlPointFileEntryV0002::BundleSolution);
         }
         else {
-          iString msg = "Invalid AprioriXYZSource [" + source + "]";
+          IString msg = "Invalid AprioriXYZSource [" + source + "]";
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }
 
       if (object.HasKeyword("AprioriRadiusSource")) {
-        iString source = object["AprioriRadiusSource"][0];
+        IString source = object["AprioriRadiusSource"][0];
 
         if (source == "None") {
           point.set_aprioriradiussource(ControlPointFileEntryV0002::None);
@@ -341,7 +341,7 @@ namespace Isis {
           group.DeleteKeyword("Reference");
         }
 
-        iString type = group["MeasureType"][0].DownCase();
+        IString type = group["MeasureType"][0].DownCase();
         if(type == "candidate")
           measure.set_type(ControlPointFileEntryV0002::Measure::Candidate);
         else if(type == "manual")
@@ -361,7 +361,7 @@ namespace Isis {
         for(int key = 0; key < group.Keywords(); key++) {
           ControlMeasureLogData interpreter(group[key]);
           if(!interpreter.IsValid()) {
-            iString msg = "Unhandled or duplicate keywords in control measure ["
+            IString msg = "Unhandled or duplicate keywords in control measure ["
                 + group[key].Name() + "]";
             throw IException(IException::Programmer, msg, _FILEINFO_);
           }
@@ -374,7 +374,7 @@ namespace Isis {
       }
 
       if(!point.IsInitialized()) {
-        iString msg = "There is missing required information in the control "
+        IString msg = "There is missing required information in the control "
             "points or measures";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
@@ -417,7 +417,7 @@ namespace Isis {
         break;
 
       default:
-        iString msg = "The binary file version [" + iString(version) + "] is "
+        IString msg = "The binary file version [" + IString(version) + "] is "
             "not supported";
         throw IException(IException::Io, msg, _FILEINFO_);
     }
@@ -468,7 +468,7 @@ namespace Isis {
       radii = Projection::TargetRadii(network["TargetName"]);
     }
     catch(IException &e) {
-      iString msg = "The target name is not recognized";
+      IString msg = "The target name is not recognized";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
 
@@ -660,7 +660,7 @@ namespace Isis {
 
         // Estimated => Candidate
         if(cm.HasKeyword("MeasureType")) {
-          iString type = cm["MeasureType"][0];
+          IString type = cm["MeasureType"][0];
           type.DownCase();
 
           if(type == "estimated" || type == "unmeasured") {
@@ -768,12 +768,12 @@ namespace Isis {
    * @param setter The protocol buffer setter method
    */
   void ControlNetVersioner::Copy(PvlContainer &container,
-      iString keyName, ControlPointFileEntryV0002 &point,
+      IString keyName, ControlPointFileEntryV0002 &point,
       void (ControlPointFileEntryV0002::*setter)(bool)) {
     if(!container.HasKeyword(keyName))
       return;
 
-    iString value = container[keyName][0];
+    IString value = container[keyName][0];
     container.DeleteKeyword(keyName);
     value.DownCase();
     if(value == "true" || value == "yes")
@@ -795,7 +795,7 @@ namespace Isis {
    * @param setter The protocol buffer setter method
    */
   void ControlNetVersioner::Copy(PvlContainer &container,
-      iString keyName, ControlPointFileEntryV0002 &point,
+      IString keyName, ControlPointFileEntryV0002 &point,
       void (ControlPointFileEntryV0002::*setter)(double)) {
     if(!container.HasKeyword(keyName))
       return;
@@ -820,12 +820,12 @@ namespace Isis {
    * @param setter The protocol buffer setter method
    */
   void ControlNetVersioner::Copy(PvlContainer &container,
-      iString keyName, ControlPointFileEntryV0002 &point,
+      IString keyName, ControlPointFileEntryV0002 &point,
       void (ControlPointFileEntryV0002::*setter)(const std::string&)) {
     if(!container.HasKeyword(keyName))
       return;
 
-    iString value = container[keyName][0];
+    IString value = container[keyName][0];
     container.DeleteKeyword(keyName);
     (point.*setter)(value);
   }
@@ -844,13 +844,13 @@ namespace Isis {
    * @param measure The protocol buffer point instance to set the value in
    * @param setter The protocol buffer setter method
    */
-  void ControlNetVersioner::Copy(PvlContainer &container, iString keyName,
+  void ControlNetVersioner::Copy(PvlContainer &container, IString keyName,
       ControlPointFileEntryV0002::Measure &measure,
       void (ControlPointFileEntryV0002::Measure::*setter)(bool)) {
     if(!container.HasKeyword(keyName))
       return;
 
-    iString value = container[keyName][0];
+    IString value = container[keyName][0];
     container.DeleteKeyword(keyName);
     value.DownCase();
     if(value == "true" || value == "yes")
@@ -871,7 +871,7 @@ namespace Isis {
    * @param measure The protocol buffer point instance to set the value in
    * @param setter The protocol buffer setter method
    */
-  void ControlNetVersioner::Copy(PvlContainer &container, iString keyName,
+  void ControlNetVersioner::Copy(PvlContainer &container, IString keyName,
       ControlPointFileEntryV0002::Measure &measure,
       void (ControlPointFileEntryV0002::Measure::*setter)(double)) {
     if(!container.HasKeyword(keyName))
@@ -896,13 +896,13 @@ namespace Isis {
    * @param measure The protocol buffer point instance to set the value in
    * @param set The protocol buffer setter method
    */
-  void ControlNetVersioner::Copy(PvlContainer &container, iString keyName,
+  void ControlNetVersioner::Copy(PvlContainer &container, IString keyName,
       ControlPointFileEntryV0002::Measure &measure,
       void (ControlPointFileEntryV0002::Measure::*set)(const std::string &)) {
     if(!container.HasKeyword(keyName))
       return;
 
-    iString value = container[keyName][0];
+    IString value = container[keyName][0];
     container.DeleteKeyword(keyName);
     (measure.*set)(value);
   }

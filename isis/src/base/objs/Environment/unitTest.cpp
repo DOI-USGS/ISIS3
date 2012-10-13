@@ -2,7 +2,7 @@
 
 #include <cstring>
 
-#include "iString.h"
+#include "IString.h"
 #include "Preference.h"
 #include "ProgramLauncher.h"
 
@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
   cerr << "userName: " << Environment::userName() << "\n";
   cerr << "hostName: " << Environment::hostName() << "\n";
   
-  iString cmd = "echo 'version:  isis" + Environment::isisVersion() + "' | cut -d . -f1";
+  IString cmd = "echo 'version:  isis" + Environment::isisVersion() + "' | cut -d . -f1";
   ProgramLauncher::RunSystemCommand(cmd);
 
   return 0;

@@ -56,7 +56,7 @@ void IsisMain() {
   std::string instId = inst["InstrumentId"];
   string camera = instId.substr(instId.size()-1);
 
-  iString filter = (string)(icube->getGroup("BandBin"))["FilterName"];
+  IString filter = (string)(icube->getGroup("BandBin"))["FilterName"];
   filter = filter.UpCase().substr(0,3);
 
   string target = inst["TargetName"];

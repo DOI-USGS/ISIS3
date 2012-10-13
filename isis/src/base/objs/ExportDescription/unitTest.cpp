@@ -5,17 +5,17 @@
 #include "ExportDescription.h"
 #include "PixelType.h"
 #include "Preference.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace Isis;
 using std::cout;
 using std::endl;
 
 
-const iString className = "ExportDescription";
+const IString className = "ExportDescription";
 
 
-void printFailure(iString methodName, iString message="") {
+void printFailure(IString methodName, IString message="") {
   cout <<
     "FAIL : " << className << "::" << methodName <<
     " : " << message << endl;
@@ -23,16 +23,16 @@ void printFailure(iString methodName, iString message="") {
 
 
 template <class T>
-void compareEqual(iString methodName, T expected, T found,
-    iString expectedString="", iString foundString="") {
+void compareEqual(IString methodName, T expected, T found,
+    IString expectedString="", IString foundString="") {
 
   bool equal = expected == found;
   cout <<
     (equal ? "PASS : " : "FAIL : ") <<
     className << "::" << methodName << " : " <<
-    (expectedString != "" ? expectedString : iString(expected)) <<
+    (expectedString != "" ? expectedString : IString(expected)) <<
     (equal ? " == " : " != ") <<
-    (foundString != "" ? foundString : iString(found)) << endl;
+    (foundString != "" ? foundString : IString(found)) << endl;
 }
 
 
@@ -72,15 +72,15 @@ int main() {
     printFailure("addChannel()", e.toString());
   }
 
-  iString innerName = "ChannelDescription";
+  IString innerName = "ChannelDescription";
   compareEqual("channelCount()", 3, desc.channelCount());
   for (int i = 0; i < desc.channelCount(); i++) {
     const ExportDescription::ChannelDescription &channel = desc.getChannel(i);
     compareEqual(innerName + "::filename()",
         filenames[i].name(), channel.filename().name());
     compareEqual(innerName + "::attributes()",
-        iString("1"),
-        iString(
+        IString("1"),
+        IString(
             QString::fromStdString(channel.attributes().toString()).mid(1)));
 
     if (i == 0) {

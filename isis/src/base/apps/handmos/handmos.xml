@@ -244,7 +244,12 @@
       Added option to have the BLOBs and labels transfered from the input
       cube transfered to the output mosaic from the input cube.
     </change>
-
+    <change name="Kimberly Oyama" date="2012-09-18">
+      When an image is placed twice (usually because the longitude range is greater than 360 and
+      encompasses the image more than once) only the last occurance was written to the log file.
+      This has been fixed so that there is an entry in the log file for every image placement.
+      References #976.
+    </change>
   </history>
 
   <oldName>

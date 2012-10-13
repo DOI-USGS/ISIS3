@@ -133,13 +133,11 @@ void IsisMain() {
   // Log the changes to NBANDS and to TRACK if any
   PvlObject hist = Isis::iApp->History();
   Isis::iApp->Log(hist.FindGroup("UserParameters"));
-  PvlGroup imgPosition("ImageLocation");
-  int iStartLine   = p.GetInputStartLineInMosaic();
-  int iStartSample = p.GetInputStartSampleInMosaic();
-  imgPosition += PvlKeyword("File", ui.GetFileName("FROM"));
-  imgPosition += PvlKeyword("StartSample", iStartSample);
-  imgPosition += PvlKeyword("StartLine", iStartLine);
-  Application::Log(imgPosition);
+
+  // Logs the input file location in the mosaic
+  for (int i = 0; i < p.imagePositions().Groups(); i++) {
+    Application::Log(p.imagePositions().Group(i));
+  }
 }
 
 /**

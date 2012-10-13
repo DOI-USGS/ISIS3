@@ -26,7 +26,7 @@
 #include "Table.h"
 #include "UserInterface.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace Isis;
 using namespace std;
@@ -49,7 +49,7 @@ namespace gbl {
   void FindShutterOffset();
   void DivideByAreaPixel();
   void FindEfficiencyFactor(string fluxunits);
-  iString GetCalibrationDirectory(string calibrationType);
+  IString GetCalibrationDirectory(string calibrationType);
 
   //global variables
   CissLabels *cissLab;
@@ -443,7 +443,7 @@ void gbl::CreateBitweightStretch(FileName bitweightTable) {
   double stretch1 = 0, stretch2;
   gbl::stretch.ClearPairs();
   for(int i = 0; i < stretchPairs->LineCount(); i++) {
-    iString line;
+    IString line;
     stretchPairs->GetLine(line);
     line.ConvertWhiteSpace();//convert all \n, \r, \t to spaces
     line.Compress();//compresses multiple spaces into single space
@@ -476,7 +476,7 @@ void gbl::CreateBitweightStretch(FileName bitweightTable) {
  */
 FileName gbl::FindBitweightFile() {
   // Get the directory where the CISS bitweight directory is
-  iString bitweightName;
+  IString bitweightName;
 
   if(gbl::cissLab->NarrowAngle()) {
     bitweightName += "nac";
@@ -484,7 +484,7 @@ FileName gbl::FindBitweightFile() {
   else {
     bitweightName += "wac";
   }
-  iString gainState(gbl::cissLab->GainState());
+  IString gainState(gbl::cissLab->GainState());
   bitweightName = bitweightName + "g" + gainState;
 
   if(gbl::cissLab->FrontOpticsTemp() < -5.0) {
@@ -522,7 +522,7 @@ void gbl::ComputeBias() {
   gbl::calgrp += PvlKeyword("BiasSubtractionPerformed", "Yes");
   gbl::calgrp.FindKeyword("BiasSubtractionPerformed").AddComment("Bias Subtraction Parameters");
 
-  iString fsw(gbl::cissLab->FlightSoftwareVersion());
+  IString fsw(gbl::cissLab->FlightSoftwareVersion());
   double flightSoftwareVersion;
 
   if(fsw == "Unknown") {
@@ -671,7 +671,7 @@ void gbl::Linearize() {
 //  The correction is then performed as DN'=DN*Cdn
 //  Where Cdn is an interpolation for C from the tabulated values
 
-  iString lut;
+  IString lut;
   int gainState = gbl::cissLab->GainState();
   if(gbl::cissLab->NarrowAngle()) {
     switch(gainState) {
@@ -727,7 +727,7 @@ void gbl::Linearize() {
 
   TextFile *pairs = new TextFile(linearLUT.expanded());
   for(int i = 0; i < pairs->LineCount(); i++) {
-    iString line;
+    IString line;
     pairs->GetLine(line, true);
     line.ConvertWhiteSpace();
     line.Compress();
@@ -806,7 +806,7 @@ void gbl::FindDustRingParameters() {
   // No mottle correct for summation mode other than 1
   if(gbl::cissLab->SummingMode() != 1) {
     gbl::mottleCorrection = false;
-    gbl::calgrp += PvlKeyword("MottleCorrectionPerformed", "No: Summing mode is " + iString(gbl::cissLab->SummingMode()));
+    gbl::calgrp += PvlKeyword("MottleCorrectionPerformed", "No: Summing mode is " + IString(gbl::cissLab->SummingMode()));
     gbl::calgrp += PvlKeyword("MottleFile", "Not applicable: No mottle correction");
     gbl::calgrp += PvlKeyword("EffectiveWavelengthFile", "Not applicable: No mottle correction");
     gbl::calgrp += PvlKeyword("StrengthFactor", "Not applicable: No mottle correction");
@@ -853,10 +853,10 @@ void gbl::FindDustRingParameters() {
     }
     gbl::calgrp += PvlKeyword("EffectiveWavelengthFile", effectiveWavelength.expanded());
     CisscalFile *effwlDB = new CisscalFile(effectiveWavelength.expanded());
-    iString col1, col2, col3, col4, col5;
+    IString col1, col2, col3, col4, col5;
     double effwl;
     for(int i = 0; i < effwlDB->LineCount(); i++) {
-      iString line;
+      IString line;
       effwlDB->GetLine(line);
       line = line.ConvertWhiteSpace();
       line = line.Compress();
@@ -992,7 +992,7 @@ FileName gbl::FindFlatFile() {
 
   // Find the best-match flat file
   //  Choose a nominal optics temp name as per ISSCAL
-  iString frontOpticsTemp("");
+  IString frontOpticsTemp("");
   if(gbl::cissLab->FrontOpticsTemp() < -5.0) {
     frontOpticsTemp += "m10";
   }
@@ -1004,9 +1004,9 @@ FileName gbl::FindFlatFile() {
   }
   //  Require match for instrument, temperature range name, Filter1, filter2
   CisscalFile *slopeDB = new CisscalFile(slopeDatabaseName.expanded());
-  iString col1, col2, col3, col4, col5, col6, col7, col8;
+  IString col1, col2, col3, col4, col5, col6, col7, col8;
   for(int i = 0; i < slopeDB->LineCount(); i++) {
-    iString line;
+    IString line;
     slopeDB->GetLine(line);  //assigns value to line
     line = line.ConvertWhiteSpace();
     line = line.Compress(true);
@@ -1168,7 +1168,7 @@ void gbl::FindShutterOffset() {
   gbl::calgrp += PvlKeyword("DividedByExposureTime", "Yes");
   gbl::divideByExposure = true;
   //  Define whereabouts of shutter offset files
-  iString offsetFileName("");
+  IString offsetFileName("");
   if(gbl::cissLab->NarrowAngle()) {
     offsetFileName += (gbl::GetCalibrationDirectory("offset") + "nacfm_so_");
   }
@@ -1297,7 +1297,7 @@ void gbl::FindEfficiencyFactor(string fluxunits) {
   vector<double> wavelengthT, transmittedFlux;
   double x, y;
   for(int i = 0; i < trans->LineCount(); i++) {
-    iString line;
+    IString line;
     trans->GetLine(line);  //assigns value to line
     line = line.ConvertWhiteSpace();
     line = line.Compress();
@@ -1342,7 +1342,7 @@ void gbl::FindEfficiencyFactor(string fluxunits) {
   CisscalFile *qeCorr = new CisscalFile(qecorrfile.expanded());
   vector<double> wavelengthQE, qecorrection;
   for(int i = 0; i < qeCorr->LineCount(); i++) {
-    iString line;
+    IString line;
     qeCorr->GetLine(line);  //assigns value to line
     line = line.ConvertWhiteSpace();
     line = line.Compress();
@@ -1370,7 +1370,7 @@ void gbl::FindEfficiencyFactor(string fluxunits) {
 
 
   // these variables will be defined in the if-statement
-  iString units;
+  IString units;
   double minlam, maxlam;
   vector<double> fluxproduct1, fluxproduct2;
 
@@ -1457,7 +1457,7 @@ void gbl::FindEfficiencyFactor(string fluxunits) {
     CisscalFile *spectral = new CisscalFile(specfile.expanded());
     vector<double> wavelengthF, flux;
     for(int i = 0; i < spectral->LineCount(); i++) {
-      iString line;
+      IString line;
       spectral->GetLine(line);  //assigns value to line
       line = line.ConvertWhiteSpace();
       line = line.Compress();
@@ -1569,9 +1569,9 @@ void gbl::FindCorrectionFactors() {
     gbl::calgrp += PvlKeyword("PolarizationFactorFile", polarizationFactorFile.expanded());
     CisscalFile *polFact = new CisscalFile(polarizationFactorFile.expanded());
     gbl::polarizationFactor = 0.0;
-    iString col1, col2, col3, col4;
+    IString col1, col2, col3, col4;
     for(int i = 0; i < polFact->LineCount(); i++) {
-      iString line;
+      IString line;
       polFact->GetLine(line);  //assigns value to line
       line = line.ConvertWhiteSpace();
       line = line.Compress();
@@ -1640,9 +1640,9 @@ void gbl::FindCorrectionFactors() {
   gbl::calgrp += PvlKeyword("CorrectionFactorFile", correctionFactorFile.expanded());
   CisscalFile *corrFact = new CisscalFile(correctionFactorFile.expanded());
   gbl::correctionFactor = 0.0;
-  iString col1, col2, col3, col4;
+  IString col1, col2, col3, col4;
   for(int i = 0; i < corrFact->LineCount(); i++) {
-    iString line;
+    IString line;
     corrFact->GetLine(line);  //assigns value to line
     line = line.ConvertWhiteSpace();
     line = line.Compress();
@@ -1689,19 +1689,19 @@ void gbl::FindCorrectionFactors() {
 //=====End Correction Factor Methods=============================================================//
 
 /**
- * This method returns an iString containing the path of a
+ * This method returns an IString containing the path of a
  * Cassini calibration directory
  *
  * @param calibrationType
- * @return <b>iString</b> Path of the calibration directory
+ * @return <b>IString</b> Path of the calibration directory
  *
  * @internal
  *   @history 2008-11-05 Jeannie Walldren - Original version
  */
-iString gbl::GetCalibrationDirectory(string calibrationType) {
+IString gbl::GetCalibrationDirectory(string calibrationType) {
   // Get the directory where the CISS calibration directories are.
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
-  iString missionDir = (string) dataDir["Cassini"];
+  IString missionDir = (string) dataDir["Cassini"];
   return missionDir + "/calibration/" + calibrationType + "/";
 }
 

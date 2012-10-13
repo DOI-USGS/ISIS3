@@ -26,7 +26,7 @@
 
 
 namespace Isis {
-  class iString;
+  class IString;
   
   /**
    * @author 2011-04-01 Eric Hyer & Steven Lambright
@@ -48,9 +48,9 @@ namespace Isis {
     public:
       ~Environment() {}
       
-      static iString userName();
-      static iString hostName();
-      static iString isisVersion();
+      static IString userName();
+      static IString hostName();
+      static IString isisVersion();
       
       
     protected:
@@ -58,7 +58,7 @@ namespace Isis {
       
       
     private:
-      static iString getEnvironmentValue(iString, iString);
+      static IString getEnvironmentValue(IString, IString);
       /**
        *  Construct an environment in static space to initialize some
        *    global Isis 3 environment options. This initialization

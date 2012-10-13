@@ -7,7 +7,7 @@
 #include "FileList.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Longitude.h"
 #include "OriginalLabel.h"
 #include "Process.h"

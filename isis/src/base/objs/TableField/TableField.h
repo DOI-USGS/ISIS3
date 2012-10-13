@@ -1,4 +1,4 @@
-#if !defined(TableField_h)
+#ifndef TableField_h
 #define TableField_h
 /**
  * @file
@@ -23,13 +23,20 @@
  */
 
 #include <string>
-#include "PvlGroup.h"
+#include <vector>
 
 namespace Isis {
+  class PvlGroup;
   /**
-   * @brief
-   *
-   *
+   * @brief Class for storing an Isis::Table's field information. 
+   *  
+   * This class represents the field values of an Isis3 table. In Isis3, fields 
+   * correspond to column values.  Each TableField object is a single table 
+   * entry for a column value at a specific row (or record) of the table. 
+   *  
+   * Be careful to note that the size of a field is the number of array values 
+   * for a single column entry.  It is not the number of rows or records of the 
+   * table. 
    *
    * @ingroup LowLevelCubeIO
    *
@@ -37,89 +44,53 @@ namespace Isis {
    *
    * @internal
    *   @history 2005-03-18 Elizabeth Ribelin - Added documentation to the class
-   *   @history 2007-05-28 Steven Lambright - Added 4 byte
-   *            floating point capabilities
+   *   @history 2007-05-28 Steven Lambright - Added 4 byte floating point
+   *                           capabilities
+   *   @history 2012-10-04 Jeannie Backer - Added accessor method for FieldType.
+   *                           Moved method implementations to cpp file. Changed
+   *                           member variable prefix to m_. Changed methods to
+   *                           lower camel case. Added documentation. Moved
+   *                           PvlGroup from header include to forward
+   *                           declaration. Added includes to cpp and header.
+   *                           Ordered includes and changed methods to lower
+   *                           camel case in the unitTest. Improved test
+   *                           coverage in all categories. Added padding to
+   *                           control statements. Fixes #1169.
    *   @todo Finish class documentation
    */
   class TableField {
     public:
-      enum Type { Integer, Double, Text, Real };
+      /**
+       * This enum describes the value type for the TableField.   
+       */
+      enum Type { 
+             Integer, //!< The values in the field are 4 byte integers.
+             Double,  //!< The values in the field are 8 byte doubles. 
+             Text,    /**< The values in the field are text strings with 1 byte 
+                           per character.*/
+             Real     //!< The values in the field are 4 byte reals or floats.
+      };
 
       //Constructors and Destructor
-      TableField(const std::string &name, Isis::TableField::Type type,
-                 int size = 1);
-      TableField(Isis::PvlGroup &field);
+      TableField(const std::string &name, Type type, int size = 1);
+      TableField(PvlGroup &field);
       ~TableField();
 
-      /**
-       * Returns the name of the TableField
-       *
-       * @return Name of TableField
-       */
-      std::string Name() const {
-        return p_name;
-      };
+      std::string name() const;
+      Type type() const;
+      bool isInteger() const;
+      bool isDouble() const;
+      bool isText() const;
+      bool isReal() const;
+      int bytes() const;
+      int size() const;
 
-      /**
-       * Checks to see if field type is Integer
-       *
-       * @return Returns true if field type is Integer, and false if it is not
-       */
-      bool IsInteger() const {
-        return (p_type == TableField::Integer);
-      };
-
-      /**
-       * Checks to see if field type is Double
-       *
-       * @return Returns true if field type is Double, and false if it is not
-       */
-      bool IsDouble() const {
-        return (p_type == TableField::Double);
-      };
-
-      /**
-       * Checks to see if field type is Text
-       *
-       * @return Returns true if field type is Text, and false if it is not
-       */
-      bool IsText() const {
-        return (p_type == TableField::Text);
-      };
-
-      /**
-       * Checks to see if field type is Text
-       *
-       * @return Returns true if field type is Text, and false if it is not
-       */
-      bool IsReal() const {
-        return (p_type == TableField::Real);
-      };
-
-      /**
-       * Returns the number of bytes in the field
-       *
-       * @return The number of bytes in the TableField
-       */
-      int Bytes() const {
-        return p_bytes;
-      };
-
-      /**
-       * Returns the size of the field
-       *
-       * @return The size of the TableField
-       */
-      int Size() const {
-        return p_size;
-      };
-
-      operator double() const;
-      operator std::vector<double>() const;
       operator int() const;
-      operator std::vector<int>() const;
-      operator std::string() const;
+      operator double() const;
       operator float() const;
+      operator std::string() const;
+      operator std::vector<int>() const;
+      operator std::vector<double>() const;
       operator std::vector<float>() const;
 
       void operator=(const int value);
@@ -132,17 +103,26 @@ namespace Isis {
       void operator=(const char *buf);
       void operator=(const void *buf);
 
-      Isis::PvlGroup PvlGroup();
+      PvlGroup pvlGroup();
 
     private:
-      std::string p_name;             //!<Name of field
-      Type p_type;                    //!<Type of field
-      int p_size;                     //!<Size of field
-      int p_bytes;                    //!<Number of bytes in field
-      std::vector<int> p_ivalues;     //!<Vector of Integer values
-      std::vector<double> p_dvalues;  //!<Vector of Double values
-      std::vector<float> p_rvalues;  //!<Vector of Real values
-      std::string p_svalue;           //!<string value of field
+      std::string m_name;            //!< Field name
+      Type m_type;                   //!< Field value type
+      int m_size;                    /**< Field size. This is the number of 
+                                          values per field entry of the table.*/
+      int m_bytes;                   //!< Number of bytes in field
+      std::vector<int> m_ivalues;    /**< Vector containing integer field values.
+                                          If the field Type is not Integer, this
+                                          vector will be empty.*/
+      std::vector<double> m_dvalues; /**< Vector containing double field values.
+                                          If the field Type is not Double, this
+                                          vector will be empty.*/
+      std::vector<float> m_rvalues;  /**< Vector containing Real field values.
+                                          If the field Type is not Real, this
+                                          vector will be empty.*/
+      std::string m_svalue;          /**< String containing text value of field.
+                                          If the field Type is not Text, this
+                                          string will be empty.*/
   };
 };
 

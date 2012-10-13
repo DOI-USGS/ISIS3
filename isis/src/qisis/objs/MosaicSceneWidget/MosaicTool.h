@@ -19,7 +19,7 @@ namespace Isis {
 }
 
 namespace Isis {
-  class iString;
+  class IString;
   class MosaicSceneWidget;
   class PvlObject;
 
@@ -61,7 +61,7 @@ namespace Isis {
        *
        * @return QString
        */
-      QPixmap getIcon(iString iconName) const;
+      QPixmap getIcon(IString iconName) const;
 
       virtual void addTo(QMenu *menu) {}
       virtual void addTo(ToolPad *toolPad);
@@ -71,7 +71,7 @@ namespace Isis {
 
       virtual PvlObject toPvl() const;
       virtual void fromPvl(const PvlObject &obj);
-      virtual iString projectPvlObjectName() const;
+      virtual IString projectPvlObjectName() const;
 
     signals:
       void activated(bool);

@@ -35,7 +35,7 @@
 #include "Displacement.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
 #include "Pvl.h"
@@ -119,7 +119,7 @@ namespace Isis {
         m_polarRadius = radii["PolarRadius"];
       }
       else {
-        iString msg = "Projection failed. No target radii are available "
+        IString msg = "Projection failed. No target radii are available "
                       "through keywords [EquatorialRadius and PolarRadius] "
                       "or [TargetName].";
         throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -127,12 +127,12 @@ namespace Isis {
 
       // Check the radii for validity
       if (m_equatorialRadius <= 0.0) {
-        iString msg = "Projection failed. Invalid value for keyword "
+        IString msg = "Projection failed. Invalid value for keyword "
                       "[EquatorialRadius]. It must be greater than zero";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
       if (m_polarRadius <= 0.0) {
-        iString msg = "Projection failed. Invalid value for keyword "
+        IString msg = "Projection failed. Invalid value for keyword "
                       "[PolarRadius]. It must be greater than zero";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -145,7 +145,7 @@ namespace Isis {
         m_latitudeType = Planetocentric;
       }
       else {
-        iString msg = "Projection failed. Invalid value for keyword "
+        IString msg = "Projection failed. Invalid value for keyword "
                       "[LatitudeType] must be "
                       "[Planetographic or Planetocentric]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -159,7 +159,7 @@ namespace Isis {
         m_longitudeDirection = PositiveEast;
       }
       else {
-        iString msg = "Projection failed. Invalid value for keyword "
+        IString msg = "Projection failed. Invalid value for keyword "
                       "[LongitudeDirection] must be "
                       "[PositiveWest or PositiveEast]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -173,7 +173,7 @@ namespace Isis {
         m_longitudeDomain = 180;
       }
       else {
-        iString msg = "Projection failed. Invalid value for keyword "
+        IString msg = "Projection failed. Invalid value for keyword "
                       "[LongitudeDomain] must be [180 or 360]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
@@ -190,33 +190,33 @@ namespace Isis {
         m_maximumLongitude = m_mappingGrp["MaximumLongitude"];
 
         if ((m_minimumLatitude < -90.0) || (m_minimumLatitude > 90.0)) {
-          iString msg = "Projection failed. "
-                        "[MinimumLatitude] of [" + iString(m_minimumLatitude)
+          IString msg = "Projection failed. "
+                        "[MinimumLatitude] of [" + IString(m_minimumLatitude)
                         + "] is outside the range of [-90:90]";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         if ((m_maximumLatitude < -90.0) || (m_maximumLatitude > 90.0)) {
-          iString msg = "Projection failed. "
-                        "[MaximumLatitude] of [" + iString(m_maximumLatitude)
+          IString msg = "Projection failed. "
+                        "[MaximumLatitude] of [" + IString(m_maximumLatitude)
                         + "] is outside the range of [-90:90]";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         if (m_minimumLatitude >= m_maximumLatitude) {
-          iString msg = "Projection failed. "
+          IString msg = "Projection failed. "
                         "[MinimumLatitude,MaximumLatitude] of ["
-                        + iString(m_minimumLatitude) + ","
-                        + iString(m_maximumLatitude) + "] are not "
+                        + IString(m_minimumLatitude) + ","
+                        + IString(m_maximumLatitude) + "] are not "
                         + "properly ordered";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         if (m_minimumLongitude >= m_maximumLongitude) {
-          iString msg = "Projection failed. "
+          IString msg = "Projection failed. "
                         "[MinimumLongitude,MaximumLongitude] of ["
-                        + iString(m_minimumLongitude) + "," 
-                        + iString(m_maximumLongitude) + "] are not "
+                        + IString(m_minimumLongitude) + "," 
+                        + IString(m_maximumLongitude) + "] are not "
                         + "properly ordered";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
@@ -252,10 +252,10 @@ namespace Isis {
       m_maximumY = -DBL_MAX;
 
       if (m_equatorialRadius < m_polarRadius) {
-        iString msg = "Projection failed. Invalid keyword value(s). "
-                      "[EquatorialRadius] = " + iString(m_equatorialRadius)
+        IString msg = "Projection failed. Invalid keyword value(s). "
+                      "[EquatorialRadius] = " + IString(m_equatorialRadius)
                       + " must be greater than or equal to [PolarRadius] = "
-                      + iString(m_polarRadius);
+                      + IString(m_polarRadius);
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
       else {
@@ -269,7 +269,7 @@ namespace Isis {
 
       m_sky = false;
       if (m_mappingGrp.HasKeyword("TargetName")) {
-        iString str = (string) m_mappingGrp["TargetName"];
+        IString str = (string) m_mappingGrp["TargetName"];
         if (str.UpCase() == "SKY") m_sky = true;
       }
 
@@ -280,7 +280,7 @@ namespace Isis {
       m_y = Null;
     }
     catch(IException &e) {
-      iString msg = "Projection failed.  Invalid label group [Mapping]";
+      IString msg = "Projection failed.  Invalid label group [Mapping]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
   }
@@ -392,7 +392,7 @@ namespace Isis {
     if (latitude == Null) {
       throw IException(IException::Unknown, 
                        "Unable to calculate local radius. The given latitude value [" 
-                       + iString(latitude) + "] is invalid.", 
+                       + IString(latitude) + "] is invalid.", 
                        _FILEINFO_);
     }
     double a = m_equatorialRadius;
@@ -439,7 +439,7 @@ namespace Isis {
     SpiceBoolean found;
     bodn2c_c(target.c_str(), &code, &found);
     if (!found) {
-      iString msg = "Could not convert target name [" + target +"] to NAIF code";
+      IString msg = "Could not convert target name [" + target +"] to NAIF code";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
@@ -599,7 +599,7 @@ namespace Isis {
     if (lat == Null || abs(lat) > 90.0) {
       throw IException(IException::Unknown, 
                        "Unable to convert to Planetocentric. The given latitude value [" 
-                       + iString(lat) + "] is invalid.", 
+                       + IString(lat) + "] is invalid.", 
                        _FILEINFO_);
     }
     double mylat = lat;
@@ -649,7 +649,7 @@ namespace Isis {
     if (lat == Null || fabs(lat) > 90.0) {
       throw IException(IException::Unknown, 
                        "Unable to convert to Planetographic. The given latitude value [" 
-                       + iString(lat) + "] is invalid.", 
+                       + IString(lat) + "] is invalid.", 
                        _FILEINFO_);
     }
     double mylat = lat;
@@ -712,7 +712,7 @@ namespace Isis {
     if (lon == Null) {
       throw IException(IException::Unknown, 
                        "Unable to convert to PositiveEast. The given longitude value [" 
-                       + iString(lon) + "] is invalid.", 
+                       + IString(lon) + "] is invalid.", 
                        _FILEINFO_);
     }
     double mylon = lon;
@@ -726,7 +726,7 @@ namespace Isis {
       mylon = To180Domain(mylon);
     }
     else {
-      iString msg = "Unable to convert longitude.  Domain [" + iString(domain) 
+      IString msg = "Unable to convert longitude.  Domain [" + IString(domain) 
                     + "] is not 180 or 360.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -751,7 +751,7 @@ namespace Isis {
     if (lon == Null) {
       throw IException(IException::Unknown, 
                        "Unable to convert to PositiveWest. The given longitude value [" 
-                       + iString(lon) + "] is invalid.", 
+                       + IString(lon) + "] is invalid.", 
                        _FILEINFO_);
     }
     double mylon = lon;
@@ -765,7 +765,7 @@ namespace Isis {
       mylon = To180Domain(mylon);
     }
     else {
-      iString msg = "Unable to convert longitude.  Domain [" + iString(domain)
+      IString msg = "Unable to convert longitude.  Domain [" + IString(domain)
                     + "] is not 180 or 360.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -821,7 +821,7 @@ namespace Isis {
     if (lon == Null) {
       throw IException(IException::Unknown, 
                        "Unable to convert to 180 degree domain. The given longitude value [" 
-                       + iString(lon) + "] is invalid.", 
+                       + IString(lon) + "] is invalid.", 
                        _FILEINFO_);
     }
     return Isis::Longitude(lon, Angle::Degrees).force180Domain().degrees();
@@ -839,7 +839,7 @@ namespace Isis {
     if (lon == Null) {
       throw IException(IException::Unknown, 
                        "Unable to convert to 360 degree domain. The given longitude value [" 
-                       + iString(lon) + "] is invalid.", 
+                       + IString(lon) + "] is invalid.", 
                        _FILEINFO_);
     }
     double result = lon;
@@ -1224,7 +1224,7 @@ namespace Isis {
     if (projectionX == Null) {
       throw IException(IException::Unknown, 
                        "Unable to convert to world x.  The given x-value [" 
-                       + iString(projectionX) + "] is invalid.", 
+                       + IString(projectionX) + "] is invalid.", 
                        _FILEINFO_);
     }
     if (m_mapper != NULL) {
@@ -1252,7 +1252,7 @@ namespace Isis {
     if (projectionY == Null) {
       throw IException(IException::Unknown, 
                        "Unable to convert to world y.  The given y-value [" 
-                       + iString(projectionY) + "] is invalid.", 
+                       + IString(projectionY) + "] is invalid.", 
                        _FILEINFO_);
     }
     if (m_mapper != NULL) {
@@ -1280,7 +1280,7 @@ namespace Isis {
     if (worldX == Null) {
       throw IException(IException::Unknown, 
                        "Unable to convert to projection x.  The given x-value [" 
-                       + iString(worldX) + "] is invalid.", 
+                       + IString(worldX) + "] is invalid.", 
                        _FILEINFO_);
     }
     if (m_mapper != NULL) {
@@ -1308,7 +1308,7 @@ namespace Isis {
     if (worldY == Null) {
       throw IException(IException::Unknown, 
                        "Unable to convert to projection y.  The given y-value [" 
-                       + iString(worldY) + "] is invalid.", 
+                       + IString(worldY) + "] is invalid.", 
                        _FILEINFO_);
     }
     if (m_mapper != NULL) {
@@ -2253,7 +2253,7 @@ namespace Isis {
    */
   double Projection::qCompute(const double sinPhi) const {
     if (m_eccentricity < DBL_EPSILON) {
-      iString msg = "Snyder's q variable should only be computed for "
+      IString msg = "Snyder's q variable should only be computed for "
                     "ellipsoidal projections.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -2307,7 +2307,7 @@ namespace Isis {
     }
 
     if (iteration >= MAX_ITERATIONS) {
-      iString msg = "Failed to converge in Projection::phi2Compute()";
+      IString msg = "Failed to converge in Projection::phi2Compute()";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 

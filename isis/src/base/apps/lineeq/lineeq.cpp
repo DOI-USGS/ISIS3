@@ -84,7 +84,7 @@ void IsisMain() {
       double filteredLine = filter.Average(line);
 
       if(csvOutput != NULL) {
-        csvOutput->PutLine((iString)lineAverages[band][line] + (iString)"," + (iString)filteredLine);
+        csvOutput->PutLine((IString)lineAverages[band][line] + (IString)"," + (IString)filteredLine);
       }
 
       lineAverages[band][line] = filteredLine;

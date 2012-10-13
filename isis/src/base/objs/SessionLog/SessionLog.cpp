@@ -22,7 +22,7 @@
 
 #include "SessionLog.h"
 #include "Preference.h"
-#include "iString.h"
+#include "IString.h"
 #include "Application.h"
 
 using namespace std;
@@ -31,10 +31,10 @@ namespace Isis {
   SessionLog::SessionLog() {
     // Grab the user preferences for logging
     Isis::PvlGroup &slog = Isis::Preference::Preferences().FindGroup("SessionLog");
-    p_termOutput = Isis::iString((string)slog["TerminalOutput"]).UpCase() == "ON";
-    p_fileOutput = Isis::iString((string)slog["FileOutput"]).UpCase() == "ON";
+    p_termOutput = Isis::IString((string)slog["TerminalOutput"]).UpCase() == "ON";
+    p_fileOutput = Isis::IString((string)slog["FileOutput"]).UpCase() == "ON";
     p_outputFile = (string) slog["FileName"];
-    p_access = Isis::iString((string) slog["FileAccess"]).UpCase();
+    p_access = Isis::IString((string) slog["FileAccess"]).UpCase();
 
     // Add root
     this->AddObject(Isis::iApp->History());

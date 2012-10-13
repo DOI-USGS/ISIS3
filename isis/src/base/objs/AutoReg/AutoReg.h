@@ -32,7 +32,7 @@
 namespace Isis {
   class AutoRegItem;
   class Buffer;
-  class iString;
+  class IString;
   class Pvl;
 
   /**
@@ -261,14 +261,14 @@ namespace Isis {
       void SetPatternValidPercent(const double percent);
       void SetSubsearchValidPercent(const double percent);
       void SetTolerance(double tolerance);
-      void SetChipInterpolator(const iString& interpolator);
+      void SetChipInterpolator(const IString& interpolator);
       void SetSurfaceModelWindowSize(int size);
       void SetSurfaceModelDistanceTolerance(double distance);
       void SetReductionFactor(int reductionFactor);
       void SetPatternZScoreMinimum(double minimum);
-      void SetGradientFilterType(const iString& gradientFilterType);
+      void SetGradientFilterType(const IString& gradientFilterType);
 
-      iString GradientFilterString() const;
+      IString GradientFilterString() const;
 
       /**
        * Return whether this object will attempt to register to whole or
@@ -384,9 +384,9 @@ namespace Isis {
        * Returns the name of the algorithm.
        *
        *
-       * @return iString
+       * @return IString
        */
-      virtual iString AlgorithmName() const = 0;
+      virtual IString AlgorithmName() const = 0;
 
       PvlGroup RegTemplate();
 

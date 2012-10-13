@@ -25,7 +25,7 @@
 #include <cmath>
 #include <cfloat>
 #include <QString>
-#include "iString.h"
+#include "IString.h"
 #include "IException.h"
 
 namespace Isis {
@@ -376,7 +376,7 @@ namespace Isis {
    */
   inline double StringToPixel(const std::string &str) {
 
-    iString s(str);
+    IString s(str);
     s.UpCase();
 
     std::vector<std::string> legal;

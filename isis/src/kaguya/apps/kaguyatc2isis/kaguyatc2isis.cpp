@@ -18,7 +18,7 @@ void IsisMain() {
 
   string labelFile = ui.GetFileName("FROM");
   FileName inFile = ui.GetFileName("FROM");
-  iString id;
+  IString id;
   Pvl lab(inFile.expanded());
 
   try {
@@ -53,7 +53,7 @@ void IsisMain() {
 
   // Get the directory where the generic pds2isis level 2 translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  iString transDir = (string) dataDir["base"] + "/translations/";
+  IString transDir = (string) dataDir["base"] + "/translations/";
 
   // Translate the Archive group
   FileName transFile(transDir + "pdsImageArchive.trn");

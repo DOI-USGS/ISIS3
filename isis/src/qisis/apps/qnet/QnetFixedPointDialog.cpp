@@ -113,7 +113,7 @@ namespace Isis {
     //  Add all files to list , selecting those in pointFiles which are
     //  those files which contain the point.
     for (int i=0; i<g_serialNumberList->Size(); i++) {
-      iString label = g_serialNumberList->FileName(i);
+      IString label = g_serialNumberList->FileName(i);
       QListWidgetItem *item = new QListWidgetItem(label);
 
       // if this entry of the SerialNumberList is also in the pointFiles then

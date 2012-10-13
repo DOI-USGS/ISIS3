@@ -10,7 +10,7 @@ using namespace Isis;
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   ProcessImport p;
-  iString from = ui.GetFileName("FROM");
+  IString from = ui.GetFileName("FROM");
   EndianSwapper swp("MSB");
   int nsamples = 0, nlines = 0, nbands = 1;
 
@@ -80,7 +80,7 @@ void IsisMain() {
       p.SetPixelType(Isis::Real);
       break;
     default:
-      iString msg = "Unsupported bit per pixel count [" + iString((int)readBytes.readLong) + "]";
+      IString msg = "Unsupported bit per pixel count [" + IString((int)readBytes.readLong) + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
   }
 

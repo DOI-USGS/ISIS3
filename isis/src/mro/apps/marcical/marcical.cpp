@@ -62,7 +62,7 @@ void IsisMain() {
     decimation.push_back(1.0);
   }
 
-  iString startTime = icube.getLabel()->FindGroup("Instrument", Pvl::Traverse)["StartTime"][0];
+  IString startTime = icube.getLabel()->FindGroup("Instrument", Pvl::Traverse)["StartTime"][0];
   iTime start(startTime);
   iTime changeTime("November 6, 2006 21:30:00 UTC");
 
@@ -80,7 +80,7 @@ void IsisMain() {
   // Create the stretch pairs
   stretch.ClearPairs();
   for(int i = 0; i < stretchPairs.LineCount(); i++) {
-    iString line;
+    IString line;
     stretchPairs.GetLine(line, true);
     int temp1 = line.Token(" ");
     int temp2 = line.Trim(" ");
@@ -100,8 +100,8 @@ void IsisMain() {
 
   // Check our coefficient file
   if(calibrationData.Objects() != 7) {
-    iString msg = "Calibration file [" + calFile.expanded() + "] must contain data for 7 filters in ascending order;";
-    msg += " only [" + iString(calibrationData.Objects()) + "] objects were found";
+    IString msg = "Calibration file [" + calFile.expanded() + "] must contain data for 7 filters in ascending order;";
+    msg += " only [" + IString(calibrationData.Objects()) + "] objects were found";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -110,7 +110,7 @@ void IsisMain() {
     PvlObject &calObj = calibrationData.Object(obj);
 
     if((int)calObj["FilterNumber"] != obj + 1) {
-      iString msg = "Calibration file [" + calFile.expanded() + "] must have the filters in ascending order";
+      IString msg = "Calibration file [" + calFile.expanded() + "] must have the filters in ascending order";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -139,8 +139,8 @@ void IsisMain() {
       continue;
     }
 
-    filePattern += "flat_band" + iString(band + 1);
-    filePattern += "_summing" + iString(summing) + "_v???.cub";
+    filePattern += "flat_band" + IString(band + 1);
+    filePattern += "_summing" + IString(summing) + "_v???.cub";
 
     FileName flatFile = FileName(filePattern).highestVersion();
     Cube *fcube = new Cube();
@@ -185,7 +185,7 @@ void IsisMain() {
       filter.push_back(filterNameToFilterIndex.find(filtNames[i])->second);
     }
     else {
-      iString msg = "Unrecognized filter name [" + iString(filtNames[i]) + "]";
+      IString msg = "Unrecognized filter name [" + IString(filtNames[i]) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }

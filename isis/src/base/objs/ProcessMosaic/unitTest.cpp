@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 #include "Application.h"
-#include "iString.h"
+#include "IString.h"
 #include "Portal.h"
 #include "ProcessMosaic.h"
 #include "Table.h"
@@ -317,7 +317,14 @@ void IsisMain() {
 
   TestOut(1, 1, 1, ProcessMosaic::UseBandPlacementCriteria, 0);
 
-  cout << "************************************************************************************************\n";
+  cout << "********* Test imagePositions() ********" << endl;
+  for (int i = 0; i <= m11.imagePositions().Groups() - 1; i++) {
+    cout << "Name: " << m11.imagePositions().Group(i).Name() << endl;
+    cout << "File: " << m11.imagePositions().Group(i).FindKeyword("File")[0] << endl;
+    cout << "StartSample: " << m11.imagePositions().Group(i).FindKeyword("StartSample")[0] << endl;
+    cout << "StartLine: " << m11.imagePositions().Group(i).FindKeyword("StartLine")[0] << endl;
+  }
+  cout << "*************************************************************************************\n";
 
   // ***********************************************************
   // Testing Errors

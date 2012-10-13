@@ -41,7 +41,7 @@ namespace Isis {
     bool printPercent;
     Isis::PvlGroup &group = Isis::Preference::Preferences().FindGroup("UserInterface");
     percent = group["ProgressBarPercent"];
-    Isis::iString temp = (string) group["ProgressBar"];
+    Isis::IString temp = (string) group["ProgressBar"];
     printPercent = temp.UpCase() == "ON";
 
     // Check for an error
@@ -80,8 +80,7 @@ namespace Isis {
   /**
    * Returns the text to output. Generally, this in not needed except rare
    * circumstances where an application has multiple steps and the text string
-   * needs to be saved and restored. For an example, see the Histogram method in
-   * the CubeInfo class.
+   * needs to be saved and restored.
    *
    * @return string
    */

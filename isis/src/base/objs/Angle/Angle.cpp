@@ -24,7 +24,7 @@
 #include <cmath>
 
 #include "Constants.h"
-#include "iString.h"
+#include "IString.h"
 #include "IException.h"
 #include "SpecialPixel.h"
 
@@ -188,7 +188,7 @@ namespace Isis {
    */
   bool Angle::operator<(const Angle& angle2) const {
     if(!isValid() || !angle2.isValid()) {
-      iString msg = "Cannot compare a invalid angles with the < operator";
+      IString msg = "Cannot compare a invalid angles with the < operator";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -205,7 +205,7 @@ namespace Isis {
    */
   bool Angle::operator>(const Angle& angle2) const {
     if(!isValid() || !angle2.isValid()) {
-      iString msg = "Cannot compare a invalid angles with the > operator";
+      IString msg = "Cannot compare a invalid angles with the > operator";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -219,11 +219,11 @@ namespace Isis {
    * @param includeUnits Include the angle's units in the text.
    * @return A user-displayable angle string.
    */
-  iString Angle::toString(bool includeUnits) const {
-    iString textResult = "";
+  IString Angle::toString(bool includeUnits) const {
+    IString textResult = "";
 
     if (isValid()) {
-      textResult = iString(degrees());
+      textResult = IString(degrees());
 
       if (includeUnits)
         textResult += " degrees";
@@ -253,8 +253,8 @@ namespace Isis {
         break;
     }
 
-    iString msg = "Angle can not interpret the enumerated value ["  +
-      iString(unit) + "] as a unit";
+    IString msg = "Angle can not interpret the enumerated value ["  +
+      IString(unit) + "] as a unit";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -284,8 +284,8 @@ namespace Isis {
     }
 
     if(angleValue == Null) {
-      iString msg = "Angle can not interpret the enumerated value ["  +
-        iString(unit) + "] as a unit";
+      IString msg = "Angle can not interpret the enumerated value ["  +
+        IString(unit) + "] as a unit";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -302,7 +302,7 @@ namespace Isis {
   void Angle::setAngle(const double &angle,const Units& unit) {
     // Don't allow non-Null special pixels, Null means no value
     if (IsSpecial(angle) && angle != Null) {
-      iString msg = "Angle cannot be a non-Null special pixel";
+      IString msg = "Angle cannot be a non-Null special pixel";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -322,8 +322,8 @@ namespace Isis {
         break;
 
       default:
-        iString msg = "Angle can not interpret the enumerated value ["  +
-          iString(unit) + "] as a unit";
+        IString msg = "Angle can not interpret the enumerated value ["  +
+          IString(unit) + "] as a unit";
         throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }

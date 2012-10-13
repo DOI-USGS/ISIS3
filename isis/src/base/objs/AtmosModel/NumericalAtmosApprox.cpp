@@ -25,7 +25,7 @@
 #include "NumericalAtmosApprox.h"
 #include "NumericalApproximation.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace std;
 namespace Isis {
@@ -113,7 +113,7 @@ namespace Isis {
     }
     throw IException(IException::Programmer,
                      "NumericalAtmosApprox::RombergsMethod() - Failed to converge in "
-                     + iString(maxits) + " iterations.",
+                     + IString(maxits) + " iterations.",
                      _FILEINFO_);
   }
 

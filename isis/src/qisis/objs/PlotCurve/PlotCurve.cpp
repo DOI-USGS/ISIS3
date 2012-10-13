@@ -153,7 +153,7 @@ namespace Isis {
                                            headerKeySize);
       dataPos += headerKeySize;
       if (givenKey != expectedHeader) {
-        iString msg = "The given byte array does not contain the required "
+        IString msg = "The given byte array does not contain the required "
             "header";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -251,7 +251,7 @@ namespace Isis {
       return classData.right(classData.size() - dataPos);
     }
     else {
-      iString msg = "The given byte array is not large enough to contain the "
+      IString msg = "The given byte array is not large enough to contain the "
           "required header";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

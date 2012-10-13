@@ -1,5 +1,64 @@
+Testing toBool
+	True:  1
+	False: 0
+	**ERROR** Failed to convert string [...] to a boolean. Please specify one of [1, on, true, y, yes] for true, or one of [0, false, n, no, off] for false.
+
+Testing toInt
+	0
+	5
+	-5
+	2147483647
+	-2147483647
+	**ERROR** Failed to convert string [-5.0] to an integer.
+	**ERROR** Failed to convert string [2147483648] to an integer.
+
+Testing toBigInt
+	0
+	5
+	-5
+	9223372036854775807
+	-9223372036854775807
+	**ERROR** Failed to convert string [-5.0] to a big integer.
+	**ERROR** Failed to convert string [9223372036854775808] to a big integer.
+
+Testing toDouble
+	0
+	5.25
+	-5.25
+	1e+100
+	-1e+100
+	**ERROR** Failed to convert string [fred] to a double.
+
+Testing toString
+	bool(false):        No
+	bool(true):         Yes
+	char(A):            A
+	int(2147483647):    2147483647
+	BigInt(2147483648): 2147483648
+	double(0.0):        0.0
+	double(DBL_MIN):    2.2250738585072e-308
+	double(DBL_MAX*2):  1.79769313486232e+308
+	double(-DBL_MAX*2): -1.79769313486232e+308
+	double(sqrt(-1)):   nan
+	double(5.25):       5.25
+	double(-5.25):      -5.25
+	double(1e13):       10000000000000
+	double(1e13+1):     1.0000000000001e+13
+	double(1e-3):       0.001
+	double(9e-4):       9.0e-04
+	double(1e100):      1.0e+100
+	double(-1e100):     -1.0e+100
+
+Testing cerr with QString and with QStringRef
+	QString
+	QStringRef
+
+----------------------------------
+-- Now testing deprecated class --
+----------------------------------
+
 No arg construtor : Test string
-Constructor Isis::iString: Test string again
+Constructor IString: Test string again
 Constructor char : 65
 Constructor int : 999
 Constructor BigInt : 9999999999

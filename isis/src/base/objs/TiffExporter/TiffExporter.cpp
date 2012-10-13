@@ -113,7 +113,7 @@ namespace Isis {
         break;
       default:
         throw IException(IException::Programmer,
-            "Invalid pixel type for data [" + iString(type) + "]",
+            "Invalid pixel type for data [" + IString(type) + "]",
             _FILEINFO_);
     }
   }
@@ -139,7 +139,7 @@ namespace Isis {
    *
    * @return True if "tiff", false otherwise
    */
-  bool TiffExporter::canWriteFormat(iString format) {
+  bool TiffExporter::canWriteFormat(IString format) {
     return format == "tiff";
   }
 };

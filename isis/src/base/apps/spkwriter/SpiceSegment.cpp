@@ -29,7 +29,7 @@
 #include <sstream>
 
 #include "SpiceSegment.h"
-#include "iString.h"
+#include "IString.h"
 #include "FileName.h"
 #include "Cube.h"
 #include "Camera.h"
@@ -365,7 +365,7 @@ std::string SpiceSegment::getNaifName(int naifid) const {
 
   // If it fails, just report it missing
   if ( cframe.empty() ) {
-    string mess = "Failed to convert FrameId (" + iString(naifid) +
+    string mess = "Failed to convert FrameId (" + IString(naifid) +
                   ") to string - perhaps the frame kernel is missing or not" +
                   " loaded.";
     cframe = "_UNKNOWN_";

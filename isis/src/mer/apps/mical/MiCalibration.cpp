@@ -44,7 +44,7 @@ namespace Isis {
      *               entered.
      */
     void MiCalibration::ReadKernel(Pvl &kernel) {
-      string rover = "MI_" + Isis::iString(p_instrumentSerialNumber);
+      string rover = "MI_" + Isis::IString(p_instrumentSerialNumber);
       PvlGroup kernelgrp = kernel.FindGroup(rover, Pvl::Traverse);
       p_DELCCDTa = kernelgrp["DELCCDTa"];
       p_DELCCDTb = kernelgrp["DELCCDTb"];

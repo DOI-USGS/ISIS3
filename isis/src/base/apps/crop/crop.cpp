@@ -103,10 +103,10 @@ void IsisMain() {
 
     // If we're not propagating spice data, dont propagate the following tables...
     if(!ui.GetBoolean("PROPSPICE")) {
-      if((iString)obj["Name"][0] == "InstrumentPointing") continue;
-      if((iString)obj["Name"][0] == "InstrumentPosition") continue;
-      if((iString)obj["Name"][0] == "BodyRotation") continue;
-      if((iString)obj["Name"][0] == "SunPosition") continue;
+      if((IString)obj["Name"][0] == "InstrumentPointing") continue;
+      if((IString)obj["Name"][0] == "InstrumentPosition") continue;
+      if((IString)obj["Name"][0] == "BodyRotation") continue;
+      if((IString)obj["Name"][0] == "SunPosition") continue;
     }
 
     // Read the table into a table object

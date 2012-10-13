@@ -34,7 +34,7 @@
 #include "Cube.h"
 #include "Brick.h"
 #include "SpecialPixel.h"
-#include "iString.h"
+#include "IString.h"
 #include "IException.h"
 
 #include "naif/SpiceUsr.h"
@@ -316,10 +316,10 @@ bool HiCalConf::_naifLoaded = false;
     scs2e_c (-74999,scStartTime.c_str(),&obsStartTime);
 
     string targetName = getKey("TargetName", "Instrument");
-    if ( (iString::Equal(targetName, "Sky")) ||
-         (iString::Equal(targetName, "Cal")) ||
-         (iString::Equal(targetName, "Phobos")) ||
-         (iString::Equal(targetName, "Deimos")) ) {
+    if ( (IString::Equal(targetName, "Sky")) ||
+         (IString::Equal(targetName, "Cal")) ||
+         (IString::Equal(targetName, "Phobos")) ||
+         (IString::Equal(targetName, "Deimos")) ) {
       targetName = "Mars";
     }
     double sunv[3];
@@ -590,7 +590,7 @@ std::string HiCalConf::parser(const std::string &s, const ValueList &vlist,
     for ( ciVlist = vlist.begin() ; ciVlist != vlist.end() ; ++ciVlist ) {
       std::string str(*ciVlist);
       if ( prof.exists(str) ) {
-        sout = iString::Replace(sout, makePattern(str), prof(str));
+        sout = IString::Replace(sout, makePattern(str), prof(str));
       }
     }
 

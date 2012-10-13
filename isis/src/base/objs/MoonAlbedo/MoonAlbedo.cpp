@@ -272,7 +272,7 @@ namespace Isis {
   void MoonAlbedo::SetNormH(const double h) {
     if(h == 0.0) {
       std::string msg = "Invalid value of normalization h [" +
-                        iString(h) + "]";
+                        IString(h) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -289,7 +289,7 @@ namespace Isis {
   void MoonAlbedo::SetNormBsh1(const double bsh1) {
     if(bsh1 < 0.0) {
       std::string msg = "Invalid value of normalization bsh1 [" +
-                        iString(bsh1) + "]";
+                        IString(bsh1) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 

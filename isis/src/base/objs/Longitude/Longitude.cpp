@@ -26,7 +26,7 @@
 
 #include "Constants.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "PvlGroup.h"
 #include "SpecialPixel.h"
 
@@ -59,8 +59,8 @@ namespace Isis {
       m_currentDomain = Domain180;
     }
     else {
-      iString msg = "Longitude domain [" +
-          iString(mapping["LongitudeDomain"][0]) + "] not recognized";
+      IString msg = "Longitude domain [" +
+          IString(mapping["LongitudeDomain"][0]) + "] not recognized";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -71,8 +71,8 @@ namespace Isis {
       setPositiveWest(longitude, longitudeUnits);
     }
     else {
-      iString msg = "Longitude direction [" +
-          iString(mapping["LongitudeDirection"][0]) + "] not recognized";
+      IString msg = "Longitude direction [" +
+          IString(mapping["LongitudeDirection"][0]) + "] not recognized";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -98,7 +98,7 @@ namespace Isis {
       setPositiveWest(longitude.radians(), Radians);
     }
     else {
-      iString msg = "Longitude direction [" + iString(lonDir) + "] not valid";
+      IString msg = "Longitude direction [" + IString(lonDir) + "] not valid";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -125,7 +125,7 @@ namespace Isis {
       setPositiveWest(longitude, longitudeUnits);
     }
     else {
-      iString msg = "Longitude direction [" + iString(lonDir) + "] not valid";
+      IString msg = "Longitude direction [" + IString(lonDir) + "] not valid";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }

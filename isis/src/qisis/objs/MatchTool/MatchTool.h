@@ -3,6 +3,7 @@
 
 #include "Tool.h"
 #include "ControlPoint.h"
+#include "SerialNumberList.h"
 
 #include <QCloseEvent>
 #include <QHideEvent>
@@ -33,9 +34,8 @@ namespace Isis {
   class ControlMeasure;
   class ControlNet;
   class Cube;
-  class iString;
+  class IString;
   class MatchToolNewPointDialog;
-  class SerialNumberList;
   class Stretch;
   class UniversalGroundMap;
 }
@@ -46,6 +46,7 @@ namespace Isis {
   class MainWindow;
   class MdiCubeViewport;
   class MatchHoldPointDialog;
+  class SerialNumberList;
   class ToolPad;
   /**
    * @brief Match tool operations
@@ -191,6 +192,13 @@ namespace Isis {
    *                          about new reference measure.
    *   @history 2012-08-11 Tracie Sucharski - In ::openNet, do not prompt for saving current
    *                          net if net hasn't changed since last save.
+   *   @history 2012-10-02 Tracie Sucharski - Qview was printing error messages and somtimes
+   *                          crashing when viewports were closed either individually or using
+   *                          "Close All" from the file menu.  The serial number list was not
+   *                          being updated correctly.  The fix no longer keeps a maintainable
+   *                          serial number list, but calculates one in real-time base on available
+   *                          viewports.  Fixes #1130.  Also, added a few more error checks to
+   *                          insure cubes for displayed measures are available.
    */
   class MatchTool : public Tool {
     Q_OBJECT
@@ -200,7 +208,7 @@ namespace Isis {
       virtual ~MatchTool();
       void paintViewport(MdiCubeViewport *mvp, QPainter *painter);
 
-      void addTo(Workspace *);
+//    void addTo(Workspace *);
 
       // measure column values
       enum MeasureColumns{
@@ -240,7 +248,6 @@ namespace Isis {
       void modifyPoint(ControlPoint *point);
       void deletePoint(ControlPoint *point);
       void updatePointInfo(QString pointId);
-      void refreshSerialNumbers();
       void refresh();
 
     protected:
@@ -250,14 +257,12 @@ namespace Isis {
     protected slots:
       QWidget *createToolBarWidget(QStackedWidget *parent);
       void mouseButtonRelease(QPoint p, Qt::MouseButton s);
-      void removeSerialNumber(CubeViewport *vp);
 
     private slots:
       void showHelp();
       void enterWhatsThisMode();
       void paintAllViewports ();
       void activateTool();
-      void newViewport(MdiCubeViewport *mvp);
       void openNet();
       void saveNet();
       void saveAsNet();
@@ -297,6 +302,7 @@ namespace Isis {
       void createActions();
       void createMenus();
       void createToolBars();
+
       void loadPoint();
       void loadMeasureTable();
       void drawAllMeasurments (MdiCubeViewport *mvp,QPainter *painter);
@@ -308,12 +314,14 @@ namespace Isis {
       void createTemplateEditorWidget();
       void loadTemplateFile(QString);
       bool okToContinue();
-      bool IsMeasureLocked(iString serialNumber);
+      bool IsMeasureLocked(IString serialNumber);
       void addMeasure(MdiCubeViewport *mvp, double sample, double line);
       bool validateMeasureChange(ControlMeasure *m);
 
       QStringList missingCubes(ControlPoint *point);
 
+      // TODO  pointer, reference, what???
+      SerialNumberList serialNumberList();
       std::string serialNumber(MdiCubeViewport *mvp);
       void addViewportToSerialNumberList(MdiCubeViewport *mvp);
 
@@ -330,7 +338,7 @@ namespace Isis {
       QString m_cnetFileName;
       QLabel *m_cnetFileNameLabel;
       bool m_coregNet;
-      iString m_coregReferenceSN;
+      IString m_coregReferenceSN;
       bool m_netChanged;
 
       QAction *m_createPoint;
@@ -386,11 +394,11 @@ namespace Isis {
       QMainWindow *m_measureWindow;
       QTableWidget *m_measureTable;
 
-      SerialNumberList *m_serialNumberList;
       QPointer<ControlNet> m_controlNet;
       ControlPoint *m_editPoint;
       MatchToolNewPointDialog *m_newPointDialog;
       ControlPoint *m_newPoint;
+      QString m_lastUsedPointId;
 
       QStringList m_pointFiles;
 
@@ -402,5 +410,4 @@ namespace Isis {
 
   };
 };
-
 #endif

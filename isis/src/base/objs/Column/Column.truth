@@ -1,13 +1,40 @@
 
 Unit Test for Column!!!
 
-Name() returns: test column
+Column ""
+	Width() = 0
+	DataType() = 0
+	Alignment() = 0
+	Precision() = 4
 
-Width() returns: 15
+**USER ERROR** Name[test column] is wider than width.
+**USER ERROR** Setting precision only makes sense for Decimal Alignment.
+**USER ERROR** Width is insufficient to contain name[test column].
+Column ""
+	Width() = 0
+	DataType() = 4
+	Alignment() = 0
+	Precision() = 100
 
-DataType() returns: 1
+Column ""
+	Width() = 0
+	DataType() = 2
+	Alignment() = 3
+	Precision() = 100
 
-Alignment() returns: 1
+**PROGRAMMER ERROR** Decimal alignment does not make sense for integer or string values.
+**PROGRAMMER ERROR** Decimal alignment does not make sense for integer or string values.
+Column ""
+	Width() = 0
+	DataType() = 2
+	Alignment() = 3
+	Precision() = 4
 
-Precision() returns: 4
+**USER ERROR** Integer or string type is not sensible if alignment is Decimal.
+**USER ERROR** Integer or string type is not sensible if alignment is Decimal.
+Column "test column"
+	Width() = 15
+	DataType() = 1
+	Alignment() = 1
+	Precision() = 4
 

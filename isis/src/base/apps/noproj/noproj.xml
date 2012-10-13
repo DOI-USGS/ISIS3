@@ -19,35 +19,42 @@
       Original version
     </change>
     <change name="Debbie A. Cook" date="2007-02-13">
-       Corrected for case where original instrument has negative affine coefficients
-     </change>
-     <change name="Debbie A. Cook" date="2007-04-24">
-         Added INTERP option, fixed SPECS parameter to allow user to override the default and enter a file, and updated the documentation
-     </change>
-     <change name="Debbie A. Cook" date="2007-05-21">
-         Changed category to Cameras
-     </change>
-     <change name="Debbie A. Cook" date="2007-06-12">
-         Corrected order of SetInputCube calls to set the MATCH cube first if is entered so that the labels on the cube to match are propagated from it and not the from cube
-     </change>
-        <change name="Debbie A. Cook" date="2007-08-31">
-         Turned off propagation of the polygon blobs because the file name contains "/" from
-         the serial number and unix does not allow "/".  Also added a remove of the match file
-         OriginalInstrument group written by cam2cam before writing the input OriginalInstrument.
-         hijitreg reads the input CcdId from this group.
-        </change>
-        <change name="Steven Lambright" date="2008-05-13"> 
-            Removed references to CubeInfo
-        </change>
-        <change name="Debbie A. Cook" date="2009-01-26">
-         Completed applying summing mode to ideal camera by applying it to the sample/line translations.
-        </change>
-        <change name="Debbie A. Cook" date="2009-03-25">
-          Fixed setting of et to correspond to first line of parent (Alpha cube)
-        </change>
-        <change name="Debbie A. Cook" date="2012-07-06">
-       Updated Spice members to be more compliant with Isis coding standards. References #972.
-        </change>
+      Corrected for case where original instrument has negative affine coefficients
+    </change>
+    <change name="Debbie A. Cook" date="2007-04-24">
+      Added INTERP option, fixed SPECS parameter to allow user to override the default and enter a file, and updated the documentation
+    </change>
+    <change name="Debbie A. Cook" date="2007-05-21">
+      Changed category to Cameras
+    </change>
+    <change name="Debbie A. Cook" date="2007-06-12">
+      Corrected order of SetInputCube calls to set the MATCH cube first if is entered so that the labels on the cube to match are propagated from it and not the from cube
+    </change>
+    <change name="Debbie A. Cook" date="2007-08-31">
+      Turned off propagation of the polygon blobs because the file name contains "/" from
+      the serial number and unix does not allow "/".  Also added a remove of the match file
+      OriginalInstrument group written by cam2cam before writing the input OriginalInstrument.
+      hijitreg reads the input CcdId from this group.
+    </change>
+    <change name="Steven Lambright" date="2008-05-13"> 
+      Removed references to CubeInfo
+    </change>
+    <change name="Debbie A. Cook" date="2009-01-26">
+      Completed applying summing mode to ideal camera by applying it to the sample/line translations.
+    </change>
+    <change name="Debbie A. Cook" date="2009-03-25">
+      Fixed setting of et to correspond to first line of parent (Alpha cube)
+    </change>
+    <change name="Debbie A. Cook" date="2012-07-06">
+      Updated Spice members to be more compliant with Isis coding standards. References #972.
+    </change>
+    <change name="Steven Lambright" date="2012-09-10">
+      This program will now modify the NaifKeywords object, if it exists, instead of the instrument
+      group with the following keywords: TransX (becomes IDEAL_TRANSX),
+      TransY (becomes IDEAL_TRANSY), TransS0 (becomes IDEAL_TRANSS), TransL0 (becomes IDEAL_TRANSL),
+      PixelPitch (becomes IDEAL_PIXEL_PITCH), and FocalLength (becomes IDEAL_FOCAL_LENGTH).
+      Fixes #1094.
+    </change>
   </history>
 
   <category>

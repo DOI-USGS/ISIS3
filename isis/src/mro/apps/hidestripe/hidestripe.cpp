@@ -79,7 +79,7 @@ void IsisMain() {
   }
   int binning_mode = icube->getGroup("Instrument")["Summing"];
   if(binning_mode != 1 && binning_mode != 2) {
-    /*iString msg = "You may only use input with binning mode 1 or 2, not";
+    /*IString msg = "You may only use input with binning mode 1 or 2, not";
     msg += binning_mode;
     throw iException::Message(iException::User, msg, _FILEINFO_);*/
     DestripeForOtherBinningModes(totalSamples);
@@ -92,8 +92,8 @@ void IsisMain() {
 
     //Phases must be able to stretch across the entire cube
     if(totalSamples != phases[3]) {
-      iString required_samples(phases[3]);
-      iString bin_string(binning_mode);
+      IString required_samples(phases[3]);
+      IString bin_string(binning_mode);
       string msg = "image must have exactly ";
       msg += required_samples;
       msg += " samples per line for binning mode ";
@@ -290,7 +290,7 @@ void fix(Buffer &in, Buffer &out) {
 void DestripeForOtherBinningModes(int piSamples)
 {
   int iBoxSample = (2 * piSamples) - 1;
-  iString sSamples(iBoxSample);
+  IString sSamples(iBoxSample);
 
   Pipeline p("hidestripe");
   p.SetInputFile("FROM");

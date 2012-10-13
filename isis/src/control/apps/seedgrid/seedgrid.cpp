@@ -91,7 +91,7 @@ void IsisMain() {
 
     Projection *proj = ProjectionFactory::Create(userMap);
 
-    int lonDomain = (int) iString(proj->LongitudeDomainString());
+    int lonDomain = (int) IString(proj->LongitudeDomainString());
     checkLongitude(minLon, maxLon, lonDomain);
 
     // Convert the Lat/Lon range to an X/Y range.
@@ -256,18 +256,18 @@ void IsisMain() {
 
 void checkLatitude(double minLat, double maxLat) {
   if (minLat > maxLat) {
-    string msg = "MINLAT [" + iString(minLat) +
-      "] is greater than MAXLAT [" + iString(maxLat) + "]";
+    string msg = "MINLAT [" + IString(minLat) +
+      "] is greater than MAXLAT [" + IString(maxLat) + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (minLat < -90) {
-    string msg = "MINLAT [" + iString(minLat) + "] is less than -90";
+    string msg = "MINLAT [" + IString(minLat) + "] is less than -90";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (maxLat > 90) {
-    string msg = "MAXLAT [" + iString(maxLat) + "] is greater than 90";
+    string msg = "MAXLAT [" + IString(maxLat) + "] is greater than 90";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }
@@ -276,27 +276,27 @@ void checkLatitude(double minLat, double maxLat) {
 void checkLongitude(double minLon, double maxLon, int lonDomain) {
   if (minLon > maxLon) {
     double suggestedMaxLon = maxLon + lonDomain + (lonDomain - 360);
-    string msg = "MINLON [" + iString(minLon) +
-      "] is greater than MAXLON [" + iString(maxLon) + "].  " +
-      "If you meant to wrap around the [" + iString(lonDomain) +
+    string msg = "MINLON [" + IString(minLon) +
+      "] is greater than MAXLON [" + IString(maxLon) + "].  " +
+      "If you meant to wrap around the [" + IString(lonDomain) +
       "] longitude " + "boundary, use a MAXLON of [" +
-      iString(suggestedMaxLon) + "]";
+      IString(suggestedMaxLon) + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (minLon < lonDomain - 360) {
-    string msg = "MINLON [" + iString(minLon) +
-      "] is less than [" + iString(lonDomain) + "] domain minimum [" +
-      iString(lonDomain - 360) + "]";
+    string msg = "MINLON [" + IString(minLon) +
+      "] is less than [" + IString(lonDomain) + "] domain minimum [" +
+      IString(lonDomain - 360) + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (maxLon - minLon > 360) {
     int range = (int) (maxLon - minLon - 1);
     int loops = range / 360 + 1;
-    string msg = "The specified longitude range [" + iString(minLon) +
-      "] to [" + iString(maxLon) + "] seeds that same area of the target [" +
-      iString(loops) + "] times";
+    string msg = "The specified longitude range [" + IString(minLon) +
+      "] to [" + IString(maxLon) + "] seeds that same area of the target [" +
+      IString(loops) + "] times";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }

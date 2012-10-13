@@ -32,7 +32,7 @@
 namespace Isis {
 
   class SqlQuery;
-  class iString;
+  class IString;
 
   /**
    * @brief Provide simplified access to resulting SQL query row
@@ -42,7 +42,7 @@ namespace Isis {
    * class and is provided for convenience and simplifed use in a standard C++
    * environment.  Mainly, it provides strings and values as Standard std::strings
    * and other more common C++ constructs as well as taking advantage of some
-   * unique Isis provisions (e.g., iString). One can still use Qt's rich features
+   * unique Isis provisions (e.g., IString). One can still use Qt's rich features
    * interchangeably with this class.
    *
    * SqlRecord is intended to be used by the SqlQuery class provided in this
@@ -56,7 +56,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2007-06-05 Brendan George - Modified to work with
-   *                           iString/StringTools merge
+   *                           IString/StringTools merge
    */
   class SqlRecord : public QSqlRecord {
     public:
@@ -84,8 +84,8 @@ namespace Isis {
       std::string getType(const std::string &name) const;
 
       bool isNull(const std::string &name) const;
-      iString getValue(int index) const;
-      iString getValue(const std::string &name) const;
+      IString getValue(int index) const;
+      IString getValue(const std::string &name) const;
 
     private:
       std::string QtTypeField(const char *ctype) const;

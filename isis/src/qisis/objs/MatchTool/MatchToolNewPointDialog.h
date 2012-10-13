@@ -15,23 +15,23 @@ namespace Isis {
   /**
    * @author 2012-05-04 Tracie Sucharski - Adapted from QnetMatchToolNewPointDialog 
    *  
-   * @internal
+   * @internal 
+   *   @history 2012-10-03 Tracie Sucharski - Remove static pointId value.  Instead, pass into
+   *                          costructor from location of instantiation.
    */
   class MatchToolNewPointDialog : public QDialog {
 
       Q_OBJECT
 
     public:
-      static QString lastPtIdValue;
+      MatchToolNewPointDialog(const ControlNet &cnet, QString defaultPointId, QWidget *parent = 0);
 
-      MatchToolNewPointDialog(const ControlNet &cnet, QWidget *parent = 0);
-
-      QLineEdit *ptIdValue;
+      QLineEdit *ptIdLineEdit;
+      QString pointId() const;
 
       void setFiles(QStringList pointFiles);
       void highlightFile(QString file);
 
-      QListWidget *fileList;
 
     signals:
       void measuresFinished();
@@ -41,7 +41,8 @@ namespace Isis {
       void enableDoneButton(const QString &text);
 
     private:
-      QLabel *m_ptIdLabel;
+      QListWidget *m_fileList;
+
       QPushButton *m_doneButton;
 
       QStringList *m_pointFiles;

@@ -24,7 +24,7 @@
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "NaifStatus.h"
 #include "RadialDistortionMap.h"
@@ -45,13 +45,13 @@ namespace Isis {
     NaifStatus::CheckErrors();
     PvlGroup bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
     // Get the camera characteristics
-    iString key = string("INS" + (iString)(int)naifIkCode() + "_") + (string)bandBin["FilterName"] + "_FOCAL_LENGTH";
+    IString key = string("INS" + (IString)(int)naifIkCode() + "_") + (string)bandBin["FilterName"] + "_FOCAL_LENGTH";
     key = key.Convert("/", '_');
     double focalLength = Spice::getDouble(key);
 
     SetFocalLength(focalLength);
     SetPixelPitch();
-    instrumentRotation()->SetFrame(Spice::getInteger("INS_" + (iString)(int)naifIkCode() + "_FRAME_ID"));
+    instrumentRotation()->SetFrame(Spice::getInteger("INS_" + (IString)(int)naifIkCode() + "_FRAME_ID"));
 
     // Get the start time in et
     PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
@@ -74,11 +74,11 @@ namespace Isis {
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
-    focalMap->SetDetectorOrigin(Spice::getDouble("INS" + (iString)(int)naifIkCode() + "_BORESIGHT_SAMPLE"),
-                                Spice::getDouble("INS" + (iString)(int)naifIkCode() + "_BORESIGHT_LINE"));
+    focalMap->SetDetectorOrigin(Spice::getDouble("INS" + (IString)(int)naifIkCode() + "_BORESIGHT_SAMPLE"),
+                                Spice::getDouble("INS" + (IString)(int)naifIkCode() + "_BORESIGHT_LINE"));
 
     // Setup distortion map
-    double k1 = Spice::getDouble("INS" + (iString)(int)naifIkCode() + "_K1");
+    double k1 = Spice::getDouble("INS" + (IString)(int)naifIkCode() + "_K1");
     new RadialDistortionMap(this, k1);
 
     // Setup the ground and sky map

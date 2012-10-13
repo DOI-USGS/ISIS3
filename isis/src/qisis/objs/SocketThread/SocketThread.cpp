@@ -93,10 +93,10 @@ namespace Isis {
       }
 
       // Push everything onto our string buffer
-      iString buffer;
+      IString buffer;
       for(int i = 0; i < bytes; i++) buffer += buf.data()[i];
       while(buffer.size() > 0) {
-        iString token = buffer.Token(" ");
+        IString token = buffer.Token(" ");
         if(token == "raise") {
           emit focusApp();
         }

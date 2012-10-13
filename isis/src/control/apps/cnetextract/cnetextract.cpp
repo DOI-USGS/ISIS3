@@ -17,7 +17,7 @@
 #include "CubeManager.h"
 #include "FileList.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Longitude.h"
 #include "Latitude.h"
 #include "Projection.h"
@@ -30,17 +30,17 @@
 using namespace std;
 using namespace Isis;
 
-void ExtractPointList(ControlNet &outNet, QVector<iString> &nonListedPoints);
-void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
-                        QVector<iString> cannotGenerateLatLonPoints,
-                        QMap<iString, iString> sn2filename);
+void ExtractPointList(ControlNet &outNet, QVector<IString> &nonListedPoints);
+void ExtractLatLonRange(ControlNet &outNet, QVector<IString> nonLatLonPoints,
+                        QVector<IString> cannotGenerateLatLonPoints,
+                        QMap<IString, IString> sn2filename);
 bool NotInLatLonRange(SurfacePoint surfacePt, Latitude minlat,
                       Latitude maxlat, Longitude minlon, Longitude maxlon);
 void WriteCubeOutList(ControlNet cnet, 
-                      QMap<iString, iString> sn2file,
+                      QMap<IString, IString> sn2file,
                       PvlGroup &summary);
-void WriteResults(iString filename, 
-                  QVector<iString> notExtracted, 
+void WriteResults(IString filename, 
+                  QVector<IString> notExtracted, 
                   PvlGroup &results);
 void omit(ControlNet &cnet, int cp);
 void omit(ControlPoint *point, int cm);
@@ -93,9 +93,9 @@ void IsisMain() {
     inputMeasures += outNet.GetPoint(cp)->GetNumMeasures();
 
   // Set up the Serial Number to FileName mapping
-  QMap<iString, iString> sn2filename;
+  QMap<IString, IString> sn2filename;
   for(int cubeIndex = 0; cubeIndex < (int)inList.size(); cubeIndex ++) {
-    iString sn = SerialNumber::Compose(inList[cubeIndex].toString());
+    IString sn = SerialNumber::Compose(inList[cubeIndex].toString());
     sn2filename[sn] = inList[cubeIndex].toString();
   }
 
@@ -105,30 +105,30 @@ void IsisMain() {
   progress.CheckStatus();
 
   // Set up vector records of how points/measures are removed
-  QVector<iString> ignoredPoints;
-  QVector<iString> ignoredMeasures;
-  QVector<iString> singleMeasurePoints;
-  QVector<iString> measurelessPoints;
-  QVector<iString> tolerancePoints;
-  QVector<iString> nonReferenceMeasures;
-  QVector<iString> nonFixedPoints;
-  QVector<iString> nonCubePoints;
-  QVector<iString> noCubeMeasures;
+  QVector<IString> ignoredPoints;
+  QVector<IString> ignoredMeasures;
+  QVector<IString> singleMeasurePoints;
+  QVector<IString> measurelessPoints;
+  QVector<IString> tolerancePoints;
+  QVector<IString> nonReferenceMeasures;
+  QVector<IString> nonFixedPoints;
+  QVector<IString> nonCubePoints;
+  QVector<IString> noCubeMeasures;
 // This is commented out since this does not correspond to any filters or the
 //  documentation of this application. I did not delete the code in case we find
 //  that we need it later. J.Backer 2012-06-22
 // 
-//  QVector<iString> noMeasurePoints;
-  QVector<iString> nonListedPoints;
-  QVector<iString> nonLatLonPoints;
-  QVector<iString> cannotGenerateLatLonPoints;
+//  QVector<IString> noMeasurePoints;
+  QVector<IString> nonListedPoints;
+  QVector<IString> nonLatLonPoints;
+  QVector<IString> cannotGenerateLatLonPoints;
 
   // Set up comparison data
-  QVector<iString> serialNumbers;
+  QVector<IString> serialNumbers;
   if(cubePoints) {
     FileList cubeList(ui.GetFileName("CUBELIST"));
     for(int cubeIndex = 0; cubeIndex < (int)cubeList.size(); cubeIndex ++) {
-      iString sn = SerialNumber::Compose(cubeList[cubeIndex].toString());
+      IString sn = SerialNumber::Compose(cubeList[cubeIndex].toString());
       serialNumbers.push_back(sn);
     }
   }
@@ -187,7 +187,7 @@ void IsisMain() {
 
       if(noIgnore && newMeasure->IsIgnored()) {
         //New error with deleting Reference Measures
-        iString msg = newPoint->GetId() + "," + newMeasure->GetCubeSerialNumber();
+        IString msg = newPoint->GetId() + "," + newMeasure->GetCubeSerialNumber();
         if(newPoint->GetRefMeasure() != newMeasure) {
           omit(newPoint, cm);
         }
@@ -320,10 +320,10 @@ void IsisMain() {
   PvlGroup summary("ResultSummary");
   PvlGroup results("Results");
 
-  summary.AddKeyword(PvlKeyword("InputPoints", iString(inputPoints)));
-  summary.AddKeyword(PvlKeyword("InputMeasures", iString(inputMeasures)));
-  summary.AddKeyword(PvlKeyword("OutputPoints", iString(outputPoints)));
-  summary.AddKeyword(PvlKeyword("OutputMeasures", iString(outputMeasures)));
+  summary.AddKeyword(PvlKeyword("InputPoints", IString(inputPoints)));
+  summary.AddKeyword(PvlKeyword("InputMeasures", IString(inputMeasures)));
+  summary.AddKeyword(PvlKeyword("OutputPoints", IString(outputPoints)));
+  summary.AddKeyword(PvlKeyword("OutputMeasures", IString(outputMeasures)));
 
   if (outputPoints != 0) {
     // Write the filenames associated with outNet
@@ -355,43 +355,43 @@ void IsisMain() {
 
 
   if(noIgnore) {
-    summary.AddKeyword(PvlKeyword("IgnoredPoints", iString((int)ignoredPoints.size())));
-    summary.AddKeyword(PvlKeyword("IgnoredMeasures", iString((int)ignoredMeasures.size())));
+    summary.AddKeyword(PvlKeyword("IgnoredPoints", IString((int)ignoredPoints.size())));
+    summary.AddKeyword(PvlKeyword("IgnoredMeasures", IString((int)ignoredMeasures.size())));
   }
   if(noSingleMeasure) {
-    summary.AddKeyword(PvlKeyword("SingleMeasurePoints", iString((int)singleMeasurePoints.size())));
+    summary.AddKeyword(PvlKeyword("SingleMeasurePoints", IString((int)singleMeasurePoints.size())));
   }
   if(noMeasureless) {
-    summary.AddKeyword(PvlKeyword("MeasurelessPoints", iString((int)measurelessPoints.size())));
+    summary.AddKeyword(PvlKeyword("MeasurelessPoints", IString((int)measurelessPoints.size())));
   }
   if(noTolerancePoints) {
-    summary.AddKeyword(PvlKeyword("TolerancePoints", iString((int)tolerancePoints.size())));
+    summary.AddKeyword(PvlKeyword("TolerancePoints", IString((int)tolerancePoints.size())));
   }
   if(reference) {
-    summary.AddKeyword(PvlKeyword("NonReferenceMeasures", iString((int)nonReferenceMeasures.size())));
+    summary.AddKeyword(PvlKeyword("NonReferenceMeasures", IString((int)nonReferenceMeasures.size())));
   }
   if(fixed) {
-    summary.AddKeyword(PvlKeyword("NonFixedPoints", iString((int)nonFixedPoints.size())));
+    summary.AddKeyword(PvlKeyword("NonFixedPoints", IString((int)nonFixedPoints.size())));
   }
   if(cubePoints) {
-    summary.AddKeyword(PvlKeyword("NonCubePoints", iString((int)nonCubePoints.size())));
+    summary.AddKeyword(PvlKeyword("NonCubePoints", IString((int)nonCubePoints.size())));
   }
 // This is commented out since this does not correspond to any filters or the
 //  documentation of this application. I did not delete the code in case we find
 //  that we need it later. J.Backer 2012-06-22
 // 
 //  if(noMeasurePoints.size() != 0) {
-//    summary.AddKeyword(PvlKeyword("NoCubeMeasure", iString((int)noMeasurePoints.size())));
+//    summary.AddKeyword(PvlKeyword("NoCubeMeasure", IString((int)noMeasurePoints.size())));
 //  }
   if(cubeMeasures) {
-    summary.AddKeyword(PvlKeyword("NonCubeMeasures", iString((int)noCubeMeasures.size())));
+    summary.AddKeyword(PvlKeyword("NonCubeMeasures", IString((int)noCubeMeasures.size())));
   }
   if(pointsEntered) {
-    summary.AddKeyword(PvlKeyword("NonListedPoints", iString((int)nonListedPoints.size())));
+    summary.AddKeyword(PvlKeyword("NonListedPoints", IString((int)nonListedPoints.size())));
   }
   if(latLon) {
-    summary.AddKeyword(PvlKeyword("LatLonOutOfRange", iString((int)nonLatLonPoints.size())));
-    summary.AddKeyword(PvlKeyword("NoLatLonPoints", iString((int)cannotGenerateLatLonPoints.size())));
+    summary.AddKeyword(PvlKeyword("LatLonOutOfRange", IString((int)nonLatLonPoints.size())));
+    summary.AddKeyword(PvlKeyword("NoLatLonPoints", IString((int)cannotGenerateLatLonPoints.size())));
   }
 
   outProgress.CheckStatus();
@@ -416,51 +416,51 @@ void IsisMain() {
       std::string prefix = ui.GetString("PREFIX");
 
       if(noIgnore) {
-        iString namecp = FileName(prefix + "IgnoredPoints.txt").expanded();
+        IString namecp = FileName(prefix + "IgnoredPoints.txt").expanded();
         WriteResults(namecp, ignoredPoints, results);
-        iString namecm = FileName(prefix + "IgnoredMeasures.txt").expanded();
+        IString namecm = FileName(prefix + "IgnoredMeasures.txt").expanded();
         WriteResults(namecm, ignoredMeasures, results);
       }
 
       resultsProgress.CheckStatus();
 
       if(noSingleMeasure) {
-        iString name = FileName(prefix + "SingleMeasurePoints.txt").expanded();
+        IString name = FileName(prefix + "SingleMeasurePoints.txt").expanded();
         WriteResults(name, singleMeasurePoints, results);
       }
 
       resultsProgress.CheckStatus();
 
       if(noMeasureless) {
-        iString name = FileName(prefix + "MeasurelessPoints.txt").expanded();
+        IString name = FileName(prefix + "MeasurelessPoints.txt").expanded();
         WriteResults(name, measurelessPoints, results);
       }
 
       resultsProgress.CheckStatus();
 
       if(noTolerancePoints) {
-        iString name = FileName(prefix + "TolerancePoints.txt").expanded();
+        IString name = FileName(prefix + "TolerancePoints.txt").expanded();
         WriteResults(name, tolerancePoints, results);
       }
 
       resultsProgress.CheckStatus();
 
       if(reference) {
-        iString name = FileName(prefix + "NonReferenceMeasures.txt").expanded();
+        IString name = FileName(prefix + "NonReferenceMeasures.txt").expanded();
         WriteResults(name, nonReferenceMeasures, results);
       }
   
       resultsProgress.CheckStatus();
   
       if(fixed) {
-        iString name = FileName(prefix + "NonFixedPoints.txt").expanded();
+        IString name = FileName(prefix + "NonFixedPoints.txt").expanded();
         WriteResults(name, nonFixedPoints, results);
       }
   
       resultsProgress.CheckStatus();
   
       if(cubePoints) {
-        iString name = FileName(prefix + "NonCubePoints.txt").expanded();
+        IString name = FileName(prefix + "NonCubePoints.txt").expanded();
         WriteResults(name, nonCubePoints, results);
       }
   
@@ -471,30 +471,30 @@ void IsisMain() {
 //  that we need it later. J.Backer 2012-06-22
 //   
 //      if(noMeasurePoints.size() != 0) {
-//        iString name = FileName(prefix + "NoMeasurePoints.txt").expanded();
+//        IString name = FileName(prefix + "NoMeasurePoints.txt").expanded();
 //        WriteResults(name, noMeasurePoints);
 //      }
   
       resultsProgress.CheckStatus();
   
       if(cubeMeasures) {
-        iString name = FileName(prefix + "NonCubeMeasures.txt").expanded();
+        IString name = FileName(prefix + "NonCubeMeasures.txt").expanded();
         WriteResults(name, noCubeMeasures, results);
       }
   
       resultsProgress.CheckStatus();
   
       if(pointsEntered) {
-        iString name = FileName(prefix + "NonListedPoints.txt").expanded();
+        IString name = FileName(prefix + "NonListedPoints.txt").expanded();
         WriteResults(name, nonListedPoints, results);
       }
   
       resultsProgress.CheckStatus();
   
       if(latLon) {
-        iString namenon = FileName(prefix + "LatLonOutOfRange.txt").expanded();
+        IString namenon = FileName(prefix + "LatLonOutOfRange.txt").expanded();
         WriteResults(namenon, nonLatLonPoints, results);
-        iString namegen = FileName(prefix + "NoLatLonPoints.txt").expanded();
+        IString namegen = FileName(prefix + "NoLatLonPoints.txt").expanded();
         WriteResults(namegen, cannotGenerateLatLonPoints, results);
       }
 
@@ -519,7 +519,7 @@ void IsisMain() {
  *                           reference so that this information could be
  *                           accessed in the main program.
  */
-void ExtractPointList(ControlNet &outNet, QVector<iString> &nonListedPoints) {
+void ExtractPointList(ControlNet &outNet, QVector<IString> &nonListedPoints) {
   UserInterface &ui = Application::GetUserInterface();
 
   // Use the file list class for functionality 
@@ -534,7 +534,7 @@ void ExtractPointList(ControlNet &outNet, QVector<iString> &nonListedPoints) {
     // loop through line numbers of POINTLIST until we find a point ID in the 
     // list that matches this control point's ID
     for(int i = 0; i < (int)listedPoints.size()  &&  !isInList; i++) {
-      iString pointId = listedPoints[i].toString();
+      IString pointId = listedPoints[i].toString();
       // isInList is true if these strings are equal
       isInList = pointId.Equal(controlpt->GetId());
     }
@@ -558,8 +558,8 @@ void ExtractPointList(ControlNet &outNet, QVector<iString> &nonListedPoints) {
  *                      due to the inability to calculate the lat/lon for that
  *                      point
  */
-void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
-                        QVector<iString> cannotGenerateLatLonPoints,  QMap<iString, iString> sn2filename) {
+void ExtractLatLonRange(ControlNet &outNet, QVector<IString> nonLatLonPoints,
+                        QVector<IString> cannotGenerateLatLonPoints,  QMap<IString, IString> sn2filename) {
   if(outNet.GetNumPoints() == 0) {
     return;
   }
@@ -602,7 +602,7 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<iString> nonLatLonPoints,
 
       // Find a cube in the Control Point to get the lat/lon from
       int cm = 0;
-      iString sn = "";
+      IString sn = "";
       Latitude lat;
       Longitude lon;
       Distance radius;
@@ -724,7 +724,7 @@ bool NotInLatLonRange(SurfacePoint surfacePtToTest, Latitude minlat,
     outRange = !lat.inRange(minlat, maxlat) || !lon.inRange(minlon, maxlon);
   }
   catch (IException &e) {
-    iString msg = "Cannot complete lat/lon range test with given filters";
+    IString msg = "Cannot complete lat/lon range test with given filters";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
@@ -743,7 +743,7 @@ bool NotInLatLonRange(SurfacePoint surfacePtToTest, Latitude minlat,
  *                to filenames.
  */
 void WriteCubeOutList(ControlNet cnet, 
-                      QMap<iString, iString> sn2file, 
+                      QMap<IString, IString> sn2file, 
                       PvlGroup &summary) {
   UserInterface &ui = Application::GetUserInterface();
 
@@ -758,10 +758,10 @@ void WriteCubeOutList(ControlNet cnet,
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
-  std::set<iString> outputsn;
+  std::set<IString> outputsn;
   for(int cp = 0; cp < cnet.GetNumPoints(); cp ++) {
     for(int cm = 0; cm < cnet.GetPoint(cp)->GetNumMeasures(); cm ++) {
-      iString sn = cnet.GetPoint(cp)->GetMeasure(cm)->GetCubeSerialNumber();
+      IString sn = cnet.GetPoint(cp)->GetMeasure(cm)->GetCubeSerialNumber();
       if (sn2file[sn].length() != 0) {
         outputsn.insert(sn);
         }
@@ -783,7 +783,7 @@ void WriteCubeOutList(ControlNet cnet,
   out_stream.open(toList.c_str(), std::ios::out);
   out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
-  for(std::set<iString>::iterator sn = outputsn.begin(); sn != outputsn.end(); sn ++) {
+  for(std::set<IString>::iterator sn = outputsn.begin(); sn != outputsn.end(); sn ++) {
     // moved the "if" statement to the previous for loop to prevent creating
     // an empty file
     //if(!sn2file[(*sn)].length() == 0) { 
@@ -805,8 +805,8 @@ void WriteCubeOutList(ControlNet cnet,
  *                      report. 
  * @param results  A reference to the results PvlGroup address.
  */
-void WriteResults(iString filename, 
-                  QVector<iString> notExtracted, 
+void WriteResults(IString filename, 
+                  QVector<IString> notExtracted, 
                   PvlGroup &results) {
   // if no points or measures are being extracted,
   // we will not create the filter report.

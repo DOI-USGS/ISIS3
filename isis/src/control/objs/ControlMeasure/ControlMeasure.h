@@ -38,7 +38,7 @@ namespace Isis {
   class ControlPoint;
   class ControlPointFileEntryV0002_Measure;
   class ControlCubeGraphNode;
-  class iString;
+  class IString;
   class PvlGroup;
   class PvlKeyword;
 
@@ -249,12 +249,12 @@ namespace Isis {
       Status SetAprioriSample(double aprioriSample);
       Status SetCamera(Isis::Camera *camera);
       Status SetChooserName();
-      Status SetChooserName(iString name);
+      Status SetChooserName(IString name);
       Status SetCoordinate(double sample, double line);
       Status SetCoordinate(double sample, double line, MeasureType type);
-      Status SetCubeSerialNumber(iString newSerialNumber);
+      Status SetCubeSerialNumber(IString newSerialNumber);
       Status SetDateTime();
-      Status SetDateTime(iString datetime);
+      Status SetDateTime(IString datetime);
       Status SetDiameter(double diameter);
       Status SetEditLock(bool editLock);
       Status SetFocalPlaneMeasured(double x, double y);
@@ -275,9 +275,9 @@ namespace Isis {
       double GetAprioriLine() const;
       double GetAprioriSample() const;
       Isis::Camera *Camera() const;
-      iString GetChooserName() const;
-      iString GetCubeSerialNumber() const;
-      iString GetDateTime() const;
+      IString GetChooserName() const;
+      IString GetCubeSerialNumber() const;
+      IString GetDateTime() const;
       double GetDiameter() const;
       ControlMeasureLogData GetLogData(long dataType) const;
       bool IsEditLocked() const;
@@ -286,7 +286,7 @@ namespace Isis {
       double GetFocalPlaneComputedY() const;
       double GetFocalPlaneMeasuredX() const;
       double GetFocalPlaneMeasuredY() const;
-      double GetMeasureData(iString) const;
+      double GetMeasureData(IString) const;
       bool IsIgnored() const;
       bool IsMeasured() const;
       bool IsRegistered() const;
@@ -307,13 +307,13 @@ namespace Isis {
       double GetLineShift() const;
       double GetPixelShift() const;
 
-      static QVector<iString> GetMeasureDataNames();
+      static QVector<IString> GetMeasureDataNames();
 
       QList<QStringList> PrintableClassData() const;
 
-      static iString MeasureTypeToString(MeasureType type);
+      static IString MeasureTypeToString(MeasureType type);
       static MeasureType StringToMeasureType(QString str);
-      iString GetMeasureTypeString() const;
+      IString GetMeasureTypeString() const;
 
       const ControlMeasure &operator=(const ControlMeasure &other);
       bool operator != (const Isis::ControlMeasure &pMeasure) const;
@@ -330,7 +330,7 @@ namespace Isis {
       ControlCubeGraphNode *associatedCSN;  //!< Pointer to the Serial Number
       // structure connecting measures in an image
 
-      iString *p_serialNumber;
+      IString *p_serialNumber;
       MeasureType p_measureType;
 
       QVector<ControlMeasureLogData> * p_loggedData;
@@ -340,8 +340,8 @@ namespace Isis {
        * list the program used and the definition file or include the user
        * name for qnet
        */
-      iString *p_chooserName;
-      iString *p_dateTime;
+      IString *p_chooserName;
+      IString *p_dateTime;
       bool p_editLock;        //!< If true do not edit anything in measure.
       bool p_ignore;
       bool p_jigsawRejected;  //!< Status of measure for last bundle adjust iteration

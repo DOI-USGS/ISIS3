@@ -3,7 +3,7 @@
 #include "FileList.h"
 #include "IException.h"
 #include "UserInterface.h"
-#include "iString.h"
+#include "IString.h"
 #include "Preference.h"
 #include "ProgramLauncher.h"
 
@@ -81,7 +81,7 @@ void IsisMain(){
   ofstream hiIncListos;
   if (rmHiIncInput && reportHiInc) {
     hiIncList = ui.GetFileName("HIGHINCLIST");
-    iString hiIncListStr = hiIncList.expanded();
+    IString hiIncListStr = hiIncList.expanded();
     if (hiIncList.fileExists()) {
       hiIncListos.open(hiIncListStr.c_str(),ios::app);
     }
@@ -96,7 +96,7 @@ void IsisMain(){
   ofstream noFileListos;
   if (reportNoFile) {
     noFileList = ui.GetFileName("NOFILELIST");
-    iString noFileListStr = noFileList.expanded();
+    IString noFileListStr = noFileList.expanded();
     if (noFileList.fileExists()) {
       noFileListos.open(noFileListStr.c_str(),ios::app);
     }
@@ -111,7 +111,7 @@ void IsisMain(){
   ofstream nadirSpcListos;
   if (reportNadirSpc) {
     nadirSpcList = ui.GetFileName("NADIRSPCLIST");
-    iString nadirSpcListStr = nadirSpcList.expanded();
+    IString nadirSpcListStr = nadirSpcList.expanded();
     if (nadirSpcList.fileExists()) {
       nadirSpcListos.open(nadirSpcListStr.c_str(),ios::app);
     }
@@ -126,7 +126,7 @@ void IsisMain(){
   ofstream imageGapListos;
   if (reportImageGap) {
     imageGapList = ui.GetFileName("IMAGEGAPLIST");
-    iString imageGapListStr = imageGapList.expanded();
+    IString imageGapListStr = imageGapList.expanded();
     if (imageGapList.fileExists()) {
       imageGapListos.open(imageGapListStr.c_str(),ios::app);
     }
@@ -144,7 +144,7 @@ void IsisMain(){
 
     // Open the input file
     FileName infile = cubes[i];
-    iString inFileStr = infile.expanded();
+    IString inFileStr = infile.expanded();
 
     if (!infile.fileExists()) {
       if (reportNoFile) {
@@ -156,7 +156,7 @@ void IsisMain(){
     Pvl lab(inFileStr);
 
     // Exit if not Themis image
-    iString instrumentID = iString(lab["INSTRUMENT_ID"][0]);
+    IString instrumentID = IString(lab["INSTRUMENT_ID"][0]);
     if (instrumentID.UpCase() != "THEMIS") {
       if (reportNoFile) {
         noFileListos << infile.baseName() << " not processed because is not a THEMIS image" << endl;
@@ -166,7 +166,7 @@ void IsisMain(){
     }
 
     // Verify for "IR" Detector ID
-    iString detectorID = iString(lab["DETECTOR_ID"][0]);
+    IString detectorID = IString(lab["DETECTOR_ID"][0]);
     if (detectorID.UpCase() != "IR") {
       if (reportNoFile) {
         noFileListos << infile.baseName() << " not processed because is not an IR THEMIS image" << endl;
@@ -287,14 +287,14 @@ void IsisMain(){
     // Note we use wavelength 12.57um in geologic mosaics.
     if (band14_88 && incAngle < 90 && !ignoreAtmCorr)  {
       output = (infile.baseName()) + "_driftcorr.cub";
-      parameters = "FROM=" + input + "+" + iString(procBand) +
-                   " ATM=" + input + "+" + iString(atmosBand) + " TO=" + output;
+      parameters = "FROM=" + input + "+" + IString(procBand) +
+                   " ATM=" + input + "+" + IString(atmosBand) + " TO=" + output;
       ProgramLauncher::RunIsisProgram("thmdriftcor", parameters);
       remove (input.c_str());
     }
     else {
       output = (infile.baseName()) + "_no_driftcorr.cub";
-      parameters = "FROM=" + input + "+" + iString(procBand) + " TO=" + output;
+      parameters = "FROM=" + input + "+" + IString(procBand) + " TO=" + output;
       ProgramLauncher::RunIsisProgram("stretch", parameters);
       remove (input.c_str());
     }
@@ -334,7 +334,7 @@ void IsisMain(){
     tgaps = FileName::createTempFile("$TEMPORARY/" + tmpstats1 + ".pvl");
     string tempgaps = tgaps.expanded();
 
-    //parameters = "FROM=" + iString(ui.GetFileName("TO")) +
+    //parameters = "FROM=" + IString(ui.GetFileName("TO")) +
     //             " TO=" + tempgaps + " CORTOL=.3";
     //ProgramLauncher::RunIsisProgram("findgaps", parameters);
     parameters = "FROM=" + outFile +
@@ -345,7 +345,7 @@ void IsisMain(){
     string totalpixels = tg.FindGroup("Results",Pvl::Traverse)["TotalPixels"];
     string validpixels = tg.FindGroup("Results",Pvl::Traverse)["ValidPixels"];
     //if (tg.HasGroup("Gap")) {
-    if (iString(totalpixels).ToInteger() != iString(validpixels).ToInteger()) {
+    if (IString(totalpixels).ToInteger() != IString(validpixels).ToInteger()) {
       cout << tg << endl;
       sgap = "yes";
       if (reportImageGap) {
@@ -390,8 +390,8 @@ void IsisMain(){
     // Run footprint stuff if requested for GIS input
     if (footPrintInit) {
       parameters = "FROM=" + outFile +
-                   " TO=" + (iString)(infile.baseName()) + ".gml" +
-                   " LABEL=" + (iString)(infile.baseName());
+                   " TO=" + (IString)(infile.baseName()) + ".gml" +
+                   " LABEL=" + (IString)(infile.baseName());
       ProgramLauncher::RunIsisProgram("isis2gml", parameters);
     }
 

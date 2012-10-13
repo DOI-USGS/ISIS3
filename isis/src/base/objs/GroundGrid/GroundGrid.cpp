@@ -223,7 +223,7 @@ namespace Isis {
                               Angle latRes, Angle lonRes) {
     if(p_groundMap == NULL ||
         (p_grid == NULL && p_latLinesGrid == NULL && p_lonLinesGrid == NULL)) {
-      iString msg = "GroundGrid::CreateGrid missing ground map or grid array";
+      IString msg = "GroundGrid::CreateGrid missing ground map or grid array";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -237,7 +237,7 @@ namespace Isis {
 
     // Verify lat/lon range is okay
     bool badLatLonRange = false;
-    QVector<iString> badLatLonValues;
+    QVector<IString> badLatLonValues;
     if(!p_minLat || !p_minLat->isValid()) {
       badLatLonValues.append("MinimumLatitude");
       badLatLonRange = true;
@@ -260,7 +260,7 @@ namespace Isis {
 
 
     if(badLatLonRange) {
-      iString msg = "Could not determine values for [";
+      IString msg = "Could not determine values for [";
       for(int i = 0; i < badLatLonValues.size(); i++) {
         if(i != 0)
           msg += ",";
@@ -305,7 +305,7 @@ namespace Isis {
       numSteps += (double)((endLon - startLon) / lonInc) + 1;
 
       if(numSteps <= 0) {
-        iString msg = "No gridlines would intersect the image";
+        IString msg = "No gridlines would intersect the image";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
@@ -553,7 +553,7 @@ namespace Isis {
       importantByte |= (1 << bitOffset);
     }
     else {
-      iString msg = "GroundGrid::SetGridBit no grids available";
+      IString msg = "GroundGrid::SetGridBit no grids available";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -591,7 +591,7 @@ namespace Isis {
       result = (importantByte >> bitOffset) & 1;
     }
     else {
-      iString msg = "GroundGrid::GetGridBit no grids available";
+      IString msg = "GroundGrid::GetGridBit no grids available";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

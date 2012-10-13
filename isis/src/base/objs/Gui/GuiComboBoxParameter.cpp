@@ -27,11 +27,11 @@ namespace Isis {
     // Create a menu item in the combo box for each list item and add it
     // to the layout
     for(int item = 0; item < ui.ParamListSize(group, param); item++) {
-      iString btext = ui.ParamListBrief(group, param, item);
+      IString btext = ui.ParamListBrief(group, param, item);
       btext += " (";
       btext += ui.ParamListValue(group, param, item);
       btext += ")";
-      p_combo->insertItem(item, (iString)btext);
+      p_combo->insertItem(item, (IString)btext);
     }
     lo->addWidget(p_combo);
     connect(p_combo, SIGNAL(activated(int)),
@@ -47,13 +47,13 @@ namespace Isis {
   }
 
 
-  void GuiComboBoxParameter::Set(iString newValue) {
-    iString value = newValue;
+  void GuiComboBoxParameter::Set(IString newValue) {
+    IString value = newValue;
     value.UpCase();
 
     int foundAtButton = -1;
     for(int i = 0; i < p_ui->ParamListSize(p_group, p_param); i++) {
-      iString option = p_ui->ParamListValue(p_group, p_param, i);
+      IString option = p_ui->ParamListValue(p_group, p_param, i);
       option.UpCase();
       if(option.compare(0, value.size(), value) == 0) foundAtButton = i;
     }
@@ -66,8 +66,8 @@ namespace Isis {
   }
 
 
-  iString GuiComboBoxParameter::Value() {
-    return (iString)p_ui->ParamListValue(p_group, p_param,
+  IString GuiComboBoxParameter::Value() {
+    return (IString)p_ui->ParamListValue(p_group, p_param,
                                          p_combo->currentIndex());
   }
 

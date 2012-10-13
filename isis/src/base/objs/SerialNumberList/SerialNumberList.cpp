@@ -7,7 +7,7 @@
 #include "FileName.h"
 #include "SerialNumber.h"
 #include "ObservationNumber.h"
-#include "iString.h"
+#include "IString.h"
 #include "Pvl.h"
 
 namespace Isis {
@@ -108,7 +108,7 @@ namespace Isis {
     try {
       // Test the target name if desired
       if (p_checkTarget) {
-        iString target;
+        IString target;
         PvlGroup targetGroup;
         if (cubeObj.HasGroup("Instrument")) {
           targetGroup = cubeObj.FindGroup("Instrument");
@@ -197,7 +197,7 @@ namespace Isis {
     try {
       // Test the target name if desired
       if (p_checkTarget) {
-        iString target;
+        IString target;
         PvlGroup targetGroup;
         if (cubeObj.HasGroup("Instrument")) {
           targetGroup = cubeObj.FindGroup("Instrument");
@@ -347,7 +347,7 @@ namespace Isis {
       return p_pairs[index].serialNumber;
     }
     else {
-      iString num = iString(index);
+      IString num = IString(index);
       std::string msg = "Index [" + (std::string) num + "] is invalid";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -365,7 +365,7 @@ namespace Isis {
       return p_pairs[index].observationNumber;
     }
     else {
-      iString num = iString(index);
+      IString num = IString(index);
       std::string msg = "Index [" + (std::string) num + "] is invalid";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -425,7 +425,7 @@ namespace Isis {
       return p_pairs[index].filename;
     }
     else {
-      iString num = iString(index);
+      IString num = IString(index);
       std::string msg = "Index [" + (std::string) num + "] is invalid";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

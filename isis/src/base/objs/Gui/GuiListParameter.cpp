@@ -29,7 +29,7 @@ namespace Isis {
     // Create a button for each list item and add each to a button group and
     // to the layout
     for(int item = 0; item < ui.ParamListSize(group, param); item++) {
-      iString btext = ui.ParamListBrief(group, param, item);
+      IString btext = ui.ParamListBrief(group, param, item);
       btext += " (";
       btext += ui.ParamListValue(group, param, item);
       btext += ")";
@@ -42,7 +42,7 @@ namespace Isis {
         lo->addLayout(hlo);
 
         // Create radio button & add to horizontal layout
-        QRadioButton *rb = new QRadioButton((iString)btext);
+        QRadioButton *rb = new QRadioButton((IString)btext);
         hlo->addWidget(rb);
         p_buttonGroup->addButton(rb);
 
@@ -54,7 +54,7 @@ namespace Isis {
         RememberWidget(helper);
       }
       else {
-        QRadioButton *rb = new QRadioButton((iString)btext);
+        QRadioButton *rb = new QRadioButton((IString)btext);
         lo->addWidget(rb);
         p_buttonGroup->addButton(rb);
         RememberWidget(rb);
@@ -72,13 +72,13 @@ namespace Isis {
   }
 
 
-  void GuiListParameter::Set(iString newValue) {
-    iString value = newValue;
+  void GuiListParameter::Set(IString newValue) {
+    IString value = newValue;
     value.UpCase();
 
     int foundAtButton = -1;
     for(int i = 0; i < p_ui->ParamListSize(p_group, p_param); i++) {
-      iString option = p_ui->ParamListValue(p_group, p_param, i);
+      IString option = p_ui->ParamListValue(p_group, p_param, i);
       option.UpCase();
       if(option.compare(0, value.size(), value) == 0) foundAtButton = i;
     }
@@ -91,12 +91,12 @@ namespace Isis {
   }
 
 
-  iString GuiListParameter::Value() {
+  IString GuiListParameter::Value() {
     if(p_buttonGroup->checkedButton() == 0) {
       return "";
     }
 
-    return (iString)p_ui->ParamListValue(p_group, p_param,
+    return (IString)p_ui->ParamListValue(p_group, p_param,
                                          p_buttonGroup->buttons().indexOf(p_buttonGroup->checkedButton()));
   }
 

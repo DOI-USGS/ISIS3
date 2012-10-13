@@ -42,8 +42,8 @@ void IsisMain() {
   PvlGroup &inst = outLabel->FindGroup("Instrument", Isis::PvlObject::Traverse);
   PvlKeyword &start = inst.FindKeyword("StartTime");
   PvlKeyword &stop  = inst.FindKeyword("StopTime");
-  iString startValue = start[0];
-  iString stopValue  = stop[0];
+  IString startValue = start[0];
+  IString stopValue  = stop[0];
   start[0] = startValue.TrimTail("Z");
   stop[0]  = stopValue.TrimTail("Z");
 
@@ -100,7 +100,7 @@ void CreateStretchPairs() {
   // Create the stretch pairs
   stretch.ClearPairs();
   for(int i = 0; i < stretchPairs->LineCount(); i++) {
-    iString line;
+    IString line;
     stretchPairs->GetLine(line, true); //assigns value to line
     int temp1 = line.Token(" ");
     int temp2 = line.Trim(" ");
@@ -122,7 +122,7 @@ void TranslateUoACassiniLabels(Pvl &labelPvl, Cube *ocube) {
 
   // Get the directory where the CISS translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  iString transDir = (string) dataDir["Cassini"] + "/translations/";
+  IString transDir = (string) dataDir["Cassini"] + "/translations/";
 
   // Translate
   FileName transFile(transDir + "cissua2isis.trn");
@@ -176,7 +176,7 @@ void TranslateUoACassiniLabels(Pvl &labelPvl, Cube *ocube) {
   outLabel->FindObject("IsisCube").AddGroup(kerns);
 
   // Create BandBin group
-  iString filter = labelPvl.FindKeyword("BAND_BIN_FILTER_NAME", Isis::PvlObject::Traverse)[0];
+  IString filter = labelPvl.FindKeyword("BAND_BIN_FILTER_NAME", Isis::PvlObject::Traverse)[0];
   filter = filter.substr(0, 3) + "/" + filter.substr(4);
   string cameraAngleDefs;
   if(instrumentID.at(3) == 'N') {
@@ -191,9 +191,9 @@ void TranslateUoACassiniLabels(Pvl &labelPvl, Cube *ocube) {
   int numLines = cameraAngle.LineCount();
   bool foundfilter = false;
   for(int i = 0; i < numLines; i++) {
-    iString line;
+    IString line;
     cameraAngle.GetLine(line, true);
-    iString token = line.Token(" ");
+    IString token = line.Token(" ");
     if(token == filter) {
       line = line.Trim(" ");
       center = line.Token(" ");

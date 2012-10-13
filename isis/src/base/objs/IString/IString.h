@@ -1,5 +1,5 @@
-#ifndef iString_h
-#define iString_h
+#ifndef IString_h
+#define IString_h
 /**
  * @file
  * $Revision: 1.14 $
@@ -29,6 +29,16 @@
 #include "Constants.h"
 
 namespace Isis {
+  bool toBool(const QString &);
+  int toInt(const QString &);
+  BigInt toBigInt(const QString &);
+  double toDouble(const QString &);
+
+  QString toString(bool);
+  QString toString(char);
+  QString toString(const int &);
+  QString toString(const BigInt &);
+  QString toString(double, int precision = 14);
 
   /**
    * @brief Adds specific functionality to C++ strings
@@ -96,7 +106,7 @@ namespace Isis {
    *
    *  @history 2005-02-15 Stuart Sides - add coded and implementation examples to
    *                                     class documentation and document
-   *                                     iString(const char *str), and private
+   *                                     IString(const char *str), and private
    *                                      methods
    *  @history 2008-07-14 Steven Lambright - Made some members const
    *  @history 2008-07-16 Steven Lambright - Added support for double nans and
@@ -108,42 +118,80 @@ namespace Isis {
    *                                       arose with current
    *                                       method and unclosed quotes.
    *  @history 2010-03-18 Sharmila Prasad - Ability to set the exact precision digits for double
-   *  @history 2010-09-27 Sharmila Prasad - Moved ParseExpression from ControlNetFilter to iString class
+   *  @history 2010-09-27 Sharmila Prasad - Moved ParseExpression from ControlNetFilter to IString class
    *  @history 2010-10-04 Sharmila Prasad - Remove redundant ParseExpression
    *  @history 2011-06-16 Jai Rideout - Fixed size of double string buffer to
    *                                    work with doubles that are -DBLMAX
-   *
-   *  @todo  The Token member should consider single and double
-   *         quotes seperatly *as of 10/28/09* Token no longer
-   *         considers quotes at all, so this todo is irrelevant?
+   *  @history 2012-08-20 Steven Lambright - Deprecated. Please use QString instead of IString or
+   *                          std::string. This file now provides toBool(), toInt(), toBigInt(),
+   *                          toDouble(), and toString() which are not deprecated. Renamed from
+   *                          iString to IString to better match our new naming conventions and
+   *                          because this class isn't going to be removed overnight. Here are
+   *                          some equivalents to IString functionality:
+   *                            Trim() - Please use QString::trimmed(), QString::simplified() or
+   *                                     QString::remove(QRegExp("(^[abc]*|[abc]*$)"))
+   *                            TrimHead() - Please use QString::trimmed(), QString::simplified() or
+   *                                         QString::remove(QRegExp("^[abc]*"))
+   *                            TrimTail() - Please use QString::trimmed(), QString::simplified() or
+   *                                         QString::remove(QRegExp("[abc]*$"))
+   *                            UpCase() - Please use QString::toUpper()
+   *                            DownCase() - Please use QString::toLower()
+   *                            ToQt() - N/A
+   *                            Token() - Please use QString::split() or QString::section()
+   *                            Split() - Please use QString::split()
+   *                            Replace() - Please use QString::replace(). If you need to respect
+   *                                       quotes, please create a standard-compliant static
+   *                                       method
+   *                            Convert() - Please use QString::replace()
+   *                            ConvertWhiteSpace() - Please use QString::simplified() or
+   *                                                 QString::replace(QRegExp("\\s"), " ")
+   *                            Remove() - Please use QString::remove()
+   *                            operator QString() - N/A
+   *                            Equal() - Please use operator==()
+   *                            ToStd() - Please use QString::toStdString()
+   *                            ToQt(vector) - This is not a string operation, it's more of a string
+   *                                           list operation.
+   *                            ToStd(QStringList) - This is not a string operation, it's more of
+   *                                                 a string list operation.
+   *                            operator int()/ToInteger() - see the new function toInt()
+   *                            operator double()/ToDouble() - see the new function toDouble()
+   *                            operator BigInt()/ToBigInteger() - see the new function toBigInt()
+   *                            operator=(const int &) - toString() handles this
+   *                            operator=(const BigInt &) - toString() handles this
+   *                            operator=(const double &) - toString() handles this
+   *                            SetDouble() - No longer necessary, only one method converts from a
+   *                                          double to a string
+   *                            Compress() - Please use QString::trimmed(), QString::simplified()
+   *                                         or QString::replace(). If you need to respect quotes,
+   *                                         please create a standard-compliant static method.
    */
-  class iString : public std::string {
+  class IString : public std::string {
     public:
-      iString();
+      IString();
 
-      iString(const std::string &str);
-      iString(const iString &str);
-      iString(const char *str);
-      iString(const int &num);
-      iString(const double &num, const int piPrecision = 14);
-      iString(const BigInt &num);
-      iString(const QString &str);
+      IString(const std::string &str);
+      IString(const IString &str);
+      IString(const char *str);
+      IString(const int &num);
+      IString(const double &num, const int piPrecision = 14);
+      IString(const BigInt &num);
+      IString(const QString &str);
 
-      ~iString();
+      ~IString();
 
-      iString Trim(const std::string &chars);
+      IString Trim(const std::string &chars);
       static std::string Trim(const std::string &chars, const std::string &str);
 
-      iString TrimHead(const std::string &chars);
+      IString TrimHead(const std::string &chars);
       static std::string TrimHead(const std::string &chars, const std::string &str);
 
-      iString TrimTail(const std::string &chars);
+      IString TrimTail(const std::string &chars);
       static std::string TrimTail(const std::string &chars, const std::string &str);
 
-      iString UpCase();
+      IString UpCase();
       static std::string UpCase(const std::string &str);
 
-      iString DownCase();
+      IString DownCase();
       static std::string DownCase(const std::string &str);
 
       int ToInteger() const;
@@ -158,34 +206,34 @@ namespace Isis {
       QString ToQt() const;
       static QString ToQt(const std::string &str);
 
-      iString Token(const iString &separator);
+      IString Token(const IString &separator);
       static int Split(const char separator, const std::string &instr,
                        std::vector<std::string> &tokens,
                        bool allowEmptyEntries = true);
 
-      iString Compress(bool force = false);
+      IString Compress(bool force = false);
       static std::string Compress(const std::string &str, bool force = false);
 
-      iString Replace(const std::string &from, const std::string &to,
+      IString Replace(const std::string &from, const std::string &to,
                       int maxReplaceCount = 20);
       static std::string  Replace(const std::string &str,
                                   const std::string &from,
                                   const std::string &to,
                                   int maxReplacementCount = 20);
 
-      iString Replace(const std::string &from, const std::string &to , bool honorquotes);
-      static iString Replace(const std::string &str, const std::string &from,
+      IString Replace(const std::string &from, const std::string &to , bool honorquotes);
+      static IString Replace(const std::string &str, const std::string &from,
                              const std::string &to , bool honorquotes);
 
-      iString Convert(const std::string &listofchars, const char &to);
+      IString Convert(const std::string &listofchars, const char &to);
       static std::string Convert(const std::string &str,
                                  const std::string &listofchars,
                                  const char &to);
 
-      iString ConvertWhiteSpace();
+      IString ConvertWhiteSpace();
       static std::string ConvertWhiteSpace(const std::string &str);
 
-      iString Remove(const std::string &del);
+      IString Remove(const std::string &del);
       static std::string Remove(const std::string &del, const std::string &str);
 
       /**
@@ -225,18 +273,18 @@ namespace Isis {
         return ToQt();
       };
 
-      iString &operator= (const int &value);
+      IString &operator= (const int &value);
 
-      iString &operator= (const BigInt &value);
+      IString &operator= (const BigInt &value);
 
       /**
        * Attempts to convert double into its string representation
        *
        * @param value [in] The double to be converted to a string
        *
-       * @return The Isis::iString representation of the double
+       * @return The Isis::IString representation of the double
        */
-      iString &operator= (const double &value) {
+      IString &operator= (const double &value) {
         SetDouble(value);
         return *this;
       }
@@ -252,5 +300,9 @@ namespace Isis {
     private:
       void SetDouble(const double &value, const int piPrecision = 14);
   };
-};
+
+  std::ostream &operator<<(std::ostream &os, const QString &string);
+  std::ostream &operator<<(std::ostream &os, const QStringRef &string);
+}
+
 #endif

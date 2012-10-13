@@ -51,11 +51,11 @@ namespace Isis {
     try {
       // First get the spacecraft and instrument and combine them
       PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
-      iString spacecraft = (string) inst["SpacecraftName"];
-      iString name = (string) inst["InstrumentId"];
+      IString spacecraft = (string) inst["SpacecraftName"];
+      IString name = (string) inst["InstrumentId"];
       spacecraft.UpCase();
       name.UpCase();
-      iString group = spacecraft + "/" + name;
+      IString group = spacecraft + "/" + name;
       group.Remove(" ");
 
       PvlGroup &kerns = lab.FindGroup("Kernels", Isis::Pvl::Traverse);
@@ -129,11 +129,11 @@ namespace Isis {
     try {
       // First get the spacecraft and instrument and combine them
       PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
-      iString spacecraft = (string) inst["SpacecraftName"];
-      iString name = (string) inst["InstrumentId"];
+      IString spacecraft = (string) inst["SpacecraftName"];
+      IString name = (string) inst["InstrumentId"];
       spacecraft.UpCase();
       name.UpCase();
-      iString group = spacecraft + "/" + name;
+      IString group = spacecraft + "/" + name;
       group.Remove(" ");
 
       PvlGroup plugin;

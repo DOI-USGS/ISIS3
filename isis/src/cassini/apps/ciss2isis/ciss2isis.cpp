@@ -11,7 +11,7 @@
 #include "Cube.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Preference.h"
 #include "ProcessImportPds.h"
 #include "ProcessByLine.h"
@@ -209,14 +209,14 @@ vector<double> ConvertLinePrefixPixels(unsigned char *data) {
 void CreateStretchPairs() {
   // Set up the strech for the 8 to 12 bit conversion from file
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
-  iString missionDir = (string) dataDir["Cassini"];
+  IString missionDir = (string) dataDir["Cassini"];
   FileName *lutFile = new FileName(missionDir + "/calibration/lut/lut.tab");
   CisscalFile *stretchPairs = new CisscalFile(lutFile->expanded());
   // Create the stretch pairs
   double temp1 = 0, temp2 = 0;
   stretch.ClearPairs();
   for(int i = 0; i < stretchPairs->LineCount(); i++) {
-    iString line;
+    IString line;
     stretchPairs->GetLine(line);  //assigns value to line
     line = line.TrimTail(", \t\n\r");
     while(line.size() > 0) {
@@ -271,7 +271,7 @@ void FixDns(Buffer &buf) {
 void TranslateCassIssLabels(FileName &labelFile, Cube *ocube) {
   // Get the directory where the CISS translation tables are.
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
-  iString missionDir = (string) dataDir["Cassini"];
+  IString missionDir = (string) dataDir["Cassini"];
   FileName transFile(missionDir + "/translations/cassiniIss.trn");
 
   // Get the translation manager ready
@@ -306,7 +306,7 @@ void TranslateCassIssLabels(FileName &labelFile, Cube *ocube) {
   dataConversionType = (string) inst.FindKeyword("DataConversionType");
   sumMode = inst.FindKeyword("SummingMode");
   compressionType = (string) inst.FindKeyword("CompressionType");
-  iString fsw((string) inst.FindKeyword("FlightSoftwareVersionId"));
+  IString fsw((string) inst.FindKeyword("FlightSoftwareVersionId"));
   if(fsw == "Unknown") {
     flightSoftware = 0.0;
   }
@@ -315,7 +315,7 @@ void TranslateCassIssLabels(FileName &labelFile, Cube *ocube) {
   }
 
   // Remove the trailing 'Z' in some pds labels
-  iString sUpdateTime = inst.FindKeyword("StartTime")[0];
+  IString sUpdateTime = inst.FindKeyword("StartTime")[0];
   sUpdateTime.Trim("Zz");
   inst.FindKeyword("StartTime").SetValue(sUpdateTime);
 
@@ -329,7 +329,7 @@ void TranslateCassIssLabels(FileName &labelFile, Cube *ocube) {
 
 
   // create BandBin group
-  iString filter = inputLabel.FindKeyword("FilterName")[0] + "/" +
+  IString filter = inputLabel.FindKeyword("FilterName")[0] + "/" +
                    inputLabel.FindKeyword("FilterName")[1];
 
   string instrumentID = inst.FindKeyword("InstrumentId");
@@ -348,9 +348,9 @@ void TranslateCassIssLabels(FileName &labelFile, Cube *ocube) {
   int numLines = cameraAngle.LineCount();
   bool foundfilter = false;
   for(int i = 0; i < numLines; i++) {
-    iString line;
+    IString line;
     cameraAngle.GetLine(line, true);
-    iString token = line.Token(" ");
+    IString token = line.Token(" ");
     if(token == filter) {
       line = line.Trim(" ");
       center = line.Token(" ");

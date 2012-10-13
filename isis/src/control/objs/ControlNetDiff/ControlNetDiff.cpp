@@ -155,8 +155,8 @@ namespace Isis {
   void ControlNetDiff::compare(PvlObject &point1Pvl, PvlObject &point2Pvl, PvlObject &report) {
     PvlObject pointReport("Point");
 
-    iString id1 = point1Pvl.FindKeyword("PointId")[0];
-    iString id2 = point2Pvl.FindKeyword("PointId")[0];
+    IString id1 = point1Pvl.FindKeyword("PointId")[0];
+    IString id2 = point2Pvl.FindKeyword("PointId")[0];
     pointReport.AddKeyword(makeKeyword("PointId", id1, id2));
 
     int p1Measures = point1Pvl.Groups();
@@ -212,8 +212,8 @@ namespace Isis {
   void ControlNetDiff::compareGroups(PvlContainer &g1, PvlContainer &g2, PvlObject &report) {
     PvlGroup measureReport("Measure");
     if (g1.HasKeyword("SerialNumber")) {
-      iString sn1 = g1.FindKeyword("SerialNumber")[0];
-      iString sn2 = g1.FindKeyword("SerialNumber")[0];
+      IString sn1 = g1.FindKeyword("SerialNumber")[0];
+      IString sn2 = g1.FindKeyword("SerialNumber")[0];
       measureReport.AddKeyword(makeKeyword("SerialNumber", sn1, sn2));
     }
     PvlContainer &groupReport = g1.HasKeyword("SerialNumber") ?
@@ -232,12 +232,12 @@ namespace Isis {
         compare(idMap[0], idMap[1], groupReport);
       }
       else if (idMap.contains(0)) {
-        iString name = idMap[0].Name();
+        IString name = idMap[0].Name();
         if (!m_ignoreKeys->contains(name))
           diff(name, idMap[0][0], "N/A", groupReport);
       }
       else if (idMap.contains(1)) {
-        iString name = idMap[1].Name();
+        IString name = idMap[1].Name();
         if (!m_ignoreKeys->contains(name))
           diff(name, "N/A", idMap[1][0], groupReport);
       }
@@ -262,7 +262,7 @@ namespace Isis {
    *               keywords
    */
   void ControlNetDiff::compare(PvlKeyword &k1, PvlKeyword &k2, PvlContainer &report) {
-    iString name = k1.Name();
+    IString name = k1.Name();
     if (m_tolerances->contains(name))
       diff(name, k1[0], k2[0], (*m_tolerances)[name], report);
     else
@@ -280,9 +280,9 @@ namespace Isis {
    * @param report Container for reporting differences between these objects for
    *               the keyword with the given name
    */
-  void ControlNetDiff::diff(iString name, PvlObject &o1, PvlObject &o2, PvlContainer &report) {
-    iString v1 = o1[name][0];
-    iString v2 = o2[name][0];
+  void ControlNetDiff::diff(IString name, PvlObject &o1, PvlObject &o2, PvlContainer &report) {
+    IString v1 = o1[name][0];
+    IString v2 = o2[name][0];
     diff(name, v1, v2, report);
   }
 
@@ -298,7 +298,7 @@ namespace Isis {
    * @param report Container for reporting differences between these values for
    *               the keyword with the given name
    */
-  void ControlNetDiff::diff(iString name, iString v1, iString v2, PvlContainer &report) {
+  void ControlNetDiff::diff(IString name, IString v1, IString v2, PvlContainer &report) {
     if (!m_ignoreKeys->contains(name)) {
       if (v1 != v2) report.AddKeyword(makeKeyword(name, v1, v2));
     }
@@ -314,7 +314,7 @@ namespace Isis {
    * @param v2 The second keyword's value
    * @return PvlKeyword Container for the two values
    */
-  PvlKeyword ControlNetDiff::makeKeyword(iString name, iString v1, iString v2) {
+  PvlKeyword ControlNetDiff::makeKeyword(IString name, IString v1, IString v2) {
     PvlKeyword keyword(name);
     keyword.AddValue(v1);
     if (v1 != v2) keyword.AddValue(v2);
@@ -335,7 +335,7 @@ namespace Isis {
    * @param report Container for reporting differences between these values for
    *               the keyword with the given name
    */
-  void ControlNetDiff::diff(iString name, double v1, double v2, double tol, PvlContainer &report) {
+  void ControlNetDiff::diff(IString name, double v1, double v2, double tol, PvlContainer &report) {
     if (!m_ignoreKeys->contains(name)) {
       if (fabs(v1 - v2) > tol) report.AddKeyword(makeKeyword(name, v1, v2, tol));
     }
@@ -353,7 +353,7 @@ namespace Isis {
    * @param tol The tolerance to compare against the values
    * @return PvlKeyword Container for the two values
    */
-  PvlKeyword ControlNetDiff::makeKeyword(iString name, double v1, double v2, double tol) {
+  PvlKeyword ControlNetDiff::makeKeyword(IString name, double v1, double v2, double tol) {
     PvlKeyword keyword(name);
     keyword.AddValue(v1);
     if (fabs(v1 - v2) > tol) {
@@ -373,7 +373,7 @@ namespace Isis {
    * @param v2 The second points's value for the unique label
    * @param parent Container for the point object
    */
-  void ControlNetDiff::addUniquePoint(iString label, iString v1, iString v2, PvlObject &parent) {
+  void ControlNetDiff::addUniquePoint(IString label, IString v1, IString v2, PvlObject &parent) {
     PvlObject point("Point");
 
     PvlKeyword keyword(label);
@@ -395,7 +395,7 @@ namespace Isis {
    * @param v2 The second measure's value for the unique label
    * @param parent Container for the measure group
    */
-  void ControlNetDiff::addUniqueMeasure(iString label, iString v1, iString v2, PvlObject &parent) {
+  void ControlNetDiff::addUniqueMeasure(IString label, IString v1, IString v2, PvlObject &parent) {
     PvlGroup measure("Measure");
 
     PvlKeyword keyword(label);

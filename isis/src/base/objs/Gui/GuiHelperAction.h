@@ -1,5 +1,5 @@
 #include <QAction>
-#include "iString.h"
+#include "IString.h"
 
 namespace Isis {
   /**

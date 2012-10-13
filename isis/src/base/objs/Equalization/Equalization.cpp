@@ -89,10 +89,10 @@ namespace Isis {
       vector<Statistics *> statsList;
       for (int img = 0; img < (int) m_imageList.size(); img++) {
         ProcessByLine p;
-        iString bandStr(band);
+        IString bandStr(band);
         string statMsg = "Calculating Statistics for Band " + bandStr +
-          " of " + iString(m_maxBand) + " in Cube " + iString(img + 1) +
-          " of " + iString(m_maxCube);
+          " of " + IString(m_maxBand) + " in Cube " + IString(img + 1) +
+          " of " + IString(m_maxCube);
         p.Progress()->SetText(statMsg);
         CubeAttributeInput att("+" + bandStr);
         const string inp = m_imageList[img].toString();
@@ -131,11 +131,11 @@ namespace Isis {
       for (int j = (i + 1); j < m_imageList.size(); j++) {
         Cube cube2;
         cube2.open(m_imageList[j].toString());
-        iString cubeStr1((int)(i + 1));
-        iString cubeStr2((int)(j + 1));
+        IString cubeStr1((int)(i + 1));
+        IString cubeStr2((int)(j + 1));
         string statMsg = "Gathering Overlap Statisitcs for Cube " +
                          cubeStr1 + " vs " + cubeStr2 + " of " +
-                         iString(m_maxCube);
+                         IString(m_maxCube);
 
         // Get overlap statistics for cubes
         OverlapStatistics oStats(cube1, cube2, statMsg, percent);
@@ -237,10 +237,10 @@ namespace Isis {
 
       // Band by band statistics
       for (int band = 1; band <= m_maxBand; band++) {
-        iString mult(m_adjustments[img]->getGain(band - 1));
-        iString base(m_adjustments[img]->getOffset(band - 1));
-        iString avg(m_adjustments[img]->getAverage(band - 1));
-        iString bandNum(band);
+        IString mult(m_adjustments[img]->getGain(band - 1));
+        IString base(m_adjustments[img]->getOffset(band - 1));
+        IString avg(m_adjustments[img]->getAverage(band - 1));
+        IString bandNum(band);
         string bandStr = "Band" + bandNum;
         PvlKeyword bandStats(bandStr);
         bandStats += mult;
@@ -286,11 +286,11 @@ namespace Isis {
     FileList outList;
     fillOutList(outList, toListName);
 
-    iString maxCubeStr((int) m_imageList.size());
+    IString maxCubeStr((int) m_imageList.size());
     for (int img = 0; img < m_imageList.size(); img++) {
       // Set up for progress bar
       ProcessByLine p;
-      p.Progress()->SetText("Equalizing Cube " + iString((int) img + 1) +
+      p.Progress()->SetText("Equalizing Cube " + IString((int) img + 1) +
           " of " + maxCubeStr);
 
       // Open input cube
@@ -327,10 +327,10 @@ namespace Isis {
 
       // Band by band statistics
       for (int band = 1; band <= m_maxBand; band++) {
-        iString mult(m_adjustments[img]->getGain(band - 1));
-        iString base(m_adjustments[img]->getOffset(band - 1));
-        iString avg(m_adjustments[img]->getAverage(band - 1));
-        iString bandNum(band);
+        IString mult(m_adjustments[img]->getGain(band - 1));
+        IString base(m_adjustments[img]->getOffset(band - 1));
+        IString avg(m_adjustments[img]->getAverage(band - 1));
+        IString bandNum(band);
         string bandStr = "Band" + bandNum;
         PvlKeyword bandStats(bandStr);
         bandStats += mult;

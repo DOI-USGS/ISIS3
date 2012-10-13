@@ -3,7 +3,7 @@
 #include <QtGui>
 #include <algorithm>
 
-#include "iString.h"
+#include "IString.h"
 #include "SerialNumberList.h"
 
 #include "qnet.h"
@@ -95,7 +95,7 @@ namespace Isis {
     for (int i = 0; i < g_serialNumberList->Size(); i++) {
 
       // build new item...
-      iString label = g_serialNumberList->FileName(i);
+      IString label = g_serialNumberList->FileName(i);
       QListWidgetItem *item = new QListWidgetItem(label);
 
       // if this entry of the SerialNumberList is also in the pointFiles then

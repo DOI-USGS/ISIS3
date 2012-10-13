@@ -192,7 +192,7 @@ FileName FindDarkFile(Cube *icube) {
 
   TextFile darkFile(file);
   darkFile.SetComment("C");
-  iString data;
+  IString data;
 
   /**
    * The dark current table requires the following information to match:
@@ -223,32 +223,32 @@ FileName FindDarkFile(Cube *icube) {
   while(darkFile.GetLine(data)) {
     data = data.Compress();
 
-    iString mission = data.Token(" ");
+    IString mission = data.Token(" ");
     if(mission != "GALILEO") {
       continue;
     }
 
-    iString frameMode = data.Token(" ");
+    IString frameMode = data.Token(" ");
     if(frameMode.at(0) != icube->getGroup("Instrument")["FrameModeId"][0].at(0)) {
       continue;
     }
 
-    iString gainState = data.Token(" ");
+    IString gainState = data.Token(" ");
     if((int)gainState != gainModeId) {
       continue;
     }
 
-    iString frameRate = data.Token(" ");
+    IString frameRate = data.Token(" ");
     if(frameRateId != (int)frameRate) {
       continue;
     }
 
-    iString tableExposureTypeId = data.Token(" ");
+    IString tableExposureTypeId = data.Token(" ");
     if((int)tableExposureTypeId != exposureTypeId) {
       continue;
     }
 
-    iString readout = data.Token(" ");
+    IString readout = data.Token(" ");
     if(readout.at(0) != icube->getGroup("Instrument")["ReadoutMode"][0].at(0)) {
       continue;
     }
@@ -257,7 +257,7 @@ FileName FindDarkFile(Cube *icube) {
     int maxImageNum = data.Token(" ");
 
     int imageNumber = (int)((double)icube->getGroup("Instrument")["SpacecraftClockStartCount"] * 100 + 0.5);
-    iString telemetry = icube->getGroup("Instrument")["TelemetryFormat"][0];
+    IString telemetry = icube->getGroup("Instrument")["TelemetryFormat"][0];
     if(imageNumber > 99757701 && imageNumber < 159999999) {
       if((telemetry == "AI8" && (gainState == "1" || gainState == "2")) ||
           (telemetry == "IM4" && (gainState == "3" || gainState == "4"))) {
@@ -284,14 +284,14 @@ FileName FindGainFile(Cube *icube) {
 
   TextFile gainFile(file);
   gainFile.SetComment("C");
-  iString data;
+  IString data;
 
   int imageNumber = (int)((double)icube->getGroup("Instrument")["SpacecraftClockStartCount"] * 100 + 0.5);
 
   while(gainFile.GetLine(data)) {
     data = data.Compress();
 
-    iString mission = data.Token(" ");
+    IString mission = data.Token(" ");
     if(mission != "GALILEO") {
       continue;
     }
@@ -300,12 +300,12 @@ FileName FindGainFile(Cube *icube) {
      * Filter codes
      * 0=clear,1=green,2=red,3=violet,4=7560,5=9680,6=7270,7=8890
      */
-    iString filter = icube->getGroup("BandBin")["FilterNumber"][0];
+    IString filter = icube->getGroup("BandBin")["FilterNumber"][0];
     if(filter != data.Token(" ")) {
       continue;
     }
 
-    iString frameMode = data.Token(" ");
+    IString frameMode = data.Token(" ");
     if(frameMode.at(0) != icube->getGroup("Instrument")["FrameModeId"][0].at(0)) {
       continue;
     }
@@ -328,9 +328,9 @@ FileName ReadWeightTable(Cube *icube) {
   FileName weightFile(file);
   weightFile = weightFile.highestVersion();
   Pvl weightTables(weightFile.expanded());
-  iString group = iString("FrameMode") + (char)icube->getGroup("Instrument")["FrameModeId"][0].at(0);
+  IString group = IString("FrameMode") + (char)icube->getGroup("Instrument")["FrameModeId"][0].at(0);
   PvlGroup &frameGrp = weightTables.FindGroup(group);
-  iString keyword = iString("GainState") + ((getGainModeID(icube) < 3) ? iString("12") : iString("34"));
+  IString keyword = IString("GainState") + ((getGainModeID(icube) < 3) ? IString("12") : IString("34"));
 
   for(int i = 0; i < frameGrp[keyword].Size(); i++) {
     weight.push_back(frameGrp[keyword][i]);
@@ -403,7 +403,7 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
     if(currGrp.HasKeyword("MinimumTargetName")) {
       try {
         if((int)currGrp["MinimumTargetName"] >
-            (int)(iString)icube->getGroup("Archive")["CalTargetCode"][0].substr(0, 2)) {
+            (int)(IString)icube->getGroup("Archive")["CalTargetCode"][0].substr(0, 2)) {
           continue;
         }
       }

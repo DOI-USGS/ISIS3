@@ -103,7 +103,7 @@ void IsisMain() {
 
   TRANS2d3p trans[8];    //final solutions for the transformations-one for each sub-scan
 
-  iString fileName,tempiString;
+  IString fileName,tempIString;
   std::string fileBaseName, tempString;
   UserInterface &ui = Application::GetUserInterface();
 
@@ -149,10 +149,10 @@ void IsisMain() {
   fileBaseName = ui.GetString("FILE_BASE");
   for (i=1; i<=8; i++) {
     panC[i-1] = new Cube;
-    fileName = fileBaseName + iString("-000") + iString(i) + iString(".cub");
+    fileName = fileBaseName + IString("-000") + IString(i) + IString(".cub");
     panC[i-1]->open(fileName, "r");
     if (!panC[i-1]->isOpen()){
-      string msg = "Unable to open input cube: " + iString(fileName) + "\n";
+      string msg = "Unable to open input cube: " + IString(fileName) + "\n";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -691,8 +691,8 @@ void IsisMain() {
   //define an output cube
   outputC.setDimensions(int(maxS),int(maxL),1);
   outputC.setPixelType(panC[0]->getPixelType());  //set pixel type
-  tempiString = ui.GetFileName("TO");
-  outputC.create(tempiString);
+  tempIString = ui.GetFileName("TO");
+  outputC.create(tempIString);
   outputC.close();  //closing the output cube so that it can be opened by the mosaic process
   ProcessMosaic mosaic;
   mosaic.SetOutputCube("TO");

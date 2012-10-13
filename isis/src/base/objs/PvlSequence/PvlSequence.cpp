@@ -54,7 +54,7 @@ namespace Isis {
     Pvl pvl;
     str >> pvl;
     PvlKeyword &key = pvl["temp"];
-    std::vector<iString> temp;
+    std::vector<IString> temp;
     for(int i = 0; i < key.Size(); i++) {
       temp.push_back(key[i]);
     }
@@ -69,9 +69,9 @@ namespace Isis {
    * @param  array  vector of strings
    */
   PvlSequence &PvlSequence::operator+=(std::vector<std::string> &array) {
-    std::vector<iString> temp;
+    std::vector<IString> temp;
     for(int i = 0; i < (int)array.size(); i++) {
-      temp.push_back(iString(array[i]));
+      temp.push_back(IString(array[i]));
     }
     p_sequence.push_back(temp);
     return *this;
@@ -84,9 +84,9 @@ namespace Isis {
    * @param  array  vector of integers
    */
   PvlSequence &PvlSequence::operator+=(std::vector<int> &array) {
-    std::vector<iString> temp;
+    std::vector<IString> temp;
     for(int i = 0; i < (int)array.size(); i++) {
-      temp.push_back(iString(array[i]));
+      temp.push_back(IString(array[i]));
     }
     p_sequence.push_back(temp);
     return *this;
@@ -99,9 +99,9 @@ namespace Isis {
    * @param  array  vector of doubles
    */
   PvlSequence &PvlSequence::operator+=(std::vector<double> &array) {
-    std::vector<iString> temp;
+    std::vector<IString> temp;
     for(int i = 0; i < (int)array.size(); i++) {
-      temp.push_back(iString(array[i]));
+      temp.push_back(IString(array[i]));
     }
     p_sequence.push_back(temp);
     return *this;

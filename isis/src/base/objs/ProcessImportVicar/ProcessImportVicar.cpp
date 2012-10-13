@@ -32,7 +32,7 @@
 #include "Pvl.h"
 #include "PixelType.h"
 #include "SpecialPixel.h"
-#include "iString.h"
+#include "IString.h"
 #include "UserInterface.h"
 
 using namespace std;
@@ -56,7 +56,7 @@ namespace Isis {
 
     try {
       // get the starting VICAR label and convert to PVL
-      iString vicLabels = ExtractPvlLabel(0, vicFile);
+      IString vicLabels = ExtractPvlLabel(0, vicFile);
 
       // Fill temp Pvl label for ProcessImport startprocess
       stringstream lbl;
@@ -121,7 +121,7 @@ namespace Isis {
                           (int) vLab["RECSIZE"];
           ifstream vicFile(vicarFile.c_str(), ios::in);
 
-          iString endPvlLabel = ExtractPvlLabel(startByte, vicFile);
+          IString endPvlLabel = ExtractPvlLabel(startByte, vicFile);
           stringstream lbl;
           lbl << endPvlLabel;
 
@@ -151,7 +151,7 @@ namespace Isis {
    *
    * @return a valid PVL label
    */
-  iString ProcessImportVicar::ExtractPvlLabel(const int startPos, std::ifstream &vicarFile) const {
+  IString ProcessImportVicar::ExtractPvlLabel(const int startPos, std::ifstream &vicarFile) const {
     vicarFile.seekg(startPos, ios::beg);
 
     // convert the LBLSIZE to an integer
@@ -175,7 +175,7 @@ namespace Isis {
       }
     }
 
-    int lblSize = iString(lblSizeValue).ToInteger();
+    int lblSize = IString(lblSizeValue).ToInteger();
     delete [] lblSizeValue;
     lblSizeValue = NULL;
 
@@ -188,7 +188,7 @@ namespace Isis {
     vicarFile.close();
 
     // Transform the vicar labels into valid pvl labels
-    iString vicLabels = buf;
+    IString vicLabels = buf;
 
     bool inQuote = false;
     for(unsigned int pos = 0; pos < vicLabels.size(); pos++) {

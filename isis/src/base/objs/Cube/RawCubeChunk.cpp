@@ -10,7 +10,7 @@
 #include "Displacement.h"
 #include "Distance.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 namespace Isis {
   /**
@@ -94,7 +94,7 @@ namespace Isis {
    */
   void RawCubeChunk::setRawData(QByteArray rawData) {
     if(rawData.size() != m_rawBuffer->size()) {
-      iString msg = "Cannot set raw data on a RawCubeChunk with a differently "
+      IString msg = "Cannot set raw data on a RawCubeChunk with a differently "
           "sized data array";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

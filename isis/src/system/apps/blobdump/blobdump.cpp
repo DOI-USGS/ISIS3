@@ -7,7 +7,7 @@
 #include "Blob.h"
 #include "Table.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include <sstream>
 
 using namespace std;

@@ -15,8 +15,8 @@
 using namespace std;
 using namespace Isis;
 
-bool copyGroup(Pvl * source, Pvl * mergeTo, iString name);
-bool copyBlob(Cube * from, Cube * to, iString type, iString name, iString fname);
+bool copyGroup(Pvl * source, Pvl * mergeTo, IString name);
+bool copyBlob(Cube * from, Cube * to, IString type, IString name, IString fname);
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
@@ -27,7 +27,7 @@ void IsisMain() {
 
   Pvl * mergeTo = NULL;
   Pvl * source = NULL;
-  iString sourceFileName = ui.GetFileName("Source");
+  IString sourceFileName = ui.GetFileName("Source");
   mergeTo = inOut.getLabel();
   source = new Pvl(sourceFileName);
 
@@ -121,7 +121,7 @@ void IsisMain() {
     results += PvlKeyword("Kernels", success ? "true" : "false");
 
     if (isACube) {
-      iString fname = sourceFileName;
+      IString fname = sourceFileName;
       bool insPoint = copyBlob(&sourceCube, &inOut, "InstrumentPointing","Table", sourceFileName);
       bool insPos = copyBlob(&sourceCube, &inOut, "InstrumentPosition","Table", sourceFileName);
       bool bodyRot = copyBlob(&sourceCube, &inOut, "BodyRotation","Table", sourceFileName);
@@ -182,7 +182,7 @@ void IsisMain() {
 
   // Any other requested groups
   if (ui.WasEntered("Groups")) {
-    QString grps = iString(ui.GetString("Groups")).Remove(" ").ToQt();
+    QString grps = IString(ui.GetString("Groups")).Remove(" ").ToQt();
     QStringList list = grps.split(",");
     QString grp;
     foreach (grp, list) {
@@ -196,7 +196,7 @@ void IsisMain() {
   // Any other requested blobs
   // Expected format is: <Object name>:<Name keyword>
   if (ui.WasEntered("Blobs")) {
-    QString blobs = iString(ui.GetString("Blobs")).Remove(" ").ToQt();
+    QString blobs = IString(ui.GetString("Blobs")).Remove(" ").ToQt();
     QStringList list = blobs.split(",");
     QString blob;
     foreach (blob, list) {
@@ -253,7 +253,7 @@ void IsisMain() {
 // Copy a group from the IsisCube object in one cube to the other
 // If it exists in the source, we'll copy it, if it exists in the
 // mergeTo Pvl, we'll overwrite it.
-bool copyGroup(Pvl * source, Pvl * mergeTo, iString name) {
+bool copyGroup(Pvl * source, Pvl * mergeTo, IString name) {
   try {
     // The call we're looking to get an exception on is the one just below.
     PvlGroup & toCopy = source->FindGroup(name, Pvl::Traverse);
@@ -268,7 +268,7 @@ bool copyGroup(Pvl * source, Pvl * mergeTo, iString name) {
   }
 }
 
-bool copyBlob(Cube * from, Cube * to, iString name, iString type, iString fname) {
+bool copyBlob(Cube * from, Cube * to, IString name, IString type, IString fname) {
   try {
     Blob blob(name, type, fname);
     from->read(blob);

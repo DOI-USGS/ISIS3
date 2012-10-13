@@ -34,7 +34,7 @@
 #include "FileName.h"
 #include "Pvl.h"
 #include "Cube.h"
-#include "iString.h"
+#include "IString.h"
 #include "TextFile.h"
 #include "Application.h"
 #include "NaifStatus.h"

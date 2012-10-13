@@ -31,7 +31,7 @@
 #include <QObject>
 #include <QToolButton>
 
-#include "iString.h"
+#include "IString.h"
 
 namespace Isis {
   class UserInterface;
@@ -58,7 +58,7 @@ namespace Isis {
       virtual ~GuiParameter();
 
       //! Return the name of the parameter
-      iString Name() const {
+      IString Name() const {
         return p_name;
       };
 
@@ -66,9 +66,9 @@ namespace Isis {
 
       void SetToCurrent();
 
-      virtual iString Value() = 0;
+      virtual IString Value() = 0;
 
-      virtual void Set(iString newValue) = 0;
+      virtual void Set(IString newValue) = 0;
 
       void SetEnabled(bool enabled, bool isParentCombo=false);
 
@@ -102,7 +102,7 @@ namespace Isis {
 
       int p_group;
       int p_param;
-      iString p_name;
+      IString p_name;
       UserInterface *p_ui;
 
       QLabel *p_label;

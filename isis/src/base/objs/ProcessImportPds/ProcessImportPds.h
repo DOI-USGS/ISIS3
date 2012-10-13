@@ -213,7 +213,7 @@ namespace Isis {
       Isis::Pvl p_pdsLabel;      //!<Internalized PDS label
       std::string p_labelFile;   //!<The filename where the PDS label came from
 
-      Isis::iString p_transDir;  //!Base data directory
+      Isis::IString p_transDir;  //!Base data directory
 
       // Encoding info
       EncodingType p_encodingType;       /**<The encoding type of the image data.

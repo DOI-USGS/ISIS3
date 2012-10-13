@@ -18,7 +18,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "LoHighDistortionMap.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace std;
 
@@ -95,8 +95,8 @@ namespace Isis {
   void LoHighDistortionMap::SetDistortion(const int naifIkCode) {
     // Get the perspective correction factors for x and y and the distortion
     // center (point of symmetry of distortion)
-    string perskey = "INS" + iString(naifIkCode) + "_PERSPECTIVE_FACTORS";
-    string centkey = "INS" + iString(naifIkCode) + "_POINT_OF_SYMMETRY";
+    string perskey = "INS" + IString(naifIkCode) + "_PERSPECTIVE_FACTORS";
+    string centkey = "INS" + IString(naifIkCode) + "_POINT_OF_SYMMETRY";
     p_xPerspective = p_camera->Spice::getDouble(perskey, 0);
     p_yPerspective = p_camera->Spice::getDouble(perskey, 1);
     p_x0 = p_camera->Spice::getDouble(centkey, 0);

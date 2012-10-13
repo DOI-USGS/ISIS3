@@ -23,7 +23,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "iString.h"
+#include "IString.h"
 #include "IException.h"
 #include "IException.h"
 #include "Message.h"
@@ -215,7 +215,7 @@ namespace Isis {
     }
 
     string msg = "Unable to find a translation value for [" +
-                 nName +  ", " + Isis::iString(fValue) + "] in file [" +
+                 nName +  ", " + Isis::IString(fValue) + "] in file [" +
                  p_trnsTbl.FileName() + "]";
 
     throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -266,7 +266,7 @@ namespace Isis {
       //   doing translation file input groups for the new keyword. Flag it
       //   immediately to give a good error message.
       if(result.Size() == 1 && result[0].find(",") != string::npos) {
-        iString msg = "Keyword [InputPosition] cannot have a comma [,] in ";
+        IString msg = "Keyword [InputPosition] cannot have a comma [,] in ";
         msg += " the value [";
         msg += result[0];
         msg += "]";
@@ -287,7 +287,7 @@ namespace Isis {
 
     /* Error if no containers were listed
     if(!foundLegalInputGroup) {
-      iString msg = "No input position found for translation [";
+      IString msg = "No input position found for translation [";
       msg += nName;
       msg += "] in translation file [";
       msg += p_trnsTbl.FileName();

@@ -24,7 +24,7 @@
 #if !defined(Endian_h)
 #define Endian_h
 
-#include "iString.h"
+#include "IString.h"
 
 namespace Isis {
   /**
@@ -70,7 +70,7 @@ namespace Isis {
   }
 
   inline Isis::ByteOrder ByteOrderEnumeration(const std::string &order) {
-    Isis::iString temp(order);
+    Isis::IString temp(order);
     temp = temp.UpCase();
     if(temp == "LSB") return Isis::Lsb;
     if(temp == "MSB") return Isis::Msb;

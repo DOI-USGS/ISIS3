@@ -3,7 +3,7 @@
 #include <QSet>
 #include "Preference.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 
 
@@ -22,7 +22,7 @@ class ErrorFunction :
 public std::unary_function <double, double> {
   public:
    double operator()(double x) {
-     iString msg = "This functor always throws an error\n";
+     IString msg = "This functor always throws an error\n";
      throw IException(IException::Programmer, msg, _FILEINFO_);
      return 0.0;
    }

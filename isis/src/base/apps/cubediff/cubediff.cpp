@@ -11,7 +11,7 @@
 #include "Pvl.h"
 #include "IException.h"
 #include "WriteTabular.h"
-#include "iString.h"
+#include "IString.h"
 #include "Pixel.h"
 
 using namespace std;
@@ -237,8 +237,8 @@ void compare(vector<Buffer *> &in, vector<Buffer *> &out) {
         diffset.push_back(currDiff);
 
         // Check the character lengths of the values
-        int val1Length = iString((int)currDiff.cube1Val).length();
-        int val2Length = iString((int)currDiff.cube2Val).length();
+        int val1Length = IString((int)currDiff.cube1Val).length();
+        int val2Length = IString((int)currDiff.cube2Val).length();
         if(val1Length < colWidth) {
           colWidth = val1Length;
         }
@@ -278,7 +278,7 @@ void diffTable(ofstream &target, int precision) {
   for(unsigned int i = 0; i < samps.size(); i++) {
     Column currCol;
     //Prepare and add the first file's column
-    currCol.SetName(iString("File1_") + iString(samps[i]));
+    currCol.SetName(IString("File1_") + IString(samps[i]));
     if((unsigned int)(colWidth + precision + 1) < currCol.Name().length()) {
       currCol.SetWidth(currCol.Name().length() + 1);
     }
@@ -290,7 +290,7 @@ void diffTable(ofstream &target, int precision) {
     cols.push_back(currCol);
 
     //Prepare and add the second file's column
-    currCol.SetName(iString("File2_") + iString(samps[i]));
+    currCol.SetName(IString("File2_") + IString(samps[i]));
     cols.push_back(currCol);
   }
 

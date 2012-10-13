@@ -23,7 +23,7 @@
 #include "Gui.h"
 #include "HelpTool.h"
 #include "HistogramTool.h"
-#include "iString.h"
+#include "IString.h"
 #include "MatchTool.h"
 #include "MeasureTool.h"
 #include "PanTool.h"
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
   // Check to see if the user wants to force a new window
   int newWindow = -1;
   for(int i = 1; i < argc; i++) {
-    if(iString(argv[i]).UpCase() == "-NEW") {
+    if(IString(argv[i]).UpCase() == "-NEW") {
       newWindow = i;
     }
   }
@@ -117,7 +117,7 @@ int main(int argc, char *argv[]) {
                              "UserInterface");
   if(uiPref.HasKeyword("GuiStyle")) {
     std::string style = uiPref["GuiStyle"];
-    QApplication::setStyle((iString) style);
+    QApplication::setStyle((IString) style);
   }
 
   // Add the Qt plugin directory to the library path

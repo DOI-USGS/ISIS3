@@ -256,18 +256,18 @@ namespace Isis {
       else {
         if(yIndex < 0 || xIndex < 0 || yIndex >= (int) p_buffer.size() ||
             xIndex >= (int) p_buffer.at(yIndex).size()) {
-          iString msg = "An index out of range error was detected. ";
+          IString msg = "An index out of range error was detected. ";
 
           if(yIndex < 0)
-            msg += "The Y-Index [" + iString(yIndex) + "] is less than 0";
+            msg += "The Y-Index [" + IString(yIndex) + "] is less than 0";
           else if(xIndex < 0)
-            msg += "The X-Index [" + iString(xIndex) + "] is less than 0";
+            msg += "The X-Index [" + IString(xIndex) + "] is less than 0";
           else if(yIndex > (int)p_buffer.size())
-            msg += "The Y-Index [" + iString(yIndex) + "] is greater than the "
-                "Y-Size of [" + iString((int)p_buffer.size()) + "]";
+            msg += "The Y-Index [" + IString(yIndex) + "] is greater than the "
+                "Y-Size of [" + IString((int)p_buffer.size()) + "]";
           else if(xIndex > (int)p_buffer.at(yIndex).size())
-            msg += "The X-Index [" + iString(xIndex) + " is greater than the "
-                "X-Size of [" + iString((int) p_buffer.at(yIndex).size()) + "]";
+            msg += "The X-Index [" + IString(xIndex) + " is greater than the "
+                "X-Size of [" + IString((int) p_buffer.at(yIndex).size()) + "]";
 
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }

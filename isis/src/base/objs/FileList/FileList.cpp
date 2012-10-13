@@ -24,7 +24,7 @@
 #include "IException.h"
 #include "Message.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include <iostream>
 #include <fstream>
 
@@ -52,7 +52,7 @@ namespace Isis {
    *
    * @param path of a file containing a list of files.
    */
-  /*FileList::FileList(iString  listFileString) {
+  /*FileList::FileList(IString  listFileString) {
     read(FileName(listFileString));
   }*/
 
@@ -101,7 +101,7 @@ namespace Isis {
   void FileList::read(std::istream &in) {
     // Read each file and put it in the vector
     char buf[65536];
-    Isis::iString s;
+    Isis::IString s;
     bool bHasQuotes = false;
 
     in.getline(buf, 65536);

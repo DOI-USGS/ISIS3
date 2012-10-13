@@ -34,7 +34,7 @@
 #include <QList>
 
 #include "Application.h"
-#include "iString.h"
+#include "IString.h"
 #include "Preference.h"
 #include "Pvl.h"
 
@@ -93,8 +93,8 @@ namespace Isis {
     m_previousExceptions = NULL;
 
     m_errorType = type;
-    m_message = new iString(iString(message).Trim(" \n\t"));
-    m_fileName = new iString(fileName);
+    m_message = new IString(IString(message).Trim(" \n\t"));
+    m_fileName = new IString(fileName);
     m_lineNumber = lineNumber;
 
     deleteEmptyMemberStrings();
@@ -110,7 +110,7 @@ namespace Isis {
    * exception caused this one to be thrown).
    *
    * @code
-   *   iString message = "While doing an important process, we could not do .. "
+   *   IString message = "While doing an important process, we could not do .. "
    *                     "because the data [" ... "] is invalid";
    *   throw IException(IException::Unknown, message, _FILEINFO_);
    * @endcode
@@ -122,7 +122,7 @@ namespace Isis {
    * @param lineNumber the line in the source code file that threw this
    *          exception
    */
-  IException::IException(ErrorType type, const iString &message,
+  IException::IException(ErrorType type, const IString &message,
                          const char *fileName, int lineNumber) {
     m_what = NULL;
     m_message = NULL;
@@ -130,8 +130,8 @@ namespace Isis {
     m_previousExceptions = NULL;
 
     m_errorType = type;
-    m_message = new iString(iString(message).Trim(" \n\t"));
-    m_fileName = new iString(fileName);
+    m_message = new IString(IString(message).Trim(" \n\t"));
+    m_fileName = new IString(fileName);
     m_lineNumber = lineNumber;
 
     deleteEmptyMemberStrings();
@@ -179,8 +179,8 @@ namespace Isis {
     m_previousExceptions = NULL;
 
     m_errorType = type;
-    m_message = new iString(iString(message).Trim(" \n\t"));
-    m_fileName = new iString(fileName);
+    m_message = new IString(IString(message).Trim(" \n\t"));
+    m_fileName = new IString(fileName);
     m_lineNumber = lineNumber;
 
     deleteEmptyMemberStrings();
@@ -202,7 +202,7 @@ namespace Isis {
    *     ...
    *   }
    *   catch (IException &e) {
-   *     iString message = "While doing an important process, we could not do "
+   *     IString message = "While doing an important process, we could not do "
    *                       "... ";
    *     throw IException(e, IException::Unknown, message, _FILEINFO_);
    *   }
@@ -218,7 +218,7 @@ namespace Isis {
    *          exception
    */
   IException::IException(const IException &caughtException,
-      ErrorType type, const iString &message,
+      ErrorType type, const IString &message,
       const char *fileName, int lineNumber) {
     m_what = NULL;
     m_message = NULL;
@@ -226,8 +226,8 @@ namespace Isis {
     m_previousExceptions = NULL;
 
     m_errorType = type;
-    m_message = new iString(iString(message).Trim(" \n\t"));
-    m_fileName = new iString(fileName);
+    m_message = new IString(IString(message).Trim(" \n\t"));
+    m_fileName = new IString(fileName);
     m_lineNumber = lineNumber;
 
     deleteEmptyMemberStrings();
@@ -258,11 +258,11 @@ namespace Isis {
     }
 
     if (other.m_message) {
-      m_message = new iString(*other.m_message);
+      m_message = new IString(*other.m_message);
     }
 
     if (other.m_fileName) {
-      m_fileName = new iString(*other.m_fileName);
+      m_fileName = new IString(*other.m_fileName);
     }
 
     if (other.m_previousExceptions) {
@@ -372,7 +372,7 @@ namespace Isis {
    * exceptions thrown by your class.
    */
   void IException::print() const {
-    iString errorString = toString();
+    IString errorString = toString();
     if (errorString != "")
       cerr << errorString << endl;
   }
@@ -388,7 +388,7 @@ namespace Isis {
    *          user's preferences file regarding file info.
    */
   void IException::print(bool printFileInfo) const {
-    iString errorString = toString(printFileInfo);
+    IString errorString = toString(printFileInfo);
     if (errorString != "")
       cerr << errorString << endl;
   }
@@ -431,7 +431,7 @@ namespace Isis {
 
       if (exception.m_message) {
         exceptionIsBlank = false;
-        iString message(*exception.m_message);
+        IString message(*exception.m_message);
 
         if (message.size() && message[message.size() - 1] == '.')
           message = message.substr(0, message.size() - 1);
@@ -463,14 +463,14 @@ namespace Isis {
    *
    * @return a string representation of this exception
    */
-  iString IException::toString() const {
+  IString IException::toString() const {
     bool reportFileLine = true;
 
     if (Preference::Preferences().HasGroup("ErrorFacility")) {
       PvlGroup &errorFacility =
           Preference::Preferences().FindGroup("ErrorFacility");
       if (errorFacility.HasKeyword("FileLine")) {
-        iString fileLine = errorFacility["FileLine"][0];
+        IString fileLine = errorFacility["FileLine"][0];
         reportFileLine = (fileLine.UpCase() == "ON");
       }
     }
@@ -490,8 +490,8 @@ namespace Isis {
    *          the user's preferences file regarding file info.
    * @return a string representation of this exception
    */
-  iString IException::toString(bool includeFileInfo) const {
-    iString result;
+  IString IException::toString(bool includeFileInfo) const {
+    IString result;
 
     bool usePvlFormat = false;
 
@@ -499,7 +499,7 @@ namespace Isis {
       PvlGroup &errorFacility =
           Preference::Preferences().FindGroup("ErrorFacility");
       if (errorFacility.HasKeyword("Format")) {
-        iString format = errorFacility["Format"][0];
+        IString format = errorFacility["Format"][0];
         usePvlFormat = (format.UpCase() == "PVL");
       }
     }
@@ -533,7 +533,7 @@ namespace Isis {
 
         bool needsPeriod = false;
         if (exception.m_message) {
-          iString message(*exception.m_message);
+          IString message(*exception.m_message);
 
           if (message.size() && message[message.size() - 1] == '.')
             message = message.substr(0, message.size() - 1);
@@ -546,7 +546,7 @@ namespace Isis {
         if(includeFileInfo && exception.m_fileName) {
           result += " in " + *exception.m_fileName;
           if (exception.m_lineNumber != -1)
-            result += " at " + iString(exception.m_lineNumber);
+            result += " at " + IString(exception.m_lineNumber);
           needsPeriod = true;
         }
 
@@ -602,7 +602,7 @@ namespace Isis {
   IException IException::createStackTrace() {
     vector<string> theStack;
     StackTrace::GetStackTrace(&theStack);
-    iString message;
+    IString message;
 
     for(unsigned int i = 1; i < theStack.size(); i++) {
       message += theStack[i] + "\n";
@@ -624,8 +624,8 @@ namespace Isis {
    * @return a string representation of the error type. For example,
    *     "USER ERROR" if the error type is User
    */
-  iString IException::errorTypeToString(ErrorType type) {
-    iString result;
+  IString IException::errorTypeToString(ErrorType type) {
+    IString result;
 
     switch(type) {
       case User:
@@ -654,7 +654,7 @@ namespace Isis {
    *     if the string reads "USER ERROR", will return type User.
    */
   IException::ErrorType IException::stringToErrorType(
-      const iString &string) {
+      const IString &string) {
     ErrorType result = Unknown;
 
     if(string == "USER ERROR")
@@ -677,7 +677,7 @@ namespace Isis {
    * @return a C string representation of this exception
    */
   char *IException::buildWhat() const {
-    iString whatStr = toString();
+    IString whatStr = toString();
 
     char *result = new char[whatStr.size() + 1];
     strncpy(result, whatStr.c_str(), whatStr.size());
@@ -690,7 +690,7 @@ namespace Isis {
   /**
    * This is a helper method for the constructors. When the message or source
    *   code file name are empty strings, we want our members to be NULL instead
-   *   of empty iStrings.
+   *   of empty IStrings.
    */
   void IException::deleteEmptyMemberStrings() {
     if (m_message->size() == 0) {

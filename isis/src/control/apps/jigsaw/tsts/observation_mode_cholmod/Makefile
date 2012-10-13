@@ -11,7 +11,7 @@ commands:
 	onet=$(OUTPUT)/obsmode_cholmod_out.net \
 	observations=yes \
 	method=sparse \
-	solvedegree=3 \
+	cksolvedegree=3 \
 	camsolve=all \
 	update=yes \
 	twist=no > /dev/null;

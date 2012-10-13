@@ -72,7 +72,7 @@ void IsisMain() {
   // Add PRODUCT_ID keyword, the first part of the output filename
   FileName outFileNoExt(ui.GetFileName("TO"));
   outFileNoExt = outFileNoExt.removeExtension();
-  iString productID(outFileNoExt.baseName());
+  IString productID(outFileNoExt.baseName());
   PvlKeyword productId("PRODUCT_ID", productID.UpCase());
   pdsLabel.AddKeyword(productId);
 
@@ -88,7 +88,7 @@ void IsisMain() {
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
 
   // Transfer the instrument group to the output cube
-  iString transDir = (string) dataDir["Lo"] + "/translations/";
+  IString transDir = (string) dataDir["Lo"] + "/translations/";
 
   // Isis 3 cubes being exported for the first time
   if(!origLabel.HasKeyword("PRODUCT_TYPE", Pvl::Traverse)) {
@@ -226,7 +226,7 @@ void IsisMain() {
 
   // Add an output format template (group, object, & keyword output order) to
   // the PDS PVL
-  iString formatDir = (string) dataDir["Lo"] + "/templates/labels/";
+  IString formatDir = (string) dataDir["Lo"] + "/templates/labels/";
   pdsLabel.SetFormatTemplate(formatDir + "LoExportTemplate.pft");
 
   // Write labels to output file

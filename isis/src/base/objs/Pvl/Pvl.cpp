@@ -483,7 +483,7 @@ namespace Isis {
       string msg;
       if(lineNumber > 0) {
         msg = "Error in PVL file on line [";
-        msg += iString((Isis::BigInt)lineNumber);
+        msg += IString((Isis::BigInt)lineNumber);
         msg += "]";
       }
 

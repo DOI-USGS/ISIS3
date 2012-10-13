@@ -16,8 +16,8 @@
 using namespace std;
 using namespace Isis;
 
-vector<iString> redFiles;
-vector<iString> tempFiles;
+vector<IString> redFiles;
+vector<IString> tempFiles;
 int firstFilter;
 int numFiles;
 FileName FindRed(FileList &inList, int n);
@@ -70,7 +70,7 @@ void IsisMain() {
 
   // We dont actually need all 10... so dont do this exception
   //if(inputList.size() != 10) {
-  //  iString msg = "Input list file must have 10 entries, one for each CCD (0 to 9)";
+  //  IString msg = "Input list file must have 10 entries, one for each CCD (0 to 9)";
   //  throw IException(IException::User, msg, _FILEINFO_);
   //}
 
@@ -82,7 +82,7 @@ void IsisMain() {
   FindRed(inputList, masterFileNum);
 
   if(masterFileNum - firstFilter > numFiles || masterFileNum - firstFilter < 0) {
-    iString msg = "Input list does not contain the MASTER [RED" + iString(masterFileNum) + "]";
+    IString msg = "Input list does not contain the MASTER [RED" + IString(masterFileNum) + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -114,7 +114,7 @@ void IsisMain() {
 
   for(int i = 0; i < numFiles; i++) {
     tempFiles.push_back(
-      FileName("$TEMPORARY/noproj.FROM" + iString(i + 1) + ".noproj.cub").expanded()
+      FileName("$TEMPORARY/noproj.FROM" + IString(i + 1) + ".noproj.cub").expanded()
     );
   }
 
@@ -142,7 +142,7 @@ void IsisMain() {
 
   p.Prepare();
 
-  iString masterFile = p.Application("cubeatt").GetOutputs()[masterFileNum - firstFilter];
+  IString masterFile = p.Application("cubeatt").GetOutputs()[masterFileNum - firstFilter];
   p.Application("appjit").AddConstParameter("MASTER", masterFile);
   p.Run();
 
@@ -150,7 +150,7 @@ void IsisMain() {
 
   // the outputs are temporary files
   for(int redNum = 0; redNum < numFiles; redNum++)
-    tempFiles.push_back(FileName("$TEMPORARY/noproj.FROM" + iString(redNum + 1) + ".cub").expanded());
+    tempFiles.push_back(FileName("$TEMPORARY/noproj.FROM" + IString(redNum + 1) + ".cub").expanded());
 
   // Do some calculations, delete the final outputs from the pipeline
   ProcessNoprojFiles(p);
@@ -166,13 +166,13 @@ void IsisMain() {
   p.Run();
 
   if (ui.WasEntered("JITTERCK")) {
-    iString params = "FROM=" + masterFile + " TO=" + ui.GetFileName("JITTERCK");
+    IString params = "FROM=" + masterFile + " TO=" + ui.GetFileName("JITTERCK");
 
     try {
       ProgramLauncher::RunIsisProgram("ckwriter", params);
     }
     catch(IException &e) {
-      iString message = "Creation of the output ck, " +
+      IString message = "Creation of the output ck, " +
         ui.GetFileName("JITTERCK") + " failed.";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
@@ -195,7 +195,7 @@ void IsisMain() {
       Pipeline pcrop;
       pcrop.KeepTemporaryFiles(false);
 
-      iString tag = "crop" + iString(i);
+      IString tag = "crop" + IString(i);
       string inFile(p.FinalOutput(i).c_str());
       string outFile = "temp_"+tag+".cub";
 
@@ -232,15 +232,15 @@ void IsisMain() {
  * @return FileName Name of the CCD file
  */
 FileName FindRed(FileList &inList, int n) {
-  iString nonMroFile = "";
+  IString nonMroFile = "";
 
   if(n > 9 || n < 0) {
-    iString msg = "Parameter n must be [0-9] but found [" + iString(n) + "]";
+    IString msg = "Parameter n must be [0-9] but found [" + IString(n) + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   if(!redFiles.empty() && redFiles[n].empty()) {
-    iString msg = "Filter [RED" + iString(n) + "] is not in the input list";
+    IString msg = "Filter [RED" + IString(n) + "] is not in the input list";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -256,10 +256,10 @@ FileName FindRed(FileList &inList, int n) {
       PvlGroup &inst = labels.FindGroup("Instrument", Pvl::Traverse);
 
       string redNum = ((string)inst["CcdId"]).substr(3);
-      int redNumber = (int)(iString)redNum;
+      int redNumber = (int)(IString)redNum;
 
       if(redNumber < 0 || redNumber > 9) {
-        iString msg = "CcdId value of [" + redNum + "] found in [" + inList[i].toString() + "] not supported";
+        IString msg = "CcdId value of [" + redNum + "] found in [" + inList[i].toString() + "] not supported";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
@@ -273,7 +273,7 @@ FileName FindRed(FileList &inList, int n) {
         numFiles ++;
       }
       else {
-        iString msg = "The input file list must be in order from RED0 to RED9";
+        IString msg = "The input file list must be in order from RED0 to RED9";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -285,7 +285,7 @@ FileName FindRed(FileList &inList, int n) {
   }
 
   if(!nonMroFile.empty()) {
-    iString message = "File [" + nonMroFile + "] is not a valid MRO cube";
+    IString message = "File [" + nonMroFile + "] is not a valid MRO cube";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
@@ -300,7 +300,7 @@ FileName FindRed(FileList &inList, int n) {
       foundLastFile = true;
     }
     else if(foundFirstFile && foundLastFile && !redFiles[i].empty()) {
-      iString msg = "Filter [RED" + iString((int)i) + "] is not consecutive";
+      IString msg = "Filter [RED" + IString((int)i) + "] is not consecutive";
     }
   }
 
@@ -314,11 +314,11 @@ void ProcessNoprojFiles(Pipeline &p) {
   int count = numFiles - 1;
 
   for(int i = 0; i < numFiles - 1; i++) {
-    iString tempDir = FileName("$TEMPORARY").expanded();
-    iString flatFileLoc = tempDir + "/first" + iString(firstFilter + i) + "-" + iString(firstFilter + i + 1) + ".flat";
+    IString tempDir = FileName("$TEMPORARY").expanded();
+    IString flatFileLoc = tempDir + "/first" + IString(firstFilter + i) + "-" + IString(firstFilter + i + 1) + ".flat";
 
-    iString params = "FROM=" + tempDir + "/noproj.FROM" + iString(i + 1) + ".cub";
-    params += " MATCH=" + tempDir + "/noproj.FROM" + iString(i + 2) + ".cub";
+    IString params = "FROM=" + tempDir + "/noproj.FROM" + IString(i + 1) + ".cub";
+    params += " MATCH=" + tempDir + "/noproj.FROM" + IString(i + 2) + ".cub";
     params += " REGDEF=" + ui.GetFileName("REGDEF");
     params += " FLAT=" + flatFileLoc;
 
@@ -342,7 +342,7 @@ void ProcessNoprojFiles(Pipeline &p) {
     try {
       while(flatFile.GetLine(line, false) &&
             (avgOffsets[i][0] == Isis::Null || avgOffsets[i][1] == Isis::Null)) {
-        line = iString(line).Compress();
+        line = IString(line).Compress();
         string::size_type pos = line.find("Average Sample Offset: ");
 
         if(pos != string::npos) {
@@ -352,7 +352,7 @@ void ProcessNoprojFiles(Pipeline &p) {
           // cut off text after our number
           line = line.substr(0, line.find(" "));
 
-          avgOffsets[i][0] = (double)(iString)line;
+          avgOffsets[i][0] = (double)(IString)line;
           pos = string::npos;
         }
 
@@ -365,20 +365,20 @@ void ProcessNoprojFiles(Pipeline &p) {
           // cut off text after our number
           line = line.substr(0, line.find(" "));
 
-          avgOffsets[i][1] = (double)(iString)line;
+          avgOffsets[i][1] = (double)(IString)line;
           pos = string::npos;
         }
       }
     }
     catch(IException &e) {
-      //iString msg = "Unable to find average sample/line offsets in hijitreg results for CCDs [" + iString(i) + "-" + iString(i+1) + "]";
+      //IString msg = "Unable to find average sample/line offsets in hijitreg results for CCDs [" + IString(i) + "-" + IString(i+1) + "]";
       //throw iException::Message(iException::Programmer, msg, _FILEINFO_);
       count --;
     }
   }
 
   if(count <= 0) {
-    iString msg = "Unable to calculate average sample/line offsets from hijitreg results";
+    IString msg = "Unable to calculate average sample/line offsets from hijitreg results";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -408,8 +408,8 @@ void ProcessNoprojFiles(Pipeline &p) {
     yaw += atan(avgOffsets[i][0] / lineOff[i]) / (double)count;
   }
 
-  p.Application("appjit").AddConstParameter("PITCHRATE", iString(pitchRate));
-  p.Application("appjit").AddConstParameter("YAW", iString(yaw));
+  p.Application("appjit").AddConstParameter("PITCHRATE", IString(pitchRate));
+  p.Application("appjit").AddConstParameter("YAW", IString(yaw));
 }
 
 /**
@@ -435,7 +435,7 @@ void GetEphemerisTimeFromJitterFile(const string jitterFile, double & eTime1, do
     for (int i=0; i<iArrSize; i++) {
       csvArr[i].TrimHead(" \n,");
       csvArr[i].TrimTail(" \n,\t\r");
-      temp = iString(csvArr[i]).ToDouble();
+      temp = IString(csvArr[i]).ToDouble();
       if(!i && temp == 0) {
         break;
       }

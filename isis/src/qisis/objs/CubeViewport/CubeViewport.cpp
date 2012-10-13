@@ -41,7 +41,7 @@
 #include "Camera.h"
 #include "CubeDataThread.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "FileName.h"
 #include "Histogram.h"
 #include "Pvl.h"

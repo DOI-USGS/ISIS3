@@ -20,7 +20,7 @@
 #include "ControlNet.h"
 #include "Cube.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "SerialNumber.h"
 
 
@@ -216,16 +216,16 @@ namespace Isis
 
     if (!imageListFile.exists())
     {
-      iString msg = "The file [";
-      msg += (iString) fileName;
+      IString msg = "The file [";
+      msg += (IString) fileName;
       msg += "does not exist.\n";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (!imageListFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-      iString msg = "The file [";
-      msg += (iString) fileName;
+      IString msg = "The file [";
+      msg += (IString) fileName;
       msg += "failed to open.\n";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -282,7 +282,7 @@ namespace Isis
 
     for (int i = 0; *interruptFlag == 0 && i < fileNames.size(); i++)
     {
-      iString fileName = fileNames[i];
+      IString fileName = fileNames[i];
 
       Cube cube;
       cube.open(fileName);

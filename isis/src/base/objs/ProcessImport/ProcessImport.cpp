@@ -31,7 +31,7 @@
 #include "CubeAttribute.h"
 #include "Brick.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "JP2Decoder.h"
 #include "LineManager.h"
 #include "PixelType.h"
@@ -152,8 +152,8 @@ namespace Isis {
       p_nb = nb;
     }
     else {
-      string msg = "Illegal dimension [" + Isis::iString(ns) + ", " +
-                   Isis::iString(nl) + ", " + Isis::iString(nb) + "]";
+      string msg = "Illegal dimension [" + Isis::IString(ns) + ", " +
+                   Isis::IString(nl) + ", " + Isis::IString(nb) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   };
@@ -193,7 +193,7 @@ namespace Isis {
       p_fileHeaderBytes = bytes;
     }
     else {
-      string msg = "Illegal file header size [" + Isis::iString(bytes) + "]";
+      string msg = "Illegal file header size [" + Isis::IString(bytes) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   };
@@ -222,7 +222,7 @@ namespace Isis {
       p_fileTrailerBytes = bytes;
     }
     else {
-      string msg = "Illegal file trailer size [" + Isis::iString(bytes) + "]";
+      string msg = "Illegal file trailer size [" + Isis::IString(bytes) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   };
@@ -250,7 +250,7 @@ namespace Isis {
       p_dataHeaderBytes = bytes;
     }
     else {
-      string msg = "Illegal data header size [" + Isis::iString(bytes) + "]";
+      string msg = "Illegal data header size [" + Isis::IString(bytes) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   };
@@ -280,7 +280,7 @@ namespace Isis {
       p_dataTrailerBytes = bytes;
     }
     else {
-      string msg = "Illegal data trailer size [" + Isis::iString(bytes) + "]";
+      string msg = "Illegal data trailer size [" + Isis::IString(bytes) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   };
@@ -309,7 +309,7 @@ namespace Isis {
       p_dataPreBytes = bytes;
     }
     else {
-      string msg = "Illegal data prefix size [" + Isis::iString(bytes) + "]";
+      string msg = "Illegal data prefix size [" + Isis::IString(bytes) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   };
@@ -338,7 +338,7 @@ namespace Isis {
       p_dataPostBytes = bytes;
     }
     else {
-      string msg = "Illegal data suffix size [" + Isis::iString(bytes) + "]";
+      string msg = "Illegal data suffix size [" + Isis::IString(bytes) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   };
@@ -362,7 +362,7 @@ namespace Isis {
   */
   void ProcessImport::SaveFileHeader() {
     if(p_fileHeaderBytes == 0) {
-      iString msg = "File header bytes equals 0.  There is nothing to save.  "
+      IString msg = "File header bytes equals 0.  There is nothing to save.  "
                     "Use SetFileHeaderBytes() first.";
       throw IException(IException::Programmer, msg.c_str(),
                                 _FILEINFO_);
@@ -389,7 +389,7 @@ namespace Isis {
    */
   void ProcessImport::SaveFileTrailer() {
     if(p_fileTrailerBytes == 0) {
-      iString msg = "File trailer bytes equals 0.  There is nothing to save.  "
+      IString msg = "File trailer bytes equals 0.  There is nothing to save.  "
                     "Use SetFileTrailerBytes() first.";
       throw IException(IException::Programmer, msg.c_str(),
                                 _FILEINFO_);
@@ -417,7 +417,7 @@ namespace Isis {
    */
   void ProcessImport::SaveDataHeader() {
     if(p_dataHeaderBytes == 0) {
-      iString msg = "Data header bytes equals 0.  There is nothing to save.  "
+      IString msg = "Data header bytes equals 0.  There is nothing to save.  "
                     "Use SetDataHeaderBytes() first.";
       throw IException(IException::Programmer, msg.c_str(),
                                 _FILEINFO_);
@@ -445,7 +445,7 @@ namespace Isis {
    */
   void ProcessImport::SaveDataTrailer() {
     if(p_dataTrailerBytes == 0) {
-      iString msg = "Data trailer bytes equals 0.  There is nothing to save.  "
+      IString msg = "Data trailer bytes equals 0.  There is nothing to save.  "
                     "Use SetDataTrailerBytes() first.";
       throw IException(IException::Programmer, msg.c_str(),
                                 _FILEINFO_);
@@ -472,7 +472,7 @@ namespace Isis {
    */
   void ProcessImport::SaveDataPrefix() {
     if(p_dataPreBytes == 0) {
-      iString msg = "Data prefix bytes equals 0.  There is nothing to save.  "
+      IString msg = "Data prefix bytes equals 0.  There is nothing to save.  "
                     "Use SetDataPrefixBytes() first.";
       throw IException(IException::Programmer, msg.c_str(),
                                 _FILEINFO_);
@@ -500,7 +500,7 @@ namespace Isis {
    */
   void ProcessImport::SaveDataSuffix() {
     if(p_dataPostBytes == 0) {
-      iString msg = "Data suffix bytes equals 0.  There is nothing to save.  "
+      IString msg = "Data suffix bytes equals 0.  There is nothing to save.  "
                     "Use SetDataSuffixBytes() first.";
       throw IException(IException::Programmer, msg.c_str(),
                                 _FILEINFO_);
@@ -844,9 +844,9 @@ namespace Isis {
           (pixelMax > p_null_min && pixelMax < p_null_max) ||  // --max crossing
           (pixelMin < p_null_min && pixelMax > p_null_max))) { // --straddling
                                                                //   values
-      string msg = "The " + pixelName + " range [" + iString(pixelMin) +
-                   "," + iString(pixelMax) + "] overlaps the NULL range [" +
-                   iString(p_null_min) + "," + iString(p_null_max) + "]";
+      string msg = "The " + pixelName + " range [" + IString(pixelMin) +
+                   "," + IString(pixelMax) + "] overlaps the NULL range [" +
+                   IString(p_null_min) + "," + IString(p_null_max) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -854,9 +854,9 @@ namespace Isis {
           (pixelMin > p_lrs_min && pixelMin < p_lrs_max) ||
           (pixelMax > p_lrs_min && pixelMax < p_lrs_max) ||
           (pixelMin < p_lrs_min && pixelMax > p_lrs_max))) {
-      string msg = "The " + pixelName + " range [" + iString(pixelMin) +
-                   "," + iString(pixelMax) + "] overlaps the LRS range [" +
-                   iString(p_lrs_min) + "," + iString(p_lrs_max) + "]";
+      string msg = "The " + pixelName + " range [" + IString(pixelMin) +
+                   "," + IString(pixelMax) + "] overlaps the LRS range [" +
+                   IString(p_lrs_min) + "," + IString(p_lrs_max) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -864,9 +864,9 @@ namespace Isis {
           (pixelMin > p_lis_min && pixelMin < p_lis_max) ||
           (pixelMax > p_lis_min && pixelMax < p_lis_max) ||
           (pixelMin < p_lis_min && pixelMax > p_lis_max))) {
-      string msg = "The " + pixelName + " range [" + iString(pixelMin) +
-                   "," + iString(pixelMax) + "] overlaps the LIS range [" +
-                   iString(p_lis_min) + "," + iString(p_lis_max) + "]";
+      string msg = "The " + pixelName + " range [" + IString(pixelMin) +
+                   "," + IString(pixelMax) + "] overlaps the LIS range [" +
+                   IString(p_lis_min) + "," + IString(p_lis_max) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -874,9 +874,9 @@ namespace Isis {
           (pixelMin > p_hrs_min && pixelMin < p_hrs_max) ||
           (pixelMax > p_hrs_min && pixelMax < p_hrs_max) ||
           (pixelMin < p_hrs_min && pixelMax > p_hrs_max))) {
-      string msg = "The " + pixelName + " range [" + iString(pixelMin) +
-                   "," + iString(pixelMax) + "] overlaps the HRS range [" +
-                   iString(p_hrs_min) + "," + iString(p_hrs_max) + "]";
+      string msg = "The " + pixelName + " range [" + IString(pixelMin) +
+                   "," + IString(pixelMax) + "] overlaps the HRS range [" +
+                   IString(p_hrs_min) + "," + IString(p_hrs_max) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -884,9 +884,9 @@ namespace Isis {
           (pixelMin > p_his_min && pixelMin < p_his_max) ||
           (pixelMax > p_his_min && pixelMax < p_his_max) ||
           (pixelMin < p_his_min && pixelMax > p_his_max))) {
-      string msg = "The " + pixelName + " range [" + iString(pixelMin) +
-                   "," + iString(pixelMax) + "] overlaps the HIS range [" +
-                   iString(p_his_min) + "," + iString(p_his_max) + "]";
+      string msg = "The " + pixelName + " range [" + IString(pixelMin) +
+                   "," + IString(pixelMax) + "] overlaps the HIS range [" +
+                   IString(p_his_min) + "," + IString(p_his_max) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -1068,7 +1068,7 @@ namespace Isis {
     char *in = new char [readBytes];
 
     // Set up an Isis::EndianSwapper object
-    Isis::iString tok(Isis::ByteOrderName(p_byteOrder));
+    Isis::IString tok(Isis::ByteOrderName(p_byteOrder));
     tok.UpCase();
     Isis::EndianSwapper swapper(tok);
 
@@ -1095,8 +1095,8 @@ namespace Isis {
     // Check the last io
     if(!fin.good()) {
       string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                   Isis::iString((int)pos) + "]. Byte count [" +
-                   Isis::iString(p_fileHeaderBytes) + "]" ;
+                   Isis::IString((int)pos) + "]. Byte count [" +
+                   Isis::IString(p_fileHeaderBytes) + "]" ;
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
@@ -1140,8 +1140,8 @@ namespace Isis {
       // Check the last io
       if(!fin.good()) {
         string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                     Isis::iString((int)pos) + "]. Byte count [" +
-                     Isis::iString(p_dataHeaderBytes) + "]" ;
+                     Isis::IString((int)pos) + "]. Byte count [" +
+                     Isis::IString(p_dataHeaderBytes) + "]" ;
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
@@ -1164,8 +1164,8 @@ namespace Isis {
         // Check the last io
         if(!fin.good()) {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                       Isis::iString((int)pos) + "]. Byte count [" +
-                       Isis::iString(p_dataPreBytes) + "]" ;
+                       Isis::IString((int)pos) + "]. Byte count [" +
+                       Isis::IString(p_dataPreBytes) + "]" ;
           throw IException(IException::Io, msg, _FILEINFO_);
         }
 
@@ -1175,8 +1175,8 @@ namespace Isis {
         fin.read(in, readBytes);
         if(!fin.good()) {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                       Isis::iString((int)pos) + "]. Byte count [" +
-                       Isis::iString(readBytes) + "]" ;
+                       Isis::IString((int)pos) + "]. Byte count [" +
+                       Isis::IString(readBytes) + "]" ;
           throw IException(IException::Io, msg, _FILEINFO_);
         }
 
@@ -1236,8 +1236,8 @@ namespace Isis {
         // Check the last io
         if(!fin.good()) {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                       Isis::iString((int)pos) + "]. Byte count [" +
-                       Isis::iString(p_dataPreBytes) + "]" ;
+                       Isis::IString((int)pos) + "]. Byte count [" +
+                       Isis::IString(p_dataPreBytes) + "]" ;
           throw IException(IException::Io, msg, _FILEINFO_);
         }
       } // End line loop
@@ -1267,8 +1267,8 @@ namespace Isis {
       // Check the last io
       if(!fin.good()) {
         string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                     Isis::iString((int)pos) + "]. Byte count [" +
-                     Isis::iString(p_fileHeaderBytes) + "]" ;
+                     Isis::IString((int)pos) + "]. Byte count [" +
+                     Isis::IString(p_fileHeaderBytes) + "]" ;
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
@@ -1287,8 +1287,8 @@ namespace Isis {
       // Check the io
       if(!fin.good()) {
         string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                     Isis::iString((int)pos) + "]. Byte count [" +
-                     Isis::iString(p_fileTrailerBytes) + "]" ;
+                     Isis::IString((int)pos) + "]. Byte count [" +
+                     Isis::IString(p_fileTrailerBytes) + "]" ;
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
@@ -1318,7 +1318,7 @@ namespace Isis {
     char *in = new char [readBytes];
 
     // Set up an Isis::EndianSwapper object
-    Isis::iString tok(Isis::ByteOrderName(p_byteOrder));
+    Isis::IString tok(Isis::ByteOrderName(p_byteOrder));
     tok.UpCase();
     Isis::EndianSwapper swapper(tok);
 
@@ -1345,8 +1345,8 @@ namespace Isis {
     // Check the last io
     if(!fin.good()) {
       string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                   Isis::iString((int)pos) + "]. Byte count [" +
-                   Isis::iString(p_fileHeaderBytes) + "]" ;
+                   Isis::IString((int)pos) + "]. Byte count [" +
+                   Isis::IString(p_fileHeaderBytes) + "]" ;
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
@@ -1382,8 +1382,8 @@ namespace Isis {
         // Check the last io
         if(!fin.good()) {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                       Isis::iString((int)pos) + "]. Byte count [" +
-                       Isis::iString(p_dataHeaderBytes) + "]" ;
+                       Isis::IString((int)pos) + "]. Byte count [" +
+                       Isis::IString(p_dataHeaderBytes) + "]" ;
           throw IException(IException::Io, msg, _FILEINFO_);
         }
 
@@ -1404,8 +1404,8 @@ namespace Isis {
         // Check the last io
         if(!fin.good()) {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                       Isis::iString((int)pos) + "]. Byte count [" +
-                       Isis::iString(p_dataPreBytes) + "]" ;
+                       Isis::IString((int)pos) + "]. Byte count [" +
+                       Isis::IString(p_dataPreBytes) + "]" ;
           throw IException(IException::Io, msg, _FILEINFO_);
         }
 
@@ -1415,8 +1415,8 @@ namespace Isis {
         fin.read(in, readBytes);
         if(!fin.good()) {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                       Isis::iString((int)pos) + "]. Byte count [" +
-                       Isis::iString(readBytes) + "]" ;
+                       Isis::IString((int)pos) + "]. Byte count [" +
+                       Isis::IString(readBytes) + "]" ;
           throw IException(IException::Io, msg, _FILEINFO_);
         }
 
@@ -1473,8 +1473,8 @@ namespace Isis {
         // Check the last io
         if(!fin.good()) {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                       Isis::iString((int)pos) + "]. Byte count [" +
-                       Isis::iString(p_dataPreBytes) + "]" ;
+                       Isis::IString((int)pos) + "]. Byte count [" +
+                       Isis::IString(p_dataPreBytes) + "]" ;
           throw IException(IException::Io, msg, _FILEINFO_);
         }
 
@@ -1494,8 +1494,8 @@ namespace Isis {
         // Check the last io
         if(!fin.good()) {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                       Isis::iString((int)pos) + "]. Byte count [" +
-                       Isis::iString(p_fileHeaderBytes) + "]" ;
+                       Isis::IString((int)pos) + "]. Byte count [" +
+                       Isis::IString(p_fileHeaderBytes) + "]" ;
           throw IException(IException::Io, msg, _FILEINFO_);
         }
 
@@ -1516,8 +1516,8 @@ namespace Isis {
       // Check the io
       if(!fin.good()) {
         string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                     Isis::iString((int)pos) + "]. Byte count [" +
-                     Isis::iString(p_fileTrailerBytes) + "]" ;
+                     Isis::IString((int)pos) + "]. Byte count [" +
+                     Isis::IString(p_fileTrailerBytes) + "]" ;
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
@@ -1548,7 +1548,7 @@ namespace Isis {
     char *in = new char [readBytes];
 
     // Set up an Isis::EndianSwapper object
-    Isis::iString tok(Isis::ByteOrderName(p_byteOrder));
+    Isis::IString tok(Isis::ByteOrderName(p_byteOrder));
     tok.UpCase();
     Isis::EndianSwapper swapper(tok);
 
@@ -1575,8 +1575,8 @@ namespace Isis {
     // Check the last io
     if(!fin.good()) {
       string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                   Isis::iString((int)pos) + "]. Byte count [" +
-                   Isis::iString(p_fileHeaderBytes) + "]" ;
+                   Isis::IString((int)pos) + "]. Byte count [" +
+                   Isis::IString(p_fileHeaderBytes) + "]" ;
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
@@ -1599,8 +1599,8 @@ namespace Isis {
       // Check the last io
       if(!fin.good()) {
         string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                     Isis::iString((int)pos) + "]. Byte count [" +
-                     Isis::iString(p_dataHeaderBytes) + "]" ;
+                     Isis::IString((int)pos) + "]. Byte count [" +
+                     Isis::IString(p_dataHeaderBytes) + "]" ;
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
@@ -1621,8 +1621,8 @@ namespace Isis {
       // Check the last io
       if(!fin.good()) {
         string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                     Isis::iString((int)pos) + "]. Byte count [" +
-                     Isis::iString(p_dataPreBytes) + "]" ;
+                     Isis::IString((int)pos) + "]. Byte count [" +
+                     Isis::IString(p_dataPreBytes) + "]" ;
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
@@ -1631,8 +1631,8 @@ namespace Isis {
       fin.read(in, readBytes);
       if(!fin.good()) {
         string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                     Isis::iString((int)pos) + "]. Byte count [" +
-                     Isis::iString(readBytes) + "]" ;
+                     Isis::IString((int)pos) + "]. Byte count [" +
+                     Isis::IString(readBytes) + "]" ;
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
@@ -1702,8 +1702,8 @@ namespace Isis {
         // Check the last io
         if(!fin.good()) {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                       Isis::iString((int)pos) + "]. Byte count [" +
-                       Isis::iString(p_dataPreBytes) + "]" ;
+                       Isis::IString((int)pos) + "]. Byte count [" +
+                       Isis::IString(p_dataPreBytes) + "]" ;
           throw IException(IException::Io, msg, _FILEINFO_);
         }
 
@@ -1723,8 +1723,8 @@ namespace Isis {
         // Check the last io
         if(!fin.good()) {
           string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                       Isis::iString((int)pos) + "]. Byte count [" +
-                       Isis::iString(p_fileHeaderBytes) + "]" ;
+                       Isis::IString((int)pos) + "]. Byte count [" +
+                       Isis::IString(p_fileHeaderBytes) + "]" ;
           throw IException(IException::Io, msg, _FILEINFO_);
         }
 
@@ -1747,8 +1747,8 @@ namespace Isis {
       // Check the io
       if(!fin.good()) {
         string msg = "Cannot read file [" + p_inFile + "]. Position [" +
-                     Isis::iString((int)pos) + "]. Byte count [" +
-                     Isis::iString(p_fileTrailerBytes) + "]" ;
+                     Isis::IString((int)pos) + "]. Byte count [" +
+                     Isis::IString(p_fileTrailerBytes) + "]" ;
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 

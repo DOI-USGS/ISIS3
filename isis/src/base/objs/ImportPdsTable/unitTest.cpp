@@ -5,6 +5,7 @@
 #include <algorithm>
 
 #include "ImportPdsTable.h"
+#include "Table.h"
 
 //  Convenience list
 typedef std::vector<std::string>  StrList;

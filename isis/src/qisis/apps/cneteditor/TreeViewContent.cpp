@@ -17,7 +17,7 @@
 #include <QVBoxLayout>
 
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 #include "AbstractTreeItem.h"
 #include "TableColumn.h"
@@ -99,7 +99,7 @@ namespace Isis
     {
       if (!someModel)
       {
-        iString msg = "Attempted to set a NULL model!";
+        IString msg = "Attempted to set a NULL model!";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 

@@ -25,7 +25,7 @@ void IsisMain() {
   // Loop and extract each band
   for(int band = 1; band <= bands; band++) {
     int pband = icube->getPhysicalBand(band);
-    iString sband(pband);
+    IString sband(pband);
 
     ProcessByLine p2;
     Progress *prog = p2.Progress();

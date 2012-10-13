@@ -2,7 +2,7 @@
 #include "IException.h"
 #include "FileName.h"
 #include "SerialNumberList.h"
-#include "iString.h"
+#include "IString.h"
 #include "Pvl.h"
 
 namespace Isis {
@@ -184,7 +184,7 @@ namespace Isis {
       return p_indexMap.find(serialNumberIndex)->second;
     }
     else {
-      iString num = iString(serialNumberIndex);
+      IString num = IString(serialNumberIndex);
       std::string msg = "Serial Number Index [" + (std::string) num + "] is invalid";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -222,7 +222,7 @@ namespace Isis {
       return p_pairs[index].observationNumber;
     }
     else {
-      iString num = iString(index);
+      IString num = IString(index);
       std::string msg = "Index [" + (std::string) num + "] is invalid";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

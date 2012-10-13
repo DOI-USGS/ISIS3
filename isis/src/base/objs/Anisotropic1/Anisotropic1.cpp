@@ -2,7 +2,7 @@
 #include "Anisotropic1.h"
 #include "AtmosModel.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 using std::max;
 

@@ -568,8 +568,8 @@ namespace Isis
 
           if (!newCubeListFile.open(QIODevice::WriteOnly | QIODevice::Text |
                                     QIODevice::Truncate)) {
-            iString msg = "The file [";
-            msg += (iString) newCubeListFileName;
+            IString msg = "The file [";
+            msg += (IString) newCubeListFileName;
             msg += "failed to open for writing.\n";
             throw IException(IException::Programmer, msg, _FILEINFO_);
           }
@@ -719,7 +719,7 @@ namespace Isis
         editorWidget->connectionFilterWidget());
 
     setFileState(HasFile, *curFile);
-    saveAsPvl = !Pvl((iString) *curFile).HasObject("ProtoBuffer");
+    saveAsPvl = !Pvl((IString) *curFile).HasObject("ProtoBuffer");
   }
 
 

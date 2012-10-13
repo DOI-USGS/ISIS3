@@ -23,7 +23,7 @@
 #include <iostream>
 
 #include "Basis1VariableFunction.h"
-#include "iString.h"
+#include "IString.h"
 #include "IException.h"
 
 namespace Isis {

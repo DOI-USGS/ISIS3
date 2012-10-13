@@ -20,13 +20,16 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include <vector>
 #include "Blobber.h"
-#include "Table.h"
+
+#include <vector>
+
 #include "Cube.h"
+#include "IException.h"
 #include "Progress.h"
 #include "SpecialPixel.h"
-#include "IException.h"
+#include "Table.h"
+#include "TableField.h"
 
 using std::string;
 using std::vector;
@@ -155,10 +158,10 @@ namespace Isis {
     Table tbl(getBlobName());
     cube.read(tbl);
     TableField data = tbl[0][getFieldName()];
-    if(data.IsDouble()) {
+    if (data.isDouble()) {
       loadDouble(tbl);
     }
-    else if(data.IsInteger()) {
+    else if (data.isInteger()) {
       loadInteger(tbl);
     }
     else {
@@ -181,11 +184,11 @@ namespace Isis {
    */
   void Blobber::loadDouble(Table &tbl) {
     int nlines = tbl.Records();
-    int nsamps = tbl[0][getFieldName()].Size();
+    int nsamps = tbl[0][getFieldName()].size();
     BlobBuf pixels(nlines, nsamps);
-    for(int i = 0 ; i < nlines ; i++) {
+    for (int i = 0 ; i < nlines ; i++) {
       vector<double> d = tbl[i][getFieldName()];
-      for(unsigned int j = 0 ; j < d.size() ; j++) {
+      for (unsigned int j = 0 ; j < d.size() ; j++) {
         pixels[i][j] = d[j];
       }
     }
@@ -207,11 +210,11 @@ namespace Isis {
    */
   void Blobber::loadInteger(Table &tbl) {
     int nlines = tbl.Records();
-    int nsamps = tbl[0][getFieldName()].Size();
+    int nsamps = tbl[0][getFieldName()].size();
     BlobBuf pixels(nlines, nsamps);
-    for(int i = 0 ; i < nlines ; i++) {
+    for (int i = 0 ; i < nlines ; i++) {
       vector<int> d = tbl[i][getFieldName()];
-      for(unsigned int j = 0 ; j < d.size(); j++) {
+      for (unsigned int j = 0 ; j < d.size(); j++) {
         pixels[i][j] = int2ToDouble(d[j]);
       }
     }
@@ -228,11 +231,11 @@ namespace Isis {
    * @param [in] value (int) Integer value to convert
    */
   double Blobber::int2ToDouble(int value) const {
-    if(value == NULL2) return NULL8;
-    else if(value == LOW_REPR_SAT2) return LOW_REPR_SAT8;
-    else if(value == LOW_INSTR_SAT2) return LOW_INSTR_SAT8;
-    else if(value == HIGH_INSTR_SAT2) return HIGH_INSTR_SAT8;
-    else if(value == HIGH_REPR_SAT2) return HIGH_REPR_SAT8;
+    if (value == NULL2) return NULL8;
+    else if (value == LOW_REPR_SAT2) return LOW_REPR_SAT8;
+    else if (value == LOW_INSTR_SAT2) return LOW_INSTR_SAT8;
+    else if (value == HIGH_INSTR_SAT2) return HIGH_INSTR_SAT8;
+    else if (value == HIGH_REPR_SAT2) return HIGH_REPR_SAT8;
     else return value;
 
   }

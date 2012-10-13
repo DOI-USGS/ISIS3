@@ -303,8 +303,8 @@ void IsisMain() {
     //   entire images, and push frame framelet exclusion stats can not be collected
     //   during pass 2 cleanly
     if((cameraType == Framing || cameraType == PushFrame) && imageValid) {
-      string prog = "Calculating Standard Deviation " + iString((int)currImage + 1) + "/";
-      prog += iString((int)inList.size()) + " (" + inList[currImage].name() + ")";
+      string prog = "Calculating Standard Deviation " + IString((int)currImage + 1) + "/";
+      prog += IString((int)inList.size()) + " (" + inList[currImage].name() + ")";
 
       if(cameraType == Framing) {
         Statistics *stats = tmp.getStatistics(1, prog);
@@ -374,7 +374,7 @@ void IsisMain() {
   ocube = new Cube();
   ocube->setDimensions(numOutputSamples, tempFileLength, 2);
   PvlGroup &prefs = Preference::Preferences().FindGroup("DataDirectory", Pvl::Traverse);
-  iString outTmpName = (string)prefs["Temporary"][0] + "/";
+  IString outTmpName = (string)prefs["Temporary"][0] + "/";
   outTmpName += FileName(ui.GetFileName("TO")).baseName() + ".tmp.cub";
   ocube->create(outTmpName);
   oLineMgr = new LineManager(*ocube);
@@ -421,8 +421,8 @@ void IsisMain() {
     }
 
     p.SetInputCube(inList[currImage].toString(), inAtt);
-    iString progText = "Calculating Averages " + iString((int)currImage + 1);
-    progText += "/" + iString((int)inList.size());
+    IString progText = "Calculating Averages " + IString((int)currImage + 1);
+    progText += "/" + IString((int)inList.size());
     progText += " (" + inList[currImage].name() + ")";
     p.Progress()->SetText(progText);
 
@@ -665,8 +665,8 @@ void CreateTemporaryData(Buffer &in) {
 
         // Record the exclusion
         PvlGroup currExclusion("ExcludedLines");
-        currExclusion += PvlKeyword("FrameStartLine", iString(in.Line()));
-        currExclusion += PvlKeyword("ValidPixels", iString(inputFrameStats.ValidPixels()));
+        currExclusion += PvlKeyword("FrameStartLine", IString(in.Line()));
+        currExclusion += PvlKeyword("ValidPixels", IString(inputFrameStats.ValidPixels()));
 
         if(!IsSpecial(inputFrameStats.StandardDeviation()))
           currExclusion += PvlKeyword("StandardDeviation", inputFrameStats.StandardDeviation());
@@ -713,7 +713,7 @@ void CreateTemporaryData(Buffer &in) {
 
     if(excluded && ((in.Line() - 1) % numFrameLines == 0)) {
       PvlGroup currExclusion("ExcludedFramelet");
-      currExclusion += PvlKeyword("FrameletStartLine", iString(in.Line()));
+      currExclusion += PvlKeyword("FrameletStartLine", IString(in.Line()));
       currExclusion += PvlKeyword("FrameletNumber", (in.Line() - 1) / numFrameLines);
 
       if(!IsSpecial(stdev)) {

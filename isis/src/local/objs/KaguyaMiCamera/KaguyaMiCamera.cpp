@@ -23,7 +23,7 @@
 
 #include "CameraFocalPlaneMap.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "LineScanCameraDetectorMap.h"
 #include "LineScanCameraGroundMap.h"
@@ -47,13 +47,13 @@ namespace Isis {
 
     SetFocalLength();
     //Kaguya IK kernal uses INS-131???_PIXEL_SIZE instead of PIXEL_PITCH
-    iString ikernKey = "INS" + iString((int)naifIkCode()) + "_PIXEL_SIZE";
+    IString ikernKey = "INS" + IString((int)naifIkCode()) + "_PIXEL_SIZE";
     SetPixelPitch(getDouble(ikernKey));
  
 
     // Get the start time from labels
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
-    iString stime = (string)inst["StartTime"];
+    IString stime = (string)inst["StartTime"];
     SpiceDouble etStart=0;
 
     if(stime != "NULL") {
@@ -78,7 +78,7 @@ namespace Isis {
     // Setup focal plane map
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
     // Retrieve boresight location from instrument kernel (IK) (addendum?)
-    ikernKey = "INS" + iString((int)naifIkCode()) + "_CENTER";
+    ikernKey = "INS" + IString((int)naifIkCode()) + "_CENTER";
     double sampleBoreSight = getDouble(ikernKey,0);
     double lineBoreSight = getDouble(ikernKey,1)-1.0;
 

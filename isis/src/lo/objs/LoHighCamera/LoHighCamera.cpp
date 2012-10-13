@@ -29,7 +29,7 @@
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "NaifStatus.h"
 
@@ -50,8 +50,8 @@ namespace Isis {
     NaifStatus::CheckErrors();
     // Get the Instrument label information needed to define the camera for this frame
     PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
-    iString spacecraft = (string)inst["SpacecraftName"];
-    iString instId = (string)inst["InstrumentId"];
+    IString spacecraft = (string)inst["SpacecraftName"];
+    IString instId = (string)inst["InstrumentId"];
 
     // Turn off the aberration corrections for the instrument position object
     instrumentPosition()->SetAberrationCorrection("NONE");

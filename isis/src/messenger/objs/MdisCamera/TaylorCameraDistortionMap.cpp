@@ -19,7 +19,7 @@
  */
 
 #include <cmath>
-#include "iString.h"
+#include "IString.h"
 #include "TaylorCameraDistortionMap.h"
 
 using namespace std;
@@ -73,8 +73,8 @@ namespace Isis {
    * @param naifIkCode    Code to search for in instrument kernel
    */
   void TaylorCameraDistortionMap::SetDistortion(const int naifIkCode) {
-    string odtxkey = "INS" + iString(naifIkCode) + "_OD_T_X";
-    string odtykey = "INS" + iString(naifIkCode) + "_OD_T_Y";
+    string odtxkey = "INS" + IString(naifIkCode) + "_OD_T_X";
+    string odtykey = "INS" + IString(naifIkCode) + "_OD_T_Y";
     for(int i = 0; i < 10; ++i) {
       p_odtx.push_back(p_camera->getDouble(odtxkey, i));
       p_odty.push_back(p_camera->getDouble(odtykey, i));

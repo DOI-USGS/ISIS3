@@ -197,7 +197,7 @@ void IsisMain() {
             if (coveredTime <= pivotEndTime) {
               // Set the end of the previous range and the beginning of the new
               // range to a week past the previous beginning
-              iString newEndTime = weekFromStart.YearString() + " ";
+              IString newEndTime = weekFromStart.YearString() + " ";
               newEndTime += MONTH_TO_STRING[weekFromStart.Month()].toStdString() + " ";
               newEndTime += weekFromStart.DayString() + " ";
               newEndTime += "00:00:00.000 TDB";

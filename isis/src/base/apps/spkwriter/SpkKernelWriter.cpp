@@ -30,7 +30,7 @@
 #include "Application.h"
 #include "SpkKernelWriter.h"
 #include "Pvl.h"
-#include "iString.h"
+#include "IString.h"
 #include "IException.h"
 
 #include "NaifStatus.h"

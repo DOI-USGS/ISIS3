@@ -23,7 +23,7 @@
  */
 
 #include <string>
-#include "iString.h"
+#include "IString.h"
 
 namespace Isis {
   /**
@@ -96,7 +96,7 @@ namespace Isis {
   /**
    * Returns PixelType enumeration given a string
    *
-   * @param type iString containing the name of pixel type. Acceptable values are
+   * @param type IString containing the name of pixel type. Acceptable values are
    *             UnsignedByte, SignedByte, UnsignedWord, SignedWord,
    *             UnsignedInteger, SignedInteger, Read, and Double (not case
    *             sensitive)
@@ -104,7 +104,7 @@ namespace Isis {
    * @return Isis::PixelType
    */
   inline Isis::PixelType PixelTypeEnumeration(const std::string &type) {
-    Isis::iString temp(type);
+    Isis::IString temp(type);
     temp = temp.UpCase();
     if(temp == "UNSIGNEDBYTE" || temp == "8BIT" || temp == "8-BIT") return Isis::UnsignedByte;
     if(temp == "SIGNEDBYTE") return Isis::SignedByte;

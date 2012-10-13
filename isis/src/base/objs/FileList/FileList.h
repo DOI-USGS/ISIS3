@@ -28,7 +28,7 @@
 
 namespace Isis {
   class FileName;
-  class iString;
+  class IString;
   /**
    * @brief Internalizes a list of files.
    *
@@ -65,7 +65,7 @@ namespace Isis {
    */
   class FileList : public QList<FileName> {
     public:
-      //FileList(iString  listFileString);
+      //FileList(IString  listFileString);
       FileList(FileName listFile);
       FileList(std::istream &in);
       FileList();

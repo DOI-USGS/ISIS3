@@ -4,7 +4,7 @@
 #include "EndianSwapper.h"
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "OriginalLabel.h"
 #include "ProcessByLine.h"
 #include "ProcessImportPds.h"
@@ -53,7 +53,7 @@ void IsisMain() {
   //Make sure it is a vims cube
   try {
     PvlObject qube(lab.FindObject("QUBE"));
-    iString id;
+    IString id;
     id = (string)qube["INSTRUMENT_ID"];
     id.ConvertWhiteSpace();
     id.Compress();
@@ -178,7 +178,7 @@ void ReadVimsBIL(std::string inFileName, const PvlKeyword &suffixItems, std::str
   sideplaneVisTable.SetAssociation(Table::Lines);
   sideplaneIrTable.SetAssociation(Table::Lines);
 
-  Isis::iString str;
+  Isis::IString str;
   str = pdsXlater.Translate("CoreBitsPerPixel");
   int bitsPerPixel = str.ToInteger();
   str = pdsXlater.Translate("CorePixelType");
@@ -210,7 +210,7 @@ void ReadVimsBIL(std::string inFileName, const PvlKeyword &suffixItems, std::str
   }
   else {
     string msg = "Invalid PixelType and BitsPerPixel combination [" + str +
-                 ", " + Isis::iString(bitsPerPixel) + "]";
+                 ", " + Isis::IString(bitsPerPixel) + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
@@ -245,7 +245,7 @@ void ReadVimsBIL(std::string inFileName, const PvlKeyword &suffixItems, std::str
   char *in = new char [readBytes];
 
   // Set up an Isis::EndianSwapper object
-  Isis::iString tok(Isis::ByteOrderName(byteOrder));
+  Isis::IString tok(Isis::ByteOrderName(byteOrder));
   tok.UpCase();
   Isis::EndianSwapper swapper(tok);
 
@@ -260,16 +260,16 @@ void ReadVimsBIL(std::string inFileName, const PvlKeyword &suffixItems, std::str
 
   // Handle the file header
   streampos pos = fin.tellg();
-  int fileHeaderBytes = (int)(iString)pdsXlater.Translate("DataFileRecordBytes") *
-                        ((int)(iString)pdsXlater.Translate("DataStart", 0) - 1);
+  int fileHeaderBytes = (int)(IString)pdsXlater.Translate("DataFileRecordBytes") *
+                        ((int)(IString)pdsXlater.Translate("DataStart", 0) - 1);
 
   fin.seekg(fileHeaderBytes, ios_base::beg);
 
   // Check the last io
   if(!fin.good()) {
     string msg = "Cannot read file [" + inFileName + "]. Position [" +
-                 Isis::iString((int)pos) + "]. Byte count [" +
-                 Isis::iString(fileHeaderBytes) + "]" ;
+                 Isis::IString((int)pos) + "]. Byte count [" +
+                 Isis::IString(fileHeaderBytes) + "]" ;
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
@@ -297,8 +297,8 @@ void ReadVimsBIL(std::string inFileName, const PvlKeyword &suffixItems, std::str
 
       if(!fin.good()) {
         string msg = "Cannot read file [" + inFileName + "]. Position [" +
-                     Isis::iString((int)pos) + "]. Byte count [" +
-                     Isis::iString(readBytes) + "]" ;
+                     Isis::IString((int)pos) + "]. Byte count [" +
+                     Isis::IString(readBytes) + "]" ;
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
@@ -370,8 +370,8 @@ void ReadVimsBIL(std::string inFileName, const PvlKeyword &suffixItems, std::str
         // Check the last io
         if(!fin.good()) {
           string msg = "Cannot read file [" + inFileName + "]. Position [" +
-                       Isis::iString((int)pos) + "]. Byte count [" +
-                       Isis::iString(4) + "]" ;
+                       Isis::IString((int)pos) + "]. Byte count [" +
+                       Isis::IString(4) + "]" ;
           throw IException(IException::Io, msg, _FILEINFO_);
         }
       }
@@ -383,8 +383,8 @@ void ReadVimsBIL(std::string inFileName, const PvlKeyword &suffixItems, std::str
     // Check the last io
     if(!fin.good()) {
       string msg = "Cannot read file [" + inFileName + "]. Position [" +
-                   Isis::iString((int)pos) + "]. Byte count [" +
-                   Isis::iString(4 * (4 * ns + 4)) + "]" ;
+                   Isis::IString((int)pos) + "]. Byte count [" +
+                   Isis::IString(4 * (4 * ns + 4)) + "]" ;
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
@@ -500,9 +500,9 @@ void TranslateVimsLabels(Pvl &pdsLab, Cube *vimscube, VimsType vType) {
 
   //trim start and stop time
   string strTime = inst.FindKeyword("StartTime")[0];
-  inst.FindKeyword("StartTime").SetValue((string)((iString)strTime).Trim("Z"));
+  inst.FindKeyword("StartTime").SetValue((string)((IString)strTime).Trim("Z"));
   strTime = (string)qube["StopTime"];
-  inst.FindKeyword("StopTime").SetValue((string)((iString)strTime).Trim("Z"));
+  inst.FindKeyword("StopTime").SetValue((string)((IString)strTime).Trim("Z"));
 
   if(vType == IR) {
     inst += PvlKeyword("SamplingMode", (string)qube["SamplingModeId"][0]);

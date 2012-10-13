@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
 
   cout << "Unit test for Isis::UserInterface ..." << endl;
 
-  Isis::iString unitTestXml = Isis::FileName("unitTest.xml").expanded();
+  Isis::IString unitTestXml = Isis::FileName("unitTest.xml").expanded();
   string highpass = Isis::FileName("$ISISROOT/src/base/apps/highpass/highpass.xml").expanded();
   char *myArgv[15];// = {"unitTest", "from=input.cub", "to=output.cub"};
 

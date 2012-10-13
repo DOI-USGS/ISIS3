@@ -194,11 +194,11 @@ void IsisMain() {
     p5.AddToPipeline("lowpass");
     p5.Application("lowpass").SetInputParameter ("FROM",    false);
     p5.Application("lowpass").SetOutputParameter("TO",      "lowpass.p5");
-    p5.Application("lowpass").AddConstParameter ("SAMPLES", iString(giLpfSamples));
-    p5.Application("lowpass").AddConstParameter ("LINES",   iString(giLpfLines));
+    p5.Application("lowpass").AddConstParameter ("SAMPLES", IString(giLpfSamples));
+    p5.Application("lowpass").AddConstParameter ("LINES",   IString(giLpfLines));
     p5.Application("lowpass").AddConstParameter ("MINOPT",  "PERCENT");
     p5.Application("lowpass").AddConstParameter ("LIS",     "FALSE");
-    p5.Application("lowpass").AddConstParameter ("MINIMUM", iString(giLpfMinPer));
+    p5.Application("lowpass").AddConstParameter ("MINIMUM", IString(giLpfMinPer));
     p5.Application("lowpass").AddConstParameter ("REPLACE", "NULL");
   #ifdef _DEBUG_
     cout << p5 << endl;
@@ -217,9 +217,9 @@ void IsisMain() {
     p6.AddToPipeline("highpass");
     p6.Application("highpass").SetInputParameter ("FROM",    false);
     p6.Application("highpass").SetOutputParameter("TO",      "highpass.p6");
-    p6.Application("highpass").AddConstParameter ("SAMPLES", iString(giHpfSamples));
-    p6.Application("highpass").AddConstParameter ("LINES",   iString(giHpfLines));
-    p6.Application("highpass").AddConstParameter ("MINIMUM", iString(giHpfMinPer));
+    p6.Application("highpass").AddConstParameter ("SAMPLES", IString(giHpfSamples));
+    p6.Application("highpass").AddConstParameter ("LINES",   IString(giHpfLines));
+    p6.Application("highpass").AddConstParameter ("MINIMUM", IString(giHpfMinPer));
     p6.Application("highpass").AddConstParameter ("MINOPT", "PERCENT");
   #ifdef _DEBUG_
     cout << p6 << endl;
@@ -281,15 +281,15 @@ void IsisMain() {
     p8.AddToPipeline("noisefilter", "noisefilter_pass1");
     p8.Application("noisefilter_pass1").SetInputParameter ("FROM",    false);
     p8.Application("noisefilter_pass1").SetOutputParameter("TO",      "noisefilter.1");
-    p8.Application("noisefilter_pass1").AddConstParameter ("FLATTOL", iString(gdFlatTol));
+    p8.Application("noisefilter_pass1").AddConstParameter ("FLATTOL", IString(gdFlatTol));
     p8.Application("noisefilter_pass1").AddConstParameter ("TOLDEF",  "STDDEV");
-    p8.Application("noisefilter_pass1").AddConstParameter ("LOW",     iString(gdMinValue));
-    p8.Application("noisefilter_pass1").AddConstParameter ("HIGH",    iString(dMaxDN));
-    p8.Application("noisefilter_pass1").AddConstParameter ("TOLMIN",  iString(gdTolMin));
-    p8.Application("noisefilter_pass1").AddConstParameter ("TOLMAX",  iString(gdTolMax));
+    p8.Application("noisefilter_pass1").AddConstParameter ("LOW",     IString(gdMinValue));
+    p8.Application("noisefilter_pass1").AddConstParameter ("HIGH",    IString(dMaxDN));
+    p8.Application("noisefilter_pass1").AddConstParameter ("TOLMIN",  IString(gdTolMin));
+    p8.Application("noisefilter_pass1").AddConstParameter ("TOLMAX",  IString(gdTolMax));
     p8.Application("noisefilter_pass1").AddConstParameter ("REPLACE", "NULL");
-    p8.Application("noisefilter_pass1").AddConstParameter ("SAMPLE",  iString(giNoiseSamples));
-    p8.Application("noisefilter_pass1").AddConstParameter ("LINE",    iString(giNoiseLines));
+    p8.Application("noisefilter_pass1").AddConstParameter ("SAMPLE",  IString(giNoiseSamples));
+    p8.Application("noisefilter_pass1").AddConstParameter ("LINE",    IString(giNoiseLines));
     p8.Application("noisefilter_pass1").AddConstParameter ("LISISNOISE", "TRUE");
     p8.Application("noisefilter_pass1").AddConstParameter ("LRSISNOISE", "TRUE");
 
@@ -297,15 +297,15 @@ void IsisMain() {
     p8.AddToPipeline("noisefilter", "noisefilter_pass2");
     p8.Application("noisefilter_pass2").SetInputParameter ("FROM",    false);
     p8.Application("noisefilter_pass2").SetOutputParameter("TO",      "noisefilter.2");
-    p8.Application("noisefilter_pass2").AddConstParameter ("FLATTOL", iString(gdFlatTol));
+    p8.Application("noisefilter_pass2").AddConstParameter ("FLATTOL", IString(gdFlatTol));
     p8.Application("noisefilter_pass2").AddConstParameter ("TOLDEF",  "STDDEV");
-    p8.Application("noisefilter_pass2").AddConstParameter ("LOW",     iString(gdMinValue));
-    p8.Application("noisefilter_pass2").AddConstParameter ("HIGH",    iString(dMaxDN));
-    p8.Application("noisefilter_pass2").AddConstParameter ("TOLMIN",  iString(gdTolMin));
-    p8.Application("noisefilter_pass2").AddConstParameter ("TOLMAX",  iString(gdTolMax));
+    p8.Application("noisefilter_pass2").AddConstParameter ("LOW",     IString(gdMinValue));
+    p8.Application("noisefilter_pass2").AddConstParameter ("HIGH",    IString(dMaxDN));
+    p8.Application("noisefilter_pass2").AddConstParameter ("TOLMIN",  IString(gdTolMin));
+    p8.Application("noisefilter_pass2").AddConstParameter ("TOLMAX",  IString(gdTolMax));
     p8.Application("noisefilter_pass2").AddConstParameter ("REPLACE", "NULL");
-    p8.Application("noisefilter_pass2").AddConstParameter ("SAMPLE",  iString(giNoiseSamples));
-    p8.Application("noisefilter_pass2").AddConstParameter ("LINE",    iString(giNoiseLines));
+    p8.Application("noisefilter_pass2").AddConstParameter ("SAMPLE",  IString(giNoiseSamples));
+    p8.Application("noisefilter_pass2").AddConstParameter ("LINE",    IString(giNoiseLines));
     p8.Application("noisefilter_pass2").AddConstParameter ("LISISNOISE", "TRUE");
     p8.Application("noisefilter_pass2").AddConstParameter ("LRSISNOISE", "TRUE");
 
@@ -313,15 +313,15 @@ void IsisMain() {
     p8.AddToPipeline("noisefilter", "noisefilter_pass3");
     p8.Application("noisefilter_pass3").SetInputParameter ("FROM",    false);
     p8.Application("noisefilter_pass3").SetOutputParameter("TO",      "noisefilter.3");
-    p8.Application("noisefilter_pass3").AddConstParameter ("FLATTOL", iString(gdFlatTol));
+    p8.Application("noisefilter_pass3").AddConstParameter ("FLATTOL", IString(gdFlatTol));
     p8.Application("noisefilter_pass3").AddConstParameter ("TOLDEF",  "STDDEV");
-    p8.Application("noisefilter_pass3").AddConstParameter ("LOW",     iString(gdMinValue));
-    p8.Application("noisefilter_pass3").AddConstParameter ("HIGH",    iString(dMaxDN));
-    p8.Application("noisefilter_pass3").AddConstParameter ("TOLMIN",  iString(gdTolMin));
-    p8.Application("noisefilter_pass3").AddConstParameter ("TOLMAX",  iString(gdTolMax));
+    p8.Application("noisefilter_pass3").AddConstParameter ("LOW",     IString(gdMinValue));
+    p8.Application("noisefilter_pass3").AddConstParameter ("HIGH",    IString(dMaxDN));
+    p8.Application("noisefilter_pass3").AddConstParameter ("TOLMIN",  IString(gdTolMin));
+    p8.Application("noisefilter_pass3").AddConstParameter ("TOLMAX",  IString(gdTolMax));
     p8.Application("noisefilter_pass3").AddConstParameter ("REPLACE", "NULL");
-    p8.Application("noisefilter_pass3").AddConstParameter ("SAMPLE",  iString(giNoiseSamples));
-    p8.Application("noisefilter_pass3").AddConstParameter ("LINE",    iString(giNoiseLines));
+    p8.Application("noisefilter_pass3").AddConstParameter ("SAMPLE",  IString(giNoiseSamples));
+    p8.Application("noisefilter_pass3").AddConstParameter ("LINE",    IString(giNoiseLines));
     p8.Application("noisefilter_pass3").AddConstParameter ("LISISNOISE", "TRUE");
     p8.Application("noisefilter_pass3").AddConstParameter ("LRSISNOISE", "TRUE");
   #ifdef _DEBUG_
@@ -345,10 +345,10 @@ void IsisMain() {
     p9.AddToPipeline("lowpass");
     p9.Application("lowpass").SetInputParameter ("FROM",    false);
     p9.Application("lowpass").SetOutputParameter("TO",      "lowpass.p9");
-    p9.Application("lowpass").AddConstParameter ("SAMPLES", iString(giLpfSamples));
-    p9.Application("lowpass").AddConstParameter ("LINES",   iString(giLpfLines));
+    p9.Application("lowpass").AddConstParameter ("SAMPLES", IString(giLpfSamples));
+    p9.Application("lowpass").AddConstParameter ("LINES",   IString(giLpfLines));
     p9.Application("lowpass").AddConstParameter ("MINOPT",  "PERCENT");
-    p9.Application("lowpass").AddConstParameter ("MINIMUM", iString(giLpfMinPer));
+    p9.Application("lowpass").AddConstParameter ("MINIMUM", IString(giLpfMinPer));
     p9.Application("lowpass").AddConstParameter ("REPLACE", "NULL");
     p9.Application("lowpass").AddConstParameter ("NULL",    "FALSE");
     p9.Application("lowpass").AddConstParameter ("HRS",     "FALSE");
@@ -372,9 +372,9 @@ void IsisMain() {
     p10.AddToPipeline("highpass");
     p10.Application("highpass").SetInputParameter ("FROM",    false);
     p10.Application("highpass").SetOutputParameter("TO",      "highpass.p10");
-    p10.Application("highpass").AddConstParameter ("SAMPLES", iString(giHpfSamples));
-    p10.Application("highpass").AddConstParameter ("LINES",   iString(giHpfLines));
-    p10.Application("highpass").AddConstParameter ("MINIMUM", iString(giHpfMinPer));
+    p10.Application("highpass").AddConstParameter ("SAMPLES", IString(giHpfSamples));
+    p10.Application("highpass").AddConstParameter ("LINES",   IString(giHpfLines));
+    p10.Application("highpass").AddConstParameter ("MINIMUM", IString(giHpfMinPer));
     p10.Application("highpass").AddConstParameter ("MINOPT", "PERCENT");
   #ifdef _DEBUG_
     cout << p10 << endl;
@@ -445,10 +445,10 @@ void IsisMain() {
       p12.AddToPipeline("lowpass", "lowpass_pass2");
       p12.Application("lowpass_pass2").SetInputParameter ("FROM",    false);
       p12.Application("lowpass_pass2").SetOutputParameter("TO",      "lowpass.p12.2");
-      p12.Application("lowpass_pass2").AddConstParameter ("SAMPLES", iString(gdLpfzSamples));
-      p12.Application("lowpass_pass2").AddConstParameter ("LINES",   iString(gdLpfzLines));
+      p12.Application("lowpass_pass2").AddConstParameter ("SAMPLES", IString(gdLpfzSamples));
+      p12.Application("lowpass_pass2").AddConstParameter ("LINES",   IString(gdLpfzLines));
       p12.Application("lowpass_pass2").AddConstParameter ("MINOPT",  "COUNT");
-      p12.Application("lowpass_pass2").AddConstParameter ("MINIMUM", iString(iMin));
+      p12.Application("lowpass_pass2").AddConstParameter ("MINIMUM", IString(iMin));
       p12.Application("lowpass_pass2").AddConstParameter ("FILTER",  "OUTSIDE");
       p12.Application("lowpass_pass2").AddConstParameter ("NULL",    "TRUE");
       p12.Application("lowpass_pass2").AddConstParameter ("HRS",     "FALSE");
@@ -472,7 +472,7 @@ void IsisMain() {
     throw;
   }
   catch(std::exception const &se) {
-    string sErrMsg = "std::exception: " + (iString)se.what();
+    string sErrMsg = "std::exception: " + (IString)se.what();
     throw IException(IException::User, sErrMsg, _FILEINFO_);
   }
   catch(...) {
@@ -498,7 +498,7 @@ void ProcessCubeNormStats(string psStatsFile, int piChannel, int piSumming)
   int iMaxValidPoints = 1;
   vector<double> dNorm1, dNorm2;
   vector<int> iValidPoints, iBand, iRowCol;
-  iString sHeader="      ";
+  IString sHeader="      ";
 
 #ifdef _DEBUG_
   cerr << "Rows="<< iRows << endl;
@@ -506,9 +506,9 @@ void ProcessCubeNormStats(string psStatsFile, int piChannel, int piSumming)
   for (int i=0; i<iRows; i++) {
     csvArr = statsFile.getRow(i);
     if (i) {
-      iBand.push_back(iString(csvArr[0]).ToInteger());
-      iRowCol.push_back(iString(csvArr[1]).ToInteger());
-      int iPoints = iString(csvArr[2]).ToInteger();
+      iBand.push_back(IString(csvArr[0]).ToInteger());
+      iRowCol.push_back(IString(csvArr[1]).ToInteger());
+      int iPoints = IString(csvArr[2]).ToInteger();
       iValidPoints.push_back(iPoints);
       if (iPoints > iMaxValidPoints) {
         iMaxValidPoints = iPoints;
@@ -653,16 +653,16 @@ void GetValuesFromHistogram(string psHistFile, double & pdLisPer, double & pdMax
     }
 
     if (csvArr[0] == "Std Deviation") {
-      pdStdDev = iString(csvArr[1]).ToDouble();
+      pdStdDev = IString(csvArr[1]).ToDouble();
     }
     else if (csvArr[0] == "Total Pixels") {
-      iTotalPixels = iString(csvArr[1]).ToInteger();
+      iTotalPixels = IString(csvArr[1]).ToInteger();
     }
     else if (csvArr[0] == "Null Pixels") {
-      iNullPixels = iString(csvArr[1]).ToInteger();
+      iNullPixels = IString(csvArr[1]).ToInteger();
     }
     else if (csvArr[0] == "Lis Pixels") {
-      iLisPixels = iString(csvArr[1]).ToInteger();
+      iLisPixels = IString(csvArr[1]).ToInteger();
     }
   }
 
@@ -682,9 +682,9 @@ void GetValuesFromHistogram(string psHistFile, double & pdLisPer, double & pdMax
   iStartIndex++;
   for (int i=iStartIndex; i<iRows; i++) {
     csvArr = histFile.getRow(i);
-    double dCurrCumPer = iString(csvArr[4]).ToDouble();
+    double dCurrCumPer = IString(csvArr[4]).ToDouble();
     if (dCurrCumPer > dCumPer) {
-      pdMaxDN = iString(csvArr[0]).ToDouble();
+      pdMaxDN = IString(csvArr[0]).ToDouble();
     }
   }
 }

@@ -24,7 +24,7 @@
 #include "CameraFocalPlaneMap.h"
 #include "IException.h"
 #include "iTime.h"
-#include "iString.h"
+#include "IString.h"
 #include "LineScanCameraDetectorMap.h"
 #include "LineScanCameraGroundMap.h"
 #include "LineScanCameraSkyMap.h"
@@ -68,10 +68,10 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     //  Retrieve boresight location from instrument kernel (IK) (addendum?)
-    iString ikernKey = "INS" + iString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
+    IString ikernKey = "INS" + IString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
     double sampleBoreSight = getDouble(ikernKey);
 
-    ikernKey = "INS" + iString((int)naifIkCode()) + "_BORESIGHT_LINE";
+    ikernKey = "INS" + IString((int)naifIkCode()) + "_BORESIGHT_LINE";
     double lineBoreSight = getDouble(ikernKey);
 
     focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight);

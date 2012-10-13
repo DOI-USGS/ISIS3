@@ -26,7 +26,7 @@
 
 #include "SqlRecord.h"
 #include "SqlQuery.h"
-#include "iString.h"
+#include "IString.h"
 
 #include <QSqlField>
 #include <QVariant>
@@ -65,7 +65,7 @@ namespace Isis {
    * @return bool  True if the field/column exists, false otherwise.
    */
   bool SqlRecord::hasField(const std::string &name) const {
-    return (contains(iString::ToQt(name)));
+    return (contains(IString::ToQt(name)));
   }
 
   /**
@@ -79,7 +79,7 @@ namespace Isis {
    * @return std::string  Name of the column at the requested index
    */
   std::string SqlRecord::getFieldName(int index) const {
-    return (iString::ToStd(fieldName(index)));
+    return (IString::ToStd(fieldName(index)));
   }
 
   /**
@@ -92,7 +92,7 @@ namespace Isis {
    * @return int Index of the named column
    */
   int SqlRecord::getFieldIndex(const std::string &name) const {
-    return(indexOf(iString::ToQt(name)));
+    return(indexOf(IString::ToQt(name)));
   }
 
   /**
@@ -116,7 +116,7 @@ namespace Isis {
    * @return std::string  Type of the field/column
    */
   std::string SqlRecord::getType(const std::string &name) const {
-    QVariant ftype(field(iString::ToQt(name)).type());
+    QVariant ftype(field(IString::ToQt(name)).type());
     return (QtTypeField(ftype.typeName()));
   }
 
@@ -153,7 +153,7 @@ namespace Isis {
    * @return bool True if NULL, otherwise false.
    */
   bool SqlRecord::isNull(const std::string &name) const {
-    return (field(iString::ToQt(name)).isNull());
+    return (field(IString::ToQt(name)).isNull());
   }
 
   /**
@@ -164,10 +164,10 @@ namespace Isis {
    *
    * @param index Index of field/column get value from.
    *
-   * @return iString Value of the field/column index.
+   * @return IString Value of the field/column index.
    */
-  iString SqlRecord::getValue(int index) const {
-    return (iString(iString::ToStd(field(index).value().toString())));
+  IString SqlRecord::getValue(int index) const {
+    return (IString(IString::ToStd(field(index).value().toString())));
   }
 
   /**
@@ -178,10 +178,10 @@ namespace Isis {
    *
    * @param name  Name of the field/column to get value for.
    *
-   * @return iString Value of the named field/column.
+   * @return IString Value of the named field/column.
    */
-  iString SqlRecord::getValue(const std::string &name) const {
-    return (iString(iString::ToStd(field(iString::ToQt(name)).value().toString())));
+  IString SqlRecord::getValue(const std::string &name) const {
+    return (IString(IString::ToStd(field(IString::ToQt(name)).value().toString())));
   }
 
   /**
@@ -203,7 +203,7 @@ namespace Isis {
       return (retType);
     }
     else {
-      retType = iString::DownCase((tolower(ctype[0]) == 'q') ? &ctype[1] : ctype);
+      retType = IString::DownCase((tolower(ctype[0]) == 'q') ? &ctype[1] : ctype);
     }
     return(retType);
   }

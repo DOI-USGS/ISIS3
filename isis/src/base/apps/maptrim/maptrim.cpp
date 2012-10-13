@@ -67,10 +67,10 @@ void IsisMain() {
       cropParams += " to=TEMPORARYcropped.cub ";
     }
 
-    cropParams += " sample= "   + iString(smallestSample);
-    cropParams += " nsamples= " + iString(samples);
-    cropParams += " line= "     + iString(smallestLine);
-    cropParams += " nlines= "   + iString(lines);
+    cropParams += " sample= "   + IString(smallestSample);
+    cropParams += " nsamples= " + IString(samples);
+    cropParams += " line= "     + IString(smallestLine);
+    cropParams += " nlines= "   + IString(lines);
 
     try {
       ProgramLauncher::RunIsisProgram("crop", cropParams);

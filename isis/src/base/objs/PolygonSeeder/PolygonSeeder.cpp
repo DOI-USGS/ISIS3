@@ -141,7 +141,7 @@ namespace Isis {
       const geos::geom::Envelope *xyBoundBox) {
     if(xymp->getArea() < MinimumArea()) {
       std::string msg = "Polygon did not meet the minimum area of [";
-      msg += Isis::iString(MinimumArea()) + "]";
+      msg += Isis::IString(MinimumArea()) + "]";
       return msg;
     }
 
@@ -150,7 +150,7 @@ namespace Isis {
       pow(std::max(xyBoundBox->getWidth(), xyBoundBox->getHeight()), 2.0);
     if(thickness < MinimumThickness()) {
       std::string msg = "Polygon did not meet the minimum thickness ratio of [";
-      msg += Isis::iString(MinimumThickness()) + "]";
+      msg += Isis::IString(MinimumThickness()) + "]";
       return msg;
     }
 

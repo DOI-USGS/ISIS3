@@ -247,7 +247,7 @@ int main(int argc, char *argv[]) {
     in.close();
     cerr << endl;
 
-    QList<iString> vbands;
+    QList<IString> vbands;
     vbands.push_back("2");
     in.setVirtualBands(vbands);
     in.open("IsisCube_01");
@@ -347,7 +347,7 @@ int main(int argc, char *argv[]) {
 
     // Test reading outside a cube with virtual bands.
     cerr << "Testing reading past cube boundaries with virtual bands ... \n";
-    QList<iString> virtualBands;
+    QList<IString> virtualBands;
     virtualBands.push_back("2");
     boundaryTestCube.setVirtualBands(virtualBands);
     boundaryTestCube.open("IsisCube_boundary");
@@ -762,7 +762,7 @@ int main(int argc, char *argv[]) {
 
 
 void Report(Cube &c) {
-  cerr << "File   = " << iString(QFileInfo(c.getFileName()).fileName()) << endl;
+  cerr << "File   = " << IString(QFileInfo(c.getFileName()).fileName()) << endl;
   cerr << "Samps  = " << c.getSampleCount() << endl;
   cerr << "Lines  = " << c.getLineCount() << endl;
   cerr << "Bands  = " << c.getBandCount() << endl;

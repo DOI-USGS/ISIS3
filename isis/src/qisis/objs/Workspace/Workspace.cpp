@@ -8,7 +8,7 @@
 #include "Cube.h"
 #include "CubeAttribute.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include "MdiCubeViewport.h"
 #include "ViewportMdiSubWindow.h"
 
@@ -127,11 +127,11 @@ namespace Isis {
 
     // Check for RGB format (#R,#G,#B)
     if(bands.size() == 3) {
-      iString st = iString(bands.at(0));
+      IString st = IString(bands.at(0));
       int index_red = st.ToInteger();
-      st = iString(bands.at(1));
+      st = IString(bands.at(1));
       int index_green = st.ToInteger();
-      st = iString(bands.at(2));
+      st = IString(bands.at(2));
       int index_blue = st.ToInteger();
       cvp->viewRGB(index_red, index_green, index_blue);
     }

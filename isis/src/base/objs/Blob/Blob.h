@@ -1,4 +1,4 @@
-#if !defined(Blob_h)
+#ifndef Blob_h
 #define Blob_h
 /**
  * @file
@@ -24,10 +24,11 @@
  */
 
 #include <string>
-#include "Pvl.h"
+#include "PvlObject.h"
 
 namespace Isis {
-  bool IsBlob(Isis::PvlObject &obj);
+  bool IsBlob(PvlObject &obj);
+  class Pvl;
   /**
    * @author ????-??-?? Unknown
    *
@@ -45,6 +46,14 @@ namespace Isis {
    *                           method that takes the pvl labels so they do not
    *                           have to be re-read, which is a very expensive
    *                           operation.
+   *   @history 2012-10-04 Jeannie Backer Added include due to forward
+   *                           declaration in TableField. Ordered includes and
+   *                           added forward declaration. Fixed header
+   *                           definition statement. Moved method implementation
+   *                           to cpp and reordered methods in cpp. Added
+   *                           documentation. Improved test coverage in all
+   *                           categories. Added padding to control statements.
+   *                           References #1169.
    *
    * @todo Write class description, history, etc.
    */
@@ -54,46 +63,39 @@ namespace Isis {
       Blob(const std::string &name, const std::string &type,
            const std::string &file);
       Blob(const Blob &other);
+      Blob &operator=(const Blob &other);
+
       virtual ~Blob();
+
+      std::string Type() const;
+      std::string Name() const;
+      int Size() const;
+      PvlObject &Label();
 
       void Read(const std::string &file);
       void Read(const std::string &file, const Pvl &pvlLabels);
       virtual void Read(const Pvl &pvl, std::istream &is);
 
       void Write(const std::string &file);
-      void Write(Isis::Pvl &pvl, std::fstream &stm,
+      void Write(Pvl &pvl, std::fstream &stm,
                  const std::string &detachedFileName = "");
 
-      std::string Type() const {
-        return p_type;
-      };
-      std::string Name() const {
-        return p_blobName;
-      };
-
-      PvlObject &Label() {
-        return p_blobPvl;
-      };
-
-      Blob &operator=(const Blob &other);
-
     protected:
-      void Find(const Isis::Pvl &pvl);
-      virtual void ReadInit() {};
+      void Find(const Pvl &pvl);
+      virtual void ReadInit();
       virtual void ReadData(std::istream &is);
-
-      virtual void WriteInit() {};
+      virtual void WriteInit();
       virtual void WriteData(std::fstream &os);
 
-      Isis::PvlObject p_blobPvl;         //!< Pvl Blob object
-      std::string p_blobName;            //!< Name of the Blob object
+      PvlObject p_blobPvl;     //!< Pvl Blob object
+      std::string p_blobName;  //!< Name of the Blob object
 
-      char *p_buffer;                    //!< Buffer blob data is stored in
-      BigInt p_startByte;                   //!< Byte blob data starts at in buffer
-      int p_nbytes;                      //!< Size of blob data (in bytes)
-      std::string p_type;                //!< Type of data stored in the buffer
-      std::string p_detached;            //!< Used for reading detached blobs
-      std::string p_labelFile;           //!< The file containing the labels
+      char *p_buffer;          //!< Buffer blob data is stored in
+      BigInt p_startByte;      //!< Byte blob data starts at in buffer
+      int p_nbytes;            //!< Size of blob data (in bytes)
+      std::string p_type;      //!< Type of data stored in the buffer
+      std::string p_detached;  //!< Used for reading detached blobs
+      std::string p_labelFile; //!< The file containing the labels
   };
 };
 

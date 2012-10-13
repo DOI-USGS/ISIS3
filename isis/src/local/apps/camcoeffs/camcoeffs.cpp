@@ -120,18 +120,18 @@ void IsisMain() {
     throw IException(IException::Unknown, "Not enough information", _FILEINFO_);
   }
 
-  iString inEquationX = "X = " + iString(eq1[0]);
-  inEquationX += " + " + iString(eq1[1]) + "S";
-  inEquationX += " + " + iString(eq1[2]) + "L";
-  iString inEquationY = "Y = " + iString(eq2[0]);
-  inEquationY += " + " + iString(eq2[1]) + "S";
-  inEquationY += " + " + iString(eq2[2]) + "L";
-  iString outEquationS = "S = " + iString(res1[0]);
-  outEquationS += " + " + iString(res1[1]) + "X";
-  outEquationS += " + " + iString(res1[2]) + "Y";
-  iString outEquationL = "L = " + iString(res2[0]);
-  outEquationL += " + " + iString(res2[1]) + "X";
-  outEquationL += " + " + iString(res2[2]) + "Y";
+  IString inEquationX = "X = " + IString(eq1[0]);
+  inEquationX += " + " + IString(eq1[1]) + "S";
+  inEquationX += " + " + IString(eq1[2]) + "L";
+  IString inEquationY = "Y = " + IString(eq2[0]);
+  inEquationY += " + " + IString(eq2[1]) + "S";
+  inEquationY += " + " + IString(eq2[2]) + "L";
+  IString outEquationS = "S = " + IString(res1[0]);
+  outEquationS += " + " + IString(res1[1]) + "X";
+  outEquationS += " + " + IString(res1[2]) + "Y";
+  IString outEquationL = "L = " + IString(res2[0]);
+  outEquationL += " + " + IString(res2[1]) + "X";
+  outEquationL += " + " + IString(res2[2]) + "Y";
 
   // check....
   /*

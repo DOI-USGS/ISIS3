@@ -4,7 +4,7 @@
 
 #include "Cube.h"
 #include "FileName.h"
-#include "iString.h"
+#include "IString.h"
 #include "ProcessExportPds.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
@@ -224,16 +224,16 @@ void IsisMain() {
   FileName ortho1(ui.GetFileName("ORTHO1"));
   FileName ortho3(ui.GetFileName("ORTHO3"));
 
-  iString vers; // Version string, will be used in orthos
+  IString vers; // Version string, will be used in orthos
   if (!defaultNames) {
-    iString pId = ui.GetFileName("DTMTO");
+    IString pId = ui.GetFileName("DTMTO");
     pId.substr(0, pId.find_first_of('.')+1);
     pdsLabel.AddKeyword(PvlKeyword("PRODUCT_ID",ui.GetString("DTM_PRODUCT_ID")));
     pdsLabel.AddKeyword(PvlKeyword("SOURCE_PRODUCT_ID",ui.GetString("SOURCE_PRODUCT_ID")));
   }
   else {
     // Set projection letter
-    iString pId = "DTE";
+    IString pId = "DTE";
     pId += isEquirectangular ? "E" : "P";
 
     // Find scale letter
@@ -242,7 +242,7 @@ void IsisMain() {
     // Product ids of orthos
     pId += ortho1.baseName().substr(3,12);
     pId += ortho3.baseName().substr(3,12);
-    iString producing = inputParameters["PRODUCING_INSTITUTION"][0];
+    IString producing = inputParameters["PRODUCING_INSTITUTION"][0];
     if (producing.size() > 1) {
       string msg = "PRODUCTING_INSTITUTION value [" + producing + "] must be a single character";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -258,10 +258,10 @@ void IsisMain() {
     // >10, takes first two digits
     // The number found here is used in ortho images as well.
     if (version >= 10.0) {
-      vers = iString(version).substr(0,2);
+      vers = IString(version).substr(0,2);
     }
     else if (version >= 1.0) {
-      vers = iString(version);
+      vers = IString(version);
       bool wasInt = false;
       // Checking for integer values, if so, make #.0 into 0#
       // necessary because in DTMgen version 1.0 corresponded to a 01 in names.
@@ -273,19 +273,19 @@ void IsisMain() {
       }
       // Wasn't int, make #.# into ##
       if (!wasInt) {
-        vers = iString(version).Remove(".");
+        vers = IString(version).Remove(".");
         if (vers.size() > 2) vers = vers.substr(0,2);
       }
     }
     // 0 - <1, if 0.#, is 0#, is 0.#####, is first two ##
     else if (version >= 0.001) { // Any less and we get E... not dealing with that.
-      vers = iString(version).Remove(".");
+      vers = IString(version).Remove(".");
       int nonZero = vers.find_first_not_of('0');
       if (vers.size() > 2) vers = vers.substr(nonZero-1,2);
     }
     // It was negative, or something else crazy?
     else {
-      string msg = "Version number [" + iString(version) + "] is invalid";
+      string msg = "Version number [" + IString(version) + "] is invalid";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -294,9 +294,9 @@ void IsisMain() {
     pdsLabel.AddKeyword(PvlKeyword("PRODUCT_ID",pId));
 
     // Source product ids
-    iString orthoS1 = ortho1.baseName().substr(0,15);
-    iString orthoS3 = ortho3.baseName().substr(0,15);
-    iString sourceId = "("+orthoS1+","+orthoS3+")"; // (######_####,######_####)
+    IString orthoS1 = ortho1.baseName().substr(0,15);
+    IString orthoS3 = ortho3.baseName().substr(0,15);
+    IString sourceId = "("+orthoS1+","+orthoS3+")"; // (######_####,######_####)
     pdsLabel.AddKeyword(PvlKeyword("SOURCE_PRODUCT_ID",sourceId));
   } // End scope of defaultNames true
 
@@ -387,13 +387,13 @@ void IsisMain() {
 
   // Loop through 4 ortho images
   for (int i = 0; i < 4; /*4 = Number of ortho images*/ i++) {
-    iString ortho("ORTHO" + iString(i + 1));
+    IString ortho("ORTHO" + IString(i + 1));
     Cube * orthoInCube = p.SetInputCube(ortho);
 
     Pvl & orthoLabel = p.StandardPdsLabel(ProcessExportPds::Image);
     PvlObject & orthoMap = orthoLabel.FindObject("IMAGE_MAP_PROJECTION");
 
-    iString orthoOut;
+    IString orthoOut;
     if (!defaultNames) {
       orthoOut = ui.GetFileName(ortho);
     }
@@ -411,7 +411,7 @@ void IsisMain() {
       // continue building name
       orthoOut += ortho1.baseName().substr(3,12);
       orthoOut += ortho3.baseName().substr(3,12);
-      iString producing = inputParameters["PRODUCING_INSTITUTION"][0];
+      IString producing = inputParameters["PRODUCING_INSTITUTION"][0];
       if (producing.size() > 1) {
         string msg = "PRODUCTING_INSTITUTION value [" + producing + "] must be a single character";
         throw IException(IException::User, msg, _FILEINFO_);
@@ -457,9 +457,9 @@ void IsisMain() {
       orthoLabel.AddKeyword(PvlKeyword("SOURCE_PRODUCT_ID",ui.GetString("SOURCE_PRODUCT_ID")));
     }
     else {
-      iString orthoS1 = ortho1.baseName().substr(0,15);
-      iString orthoS3 = ortho3.baseName().substr(0,15);
-      iString sourceId = "("+orthoS1+","+orthoS3+")"; // (######_####,######_####)
+      IString orthoS1 = ortho1.baseName().substr(0,15);
+      IString orthoS3 = ortho3.baseName().substr(0,15);
+      IString sourceId = "("+orthoS1+","+orthoS3+")"; // (######_####,######_####)
       orthoLabel.AddKeyword(PvlKeyword("SOURCE_PRODUCT_ID",sourceId));
     }
 

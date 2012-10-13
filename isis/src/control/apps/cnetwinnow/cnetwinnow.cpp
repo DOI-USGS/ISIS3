@@ -17,7 +17,7 @@
 #include "PvlGroup.h"
 #include "Histogram.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include "Progress.h"
 #include "SerialNumber.h"
 #include "SerialNumberList.h"
@@ -30,7 +30,7 @@
 using namespace std;
 using namespace Isis;
 
-void cubeConvexHullAndMeasures(iString &serialNum,ControlNet &net, double &area, int &validMeasures, 
+void cubeConvexHullAndMeasures(IString &serialNum,ControlNet &net, double &area, int &validMeasures, 
                           QList <ControlMeasure *> *measToIgnor=NULL);
 
 
@@ -76,7 +76,7 @@ void IsisMain() {
   strcat(fileName,"Guilty.csv");
   guiltyFile = fopen(fileName,"w");
   if (guiltyFile == NULL) {
-    string msg = "Unable to open file [" + iString(fileName) + "]";
+    string msg = "Unable to open file [" + IString(fileName) + "]";
     throw IException(IException::User, msg, _FILEINFO_);
     return;
   }
@@ -86,7 +86,7 @@ void IsisMain() {
   strcat(fileName,"Ignored.csv");
   ignoredReport = fopen(fileName,"w");
   if (guiltyFile == NULL) {
-    string msg = "Unable to open file [" + iString(fileName) + "]";
+    string msg = "Unable to open file [" + IString(fileName) + "]";
     throw IException(IException::User, msg, _FILEINFO_);
     return;
   }
@@ -104,7 +104,7 @@ void IsisMain() {
   }
 
   if ( bin <0) {  //if Histogram is being inconsistent throw an error
-    string msg = "Histogram resturns the 80th percentile of " + iString(percentile80) + 
+    string msg = "Histogram resturns the 80th percentile of " + IString(percentile80) + 
                  " but has no bin containing values that small";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
@@ -264,7 +264,7 @@ void IsisMain() {
       QList<double> hullAndValidMeasures;
       double area;
       int validMeasures;
-      iString serialNum = measGroup[j]->GetCubeSerialNumber();
+      IString serialNum = measGroup[j]->GetCubeSerialNumber();
       //check to see if the initial stats are already calculated for this image
       if (originalCubeStats.contains(serialNum.ToQt())) continue;
       //otherwise do the calculations
@@ -283,7 +283,7 @@ void IsisMain() {
       else
         ableToEditFlag[j] = false; //test fail
 
-      iString serialNum = measGroup[j]->GetCubeSerialNumber();
+      IString serialNum = measGroup[j]->GetCubeSerialNumber();
       cubeConvexHullAndMeasures(serialNum,net,hullArea[j],measNum[j],&measGroup);
 
       //get the original values for this cube
@@ -403,7 +403,7 @@ void IsisMain() {
 
 
 
-void cubeConvexHullAndMeasures(iString &serialNum,ControlNet &net, double &area, int &validMeasures, 
+void cubeConvexHullAndMeasures(IString &serialNum,ControlNet &net, double &area, int &validMeasures, 
                           QList <ControlMeasure *> *measToIgnor) {
 
   int i,j,firstIndex=0;

@@ -4,7 +4,7 @@
 
 #include "FileName.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 using namespace Isis;
 

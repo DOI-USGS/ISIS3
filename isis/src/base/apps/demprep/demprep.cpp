@@ -53,7 +53,7 @@ void IsisMain() {
 
   Projection *proj = icube->getProjection();
   if(proj == NULL) {
-    iString message = "The input cube must be a DEM file, which means it must be projected. ";
+    IString message = "The input cube must be a DEM file, which means it must be projected. ";
     message += "This file is not map projected.";
     throw IException(IException::User, message, _FILEINFO_);
   }
@@ -90,7 +90,7 @@ void IsisMain() {
   }
 
   if (proj->LatitudeTypeString() != "Planetocentric") {
-    iString message = "The input cube must have Planetocentric latitude type.";
+    IString message = "The input cube must have Planetocentric latitude type.";
     throw IException(IException::User, message, _FILEINFO_);
   }
 

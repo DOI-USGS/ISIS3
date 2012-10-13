@@ -14,7 +14,7 @@
 #include "ProcessByLine.h"
 #include "UserInterface.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 
 
 using namespace Isis;
@@ -200,7 +200,7 @@ void IsisMain() {
         ProcessByLine p;
         CubeAttributeInput att;
 
-        iString cubeName = outputs[i].toString();
+        IString cubeName = outputs[i].toString();
         p.SetInputCube(cubeName, att, ReadWrite);
 
         p.StartProcess(blend);
@@ -416,7 +416,7 @@ void readOutputs(string outName, const FileList &inputs, FileList &outputs) {
 void generateOutputs(const FileList &inputs, FileList &outputs) {
   for (int i = 0; i < inputs.size(); i++) {
     FileName file=inputs[i];
-    iString filename = file.path() + "/" + file.baseName() +
+    IString filename = file.path() + "/" + file.baseName() +
       ".blend." + file.extension();
     outputs.push_back(filename);
   }

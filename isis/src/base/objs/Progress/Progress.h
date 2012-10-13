@@ -40,11 +40,14 @@ namespace Isis {
    * @internal
    *  @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
    *                                     isis.astrogeology...
-   *  @history 2004-02-29 Jeff Anderson - Added ability to send progress status to
-   *                                      the parent process
+   *  @history 2004-02-29 Jeff Anderson - Added ability to send progress status 
+   *                          to the parent process
    *  @history 2005-02-11 Elizabeth Ribelin - Modified file to support Doxygen
-   *                                          documentation
+   *                          documentation
    *  @history 2005-10-03 Elizabeth Miller - Changed @ingroup tag
+   *  @history 2012-10-04 Jeannie Backer - Removed documentation reference to 
+   *                          the now non-existant CubeInfo class. No mantis
+   *                          ticket related to this change.
    *
    *  @todo 2005-02-11 Jeff Anderson - add coded and implementation example to
    *                                   class documentation
@@ -52,20 +55,20 @@ namespace Isis {
 
   class Progress {
     private:
-      std::string p_text;     /**<Text string to output at the initial call to
-                                  CheckStatus (0% processed)*/
-      int p_maximumSteps;     /**<Number of steps in your processing sequence.
-                                  For example, if there are 20 lines in an cube.
-                                  This will be 20.*/
-      int p_currentStep;      /**<The current step in the processing sequence.
-                                  This is incremented by one everytime
-                                  CheckStatus is called.*/
-      int p_currentPercent;   /**<The current percent we are checking against.
-                                  Once this percentage is exceeded we report
-                                  that percentage is completed and increase
-                                  this value by the increment.*/
-      int p_percentIncrement; /**<How much to increment the currentPercent by.
-                                  It should only be 1,2, 5, or 10.*/
+      std::string p_text;     /**< Text string to output at the initial call to
+                                   CheckStatus (0% processed)*/
+      int p_maximumSteps;     /**< Number of steps in your processing sequence.
+                                   For example, if there are 20 lines in an cube.
+                                   This will be 20.*/
+      int p_currentStep;      /**< The current step in the processing sequence.
+                                   This is incremented by one everytime
+                                   CheckStatus is called.*/
+      int p_currentPercent;   /**< The current percent we are checking against.
+                                   Once this percentage is exceeded we report
+                                   that percentage is completed and increase
+                                   this value by the increment.*/
+      int p_percentIncrement; /**< How much to increment the currentPercent by.
+                                   It should only be 1,2, 5, or 10.*/
       bool p_printPercent;
 
     public:

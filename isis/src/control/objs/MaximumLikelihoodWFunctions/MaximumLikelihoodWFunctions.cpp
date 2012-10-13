@@ -1,7 +1,7 @@
 #include "MaximumLikelihoodWFunctions.h"
 #include "math.h"
 #include "IException.h"
-#include "iString.h"
+#include "IString.h"
 #include <stdio.h>
 
 namespace Isis {
@@ -18,7 +18,7 @@ namespace Isis {
     m_PI = acos(-1.0);
     m_model = modelSelection;
     if (tweakingConstant <= 0.0) {
-      iString msg = "Maximum likelihood estimation tweaking constants must be > 0.0";
+      IString msg = "Maximum likelihood estimation tweaking constants must be > 0.0";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     m_c = tweakingConstant;
@@ -48,7 +48,7 @@ namespace Isis {
     //choose Model and define the tweaking constant
     m_model = modelSelection;
     if (tweakingConstant <= 0.0) {
-      iString msg = "Maximum likelihood estimation tweaking constants must be > 0.0";
+      IString msg = "Maximum likelihood estimation tweaking constants must be > 0.0";
       throw IException(IException::Programmer, msg, _FILEINFO_);
       return false;
     }
@@ -98,7 +98,7 @@ namespace Isis {
     //leave model type unaltered and change tweaking constant
     if (tweakingConstant <= 0.0) return false;  //the constant must be positive
     if (tweakingConstant <= 0.0) {
-      iString msg = "Maximum likelihood estimation tweaking constants must be > 0.0";
+      IString msg = "Maximum likelihood estimation tweaking constants must be > 0.0";
       throw IException(IException::Programmer, msg, _FILEINFO_);
       return false;
     }

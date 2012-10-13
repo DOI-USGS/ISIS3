@@ -87,13 +87,13 @@ namespace Isis {
       string p_compType;            //!< Value of <b>PvlKeyword</b> CompressionType from the labels of the image.  Called "comp" in IDL code.
       string p_dataConvType;        //!< Value of <b>PvlKeyword</b> DataConversionType from the labels of the image.  Called "conv" in IDL code.
       double p_expDur;              //!< Value of <b>PvlKeyword</b> ExposureDuration from the labels of the image.  Called "exposure" or "time" in IDL code.
-      iString p_flightSoftware;     //!< Value of <b>PvlKeyword</b> FlightSoftwareVersion from the labels of the image.  Called "fsw" in IDL code.
+      IString p_flightSoftware;     //!< Value of <b>PvlKeyword</b> FlightSoftwareVersion from the labels of the image.  Called "fsw" in IDL code.
       int p_gainMode;               //!< Value of <b>PvlKeyword</b> GainModeId from the labels of the image.
       double p_instDataRate;        //!< Value of <b>PvlKeyword</b> InstrumentDataRate from the labels of the image.
       bool p_narrow;                //!< Indicates whether the image is from a narrow-angle camera
       int p_readoutIndex;           //!< Value of <b>PvlKeyword</b> InstrumentDataRate from the labels of the image.  Called "rdind" or "roindex" in IDL code.
       int p_readoutOrder;           //!< Value of <b>PvlKeyword</b> ReadoutOrder from the labels of the image. Valid values are: NAC first = 0, WAC first = 1.  Called "roo" in IDL code.
-      iString p_sum;                //!< Summing mode, as found in the labels of the image.  This integer is created as an iString so that it may be added to a string.  Called "sum" in IDL code.
+      IString p_sum;                //!< Summing mode, as found in the labels of the image.  This integer is created as an IString so that it may be added to a string.  Called "sum" in IDL code.
       int p_telemetryRate;          //!< Telemetry rate of the image in packets per second.  This is dependent on the range of the instrument data rate.  Called "cdsr" in IDL code.
 
       vector <vector <double> > p_startTime;    //!< Array of start times for each pixel of the image.

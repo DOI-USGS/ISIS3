@@ -33,7 +33,7 @@
 #include "CameraFocalPlaneMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
-#include "iString.h"
+#include "IString.h"
 #include "iTime.h"
 #include "FileName.h"
 #include "NaifStatus.h"
@@ -79,17 +79,17 @@ namespace Isis {
     // Setup focal plane map, and detector origin
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
-    iString ikernKey = "INS" + iString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
+    IString ikernKey = "INS" + IString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
     double sampleBoresight = getDouble(ikernKey);
-    ikernKey = "INS" + iString((int)naifIkCode()) + "_BORESIGHT_LINE";
+    ikernKey = "INS" + IString((int)naifIkCode()) + "_BORESIGHT_LINE";
     double lineBoresight = getDouble(ikernKey);
 
     focalMap->SetDetectorOrigin(sampleBoresight, lineBoresight);
 
     // Setup distortion map which is dependent on encounter, use start time
     // MOON:  1973-11-08T03:16:26.350
-    iString spacecraft = (string)inst["SpacecraftName"];
-    iString instId = (string)inst["InstrumentId"];
+    IString spacecraft = (string)inst["SpacecraftName"];
+    IString instId = (string)inst["InstrumentId"];
     string cam;
     if(instId == "M10_VIDICON_A") {
       cam = "a";

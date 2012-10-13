@@ -91,7 +91,7 @@ namespace Isis {
       int iRefIndex = -1;
       if (newPnt->IsReferenceExplicit())
         iRefIndex = newPnt->IndexOfRefMeasure();
-      iString istrTemp;
+      IString istrTemp;
 
       std::vector <PvlGroup> pvlGrpVector;
       int iBestIndex = 0;
@@ -103,7 +103,7 @@ namespace Isis {
       if (!newPnt->IsIgnored() && newPnt->GetType() == ControlPoint::Free && numMeasures > 0 &&
           (iNumMeasuresLocked == 0 || (iNumMeasuresLocked > 0 && bRefLocked))) {
         int iNumIgnore = 0;
-        iString istrTemp;
+        IString istrTemp;
         for (int measure = 0; measure < newPnt->GetNumMeasures(); ++measure) {
           ControlMeasure *newMsr = newPnt->GetMeasure(measure);
           bool bMeasureLocked = newMsr->IsEditLocked();
@@ -202,25 +202,25 @@ namespace Isis {
       else {
         int iComment = 0;
         if (numMeasures == 0) {
-          iString sComment = "Comment";
-          sComment += iString(++iComment);
+          IString sComment = "Comment";
+          sComment += IString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "No Measures in the Point");
         }
 
         if (newPnt->IsIgnored()) {
-          iString sComment = "Comment";
-          sComment += iString(++iComment);
+          IString sComment = "Comment";
+          sComment += IString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Point was originally Ignored");
         }
 
         if (newPnt->GetType() == ControlPoint::Fixed) {
-          iString sComment = "Comment";
-          sComment += iString(++iComment);
+          IString sComment = "Comment";
+          sComment += IString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Fixed Point");
         }
         else if (newPnt->GetType() == ControlPoint::Constrained) {
-          iString sComment = "Comment";
-          sComment += iString(++iComment);
+          IString sComment = "Comment";
+          sComment += IString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Constrained Point");
         }
 
@@ -252,9 +252,9 @@ namespace Isis {
               origPnt.GetMeasure(iRefIndex)->GetCubeSerialNumber());
           pvlRefChangeGrp += Isis::PvlKeyword("PrevResolution",   mdResVector[iRefIndex]);
   
-          istrTemp = iString((int)origPnt.GetMeasure(iRefIndex)->GetSample());
+          istrTemp = IString((int)origPnt.GetMeasure(iRefIndex)->GetSample());
           istrTemp += ",";
-          istrTemp += iString((int)origPnt.GetMeasure(iRefIndex)->GetLine());
+          istrTemp += IString((int)origPnt.GetMeasure(iRefIndex)->GetLine());
           pvlRefChangeGrp += Isis::PvlKeyword("PrevLocation",     istrTemp);
         }
         else {
@@ -279,9 +279,9 @@ namespace Isis {
         }
         pvlRefChangeGrp += Isis::PvlKeyword(sKeyName,  mdResVector[iBestIndex]);
 
-        istrTemp = iString((int)newPnt->GetMeasure(iBestIndex)->GetSample());
+        istrTemp = IString((int)newPnt->GetMeasure(iBestIndex)->GetSample());
         istrTemp += ",";
-        istrTemp += iString((int)newPnt->GetMeasure(iBestIndex)->GetLine());
+        istrTemp += IString((int)newPnt->GetMeasure(iBestIndex)->GetLine());
         pvlRefChangeGrp += Isis::PvlKeyword("NewLocation",      istrTemp);
 
         pvlPointObj += pvlRefChangeGrp;
