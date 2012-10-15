@@ -57,7 +57,7 @@ class MyShape : public DemShape {
 
    void testDemCube()  {
      // Cube *demCube();
-     iString fileName = demCube()->getFileName();
+     IString fileName = demCube()->getFileName();
      cout << "    Using dem cube file = " << demCube()->getFileName() << endl;
    }
 };
@@ -183,7 +183,7 @@ Local normal = -0.581842, -0.703663, 0.407823
   try {
     Pvl elPvl;
     PvlGroup kernels = pvl.FindGroup("Kernels", Pvl::Traverse);
-    iString demCubeFile;
+    IString demCubeFile;
     demCubeFile = (std::string) kernels["ShapeModel"];
     kernels.DeleteKeyword("ShapeModel");
     PvlKeyword shapeKey("ElevationModel", demCubeFile);
