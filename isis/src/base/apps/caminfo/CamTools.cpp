@@ -51,6 +51,7 @@
 #include "ProjectionFactory.h"
 #include "Statistics.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 
 using namespace std;
 
@@ -190,7 +191,7 @@ namespace Isis {
       g.realBand = cube.getPhysicalBand(band + 1);
 
 
-      g.target = camera.target();
+      g.target = camera.target()->name();
 
       iTime t1(camera.cacheStartTime());
       g.startTime = t1.UTC();

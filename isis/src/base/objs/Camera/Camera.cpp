@@ -38,6 +38,7 @@
 #include "CameraDistortionMap.h"
 #include "CameraGroundMap.h"
 #include "CameraSkyMap.h"
+#include "DemShape.h"
 #include "IException.h"
 #include "IString.h"
 #include "iTime.h"
@@ -46,7 +47,9 @@
 #include "NaifStatus.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
+#include "ShapeModel.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 
 using namespace std;
 
@@ -155,6 +158,10 @@ namespace Isis {
     p_childLine = line;
     p_pointComputed = true;
 
+    // get shape
+    // TODO: we need to validate this pointer (somewhere)
+    ShapeModel *shape = target()->shape();
+
     // Case of no map projection
     if(p_projection == NULL || p_ignoreProjection) {
       // Convert to parent coordinate (remove crop, pad, shrink, enlarge)
@@ -180,9 +187,7 @@ namespace Isis {
             double x = p_distortionMap->UndistortedFocalPlaneX();
             double y = p_distortionMap->UndistortedFocalPlaneY();
             double z = p_distortionMap->UndistortedFocalPlaneZ();
-            //cout << "Look vector: " << x << " " << y << " " << z << endl; //debug
-            p_hasIntersection = p_groundMap->SetFocalPlane(x, y, z);
-            return p_hasIntersection;
+            return p_groundMap->SetFocalPlane(x, y, z);
           }
         }
       }
@@ -207,24 +212,24 @@ namespace Isis {
         Latitude lat(p_projection->UniversalLatitude(), Angle::Degrees);
         Longitude lon(p_projection->UniversalLongitude(), Angle::Degrees);
         Distance rad(LocalRadius(lat, lon));
-        if(!rad.isValid()) {
-          p_hasIntersection = false;
-          return p_hasIntersection;
+        if (!rad.isValid()) {
+          shape->clearSurfacePoint();
+          return false;
         }
         SurfacePoint surfPt(lat, lon, rad);
-        if(SetGround(surfPt)) {
+        if (SetGround(surfPt)) {
           p_childSample = sample;
           p_childLine = line;
 
-          p_hasIntersection = true;
-          return p_hasIntersection;
+          shape->setHasIntersection(true);
+          return true;
         }
       }
     }
 
     // failure
-    p_hasIntersection = false;
-    return p_hasIntersection;
+    shape->clearSurfacePoint();
+    return false;
   }
 
   /**
@@ -243,8 +248,8 @@ namespace Isis {
       return RawFocalPlanetoImage();
     }
 
-    p_hasIntersection = false;
-    return p_hasIntersection;
+    target()->shape()->clearSurfacePoint();
+    return false;
   }
 
 
@@ -261,8 +266,8 @@ namespace Isis {
     Distance localRadius(LocalRadius(latitude, longitude));
 
     if(!localRadius.isValid()) {
-      p_hasIntersection = false;
-      return p_hasIntersection;
+      target()->shape()->clearSurfacePoint();
+      return false;
     }
 
     return SetGround(SurfacePoint(latitude, longitude, localRadius));
@@ -280,9 +285,10 @@ namespace Isis {
    *              false if it was not
    */
   bool Camera::SetGround(const SurfacePoint & surfacePt) {
+    ShapeModel *shape = target()->shape();
     if(!surfacePt.Valid()) {
-      p_hasIntersection = false;
-      return p_hasIntersection;
+      shape->clearSurfacePoint();
+      return false;
     }
 
     // Convert lat/lon to undistorted focal plane x/y
@@ -290,8 +296,8 @@ namespace Isis {
       return RawFocalPlanetoImage();
     }
 
-    p_hasIntersection = false;
-    return p_hasIntersection;
+    shape->clearSurfacePoint();
+    return false;
   }
 
 
@@ -305,6 +311,11 @@ namespace Isis {
   bool Camera::RawFocalPlanetoImage() {
     double ux = p_groundMap->FocalPlaneX();
     double uy = p_groundMap->FocalPlaneY();
+    
+    // get shape
+    // TODO: we need to validate this pointer (somewhere)
+    ShapeModel *shape = target()->shape();
+   
     //cout << "undistorted focal plane: " << ux << " " << uy << endl; //debug
     //cout.precision(15);
     //cout << "Backward Time: " << Time().Et() << endl;
@@ -328,31 +339,31 @@ namespace Isis {
           if(p_projection == NULL || p_ignoreProjection) {
             p_childSample = p_alphaCube->BetaSample(parentSample);
             p_childLine = p_alphaCube->BetaLine(parentLine);
-            p_hasIntersection = true;
-            return p_hasIntersection;
+            shape->setHasIntersection(true);
+            return true;
           }
           else if(p_projection->IsSky()) {
             if(p_projection->SetGround(Declination(), RightAscension())) {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
-              p_hasIntersection = true;
-              return p_hasIntersection;
+              shape->setHasIntersection(true);
+              return true;
             }
           }
           else {
             if(p_projection->SetUniversalGround(UniversalLatitude(), UniversalLongitude())) {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
-              p_hasIntersection = true;
-              return p_hasIntersection;
+              shape->setHasIntersection(true);
+              return true;
             }
           }
         }
       }
     }
 
-    p_hasIntersection = false;
-    return p_hasIntersection;
+   shape->clearSurfacePoint();
+   return false;
   }
 
 
@@ -377,8 +388,8 @@ namespace Isis {
       return RawFocalPlanetoImage();  // sets p_hasIntersection
     }
 
-    p_hasIntersection = false;
-    return p_hasIntersection;
+    target()->shape()->clearSurfacePoint();
+   return false;
   }
 
   /**
@@ -772,9 +783,12 @@ namespace Isis {
    */
   void Camera::BasicMapping(Pvl &pvl) {
     PvlGroup map("Mapping");
-    map += PvlKeyword("TargetName", target());
-    map += PvlKeyword("EquatorialRadius", p_radii[0].meters(), "meters");
-    map += PvlKeyword("PolarRadius", p_radii[2].meters(), "meters");
+    map += PvlKeyword("TargetName", target()->name());
+
+    std::vector<Distance> radii = target()->radii();
+    map += PvlKeyword("EquatorialRadius", radii[0].meters(), "meters");
+    map += PvlKeyword("PolarRadius", radii[2].meters(), "meters");
+    
     map += PvlKeyword("LatitudeType", "Planetocentric");
     map += PvlKeyword("LongitudeDirection", "PositiveEast");
     map += PvlKeyword("LongitudeDomain", "360");
@@ -840,7 +854,7 @@ namespace Isis {
                 return true;
               }
             }
-            else if(p_hasIntersection) {
+            else if(target()->shape()->hasIntersection()) {
               if(p_projection->SetUniversalGround(UniversalLatitude(),
                                                   UniversalLongitude())) {
                 p_childSample = p_projection->WorldX();
@@ -865,10 +879,10 @@ namespace Isis {
    *
    */
   void Camera::GetLocalNormal(double normal[3]) {
+    // TODO ** Can the logic here be simplified???
 
     // As documented in the doxygen above, the goal of this method is to
-    // calculate a normal vector to the surface using the DEM instead of the
-    // ellipsoid
+    // calculate a normal vector to the surface using the 4 corner surrounding points.
     double samp = Sample();
     double line = Line();
 
@@ -879,48 +893,61 @@ namespace Isis {
     surroundingPoints.append(qMakePair(samp - 0.5, line));
     surroundingPoints.append(qMakePair(samp + 0.5, line));
 
-    // save state
+    // save input state to be restored on return
     bool computed = p_pointComputed;
     double originalSample = samp;
     double originalLine = line;
 
-    // now we have all four points in the image, so find the same points in the
-    // dem
-    QVector< double * > lookVects(4);
-    for (int i = 0; i < lookVects.size(); i++)
-      lookVects[i] = new double[3];
+    // now we have all four points in the image, so find the same points on the surface
+    QVector<double *> cornerNeighborPoints(4);
 
-    for (int i = 0; i < surroundingPoints.size(); i ++) {
+    for (int i = 0; i < cornerNeighborPoints.size(); i ++)
+      cornerNeighborPoints[i] = new double[3];
+
+    Latitude lat;
+    Longitude lon;
+    Distance radius;
+    ShapeModel *shapeModel = target()->shape();
+
+    for (int i = 0; i < cornerNeighborPoints.size(); i ++) {
+      // If a surrounding point fails, set it to the original point
       if (!(SetImage(surroundingPoints[i].first, surroundingPoints[i].second))) {
         surroundingPoints[i].first = samp;
         surroundingPoints[i].second = line;
+
+        // If the original point fails too, we can't get a normal.  Clean up and return.
         if (!(SetImage(surroundingPoints[i].first, surroundingPoints[i].second))) {
           normal[0] = 0.;
           normal[1] = 0.;
           normal[2] = 0.;
-          // restore state
+
+          // restore input state
           if(computed) {
             SetImage(originalSample, originalLine);
-          } else {
+          } 
+          else {
             p_pointComputed = false;
           }
 
           // free memory
-          for (int i = 0; i < lookVects.size(); i++)
-            delete [] lookVects[i];
+          for (int i = 0; i < cornerNeighborPoints.size(); i++)
+            delete [] cornerNeighborPoints[i];
 
           return;
         }
       }
 
-      Latitude demLat = p_surfacePoint->GetLatitude();
-      Longitude demLon = p_surfacePoint->GetLongitude();
-      Distance demRadius = DemRadius(demLat, demLon);
+      SurfacePoint surfacePoint = GetSurfacePoint();
+      lat = surfacePoint.GetLatitude();
+      lon = surfacePoint.GetLongitude();
+      radius = LocalRadius(lat, lon);
 
-      latrec_c(demRadius.kilometers(), demLon.radians(),
-               demLat.radians(), lookVects[i]);
+      latrec_c(radius.kilometers(), lon.radians(),
+               lat.radians(), cornerNeighborPoints[i]);
     }
 
+    // if the first 2 surrounding points match or the last 2 surrounding points match, 
+    // we can't get a normal.  Clean up and return. 
     if ((surroundingPoints[0].first == surroundingPoints[1].first &&
         surroundingPoints[0].second == surroundingPoints[1].second) ||
        (surroundingPoints[2].first == surroundingPoints[3].first &&
@@ -928,85 +955,50 @@ namespace Isis {
       normal[0] = 0.;
       normal[1] = 0.;
       normal[2] = 0.;
-      // restore state
-      if(computed) {
+
+      // restore input state
+      if (!computed) {
         SetImage(originalSample, originalLine);
       } else {
         p_pointComputed = false;
       }
 
       // free memory
-      for (int i = 0; i < lookVects.size(); i++)
-        delete [] lookVects[i];
+      for (int i = 0; i < cornerNeighborPoints.size(); i++)
+        delete [] cornerNeighborPoints[i];
 
       return;
     }
 
-    // subtract bottom from top and left from right and store results
-    double topMinusBottom[3];
-    vsub_c(lookVects[0], lookVects[1], topMinusBottom);
-    double rightMinusLeft[3];
-    vsub_c(lookVects[3], lookVects[2], rightMinusLeft);
-
-    // take cross product of subtraction results to get normal
-    ucrss_c(topMinusBottom, rightMinusLeft, normal);
-
-    // unitize normal (and do sanity check for magnitude)
-    double mag;
-    unorm_c(normal, normal, &mag);
-    if (mag == 0.0) {
-      normal[0] = 0.;
-      normal[1] = 0.;
-      normal[2] = 0.;
-      // restore state
-      if(computed) {
-        SetImage(originalSample, originalLine);
-      } else {
-        p_pointComputed = false;
-      }
-
-      // free memory
-      for (int i = 0; i < lookVects.size(); i++)
-        delete [] lookVects[i];
-
-      return;
-    }
-
-    double centerLookVect[3];
+    // Restore input state to original point before calculating normal
     SetImage(originalSample, originalLine);
+    shapeModel->calculateLocalNormal(cornerNeighborPoints);
 
-    // Check to make sure that the normal is pointing outward from the planet
-    // surface. This is done by taking the dot product of the normal and
-    // any one of the unitized xyz vectors. If the normal is pointing inward,
-    // then negate it.
-
-    SpiceDouble pB[3];
-    pB[0] = p_surfacePoint->GetX().kilometers();
-    pB[1] = p_surfacePoint->GetY().kilometers();
-    pB[2] = p_surfacePoint->GetZ().kilometers();
-
-    unorm_c(pB, centerLookVect, &mag);
-    double dotprod = vdot_c(normal,centerLookVect);
-    if (dotprod < 0.0)
-      vminus_c(normal, normal);
-
-    // restore state
-    if(computed) {
-      SetImage(originalSample, originalLine);
+    // free memory
+    for (int i = 0; i < cornerNeighborPoints.size(); i++)
+      delete [] cornerNeighborPoints[i];
+ 
+    // restore input state if calculation failed and clean up.
+    if (!shapeModel->hasNormal()) {
+       p_pointComputed = false;
+      return;
     }
-    else {
+
+    // restore failed computed state
+    if (!computed) {
       p_pointComputed = false;
     }
 
-    // free memory
-    for (int i = 0; i < lookVects.size(); i++)
-      delete [] lookVects[i];
+    // Set the method normal values
+    std::vector<double> localNormal(3);
+    localNormal = shapeModel->normal();
+    memcpy(normal, (double *) &localNormal[0], sizeof(double) * 3);
   }
 
 
   /**
    * Calculates LOCAL photometric angles using the DEM (not ellipsoid).  These
-   * calcualtions are more expensive computationally than Sensor's angle getter
+   * calculations are more expensive computationally than Sensor's angle getter
    * methods.  Furthermore, this cost is mostly in calculating the local normal
    * vector, which can be done only once for all angles using this method.
    *
@@ -1038,16 +1030,17 @@ namespace Isis {
         instrumentPosition()->Coordinate());
 
     SpiceDouble pB[3];
-    pB[0] = p_surfacePoint->GetX().kilometers();
-    pB[1] = p_surfacePoint->GetY().kilometers();
-    pB[2] = p_surfacePoint->GetZ().kilometers();
+    SurfacePoint surfacePoint = GetSurfacePoint();
+    pB[0] = surfacePoint.GetX().kilometers();
+    pB[1] = surfacePoint.GetY().kilometers();
+    pB[2] = surfacePoint.GetZ().kilometers();
 
     vsub_c((SpiceDouble *) &sB[0], pB, surfSpaceVect);
     unorm_c(surfSpaceVect, unitizedSurfSpaceVect, &dist);
 
     // get a normalized surface sun vector
     SpiceDouble surfaceSunVect[3];
-    vsub_c(p_uB, pB, surfaceSunVect);
+    vsub_c(m_uB, pB, surfaceSunVect);
     SpiceDouble unitizedSurfSunVect[3];
     unorm_c(surfaceSunVect, unitizedSurfSunVect, &dist);
 
@@ -1680,7 +1673,7 @@ namespace Isis {
     if(tol < 0.0) {
       // Alternative calculation of ground resolution of a pixel/100
       double altitudeMeters;
-      if(isSky()) {   // Use the unit sphere as the target
+      if(target()->isSky()) {   // Use the unit sphere as the target
         altitudeMeters = 1.0;
       }
       else {

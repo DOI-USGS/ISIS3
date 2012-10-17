@@ -39,9 +39,10 @@
 #include "OriginalLabel.h"
 #include "Projection.h"
 #include "Pvl.h"
+#include "Projection.h"
 #include "SpecialPixel.h"
 #include "SpiceManager.h"
-#include "Projection.h"
+#include "Target.h"
 
 using namespace std;
 
@@ -409,7 +410,7 @@ namespace Isis {
 
     // Get sc_target_position_vector and target_center_distance for all targets
     // except Sky
-    if(!_camera->isSky()) {
+    if(!_camera->target()->isSky()) {
       SpicePosition *scpos = _camera->instrumentPosition();
       std::vector<double> jVec;
       jVec = scpos->Coordinate();
@@ -716,7 +717,7 @@ namespace Isis {
     // Get NAIF body codes
     SpiceInt scCode(-236), targCode(0);
     SpiceBoolean found;
-    string target(_camera->target());
+    string target(_camera->target()->name());
     (void) bodn2c_c("MESSENGER", &scCode, &found);
     (void) bodn2c_c(target.c_str(), &targCode, &found);
     if(!found) {
@@ -890,7 +891,7 @@ namespace Isis {
 
     // Get the center ra/dec
     _camera->SetImage(refSamp, refLine);
-    if(!_camera->isSky()) {
+    if(!_camera->target()->isSky()) {
       double lat, lon;
       _camera->subSpacecraftPoint(lat, lon);
       geom += format("SUB_SPACECRAFT_LATITUDE", lat, "DEG");
@@ -1008,7 +1009,7 @@ namespace Isis {
     _camera->SetImage(refSamp, refLine);
 
     //  These parameters only require a target other than the Sky
-    if(!_camera->isSky()) {
+    if(!_camera->target()->isSky()) {
       double sslat, sslon;
       _camera->subSolarPoint(sslat, sslon);
       geom += format("SUB_SOLAR_LATITUDE", sslat, "DEG");

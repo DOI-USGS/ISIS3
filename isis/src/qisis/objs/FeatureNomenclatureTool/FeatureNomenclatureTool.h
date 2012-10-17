@@ -48,6 +48,8 @@ namespace Isis {
    *                           method. References #958.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
    *                          coding standards. References #972
+   *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis tickets 
+   *                           #775 and #1114.
    * 
    */
   class FeatureNomenclatureTool : public Tool {

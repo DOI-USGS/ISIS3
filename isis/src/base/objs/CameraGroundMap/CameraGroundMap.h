@@ -65,8 +65,10 @@ namespace Isis {
    *  @history 2011-02-09 Steven Lambright SetGround now uses the Latitude,
    *                       Longitude and SurfacePoint classes.
    *  @history 2011-03-18 Debbie A. Cook Added reference to surface point in GetXY
-   *  @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *  @history 2012-07-06 Debbie A. Cook Updated Spice members to be more compliant with Isis 
    *                       coding standards. References #972.
+   *  @history 2012-10-10 Debbie A. Cook Modified to use new Target class.
+   *                        References Mantis ticket #775 and #1114.
    *
    */
   class CameraGroundMap {

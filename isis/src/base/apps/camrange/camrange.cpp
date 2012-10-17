@@ -4,6 +4,7 @@
 #include "Distance.h"
 #include "Process.h"
 #include "Pvl.h"
+#include "Target.h"
 
 using namespace std;
 using namespace Isis;
@@ -27,7 +28,7 @@ void IsisMain() {
   cam->radii(radii);
   PvlGroup target("Target");
   target += PvlKeyword("From", ui.GetFileName("FROM"));
-  target += PvlKeyword("TargetName", cam->target());
+  target += PvlKeyword("TargetName", cam->target()->name());
   target += PvlKeyword("RadiusA", radii[0].meters(), "meters");
   target += PvlKeyword("RadiusB", radii[1].meters(), "meters");
   target += PvlKeyword("RadiusC", radii[2].meters(), "meters");

@@ -16,6 +16,11 @@
  *   the Privacy &amp; Disclaimers page on the Isis website,
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
+ *
+ * @author 2003-03-13 Jeff Anderson?
+ *
+ * @internal
+ *  @history 2012-10-11 Debbie A. Cook - Updated to use new Target and Shape Model classes.
  */
 #include <iostream>
 #include <iomanip>
@@ -26,6 +31,7 @@
 #include "iTime.h"
 #include "Spice.h"
 #include "Preference.h"
+#include "Target.h"
 
 using namespace Isis;
 using namespace std;
@@ -75,6 +81,10 @@ class MySpice : public Spice {
       for(int i = 0; i < (int)BI.size(); i++) {
         cout << BI[i] << endl;
       }
+    }
+
+    double Resolution() {
+      return 1.;
     }
 };
 
@@ -222,5 +232,5 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   cout << "Testing Utility methods" << endl;
-  cout << "Target Name = " << spi.target() << endl;
+  cout << "Target Name = " << spi.target()->name() << endl;
 }

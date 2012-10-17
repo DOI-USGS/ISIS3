@@ -27,13 +27,16 @@
 #include "naif/SpiceZfc.h"
 #include "naif/SpiceZmc.h"
 #include "Pvl.h"
+#include "ShapeModel.h"
 #include "SpicePosition.h"
 #include "SpiceRotation.h"
 
 namespace Isis {
   class iTime;
   class Distance;
+  class EllipsoidShape;
   class Longitude;
+  class Target;
 
   /**
    * @brief Obtain SPICE information for a spacecraft
@@ -119,16 +122,16 @@ namespace Isis {
    *                                       will be used.  If the frame is different from the
    *                                       default IAU frame, the correct frame should be set
    *                                       in the iak file (see frames.req).  Also modified
-   *                                       setting of p_bodyRotation frameCode.  The old code
+   *                                       setting of m_bodyRotation frameCode.  The old code
    *                                       forced the IAU_ frame.  The new code uses the Naif
    *                                       routine cidfrm to get the frame associated with the
    *                                       body id.  These change will recognize any frame
    *                                       changes made in the iak file.
    *  @history 2007-08-10 Steven Lambright - Added support for Nadir keyword in InstrumentPointing group
    *                                       to not be the first element in the PvlKeyword.
-   *  @history 2007-08-24 Debbie A. Cook - Removed p_sB so it is recalculated every time it is used
+   *  @history 2007-08-24 Debbie A. Cook - Removed m_sB so it is recalculated every time it is used
    *                                       insuring that any updates to the position or rotation are applied.
-   *                                       Also removed p_BP since it is no longer used
+   *                                       Also removed m_BP since it is no longer used
    *  @history 2008-02-13 Steven Lambright - Added StartPadding and EndPadding caching capabilties
    *  @history 2008-02-13 Steven Lambright - Added Support Check for StartPadding and EndPadding caching capabilties;
    *                                        An clarified exception is thrown if a framing camera tries to use time padding
@@ -159,7 +162,7 @@ namespace Isis {
    *                                         createCache(double,double) since it appears that this method is not
    *                                         needed. Initialize pointers to NULL in Init() method.
    *  @history 2011-02-09 Steven Lambright - Refactored to use iTime where
-   *                                         possible. Changed p_radii to a
+   *                                         possible. Changed m_radii to a
    *                                         Distance so the units are no longer
    *                                         ambiguous. These changes were meant
    *                                         for readability and reducing the
@@ -170,8 +173,8 @@ namespace Isis {
    *                                         were replaced with references to
    *                                         setTime()). Added missing
    *                                         documentation to new methods.
-   *   @history 2011-05-03 Jeannie Walldren - Added Isis Disclaimer to files.
-   *   @history 2011-05-25 Janet Barrett and Steven Lambright - Added API that
+   *  @history 2011-05-03 Jeannie Walldren - Added Isis Disclaimer to files.
+   *  @history 2011-05-25 Janet Barrett and Steven Lambright - Added API that
    *                                         stores naif values and arbitrary
    *                                         computations so that the text
    *                                         kernels do not have to be
@@ -180,21 +183,21 @@ namespace Isis {
    *                                         quicker. Text kernels are no longer
    *                                         furnished when their data has been
    *                                         stored in the labels.
-   *   @history 2011-05-26 Debbie A. Cook -  Put back the code for spkwriter that
+   *  @history 2011-05-26 Debbie A. Cook -  Put back the code for spkwriter that
    *                                         was checked in May 25 but disappeared
    *                                         in the May 26 build.  This code turns
    *                                         aberration corrections off for the
    *                                         instrument position if the spk file
    *                                         was created by spkwriter.
-   *   @history 2011-07-08 Jeff Anderson  -  Fixed Init method to record the
+   *  @history 2011-07-08 Jeff Anderson  -  Fixed Init method to record the
    *                                         integer body frame code in the labels
    *                                         of the cube. Vesta exposed this
    *                                         problem because it was not a
    *                                         instrinsic body in the NAIF toolkit
    *                                         version 63.
-   *   @history 2011-07-11 Jeff Anderson  -  Added private copy constructors and
+   *  @history 2011-07-11 Jeff Anderson  -  Added private copy constructors and
    *                                         operator= methods
-   *   @history 2011-09-19 Debbie Cook    -  Added cubes with Ideal Cameras to the
+   *  @history 2011-09-19 Debbie Cook -  Added cubes with Ideal Cameras to the
    *                                         exclusion list for reading instrument
    *                                         keywords from the label.  The Ideal
    *                                         Camera has variable values for the
@@ -202,11 +205,16 @@ namespace Isis {
    *                                         the camera itself and not read from
    *                                         a kernel.  The camera puts these
    *                                         values into the Naif kernel pool.
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *                           coding standards. References #972.
-   *   @history 2012-09-10 Steven Lambright - Undid Debbie's change on 2012-09-19 because the
+   *  @history 2012-07-06 Debbie A. Cook - Updated Spice members to be more compliant with Isis 
+   *                          coding standards. References #972.
+   *  @history 2012-09-10 Steven Lambright - Undid Debbie's change on 2012-09-19 because the
    *                           Ideal camera now supports putting those keywords in the label
    *                           on the fly. References #1094.
+   *  @history 2012-10-11 Debbie A. Cook - Deleted deprecated createCache code already commented
+   *                                         out for over a year.  Updated to use new Target and ShapeModel classes.
+   *                                         Added Resolution method needed for Target and its ShapeModel.
+   *                                         Changed private member names from p_ to m_ to comply with coding
+   *                                         standards.  References Mantis tickets #775 and #1114.
    */
   class Spice {
     public:
@@ -230,22 +238,14 @@ namespace Isis {
 
       void createCache(iTime startTime, iTime endTime,
                        const int size, double tol);
-        //NO CALL TO THIS METHOD IS FOUND IN ISIS.  COMMENT OUT AND SAVE FOR AT LEAST 3 MONTHS
-        //IF NO NEED IS FOUND FOR IT, DELETE METHOD.
-        // 2011-02-08 JEANNIE WALLDREN
-//      void createCache(const double time, double tol);
       iTime cacheStartTime() const;
       iTime cacheEndTime() const;
 
       void subSpacecraftPoint(double &lat, double &lon);
       void subSolarPoint(double &lat, double &lon);
 
-      IString target() const;
-
-      //! Return if our target is the sky
-      bool isSky() const {
-        return p_sky;
-      };
+      Target *target() const;
+      IString targetName() const;
 
       iTime getClockTime(IString clockValue,
                          int sclkCode = -1);
@@ -261,7 +261,7 @@ namespace Isis {
        *   @history 2011-02-09 Steven Lambright - Original version.
        */
       SpicePosition *sunPosition() const {
-        return p_sunPosition;
+        return m_sunPosition;
       };
 
       /**
@@ -272,7 +272,7 @@ namespace Isis {
        *   @history 2011-02-09 Steven Lambright - Original version.
        */
       SpicePosition *instrumentPosition() const {
-        return p_instrumentPosition;
+        return m_instrumentPosition;
       };
 
       /**
@@ -283,7 +283,7 @@ namespace Isis {
        *   @history 2011-02-09 Steven Lambright - Original version.
        */
       SpiceRotation *bodyRotation() const {
-        return p_bodyRotation;
+        return m_bodyRotation;
       };
 
       /**
@@ -294,7 +294,7 @@ namespace Isis {
        *   @history 2011-02-09 Steven Lambright - Original version.
        */
       SpiceRotation *instrumentRotation() const {
-        return p_instrumentRotation;
+        return m_instrumentRotation;
       };
 
       bool hasKernels(Pvl &lab);
@@ -306,6 +306,16 @@ namespace Isis {
       SpiceInt naifSclkCode() const;
 
       PvlObject getStoredNaifKeywords() const;
+
+      /**
+       * Pure virtual method that returns the pixel resolution of the sensor in
+       * meters/pix.
+       *
+       * @return @b double Resolution value of 1.0
+       */
+      virtual double Resolution() {
+        return 1.;
+          };
 
     protected:
       enum SpiceValueType {
@@ -327,20 +337,19 @@ namespace Isis {
       // Leave these protected so that inheriting classes don't
       // have to convert between double and spicedouble
       // None of the below data elements are usable (except
-      // p_radii) until SetEphemerisTime is invoked
-      SpiceDouble p_uB[3];    /**< This contains the sun position (u) in the
+      // m_radii) until SetEphemerisTime is invoked
+      SpiceDouble m_uB[3];    /**< This contains the sun position (u) in the
                                   bodyfixed reference frame (B). It is left
                                   protected so that conversions between double
                                   and SpiceDouble do not have to occur in
                                   inheriting classes. Units are km */
-      SpiceDouble p_BJ[3][3]; /**< This contains the transformation matrix from
+      SpiceDouble m_BJ[3][3]; /**< This contains the transformation matrix from
                                   J2000 (J) to Body fixed (B). Recall that the
                                   transpose of this matrix JB will convert from
                                   body-fixed to J2000. It is left in protected
                                   space so that conversions between double and
                                   SpiceDouble do not have to occur in inheriting
                                   classes.*/
-      Distance *p_radii; //!< The radii of the target
 
 
     private:
@@ -349,45 +358,45 @@ namespace Isis {
       void load(PvlKeyword &key, bool notab);
       void computeSolarLongitude(iTime et);
 
-      Longitude *p_solarLongitude; //!< Body rotation solar longitude value
-      iTime *p_et; //!< Ephemeris time (read NAIF documentation for a detailed description)
-      QVector<IString> * p_kernels; //!< Vector containing kernels filenames
-      IString *p_target; //!< Target of the observation
+      Longitude *m_solarLongitude; //!< Body rotation solar longitude value
+      iTime *m_et; //!< Ephemeris time (read NAIF documentation for a detailed description)
+      QVector<IString> * m_kernels; //!< Vector containing kernels filenames
+      Target *m_target; //!< Target of the observation
 
       // cache stuff
-      iTime *p_startTime; //!< Corrected start (shutter open) time of the observation.
-      iTime *p_endTime; //!< Corrected end (shutter close) time of the observation.
-      SpiceDouble *p_cacheSize; //!< Cache size.  Note:  This value is 1 for Framing cameras.
+      iTime *m_startTime; //!< Corrected start (shutter open) time of the observation.
+      iTime *m_endTime; //!< Corrected end (shutter close) time of the observation.
+      SpiceDouble *m_cacheSize; //!< Cache size.  Note:  This value is 1 for Framing cameras.
 
-      SpiceDouble *p_startTimePadding; //!< Kernels pvl group StartPadding keyword value
-      SpiceDouble *p_endTimePadding; //!< Kernels pvl group EndPadding keyword value
+      SpiceDouble *m_startTimePadding; //!< Kernels pvl group StartPadding keyword value
+      SpiceDouble *m_endTimePadding; //!< Kernels pvl group EndPadding keyword value
 
-      SpicePosition *p_instrumentPosition; //!< Instrument spice position
-      SpiceRotation *p_instrumentRotation; //!< Instrument spice rotation
-      SpicePosition *p_sunPosition; //!< Sun spice position
-      SpiceRotation *p_bodyRotation; //!< Body spice rotation
+      SpicePosition *m_instrumentPosition; //!< Instrument spice position
+      SpiceRotation *m_instrumentRotation; //!< Instrument spice rotation
+      SpicePosition *m_sunPosition; //!< Sun spice position
+      SpiceRotation *m_bodyRotation; //!< Body spice rotation
 
-      bool p_allowDownsizing; //!< Indicates whether to allow downsizing
+      bool m_allowDownsizing; //!< Indicates whether to allow downsizing
 
       // Constants
-      SpiceInt *p_bodyCode;    /**< The NaifBodyCode value, if it exists in the
-                                    labels. Otherwise, if the target is sky,
-                                    it's the SPK code and if not sky then it's
-                                    calculated by the naifBodyCode() method.*/
-      SpiceInt *p_spkCode;     //!< Spacecraft and planet ephemeris kernel (SPK) code
-      SpiceInt *p_ckCode;      //!< Camera kernel (CK) code
-      SpiceInt *p_ikCode;      //!< Instrument kernel (IK) code
-      SpiceInt *p_sclkCode;    //!< Spacecraft clock correlation kernel (SCLK) code
-      SpiceInt *p_spkBodyCode; //!< Spacecraft and planet ephemeris kernel (SPK) body code
+      //      SpiceInt *m_bodyCode;        /**< The NaifBodyCode value, if it exists in the
+      //                                        labels. Otherwise, if the target is sky,
+      //                                        it's the SPK code and if not sky then it's
+      //                                        calculated by the naifBodyCode() method.*/
+      SpiceInt *m_spkCode;         //!< Spacecraft and planet ephemeris kernel (SPK) code
+      SpiceInt *m_ckCode;          //!< Camera kernel (CK) code
+      SpiceInt *m_ikCode;          //!< Instrument kernel (IK) code
+      SpiceInt *m_sclkCode;        //!< Spacecraft clock correlation kernel (SCLK) code
+      SpiceInt *m_spkBodyCode;     //!< Spacecraft and planet ephemeris kernel (SPK) body code
 
-      PvlObject *p_naifKeywords;
+      PvlObject *m_naifKeywords;
 
-      bool p_sky; //!< Indicates whether the target of the observation is the sky.
-      bool p_usingNaif;
+      bool m_usingNaif;
 
       // Don't allow copies
       Spice(const Spice &other);
       Spice &operator=(const Spice &other);
+
   };
 }
 

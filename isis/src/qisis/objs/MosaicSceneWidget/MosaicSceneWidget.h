@@ -73,6 +73,8 @@ namespace Isis {
    *                           the grid tool to include tips for the options
    *                           dialog and the new 'Auto Grid' functionality.
    *                           References #604.
+   *  @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis tickets 
+   *                          #775 and #1114.
    */
   class MosaicSceneWidget : public QWidget {
       Q_OBJECT

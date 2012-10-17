@@ -1,0 +1,35 @@
+Begin testing Ellipsoid Shape Model class....
+
+  Testing constructors...
+    Shape1  name is Ellipsoid
+    Shape2  name is Ellipsoid
+    Shape3  name is Ellipsoid
+
+  Testing method intersectSurface with failure...
+    Do we have an intersection? 0
+    Intersection failed 
+
+Testing method intersectSurface...
+    Do we have an intersection? 0
+   Set a pixel in the image and check again.
+    Do we have an intersection? 1
+     surface point = (-2105.83, -2380.77, 1189.41
+
+  Testing class method calculateLocalNormal...
+    local normal = (-0.620509, -0.701524, 0.350474
+
+  Testing class method calculateSurfaceNormal...
+    surface normal = (-0.620509, -0.701524, 0.350474
+
+  Testing class method calculateDefaultNormal...
+    default normal = (-0.620509, -0.701524, 0.350474
+
+  Testing localRadius method ...
+    Local radius = 3393.71
+
+  Testing setHasIntersection method
+    Do we have an intersection? 0
+
+  Testing setSurfacePoint method ...
+     Do we have an intersection? 1
+     surface point = (-2105.83, -2380.77, 1189.41

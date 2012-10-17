@@ -10,6 +10,7 @@
 #include "Pvl.h"
 #include "IString.h"
 #include "PushFrameCameraDetectorMap.h"
+#include "Target.h"
 
 using namespace std;
 using namespace Isis;
@@ -51,7 +52,7 @@ void IsisMain() {
   incam = icube->getCamera();
 
   // Make sure it is not the sky
-  if(incam->isSky()) {
+  if(incam->target()->isSky()) {
     string msg = "The image [" + ui.GetFileName("FROM") +
                  "] is targeting the sky, use skymap instead.";
     throw IException(IException::User, msg, _FILEINFO_);

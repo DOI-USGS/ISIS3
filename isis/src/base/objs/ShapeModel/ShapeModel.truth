@@ -1,0 +1,89 @@
+Begin testing Shape Model base class....
+
+  Shape name is Test
+    Do we have an intersection? 0
+    Set a pixel in the image and check again.
+
+    Testing pure virtual method intersectSurface...
+    intersectSurface called with observer position = -2399.54, -2374.03, 1277.68
+                                 lookDirection = 0.957458, -0.0219727, -0.287736
+    Do we have an intersection? 1
+    surface point = (-2123.36, -2380.37, 1194.68
+
+  Testing class method normal() when no normal exists...
+    Do we have a normal? 0
+**ERROR** The local normal has not been computed.
+
+  Testing photometric angle calculations before normal computation...
+    Do we have a normal? 0
+    Emission angle = 46.9663    Incidence angle = 85.3411
+
+  Testing class method calculateLocalNormal...
+    Do we have a normal? 1
+    local normal = (-0.581842, -0.703663, 0.407823
+
+  Testing class method calculateSurfaceNormal...
+    surface normal = (-0.623384, -0.698838, 0.350738
+
+  Testing photometric angle calculations with undersize normal...
+    Emission angle = 180    Incidence angle = 180
+
+  Testing photometric angle calculations with oversize normal...
+    Emission angle = 0    Incidence angle = 0
+  Testing class method calculateDefaultNormal...
+    default normal = (-0.623384, -0.698838, 0.350738
+
+  Testing photometric angle calculations...
+    Emission angle = 46.9663    Incidence angle = 85.3411    Phase angle = 40.7873
+
+  Testing localRadius method ...
+    Local radius = 6357.02
+
+  Testing setHasIntersection method
+    Do we have an intersection? 0
+
+  Testing setSurfacePoint method ...
+     Do we have an intersection? 1
+     surface point = (-2123.36, -2380.37, 1194.68)
+
+  Testing ellipsoid methods in base class
+    Do we have an intersection? 0
+
+    Testing  failing of method intersectEllipsoid...
+    intersectSurface called with observer position = -2399.54, -2374.03, 1277.68
+                                 lookDirection = -1, 1, 1
+    ...  intersectSurface method failed -- no intersection
+    Do we have an intersection? 0
+
+    Testing  method intersectEllipsoid...
+    intersectSurface called with observer position = -2399.54, -2374.03, 1277.68
+                                 lookDirection = 0.957458, -0.0219727, -0.287736
+    surface point = (-2105.83, -2380.77, 1189.41
+    Do we have an intersection? 1
+    surface point = (-2105.83, -2380.77, 1189.41
+
+    Testing  method calculateEllipsoidalSurfaceNormal with bad intersection...
+**PROGRAMMER ERROR** A valid intersection must be defined before computing the surface normal.
+
+    Testing  method setHasIntersection false...
+    Do we have an intersection? 0
+
+    Testing  method calculateEllipsoidalSurfaceNormal with no intersection...
+**PROGRAMMER ERROR** A valid intersection must be defined before computing the surface normal.
+
+    Testing  method calculateEllipsoidalSurfaceNormal with valid intersection...
+    intersectSurface called with observer position = -2399.54, -2374.03, 1277.68
+                                 lookDirection = 0.957458, -0.0219727, -0.287736
+    Intersection set
+      Do we have a normal? 0
+      Do we have a normal? 1
+      local normal = (-0.620509, -0.701524, 0.350474
+
+    Testing  method targetRadii...
+      true normal = (-0.6196, -0.700497, 0.354117
+
+  Testing default constructor...
+    Shape is DefaultConstructor
+    Is there an intersection? 0
+    Is there an normal? 0
+    Number of normal components = 3

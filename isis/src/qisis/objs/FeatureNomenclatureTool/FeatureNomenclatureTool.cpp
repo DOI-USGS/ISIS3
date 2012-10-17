@@ -31,6 +31,7 @@
 #include "MdiCubeViewport.h"
 #include "NomenclatureToolConfigDialog.h"
 #include "PolygonTools.h"
+#include "Target.h"
 #include "ToolPad.h"
 
 
@@ -739,7 +740,7 @@ namespace Isis {
 
       IString target;
       if (vp->camera()) {
-        target = vp->camera()->target();
+        target = vp->camera()->target()->name();
       }
       else if (vp->projection()) {
         PvlGroup mappingGrp = vp->projection()->Mapping();

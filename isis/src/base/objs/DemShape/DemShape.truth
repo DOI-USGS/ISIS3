@@ -1,0 +1,47 @@
+Begin testing Dem Shape Model class....
+
+  Testing constructors...
+    Shape name is DemShape
+    Shape name is DemShape
+
+  Testing method intersectSurface...
+    Do we have an intersection? 0
+    Set a pixel in the image and check again.
+    Do we have an intersection? 1
+    surface point = (-2123.36, -2380.37, 1194.68
+
+  Testing class method calculateLocalNormal with correction for inward pointing vector
+    local normal = (-0.58374, -0.701835, 0.408259
+
+  Testing class method calculateSurfaceNormal...
+    surface normal = (-0.623384, -0.698838, 0.350738
+
+  Testing class method calculateDefaultNormal...
+    default normal = (-0.623384, -0.698838, 0.350738
+
+  Testing localRadius method with good lat/lon values...
+    Local radius = 3406.18
+
+  Testing localRadius method with bad lat/lon values...
+    Local radius = -1.79769e+308
+
+  Testing setHasIntersection method
+    Do we have an intersection? 0
+
+  Testing setSurfacePoint method ...
+    Do we have an intersection? 1
+    surface point = (-2123.36, -2380.37, 1194.68
+
+  Testing demScale method...
+    The map scale of the dem file is 128 pixels/degree
+
+  Testing protected methods demCube ...
+    Using dem cube file = /usgs/cpkgs/isis3/data/base/dems/molaMarsPlanetaryRadius0004.cub
+
+  Testing input of dem file with keyword ElevationModel
+
+  Testing method calculateLocalNormal with vector pointing outward
+    local normal = (-0.743083, 0.662884, 0.0917187
+
+  Testing method calculateLocalNormal with magnitude = 0
+**ERROR** The local normal has not been computed.

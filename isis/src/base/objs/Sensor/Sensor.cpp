@@ -30,6 +30,7 @@
 #include "Constants.h"
 #include "CubeManager.h"
 #include "Distance.h"
+#include "EllipsoidShape.h"
 #include "IException.h"
 #include "IString.h"
 #include "iTime.h"
@@ -37,8 +38,10 @@
 #include "Longitude.h"
 #include "NaifStatus.h"
 #include "Projection.h"
+#include "ShapeModel.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 #include "UniqueIOCachingAlgorithm.h"
 
 #define MAX(x,y) (((x) > (y)) ? (x) : (y))
@@ -55,118 +58,29 @@ namespace Isis {
    * @param lab Label containing Instrument and Kernels groups.
    */
   Sensor::Sensor(Pvl &lab) : Spice(lab) {
-    // Assume no shape model
-    p_hasElevationModel = false;
-    p_demProj = NULL;
-    p_demCube = NULL;
-    p_interp = NULL;
-    p_portal = NULL;
-    p_surfacePoint = new SurfacePoint;
-    p_minRadius = NULL;
-    p_maxRadius = NULL;
-    string demCube = "";
-
-    // Do we have one
-    PvlGroup &kernels = lab.FindGroup("Kernels", Pvl::Traverse);
-    if(kernels.HasKeyword("ElevationModel") &&
-        !kernels["ElevationModel"].IsNull() &&
-        !isSky()) {
-      demCube = (string) kernels["ElevationModel"];
-    }
-    else if(kernels.HasKeyword("ShapeModel") &&
-            !kernels["ShapeModel"].IsNull() &&
-            !isSky()) {
-      demCube = (string) kernels["ShapeModel"];
-    }
-
-    if(demCube != "") {
-      p_hasElevationModel = true;
-      p_demCube = CubeManager::Open(demCube);
-
-      // This caching algorithm works much better for DEMs than the default,
-      //   regional. This is because the uniqueIOCachingAlgorithm keeps track
-      //   of a history, which for something that isn't linearly processing a
-      //   cube is worth it. The regional caching algorithm tosses out results
-      //   from iteration 1 of setlookdirection (first algorithm) at iteration
-      //   4 and the next setimage has to re-read the data.
-      p_demCube->addCachingAlgorithm(new UniqueIOCachingAlgorithm(5));
-      p_demProj = p_demCube->getProjection();
-
-      p_interp = new Interpolator(Interpolator::BiLinearType);
-      p_portal = new Portal(p_interp->Samples(), p_interp->Lines(),
-                            p_demCube->getPixelType(),
-                            p_interp->HotSample(), p_interp->HotLine());
-
-      // Read in the min/max radius of the DEM file and the Scale of the DEM
-      // file in pixels/degree
-      const Pvl &demlab = *(p_demCube->getLabel());
-      if (p_demProj->IsEquatorialCylindrical()) {
-        if (!p_demCube->hasTable("ShapeModelStatistics")) {
-          std::string msg = "The input cube references a ShapeModel that has "
-              "not been updated for the new ray tracing algorithm. All DEM "
-              "files must now be padded at the poles and contain a "
-              "ShapeModelStatistics table defining their minimum and maximum "
-              "radii values. The demprep program should be used to prepare the "
-              "DEM before you can run this program. There is more information "
-              "available in the documentation of the demprep program.";
-          throw IException(IException::User, msg, _FILEINFO_);
-        }
-
-        Table table("ShapeModelStatistics", demCube, demlab);
-        p_minRadius = new Distance(table[0]["MinimumRadius"],
-                                   Distance::Kilometers);
-        p_maxRadius = new Distance(table[0]["MaximumRadius"],
-                                   Distance::Kilometers);
-
-        const PvlGroup &mapgrp = demlab.FindGroup("Mapping", Pvl::Traverse);
-        p_demScale = (double) mapgrp["Scale"];
-      }
-    }
-
-    // No intersection with the target yet
-    p_hasIntersection = false;
   }
 
   //! Destroys the Sensor
   Sensor::~Sensor() {
-    if(p_surfacePoint) {
-      delete p_surfacePoint;
-      p_surfacePoint = NULL;
-    }
-
-    if(p_demProj) {
-      p_demProj = NULL;
-    }
-
-    // we do not have ownership of p_demCube
-    p_demCube = NULL;
-
-    if(p_interp) {
-      delete p_interp;
-      p_interp = NULL;
-    }
-
-    if(p_portal) {
-      delete p_portal;
-      p_portal = NULL;
-    }
   }
 
+
   /**
-   * This allows you to ignore the elevation model
+   * This allows you to ignore the cube elevation model and use the ellipse
    *
    * @param ignore True if the elevation model is ignored
    */
   void Sensor::IgnoreElevationModel(bool ignore) {
     // if we have an elevation model and are not ignoring it,
     //   set p_hasElevationModel to true
-    if(p_demProj && !ignore) {
-      p_hasElevationModel = true;
+    if(!ignore) {
+      target()->restoreShape();
     }
     else {
-      p_hasElevationModel = false;
+      target()->setShapeEllipsoid();
     }
   }
+
 
   /**
   * By setting the time you essential set the position of the
@@ -179,7 +93,7 @@ namespace Isis {
   */
   void Sensor::setTime(const iTime &time) {
     Spice::setTime(time);
-    p_hasIntersection = false;
+    target()->shape()->clearSurfacePoint();
   }
 
   /**
@@ -222,7 +136,7 @@ namespace Isis {
   bool Sensor::SetLookDirection(const double v[3]) {
     // The look vector must be in the camera coordinate system
 
-    // This constructor does:
+    // copy v to LookC
     // lookC[0] = v[0];
     // lookC[1] = v[1];
     // lookC[2] = v[2];
@@ -233,357 +147,40 @@ namespace Isis {
     const vector<double> &lookB = bodyRotation()->ReferenceVector(lookJ);
 
     // This memcpy does:
-    // p_lookB[0] = lookB[0];
-    // p_lookB[1] = lookB[1];
-    // p_lookB[2] = lookB[2];
-    memcpy(p_lookB, &lookB[0], sizeof(double) * 3);
-    p_newLookB = true;
+    // m_lookB[0] = lookB[0];
+    // m_lookB[1] = lookB[1];
+    // m_lookB[2] = lookB[2];
+    memcpy(m_lookB, &lookB[0], sizeof(double) * 3);
+    m_newLookB = true;
 
     // Don't try to intersect the sky
-    if(isSky()) {
-      p_hasIntersection = false;
-      return p_hasIntersection;
+    if(target()->isSky()) {
+      target()->shape()->setHasIntersection(false);
+      return false;
     }
 
-    // Prep for surfpt by obtaining the radii
-    SpiceDouble a = p_radii[0].kilometers();
-    SpiceDouble b = p_radii[1].kilometers();
-    SpiceDouble c = p_radii[2].kilometers();
-
     // See if it intersects the planet
-    SpiceBoolean found;
     const vector<double> &sB = bodyRotation()->ReferenceVector(
         instrumentPosition()->Coordinate());
 
-    SpiceDouble pBOutput[3];
-    surfpt_c((SpiceDouble *) &sB[0], p_lookB, a, b, c, pBOutput, &found);
-    NaifStatus::CheckErrors();
-
-    // TIDBIT:  From the code below we have historically tested to see if we
-    // can intersect the ellipsoid.  If we can't then we made the assumption
-    // that we could not intersect the DEM.  This of course isn't always true
-    // as the DEM could be above the surface of the ellipsoid.  For most images
-    // we really wouldn't notice.  It has recently (Aug 2011) come into play
-    // when we try to intersect images containing a limb and spiceinit'ed
-    // with a DEM (e.g., Vesta and soon Mercury).  This implies that info
-    // at the limb will not always be computed.  In the future we may want
-    // to do a better job at handling this special case.
-    if(!found) {
-      p_hasIntersection = false;
-      return p_hasIntersection;
-    }
-
-    p_surfacePoint->FromNaifArray(pBOutput);
-
-    // If we have a dem kernel then we should iterate until
-    // the point converges
-
-    if(p_hasElevationModel) {
-      // Set hasIntersection flag to true so Resolution can be calculated
-      p_hasIntersection = true;
-      static const int maxit = 100;
-      int it = 1;
-      bool done = false;
-      double latDouble, lonDouble;
-      double &pBOutputX = pBOutput[0];
-      double &pBOutputY = pBOutput[1];
-      double &pBOutputZ = pBOutput[2];
-
-      // This stores pB before the current iteration of the loop to compare with
-      //   the new pB (pBOutput).
-      SpiceDouble pBOrig[3];
-      double tolerance = Resolution() / 100.0;
-
-      while(!done) {
-        if(it > maxit) {
-          p_hasIntersection = false;
-          done = true;
-          continue;
-        }
-
-        // The lat/lon calculations are done here by hand for speed & efficiency
-        //   With doing it in the SurfacePoint class using p_surfacePoint, there
-        //   is a 24% slowdown (which is significant in this very tightly looped
-        //   call).
-        latDouble = atan2(pBOutputZ,
-              sqrt(pBOutputX * pBOutputX + pBOutputY * pBOutputY))
-              * 180.0 / PI;
-        lonDouble = atan2(pBOutputY, pBOutputX) * 180.0 / PI;
-        if(lonDouble < 0) lonDouble += 360;
-
-        const double &radiusKm = DemRadius(latDouble, lonDouble);
-
-        if(Isis::IsSpecial(radiusKm)) {
-          p_hasIntersection = false;
-          return p_hasIntersection;
-        }
-
-        // This memcpy does:
-        // pBOrig[0] = pBOutput[0];
-        // pBOrig[1] = pBOutput[1];
-        // pBOrig[2] = pBOutput[2];
-        memcpy(pBOrig, pBOutput, sizeof(double) * 3);
-        surfpt_c((SpiceDouble *)&sB[0], p_lookB, radiusKm, radiusKm, radiusKm,
-                 pBOutput, &found);
-
-        p_hasIntersection = found;
-        if(!p_hasIntersection) {
-          return p_hasIntersection;
-        }
-
-        const double deltaX(pBOrig[0] - pBOutput[0]);
-        const double deltaY(pBOrig[1] - pBOutput[1]);
-        const double deltaZ(pBOrig[2] - pBOutput[2]);
-        const double dist((deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ)
-            * 1000 * 1000);
-
-
-        if(dist < tolerance * tolerance) {
-          // Now recompute tolerance at updated surface point and recheck
-          p_surfacePoint->FromNaifArray(pBOutput);
-          tolerance = Resolution() / 100.0;
-          if(dist < tolerance * tolerance) done = true;
-        }
-
-        it ++;
-      }
-
-      if (!p_hasIntersection && p_demProj->IsEquatorialCylindrical()) {
-        double plen=0.0;
-        SpiceDouble plat, plon, pradius;
-        SpiceDouble pB[3];
-        double maxRadiusMetersSquared =
-            p_maxRadius->kilometers() * p_maxRadius->kilometers();
-        double cmin = cos((90.0 - 1.0 / (2.0*p_demScale)) * PI/180.0);
-
-        // Separate iteration algorithms are used for different projections -
-        // use this iteration for equatorial cylindrical type projections
-        // Set hasIntersection flag to true so Resolution can be calculated
-        p_hasIntersection = true;
-        int maxit = 100;
-        int it = 0;
-        bool done = false;
-
-        // Normalize the look vector
-        SpiceDouble ulookB[3];
-        ulookB[0] = lookB[0];
-        ulookB[1] = lookB[1];
-        ulookB[2] = lookB[2];
-        vhat_c(ulookB,ulookB);
-
-        // Calculate the limb viewing angle to see if the line of sight is
-        // pointing away from the planet
-        SpiceDouble observer[3];
-        observer[0] = sB[0];
-        observer[1] = sB[1];
-        observer[2] = sB[2];
-        SpiceDouble negobserver[3];
-        vminus_c(observer, negobserver);
-        double psi0 = vsep_c(negobserver, ulookB);
-        double cospsi0 = cos(psi0);
-
-        // If psi0 is greater than 90 degrees, then reject data as looking
-        // away from the planet and no proper tangent point exists in the
-        // direction that the spacecraft is looking
-        if (psi0 > PI/2.0) {
-          p_hasIntersection = false;
-          return p_hasIntersection;
-        }
-
-        // Calculate the vector to the tangent point
-        SpiceDouble tvec[3];
-        double observerdist = vnorm_c(observer);
-        tvec[0] = observer[0] + observerdist*cospsi0*ulookB[0];
-        tvec[1] = observer[1] + observerdist*cospsi0*ulookB[1];
-        tvec[2] = observer[2] + observerdist*cospsi0*ulookB[2];
-        double tlen = vnorm_c(tvec);
-
-        // Calculate distance along look vector to first and last test point
-        double radiusDiff = sqrt(maxRadiusMetersSquared - tlen * tlen);
-        double d0 = observerdist * cospsi0 - radiusDiff;
-        double dm = observerdist * cospsi0 + radiusDiff;
-
-        // Set the properties at the first test observation point
-        double d = d0;
-        SpiceDouble g1[3];
-        g1[0] = observer[0] + d0*ulookB[0];
-        g1[1] = observer[1] + d0*ulookB[1];
-        g1[2] = observer[2] + d0*ulookB[2];
-        double g1len = vnorm_c(g1);
-        SpiceDouble g1lat, g1lon, g1radius;
-        reclat_c(g1,&g1radius,&g1lon,&g1lat);
-        g1lat *= 180.0 / Isis::PI;
-        g1lon *= 180.0 / Isis::PI;
-        if (g1lon < 0.0) g1lon += 360.0;
-        SpiceDouble negg1[3];
-        vminus_c(g1, negg1);
-        double psi1 = vsep_c(negg1, ulookB);
-
-        // Set dalpha to be half the grid spacing for nyquist sampling
-        //double dalpha = (PI/180.0)/(2.0*p_demScale);
-        double dalpha = MAX(cos(g1lat*(Isis::PI/180.0)),cmin) / (2.0*p_demScale*(Isis::PI/180.0));
-        double r1 = DemRadius(g1lat,g1lon);
-        if (Isis::IsSpecial(r1)) {
-          p_hasIntersection = false;
-          return p_hasIntersection;
-        }
-
-        // Set the tolerance to a fraction of the equatorial radius, a
-        double tolerance = 3E-8 * a;
-
-        // Main iteration loop
-        // Loop from g1 to gm stepping by angles of dalpha until intersection is found
-        while(!done) {
-          if (d > dm) {
-            p_hasIntersection = false;
-            return p_hasIntersection;
-          }
-          it = 0;
-
-          // Calculate the angle between the look vector and the planet radius at the current
-          // test point
-          double psi2 = psi1 + dalpha;
-
-          // Calculate the step size
-          double dd = g1len * sin(dalpha) / sin(PI-psi2);
-
-          // JAA:  If we are moving along the vector at a smaller increment than the pixel
-          // tolerance we will be in an infinite loop.  The infinite loop is elimnated by
-          // this test.  Now the algorithm produces a jagged limb in phocube.  This may
-          // be a function of the very low resolution of the Vesta DEM and could
-          // improve in the future
-          if(dd < tolerance) {
-            p_hasIntersection = false;
-            return p_hasIntersection;
-          }
-
-          // Calculate the vector to the current test point from the planet center
-          d = d + dd;
-          SpiceDouble g2[3];
-          g2[0] = observer[0] + d * ulookB[0];
-          g2[1] = observer[1] + d * ulookB[1];
-          g2[2] = observer[2] + d * ulookB[2];
-          double g2len = vnorm_c(g2);
-
-          // Determine lat,lon,radius at this point
-          SpiceDouble g2lat, g2lon, g2radius;
-          reclat_c(g2,&g2radius,&g2lon,&g2lat);
-          g2lat *= 180.0 / Isis::PI;
-          g2lon *= 180.0 / Isis::PI;
-          if (g2lon < 0.0) g2lon += 360.0;
-          double r2 = DemRadius(g2lat,g2lon);
-          if (Isis::IsSpecial(r2)) {
-            p_hasIntersection = false;
-            return p_hasIntersection;
-          }
-
-          // Test for intersection
-          if (r2 > g2len) {
-            // An intersection has occurred. Interpolate between g1 and g2 to get the
-            // lat,lon of the intersect point.
-
-            // If g1 and g2 straddle a hill, then we may need to iterate a few times
-            // until we are on the linear segment.
-            while (it < maxit && !done) {
-              // Calculate the fractional distance "v" to move along the look vector
-              // to the intersection point. Check to see if there was a convergence
-              // of the solution and the tolerance was too small to detect it.
-              double palt;
-              if ((g2len*r1/r2 - g1len) == 0.0) {
-                p_hasIntersection = true;
-                plen = pradius;
-                palt = 0.0;
-                done = true;
-              } else {
-                double v = (r1-g1len) / (g2len*r1/r2 - g1len);
-                pB[0] = g1[0] + v * dd * ulookB[0];
-                pB[1] = g1[1] + v * dd * ulookB[1];
-                pB[2] = g1[2] + v * dd * ulookB[2];
-                plen = vnorm_c(pB);
-                reclat_c(pB,&pradius,&plon,&plat);
-                plat *= 180.0 / Isis::PI;
-                plon *= 180.0 / Isis::PI;
-                if (plon < 0.0) plon += 360.0;
-                if (plon > 360.0) plon -= 360.0;
-                pradius = DemRadius(plat,plon);
-                if (Isis::IsSpecial(pradius)) {
-                  p_hasIntersection = false;
-                  return p_hasIntersection;
-                }
-                palt = plen - pradius;
-
-                // The altitude relative to surface is +ve at the observation point,
-                // so reset g1=p and r1=pradius
-                if (palt > tolerance) {
-                  it = it + 1;
-                  g1[0] = pB[0];
-                  g1[1] = pB[1];
-                  g1[2] = pB[2];
-                  g1len = plen;
-                  r1 = pradius;
-                  dd = dd * (1.0 - v);
-
-                // The altitude relative to surface -ve at the observation point,
-                // so reset g2=p and r2=pradius
-                } else if (palt < -tolerance) {
-                  it = it + 1;
-                  g2[0] = pB[0];
-                  g2[1] = pB[1];
-                  g2[2] = pB[2];
-                  g2len = plen;
-                  r2 = pradius;
-                  dd = dd * v;
-
-                // We are within the tolerance, so the solution has converged
-                } else {
-                  p_hasIntersection = true;
-                  plen = pradius;
-                  palt = 0.0;
-                  done = true;
-                }
-              }
-              if (!done && it >= maxit) {
-                p_hasIntersection = false;
-                return p_hasIntersection;
-              }
-            }
-          }
-          g1[0] = g2[0];
-          g1[1] = g2[1];
-          g1[2] = g2[2];
-          g1len = g2len;
-          r1 = r2;
-          psi1 = psi2;
-
-          // TODO:  Examine how dalpha is computed at the limb for Vesta.  It
-          // appears that eventually it gets really small and causes the loop
-          // to be neverending.  Of course this could be happening for other
-          // limb images and we just have never tested the code.  For example,
-          // Messenger with a DEM could cause the problem.  As a result JAA
-          // put in a test (above) for dd being smaller than the pixel
-          // convergence tolerance.  If so the loop exits without an
-          // intersection
-          dalpha = MAX(cos(g2lat*(PI/180.0)),cmin) / (2.0*p_demScale*(PI/180.0));
-        }
-
-        SpiceDouble intersectionPoint[3];
-        surfpt_c((SpiceDouble *)&sB[0], p_lookB, plen, plen, plen,
-                  intersectionPoint, &found);
-
-        p_surfacePoint->FromNaifArray(intersectionPoint);
-
-        if(!found) {
-          p_hasIntersection = false;
-          return p_hasIntersection;
-        }
-      } else {
-        return p_hasIntersection;
-      }
-    }
-
-    p_hasIntersection = true;
-    return p_hasIntersection;
+    // double tolerance = Resolution() / 100.0;
+    // return target()->shape()->intersectSurface(sB, lookB, tolerance);
+    return target()->shape()->intersectSurface(sB, lookB);
   }
+
+  /**
+   * Returns if the last call to either SetLookDirection or
+   * SetUniversalGround had a valid intersection with the target. If so then
+   * other methods such as Coordinate, UniversalLatitude, UniversalLongitude,
+   * etc can be used with confidence.
+   *
+   * @return @b bool True if the look direction intersects with the
+   *         target.
+   */
+  bool Sensor::HasSurfaceIntersection() const {
+    return target()->shape()->hasIntersection();
+  }
+
 
   /**
    * Returns the x,y,z of the surface intersection in BodyFixed km.
@@ -591,39 +188,42 @@ namespace Isis {
    * @param p[] The coordinate of the surface intersection
    */
   void Sensor::Coordinate(double p[3]) const {
-    p[0] = p_surfacePoint->GetX().kilometers();
-    p[1] = p_surfacePoint->GetY().kilometers();
-    p[2] = p_surfacePoint->GetZ().kilometers();
+    ShapeModel *shape = target()->shape();
+    p[0] = shape->surfaceIntersection()->GetX().kilometers();
+    p[1] = shape->surfaceIntersection()->GetY().kilometers();
+    p[2] = shape->surfaceIntersection()->GetZ().kilometers();
   }
 
 
   double Sensor::UniversalLatitude() const {
-    return p_surfacePoint->GetLatitude().degrees();
+    return target()->shape()->surfaceIntersection()->GetLatitude().degrees();
   }
 
 
   Latitude Sensor::GetLatitude() const {
-    return p_surfacePoint->GetLatitude();
+    return target()->shape()->surfaceIntersection()->GetLatitude();
   }
 
 
   double Sensor::UniversalLongitude() const {
-    return p_surfacePoint->GetLongitude().degrees();
+    return target()->shape()->surfaceIntersection()->GetLongitude().degrees();
   }
 
 
   Longitude Sensor::GetLongitude() const {
-    return p_surfacePoint->GetLongitude();
+    return target()->shape()->surfaceIntersection()->GetLongitude();
   }
 
 
   SurfacePoint Sensor::GetSurfacePoint() const {
-    return *p_surfacePoint;
+    return *(target()->shape()->surfaceIntersection());
   }
 
 
   Distance Sensor::LocalRadius() const {
-    return p_surfacePoint->GetLocalRadius();
+    //TODO: We probably need to be validating surface intersect point is not NULL
+    // Here? or in ShapeModel? or what, man?
+    return target()->shape()->surfaceIntersection()->GetLocalRadius();
   }
 
 
@@ -636,7 +236,7 @@ namespace Isis {
    *          lat,lon in meters
    */
   Distance Sensor::LocalRadius(Latitude lat, Longitude lon) {
-    return LocalRadius(lat.degrees(), lon.degrees());
+    return target()->shape()->localRadius(lat, lon); 
   }
 
 
@@ -649,22 +249,8 @@ namespace Isis {
     *          lat,lon in meters
     */
   Distance Sensor::LocalRadius(double lat, double lon) {
-    if(p_hasElevationModel) {
-      return DemRadius(Latitude(lat, Angle::Degrees),
-                       Longitude(lon, Angle::Degrees));
-    }
-
-    double a = p_radii[0].kilometers();
-    double b = p_radii[1].kilometers();
-    double c = p_radii[2].kilometers();
-    double rlat = Angle(lat, Angle::Degrees).radians();
-    double rlon = Angle(lon, Angle::Degrees).radians();
-    double xyradius = a * b / sqrt(pow(b * cos(rlon), 2) +
-                      pow(a * sin(rlon), 2));
-    const double &radius = xyradius * c / sqrt(pow(c * cos(rlat), 2) +
-                           pow(xyradius * sin(rlat), 2));
-
-    return Distance(radius, Distance::Kilometers);
+    return target()->shape()->localRadius(Latitude(lat, Angle::Degrees),
+                                Longitude(lon, Angle::Degrees));
   }
 
   /**
@@ -673,58 +259,22 @@ namespace Isis {
    * @return @b double Phase angle, in degrees.
    */
   double Sensor::PhaseAngle() const {
-    SpiceDouble psB[3], upsB[3], dist;
-    std::vector<double> sB = bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate());
-
-    SpiceDouble pB[3];
-    pB[0] = p_surfacePoint->GetX().kilometers();
-    pB[1] = p_surfacePoint->GetY().kilometers();
-    pB[2] = p_surfacePoint->GetZ().kilometers();
-    vsub_c((SpiceDouble *) &sB[0], pB, psB);
-    unorm_c(psB, upsB, &dist);
-
-    SpiceDouble puB[3], upuB[3];
-    vsub_c(p_uB, pB, puB);
-    unorm_c(puB, upuB, &dist);
-
-    double angle = vdot_c(upsB, upuB);
-    if(angle > 1.0) return 0.0;
-    if(angle < -1.0) return 180.0;
-    return acos(angle) * 180.0 / PI;
+    std::vector<double> sunB(m_uB, m_uB+3);
+    return target()->shape()->phaseAngle(
+                               bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate()), sunB);
   }
 
+
   /**
-   * Returns the emission angle in degrees. This does not use the surface model.
+   * Returns the emission angle in degrees.
    *
    * @return @b double Emission angle, in degrees.
    */
   double Sensor::EmissionAngle() const {
-    return EmissionAngle(
+    return target()->shape()->emissionAngle(
         bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate()));
   }
 
-  /**
-   * Returns the emission angle in degrees. This does not use the surface model.
-   *
-   * @return double
-   */
-  double Sensor::EmissionAngle(const std::vector<double> & sB) const {
-    SpiceDouble psB[3], upsB[3], upB[3], dist;
-
-    SpiceDouble pB[3];
-    pB[0] = p_surfacePoint->GetX().kilometers();
-    pB[1] = p_surfacePoint->GetY().kilometers();
-    pB[2] = p_surfacePoint->GetZ().kilometers();
-
-    vsub_c((ConstSpiceDouble *) &sB[0], pB, psB);
-    unorm_c(psB, upsB, &dist);
-    unorm_c(pB, upB, &dist);
-
-    double angle = vdot_c(upB, upsB);
-    if(angle > 1.0) return 0.0;
-    if(angle < -1.0) return 180.0;
-    return acos(angle) * 180.0 / PI;
-  }
 
   /**
    * Returns the incidence angle in degrees. This does not use the surface model.
@@ -732,21 +282,8 @@ namespace Isis {
    * @return @b double Incidence angle, in degrees.
    */
   double Sensor::IncidenceAngle() const {
-    SpiceDouble puB[3], upuB[3], upB[3], dist;
-
-    SpiceDouble pB[3];
-    pB[0] = p_surfacePoint->GetX().kilometers();
-    pB[1] = p_surfacePoint->GetY().kilometers();
-    pB[2] = p_surfacePoint->GetZ().kilometers();
-
-    vsub_c(p_uB, pB, puB);
-    unorm_c(puB, upuB, &dist);
-    unorm_c(pB, upB, &dist);
-
-    double angle = vdot_c(upB, upuB);
-    if(angle > 1.0) return 0.0;
-    if(angle < -1.0) return 180.0;
-    return acos(angle) * 180.0 / PI;
+    std::vector<double> sunB(m_uB, m_uB+3);
+    return target()->shape()->incidenceAngle(sunB);
   }
 
   /**
@@ -766,22 +303,19 @@ namespace Isis {
    */
   bool Sensor::SetUniversalGround(const double latitude,
                                   const double longitude, bool backCheck) {
+
+    ShapeModel *shape = target()->shape();
+    shape->clearSurfacePoint();
+
     // Can't intersect the sky
-    if(isSky()) {
-      p_hasIntersection = false;
-      return p_hasIntersection;
+    if (target()->isSky()) {
+      return false;
     }
 
     // Load the latitude/longitude
     Latitude lat(latitude, Angle::Degrees);
     Longitude lon(longitude, Angle::Degrees);
-    p_surfacePoint->SetSpherical(lat, lon, LocalRadius(lat, lon));
-
-    if(!p_surfacePoint->Valid()) {
-      p_hasIntersection = false;
-      return p_hasIntersection;
-    }
-
+    shape->surfaceIntersection()->SetSpherical(lat, lon, LocalRadius(lat, lon));
     return SetGroundLocal(backCheck);
   }
 
@@ -804,16 +338,19 @@ namespace Isis {
   bool Sensor::SetUniversalGround(const double latitude,
                                   const double longitude,
                                   const double radius, bool backCheck) {
-    // Can't intersect the sky
-    if(isSky()) {
-      p_hasIntersection = false;
-      return p_hasIntersection;
+
+    ShapeModel *shape = target()->shape();
+    shape->clearSurfacePoint();
+
+   // Can't intersect the sky
+    if (target()->isSky()) {
+      return false;
     }
 
     Latitude lat(latitude, Angle::Degrees);
     Longitude lon(longitude, Angle::Degrees);
     Distance rad(radius, Distance::Meters);
-    p_surfacePoint->SetSpherical(lat, lon, rad);
+    shape->surfaceIntersection()->SetSpherical(lat, lon, rad);
 
     return SetGroundLocal(backCheck);
   }
@@ -833,13 +370,15 @@ namespace Isis {
    * @return bool
    */
   bool Sensor::SetGround(const SurfacePoint &surfacePt, bool backCheck) {
+    ShapeModel *shape = target()->shape();
+    shape->clearSurfacePoint();
+
     // Can't intersect the sky
-    if(isSky()) {
-      p_hasIntersection = false;
-      return p_hasIntersection;
+    if (target()->isSky()) {
+      return false;
     }
 
-    *p_surfacePoint = surfacePt;
+    shape->setSurfacePoint(surfacePt);
 
     return SetGroundLocal(backCheck);
   }
@@ -857,8 +396,14 @@ namespace Isis {
   * @return bool True if the look direction intersects the target.
   */
   bool Sensor::SetGroundLocal(bool backCheck) {
+    ShapeModel *shape = target()->shape();
     // With the 3 spherical value compute the x/y/z coordinate
-    //latrec_c(p_radius, (p_longitude * PI / 180.0), (p_latitude * PI / 180.0), p_pB);
+    //latrec_c(m_radius, (m_longitude * PI / 180.0), (m_latitude * PI / 180.0), m_pB);
+
+
+    if (!(shape->surfaceIntersection()->Valid())) {
+      return false;
+    }
 
     // Make sure the point isn't on the backside of the body
 
@@ -867,22 +412,27 @@ namespace Isis {
     const vector<double> &sB =
         bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate());
 
-    p_lookB[0] = p_surfacePoint->GetX().kilometers() - sB[0];
-    p_lookB[1] = p_surfacePoint->GetY().kilometers() - sB[1];
-    p_lookB[2] = p_surfacePoint->GetZ().kilometers() - sB[2];
-    p_newLookB = true;
+    m_lookB[0] = shape->surfaceIntersection()->GetX().kilometers() - sB[0];
+    m_lookB[1] = shape->surfaceIntersection()->GetY().kilometers() - sB[1];
+    m_lookB[2] = shape->surfaceIntersection()->GetZ().kilometers() - sB[2];
+    m_newLookB = true;
 
     // See if the point is on the backside of the target
-    if(backCheck) {
-      if(fabs(EmissionAngle(sB)) > 90.) {
-        p_hasIntersection = false;
-        return p_hasIntersection;
+
+    if (backCheck) {
+      // Assume the intersection point is good in order to get the emission angle
+      shape->setHasIntersection(true);
+      if (fabs(shape->emissionAngle(sB)) > 90.) {
+        shape->clearSurfacePoint();
+        shape->setHasIntersection(false);
+        return false;
       }
     }
 
     // return with success
-    p_hasIntersection = true;
-    return p_hasIntersection;
+    shape->setHasIntersection(true);
+    
+    return true;
   }
 
 
@@ -894,9 +444,9 @@ namespace Isis {
   */
   void Sensor::LookDirection(double v[3]) const {
     vector<double> lookB(3);
-    lookB[0] = p_lookB[0];
-    lookB[1] = p_lookB[1];
-    lookB[2] = p_lookB[2];
+    lookB[0] = m_lookB[0];
+    lookB[1] = m_lookB[1];
+    lookB[2] = m_lookB[2];
     vector<double> lookJ = bodyRotation()->J2000Vector(lookB);
     vector<double> lookC = instrumentRotation()->ReferenceVector(lookJ);
     v[0] = lookC[0];
@@ -908,8 +458,8 @@ namespace Isis {
    * Returns the right ascension angle (sky longitude)
    */
   double Sensor::RightAscension() {
-    if(p_newLookB) computeRaDec();
-    return p_ra;
+    if(m_newLookB) computeRaDec();
+    return m_ra;
   }
 
   /**
@@ -917,25 +467,25 @@ namespace Isis {
    * @return @b double Declination angle.
    */
   double Sensor::Declination() {
-    if(p_newLookB) computeRaDec();
-    return p_dec;
+    if(m_newLookB) computeRaDec();
+    return m_dec;
   }
 
   /**
    * Protected method which computes the ra/dec of the current look direction
    */
   void Sensor::computeRaDec() {
-    p_newLookB = false;
+    m_newLookB = false;
     vector<double> lookB(3);
-    lookB[0] = p_lookB[0];
-    lookB[1] = p_lookB[1];
-    lookB[2] = p_lookB[2];
+    lookB[0] = m_lookB[0];
+    lookB[1] = m_lookB[1];
+    lookB[2] = m_lookB[2];
     vector<double> lookJ = bodyRotation()->J2000Vector(lookB);;
 
     SpiceDouble range;
-    recrad_c((SpiceDouble *)&lookJ[0], &range, &p_ra, &p_dec);
-    p_ra *= 180.0 / PI;
-    p_dec *= 180.0 / PI;
+    recrad_c((SpiceDouble *)&lookJ[0], &range, &m_ra, &m_dec);
+    m_ra *= 180.0 / PI;
+    m_dec *= 180.0 / PI;
   }
 
   /**
@@ -961,9 +511,9 @@ namespace Isis {
    * @author 2011-12-20 Tracie Sucharski
    */
   void Sensor::SpacecraftSurfaceVector(double scSurfaceVector[3]) const {
-    scSurfaceVector[0] = p_lookB[0];
-    scSurfaceVector[1] = p_lookB[1];
-    scSurfaceVector[2] = p_lookB[2];
+    scSurfaceVector[0] = m_lookB[0];
+    scSurfaceVector[1] = m_lookB[1];
+    scSurfaceVector[2] = m_lookB[2];
   }
 
 
@@ -979,9 +529,10 @@ namespace Isis {
     std::vector<double> sB = bodyRotation()->ReferenceVector(instrumentPosition()->Coordinate());
 
     SpiceDouble pB[3];
-    pB[0] = p_surfacePoint->GetX().kilometers();
-    pB[1] = p_surfacePoint->GetY().kilometers();
-    pB[2] = p_surfacePoint->GetZ().kilometers();
+    ShapeModel *shape = target()->shape();
+    pB[0] = shape->surfaceIntersection()->GetX().kilometers();
+    pB[1] = shape->surfaceIntersection()->GetY().kilometers();
+    pB[2] = shape->surfaceIntersection()->GetZ().kilometers();
 
     vsub_c(pB, (SpiceDouble *) &sB[0], psB);
     unorm_c(psB, upsB, &dist);
@@ -1013,15 +564,17 @@ namespace Isis {
     Spice::sunPosition(sB);
 
     // Calc the change
-    double xChange = sB[0] - p_surfacePoint->GetX().kilometers();
-    double yChange = sB[1] - p_surfacePoint->GetY().kilometers();
-    double zChange = sB[2] - p_surfacePoint->GetZ().kilometers();
+    ShapeModel *shape = target()->shape();
+    double xChange = sB[0] - shape->surfaceIntersection()->GetX().kilometers();
+    double yChange = sB[1] - shape->surfaceIntersection()->GetY().kilometers();
+    double zChange = sB[2] - shape->surfaceIntersection()->GetZ().kilometers();
 
     // Calc the distance and convert to AU
-    double dist = sqrt(pow(xChange, 2) + pow(yChange, 2) + pow(zChange, 2));
+    double dist = sqrt(xChange*xChange + yChange*yChange + zChange*zChange);
     dist /= 149597870.691;
     return dist;
   }
+
 
   /**
    * Returns the distance from the spacecraft to the subspacecraft point in km.
@@ -1052,7 +605,7 @@ namespace Isis {
     double zChange = spB[2] - ssB[2];
 
     // Calc the distance
-    double dist = sqrt(pow(xChange, 2) + pow(yChange, 2) + pow(zChange, 2));
+    double dist = sqrt(xChange*xChange + yChange*yChange + zChange*zChange);
     return dist;
   }
 
@@ -1062,9 +615,9 @@ namespace Isis {
 
    * @return @b double Local radius from the DEM
    */
-  Distance Sensor::DemRadius(const SurfacePoint &pt) {
-    return DemRadius(pt.GetLatitude(), pt.GetLongitude());
-  }
+//  Distance Sensor::DemRadius(const SurfacePoint &pt) {
+//    return DemRadius(pt.GetLatitude(), pt.GetLongitude());
+//  }
 
 
   /**
@@ -1073,24 +626,26 @@ namespace Isis {
    * @param lon Longitude
    * @return @b double Local radius from the DEM
    */
-  Distance Sensor::DemRadius(const Latitude &lat, const Longitude &lon) {
-    if(!p_hasElevationModel) return Distance();
-    if(!lat.isValid() || !lon.isValid()) return Distance();
-    p_demProj->SetUniversalGround(lat.degrees(), lon.degrees());
-    if(!p_demProj->IsGood()) {
-      return Distance();
-    }
+//  Distance Sensor::DemRadius(const Latitude &lat, const Longitude &lon) {
+//    if(!m_hasElevationModel) return Distance();
+//    //if(!lat.Valid() || !lon.Valid()) return Distance();
+//    m_demProj->SetUniversalGround(lat.degrees(), lon.degrees());
+//    if(!m_demProj->IsGood()) {
+//      return Distance();
+//    }
 
-    p_portal->SetPosition(p_demProj->WorldX(), p_demProj->WorldY(), 1);
+//    m_portal->SetPosition(m_demProj->WorldX(), m_demProj->WorldY(), 1);
 
-    p_demCube->read(*p_portal);
+//    m_demCube->read(*m_portal);
 
-    const double &radius = p_interp->Interpolate(p_demProj->WorldX(),
-                                                 p_demProj->WorldY(),
-                                                 p_portal->DoubleBuffer());
+//    const double &radius = m_interp->Interpolate(m_demProj->WorldX(),
+//                                                 m_demProj->WorldY(),
+//                                                 m_portal->DoubleBuffer());
 
-    return Distance(radius, Distance::Meters);
-  }
+//    return Distance(radius, Distance::Meters);
+//      Distance fred;
+//      return fred;
+//  }
 
 
   /**
@@ -1103,22 +658,24 @@ namespace Isis {
    *
    * @returns A radius in kilometers
    */
-  double Sensor::DemRadius(double lat, double lon) {
-    if(!p_demProj->SetUniversalGround(lat, lon)) {
-      return Isis::Null;
-    }
+//  double Sensor::DemRadius(double lat, double lon) {
+//    if(!m_demProj->SetUniversalGround(lat, lon)) {
+//      return Isis::Null;
+//    }
 
-    p_portal->SetPosition(p_demProj->WorldX(), p_demProj->WorldY(), 1);
-    p_demCube->read(*p_portal);
+//    m_portal->SetPosition(m_demProj->WorldX(), m_demProj->WorldY(), 1);
+//    m_demCube->read(*m_portal);
 
-    double radius = p_interp->Interpolate(p_demProj->WorldX(),
-                                          p_demProj->WorldY(),
-                                          p_portal->DoubleBuffer());
-    if(Isis::IsSpecial(radius)) {
-      return Isis::Null;
-    }
+//    double radius = m_interp->Interpolate(m_demProj->WorldX(),
+//                                          m_demProj->WorldY(),
+//                                          m_portal->DoubleBuffer());
+//    if(Isis::IsSpecial(radius)) {
+//      return Isis::Null;
+//    }
 
-    return radius / 1000.0;
-  }
+//    return radius / 1000.0;
+//      double fred;
+//      return fred;
+//  }
 
 }

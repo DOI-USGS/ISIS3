@@ -28,6 +28,7 @@
 #include "SurfacePoint.h"
 #include "Latitude.h"
 #include "Longitude.h"
+#include "Target.h"
 
 using namespace std;
 
@@ -132,7 +133,7 @@ namespace Isis {
     pB[2] = point.GetZ().kilometers();
 
     // Check for Sky images
-    if(p_camera->isSky()) {
+    if(p_camera->target()->isSky()) {
       return false;
     }
 

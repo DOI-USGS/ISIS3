@@ -36,6 +36,7 @@
 #include "SerialNumber.h"
 #include "Stereo.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 #include "ToolPad.h"
 #include "UniversalGroundMap.h"
 
@@ -633,9 +634,9 @@ namespace Isis {
       //  If cubes set, make sure they have an elevation model
       if (m_leftCube) {
         m_leftCube->getCamera()->IgnoreElevationModel(false);
-        if (!m_leftCube->getCamera()->HasElevationModel()) {
+        if (m_leftCube->getCamera()->target()->shape()->name() == "Ellipsoid") {
         QString message = "No valid Dem on cube.  Run <i>spicinit</i> using a "
-           "shape model.  The local radius will default back to the ellipsoid.";
+           "dem shape model.  The local radius will default back to the ellipsoid.";
         QMessageBox::warning(m_stereoTool, "Warning", message);
         m_radiusBox->setCurrentIndex(0);
 
@@ -703,7 +704,7 @@ namespace Isis {
     //  as the current control net.
     if (m_controlNet) {
       if (m_controlNet->GetTarget() !=
-          m_linkedViewports.at(0)->cube()->getCamera()->target()) {
+          m_linkedViewports.at(0)->cube()->getCamera()->target()->name()) {
         //  Allow opportunity to save current data before clearing for new
         //  target.
         QString message = "You have changed targets.  All data must be re-set";
@@ -720,14 +721,14 @@ namespace Isis {
         clearNetData();
         m_controlNet = new ControlNet();
         m_controlNet->SetTarget(
-                        m_linkedViewports.at(0)->cube()->getCamera()->target());
+                                m_linkedViewports.at(0)->cube()->getCamera()->target()->name());
         m_serialNumberList = new SerialNumberList(false);
       }
     }
     else {
       m_controlNet = new ControlNet();
       m_controlNet->SetTarget(
-                       m_linkedViewports.at(0)->cube()->getCamera()->target());
+                              m_linkedViewports.at(0)->cube()->getCamera()->target()->name());
       m_serialNumberList = new SerialNumberList(false);
     }
 
@@ -1471,8 +1472,8 @@ namespace Isis {
       leftCamera->IgnoreElevationModel(false);
       leftCamera->SetImage((*point)[Left]->GetSample(),
                            (*point)[Left]->GetLine());
-      m_baseRadius = leftCamera->DemRadius(leftCamera->GetLatitude(),
-                                           leftCamera->GetLongitude());
+      m_baseRadius = leftCamera->LocalRadius(leftCamera->GetLatitude(),
+                                             leftCamera->GetLongitude());
       if (!m_baseRadius.isValid()) {
         QString message = "Invalid Dem radius, defaulting to ellipsoidal.";
         QMessageBox::warning(m_stereoTool, "Invalid Dem radius", message);
@@ -1758,7 +1759,7 @@ namespace Isis {
           if (m_radiusBox->currentText() == "DEM Radius") {
             shortCube->getCamera()->IgnoreElevationModel(false);
             shortCube->getCamera()->SetImage(shortSamp, shortLine);
-            m_baseRadius = shortCube->getCamera()->DemRadius(
+            m_baseRadius = shortCube->getCamera()->LocalRadius(
                                   shortCube->getCamera()->GetLatitude(),
                                   shortCube->getCamera()->GetLongitude());
             if (!m_baseRadius.isValid()) {

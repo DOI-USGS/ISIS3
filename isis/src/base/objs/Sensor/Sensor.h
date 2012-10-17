@@ -30,10 +30,13 @@
 
 namespace Isis {
   class Distance;
+  class EllipsoidShape;
   class iTime;
   class Latitude;
   class Longitude;
+  class ShapeModel;
   class SurfacePoint;
+  class Target;
 
   /**
    * @brief Class for computing sensor ground coordinates
@@ -109,7 +112,7 @@ namespace Isis {
    *   @history 2007-05-18 Jeff Anderson - Modify SpacecraftAltitude method
    *                                       to use DEM
    *   @history 2007-06-11 Debbie A. Cook - Added alternative  method that includes radius
-   *   @history 2007-08-24 Debbie A. Cook - Replaced references to p_sB since it was removed from Spice
+   *   @history 2007-08-24 Debbie A. Cook - Replaced references to m_sB since it was removed from Spice
    *   @history 2007-11-27 Debbie A. Cook - Added overloaded method SetUniversalGround(lat, lon, radius)
    *   @history 2008-05-21 Steven Lambright - CubeManager is now used to speed up DEM Cube I/O
    *   @history 2008-06-18 Debbie A. Cook - Made DemRadius radius public instead of private and added
@@ -171,8 +174,12 @@ namespace Isis {
    *   @history 2012-05-04 Steven Lambright - Re-enabled a safety check in the DemRadius() method
    *                           which was needed due to Projection not uniformly handling Null
    *                           inputs. Fixes #807.
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *   @history 2012-07-06 Debbie A. Cook - Updated Spice members to be more compliant with Isis 
    *                          coding standards. References #972.
+   *   @history 2012-10-10 Debbie A. Cook - Moved the functionality related to the shape model into 
+   *                          new classes:  ShapeModel, EllipsoidShape, DemShape, and 
+   *                          EquatorialCylindricalShape.  Also modified to use new Target class.  References 
+   *                          #775 and #1114
    */
   class Sensor : public Spice {
     public:
@@ -188,20 +195,7 @@ namespace Isis {
       bool SetUniversalGround(const double latitude, const double longitude,
                               const double radius, bool backCheck = true);
       bool SetGround(const SurfacePoint &surfacePt, bool backCheck = true);
-
-      /**
-       * Returns if the last call to either SetLookDirection or
-       * SetUniversalGround had a valid intersection with the target. If so then
-       * other methods such as Coordinate, UniversalLatitude, UniversalLongitude,
-       * etc can be used with confidence.
-       *
-       * @return @b bool True if the look direction intersects with the
-       *         target.
-       */
-      inline bool HasSurfaceIntersection() const {
-        return p_hasIntersection;
-      };
-
+      bool HasSurfaceIntersection() const;
       void Coordinate(double p[3]) const;
 
       /**
@@ -261,8 +255,8 @@ namespace Isis {
       double SpacecraftAltitude();
 
       //! Return local radius from dem
-      Distance DemRadius(const SurfacePoint &pt);
-      Distance DemRadius(const Latitude &lat, const Longitude &lon);
+ //     Distance DemRadius(const SurfacePoint &pt);
+ //     Distance DemRadius(const Latitude &lat, const Longitude &lon);
 
       /**
        * Indicates whether the Kernels PvlGroup has an ElevationModel or
@@ -270,9 +264,9 @@ namespace Isis {
        *
        * @return @b bool True if an elevation model exists.
        */
-      bool HasElevationModel() {
-        return p_hasElevationModel;
-      };
+   //   bool HasElevationModel() {
+   //     return m_hasElevationModel;
+   //   };
 
       /**
        * Virtual method that returns the pixel resolution of the sensor in
@@ -283,39 +277,21 @@ namespace Isis {
       virtual double Resolution() {
         return 1.0;
       };
-
       void IgnoreElevationModel(bool ignore);
-
-    protected:
-      bool p_hasIntersection; /**< This indicates if the surface point or look
-                                  direction is valid. It is made protected so
-                                  inheriting classes can change it if
-                                  necessary.*/
-      Cube *p_demCube;         //!< The cube containing the model
-      SurfacePoint *p_surfacePoint; //!< Surface intersection point
 
     private:
       //! This version of DemRadius is for SetLookDirection ONLY. Do not call.
-      double DemRadius(double lat, double lon);
-      double EmissionAngle(const std::vector<double> & sB) const;
+      //DAC TODO Why is next declaration here? Don't move until I know
+//      double DemRadius(double lat, double lon);
       void CommonInitialize(const std::string &demCube);
 
-      SpiceDouble p_lookB[3];  //!< Look direction in body fixed
+      SpiceDouble m_lookB[3];  //!< Look direction in body fixed
 
-      bool p_newLookB;      //!< flag to indicate we need to recompute ra/dec
-      SpiceDouble p_ra;     //!< Right ascension (sky longitude)
-      SpiceDouble p_dec;    //!< Decliation (sky latitude)
+      bool m_newLookB;      //!< flag to indicate we need to recompute ra/dec
+      SpiceDouble m_ra;     //!< Right ascension (sky longitude)
+      SpiceDouble m_dec;    //!< Decliation (sky latitude)
       void computeRaDec();  //!< Computes the ra/dec from the look direction
-
-      bool p_hasElevationModel;     //!< Does sensor use an elevation model
-      Projection *p_demProj;  //!< The projection of the model
-      Portal *p_portal;       //!< Buffer used to read from the model
-      Interpolator *p_interp; //!< Use bilinear interpolation from dem
       bool SetGroundLocal(bool backCheck);   //!<Computes look vector
-
-      Distance *p_minRadius;  //!< Minimum radius value in DEM file
-      Distance *p_maxRadius;  //!< Maximum radius value in DEM file
-      double p_demScale;   //!< Scale of DEM file in pixels per degree
   };
 };
 

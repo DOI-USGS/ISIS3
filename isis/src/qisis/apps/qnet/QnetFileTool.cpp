@@ -14,6 +14,7 @@
 #include "QnetFileTool.h"
 #include "SerialNumber.h"
 #include "SerialNumberList.h"
+#include "Target.h"
 #include "Workspace.h"
 
 #include "qnet.h"
@@ -178,7 +179,7 @@ namespace Isis {
       //  Determine target from first file in cube list
       Cube *cube = new Cube;
       cube->open(g_serialNumberList->FileName(0));
-      g_controlNetwork->SetTarget(cube->getCamera()->target());
+      g_controlNetwork->SetTarget(cube->getCamera()->target()->name());
       delete cube;
       cube = NULL;
     }

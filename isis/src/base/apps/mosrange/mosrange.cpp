@@ -9,6 +9,7 @@
 #include "Process.h"
 #include "Pvl.h"
 #include "Statistics.h"
+#include "Target.h"
 
 using namespace std;
 using namespace Isis;
@@ -139,7 +140,7 @@ void IsisMain() {
       eqRad   = radii[0].meters();
       poleRad = radii[2].meters();
 
-      target = cam->target();
+      target = cam->target()->name();
       equiRadStat.AddData(&eqRad, 1);
       poleRadStat.AddData(&poleRad, 1);
 

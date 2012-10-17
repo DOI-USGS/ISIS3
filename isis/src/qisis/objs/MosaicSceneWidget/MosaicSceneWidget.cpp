@@ -42,6 +42,7 @@
 #include "PvlObject.h"
 #include "Pvl.h"
 #include "TextFile.h"
+#include "Target.h"
 #include "ToolPad.h"
 
 namespace Isis {
@@ -226,7 +227,7 @@ namespace Isis {
         Distance radii[3];
         cam->radii(radii);
 
-        mappingGrp += PvlKeyword("TargetName", cam->target());
+        mappingGrp += PvlKeyword("TargetName", cam->target()->name());
         mappingGrp += PvlKeyword("EquatorialRadius", radii[0].meters(),
                                  "meters");
         mappingGrp += PvlKeyword("PolarRadius", radii[2].meters(),

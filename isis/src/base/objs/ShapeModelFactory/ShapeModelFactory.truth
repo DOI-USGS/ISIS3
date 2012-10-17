@@ -1,0 +1,31 @@
+Unit test for Isis::ShapeModel
+
+  Testing ShapeModel keyword...
+    Successfully created shape EquatorialCylindricalShape
+
+  Testing ElevationModel keyword...
+    Successfully created shape EquatorialCylindricalShape
+
+  Testing ElevationModel keyword Null...
+    Successfully created shape Ellipsoid
+
+  Testing Sky target...
+    Shape model is Ellipsoid
+
+  Testing nonexistent file for shape model dem
+**ERROR** Failed opening shape fileNotAFile.
+**ERROR** Shape fileNotAFile does not exist or is not an Isis cube.
+**I/O ERROR** Unable to open [NotAFile].
+
+  Testing Isis cube file for dem that is not map projected
+**ERROR** Failed opening shape file/usgs/cpkgs/isis3/data/mgs/testData/ab102401.cub.
+**USER ERROR** Shape model cube must be an Isis DEM file, meaning it must be map-projected. This cube is NOT map projected.
+
+  Testing a dem that's not equatorial cylindrical
+    Successfully created shape DemShape
+
+  Testing dem shape...
+    Successfully created shape EquatorialCylindricalShape
+
+  Testing ellipsoid shape...
+    Successfully created shape Ellipsoid

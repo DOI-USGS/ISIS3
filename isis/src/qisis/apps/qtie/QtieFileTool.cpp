@@ -24,6 +24,7 @@
 #include "MainWindow.h"
 #include "MdiCubeViewport.h"
 #include "SerialNumber.h"
+#include "Target.h"
 #include "UniversalGroundMap.h"
 #include "Workspace.h"
 
@@ -189,7 +190,7 @@ namespace Isis {
     }
 
     // Find target
-    IString target = matchCube->getCamera()->target();
+    IString target = matchCube->getCamera()->target()->name();
 
     // Find directory and save for use in file dialog for control net
     FileName fname(matchFile.toStdString());
@@ -270,10 +271,10 @@ namespace Isis {
     }
 
     // Make sure targets match
-    if (cnet->GetTarget() != matchCube->getCamera()->target()) {
+    if (cnet->GetTarget() != matchCube->getCamera()->target()->name()) {
       QString message = tr("Control Net target, [%1], is not the same as the cube target, [%2].")
                         .arg(QString(cnet->GetTarget()))
-                        .arg(QString(matchCube->getCamera()->target()));
+        .arg(QString(matchCube->getCamera()->target()->name()));
       QMessageBox::critical((QWidget *)parent(), "Invalid Control Network", message);
       return false;
     }
