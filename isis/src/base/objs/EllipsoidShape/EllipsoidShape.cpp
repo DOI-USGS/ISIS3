@@ -1,15 +1,10 @@
-#include <algorithm>
-#include <cfloat>
-#include <string>
-#include <vector>
-
-#include <cmath>
-#include <iomanip>
-
 #include "EllipsoidShape.h"
+
+#include <QVector>
 
 #include "Distance.h"
 #include "IException.h"
+#include "IString.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "NaifStatus.h"

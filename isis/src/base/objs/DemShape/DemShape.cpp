@@ -1,3 +1,5 @@
+#include "DemShape.h"
+
 #include <string>
 #include <algorithm>
 #include <vector>
@@ -6,9 +8,14 @@
 #include <cmath>
 #include <iomanip>
 
+#include <QVector>
+
+#include <naif/SpiceUsr.h>
+#include <naif/SpiceZfc.h>
+#include <naif/SpiceZmc.h>
+
 #include "Cube.h"
 #include "CubeManager.h"
-#include "DemShape.h"
 #include "EllipsoidShape.h"
 #include "IException.h"
 #include "Interpolator.h"
@@ -19,7 +26,6 @@
 #include "Projection.h"
 #include "Pvl.h"
 #include "SurfacePoint.h"
-//#include "IException.h"
 #include "UniqueIOCachingAlgorithm.h"
 
 using namespace std;
@@ -37,9 +43,6 @@ namespace Isis {
     m_interp = NULL;
     m_portal = NULL;
 
-    // m_samples.resize(4,.0);
-    // m_lines.resize(4,0.);
-
     PvlGroup &kernels = pvl.FindGroup("Kernels", Pvl::Traverse);
 
     IString demCubeFile;
@@ -51,28 +54,25 @@ namespace Isis {
     }
 
     m_demCube = CubeManager::Open(demCubeFile);
-
-//    Isis::PvlGroup &mapGroup = m_demCube->getLabel()->FindGroup("Mapping", Isis::Pvl::Traverse);
-    // std::string proj = mapGroup["ProjectionName"];
  
-     // This caching algorithm works much better for DEMs than the default,
-     //   regional. This is because the uniqueIOCachingAlgorithm keeps track
-     //   of a history, which for something that isn't linearly processing a
-     //   cube is worth it. The regional caching algorithm tosses out results
-     //   from iteration 1 of setlookdirection (first algorithm) at iteration
-     //   4 and the next setimage has to re-read the data.
-      m_demCube->addCachingAlgorithm(new UniqueIOCachingAlgorithm(5));
-      m_demProj = m_demCube->getProjection();
-      m_interp = new Interpolator(Interpolator::BiLinearType);
-      m_portal = new Portal(m_interp->Samples(), m_interp->Lines(),
+    // This caching algorithm works much better for DEMs than the default,
+    //   regional. This is because the uniqueIOCachingAlgorithm keeps track
+    //   of a history, which for something that isn't linearly processing a
+    //   cube is worth it. The regional caching algorithm tosses out results
+    //   from iteration 1 of setlookdirection (first algorithm) at iteration
+    //   4 and the next setimage has to re-read the data.
+    m_demCube->addCachingAlgorithm(new UniqueIOCachingAlgorithm(5));
+    m_demProj = m_demCube->getProjection();
+    m_interp = new Interpolator(Interpolator::BiLinearType);
+    m_portal = new Portal(m_interp->Samples(), m_interp->Lines(),
                             m_demCube->getPixelType(),
                             m_interp->HotSample(), m_interp->HotLine());
 
-      // Read in the Scale of the DEM file in pixels/degree
-      const PvlGroup &mapgrp = m_demCube->getLabel()->FindGroup("Mapping", Pvl::Traverse);
+    // Read in the Scale of the DEM file in pixels/degree
+    const PvlGroup &mapgrp = m_demCube->getLabel()->FindGroup("Mapping", Pvl::Traverse);
 
     // Save map scale in pixels per degree
-      m_pixPerDegree = (double) mapgrp["Scale"];
+    m_pixPerDegree = (double) mapgrp["Scale"];
   }
 
 
@@ -92,27 +92,21 @@ namespace Isis {
 
   //! Destroys the DemShape
   DemShape::~DemShape() {
-    if(m_demProj) {
-      m_demProj = NULL;
-    }
+    m_demProj = NULL;
 
     // We do not have ownership of p_demCube
     m_demCube = NULL;
 
-    if(m_interp) {
-      delete m_interp;
-      m_interp = NULL;
-    }
+    delete m_interp;
+    m_interp = NULL;
 
-    if (m_portal) {
-      delete m_portal;
-      m_portal = NULL;
-    }
+    delete m_portal;
+    m_portal = NULL;
   }
 
 
-  /** Find the intersection point with the DEM
-   *
+  /** 
+   * Find the intersection point with the DEM
    * 
    * TIDBIT:  From the code below we have historically tested to see if we can
    * first intersect the ellipsoid. If not then we assumed that we could not
@@ -169,18 +163,13 @@ namespace Isis {
           newIntersectPt[1] * newIntersectPt[1];
       
       latDD = atan2(newIntersectPt[2], sqrt(t)) * 180.0 / PI;
-      // START DEBUG CODE
-      // latDD = atan2(newIntersectPt[2], sqrt(t)) * RAD2DEG;
       lonDD = atan2(newIntersectPt[1], newIntersectPt[0]) * 180.0 / PI;
-      // END DEBUG CODE
-      // lonDD = atan2(newIntersectPt[1], newIntersectPt[0]) * RAD2DEG;
        
       if (lonDD < 0)
         lonDD += 360;
 
-      // Previous Sensor version used local version of this method with lat and lon doubles. ..Why Jeff??? 
-      // Steven made the change to improve speed.  We will try using the primitives and see what differences
-      // the users notice in their time tests.  
+      // Previous Sensor version used local version of this method with lat and lon doubles. 
+      // Steven made the change to improve speed.  He said the difference was negilgible.  
       Distance radiusKm = localRadius(Latitude(latDD, Angle::Degrees),
                                       Longitude(lonDD, Angle::Degrees));
 
@@ -226,46 +215,49 @@ namespace Isis {
 
 
   /**
-  * Gets the radius from the DEM, if we have one.
-  * @param lat Latitude
-  * @param lon Longitude
-  * @return @b double Local radius from the DEM
-  */
+   * Gets the radius from the DEM, if we have one.
+   * @param lat Latitude
+   * @param lon Longitude
+   * @return @b double Local radius from the DEM
+   */
   Distance DemShape::localRadius(const Latitude &lat, const Longitude &lon) {
     
-    if (!lat.isValid() || !lon.isValid())
-      return Distance();
+    Distance distance=Distance();
+
+    if (lat.isValid() && lon.isValid()) {
+      m_demProj->SetUniversalGround(lat.degrees(), lon.degrees());
     
-    m_demProj->SetUniversalGround(lat.degrees(), lon.degrees());
-    
-    // The next if statement attempts to do the same as the previous one, but not as well 
-    // if (!m_demProj->IsGood())
-    //   return Distance();
+      // The next if statement attempts to do the same as the previous one, but not as well so 
+      // it was replaced.
+      // if (!m_demProj->IsGood())
+      //   return Distance();
 
-    m_portal->SetPosition(m_demProj->WorldX(), m_demProj->WorldY(), 1);
+      m_portal->SetPosition(m_demProj->WorldX(), m_demProj->WorldY(), 1);
 
-    m_demCube->read(*m_portal);
+      m_demCube->read(*m_portal);
 
-    const double &radius = m_interp->Interpolate(m_demProj->WorldX(),
-                                                 m_demProj->WorldY(),
-                                                 m_portal->DoubleBuffer());
+      distance = Distance(m_interp->Interpolate(m_demProj->WorldX(),
+                                                                          m_demProj->WorldY(),
+                                                                          m_portal->DoubleBuffer()),
+                          Distance::Meters);
+    }
 
-    return Distance(radius, Distance::Meters);
+    return distance;
   }
 
 
   /** 
    * Return pixels per degree
    */
-    double DemShape::demScale () {
-      return m_pixPerDegree;
-    }
+  double DemShape::demScale() {
+    return m_pixPerDegree;
+  }
 
 
   /** 
-   * Calculate default normal for the DemShape
+   * Calculate default normal (Ellipsoid for backwards compatability) for the DemShape
    */
-  void DemShape::calculateDefaultNormal()  {
+  void DemShape::calculateDefaultNormal() {
     calculateEllipsoidalSurfaceNormal();
   }
 
@@ -273,7 +265,7 @@ namespace Isis {
   /** 
    * Return the dem Cube object
    */
-  Cube *DemShape::demCube()  {
+  Cube *DemShape::demCube() {
     return m_demCube;
   }
 
@@ -281,7 +273,7 @@ namespace Isis {
   /** 
    * Calculate local normal
    */
-  void DemShape::calculateLocalNormal (QVector<double *> neighborPoints) {
+  void DemShape::calculateLocalNormal(QVector<double *> neighborPoints) {
     // subtract bottom from top and left from right and store results
     double topMinusBottom[3];
     vsub_c(neighborPoints[0], neighborPoints[1], topMinusBottom);
@@ -325,7 +317,7 @@ namespace Isis {
   /** 
    * Calculate surface normal
    */
-  void DemShape::calculateSurfaceNormal()  {
+  void DemShape::calculateSurfaceNormal() {
     calculateEllipsoidalSurfaceNormal();
   }
 

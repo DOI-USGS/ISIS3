@@ -27,7 +27,6 @@
 
 namespace Isis {
   class Pvl;
-  class ShapeModel;
 
   /**
    * This class is used to create ShapeModel objects.  It determines the type
@@ -37,7 +36,6 @@ namespace Isis {
    * @author 2010-07-29 Debbie A. Cook
    *
    * @internal
-   *   @history
    */
   class ShapeModelFactory {
     public:
@@ -63,6 +61,6 @@ namespace Isis {
         Stack,
         NaifDSK};
   };
-};
+}
 
 #endif

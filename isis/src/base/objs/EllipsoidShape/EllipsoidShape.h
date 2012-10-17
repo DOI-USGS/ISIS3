@@ -22,17 +22,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
-#include <vector>
-
-#include <QVector>
-
-#include "naif/SpiceUsr.h"
-#include "naif/SpiceZfc.h"
-#include "naif/SpiceZmc.h"
-
 #include "ShapeModel.h"
-//#include "Pvl.h"
+
+template<class T> class QVector;
 
 namespace Isis {
   class Pvl;

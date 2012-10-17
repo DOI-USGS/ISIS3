@@ -1,3 +1,5 @@
+#include "EquatorialCylindricalShape.h"
+
 #include <algorithm>
 #include <cfloat>
 #include <string>
@@ -5,13 +7,15 @@
 #include <cmath>
 #include <vector>
 
-#include "EquatorialCylindricalShape.h"
+#include <naif/SpiceUsr.h>
+#include <naif/SpiceZfc.h>
+#include <naif/SpiceZmc.h>
+
 #include "Cube.h"
 #include "IException.h"
 #include "Latitude.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
-//#include "SimpShape.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
 #include "Table.h"
@@ -25,7 +29,7 @@ namespace Isis {
    * @param pvl Valid Isis3 cube label.
    */
   EquatorialCylindricalShape::EquatorialCylindricalShape(Target *target, Pvl &pvl) : 
-      DemShape (target, pvl) {
+      DemShape(target, pvl) {
     setName("EquatorialCylindricalShape");
 
     m_minRadius = NULL;
@@ -53,34 +57,27 @@ namespace Isis {
   }
 
 
-  /** destructor
-   *
+  /** 
+   * Destructor for Isis3 Equatorial Cylindrical shape model
    */
   EquatorialCylindricalShape::~EquatorialCylindricalShape() {
     
-    if (m_minRadius) {
-      delete m_minRadius;
-      m_minRadius = NULL;
-    }
+    delete m_minRadius;
+    m_minRadius = NULL;
 
-    if (m_maxRadius) {
-      delete m_minRadius;
-      m_maxRadius = NULL;
-    }
-  };
+    delete m_minRadius;
+    m_maxRadius = NULL;
+   }
 
 
-  /** Find the intersection point
-   *
+  /** 
+   * Find the intersection point
    */
-   bool EquatorialCylindricalShape::intersectSurface
-  (std::vector<double> observerPos, std::vector<double> lookDirection) {
+  bool EquatorialCylindricalShape::intersectSurface(
+         std::vector<double> observerPos, std::vector<double> lookDirection) {
     
-    DemShape::intersectSurface(observerPos, lookDirection);
+    if (!DemShape::intersectSurface(observerPos, lookDirection)) {
 
-    if (!hasIntersection()) {
-
-      // std::vector<Distance> radii = targetRadii();
       SpiceDouble a = targetRadii()[0].kilometers();
       
       double plen=0.0;
@@ -94,8 +91,6 @@ namespace Isis {
       // Separate iteration algorithms are used for different projections -
       // use this iteration for equatorial cylindrical type projections that
       // failed to find an intersection with the DemShape method.
-      // Notify the shape model that we have an intersection so Resolution can be calculated ??? is this needed
-      // setHasIntersection(true);
       int maxit = 100;
       int it = 0;
       bool done = false;
@@ -123,7 +118,7 @@ namespace Isis {
       // direction that the spacecraft is looking
       if (psi0 > PI/2.0) {
         setHasIntersection(false);
-        return false;
+        return hasIntersection();
       }
 
       // Calculate the vector to the tangent point
@@ -162,13 +157,14 @@ namespace Isis {
       //double dalpha = (PI/180.0)/(2.0*p_demScale);
       double dalpha = MAX(cos(g1lat*DEG2RAD),cmin) / (2.0*demScale()*DEG2RAD);
       
-      // Previous Sensor version used local version of this method with lat and lon doubles. ..Why Jeff???
+      // Previous Sensor version used local version of this method with lat and lon doubles.  Steven said
+      // it didn't make a significant difference in speed.
       double r1 = (localRadius(Latitude(g1lat, Angle::Degrees),
                                Longitude(g1lon, Angle::Degrees))).kilometers();
       
       if (Isis::IsSpecial(r1)) {
         setHasIntersection(false);
-        return false;
+        return hasIntersection();
       }
 
       // Set the tolerance to a fraction of the equatorial radius, a
@@ -180,7 +176,7 @@ namespace Isis {
         
         if (d > dm) {
           setHasIntersection(false);
-          return false;
+          return hasIntersection();
         }
 
         it = 0;
@@ -199,7 +195,7 @@ namespace Isis {
         // improve in the future
         if (dd < tolerance) {
           setHasIntersection(false);
-          return false;
+          return hasIntersection();
         }
 
         // Calculate the vector to the current test point from the planet center
@@ -220,14 +216,15 @@ namespace Isis {
         if (g2lon < 0.0)
           g2lon += 360.0;
 
-      // Previous Sensor version used local version of this method with lat and lon doubles. ..Why Jeff???
+        // Previous Sensor version used local version of this method with lat and lon doubles to save
+        // According to Steven the savings was negligible.
         double r2 = (localRadius(Latitude(g2lat, Angle::Degrees),
                                  Longitude(g2lon, Angle::Degrees))).kilometers();
         
 
         if (Isis::IsSpecial(r2)) {
           setHasIntersection(false);
-          return false;
+          return hasIntersection();
         }
 
         // Test for intersection
@@ -269,7 +266,7 @@ namespace Isis {
 
               if (Isis::IsSpecial(pradius)) {
                 setHasIntersection(false);
-                return false;
+                return hasIntersection();
               }
               palt = plen - pradius;
 
@@ -307,7 +304,7 @@ namespace Isis {
             }
             if (!done && it >= maxit) {
               setHasIntersection(false);
-              return false;
+              return hasIntersection();
             }
           }
         }
@@ -339,7 +336,7 @@ namespace Isis {
 
       if (!found) {
         setHasIntersection(false);
-        return false;
+        return hasIntersection();
       }
       else {
         return hasIntersection();

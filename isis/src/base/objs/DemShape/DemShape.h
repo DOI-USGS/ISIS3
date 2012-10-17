@@ -22,16 +22,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
-#include <vector>
-
-#include <QVector>
-
-#include "naif/SpiceUsr.h"
-#include "naif/SpiceZfc.h"
-#include "naif/SpiceZmc.h"
-
 #include "ShapeModel.h"
+
+template<class T> class QVector;
 
 namespace Isis {
   class Cube;
@@ -40,39 +33,37 @@ namespace Isis {
   class Projection;
 
   /**
-   * @brief Define shapes and provide utilities for Isis3 targets
+   * @brief Define shapes and provide utilities for targets stored as Isis3 maps
    *
-   * This class will define shapes of Isis3 target bodies as well as
-   * provide utilities to retrieve radii and photometric information.
-   *
-   *
-   * @ingroup 
+   * This class will define shapes of Isis3 target bodies with the shape defined by an 
+   * Isis 3 map fille (level 2 image), as well as provide utilities to retrieve radii and 
+   * photometric information for the intersection point.
    *
    * @author 2010-07-30 Debbie A. Cook
    *
    * @internal
-   *  @history
    */
   class DemShape : public ShapeModel {
     public:
-      //! Constructor
-      DemShape(Target *target, Isis::Pvl &pvl);
-      //! Constructor
+      // Constructor
+      DemShape(Target *target, Pvl &pvl);
+
+      // Constructor
       DemShape();
 
-      //! Destructor
+      // Destructor
       ~DemShape();
 
-      //! Intersect the shape model
+      // Intersect the shape model
       bool intersectSurface(std::vector<double> observerPos,
                             std::vector<double> lookDirection);
 
       Distance localRadius(const Latitude &lat, const Longitude &lon);
 
-      //! Return dem scale in pixels/degree
+      // Return dem scale in pixels/degree
       double demScale();
 
-      //! Calculate the default normal of the current intersection point
+      // Calculate the default normal of the current intersection point
       virtual void calculateDefaultNormal(); 
 
       // To compute the surface normal, you must call setLocalAreaPoint on top, bottom, left, and 
@@ -87,21 +78,13 @@ namespace Isis {
      Cube *demCube();                 //!< Returns the cube defining the shape model.  
 
     private:
-      Cube *m_demCube;              //!< The cube containing the model  NOTE::  
+      Cube *m_demCube;              //!< The cube containing the model
       Projection *m_demProj;                                     //!< The projection of the model
       double m_pixPerDegree;                                   //!< Scale of DEM file in pixels per degree
       Portal *m_portal;                                               //!< Buffer used to read from the model
       Interpolator *m_interp;                                      //!< Use bilinear interpolation from dem
-
-      // From Sensor.h
-      /* void CommonInitialize(const std::string &demCube); */
-      /* bool p_newLookB;      //!< flag to indicate we need to recompute ra/dec */
-      /* SpiceDouble p_ra;     //!< Right ascension (sky longitude) */
-      /* SpiceDouble p_dec;    //!< Decliation (sky latitude) */
-      /* void computeRaDec();  //!< Computes the ra/dec from the look direction */
-      /* bool SetGroundLocal(bool backCheck);   //!<Computes look vector */
   };
-};
+}
 
 #endif
 

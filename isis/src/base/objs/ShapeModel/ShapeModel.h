@@ -22,122 +22,101 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
 #include <vector>
 
-#include "naif/SpiceUsr.h"
-#include "naif/SpiceZfc.h"
-#include "naif/SpiceZmc.h"
-
-#include <QVector>
-
-//#include "SurfacePoint.h"
-//#include "Pvl.h"
+template<class T> class QVector;
 
 namespace Isis {
   class Distance;
+  class IString;
   class Latitude;
   class Longitude;
   class Pvl;
   class Spice;
   class SurfacePoint;
   class Target;
+
   /**
    * @brief Define shapes and provide utilities for Isis3 targets
    *
-   * This class will define shapes of Isis3 target bodies as well as
+   * This base class will define shapes of Isis3 target bodies as well as
    * provide utilities to retrieve radii and photometric information.
    *
-   *
-   * @ingroup 
    *
    * @author 2010-07-30 Debbie A. Cook
    *
    * @internal
-   *  @history
    */
   class ShapeModel {
     public:
-      //! Constructors
+      // Constructors
       ShapeModel();
       ShapeModel(Target *target, Isis::Pvl &pvl);
       ShapeModel(Target *target);
 
-      //! Initialization
+      // Initialization
       void Initialize();
 
-      //! Destructor -- must be virtual in order to clean up properly because of virtual method below
+      // Destructor -- must be virtual in order to clean up properly because of virtual method below
       virtual ~ShapeModel()=0;
 
-      //! Intersect the shape model
+      // Intersect the shape model
       virtual bool intersectSurface(std::vector<double> observerPos,
                                     std::vector<double> lookDirection)=0;
-      //                                    double tol = 0.)=0;
 
-      //! Return the surface intersection
+      // Return the surface intersection
       SurfacePoint *surfaceIntersection() const;
 
       bool hasIntersection();
       bool hasNormal() const;
 
-      //! Calculate the default normal of the current intersection point
+      // Calculate the default normal of the current intersection point
       virtual void calculateDefaultNormal() = 0; 
 
-      //! Calculate the local normal of the current intersection point (relative to neighbor points)
-      virtual void calculateLocalNormal(QVector<double *> cornerNeighborPoints) = 0; 
+      // Calculate the local normal of the current intersection point (relative to neighbor points)
+      virtual void calculateLocalNormal(QVector<double *> neighborPoints) = 0; 
 
-      //! Calculate the surface normal of the current intersection point (relative to ellipsoid)
+      // Calculate the surface normal of the current intersection point (relative to ellipsoid)
       virtual void calculateSurfaceNormal() = 0; 
 
-      //! Clear current point
+      // Clear current point
       void clearSurfacePoint();
 
-      //! Calculate the emission angle of the current intersection point
+      // Calculate the emission angle of the current intersection point
       virtual double emissionAngle(const std::vector<double> & sB);
 
-      //! Calculate the incidence angle of the current intersection point
+      // Calculate the incidence angle of the current intersection point
       virtual double incidenceAngle(const std::vector<double> &uB);
 
-      //! Calculate the phase angle of the current intersection point
+      // Calculate the phase angle of the current intersection point
       virtual double phaseAngle(const std::vector<double> &sB, const std::vector<double> &uB);
 
-      //! Return local radius from shape model
+      // Return local radius from shape model
       virtual Distance localRadius(const Latitude &lat, const Longitude &lon) = 0;
 
-      //! Get shape name
-      std::string name() const;
+      // Get shape name
+      IString name() const;
 
-      //! Set m_hasIntersection
+      // Set m_hasIntersection
       void setHasIntersection(bool b);
 
-      //! Set tolerance for acceptance in iterative loops
-      //      void setTolerance(const double tol);
-
-      //! Return triaxial target radii from shape model TODO Put this in Target class???
-      //      Distance *targetRadii();
-
-      //! Return the tolerance
-      //      double tolerance();
-
-      //! Set current surface point
+      // Set current surface point
       void setSurfacePoint(const SurfacePoint &surfacePoint);
 
-      //! Return the normal (surface or local) of the current intersection point
+      // Return the normal (surface or local) of the current intersection point
       std::vector<double>  normal();
 
     protected:
 
-      //! Set the normal (surface or local) of the current intersection point
+      // Set the normal (surface or local) of the current intersection point
       void setNormal(const std::vector<double>);
 
-      //! Set shape name
-      void setName(const std::string name);
+      // Set shape name
+      void setName(const IString name);
  
-      //      double *m_tolerance;
-
       void calculateEllipsoidalSurfaceNormal();
 
-      //! Intersect ellipse
+      // Intersect ellipse
       bool intersectEllipsoid(const std::vector<double> observerPosRelativeToTarget,
                               const std::vector<double> &observerLookVectorToTarget);
       std::vector<Distance> targetRadii() const;
@@ -148,10 +127,9 @@ namespace Isis {
       bool m_hasIntersection;       //!< indicates good intersection exists
       bool m_hasNormal;             //!< indicates normal has been computed
       std::vector<double> m_normal; //!< Local normal of current intersection point
-      std::string *m_name;
+      IString *m_name;
       SurfacePoint *m_surfacePoint;        //!< Current intersection point
 
-      // This needs to get reset by cameras???
       Target *m_target;
   };
 };

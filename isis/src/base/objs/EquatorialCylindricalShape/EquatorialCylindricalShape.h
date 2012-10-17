@@ -22,42 +22,31 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
-#include <vector>
-
-#include "naif/SpiceUsr.h"
-#include "naif/SpiceZfc.h"
-#include "naif/SpiceZmc.h"
-
 #include "DemShape.h"
-//#include "SurfacePoint.h"
-//#include "Pvl.h"
 
 namespace Isis {
   class Pvl;
+
   /**
-   * @brief Define shapes and provide utilities for Isis3 targets
+   * @brief Define shapes and provide utilities for shapes stored as Isis3 EquatorialCylindrical map
    *
-   * This class will define shapes of Isis3 target bodies as well as
-   * provide utilities to retrieve radii and photometric information.
-   *
-   *
-   * @ingroup 
+   * This class will define shapes of Isis3 target bodies with the shape defined by an 
+   * EquatorialCylindrical map, as well as provide utilities to retrieve radii and
+   * photometric information for the intersection point.
    *
    * @author 2010-07-30 Debbie A. Cook
    *
    * @internal
-   *  @history
    */
   class EquatorialCylindricalShape : public DemShape {
     public:
-      //! Constructor
-      EquatorialCylindricalShape(Target *target, Isis::Pvl &pvl);
+      // Constructor
+      EquatorialCylindricalShape(Target *target, Pvl &pvl);
 
-      //! Destructor
+      // Destructor
       ~EquatorialCylindricalShape();
 
-      //! Intersect the shape model
+      // Intersect the shape model
       bool intersectSurface(std::vector<double> observerPos,
                             std::vector<double> lookDirection);
 

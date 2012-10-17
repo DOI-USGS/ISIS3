@@ -20,6 +20,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include "Target.h"
+
 #include "Distance.h"
 #include "EllipsoidShape.h"
 #include "IException.h"
@@ -125,35 +126,27 @@ namespace Isis {
   Target::~Target() {
     NaifStatus::CheckErrors();
 
-    if (m_bodyCode != NULL) {
-      delete m_bodyCode;
-      m_bodyCode = NULL;
-    }
+    delete m_bodyCode;
+    m_bodyCode = NULL;
 
-    if (m_name != NULL) {
-      delete m_name;
-      m_name = NULL;
-    }
+    delete m_name;
+    m_name = NULL;
 
     if (m_radii.size() != 0) {
       m_radii.clear();
     }
 
-    if (m_originalShape != NULL) {
-      delete m_originalShape;
-      m_originalShape = NULL;
-    }
+    delete m_originalShape;
+    m_originalShape = NULL;
 
-    if (m_shape != NULL) {
-      delete m_shape;
-      m_shape = NULL;
-    }
+    delete m_shape;
+    m_shape = NULL;
   }
 
 
   //! Return if our target is the sky
   bool Target::isSky() const {
-        return m_sky;
+    return m_sky;
   }
 
 
@@ -168,7 +161,7 @@ namespace Isis {
     SpiceBoolean found;
     bodn2c_c(m_name->c_str(), &code, &found);
     if (!found) {
-      string msg = "Could not convert Target [" + *m_name +
+      IString msg = "Could not convert Target [" + *m_name +
                    "] to NAIF code";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
@@ -190,8 +183,8 @@ namespace Isis {
 
   //! Return target name
   IString Target::name() const {
-        return *m_name;
-      }
+    return *m_name;
+  }
 
 
   /**
@@ -230,15 +223,6 @@ namespace Isis {
     m_originalShape = m_shape;
     m_shape = new EllipsoidShape(this);
   }
-
-
-  /**
-   * This sets the NAIF body code of a "SKY" target to the observing spacecraft.
-   *
-   */
-  // void Target::setSky(SpiceInt bodyCode) const {
-  //     *m_bodyCode = bodyCode;  // TODO Is this the best way for now???
-  // }
 
 
   /**

@@ -21,20 +21,23 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+#include "ShapeModelFactory.h"
+
 #include <string>
 
-#include "ShapeModelFactory.h"
 #include "Cube.h"
 #include "DemShape.h"
 #include "EllipsoidShape.h"
 #include "EquatorialCylindricalShape.h"
+#include "FileName.h"
 #include "IException.h"
 #include "IString.h"
-#include "FileName.h"
 #include "Projection.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "Target.h"
+
+using namespace std;
 
 namespace Isis {
 
@@ -42,14 +45,15 @@ namespace Isis {
     
     // get kernels and instrument Pvl groups
     PvlGroup &kernelsPvlGroup = pvl.FindGroup("Kernels", Pvl::Traverse);
-    bool skyTarget = target->isSky(); // TODO Do we need a sky shape model, member variable, or neither?
+    // Do we need a sky shape model, member variable, or neither? For now treat sky as ellipsoid
+    bool skyTarget = target->isSky(); 
 
     // Determine if target is a plane??? target name has rings in it? 
     // Another keyword in label to indicate plane? What about lander/rovers?
     // bool planeTarget = false;
     
     // shape model file name
-    std::string shapeModelFilenames = "";
+    IString shapeModelFilenames = "";
 
     // TODO: We differentiate between "Elevation" and "Shape" models on the
     // labels, but we assign either one to the shapeModelFilename. Do we
@@ -60,11 +64,11 @@ namespace Isis {
     }
     else if (kernelsPvlGroup.HasKeyword("ElevationModel") &&
              !kernelsPvlGroup["ElevationModel"].IsNull())  {//&&
-      shapeModelFilenames = (std::string) kernelsPvlGroup["ElevationModel"];
+      shapeModelFilenames = (string) kernelsPvlGroup["ElevationModel"];
     }
     else if (kernelsPvlGroup.HasKeyword("ShapeModel") &&
              !kernelsPvlGroup["ShapeModel"].IsNull()) {//&&
-      shapeModelFilenames = (std::string) kernelsPvlGroup["ShapeModel"];
+      shapeModelFilenames = (string) kernelsPvlGroup["ShapeModel"];
     }
 
     // Create shape model

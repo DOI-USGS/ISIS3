@@ -51,7 +51,7 @@ using namespace Isis;
 class MyShape : public ShapeModel {
   public:
   MyShape(Target *target, Pvl &lab) : ShapeModel (target, lab) {
-    setName("Test");
+    setName(IString("Test"));
   }
 
    bool intersectSurface(std::vector<double> observerPos,
@@ -129,11 +129,11 @@ class MyShape : public ShapeModel {
 class MyEllipse : public ShapeModel {
   public:
   MyEllipse(Target *target) : ShapeModel (target) {
-    setName("Ellipsoid");
+    setName(IString("Ellipsoid"));
   }
 
   MyEllipse() : ShapeModel() {
-    setName("DefaultConstructor");
+    setName(IString("DefaultConstructor"));
   }
 
   bool intersectSurface(std::vector<double> observerPos,

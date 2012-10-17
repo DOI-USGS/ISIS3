@@ -1,11 +1,16 @@
+#include "ShapeModel.h"
+
 #include <algorithm>
 #include <cfloat>
+#include <vector>
 
 #include <cmath>
-#include <iomanip>
+
+#include <naif/SpiceUsr.h>
+#include <naif/SpiceZfc.h>
+#include <naif/SpiceZmc.h>
 
 #include "Distance.h"
-#include "ShapeModel.h"
 #include "SurfacePoint.h"
 #include "IException.h"
 #include "IString.h"
@@ -51,7 +56,7 @@ namespace Isis {
    * Initialize the ShapeModel private variables.
    */
   void ShapeModel::Initialize() {
-    m_name = new std::string();
+    m_name = new IString();
     m_surfacePoint = new SurfacePoint();
     m_hasIntersection = false;
     m_hasNormal = false;
@@ -61,15 +66,11 @@ namespace Isis {
   //! Destroys the ShapeModel
   ShapeModel::~ShapeModel() {
 
-    if (m_name) {
-      delete m_name;
-      m_name = NULL;
-    }
+    delete m_name;
+    m_name = NULL;
 
-    if (m_surfacePoint) {
-      delete m_surfacePoint;
-      m_surfacePoint = NULL;
-    }
+    delete m_surfacePoint;
+    m_surfacePoint = NULL;
   }
 
 
@@ -82,9 +83,8 @@ namespace Isis {
     // for an ellipsoid.  For testing purposes to match old results do as Isis3 currently does until
     // Jeff and Stuart respond.
 
-   // if ( !m_hasIntersection ) {
     if (!surfaceIntersection()->Valid() || !m_hasIntersection) {
-     Isis::IString msg = "A valid intersection must be defined before computing the surface normal";
+     IString msg = "A valid intersection must be defined before computing the surface normal";
       throw IException(IException::Programmer, msg, _FILEINFO_);
    }
 
@@ -93,10 +93,6 @@ namespace Isis {
     pB[0] = surfaceIntersection()->GetX().kilometers();
     pB[1] = surfaceIntersection()->GetY().kilometers();
     pB[2] = surfaceIntersection()->GetZ().kilometers();
-
-    // SpiceDouble normal[3];
-    // std::vector<Distance> radii = m_target->radii();
-    // surfnm_c(radii[0].kilometers(), radii[1].kilometers(), radii[2].kilometers(), pB, normal);
 
     // Unitize the vector
     SpiceDouble upB[3];
@@ -178,9 +174,9 @@ namespace Isis {
    * 
    */
   bool ShapeModel::intersectEllipsoid(const std::vector<double> observerBodyFixedPosition,
-      const std::vector<double> &observerLookVectorToTarget) {
+                              const std::vector<double> &observerLookVectorToTarget) {
 
-    //Clear out previous surface point and normal
+    // Clear out previous surface point and normal
     clearSurfacePoint();
 
     SpiceDouble lookB[3];
@@ -249,39 +245,40 @@ namespace Isis {
   }
 
 
-  /** Return the surface intersection
-   *
+  /** 
+   * Return the surface intersection
    */
   SurfacePoint *ShapeModel::surfaceIntersection() const {
     return m_surfacePoint;
   }
 
 
-  /** Return intersection status
-   *
+  /** 
+   * Return intersection status
    */
   bool ShapeModel::hasIntersection() {
     return m_hasIntersection;
   }
 
 
-  /** Return surface point normal status
-   *
+  /** 
+   * Return surface point normal status
    */
   bool ShapeModel::hasNormal() const {
     return m_hasNormal;
   }
 
 
-  /** Clear or reset the current surface point
-   *
+  /** 
+   * Clear or reset the current surface point
    */
   void ShapeModel::clearSurfacePoint() {
     setHasIntersection(false);
   }
 
 
-  /** Return the local normal of the current intersection point.
+  /** 
+   * Return the local normal of the current intersection point.
    *
    * @param returns normal vector if it exists
    */
@@ -290,7 +287,7 @@ namespace Isis {
       return m_normal;
     }
     else {
-      std::string message = "The local normal has not been computed.";
+      IString message = "The local normal has not been computed.";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
 
@@ -314,7 +311,7 @@ namespace Isis {
       m_normal = normal;
     }
     else {
-      std::string message = "No intersection point in known.  A normal can not be set.";
+      IString message = "No intersection point in known.  A normal can not be set.";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
   }
@@ -323,7 +320,7 @@ namespace Isis {
   /** Set the shape name
    *
    */
-  void ShapeModel::setName(const std::string name) {
+  void ShapeModel::setName(const IString name) {
      *m_name = name;
   }
 
@@ -331,7 +328,7 @@ namespace Isis {
   /** Get the shape name
    *
    */
-  std::string ShapeModel::name() const{
+  IString ShapeModel::name() const{
     return *m_name;
   }
 
@@ -416,7 +413,7 @@ namespace Isis {
       return m_target->spice()->Resolution();
     }
     else {
-      std::string message = "No valid intersection point for computing resolution.";
+      IString message = "No valid intersection point for computing resolution.";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
   }
