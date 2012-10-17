@@ -67,6 +67,11 @@
         <change name="Tracie Sucharski" date="2011-12-16">
             Added the OriginalLabel blob to both output cubes , vis and  ir.
         </change>
+        <change name="Kris Becker" date="2012-10-15">
+            Propagated additional keywords from the original label to the output
+            ISIS label.  These keywords are: MissionPhaseName, SequenceId,
+            SequenceTitle, PowerStateFlag, StarTracking and SnapshotMode.
+        </change>
       </history>
     <category>
         <missionItem>Cassini</missionItem>
