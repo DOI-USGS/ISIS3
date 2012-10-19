@@ -2,6 +2,10 @@
 
 #include <QVector>
 
+#include <naif/SpiceUsr.h>
+#include <naif/SpiceZfc.h>
+#include <naif/SpiceZmc.h>
+
 #include "Distance.h"
 #include "IException.h"
 #include "IString.h"
@@ -10,6 +14,8 @@
 #include "NaifStatus.h"
 #include "ShapeModel.h"
 #include "SurfacePoint.h"
+
+using namespace std;
 
 namespace Isis {
   /**
@@ -81,7 +87,28 @@ namespace Isis {
    *
    */
   void EllipsoidShape::calculateLocalNormal(QVector<double *> cornerNeighborPoints)  {
-    calculateEllipsoidalSurfaceNormal();
+    // calculateEllipsoidalSurfaceNormal();
+
+    if (!surfaceIntersection()->Valid() || !hasIntersection()) {
+     IString msg = "A valid intersection must be defined before computing the surface normal";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+   }
+
+   // Get the coordinates of the current surface point
+    SpiceDouble pB[3];
+    pB[0] = surfaceIntersection()->GetX().kilometers();
+    pB[1] = surfaceIntersection()->GetY().kilometers();
+    pB[2] = surfaceIntersection()->GetZ().kilometers();
+
+    // Get the radii of the ellipsoid
+    vector<Distance> radii = targetRadii();
+    double a = radii[0].kilometers();
+    double b = radii[1].kilometers();
+    double c = radii[2].kilometers();
+    vector<double> normal(3,0.);
+    surfnm_c(a, b, c, pB, (SpiceDouble *) &normal[0]);
+    setNormal(normal);
+    setHasNormal(true);
   }
 
 
