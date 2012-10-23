@@ -6,7 +6,7 @@
   </brief>
 
   <description>
-    FX allows general arithmetic operations to be performed on an arbitrary 
+    FX allows general arithmetic operations to be performed on an arbitrary  
     number of input cubes.  It works by loading whatever input files are 
     specified, if any, then applying a user defined equation to those files 
     and then writing the results to an output cube.  For instance, if the user
