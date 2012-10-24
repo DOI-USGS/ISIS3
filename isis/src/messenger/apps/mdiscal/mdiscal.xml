@@ -368,6 +368,14 @@ bandpass.
 The effective average solar radiance for each camera and bandpass is given
 in the SOLAR directory.
     </PRE>
+
+    <p>
+       Additional corrective measures have been added to address a contamination 
+       event that occurred with the instruments on May 24, 2011 through January 
+       3, 2012 after Mercury orbital insertion.  The event and subsequent 
+       bake-off has been modeled as additional multiplicative component to the 
+       output values.
+    </p>
   </description>
 
   <category>
@@ -469,6 +477,19 @@ in the SOLAR directory.
         Set the version back to 3 as it was deemed not neccessary to change the 
         version after discussion with the MESSENGER team.
     </change>
+   <change name="Kris Becker" date="2012-10-23">
+       Several select calibration files were updated.  New flat fields are  
+       MDISWAC_BINNED_FLAT_FIL03_5.cub, MDISWAC_NOTBIN_FLAT_FIL03_5.cub, 
+       MDISWAC_BINNED_FLAT_FIL06_5.cub and  MDISWAC_NOTBIN_FLAT_FIL06_5.cub.  
+       Also updated was the frame transfer file MDISWAC_FRAME_TRANSFER_02.TAB.  
+       Added specific corrections for WAC images for a contamination event 
+       starting on May 24, 2011 through January 3, 2012  As a result, added new 
+       keywords to the RadiometricCalibration group to log this new correction. 
+       These keywords are: ContaminationEventFile, ContaminationEventDate and 
+       ContaminationEventFactor.  Also corrected computation of dark strip 
+       average to properly report 0 when all these pixels are NULL pixels.  
+       Software version number is now 1.4.
+   </change>
   </history>
 
   <groups>

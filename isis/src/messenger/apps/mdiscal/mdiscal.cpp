@@ -43,6 +43,7 @@ Statistics darkStrip;
 vector<double> prevLineData;
 vector<double> smearData;
 static double smearComponent(3.4);
+static double eventCorrection(1.0);   // Contamination event correction
 Pvl configFile;
 
 //  Limit functionality for aiding dark analysis
@@ -56,17 +57,17 @@ static double abs_coef(1.0);
 static double solarDist(1.0);
 static double F_f(1.0);
 static double iof(1.0);   //  I/F value for observation
-static DarkModelPixel *model(0);
+static DarkModelPixel* model(0);
 
 //  Local functions
 FileName DetermineFlatFieldFile();
-void GatherDarkStatistics(Buffer &in);
-void Calibrate(vector<Buffer *>&in, vector<Buffer *>&out);
+void GatherDarkStatistics(Buffer& in);
+void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out);
 
 void IsisMain() {
 
   const string mdiscal_program = "mdiscal";
-  const string mdiscal_version = "1.3";
+  const string mdiscal_version = "1.4";
   const string mdiscal_revision = "$Revision$";
   string mdiscal_runtime = Application::DateTime();
 
@@ -91,9 +92,10 @@ void IsisMain() {
   ccdTemperature = 0.0; // This needs figured out!
   filterNumber = 1;  // Sufficent for the NAC!
   model = 0;
+  eventCorrection = 1.0;
 
   Cube *icube = p.SetInputCube("FROM");
-  PvlGroup &inst = icube->getGroup("Instrument");
+  PvlGroup& inst = icube->getGroup("Instrument");
   isNarrowAngleCamera = ((string)inst["InstrumentId"] == "MDIS-NAC");
   exposureDuration = inst["ExposureDuration"];
   exposureDuration /= 1000.0;  //  Convert ms to sec
@@ -104,14 +106,14 @@ void IsisMain() {
 
   nDarkColumns = 4 / (fpuBin + 1);    //  DPU binning gives 2 dark cols
   if (pxlBin > 2) nDarkColumns = 0;   //  MP binning > 2x2 yields no darks
-  else if (pxlBin > 0) nDarkColumns /= (pxlBin+1); // Might be 1 if wo/DPU + MP 2x2
+  else if (pxlBin > 0) nDarkColumns /= (pxlBin + 1); // Might be 1 if wo/DPU + MP 2x2
 
   //  Determine number of valid darks.  For no binning will have 3.  All combos
   //  that have 2x2 total binning will give 1 valid dark.  All other options
   //  have no valid dark columns.
   nValidDark = MIN(nDarkColumns, 3);
-  if(nValidDark < 3) {
-    if((fpuBin + pxlBin) > 1) nValidDark = 0;
+  if (nValidDark < 3) {
+    if ((fpuBin + pxlBin) > 1) nValidDark = 0;
     else nValidDark = MIN(nValidDark, 1);
   }
 
@@ -119,7 +121,7 @@ void IsisMain() {
 // columns to NULL.  For DPU but no MP binning, 3;  For no DPU but MP binning,
 //  2x2 yields 3, 4x4 and 8x8 yields 1.
   nSampsToNull = (pxlBin < 2) ? 0 : ((pxlBin > 2) ? 1 : 3);  // Only MP here
-  nSampsToNull = MIN(MAX(nDarkColumns+1,nSampsToNull), 4);  // No more than 4!
+  nSampsToNull = MIN(MAX(nDarkColumns + 1, nSampsToNull), 4);  // No more than 4!
   darkStrip.Reset();
 
   ccdTemperature = icube->getGroup("Archive")["CCDTemperature"];
@@ -129,14 +131,13 @@ void IsisMain() {
   isBinnedData = (fpuBin == 1);
 
   // Get the trusted filter number
-  if(!isNarrowAngleCamera) {
+  if (!isNarrowAngleCamera) {
     filterNumber = ((int)(icube->getGroup("BandBin")["Number"])) - 1;
-  }
-  else {
+  } else {
     filterNumber = 1;  // For the NAC
   }
 
-  UserInterface &ui = Application::GetUserInterface();
+  UserInterface& ui = Application::GetUserInterface();
   convertDarkToNull = !ui.GetBoolean("KEEPDARK");
   if (!convertDarkToNull) nSampsToNull = 0;
 
@@ -145,17 +146,17 @@ void IsisMain() {
   g_flatfield = ui.GetBoolean("FLATFIELD");
   g_radiometric = ui.GetBoolean("RADIOMETRIC");
 
-  if(icube->getBandCount() != 1) {
+  if (icube->getBandCount() != 1) {
     throw IException(IException::User,
                      "MDIS images may only contain one band", _FILEINFO_);
   }
 
-  if(icube->getSampleCount() < 3) {
+  if (icube->getSampleCount() < 3) {
     throw IException(IException::User,
                      "Unable to obtain dark current data. Expected a sample dimension of at least 3", _FILEINFO_);
   }
 
-  if((int)icube->getGroup("Instrument")["Unlutted"] == false) {
+  if ((int)icube->getGroup("Instrument")["Unlutted"] == false) {
     throw IException(IException::User,
                      "Calibration may not be performed on unlutted data.", _FILEINFO_);
   }
@@ -165,43 +166,40 @@ void IsisMain() {
   //  These would be for cases where more than two factors of compression
   //  occur.  For this case, only the model can be used and only if the
   //  exposure time < 2 secs.
-  if((darkCurr != "NONE") && (nValidDark <= 0)) {
+  if ((darkCurr != "NONE") && (nValidDark <= 0)) {
     //  Both cases require dark pixels, model does not
-    if((darkCurr == "STANDARD") || (darkCurr == "LINEAR")) {
+    if ((darkCurr == "STANDARD") || (darkCurr == "LINEAR")) {
       darkCurr = "MODEL";
       string mess = "There are no valid dark current pixels which are required"
-                    " for " + darkCurr + " calibration... must use MODEL";
+         " for " + darkCurr + " calibration... must use MODEL";
       IException ie(IException::User, mess, _FILEINFO_);
       ie.print();
     }
 
     //  Model cannot be used for exposure times > 1.0 <sec>
-    if((darkCurr == "MODEL") && (exposureDuration > 1.0)) {
+    if ((darkCurr == "MODEL") && (exposureDuration > 1.0)) {
       darkCurr = "NONE";
       string mess = "There are no valid dark current pixels and the dark model"
-                    " correction can not be used when the exposure duration"
-                    " exceeds 1000...image cannot be calibrated";
+         " correction can not be used when the exposure duration"
+         " exceeds 1000...image cannot be calibrated";
       IException ie(IException::User, mess, _FILEINFO_);
       ie.print();
     }
   }
 
   auto_ptr<DarkModelPixel> darkModel;
-  if(darkCurr == "NONE") {
+  if (darkCurr == "NONE") {
     darkCurrentMode = DarkCurrentNone;
-  }
-  else if(darkCurr == "STANDARD") {
+  } else if (darkCurr == "STANDARD") {
     darkCurrentMode = DarkCurrentStandard;
     calibrationValues.resize(icube->getLineCount());
-  }
-  else if(darkCurr == "LINEAR") {
+  } else if (darkCurr == "LINEAR") {
     darkCurrentMode = DarkCurrentLinear;
     calibrationValues.resize(icube->getLineCount());
-  }
-  else if(darkCurr == "MODEL") {
-    if(exposureDuration > 1.0) {
+  } else if (darkCurr == "MODEL") {
+    if (exposureDuration > 1.0) {
       string mess = "Dark model correction can not be used when the "
-                    "exposure duration exceeds 1000...using LINEAR instead.";
+         "exposure duration exceeds 1000...using LINEAR instead.";
       IException ie(IException::User, mess, _FILEINFO_);
       ie.print();
 
@@ -209,12 +207,10 @@ void IsisMain() {
       darkCurrentMode = DarkCurrentLinear;
       calibrationValues.resize(icube->getLineCount());
       darkCurr = "STANDARD";
-    }
-    else {
+    } else {
       darkCurrentMode = DarkCurrentModel;
     }
-  }
-  else {
+  } else {
     // should never happen
     throw IException(IException::Programmer,
                      "Invalid dark current mode [" +
@@ -222,27 +218,26 @@ void IsisMain() {
   }
 
   string darkCurrentFile("");
-  if(darkCurrentMode != DarkCurrentNone) {
-    if(darkCurrentMode != DarkCurrentModel) {
+  if (darkCurrentMode != DarkCurrentNone) {
+    if (darkCurrentMode != DarkCurrentModel) {
       p.Progress()->SetText("Gathering Dark Current Statistics");
       p.StartProcess(GatherDarkStatistics);
-    }
-    else {
+    } else {
       // read in dark current table variables and report the filename used
-      darkModel = auto_ptr<DarkModelPixel> (new DarkModelPixel(pxlBin, ccdTemperature, exposureDuration));
+      darkModel = auto_ptr<DarkModelPixel>(new DarkModelPixel(pxlBin, ccdTemperature, exposureDuration));
       darkCurrentFile = darkModel->loadCoefficients(isNarrowAngleCamera, isBinnedData);
       model = darkModel.get();
     }
   }
 
   // We need to figure out our flat-field file
-  if(darkCurrentMode == DarkCurrentLinear) {
+  if (darkCurrentMode == DarkCurrentLinear) {
     // We need to perform a linear regression with our data,
     //   convert statistics to a line.
     double *xdata = new double[calibrationValues.size()];
     double *ydata = new double[calibrationValues.size()];
 
-    for(unsigned int x = 0; x < calibrationValues.size(); x++) {
+    for (unsigned int x = 0; x < calibrationValues.size(); x++) {
       xdata[x] = x;
       ydata[x] = calibrationValues[x];
     }
@@ -254,8 +249,8 @@ void IsisMain() {
     // y = A + Bx
     double a, b;
     stats.LinearRegression(a, b);
-    delete [] xdata;
-    delete [] ydata;
+    delete[] xdata;
+    delete[] ydata;
 
     // Store a,b in calibration data instead of our line
     calibrationValues.resize(2);
@@ -271,7 +266,7 @@ void IsisMain() {
   double T = 1.0;
   double Rt = rsp[0];
   double Resp = 0;
-  for(unsigned int i = 1 ; i < rsp.size() ; i++) {
+  for (unsigned int i = 1; i < rsp.size(); i++) {
     Resp += Rt * (rsp[i] * T);
     T *= ccdTemperature;
   }
@@ -282,6 +277,20 @@ void IsisMain() {
   smearComponent = loadSmearComponent(isNarrowAngleCamera, filterNumber + 1,
                                       smearfile);
 
+  //  Get s/c clock count
+  string startTime = inst["SpacecraftClockCount"];
+
+  //  Retrieve contamination event correction parameter
+  string eventfile(""), eventDate("N/A");
+  if (isNarrowAngleCamera) {  // Not applicable to the NAC
+    eventfile = "N/A";
+    eventCorrection = 1.0;
+  } 
+  else {  // Get correction for WAC filters
+    eventCorrection = loadContaminationEvent(startTime, filterNumber + 1,
+                                             eventfile, eventDate);
+  }
+
   //  Compute I/F if requested by user
   iof = 1.0;
   bool do_iof = ui.GetBoolean("IOF");
@@ -289,17 +298,16 @@ void IsisMain() {
   bool iof_is_good = false;
   string solirrfile("");
   if (do_iof) {
-    PvlGroup &inst = icube->getGroup("Instrument");
+    PvlGroup& inst = icube->getGroup("Instrument");
     string target = inst["TargetName"];
     string startTime = inst["SpacecraftClockCount"];
-    if(sunDistanceAU(startTime, target, solarDist)) {
+    if (sunDistanceAU(startTime, target, solarDist)) {
       vector<double> sol = loadSolarIrr(isNarrowAngleCamera, isBinnedData,
                                         filterNumber + 1, solirrfile);
       F_f = sol[2];
       iof = pi_c() * (solarDist * solarDist) / F_f;
       iof_is_good = true;
-    }
-    else {
+    } else {
       iof = 1.0;
       iof_is_good = false;
     }
@@ -309,28 +317,27 @@ void IsisMain() {
   //  occurred
   string reducedFlat("");
   FileName flatfield = DetermineFlatFieldFile();
-  if(pxlBin > 0) {
+  if (pxlBin > 0) {
     IString scale(pxlBin);
     FileName newflat = FileName::createTempFile("$TEMPORARY/" + flatfield.baseName() + "_reduced.cub");
     reducedFlat = newflat.expanded();
     string parameters = "FROM=" + flatfield.expanded() +
-                        " TO="   + newflat.expanded() +
-                        " MODE=SCALE" +
-                        " LSCALE=" + scale +
-                        " SSCALE=" + scale;
+       " TO="   + newflat.expanded() +
+       " MODE=SCALE" +
+       " LSCALE=" + scale +
+       " SSCALE=" + scale;
     try {
-    //  iApp->Exec("reduce", parameters);
+      //  iApp->Exec("reduce", parameters);
       ProgramLauncher::RunIsisProgram("reduce", parameters);
       reducedFlat = newflat.expanded();
     }
-    catch (IException &) {
+    catch (IException&) {
       remove(reducedFlat.c_str());
       throw;
     }
     CubeAttributeInput att;
     p.SetInputCube(reducedFlat, att);
-  }
-  else {
+  } else {
     CubeAttributeInput att;
     p.SetInputCube(flatfield.expanded(), att);
   }
@@ -342,13 +349,13 @@ void IsisMain() {
     p.Progress()->SetText("Calibrating MDIS Cube");
     p.StartProcess(Calibrate);
   }
-  catch(...) {
-    if(!reducedFlat.empty()) remove(reducedFlat.c_str());
+  catch (...) {
+    if (!reducedFlat.empty()) remove(reducedFlat.c_str());
     throw;
   }
 
   //  Remove the temporary reduced input file if generated
-  if(!reducedFlat.empty()) remove(reducedFlat.c_str());
+  if (!reducedFlat.empty()) remove(reducedFlat.c_str());
 
   // Log calibration activity
   PvlGroup calibrationLog("RadiometricCalibration");
@@ -357,11 +364,10 @@ void IsisMain() {
   calibrationLog.AddKeyword(PvlKeyword("ProcessDate", mdiscal_runtime));
   calibrationLog.AddKeyword(PvlKeyword("DarkCurrentModel", darkCurr));
 
-  if(darkCurrentMode == DarkCurrentLinear) {
+  if (darkCurrentMode == DarkCurrentLinear) {
     IString equation = "Y = " + IString(calibrationValues[0]) + IString(" + ") + IString(calibrationValues[1]) + IString("x");
     calibrationLog.AddKeyword(PvlKeyword("DarkCurrentEquation", (string)equation));
-  }
-  else if(darkCurrentMode == DarkCurrentModel) {
+  } else if (darkCurrentMode == DarkCurrentModel) {
     calibrationLog.AddKeyword(PvlKeyword("DarkCurrentFile", darkCurrentFile));
   }
 
@@ -373,13 +379,12 @@ void IsisMain() {
     calibrationLog.AddKeyword(PvlKeyword("ResponsivityFile", respfile));
     calibrationLog.AddKeyword(PvlKeyword("SmearCompFile", smearfile));
     PvlKeyword rspKey("Response", rsp[0]);
-    for(unsigned int i = 1 ; i < rsp.size() ; i++) {
+    for (unsigned int i = 1; i < rsp.size(); i++) {
       rspKey.AddValue(rsp[i]);
     }
     calibrationLog.AddKeyword(rspKey);
     calibrationLog.AddKeyword(PvlKeyword("SmearComponent", smearComponent));
-  }
-  else {
+  } else {
     calibrationLog.AddKeyword(PvlKeyword("FlatFieldFile", "N/A"));
     calibrationLog.AddKeyword(PvlKeyword("CalibrationFile", "N/A"));
     calibrationLog.AddKeyword(PvlKeyword("ResponsivityFile", "N/A"));
@@ -390,37 +395,42 @@ void IsisMain() {
   }
 
   string calibType;
-  if(do_iof  && iof_is_good) {
+  if (do_iof  && iof_is_good) {
     calibrationLog.AddKeyword(PvlKeyword("Units", "I over F"));
     calibrationLog.AddKeyword(PvlKeyword("SolarDistance", solarDist, "AU"));
     calibrationLog.AddKeyword(PvlKeyword("SolarIrrFile", solirrfile));
     calibrationLog.AddKeyword(PvlKeyword("FilterIrradianceFactor", F_f));
     calibrationLog.AddKeyword(PvlKeyword("IOFFactor", iof));
     calibType = "IF";
-  }
-  else if (g_radiometric) {
-    calibrationLog.AddKeyword(PvlKeyword("Units", "W / (m**2 micrometer sr )"));
+  } else if (g_radiometric) {
+    calibrationLog.AddKeyword(PvlKeyword("Units", "W / (m**2 micrometer sr)"));
     calibType = "RA";
-  }
-  else {
+  } else {
     calibrationLog.AddKeyword(PvlKeyword("Units", "DN"));
     calibType = "DN";
   }
+
+  calibrationLog.AddKeyword(PvlKeyword("ContaminationEventFile", eventfile));
+  calibrationLog.AddKeyword(PvlKeyword("ContaminationEventDate", eventDate));
+  calibrationLog.AddKeyword(PvlKeyword("ContaminationEventFactor",
+                                       eventCorrection));
+
 
   calibrationLog.AddKeyword(PvlKeyword("DarkStripColumns", nDarkColumns),
                             Pvl::Replace);
   calibrationLog.AddKeyword(PvlKeyword("ValidDarkColumns", nValidDark),
                             Pvl::Replace);
-  if(darkStrip.TotalPixels() > 0) {
-    calibrationLog.AddKeyword(PvlKeyword("DarkStripMean", darkStrip.Average()),
-                              Pvl::Replace);
+  if (darkStrip.TotalPixels() > 0) {
+    double avgDark = (darkStrip.ValidPixels() > 0) ? darkStrip.Average() : 0.0;
+    calibrationLog.AddKeyword(PvlKeyword("DarkStripMean", avgDark), 
+                                         Pvl::Replace); 
   }
 
   // Report nulled sample count
   calibrationLog.AddKeyword(PvlKeyword("LeftSamplesNulled", nSampsToNull));
 
   //  Handle updates of ProductId and SourceProduct Id keywords
-  PvlGroup &archive = ocube->getGroup("Archive");
+  PvlGroup& archive = ocube->getGroup("Archive");
   PvlKeyword key = archive["ProductId"];
   IString orgProdId = key[0];
   IString newProdId = orgProdId + "_" + calibType + "_" + IString(cdr_version);
@@ -429,23 +439,22 @@ void IsisMain() {
   archive.AddKeyword(key, Pvl::Replace);
 
   // Now SourceProductId
-  if(archive.HasKeyword("SourceProductId")) {
+  if (archive.HasKeyword("SourceProductId")) {
     key = archive["SourceProductId"];
-    for(int i = 0 ; i < key.Size() ; i++) {
+    for (int i = 0; i < key.Size(); i++) {
       key[i] = Quote(key[i]);
     }
-  }
-  else {
+  } else {
     key = PvlKeyword("SourceProductId", Quote(orgProdId));
   }
 
-  if(!darkCurrentFile.empty()) {
+  if (!darkCurrentFile.empty()) {
     key.AddValue(Quote(FileName(darkCurrentFile).baseName()));
   }
   key.AddValue(Quote(flatfield.baseName()));
   key.AddValue(Quote(FileName(respfile).baseName()));
   // key.AddValue(Quote(FileName(smearfile).baseName()));
-  if(iof_is_good) {
+  if (iof_is_good) {
     key.AddValue(Quote(FileName(solirrfile).baseName()));
   }
   archive.AddKeyword(key, Pvl::Replace);
@@ -464,14 +473,13 @@ FileName DetermineFlatFieldFile() {
   filename += ((isNarrowAngleCamera) ? "NAC" : "WAC");
   filename += ((isBinnedData) ? "_BINNED_" : "_NOTBIN_");
   filename += "FLAT";
-  if(isNarrowAngleCamera) {
+  if (isNarrowAngleCamera) {
     // NAC spec is simpler
     filename += "_?.cub";
-  }
-  else {
+  } else {
     // add a zero if the filter is 1-digit
     filename += "_FIL";
-    if(filterNumber < 9) filename += "0";
+    if (filterNumber < 9) filename += "0";
     filename += IString(filterNumber + 1);
     filename += "_?.cub";
   }
@@ -482,10 +490,10 @@ FileName DetermineFlatFieldFile() {
 }
 
 
-void GatherDarkStatistics(Buffer &in) {
+void GatherDarkStatistics(Buffer& in) {
 
   // Some situations cannot use these processes for calibration
-  calibrationValues[in.Line()-1] = Isis::Null;
+  calibrationValues[in.Line() - 1] = Isis::Null;
 
   if (nValidDark > 0) {
     if (darkCurrentMode == DarkCurrentStandard) {
@@ -494,41 +502,40 @@ void GatherDarkStatistics(Buffer &in) {
       // of no more than 3 and take the middle
       vector<double> calibValues;
       int nDark = nValidDark;
-      for(int i = 0 ; i < nDark ; i++) {
+      for (int i = 0; i < nDark; i++) {
         calibValues.push_back(in[i]);
       }
       sort(calibValues.begin(), calibValues.end());
 
       // grab the middle element in the array for the median
-      calibrationValues[in.Line()-1] = calibValues[nDark/2];
-    }
-    else if(darkCurrentMode == DarkCurrentLinear) {
+      calibrationValues[in.Line() - 1] = calibValues[nDark / 2];
+    } else if (darkCurrentMode == DarkCurrentLinear) {
       // Presently the linear regression only uses the first sample in the
       // dark current data
-      calibrationValues[in.Line()-1] = in[0];
+      calibrationValues[in.Line() - 1] = in[0];
     }
   }
 }
 
-void Calibrate(vector<Buffer *>&in, vector<Buffer *>&out) {
-  Buffer &imageIn   = *in[0];
-  Buffer &flatField = *in[1];
-  Buffer &imageOut  = *out[0];
+void Calibrate(vector<Buffer *>& in, vector<Buffer *>& out) {
+  Buffer& imageIn   = *in[0];
+  Buffer& flatField = *in[1];
+  Buffer& imageOut  = *out[0];
 
-  if(imageIn.Line() == 1) {
+  if (imageIn.Line() == 1) {
     prevLineData.resize(imageIn.SampleDimension());
     smearData.resize(imageIn.SampleDimension());
 
-    for(unsigned int i = 0; i < prevLineData.size(); i++) {
+    for (unsigned int i = 0; i < prevLineData.size(); i++) {
       prevLineData[i] = 0.0;
       smearData[i] = 0.0;
     }
   }
 
-  for(int i = 0; i < imageIn.size(); i++) {
+  for (int i = 0; i < imageIn.size(); i++) {
 
     // Check for special pixel in input image and pass through
-    if(Isis::IsSpecial(imageIn[i])) {
+    if (Isis::IsSpecial(imageIn[i])) {
       imageOut[i] = imageIn[i];
       continue;
     }
@@ -536,7 +543,7 @@ void Calibrate(vector<Buffer *>&in, vector<Buffer *>&out) {
     if (g_flatfield) {
       //  If the flat field pixel is special, can't calibrate so set to NULL
       //  and pass through (unlikely).
-      if(Isis::IsSpecial(flatField[i])) {
+      if (Isis::IsSpecial(flatField[i])) {
         imageOut[i] = Isis::Null;
         continue;
       }
@@ -545,37 +552,31 @@ void Calibrate(vector<Buffer *>&in, vector<Buffer *>&out) {
 //if(i == 25 && imageIn.Line() == 25) std::cout <<  "In: " << imageIn[i] << std::endl;
 
     // Step 1: Perform dark current corrections
-    if(darkCurrentMode == DarkCurrentNone) {
+    if (darkCurrentMode == DarkCurrentNone) {
       imageOut[i] = imageIn[i];
-    }
-    else if(darkCurrentMode == DarkCurrentStandard) {
-      imageOut[i] = imageIn[i] - calibrationValues[imageIn.Line()-1];
-    }
-    else if(darkCurrentMode == DarkCurrentLinear) {
+    } else if (darkCurrentMode == DarkCurrentStandard) {
+      imageOut[i] = imageIn[i] - calibrationValues[imageIn.Line() - 1];
+    } else if (darkCurrentMode == DarkCurrentLinear) {
       // Linear: out = in - bestfitline = in - (A + Bx)
       imageOut[i] = imageIn[i] - (calibrationValues[0] + calibrationValues[1] *
                                   (imageIn.Line() - 1));
-    }
-    else if(darkCurrentMode == DarkCurrentModel) {
+    } else if (darkCurrentMode == DarkCurrentModel) {
       imageOut[i] = imageIn[i] - model->getDarkPixel(i, imageIn.Line() - 1);
     }
 
     if (g_flatfield) {
       // Step 2: Perform linearity correction
-      if(isNarrowAngleCamera == true) {
-        if(imageOut[i] <= 0.0) {
+      if (isNarrowAngleCamera == true) {
+        if (imageOut[i] <= 0.0) {
           imageOut[i] /= 0.912031;
-        }
-        else {
+        } else {
           imageOut[i] /= 0.011844 * log10(imageOut[i]) + 0.912031;
         }
-      }
-      else {
+      } else {
         // Wide angle camera
-        if(imageOut[i] <= 0.0) {
+        if (imageOut[i] <= 0.0) {
           imageOut[i] /= 0.936321;
-        }
-        else {
+        } else {
           imageOut[i] /= 0.008760 * log10(imageOut[i]) + 0.936321;
         }
       }
@@ -583,7 +584,7 @@ void Calibrate(vector<Buffer *>&in, vector<Buffer *>&out) {
       // Step 3: Readout Smear Correction (ms -> seconds)
       double t2 = smearComponent / imageIn.SampleDimension() / 1000.0;
 
-      if(exposureDuration > 0.0 && imageIn.Line() > 1) {
+      if (exposureDuration > 0.0 && imageIn.Line() > 1) {
         smearData[i] += t2 / exposureDuration * prevLineData[i];
         imageOut[i] -= smearData[i];
       }
@@ -594,24 +595,27 @@ void Calibrate(vector<Buffer *>&in, vector<Buffer *>&out) {
       imageOut[i] /= flatField[i]; // divide by flat field
 
       // Step 5: Absolute coefficient
-      if(exposureDuration > 0.0) {
+      if (exposureDuration > 0.0) {
         imageOut[i] = imageOut[i] / exposureDuration * abs_coef;
       }
     }  // End of flat field
 
     if (g_radiometric) {
-    //  Step 6:  Convert to I/F units
+      //  Step 6:  Convert to I/F units
       imageOut[i] *= iof;
     }
+
+    //  Apply contamination event factor to final result w/o.r.f output units
+    imageOut[i] *= eventCorrection;
   }
 
   //  Compute dark current statistics
-  for(int j = 0 ; j < nValidDark; j++) {
+  for (int j = 0; j < nValidDark; j++) {
     darkStrip.AddData(imageOut[j]);
   }
 
   //  Null specified columns (2011-04-20 - KJB)
-  for(int n = 0 ; n < nSampsToNull ; n++) {
+  for (int n = 0 ; n < nSampsToNull ; n++) {
     imageOut[n] = Isis::Null;
   }
 
