@@ -53,9 +53,9 @@ int main(int argc, char *argv[]) {
   cout << "Has field(v2): " << record.hasField("v2") << endl;
   cout << "Field index(v3): " << record.getFieldIndex("v3") << endl;
 
-  cout << "The mac systems report the double fields as string fields. " <<
+  cout << "Older sqlite versions report the double fields as string fields. " <<
        "Until the problematic 3rd party software is fixed, " <<
-       "the mac systems will need OS truth data." << endl;
+       "systems that report double will need OS truth data." << endl;
 
   for(int i = 0; i < record.size(); i++) {
     IString value = record.getValue(i);

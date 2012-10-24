@@ -9,4 +9,4 @@ Field index(v3): 2
 Older sqlite versions report the double fields as string fields. Until the problematic 3rd party software is fixed, systems that report double will need OS truth data.
 Col 0) Name: v1, Type: string
 Col 1) Name: v2, Type: int
-Col 2) Name: v3, Type: string
+Col 2) Name: v3, Type: double

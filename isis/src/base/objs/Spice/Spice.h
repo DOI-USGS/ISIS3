@@ -223,7 +223,7 @@ namespace Isis {
       Spice(Pvl &label, bool noTables);
 
       // destructor
-      ~Spice();
+      virtual ~Spice();
 
       // Methods
       void setTime(const iTime &time);

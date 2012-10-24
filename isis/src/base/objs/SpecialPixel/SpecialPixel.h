@@ -80,7 +80,7 @@ namespace Isis {
 /// @cond INTERNAL
   //  Set up special kludge for double precision initialization
   typedef union {
-    int i[2];
+    unsigned int i[2];
     double d;
   } DBL_UNION;
 

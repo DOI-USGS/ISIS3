@@ -63,7 +63,7 @@ else
       else
         testFile = $(wildcard /etc/debian_version)
         ifeq ($(testFile), /etc/debian_version)
-          HOST_OS := $(shell cat /etc/debian_version | sed 's/\./_/g')
+          HOST_OS := $(shell cat /etc/debian_version | sed 's/\./_/g' | sed 's/\//_/g')
           HOST_OS := Debian$(HOST_OS)
         endif
       endif

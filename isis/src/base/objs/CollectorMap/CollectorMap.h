@@ -696,7 +696,7 @@ namespace Isis {
 
         CollectorIter Itr2 = _list.upper_bound(key);
         while(Itr1 != Itr2) {
-          destroy(&Itr1->second);
+          this->destroy(&Itr1->second);
           ++Itr1;
         }
         return (_list.erase(key));
@@ -753,7 +753,7 @@ namespace Isis {
       void selfDestruct() {
         CollectorIter itr;
         for(itr = _list.begin() ; itr != _list.end() ; itr++) {
-          destroy(&itr->second);
+          this->destroy(&itr->second);
         }
         _list.clear();
       }
