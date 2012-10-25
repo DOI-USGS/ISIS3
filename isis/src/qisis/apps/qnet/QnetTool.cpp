@@ -2026,6 +2026,10 @@ namespace Isis {
    *                          of reference measure unless there is no apriori
    *                          surface point.
    *   @history 2012-05-08 Tracie Sucharski - p_leftFile changed from std::string to QString.
+   *   @history 2012-09-28 Tracie Sucharski - When looking for ground source in right combo, use
+   *                          fileName, not the serial number.  The ground source serial number
+   *                          will not be the fileName if the Instrument group is retained in the
+   *                          labels.  Fixes #1018
    */
   void QnetTool::loadPoint () {
 
@@ -2151,7 +2155,14 @@ namespace Isis {
     }
 
     if (p_groundOpen && (p_editPoint->GetType() != ControlPoint::Free))  {
-      rightIndex = p_rightCombo->findText((QString)p_groundSN);
+      rightIndex = p_rightCombo->findText((QString)p_groundFile);
+      if (rightIndex < 0) {
+        rightIndex = 0;
+        //  Could not find ground source in list, warn user
+        QString message = "Cannot find ground file in list of files, make sure correct ground ";
+        message += "source file was loaded.";
+        QMessageBox::warning(p_qnetTool, "Warning", message);
+      }
     }
     else {
       if (leftIndex == 0) {
@@ -3398,6 +3409,10 @@ namespace Isis {
    * @internal
    * @history 2011-06-03 Tracie Sucharski - Make sure edit point valid before
    *                        loading.
+   * @history 2012-10-04 Tracie Sucharski - If the ground source serial number already exists in 
+   *                        the serial number list, print error and clear out ground information.
+   * @history 2012-10-05 Tracie Sucharski - Re-factored most of this method, attempting to clean 
+   *                        up logic, error checking and recovery.
    */
   void QnetTool::openGround() {
 
@@ -3410,37 +3425,65 @@ namespace Isis {
                                                   filter);
     if (ground.isEmpty()) return;
 
-    //  If a ground source is already opened, check if new is same as old.  If so,
-    //  simply set as active window.  If new ground source, close old,
-    //  open new and add new to serial number list if not already in list.
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    if (p_groundOpen) {
+    //  First off, find serial number of new ground, it is needed for a couple of error checks.
+    IString newGroundSN = SerialNumber::Compose(ground.toStdString(), true);
+
+      //  If new ground same file as old ground file simply set as active window. 
+    if (p_groundOpen && p_groundFile == FileName(ground).name().ToQt()) {
       //  See if ground source is already opened in a cubeviewport.  If so, simply
       //  activate the viewport and return.
       MdiCubeViewport *vp;
       for (int i=0; i<(int)cubeViewportList()->size(); i++) {
         vp = (*(cubeViewportList()))[i];
         if (vp->cube()->getFileName() == ground.toStdString()) {
-          g_vpMainWindow->workspace()->setActiveSubWindow((QMdiSubWindow *)vp->parentWidget());
-          QApplication::restoreOverrideCursor();
+          g_vpMainWindow->workspace()->setActiveSubWindow(
+              (QMdiSubWindow *)vp->parentWidget()->parent());
           return;
         }
       }
+    }
+      
+    //  Make sure there are not serial number conflicts.  If there are serial number conflicts,
+    //  simply return, retaining current ground source.
+    if (newGroundSN != p_groundSN && g_serialNumberList->HasSerialNumber(newGroundSN)) {
+      //  TODO  If it already exists, are the files different?  Now what?
+      //     For now, do not allow.
+      QString message = "A cube in the cube list has the same serial number as this ground file.  ";
+      message += "If this ground source is a level 1, un-projected cube, it is probably included ";
+      message += "in the cube list.  If the ground source is a projected version of a cube in ";
+      message += "the list and has the Instrument Group in the labels, the un-projected and ";
+      message += "projected cube will have the same serial number. \n";
+      message += "Because of duplicate serial numbers this cube cannot be used as a ground ";
+      message += "source.\n\n";
+      message += "NOTE:  If this cube is the reference cube you can select points in ";
+      message += "the Navigator window, then select the Set Apriori button to use this cube to ";
+      message += "set the apriori latitude, longitude and radius.";
+      QMessageBox::critical(p_qnetTool, "Cannot set ground source", message);
+      return;
+    }
+
+      //  So far, so good.  If previous ground, clear out ground source info.
+    if (p_groundOpen) {
       //  ....otherwise if new ground source, close old.  We only want a single
       //  ground source opened at once.  Delete old ground source from left/right
       //  combo if it's there, and delete from serial number list.
       clearGroundSource ();
-
     }
 
-    p_groundSourceFile = ground;
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    //  Create new ground cube,  if failure, there will be not ground source, clear all ground
+    //  source data.  (Cannot call clearGroundSource because it assumes a ground was successfully
+    //  loaded)
     p_groundCube = new Cube();
     try {
       p_groundCube->open(ground.toStdString());
       p_groundGmap = new UniversalGroundMap(*p_groundCube);
       p_groundFile = FileName(p_groundCube->getFileName()).name().c_str();
+      g_serialNumberList->Add(ground.toStdString(), true);
     }
     catch (IException &e) {
+      QApplication::restoreOverrideCursor();
       QString message = e.toString();
       QMessageBox::critical(p_qnetTool, "Error", message);
       if (p_groundCube) {
@@ -3450,21 +3493,18 @@ namespace Isis {
         delete p_groundGmap;
         p_groundGmap = NULL;
       }
-      QApplication::restoreOverrideCursor();
+      p_groundFile.clear();
       // Re-load point w/o ground source
-      loadPoint();
+      if (p_editPoint) loadPoint();
+      emit refreshNavList();
       return;
     }
+
+
+    p_groundSN = newGroundSN;
+    p_groundSourceFile = ground;
     p_groundOpen = true;
-
     g_vpMainWindow->workspace()->addCubeViewport(p_groundCube);
-
-    // If ground source cube not in serial number list, add
-    string serialNumber = SerialNumber::Compose(*p_groundCube,true);
-    p_groundSN = serialNumber;
-    if (!g_serialNumberList->HasSerialNumber(serialNumber)) {
-      g_serialNumberList->Add(ground.toStdString(),true);
-    }
 
     //  Determine file type of ground for setting AprioriSurfacePointSource
     //  and AprioriRadiusSource.
@@ -3522,6 +3562,7 @@ namespace Isis {
           //  Clear out everything relating to ground source
           clearGroundSource ();
           QApplication::restoreOverrideCursor();
+          emit refreshNavList();
           return;
         }
       }
@@ -3532,6 +3573,7 @@ namespace Isis {
     p_groundFileNameLabel->setText("Ground Source File:  " + p_groundFile);
     p_radiusFileNameLabel->setText("Radius Source File:  " + p_demFile);
 
+    emit refreshNavList();
     QApplication::restoreOverrideCursor();
   }
 
@@ -3628,7 +3670,7 @@ namespace Isis {
     //  If the loaded point is a fixed point, see if there is a temporary measure
     //  holding the coordinate information for the currentground source. If so,
     //  delete this measure.
-    if (p_editPoint->GetType() != ControlPoint::Free &&
+    if (p_editPoint && p_editPoint->GetType() != ControlPoint::Free &&
         p_editPoint->HasSerialNumber(p_groundSN)) {
       p_editPoint->Delete(p_groundSN);
     }
@@ -3649,8 +3691,6 @@ namespace Isis {
     //  If we could not find the ground source in the open viewports, user might
     //  have closed the viewport , reset ground source variables and re-open.
     p_groundOpen = false;
-//    p_groundCube->close();
-//    delete p_groundCube;
     p_groundCube = NULL;
     p_groundFile.clear();
 
@@ -3661,6 +3701,7 @@ namespace Isis {
 
     // Remove from serial number list
     g_serialNumberList->Delete(p_groundSN);
+    p_groundSN = "";
   }
 
 
