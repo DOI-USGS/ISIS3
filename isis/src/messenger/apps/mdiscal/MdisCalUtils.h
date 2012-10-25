@@ -308,6 +308,9 @@ namespace Isis {
  * factor returned by the algorithm is the one whose event time is closest to 
  * the SCET. 
  *  
+ * The contamination correction model and algorithm was developed by
+ * Mary Ruth Keller of JHA/APL.
+ *
  * @author Kris Becker - 10/23/2012
  * 
  * @param scStartTime - Start time of the image in SCLK format
