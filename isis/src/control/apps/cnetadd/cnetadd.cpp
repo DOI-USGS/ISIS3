@@ -8,12 +8,12 @@
 #include <QSet>
 #include <QString>
 
-#include "geos/geom/Coordinate.h"
-#include "geos/geom/Envelope.h"
-#include "geos/geom/Geometry.h"
-#include "geos/geom/MultiPolygon.h"
-#include "geos/geom/Point.h"
-#include "geos/index/strtree/STRtree.h"
+#include <geos/geom/Coordinate.h>
+#include <geos/geom/Envelope.h>
+#include <geos/geom/Geometry.h>
+#include <geos/geom/MultiPolygon.h>
+#include <geos/geom/Point.h>
+#include <geos/index/strtree/STRtree.h>
 
 #include "Camera.h"
 #include "CameraFactory.h"
@@ -42,13 +42,14 @@ using geos::geom::MultiPolygon;
 using geos::geom::Point;
 using geos::index::strtree::STRtree;
 
+using namespace std;
 using namespace Isis;
 
-void SetControlPointLatLon(SerialNumberList &snl, ControlNet &cnet);
+void setControlPointLatLon(SerialNumberList &snl, ControlNet &cnet);
 QList<ControlPoint *> getValidPoints(Cube &cube, STRtree &coordTree);
 
-std::map< std::string, SurfacePoint > surfacePoints;
-QMap< QString, QSet<QString> > modifications;
+std::map< std::string, SurfacePoint > g_surfacePoints;
+QMap< QString, QSet<QString> > g_modifications;
 
 
 void IsisMain() {
@@ -108,7 +109,7 @@ void IsisMain() {
     }
 
     // Get the lat/long coords from the existing reference measure
-    SetControlPointLatLon(*fromSerials, inNet);
+    setControlPointLatLon(*fromSerials, inNet);
   }
   else {
     for (int cp = 0; cp < inNet.GetNumPoints(); cp++) {
@@ -123,7 +124,7 @@ void IsisMain() {
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
-      surfacePoints[point->GetId()] = surfacePoint;
+      g_surfacePoints[point->GetId()] = surfacePoint;
     }
   }
 
@@ -140,7 +141,7 @@ void IsisMain() {
   if (usePolygon) {
     for (int cp = 0; cp < inNet.GetNumPoints(); cp++) {
       ControlPoint *point = inNet.GetPoint(cp);
-      SurfacePoint surfacePoint = surfacePoints[point->GetId()];
+      SurfacePoint surfacePoint = g_surfacePoints[point->GetId()];
 
       Longitude lon = surfacePoint.GetLongitude();
       Latitude lat = surfacePoint.GetLatitude();
@@ -187,7 +188,7 @@ void IsisMain() {
       // inconsistent results from successive runs of this program if the
       // different DEMs are used, or the point X, Y, Z was generated from the
       // ellipsoid.
-      SurfacePoint surfacePoint = surfacePoints[point->GetId()];
+      SurfacePoint surfacePoint = g_surfacePoints[point->GetId()];
       if (cam->SetGround(
               surfacePoint.GetLatitude(), surfacePoint.GetLongitude())) {
 
@@ -233,7 +234,7 @@ void IsisMain() {
           point->Add(newCm); // Point takes ownership
 
           // Record the modified Point and Measure
-          modifications[point->GetId()].insert(newCm->GetCubeSerialNumber());
+          g_modifications[point->GetId()].insert(newCm->GetCubeSerialNumber());
           newCm = NULL; // Do not delete because the point has ownership
 
           if (retrievalOpt == "POINT" && point->GetNumMeasures() == 1)
@@ -257,7 +258,7 @@ void IsisMain() {
 
   if (log) {
     // Add the list of modified points to the output log file
-    QList<QString> modifiedPointsList = modifications.keys();
+    QList<QString> modifiedPointsList = g_modifications.keys();
     for (int i = 0; i < modifiedPointsList.size(); i++)
       pointsModified += modifiedPointsList[i];
 
@@ -280,7 +281,7 @@ void IsisMain() {
     out_stream.open(pointList.expanded().c_str(), std::ios::out);
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
-    QList<QString> modifiedPointsList = modifications.keys();
+    QList<QString> modifiedPointsList = g_modifications.keys();
     for (int i = 0; i < modifiedPointsList.size(); i++)
       out_stream << modifiedPointsList[i].toStdString() << std::endl;
 
@@ -294,7 +295,7 @@ void IsisMain() {
 
       // If the point was not modified, delete
       // Even get rid of edit locked points in this case
-      if (!modifications.contains(point->GetId())) {
+      if (!g_modifications.contains(point->GetId())) {
         point->SetEditLock(false);
         inNet.DeletePoint(cp);
       }
@@ -305,7 +306,7 @@ void IsisMain() {
 
           // Even get rid of edit locked measures in this case
           if (point->GetRefMeasure() != measure &&
-              !modifications[point->GetId()].contains(
+              !g_modifications[point->GetId()].contains(
                   measure->GetCubeSerialNumber())) {
             measure->SetEditLock(false);
             point->Delete(cm);
@@ -354,7 +355,7 @@ void IsisMain() {
  * @param incubes The filename of the list of cubes in the ControlNet
  * @param cnet    The filename of the ControlNet
  */
-void SetControlPointLatLon(SerialNumberList &snl, ControlNet &cnet) {
+void setControlPointLatLon(SerialNumberList &snl, ControlNet &cnet) {
   CubeManager manager;
   manager.SetNumOpenCubes(50);   //Should keep memory usage to around 1GB
 
@@ -370,7 +371,7 @@ void SetControlPointLatLon(SerialNumberList &snl, ControlNet &cnet) {
     Cube *cube = manager.OpenCube(snl.FileName(cm->GetCubeSerialNumber()));
     try {
       cube->getCamera()->SetImage(cm->GetSample(), cm->GetLine());
-      surfacePoints[point->GetId()] = cube->getCamera()->GetSurfacePoint();
+      g_surfacePoints[point->GetId()] = cube->getCamera()->GetSurfacePoint();
     }
     catch (IException &e) {
       std::string msg = "Unable to create camera for cube file [";

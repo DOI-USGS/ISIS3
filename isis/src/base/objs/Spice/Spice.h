@@ -78,143 +78,164 @@ namespace Isis {
    * @author 2003-03-13 Jeff Anderson
    *
    * @internal
-   *  @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
-   *                                     isis.astrogeology...
-   *  @history 2003-10-15 Jeff Anderson - Added requirement for frame kernel in
-   *                                      labels
-   *  @history 2003-10-28 Jeff Anderson - Changed SpaceCraft to Spacecraft in
-   *                                      labels and method names
-   *  @history 2003-11-03 Jeff Anderson - Added SubSolarPoint and
-   *                                      SubSpacecraftPoint methods
-   *  @history 2003-11-12 Jeff Anderson - Added Target method
-   *  @history 2004-01-14 Jeff Anderson - Changed how the SPK, CK, and Instrument
-   *                                      codes where handled. The instrument code
-   *                                      must be in the labels as NaifFrameCode
-   *                                      and then the other two can be
-   *                                      automatically computed.
-   *  @history 2004-02-18 Jeff Anderson - Modified to ignore kernel labels which
-   *                                      were blank
-   *  @history 2004-03-25 Jeff Anderson - Modified NaifBodyCode method to convert
-   *                                      Jupiter target code of 599 to 5
-   *  @history 2004-03-25 Jeff Anderson - Fixed bug in destructor and added
-   *                                      GetString method.
-   *  @history 2005-02-15 Elizabeth Ribelin - Modified file to support Doxygen
-   *                                          documentation
-   *  @history 2005-02-24 Jeff Anderson - Modified SubSolarPoint and
-   *                                      SubSpacecraftPoint to return positive
-   *                                      longitudes only
-   *  @history 2005-09-12 Jeff Anderson - Check for case-insensitive values for
-   *                                      TargetName of SKY
-   *  @history 2005-09-20 Jeff Anderson - Added IsSky method
-   *  @history 2006-01-05 Debbie A. Cook - Added units to comments
-   *  @history 2006-03-28 Jeff Anderson - Refactored using SpiceRotation and
-   *                                      SpicePosition classes.  Added Tables
-   *                                      and nadir kernel information.
-   *  @history 2006-03-31 Elizabeth Miller - Added TargetCenterDistance method
-   *  @history 2006-04-19 Elizabeth Miller - Added SolarLongitude method
-   *  @history 2007-01-30 Tracie Sucharski - Throw error in the load method before
-   *                              calling furnish if the file does not exist.
-   *  @history 2007-07-09 Steven Lambright - Frame kernel is now optional, added Extra kernel
-   *                              support.
-   *  @history 2007-07-10 Debbie A. Cook - Modified method ComputeSolarLongitude to use
-   *                                       pxform instead of tipbod to get body-fixed to
-   *                                       J2000 rotation matrix so that the correct frame
-   *                                       will be used.  If the frame is different from the
-   *                                       default IAU frame, the correct frame should be set
-   *                                       in the iak file (see frames.req).  Also modified
-   *                                       setting of m_bodyRotation frameCode.  The old code
-   *                                       forced the IAU_ frame.  The new code uses the Naif
-   *                                       routine cidfrm to get the frame associated with the
-   *                                       body id.  These change will recognize any frame
-   *                                       changes made in the iak file.
-   *  @history 2007-08-10 Steven Lambright - Added support for Nadir keyword in InstrumentPointing group
-   *                                       to not be the first element in the PvlKeyword.
-   *  @history 2007-08-24 Debbie A. Cook - Removed m_sB so it is recalculated every time it is used
-   *                                       insuring that any updates to the position or rotation are applied.
-   *                                       Also removed m_BP since it is no longer used
-   *  @history 2008-02-13 Steven Lambright - Added StartPadding and EndPadding caching capabilties
-   *  @history 2008-02-13 Steven Lambright - Added Support Check for StartPadding and EndPadding caching capabilties;
-   *                                        An clarified exception is thrown if a framing camera tries to use time padding
-   *  @history 2008-02-27 Kris Becker - Modified so that planetary ephemeris SPKs
-   *                                    are loaded before spacecraft SPKs so that
-   *                                    missions that augment planet ephemerides
-   *                                    will take precidence.
-   *  @history 2008-06-23 Steven Lambright - Added NaifStatus error checking
-   *  @history 2008-06-25 Debbie A. Cook - Added method InstrumentVelocity to support miniRF
-   *  @history 2008-11-28 Debbie A. Cook - Added method hasKernels()
-   *  @history 2009-03-18 Tracie Sucharski - Cleaned up some unnecessary,obsolete code.  Make sure the
-   *                                    table is used if the kernel names follow the "Table" keyword value, due to change
-   *                                    made to spiceinit to retain kernel names if the spice is written to blob.
-   *  @history 2009-06-18 Debbie A. Cook - Modified to downsize instrument rotation table when loading cache
-   *  @history 2009-07-01 Debbie A. Cook - Modified to downsize body rotation, and sun position tables when loading cache
-   *  @history 2009-08-03 Debbie A. Cook - Added tolerance argument to method
-   *                                       CreateCache to allow downsizing of
-   *                                       instrument position Spice table.
-   *  @history 2009-08-21 Kris Becker - Moved the NAIF code methods to public
-   *                                    scope.
-   *  @history 2010-01-29 Debbie A. Cook - Redid Tracie's change to make sure the table is loaded instead of the
-   *                                        kernels if the kernel keyword value lists "Table" before the kernel files.
-   *  @history 2010-03-19 Debbie A. Cook - Added constructor and moved common constructor initialization into
-   *                                        new method Init.  Also added parameter notab to method Load.
-   *  @history 2010-04-09 Debbie A. Cook - Moved the loading of the "extra" kernel(s) from the middle of
-   *                                       the loads to the end.
-   *  @history 2011-02-08 Jeannie Walldren - Added documentation to methods and private variables. Commented out
-   *                                         createCache(double,double) since it appears that this method is not
-   *                                         needed. Initialize pointers to NULL in Init() method.
-   *  @history 2011-02-09 Steven Lambright - Refactored to use iTime where
-   *                                         possible. Changed m_radii to a
-   *                                         Distance so the units are no longer
-   *                                         ambiguous. These changes were meant
-   *                                         for readability and reducing the
-   *                                         likelyhood of future code having
-   *                                         bugs due to unit mismatches.
-   *  @history 2011-02-11 Jeannie Walldren - Changed documentation references to
-   *                                         SetEphemerisTime() method (these
-   *                                         were replaced with references to
-   *                                         setTime()). Added missing
-   *                                         documentation to new methods.
-   *  @history 2011-05-03 Jeannie Walldren - Added Isis Disclaimer to files.
-   *  @history 2011-05-25 Janet Barrett and Steven Lambright - Added API that
-   *                                         stores naif values and arbitrary
-   *                                         computations so that the text
-   *                                         kernels do not have to be
-   *                                         furnished. This makes the
-   *                                         Camera instantiation much, much
-   *                                         quicker. Text kernels are no longer
-   *                                         furnished when their data has been
-   *                                         stored in the labels.
-   *  @history 2011-05-26 Debbie A. Cook -  Put back the code for spkwriter that
-   *                                         was checked in May 25 but disappeared
-   *                                         in the May 26 build.  This code turns
-   *                                         aberration corrections off for the
-   *                                         instrument position if the spk file
-   *                                         was created by spkwriter.
-   *  @history 2011-07-08 Jeff Anderson  -  Fixed Init method to record the
-   *                                         integer body frame code in the labels
-   *                                         of the cube. Vesta exposed this
-   *                                         problem because it was not a
-   *                                         instrinsic body in the NAIF toolkit
-   *                                         version 63.
-   *  @history 2011-07-11 Jeff Anderson  -  Added private copy constructors and
-   *                                         operator= methods
-   *  @history 2011-09-19 Debbie Cook -  Added cubes with Ideal Cameras to the
-   *                                         exclusion list for reading instrument
-   *                                         keywords from the label.  The Ideal
-   *                                         Camera has variable values for the
-   *                                         affine coefficients that are set in
-   *                                         the camera itself and not read from
-   *                                         a kernel.  The camera puts these
-   *                                         values into the Naif kernel pool.
-   *  @history 2012-07-06 Debbie A. Cook - Updated Spice members to be more compliant with Isis 
-   *                          coding standards. References #972.
-   *  @history 2012-09-10 Steven Lambright - Undid Debbie's change on 2012-09-19 because the
-   *                           Ideal camera now supports putting those keywords in the label
-   *                           on the fly. References #1094.
-   *  @history 2012-10-11 Debbie A. Cook - Deleted deprecated createCache code already commented
-   *                                         out for over a year.  Updated to use new Target and ShapeModel classes.
-   *                                         Added Resolution method needed for Target and its ShapeModel.
-   *                                         Changed private member names from p_ to m_ to comply with coding
-   *                                         standards.  References Mantis tickets #775 and #1114.
+   *   @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
+   *                           isis.astrogeology...
+   *   @history 2003-10-15 Jeff Anderson - Added requirement for frame kernel in
+   *                           labels
+   *   @history 2003-10-28 Jeff Anderson - Changed SpaceCraft to Spacecraft in
+   *                           labels and method names
+   *   @history 2003-11-03 Jeff Anderson - Added SubSolarPoint and 
+   *                           SubSpacecraftPoint methods
+   *   @history 2003-11-12 Jeff Anderson - Added Target method
+   *   @history 2004-01-14 Jeff Anderson - Changed how the SPK, CK, and
+   *                           Instrument codes where handled. The instrument
+   *                           code must be in the labels as NaifFrameCode and
+   *                           then the other two can be automatically computed.
+   *   @history 2004-02-18 Jeff Anderson - Modified to ignore kernel labels which
+   *                           were blank
+   *   @history 2004-03-25 Jeff Anderson - Modified NaifBodyCode method to convert
+   *                           Jupiter target code of 599 to 5
+   *   @history 2004-03-25 Jeff Anderson - Fixed bug in destructor and added
+   *                           GetString method.
+   *   @history 2005-02-15 Elizabeth Ribelin - Modified file to support Doxygen
+   *                           documentation
+   *   @history 2005-02-24 Jeff Anderson - Modified SubSolarPoint and
+   *                           SubSpacecraftPoint to return positive
+   *                           longitudes only
+   *   @history 2005-09-12 Jeff Anderson - Check for case-insensitive values for
+   *                           TargetName of SKY
+   *   @history 2005-09-20 Jeff Anderson - Added IsSky method
+   *   @history 2006-01-05 Debbie A. Cook - Added units to comments
+   *   @history 2006-03-28 Jeff Anderson - Refactored using SpiceRotation and
+   *                           SpicePosition classes.  Added Tables
+   *                           and nadir kernel information.
+   *   @history 2006-03-31 Elizabeth Miller - Added TargetCenterDistance method
+   *   @history 2006-04-19 Elizabeth Miller - Added SolarLongitude method
+   *   @history 2007-01-30 Tracie Sucharski - Throw error in the load method before
+   *                           calling furnish if the file does not exist.
+   *   @history 2007-07-09 Steven Lambright - Frame kernel is now optional,
+   *                           added Extra kernel support.
+   *   @history 2007-07-10 Debbie A. Cook - Modified method
+   *                           ComputeSolarLongitude to use pxform instead of
+   *                           tipbod to get body-fixed to J2000 rotation matrix
+   *                           so that the correct frame will be used. If the
+   *                           frame is different from the default IAU frame,
+   *                           the correct frame should be set in the iak file
+   *                           (see frames.req).  Also modified setting of
+   *                           m_bodyRotation frameCode.  The old code forced
+   *                           the IAU_ frame.  The new code uses the Naif
+   *                           routine cidfrm to get the frame associated with
+   *                           the body id.  These change will recognize any
+   *                           frame changes made in the iak file.
+   *   @history 2007-08-10 Steven Lambright - Added support for Nadir keyword in
+   *                           InstrumentPointing group to not be the first
+   *                           element in the PvlKeyword.
+   *   @history 2007-08-24 Debbie A. Cook - Removed p_sB so it is recalculated
+   *                           every time it is used insuring that any updates
+   *                           to the position or rotation are applied. Also
+   *                           removed p_BP since it is no longer used
+   *   @history 2008-02-13 Steven Lambright - Added StartPadding and EndPadding
+   *                           caching capabilties
+   *   @history 2008-02-13 Steven Lambright - Added Support Check for
+   *                           StartPadding and EndPadding caching capabilties;
+   *                           An clarified exception is thrown if a framing
+   *                           camera tries to use time padding
+   *   @history 2008-02-27 Kris Becker - Modified so that planetary ephemeris SPKs
+   *                           are loaded before spacecraft SPKs so that
+   *                           missions that augment planet ephemerides will
+   *                           take precidence.
+   *   @history 2008-06-23 Steven Lambright - Added NaifStatus error checking
+   *   @history 2008-06-25 Debbie A. Cook - Added method InstrumentVelocity to
+   *                           support miniRF
+   *   @history 2008-11-28 Debbie A. Cook - Added method hasKernels()
+   *   @history 2009-03-18 Tracie Sucharski - Cleaned up some unnecessary,
+   *                           obsolete code.  Make sure the table is used if
+   *                           the kernel names follow the "Table" keyword
+   *                           value, due to change made to spiceinit to retain
+   *                           kernel names if the spice is written to blob.
+   *   @history 2009-06-18 Debbie A. Cook - Modified to downsize instrument
+   *                           rotation table when loading cache
+   *   @history 2009-07-01 Debbie A. Cook - Modified to downsize body rotation,
+   *                           and sun position tables when loading cache
+   *   @history 2009-08-03 Debbie A. Cook - Added tolerance argument to method
+   *                           CreateCache to allow downsizing of instrument
+   *                           position Spice table.
+   *   @history 2009-08-21 Kris Becker - Moved the NAIF code methods to public
+   *                           scope.
+   *   @history 2010-01-29 Debbie A. Cook - Redid Tracie's change to make sure
+   *                           the table is loaded instead of the kernels if the
+   *                           kernel keyword value lists "Table" before the
+   *                           kernel files.
+   *   @history 2010-03-19 Debbie A. Cook - Added constructor and moved common
+   *                           constructor initialization into new method Init.
+   *                           Also added parameter notab to method Load.
+   *   @history 2010-04-09 Debbie A. Cook - Moved the loading of the "extra"
+   *                           kernel(s) from the middle of the loads to the end.
+   *   @history 2011-02-08 Jeannie Walldren - Added documentation to methods and
+   *                           private variables. Commented out
+   *                           createCache(double,double) since it appears that
+   *                           this method is not needed. Initialize pointers to
+   *                           NULL in Init() method.
+   *   @history 2011-02-09 Steven Lambright - Refactored to use iTime where
+   *                           possible. Changed p_radii to a Distance so the
+   *                           units are no longer ambiguous. These changes were
+   *                           meant for readability and reducing the likelyhood
+   *                           of future code having bugs due to unit mismatches.
+   *   @history 2011-02-11 Jeannie Walldren - Changed documentation references to
+   *                           SetEphemerisTime() method (these were replaced
+   *                           with references to setTime()). Added missing
+   *                           documentation to new methods.
+   *   @history 2011-05-03 Jeannie Walldren - Added Isis Disclaimer to files.
+   *   @history 2011-05-25 Janet Barrett and Steven Lambright - Added API that
+   *                           stores naif values and arbitrary computations so
+   *                           that the text kernels do not have to be
+   *                           furnished. This makes the Camera instantiation
+   *                           much, much quicker. Text kernels are no longer
+   *                           furnished when their data has been stored in the
+   *                           labels.
+   *   @history 2011-05-26 Debbie A. Cook - Put back the code for spkwriter
+   *                           that was checked in May 25 but disappeared in the
+   *                           May 26 build.  This code turns aberration
+   *                           corrections off for the instrument position if
+   *                           the spk file was created by spkwriter.
+   *   @history 2011-07-08 Jeff Anderson - Fixed Init method to record the
+   *                           integer body frame code in the labels of the
+   *                           cube. Vesta exposed this problem because it was
+   *                           not a instrinsic body in the NAIF toolkit
+   *                           version 63.
+   *   @history 2011-07-11 Jeff Anderson - Added private copy constructors and
+   *                           operator= methods
+   *   @history 2011-09-19 Debbie Cook - Added cubes with Ideal Cameras to the
+   *                           exclusion list for reading instrument keywords
+   *                           from the label.  The Ideal Camera has variable
+   *                           values for the affine coefficients that are set
+   *                           in the camera itself and not read from a kernel.
+   *                           The camera puts these values into the Naif kernel
+   *                           pool.
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more
+   *                           compliant with Isis coding standards. References
+   *                           #972.
+   *   @history 2012-09-10 Steven Lambright - Undid Debbie's change from
+   *                           2011-09-19 because the Ideal camera now supports
+   *                           putting those keywords in the label on the fly.
+   *                           References #1094.
+   *   @history 2012-10-11 Debbie A. Cook - Deleted deprecated createCache code
+   *                           already commented out for over a year.  Updated
+   *                           to use new Target and ShapeModel classes. Added
+   *                           resolution method needed for Target and its
+   *                           ShapeModel. Changed private member names from
+   *                           p_ to m_ to comply with coding standards.
+   *                           References Mantis tickets #775 and #1114.
+   *   @history 2012-10-25 Jeannie Backer - Added accesssor method to return the
+   *                           BODY_FRAME_CODE value found in the init() method.
+   *                           Improved unitTest coverage in all areas. New
+   *                           method has 100% scope, line, function coverage.
+   *                           Improved padding around control statements  and
+   *                           indentation of history entries to be more
+   *                           compliant with standards. Moved accessor method
+   *                           implementations to cpp file. Changed Resolution()
+   *                           method to lower camel case. Added documentation.
+   *                           Fixes #1181.
    */
   class Spice {
     public:
@@ -253,49 +274,10 @@ namespace Isis {
       SpiceInt getInteger(const IString &key,   int index = 0);
       IString getString(const IString &key,     int index = 0);
 
-      /**
-       * Accessor method for the sun position.
-       * @return @b iTime Sun position for the image.
-       * @author Steven Lambright
-       * @internal
-       *   @history 2011-02-09 Steven Lambright - Original version.
-       */
-      SpicePosition *sunPosition() const {
-        return m_sunPosition;
-      };
-
-      /**
-       * Accessor method for the instrument position.
-       * @return @b iTime Instrument position for the image.
-       * @author Steven Lambright
-       * @internal
-       *   @history 2011-02-09 Steven Lambright - Original version.
-       */
-      SpicePosition *instrumentPosition() const {
-        return m_instrumentPosition;
-      };
-
-      /**
-       * Accessor method for the body rotation.
-       * @return @b iTime Body rotation for the image.
-       * @author Steven Lambright
-       * @internal
-       *   @history 2011-02-09 Steven Lambright - Original version.
-       */
-      SpiceRotation *bodyRotation() const {
-        return m_bodyRotation;
-      };
-
-      /**
-       * Accessor method for the instrument rotation.
-       * @return @b iTime Instrument rotation for the image.
-       * @author Steven Lambright
-       * @internal
-       *   @history 2011-02-09 Steven Lambright - Original version.
-       */
-      SpiceRotation *instrumentRotation() const {
-        return m_instrumentRotation;
-      };
+      SpicePosition *sunPosition() const;
+      SpicePosition *instrumentPosition() const;
+      SpiceRotation *bodyRotation() const;
+      SpiceRotation *instrumentRotation() const;
 
       bool hasKernels(Pvl &lab);
 
@@ -304,25 +286,21 @@ namespace Isis {
       SpiceInt naifCkCode() const;
       SpiceInt naifIkCode() const;
       SpiceInt naifSclkCode() const;
+      SpiceInt naifBodyFrameCode() const;
 
       PvlObject getStoredNaifKeywords() const;
-
-      /**
-       * Pure virtual method that returns the pixel resolution of the sensor in
-       * meters/pix.
-       *
-       * @return @b double Resolution value of 1.0
-       */
-      virtual double Resolution() {
-        return 1.;
-          };
+      virtual double resolution();
 
     protected:
+      /**
+       * NAIF value primitive type
+       *
+       */
       enum SpiceValueType {
-        SpiceDoubleType,
-        SpiceStringType,
-        SpiceIntType,
-        SpiceByteCodeType
+        SpiceDoubleType,  //!< SpiceDouble type
+        SpiceStringType,  //!< SpiceString type
+        SpiceIntType,     //!< SpiceInt type
+        SpiceByteCodeType //!< SpiceByteCode type
       };
 
       QVariant readValue(IString key, SpiceValueType type, int index = 0);
@@ -388,6 +366,9 @@ namespace Isis {
       SpiceInt *m_ikCode;          //!< Instrument kernel (IK) code
       SpiceInt *m_sclkCode;        //!< Spacecraft clock correlation kernel (SCLK) code
       SpiceInt *m_spkBodyCode;     //!< Spacecraft and planet ephemeris kernel (SPK) body code
+      SpiceInt *m_bodyFrameCode; /**< Naif's BODY_FRAME_CODE value. It is read 
+                                      from the labels, if it exists. Otherwise, 
+                                      it's calculated by the init() method.*/
 
       PvlObject *m_naifKeywords;
 

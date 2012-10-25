@@ -291,7 +291,8 @@ int main() {
     cout << "Phase = " << phase.degrees() << endl;
     cout << "Emission = " << emission.degrees() << endl;
     cout << "Incidence = " << incidence.degrees() << endl;
-  } else {
+  } 
+  else {
     cout << "Angles could not be calculated." << endl;
   }
   delete cam3;
@@ -316,7 +317,8 @@ int main() {
     cout << "Phase = " << phase.degrees() << endl;
     cout << "Emission = " << emission.degrees() << endl;
     cout << "Incidence = " << incidence.degrees() << endl;
-  } else {
+  } 
+  else {
     cout << "Angles could not be calculated." << endl;
   }
   delete cam4;
@@ -341,7 +343,8 @@ int main() {
     cout << "Phase = " << phase.degrees() << endl;
     cout << "Emission = " << emission.degrees() << endl;
     cout << "Incidence = " << incidence.degrees() << endl;
-  } else {
+  } 
+  else {
     cout << "Angles could not be calculated." << endl;
   }
   delete cam5;
@@ -366,7 +369,8 @@ int main() {
     cout << "Phase = " << phase.degrees() << endl;
     cout << "Emission = " << emission.degrees() << endl;
     cout << "Incidence = " << incidence.degrees() << endl;
-  } else {
+  } 
+  else {
     cout << "Angles could not be calculated." << endl;
   }
   delete cam6;
@@ -391,7 +395,8 @@ int main() {
     cout << "Phase = " << phase.degrees() << endl;
     cout << "Emission = " << emission.degrees() << endl;
     cout << "Incidence = " << incidence.degrees() << endl;
-  } else {
+  } 
+  else {
     cout << "Angles could not be calculated." << endl;
   }
   delete cam7;
@@ -416,7 +421,8 @@ int main() {
     cout << "Phase = " << phase.degrees() << endl;
     cout << "Emission = " << emission.degrees() << endl;
     cout << "Incidence = " << incidence.degrees() << endl;
-  } else {
+  } 
+  else {
     cout << "Angles could not be calculated." << endl;
   }
   delete cam8;
@@ -441,7 +447,8 @@ int main() {
     cout << "Phase = " << phase.degrees() << endl;
     cout << "Emission = " << emission.degrees() << endl;
     cout << "Incidence = " << incidence.degrees() << endl;
-  } else {
+  } 
+  else {
     cout << "Angles could not be calculated." << endl;
   }
   delete cam9;
@@ -466,7 +473,8 @@ int main() {
     cout << "Phase = " << phase.degrees() << endl;
     cout << "Emission = " << emission.degrees() << endl;
     cout << "Incidence = " << incidence.degrees() << endl;
-  } else {
+  } 
+  else {
     cout << "Angles could not be calculated." << endl;
   }
   delete cam10;
@@ -491,7 +499,8 @@ int main() {
     cout << "Phase = " << phase.degrees() << endl;
     cout << "Emission = " << emission.degrees() << endl;
     cout << "Incidence = " << incidence.degrees() << endl;
-  } else {
+  } 
+  else {
     cout << "Angles could not be calculated." << endl;
   }
   delete cam11;
@@ -516,7 +525,8 @@ int main() {
     cout << "Phase = " << phase.degrees() << endl;
     cout << "Emission = " << emission.degrees() << endl;
     cout << "Incidence = " << incidence.degrees() << endl;
-  } else {
+  } 
+  else {
     cout << "Angles could not be calculated." << endl;
   }
   delete cam12;

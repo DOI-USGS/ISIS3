@@ -46,6 +46,12 @@ namespace Isis {
    * @author 2010-07-30 Debbie A. Cook
    *
    * @internal
+   *   @history 2010-07-30 - Debbie A. Cook - Original version.
+   *   @history 2012-10-25 - Jeannie Backer - Changed resolution() method and
+   *                             call to Spice::resolution() method to lower
+   *                             camel case. Added resolution() method test to
+   *                             improve unitTest code coverage. References
+   *                             #1181.
    */
   class ShapeModel {
     public:
@@ -57,7 +63,8 @@ namespace Isis {
       // Initialization
       void Initialize();
 
-      // Destructor -- must be virtual in order to clean up properly because of virtual method below
+      // Destructor -- must be virtual in order to clean up properly because of 
+      // virtual method below
       virtual ~ShapeModel()=0;
 
       // Intersect the shape model
@@ -73,10 +80,12 @@ namespace Isis {
       // Calculate the default normal of the current intersection point
       virtual void calculateDefaultNormal() = 0; 
 
-      // Calculate the local normal of the current intersection point (relative to neighbor points)
+      // Calculate the local normal of the current intersection point 
+      // (relative to neighbor points)
       virtual void calculateLocalNormal(QVector<double *> neighborPoints) = 0; 
 
-      // Calculate the surface normal of the current intersection point (relative to ellipsoid)
+      // Calculate the surface normal of the current intersection point 
+      // (relative to ellipsoid)
       virtual void calculateSurfaceNormal() = 0; 
 
       // Clear current point
@@ -89,7 +98,8 @@ namespace Isis {
       virtual double incidenceAngle(const std::vector<double> &uB);
 
       // Calculate the phase angle of the current intersection point
-      virtual double phaseAngle(const std::vector<double> &sB, const std::vector<double> &uB);
+      virtual double phaseAngle(const std::vector<double> &sB, 
+                                const std::vector<double> &uB);
 
       // Return local radius from shape model
       virtual Distance localRadius(const Latitude &lat, const Longitude &lon) = 0;
@@ -121,14 +131,14 @@ namespace Isis {
                               const std::vector<double> &observerLookVectorToTarget);
       std::vector<Distance> targetRadii() const;
       void setHasNormal(bool status);
-      double Resolution();
+      double resolution();
 
     private:
       bool m_hasIntersection;       //!< indicates good intersection exists
       bool m_hasNormal;             //!< indicates normal has been computed
       std::vector<double> m_normal; //!< Local normal of current intersection point
       IString *m_name;
-      SurfacePoint *m_surfacePoint;        //!< Current intersection point
+      SurfacePoint *m_surfacePoint; //!< Current intersection point
 
       Target *m_target;
   };

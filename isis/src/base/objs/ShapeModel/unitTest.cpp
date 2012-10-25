@@ -122,6 +122,9 @@ class MyShape : public ShapeModel {
       setHasNormal(true);
   }
 
+  double resolution() {
+    return ShapeModel::resolution();
+  }
 };
 
 
@@ -185,6 +188,9 @@ class MyEllipse : public ShapeModel {
     return hasNormal();
   }
 
+  double resolution() {
+    return ShapeModel::resolution();
+  }
 };
 
 
@@ -207,6 +213,13 @@ int main() {
 
   cout << endl << "  Shape name is " << shape.name() << endl;
   cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
+  try {
+    cout << "    Get the resolution:         " << shape.resolution() << endl;
+  }
+  catch (IException &e) {
+    cout << "    Test resolution() error message when there is no intersection:" << endl;
+    e.print();
+  }
   cout << "    Set a pixel in the image and check again." << endl;
   double line = 453.0;
   double sample = 534.0;
@@ -231,6 +244,13 @@ Local normal = -0.581842, -0.703663, 0.407823
       return -1;
   }
   cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
+  try {
+    cout << "    Get the resolution:         " << shape.resolution() << endl;
+  }
+  catch (IException &e) {
+    cout << "    Test resolution() error message when there is no intersection:" << endl;
+    e.print();
+  }
   SurfacePoint *sp = shape.surfaceIntersection();
   cout << "    surface point = (" << sp->GetX().kilometers() << ", " << 
     sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << endl;
@@ -298,10 +318,24 @@ Local normal = -0.581842, -0.703663, 0.407823
   cout << endl << "  Testing setHasIntersection method" << endl;
   shape.setHasIntersection(false);
   cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
+  try {
+    cout << "    Get the resolution:         " << shape.resolution() << endl;
+  }
+  catch (IException &e) {
+    cout << "    Test resolution() error message when there is no intersection:" << endl;
+    e.print();
+  }
 
   cout << endl << "  Testing setSurfacePoint method ..." << endl;
   shape.setSurfacePoint(*sp);
   cout << "     Do we have an intersection? " << shape.hasIntersection() << endl;
+  try {
+    cout << "    Get the resolution:         " << shape.resolution() << endl;
+  }
+  catch (IException &e) {
+    cout << "    Test resolution() error message when there is no intersection:" << endl;
+    e.print();
+  }
   cout << "     surface point = (" << sp->GetX().kilometers() << ", " << 
     sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << ")" << endl;
   
@@ -310,6 +344,13 @@ Local normal = -0.581842, -0.703663, 0.407823
   try {
     cout << endl << "  Testing ellipsoid methods in base class" << endl;
     cout << "    Do we have an intersection? " << eshape.hasIntersection() << endl;
+    try {
+      cout << "    Get the resolution:         " << eshape.resolution() << endl;
+    }
+    catch (IException &e) {
+      cout << "    Test resolution() error message when there is no intersection:" << endl;
+      e.print();
+    }
     cout << endl << "    Testing  failing of method intersectEllipsoid..." << endl;
     std::vector<double> badlook(3,1.);
     badlook[0] = -1.; 
@@ -318,6 +359,13 @@ Local normal = -0.581842, -0.703663, 0.407823
       cout << "    ...  intersectSurface method failed -- no intersection" << endl;
     
     cout << "    Do we have an intersection? " << eshape.hasIntersection() << endl;
+    try {
+      cout << "    Get the resolution:         " << eshape.resolution() << endl;
+    }
+    catch (IException &e) {
+      cout << "    Test resolution() error message when there is no intersection:" << endl;
+      e.print();
+    }
     cout << endl << "    Testing  method intersectEllipsoid..." << endl; 
 
     if (eshape.intersectSurface(sB, lookB)) { 
@@ -326,6 +374,13 @@ Local normal = -0.581842, -0.703663, 0.407823
         sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << endl;
     }
     cout << "    Do we have an intersection? " << eshape.hasIntersection() << endl;
+    try {
+      cout << "    Get the resolution:         " << eshape.resolution() << endl;
+    }
+    catch (IException &e) {
+      cout << "    Test resolution() error message when there is no intersection:" << endl;
+      e.print();
+    }
     SurfacePoint *sp = eshape.surfaceIntersection();
     cout << "    surface point = (" << sp->GetX().kilometers() << ", " << 
       sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << endl;
@@ -345,6 +400,13 @@ Local normal = -0.581842, -0.703663, 0.407823
     eshape.setHasIntersection(false); 
     cout << "    Do we have an intersection? " << eshape.hasIntersection() << endl;
     try {
+      cout << "    Get the resolution:         " << eshape.resolution() << endl;
+    }
+    catch (IException &e) {
+      cout << "    Test resolution() error message when there is no intersection:" << endl;
+      e.print();
+    }
+    try {
       cout << endl << "    Testing  method calculateEllipsoidalSurfaceNormal with no intersection..." << endl;
       eshape.calculateLocalNormal(notUsed);
     }
@@ -363,7 +425,6 @@ Local normal = -0.581842, -0.703663, 0.407823
     myNormal = eshape.normal();
     cout << "      true normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
   }
-
   catch(Isis::IException &e) {
     e.print();
   }
@@ -372,7 +433,14 @@ Local normal = -0.581842, -0.703663, 0.407823
   MyEllipse defaultShape;
   cout << endl << "  Testing default constructor..." << endl;
   cout << "    Shape is " << defaultShape.name() << endl;
-  cout << "    Is there an intersection? " << defaultShape.hasIntersection() << endl;
+  cout << "    Do we have an an intersection? " << defaultShape.hasIntersection() << endl;
+  try {
+    cout << "    Get the resolution:       " << defaultShape.resolution() << endl;
+  }
+  catch (IException &e) {
+    cout << "    Test resolution() error message when there is no intersection:" << endl;
+    e.print();
+  }
   cout << "    Is there an normal? " << defaultShape.normalStatus() << endl;
   defaultShape.setHasIntersection(true);
   defaultShape.calculateDefaultNormal();

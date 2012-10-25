@@ -5,12 +5,13 @@
 #include <iomanip>
 
 #include "BasisFunction.h"
+#include "IException.h"
 #include "LeastSquares.h"
 #include "LineEquation.h"
 #include "NaifStatus.h"
 #include "NumericalApproximation.h"
 #include "PolynomialUnivariate.h"
-#include "IException.h"
+#include "TableField.h"
 
 namespace Isis {
   /**

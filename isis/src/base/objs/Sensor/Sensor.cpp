@@ -22,9 +22,9 @@
 
 #include "Sensor.h"
 
-#include <iomanip>
-
 #include <QDebug>
+
+#include <iomanip>
 
 #include "Angle.h"
 #include "Constants.h"
@@ -73,7 +73,7 @@ namespace Isis {
   void Sensor::IgnoreElevationModel(bool ignore) {
     // if we have an elevation model and are not ignoring it,
     //   set p_hasElevationModel to true
-    if(!ignore) {
+    if (!ignore) {
       target()->restoreShape();
     }
     else {
@@ -154,7 +154,7 @@ namespace Isis {
     m_newLookB = true;
 
     // Don't try to intersect the sky
-    if(target()->isSky()) {
+    if (target()->isSky()) {
       target()->shape()->setHasIntersection(false);
       return false;
     }
@@ -163,8 +163,8 @@ namespace Isis {
     const vector<double> &sB = bodyRotation()->ReferenceVector(
         instrumentPosition()->Coordinate());
 
-    // double tolerance = Resolution() / 100.0;
-    // return target()->shape()->intersectSurface(sB, lookB, tolerance);
+    // double tolerance = resolution() / 100.0; return
+    // target()->shape()->intersectSurface(sB, lookB, tolerance);
     return target()->shape()->intersectSurface(sB, lookB);
   }
 
@@ -194,32 +194,56 @@ namespace Isis {
     p[2] = shape->surfaceIntersection()->GetZ().kilometers();
   }
 
-
+  /**
+   * Returns the planetocentric latitude at the surface intersection point
+   * in body fixed.
+   *
+   * @return @b double Universal latitude value
+   */
   double Sensor::UniversalLatitude() const {
     return target()->shape()->surfaceIntersection()->GetLatitude().degrees();
   }
 
 
+  /**
+   * Returns the latitude.
+   */
   Latitude Sensor::GetLatitude() const {
     return target()->shape()->surfaceIntersection()->GetLatitude();
   }
 
 
+  /**
+   * Returns a positive east, 0-360 domain longitude at the surface
+   * intersection point in body fixed.
+   *
+   * @return @b double Universal longitude value
+   */
   double Sensor::UniversalLongitude() const {
     return target()->shape()->surfaceIntersection()->GetLongitude().degrees();
   }
 
 
+  /**
+   * Returns the longitude.
+   */
   Longitude Sensor::GetLongitude() const {
     return target()->shape()->surfaceIntersection()->GetLongitude();
   }
 
-
+  /**
+   * Returns the surface point (most efficient accessor).
+   */
   SurfacePoint Sensor::GetSurfacePoint() const {
     return *(target()->shape()->surfaceIntersection());
   }
 
 
+  /**
+   * Returns the local radius at the intersection point. This is either the
+   * radius on the ellipsoid, the radius from the surface model passed into
+   * the constructor, or the radius set with SetUniversalGround.
+   */
   Distance Sensor::LocalRadius() const {
     //TODO: We probably need to be validating surface intersect point is not NULL
     // Here? or in ShapeModel? or what, man?
@@ -458,7 +482,7 @@ namespace Isis {
    * Returns the right ascension angle (sky longitude)
    */
   double Sensor::RightAscension() {
-    if(m_newLookB) computeRaDec();
+    if (m_newLookB) computeRaDec();
     return m_ra;
   }
 
@@ -467,7 +491,7 @@ namespace Isis {
    * @return @b double Declination angle.
    */
   double Sensor::Declination() {
-    if(m_newLookB) computeRaDec();
+    if (m_newLookB) computeRaDec();
     return m_dec;
   }
 
@@ -549,8 +573,8 @@ namespace Isis {
 
     double lst = UniversalLongitude() - slon + 180.0;
     lst = lst / 15.0;  // 15 degress per hour
-    if(lst < 0.0) lst += 24.0;
-    if(lst > 24.0) lst -= 24.0;
+    if (lst < 0.0) lst += 24.0;
+    if (lst > 24.0) lst -= 24.0;
     return lst;
   }
 
@@ -627,10 +651,10 @@ namespace Isis {
    * @return @b double Local radius from the DEM
    */
 //  Distance Sensor::DemRadius(const Latitude &lat, const Longitude &lon) {
-//    if(!m_hasElevationModel) return Distance();
-//    //if(!lat.Valid() || !lon.Valid()) return Distance();
+//    if (!m_hasElevationModel) return Distance();
+//    //if (!lat.Valid() || !lon.Valid()) return Distance();
 //    m_demProj->SetUniversalGround(lat.degrees(), lon.degrees());
-//    if(!m_demProj->IsGood()) {
+//    if (!m_demProj->IsGood()) {
 //      return Distance();
 //    }
 
@@ -659,7 +683,7 @@ namespace Isis {
    * @returns A radius in kilometers
    */
 //  double Sensor::DemRadius(double lat, double lon) {
-//    if(!m_demProj->SetUniversalGround(lat, lon)) {
+//    if (!m_demProj->SetUniversalGround(lat, lon)) {
 //      return Isis::Null;
 //    }
 
@@ -669,7 +693,7 @@ namespace Isis {
 //    double radius = m_interp->Interpolate(m_demProj->WorldX(),
 //                                          m_demProj->WorldY(),
 //                                          m_portal->DoubleBuffer());
-//    if(Isis::IsSpecial(radius)) {
+//    if (Isis::IsSpecial(radius)) {
 //      return Isis::Null;
 //    }
 
@@ -677,5 +701,14 @@ namespace Isis {
 //      double fred;
 //      return fred;
 //  }
+  /**
+   * Indicates whether the Kernels PvlGroup has an ElevationModel or
+   * ShapeModel PvlKeyword value.
+   *
+   * @return @b bool True if an elevation model exists.
+   */
+//   bool HasElevationModel() {
+//     return m_hasElevationModel;
+//   };
 
 }

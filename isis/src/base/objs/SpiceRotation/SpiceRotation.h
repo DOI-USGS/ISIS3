@@ -24,12 +24,14 @@
 
 #include <string>
 #include <vector>
+
+#include <naif/SpiceUsr.h>
+#include <naif/SpiceZfc.h>
+#include <naif/SpiceZmc.h>
+
 #include "Table.h"
 #include "Quaternion.h"
 #include "PolynomialUnivariate.h"
-#include "naif/SpiceUsr.h"
-#include "naif/SpiceZfc.h"
-#include "naif/SpiceZmc.h"
 
 #define J2000Code    1
 
@@ -59,77 +61,114 @@ namespace Isis {
    * @author 2005-12-01 Debbie A. Cook
    *
    * @internal
-   *  @history 2005-12-01  Debbie A. Cook Original Version modified from
-   *  SpicePosition class by Jeff Anderson
-   *  @history 2006-03-23  Jeff Anderson modified SetEphemerisTime to return
-   *                       if the time did not change to improve speed.
-   *  @history 2006-10-18  Debbie A. Cook Added method, WrapAngle, to wrap
-   *                        angles around 2 pi
-   *  @history 2007-12-05  Debbie A. Cook added method SetPolynomialDegree to
-   *                        allow the degree of the polynomials fit to the
-   *                        camera angles to be changed.  Also changed the
-   *                        polynomial from a fixed 2nd order polynomial to
-   *                        an nth degree polynomial with one independent
-   *                        variable.  PartialType was revised and the calls to
-   *                        SetReferencePartial (has an added argument, coefficient index)
-   *                        and DPolynomial (argument type changed to int) were revised.
-   *                        The function was changed from Parabola
-   *                        to Polynomial1Variable, now called
-   *                        PolynomialUnivariate. New methods GetBaseTime
-   *                        and SetOverrideBaseTime were added
-   *  @history 2008-02-15  Debbie A. Cook added a new error message to handle the
-   *                        case where the Naif reference frame code is not
-   *                        recognized.
-   *  @history 2008-06-18  Fixed documentation, added NaifStatus calls
-   *  @history 2008-11-26  Debbie A. Cook Added method to set axes of rotation.
-   *                        Default axes are still 3,1,3 so existing software will
-   *                        not be affected by the change.  Also added timeScale to the
-   *                        the class and made some parameters protected instead of private
-   *                        so they are available to inheriting classes.
-   *  @history 2008-12-12  Debbie A. Cook Added method to return frame code
-   *  @history 2009-01-26  Debbie A. Cook Added wrap of 3rd camera angle when crossing +-180
-   *  @history 2009-04-21  Debbie A. Cook Added methods MinimizeCache and LoadTimeCache, variable p_minimizeCache, and
-   *                        enum constants DownsizeStatus
-   *  @history 2009-06-29  Debbie A. Cook Fixed memory overwrite problem in LoadTimeCache when reading a type 3 ck
-   *  @history 2009-07-24  Debbie A. Cook Removed downsizing for Nadir instrument pointing tables (LoadTimeCache) so that
-   *                        radar instruments will work.  Current downsizing code requires sclk and radar has no sclk.
-   *  @history 2009-10-01  Debbie A. Cook Divided the rotation into a constant (in time) part and a time-based part and
-   *                        added keywords listing the frame chains for both the constant part and the time-based part.
-   *  @history 2009-10-09  Debbie A. Cook Added angular velocity when it is available
-   *  @history 2009-10-30  Modified J2000Vector and ReferenceVector to work on either length 3 vectors (position only)
-   *                        or lenght 6 vectors (position and velocity) and added private method StateTJ()
-   *  @history 2009-12-03  Debbie A. Cook Modified tests in LoadTimeCache to allow observation to cross segment boundary
-   *                        for LRO
-   *  @history 2010-03-19  Debbie A. Cook Revised ReloadCache including removing obsolete arguments.  Added
-   *                        initialization of members p_fullCacheStartTime, p_fullCacheEndTime, and p_fullCacheSize.  Added these
-   *                        same values to the table label in method Cache and the reading of these values to the method
-   *                        LoadCache(table).  Improved error message in FrameTrace.  Also corrected a comment in StateTJ
-   *  @history 2010-09-23  Debbie A. Cook Revised to write out line cache for updated pointing when cache size is 1. If the
-   *                        original pointing had an angular velocity in this case, the original angular velocity is written
-   *                        out along with the updated quaternion.  Also added method Extrapolate, to extrapolate pointing
-   *                        assuming a constant angular velocity.  This method was designed to compute the pointing at the
-   *                        start and end of the exposure for framing cameras to create a ck that would cover a single framing
-   *                        observation.
-   *  @history 2010-12-22  Debbie A. Cook  Added new method SetFullCacheParameters to upgrade appjit to current instrument
-   *                        Rotation group labels.
-   *  @history 2011-02-17  Debbie A. Cook  Fixed bug in method LineCache and fixed computation of angular velocity in
-   *                        method DCJdt (derivative was with respect to scaled et instead of et)
-   *  @history 2011-02-22 Debbie A. Cook - Corrected Extrapolation method
-   *  @history 2011-03-25 Debbie A. Cook - Added method GetCenterAngles()
-   *  @history 2011-07-20 Kris J Becker - Modified  SpiceRotation::LoadCache(Table &table) to be
-   *                        reentrant.  This mod was necessitated by the Dawn VIR instrument.
-   *  @history 2012-05-28 Debbie A. Cook - Programmer notes - A new interpolation algorithm, 
-   *                       PolyFunctionOverSpice, was added and new supporting methods: 
-   *                       SetEphemerisTimePolyOverSpice,  SetEphemerisTimeSpice, 
-   *                       SetEphemerisTimeNadir, SetEphemerisTimeMemcache, and 
-   *                       SetEphemerisTimePolyFunction.  PolyFunctionOverSpice is never output, but
-   *                       is converted to a line cache and reduced.  Methods LineCache and 
-   *                       ReloadCache were modified to do the reduction and a copy constructor was
-   *                       added to support the reduction.  Also an argument was added to 
-   *                       SetPolynomial methods for function type, since PolyFunction 
-   *                       is no longer the only function supported.  These changes help the 
-   *                       BundleAdjust applications to better fit line scan images where the 
-   *                       pointing was not modeled well with a regular polynomial.
+   *   @history 2005-12-01 Debbie A. Cook Original Version modified from
+   *                           SpicePosition class by Jeff Anderson
+   *   @history 2006-03-23 Jeff Anderson modified SetEphemerisTime to return
+   *                           if the time did not change to improve speed.
+   *   @history 2006-10-18 Debbie A. Cook Added method, WrapAngle, to wrap
+   *                           angles around 2 pi
+   *   @history 2007-12-05 Debbie A. Cook added method SetPolynomialDegree to
+   *                           allow the degree of the polynomials fit to the
+   *                           camera angles to be changed.  Also changed the
+   *                           polynomial from a fixed 2nd order polynomial to
+   *                           an nth degree polynomial with one independent
+   *                           variable.  PartialType was revised and the calls
+   *                           to SetReferencePartial (has an added argument,
+   *                           coefficient index) and DPolynomial (argument type
+   *                           changed to int) were revised. The function was
+   *                           changed from Parabola to Polynomial1Variable, now
+   *                           called PolynomialUnivariate. New methods
+   *                           GetBaseTime and SetOverrideBaseTime were added
+   *   @history 2008-02-15 Debbie A. Cook added a new error message to handle
+   *                           the case where the Naif reference frame code is
+   *                           not recognized.
+   *   @history 2008-06-18 Unknown - Fixed documentation, added NaifStatus calls
+   *   @history 2008-11-26 Debbie A. Cook Added method to set axes of rotation.
+   *                           Default axes are still 3,1,3 so existing software
+   *                           will not be affected by the change.  Also added
+   *                           timeScale to the the class and made some
+   *                           parameters protected instead of private so they
+   *                           are available to inheriting classes.
+   *   @history 2008-12-12 Debbie A. Cook Added method to return frame code
+   *   @history 2009-01-26 Debbie A. Cook Added wrap of 3rd camera angle when
+   *                           crossing +-180
+   *   @history 2009-04-21 Debbie A. Cook Added methods MinimizeCache and
+   *                           LoadTimeCache, variable p_minimizeCache, and
+   *                           enum constants DownsizeStatus
+   *   @history 2009-06-29 Debbie A. Cook Fixed memory overwrite problem in
+   *                           LoadTimeCache when reading a type 3 ck
+   *   @history 2009-07-24 Debbie A. Cook Removed downsizing for Nadir
+   *                           instrument pointing tables (LoadTimeCache) so
+   *                           that radar instruments will work.  Current
+   *                           downsizing code requires sclk and radar has no
+   *                           sclk.
+   *   @history 2009-10-01 Debbie A. Cook Divided the rotation into a constant
+   *                           (in time) part and a time-based part and
+   *                           added keywords listing the frame chains for both
+   *                           the constant part and the time-based part.
+   *   @history 2009-10-09 Debbie A. Cook Added angular velocity when it is
+   *                           available
+   *   @history 2009-10-30 Unknown - Modified J2000Vector and ReferenceVector
+   *                           to work on either length 3 vectors (position
+   *                           only) or lenght 6 vectors (position and velocity)
+   *                           and added private method StateTJ()
+   *   @history 2009-12-03 Debbie A. Cook Modified tests in LoadTimeCache to
+   *                           allow observation to cross segment boundary for
+   *                           LRO
+   *   @history 2010-03-19 Debbie A. Cook Revised ReloadCache including removing
+   *                           obsolete arguments.  Added initialization of
+   *                           members p_fullCacheStartTime, p_fullCacheEndTime,
+   *                           and p_fullCacheSize.  Added these same values to
+   *                           the table label in method Cache and the reading
+   *                           of these values to the method LoadCache(table).
+   *                           Improved error message in FrameTrace.  Also
+   *                           corrected a comment in StateTJ
+   *   @history 2010-09-23 Debbie A. Cook Revised to write out line cache for
+   *                           updated pointing when cache size is 1. If the
+   *                           original pointing had an angular velocity in
+   *                           this case, the original angular velocity is
+   *                           written out along with the updated quaternion.
+   *                           Also added method Extrapolate, to extrapolate
+   *                           pointing assuming a constant angular velocity.
+   *                           This method was designed to compute the pointing
+   *                           at the start and end of the exposure for framing
+   *                           cameras to create a ck that would cover a single
+   *                           framing observation.
+   *   @history 2010-12-22 Debbie A. Cook  Added new method
+   *                           SetFullCacheParameters to upgrade appjit to
+   *                           current instrument Rotation group labels.
+   *   @history 2011-02-17 Debbie A. Cook  Fixed bug in method LineCache and
+   *                           fixed computation of angular velocity in method
+   *                           DCJdt (derivative was with respect to scaled et
+   *                           instead of et)
+   *   @history 2011-02-22 Debbie A. Cook - Corrected Extrapolation method
+   *   @history 2011-03-25 Debbie A. Cook - Added method GetCenterAngles()
+   *   @history 2011-07-20 Kris J Becker - Modified
+   *                           SpiceRotation::LoadCache(Table &table) to be
+   *                           reentrant.  This mod was necessitated by the Dawn
+   *                           VIR instrument.
+   *   @history 2012-05-28 Debbie A. Cook - Programmer notes - A new
+   *                           interpolation algorithm, PolyFunctionOverSpice,
+   *                           was added and new supporting methods:
+   *                           SetEphemerisTimePolyOverSpice,  SetEphemerisTimeSpice,
+   *                           SetEphemerisTimeNadir, SetEphemerisTimeMemcache,
+   *                           and SetEphemerisTimePolyFunction.
+   *                           PolyFunctionOverSpice is never output, but is
+   *                           converted to a line cache and reduced.  Methods
+   *                           LineCache and ReloadCache were modified to do the
+   *                           reduction and a copy constructor was added to
+   *                           support the reduction.  Also an argument was
+   *                           added to SetPolynomial methods for function type,
+   *                           since PolyFunction is no longer the only function
+   *                           supported.  These changes help the BundleAdjust
+   *                           applications to better fit line scan images where
+   *                           the pointing was not modeled well with a regular
+   *                           polynomial.
+   *   @history 2012-10-25 Jeannie Backer - Brought class closer to Isis3
+   *                           standards: Ordered includes in cpp file, replaced
+   *                           quotation marks with angle braces in 3rd party
+   *                           includes, fixed history indentation and line
+   *                           length. References #1181.
    *
    *  @todo Downsize using Hermite cubic spline and allow Nadir tables to be downsized again.
    */
