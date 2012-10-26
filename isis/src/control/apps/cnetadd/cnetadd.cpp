@@ -212,7 +212,7 @@ void IsisMain() {
               //TODO: log that it was Incidence Angle that failed the check
               newCm->SetIgnored(true);
             }
-            else if (!validator.ValidResolution(cam->Resolution())) {
+            else if (!validator.ValidResolution(cam->resolution())) {
               //TODO: log that it was Resolution that failed the check
               newCm->SetIgnored(true);
             }
