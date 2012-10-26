@@ -43,8 +43,10 @@ int main(void) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat = -0.1890205755726288;
-    double knownLon = 225.0221110457575264;
+//    double knownLat = -0.1890205755726288;  // Version 1 values
+//    double knownLon = 225.0221110457575264; // Version 1 values
+    double knownLat = -0.1923383009013995;
+    double knownLon = 225.0671436738516888;
 
     //Pvl p("$mgs/testData/lub0428b.cub");
     Pvl p("$messenger/testData/EW0089570936I.cub");
@@ -69,7 +71,8 @@ int main(void) {
     str2et_c(stime.c_str(), &et);
     pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
     cout << "Shutter open = " << shuttertimes.first.Et() << endl;
-    cout << "Shutter close = " << shuttertimes.second.Et() << endl << endl;
+    cout << "Shutter close = " << shuttertimes.second.Et() << endl;
+    cout << "Focal Length = " << cam->FocalLength() << endl << endl;
 
     // Test all four corners to make sure the conversions are right
     cout << "For upper left corner ..." << endl;

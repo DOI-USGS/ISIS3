@@ -270,6 +270,9 @@ namespace Isis {
  * these values are stored in hexidecimal format. 
  *  
  * @author Kris Becker (8/13/2012)
+ * @internal
+ *  @history 2012-10-22 Kris Becker - Store temperature dependant keyword in instrument
+ *                                    neutral keyword called TempDependentFocalLength.
  * 
  * @param filterCode Integer MDIS instrument/filter code
  * @param label      Pvl label from cube being initialized where temperature 
@@ -281,12 +284,12 @@ namespace Isis {
                                         Pvl &label) {
 
     double focalLength(0.0);
-    IString tdflKey("INS"+filterCode+"_TEMPDEP_FOCAL_LENGTH");
+    IString tdflKey("TempDependentFocalLength");
 
     //  Determine if the desired value is already computed.  We are interested
-    //  in the temperature dependent value firstly.  Backwartd compatibility
+    //  in the temperature dependent value firstly.  Backwadd compatibility
     //  is considered below.
-    QVariant my_tdfl = getStoredResult(tdflKey, SpiceStringType);
+    QVariant my_tdfl = readStoredValue(tdflKey, SpiceStringType, 0);
     if (my_tdfl.isValid()) {
       focalLength = IString(my_tdfl.toString()).ToDouble();
     }
@@ -311,15 +314,13 @@ namespace Isis {
 
         // Store computed focal length
         focalLength = fl;
-        storeResult(tdflKey, SpiceStringType, IString(focalLength).ToQt());
+        storeValue(tdflKey, 0, SpiceStringType, QVariant(focalLength));
       }
       catch (IException &ie) {
         // Noop when supporting old IKs
-#if defined(DISABLE_BACKWARD_COMPATIBILITY)
         throw IException(ie, IException::Programmer,
                           "Failed to compute temperature-dependent focal length",
                            _FILEINFO_);
-#endif
       }
     }
      return (focalLength);
