@@ -490,6 +490,10 @@ in the SOLAR directory.
        average to properly report 0 when all these pixels are NULL pixels.  
        Software version number is now 1.4.
    </change>
+   <change name="Kris Becker" date="2012-10-24">
+     Incremented the CDR version number from 3 to 4 per the request by the
+     MESSENGER team.
+   </change>
   </history>
 
   <groups>
