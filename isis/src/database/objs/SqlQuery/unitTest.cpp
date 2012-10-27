@@ -42,9 +42,10 @@ int main(int argc, char *argv[]) {
     e.print();
   }
 
-  cout << "The mac systems report the double fields as string fields. " <<
-       "Until the problematic 3rd party software is fixed, " <<
-       "the mac systems will need OS truth data." << endl;
+  cout << "Some versoin of Sqlite treat reals as strings. " <<
+       "Until the sqlite honors reals the main truth file will " <<
+       "appear incorrect. Systems with sqlite version that correctly" <<
+       "report real fields as double will need os specific truth data" << endl;
 
   vector<string> nameList = q.fieldNameList();
   vector<string> typeList = q.fieldTypeList();

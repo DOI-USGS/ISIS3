@@ -2,12 +2,15 @@ Begin testing Shape Model base class....
 
   Shape name is Test
     Do we have an intersection? 0
+    Test resolution() error message when there is no intersection:
+**PROGRAMMER ERROR** No valid intersection point for computing resolution.
     Set a pixel in the image and check again.
 
     Testing pure virtual method intersectSurface...
     intersectSurface called with observer position = -2399.54, -2374.03, 1277.68
                                  lookDirection = 0.957458, -0.0219727, -0.287736
     Do we have an intersection? 1
+    Get the resolution:         1
     surface point = (-2123.36, -2380.37, 1194.68
 
   Testing class method normal() when no normal exists...
@@ -41,25 +44,33 @@ Begin testing Shape Model base class....
 
   Testing setHasIntersection method
     Do we have an intersection? 0
+    Test resolution() error message when there is no intersection:
+**PROGRAMMER ERROR** No valid intersection point for computing resolution.
 
   Testing setSurfacePoint method ...
      Do we have an intersection? 1
+    Get the resolution:         1
      surface point = (-2123.36, -2380.37, 1194.68)
 
   Testing ellipsoid methods in base class
     Do we have an intersection? 0
+    Test resolution() error message when there is no intersection:
+**PROGRAMMER ERROR** No valid intersection point for computing resolution.
 
     Testing  failing of method intersectEllipsoid...
     intersectSurface called with observer position = -2399.54, -2374.03, 1277.68
                                  lookDirection = -1, 1, 1
     ...  intersectSurface method failed -- no intersection
     Do we have an intersection? 0
+    Test resolution() error message when there is no intersection:
+**PROGRAMMER ERROR** No valid intersection point for computing resolution.
 
     Testing  method intersectEllipsoid...
     intersectSurface called with observer position = -2399.54, -2374.03, 1277.68
                                  lookDirection = 0.957458, -0.0219727, -0.287736
     surface point = (-2105.83, -2380.77, 1189.41
     Do we have an intersection? 1
+    Get the resolution:         1
     surface point = (-2105.83, -2380.77, 1189.41
 
     Testing  method calculateEllipsoidalSurfaceNormal with bad intersection...
@@ -67,6 +78,8 @@ Begin testing Shape Model base class....
 
     Testing  method setHasIntersection false...
     Do we have an intersection? 0
+    Test resolution() error message when there is no intersection:
+**PROGRAMMER ERROR** No valid intersection point for computing resolution.
 
     Testing  method calculateEllipsoidalSurfaceNormal with no intersection...
 **PROGRAMMER ERROR** A valid intersection must be defined before computing the surface normal.
@@ -84,6 +97,8 @@ Begin testing Shape Model base class....
 
   Testing default constructor...
     Shape is DefaultConstructor
-    Is there an intersection? 0
+    Do we have an an intersection? 0
+    Test resolution() error message when there is no intersection:
+**PROGRAMMER ERROR** No valid intersection point for computing resolution.
     Is there an normal? 0
     Number of normal components = 3

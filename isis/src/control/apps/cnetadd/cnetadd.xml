@@ -230,6 +230,10 @@
       The extract=modified option was changed to not output edit locked points
       and measures, since they were not modified.
     </change>
+    <change name="Jeannie Backer" date="2012-10-25">
+      Changed call to Camera::resolution() to lower camel case. Isis3 standards
+      improvements. References #1181.
+    </change>
   </history>
 
   <groups>

@@ -355,48 +355,6 @@ namespace Isis {
   }
 
 
-  /** Set surface normal
-   *
-   */
-  // void ShapeModel::setSurfaceNormal(const std::vector<double> normalB) const{
-  //   m_surfaceNormal  = normalB;
-  // }
-
-
-  /** Set  tolerance for acceptance in iterative loops
-   *
-   */
-  // void ShapeModel::setTolerance(const double tol) {
-  //   *m_tolerance = tol;
-  // }
-
-
-  /** Return triaxial target radii from shape model
-   *
-   */
-  // Distance *ShapeModel::targetRadii() {
-  //    return  m_radii;
-  // }
-
-
-  /** Return the tolerance for acceptance in iterative loops
-   *
-   */
-  // double ShapeModel::tolerance() {
-  //   return *m_tolerance;
-  // }
-
-
-  /** Set the radii
-   *
-   */
-  // void ShapeModel::setRadii(Distance radii[3]) {
-  //   m_radii[0] = radii[0];
-  //   m_radii[1] = radii[1];
-  //   m_radii[2] = radii[2];
-  // }
-
-
   /** Set the hasNormal flag
    *
    */
@@ -408,15 +366,19 @@ namespace Isis {
   /** Convenience method to get pixel resolution (m/pix) at current intersection point
    *
    */
-  double ShapeModel::Resolution() {
+  double ShapeModel::resolution() {
     if (m_hasIntersection) {
-      return m_target->spice()->Resolution();
+//??? cout << "No scope lower case = " << (m_target->spice())->resolution() << endl;
+//??? cout << "No scope lower case no parens = " << m_target->spice()->resolution() << endl;
+//??? cout << "Spice with parens = " << (m_target->spice())->Spice::resolution() << endl;
+//??? cout << "Camera = " << (m_target->spice())->Camera::Resolution() << endl;
+//??? cout << "Sensor = " << (m_target->spice())->Sensor::Resolution() << endl;
+      return m_target->spice()->resolution();
     }
     else {
       IString message = "No valid intersection point for computing resolution.";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
   }
-
 
 }

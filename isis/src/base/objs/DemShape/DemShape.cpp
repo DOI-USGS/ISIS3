@@ -1,15 +1,17 @@
 #include "DemShape.h"
 
-#include <string>
-#include <algorithm>
-#include <vector>
-#include <cfloat>
-
-#include <cmath>
-#include <iomanip>
-
+// Qt third party includes
 #include <QVector>
 
+// c standard library third party includes
+#include <algorithm>
+#include <cfloat>
+#include <cmath>
+#include <iomanip>
+#include <string>
+#include <vector>
+
+// naif third party includes
 #include <naif/SpiceUsr.h>
 #include <naif/SpiceZfc.h>
 #include <naif/SpiceZmc.h>
@@ -32,7 +34,9 @@ using namespace std;
 
 namespace Isis {
   /**
-   * Initialize the Isis3 Dem from projection shape model.
+   * Construct a DemShape object. This method creates a ShapeModel object 
+   * named "DemShape" and initializes member variables from the projection 
+   * shape model using the given Target and Pvl. 
    *
    * @param pvl Valid Isis3 cube label.
    */
@@ -77,9 +81,9 @@ namespace Isis {
 
 
   /**
-   * Initialize the Isis3 Dem from projection shape model.
+   * Construct a DemShape object. This method creates a ShapeModel object named 
+   * "DemShape". The member variables are set to Null. 
    *
-   * @param pvl Valid Isis3 cube label.
    */
   DemShape::DemShape() : ShapeModel () {
     setName("DemShape");
@@ -115,7 +119,12 @@ namespace Isis {
    * notice. It has recently (Aug 2011) come into play trying to intersect
    * images containing a limb and spiceinit'ed with a DEM (e.g., Vesta and soon
    * Mercury). This implies that info at the limb will not always be computed.
-   * In the future we may want to do a better job handling this special case.
+   * In the future we may want to do a better job handling this special case. 
+   *  
+   * @param observerPos
+   * @param lookDirection
+   *  
+   * @return Indicates whether the intersection was found.
    */
   bool DemShape::intersectSurface(vector<double> observerPos,
                                   vector<double> lookDirection) {
@@ -125,7 +134,7 @@ namespace Isis {
     if (!intersectEllipsoid(observerPos, lookDirection))
       return false;
  
-    double tol = Resolution()/100;  // 1/100 of a pixel
+    double tol = resolution()/100;  // 1/100 of a pixel
     static const int maxit = 100;
     int it = 1;
     double dX, dY, dZ, dist2;
@@ -199,7 +208,7 @@ namespace Isis {
       // Now recompute tolerance at updated surface point and recheck
       if (dist2 < tol2) {
         surfaceIntersection()->FromNaifArray(newIntersectPt);
-        tol = Resolution() / 100.0;
+        tol = resolution() / 100.0;
         tol2 = tol * tol;
         if (dist2 < tol2) {
           setHasIntersection(true);
@@ -216,8 +225,10 @@ namespace Isis {
 
   /**
    * Gets the radius from the DEM, if we have one.
+   *  
    * @param lat Latitude
    * @param lon Longitude
+   *  
    * @return @b double Local radius from the DEM
    */
   Distance DemShape::localRadius(const Latitude &lat, const Longitude &lon) {
@@ -247,7 +258,9 @@ namespace Isis {
 
 
   /** 
-   * Return pixels per degree
+   * Return the scale of the DEM shape, in pixels per degree.
+   *  
+   * @return The scale of the DEM
    */
   double DemShape::demScale() {
     return m_pixPerDegree;
@@ -255,7 +268,8 @@ namespace Isis {
 
 
   /** 
-   * Calculate default normal (Ellipsoid for backwards compatability) for the DemShape
+   * This method calculates the default normal (Ellipsoid for backwards 
+   * compatability) for the DemShape. 
    */
   void DemShape::calculateDefaultNormal() {
     calculateEllipsoidalSurfaceNormal();
@@ -263,7 +277,9 @@ namespace Isis {
 
 
   /** 
-   * Return the dem Cube object
+   * Returns the DEM Cube object.
+   *  
+   * @return The DEM cube associated with this shape model.
    */
   Cube *DemShape::demCube() {
     return m_demCube;
@@ -271,7 +287,10 @@ namespace Isis {
 
 
   /** 
-   * Calculate local normal
+   * This method calculates the local surface normal of the current intersection 
+   * point. 
+   *  
+   * @param neighborPoints
    */
   void DemShape::calculateLocalNormal(QVector<double *> neighborPoints) {
     // subtract bottom from top and left from right and store results
@@ -315,7 +334,8 @@ namespace Isis {
 
 
   /** 
-   * Calculate surface normal
+   * This method calculates the surface normal of the current intersection 
+   * point. 
    */
   void DemShape::calculateSurfaceNormal() {
     calculateEllipsoidalSurfaceNormal();

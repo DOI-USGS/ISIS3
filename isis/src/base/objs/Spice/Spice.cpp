@@ -127,6 +127,7 @@ namespace Isis {
     m_ikCode = new SpiceInt;
     m_sclkCode = new SpiceInt;
     m_spkBodyCode = new SpiceInt;
+    m_bodyFrameCode = new SpiceInt;
 
     m_naifKeywords = new PvlObject("NaifKeywords");
 
@@ -152,9 +153,9 @@ namespace Isis {
 
     m_usingNaif = !lab.HasObject("NaifKeywords") || noTables;
 
-//  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
-//  missions (e.g., MESSENGER) may augment the s/c SPK with new planet
-//  ephemerides. (2008-02-27 (KJB))
+    //  Modified  to load planetary ephemeris SPKs before s/c SPKs since some
+    //  missions (e.g., MESSENGER) may augment the s/c SPK with new planet
+    //  ephemerides. (2008-02-27 (KJB))
     if (m_usingNaif) {
       if (noTables) {
         load(kernels["TargetPosition"], noTables);
@@ -167,17 +168,20 @@ namespace Isis {
       }
 
       load(kernels["TargetAttitudeShape"], noTables);
-    if (kernels.HasKeyword("Instrument"))
-    load(kernels["Instrument"], noTables);
+      if (kernels.HasKeyword("Instrument")) {
+        load(kernels["Instrument"], noTables);
+      }
       // Always load after instrument
-    if (kernels.HasKeyword("InstrumentAddendum"))
-    load(kernels["InstrumentAddendum"], noTables);
+      if (kernels.HasKeyword("InstrumentAddendum")) {
+        load(kernels["InstrumentAddendum"], noTables);
+      }
       load(kernels["LeapSecond"], noTables);
-    if ( kernels.HasKeyword("SpacecraftClock"))
-    load(kernels["SpacecraftClock"], noTables);
+      if ( kernels.HasKeyword("SpacecraftClock")) {
+        load(kernels["SpacecraftClock"], noTables);
+      }
 
-// Modified to load extra kernels last to allow overriding default values
-// (2010-04-07) (DAC)
+      // Modified to load extra kernels last to allow overriding default values
+      // (2010-04-07) (DAC)
       if (kernels.HasKeyword("Extra")) {
         load(kernels["Extra"], noTables);
       }
@@ -221,18 +225,22 @@ namespace Isis {
     *m_spkBodyCode = m_target->naifBodyCode();
 
     // Override them if they exist in the labels
-    if (kernels.HasKeyword("NaifSpkCode"))
+    if (kernels.HasKeyword("NaifSpkCode")) {
       *m_spkCode = (int) kernels["NaifSpkCode"];
+    }
 
-    if (kernels.HasKeyword("NaifCkCode"))
+    if (kernels.HasKeyword("NaifCkCode")) {
       *m_ckCode = (int) kernels["NaifCkCode"];
+    }
 
-    if (kernels.HasKeyword("NaifSclkCode"))
+    if (kernels.HasKeyword("NaifSclkCode")) {
       *m_sclkCode = (int) kernels["NaifSclkCode"];
+    }
 
     if (!m_target->isSky()) {
-      if (kernels.HasKeyword("NaifSpkBodyCode"))
+      if (kernels.HasKeyword("NaifSpkBodyCode")) {
         *m_spkBodyCode = (int) kernels["NaifSpkBodyCode"];
+      }
     }
 
     if (m_target->isSky()) {
@@ -254,7 +262,8 @@ namespace Isis {
           IString naifTarget = "IAU_" + IString(m_target->name()).UpCase();
           namfrm_c(naifTarget.c_str(), &frameCode);
           if (frameCode == 0) {
-            string msg = "Can not find NAIF code for [" + naifTarget + "]";
+            string msg = "Can not find NAIF BODY_FRAME_CODE for target [" 
+                         + IString(m_target->name()) + "]";
             throw IException(IException::Io, msg, _FILEINFO_);
           }
         }
@@ -267,6 +276,7 @@ namespace Isis {
       }
 
       m_bodyRotation = new SpiceRotation(frameCode);
+      *m_bodyFrameCode = frameCode;
     }
 
     m_instrumentRotation = new SpiceRotation(*m_ckCode);
@@ -448,11 +458,15 @@ namespace Isis {
       m_spkBodyCode = NULL;
     }
 
-   if (m_target != NULL) {
-      delete m_target;
-        m_target = NULL;
+    if (m_bodyFrameCode != NULL) {
+      delete m_bodyFrameCode;
+      m_bodyFrameCode = NULL;
     }
 
+    if (m_target != NULL) {
+      delete m_target;
+      m_target = NULL;
+    }
 
     // Unload the kernels (TODO: Can this be done faster)
     for (int i = 0; m_kernels && i < m_kernels->size(); i++) {
@@ -468,7 +482,6 @@ namespace Isis {
 
     NaifStatus::CheckErrors();
   }
-
 
   /**
    * This method creates an internal cache of spacecraft and sun positions over a
@@ -526,8 +539,9 @@ namespace Isis {
     }
 
     string abcorr;
-    if (getSpkAbCorrState(abcorr) )
+    if (getSpkAbCorrState(abcorr) ) {
       instrumentPosition()->SetAberrationCorrection("NONE");
+    }
 
     iTime avgTime((startTime.Et() + endTime.Et()) / 2.0);
     computeSolarLongitude(avgTime);
@@ -594,8 +608,9 @@ namespace Isis {
    *   @history 2011-02-09 Steven Lambright - Original version.
    */
   iTime Spice::cacheStartTime() const {
-    if (m_startTime)
+    if (m_startTime) {
       return *m_startTime;
+    }
 
     return iTime();
   }
@@ -608,8 +623,9 @@ namespace Isis {
    *   @history 2011-02-09 Steven Lambright - Original version.
    */
   iTime Spice::cacheEndTime() const {
-    if (m_endTime)
+    if (m_endTime) {
       return *m_endTime;
+    }
 
     return iTime();
   }
@@ -638,9 +654,10 @@ namespace Isis {
       // set aberration corrections are included in the spk already.
       string abcorr;
       if (*m_cacheSize == 0) {
-        if (m_startTime->Et() == 0.0  && m_endTime->Et() == 0.0  &&
-           getSpkAbCorrState(abcorr))
+        if (m_startTime->Et() == 0.0 && m_endTime->Et() == 0.0
+            && getSpkAbCorrState(abcorr)) {
           instrumentPosition()->SetAberrationCorrection("NONE");
+        }
       }
     }
 
@@ -797,12 +814,34 @@ namespace Isis {
   }
 
   /**
+   * This returns the NAIF body frame code. It is read from the labels, if it 
+   * exists. Otherwise, it's calculated by the init() method.
+   *
+   * @return @b SpiceInt NAIF body frame code
+   *
+   */
+  SpiceInt Spice::naifBodyFrameCode() const {
+    return *m_bodyFrameCode;
+  }
+
+
+  /**
    * This returns the PvlObject that stores all of the requested Naif data
    *   and can be a replacement for furnishing text kernels.
    */
   PvlObject Spice::getStoredNaifKeywords() const {
     return *m_naifKeywords;
   }
+
+  /**
+   * Virtual method that returns the pixel resolution of the sensor in
+   * meters/pix.
+   *
+   * @return @b double Resolution value of 1.0
+   */
+  double Spice::resolution() {
+    return 1.;
+  };
 
 
   /**
@@ -842,8 +881,9 @@ namespace Isis {
    *   called when not using naif.
    */
   iTime Spice::getClockTime(IString clockValue, int sclkCode) {
-    if (sclkCode == -1)
+    if (sclkCode == -1) {
       sclkCode = naifSclkCode();
+    }
 
     iTime result;
 
@@ -965,8 +1005,9 @@ namespace Isis {
 
   void Spice::storeValue(IString key, int index, SpiceValueType type,
                          QVariant value) {
-    if (!m_naifKeywords->HasKeyword(key))
+    if (!m_naifKeywords->HasKeyword(key)) {
       m_naifKeywords->AddKeyword(PvlKeyword(key));
+    }
 
     PvlKeyword &storedKey = m_naifKeywords->FindKeyword(key);
 
@@ -1002,15 +1043,19 @@ namespace Isis {
       PvlKeyword &storedKeyword = m_naifKeywords->FindKeyword(key);
 
       try {
-        if (type == SpiceDoubleType)
+        if (type == SpiceDoubleType) {
           result = (double)storedKeyword[index];
-        else if (type == SpiceStringType)
+        }
+        else if (type == SpiceStringType) {
           result = QString::fromStdString(storedKeyword[index]);
-        else if (type == SpiceByteCodeType || SpiceStringType)
+        }
+        else if (type == SpiceByteCodeType || SpiceStringType) {
           result = QByteArray(
               string(storedKeyword[index]).c_str());
-        else if (type == SpiceIntType)
+        }
+        else if (type == SpiceIntType) {
           result = (int)storedKeyword[index];
+        }
       }
       catch(IException &) {
       }
@@ -1098,7 +1143,7 @@ namespace Isis {
   void Spice::subSolarPoint(double &lat, double &lon) {
     NaifStatus::CheckErrors();
 
-    if(m_et == NULL) {
+    if (m_et == NULL) {
       std::string msg = "You must call SetTime first";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1122,7 +1167,7 @@ namespace Isis {
     reclat_c(subB, &a, &mylon, &mylat);
     lat = mylat * 180.0 / PI;
     lon = mylon * 180.0 / PI;
-    if(lon < 0.0) lon += 360.0;
+    if (lon < 0.0) lon += 360.0;
 
     NaifStatus::CheckErrors();
   }
@@ -1146,8 +1191,8 @@ namespace Isis {
   IString Spice::targetName() const {
     return m_target->name();
   }
-  
-  
+
+
   /**
    * Computes the solar longitude for the given ephemeris time.  If the target
    * is sky, the longitude is set to -999.0.
@@ -1278,4 +1323,49 @@ namespace Isis {
     }
     return true;
   }
+
+  /**
+   * Accessor method for the sun position.
+   * @return @b iTime Sun position for the image.
+   * @author Steven Lambright
+   * @internal
+   *   @history 2011-02-09 Steven Lambright - Original version.
+   */
+  SpicePosition *Spice::sunPosition() const {
+    return m_sunPosition;
+  }
+
+  /**
+   * Accessor method for the instrument position.
+   * @return @b iTime Instrument position for the image.
+   * @author Steven Lambright
+   * @internal
+   *   @history 2011-02-09 Steven Lambright - Original version.
+   */
+  SpicePosition *Spice::instrumentPosition() const {
+    return m_instrumentPosition;
+  }
+
+  /**
+   * Accessor method for the body rotation.
+   * @return @b iTime Body rotation for the image.
+   * @author Steven Lambright
+   * @internal
+   *   @history 2011-02-09 Steven Lambright - Original version.
+   */
+  SpiceRotation *Spice::bodyRotation() const {
+    return m_bodyRotation;
+  }
+
+  /**
+   * Accessor method for the instrument rotation.
+   * @return @b iTime Instrument rotation for the image.
+   * @author Steven Lambright
+   * @internal
+   *   @history 2011-02-09 Steven Lambright - Original version.
+   */
+  SpiceRotation *Spice::instrumentRotation() const {
+    return m_instrumentRotation;
+  }
+
 }

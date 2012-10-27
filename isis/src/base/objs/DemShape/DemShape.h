@@ -41,7 +41,12 @@ namespace Isis {
    *
    * @author 2010-07-30 Debbie A. Cook
    *
-   * @internal
+   * @internal 
+   *   @history 2010-07-30 - Debbie A. Cook - Original version.
+   *   @history 2012-10-25 - Jeannie Backer - Changed call to
+   *                             Spice::resolution() method to lower camel case.
+   *                             Added documentation. Ordered includes.
+   *                             References #1181.
    */
   class DemShape : public ShapeModel {
     public:
@@ -66,23 +71,25 @@ namespace Isis {
       // Calculate the default normal of the current intersection point
       virtual void calculateDefaultNormal(); 
 
-      // To compute the surface normal, you must call setLocalAreaPoint on top, bottom, left, and 
-      // right surrounding points in the image.  Then call calculateSurfaceNormal and 
-      // directSurfaceNormal to calculate the normal.  Use removeLOcalAreaPoints to clean up as
-      // needed.  See Camera for an example, or use its GetLocalNormal method.
-      //! Calculate the surface normal of the current intersection point
+      // To compute the surface normal, you must call setLocalAreaPoint on top,
+      // bottom, left, and right surrounding points in the image.  Then call
+      // calculateSurfaceNormal and directSurfaceNormal to calculate the normal.
+      // Use removeLOcalAreaPoints to clean up as needed.  See Camera for an
+      // example, or use its GetLocalNormal method.
+      
+      // Calculate the surface normal of the current intersection point
      void calculateLocalNormal(QVector<double *> cornerNeighborPoints) ; 
      void calculateSurfaceNormal(); 
 
     protected:
-     Cube *demCube();                 //!< Returns the cube defining the shape model.  
+     Cube *demCube();         //!< Returns the cube defining the shape model.  
 
     private:
-      Cube *m_demCube;              //!< The cube containing the model
-      Projection *m_demProj;                                     //!< The projection of the model
-      double m_pixPerDegree;                                   //!< Scale of DEM file in pixels per degree
-      Portal *m_portal;                                               //!< Buffer used to read from the model
-      Interpolator *m_interp;                                      //!< Use bilinear interpolation from dem
+      Cube *m_demCube;        //!< The cube containing the model
+      Projection *m_demProj;  //!< The projection of the model
+      double m_pixPerDegree;  //!< Scale of DEM file in pixels per degree
+      Portal *m_portal;       //!< Buffer used to read from the model
+      Interpolator *m_interp; //!< Use bilinear interpolation from dem
   };
 }
 

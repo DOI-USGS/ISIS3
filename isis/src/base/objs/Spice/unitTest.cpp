@@ -29,12 +29,18 @@
 #include "FileName.h"
 #include "IException.h"
 #include "iTime.h"
+#include "Longitude.h"
 #include "Spice.h"
 #include "Preference.h"
 #include "Target.h"
 
 using namespace Isis;
 using namespace std;
+
+   // public methods not tested:
+    // Spice(Pvl &lab, bool noTables);
+    // SpicePosition *sunPosition() const;
+    // SpicePosition *instrumentPosition() const;
 
 /**
  * UnitTest for Spice class.
@@ -47,10 +53,12 @@ using namespace std;
 class MySpice : public Spice {
   public:
     MySpice(Pvl &lab) : Spice(lab) {
-      cout << "BodyCode        = " << naifBodyCode() << endl;
-      cout << "SpkCode         = " << naifSpkCode() << endl;
-      cout << "CkCode          = " << naifCkCode() << endl;
-      cout << "IkCode          = " << naifIkCode() << endl;
+      cout << "BodyCode        = " << naifBodyCode()      << endl;
+      cout << "SpkCode         = " << naifSpkCode()       << endl;
+      cout << "CkCode          = " << naifCkCode()        << endl;
+      cout << "IkCode          = " << naifIkCode()        << endl;
+      cout << "SclkCode        = " << naifSclkCode()      << endl;
+      cout << "BodyFrameCode   = " << naifBodyFrameCode() << endl;
       cout << endl;
     }
 
@@ -174,6 +182,7 @@ int main(int argc, char *argv[]) {
 
   // Test good gets
   cout << "Testing convience get methods ... " << endl;
+  cout << "Label has kernels? " << spi.hasKernels(lab) << endl;
   cout << spi.MyInteger("FRAME_MGS_MOC") << endl;
   cout << spi.MyDouble("INS-94030_NA_FOCAL_LENGTH") << endl;
   cout << spi.MyString("FRAME_-94031_NAME") << endl;
@@ -187,21 +196,24 @@ int main(int argc, char *argv[]) {
   cout << "Radii[1]:  " << radii[1].kilometers() << endl;
   cout << "Radii[2]:  " << radii[2].kilometers() << endl;
   cout << endl;
+  cout << "Solar Longitude = " << spi.solarLongitude().positiveEast() << endl;
+  cout << "Resolution      = " << spi.Resolution() << endl;
 
   // Normal testing (no cache)
   cout << "Testing without cache ... " << endl;
   for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
     spi.setTime(t);
-    cout << "Time           = " << spi.time().Et() << endl;
+    cout << "Time             = " << spi.time().Et() << endl;
+    cout << "Clock Time (ET)  = " << spi.getClockTime("895484264:57204").Et() << endl;
     double p[3];
     spi.instrumentPosition(p);
-    cout << "Spacecraft (B) = " << p[0] << " " << p[1] << " " << p[2] << endl;
+    cout << "Spacecraft          (B) = " << p[0] << " " << p[1] << " " << p[2] << endl;
     double v[3];
     spi.instrumentVelocity(v);
     cout << "Spacecraft Velocity (B) = " << v[0] << " " << v[1] << " " << v[2] << endl;
     spi.sunPosition(p);
-    cout << "Sun        (B) = " << p[0] << " " << p[1] << " " << p[2] << endl;
+    cout << "Sun                 (B) = " << p[0] << " " << p[1] << " " << p[2] << endl;
     spi.MyOutput();
     double lat, lon;
     spi.subSpacecraftPoint(lat, lon);
@@ -228,9 +240,20 @@ int main(int argc, char *argv[]) {
     spi.sunPosition(p);
     cout << "Sun        (B) = " << p[0] << " " << p[1] << " " << p[2] << endl;
     spi.MyOutput();
+    cout << "Cache Start Time = " << spi.cacheStartTime().Et() << endl;
+    cout << "Cache End Time   = " << spi.cacheEndTime().Et() << endl;
+    cout << "Target Center Distance = " << spi.targetCenterDistance() << endl;
   }
   cout << endl;
 
   cout << "Testing Utility methods" << endl;
   cout << "Target Name = " << spi.target()->name() << endl;
+  cout << endl;
+  PvlObject naifKeywords(spi.getStoredNaifKeywords());
+  cout << "Get Stored Naif Keywords..." << endl;
+  cout << "Object = " << naifKeywords.Name() << endl;
+  for (int i = 0; i < naifKeywords.Keywords(); i++) {
+    cout << "  " << naifKeywords[i] << endl;
+  }
+  cout << "EndObject" << endl;
 }

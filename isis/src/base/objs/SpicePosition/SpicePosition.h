@@ -24,11 +24,13 @@
 
 #include <string>
 #include <vector>
+
+#include <naif/SpiceUsr.h>
+#include <naif/SpiceZfc.h>
+#include <naif/SpiceZmc.h>
+
 #include "Table.h"
 #include "PolynomialUnivariate.h"
-#include "naif/SpiceUsr.h"
-#include "naif/SpiceZfc.h"
-#include "naif/SpiceZmc.h"
 
 namespace Isis {
   class NumericalApproximation;
@@ -59,95 +61,100 @@ namespace Isis {
    * @author 2005-12-01 Jeff Anderson
    *
    * @internal
-   *  @history 2003-12-01 Jeff Anderson Original Version derived from Spice
-   *  class
-   *  @history 2006-03-23 Jeff Anderson Added check to SetEphemeris to return
-   *                       if the time did not change.  Should speed up line
-   *                       scan cameras
-   *  @history 2007-07-10 Debbie A. Cook Added else to method
-   *                       SetAberrationCorrection to separate error section
-   *                       from the rest of the code
-   *  @history 2007-08-24 Debbie A. Cook Added members p_coefficients, enums
-   *                       PartialType and Coefficient, and methods ReloadCache,
-   *                       SetPolynomial, GetPolynomial, ComputeBaseTime,
-   *                       DPolynomial, and CoordinatePartial to support solving
-   *                       for instrument position in BundleAdjust
-   *  @history 2008-01-10 Debbie A. Cook The function was changed from Parabola
-   *                       to Poly1D. New methods GetBaseTime and
-   *                       SetOverrideBaseTime were added
-   *  @history 2008-02-07 Jeannie Walldren  Poly1D was changed to
-   *                       PolynomialUnivariate
-   *  @history 2008-02-10 Debbie A. Cook Removed the (-1.) in case A of
-   *                       DPolynomial since it was not actually part of the
-   *                       position derivation but how it was being applied in
-   *                       BundleAdjust.
-   *  @history 2008-06-18 Steven Lambright Fixed documentation
-   *  @history 2008-06-25 Debbie A. Cook  Added members p_velocity,
-   *                       p_cacheVelocity, and p_hasVelocity; also added
-   *                       methods Velocity() and HasVelocity() to support
-   *                       miniRF.
-   *  @history 2008-06-26 Debbie A. Cook Replaced Naif error handling calls with
-   *                       Isis NaifStatus
-   *  @history 2009-08-03 Jeannie Walldren - Added methods ReloadCache( table ),
-   *                       HermiteIndices(), Memcache2HermiteCache() to allow
-   *                       for downsized instrument position tables in labels of
-   *                       Isis cubes and added methods SetEphemerisTimeSpice(),
-   *                       SetEphemerisTimeHermiteCache(), and
-   *                       SetEphemerisTimeMemcache() to make software more
-   *                       readable.
-   *  @history 2009-08-14 Debbie A. Cook - Corrected loop counter in
-   *                       HermiteIndices
-   *  @history 2009-08-27 Jeannie Walldren - Added documentation.
-   *  @history 2009-10-20 Debbie A. Cook - Corrected calculation of extremum in
-   *                       ReloadCache
-   *  @history 2009-11-06 Debbie A. Cook - Added velocity partial derivative
-   *                       method
-   *  @history 2009-12-15 Debbie A. Cook - Changed enumerated partial types and
-   *                       argument list for CoordinatePartial and
-   *                       VelocityPartial
-   *  @history 2010-03-19 Debbie A. Cook - Added argument coeffIndex to method
-   *                       Velocity Partial
-   *  @history 2010-12-07 Steven Lambright - Moved the cubic hermite splines to
-   *                       member scope for efficiency. It was a significant
-   *                       overhead to keep reconstructing these. Created
-   *                       ClearCache() to help increase code reusability.
-   *  @history 2011-02-12 Debbie A. Cook - Added PolyFunction to source types and
-   *                       new method SetEphemerisTimePolyFunction to support the
-   *                       new type.  Also added method SetPolynomialDegree to
-   *                       allow the degree of the polynomials fit to the
-   *                       position coordinates to be changed.  The fit
-   *                       polynomial was changed from a fixed 2nd order
-   *                       polynomial to an nth degree polynomial with one
-   *                       independent variable.  Added private class members
-   *                       p_fullCacheStartTime, p_fullCacheEndTime, and
-   *                       p_fullCacheSize.  Added p_timeScale, GetBaseTime(),
-   *                       SetOverrideBaseTime, GetTimeScale(),
-   *                       Extrapolate(double timeEt), and
-   *                       ComputeVelocityInTime(PartialType var).  The function
-   *                       was changed from a Parabola to Polynomial1Variable,
-   *                       now called PolynomialUnivariate.
-   *  @history 2011-02-14 Debbie A. Cook - Corrected previous update for Hermite
-   *                       case.  Created a special member, p_overrideScale, for
-   *                       Hermite case.  Also removed obsolete enum Coefficient.
-   *  @history 2011-02-17 Debbie A. Cook - Corrected missed problem with degree
-   *                       forced to be 2 and corrected calculation of velocity
-   *                       partial
-   *  @history 2011-02-22 Debbie A. Cook - Corrected Extrapolation method
-   *  @history 2011-02-28 Debbie A. Cook - Fixed typo in LoadCache and potential
-   *                       memory problem in SetPolynomial
-   *  @history 2011-04-10 Debbie A. Cook - Added GetSource method to support
-   *                       spkwriter.
-   *  @history 2011-05-27 Debbie A. Cook - Renamed old ReloadCache method for
-   *                       converting polynomial functions to Hermite cubic
-   *                       splines to LoadHermiteCache for use with spkwriter.
-   *  @history 2012-03-31 Debbie A. Cook - Programmer notes: Added new 
-   *                       interpolation algorithm, 
-   *                       PolyFunctionOverHermiteConstant, and new supporting
-   *                       method, SetEphemerisTimePolyOverHermiteConstant.  Also
-   *                       added argument to SetPolynomial methods for type.
-   *                       LineCache and ReloadCache were modified to allow
-   *                       other function types beyond the PolyFunction.  Added
-   *                       new method to return Hermite coordinate.
+   *   @history 2003-12-01 Jeff Anderson Original Version derived from Spice
+   *                           class
+   *   @history 2006-03-23 Jeff Anderson Added check to SetEphemeris to return
+   *                           if the time did not change.  Should speed up line
+   *                           scan cameras
+   *   @history 2007-07-10 Debbie A. Cook Added else to method
+   *                           SetAberrationCorrection to separate error section
+   *                           from the rest of the code
+   *   @history 2007-08-24 Debbie A. Cook Added members p_coefficients, enums
+   *                           PartialType and Coefficient, and methods ReloadCache,
+   *                           SetPolynomial, GetPolynomial, ComputeBaseTime,
+   *                           DPolynomial, and CoordinatePartial to support solving
+   *                           for instrument position in BundleAdjust
+   *   @history 2008-01-10 Debbie A. Cook The function was changed from Parabola
+   *                           to Poly1D. New methods GetBaseTime and
+   *                           SetOverrideBaseTime were added
+   *   @history 2008-02-07 Jeannie Walldren  Poly1D was changed to
+   *                           PolynomialUnivariate
+   *   @history 2008-02-10 Debbie A. Cook Removed the (-1.) in case A of
+   *                           DPolynomial since it was not actually part of the
+   *                           position derivation but how it was being applied in
+   *                           BundleAdjust.
+   *   @history 2008-06-18 Steven Lambright Fixed documentation
+   *   @history 2008-06-25 Debbie A. Cook  Added members p_velocity,
+   *                           p_cacheVelocity, and p_hasVelocity; also added
+   *                           methods Velocity() and HasVelocity() to support
+   *                           miniRF.
+   *   @history 2008-06-26 Debbie A. Cook Replaced Naif error handling calls with
+   *                           Isis NaifStatus
+   *   @history 2009-08-03 Jeannie Walldren - Added methods ReloadCache( table ),
+   *                           HermiteIndices(), Memcache2HermiteCache() to allow
+   *                           for downsized instrument position tables in labels of
+   *                           Isis cubes and added methods SetEphemerisTimeSpice(),
+   *                           SetEphemerisTimeHermiteCache(), and
+   *                           SetEphemerisTimeMemcache() to make software more
+   *                           readable.
+   *   @history 2009-08-14 Debbie A. Cook - Corrected loop counter in
+   *                           HermiteIndices
+   *   @history 2009-08-27 Jeannie Walldren - Added documentation.
+   *   @history 2009-10-20 Debbie A. Cook - Corrected calculation of extremum in
+   *                           ReloadCache
+   *   @history 2009-11-06 Debbie A. Cook - Added velocity partial derivative
+   *                           method
+   *   @history 2009-12-15 Debbie A. Cook - Changed enumerated partial types and
+   *                           argument list for CoordinatePartial and
+   *                           VelocityPartial
+   *   @history 2010-03-19 Debbie A. Cook - Added argument coeffIndex to method
+   *                           Velocity Partial
+   *   @history 2010-12-07 Steven Lambright - Moved the cubic hermite splines to
+   *                           member scope for efficiency. It was a significant
+   *                           overhead to keep reconstructing these. Created
+   *                           ClearCache() to help increase code reusability.
+   *   @history 2011-02-12 Debbie A. Cook - Added PolyFunction to source types and
+   *                           new method SetEphemerisTimePolyFunction to support the
+   *                           new type.  Also added method SetPolynomialDegree to
+   *                           allow the degree of the polynomials fit to the
+   *                           position coordinates to be changed.  The fit
+   *                           polynomial was changed from a fixed 2nd order
+   *                           polynomial to an nth degree polynomial with one
+   *                           independent variable.  Added private class members
+   *                           p_fullCacheStartTime, p_fullCacheEndTime, and
+   *                           p_fullCacheSize.  Added p_timeScale, GetBaseTime(),
+   *                           SetOverrideBaseTime, GetTimeScale(),
+   *                           Extrapolate(double timeEt), and
+   *                           ComputeVelocityInTime(PartialType var).  The function
+   *                           was changed from a Parabola to Polynomial1Variable,
+   *                           now called PolynomialUnivariate.
+   *   @history 2011-02-14 Debbie A. Cook - Corrected previous update for Hermite
+   *                           case.  Created a special member, p_overrideScale, for
+   *                           Hermite case.  Also removed obsolete enum Coefficient.
+   *   @history 2011-02-17 Debbie A. Cook - Corrected missed problem with degree
+   *                           forced to be 2 and corrected calculation of velocity
+   *                           partial
+   *   @history 2011-02-22 Debbie A. Cook - Corrected Extrapolation method
+   *   @history 2011-02-28 Debbie A. Cook - Fixed typo in LoadCache and potential
+   *                           memory problem in SetPolynomial
+   *   @history 2011-04-10 Debbie A. Cook - Added GetSource method to support
+   *                           spkwriter.
+   *   @history 2011-05-27 Debbie A. Cook - Renamed old ReloadCache method for
+   *                           converting polynomial functions to Hermite cubic
+   *                           splines to LoadHermiteCache for use with spkwriter.
+   *   @history 2012-03-31 Debbie A. Cook - Programmer notes: Added new 
+   *                           interpolation algorithm, 
+   *                           PolyFunctionOverHermiteConstant, and new supporting
+   *                           method, SetEphemerisTimePolyOverHermiteConstant.  Also
+   *                           added argument to SetPolynomial methods for type.
+   *                           LineCache and ReloadCache were modified to allow
+   *                           other function types beyond the PolyFunction.  Added
+   *                           new method to return Hermite coordinate.
+   *   @history 2012-10-25 Jeannie Backer - Brought class closer to Isis3
+   *                           standards: Ordered includes in cpp file, replaced
+   *                           quotation marks with angle braces in 3rd party
+   *                           includes, fixed history indentation. References
+   *                           #1181.
    */
   class SpicePosition {
     public:

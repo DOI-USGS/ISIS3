@@ -188,6 +188,13 @@ namespace Isis {
    *   @history 2012-07-30 Tracie Sucharski - Fixed bug, program would seg fault when left-clicking
    *                          on a cube when there were no control points.  Before calling
    *                          FindClosest, make sure the control net has points.
+   *   @history 2012-09-28 Tracie Sucharski - In ::loadPoint when looking for ground source in
+   *                          the right combo box, use the fileName, not the serial number.  The
+   *                          ground source serial number will not be the fileName if the
+   *                          Instrument group is retained in the labels.  Fixes #1018
+   * @history 2012-10-04 Tracie Sucharski - If the ground source serial number already exists in 
+   *                          the serial number list, print error and clear out ground information.
+   *                          Fixes #1018
    */
   class QnetTool : public Tool {
     Q_OBJECT

@@ -86,6 +86,15 @@ namespace Isis {
    *            coding standards. References #972.
    *   @history 2012-07-25 Kris Becker - Added temperature dependant focal
    *            length computation from new IK content.  Fixes #922.
+   *   @history 2012-10-25 Kris Becker - Create instrument neutral temperature
+   *            dependent focal length keyword (TempDependentFocalLength) in the
+   *            NaifKeywords group to store this value for easy access.
+   *            Incremented camera version number to 2. Removed backword
+   *            compatibility code supporting older IKs.  The first valid one
+   *            with this version is msgr_mdis_v131.ti. Updated FK (msgr_v220.tf)
+   *            and PCK (pck00010_MSGR_v10.tpc). Reran spiceinit on all MESSENGER
+   *            data in the test suite and updated all appTests (18 total were
+   *            affected by this change).  Fixes #1214.
    */
   class MdisCamera : public FramingCamera {
     public:

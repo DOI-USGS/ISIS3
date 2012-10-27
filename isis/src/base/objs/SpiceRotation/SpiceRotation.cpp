@@ -1,22 +1,22 @@
-#include <string>
-#include <algorithm>
-#include <vector>
-#include <cfloat>
+#include "SpiceRotation.h"
 
+#include <algorithm>
+#include <cfloat>
 #include <cmath>
 #include <iomanip>
+#include <string>
+#include <vector>
 
-#include "SpiceRotation.h"
-#include "Quaternion.h"
-#include "LineEquation.h"
 #include "BasisFunction.h"
-#include "LeastSquares.h"
-#include "BasisFunction.h"
-#include "PolynomialUnivariate.h"
-#include "IString.h"
 #include "IException.h"
-#include "Table.h"
+#include "IString.h"
+#include "LeastSquares.h"
+#include "LineEquation.h"
 #include "NaifStatus.h"
+#include "PolynomialUnivariate.h"
+#include "Quaternion.h"
+#include "Table.h"
+#include "TableField.h"
 
 // Declarations for bindings for Naif Spicelib routines that do not have
 // a wrapper

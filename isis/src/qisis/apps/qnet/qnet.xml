@@ -515,5 +515,14 @@
       Fixed bug which caused program to crash when left clicking on a cube when
       there are no control points.
     </change>
+    <change name="Tracie Sucharski" date="2012-09-28">
+      Fixed bug that resulted in a qt assert error when loading or creating a new
+      ground point if the ground source file had the Instrument group in the labels.
+    </change>
+    <change name="Tracie Sucharski" date="2012-10-05">
+      Improved error checking for opening a ground source file with the same serial
+      number as a cube in the cube list.  This is not allowed, so an error with suggested
+      solution is printed.
+    </change>
   </history>
 </application>
