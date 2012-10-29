@@ -1,3 +1,5 @@
+import os
+import shutil
 
 def main():
     # Backup current qview settings
