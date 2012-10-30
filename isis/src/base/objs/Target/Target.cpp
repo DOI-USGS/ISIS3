@@ -75,10 +75,6 @@ namespace Isis {
     else {
       *m_bodyCode = lookupNaifBodyCode();
       m_sky = false;
-      // IString radiiKey = "BODY" + IString((BigInt) naifBodyCode()) + "_RADII";
-      // m_radii[0] = Distance(getDouble(radiiKey, 0), Distance::Kilometers);
-      // m_radii[1] = Distance(getDouble(radiiKey, 1), Distance::Kilometers);
-      // m_radii[2] = Distance(getDouble(radiiKey, 2), Distance::Kilometers);
     }
     // Override it if it exists in the labels
     if (kernels.HasKeyword("NaifBodyCode"))

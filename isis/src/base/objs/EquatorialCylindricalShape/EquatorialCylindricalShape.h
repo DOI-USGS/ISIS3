@@ -47,6 +47,9 @@ namespace Isis {
       ~EquatorialCylindricalShape();
 
       // Intersect the shape model
+      //bool intersectSurface(std::vector<double> observerPos,
+      //                      std::vector<double> lookDirection,
+      //                      double tolerance);
       bool intersectSurface(std::vector<double> observerPos,
                             std::vector<double> lookDirection);
 

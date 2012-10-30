@@ -120,6 +120,7 @@ namespace Isis {
 
       // Set the normal (surface or local) of the current intersection point
       void setNormal(const std::vector<double>);
+      void setNormal(const double a, const double b, const double c);
 
       // Set shape name
       void setName(const IString name);

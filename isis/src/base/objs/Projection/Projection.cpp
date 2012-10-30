@@ -202,8 +202,9 @@ namespace Isis {
                         + "] is outside the range of [-90:90]";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
-
-        if (m_minimumLatitude >= m_maximumLatitude) {
+// TODO: how to deal with this for plane shape model
+//      if (m_minimumLatitude >= m_maximumLatitude) {
+      if (m_minimumLatitude > m_maximumLatitude) {
           IString msg = "Projection failed. "
                         "[MinimumLatitude,MaximumLatitude] of ["
                         + IString(m_minimumLatitude) + ","
@@ -1617,7 +1618,8 @@ namespace Isis {
     return;
   }
 
-  /** 
+
+  /**
    * This method is used to find the XY range for oblique aspect projections 
    * (non-polar projections) by "walking" around each of the min/max lat/lon. 
    *  

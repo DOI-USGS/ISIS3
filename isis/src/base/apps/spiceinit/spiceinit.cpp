@@ -211,6 +211,8 @@ bool TryKernels(Cube *icube, Process &p,
                 Kernel dem, Kernel exk) {
   Pvl lab = *icube->getLabel();
 
+  UserInterface &ui = Application::GetUserInterface();
+
   // Add the new kernel files to the existing kernels group
   PvlKeyword lkKeyword("LeapSecond");
   PvlKeyword pckKeyword("TargetAttitudeShape");
@@ -247,8 +249,13 @@ bool TryKernels(Cube *icube, Process &p,
   for (int i = 0; i < iak.size(); i++) {
     iakKeyword.AddValue(iak[i]);
   }
-  for (int i = 0; i < dem.size(); i++) {
-    demKeyword.AddValue(dem[i]);
+  if (ui.GetString("SHAPE") == "RINGPLANE") {
+      demKeyword.AddValue("RingPlane");
+  }
+  else {
+    for (int i = 0; i < dem.size(); i++) {
+      demKeyword.AddValue(dem[i]);
+    }
   }
   for (int i = 0; i < exk.size(); i++) {
     exkKeyword.AddValue(exk[i]);
@@ -301,7 +308,6 @@ bool TryKernels(Cube *icube, Process &p,
   if (currentKernels.HasKeyword("EndPadding"))
     currentKernels.DeleteKeyword("EndPadding");
 
-  UserInterface &ui = Application::GetUserInterface();
   // Add any time padding the user specified to the spice group
   if (ui.GetDouble("STARTPAD") > DBL_EPSILON) {
     currentKernels.AddKeyword(PvlKeyword("StartPadding",

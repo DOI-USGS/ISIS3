@@ -101,13 +101,16 @@ namespace Isis {
     // We do not have ownership of p_demCube
     m_demCube = NULL;
 
-    delete m_interp;
-    m_interp = NULL;
+    if(m_interp) {
+      delete m_interp;
+      m_interp = NULL;
+    }
 
-    delete m_portal;
-    m_portal = NULL;
+    if (m_portal) {
+      delete m_portal;
+      m_portal = NULL;
+    }
   }
-
 
   /** 
    * Find the intersection point with the DEM
@@ -171,8 +174,8 @@ namespace Isis {
       double t = newIntersectPt[0] * newIntersectPt[0] +
           newIntersectPt[1] * newIntersectPt[1];
       
-      latDD = atan2(newIntersectPt[2], sqrt(t)) * 180.0 / PI;
-      lonDD = atan2(newIntersectPt[1], newIntersectPt[0]) * 180.0 / PI;
+      latDD = atan2(newIntersectPt[2], sqrt(t)) * RAD2DEG;
+      lonDD = atan2(newIntersectPt[1], newIntersectPt[0]) * RAD2DEG;
        
       if (lonDD < 0)
         lonDD += 360;
@@ -248,9 +251,9 @@ namespace Isis {
       m_demCube->read(*m_portal);
 
       distance = Distance(m_interp->Interpolate(m_demProj->WorldX(),
-                                                                          m_demProj->WorldY(),
-                                                                          m_portal->DoubleBuffer()),
-                          Distance::Meters);
+                                                m_demProj->WorldY(),
+                                                m_portal->DoubleBuffer()),
+                                                Distance::Meters);
     }
 
     return distance;

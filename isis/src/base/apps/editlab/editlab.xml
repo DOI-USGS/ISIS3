@@ -60,7 +60,7 @@
           The pvl or cube file containing the label to be modified.
         </description>
         <filter>
-          *.cub, *.pvl
+          *.cub *.pvl
         </filter>
       </parameter>
     </group>

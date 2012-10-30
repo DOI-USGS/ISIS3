@@ -75,12 +75,35 @@ namespace Isis {
    *
    * @return conversion was successful
    */
+//  bool CameraGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
+//    Distance radius(p_camera->LocalRadius(lat, lon));
+//    if (radius.isValid()) {
+//      if(p_camera->Sensor::SetGround(SurfacePoint(lat, lon, radius))) {
+//        LookCtoFocalPlaneXY();
+//        return true;
+//      }
+//    }
+
+//    return false;
+//  }
+
   bool CameraGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
-    Distance radius(p_camera->LocalRadius(lat, lon));
-    if (radius.isValid()) {
-      if(p_camera->Sensor::SetGround(SurfacePoint(lat, lon, radius))) {
-        LookCtoFocalPlaneXY();
-        return true;
+    if (p_camera->target()->shape()->name() == "Plane") {
+      double radius = lat.degrees();
+      double longitude = lon.degrees();
+      if (radius < 0.0) radius = 0.0; // TODO: massive, temporary kluge to get around testing latitude at -90 in caminfo app (are there more issues like this? Probably)
+      if(p_camera->Sensor::SetUniversalGround(0.0, longitude, radius)) {
+         LookCtoFocalPlaneXY();
+         return true;
+      }
+    }
+    else {
+      Distance radius(p_camera->LocalRadius(lat, lon));
+      if (radius.isValid()) {
+        if(p_camera->Sensor::SetGround(SurfacePoint(lat, lon, radius))) {
+          LookCtoFocalPlaneXY();
+          return true;
+        }
       }
     }
 

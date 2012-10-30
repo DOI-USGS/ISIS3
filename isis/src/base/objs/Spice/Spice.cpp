@@ -131,7 +131,6 @@ namespace Isis {
 
     m_naifKeywords = new PvlObject("NaifKeywords");
 
-    // m_sky = false;
 
     // Get the kernel group and load main kernels
     PvlGroup kernels = lab.FindGroup("Kernels", Pvl::Traverse);

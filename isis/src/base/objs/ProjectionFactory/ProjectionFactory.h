@@ -86,6 +86,13 @@ namespace Isis {
                                              int &samples, int &lines,
                                              Camera &cam);
 
+      static Isis::Projection *CreatePlanarForCube(Isis::Pvl &label,
+                                                   int &samples, int &lines,
+                                                   Camera &cam);
+      static Isis::Projection *CreatePlanarForCube(Isis::Pvl &label,
+                                                   int &samples, int &lines,
+                                                   bool sizeMatch);
+
     private:
       /**
        * Constructor (Its private, so you cannot use it.)  Use the Create method
