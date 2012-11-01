@@ -155,6 +155,17 @@ namespace Isis {
    *                           quotation marks with angle braces in 3rd party
    *                           includes, fixed history indentation. References
    *                           #1181.
+   *   @history 2012-10-31 Kris Becker - Added implementation for swapping of 
+   *                           observer/target and light time correction to
+   *                           surface.  Added a new, special protected
+   *                           constructor; virtualized the SetEphemerisTimeSpice
+   *                           method which allows for specialized determination
+   *                           of light time corrections; generalized the
+   *                           retrieval of body state vectors
+   *                           (computeStateVector); added many new, mostly
+   *                           protected, ssupport routines for this
+   *                           generalization. Fixes (mostly) #0909, #1136 and
+   *                           #1223.
    */
   class SpicePosition {
     public:
@@ -177,7 +188,12 @@ namespace Isis {
       virtual ~SpicePosition();
 
       void SetTimeBias(double timeBias);
-      void SetAberrationCorrection(const std::string &correction);
+      double GetTimeBias() const;
+
+      virtual void SetAberrationCorrection(const std::string &correction);
+      virtual std::string GetAberrationCorrection() const;
+      double GetLightTime() const;
+
       const std::vector<double> &SetEphemerisTime(double et);
       enum PartialType {WRT_X, WRT_Y, WRT_Z};
 
@@ -263,13 +279,30 @@ namespace Isis {
     protected:
       void SetEphemerisTimeMemcache();
       void SetEphemerisTimeHermiteCache();
-      void SetEphemerisTimeSpice();
+      virtual void SetEphemerisTimeSpice();
       void SetEphemerisTimePolyFunction();
       void SetEphemerisTimePolyFunctionOverHermiteConstant();
 
       std::vector<int> HermiteIndices(double tol, std::vector <int> indexList);
 
+      //======================================================================
+      // New methods support for light time correction and swap of observer/target
+      SpicePosition(int targetCode, int observerCode, bool swapObserverTarget);
+      int getObserverCode() const;
+      int getTargetCode() const;
+      double getAdjustedEphemerisTime() const;
+      void computeStateVector(double et, int target, int observer, 
+                              const std::string &refFrame, 
+                              const std::string &abcorr, 
+                              double state[6], bool &hasVelocity,
+                              double &lightTime) const;
+      void setStateVector(const double state[6], const bool &hasVelocity);
+      void setLightTime(const double &lightTime);
+      //======================================================================
+
     private:
+      void init(int targetCode, int observerCode,
+                const bool &swapObserverTarget = false);
       void ClearCache();
       void LoadTimeCache();
       void CacheLabel(Table &table);
@@ -311,6 +344,10 @@ namespace Isis {
       OverrideType p_override;            //!< Time base and scale override options;
       double p_overrideBaseTime;          //!< Value set by caller to override computed base time
       double p_overrideTimeScale;         //!< Value set by caller to override computed time scale
+
+      // Variables support observer/target swap and light time correction
+      bool   m_swapObserverTarget;  ///!< Swap traditional order
+      double m_lt;                 ///!<  Light time correction
   };
 };
 

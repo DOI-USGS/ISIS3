@@ -4,6 +4,10 @@
 #include <cfloat>
 #include <iomanip>
 
+#include <QString>
+#include <QStringList>
+#include <QChar>
+
 #include "BasisFunction.h"
 #include "IException.h"
 #include "LeastSquares.h"
@@ -23,6 +27,58 @@ namespace Isis {
    * @param observerCode Valid naif body name.
    */
   SpicePosition::SpicePosition(int targetCode, int observerCode) {
+    init(targetCode, observerCode, false);
+  }
+
+/**
+ * @brief Constructor for swapping observer/target order 
+ *  
+ * This specialized constructor is provided to expressly support swap of 
+ * observer/target order in the NAIF spkez_c/spkezp_c routines when determining 
+ * the state of spacecraft and target body. 
+ *  
+ * Traditionally, ISIS3 (and ISIS2!) has had the target/observer order swapped 
+ * improperly to determine state vector between the two bodies.  This 
+ * constructor provides a transaitional path to correct this in a 
+ * controlled way.  See SpacecraftPosition for details. 
+ *  
+ * Note that the targetCode and observerCode are always provided in the same 
+ * order as the orignal constructor (i.e., targetCode=s/c, observerCode=planet) 
+ * as the swapObserverTarget boolean parameter provides the means to properly 
+ * implement the swap internally. 
+ *  
+ * It is not as simple as simply swapping the codes in the constructor as 
+ * internal representation of the state vector is in body fixed state of the 
+ * target body relative to observer.  If the swap is invoked, the state vector 
+ * must be inverted. 
+ * 
+ * @author kbecker (10/29/2012)
+ * 
+ * @param targetCode         Traditional s/c code
+ * @param observerCode       Traditional target/planet code
+ * @param swapObserverTarget True indicates implement the observer/target swap, 
+ *                             false will invoke preexisting behavior 
+ */
+  SpicePosition::SpicePosition(int targetCode, int observerCode,
+                               bool swapObserverTarget) {
+    init(targetCode, observerCode, swapObserverTarget);
+  }
+
+/**
+ * @brief Internal initialization of the object support observer/target swap 
+ *  
+ * This initailizer provides options to swap observer/target properly. 
+ * 
+ * @author kbecker (10/29/2012)
+ *  
+ * @param targetCode         Traditional s/c code
+ * @param observerCode       Traditional target/planet code
+ * @param swapObserverTarget True indicates implement the observer/target swap, 
+ *                             false will invoke preexisting behavior   
+ */
+  void SpicePosition::init(int targetCode, int observerCode,
+                           const bool &swapObserverTarget) {
+
     p_aberrationCorrection = "LT+S";
     p_baseTime = 0.;
     p_coefficients[0].clear();
@@ -36,16 +92,31 @@ namespace Isis {
     p_fullCacheEndTime = 0;
     p_fullCacheSize = 0;
     p_hasVelocity = false;
-    p_observerCode = observerCode;
+ 
     p_override = NoOverrides;
     p_source = Spice;
-    p_targetCode = targetCode;
+
     p_timeBias = 0.0;
     p_timeScale = 1.;
     p_velocity.resize(3);
     p_xhermite = NULL;
     p_yhermite = NULL;
     p_zhermite = NULL;
+
+    m_swapObserverTarget = swapObserverTarget;
+    m_lt = 0.0;
+
+    // Determine observer/target ordering
+    if ( m_swapObserverTarget ) {
+      // New/improved settings.. Results in vector negation in SetEphemerisTimeSpice
+      p_targetCode = observerCode;
+      p_observerCode = targetCode;
+    }
+    else {
+      // Traditional settings
+      p_targetCode = targetCode;
+      p_observerCode = observerCode;
+    }
   }
 
 
@@ -72,19 +143,46 @@ namespace Isis {
     p_timeBias = timeBias;
   }
 
+/**
+ * @brief Returns the value of the time bias added to ET 
+ * 
+ * @author kbecker (10/29/2012)
+ * 
+ * @return double Returns time bias for current object
+ */
+  double SpicePosition::GetTimeBias() const {
+    return (p_timeBias);
+  }
 
   /** Set the aberration correction (light time).
    * See NAIF required reading for more information on this correction at
    * ftp://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/ascii/individual_docs/spk.req
    *
    * @param correction  This value must be one of the following: "NONE", "LT",
-   * "LT+S", where LT is a correction for planetary aberration (light time) and
-   * S a correction for stellar aberration.  If never called the default is
-   * "LT+S".
+   * "LT+S", "CN", "CN+S", "XLT", "XLT+S", "XCN" and "XCN+S" where LT is a 
+   * correction for planetary aberration (light time), CN is converged Newtonian,
+   * XLT is transmission case using Newtonian formulation, XCN is transmission 
+   * case using converged Newtonian formuation and S a correction for stellar 
+   * aberration. See 
+   * http://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/spkezr_c.html for 
+   * additional information on the "abcorr" parameters.  If never called the 
+   * default is "LT+S". 
+   *  
+   * @internal 
+   * @history 2012-10-10 Kris Becker - Added support for all current abcorr 
+   *          parameters options in the NAIF spkezX functions.
+   *  
    */
   void SpicePosition::SetAberrationCorrection(const std::string &correction) {
-    if(correction == "NONE" || correction == "LT" || correction == "LT+S") {
-      p_aberrationCorrection = correction;
+    QString abcorr(correction.c_str());
+    abcorr.remove(QChar(' '));
+    abcorr = abcorr.toUpper();
+    QStringList validAbcorr;
+    validAbcorr << "NONE" << "LT" << "LT+S" << "CN" << "CN+S"
+                << "XLT" << "XLT+S" << "XCN" << "XCN+S";
+
+    if (validAbcorr.indexOf(abcorr) >= 0) {
+      p_aberrationCorrection = abcorr.toStdString();
     }
     else {
       std::string msg = "Invalid abberation correction [" + correction + "]";
@@ -92,7 +190,37 @@ namespace Isis {
     }
   }
 
+/**
+ * @brief Returns current state of stellar aberration correction 
+ *  
+ * The aberration correction is the value of the parameter that will be 
+ * provided to the spkez_c/spkezp_c routines when determining the 
+ * targer/observer vector state.  See SetAberrationCorrection() for valid 
+ * values. 
+ * 
+ * @author kbecker (10/29/2012)
+ */
+  std::string SpicePosition::GetAberrationCorrection() const {
+    return (p_aberrationCorrection);
+  }
 
+/**
+ * @brief Return the light time coorection value 
+ *  
+ * This method returns the light time correction of the last call to 
+ * SetEphemerisTimeSpice.  This is the actual time after adjustments that has 
+ * resulting int the adjustment of the target body.  The observer position 
+ * should be unchanged. 
+ * 
+ * @author kbecker (10/29/2012)
+ * 
+ * @return double Returns the light time determined from the last call to 
+ *         SetEphemerisTime[Spice].
+ */
+  double SpicePosition::GetLightTime() const {
+    return (m_lt);
+  }
+ 
   /** Return J2000 coordinate at given time.
    *
    * This method returns the J2000 coordinates (x,y,z) of the body at a given
@@ -1300,41 +1428,21 @@ namespace Isis {
    *            method)
    */
   void SpicePosition::SetEphemerisTimeSpice() {
-    // Read from the kernel
-    SpiceDouble j[6], lt;
 
-    // First try getting the entire state (including the velocity vector)
-    spkez_c((SpiceInt)p_targetCode,
-            (SpiceDouble)(p_et + p_timeBias),
-            "J2000",
-            p_aberrationCorrection.c_str(),
-            (SpiceInt)p_observerCode,
-            j,
-            &lt);
+    double state[6];
+    bool hasVelocity;
+    double lt;
 
-    // If Naif fails attempting to get the entire state, assume the velocity vector is
-    // not available and just get the position.  First turn off Naif error reporting and
-    // return any error without printing them.
-    SpiceBoolean spfailure = failed_c();
-    reset_c();                   // Reset Naif error system to allow caller to recover
-    if(!spfailure) {
-      p_velocity[0] = j[3];
-      p_velocity[1] = j[4];
-      p_velocity[2] = j[5];
-      p_hasVelocity = true;
-    }
-    else {
-      spkezp_c((SpiceInt)p_targetCode,
-               (SpiceDouble)(p_et + p_timeBias),
-               "J2000",
-               p_aberrationCorrection.c_str(),
-               (SpiceInt)p_observerCode,
-               j,
-               &lt);
-    }
-    p_coordinate[0] = j[0];
-    p_coordinate[1] = j[1];
-    p_coordinate[2] = j[2];
+    // NOTE:  Prefer method getter access as some are virtualized and portray
+    // the appropriate internal representation!!!
+    computeStateVector(getAdjustedEphemerisTime(), getTargetCode(), getObserverCode(),
+                       "J2000", GetAberrationCorrection(), state, hasVelocity,
+                       lt);
+
+    // Set the internal state
+    setStateVector(state, hasVelocity);
+    setLightTime(lt);
+    return;
   }
 
 
@@ -1668,6 +1776,172 @@ namespace Isis {
     return hermiteCoordinate;
   }
 
+  //=========================================================================
+  //  Observer/Target swap and light time correction methods 
+  //=========================================================================
+
+/**
+ * @brief Returns observer code
+ * 
+ * @author kbecker (10/29/2012)
+ *  
+ * This methods returns the proper observer code as specified in constructor. 
+ * Code has been subjected to swapping if requested. 
+ *  
+ * @return int NAIF code of observer
+ */
+  int SpicePosition::getObserverCode() const {
+    return (p_observerCode);
+  }
+
+/**
+ * @brief Returns target code 
+ *  
+ * This methods returns the proper target code as specified in constructor. 
+ * Code has been subjected to swapping if requested. 
+ * 
+ * @author kbecker (10/29/2012)
+ * 
+ * @return int NAIF code for target body
+ */
+  int SpicePosition::getTargetCode() const {
+    return (p_targetCode);
+  }
+
+
+/**
+ * @brief Returns adjusted ephemeris time 
+ *  
+ * This method returns the actual ephemeris time adjusted by a specifed time 
+ * bias.  The bias typically comes explicitly from the camera model but could 
+ * be adjusted by the environment they are utlized in. 
+ * 
+ * @author kbecker (10/29/2012)
+ * 
+ * @return double Adjusted ephemeris time with time bias applied
+ */
+  double SpicePosition::getAdjustedEphemerisTime() const {
+    return (EphemerisTime() + GetTimeBias());
+  }
+
+
+/**
+ * @brief Computes the state vector of the target w.r.t observer 
+ *  
+ * This method computes the state vector of the target that is relative of the 
+ * observer.  It first attempts to retrieve with velocity vectors. If that 
+ * fails, it makes an additional attempt to get the state w/o velocity vectors. 
+ * The final result is indicated by the hasVelocity parameter. 
+ *  
+ * The parameters to this routine are the same as the NAIF spkez_c/spkezp_c 
+ * routines. See 
+ * http://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/spkez_c.html for 
+ * complete description. 
+ *  
+ * Note that this routine does not actually affect the internals of this object 
+ * (hence the constness of the method).  It is up to the caller to apply the 
+ * results and potentially handle swapping of observer/target and light time 
+ * correction. See SpacecraftPosition for additional details on this 
+ * application of the results. 
+ * 
+ * @author kbecker (10/29/2012)
+ * 
+ * @param et          Time to compute state vector for
+ * @param target      NAIF target code
+ * @param observer    NAIF observer code
+ * @param refFrame    Reference frame to express coordinates in (e.g., J2000)
+ * @param abcorr      Stellar aberration correction option
+ * @param state       Returns the 6-element state vector in target body fixed 
+ *                    coordinates
+ * @param hasVelocity Returns knowledge of whether the velocity vector is valid
+ * @param lightTime   Returns the light time correct resulting from the request 
+ *                    if applicable
+ */
+  void SpicePosition::computeStateVector(double et, int target, int observer, 
+                                         const std::string &refFrame, 
+                                         const std::string &abcorr, 
+                                         double state[6], bool &hasVelocity,
+                                         double &lightTime) const {
+
+    // First try getting the entire state (including the velocity vector)
+    hasVelocity = true;
+    lightTime = 0.0;
+    spkez_c((SpiceInt) target, (SpiceDouble) et, refFrame.c_str(), 
+            abcorr.c_str(), (SpiceInt) observer, state, &lightTime);
+
+    // If Naif fails attempting to get the entire state, assume the velocity vector is
+    // not available and just get the position.  First turn off Naif error reporting and
+    // return any error without printing them.
+    SpiceBoolean spfailure = failed_c();
+    reset_c();                   // Reset Naif error system to allow caller to recover
+    if ( spfailure ) {
+      hasVelocity = false;
+      lightTime = 0.0;
+      spkezp_c((SpiceInt) target, (SpiceDouble) et, refFrame.c_str(), 
+               abcorr.c_str(), (SpiceInt) observer, state, &lightTime);
+    }
+
+    return;
+  }
+
+/**
+ * @brief Sets the state of target relative to observer 
+ *  
+ * This method sets the state of the target (vector) relative to the observer. 
+ * Note that is the only place where the swap of observer/target adjustment to 
+ * the state vector is handled.  All contributors to this computation *must* 
+ * compute the state vector representing the position and velocity of the 
+ * target relative to the observer where the first three components of state[] 
+ * are the x-, y- and z-component cartesian coordinates of the target's 
+ * position; the last three are the corresponding velocity vector. 
+ *  
+ * This routine maintains the directional integrity of the state vector should 
+ * the observer/target be swapped.  See the documentation for the spkez_c at 
+ * http://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/spkez_c.html. 
+ * 
+ * @author kbecker (10/29/2012)
+ * 
+ * @param state        State vector.  First three components of this 6 element 
+ *                     array is the body fixed coordinates of the vector from
+ *                     the target to the observer.  The last three components
+ *                     are the velocity state. 
+ * @param hasVelocity  If true, then the velocity components of the state 
+ *                     vector are valid, otherwise they should be ignored.
+ */
+  void SpicePosition::setStateVector(const double state[6],
+                                     const bool &hasVelocity) {
+
+    p_coordinate[0] = state[0];
+    p_coordinate[1] = state[1];
+    p_coordinate[2] = state[2];
+
+    if ( hasVelocity ) {
+      p_velocity[0] = state[3];
+      p_velocity[1] = state[4];
+      p_velocity[2] = state[5];
+    }
+    else {
+      p_velocity[0] = 0.0;
+      p_velocity[1] = 0.0;
+      p_velocity[2] = 0.0;
+    }
+    p_hasVelocity = hasVelocity;
+
+    // Negate vectors if swap of observer target is requested so interface 
+    // remains consistent
+    if (m_swapObserverTarget) {
+      vminus_c(&p_velocity[0],   &p_velocity[0]);
+      vminus_c(&p_coordinate[0], &p_coordinate[0]);
+    }
+
+    return;
+  }
+
+  /** Inheritors can set the light time if indicated */
+  void SpicePosition::setLightTime(const double &lightTime) {
+    m_lt = lightTime;
+    return;
+  }
 
   // /** Resets the source interpolation of the position.
   //  *

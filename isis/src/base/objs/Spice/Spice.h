@@ -236,6 +236,9 @@ namespace Isis {
    *                           implementations to cpp file. Changed Resolution()
    *                           method to lower camel case. Added documentation.
    *                           Fixes #1181.
+   *   @history 2012-10-31 Kris Becker - Added implementation for swapping of 
+   *                           observer/target and light time correction to
+   *                           surface. Fixes (mostly) #0909, #1136 and #1223.
    */
   class Spice {
     public:
