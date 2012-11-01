@@ -9,4 +9,4 @@ commands:
 	  pline=15 \
 	  ssamp=31 \
 	  sline=31 \
-	  to=$(OUTPUT)/autoregtemplateTruth1.txt > /dev/null;
+	  topvl=$(OUTPUT)/autoregtemplateTruth1.txt > /dev/null;

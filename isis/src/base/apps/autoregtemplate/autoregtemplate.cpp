@@ -22,7 +22,7 @@ void IsisMain() {
   if(!algos.HasGroup(algoName)) {
     // Give the user a list of possible algorithms
     string msg = "Invalid value for [ALGORITHM] entered [" + algoName + "].  "
-      + "Must be one of [";
+        + "Must be one of [";
 
     for(int i = 0; i < algos.Groups(); i++) {
       if(i != 0 &&
@@ -59,24 +59,12 @@ void IsisMain() {
   algorithm += PvlKeyword("SubpixelAccuracy", (subPixelAccuracy) ? "True" : "False");
 
   // Set the chip interpolator type
-  if(ui.GetBoolean("CHIPINTERPOLATOR")) {
-    IString itype = ui.GetString("INTERPOLATORTYPE");
-    if(itype == "NEARESTNEIGHBORTYPE") {
-      algorithm += PvlKeyword("ChipInterpolator", "NearestNeighborType");
-    }
-    else if(itype == "BILINEARTYPE") {
-      algorithm += PvlKeyword("ChipInterpolator", "BiLinearType");
-    }
-    else {
-      algorithm += PvlKeyword("ChipInterpolator", "CubicConvolutionType");
-    }
-  }
-  else {
-    if(ui.WasEntered("INTERPOLATORTYPE")) {
-      string msg = "CHIPINTERPOLATOR parameter must be set to TRUE to enter INTERPOLATORTYPE parameter";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-  }
+  QMap<std::string, QString> paramToInterpMap;
+  paramToInterpMap["NEARESTNEIGHBORTYPE"] = "NearestNeighborType";
+  paramToInterpMap["BILINEARTYPE"] = "BiLinearType";
+  paramToInterpMap["CUBICCONVOLUTIONTYPE"] = "CubicConvolutionType";
+  
+  algorithm += PvlKeyword("ChipInterpolator", paramToInterpMap[ui.GetString("INTERP")]);
 
   // Add algorithm group to the autoreg object
   autoreg.AddGroup(algorithm);
@@ -175,39 +163,11 @@ void IsisMain() {
     int winSize = ui.GetInteger("WINDOWSIZE");
     surfaceModel += PvlKeyword("WindowSize", IString(winSize));
 
-    // Make sure the window size is at least 3
-    if(winSize < 3) {
-      string msg = "Invalid value for [WINDOWSIZE] entered ["
-        + IString(winSize) + "].  Must be greater than or equal to 3 (Default = 5)";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-
     // Make sure the window size is odd
     if(winSize % 2 == 0) {
       string msg = "Invalid value for [WINDOWSIZE] entered ["
         + IString(winSize) + "].  Must be an odd number (Default = 5)";
       throw IException(IException::User, msg, _FILEINFO_);
-    }
-
-    if(ui.GetBoolean("ECCENTRICITYTESTING")) {
-      double eccRatio = ui.GetDouble("ECCENTRICITYRATIO");
-      surfaceModel += PvlKeyword("EccentricityRatio", IString(eccRatio));
-
-      if(eccRatio < 1) {
-        string msg = "Invalid value for [ECCENTRICITYRATIO] entered ["
-          + IString(eccRatio) + "].  Must be 1.0 or larger (Default = 2.0)";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
-    }
-    if(ui.GetBoolean("RESIDUALTESTING")) {
-      double residualTol = ui.GetDouble("RESIDUALTOLERANCE");
-      surfaceModel += PvlKeyword("ResidualTolerance", IString(residualTol));
-
-      if(residualTol < 0) {
-        string msg = "Invalid value for [RESIDUALTOLERANCE] entered ["
-          + IString(residualTol) + "].  Must be 0.0 or larger (Default = 0.1)";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
     }
     autoreg.AddGroup(surfaceModel);
   }
@@ -216,7 +176,7 @@ void IsisMain() {
   p.AddObject(autoreg);
 
   // Write the autoreg group pvl to the output file
-  string output = ui.GetFileName("TO");
+  string output = ui.GetFileName("TOPVL");
   p.Write(output);
 
   Isis::Application::GuiLog(p);
