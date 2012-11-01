@@ -287,8 +287,8 @@ namespace Isis {
     IString tdflKey("TempDependentFocalLength");
 
     //  Determine if the desired value is already computed.  We are interested
-    //  in the temperature dependent value firstly.  Backwadd compatibility
-    //  is considered below.
+    //  in the temperature dependent value firstly.  Backward compatibility is
+    //  considered below.
     QVariant my_tdfl = readStoredValue(tdflKey, SpiceStringType, 0);
     if (my_tdfl.isValid()) {
       focalLength = IString(my_tdfl.toString()).ToDouble();
@@ -300,27 +300,43 @@ namespace Isis {
     // Original Code ensures backward compatibility
       focalLength = getDouble("INS" + filterCode + "_FOCAL_LENGTH");
 
-      // Wrap a try clause all around this so that if it fails, will return
-      // default
+      //  Check for disabling of temperature dependent focal length
+      bool tdfl_disabled(false);
+#if !defined(DISABLE_TDFL_DISABLING)
       try {
-        PvlGroup &inst = label.FindGroup("Instrument", Pvl::Traverse);      
-        double fpTemp = inst["FocalPlaneTemperature"];
-        double fl(0.0);
-        IString fptCoeffs = "INS" + filterCode + "_FL_TEMP_COEFFS";
-        //  Compute 5th order polynomial
-        for (int i = 0 ; i < 6 ;  i++) {
-          fl += getDouble(fptCoeffs, i) * pow(fpTemp, (double) i);
-        }
-
-        // Store computed focal length
-        focalLength = fl;
-        storeValue(tdflKey, 0, SpiceStringType, QVariant(focalLength));
+        IString tdfl_state = getString("DISABLE_MDIS_TD_FOCAL_LENGTH");
+        tdfl_disabled = ( "TRUE" == tdfl_state.UpCase() );
       }
       catch (IException &ie) {
-        // Noop when supporting old IKs
-        throw IException(ie, IException::Programmer,
-                          "Failed to compute temperature-dependent focal length",
-                           _FILEINFO_);
+        tdfl_disabled = false;
+      }
+#endif
+      
+      // Attempt to retrieve parameters necessary for temperature-dependent focal
+      // length and computed it
+      if ( !tdfl_disabled ) {
+        // Wrap a try clause all around this so that if it fails, will return
+        // default
+        try {
+          PvlGroup &inst = label.FindGroup("Instrument", Pvl::Traverse);      
+          double fpTemp = inst["FocalPlaneTemperature"];
+          double fl(0.0);
+          IString fptCoeffs = "INS" + filterCode + "_FL_TEMP_COEFFS";
+          //  Compute 5th order polynomial
+          for (int i = 0 ; i < 6 ;  i++) {
+            fl += getDouble(fptCoeffs, i) * pow(fpTemp, (double) i);
+          }
+
+          // Store computed focal length
+          focalLength = fl;
+          storeValue(tdflKey, 0, SpiceStringType, QVariant(focalLength));
+        }
+        catch (IException &ie) {
+          // Noop when supporting old IKs
+          throw IException(ie, IException::Programmer,
+                            "Failed to compute temperature-dependent focal length",
+                             _FILEINFO_);
+        }
       }
     }
      return (focalLength);
