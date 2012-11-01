@@ -43,6 +43,8 @@ namespace Isis {
  * @history 2012-10-31 Kris Becker - New class implements swapping of 
  *          observer/target and light time correction to surface.  Fixes
  *          (mostly) #0909, #1136 and #1223.
+ * @history 2012-11-01 Kris Becker - Revised parameter order to computeStateVector
+ *                                   to match comments.  References #1136.          
  */
   class SpacecraftPosition : public SpicePosition {
     public:

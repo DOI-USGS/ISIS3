@@ -1,7 +1,7 @@
 /**
  * @file
- * $Revision: 1.24 $
- * $Date: 2010/04/09 22:31:16 $
+ * $Revision$
+ * $Date$
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
@@ -138,6 +138,9 @@ namespace Isis {
  * reference  
  * 
  * @author kbecker (10/29/2012)
+ * @internal
+ *   @history 2012-11-01 Kris Becker - Revised parameters to computeStateVector
+ *                                     to match comments.  References #1136.
  */
   void SpacecraftPosition::SetEphemerisTimeSpice() {
 
@@ -165,31 +168,31 @@ namespace Isis {
     //      travel the radius of the target.
     // 
     //  4)  Compute the vector state of the target from the observer
-    //      buy subtracting the result of 3) from 2).
+    //      buy subtracting the result of 2) from 3).
     //////////////////////////////////////////////////////////////////////
 
     SpiceDouble state[6], lt;
     bool hasVelocity;
+    const SpiceInt ssbCode(0);
 
     //  1)  get observer/target light time
     computeStateVector(getAdjustedEphemerisTime(), getTargetCode(), getObserverCode(),
-                       "J2000", GetAberrationCorrection(), state, hasVelocity,
-                       lt);
+                       "J2000", GetAberrationCorrection(), state, hasVelocity, lt);
 
     //  2)  get SSB to s/c
     SpiceDouble ssbObs[6], ssbObs_lt;
     bool dummy;
-    computeStateVector(getAdjustedEphemerisTime(), 0, getObserverCode(), 
+    computeStateVector(getAdjustedEphemerisTime(), getObserverCode(), ssbCode,
                        "J2000", "NONE", ssbObs, dummy, ssbObs_lt);
 
     // 3) get adjusted target position from SSB
     double ltAdj_et = getAdjustedEphemerisTime() - lt + getRadiusLightTime();
     SpiceDouble ssbTarg[6], ssbTarg_lt;
-    computeStateVector(ltAdj_et, 0, getTargetCode(), 
+    computeStateVector(ltAdj_et, getTargetCode(), ssbCode,
                        "J2000", "NONE", ssbTarg, dummy, ssbTarg_lt);
 
     // 4) compute target to observer
-    (void) vsubg_c(ssbObs, ssbTarg, 6, state);
+    (void) vsubg_c(ssbTarg, ssbObs, 6, state);
 
     // Store vector and light time correction results
     setStateVector(state, hasVelocity);

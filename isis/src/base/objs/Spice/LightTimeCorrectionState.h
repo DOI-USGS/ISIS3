@@ -29,6 +29,8 @@ namespace Isis {
  * @history 2012-10-31 Kris Becker - New class iprovides support for swapping
  *          of observer/target and light time correction to surface. Fixes
  *          (mostly) #0909, #1136 and #1223.
+ * @history 2012-11-01 Kris Becker - Fixed isLightTimeCorrected() as it was
+ *          returning exactly opposite what it should be.  Refernces #1136.
  */
   class LightTimeCorrectionState  {
     public:
