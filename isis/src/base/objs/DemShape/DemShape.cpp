@@ -101,16 +101,13 @@ namespace Isis {
     // We do not have ownership of p_demCube
     m_demCube = NULL;
 
-    if(m_interp) {
-      delete m_interp;
-      m_interp = NULL;
-    }
+    delete m_interp;
+    m_interp = NULL;
 
-    if (m_portal) {
-      delete m_portal;
-      m_portal = NULL;
-    }
+    delete m_portal;
+    m_portal = NULL;
   }
+
 
   /** 
    * Find the intersection point with the DEM

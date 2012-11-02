@@ -24,7 +24,7 @@
  */
 
 #include "Pvl.h"
-#include <QDebug>
+
 namespace Isis {
   /**
    * @brief Loads plugins from a shared library

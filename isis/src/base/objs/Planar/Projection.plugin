@@ -1,0 +1,6 @@
+Group = Planar
+  Library = Planar
+  Routine = PlanarPlugin
+  Keyword = CenterLongitude
+  Keyword = CenterRadius
+EndGroup

@@ -1,0 +1,44 @@
+Begin testing Plane Shape Model class....
+
+  Testing constructors...
+    Shape1  name is Plane
+    Shape2  name is Plane
+    Shape3  name is Plane
+
+  Testing method intersectSurface with failure...
+    Do we have an intersection? 0
+    Intersection failed 
+
+Testing method intersectSurface...
+    Do we have an intersection? 0
+   Set a pixel in the image and check again.
+    Do we have an intersection? 1
+     surface point = (117219, -50181.5, 0)
+
+  Testing class method calculateLocalNormal...
+    local normal = (0, 0, 1)
+
+  Testing class method calculateSurfaceNormal...
+    surface normal = (0, 0, 1)
+
+  Testing class method calculateDefaultNormal...
+    default normal = (0, 0, 1)
+
+  Testing localRadius method ...
+   Localradius = 127509.097814 km
+
+  Testing setHasIntersection method...
+    Do we have an intersection? 0
+
+  Testing setSurfacePoint method...
+     Do we have an intersection? 1
+     surface point = (117219, -50181.5, 0)
+
+  Testing incidence angle method...
+    incidence angle: 83.3692
+
+  Testing emission angle method...
+     emission angle: 62.2289
+
+  Testing phase angle method...
+        phase angle: 34.4111

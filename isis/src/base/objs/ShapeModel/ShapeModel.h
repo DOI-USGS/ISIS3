@@ -52,6 +52,8 @@ namespace Isis {
    *                             camel case. Added resolution() method test to
    *                             improve unitTest code coverage. References
    *                             #1181.
+   *   @history 2012-10-31 - Ken Edmundson - Added another SetNormal method and fixed original to 
+   *                             set the m_hasNormal to true.
    */
   class ShapeModel {
     public:
