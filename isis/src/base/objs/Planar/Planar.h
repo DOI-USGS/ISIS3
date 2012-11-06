@@ -57,7 +57,6 @@ namespace Isis {
 
       std::string Name() const;
       std::string Version() const;
-//      double TrueScaleLatitude() const;
 
       bool SetGround(const double radius, const double lon);
       bool SetCoordinate(const double x, const double y);
@@ -71,8 +70,13 @@ namespace Isis {
 
   protected:
       double m_radius;
-      double m_minimumRadius;
-      double m_maximumRadius;
+
+      double m_minimumRingRadius;   /**< Contains minimum radius for entire ring
+                                       range. Only usable if m_ringRangeGood is
+                                       true.*/
+      double m_maximumRingRadius;   /**< Contains maximum radius for entire ring
+                                       range. Only usable if m_ringRangeGood is
+                                       true.*/
 
     private:
       double m_centerLongitude; //!< The center longitude for the map projection

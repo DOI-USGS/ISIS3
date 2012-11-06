@@ -255,8 +255,10 @@ namespace Isis {
       int Band();
       double Line();
 
-      bool GroundRange(double &minlat, double &maxlat,
-                       double &minlon, double &maxlon, Pvl &pvl);
+      bool GroundRange(double &minlat, double &maxlat, double &minlon,
+                       double &maxlon, Pvl &pvl);
+      bool ringRange(double &minradius, double &maxradius, double &minlon,
+                     double &maxlon, Pvl &pvl);
       bool IntersectsLongitudeDomain(Pvl &pvl);
 
       double PixelResolution();
@@ -269,6 +271,7 @@ namespace Isis {
       double HighestImageResolution();
 
       void BasicMapping(Pvl &map);
+      void basicRingMapping(Pvl &map);
 
       double FocalLength() const;
       double PixelPitch() const;
@@ -461,15 +464,20 @@ namespace Isis {
       double p_pixelPitch;                   //!< The pixel pitch, in millimeters per pixel
 
       void GroundRangeResolution();
+      void ringRangeResolution();
       double p_minlat;                       //!< The minimum latitude
       double p_maxlat;                       //!< The maximum latitude
       double p_minlon;                       //!< The minimum longitude
       double p_maxlon;                       //!< The maximum longitude
+      double p_minRingRadius;                //!< The minimum ring radius
+      double p_maxRingRadius;                //!< The maximum ring radius
       double p_minres;                       //!< The minimum resolution
       double p_maxres;                       //!< The maximum resolution
       double p_minlon180;                    //!< The minimum longitude in the 180 domain
       double p_maxlon180;                    //!< The maximum longitude in the 180 domain
-      bool p_groundRangeComputed;            /**!< Flag showing if the ground range
+      bool p_groundRangeComputed;            /**!< Flag showing if ground range
+                                                  was computed successfully.*/
+      bool p_ringRangeComputed;              /**!< Flag showing if ring range
                                                   was computed successfully.*/
 
       bool p_pointComputed;                  //!< Flag showing if Sample/Line has been computed

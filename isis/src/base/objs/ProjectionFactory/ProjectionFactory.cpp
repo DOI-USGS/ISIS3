@@ -285,31 +285,32 @@ namespace Isis {
   }
 
   /**
-   * This method creates a map projection for a cube given a label.  The label
-   * must contain all the proper mapping information (radii, projection name,
-   * parameters, pixel resolution, etc).  If the labels contain a Cube group and
-   * the Mapping group already has the upper left corner, then the values in the
-   * label will be used to set the cube size.  If they don't exist then the
-   * minimum/maximum latitude/longitude values (ground range) are expected to be
-   * in the Mapping group and will be used to compute the cube size and upper
-   * left corner values.
+   * This method creates a projection for a cube to a plane given a label.
+   * Currently this is utilized only for projecting images of rings to the ring
+   * plane (i.e the equatorial plane). The label must contain all the proper
+   * mapping information (radii, projection name, parameters, pixel resolution,
+   * etc). If the labels contain a Cube group and the Mapping group already has
+   * the upper left corner, then the values in the label will be used to set the
+   * cube size.  If they don't exist then the minimum/maximum latitude/longitude
+   * values (ground range) are expected to be in the Mapping group and will be
+   * used to compute the cube size and upper left corner values.
    *
    * @param label A label containing valid map projection information for a
    *              cube.
-   * @param samples The number of samples.  This value is calculated in the
+   * @param samples The number of samples. This value is calculated in the
    *                method and returned.
-   * @param lines The number of lines.  This value is calculated in the method
+   * @param lines The number of lines. This value is calculated in the method
    *              and returned.
-   * @param sizeMatch Boolean value that determines whether the method should
-   *                  match the size of the output cube to the size of the input
-   *                  cube.  This parameter defaults to true.
+   * @param sizeMatch Boolean value specifying whether the method should match
+   *                  the size of the output cube to the size of the input cube.
+   *                  Defaults to true.
    *
    * @return A pointer to a Projection object.
    *
    */
   Isis::Projection *ProjectionFactory::CreatePlanarForCube(Isis::Pvl &label,
-      int &samples, int &lines,
-      bool sizeMatch) {
+      int &samples, int &lines, bool sizeMatch) {
+
     // Create a temporary projection and get the radius at the special latitude
     // NOTE: by "special latitude" we mean that latitude where the projection is
     // not distorted
@@ -350,7 +351,7 @@ namespace Isis {
       // output cubes
       bool sizeFound = false;
       double upperLeftX, upperLeftY;
-      if(label.HasObject("IsisCube")) {
+      if (label.HasObject("IsisCube")) {
         Isis::PvlGroup &dims = label.FindGroup("Dimensions", Isis::Pvl::Traverse);
         samples = dims["Samples"];
         lines = dims["Lines"];
@@ -359,42 +360,43 @@ namespace Isis {
         upperLeftY = mapGroup["UpperLeftCornerY"];
         sizeFound = true;
       }
-      if(!sizeMatch) sizeFound = false;
+      if (!sizeMatch)
+        sizeFound = false;
 
       // Initialize the rest of the projection
 //      proj = Create(label, true);
 
       // Couldn't find the cube size from the labels so compute it
-      if(!sizeFound) {
-        if(!proj->HasGroundRange()) {
-          string msg = "Invalid ground range [MinimumLatitude,MaximumLatitude,";
+      if (!sizeFound) {
+        if (!proj->HasGroundRange()) {
+          string msg = "Invalid ring range [MinimumRadius,MaximumRadius,";
           msg += "MinimumLongitude,MaximumLongitude] missing or invalid";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         double minX, maxX, minY, maxY;
-        if(!proj->XYRange(minX, maxX, minY, maxY)) {
-          string msg = "Invalid ground range [MinimumLatitude,MaximumLatitude,";
+        if (!proj->XYRange(minX, maxX, minY, maxY)) {
+          string msg = "Invalid ring range [MinimumRadius,MaximumRadius,";
           msg += "MinimumLongitude,MaximumLongitude] cause invalid computation ";
           msg += "of image size";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
-        // Convert upperleft coordinate to units of pixel
+        // Convert upperleft coordinate to pixel units
         // Truncate it to the nearest whole pixel (floor/ceil)
-        // Convert it back to meters.  But don't do this if
+        // Convert it back to meters. But don't do this if
         // the X/Y position is already close to a whole pixel because
         // the floor/ceil function could cause an extra pixel to be added
         // just due to machine precision issues
-        if(fabs(fmod(minX, pixelResolution)) > 1.0e-6) {
-          if(pixelResolution - fabs(fmod(minX, pixelResolution)) > 1.0e-6) {
+        if (fabs(fmod(minX, pixelResolution)) > 1.0e-6) {
+          if (pixelResolution - fabs(fmod(minX, pixelResolution)) > 1.0e-6) {
             double sampleOffset = floor(minX / pixelResolution);
             minX = sampleOffset * pixelResolution;
           }
         }
 
-        if(fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
-          if(pixelResolution - fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
+        if (fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
+          if (pixelResolution - fabs(fmod(maxY, pixelResolution)) > 1.0e-6) {
             double lineOffset = -1.0 * ceil(maxY / pixelResolution);
             maxY = -1.0 * lineOffset * pixelResolution;
           }
@@ -442,14 +444,6 @@ namespace Isis {
                                            (string) mapGroup["UpperLeftCornerY"],
                                            "meters"), Isis::Pvl::Replace);
 
-      mapGroup.AddKeyword(Isis::PvlKeyword("EquatorialRadius",
-                                           (string) mapGroup["EquatorialRadius"],
-                                           "meters"), Isis::Pvl::Replace);
-
-      mapGroup.AddKeyword(Isis::PvlKeyword("PolarRadius",
-                                           (string) mapGroup["PolarRadius"],
-                                           "meters"), Isis::Pvl::Replace);
-
       // Add the mapper from pixel coordinates to projection coordinates
       PFPixelMapper *pixelMapper = new PFPixelMapper(pixelResolution, upperLeftX, upperLeftY);
       proj->SetWorldMapper(pixelMapper);
@@ -478,7 +472,7 @@ namespace Isis {
    * compute a x/y range.  This x/y range will be minimal
    * (compared to the alternate CreateForCube method and generates
    * significantly small cube size (samples,lines) depending on
-   * the projection.  Projections with curved merdians and/or
+   * the projection.  Projections with curved meridians and/or
    * parallels generate larger x/y ranges when only looking at the
    * ground range.
    *
@@ -736,14 +730,15 @@ namespace Isis {
    *
    */
   Isis::Projection *ProjectionFactory::CreatePlanarForCube(Isis::Pvl &label,
-      int &samples, int &lines,
-      Camera &cam) {
+      int &samples, int &lines, Camera &cam) {
 
-    // Create a temporary projection and get the radius at the special latitude
+    // Create a temporary projection
     Isis::Projection *proj = Create(label, true);
-    double trueScaleLat = proj->TrueScaleLatitude();
-    double localRadius = proj->LocalRadius(trueScaleLat);
-    delete proj;
+//    double trueScaleLat = proj->TrueScaleLatitude();
+//    double localRadius = proj->LocalRadius(trueScaleLat);
+//    delete proj;
+
+    double localRadius = 1.0;
 
     try {
       // Try to get the pixel resolution and then compute the scale
@@ -760,11 +755,10 @@ namespace Isis {
         pixelResolution = (2.0 * Isis::PI * localRadius) / (360.0 * scale);
       }
       // Write out the scale and resolution with units and truescale latitude
-      mapGroup.AddKeyword(Isis::PvlKeyword("PixelResolution", pixelResolution, "meters/pixel"),
+      mapGroup.AddKeyword(Isis::PvlKeyword("PixelResolution", pixelResolution,
+                                           "meters/pixel"), Isis::Pvl::Replace);
+      mapGroup.AddKeyword(Isis::PvlKeyword("Scale", scale, "pixels/degree"),
                           Isis::Pvl::Replace);
-      mapGroup.AddKeyword(Isis::PvlKeyword("Scale", scale, "pixels/degree"), Isis::Pvl::Replace);
-      //mapGroup.AddKeyword(Isis::PvlKeyword ("TrueScaleLatitude", trueScaleLat),
-      //                                    Isis::Pvl::Replace);
 
       // Initialize the rest of the projection
       proj = Create(label, true);
@@ -932,14 +926,6 @@ namespace Isis {
 
       mapGroup.AddKeyword(Isis::PvlKeyword("UpperLeftCornerY",
                                            (string) mapGroup["UpperLeftCornerY"],
-                                           "meters"), Isis::Pvl::Replace);
-
-      mapGroup.AddKeyword(Isis::PvlKeyword("EquatorialRadius",
-                                           (string) mapGroup["EquatorialRadius"],
-                                           "meters"), Isis::Pvl::Replace);
-
-      mapGroup.AddKeyword(Isis::PvlKeyword("PolarRadius",
-                                           (string) mapGroup["PolarRadius"],
                                            "meters"), Isis::Pvl::Replace);
 
       // Add the mapper from pixel coordinates to projection coordinates

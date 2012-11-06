@@ -287,6 +287,8 @@ namespace Isis {
       virtual PvlGroup MappingLatitudes();
       virtual PvlGroup MappingLongitudes();
 
+      virtual PvlGroup ringMapping();
+
       // Static conversion methods
       static PvlGroup TargetRadii(std::string target);
       static PvlGroup TargetRadii(Pvl &cubeLab, PvlGroup &mapGroup);

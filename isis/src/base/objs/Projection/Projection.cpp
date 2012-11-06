@@ -102,9 +102,17 @@ namespace Isis {
    * 
    */
   Projection::Projection(Pvl &label) : m_mappingGrp("Mapping") {
+
+    bool bPlanar = false;
+
     try {
       // Try to read the mapping group
       m_mappingGrp = label.FindGroup("Mapping", Pvl::Traverse);
+
+      if ((m_mappingGrp.HasKeyword("ProjectionName")) &&
+          (string) m_mappingGrp["ProjectionName"] == "Planar") {
+            bPlanar = true;
+      }
 
       // Get the radii from the EquatorialRadius and PolarRadius keywords
       if ((m_mappingGrp.HasKeyword("EquatorialRadius")) &&
@@ -137,18 +145,20 @@ namespace Isis {
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
-      // Get the LatitudeType
-      if ((string) m_mappingGrp["LatitudeType"] == "Planetographic") {
-        m_latitudeType = Planetographic;
-      }
-      else if ((string) m_mappingGrp["LatitudeType"] == "Planetocentric") {
-        m_latitudeType = Planetocentric;
-      }
-      else {
-        IString msg = "Projection failed. Invalid value for keyword "
-                      "[LatitudeType] must be "
-                      "[Planetographic or Planetocentric]";
-        throw IException(IException::Unknown, msg, _FILEINFO_);
+      // Get the LatitudeType (if not planar projection)
+      if (!bPlanar) {
+        if ((string) m_mappingGrp["LatitudeType"] == "Planetographic") {
+          m_latitudeType = Planetographic;
+        }
+        else if ((string) m_mappingGrp["LatitudeType"] == "Planetocentric") {
+          m_latitudeType = Planetocentric;
+        }
+        else {
+          IString msg = "Projection failed. Invalid value for keyword "
+                        "[LatitudeType] must be "
+                        "[Planetographic or Planetocentric]";
+          throw IException(IException::Unknown, msg, _FILEINFO_);
+        }
       }
 
       // Get the LongitudeDirection
@@ -178,58 +188,85 @@ namespace Isis {
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
-      // Get the ground range if it exists
-      m_groundRangeGood = false;
-      if ((m_mappingGrp.HasKeyword("MinimumLatitude")) &&
-          (m_mappingGrp.HasKeyword("MaximumLatitude")) &&
-          (m_mappingGrp.HasKeyword("MinimumLongitude")) &&
-          (m_mappingGrp.HasKeyword("MaximumLongitude"))) {
-        m_minimumLatitude  = m_mappingGrp["MinimumLatitude"];
-        m_maximumLatitude  = m_mappingGrp["MaximumLatitude"];
-        m_minimumLongitude = m_mappingGrp["MinimumLongitude"];
-        m_maximumLongitude = m_mappingGrp["MaximumLongitude"];
+      // Get the ground range if it exists (not for planar)
+      if (!bPlanar) {
+        m_groundRangeGood = false;
+        if ((m_mappingGrp.HasKeyword("MinimumLatitude")) &&
+            (m_mappingGrp.HasKeyword("MaximumLatitude")) &&
+            (m_mappingGrp.HasKeyword("MinimumLongitude")) &&
+            (m_mappingGrp.HasKeyword("MaximumLongitude"))) {
+          m_minimumLatitude  = m_mappingGrp["MinimumLatitude"];
+          m_maximumLatitude  = m_mappingGrp["MaximumLatitude"];
+          m_minimumLongitude = m_mappingGrp["MinimumLongitude"];
+          m_maximumLongitude = m_mappingGrp["MaximumLongitude"];
 
-        if ((m_minimumLatitude < -90.0) || (m_minimumLatitude > 90.0)) {
-          IString msg = "Projection failed. "
-                        "[MinimumLatitude] of [" + IString(m_minimumLatitude)
-                        + "] is outside the range of [-90:90]";
-          throw IException(IException::Unknown, msg, _FILEINFO_);
-        }
+          if ((m_minimumLatitude < -90.0) || (m_minimumLatitude > 90.0)) {
+            IString msg = "Projection failed. "
+                          "[MinimumLatitude] of [" + IString(m_minimumLatitude)
+                          + "] is outside the range of [-90:90]";
+            throw IException(IException::Unknown, msg, _FILEINFO_);
+          }
 
-        if ((m_maximumLatitude < -90.0) || (m_maximumLatitude > 90.0)) {
-          IString msg = "Projection failed. "
-                        "[MaximumLatitude] of [" + IString(m_maximumLatitude)
-                        + "] is outside the range of [-90:90]";
-          throw IException(IException::Unknown, msg, _FILEINFO_);
-        }
-// TODO: how to deal with this for plane shape model
-//      if (m_minimumLatitude >= m_maximumLatitude) {
-      if (m_minimumLatitude > m_maximumLatitude) {
-          IString msg = "Projection failed. "
-                        "[MinimumLatitude,MaximumLatitude] of ["
-                        + IString(m_minimumLatitude) + ","
-                        + IString(m_maximumLatitude) + "] are not "
-                        + "properly ordered";
-          throw IException(IException::Unknown, msg, _FILEINFO_);
-        }
+          if ((m_maximumLatitude < -90.0) || (m_maximumLatitude > 90.0)) {
+            IString msg = "Projection failed. "
+                          "[MaximumLatitude] of [" + IString(m_maximumLatitude)
+                          + "] is outside the range of [-90:90]";
+            throw IException(IException::Unknown, msg, _FILEINFO_);
+          }
+        if (m_minimumLatitude >= m_maximumLatitude) {
+            IString msg = "Projection failed. "
+                          "[MinimumLatitude,MaximumLatitude] of ["
+                          + IString(m_minimumLatitude) + ","
+                          + IString(m_maximumLatitude) + "] are not "
+                          + "properly ordered";
+            throw IException(IException::Unknown, msg, _FILEINFO_);
+          }
 
-        if (m_minimumLongitude >= m_maximumLongitude) {
-          IString msg = "Projection failed. "
-                        "[MinimumLongitude,MaximumLongitude] of ["
-                        + IString(m_minimumLongitude) + "," 
-                        + IString(m_maximumLongitude) + "] are not "
-                        + "properly ordered";
-          throw IException(IException::Unknown, msg, _FILEINFO_);
-        }
+          if (m_minimumLongitude >= m_maximumLongitude) {
+            IString msg = "Projection failed. "
+                          "[MinimumLongitude,MaximumLongitude] of ["
+                          + IString(m_minimumLongitude) + ","
+                          + IString(m_maximumLongitude) + "] are not "
+                          + "properly ordered";
+            throw IException(IException::Unknown, msg, _FILEINFO_);
+          }
 
-        m_groundRangeGood = true;
+          m_groundRangeGood = true;
+        }
+        else {
+          // if no ground range is given, initialize the min/max lat/lon to 0
+          m_minimumLatitude  = 0.0;
+          m_maximumLatitude  = 0.0;
+          m_minimumLongitude = 0.0;
+          m_maximumLongitude = 0.0;
+        }
       }
+      // it is planar
       else {
-        // if no ground range is given, initialize the min/max lat/lon to 0
-        m_minimumLatitude  = 0.0;
-        m_maximumLatitude  = 0.0;
-        m_minimumLongitude = 0.0;
-        m_maximumLongitude = 0.0;
+        m_groundRangeGood = false;
+        if ((m_mappingGrp.HasKeyword("MinimumLongitude")) &&
+            (m_mappingGrp.HasKeyword("MaximumLongitude"))) {
+          m_minimumLongitude = m_mappingGrp["MinimumLongitude"];
+          m_maximumLongitude = m_mappingGrp["MaximumLongitude"];
+
+          if (m_minimumLongitude >= m_maximumLongitude) {
+            IString msg = "Projection failed. "
+                          "[MinimumLongitude,MaximumLongitude] of ["
+                          + IString(m_minimumLongitude) + ","
+                          + IString(m_maximumLongitude) + "] are not "
+                          + "properly ordered";
+            throw IException(IException::Unknown, msg, _FILEINFO_);
+          }
+
+          m_groundRangeGood = true;
+        }
+        else {
+          // if no ground range is given, initialize the min/max lat/lon to 0
+          m_minimumLatitude  = 0.0;
+          m_maximumLatitude  = 0.0;
+          m_minimumLongitude = 0.0;
+          m_maximumLongitude = 0.0;
+        }
       }
 
       // Get the map rotation
@@ -290,6 +327,7 @@ namespace Isis {
   Projection::~Projection() {
     if(m_mapper) delete m_mapper;
   }
+
 
   /**
    * This method determines whether two map projection objects are equal by 
@@ -2190,6 +2228,47 @@ namespace Isis {
     if (HasGroundRange()) {
       mapping += m_mappingGrp["MinimumLatitude"];
       mapping += m_mappingGrp["MaximumLatitude"];
+      mapping += m_mappingGrp["MinimumLongitude"];
+      mapping += m_mappingGrp["MaximumLongitude"];
+    }
+
+    if (m_mappingGrp.HasKeyword("Rotation")) {
+      mapping += m_mappingGrp["Rotation"];
+    }
+
+    return mapping;
+  }
+
+  /**
+   * This function returns the keywords that this projection uses.
+   *
+   * @return PvlGroup The keywords that this projection uses
+   */
+  PvlGroup Projection::ringMapping() {
+    PvlGroup mapping("Mapping");
+
+    if (m_mappingGrp.HasKeyword("TargetName")) {
+      mapping += m_mappingGrp["TargetName"];
+    }
+
+    mapping += m_mappingGrp["ProjectionName"];
+    mapping += m_mappingGrp["LongitudeDirection"];
+    mapping += m_mappingGrp["LongitudeDomain"];
+
+    if (m_mappingGrp.HasKeyword("PixelResolution")) {
+      mapping += m_mappingGrp["PixelResolution"];
+    }
+    if (m_mappingGrp.HasKeyword("Scale")) {
+      mapping += m_mappingGrp["Scale"];
+    }
+    if (m_mappingGrp.HasKeyword("UpperLeftCornerX")) {
+      mapping += m_mappingGrp["UpperLeftCornerX"];
+    }
+    if (m_mappingGrp.HasKeyword("UpperLeftCornerY")) {
+      mapping += m_mappingGrp["UpperLeftCornerY"];
+    }
+
+    if (HasGroundRange()) {
       mapping += m_mappingGrp["MinimumLongitude"];
       mapping += m_mappingGrp["MaximumLongitude"];
     }

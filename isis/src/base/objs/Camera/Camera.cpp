@@ -103,6 +103,7 @@ namespace Isis {
 
     p_groundRangeComputed = false;
     p_raDecRangeComputed = false;
+    p_ringRangeComputed = false;
     p_pointComputed = false;
   }
 
@@ -704,13 +705,13 @@ namespace Isis {
    * Analogous to above GroundRangeResolution method. Computes the ring range
    * and min/max resolution
    */
-/*  void Camera::RingRangeResolution() {
+  void Camera::ringRangeResolution() {
 
     // Have we already done this
-    if (m_ringRangeComputed)
+    if (p_ringRangeComputed)
       return;
 
-    m_ringRangeComputed = true;
+    p_ringRangeComputed = true;
 
     bool computed = p_pointComputed;
     double originalSample = Sample();
@@ -718,14 +719,14 @@ namespace Isis {
     int originalBand = Band();
 
     // Initializations
-    p_minrad    = DBL_MAX;
-    p_minlon    = DBL_MAX;
-    p_minlon180 = DBL_MAX;
-    p_maxrad    = -DBL_MAX;
-    p_maxlon    = -DBL_MAX;
-    p_maxlon180 = -DBL_MAX;
-    p_minres    = DBL_MAX;
-    p_maxres    = -DBL_MAX;
+    p_minRingRadius = DBL_MAX;
+    p_minlon        = DBL_MAX;
+    p_minlon180     = DBL_MAX;
+    p_maxRingRadius = -DBL_MAX;
+    p_maxlon        = -DBL_MAX;
+    p_maxlon180     = -DBL_MAX;
+    p_minres        = DBL_MAX;
+    p_maxres        = -DBL_MAX;
 
     // See if we have band dependence and loop for the appropriate number of bands
     int eband = p_bands;
@@ -744,10 +745,10 @@ namespace Isis {
         for (samp = 1; samp <= p_samples + 1; samp++) {
 
           if (SetImage((double)samp - 0.5, (double)line - 0.5)) {
-            double rad = LocalRadius();
+              double rad = LocalRadius().meters();
             double lon = UniversalLongitude();
-            if (rad < p_minrad) p_minrad = rad;
-            if (rad > p_maxrad) p_maxrad = rad;
+            if (rad < p_minRingRadius) p_minRingRadius = rad;
+            if (rad > p_maxRingRadius) p_maxRingRadius = rad;
             if (lon < p_minlon) p_minlon = lon;
             if (lon > p_maxlon) p_maxlon = lon;
 
@@ -772,10 +773,10 @@ namespace Isis {
         if (samp < p_samples + 1) {
           for(samp = p_samples + 1; samp >= 1; samp--) {
             if (SetImage((double)samp - 0.5, (double)line - 0.5)) {
-              double rad = LocalRadius();
+                double rad = LocalRadius().meters();
               double lon = UniversalLongitude();
-              if (rad < p_minrad) p_minrad = rad;
-              if (rad > p_maxrad) p_maxrad = rad;
+              if (rad < p_minRingRadius) p_minRingRadius = rad;
+              if (rad > p_maxRingRadius) p_maxRingRadius = rad;
               if (lon < p_minlon) p_minlon = lon;
               if (lon > p_maxlon) p_maxlon = lon;
 
@@ -821,46 +822,6 @@ namespace Isis {
 //        }
 //      }
 
-      // Special test for ground range to see if either pole is in the image
-      // TODO: not applicable at all for ring images???
-//      latitude = Latitude(90, Angle::Degrees);
-//      longitude = Longitude(0.0, Angle::Degrees);
-//      radius = LocalRadius(latitude, longitude);
-
-//      if (radius.isValid()) {
-
-//        testPoint = SurfacePoint(latitude, longitude, radius);
-
-//        if(SetGround(testPoint)) {
-//          if(Sample() >= 0.5 && Line() >= 0.5 &&
-//              Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
-//            p_maxlat = 90.0;
-//            p_minlon = 0.0;
-//            p_maxlon = 360.0;
-//            p_minlon180 = -180.0;
-//            p_maxlon180 = 180.0;
-//          }
-//        }
-//      }
-
-//      latitude = Latitude(-90, Angle::Degrees);
-//      radius = LocalRadius(latitude, longitude);
-
-//      if (radius.isValid()) {
-
-//        testPoint = SurfacePoint(latitude, longitude, radius);
-//        if(SetGround(testPoint)) {
-//          if(Sample() >= 0.5 && Line() >= 0.5 &&
-//              Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
-//            p_minlat = -90.0;
-//            p_minlon = 0.0;
-//            p_maxlon = 360.0;
-//            p_minlon180 = -180.0;
-//            p_maxlon180 = 180.0;
-//          }
-//        }
-//      }
-
       // Another special test for ring range as we could have the
       // 0-360 seam running right through the image so
       // test it as well (the increment may not be fine enough !!!)
@@ -901,13 +862,12 @@ namespace Isis {
     }
 
     // Checks for invalid radius/lon ranges
-    if (m_minrad == DBL_MAX  ||  m_minrad == DBL_MAX  || p_minlon == DBL_MAX  ||  p_maxlon == -DBL_MAX) {
+    if (p_minRingRadius == DBL_MAX  ||  p_minRingRadius == DBL_MAX  || p_minlon == DBL_MAX  ||  p_maxlon == -DBL_MAX) {
       string message = "RingPlane ShapeModel - Camera missed plane or SPICE data off.";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
-
   }
-*/
+
 
   /**
    * Checks whether the ground range intersects the longitude domain or not
@@ -1038,46 +998,17 @@ namespace Isis {
    * @return @b bool Returns true if it crosses the longitude domain boundary and
    *              false if it does not
    */
-/*  bool Camera::RingRange(double &minrad, double &maxrad, double &minlon,
+  bool Camera::ringRange(double &minrad, double &maxrad, double &minlon,
                          double &maxlon, Pvl &pvl) {
 
     // Compute the ring range and resolution
-    GroundRangeResolution();
-
-    // Get the default radii
-    Distance localRadii[3];
-    radii(localRadii);
-    Distance &a = localRadii[0];
-    Distance &b = localRadii[2];
+    ringRangeResolution();
 
     // See if the PVL overrides the radii
     PvlGroup map = pvl.FindGroup("Mapping", Pvl::Traverse);
 
-    if (map.HasKeyword("EquatorialRadius"))
-      a = Distance(map["EquatorialRadius"][0], Distance::Meters);
-
-    if (map.HasKeyword("PolarRadius"))
-      b = Distance(map["PolarRadius"][0], Distance::Meters);
-
-    // Convert to planetographic if necessary
-    minlat = p_minlat;
-    maxlat = p_maxlat;
-    if (map.HasKeyword("LatitudeType")) {
-      IString latType = (string) map["LatitudeType"];
-      if (latType.UpCase() == "PLANETOGRAPHIC") {
-        if (abs(minlat) < 90.0) {  // So tan doesn't fail
-          minlat *= PI / 180.0;
-          minlat = atan(tan(minlat) * (a / b) * (a / b));
-          minlat *= 180.0 / PI;
-        }
-
-        if (abs(maxlat) < 90.0) {  // So tan doesn't fail
-          maxlat *= PI / 180.0;
-          maxlat = atan(tan(maxlat) * (a / b) * (a / b));
-          maxlat *= 180.0 / PI;
-        }
-      }
-    }
+    minrad = p_minRingRadius;
+    maxrad = p_maxRingRadius;
 
     // Assume 0 to 360 domain but change it if necessary
     minlon = p_minlon;
@@ -1125,10 +1056,12 @@ namespace Isis {
     }
 
     // Now return if it crosses the longitude domain boundary
-    if ((maxlon - minlon) > 359.0) return true;
+    if ((maxlon - minlon) > 359.0)
+      return true;
+
     return false;
   }
-*/
+
 
   /**
    * Writes the basic mapping group to the specified Pvl.
@@ -1157,6 +1090,31 @@ namespace Isis {
     map += PvlKeyword("ProjectionName", "Sinusoidal");
     pvl.AddGroup(map);
   }
+
+
+  /**
+   * Writes the basic mapping group for ring plane to the specified Pvl.
+   *
+   * @param pvl Pvl to write mapping group to
+   */
+  void Camera::basicRingMapping(Pvl &pvl) {
+    PvlGroup map("Mapping");
+    map += PvlKeyword("TargetName", target()->name());
+
+    map += PvlKeyword("LongitudeDirection", "PositiveEast");
+    map += PvlKeyword("LongitudeDomain", "360");
+
+    ringRangeResolution();
+    map += PvlKeyword("MinimumRingRadius", p_minRingRadius);
+    map += PvlKeyword("MaximumRingRadius", p_maxRingRadius);
+    map += PvlKeyword("MinimumLongitude", p_minlon);
+    map += PvlKeyword("MaximumLongitude", p_maxlon);
+    map += PvlKeyword("PixelResolution", p_minres);
+
+    map += PvlKeyword("ProjectionName", "Planar");
+    pvl.AddGroup(map);
+  }
+
 
   //! Reads the focal length from the instrument kernel
   void Camera::SetFocalLength() {

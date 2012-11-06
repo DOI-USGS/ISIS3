@@ -60,10 +60,10 @@ namespace Isis {
     m_minimumLatitude = 0.0;
     m_maximumLatitude = 1.0;
 
-    if (m_mappingGrp.HasKeyword("MinimumRadius"))
-      m_minimumRadius = m_mappingGrp["MinimumRadius"];
-    if (m_mappingGrp.HasKeyword("MaximumRadius"))
-      m_maximumRadius = m_mappingGrp["MaximumRadius"];
+    if (m_mappingGrp.HasKeyword("MinimumRingRadius"))
+      m_minimumRingRadius = m_mappingGrp["MinimumRingRadius"];
+    if (m_mappingGrp.HasKeyword("MaximumRingRadius"))
+      m_maximumRingRadius = m_mappingGrp["MaximumRingRadius"];
 
     try {
       // Try to read the mapping group
@@ -79,7 +79,7 @@ namespace Isis {
       // Compute and write the default center radius if allowed and
       // necessary
       if ((allowDefaults) && (!mapGroup.HasKeyword("CenterRadius"))) {
-        double radius = (m_minimumRadius + m_maximumRadius) / 2.0;
+        double radius = (m_minimumRingRadius + m_maximumRingRadius) / 2.0;
         mapGroup += PvlKeyword("CenterRadius", radius);
       }
 
@@ -496,9 +496,9 @@ namespace Isis {
     // Return X/Y min/maxs
     // TODO: get rid of hard-coding
 
-    m_maximumX = m_maximumRadius*cos(m_maximumLongitude);
+    m_maximumX = m_maximumRingRadius*cos(m_maximumLongitude);
     m_minimumX = -m_maximumX;
-    m_maximumY = m_maximumRadius*sin(m_maximumLongitude);
+    m_maximumY = m_maximumRingRadius*sin(m_maximumLongitude);
     m_minimumY = -m_maximumY;
 
     minX = m_minimumX;
@@ -516,13 +516,10 @@ namespace Isis {
    * @return PvlGroup The keywords that this projection uses
    */
   PvlGroup Planar::Mapping() {
-    PvlGroup mapping = Projection::Mapping();
+    PvlGroup mapping = Projection::ringMapping();
 
     mapping += PvlKeyword("CenterRadius", m_centerRadius);
     mapping += PvlKeyword("CenterLongitude", m_centerLongitude);
-
-//    mapping += m_mappingGrp["CenterRadius"];
-//    mapping += m_mappingGrp["CenterLongitude"];
 
     return mapping;
   }
