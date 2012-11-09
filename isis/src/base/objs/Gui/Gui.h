@@ -71,6 +71,9 @@ namespace Isis {
    *                         from GuiCubeParameter. Cube and File customization
    *                         preferences are now being handled in Cube's
    *                         CubeIoHandler and IsisAml classes.  
+   *  @history 2012-11-08 Janet Barrett - Modified the AddParameter method to
+   *                         only update exclusions for list and combobox widgets.
+   *                         Fixes #624.
    */
 
   class Gui : public QMainWindow {

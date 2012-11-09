@@ -512,7 +512,11 @@ namespace Isis {
     }
 
     GuiParameter *p = GuiParameterFactory::Create(gridLayout, ui, group, param);
-    connect(p, SIGNAL(ValueChanged()), this, SLOT(UpdateExclusions()));
+
+    if (p->Type() == GuiParameter::ListWidget || p->Type() == GuiParameter::ComboWidget) {
+      connect(p, SIGNAL(ValueChanged()), this, SLOT(UpdateExclusions()));
+    }
+
     connect(p, SIGNAL(HelperTrigger(const QString &)),
             this, SLOT(InvokeHelper(const QString &)));
     return p;
