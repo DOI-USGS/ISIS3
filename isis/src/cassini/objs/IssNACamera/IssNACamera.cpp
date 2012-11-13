@@ -42,13 +42,37 @@ namespace Isis {
    *                          to ShutterOpenCloseTimes() method.
    */
   IssNACamera::IssNACamera(Pvl &lab) : FramingCamera(lab) {
-    NaifStatus::CheckErrors();
-    PvlGroup bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
-    // Get the camera characteristics
-    IString key = string("INS" + (IString)(int)naifIkCode() + "_") + (string)bandBin["FilterName"] + "_FOCAL_LENGTH";
-    key = key.Convert("/", '_');
-    double focalLength = Spice::getDouble(key);
 
+    // Get the filter wheels positions dependent focal length.
+    // If we can not get the focal length for this specific filter wheel combination then
+    // use the default.
+    double focalLength = 0.0;
+    try {
+      PvlGroup bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
+      QString key = QString("INS%1_%2_FOCAL_LENGTH").
+                      arg(naifIkCode()).arg(bandBin["FilterName"][0].c_str());
+      key = key.replace("/", "_");
+      focalLength = getDouble(key);   
+    }
+    catch (IException &firstException) {
+      try {
+        QString key = "INS-82360_DEFAULT_FOCAL_LENGTH";
+        focalLength = getDouble(key);   
+      }
+      catch (IException &secondException) {
+        PvlGroup bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
+        IException finalError(IException::Unknown,
+            QString("Unable to find a focal length for the requested Cassini ISS NA "
+                    "filter combination [%1] or the default focal length")
+                        .arg(bandBin["FilterName"][0].c_str()),
+            _FILEINFO_);
+        finalError.append(firstException);
+        finalError.append(secondException);
+        throw finalError;
+      }
+    }
+
+    NaifStatus::CheckErrors();
     SetFocalLength(focalLength);
     SetPixelPitch();
     instrumentRotation()->SetFrame(Spice::getInteger("INS_" + (IString)(int)naifIkCode() + "_FRAME_ID"));

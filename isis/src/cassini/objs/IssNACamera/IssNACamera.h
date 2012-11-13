@@ -40,30 +40,28 @@ namespace Isis {
    *
    * @internal
    *   @history 2007-07-10 Steven Koechle - Original Version
-   *   @history 2007-07-10 Steven Koechle - Removed hardcoding of NAIF
-   *                          Instrument number
-   *   @history 2007-07-11 Steven Koechle - casted NaifIkCode to int before
-   *                          IString to fix problem on Linux 32bit
-   *   @history 2008-08-08 Steven Lambright Now using the new LoadCache(...)
-   *                          method instead of CreateCache(...).
-   *   @history 2009-01-22 Kris Becker Added new frame rotation to the CK frame
-   *                          hierarchy to convert to detector coordinates.
-   *                          This is essentially a 180 degree rotation.  The
-   *                          frame definition is actually contained in the IAK.
-   *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer
-   *                          inherit directly from Camera
-   *   @history 2011-01-14 Travis Addair - Added new CK/SPK accessor methods,
-   *                          pure virtual in Camera, implemented in mission
-   *                          specific cameras
-   *   @history 2011-02-09 Steven Lambright - Major changes to camera classes.
-   *                          documentation. 
-   *   @history 2011-05-03 Jeannie Walldren - Added ShutterOpenCloseTimes()
-   *                          method. Updated unitTest to test for new methods.
-   *                          Updated documentation. Replaced Cassini namespace
-   *                          wrap with Isis namespace. Added Isis Disclaimer
-   *                          to files. Added NAIF error check to constructor.
+   *   @history 2007-07-10 Steven Koechle - Removed hardcoding of NAIF Instrument number
+   *   @history 2007-07-11 Steven Koechle - casted NaifIkCode to int before iString to fix
+   *                           problem on Linux 32bit
+   *   @history 2008-08-08 Steven Lambright Now using the new LoadCache(...) method instead of
+   *                           CreateCache(...).
+   *   @history 2009-01-22 Kris Becker Added new frame rotation to the CK frame hierarchy to
+   *                          convert to detector coordinates. This is essentially a 180 degree
+   *                          rotation.  The frame definition is actually contained in the IAK.
+   *   @history 2009-08-28 Steven Lambright - Changed inheritance to no longer inherit directly
+   *                           from Camera
+   *   @history 2011-01-14 Travis Addair - Added new CK/SPK accessor methods, pure virtual in
+   *                           Camera, implemented in mission specific cameras 
+   *   @history 2011-02-09 Steven Lambright - Major changes to camera classes documentation.
+   *   @history 2011-05-03 Jeannie Walldren - Added ShutterOpenCloseTimes() method. Updated
+   *                           unitTest to test for new methods. Updated documentation. Replaced
+   *                           Cassini namespace wrap with Isis namespace. Added Isis Disclaimer
+   *                           to files. Added NAIF error check to constructor.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *                          coding standards. References #972.
+   *                           coding standards. References #972.
+   *   @history 2012-09-12 Stuart C. Sides -  Added ability for the camera to use the default
+   *                           focal length if the observation was taken using a filter
+   *                           combination not supported in the calibraion report. Fixes #837.
    */
   class IssNACamera : public FramingCamera {
     public:
