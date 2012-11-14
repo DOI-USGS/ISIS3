@@ -530,6 +530,23 @@
       use the PHASE_ANGLE_FILE, INCIDENCE_ANGLE_FILE, and EMISSION_ANGLE fields to input
       the 2 file names and the emission angle constant.
     </change>
+    <change name="Janet Barrett" date="2012-10-24">
+      The following changes were made to the program:
+      1) Changed the ZEROB0STANDARD parameter name to ZEROB0ST. This was to help prevent the
+         user from needing to resize the GUI each time they opened it because the parameter
+         name was too long. We are maintaining backwards compatibility by supporting both
+         ZEROB0STANDARD and ZEROB0ST in the photomet code. This will allow you to run a
+         script with the old parameter name without any problems. References #453. Fixes
+         #1288.
+      2) Added a new parameter, CHNGPAR, which allows the user to change any of the model-
+         related parameter settings without having to specify the model name on the command
+         line or in the GUI. Before the CHNGPAR parameter was added, you could only change
+         a model-related parameter on the command line or in the GUI if you also specified
+         the model name using the PHTNAME, ATMNAME, or NORMNAME parameter. Any value you
+         set using the CHNGPAR parameter will override changes that are specified in the
+         GUI. Any value that is changed through the GUI will override values specified in
+         the FROMPVL file. References #453. Fixes #1183.
+    </change>
   </history>
 
   <category>
@@ -601,6 +618,24 @@
         </filter>
       </parameter>
     </group>
+
+    <group name="Change Parameters">
+      <parameter name="CHNGPAR">
+        <type>string</type>
+        <brief>
+          Change parameter string
+        </brief>
+        <default><item>None</item></default>
+        <internalDefault>None</internalDefault>
+        <description>
+          This is used to enter a string of parameter names and values enclosed in
+          quotes that will be added to or replaces the pre-defined parameter values.
+          For example:<br/>
+          photomet from=f1.cub to=pho.cub frompvl=my.pvl chngpar="tau=0.5 tauref=30"
+        </description>
+      </parameter>
+    </group>
+
     <group name="Trim Parameters">
       <parameter name="MAXEMISSION">
         <type>double</type>
@@ -857,7 +892,7 @@
               <item>HG2</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0STANDARD</item>
+              <item>ZEROB0ST</item>
               <item>BH</item>
               <item>CH</item>
               <item>L</item>
@@ -887,7 +922,7 @@
               <item>HG2</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0STANDARD</item>
+              <item>ZEROB0ST</item>
               <item>BH</item>
               <item>CH</item>
               <item>L</item>
@@ -916,7 +951,7 @@
               <item>HG2</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0STANDARD</item>
+              <item>ZEROB0ST</item>
             </inclusions>
             <exclusions>
               <item>BH</item>
@@ -947,7 +982,7 @@
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0STANDARD</item>
+              <item>ZEROB0ST</item>
             </inclusions>
             <exclusions>
               <item>HG1</item>
@@ -981,7 +1016,7 @@
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0STANDARD</item>
+              <item>ZEROB0ST</item>
               <item>L</item>
               <item>K</item>
               <item>PHASELIST</item>
@@ -1015,7 +1050,7 @@
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0STANDARD</item>
+              <item>ZEROB0ST</item>
               <item>K</item>
               <item>L</item>
               <item>KLIST</item>
@@ -1039,7 +1074,7 @@
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0STANDARD</item>
+              <item>ZEROB0ST</item>
               <item>L</item>
               <item>K</item>
               <item>PHASELIST</item>
@@ -1071,7 +1106,7 @@
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0STANDARD</item>
+              <item>ZEROB0ST</item>
               <item>K</item>
               <item>PHASELIST</item>
               <item>KLIST</item>
@@ -1104,7 +1139,7 @@
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0STANDARD</item>
+              <item>ZEROB0ST</item>
               <item>K</item>
               <item>L</item>
               <item>LLIST</item>
@@ -1133,7 +1168,7 @@
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0STANDARD</item>
+              <item>ZEROB0ST</item>
               <item>L</item>
               <item>PHASELIST</item>
               <item>KLIST</item>
@@ -1258,7 +1293,7 @@
         <minimum inclusive="yes">0.0</minimum>
       </parameter>
 
-      <parameter name="ZEROB0STANDARD">
+      <parameter name="ZEROB0ST">
         <type>string</type>
         <brief>
           Determines if opposition surge (B0) is set to zero when standard conditions are used

@@ -2,23 +2,126 @@ UNIT TEST for HapkeHen photometric function
 
 Object = PhotometricModel
   Group = Algorithm
-    Name  = HapkeHen
-    Wh    = 0.52
-    B0    = 0.0
-    Hh    = 0.0
-    Theta = 30.0
-    Hg1   = 0.213
-    Hg2   = 1.0
+    Name = HapkeHen
   End_Group
 End_Object
 End
 
 Test phase=0.0, incidence=0.0, emission=0.0 ...
-Albedo = 0.158749
+Albedo = 0.0965097
 
 Test phase=60.0, incidence=45.0, emission=30.0 ...
-Albedo = 0.0911799
+Albedo = 0.0832883
 
 Test phase=180.0, incidence=90.0, emission=90.0 ...
 Albedo = 0
 
+Object = PhotometricModel
+  Group = Algorithm
+    Name     = HapkeHen
+    Wh       = 0.52
+    B0       = 1.0
+    Hh       = 1.0
+    Theta    = 30.0
+    Hg1      = 0.213
+    Hg2      = 1.0
+    ZeroB0St = TRUE
+  End_Group
+End_Object
+End
+
+Test phase=0.0, incidence=0.0, emission=0.0 ...
+Albedo = 0.286048
+
+Test phase=60.0, incidence=45.0, emission=30.0 ...
+Albedo = 0.1342
+
+Test phase=180.0, incidence=90.0, emission=90.0 ...
+Albedo = 0
+
+Object = PhotometricModel
+  Group = Algorithm
+    Name     = HapkeHen
+    Wh       = 0.52
+    B0       = 1.0
+    Hh       = 1.0
+    Theta    = 30.0
+    Hg1      = 0.213
+    Hg2      = 1.0
+    ZeroB0St = YES
+  End_Group
+End_Object
+End
+
+Test phase=0.0, incidence=0.0, emission=0.0 ...
+Albedo = 0.286048
+
+Test phase=60.0, incidence=45.0, emission=30.0 ...
+Albedo = 0.1342
+
+Test phase=180.0, incidence=90.0, emission=90.0 ...
+Albedo = 0
+
+UNIT TEST for HapkeLeg photometric function
+
+Object = PhotometricModel
+  Group = Algorithm
+    Name           = HapkeLeg
+    Wh             = 0.52
+    B0             = 1.0
+    Hh             = 1.0
+    Bh             = 0.0
+    Ch             = 0.0
+    Theta          = 30.0
+    ZeroB0Standard = FALSE
+  End_Group
+End_Object
+End
+
+Test phase=0.0, incidence=0.0, emission=0.0 ...
+Albedo = 0.16145
+
+Test phase=60.0, incidence=45.0, emission=30.0 ...
+Albedo = 0.111525
+
+Test phase=180.0, incidence=90.0, emission=90.0 ...
+Albedo = 0
+
+Object = PhotometricModel
+  Group = Algorithm
+    Name           = HapkeLeg
+    Wh             = 0.52
+    B0             = 1.0
+    Hh             = 1.0
+    Bh             = 0.0
+    Ch             = 0.0
+    Theta          = 30.0
+    ZeroB0Standard = NO
+  End_Group
+End_Object
+End
+
+Test phase=0.0, incidence=0.0, emission=0.0 ...
+Albedo = 0.16145
+
+Test phase=60.0, incidence=45.0, emission=30.0 ...
+Albedo = 0.111525
+
+Test phase=180.0, incidence=90.0, emission=90.0 ...
+Albedo = 0
+
+Object = PhotometricModel
+  Group = Algorithm
+    Name           = HapkeLeg
+    Wh             = 0.52
+    B0             = 1.0
+    Hh             = 1.0
+    Bh             = 0.0
+    Ch             = 0.0
+    Theta          = 30.0
+    ZeroB0Standard = MAYBE
+  End_Group
+End_Object
+End
+
+**USER ERROR** Invalid value of Hapke ZeroB0Standard [MAYBE] in Hapke.cpp at 424.

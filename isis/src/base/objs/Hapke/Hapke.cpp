@@ -43,8 +43,10 @@ namespace Isis {
 
     if(algorithm.HasKeyword("ZeroB0Standard")) {
       SetPhoto0B0Standard((string)algorithm["ZeroB0Standard"]);
+    } else if (algorithm.HasKeyword("ZeroB0St")) {
+      SetPhoto0B0Standard((string)algorithm["ZeroB0St"]);
     } else {
-      p_photo0B0Standard = "TRUE";
+      SetPhoto0B0Standard("TRUE");
     }
 
     if(algorithm.HasKeyword("Wh")) {
@@ -407,7 +409,7 @@ namespace Isis {
 
   /**
     * Determine if the Hapke opposition surge component is initialized
-    * to zero during the SetStandardContions phase.
+    * to zero during the SetStandardConditions phase.
     * This parameter is limited to values that are true or false.
     *
     * @param b0standard  Hapke opposition surge initialization, default is true
@@ -417,7 +419,7 @@ namespace Isis {
     temp = temp.UpCase();
 
     if(temp != "NO" && temp != "YES" && temp != "FALSE" && temp != "TRUE") {
-      string msg = "Invalid value of Hapke b0standard [" +
+      string msg = "Invalid value of Hapke ZeroB0Standard [" +
                    temp + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
