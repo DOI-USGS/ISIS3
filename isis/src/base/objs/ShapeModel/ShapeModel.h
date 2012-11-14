@@ -52,6 +52,8 @@ namespace Isis {
    *                             camel case. Added resolution() method test to
    *                             improve unitTest code coverage. References
    *                             #1181.
+   *   @history 2012-11-14 - Jeannie Backer - Removed cout lines left in while
+   *                             testing code. References #1181.
    */
   class ShapeModel {
     public:

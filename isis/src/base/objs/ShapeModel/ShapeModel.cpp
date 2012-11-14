@@ -368,11 +368,6 @@ namespace Isis {
    */
   double ShapeModel::resolution() {
     if (m_hasIntersection) {
-//??? cout << "No scope lower case = " << (m_target->spice())->resolution() << endl;
-//??? cout << "No scope lower case no parens = " << m_target->spice()->resolution() << endl;
-//??? cout << "Spice with parens = " << (m_target->spice())->Spice::resolution() << endl;
-//??? cout << "Camera = " << (m_target->spice())->Camera::Resolution() << endl;
-//??? cout << "Sensor = " << (m_target->spice())->Sensor::Resolution() << endl;
       return m_target->spice()->resolution();
     }
     else {
