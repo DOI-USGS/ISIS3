@@ -5,10 +5,13 @@
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "IException.h"
+#include "Preference.h"
 
 using namespace Isis;
 
 int main() {
+  Isis::Preference::Preferences(true);
+
   std::cout << "UNIT TEST for HapkeHen photometric function" <<
             std::endl << std::endl;
 
