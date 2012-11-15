@@ -1314,12 +1314,21 @@
         <brief>
           Determines if opposition surge (B0) is set to zero when standard conditions are used
         </brief>
-        <default><item>TRUE</item></default>
+        <default><item>READFROMPVL</item></default>
         <description>
           This determines if the opposition surge component B0 is set to zero
           during the standard conditions phase.
         </description>
         <list>
+          <option value="READFROMPVL">
+            <brief>
+              Get ZEROB0ST value from the FROMPVL file
+            </brief>
+            <description>
+              Retrieve and set the ZEROB0ST parameter from the FROMPVL file. If
+              a FROMPVL file is not provided, then an error will occur.
+            </description>
+          </option>
           <option value="FALSE">
             <brief>
               The opposition surge B0 will not be set to zero for the standard conditions phase
@@ -1809,11 +1818,11 @@
             </description>
             <inclusions>
               <item>INCREF</item>
-              <item>INCMAT</item>
               <item>THRESH</item>
               <item>ALBEDO</item>
             </inclusions>
             <exclusions>
+              <item>INCMAT</item>
               <item>ATMNAME</item>
               <item>D</item>
               <item>E</item>
