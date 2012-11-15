@@ -545,7 +545,23 @@
          the model name using the PHTNAME, ATMNAME, or NORMNAME parameter. Any value you
          set using the CHNGPAR parameter will override changes that are specified in the
          GUI. Any value that is changed through the GUI will override values specified in
-         the FROMPVL file. References #453. Fixes #1183.
+         the FROMPVL file. References #453. Fixes #1183. Fixes #1108.
+    </change>
+    <change name="Janet Barrett" date="2012-11-07">
+      The following changes were made to the program:
+      1) Added new output groups to the print.prt log file so that the user can see exactly
+         which values were used to run photomet. The new groups that get written to the
+         print.prt file include NormalizationModelParametersUsed, AtmosphericModelParametersUsed,
+         and PhotometricModelParametersUsed. Fixes #960.
+      2) Fixed photomet so that the INCMAT parameter is no longer required for the ALBEDO
+         normalization model. The INCMAT parameter is not used by the ALBEDO normalization
+         model, so the user is no longer required to input an INCMAT value for that model.
+         References #453. Fixes #1176.
+      3) Fixed a problem which was causing the NULNEG and ZEROB0STANDARD parameters to be
+         loaded incorrectly if specified in the FROMPVL file. References #453. Fixes #1187.
+      4) Added a more meaningful error message when a normalization model is not specified by
+         the user either through the GUI, command line, or FROMPVL file. References #453.
+         Fixes #1177.
     </change>
   </history>
 
