@@ -1,42 +1,153 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="phocube" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="Phocube" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Creates a choice of multiple information bands for an image cube
+    Creates photometric and geometric information bands for an image cube
   </brief>
 
   <description>
-    <p>
-    Phocube creates an output cube where each <def>band</def> represents a choice of information
-    computed from either the <def>SPICE</def> for every pixel or the projection information for
-    every pixel. The choices of information depends on the processing level of the image and
-    ranges from photometric angles (phase, emission, incidence) to various azimuth angles and 
-    resolution values. Images that have a camera model associated with them will have the ability
-    to generate any of the possible bands of information provided by this program. Those images
-    that do not have a camera model associated with them are more limited in the types of bands
-    that can be produced by this program.
+  <p>
+    Phocube creates backplane bands that contain photometric, geometric, and 
+    spacecraft instrument information for an image file.  The parameter options
+    range from photometric angles (incidence, emission, and phase) to various 
+    <def line="Azimuth">azimuth</def> angles, and options based on spatial 
+    (latitude, longitude, and resolution) information. This program will
+    not work on <def>Level1</def> images without a camera model, or on mosaics.  
+    The input image pixels are not propagated to the output file unless the 
+    user selects the "DN" option.  The following is a partial list of how 
+    users have made use of band output:
+    <ul>
+      <li>Evaluate the individual bands in order to establish subsequent 
+          image processing steps</li> 
+      <li>Specify as input to other ISIS3 programs such as fx and photomet</li>
+      <li>Demonstrate the result of each selected option</li>
+      <li>Determine how the images are mosaicked together after the 
+          Level2 images are created from the Level1 images with backplanes </li>
+    </ul>
     </p>
-
     <p>
-    The input cube is required to have had a successful 'spiceinit' applied previous to 
-    running phocube or the input cube must have mapping labels associated with it.
+    All ISIS3 applications default to the following geometric reference if a camera model exists:
+    <ul>
+      <li>Longitude Domain = 360, longitude range reported from 0 to 360</li>
+      <li>Latitude System = Ocentric</li>
+      <li>Longitude Direction = East, longitude increases to the east</li>
+    </ul>
     </p>
-
     <p>
-    The BandBin group on the output image cube labels will be updated.  The "Name" keyword
-    within the BandBin will be popluated with the names of the selected information bands.  
-    These bands can be referenced by their names in applications such as mapmos and qview. 
-    </p>
+    This program requires a <def>Level1</def> file that has a successful 
+    "<a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/spiceinit/spiceinit.html"><b>spiceinit</b></a>" 
+    applied to it, or a <def>Level2</def> image cube file.  For every valid
+    input pixel, an output pixel is computed based on either the <def>SPICE</def> 
+    information, or the <def link="Map Projection">map projected</def> spatial 
+    information, or a pre-defined equation.   
+  </p>
+  <p> 
+    The parameters "morphology" and "albedo" are specifically designed to be used
+    by the ISIS3 mosaic programs.  A mosaic program will automatically compare 
+    two pixel values to determine how each pixel is mosaicked into an output 
+    file, which depends on whether a morphology-based or an albedo-based 
+    product is desired.  The program computes a 
+    <def link="Digital Number">DN</def> value for every input pixel based on 
+    the formulas listed below and outputs the value to a backplane band.  
+    These backplane bands are used by the ISIS3 mosaic programs.  The following are 
+    equations for "morphology" and "albedo" options:
+  <blockquote>
+  <dl>
+    <dt>  Morphology </dt>
+    <dd>Equation = <def>PixelResolution</def>/cos(EmissionAngle)</dd>
+    <dt>  Albedo </dt>
+    <dd>Equation = PixelResolution * [(1/cos(<def>EmissionAngle</def>)) +
+    (1/cos(<def>IncidenceAngle</def>))]</dd>
+  </dl>
+  </blockquote>
+  </p>  
+  <p>
+    All the options in phocube are applicable if the input file is a Level1 
+    image and has a camera model associated with the file.  If the input file 
+    is a map-projected Level2 image, only a few options are appropriate 
+    and available for selection. <br /><br />
+ 
+    The following options are available for Level1 images that contain a camera model:
+     <ul>
+     <li>DN</li>
+     <li>PHASE</li>
+     <li>EMISSION</li>
+     <li>INCIDENCE</li>
+     <li>LOCALEMISSION</li>
+     <li>LOCALINCIDENCE</li>
+     <li>LATITUDE</li>
+     <li>LONGITUDE</li>
+     <li>PIXELRESOLUTION</li>
+     <li>LINERESOLUTION</li>
+     <li>SAMPLERESOLUTION</li>
+     <li>DETECTORRESOLUTION</li>
+     <li>NORTHAZIMUTH</li>
+     <li>SUNAZIMUTH</li>
+     <li>SPACECRAFTAZIMUTH</li>
+     <li>OFFNADIRANGLE</li>
+     <li>SUBSPACECRAFTGROUNDAZIMUTH</li>
+     <li>SUBSOLARGROUNDAZIMUTH</li>
+     <li>MORPHOLOGY</li>
+     <li>ALBEDO</li>
+     </ul>
+	The following options are available for Level2 images:
+     <ul>
+     <li>DN</li>
+     <li>LATITUDE</li>
+     <li>LONGITUDE</li>
+     <li>PIXELRESOLUTION</li>
+     </ul>
+  </p>
+  <p>
+    The BandBin group keywords are updated in the labels of the output cube 
+    file; see the example below.   The keyword "Name" within the BandBin group,
+    shown below, is populated with the name of each option selected by the 
+    user as bands.  These bands can be referenced by their names in 
+    applications such as 
+    "<a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/mapmos/mapmos.html"><b>mapmos</b></a>"
+    and 
+    "<a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/qview/qview.html"><b>qview</b></a>." 
+    <blockquote>
+    <pre>
+    <b>Example:</b>
     
-    <p>
-     Phocube can be applied to a <def>Level1</def> or <def>Level2</def> image cube. Phocube can
-     also be applied to any file as long as it has mapping labels contained in it, such as a 
-     mosaic. The number of bands that can be created for an image without a camera model 
-     associated with it are very limited. Image files that have only mapping labels (no camera
-     model or SPICE information) will be limited to the ability to create Dn, PixelResolution, 
-     Latitude, and Longitude.
-    </p>
+    phocube from=EW0131773041G_cal.cub to=EW0131773041G_cal.pho.cub morph=true dn=true
+     
+    <b>Sample of image label:</b>
+    
+    Group = Dimensions
+      Samples = 1024
+      Lines   = 1024
+      <b>Bands   = 7 </b>  
+    End_Group
+    <b>
+    Group = BandBin
+      Name   = ("750 BW 5", "Phase Angle", "Emission Angle", "Incidence Angle",
+        	Latitude, Longitude, Morphology)
+      Number = (7, 7, 7, 7, 7, 7, 7)
+      Center = (748.7, 748.7, 748.7, 748.7, 748.7, 748.7, 748.7)
+      Width  = (5.1, 5.1, 5.1, 5.1, 5.1, 5.1, 5.1)
+    End_Group
+    </b>
+    
+    Note:  The first band retained the BandBin Name value from the input file.
+    The program has "Phase Angle," "Emission Angle," "Incidence Angle,"
+    "Latitude," and "Longitude" options pre-selected.
+    </pre>
+   </blockquote>
+  </p>
+  <p>
+    If the backplane bands generated by phocube are used in the mosaic 
+    programs and the mosaic requires the input image pixel, the "DN" 
+    parameter name must be set to "true" in phocube.  When backplane 
+    bands are used in the
+    "<a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/fx/fx.html"><b>fx</b></a>" 
+    or 
+    "<a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/photomet/photomet.html"><b>photomet</b></a>" 
+    program, it is not necessary to propagate the input image to the output 
+    file.
+  </p>
   </description>
 
   <oldName>
@@ -52,44 +163,44 @@
 
   <history>
     <change name="Unknown" date="1999-02-11">
-      Original version
+      Original version.
     </change>
     <change name="Stuart Sides" date="2003-06-04">
-      Converted to Isis 3.0, and made it create a cube rather than adding
+      Converted to ISIS3, and made it create a cube rather than adding
       backplanes.
     </change>
     <change name="Stuart Sides" date="2003-07-29">
-      Modified filename parameters to be cube parameters where necessary
+      Modified filename parameters to be cube parameters where necessary.
     </change>
     <change name="Stuart Sides" date="2005-09-09">
-      Fixed problem where the program through an error when it tried to propagate 
+      Fixed problem where the program threw an error when it tried to propagate 
       the pixel type from the input file.
     </change>
     <change name="Stuart Sides" date="2005-09-09">
       Added the bandbin group to the cube labels.
     </change>
     <change name="Jeff Anderson" date="2005-09-20">
-      Fixed a bug with switched samples and lines
+      Fixed a bug with switched samples and lines.
     </change>
     <change name="Elizabeth Miller" date="2005-10-05">
-        Moved into Photometry and Radiometry category
+        Moved into Photometry and Radiometry category.
     </change>
     <change name="Elizabeth Miller" date="2006-05-23">
-      Modified to use ProcessByBrick instead of ProcessByLine to make faster
+      Modified to use ProcessByBrick instead of ProcessByLine to make faster.
     </change>
     <change name="Brendan George" date="2006-09-21">
-        Documentation fixes
+        Documentation fixes.
     </change>
     <change name="Steven Lambright" date="2008-05-13">
-      Removed references to CubeInfo 
+      Removed references to CubeInfo.
     </change>
     <change name="Steven Koechle" date="2008-08-19">
       Added new parameters: PIXELRESOLUTION, LINERESOLUTION,
       SAMPLERESOLUTION, DETECTORRESOLUTION, NORTHAZIMUTH, 
-      SUNAZIMUTH, SPACECRAFTAZIMUTH, OFFNADIRANGLE
+      SUNAZIMUTH, SPACECRAFTAZIMUTH, OFFNADIRANGLE.
     </change>
     <change name="Steven Lambright" date="2009-03-06">
-      Fixed a bug that occurred when processing band-dependant cubes
+      Fixed a bug that occurred when processing band-dependent cubes.
     </change>
    <change name="Kris Becker" date="2009-05-29">
       Added the propagation of the input cube labels, objects, blobs, etc..., so 
@@ -98,7 +209,7 @@
     <change name="Sharmila Prasad" date="2009-07-17">
       Set the defaults for PIXELRESOLUTION, LINERESOLUTION,
       SAMPLERESOLUTION, DETECTORRESOLUTION, NORTHAZIMUTH, 
-      SUNAZIMUTH, SPACECRAFTAZIMUTH, OFFNADIRANGLE to FALSE
+      SUNAZIMUTH, SPACECRAFTAZIMUTH, and OFFNADIRANGLE to FALSE.
     </change>
     <change name="Mackenzie Boyd" date="2010-10-29">
       Added parameters/bands SUBSPACECRAFTGROUNDAZIMUTH and
@@ -120,14 +231,17 @@
       information is missing. The ability to generate lat/lon bands for 
       image files is highly useful when performing fx operations on the files.
       Other bands that can be created for a mosaic file include: Dn and PixelResolution.
-      A new parameter, NoCamera, was added so that the user can specify
+      A new parameter, SOURCE, was added so that the user can specify
       if their image does not contain a camera model. This will result in the
       appropriate parameter choices being greyed out. If the user does not specify 
       that their file does not contain a camera model, then they will receive an error 
       if they choose to create a band that cannot be created for the file.
     </change>
     <change name="Debbie A. Cook" date="2012-07-06">
-       Updated Spice members to be more compliant with Isis coding standards. References #972.
+       Updated Spice members to be more compliant with ISIS coding standards. References #972.
+    </change>
+    <change name="Ella Mae Lee" date="2012-11-15">
+       Improved documentation, fixes #1254.
     </change>
 </history>
 
@@ -142,12 +256,12 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Input cube
+          Input cube file
         </brief>
         <description>
-          Use this parameter to select the input filename.  The application,
-          spiceinit, must be successfully applied previously to running phocube.
-          The input image cube can be a <def>Level1</def> or <def>Level2</def>.
+          This is the input filename.  The input image cube can be a <def>Level1</def>
+	  or <def>Level2</def> file.  For a Level1 image, spiceinit 
+	  must be successfully applied before running phocube.
         </description>
         <filter>
           *.cub
@@ -159,43 +273,46 @@
         <pixelType>real</pixelType>
         <fileMode>output</fileMode>
         <brief>
-          Output cube
+          Output cube file
         </brief>
         <description>
-          This output cube file will contain the bands of the chosen information.
-          The BandBin Group on the labels of the output cube will be updated 
-          with the Name keyword containing the output band names in the order
-          that they are stacked within the cube.
+          This is the output file name.  The cube file will contain a band for
+	  each of the selected options.  The BandBin Group in the image labels 
+	  of the output cube file will be updated with the "Name" keyword 
+	  containing the output band names (options) in the order that they are 
+	  stacked within the cube.
         </description>
       </parameter>
 
       <parameter name="SOURCE">
         <type>string</type>
-        <brief>Determines where geometric information will come from - camera or projection</brief>
+        <brief>Specifies the source of the geometric information</brief>
         <default><item>CAMERA</item></default>
         <description>
-          If this parameter is set to CAMERA, then all the band choices are available
-          for the user to choose from. If this parameter is set to PROJECTION, then 
-          only the DN, LATITUDE, LONGITUDE, and PIXELRESOLUTION band choices will
-          be available and all other band choices will be greyed out. If the
-          user sets this parameter to CAMERA and their input file does not contain
-          a camera model or SPICE information, then they will receive an error
-          when they choose a band option that is not valid for their file.
+	  Specifies whether the geometric information will be obtained from the
+	  camera model or from the map projection.  If this parameter is set to CAMERA, 
+	  all band options are available for the user to select. If this 
+	  parameter is set to PROJECTION, then only DN, LATITUDE, LONGITUDE, and 
+	  PIXELRESOLUTION band options are available and all other options 
+	  will be greyed out. If the user sets this parameter to CAMERA and 
+	  the input file does not contain a camera model or SPICE information, 
+	  then an error message will occur.
         </description>
         <list>
           <option value="CAMERA">
-            <brief>Get geometric information from camera model</brief>
+            <brief>Get the geometric information from camera model</brief>
             <description>
-              Geometric information will be obtained from a camera model and all the
-              photometry options will be available.
+              The geometric information is obtained from a camera model and 
+	      all band options are available for selection.
             </description>
           </option>
           <option value="PROJECTION">
-            <brief>Get geometric information from the projection</brief>
+            <brief>Get the geometric information based on map projection information</brief>
             <description>
-              Geometric information will be obtained from the projection and only the
-              DN, LATITUDE, LONGITUDE, and PIXELRESOLUTION photometry options will be
-              available.
+              The geometric information is obtained based on the label 
+	      keyword values stored under the "Mapping" group in the image 
+	      labels.  Only DN, LATITUDE, LONGITUDE, and PIXELRESOLUTION 
+	      band options are available.
             </description>
             <exclusions>
               <item>PHASE</item>
@@ -224,203 +341,209 @@
       <parameter name="DN">
         <type>boolean</type>
         <default><item>FALSE</item></default>
-        <brief>Propagate the input pixel to the output file.</brief>
+        <brief>Propagate the input pixel to the output file</brief>
         <description>
-          If this parameter is true then the input image pixel value 
-          (<def link="Digital Number">DN</def>) will be
-          propagated to the output file.  This will help alleviate potential 
-          additional runs of cubeit when necessary.  When this option is 
-          selected, the BandBin values are retained for this band so that 
-          geometry operations are preserved.
+	  This parameter specifies whether the input image pixel value 
+          (<def link="Digital Number">DN</def>) will be propagated to 
+	  the output file.  The DN parameter must be set to "true," 
+	  if the output product created is expected to contain the input 
+	  image information.
         </description>
       </parameter>
       <parameter name="PHASE">
         <type>boolean</type>
         <default><item>TRUE</item></default>
-        <brief>Create a phase angle band.</brief>
+        <brief>Create a phase angle band</brief>
         <description>
-          If this parameter is true,  then for every input pixel, a <def>Phase Angle</def> 
-          will be computed and placed in a band in the output cube.  The output 
-          cube labels will contain Group=BandBin Name=PhaseAngle in the output band order.
-          PhaseAngle is in degrees.
+          If this parameter is true, the <def>Phase Angle</def> will be 
+	  computed for every pixel and placed in a band in the output cube.  
+	  The output cube labels will contain "Phase Angle" in the BandBin
+	  group, in band sequence of the output file.  Phase angles are in degrees.
         </description>
       </parameter>
       <parameter name="EMISSION">
         <type>boolean</type>
         <default><item>TRUE</item></default>
-        <brief>Create an emission angle band.</brief>
+        <brief>Create an emission angle band</brief>
         <description>
-          If this parameter is true,  then for every input pixel, a <def>Emission Angle</def> 
-          will be computed and placed in a band in the output cube.  The output 
-          cube labels will contain Group=BandBin Name=EmissionAngle in the output band order.
-          EmissionAngle is in degrees.
+          If this parameter is true, the <def>Emission Angle</def> will be 
+	  computed  for every pixel and placed in a band in the output cube.  
+	  The output cube labels will contain "Emission Angle" in the BandBin
+	  group, in band sequence of the output file.  Emission angles are in degrees.
         </description>
       </parameter>
       <parameter name="INCIDENCE">
         <type>boolean</type>
         <default><item>TRUE</item></default>
-        <brief>Create an incidience angle band.</brief>
+        <brief>Create an incidence angle band</brief>
         <description>
-          If this parameter is true,  then for every input pixel, a <def>Incidence Angle</def> 
-          will be computed and placed in a band in the output cube.  The output 
-          cube labels will contain Group=BandBin Name=IncidenceAngle in the output band order.
-          IncidenceAngle is in degrees.
+          If this parameter is true, the <def>Incidence Angle</def> will be 
+	  computed for every pixel and placed in a band in the output cube.  
+	  The output cube labels will contain "Incidence Angle" in the BandBin
+	  group, in band sequence of the output file.  Incidence angles are in degrees.
         </description>
       </parameter>
       <parameter name="LOCALEMISSION">
         <type>boolean</type>
         <default><item>FALSE</item></default>
-        <brief>Create a local emission angle band.</brief>
+        <brief>Create a local emission angle band</brief>
         <description>
-          If this parameter is true then a <def link="Local Emission Angle">Local Emission Angle</def> 
-          will be computed and placed in a band in the output cube.  The output 
-          cube labels will contain Group=BandBin Name=LocalEmissionAngle in the output band order.  
-          LocalIncidenceAngle is in degrees.
+          If this parameter is true, the <def link="local emission angle"
+	  >Local Emission Angle</def>  will be computed for every pixel 
+	  and placed in a band in the output cube.  The output cube labels 
+	  will contain "Local Emission Angle" in the BandBin group, in band
+	  sequence of the output file.  LocalEmissionAngle is in degrees.
         </description>
       </parameter>
       <parameter name="LOCALINCIDENCE">
         <type>boolean</type>
         <default><item>FALSE</item></default>
-        <brief>Create a local incidience angle band.</brief>
+        <brief>Create a local incidence angle band</brief>
         <description>
-          If this parameter is true then a <def link="Local Incidence Angle">Local Incidence Angle</def>
-          will be computed and placed in a band in the output cube.  The output 
-          cube labels will contain Group=BandBin Name=LocalIncidenceAngle in the output band order.  
+          If this parameter is true, the <def link="Local Incidence Angle">Local 
+	  Incidence Angle</def> will be computed for every pixel and placed in 
+	  a band in the output cube.  The output cube labels will contain 
+	  "Local Incidence Angle" in the BandBin group, in band sequence  
+	  of the output file.  LocalIncidenceAngle is in degrees.
          </description>
       </parameter>
       <parameter name="LATITUDE">
         <type>boolean</type>
         <default><item>TRUE</item></default>
-        <brief>Create a latitude band.</brief>
+        <brief>Create a latitude band</brief>
         <description>
-          If this parameter is true,  then for every input pixel, a Latitude value will be computed
-          and placed in a band in the output cube.  The output cube labels
-          will contain Group=BandBin Name=Latitude in the output band order.
-          Latitude is in degrees.
+          If this parameter is true, the latitude value will be computed for 
+	  every pixel and placed in a band in the output cube.  The output cube 
+	  labels will contain "Latitude" in the BandBin group, in band sequence
+	  of the output file.  Latitude is in degrees.
         </description>
       </parameter>
       <parameter name="LONGITUDE">
         <type>boolean</type>
         <default><item>TRUE</item></default>
-        <brief>Create a longitude band.</brief>
+        <brief>Create a longitude band</brief>
         <description>
-          If this parameter is true,  then for every input pixel, a Longitude value will be computed
-          and placed in a band in the output cube.  The output cube labels
-          will contain Group=BandBin Name=Longitude in the output band order.
-          Longitude is in degrees.
+          If this parameter is true, the longitude value will be computed for 
+	  every pixel placed in a band in the output cube.  The output cube 
+	  labels will contain "Longitude" in the BandBin group, in band 
+	  sequence of the output file.  Longitude is in degrees.
         </description>
       </parameter>
       <parameter name="PIXELRESOLUTION">
         <type>boolean</type>
         <default><item>FALSE</item></default>
-        <brief>Create a pixel resolution band.</brief>
+        <brief>Create a pixel resolution band</brief>
         <description>
-          If this parameter is true,  then for every input pixel, a <def>Pixel Resolution</def>
-          will be computed and placed in a band in the output cube.  The output cube labels
-          will contain Group=BandBin Name=PixelResolution in the output band order.
-          PixelResolution is in meters.
+          If this parameter is true, the <def>Pixel Resolution</def>
+          will be computed for every pixel and placed in a band in the output 
+	  cube.  The output cube labels will contain "Pixel Resolution" in the 
+	  BandBin group, in band sequence of the output file. PixelResolution 
+	  is in meters.
         </description>
       </parameter>
       <parameter name="LINERESOLUTION">
         <type>boolean</type>
         <default><item>FALSE</item></default>
-        <brief>Create a line resolution band.</brief>
+        <brief>Create a line resolution band</brief>
         <description>
-          If this parameter is true, then for every input pixel, a <def>Line Resolution</def>
-          will be computed and placed in a band in the output cube.  The output cube labels
-          will contain Group=BandBin Name=LineResolution in the output band order.
-          LineResolution is in meters.
+          If this parameter is true, the <def>Line Resolution</def> will be 
+	  computed for every pixel and placed in a band in the output cube.  
+	  The output cube labels will contain "Line Resolution" in the BandBin 
+	  group, in band sequence of the output file.  LineResolution is in meters.
         </description>
       </parameter>
       <parameter name="SAMPLERESOLUTION">
         <type>boolean</type>
         <default><item>FALSE</item></default>
-        <brief>Create a sample resolution band.</brief>
+        <brief>Create a sample resolution band</brief>
         <description>
-          If this parameter is true, then for every input pixel, a <def>Sample Resolution</def>
-          will be computed and placed in a band in the output cube.  The output cube labels
-          will contain Group=BandBin Name=SampleResolution in the output band order. 
-          SampleResolution is in meters.
+          If this parameter is true, the <def>Sample Resolution</def> will be 
+	  computed for every pixel and placed in a band in the output cube.  
+	  The output cube labels will contain "Sample Resolution" in the 
+	  BandBin group, in band sequence of the output file.  SampleResolution 
+	  is in meters.
        </description>
       </parameter>
       <parameter name="DETECTORRESOLUTION">
         <type>boolean</type>
         <default><item>FALSE</item></default>
-        <brief>Create a detector resolution band.</brief>
+        <brief>Create a detector resolution band</brief>
         <description>
-          If this parameter is true, then for every input pixel, a 
-          <def>Detector Resolution</def>
-          will be computed and placed in a band in the output cube.  The output cube labels
-          will contain Group=BandBin Name=DetectorResolution in the output band order. 
-          DetectorResolution is in millimeters.
+          If this parameter is true, the <def>Detector Resolution</def> will be 
+	  computed for every pixel and placed in a band in the output cube.  The 
+	  output cube labels will contain "Detector Resolution" in the BandBin 
+	  group, in band sequence of the output file.  DetectorResolution is 
+	  in millimeters.
         </description>
       </parameter>
       <parameter name="NORTHAZIMUTH">
         <type>boolean</type>
         <default><item>FALSE</item></default>
-        <brief>Create a north azimuth band.</brief>
+        <brief>Create a north azimuth band</brief>
         <description>
-          If this parameter is true, then for every input pixel, a <def>North Azimuth</def>
-          will be computed and placed in a band in the output cube.  The output cube labels
-          will contain Group=BandBin Name=NorthAzimuth in the output band order. 
-          NorthAzmith is in degree angles.
+          If this parameter is true, the <def>North Azimuth</def> will be 
+	  computed for every pixel and placed in a band in the output cube.  The 
+	  output cube labels will contain "North  Azimuth" in the BandBin group,
+	  in band sequence of the output file.  NorthAzimuth is in degrees.
         </description>
       </parameter>
       <parameter name="SUNAZIMUTH">
         <type>boolean</type>
         <default><item>FALSE</item></default>
-        <brief>Create a sun azimuth band.</brief>
+        <brief>Create a sun azimuth band</brief>
         <description>
-          If this parameter is true, then for every input pixel, a <def>Sun Azimuth</def>
-          will be computed and placed in a band in the output cube.  The output cube labels
-          will contain Group=BandBin Name=SunAzimuth in the output band order. 
-          SunAzimuth is in degree angles.
+          If this parameter is true, the <def>Sun Azimuth</def> will be computed 
+	  for every pixel and placed in a band in the output cube.  The output 
+	  cube labels will contain "Sun Azimuth" in the BandBin group, in band 
+	  sequence of the output file.  SunAzimuth is in degrees.
         </description>
       </parameter>
       <parameter name="SPACECRAFTAZIMUTH">
         <type>boolean</type>
         <default><item>FALSE</item></default>
-        <brief>Create a spacecraft azimuth band.</brief>
+        <brief>Create a spacecraft azimuth band</brief>
         <description>
-          If this parameter is true, then for every input pixel, a <def>Spacecraft Azimuth</def>
-          will be computed and placed in a band in the output cube.  The output cube labels
-          will contain Group=BandBin Name=SpacecraftAzimuth in the output band order. 
-          SpacecraftAzimuth is in degree angles.
+          If this parameter is true, the <def>Spacecraft Azimuth</def>  will 
+	  be computed for every pixel and placed in a band in the output cube.  
+	  The output cube labels will contain "Spacecraft Azimuth" in the 
+	  BandBin group, in band sequence of the output file.  SpacecraftAzimuth 
+	  is in degrees.
         </description>
       </parameter>
       <parameter name="OFFNADIRANGLE">
         <type>boolean</type>
         <default><item>FALSE</item></default>
-        <brief>Create a offNadir angle band.</brief>
+        <brief>Create an offNadir angle band</brief>
         <description>
-          If this parameter is true, then for every input pixel, a <def>Off Nadir Angle</def>
-          will be computed and placed in a band in the output cube.  The output cube labels
-          will contain Group=BandBin Name=OffNadirAngle in the output band order. 
-          OffNadirAngle is in degrees.
+          If this parameter is true, the <def>Off Nadir Angle</def> will be 
+	  computed for every pixel and placed in a band in the output cube.  
+	  The output cube labels will contain "OffNadir Angle" in the BandBin 
+	  group, in band sequence of the output file.  OffNadirAngle is 
+	  in degrees.
         </description>
       </parameter>
       <parameter name="SUBSPACECRAFTGROUNDAZIMUTH">
         <type>boolean</type>
         <default><item>FALSE</item></default>
-        <brief>Creata a sub spacecraft ground azimuth band.</brief>
+        <brief>Create a sub spacecraft ground azimuth band</brief>
         <description>
-          If this parameter is true, then for every input pixel, a 
-          <def>Spacecraft Ground Azimuth</def>
-          will be computed and placed in a band in the output cube.  The output cube labels
-          will contain Group=BandBin Name=SubSpacecraftGroundAzimuth in the output band order. 
-          SubSpacecraftGroundAzimuth is in degree angles.
+          If this parameter is true, the <def>Spacecraft Ground Azimuth</def>
+          will be computed for every pixel and placed in a band in the output 
+	  cube.  The output cube labels  will contain "Sub Spacecraft Ground
+	  Azimuth" in the BandBin group, in band sequence of the output file. 
+          SubSpacecraftGround Azimuth is in degrees.
         </description>
       </parameter>
       <parameter name="SUBSOLARGROUNDAZIMUTH">
         <type>boolean</type>
         <default><item>FALSE</item></default>
-        <brief>Create a sub solar ground azimuth band.</brief>
+        <brief>Create a sub solar ground azimuth band</brief>
         <description>
-          If this parameter is true, then for every input pixel, a 
-          <def>SubSolar Ground Azimuth</def>
-          will be computed and placed in a band in the output cube.  The output cube labels
-          will contain Group=BandBin Name=SubSolarGroundAzimuth in the output band order. 
-          SubSolarGroundAzimuth is in degree angles.
+          If this parameter is true, the <def>SubSolar Ground Azimuth</def>
+	  will be computed for every pixel and placed in a band in the output 
+	  cube.  The output cube labels will contain "Sub Solar Ground Azimuth"  
+	  in the BandBin group, in band sequence of the output file.  
+	  SubSolarGroundAzimuth is in degrees.
         </description>
       </parameter>
      <parameter name="MORPHOLOGY">
@@ -428,23 +551,29 @@
         <default><item>FALSE</item></default>
         <brief>Create a morphology index band</brief>
         <description>
-          <p>
-            This band is computed from the <def link="Pixel Resolution">resolution</def>
-            and <def link="Emission Angle">emission angle</def> using the following formula:  
-            MORPHOLOGY = PIXELRESOLUTION / cos(EMISSION).  
-            The resulting output band can then be used by 'automos' to create a 
-            morphology-based mosaic product.  This option will always use the 
+	  <p>
+            This band is computed from the <def link="Pixel Resolution">pixel resolution</def>
+            and <def link="Emission Angle">emission angle</def> using the following formula:<br />  
+            <br />Morphology = PixelResolution / cos(EmissionAngle)<br /> <br />
+            The resulting output band can be used by "automos" to create a 
+            morphology-based mosaic product.  This option uses the 
             <def link="Local Emission Angle">local emission angle</def> if the input file
-            was initialized (spiceinit) with an elevation model (DEM).   If not, it will 
-            use the default calculation (from the ellipsoid).    All values are tested 
-            for zero values and set to a constant very close to zero so all 
-            pixels should have real values.
+            is initialized (spiceinit) with an elevation model (DEM); otherwise, it  
+            uses the default calculation (from the ellipsoid).  All computed values are 
+	    tested for zero.  If the result is zero, then the value is set to a constant 
+	    value very close to zero.
           </p>
           <p>
-            To utilize the this backplane in automos, add the parameters 
-            <b>priority=band type=keyword keyname=Name keyvalue=morphology 
-              criteria=lesser</b>.  
-            See <b>automos</b> documentation for further details.
+ 	    <dl>
+	    <dt>
+              Append the following parameters to the "automos" command line to utilize this backplane band:
+	    </dt>
+            <dd>
+	      <b>priority=band type=keyword keyname=Name keyvalue=morphology criteria=lesser</b>.
+	    </dd>
+	    </dl>  
+            See <a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/automos/automos.html">"<b>automos</b>"</a> 
+	    documentation for further details.
           </p>
         </description>
       </parameter>
@@ -454,26 +583,114 @@
         <brief>Create an albedo index band</brief>
         <description>
           <p>
-            This band is computed from the <def link="Pixel Resolution">resolution</def>, 
-            <def link="Incidence Angle">incidence</def> and <def link="Emission Angle">emission</def> 
-            angles using the following formula: ALBEDO = PIXELRESOLUTION * [  (1 
-            / cos(EMISSION)) + (1 / cos(INCIDENCE)) ] .  The resulting output band 
-            can then be used automos to create an albedo-based mosaic product. 
-            This option will always use the <def link="Local Emission Angle">local emission</def> 
-            and <def link="Local Incidence Angle">incidence</def> angles if the input file
-            was initialized (spiceinit) with an elevation model (DEM).   If not, it will 
-            use the default calculation (from the ellipsoid).  All values are tested for 
-            zero values and set to a constant very close to zero so all pixels should have real 
-            values.
+            This band is computed from the <def link="Pixel Resolution">pixel resolution</def>, 
+            <def link="Incidence Angle">incidence angle</def> and <def link="Emission Angle">emission angle</def> 
+            using the following formula:<br /><br /> 
+	    Albedo = PixelResolution * [(1 / cos(EmissionAngle)) + (1 / cos(IncidenceAngle))]<br /><br />
+	    The resulting output band can be used by "automos" to create an albedo-based
+	    mosaic product.  This option always uses the  
+	    <def link="Local Emission Angle">local emission angle</def>  and 
+	    <def link="Local Incidence Angle">local incidence angle</def> if the input file
+            is initialized (spiceinit) with an elevation model (DEM); otherwise, it  
+            uses the default calculation (from the ellipsoid).  All computed values are 
+	    tested for zero.  If the result is zero, then the value is set to a constant 
+	    value very close to zero.
           </p>
           <p>
-            To utilize the this backplane in automos, add the parameters 
+ 	    <dl>
+	    <dt>
+              Append the following parameters to the "automos" command line to utilize this backplane band:
+	    </dt>
+            <dd>
             <b>priority=band type=keyword keyname=Name keyvalue=albedo 
               criteria=lesser</b>.  
-            See <b>automos</b> documentation for further details.
+	    </dd>
+	    </dl>  
+            See <a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/automos/automos.html">"<b>automos</b>"</a> 
+	    documentation for further details.
           </p>
         </description>
       </parameter>
     </group>
   </groups>
+  
+  <examples>
+    <example>
+      <brief>Create latitude and morphology backplane bands</brief>
+      <description>
+        Within this example, phocube creates an output file with two bands 
+	that contain latitude information and computed morphology 
+	values, which are shown below as separate snapshots under "Output 
+	Images."  The input image file shown below under "Input Image" was 
+	not propagated to the phocube output file because DN is set to 
+	false.  If the phocube output file is projected and mosaicked, 
+	the mosaic file will contain the latitude information for the first 
+	band and the "morphology" values for the second band, but no image 
+	information from the input image will be included.  The "DN" 
+	parameter must be set to "true" if the output product is expected 
+	to contain the input image.
+      </description>
+      <terminalInterface>
+        <commandLine>
+	 from=EW0131773041G_cal.cub to=EW0131773041G_cal.pho.cub phase=no emission=no incidence=no 
+	 longitude=no morphology=yes
+        </commandLine>
+        <description>Run phocube to create latitude and morphology bands.</description>
+      </terminalInterface>
+      <guiInterfaces>
+        <guiInterface>
+          <image src="assets/images/phocube_gui.jpg" width="458" height="750">
+            <brief>Example GUI</brief>
+            <description>
+              Screenshot of GUI version of the application.<br />  For this example,
+	      only "LATITUDE" and "MORPHOLOGY" are selected.  The pre-selected 
+	      options "PHASE," "EMISSION," "INCIDENCE," and "LONGITUDE" are 
+	      deselected to avoid creating these unwanted backplanes. 
+            </description>
+            <thumbnail src="assets/thumbs/thumb_phocube_gui.jpg" caption="Phocube GUI" width="147" height="243"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+      <inputImages>
+        <image src="assets/images/EW0131773041G_cal.png" width="496" height="496">
+          <brief>Input file </brief>
+          <description>
+            Screenshot of the input cube file. 
+          </description>
+          <thumbnail src="assets/thumbs/EW0131773041G_cal_thumb.png" caption="Input image" width="200" height="200"/>
+          <parameterName>
+            FROM
+          </parameterName>
+        </image>
+      </inputImages>
+      <outputImages>
+        <image src="assets/images/phocube_lat_band.png" width="496" height="496">
+          <brief>Output file band 1 (Latitude)</brief>
+          <description> 
+            Screenshot of the first band in the output file.  This file contains the
+	    latitude information with -72.2 degree as the minimum, and 6.27 degree 
+	    as the maximum value.
+          </description>
+          <thumbnail src="assets/thumbs/thumb_phocube_lat_band.png" caption="Output image band 1 (latitude)" width="200" height="200"/>
+          <parameterName>
+            TO
+          </parameterName>
+        </image>
+        <image src="assets/images/phocube_morph_band.png" width="496" height="496">
+          <brief>Output file band 2 (Morphology)</brief>
+          <description> 
+            Screenshot of the second band in the output file.  This file contains the
+	    computed morphology values with 0.0 as the minimum, and 15.0 as the maximum 
+	    value.  The minimum and maximum values were manually selected to brighten
+	    the image for visual presentation.  The actual range is between 2.8 and 41.5
+	    DN values.
+          </description>
+          <thumbnail src="assets/thumbs/thumb_phocube_morph_band.png" caption="Output image band 2 (morphology)" width="200" height="200"/>
+          <parameterName>
+            TO
+          </parameterName>
+        </image>
+      </outputImages>
+    </example> 
+  </examples>
 </application>
