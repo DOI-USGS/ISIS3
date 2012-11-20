@@ -43,6 +43,9 @@ namespace Isis {
    *                             Cannot mix incompatible Qt library (version
    *                             0x40704) with this library (version 0x40800)
    *                           Fixes #742.
+   *   @history 2012-11-02 Steven Lambright - Updated automatic environment setup to fix
+   *                           a library dependency problem (that is ignoring our plugin path
+   *                           setting) with QDBus. Fixes #1228.
    */
   class Environment {
     public:

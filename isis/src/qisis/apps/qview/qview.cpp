@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QWorkspace>
 #include <QFontDialog>
+#include <QtDBus>
 
 #include <sys/types.h>
 #include <unistd.h>
@@ -51,6 +52,7 @@ void stopMonitoringMemory();
 using namespace Isis;
 
 int main(int argc, char *argv[]) {
+  QDBusArgument arg;
   Isis::Gui::checkX11();
 
   // Check to see if the user wants to force a new window
