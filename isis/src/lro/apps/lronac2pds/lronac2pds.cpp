@@ -1,4 +1,9 @@
 #include "Isis.h"
+
+#include <sstream>
+
+#include <QDebug>
+
 #include "ProcessExport.h"
 #include "ProcessByLine.h"
 #include "Pvl.h"
@@ -8,7 +13,6 @@
 #include "iTime.h"
 #include "md5.h"
 #include "md5wrapper.h"
-#include <sstream>
 
 #define SCALING_FACTOR 32767
 
@@ -40,8 +44,10 @@ void IsisMain () {
 
     g_isIof = inCube->getLabel()->FindGroup("Radiometry", Pvl::Traverse).FindKeyword("RadiometricType")[0].Equal("IOF");
 
-    FileName scaledCube = ui.GetFileName("FROM");
-    scaledCube = FileName::createTempFile("$TEMPORARY/" + FileName(ui.GetFileName("FROM")).baseName());
+    FileName scaledCube("$TEMPORARY/" + FileName(ui.GetFileName("FROM")).name());
+    scaledCube.addExtension("cub");
+
+    scaledCube = FileName::createTempFile(scaledCube);
     p.SetOutputCube(
         scaledCube.expanded(), CubeAttributeOutput(),
         inCube->getSampleCount(), inCube->getLineCount(),
@@ -81,7 +87,7 @@ void IsisMain () {
         pe.SetOutputHrs(Isis::HIGH_REPR_SAT4);
     }
 
-    FileName tempFile(ui.GetFileName("TO"));
+    FileName tempFile;
     tempFile = FileName::createTempFile("$TEMPORARY/" + FileName(ui.GetFileName("TO")).baseName() + ".temp");
     string tempFileName(tempFile.expanded());
     ofstream temporaryFile(tempFileName.c_str());

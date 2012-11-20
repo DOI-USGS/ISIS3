@@ -19,6 +19,9 @@
     <change name="Jeannie Backer" date="2011-08-19">
       Replaced test cube path /tmp/... with $temporary/...
     </change>
+    <change name="Steven Lambright and Mathew Eis" date="2012-11-06">
+      Fixed (the lack of) deletion of temporary files. Fixes #1009.
+    </change>
   </history>
 
   <groups>

@@ -14,8 +14,8 @@ namespace Isis {
   /**
    * @brief Reduce the pixel dimensions of an image
    *
-   * Reduce the pixel dimensions of an image. Has the functionality to reduce 
-   * only a sub area in input image to output 
+   * Reduce the pixel dimensions of an image. Has the functionality to reduce
+   * only a sub area in input image to output
    *
    * @ingroup Geometry
    *
@@ -39,17 +39,17 @@ namespace Isis {
   public:
     //! Constructor
     Reduce(Isis::Cube *pInCube,const double sampleScale, const double lineScale);
-    
+
     //! Destructor
     ~Reduce();
-    
+
     //! Create label for the reduced output image
     Isis::PvlGroup  UpdateOutputLabel(Isis::Cube *pOutCube);
-    
+
     //! Parameters to input image sub area
-    void setInputBoundary(int startSample, int endSample, 
+    void setInputBoundary(int startSample, int endSample,
                           int startLine, int endLine);
-    
+
     protected:
       Isis::Cube *mInCube;        //!< Input image
       double mdSampleScale;       //!< Sample scale
@@ -79,11 +79,11 @@ namespace Isis {
   class Nearest : public Isis::Reduce {
     public:
       //! Constructor
-      Nearest(Isis::Cube *pInCube, double pdSampleScale, double pdLineScale) 
+      Nearest(Isis::Cube *pInCube, double pdSampleScale, double pdLineScale)
       :Reduce(pInCube, pdSampleScale, pdLineScale){
       }
 
-      //! Operator () overload 
+      //! Operator () overload
       void operator() (Isis::Buffer & out) const;
   };
 
@@ -98,8 +98,8 @@ namespace Isis {
   class Average : public Isis::Reduce {
     public:
       //! Constructor
-      Average(Isis::Cube *pInCube, double pdSampleScale, double pdLineScale, 
-              double pdValidPer, string psReplaceMode) 
+      Average(Isis::Cube *pInCube, double pdSampleScale, double pdLineScale,
+              double pdValidPer, string psReplaceMode)
       : Reduce(pInCube, pdSampleScale, pdLineScale){
         mdValidPer    = pdValidPer;
         msReplaceMode = psReplaceMode;
@@ -117,7 +117,7 @@ namespace Isis {
       mutable double *mdSum2;
       mutable double *mdNpts2;
   };
-  
-};
+
+}
 
 #endif

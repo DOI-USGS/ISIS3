@@ -137,6 +137,8 @@ namespace Isis {
    *                           be imported into projects without copying the DN data. Also, multiple
    *                           versions of SPICE will be save-able for one cube (multiple ecubs...
    *                           again, not copying DN data). Fixes #961.
+   *   @history 2012-11-06 Steven Lambright and Mathew Eis - Fixed (the lack of) deletion of
+   *                           temporary files in the unit test. Fixes #1009.
    *
    */
   class Cube {
