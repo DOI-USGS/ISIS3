@@ -1570,6 +1570,9 @@ void IsisMain() {
       } else if (ui.GetString("ZEROB0ST") == "FALSE") {
         toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                  AddKeyword(PvlKeyword("ZEROB0ST","FALSE"),Pvl::Replace);
+      } else if (ui.GetString("ZEROB0ST") == "READFROMPVL") {
+        toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+                 AddKeyword(PvlKeyword("ZEROB0ST","TRUE"),Pvl::Replace);
       } else {
         string message = "The " + phtName + " Photometric model requires a value for the ZEROB0ST parameter.";
         message += "The valid values for ZEROB0ST are: TRUE, FALSE";

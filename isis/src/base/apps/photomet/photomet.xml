@@ -1822,7 +1822,6 @@
               <item>ALBEDO</item>
             </inclusions>
             <exclusions>
-              <item>INCMAT</item>
               <item>ATMNAME</item>
               <item>D</item>
               <item>E</item>
