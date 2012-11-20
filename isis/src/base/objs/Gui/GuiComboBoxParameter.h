@@ -11,6 +11,11 @@ namespace Isis {
    * @author ????-??-?? Unknown
    *
    * @internal
+   * 
+   * @history 2012-11-20 Janet Barrett - Fixed the Set method so that it doesn't
+   *                                     stop searching for a matched string until an
+   *                                     exact match is found or it has gone through the
+   *                                     entire list. Fixes #554.
    */
   class GuiComboBoxParameter : public GuiParameter {
 

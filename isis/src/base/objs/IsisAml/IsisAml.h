@@ -142,6 +142,10 @@ namespace Isis {
  *                                         written to the history file
  *   @history 2011-08-16 Sharmila Prasad - Added API to CreatePVL from a GUI Group and
  *                                         Get GUI Group index given the Group name
+ *   @history 2012-11-20 Janet Barrett - Fixed the GetString method so that it doesn't
+ *                                       stop searching for a matched string until an
+ *                                       exact match is found or it has gone through the
+ *                                       entire list. Fixes #554.
  */
 class IsisAml : protected IsisAmlData {
 

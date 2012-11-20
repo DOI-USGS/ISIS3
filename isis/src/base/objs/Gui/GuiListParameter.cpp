@@ -80,7 +80,8 @@ namespace Isis {
     for(int i = 0; i < p_ui->ParamListSize(p_group, p_param); i++) {
       IString option = p_ui->ParamListValue(p_group, p_param, i);
       option.UpCase();
-      if(option.compare(0, value.size(), value) == 0) foundAtButton = i;
+      //if(option.compare(0, value.size(), value) == 0) foundAtButton = i;
+      if(option == value) foundAtButton = i;
     }
 
     if(foundAtButton != -1) {
