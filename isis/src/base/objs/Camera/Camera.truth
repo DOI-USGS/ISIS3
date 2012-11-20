@@ -11,6 +11,17 @@ SunAzimuth: 168.17
 SpacecraftAzimuth: 184.591
 OffNadirAngle: 44.4225
 
+GroundAzimuth in North: 59.9718
+GroundAzimuth in North: 89.4306
+GroundAzimuth in North: 78.9509
+GroundAzimuth in North: 281.049
+GroundAzimuth in North: 1.11971e-05
+GroundAzimuth in South: 120.028
+GroundAzimuth in South: 90.5694
+GroundAzimuth in South: 101.049
+GroundAzimuth in South: 258.951
+GroundAzimuth in South: 180
+
 SetUniversalGround(lat, lon): 1
 SetRightAscensionDeclination(ra, dec): 1
 HasProjection: 1

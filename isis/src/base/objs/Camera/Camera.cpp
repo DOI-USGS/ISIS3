@@ -1541,7 +1541,58 @@ namespace Isis {
       a = (90.0 + slat) * PI / 180.0;
       b = (90.0 + glat) * PI / 180.0;
     }
-    double C = (glon - slon) * PI / 180.0;
+
+    double cslon = slon;
+    double cglon = glon;
+    if (cslon > cglon) {
+      if ((cslon-cglon) > 180.0) {
+        while ((cslon-cglon) > 180.0) cslon = cslon - 360.0;
+      }
+    }
+    if (cglon > cslon) {
+      if ((cglon-cslon) > 180.0) {
+        while ((cglon-cslon) > 180.0) cglon = cglon - 360.0;
+      }
+    }
+ 
+    // Which quadrant are we in?
+    int quad;
+    if (slat > glat) {
+      if (cslon > cglon) {
+        quad = 1;
+      } 
+      else if (cslon < cglon) {
+        quad = 2;
+      }
+      else {
+        quad = 1;
+      }
+    }
+    else if (slat < glat) {
+      if (cslon > cglon) {
+        quad = 4;
+      } 
+      else if (cslon < cglon) {
+        quad = 3;
+      } 
+      else {
+        quad = 4;
+      }
+    } 
+    else {
+      if (cslon > cglon) {
+        quad = 1;
+      }
+      else if (cslon < cglon) {
+        quad = 2;
+      }
+      else {
+        return 0.0;
+      }
+    }
+
+    double C = (cglon - cslon) * PI / 180.0;
+    if (C < 0) C = -C;
     double c = acos(cos(a)*cos(b) + sin(a)*sin(b)*cos(C));
     double azimuth = 0.0;
     if (sin(b) == 0.0 || sin(c) == 0.0) {
@@ -1549,38 +1600,23 @@ namespace Isis {
     }
     double A = acos((cos(a) - cos(b)*cos(c))/(sin(b)*sin(c))) * 180.0 / PI;
     //double B = acos((cos(b) - cos(c)*cos(a))/(sin(c)*sin(a))) * 180.0 / PI;
-    if (fabs(slon - glon) <= 180.0) {
-      if (glon >= slon) {
-        if (glat >= 0.0) {
-          azimuth = 360.0 - A;
-        } 
-        else {
-          azimuth = A;
-        }
-      } 
-      else {
-        if (glat >= 0.0) {
-          azimuth = A;
-        } 
-        else {
-          azimuth = 360.0 - A;
-        }
-      }
-    } 
-    else {
-      if (glat >= 0.0) {
-        azimuth = 360.0 - A;
-      } 
-      else {
+    if (glat >= 0.0) {
+      if (quad == 1 || quad == 4) {
         azimuth = A;
       }
+      else if (quad == 2 || quad == 3) {
+        azimuth = 360.0 - A;
+      }
     }
-    if (glat < 0.0) {
-      azimuth = azimuth + 180.0;
+    else {
+      if (quad == 1 || quad == 4) {
+        azimuth = 180.0 - A;
+      }
+      else if (quad == 2 || quad == 3) {
+        azimuth = 180.0 + A;
+      }
     }
-    if (azimuth >= 360.0) {
-      azimuth = azimuth - 360.0;
-    }
+
     return azimuth;
   }
 

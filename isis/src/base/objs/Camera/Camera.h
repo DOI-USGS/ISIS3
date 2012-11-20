@@ -221,6 +221,9 @@ namespace Isis {
    *                           References Mantis ticket #775 and #1114.
    *   @history 2012-10-25 Jeannie Backer - Changed resolution() method to lower
    *                           camel case. References #1181.
+   *   @history 2012-11-20 Janet Barrett - Fixed a problem with the GroundAzimuth method so
+   *                           that the azimuth value is calculated correctly for radar data.
+   *                           Fixes #1117.
    */
 
   class Camera : public Sensor {
