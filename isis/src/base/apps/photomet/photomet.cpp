@@ -169,10 +169,12 @@ void LoadPvl() {
           }
           if (phtGrp->HasKeyword("ZEROB0STANDARD")) {
             string zerob0 = (string)phtGrp->FindKeyword("ZEROB0STANDARD");
-            if (zerob0.compare("TRUE")) {
-              ui.PutString("ZEROB0STANDARD", "TRUE");
-            } else if (zerob0.compare("FALSE")) {
-              ui.PutString("ZEROB0STANDARD", "FALSE");
+            IString izerob0 = zerob0;
+            izerob0 = izerob0.UpCase();
+            if (izerob0 == "TRUE") {
+              ui.PutString("ZEROB0ST", "TRUE");
+            } else if (izerob0 == "FALSE") {
+              ui.PutString("ZEROB0ST", "FALSE");
             } else {
               string message = "The ZEROB0STANDARD value is invalid - must be set to TRUE or FALSE";
               throw IException(IException::User, message, _FILEINFO_);
@@ -180,9 +182,11 @@ void LoadPvl() {
           }
           else if (phtGrp->HasKeyword("ZEROB0ST")) {
             string zerob0 = (string)phtGrp->FindKeyword("ZEROB0ST");
-            if (zerob0.compare("TRUE")) {
+            IString izerob0 = zerob0;
+            izerob0 = izerob0.UpCase();
+            if (izerob0 == "TRUE") {
               ui.PutString("ZEROB0ST", "TRUE");
-            } else if (zerob0.compare("FALSE")) {
+            } else if (izerob0 == "FALSE") {
               ui.PutString("ZEROB0ST", "FALSE");
             } else {
               string message = "The ZEROB0ST value is invalid - must be set to TRUE or FALSE";
