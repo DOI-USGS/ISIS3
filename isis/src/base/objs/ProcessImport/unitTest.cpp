@@ -37,13 +37,15 @@ void IsisMain() {
   string file = Isis::Application::GetUserInterface().GetFileName("TO");
   Isis::Cube *icube = p2.SetInputCube(file, att);
   Isis::Statistics *stat = icube->getStatistics();
-  cout << stat->Average() << endl;
-  cout << stat->Variance() << endl;
+  cout << endl << "Average: " << stat->Average() << endl;
+  cout << endl << "Variance: " << stat->Variance() << endl;
   p2.EndProcess();
   remove(file.c_str());
   cout << endl;
 
   //Checks the setting of special pixel ranges
+
+  cout << "Check the settings of the special pixel ranges" << endl;
 
   Isis::ProcessImport pNull;
   pNull.SetNull(0.0, 45.0);
@@ -107,4 +109,39 @@ void IsisMain() {
   }
   cout << endl;
 
+  cout << "Testing ProcessBil()" << endl;
+  Isis::ProcessImport p3;
+  p3.SetInputFile("$base/testData/isisTruth.dat");
+  p3.SetBase(0.0);
+  p3.SetMultiplier(1.0);
+  p3.SetDataHeaderBytes(0);
+  p3.SetDataPrefixBytes(0);
+  p3.SetDataSuffixBytes(0);
+  p3.SetDataTrailerBytes(0);
+  p3.SetDimensions(126, 126, 1);
+  p3.SetFileHeaderBytes(16384);
+  p3.SetOrganization(Isis::ProcessImport::BIL);
+  p3.SetPixelType(Isis::Real);
+  p3.SetByteOrder(Isis::Lsb);
+  p3.SetOutputCube("TO");
+  p3.StartProcess();
+  p3.EndProcess();
+
+  cout << endl << "Testing ProcessBip()" << endl;
+  Isis::ProcessImport p4;
+  p4.SetInputFile("$base/testData/isisTruth.dat");
+  p4.SetBase(0.0);
+  p4.SetMultiplier(1.0);
+  p4.SetDataHeaderBytes(0);
+  p4.SetDataPrefixBytes(0);
+  p4.SetDataSuffixBytes(0);
+  p4.SetDataTrailerBytes(0);
+  p4.SetDimensions(126, 126, 1);
+  p4.SetFileHeaderBytes(16384);
+  p4.SetOrganization(Isis::ProcessImport::BIP);
+  p4.SetPixelType(Isis::Real);
+  p4.SetByteOrder(Isis::Lsb);
+  p4.SetOutputCube("TO");
+  p4.StartProcess();
+  p4.EndProcess();
 }

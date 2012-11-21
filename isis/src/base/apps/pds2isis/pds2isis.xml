@@ -113,6 +113,9 @@
       Improve the documentation, document capability to import ISIS2 images, 
       fixes #1172.
     </change>
+    <change name="Kimberly Oyama" date="2012-11-21">
+      Added app tests for BIP and BIL formatted input. References #819.
+    </change>
   </history>
 
   <category>
