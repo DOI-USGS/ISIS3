@@ -6,33 +6,36 @@
 
   <description>
     <p>
-      This program converts a PDS or ISIS2 formatted file to an ISIS3 cube format.  The 
-      standard PDS image is defined in the "FROM" parameter, and not the "IMAGE" parameter.
-      If the PDS file has a detached label file and an image file, both are required 
-      to exist in the working directory.  If the label is detached, the detached label 
-      filename is defined as the input file for the "FROM" parameter.  The "IMAGE" parameter
-      does not need to be defined, unless the program fails to find the image file specifed
-      in the label file upon the program's execution.
+      This program converts a PDS or ISIS2 formatted file to an ISIS3 
+      <def link="Cube">cube</def> format.  The standard PDS image is defined in 
+      the "FROM" parameter, and not the "IMAGE" parameter.  If the PDS file has 
+      a detached label file and an image file, both are required to exist in the 
+      working directory.  If the label is detached, the detached label filename 
+      is defined as the input file for the "FROM" parameter.  The "IMAGE" parameter
+      does not need to be defined, unless the program fails to find the image file 
+      specifed in the label file upon the program's execution.
       
-      The default settings normally work for most 
-      PDS products, but occasionally the user may need to modify the default values 
-      in order to obtain an image that meets their specific requirements.
+      The default settings normally work for most PDS products, but occasionally 
+      the user may need to modify the default values in order to obtain an image 
+      that meets their specific requirements.
      </p>
      <p>
-      The incoming special pixel values in the PDS file are assigned equivalent values 
-      for special pixels in ISIS3.  The order of precedence for special pixels in ISIS 
-      from highest to lowest priority is the following:  
+      The incoming <def link="Special Pixels">special pixel</def> values in the 
+      PDS file are assigned equivalent values for special pixels in ISIS3.  The 
+      order of precedence for special pixels in ISIS from highest to lowest 
+      priority is the following:  
       <blockquote>
       <ol>
-        <li>NULL</li> 
-	<li>HRS</li> 
-	<li>LRS</li> 
-	<li>HIS</li>
-	<li>LIS</li>
+        <li><def>NULL</def></li> 
+	<li><def>HRS</def></li> 
+	<li><def>LRS</def></li> 
+	<li><def>HIS</def></li>
+	<li><def>LIS</def></li>
       </ol>
       </blockquote> 
-      If any incoming pixel value falls within two different special pixel types, 
-      the special pixel with the higher priority is assigned.  The user may also 
+      If any incoming <def link="Digital Number">pixel value</def> falls within 
+      two different special pixel types, the <def link="Special Pixel">special 
+      pixel</def> with the higher priority is assigned.  The user may also 
       specify a range of pixel values to be assigned to the different special pixels.
       If the range of pixel values defined by the user for the different special 
       pixels overlap, the special pixel with the highest priority is assigned.  For 
@@ -43,13 +46,15 @@
       is propagated to the output file.
      </p>
      <p>
-      The best option to convert files from ISIS2 to ISIS3 is to maintain all the input
-      file settings, and do not change the bit type or change any incoming pixel values to 
-      special pixels.  When an ISIS2 Level1 image is imported into ISIS3, it is important 
-      to note the label information is not propagated from the ISIS2 to the ISIS3 cube file.  
-      For an ISIS2 Level2 image or mosaic file, a limited set of label information is 
-      transferred to the ISIS3 labels that include the "Instrument," "BandBin," and 
-      "Mapping" groups.
+      The best option to convert files from ISIS2 to ISIS3 is to maintain all the 
+      input file settings, and do not change the <def link="Bit Type">bit type</def> 
+      or change any incoming pixel values to special pixels.  When an ISIS2 
+      <def>Level1</def> image is imported into ISIS3, it is important to note the 
+      label information is not propagated from the ISIS2 to the ISIS3 cube file.  
+      For an ISIS2 <def>Level2</def> image or mosaic file, a limited set of label 
+      information is transferred to the ISIS3 labels that include the "Instrument," 
+      "<def link="Band">BandBin</def>," and "<def link="Map Projection">Mapping</def>" 
+      groups.
     </p>
   </description>
 
@@ -180,11 +185,12 @@
         <brief>Option to convert pixel values to NULL</brief>
         <description>
 	  If this option is set to "yes" or "true", a range of input raw pixels
-	  defined by the NULLMIN and NULLMAX parameters are converted to NULL
+	  defined by the NULLMIN and NULLMAX parameters are converted to <def>NULL</def>
 	  pixels.  All other valid pixels that do not fall within the ranges 
 	  specified for LIS, LRS, HIS, and HRS pixels are transferred to the output file 
-	  unchanged.  If the bit type of the input file is changed, the NULL and HRS 
-	  special pixels may be incorrectly set to valid pixel values.  For example, 
+	  unchanged.  If the <def link="Bit Type">bit type</def> of the input 
+	  file is changed, the NULL and HRS <def link="Special Pixels">special 
+	  pixels</def> may be incorrectly set to valid pixel values.  For example, 
 	  if a raw 8-bit file is output to 16 or 32-bit, the pixel values "0" 
 	  and "255" may be converted to actual values instead of retaining the 
 	  special pixel property.  If the output file remains as 8-bit, then "0" 
@@ -199,7 +205,7 @@
         <type>double</type>
         <brief> Minimum value for NULL</brief>
         <description>
-          Minimum pixel value to set to NULL.  All values greater than or equal to
+          Minimum pixel value to set to <def>NULL</def>.  All values greater than or equal to
 	  NULLMIN and less than or equal to NULLMAX are converted to NULL.
         </description>
         <inclusions>
@@ -210,7 +216,7 @@
         <type>double</type>
         <brief> Maximum value for NULL </brief>
         <description>
-          Maximum pixel value to set to NULL.  All values greater than or equal to
+          Maximum pixel value to set to <def>NULL</def>.  All values greater than or equal to
 	  NULLMIN and less than or equal to NULLMAX are converted to NULL.
         </description>
         <inclusions>
@@ -229,8 +235,9 @@
 	  defined by the HRSMIN and HRSMAX parameters are converted to HRS
 	  pixels.  All other valid pixels that do not fall within the ranges 
 	  specified for LIS, LRS, HIS, and NULL pixels are transferred to the output file 
-	  unchanged.  If the bit type of the input file is changed, the NULL and HRS 
-	  special pixels may be incorrectly set to valid pixel values.  For example, 
+	  unchanged.  If the <def link="Bit Type">bit type</def> of the input 
+	  file is changed, the NULL and HRS <def link="Special Pixels">special 
+	  pixels</def> may be incorrectly set to valid pixel values.  For example, 
 	  if a raw 8-bit file is output to 16 or 32-bit, the pixel values "0" 
 	  and "255" may be converted to actual values instead of retaining the 
 	  special pixel property.  If the output file remains as 8-bit, then "0" 
@@ -245,7 +252,7 @@
         <type>double</type>
         <brief> Minimum value for HRS</brief>
         <description>
-          Minimum pixel value to set to HRS.  All values greater than or equal to
+          Minimum pixel value to set to <def>HRS</def>.  All values greater than or equal to
 	  HRSMIN and less than or equal to HRSMAX are converted to HRS.
         </description>
         <inclusions>
@@ -256,7 +263,7 @@
         <type>double</type>
         <brief> Maximum value for HRS</brief>
         <description>
-          Maximum pixel value to set to HRS.  All values greater than or equal to
+          Maximum pixel value to set to <def>HRS</def>.  All values greater than or equal to
 	  HRSMIN and less than or equal to HRSMAX are converted to HRS.
         </description>
         <inclusions>
@@ -286,7 +293,7 @@
         <type>double</type>
         <brief> Minimum value for HIS</brief>
         <description>
-          Minimum pixel value to set to HIS.  All values greater than or equal to
+          Minimum pixel value to set to <def>HIS</def>.  All values greater than or equal to
 	  HISMIN and less than or equal to HISMAX are converted to HIS.
         </description>
         <inclusions>
@@ -297,7 +304,7 @@
         <type>double</type>
         <brief> Maximum value for HIS</brief>
         <description>
-          Maximum pixel value to set to HIS.  All values greater than or equal to
+          Maximum pixel value to set to <def>HIS</def>.  All values greater than or equal to
 	  HISMIN and less than or equal to HISMAX are converted to HIS.
         </description>
         <inclusions>
@@ -327,7 +334,7 @@
         <type>double</type>
         <brief> Minimum value for LRS</brief>
         <description>
-          Minimum pixel value to set to LRS.  All values greater than or equal to
+          Minimum pixel value to set to <def>LRS</def>.  All values greater than or equal to
 	  LRSMIN and less than or equal to LRSMAX are converted to LRS.
         </description>
         <inclusions>
@@ -338,7 +345,7 @@
         <type>double</type>
         <brief> Maximum value for LRS </brief>
         <description>
-          Maximum pixel value to set to LRS.  All values greater than or equal to
+          Maximum pixel value to set to <def>LRS</def>.  All values greater than or equal to
 	  LRSMIN and less than or equal to LRSMAX are converted to LRS.
         </description>
         <inclusions>
@@ -368,7 +375,7 @@
         <type>double</type>
         <brief> Minimum value for LIS </brief>
         <description>
-          Minimum pixel value to set to LIS.  All values greater than or equal to
+          Minimum pixel value to set to <def>LIS</def>.  All values greater than or equal to
 	  LISMIN and less than or equal to LISMAX are converted to LIS.
         </description>
         <inclusions>
@@ -379,7 +386,7 @@
         <type>double</type>
         <brief> Maximum value for LIS </brief>
         <description>
-          Maximum pixel value to set to LIS.  All values greater than or equal to
+          Maximum pixel value to set to <def>LIS</def>.  All values greater than or equal to
 	  LISMIN and less than or equal to LISMAX are converted to LIS.
         </description>
         <inclusions>
