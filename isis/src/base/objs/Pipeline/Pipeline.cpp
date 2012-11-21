@@ -6,6 +6,7 @@
 #include "IException.h"
 #include "Application.h"
 #include "Preference.h"
+#include "Progress.h"
 #include "TextFile.h"
 #include "FileName.h"
 
@@ -38,7 +39,7 @@ namespace Isis {
    *
    */
   Pipeline::~Pipeline() {
-    for(int i = 0; i < (int)p_apps.size(); i++) {
+    for (int i = 0; i < (int)p_apps.size(); i++) {
       delete p_apps[i];
     }
 
@@ -59,12 +60,12 @@ namespace Isis {
    */
   void Pipeline::Prepare() {
     // Nothing in the pipeline? quit
-    if(p_apps.size() == 0) return;
+    if (p_apps.size() == 0) return;
 
     // We might have to modify the pipeline and try again, so keep track of if this is necessary
     bool successfulPrepare = false;
 
-    while(!successfulPrepare) {
+    while (!successfulPrepare) {
       // Assume we'll be successful
       successfulPrepare = true;
       bool foundFirst = false;
@@ -73,7 +74,7 @@ namespace Isis {
       bool mustElimBands = false;
 
       // Look to see if we need to eliminate virtual bands...
-      for(unsigned int i = 0; i < p_virtualBands.size(); i++) {
+      for (unsigned int i = 0; i < p_virtualBands.size(); i++) {
         mustElimBands |= !p_virtualBands[i].empty();
       }
 
@@ -83,10 +84,10 @@ namespace Isis {
       // Loop through all the pipeline apps, look for a good place to remove virtual
       //   bands and tell the apps the prepare themselves. Double check the first program
       //   is not branched (expecting multiple inputs).
-      for(int i = 0; i < (int)p_apps.size() && successfulPrepare; i++) {
+      for (int i = 0; i < (int)p_apps.size() && successfulPrepare; i++) {
         if (p_apps[i] == NULL) continue;
-        if(mustElimBands && p_apps[i]->SupportsVirtualBands()) {
-          if(i != 0 && p_virtualBands.size() != 1) {
+        if (mustElimBands && p_apps[i]->SupportsVirtualBands()) {
+          if (i != 0 && p_virtualBands.size() != 1) {
             IString message = "If multiple original inputs were set in the pipeline, the first application must support virtual bands.";
             throw IException(IException::Programmer, message, _FILEINFO_);
           }
@@ -97,7 +98,7 @@ namespace Isis {
           // We might have added the "cubeatt" program to eliminate bands,
           //   remove it if we found something else to do the virtual bands.
           // **This causes a failure in our calculations, start over.
-          if(p_addedCubeatt && i != (int)p_apps.size() - 1) {
+          if (p_addedCubeatt && i != (int)p_apps.size() - 1) {
             delete p_apps[p_apps.size() - 1];
             p_apps.resize(p_apps.size() - 1);
             p_appIdentifiers.resize(p_appIdentifiers.size() - 1);
@@ -120,17 +121,17 @@ namespace Isis {
 
         // keep track of tmp files
         vector<IString> theseTempFiles = p_apps[i]->TemporaryFiles();
-        for(int tmpFile = 0; tmpFile < (int)theseTempFiles.size(); tmpFile++) {
+        for (int tmpFile = 0; tmpFile < (int)theseTempFiles.size(); tmpFile++) {
           // no need to delete blank files
-          if(theseTempFiles[tmpFile].find("blank") == string::npos) {
+          if (theseTempFiles[tmpFile].find("blank") == string::npos) {
             tmpFiles.push_back(theseTempFiles[tmpFile]);
           }
         }
 
-        if(!foundFirst && p_apps[i]->Enabled()) {
+        if (!foundFirst && p_apps[i]->Enabled()) {
           foundFirst = true;
 
-          if(p_apps[i]->InputBranches().size() != OriginalBranches().size()) {
+          if (p_apps[i]->InputBranches().size() != OriginalBranches().size()) {
             string msg = "The program [" + p_apps[i]->Name() + "] can not be the first in the pipeline";
             msg += " because it must be run multiple times with unspecified varying inputs";
             throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -139,15 +140,15 @@ namespace Isis {
       }
 
       // Make sure we found an app!
-      if(!foundFirst) {
+      if (!foundFirst) {
         string msg = "No applications are enabled in the pipeline";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       // Make sure all tmp files are unique!
-      for(int i = 0; successfulPrepare && i < (int)tmpFiles.size(); i++) {
-        for(int j = i + 1; j < (int)tmpFiles.size(); j++) {
-          if(tmpFiles[i] == tmpFiles[j]) {
+      for (int i = 0; successfulPrepare && i < (int)tmpFiles.size(); i++) {
+        for (int j = i + 1; j < (int)tmpFiles.size(); j++) {
+          if (tmpFiles[i] == tmpFiles[j]) {
             string msg = "There is a conflict with the temporary file naming. The temporary file [";
             msg += tmpFiles[i] + "] is created twice.";
             throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -156,7 +157,7 @@ namespace Isis {
       }
 
       // We failed at eliminating bands, add stretch to our programs and try again
-      if(successfulPrepare && mustElimBands) {
+      if (successfulPrepare && mustElimBands) {
         AddToPipeline("cubeatt", "~PIPELINE_RESERVED_FOR_BANDS~");
         Application("~PIPELINE_RESERVED_FOR_BANDS~").SetInputParameter("FROM", true);
         Application("~PIPELINE_RESERVED_FOR_BANDS~").SetOutputParameter("TO", "final");
@@ -168,7 +169,7 @@ namespace Isis {
       if (p_apps[p_apps.size()-1] == NULL)
         lastApp = p_apps.size() - 2;
 
-      if(p_apps[lastApp]->GetOutputs().size() == 0) {
+      if (p_apps[lastApp]->GetOutputs().size() == 0) {
         string msg = "There are no outputted files in the pipeline. At least one program must generate an output file.";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -194,8 +195,13 @@ namespace Isis {
     // Get the starting point
     p_pausePosition++;
 
+    Progress pipelineProg;
+    pipelineProg.SetText(p_procAppName);
+    pipelineProg.SetMaximumSteps(1);
+    pipelineProg.CheckStatus();
+
     // Go through these programs, executing them
-    for(int i = p_pausePosition; i < Size(); i++) {
+    for (int i = p_pausePosition; i < Size(); i++) {
 
       // Return to caller for a pause
       if (p_apps[i] == NULL) {
@@ -203,21 +209,26 @@ namespace Isis {
         return;
       }
 
-      if(Application(i).Enabled()) {
+      if (Application(i).Enabled()) {
+        Progress appName;
+        appName.SetText("Running " + Application(i).Name());
+        appName.SetMaximumSteps(1);
+        appName.CheckStatus();
+         
         // grab the sets of parameters this program needs to be run with
         const vector<IString> &params = Application(i).ParamString();
-        for(int j = 0; j < (int)params.size(); j++) {
+        for (int j = 0; j < (int)params.size(); j++) {
 
           // check for non-program run special strings
           IString special(params[j].substr(0, 7));
 
           // If ">>LIST", then we need to make a list file
-          if(special == ">>LIST ") {
+          if (special == ">>LIST ") {
             IString cmd = params[j].substr(7);
             IString listFileName = cmd.Token(" ");
             TextFile listFile(listFileName, "overwrite");
 
-            while(!cmd.empty()) {
+            while (!cmd.empty()) {
               listFile.PutLine(cmd.Token(" "));
             }
 
@@ -228,12 +239,12 @@ namespace Isis {
             try {
               ProgramLauncher::RunIsisProgram(Application(i).Name(), params[j]);
             }
-            catch(IException &ex) {
-              if(!p_continue && !Application(i).Continue()) {
+            catch (IException &e) {
+              if (!p_continue && !Application(i).Continue()) {
                 throw;
               }
               else {
-                ex.print();
+                e.print();
                 cerr << "Continuing ......" << endl;
               }
             }
@@ -243,12 +254,12 @@ namespace Isis {
     }
 
     // Remove temporary files now
-    if(!KeepTemporaryFiles()) {
-      for(int i = 0; i < Size(); i++) {
+    if (!KeepTemporaryFiles()) {
+      for (int i = 0; i < Size(); i++) {
         if (p_apps[i] == NULL) continue;
-        if(Application(i).Enabled()) {
+        if (Application(i).Enabled()) {
           vector<IString> tmpFiles = Application(i).TemporaryFiles();
-          for(int file = 0; file < (int)tmpFiles.size(); file++) {
+          for (int file = 0; file < (int)tmpFiles.size(); file++) {
             remove(tmpFiles[file].c_str());
           }
         }
@@ -337,7 +348,7 @@ namespace Isis {
     string filename;
     int branch = 1;
 
-    while(filelist.GetLineNoFilter(filename)) {
+    while (filelist.GetLineNoFilter(filename)) {
       p_originalInput.push_back(filename);
       p_inputBranches.push_back(inputParam + IString(branch));
       p_virtualBands.push_back("");
@@ -363,7 +374,7 @@ namespace Isis {
     string filename;
     int branch = 1;
 
-    while(filelist.GetLineNoFilter(filename)) {
+    while (filelist.GetLineNoFilter(filename)) {
       p_originalInput.push_back(filename);
       p_inputBranches.push_back(FileName(inputFileName).expanded() + " " + IString(branch));
       p_finalOutput.push_back(FileName(filename).name());
@@ -410,7 +421,7 @@ namespace Isis {
     p_originalInput.push_back(ui.GetAsString(inputParam));
     p_inputBranches.push_back(inputParam);
 
-    if(!virtualBandsParam.empty() && ui.WasEntered(virtualBandsParam)) {
+    if (!virtualBandsParam.empty() && ui.WasEntered(virtualBandsParam)) {
       p_virtualBands.push_back(ui.GetAsString(virtualBandsParam));
     }
     else {
@@ -446,7 +457,7 @@ namespace Isis {
     UserInterface &ui = Application::GetUserInterface();
     p_finalOutput.clear();
 
-    if(ui.WasEntered(outputParam)) {
+    if (ui.WasEntered(outputParam)) {
       p_finalOutput.push_back(ui.GetAsString(outputParam));
     }
   }
@@ -490,14 +501,14 @@ namespace Isis {
   void Pipeline::SetOutputListFile(const IString &outputFileNameParam) {
     UserInterface &ui = Application::GetUserInterface();
 
-    if(ui.WasEntered(outputFileNameParam)) {
+    if (ui.WasEntered(outputFileNameParam)) {
       SetOutputListFile(FileName(ui.GetFileName(outputFileNameParam)));
     }
     else {
       p_finalOutput.clear();
 
       // Calculate output files
-      for(unsigned int i = 0; i < p_originalInput.size(); i++) {
+      for (unsigned int i = 0; i < p_originalInput.size(); i++) {
         p_finalOutput.push_back(FileName(p_originalInput[i]).name());
       }
 
@@ -518,7 +529,7 @@ namespace Isis {
     TextFile filelist(outputFileNameList.expanded());
     string filename;
 
-    while(filelist.GetLineNoFilter(filename)) {
+    while (filelist.GetLineNoFilter(filename)) {
       p_finalOutput.push_back(filename);
     }
 
@@ -569,8 +580,8 @@ namespace Isis {
    */
   void Pipeline::AddToPipeline(const IString &appname, const IString &identifier) {
     // Check uniqueness first
-    for(unsigned int appIdentifier = 0; appIdentifier < p_appIdentifiers.size(); appIdentifier++) {
-      if(p_appIdentifiers[appIdentifier] == identifier) {
+    for (unsigned int appIdentifier = 0; appIdentifier < p_appIdentifiers.size(); appIdentifier++) {
+      if (p_appIdentifiers[appIdentifier] == identifier) {
         IString message = "The application identifier [" + identifier + "] is not unique. " +
                           "Please providing a unique identifier";
         throw IException(IException::Programmer, message, _FILEINFO_);
@@ -580,7 +591,7 @@ namespace Isis {
     // If we've got cubeatt on our list of applications for band eliminating, take it away temporarily
     PipelineApplication *cubeAtt = NULL;
     IString cubeAttId = "";
-    if(p_addedCubeatt) {
+    if (p_addedCubeatt) {
       cubeAtt = p_apps[p_apps.size()-1];
       cubeAttId = p_appIdentifiers[p_appIdentifiers.size()-1];
       p_apps.resize(p_apps.size() - 1);
@@ -596,7 +607,7 @@ namespace Isis {
       if (p_apps[iapp] != NULL) appsSize++;
 
     // Add the new application
-    if(p_apps.size() == 0) {
+    if (p_apps.size() == 0) {
       p_apps.push_back(new PipelineApplication(appname, this));
     }
     else {
@@ -609,7 +620,7 @@ namespace Isis {
     p_appIdentifiers.push_back(identifier);
 
     // If we have stretch, put it back where it belongs
-    if(cubeAtt) {
+    if (cubeAtt) {
       p_apps[p_apps.size()-1]->SetNext(cubeAtt);
       cubeAtt->SetPrevious(p_apps[p_apps.size()-1]);
       p_apps.push_back(cubeAtt);
@@ -631,8 +642,8 @@ namespace Isis {
    */
   void Pipeline::AddToPipeline(const IString &appname) {
     // Check uniqueness first
-    for(unsigned int appIdentifier = 0; appIdentifier < p_appIdentifiers.size(); appIdentifier++) {
-      if(p_appIdentifiers[appIdentifier] == appname) {
+    for (unsigned int appIdentifier = 0; appIdentifier < p_appIdentifiers.size(); appIdentifier++) {
+      if (p_appIdentifiers[appIdentifier] == appname) {
         IString message = "The application identifier [" + appname + "] is not unique. Please use " +
                           "the other AddToPipeline method providing a unique identifier";
         throw IException(IException::Programmer, message, _FILEINFO_);
@@ -642,7 +653,7 @@ namespace Isis {
     // If we've got cubeatt on our list of applications for band eliminating, take it away temporarily
     PipelineApplication *cubeAtt = NULL;
     IString cubeAttId = "";
-    if(p_addedCubeatt) {
+    if (p_addedCubeatt) {
       cubeAtt = p_apps[p_apps.size()-1];
       cubeAttId = p_appIdentifiers[p_appIdentifiers.size()-1];
       p_apps.resize(p_apps.size() - 1);
@@ -651,7 +662,7 @@ namespace Isis {
     }
 
     // Add the new application
-    if(p_apps.size() == 0) {
+    if (p_apps.size() == 0) {
       p_apps.push_back(new PipelineApplication(appname, this));
     }
     else {
@@ -664,7 +675,7 @@ namespace Isis {
     p_appIdentifiers.push_back(appname);
 
     // If we have stretch, put it back where it belongs
-    if(cubeAtt) {
+    if (cubeAtt) {
       p_apps[p_apps.size()-1]->SetNext(cubeAtt);
       cubeAtt->SetPrevious(p_apps[p_apps.size()-1]);
       p_apps.push_back(cubeAtt);
@@ -686,8 +697,8 @@ namespace Isis {
     int index = 0;
     bool found = false;
 
-    while(!found && index < Size()) {
-      if(p_appIdentifiers[index] == identifier) {
+    while (!found && index < Size()) {
+      if (p_appIdentifiers[index] == identifier) {
         found = true;
       }
       else {
@@ -695,7 +706,7 @@ namespace Isis {
       }
     }
 
-    if(!found) {
+    if (!found) {
       IString msg = "Application identified by [" + identifier + "] has not been added to the pipeline";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -713,7 +724,7 @@ namespace Isis {
    * @return PipelineApplication& The pipeline application
    */
   PipelineApplication &Pipeline::Application(const int &index) {
-    if(index > Size()) {
+    if (index > Size()) {
       IString msg = "Index [" + IString(index) + "] out of bounds";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -736,16 +747,16 @@ namespace Isis {
    */
   void Pipeline::SetFirstApplication(const IString &appname) {
     int appIndex = 0;
-    for(appIndex = 0; appIndex < (int)p_apps.size() &&
+    for (appIndex = 0; appIndex < (int)p_apps.size() &&
                       p_apps[appIndex]->Name() != appname; appIndex++) {
       if (p_apps[appIndex] == NULL) continue;
       p_apps[appIndex]->Disable();
     }
-    // for(appIndex = 0; appIndex < (int)p_apps.size() && p_apps[appIndex]->Name() != appname; appIndex++) {
+    // for (appIndex = 0; appIndex < (int)p_apps.size() && p_apps[appIndex]->Name() != appname; appIndex++) {
     //   p_apps[appIndex]->Disable();
     // }
 
-    if(appIndex >= (int)p_apps.size()) {
+    if (appIndex >= (int)p_apps.size()) {
       string msg = "Pipeline could not find application [" + appname + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -766,12 +777,12 @@ namespace Isis {
    */
   void Pipeline::SetLastApplication(const IString &appname) {
     int appIndex = p_apps.size() - 1;
-    for(appIndex = p_apps.size() - 1; appIndex >= 0 && p_apps[appIndex]->Name() != appname; appIndex --) {
+    for (appIndex = p_apps.size() - 1; appIndex >= 0 && p_apps[appIndex]->Name() != appname; appIndex --) {
       if (p_apps[appIndex] == NULL) continue;
       p_apps[appIndex]->Disable();
     }
 
-    if(appIndex < 0) {
+    if (appIndex < 0) {
       string msg = "Pipeline could not find application [" + appname + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -794,15 +805,15 @@ namespace Isis {
   IString Pipeline::FinalOutput(int branch, bool addModifiers) {
     IString output = ((p_finalOutput.size() != 0) ? p_finalOutput[0] : "");
 
-    if(p_apps.size() == 0) return output;
+    if (p_apps.size() == 0) return output;
 
-    if(p_finalOutput.size() > 1) {
-      if((unsigned int)branch >= p_finalOutput.size()) {
+    if (p_finalOutput.size() > 1) {
+      if ((unsigned int)branch >= p_finalOutput.size()) {
         IString msg = "Output not set for branch [" + IString(branch) + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
-      if(!p_outputListNeedsModifiers) {
+      if (!p_outputListNeedsModifiers) {
         return p_finalOutput[branch];
       }
       else {
@@ -813,10 +824,10 @@ namespace Isis {
 
     PipelineApplication *last = p_apps[p_apps.size()-1];
     if (last == NULL) last = p_apps[p_apps.size()-2];
-    if(!last->Enabled()) last = last->Previous();
+    if (!last->Enabled()) last = last->Previous();
 
-    if(output == "" || p_finalOutput.size() > 1) {
-      if(output == "") {
+    if (output == "" || p_finalOutput.size() > 1) {
+      if (output == "") {
         output = "./" + FileName(p_originalInput[0]).baseName();
       }
       else {
@@ -824,8 +835,8 @@ namespace Isis {
       }
 
       // Base filename off of first input file
-      if(!addModifiers || last->OutputBranches().size() == 1) {
-        if(addModifiers && p_finalOutput.size() > 1)
+      if (!addModifiers || last->OutputBranches().size() == 1) {
+        if (addModifiers && p_finalOutput.size() > 1)
           output += "." + last->OutputNameModifier();
 
         output += "." + last->OutputExtension();
@@ -833,25 +844,25 @@ namespace Isis {
       else {
         // If we have multiple final outputs, rely on them to
         //   differentiate the branches
-        if(p_finalOutput.size() <= 1) {
+        if (p_finalOutput.size() <= 1) {
           output += "." + last->OutputBranches()[branch];
         }
 
-        if(addModifiers && p_finalOutput.size() > 1)
+        if (addModifiers && p_finalOutput.size() > 1)
           output += "." + last->OutputNameModifier();
 
         output += "." + last->OutputExtension();
       }
     }
-    else if(addModifiers) {
+    else if (addModifiers) {
       PipelineApplication *last = p_apps[p_apps.size()-1];
-      if(!last->Enabled()) last = last->Previous();
+      if (!last->Enabled()) last = last->Previous();
 
       output = FileName(p_finalOutput[0]).path() + "/" +
                FileName(p_finalOutput[0]).baseName() + "." +
                last->OutputBranches()[branch] + ".";
 
-      if(p_finalOutput.size() > 1) {
+      if (p_finalOutput.size() > 1) {
         output += last->OutputNameModifier() + ".";
       }
 
@@ -883,7 +894,7 @@ namespace Isis {
    *
    */
   void Pipeline::EnableAllApplications() {
-    for(int i = 0; i < Size(); i++) {
+    for (int i = 0; i < Size(); i++) {
       if (p_apps[i] != NULL) p_apps[i]->Enable();
     }
   }
@@ -908,17 +919,17 @@ namespace Isis {
   ostream &operator<<(ostream &os, Pipeline &pipeline) {
     pipeline.Prepare();
 
-    if(!pipeline.Name().empty()) {
+    if (!pipeline.Name().empty()) {
       os << "PIPELINE -------> " << pipeline.Name() << " <------- PIPELINE" << endl;
     }
 
-    for(int i = 0; i < pipeline.Size(); i++) {
+    for (int i = 0; i < pipeline.Size(); i++) {
       if (&(pipeline.Application(i)) == NULL) continue;
-      if(pipeline.Application(i).Enabled()) {
+      if (pipeline.Application(i).Enabled()) {
         const vector<IString> &params = pipeline.Application(i).ParamString();
-        for(int j = 0; j < (int)params.size(); j++) {
+        for (int j = 0; j < (int)params.size(); j++) {
           IString special(params[j].substr(0, 7));
-          if(special == ">>LIST ") {
+          if (special == ">>LIST ") {
             IString cmd = params[j].substr(7);
             IString file = cmd.Token(" ");
             os << "echo " << cmd << " > " << file << endl;
@@ -930,13 +941,13 @@ namespace Isis {
       }
     }
 
-    if(!pipeline.KeepTemporaryFiles()) {
-      for(int i = 0; i < pipeline.Size(); i++) {
+    if (!pipeline.KeepTemporaryFiles()) {
+      for (int i = 0; i < pipeline.Size(); i++) {
         if (&(pipeline.Application(i)) == NULL) continue;
-        if(pipeline.Application(i).Enabled()) {
+        if (pipeline.Application(i).Enabled()) {
           vector<IString> tmpFiles = pipeline.Application(i).TemporaryFiles();
-          for(int file = 0; file < (int)tmpFiles.size(); file++) {
-            if(tmpFiles[file].find("blank") == string::npos) {
+          for (int file = 0; file < (int)tmpFiles.size(); file++) {
+            if (tmpFiles[file].find("blank") == string::npos) {
               os << "rm " << tmpFiles[file] << endl;
             }
           }
@@ -944,7 +955,7 @@ namespace Isis {
       }
     }
 
-    if(!pipeline.Name().empty()) {
+    if (!pipeline.Name().empty()) {
       os << "PIPELINE -------> " << pipeline.Name() << " <------- PIPELINE" << endl;
     }
 

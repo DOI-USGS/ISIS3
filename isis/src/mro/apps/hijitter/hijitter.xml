@@ -76,6 +76,10 @@
     <change name="Debbie A. Cook" date="2012-07-06">
      Updated Spice members to be more compliant with Isis standards. References #972.
     </change>
+    <change name="Jeannie Backer" date="2012-11-21">
+     Modified to work with IR and BG ccd images.  Fixed bug with computation of 
+     yaw and pitch. Fixes #795.
+    </change>
   </history>
 
   <groups>
@@ -89,10 +93,12 @@
         <description>
           This file is a list of the file specifications for the input cubes all 
           from the save observation and containing pointing errors due to jitter 
-          modeled by the pixel offsets in the JITTER file.
+          modeled by the pixel offsets in the JITTER file. The list should be in 
+          ascending order, by CCD.  Each CCD in the list must have at least one
+          overlapping CCD.
         </description>
         <filter>
-          *.lis
+          *.lis *.txt
         </filter>
       </parameter>
 
@@ -123,7 +129,7 @@
            of the observation.  See hijitreg for more information.
         </description>
         <filter>
-          *.txt
+          *.txt *.def
         </filter>
       </parameter>
 
@@ -148,7 +154,7 @@
       <parameter name="MASTER">
         <type>integer</type>
         <minimum inclusive="yes">0</minimum>
-        <maximum inclusive="yes">9</maximum>
+        <maximum inclusive="yes">13</maximum>
         <brief>
           The file to use as the MASTER
         </brief>

@@ -130,25 +130,33 @@ namespace Isis {
    * @author 2008-08-04 Steven Lambright
    *
    * @internal
-   *   @history 2008-09-25 Added features: Application identifiers other than the
-   *            application names, branched original input, branching from
-   *            branches, partial branch merging (discontinuing branches*)
-   *   @history 2008-10-28 The input no longer has to have virtual bands if the
-   *            SetInputFile(IString,IString) has an empty parameter name for the
-   *            virtual bands parameter. SetInputListFile(...) method added.
-   *   @history 2008-12-19 List files are now fully supported, along with output
-   *            list files.
-   *   @history 2010-12-20 Sharmila Prasad - Added ability to add branches right off
-   *            of the Pipeline
-   *   @history 2010-12-21 Sharmila Prasad - Added documentation and ignore temp files
-   *            from disabled branches
-   *   @history 2011-02-09 Sharmila Prasad - Added option continue to proceed with execution
-   *            even if an application in the pipeline encounters an exception.
+   *   @history 2008-09-25 Unknown - Added features: Application identifiers
+   *                           other than the application names, branched
+   *                           original input, branching from branches, partial
+   *                           branch merging (discontinuing branches*)
+   *   @history 2008-10-28 Unknown - The input no longer has to have virtual
+   *                           bands if the SetInputFile(IString,IString) has an
+   *                           empty parameter name for the virtual bands
+   *                           parameter. SetInputListFile(...) method added.
+   *   @history 2008-12-19 Unknown - List files are now fully supported, along
+   *                           with output list files.
+   *   @history 2010-12-20 Sharmila Prasad - Added ability to add branches right
+   *                           off of the Pipeline
+   *   @history 2010-12-21 Sharmila Prasad - Added documentation and ignore temp
+   *                           files from disabled branches
+   *   @history 2011-02-09 Sharmila Prasad - Added option continue to proceed
+   *                           with execution even if an application in the
+   *                           pipeline encounters an exception.
    *   @history 2011-08-15 Debbie A. Cook - Added member p_pausePosition and 
-   *            method AddPause and modified method Run to allow the pipeline to
-   8            be stopped temporarily and resumed.  When AddPause is used, Run 
-   *            will need to be called an additional time for each AddPause 
-   *            included in the pipeline to resume the execution of the pipeline.
+   *                           method AddPause and modified method Run to allow
+   *                           the pipeline to be stopped temporarily and
+   *                           resumed.  When AddPause is used, Run will need to
+   *                           be called an additional time for each AddPause
+   *                           included in the pipeline to resume the execution
+   *                           of the pipeline.
+   *   @history 2012-11-21 Jeannie Backer - Added Progress output to indicate
+   *                           which application is running. Added padding to
+   *                           control statements. References # 795.
    */
   class Pipeline {
     public:
