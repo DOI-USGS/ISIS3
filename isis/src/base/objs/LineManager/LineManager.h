@@ -1,4 +1,4 @@
-#if !defined(LineManager_h)
+#ifndef LineManager_h
 #define LineManager_h
 /**
  * @file
@@ -43,13 +43,14 @@ namespace Isis {
    * @author 2003-02-13 Jeff Anderson
    *
    * @internal
-   *  @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
-   *                                     isis.astrogeology...
-   *  @history 2005-02-28 Elizabeth Ribelin - Modified file to support Doxygen
-   *                                          documentation
-   *  @history 2007-12-06 Chris Austin - Added option
-   *              to constructor to change the order of the
-   *              progression through the cube
+   *   @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
+   *                           isis.astrogeology...
+   *   @history 2005-02-28 Elizabeth Ribelin - Modified file to support Doxygen
+   *                           documentation
+   *   @history 2007-12-06 Chris Austin - Added option to constructor to change
+   *                           the order of the progression through the cube
+   *   @history 2012-11-21 Jeannie Backer - Improved error messages. References
+   *                           #1058.
    */
   class LineManager : public Isis::BufferManager {
 

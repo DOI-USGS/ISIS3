@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="hicrop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    This program extracts a sub-area from a HiRise cube. 
+  </brief>
+
+  <description>
+    This program can be used to crop lines from a HiRise cube. The purpose of 
+    the application is to remove boundary image data for which the 
+    corresponding CK binary file data is missing or discontiuous. The user may
+    choose from one of 4 options for determining where to crop the image.
+    <ul>
+      <li>The CK file provided by the user.</li>
+      <li>A jitter analysis file provided by the user.</li>
+      <li>A user entered start and stop times.</li>
+      <li>A user entered start line and number of lines.</li>
+    </ul>
+    
+    After the crop area is chosen, the program will first verify that the start
+    and stop times lie within the input cube.  If not, the values will be cropped
+    further, to the nearest time that contained within the cube data. 
+    The program will also verify that the crop area lies entirely within the 
+    coverage area of the given camera kernel. If it does not, an error message 
+    will be thrown to alert the user that the provided source for finding the 
+    crop boundaries is invalid.
+  </description>
+
+  <category>
+    <categoryItem>Trim and Mask</categoryItem>
+  </category>
+
+  <history>
+    <change name="Jeannie Backer" date="2012-11-21">
+      Original version
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input HiRISE cube.
+        </brief>
+        <description>
+  	      The HiRISE cube which will be cropped.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+      
+      <parameter name="CK">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <defaultPath>$mro/kernels/ck</defaultPath>
+        <brief>Input CK file</brief>
+        <description>
+  	      The camera kernel file that will be used to spiceinit the cube. This 
+          parameter is required to validate that the chosen crop area is covered 
+          in the CK kernel. It is also the default method to determine the crop 
+          area, if no other crop boundary source is chosen.
+        </description>
+        <filter>*.bc</filter>
+      </parameter>
+
+      <parameter name="SCLK">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <internalDefault>Use latest MRO SCLK file</internalDefault>
+        <defaultPath>$mro/kernels/sclk</defaultPath>
+        <brief>Input SCLK file</brief>
+        <description>
+          The spacecraft clock kernel file for the given cube. This parameter
+          is required to find the true spacecraft clock counts and ephemeris
+          times associated with the cube. The default is the highest version
+          found in the mro sclk directory.
+        </description>
+        <filter>*.tsc</filter>
+      </parameter>
+
+      <parameter name="LSK">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <internalDefault>Use latest LSK file</internalDefault>
+        <defaultPath>$base/kernels/lsk</defaultPath>
+        <brief>Input LSK file</brief>
+        <description>
+  	      The leapsecond file for the given cube. This parameter is required to
+          find the spacecraft clock counts and ephemeris times. The default is
+          the highest version found in the base lsk directory.
+        </description>
+        <filter>*.tls</filter>
+      </parameter>
+
+      <parameter name="JITTER">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>Input jitter analysis file</brief>
+        <description>
+          Ascii table of pixel offsets representing jitter errors in the camera
+          pointing for a given time. The table has three columns:  sampleOffset,
+          lineOffset, and ephemerisTimeSeconds.  The user may choose this file 
+          as the crop boundary source. In that case, SOURCE=JITTER must also be
+          entered. When the jitter analsis file is used, the program will find 
+          earliest and latest times in the file that do not have sample and line
+          offsets that both equal zero. If any other SOURCE value is chosen, 
+          this file should not be entered by the user.
+        </description>
+        <filter>*.txt</filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>Output cube</brief>
+        <description>
+          The cropped output cube containing a sub-area of the input cube.
+        </description>
+        <filter>*.cub</filter>
+      </parameter>
+    </group>
+
+    <group name="Options">
+      <parameter name="SOURCE">
+        <type>string</type>
+        <default><item>CK</item></default>
+        <brief>The source of the crop boundary.</brief>
+        <description>
+          This option determines how the boundaries of the cropped cube will 
+          be chosen.
+        </description>
+        <list>
+          <option value="CK">
+            <brief>Use the CK file to find crop boundaries.</brief>
+            <description>
+              Keep all lines in the cube that correspond to times that lie 
+              entirely within the coverage area of the given camera kernel. 
+              If this option is chosen, then JITTER, STARTTIME, STOPTIME, LINE,
+              and NLINES should not be entered.
+            </description>
+            <exclusions>
+              <item>JITTER</item>
+              <item>STARTTIME</item>
+              <item>STOPTIME</item>
+              <item>LINE</item>
+              <item>NLINES</item>
+            </exclusions>
+          </option>
+          <option value="JITTERFILE">
+            <brief>Use a jitter analysis file to find crop boundaries.</brief>
+            <description>
+              Keep all lines in the cube that correspond to times that lie 
+              entirely between the first and last times in the jitter file.
+              If one of these times has sample and line offsets both equal to 0, 
+              then the time value is skipped and the next time in the table is 
+              used. If this option is chosen, then JITTER should also be 
+              entered and STARTTIME, STOPTIME, LINE, and NLINES should not be 
+              entered.
+            </description>
+            <exclusions>
+              <item>STARTTIME</item>
+              <item>STOPTIME</item>
+              <item>LINE</item>
+              <item>NLINES</item>
+            </exclusions>
+          </option>
+          <option value="TIME">
+            <brief>Enter start/stop times to find crop boundaries.</brief>
+            <description>
+              Keep all lines in the cube that correspond to times that lie 
+              entirely between the given start and stop times. If this option 
+              is chosen, then STARTTIME and STOPTIME should also be entered 
+              and JITTER, LINE, and NLINES should not be entered.
+            </description>
+            <exclusions>
+              <item>JITTER</item>
+              <item>LINE</item>
+              <item>NLINES</item>
+            </exclusions>
+          </option>
+          <option value="LINEVALUES">
+            <brief>Enter line values to find crop boundaries.</brief>
+            <description>
+              Keep all lines in the cube from LINE to (NLINES-LINE+1). If this 
+              option is chosen, then LINE and NLINES should also be entered 
+              and JITTER, STARTTIME, and STOPTIME should not be entered.
+            </description>
+            <exclusions>
+              <item>JITTER</item>
+              <item>STARTTIME</item>
+              <item>STOPTIME</item>
+            </exclusions>
+          </option>
+        </list>
+      </parameter>
+
+      <parameter name="STARTTIME">
+        <type>double</type>
+        <brief>ET for the starting line of the cropped cube.</brief>
+        <description>
+          The earliest time that will be kept in the cropped cube. This is the 
+          initial start time for the cropped cube. If it does not correspond to
+          the beginning of a line, the start time of the cropped cube will be 
+          the time corresponding to the beginning of the next line in the input
+          cube. This parameter should only be entered if SOURCE=TIME. If any 
+          other SOURCE value is chosen, this value should not be entered by the 
+          user.
+        </description>
+        <inclusions>
+          <item>STOPTIME</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="STOPTIME">
+        <type>double</type>
+        <brief>ET corresponding to the ending line of the cropped cube.</brief>
+        <description>
+          The latest time that will be kept in the cropped cube. This is the 
+          initial stop time for the cropped cube. If it does not correspond to
+          the end of a line, the stop time of the cropped cube will be 
+          the time corresponding to the end of the previous line in the input
+          cube. This parameter should only be entered if SOURCE=TIME. If any 
+          other SOURCE value is chosen, this value should not be entered by the 
+          user.
+        </description>
+        <inclusions>
+          <item>STARTTIME</item>
+        </inclusions>
+      </parameter>
+      <parameter name="LINE">
+        <minimum inclusive="yes">1</minimum>
+        <type>integer</type>
+        <brief>First line to be kept in the cropped cube.</brief>
+        <description>
+          The line number of the input cube that will be the first line of the 
+          cropped cube. This parameter should only be entered if 
+          SOURCE=LINEVALUES. If any other SOURCE value is chosen, this value 
+          should not be entered by the user.
+        </description>
+        <inclusions>
+          <item>NLINES</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="NLINES">
+        <type>integer</type>
+        <minimum inclusive="yes">1</minimum>
+        <brief>Number of lines to be kept in the cropped cube.</brief>
+        <description>
+          The number of lines that will be taken from the input cube. The last
+          line to be kept from the input cube is found by (NLINES - LINE + 1).
+          If this end line is greater than the number of lines in the input
+          cube, then the number of lines kept will be modified so that the 
+          end line calculation equals the number of lines in the input cube.
+          This parameter should only be entered if SOURCE=LINEVALUES. If any 
+          other SOURCE value is chosen, this value should not be entered by the 
+          user.
+        </description>
+        <inclusions>
+          <item>LINE</item>
+        </inclusions>
+      </parameter>
+
+    </group>
+
+  </groups>
+
+</application>

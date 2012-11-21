@@ -511,8 +511,8 @@ Buffer Size:  126 1 1
   Current sample, line, band is:  1 50 1
 
 Testing errors ... 
-**PROGRAMMER ERROR** Invalid value for argument [line].
+**PROGRAMMER ERROR** LineManager is unable to set the line to [0]. Minimum line value is 1.
 
 Testing errors ... 
-**PROGRAMMER ERROR** Invalid value for argument [band].
+**PROGRAMMER ERROR** LineManager is unable to set the line for band [0]. Minimum band value is 1.
 
