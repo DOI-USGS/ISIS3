@@ -143,8 +143,19 @@ void IsisMain() {
           string msg = "[" + ui.GetFileName("FROM") + "] is not a line scan camera";
           throw IException(IException::User, msg, _FILEINFO_);
         }
-        // Pull out the pointing cache as a table and write it
+        // Write out the pointing cache as a table
         cube.write(cmatrix);
+
+        // Write out the new instrument pointing table
+        Isis::PvlGroup kernels = cube.getLabel()->FindGroup("Kernels", Isis::Pvl::Traverse);
+
+        // Save original kernels in keyword before changing to "Table" in the kernels group
+        PvlKeyword origCk = kernels["InstrumentPointing"];
+        kernels["InstrumentPointing"] = "Table";
+
+        for (int i = 0;  i < origCk.Size();  i++) {
+           kernels["InstrumentPointing"].AddValue(origCk[i]);
+        }
         cube.putGroup(kernels);
         cube.close();
         gp += PvlKeyword("Status" + IString(ifile), list[ifile].toString() + ":  camera pointing updated");

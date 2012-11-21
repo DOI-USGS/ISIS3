@@ -44,6 +44,10 @@
     <change name="Debbie A. Cook" date="2012-07-06">
        Updated Spice members to be more compliant with Isis coding standards. References #972.
     </change>
+    <change name="Debbie A. Cook" date="2012-10-25">
+      Fixed Kernels group to include the original kernels listed for the InstrumentPointing kernels 
+      after the Table value.
+    </change>
    </history>
 
   <groups>

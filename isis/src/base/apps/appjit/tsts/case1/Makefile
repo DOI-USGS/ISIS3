@@ -16,4 +16,5 @@ commands:
 	tabledump from=$(OUTPUT)/PSP_007556_2010_RED5.balance.cropped.cub \
 	name=InstrumentPointing \
 	to=$(OUTPUT)/red5.instrumentPointing.csv > /dev/null;
+	catlab from=$(OUTPUT)/PSP_007556_2010_RED5.balance.cropped.cub > $(OUTPUT)/red5.pvl
 	$(RM) $(OUTPUT)/PSP_007556_2010_RED4.balance.cropped.cub $(OUTPUT)/PSP_007556_2010_RED5.balance.cropped.cub from.lis print.prt > /dev/null;
