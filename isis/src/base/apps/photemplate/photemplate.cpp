@@ -570,29 +570,39 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
   }
   //Lunar Lambert Empirical and Minnaert Empirical Photometric Models
   else if (phtName == "LUNARLAMBERTEMPIRICAL" || phtName == "MINNAERTEMPIRICAL") {
+    int phaselistsize = 0;
+    int phasecurvelistsize = 0;
+    int llistsize = 0;
+    int klistsize = 0;
     if (ui.WasEntered("PHASELIST")) {
       PvlKeyword phaseListKey("PHASELIST");
       OutputKeyValue(phaseListKey, ui.GetString("PHASELIST"));
       outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
              AddKeyword(phaseListKey, Pvl::Replace);
+      phaselistsize = phaseListKey.Size();
     } else {
       if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     HasKeyword("PHASELIST")) {
         string message = "The " + phtName + " Photometric model requires a value for the PHASELIST parameter.";
         throw IException(IException::User, message, _FILEINFO_);
       }
+      phaselistsize = outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+                      FindKeyword("PHASELIST").Size();
     }
     if (ui.WasEntered("PHASECURVELIST")) {
       PvlKeyword phCurveListKey("PHASECURVELIST");
       OutputKeyValue(phCurveListKey, ui.GetString("PHASECURVELIST"));
       outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
              AddKeyword(phCurveListKey, Pvl::Replace);
+      phasecurvelistsize = phCurveListKey.Size();
     } else {
       if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                   HasKeyword("PHASECURVELIST")) {
         string message = "The " + phtName + " Photometric model requires a value for the PHASECURVELIST parameter.";
         throw IException(IException::User, message, _FILEINFO_);
       }
+      phasecurvelistsize = outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+                           FindKeyword("PHASECURVELIST").Size();
     }
     if (phtName == "LUNARLAMBERTEMPIRICAL") {
       if (ui.WasEntered("LLIST")) {
@@ -600,12 +610,21 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
         OutputKeyValue(lListKey, ui.GetString("LLIST"));
         outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                AddKeyword(lListKey, Pvl::Replace);
+        llistsize = lListKey.Size();
       } else {
         if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     HasKeyword("LLIST")) {
           string message = "The " + phtName + " Photometric model requires a value for the LLIST parameter.";
           throw IException(IException::User, message, _FILEINFO_);
         }
+        llistsize = outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+                    FindKeyword("LLIST").Size();
+      }
+      if (llistsize != phaselistsize || llistsize != phasecurvelistsize) {
+        string message = "The " + phtName + " Photometric model requires that the LLIST, ";
+        message += "PHASELIST, and PHASECURVELIST  parameters all have the same number of ";
+        message += "entries.";
+        throw IException(IException::User, message, _FILEINFO_);
       }
     } else {
       if (ui.WasEntered("KLIST")) {
@@ -613,12 +632,21 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
         OutputKeyValue(kListKey, ui.GetString("KLIST"));
         outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                AddKeyword(kListKey, Pvl::Replace);
+        klistsize = kListKey.Size();
       } else {
         if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     HasKeyword("KLIST")) {
           string message = "The " + phtName + " Photometric model requires a value for the KLIST parameter.";
           throw IException(IException::User, message, _FILEINFO_);
         }
+        klistsize = outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+                    FindKeyword("KLIST").Size();
+      }
+      if (klistsize != phaselistsize || klistsize != phasecurvelistsize) {
+        string message = "The " + phtName + " Photometric model requires that the KLIST, ";
+        message += "PHASELIST, and PHASECURVELIST  parameters all have the same number of ";
+        message += "entries.";
+        throw IException(IException::User, message, _FILEINFO_);
       }
     }
   }
