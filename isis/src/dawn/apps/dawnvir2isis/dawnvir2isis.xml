@@ -21,19 +21,23 @@
     <change name="Janet Barrett" date="2010-11-15">
       Added capability to read detached labels
     </change>
-      <change name="Kris Becker" date="2011-03-09">
-          Updated documentation
-      </change>
-     <change name="Kris Becker" date="2011-03-14">
-          Removed HorixontalPixelScale and VerticalPixelScale compliancy test; 
-          Added optional TARGET parameter to allow TargetName specification 
-     </change>
-     <change name="Kris Becker" date="2011-06-29">
-          Added ingestion of PDS table data file for camera model support
-     </change>
-     <change name="Kris Becker" date="2011-10-02">
-          Updated documentation.
-     </change>
+    <change name="Kris Becker" date="2011-03-09">
+      Updated documentation
+    </change>
+    <change name="Kris Becker" date="2011-03-14">
+      Removed HorixontalPixelScale and VerticalPixelScale compliancy test; 
+      Added optional TARGET parameter to allow TargetName specification 
+    </change>
+    <change name="Kris Becker" date="2011-06-29">
+      Added ingestion of PDS table data file for camera model support
+    </change>
+    <change name="Kris Becker" date="2011-10-02">
+      Updated documentation.
+    </change>
+    <change name="Jeannie Backer" date="2012-11-21">
+      Change call to ImportPdsTable method from importTable() to 
+      exportAsTable(). References #700.
+    </change>
   </history>
 
   <category>

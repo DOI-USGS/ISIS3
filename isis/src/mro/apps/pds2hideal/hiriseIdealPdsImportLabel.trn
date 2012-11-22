@@ -1,0 +1,342 @@
+############################# To Instrument Group #############################
+
+Group = SpacecraftName
+  Auto
+  InputKey       = SPACECRAFT_NAME
+  InputPostion   = ROOT
+  OutputName     = SpacecraftName 
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (IdealSpacecraft, *)
+End_Group
+
+Group = InstrumentId
+  Auto
+  InputKey       = INSTRUMENT_ID
+  InputPostion   = ROOT
+  OutputName     = InstrumentId 
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (IdealCamera, *)
+End_Group
+
+Group = TargetName
+  Auto
+  InputKey       = TARGET_NAME 
+  InputKey       = TargetName
+  InputPostion   = ROOT
+  OutputName     = TargetName
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SampleDetectors
+  Auto
+  InputKey       = SAMPLE_DETECTORS
+  InputKey       = SampleDetectors
+  InputPostion   = ROOT
+  OutputName     = SampleDetectors
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = LineDetectors
+  Auto
+  InputKey       = LINE_DETECTORS
+  InputKey       = LineDetectors
+  InputPostion   = ROOT
+  OutputName     = LineDetectors
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = InstrumentType
+  Auto
+  InputKey       = INSTRUMENT_TYPE
+  InputKey       = InstrumentType
+  InputPostion   = ROOT
+  OutputName     = InstrumentType
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FocalLength
+  Auto
+  Optional
+  InputKey       = FOCAL_LENGTH
+  InputKey       = FocalLength
+  InputPostion   = ROOT
+  OutputName     = FocalLength
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = PixelPitch
+  Auto
+  Optional
+  InputKey       = PIXEL_PITCH
+  InputKey       = PixelPitch
+  InputPostion   = ROOT
+  OutputName     = PixelPitch
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = EphemerisTime
+  Auto
+  InputKey       = EPHEMERIS_TIME 
+  InputKey       = EphemerisTime
+  InputPostion   = ROOT
+  OutputName     = EphemerisTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StartTime
+  Auto
+  InputKey       = START_TIME
+  InputGroup     = TIME_PARAMETERS
+  InputPosition  = TIME_PARAMETERS
+  OutputName     = StartTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = StopTime
+  Auto
+  InputKey       = STOP_TIME
+  InputGroup     = TIME_PARAMETERS
+  InputPosition  = TIME_PARAMETERS
+  OutputName     = StopTime
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = FocalPlaneXDependency
+  Auto
+  InputKey       = FOCAL_PLANE_X_DEPENDENCY
+  InputKey       = FocalPlaneXDependency
+  InputPostion   = ROOT
+  OutputName     = FocalPlaneXDependency
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (1, SAMPLE)
+  Translation    = (2, LINE)
+End_Group
+
+Group = TransX
+  Auto
+  InputKey       = TRANS_X
+  InputKey       = TransX
+  InputPostion   = ROOT
+  OutputName     = TransX
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = TransY
+  Auto
+  InputKey       = TRANS_Y
+  InputKey       = TransY
+  InputPostion   = ROOT
+  OutputName     = TransY
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ExposureDuration
+  Auto
+  InputKey       = EXPOSURE_DURATION
+  InputKey       = ExposureDuration
+  InputPostion   = ROOT
+  OutputName     = ExposureDuration
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = MatchedCube
+  Auto
+  InputKey       = MATCHED_CUBE 
+  InputKey       = MatchedCube
+  InputPostion   = ROOT
+  OutputName     = MatchedCube
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+
+Group = ImageJitterCorrected
+  Auto
+  InputKey       = IMAGE_JITTER_CORRECTED 
+  InputKey       = ImageJitterCorrected
+  InputPostion   = ROOT
+  OutputName     = ImageJitterCorrected
+  OutputPosition = (Object, IsisCube, Group, Instrument)
+  Translation    = (*, *)
+End_Group
+############################## To Archive Group ##############################
+# these are handled in default translation file 
+# Group = DataSetId
+# Group = ProducerId
+# Group = ObservationId
+# Group = ProductId
+# Group = ProductVersionId
+# Group = RationaleDesc
+# Group = OrbitNumber
+
+Group = ObservationStartTime
+  Auto
+  InputKey       = MRO:OBSERVATION_START_TIME
+  InputKey       = MRO:ObservationStartTime
+  InputGroup     = TIME_PARAMETERS
+  InputPosition  = TIME_PARAMETERS
+  OutputName     = ObservationStartTime
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+Group = SourceProductId
+  Auto
+  InputKey       = SOURCE_PRODUCT_ID
+  InputKey       = SourceProductId
+  InputPosition  = ROOT
+  OutputName     = SourceProductId
+  OutputPosition = (Object, IsisCube, Group, Archive)
+  Translation    = (*, *)
+End_Group
+
+############################## To BandBin Group ##############################
+# calculated by process program
+############################## To Kernels Group ##############################
+## moved this to application
+############################# To AlphaCube Group #############################
+## moved this to application
+###################### To RadiometricCalibration Group #######################
+## no keywords saved off for this group
+########################## To OriginalInstrument Group #######################
+Group = OriginalSpacecraftName
+  Auto
+  InputKey       = SPACECRAFT_NAME
+  InputPostion   = ROOT
+  OutputName     = SpacecraftName 
+  OutputPosition = (Object, IsisCube, Group, OriginalInstrument)
+  Translation    = ("MARS RECONNAISSANCE ORBITER", *)
+End_Group
+
+Group = OriginalInstrumentId
+  Auto
+  InputKey       = INSTRUMENT_ID
+  InputPostion   = ROOT
+  OutputName     = InstrumentId 
+  OutputPosition = (Object, IsisCube, Group, OriginalInstrument)
+  Translation    = (HIRISE, *)
+End_Group
+
+Group = OriginalTargetName
+  Auto
+  InputKey       = TARGET_NAME 
+  InputKey       = TargetName
+  InputPostion   = ROOT
+  OutputName     = TargetName
+  OutputPosition = (Object, IsisCube, Group, OriginalInstrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStartCount 
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_START_COUNT
+  InputKey       = SpacecraftClockStartCount
+  InputGroup     = TIME_PARAMETERS
+  InputPosition  = TIME_PARAMETERS
+  OutputName     = SpacecraftClockStartCount
+  OutputPosition = (Object, IsisCube, Group, OriginalInstrument)
+  Translation    = (*, *)
+End_Group
+
+Group = SpacecraftClockStopCount
+  Auto
+  InputKey       = SPACECRAFT_CLOCK_STOP_COUNT
+  InputKey       = SpacecraftClockStopCount
+  InputGroup     = TIME_PARAMETERS
+  InputPosition  = TIME_PARAMETERS
+  OutputName     = SpacecraftClockStopCount
+  OutputPosition = (Object, IsisCube, Group, OriginalInstrument)
+  Translation    = (*, *)
+End_Group
+
+Group = MissionPhaseName
+  Auto
+  InputKey       = MISSION_PHASE_NAME
+  InputKey       = MissionPhaseName
+  InputPosition  = ROOT
+  OutputName     = MissionPhaseName
+  OutputPosition = (Object, IsisCube, Group, OriginalInstrument)
+  Translation    = (*, *)
+End_Group
+
+
+############################ To NaifKeyword Object ############################
+# Keywords that come from the ROOT of the PDS label
+# and go into the NaifKeywords Object of the Isis label
+
+# moved BODY499_RADII to application
+Group = BODY_FRAME_CODE
+  Auto
+  InputKey       = BODY_FRAME_CODE
+  InputPostion   = ROOT
+  OutputName     = BODY_FRAME_CODE
+  OutputPosition = (Object, NaifKeywords)
+  Translation    = (*, *)
+End_Group
+
+Group = IDEAL_FOCAL_LENGTH
+  Auto
+  InputKey       = IDEAL_FOCAL_LENGTH
+  InputPostion   = ROOT
+  OutputName     = IDEAL_FOCAL_LENGTH
+  OutputPosition = (Object, NaifKeywords)
+  Translation    = (*, *)
+End_Group
+
+Group = IDEAL_PIXEL_PITCH
+  Auto
+  InputKey       = IDEAL_PIXEL_PITCH
+  InputPostion   = ROOT
+  OutputName     = IDEAL_PIXEL_PITCH
+  OutputPosition = (Object, NaifKeywords)
+  Translation    = (*, *)
+End_Group
+
+Group = IDEAL_TRANSX
+  Auto
+  InputKey       = IDEAL_TRANSX
+  InputPostion   = ROOT
+  OutputName     = IDEAL_TRANSX
+  OutputPosition = (Object, NaifKeywords)
+  Translation    = (*, *)
+End_Group
+
+Group = IDEAL_TRANSY
+  Auto
+  InputKey       = IDEAL_TRANSY
+  InputPostion   = ROOT
+  OutputName     = IDEAL_TRANSY
+  OutputPosition = (Object, NaifKeywords)
+  Translation    = (*, *)
+End_Group
+
+Group = IDEAL_TRANSL
+  Auto
+  InputKey       = IDEAL_TRANSL
+  InputPostion   = ROOT
+  OutputName     = IDEAL_TRANSL
+  OutputPosition = (Object, NaifKeywords)
+  Translation    = (*, *)
+End_Group
+
+Group = IDEAL_TRANSS
+  Auto
+  InputKey       = IDEAL_TRANSS
+  InputPostion   = ROOT
+  OutputName     = IDEAL_TRANSS
+  OutputPosition = (Object, NaifKeywords)
+  Translation    = (*, *)
+End_Group
+End
+

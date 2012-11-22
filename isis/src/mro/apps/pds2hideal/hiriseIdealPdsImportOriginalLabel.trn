@@ -1,0 +1,124 @@
+Group = PRODUCER_INSTITUTION_NAME
+  Auto
+  InputKey       = PRODUCER_INSTITUTION_NAME
+  InputKey       = ProducerInstitutionName
+  InputGroup     = OriginalLabelObject
+  InputPosition  = OriginalLabelObject
+  OutputName     = PRODUCER_INSTITUTION_NAME
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = PRODUCER_ID
+  Auto
+  InputKey       = PRODUCER_ID
+  InputKey       = ProducerId
+  InputGroup     = OriginalLabelObject
+  InputPosition  = OriginalLabelObject
+  OutputName     = PRODUCER_ID
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = PRODUCER_FULL_NAME
+  Auto
+  InputKey       = PRODUCER_FULL_NAME
+  InputKey       = ProducerFullName
+  InputGroup     = OriginalLabelObject
+  InputPosition  = OriginalLabelObject
+  OutputName     = PRODUCER_FULL_NAME
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = OBSERVATION_ID
+  Auto
+  InputKey       = OBSERVATION_ID
+  InputKey       = ObservationId
+  InputGroup     = OriginalLabelObject
+  InputPosition  = OriginalLabelObject
+  OutputName     = OBSERVATION_ID
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_HOST_NAME
+  Auto
+  InputKey       = INSTRUMENT_HOST_NAME
+  InputGroup     = OriginalLabelObject
+  InputPosition  = OriginalLabelObject
+  OutputName     = INSTRUMENT_HOST_NAME
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_HOST_ID
+  Auto
+  InputKey       = INSTRUMENT_HOST_ID
+  InputGroup     = OriginalLabelObject
+  InputPosition  = OriginalLabelObject
+  OutputName     = INSTRUMENT_HOST_ID
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_NAME
+  Auto
+  InputKey       = INSTRUMENT_NAME
+  InputGroup     = OriginalLabelObject
+  InputPosition  = OriginalLabelObject
+  OutputName     = INSTRUMENT_NAME
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_ID
+  Auto
+  InputKey       = INSTRUMENT_ID
+  InputGroup     = OriginalLabelObject
+  InputPosition  = OriginalLabelObject
+  OutputName     = INSTRUMENT_ID
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = MISSION_PHASE_NAME
+  Auto
+  InputKey       = MISSION_PHASE_NAME
+  InputGroup     = OriginalLabelObject
+  InputPosition  = OriginalLabelObject
+  OutputName     = MISSION_PHASE_NAME
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = ORBIT_NUMBER
+  Auto
+  InputKey       = ORBIT_NUMBER
+  InputGroup     = OriginalLabelObject
+  InputPosition  = OriginalLabelObject
+  OutputName     = ORBIT_NUMBER
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = RATIONALE_DESC
+  Auto
+  InputKey       = RATIONALE_DESC
+  InputGroup     = OriginalLabelObject
+  InputPosition  = OriginalLabelObject
+  OutputName     = RATIONALE_DESC
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = MRO:OBSERVATION_START_TIME
+  Auto
+  InputKey       = MRO:OBSERVATION_START_TIME
+  InputGroup     = "OriginalLabelObject,TIME_PARAMETERS"
+  InputPosition  = (OriginalLabelObject, TIME_PARAMETERS)
+  OutputName     = MRO:OBSERVATION_START_TIME
+  OutputPosition = (Group, TIME_PARAMETERS)
+  Translation    = (*, *)
+End_Group
+End

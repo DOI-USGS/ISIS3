@@ -43,39 +43,51 @@ using namespace std;
 namespace Isis {
 
 
-  /** Default constructor */
+  /** 
+   * Default constructor. This constructor initializes the PDS table name to 
+   * TABLE.
+   *
+   * If this constructor is used, the load() method will need to be called to
+   * set the PDS label file.
+   *
+   * This constructor may be used for ASCII or BINARY PDS tables.
+   */
   ImportPdsTable::ImportPdsTable() {
     // just inititalize the member variables
     init();
+    m_tableName = "TABLE";
   }
 
   /**
-   * @brief Constructor accepts the name of the label file
+   * @brief This constructor automatically loads the given label and table files.
    *
-   * This constructor takes the name of the label file describing the PDS table.
-   * It will extract the description of the columns and the name of the table 
-   * data file.  The table data file is also read and internalized.
+   * This constructor takes the name of the label file describing the PDS 
+   * table, the table data file name, and the name of the PDS table object.  
+   * It will extract the description of the columns and read the contents of the 
+   * table data file.
    *
-   * @param labfile Name of table label file
+   * If no table file is given or an empty string is given for the table file, 
+   * the table location will be read from the label file.
+   *
+   * If no table name is given, the default name for the object is TABLE.
+   *
+   * This constructor may be used for ASCII or BINARY PDS tables.
+   *
+   * @param pdsLabFile Name of table label file
+   * @param pdsTableFile Name of table data file
+   * @param pdsTableName The name of the table object in the PDS file.
    */
-  ImportPdsTable::ImportPdsTable(const std::string &labfile) {
-    string tblfile;
-    load(labfile, tblfile);
+  ImportPdsTable::ImportPdsTable(const std::string &pdsLabFile,
+                                 const std::string &pdsTableFile,
+                                 const std::string &pdsTableName) {
+    m_tableName = QString::fromStdString(pdsTableName);
+    load(pdsLabFile, pdsTableFile);
   }
 
   /**
-   * @brief Constructor automatically loads the label and table files 
-   *
-   * This constructor takes the name of the label file describing the PDS table
-   * and the table data file name.  It will extract the description of the 
-   * columns and read the contents of the table data file.
-   *
-   * @param labfile Name of table label file
-   * @param tabfile Name of table data file
-   */
-  ImportPdsTable::ImportPdsTable(const std::string &labfile,
-                                 const std::string &tabfile) {
-    load(labfile, tabfile);
+   * Destructs the ImportPdsTable object.
+   */ 
+  ImportPdsTable::~ImportPdsTable() {
   }
 
   /**
@@ -83,35 +95,80 @@ namespace Isis {
    *
    * This method will load a PDS table dataset using a label file describing the
    * contents of the table data.  The caller can provide the table data file,
-   * otherwise, the name of the table data file is extracted from label in the
-   * ^TABLE keyword.  The table data is then loaded.
+   * otherwise, the location of the table data is extracted from the ^TABLE_NAME
+   * keyword in the provided labels.  The table data is then loaded.
    *
-   * when this method is invoked, the current contents of the object are
+   * This method needs to be called if the default constructor is used. 
+   * Otherwise, it is invoked in the constructor that takes the label, table 
+   * file, and table name. This method may be used to overwrite the label and 
+   * table file used. When it is invoked, the current contents of the object are
    * discarded.
    *
+   * This method is used for ASCII or BINARY PDS tables.
    *
-   * @param labfile Name of table label file
-   * @param tabfile Name of table data file (optional)
+   * @param pdsLabFile Name of PDS table label file
+   * @param pdsTableFile Name of PDS table data file to be imported into Isis 
+   *                (optional)
    */
-  void ImportPdsTable::load(const std::string &labfile,
-                            const std::string &tabfile) {
+  void ImportPdsTable::load(const std::string &pdsLabFile,
+                            const std::string &pdsTableFile) {
 
     init();
-    string tblfile;
-    loadLabel(labfile, tblfile);
-    if (!tabfile.empty()) tblfile = tabfile;
-    loadTable(tblfile);
+    string tempTblFile;
+    loadLabel(pdsLabFile, tempTblFile);
+    if (!pdsTableFile.empty()) tempTblFile = pdsTableFile;
+    //  Vet the table filename.  Many PDS files record the filename in
+    //  uppercase and in practice, the filename is in lowercase.  Do this
+    //  check here.
+    FileName tableFile(tempTblFile);
+    try {
+      int tableStartRecord = tableFile.baseName().ToInteger();
+      tempTblFile = pdsLabFile;
+      m_pdsTableStart = tableStartRecord;
+    }
+    catch (IException &e) {
+      // if we are unable to cast the table file value to an integer, it must be a
+      // file name, not a location in the label file.
+      if (!tableFile.fileExists()) {
+        // if the table file name doesn't exist, try lowercased version...
+        FileName tableFileLowercase(tableFile.path() + "/" 
+                                    + IString(tableFile.name()).DownCase());
+        if (!tableFileLowercase.fileExists()) {
+          IString msg = "Unable to import PDS table.  Neither of the following "
+                        "possible table files were found: [" 
+                        + tableFile.expanded() + "]  or [" 
+                        + tableFileLowercase.expanded() + "]";  
+          throw IException(e, IException::Unknown, msg, _FILEINFO_);
+        }
+        tableFile = tableFileLowercase.expanded();
+        tempTblFile = tableFile.expanded();
+      }
+      m_pdsTableStart = 1;
+    }
+    if (m_pdsTableType == "ASCII") {
+      loadTable(tempTblFile);
+    }
+    m_pdsTableFile = QString::fromStdString(tempTblFile);
     return;
   }
 
-  /** Determine if a named column exists */
+  /** 
+   * This method determines whether the PDS table has a column with the given 
+   * name.
+   *
+   * This method can be called for ASCII or BINARY PDS tables.
+   *
+   * @param colName A string containing the column name.
+   *
+   * @return @b bool Indicates whether the table has the given column.
+   */
   bool ImportPdsTable::hasColumn(const std::string &colName) const {
      return (findColumn(colName) != 0);
   }
 
 
   /**
-   * @brief Return the name of the specifed column
+   * @brief Returns the name of the specifed column
    *
    * This method will return the name of a specified column by index. It also 
    * has the option to format the column name to Camel-Case.  This will remove 
@@ -119,19 +176,22 @@ namespace Isis {
    * consecutive spaces to only one space.  It then removes the spaces 
    * converting the next character to uppercase.
    *
+   * This method can be called for ASCII or BINARY PDS tables.
+   *
    * @param index      Index of colunm name to get.
    * @param formatted  Specifies to convert the name to Camel-Case if true,
    *                   otherwise leave as is in the PDS table.
    *
    * @return std::string Returns the column name as requested
    */
-  std::string ImportPdsTable::getColumnName(const int &index,
+  std::string ImportPdsTable::getColumnName(const unsigned int &index,
                                             const bool &formatted) const {
-    if ((index < 0) || (index >= columns()) ) {
-      ostringstream mess;
-      mess << "Requested column index (" << index
-           << "exceeds numnber of columns (" << columns() << ")";
-      throw IException(IException::Programmer, mess.str(), _FILEINFO_);
+    if ((int) index >= columns() - 1) {
+      QString msg = "Unable to import the binary PDS table [" + m_tableName 
+                    + "] into Isis. The requested column index [" 
+                    + toString((int) index) + "] exceeds the last column index [" 
+                    + toString(columns() - 1) + "]";
+      throw IException(IException::Programmer, msg.toStdString(), _FILEINFO_);
     }
     string name = m_coldesc[index].m_name;
     if (formatted) name = getFormattedName(name);
@@ -147,6 +207,8 @@ namespace Isis {
    * one space. It then removes the spaces converting the next character to
    * uppercase.
    *
+   * This method can be called for ASCII or BINARY PDS tables.
+   *
    * @param formatted  Specifies to convert the name to Camel-Case if true,
    *                   otherwise leave as is in the PDS table.
    *
@@ -155,7 +217,7 @@ namespace Isis {
   std::vector<std::string> ImportPdsTable::getColumnNames(const bool &formatted)
                                                           const {
     vector<string> colnames;
-    for (unsigned int i = 0 ; i < m_coldesc.size() ; i++) {
+    for (int i = 0 ; i < columns() ; i++) {
       string name = m_coldesc[i].m_name;
       if (formatted) name = getFormattedName(name);
       colnames.push_back(name);
@@ -169,6 +231,8 @@ namespace Isis {
    * This method returns the datatype associated with the specfied column.  If 
    * the column does not exist, an empty string is returned.
    *
+   * This method can be called for ASCII or BINARY PDS tables.
+   *
    * @author kbecker (6/27/2011)
    *
    * @param colName      Name of column to get type for
@@ -180,7 +244,7 @@ namespace Isis {
     const ColumnDescr *column = findColumn(colName);
     string dtype("");
     if (column != 0) {
-      dtype = column->m_type;
+      dtype = column->m_dataType;
     }
     return (dtype);
   }
@@ -189,6 +253,8 @@ namespace Isis {
    * @brief Change the datatype for a column
    *
    * This method changes the data type the specified column.
+   *
+   * This method can be called for ASCII or BINARY PDS tables.
    *
    * @author kbecker (6/27/2011)
    *
@@ -200,123 +266,158 @@ namespace Isis {
    * @return bool
    */
   bool ImportPdsTable::setType(const std::string &colName,
-                               const std::string &dtype) {
+                               const std::string &dataType) {
     ColumnDescr *column = findColumn(colName);
     if (column != 0) {
-      column->m_type = IString(dtype).UpCase();
+      column->m_dataType = IString(dataType).UpCase();
     }
     return (column != 0);
   }
 
-
   /**
    * @brief Populate a Table object with the PDS table and return it
    *
-   * This method converts all the PDS table data to an ISIS table.
+   * This method converts PDS table data to an ISIS table.
    *
-   * @param tname Name of table
+   * This method can be called to import ASCII or BINARY PDS tables.
+   *
+   * @param isisTableName Name of table
    *
    * @return Table Table containing PDS table data
    */
-  Table ImportPdsTable::exportAsTable(const std::string &tname) const {
-    TableRecord record = makeRecord(m_coldesc);
-    Table table(tname, record);
-    fillTable(table, m_coldesc, record);
-    return (table);
+  Table ImportPdsTable::importTable(const std::string &isisTableName) {
+    try {
+      TableRecord record = makeRecord(m_coldesc);
+      Table table(isisTableName, record);
+      fillTable(table, m_coldesc, record);
+      return (table);
+    }
+    catch (IException &e) {
+      QString msg = "Unable to import the PDS table [" + m_tableName 
+                    + "] from the PDS file [" + m_pdsTableFile + "] into Isis.";
+      throw IException(e, IException::Unknown, msg.toStdString(), _FILEINFO_);
+    
+    }
   }
 
 
   /**
-   * @brief Populate ISIS Table with specified column(s)
+   * @brief Populate ISIS Table with specified column(s) from ASCII table
    *
    * This method extracts columns specified by the caller in a string.  It is
    * typically used for a single column, but any number of columns can be
    * provided.  colnames is a comma delimited string that contains the name of
    * the columns that will be exported in the table.
+   *  
+   * This method should only be called for ASCII PDS tables. If needed for 
+   * BINARY tables, implementation should be added and tested.
    *
    * @param colNames String containing comma delimited column names to export
-   * @param tname    Name of table to create
+   * @param isisTableName    Name of table to create
    *
    * @return Table  Table containing the specified columns
    */
-  Table ImportPdsTable::exportAsTable(const std::string &colnames,
-                                      const std::string &tname) const {
+  Table ImportPdsTable::importTable(const std::string &colnames,
+                                    const std::string &isisTableName) {
     std::vector<std::string> cols;
     IString::Split(',', colnames, cols);
-    return (exportAsTable(cols, tname));
+    return (importTable(cols, isisTableName));
   }
 
   /**
-   * @brief Populate ISIS Table with specific columns
+   * @brief Populate ISIS Table with specific columns from ASCII table
    *
    * This method extracts columns specified by the caller.  If the requested
    * column does not exist, an exception is thrown.
    *
+   * This method should only be called for ASCII PDS tables. If needed for 
+   * BINARY tables, implementation should be added and tested.
    *
    * @param colNames Vector column names to convert to a table.
-   * @param tname  Name of the table to create.
+   * @param isisTableName  Name of the table to create.
    *
    * @return Table
    */
-  Table ImportPdsTable::exportAsTable(const std::vector<std::string> &colnames,
-                                      const std::string &tname) const {
+  Table ImportPdsTable::importTable(const std::vector<std::string> &colnames,
+                                    const std::string &isisTableName) {
     ColumnTypes ctypes;
     for (unsigned int i = 0 ; i < colnames.size() ; i++) {
       const ColumnDescr *descr = findColumn(colnames[i]);
       if (!descr) {
-        ostringstream mess;
-        mess << "Requested column name (" << colnames[i] << ") does not exist in table";
-        throw IException(IException::Programmer, mess.str(), _FILEINFO_);
+        QString msg = "Unable to import the PDS table [" + m_tableName 
+                      + "] into Isis. The requested column name [" 
+                      + QString::fromStdString(colnames[i]) + "] does not "
+                      "exist in table."; 
+        throw IException(IException::Programmer, msg.toStdString(), _FILEINFO_);
       }
       ctypes.push_back(*descr);
     }
 
     // Create and populate the table
     TableRecord record = makeRecord(ctypes);
-    Table table(tname, record);
+    Table table(isisTableName, record);
     fillTable(table, ctypes, record);
     return (table);
   }
 
-
-  /** Initialize object variables */
+  /** 
+   * Initialize object variables.
+   *
+   * This method is used for ASCII or BINARY PDS tables.
+   */
   void ImportPdsTable::init() {
 
+    m_byteOrder = "";
     m_trows = 0;
+    m_pdsTableStart = 0;
     m_coldesc.clear();
     m_rows.clear();
+    m_pdsTableType = "";
+    m_pdsTableFile = "";
     return;
   }
 
   /**
    * @brief Loads the contents of a PDS table label description
    *
-   * The labfile parameter contains the name of a PDS label describing the
+   * The pdsLabFile parameter contains the name of a PDS label describing the
    * contents of a PDS table data file.  It will be loaded and parsed by this
-   * method. The name of the table data file is returned in the tblfile parameter.
-   * It is not loaded.
+   * method. The name of the table data file is returned in the pdsTableFile 
+   * parameter. It is not loaded.
    *
+   * This method is used for ASCII or BINARY PDS tables.
    *
-   * @param labfile Name of PDS table label description file
-   * @param tblfile Returns the name of the PDS table data
+   * @param pdsLabFile Name of PDS table label description file
+   * @param pdsTableFile Returns the name of the PDS table data
    */
-  void ImportPdsTable::loadLabel(const std::string &labfile, std::string &tblfile) {
+  void ImportPdsTable::loadLabel(const std::string &pdsLabFile, 
+                                 std::string &pdsTableFile) {
 
-    Pvl label(labfile);
+    Isis::Pvl label(pdsLabFile);
 
-    if (!label.HasObject("TABLE")) {
-      std::string msg = "File " + labfile +
-                        " does not have the required TABLE object, probably not"
-                        " a valid PDS table label!";
-      throw IException(IException::User, msg, _FILEINFO_);
+    if (!label.HasObject(m_tableName.toStdString())) {
+      QString msg = "The PDS file " + QString::fromStdString(pdsLabFile) +
+                    " does not have the required TABLE object, ["
+                    + m_tableName +"]. The PDS label file is probably invalid";
+      throw IException(IException::Unknown, msg.toStdString(), _FILEINFO_);
     }
-
-  //  Get some pertinent information from the label
-    PvlObject &tabobj = label.FindObject("TABLE");
-    tblfile = FileName(labfile).path() + "/" + label["^TABLE"][0];
-
+    m_recordBytes = (int) label.FindKeyword("RECORD_BYTES");
+    //  Get some pertinent information from the label
+    PvlObject &tabobj = label.FindObject(m_tableName.toStdString());
+    pdsTableFile = FileName(pdsLabFile).path() + "/" 
+                   + label["^" + m_tableName.toStdString()][0];
     m_trows = (int) tabobj.FindKeyword("ROWS");
     int ncols =  (int) tabobj.FindKeyword("COLUMNS");
+    m_pdsTableType = QString(QString::fromStdString(tabobj.FindKeyword("INTERCHANGE_FORMAT")));//[0];
+    if (m_pdsTableType != "ASCII" && m_pdsTableType.toUpper() != "BINARY") {
+      QString msg = "Unable to import the PDS table [" + m_tableName 
+                    + "] from the PDS file [" 
+                    + QString::fromStdString(pdsTableFile) + "] into Isis. "
+                    "The PDS INTERCHANGE_FORMAT [" + m_pdsTableType
+                    + "] is not supported. Valid values are ASCII or BINARY.";
+      throw IException(IException::User, msg.toStdString(), _FILEINFO_);
+    }
+    m_rowBytes = tabobj.FindKeyword("ROW_BYTES");
 
     m_coldesc.clear();
     PvlObject::PvlObjectIterator colobj = tabobj.BeginObject();
@@ -330,15 +431,15 @@ namespace Isis {
     }
 
     //  Test to ensure columns match the number listed in the label
-    if (ncols != (int) m_coldesc.size()) {
+    if (ncols != columns()) {
       ostringstream msg;
       msg << "Number of columns in the COLUMNS label keyword (" << ncols
            << ") does not match number of COLUMN objects found ("
-           << m_coldesc.size() << ")";
+           << columns() << ")";
   #if 0
       throw iException::Message(iException::Programmer, msg.str(), _FILEINFO_);
   #else
-       cout << msg.str() << "\n";
+       cout << msg.str() << endl;
   #endif
     }
     return;
@@ -353,38 +454,34 @@ namespace Isis {
    *
    * Note that the table label description must already be loaded in this 
    * object. 
+   *
+   * This method is called by the load() method if the PDS file is ASCII.
+   *
    * @see loadLabel().
    *
-   * @param tabfile Name of PDS table data file
+   * @param pdsTableFile Name of PDS table data file
    */
-  void ImportPdsTable::loadTable(const std::string &tabfile) {
+  void ImportPdsTable::loadTable(const std::string &pdsTableFile) {
 
     //  Vet the filename.  Many PDS files record the filename in uppercase and
     //  in practice, the filename is in lowercase.  Do this check here.
-    string tblfile(tabfile);
-    FileName tname(tblfile);
-    if (!tname.fileExists()) {
-      tname =  tname.path() + "/" + IString(tname.name()).DownCase();
-      tblfile = tname.expanded();
-    }
-
-    TextFile tfile(tblfile);
+    string tempTblFile(pdsTableFile);
+    TextFile tfile(tempTblFile);
     string tline;
     m_rows.clear();
     int irow(0);
     while (tfile.GetLine(tline, false)) {
       if (irow >= m_trows) break;
 
-      Columns columns;
-      for (unsigned int i = 0 ; i < m_coldesc.size() ; i++) {
-        columns.push_back(getColumnValue(tline, m_coldesc[i]));
+      Columns cols;
+      for (int i = 0 ; i < columns() ; i++) {
+        cols.push_back(getColumnValue(tline, m_coldesc[i]));
       }
-      m_rows.push_back(columns);
+      m_rows.push_back(cols);
       irow++;
     }
     return;
   }
-
 
   /**
    * @brief Extract a column description from a COLUMN object
@@ -395,20 +492,28 @@ namespace Isis {
    *
    * The keywords NAME, DATA_TYPE, START_BYTE and BYTES must exist.
    *
+   * This method is used for ASCII or BINARY PDS tables.
+   *
    * @param colobj Pvl Object containing column description
    * @param nth    Current column counter
    *
    * @return ImportPdsTable::ColumnType Returns internal struct of column
    *         description
    */
-  ImportPdsTable::ColumnDescr ImportPdsTable::getColumnDescription(PvlObject &colobj,
-                                                                   int nth) const {
+  ImportPdsTable::ColumnDescr ImportPdsTable::getColumnDescription(
+      PvlObject &colobj, int nth) const {
     ColumnDescr cd;
     cd.m_name = colobj["NAME"][0];
     cd.m_colnum = nth;
-    cd.m_type = IString(getGenericType(colobj["DATA_TYPE"][0])).UpCase();
-    cd.m_sbyte = ((int) colobj["START_BYTE"]) - 1;   // 0-based indexing
-    cd.m_nbytes = (int) colobj["BYTES"];
+    if (m_pdsTableType == "ASCII") {
+      cd.m_dataType = IString(getGenericType(colobj["DATA_TYPE"][0])).UpCase();
+    }
+    else {
+      cd.m_dataType = IString(colobj["DATA_TYPE"][0]).UpCase();
+      //cd.m_numBytes = colobj["ITEM_BYTES"];
+    }
+    cd.m_startByte = ((int) colobj["START_BYTE"]) - 1;   // 0-based indexing
+    cd.m_numBytes = (int) colobj["BYTES"];
     return (cd);
   }
 
@@ -419,6 +524,7 @@ namespace Isis {
    * and then checks for the given name - with case insensitivity.  If found, a
    * pointer to the column description is returned, otherwise NULL.
    *
+   * This method can be called for ASCII or BINARY PDS tables.
    *
    * @param colName Name of column to find
    *
@@ -444,6 +550,7 @@ namespace Isis {
    * and then checks for the given name - with case insensitivity.  If found, a
    * pointer to the column description is returned, otherwise NULL.
    *
+   * This method can be called for ASCII or BINARY PDS tables.
    *
    * @param colName Name of column to find
    *
@@ -466,6 +573,7 @@ namespace Isis {
   /**
    * @brief Extracts a column from a string based upon a description
    *
+   * This method should not be called for BINARY PDS tables.
    *
    * @param tline  Row from table data
    * @param cdesc  Column description
@@ -474,7 +582,7 @@ namespace Isis {
    */
   std::string ImportPdsTable::getColumnValue(const std::string &tline,
                                              const ColumnDescr &cdesc) const {
-    return (tline.substr(cdesc.m_sbyte, cdesc.m_nbytes));
+    return (tline.substr(cdesc.m_startByte, cdesc.m_numBytes));
   }
 
   /**
@@ -489,6 +597,8 @@ namespace Isis {
    * Camel case always converts the first character in a string to uppercase. 
    * Any space or '_' character are removed and the following character is 
    * converted to uppercase.  All other characters are converted to lowercase. 
+   *
+   * This method can be called for ASCII or BINARY PDS tables.
    *
    * @param colname Column name to converty
    *
@@ -531,6 +641,8 @@ namespace Isis {
    * For example, if the incoming type is MSB_INTEGER, only INTEGER will be
    * returned.
    *
+   * This method is used for ASCII or BINARY PDS tables.
+   *
    * @param ttype PDS data type to convert
    *
    * @return std::string Generic type found in the data type.
@@ -551,24 +663,33 @@ namespace Isis {
    *
    * All PDS data types that have INTEGER in their type are stored as an Integer
    * field type.  PDS columns with DOUBLE, REAL or FLOAT are stored as Doubles.
-   * All other types are Text types.
+   * All other types are Text types. 
+   *  
+   * This method is called for ASCII or BINARY PDS tables. 
    *
    * @param cdesc Column description to create the TableField from
    *
    * @return TableField Returns a TableField for the column type
    */
-  TableField ImportPdsTable::makeField(const ColumnDescr &cdesc) const {
-    string dtype = cdesc.m_type;
+  TableField ImportPdsTable::makeField(const ColumnDescr &cdesc) {
+    string dtype = cdesc.m_dataType;
     string name = getFormattedName(cdesc.m_name);
-    if ( dtype == "INTEGER" ) {
-      return (TableField(name, TableField::Integer));
+    if (m_pdsTableType == "ASCII") {
+      if ( dtype == "INTEGER" ) {
+        return (TableField(name, TableField::Integer));
+      }
+      else if ( ((dtype == "DOUBLE" ) 
+                 || (dtype == "REAL")
+                 || (dtype == "FLOAT")) ) {
+        return (TableField(name, TableField::Double));
+      }
+      else {
+        return (TableField(name, TableField::Text, cdesc.m_numBytes));
+      }
     }
-    else if ( ((dtype == "DOUBLE" ) ||(dtype == "REAL") || (dtype == "FLOAT")) ) {
-      return (TableField(name, TableField::Double));
+    else {
+      return makeFieldFromBinaryTable(cdesc);
     }
-
-  // All other cases are just text
-    return (TableField(name, TableField::Text, cdesc.m_nbytes));
   }
 
   /**
@@ -579,11 +700,13 @@ namespace Isis {
    * be used to populate the table.  TableFields are added in the order provided 
    * in ctypes. 
    *
+   * This method is called for ASCII or BINARY PDS tables. 
+   *  
    * @param ctypes  Columns to create fields for and add to record
    *
    * @return TableRecord Returns TableRecord of columns/fields
    */
-  TableRecord ImportPdsTable::makeRecord(const ColumnTypes &ctypes) const {
+  TableRecord ImportPdsTable::makeRecord(const ColumnTypes &ctypes) {
     TableRecord rec;
     for (unsigned int i = 0 ; i < ctypes.size() ; i++) {
       TableField field = makeField(ctypes[i]);
@@ -599,18 +722,20 @@ namespace Isis {
    * This routine will extract the column and convert to a TableField with the
    * appropriate type to contain the field.
    *
-   *
-   * @param columns Columns for a given row
-   * @param cdesc   Column description used to create TableField
+   * This method is only called for ASCII PDS tables. 
+   *  
+   * @param cols Columns for a given row
+   * @param cdesc Column description used to create TableField
+   * @param tfield Isis3 TableField used to determine the data type to be imported.
    *
    * @return TableField  Returns the TableField with the value from the column
    */
-  TableField &ImportPdsTable::extract(const Columns &columns,
+  TableField &ImportPdsTable::extract(const Columns &cols,
                                       const ColumnDescr &cdesc,
                                       TableField &tfield) const {
     int ith = cdesc.m_colnum;
     try {
-      IString data(columns[ith]);
+      IString data(cols[ith]);
       if (tfield.isInteger()) {
         data.Trim(" \t\r\n");
         tfield = data.ToInteger();
@@ -626,8 +751,8 @@ namespace Isis {
       }
     }
     catch (IException &e) {
-      string mess = "Conversion failure of column " + cdesc.m_name;
-      throw IException(e, IException::Programmer, mess, _FILEINFO_);
+      string msg = "Conversion failure of column " + cdesc.m_name;
+      throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
 
     return (tfield);
@@ -639,22 +764,22 @@ namespace Isis {
    * This method will create a TableRecord from a list of columns.  The columns
    * are selected from the list of column descriptions parameter.
    *
+   * This method is only called for ASCII PDS tables.
    *
-   * @param columns Row of column data
+   * @param cols Row of column data
    * @param ctypes  List of columns to extract
    * @param record  TableRecord with fields to populate
    *
    * @return TableRecord Record containing extract fields from columns
    */
-  TableRecord &ImportPdsTable::extract(const Columns &columns,
+  TableRecord &ImportPdsTable::extract(const Columns &cols,
                                        const ColumnTypes &ctypes,
                                        TableRecord &record) const {
     for (unsigned int i = 0 ; i < ctypes.size() ; i++) {
-      extract(columns, ctypes[i], record[i]);
+      extract(cols, ctypes[i], record[i]);
     }
     return (record);
   }
-
 
   /**
    * @brief Fill the ISIS Table object with PDS table data
@@ -662,31 +787,243 @@ namespace Isis {
    * This method populates the ISIS Table object with selected PDS table data
    * fields.
    *
+   * This method is used for ASCII or BINARY PDS tables.
+   *  
    * @param table   ISIS Table object to populate
-   * @param columns PDS Column map to extract data
+   * @param cols PDS Column map to extract data
    * @param record  ISIS TableRecord with fields to contain PDS columns
    */
-  void ImportPdsTable::fillTable(Table &table, const ColumnTypes &columns,
+  void ImportPdsTable::fillTable(Table &table, const ColumnTypes &cols,
                                  TableRecord &record) const {
-    for (unsigned int i = 0 ; i < m_rows.size() ; i++) {
-      try {
-        table += extract(m_rows[i], columns, record);
+    if (m_pdsTableType == "ASCII") {
+      for (unsigned int i = 0 ; i < m_rows.size() ; i++) {
+        try {
+          table += extract(m_rows[i], cols, record);
+        }
+        catch (IException &e) {
+          string msg = "Failed to convert data in row [" + IString((int) i) + "]";
+          throw IException(e, IException::Programmer, msg, _FILEINFO_);
+        }
       }
-      catch (IException &e) {
-        string mess = "Failed to convert data in row " + IString((int) i);
-        throw IException(e, IException::Programmer, mess, _FILEINFO_);
+    }
+    else {
+      string tempTblFile = m_pdsTableFile.toStdString();
+      ifstream pdsFileStream(tempTblFile.c_str(), ifstream::binary);
+      if (!pdsFileStream) {
+        IString msg = "Unable to open file containing PDS table [" 
+                      + tempTblFile + "].";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
+      }
+      // read and discard the rows above the table data
+      char *rowBuffer = new char[m_recordBytes];
+      for (int i = 1; i < m_pdsTableStart; i++) {
+        pdsFileStream.read(rowBuffer, m_recordBytes);
+      }
+      delete [] rowBuffer;
+      rowBuffer = NULL;
+      // now, import and add the records to the table
+      for (int rowIndex = 0; rowIndex < m_trows; rowIndex++) {
+        rowBuffer = new char[m_recordBytes];
+        pdsFileStream.read(rowBuffer, m_recordBytes);
+        TableRecord rec = extractBinary(rowBuffer, record);
+        table += rec;
+  //      TableRecord rec = extractBinary(pdsFileStream, record);
+        delete [] rowBuffer;
+        rowBuffer = NULL;
       }
     }
     return;
   }
 
+  /**
+   * Returns the number of columns in the table.
+   *
+   * This method can be called for ASCII or BINARY PDS tables.
+   *
+   * @return The number of columns.
+   */
   int ImportPdsTable::columns() const { 
     return (m_coldesc.size()); 
   }
 
+  /**
+   * Returns the number of rows in the table.
+   *
+   * This method can be called for ASCII or BINARY PDS tables.
+   *
+   * @return The number of rows.
+   */
   int ImportPdsTable::rows() const { 
     return (m_rows.size()); 
   }
+
+  /** 
+   * This method is used to set the field values for the given record. These 
+   * values are extracted from the given binary buffer containing the PDS 
+   * table data for the corresponding row. 
+   *  
+   * This method is only called for BINARY PDS tables. 
+   *  
+   * @param rowBuffer Buffer containing the binary information for one row of 
+   *                  the table.
+   * @param record The TableRecord containing fields with correct names and 
+   *               types but no values. The field values will be set by this
+   *               method.
+   * @return TableRecord containing the field values extracted from the row 
+   *         buffer.
+   */
+  TableRecord ImportPdsTable::extractBinary(char *rowBuffer, TableRecord &record) const {
+    // for each record loop through the columns to get field values
+    for (int colIndex = 0; colIndex < columns(); colIndex++) {
+      QString columnName = QString::fromStdString(m_coldesc[colIndex].m_name);
+      for (int fieldIndex = 0 ; fieldIndex < record.Fields() ; fieldIndex++) {
+        QString fieldName = QString::fromStdString(record[fieldIndex].name());
+        if (fieldName == columnName) {
+          int startByte = m_coldesc[colIndex].m_startByte;
+          int numBytes = m_coldesc[colIndex].m_numBytes;
+          if (record[fieldIndex].isInteger()) {
+            int columnValue;
+            memmove(&columnValue, &rowBuffer[startByte], numBytes);
+            EndianSwapper endianSwap(m_byteOrder.toStdString());
+            int fieldValue = endianSwap.Int(&columnValue);
+            record[fieldIndex] = fieldValue;
+          }
+          else if (record[fieldIndex].isDouble()) {
+            EndianSwapper endianSwap(m_byteOrder.toStdString());
+            double columnValue;
+            memmove(&columnValue, &rowBuffer[startByte], numBytes);
+            double fieldValue = endianSwap.Double(&columnValue);
+            record[fieldIndex] = fieldValue;
+          }
+          else if (record[fieldIndex].isReal()) {
+            EndianSwapper endianSwap(m_byteOrder.toStdString());
+            float columnValue;
+            memmove(&columnValue, &rowBuffer[startByte], numBytes);
+            float fieldValue = endianSwap.Float(&columnValue);
+            record[fieldIndex] = fieldValue;
+          }
+          else if (record[fieldIndex].isText()) {
+            string fieldValue(numBytes, '\0');
+            for (int byte = 0; byte < numBytes; byte++) {
+              fieldValue[byte] = rowBuffer[startByte + byte];
+            }
+            record[fieldIndex] = fieldValue;
+          }
+        }
+      }
+
+    }
+    return record;
+  }
+
+  /**
+   * Creates an empty TableField with the appropriate type from a binary PDS
+   * table column description. This method also determines whether the pds table
+   * has byte order LSB or MSB.
+   *
+   * This method is only called for BINARY PDS tables. 
+   *  
+   * @param cdesc The ColumnDescr reference used to determine the column keyword
+   *              values NAME, BYTES, and DATA_TYPE from the PDS file.
+   *  
+   * @return TableField object with the correct field name and field type, but 
+   *         no value.
+   */
+  TableField ImportPdsTable::makeFieldFromBinaryTable(const ColumnDescr &cdesc){
+    string dataType = cdesc.m_dataType;
+    // For binary tables, we will not reformat the name of the column
+    string name = cdesc.m_name;
+    if (dataType == "MSB_INTEGER" || dataType == "INTEGER"    
+        || dataType == "SUN_INTEGER" || dataType == "MAC_INTEGER") {
+      if (cdesc.m_numBytes != 4) {
+        IString msg = "Only 4 byte integer values are supported in Isis. "
+                      "PDS Column [" + cdesc.m_name
+                      + "] has an integer DATA_TYPE with [BYTES = " 
+                      + IString(cdesc.m_numBytes) + "].";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
+      }
+      setPdsByteOrder("MSB");
+      return TableField(name, TableField::Integer);
+    }
+    else if (dataType == "LSB_INTEGER" || dataType == "VAX_INTEGER"
+             || dataType == "PC_INTEGER" ) {
+      if (cdesc.m_numBytes != 4) {
+        IString msg = "Only 4 byte integer values are supported in Isis. "
+                      "PDS Column [" + cdesc.m_name
+                      + "] has an integer DATA_TYPE with [BYTES = " 
+                      + IString(cdesc.m_numBytes) + "].";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
+      }
+      setPdsByteOrder("LSB");
+      return TableField(name, TableField::Integer);
+    }
+    else if (dataType == "FLOAT"    //IEEE_REAL alias (MSB)
+             || dataType == "REAL"     //IEEE_REAL alias (MSB)
+             || dataType == "SUN_REAL" //IEEE_REAL alias (MSB)
+             || dataType == "MAC_REAL" //IEEE_REAL alias (MSB)
+             || dataType == "IEEE_REAL" ) {
+      setPdsByteOrder("MSB");
+      if (cdesc.m_numBytes == 8) {
+        return TableField(name, TableField::Double);
+      }
+      else if (cdesc.m_numBytes == 4) {
+        return TableField(name, TableField::Real);
+      }
+      else {
+        IString msg = "Only 4 byte or 8 byte real values are supported in Isis. "
+                      "PDS Column [" + cdesc.m_name
+                      + "] has a real DATA_TYPE with [BYTES = " 
+                      + IString(cdesc.m_numBytes) + "].";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
+      }
+    }
+    else if (dataType == "PC_REAL") {
+      setPdsByteOrder("LSB");
+      if (cdesc.m_numBytes == 8) {
+        return TableField(name, TableField::Double);
+      }
+      else if (cdesc.m_numBytes == 4) {
+        return TableField(name, TableField::Real);
+      }
+      else {
+        IString msg = "Only 4 byte or 8 byte real values are supported in Isis. "
+                      "PDS Column [" + cdesc.m_name
+                      + "] has a real DATA_TYPE with [BYTES = " 
+                      + IString(cdesc.m_numBytes) + "].";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
+      }
+    }
+    else if (dataType.find("CHARACTER") != string::npos
+             || dataType.find("ASCII") != string::npos
+             || dataType == "DATE" || dataType == "TIME" ) {
+      return TableField(name, TableField::Text, cdesc.m_numBytes);
+    }
+    // Isis3 tables currently don't support any of the following PDS DATA_TYPE:
+    // BIT_STRING, COMPLEX, N/A, BOOLEAN, UNSIGNED_INTEGER, IBM types, some VAX types
+    IString msg = "PDS Column [" + cdesc.m_name
+                  + "] has an unsupported DATA_TYPE [" 
+                  + dataType + "]."; 
+    throw IException(IException::Unknown, msg, _FILEINFO_);
+  }
+
+  /**
+   * Sets the byte order for BINARY PDS table files.
+   *
+   * This method is only used for BINARY PDS tables.
+   *
+   * @param byteOrder The byte order of the PDS binary table. Valid values are 
+   *                  "LSB" or "MSB".
+   */
+  void ImportPdsTable::setPdsByteOrder(QString byteOrder) {
+    if (!m_byteOrder.isEmpty() && m_byteOrder != byteOrder) {
+      QString msg = "Unable import the binary PDS table [" + m_tableName
+                    + "]. The column DATA_TYPE values indicate differing byte "
+                      "orders. ";
+      throw IException(IException::Unknown, msg.toStdString(), _FILEINFO_);
+    }
+    m_byteOrder = byteOrder;
+  }
+
 
 }  //  namespace Isis
 

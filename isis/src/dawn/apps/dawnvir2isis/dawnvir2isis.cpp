@@ -3,12 +3,11 @@
 #include <cstdio>
 #include <string>
 
-#include "ProcessImportPds.h"
-
-#include "UserInterface.h"
-#include "Table.h"
 #include "FileName.h"
 #include "ImportPdsTable.h"
+#include "ProcessImportPds.h"
+#include "Table.h"
+#include "UserInterface.h"
 
 using namespace std;
 using namespace Isis;
@@ -73,7 +72,7 @@ void IsisMain ()
   }
 
   std::string target;
-  if(ui.WasEntered("TARGET")) {
+  if (ui.WasEntered("TARGET")) {
     target = ui.GetString("TARGET");
   }
 
@@ -141,14 +140,14 @@ void IsisMain ()
    hktable.setType("ShutterStatus", "CHARACTER");
    hktable.setType("MirrorSin", "DOUBLE");
    hktable.setType("MirrorCos", "DOUBLE");
-   Table hktab = hktable.exportAsTable("ScetTimeClock,ShutterStatus,MirrorSin,MirrorCos",
-                                        "VIRHouseKeeping");
+   Table hktab = hktable.importTable("ScetTimeClock,ShutterStatus,MirrorSin,MirrorCos",
+                                      "VIRHouseKeeping");
    hktab.Label().AddKeyword(PvlKeyword("SourceFile", hkLabel));
    outcube->write(hktab);
  }
- catch (IException &ie) {
+ catch (IException &e) {
    string mess = "Cannot read/open housekeeping data";
-   throw IException(ie, IException::User, mess, _FILEINFO_);
+   throw IException(e, IException::User, mess, _FILEINFO_);
  }
 
   p.EndProcess ();

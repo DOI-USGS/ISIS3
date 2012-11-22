@@ -21,13 +21,14 @@
  */
 #include "ProcessImportPds.h"
 
+#include <QString>
+
 #include <iostream>
 #include <string>
 #include <sstream>
 
-#include <QString>
-
 #include "IException.h"
+#include "ImportPdsTable.h"
 #include "IString.h"
 #include "LineManager.h"
 #include "OriginalLabel.h"
@@ -37,7 +38,9 @@
 #include "Pvl.h"
 #include "PvlObject.h"
 #include "PvlTokenizer.h"
+#include "PvlTranslationManager.h"
 #include "SpecialPixel.h"
+#include "Table.h"
 #include "UserInterface.h"
 
 using namespace std;
@@ -55,6 +58,11 @@ namespace Isis {
     Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
     p_transDir = (string) dataDir["Base"];
   }
+
+
+  ProcessImportPds::~ProcessImportPds() {
+  }
+
 
   /**
    * Set the input label file, data file and initialize a Pvl with the PDS labels.
@@ -82,7 +90,7 @@ namespace Isis {
       pdsLabel.Read(pdsLabelFile);
     }
     catch (IException &e) {
-      throw IException(IException::User,
+      throw IException(e, IException::User,
                        QObject::tr("This image does not contain a pds label.  You will need an "
                                    "image with a PDS label or a detached PDS label for this "
                                    "image."), _FILEINFO_);
@@ -1236,5 +1244,37 @@ namespace Isis {
     }
   }
 
+  /**
+   * This method will import the PDS table with the given name into an Isis
+   * Table object. The table will be added to the cube file in the call to
+   * StartProcess().
+   * 
+   * @param pdsTableName Name of the PDS table object to be imported.
+   */
+  void ProcessImportPds::ImportTable(IString pdsTableName) {
+    // No table file given, let ImportPdsTable find it.
+    ImportPdsTable pdsTable(p_labelFile, "", pdsTableName);
+    // reformat the table name. If the name ends with the word "Table", remove
+    // it. (So, for example, INSTRUMENT_POINTING_TABLE gets formatted to
+    // InstrumentPointingTable and then to InstrumentPointing)
+    IString isisTableName = pdsTable.getFormattedName(pdsTableName);
+    size_t found = isisTableName.rfind("Table");
+    if (found == isisTableName.length() - 5) {
+      isisTableName.erase(found, 5);
+    }
 
+    Table isisTable = pdsTable.importTable(isisTableName);
+    p_tables.push_back(isisTable);
+  }
+
+  /**
+   * This method will write the cube and table data to the output cube.
+   */
+  void ProcessImportPds::StartProcess() {
+    ProcessImport::StartProcess();
+    for (unsigned int i = 0; i < p_tables.size(); i++) {
+      OutputCubes[0]->write(p_tables[i]);
+    }
+    return;
+  }
 }

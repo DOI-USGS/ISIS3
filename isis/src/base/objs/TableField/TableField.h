@@ -56,6 +56,11 @@ namespace Isis {
    *                           camel case in the unitTest. Improved test
    *                           coverage in all categories. Added padding to
    *                           control statements. Fixes #1169.
+   *   @history 2012-11-21 Jeannie Backer - Added documentation and error
+   *                           message if a Text type field is set to a string
+   *                           value that is longer than the number of allowed
+   *                           bytes for the field. References #700.
+   *  
    *   @todo Finish class documentation
    */
   class TableField {

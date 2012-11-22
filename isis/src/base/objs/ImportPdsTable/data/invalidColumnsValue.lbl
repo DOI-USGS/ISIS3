@@ -1,0 +1,43 @@
+RECORD_TYPE = FIXED_LENGTH
+RECORD_BYTES = 18
+^TABLE = LSB_PDS_BINARY_TABLE.DAT
+
+Object = TABLE
+  INTERCHANGE_FORMAT = BINARY
+  ROWS               = 2
+  COLUMNS            = 3
+  ROW_BYTES          = 18
+  ROW_SUFFIX_BYTES   = 0
+
+  Object = COLUMN
+    COLUMN_NUMBER = 1
+    NAME          = "Double Value"
+    DATA_TYPE     = PC_REAL
+    START_BYTE    = 1
+    BYTES         = 8
+  End_Object
+
+  Object = COLUMN
+    COLUMN_NUMBER = 2
+    NAME          = "Integer Value"
+    DATA_TYPE     = LSB_INTEGER
+    START_BYTE    = 9
+    BYTES         = 4
+  End_Object
+
+  Object = COLUMN
+    COLUMN_NUMBER = 3
+    NAME          = "Text Value"
+    DATA_TYPE     = CHARACTER
+    START_BYTE    = 13
+    BYTES         = 2
+  End_Object
+
+  Object = COLUMN
+    COLUMN_NUMBER = 4
+    NAME          = "Real Value"
+    DATA_TYPE     = PC_REAL
+    START_BYTE    = 15
+    BYTES         = 4
+  End_Object
+End_Object

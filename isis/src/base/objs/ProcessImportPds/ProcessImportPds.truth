@@ -974,6 +974,335 @@ Group = Instrument
   InstrumentId   = UVVIS
 End_Group
 End
+Testing PDS file containing an ^IMAGE pointer and ^TABLE pointer
+isisimportpds: Importing
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+PDS_VERSION_ID       = PDS3
+RECORD_TYPE          = FIXED_LENGTH
+RECORD_BYTES         = 40000
+FILE_RECORDS         = 22
+LABEL_RECORDS        = 1
+^IMAGE               = pdsImageWithTables.img
+^SUN_POSITION_TABLE  = pdsImageWithTables_SUN_POSITION_TABLE.dat
+DATA_SET_ID          = MRO-M-HIRISE-3-CDR-V1.0
+DATA_SET_NAME        = "MRO MARS HIGH RESOLUTION IMAGING SCIENCE EXPERIMENT
+                        CDR V1.0"
+OBSERVATION_ID       = PSP_008469_2040
+PRODUCT_ID           = PSP_008469_2040_RED5_1
+SPACECRAFT_NAME      = HIRISE_IDEAL_SPACECRAFT
+INSTRUMENT_ID        = HIRISE_IDEAL_CAMERA
+INSTRUMENT_NAME      = "HIGH RESOLUTION IMAGING SCIENCE EXPERIMENT"
+INSTRUMENT_HOST_ID   = MRO
+INSTRUMENT_HOST_NAME = "MARS RECONNAISSANCE ORBITER"
+TARGET_NAME          = Mars
+MISSION_PHASE_NAME   = "PRIMARY SCIENCE PHASE"
+ORBIT_NUMBER         = 8469
+SOURCE_PRODUCT_ID    = RED5
+
+Object = IMAGE
+  DESCRIPTION                = "HiRISE mosaicked product, not map projected"
+  LINES                      = 10
+  LINE_SAMPLES               = 20000
+  SOURCE_LINE_SAMPLES        = 20000.0
+  SOURCE_LINES               = 80000.0
+  FIRST_LINE_SAMPLE          = 0.5
+  FIRST_LINE                 = 39999.5
+  BANDS                      = 1
+  OFFSET                     = 0.096609231570811
+  SCALING_FACTOR             = 1.32153376269238e-06
+  SAMPLE_BITS                = 16
+  SAMPLE_BIT_MASK            = 2#1111111111111111#
+  SAMPLE_TYPE                = MSB_UNSIGNED_INTEGER
+  FILTER_NAME                = Red
+  CENTER_FILTER_WAVELENGTH   = 700
+  BAND_WIDTH                 = 300
+  BAND_STORAGE_TYPE          = BAND_SEQUENTIAL
+  CORE_NULL                  = 0
+  CORE_LOW_REPR_SATURATION   = 1
+  CORE_LOW_INSTR_SATURATION  = 2
+  CORE_HIGH_REPR_SATURATION  = 65535
+  CORE_HIGH_INSTR_SATURATION = 65534
+End_Object
+
+Object = SUN_POSITION_TABLE
+  ROWS                    = 2
+  COLUMNS                 = 7
+  ROW_BYTES               = 56
+  ROW_SUFFIX_BYTES        = 39944
+  CACHE_TYPE              = Linear
+  SPK_TABLE_START_TIME    = 264289113.57475
+  SPK_TABLE_END_TIME      = 264289113.57566
+  SPK_TABLE_ORIGINAL_SIZE = 2.0
+  INTERCHANGE_FORMAT      = BINARY
+
+  Object = COLUMN
+    COLUMN_NUMBER = 1
+    NAME          = J2000X
+    DATA_TYPE     = IEEE_REAL
+    START_BYTE    = 1
+    BYTES         = 8
+  End_Object
+
+  Object = COLUMN
+    COLUMN_NUMBER = 2
+    NAME          = J2000Y
+    DATA_TYPE     = IEEE_REAL
+    START_BYTE    = 9
+    BYTES         = 8
+  End_Object
+
+  Object = COLUMN
+    COLUMN_NUMBER = 3
+    NAME          = J2000Z
+    DATA_TYPE     = IEEE_REAL
+    START_BYTE    = 17
+    BYTES         = 8
+  End_Object
+
+  Object = COLUMN
+    COLUMN_NUMBER = 4
+    NAME          = J2000XV
+    DATA_TYPE     = IEEE_REAL
+    START_BYTE    = 25
+    BYTES         = 8
+  End_Object
+
+  Object = COLUMN
+    COLUMN_NUMBER = 5
+    NAME          = J2000YV
+    DATA_TYPE     = IEEE_REAL
+    START_BYTE    = 33
+    BYTES         = 8
+  End_Object
+
+  Object = COLUMN
+    COLUMN_NUMBER = 6
+    NAME          = J2000ZV
+    DATA_TYPE     = IEEE_REAL
+    START_BYTE    = 41
+    BYTES         = 8
+  End_Object
+
+  Object = COLUMN
+    COLUMN_NUMBER = 7
+    NAME          = ET
+    DATA_TYPE     = IEEE_REAL
+    START_BYTE    = 49
+    BYTES         = 8
+  End_Object
+End_Object
+End
+Object = IsisCube
+  Object = Core
+    StartByte   = Null
+    Format      = Tile
+    TileSamples = 500
+    TileLines   = 10
+
+    Group = Dimensions
+      Samples = 20000
+      Lines   = 10
+      Bands   = 1
+    End_Group
+
+    Group = Pixels
+      Type       = Real
+      ByteOrder  = Lsb
+      Base       = 0.0
+      Multiplier = 1.0
+    End_Group
+  End_Object
+End_Object
+
+Object = Label
+  Bytes = 65536
+End_Object
+
+Object = Table
+  Name      = SunPosition
+  StartByte = Null
+  Bytes     = Null
+  Records   = 2
+  ByteOrder = Lsb
+
+  Group = Field
+    Name = J2000X
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Y
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000Z
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000XV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000YV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = J2000ZV
+    Type = Double
+    Size = 1
+  End_Group
+
+  Group = Field
+    Name = ET
+    Type = Double
+    Size = 1
+  End_Group
+End_Object
+
+Object = History
+  Name      = IsisCube
+  StartByte = Null
+  Bytes     = Null
+End_Object
+
+Object = OriginalLabel
+  Name      = IsisCube
+  StartByte = Null
+  Bytes     = Null
+End_Object
+End
+isisimportpds: Gathering statistics
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+0.136336
+0.000260177
+PDS_VERSION_ID       = PDS3
+RECORD_TYPE          = FIXED_LENGTH
+RECORD_BYTES         = 40000
+FILE_RECORDS         = 22
+LABEL_RECORDS        = 1
+^IMAGE               = pdsImageWithTables.img
+^SUN_POSITION_TABLE  = pdsImageWithTables_SUN_POSITION_TABLE.dat
+DATA_SET_ID          = MRO-M-HIRISE-3-CDR-V1.0
+DATA_SET_NAME        = "MRO MARS HIGH RESOLUTION IMAGING SCIENCE EXPERIMENT
+                        CDR V1.0"
+OBSERVATION_ID       = PSP_008469_2040
+PRODUCT_ID           = PSP_008469_2040_RED5_1
+SPACECRAFT_NAME      = HIRISE_IDEAL_SPACECRAFT
+INSTRUMENT_ID        = HIRISE_IDEAL_CAMERA
+INSTRUMENT_NAME      = "HIGH RESOLUTION IMAGING SCIENCE EXPERIMENT"
+INSTRUMENT_HOST_ID   = MRO
+INSTRUMENT_HOST_NAME = "MARS RECONNAISSANCE ORBITER"
+TARGET_NAME          = Mars
+MISSION_PHASE_NAME   = "PRIMARY SCIENCE PHASE"
+ORBIT_NUMBER         = 8469
+SOURCE_PRODUCT_ID    = RED5
+
+Object = IMAGE
+  DESCRIPTION                = "HiRISE mosaicked product, not map projected"
+  LINES                      = 10
+  LINE_SAMPLES               = 20000
+  SOURCE_LINE_SAMPLES        = 20000.0
+  SOURCE_LINES               = 80000.0
+  FIRST_LINE_SAMPLE          = 0.5
+  FIRST_LINE                 = 39999.5
+  BANDS                      = 1
+  OFFSET                     = 0.096609231570811
+  SCALING_FACTOR             = 1.32153376269238e-06
+  SAMPLE_BITS                = 16
+  SAMPLE_BIT_MASK            = 2#1111111111111111#
+  SAMPLE_TYPE                = MSB_UNSIGNED_INTEGER
+  FILTER_NAME                = Red
+  CENTER_FILTER_WAVELENGTH   = 700
+  BAND_WIDTH                 = 300
+  BAND_STORAGE_TYPE          = BAND_SEQUENTIAL
+  CORE_NULL                  = 0
+  CORE_LOW_REPR_SATURATION   = 1
+  CORE_LOW_INSTR_SATURATION  = 2
+  CORE_HIGH_REPR_SATURATION  = 65535
+  CORE_HIGH_INSTR_SATURATION = 65534
+End_Object
+
+Object = SUN_POSITION_TABLE
+  ROWS                    = 2
+  COLUMNS                 = 7
+  ROW_BYTES               = 56
+  ROW_SUFFIX_BYTES        = 39944
+  CACHE_TYPE              = Linear
+  SPK_TABLE_START_TIME    = 264289113.57475
+  SPK_TABLE_END_TIME      = 264289113.57566
+  SPK_TABLE_ORIGINAL_SIZE = 2.0
+  INTERCHANGE_FORMAT      = BINARY
+
+  Object = COLUMN
+    COLUMN_NUMBER = 1
+    NAME          = J2000X
+    DATA_TYPE     = IEEE_REAL
+    START_BYTE    = 1
+    BYTES         = 8
+  End_Object
+
+  Object = COLUMN
+    COLUMN_NUMBER = 2
+    NAME          = J2000Y
+    DATA_TYPE     = IEEE_REAL
+    START_BYTE    = 9
+    BYTES         = 8
+  End_Object
+
+  Object = COLUMN
+    COLUMN_NUMBER = 3
+    NAME          = J2000Z
+    DATA_TYPE     = IEEE_REAL
+    START_BYTE    = 17
+    BYTES         = 8
+  End_Object
+
+  Object = COLUMN
+    COLUMN_NUMBER = 4
+    NAME          = J2000XV
+    DATA_TYPE     = IEEE_REAL
+    START_BYTE    = 25
+    BYTES         = 8
+  End_Object
+
+  Object = COLUMN
+    COLUMN_NUMBER = 5
+    NAME          = J2000YV
+    DATA_TYPE     = IEEE_REAL
+    START_BYTE    = 33
+    BYTES         = 8
+  End_Object
+
+  Object = COLUMN
+    COLUMN_NUMBER = 6
+    NAME          = J2000ZV
+    DATA_TYPE     = IEEE_REAL
+    START_BYTE    = 41
+    BYTES         = 8
+  End_Object
+
+  Object = COLUMN
+    COLUMN_NUMBER = 7
+    NAME          = ET
+    DATA_TYPE     = IEEE_REAL
+    START_BYTE    = 49
+    BYTES         = 8
+  End_Object
+End_Object
+End
 
 Testing file with invalid Pds label
 **USER ERROR** This image does not contain a pds label.  You will need an image with a PDS label or a detached PDS label for this image.
+**ERROR** Unable to read PVL file [/usgs/cpkgs/isis3/data/galileo/testData/1213r.img].
+**ERROR** Error in PVL file on line [1].
+**ERROR** Unable to read PVL keyword [LBLSIZE=2000            FORMAT='BYTE'  TYPE='IMAGE'  BUFSIZ=20480  DIM=3  EOL=0  RECSIZE=1000  ORG='BSQ'  NL=800  NS=800  NB=1  N1=800  N2=800  N3=1  N4=0  NBB=200    HOST='AXP-VMS'  INTFMT='LOW'  REALFMT='VAX'  BHOST='VAX-VMS'  BINTFMT='LOW'  BREALFMT='VAX'  BLTYPE=''  NLB=10  TASK='SSIMERGE'  USER='AXC040'  DAT_TIM='Tue Jan 18 16:36:41 2000'  MISSION='GALILEO'  SENSOR='SSI'  PICNO='24I0134'  RIM=5208212  MOD91=13  MOD10=0  MOD8=0  PARTITION=1  PA='24ISSTEREO01'  TCA='000T07:15:09Z'  TARGET='IO'  SCETYEAR=1999  SCETDAY=284  SCETHOUR=9  SCETMIN=17  SCETSEC=10  SCETMSEC=480  ERTYEAR=1999  ERTDAY=316  ERTHOUR=3  ERTMIN=27  ERTSEC=8  ERTMSEC=120  FILTER=0  EXP=6.25  GAIN=2  RATE=2  TLMFMT='IM4'  BOOM='N'  MOFIBE='001000'  ENCODING_TYPE='BARC RATE CONTROL '    TBPPXL=1.1559  TPPLNE=4.43638  INA=35.4711  EMA=30.8087  HRA=206.599  TWIST=299.208  CONE=157.429  RA=49.4416  DEC=20.7453  SMEAR=0.1  CUT_OUT_WINDOW=(1,1,800,800)  PHA=24.0033  HSCL=1490.08  VSCL=1704.71  LAT=30.1268  LON=177.269  PLRANGE=569451.0  SLRANGE=145354.0  SOLRANGE=7.41096e+08  SUB_SOLAR_LATITUDE=2.99102  SUB_SOLAR_LONGITUDE=200.927  SUB_SPACECRAFT_LATITUDE=0.081587  SUB_SPACECRAFT_LONGITUDE=177.139  SUNAZ=124.394  NORAZ=256.334  SCAZ=76.1117  SMRAZ=-999.0  RAD=-999.0  SPICE_C_ID='M902'  TARGET_CENTER_DISTANCE=146933.0  SUB_SPACECRAFT_LINE=1001.48  SUB_SPACECRAFT_SAMPLE=548.759  READOUTMODE='NOT APPLICABLE'      INTERCEPT_POINT_LINE=400.0  INTERCEPT_POINT_LINE_SAMPLE=400.0  ENTROPY=3.39634  TASK='CATLABEL'  USER='AXC040'  DAT_TIM='Wed Feb  9 16:36:22 2000'  TASK='BADLABEL'  USER='AXC040'  DAT_TIM='Wed Feb  9 16:36:39 2000'  REDR_EXT='1'  ].
+**ERROR** Keyword has extraneous data [FORMAT='BYTE'  TYPE='IMAGE'  BUFSIZ=20480  DIM=3  EOL=0  RECSIZE=1000  ORG='BSQ'  NL=800  NS=800  NB=1  N1=800  N2=800  N3=1  N4=0  NBB=200    HOST='AXP-VMS'  INTFMT='LOW'  REALFMT='VAX'  BHOST='VAX-VMS'  BINTFMT='LOW'  BREALFMT='VAX'  BLTYPE=''  NLB=10  TASK='SSIMERGE'  USER='AXC040'  DAT_TIM='Tue Jan 18 16:36:41 2000'  MISSION='GALILEO'  SENSOR='SSI'  PICNO='24I0134'  RIM=5208212  MOD91=13  MOD10=0  MOD8=0  PARTITION=1  PA='24ISSTEREO01'  TCA='000T07:15:09Z'  TARGET='IO'  SCETYEAR=1999  SCETDAY=284  SCETHOUR=9  SCETMIN=17  SCETSEC=10  SCETMSEC=480  ERTYEAR=1999  ERTDAY=316  ERTHOUR=3  ERTMIN=27  ERTSEC=8  ERTMSEC=120  FILTER=0  EXP=6.25  GAIN=2  RATE=2  TLMFMT='IM4'  BOOM='N'  MOFIBE='001000'  ENCODING_TYPE='BARC RATE CONTROL '    TBPPXL=1.1559  TPPLNE=4.43638  INA=35.4711  EMA=30.8087  HRA=206.599  TWIST=299.208  CONE=157.429  RA=49.4416  DEC=20.7453  SMEAR=0.1  CUT_OUT_WINDOW=(1,1,800,800)  PHA=24.0033  HSCL=1490.08  VSCL=1704.71  LAT=30.1268  LON=177.269  PLRANGE=569451.0  SLRANGE=145354.0  SOLRANGE=7.41096e+08  SUB_SOLAR_LATITUDE=2.99102  SUB_SOLAR_LONGITUDE=200.927  SUB_SPACECRAFT_LATITUDE=0.081587  SUB_SPACECRAFT_LONGITUDE=177.139  SUNAZ=124.394  NORAZ=256.334  SCAZ=76.1117  SMRAZ=-999.0  RAD=-999.0  SPICE_C_ID='M902'  TARGET_CENTER_DISTANCE=146933.0  SUB_SPACECRAFT_LINE=1001.48  SUB_SPACECRAFT_SAMPLE=548.759  READOUTMODE='NOT APPLICABLE'      INTERCEPT_POINT_LINE=400.0  INTERCEPT_POINT_LINE_SAMPLE=400.0  ENTROPY=3.39634  TASK='CATLABEL'  USER='AXC040'  DAT_TIM='Wed Feb  9 16:36:22 2000'  TASK='BADLABEL'  USER='AXC040'  DAT_TIM='Wed Feb  9 16:36:39 2000'  REDR_EXT='1'] at the end.
