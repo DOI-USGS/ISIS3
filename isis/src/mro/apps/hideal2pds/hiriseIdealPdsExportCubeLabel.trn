@@ -1,0 +1,250 @@
+# Keywords that go into ROOT of the PDS label
+
+############################## Hard-coded values ##############################
+Group = DATA_SET_ID
+  Auto
+  InputKey       = DATA_SET_ID
+  InputKey       = DataSetId
+  InputDefault   = MRO-M-HIRISE-3-CDR-V1.0
+  OutputName     = DATA_SET_ID
+  OutputPosition = ROOT
+  Translation    = (MRO-M-HIRISE-3-CDR-V1.0, *)
+End_Group
+
+Group = DATA_SET_NAME
+  Auto
+  InputKey       = DATA_SET_NAME
+  InputKey       = DataSetName
+  InputDefault   = "MRO MARS HIGH RESOLUTION IMAGING SCIENCE EXPERIMENT CDR
+                    V1.0"
+  OutputName     = DATA_SET_NAME
+  OutputPosition = ROOT
+  Translation    = ("MRO MARS HIGH RESOLUTION IMAGING SCIENCE EXPERIMENT CDR
+                    V1.0", *)
+End_Group
+
+Group = SPACECRAFT_NAME
+  Auto
+  InputKey       = SpacecraftName
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = SPACECRAFT_NAME
+  OutputPosition = ROOT
+  Translation    = (HIRISE_IDEAL_SPACECRAFT, *)
+End_Group
+
+############################ From Instrument Group ############################
+Group = TARGET_NAME
+  Auto
+  InputKey       = TargetName
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = TARGET_NAME
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = SAMPLE_DETECTORS
+  Auto
+  InputKey       = SampleDetectors
+  InputGroup     = "IsisCube, Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = SAMPLE_DETECTORS
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = LINE_DETECTORS
+  Auto
+  InputKey       = LineDetectors
+  InputGroup     = "IsisCube, Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = LINE_DETECTORS
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = INSTRUMENT_TYPE
+  Auto
+  InputKey       = InstrumentType
+  InputGroup     = "IsisCube, Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = INSTRUMENT_TYPE
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = FOCAL_LENGTH
+  Auto
+  Optional
+  InputKey       = FocalLength
+  InputGroup     = "IsisCube, Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = FOCAL_LENGTH
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = PIXEL_PITCH
+  Auto
+  Optional
+  InputKey       = PixelPitch
+  InputGroup     = "IsisCube, Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = PIXEL_PITCH
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = EPHEMERIS_TIME
+  Auto
+  InputKey       = EphemerisTime
+  InputGroup     = "IsisCube, Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = EPHEMERIS_TIME
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = FOCAL_PLANE_X_DEPENDENCY
+  Auto
+  InputKey       = FocalPlaneXDependency
+  InputGroup     = "IsisCube, Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = FOCAL_PLANE_X_DEPENDENCY
+  OutputPosition = ROOT
+  Translation    = (SAMPLE, 1)
+  Translation    = (LINE, 2)
+End_Group
+
+Group = TRANS_X
+  Auto
+  InputKey       = TransX
+  InputGroup     = "IsisCube, Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = TRANS_X
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = TRANS_Y
+  Auto
+  InputKey       = TransY
+  InputGroup     = "IsisCube, Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = TRANS_Y
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = EXPOSURE_DURATION
+  Auto
+  InputKey       = ExposureDuration
+  InputGroup     = "IsisCube, Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = EXPOSURE_DURATION
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+############################# From Archive Group #############################
+Group = PRODUCT_ID
+  Auto
+  InputKey       = ProductId
+  InputGroup     = "IsisCube,Archive"
+  InputPosition  = (IsisCube, Archive)
+  OutputName     = PRODUCT_ID
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+Group = MRO:OBSERVATION_START_TIME
+  Auto
+  InputKey       = OBSERVATION_START_TIME
+  InputKey       = ObservationStartTime
+  InputGroup     = "IsisCube,Archive"
+  InputPosition  = (IsisCube, Archive)
+  OutputName     = MRO:OBSERVATION_START_TIME
+  OutputPosition = (Group, TIME_PARAMETERS)
+  Translation    = (*, *)
+End_Group
+
+############################ From Archive Group  ############################
+Group = SOURCE_PRODUCT_ID
+  Auto
+  InputKey       = SourceProductId
+  InputGroup     = "IsisCube,Archive"
+  InputPosition  = (IsisCube, Archive)
+  OutputName     = SOURCE_PRODUCT_ID
+  OutputPosition = ROOT
+  Translation    = (*, *)
+End_Group
+
+############################ From AlphaCube Group ############################
+# handled in application code
+
+######################## From Kernels Group ########################
+# handled in application code
+
+
+########################### From NaifKeywords Object ###########################
+# handled in application code
+
+######################## From OriginalInstrument Group ########################
+################ Keywords that go into GROUP = TIME_PARAMETERS ################
+Group = MRO:OBSERVATION_START_TIME
+  Auto
+  InputKey       = MRO:OBSERVATION_START_TIME
+  InputKey       = ObservationStartTime
+  InputGroup     = "IsisCube,OriginalInstrument"
+  InputPosition  = (IsisCube, OriginalInstrument)
+  OutputName     = MRO:OBSERVATION_START_TIME
+  OutputPosition = (Group, TIME_PARAMETERS)
+  Translation    = (*, *)
+End_Group
+
+Group = START_TIME
+  Auto
+  InputName      = START_TIME
+  InputKey       = StartTime
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = START_TIME
+  OutputPosition = (Group, TIME_PARAMETERS)
+  Translation    = (*, *)
+End_Group
+
+Group = STOP_TIME
+  Auto
+  InputName      = STOP_TIME
+  InputKey       = StopTime
+  InputGroup     = "IsisCube,Instrument"
+  InputPosition  = (IsisCube, Instrument)
+  OutputName     = STOP_TIME
+  OutputPosition = (Group, TIME_PARAMETERS)
+  Translation    = (*, *)
+End_Group
+
+Group = SPACECRAFT_CLOCK_START_COUNT
+  Auto
+  InputName      = SPACECRAFT_CLOCK_START_COUNT
+  InputKey       = SpacecraftClockStartCount
+  InputGroup     = "IsisCube,OriginalInstrument"
+  InputPosition  = (IsisCube, OriginalInstrument)
+  OutputName     = SPACECRAFT_CLOCK_START_COUNT
+  OutputPosition = (Group, TIME_PARAMETERS)
+  Translation    = (*, *)
+End_Group
+
+Group = SPACECRAFT_CLOCK_STOP_COUNT
+  Auto
+  InputName      = SPACECRAFT_CLOCK_STOP_COUNT
+  InputKey       = SpacecraftClockStopCount
+  InputGroup     = "IsisCube,OriginalInstrument"
+  InputPosition  = (IsisCube, OriginalInstrument)
+  OutputName     = SPACECRAFT_CLOCK_STOP_COUNT
+  OutputPosition = (Group, TIME_PARAMETERS)
+  Translation    = (*, *)
+End_Group
+End
+

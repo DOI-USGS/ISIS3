@@ -20,15 +20,25 @@
  */
 
 #include "ProcessExport.h"
+#include <vector>
 
 namespace Isis {
+  class IString;
   class PvlFormatPds;
+  class Table;
 
   /**
    * @brief Process class for exporting cubes to PDS standards
    *
    * This class extends the ProcessExport class to allow the user
-   * to export cubes to PDS format.
+   * to export cubes to PDS format. 
+   *  
+   * Tables from the cube may also be exported. These exported PDS tables may be
+   * attached or detached. This should correspond to whether the labels of the 
+   * exported PDS file are attached or detached. NOTE: If attached, the labels 
+   * of the table should not be altered in the export program unless 
+   * functionality is added to deal with the new start byte values for the 
+   * tables. 
    *
    * @author 2006-09-05 Stuart Sides
    *
@@ -53,23 +63,51 @@ namespace Isis {
    *   @history 2012-04-06 Kris Becker - Correct label padding whereby spaces
    *                           are used as the fill character instead of '\0'.
    *                           This makes it compliant with PDS specifications.
+   *   @history 2012-11-21 Jeannie Backer - Added functionality to allow export
+   *                           of Isis3 Table objects to binary PDS tables. The
+   *                           PDS tables may be attached or detached. If
+   *                           attached, the labels of the table should not be
+   *                           altered in the export program unless
+   *                           functionality is added to deal with the new start
+   *                           byte values. References #678.
    */
   class ProcessExportPds : public Isis::ProcessExport {
     public:
       /** 
-       * Pds File Type      
+       * File type to be exported 
+       * @see http://pds.nasa.gov/documents/sr/AppendixA.pdf 
        */
-      enum PdsFileType   {Image, Qube, SpectralQube, JP2Image};
+      enum PdsFileType   {
+        Image,        /**< Two dimensional array of line/sample values. These 
+                           files generallly have the extension *.img or *.imq**/
+        Qube,         /**< Multi-dimensional array (1-3 dimensional) whose axes
+                           may be interpreted as line/sample/band.  These files
+                           generally have the extension *.qub**/
+        SpectralQube, /**< Three dimensional objects with two spatial dimensions
+                           and one spectral dimension. These files generally 
+                           have the extension *.qub**/
+        JP2Image      /**< Image coding system JPEG 2000 formatted image. These 
+                           files generally have the extension *.jp2 **/
+      };
       
       /**
-       * Resolution
+       * Resolution units per pixel of the exported PDS file  
        */
-      enum PdsResolution {Meter, Kilometer};
+      enum PdsResolution {
+        Meter,    //!< Meters per pixel
+        Kilometer //!< Kilometers per pixel
+      };
       
       /**
-       * Export Type
+       * Record format type of exported PDS file. 
+       *  
+       * @see http://pds.nasa.gov/documents/sr/Chapter15.pdf 
        */
-      enum PdsExportType {Stream, Fixed};
+      enum PdsExportType {
+        Stream, //!< Stream Records. This type is generally used for ASCII files.
+        Fixed   /**< Fixed length records. PDS recommends that FIXED_LENGTH 
+                     records are used whenever possible.**/
+      };
       
       ProcessExportPds();
       ~ProcessExportPds();
@@ -85,104 +123,123 @@ namespace Isis {
       void StandardImageImage(Pvl &mainPvl);
       void StandardJP2Image(Pvl &mainPvl);
 
-      void SetPdsResolution(PdsResolution peType) {
-        meResolution = peType;
-      };
-      void SetExportType(PdsExportType type) {
-        p_exportType = type;
-      };
+      void SetPdsResolution(PdsResolution resolutionUnits);
+      void SetExportType(PdsExportType recordFormat);
 
       virtual Pvl &StandardPdsLabel(ProcessExportPds::PdsFileType type);
-      void OutputLabel(std::ofstream &os);
-      void OutputDetatchedLabel(void);
 
-      void SetDetached(bool pbDetached, const std::string psLabelFile = "") {
-        p_detachedLabel = pbDetached;
-        msLabelFile = psLabelFile;
-      }
-      inline bool GetDetached(void)      {
-        return p_detachedLabel;
-      }
+      void OutputLabel(std::ofstream &pdsFileStream);
+      void OutputDetachedLabel();
 
-      inline void ForceBands(bool force) {
-        p_forceBands = force;
-      }
-      inline void ForceBandName(bool force) {
-        p_forceBandName = force;
-      }
-      inline void ForceCenterFilterWavelength(bool force) {
-        p_forceCenterFilterWavelength = force;
-      }
-      inline void ForceBandwidth(bool force) {
-        p_forceBandwidth = force;
-      }
-      inline void ForceBandStorageType(bool force) {
-        p_forceBandStorageType = force;
-      }
-      inline void ForceOffset(bool force) {
-        p_forceOffset = force;
-      }
-      inline void ForceScalingFactor(bool force) {
-        p_forceScalingFactor = force;
-      }
-      inline void ForceSampleBits(bool force) {
-        p_forceSampleBits = force;
-      }
-      inline void ForceSampleBitMask(bool force) {
-        p_forceSampleBitMask = force;
-      }
-      inline void ForceSampleType(bool force) {
-        p_forceSampleType = force;
-      }
-      inline void ForceCoreNull(bool force) {
-        p_forceCoreNull = force;
-      }
-      inline void ForceCoreLrs(bool force) {
-        p_forceCoreLrs = force;
-      }
-      inline void ForceCoreLis(bool force) {
-        p_forceCoreLis = force;
-      }
-      inline void ForceCoreHrs(bool force) {
-        p_forceCoreHrs = force;
-      }
-      inline void ForceCoreHis(bool force) {
-        p_forceCoreHis = force;
-      }
+      void ExportTable(Isis::Table isisTable, IString detachedPdsTableFileName="");
+
+      // include this using declaration to indicate that ProcessExportPds 
+      // objects that call a StartProcess() method that has not been overridden
+      // here should use the corresponding base class definitions
+      using ProcessExport::StartProcess;
+      void StartProcess(std::ofstream &fout);
+
+      // Accessors
+      bool Detached();
+      bool Attached();
+
+      // Mutators
+      void SetDetached(const std::string detachedLabelFile);
+      void SetAttached();
+      void ForceBands(bool force);
+      void ForceBandName(bool force);
+      void ForceCenterFilterWavelength(bool force);
+      void ForceBandwidth(bool force);
+      void ForceBandStorageType(bool force);
+      void ForceOffset(bool force);
+      void ForceScalingFactor(bool force);
+      void ForceSampleBits(bool force);
+      void ForceSampleBitMask(bool force);
+      void ForceSampleType(bool force);
+      void ForceCoreNull(bool force);
+      void ForceCoreLrs(bool force);
+      void ForceCoreLis(bool force);
+      void ForceCoreHrs(bool force);
+      void ForceCoreHis(bool force);
 
     protected:
       int LineBytes();
       int LabelSize();
       virtual void CreateImageLabel();
-      void CreateQubeLabel(void);
+      void CreateQubeLabel();
       void CreateSpectralQubeLabel();
 
       std::string ProjectionName(Pvl &inputLabel);
 
-      PvlFormatPds *p_formatter;
-      Pvl *p_label;
-      PdsExportType p_exportType;
+      PvlFormatPds *m_formatter;  /**< Used to determine how to format the 
+                                       keyword values in the PDS file.*/
+      Pvl *m_label;               //!< Exported PDS label.
+      PdsExportType m_exportType; //!< Stream or Fixed
 
     private:
-      PdsResolution meResolution;
-      bool p_forceBands;
-      bool p_forceBandName;
-      bool p_forceCenterFilterWavelength;
-      bool p_forceBandwidth;
-      bool p_forceBandStorageType;
-      bool p_forceOffset;
-      bool p_forceScalingFactor;
-      bool p_forceSampleBits;
-      bool p_forceSampleBitMask;
-      bool p_forceSampleType;
-      bool p_forceCoreNull;
-      bool p_forceCoreLrs;
-      bool p_forceCoreLis;
-      bool p_forceCoreHrs;
-      bool p_forceCoreHis;
-      bool p_detachedLabel;
-      std::string msLabelFile;
-      PdsFileType p_pdsFileType;
+      PdsResolution m_exportResolution; //!< Meters or kilometers.
+      bool m_forceBands;             /**< Indicates whether to keep the 
+                                          BANDS keyword in the PDS labels.*/
+      bool m_forceBandName;          /**< Indicates whether to keep the 
+                                          BAND_NAME keyword in the PDS labels.*/
+      bool m_forceCenterFilterWavelength; /**< Indicates whether to keep the
+                                          CENTER_FILTER_WAVELENGTH keyword in 
+                                          the PDS labels.*/
+      bool m_forceBandwidth;         /**< Indicates whether to keep the
+                                          BANDWIDTH keyword in the PDS labels.*/
+      bool m_forceBandStorageType;   /**< Indicates whether to add the
+                                          BAND_STORAGE_TYPE keyword in the PDS
+                                          labels.*/
+      bool m_forceOffset;            /**< Indicates whether to add the
+                                          OFFSET keyword in the PDS labels.*/
+      bool m_forceScalingFactor;     /**< Indicates whether to add the
+                                          SCALING_FACTOR keyword in the PDS
+                                          labels.*/
+      bool m_forceSampleBits;        /**< Indicates whether to add the
+                                          SAMPLE_BITS keyword in the PDS labels.*/
+      bool m_forceSampleBitMask;     /**< Indicates whether to add the
+                                          SAMPLE_BIT_MASK keyword in the PDS
+                                          labels.*/
+      bool m_forceSampleType;        /**< Indicates whether to add the
+                                          SAMPLE_TYPE keyword in the PDS
+                                          labels.*/
+      bool m_forceCoreNull;          /**< Indicates whether to add the
+                                          CORE_NULL keyword in the PDS labels.*/
+      bool m_forceCoreLrs;           /**< Indicates whether to add the
+                                          CORE_LOW_REPR_SATURATION keyword in 
+                                          the PDS labels.*/
+      bool m_forceCoreLis;           /**< Indicates whether to add the
+                                          CORE_LOW_INSTR_SATURATION keyword in
+                                           the PDS labels.*/
+      bool m_forceCoreHrs;           /**< Indicates whether to add the
+                                          CORE_HIGH_REPR_SATURATION keyword in
+                                           the PDS labels.*/
+      bool m_forceCoreHis;           /**< Indicates whether to add the
+                                          CORE_HIGH_INSTR_SATURATION keyword in 
+                                          the PDS labels.*/
+      bool m_detachedLabel;          /**< Indicates whether the PDS file
+                                          will be detached.*/
+      IString m_detachedPdsLabelFile;/**< The name of the detached PDS label
+                                          file.*/
+      PdsFileType m_pdsFileType;     /**< Image, Qube, Spectral Qube, or 
+                                          JP2 Image*/
+
+      std::vector<int> m_tableStartRecord;/**< Record number where the added
+                                           table data begins. The order of the 
+                                           tables represented in this vector 
+                                           corresponds to the order of the table 
+                                           data in m_tableBuffers**/
+      std::vector<int> m_tableRecords; /**< Number of records in each added 
+                                           table. The order of the tables 
+                                           represented in this vector
+                                           corresponds to the order of the table
+                                           data in m_tableBuffers. **/
+      std::vector<char *> m_tableBuffers; /**< Vector containing the binary 
+                                           table data for each of the added 
+                                           tables. The order of the tables 
+                                           represented in this vector 
+                                           corresponds to the order of the table
+                                           data in m_tableRecords. **/
   };
 }
 

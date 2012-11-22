@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="hideal2pds" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+      Export an Isis3 mosaicked ideal cube from a HiRISE image to a PDS product 
+      containing related spice data. 
+  </brief>
+
+  <description>
+    <pre>
+      This application takes an Isis3 cube from the HiRISE instrument that
+      has been jitter corrected and mosaicked and exports it to a PDS product
+      with detached label and spice tables.
+
+      The following output files will be created using the file name passed in by the user.
+      <OL>
+        <LI>
+          PDS image file with the extension .img
+        </LI>
+        <LI>
+          PDS label file with the extension .lbl
+        </LI>
+        <LI>
+          PDS binary ck table file with the suffix _INSTRUMENT_POINTING_TABLE.dat
+        </LI>
+        <LI>
+          PDS binary spk table file with the suffix _INSTRUMENT_POSITION_TABLE.dat
+        </LI>
+        <LI>
+          PDS binary body rotation table file with the suffix _BODY_ROTATION_TABLE.dat
+        </LI>
+        <LI>
+          PDS binary sun position table file with the suffix _SUN_POSITION_TABLE.dat
+        </LI>
+      </OL>
+
+      The output PDS image will be unsigned word 16 bit type, MSB, BSQ format 
+      and the resolution will be in meters.
+
+      Note that the IMAGE_JITTER_CORRECTED keyword is copied from the input 
+      cube. If the input cube has been run through an older version of hijitter,
+      this value will be set to UNK, since it is not known whether the image
+      values have been jitter corrected.
+
+    </pre>
+  </description>
+
+  <category>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
+  </category>  
+
+  <history>
+    <change name="Jeannie Backer" date="2012-11-21">
+      Original Version of hideal2pds. Fixes #678.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Isis3 ideal camera cube to be exported to PDS format
+        </brief>
+        <description>
+          The Ideal cube from a HiRISE image containing the related spice data 
+          to be exported to PDS. 
+        </description>
+        <filter>
+          *.cub *.lbl
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output PDS file name.
+        </brief>
+        <description>
+          The file name of the output PDS image. This value will also be used 
+          for the name of the detached label and table files. 
+        </description>
+        <filter>
+          *.img
+        </filter>
+      </parameter>
+    </group>
+
+    <group name="Special Keywords">
+      <parameter name="VERSION">
+        <type>string</type>
+        <default>
+          <item>1.0</item>
+        </default>
+        <brief>
+          Value for the output PDS keyword PRODUCT_VERSION_ID
+        </brief>
+        <description>
+          This parameter allows the user to specify the value of the standard 
+          PDS keyword  PRODUCT_VERSION_ID within the output PDS label. This 
+          keyword will be located in the Root of the PDS PVL label. This value
+          defaults to 1.0.
+        </description>
+      </parameter>
+
+      <parameter name="RATIONALE_DESC">
+        <type>string</type>
+        <internalDefault>Preserve Original Rationale Description</internalDefault>
+        <brief>
+          Value for the output PDS keyword RATIONALE_DESC
+        </brief>
+        <description>
+          This parameter allows the user to specify the value of the standard 
+          PDS keyword RATIONALE_DESC within the output PDS label. This keyword
+          will be located in the ROOT of the PDS PVL label. Note that if a 
+          keyword value is not entered, the value will be read from the input
+          cube labels.  If it does not exist there, the program will throw an ]
+          error.
+        </description>
+      </parameter>
+
+    </group>
+  </groups>
+</application>

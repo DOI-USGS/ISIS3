@@ -1,2 +1,3 @@
 Testing Isis::ProcessExportPds ...
 Test deferred to the appTest for isis2pds
+ExportTable() with detached tables is tested in hideal2pds.

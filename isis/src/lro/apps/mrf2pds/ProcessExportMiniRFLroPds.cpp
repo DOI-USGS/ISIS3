@@ -31,6 +31,8 @@
 using namespace std;
 
 namespace Isis {
+  ProcessExportMiniRFLroPds::ProcessExportMiniRFLroPds() {}
+  ProcessExportMiniRFLroPds::~ProcessExportMiniRFLroPds() {}
 
   /**
     * Create a standard PDS label for type IMAGE using the mrf
@@ -39,20 +41,20 @@ namespace Isis {
     * @author sprasad (2/1/2010)
     */
   Pvl &ProcessExportMiniRFLroPds::StandardPdsLabel(const ProcessExportPds::PdsFileType type) {
-    p_label = new Pvl;
+    m_label = new Pvl;
 
-    p_formatter = new PvlFormatPds("$lro/translations/mrfExportRoot.typ");
-    p_label->SetFormat(p_formatter);
-    p_label->SetTerminator("END");
+    m_formatter = new PvlFormatPds("$lro/translations/mrfExportRoot.typ");
+    m_label->SetFormat(m_formatter);
+    m_label->SetTerminator("END");
 
-    if(type == ProcessExportPds::Image) {
+    if (type == ProcessExportPds::Image) {
       CreateImageLabel();
     }
     else {
       string msg = "Unsupported PDS output type";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    return *p_label;
+    return *m_label;
   }
 
 
@@ -63,12 +65,12 @@ namespace Isis {
    */
   void ProcessExportMiniRFLroPds::CreateImageLabel(void) {
 
-    Pvl &mainPvl = *p_label;
+    Pvl &mainPvl = *m_label;
 
-    if(p_exportType == ProcessExportPds::Stream) {
+    if (m_exportType == ProcessExportPds::Stream) {
       StreamImageRoot(mainPvl);
     }
-    else if(p_exportType == ProcessExportPds::Fixed) {
+    else if (m_exportType == ProcessExportPds::Fixed) {
       FixedImageRoot(mainPvl);
     }
     else {

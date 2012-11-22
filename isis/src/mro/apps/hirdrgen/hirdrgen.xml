@@ -86,6 +86,12 @@
           Fixed an error which misplaced the proper SCALING_FACTOR and OFFSET
           keyword values.
       </change>
+      <change name="Jeannie Backer" date="2012-11-21"> 
+          Changed bandwidth units from nm to NM.  Fixed bug so that the program
+          no uses the default MAXPER=100 value correctly. References #678
+          PROG: [Changed ProcessExportPds::SetDetached() method call to correct
+          spelling. Added g_ to global variables to meet Isis3 standards.]
+      </change>
  </history>
 
   <groups>
