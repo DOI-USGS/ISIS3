@@ -10,7 +10,7 @@
     <p>
       This program estimates the optical depth (tau) values using a table file 
       that consists of measurements collected at different locations on 
-      <def>Level1</def>images with ISIS 
+      <def>Level1</def> images with ISIS 
       <a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/qview/qview.html">
       <b>qview</b></a> or another image display program.  Information for 
       different images can be entered into a single table file.  The input values 
