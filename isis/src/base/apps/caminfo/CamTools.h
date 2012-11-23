@@ -140,6 +140,8 @@ namespace Isis {
    *                          coding standards. References #972.
    *   @history 2012-10-11 Debbie A. Cook, Updated to use new Target class.  References Mantis 
    *                          tickets #775 and #1114.
+   *   @history 2012-11-23 Kris Becker Corrected computations for parallaxx,
+   *                          parallaxy, shadowx, shadowy.  Fixes #1296
    */
   class BandGeometry {
 

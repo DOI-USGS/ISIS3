@@ -240,17 +240,20 @@ namespace Isis {
         g.emi   = camera.EmissionAngle();
         g.inc   = camera.IncidenceAngle();
 
-        //  Need some radian values
-        if(!IsSpecial(g.emi) && !IsSpecial(g.subSpacecraftAzimuth)) {
-          double emi_r = DegToRad(g.emi);
-          g.parallaxx = RadToDeg(-tan(emi_r) * cos(DegToRad(g.subSpacecraftAzimuth)));
-          g.parallaxy = RadToDeg(tan(emi_r) * sin(DegToRad(g.subSpacecraftAzimuth)));
+        //  Parallax values (Corrected 2012-11-23, KJB)
+        if(!IsSpecial(g.emi) && !IsSpecial(g.subSpacecraftGroundAzimuth)) {
+          double emi_r  = DegToRad(g.emi);
+          double ssga_r = DegToRad(g.subSpacecraftGroundAzimuth);
+          g.parallaxx = -tan(emi_r) * cos(ssga_r);
+          g.parallaxy =  tan(emi_r) * sin(ssga_r);
         }
 
-        if(!IsSpecial(g.inc) && !IsSpecial(g.subSolarAzimuth)) {
-          double inc_r = DegToRad(g.inc);
-          g.shadowx = RadToDeg(-tan(inc_r) * cos(DegToRad(g.subSolarAzimuth)));
-          g.shadowy = RadToDeg(tan(inc_r) * sin(DegToRad(g.subSolarAzimuth)));
+        // Shadow values (Corrected 2012-11-23, KJB)
+        if(!IsSpecial(g.inc) && !IsSpecial(g.subSolarGroundAzimuth)) {
+          double inc_r  = DegToRad(g.inc);
+          double ssga_r = DegToRad(g.subSolarGroundAzimuth);
+          g.shadowx = -tan(inc_r) * cos(ssga_r);
+          g.shadowy =  tan(inc_r) * sin(ssga_r);
         }
       }
       //  OK...now get corner pixel geometry.  NOTE this resets image
