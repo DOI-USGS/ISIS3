@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="Campt" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="campt" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
     Computes geometric and photometric information at a given pixel location
   </brief>
@@ -36,7 +36,7 @@
     Coordinates.    
     </p>
     <p> 
-    The following is a partial list of coordinates computed in the Campt application:<br />
+    The following is a partial list of coordinates computed in the campt application:<br />
     <br />
     <b>Geometric Information</b>: <def>Latitude</def>, <def>Longitude</def>, <def 
     link="Line Resolution">Resolution</def> <br />
@@ -57,10 +57,10 @@
     a choice of a <def>PVL</def> file or a flat file. A PVL file is a text 
     file in label format, while the flat file is a comma-delimited text file 
     that is easily imported into most databases and digital spreadsheets 
-    such as Microsoft Excel. Below is an example of Campt output in <def>PVL</def>
+    such as Microsoft Excel. Below is an example of campt output in <def>PVL</def>
     format. You can skim the left column of this PVL-formatted output file for 
     a thorough listing of the types of coordinates, sun and instrument-related 
-    information computed when using Campt.
+    information computed when using campt.
     </p>
     
     <pre>
@@ -214,7 +214,7 @@ End_Group
         <internalDefault>None</internalDefault>
         <description>
           A text file in label format (<def>PVL</def>) which will 
-          contain the results of <i>Campt</i>.  This file can
+          contain the results of <i>campt</i>.  This file can
           be used in conjunction with the 
 	  <a href=
          "http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/getkey/getkey.html"

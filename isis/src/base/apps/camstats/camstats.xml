@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<application name="Camstats" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+<application name="camstats" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
     Generates and outputs camera statistics for a cube in raw camera geometry
@@ -9,7 +9,7 @@
   <description>
     <p>
     Camstats generates camera statistics from a user-supplied <def>Level0</def> 
-    or <def>Level1</def> cube.  The output of Camstats can be directed to a 
+    or <def>Level1</def> cube.  The output of camstats can be directed to a 
     <def>PVL</def> file or a comma-delimited text file (flat file).  For each 
     output group, the program will calculate the minimum, maximum, average, and 
     standard  deviation values.  The output groups are listed below:
