@@ -13,6 +13,12 @@
 :Advanced Tracking_Isis::TableMainWindow	{name='Advanced Tracking' type='Isis::TableMainWindow' visible='0' windowTitle='Advanced Tracking'}
 :Basic colors_QWellArray	{buddy=':Select Color.Basic colors_QLabel' type='QWellArray' unnamed='1' visible='1'}
 :Blink Comparator_QDialog	{type='QDialog' unnamed='1' visible='0' windowTitle='Blink Comparator'}
+:Configure DN Values - EN0210454090M+1.Color: _QLabel	{text='Color: ' type='QLabel' unnamed='1' visible='1' window=':Configure DN Values - EN0210454090M+1_Isis::CubePlotCurveConfigureDialog'}
+:Configure DN Values - EN0210454090M+1.Color: _QPushButton	{leftWidget=':Configure DN Values - EN0210454090M+1.Color: _QLabel' type='QPushButton' unnamed='1' visible='1' window=':Configure DN Values - EN0210454090M+1_Isis::CubePlotCurveConfigureDialog'}
+:Configure DN Values - EN0210454090M+1.Ok_QPushButton	{text='Ok' type='QPushButton' unnamed='1' visible='1' window=':Configure DN Values - EN0210454090M+1_Isis::CubePlotCurveConfigureDialog'}
+:Configure DN Values - EN0210454090M+1_Isis::CubePlotCurveConfigureDialog	{type='Isis::CubePlotCurveConfigureDialog' unnamed='1' visible='1' windowTitle='Configure DN Values - EN0210454090M+1'}
+:Configure Scatter Plot.Cancel_QPushButton	{text='Cancel' type='QPushButton' unnamed='1' visible='1' window=':Configure Scatter Plot_Isis::ScatterPlotConfigDialog'}
+:Configure Scatter Plot_Isis::ScatterPlotConfigDialog	{type='Isis::ScatterPlotConfigDialog' unnamed='1' visible='1' windowTitle='Configure Scatter Plot'}
 :Display Mode.Show Pixel Values_QRadioButton	{container=':Visual Display.Display Mode_QGroupBox' text='Show Pixel Values' type='QRadioButton' unnamed='1' visible='1'}
 :Elevation Calculator (via stereo pairs).Options_QMenu	{title='Options' type='QMenu' unnamed='1' visible='0' window=':Elevation Calculator (via stereo pairs)_QMainWindow'}
 :Elevation Calculator (via stereo pairs)_QMainWindow	{type='QMainWindow' unnamed='1' visible='0' windowTitle='Elevation Calculator (via stereo pairs)'}
@@ -42,10 +48,15 @@
 :Options.Show Nomenclature_QAction	{container=':qview.Options_QMenu' text='Show Nomenclature' type='QAction' unnamed='1' visible='true'}
 :Options.Tracking ..._QAction	{container=':qview.Options_QMenu' text='Tracking ...' type='QAction' unnamed='1' visible='true'}
 :ProgressDialog	{type='QProgressDialog'}
+:QwtLegendView_QwtLegendItem	{container=':Spatial Plot.QwtLegendView_QScrollArea' type='QwtLegendItem' unnamed='1' visible='1'}
 :Select Color.Basic colors_QColorPicker	{leftWidget=':Basic colors_QWellArray' type='QColorPicker' unnamed='1' visible='1' window=':Select Color_QColorDialog'}
 :Select Color.Basic colors_QLabel	{text='Basic colors' type='QLabel' unnamed='1' visible='1' window=':Select Color_QColorDialog'}
 :Select Color.OK_QPushButton	{text='OK' type='QPushButton' unnamed='1' visible='1' window=':Select Color_QColorDialog'}
 :Select Color_QColorDialog	{type='QColorDialog' unnamed='1' visible='1' windowTitle='Select Color'}
+:Spatial Plot.PlotWindow_QToolBar	{name='PlotWindow' type='QToolBar' visible='1' window=':Spatial Plot_Isis::PlotWindow'}
+:Spatial Plot.QwtLegendView_QScrollArea	{name='QwtLegendView' type='QScrollArea' visible='1' window=':Spatial Plot_Isis::PlotWindow'}
+:Spatial Plot.QwtPlotCanvas_QwtPlotCanvas	{name='QwtPlotCanvas' type='QwtPlotCanvas' visible='1' window=':Spatial Plot_Isis::PlotWindow'}
+:Spatial Plot_Isis::PlotWindow	{name='Plot Window: Spatial Plot' type='Isis::PlotWindow' visible='1' windowTitle='Spatial Plot'}
 :Special Pixel Tool_QDialog	{type='QDialog' unnamed='1' visible='0' windowTitle='Special Pixel Tool'}
 :Statistics.Average_QLabel	{container=':Statistics.Statistics_QGroupBox' text~='Average.*' type='QLabel' unnamed='1' visible='1'}
 :Statistics.Hide Display_QCheckBox	{text='Hide Display' type='QCheckBox' unnamed='1' visible='1' window=':Statistics_QDialog'}
@@ -83,6 +94,7 @@
 :_Isis::AdvancedStretchDialog	{type='Isis::AdvancedStretchDialog' unnamed='1' visible='0'}
 :_Isis::NomenclatureToolConfigDialog	{type='Isis::NomenclatureToolConfigDialog' unnamed='1' visible='1'}
 :_QListView	{type='QListView' unnamed='1' visible='1'}
+:_QMenu	{type='QMenu' unnamed='1' visible='1'}
 :_QWebView	{type='QWebView' unnamed='1' visible='1'}
 :fileNameEdit_QLineEdit	{buddy=':Open.File name:_QLabel' name='fileNameEdit' type='QLineEdit' visible='1'}
 :frame.stackedWidget_QStackedWidget	{container=':splitter.frame_QFrame' name='stackedWidget' type='QStackedWidget' visible='1'}
@@ -96,6 +108,7 @@
 :qview.RGB_QRadioButton	{text='RGB' type='QRadioButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
 :qview.Spatial Plot Tool_QToolButton	{text='Spatial Plot Tool' type='QToolButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
 :qview.Spectral Plot Tool_QToolButton	{text='Spectral Plot Tool' type='QToolButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview.Spectral Plot Tool_QToolButton_2	{aboveWidget=':qview.Spectral Plot Tool_QToolButton' type='QToolButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
 :qview.Tool Options_QPushButton	{text='Tool Options' type='QPushButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
 :qview.Tool Pad_Isis::ToolPad	{name='ViewportMainWindow' type='Isis::ToolPad' visible='1' window=':qview_Isis::ViewportMainWindow' windowTitle='Tool Pad'}
 :qview.Tracking_QToolButton	{text='Tracking' type='QToolButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}

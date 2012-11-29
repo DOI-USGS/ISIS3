@@ -12,6 +12,7 @@ def main():
         os.rename(os.path.expandvars('$HOME/.Isis/qview'), os.path.expandvars('$HOME/.Isis/qview.squishbackup'))
     except Exception:
         pass
+    
     startApplication("qview")
     waitFor("object.exists(':File.&Open..._QAction')", 20000)
     test.compare(findObject(":File.&Open..._QAction").enabled, True)
