@@ -41,7 +41,6 @@ namespace Isis {
    * @author 2010-08-02 Debbie A. Cook
    *
    * @internal
-   *  @history
    */
   class EllipsoidShape : public Isis::ShapeModel {
     public:
