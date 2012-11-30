@@ -435,9 +435,6 @@ namespace Isis {
                                        const Longitude &lon,
                                        const Distance  &radius) {
 // Is error checking necessary or does Latitude, Longitude, and Distance handle it?????
-
-    cout << "In SurfacePoint with " << lat.degrees() <<"/" << lon.degrees() << "/" << radius.meters() << endl;
-
     if (!lat.isValid()  ||  !lon.isValid()  ||  !radius.isValid()) {
       IString msg = "Latitude, longitude, or radius is an invalid value.";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -781,14 +778,6 @@ namespace Isis {
 
   bool SurfacePoint::Valid() const {
     static const Displacement zero(0, Displacement::Meters);
-
-    // cout << endl << endl;
-    // cout << "coordinate pointers = " << p_x << "/" << p_y << "/" << p_z << endl;
-    // cout << "coordinate = " << p_x->isValid() << "/" << p_y->isValid()  << "/" << p_z->isValid()  << endl;
-    // cout << "coordinate = " << p_x->meters() << "/" << p_y->meters() << "/" << p_z->meters() << endl;
-    // cout << "coordinate = 0 " << (*p_x != zero) << "/" << (*p_y != zero) << "/" << (*p_z != zero) << endl;
-    // cout << endl << endl;
-
     return p_x && p_y && p_z && p_x->isValid() && p_y->isValid() && p_z->isValid() &&
            (*p_x != zero || *p_y != zero || *p_z != zero);
   }

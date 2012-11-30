@@ -25,9 +25,6 @@
 
 #include <string>
 #include <iostream>
-//DELETE THIS LINE AND NEXT 2
-#include <iomanip>
-//END DELETE
 #include <vector>
 
 #include <QDebug>
@@ -761,22 +758,11 @@ namespace Isis {
     // this vector stores crossing points, where the image crosses the
     // meridian. It stores the first coordinate of the pair in its vector
     vector<geos::geom::Coordinate> *crossingPoints = new vector<geos::geom::Coordinate>;
-    // for (unsigned int i = 0; i < points.size(); i++) {
-    //   geos::geom::Coordinate *temp = &(points.at(i));
-    //   SetImage(temp->x, temp->y);
-    //   lon = p_gMap->UniversalLongitude();
-    //   lat = p_gMap->UniversalLatitude();
-
-      geos::geom::Coordinate *temp = &(points.at(79));
-      cout << "This is the one to watch..." << endl;
+    for (unsigned int i = 0; i < points.size(); i++) {
+      geos::geom::Coordinate *temp = &(points.at(i));
       SetImage(temp->x, temp->y);
-      cout << "Did you see it?" << endl;
       lon = p_gMap->UniversalLongitude();
       lat = p_gMap->UniversalLatitude();
-      if (lon > 224.85  &&  lon < 224.87  && lat > 34.4312  && lat < 34.4315)
-        cout << "79" << " " << std::setprecision(12) << lon << " " << lat << endl;
-      /*
-
       if (abs(lon - prevLon) >= 180 && i != 0) {
         crossingPoints->push_back(geos::geom::Coordinate(prevLon, prevLat));
       }
@@ -809,7 +795,6 @@ namespace Isis {
     // end self-intersection check
 
     FixPolePoly(crossingPoints);
-      */
     delete crossingPoints;
     crossingPoints = NULL;
   }

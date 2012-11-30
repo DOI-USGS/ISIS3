@@ -13,4 +13,4 @@ commands:
 	TO= $(OUTPUT)/botdrotation.txt NAME=BodyRotation > /dev/null;
 	tabledump FROM= $(OUTPUT)/moc2isisTruth.cub \
 	TO= $(OUTPUT)/sunposition.txt NAME=SunPosition > /dev/null;
-#	$(RM) $(OUTPUT)/moc2isisTruth.cub;
+	$(RM) $(OUTPUT)/moc2isisTruth.cub;
