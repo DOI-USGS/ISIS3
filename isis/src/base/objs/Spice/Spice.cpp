@@ -522,6 +522,7 @@ namespace Isis {
    * @throw Isis::IException::User - "This instrument does not support time
    *             padding"
    *
+   * @internal
    * @history 2011-04-10 Debbie A. Cook - Updated to only create cache for
    *          instrumentPosition if type is Spice.
    */

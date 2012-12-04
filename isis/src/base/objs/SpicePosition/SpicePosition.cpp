@@ -52,7 +52,7 @@ namespace Isis {
  * target body relative to observer.  If the swap is invoked, the state vector 
  * must be inverted. 
  * 
- * @author kbecker (10/29/2012)
+ * @author 2012-10-29 Kris Becker
  * 
  * @param targetCode         Traditional s/c code
  * @param observerCode       Traditional target/planet code
@@ -69,7 +69,7 @@ namespace Isis {
  *  
  * This initailizer provides options to swap observer/target properly. 
  * 
- * @author kbecker (10/29/2012)
+ * @author 2012-10-29 Kris Becker
  *  
  * @param targetCode         Traditional s/c code
  * @param observerCode       Traditional target/planet code
@@ -128,7 +128,8 @@ namespace Isis {
   }
 
 
-  /** Apply a time bias when invoking SetEphemerisTime method.
+  /** 
+   *  @brief Apply a time bias when invoking SetEphemerisTime method.
    *
    * The bias is used only when reading from NAIF kernels.  It is added to the
    * ephermeris time passed into SetEphemerisTime and then the body
@@ -146,7 +147,7 @@ namespace Isis {
 /**
  * @brief Returns the value of the time bias added to ET 
  * 
- * @author kbecker (10/29/2012)
+ * @author 2012-10-29 Kris Becker
  * 
  * @return double Returns time bias for current object
  */
@@ -154,7 +155,9 @@ namespace Isis {
     return (p_timeBias);
   }
 
-  /** Set the aberration correction (light time).
+  /** 
+   *  @brief Set the aberration correction (light time)
+   *  
    * See NAIF required reading for more information on this correction at
    * ftp://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/ascii/individual_docs/spk.req
    *
@@ -198,7 +201,7 @@ namespace Isis {
  * targer/observer vector state.  See SetAberrationCorrection() for valid 
  * values. 
  * 
- * @author kbecker (10/29/2012)
+ * @author 2012-10-29 Kris Becker
  */
   std::string SpicePosition::GetAberrationCorrection() const {
     return (p_aberrationCorrection);
@@ -212,7 +215,7 @@ namespace Isis {
  * resulting int the adjustment of the target body.  The observer position 
  * should be unchanged. 
  * 
- * @author kbecker (10/29/2012)
+ * @author 2012-10-29 Kris Becker
  * 
  * @return double Returns the light time determined from the last call to 
  *         SetEphemerisTime[Spice].
@@ -1783,10 +1786,10 @@ namespace Isis {
 /**
  * @brief Returns observer code
  * 
- * @author kbecker (10/29/2012)
- *  
  * This methods returns the proper observer code as specified in constructor. 
  * Code has been subjected to swapping if requested. 
+ *  
+ * @author 2012-10-29 Kris Becker 
  *  
  * @return int NAIF code of observer
  */
@@ -1800,7 +1803,7 @@ namespace Isis {
  * This methods returns the proper target code as specified in constructor. 
  * Code has been subjected to swapping if requested. 
  * 
- * @author kbecker (10/29/2012)
+ * @author 2012-10-29 Kris Becker
  * 
  * @return int NAIF code for target body
  */
@@ -1816,7 +1819,7 @@ namespace Isis {
  * bias.  The bias typically comes explicitly from the camera model but could 
  * be adjusted by the environment they are utlized in. 
  * 
- * @author kbecker (10/29/2012)
+ * @author 2012-10-29 Kris Becker
  * 
  * @return double Adjusted ephemeris time with time bias applied
  */
@@ -1844,7 +1847,7 @@ namespace Isis {
  * correction. See SpacecraftPosition for additional details on this 
  * application of the results. 
  * 
- * @author kbecker (10/29/2012)
+ * @author 2012-10-29 Kris Becker
  * 
  * @param et          Time to compute state vector for
  * @param target      NAIF target code
@@ -1899,7 +1902,7 @@ namespace Isis {
  * the observer/target be swapped.  See the documentation for the spkez_c at 
  * http://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/spkez_c.html. 
  * 
- * @author kbecker (10/29/2012)
+ * @author 2012-10-29 Kris Becker
  * 
  * @param state        State vector.  First three components of this 6 element 
  *                     array is the body fixed coordinates of the vector from

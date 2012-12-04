@@ -54,7 +54,7 @@ namespace Isis {
    * indicates to treat the targetCode as the observer and the observerCode as 
    * the target. 
    * 
-   * @author kbecker (10/11/2012)
+   * @author 2012-10-11 Kris Becker
    * 
    * @param targetCode         NAIF code for target
    * @param observerCode       NAIF code for observer
@@ -80,7 +80,7 @@ namespace Isis {
  *  the radius of the target body.  This is a function of the Distance
  *  parameter provided at the time this object was constructed.
  *  
- * @author Kris Becker - 10/23/2012
+ * @author 2012-10-23 Kris Becker
  * 
  * @return double Time in seconds it takes light to travel the distance of the 
  *         radius provided/set in the object
@@ -93,7 +93,7 @@ namespace Isis {
  * @brief Returns the time it takes for light to travel a given distance 
  *  
  *  
- * @author Kris Becker - 10/23/2012
+ * @author 2012-10-23 Kris Becker
  *  
  * @param  radius Distance to compute light time travel for
  * @return double Time in seconds it takes light to travel given distance 
@@ -107,7 +107,7 @@ namespace Isis {
 /**
  * @brief Set aberration correction value for determining positions
  * 
- * @author kbecker (10/29/2012)
+ * @author 2012-10-29 Kris Becker
  * 
  * @param correction Type of stellar aberration correction to apply
  */
@@ -120,7 +120,7 @@ namespace Isis {
 /**
  * @brief Returns the stellr aberration correction applied
  * 
- * @author kbecker (10/29/2012)
+ * @author 2012-10-29 Kris Becker
  */
   std::string SpacecraftPosition::GetAberrationCorrection() const {
     return (m_abcorr.getAberrationCorrection().toStdString());
@@ -137,7 +137,8 @@ namespace Isis {
  * time correction applied.  However, this uses the center of the body as the 
  * reference  
  * 
- * @author kbecker (10/29/2012)
+ * @author 2012-10-29 Kris Becker 
+ *  
  * @internal
  *   @history 2012-11-01 Kris Becker - Revised parameters to computeStateVector
  *                                     to match comments.  References #1136.

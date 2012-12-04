@@ -51,7 +51,7 @@ namespace Isis {
  * Initial state of these conditions are "LT+S" for stellar aberration, false 
  * for observer/target swap and no light time to surface correction. 
  * 
- * @author Kris Becker - 10/28/2012
+ * @author 2012-10-28 Kris Becker
  */
   LightTimeCorrectionState::LightTimeCorrectionState() {
     setDefaultState();
@@ -66,7 +66,7 @@ namespace Isis {
   * valid NAIF instrument code).  The Spice object is required so these values 
   * are properly recorded (in the label) for subsequent use. 
   *  
-  * @author kbecker (10/11/2012)
+  * @author 2012-10-11 Kris Becker
   * 
   * @param ikCode NAIF code for instrument
   * @param spice  Spice object associated with geometry
@@ -110,7 +110,7 @@ namespace Isis {
  * kernel pool keyword to determine the value (if specified) of the light time
  * and stellar aborration correction parameter provided to NAIF routines.
  *
- * @author kbecker (10/09/2012)
+ * @author 2012-10-09 Kris Becker
  *
  * @param ikCode Instrument code to check for keyword specification of
  *               correction
@@ -139,7 +139,7 @@ namespace Isis {
  * Provides programmer direct setting of this value.  This is typically 
  * required by camera models that fix this value for a specific reason. 
  * 
- * @author Kris Becker - 10/28/2012
+ * @author 2012-10-28 Kris Becker
  * 
  * @param correction User specified abcorr correction option as defined by the 
  *                   NAIF routine found at
@@ -255,7 +255,7 @@ namespace Isis {
  * A values of TRUE will result in the switch of the order of the target and
  * observer codes in the SpicePosition constructor.
  *
- * @author kbecker (10/5/2012)
+ * @author 2012-10-05 Kris Becker
  *
  * @param ikCode Instrument code to check for 
  * @param spice Spice class is required in order to check kernel pool for 
@@ -307,7 +307,7 @@ namespace Isis {
  * pool keyword to determine if correction adjustments for light time from 
  * surface to center body are to be applied in the SpicePosition class. 
  *
- * @author Kris Becker - 10/28/2012
+ * @author 2012-10-28 Kris Becker
  * 
  * @param ikCode Code of instrument to check for
  * @param spice Spice instance to interface virtual NAIF kernel pool
@@ -356,7 +356,7 @@ namespace Isis {
  *  
  * Default preserves existing behavior at the time of this implementation. 
  * 
- * @author Kris Becker - 10/28/2012
+ * @author 2012-10-28 Kris Becker
  */
   void LightTimeCorrectionState::setDefaultState() {
     m_abcorr = "LT+S";
