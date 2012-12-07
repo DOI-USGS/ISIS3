@@ -337,12 +337,18 @@ namespace Isis {
    *                            sample and line against edge of starting
    *                            ending pixels (0.5/Parent+0.5) instead of
    *                            center of pixels.
+   * @history 2012-12-03  Tracie Sucharski - Check for valid minLat/maxLat, minLon/maxLon.  If 
+   *                            none are valid, this means the latMap and lonMap have no valid
+   *                            data, therefore we cannot back project, so return false.
    *
    */
   bool VimsGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
 
-    if(lat < *p_minLat || lat > *p_maxLat) return false;
-    if(lon < *p_minLon || lon > *p_maxLon) return false;
+    if (!p_minLat->isValid() || !p_minLon->isValid() ||
+        !p_maxLat->isValid() || !p_maxLon->isValid()) return false;
+
+    if (lat < *p_minLat || lat > *p_maxLat) return false;
+    if (lon < *p_minLon || lon > *p_maxLon) return false;
 
     //  Find closest points  ??? what tolerance ???
     double minDist = 9999.;

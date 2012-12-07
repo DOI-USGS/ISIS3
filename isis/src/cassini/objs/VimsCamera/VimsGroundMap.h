@@ -70,6 +70,9 @@ namespace Isis {
    *                           fault.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
    *                          coding standards. References #972.
+   *   @history 2012-12-03  Tracie Sucharski - Added error check to SetGround method.  Returns false
+   *                          if none of the pixel centers in the cube intersect with the planet.
+   *                          Fixes #1306.
    */
   class VimsGroundMap : public CameraGroundMap {
     public:
