@@ -133,7 +133,7 @@ void LoadPvl() {
         ui.Clear("HG2");
         ui.Clear("HH");
         ui.Clear("B0");
-        ui.Clear("ZEROB0ST");
+        ui.Clear("ZEROB0STANDARD");
         ui.Clear("BH");
         ui.Clear("CH");
         ui.Clear("L");
@@ -172,24 +172,11 @@ void LoadPvl() {
             IString izerob0 = zerob0;
             izerob0 = izerob0.UpCase();
             if (izerob0 == "TRUE") {
-              ui.PutString("ZEROB0ST", "TRUE");
+              ui.PutString("ZEROB0STANDARD", "TRUE");
             } else if (izerob0 == "FALSE") {
-              ui.PutString("ZEROB0ST", "FALSE");
+              ui.PutString("ZEROB0STANDARD", "FALSE");
             } else {
               string message = "The ZEROB0STANDARD value is invalid - must be set to TRUE or FALSE";
-              throw IException(IException::User, message, _FILEINFO_);
-            }
-          }
-          else if (phtGrp->HasKeyword("ZEROB0ST")) {
-            string zerob0 = (string)phtGrp->FindKeyword("ZEROB0ST");
-            IString izerob0 = zerob0;
-            izerob0 = izerob0.UpCase();
-            if (izerob0 == "TRUE") {
-              ui.PutString("ZEROB0ST", "TRUE");
-            } else if (izerob0 == "FALSE") {
-              ui.PutString("ZEROB0ST", "FALSE");
-            } else {
-              string message = "The ZEROB0ST value is invalid - must be set to TRUE or FALSE";
               throw IException(IException::User, message, _FILEINFO_);
             }
           }
@@ -1544,51 +1531,37 @@ void IsisMain() {
     if (parMap.contains("ZEROB0STANDARD")) {
       if (parMap["ZEROB0STANDARD"].toStdString() == "TRUE") {
         toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-                 AddKeyword(PvlKeyword("ZEROB0ST","TRUE"),Pvl::Replace);
+                 AddKeyword(PvlKeyword("ZEROB0STANDARD","TRUE"),Pvl::Replace);
       } else if (parMap["ZEROB0STANDARD"].toStdString() == "FALSE") {
         toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-                 AddKeyword(PvlKeyword("ZEROB0ST","FALSE"),Pvl::Replace);
+                 AddKeyword(PvlKeyword("ZEROB0STANDARD","FALSE"),Pvl::Replace);
       } else {
         string message = "The " + phtName + " Photometric model requires a value for the ZEROB0STANDARD parameter.";
         message += "The valid values for ZEROB0STANDARD are: TRUE, FALSE";
         throw IException(IException::User, message, _FILEINFO_);
       }
-    } else if (parMap.contains("ZEROB0ST")) {
-      if (parMap["ZEROB0ST"].toStdString() == "TRUE") {
+    } else if (ui.GetString("ZEROB0STANDARD") != "READFROMPVL") {
+      if (ui.GetString("ZEROB0STANDARD") == "TRUE") {
         toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-                 AddKeyword(PvlKeyword("ZEROB0ST","TRUE"),Pvl::Replace);
-      } else if (parMap["ZEROB0ST"].toStdString() == "FALSE") {
+                 AddKeyword(PvlKeyword("ZEROB0STANDARD","TRUE"),Pvl::Replace);
+      } else if (ui.GetString("ZEROB0STANDARD") == "FALSE") {
         toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-                 AddKeyword(PvlKeyword("ZEROB0ST","FALSE"),Pvl::Replace);
-      } else {
-        string message = "The " + phtName + " Photometric model requires a value for the ZEROB0ST parameter.";
-        message += "The valid values for ZEROB0ST are: TRUE, FALSE";
-        throw IException(IException::User, message, _FILEINFO_);
+                 AddKeyword(PvlKeyword("ZEROB0STANDARD","FALSE"),Pvl::Replace);
       }
     } else if (!toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-                 HasKeyword("ZEROB0STANDARD") && !toPhtPvl.FindObject("PhotometricModel").
-                 FindGroup("Algorithm").HasKeyword("ZEROB0ST")) {
-      if (ui.GetString("ZEROB0ST") == "TRUE") {
-        toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-                 AddKeyword(PvlKeyword("ZEROB0ST","TRUE"),Pvl::Replace);
-      } else if (ui.GetString("ZEROB0ST") == "FALSE") {
-        toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-                 AddKeyword(PvlKeyword("ZEROB0ST","FALSE"),Pvl::Replace);
-      } else if (ui.GetString("ZEROB0ST") == "READFROMPVL") {
-        toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-                 AddKeyword(PvlKeyword("ZEROB0ST","TRUE"),Pvl::Replace);
-      } else {
-        string message = "The " + phtName + " Photometric model requires a value for the ZEROB0ST parameter.";
-        message += "The valid values for ZEROB0ST are: TRUE, FALSE";
-        throw IException(IException::User, message, _FILEINFO_);
-      }
+                 HasKeyword("ZEROB0STANDARD")) { 
+      toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+               AddKeyword(PvlKeyword("ZEROB0STANDARD","TRUE"),Pvl::Replace);
     }
-    if (toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").HasKeyword("ZEROB0STANDARD")) {
-      string zerob0 = (string)toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("ZEROB0STANDARD");
-      phtLog.AddKeyword(PvlKeyword("ZEROB0ST",zerob0));
-    } else {
-      phtLog += toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("ZEROB0ST");
+    string zerob0 = (string)toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("ZEROB0STANDARD");
+    IString izerob0 = zerob0;
+    izerob0 = izerob0.UpCase();
+    if (izerob0 != "TRUE" && izerob0 != "FALSE") {
+      string message = "The " + phtName + " Photometric model requires a value for the ZEROB0STANDARD parameter.";
+      message += "The valid values for ZEROB0STANDARD are: TRUE, FALSE";
+      throw IException(IException::User, message, _FILEINFO_);
     }
+    phtLog += toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("ZEROB0STANDARD");
     if (phtName == "HAPKEHEN") {
       if (parMap.contains("HG1")) {
         toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").

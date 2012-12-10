@@ -167,7 +167,10 @@
     user setting for "ZEROB0ST" from the PVL file.  If no PVL file exists and the 
     user does not specify a "FALSE" or "TRUE" option, the program will automatically
     default to "TRUE" to follow the default setting in previous photomet versions.
- 
+
+    PLEASE NOTE: This change was actually not added because the ability to support aliases
+    (or deprecated) values has not been fully implemented in ISIS. As a result, you
+    must use the full ZEROB0STANDARD parameter name. 
     </p>
     <p>
     The parameter name "INCMAT" is no longer required when the "ALBEDO" normalization 
@@ -780,15 +783,19 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
       Group = Algorithm
 	PhtName = LunarLambertEmpirical
 	PhaseList = "0.,10.,20.,30.,40.,50.,60.,70.,80.,90.,100.,110.,120.,130.,140.,150.,160.,170.,180."
-	LList = "0.946,0.748,0.616,0.522,0.435,0.350,0.266,0.187,0.118,0.062,0.018,-0.012,-0.027,-0.035,-0.036,-0.037,-0.031,-0.012,-0.010"
-	PhaseCurveList = "0.1578,0.1593,0.1558,0.1484,0.1391,0.1292,0.1194,0.1099,0.1008,0.09176,0.08242,0.07234,0.06165,0.05106,0.04091,0.03137,0.02171,0.01038,0."
+	LList = "0.946,0.748,0.616,0.522,0.435,0.350,0.266,0.187,0.118,0.062,0.018,-0.012,-0.027,
+	   -0.035,-0.036,-0.037,-0.031,-0.012,-0.010"
+	PhaseCurveList = "0.1578,0.1593,0.1558,0.1484,0.1391,0.1292,0.1194,0.1099,0.1008,0.09176,
+	   0.08242,0.07234,0.06165,0.05106,0.04091,0.03137,0.02171,0.01038,0."
       EndGroup
 
       Group = Algorithm
 	PhtName = MinnaertEmpirical
 	PhaseList = "0.,10.,20.,30.,40.,50.,60.,70.,80.,90.,100.,110.,120.,130.,140.,150.,160.,170.,180."
-	KList = "0.518,0.595,0.660,0.709,0.753,0.796,0.837,0.875,0.904,0.922,0.926,0.935,0.954,0.986,1.019,1.063,1.099,1.095,1.090"
-	PhaseCurveList = "0.1574,0.1582,0.1546,0.1470,0.1375,0.1273,0.1174,0.1077,0.09797,0.08750,0.07594,0.06466,0.05471,0.04665,0.03935,0.03339,0.02642,0.01482,0."
+	KList = "0.518,0.595,0.660,0.709,0.753,0.796,0.837,0.875,0.904,0.922,0.926,0.935,0.954,0.986,
+	   1.019,1.063,1.099,1.095,1.090"
+	PhaseCurveList = "0.1574,0.1582,0.1546,0.1470,0.1375,0.1273,0.1174,0.1077,0.09797,0.08750,
+	   0.07594,0.06466,0.05471,0.04665,0.03935,0.03339,0.02642,0.01482,0."
       EndGroup
     EndObject 
 
@@ -960,6 +967,9 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
          set using the CHNGPAR parameter will override changes that are specified in the
          GUI. Any value that is changed through the GUI will override values specified in
          the FROMPVL file.
+         **PLEASE NOTE**: Any parameter that you type into the CHNGPAR string MUST be spelled
+         correctly and using the full name (no partial parameter names). Otherwise, the
+         program will not recognize the parameter and it won't get used.
       2) Added new output groups to the print.prt log file so that the user can see exactly
          which values were used to run photomet. The new groups that get written to the
          print.prt file include NormalizationModelParametersUsed, AtmosphericModelParametersUsed,
@@ -976,6 +986,13 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
          name was too long. We are maintaining backwards compatibility by supporting both
          ZEROB0STANDARD and ZEROB0ST in the photomet code. This will allow you to run a 
          script with the old parameter name without any problems.
+    </change>
+    <change name="Janet Barrett" date="2012-12-07">
+      PLEASE NOTE (in reference to change made on 2012-10-24): The backwards compatibility for 
+      the shorter ZEROB0ST parameter name has not been fully implemented in ISIS. As a result, 
+      this change has been removed and the full ZEROB0STANDARD parameter name must be used.
+      Support for aliases (deprecated values) must be fully implemented in ISIS before the shorter
+      parameter name (ZEROB0ST) will be available. Fixes #1288.
     </change>
   </history>
   
@@ -1061,6 +1078,9 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
         <description>
           Chngpar is used to enter a string of parameter names and values enclosed in
 	  quotes that will be added to or replaces the pre-defined parameter values. 
+	  PLEASE NOTE: Any parameter names used in the CHNGPAR string input MUST be
+	  spelled out completely and without any errors. Otherwise, they will be ignored
+	  by the program.
 	  <blockquote>
 	  Example:<br/>
 	  photomet from=f1.cub to=pho.cub frompvl=my.pvl chngpar="tau=0.5 tauref=30"
@@ -1482,7 +1502,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
               <item>HG2</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0ST</item>
+              <item>ZEROB0STANDARD</item>
               <item>BH</item>
               <item>CH</item>
               <item>L</item>
@@ -1509,7 +1529,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
               <item>HG2</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0ST</item>
+              <item>ZEROB0STANDARD</item>
               <item>BH</item>
               <item>CH</item>
               <item>L</item>
@@ -1535,7 +1555,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
               <item>HG2</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0ST</item>
+              <item>ZEROB0STANDARD</item>
             </inclusions>
             <exclusions>
               <item>BH</item>
@@ -1563,7 +1583,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0ST</item>
+              <item>ZEROB0STANDARD</item>
             </inclusions>
             <exclusions>
               <item>HG1</item>
@@ -1594,7 +1614,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0ST</item>
+              <item>ZEROB0STANDARD</item>
               <item>L</item>
               <item>K</item>
               <item>PHASELIST</item>
@@ -1625,7 +1645,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0ST</item>
+              <item>ZEROB0STANDARD</item>
               <item>K</item>
               <item>L</item>
               <item>KLIST</item>
@@ -1648,7 +1668,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0ST</item>
+              <item>ZEROB0STANDARD</item>
               <item>L</item>
               <item>K</item>
               <item>PHASELIST</item>
@@ -1677,7 +1697,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0ST</item>
+              <item>ZEROB0STANDARD</item>
               <item>K</item>
               <item>PHASELIST</item>
               <item>KLIST</item>
@@ -1707,7 +1727,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0ST</item>
+              <item>ZEROB0STANDARD</item>
               <item>K</item>
               <item>L</item>
               <item>LLIST</item>
@@ -1733,7 +1753,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0ST</item>
+              <item>ZEROB0STANDARD</item>
               <item>L</item>
               <item>PHASELIST</item>
               <item>KLIST</item>
@@ -1888,7 +1908,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
         <minimum inclusive="yes">0.0</minimum>
       </parameter>
 
-      <parameter name="ZEROB0ST">
+      <parameter name="ZEROB0STANDARD">
         <type>string</type>
         <brief>
            Specifies if opposition surge is set to zero under standard conditions
@@ -1897,17 +1917,17 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
         <description>
           This specifies if the opposition surge component B0 is set to zero
           during the standard conditions phase.  The program will automatically
-	  default to "true" if "ZEROB0ST" is not defined in the PVL FILE when the 
+	  default to "true" if "ZEROB0STANDARD" is not defined in the PVL FILE when the 
 	  "READFROMPVL" option is selected, and the user did not choose either
 	   "FALSE" or "TRUE" option.
         </description>
         <list>
           <option value="READFROMPVL">
             <brief>
-              Get ZEROB0ST value from the FROMPVL file
+              Get ZEROB0STANDARD value from the FROMPVL file
             </brief>
             <description>
-              Retrieve and set the ZEROB0ST parameter from the FROMPVL file. If
+              Retrieve and set the ZEROB0STANDARD parameter from the FROMPVL file. If
               a FROMPVL file is not provided, then an error will occur.
             </description>
           </option>

@@ -5,6 +5,7 @@
 #include "PvlGroup.h"
 #include "UserInterface.h"
 #include "IString.h"
+#include <QMessageBox>
 
 using namespace std;
 using namespace Isis;
@@ -74,172 +75,183 @@ void LoadPvl() {
   phtName = phtName.UpCase();
   IString atmName = ui.GetAsString("ATMNAME");
   atmName = atmName.UpCase();
-  if (phtName == "NONE" && atmName == "NONE") {
-    string message = "A photometric model or an atmospheric model must be specified before it can be loaded from the PVL";
-    throw IException(IException::User, message, _FILEINFO_);
-  }
-  if (phtName != "NONE") {
-    if (inPvl.HasObject("PhotometricModel")) {
-      PvlObject phtObj = inPvl.FindObject("PhotometricModel");
-      IString phtVal;
-      if (phtObj.HasGroup("Algorithm")) {
-        PvlObject::PvlGroupIterator phtGrp = phtObj.BeginGroup();
-        bool wasFound = false;
-        if (phtGrp->HasKeyword("PHTNAME")) {
-          phtVal = (string)phtGrp->FindKeyword("PHTNAME");
-        } else if (phtGrp->HasKeyword("NAME")) {
-          phtVal = (string)phtGrp->FindKeyword("NAME");
-        } else {
-          phtVal = "NONE";
-        }
-        phtVal = phtVal.UpCase();
-        if (phtName == phtVal) {
-          wasFound = true;
-        }
-        if (ui.WasEntered("PHTNAME") && !wasFound) {
-          phtName = ui.GetAsString("PHTNAME");
-          phtName = phtName.UpCase();
-          while (phtGrp != phtObj.EndGroup()) {
-            if (phtGrp->HasKeyword("PHTNAME") || phtGrp->HasKeyword("NAME")) {
-              if (phtGrp->HasKeyword("PHTNAME")) {
-                phtVal = (string)phtGrp->FindKeyword("PHTNAME");
-              } else if (phtGrp->HasKeyword("NAME")) {
-                phtVal = (string)phtGrp->FindKeyword("NAME");
-              } else {
-                phtVal = "NONE";
-              }
-              phtVal = phtVal.UpCase();
-              if (phtName == phtVal) {
-                wasFound = true;
-                break;
-              }
+
+  IString phtVal;
+  if (inPvl.HasObject("PhotometricModel")) {
+    PvlObject phtObj = inPvl.FindObject("PhotometricModel");
+    if (!phtObj.HasGroup("Algorithm")) {
+      string message = "The input PVL does not contain a valid photometric model so you must specify one ";
+      message += "- the [Algorithm] group is missing in your [PhotometricModel]";
+      throw IException(IException::User, message, _FILEINFO_);
+    }
+    else {
+      PvlObject::PvlGroupIterator phtGrp = phtObj.BeginGroup();
+      bool wasFound = false;
+      if (phtGrp->HasKeyword("PHTNAME")) {
+        phtVal = (string)phtGrp->FindKeyword("PHTNAME");
+      } else if (phtGrp->HasKeyword("NAME")) {
+        phtVal = (string)phtGrp->FindKeyword("NAME");
+      } else {
+        string message = "The input PVL does not contain a valid photometric model so you must specify one ";
+        message += "- the [Phtname] keyword is missing in your [Algorithm] group";
+        throw IException(IException::User, message, _FILEINFO_);
+      }
+      phtVal = phtVal.UpCase();
+      if (phtName == phtVal || phtName == "NONE" || phtName == "FROMPVL") {
+        wasFound = true;
+      }
+      if (!wasFound) {
+        while (phtGrp != phtObj.EndGroup()) {
+          if (phtGrp->HasKeyword("PHTNAME") || phtGrp->HasKeyword("NAME")) {
+            if (phtGrp->HasKeyword("PHTNAME")) {
+              phtVal = (string)phtGrp->FindKeyword("PHTNAME");
+            } else if (phtGrp->HasKeyword("NAME")) {
+              phtVal = (string)phtGrp->FindKeyword("NAME");
+            } else {
+              string message = "The input PVL does not contain a valid photometric model so you must specify one ";
+              message += "- the [Phtname] keyword is missing in your [Algorithm] group";
+              throw IException(IException::User, message, _FILEINFO_);
+            }
+            phtVal = phtVal.UpCase();
+            if (phtName == phtVal) {
+              wasFound = true;
+              break;
             }
             phtGrp++;
           }
         }
-        if (wasFound) {
-          ui.Clear("PHTNAME");
-          ui.Clear("THETA");
-          ui.Clear("WH");
-          ui.Clear("HG1");
-          ui.Clear("HG2");
-          ui.Clear("HH");
-          ui.Clear("B0");
-          ui.Clear("BH");
-          ui.Clear("CH");
-          ui.Clear("L");
-          ui.Clear("K");
-          ui.Clear("PHASELIST");
-          ui.Clear("KLIST");
-          ui.Clear("LLIST");
-          ui.Clear("PHASECURVELIST");
-          if (phtGrp->HasKeyword("PHTNAME")) {
-            phtVal = (string)phtGrp->FindKeyword("PHTNAME");
-          } else if (phtGrp->HasKeyword("NAME")) {
-            phtVal = (string)phtGrp->FindKeyword("NAME");
-          } else {
-            phtVal = "NONE";
+      }
+      if (wasFound) {
+        ui.Clear("PHTNAME");
+        ui.Clear("THETA");
+        ui.Clear("WH");
+        ui.Clear("HG1");
+        ui.Clear("HG2");
+        ui.Clear("HH");
+        ui.Clear("B0");
+        ui.Clear("ZEROB0STANDARD");
+        ui.Clear("BH");
+        ui.Clear("CH");
+        ui.Clear("L");
+        ui.Clear("K");
+        ui.Clear("PHASELIST");
+        ui.Clear("KLIST");
+        ui.Clear("LLIST");
+        ui.Clear("PHASECURVELIST");
+        if (phtVal == "HAPKEHEN" || phtVal == "HAPKELEG") {
+          if (phtGrp->HasKeyword("THETA")) {
+            PvlKeyword thetaKey = phtGrp->FindKeyword("THETA");
+            LoadKeyValue(thetaKey, keyVal);
+            ui.PutAsString("THETA", keyVal);
           }
-          phtVal = phtVal.UpCase();
-          if (phtVal == "HAPKEHEN" || phtVal == "HAPKELEG") {
-            if (phtGrp->HasKeyword("THETA")) {
-              PvlKeyword thetaKey = phtGrp->FindKeyword("THETA");
-              LoadKeyValue(thetaKey, keyVal);
-              ui.PutAsString("THETA", keyVal);
-            }
-            if (phtGrp->HasKeyword("WH")) {
-              PvlKeyword whKey = phtGrp->FindKeyword("WH");
-              LoadKeyValue(whKey, keyVal);
-              ui.PutAsString("WH", keyVal);
-            }
-            if (phtGrp->HasKeyword("HH")) {
-              PvlKeyword hhKey = phtGrp->FindKeyword("HH");
-              LoadKeyValue(hhKey, keyVal);
-              ui.PutAsString("HH", keyVal);
-            }
-            if (phtGrp->HasKeyword("B0")) {
-              PvlKeyword b0Key = phtGrp->FindKeyword("B0");
-              LoadKeyValue(b0Key, keyVal);
-              ui.PutAsString("B0", keyVal);
-            }
-            if (phtVal == "HAPKEHEN") {
-              if (phtGrp->HasKeyword("HG1")) {
-                PvlKeyword hg1Key = phtGrp->FindKeyword("HG1");
-                LoadKeyValue(hg1Key, keyVal);
-                ui.PutAsString("HG1", keyVal);
-              }
-              if (phtGrp->HasKeyword("HG2")) {
-                PvlKeyword hg2Key = phtGrp->FindKeyword("HG2");
-                LoadKeyValue(hg2Key, keyVal);
-                ui.PutAsString("HG2", keyVal);
-              }
-            }
-            if (phtVal == "HAPKELEG") {
-              if (phtGrp->HasKeyword("BH")) {
-                PvlKeyword bhKey = phtGrp->FindKeyword("BH");
-                LoadKeyValue(bhKey, keyVal);
-                ui.PutAsString("BH", keyVal);
-              }
-              if (phtGrp->HasKeyword("CH")) {
-                PvlKeyword chKey = phtGrp->FindKeyword("CH");
-                LoadKeyValue(chKey, keyVal);
-                ui.PutAsString("CH", keyVal);
-              }
-            }
-          } else if (phtVal == "MINNAERT") {
-            if (phtGrp->HasKeyword("K")) {
-              PvlKeyword k = phtGrp->FindKeyword("K");
-              LoadKeyValue(k, keyVal);
-              ui.PutAsString("K", keyVal);
-            }
-          } else if (phtVal == "LUNARLAMBERTEMPIRICAL" || phtVal == "MINNAERTEMPIRICAL") {
-            if (phtGrp->HasKeyword("PHASELIST")) {
-              PvlKeyword phaselist = phtGrp->FindKeyword("PHASELIST");
-              LoadKeyValue(phaselist, keyVal);
-              ui.PutAsString("PHASELIST", keyVal);
-            }
-            if (phtGrp->HasKeyword("PHASECURVELIST")) {
-              PvlKeyword phasecurvelist = phtGrp->FindKeyword("PHASECURVELIST");
-              LoadKeyValue(phasecurvelist, keyVal);
-              ui.PutAsString("PHASECURVELIST", keyVal);
-            }
-            if (phtVal == "LUNARLAMBERTEMPIRICAL") {
-              if (phtGrp->HasKeyword("LLIST")) {
-                PvlKeyword llist = phtGrp->FindKeyword("LLIST");
-                LoadKeyValue(llist, keyVal);
-                ui.PutAsString("LLIST", keyVal);
-              }
-            }
-            if (phtVal == "MINNAERTEMPIRICAL") {
-              if (phtGrp->HasKeyword("KLIST")) {
-                PvlKeyword kList = phtGrp->FindKeyword("KLIST");
-                LoadKeyValue(kList, keyVal);
-                ui.PutAsString("KLIST", keyVal);
-              }
-            }
-          } else if (phtVal == "LUNARLAMBERT") {
-            if (phtGrp->HasKeyword("L")) {
-              PvlKeyword l = phtGrp->FindKeyword("L");
-              LoadKeyValue(l, keyVal);
-              ui.PutAsString("L", keyVal);
-            }
-          } else if (phtVal != "LAMBERT" && phtVal != "LOMMELSEELIGER" &&
-                     phtVal != "LUNARLAMBERTMCEWEN") {
-            string message = "Unsupported photometric model [" + phtVal + "].";
-            throw IException(IException::User, message, _FILEINFO_);
+          if (phtGrp->HasKeyword("WH")) {
+            PvlKeyword whKey = phtGrp->FindKeyword("WH");
+            LoadKeyValue(whKey, keyVal);
+            ui.PutAsString("WH", keyVal);
           }
-          ui.PutAsString("PHTNAME", phtVal);
+          if (phtGrp->HasKeyword("HH")) {
+            PvlKeyword hhKey = phtGrp->FindKeyword("HH");
+            LoadKeyValue(hhKey, keyVal);
+            ui.PutAsString("HH", keyVal);
+          }
+          if (phtGrp->HasKeyword("B0")) {
+            PvlKeyword b0Key = phtGrp->FindKeyword("B0");
+            LoadKeyValue(b0Key, keyVal);
+            ui.PutAsString("B0", keyVal);
+          }
+          if (phtGrp->HasKeyword("ZEROB0STANDARD")) {
+            string zerob0 = (string)phtGrp->FindKeyword("ZEROB0STANDARD");
+            IString izerob0 = zerob0;
+            izerob0 = izerob0.UpCase();
+            if (izerob0 == "TRUE") {
+              ui.PutString("ZEROB0STANDARD", "TRUE");
+            } else if (izerob0 == "FALSE") {
+              ui.PutString("ZEROB0STANDARD", "FALSE");
+            } else {
+              string message = "The ZEROB0STANDARD value is invalid - must be set to TRUE or FALSE";
+              throw IException(IException::User, message, _FILEINFO_);
+            }
+          }
+          if (phtVal == "HAPKEHEN") {
+            if (phtGrp->HasKeyword("HG1")) {
+              PvlKeyword hg1Key = phtGrp->FindKeyword("HG1");
+              LoadKeyValue(hg1Key, keyVal);
+              ui.PutAsString("HG1", keyVal);
+            }
+            if (phtGrp->HasKeyword("HG2")) {
+              PvlKeyword hg2Key = phtGrp->FindKeyword("HG2");
+              LoadKeyValue(hg2Key, keyVal);
+              ui.PutAsString("HG2", keyVal);
+            }
+          }
+          if (phtVal == "HAPKELEG") {
+            if (phtGrp->HasKeyword("BH")) {
+              PvlKeyword bhKey = phtGrp->FindKeyword("BH");
+              LoadKeyValue(bhKey, keyVal);
+              ui.PutAsString("BH", keyVal);
+            }
+            if (phtGrp->HasKeyword("CH")) {
+              PvlKeyword chKey = phtGrp->FindKeyword("CH");
+              LoadKeyValue(chKey, keyVal);
+              ui.PutAsString("CH", keyVal);
+            }
+          }
+        } else if (phtVal == "MINNAERT") {
+          if (phtGrp->HasKeyword("K")) {
+            PvlKeyword k = phtGrp->FindKeyword("K");
+            LoadKeyValue(k, keyVal);
+            ui.PutAsString("K", keyVal);
+          }
+        } else if (phtVal == "LUNARLAMBERTEMPIRICAL" || phtVal == "MINNAERTEMPIRICAL") {
+          if (phtGrp->HasKeyword("PHASELIST")) {
+            PvlKeyword phaselist = phtGrp->FindKeyword("PHASELIST");
+            LoadKeyValue(phaselist, keyVal);
+            ui.PutAsString("PHASELIST", keyVal);
+          }
+          if (phtGrp->HasKeyword("PHASECURVELIST")) {
+            PvlKeyword phasecurvelist = phtGrp->FindKeyword("PHASECURVELIST");
+            LoadKeyValue(phasecurvelist, keyVal);
+            ui.PutAsString("PHASECURVELIST", keyVal);
+          }
+          if (phtVal == "LUNARLAMBERTEMPIRICAL") {
+            if (phtGrp->HasKeyword("LLIST")) {
+              PvlKeyword llist = phtGrp->FindKeyword("LLIST");
+              LoadKeyValue(llist, keyVal);
+              ui.PutAsString("LLIST", keyVal);
+            }
+          }
+          if (phtVal == "MINNAERTEMPIRICAL") {
+            if (phtGrp->HasKeyword("KLIST")) {
+              PvlKeyword kList = phtGrp->FindKeyword("KLIST");
+              LoadKeyValue(kList, keyVal);
+              ui.PutAsString("KLIST", keyVal);
+            }
+          }
+        } else if (phtVal == "LUNARLAMBERT") {
+          if (phtGrp->HasKeyword("L")) {
+            PvlKeyword l = phtGrp->FindKeyword("L");
+            LoadKeyValue(l, keyVal);
+            ui.PutAsString("L", keyVal);
+          }
+        } else if (phtVal != "LAMBERT" && phtVal != "LOMMELSEELIGER" &&
+                   phtVal != "LUNARLAMBERTMCEWEN") {
+          string message = "Unsupported photometric model [" + phtVal + "].";
+          throw IException(IException::User, message, _FILEINFO_);
         }
+        ui.PutAsString("PHTNAME", phtVal);
       }
     }
   }
-  if (atmName == "NONE") {
-    return;
-  }
+
+  IString atmVal;
   if (inPvl.HasObject("AtmosphericModel")) {
     PvlObject atmObj = inPvl.FindObject("AtmosphericModel");
-    IString atmVal;
-    if (atmObj.HasGroup("Algorithm")) {
+    if (!atmObj.HasGroup("Algorithm")) {
+      string message = "The input PVL does not contain a valid atmospheric model so you must specify one ";
+      message += "- the [Algorithm] group is missing in your [AtmosphericModel]";
+      throw IException(IException::User, message, _FILEINFO_);
+    }
+    else {
       PvlObject::PvlGroupIterator atmGrp = atmObj.BeginGroup();
       bool wasFound = false;
       if (atmGrp->HasKeyword("ATMNAME")) {
@@ -247,13 +259,15 @@ void LoadPvl() {
       } else if (atmGrp->HasKeyword("NAME")) {
         atmVal = (string)atmGrp->FindKeyword("NAME");
       } else {
-        atmVal = "NONE";
+        string message = "The input PVL does not contain a valid atmospheric model so you must specify one ";
+        message += "- the [Atmname] keyword is missing in your [Algorithm] group";
+        throw IException(IException::User, message, _FILEINFO_);
       }
       atmVal = atmVal.UpCase();
-      if (atmName == atmVal) {
+      if (atmName == atmVal || atmName == "NONE" || atmName == "FROMPVL") {
         wasFound = true;
       }
-      if (ui.WasEntered("ATMNAME") && !wasFound) {
+      if (!wasFound) {
         while (atmGrp != atmObj.EndGroup()) {
           if (atmGrp->HasKeyword("ATMNAME") || atmGrp->HasKeyword("NAME")) {
             if (atmGrp->HasKeyword("ATMNAME")) {
@@ -261,7 +275,9 @@ void LoadPvl() {
             } else if (atmGrp->HasKeyword("NAME")) {
               atmVal = (string)atmGrp->FindKeyword("NAME");
             } else {
-              atmVal = "NONE";
+              string message = "The input PVL does not contain a valid atmospheric model so you must specify one ";
+              message += "- the [Atmname] keyword is missing in your [Algorithm] group";
+              throw IException(IException::User, message, _FILEINFO_);
             }
             atmVal = atmVal.UpCase();
             if (atmName == atmVal) {
@@ -272,87 +288,78 @@ void LoadPvl() {
           atmGrp++;
         }
       }
-      if (!wasFound) {
-        return;
-      }
-      ui.Clear("ATMNAME");
-      ui.Clear("HNORM");
-      ui.Clear("BHA");
-      ui.Clear("TAU");
-      ui.Clear("TAUREF");
-      ui.Clear("WHA");
-      ui.Clear("HGA");
-      if (atmGrp->HasKeyword("ATMNAME")) {
-        atmVal = (string)atmGrp->FindKeyword("ATMNAME");
-      } else if (atmGrp->HasKeyword("NAME")) {
-        atmVal = (string)atmGrp->FindKeyword("NAME");
-      } else {
-        atmVal = "NONE";
-      }
-      atmVal = atmVal.UpCase();
-      if (atmVal == "ANISOTROPIC1" || atmVal == "ANISOTROPIC2" ||
-          atmVal == "HAPKEATM1" || atmVal == "HAPKEATM2" ||
-          atmVal == "ISOTROPIC1" || atmVal == "ISOTROPIC2") {
-        if (atmGrp->HasKeyword("HNORM")) {
-          double hnorm = atmGrp->FindKeyword("HNORM");
-          os.str("");
-          os << hnorm;
-          ui.PutAsString("HNORM", os.str());
-        }
-        if (atmGrp->HasKeyword("TAU")) {
-          double tau = atmGrp->FindKeyword("TAU");
-          os.str("");
-          os << tau;
-          ui.PutAsString("TAU", os.str());
-        }
-        if (atmGrp->HasKeyword("TAUREF")) {
-          double tauref = atmGrp->FindKeyword("TAUREF");
-          os.str("");
-          os << tauref;
-          ui.PutAsString("TAUREF", os.str());
-        }
-        if (atmGrp->HasKeyword("WHA")) {
-          double wha = atmGrp->FindKeyword("WHA");
-          os.str("");
-          os << wha;
-          ui.PutAsString("WHA", os.str());
-        }
-        if (atmGrp->HasKeyword("NULNEG")) {
-          string nulneg = (string)atmGrp->FindKeyword("NULNEG");
-          if (nulneg.compare("YES")) {
-            ui.PutString("NULNEG", "YES");
-          } else if (nulneg.compare("NO")) {
-            ui.PutString("NULNEG", "NO");
-          } else {
-            string message = "The NULNEG value is invalid - must be set to YES or NO";
-            throw IException(IException::User, message, _FILEINFO_);
+      if (wasFound) {
+        ui.Clear("ATMNAME");
+        ui.Clear("HNORM");
+        ui.Clear("BHA");
+        ui.Clear("TAU");
+        ui.Clear("TAUREF");
+        ui.Clear("WHA");
+        ui.Clear("HGA");
+        if (atmVal == "ANISOTROPIC1" || atmVal == "ANISOTROPIC2" ||
+            atmVal == "HAPKEATM1" || atmVal == "HAPKEATM2" ||
+            atmVal == "ISOTROPIC1" || atmVal == "ISOTROPIC2") {
+          if (atmGrp->HasKeyword("HNORM")) {
+            double hnorm = atmGrp->FindKeyword("HNORM");
+            os.str("");
+            os << hnorm;
+            ui.PutAsString("HNORM", os.str());
+          }
+          if (atmGrp->HasKeyword("TAU")) {
+            double tau = atmGrp->FindKeyword("TAU");
+            os.str("");
+            os << tau;
+            ui.PutAsString("TAU", os.str());
+          }
+          if (atmGrp->HasKeyword("TAUREF")) {
+            double tauref = atmGrp->FindKeyword("TAUREF");
+            os.str("");
+            os << tauref;
+            ui.PutAsString("TAUREF", os.str());
+          }
+          if (atmGrp->HasKeyword("WHA")) {
+            double wha = atmGrp->FindKeyword("WHA");
+            os.str("");
+            os << wha;
+            ui.PutAsString("WHA", os.str());
+          }
+          if (atmGrp->HasKeyword("NULNEG")) {
+            string nulneg = (string)atmGrp->FindKeyword("NULNEG");
+            if (nulneg.compare("YES")) {
+              ui.PutString("NULNEG", "YES");
+            } else if (nulneg.compare("NO")) {
+              ui.PutString("NULNEG", "NO");
+            } else {
+              string message = "The NULNEG value is invalid - must be set to YES or NO";
+              throw IException(IException::User, message, _FILEINFO_);
+            }
           }
         }
-      }
-      if (atmVal == "ANISOTROPIC1" || atmVal == "ANISOTROPIC2") {
-        if (atmGrp->HasKeyword("BHA")) {
-          double bha = atmGrp->FindKeyword("BHA");
-          os.str("");
-          os << bha;
-          ui.PutAsString("BHA", os.str());
+        if (atmVal == "ANISOTROPIC1" || atmVal == "ANISOTROPIC2") {
+          if (atmGrp->HasKeyword("BHA")) {
+            double bha = atmGrp->FindKeyword("BHA");
+            os.str("");
+            os << bha;
+            ui.PutAsString("BHA", os.str());
+          }
         }
-      }
-      if (atmVal == "HAPKEATM1" || atmVal == "HAPKEATM2") {
-        if (atmGrp->HasKeyword("HGA")) {
-          double hga = atmGrp->FindKeyword("HGA");
-          os.str("");
-          os << hga;
-          ui.PutAsString("HGA", os.str());
+        if (atmVal == "HAPKEATM1" || atmVal == "HAPKEATM2") {
+          if (atmGrp->HasKeyword("HGA")) {
+            double hga = atmGrp->FindKeyword("HGA");
+            os.str("");
+            os << hga;
+            ui.PutAsString("HGA", os.str());
+          }
         }
-      }
 
-      if (atmVal != "ANISOTROPIC1" && atmVal != "ANISOTROPIC2" &&
-          atmVal != "HAPKEATM1" && atmVal != "HAPKEATM2" &&
-          atmVal != "ISOTROPIC1" && atmVal != "ISOTROPIC2") {
-        string message = "Unsupported atmospheric model [" + atmVal + "].";
-        throw IException(IException::User, message, _FILEINFO_);
+        if (atmVal != "ANISOTROPIC1" && atmVal != "ANISOTROPIC2" &&
+            atmVal != "HAPKEATM1" && atmVal != "HAPKEATM2" &&
+            atmVal != "ISOTROPIC1" && atmVal != "ISOTROPIC2") {
+          string message = "Unsupported atmospheric model [" + atmVal + "].";
+          throw IException(IException::User, message, _FILEINFO_);
+        }
+        ui.PutAsString("ATMNAME", atmVal);
       }
-      ui.PutAsString("ATMNAME", atmVal);
     }
   }
 }
@@ -510,6 +517,26 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
         message += "The normal range for B0 is: 0 <= B0";
         throw IException(IException::User, message, _FILEINFO_);
       }
+    }
+    if (ui.GetString("ZEROB0STANDARD") != "READFROMPVL") {
+      if (ui.GetString("ZEROB0STANDARD") == "TRUE") {
+        outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+               AddKeyword(PvlKeyword("ZEROB0STANDARD","TRUE"),Pvl::Replace);
+      } else if (ui.GetString("ZEROB0STANDARD") == "FALSE") {
+        outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+               AddKeyword(PvlKeyword("ZEROB0STANDARD","FALSE"),Pvl::Replace);
+      }
+    } else if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+               HasKeyword("ZEROB0STANDARD")) {
+      if (ui.IsInteractive()) { 
+        QMessageBox msgbox;
+        QString message = "You requested that the ZEROB0STANDARD value come from the input PVL file, but there is not one, so the ";
+        message += "ZEROB0STANDARD parameter is being set to TRUE.";
+        msgbox.setText(message);
+        msgbox.exec();
+      }
+      outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+             AddKeyword(PvlKeyword("ZEROB0STANDARD","TRUE"),Pvl::Replace);
     }
     if (phtName == "HAPKEHEN") {
       if (ui.WasEntered("HG1")) {
@@ -802,14 +829,14 @@ void addAtmosModel(Pvl &pvl, Pvl &outPvl) {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.GetString("NULNEG") == "YES") {
-      outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
-             AddKeyword(PvlKeyword("NULNEG","YES"),Pvl::Replace);
-    } else if (ui.GetString("NULNEG") == "NO") {
-      outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
-             AddKeyword(PvlKeyword("NULNEG","NO"),Pvl::Replace);
-    } else {
-      if (!outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
+    if (ui.GetString("NULNEG") != "READFROMPVL") {
+      if (ui.GetString("NULNEG") == "YES") {
+        outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
+               AddKeyword(PvlKeyword("NULNEG","YES"),Pvl::Replace);
+      } else if (ui.GetString("NULNEG") == "NO") {
+        outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
+               AddKeyword(PvlKeyword("NULNEG","NO"),Pvl::Replace);
+    } else if (!outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                   HasKeyword("NULNEG")) {
         string message = "The " + atmName + " Atmospheric model requires a value for the NULNEG parameter.";
         message += "The valid values for NULNEG are: YES, NO";

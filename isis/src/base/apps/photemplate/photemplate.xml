@@ -29,7 +29,10 @@
      </p>
      <p>
      This program allows the use of a PVL file that contains preset parameter names for 
-     different photometric and atmospheric models.  
+     different photometric and atmospheric models. NOTE: if the user leaves the 
+     ZEROB0STANDARD parameter set to READFROMPVL and does not provide an input PVL
+     file, then the ZEROB0STANDARD parameter will default to TRUE.
+
      Within the GUI, the user may select a PVL file and then use the drop-down 
      menu to view the contents of the PVL file or to load the parameter values 
      from the PVL file into the appropriate parameter names in the GUI.  Note:  
@@ -341,6 +344,7 @@ See <a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/p
               <item>KLIST</item>
               <item>LLIST</item>
               <item>PHASECURVELIST</item>
+              <item>ZEROB0STANDARD</item>
             </exclusions>
           </option>
 
@@ -753,7 +757,7 @@ See <a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/p
         <minimum inclusive="yes">0.0</minimum>
       </parameter>
 
-      <parameter name="ZEROB0ST">
+      <parameter name="ZEROB0STANDARD">
         <type>string</type>
         <brief>
           Specifies if opposition surge is set to zero under standard conditions
@@ -761,17 +765,19 @@ See <a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/p
          <default><item>TRUE</item></default>
         <description>
           This specifies if the opposition surge component B0 is set to zero
-          during the standard conditions phase.  The program will automatically
-	  default to "TRUE" if "ZEROBST" is not defined by the user.
+          during the standard conditions phase.  NOTE: The program will automatically
+	  default to "TRUE" if "ZEROBSTANDARD" is not defined by the user.
         </description>
         <list>
           <option value="READFROMPVL">
             <brief>
-              Get ZEROB0ST value from the FROMPVL file
+              Get ZEROB0STANDARD value from the FROMPVL file
             </brief>
             <description>
-              Retrieve and set the ZEROB0ST parameter from the FROMPVL file. If
-              a FROMPVL file is not provided, then an error will occur.
+              Retrieve and set the ZEROB0STANDARD parameter from the FROMPVL file. If
+              a FROMPVL file is not provided, then an error will occur. NOTE: If the
+              user does not define a value for ZEROB0STANDARD in the input PVL file, 
+              then the ZEROB0STANDARD value will default to TRUE.
             </description>
           </option>
           <option value="FALSE">

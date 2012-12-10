@@ -389,6 +389,13 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
       disabled the use of a datafile with the empirical functions because
       of a bug in the program, fixes #455.
     </change>
+    <change name="Janet Barrett" date="2012-12-07">
+      PLEASE NOTE (in reference to change made on 2012-11-20): The backwards compatibility for
+      the shorter ZEROB0ST parameter name has not been fully implemented in ISIS. As a result,
+      this change has been removed and the full ZEROB0STANDARD parameter name must be used.
+      Support for aliases (deprecated values) must be fully implemented in ISIS before the shorter
+      parameter name (ZEROB0ST) will be available. Fixes #1288.
+    </change>
   </history>
 
   <groups>
@@ -554,7 +561,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
               <item>HG2</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0ST</item>
+              <item>ZEROB0STANDARD</item>
             </inclusions>
             <exclusions>
               <item>BH</item>
@@ -579,7 +586,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0ST</item>
+              <item>ZEROB0STANDARD</item>
             </inclusions>
             <exclusions>
               <item>HG1</item>
@@ -604,7 +611,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
               <item>HG2</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0ST</item>
+              <item>ZEROB0STANDARD</item>
               <item>BH</item>
               <item>CH</item>
               <item>L</item>
@@ -630,7 +637,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0ST</item>
+              <item>ZEROB0STANDARD</item>
               <item>L</item>
               <item>K</item>
               <!-- item DATAFILE item -->
@@ -654,7 +661,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0ST</item>
+              <item>ZEROB0STANDARD</item>
               <item>K</item>
               <item>L</item>
               <item>DATAFILE</item>
@@ -679,7 +686,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0ST</item>
+              <item>ZEROB0STANDARD</item>
               <item>L</item>
               <item>K</item>
               <!-- item DATAFILE item -->
@@ -705,7 +712,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0ST</item>
+              <item>ZEROB0STANDARD</item>
               <item>K</item>
               <!-- item DATAFILE item -->
             </exclusions>
@@ -728,7 +735,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0ST</item>
+              <item>ZEROB0STANDARD</item>
               <item>K</item>
               <item>L</item>
               <item>DATAFILE</item>
@@ -755,7 +762,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
               <item>CH</item>
               <item>HH</item>
               <item>B0</item>
-              <item>ZEROB0ST</item>
+              <item>ZEROB0STANDARD</item>
               <item>L</item>
               <!-- item DATAFILE item -->
             </exclusions>
@@ -907,7 +914,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
         <minimum inclusive="yes">0.0</minimum>
       </parameter>
 
-      <parameter name="ZEROB0ST">
+      <parameter name="ZEROB0STANDARD">
         <type>string</type>
         <brief>
            Specifies if opposition surge is set to zero under standard conditions
@@ -916,7 +923,7 @@ Tomasko, M. G., et al., 1999, Properties of Dust in the Martian Atmosphere
         <description>
           This specifies if the opposition surge component B0 is set to zero
           during the standard conditions phase.  The program will automatically
-	  default to "true" if "ZEROB0ST" is not defined by the user.
+	  default to "true" if "ZEROB0STANDARD" is not defined by the user.
         </description>
         <list>
           <option value="FALSE">

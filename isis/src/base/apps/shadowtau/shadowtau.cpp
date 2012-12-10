@@ -114,11 +114,11 @@ void IsisMain() {
       photoPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                AddKeyword(PvlKeyword("THETA",theta),Pvl::Replace);
     }
-    if (ui.WasEntered("ZEROB0ST")) {
-      IString keyval = ui.GetString("ZEROB0ST");
+    if (ui.WasEntered("ZEROB0STANDARD")) {
+      IString keyval = ui.GetString("ZEROB0STANDARD");
       keyval = keyval.UpCase();
       photoPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-               AddKeyword(PvlKeyword("ZEROB0ST",keyval),Pvl::Replace);
+               AddKeyword(PvlKeyword("ZEROB0STANDARD",keyval),Pvl::Replace);
     }
     if (sPhotoFunc == "HAPKEHEN") {
       if (ui.WasEntered("HG1")) {
