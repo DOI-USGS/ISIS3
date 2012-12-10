@@ -239,6 +239,18 @@ namespace Isis {
    *   @history 2012-10-31 Kris Becker - Added implementation for swapping of 
    *                           observer/target and light time correction to
    *                           surface. Fixes (mostly) #0909, #1136 and #1223.
+   *   @history 2012-12-10 Kris Becker - A newly designed class,
+   *                           SpacecraftPosition, is now being instantiated
+   *                           instead of SpicePosition specifically to properly
+   *                           order NAIF observer and target codes (to more
+   *                           accurately determine the target body position at
+   *                           the time the observation was initiated) and help
+   *                           determine light time correction to the surface of
+   *                           the target body instead of the center of the body.
+   *                           See the documention in SpacecraftPosition.h for a
+   *                           more detailed description of these changes.
+   *                           References #909, #1136 and #1223.
+   *                           
    */
   class Spice {
     public:
