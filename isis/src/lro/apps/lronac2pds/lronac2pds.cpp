@@ -184,7 +184,9 @@ void OutputLabel ( std::ofstream &fout, Cube* cube ) {
     }
 
     //Update the product ID
-    labelPvl["PRODUCT_ID"][0].replace(11, 1, "C");
+    //we switch the last char in the id from edr->cdr
+    string prod_id = labelPvl["PRODUCT_ID"][0];
+    labelPvl["PRODUCT_ID"][0].replace((prod_id.length()-1), 1, "C");
 
     // Update the product creation time
     labelPvl["PRODUCT_CREATION_TIME"].SetValue(iTime::CurrentGMT());
