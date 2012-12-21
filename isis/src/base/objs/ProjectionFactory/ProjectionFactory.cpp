@@ -164,7 +164,7 @@ namespace Isis {
       // This forces an exact match of projection parameters for
       // output cubes
       bool sizeFound = false;
-      double upperLeftX, upperLeftY;
+      double upperLeftX = Null, upperLeftY = Null;
       if(label.HasObject("IsisCube")) {
         Isis::PvlGroup &dims = label.FindGroup("Dimensions", Isis::Pvl::Traverse);
         samples = dims["Samples"];

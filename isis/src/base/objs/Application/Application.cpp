@@ -894,7 +894,7 @@ namespace Isis {
 
     // Read data from temp file
     char value[256];
-    readTemp.open(tempFile.c_str(), ifstream::in);
+    readTemp.open(tempFile.toAscii().data(), ifstream::in);
     readTemp.getline(value, 256);
     unameGroup.AddKeyword(PvlKeyword("MachineHardware", value));
     readTemp.getline(value, 256);

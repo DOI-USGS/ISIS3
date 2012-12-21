@@ -444,7 +444,7 @@ void OutputLabel ( std::ofstream &fout, Cube* cube, Pvl &labelPvl ) {
     stream << labelPvl;
     pdsLabel += stream.str().c_str();
 
-    while (pdsLabel.length() < (unsigned int) (labelRecords * recordBytes)) {
+    while ((int)pdsLabel.length() < (int) (labelRecords * recordBytes)) {
         pdsLabel += '\n';
     }
 

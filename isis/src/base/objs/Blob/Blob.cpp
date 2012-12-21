@@ -435,7 +435,7 @@ namespace Isis {
     }
 
     // See if the blob is already in the file
-    p_blobPvl["StartByte"] = toString(sbyte);
+    p_blobPvl["StartByte"] = toString((int)sbyte);
     p_blobPvl["Bytes"] = toString(p_nbytes);
 
     bool found = false;

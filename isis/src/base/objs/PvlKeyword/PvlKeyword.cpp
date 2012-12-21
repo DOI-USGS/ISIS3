@@ -811,7 +811,7 @@ namespace Isis {
             //   not units next.
             // we were already done if we had an excellent space
             if(validSpace && !currentPosQuoted) {
-              if((unsigned)searchPosition < remainingText.size() - 1 &&
+              if((int)searchPosition < (int)(remainingText.size() - 1) &&
                   remainingText[searchPosition+1] != '<') {
                 excellentSpace = searchPosition;
               }

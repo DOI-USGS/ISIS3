@@ -279,7 +279,7 @@ void diffTable(ofstream &target, int precision) {
     Column currCol;
     //Prepare and add the first file's column
     currCol.SetName(QString("File1_") + toString(samps[i]));
-    if((unsigned int)(colWidth + precision + 1) < currCol.Name().length()) {
+    if((int)(colWidth + precision + 1) < (int)currCol.Name().length()) {
       currCol.SetWidth(currCol.Name().length() + 1);
     }
     else currCol.SetWidth(colWidth + precision + 1);
