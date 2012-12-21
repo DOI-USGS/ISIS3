@@ -40,7 +40,7 @@ SCCSID @(#)types.h  1.1 10/04/99
 */
 /* SCCShid @(#)types.h (types.h) 1.1 */
 
-#if !defined(types_h)
+#ifndef types_h
 
 #define types_h
 

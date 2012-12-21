@@ -105,7 +105,7 @@ namespace Isis {
    * @param pattern Specifies an optional directory and file pattern to write
    *                the subsearch chip at each algorithm iteration.
    */
-  void Gruen::WriteSubsearchChips(const std::string &pattern) {
+  void Gruen::WriteSubsearchChips(const QString &pattern) {
     m_filePattern = pattern;
     return;
   }
@@ -235,7 +235,7 @@ namespace Isis {
       std::ostringstream mess;
       mess << "Minimum points (" << MinValidPoints(maxPnts)
            << ") criteria not met (" << npts << ")";
-      return (logError(NotEnoughPoints, string(mess.str())));
+      return (logError(NotEnoughPoints, mess.str().c_str()));
     }
 
     // Create the ATA array
@@ -259,8 +259,8 @@ namespace Isis {
       atai = Cholsl(atai, p, b, x);
     }
     catch(IException &ie) {
-      string mess = "Cholesky Failed:: " + ie.toString();
-      return (logError(CholeskyFailed, string(mess.c_str())));
+      QString mess = "Cholesky Failed:: " + ie.toString();
+      return (logError(CholeskyFailed, mess));
     }
 
     // Compute the affine update if result are requested by caller.
@@ -284,7 +284,7 @@ namespace Isis {
      affrad = AffineRadio(alpha);
     }
     catch(IException &ie) {
-      string mess = "Affine failed: " + ie.toString();
+      QString mess = "Affine failed: " + ie.toString();
       return (logError(AffineNotInvertable, mess));
     }
 
@@ -335,7 +335,7 @@ namespace Isis {
       }
     }
     catch(IException &ie) {
-      string errmsg = "Eigen Solution Failed:: " + ie.toString();
+      QString errmsg = "Eigen Solution Failed:: " + ie.toString();
       results.m_status = logError(EigenSolutionFailed, errmsg);
       return (results);
     }
@@ -703,7 +703,7 @@ namespace Isis {
     // implementation ensures caller must request it per call to this routine.
     //  See the WriteSubsearchChips() method.
     m_callCount++;
-    string chipOut = m_filePattern;
+    QString chipOut = m_filePattern;
     m_filePattern = "";
 
     //  Initialize match point.  Ensure points are centered to get real cube
@@ -745,11 +745,11 @@ namespace Isis {
       sChip.Extract(fChip, extractor);
 
       //  If requested for this run, write the current subsearch chip state
-      if (!chipOut.empty()) {
+      if (!chipOut.isEmpty()) {
         std::ostringstream ss;
         ss << "C" << std::setw(6) << std::setfill('0') << m_callCount << "I"
            << std::setw(3) << std::setfill('0') << m_nIters;
-        std::string sfname = chipOut + ss.str() + ".cub";
+        QString sfname = chipOut + ss.str().c_str() + ".cub";
         fChip.Write(sfname);
       }
 
@@ -768,7 +768,7 @@ namespace Isis {
       //  Test for termination conditions - errors or convergence
       matchpt.m_nIters = ++m_nIters;
       if (m_nIters > m_maxIters) {
-        string errmsg = "Maximum Iterations exceeded";
+        QString errmsg = "Maximum Iterations exceeded";
         matchpt.setStatus(logError(MaxIterationsExceeded, errmsg));
         return (Status(matchpt));  //  Error condition
       }
@@ -801,7 +801,7 @@ namespace Isis {
         affine += alpha;
       }
       catch (IException &ie) {
-        string mess = "Affine invalid/not invertable";
+        QString mess = "Affine invalid/not invertable";
         matchpt.setStatus(logError(AffineNotInvertable, mess));
         return (Status(matchpt));  //  Another error condition to return
       }
@@ -849,7 +849,7 @@ namespace Isis {
     }
 
     if (m_unclassified > 0) {
-      algo += PvlKeyword("UnclassifiedErrors", m_unclassified);
+      algo += PvlKeyword("UnclassifiedErrors", toString(m_unclassified));
     }
     pvl.AddGroup(algo);
     pvl.AddGroup(StatsLog());
@@ -870,7 +870,7 @@ namespace Isis {
   PvlGroup Gruen::StatsLog() const {
     PvlGroup stats("GruenStatistics");
 
-    stats += PvlKeyword("TotalIterations", m_totalIterations);
+    stats += PvlKeyword("TotalIterations",   toString(m_totalIterations));
     stats += ValidateKey("IterationMinimum", m_iterStat.Minimum());
     stats += ValidateKey("IterationAverage", m_iterStat.Average());
     stats += ValidateKey("IterationMaximum", m_iterStat.Maximum());
@@ -907,20 +907,20 @@ namespace Isis {
   PvlGroup Gruen::ParameterLog() const {
     PvlGroup parms("GruenParameters");
 
-    parms += PvlKeyword("MaximumIterations", m_maxIters);
+    parms += PvlKeyword("MaximumIterations", toString(m_maxIters));
     parms += ValidateKey("AffineScaleTolerance", m_scaleTol);
     parms += ValidateKey("AffineShearTolerance", m_shearTol);
     parms += ValidateKey("AffineTranslationTolerance", m_transTol);
 
     parms += ParameterKey("AffineTolerance", m_affineTol);
-    parms += ParameterKey("SpiceTolerance", m_spiceTol);
+    parms += ParameterKey("SpiceTolerance",  m_spiceTol);
 
     parms += ParameterKey("RadioShiftTolerance", m_shiftTol);
 
     parms += ParameterKey("RadioGainMinTolerance", m_rgainMinTol);
     parms += ParameterKey("RadioGainMaxTolerance", m_rgainMaxTol);
 
-    parms += ValidateKey("DefaultRadioGain", m_defGain);
+    parms += ValidateKey("DefaultRadioGain",  m_defGain);
     parms += ValidateKey("DefaultRadioShift", m_defShift);
 
     return (parms);
@@ -962,7 +962,7 @@ namespace Isis {
    * @param gerrno  One of the errors as defined by GruenError enum
    * @param gerrmsg  Optional message although it is ignored in this context
    */
-  int Gruen::logError(int gerrno, const std::string &gerrmsg) {
+  int Gruen::logError(int gerrno, const QString &gerrmsg) {
     if (!m_errors.exists(gerrno)) {
       m_unclassified++;
     }
@@ -990,25 +990,25 @@ namespace Isis {
       m_prof = DbProfile(pvl);
     }
 
-    if (m_prof.Name().empty())  m_prof.setName("Gruen");
+    if (m_prof.Name().isEmpty())  m_prof.setName("Gruen");
 
     // Define internal parameters
-    m_maxIters = ConfKey(m_prof, "MaximumIterations", 30);
+    m_maxIters = toInt(ConfKey(m_prof, "MaximumIterations", toString(30)));
 
-    m_transTol = ConfKey(m_prof, "AffineTranslationTolerance", 0.1);
-    m_scaleTol = ConfKey(m_prof, "AffineScaleTolerance", 0.3);
-    m_shearTol = ConfKey(m_prof, "AffineShearTolerance", m_scaleTol);
-    m_affineTol = ConfKey(m_prof, "AffineTolerance", DBL_MAX);
+    m_transTol = toDouble(ConfKey(m_prof, "AffineTranslationTolerance", toString(0.1)));
+    m_scaleTol = toDouble(ConfKey(m_prof, "AffineScaleTolerance", toString(0.3)));
+    m_shearTol = toDouble(ConfKey(m_prof, "AffineShearTolerance", toString(m_scaleTol)));
+    m_affineTol = toDouble(ConfKey(m_prof, "AffineTolerance", toString(DBL_MAX)));
 
-    m_spiceTol = ConfKey(m_prof, "SpiceTolerance", DBL_MAX);
+    m_spiceTol = toDouble(ConfKey(m_prof, "SpiceTolerance", toString(DBL_MAX)));
 
-    m_shiftTol = ConfKey(m_prof, "RadioShiftTolerance", DBL_MAX);
-    m_rgainMinTol = ConfKey(m_prof, "RadioGainMinTolerance", -DBL_MAX);
-    m_rgainMaxTol = ConfKey(m_prof, "RadioGainMaxTolerance", DBL_MAX);
+    m_shiftTol = toDouble(ConfKey(m_prof, "RadioShiftTolerance", toString(DBL_MAX)));
+    m_rgainMinTol = toDouble(ConfKey(m_prof, "RadioGainMinTolerance", toString(-DBL_MAX)));
+    m_rgainMaxTol = toDouble(ConfKey(m_prof, "RadioGainMaxTolerance", toString(DBL_MAX)));
 
     // Set radiometric defaults
-    m_defGain  =  ConfKey(m_prof, "DefaultRadioGain", 0.0);
-    m_defShift =  ConfKey(m_prof, "DefaultRadioShift", 0.0);
+    m_defGain  =  toDouble(ConfKey(m_prof, "DefaultRadioGain", toString(0.0)));
+    m_defShift =  toDouble(ConfKey(m_prof, "DefaultRadioShift", toString(0.0)));
 
     m_callCount = 0;
     m_filePattern = "";
@@ -1109,20 +1109,20 @@ namespace Isis {
     //  Point must be good for check to occur
     if (point.isValid()) {
       if (point.m_nIters > m_maxIters) {
-        string errmsg = "Maximum Iterations exceeded";
+        QString errmsg = "Maximum Iterations exceeded";
         return (logError(MaxIterationsExceeded, errmsg));
       }
       m_iterStat.AddData(point.m_nIters);
 
       if (point.getEigen() > Tolerance()) {
-        string errmsg = "Maximum Eigenvalue exceeded";
+        QString errmsg = "Maximum Eigenvalue exceeded";
         return (logError(MaxEigenExceeded, errmsg));
       }
       m_eigenStat.AddData(point.getEigen());
 
       double shift = point.m_affine.m_radio.Shift();
       if ( shift > m_shiftTol) {
-        string errmsg = "Radiometric shift exceeds tolerance";
+        QString errmsg = "Radiometric shift exceeds tolerance";
         return (logError(RadShiftExceeded, errmsg));
       }
       m_shiftStat.AddData(shift);
@@ -1130,7 +1130,7 @@ namespace Isis {
       double gain = point.m_affine.m_radio.Gain();
       if (((1.0 + gain) > m_rgainMaxTol) ||
           ((1.0 + gain) < m_rgainMinTol)) {
-        string errmsg = "Radiometric gain exceeds tolerances";
+        QString errmsg = "Radiometric gain exceeds tolerances";
         return (logError(RadGainExceeded, errmsg));
       }
       m_gainStat.AddData(gain);
@@ -1138,7 +1138,7 @@ namespace Isis {
 
       double dist = point.getAffinePoint(Coordinate(0.0, 0.0)).getDistance();
       if (dist > getAffineConstraint()) {
-        string errmsg = "Affine distance exceeded";
+        QString errmsg = "Affine distance exceeded";
         return (logError(AffineDistExceeded, errmsg));
       }
     }

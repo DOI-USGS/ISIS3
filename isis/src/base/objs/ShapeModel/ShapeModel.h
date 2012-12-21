@@ -26,9 +26,10 @@
 
 template<class T> class QVector;
 
+class QString;
+
 namespace Isis {
   class Distance;
-  class IString;
   class Latitude;
   class Longitude;
   class Pvl;
@@ -107,7 +108,7 @@ namespace Isis {
       virtual Distance localRadius(const Latitude &lat, const Longitude &lon) = 0;
 
       // Get shape name
-      IString name() const;
+      QString name() const;
 
       // Set m_hasIntersection
       void setHasIntersection(bool b);
@@ -124,7 +125,7 @@ namespace Isis {
       void setNormal(const std::vector<double>);
 
       // Set shape name
-      void setName(const IString name);
+      void setName(QString name);
  
       void calculateEllipsoidalSurfaceNormal();
 
@@ -139,7 +140,7 @@ namespace Isis {
       bool m_hasIntersection;       //!< indicates good intersection exists
       bool m_hasNormal;             //!< indicates normal has been computed
       std::vector<double> m_normal; //!< Local normal of current intersection point
-      IString *m_name;
+      QString *m_name;
       SurfacePoint *m_surfacePoint; //!< Current intersection point
 
       Target *m_target;

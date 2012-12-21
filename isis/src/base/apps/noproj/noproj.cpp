@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <sstream>
-#include <string>
+#include <QString>
 
 #include "AlphaCube.h"
 #include "Application.h"
@@ -24,15 +24,15 @@ using namespace std;
 void LoadMatchSummingMode();
 void LoadInputSummingMode();
 
-map <string, void *> GuiHelpers() {
-  map <string, void *> helper;
+map <QString, void *> GuiHelpers() {
+  map <QString, void *> helper;
   helper ["LoadMatchSummingMode"] = (void *) LoadMatchSummingMode;
   helper ["LoadInputSummingMode"] = (void *) LoadInputSummingMode;
   return helper;
 }
 
 void storeSpice(PvlGroup *instrumentGroup, PvlObject *naifKeywordsObject,
-                IString oldName, IString spiceName,
+                QString oldName, QString spiceName,
                 double constantCoeff, double multiplierCoeff, bool putMultiplierInX);
 
 void IsisMain() {
@@ -63,8 +63,8 @@ void IsisMain() {
   // Extract Instrument groups from input labels for the output match and noproj'd cubes
   PvlGroup inst = mcube->getGroup("Instrument");
   PvlGroup fromInst = icube->getGroup("Instrument");
-  std::string groupName = (string) inst["SpacecraftName"] + "/";
-  groupName += (string) inst.FindKeyword("InstrumentId");
+  QString groupName = (QString) inst["SpacecraftName"] + "/";
+  groupName += (QString) inst.FindKeyword("InstrumentId");
 
   // Get Ideal camera specifications
   FileName specs;
@@ -107,7 +107,7 @@ void IsisMain() {
   // Get the user options
   int sampleExpansion = int((ui.GetDouble("SAMPEXP") / 100.) * detectorSamples + .5);
   int lineExpansion = int((ui.GetDouble("LINEEXP") / 100.) * numberLines + .5);
-  string instType;
+  QString instType;
 
   // Adjust translations for summing mode
   transl /= ui.GetDouble("SUMMINGMODE");
@@ -167,11 +167,11 @@ void IsisMain() {
   Cube *ocube = p.SetOutputCube("match.cub", cao, 1, 1, 1);
 
   // Extract the times and the target from the instrument group
-  string startTime = inst["StartTime"];
-  string stopTime;
-  if(inst.HasKeyword("StopTime")) stopTime = (string) inst["StopTime"];
+  QString startTime = inst["StartTime"];
+  QString stopTime;
+  if(inst.HasKeyword("StopTime")) stopTime = (QString) inst["StopTime"];
 
-  string target = inst["TargetName"];
+  QString target = inst["TargetName"];
 
   // rename the instrument groups
   inst.SetName("OriginalInstrument");
@@ -200,11 +200,11 @@ void IsisMain() {
   inst.AddKeyword(key);
 
   key.SetName("SampleDetectors");
-  key.SetValue(Isis::IString(detectorSamples));
+  key.SetValue(Isis::toString(detectorSamples));
   inst.AddKeyword(key);
 
   key.SetName("LineDetectors");
-  key.SetValue(Isis::IString(detectorLines));
+  key.SetValue(Isis::toString(detectorLines));
   inst.AddKeyword(key);
 
   key.SetName("InstrumentType");
@@ -219,8 +219,7 @@ void IsisMain() {
 
     // Clean up the naif keywords object... delete everything that isn't a radii
     for (int keyIndex = naifKeywordsObject->Keywords() - 1; keyIndex >= 0; keyIndex--) {
-      QString keyName = QString::fromStdString(
-          (*naifKeywordsObject)[keyIndex].Name());
+      QString keyName = (*naifKeywordsObject)[keyIndex].Name();
       
       if (!keyName.contains("RADII")) {
         naifKeywordsObject->DeleteKeyword(keyIndex);
@@ -251,24 +250,24 @@ void IsisMain() {
   }
 
   if (naifKeywordsObject) {
-    naifKeywordsObject->AddKeyword(PvlKeyword("IDEAL_FOCAL_LENGTH", incam->FocalLength()),
+    naifKeywordsObject->AddKeyword(PvlKeyword("IDEAL_FOCAL_LENGTH", toString(incam->FocalLength())),
                                    Pvl::Replace);
   }
   else {
-    inst.AddKeyword(PvlKeyword("FocalLength", incam->FocalLength(), "millimeters"));
+    inst.AddKeyword(PvlKeyword("FocalLength", toString(incam->FocalLength()), "millimeters"));
   }
 
   double newPixelPitch = incam->PixelPitch() * ui.GetDouble("SUMMINGMODE");
   if (naifKeywordsObject) {
-    naifKeywordsObject->AddKeyword(PvlKeyword("IDEAL_PIXEL_PITCH", newPixelPitch),
+    naifKeywordsObject->AddKeyword(PvlKeyword("IDEAL_PIXEL_PITCH", toString(newPixelPitch)),
                                    Pvl::Replace);
   }
   else {
-    inst.AddKeyword(PvlKeyword("PixelPitch", newPixelPitch, "millimeters"));
+    inst.AddKeyword(PvlKeyword("PixelPitch", toString(newPixelPitch), "millimeters"));
   }
 
   key.SetName("EphemerisTime");
-  key.SetValue(Isis::IString(et), "seconds");
+  key.SetValue(Isis::toString(et), "seconds");
   inst.AddKeyword(key);
 
   key.SetName("StartTime");
@@ -282,16 +281,16 @@ void IsisMain() {
   }
 
   key.SetName("FocalPlaneXDependency");
-  key.SetValue(incam->FocalPlaneMap()->FocalPlaneXDependency());
+  key.SetValue(toString((int)incam->FocalPlaneMap()->FocalPlaneXDependency()));
   inst.AddKeyword(key);
 
   int xDependency = incam->FocalPlaneMap()->FocalPlaneXDependency();
 
   double newInstrumentTransX = incam->FocalPlaneMap()->SignMostSigX();
-  inst.AddKeyword(PvlKeyword("TransX", newInstrumentTransX));
+  inst.AddKeyword(PvlKeyword("TransX", toString(newInstrumentTransX)));
 
   double newInstrumentTransY = incam->FocalPlaneMap()->SignMostSigY();
-  inst.AddKeyword(PvlKeyword("TransY", newInstrumentTransY));
+  inst.AddKeyword(PvlKeyword("TransY", toString(newInstrumentTransY)));
 
   storeSpice(&inst, naifKeywordsObject, "TransX0", "IDEAL_TRANSX", transx,
              newPixelPitch * newInstrumentTransX, (xDependency == CameraFocalPlaneMap::Sample));
@@ -313,7 +312,7 @@ void IsisMain() {
 
   if(instType == "LINESCAN") {
     key.SetName("ExposureDuration");
-    key.SetValue(Isis::IString(incam->DetectorMap()->LineRate() * 1000.), "milliseconds");
+    key.SetValue(Isis::toString(incam->DetectorMap()->LineRate() * 1000.), "milliseconds");
     inst.AddKeyword(key);
   }
 
@@ -330,15 +329,15 @@ void IsisMain() {
   Pvl label;
   label.Read("match.lbl");
   PvlGroup &dims = label.FindGroup("Dimensions", Pvl::Traverse);
-  dims["Lines"] = numberLines;
-  dims["Samples"] = detectorSamples;
-  dims["Bands"] = numberBands;
+  dims["Lines"] = toString(numberLines);
+  dims["Samples"] = toString(detectorSamples);
+  dims["Bands"] = toString(numberBands);
   label.Write("match.lbl");
 
 // And run cam2cam to apply the transformation
-  string parameters;
+  QString parameters;
   parameters += " FROM= " + ui.GetFileName("FROM");
-  parameters += " MATCH= " + string("match.cub");
+  parameters += " MATCH= " + QString("match.cub");
   parameters += " TO= " + ui.GetFileName("TO");
   parameters += " INTERP=" + ui.GetString("INTERP");
   ProgramLauncher::RunIsisProgram("cam2cam", parameters);
@@ -369,7 +368,7 @@ void IsisMain() {
 
 // Helper function to get output summing mode from cube to MATCH
 void LoadMatchSummingMode() {
-  string file;
+  QString file;
   UserInterface &ui = Application::GetUserInterface();
 
   // Get camera from cube to match
@@ -394,22 +393,22 @@ void LoadMatchSummingMode() {
 
 
 void storeSpice(PvlGroup *instrumentGroup, PvlObject *naifKeywordsObject,
-                IString oldName, IString spiceName,
+                QString oldName, QString spiceName,
                 double constantCoeff, double multiplierCoeff, bool putMultiplierInX) {
   if(constantCoeff != 0 && !naifKeywordsObject && instrumentGroup) {
-    instrumentGroup->AddKeyword(PvlKeyword(oldName, constantCoeff));
+    instrumentGroup->AddKeyword(PvlKeyword(oldName, toString(constantCoeff)));
   }
   else if (naifKeywordsObject) {
     PvlKeyword spiceKeyword(spiceName);
-    spiceKeyword += constantCoeff;
+    spiceKeyword += toString(constantCoeff);
 
     if (putMultiplierInX) {
-      spiceKeyword += multiplierCoeff;
-      spiceKeyword += 0.0;
+      spiceKeyword += toString(multiplierCoeff);
+      spiceKeyword += toString(0.0);
     }
     else {
-      spiceKeyword += 0.0;
-      spiceKeyword += multiplierCoeff;
+      spiceKeyword += toString(0.0);
+      spiceKeyword += toString(multiplierCoeff);
     }
 
     naifKeywordsObject->AddKeyword(spiceKeyword, Pvl::Replace);
@@ -422,7 +421,7 @@ void LoadInputSummingMode() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Get camera from cube to match
-  string file = ui.GetFileName("FROM");
+  QString file = ui.GetFileName("FROM");
   // Open the input cube and get the camera object
   Cube c;
   c.open(file);

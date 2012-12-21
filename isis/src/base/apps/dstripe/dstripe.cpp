@@ -1,5 +1,7 @@
 #include "Isis.h"
 
+#include <QFile>
+
 #include "Application.h"
 #include "ProcessByLine.h"
 #include "ProgramLauncher.h"
@@ -63,30 +65,30 @@ void IsisMain() {
   // Algorithm: lowpass(from, temp) -> hipass(temp, noise) -> to = from-noise
 
   // Run lowpass filter on input
-  string lowParams = "";
+  QString lowParams = "";
   lowParams += "from= " + ui.GetFileName("FROM");
   lowParams += " to= dstripe.temporary.cub ";
-  lowParams += " samples= " + IString(lowSamples);
-  lowParams += " lines= " + IString(lowLines);
+  lowParams += " samples= " + toString(lowSamples);
+  lowParams += " lines= " + toString(lowLines);
 
   ProgramLauncher::RunIsisProgram("lowpass", lowParams);
 
   // Make a copy of the lowpass filter results if the user wants it
   if(!ui.GetBoolean("DELETENOISE")) {
-    string lowParams = "";
+    QString lowParams = "";
     lowParams += "from= " + ui.GetFileName("FROM");
     lowParams += " to= " + ui.GetFileName("LPFNOISE");
-    lowParams += " samples= " + IString(lowSamples);
-    lowParams += " lines= " + IString(lowLines);
+    lowParams += " samples= " + toString(lowSamples);
+    lowParams += " lines= " + toString(lowLines);
     ProgramLauncher::RunIsisProgram("lowpass", lowParams);
   }
 
   // Run highpass filter after lowpass is done, i.e. highpass(lowpass(input))
-  string highParams = "";
+  QString highParams = "";
   highParams += "from= dstripe.temporary.cub ";
   highParams += " to= " + ui.GetFileName("NOISE") + " ";
-  highParams += " samples= " + IString(highSamples);
-  highParams += " lines= " + IString(highLines);
+  highParams += " samples= " + toString(highSamples);
+  highParams += " lines= " + toString(highLines);
 
   ProgramLauncher::RunIsisProgram("highpass", highParams);
   remove("dstripe.temporary.cub");
@@ -97,8 +99,8 @@ void IsisMain() {
   p.StartProcess(difference);
   p.EndProcess();
   if(ui.GetBoolean("DELETENOISE")) {
-    string noiseFile(FileName(ui.GetFileName("NOISE")).expanded());
-    remove(noiseFile.c_str());
+    QString noiseFile(FileName(ui.GetFileName("NOISE")).expanded());
+    QFile::remove(noiseFile);
   }
 }
 

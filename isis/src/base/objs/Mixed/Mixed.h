@@ -1,4 +1,4 @@
-#if !defined(Mixed_h)
+#ifndef Mixed_h
 #define Mixed_h
 /**
  * @file

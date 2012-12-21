@@ -27,11 +27,11 @@ namespace Isis {
                        int group, int param);
       ~GuiListParameter();
 
-      IString Value();
+      QString Value();
 
-      void Set(IString newValue);
+      void Set(QString newValue);
 
-      virtual std::vector<std::string> Exclusions();
+      virtual std::vector<QString> Exclusions();
 
     private:
       QButtonGroup *p_buttonGroup;

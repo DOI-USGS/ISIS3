@@ -7,6 +7,7 @@
 #include "FileName.h" 
 #include "Preference.h" 
 
+using namespace Isis;
 using namespace std;
 
 int main() {

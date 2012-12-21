@@ -10,7 +10,7 @@ void IsisMain() {
 
   // Make sure the user enters an "OUTSTATS" file if the CALCULATE option
   // is selected
-  std::string processOpt = ui.GetString("PROCESS");
+  QString processOpt = ui.GetString("PROCESS");
   if (processOpt == "CALCULATE") {
     if (!ui.WasEntered("OUTSTATS")) {
       std::string msg = "If the CALCULATE option is selected, you must enter";

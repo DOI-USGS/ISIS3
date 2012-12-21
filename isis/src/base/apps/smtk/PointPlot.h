@@ -1,4 +1,4 @@
-#if !defined(PointPlot_h)
+#ifndef PointPlot_h
 #define PointPlot_h
 
 /**                                                                       

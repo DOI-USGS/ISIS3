@@ -25,14 +25,14 @@ void IsisMain() {
 
   // Check for filter type of A-D
   Pvl *label = input->getLabel();
-  IString wave = (string)label->FindGroup("BandBin", Pvl::Traverse)["FilterName"];
+  QString wave = (QString)label->FindGroup("BandBin", Pvl::Traverse)["FilterName"];
   if((wave != "A") && (wave != "B") && (wave != "C") && (wave != "D")) {
-    string message = "Invalid FilterName [" + wave + "], can only handle A-D filters";
+    QString message = "Invalid FilterName [" + wave + "], can only handle A-D filters";
     throw IException(IException::Unknown, message, _FILEINFO_);
   }
   // Determine and load calibration flat field file
-  wave.DownCase();
-  IString flatFile("$Clementine1/calibration/hires/lh" +
+  wave = wave.toLower();
+  QString flatFile("$Clementine1/calibration/hires/lh" +
                    wave + "_flat.cub");
   CubeAttributeInput cubeAtt;
   p.SetInputCube(flatFile, cubeAtt);
@@ -40,7 +40,7 @@ void IsisMain() {
   // Check the offset mode for validity
   int index = label->FindGroup("Instrument", Pvl::Traverse)["OffsetModeID"];
   if(index < 0 || index > 5) {
-    string message = "Invalid OffsetModeID, can only handle offests 0-5";
+    QString message = "Invalid OffsetModeID, can only handle offests 0-5";
     throw IException(IException::Unknown, message, _FILEINFO_);
   }
 
@@ -53,7 +53,7 @@ void IsisMain() {
   // Clementine HIRES camera: Robinson, Malart, White, page 17
   UserInterface &ui = Application::GetUserInterface();
   if(ui.GetString("KFROM").compare("COMPUTED") == 0) {
-    wave.UpCase();
+    wave = wave.toUpper();
     int MCP = label->FindGroup("Instrument", Pvl::Traverse)["MCPGainModeID"];
     // Two possible MCP gains for filter A
     if(wave == "A") {
@@ -64,7 +64,7 @@ void IsisMain() {
         abscoef = 0.00089;
       }
       else {
-        string message = "Image is not one of supported MCP Gain Mode IDs, enter your own K value";
+        QString message = "Image is not one of supported MCP Gain Mode IDs, enter your own K value";
         throw IException(IException::Unknown, message, _FILEINFO_);
       }
     }
@@ -80,13 +80,13 @@ void IsisMain() {
         abscoef = 0.00097;
       }
       else {
-        string message = "Image is not one of supported MCP Gain Mode IDs, enter your own K value";
+        QString message = "Image is not one of supported MCP Gain Mode IDs, enter your own K value";
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
     // Other filters not supported for preset K value
     else {
-      string message = "Image is of filter [" + wave + "], not supported type A or D, enter your own K value";
+      QString message = "Image is of filter [" + wave + "], not supported type A or D, enter your own K value";
       throw IException(IException::User, message, _FILEINFO_);
     }
   }

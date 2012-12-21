@@ -1,4 +1,4 @@
-#if !defined(SplineFill_h)
+#ifndef SplineFill_h
 #define SplineFill_h
 /**                                                                       
  * @file                                                                  
@@ -81,9 +81,9 @@ namespace Isis {
     private:
       int   _filled;         //!< Number values replaced
 
-      std::string formHistory() {
-        IString cfilled(_filled);
-        return (std::string("SplineFill(Cubic,Filled[" + cfilled + "])"));
+      QString formHistory() {
+        QString cfilled(toString(_filled));
+        return (QString("SplineFill(Cubic,Filled[" + cfilled + "])"));
       }
 
       void fill(const HiVector &v) {

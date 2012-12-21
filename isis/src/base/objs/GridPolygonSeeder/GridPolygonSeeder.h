@@ -59,7 +59,7 @@ namespace Isis {
    *                               - included SubGrid for what PluginParameters
    *                                 returns
    * @history 2010-04-20 Christopher Austin - adapted for generic/unitless
-   * 	                                      seeding
+   *                                          seeding
    */
   class GridPolygonSeeder : public PolygonSeeder {
     public:
@@ -73,7 +73,7 @@ namespace Isis {
       const bool SubGrid() {
         return p_subGrid;
       }
-      virtual PvlGroup PluginParameters(std::string grpName);
+      virtual PvlGroup PluginParameters(QString grpName);
 
     protected:
       virtual void Parse(Pvl &pvl);

@@ -40,7 +40,7 @@ SCCSID @(#)readBits.h  1.1 10/04/99
 */
 /* SCCShid @(#)readBits.h (readBits.h) 1.2 */
 
-#if !defined(readBits_h)
+#ifndef readBits_h
 
 #define readBits_h
 

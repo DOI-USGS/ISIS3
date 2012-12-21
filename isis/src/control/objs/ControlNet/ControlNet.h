@@ -26,17 +26,16 @@
 #include <QObject> // parent class
 
 #include <map>
+#include <vector>
 
 #include "ControlNetFile.h"
 
-#include "IString.h"
+#include <QString>
 
 template< typename A, typename B > class QHash;
 template< typename T > class QList;
 template< typename A, typename B > class QPair;
 template< typename T > class QSet;
-class QString;
-
 
 namespace Isis {
   class Camera;
@@ -44,7 +43,6 @@ namespace Isis {
   class ControlPoint;
   class ControlCubeGraphNode;
   class Distance;
-  class IString;
   class Progress;
   class SerialNumberList;
 
@@ -176,18 +174,18 @@ namespace Isis {
     public:
       ControlNet();
       ControlNet(const ControlNet &other);
-      ControlNet(const IString &filename, Progress *progress = 0);
+      ControlNet(const QString &filename, Progress *progress = 0);
 
       ~ControlNet();
 
-      void ReadControl(const IString &filename, Progress *progress = 0);
-      void Write(const IString &filename, bool pvl = false);
+      void ReadControl(const QString &filename, Progress *progress = 0);
+      void Write(const QString &filename, bool pvl = false);
 
       void AddPoint(ControlPoint *point);
       int DeletePoint(ControlPoint *point);
-      int DeletePoint(IString pointId);
+      int DeletePoint(QString pointId);
       int DeletePoint(int index);
-      bool ContainsPoint(IString pointId) const;
+      bool ContainsPoint(QString pointId) const;
 
       QList< QString > GetCubeSerials() const;
       QList< ControlCubeGraphNode * > GetCubeGraphNodes();
@@ -197,11 +195,11 @@ namespace Isis {
           QList< ControlCubeGraphNode *> &island,
           bool lessThan(const ControlMeasure *, const ControlMeasure *)) const;
       int getEdgeCount() const;
-      IString CubeGraphToString() const;
-      QList< ControlMeasure * > GetMeasuresInCube(IString serialNumber);
+      QString CubeGraphToString() const;
+      QList< ControlMeasure * > GetMeasuresInCube(QString serialNumber);
       QList< ControlMeasure * > sortedMeasureList(double(ControlMeasure::*statFunc)() const,
                                                   double min,double max);
-      void DeleteMeasuresWithId(IString serialNumber);
+      void DeleteMeasuresWithId(QString serialNumber);
 
       void ComputeResiduals();
       void ComputeApriori();
@@ -216,39 +214,39 @@ namespace Isis {
 
       double AverageResidual();
       Isis::Camera *Camera(int index);
-      IString CreatedDate() const;
-      IString Description() const;
-      ControlPoint *FindClosest(IString serialNumber,
+      QString CreatedDate() const;
+      QString Description() const;
+      ControlPoint *FindClosest(QString serialNumber,
           double sample, double line);
       bool IsValid() const;
       double GetMaximumResidual();
-      IString GetNetworkId() const;
+      QString GetNetworkId() const;
       int GetNumEditLockMeasures();
       int GetNumEditLockPoints();
       int GetNumIgnoredMeasures();
-      int GetNumberOfMeasuresInImage(const std::string &serialNumber);
-      int GetNumberOfJigsawRejectedMeasuresInImage(const std::string &serialNumber);
+      int GetNumberOfMeasuresInImage(const QString &serialNumber);
+      int GetNumberOfJigsawRejectedMeasuresInImage(const QString &serialNumber);
       void ClearJigsawRejected();
-      void IncrementNumberOfRejectedMeasuresInImage(const std::string &serialNumber);
-      void DecrementNumberOfRejectedMeasuresInImage(const std::string &serialNumber);
+      void IncrementNumberOfRejectedMeasuresInImage(const QString &serialNumber);
+      void DecrementNumberOfRejectedMeasuresInImage(const QString &serialNumber);
       int GetNumMeasures() const;
       int GetNumPoints() const;
       int GetNumValidMeasures();
       int GetNumValidPoints();
-      IString GetTarget() const;
-      IString GetUserName() const;
+      QString GetTarget() const;
+      QString GetUserName() const;
       QList< ControlPoint * > GetPoints();
       QList< QString > GetPointIds() const;
       std::vector<Distance> GetTargetRadii();
 
-      void SetCreatedDate(const IString &date);
-      void SetDescription(const IString &newDescription);
-      void SetImages(const IString &imageListFile);
+      void SetCreatedDate(const QString &date);
+      void SetDescription(const QString &newDescription);
+      void SetImages(const QString &imageListFile);
       void SetImages(SerialNumberList &list, Progress *progress = 0);
-      void SetModifiedDate(const IString &date);
-      void SetNetworkId(const IString &id);
-      void SetTarget(const IString &target);
-      void SetUserName(const IString &name);
+      void SetModifiedDate(const QString &date);
+      void SetNetworkId(const QString &id);
+      void SetTarget(const QString &target);
+      void SetUserName(const QString &name);
 
       const ControlNet &operator=(ControlNet other);
 
@@ -263,12 +261,12 @@ namespace Isis {
 
     private:
       void nullify();
-      void ValidateSerialNumber(IString serialNumber) const;
+      void ValidateSerialNumber(QString serialNumber) const;
       void measureAdded(ControlMeasure *measure);
       void measureDeleted(ControlMeasure *measure);
       void measureIgnored(ControlMeasure *measure);
       void measureUnIgnored(ControlMeasure *measure);
-      void UpdatePointReference(ControlPoint *point, IString oldId);
+      void UpdatePointReference(ControlPoint *point, QString oldId);
       void emitNetworkStructureModified();
 
 
@@ -377,15 +375,15 @@ namespace Isis {
       QHash< QString, ControlCubeGraphNode * > * cubeGraphNodes;
       QStringList *pointIds;
 
-      IString p_targetName;            //!< Name of the target
-      IString p_networkId;             //!< The Network Id
-      IString p_created;               //!< Creation Date
-      IString p_modified;              //!< Date Last Modified
-      IString p_description;           //!< Textual Description of network
-      IString p_userName;              //!< The user who created the network
-      std::map<IString, Isis::Camera *> p_cameraMap; //!< A map from serialnumber to camera
-      std::map<std::string, int> p_cameraMeasuresMap; //!< A map from serialnumber to #measures
-      std::map<std::string, int> p_cameraRejectedMeasuresMap; //!< A map from serialnumber to
+      QString p_targetName;            //!< Name of the target
+      QString p_networkId;             //!< The Network Id
+      QString p_created;               //!< Creation Date
+      QString p_modified;              //!< Date Last Modified
+      QString p_description;           //!< Textual Description of network
+      QString p_userName;              //!< The user who created the network
+      std::map<QString, Isis::Camera *> p_cameraMap; //!< A map from serialnumber to camera
+      std::map<QString, int> p_cameraMeasuresMap; //!< A map from serialnumber to #measures
+      std::map<QString, int> p_cameraRejectedMeasuresMap; //!< A map from serialnumber to
       //!  #rejected measures
       std::vector<Isis::Camera *> p_cameraList; //!< Vector of image number to camera
       std::vector<Distance> p_targetRadii;        //!< Radii of target body

@@ -22,22 +22,22 @@ namespace Isis {
   //**********************************************
   // getFile function will check URL, if URL is good the function will connect,
   // login, and get the file.  This function returns p_error
-  bool HttpGet::getFile(const QUrl &url, string topath) {
+  bool HttpGet::getFile(const QUrl &url, QString topath) {
     // The next four ifs will check the URL and return error is bad
     if(!url.isValid()) {
-      string msg = "invalid URL";
+      QString msg = "invalid URL";
 //       iException::Message(iException::User, msg, _FILEINFO_);
       p_error = true;
       return p_error;
     }
     if(url.scheme().toLower() != "http") {
-      string msg = "URL must start with 'http:'";
+      QString msg = "URL must start with 'http:'";
 //       iException::Message(iException::User, msg, _FILEINFO_);
       p_error = true;
       return p_error;
     }
     if(url.path().isEmpty()) {
-      string msg = "URL has no path";
+      QString msg = "URL has no path";
 //       iException::Message(iException::User, msg, _FILEINFO_);
       p_error = true;
       return p_error;
@@ -45,12 +45,12 @@ namespace Isis {
 
     QString localFileName;
     if(topath.size() != 0) {
-      localFileName += topath.c_str();
+      localFileName += topath;
       localFileName += "/";
     }
     localFileName +=  QFileInfo(url.path()).fileName();
     if(localFileName.isEmpty()) {
-      string msg = "URL has no filename";
+      QString msg = "URL has no filename";
 //       iException::Message(iException::User, msg, _FILEINFO_);
       p_error = true;
       return p_error;
@@ -58,7 +58,7 @@ namespace Isis {
     // check the local file.
     p_file.setFileName(localFileName);
     if(!p_file.open(QIODevice::WriteOnly)) {
-      string msg = "Cannot open output file";
+      QString msg = "Cannot open output file";
 //       iException::Message(iException::User, msg, _FILEINFO_);
       p_error = true;
       return p_error;
@@ -72,7 +72,7 @@ namespace Isis {
   }
 
   void HttpGet::httpDone(bool error) {
-    map <int, string> errLUT;
+    map <int, QString> errLUT;
     errLUT [204] = "No content";
     errLUT [301] = "Moved Permanently";
     errLUT [302] = "Moved Temporarily";
@@ -86,12 +86,12 @@ namespace Isis {
 
     if(error) {
       p_error =  true;
-      string msg = p_http.errorString().toStdString();
+      QString msg = p_http.errorString();
 //       iException::Message(iException::User, msg, _FILEINFO_);
     }
     else if(p_http.lastResponse().statusCode()  != 200 && p_http.lastResponse().statusCode()  != 0) {
       p_error = true;
-      string msg = "error code: [" + errLUT[p_http.lastResponse().statusCode()] + "]";
+      QString msg = "error code: [" + errLUT[p_http.lastResponse().statusCode()] + "]";
 //       iException::Message(iException::User, msg, _FILEINFO_);
     }
     else {
@@ -106,7 +106,7 @@ namespace Isis {
     if(total == 0) return;
     if(p_error) return;
     if(p_lastDone < 0) {
-      p_progress.SetText(string("Downloading File ") + p_file.fileName().toStdString());
+      p_progress.SetText(QString("Downloading File ") + p_file.fileName());
       p_progress.SetMaximumSteps(total);
       p_progress.CheckStatus();
       p_lastDone = 1;

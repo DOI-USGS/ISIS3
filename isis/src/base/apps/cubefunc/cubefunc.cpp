@@ -42,7 +42,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Which function is it to be?
-  string func = ui.GetString("FUNCTION");
+  QString func = ui.GetString("FUNCTION");
   if(func == "COS") Function = COS;
   if(func == "SIN") Function = SIN;
   if(func == "TAN") Function = TAN;
@@ -73,9 +73,9 @@ void IsisMain() {
 
   if(bad != 0) {
     PvlGroup results("Results");
-    string message = "Invalid input pixels converted to Isis NULL values";
+    QString message = "Invalid input pixels converted to Isis NULL values";
     results += PvlKeyword("Error", message);
-    results += PvlKeyword("Count", bad);
+    results += PvlKeyword("Count", toString(bad));
     Application::Log(results);
   }
   p.EndProcess();

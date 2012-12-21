@@ -1,4 +1,4 @@
-#if !defined(SmtkPoint_h)
+#ifndef SmtkPoint_h
 #define SmtkPoint_h
 
 /**                                                                       

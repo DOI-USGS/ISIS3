@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 
   try {
     FileName fromList("FromList.lst");
-    string holdList = "HoldList.lst";
+    QString holdList = "HoldList.lst";
 
     cout << "UnitTest for Equalization" << endl;
     HiEqualization equalizer(fromList.toString());
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < imageList.size(); i++) {
       ProcessByLine p;
       CubeAttributeInput att;
-      const string inp = imageList[i].toString();
+      QString inp = imageList[i].toString();
       Cube *inputCube = p.SetInputCube(inp, att);
       TestFunctor func(&equalizer, inputCube->getLineCount(), i);
       p.ProcessCubeInPlace(func, false);

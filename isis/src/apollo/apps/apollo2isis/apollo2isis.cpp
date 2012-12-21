@@ -22,10 +22,10 @@ void RefineCodeLocation();
 void TranslateCode();
 void TranslateApolloLabels (IString filename, Cube *pack);
 bool IsValidCode();
-IString FrameTime();
+QString FrameTime();
 int Altitude();
 double ShutterInterval();
-IString FMC();
+QString FMC();
 
 int codeSample, codeLine;
 bool code[4][32];
@@ -33,7 +33,7 @@ bool codeFound = true;
 
 Cube cube;
 Apollo *apollo;
-IString utcTime;
+QString utcTime;
 
 int RADIUS = 46;
 double rotation, sampleTranslation, lineTranslation;
@@ -47,12 +47,12 @@ void IsisMain() {
 
   p.SetPdsFile(inFile.expanded(), "", pdsLabel);
 
-  IString filename = FileName(ui.GetFileName("FROM")).baseName();
+  QString filename = FileName(ui.GetFileName("FROM")).baseName();
   FileName toFile = ui.GetFileName("TO");
   
   apollo = new Apollo(filename);
 
-  utcTime = (string)pdsLabel["START_TIME"];  
+  utcTime = (QString)pdsLabel["START_TIME"];  
   
   // Setup the output cube attributes for a 16-bit unsigned tiff
   Isis::CubeAttributeOutput cao;
@@ -231,9 +231,9 @@ void TranslateApolloLabels (IString filename, Cube *opack) {
     PvlGroup error("ERROR");
     error.AddComment("The decrypted code is invalid.");
     for (int i=0; i<4; i++) {
-      PvlKeyword keyword("Column"+IString(i+1));
+      PvlKeyword keyword("Column"+toString(i+1));
       for (int j=0; j<32; j++) {
-        keyword += code[i][j];
+        keyword += toString((int)code[i][j]);
       }
       error.AddKeyword(keyword);
       codeGroup += keyword;
@@ -242,17 +242,17 @@ void TranslateApolloLabels (IString filename, Cube *opack) {
   }
   else {
     codeGroup += PvlKeyword("StartTime", FrameTime());
-    codeGroup += PvlKeyword("SpacecraftAltitude", Altitude(),"meters");
+    codeGroup += PvlKeyword("SpacecraftAltitude", toString(Altitude()),"meters");
   
     if (apollo->IsMetric()){
-      codeGroup += PvlKeyword("ExposureDuration", ShutterInterval(), "milliseconds");
+      codeGroup += PvlKeyword("ExposureDuration", toString(ShutterInterval()), "milliseconds");
       codeGroup += PvlKeyword("ForwardMotionCompensation", FMC());
     }
     
     for (int i=0; i<4; i++) {
-      PvlKeyword keyword("Column"+IString(i+1));
+      PvlKeyword keyword("Column"+toString(i+1));
       for (int j=0; j<32; j++) {
-        keyword += code[i][j];
+        keyword += toString((int)code[i][j]);
       }
       codeGroup += keyword;
     }
@@ -262,7 +262,7 @@ void TranslateApolloLabels (IString filename, Cube *opack) {
   // There are no filters on the camera, so the default is clear with id # of 1
   // the BandBin group is only included to work with the spiceinit application
   bandBin += PvlKeyword("FilterName", "CLEAR");
-  bandBin += PvlKeyword("FilterId", 1);
+  bandBin += PvlKeyword("FilterId", "1");
   
   kern += PvlKeyword("NaifFrameCode", apollo->NaifFrameCode());
 
@@ -270,23 +270,25 @@ void TranslateApolloLabels (IString filename, Cube *opack) {
   Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
   Process p;
   PvlTranslationTable tTable(
-      (IString)p.MissionData("base", "translations/MissionName2DataDir.trn"));
-  IString missionDir = dataDir[tTable.Translate("MissionName", apollo->SpacecraftName())][0];
+      (QString)p.MissionData("base", "translations/MissionName2DataDir.trn"));
+  QString missionDir = dataDir[tTable.Translate("MissionName", apollo->SpacecraftName())][0];
   Pvl resTemplate(missionDir + "/reseaus/" + apollo->InstrumentId() + "_NOMINAL.pvl");
   PvlGroup *reseaus = &resTemplate.FindGroup("Reseaus");
   
   // Update reseau locations based on refined code location
   for (int i=0; i<(reseaus->FindKeyword("Type")).Size(); i++) {
-    double x = (double)(reseaus->FindKeyword("Sample")[i]) + sampleTranslation + 2278,
-           y = (double)(reseaus->FindKeyword("Line")[i]) + lineTranslation - 20231;
+    double x = toDouble(reseaus->FindKeyword("Sample")[i]) + sampleTranslation + 2278,
+           y = toDouble(reseaus->FindKeyword("Line")[i]) + lineTranslation - 20231;
     
     if (apollo->IsApollo17()) {
         x += 50;
         y += 20;
     }
     
-    reseaus->FindKeyword("Sample")[i] = cos(rotation)*(x-sampleTranslation) - sin(rotation)*(y-lineTranslation) + sampleTranslation;
-    reseaus->FindKeyword("Line")[i] = sin(rotation)*(x-sampleTranslation) + cos(rotation)*(y-lineTranslation) + lineTranslation;
+    reseaus->FindKeyword("Sample")[i] = toString(
+        cos(rotation)*(x-sampleTranslation) - sin(rotation)*(y-lineTranslation) + sampleTranslation);
+    reseaus->FindKeyword("Line")[i] = toString(
+        sin(rotation)*(x-sampleTranslation) + cos(rotation)*(y-lineTranslation) + lineTranslation);
   }
   inst += PvlKeyword("StartTime", utcTime);
     
@@ -306,7 +308,7 @@ bool IsValidCode() {
                                                    !code[3][22] || !code[3][23] || !code[3][24] || !code[3][25] || !code[3][26] || !code[3][27] || !code[3][28] || !code[3][30] || code[3][31]));
 }
 
-IString FrameTime() {
+QString FrameTime() {
   iTime launch = apollo->LaunchDate();
     int year = launch.Year(),
         month = launch.Month(),
@@ -362,17 +364,17 @@ IString FrameTime() {
       month += 1;
     }
   
-    IString sTime = IString(year) + "-";
+    QString sTime = toString(year) + "-";
     if (month < 10) sTime += "0";
-    sTime += IString(month)+ "-";
+    sTime += toString(month)+ "-";
     if (days <10) sTime += "0";
-    sTime += IString(days) + "T";
+    sTime += toString(days) + "T";
     if (hours <10) sTime += "0";
-    sTime += IString(hours) + ":";
+    sTime += toString(hours) + ":";
     if (minutes <10) sTime += "0";
-    sTime += IString(minutes) + ":";
+    sTime += toString(minutes) + ":";
     if (seconds <10) sTime += "0";
-    sTime += IString(seconds);
+    sTime += toString(seconds);
     
     return sTime;
 }
@@ -394,7 +396,7 @@ double ShutterInterval() {
   return 0.1*shutterInterval;
 }
 
-IString FMC() {
+QString FMC() {
   if (code[3][29]) return "True";
   return "False";
 }

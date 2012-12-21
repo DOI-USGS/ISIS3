@@ -44,7 +44,7 @@ namespace Isis {
    * @param tableName Name of the Table to be read
    * @param rec Name of the TableRecord to be read into the Table
    */
-  Table::Table(const std::string &tableName, Isis::TableRecord &rec) :
+  Table::Table(const QString &tableName, Isis::TableRecord &rec) :
     Blob(tableName, "Table") {
     p_assoc = Table::None;
     p_blobPvl += Isis::PvlKeyword("Records", 0);
@@ -65,7 +65,7 @@ namespace Isis {
    *
    * @param tableName Name of the Table to be read
    */
-  Table::Table(const std::string &tableName) :
+  Table::Table(const QString &tableName) :
     Isis::Blob(tableName, "Table") {
     p_assoc = Table::None;
   }
@@ -84,7 +84,7 @@ namespace Isis {
    *  
    * @see Blob::Read() 
    */
-  Table::Table(const std::string &tableName, const std::string &file) :
+  Table::Table(const QString &tableName, const QString &file) :
     Blob(tableName, "Table") {
     p_assoc = Table::None;
     Read(file);
@@ -105,7 +105,7 @@ namespace Isis {
    *  
    * @see Blob::Read() 
    */
-  Table::Table(const std::string &tableName, const std::string &file,
+  Table::Table(const QString &tableName, const QString &file,
       const Pvl &fileHeader) : Blob(tableName, "Table") {
     p_assoc = Table::None;
     Read(file, fileHeader);
@@ -272,10 +272,10 @@ namespace Isis {
     // }
     // Temporary substitution?
     if (RecordSize() < rec.RecordSize()) {
-      IString msg = "Unable to add the given record with size = [" 
-                    + IString(rec.RecordSize()) + " bytes] to to Isis Table [" 
+      QString msg = "Unable to add the given record with size = [" 
+                    + toString(rec.RecordSize()) + " bytes] to to Isis Table [" 
                     + p_blobName + "] with record size = [" 
-                    + IString(RecordSize()) + " bytes]. Added record size can "
+                    + toString(RecordSize()) + " bytes]. Added record size can "
                     "not exceed table record size.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -329,8 +329,8 @@ namespace Isis {
     p_record = rec;
 
     if (p_blobPvl.HasKeyword("Association")) {
-      Isis::IString temp = (string) p_blobPvl["Association"];
-      temp.UpCase();
+      QString temp = (QString) p_blobPvl["Association"];
+      temp = temp.toUpper();
       if (temp == "SAMPLES") p_assoc = Table::Samples;
       if (temp == "LINES") p_assoc = Table::Lines;
       if (temp == "BANDS") p_assoc = Table::Bands;
@@ -359,7 +359,7 @@ namespace Isis {
                         (streampos)(rec * RecordSize());
       stream.seekg(sbyte, std::ios::beg);
       if (!stream.good()) {
-        string msg = "Error preparing to read record [" + Isis::IString(rec + 1) +
+        QString msg = "Error preparing to read record [" + toString(rec + 1) +
                      "] from Table [" + p_blobName + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
@@ -367,8 +367,8 @@ namespace Isis {
       char *buf = new char[RecordSize()];
       stream.read(buf, RecordSize());
       if (!stream.good()) {
-        string msg = "Error reading record [" + Isis::IString(rec + 1) +
-                     "] from Table [" + p_blobName + "]";
+        QString msg = "Error reading record [" + toString(rec + 1) +
+                      "] from Table [" + p_blobName + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
@@ -379,14 +379,14 @@ namespace Isis {
 
   //! Virtual Function to prepare labels for writing
   void Table::WriteInit() {
-    p_blobPvl["Records"] = Records();
+    p_blobPvl["Records"] = toString(Records());
     p_nbytes = Records() * RecordSize();
 
     if (Isis::IsLsb()) {
-      p_blobPvl["ByteOrder"] = Isis::IString(Isis::ByteOrderName(Isis::Lsb));
+      p_blobPvl["ByteOrder"] = Isis::ByteOrderName(Isis::Lsb);
     }
     else {
-      p_blobPvl["ByteOrder"] = Isis::IString(Isis::ByteOrderName(Isis::Msb));
+      p_blobPvl["ByteOrder"] = Isis::ByteOrderName(Isis::Msb);
     }
 
     if (p_blobPvl.HasKeyword("Association")) {

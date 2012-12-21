@@ -15,8 +15,8 @@
 using namespace std;
 using namespace Isis;
 
-bool copyGroup(Pvl * source, Pvl * mergeTo, IString name);
-bool copyBlob(Cube * from, Cube * to, IString type, IString name, IString fname);
+bool copyGroup(Pvl * source, Pvl * mergeTo, QString name);
+bool copyBlob(Cube * from, Cube * to, QString type, QString name, QString fname);
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
@@ -27,7 +27,7 @@ void IsisMain() {
 
   Pvl * mergeTo = NULL;
   Pvl * source = NULL;
-  IString sourceFileName = ui.GetFileName("Source");
+  QString sourceFileName = ui.GetFileName("Source");
   mergeTo = inOut.getLabel();
   source = new Pvl(sourceFileName);
 
@@ -121,7 +121,7 @@ void IsisMain() {
     results += PvlKeyword("Kernels", success ? "true" : "false");
 
     if (isACube) {
-      IString fname = sourceFileName;
+      QString fname = sourceFileName;
       bool insPoint = copyBlob(&sourceCube, &inOut, "InstrumentPointing","Table", sourceFileName);
       bool insPos = copyBlob(&sourceCube, &inOut, "InstrumentPosition","Table", sourceFileName);
       bool bodyRot = copyBlob(&sourceCube, &inOut, "BodyRotation","Table", sourceFileName);
@@ -182,13 +182,13 @@ void IsisMain() {
 
   // Any other requested groups
   if (ui.WasEntered("Groups")) {
-    QString grps = IString(ui.GetString("Groups")).Remove(" ").ToQt();
+    QString grps = QString(ui.GetString("Groups")).remove(" ");
     QStringList list = grps.split(",");
     QString grp;
     foreach (grp, list) {
       if (grp.size() != 0) {
-        bool success = copyGroup(source, mergeTo, grp.toStdString());
-        results += PvlKeyword(grp.toStdString(), success ? "true" : "false");
+        bool success = copyGroup(source, mergeTo, grp);
+        results += PvlKeyword(grp, success ? "true" : "false");
       }
     }
   }
@@ -196,7 +196,7 @@ void IsisMain() {
   // Any other requested blobs
   // Expected format is: <Object name>:<Name keyword>
   if (ui.WasEntered("Blobs")) {
-    QString blobs = IString(ui.GetString("Blobs")).Remove(" ").ToQt();
+    QString blobs = QString(ui.GetString("Blobs")).remove(" ");
     QStringList list = blobs.split(",");
     QString blob;
     foreach (blob, list) {
@@ -207,12 +207,12 @@ void IsisMain() {
                        " improperly formatted";
           throw IException(IException::User, msg, _FILEINFO_);
         }
-        bool success = copyBlob(&sourceCube, &inOut, brk[1].toStdString(),
-                         brk[0].toStdString(), sourceFileName);
-        results += PvlKeyword(blob.toStdString(), success ? "true" : "false");
+        bool success = copyBlob(&sourceCube, &inOut, brk[1],
+                         brk[0], sourceFileName);
+        results += PvlKeyword(blob, success ? "true" : "false");
       }
       else {
-        results += PvlKeyword(blob.toStdString(), "false");
+        results += PvlKeyword(blob, "false");
       }
     }
   }
@@ -231,7 +231,7 @@ void IsisMain() {
   bool found = false;
   for (int i = 0; i < mergeTo->Objects() && !found; i++) {
     if (mergeTo->Object(i).IsNamed("History")) {
-      History his((string)mergeTo->Object(i)["Name"]);
+      History his((QString)mergeTo->Object(i)["Name"]);
       inOut.read(his);
       his.AddEntry();
       inOut.write(his);
@@ -253,7 +253,7 @@ void IsisMain() {
 // Copy a group from the IsisCube object in one cube to the other
 // If it exists in the source, we'll copy it, if it exists in the
 // mergeTo Pvl, we'll overwrite it.
-bool copyGroup(Pvl * source, Pvl * mergeTo, IString name) {
+bool copyGroup(Pvl * source, Pvl * mergeTo, QString name) {
   try {
     // The call we're looking to get an exception on is the one just below.
     PvlGroup & toCopy = source->FindGroup(name, Pvl::Traverse);
@@ -268,7 +268,7 @@ bool copyGroup(Pvl * source, Pvl * mergeTo, IString name) {
   }
 }
 
-bool copyBlob(Cube * from, Cube * to, IString name, IString type, IString fname) {
+bool copyBlob(Cube * from, Cube * to, QString name, QString type, QString fname) {
   try {
     Blob blob(name, type, fname);
     from->read(blob);

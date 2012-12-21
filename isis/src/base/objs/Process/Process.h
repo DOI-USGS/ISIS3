@@ -77,7 +77,7 @@ namespace Isis {
    *  @history 2003-02-04 Jeff Anderson - Added PropagateLabels method
    *  @history 2003-02-04 Jeff Anderson - Fixed bug in propagation of input labels
    *                                      to output cube
-   *  @history 2003-02-07 Jeff Anderson - Integrated IString class into the Log
+   *  @history 2003-02-07 Jeff Anderson - Integrated QString class into the Log
    *                                      methods
    *  @history 2003-04-23 Jeff Anderson - Made accomodations for the updated
    *                                      Preference class
@@ -220,18 +220,18 @@ namespace Isis {
       virtual void EndProcess();
       virtual void Finalize();
 
-      Isis::Cube *SetInputCube(const std::string &parameter,
+      Isis::Cube *SetInputCube(const QString &parameter,
                                const int requirements = 0);
-      Isis::Cube *SetInputCube(const std::string &fname,
+      Isis::Cube *SetInputCube(const QString &fname,
                                const Isis::CubeAttributeInput &att,
                                int requirements = 0);
       void SetInputCube(Isis::Cube *inCube);
 
 
-      Isis::Cube *SetOutputCube(const std::string &parameter);
-      Isis::Cube *SetOutputCube(const std::string &parameter, const int nsamps,
+      Isis::Cube *SetOutputCube(const QString &parameter);
+      Isis::Cube *SetOutputCube(const QString &parameter, const int nsamps,
                                 const int nlines, const int nbands = 1);
-      Isis::Cube *SetOutputCube(const std::string &fname,
+      Isis::Cube *SetOutputCube(const QString &fname,
                                 const Isis::CubeAttributeOutput &att,
                                 const int nsamps, const int nlines,
                                 const int nbands = 1);
@@ -244,9 +244,9 @@ namespace Isis {
       void ClearOutputCubes();
  
       void PropagateLabels(const bool prop);
-      void PropagateLabels(const std::string &cube);
+      void PropagateLabels(const QString &cube);
       void PropagateTables(const bool prop);
-      void PropagateTables(const std::string &fromName);
+      void PropagateTables(const QString &fromName);
       void PropagatePolygons(const bool prop);
       void PropagateHistory(const bool prop);
       void PropagateOriginalLabel(const bool prop);
@@ -260,7 +260,7 @@ namespace Isis {
         return p_progress;
       };
 
-      std::string MissionData(const std::string &mission, const std::string &file,
+      QString MissionData(const QString &mission, const QString &file,
                               bool highestVersion = false);
 
       void WriteHistory(Cube &cube);

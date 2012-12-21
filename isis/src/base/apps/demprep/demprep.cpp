@@ -63,12 +63,12 @@ void IsisMain() {
     p.StartProcess(GetStats);
 
     PvlGroup demRange("Results");
-    demRange += PvlKeyword("MinimumRadius", inCubeStats.Minimum(), "meters");
-    demRange += PvlKeyword("MaximumRadius", inCubeStats.Maximum(), "meters");
+    demRange += PvlKeyword("MinimumRadius", toString(inCubeStats.Minimum()), "meters");
+    demRange += PvlKeyword("MaximumRadius", toString(inCubeStats.Maximum()), "meters");
     Application::Log(demRange);
 
     // Store min/max radii values in new ShapeModelStatistics table
-    string shp_name = "ShapeModelStatistics";
+    QString shp_name = "ShapeModelStatistics";
     TableField fmin("MinimumRadius",Isis::TableField::Double);
     TableField fmax("MaximumRadius",Isis::TableField::Double);
 
@@ -234,12 +234,12 @@ void IsisMain() {
 
   double upperLeftCorner = mapgrp["UpperLeftCornerX"];
   upperLeftCorner -= leftPad * proj->Resolution();
-  mapgrp.AddKeyword(PvlKeyword("UpperLeftCornerX", upperLeftCorner, "meters"),
+  mapgrp.AddKeyword(PvlKeyword("UpperLeftCornerX", toString(upperLeftCorner), "meters"),
                     Pvl::Replace);
 
   upperLeftCorner = mapgrp["UpperLeftCornerY"];
   upperLeftCorner += topPad * proj->Resolution();
-  mapgrp.AddKeyword(PvlKeyword("UpperLeftCornerY", upperLeftCorner, "meters"),
+  mapgrp.AddKeyword(PvlKeyword("UpperLeftCornerY", toString(upperLeftCorner), "meters"),
                     Pvl::Replace);
 
 
@@ -260,12 +260,12 @@ void IsisMain() {
   ocube->putGroup(mapgrp);
 
   PvlGroup demRange("Results");
-  demRange += PvlKeyword("MinimumRadius", outCubeStats.Minimum(), "meters");
-  demRange += PvlKeyword("MaximumRadius", outCubeStats.Maximum(), "meters");
+  demRange += PvlKeyword("MinimumRadius", toString(outCubeStats.Minimum()), "meters");
+  demRange += PvlKeyword("MaximumRadius", toString(outCubeStats.Maximum()), "meters");
   Application::Log(demRange);
 
   // Store min/max radii values in new ShapeModelStatistics table
-  string shp_name = "ShapeModelStatistics";
+  QString shp_name = "ShapeModelStatistics";
   TableField fmin("MinimumRadius",Isis::TableField::Double);
   TableField fmax("MaximumRadius",Isis::TableField::Double);
 

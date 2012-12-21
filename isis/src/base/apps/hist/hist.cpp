@@ -1,6 +1,6 @@
 #include "Isis.h"
 
-#include <string>
+#include <QString>
 #include <QMenuBar>
 
 #include "Process.h"
@@ -46,12 +46,12 @@ void IsisMain() {
     // Write the results
 
     if(!ui.WasEntered("TO")) {
-      string msg = "The [TO] parameter must be entered";
+      QString msg = "The [TO] parameter must be entered";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    string outfile = ui.GetFileName("TO");
+    QString outfile = ui.GetFileName("TO");
     ofstream fout;
-    fout.open(outfile.c_str());
+    fout.open(outfile.toAscii().data());
 
     fout << "Cube:           " << ui.GetFileName("FROM") << endl;
     fout << "Band:           " << icube->getBandCount() << endl;
@@ -98,7 +98,7 @@ void IsisMain() {
   // If we are in gui mode, create a histogram plot
   if(ui.IsInteractive()) {
     // Set the title for the dialog
-    string title;
+    QString title;
     if(ui.WasEntered("TITLE")) {
       title = ui.GetString("TITLE");
     }
@@ -108,25 +108,25 @@ void IsisMain() {
 
     // Create the QHistogram, set the title & load the Isis::Histogram into it
 
-    HistogramPlotWindow *plot = new HistogramPlotWindow(title.c_str(),
+    HistogramPlotWindow *plot = new HistogramPlotWindow(title.toAscii().data(),
                                                         ui.TheGui());
 
     // Set the xaxis title if they entered one
     if(ui.WasEntered("XAXIS")) {
-      string xaxis(ui.GetString("XAXIS"));
-      plot->setAxisLabel(QwtPlot::xBottom, xaxis.c_str());
+      QString xaxis(ui.GetString("XAXIS"));
+      plot->setAxisLabel(QwtPlot::xBottom, xaxis.toAscii().data());
     }
 
     // Set the yLeft axis title if they entered one
     if(ui.WasEntered("FREQAXIS")) {
-      string yaxis(ui.GetString("FREQAXIS"));
-      plot->setAxisLabel(QwtPlot::yRight, yaxis.c_str());
+      QString yaxis(ui.GetString("FREQAXIS"));
+      plot->setAxisLabel(QwtPlot::yRight, yaxis.toAscii().data());
     }
 
     // Set the yRight axis title if they entered one
     if(ui.WasEntered("PERCENTAXIS")) {
-      string y2axis(ui.GetString("PERCENTAXIS"));
-      plot->setAxisLabel(QwtPlot::yLeft, y2axis.c_str());
+      QString y2axis(ui.GetString("PERCENTAXIS"));
+      plot->setAxisLabel(QwtPlot::yLeft, y2axis.toAscii().data());
     }
 
     //Transfer data from histogram to the plotcurve

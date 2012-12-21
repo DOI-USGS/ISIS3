@@ -16,15 +16,15 @@ int main(int argc, char *argv[]) {
   Pvl lab;
   lab.AddGroup(PvlGroup("Mapping"));
   PvlGroup &mapGroup = lab.FindGroup("Mapping");
-  mapGroup += PvlKeyword("EquatorialRadius", 1.0);
-  mapGroup += PvlKeyword("PolarRadius", 1.0);
+  mapGroup += PvlKeyword("EquatorialRadius", toString(1.0));
+  mapGroup += PvlKeyword("PolarRadius", toString(1.0));
   mapGroup += PvlKeyword("LatitudeType", "Planetocentric");
   mapGroup += PvlKeyword("LongitudeDirection", "PositiveEast");
-  mapGroup += PvlKeyword("LongitudeDomain", 180);
-  mapGroup += PvlKeyword("MinimumLatitude", -90.0);
-  mapGroup += PvlKeyword("MaximumLatitude", 90.0);
-  mapGroup += PvlKeyword("MinimumLongitude", -180.0);
-  mapGroup += PvlKeyword("MaximumLongitude", 180.0);
+  mapGroup += PvlKeyword("LongitudeDomain", toString(180));
+  mapGroup += PvlKeyword("MinimumLatitude", toString(-90.0));
+  mapGroup += PvlKeyword("MaximumLatitude", toString(90.0));
+  mapGroup += PvlKeyword("MinimumLongitude", toString(-180.0));
+  mapGroup += PvlKeyword("MaximumLongitude", toString(180.0));
   mapGroup += PvlKeyword("ProjectionName", "Equirectangular");
 
   cout << "Test missing center longitude keyword ..." << endl;
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
   }
   cout << endl;
 
-  mapGroup += PvlKeyword("CenterLongitude", -90.0);
+  mapGroup += PvlKeyword("CenterLongitude", toString(-90.0));
 
   cout << "Test missing center latitude keyword ..." << endl;
   try {
@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
   }
   cout << endl;
 
-  mapGroup += PvlKeyword("CenterLatitude", 0.0);
+  mapGroup += PvlKeyword("CenterLatitude", toString(0.0));
 
   Projection &p = *ProjectionFactory::Create(lab);
 
@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   std::cout << "Check Invalid Latitude" << std::endl;
-  mapGroup.AddKeyword(PvlKeyword("CenterLatitude", 90.0), Pvl::Replace);
+  mapGroup.AddKeyword(PvlKeyword("CenterLatitude", toString(90.0)), Pvl::Replace);
   std::cout << mapGroup << std::endl;
   try {
     Equirectangular p2(lab);

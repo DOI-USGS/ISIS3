@@ -1,4 +1,4 @@
-#if !defined(ZeroReverse_h)
+#ifndef ZeroReverse_h
 #define ZeroReverse_h
 /**                                                                       
  * @file                                                                  
@@ -107,9 +107,9 @@ namespace Isis {
         _history.clear();
         _history.add("Profile["+ prof.Name()+"]");
 
-        int line0 = ConfKey(prof,"ZeroReverseFirstLine",0);
-        int lineN = ConfKey(prof,"ZeroReverseLastLine",19);
-        std::string tfile= conf.getMatrixSource("ReverseClockStatistics",prof);
+        int line0 = toInt(ConfKey(prof, "ZeroReverseFirstLine", toString(0)));
+        int lineN = toInt(ConfKey(prof, "ZeroReverseLastLine", toString(19)));
+        QString tfile= conf.getMatrixSource("ReverseClockStatistics",prof);
 
         HiMatrix revclk = cropLines(cal.getReverseClock(), line0, lineN);
         _stats.Reset();
@@ -124,18 +124,18 @@ namespace Isis {
                      "],NulPixels["+ToString(_stats.NullPixels())+ "])");
 
        DbAccess triggers(Pvl(tfile).FindObject("ReverseClockStatistics"));
-       std::string tprofName = conf.resolve("{FILTER}{CCD}_{CHANNEL}_{BIN}",prof); 
+       QString tprofName = conf.resolve("{FILTER}{CCD}_{CHANNEL}_{BIN}",prof); 
        _history.add("ReverseClockStatistics(File["+tfile+
                     "],Profile["+tprofName+"])");
 
        _triggered= false;
        if (triggers.profileExists(tprofName)) {
          DbProfile tprof(prof, triggers.getProfile(tprofName), tprofName);
-         double revmean = ConfKey(tprof,"RevMeanTrigger", _stats.Average());
-         double revstddev = ConfKey(tprof,"RevStdDevTrigger", DBL_MAX);
-         int lisTol = ConfKey(tprof, "RevLisTolerance", 1);
-         int hisTol = ConfKey(tprof, "RevHisTolerance", 1);
-         int nulTol = ConfKey(tprof, "RevNulTolerance", 1);
+         double revmean = toDouble(ConfKey(tprof,"RevMeanTrigger", toString(_stats.Average())));
+         double revstddev = toDouble(ConfKey(tprof,"RevStdDevTrigger", toString(DBL_MAX)));
+         int lisTol = toInt(ConfKey(tprof, "RevLisTolerance", toString(1)));
+         int hisTol = toInt(ConfKey(tprof, "RevHisTolerance", toString(1)));
+         int nulTol = toInt(ConfKey(tprof, "RevNulTolerance", toString(1)));
 
          _history.add("TriggerLimits(RevMeanTrigger["+ToString(revmean) +
                       "],RevStdDevTrigger["+ToString(revstddev)+

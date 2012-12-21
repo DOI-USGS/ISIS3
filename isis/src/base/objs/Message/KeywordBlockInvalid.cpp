@@ -25,8 +25,6 @@ using namespace std;
 
 #include "Message.h"
 
-string Isis::Message::KeywordBlockInvalid(const string &block) {
-  string message;
-  message = "Keyword block [" + block + "] is invalid";
-  return message;
+QString Isis::Message::KeywordBlockInvalid(const QString &block) {
+  return "Keyword block [" + block + "] is invalid";
 }

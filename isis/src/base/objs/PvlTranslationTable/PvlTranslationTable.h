@@ -134,20 +134,20 @@ namespace Isis {
       ~PvlTranslationTable() { };
 
       // Return the associated input group from the trans table
-      PvlKeyword InputGroup(const std::string nName, const int inst = 0) const;
+      PvlKeyword InputGroup(const QString nName, const int inst = 0) const;
 
       // Return the associated input keyword name from the trans table
-      std::string InputKeywordName(const std::string nName) const;
+      QString InputKeywordName(const QString nName) const;
 
       // Return the associated input default value from the trans table
-      std::string InputDefault(const std::string nName) const;
+      QString InputDefault(const QString nName) const;
 
       // Translate a single input value associated with a output name to a output value
-      std::string Translate(const std::string nName, const std::string fValue = "") const;
+      QString Translate(const QString nName, const QString fValue = "") const;
 
       // Add more table entries to the translation table data
       void AddTable(std::istream &transStm);
-      void AddTable(const std::string &transFile);
+      void AddTable(const QString &transFile);
 
     protected:
       Pvl &TranslationTable() {
@@ -157,10 +157,10 @@ namespace Isis {
         return p_trnsTbl;
       }
 
-      bool IsAuto(const std::string nName);
-      bool IsOptional(const std::string nName);
-      PvlKeyword &OutputPosition(const std::string nName);
-      std::string OutputName(const std::string nName);
+      bool IsAuto(const QString nName);
+      bool IsOptional(const QString nName);
+      PvlKeyword &OutputPosition(const QString nName);
+      QString OutputName(const QString nName);
 
     private:
       Pvl p_trnsTbl;

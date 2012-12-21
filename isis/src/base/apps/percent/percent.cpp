@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 #include <vector>
-#include <string>
+#include <QString>
 
 #include "Process.h"
 #include "Pvl.h"
@@ -22,21 +22,20 @@ void IsisMain() {
 
   // Get the desired percentage(s)
   UserInterface &ui = Application::GetUserInterface();
-  string sPercentage;
+  QString sPercentage;
   sPercentage = ui.GetString("PERCENTAGE");
-  vector <string>tokens;
-  IString::Split(',', sPercentage, tokens, true);
+  QStringList tokens = sPercentage.split(",");
   PvlGroup results("Results");
   PvlKeyword kwPercent("Percentage");
   PvlKeyword kwValue("Value");
 
-  for(unsigned int i = 0; i < tokens.size(); i++) {
-    double percentage = IString::ToDouble(tokens[i]);
+  for(int i = 0; i < tokens.size(); i++) {
+    double percentage = toDouble(tokens[i]);
     // Obtain the Histogram and the value at the percentage
     Histogram *hist = icube->getHistogram();
     double value = hist->Percent(percentage);
-    kwPercent += percentage;
-    kwValue += value;
+    kwPercent += toString(percentage);
+    kwValue += toString(value);
   }
   results += kwPercent;
   results += kwValue;

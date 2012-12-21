@@ -35,10 +35,10 @@ int main() {
   FileName f("$base/testData/kernels");
   FileName f2("$base/dems");
   FileName f3("$mgs/testData");
-  string dir = f.expanded() + "/";
-  string dir2 = f2.expanded() + "/";
-  string dir3 = f3.expanded() + "/";
-  kern1 += PvlKeyword("NaifFrameCode", -94031);
+  QString dir = f.expanded() + "/";
+  QString dir2 = f2.expanded() + "/";
+  QString dir3 = f3.expanded() + "/";
+  kern1 += PvlKeyword("NaifFrameCode", toString(-94031));
   kern1 += PvlKeyword("LeapSecond", dir + "naif0007.tls");
   kern1 += PvlKeyword("SpacecraftClock", dir + "MGS_SCLKSCET.00045.tsc");
   kern1 += PvlKeyword("TargetPosition", dir + "de405.bsp");
@@ -48,14 +48,14 @@ int main() {
   kern1 += PvlKeyword("InstrumentPosition", dir + "moc.bsp");
   kern1 += PvlKeyword("InstrumentPointing", dir + "moc.bc");
   kern1 += PvlKeyword("Frame", "");
-  kern1 += PvlKeyword("NaifBodyCode", 499);
+  kern1 += PvlKeyword("NaifBodyCode", toString(499));
   // Time Setup
   double startTime = -69382819.0;
   double endTime = -69382512.0;
   double slope = (endTime - startTime) / (10 - 1);
 
-  kern1 += PvlKeyword("StartPadding", slope);
-  kern1 += PvlKeyword("EndPadding", slope);
+  kern1 += PvlKeyword("StartPadding", toString(slope));
+  kern1 += PvlKeyword("EndPadding", toString(slope));
 
   Pvl lab1;
   lab1.AddGroup(inst1);
@@ -162,7 +162,7 @@ int main() {
 
  // Test demshape with ShapeModel keyword
   cout << endl << "  Testing dem shape..." << endl;
-  string inputFile = "$ISIS3DATA/mgs/testData/ab102401.cub";
+  QString inputFile = "$ISIS3DATA/mgs/testData/ab102401.cub";
   Cube cube;
   cube.open(inputFile);
   Camera *c = cube.getCamera();

@@ -38,7 +38,7 @@ void IsisMain() {
   Isise = ui.GetDouble("E");
 
   // Start the processing based on the operator
-  string op = ui.GetString("OPERATOR");
+  QString op = ui.GetString("OPERATOR");
   if(op == "ADD") p.ProcessCubes(&add);
   if(op == "SUBTRACT") p.ProcessCubes(&sub);
   if(op == "MULTIPLY") p.ProcessCubes(&mult);

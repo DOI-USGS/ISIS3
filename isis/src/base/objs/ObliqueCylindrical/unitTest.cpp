@@ -6,49 +6,51 @@
 #include "ProjectionFactory.h"
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
+
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   cout << "UNIT TEST FOR ObliqueCylindrical" << endl << endl;
 
-  Isis::Pvl lab;
-  lab.AddGroup(Isis::PvlGroup("Mapping"));
-  Isis::PvlGroup &mapGrp = lab.FindGroup("Mapping");
+  Pvl lab;
+  lab.AddGroup(PvlGroup("Mapping"));
+  PvlGroup &mapGrp = lab.FindGroup("Mapping");
 
-  mapGrp += Isis::PvlKeyword("EquatorialRadius", 2575000.0);
-  mapGrp += Isis::PvlKeyword("PolarRadius", 2575000.0);
+  mapGrp += PvlKeyword("EquatorialRadius", "2575000.0");
+  mapGrp += PvlKeyword("PolarRadius", "2575000.0");
 
-  mapGrp += Isis::PvlKeyword("PoleLatitude", 22.858149);
-  mapGrp += Isis::PvlKeyword("PoleLongitude", 297.158602);
+  mapGrp += PvlKeyword("PoleLatitude", "22.858149");
+  mapGrp += PvlKeyword("PoleLongitude", "297.158602");
 
-  mapGrp += Isis::PvlKeyword("LatitudeType", "Planetocentric");
-  mapGrp += Isis::PvlKeyword("LongitudeDirection", "PositiveWest");
-  mapGrp += Isis::PvlKeyword("LongitudeDomain", 360);
-  mapGrp += Isis::PvlKeyword("ProjectionName", "ObliqueCylindrical");
+  mapGrp += PvlKeyword("LatitudeType", "Planetocentric");
+  mapGrp += PvlKeyword("LongitudeDirection", "PositiveWest");
+  mapGrp += PvlKeyword("LongitudeDomain", "360");
+  mapGrp += PvlKeyword("ProjectionName", "ObliqueCylindrical");
 
-  mapGrp += Isis::PvlKeyword("MinimumLatitude", -90);
-  mapGrp += Isis::PvlKeyword("MaximumLatitude", 0.92523);
-  mapGrp += Isis::PvlKeyword("MinimumLongitude", -0.8235);
-  mapGrp += Isis::PvlKeyword("MaximumLongitude", 180.5);
+  mapGrp += PvlKeyword("MinimumLatitude", "-90");
+  mapGrp += PvlKeyword("MaximumLatitude", "0.92523");
+  mapGrp += PvlKeyword("MinimumLongitude", "-0.8235");
+  mapGrp += PvlKeyword("MaximumLongitude", "180.5");
 
   cout << "Test missing pole rotation keyword ..." << endl;
   try {
-    Isis::ObliqueCylindrical p(lab);
+    ObliqueCylindrical p(lab);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
 
   // Add the missing keyword "PoleRotation"
-  mapGrp += Isis::PvlKeyword("PoleRotation", 45.7832);
+  mapGrp += PvlKeyword("PoleRotation", "45.7832");
 
   // testing operator ==
   cout << "Testing operator == ..." << endl;
   try {
-    Isis::ObliqueCylindrical p1(lab);
-    Isis::ObliqueCylindrical p2(lab);
+    ObliqueCylindrical p1(lab);
+    ObliqueCylindrical p2(lab);
     bool flag = (p1 == p2);
     if(flag) {
       cout << "(p1==p2) = True" << endl;
@@ -57,25 +59,25 @@ int main(int argc, char *argv[]) {
       cout << "*** Error ****" << endl;
     }
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
 
   try {
 
-    Isis::Projection &p = *Isis::ProjectionFactory::Create(lab);
+    Projection &p = *ProjectionFactory::Create(lab);
 
     cout << "Test X,Y,Z Axis Vector Calculations ... " << endl;
-    cout << "Map Group Data (X[0]):      " << (double)mapGrp["XAxisVector"][0] << endl;
-    cout << "Map Group Data (X[1]):      " << (double)mapGrp["XAxisVector"][1] << endl;
-    cout << "Map Group Data (X[2]):      " << (double)mapGrp["XAxisVector"][2] << endl;
-    cout << "Map Group Data (Y[0]):      " << (double)mapGrp["YAxisVector"][0] << endl;
-    cout << "Map Group Data (Y[1]):      " << (double)mapGrp["YAxisVector"][1] << endl;
-    cout << "Map Group Data (Y[2]):      " << (double)mapGrp["YAxisVector"][2] << endl;
-    cout << "Map Group Data (Z[0]):      " << (double)mapGrp["ZAxisVector"][0] << endl;
-    cout << "Map Group Data (Z[1]):      " << (double)mapGrp["ZAxisVector"][1] << endl;
-    cout << "Map Group Data (Z[2]):      " << (double)mapGrp["ZAxisVector"][2] << endl;
+    cout << "Map Group Data (X[0]):      " << toDouble(mapGrp["XAxisVector"][0]) << endl;
+    cout << "Map Group Data (X[1]):      " << toDouble(mapGrp["XAxisVector"][1]) << endl;
+    cout << "Map Group Data (X[2]):      " << toDouble(mapGrp["XAxisVector"][2]) << endl;
+    cout << "Map Group Data (Y[0]):      " << toDouble(mapGrp["YAxisVector"][0]) << endl;
+    cout << "Map Group Data (Y[1]):      " << toDouble(mapGrp["YAxisVector"][1]) << endl;
+    cout << "Map Group Data (Y[2]):      " << toDouble(mapGrp["YAxisVector"][2]) << endl;
+    cout << "Map Group Data (Z[0]):      " << toDouble(mapGrp["ZAxisVector"][0]) << endl;
+    cout << "Map Group Data (Z[1]):      " << toDouble(mapGrp["ZAxisVector"][1]) << endl;
+    cout << "Map Group Data (Z[2]):      " << toDouble(mapGrp["ZAxisVector"][2]) << endl;
     cout << endl;
 
     const double X = -2646.237039, Y = -537.814519;
@@ -109,14 +111,14 @@ int main(int argc, char *argv[]) {
     cout << "Maximum Y:  " << maxY << endl;
     cout << endl;
 
-    Isis::Projection *s = &p;
+    Projection *s = &p;
     cout << "Test Name and comparision method ... " << endl;
     cout << "Name:       " << s->Name() << endl;
     cout << "operator==  " << (*s == *s) << endl;
     cout << endl;
 
-    mapGrp["PoleRotation"] = 43.8423;
-    Isis::ObliqueCylindrical different(lab);
+    mapGrp["PoleRotation"] = "43.8423";
+    ObliqueCylindrical different(lab);
     cout << "Test Name and comparision method with differing data... " << endl;
     cout << "Name:       " << s->Name() << endl;
     cout << "operator==  " << (different == *s) << endl;
@@ -124,9 +126,9 @@ int main(int argc, char *argv[]) {
 
     cout << "Testing Mapping() methods ... " << endl;
 
-    Isis::Pvl tmp1;
-    Isis::Pvl tmp2;
-    Isis::Pvl tmp3;
+    Pvl tmp1;
+    Pvl tmp2;
+    Pvl tmp3;
     tmp1.AddGroup(p.Mapping());
     tmp2.AddGroup(p.MappingLatitudes());
     tmp3.AddGroup(p.MappingLongitudes());
@@ -139,7 +141,7 @@ int main(int argc, char *argv[]) {
     cout << tmp3 << endl;
     cout << endl;
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 }

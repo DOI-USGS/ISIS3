@@ -22,8 +22,7 @@ namespace Isis {
 
     PvlGroup &algorithm = pvl.FindObject("PhotometricModel").FindGroup("Algorithm", Pvl::Traverse);
 
-    p_algName = AlgorithmName();
-    p_algName.UpCase();
+    p_algName = AlgorithmName().toUpper();
 
     if(algorithm.HasKeyword("Hg1")) {
       SetPhotoHg1(algorithm["Hg1"]);
@@ -42,9 +41,9 @@ namespace Isis {
     }
 
     if(algorithm.HasKeyword("ZeroB0Standard")) {
-      SetPhoto0B0Standard((string)algorithm["ZeroB0Standard"]);
+      SetPhoto0B0Standard(algorithm["ZeroB0Standard"][0]);
     } else if (algorithm.HasKeyword("ZeroB0St")) {
-      SetPhoto0B0Standard((string)algorithm["ZeroB0St"]);
+      SetPhoto0B0Standard(algorithm["ZeroB0St"][0]);
     } else {
       SetPhoto0B0Standard("TRUE");
     }
@@ -414,7 +413,7 @@ namespace Isis {
     *
     * @param b0standard  Hapke opposition surge initialization, default is true
     */
-  void Hapke::SetPhoto0B0Standard(const string &b0standard) {
+  void Hapke::SetPhoto0B0Standard(const QString &b0standard) {
     IString temp(b0standard);
     temp = temp.UpCase();
 

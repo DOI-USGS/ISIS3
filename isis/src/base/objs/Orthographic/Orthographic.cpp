@@ -60,14 +60,14 @@ namespace Isis {
       // necessary
       if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
         double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
-        mapGroup += PvlKeyword("CenterLongitude", lon);
+        mapGroup += PvlKeyword("CenterLongitude", toString(lon));
       }
 
       // Compute and write the default center latitude if allowed and
       // necessary
       if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLatitude"))) {
         double lat = (m_minimumLatitude + m_maximumLatitude) / 2.0;
-        mapGroup += PvlKeyword("CenterLatitude", lat);
+        mapGroup += PvlKeyword("CenterLatitude", toString(lat));
       }
 
       // Get the center longitude  & latitude
@@ -150,7 +150,7 @@ namespace Isis {
       }
     }
     catch(IException &e) {
-      string message = "Invalid label group [Mapping]";
+      QString message = "Invalid label group [Mapping]";
       throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }
@@ -180,9 +180,9 @@ namespace Isis {
   /**
     * Returns the name of the map projection, "Orthographic"
     *
-    * @return string Name of projection, "Orthographic"
+    * @return QString Name of projection, "Orthographic"
     */
-   string Orthographic::Name() const {
+   QString Orthographic::Name() const {
      return "Orthographic";
    }
 
@@ -190,9 +190,9 @@ namespace Isis {
     * Returns the version of the map projection
     *
     *
-    * @return string Version number
+    * @return QString Version number
     */
-   string Orthographic::Version() const {
+   QString Orthographic::Version() const {
      return "1.0";
    }
 

@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
     snl.Add("$lo/testData/3133_h1.cub");
   }
   catch(Isis::IException &e) {
-    QString error = e.toString().ToQt().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
+    QString error = e.toString().replace(QRegExp("(\\[[^\\]]*/)([^\\]]*)"), "[.../\\2");
     cerr << error.toStdString() << endl;
   }
 

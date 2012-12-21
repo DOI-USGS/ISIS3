@@ -40,7 +40,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2007-01-11 Tracie Sucharski - Original version.
-   *   @history 2007-01-30 Elizabeth Ribelin - Renamed String to IString and
+   *   @history 2007-01-30 Elizabeth Ribelin - Renamed String to QString and
    *                          Time to iTime.
    *   @history 2007-07-10 Steven Lambright - Added unitTest.  Read boresight
    *                          from addendum.  Added time to 1/2 exposure

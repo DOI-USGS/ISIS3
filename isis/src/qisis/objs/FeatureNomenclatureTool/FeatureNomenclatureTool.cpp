@@ -582,7 +582,7 @@ namespace Isis {
       features = viewportFeatureDisplay(vp)->features();
 
       QProgressDialog updatingFeaturesProgress(
-          tr("Projecting Features for [%1]").arg(vp->cube()->getFileName().ToQt().section('/',-1)),
+          tr("Projecting Features for [%1]").arg(vp->cube()->getFileName().section('/',-1)),
           QString(), 0, 100);
           
       updatingFeaturesProgress.setWindowModality(Qt::WindowModal);
@@ -608,10 +608,10 @@ namespace Isis {
         if ( !m_showApprovedOnly ||
             (m_showApprovedOnly && feature.status() == FeatureNomenclature::Approved) ) {
 
-          QString displayName = feature.cleanName().ToQt() +
-              " (" + FileName(vp->cube()->getFileName()).name().ToQt() + ")";
+          QString displayName = feature.cleanName() +
+              " (" + FileName(vp->cube()->getFileName()).name() + ")";
 
-          QString targetName = feature.target().UpCase().ToQt();
+          QString targetName = feature.target().toUpper();
 
           // never insert above the blank (at 0)
           int insertPos = 1;
@@ -738,7 +738,7 @@ namespace Isis {
       if (!ugm)
         throw IException();
 
-      IString target;
+      QString target;
       if (vp->camera()) {
         target = vp->camera()->target()->name();
       }
@@ -761,7 +761,7 @@ namespace Isis {
       
         (*m_nomenclatureSearchers)[vp] = searcher;
         toolStateChanged();
-        (*m_nomenclatureSearchers)[vp]->queryFeatures(target.UpCase(),
+        (*m_nomenclatureSearchers)[vp]->queryFeatures(target.toUpper(),
                                                       minLat, minLon,
                                                       maxLat, maxLon);
       }
@@ -986,7 +986,7 @@ namespace Isis {
   void FeatureNomenclatureTool::readSettings() {
     FileName config("$HOME/.Isis/qview/nomenclature.config");
     QSettings settings(
-        QString::fromStdString(config.expanded()), QSettings::NativeFormat);
+        config.expanded(), QSettings::NativeFormat);
     
     m_fontSize = settings.value("fontSize", m_fontSize).toInt();
     *m_fontColor = settings.value("fontColor", *m_fontColor).value<QColor>();
@@ -1008,7 +1008,7 @@ namespace Isis {
   void FeatureNomenclatureTool::writeSettings() {
     FileName config("$HOME/.Isis/qview/nomenclature.config");
     QSettings settings(
-        QString::fromStdString(config.expanded()), QSettings::NativeFormat);
+        config.expanded(), QSettings::NativeFormat);
     settings.setValue("fontSize", m_fontSize);
     settings.setValue("fontColor", qVariantFromValue(*m_fontColor));
     settings.setValue("defaultEnabled", m_defaultEnabled);
@@ -1512,7 +1512,7 @@ namespace Isis {
    */
   void FeatureNomenclatureTool::ViewportFeatureDisplay::centerFeature(
       FeatureNomenclature::Feature feature) {
-    IString displayName = feature.displayName();
+    QString displayName = feature.displayName();
 
     int foundIndex = -1;
     for (int i = 0; foundIndex == -1 && i < m_features->count(); i++) {

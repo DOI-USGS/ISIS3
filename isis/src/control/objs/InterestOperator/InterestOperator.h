@@ -131,7 +131,7 @@ namespace Isis {
       void SetPatternReduction(std::vector<int> samples, std::vector<int> lines);
 
       //! Return name of the matching operator
-      inline std::string operatorName() const {
+      inline QString operatorName() const {
         return mOperatorGrp["Name"];
       };
 
@@ -139,7 +139,7 @@ namespace Isis {
       bool Operate(Cube &pCube, UniversalGroundMap &pUnivGrndMap, int piSample, int piLine);
 
       //! Operate - to calculate interest for entire control net to get better reference
-      void Operate(ControlNet &pNewNet, std::string psSerialNumFile, std::string psOverlapListFile = "");
+      void Operate(ControlNet &pNewNet, QString psSerialNumFile, QString psOverlapListFile = "");
 
       //! Return the Interest Amount
       inline double InterestAmount() const {
@@ -220,7 +220,7 @@ namespace Isis {
 
       //! Structure to hold Interest Results
       typedef struct {
-        std::string msSerialNum;     //!< Serial Number of the Measure
+        QString msSerialNum;     //!< Serial Number of the Measure
         double mdInterest;           //!< Resulting interest amt from InterestOperator
         double mdBestSample;         //!< Most interesting sample
         double mdBestLine;           //!< Most interesting line

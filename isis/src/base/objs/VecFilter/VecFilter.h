@@ -21,7 +21,7 @@
  */
 
 #include <vector>
-#include "IString.h"
+#include <QString>
 
 namespace Isis {
   /**
@@ -49,7 +49,7 @@ namespace Isis {
       std::vector<double> LowPass(std::vector<double> invec, int boxsize);
       std::vector<double> HighPass(std::vector<double> invec1, std::vector<double> invec2);
       std::vector<double> HighPass(std::vector<double> pdInVector1, std::vector<double> pdInVector2, 
-             std::vector<int> piValidPntsVector, int piMaxPoints, const IString & psMode="SUBTRACT");
+             std::vector<int> piValidPntsVector, int piMaxPoints, const QString & psMode="SUBTRACT");
 
     private:
   };

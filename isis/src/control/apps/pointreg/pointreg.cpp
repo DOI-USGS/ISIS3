@@ -54,7 +54,7 @@ class Validation {
       Skipped
     };
 
-    Validation(string test, ControlMeasure *held, ControlMeasure *registered,
+    Validation(QString test, ControlMeasure *held, ControlMeasure *registered,
         double tolerance) {
 
       m_test = test;
@@ -96,7 +96,7 @@ class Validation {
       return m_result == Skipped;
     }
 
-    string resultString() const {
+    QString resultString() const {
       switch (m_result) {
         case Untested: return "Untested";
         case Success: return "Success";
@@ -111,7 +111,7 @@ class Validation {
       m_result = valid ? Success : Failure;
     }
 
-    void skip(string testFailure) {
+    void skip(QString testFailure) {
       m_test = testFailure;
       m_result = Skipped;
     }
@@ -136,14 +136,14 @@ class Validation {
       setValidity(m_shift <= m_shiftTolerance);
     }
 
-    static string getHeader() {
+    static QString getHeader() {
       return "Result,Test,PointID,HeldID,RegisteredID,"
           "Sample,Line,ShiftedSample,ShiftedLine,"
           "ResolutionDifference,ResolutionTolerance,"
           "Shift,ShiftTolerance";
     }
 
-    string toString() {
+    QString toString() {
       stringstream stream;
       stream <<
         resultString() << "," << m_test << "," << m_pointId << "," <<
@@ -152,14 +152,14 @@ class Validation {
         m_shiftSample << "," << m_shiftLine << "," <<
         m_resDiff << "," << m_resTolerance << "," <<
         m_shift << "," << m_shiftTolerance;
-      return stream.str();
+      return stream.str().c_str();
     }
 
   private:
-    string m_test;
-    string m_pointId;
-    string m_heldId;
-    string m_registeredId;
+    QString m_test;
+    QString m_pointId;
+    QString m_heldId;
+    QString m_registeredId;
 
     double m_aprioriSample;
     double m_aprioriLine;
@@ -177,7 +177,7 @@ class Validation {
 
 
 void registerPoint(ControlPoint *outPoint, ControlMeasure *patternCM,
-    string registerMeasures, bool outputFailed);
+    QString registerMeasures, bool outputFailed);
 void validatePoint(ControlPoint *point, ControlMeasure *reference,
     double shiftTolerance);
 Validation backRegister(ControlMeasure *measure, ControlMeasure *reference,
@@ -189,8 +189,8 @@ bool outputValue(ofstream &os, double value);
 int calcGoodMeasureCount(const ControlPoint *point);
 void printTemp();
 
-map<string, void *> GuiHelpers() {
-  map<string, void *> helper;
+map<QString, void *> GuiHelpers() {
+  map<QString, void *> helper;
   helper["PrintTemp"] = (void *) printTemp;
   return helper;
 }
@@ -222,8 +222,8 @@ void IsisMain() {
   }
 
   // Determine which points/measures to register
-  string registerPoints = ui.GetString("POINTS");
-  string registerMeasures = ui.GetString("MEASURES");
+  QString registerPoints = ui.GetString("POINTS");
+  QString registerMeasures = ui.GetString("MEASURES");
 
   bool outputFailed = ui.GetBoolean("OUTPUTFAILED");
   bool outputIgnored = ui.GetBoolean("OUTPUTIGNORED");
@@ -236,7 +236,7 @@ void IsisMain() {
   ControlNet outNet(ui.GetFileName("CNET"));
 
   if (outNet.GetNumPoints() <= 0) {
-    std::string msg = "Control network [" + ui.GetFileName("CNET") + "] ";
+    QString msg = "Control network [" + ui.GetFileName("CNET") + "] ";
     msg += "contains no points";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -255,7 +255,7 @@ void IsisMain() {
   cubeMgr = new CubeManager;
   cubeMgr->SetNumOpenCubes(500);
 
-  string validate = ui.GetString("VALIDATE");
+  QString validate = ui.GetString("VALIDATE");
   if (validate != "SKIP") {
     validator = AutoRegFactory::Create(pvl);
 
@@ -349,10 +349,10 @@ void IsisMain() {
   // The flatfile is comma seperated and can be imported into an excel
   // spreadsheet
   if (ui.WasEntered("FLATFILE")) {
-    string fFile = FileName(ui.GetFileName("FLATFILE")).expanded();
+    QString fFile = FileName(ui.GetFileName("FLATFILE")).expanded();
 
     ofstream os;
-    os.open(fFile.c_str(), ios::out);
+    os.open(fFile.toAscii().data(), ios::out);
     os <<
       "PointId,Filename,MeasureType,Reference,EditLock,Ignore,Registered," <<
       "OriginalMeasurementSample,OriginalMeasurementLine," <<
@@ -379,18 +379,18 @@ void IsisMain() {
           const ControlMeasure * cmOrig =
             inPoint->GetMeasure((QString) cmTrans->GetCubeSerialNumber());
 
-          string pointId = outPoint->GetId();
+          QString pointId = outPoint->GetId();
 
-          string fullName = files->FileName(cmTrans->GetCubeSerialNumber());
-          string filename = FileName(fullName).baseName();
+          QString fullName = files->FileName(cmTrans->GetCubeSerialNumber());
+          QString filename = FileName(fullName).baseName();
 
-          string measureType = cmTrans->MeasureTypeToString(
+          QString measureType = cmTrans->MeasureTypeToString(
               cmTrans->GetType());
-          string reference = outPoint->GetRefMeasure() == cmTrans ?
+          QString reference = outPoint->GetRefMeasure() == cmTrans ?
             "true" : "false";
-          string editLock = cmTrans->IsEditLocked() ? "true" : "false";
-          string ignore = cmTrans->IsIgnored() ? "true" : "false";
-          string registered =
+          QString editLock = cmTrans->IsEditLocked() ? "true" : "false";
+          QString ignore = cmTrans->IsIgnored() ? "true" : "false";
+          QString registered =
             !cmOrig->IsRegistered() && cmTrans->IsRegistered() ?
             "true" : "false";
 
@@ -439,9 +439,9 @@ void IsisMain() {
   }
 
   if (logFalsePositives) {
-    string filename = FileName(ui.GetFileName("FALSEPOSITIVES")).expanded();
+    QString filename = FileName(ui.GetFileName("FALSEPOSITIVES")).expanded();
     ofstream os;
-    os.open(filename.c_str(), ios::out);
+    os.open(filename.toAscii().data(), ios::out);
 
     os << Validation::getHeader() << endl;
     for (int i = 0; i < falsePositives->size(); i++) {
@@ -452,15 +452,15 @@ void IsisMain() {
   }
 
   PvlGroup pLog("Points");
-  pLog += PvlKeyword("Total", outNet.GetNumPoints());
-  pLog += PvlKeyword("Ignored", ignored);
+  pLog += PvlKeyword("Total", toString(outNet.GetNumPoints()));
+  pLog += PvlKeyword("Ignored", toString(ignored));
   Application::Log(pLog);
 
   PvlGroup mLog("Measures");
-  mLog += PvlKeyword("Locked", locked);
-  mLog += PvlKeyword("Registered", registered);
-  mLog += PvlKeyword("NotIntersected", notintersected);
-  mLog += PvlKeyword("Unregistered", unregistered);
+  mLog += PvlKeyword("Locked", toString(locked));
+  mLog += PvlKeyword("Registered", toString(registered));
+  mLog += PvlKeyword("NotIntersected", toString(notintersected));
+  mLog += PvlKeyword("Unregistered", toString(unregistered));
   Application::Log(mLog);
 
   // Log Registration Statistics
@@ -514,7 +514,7 @@ void IsisMain() {
 
 
 void registerPoint(ControlPoint *outPoint, ControlMeasure *patternCM,
-    string registerMeasures, bool outputFailed) {
+    QString registerMeasures, bool outputFailed) {
 
   Cube &patternCube = *cubeMgr->OpenCube(
       files->FileName(patternCM->GetCubeSerialNumber()));
@@ -699,7 +699,7 @@ void validatePoint(ControlPoint *point, ControlMeasure *reference,
         if (logFalsePositives) {
           if (!validation.succeeded()) {
             falsePositives->append(
-                QString::fromStdString(validation.toString()));
+                validation.toString());
           }
         }
       }

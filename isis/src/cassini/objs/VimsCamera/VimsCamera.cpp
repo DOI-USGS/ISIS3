@@ -58,7 +58,7 @@ namespace Isis {
     NaifStatus::CheckErrors();
 
     PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
-    string channel = (string) inst ["Channel"];
+    QString channel = (QString) inst ["Channel"];
 
     // Set Frame mounting
 
@@ -66,7 +66,7 @@ namespace Isis {
       //LoadFrameMounting ("CASSINI_SC_COORD","CASSINI_VIMS_V");
 
       SetFocalLength(143.0);
-      if(IString((string)inst["SamplingMode"]).UpCase() == "NORMAL") {
+      if(QString((QString)inst["SamplingMode"]).toUpper() == "NORMAL") {
         SetPixelPitch(3 * .024);
       }
       else {
@@ -81,26 +81,28 @@ namespace Isis {
     }
 
     // Get the start time in et
-    IString stime = (string) inst ["NativeStartTime"];
-    string intTime = stime.Token(".");
+    QString stime = inst ["NativeStartTime"][0];
+    QString intTime = stime.split(".").first();
+    stime = stime.split(".").last();
 
     double etStart = getClockTime(intTime).Et();
 
     //  Add 2 seconds to either side of time range because the time are for IR
     // channel, the VIS may actually start integrating before NATIVE_START_TIME.
     //  This insures the cache is large enough.
-    etStart += stime.ToDouble() / 15959.0 - 2.;
+    etStart += toDouble(stime) / 15959.0 - 2.;
 
     // Get the end time in et
-    IString etime = (string) inst ["NativeStopTime"];
-    intTime = etime.Token(".");
+    QString etime = (QString) inst ["NativeStopTime"];
+    intTime = etime.split(".").first();
+    etime = etime.split(".").last();
 
     double etStop = getClockTime(intTime).Et();
 
     //  Add 2 seconds to either side of time range because the time are for IR
     // channel, the VIS may actually start integrating before NATIVE_START_TIME.
     //  This insures the cache is large enough.
-    etStop += stime.ToDouble() / 15959.0 + 2.;
+    etStop += toDouble(stime) / 15959.0 + 2.;
 
     //  Setup detector map
     new CameraDetectorMap(this);

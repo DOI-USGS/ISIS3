@@ -122,7 +122,7 @@ void IsisMain() {
   // Get seed domain for unit conversion, no keyword == XY
   SeedDomain seedDomain = XY;
   if(seedDef.HasKeyword("SeedDomain", Pvl::Traverse)) {
-    IString domain = (std::string) seedDef.FindKeyword("SeedDomain", Pvl::Traverse);
+    IString domain = (QString) seedDef.FindKeyword("SeedDomain", Pvl::Traverse);
     if(unusedDefKeywords.HasKeyword("SeedDomain"))
       unusedDefKeywords.DeleteKeyword("SeedDomain");
 
@@ -144,18 +144,18 @@ void IsisMain() {
   // This is used inside the seeding algorithms.
   // Note: Should this be an option to include this in the program?
   PvlGroup inst = cubeLab.FindGroup("Instrument", Pvl::Traverse);
-  string target = inst["TargetName"];
+  QString target = inst["TargetName"];
   PvlGroup radii = Projection::TargetRadii(target);
   Isis::Pvl maplab;
   maplab.AddGroup(Isis::PvlGroup("Mapping"));
   Isis::PvlGroup &mapGroup = maplab.FindGroup("Mapping");
-  mapGroup += Isis::PvlKeyword("EquatorialRadius", (string)radii["EquatorialRadius"]);
-  mapGroup += Isis::PvlKeyword("PolarRadius", (string)radii["PolarRadius"]);
+  mapGroup += Isis::PvlKeyword("EquatorialRadius", (QString)radii["EquatorialRadius"]);
+  mapGroup += Isis::PvlKeyword("PolarRadius", (QString)radii["PolarRadius"]);
   mapGroup += Isis::PvlKeyword("LatitudeType", "Planetocentric");
   mapGroup += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-  mapGroup += Isis::PvlKeyword("LongitudeDomain", 360);
-  mapGroup += Isis::PvlKeyword("CenterLatitude", 0);
-  mapGroup += Isis::PvlKeyword("CenterLongitude", 0);
+  mapGroup += Isis::PvlKeyword("LongitudeDomain", toString(360));
+  mapGroup += Isis::PvlKeyword("CenterLatitude", toString(0));
+  mapGroup += Isis::PvlKeyword("CenterLongitude", toString(0));
   mapGroup += Isis::PvlKeyword("ProjectionName", "Sinusoidal");
 
   //PolygonSeeder *seeder = PolygonSeederFactory::Create(seedDef);
@@ -190,11 +190,11 @@ void IsisMain() {
   int stats_noOverlap = 0;
   int stats_tolerance = 0;
 
-  map<std::string, UniversalGroundMap *> gMaps;
+  map<QString, UniversalGroundMap *> gMaps;
   for(int sn = 0; sn < serialNumbers.Size(); ++sn) {
     // Create the UGM for the cube associated with this SN
     Pvl lab = Pvl(serialNumbers.FileName(sn));
-    gMaps.insert(std::pair<std::string, UniversalGroundMap *>
+    gMaps.insert(std::pair<QString, UniversalGroundMap *>
                  (serialNumbers.SerialNumber(sn), new UniversalGroundMap(lab)));
   }
 
@@ -220,7 +220,7 @@ void IsisMain() {
     for(int i = 0 ; i < precnet.GetNumPoints(); i ++) {
       ControlPoint *cp = precnet.GetPoint(i);
       ControlMeasure *cm = cp->GetRefMeasure();
-      IString c = serialNumbers.FileName(cm->GetCubeSerialNumber());
+      QString c = serialNumbers.FileName(cm->GetCubeSerialNumber());
       Pvl cubepvl(c);
       Camera *cam = CameraFactory::Create(cubepvl);
       cam->SetImage(cm->GetSample(), cm->GetLine());
@@ -350,7 +350,7 @@ void IsisMain() {
     for(unsigned int point = 0; point < seed.size(); ++point) {
 
       ControlPoint *controlpt = new ControlPoint();
-      controlpt->SetId(QString::fromStdString(pointId.Next()));
+      controlpt->SetId(pointId.Next());
       controlpt->SetType(ControlPoint::Free);
 
       // Create a measurment at this point for each image in the overlap area
@@ -361,7 +361,7 @@ void IsisMain() {
         UniversalGroundMap *gmap = gMaps[(*overlaps[ov])[sn]];
 
         if(!gmap) {
-          std::string msg = "Unable to create a Universal Ground for Serial Number [";
+          QString msg = "Unable to create a Universal Ground for Serial Number [";
           msg += (*overlaps[ov])[sn] + "] The associated image is more than ";
           msg += "likely missing from your FROMLIST.";
           throw IException(IException::User, msg, _FILEINFO_);
@@ -392,7 +392,7 @@ void IsisMain() {
         // Check the DNs with the cube, Note: this is costly to do
         if(hasDNRestriction) {
           Cube cube;
-          string c = serialNumbers.FileName((*overlaps[ov])[sn]);
+          QString c = serialNumbers.FileName((*overlaps[ov])[sn]);
           cube.open(c);
           Isis::Brick brick(1, 1, 1, cube.getPixelType());
           brick.SetBasePosition((int)gmap->Camera()->Sample(), (int)gmap->Camera()->Line(), (int)gmap->Camera()->Band());
@@ -455,16 +455,16 @@ void IsisMain() {
 
   //Log the ERRORS file
   if(ui.WasEntered("ERRORS") && errorNum > 0) {
-    string errorname = ui.GetFileName("ERRORS");
+    QString errorname = ui.GetFileName("ERRORS");
     std::ofstream errorsfile;
-    errorsfile.open(errorname.c_str());
+    errorsfile.open(errorname.toAscii().data());
     errorsfile << errors.str();
     errorsfile.close();
   }
 
   // Make sure the control network is not empty
   if(cnet.GetNumPoints() == 0) {
-    string msg = "The ouput control network is empty. This is likely due";
+    QString msg = "The ouput control network is empty. This is likely due";
     msg += " to the input cubes failing to overlap.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -474,8 +474,8 @@ void IsisMain() {
 
   // create SeedDef group and add to print.prt
   PvlGroup pluginInfo = seeder->PluginParameters("SeedDefinition");
-  pluginInfo.AddKeyword(PvlKeyword("MaxIncidence", maxIncidence));
-  pluginInfo.AddKeyword(PvlKeyword("MaxEmission", maxEmission));
+  pluginInfo.AddKeyword(PvlKeyword("MaxIncidence", toString(maxIncidence)));
+  pluginInfo.AddKeyword(PvlKeyword("MaxEmission", toString(maxEmission)));
   Application::Log(pluginInfo);
 
   // inform user of any unused (invalid) keywords found in the def file
@@ -493,10 +493,10 @@ void IsisMain() {
   }
 
   // create Results group and add to print.prt
-  PvlKeyword cpCountKeyword("ControlPointCount", IString(cpCount));
-  PvlKeyword msCountKeyword("ControlMeasureCount", IString(msCount));
-  PvlKeyword cpIgnoredCountKeyword("ControlPointsIgnored", IString(cpIgnoredCount));
-  PvlKeyword cmIgnoredCountKeyword("ControlMeasuresIgnored", IString(cmIgnoredCount));
+  PvlKeyword cpCountKeyword("ControlPointCount", toString(cpCount));
+  PvlKeyword msCountKeyword("ControlMeasureCount", toString(msCount));
+  PvlKeyword cpIgnoredCountKeyword("ControlPointsIgnored", toString(cpIgnoredCount));
+  PvlKeyword cmIgnoredCountKeyword("ControlMeasuresIgnored", toString(cmIgnoredCount));
 
   PvlGroup resultsGrp("Results");
   resultsGrp.AddKeyword(cpCountKeyword);

@@ -41,7 +41,7 @@ using namespace Isis;
 
 int main() {
   Preference::Preferences(true);
-  string inputFile = "$mgs/testData/ab102401.cub";
+  QString inputFile = "$mgs/testData/ab102401.cub";
   // string inputFile = "/work/projects/isis/latest/m00775/test/M123149061RE.lev1.cub";
   Cube cube;
   cube.open(inputFile);

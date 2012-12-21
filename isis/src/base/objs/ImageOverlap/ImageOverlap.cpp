@@ -29,7 +29,7 @@ namespace Isis {
    * @param polygon The polygon that defines the overlap area.
    *
    */
-  ImageOverlap::ImageOverlap(std::string serialNumber,
+  ImageOverlap::ImageOverlap(QString serialNumber,
                              geos::geom::MultiPolygon &polygon) {
     Init();
     SetPolygon(polygon);
@@ -48,9 +48,8 @@ namespace Isis {
     std::string fileData;
     getline(inputStream, fileData);
 
-    IString serialNums = fileData;
-    IString serialNum;
-    while((serialNum = serialNums.Token(",")) != "") {
+    QString serialNums = fileData.c_str();
+    foreach (QString serialNum, serialNums.split(",")) {
       Add(serialNum);
     }
 
@@ -122,7 +121,7 @@ namespace Isis {
   void ImageOverlap::Write(std::ostream &outputStream) {
     geos::io::WKBWriter geosWriter;
 
-    IString serialNums;
+    QString serialNums;
 
     for(unsigned int sn = 0; sn < p_serialNumbers.size(); sn++) {
       if(sn != 0) {
@@ -145,10 +144,11 @@ namespace Isis {
    * @param sn The serial number to be added to the list.
    *
    */
-  void ImageOverlap::Add(std::string &sn) {
+  void ImageOverlap::Add(QString &sn) {
     for(unsigned int s = 0; s < p_serialNumbers.size(); ++s) {
       if(sn == p_serialNumbers[s]) {
-        std::string msg = "Duplicate SN added to [" +  p_polygon->toString() + "]";
+        QString msg = "Duplicate SN added to [" +
+            QString::fromStdString(p_polygon->toString()) + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
@@ -189,12 +189,12 @@ namespace Isis {
    * This method will return true if input serial number exists in the
    * ImageOverlap.
    *
-   * @param[in] sn    (std::string &)  Serial Number to search for
+   * @param[in] sn    (QString &)  Serial Number to search for
    *
    * @return bool  Returns true if the serial number exists in the
    *               ImageOverlap.
    */
-  bool ImageOverlap::HasSerialNumber(std::string &sn) const {
+  bool ImageOverlap::HasSerialNumber(QString &sn) const {
     for(int thisSn = 0; thisSn < Size(); ++thisSn) {
       if(p_serialNumbers[thisSn] == sn) {
         return true;

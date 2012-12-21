@@ -88,8 +88,8 @@ namespace Isis {
         std::vector<LineRateChange> m_lineRates;
         std::vector<ScanMirrorInfo> m_mirrorData;
 
-        void readHouseKeeping(const std::string &filename, double lineRate);
-        std::string scrub(const std::string &text) const;
+        void readHouseKeeping(const QString &filename, double lineRate);
+        QString scrub(const QString &text) const;
         double exposureTime() const;
         double scanLineTime() const;
         int    pixelSumming() const;
@@ -101,10 +101,10 @@ namespace Isis {
         double startTime() const;
         double endTime() const;
 
-        Table getPointingTable(const std::string &channelId, 
+        Table getPointingTable(const QString &channelId, 
                                const int zeroFrame);
-        SMatrix getStateRotation(const std::string &frame1, 
-                                 const std::string &frame2, 
+        SMatrix getStateRotation(const QString &frame1, 
+                                 const QString &frame2, 
                                  const double &et) const;
 
         bool hasArticulationKernel(Pvl &label) const;

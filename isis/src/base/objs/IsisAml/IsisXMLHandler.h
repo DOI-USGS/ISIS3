@@ -44,7 +44,7 @@ class IsisXMLHandler : public XERCES::DefaultHandler {
     IsisXMLHandler(char *PencodingName,
                    bool &PexpandNamespaces,
                    XERCES::SAX2XMLReader* &Pparser,
-                   std::string *chars);
+                   QString *chars);
 
     IsisXMLHandler(char *PencodingName,
                    bool &PexpandNamespaces,
@@ -87,7 +87,7 @@ class IsisXMLHandler : public XERCES::DefaultHandler {
     char *encodingName;
     bool expandNamespaces;
     XERCES::SAX2XMLReader *parser;
-    std::string *value;
+    QString *value;
     int outputEndTag;
 };
 

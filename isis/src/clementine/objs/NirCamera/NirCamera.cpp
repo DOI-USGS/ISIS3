@@ -46,8 +46,8 @@ namespace Isis {
   NirCamera::NirCamera(Pvl &lab) : FramingCamera(lab) {
     NaifStatus::CheckErrors();
     // Get the camera characteristics
-    IString filter = (string)(lab.FindGroup("BandBin", Pvl::Traverse))["FilterName"];
-    filter = filter.UpCase();
+    QString filter = (QString)(lab.FindGroup("BandBin", Pvl::Traverse))["FilterName"];
+    filter = filter.toUpper();
 
     if(filter.compare("A") == 0) {
       SetFocalLength(2548.2642 * 0.038);
@@ -74,7 +74,7 @@ namespace Isis {
     PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
 
     // set variables startTime and exposureDuration
-    double et = iTime((string)inst["StartTime"]).Et();
+    double et = iTime((QString)inst["StartTime"]).Et();
 
     // divide exposure duration keyword value by 1000 to convert to seconds
     double exposureDuration = ((double) inst["ExposureDuration"]) / 1000.0;
@@ -97,9 +97,9 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     focalMap->SetDetectorOrigin(
-      Spice::getDouble("INS" + (IString)(int)naifIkCode() + 
+      Spice::getDouble("INS" + toString(naifIkCode()) + 
                        "_BORESIGHT_SAMPLE"),
-      Spice::getDouble("INS" + (IString)(int)naifIkCode() + 
+      Spice::getDouble("INS" + toString(naifIkCode()) + 
                        "_BORESIGHT_LINE"));
 
     // Setup distortion map

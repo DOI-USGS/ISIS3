@@ -16,7 +16,7 @@ void IsisMain() {
   // Get user entered file name & mode
   UserInterface &ui = Application::GetUserInterface();
   FileName fromfile(ui.GetFileName("FROM"));
-  string mode = ui.GetString("MODE");
+  QString mode = ui.GetString("MODE");
 
   FileName tofile;
   bool append = false;
@@ -59,16 +59,16 @@ void IsisMain() {
       }
     }
     for(int i = 0; i < pvl.Objects(); ++i) {
-      string all = pvl.Object(i).Name() + " ";
+      QString all = pvl.Object(i).Name() + " ";
       PvlGroup user = pvl.Object(i).FindGroup("UserParameters");
       for(int j = 0; j < user.Keywords(); ++j) {
         ostringstream os;
         os << user[j];
-        string temp = os.str();
-        int index = temp.find("=");
-        IString temp1(temp.substr(0, index - 1));
-        string temp2 = temp.substr(index + 2);
-        all += temp1.DownCase() + "=" + temp2 + " ";
+        QString temp = os.str().c_str();
+        int index = temp.indexOf("=");
+        QString temp1(temp.mid(0, index - 1));
+        QString temp2 = temp.mid(index + 2);
+        all += temp1.toLower() + "=" + temp2 + " ";
       }
       if(ui.IsInteractive()) {
         Application::GuiLog(all);

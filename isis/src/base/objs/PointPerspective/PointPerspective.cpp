@@ -60,14 +60,14 @@ namespace Isis {
       // necessary
       if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
         double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
-        mapGroup += PvlKeyword("CenterLongitude", lon);
+        mapGroup += PvlKeyword("CenterLongitude", toString(lon));
       }
 
       // Compute and write the default center latitude if allowed and
       // necessary
       if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLatitude"))) {
         double lat = (m_minimumLatitude + m_maximumLatitude) / 2.0;
-        mapGroup += PvlKeyword("CenterLatitude", lat);
+        mapGroup += PvlKeyword("CenterLatitude", toString(lat));
       }
 
       // Get the center longitude  & latitude
@@ -94,7 +94,7 @@ namespace Isis {
 
     }
     catch(IException &e) {
-      string message = "Invalid label group [Mapping]";
+      QString message = "Invalid label group [Mapping]";
       throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }
@@ -125,18 +125,18 @@ namespace Isis {
   /**
    * Returns the name of the map projection, "PointPerspective"
    *
-   * @return string Name of projection, "PointPerspective"
+   * @return QString Name of projection, "PointPerspective"
    */
-  string PointPerspective::Name() const {
+  QString PointPerspective::Name() const {
     return "PointPerspective";
   }
 
   /**
    * Returns the version of the map projection
    *
-   * @return std::string Version number
+   * @return std::QString Version number
    */
-  string PointPerspective::Version() const {
+  QString PointPerspective::Version() const {
     return "1.0";
   }
 

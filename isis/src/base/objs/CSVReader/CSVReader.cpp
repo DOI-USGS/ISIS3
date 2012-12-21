@@ -78,7 +78,7 @@ namespace Isis {
    *                        empty tokens (true) or collapsed into one token
    *                        (false)
    */
-  CSVReader::CSVReader(const std::string &csvfile, bool header, int skip,
+  CSVReader::CSVReader(const QString &csvfile, bool header, int skip,
                        const char &delimiter, const bool keepEmptyParts,
                        const bool ignoreComments) :
     _header(header), _skip(skip), _delimiter(delimiter),
@@ -153,10 +153,10 @@ namespace Isis {
    *
    * @param csvfile  Name of file to read
    */
-  void CSVReader::read(const std::string &csvfile) {
-    ifstream ifile(csvfile.c_str(), ios::in);
+  void CSVReader::read(const QString &csvfile) {
+    ifstream ifile(csvfile.toAscii().data(), ios::in);
     if(!ifile) {
-      string mess = "Unable to open file " + csvfile;
+      QString mess = "Unable to open file " + csvfile;
       throw IException(IException::User, mess, _FILEINFO_);
     }
 
@@ -276,12 +276,12 @@ namespace Isis {
    *
    * @return CSVReader::CSVAxis Column array parsed from each row
    */
-  CSVReader::CSVAxis CSVReader::getColumn(const std::string &hname) const {
+  CSVReader::CSVAxis CSVReader::getColumn(const QString &hname) const {
     //  Get the header
     CSVAxis header(getHeader());
-    std::string head = IString(hname).Trim(" ");
+    QString head = hname.trimmed();
     for(int i = 0 ; i < header.dim() ; i++) {
-      if(IString::Equal(head, IString(header[i]).Trim(" "))) {
+      if(head.toLower() == header[i].trimmed().toLower()) {
         return (getColumn(i));
       }
     }
@@ -417,12 +417,12 @@ namespace Isis {
    */
   std::istream &CSVReader::load(std::istream &ifile) {
 
-    string iline;
+    std::string iline;
     int nlines(0);
     while(getline(ifile, iline)) {
       if(!iline.empty()) {
         if(!(_ignoreComments && (iline[0] == '#'))) {
-          _lines.push_back(iline);
+          _lines.push_back(iline.c_str());
           nlines++;
         }
       }

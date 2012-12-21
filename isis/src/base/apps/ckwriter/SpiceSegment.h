@@ -1,4 +1,4 @@
-#if !defined(SpiceSegment_h)
+#ifndef SpiceSegment_h
 #define SpiceSegment_h
 /**                                                                       
  * @file                                                                  
@@ -31,11 +31,13 @@
 #include <iostream>
 #include <sstream>
 
-#include "naif/SpiceZdf.h"
-#include "tnt/tnt_array1d.h"
-#include "tnt/tnt_array1d_utils.h"
-#include "tnt/tnt_array2d.h"
-#include "tnt/tnt_array2d_utils.h"
+#include <QString>
+
+#include <naif/SpiceZdf.h>
+#include <tnt/tnt_array1d.h>
+#include <tnt/tnt_array1d_utils.h>
+#include <tnt/tnt_array2d.h>
+#include <tnt/tnt_array2d_utils.h>
 
 #include "Kernels.h"
 #include "IString.h"
@@ -84,16 +86,16 @@ class SpiceSegment {
     typedef TNT::Array2D<SpiceDouble> SMatrix;       //!<  2-D buffer
 
     SpiceSegment();
-    SpiceSegment(const std::string &fname);
-    SpiceSegment(Cube &cube, const std::string &tblname = "SpiceSegment");
+    SpiceSegment(const QString &fname);
+    SpiceSegment(Cube &cube, const QString &tblname = "SpiceSegment");
     virtual ~SpiceSegment() { }
     
     /** Returns the number of elements in the quaternions */
     int size() const { return (size(_quats)); }
 
     /** Returns the name of the segment, typically the ProductId */
-    std::string Id() const { return (_name); }
-    void setId(const std::string &id);
+    QString Id() const { return (_name); }
+    void setId(const QString &id);
 
     /** Start time of segment in ET */
     double startTime() const { return (_startTime); }
@@ -105,11 +107,11 @@ class SpiceSegment {
     }
 
     // Elements for writing NAIF SPICE kernels
-    int FurnshKernelType(const std::string &ktypes) const;
-    int UnloadKernelType(const std::string &ktypes = "") const;
+    int FurnshKernelType(const QString &ktypes) const;
+    int UnloadKernelType(const QString &ktypes = "") const;
 
     /** Returns CK segment reference frame */
-    std::string ReferenceFrame() const { return (_refFrame); }
+    QString ReferenceFrame() const { return (_refFrame); }
     /** NAIF SPICE instrument code */
     int InstCode() const { return (_instCode); }
     /** Returns instance of quaternions */
@@ -123,7 +125,7 @@ class SpiceSegment {
     const SVector &SCLKTimes() const { return (_times); }
 
     /** Returns a comment summarizing the segment */
-    std::string getComment() const;
+    QString getComment() const;
 
     // Mostly type 2 needs but can be used for type 3 (start times anyway)
     virtual SVector SCLKStartIntervals() const;
@@ -136,17 +138,17 @@ class SpiceSegment {
     // Mutable for full loading/unloading of kernels w/o restrictions
     mutable Kernels  _kernels;
     int         _camVersion;
-    std::string _name;
-    std::string _fname;
+    QString _name;
+    QString _fname;
     double      _startTime;
     double      _endTime;
-    std::string _utcStartTime; //  Need to store these as conversion from ET
-    std::string _utcEndTime;   //  requires leap seconds kernel
-    std::string _instId;       //  Instrument ID
-    std::string _target;       //  Target name
+    QString _utcStartTime; //  Need to store these as conversion from ET
+    QString _utcEndTime;   //  requires leap seconds kernel
+    QString _instId;       //  Instrument ID
+    QString _target;       //  Target name
     int         _instCode;     //  NAIF instrument code of the SPICE segment
-    std::string _instFrame;    //  NAIF instrument frame
-    std::string _refFrame;     //  NAIF reference frame
+    QString _instFrame;    //  NAIF instrument frame
+    QString _refFrame;     //  NAIF reference frame
     SMatrix     _quats;
     SMatrix     _avvs;
     SVector     _times;
@@ -157,19 +159,19 @@ class SpiceSegment {
     void init();
     template <class TNTSTORE> int size(const TNTSTORE &t) const { return (t.dim1()); }
 
-    std::string getKeyValue(PvlObject &label, const std::string &keyword);
-    void import(Cube &cube, const std::string &tblname = "SpiceSegment");
+    QString getKeyValue(PvlObject &label, const QString &keyword);
+    void import(Cube &cube, const QString &tblname = "SpiceSegment");
     SMatrix load(Table &cache);
     SMatrix getQuaternions(const SMatrix &spice) const;
     SMatrix getAngularVelocities(const SMatrix &spice) const;
     SVector getTimes(const SMatrix &spice) const;
 
     bool getTimeDependentFrameIds(Table &table, int &toId, int &fromId) const;
-    std::string getFrameName(int frameid) const;
+    QString getFrameName(int frameid) const;
     SMatrix getConstantRotation(Table &table) const;
     SMatrix getIdentityRotation(const int &nelements = 3) const;
-    SMatrix computeStateRotation(const std::string &frame1, 
-                                 const std::string &frame2, 
+    SMatrix computeStateRotation(const QString &frame1, 
+                                 const QString &frame2, 
                                  double etTime) const;
     void getRotationMatrices(Cube &cube, Camera &camera, Table &table,
                              SMatSeq &lmats, SMatSeq &rmat, SVector &sclks);
@@ -185,7 +187,7 @@ class SpiceSegment {
     double SCLKtoET(SpiceInt scCode, double sclk) const;
     double ETtoSCLK(SpiceInt scCode, double et) const;
 
-    std::string toUTC(const double &et) const;
+    QString toUTC(const double &et) const;
 
 };
 

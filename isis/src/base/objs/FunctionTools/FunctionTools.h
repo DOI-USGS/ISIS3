@@ -24,13 +24,19 @@
 #ifndef FunctionTools_h
 #define FunctionTools_h
 
-#include "IString.h"
-#include "IException.h"
 #include <math.h>
 #include <cfloat>
 
+#include <QList>
+#include <QString>
+
+#include "Constants.h"
+#include "IException.h"
+#include "IString.h"
+
 namespace Isis {
-  /** A collection of tools for mathmatical function root finding, maximization, etc (eventually)
+  /**
+   * A collection of tools for mathmatical function root finding, maximization, etc (eventually)
    * This class contains only static methods, and cannot be instantiated
    *
    * @ingroup Math
@@ -55,7 +61,7 @@ namespace Isis {
       *  @param coefflinearTerm  coefficient of the linear term
       *  @param coeffConstTerm  coefficient of the constant term
       */
-    static QList <double> realLinearRoots(const double coeffLinearTerm, const double coeffConstTerm) {
+    static QList <double> realLinearRoots(double coeffLinearTerm, double coeffConstTerm) {
       double m=coeffLinearTerm, b=coeffConstTerm;
 
       QList<double> roots;
@@ -78,8 +84,8 @@ namespace Isis {
       *  @param coefflinearTerm  coefficient of the linear term
       *  @param coeffConstTerm  coefficient of the constant term
       */
-    static QList <double> realQuadraticRoots(const double coeffQuadTerm, const double coeffLinearTerm, 
-                                     const double coeffConstTerm) {
+    static QList <double> realQuadraticRoots(double coeffQuadTerm, double coeffLinearTerm, 
+                                     double coeffConstTerm) {
       double A=coeffQuadTerm, B=coeffLinearTerm, C=coeffConstTerm;
       double disc,q,temp; //helpers on the way to a solution 
 
@@ -113,8 +119,8 @@ namespace Isis {
       *  @param coefflinearTerm  coefficient of the linear term
       *  @param coeffConstTerm  coefficient of the constant term
       */
-    static QList <double> realCubicRoots(const double coeffCubicTerm,  const double coeffQuadTerm, 
-                                 const double coeffLinearTerm, const double coeffConstTerm) {
+    static QList <double> realCubicRoots(double coeffCubicTerm,  double coeffQuadTerm, 
+                                 double coeffLinearTerm, double coeffConstTerm) {
       double a=coeffQuadTerm, b=coeffLinearTerm, c=coeffConstTerm;
       double Q,R; //helpers on the way to a solution 
 
@@ -194,7 +200,7 @@ namespace Isis {
 
       //check to see if the points bracket a root(s), if the signs are equal they don't
       if ( (fa > 0) - (fa < 0) == (fb > 0) - (fb < 0) ) {
-        IString msg = "The function evaluations of two bounding points passed to Brents Method "
+        QString msg = "The function evaluations of two bounding points passed to Brents Method "
                       "have the same sign.  Therefore, they don't necessary bound a root.  No "
                       "root finding will be attempted.\n";
         throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -272,8 +278,8 @@ namespace Isis {
         }
         try {
           fbnew = func(bnew + offset);
-        } catch (IException e) {
-          IString msg = "Function evaluation failed at:" + IString(bnew) + 
+        } catch (IException &e) {
+          QString msg = "Function evaluation failed at:" + toString(bnew) + 
                         ".  Function must be continuous and defined for the entire interval "
                         "inorder to gaurentee brentsRootFinder will work.";
           throw IException(e, IException::Programmer, msg, _FILEINFO_);

@@ -48,7 +48,7 @@ namespace Isis {
    * @param type The type of information the column is to represent
    * @param align The alignment, within the column, the data is to conform to
    */
-  Column::Column(std::string name, int width, Column::Type type, Column::Align align) {
+  Column::Column(QString name, int width, Column::Type type, Column::Align align) {
     p_precision = 4;
     p_width = 0;
     p_name = "";
@@ -67,9 +67,9 @@ namespace Isis {
    *
    * @param name The name of the Column
    */
-  void Column::SetName(std::string name) {
-    if (p_width != 0 && name.length() > p_width) {
-      IString message = "Name[" + name + "] is wider than width";
+  void Column::SetName(QString name) {
+    if (p_width != 0 && name.length() > (int)p_width) {
+      QString message = "Name [" + name + "] is wider than width";
       throw IException(IException::User, message, _FILEINFO_);
     }
     p_name = name;
@@ -81,8 +81,8 @@ namespace Isis {
    * @param width The number of text columns the Column will hold
    */
   void Column::SetWidth(unsigned int width) {
-    if (p_name.size() > 0 && p_name.size() > width) {
-      std::string message = "Width is insufficient to contain name[";
+    if (p_name.size() > 0 && p_name.size() > (int)width) {
+      QString message = "Width is insufficient to contain name[";
       message += p_name + "]";
       throw IException(IException::User, message, _FILEINFO_);
     }
@@ -97,7 +97,7 @@ namespace Isis {
   void Column::SetType(Column::Type type) {
     if (p_align == Column::Decimal &&
         (type == Column::Integer || type == Column::String)) {
-      std::string message = "Integer or string type is not sensible if ";
+      QString message = "Integer or string type is not sensible if ";
       message += "alignment is Decimal.";
       throw IException(IException::User, message, _FILEINFO_);
     }
@@ -116,7 +116,7 @@ namespace Isis {
   void Column::SetAlignment(Column::Align alignment) {
     if (alignment == Column::Decimal &&
         (p_type == Column::Integer || p_type == Column::String)) {
-      std::string message = "Decimal alignment does not make sense for ";
+      QString message = "Decimal alignment does not make sense for ";
       message += "integer or string values.";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
@@ -134,14 +134,14 @@ namespace Isis {
   void Column::SetPrecision(unsigned int precision) {
     if (DataType() != Column::Real &&
         DataType() != Column::Pixel) {
-      std::string message = "Setting precision only makes sense for Decimal Alignment";
+      QString message = "Setting precision only makes sense for Decimal Alignment";
       throw IException(IException::User, message, _FILEINFO_);
     }
     p_precision = precision;
   }
 
   //! get the Column's name
-  std::string Column::Name() const {
+  QString Column::Name() const {
     return p_name;
   }
 

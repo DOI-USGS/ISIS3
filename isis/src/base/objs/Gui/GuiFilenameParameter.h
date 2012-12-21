@@ -55,9 +55,9 @@ namespace Isis {
                            int group, int param);
       ~GuiFileNameParameter();
 
-      IString Value();
+      QString Value();
 
-      void Set(IString newValue);
+      void Set(QString newValue);
 
     protected slots:
       virtual void SelectFile();

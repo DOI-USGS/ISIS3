@@ -25,21 +25,19 @@ using namespace std;
 
 #include "Message.h"
 
-string Isis::Message::KeywordValueBad(const string &key) {
-  string message;
-  message = "Keyword [" + key + "] has bad value";
-  return message;
+QString Isis::Message::KeywordValueBad(const QString &key) {
+  return "Keyword [" + key + "] has bad value";
 }
 
-string Isis::Message::KeywordValueBad(const string &key, const string &value) {
-  string message;
+QString Isis::Message::KeywordValueBad(const QString &key, const QString &value) {
+  QString message;
 
   message = "Keyword [" + key + "] has bad value [";
   if(value.size() <= 20) {
     message += value + "]";
   }
   else {
-    message += value.substr(0, 20) + " ...]";
+    message += value.mid(0, 20) + " ...]";
   }
   return message;
 }

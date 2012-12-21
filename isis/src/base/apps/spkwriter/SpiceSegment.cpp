@@ -55,7 +55,7 @@ SpiceSegment::SpiceSegment(Cube &cube) {
 }
 
 /** Set the segment Id that will be written to the kernel */
-void SpiceSegment::setId(const std::string &name) {
+void SpiceSegment::setId(const QString &name) {
   _name = name;
   return;
 }
@@ -75,7 +75,7 @@ void SpiceSegment::setId(const std::string &name) {
  *
  * @return int  Number of kernels loaded for the requested type
  */
-int SpiceSegment::LoadKernelType(const std::string &ktypes) const {
+int SpiceSegment::LoadKernelType(const QString &ktypes) const {
   return (_kernels.Load(ktypes));
 }
 
@@ -89,7 +89,7 @@ int SpiceSegment::LoadKernelType(const std::string &ktypes) const {
  *
  * @return int Number kernels unloaded
  */
-int SpiceSegment::UnloadKernelType(const std::string &ktypes) const {
+int SpiceSegment::UnloadKernelType(const QString &ktypes) const {
   return (_kernels.UnLoad(ktypes));
 }
 
@@ -123,19 +123,19 @@ void SpiceSegment::init(Cube &cube) {
     Camera *camera = cube.getCamera();
 
     //  Determine segment ID from product ID if it exists, otherwise basename
-    if ( _name.empty() ) {
+    if ( _name.isEmpty() ) {
       _name = getKeyValue(*label, "ProductId");
-      if (_name.empty() ) {
+      if (_name.isEmpty() ) {
         _name = FileName(_fname).baseName();
       }
     }
 
     // Get instrument and target ids
-    string value("");
+    QString value("");
     value = getKeyValue(*label, "InstrumentId");
-    if (!value.empty()) { _instId = value; }
+    if (!value.isEmpty()) { _instId = value; }
     value = getKeyValue(*label, "TargetName");
-    if (!value.empty()) { _target = value; }
+    if (!value.isEmpty()) { _target = value; }
 
     // Get default times for sorting purposes
     setStartTime(camera->cacheStartTime().Et());
@@ -161,12 +161,12 @@ void SpiceSegment::init(Cube &cube) {
  * @param label   Label to search the keyword
  * @param keyword Nanme of keyword to find
  *
- * @return std::string Returns first value in the found keyword.  If the keyword
+ * @return QString Returns first value in the found keyword.  If the keyword
  *         does not exist, an empty string is returned.
  */
-std::string SpiceSegment::getKeyValue(PvlObject &label,
-                                      const std::string &keyword) {
-  string value("");
+QString SpiceSegment::getKeyValue(PvlObject &label,
+                                      const QString &keyword) {
+  QString value("");
   if ( label.HasKeyword(keyword,Pvl::Traverse) ) {
     value = label.FindKeyword(keyword,Pvl::Traverse)[0];
   }
@@ -208,9 +208,9 @@ bool SpiceSegment::getImageTimes(Pvl &lab, double &start, double &end) const {
   _kernels.Load("LSK,SCLK");
   PvlObject &cube = lab.FindObject("IsisCube");
   // Get the start and end time for the cube
-  start = UTCtoET((string) cube.FindGroup("Instrument")["StartTime"]);
+  start = UTCtoET((QString) cube.FindGroup("Instrument")["StartTime"]);
   if(cube.FindGroup("Instrument").HasKeyword("StopTime")) {
-    end = UTCtoET((string) cube.FindGroup("Instrument")["StopTime"]);
+    end = UTCtoET((QString) cube.FindGroup("Instrument")["StopTime"]);
   }
   else {
     end = UTCtoET (cube.FindGroup("Instrument")["StartTime"]);
@@ -350,9 +350,9 @@ void SpiceSegment::setEndTime(double et) {
  *
  * @param naifid NAIF integer code to convert to a name
  *
- * @return std::string Returns the frame or body name.
+ * @return QString Returns the frame or body name.
  */
-std::string SpiceSegment::getNaifName(int naifid) const {
+QString SpiceSegment::getNaifName(int naifid) const {
   SpiceChar naifBuf[40];
   frmnam_c ( (SpiceInt) naifid, sizeof(naifBuf), naifBuf);
   string cframe(naifBuf);
@@ -373,21 +373,21 @@ std::string SpiceSegment::getNaifName(int naifid) const {
   }
 
 
-  return (cframe);
+  return (cframe.c_str());
 }
 
 /** Converts and ET time to UTC string */
-std::string SpiceSegment::toUTC(const double &et) const {
+QString SpiceSegment::toUTC(const double &et) const {
   const int UTCLEN = 80;
   char utcout[UTCLEN];
   et2utc_c(et, "ISOC", 3, UTCLEN, utcout);
-  return (string(utcout));
+  return (QString(utcout));
 }
 
 /** Converts a UTC time string to ET  */
-double SpiceSegment::UTCtoET(const std::string &utc) const {
+double SpiceSegment::UTCtoET(const QString &utc) const {
   SpiceDouble et;
-  utc2et_c(utc.c_str(), &et);
+  utc2et_c(utc.toAscii().data(), &et);
   return (et);
 }
 

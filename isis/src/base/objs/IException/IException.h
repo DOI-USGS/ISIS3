@@ -25,8 +25,11 @@
  */
 
 #include <exception>
+#include <string>
 
 template <typename T> class QList;
+
+class QString;
 
 /**
  * Macro for the filename and line number. This is typically used for the last
@@ -35,7 +38,6 @@ template <typename T> class QList;
 #define _FILEINFO_ __FILE__,__LINE__
 
 namespace Isis {
-  class IString;
   class Pvl;
 
   /**
@@ -166,7 +168,10 @@ namespace Isis {
       IException(ErrorType type, const char *message,
                  const char *fileName, int lineNumber);
 
-      IException(ErrorType type, const IString &message,
+      IException(ErrorType type, const std::string &message,
+                 const char *fileName, int lineNumber);
+
+      IException(ErrorType type, const QString &message,
                  const char *fileName, int lineNumber);
 
       IException(const IException &caughtException,
@@ -174,7 +179,11 @@ namespace Isis {
                  const char *fileName, int lineNumber);
 
       IException(const IException &caughtException,
-                 ErrorType newExceptionType, const IString &message,
+                 ErrorType newExceptionType, const std::string &message,
+                 const char *fileName, int lineNumber);
+
+      IException(const IException &caughtException,
+                 ErrorType newExceptionType, const QString &message,
                  const char *fileName, int lineNumber);
 
       IException(const IException &other);
@@ -189,16 +198,16 @@ namespace Isis {
       void print() const;
       void print(bool printFileInfo) const;
       Pvl toPvl() const;
-      IString toString() const;
-      IString toString(bool printFileInfo) const;
+      QString toString() const;
+      QString toString(bool printFileInfo) const;
 
       void swap(IException &other);
       IException &operator=(const IException &rhs);
 
     private:
       static IException createStackTrace();
-      static IString errorTypeToString(ErrorType t);
-      static ErrorType stringToErrorType(const IString &s);
+      static QString errorTypeToString(ErrorType t);
+      static ErrorType stringToErrorType(const QString &s);
       char *buildWhat() const;
       void deleteEmptyMemberStrings();
 
@@ -221,12 +230,12 @@ namespace Isis {
        * The message associated with this exception. This will be NULL if the
        *   message is empty (or only contained whitespace).
        */
-      IString * m_message;
+      QString * m_message;
 
       /**
        * The source code file that threw this exception.
        */
-      IString * m_fileName;
+      QString * m_fileName;
 
       /**
        * The line in the source code file that threw this exception.

@@ -24,12 +24,12 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-namespace Isis {
+class QString;
 
+namespace Isis {
   class Brick;
   class Buffer;
   class Cube;
-  class IString;
   class Pvl;
   class PvlGroup;
 
@@ -56,7 +56,7 @@ namespace Isis {
       PvlGroup gap();
       Pvl gaps();
 
-      void setModification(IString newModValue);
+      void setModification(QString newModValue);
 
       // Processors
       void operator() (Buffer &in) const;

@@ -26,16 +26,16 @@ void IsisMain(){
   // Input file options
   FileList cubes;
   Pvl &pref = Preference::Preferences();
-  string pathName = (string)pref.FindGroup("DataDirectory")["Temporary"] + "/";
+  QString pathName = (QString)pref.FindGroup("DataDirectory")["Temporary"] + "/";
   if (ui.WasEntered("TOPATH")) {
-    pathName = (string)ui.GetString("TOPATH") + "/";
+    pathName = (QString)ui.GetString("TOPATH") + "/";
   }
-  string outFile;
+  QString outFile;
   if (ui.WasEntered("FROMLIST")) {
     cubes.read(ui.GetFileName("FROMLIST"));
   }
   else {
-    string msg = "Error: FROMLIST file must be specified";
+    QString msg = "Error: FROMLIST file must be specified";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -46,7 +46,7 @@ void IsisMain(){
   // Output Information for GIS Software Package
   bool logCamStats = ui.GetBoolean("INFO");
   bool footPrintInit = false;
-  string logFileName;
+  QString logFileName;
   if (logCamStats) {
     footPrintInit = ui.GetBoolean("FOOTPRINT");
     if (!ui.WasEntered("TOSTAT")) {
@@ -62,10 +62,10 @@ void IsisMain(){
   if (logCamStats) {
     FileName logFile(logFileName);
     if (logFile.fileExists()) {
-      logFileos.open(logFileName.c_str(),ios::app);
+      logFileos.open(logFileName.toAscii().data(),ios::app);
     }
     else {
-      logFileos.open(logFileName.c_str(),ios::out);
+      logFileos.open(logFileName.toAscii().data(),ios::out);
       logFileos << "Filename," << "Duration," << "Summing,"<< "IncidenceAverage," <<
               "ResolutionAverage,"<< "IncidenceMinimum," << "IncidenceMaximum," <<  "Gaps,"<<endl;
     }
@@ -144,7 +144,7 @@ void IsisMain(){
 
     // Open the input file
     FileName infile = cubes[i];
-    IString inFileStr = infile.expanded();
+    QString inFileStr = infile.expanded();
 
     if (!infile.fileExists()) {
       if (reportNoFile) {
@@ -161,7 +161,7 @@ void IsisMain(){
       if (reportNoFile) {
         noFileListos << infile.baseName() << " not processed because is not a THEMIS image" << endl;
       }
-      string msg = "Error: Not a Themis Image";
+      QString msg = "Error: Not a Themis Image";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -171,15 +171,15 @@ void IsisMain(){
       if (reportNoFile) {
         noFileListos << infile.baseName() << " not processed because is not an IR THEMIS image" << endl;
       }
-      string msg = "Error: Not an IR Themis Image";
+      QString msg = "Error: Not an IR Themis Image";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    if (inFileStr.find("pds_san") != string::npos) {
+    if (inFileStr.indexOf("pds_san") != -1) {
       pdsSanFile = true;
     }
 
-    string duration =(string)lab.FindObject("SPECTRAL_QUBE",Isis::PvlObject::Traverse)["IMAGE_DURATION"];
+    QString duration =(QString)lab.FindObject("SPECTRAL_QUBE",Isis::PvlObject::Traverse)["IMAGE_DURATION"];
 
     // Make sure we have THEMIS IR at wavelength 12.57.
     // 12.57um wavelength has the best signal to noise ratio, and 14.88um wavelenght is atmospheric band
@@ -203,17 +203,17 @@ void IsisMain(){
       if (reportNoFile) {
         noFileListos << infile.baseName() << " not processed because is missing filter 12.57" << endl;
       }
-      string msg = "Filter 12.57 not found in input file [" + inFileStr + "]";
+      QString msg = "Filter 12.57 not found in input file [" + inFileStr + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     // Run thm2isis
-    string output = (infile.baseName()) + ".cub";
-    string parameters = "FROM=" + cubes[i].toString() + " TO=" + output;
+    QString output = (infile.baseName()) + ".cub";
+    QString parameters = "FROM=" + cubes[i].toString() + " TO=" + output;
     ProgramLauncher::RunIsisProgram("thm2isis", parameters);
 
     //Run spiceinit
-    string input = output;
+    QString input = output;
     parameters = "FROM=" + input + " CKRECON=yes CKPREDICTED=yes CKNADIR=yes";
     ProgramLauncher::RunIsisProgram("spiceinit", parameters);
     if (reportNadirSpc) {
@@ -221,7 +221,7 @@ void IsisMain(){
       PvlGroup kernels = spclab.FindGroup("Kernels", Pvl::Traverse);
       bool isNadir = false;
       for (int j=0; j < kernels["InstrumentPointing"].Size(); j++) {
-        if (kernels["InstrumentPointing"][j].UpCase() == "NADIR") {
+        if (kernels["InstrumentPointing"][j].toUpper() == "NADIR") {
           isNadir = true;
         }
       }
@@ -232,9 +232,9 @@ void IsisMain(){
 
     // Create a temporary pvl and fill with camstats used to test incedence
     FileName tstat1;
-    string tmpcamstats1 = infile.baseName() + "_tmpcamstats1";
+    QString tmpcamstats1 = infile.baseName() + "_tmpcamstats1";
     tstat1 = FileName::createTempFile("$TEMPORARY/" + tmpcamstats1 + ".pvl");
-    string tempstat1 = tstat1.expanded();
+    QString tempstat1 = tstat1.expanded();
 
     parameters = "FROM=" + input + " TO=" + tempstat1 + " linc = 100 sinc = 100";
     ProgramLauncher::RunIsisProgram("camstats", parameters);
@@ -244,41 +244,41 @@ void IsisMain(){
 
     // if do not process night and incidence angle > 90, then exit
     if (!processNight && incAngle >= 90) {
-      remove (tstat1.expanded().c_str());
+      remove (tstat1.expanded().toAscii().data());
       if (rmHiIncInput) {
         if (reportHiInc) {
           hiIncListos << infile.baseName() << endl;
         }
         if (!pdsSanFile) {
-          remove(inFileStr.c_str());
-          remove(input.c_str());
+          remove(inFileStr.toAscii().data());
+          remove(input.toAscii().data());
         }
       }
       if (reportNoFile) {
         noFileListos << infile.baseName() << " not processed because average incidence angle >= 90 and DAY images requested" << endl;
-        remove(output.c_str());
+        remove(output.toAscii().data());
       }
-      string msg = "The average incidence angle of [" + cubes[i].toString() + "] is over 90";
+      QString msg = "The average incidence angle of [" + cubes[i].toString() + "] is over 90";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // if process night and incidence angle < 90, then exit
     if (processNight && incAngle < 90) {
-      remove (tstat1.expanded().c_str());
+      remove (tstat1.expanded().toAscii().data());
       if (rmHiIncInput) {
         if (reportHiInc) {
           hiIncListos << infile.baseName() << endl;
         }
         if (!pdsSanFile) {
-          remove(inFileStr.c_str());
-          remove(input.c_str());
+          remove(inFileStr.toAscii().data());
+          remove(input.toAscii().data());
         }
       }
       if (reportNoFile) {
         noFileListos << infile.baseName() << " not processed because average incidence angle < 90 and NIGHT images requested" << endl;
-        remove(output.c_str());
+        remove(output.toAscii().data());
       }
-      string msg = "The average incidence angle of [" + cubes[i].toString() + "] is over 90";
+      QString msg = "The average incidence angle of [" + cubes[i].toString() + "] is over 90";
       throw IException(IException::User,msg,_FILEINFO_);
     }
 
@@ -287,16 +287,16 @@ void IsisMain(){
     // Note we use wavelength 12.57um in geologic mosaics.
     if (band14_88 && incAngle < 90 && !ignoreAtmCorr)  {
       output = (infile.baseName()) + "_driftcorr.cub";
-      parameters = "FROM=" + input + "+" + IString(procBand) +
-                   " ATM=" + input + "+" + IString(atmosBand) + " TO=" + output;
+      parameters = "FROM=" + input + "+" + toString(procBand) +
+                   " ATM=" + input + "+" + toString(atmosBand) + " TO=" + output;
       ProgramLauncher::RunIsisProgram("thmdriftcor", parameters);
-      remove (input.c_str());
+      remove (input.toAscii().data());
     }
     else {
       output = (infile.baseName()) + "_no_driftcorr.cub";
-      parameters = "FROM=" + input + "+" + IString(procBand) + " TO=" + output;
+      parameters = "FROM=" + input + "+" + toString(procBand) + " TO=" + output;
       ProgramLauncher::RunIsisProgram("stretch", parameters);
-      remove (input.c_str());
+      remove (input.toAscii().data());
     }
 
     // Run cosi, for incidence < 90 (day images)
@@ -306,7 +306,7 @@ void IsisMain(){
       output = (infile.baseName()) + "_cosi.cub";
       parameters = "FROM=" + input + " TO=" + output;
       ProgramLauncher::RunIsisProgram("cosi", parameters);
-      remove (input.c_str());
+      remove (input.toAscii().data());
     }
 
     // Run cubenorm
@@ -314,25 +314,25 @@ void IsisMain(){
     output = (infile.baseName()) + "cubenorm.cub";
     parameters = "FROM=" + input + " TO=" + output;
     ProgramLauncher::RunIsisProgram("cubenorm", parameters);
-    remove (input.c_str());
+    remove (input.toAscii().data());
 
     //Run lineeq
     input=output;
     outFile = pathName + infile.baseName() + ".lev1.cub";
     parameters ="FROM=" + input + " TO=" + outFile;
     ProgramLauncher::RunIsisProgram("lineeq", parameters);
-    remove (input.c_str());
+    remove (input.toAscii().data());
 
-    remove (tstat1.expanded().c_str());
+    remove (tstat1.expanded().toAscii().data());
 
     //************************************
     // Run findgaps
     // Create temporary pvl for gaps
-    string sgap = "no";
+    QString sgap = "no";
     FileName tgaps;
-    string tmpstats1 = infile.baseName() + "_tmpstats1";
+    QString tmpstats1 = infile.baseName() + "_tmpstats1";
     tgaps = FileName::createTempFile("$TEMPORARY/" + tmpstats1 + ".pvl");
-    string tempgaps = tgaps.expanded();
+    QString tempgaps = tgaps.expanded();
 
     //parameters = "FROM=" + IString(ui.GetFileName("TO")) +
     //             " TO=" + tempgaps + " CORTOL=.3";
@@ -342,8 +342,8 @@ void IsisMain(){
     ProgramLauncher::RunIsisProgram("stats", parameters);
     Pvl tg;
     tg.Read(tempgaps);
-    string totalpixels = tg.FindGroup("Results",Pvl::Traverse)["TotalPixels"];
-    string validpixels = tg.FindGroup("Results",Pvl::Traverse)["ValidPixels"];
+    QString totalpixels = tg.FindGroup("Results",Pvl::Traverse)["TotalPixels"];
+    QString validpixels = tg.FindGroup("Results",Pvl::Traverse)["ValidPixels"];
     //if (tg.HasGroup("Gap")) {
     if (IString(totalpixels).ToInteger() != IString(validpixels).ToInteger()) {
       cout << tg << endl;
@@ -352,13 +352,13 @@ void IsisMain(){
         imageGapListos << infile.baseName() << endl;
       }
     }
-    remove (tgaps.expanded().c_str());
+    remove (tgaps.expanded().toAscii().data());
 
     // Create temporary pvl and fill with camstats
     FileName tstat2;
-    string tmpcamstats2 = infile.baseName() + "_tmpcamstats2";
+    QString tmpcamstats2 = infile.baseName() + "_tmpcamstats2";
     tstat2 = FileName::createTempFile("$TEMPORARY/" + tmpcamstats2 + ".pvl");
-    string tempstat2 = tstat2.expanded();
+    QString tempstat2 = tstat2.expanded();
 
     parameters = "FROM=" + outFile +
                  " TO=" + tempstat2 + " linc = 100 sinc = 100";
@@ -366,11 +366,11 @@ void IsisMain(){
 
     Pvl p2;
     p2.Read(tempstat2);
-    string incavg = p2.FindGroup("IncidenceAngle",Pvl::Traverse)["IncidenceAverage"];
-    string  resavg = p2.FindGroup("Resolution",Pvl::Traverse)["ResolutionAverage"];
-    string incmin = p2.FindGroup("IncidenceAngle",Pvl::Traverse)["IncidenceMinimum"];
-    string incmax = p2.FindGroup("IncidenceAngle",Pvl::Traverse)["IncidenceMaximum"];
-    remove (tstat2.expanded().c_str());
+    QString incavg = p2.FindGroup("IncidenceAngle",Pvl::Traverse)["IncidenceAverage"];
+    QString  resavg = p2.FindGroup("Resolution",Pvl::Traverse)["ResolutionAverage"];
+    QString incmin = p2.FindGroup("IncidenceAngle",Pvl::Traverse)["IncidenceMinimum"];
+    QString incmax = p2.FindGroup("IncidenceAngle",Pvl::Traverse)["IncidenceMaximum"];
+    remove (tstat2.expanded().toAscii().data());
 
     double summing = 1;
     FileName tosum = FileName(outFile);
@@ -390,13 +390,13 @@ void IsisMain(){
     // Run footprint stuff if requested for GIS input
     if (footPrintInit) {
       parameters = "FROM=" + outFile +
-                   " TO=" + (IString)(infile.baseName()) + ".gml" +
-                   " LABEL=" + (IString)(infile.baseName());
+                   " TO=" + (QString)(infile.baseName()) + ".gml" +
+                   " LABEL=" + (QString)(infile.baseName());
       ProgramLauncher::RunIsisProgram("isis2gml", parameters);
     }
 
     if (rmInput && !pdsSanFile) {
-      remove(inFileStr.c_str());
+      remove(inFileStr.toAscii().data());
     }
   }
   catch(IException &e) {

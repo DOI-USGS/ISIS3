@@ -79,7 +79,7 @@ namespace Isis {
    */
   class JP2Encoder {
     public:
-      JP2Encoder(const std::string &jp2file, const unsigned int nsamps,
+      JP2Encoder(const QString &jp2file, const unsigned int nsamps,
                  const unsigned int nlines, const unsigned int nbands,
                  const Isis::PixelType type);
       ~JP2Encoder();
@@ -99,7 +99,7 @@ namespace Isis {
       void Write(short int **inbuf);
 
     private:
-      std::string p_jp2File;           //!<Output file name
+      QString p_jp2File;           //!<Output file name
       unsigned int p_sampleDimension;  //!<Sample dimension of output file
       unsigned int p_lineDimension;    //!<Line dimension of output file
       unsigned int p_bandDimension;    //!<Band dimension of output file

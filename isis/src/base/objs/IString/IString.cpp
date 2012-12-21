@@ -19,30 +19,36 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-
-#include <string>
-#include <iostream>
-#include <stdio.h>
-#include <cstring>
-#include <sstream>
-#include <cmath>
-#include <algorithm>
-#include <iomanip>
 #include "IString.h"
+
+#include <algorithm>
+#include <cmath>
+#include <cstring>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <stdio.h>
+#include <string>
+
+#include <QMap>
+
 #include "IException.h"
 #include "SpecialPixel.h"
 
 using namespace std;
+
 namespace Isis {
   /**
    * Convert from a string to a boolean. Known string values include anything that remotely looks
    *   like a true or false.
-   *
+   *  
+   * @param string QString to be converted to a boolean.
    * @return The boolean equivalent to the string
    */
   bool toBool(const QString &string) {
     QStringList trues;
     trues.append("true");
+    trues.append("t");
     trues.append("yes");
     trues.append("y");
     trues.append("on");
@@ -50,6 +56,7 @@ namespace Isis {
 
     QStringList falses;
     falses.append("false");
+    falses.append("f");
     falses.append("no");
     falses.append("n");
     falses.append("off");
@@ -75,7 +82,7 @@ namespace Isis {
     if (!foundMatch) {
       qSort(trues);
       qSort(falses);
-      IString message = QObject::tr("Failed to convert string [%1] to a boolean. "
+      QString message = QObject::tr("Failed to convert string [%1] to a boolean. "
           "Please specify one of [%2] for true, or one of [%3] for false.")
             .arg(string).arg(trues.join(", ")).arg(falses.join(", "));
       throw IException(IException::Unknown, message, _FILEINFO_);
@@ -88,6 +95,7 @@ namespace Isis {
   /**
    * Convert from a string to an integer.
    *
+   * @param string QString to be converted to an integer.
    * @return The integer equivalent to the string
    */
   int toInt(const QString &string) {
@@ -96,7 +104,7 @@ namespace Isis {
     int result = string.toInt(&ok);
 
     if (!ok) {
-      IString message = QObject::tr("Failed to convert string [%1] to an integer").arg(string);
+      QString message = QObject::tr("Failed to convert string [%1] to an integer").arg(string);
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
 
@@ -107,6 +115,7 @@ namespace Isis {
   /**
    * Convert from a string to a "big" integer.
    *
+   * @param string QString to be converted to a big integer.
    * @return The BigInt equivalent to the string
    */
   BigInt toBigInt(const QString &string) {
@@ -124,7 +133,7 @@ namespace Isis {
       }
     }
     catch(...) {
-      IString message = QObject::tr("Failed to convert string [%1] to a big integer").arg(string);
+      QString message = QObject::tr("Failed to convert string [%1] to a big integer").arg(string);
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
 
@@ -135,16 +144,58 @@ namespace Isis {
   /**
    * Convert from a string to a double.
    *
+   * @param string QString to be converted to a double.
    * @return The double equivalent to the string
    */
   double toDouble(const QString &string) {
-    bool ok = true;
+    double result = 0.0;
+    
+    if (string.startsWith("16#") && string.endsWith("#")) {
+      try {
+        stringstream s;
+        s << string.mid(3, string.size() - 3);
+        s.seekg(0, ios::beg);
 
-    double result = string.toDouble(&ok);
+        union {
+          unsigned int intData;
+          float floatData;
+        } raw;
 
-    if (!ok) {
-      IString message = QObject::tr("Failed to convert string [%1] to a double").arg(string);
-      throw IException(IException::Unknown, message, _FILEINFO_);
+        s >> hex >> raw.intData;
+
+        ios::iostate state = s.rdstate();
+        if((state & ios::failbit) || (state & ios::badbit)) {
+          throw IException();
+        }
+
+        result = raw.floatData;
+      }
+      catch(...) {
+        QString message = QObject::tr("Failed to convert HEX string [%1] to a "
+                            "double").arg(string);
+        throw IException(IException::Unknown, message, _FILEINFO_);
+      }
+    }
+    else {
+      static QMap<QString, double> knownStrings;
+      if (knownStrings.isEmpty()) {
+        // Special case: user called toDouble(toString(DBL_MAX))
+        knownStrings["1.79769313486232e+308"]  = DBL_MAX;
+        knownStrings["-1.79769313486232e+308"] = -DBL_MAX;
+      }
+
+      bool ok = true;
+      if (!knownStrings.contains(string)) {
+        result = string.toDouble(&ok);
+      }
+      else {
+        result = knownStrings[string];
+      }
+
+      if (!ok) {
+        QString message = QObject::tr("Failed to convert string [%1] to a double").arg(string);
+        throw IException(IException::Unknown, message, _FILEINFO_);
+      }
     }
 
     return result;
@@ -153,6 +204,9 @@ namespace Isis {
 
   /**
    * Convert a boolean to a string. The resulting string will be "Yes" (true) or "No" (false).
+   *  
+   * @param boolToConvert Boolean value to be converted to a QString.
+   * @return string Converted QString (Yes or No).
    */
   QString toString(bool boolToConvert) {
     return boolToConvert? "Yes" : "No";
@@ -160,8 +214,12 @@ namespace Isis {
 
 
   /**
-   * Convert a character to a string. The resulting string will be a string with length 1 which
-   *   contains only the given ASCII character.
+   * Convert a character to a string. The resulting string will be 
+   * a string with length 1 which contains only the given ASCII 
+   * character. 
+   *  
+   * @param charToConvert Character value to be converted to a QString.
+   * @return string Converted QString.
    */
   QString toString(char charToConvert) {
     QString result;
@@ -171,18 +229,35 @@ namespace Isis {
 
 
   /**
-   * Convert an integer to a string.
+   * Convert an integer to a string. 
+   * 
+   * @param intToConvert Integer value to be converted to a QString.
+   * @return string Converted QString. 
    */
-  QString toString(const int &num) {
-    return QString::number(num);
+  QString toString(const int &intToConvert) {
+    return QString::number(intToConvert);
   }
 
 
   /**
-   * Convert a big integer to a string.
+   * Convert an unsigned integer to a string. 
+   * 
+   * @param intToConvert Unsigned integer value to be converted to a QString.
+   * @return string Converted QString.  
    */
-  QString toString(const BigInt &num) {
-    return QString::number(num);
+  QString toString(const unsigned int &intToConvert) {
+    return QString::number(intToConvert);
+  }
+
+
+  /**
+   * Convert a big integer to a string. 
+   * 
+   * @param intToConvert Big integer value to be converted to a QString.
+   * @return string Converted QString.  
+   */
+  QString toString(const BigInt &intToConvert) {
+    return QString::number(intToConvert);
   }
 
 
@@ -194,25 +269,29 @@ namespace Isis {
    *   If (log10(num) > 13.0) it is presented in scientific notation
    *   If (log10(num) >= -3 && log10(num) <= 13) it is presented in normal notation
    *   Trailing zeros are removed such that 5.000 is presented as 5.0
+   * 
+   * @param doubleToConvert Double value to be converted to a QString.
+   * @param precision Number of significant figures to convert.
+   * @return string Converted QString. 
    */
-  QString toString(double num, int precision) {
+  QString toString(double doubleToConvert, int precision) {
     // If number is zero, then it is not valid to do a log10 on it. To avoid this,
     // check for zero ahead of time and handle it.
     QString result;
 
-    if(num == 0.0) {
+    if(doubleToConvert == 0.0) {
       result = "0.0";
     }
-    else if(isnan(num)) {
+    else if(isnan(doubleToConvert)) {
       result = "nan";
     }
 
-    if(num > DBL_MAX) {
-      num = DBL_MAX;
+    if(doubleToConvert > DBL_MAX) {
+      doubleToConvert = DBL_MAX;
     }
 
-    if(num < -DBL_MAX) {
-      num = -DBL_MAX;
+    if(doubleToConvert < -DBL_MAX) {
+      doubleToConvert = -DBL_MAX;
     }
 
     if (result == "") {
@@ -221,7 +300,7 @@ namespace Isis {
       // have a leading digit of zero.  Numbers of the form 0.0ABCDEFG,
       // 0.00ABCEFEG and so on are not considered to have a leading digit
       // (pre = 0).
-      double temp = qAbs(num);
+      double temp = qAbs(doubleToConvert);
       int pre = (int)(log10(temp)) + 1;
 
       // If preceding number of digits is too large then we will need to create a
@@ -244,7 +323,7 @@ namespace Isis {
         snprintf(buffer, 8, "%de", precision);
         strcpy(format, "%21.");
         strcat(format, buffer);
-        snprintf(doubleString, 23, format, num);
+        snprintf(doubleString, 23, format, doubleToConvert);
 
         char *e = strchr(doubleString, 'e');
         char *sptr = e - 1;
@@ -292,7 +371,7 @@ namespace Isis {
         strcat(format, tempStr);
         strcat(format, "f");
 
-        snprintf(doubleString, 23, format, num);
+        snprintf(doubleString, 23, format, doubleToConvert);
 
         if(post > 0) {
           char *sptr = doubleString + strlen(doubleString) - 1;

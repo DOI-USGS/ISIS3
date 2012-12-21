@@ -91,31 +91,31 @@ namespace Isis {
 
       ~ProcessMapMosaic();
       Isis::Cube *SetOutputCube(FileList &propagationCubes, CubeAttributeOutput &oAtt,
-                                const std::string &mosaicFile);
+                                const QString &mosaicFile);
 
       Isis::Cube *SetOutputCube(FileList &propagationCubes,
                                 double slat, double elat, double slon, double elon,
-                                CubeAttributeOutput &oAtt, const std::string &mosaicFile);
+                                CubeAttributeOutput &oAtt, const QString &mosaicFile);
 
-      Isis::Cube *SetOutputCube(const std::string &inputFile,
+      Isis::Cube *SetOutputCube(const QString &inputFile,
                                 double xmin, double xmax, double ymin, double ymax,
                                 double slat, double elat, double slon, double elon, int nbands,
-                                CubeAttributeOutput &oAtt, const std::string &mosaicFile);
+                                CubeAttributeOutput &oAtt, const QString &mosaicFile);
 
-      Isis::Cube *SetOutputCube(const std::string &inputFile, PvlGroup mapping,
-                                CubeAttributeOutput &oAtt, const std::string &mosaicFile);
+      Isis::Cube *SetOutputCube(const QString &inputFile, PvlGroup mapping,
+                                CubeAttributeOutput &oAtt, const QString &mosaicFile);
 
-      Isis::Cube *SetOutputCube(const std::string &mosaicFile);
+      Isis::Cube *SetOutputCube(const QString &mosaicFile);
 
       Isis::Cube *SetInputCube();
 
-      bool StartProcess(std::string inputFile);
+      bool StartProcess(QString inputFile);
 
     private:
       static void FillNull(Buffer &data);
 
      /**
-      * Internal use; SetOutputMosaic (const std::string &) sets to false to
+      * Internal use; SetOutputMosaic (const QString &) sets to false to
       * not attempt creation when using SetOutputMosaic
       */
       bool p_createMosaic;

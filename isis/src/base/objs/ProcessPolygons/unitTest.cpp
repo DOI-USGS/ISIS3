@@ -1,4 +1,7 @@
 #include "Isis.h"
+
+#include <QFile>
+
 #include "ProcessPolygons.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
@@ -26,8 +29,8 @@ void IsisMain() {
   CubeAttributeOutput out_atts;
   out_atts.setPixelType(Real);
 
-  const string output1 = "processPolygonsTest.cub";
-  const string output2 = "processPolygonsTest_count.cub";
+  QString output1 = "processPolygonsTest.cub";
+  QString output2 = "processPolygonsTest_count.cub";
   p.SetOutputCube(output1 , output2 , out_atts, 4, 4, 2);
 
   samples.clear();
@@ -74,8 +77,8 @@ void IsisMain() {
   pbl.StartProcess(writeAscii);
   pbl.EndProcess();
 
-  remove(output1.c_str());
-  remove(output2.c_str());
+  QFile::remove(output1);
+  QFile::remove(output2);
 }
 
 /**

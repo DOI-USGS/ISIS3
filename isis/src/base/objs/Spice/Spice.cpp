@@ -104,7 +104,7 @@ namespace Isis {
     // Initialize members
     m_solarLongitude = new Longitude;
     m_et = NULL;
-    m_kernels = new QVector<IString>;
+    m_kernels = new QVector<QString>;
     m_target = new Target(this, lab);
 
     m_startTime = new iTime;
@@ -140,14 +140,14 @@ namespace Isis {
 
     // Get the time padding first
     if (kernels.HasKeyword("StartPadding")) {
-      *m_startTimePadding = kernels["StartPadding"][0];
+      *m_startTimePadding = toDouble(kernels["StartPadding"][0]);
     }
     else {
       *m_startTimePadding = 0.0;
     }
 
     if (kernels.HasKeyword("EndPadding")) {
-      *m_endTimePadding  = kernels["EndPadding"][0];
+      *m_endTimePadding  = toDouble(kernels["EndPadding"][0]);
     }
     else {
       *m_endTimePadding = 0.0;
@@ -207,16 +207,16 @@ namespace Isis {
     //
     //    Use spkbodycode to read body position from spk
 
-    string trykey = "NaifIkCode";
+    QString trykey = "NaifIkCode";
     if (kernels.HasKeyword("NaifFrameCode")) trykey = "NaifFrameCode";
-    *m_ikCode = (int) kernels[trykey];
+    *m_ikCode = toInt(kernels[trykey][0]);
 
     *m_spkCode  = *m_ikCode / 1000;
     *m_sclkCode = *m_spkCode;
     *m_ckCode   = *m_ikCode;
 
     if (!m_target->isSky()) {
-      IString radiiKey = "BODY" + IString((BigInt) m_target->naifBodyCode()) + "_RADII";
+      QString radiiKey = "BODY" + toString(m_target->naifBodyCode()) + "_RADII";
       std::vector<Distance> radii(3,Distance());
       radii[0] = Distance(getDouble(radiiKey, 0), Distance::Kilometers);
       radii[1] = Distance(getDouble(radiiKey, 1), Distance::Kilometers);
@@ -261,8 +261,8 @@ namespace Isis {
                  &found);
 
         if (!found) {
-          IString naifTarget = "IAU_" + IString(m_target->name()).UpCase();
-          namfrm_c(naifTarget.c_str(), &frameCode);
+          QString naifTarget = "IAU_" + QString(m_target->name()).toUpper();
+          namfrm_c(naifTarget.toAscii().data(), &frameCode);
           if (frameCode == 0) {
             string msg = "Can not find NAIF BODY_FRAME_CODE for target [" 
                          + IString(m_target->name()) + "]";
@@ -297,7 +297,7 @@ namespace Isis {
 
     // Check to see if we have nadir pointing that needs to be computed &
     // See if we have table blobs to load
-    if (kernels["TargetPosition"][0].UpCase() == "TABLE") {
+    if (kernels["TargetPosition"][0].toUpper() == "TABLE") {
       Table t("SunPosition", lab.FileName(), lab);
       m_sunPosition->LoadCache(t);
 
@@ -326,7 +326,7 @@ namespace Isis {
 
     //  2009-03-18  Tracie Sucharski - Removed test for old keywords, any files
     // with the old keywords should be re-run through spiceinit.
-    if (kernels["InstrumentPointing"][0].UpCase() == "NADIR") {
+    if (kernels["InstrumentPointing"][0].toUpper() == "NADIR") {
       if (m_instrumentRotation) {
         delete m_instrumentRotation;
         m_instrumentRotation = NULL;
@@ -334,7 +334,7 @@ namespace Isis {
 
       m_instrumentRotation = new SpiceRotation(*m_ikCode, *m_spkBodyCode);
     }
-    else if (IString((std::string)kernels["InstrumentPointing"]).UpCase() == "TABLE") {
+    else if (kernels["InstrumentPointing"][0].toUpper() == "TABLE") {
       Table t("InstrumentPointing", lab.FileName(), lab);
       m_instrumentRotation->LoadCache(t);
     }
@@ -345,7 +345,7 @@ namespace Isis {
                        _FILEINFO_);
     }
 
-    if (IString((std::string)kernels["InstrumentPosition"]).UpCase() == "TABLE") {
+    if (kernels["InstrumentPosition"][0].toUpper() == "TABLE") {
       Table t("InstrumentPosition", lab.FileName(), lab);
       m_instrumentPosition->LoadCache(t);
     }
@@ -373,12 +373,12 @@ namespace Isis {
       if (IString(key[i]).UpCase() == "TABLE" && noTables) continue;
       FileName file(key[i]);
       if (!file.fileExists()) {
-        string msg = "Spice file does not exist [" + file.expanded() + "]";
+        QString msg = "Spice file does not exist [" + file.expanded() + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
-      string fileName(file.expanded());
-      furnsh_c(fileName.c_str());
-      m_kernels->push_back((string)key[i]);
+      QString fileName(file.expanded());
+      furnsh_c(fileName.toAscii().data());
+      m_kernels->push_back((QString)key[i]);
     }
 
     NaifStatus::CheckErrors();
@@ -483,8 +483,8 @@ namespace Isis {
     // Unload the kernels (TODO: Can this be done faster)
     for (int i = 0; m_kernels && i < m_kernels->size(); i++) {
       FileName file(m_kernels->at(i));
-      string fileName(file.expanded());
-      unload_c(fileName.c_str());
+      QString fileName(file.expanded());
+      unload_c(fileName.toAscii().data());
     }
 
     if (m_kernels != NULL) {
@@ -603,8 +603,8 @@ namespace Isis {
     // Unload the kernels (TODO: Can this be done faster)
     for (int i = 0; i < m_kernels->size(); i++) {
       FileName file(m_kernels->at(i));
-      string fileName(file.expanded());
-      unload_c(fileName.c_str());
+      QString fileName(file.expanded());
+      unload_c(fileName.toAscii().data());
     }
 
     m_kernels->clear();
@@ -868,7 +868,7 @@ namespace Isis {
    *
    * @throw Isis::iException::Io - "Can not find key in instrument kernels
    */
-  SpiceInt Spice::getInteger(const IString &key, int index) {
+  SpiceInt Spice::getInteger(const QString &key, int index) {
     return readValue(key, SpiceIntType, index).toInt();
   }
 
@@ -882,7 +882,7 @@ namespace Isis {
    *
    * @throw Isis::iException::Io - "Can not find key in instrument kernels."
    */
-  SpiceDouble Spice::getDouble(const IString &key, int index) {
+  SpiceDouble Spice::getDouble(const QString &key, int index) {
     return readValue(key, SpiceDoubleType, index).toDouble();
   }
 
@@ -893,19 +893,19 @@ namespace Isis {
    * Use this when possible because naif calls (such as scs2e_c) cannot be
    *   called when not using naif.
    */
-  iTime Spice::getClockTime(IString clockValue, int sclkCode) {
+  iTime Spice::getClockTime(QString clockValue, int sclkCode) {
     if (sclkCode == -1) {
       sclkCode = naifSclkCode();
     }
 
     iTime result;
 
-    IString key = "CLOCK_ET_" + IString(sclkCode) + "_" + clockValue;
+    QString key = "CLOCK_ET_" + toString(sclkCode) + "_" + clockValue;
     QVariant storedClockTime = getStoredResult(key, SpiceDoubleType);
 
     if (storedClockTime.isNull()) {
       SpiceDouble timeOutput;
-      scs2e_c(sclkCode, clockValue.c_str(), &timeOutput);
+      scs2e_c(sclkCode, clockValue.toAscii().data(), &timeOutput);
       storedClockTime = timeOutput;
       storeResult(key, SpiceDoubleType, timeOutput);
     }
@@ -926,7 +926,7 @@ namespace Isis {
    * @param type The naif value's primitive type
    * @param index The index into the naif keyword array to read
    */
-  QVariant Spice::readValue(IString key, SpiceValueType type, int index) {
+  QVariant Spice::readValue(QString key, SpiceValueType type, int index) {
     QVariant result;
 
     if (m_usingNaif) {
@@ -941,25 +941,25 @@ namespace Isis {
 
       if (type == SpiceDoubleType) {
         SpiceDouble kernelValue;
-        gdpool_c(key.c_str(), (SpiceInt)index, 1,
+        gdpool_c(key.toAscii().data(), (SpiceInt)index, 1,
                  &numValuesRead, &kernelValue, &found);
         result = kernelValue;
       }
       else if (type == SpiceStringType) {
         char kernelValue[512];
-        gcpool_c(key.c_str(), (SpiceInt)index, 1, sizeof(kernelValue),
+        gcpool_c(key.toAscii().data(), (SpiceInt)index, 1, sizeof(kernelValue),
                  &numValuesRead, kernelValue, &found);
         result = kernelValue;
       }
       else if (type == SpiceIntType) {
         SpiceInt kernelValue;
-        gipool_c(key.c_str(), (SpiceInt)index, 1, &numValuesRead,
+        gipool_c(key.toAscii().data(), (SpiceInt)index, 1, &numValuesRead,
                  &kernelValue, &found);
         result = (int)kernelValue;
       }
 
       if (!found) {
-        string msg = "Can not find [" + key + "] in text kernels";
+        QString msg = "Can not find [" + key + "] in text kernels";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
@@ -980,7 +980,7 @@ namespace Isis {
   }
 
 
-  void Spice::storeResult(IString name, SpiceValueType type, QVariant value) {
+  void Spice::storeResult(QString name, SpiceValueType type, QVariant value) {
     if (type == SpiceDoubleType) {
       EndianSwapper swapper("LSB");
 
@@ -995,7 +995,7 @@ namespace Isis {
   }
 
 
-  QVariant Spice::getStoredResult(IString name, SpiceValueType type) {
+  QVariant Spice::getStoredResult(QString name, SpiceValueType type) {
     bool wasDouble = false;
 
     if (type == SpiceDoubleType) {
@@ -1016,7 +1016,7 @@ namespace Isis {
   }
 
 
-  void Spice::storeValue(IString key, int index, SpiceValueType type,
+  void Spice::storeValue(QString key, int index, SpiceValueType type,
                          QVariant value) {
     if (!m_naifKeywords->HasKeyword(key)) {
       m_naifKeywords->AddKeyword(PvlKeyword(key));
@@ -1029,16 +1029,16 @@ namespace Isis {
     }
 
     if (type == SpiceByteCodeType) {
-      storedKey[index] = IString(value.toByteArray().toHex().data());
+      storedKey[index] = QString(value.toByteArray().toHex().data());
     }
     else if (type == SpiceStringType) {
       storedKey[index] = value.toString();
     }
     else if (type == SpiceDoubleType) {
-      storedKey[index] = value.toDouble();
+      storedKey[index] = toString(value.toDouble());
     }
     else if (type == SpiceIntType) {
-      storedKey[index] = value.toInt();
+      storedKey[index] = toString(value.toInt());
     }
     else {
       IString msg = "Unable to store variant in labels for key [" + key + "]";
@@ -1047,7 +1047,7 @@ namespace Isis {
   }
 
 
-  QVariant Spice::readStoredValue(IString key, SpiceValueType type,
+  QVariant Spice::readStoredValue(QString key, SpiceValueType type,
                                   int index) {
     // Read from PvlObject that is our naif keywords
     QVariant result;
@@ -1057,17 +1057,16 @@ namespace Isis {
 
       try {
         if (type == SpiceDoubleType) {
-          result = (double)storedKeyword[index];
+          result = toDouble(storedKeyword[index]);
         }
         else if (type == SpiceStringType) {
-          result = QString::fromStdString(storedKeyword[index]);
+          result = storedKeyword[index];
         }
         else if (type == SpiceByteCodeType || SpiceStringType) {
-          result = QByteArray(
-              string(storedKeyword[index]).c_str());
+          result = storedKeyword[index].toAscii();
         }
         else if (type == SpiceIntType) {
-          result = (int)storedKeyword[index];
+          result = toInt(storedKeyword[index]);
         }
       }
       catch(IException &) {
@@ -1088,7 +1087,7 @@ namespace Isis {
    *
    * @throw Isis::IException::Io - "Can not find key in instrument kernels."
    */
-  IString Spice::getString(const IString &key, int index) {
+  QString Spice::getString(const QString &key, int index) {
     return readValue(key, SpiceStringType, index).toString();
   }
 
@@ -1201,7 +1200,7 @@ namespace Isis {
     *
     * @return string
     */
-  IString Spice::targetName() const {
+  QString Spice::targetName() const {
     return m_target->name();
   }
 

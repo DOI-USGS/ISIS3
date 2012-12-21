@@ -135,7 +135,7 @@ namespace Isis {
 
           if(filename.size() > 0) {
             if((*m_cubeToGroundMap)[filename] == NULL) {
-              Pvl label(FileName(filename.toStdString()).expanded());
+              Pvl label(FileName(filename).expanded());
               UniversalGroundMap *groundMap = new UniversalGroundMap(label);
               (*m_cubeToGroundMap)[filename] = groundMap;
             }
@@ -182,8 +182,7 @@ namespace Isis {
 
     if(m_serialNumbers && m_serialNumbers->Size()) {
       try {
-        result = QString::fromStdString(
-            m_serialNumbers->FileName(sn.toStdString()));
+        result = m_serialNumbers->FileName(sn);
       }
       catch(IException &) {
       }
@@ -232,7 +231,7 @@ namespace Isis {
       QString filename;
       foreach(filename, cubeFiles) {
         try {
-          m_serialNumbers->Add(filename.toStdString());
+          m_serialNumbers->Add(filename);
         }
         catch(IException &) {
         }

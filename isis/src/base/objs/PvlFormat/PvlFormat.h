@@ -51,11 +51,10 @@ namespace Isis {
   * @param type The string to be converted.
   * @return The corresponding KeywordType enum.
   */
-  inline KeywordType ToKeywordType(const std::string type) {
+  inline KeywordType ToKeywordType(const QString type) {
 
-    IString t(type);
-    t.Remove("_- \r\n\f\t\v\"\'");
-    t.UpCase();
+    QString t(type);
+    t = t.remove(QRegExp("[\\w_-\"'")).toUpper();
 
     if(t == "STRING") return StringKeyword;
     else if(t == "BOOL") return BoolKeyword;
@@ -122,11 +121,11 @@ namespace Isis {
     public:
 
       PvlFormat();
-      PvlFormat(const std::string &file);
+      PvlFormat(const QString &file);
       PvlFormat(Pvl &keymap);
       virtual ~PvlFormat() {};
 
-      void Add(const std::string &file);
+      void Add(const QString &file);
       void Add(Pvl &keymap);
 
       /**
@@ -151,12 +150,12 @@ namespace Isis {
         return p_charLimit;
       };
 
-      virtual std::string FormatValue(const PvlKeyword &keyword,
+      virtual QString FormatValue(const PvlKeyword &keyword,
                                       int valueIndex = 0);
-      virtual std::string FormatName(const PvlKeyword &keyword);
-      virtual std::string FormatEnd(const std::string name,
+      virtual QString FormatName(const PvlKeyword &keyword);
+      virtual QString FormatEnd(const QString name,
                                     const PvlKeyword &keyword);
-      virtual std::string FormatEOL() {
+      virtual QString FormatEOL() {
         return "\n";
       }
 
@@ -165,10 +164,10 @@ namespace Isis {
 
     protected:
 
-      virtual std::string AddQuotes(const std::string value);
+      virtual QString AddQuotes(const QString value);
       bool IsSingleUnit(const PvlKeyword &keyword);
 
-      std::string p_keywordMapFile;
+      QString p_keywordMapFile;
       Pvl p_keywordMap;
 
       //! Maximum number of characters on a single line of a keyword value.

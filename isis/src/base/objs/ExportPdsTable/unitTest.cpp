@@ -1,4 +1,7 @@
 #include "ExportPdsTable.h"
+
+#include <QFile>
+
 #include "FileName.h"
 #include "IException.h"
 #include "ImportPdsTable.h"
@@ -45,17 +48,17 @@ int main(int argc, char *argv[]) {
   PvlObject metadata = exportedTable.exportTable(buf, tableRecBytes, "lsb");
   // Create a label file containing the needed information.
   FileName lsbLabelFile("$temporary/lsbPdsTable.lbl");
-  ofstream outputLsbLabel((lsbLabelFile.expanded()).c_str());
+  ofstream outputLsbLabel((lsbLabelFile.expanded()).toAscii().data());
   outputLsbLabel << PvlKeyword("RECORD_TYPE", "FIXED_LENGTH") << endl;
-  outputLsbLabel << PvlKeyword("RECORD_BYTES", tableRecBytes) << endl;
-  IString tableName = ExportPdsTable::formatPdsTableName(table.Name());
+  outputLsbLabel << PvlKeyword("RECORD_BYTES", toString(tableRecBytes)) << endl;
+  QString tableName = ExportPdsTable::formatPdsTableName(table.Name());
   outputLsbLabel << PvlKeyword("^" + tableName, "lsbPdsTable.dat") << endl;
   outputLsbLabel << endl;
   // Add table object to label keywords
   outputLsbLabel << metadata;
   outputLsbLabel.close();
   FileName lsbTableFile("$temporary/lsbPdsTable.dat");
-  ofstream outputLsbTable((lsbTableFile.expanded()).c_str());
+  ofstream outputLsbTable((lsbTableFile.expanded()).toAscii().data());
   outputLsbTable.write(buf, tableRecBytes*table.Records());
   outputLsbTable.close();
   ImportPdsTable lsbTable(lsbLabelFile.expanded(), lsbTableFile.expanded(), tableName);
@@ -67,14 +70,14 @@ int main(int argc, char *argv[]) {
   cout << reimportedLsbTable[0][2].name() << "\t";
   cout << reimportedLsbTable[0][3].name() << "\n";
   for (int i = 0; i < reimportedLsbTable.Records(); i++) {
-    cout << IString((double) reimportedLsbTable[i][0]) << "\t\t\t";
-    cout << IString((int)    reimportedLsbTable[i][1]) << "\t\t\t\t";
-    cout << IString((string) reimportedLsbTable[i][2]) << "\t\t\t";
-    cout << IString((float)  reimportedLsbTable[i][3]) << "\n";
+    cout << toString((double) reimportedLsbTable[i][0]) << "\t\t\t";
+    cout << toString((int)    reimportedLsbTable[i][1]) << "\t\t\t\t";
+    cout <<         (QString) reimportedLsbTable[i][2]  << "\t\t\t";
+    cout << toString((float)  reimportedLsbTable[i][3]) << "\n";
   }
   // remove files and reset buffer
-  remove((lsbLabelFile.expanded()).c_str());
-  remove((lsbTableFile.expanded()).c_str());
+  QFile::remove((lsbLabelFile.expanded()));
+  QFile::remove((lsbTableFile.expanded()));
   delete [] buf;
   buf = NULL;
   cout << endl;
@@ -87,16 +90,16 @@ int main(int argc, char *argv[]) {
   metadata = exportedTable.exportTable(buf, tableRecBytes, "msb");
   // Create a label file containing the needed information.
   FileName msbLabelFile("$temporary/msbPdsTable.lbl");
-  ofstream outputMsbLabel((msbLabelFile.expanded()).c_str());
+  ofstream outputMsbLabel((msbLabelFile.expanded()).toAscii().data());
   outputMsbLabel << PvlKeyword("RECORD_TYPE", "FIXED_LENGTH") << endl;
-  outputMsbLabel << PvlKeyword("RECORD_BYTES", tableRecBytes) << endl;
+  outputMsbLabel << PvlKeyword("RECORD_BYTES", toString(tableRecBytes)) << endl;
   outputMsbLabel << PvlKeyword("^" + tableName, "msbPdsTable.dat") << endl;
   outputMsbLabel << endl;
   // Add table object to label keywords
   outputMsbLabel << metadata;
   outputMsbLabel.close();
   FileName msbTableFile("$temporary/msbPdsTable.dat");
-  ofstream outputMsbTable((msbTableFile.expanded()).c_str());
+  ofstream outputMsbTable((msbTableFile.expanded()).toAscii().data());
   outputMsbTable.write(buf, tableRecBytes*table.Records());
   outputMsbTable.close();
   ImportPdsTable msbTable(msbLabelFile.expanded(), msbTableFile.expanded(), tableName);
@@ -110,12 +113,12 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < reimportedMsbTable.Records(); i++) {
     cout << IString((double) reimportedMsbTable[i][0]) << "\t\t\t";
     cout << IString((int)    reimportedMsbTable[i][1]) << "\t\t\t\t";
-    cout << IString((string) reimportedMsbTable[i][2]) << "\t\t\t";
+    cout << IString((QString) reimportedMsbTable[i][2]) << "\t\t\t";
     cout << IString((float)  reimportedMsbTable[i][3]) << "\n";
   }
   // remove files and reset buffer and tableRecBytes
-  remove((msbLabelFile.expanded()).c_str());
-  remove((msbTableFile.expanded()).c_str());
+  QFile::remove((msbLabelFile.expanded()));
+  QFile::remove((msbTableFile.expanded()));
   delete [] buf;
   buf = NULL;
   tableRecBytes -= 4;

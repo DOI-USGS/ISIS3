@@ -26,6 +26,8 @@
 #include <vector>
 #include <string>
 
+#include <QString>
+
 #include "BasisFunction.h"
 
 namespace Isis {
@@ -62,7 +64,7 @@ namespace Isis {
    */
   class Basis1VariableFunction : public Isis::BasisFunction {
     public:
-      Basis1VariableFunction(const std::string &name, int numCoefs);
+      Basis1VariableFunction(const QString &name, int numCoefs);
       //! Destroys the Basis1VariableFunction object.
       virtual ~Basis1VariableFunction() {};
 

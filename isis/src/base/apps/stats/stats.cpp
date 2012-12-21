@@ -42,28 +42,28 @@ void IsisMain() {
     // Construct a label with the results
     PvlGroup results("Results");  
     results += PvlKeyword("From", icube->getFileName());
-    results += PvlKeyword("Band", icube->getPhysicalBand(i));
+    results += PvlKeyword("Band", toString(icube->getPhysicalBand(i)));
     if(stats->ValidPixels() != 0) {
-      results += PvlKeyword("Average", stats->Average());
-      results += PvlKeyword("StandardDeviation", stats->StandardDeviation());
-      results += PvlKeyword("Variance", stats->Variance());
+      results += PvlKeyword("Average", toString(stats->Average()));
+      results += PvlKeyword("StandardDeviation", toString(stats->StandardDeviation()));
+      results += PvlKeyword("Variance", toString(stats->Variance()));
       // These statistics only worked on a histogram
-      results += PvlKeyword("Median", stats->Median());
-      results += PvlKeyword("Mode", stats->Mode());
-      results += PvlKeyword("Skew", stats->Skew());
-      results += PvlKeyword("Minimum", stats->Minimum());
-      results += PvlKeyword("Maximum", stats->Maximum());
-      results += PvlKeyword("Sum", stats->Sum());
+      results += PvlKeyword("Median", toString(stats->Median()));
+      results += PvlKeyword("Mode", toString(stats->Mode()));
+      results += PvlKeyword("Skew", toString(stats->Skew()));
+      results += PvlKeyword("Minimum", toString(stats->Minimum()));
+      results += PvlKeyword("Maximum", toString(stats->Maximum()));
+      results += PvlKeyword("Sum", toString(stats->Sum()));
     }
-    results += PvlKeyword("TotalPixels", stats->TotalPixels());
-    results += PvlKeyword("ValidPixels", stats->ValidPixels());
-    results += PvlKeyword("OverValidMaximumPixels", stats->OverRangePixels());
-    results += PvlKeyword("UnderValidMinimumPixels", stats->UnderRangePixels());
-    results += PvlKeyword("NullPixels", stats->NullPixels());
-    results += PvlKeyword("LisPixels", stats->LisPixels());
-    results += PvlKeyword("LrsPixels", stats->LrsPixels());
-    results += PvlKeyword("HisPixels", stats->HisPixels());
-    results += PvlKeyword("HrsPixels", stats->HrsPixels());
+    results += PvlKeyword("TotalPixels", toString(stats->TotalPixels()));
+    results += PvlKeyword("ValidPixels", toString(stats->ValidPixels()));
+    results += PvlKeyword("OverValidMaximumPixels", toString(stats->OverRangePixels()));
+    results += PvlKeyword("UnderValidMinimumPixels", toString(stats->UnderRangePixels()));
+    results += PvlKeyword("NullPixels", toString(stats->NullPixels()));
+    results += PvlKeyword("LisPixels", toString(stats->LisPixels()));
+    results += PvlKeyword("LrsPixels", toString(stats->LrsPixels()));
+    results += PvlKeyword("HisPixels", toString(stats->HisPixels()));
+    results += PvlKeyword("HrsPixels", toString(stats->HrsPixels()));
     
     mainpvl.AddGroup(results);
     
@@ -74,7 +74,7 @@ void IsisMain() {
   
   // Write the results to the output file if the user specified one
   if(ui.WasEntered("TO")) {
-    string outFile = FileName(ui.GetFileName("TO")).expanded();
+    QString outFile = FileName(ui.GetFileName("TO")).expanded();
     bool exists = FileName(outFile).fileExists();
     bool append = ui.GetBoolean("APPEND");
     ofstream os;
@@ -91,13 +91,13 @@ void IsisMain() {
     else {
       //if the format was not PVL, write out a flat file.
       if(append) {
-        os.open(outFile.c_str(), ios::app);
+        os.open(outFile.toAscii().data(), ios::app);
         if(!exists) {
           writeHeader = true;
         }
       }
       else {
-        os.open(outFile.c_str(), ios::out);
+        os.open(outFile.toAscii().data(), ios::out);
         writeHeader = true;
       }
 
@@ -113,7 +113,7 @@ void IsisMain() {
       
       for(int i = 0; i < mainpvl.Groups(); i++) {
         for (int j = 0; j < mainpvl.Group(i).Keywords(); j++) {
-          os << (string)mainpvl.Group(i)[j];
+          os << (QString)mainpvl.Group(i)[j];
           if(j < mainpvl.Group(i).Keywords() - 1) {
             os << ",";
           }

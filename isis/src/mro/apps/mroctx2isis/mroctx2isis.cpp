@@ -37,7 +37,7 @@ void IsisMain() {
   bool projected;
   try {
     Pvl lab(inFile.expanded());
-    id = (string) lab.FindKeyword("DATA_SET_ID");
+    id = (QString) lab.FindKeyword("DATA_SET_ID");
     projected = lab.HasObject("IMAGE_MAP_PROJECTION");
     if(lab.HasKeyword("SPATIAL_SUMMING")) {
       sumMode = (int)lab.FindKeyword("SPATIAL_SUMMING");
@@ -46,7 +46,7 @@ void IsisMain() {
       sumMode = (int)lab.FindKeyword("SAMPLING_FACTOR");
     }
 
-    bitMode = (string) lab.FindKeyword("SAMPLE_BIT_MODE_ID");
+    bitMode = (QString) lab.FindKeyword("SAMPLE_BIT_MODE_ID");
     if(lab.HasKeyword("EDIT_MODE_ID")) {
       editMode = (int)lab.FindKeyword("EDIT_MODE_ID");
     }
@@ -56,14 +56,14 @@ void IsisMain() {
 
   }
   catch(IException &e) {
-    string msg = "Unable to read [DATA_SET_ID] from input file [" +
-                 inFile.expanded() + "]";
+    QString msg = "Unable to read [DATA_SET_ID] from input file [" +
+                  inFile.expanded() + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
   //Checks if in file is rdr
   if(projected) {
-    string msg = "[" + inFile.name() + "] appears to be an rdr file.";
+    QString msg = "[" + inFile.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -72,8 +72,8 @@ void IsisMain() {
   id.Compress();
   id.Trim(" ");
   if(id != "MRO-M-CTX-2-EDR-L0-V1.0") {
-    string msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
-                 "in MRO-CTX EDR format. DATA_SET_ID is [" + id + "]";
+    QString msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
+                  "in MRO-CTX EDR format. DATA_SET_ID is [" + id.ToQt() + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
@@ -165,10 +165,10 @@ void IsisMain() {
   // Create the stretch pairs
   stretch.ClearPairs();
   for(int i = 0; i < stretchPairs->LineCount(); i++) {
-    IString line;
+    QString line;
     stretchPairs->GetLine(line, true);
-    int temp1 = line.Token(" ");
-    int temp2 = line.Trim(" ");
+    int temp1 = toInt(line.split(" ").first());
+    int temp2 = toInt(line.split(" ").last());
     stretch.AddPair(temp1, temp2);
   }
 
@@ -180,7 +180,7 @@ void IsisMain() {
   // Do 8 bit to 12 bit conversion
   fillGap = ui.GetBoolean("FILLGAP");
   ProcessByLine p2;
-  string ioFile = ui.GetFileName("TO");
+  QString ioFile = ui.GetFileName("TO");
   CubeAttributeInput att;
   p2.SetInputCube(ioFile, att, ReadWrite);
   p2.Progress()->SetText("Converting 8 bit pixels to 16 bit");
@@ -207,7 +207,7 @@ void TranslateMroCtxLabels(FileName &labelFile, Cube *ocube) {
   Pvl outLabel;
   //Set up the directory where the translations are
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  IString transDir = (string) dataDir["Mro"] + "/translations/";
+  QString transDir = (QString) dataDir["Mro"] + "/translations/";
   Pvl labelPvl(labelFile.expanded());
 
   //Translate the Instrument group
@@ -223,12 +223,12 @@ void TranslateMroCtxLabels(FileName &labelFile, Cube *ocube) {
   // Set up the BandBin groups
   PvlGroup bbin("BandBin");
   bbin += PvlKeyword("FilterName", "BroadBand");
-  bbin += PvlKeyword("Center", 0.650, "micrometers");
-  bbin += PvlKeyword("Width", 0.150, "micrometers");
+  bbin += PvlKeyword("Center", toString(0.650), "micrometers");
+  bbin += PvlKeyword("Width", toString(0.150), "micrometers");
 
   //Set up the Kernels group
   PvlGroup kern("Kernels");
-  kern += PvlKeyword("NaifFrameCode", -74021);
+  kern += PvlKeyword("NaifFrameCode", toString(-74021));
 
   Pvl lab(labelFile.expanded());
   int sumMode, startSamp;
@@ -245,8 +245,8 @@ void TranslateMroCtxLabels(FileName &labelFile, Cube *ocube) {
     startSamp = (int)lab.FindKeyword("SAMPLE_FIRST_PIXEL");
   }
   PvlGroup inst = outLabel.FindGroup("Instrument", Pvl::Traverse);
-  inst += PvlKeyword("SpatialSumming", sumMode);
-  inst += PvlKeyword("SampleFirstPixel", startSamp);
+  inst += PvlKeyword("SpatialSumming", toString(sumMode));
+  inst += PvlKeyword("SampleFirstPixel", toString(startSamp));
 
   //Add all groups to the output cube
   ocube->putGroup(inst);

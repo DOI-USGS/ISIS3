@@ -1,14 +1,14 @@
 mystring = stringval
 mystring = "string val"
 myint = 12345
-myfloat = 1.234567e+93
+myfloat = 12345.67e+89
 myarray = (12345, "a short string", 1.234)
 myarray = {12345, "a short string", 1.234}
 Group = Group1
   mystring = stringval
   mystring = "string val"
   myint    = 12345
-  myfloat  = 1.234567e+93
+  myfloat  = 12345.67e+89
   myarray  = (12345,"a short string",1.234)
 End_Group
 Object = Object1
@@ -16,7 +16,7 @@ Object = Object1
     mystring = stringval
     mystring = "string val"
     myint    = 12345
-    myfloat  = 1.234567e+93
+    myfloat  = 12345.67e+89
     myarray  = (12345,"a short string",1.234)
   End_Object
 
@@ -24,7 +24,7 @@ Object = Object1
     mystring = stringval
     mystring = "string val"
     myint    = 12345
-    myfloat  = 1.234567e+93
+    myfloat  = 12345.67e+89
     myarray  = (12345,"a short string",1.234)
   End_Group
 End_Object

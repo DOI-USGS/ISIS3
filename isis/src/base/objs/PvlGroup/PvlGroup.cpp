@@ -32,7 +32,7 @@ namespace Isis {
    * Creates a PvlGroup object with a name.
    * @param name The group name.
    */
-  PvlGroup::PvlGroup(const std::string &name) :
+  PvlGroup::PvlGroup(const QString &name) :
     Isis::PvlContainer("Group", name) {
   }
 
@@ -69,7 +69,7 @@ namespace Isis {
 
       is.seekg(beforeKeywordPos, ios::beg);
 
-      string msg = "Expected PVL keyword named [Group], found keyword named [";
+      QString msg = "Expected PVL keyword named [Group], found keyword named [";
       msg += readKeyword.Name();
       msg += "] when reading PVL";
       throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -85,7 +85,7 @@ namespace Isis {
 
       is.seekg(beforeKeywordPos, ios::beg);
 
-      string msg = "Expected a single value for group name, found [(";
+      QString msg = "Expected a single value for group name, found [(";
 
       for(int i = 0; i < readKeyword.Size(); i++) {
         if(i != 0) msg += ", ";
@@ -118,7 +118,7 @@ namespace Isis {
 
           is.seekg(beforeKeywordPos, ios::beg);
 
-          string msg = "Unexpected [";
+          QString msg = "Unexpected [";
           msg += readKeyword.Name();
           msg += "] in Group [";
           msg += result.Name();
@@ -142,7 +142,7 @@ namespace Isis {
 
       is.seekg(beforeKeywordPos, ios::beg);
 
-      string msg = "Group [" + result.Name();
+      QString msg = "Group [" + result.Name();
       msg += "] EndGroup not found before end of file when reading PVL";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -221,7 +221,7 @@ namespace Isis {
   {
     // Group cannot be empty - needs to have a keyword
     if(pPvlGrp.Keywords() <= 0) {
-      string sErrMsg = "Group \"" + pPvlGrp.Name() + "\" has no Keywords\n";
+      QString sErrMsg = "Group \"" + pPvlGrp.Name() + "\" has no Keywords\n";
       throw IException(IException::User, sErrMsg, _FILEINFO_);
     }
 

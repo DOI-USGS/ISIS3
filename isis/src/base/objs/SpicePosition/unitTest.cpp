@@ -1,34 +1,37 @@
 #include <iostream>
 #include <iomanip>
-#include "SpicePosition.h"
+
 #include "FileName.h"
+#include "IString.h"
 #include "Preference.h"
+#include "SpicePosition.h"
 #include "Table.h"
 
+using namespace Isis;
 using namespace std;
 
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   cout << setprecision(8);
   cout << "Unit test for SpicePosition" << endl;
 
   // Test case is taken from moc red wide angle image ab102401
   // sn = MGS/561812335:32/MOC-WA/RED
-  Isis::FileName f("$base/testData/kernels");
-  string dir = f.expanded() + "/";
-  string moc(dir + "moc.bsp");
-  string de(dir + "de405.bsp");
-  string pck(dir + "pck00006.tpc");
-  furnsh_c(moc.c_str());
-  furnsh_c(de.c_str());
-  furnsh_c(pck.c_str());
+  FileName f("$base/testData/kernels");
+  QString dir = f.expanded() + "/";
+  QString moc(dir + "moc.bsp");
+  QString de(dir + "de405.bsp");
+  QString pck(dir + "pck00006.tpc");
+  furnsh_c(moc.toAscii().data());
+  furnsh_c(de.toAscii().data());
+  furnsh_c(pck.toAscii().data());
 
   double startTime = -69382819.0;
   double endTime = -69382512.0;
   double slope = (endTime - startTime) / (10 - 1);
 
-  Isis::SpicePosition pos(-94, 499);
+  SpicePosition pos(-94, 499);
 
   // Normal testing (no cache)
   cout << "Testing without cache ... " << endl;
@@ -58,8 +61,8 @@ int main(int argc, char *argv[]) {
 
   // Test table options
   cout << "Testing tables ... " << endl;
-  Isis::Table tab = pos.Cache("Test");
-  Isis::SpicePosition pos2(-94, 499);
+  Table tab = pos.Cache("Test");
+  SpicePosition pos2(-94, 499);
   pos2.LoadCache(tab);
   for(int i = 0; i < 10; i++) {
     double t = startTime + (double) i * slope;
@@ -96,7 +99,7 @@ int main(int argc, char *argv[]) {
   // Now use LineCache method 
   cout << "Testing line cache..." << endl;
   tab = pos.LineCache("Test2");
-  Isis::SpicePosition pos3(-94, 499);
+  SpicePosition pos3(-94, 499);
   pos3.LoadCache(tab);
 
   for (int i=0; i<10; i++) {
@@ -125,30 +128,30 @@ int main(int argc, char *argv[]) {
 
   // Test Hermite input
   cout << "Testing Hermite function input ..." << endl;
-  Isis::SpicePosition pos4(-94, 499);
+  SpicePosition pos4(-94, 499);
 
   // Build a Hermite table
-  Isis::TableRecord record;
+  TableRecord record;
   // add x,y,z position labels to record
-  Isis::TableField x("J2000X", Isis::TableField::Double);
-  Isis::TableField y("J2000Y", Isis::TableField::Double);
-  Isis::TableField z("J2000Z", Isis::TableField::Double);
+  TableField x("J2000X", TableField::Double);
+  TableField y("J2000Y", TableField::Double);
+  TableField z("J2000Z", TableField::Double);
   record += x;
   record += y;
   record += z;
   // add x,y,z velocity labels to record
-  Isis::TableField vx("J2000XV", Isis::TableField::Double);
-  Isis::TableField vy("J2000YV", Isis::TableField::Double);
-  Isis::TableField vz("J2000ZV", Isis::TableField::Double);
+  TableField vx("J2000XV", TableField::Double);
+  TableField vy("J2000YV", TableField::Double);
+  TableField vz("J2000ZV", TableField::Double);
   record += vx;
   record += vy;
   record += vz;
   // add time label to record
-  Isis::TableField t("ET", Isis::TableField::Double);
+  TableField t("ET", TableField::Double);
   record += t;
 
   // create input table with 6 nodes
-  Isis::Table table("InitialHermite", record);
+  Table table("InitialHermite", record);
   record[0] = -1728.9713397204;
   record[1] = -1562.6465460511;
   record[2] = 2691.9864927899;
@@ -199,13 +202,13 @@ int main(int argc, char *argv[]) {
   table += record;
 
   // Add table label 
-  table.Label() += Isis::PvlKeyword("CacheType", "HermiteSpline");
-  table.Label() += Isis::PvlKeyword("SpkTableStartTime");
-  table.Label()["SpkTableStartTime"].AddValue(-69382819.360519);
-  table.Label() += Isis::PvlKeyword("SpkTableEndTime");
-  table.Label()["SpkTableEndTime"].AddValue(-69382512.160519);
-  table.Label() += Isis::PvlKeyword("SpkTableOriginalSize");
-  table.Label()["SpkTableOriginalSize"].AddValue(769);
+  table.Label() += PvlKeyword("CacheType", "HermiteSpline");
+  table.Label() += PvlKeyword("SpkTableStartTime");
+  table.Label()["SpkTableStartTime"].AddValue(toString(-69382819.360519));
+  table.Label() += PvlKeyword("SpkTableEndTime");
+  table.Label()["SpkTableEndTime"].AddValue(toString(-69382512.160519));
+  table.Label() += PvlKeyword("SpkTableOriginalSize");
+  table.Label()["SpkTableOriginalSize"].AddValue(toString(769));
 
   // Load table into the object
   pos4.LoadCache(table);
@@ -240,7 +243,7 @@ int main(int argc, char *argv[]) {
   abcPos3.push_back(0.0);
   abcPos3.push_back(0.0);
   pos4.SetPolynomial(abcPos1, abcPos2, abcPos3, 
-                     Isis::SpicePosition::PolyFunctionOverHermiteConstant);
+                     SpicePosition::PolyFunctionOverHermiteConstant);
 
    cout << "Source = " << pos.GetSource() << endl;
    for(int i = 0; i < 10; i++) {
@@ -258,8 +261,8 @@ int main(int argc, char *argv[]) {
   cout << "Test fitting polynomial function over Hermite to new Hermite" << endl;
 
   // Fit new Hermite using existing Hermite and polynomial
-  Isis::Table table2 = pos4.Cache("OutputHermite");
-  Isis::SpicePosition pos5(-94, 499);
+  Table table2 = pos4.Cache("OutputHermite");
+  SpicePosition pos5(-94, 499);
 
   // Load table2 into the object
   pos5.LoadCache(table2);

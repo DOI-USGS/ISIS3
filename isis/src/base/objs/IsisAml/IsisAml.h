@@ -27,16 +27,15 @@
 #include <string>
 #include <vector>
 
+#include <QString>
+
 #include <xercesc/sax2/SAX2XMLReader.hpp>
 
 #include "IsisXMLApplication.h"
 #include "IsisAmlData.h"
-#include "IString.h"
 #include "Pvl.h"
 
-namespace Isis {
-  class IString;
-}
+class QString;
 
 /**
  * @brief Application program XML file parameter manager.
@@ -152,7 +151,7 @@ class IsisAml : protected IsisAmlData {
 // Public section
   public:
 
-    IsisAml(const std::string &xmlfile);
+    IsisAml(const QString &xmlfile);
 
     ~IsisAml();
 
@@ -160,84 +159,84 @@ class IsisAml : protected IsisAmlData {
     // Methods for searching and retrieving application info
     // via the parameter name
 
-    void PutAsString(const std::string &paramName, const std::string &value);
-    void PutAsString(const std::string &paramName, const std::vector<std::string> &value);
+    void PutAsString(const QString &paramName, const QString &value);
+    void PutAsString(const QString &paramName, const std::vector<QString> &value);
 
-    void PutFileName(const std::string &paramName, const std::string &value);
-    void PutFileName(const std::string &paramName, const std::vector<std::string> &value);
+    void PutFileName(const QString &paramName, const QString &value);
+    void PutFileName(const QString &paramName, const std::vector<QString> &value);
 
-    void PutDouble(const std::string &paramName, const double &value);
-    void PutDouble(const std::string &paramName, const std::vector<double> &value);
+    void PutDouble(const QString &paramName, const double &value);
+    void PutDouble(const QString &paramName, const std::vector<double> &value);
 
-    void PutInteger(const std::string &paramName, const int &value);
-    void PutInteger(const std::string &paramName, const std::vector<int> &value);
+    void PutInteger(const QString &paramName, const int &value);
+    void PutInteger(const QString &paramName, const std::vector<int> &value);
 
-    void PutBoolean(const std::string &paramName, const bool &value);
-    void PutBoolean(const std::string &paramName, const std::vector<bool> &value);
+    void PutBoolean(const QString &paramName, const bool &value);
+    void PutBoolean(const QString &paramName, const std::vector<bool> &value);
 
-    void PutString(const std::string &paramName, const std::string &value);
-    void PutString(const std::string &paramName, const std::vector<std::string> &value);
+    void PutString(const QString &paramName, const QString &value);
+    void PutString(const QString &paramName, const std::vector<QString> &value);
 
-    std::string GetAsString(const std::string &paramName) const;
-    void GetAsString(const std::string &paramName, std::vector<std::string> &values) const;
+    QString GetAsString(const QString &paramName) const;
+    void GetAsString(const QString &paramName, std::vector<QString> &values) const;
 
-    Isis::IString GetFileName(const std::string &paramName, std::string extension = "") const;
-    void GetFileName(const std::string &paramName, std::vector<std::string> &values) const;
+    QString GetFileName(const QString &paramName, QString extension = "") const;
+    void GetFileName(const QString &paramName, std::vector<QString> &values) const;
 
-    std::string GetString(const std::string &paramName) const;
-    void GetString(const std::string &paramName, std::vector<std::string> &values) const;
+    QString GetString(const QString &paramName) const;
+    void GetString(const QString &paramName, std::vector<QString> &values) const;
 
-    int GetInteger(const std::string &paramName) const;
-    void GetInteger(const std::string &paramName, std::vector<int> &values) const;
+    int GetInteger(const QString &paramName) const;
+    void GetInteger(const QString &paramName, std::vector<int> &values) const;
 
-    bool GetBoolean(const std::string &paramName) const;
+    bool GetBoolean(const QString &paramName) const;
 
-    void GetBoolean(const std::string &paramName, std::vector<bool> &values) const;
+    void GetBoolean(const QString &paramName, std::vector<bool> &values) const;
 
-    double GetDouble(const std::string &paramName) const;
-    void GetDouble(const std::string &paramName, std::vector<double> &values) const;
+    double GetDouble(const QString &paramName) const;
+    void GetDouble(const QString &paramName, std::vector<double> &values) const;
 
-    bool WasEntered(const std::string &paramName) const;
-    void Clear(const std::string &paramName);
+    bool WasEntered(const QString &paramName) const;
+    void Clear(const QString &paramName);
 
-    Isis::CubeAttributeInput &GetInputAttribute(const std::string &paramName);
-    Isis::CubeAttributeOutput &GetOutputAttribute(const std::string &paramName);
+    Isis::CubeAttributeInput &GetInputAttribute(const QString &paramName);
+    Isis::CubeAttributeOutput &GetOutputAttribute(const QString &paramName);
 
     // Methods for retrieving application info not inside a group
 
-    std::string ProgramName() const;
-    std::string Brief() const;
-    std::string Description() const;
+    QString ProgramName() const;
+    QString Brief() const;
+    QString Description() const;
 
     // Methods for searching and retrieving application info
     // via the index into groups and parameters
 
     int  NumGroups() const;
 
-    std::string GroupName(const int &group) const;
+    QString GroupName(const int &group) const;
     
     //! Given the group name get its index in group array
-    int GroupIndex(const std::string & grpName) const;
+    int GroupIndex(const QString & grpName) const;
 
     int NumParams(const int &) const;
 
-    std::string ParamName(const int &group, const int &param) const;
+    QString ParamName(const int &group, const int &param) const;
 
-    std::string ParamType(const int &group, const int &param) const;
+    QString ParamType(const int &group, const int &param) const;
 
-    std::string ParamBrief(const int &group, const int &param) const;
+    QString ParamBrief(const int &group, const int &param) const;
 
-    std::string ParamDescription(const int &group, const int &param) const;
+    QString ParamDescription(const int &group, const int &param) const;
 
-    std::string ParamMinimum(const int &group, const int &param) const;
+    QString ParamMinimum(const int &group, const int &param) const;
 
-    std::string ParamMinimumInclusive(const int &group, const int &param) const;
+    QString ParamMinimumInclusive(const int &group, const int &param) const;
 
-    std::string ParamMaximum(const int &group, const int &param) const;
+    QString ParamMaximum(const int &group, const int &param) const;
 
-    std::string ParamMaximumInclusive(const int &group, const int &param) const;
+    QString ParamMaximumInclusive(const int &group, const int &param) const;
 
-    std::string ParamOdd(const int &group, const int &param) const;
+    QString ParamOdd(const int &group, const int &param) const;
 
     int ParamGreaterThanSize(const int &group, const int &param) const;
 
@@ -249,102 +248,102 @@ class IsisAml : protected IsisAmlData {
 
     int ParamNotEqualSize(const int &group, const int &param) const;
 
-    std::string ParamGreaterThan(const int &group, const int &param,
+    QString ParamGreaterThan(const int &group, const int &param,
                                  const int &great) const;
 
-    std::string ParamGreaterThanOrEqual(const int &group, const int &param,
+    QString ParamGreaterThanOrEqual(const int &group, const int &param,
                                         const int &great) const;
 
-    std::string ParamLessThan(const int &group, const int &param,
+    QString ParamLessThan(const int &group, const int &param,
                               const int &great) const;
 
-    std::string ParamLessThanOrEqual(const int &group, const int &param,
+    QString ParamLessThanOrEqual(const int &group, const int &param,
                                      const int &les) const;
 
-    std::string ParamNotEqual(const int &group, const int &param,
+    QString ParamNotEqual(const int &group, const int &param,
                               const int &notEq) const;
 
     int ParamListSize(const int &group, const int &param) const;
 
-    std::string ParamListValue(const int &group, const int &param,
+    QString ParamListValue(const int &group, const int &param,
                                const int &option) const;
 
-    std::string ParamListBrief(const int &group, const int &param,
+    QString ParamListBrief(const int &group, const int &param,
                                const int &option) const;
 
-    std::string ParamListDescription(const int &group, const int &param,
+    QString ParamListDescription(const int &group, const int &param,
                                      const int &option) const;
 
     int ParamListExcludeSize(const int &group, const int &param,
                              const int &option) const;
 
-    std::string ParamListExclude(const int &group, const int &param,
+    QString ParamListExclude(const int &group, const int &param,
                                  const int &option, const int &exclude) const;
 
     int ParamListIncludeSize(const int &group, const int &param,
                              const int &option) const;
 
-    std::string ParamListInclude(const int &group, const int &param,
+    QString ParamListInclude(const int &group, const int &param,
                                  const int &option, const int &include) const;
 
-    std::string ParamDefault(const int &group, const int &param) const;
+    QString ParamDefault(const int &group, const int &param) const;
 
-    std::string ParamInternalDefault(const int &group, const int &param) const;
+    QString ParamInternalDefault(const int &group, const int &param) const;
 
-    std::string ParamFilter(const int &group, const int &param) const;
+    QString ParamFilter(const int &group, const int &param) const;
 
-    std::string ParamPath(const int &group, const int &param) const;
+    QString ParamPath(const int &group, const int &param) const;
 
-    std::string ParamFileMode(const int &group, const int &param) const;
+    QString ParamFileMode(const int &group, const int &param) const;
 
     int ParamExcludeSize(const int &group, const int &param) const;
 
-    std::string ParamExclude(const int &group, const int &param,
+    QString ParamExclude(const int &group, const int &param,
                              const int &exclude) const;
     int ParamIncludeSize(const int &group, const int &param) const;
 
-    std::string ParamInclude(const int &group, const int &param,
+    QString ParamInclude(const int &group, const int &param,
                              const int &include) const;
 
-    std::string PixelType(const int &group, const int &param) const;
+    QString PixelType(const int &group, const int &param) const;
 
     int HelpersSize(const int &group, const int &param) const;
 
-    std::string HelperButtonName(const int &group, const int &param,
+    QString HelperButtonName(const int &group, const int &param,
                                  const int &helper) const;
 
-    std::string HelperFunction(const int &group, const int &param,
+    QString HelperFunction(const int &group, const int &param,
                                const int &helper) const;
 
-    std::string HelperBrief(const int &group, const int &param,
+    QString HelperBrief(const int &group, const int &param,
                             const int &helper) const;
 
-    std::string HelperDescription(const int &group, const int &param,
+    QString HelperDescription(const int &group, const int &param,
                                   const int &helper) const;
 
-    std::string HelperIcon(const int &group, const int &param,
+    QString HelperIcon(const int &group, const int &param,
                            const int &helper) const;
 
     //! Verify whether Parameter name is in the Include list
     //! Used in creation of DefFile 
-    bool IsParamInPvlInclude(std::string & paramName, std::vector<std::string> & exclude);
+    bool IsParamInPvlInclude(QString & paramName, std::vector<QString> & exclude);
     
     //! Create Pvl with the parameters in a user defined group given the Pvl object and group name
-    void CreatePVL(Isis::Pvl &pvlDef , std::string guiGrpName, std::string pvlObjName, 
-                   std::string pvlGrpName, std::vector<std::string> & exclude);
+    void CreatePVL(Isis::Pvl &pvlDef , QString guiGrpName, QString pvlObjName, 
+                   QString pvlGrpName, std::vector<QString> & exclude);
     
     // Test all parameters for valid values and conditions
     void VerifyAll();
 
-    bool StringToBool(Isis::IString value) const;
+    bool StringToBool(QString value) const;
 
     void CommandLine(Isis::Pvl &lab) const;
 
-    std::string Version() const;
+    QString Version() const;
 
 
   protected:
-    const IsisParameterData *ReturnParam(const std::string &paramName) const;
+    const IsisParameterData *ReturnParam(const QString &paramName) const;
 
 
   private:
@@ -359,7 +358,7 @@ class IsisAml : protected IsisAmlData {
 
     void Verify(const IsisParameterData *param);
     
-    void CheckFileNamePreference(std::string filename, std::string paramname);
+    void CheckFileNamePreference(QString filename, QString paramname);
 };
 
 

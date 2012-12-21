@@ -19,7 +19,7 @@ using std::vector;
 namespace Isis {
 
 
-  HiEqualization::HiEqualization(string fromListName) :
+  HiEqualization::HiEqualization(QString fromListName) :
       Equalization() {
     loadInputs(fromListName);
   }
@@ -32,7 +32,7 @@ namespace Isis {
   void HiEqualization::calculateStatistics() {
     // TODO member variable
     const FileList &imageList = getInputs();
-    IString maxCubeStr((int) imageList.size());
+    QString maxCubeStr = toString((int) imageList.size());
 
     // Adds statistics for whole and side regions of every cube
     vector<Statistics *> statsList;
@@ -43,13 +43,13 @@ namespace Isis {
       Statistics *statsLeft = new Statistics();
       Statistics *statsRight = new Statistics();
 
-      IString cubeStr((int) img + 1);
+      QString cubeStr = toString((int) img + 1);
 
       ProcessByLine p;
       p.Progress()->SetText("Calculating Statistics for Cube " +
           cubeStr + " of " + maxCubeStr);
       CubeAttributeInput att;
-      const string inp = imageList[img].toString();
+      QString inp = imageList[img].toString();
       p.SetInputCube(inp, att);
       HiCalculateFunctor func(stats, statsLeft, statsRight, 100.0);
       p.ProcessCubeInPlace(func, false);
@@ -89,8 +89,8 @@ namespace Isis {
   }
 
 
-  void HiEqualization::fillOutList(FileList &outList, string toListName) {
-    if (toListName.empty()) {
+  void HiEqualization::fillOutList(FileList &outList, QString toListName) {
+    if (toListName.isEmpty()) {
       generateOutputs(outList);
     }
     else {
@@ -104,12 +104,12 @@ namespace Isis {
   }
 
 
-  void HiEqualization::errorCheck(string fromListName) {
+  void HiEqualization::errorCheck(QString fromListName) {
     const FileList &imageList = getInputs();
 
     // Ensures number of images is within bound
     if (imageList.size() > 10) {
-      string msg = "The input file [" + fromListName +
+      QString msg = "The input file [" + fromListName +
         "] cannot contain more than 10 file names";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -132,14 +132,14 @@ namespace Isis {
         movedIndices.push_back(i);
       }
       catch (IException &e) {
-        string msg = "The [" + imageList[i].toString() +
+        QString msg = "The [" + imageList[i].toString() +
           "] file is not a valid HiRise image";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
       catch (...) {
         // If any part of the above didn't work, we can safely assume the
         // current file is not a valid HiRise image
-        string msg = "The [" + imageList[i].toString() +
+        QString msg = "The [" + imageList[i].toString() +
           "] file is not a valid HiRise image";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -160,7 +160,7 @@ namespace Isis {
 
     // Insertion sorts a list of filenames by their CCD numbers
     for (int i = 1; i < imageList.size(); i++) {
-      string temp = imageList[i].toString();
+      QString temp = imageList[i].toString();
       int ccd1 = ccds[i];
       int movedIndex = movedIndices[i];
 

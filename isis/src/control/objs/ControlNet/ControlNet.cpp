@@ -88,7 +88,7 @@ namespace Isis {
    * @param ptfile Name of file containing a Pvl list of control points
    * @param progress A pointer to the progress of reading in the control points
    */
-  ControlNet::ControlNet(const IString &ptfile, Progress *progress) {
+  ControlNet::ControlNet(const QString &ptfile, Progress *progress) {
     nullify();
 
     points = new QHash< QString, ControlPoint * >;
@@ -152,22 +152,22 @@ namespace Isis {
    *                           in ControlPoint.
    *
    */
-  void ControlNet::ReadControl(const IString &filename, Progress *progress) {
+  void ControlNet::ReadControl(const QString &filename, Progress *progress) {
     LatestControlNetFile *fileData = ControlNetVersioner::Read(filename);
 
     ControlNetFileHeaderV0002 &header = fileData->GetNetworkHeader();
-    p_networkId     = header.networkid();
+    p_networkId     = header.networkid().c_str();
     if (header.has_targetname()) {
-      SetTarget(header.targetname());
+      SetTarget(header.targetname().c_str());
     }
     else {
       SetTarget("");
     }
 
-    p_userName      = header.username();
-    p_created       = header.created();
-    p_modified      = header.lastmodified();
-    p_description   = header.description();
+    p_userName      = header.username().c_str();
+    p_created       = header.created().c_str();
+    p_modified      = header.lastmodified().c_str();
+    p_description   = header.description().c_str();
 
     QList< ControlPointFileEntryV0002 > &fileDataPoints =
       fileData->GetNetworkPoints();
@@ -210,17 +210,17 @@ namespace Isis {
    *                     and created this new method to determine format to
    *                     be written.
    */
-  void ControlNet::Write(const IString &ptfile, bool pvl) {
+  void ControlNet::Write(const QString &ptfile, bool pvl) {
     LatestControlNetFile *fileData = new LatestControlNetFile();
 
     ControlNetFileHeaderV0002 &header = fileData->GetNetworkHeader();
 
-    header.set_networkid(p_networkId);
-    header.set_targetname(p_targetName);
-    header.set_username(p_userName);
-    header.set_created(p_created);
-    header.set_lastmodified(p_modified);
-    header.set_description(p_description);
+    header.set_networkid(p_networkId.toAscii().data());
+    header.set_targetname(p_targetName.toAscii().data());
+    header.set_username(p_userName.toAscii().data());
+    header.set_created(p_created.toAscii().data());
+    header.set_lastmodified(p_modified.toAscii().data());
+    header.set_description(p_description.toAscii().data());
 
     QList< ControlPointFileEntryV0002 > &fileDataPoints =
       fileData->GetNetworkPoints();
@@ -295,7 +295,7 @@ namespace Isis {
     }
 
     if (!ContainsPoint(point->GetId())) {
-      IString msg = "ControlNet does not contain the point [";
+      QString msg = "ControlNet does not contain the point [";
       msg += point->GetId() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -353,7 +353,7 @@ namespace Isis {
     }
 
     if (!ContainsPoint(point->GetId())) {
-      IString msg = "ControlNet does not contain the point [";
+      QString msg = "ControlNet does not contain the point [";
       msg += point->GetId() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -362,7 +362,7 @@ namespace Isis {
     for (int i = 0; i < point->GetNumMeasures(); i++) {
       QString sn = point->GetMeasure(i)->GetCubeSerialNumber();
       if (!cubeGraphNodes->contains(sn)) {
-        IString msg = "Node does not exist for [";
+        QString msg = "Node does not exist for [";
         msg += measure->GetCubeSerialNumber() + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
@@ -397,7 +397,7 @@ namespace Isis {
    * @param point The point that needs to be updated.
    * @param oldId The pointId that the point had.
    */
-  void ControlNet::UpdatePointReference(ControlPoint *point, IString oldId) {
+  void ControlNet::UpdatePointReference(ControlPoint *point, QString oldId) {
     points->remove(oldId);
     (*points)[point->GetId()] = point;
     (*pointIds)[pointIds->indexOf((QString) oldId)] = (QString)point->GetId();
@@ -448,9 +448,9 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    IString serial = measure->GetCubeSerialNumber();
+    QString serial = measure->GetCubeSerialNumber();
     if (!cubeGraphNodes->contains(serial)) {
-      IString msg = "Node does not exist for [";
+      QString msg = "Node does not exist for [";
       msg += serial + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -605,7 +605,7 @@ namespace Isis {
    *
    * @param pointId The Point Id of the ControlPoint to be deleted.
    */
-  int ControlNet::DeletePoint(IString pointId) {
+  int ControlNet::DeletePoint(QString pointId) {
     if (!points->contains(pointId)) {
       IString msg = "point Id [" + pointId + "] does not exist in the network";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -674,7 +674,7 @@ namespace Isis {
    *
    * @returns True if the point is in the network, false otherwise.
    */
-  bool ControlNet::ContainsPoint(IString pointId) const {
+  bool ControlNet::ContainsPoint(QString pointId) const {
     return points->contains(pointId);
   }
 
@@ -844,10 +844,10 @@ namespace Isis {
       // Each edge connects two vertices: a point and a graph node.  So grab the
       // trees for each node and check that they're disjoint, and thus able to
       // be joined.
-      IString pointId = leastEdge->Parent()->GetId();
+      QString pointId = leastEdge->Parent()->GetId();
       ControlVertex *pointVertex = forest[pointId];
 
-      IString serialNum = leastEdge->ControlSN()->getSerialNumber();
+      QString serialNum = leastEdge->ControlSN()->getSerialNumber();
       ControlVertex *nodeVertex = forest[serialNum];
 
       // When the edge joins two different trees (i.e., they have different
@@ -915,7 +915,7 @@ namespace Isis {
    *
    * @returns A string representation of the cube graph
    */
-  IString ControlNet::CubeGraphToString() const {
+  QString ControlNet::CubeGraphToString() const {
     QStringList serials;
     QHashIterator < QString, ControlCubeGraphNode * > i(*cubeGraphNodes);
     while (i.hasNext()) {
@@ -961,7 +961,7 @@ namespace Isis {
    *
    * @param serialNumber the cube serial number to validate
    */
-  void ControlNet::ValidateSerialNumber(IString serialNumber) const {
+  void ControlNet::ValidateSerialNumber(QString serialNumber) const {
     if (!cubeGraphNodes->contains(serialNumber)) {
       IString msg = "Cube Serial Number [" + serialNumber + "] not found in "
           "the network";
@@ -975,7 +975,7 @@ namespace Isis {
    *
    * @returns A list of all measures which are in a given cube
    */
-  QList< ControlMeasure * > ControlNet::GetMeasuresInCube(IString serialNumber) {
+  QList< ControlMeasure * > ControlNet::GetMeasuresInCube(QString serialNumber) {
     ValidateSerialNumber(serialNumber);
     return (*cubeGraphNodes)[serialNumber]->getMeasures();
   }
@@ -1054,7 +1054,7 @@ namespace Isis {
    *
    * @param serialNumber The cube serial number to be removed from the network
    */
-  void ControlNet::DeleteMeasuresWithId(IString serialNumber) {
+  void ControlNet::DeleteMeasuresWithId(QString serialNumber) {
     ValidateSerialNumber(serialNumber);
 
     ControlCubeGraphNode *csn = (*cubeGraphNodes)[serialNumber];
@@ -1145,7 +1145,7 @@ namespace Isis {
    *
    * @return std::string
    */
-  IString ControlNet::CreatedDate() const {
+  QString ControlNet::CreatedDate() const {
     return p_created;
   }
 
@@ -1155,7 +1155,7 @@ namespace Isis {
    *
    * @return The description of this Control Network
    */
-  IString ControlNet::Description() const {
+  QString ControlNet::Description() const {
     return p_description;
   }
 
@@ -1172,10 +1172,10 @@ namespace Isis {
    * @return <B>ControlPoint*</B> Pointer to the ControlPoint
    *         closest to the given line, sample position
    */
-  ControlPoint *ControlNet::FindClosest(IString serialNumber,
+  ControlPoint *ControlNet::FindClosest(QString serialNumber,
       double sample, double line) {
     if (!cubeGraphNodes->contains(serialNumber)) {
-      IString msg = "serialNumber [";
+      QString msg = "serialNumber [";
       msg += serialNumber;
       msg += "] not found in ControlNet";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -1244,7 +1244,7 @@ namespace Isis {
   }
 
 
-  IString ControlNet::GetNetworkId() const {
+  QString ControlNet::GetNetworkId() const {
     return p_networkId;
   }
 
@@ -1302,7 +1302,7 @@ namespace Isis {
    *
    * @return Number of valid measures in image
    */
-  int ControlNet::GetNumberOfMeasuresInImage(const std::string &serialNumber) {
+  int ControlNet::GetNumberOfMeasuresInImage(const QString &serialNumber) {
     return p_cameraMeasuresMap[serialNumber];
   }
 
@@ -1312,7 +1312,7 @@ namespace Isis {
    *
    * @return Number of jigsaw rejected measures in image
    */
-  int ControlNet::GetNumberOfJigsawRejectedMeasuresInImage(const std::string &serialNumber) {
+  int ControlNet::GetNumberOfJigsawRejectedMeasuresInImage(const QString &serialNumber) {
     return p_cameraRejectedMeasuresMap[serialNumber];
   }
 
@@ -1333,7 +1333,7 @@ namespace Isis {
    * Increment number of jigsaw rejected measures in image specified by serialNumber
    *
    */
-  void ControlNet::IncrementNumberOfRejectedMeasuresInImage(const std::string &serialNumber) {
+  void ControlNet::IncrementNumberOfRejectedMeasuresInImage(const QString &serialNumber) {
     p_cameraRejectedMeasuresMap[serialNumber]++;
   }
 
@@ -1342,7 +1342,7 @@ namespace Isis {
    * Decrement number of jigsaw rejected measures in image specified by serialNumber
    *
    */
-  void ControlNet::DecrementNumberOfRejectedMeasuresInImage(const std::string &serialNumber) {
+  void ControlNet::DecrementNumberOfRejectedMeasuresInImage(const QString &serialNumber) {
     if (p_cameraRejectedMeasuresMap[serialNumber] > 0)
       p_cameraRejectedMeasuresMap[serialNumber]--;
   }
@@ -1406,13 +1406,13 @@ namespace Isis {
 
 
   //! Return the target name
-  IString ControlNet::GetTarget() const {
+  QString ControlNet::GetTarget() const {
     return p_targetName;
   }
 
 
   //! Return the user name
-  IString ControlNet::GetUserName() const {
+  QString ControlNet::GetUserName() const {
     return p_userName;
   }
 
@@ -1440,7 +1440,7 @@ namespace Isis {
    *
    * @param date The date this Control Network was created
    */
-  void ControlNet::SetCreatedDate(const IString &date) {
+  void ControlNet::SetCreatedDate(const QString &date) {
     p_created = date;
   }
 
@@ -1450,7 +1450,7 @@ namespace Isis {
     *
     * @param desc The description of this Control Network
     */
-  void ControlNet::SetDescription(const IString &newDescription) {
+  void ControlNet::SetDescription(const QString &newDescription) {
     p_description = newDescription;
   }
 
@@ -1460,7 +1460,7 @@ namespace Isis {
    *
    * @param imageListFile The list of images
    */
-  void ControlNet::SetImages(const IString &imageListFile) {
+  void ControlNet::SetImages(const QString &imageListFile) {
     SerialNumberList list(imageListFile);
     SetImages(list);
   }
@@ -1488,8 +1488,8 @@ namespace Isis {
     }
     // Open the camera for all the images in the serial number list
     for (int i = 0; i < list.Size(); i++) {
-      IString serialNumber = list.SerialNumber(i);
-      IString filename = list.FileName(i);
+      QString serialNumber = list.SerialNumber(i);
+      QString filename = list.FileName(i);
       Pvl pvl(filename);
 
       try {
@@ -1500,7 +1500,7 @@ namespace Isis {
         p_cameraList.push_back(cam);
       }
       catch (IException &e) {
-        IString msg = "Unable to create camera for cube file ";
+        QString msg = "Unable to create camera for cube file ";
         msg += filename;
         throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
@@ -1520,7 +1520,7 @@ namespace Isis {
         ControlMeasure *curMeasure = (*curPoint)[serialNums[m]];
 
         if (!curMeasure->IsIgnored()) {
-          IString serialNumber = curMeasure->GetCubeSerialNumber();
+          QString serialNumber = curMeasure->GetCubeSerialNumber();
           if (list.HasSerialNumber(serialNumber)) {
             curMeasure->SetCamera(p_cameraMap[serialNumber]);
 
@@ -1544,7 +1544,7 @@ namespace Isis {
    *
    * @param date The last date this Control Network was modified
    */
-  void ControlNet::SetModifiedDate(const IString &date) {
+  void ControlNet::SetModifiedDate(const QString &date) {
     p_modified = date;
   }
 
@@ -1554,7 +1554,7 @@ namespace Isis {
    *
    * @param id The Id of this Control Network
    */
-  void ControlNet::SetNetworkId(const IString &id) {
+  void ControlNet::SetNetworkId(const QString &id) {
     p_networkId = id;
   }
 
@@ -1564,7 +1564,7 @@ namespace Isis {
    *
    * @param target The name of the target of this Control Network
    */
-  void ControlNet::SetTarget(const IString &target) {
+  void ControlNet::SetTarget(const QString &target) {
     p_targetName = target;
 
     p_targetRadii.clear();
@@ -1591,7 +1591,7 @@ namespace Isis {
    *
    * @param name The name of the user creating or modifying this Control Net
    */
-  void ControlNet::SetUserName(const IString &name) {
+  void ControlNet::SetUserName(const QString &name) {
     p_userName = name;
   }
 

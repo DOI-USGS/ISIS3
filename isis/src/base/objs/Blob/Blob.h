@@ -59,26 +59,26 @@ namespace Isis {
    */
   class Blob {
     public:
-      Blob(const std::string &name, const std::string &type);
-      Blob(const std::string &name, const std::string &type,
-           const std::string &file);
+      Blob(const QString &name, const QString &type);
+      Blob(const QString &name, const QString &type,
+           const QString &file);
       Blob(const Blob &other);
       Blob &operator=(const Blob &other);
 
       virtual ~Blob();
 
-      std::string Type() const;
-      std::string Name() const;
+      QString Type() const;
+      QString Name() const;
       int Size() const;
       PvlObject &Label();
 
-      void Read(const std::string &file);
-      void Read(const std::string &file, const Pvl &pvlLabels);
+      void Read(const QString &file);
+      void Read(const QString &file, const Pvl &pvlLabels);
       virtual void Read(const Pvl &pvl, std::istream &is);
 
-      void Write(const std::string &file);
+      void Write(const QString &file);
       void Write(Pvl &pvl, std::fstream &stm,
-                 const std::string &detachedFileName = "");
+                 const QString &detachedFileName = "");
 
     protected:
       void Find(const Pvl &pvl);
@@ -88,14 +88,14 @@ namespace Isis {
       virtual void WriteData(std::fstream &os);
 
       PvlObject p_blobPvl;     //!< Pvl Blob object
-      std::string p_blobName;  //!< Name of the Blob object
+      QString p_blobName;  //!< Name of the Blob object
 
       char *p_buffer;          //!< Buffer blob data is stored in
       BigInt p_startByte;      //!< Byte blob data starts at in buffer
       int p_nbytes;            //!< Size of blob data (in bytes)
-      std::string p_type;      //!< Type of data stored in the buffer
-      std::string p_detached;  //!< Used for reading detached blobs
-      std::string p_labelFile; //!< The file containing the labels
+      QString p_type;      //!< Type of data stored in the buffer
+      QString p_detached;  //!< Used for reading detached blobs
+      QString p_labelFile; //!< The file containing the labels
   };
 };
 

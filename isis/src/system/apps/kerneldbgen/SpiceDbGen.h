@@ -25,16 +25,16 @@
  */
 
 #include <iostream>
-#include "FileName.h"
-#include "Pvl.h"
-#include "IString.h"
-#include "naif/SpiceUsr.h"
-#include "qstringlist.h"
-#include "KernelDb.h"
-#include "IException.h"
 
-using namespace std;
-using namespace Isis;
+#include <QStringList>
+
+#include <naif/SpiceUsr.h>
+
+#include "FileName.h"
+#include "IException.h"
+#include "IString.h"
+#include "KernelDb.h"
+#include "Pvl.h"
 
 /**
  * @brief Utility for SPICE kernel interrogation and kerneldb generation
@@ -43,23 +43,23 @@ using namespace Isis;
  *
  * @internal
  *   @history 2010-04-27 Stuart Sides - Modified Direct member to use a vector
- *                           of filters instead of a single string
+ *                           of filters instead of a single QString
  *
  */
 class SpiceDbGen {
 
   public:
-    SpiceDbGen(IString type);
-    PvlObject Direct(IString quality, IString location,
-                     std::vector<std::string> & filter);
-    void FurnishDependencies(string sclk, string fk);
+    SpiceDbGen(QString type);
+    Isis::PvlObject Direct(QString quality, QString location,
+                     std::vector<QString> & filter);
+    void FurnishDependencies(QString sclk, QString fk);
   private:
-    QStringList GetFiles(FileName location, IString filter);
-    PvlGroup AddSelection(FileName fileIn);
-    PvlGroup FormatIntervals(SpiceCell &coverage, string type);
-    PvlGroup GetIntervals(SpiceCell &cover);
+    QStringList GetFiles(Isis::FileName location, QString filter);
+    Isis::PvlGroup AddSelection(Isis::FileName fileIn);
+    Isis::PvlGroup FormatIntervals(SpiceCell &coverage, QString type);
+    Isis::PvlGroup GetIntervals(SpiceCell &cover);
     //private instance variables
-    IString p_type;
+    QString p_type;
     static const char *calForm;
 };
 

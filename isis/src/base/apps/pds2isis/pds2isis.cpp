@@ -12,8 +12,8 @@ void IsisMain() {
   Pvl label;
   UserInterface &ui = Application::GetUserInterface();
 
-  string labelFile = ui.GetFileName("FROM");
-  string imageFile("");
+  QString labelFile = ui.GetFileName("FROM");
+  QString imageFile("");
   if(ui.WasEntered("IMAGE")) {
     imageFile = ui.GetFileName("IMAGE");
   }

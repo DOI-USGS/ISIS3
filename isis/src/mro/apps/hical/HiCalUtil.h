@@ -1,4 +1,4 @@
-#if !defined(HiCalUtil_h)
+#ifndef HiCalUtil_h
 #define HiCalUtil_h
 /**
  * @file
@@ -85,8 +85,8 @@ inline int InValidCount(const HiVector &v) {
 inline int CpmmToCcd(int cpmm) {
   const int cpmm2ccd[] = {0,1,2,3,12,4,10,11,5,13,6,7,8,9};
   if ( (cpmm < 0) || (cpmm >= (int)(sizeof(cpmm2ccd)/sizeof(int))) ) {
-    std::string mess = "CpmmToCdd: Bad CpmmNumber (" + IString(cpmm) + ")";
-    throw IException(IException::User, mess.c_str(), _FILEINFO_);
+    QString mess = "CpmmToCdd: Bad CpmmNumber (" + toString(cpmm) + ")";
+    throw IException(IException::User, mess, _FILEINFO_);
   }
   return (cpmm2ccd[cpmm]);
 }
@@ -97,13 +97,13 @@ inline int CpmmToCcd(int cpmm) {
  *
  * @param ccd Ccd number of device
  */
-inline std::string CcdToFilter(int ccd) {
+inline QString CcdToFilter(int ccd) {
   if ( (ccd < 0) || (ccd > 13) ) {
-    std::string mess = "CcdToFilter: Bad Ccd Number (" + IString(ccd) + ")";
-    throw IException(IException::User, mess.c_str(), _FILEINFO_);
+    QString mess = "CcdToFilter: Bad Ccd Number (" + QString(ccd) + ")";
+    throw IException(IException::User, mess, _FILEINFO_);
   }
 
-  std::string filter;
+  QString filter;
   if ( ccd <= 9 )     { filter = "RED"; }
   else if (ccd <= 11) { filter = "IR";  }
   else                { filter = "BG";  }
@@ -216,11 +216,11 @@ inline HiVector averageSamples(const HiMatrix &m, int ssamp = 0,
  *
  */
 template <typename T>
-  T ConfKey(const DbProfile &conf, const std::string &keyname, const T &defval,
+  T ConfKey(const DbProfile &conf, const QString &keyname, const T &defval,
             int index = 0) {
   if (!conf.exists(keyname)) { return (defval); }
   if (conf.count(keyname) < index) { return (defval); }
-  IString iValue(conf.value(keyname, index));
+  QString iValue(conf.value(keyname, index));
   T value = iValue;  // This makes it work with a string?
   return (value);
 }
@@ -234,7 +234,7 @@ template <typename T>
  * @return int Converted value
  */
 template <typename T> int ToInteger(const T &value) {
-    return (IString(value).Trim(" \r\t\n").ToInteger());
+    return (QString(value).trimmed().toInt());
 }
 
 /**
@@ -246,7 +246,7 @@ template <typename T> int ToInteger(const T &value) {
  * @return double Converted value
  */
 template <typename T> double ToDouble(const T &value) {
-    return (IString(value).Trim(" \r\t\n").ToDouble());
+    return (QString(value).trimmed().toDouble());
 }
 
 /**
@@ -257,8 +257,8 @@ template <typename T> double ToDouble(const T &value) {
  *
  * @return string Converted value
  */
-template <typename T> std::string ToString(const T &value) {
-    return (IString(value).Trim(" \r\t\n"));
+template <typename T> QString ToString(const T &value) {
+    return (toString(value).trimmed());
 }
 
 /**
@@ -269,8 +269,8 @@ template <typename T> std::string ToString(const T &value) {
  *
  * @return bool True if they are equal w/o regard to case
  */
-inline bool IsEqual(const std::string &v1, const std::string &v2 = "TRUE") {
-    return (IString::UpCase(v1) == IString::UpCase(v2));
+inline bool IsEqual(const QString &v1, const QString &v2 = "TRUE") {
+    return (v1.toUpper() == v2.toUpper());
 }
 
 /**
@@ -287,8 +287,8 @@ inline bool IsEqual(const std::string &v1, const std::string &v2 = "TRUE") {
  * @return bool Returns true only if the keyword exists in the profile and it is
  *              the value expected.
  */
-inline bool IsTrueValue(const DbProfile &prof, const std::string &key,
-                   const std::string &value = "TRUE") {
+inline bool IsTrueValue(const DbProfile &prof, const QString &key,
+                   const QString &value = "TRUE") {
   if ( prof.exists(key) ) {
     return (IsEqual(prof(key), value));
   }
@@ -463,10 +463,10 @@ inline HiVector rebin(const HiVector &v, int n) {
 inline void RemoveHiBlobs(Pvl &label) {
   for ( int blob = 0 ; blob < label.Objects() ; blob++ ) {
     if ( label.Object(blob).IsNamed("Table") ) {
-      std::string name = label.Object(blob)["Name"][0];
-      if ( IString::Equal(name,"HiRISE Calibration Ancillary") ||
-           IString::Equal(name,"HiRISE Calibration Image")  ||
-           IString::Equal(name,"HiRISE Ancillary") ) {
+      QString name = label.Object(blob)["Name"][0];
+      if ( name.toLower() == "hirise calibration ancillary" ||
+           name.toLower() == "hirise calibration image" ||
+           name.toLower() == "hirise ancillary" ) {
         label.DeleteObject(blob);
         blob--;
       }

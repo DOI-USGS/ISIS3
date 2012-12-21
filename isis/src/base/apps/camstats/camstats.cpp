@@ -27,7 +27,7 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
 
-  string from = ui.GetFileName("FROM");
+  QString from = ui.GetFileName("FROM");
   int sinc = ui.GetInteger("SINC");
   int linc = ui.GetInteger("LINC");
   CameraStatistics camStats(cam, sinc, linc, from);
@@ -39,7 +39,7 @@ void IsisMain() {
   }
 
   if(ui.WasEntered("TO")) {
-    string outfile = FileName(ui.GetFileName("TO")).expanded();
+    QString outfile = FileName(ui.GetFileName("TO")).expanded();
     bool exists = FileName(outfile).fileExists();
     bool append = ui.GetBoolean("APPEND");
 
@@ -53,13 +53,13 @@ void IsisMain() {
       ofstream os;
       bool writeHeader = true;
       if(append) {
-        os.open(outfile.c_str(), ios::app);
+        os.open(outfile.toAscii().data(), ios::app);
         if(exists) {
           writeHeader = false;
         }
       }
       else {
-        os.open(outfile.c_str(), ios::out);
+        os.open(outfile.toAscii().data(), ios::out);
       }
 
       // if new file or append and no file exists then write header
@@ -134,7 +134,7 @@ void IsisMain() {
 
   if(ui.GetBoolean("ATTACH")) {
 
-    string cam_name = "CameraStatistics";
+    QString cam_name = "CameraStatistics";
 
     //Creates new CameraStatistics Table
     TableField fname("Name", Isis::TableField::Text, 20);
@@ -161,7 +161,7 @@ void IsisMain() {
       record[entry] = group.Name();
       entry++;
       for (int j = 0; j < group.Keywords(); j++) {
-        record[entry] = (double) group[j][0];
+        record[entry] = toDouble(group[j][0]);
         entry++;
       }
       table += record;

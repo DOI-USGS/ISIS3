@@ -22,8 +22,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
 #include <vector>
+
+#include <QString>
 
 namespace Isis {
   /**
@@ -47,7 +48,7 @@ namespace Isis {
   class CalParameters {
     public:
       // Constructor
-      CalParameters(const std::string &fname);
+      CalParameters(const QString &fname);
 
       /**
        * Calculates and returns time based offset at specified line and sample
@@ -112,7 +113,7 @@ namespace Isis {
        *
        * @return string Gain file
        */
-      inline std::string GainFile() {
+      inline QString GainFile() {
         return p_gainFile;
       }
 
@@ -121,7 +122,7 @@ namespace Isis {
        *
        * @return string Offset file
        */
-      inline std::string OffsetFile() {
+      inline QString OffsetFile() {
         return p_offsetFile;
       }
 
@@ -224,13 +225,13 @@ namespace Isis {
       }
 
     private:
-      void vikcalSetup(std::string mission, int spn, std::string target,
-                       int cam, std::string wav, int cs1, int cs2, int cs3, int cs4);
-      void viklinSetup(std::string mission, int spn, std::string target,
-                       int cam, std::string wav, int cs1, int cs2, int cs3, int cs4);
-      void vikoffSetup(std::string mission, int spn, std::string target,
+      void vikcalSetup(QString mission, int spn, QString target,
+                       int cam, QString wav, int cs1, int cs2, int cs3, int cs4);
+      void viklinSetup(QString mission, int spn, QString target,
+                       int cam, QString wav, int cs1, int cs2, int cs3, int cs4);
+      void vikoffSetup(QString mission, int spn, QString target,
                        int cam, double clock, int cs3);
-      void CalcSunDist(std::string t);
+      void CalcSunDist(QString t);
 
       double p_labexp;           //!<Exposure Duration from cube label
       double p_w0;               //!<Omega0 from vikcal.sav file
@@ -238,8 +239,8 @@ namespace Isis {
       double p_gain;             //!<Gain from vikcal.sav file
       double p_offset;           //!<Offset from vikcal.sav file
       double p_exp;              //!<Exposure from vikcal.sav file
-      std::string p_gainFile;    //!<Gain file from vikcal.sav file
-      std::string p_offsetFile;  //!<Offset file from vikcal.sav file
+      QString p_gainFile;    //!<Gain file from vikcal.sav file
+      QString p_offsetFile;  //!<Offset file from vikcal.sav file
       double p_b;                //!<Linearity correction from viklin.sav file
       int p_k;                   //!<Linearity power from viklin.sav file
       double p_normpow;          //!<Normalizing power from viklin.sav file

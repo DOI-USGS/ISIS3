@@ -23,7 +23,8 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
+#include <QString>
+
 #include <tnt/tnt_array2d.h>
 
 namespace Isis {
@@ -110,10 +111,10 @@ namespace Isis {
   class Blobber {
     public:
       Blobber();
-      Blobber(const std::string &blobname, const std::string &fieldname,
-              const std::string &name = "Blob");
-      Blobber(Cube &cube, const std::string &blobname,
-              const std::string &fieldname, const std::string &name = "Blob");
+      Blobber(const QString &blobname, const QString &fieldname,
+              const QString &name = "Blob");
+      Blobber(Cube &cube, const QString &blobname,
+              const QString &fieldname, const QString &name = "Blob");
       /** Destructor of this object */
       virtual ~Blobber() { }
 
@@ -128,7 +129,7 @@ namespace Isis {
        *
        * @param name Unique name
        */
-      void setName(const std::string &name) {
+      void setName(const QString &name) {
         _name = name;
       }
 
@@ -141,7 +142,7 @@ namespace Isis {
        *
        * @param bname Blobber name
        */
-      void setBlobName(const std::string &bname) {
+      void setBlobName(const QString &bname) {
         _blobname = bname;
       }
 
@@ -153,7 +154,7 @@ namespace Isis {
        *
        * @param fname Field name
        */
-      void setFieldName(const std::string &fname) {
+      void setFieldName(const QString &fname) {
         _fieldname = fname;
       }
 
@@ -184,7 +185,7 @@ namespace Isis {
        * Returns the name of the BLOB given to refer to this instantiation
        * @return Name of BLOB instance
        */
-      std::string getName() const {
+      QString getName() const {
         return (_name);
       }
 
@@ -192,7 +193,7 @@ namespace Isis {
        * @brief Retrieves the name of the Table object
        * @return (string) Name of the Table
        */
-      std::string getBlobName() const {
+      QString getBlobName() const {
         return (_blobname);
       }
 
@@ -200,7 +201,7 @@ namespace Isis {
        * @brief Retreive the name of the field in the Tabel object BLOB
        * @return (string) Name of the BLOB field
        */
-      std::string getFieldName() const {
+      QString getFieldName() const {
         return (_fieldname);
       }
 
@@ -235,7 +236,7 @@ namespace Isis {
       }
 
 //  Load options for reading the BLOB from ISIS files
-      void load(const std::string &filename);
+      void load(const QString &filename);
       void load(Cube &cube);
 
 
@@ -252,9 +253,9 @@ namespace Isis {
       }
 
     private:
-      std::string _blobname;    //!<  Name of BLOB to read
-      std::string _fieldname;   //!<  Name of field in BLOB to read
-      std::string _name;        //!<  Name of this data set
+      QString _blobname;    //!<  Name of BLOB to read
+      QString _fieldname;   //!<  Name of field in BLOB to read
+      QString _name;        //!<  Name of this data set
       BlobBuf     _buf;         //!<  Buffer holding data
 
 //  Low/level I/O and conversion methods

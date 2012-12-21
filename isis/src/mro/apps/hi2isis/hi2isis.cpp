@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 #include <cstdio>
-#include <string>
+#include <QString>
 
 #include "ProcessImportPds.h"
 #include "ProcessByLine.h"
@@ -64,31 +64,29 @@ void IsisMain() {
 
   // Get the input filename and make sure it is a HiRISE EDR
   FileName inFile = ui.GetFileName("FROM");
-  IString id;
+  QString id;
   bool projected;
   try {
     Pvl lab(inFile.expanded());
-    id = (string) lab.FindKeyword("DATA_SET_ID");
+    id = (QString) lab.FindKeyword("DATA_SET_ID");
     projected = lab.HasObject("IMAGE_MAP_PROJECTION");
   }
   catch(IException &e) {
-    string msg = "Unable to read [DATA_SET_ID] from input file [" +
+    QString msg = "Unable to read [DATA_SET_ID] from input file [" +
                  inFile.expanded() + "]";
     throw IException(e, IException::Io, msg, _FILEINFO_);
   }
 
   //Checks if in file is rdr
   if(projected) {
-    string msg = "[" + inFile.name() + "] appears to be an rdr file.";
+    QString msg = "[" + inFile.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  id.ConvertWhiteSpace();
-  id.Compress();
-  id.Trim(" ");
+  id = id.simplified().trimmed();
   if(id != "MRO-M-HIRISE-2-EDR-V1.0") {
-    string msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
+    QString msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
                  "in HiRISE EDR format. DATA_SET_ID is [" + id + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
@@ -135,7 +133,7 @@ void IsisMain() {
   // The user wants it unlutted
   else if(ui.GetBoolean("UNLUT")) {
     for(int i = 0; i < lutSeq.Size(); i++) {
-      stretch.AddPair(i, (((double)lutSeq[i][0] + (double)lutSeq[i][1]) / 2.0));
+      stretch.AddPair(i, ((toDouble(lutSeq[i][0]) + toDouble(lutSeq[i][1])) / 2.0));
     }
     instgrp.AddKeyword(PvlKeyword("Unlutted", "TRUE"));
     instgrp.DeleteKeyword("LookupTable");
@@ -165,7 +163,7 @@ void IsisMain() {
   // counts
   lsbGap = ui.GetBoolean("LSBGAP");
   ProcessByLine p2;
-  string ioFile = ui.GetFileName("TO");
+  QString ioFile = ui.GetFileName("TO");
   CubeAttributeInput att;
   p2.SetInputCube(ioFile, att, ReadWrite);
   p2.Progress()->SetText("Converting special pixels");
@@ -178,47 +176,47 @@ void IsisMain() {
   PvlGroup results("Results");
   results += PvlKeyword("From", inFile.expanded());
 
-  results += PvlKeyword("CalibrationBufferGaps", gapCount[0]);
-  results += PvlKeyword("CalibrationBufferLIS", lisCount[0]);
-  results += PvlKeyword("CalibrationBufferHIS", hisCount[0]);
-  results += PvlKeyword("CalibrationBufferPossibleGaps", suspectGapCount[0]);
-  results += PvlKeyword("CalibrationBufferInvalid", invalidCount[0]);
-  results += PvlKeyword("CalibrationBufferValid", validCount[0]);
+  results += PvlKeyword("CalibrationBufferGaps", toString(gapCount[0]));
+  results += PvlKeyword("CalibrationBufferLIS", toString(lisCount[0]));
+  results += PvlKeyword("CalibrationBufferHIS", toString(hisCount[0]));
+  results += PvlKeyword("CalibrationBufferPossibleGaps", toString(suspectGapCount[0]));
+  results += PvlKeyword("CalibrationBufferInvalid", toString(invalidCount[0]));
+  results += PvlKeyword("CalibrationBufferValid", toString(validCount[0]));
 
-  results += PvlKeyword("CalibrationImageGaps", gapCount[1]);
-  results += PvlKeyword("CalibrationImageLIS", lisCount[1]);
-  results += PvlKeyword("CalibrationImageHIS", hisCount[1]);
-  results += PvlKeyword("CalibrationImagePossibleGaps", suspectGapCount[1]);
-  results += PvlKeyword("CalibrationImageInvalid", invalidCount[1]);
-  results += PvlKeyword("CalibrationImageValid", validCount[1]);
+  results += PvlKeyword("CalibrationImageGaps", toString(gapCount[1]));
+  results += PvlKeyword("CalibrationImageLIS", toString(lisCount[1]));
+  results += PvlKeyword("CalibrationImageHIS", toString(hisCount[1]));
+  results += PvlKeyword("CalibrationImagePossibleGaps", toString(suspectGapCount[1]));
+  results += PvlKeyword("CalibrationImageInvalid", toString(invalidCount[1]));
+  results += PvlKeyword("CalibrationImageValid", toString(validCount[1]));
 
-  results += PvlKeyword("CalibrationDarkGaps", gapCount[2]);
-  results += PvlKeyword("CalibrationDarkLIS", lisCount[2]);
-  results += PvlKeyword("CalibrationDarkHIS", hisCount[2]);
-  results += PvlKeyword("CalibrationDarkPossibleGaps", suspectGapCount[2]);
-  results += PvlKeyword("CalibrationDarkInvalid", invalidCount[2]);
-  results += PvlKeyword("CalibrationDarkValid", validCount[2]);
+  results += PvlKeyword("CalibrationDarkGaps", toString(gapCount[2]));
+  results += PvlKeyword("CalibrationDarkLIS", toString(lisCount[2]));
+  results += PvlKeyword("CalibrationDarkHIS", toString(hisCount[2]));
+  results += PvlKeyword("CalibrationDarkPossibleGaps", toString(suspectGapCount[2]));
+  results += PvlKeyword("CalibrationDarkInvalid", toString(invalidCount[2]));
+  results += PvlKeyword("CalibrationDarkValid", toString(validCount[2]));
 
-  results += PvlKeyword("ObservationBufferGaps", gapCount[3]);
-  results += PvlKeyword("ObservationBufferLIS", lisCount[3]);
-  results += PvlKeyword("ObservationBufferHIS", hisCount[3]);
-  results += PvlKeyword("ObservationBufferPossibleGaps", suspectGapCount[3]);
-  results += PvlKeyword("ObservationBufferInvalid", invalidCount[3]);
-  results += PvlKeyword("ObservationBufferValid", validCount[3]);
+  results += PvlKeyword("ObservationBufferGaps", toString(gapCount[3]));
+  results += PvlKeyword("ObservationBufferLIS", toString(lisCount[3]));
+  results += PvlKeyword("ObservationBufferHIS", toString(hisCount[3]));
+  results += PvlKeyword("ObservationBufferPossibleGaps", toString(suspectGapCount[3]));
+  results += PvlKeyword("ObservationBufferInvalid", toString(invalidCount[3]));
+  results += PvlKeyword("ObservationBufferValid", toString(validCount[3]));
 
-  results += PvlKeyword("ObservationImageGaps", gapCount[4]);
-  results += PvlKeyword("ObservationImageLIS", lisCount[4]);
-  results += PvlKeyword("ObservationImageHIS", hisCount[4]);
-  results += PvlKeyword("ObservationImagePossibleGaps", suspectGapCount[4]);
-  results += PvlKeyword("ObservationImageInvalid", invalidCount[4]);
-  results += PvlKeyword("ObservationImageValid", validCount[4]);
+  results += PvlKeyword("ObservationImageGaps", toString(gapCount[4]));
+  results += PvlKeyword("ObservationImageLIS", toString(lisCount[4]));
+  results += PvlKeyword("ObservationImageHIS", toString(hisCount[4]));
+  results += PvlKeyword("ObservationImagePossibleGaps", toString(suspectGapCount[4]));
+  results += PvlKeyword("ObservationImageInvalid", toString(invalidCount[4]));
+  results += PvlKeyword("ObservationImageValid", toString(validCount[4]));
 
-  results += PvlKeyword("ObservationDarkGaps", gapCount[5]);
-  results += PvlKeyword("ObservationDarkLIS", lisCount[5]);
-  results += PvlKeyword("ObservationDarkHIS", hisCount[5]);
-  results += PvlKeyword("ObservationDarkPossibleGaps", suspectGapCount[5]);
-  results += PvlKeyword("ObservationDarkInvalid", invalidCount[5]);
-  results += PvlKeyword("ObservationDarkValid", validCount[5]);
+  results += PvlKeyword("ObservationDarkGaps", toString(gapCount[5]));
+  results += PvlKeyword("ObservationDarkLIS", toString(lisCount[5]));
+  results += PvlKeyword("ObservationDarkHIS", toString(hisCount[5]));
+  results += PvlKeyword("ObservationDarkPossibleGaps", toString(suspectGapCount[5]));
+  results += PvlKeyword("ObservationDarkInvalid", toString(invalidCount[5]));
+  results += PvlKeyword("ObservationDarkValid", toString(validCount[5]));
 
   // Write the results to the log
   Application::Log(results);
@@ -234,7 +232,7 @@ void TranslateHiriseEdrLabels(FileName &labelFile, Cube *ocube) {
 
   // Get the directory where the MRO HiRISE translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  IString transDir = (string) dataDir["Mro"] + "/translations/";
+  QString transDir = (QString) dataDir["Mro"] + "/translations/";
 
   // Get a filename for the HiRISE EDR label
   Pvl labelPvl(labelFile.expanded());
@@ -257,7 +255,7 @@ void TranslateHiriseEdrLabels(FileName &labelFile, Cube *ocube) {
   // Create the Instrument group keyword CcdId from the ProductId
   // SCS 28-03-06 Do it in the instrument translation table instead of here
 //  PvlGroup &archiveGroup(outLabel.FindGroup("Archive", Pvl::Traverse));
-//  IString productId = (string)archiveGroup.FindKeyword("ProductId");
+//  QString productId = (QString)archiveGroup.FindKeyword("ProductId");
 //  productId.Token("_");
 //  productId.Token("_");
 //  productId = productId.Token("_");

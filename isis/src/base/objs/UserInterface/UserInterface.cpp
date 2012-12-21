@@ -49,7 +49,7 @@ namespace Isis {
    *
    * @param argv[] Array of arguments
    */
-  UserInterface::UserInterface(const std::string &xmlfile, int &argc,
+  UserInterface::UserInterface(const QString &xmlfile, int &argc,
                                char *argv[]) :
       IsisAml::IsisAml(xmlfile) {
     p_interactive = false;
@@ -117,7 +117,7 @@ namespace Isis {
     }
 
     // Check for special tokens (those beginning with a dash)
-    vector< string > options;
+    vector< QString > options;
     options.push_back("-GUI");
     options.push_back("-NOGUI");
     options.push_back("-BATCHLIST");
@@ -138,12 +138,12 @@ namespace Isis {
 
     // Use an initial pass to find conflicting parameters
     for(unsigned int currArgument = 1; currArgument < (unsigned) argc; currArgument ++) {
-      string paramName;
-      vector< string > paramValue;
+      QString paramName;
+      vector< QString > paramValue;
 
       GetNextParameter(currArgument, paramName, paramValue);
 
-      paramName = ((IString) paramName).UpCase();
+      paramName = paramName.toUpper();
 
       // -LAST needs to be evaluated first to prevent incorrect errors from IsisAml
       if(paramName == "-LAST") {
@@ -153,14 +153,14 @@ namespace Isis {
     }
 
     for(unsigned int currArgument = 1; currArgument < (unsigned) argc; currArgument ++) {
-      string paramName;
-      vector< string > paramValue;
+      QString paramName;
+      vector< QString > paramValue;
 
       GetNextParameter(currArgument, paramName, paramValue);
 
       // we now have a name,value pair
       if(paramName[0] == '-') {
-        paramName = ((IString) paramName).UpCase();
+        paramName = paramName.toUpper();
 
         // Prevent double handling of conflicting parameters handled in first pass
         if(paramName == "-LAST") {
@@ -168,7 +168,7 @@ namespace Isis {
         }
 
         if(paramValue.size() > 1) {
-          string msg = "Invalid value for reserve parameter ["
+          QString msg = "Invalid value for reserve parameter ["
                        + paramName + "]";
           throw IException(IException::User, msg, _FILEINFO_);
         }
@@ -178,10 +178,10 @@ namespace Isis {
 
         for(int option = 0; option < (int) options.size(); option ++) {
           // If our option starts with the parameter name so far, this is it
-          if(options[option].find(paramName) == 0) {
+          if(options[option].startsWith(paramName)) {
             if(matchOption >= 0) {
-              string msg = "Ambiguous Reserve Parameter ["
-                           + paramName + "]. Please clarify.";
+              QString msg = "Ambiguous Reserve Parameter ["
+                            + paramName + "]. Please clarify.";
               throw IException(IException::User, msg,  _FILEINFO_);
             }
 
@@ -190,10 +190,10 @@ namespace Isis {
         }
 
         if(matchOption < 0) {
-          string msg = "Invalid Reserve Parameter Option ["
-                       + paramName + "]. Choices are ";
+          QString msg = "Invalid Reserve Parameter Option ["
+                        + paramName + "]. Choices are ";
 
-          IString msgOptions;
+          QString msgOptions;
           for(int option = 0; option < (int) options.size() - 1; option ++) {
             // Make sure not to show -PID as an option
             if(options[option].compare("-PID") != 0) {
@@ -218,7 +218,7 @@ namespace Isis {
           usedDashLast = true;
         }
 
-        IString realValue = "";
+        QString realValue = "";
 
         if(paramValue.size())
           realValue = paramValue[0];
@@ -240,7 +240,7 @@ namespace Isis {
     // Can't use the batchlist with the gui, save, last or restore option
     if(BatchListSize() != 0 && (p_interactive || usedDashLast
                                 || p_saveFile != "")) {
-      string msg =
+      QString msg =
         "-BATCHLIST cannot be used with -GUI, -SAVE, -RESTORE, ";
       msg += "or -LAST";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -248,7 +248,7 @@ namespace Isis {
 
     // Must use batchlist if using errorlist or onerror=continue
     if((BatchListSize() == 0) && (!p_abortOnError || p_errList != "")) {
-      string msg =
+      QString msg =
         "-ERRLIST and -ONERROR=continue cannot be used without ";
       msg += " the -BATCHLIST option";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -265,19 +265,19 @@ namespace Isis {
    * @param value Resulting array of parameter values (usually just 1 element)
    */
   void UserInterface::GetNextParameter(unsigned int &curPos,
-                                       std::string &name, std::vector< std::string > &value) {
-    IString paramName = p_cmdline[curPos];
-    IString paramValue = "";
+                                       QString &name, std::vector< QString > &value) {
+    QString paramName = p_cmdline[curPos];
+    QString paramValue = "";
 
     // we need to split name and value, they can either be in 1, 2 or 3 arguments,
     //   try to see if "=" is end of argument to distinguish. Some options have no
     //   "=" and they are value-less (-gui for example).
-    if(paramName.find("=") == string::npos) {
+    if(!paramName.contains("=")) {
       // This looks value-less, but lets make sure
       //   the next argument is not an equals sign by
       //   itself
       if(curPos < p_cmdline.size() - 2) {
-        if(string(p_cmdline[curPos + 1]).compare("=") == 0) {
+        if(QString(p_cmdline[curPos + 1]).compare("=") == 0) {
           paramValue = p_cmdline[curPos + 2];
 
           // increment extra to skip 2 elements next time around
@@ -286,8 +286,8 @@ namespace Isis {
       }
     }
     // = is end of parameter, next item must be value
-    else if(paramName.find("=") == paramName.size() - 1) {
-      paramName = paramName.substr(0, paramName.size() - 1);
+    else if(paramName.endsWith("=")) {
+      paramName = paramName.mid(0, paramName.size() - 1);
 
       if(curPos + 1 < p_cmdline.size()) {
         paramValue = p_cmdline[curPos + 1];
@@ -297,17 +297,17 @@ namespace Isis {
       curPos ++ ;
     }
     // we found "=" in the middle
-    else if(paramName.find("=") != 0) {
-      string parameterLiteral = p_cmdline[curPos];
+    else if(paramName.indexOf("=") > 0) {
+      QString parameterLiteral = p_cmdline[curPos];
       paramName
-      = parameterLiteral.substr(0, parameterLiteral.find("="));
-      paramValue = parameterLiteral.substr(parameterLiteral.find("=")
-                                           + 1);
+      = parameterLiteral.mid(0, parameterLiteral.indexOf("="));
+      paramValue = parameterLiteral.mid(parameterLiteral.indexOf("=")
+                                          + 1);
     }
     // We found "=" at the beginning - did we find "appname param =value" ?
     else {
       // parameters can not start with "="
-      string msg = "Unknown parameter [" + string(p_cmdline[curPos])
+      QString msg = "Unknown parameter [" + QString(p_cmdline[curPos])
                    + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -316,21 +316,21 @@ namespace Isis {
     value.clear();
 
     // read arrays out of paramValue
-    paramValue = paramValue.Trim(" ");
+    paramValue = paramValue.trimmed();
 
     if(paramValue.length() > 0 && paramValue[0] != '(') {
       // We dont have an array... if they escaped
       //  an open paren, undo their escape
 
       // escape: \( result: (
-      if(paramValue.length() > 1 && paramValue.substr(0, 2).compare(
-            "\\(") == 0) {
-        paramValue = paramValue.substr(1);
+      if(paramValue.length() > 1 && paramValue.mid(0, 2) ==
+            "\\(") {
+        paramValue = paramValue.mid(1);
       }
       // escape: \\( result: \(
       else if(paramValue.length() > 2
-              && paramValue.substr(0, 4).compare("\\\\(") == 0) {
-        paramValue = paramValue.substr(1);
+              && paramValue.mid(0, 4) == "\\\\(") {
+        paramValue = paramValue.mid(1);
       }
 
       value.push_back(paramValue);
@@ -347,21 +347,21 @@ namespace Isis {
    * @param arrayString Parameter value containing an array of
    *   format (a,b,c)
    *
-   * @return std::vector<std::string> Values in the array string
+   * @return std::vector<QString> Values in the array QString
    */
-  std::vector< std::string > UserInterface::ReadArray(IString arrayString) {
-    std::vector< std::string > values;
+  std::vector< QString > UserInterface::ReadArray(QString arrayString) {
+    std::vector< QString > values;
 
     bool inDoubleQuotes = false;
     bool inSingleQuotes = false;
     bool arrayClosed = false;
     bool nextElementStarted = false;
-    IString currElement = "";
+    QString currElement = "";
 
-    for(unsigned int strPos = 0; strPos < arrayString.size(); strPos ++) {
+    for(int strPos = 0; strPos < arrayString.size(); strPos ++) {
       if(strPos == 0) {
         if(arrayString[strPos] != '(') {
-          string msg = "Invalid array format [" + arrayString + "]";
+          QString msg = "Invalid array format [" + arrayString + "]";
           throw IException(IException::User, msg, _FILEINFO_);
         }
 
@@ -369,21 +369,21 @@ namespace Isis {
       }
 
       // take literally anything that is escaped and not quoted
-      if(arrayString[strPos] == '\\' && strPos + 1 < arrayString.size()) {
+      if(arrayString[strPos] == '\\' && strPos + 1 < (int)arrayString.size()) {
         currElement += arrayString[strPos+1];
         strPos ++;
         continue;
       }
       // ends in a backslash??
       else if(arrayString[strPos] == '\\') {
-        string msg = "Invalid array format [" + arrayString + "]";
+        QString msg = "Invalid array format [" + arrayString + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
-      // not in quoted part of string
+      // not in quoted part of QString
       if(!inDoubleQuotes && !inSingleQuotes) {
         if(arrayClosed) {
-          string msg = "Invalid array format [" + arrayString + "]";
+          QString msg = "Invalid array format [" + arrayString + "]";
           throw IException(IException::User, msg, _FILEINFO_);
         }
 
@@ -415,7 +415,7 @@ namespace Isis {
           bool onlyWhite = true;
           int closingPos = strPos + 1;
 
-          for(unsigned int pos = strPos;
+          for(int pos = strPos;
               onlyWhite && arrayString[pos] != ',' && arrayString[pos] != ')' &&
               pos < arrayString.size(); pos++) {
             closingPos ++;
@@ -451,7 +451,7 @@ namespace Isis {
 
 
     if(!arrayClosed || currElement != "") {
-      string msg = "Invalid array format [" + arrayString + "]";
+      QString msg = "Invalid array format [" + arrayString + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -464,8 +464,8 @@ namespace Isis {
    * @param name "-OPTIONNAME"
    * @param value Value of the option, if supplied (-name=value)
    */
-  void UserInterface::EvaluateOption(const std::string name,
-                                     const std::string value) {
+  void UserInterface::EvaluateOption(const QString name,
+                                     const QString value) {
     Preference &p = Preference::Preferences();
 
     if(name == "-GUI") {
@@ -479,7 +479,7 @@ namespace Isis {
     }
     else if(name == "-LAST") {
       PvlGroup &grp = p.FindGroup("UserInterface", Isis::Pvl::Traverse);
-      IString histFile = grp["HistoryPath"][0] + "/" + FileName(
+      QString histFile = grp["HistoryPath"][0] + "/" + FileName(
                            p_progName).name() + ".par";
 
       LoadHistory(histFile);
@@ -490,7 +490,7 @@ namespace Isis {
     else if(name == "-WEBHELP") {
       Isis::PvlGroup &pref = Isis::Preference::Preferences().FindGroup(
                                "UserInterface");
-      string command = pref["GuiHelpBrowser"];
+      QString command = pref["GuiHelpBrowser"];
       command += " $ISISROOT/doc/Application/presentation/Tabbed/";
       command += FileName(p_progName).name() + "/" + FileName(
                    p_progName).name() + ".html";
@@ -517,7 +517,7 @@ namespace Isis {
             }
             else {
               PvlKeyword key(ParamName(k, j));
-              string def = ParamDefault(k, j);
+              QString def = ParamDefault(k, j);
               for(int l = 0; l < ParamListSize(k, j); l ++) {
                 if(ParamListValue(k, j, l) == def)
                   key.AddValue("*" + def);
@@ -533,7 +533,7 @@ namespace Isis {
       else {
         Pvl param;
         param.SetTerminator("");
-        string key = value;
+        QString key = value;
         for(int k = 0; k < NumGroups(); k ++) {
           for(int j = 0; j < NumParams(k); j ++) {
             if(ParamName(k, j) == key) {
@@ -662,31 +662,31 @@ namespace Isis {
       exit(0);
     }
     else if(name == "-PID") {
-      p_parentId = IString(value).ToInteger();
+      p_parentId = toInt(value);
     }
     else if(name == "-ERRLIST") {
       p_errList = value;
 
       if(value == "") {
-        string msg = "-ERRLIST expects a file name";
+        QString msg = "-ERRLIST expects a file name";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
       if(FileName(p_errList).fileExists()) {
-        remove(p_errList.c_str());
+        QFile::remove(p_errList);
       }
     }
     else if(name == "-ONERROR") {
-      if(IString(value).UpCase() == "CONTINUE") {
+      if(value.toUpper() == "CONTINUE") {
         p_abortOnError = false;
       }
 
-      else if(IString(value).UpCase() == "ABORT") {
+      else if(value.toUpper() == "ABORT") {
         p_abortOnError = true;
       }
 
       else {
-        string
+        QString
         msg =
           "[" + value
           + "] is an invalid value for -ONERROR, options are ABORT or CONTINUE";
@@ -705,7 +705,7 @@ namespace Isis {
       p.Load(value);
     }
     else if(name == "-LOG") {
-      if(value.empty()) {
+      if(value.isEmpty()) {
         p.FindGroup("SessionLog")["FileOutput"].SetValue("On");
       }
       else {
@@ -719,7 +719,7 @@ namespace Isis {
 
     // Can't have a parent id and the gui
     if(p_parentId > 0 && p_interactive) {
-      string msg = "-GUI and -PID are incompatible arguments";
+      QString msg = "-GUI and -PID are incompatible arguments";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
@@ -733,14 +733,14 @@ namespace Isis {
    *           columns in the batchlist file to 10.
    * @throws Isis::IException::User - The batchlist does not contain any data
    */
-  void UserInterface::LoadBatchList(const std::string file) {
+  void UserInterface::LoadBatchList(const QString file) {
     // Read in the batch list
     TextFile temp;
     try {
       temp.Open(file);
     }
     catch (IException &e) {
-      string msg = "The batchlist file [" + file
+      QString msg = "The batchlist file [" + file
                    + "] could not be opened";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -748,42 +748,42 @@ namespace Isis {
     p_batchList.resize(temp.LineCount());
 
     for(int i = 0; i < temp.LineCount(); i ++) {
-      IString t;
+      QString t;
       temp.GetLine(t);
 
       // Convert tabs to spaces but leave tabs inside quotes alone
-      t.Replace("\t", " ", true);
+      t = IString(t).Replace("\t", " ", true).ToQt();
 
-      t.Compress();
-      t.Trim(" ");
+      t = IString(t).Compress().ToQt().trimmed();
       // Allow " ," " , " or ", " as a valid single seperator
-      t.Replace(" ,", ",", true);
-      t.Replace(", ", ",", true);
+      t = IString(t).Replace(" ,", ",", true).ToQt();
+      t = IString(t).Replace(", ", ",", true).ToQt();
       // Convert all spaces to "," the use "," as delimiter
-      t.Replace(" ", ",", true);
+      t = IString(t).Replace(" ", ",", true).ToQt();
       int j = 0;
-      IString token = t.Token(",");
 
-      while(token != "") {
+      QStringList tokens = t.split(",");
+
+      foreach(QString token, tokens) {
         // removes quotes from tokens. NOTE: also removes escaped quotes.
-        token = token.Remove("\"'");
+        token = token.remove(QRegExp("[\"']"));
         p_batchList[i].push_back(token);
-        token = t.Token(",");
         j ++ ;
       }
+
       p_batchList[i].resize(j);
       // Every row in the batchlist must have the same number of columns
       if(i == 0)
         continue;
       if(p_batchList[i - 1].size() != p_batchList[i].size()) {
-        string msg =
+        QString msg =
           "The number of columns must be constant in batchlist";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     // The batchlist cannot be empty
     if(p_batchList.size() < 1) {
-      string msg = "The list file [" + file
+      QString msg = "The list file [" + file
                    + "] does not contain any data";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -800,7 +800,7 @@ namespace Isis {
    *                                  history file
    * @throws Isis::iException::User - Parameter history file does not exist
    */
-  void UserInterface::LoadHistory(const std::string file) {
+  void UserInterface::LoadHistory(const QString file) {
     Isis::FileName hist(file);
     if(hist.fileExists()) {
       try {
@@ -810,9 +810,9 @@ namespace Isis {
         if(g >= 0 && lab.Group(g).IsNamed("UserParameters")) {
           Isis::PvlGroup &up = lab.Group(g);
           for(int k = 0; k < up.Keywords(); k ++) {
-            string keyword = up[k].Name();
+            QString keyword = up[k].Name();
 
-            vector<string> values;
+            vector<QString> values;
 
             for(int i = 0; i < up[k].Size(); i++) {
               values.push_back(up[k][i]);
@@ -847,8 +847,8 @@ namespace Isis {
               Isis::PvlGroup &up = obj.Group(g);
               if(up.IsNamed("UserParameters")) {
                 for(int k = 0; k < up.Keywords(); k ++) {
-                  string keyword = up[k].Name();
-                  string value = up[k][0];
+                  QString keyword = up[k].Name();
+                  QString value = up[k][0];
                   PutAsString(keyword, value);
                 }
               }
@@ -857,18 +857,18 @@ namespace Isis {
           }
         }
 
-        /*string msg = "[" + hist.expanded() +
+        /*QString msg = "[" + hist.expanded() +
          "] does not contain any parameters to restore";
          throw Isis::iException::Message( Isis::iException::User, msg, _FILEINFO_ );*/
       }
       catch(...) {
-        string msg = "The history file [" + file
+        QString msg = "The history file [" + file
                      + "] is corrupt, please fix or delete this file";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else {
-      string msg = "The history file [" + file + "] does not exist";
+      QString msg = "The history file [" + file + "] does not exist";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -914,7 +914,7 @@ namespace Isis {
     hist.AddGroup(cmdLine.FindGroup("UserParameters"));
 
     // See if we have exceeded history length
-    while(hist.Groups() > (int) grp["HistoryLength"][0]) {
+    while(hist.Groups() > toInt(grp["HistoryLength"][0])) {
       hist.DeleteGroup("UserParameters");
     }
 
@@ -945,8 +945,8 @@ namespace Isis {
     cout << p_progName << " ";
 
     for(unsigned int currArgument = 1; currArgument < p_cmdline.size(); currArgument ++) {
-      string paramName;
-      vector< string > paramValue;
+      QString paramName;
+      vector< QString > paramValue;
 
       try {
         GetNextParameter(currArgument, paramName, paramValue);
@@ -957,21 +957,22 @@ namespace Isis {
         for(unsigned int value = 0; value < paramValue.size(); value ++) {
           IString thisValue = paramValue[value];
 
-          string token = thisValue.Token("$");
-          IString newValue;
+          QString token = thisValue.Token("$").ToQt();
+
+          QString newValue;
 
           while(thisValue != "") {
             newValue += token;
             try {
-              int j = IString(thisValue.substr(0, 1)).ToInteger() - 1;
+              int j = toInt(thisValue.substr(0, 1).c_str()) - 1;
               newValue += p_batchList[i][j];
               thisValue.replace(0, 1, "");
-              token = thisValue.Token("$");
+              token = thisValue.Token("$").ToQt();
             }
             catch (IException &e) {
               // Let the variable be parsed by the application
               newValue += "$";
-              token = thisValue.Token("$");
+              token = thisValue.Token("$").ToQt();
             }
           }
 
@@ -1021,11 +1022,11 @@ namespace Isis {
   void UserInterface::SetErrorList(int i) {
     if(p_errList != "") {
       std::ofstream os;
-      string fileName(FileName(p_errList).expanded());
-      os.open(fileName.c_str(), std::ios::app);
+      QString fileName(FileName(p_errList).expanded());
+      os.open(fileName.toAscii().data(), std::ios::app);
 
       if(!os.good()) {
-        string
+        QString
         msg =
           "Unable to create error list [" + p_errList
           + "] Disk may be full or directory permissions not writeable";
@@ -1055,9 +1056,9 @@ namespace Isis {
    * This method returns the filename where the debugging info is
    * stored when the "-info" tag is used.
    *
-   * @return @b string Name of file containing debugging ingo.
+   * @return @b QString Name of file containing debugging ingo.
    */
-  std::string UserInterface::GetInfoFileName() {
+  QString UserInterface::GetInfoFileName() {
     return p_infoFileName;
   }
 } // end namespace isis

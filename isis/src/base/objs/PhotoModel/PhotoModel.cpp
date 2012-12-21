@@ -23,10 +23,10 @@ namespace Isis {
     // Use 'PhtName' instead of 'Name' if using the Gui combo box
     // for unique Pvl keyword in DefFile
     if(algorithm.HasKeyword("PhtName")) {
-      p_photoAlgorithmName = string(algorithm["PhtName"]);
+      p_photoAlgorithmName = algorithm["PhtName"][0];
     }
     else if(algorithm.HasKeyword("Name")) {
-      p_photoAlgorithmName = string(algorithm["Name"]);
+      p_photoAlgorithmName = algorithm["Name"][0];
     }
     else {
       IString msg = "Keyword [Name] or keyword [PhtName] must ";

@@ -23,7 +23,7 @@
 #include "jama/jama_svd.h"
 #include "jama/jama_qr.h"
 
-#if !defined(__sun__)
+#ifndef __sun__
 #include "gmm/gmm_superlu_interface.h"
 #endif
 
@@ -60,7 +60,7 @@ namespace Isis {
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
-#if !defined(__sun__)
+#ifndef __sun__
       gmm::resize(p_sparseA, sparseRows, sparseCols);
       gmm::resize(p_normals, sparseCols, sparseCols);
       gmm::resize(p_ATb, sparseCols, 1);
@@ -118,7 +118,7 @@ namespace Isis {
   void LeastSquares::AddKnown(const std::vector<double> &data, double result,
                               double weight) {
     if((int) data.size() != p_basis->Variables()) {
-      std::string msg = "Number of elements in data does not match basis [" +
+      QString msg = "Number of elements in data does not match basis [" +
                         p_basis->Name() + "] requirements";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -133,7 +133,7 @@ namespace Isis {
     }
 
     if(p_sparse) {
-#if !defined(__sun__)
+#ifndef __sun__
       FillSparseA(data);
 #endif
     }
@@ -158,7 +158,7 @@ namespace Isis {
    *          from p_weight to p_sqrtweight.
    *
    */
-#if !defined(__sun__)
+#ifndef __sun__
   void LeastSquares::FillSparseA(const std::vector<double> &data) {
 
     p_basis->Expand(data);
@@ -252,7 +252,7 @@ namespace Isis {
       SolveQRD();
     }
     else if(method == SPARSE) {
-#if !defined(__sun__)
+#ifndef __sun__
       int column = SolveSparse();
       return column;
 #endif
@@ -456,7 +456,7 @@ namespace Isis {
    * @history 2011-03-17  Ken Edmundson Corrected computation of residuals
    *
    */
-#if !defined(__sun__)
+#ifndef __sun__
   int LeastSquares::SolveSparse() {
 
     // form "normal equations" matrix by multiplying ATA
@@ -657,7 +657,7 @@ namespace Isis {
    * datum (i.e. constraining a minimum of seven parameters -
    * usually 3 coordinates of two points and 1 of a third).
    */
-#if !defined(__sun__)
+#ifndef __sun__
   bool LeastSquares::SparseErrorPropagation ()
   {
     // clear memory

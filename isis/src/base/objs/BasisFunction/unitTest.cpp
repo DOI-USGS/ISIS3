@@ -2,11 +2,12 @@
 #include "Preference.h"
 #include <iostream>
 
+using namespace Isis;
 using namespace std;
 
 int main() {
-  Isis::Preference::Preferences(true);
-  Isis::BasisFunction b("Basis", 2, 2);
+  Preference::Preferences(true);
+  BasisFunction b("Basis", 2, 2);
   vector<double> coefs;
   coefs.push_back(0.5);
   coefs.push_back(-0.5);

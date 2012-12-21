@@ -13,7 +13,7 @@
 using namespace std;
 using namespace Isis;
 
-geos::geom::Geometry *GetPolygon(std::string name);
+geos::geom::Geometry *GetPolygon(QString name);
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
@@ -67,9 +67,9 @@ void IsisMain() {
 
   if(!result.empty()) {
     // Output the resultant polygon
-    std::string outname = ui.GetFileName("TO");
+    QString outname = ui.GetFileName("TO");
     std::ofstream outfile;
-    outfile.open(outname.c_str());
+    outfile.open(outname.toAscii().data());
     outfile << result;
     outfile.close();
     if(outfile.fail()) {
@@ -88,9 +88,9 @@ void IsisMain() {
  *
  * @return geos::geom::MultiPolygon*
  */
-geos::geom::Geometry *GetPolygon(std::string name) {
+geos::geom::Geometry *GetPolygon(QString name) {
   ifstream is;
-  is.open(name.c_str());
+  is.open(name.toAscii().data());
 
   std::string fileData = "";
   while(is.good()) {

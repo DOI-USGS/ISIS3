@@ -1,4 +1,4 @@
-Unit test for Isis::ProjectionFactory
+Unit test for ProjectionFactory
 Test for missing pixel resolution ... 
 **ERROR** Unable to initialize cube projection.
 **ERROR** PVL Keyword [PixelResolution] does not exist in [Group = Mapping].

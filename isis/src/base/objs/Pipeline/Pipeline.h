@@ -25,10 +25,9 @@
 
 #include <vector>
 
-#include "IString.h"
-#include "PipelineApplication.h"
+#include <QString>
 
-using namespace std;
+#include "PipelineApplication.h"
 
 namespace Isis {
   class FileName;
@@ -135,7 +134,7 @@ namespace Isis {
    *                           original input, branching from branches, partial
    *                           branch merging (discontinuing branches*)
    *   @history 2008-10-28 Unknown - The input no longer has to have virtual
-   *                           bands if the SetInputFile(IString,IString) has an
+   *                           bands if the SetInputFile(QString,QString) has an
    *                           empty parameter name for the virtual bands
    *                           parameter. SetInputListFile(...) method added.
    *   @history 2008-12-19 Unknown - List files are now fully supported, along
@@ -160,26 +159,26 @@ namespace Isis {
    */
   class Pipeline {
     public:
-      Pipeline(const IString &procAppName = "");
+      Pipeline(const QString &procAppName = "");
       ~Pipeline();
 
       void Prepare();
       void Run();
 
       void SetInputFile(const char *inputParam);
-      void SetInputFile(const IString &inputParam);
+      void SetInputFile(const QString &inputParam);
       void SetInputFile(const char *inputParam, const char *virtualBandsParam);
-      void SetInputFile(const IString &inputParam, const IString &virtualBandsParam);
+      void SetInputFile(const QString &inputParam, const QString &virtualBandsParam);
       void SetInputListFile(const char *inputParam);
-      void SetInputListFile(const IString &inputParam);
+      void SetInputListFile(const QString &inputParam);
       void SetInputFile(const FileName &inputFileName);
       void SetInputListFile(const FileName &inputFileName);
 
       void SetOutputFile(const char *outputParam);
-      void SetOutputFile(const IString &outputParam);
+      void SetOutputFile(const QString &outputParam);
       void SetOutputFile(const FileName &outputFile);
       void SetOutputListFile(const char *outputFileNameParam);
-      void SetOutputListFile(const IString &outputFileNameParam);
+      void SetOutputListFile(const QString &outputFileNameParam);
       void SetOutputListFile(const FileName &outputFileNameList);
       void KeepTemporaryFiles(bool keep);
       //! Returns true if temporary files will not be deleted, false if they will
@@ -188,18 +187,18 @@ namespace Isis {
       }
 
       void AddPause();
-      void AddToPipeline(const IString &appname);
-      void AddToPipeline(const IString &appname, const IString &identifier);
-      PipelineApplication &Application(const IString &identifier);
+      void AddToPipeline(const QString &appname);
+      void AddToPipeline(const QString &appname, const QString &identifier);
+      PipelineApplication &Application(const QString &identifier);
       PipelineApplication &Application(const int &index);
 
-      void SetFirstApplication(const IString &appname);
-      void SetLastApplication(const IString &appname);
+      void SetFirstApplication(const QString &appname);
+      void SetLastApplication(const QString &appname);
 
-      friend ostream &operator<<(ostream &os, Pipeline &pipeline);
+      friend std::ostream &operator<<(std::ostream &os, Pipeline &pipeline);
 
       //! Returns the name of the pipeline
-      IString Name() const {
+      QString Name() const {
         return p_procAppName;
       }
       //! Returns the number of applications in the pipeline
@@ -212,9 +211,9 @@ namespace Isis {
        *
        * @param branch Branch of the original input to get the filename from
        *
-       * @return IString Name of the original input file
+       * @return QString Name of the original input file
        */
-      IString OriginalInput(unsigned int branch) {
+      QString OriginalInput(unsigned int branch) {
         return ((branch < p_originalInput.size()) ? p_originalInput[branch] : "");
       }
       
@@ -240,15 +239,15 @@ namespace Isis {
       
       //! Returns the names of the original branches of the pipeline 
       //! (input files * branches if any)
-      vector<IString> OriginalBranches() {
+      std::vector<QString> OriginalBranches() {
         if (p_originalBranches.size() > 0){
           return p_originalBranches;
         }
         return p_inputBranches;
       }
       
-      IString FinalOutput(int branch = 0, bool addModifiers = true);
-      IString TemporaryFolder();
+      QString FinalOutput(int branch = 0, bool addModifiers = true);
+      QString TemporaryFolder();
 
       void EnableAllApplications();
       
@@ -259,7 +258,7 @@ namespace Isis {
        * 
        * @param branch - Branch name to be added
        */
-      void AddOriginalBranch(IString branch){
+      void AddOriginalBranch(QString branch){
         int size = (int)p_inputBranches.size();
         if (size == 1) {
           p_originalBranches.push_back(branch);
@@ -284,16 +283,16 @@ namespace Isis {
 
     private:
       int p_pausePosition;
-      IString p_procAppName; //!< The name of the pipeline
-      vector<IString> p_originalInput; //!< The original input file
-      vector<IString> p_inputBranches; //!< Branches for input list
-      vector<IString> p_originalBranches; //!< The input file(s) + original branches from pipeline
-      vector<IString> p_finalOutput; //!< The final output file (empty if needs calculated)
-      vector<IString> p_virtualBands;//!< The virtual bands string
+      QString p_procAppName; //!< The name of the pipeline
+      std::vector<QString> p_originalInput; //!< The original input file
+      std::vector<QString> p_inputBranches; //!< Branches for input list
+      std::vector<QString> p_originalBranches; //!< The input file(s) + original branches from pipeline
+      std::vector<QString> p_finalOutput; //!< The final output file (empty if needs calculated)
+      std::vector<QString> p_virtualBands;//!< The virtual bands string
       bool p_keepTemporary; //!< True if keeping temporary files
       bool p_addedCubeatt; //!< True if the "cubeatt" program was added
-      vector< PipelineApplication * > p_apps; //!< The pipeline applications
-      vector< IString > p_appIdentifiers; //!< The strings to identify the pipeline applications
+      std::vector< PipelineApplication * > p_apps; //!< The pipeline applications
+      std::vector< QString > p_appIdentifiers; //!< The strings to identify the pipeline applications
       bool p_outputListNeedsModifiers;
       bool p_continue; //!< continue the execution even if exception is encountered.
   };

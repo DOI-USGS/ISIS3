@@ -98,12 +98,12 @@ namespace Isis {
       }
 
       // Find directory and save for use in file dialog for match cube
-      FileName fname(baseFile.toStdString());
-      dir = fname.path().ToQt();
+      FileName fname(baseFile);
+      dir = fname.path();
 
       //  Make sure base is projected
       try {
-        baseCube->open(baseFile.toStdString());
+        baseCube->open(baseFile);
         try {
           baseCube->getProjection();
         }
@@ -120,8 +120,8 @@ namespace Isis {
         }
         catch (IException &e) {
           QString message = "Cannot initialize universal ground map for basemap.\n";
-          string errors = e.toString();
-          message += errors.c_str();
+          QString errors = e.toString();
+          message += errors;
           QMessageBox::critical((QWidget *)parent(), "Error", message);
           baseCube->close();
           continue;
@@ -154,7 +154,7 @@ namespace Isis {
 
       //Make sure match is not projected
       try {
-        matchCube->open(matchFile.toStdString());
+        matchCube->open(matchFile);
         try {
 
           if (matchCube->hasGroup("Mapping")) {
@@ -176,8 +176,8 @@ namespace Isis {
         }
         catch (IException &e) {
           QString message = "Cannot initialize universal ground map for match cube.\n";
-          string errors = e.toString();
-          message += errors.c_str();
+          QString errors = e.toString();
+          message += errors;
           QMessageBox::critical((QWidget *)parent(), "Error", message);
           matchCube->close();
           continue;
@@ -190,11 +190,11 @@ namespace Isis {
     }
 
     // Find target
-    IString target = matchCube->getCamera()->target()->name();
+    QString target = matchCube->getCamera()->target()->name();
 
     // Find directory and save for use in file dialog for control net
-    FileName fname(matchFile.toStdString());
-    dir = fname.path().ToQt();
+    FileName fname(matchFile);
+    dir = fname.path();
 
     bool netOk = false;
 
@@ -218,7 +218,7 @@ namespace Isis {
       else {
         try {
           QApplication::setOverrideCursor(Qt::WaitCursor);
-          cnet = new ControlNet(cnetFile.toStdString());
+          cnet = new ControlNet(cnetFile);
           QApplication::restoreOverrideCursor();
 
           netOk = checkNet(baseCube, baseGM, matchCube, matchGM, cnet);
@@ -229,8 +229,8 @@ namespace Isis {
         }
         catch (IException &e) {
           QString message = "Invalid control network.  \n";
-          std::string errors = e.toString();
-          message += errors.c_str();
+          QString errors = e.toString();
+          message += errors;
           QMessageBox::information((QWidget *)parent(), "Error", message);
         }
       }
@@ -306,7 +306,7 @@ namespace Isis {
               baseLine < 1 || baseLine > baseCube->getLineCount()) {
             // throw error? point not on base
             QString message = "Error parsing input control net.  Lat/Lon for Point Id: " +
-                              QString::fromStdString(p.GetId()) + " computes to a sample/line off " +
+                              (p.GetId()) + " computes to a sample/line off " +
                               "the edge of the basemap cube.  This point will be skipped.";
             QMessageBox::critical((QWidget *)parent(), "Invalid Control Net", message);
             return false;
@@ -316,7 +316,7 @@ namespace Isis {
           //  throw error?  point not on base cube
           qDebug()<<"SetGround else";
           QString message = "Error parsing input control net.  Point Id: " +
-                            QString::fromStdString(p.GetId()) + " does not exist on basemap.  "
+                            (p.GetId()) + " does not exist on basemap.  "
                             "This point will be skipped.";
           QMessageBox::critical((QWidget *)parent(), "Invalid Control Network", message);
           return false;
@@ -325,7 +325,7 @@ namespace Isis {
       catch (IException &e) {
         qDebug()<<"catch";
         QString message = "Error in SetGround.  Error parsing input control net.  Point Id: " +
-                          QString::fromStdString(p.GetId()) + " does not exist on basemap.  "
+                          (p.GetId()) + " does not exist on basemap.  "
                           "This point will be skipped.";
         QMessageBox::critical((QWidget *)parent(), "Invalid Control Network", message);
         return false;

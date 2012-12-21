@@ -22,7 +22,7 @@ void IsisMain() {
   FileList imageList;
   imageList.read(ui.GetFileName("FROMLIST"));
   if(imageList.size() < 1) {
-    std::string msg = "The list file [" + ui.GetFileName("FROMLIST") +
+    QString msg = "The list file [" + ui.GetFileName("FROMLIST") +
                       "] does not contain any data";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -34,7 +34,7 @@ void IsisMain() {
 
   //  For this first loop union all image polygons
   vector<geos::geom::Geometry *> allPolys;
-  vector<string> files;
+  vector<QString> files;
   bool conv360 = false;
 
   for(int img = 0; img < imageList.size(); img++) {
@@ -47,7 +47,7 @@ void IsisMain() {
       cube.getCamera();
     }
     catch(IException &e) {
-      string msg = "Spiceinit must be run prior to running footprintmerge";
+      QString msg = "Spiceinit must be run prior to running footprintmerge";
       msg += " for cube [" + imageList[img].toString() + "]";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
@@ -59,7 +59,7 @@ void IsisMain() {
       cube.close();
     }
     catch(IException &e) {
-      string msg = "Footprintinit must be run prior to running footprintmerge";
+      QString msg = "Footprintinit must be run prior to running footprintmerge";
       msg += " for cube [" + imageList[img].toString() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -118,7 +118,7 @@ void IsisMain() {
   prog.SetMaximumSteps(allPolys.size());
   prog.CheckStatus();
 
-  typedef std::vector<std::string> islandFiles;
+  typedef std::vector<QString> islandFiles;
   std::vector< islandFiles > islands;
   islands.resize(islandPolys.size());
   for(unsigned int i = 0; i < allPolys.size(); i++) {
@@ -131,23 +131,23 @@ void IsisMain() {
   }
 
 
-  string mode = ui.GetString("MODE");
+  QString mode = ui.GetString("MODE");
 
   //  print out island statistics
   // Brief
   if(mode == "BRIEF") {
     PvlGroup results("Results");
-    results += PvlKeyword("NumberOfIslands", (int)islandPolys.size());
+    results += PvlKeyword("NumberOfIslands", toString((int)islandPolys.size()));
     Application::Log(results);
   }
   else if(mode == "FULL") {
-    string out = ui.GetFileName("TO");
+    QString out = ui.GetFileName("TO");
     PvlObject results("Results");
     for(unsigned int p = 0; p < islandPolys.size(); p++) {
       int numFiles = islands[p].size();
-      string isle = "FootprintIsland_" + IString((int)p + 1);
+      QString isle = "FootprintIsland_" + toString((int)p + 1);
       PvlGroup island(isle);
-      island += PvlKeyword("NumberFiles", numFiles);
+      island += PvlKeyword("NumberFiles", toString(numFiles));
       PvlKeyword files("Files");
       for(int f = 0; f < numFiles; f++) {
         files.AddValue(islands[p][f]);

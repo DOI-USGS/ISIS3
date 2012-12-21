@@ -53,7 +53,7 @@ namespace Isis {
    *                                  bands
    */
   OverlapStatistics::OverlapStatistics(Isis::Cube &x, Isis::Cube &y,
-                                       std::string progressMsg, double sampPercent) {
+                                       QString progressMsg, double sampPercent) {
     // Test to ensure sampling percent in bound
     if (sampPercent <= 0.0 || sampPercent > 100.0) {
       string msg = "The sampling percent must be a decimal (0.0, 100.0]";
@@ -68,7 +68,7 @@ namespace Isis {
 
     // Make sure number of bands match
     if (x.getBandCount() != y.getBandCount()) {
-      string msg = "Number of bands do not match between cubes [" +
+      QString msg = "Number of bands do not match between cubes [" +
                    p_xFile.name() + "] and [" + p_yFile.name() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -81,7 +81,7 @@ namespace Isis {
 
     // Test to make sure projection parameters match
     if (*projX != *projY) {
-      string msg = "Mapping groups do not match between cubes [" +
+      QString msg = "Mapping groups do not match between cubes [" +
                    p_xFile.name() + "] and [" + p_yFile.name() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -185,18 +185,18 @@ namespace Isis {
     try {
       PvlObject o("OverlapStatistics");
       PvlGroup gX("File1");
-      PvlKeyword stsX("StartSample", StartSampleX());
-      PvlKeyword ensX("EndSample", EndSampleX());
-      PvlKeyword stlX("StartLine", StartLineX());
-      PvlKeyword enlX("EndLine", EndLineX());
+      PvlKeyword stsX("StartSample", toString(StartSampleX()));
+      PvlKeyword ensX("EndSample", toString(EndSampleX()));
+      PvlKeyword stlX("StartLine", toString(StartLineX()));
+      PvlKeyword enlX("EndLine", toString(EndLineX()));
       PvlKeyword avgX("Average");
       PvlKeyword stdX("StandardDeviation");
       PvlKeyword varX("Variance");
       for (int band = 1; band <= Bands(); band++) {
         if (HasOverlap(band)) {
-          avgX += GetMStats(band).X().Average();
-          stdX += GetMStats(band).X().StandardDeviation();
-          varX += GetMStats(band).X().Variance();
+          avgX += toString(GetMStats(band).X().Average());
+          stdX += toString(GetMStats(band).X().StandardDeviation());
+          varX += toString(GetMStats(band).X().Variance());
         }
       }
       gX += stsX;
@@ -208,18 +208,18 @@ namespace Isis {
       gX += varX;
 
       PvlGroup gY("File2");
-      PvlKeyword stsY("StartSample", StartSampleY());
-      PvlKeyword ensY("EndSample", EndSampleY());
-      PvlKeyword stlY("StartLine", StartLineY());
-      PvlKeyword enlY("EndLine", EndLineY());
+      PvlKeyword stsY("StartSample", toString(StartSampleY()));
+      PvlKeyword ensY("EndSample", toString(EndSampleY()));
+      PvlKeyword stlY("StartLine", toString(StartLineY()));
+      PvlKeyword enlY("EndLine", toString(EndLineY()));
       PvlKeyword avgY("Average");
       PvlKeyword stdY("StandardDeviation");
       PvlKeyword varY("Variance");
       for (int band = 1; band <= Bands(); band++) {
         if (HasOverlap(band)) {
-          avgY += GetMStats(band).Y().Average();
-          stdY += GetMStats(band).Y().StandardDeviation();
-          varY += GetMStats(band).Y().Variance();
+          avgY += toString(GetMStats(band).Y().Average());
+          stdY += toString(GetMStats(band).Y().StandardDeviation());
+          varY += toString(GetMStats(band).Y().Variance());
         }
       }
       gY += stsY;
@@ -232,9 +232,9 @@ namespace Isis {
 
       o += PvlKeyword("File1", FileNameX().name());
       o += PvlKeyword("File2", FileNameY().name());
-      o += PvlKeyword("Width", Samples());
-      o += PvlKeyword("Height", Lines());
-      o += PvlKeyword("SamplingPercent", SampPercent());
+      o += PvlKeyword("Width", toString(Samples()));
+      o += PvlKeyword("Height", toString(Lines()));
+      o += PvlKeyword("SamplingPercent", toString(SampPercent()));
       o.AddGroup(gX);
       o.AddGroup(gY);
 
@@ -247,14 +247,14 @@ namespace Isis {
       PvlKeyword tot("TotalPixels");
       for (int band = 1; band <= Bands(); band++) {
         if (HasOverlap(band)) {
-          std::string validStr = "false";
+          QString validStr = "false";
           if (IsValid(band)) validStr = "true";
           valid += validStr;
-          cov += GetMStats(band).Covariance();
-          cor += GetMStats(band).Correlation();
-          val += GetMStats(band).ValidPixels();
-          inv += GetMStats(band).InvalidPixels();
-          tot += GetMStats(band).TotalPixels();
+          cov += toString(GetMStats(band).Covariance());
+          cor += toString(GetMStats(band).Correlation());
+          val += toString(GetMStats(band).ValidPixels());
+          inv += toString(GetMStats(band).InvalidPixels());
+          tot += toString(GetMStats(band).TotalPixels());
         }
       }
       o += valid;
@@ -266,14 +266,13 @@ namespace Isis {
 
       for (int band = 1; band <= Bands(); band++) {
         if (HasOverlap(band)) {
-          IString bandNum(band);
-          std::string bandStr = "LinearRegression" + bandNum;
+          QString bandStr = "LinearRegression" + toString(band);
           PvlKeyword LinReg(bandStr);
           double a, b;
           try {
             GetMStats(band).LinearRegression(a, b);
-            LinReg += a;
-            LinReg += b;
+            LinReg += toString(a);
+            LinReg += toString(b);
           }
           catch (IException &e) {
             // It is possible one of the overlaps was constant and therefore
@@ -286,7 +285,7 @@ namespace Isis {
       return o;
     }
     catch (IException &e) {
-      string msg = "Trivial overlap between [" + FileNameX().name();
+      QString msg = "Trivial overlap between [" + FileNameX().name();
       msg += "] and [" + FileNameY().name() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }

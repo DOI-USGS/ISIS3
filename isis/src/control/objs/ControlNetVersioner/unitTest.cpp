@@ -1,6 +1,6 @@
 #include "ControlNetVersioner.h"
 
-#include <string>
+#include <QString>
 
 #include <QTime>
 
@@ -14,7 +14,7 @@
 using namespace std;
 using namespace Isis;
 
-void TestNetwork(const string &filename, bool printNetwork = true);
+void TestNetwork(const QString &filename, bool printNetwork = true);
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
 }
 
 
-void TestNetwork(const string &filename, bool printNetwork) {
+void TestNetwork(const QString &filename, bool printNetwork) {
   cerr << "Reading: " << filename << "...\n\n";
   FileName networkFileName(filename);
 

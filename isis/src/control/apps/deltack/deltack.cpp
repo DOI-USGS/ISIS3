@@ -18,12 +18,12 @@
 using namespace std;
 using namespace Isis;
 
-Distance GetRadius(std::string filename, Latitude lat, Longitude lon);
+Distance GetRadius(QString filename, Latitude lat, Longitude lon);
 
 void IsisMain() {
   // Create a serial number list
   UserInterface &ui = Application::GetUserInterface();
-  string filename = ui.GetFileName("FROM");
+  QString filename = ui.GetFileName("FROM");
   SerialNumberList serialNumberList;
   serialNumberList.Add(filename);
 
@@ -67,7 +67,7 @@ void IsisMain() {
     if(c.getLabel()->HasKeyword("TargetName", PvlObject::Traverse)) {
 //       c.Label()->FindKeyword("TargetName");
       PvlGroup inst = c.getLabel()->FindGroup("Instrument", PvlObject::Traverse);
-      std::string targetName = inst["TargetName"];
+      QString targetName = inst["TargetName"];
       cnet.SetTarget(targetName);
     }
     c.close();
@@ -132,7 +132,7 @@ void IsisMain() {
     Table cmatrix = b.Cmatrix(0);
 
     // Write out a description in the spice table
-    std::string deltackComment = "deltackAdjusted = " + Isis::iTime::CurrentLocalTime();
+    QString deltackComment = "deltackAdjusted = " + Isis::iTime::CurrentLocalTime();
     cmatrix.Label().AddComment(deltackComment);
     //PvlKeyword description("Description");
     //description = "Camera pointing updated via deltack application";
@@ -150,21 +150,21 @@ void IsisMain() {
     Application::Log(gp);
   }
   catch(IException &e) {
-    string msg = "Unable to update camera pointing for [" + filename + "]";
+    QString msg = "Unable to update camera pointing for [" + filename + "]";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
 
 }
 
 // Compute the radius at the lat/lon
-Distance GetRadius(std::string filename, Latitude lat, Longitude lon) {
+Distance GetRadius(QString filename, Latitude lat, Longitude lon) {
   Pvl lab(filename);
   Sensor sensor(lab);
   sensor.SetGround(SurfacePoint(lat, lon, sensor.LocalRadius(lat, lon)));
   Distance radius = sensor.LocalRadius();
   if(!radius.isValid()) {
-    string msg = "Could not determine radius from DEM at lat/lon [";
-    msg += IString(lat.degrees()) + "," + IString(lon.degrees()) + "]";
+    QString msg = "Could not determine radius from DEM at lat/lon [";
+    msg += toString(lat.degrees()) + "," + toString(lon.degrees()) + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
   return radius;

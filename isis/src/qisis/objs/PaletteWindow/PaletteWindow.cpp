@@ -12,7 +12,7 @@ namespace Isis {
   PaletteWindow::PaletteWindow(QWidget *parent) : QMainWindow(parent) {
     readSettings();
     parent->installEventFilter(this);
-    p_appName = parent->windowTitle().toStdString();
+    p_appName = parent->windowTitle();
   }
 
 
@@ -44,9 +44,9 @@ namespace Isis {
    *
    */
   void PaletteWindow::readSettings() {
-    std::string instanceName = this->windowTitle().toStdString();
+    QString instanceName = this->windowTitle();
     FileName config("$HOME/.Isis/" + p_appName + "/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
+    QSettings settings(config.expanded(), QSettings::NativeFormat);
     QPoint pos = settings.value("pos", QPoint(300, 100)).toPoint();
     QSize size = settings.value("size", QSize(900, 500)).toSize();
     resize(size);
@@ -65,9 +65,9 @@ namespace Isis {
       visible at the time of closing the application*/
     if(!this->isVisible()) return;
 
-    std::string instanceName = this->windowTitle().toStdString();
+    QString instanceName = this->windowTitle();
     FileName config("$HOME/.Isis/" + p_appName + "/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
+    QSettings settings(config.expanded(), QSettings::NativeFormat);
     settings.setValue("pos", pos());
     settings.setValue("size", size());
   }

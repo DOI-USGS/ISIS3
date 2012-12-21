@@ -1,4 +1,4 @@
-#if !defined(GainNonLinearity_h)
+#ifndef GainNonLinearity_h
 #define GainNonLinearity_h
 /**                                                                       
  * @file                                                                  
@@ -64,7 +64,7 @@ namespace Isis {
       virtual ~GainNonLinearity() { }
 
     private:
-      std::string _gainFile;
+      QString _gainFile;
       double _gainFactor;      // Temperature factor
 
       void init(const HiCalConf &conf) {

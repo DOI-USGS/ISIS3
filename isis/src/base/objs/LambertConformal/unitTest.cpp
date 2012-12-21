@@ -2,76 +2,79 @@
 #include <iomanip>
 #include "LambertConformal.h"
 #include "IException.h"
+#include "IString.h"
 #include "ProjectionFactory.h"
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
+
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   cout << "UNIT TEST FOR LambertConformal" << endl << endl;
 
-  Isis::Pvl lab;
-  lab.AddGroup(Isis::PvlGroup("Mapping"));
-  Isis::PvlGroup &mapGroup = lab.FindGroup("Mapping");
-  mapGroup += Isis::PvlKeyword("EquatorialRadius", 1.0);
-  mapGroup += Isis::PvlKeyword("PolarRadius", 1.0);
-  mapGroup += Isis::PvlKeyword("LatitudeType", "Planetographic");
-  mapGroup += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-  mapGroup += Isis::PvlKeyword("LongitudeDomain", 180);
-  mapGroup += Isis::PvlKeyword("MinimumLatitude", 20.0);
-  mapGroup += Isis::PvlKeyword("MaximumLatitude", 80.0);
-  mapGroup += Isis::PvlKeyword("MinimumLongitude", -180.0);
-  mapGroup += Isis::PvlKeyword("MaximumLongitude", 180.0);
-  mapGroup += Isis::PvlKeyword("ProjectionName", "LambertConformal");
+  Pvl lab;
+  lab.AddGroup(PvlGroup("Mapping"));
+  PvlGroup &mapGroup = lab.FindGroup("Mapping");
+  mapGroup += PvlKeyword("EquatorialRadius", "1.0");
+  mapGroup += PvlKeyword("PolarRadius", "1.0");
+  mapGroup += PvlKeyword("LatitudeType", "Planetographic");
+  mapGroup += PvlKeyword("LongitudeDirection", "PositiveEast");
+  mapGroup += PvlKeyword("LongitudeDomain", "180");
+  mapGroup += PvlKeyword("MinimumLatitude", "20.0");
+  mapGroup += PvlKeyword("MaximumLatitude", "80.0");
+  mapGroup += PvlKeyword("MinimumLongitude", "-180.0");
+  mapGroup += PvlKeyword("MaximumLongitude", "180.0");
+  mapGroup += PvlKeyword("ProjectionName", "LambertConformal");
 
   cout << "Test missing center longitude keyword ..." << endl;
   try {
-    Isis::LambertConformal p(lab);
+    LambertConformal p(lab);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
 
-  mapGroup += Isis::PvlKeyword("CenterLongitude", -96.0);
+  mapGroup += PvlKeyword("CenterLongitude", "-96.0");
 
   cout << "Test missing center latitude keyword..." << endl;
   try {
-    Isis::LambertConformal p(lab);
+    LambertConformal p(lab);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
 
-  mapGroup += Isis::PvlKeyword("CenterLatitude", 23.0);
+  mapGroup += PvlKeyword("CenterLatitude", "23.0");
 
   cout << "Test missing first standard parallel keyword..." << endl;
   try {
-    Isis::LambertConformal p(lab);
+    LambertConformal p(lab);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
 
-  mapGroup += Isis::PvlKeyword("FirstStandardParallel", 33);
+  mapGroup += PvlKeyword("FirstStandardParallel", "33");
 
   cout << "Test missing second standard parallel keyword..." << endl;
   try {
-    Isis::LambertConformal p(lab);
+    LambertConformal p(lab);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
 
-  mapGroup += Isis::PvlKeyword("SecondStandardParallel", 45);
+  mapGroup += PvlKeyword("SecondStandardParallel", "45");
 
   try {
-    Isis::Projection &p = *Isis::ProjectionFactory::Create(lab);
-    //  Isis::LambertConformal p(lab);
+    Projection &p = *ProjectionFactory::Create(lab);
+    //  LambertConformal p(lab);
 
     cout << "Test SetGround method ... " << endl;
     cout << std::setprecision(9);
@@ -103,7 +106,7 @@ int main(int argc, char *argv[]) {
     cout << "Maximum Y:  " << maxY << endl;
     cout << endl;
 
-    Isis::Projection *s = &p;
+    Projection *s = &p;
     cout << "Test Name and comparision method ... " << endl;
     cout << "Name:       " << s->Name() << endl;
     cout << "operator==  " << (*s == *s) << endl;
@@ -112,7 +115,7 @@ int main(int argc, char *argv[]) {
     cout << "Test default computation ... " << endl;
     mapGroup.DeleteKeyword("CenterLongitude");
     mapGroup.DeleteKeyword("CenterLatitude");
-    Isis::LambertConformal p2(lab, true);
+    LambertConformal p2(lab, true);
     cout << lab << endl;
     cout << endl;
 
@@ -122,9 +125,9 @@ int main(int argc, char *argv[]) {
 
     cout << "Testing Mapping() methods ... " << endl;
 
-    Isis::Pvl tmp1;
-    Isis::Pvl tmp2;
-    Isis::Pvl tmp3;
+    Pvl tmp1;
+    Pvl tmp2;
+    Pvl tmp3;
     tmp1.AddGroup(p.Mapping());
     tmp2.AddGroup(p.MappingLatitudes());
     tmp3.AddGroup(p.MappingLongitudes());
@@ -140,24 +143,24 @@ int main(int argc, char *argv[]) {
     cout << "Test invalid combinations of mapping parameters ..." << endl;
 
     mapGroup.DeleteKeyword("CenterLatitude");
-    mapGroup += Isis::PvlKeyword("CenterLatitude", -90.0);
+    mapGroup += PvlKeyword("CenterLatitude", "-90.0");
     try {
-      Isis::LambertConformal p(lab);
+      LambertConformal p(lab);
     }
-    catch(Isis::IException &e) {
+    catch(IException &e) {
       e.print();
     }
     cout << endl;
 
     mapGroup.DeleteKeyword("CenterLatitude");
-    mapGroup += Isis::PvlKeyword("CenterLatitude", 90.0);
+    mapGroup += PvlKeyword("CenterLatitude", "90.0");
     mapGroup.DeleteKeyword("FirstStandardParallel");
-    mapGroup += Isis::PvlKeyword("FirstStandardParallel", -60);
+    mapGroup += PvlKeyword("FirstStandardParallel", "-60");
 
     try {
-      Isis::LambertConformal p(lab);
+      LambertConformal p(lab);
     }
-    catch(Isis::IException &e) {
+    catch(IException &e) {
       e.print();
     }
     cout << endl;
@@ -171,7 +174,7 @@ int main(int argc, char *argv[]) {
     cout << "  USGS Professional Paper 1395 by John P. Snyder" << endl;
     cout << "  Pages 295-297" << endl;
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 }

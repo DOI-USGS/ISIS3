@@ -34,7 +34,6 @@
 #include "FileName.h"
 
 using namespace UA::HiRISE;
-using std::string;
 using std::endl;
 using std::ostringstream;
 
@@ -59,7 +58,7 @@ namespace Isis {
   /**
    *  @brief Constructor with file to open
    */
-  HiJitCube::HiJitCube(const std::string &filename) {
+  HiJitCube::HiJitCube(const QString &filename) {
     initLocal();
     OpenCube(filename);
   }
@@ -67,7 +66,7 @@ namespace Isis {
   /**
    *  @brief Constructor with file to open and potential shift applied
    */
-  HiJitCube::HiJitCube(const std::string &filename, PvlObject &shift) {
+  HiJitCube::HiJitCube(const QString &filename, PvlObject &shift) {
     initLocal();
     OpenCube(filename, shift);
   }
@@ -94,13 +93,13 @@ namespace Isis {
   }
 
 
-  void HiJitCube::OpenCube(const std::string &filename) {
+  void HiJitCube::OpenCube(const QString &filename) {
     open(filename);
     Init();
     return;
   }
 
-  void HiJitCube::OpenCube(const std::string &filename, PvlObject &shift) {
+  void HiJitCube::OpenCube(const QString &filename, PvlObject &shift) {
     OpenCube(filename);
 
     //  Determine if a shift of the CCD exists in the definitions file
@@ -159,10 +158,10 @@ namespace Isis {
       sclk = sclk.highestVersion();
 
 //  Load the kernels
-      string lsk = leapseconds.expanded();
-      string sClock = sclk.expanded();
-      furnsh_c(lsk.c_str());
-      furnsh_c(sClock.c_str());
+      QString lsk = leapseconds.expanded();
+      QString sClock = sclk.expanded();
+      furnsh_c(lsk.toAscii().data());
+      furnsh_c(sClock.toAscii().data());
 
 //  Ensure it is loaded only once
       naifLoaded = true;
@@ -179,9 +178,9 @@ namespace Isis {
                           / 1000000.0);
     jdata.linerate = jdata.unBinnedRate * ((double) jdata.summing);
 
-    if(!jdata.scStartTime.empty()) {
-      string scStartTimeString = jdata.scStartTime;
-      scs2e_c(-74999, scStartTimeString.c_str(), &jdata.obsStartTime);
+    if(!jdata.scStartTime.isEmpty()) {
+      QString scStartTimeString = jdata.scStartTime;
+      scs2e_c(-74999, scStartTimeString.toAscii().data(), &jdata.obsStartTime);
       // Adjust the start time so that it is the effective time for
       // the first line in the image file
       jdata.obsStartTime -= (jdata.unBinnedRate * (((double(jdata.tdiMode / 2.0)
@@ -227,7 +226,7 @@ namespace Isis {
     Isis::PvlGroup idinst;
     jdata.filename = getFileName();
     Isis::PvlGroup &archive = label->FindGroup("Archive", Isis::Pvl::Traverse);
-    jdata.productId = (string) archive["ProductId"];
+    jdata.productId = (QString) archive["ProductId"];
 
     jdata.lines = getLineCount();
     if(label->FindObject("IsisCube").HasGroup("OriginalInstrument")) {
@@ -267,8 +266,8 @@ namespace Isis {
     }
     jdata.ccdName = Instrument::CCD_NAMES[jdata.cpmmNumber];
     jdata.dltCount = inst["DeltaLineTimerCount"];
-    jdata.UTCStartTime = (string) inst["StartTime"];
-    jdata.scStartTime = (string) inst["SpacecraftClockStartCount"];
+    jdata.UTCStartTime = (QString) inst["StartTime"];
+    jdata.scStartTime = (QString) inst["SpacecraftClockStartCount"];
 
     try {
       if(originst) {

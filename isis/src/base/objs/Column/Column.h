@@ -24,7 +24,8 @@
  */
 
 #include <vector>
-#include <string>
+
+#include <QString>
 
 namespace Isis {
   /**
@@ -74,14 +75,14 @@ namespace Isis {
       };
 
       Column();
-      Column(std::string name, int width, Column::Type type, Column::Align align = Right);
-      void SetName(std::string name);
+      Column(QString name, int width, Column::Type type, Column::Align align = Right);
+      void SetName(QString name);
       void SetWidth(unsigned int width);
       void SetType(Column::Type type);
       void SetAlignment(Column::Align alignment);
       void SetPrecision(unsigned int precision);
 
-      std::string Name() const; 
+      QString Name() const; 
       unsigned int Width() const;
       Column::Type DataType() const;
       Column::Align Alignment() const;
@@ -90,7 +91,7 @@ namespace Isis {
 
     private:
       //! Name of the Column
-      std::string p_name;
+      QString p_name;
 
       //! Width of the Column
       unsigned int p_width;

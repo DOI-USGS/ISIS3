@@ -32,7 +32,7 @@ void IsisMain() {
   double lonInc = ui.GetDouble("LONINCREMENT");
 
   // Get mapfile, add values for range and create projection
-  string mapFile = ui.GetFileName("MAPFILE");
+  QString mapFile = ui.GetFileName("MAPFILE");
   Pvl p(mapFile);
   PvlGroup &mapping = p.FindGroup("Mapping", Pvl::Traverse);
 
@@ -52,26 +52,26 @@ void IsisMain() {
     mapping.DeleteKeyword("MaximumLongitude");
   }
 
-  mapping += PvlKeyword("MinimumLatitude", latStart);
-  mapping += PvlKeyword("MaximumLatitude", latEnd);
-  mapping += PvlKeyword("MinimumLongitude", lonStart);
-  mapping += PvlKeyword("MaximumLongitude", lonEnd);
+  mapping += PvlKeyword("MinimumLatitude", toString(latStart));
+  mapping += PvlKeyword("MaximumLatitude", toString(latEnd));
+  mapping += PvlKeyword("MinimumLongitude", toString(lonStart));
+  mapping += PvlKeyword("MaximumLongitude", toString(lonEnd));
 
   Projection *proj;
   try {
     proj = ProjectionFactory::Create(p);
   }
   catch(IException &e) {
-    string msg = "Cannot create grid - MapFile [" + mapFile +
-                 "] does not contain necessary information to create a projection";
+    QString msg = "Cannot create grid - MapFile [" + mapFile +
+                  "] does not contain necessary information to create a projection";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
 
   // Write grid to well known text output
-  string out = FileName(ui.GetFileName("TO")).expanded();
+  QString out = FileName(ui.GetFileName("TO")).expanded();
   std::ofstream os;
-  os.open(out.c_str(), std::ios::out);
+  os.open(out.toAscii().data(), std::ios::out);
 
   // Display the progress...10% 20% etc.
   Progress prog;

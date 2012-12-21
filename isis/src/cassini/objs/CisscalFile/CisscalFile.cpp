@@ -56,7 +56,7 @@ namespace Isis {
    * @param extension Extension to be added to filename (added only if not
    *                  already on filename). Defaults to ""
    */
-  CisscalFile::CisscalFile(const string &filename, const char *openmode,
+  CisscalFile::CisscalFile(const QString &filename, const char *openmode,
                            const char *extension): TextFile(filename, openmode, extension) {
     p_begindataFound = false;
   }
@@ -74,10 +74,13 @@ namespace Isis {
    * @throws Isis::iException::Io "Error reading text file"
    * @see GetLine()
    */
-  bool CisscalFile::p_GetLine(string &line) {
+  bool CisscalFile::p_GetLine(QString &line) {
     OpenChk(true);
     // Try to read the next line
-    getline(p_stream, line);
+    std::string lineTmp;
+    getline(p_stream, lineTmp);
+    line = lineTmp.c_str();
+
     // Check for end of file
     if(p_stream.eof()) {
       line = "";
@@ -86,13 +89,13 @@ namespace Isis {
     // See if an error occured
     if(!p_stream.good()) {
       line = "";
-      string message = "TextFile:GetLine: -> Error reading text file: ["
-                       + p_filename + "]";
+      QString message = "TextFile:GetLine: -> Error reading text file: ["
+                        + p_filename + "]";
       throw IException(IException::Io, message, _FILEINFO_);
     }
     // Search for tag "\begindata" if it was not already found by recursively using this method
     if(!p_begindataFound) {
-      if(line.find("\\begindata") == string::npos) {
+      if(!line.contains("\\begindata")) {
         return p_GetLine(line);
       }
       p_begindataFound = true;
@@ -119,7 +122,7 @@ namespace Isis {
    * @throws Isis::iException::Io "Error reading text file"
    * @see p_GetLine()
    */
-  bool CisscalFile::GetLine(string &line) {
+  bool CisscalFile::GetLine(QString &line) {
     return p_GetLine(line);
   }
 

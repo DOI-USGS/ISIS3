@@ -23,7 +23,7 @@
 #ifndef CameraPointInfo_h
 #define CameraPointInfo_h
 
-#include <string>
+#include <QString>
 
 namespace Isis {
   class CubeManager;
@@ -91,7 +91,7 @@ namespace Isis {
       CameraPointInfo();
       virtual ~CameraPointInfo();
 
-      void SetCube(const std::string &cubeFileName);
+      void SetCube(const QString &cubeFileName);
       PvlGroup *SetImage(const double sample, const double line,
                          const bool outside = false, const bool error = false);
       PvlGroup *SetCenter(const bool outside = false, const bool error = false);

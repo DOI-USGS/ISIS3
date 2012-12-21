@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 #include <cstdio>
-#include <string>
+#include <QString>
 
 #include "FileName.h"
 #include "ImportPdsTable.h"
@@ -19,15 +19,15 @@ void IsisMain ()
   UserInterface &ui = Application::GetUserInterface();
 
   FileName inFile = ui.GetFileName("FROM");
-  string imageFile("");
+  QString imageFile("");
   if (ui.WasEntered("IMAGE")) {
     imageFile = ui.GetFileName("IMAGE");
   }
 
 
   // Generate the housekeeping filenames
-  string hkLabel("");
-  string hkData("");
+  QString hkLabel("");
+  QString hkData("");
   if (ui.WasEntered("HKFROM") ) {
     hkLabel = ui.GetFileName("HKFROM");
   }
@@ -36,7 +36,7 @@ void IsisMain ()
     // Determine the housekeeping file
     FileName hkFile(hkLabel);
     if (!hkFile.fileExists()) {
-      hkFile = IString::Replace(hkLabel, "_1B_", "_1A_", false);
+      hkFile = hkLabel.replace("_1B_", "_1A_");
       if (hkFile.fileExists()) hkLabel = hkFile.expanded();
     }
   }
@@ -45,39 +45,35 @@ void IsisMain ()
     hkData = ui.GetFileName("HKTABLE");
   }
 
-  IString instid;
-  IString missid;
+  QString instid;
+  QString missid;
 
   try {
     Pvl lab(inFile.expanded());
-    instid = (string) lab.FindKeyword ("CHANNEL_ID");
-    missid = (string) lab.FindKeyword ("INSTRUMENT_HOST_ID");
+    instid = (QString) lab.FindKeyword ("CHANNEL_ID");
+    missid = (QString) lab.FindKeyword ("INSTRUMENT_HOST_ID");
   }
   catch (IException &e) {
-    string msg = "Unable to read [INSTRUMENT_ID] or [MISSION_ID] from input file [" +
+    QString msg = "Unable to read [INSTRUMENT_ID] or [MISSION_ID] from input file [" +
                  inFile.expanded() + "]";
     throw IException(e, IException::Io,msg, _FILEINFO_);
   }
 
-  instid.ConvertWhiteSpace();
-  instid.Compress();
-  instid.Trim(" ");
-  missid.ConvertWhiteSpace();
-  missid.Compress();
-  missid.Trim(" ");
+  instid = instid.simplified().trimmed();
+  missid = missid.simplified().trimmed();
   if (missid != "DAWN" && instid != "VIS" && instid != "IR") {
-    string msg = "Input file [" + inFile.expanded() + "] does not appear to be a " +
+    QString msg = "Input file [" + inFile.expanded() + "] does not appear to be a " +
                  "DAWN Visual and InfraRed Mapping Spectrometer (VIR) EDR or RDR file.";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
-  std::string target;
+  QString target;
   if (ui.WasEntered("TARGET")) {
     target = ui.GetString("TARGET");
   }
 
 //  p.SetPdsFile (inFile.expanded(),imageFile,pdsLabel);
-//  string labelFile = ui.GetFileName("FROM");
+//  QString labelFile = ui.GetFileName("FROM");
   p.SetPdsFile (inFile.expanded(),imageFile,pdsLabel);
   p.SetOrganization(Isis::ProcessImport::BIP);
   Cube *outcube = p.SetOutputCube ("TO");
@@ -89,7 +85,7 @@ void IsisMain ()
 
   // Get the directory where the DAWN translation tables are.
   PvlGroup dataDir (Preference::Preferences().FindGroup("DataDirectory"));
-  IString transDir = (string) dataDir["Dawn"] + "/translations/";
+  QString transDir = (QString) dataDir["Dawn"] + "/translations/";
 
   // Create a PVL to store the translated labels in
   Pvl outLabel;
@@ -110,9 +106,9 @@ void IsisMain ()
   instrumentXlater.Auto(outLabel);
 
   //  Update target if user specifies it
-  if (!target.empty()) {
+  if (!target.isEmpty()) {
     PvlGroup &igrp = outLabel.FindGroup("Instrument",Pvl::Traverse);
-    igrp["TargetName"] = IString(target);
+    igrp["TargetName"] = target;
   }
 
   // Write the BandBin, Archive, and Instrument groups
@@ -123,11 +119,11 @@ void IsisMain ()
 
   PvlGroup kerns("Kernels");
   if (instid == "VIS") {
-    kerns += PvlKeyword("NaifFrameCode",-203211);
+    kerns += PvlKeyword("NaifFrameCode","-203211");
   } else if (instid == "IR") {
-    kerns += PvlKeyword("NaifFrameCode",-203213);
+    kerns += PvlKeyword("NaifFrameCode","-203213");
   } else {
-    string msg = "Input file [" + inFile.expanded() + "] has an invalid " +
+    QString msg = "Input file [" + inFile.expanded() + "] has an invalid " +
                  "InstrumentId.";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
@@ -146,7 +142,7 @@ void IsisMain ()
    outcube->write(hktab);
  }
  catch (IException &e) {
-   string mess = "Cannot read/open housekeeping data";
+   QString mess = "Cannot read/open housekeeping data";
    throw IException(e, IException::User, mess, _FILEINFO_);
  }
 

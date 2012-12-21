@@ -27,7 +27,7 @@ void IsisMain() {
 
   // Open the input cube
   UserInterface &ui = Application::GetUserInterface();
-  string from = ui.GetAsString("FROM");
+  QString from = ui.GetAsString("FROM");
   CubeAttributeInput inAtt(from);
   cube.setVirtualBands(inAtt.bands());
   from = ui.GetFileName("FROM");
@@ -52,27 +52,27 @@ void IsisMain() {
   // Make sure starting positions fall within the cube
   if(ss > cube.getSampleCount()) {
     cube.close();
-    string msg = "[SAMPLE] exceeds number of samples in the [FROM] cube";
+    QString msg = "[SAMPLE] exceeds number of samples in the [FROM] cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(sl > cube.getLineCount()) {
     cube.close();
-    string msg = "[LINE] exceeds number of lines in the [FROM] cube";
+    QString msg = "[LINE] exceeds number of lines in the [FROM] cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Make sure the number of elements do not fall outside the cube
   if(es > cube.getSampleCount()) {
     cube.close();
-    string msg = "[SAMPLE+NSAMPLES-1] exceeds number of ";
+    QString msg = "[SAMPLE+NSAMPLES-1] exceeds number of ";
     msg += "samples in the [FROM] cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(el > cube.getLineCount()) {
     cube.close();
-    string msg = "[LINE+NLINES-1] exceeds number of ";
+    QString msg = "[LINE+NLINES-1] exceeds number of ";
     msg += "lines in the [FROM] cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -150,7 +150,7 @@ void IsisMain() {
   if(!ui.GetBoolean("PROPSPICE") && outLabels.FindObject("IsisCube").HasGroup("Kernels")) {
     PvlGroup &kerns = outLabels.FindObject("IsisCube").FindGroup("Kernels");
 
-    string tryKey = "NaifIkCode";
+    QString tryKey = "NaifIkCode";
     if(kerns.HasKeyword("NaifFrameCode")) {
       tryKey = "NaifFrameCode";
     }
@@ -173,16 +173,16 @@ void IsisMain() {
 
   // Construct a label with the results
   PvlGroup results("Results");
-  results += PvlKeyword("InputLines", orignl);
-  results += PvlKeyword("InputSamples", origns);
-  results += PvlKeyword("StartingLine", sl);
-  results += PvlKeyword("StartingSample", ss);
-  results += PvlKeyword("EndingLine", el);
-  results += PvlKeyword("EndingSample", es);
-  results += PvlKeyword("LineIncrement", linc);
-  results += PvlKeyword("SampleIncrement", sinc);
-  results += PvlKeyword("OutputLines", nl);
-  results += PvlKeyword("OutputSamples", ns);
+  results += PvlKeyword("InputLines", toString(orignl));
+  results += PvlKeyword("InputSamples", toString(origns));
+  results += PvlKeyword("StartingLine", toString(sl));
+  results += PvlKeyword("StartingSample", toString(ss));
+  results += PvlKeyword("EndingLine", toString(el));
+  results += PvlKeyword("EndingSample", toString(es));
+  results += PvlKeyword("LineIncrement", toString(linc));
+  results += PvlKeyword("SampleIncrement", toString(sinc));
+  results += PvlKeyword("OutputLines", toString(nl));
+  results += PvlKeyword("OutputSamples", toString(ns));
 
   // Update the Mapping, Instrument, and AlphaCube groups in the output
   // cube label

@@ -20,13 +20,13 @@ enum eCoefficients {CCD_CH, R0, R1, R2, MAX_LINE};
 CSVReader::CSVAxis csvArr;
 
 void GetCCD_Channel_Coefficients(Pvl & pCubeLabel);
-void ReadCoefficientFile(string psCoeffile, string psCcd, int piChannel);
-void AnalyzeCubenormStats(string psStatsFile, int piSumming, double & pdMinDN, double & pdMaxDN);
-void CleanUp(vector<IString> & psTempFiles, string psInfile);
+void ReadCoefficientFile(QString psCoeffile, QString psCcd, int piChannel);
+void AnalyzeCubenormStats(QString psStatsFile, int piSumming, double & pdMinDN, double & pdMaxDN);
+void CleanUp(vector<QString> & psTempFiles, QString psInfile);
 
 void IsisMain() {
-  vector<IString> sTempFiles;
-  string inFile, outFile;
+  vector<QString> sTempFiles;
+  QString inFile, outFile;
 
   try {
     // Get user interface
@@ -45,15 +45,15 @@ void IsisMain() {
     outFile = ui.GetFileName("TO");
     Pvl cubeLabel;
     if (bIngestion) {
-      int sDotPos = outFile.find('.');
-      string sIngestedFile = outFile.substr (0, sDotPos);
+      int sDotPos = outFile.indexOf('.');
+      QString sIngestedFile = outFile.mid(0, sDotPos);
       cubeLabel = Pvl(sIngestedFile + ".lev2.cub");
     }
     else {
       cubeLabel = Pvl(inFile);
     }
     // Get the Summing from the label
-    int iSumming = int (cubeLabel.FindObject("IsisCube").FindGroup("Instrument").FindKeyword("Summing")[0]);
+    int iSumming = toInt(cubeLabel.FindObject("IsisCube").FindGroup("Instrument").FindKeyword("Summing")[0]);
 
     Pipeline p1("hicalproc1");
     p1.SetInputFile("FROM");
@@ -160,8 +160,8 @@ void IsisMain() {
     p2.Application("mask").SetContinue(true);
     p2.Application("mask").SetInputParameter("FROM",     false);
     p2.Application("mask").SetOutputParameter("TO",      "mask2");
-    p2.Application("mask").AddConstParameter("MINIMUM",  IString(dMinDN));
-    p2.Application("mask").AddConstParameter("MAXIMUM",  IString(dMaxDN));
+    p2.Application("mask").AddConstParameter("MINIMUM",  toString(dMinDN));
+    p2.Application("mask").AddConstParameter("MAXIMUM",  toString(dMaxDN));
     p2.Application("mask").AddConstParameter("PRESERVE", "INSIDE");
     p2.Application("mask").AddConstParameter("SPIXELS",  "NONE");
     if (!bNoiseFilter) {
@@ -179,8 +179,9 @@ void IsisMain() {
     p2.Application("fx").SetInputParameter("F1", false);
     p2.Application("fx").SetOutputParameter("TO", "gnfx");
     p2.Application("fx").AddConstParameter("MODE", "CUBES");
-    IString sEquation = "\\((F1/(" + csvArr[R0]+ "+( " + csvArr[R1] + "*line)+(" + csvArr[R2];
+    QString sEquation = "\\((F1/(" + csvArr[R0]+ "+( " + csvArr[R1] + "*line)+(" + csvArr[R2];
     sEquation += "*line*line))) *(line<" + csvArr[MAX_LINE]+ ") + (F1*(line>=" + csvArr[MAX_LINE] + ")))";
+    sEquation = sEquation.simplified();
     p2.Application("fx").AddConstParameter("EQUATION", sEquation);
 #ifdef _DEBUG_
     cerr << "FX Equation=" << sEquation << endl;
@@ -272,7 +273,7 @@ void IsisMain() {
         p5.AddToPipeline("hinoise");
         p5.Application("hinoise").SetInputParameter ("FROM", false);
         p5.Application("hinoise").SetOutputParameter("TO",   "hinoise");
-        p5.Application("hinoise").AddConstParameter ("REMOVE", IString(bRemoveTempFiles));
+        p5.Application("hinoise").AddConstParameter ("REMOVE", QString(bRemoveTempFiles));
 
         // Values got from HiCal configuration file
         // Lowpass options
@@ -391,12 +392,12 @@ void IsisMain() {
   }
   catch(std::exception const &se) {
     CleanUp(sTempFiles, inFile);
-    string message = "std::exception: " + (IString)se.what();
+    QString message = "std::exception: " + (QString)se.what();
     throw IException(IException::User, message, _FILEINFO_);
   }
   catch(...) {
     CleanUp(sTempFiles, inFile);
-    string message = "Other Error";
+    QString message = "Other Error";
     throw IException(IException::User, message, _FILEINFO_);
   }
 }
@@ -406,22 +407,22 @@ void IsisMain() {
  *
  * @author Sharmila Prasad (2/14/2011)
  */
-void CleanUp(vector<IString> & psTempFiles, string psInfile)
+void CleanUp(vector<QString> & psTempFiles, QString psInfile)
 {
   // more clean up
   for (int i=0; i<(int)psTempFiles.size(); i++) {
-    remove(psTempFiles[i].c_str());
+    remove(psTempFiles[i].toAscii().data());
   }
   psTempFiles.clear();
 
   // Cleanup log files
-  int ipos = psInfile.find(".cub");
-  if (ipos != (int)string::npos) {
-    string sLogFile = psInfile.replace(ipos, 4, ".hical.log");
-    ipos = sLogFile.rfind("/");
+  int ipos = psInfile.indexOf(".cub");
+  if (ipos != -1) {
+    QString sLogFile = psInfile.replace(ipos, 4, ".hical.log");
+    ipos = sLogFile.lastIndexOf("/");
     sLogFile.replace(0, ipos+1, "./");
     //cerr << "Log=" << sLogFile << endl;
-    remove(sLogFile.c_str());
+    remove(sLogFile.toAscii().data());
   }
 }
 
@@ -436,27 +437,27 @@ void CleanUp(vector<IString> & psTempFiles, string psInfile)
 void GetCCD_Channel_Coefficients(Pvl & pCubeLabel)
 {
   int iChannel=-1, iSumming=-1;
-  string sCcd="";
+  QString sCcd="";
 
   PvlGroup instrGrp = pCubeLabel.FindObject("IsisCube").FindGroup("Instrument");
 
   // Summing keyword
   if (!instrGrp.HasKeyword("Summing")) {
-    string sMsg = "Summing keyword not found";
+    QString sMsg = "Summing keyword not found";
     throw IException(IException::User, sMsg, _FILEINFO_);
   }
   else {
     PvlKeyword binKey = instrGrp.FindKeyword("Summing");
-    iSumming = (int)binKey[0];
+    iSumming = toInt(binKey[0]);
     if (iSumming != 1 && iSumming != 2 && iSumming != 4) {
-      string sMsg = "Invalid Summing value in input file, must be 1,2,or 4";
+      QString sMsg = "Invalid Summing value in input file, must be 1,2,or 4";
       throw IException(IException::User, sMsg, _FILEINFO_);
     }
   }
 
   // CCD Keyword
   if (!instrGrp.HasKeyword("CcdId")) {
-    string sMsg = "CcdId keyword not found";
+    QString sMsg = "CcdId keyword not found";
     throw IException(IException::User, sMsg, _FILEINFO_);
   }
   else {
@@ -466,17 +467,17 @@ void GetCCD_Channel_Coefficients(Pvl & pCubeLabel)
 
   // Channel Keyword
   if (!instrGrp.HasKeyword("ChannelNumber")) {
-    string sMsg = "ChannelNumber keyword not found";
+    QString sMsg = "ChannelNumber keyword not found";
     throw IException(IException::User, sMsg, _FILEINFO_);
   }
   else {
     PvlKeyword channelKey = instrGrp.FindKeyword("ChannelNumber");
-    iChannel = channelKey[0];
+    iChannel = toInt(channelKey[0]);
   }
 
   // Get the coefficient file name
-  IString dCoeffFile = "$mro/calibration/HiRISE_Gain_Drift_Correction_Bin" + IString(iSumming) + ".0001.csv";
-  //IString dCoeffFile = "/home/sprasad/isis3/isis/src/mro/apps/hicalproc/HiRISE_Gain_Drift_Correction_Bin" + IString(iSumming) + ".0001.csv";
+  QString dCoeffFile = "$mro/calibration/HiRISE_Gain_Drift_Correction_Bin" + toString(iSumming) + ".0001.csv";
+  //QString dCoeffFile = "/home/sprasad/isis3/isis/src/mro/apps/hicalproc/HiRISE_Gain_Drift_Correction_Bin" + toString(iSumming) + ".0001.csv";
 #ifdef _DEBUG_
   cout << dCoeffFile << endl;
 #endif
@@ -492,14 +493,14 @@ void GetCCD_Channel_Coefficients(Pvl & pCubeLabel)
  *
  * @param psCoeffFile = Coefficient file name
  */
-void ReadCoefficientFile(string psCoeffile, string psCcd, int piChannel)
+void ReadCoefficientFile(QString psCoeffile, QString psCcd, int piChannel)
 {
   CSVReader coefFile(psCoeffile, true, 1, ',', false, true);
   double dCoeff[5];
   int iRows = coefFile.rows();
   int iRowIndex = -1;
 
-  IString sColName = psCcd + "_" + IString(piChannel);
+  QString sColName = psCcd + "_" + toString(piChannel);
 #ifdef _DEBUG_
   cout << endl << "Col name=" << sColName <<  "Rows=" << iRows << endl;
 #endif
@@ -515,12 +516,11 @@ void ReadCoefficientFile(string psCoeffile, string psCcd, int piChannel)
   if (iRowIndex != -1) {
     int iArrSize = csvArr.dim();
     for (int i=1; i<iArrSize; i++) {
-      csvArr[i].TrimHead(" \n,");
-      csvArr[i].TrimTail(" \n,\t\r");
-      dCoeff[i] = IString(csvArr[i]).ToDouble();
+      csvArr[i] = csvArr[i].trimmed().remove(QRegExp("(^,*|,*$)"));
+      dCoeff[i] = toDouble(csvArr[i]);
       if (dCoeff[i] < 0) {
         dCoeff[i] *= -1;
-        csvArr[i] = IString(dCoeff[i]) ;
+        csvArr[i] = toString(dCoeff[i]) ;
       }
     }
   }
@@ -536,7 +536,7 @@ void ReadCoefficientFile(string psCoeffile, string psCcd, int piChannel)
  * @param pdMinDN     - Minimum DN Value
  * @param pdMaxDN     - Maximum DN value
  */
-void AnalyzeCubenormStats(string psStatsFile, int piSumming, double & pdMinDN, double & pdMaxDN)
+void AnalyzeCubenormStats(QString psStatsFile, int piSumming, double & pdMinDN, double & pdMaxDN)
 {
   CSVReader coefFile(psStatsFile, true, 1, ' ', false, true);
   int iRows = coefFile.rows();
@@ -550,14 +550,13 @@ void AnalyzeCubenormStats(string psStatsFile, int piSumming, double & pdMinDN, d
 
     int iArrSize = csvArr.dim();
     for (int j=0; j<iArrSize; j++) {
-      csvArr[j].TrimHead(" \n,");
-      csvArr[j].TrimTail(" \n,\t\r");
+      csvArr[i] = csvArr[i].trimmed().remove(QRegExp("(^,*|,*$)"));
       // Store Valid Points and get the Max Valid Points for a
       // given RowCol
       //cerr << "  " << j << "." << csvArr[j];
       if (j==2) {
-        iValidPoints.push_back(csvArr[j]);
-        int iCurrValidPoints = IString(csvArr[j]).ToInteger();
+        iValidPoints.push_back(toInt(csvArr[j]));
+        int iCurrValidPoints = toInt(csvArr[j]);
         if (iCurrValidPoints > iMaxValidPoints) {
           iMaxValidPoints = iCurrValidPoints;
         }
@@ -565,15 +564,15 @@ void AnalyzeCubenormStats(string psStatsFile, int piSumming, double & pdMinDN, d
       }
       // Get the Standard deviation
       if (j==5) {
-        dStdDev.push_back(csvArr[j]);
+        dStdDev.push_back(toDouble(csvArr[j]));
       }
 
       // Get the Maximum and Minimum values
       if (j==6) {
-        dMinimum.push_back(csvArr[j]);
+        dMinimum.push_back(toDouble(csvArr[j]));
       }
       if (j==7) {
-        dMaximum.push_back(csvArr[j]);
+        dMaximum.push_back(toDouble(csvArr[j]));
       }
     }
   }

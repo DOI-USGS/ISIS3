@@ -58,15 +58,15 @@ namespace Isis {
     PvlGroup &kernels = lab.FindGroup("Kernels", Pvl::Traverse);
 
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
-    m_name = new IString;
+    m_name = new QString;
     *m_name = inst["TargetName"][0];
-    string trykey = "NaifIkCode";
+    QString trykey = "NaifIkCode";
     if (kernels.HasKeyword("NaifFrameCode")) trykey = "NaifFrameCode";
 
-    if (name().UpCase() == "SKY") {
+    if (name().toUpper() == "SKY") {
       m_radii[0] = m_radii[1] = m_radii[2] = Distance(1000.0, Distance::Meters);
       m_sky = true;
-      int ikCode = (int) kernels[trykey];
+      int ikCode = toInt(kernels[trykey][0]);
       *m_bodyCode  = ikCode / 1000;
       // Check for override in kernel group
       if (kernels.HasKeyword("NaifSpkCode"))
@@ -159,7 +159,7 @@ namespace Isis {
   SpiceInt Target::lookupNaifBodyCode() const {
     SpiceInt code;
     SpiceBoolean found;
-    bodn2c_c(m_name->c_str(), &code, &found);
+    bodn2c_c(m_name->toAscii().data(), &code, &found);
     if (!found) {
       IString msg = "Could not convert Target [" + *m_name +
                    "] to NAIF code";
@@ -182,7 +182,7 @@ namespace Isis {
 
 
   //! Return target name
-  IString Target::name() const {
+  QString Target::name() const {
     return *m_name;
   }
 

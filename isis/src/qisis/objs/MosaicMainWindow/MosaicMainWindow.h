@@ -5,14 +5,12 @@
 
 #include "MainWindow.h"
 
-namespace Isis {
-  class ToolPad;
-}
+class QString;
 
 namespace Isis {
   class Cube;
-  class IString;
   class MosaicController;
+  class ToolPad;
 
   /**
    * @brief

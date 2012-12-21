@@ -1,4 +1,4 @@
-#if !defined(Kernels_h)
+#ifndef Kernels_h
 #define Kernels_h
 /**                                                                       
  * @file                                                                  
@@ -109,7 +109,7 @@ class Kernels {
       /** Default Constructor */
       Kernels();
       Kernels(const Kernels &kernels);
-      Kernels(const std::string &filename);
+      Kernels(const QString &filename);
       Kernels(Cube &cube);
       Kernels(Pvl &pvl);
       /** Destructor always unloads the kernels from the pool */
@@ -122,7 +122,7 @@ class Kernels {
       int Missing() const;
 
       void Init(Pvl &pvl);
-      bool Add(const std::string &kfile);
+      bool Add(const QString &kfile);
 
       void Clear();
       int Discover();
@@ -133,22 +133,22 @@ class Kernels {
 
       void InitializeNaifKernelPool();
 
-      int Load(const std::string &ktype);
+      int Load(const QString &ktype);
       int Load();
 
-      int UnLoad(const std::string &ktype);
+      int UnLoad(const QString &ktype);
       int UnLoad();
 
       int UpdateLoadStatus();
 
       int Merge(const Kernels &other);
 
-      std::vector<std::string> getKernelTypes() const;
-      std::vector<std::string> getKernelList(const std::string &ktype = "") 
+      QStringList getKernelTypes() const;
+      QStringList getKernelList(const QString &ktype = "") 
                                              const;
-      std::vector<std::string> getLoadedList(const std::string &ktypes = "") 
+      QStringList getLoadedList(const QString &ktypes = "") 
                                              const;
-      std::vector<std::string> getMissingList() const;
+      QStringList getMissingList() const;
 
       
       /** Returns the ISIS camera model version number */
@@ -156,11 +156,11 @@ class Kernels {
 
   private:
     struct KernelFile {          
-      std::string  pathname;
-      std::string  name;
-      std::string  fullpath;
+      QString  pathname;
+      QString  name;
+      QString  fullpath;
       bool         exists; 
-      std::string  ktype; 
+      QString  ktype; 
       mutable bool loaded; 
       bool         managed;
     };
@@ -170,28 +170,28 @@ class Kernels {
     int        _camVersion;
 
     typedef std::vector<KernelFile *> KernelFileList;
-    typedef CollectorMap<std::string, KernelFileList> TypeList;
+    typedef CollectorMap<QString, KernelFileList> TypeList;
 
     bool Load(KernelFile &kfile);
     bool UnLoad(KernelFile &kfile);
 
-    std::vector<std::string> getTypes(const std::string &ktypes) const;
-    std::string resolveType(const std::string &kfile) const;
-    std::string resolveTypeByExt(const std::string &kfile, 
-                                 const std::string &iktype = "UNKNOWN") const;
+    QStringList getTypes(const QString &ktypes) const;
+    QString resolveType(const QString &kfile) const;
+    QString resolveTypeByExt(const QString &kfile, 
+                                 const QString &iktype = "UNKNOWN") const;
 
-    bool IsNaifType(const std::string &ktype) const;
-    KernelFile examine(const std::string &fname, const bool &manage = true) 
+    bool IsNaifType(const QString &ktype) const;
+    KernelFile examine(const QString &fname, const bool &manage = true) 
                        const;
     int UpdateManagedStatus();
-    std::vector<KernelFile> findKernels(Pvl &pvl, const std::string &kname,
+    std::vector<KernelFile> findKernels(Pvl &pvl, const QString &kname,
                                        const bool &manage = true);
-    KernelFile *findByName(const std::string &kfile);
+    KernelFile *findByName(const QString &kfile);
     TypeList categorizeByType() const;
       
     void addKernels(const KernelList &klist);
-    std::string getKernelType(const std::string &kname) const; 
-    void loadKernel(const std::string &ktype = "");
+    QString getKernelType(const QString &kname) const; 
+    void loadKernel(const QString &ktype = "");
     int getCameraVersion(Pvl &pvl) const;
 
 };

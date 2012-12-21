@@ -31,7 +31,7 @@ void IsisMain() {
 
   // Open the input cube
   UserInterface &ui = Application::GetUserInterface();
-  string from = ui.GetFileName("FROM");
+  QString from = ui.GetFileName("FROM");
   g_cube.open(from);
 
   samples = g_cube.getSampleCount();

@@ -44,7 +44,7 @@ namespace Isis {
   }
 
   /** Construct with Gruen definintions file */
-  SmtkMatcher::SmtkMatcher(const std::string &regdef) : m_lhCube(0),
+  SmtkMatcher::SmtkMatcher(const QString &regdef) : m_lhCube(0),
                                                         m_rhCube(0),
                                                         m_gruen(0),
                                                         m_offImage(0),
@@ -55,7 +55,7 @@ namespace Isis {
   }
 
   /** Construct with Gruen definintions file and camera objects  */
-  SmtkMatcher::SmtkMatcher(const std::string &regdef, Cube *lhCube,
+  SmtkMatcher::SmtkMatcher(const QString &regdef, Cube *lhCube,
                            Cube *rhCube) : m_lhCube(lhCube),
                                            m_rhCube(rhCube),
                                            m_gruen(0), m_offImage(0),
@@ -90,9 +90,9 @@ namespace Isis {
    *
    * @param regdef Gruen definitions Pvl file
    */
-  void SmtkMatcher::setGruenDef(const std::string &regdef) {
+  void SmtkMatcher::setGruenDef(const QString &regdef) {
     Pvl reg(regdef);
-    m_gruen = auto_ptr<Gruen> (new Gruen(reg));  // Deallocation automatic
+    m_gruen = std::auto_ptr<Gruen> (new Gruen(reg));  // Deallocation automatic
     return;
   }
 
@@ -144,7 +144,7 @@ namespace Isis {
    * @param pattern Set the file pattern of the output cube search
    *                chips.
    */
-  void SmtkMatcher::setWriteSubsearchChipPattern(const std::string &fileptrn) {
+  void SmtkMatcher::setWriteSubsearchChipPattern(const QString &fileptrn) {
     validate();
     m_gruen->WriteSubsearchChips(fileptrn);
   }
@@ -236,20 +236,20 @@ namespace Isis {
     bool valid(true);
 
     if (!spnt.isValid()) {
-      cout << "Point status is invalid!\n";
+      std::cout << "Point status is invalid!\n";
       valid = false;
     }
 
     // Is valid in left image?
     if (!inCube(lhCamera(), spnt.getLeft())) {
-      cout << "Left point (" << spnt.getLeft().getLine() << ","
+      std::cout << "Left point (" << spnt.getLeft().getLine() << ","
            << spnt.getLeft().getSample() << ") is invalid!\n";
       valid = false;
     }
 
     // Is valud in right image?
     if (!inCube(rhCamera(), spnt.getRight())) {
-      cout << "Right point (" << spnt.getRight().getLine() << ","
+      std::cout << "Right point (" << spnt.getRight().getLine() << ","
            << spnt.getRight().getSample() << ") is invalid!\n";
       valid = false;
     }
@@ -355,7 +355,7 @@ namespace Isis {
     // Test if the left point is defined. This will throw an error if this
     // situation occurs
     if (!lpg.getPoint().isValid()) {
-      string mess = "Left point is not defined which is required";
+      QString mess = "Left point is not defined which is required";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
@@ -535,7 +535,7 @@ namespace Isis {
     if (!m_rhCube) isGood = false;
     if (!m_gruen.get()) isGood = false;
     if ((!isGood) && throwError) {
-      std::string mess = "Images/match algorithm not initialized!";
+      QString mess = "Images/match algorithm not initialized!";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
     return (isGood);

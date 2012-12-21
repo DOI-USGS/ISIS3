@@ -22,8 +22,9 @@
 #include "ProcessExport.h"
 #include <vector>
 
+class QString;
+
 namespace Isis {
-  class IString;
   class PvlFormatPds;
   class Table;
 
@@ -131,7 +132,7 @@ namespace Isis {
       void OutputLabel(std::ofstream &pdsFileStream);
       void OutputDetachedLabel();
 
-      void ExportTable(Isis::Table isisTable, IString detachedPdsTableFileName="");
+      void ExportTable(Isis::Table isisTable, QString detachedPdsTableFileName="");
 
       // include this using declaration to indicate that ProcessExportPds 
       // objects that call a StartProcess() method that has not been overridden
@@ -144,7 +145,7 @@ namespace Isis {
       bool Attached();
 
       // Mutators
-      void SetDetached(const std::string detachedLabelFile);
+      void SetDetached(QString detachedLabelFile);
       void SetAttached();
       void ForceBands(bool force);
       void ForceBandName(bool force);
@@ -169,7 +170,7 @@ namespace Isis {
       void CreateQubeLabel();
       void CreateSpectralQubeLabel();
 
-      std::string ProjectionName(Pvl &inputLabel);
+      QString ProjectionName(Pvl &inputLabel);
 
       PvlFormatPds *m_formatter;  /**< Used to determine how to format the 
                                        keyword values in the PDS file.*/
@@ -219,7 +220,7 @@ namespace Isis {
                                           the PDS labels.*/
       bool m_detachedLabel;          /**< Indicates whether the PDS file
                                           will be detached.*/
-      IString m_detachedPdsLabelFile;/**< The name of the detached PDS label
+      QString m_detachedPdsLabelFile;/**< The name of the detached PDS label
                                           file.*/
       PdsFileType m_pdsFileType;     /**< Image, Qube, Spectral Qube, or 
                                           JP2 Image*/

@@ -219,11 +219,11 @@ namespace Isis {
    * @param includeUnits Include the angle's units in the text.
    * @return A user-displayable angle string.
    */
-  IString Angle::toString(bool includeUnits) const {
-    IString textResult = "";
+  QString Angle::toString(bool includeUnits) const {
+    QString textResult = "";
 
     if (isValid()) {
-      textResult = IString(degrees());
+      textResult = Isis::toString(degrees());
 
       if (includeUnits)
         textResult += " degrees";

@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <vector>
 
+#include <QFile>
+
 #include "CisscalFile.h"
 #include "FileName.h"
 #include "IException.h"
@@ -43,9 +45,9 @@ int main(int argc, char *argv[]) {
 
 // ----------------------------------------------------------------------------------
 
-  string testFile = "$temporary/CisscalFile.tmp";
+  QString testFile = "$temporary/CisscalFile.tmp";
   // setup test data
-  string testLines[8];
+  QString testLines[8];
 
   // setup line test data
   testLines[0]  = "PDS_VERSION_ID    = PDS3";
@@ -60,7 +62,7 @@ int main(int argc, char *argv[]) {
   // calc cumulative byte counts for each line - to check CisscalFile.Size()
   streamsize numBytes = 0;
   streamsize numBytesFiltered = 0;
-  vector<string> testLinesVector;
+  vector<QString> testLinesVector;
 
   for(int i = 0; i <= 7; i++) {
     numBytes += testLines[i].length() + strlen("\n");
@@ -77,7 +79,7 @@ int main(int argc, char *argv[]) {
   try {
     Isis::CisscalFile f(testFile);
     bool lineFound = false;
-    string line;
+    QString line;
     // data line 1
     lineFound = f.GetLine(line);
     if (!lineFound) {
@@ -146,7 +148,7 @@ int main(int argc, char *argv[]) {
   }
 //-----------------------------------------------------------------------------------
   cout << "2) Remove temp file -> " << testFile << " <-" << endl;
-  if (remove(FileName(testFile).expanded().c_str())) {
+  if (!QFile::remove(FileName(testFile).expanded())) {
     cout << "*** Failed to remove tmp file: " << testFile << endl;
   }
   return 0;

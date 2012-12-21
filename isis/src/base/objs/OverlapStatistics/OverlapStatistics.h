@@ -70,7 +70,7 @@ namespace Isis {
   class OverlapStatistics {
     public:
       OverlapStatistics(Isis::Cube &x, Isis::Cube &y,
-                        std::string progressMsg = "Gathering Overlap Statistics",
+                        QString progressMsg = "Gathering Overlap Statistics",
                         double sampPercent = 100.0);
 
       /**
@@ -90,7 +90,7 @@ namespace Isis {
       /**
        * Returns the filename of the first cube
        *
-       * @return string The name of the first cube
+       * @return QString The name of the first cube
        */
       Isis::FileName FileNameX() const {
         return p_xFile;
@@ -99,7 +99,7 @@ namespace Isis {
       /**
        * Returns the filename of the second cube
        *
-       * @return string The name of the second cube
+       * @return QString The name of the second cube
        */
       Isis::FileName FileNameY() const {
         return p_yFile;

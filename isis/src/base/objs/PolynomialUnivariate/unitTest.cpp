@@ -1,10 +1,13 @@
 #include "PolynomialUnivariate.h"
 #include <iostream>
 
+#include "IString.h"
+
+using namespace Isis;
 using namespace std;
 
 int main() {
-  Isis::PolynomialUnivariate b(1);
+  PolynomialUnivariate b(1);
   vector<double> coefs;
   coefs.push_back(0.5);
   coefs.push_back(0.5);
@@ -35,7 +38,7 @@ int main() {
 
   // Test 2nd order
   // 0.5 + 0.5*v1 + 1.0*v1*v1
-  Isis::PolynomialUnivariate c(2);
+  PolynomialUnivariate c(2);
   cout << "---- 2nd order ----" << endl;
   cout << "Name   = " << c.Name() << endl;
   cout << "Ncoefs = " << c.Coefficients() << endl;

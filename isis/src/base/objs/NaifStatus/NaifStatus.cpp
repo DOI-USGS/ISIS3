@@ -77,7 +77,7 @@ namespace Isis {
     getmsg_c("LONG", LONG_DESC_LEN, naifLong);
 
     // Search for known naif errors...
-    IString errMsg;
+    QString errMsg;
 
     Pvl error;
     PvlGroup errorDescription("ErrorDescription");
@@ -106,8 +106,8 @@ namespace Isis {
     }
 
     errMsg += " The short explanation ";
-    errMsg += "provided by NAIF is [" + IString(naifShort) + "]. ";
-    errMsg += "The Naif error is [" + IString(naifLong) + "]";
+    errMsg += "provided by NAIF is [" + QString(naifShort) + "]. ";
+    errMsg += "The Naif error is [" + QString(naifLong) + "]";
 
     throw IException(IException::Unknown, errMsg, _FILEINFO_);
   }

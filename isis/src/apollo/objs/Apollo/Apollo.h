@@ -43,27 +43,27 @@ namespace Isis {
   class Apollo {
     public:
 
-      Apollo (IString spacecraft, IString instrument) {
-        initialize(spacecraft.UpCase(), instrument.UpCase());
+      Apollo (QString spacecraft, QString instrument) {
+        initialize(spacecraft.toUpper(), instrument.toUpper());
       };
 
-      Apollo(IString filename) {
-        IString spacecraft, instrument;
-        if (filename.substr(0,4) == "AS15") spacecraft = "APOLLO 15";
-        else if (filename.substr(0,4) == "AS16") spacecraft = "APOLLO 16";
-        else if (filename.substr(0,4) == "AS17") spacecraft = "APOLLO 17";
+      Apollo(QString filename) {
+        QString spacecraft, instrument;
+        if (filename.mid(0,4) == "AS15") spacecraft = "APOLLO 15";
+        else if (filename.mid(0,4) == "AS16") spacecraft = "APOLLO 16";
+        else if (filename.mid(0,4) == "AS17") spacecraft = "APOLLO 17";
         // throw an error
         else {
-          IString msg = "The image filename does not match the required formatting.";
+          QString msg = "The image filename does not match the required formatting.";
           throw IException(IException::User,msg,_FILEINFO_);
         }
 
-        if (filename.substr(5,1) == "M") instrument = "METRIC";
-        else if (filename.substr(5,1) == "P") instrument = "PANORAMIC";
-        else if (filename.substr(5,1) == "H") instrument = "HASSELBLAD";
+        if (filename.mid(5,1) == "M") instrument = "METRIC";
+        else if (filename.mid(5,1) == "P") instrument = "PANORAMIC";
+        else if (filename.mid(5,1) == "H") instrument = "HASSELBLAD";
         // throw an error
         else {
-          IString msg = "The image filename does not match the required formatting.";
+          QString msg = "The image filename does not match the required formatting.";
           throw IException(IException::User,msg,_FILEINFO_);
         }
 
@@ -84,15 +84,15 @@ namespace Isis {
       int Bands () { return p_imageBands;};
       int ReseauDimension () {return p_reseauDimension;};
       double PixelPitch () {return p_imagePixelPitch;};
-      IString SpacecraftName () {return p_spacecraftName;};
-      IString InstrumentId () {return p_instrumentId;};
-      IString NaifFrameCode () {return p_naifFrameCode;};
-      IString TargetName () {return "MOON";};
+      QString SpacecraftName () {return p_spacecraftName;};
+      QString InstrumentId () {return p_instrumentId;};
+      QString NaifFrameCode () {return p_naifFrameCode;};
+      QString TargetName () {return "MOON";};
       iTime LaunchDate () {return p_launchDate;};
 
       private:
 
-      void initialize(IString spacecraft, IString instrument) {
+      void initialize(QString spacecraft, QString instrument) {
         if (instrument == "METRIC") {
           p_instrumentId = "METRIC";
           p_reseauDimension = 403;
@@ -118,7 +118,7 @@ namespace Isis {
           p_imagePixelPitch = 200.5;
         }
         else {
-          IString msg = "Unknown instrument: " + instrument;
+          QString msg = "Unknown instrument: " + instrument;
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
@@ -144,14 +144,14 @@ namespace Isis {
           else if (IsPanoramic()) p_naifFrameCode = "-917230";
         }
         else {
-          IString msg = "Unknown spacecraft: " + spacecraft;
+          QString msg = "Unknown spacecraft: " + spacecraft;
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
       }
 
       int p_imageWidth, p_imageHeight, p_imageBands, p_reseauDimension;
       double p_imagePixelPitch;
-      IString p_spacecraftName, p_instrumentId, p_naifFrameCode;
+      QString p_spacecraftName, p_instrumentId, p_naifFrameCode;
       iTime p_launchDate;
     };
 };

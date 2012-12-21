@@ -27,9 +27,10 @@
 #include <string>
 #include <queue>
 
-#include "Pvl.h"
+#include <QString>
+
 #include "iTime.h"
-#include "IString.h"
+#include "Pvl.h"
 
 namespace spiceInit {
 
@@ -40,12 +41,9 @@ namespace spiceInit {
     Smithed = 8
   };
 
-  inline kernelTypes kernelTypeEnum(const std::string &type) {
-    Isis::IString strng = type;
-    strng.ConvertWhiteSpace();
-    strng.Compress();
-    strng.Trim(" ");
-    strng.UpCase();
+  inline kernelTypes kernelTypeEnum(const QString &type) {
+    QString strng = type.simplified().trimmed().toUpper();
+
     if(strng == "PREDICTED") return Predicted;
     if(strng == "NADIR") return Nadir;
     if(strng == "RECONSTRUCTED") return Reconstructed;
@@ -105,7 +103,7 @@ class KernelDb {
   public:
     // constructor
     KernelDb(const unsigned int kernelTypes);
-    KernelDb(const std::string &dbName, const unsigned int kernelTypes);
+    KernelDb(const QString &dbName, const unsigned int kernelTypes);
     KernelDb(std::istream &dbStream, const unsigned int kernelTypes);
 
     // destructor
@@ -123,25 +121,25 @@ class KernelDb {
     Kernel InstrumentAddendum(Isis::Pvl &lab);
     Kernel Dem(Isis::Pvl &lab);
 
-    Kernel FindLast(const std::string &entry, Isis::Pvl &lab);
-    std::priority_queue< Kernel > FindAll(const std::string &entry,
+    Kernel FindLast(const QString &entry, Isis::Pvl &lab);
+    std::priority_queue< Kernel > FindAll(const QString &entry,
                                           Isis::Pvl &lab);
 
-    void LoadSystemDb(const std::string &mission);
+    void LoadSystemDb(const QString &mission);
 
     // Returns true if the newType is allowed and better than
     // the oldType
-    const bool Better(const std::string newType, const std::string oldType);
+    const bool Better(const QString newType, const QString oldType);
     const bool Better(const spiceInit::kernelTypes newType,
                       const spiceInit::kernelTypes oldType);
     const bool Matches(Isis::Pvl &lab, Isis::PvlGroup &kernelDbGrp,
                        Isis::iTime timeToMatch, int cameraVersion);
 
   protected:
-    std::string p_filename;
+    QString p_filename;
 
   private:
-    std::vector<std::string> GetFile(Isis::PvlGroup &grp);
+    std::vector<QString> GetFile(Isis::PvlGroup &grp);
     unsigned int p_kernelTypes;
     Isis::Pvl p_kernelData;
 };
@@ -157,7 +155,7 @@ class Kernel {
       kernelType = (spiceInit::kernelTypes)0;
     }
 
-    Kernel(spiceInit::kernelTypes type, const std::vector<std::string> &data) {
+    Kernel(spiceInit::kernelTypes type, const std::vector<QString> &data) {
       kernelType = type;
       kernels = data;
     }
@@ -169,19 +167,19 @@ class Kernel {
     const int size() {
       return kernels.size();
     }
-    void push_back(const std::string &str) {
+    void push_back(const QString &str) {
       kernels.push_back(str);
     }
 
-    std::string &operator[](const int index) {
+    QString &operator[](const int index) {
       return kernels[index];
     }
-    std::string operator[](const int index) const {
+    QString operator[](const int index) const {
       return kernels[index];
     }
 
     spiceInit::kernelTypes kernelType;
-    std::vector<std::string> kernels;
+    std::vector<QString> kernels;
 };
 
 #endif

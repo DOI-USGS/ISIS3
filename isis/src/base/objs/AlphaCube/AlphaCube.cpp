@@ -22,6 +22,8 @@
  */
 #include "AlphaCube.h"
 
+#include "IString.h"
+
 using namespace std;
 namespace Isis {
   //! Constructs an AlphaCube object using a PVL object.
@@ -138,25 +140,25 @@ namespace Isis {
       *this = temp;
 
       Isis::PvlGroup &alpha = cube.FindGroup("AlphaCube");
-      alpha["AlphaSamples"] = p_alphaSamples;
-      alpha["AlphaLines"] = p_alphaLines;
-      alpha["AlphaStartingSample"] = p_alphaStartingSample;
-      alpha["AlphaStartingLine"] = p_alphaStartingLine;
-      alpha["AlphaEndingSample"] = p_alphaEndingSample;
-      alpha["AlphaEndingLine"] = p_alphaEndingLine;
-      alpha["BetaSamples"] = p_betaSamples;
-      alpha["BetaLines"] = p_betaLines;
+      alpha["AlphaSamples"] = toString(p_alphaSamples);
+      alpha["AlphaLines"] = toString(p_alphaLines);
+      alpha["AlphaStartingSample"] = toString(p_alphaStartingSample);
+      alpha["AlphaStartingLine"] = toString(p_alphaStartingLine);
+      alpha["AlphaEndingSample"] = toString(p_alphaEndingSample);
+      alpha["AlphaEndingLine"] = toString(p_alphaEndingLine);
+      alpha["BetaSamples"] = toString(p_betaSamples);
+      alpha["BetaLines"] = toString(p_betaLines);
     }
     else {
       Isis::PvlGroup alpha("AlphaCube");
-      alpha += Isis::PvlKeyword("AlphaSamples", p_alphaSamples);
-      alpha += Isis::PvlKeyword("AlphaLines", p_alphaLines);
-      alpha += Isis::PvlKeyword("AlphaStartingSample", p_alphaStartingSample);
-      alpha += Isis::PvlKeyword("AlphaStartingLine", p_alphaStartingLine);
-      alpha += Isis::PvlKeyword("AlphaEndingSample", p_alphaEndingSample);
-      alpha += Isis::PvlKeyword("AlphaEndingLine", p_alphaEndingLine);
-      alpha += Isis::PvlKeyword("BetaSamples", p_betaSamples);
-      alpha += Isis::PvlKeyword("BetaLines", p_betaLines);
+      alpha += Isis::PvlKeyword("AlphaSamples", toString(p_alphaSamples));
+      alpha += Isis::PvlKeyword("AlphaLines", toString(p_alphaLines));
+      alpha += Isis::PvlKeyword("AlphaStartingSample", toString(p_alphaStartingSample));
+      alpha += Isis::PvlKeyword("AlphaStartingLine", toString(p_alphaStartingLine));
+      alpha += Isis::PvlKeyword("AlphaEndingSample", toString(p_alphaEndingSample));
+      alpha += Isis::PvlKeyword("AlphaEndingLine", toString(p_alphaEndingLine));
+      alpha += Isis::PvlKeyword("BetaSamples", toString(p_betaSamples));
+      alpha += Isis::PvlKeyword("BetaLines", toString(p_betaLines));
       cube.AddGroup(alpha);
     }
   }

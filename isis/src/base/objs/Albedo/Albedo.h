@@ -1,4 +1,4 @@
-#if !defined(Albedo_h)
+#ifndef Albedo_h
 #define Albedo_h
 /**
  * @file

@@ -29,6 +29,8 @@
 #include <iomanip>
 #include <sstream>
 
+#include <QVector>
+
 #include "Kernels.h"
 #include "FileName.h"
 #include "PvlKeyword.h"
@@ -102,7 +104,7 @@ namespace Isis {
    *
    * @param filename Name of ISIS cube file
    */
-  Kernels::Kernels(const std::string &filename) {
+  Kernels::Kernels(const QString &filename) {
     Pvl pvl(filename);
     Init(pvl);
   }
@@ -188,7 +190,7 @@ namespace Isis {
    * @return bool True if the files was added to the list, false if it already
    *              exists
    */
-  bool Kernels::Add(const std::string &kfile) {
+  bool Kernels::Add(const QString &kfile) {
     if (!findByName(kfile)) {
       _kernels.push_back(examine(kfile, true));
       return (true);
@@ -370,18 +372,18 @@ namespace Isis {
    *
    * @return int Number of kernels loaded
    */
-  int Kernels::Load(const std::string &ktypes) {
+  int Kernels::Load(const QString &ktypes) {
     //  If no types specified, return them all
     int nLoaded(0);
-    if (ktypes.empty()) {
+    if (ktypes.isEmpty()) {
       for (unsigned int k = 0 ; k < _kernels.size() ; k++) {
         if (Load(_kernels[k])) { nLoaded++; }
       }
     }
     else {
       // Find types and return requested types
-      vector<string> tlist = getTypes(ktypes);
-      for (unsigned int t = 0 ; t < tlist.size() ; t++) {
+      QStringList tlist = getTypes(ktypes);
+      for (int t = 0 ; t < tlist.size() ; t++) {
         for (unsigned int k = 0; k < _kernels.size() ; k++) {
           if (_kernels[k].ktype == tlist[t]) {
             if (Load(_kernels[k])) { nLoaded++; }
@@ -459,16 +461,16 @@ namespace Isis {
    *
    * @return int Number of kernels unloaded
    */
-  int Kernels::UnLoad(const std::string &ktypes) {
+  int Kernels::UnLoad(const QString &ktypes) {
     //  If not types specified, return them all
     int nUnloaded(0);
-    if (ktypes.empty()) {
+    if (ktypes.isEmpty()) {
       nUnloaded = UnLoad();
     }
     else {
       // Find types and return requested types
-      vector<string> tlist = getTypes(ktypes);
-      for (unsigned int t = 0 ; t < tlist.size() ; t++) {
+      QStringList tlist = getTypes(ktypes);
+      for (int t = 0 ; t < tlist.size() ; t++) {
         for (unsigned int k = 0; k < _kernels.size() ; k++) {
           if (_kernels[k].ktype == tlist[t]) {
             if (UnLoad(_kernels[k])) nUnloaded++;
@@ -506,7 +508,7 @@ namespace Isis {
         SpiceChar source[128];
         SpiceInt  handle;
         SpiceBoolean found;
-        kinfo_c(_kernels[i].fullpath.c_str(), sizeof(ktype), sizeof(source),
+        kinfo_c(_kernels[i].fullpath.toAscii().data(), sizeof(ktype), sizeof(source),
                  ktype,source, &handle, &found);
         if (found == SPICETRUE) {
           if (!_kernels[i].loaded) nchanged++;
@@ -649,13 +651,13 @@ namespace Isis {
    * string value after the last '/' character.  This is typically the value
    * that is also returned by the NAIF kinfo_c utility.
    *
-   * @return std::vector<std::string> Alphabetical list of kernel types
+   * @return std::vector<QString> Alphabetical list of kernel types
    */
-  std::vector<std::string> Kernels::getKernelTypes() const {
+  QStringList Kernels::getKernelTypes() const {
     TypeList kmap = categorizeByType();
-    std::vector<std::string> types;
+    QStringList types;
     for (int i = 0 ; i < kmap.size() ; i++) {
-      types.push_back(kmap.key(i));
+      types.append(kmap.key(i));
     }
     return (types);
   }
@@ -671,21 +673,21 @@ namespace Isis {
    *               can be any type found in the internal list as returned by
    *               getKernelTypes().  If empty, returns all kernels.
    *
-   * @return std::vector<std::string> A vector of filenames of SPICE kernels
+   * @return std::vector<QString> A vector of filenames of SPICE kernels
    */
-  std::vector<std::string> Kernels::getKernelList(const std::string &ktypes) const {
+  QStringList Kernels::getKernelList(const QString &ktypes) const {
 
     //  If not types specified, return them all
-    vector<string> flist;
-    if (ktypes.empty()) {
+    QStringList flist;
+    if (ktypes.isEmpty()) {
       for (unsigned int k = 0; k < _kernels.size() ; k++) {
         flist.push_back(_kernels[k].pathname);
       }
     }
     else {
       // Find types and return requested types
-      vector<string> tlist = getTypes(ktypes);
-      for (unsigned int t = 0 ; t < tlist.size() ; t++) {
+      QStringList tlist = getTypes(ktypes);
+      for (int t = 0 ; t < tlist.size() ; t++) {
         for (unsigned int k = 0; k < _kernels.size() ; k++) {
           if (_kernels[k].ktype == tlist[t]) {
             flist.push_back(_kernels[k].pathname);
@@ -717,21 +719,21 @@ namespace Isis {
    *               return if loaded.  If empty, returns all types of kernels
    *               that are deemed loaded.
    *
-   * @return std::vector<std::string> List of kernel filenames that are
+   * @return std::vector<QString> List of kernel filenames that are
    *         currently loaded.
    *
    */
-  std::vector<std::string> Kernels::getLoadedList(const std::string &ktypes)
+  QStringList Kernels::getLoadedList(const QString &ktypes)
                                                  const {
-    std::vector<std::string> flist;
-    if (ktypes.empty()) {
+    QStringList flist;
+    if (ktypes.isEmpty()) {
       for (unsigned int i = 0 ; i < _kernels.size() ; i++) {
         if (_kernels[i].loaded) flist.push_back(_kernels[i].pathname);
       }
     }
     else {
-      std::vector<std::string> tlist = getTypes(ktypes);
-      for (unsigned int t = 0 ; t < tlist.size() ; t++ ) {
+      QStringList tlist = getTypes(ktypes);
+      for (int t = 0 ; t < tlist.size() ; t++ ) {
         for (unsigned int k = 0; k < _kernels.size() ; k++) {
           if (_kernels[k].ktype == tlist[t]) {
             flist.push_back(_kernels[k].pathname);
@@ -751,10 +753,10 @@ namespace Isis {
    * then this routine returns a list of files missing.
    *
    *
-   * @return std::vector<std::string>  List of missing kernel files
+   * @return std::vector<QString>  List of missing kernel files
    */
-  std::vector<std::string> Kernels::getMissingList() const {
-    std::vector<std::string> flist;
+  QStringList Kernels::getMissingList() const {
+    QStringList flist;
     for (unsigned int i = 0 ; i < _kernels.size() ; i++) {
       if (!_kernels[i].exists) flist.push_back(_kernels[i].pathname);
     }
@@ -780,7 +782,7 @@ namespace Isis {
       if (!kfile.loaded) {
         NaifStatus::CheckErrors();
         try {
-          furnsh_c(kfile.fullpath.c_str());
+          furnsh_c(kfile.fullpath.toAscii().data());
           NaifStatus::CheckErrors();
           kfile.loaded = true;
           kfile.managed = true;
@@ -822,7 +824,7 @@ namespace Isis {
       if (kfile.managed) {
          NaifStatus::CheckErrors();
          try {
-           unload_c(kfile.fullpath.c_str());
+           unload_c(kfile.fullpath.toAscii().data());
            NaifStatus::CheckErrors();
          }
          catch (IException &) {
@@ -848,7 +850,7 @@ namespace Isis {
    * Here is now the strings are used:
    *
    * @code
-   * std::vector<std::string> klist = myKernels.getTypes("LSK,FK,SPK"); for
+   * std::vector<QString> klist = myKernels.getTypes("LSK,FK,SPK"); for
    * (unsigned int i = 0 ; i < klist.size(I) ; i++) {
    *    cout << i << ": " << klist[i] << endl;
    * }
@@ -864,14 +866,13 @@ namespace Isis {
    *
    * @param ktypes Sgtring containing comma separated list of kernel file types
    *
-   * @return std::vector<std::string> Vector containing values between commas.
+   * @return std::vector<QString> Vector containing values between commas.
    */
-  std::vector<std::string> Kernels::getTypes(const std::string &ktypes) const {
+  QStringList Kernels::getTypes(const QString &ktypes) const {
    // Find types and return requested types
-    vector<string> tlist;
-    IString::Split(',', ktypes, tlist);
-    for (unsigned int k = 0 ; k < tlist.size() ; k++) {
-      tlist[k] = IString(tlist[k]).Trim(" \r\n\t\v\b\f").UpCase();
+    QStringList tlist = ktypes.split(",");
+    for (int k = 0 ; k < tlist.size() ; k++) {
+      tlist[k] = IString(tlist[k]).Trim(" \r\n\t\v\b\f").UpCase().ToQt();
     }
     return (tlist);
   }
@@ -906,7 +907,7 @@ namespace Isis {
    * @return Kernels::KernelList List of scrutinized kernel file names
    */
   Kernels::KernelList Kernels::findKernels(Pvl &pvl,
-                                           const std::string &kname,
+                                           const QString &kname,
                                            const bool &manage) {
     KernelList klist;
     // Get the kernel group and load main kernels
@@ -916,7 +917,7 @@ namespace Isis {
       PvlKeyword &kkey = kernels[kname];
       for (int i = 0 ; i < kkey.Size() ; i++) {
         if (!kkey.IsNull(i)) {
-          if (!IString::Equal(kkey[i], "Table")) {
+          if (kkey[i].toLower() != "table") {
             klist.push_back(examine(kkey[i], manage));
           }
         }
@@ -951,7 +952,7 @@ namespace Isis {
    *              with the name if it exists in the list, otherwise a 0 pointer
    *              is returned indicating it does not exist in the list
    */
-  Kernels::KernelFile *Kernels::findByName(const std::string &kfile)  {
+  Kernels::KernelFile *Kernels::findByName(const QString &kfile)  {
     KernelList::iterator klist;
     for (klist = _kernels.begin() ; klist != _kernels.end() ; ++klist) {
       if (klist->pathname == kfile) { return (&(*klist)); }
@@ -993,9 +994,9 @@ namespace Isis {
    *
    * @return bool True if it is a NAIF kernel type
    */
-  bool Kernels::IsNaifType(const std::string &ktype) const {
-    if (IString::Equal(ktype, "UNKNOWN")) return (false);
-    if (IString::Equal(ktype, "DEM")) return (false);
+  bool Kernels::IsNaifType(const QString &ktype) const {
+    if (ktype.toUpper() == "UNKNOWN") return (false);
+    if (ktype.toUpper() == "DEM") return (false);
     return (true);
   }
   /**
@@ -1046,7 +1047,7 @@ namespace Isis {
    * @return Kernels::KernelFile An internal Kernels file structure describing
    *         the file.
    */
-  Kernels::KernelFile Kernels::examine(const std::string &kfile,
+  Kernels::KernelFile Kernels::examine(const QString &kfile,
                                        const bool &manage) const {
 
     FileName kernfile(kfile);
@@ -1069,12 +1070,12 @@ namespace Isis {
         SpiceChar source[128];
         SpiceInt  handle;
         SpiceBoolean found;
-        kinfo_c(kf.fullpath.c_str(), sizeof(ktype), sizeof(source), ktype,
+        kinfo_c(kf.fullpath.toAscii().data(), sizeof(ktype), sizeof(source), ktype,
                 source, &handle, &found);
         if (found == SPICETRUE) {
           kf.loaded = true;
           kf.managed = false;
-          kf.ktype = IString(ktype).UpCase();
+          kf.ktype = IString(ktype).UpCase().ToQt();
         }
       }
     }
@@ -1103,14 +1104,14 @@ namespace Isis {
    *
    * @param kfile Name of potential NAIF kernel to determine type for
    *
-   * @return std::string Value of the identifier found.  If undetermined,
+   * @return QString Value of the identifier found.  If undetermined,
    *         "UNKNOWN" is returned.
    */
-  std::string Kernels::resolveType(const std::string &kfile) const {
+  QString Kernels::resolveType(const QString &kfile) const {
     FileName kernFile(kfile);
-    string kpath = kernFile.expanded();
-    ifstream ifile(kpath.c_str(), ios::in | ios::binary);
-    string ktype("UNKNOWN");
+    QString kpath = kernFile.expanded();
+    ifstream ifile(kpath.toAscii().data(), ios::in | ios::binary);
+    QString ktype("UNKNOWN");
     if (ifile) {
       char ibuf[10];
       ifile.read(ibuf, 8);
@@ -1120,13 +1121,9 @@ namespace Isis {
 
       // See if the file is a known NAIF type.  Assume it has been
       // extracted from a NAIF compliant kernel
-      string istr = IString(ibuf).Trim(" \n\r\f\t\v\b");
-      if (!istr.empty()) {
-        vector<string> parts;
-        IString::Split('/', istr, parts);
-        if (parts.size() > 1) {
-          ktype = parts[parts.size()-1];
-        }
+      QString istr = IString(ibuf).Trim(" \n\r\f\t\v\b").ToQt();
+      if (istr.contains("/")) {
+        ktype = istr.split("/").last();
       }
 
       // If type is not resolved, check file extensions and special ISIS types
@@ -1179,12 +1176,12 @@ namespace Isis {
    * @param iktype Default type to be used in none are determined from this
    *               methiod
    *
-   * @return std::string Type of kernel found from file extensions
+   * @return QString Type of kernel found from file extensions
    */
-  std::string Kernels::resolveTypeByExt(const std::string &kfile,
-                                        const std::string &iktype) const {
+  QString Kernels::resolveTypeByExt(const QString &kfile,
+                                    const QString &iktype) const {
 
-    string ktype(iktype);  // Set default condition
+    QString ktype(iktype);  // Set default condition
 
     //  Deciminate file parts
     FileName kf(kfile);

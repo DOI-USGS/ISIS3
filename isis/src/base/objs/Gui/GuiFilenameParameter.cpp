@@ -51,12 +51,12 @@ namespace Isis {
     grid->addWidget(p_fileButton, param, 3);
 
     QAction *action = new QAction(this);
-    std::string file = FileName("$ISIS3DATA/base/icons/view_tree.png").expanded();
-    action->setIcon(QPixmap((IString)file));
+    QString file = FileName("$ISIS3DATA/base/icons/view_tree.png").expanded();
+    action->setIcon(QPixmap(file));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(SelectFile()));
 
     p_fileButton->setIconSize(QSize(22, 22));
-    p_fileButton->setIcon(QPixmap((IString)file));
+    p_fileButton->setIcon(QPixmap(file));
     p_fileButton->setDefaultAction(action);
     p_fileButton->setToolTip("Select file");
     QString fileButtonWhatsThisText = "<p><b>Function:</b> \
@@ -85,8 +85,8 @@ namespace Isis {
    *
    * @param newValue
    */
-  void GuiFileNameParameter::Set(IString newValue) {
-    p_lineEdit->setText(newValue.ToQt());
+  void GuiFileNameParameter::Set(QString newValue) {
+    p_lineEdit->setText(newValue);
   }
 
 
@@ -95,8 +95,8 @@ namespace Isis {
    *
    * @return @b IString Value found in line edit text box
    */
-  IString GuiFileNameParameter::Value() {
-    return p_lineEdit->text().toStdString();
+  QString GuiFileNameParameter::Value() {
+    return p_lineEdit->text();
   }
 
   /**
@@ -122,17 +122,17 @@ namespace Isis {
     // What directory do we look in?
     QString dir;
     if((p_lineEdit->text().length() > 0) &&
-        (p_lineEdit->text().toStdString() != p_ui->ParamInternalDefault(p_group, p_param))) {
-      Isis::FileName fname(p_lineEdit->text().toStdString());
-      dir = (QString)(IString)fname.expanded();
+        (p_lineEdit->text() != p_ui->ParamInternalDefault(p_group, p_param))) {
+      Isis::FileName fname(p_lineEdit->text());
+      dir = fname.expanded();
     }
     else if(p_ui->ParamPath(p_group, p_param).length() > 0) {
       Isis::FileName fname(p_ui->ParamPath(p_group, p_param));
-      dir = (QString)(IString)fname.expanded();
+      dir = fname.expanded();
     }
 
     // Set up the filter
-    QString filter = (IString)p_ui->ParamFilter(p_group, p_param);
+    QString filter = p_ui->ParamFilter(p_group, p_param);
     if(filter.isEmpty()) {
       filter = "Any(*)";
     }
@@ -159,11 +159,11 @@ namespace Isis {
       fnameQString = QFileDialog::getSaveFileName(p_fileButton, "Select file", dir, filter, 0, options);
     }
     if(fnameQString != "") {
-      Isis::FileName fname(fnameQString.toStdString());
+      Isis::FileName fname(fnameQString);
       if(fname.dir() == QDir::currentPath()) {
-        fnameQString = (QString)(IString)fname.name();
+        fnameQString = fname.name();
       }
-      Set(fnameQString.toStdString());
+      Set(fnameQString);
     }
   }
 }

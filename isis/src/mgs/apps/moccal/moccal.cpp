@@ -31,8 +31,8 @@ using namespace Isis;
 // Working functions and parameters
 namespace gbl {
   void Calibrate(Buffer &in, Buffer &out);
-  void LoadCoefficients(const string &file, int ns);
-  void FixWagoLines(string file);
+  void LoadCoefficients(const QString &file, int ns);
+  void FixWagoLines(QString file);
 
   double a;      // Commanded system gain
   double off;    // Commanded system offset
@@ -66,7 +66,7 @@ void IsisMain() {
 
   // If it is already calibrated then complain
   if(icube->hasGroup("Radiometry")) {
-    string msg = "The MOC image [" + icube->getFileName() + "] has already "
+    QString msg = "The MOC image [" + icube->getFileName() + "] has already "
                  "been radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -86,7 +86,7 @@ void IsisMain() {
 
   // Open the calibration kernel that contains constants for each camera
   // and internalize it in a pvl object
-  string calKernelFile;
+  QString calKernelFile;
   if(ui.WasEntered("CALKERNEL")) {
     calKernelFile = ui.GetFileName("CALKERNEL");
   }
@@ -96,7 +96,7 @@ void IsisMain() {
   Pvl calKernel(calKernelFile);
 
   // Point to the right group of camera parameters
-  string camera;
+  QString camera;
   if(gbl::moc->WideAngleRed()) {
     camera = "WideAngleRed";
   }
@@ -117,7 +117,7 @@ void IsisMain() {
   gbl::dc = calCamera["DC"];
   gbl::g = calCamera["G"];
   gbl::w0 = calCamera["W0"];
-  string coefFile = calCamera["CoefFile"];
+  QString coefFile = calCamera["CoefFile"];
   gbl::LoadCoefficients(coefFile, icube->getSampleCount());
 
 #if 0
@@ -131,17 +131,17 @@ void IsisMain() {
 
   // Get the distance between Mars and the Sun at the given time in
   // Astronomical Units (AU)
-  string bspKernel = p.MissionData("base", "/kernels/spk/de???.bsp", true);
-  furnsh_c(bspKernel.c_str());
-  string pckKernel = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
-  furnsh_c(pckKernel.c_str());
+  QString bspKernel = p.MissionData("base", "/kernels/spk/de???.bsp", true);
+  furnsh_c(bspKernel.toAscii().data());
+  QString pckKernel = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
+  furnsh_c(pckKernel.toAscii().data());
   double sunpos[6], lt;
   spkezr_c("sun", etStart, "iau_mars", "LT+S", "mars", sunpos, &lt);
   double dist = vnorm_c(sunpos);
   double kmPerAU = 1.4959787066E8;
   double sunAU = dist / kmPerAU;
-  unload_c(bspKernel.c_str());
-  unload_c(pckKernel.c_str());
+  unload_c(bspKernel.toAscii().data());
+  unload_c(pckKernel.toAscii().data());
 
   // See if the user wants counts/ms or i/f but if w0 is 0 then
   // we must go to counts/ms
@@ -162,19 +162,19 @@ void IsisMain() {
   calgrp += PvlKeyword("CalibrationKernel", calKernelFile);
   calgrp += PvlKeyword("CoefficientFile", coefFile);
 
-  calgrp += PvlKeyword("a", gbl::a);
+  calgrp += PvlKeyword("a", toString(gbl::a));
   calgrp["a"].AddComment("Radiometric equation in moccal");
   calgrp["a"].AddComment("r = (pixel - z + off) / a - g / ex - dc");
-  calgrp += PvlKeyword("off", gbl::off);
-  calgrp += PvlKeyword("ex", gbl::ex);
-  calgrp += PvlKeyword("z", gbl::z);
-  calgrp += PvlKeyword("dc", gbl::dc);
-  calgrp += PvlKeyword("g", gbl::g);
+  calgrp += PvlKeyword("off", toString(gbl::off));
+  calgrp += PvlKeyword("ex", toString(gbl::ex));
+  calgrp += PvlKeyword("z", toString(gbl::z));
+  calgrp += PvlKeyword("dc", toString(gbl::dc));
+  calgrp += PvlKeyword("g", toString(gbl::g));
 
-  calgrp += PvlKeyword("w0", gbl::w0);
+  calgrp += PvlKeyword("w0", toString(gbl::w0));
   calgrp["w0"].AddComment("Reflectance = r * iof, where iof = (s * s) / w0");
-  calgrp += PvlKeyword("s", sunAU);
-  calgrp += PvlKeyword("iof", gbl::iof);
+  calgrp += PvlKeyword("s", toString(sunAU));
+  calgrp += PvlKeyword("iof", toString(gbl::iof));
 
   ocube->putGroup(calgrp);
 
@@ -241,7 +241,7 @@ void gbl::Calibrate(Buffer &in, Buffer &out) {
 }
 
 
-void gbl::LoadCoefficients(const string &file, int ns) {
+void gbl::LoadCoefficients(const QString &file, int ns) {
   // First create space for our coefficients
   gbl::pixelGain.resize(ns);
   gbl::pixelOffset.resize(ns);
@@ -259,24 +259,26 @@ void gbl::LoadCoefficients(const string &file, int ns) {
   vector<double> gainCoef;
   vector<double> offsetCoef;
   TextFile coef(file);
-  IString record, tok;
+  QString record, tok;
   coef.GetLine(record, true);
-  int numCoefs = record.ToInteger();
+  int numCoefs = toInt(record);
   for(int i = 0; i < numCoefs; i++) {
     coef.GetLine(record, true);
-    record.Trim(" ");
-    tok = record.Token(" ");
-    gainCoef.push_back(tok.ToDouble());
-    record.Trim(" ");
-    tok = record.Token(" ");
-    offsetCoef.push_back(tok.ToDouble());
+    record = record.simplified().trimmed();
+
+    QStringList records = record.split(" ");
+
+    if (records.count() > 1) {
+      gainCoef.push_back(toDouble(records.takeFirst()));
+      offsetCoef.push_back(toDouble(records.takeFirst()));
+    }
   }
 
   // Make sure the file had the correct number of coefficients.  It should
   // match the number of detectors in the NA or WA camera
   if((int)gainCoef.size() != gbl::moc->Detectors()) {
-    string msg = "Coefficient file [" + file + "] size is wrong ... should have [";
-    msg += IString(gbl::moc->Detectors()) + "] gain/offset entries";
+    QString msg = "Coefficient file [" + file + "] size is wrong ... should have [";
+    msg += toString(gbl::moc->Detectors()) + "] gain/offset entries";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -290,7 +292,7 @@ void gbl::LoadCoefficients(const string &file, int ns) {
     double osum = 0.0;
     for(n = 0; ss <= es; ss++, n++) {
       if(ss >= (int)gainCoef.size()) {
-        string msg = "Array bounds exceeded for gainCoef/offsetCoef";
+        QString msg = "Array bounds exceeded for gainCoef/offsetCoef";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
       gsum += gainCoef[ss];
@@ -301,7 +303,7 @@ void gbl::LoadCoefficients(const string &file, int ns) {
   }
 }
 
-void gbl::FixWagoLines(string file) {
+void gbl::FixWagoLines(QString file) {
   // Nothing to do for narrow angle
   if(gbl::moc->NarrowAngle()) return;
 

@@ -21,9 +21,9 @@ using namespace Isis;
 // Global variables
 int headerBytes = 0;
 
-string FitsKeyword(string keyword, bool isVal, Isis::IString value, Isis::IString unit = "");
+QString FitsKeyword(QString keyword, bool isVal, QString value, QString unit = "");
 
-string WritePvl(string fitsKey, string group, IString key, Cube *icube, bool isString);
+QString WritePvl(QString fitsKey, QString group, IString key, Cube *icube, bool isString);
 
 // Main program
 void IsisMain() {
@@ -40,12 +40,12 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // specify the bits per pixel
-  string bitpix;
+  QString bitpix;
   if(ui.GetString("BITTYPE") == "8BIT") bitpix = "8";
   else if(ui.GetString("BITTYPE") == "16BIT") bitpix = "16";
   else if(ui.GetString("BITTYPE") == "32BIT") bitpix = "-32";
   else {
-    string msg = "Pixel type of [" + ui.GetString("BITTYPE") + "] is unsupported";
+    QString msg = "Pixel type of [" + ui.GetString("BITTYPE") + "] is unsupported";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -57,8 +57,8 @@ void IsisMain() {
 
   // determine core base and multiplier, set up the stretch
   PvlGroup pix = icube->getLabel()->FindObject("IsisCube").FindObject("Core").FindGroup("Pixels");
-  double scale = pix["Multiplier"][0].ToDouble();
-  double base = pix["Base"][0].ToDouble();
+  double scale = toDouble(pix["Multiplier"][0]);
+  double base = toDouble(pix["Base"][0]);
 
   if(ui.GetString("STRETCH") != "NONE" && bitpix != "-32") {
     if(ui.GetString("STRETCH") == "LINEAR") {
@@ -85,7 +85,7 @@ void IsisMain() {
   //////////////////////////////////////////
   // Write the minimal fits header        //
   //////////////////////////////////////////
-  string header;
+  QString header;
 
   // specify that this file conforms to simple fits standard
   header += FitsKeyword("SIMPLE", true, "T");
@@ -100,21 +100,21 @@ void IsisMain() {
     axes = 3;
   }
 
-  header += FitsKeyword("NAXIS", true, IString(axes));
+  header += FitsKeyword("NAXIS", true, toString(axes));
 
   // specify the limit on data axis 1 (number of samples)
-  header += FitsKeyword("NAXIS1", true, IString(icube->getSampleCount()));
+  header += FitsKeyword("NAXIS1", true, toString(icube->getSampleCount()));
 
   // specify the limit on data axis 2 (number of lines)
-  header += FitsKeyword("NAXIS2", true, IString(icube->getLineCount()));
+  header += FitsKeyword("NAXIS2", true, toString(icube->getLineCount()));
 
   if(axes == 3) {
-    header += FitsKeyword("NAXIS3", true, IString(icube->getBandCount()));
+    header += FitsKeyword("NAXIS3", true, toString(icube->getBandCount()));
   }
 
-  header += FitsKeyword("BZERO", true,  base);
+  header += FitsKeyword("BZERO", true,  toString(base));
 
-  header += FitsKeyword("BSCALE", true, scale);
+  header += FitsKeyword("BSCALE", true, toString(scale));
 
   // Sky and All cases
   if(ui.GetString("INFO") == "SKY" || ui.GetString("INFO") == "ALL") {
@@ -123,7 +123,7 @@ void IsisMain() {
 
     if(icube->hasGroup("mapping")) {
       map = icube->getGroup("mapping");
-      msg = (string)map["targetname"];
+      msg = (QString)map["targetname"];
     }
     // If we have sky we want it
     if(msg == "Sky") {
@@ -135,10 +135,10 @@ void IsisMain() {
       midDec = ((double)map["MaximumLatitude"] +
                 (double)map["MinimumLatitude"]) / 2;
 
-      header += FitsKeyword("OBJCTRA", true, IString(midRa));
+      header += FitsKeyword("OBJCTRA", true, toString(midRa));
 
       // Specify the Declination
-      header += FitsKeyword("OBJCTDEC", true, IString(midDec));
+      header += FitsKeyword("OBJCTDEC", true, toString(midDec));
 
     }
 
@@ -174,16 +174,16 @@ void IsisMain() {
   for(int i = header.length() % 2880 ; i < 2880 ; i++) header += " ";
 
   // open the cube for writing
-  string to = ui.GetFileName("TO", "fits");
+  QString to = ui.GetFileName("TO", "fits");
   ofstream fout;
-  fout.open(to.c_str(), ios::out | ios::binary);
+  fout.open(to.toAscii().data(), ios::out | ios::binary);
   if(!fout.is_open()) {
-    string msg = "Cannot open fits output file";
+    QString msg = "Cannot open fits output file";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   fout.seekp(0);
-  fout.write(header.c_str(), header.length());
+  fout.write(header.toAscii().data(), header.length());
   // write the raw cube data
   p.StartProcess(fout);
 
@@ -198,7 +198,7 @@ void IsisMain() {
   p.EndProcess();
 }
 
-string FitsKeyword(string key, bool isValue, Isis::IString value, Isis::IString unit) {
+QString FitsKeyword(QString key, bool isValue, QString value, QString unit) {
   // pad the keyword with space
   for(int i = key.length() ; i < 8 ; i++)
     key += " ";
@@ -234,14 +234,14 @@ string FitsKeyword(string key, bool isValue, Isis::IString value, Isis::IString 
   return key;
 }
 
-string WritePvl(string fitsKey, string group, IString key, Cube *icube, bool isString) {
+QString WritePvl(QString fitsKey, QString group, IString key, Cube *icube, bool isString) {
   if(icube->hasGroup(group)) {
     PvlGroup theGroup = icube->getGroup(group);
-    IString name = (string)theGroup[key];
+    QString name = (QString)theGroup[key];
     if(isString) {
       name = "'" + name + "'";
     }
-    IString unit = theGroup[key].Unit();
+    QString unit = theGroup[key].Unit();
     return FitsKeyword(fitsKey, true, name, unit);
   }
   return NULL;

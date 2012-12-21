@@ -40,7 +40,7 @@ SCCSID @(#)predCompCommon.h  1.1 10/04/99
 */
 /* SCCShid @(#)predCompCommon.h (predCompCommon.h) 1.2 */
 
-#if !defined(predCompCommon_h)
+#ifndef predCompCommon_h
 
 #define predCompCommon_h
 

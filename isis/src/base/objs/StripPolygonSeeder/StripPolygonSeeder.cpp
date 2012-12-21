@@ -73,8 +73,8 @@ namespace Isis {
     const geos::geom::Envelope *polyBoundBox = multiPoly->getEnvelopeInternal();
 
     // Call the parents standardTests member
-    std::string msg = StandardTests(multiPoly, polyBoundBox);
-    if(!msg.empty()) {
+    QString msg = StandardTests(multiPoly, polyBoundBox);
+    if(!msg.isEmpty()) {
       return points;
     }
 
@@ -141,7 +141,7 @@ namespace Isis {
         }
       }
       else {
-        std::string msg = "PVL for StripSeeder must contain [XSpacing] in [";
+        QString msg = "PVL for StripSeeder must contain [XSpacing] in [";
         msg += pvl.FileName() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -154,13 +154,13 @@ namespace Isis {
         }
       }
       else {
-        std::string msg = "PVL for StripSeeder must contain [YSpacing] in [";
+        QString msg = "PVL for StripSeeder must contain [YSpacing] in [";
         msg += pvl.FileName() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     catch(IException &e) {
-      std::string msg = "Improper format for PolygonSeeder PVL [" + pvl.FileName() + "]";
+      QString msg = "Improper format for PolygonSeeder PVL [" + pvl.FileName() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -174,14 +174,14 @@ namespace Isis {
     }
   }
 
-  PvlGroup StripPolygonSeeder::PluginParameters(std::string grpName) {
+  PvlGroup StripPolygonSeeder::PluginParameters(QString grpName) {
     PvlGroup pluginInfo(grpName);
 
     PvlKeyword name("Name", Algorithm());
-    PvlKeyword minThickness("MinimumThickness", MinimumThickness());
-    PvlKeyword minArea("MinimumArea", MinimumArea());
-    PvlKeyword xSpac("XSpacing", p_Xspacing);
-    PvlKeyword ySpac("YSpacing", p_Yspacing);
+    PvlKeyword minThickness("MinimumThickness", toString(MinimumThickness()));
+    PvlKeyword minArea("MinimumArea", toString(MinimumArea()));
+    PvlKeyword xSpac("XSpacing", toString(p_Xspacing));
+    PvlKeyword ySpac("YSpacing", toString(p_Yspacing));
 
     pluginInfo.AddKeyword(name);
     pluginInfo.AddKeyword(minThickness);

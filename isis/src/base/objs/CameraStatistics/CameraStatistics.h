@@ -24,7 +24,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
+#include <QString>
 
 namespace Isis {
   class Camera;
@@ -54,14 +54,14 @@ namespace Isis {
 
   class CameraStatistics {
     public:
-      CameraStatistics(std::string filename, int sinc, int linc);
+      CameraStatistics(QString filename, int sinc, int linc);
       CameraStatistics(Camera *cam, int sinc, int linc);
-      CameraStatistics(Camera *cam, int sinc, int linc, std::string filename);
+      CameraStatistics(Camera *cam, int sinc, int linc, QString filename);
       virtual ~CameraStatistics();
 
       void addStats(Camera *cam, int &sample, int &line);
-      PvlKeyword constructKeyword(std::string keyname, double value,
-          std::string unit) const;
+      PvlKeyword constructKeyword(QString keyname, double value,
+          QString unit) const;
       Pvl toPvl() const;
 
 
@@ -197,10 +197,10 @@ namespace Isis {
       };
 
     private:
-      void init(Camera *cam, int sinc, int linc, std::string filename);
+      void init(Camera *cam, int sinc, int linc, QString filename);
 
       //!< FileName of the Cube the Camera was derived from.
-      std::string m_filename;
+      QString m_filename;
       int m_sinc; //!< Sample increment for composing statistics.
       int m_linc; //!< Line increment for composing statistics.
 

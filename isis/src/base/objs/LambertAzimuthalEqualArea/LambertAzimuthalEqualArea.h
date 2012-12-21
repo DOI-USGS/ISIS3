@@ -109,8 +109,8 @@ namespace Isis {
       ~LambertAzimuthalEqualArea();
       bool operator== (const Projection &proj);
 
-      std::string Name() const;
-      std::string Version() const;
+      QString Name() const;
+      QString Version() const;
       double TrueScaleLatitude() const;
       // since this projection is not cylindrical the following method does not
       // need to be be overwritten, returning false by default 

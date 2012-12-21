@@ -58,9 +58,9 @@ int main(int argc, char *argv[]) {
 
     Isis::PvlGroup kern("Kernels");
     Isis::FileName f("$base/testData/kernels");
-    string dir = f.expanded() + "/";
+    QString dir = f.expanded() + "/";
 
-    kern += Isis::PvlKeyword("NaifFrameCode", -94031);
+    kern += Isis::PvlKeyword("NaifFrameCode", "-94031");
     kern += Isis::PvlKeyword("LeapSecond", dir + "naif0007.tls");
     kern += Isis::PvlKeyword("SpacecraftClock", dir + "MGS_SCLKSCET.00045.tsc");
     kern += Isis::PvlKeyword("TargetPosition", dir + "de405.bsp");
@@ -197,7 +197,7 @@ int main(int argc, char *argv[]) {
 
     Isis::PvlGroup kern2("Kernels");
 
-    kern2 += Isis::PvlKeyword("NaifFrameCode", -94031);
+    kern2 += Isis::PvlKeyword("NaifFrameCode", "-94031");
     kern2 += Isis::PvlKeyword("LeapSecond", dir + "naif0007.tls");
     kern2 += Isis::PvlKeyword("SpacecraftClock",
                               dir + "MGS_SCLKSCET.00045.tsc");

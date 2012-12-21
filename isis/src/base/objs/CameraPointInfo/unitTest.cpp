@@ -38,9 +38,9 @@ int main() {
 }
 
 void LowerPrecision(PvlKeyword &keyword) {
-  double value = keyword[0];
+  double value = toDouble(keyword[0]);
   value = round(value * 1000) / 1000.0;
-  keyword[0] = value;
+  keyword[0] = toString(value);
 }
 
 void PrintResults(PvlGroup &grp) {

@@ -1,4 +1,4 @@
-#if !defined(MoonAlbedo_h)
+#ifndef MoonAlbedo_h
 #define MoonAlbedo_h
 /**
  * @file

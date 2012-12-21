@@ -71,7 +71,7 @@ namespace Isis {
   class Preference : public Pvl {
 
     public:
-      void Load(const std::string &file);
+      void Load(const QString &file);
 
       /**
        * Tests whether or not a file is a unitTest

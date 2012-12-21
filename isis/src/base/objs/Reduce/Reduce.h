@@ -8,8 +8,6 @@
 
 #include <cmath>
 
-using namespace std;
-
 namespace Isis {
   /**
    * @brief Reduce the pixel dimensions of an image
@@ -99,7 +97,7 @@ namespace Isis {
     public:
       //! Constructor
       Average(Isis::Cube *pInCube, double pdSampleScale, double pdLineScale,
-              double pdValidPer, string psReplaceMode)
+              double pdValidPer, QString psReplaceMode)
       : Reduce(pInCube, pdSampleScale, pdLineScale){
         mdValidPer    = pdValidPer;
         msReplaceMode = psReplaceMode;
@@ -110,7 +108,7 @@ namespace Isis {
 
     private:
       mutable double mdValidPer;   //!< Valid Percentage
-      string msReplaceMode;//!< Replace Mode (scale/total)
+      QString msReplaceMode;//!< Replace Mode (scale/total)
       mutable double *mdIncTab;
       mutable double *mdSum;
       mutable double *mdNpts;

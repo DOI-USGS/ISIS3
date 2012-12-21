@@ -9,7 +9,7 @@ End_Object
 Object = NormalizationModel
   Group = Algorithm
     Name   = Shade
-    Albedo = 0.0690507
+    Albedo = .0690507
   End_Group
 End_Object
 End

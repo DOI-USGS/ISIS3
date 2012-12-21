@@ -25,6 +25,8 @@
 
 #include <algorithm>
 
+#include <QString>
+
 #include "Displacement.h"
 #include "Distance.h"
 #include "IException.h"
@@ -608,23 +610,23 @@ namespace Isis {
     }
     else {
       if(startXValid && endXValid && startX > endX) {
-        IString msg = "Cannot have a 3D area with inverted X coordinates of ["
-            + IString(startX.meters()) + " meters] to ["
-            + IString(endX.meters()) + " meters]";
+        QString msg = QObject::tr("Cannot have a 3D area with inverted X coordinates of "
+                                  "[%1 meters] to [%2 meters]")
+                        .arg(startX.meters()).arg(endX.meters());
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       if(startYValid && endYValid && startY > endY) {
-        IString msg = "Cannot have a 3D area with inverted Y coordinates of ["
-            + IString(startY.meters()) + " meters] to ["
-            + IString(endY.meters()) + " meters]";
+        QString msg = QObject::tr("Cannot have a 3D area with inverted Y coordinates of "
+                                  "[%1 meters] to [%2 meters]")
+                        .arg(startY.meters()).arg(endY.meters());
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
       if(startZValid && endZValid && startZ > endZ) {
-        IString msg = "Cannot have a 3D area with inverted Z coordinates of ["
-            + IString(startZ.meters()) + " meters] to ["
-            + IString(endZ.meters()) + " meters]";
+        QString msg = QObject::tr("Cannot have a 3D area with inverted Z coordinates of "
+                                  "[%1 meters] to [%2 meters]")
+                        .arg(startZ.meters()).arg(endZ.meters());
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 

@@ -24,9 +24,10 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+class QString;
+
 namespace Isis {
   class IException;
-  class IString;
 
   /**
    * @brief Execute External Programs and Commands
@@ -43,11 +44,11 @@ namespace Isis {
    */
   class ProgramLauncher {
     public:
-      static void RunIsisProgram(IString isisProgramName, IString arguments);
-      static void RunSystemCommand(IString commandLine);
+      static void RunIsisProgram(QString isisProgramName, QString arguments);
+      static void RunSystemCommand(QString commandLine);
 
     private:
-      static IException ProcessIsisMessageFromChild(IString code, IString msg);
+      static IException ProcessIsisMessageFromChild(QString code, QString msg);
 
     private:
       //! Construction is not allowed

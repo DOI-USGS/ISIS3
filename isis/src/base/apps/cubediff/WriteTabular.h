@@ -1,4 +1,4 @@
-#if !defined(NewClass_h)
+#ifndef NewClass_h
 #define NewClass_h
 /**
  * @file
@@ -48,9 +48,9 @@ namespace Isis {
       void SetColumns(std::vector <Column> cols);
       void Write();
       void Write(int item);
-      void Write(std::string item);
+      void Write(const char *item);
       void Write(double item);
-      void SetDelimiter(std::string delim);
+      void SetDelimiter(QString delim);
 
       int Columns() {
         return p_cols.size();
@@ -60,7 +60,7 @@ namespace Isis {
       };
 
     private:
-      std::string p_delimiter;
+      QString p_delimiter;
       std::ostream &p_outfile;
       unsigned int p_rows;
       std::vector <Column> p_cols;

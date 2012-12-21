@@ -47,17 +47,17 @@ void IsisMain() {
   Cube *ocube = p.SetOutputCube("TO");
   Cube *ffcube, *ofcube, *afcube, *dccube, *biascube, *bpcube;
 
-  IString filter = (string)(icube->getGroup("BandBin"))["FilterName"];
-  filter = filter.DownCase();
-  IString productID = (string)(icube->getGroup("Archive"))["ProductID"];
-  IString orbit = productID.substr(productID.find('.') + 1, productID.length() - 1);
+  QString filter = (QString)(icube->getGroup("BandBin"))["FilterName"];
+  filter = filter.toLower();
+  QString productID = (QString)(icube->getGroup("Archive"))["ProductID"];
+  QString orbit = productID.mid(productID.indexOf('.') + 1, productID.length() - 1);
 
   // If hemisphere code greater than 'I' set to 'n' else set to 's'
-  char hemisphereCode = (productID[productID.find('.')-1] > 'I') ? 'n' : 's';
-  IString compressionType = (string)(icube->getGroup("Instrument"))["EncodingFormat"];
+  char hemisphereCode = (productID[productID.indexOf('.')-1] > 'I') ? 'n' : 's';
+  QString compressionType = (QString)(icube->getGroup("Instrument"))["EncodingFormat"];
   offsetModeID = (icube->getGroup("Instrument"))["OffsetModeID"];
   int gainModeID = (icube->getGroup("Instrument"))["GainModeID"];
-  IString gainModeIDStr = gainModeID;
+  QString gainModeIDStr = toString(gainModeID);
   double exposureDuration = (double)(icube->getGroup("Instrument"))["ExposureDuration"];
   optimalExposureDuration = (exposureDuration * 0.984675) + 0.233398;
   cryocoolerDuration = (icube->getGroup("Instrument"))["CryocoolerDuration"];
@@ -66,7 +66,7 @@ void IsisMain() {
     ffcube = p.SetInputCube("FFFILE");
   }
   else {
-    string fffileLoc = "$clementine1/calibration/nir/";
+    QString fffileLoc = "$clementine1/calibration/nir/";
     fffileLoc += "newnir_flat_" + filter + ".cub";
     CubeAttributeInput cubeAtt;
     ffcube = p.SetInputCube(fffileLoc, cubeAtt);
@@ -76,34 +76,35 @@ void IsisMain() {
     ofcube = p.SetInputCube("OFFILE");
   }
   else {
-    string fffileLoc = "$clementine1/calibration/nir/nirorbitflats/";
+    QString fffileLoc = "$clementine1/calibration/nir/nirorbitflats/";
     fffileLoc += "nir_orbflat_" + orbit + "_" + filter + ".cub";
     CubeAttributeInput cubeAtt;
     ofcube = p.SetInputCube(fffileLoc, cubeAtt);
   }
 
-  string afFileTableLoc = "";
+  QString afFileTableLoc = "";
   if(ui.WasEntered("AFFILE")) {
     afcube = p.SetInputCube("AFFILE");
   }
   else {
-    string affileLoc;
+    QString affileLoc;
     afFileTableLoc = "$clementine1/calibration/nir/nir.addflats.dat";
 
     TextFile aFFileTable(afFileTableLoc);
     int numLines = aFFileTable.LineCount();
     for(int i = 0; i < numLines; i++) {
-      IString line;
+      QString line;
       aFFileTable.GetLine(line, true);
-      line = line.Compress();
-      if(orbit.compare(line.Token(" ")) == 0 &&
-          filter.compare(line.Token(" ")) == 0 &&
-          gainModeID == (int)line.Token(" ") &&
-          offsetModeID == (int)line.Token(" ") &&
-          (int)exposureDuration == (int)line.Token(" ") &&
-          hemisphereCode == line.Token(" ")[0]) {
-        line.Token(" "); // strip unused data
-        affileLoc = line.Token(" ");
+      line = line.simplified();
+      QStringList tokens = line.split(" ");
+      if(tokens.count() > 6 && orbit == tokens.takeFirst() &&
+          filter == tokens.takeFirst() &&
+          gainModeID == toInt(tokens.takeFirst()) &&
+          offsetModeID == toInt(tokens.takeFirst()) &&
+          (int)exposureDuration == toInt(tokens.takeFirst()) &&
+          QString(hemisphereCode) == tokens.takeFirst()) {
+        tokens.takeFirst();
+        affileLoc = tokens.takeFirst();
         break;
       }
     }
@@ -112,15 +113,15 @@ void IsisMain() {
       affileLoc = "zeros.cub";
     }
 
-    IString gainFactorDef = "$clementine1/calibration/nir/";
+    QString gainFactorDef = "$clementine1/calibration/nir/";
     gainFactorDef += "clemnircal.def";
     Pvl gainFactorData(gainFactorDef);
-    IString group = "GainModeID";
-    group += (IString)gainModeID;
+    QString group = "GainModeID";
+    group += toString(gainModeID);
 
     if(!gainFactorData.HasGroup(group)) {
-      IString err = "The Gain Factor for Gain Mode ID [";
-      err += gainModeID;
+      QString err = "The Gain Factor for Gain Mode ID [";
+      err += toString(gainModeID);
       err += "] could not be found in clemnircal.def";
       throw IException(IException::Programmer, err, _FILEINFO_);
     }
@@ -128,8 +129,8 @@ void IsisMain() {
     gainFactor = (gainFactorData.FindGroup(group))["GAIN"];
 
     if(abs(gainFactor) < DBL_EPSILON) {
-      IString err = "The Gain Factor for Gain Mode ID [";
-      err += gainModeID;
+      QString err = "The Gain Factor for Gain Mode ID [";
+      err += toString(gainModeID);
       err += "] can not be zero.";
       throw IException(IException::Programmer, err, _FILEINFO_);
     }
@@ -143,7 +144,7 @@ void IsisMain() {
     dccube = p.SetInputCube("DCFILE");
   }
   else {
-    string dcfileLoc = "$clementine1/calibration/nir/";
+    QString dcfileLoc = "$clementine1/calibration/nir/";
 
     if(compressionType.compare("CLEM-JPEG-0") == 0) {
       dcfileLoc += "dark_nir_cmp0.cub";
@@ -160,7 +161,7 @@ void IsisMain() {
     biascube = p.SetInputCube("BIASFILE");
   }
   else {
-    string biasfileLoc = "$clementine1/calibration/nir/";
+    QString biasfileLoc = "$clementine1/calibration/nir/";
 
     if(compressionType.compare("CLEM-JPEG-0") == 0) {
       biasfileLoc += "bias_nir_cmp0.cub";
@@ -177,7 +178,7 @@ void IsisMain() {
     bpcube = p.SetInputCube("BPFILE");
   }
   else {
-    string bpfileLoc = "$clementine1/calibration/nir/";
+    QString bpfileLoc = "$clementine1/calibration/nir/";
     if(compressionType.compare("CLEM-JPEG-0") == 0) {
       bpfileLoc += "badpix_nir_cmp0.v3.cub";
     }
@@ -190,12 +191,12 @@ void IsisMain() {
   }
 
   // We need thermal data
-  IString thermTbl = "$clementine1/calibration/nir/";
+  QString thermTbl = "$clementine1/calibration/nir/";
   thermTbl += "nir" + filter + ".therm.dat";
 
   TextFile thermTable(thermTbl);
   int numLines = thermTable.LineCount();
-  IString line;
+  QString line;
   for(int i = 0; i < numLines; i++) {
     thermTable.GetLine(line);
 
@@ -203,25 +204,25 @@ void IsisMain() {
     // I'm adding a space to every line and using Compress() to remove any extras. Compress() is
     // necessary in order to ensure data integrity from line to line also.
     line = " " + line;
-    line = line.Compress();
-    line.Token(" "); // There's an initial space that needs removed
+    line = line.simplified().trimmed();
+    QStringList tokens = line.split(" ");
 
-    if((int)orbit == (int)line.Token(" ")) { // if orbits match, get data
-      cryonorm = (double)line.Token(" ");
-      numCoefficients = (int)line.Token(" ");
+    if(toInt(orbit) == toInt(tokens.takeFirst())) { // if orbits match, get data
+      cryonorm = toDouble(tokens.takeFirst());
+      numCoefficients = toInt(tokens.takeFirst());
 
       // Read in coefficients
-      thermBgCoefficients.push_back((double)line.Token(" "));
+      thermBgCoefficients.push_back(toDouble(tokens.takeFirst()));
 
       for(int iCoeff = 0; iCoeff < numCoefficients; iCoeff ++) {
-        thermBgCoefficients.push_back((double)line.Token(" "));
+        thermBgCoefficients.push_back(toDouble(tokens.takeFirst()));
       }
       break;
     }
   }
 
   if(numCoefficients == 0) {
-    IString err = "The orbit [" + orbit + "] could not be located in the thermal corrections table [" + thermTbl + "].";
+    QString err = "The orbit [" + orbit + "] could not be located in the thermal corrections table [" + thermTbl + "].";
     throw IException(IException::Unknown, err, _FILEINFO_);
   }
 
@@ -241,15 +242,15 @@ void IsisMain() {
   calgrp += PvlKeyword("ThermalCorrectionTable", thermTbl);
   calgrp += PvlKeyword("AdditiveFileTable", afFileTableLoc);
 
-  calgrp += PvlKeyword("DigitalOffset", digitalOffset);
-  calgrp += PvlKeyword("GlobalBias", globalBias);
-  calgrp += PvlKeyword("GlobalDarkCoefficient", globalDarkCoefficient);
-  calgrp += PvlKeyword("V", vConstant);
+  calgrp += PvlKeyword("DigitalOffset", toString(digitalOffset));
+  calgrp += PvlKeyword("GlobalBias", toString(globalBias));
+  calgrp += PvlKeyword("GlobalDarkCoefficient", toString(globalDarkCoefficient));
+  calgrp += PvlKeyword("V", toString(vConstant));
   //Calculated in processing routine
-  calgrp += PvlKeyword("GainFactor", gainFactor);
-  calgrp += PvlKeyword("AbsoluteCoefficient", absoluteCoefficient);
-  calgrp += PvlKeyword("CryoNorm", cryonorm);
-  calgrp += PvlKeyword("OptimalExposureDuration", optimalExposureDuration);
+  calgrp += PvlKeyword("GainFactor", toString(gainFactor));
+  calgrp += PvlKeyword("AbsoluteCoefficient", toString(absoluteCoefficient));
+  calgrp += PvlKeyword("CryoNorm", toString(cryonorm));
+  calgrp += PvlKeyword("OptimalExposureDuration", toString(optimalExposureDuration));
 
   ocube->putGroup(calgrp);
   p.EndProcess();

@@ -69,13 +69,13 @@ int main() {
     Isis::Pvl lab;
     lab.AddGroup(Isis::PvlGroup("Mapping"));
     Isis::PvlGroup &mapGroup = lab.FindGroup("Mapping");
-    mapGroup += Isis::PvlKeyword("EquatorialRadius", 1.0);
-    mapGroup += Isis::PvlKeyword("PolarRadius", 1.0);
+    mapGroup += Isis::PvlKeyword("EquatorialRadius", "1.0");
+    mapGroup += Isis::PvlKeyword("PolarRadius", "1.0");
     mapGroup += Isis::PvlKeyword("LatitudeType", "Planetocentric");
     mapGroup += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-    mapGroup += Isis::PvlKeyword("LongitudeDomain", 360);
-    mapGroup += Isis::PvlKeyword("CenterLatitude", 0);
-    mapGroup += Isis::PvlKeyword("CenterLongitude", 0);
+    mapGroup += Isis::PvlKeyword("LongitudeDomain", "360");
+    mapGroup += Isis::PvlKeyword("CenterLatitude", "0");
+    mapGroup += Isis::PvlKeyword("CenterLongitude", "0");
     mapGroup += Isis::PvlKeyword("ProjectionName", "Sinusoidal");
 
     Projection *proj = ProjectionFactory::Create(lab);
@@ -90,9 +90,9 @@ int main() {
     // Change the radius and set a new projection
     // Then get the XYPolygon again
     mapGroup.DeleteKeyword("EquatorialRadius");
-    mapGroup += Isis::PvlKeyword("EquatorialRadius", 10.0);
+    mapGroup += Isis::PvlKeyword("EquatorialRadius", "10.0");
     mapGroup.DeleteKeyword("PolarRadius");
-    mapGroup += Isis::PvlKeyword("PolarRadius", 10.0);
+    mapGroup += Isis::PvlKeyword("PolarRadius", "10.0");
 
     proj = ProjectionFactory::Create(lab);
     cout << "X/Y polygon radius (10) = "
@@ -150,7 +150,7 @@ int main() {
     cout << endl;
 
     cout << "GML Ploygon:" << endl;
-    std::string GMLpolygon = PolygonTools::ToGML(mPolygon, "test");
+    QString GMLpolygon = PolygonTools::ToGML(mPolygon, "test");
     cout << GMLpolygon << endl;
 
     cout << "GML Thickness:" << endl;

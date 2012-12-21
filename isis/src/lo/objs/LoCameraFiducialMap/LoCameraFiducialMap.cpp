@@ -53,10 +53,10 @@ namespace Isis {
       PvlKeyword &fYs = inst["FiducialYCoordinates"];
 
       for(int i = 0; i < fSamps.Size(); i++) {
-        p_fidSamples.push_back(fSamps[i]);
-        p_fidLines.push_back(fLines[i]);
-        p_fidXCoords.push_back(fXs[i]);
-        p_fidYCoords.push_back(fYs[i]);
+        p_fidSamples.push_back(toDouble(fSamps[i]));
+        p_fidLines.push_back(toDouble(fLines[i]));
+        p_fidXCoords.push_back(toDouble(fXs[i]));
+        p_fidYCoords.push_back(toDouble(fYs[i]));
       }
     }
     catch(IException &e) {

@@ -25,10 +25,6 @@ using namespace std;
 
 #include "Message.h"
 
-string Isis::Message::KeywordBlockEndMissing
-(const string &block, const string &found) {
-  string message;
-  message = "Expecting end of keyword block [" + block + "] " +
-            "but found [" + found + "]";
-  return message;
+QString Isis::Message::KeywordBlockEndMissing(const QString &block, const QString &found) {
+  return "Expecting end of keyword block [" + block + "] but found [" + found + "]";
 }

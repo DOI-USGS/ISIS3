@@ -138,8 +138,8 @@ namespace Isis {
 
       Cube *p_baseCube;
       Cube *p_matchCube;
-      std::string p_baseSN;
-      std::string p_matchSN;
+      QString p_baseSN;
+      QString p_matchSN;
       UniversalGroundMap *p_baseGM;
       UniversalGroundMap *p_matchGM;
 

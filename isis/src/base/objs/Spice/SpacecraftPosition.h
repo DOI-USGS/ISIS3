@@ -85,8 +85,8 @@ namespace Isis {
       double getRadiusLightTime() const;
       static double getDistanceLightTime(const Distance &distance);
 
-      virtual void SetAberrationCorrection(const std::string &correction);
-      virtual std::string GetAberrationCorrection() const;
+      virtual void SetAberrationCorrection(const QString &correction);
+      virtual QString GetAberrationCorrection() const;
 
       virtual void SetEphemerisTimeSpice();
 

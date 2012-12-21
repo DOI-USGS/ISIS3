@@ -19,13 +19,13 @@ void IsisMain() {
   // Check to see if it is an Apollo image and if the reseaus have been refined
   //    (note: a status of 'Removed' implies it is also 'Refined')
   PvlGroup &reseaus = ipacket->getGroup("Reseaus");
-  string mission = (ipacket->getGroup("Instrument"))["SpacecraftName"];
-  if (mission.substr(0,6) != "APOLLO") {
-    string msg = "This application is for use with Apollo spacecrafts only. ";
+  QString mission = (ipacket->getGroup("Instrument"))["SpacecraftName"];
+  if (mission.mid(0,6) != "APOLLO") {
+    QString msg = "This application is for use with Apollo spacecrafts only. ";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
-  if ((string)reseaus["Status"] != "Refined" && (string)reseaus["Status"] != "Removed") {
-    string msg = "This application can only be run after findapollorx.";
+  if ((QString)reseaus["Status"] != "Refined" && (QString)reseaus["Status"] != "Removed") {
+    QString msg = "This application can only be run after findapollorx.";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
@@ -35,10 +35,10 @@ void IsisMain() {
   vector<double> inputLine,inputSample,outputLine,outputSample;
   // Setup the parameters for the transform
   for (int i=0; i<reseaus["Sample"].Size(); i++) {
-    inputLine.push_back(reseaus["Line"][i]);
-    inputSample.push_back(reseaus["Sample"][i]);
-    outputLine.push_back(master["Line"][i]);
-    outputSample.push_back(master["Sample"][i]);
+    inputLine.push_back(toDouble(reseaus["Line"][i]));
+    inputSample.push_back(toDouble(reseaus["Sample"][i]));
+    outputLine.push_back(toDouble(master["Line"][i]));
+    outputSample.push_back(toDouble(master["Sample"][i]));
 
     // Update the cube's reseau information
     reseaus["Line"][i] = outputLine[i];
@@ -74,7 +74,7 @@ void IsisMain() {
     interp = new Interpolator(Interpolator::CubicConvolutionType);
   }
   else {
-    string msg = "Unknow value for INTERP [" +
+    QString msg = "Unknow value for INTERP [" +
                  ui.GetString("INTERP") + "]";
     throw IException(IException::Programmer, msg,_FILEINFO_);
   }

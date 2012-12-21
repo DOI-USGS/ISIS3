@@ -1,4 +1,4 @@
-#if !defined(LowPassFilter_h)
+#ifndef LowPassFilter_h
 #define LowPassFilter_h
 /**                                                                       
  * @file                                                                  
@@ -81,8 +81,8 @@ namespace Isis {
       int   _width;         //!< Filter width
       int   _iterations;    // Number iterations to apply filter
 
-      std::string formHistory() {
-        return (std::string("LowPassFilter(Width[" + ToString(_width) + 
+      QString formHistory() {
+        return (QString("LowPassFilter(Width[" + ToString(_width) + 
                             "],Iters["+ToString(_iterations)+"])"));
       }
 

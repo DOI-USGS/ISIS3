@@ -11,7 +11,7 @@ using namespace std;
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
-  string fname = "$base/testData/isisTruth.cub";
+  QString fname = "$base/testData/isisTruth.cub";
 
   // Allocate a cube
   Isis::Cube *cube = new Isis::Cube;

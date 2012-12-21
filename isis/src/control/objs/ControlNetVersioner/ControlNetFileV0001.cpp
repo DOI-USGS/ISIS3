@@ -39,7 +39,7 @@ namespace Isis {
     BigInt coreStartPos = protoBufferCore["StartByte"];
     BigInt coreLength = protoBufferCore["Bytes"];
 
-    fstream input(file.expanded().c_str(), ios::in | ios::binary);
+    fstream input(file.expanded().toAscii().data(), ios::in | ios::binary);
     if (!input.is_open()) {
       IString msg = "Failed to open PB file" + file.name();
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -99,12 +99,12 @@ namespace Isis {
     pvl.AddObject(PvlObject("ControlNetwork"));
     PvlObject &network = pvl.FindObject("ControlNetwork");
 
-    network += PvlKeyword("NetworkId", p_network->networkid());
-    network += PvlKeyword("TargetName", p_network->targetname());
-    network += PvlKeyword("UserName", p_network->username());
-    network += PvlKeyword("Created", p_network->created());
-    network += PvlKeyword("LastModified", p_network->lastmodified());
-    network += PvlKeyword("Description", p_network->description());
+    network += PvlKeyword("NetworkId", p_network->networkid().c_str());
+    network += PvlKeyword("TargetName", p_network->targetname().c_str());
+    network += PvlKeyword("UserName", p_network->username().c_str());
+    network += PvlKeyword("Created", p_network->created().c_str());
+    network += PvlKeyword("LastModified", p_network->lastmodified().c_str());
+    network += PvlKeyword("Description", p_network->description().c_str());
 
     // This is the Pvl version we're converting to
     network += PvlKeyword("Version", "1");
@@ -119,9 +119,9 @@ namespace Isis {
       else
         pvlPoint += PvlKeyword("PointType", "Tie");
 
-      pvlPoint += PvlKeyword("PointId", binaryPoint.id());
-      pvlPoint += PvlKeyword("ChooserName", binaryPoint.choosername());
-      pvlPoint += PvlKeyword("DateTime", binaryPoint.datetime());
+      pvlPoint += PvlKeyword("PointId", binaryPoint.id().c_str());
+      pvlPoint += PvlKeyword("ChooserName", binaryPoint.choosername().c_str());
+      pvlPoint += PvlKeyword("DateTime", binaryPoint.datetime().c_str());
 
       if (binaryPoint.editlock()) {
         pvlPoint += PvlKeyword("EditLock", "True");
@@ -156,7 +156,7 @@ namespace Isis {
 
       if (binaryPoint.has_apriorisurfpointsourcefile())
         pvlPoint += PvlKeyword("AprioriXYZSourceFile",
-                        binaryPoint.apriorisurfpointsourcefile());
+                        binaryPoint.apriorisurfpointsourcefile().c_str());
 
       switch (binaryPoint.aprioriradiussource()) {
         case ControlNetFileProtoV0001_PBControlPoint::None:
@@ -186,21 +186,21 @@ namespace Isis {
 
       if (binaryPoint.has_aprioriradiussourcefile())
         pvlPoint += PvlKeyword("AprioriRadiusSourceFile",
-                        binaryPoint.aprioriradiussourcefile());
+                        binaryPoint.aprioriradiussourcefile().c_str());
 
       if(binaryPoint.has_apriorix()) {
-        pvlPoint += PvlKeyword("AprioriX", binaryPoint.apriorix(), "meters");
-        pvlPoint += PvlKeyword("AprioriY", binaryPoint.aprioriy(), "meters");
-        pvlPoint += PvlKeyword("AprioriZ", binaryPoint.aprioriz(), "meters");
+        pvlPoint += PvlKeyword("AprioriX", toString(binaryPoint.apriorix()), "meters");
+        pvlPoint += PvlKeyword("AprioriY", toString(binaryPoint.aprioriy()), "meters");
+        pvlPoint += PvlKeyword("AprioriZ", toString(binaryPoint.aprioriz()), "meters");
 
         if(binaryPoint.aprioricovar_size()) {
           PvlKeyword matrix("AprioriCovarianceMatrix");
-          matrix += binaryPoint.aprioricovar(0);
-          matrix += binaryPoint.aprioricovar(1);
-          matrix += binaryPoint.aprioricovar(2);
-          matrix += binaryPoint.aprioricovar(3);
-          matrix += binaryPoint.aprioricovar(4);
-          matrix += binaryPoint.aprioricovar(5);
+          matrix += toString(binaryPoint.aprioricovar(0));
+          matrix += toString(binaryPoint.aprioricovar(1));
+          matrix += toString(binaryPoint.aprioricovar(2));
+          matrix += toString(binaryPoint.aprioricovar(3));
+          matrix += toString(binaryPoint.aprioricovar(4));
+          matrix += toString(binaryPoint.aprioricovar(5));
           pvlPoint += matrix;
         }
       }
@@ -218,18 +218,18 @@ namespace Isis {
         pvlPoint += PvlKeyword("RadiusConstrained", "True");
 
       if(binaryPoint.has_adjustedx()) {
-        pvlPoint += PvlKeyword("AdjustedX", binaryPoint.adjustedx(), "meters");
-        pvlPoint += PvlKeyword("AdjustedY", binaryPoint.adjustedy(), "meters");
-        pvlPoint += PvlKeyword("AdjustedZ", binaryPoint.adjustedz(), "meters");
+        pvlPoint += PvlKeyword("AdjustedX", toString(binaryPoint.adjustedx()), "meters");
+        pvlPoint += PvlKeyword("AdjustedY", toString(binaryPoint.adjustedy()), "meters");
+        pvlPoint += PvlKeyword("AdjustedZ", toString(binaryPoint.adjustedz()), "meters");
 
         if(binaryPoint.adjustedcovar_size()) {
           PvlKeyword matrix("AdjustedCovarianceMatrix");
-          matrix += binaryPoint.adjustedcovar(0);
-          matrix += binaryPoint.adjustedcovar(1);
-          matrix += binaryPoint.adjustedcovar(2);
-          matrix += binaryPoint.adjustedcovar(3);
-          matrix += binaryPoint.adjustedcovar(4);
-          matrix += binaryPoint.adjustedcovar(5);
+          matrix += toString(binaryPoint.adjustedcovar(0));
+          matrix += toString(binaryPoint.adjustedcovar(1));
+          matrix += toString(binaryPoint.adjustedcovar(2));
+          matrix += toString(binaryPoint.adjustedcovar(3));
+          matrix += toString(binaryPoint.adjustedcovar(4));
+          matrix += toString(binaryPoint.adjustedcovar(5));
           pvlPoint += matrix;
         }
       }
@@ -238,7 +238,7 @@ namespace Isis {
         PvlGroup pvlMeasure("ControlMeasure");
         const ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure &
             binaryMeasure = binaryPoint.measures(j);
-        pvlMeasure += PvlKeyword("SerialNumber", binaryMeasure.serialnumber());
+        pvlMeasure += PvlKeyword("SerialNumber", binaryMeasure.serialnumber().c_str());
 
         switch(binaryMeasure.type()) {
           case ControlNetFileProtoV0001_PBControlPoint_PBControlMeasure_MeasureType_Candidate:
@@ -255,8 +255,8 @@ namespace Isis {
             break;
         }
 
-        pvlMeasure += PvlKeyword("ChooserName", binaryMeasure.choosername());
-        pvlMeasure += PvlKeyword("DateTime", binaryMeasure.datetime());
+        pvlMeasure += PvlKeyword("ChooserName", binaryMeasure.choosername().c_str());
+        pvlMeasure += PvlKeyword("DateTime", binaryMeasure.datetime().c_str());
 
         if(binaryMeasure.editlock())
           pvlMeasure += PvlKeyword("EditLock", "True");
@@ -265,32 +265,32 @@ namespace Isis {
           pvlMeasure += PvlKeyword("Ignore", "True");
 
         if(binaryMeasure.has_measurement()) {
-          pvlMeasure += PvlKeyword("Sample", binaryMeasure.measurement().sample());
-          pvlMeasure += PvlKeyword("Line", binaryMeasure.measurement().line());
+          pvlMeasure += PvlKeyword("Sample", toString(binaryMeasure.measurement().sample()));
+          pvlMeasure += PvlKeyword("Line", toString(binaryMeasure.measurement().line()));
 
           if (binaryMeasure.measurement().has_sampleresidual())
             pvlMeasure += PvlKeyword("SampleResidual",
-                binaryMeasure.measurement().sampleresidual(), "pixels");
+                toString(binaryMeasure.measurement().sampleresidual()), "pixels");
 
           if (binaryMeasure.measurement().has_lineresidual())
             pvlMeasure += PvlKeyword("LineResidual",
-                binaryMeasure.measurement().lineresidual(), "pixels");
+                toString(binaryMeasure.measurement().lineresidual()), "pixels");
         }
 
         if (binaryMeasure.has_diameter())
-          pvlMeasure += PvlKeyword("Diameter", binaryMeasure.diameter());
+          pvlMeasure += PvlKeyword("Diameter", toString(binaryMeasure.diameter()));
 
         if (binaryMeasure.has_apriorisample())
-          pvlMeasure += PvlKeyword("AprioriSample", binaryMeasure.apriorisample());
+          pvlMeasure += PvlKeyword("AprioriSample", toString(binaryMeasure.apriorisample()));
 
         if (binaryMeasure.has_aprioriline())
-          pvlMeasure += PvlKeyword("AprioriLine", binaryMeasure.aprioriline());
+          pvlMeasure += PvlKeyword("AprioriLine", toString(binaryMeasure.aprioriline()));
 
         if (binaryMeasure.has_samplesigma())
-          pvlMeasure += PvlKeyword("SampleSigma", binaryMeasure.samplesigma());
+          pvlMeasure += PvlKeyword("SampleSigma", toString(binaryMeasure.samplesigma()));
 
         if (binaryMeasure.has_samplesigma())
-          pvlMeasure += PvlKeyword("LineSigma", binaryMeasure.linesigma());
+          pvlMeasure += PvlKeyword("LineSigma", toString(binaryMeasure.linesigma()));
 
          for (int logEntry = 0;
              logEntry <

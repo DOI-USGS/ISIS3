@@ -107,7 +107,7 @@ namespace Isis {
   double Hillier::photometry(double i, double e, double g, int band) const {
     // Test for valid band
     if((band <= 0) || (band > (int) _bandpho.size())) {
-      std::string mess = "Provided band " + IString(band) + " out of range.";
+      QString mess = "Provided band " + toString(band) + " out of range.";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
     double ph = photometry(_bandpho[band-1], i, e, g);
@@ -170,9 +170,9 @@ namespace Isis {
    */
   void Hillier::Report(PvlContainer &pvl) {
     pvl += PvlKeyword("Algorithm", "Hillier");
-    pvl += PvlKeyword("IncRef", _iRef, "degrees");
-    pvl += PvlKeyword("EmaRef", _eRef, "degrees");
-    pvl += PvlKeyword("PhaRef", _gRef, "degrees");
+    pvl += PvlKeyword("IncRef", toString(_iRef), "degrees");
+    pvl += PvlKeyword("EmaRef", toString(_eRef), "degrees");
+    pvl += PvlKeyword("PhaRef", toString(_gRef), "degrees");
     PvlKeyword units("HillierUnits");
     PvlKeyword phostd("PhotometricStandard");
     PvlKeyword bbc("BandBinCenter");
@@ -188,17 +188,17 @@ namespace Isis {
     for(unsigned int i = 0 ; i < _bandpho.size() ; i++) {
       Parameters &p = _bandpho[i];
       units.AddValue(p.units);
-      phostd.AddValue(p.phoStd);
-      bbc.AddValue(p.wavelength);
-      bbct.AddValue(p.tolerance);
-      bbn.AddValue(p.band);
-      b0.AddValue(p.b0);
-      b1.AddValue(p.b1);
-      a0.AddValue(p.a0);
-      a1.AddValue(p.a1);
-      a2.AddValue(p.a2);
-      a3.AddValue(p.a3);
-      a4.AddValue(p.a4);
+      phostd.AddValue(toString(p.phoStd));
+      bbc.AddValue(toString(p.wavelength));
+      bbct.AddValue(toString(p.tolerance));
+      bbn.AddValue(toString(p.band));
+      b0.AddValue(toString(p.b0));
+      b1.AddValue(toString(p.b1));
+      a0.AddValue(toString(p.a0));
+      a1.AddValue(toString(p.a1));
+      a2.AddValue(toString(p.a2));
+      a3.AddValue(toString(p.a3));
+      a4.AddValue(toString(p.a4));
     }
     pvl += units;
     pvl += phostd;
@@ -239,8 +239,8 @@ namespace Isis {
     for(unsigned int i = 0 ; i < _profiles.size() ; i++) {
       const DbProfile &p = _profiles[i];
       if(p.exists("BandBinCenter")) {
-        double p_center = ConfKey(p, "BandBinCenter", Null);
-        double tolerance = ConfKey(p, "BandBinCenterTolerance", 1.0E-6);
+        double p_center = toDouble(ConfKey(p, "BandBinCenter", toString(Null)));
+        double tolerance = toDouble(ConfKey(p, "BandBinCenterTolerance", toString(1.0E-6)));
         if(fabs(wavelength - p_center) <= fabs(tolerance)) {
           Parameters pars = extract(p);
           pars.iProfile = i;
@@ -270,18 +270,18 @@ namespace Isis {
    */
   Hillier::Parameters Hillier::extract(const DbProfile &p) const {
     Parameters pars;
-    pars.b0 = ConfKey(p, "B0", 0.0);
-    pars.b1 = ConfKey(p, "B1", 0.0);
-    pars.a0 = ConfKey(p, "A0", 0.0);
-    pars.a1 = ConfKey(p, "A1", 0.0);
-    pars.a2 = ConfKey(p, "A2", 0.0);
-    pars.a3 = ConfKey(p, "A3", 0.0);
-    pars.a4 = ConfKey(p, "A4", 0.0);
-    pars.wavelength = ConfKey(p, "BandBinCenter", Null);
-    pars.tolerance = ConfKey(p, "BandBinCenterTolerance", Null);
+    pars.b0 = toDouble(ConfKey(p, "B0", toString(0.0)));
+    pars.b1 = toDouble(ConfKey(p, "B1", toString(0.0)));
+    pars.a0 = toDouble(ConfKey(p, "A0", toString(0.0)));
+    pars.a1 = toDouble(ConfKey(p, "A1", toString(0.0)));
+    pars.a2 = toDouble(ConfKey(p, "A2", toString(0.0)));
+    pars.a3 = toDouble(ConfKey(p, "A3", toString(0.0)));
+    pars.a4 = toDouble(ConfKey(p, "A4", toString(0.0)));
+    pars.wavelength = toDouble(ConfKey(p, "BandBinCenter", toString(Null)));
+    pars.tolerance = toDouble(ConfKey(p, "BandBinCenterTolerance", toString(Null)));
     //  Determine equation units - defaults to Radians
-    pars.units = ConfKey(p, "HillierUnits", IString("Radians"));
-    pars.phaUnit = (IString::Equal(pars.units, "Degrees")) ? 1.0 : rpd_c();
+    pars.units = ConfKey(p, "HillierUnits", QString("Radians"));
+    pars.phaUnit = (pars.units.toLower() == "degrees") ? 1.0 : rpd_c();
     return (pars);
   }
 
@@ -308,9 +308,9 @@ namespace Isis {
 
     //  Interate over all Photometric groups
     _normProf = DbProfile(pvl.FindObject("NormalizationModel").FindGroup("Algorithm", Pvl::Traverse));
-    _iRef = ConfKey(_normProf, "IncRef", 30.0);
-    _eRef = ConfKey(_normProf, "EmaRef", 0.0);
-    _gRef = ConfKey(_normProf, "PhaRef", _iRef);
+    _iRef = toDouble(ConfKey(_normProf, "IncRef", toString(30.0)));
+    _eRef = toDouble(ConfKey(_normProf, "EmaRef", toString(0.0)));
+    _gRef = toDouble(ConfKey(_normProf, "PhaRef", toString(_iRef)));
 
     // Check for valid incidence angle
     if(_iRef > fabs(90.0)) {
@@ -325,7 +325,7 @@ namespace Isis {
     DbProfile phoProf = DbProfile(phoObj);
     PvlObject::PvlGroupIterator algo = phoObj.BeginGroup();
     while(algo != phoObj.EndGroup()) {
-      if(IString::Equal(algo->Name(), "Algorithm")) {
+      if(algo->Name().toLower() == "algorithm") {
         _profiles.push_back(DbProfile(phoProf, DbProfile(*algo)));
       }
       ++algo;
@@ -333,9 +333,9 @@ namespace Isis {
 
     Pvl *label = cube.getLabel();
     PvlKeyword center = label->FindGroup("BandBin", Pvl::Traverse)["Center"];
-    string errs("");
+    QString errs("");
     for(int i = 0; i < cube.getBandCount() ; i++) {
-      Parameters parms = findParameters(center[i]);
+      Parameters parms = findParameters(toDouble(center[i]));
       if(parms.IsValid()) {
         parms.band = i + 1;
         _camera->SetBand(i + 1);
@@ -352,7 +352,7 @@ namespace Isis {
     }
 
     // Check for errors and throw them all at the same time
-    if(!errs.empty()) {
+    if(!errs.isEmpty()) {
       errs += " --> Errors in the input PVL file \"" + pvl.FileName() + "\"";
       throw IException(IException::User, errs, _FILEINFO_);
     }

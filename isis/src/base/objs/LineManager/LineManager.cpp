@@ -23,8 +23,10 @@
 #include "LineManager.h"
 
 #include "IException.h"
+#include "IString.h"
 
 using namespace std;
+
 namespace Isis {
 
   /**
@@ -57,8 +59,8 @@ namespace Isis {
 
   bool LineManager::SetLine(const int line, const int band) {
     if(line < 1) {
-      string message = "LineManager is unable to set the line to [" 
-                       + IString(line) + "]. Minimum line value is 1.";
+      QString message = "LineManager is unable to set the line to [" 
+                       + toString(line) + "]. Minimum line value is 1.";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 

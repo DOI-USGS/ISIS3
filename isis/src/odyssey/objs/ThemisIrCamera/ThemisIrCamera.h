@@ -98,7 +98,7 @@ namespace Isis {
       double p_etStart;
       double p_lineRate;
       double p_bandTimeOffset;
-      std::string p_tdiMode;
+      QString p_tdiMode;
       std::vector<int> p_originalBand;
   };
   

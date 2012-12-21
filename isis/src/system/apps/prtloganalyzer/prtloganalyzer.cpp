@@ -64,13 +64,13 @@ void IsisMain() {
   if(ui.WasEntered("LOG")) {
    // Set up for opening
     FileName temp(ui.GetFileName("LOG"));
-    string file = temp.expanded();
+    QString file = temp.expanded();
     ofstream ostm;
 
     // Open the file
-    ostm.open(file.c_str(), std::ios::out);
+    ostm.open(file.toAscii().data(), std::ios::out);
     if(!ostm) {
-      string message = "Cannot open/create output file " + file;
+      QString message = "Cannot open/create output file " + file;
       throw IException(IException::Io, message, _FILEINFO_);
     }
 

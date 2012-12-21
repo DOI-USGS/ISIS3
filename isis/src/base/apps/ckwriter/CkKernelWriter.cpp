@@ -27,6 +27,8 @@
 #include <iomanip>
 #include <sstream>
 
+#include <QFile>
+
 #include "CkKernelWriter.h"
 #include "SpiceSegment.h"
 #include "FileName.h"
@@ -46,7 +48,7 @@ namespace Isis {
    init();
  }
 
- CkKernelWriter::CkKernelWriter(const std::string &kfile, const int &csize,
+ CkKernelWriter::CkKernelWriter(const QString &kfile, const int &csize,
                                 const int &cktype) {
    init();
    setCommentSize(csize);
@@ -72,13 +74,13 @@ namespace Isis {
    return;
  }
 
- bool CkKernelWriter::addComment(const std::string &comment) {
+ bool CkKernelWriter::addComment(const QString &comment) {
    return (writeComment(comment));
  }
 
- bool CkKernelWriter::addCommentFile(const std::string &comfile) {
+ bool CkKernelWriter::addCommentFile(const QString &comfile) {
    TextFile t(comfile);
-   string comment;
+   QString comment;
    bool lastWrite(true);
    while ( t.GetLine(comment, false) ) {
      if ( comment.size() == 0 ) comment.push_back('\n');
@@ -87,15 +89,15 @@ namespace Isis {
    return (lastWrite);
  }
 
- void CkKernelWriter::open(const std::string &kfile,
-                           const std::string &intCkName) {
+ void CkKernelWriter::open(const QString &kfile,
+                           const QString &intCkName) {
    FileName kf(kfile);
    if ( kf.fileExists() ) {
-     string full_kf = kf.expanded();
-     remove(full_kf.c_str());
+     QString full_kf = kf.expanded();
+     QFile::remove(full_kf);
    }
    SpiceInt  myHandle;
-   ckopn_c(kf.expanded().c_str(), intCkName.c_str(), _comSize, &myHandle);
+   ckopn_c(kf.expanded().toAscii().data(), intCkName.toAscii().data(), _comSize, &myHandle);
    _handle = myHandle;
    return;
  }
@@ -121,7 +123,7 @@ namespace Isis {
  }
 
  /** Writes a comment to an opened NAIF kernel file */
- bool CkKernelWriter::writeComment(const std::string &comment) const {
+ bool CkKernelWriter::writeComment(const QString &comment) const {
    if ( _handle == 0 ) {
      string mess = "Comments cannot be written as the file is not open";
      throw IException(IException::Programmer, mess, _FILEINFO_);
@@ -130,12 +132,12 @@ namespace Isis {
    // Trap errors so they are not fatal if the comment section fills up.
    // Calling environments can decide how to handle it.
    try {
-     string commOut;
+     QString commOut;
      NaifStatus::CheckErrors();
-     for ( unsigned int i = 0 ; i < comment.size() ; i++ ) {
+     for ( int i = 0 ; i < comment.size() ; i++ ) {
         if ( comment[i] == '\n' ) {
           while ( commOut.size() < 2 ) { commOut.append(" "); }
-          dafac_c(_handle, 1, commOut.size(), commOut.c_str());
+          dafac_c(_handle, 1, commOut.size(), commOut.toAscii().data());
           _comCharsWritten += commOut.size();
           NaifStatus::CheckErrors();
           commOut.clear();
@@ -148,7 +150,7 @@ namespace Isis {
      // See if there is residual to write
      if ( commOut.size() > 0 ) {
        while ( commOut.size() < 2 ) { commOut.append(" "); }
-       dafac_c(_handle, 1, commOut.size(), commOut.c_str());
+       dafac_c(_handle, 1, commOut.size(), commOut.toAscii().data());
        _comCharsWritten += commOut.size();
        NaifStatus::CheckErrors();
      }
@@ -178,14 +180,14 @@ namespace Isis {
       avvs = segment.AngularVelocities()[0];
       hasAvvs = SPICETRUE;
     }
-    string refFrame = segment.ReferenceFrame();
-    string segId = segment.Id();
+    QString refFrame = segment.ReferenceFrame();
+    QString segId = segment.Id();
 
     int nrecs = segment.size();
 
     NaifStatus::CheckErrors();
     ckw01_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
-             refFrame.c_str(), hasAvvs, segId.c_str(), nrecs, &sclks[0],
+             refFrame.toAscii().data(), hasAvvs, segId.toAscii().data(), nrecs, &sclks[0],
              quats[0], avvs);
     NaifStatus::CheckErrors();
     return;
@@ -194,7 +196,7 @@ namespace Isis {
   void CkKernelWriter::writeCk2(const SpiceSegment &segment) const {
 
     if ( !segment.hasAngularVelocities() ) {
-      string mess = "Type 2 CK kernels require angular velocities";
+      QString mess = "Type 2 CK kernels require angular velocities";
       throw IException(IException::User, mess, _FILEINFO_);
     }
 
@@ -202,8 +204,8 @@ namespace Isis {
     const SpiceSegment::SMatrix &quats = segment.Quaternions();
     const SpiceSegment::SMatrix &avvs = segment.AngularVelocities();
 
-    string refFrame = segment.ReferenceFrame();
-    string segId = segment.Id();
+    QString refFrame = segment.ReferenceFrame();
+    QString segId = segment.Id();
 
     int nrecs = segment.size();
 
@@ -215,7 +217,7 @@ namespace Isis {
     SpiceSegment::SVector rates(nrecs, segment.TickRate());
     NaifStatus::CheckErrors();
     ckw02_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
-             refFrame.c_str(), segId.c_str(), nrecs, &sclks[0],
+             refFrame.toAscii().data(), segId.toAscii().data(), nrecs, &sclks[0],
              &stops[0], quats[0], avvs[0], &rates[0]);
     NaifStatus::CheckErrors();
     return;
@@ -232,15 +234,15 @@ namespace Isis {
       avvs = segment.AngularVelocities()[0];
       hasAvvs = SPICETRUE;
     }
-    string refFrame = segment.ReferenceFrame();
-    string segId = segment.Id();
+    QString refFrame = segment.ReferenceFrame();
+    QString segId = segment.Id();
 
     int nrecs = segment.size();
 
     segment.FurnshKernelType("FK");
     NaifStatus::CheckErrors();
     ckw03_c(_handle, sclks[0], sclks[nrecs-1], segment.InstCode(),
-             refFrame.c_str(), hasAvvs, segId.c_str(), nrecs, &sclks[0],
+             refFrame.toAscii().data(), hasAvvs, segId.toAscii().data(), nrecs, &sclks[0],
              quats[0], avvs, 1, &sclks[0]);
     segment.UnloadKernelType("FK");
 

@@ -1,4 +1,4 @@
-#if !defined(Gruen_h)
+#ifndef Gruen_h
 #define Gruen_h
 /**
  * @file
@@ -100,7 +100,7 @@ namespace Isis {
       /** Returns the current call count */
       BigInt CallCount() const { return (m_callCount); }
 
-      void WriteSubsearchChips(const std::string &pattern = "SubChip");
+      void WriteSubsearchChips(const QString &pattern = "SubChip");
 
       AffineTolerance getAffineTolerance() const;
 
@@ -137,7 +137,7 @@ namespace Isis {
 
     protected:
       /** Returns the default name of the algorithm as Gruen */
-      virtual IString AlgorithmName() const {
+      virtual QString AlgorithmName() const {
         return ("Gruen");
       }
 
@@ -181,16 +181,16 @@ namespace Isis {
       /** Struct that maintains error counts */
       struct ErrorCounter {
         ErrorCounter() : m_gerrno(0), m_keyname("Unknown"), m_count(0) { }
-        ErrorCounter(int gerrno, const std::string &keyname) : m_gerrno(gerrno),
+        ErrorCounter(int gerrno, const QString &keyname) : m_gerrno(gerrno),
           m_keyname(keyname), m_count(0) { }
     
         inline int  Errno() const {  return (m_gerrno); }
         inline BigInt Count() const { return (m_count); }
         inline void BumpIt() { m_count++; }
-        PvlKeyword LogIt() const { return (PvlKeyword(m_keyname, m_count)); }
+        PvlKeyword LogIt() const { return (PvlKeyword(m_keyname, toString(m_count))); }
     
         int         m_gerrno;
-        std::string m_keyname;
+        QString m_keyname;
         BigInt      m_count;
       };
 
@@ -199,7 +199,7 @@ namespace Isis {
 
       // Iteration loop variables
       BigInt       m_callCount;
-      std::string  m_filePattern;
+      QString  m_filePattern;
 
       ErrorList    m_errors;            // Error logger
       BigInt       m_unclassified;      // Unclassified errors
@@ -254,8 +254,38 @@ namespace Isis {
        *
        * @return T Return type
        */
+      QString ConfKey(const DbProfile &conf, const QString &keyname,
+                const QString &defval, int index = 0) const {
+        if(!conf.exists(keyname)) {
+          return (defval);
+        }
+        if(conf.count(keyname) < index) {
+          return (defval);
+        }
+        QString iValue(conf.value(keyname, index));
+        IString tmp(iValue);
+        QString value = tmp.ToQt();  // This makes it work with a string?
+        return (value);
+      };
+
+      /**
+       * @brief Helper method to initialize parameters
+       *
+       * This method will check the existance of a keyword and extract the value
+
+       * if it exists to the passed parameter (type).  If it doesn't exist, the
+       * default values is returned.
+       *
+       * @param T Templated variable type
+       * @param conf Parameter profile container
+       * @param keyname Name of keyword to get a value from
+       * @param defval Default value it keyword/value doesn't exist
+       * @param index Optional index of the value for keyword arrays
+       *
+       * @return T Return type
+       */
       template <typename T>
-      T ConfKey(const DbProfile &conf, const std::string &keyname,
+      T ConfKey(const DbProfile &conf, const QString &keyname,
                 const T &defval, int index = 0) const {
         if(!conf.exists(keyname)) {
           return (defval);
@@ -263,8 +293,9 @@ namespace Isis {
         if(conf.count(keyname) < index) {
           return (defval);
         }
-        IString iValue(conf.value(keyname, index));
-        T value = iValue;  // This makes it work with a string?
+        QString iValue(conf.value(keyname, index));
+        IString tmp(iValue);
+        T value = tmp;  // This makes it work with a string?
         return (value);
       };
 
@@ -282,9 +313,9 @@ namespace Isis {
        * @return PvlKeyword Constructed keyword for key/value
        */
       template <typename T>
-      PvlKeyword ParameterKey(const std::string &keyname,
+      PvlKeyword ParameterKey(const QString &keyname,
                               const T &value,
-                              const std::string &unit = "") const {
+                              const QString &unit = "") const {
         if(m_prof.exists(keyname)) {
           return(ValidateKey(keyname, value, unit));
         }
@@ -304,19 +335,19 @@ namespace Isis {
        *
        * @return PvlKeyword Returns newly created keyword/value
        */
-      inline PvlKeyword ValidateKey(const std::string keyname,
+      inline PvlKeyword ValidateKey(const QString keyname,
                                     const double &value,
-                                    const std::string &unit = "") const {
+                                    const QString &unit = "") const {
         if(IsSpecial(value)) {
           return (PvlKeyword(keyname, "NULL"));
         }
         else {
-          return (PvlKeyword(keyname, value, unit));
+          return (PvlKeyword(keyname, toString(value), unit));
         }
       }
 
       ErrorList initErrorList() const;
-      int logError(int gerrno, const std::string &gerrmsg);
+      int logError(int gerrno, const QString &gerrmsg);
       PvlGroup StatsLog() const;
       PvlGroup ParameterLog() const;
 

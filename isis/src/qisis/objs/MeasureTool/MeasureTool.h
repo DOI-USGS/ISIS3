@@ -10,14 +10,11 @@
 #include "IString.h"
 
 
+class QComboBox;
 class QDialog;
 class QMenu;
 class QLineEdit;
-class QComboBox;
-
-namespace Isis {
-  class IString;
-}
+class QString;
 
 namespace Isis {
   class MdiCubeViewport;
@@ -172,8 +169,8 @@ namespace Isis {
 
 
       int m_numLinked;//!< number of linked viewports
-      IString m_path;//!< filename path
-      IString m_fname;//!< filename
+      QString m_path;//!< filename path
+      QString m_fname;//!< filename
 
       TableMainWindow *m_tableWin;//!< table window
       RubberBandComboBox *m_rubberBand;//!< rubberband combo box

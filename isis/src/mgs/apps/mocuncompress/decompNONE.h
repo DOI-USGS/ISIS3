@@ -40,7 +40,7 @@ SCCSID @(#)decompNONE.h  1.1 10/04/99
 */
 /* SCCShid @(#)decompNONE.h (decompNONE.h) 1.2 */
 
-#if !defined(decompNONE_h)
+#ifndef decompNONE_h
 
 #define decompNONE_h
 

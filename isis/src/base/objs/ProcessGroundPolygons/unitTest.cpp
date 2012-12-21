@@ -1,4 +1,7 @@
 #include "Isis.h"
+
+#include <QFile>
+
 #include "ProcessGroundPolygons.h"
 #include "ProcessByLine.h"
 #include "ProcessByBrick.h"
@@ -76,17 +79,17 @@ void IsisMain() {
   CubeAttributeOutput out_atts;
   out_atts.setPixelType(Real);
 
-  const string output1 = "ProcessGroundPolygonsTest.cub";
-  const string output2 = "ProcessGroundPolygonsTest_count.cub";
+  QString output1 = "ProcessGroundPolygonsTest.cub";
+  QString output2 = "ProcessGroundPolygonsTest_count.cub";
 
   p.SetOutputCube(output1 , output2 , out_atts, vimsPvl, 2);
 
   for(int f = 0; f < vimsCube.size(); f++) {
-    Pvl vimsCubePvl(vimsCube[f].toStdString());
+    Pvl vimsCubePvl(vimsCube[f]);
     UniversalGroundMap *groundMap = new UniversalGroundMap(vimsCubePvl);
 
     vimsValues.clear();
-    pbl.SetInputCube(vimsCube[f].toStdString(), atts0, 0);
+    pbl.SetInputCube(vimsCube[f], atts0, 0);
     pbl.StartProcess(readValues);
     pbl.EndProcess();
     double latitude, longitude;
@@ -153,8 +156,8 @@ void IsisMain() {
   pbl.StartProcess(writeAscii);
   pbl.EndProcess();
 
-  remove(output1.c_str());
-  remove(output2.c_str());
+  QFile::remove(output1);
+  QFile::remove(output2);
 
 
 }

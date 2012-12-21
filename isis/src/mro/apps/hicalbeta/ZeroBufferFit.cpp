@@ -57,26 +57,26 @@ namespace Isis {
     _timet.setBin(ToInteger(prof("Summing")));
     _timet.setLineTime(ToDouble(prof("ScanExposureDuration")));
 
-    _skipFit = IsEqual(ConfKey(prof, "ZeroBufferFitSkipFit", std::string("TRUE")), "TRUE");
+    _skipFit = IsEqual(ConfKey(prof, "ZeroBufferFitSkipFit", QString("TRUE")), "TRUE");
     _useLinFit = IsTrueValue(prof, "ZeroBufferFitOnFailUseLinear");
 
 
-    _absErr = ConfKey(prof, "AbsoluteError", 1.0E-4);
-    _relErr = ConfKey(prof, "RelativeError", 1.0E-4);
+    _absErr = toDouble(ConfKey(prof, "AbsoluteError", QString("1.0E-4")));
+    _relErr = toDouble(ConfKey(prof, "RelativeError", QString("1.0E-4")));
 
-    _sWidth = ConfKey(prof, "GuessFilterWidth", 17);
-    _sIters = ConfKey(prof, "GuessFilterIterations", 1);
+    _sWidth = toInt(ConfKey(prof, "GuessFilterWidth", QString("17")));
+    _sIters = toInt(ConfKey(prof, "GuessFilterIterations", QString("1")));
 
     if ( prof.exists("MaximumIterations") ) {
       setMaxIters(ToInteger(prof("MaximumIterations")));
     }
 
-    _maxLog = ConfKey(prof, "MaximumLog", 709.0);
+    _maxLog = toDouble(ConfKey(prof, "MaximumLog", QString("709.0")));
     _badLines = ToInteger(prof("TrimLines"))/ToInteger(prof("Summing"));
-    _minLines = ConfKey(prof,"ZeroBufferFitMinimumLines", 100);
+    _minLines = toInt(ConfKey(prof,"ZeroBufferFitMinimumLines", QString("100")));
 
 
-    string histstr = "ZeroBufferFit(AbsErr[" + ToString(_absErr) +
+    QString histstr = "ZeroBufferFit(AbsErr[" + ToString(_absErr) +
                           "],RelErr[" + ToString(_relErr) + 
                           "],MaxIter[" + ToString(maxIters()) + "])";
    _history.add(histstr);
@@ -118,7 +118,7 @@ namespace Isis {
       }
 
       hist << "SkipFit(TRUE: Not using LMFit)";
-      _history.add(hist.str());
+      _history.add(hist.str().c_str());
     }
     else {
       hist << "Fit(";
@@ -128,7 +128,7 @@ namespace Isis {
         _uncert = uncert();
         hist << "Solved,#Iters[" << nIterations() << "],ChiSq[" << Chisq()
              << "],DoF[" << DoF() << "])";
-        _history.add(hist.str());
+        _history.add(hist.str().c_str());
         _history.add("a0("+ToString(_coefs[0])+"+-"+ToString(_uncert[0])+")");
         _history.add("a1("+ToString(_coefs[1])+"+-"+ToString(_uncert[1])+")");
         _history.add("a2("+ToString(_coefs[2])+"+-"+ToString(_uncert[2])+")");
@@ -146,7 +146,7 @@ namespace Isis {
   
         hist << "Failed::Reason("<< statusstr() << "),#Iters[" 
              << nIterations() << "])";
-        _history.add(hist.str());
+        _history.add(hist.str().c_str());
         _history.add("a0("+ToString(_coefs[0])+")");
         _history.add("a1("+ToString(_coefs[1])+")");
         _history.add("a2("+ToString(_coefs[2])+")");

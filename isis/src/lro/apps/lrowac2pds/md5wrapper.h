@@ -1,13 +1,13 @@
 /*
- *	This is my wrapper-class to create
- *	a MD5 Hash from a string and a file.
+ *  This is my wrapper-class to create
+ *  a MD5 Hash from a string and a file.
  *
- *	This code is completly free, you
- *	can copy it, modify it, or do
- *	what ever you want with it.
+ *  This code is completly free, you
+ *  can copy it, modify it, or do
+ *  what ever you want with it.
  *
- *	Feb. 2005
- *	Benjamin Grüdelbach
+ *  Feb. 2005
+ *  Benjamin Grüdelbach
  */
 
 //include protection
@@ -15,11 +15,16 @@
 #define MD5WRAPPER_H
 
 //basic includes
-#include <string>
+#include <QString>
 
 //forwards
 class MD5;
 
+/**
+ * @author 2005-02-?? Benjamin Grudelbach
+ *
+ * @internal
+ */
 class md5wrapper {
   private:
     MD5 *md5;
@@ -28,13 +33,13 @@ class md5wrapper {
      * internal hash function, calling
      * the basic methods from md5.h
      */
-    std::string hashit(std::string text);
+    QString hashit(QString text);
 
     /*
      * converts the numeric giets to
-     * a valid std::string
+     * a valid QString
      */
-    std::string convToString(unsigned char *bytes);
+    QString convToString(unsigned char *bytes);
   public:
     //constructor
     md5wrapper();
@@ -47,14 +52,14 @@ class md5wrapper {
      * "text" and returns it as
      * string
      */
-    std::string getHashFromString(std::string text);
+    QString getHashFromString(QString text);
 
     /*
      * creates a MD5 hash from
      * a file specified in "filename" and
      * returns it as string
      */
-    std::string getHashFromFile(std::string filename);
+    QString getHashFromFile(QString filename);
 };
 
 

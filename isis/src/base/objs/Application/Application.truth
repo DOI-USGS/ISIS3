@@ -27,7 +27,7 @@ End_Object
 Can't test Gui methods
   GuiLog(Pvl &results)
   GuiLog(PvlGroup &results)
-  GuiLog(std::string &results)
+  GuiLog(QString &results)
   GuiReportErrorLog(iException &e)
 
 GuiHelpers ok

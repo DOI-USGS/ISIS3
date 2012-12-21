@@ -87,10 +87,10 @@ namespace Isis {
       };
 
       // Constructors and Destructors
-      Table(const std::string &tableName, TableRecord &rec);
-      Table(const std::string &tableName);// Only use this constructor for reading in an existing table
-      Table(const std::string &tableName, const std::string &file);
-      Table(const std::string &tableName, const std::string &file,
+      Table(const QString &tableName, TableRecord &rec);
+      Table(const QString &tableName);// Only use this constructor for reading in an existing table
+      Table(const QString &tableName, const QString &file);
+      Table(const QString &tableName, const QString &file,
             const Pvl &fileHeader);
       Table(const Table &other);
       Table &operator=(const Isis::Table &other);

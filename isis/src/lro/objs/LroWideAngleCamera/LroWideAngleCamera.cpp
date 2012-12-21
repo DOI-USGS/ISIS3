@@ -56,7 +56,7 @@ namespace Isis {
     // Get the ephemeris time from the labels
     double et;
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
-    string stime = inst["SpacecraftClockStartCount"];
+    QString stime = inst["SpacecraftClockStartCount"];
     et = getClockTime(stime).Et();
 
     p_exposureDur = inst["ExposureDuration"];
@@ -65,7 +65,7 @@ namespace Isis {
     p_etStart = et + ((p_exposureDur / 1000.0) / 2.0);
 
     // Compute the framelet size and number of framelets
-    IString instId = IString((string) inst["InstrumentId"]).UpCase();
+    IString instId = QString((QString) inst["InstrumentId"]).toUpper();
 
     int frameletSize = 14;
     int sumMode = 1;
@@ -100,11 +100,11 @@ namespace Isis {
     }
 
     // Is the data flipped?
-    bool dataflipped = (inst["DataFlipped"][0].UpCase() == "YES");
+    bool dataflipped = (inst["DataFlipped"][0].toUpper() == "YES");
 
     //  Now create detector offsets
-    IString instCode = "INS" + IString((int) naifIkCode());
-    IString ikernKey = instCode + "_FILTER_BANDCENTER";
+    QString instCode = "INS" + toString(naifIkCode());
+    QString ikernKey = instCode + "_FILTER_BANDCENTER";
     vector<int> fbc = GetVector(ikernKey);
     ikernKey = instCode + "_FILTER_OFFSET";
     vector<int> foffset = GetVector(ikernKey);
@@ -132,13 +132,13 @@ namespace Isis {
 
     //  Now map the actual filter that exist in cube
     for(int i = 0; i < filtNames.Size(); i++) {
-      if(!filterToDetectorOffset.exists(filtNames[i])) {
-        string msg = "Unrecognized filter name [" + filtNames[i] + "]";
+      if(!filterToDetectorOffset.exists((IString)filtNames[i])) {
+        QString msg = "Unrecognized filter name [" + filtNames[i] + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
-      p_detectorStartLines.push_back(filterToDetectorOffset.get(filtNames[i]));
-      p_frameletOffsets.push_back(filterToFrameletOffset.get(filtNames[i]));
+      p_detectorStartLines.push_back(filterToDetectorOffset.get((IString)filtNames[i]));
+      p_frameletOffsets.push_back(filterToFrameletOffset.get((IString)filtNames[i]));
     }
 
     // Setup detector map
@@ -168,7 +168,7 @@ namespace Isis {
     double lineBoreSight = getDouble(ikernKey);
 
     //  get instrument-specific sample offset
-    IString instModeId = ((IString)(string) inst["InstrumentModeId"]).UpCase();
+    QString instModeId = ((QString)inst["InstrumentModeId"]).toUpper();
     // For BW mode, add the mode (0,1 (non-polar) or 2,3 (polar)) used to
     // acquire image
     if (instModeId == "BW") {
@@ -191,7 +191,7 @@ namespace Isis {
     new LroWideAngleCameraDistortionMap(this, naifIkCode());
 
     // Setup the ground and sky map
-    bool evenFramelets = (IString((string) inst["Framelets"][0]).UpCase()
+    bool evenFramelets = (QString(inst["Framelets"][0]).toUpper()
                           == "EVEN");
 
     new PushFrameCameraGroundMap(this, evenFramelets);
@@ -238,11 +238,11 @@ namespace Isis {
    * @param key
    * @return @b int Pool key size
    */
-  int LroWideAngleCamera::PoolKeySize(const string &key) const {
+  int LroWideAngleCamera::PoolKeySize(const QString &key) const {
     SpiceBoolean found;
     SpiceInt n;
     SpiceChar ctype[1];
-    dtpool_c(key.c_str(), &found, &n, ctype);
+    dtpool_c(key.toAscii().data(), &found, &n, ctype);
     if(!found) n = 0;
     return (n);
   }
@@ -251,7 +251,7 @@ namespace Isis {
    * @param key
    * @return @b vector < @b int >
    */
-  vector<int> LroWideAngleCamera::GetVector(const string &key) {
+  vector<int> LroWideAngleCamera::GetVector(const QString &key) {
     QVariant poolKeySize = getStoredResult(key + "_SIZE", SpiceIntType);
 
     int nvals = poolKeySize.toInt();
@@ -262,7 +262,7 @@ namespace Isis {
     }
 
     if(nvals <= 0) {
-      string mess = "Kernel pool keyword " + key + " not found!";
+      QString mess = "Kernel pool keyword " + key + " not found!";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 

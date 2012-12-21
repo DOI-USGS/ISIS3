@@ -53,7 +53,7 @@ namespace Isis {
    *
    * @throws Isis::iException::Message
    */
-  Isis::Cube *ProcessBySample::SetInputCube(const std::string &parameter,
+  Isis::Cube *ProcessBySample::SetInputCube(const QString &parameter,
       int requirements) {
     int allRequirements = Isis::SpatialMatch | Isis::BandMatchOrOne;
     allRequirements |= requirements;
@@ -73,7 +73,7 @@ namespace Isis {
    *                     Defaults to 0
    *
    */
-  Isis::Cube *ProcessBySample::SetInputCube(const std::string &file,
+  Isis::Cube *ProcessBySample::SetInputCube(const QString &file,
       Isis::CubeAttributeInput &att,
       int requirements) {
     int allRequirements = Isis::SpatialMatch | Isis::BandMatchOrOne;

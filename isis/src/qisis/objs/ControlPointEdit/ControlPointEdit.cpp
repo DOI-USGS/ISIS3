@@ -121,8 +121,8 @@ namespace Isis {
     //  grid row
     int row = 0;
 
-    std::string tempFileName = FileName("$base/icons").expanded();
-    QString toolIconDir = tempFileName.c_str();
+    QString tempFileName = FileName("$base/icons").expanded();
+    QString toolIconDir = tempFileName;
 
     QSize isize(27, 27);
     //  Add zoom buttons
@@ -158,7 +158,7 @@ namespace Isis {
       //  Add arrows for panning
       leftPanUp = new QToolButton(parent);
       leftPanUp->setIcon(QIcon(FileName("$base/icons/up.png").
-                               expanded().c_str()));
+                               expanded()));
       leftPanUp->setIconSize(isize);
       leftPanUp->setToolTip("Move up 1 screen pixel");
       leftPanUp->setStatusTip("Move up 1 screen pixel");
@@ -166,7 +166,7 @@ namespace Isis {
 
       leftPanDown = new QToolButton(parent);
       leftPanDown->setIcon(QIcon(FileName("$base/icons/down.png").
-                                 expanded().c_str()));
+                                 expanded()));
       leftPanDown->setIconSize(isize);
       leftPanDown->setToolTip("Move down 1 screen pixel");
       leftPanDown->setStatusTip("Move down 1 screen pixel");
@@ -174,7 +174,7 @@ namespace Isis {
 
       leftPanLeft = new QToolButton(parent);
       leftPanLeft->setIcon(QIcon(FileName("$base/icons/back.png").
-                                 expanded().c_str()));
+                                 expanded()));
       leftPanLeft->setIconSize(isize);
       leftPanLeft->setToolTip("Move left 1 screen pixel");
       leftPanLeft->setWhatsThis("Move the left measure to the left by 1 screen"
@@ -182,7 +182,7 @@ namespace Isis {
 
       leftPanRight = new QToolButton(parent);
       leftPanRight->setIcon(QIcon(FileName("$base/icons/forward.png").
-                                  expanded().c_str()));
+                                  expanded()));
       leftPanRight->setIconSize(isize);
       leftPanRight->setToolTip("Move right 1 screen pixel");
       leftPanRight->setWhatsThis("Move the left measure to the right by 1"
@@ -205,7 +205,7 @@ namespace Isis {
 
     p_rightZoomOut = new QToolButton();
     p_rightZoomOut->setIcon(QIcon(FileName("$base/icons/viewmag-.png").
-                                  expanded().c_str()));
+                                  expanded()));
     p_rightZoomOut->setIconSize(isize);
     p_rightZoomOut->setToolTip("Zoom Out 2x");
     p_rightZoomOut->setWhatsThis("Zoom Out 2x on right measure.");
@@ -224,21 +224,21 @@ namespace Isis {
     //  Add arrows for panning
     QToolButton *rightPanUp = new QToolButton(parent);
     rightPanUp->setIcon(QIcon(FileName("$base/icons/up.png").
-                              expanded().c_str()));
+                              expanded()));
     rightPanUp->setIconSize(isize);
     rightPanUp->setToolTip("Move up 1 screen pixel");
     rightPanUp->setWhatsThis("Move the right measure up 1 screen pixel.");
 
     QToolButton *rightPanDown = new QToolButton(parent);
     rightPanDown->setIcon(QIcon(FileName("$base/icons/down.png").
-                                expanded().c_str()));
+                                expanded()));
     rightPanDown->setIconSize(isize);
     rightPanDown->setToolTip("Move down 1 screen pixel");
     rightPanUp->setWhatsThis("Move the right measure down 1 screen pixel.");
 
     QToolButton *rightPanLeft = new QToolButton(parent);
     rightPanLeft->setIcon(QIcon(FileName("$base/icons/back.png").
-                                expanded().c_str()));
+                                expanded()));
     rightPanLeft->setIconSize(isize);
     rightPanLeft->setToolTip("Move left 1 screen pixel");
     rightPanLeft->setWhatsThis("Move the right measure to the left by 1 screen"
@@ -246,7 +246,7 @@ namespace Isis {
 
     QToolButton *rightPanRight = new QToolButton(parent);
     rightPanRight->setIcon(QIcon(FileName("$base/icons/forward.png").
-                                 expanded().c_str()));
+                                 expanded()));
     rightPanRight->setIconSize(isize);
     rightPanRight->setToolTip("Move right 1 screen pixel");
     rightPanRight->setWhatsThis("Move the right measure to the right by 1"
@@ -651,7 +651,7 @@ namespace Isis {
    *                           different control point.
    */
   void ControlPointEdit::setLeftMeasure(ControlMeasure *leftMeasure,
-                                        Cube *leftCube, std::string pointId) {
+                                        Cube *leftCube, QString pointId) {
 
     //  Make sure registration is turned off
     if ( p_autoRegShown ) {
@@ -705,7 +705,7 @@ namespace Isis {
   *
     */
   void ControlPointEdit::setRightMeasure(ControlMeasure *rightMeasure,
-                                         Cube *rightCube, std::string pointId) {
+                                         Cube *rightCube, QString pointId) {
 
     //  Make sure registration is turned off
     if ( p_autoRegShown ) {
@@ -951,7 +951,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString msg = "Cannot register this point, unable to Load chips.\n";
-      msg += e.toString().ToQt();
+      msg += e.toString();
       QMessageBox::information((QWidget *)parent(), "Error", msg);
       return;
     }
@@ -1010,7 +1010,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString msg = "Cannot register this point.\n";
-      msg += e.toString().ToQt();
+      msg += e.toString();
       QMessageBox::information((QWidget *)parent(), "Error", msg);
       return;
     }
@@ -1443,13 +1443,13 @@ namespace Isis {
 
     AutoReg *reg = NULL;
     // save original template filename
-    std::string temp = p_templateFileName;
+    QString temp = p_templateFileName;
     try {
       // set template filename to user chosen pvl file
-      p_templateFileName = fn.toStdString();
+      p_templateFileName = fn;
 
       // Create PVL object with this file
-      Pvl pvl(fn.toStdString());
+      Pvl pvl(fn);
 
       // try to register file
       reg = AutoRegFactory::Create(pvl);
@@ -1457,7 +1457,7 @@ namespace Isis {
         delete p_autoRegFact;
       p_autoRegFact = reg;
 
-      p_templateFileName = fn.toStdString();
+      p_templateFileName = fn;
       return true;
     }
     catch (IException &e) {
@@ -1465,7 +1465,7 @@ namespace Isis {
       p_templateFileName = temp;
       IException fullError(e, IException::Io,
           "Cannot create AutoRegFactory for " +
-          fn.toStdString() +
+          fn +
           ".  As a result, current template file will remain set to " +
           p_templateFileName, _FILEINFO_);
       QString message = fullError.toString();
@@ -1529,13 +1529,13 @@ namespace Isis {
     }
 
     //  Save chips - pattern, search and fit
-    std::string baseFile = p_pointId + "_" +
-                           IString((int)(p_leftMeasure ->GetSample())) + "_" +
-                           IString((int)(p_leftMeasure ->GetLine()))   + "_" +
-                           IString((int)(p_rightMeasure->GetSample())) + "_" +
-                           IString((int)(p_rightMeasure->GetLine()))   + "_";
-    std::string fname = baseFile + "Search.cub";
-    std::string command = "$ISISROOT/bin/qview " + fname;
+    QString baseFile = p_pointId + "_" +
+                           toString((int)(p_leftMeasure ->GetSample())) + "_" +
+                           toString((int)(p_leftMeasure ->GetLine()))   + "_" +
+                           toString((int)(p_rightMeasure->GetSample())) + "_" +
+                           toString((int)(p_rightMeasure->GetLine()))   + "_";
+    QString fname = baseFile + "Search.cub";
+    QString command = "$ISISROOT/bin/qview " + fname;
     p_autoRegFact->RegistrationSearchChip()->Write(fname);
     fname = baseFile + "Pattern.cub";
     command += " " + fname;

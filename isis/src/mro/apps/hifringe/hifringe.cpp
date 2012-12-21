@@ -33,7 +33,7 @@ using namespace std;
 using namespace Isis;
 
 
-void pvlOut(Statistics stats1, Statistics stats2, string name, int start,
+void pvlOut(Statistics stats1, Statistics stats2, QString name, int start,
             int end, PvlObject *one, PvlObject *two);
 
 static const char *const
@@ -48,7 +48,7 @@ void IsisMain() {
 
   //Check to make sure we got the cube properly
   if(!inputCube.isOpen()) {
-    string msg = "Could not open FROM cube" + fromFile.expanded();
+    QString msg = "Could not open FROM cube" + fromFile.expanded();
     throw IException(IException::User, msg, _FILEINFO_);
   }
   Process p;
@@ -70,7 +70,7 @@ void IsisMain() {
 
   int numSections = ui.GetInteger("SECTIONS");
   if(numSections > 9) {
-    string msg = "You may have no more than 9 sections per side";
+    QString msg = "You may have no more than 9 sections per side";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -149,8 +149,7 @@ void IsisMain() {
   // Write the results to the output file if the user specified one
   PvlObject leftSide("LeftSide"), rightSide("RightSide");
   for(int i = 0 ; i < numSections ; i++) {
-    IString sectionNumber = i + 1;
-    string sectionName = "Section" + sectionNumber;
+    QString sectionName = "Section" + toString(i + 1);
     pvlOut(sections[i][0], //Stats to add to the left Object
            sections[i][1], //Stats to add to the right Object
            sectionName,    //Name for the new groups
@@ -189,31 +188,31 @@ void IsisMain() {
   outputPvl.Write(ui.GetFileName("TO"));
 }
 
-void pvlOut(Statistics stats1, Statistics stats2, string name, int start,
+void pvlOut(Statistics stats1, Statistics stats2, QString name, int start,
             int end, PvlObject *one, PvlObject *two) {
   PvlGroup left(name);
-  left += PvlKeyword("StartLine", start + 1);
-  left += PvlKeyword("EndLine", end);
-  left += PvlKeyword("TotalPixels", stats1.TotalPixels());
-  left += PvlKeyword("ValidPixels", stats1.ValidPixels());
+  left += PvlKeyword("StartLine", toString(start + 1));
+  left += PvlKeyword("EndLine", toString(end));
+  left += PvlKeyword("TotalPixels", toString(stats1.TotalPixels()));
+  left += PvlKeyword("ValidPixels", toString(stats1.ValidPixels()));
   if(stats1.ValidPixels() > 0) {
-    left += PvlKeyword("Mean", stats1.Average());
-    left += PvlKeyword("StandardDeviation", stats1.StandardDeviation());
-    left += PvlKeyword("Minimum", stats1.Minimum());
-    left += PvlKeyword("Maximum", stats1.Maximum());
+    left += PvlKeyword("Mean", toString(stats1.Average()));
+    left += PvlKeyword("StandardDeviation", toString(stats1.StandardDeviation()));
+    left += PvlKeyword("Minimum", toString(stats1.Minimum()));
+    left += PvlKeyword("Maximum", toString(stats1.Maximum()));
   }
   one->AddGroup(left);
 
   PvlGroup right(name);
-  right += PvlKeyword("StartLine", start + 1);
-  right += PvlKeyword("EndLine", end);
-  right += PvlKeyword("TotalPixels", stats2.TotalPixels());
-  right += PvlKeyword("ValidPixels", stats2.ValidPixels());
+  right += PvlKeyword("StartLine", toString(start + 1));
+  right += PvlKeyword("EndLine", toString(end));
+  right += PvlKeyword("TotalPixels", toString(stats2.TotalPixels()));
+  right += PvlKeyword("ValidPixels", toString(stats2.ValidPixels()));
   if(stats2.ValidPixels() > 0) {
-    right += PvlKeyword("Mean", stats2.Average());
-    right += PvlKeyword("StandardDeviation", stats2.StandardDeviation());
-    right += PvlKeyword("Minimum", stats2.Minimum());
-    right += PvlKeyword("Maximum", stats2.Maximum());
+    right += PvlKeyword("Mean", toString(stats2.Average()));
+    right += PvlKeyword("StandardDeviation", toString(stats2.StandardDeviation()));
+    right += PvlKeyword("Minimum", toString(stats2.Minimum()));
+    right += PvlKeyword("Maximum", toString(stats2.Maximum()));
   }
   two->AddGroup(right);
 }

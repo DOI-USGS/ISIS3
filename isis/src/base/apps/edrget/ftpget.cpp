@@ -22,7 +22,7 @@ namespace Isis {
   //**************************************
   // getFile function will check URL, if URL is good function will connect,
   // login, and get the file.  This function returns P_error.
-  bool FtpGet::getFile(const QUrl &url, string topath) {
+  bool FtpGet::getFile(const QUrl &url, QString topath) {
     //next four if check the URL and return true is there is error.
     if(!url.isValid()) {
       string msg = "invalid URL";
@@ -45,7 +45,7 @@ namespace Isis {
 
     QString localFileName;
     if(topath.size() != 0) {
-      localFileName += topath.c_str();
+      localFileName += topath;
       localFileName += "/";
     }
     localFileName +=  QFileInfo(url.path()).fileName();
@@ -75,8 +75,8 @@ namespace Isis {
   void FtpGet::ftpDone(bool error) {
     if(error) {
       p_error = true;
-      IString msg = p_ftp.errorString().toStdString();
-      msg.Remove("\n");
+      QString msg = p_ftp.errorString();
+      msg.remove("\n");
 //       iException::Message(iException::User, msg, _FILEINFO_);
     }
     else {
@@ -100,7 +100,7 @@ namespace Isis {
     if(total == -1) return;
     if(p_error) return;
     if(p_lastDone < 0) {
-      p_progress.SetText(string("Downloading File ") + p_file.fileName().toStdString());
+      p_progress.SetText(QString("Downloading File ") + p_file.fileName());
       p_progress.SetMaximumSteps(total);
       p_progress.CheckStatus();
       p_lastDone = 1;

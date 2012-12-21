@@ -1,4 +1,4 @@
-#if !defined(HiBlob_h)
+#ifndef HiBlob_h
 #define HiBlob_h
 /**
  * @file
@@ -59,9 +59,9 @@ namespace Isis {
       /**
        * @brief Constructor providing interface to an ISIS Cube object
        */
-      HiBlob(Cube &cube, const std::string &tblname,
-             const std::string &field,
-             const std::string &name = "HiBlob") :
+      HiBlob(Cube &cube, const QString &tblname,
+             const QString &field,
+             const QString &name = "HiBlob") :
         Blobber(cube, tblname, field, name)  { }
 
       /** Destructor */

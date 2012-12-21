@@ -1,4 +1,7 @@
 #include "Isis.h"
+
+#include <QFile>
+
 #include "ProcessImportPds.h"
 #include "Application.h"
 #include "IString.h"
@@ -15,7 +18,7 @@ using namespace Isis;
 void IsisMain() {
 
   Isis::Preference::Preferences(true);
-  void ReportError(IString err);
+  void ReportError(QString err);
 
   // Test an IMAGE file
   try {
@@ -30,7 +33,7 @@ void IsisMain() {
     cout << plab << endl;
     Isis::Process p2;
     Isis::CubeAttributeInput att;
-    string file = Isis::Application::GetUserInterface().GetFileName("TO");
+    QString file = Isis::Application::GetUserInterface().GetFileName("TO");
     Isis::Cube *cube = p2.SetInputCube(file, att);
     Isis::Statistics *stat = cube->getStatistics();
     cout << stat->Average() << endl;
@@ -39,7 +42,7 @@ void IsisMain() {
     Isis::OriginalLabel ol(file);
     Isis::Pvl label = ol.ReturnLabels();
     cout << label << endl;
-    remove(file.c_str());
+    QFile::remove(file);
   }
   catch(Isis::IException &e) {
     e.print();
@@ -60,7 +63,7 @@ void IsisMain() {
     cout << plab << endl;
     Isis::Process p2;
     Isis::CubeAttributeInput att;
-    string file = Isis::Application::GetUserInterface().GetFileName("TO");
+    QString file = Isis::Application::GetUserInterface().GetFileName("TO");
     Isis::Cube *cube = p2.SetInputCube(file, att);
     Isis::Statistics *stat = cube->getStatistics();
     cout << stat->Average() << endl;
@@ -74,7 +77,7 @@ void IsisMain() {
     catch(Isis::IException &e) {
       ReportError(e.toString());
     }
-    remove(file.c_str());
+    QFile::remove(file);
   }
   catch(Isis::IException &e) {
     e.print();
@@ -95,8 +98,8 @@ void IsisMain() {
     p.EndProcess();
 
     cout << ilab << endl;
-    string file = Isis::Application::GetUserInterface().GetFileName("TO");
-    remove(file.c_str());
+    QString file = Isis::Application::GetUserInterface().GetFileName("TO");
+    QFile::remove(file);
   }
   catch(Isis::IException &e) {
     e.print();
@@ -116,7 +119,7 @@ void IsisMain() {
     cout << plab << endl;
     Isis::Process p2;
     Isis::CubeAttributeInput att;
-    string file = Isis::Application::GetUserInterface().GetFileName("TO");
+    QString file = Isis::Application::GetUserInterface().GetFileName("TO");
     Isis::Cube *cube = p2.SetInputCube(file, att);
     Pvl isisCubeLab = *(cube->getLabel());
     (isisCubeLab.FindObject("IsisCube").FindObject("Core")["StartByte"]).SetValue("");
@@ -134,7 +137,7 @@ void IsisMain() {
     Isis::OriginalLabel ol(file);
     Isis::Pvl label = ol.ReturnLabels();
     cout << label << endl;
-    remove(file.c_str());
+    QFile::remove(file);
   }
   catch(Isis::IException &e) {
     e.print();
@@ -155,46 +158,12 @@ void IsisMain() {
 
 /**
  * Reports error messages from Isis:iException without full paths of filenames
- * @param err Error string of iException
+ * @param err Error QString of iException
  * @author Jeannie Walldren
  * @internal
  *   @history 2011-08-05 Jeannie Backer - Copied from Cube class.
  */
-void ReportError(IString err) {
-  IString report = ""; // report will be modified error message
-  IString errorLine = ""; // read message one line at a time
-  FileName expandedfile;
-  while(err != "") {
-    // pull off first line
-    errorLine = err.Token("\n");
-    while(errorLine != "") {
-      size_t openBrace = errorLine.find('[');
-      if(openBrace != string::npos) {
-        // if open brace is found, look to see if a filename is inside (indicated by '/')
-        if(errorLine.at(openBrace + 1) == '/') {
-          // add message up to and including [
-          report += errorLine.Token("[");
-          report += "[";
-          // read entire path into FileName object
-          expandedfile = errorLine.Token("]");
-          report += expandedfile.name(); // only report base name, rather than fully expanded path
-          report += "]";
-        }
-        else {
-          // not a filename inside braces, add message up to and including ]
-          report += errorLine.Token("]");
-          report += "]";
-          continue;
-        }
-      }
-      else {
-        // no more braces are found, add rest of error message
-        report += errorLine;
-        break;
-      }
-    }
-    report += "\n";
-  }
-  cout << report << endl;
+void ReportError(QString err) {
+  cout << err.replace(QRegExp("\\[[^\\]]*\\]"), "[]") << endl;
 }
 

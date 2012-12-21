@@ -1,4 +1,7 @@
 #include "Database.h"
+
+#include <QFile>
+
 #include "FileName.h"
 #include "SqlQuery.h"
 #include "SqlRecord.h"
@@ -13,8 +16,8 @@ int main(int argc, char *argv[]) {
   // SQLite
   FileName dbfile("$TEMPORARY/test.db");
   Database testdb("testdb", "SQLite");
-  string dbfileName(dbfile.expanded());
-  testdb.setDatabaseName(dbfileName.c_str());
+  QString dbfileName(dbfile.expanded());
+  testdb.setDatabaseName(dbfileName.toAscii().data());
   if(!testdb.open()) {
     throw IException(IException::User, "Connection failed", _FILEINFO_);
   }
@@ -64,6 +67,6 @@ int main(int argc, char *argv[]) {
 
   }
 
-  remove(FileName("$TEMPORARY/test.db").expanded().c_str());
+  QFile::remove(FileName("$TEMPORARY/test.db").expanded());
   return 0;
 }

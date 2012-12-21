@@ -3,10 +3,10 @@
 #include "Preference.h"
 #include "IException.h"
 
+using namespace Isis;
 using namespace std;
-int main()
 
-{
+int main() {
   try {
     // Note: Normally a call to Preferences in a unitTest would be called
     // with a true. In this case however, we can't have the Preferences
@@ -46,7 +46,7 @@ int main()
     //  if (p2.HasGroup("Junk")) {
     if(Isis::Preference::Preferences(false).HasGroup("Junk")) {
       Isis::PvlGroup &g = Isis::Preference::Preferences(false).FindGroup("Junk");
-      cout << "Value of Vegetable is : " << (string) g["Vegetable"] << endl;
+      cout << "Value of Vegetable is : " << (QString) g["Vegetable"] << endl;
     }
 
     remove("tmpSystem");

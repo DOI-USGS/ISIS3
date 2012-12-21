@@ -1,4 +1,4 @@
-#if !defined(PolygonSeederFactory_h)
+#ifndef PolygonSeederFactory_h
 #define PolygonSeederFactory_h
 /**
  * @file

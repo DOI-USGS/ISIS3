@@ -3,35 +3,39 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
+
 #include "LunarAzimuthalEqualArea.h"
 #include "IException.h"
+#include "IString.h"
 #include "ProjectionFactory.h"
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
+
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   cout << "UNIT TEST FOR LunarAzimuthalEqualArea\n\n";
 
-  Isis::Pvl lab;
-  lab.AddGroup(Isis::PvlGroup("Mapping"));
-  Isis::PvlGroup &mapGroup = lab.FindGroup("Mapping");
-  mapGroup += Isis::PvlKeyword("EquatorialRadius", 6378206.4);
-  mapGroup += Isis::PvlKeyword("PolarRadius", 6378206.4);
-  mapGroup += Isis::PvlKeyword("LatitudeType", "Planetographic");
-  mapGroup += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-  mapGroup += Isis::PvlKeyword("LongitudeDomain", 180);
-  mapGroup += Isis::PvlKeyword("MinimumLatitude", -30.0);
-  mapGroup += Isis::PvlKeyword("MaximumLatitude", -15.0);
-  mapGroup += Isis::PvlKeyword("MinimumLongitude", -30.0);
-  mapGroup += Isis::PvlKeyword("MaximumLongitude", -15.0);
-  mapGroup += Isis::PvlKeyword("MaximumLibration", 1);
-  mapGroup += Isis::PvlKeyword("ProjectionName",
+  Pvl lab;
+  lab.AddGroup(PvlGroup("Mapping"));
+  PvlGroup &mapGroup = lab.FindGroup("Mapping");
+  mapGroup += PvlKeyword("EquatorialRadius", toString(6378206.4));
+  mapGroup += PvlKeyword("PolarRadius", toString(6378206.4));
+  mapGroup += PvlKeyword("LatitudeType", "Planetographic");
+  mapGroup += PvlKeyword("LongitudeDirection", "PositiveEast");
+  mapGroup += PvlKeyword("LongitudeDomain", toString(180));
+  mapGroup += PvlKeyword("MinimumLatitude", toString(-30.0));
+  mapGroup += PvlKeyword("MaximumLatitude", toString(-15.0));
+  mapGroup += PvlKeyword("MinimumLongitude", toString(-30.0));
+  mapGroup += PvlKeyword("MaximumLongitude", toString(-15.0));
+  mapGroup += PvlKeyword("MaximumLibration", toString(1));
+  mapGroup += PvlKeyword("ProjectionName",
                                "LunarAzimuthalEqualArea");
 
   try {
-    Isis::Projection &p = *Isis::ProjectionFactory::Create(lab);
+    Projection &p = *ProjectionFactory::Create(lab);
 
     cout << "\n******* Test SetGround and SetCoordinate methods ********"
          << "\n\nfor all lat and lon in [-90..90] step 45"
@@ -68,16 +72,16 @@ int main(int argc, char *argv[]) {
     else
       cout << "[ FAILED ]\n";
 
-    Isis::Projection *s = &p;
-    cout << "\nIsis::Projection * s = &p; // p is this projection"
+    Projection *s = &p;
+    cout << "\nProjection * s = &p; // p is this projection"
          << "\n(*s == p) returns ";
     if(*s == p)
       cout << "true! ..................................... [   OK   ]\n";
     else
       cout << "false! .................................... [ FAILED ]\n";
-    mapGroup["PolarRadius"].SetValue(42);
-    Isis::Pvl tmp1;
-    Isis::Projection &p2 = *Isis::ProjectionFactory::Create(lab);
+    mapGroup["PolarRadius"].SetValue(toString(42));
+    Pvl tmp1;
+    Projection &p2 = *ProjectionFactory::Create(lab);
     tmp1.AddGroup(p2.Mapping());
     s = &p2;
     cout << "created a second Projection reference p2"
@@ -98,11 +102,11 @@ int main(int argc, char *argv[]) {
          << "\n  Minimum Y:  " << minY
          << "\n  Maximum Y:  " << maxY << "\n";
 
-    Isis::Pvl tmp2;
+    Pvl tmp2;
     tmp2.AddGroup(p.Mapping());
 
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 }

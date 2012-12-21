@@ -6,21 +6,22 @@
 
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
 
 int main(int argc, char *argv[]) {
 
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   try {
 
-    cout << "Unit test for Isis::Apollo" << endl;
+    cout << "Unit test for Apollo" << endl;
 
-    Isis::IString fname("AS15-M-1450");
+    QString fname("AS15-M-1450");
 
-    Isis::Apollo *apollo;
+    Apollo *apollo;
 
-    apollo = new Isis::Apollo(fname);
+    apollo = new Apollo(fname);
 
     cout << "IsMetric: " << apollo->IsMetric() << endl;
     cout << "IsPanoramic: " << apollo->IsPanoramic() << endl;
@@ -37,11 +38,11 @@ int main(int argc, char *argv[]) {
     cout << "InstrumentId: " << apollo->InstrumentId() << endl;
     cout << "NaifFrameCode: " << apollo->NaifFrameCode() << endl;
     cout << "TargetName: " << apollo->TargetName() << endl;
-    string time=(apollo->LaunchDate().UTC());
+    QString time=(apollo->LaunchDate().UTC());
     cout << "Time: " << time << endl;
 
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 }

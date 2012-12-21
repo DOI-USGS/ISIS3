@@ -21,7 +21,7 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include <string>
+#include <QString>
 #include <vector>
 #include <numeric>
 #include <iostream>
@@ -69,7 +69,7 @@ bool HiCalConf::_naifLoaded = false;
    * @param label Label from HiRISE cube file
    * @param conf Name of configuration file to use
    */
-  HiCalConf::HiCalConf(Pvl &label, const std::string &conf) :
+  HiCalConf::HiCalConf(Pvl &label, const QString &conf) :
        DbAccess(Pvl(filepath(conf)).FindObject("Hical", PvlObject::Traverse)) {
     _profName.clear();
     init(label);
@@ -95,13 +95,13 @@ bool HiCalConf::_naifLoaded = false;
    *
    * @param fname  File specification with or without versioning patterns
    *
-   * @return string Expanded filename but not the filepath
+   * @return QString Expanded filename but not the filepath
    */
-  string HiCalConf::filepath(const std::string &fname) const {
+  QString HiCalConf::filepath(const QString &fname) const {
     FileName efile(fname);
     if (efile.isVersioned()) {
-      string path(efile.originalPath());
-      if (!path.empty()) path += "/";
+      QString path(efile.originalPath());
+      if (!path.isEmpty()) path += "/";
 
       efile = efile.highestVersion();
 
@@ -120,7 +120,7 @@ bool HiCalConf::_naifLoaded = false;
    *
    * @param conf Name of configuration file to use
    */
-  void HiCalConf::setConf(const std::string &conf) {
+  void HiCalConf::setConf(const QString &conf) {
     load(Pvl(filepath(conf)).FindObject("Hical", PvlObject::Traverse));
   }
 
@@ -133,7 +133,7 @@ bool HiCalConf::_naifLoaded = false;
    *
    * @param profile Name of existing profile in the configuration file
    */
-  void HiCalConf::selectProfile(const std::string &profile) {
+  void HiCalConf::selectProfile(const QString &profile) {
     _profName = profile;
     return;
   }
@@ -143,9 +143,9 @@ bool HiCalConf::_naifLoaded = false;
    *
    * This method returns the selected profile name.
    *
-   * @return string Selected profile name
+   * @return QString Selected profile name
    */
-  string HiCalConf::getProfileName() const {
+  QString HiCalConf::getProfileName() const {
     return (_profName);
   }
 
@@ -155,14 +155,14 @@ bool HiCalConf::_naifLoaded = false;
    * This method returns the name of a matrix file reference variable from the
    * \b Matrices keyword as determined from the fully option profile. It then
    * expands the filename portion (not the filepath!) and returns the result as
-   * a string for subsequent use.  See also getMatrixList and getMatrix.
+   * a QString for subsequent use.  See also getMatrixList and getMatrix.
    *
    * @param name  Name of Matrix to resolve.  It must be one in the \b Matrices
    *              keyword from the configuration file
    *
-   * @return std::string The expanded file name reference for the matrix
+   * @return QString The expanded file name reference for the matrix
    */
-  std::string HiCalConf::getMatrixSource(const std::string &name) const {
+  QString HiCalConf::getMatrixSource(const QString &name) const {
     return (getMatrixSource(name, getMatrixProfile()));
   }
 
@@ -172,18 +172,18 @@ bool HiCalConf::_naifLoaded = false;
    * This method returns the name of a matrix file reference variable from the
    * \b Matrices keyword as determined from the specified profile. It then
    * expands the filename portion (not the filepath!) and returns the result as
-   * a string for subsequent use.  See also getMatrixList and getMatrix.
+   * a QString for subsequent use.  See also getMatrixList and getMatrix.
    *
    * @param name  Name of Matrix to resolve.  It must be one in the \b Matrices
    *              keyword from the configuration file
    * @param matconf Profile to extract the named matrix source from
    *
-   * @return std::string The expanded file name reference for the matrix
+   * @return QString The expanded file name reference for the matrix
    */
-  std::string HiCalConf::getMatrixSource(const std::string &name,
+  QString HiCalConf::getMatrixSource(const QString &name,
                                          const DbProfile &matconf) const {
 
-    std::string mfile = parser(matconf.value(name),
+    QString mfile = parser(matconf.value(name),
                                getList(matconf,"OptionKeywords"),
                                matconf);
 
@@ -191,13 +191,13 @@ bool HiCalConf::_naifLoaded = false;
     return (filepath(mfile));
   }
 
-  HiVector HiCalConf::getMatrix(const std::string &name,
+  HiVector HiCalConf::getMatrix(const QString &name,
                                 int expected_size) const {
     return (getMatrix(name,getMatrixProfile(), expected_size));
   }
 
 
-  std::string HiCalConf::resolve(const std::string &composite,
+  QString HiCalConf::resolve(const QString &composite,
                                  const DbProfile &matconf) const {
     return (parser(composite,getList(matconf,"OptionKeywords"), matconf));
   }
@@ -227,11 +227,11 @@ bool HiCalConf::_naifLoaded = false;
    *
    * @return HiCalConf::HiVector Returns the extracted band from the cube
    */
-  HiVector HiCalConf::getMatrix(const std::string &name,
+  HiVector HiCalConf::getMatrix(const QString &name,
                                 const DbProfile &profile,
                                 int expected_size) const {
 
-    std::string mfile = getMatrixSource(name, profile);
+    QString mfile = getMatrixSource(name, profile);
 
 // Crack the file and read the appropriate band
     Cube cube;
@@ -277,7 +277,7 @@ bool HiCalConf::_naifLoaded = false;
    *
    * @return HiCalConf::HiVector Values of scalar constants
    */
-  HiVector HiCalConf::getScalar(const std::string &name,
+  HiVector HiCalConf::getScalar(const QString &name,
                                 const DbProfile &profile,
                                 int expected_size) const {
     int nvals = profile.count(name);
@@ -311,20 +311,20 @@ bool HiCalConf::_naifLoaded = false;
   double HiCalConf::sunDistanceAU() {
     loadNaifTiming();
 
-    string scStartTime = getKey("SpacecraftClockStartCount", "Instrument");
+    QString scStartTime = getKey("SpacecraftClockStartCount", "Instrument");
     double obsStartTime;
-    scs2e_c (-74999,scStartTime.c_str(),&obsStartTime);
+    scs2e_c (-74999,scStartTime.toAscii().data(),&obsStartTime);
 
-    string targetName = getKey("TargetName", "Instrument");
-    if ( (IString::Equal(targetName, "Sky")) ||
-         (IString::Equal(targetName, "Cal")) ||
-         (IString::Equal(targetName, "Phobos")) ||
-         (IString::Equal(targetName, "Deimos")) ) {
+    QString targetName = getKey("TargetName", "Instrument");
+    if (targetName.toLower() == "sky" ||
+        targetName.toLower() == "cal" ||
+        targetName.toLower() == "phobos" ||
+        targetName.toLower() == "deimos") {
       targetName = "Mars";
     }
     double sunv[3];
     double lt;
-    (void) spkpos_c(targetName.c_str(), obsStartTime, "J2000", "LT+S", "sun",
+    (void) spkpos_c(targetName.toAscii().data(), obsStartTime, "J2000", "LT+S", "sun",
                     sunv, &lt);
     double sunkm = vnorm_c(sunv);
     //  Return in AU units
@@ -373,16 +373,16 @@ bool HiCalConf::_naifLoaded = false;
    * @brief Generic profile keyword value extractor
    *
    * This method retrieves a profile keyword from the given profile and returns
-   * all its values a a list of strings.  An exception will be thrown
+   * all its values a a list of QStrings.  An exception will be thrown
    * incidentally if the keyword does not exist.
    *
    * @param profile Profile containing the keyword to extract
    * @param key  Name of keyword to retrieve
    *
-   * @return std::vector<std::string> List of values from profile keyword
+   * @return std::vector<QString> List of values from profile keyword
    */
   HiCalConf::ValueList HiCalConf::getList(const DbProfile &profile,
-                                          const std::string &key) const {
+                                          const QString &key) const {
     ValueList slist;
 
 //  Get keyword parameters
@@ -414,12 +414,12 @@ void HiCalConf::loadNaifTiming( ) {
     pck = pck.highestVersion();
 
 //  Load the kernels
-    string lsk = leapseconds.expanded();
-    string sClock = sclk.expanded();
-    string pConstants = pck.expanded();
-    furnsh_c(lsk.c_str());
-    furnsh_c(sClock.c_str());
-    furnsh_c(pConstants.c_str());
+    QString lsk = leapseconds.expanded();
+    QString sClock = sclk.expanded();
+    QString pConstants = pck.expanded();
+    furnsh_c(lsk.toAscii().data());
+    furnsh_c(sClock.toAscii().data());
+    furnsh_c(pConstants.toAscii().data());
 
 //  Ensure it is loaded only once
     _naifLoaded = true;
@@ -461,9 +461,9 @@ void HiCalConf::init(Pvl &label) {
  *
  * @return PvlKeyword& Reference to retrieved label keyword
  */
-PvlKeyword &HiCalConf::getKey(const std::string &key,
-                                 const std::string &group) {
-  if (!group.empty()) {
+PvlKeyword &HiCalConf::getKey(const QString &key,
+                              const QString &group) {
+  if (!group.isEmpty()) {
     PvlGroup &grp = _label.FindGroup(group, Pvl::Traverse);
     return (grp[key]);
   }
@@ -490,8 +490,8 @@ PvlKeyword &HiCalConf::getKey(const std::string &key,
  *                default profile if this parameter is not provided (empty).
  * @return DbProfile  Returns a fully optioned profile
  */
-DbProfile HiCalConf::getMatrixProfile(const std::string &profile) const {
-  string myprof = (!profile.empty()) ? profile : _profName;
+DbProfile HiCalConf::getMatrixProfile(const QString &profile) const {
+  QString myprof = (!profile.isEmpty()) ? profile : _profName;
   DbProfile matconf = getProfile(myprof);
   if (!matconf.isValid()) {
     ostringstream mess;
@@ -509,9 +509,9 @@ DbProfile HiCalConf::getMatrixProfile(const std::string &profile) const {
 //  Load any optional ones
   ValueList profkeys = getList(matconf,"OptionKeywords");
   ValueList proforder = getList(matconf,"ProfileOptions");
-  string pName(matconf.Name());
+  QString pName(matconf.Name());
   for (unsigned int i = 0 ; i < proforder.size() ; i++) {
-    std::string profile = parser(proforder[i], profkeys, matconf);
+    QString profile = parser(proforder[i], profkeys, matconf);
     if (profileExists(profile)) {
       pName += "+[" + profile + "]";
       matconf = DbProfile(matconf,getProfile(profile), pName);
@@ -527,7 +527,7 @@ DbProfile HiCalConf::getLabelProfile(const DbProfile &profile) const {
     int ngroups = profile.count("LabelGroups");
     Pvl label = _label;
     for ( int g = 0 ; g < ngroups ; g++ ) {
-      string group = profile("LabelGroups", g);
+      QString group = profile("LabelGroups", g);
       PvlGroup grp = label.FindGroup(group, Pvl::Traverse);
       lblprof = DbProfile(lblprof,DbProfile(grp));
     }
@@ -567,30 +567,30 @@ DbProfile HiCalConf::makeParameters(const DbProfile &profile) const {
   return (parms);
 }
 
-std::string  HiCalConf::makePattern(const std::string &str) const {
-  return (string("{" + str + "}"));
+QString  HiCalConf::makePattern(const QString &str) const {
+  return (QString("{" + str + "}"));
 }
 
 /**
- * @brief Performs a search and replace operation for the given string
+ * @brief Performs a search and replace operation for the given QString
  *
- * This method will search the input string s for predefined keywords (FILTER,
+ * This method will search the input QString s for predefined keywords (FILTER,
  * TDI, BIN, CCD and CHANNEL) delimited by {} and replace these occurances with
  * the textual equivalent.
  *
  * @param s String to conduct search/replace of values
  *
- * @return std::string  Results of search/replace
+ * @return QString  Results of search/replace
  */
-std::string HiCalConf::parser(const std::string &s, const ValueList &vlist,
-                              const DbProfile &prof) const {
-    string sout(s);
+QString HiCalConf::parser(const QString &s, const ValueList &vlist,
+                          const DbProfile &prof) const {
+    QString sout(s);
 
     ValueList::const_iterator ciVlist;
     for ( ciVlist = vlist.begin() ; ciVlist != vlist.end() ; ++ciVlist ) {
-      std::string str(*ciVlist);
+      QString str(*ciVlist);
       if ( prof.exists(str) ) {
-        sout = IString::Replace(sout, makePattern(str), prof(str));
+        sout = sout.replace(makePattern(str), prof(str));
       }
     }
 

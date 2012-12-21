@@ -86,7 +86,7 @@ namespace Isis {
       } p_swapper;
 
     public:
-      EndianSwapper(std::string inputEndian);
+      EndianSwapper(QString inputEndian);
       ~EndianSwapper();
       double Double(void *buf);
       float Float(void *buf);

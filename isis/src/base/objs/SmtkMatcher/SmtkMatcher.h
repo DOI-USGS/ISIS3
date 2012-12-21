@@ -1,4 +1,4 @@
-#if !defined(SmtkMatcher_h)
+#ifndef SmtkMatcher_h
 #define SmtkMatcher_h
 
 /**
@@ -54,13 +54,13 @@ namespace Isis {
 class SmtkMatcher {
   public:
     SmtkMatcher();
-    SmtkMatcher(const std::string &regdef);
-    SmtkMatcher(const std::string &regdef, Cube *lhImage, Cube *rhImage);
+    SmtkMatcher(const QString &regdef);
+    SmtkMatcher(const QString &regdef, Cube *lhImage, Cube *rhImage);
     SmtkMatcher(Cube *lhImage, Cube *rhImage);
     ~SmtkMatcher();
 
     void setImages(Cube *lhImage, Cube *rhImage);
-    void setGruenDef(const std::string &regdef);
+    void setGruenDef(const QString &regdef);
 
     bool isValid(const Coordinate &pnt);
     bool isValid(const SmtkPoint &spnt);
@@ -83,7 +83,7 @@ class SmtkMatcher {
       return (m_gruen->FitChip());
     }
 
-    void setWriteSubsearchChipPattern(const std::string &fileptrn = "SmtkMatcher");
+    void setWriteSubsearchChipPattern(const QString &fileptrn = "SmtkMatcher");
 
     SmtkQStackIter FindSmallestEV(SmtkQStack &stack);
     SmtkQStackIter FindExpDistEV(SmtkQStack &stack, const double &seedsample,

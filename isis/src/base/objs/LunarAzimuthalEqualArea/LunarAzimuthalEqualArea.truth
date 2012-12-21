@@ -93,7 +93,7 @@ print the output of the XYRange and Mapping methods...
 
 Name method returns "LunarAzimuthalEqualArea"................ [   OK   ]
 
-Isis::Projection * s = &p; // p is this projection
+Projection * s = &p; // p is this projection
 (*s == p) returns true! ..................................... [   OK   ]
 created a second Projection reference p2
 using the same pvl as p except for that PolarRadius = 42

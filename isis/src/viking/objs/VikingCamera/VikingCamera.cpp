@@ -60,9 +60,9 @@ namespace Isis {
     // Find out what camera is being used, and set the focal length, altinstcode,
     // raster orientation, cone, crosscone, and camera
     PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
-    IString spacecraft = (string)inst["SPACECRAFTNAME"];
-    IString instId = (string)inst["INSTRUMENTID"];
-    string cam;
+    QString spacecraft = inst["SPACECRAFTNAME"];
+    QString instId = inst["INSTRUMENTID"];
+    QString cam;
     int spn;
     double raster, cone, crosscone;
     int altinstcode = 0;
@@ -87,8 +87,8 @@ namespace Isis {
         raster = 90.022800;
       }
       else {
-        string msg = "File does not appear to be a Viking image. InstrumentId ["
-          + instId + "] is invalid Viking value.";
+        QString msg = "File does not appear to be a Viking image. InstrumentId ["
+            + instId + "] is invalid Viking value.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -113,13 +113,13 @@ namespace Isis {
         raster = 89.663790;
       }
       else {
-        string msg = "File does not appear to be a Viking image. InstrumentId ["
-          + instId + "] is invalid Viking value.";
+        QString msg = "File does not appear to be a Viking image. InstrumentId ["
+            + instId + "] is invalid Viking value.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else {
-      string msg = "File does not appear to be a Viking image. SpacecraftName ["
+      QString msg = "File does not appear to be a Viking image. SpacecraftName ["
           + spacecraft + "] is invalid Viking value.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -143,7 +143,7 @@ namespace Isis {
      *****************************************************************************/
 
     // Get clock count and convert it to a time
-    string spacecraftClock = inst["SpacecraftClockCount"];
+    QString spacecraftClock = inst["SpacecraftClockCount"];
     double etClock = getClockTime(spacecraftClock, altinstcode).Et();
 
     // exposure duration keyword value is measured in seconds
@@ -172,8 +172,8 @@ namespace Isis {
     focalMap->SetDetectorOrigin(602.0, 528.0);
 
     // Setup distortion map
-    const string fname = FileName("$viking" + IString(spn) + "/reseaus/vik" + cam
-                                  + "MasterReseaus.pvl").expanded();
+    QString fname = FileName("$viking" + toString(spn) + "/reseaus/vik" + cam
+                             + "MasterReseaus.pvl").expanded();
     new ReseauDistortionMap(this, lab, fname);
 
     // Setup the ground and sky map

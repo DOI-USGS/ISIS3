@@ -1,4 +1,4 @@
-#if !defined(LommelSeeliger_h)
+#ifndef LommelSeeliger_h
 #define LommelSeeliger_h
 /**
  * @file

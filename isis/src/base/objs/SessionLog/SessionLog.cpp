@@ -31,10 +31,10 @@ namespace Isis {
   SessionLog::SessionLog() {
     // Grab the user preferences for logging
     Isis::PvlGroup &slog = Isis::Preference::Preferences().FindGroup("SessionLog");
-    p_termOutput = Isis::IString((string)slog["TerminalOutput"]).UpCase() == "ON";
-    p_fileOutput = Isis::IString((string)slog["FileOutput"]).UpCase() == "ON";
-    p_outputFile = (string) slog["FileName"];
-    p_access = Isis::IString((string) slog["FileAccess"]).UpCase();
+    p_termOutput = ((QString)slog["TerminalOutput"]).toUpper() == "ON";
+    p_fileOutput = ((QString)slog["FileOutput"]).toUpper() == "ON";
+    p_outputFile = (QString) slog["FileName"];
+    p_access = ((QString) slog["FileAccess"]).toUpper();
 
     // Add root
     this->AddObject(Isis::iApp->History());

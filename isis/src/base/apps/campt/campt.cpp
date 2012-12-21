@@ -62,7 +62,7 @@ void IsisMain() {
 
   if(ui.WasEntered("TO")) {
     // Get user params from ui
-    string outFile = FileName(ui.GetFileName("TO")).expanded();
+    QString outFile = FileName(ui.GetFileName("TO")).expanded();
     bool exists = FileName(outFile).fileExists();
     bool append = ui.GetBoolean("APPEND");
 
@@ -85,13 +85,13 @@ void IsisMain() {
       ofstream os;
       bool writeHeader = false;
       if(append) {
-        os.open(outFile.c_str(), ios::app);
+        os.open(outFile.toAscii().data(), ios::app);
         if(!exists) {
           writeHeader = true;
         }
       }
       else {
-        os.open(outFile.c_str(), ios::out);
+        os.open(outFile.toAscii().data(), ios::out);
         writeHeader = true;
       }
 
@@ -115,12 +115,12 @@ void IsisMain() {
 
       for(int i = 0; i < (*point).Keywords(); i++) {
         if((*point)[i].Size() == 3) {
-          os << (string)(*point)[i][0] << ","
-             << (string)(*point)[i][1] << ","
-             << (string)(*point)[i][2];
+          os << (QString)(*point)[i][0] << ","
+             << (QString)(*point)[i][1] << ","
+             << (QString)(*point)[i][2];
         }
         else {
-          os << (string)(*point)[i];
+          os << (QString)(*point)[i];
         }
 
         if(i < (*point).Keywords() - 1) {

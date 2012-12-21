@@ -48,7 +48,7 @@ ProgramAnalyzer::ProgramAnalyzer() {
  * 
  * @param logfile A print.prt file
  */
-ProgramAnalyzer::ProgramAnalyzer(const std::string &logfile) {
+ProgramAnalyzer::ProgramAnalyzer(const QString &logfile) {
   init();
   add(logfile);
 }
@@ -56,7 +56,7 @@ ProgramAnalyzer::ProgramAnalyzer(const std::string &logfile) {
 /**
  * @brief Set the list of program exclusions 
  *  
- *  When provided, the string should contain names of ISIS programs that will be
+ *  When provided, the QString should contain names of ISIS programs that will be
  *  excluded in the analysis.  If more than one program is desired, separate
  *  them by commas.
  *  
@@ -68,14 +68,10 @@ ProgramAnalyzer::ProgramAnalyzer(const std::string &logfile) {
  *
  * @param name Comma separated list of names of programs to exclude
  */
-void ProgramAnalyzer::setExclude(const std::string &name) {
-
-  vector<string> names;
-  IString::Split(',', name, names);
-  for ( unsigned i = 0 ; i < names.size() ; i++ ) {
-    exclude(names[i]);
+void ProgramAnalyzer::setExclude(const QString &name) {
+  foreach (QString singleName, name.split(",")) {
+    exclude(singleName);
   }
-  return;
 }
 
 /**
@@ -92,8 +88,8 @@ void ProgramAnalyzer::setExclude(const std::string &name) {
  *  
  * @param name  Name of file containing program list to exclude
  */
-void ProgramAnalyzer::exclude(const std::string &name) {
-  string prog = IString(name).Trim(" \t\n");
+void ProgramAnalyzer::exclude(const QString &name) {
+  QString prog = name.trimmed();
   if ( !_excludes.exists(prog) ) {
     _excludes.add(prog, 0);
   }
@@ -104,7 +100,7 @@ void ProgramAnalyzer::exclude(const std::string &name) {
 /**
  * @brief Set the list of program inclusions 
  *  
- * When provided, the string should contain names of ISIS programs that will be
+ * When provided, the QString should contain names of ISIS programs that will be
  * included in the analysis.  If more than one program is desired, separate
  * them by commas.
  *  
@@ -121,13 +117,10 @@ void ProgramAnalyzer::exclude(const std::string &name) {
  *  
  * @param name Comma separated list of names of programs to include
  */
-void ProgramAnalyzer::setInclude(const std::string &name) {
-  vector<string> names;
-  IString::Split(',', name, names);
-  for ( unsigned i = 0 ; i < names.size() ; i++ ) {
-    include(names[i]);
+void ProgramAnalyzer::setInclude(const QString &name) {
+  foreach (QString singleName, name.split(",")) {
+    include(singleName);
   }
-  return;
 }
 
 /**
@@ -149,8 +142,8 @@ void ProgramAnalyzer::setInclude(const std::string &name) {
  *  
  * @param name  Name of file containing program list to include
  */
-void ProgramAnalyzer::include(const std::string &name) {
-  string prog = IString(name).Trim(" \t\n");
+void ProgramAnalyzer::include(const QString &name) {
+  QString prog = name.trimmed();
   if ( !_includes.exists(prog) ) {
     _includes.add(prog, 0);
   }
@@ -166,7 +159,7 @@ void ProgramAnalyzer::include(const std::string &name) {
  * 
  * @param logfile An ISIS3 print.prt file
  */
-void ProgramAnalyzer::add(const std::string &logfile) {
+void ProgramAnalyzer::add(const QString &logfile) {
   Pvl plog(logfile);
   for(int i = 0; i < plog.Objects(); i++) {
     add(plog.Object(i));
@@ -185,7 +178,7 @@ void ProgramAnalyzer::add(const std::string &logfile) {
  */
 void ProgramAnalyzer::add(PvlObject &program) {
   _count++;
-  string prog(program.Name());
+  QString prog(program.Name());
   if ( _excludes.exists(prog) ) {
     _excludes.get(prog)++;
     return;
@@ -220,19 +213,19 @@ void ProgramAnalyzer::add(PvlObject &program) {
  * 
  * @return PvlGroup Pvl group containing program numbers/counts
  */
-PvlGroup ProgramAnalyzer::review(const std::string &name) const {
+PvlGroup ProgramAnalyzer::review(const QString &name) const {
   PvlGroup pvl(name);
 
-  pvl += PvlKeyword("Programs", size());
-  pvl += PvlKeyword("Unique", Programs());
-  pvl += PvlKeyword("Included", LimitTotals(_includes));
-  pvl += PvlKeyword("Excluded", LimitTotals(_excludes));
-  pvl += PvlKeyword("Valid", valid());
-  pvl += PvlKeyword("Errors", errors());
-  pvl += PvlKeyword("ZeroTime", zerotime());
-  pvl += PvlKeyword("NoData", nodata());
-  pvl += PvlKeyword("BadData", baddata());
-  pvl += PvlKeyword("Total", count());
+  pvl += PvlKeyword("Programs", toString(size()));
+  pvl += PvlKeyword("Unique", toString(Programs()));
+  pvl += PvlKeyword("Included", toString(LimitTotals(_includes)));
+  pvl += PvlKeyword("Excluded", toString(LimitTotals(_excludes)));
+  pvl += PvlKeyword("Valid", toString(valid()));
+  pvl += PvlKeyword("Errors", toString(errors()));
+  pvl += PvlKeyword("ZeroTime", toString(zerotime()));
+  pvl += PvlKeyword("NoData", toString(nodata()));
+  pvl += PvlKeyword("BadData", toString(baddata()));
+  pvl += PvlKeyword("Total", toString(count()));
   return (pvl);
 }
 
@@ -248,7 +241,7 @@ PvlGroup ProgramAnalyzer::review(const std::string &name) const {
  * 
  * @return PvlGroup Pvl group containing cumulative program analysis
  */
-PvlGroup ProgramAnalyzer::cumulative(const std::string &name) const {
+PvlGroup ProgramAnalyzer::cumulative(const QString &name) const {
   return (toPvl(_totals, name));
 }
 
@@ -263,7 +256,7 @@ PvlGroup ProgramAnalyzer::cumulative(const std::string &name) const {
  * 
  * @return PvlGroup Pvl group containing program analysis
  */
-PvlGroup ProgramAnalyzer::summarize(const std::string &name) const {
+PvlGroup ProgramAnalyzer::summarize(const QString &name) const {
   return (toPvl(_programs.get(name)));
 }
 
@@ -374,14 +367,14 @@ int ProgramAnalyzer::getCount (ProgramAnalyzer::Status status) const {
  * @param key Name of keyword to find
  * @param grp Optional group within the object to find the keyword
  *  
- * @return string Value of the keyword if the keyword exists, otherwise an empty 
- *                string is returned.
+ * @return QString Value of the keyword if the keyword exists, otherwise an empty 
+ *                QString is returned.
  */
-string ProgramAnalyzer::getKey(PvlObject &obj, const std::string &key, 
-                               const std::string &grp) const {
+QString ProgramAnalyzer::getKey(PvlObject &obj, const QString &key, 
+                               const QString &grp) const {
 
-  string value("");
-  if ( !grp.empty() ) {
+  QString value("");
+  if ( !grp.isEmpty() ) {
     PvlGroup &g = obj.FindGroup(grp);
     value = findKey(g, key);
   }
@@ -394,22 +387,21 @@ string ProgramAnalyzer::getKey(PvlObject &obj, const std::string &key,
 /**
  * @brief Converts times represented in text to digital values 
  *  
- * The text string, atime, is expected to be of the format "HH:MM:SS.sss" where 
+ * The text QString, atime, is expected to be of the format "HH:MM:SS.sss" where 
  * "HH" is hours, "MM" is minutes and "SS.sss" is seconds.milliseconds.  The 
  * units returned are in seconds. 
  * 
- * @param atime Text string containing time to convert
+ * @param atime Text QString containing time to convert
  * @param dtime Time in seconds
  * 
- * @return ProgramAnalyzer::Status Returns BADDATA if the text string is empty 
+ * @return ProgramAnalyzer::Status Returns BADDATA if the text QString is empty 
  *                                 or malformed, or VALID if the conversion
  *                                 succeeds.
  */
-ProgramAnalyzer::Status ProgramAnalyzer::convertTime(const std::string &atime, 
+ProgramAnalyzer::Status ProgramAnalyzer::convertTime(const QString &atime, 
                                                      double &dtime) const {
-  if ( atime.empty() ) return (BADDATA);
-  vector<string> t;
-  IString::Split(':', atime, t);
+  if ( atime.isEmpty() ) return (BADDATA);
+  QStringList t = atime.split(":");
   if ( t.size() != 3 ) {
     return (BADDATA);
   }
@@ -418,7 +410,7 @@ ProgramAnalyzer::Status ProgramAnalyzer::convertTime(const std::string &atime,
   double toSeconds(3600.0);
   dtime = 0.0;
   for ( unsigned int i = 0 ; i < 3 ; i++ ) {
-    dtime += IString(t[i]).ToDouble() * toSeconds;
+    dtime += toDouble(t[i]) * toSeconds;
     toSeconds /= 60.0;
   }
 
@@ -509,10 +501,10 @@ bool ProgramAnalyzer::analyze(const ProgramAnalyzer::ProgramData &data) {
  * @return PvlGroup Pvl group of runtime statistics
  */
 PvlGroup ProgramAnalyzer::toPvl(const RunTimeStats &stats, 
-                                const std::string &name) const {
-  PvlGroup pvl((name.empty() ? stats.pname : name));
+                                const QString &name) const {
+  PvlGroup pvl((name.isEmpty() ? stats.pname : name));
 
-  pvl += PvlKeyword("Hits", stats.contime.TotalPixels());
+  pvl += PvlKeyword("Hits", toString(stats.contime.TotalPixels()));
   pvl += PvlKeyword("ConnectTimeMinimum", DblToStr(stats.contime.Minimum(), 2));
   pvl += PvlKeyword("ConnectTimeMaximum", DblToStr(stats.contime.Maximum(), 2));
   pvl += PvlKeyword("ConnectTimeAverage", DblToStr(stats.contime.Average(), 2));
@@ -532,40 +524,40 @@ PvlGroup ProgramAnalyzer::toPvl(const RunTimeStats &stats,
 }
 
 /**
- * @brief Returns NULL for empty strings to ensure meaningful content
+ * @brief Returns NULL for empty QStrings to ensure meaningful content
  * 
  * @param s  String to test for content
  * 
- * @return IString Returns existing content if present, NULL if empty
+ * @return QString Returns existing content if present, NULL if empty
  */
-IString ProgramAnalyzer::format(const std::string &s) const {
- if ( s.empty() )  return (IString("NULL"));
+QString ProgramAnalyzer::format(const QString &s) const {
+ if ( s.isEmpty() )  return (QString("NULL"));
  return (s);
 }
 
 
   /**
-   * @brief Convert a double value to a string subject to precision specs
+   * @brief Convert a double value to a QString subject to precision specs
    *
-   * This method converts a double value to a string that has a prefined digitis
+   * This method converts a double value to a QString that has a prefined digitis
    * of precision.  Fixed float form is used with the specified number of digits
    * of precision.
    *
-   * @param value Double value to convert to string
+   * @param value Double value to convert to QString
    *
-   * @return IString Returns the converted string
+   * @return QString Returns the converted QString
    */
-  IString ProgramAnalyzer::DblToStr(const double &value, const int precision) 
+  QString ProgramAnalyzer::DblToStr(const double &value, const int precision) 
                                     const {
     if(IsSpecial(value)) {
-      return (IString("0.0"));
+      return (QString("0.0"));
     }
 
-    //  Format the string to specs
+    //  Format the QString to specs
     ostringstream strcnv;
     strcnv.setf(std::ios::fixed);
     strcnv << setprecision(precision) << value;
-    return (IString(strcnv.str()));
+    return (QString(strcnv.str().c_str()));
   }
 
   /**

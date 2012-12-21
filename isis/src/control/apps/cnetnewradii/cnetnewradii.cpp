@@ -26,7 +26,7 @@ void IsisMain() {
   ControlNet cnet(ui.GetFileName("CNET"));
 
   // Get input DEM cube and get ground map for it
-  string demFile = ui.GetFileName("MODEL");
+  QString demFile = ui.GetFileName("MODEL");
   Cube demCube;
   demCube.open(demFile);
   UniversalGroundMap *ugm = NULL;
@@ -58,7 +58,7 @@ void IsisMain() {
     newRadiiSource = Apriori;
   }
   else {
-    string msg = "The value for parameter GETLATLON [";
+    QString msg = "The value for parameter GETLATLON [";
     msg += ui.GetAsString("GETLATLON") + "] must be provided.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -67,7 +67,7 @@ void IsisMain() {
   int numFailures = 0;
   int numConstrainedFixed = 0;
   int numLocked = 0;
-  string failedIDs = "";
+  QString failedIDs = "";
 
   for (int i = 0; i < cnet.GetNumPoints() ; i++) {
     ControlPoint *cp = cnet.GetPoint(i);
@@ -137,12 +137,12 @@ void IsisMain() {
 
   if (numSuccesses == 0) {
     if (numConstrainedFixed == 0) {
-      string msg = "There were no Fixed or Constrained points in this network."
+      QString msg = "There were no Fixed or Constrained points in this network."
           "  No radii were replaced.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     else {
-      string msg = "No valid radii can be calculated. Verify that the DEM [" +
+      QString msg = "No valid radii can be calculated. Verify that the DEM [" +
                        ui.GetAsString("MODEL") + "] is valid.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -153,11 +153,11 @@ void IsisMain() {
   // Write results to Logs
   // Summary group is created with the counts of successes and failures
   PvlGroup summaryGroup = PvlGroup("Summary");
-  summaryGroup.AddKeyword(PvlKeyword("Successes", numSuccesses));
-  summaryGroup.AddKeyword(PvlKeyword("Failures", numFailures));
+  summaryGroup.AddKeyword(PvlKeyword("Successes", toString(numSuccesses)));
+  summaryGroup.AddKeyword(PvlKeyword("Failures", toString(numFailures)));
   summaryGroup.AddKeyword(PvlKeyword("NumberFixedConstrainedPoints",
-                                      numConstrainedFixed));
-  summaryGroup.AddKeyword(PvlKeyword("NumberEditLockedPoints", numLocked));
+                                      toString(numConstrainedFixed)));
+  summaryGroup.AddKeyword(PvlKeyword("NumberEditLockedPoints", toString(numLocked)));
 
   bool errorlog;
   FileName errorlogFile;

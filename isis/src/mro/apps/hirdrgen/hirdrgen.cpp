@@ -32,14 +32,14 @@ void writeJP2Image(Buffer &in);
 
 void IsisMain() {
 
-  string projName;
+  QString projName;
 
   Process pHist;
   Cube *icube = pHist.SetInputCube("FROM");
 
   // Check to see if the input cube looks like a HiRISE RDR
   if (icube->getBandCount() > 3) {
-    string msg = "Input file [" +
+    QString msg = "Input file [" +
                  Application::GetUserInterface().GetFileName("FROM") +
                  "] does not appear to be a HiRISE RDR product. Number of " +
                  "bands is greater than 3";
@@ -102,7 +102,7 @@ void IsisMain() {
   if (enctype.Equal("jp2")) {
     g_jp2buf = new char* [icube2->getBandCount()];
     FileName lblFile(ui.GetFileName("TO"));
-    string lblFileName = lblFile.path() + "/" + lblFile.baseName() + ".lbl";
+    QString lblFileName = lblFile.path() + "/" + lblFile.baseName() + ".lbl";
     p.SetDetached(lblFileName);
     p.SetFormat(ProcessExport::JP2);
   }
@@ -197,16 +197,16 @@ void IsisMain() {
   struct tm *tmbuf = gmtime(&startTime);
   char timestr[80];
   strftime(timestr, 80, "%Y-%m-%dT%H:%M:%S", tmbuf);
-  string dateTime = (string) timestr;
+  QString dateTime = (QString) timestr;
   iTime tmpDateTime(dateTime);
   PvlGroup &timeParam = pdsLabel.FindGroup("TIME_PARAMETERS");
   timeParam += PvlKeyword("PRODUCT_CREATION_TIME", tmpDateTime.UTC());
 
   // Add the N/A constant keyword to the ROOT
-  pdsLabel += PvlKeyword("NOT_APPLICABLE_CONSTANT", -9998);
+  pdsLabel += PvlKeyword("NOT_APPLICABLE_CONSTANT", toString(-9998));
 
   // Add SOFTWARE_NAME to the ROOT
-  IString sfname;
+  QString sfname;
   sfname.clear();
   sfname += "Isis " + Application::Version() + " " +
             Application::GetUserInterface().ProgramName();
@@ -239,7 +239,7 @@ void IsisMain() {
     ccdTdi.AddValue(cpmmTdi[cpmmByCcd[ccd]] != "Null" ? cpmmTdi[cpmmByCcd[ccd]] : "-9998");
     IString tmp = cpmmSpecial[cpmmByCcd[ccd]];
     tmp.Trim("\"");
-    ccdSpecial.AddValue(tmp);
+    ccdSpecial.AddValue(tmp.ToQt());
   }
 
   if (!pdsLabel.HasGroup("INSTRUMENT_SETTING_PARAMETERS")) {
@@ -299,9 +299,9 @@ void IsisMain() {
       Projection *proj = ProjectionFactory::CreateFromCube(*icube2);
       PvlGroup &mapping = icube2->getLabel()->FindGroup("MAPPING", Pvl::Traverse);
       double radius = proj->LocalRadius((double)mapping["CenterLatitude"]) / 1000.0;
-      mapObject["A_AXIS_RADIUS"].SetValue(radius, "KM");
-      mapObject["B_AXIS_RADIUS"].SetValue(radius, "KM");
-      mapObject["C_AXIS_RADIUS"].SetValue(radius, "KM");
+      mapObject["A_AXIS_RADIUS"].SetValue(toString(radius), "KM");
+      mapObject["B_AXIS_RADIUS"].SetValue(toString(radius), "KM");
+      mapObject["C_AXIS_RADIUS"].SetValue(toString(radius), "KM");
     }
 
     projName = mapObject["MAP_PROJECTION_TYPE"][0];
@@ -312,11 +312,11 @@ void IsisMain() {
   // The input to output mapping is opposite from the one above
   double slope = (p.GetOutputMaximum() - p.GetOutputMinimum()) / (maxmax - minmin);
   double intercept = p.GetOutputMaximum() - slope * maxmax;
-  PvlKeyword minimum("MRO:MINIMUM_STRETCH", slope * g_min[0] + intercept);
-  PvlKeyword maximum("MRO:MAXIMUM_STRETCH", slope * g_max[0] + intercept);
+  PvlKeyword minimum("MRO:MINIMUM_STRETCH", toString(slope * g_min[0] + intercept));
+  PvlKeyword maximum("MRO:MAXIMUM_STRETCH", toString(slope * g_max[0] + intercept));
   for (int band = 1; band < icube2->getBandCount(); ++band) {
-    minimum += slope * g_min[band] + intercept;
-    maximum += slope * g_max[band] + intercept;
+    minimum += toString(slope * g_min[band] + intercept);
+    maximum += toString(slope * g_max[band] + intercept);
   }
 
   if (enctype.Equal("jp2")) {
@@ -327,15 +327,15 @@ void IsisMain() {
     imagejp2 += PvlKeyword("DESCRIPTION", "HiRISE projected and mosaicked product");
 
     // Add the SCALLING_FACTOR and OFFSET keywords
-    imagejp2.AddKeyword(PvlKeyword("SCALING_FACTOR", slope), Pvl::Replace);
-    imagejp2.AddKeyword(PvlKeyword("OFFSET", intercept), Pvl::Replace);
+    imagejp2.AddKeyword(PvlKeyword("SCALING_FACTOR", toString(slope)), Pvl::Replace);
+    imagejp2.AddKeyword(PvlKeyword("OFFSET", toString(intercept)), Pvl::Replace);
 
     // Reformat some keyword units in the image object
     // This is lame, but PDS units are difficult to work with, so for now???
     PvlKeyword &oldFilterNamejp2 = imagejp2["FILTER_NAME"];
     PvlKeyword newFilterName("FILTER_NAME");
     for (int val = 0; val < oldFilterNamejp2.Size(); ++val) {
-      IString  filtname(oldFilterNamejp2[val].UpCase());
+      QString  filtname(oldFilterNamejp2[val].toUpper());
       if (filtname == "BLUEGREEN") filtname = "BLUE-GREEN";
       else if (filtname == "NEARINFRARED") filtname = "NEAR-INFRARED";
       newFilterName.AddValue(filtname);
@@ -374,7 +374,7 @@ void IsisMain() {
     // ProcessExportPds
     if (nbits != 8 && nbits != 16) {
       imagejp2.AddKeyword(PvlKeyword("SAMPLE_BIT_MASK",
-                                     (int)pow(2.0, (double)ui.GetInteger("BITS")) - 1),
+                                     toString((int)pow(2.0, (double)ui.GetInteger("BITS")) - 1)),
                           Pvl::Replace);
     }
   }
@@ -395,15 +395,15 @@ void IsisMain() {
     // ??? unneccessary calculation - this is done by ProcessExportPds class.
     double slope = (maxmax - minmin) / (p.GetOutputMaximum() - p.GetOutputMinimum()); 
     double intercept = maxmax - slope * p.GetOutputMaximum();
-    image.AddKeyword(PvlKeyword("SCALING_FACTOR", slope), Pvl::Replace);
-    image.AddKeyword(PvlKeyword("OFFSET", intercept), Pvl::Replace);
+    image.AddKeyword(PvlKeyword("SCALING_FACTOR", toString(slope)), Pvl::Replace);
+    image.AddKeyword(PvlKeyword("OFFSET", toString(intercept)), Pvl::Replace);
 
     // Reformat some keyword units in the image object
     // This is lame, but PDS units are difficult to work with, so for now
     PvlKeyword &oldFilterName = image["FILTER_NAME"];
     PvlKeyword newFilterName("FILTER_NAME");
     for (int val = 0; val < oldFilterName.Size(); ++val) {
-      IString  filtname(oldFilterName[val].UpCase());
+      QString  filtname(oldFilterName[val].toUpper());
       if (filtname == "BLUEGREEN") filtname = "BLUE-GREEN";
       else if (filtname == "NEARINFRARED") filtname = "NEAR-INFRARED";
       newFilterName.AddValue(filtname);
@@ -442,7 +442,7 @@ void IsisMain() {
     // ProcessExportPds
     if (nbits != 8 && nbits != 16) {
       image.AddKeyword(PvlKeyword("SAMPLE_BIT_MASK",
-                                  (int)pow(2.0, (double)ui.GetInteger("BITS")) - 1),
+                                  toString((int)pow(2.0, (double)ui.GetInteger("BITS")) - 1)),
                        Pvl::Replace);
     }
   }
@@ -453,26 +453,26 @@ void IsisMain() {
 
 //    PvlKeyword &incidence = viewGroup["INCIDENCE_ANGLE"];
 //    IString tstr = incidence.Unit();
-//    if (tstr.UpCase() == "DEG") incidence.SetValue((string)incidence, "deg");
+//    if (tstr.UpCase() == "DEG") incidence.SetValue((QString)incidence, "deg");
 
 //    PvlKeyword &emission = viewGroup["EMISSION_ANGLE"];
 //    tstr = emission.Unit();
-//    if (tstr.UpCase() == "DEG") emission.SetValue((string)emission, "deg");
+//    if (tstr.UpCase() == "DEG") emission.SetValue((QString)emission, "deg");
 
 //    PvlKeyword &phase = viewGroup["PHASE_ANGLE"];
 //    tstr = phase.Unit();
-//    if (tstr.UpCase() == "DEG") phase.SetValue((string)phase, "deg");
+//    if (tstr.UpCase() == "DEG") phase.SetValue((QString)phase, "deg");
 
 //    PvlKeyword &solarLon = viewGroup["SOLAR_LONGITUDE"];
 //    tstr = solarLon.Unit();   q
-//    if (tstr.UpCase() == "DEG") solarLon.SetValue((string)solarLon, "deg");
+//    if (tstr.UpCase() == "DEG") solarLon.SetValue((QString)solarLon, "deg");
 
 //    PvlKeyword &localTime = viewGroup["LOCAL_TIME"];
 //    tstr = localTime.Unit();
-//    if (tstr.UpCase() == "LOCALDAY/24") localTime.SetValue((string)localTime, "local day/24");
+//    if (tstr.UpCase() == "LOCALDAY/24") localTime.SetValue((QString)localTime, "local day/24");
 //  }
 
-  // Add a keyword type (i.e., string, bool, int...) file to the PDS label Pvl
+  // Add a keyword type (i.e., QString, bool, int...) file to the PDS label Pvl
   PvlFormat *formatter = pdsLabel.GetFormat();
   formatter->Add("$mro/translations/hirisePdsRdrExtras.typ");
 
@@ -513,7 +513,7 @@ void IsisMain() {
   }
   else {
     FileName outFile(ui.GetFileName("TO"));
-    ofstream oCube(outFile.expanded().c_str());
+    ofstream oCube(outFile.expanded().toAscii().data());
     p.OutputLabel(oCube);
     p.StartProcess(oCube);
     oCube.close();

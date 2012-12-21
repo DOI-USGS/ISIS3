@@ -65,7 +65,7 @@ namespace Isis {
   class CnetRefByIncidence : public ControlNetValidMeasure {
     public:
       //! Constructor
-      CnetRefByIncidence(Pvl *pPvlDef, std::string msSerialNumfile);
+      CnetRefByIncidence(Pvl *pPvlDef, QString msSerialNumfile);
       virtual ~CnetRefByIncidence() {};
 
       //! Get the Log updated by this object

@@ -20,14 +20,14 @@ void IsisMain() {
 
   // Get the control point file
   UserInterface &ui = Application::GetUserInterface();
-  string cfile = ui.GetFileName("CNET");
+  QString cfile = ui.GetFileName("CNET");
   ControlNet cn(cfile);
 
   std::vector<double> inputLine, inputSample, outputLine, outputSample;
   for (int i = 0; i < cn.GetNumPoints(); i++) {
     const ControlPoint *cp = cn.GetPoint(i);
     if (cp->GetNumMeasures() != 2) {
-      string msg = "Control points must have exactly 2 control measures";
+      QString msg = "Control points must have exactly 2 control measures";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     if (!cp->IsIgnored()) {
@@ -41,7 +41,7 @@ void IsisMain() {
   // If there are no valid control points,
   //  throw an error
   if (inputLine.size() < 1) {
-    string msg = "The specified Control Network is empty.";
+    QString msg = "The specified Control Network is empty.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -52,7 +52,7 @@ void IsisMain() {
   int onl, ons;
   if (ui.GetString("OSIZE") == "MATCH") {
     Cube c;
-    c.open(IString(ui.GetFileName("CUBE")), "r");
+    c.open(ui.GetFileName("CUBE"), "r");
     onl = c.getLineCount();
     ons = c.getSampleCount();
     c.close();
@@ -96,8 +96,8 @@ void IsisMain() {
     interp = new Interpolator(Interpolator::CubicConvolutionType);
   }
   else {
-    string msg = "Unknow value for INTERP [" +
-                 ui.GetString("INTERP") + "]";
+    QString msg = "Unknow value for INTERP [" +
+                  ui.GetString("INTERP") + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 

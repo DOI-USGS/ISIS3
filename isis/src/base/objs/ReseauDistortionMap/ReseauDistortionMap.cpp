@@ -41,7 +41,7 @@ namespace Isis {
    * @throws Isis::IException::User - There are not the same amount of master and
    *                                  refined reseaus
    */
-  ReseauDistortionMap::ReseauDistortionMap(Camera *parent, Pvl &labels, const std::string &fname) :
+  ReseauDistortionMap::ReseauDistortionMap(Camera *parent, Pvl &labels, const QString &fname) :
     CameraDistortionMap(parent, 1.0) {
     // Set up distortion coefficients
     Pvl mast(fname);
@@ -60,8 +60,8 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
     for(int i = 0; i < p_numRes; i++) {
-      p_mlines.push_back(mline[i]);
-      p_msamps.push_back(msamp[i]);
+      p_mlines.push_back(toDouble(mline[i]));
+      p_msamps.push_back(toDouble(msamp[i]));
     }
     p_pixelPitch = parent->PixelPitch();
 
@@ -74,8 +74,8 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
     for(int i = 0; i < p_numRes; i++) {
-      p_rlines.push_back(rline[i]);
-      p_rsamps.push_back(rsamp[i]);
+      p_rlines.push_back(toDouble(rline[i]));
+      p_rsamps.push_back(toDouble(rsamp[i]));
     }
     if(p_mlines.size() != p_rlines.size()) {
       string msg = "The number of master reseaus and refined reseaus";

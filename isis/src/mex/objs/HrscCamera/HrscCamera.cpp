@@ -64,10 +64,10 @@ namespace Isis {
 
     new CameraFocalPlaneMap(this, naifIkCode());
 
-    string ikernKey = "INS" + IString((int)naifIkCode())  + "_BORESIGHT_SAMPLE";
+    QString ikernKey = "INS" + toString(naifIkCode())  + "_BORESIGHT_SAMPLE";
     double sampleBoresight = getDouble(ikernKey);
 
-    ikernKey = "INS" + IString((int)naifIkCode())  + "_BORESIGHT_LINE";
+    ikernKey = "INS" + toString(naifIkCode())  + "_BORESIGHT_LINE";
     double lineBoresight = getDouble(ikernKey);
 
     FocalPlaneMap()->SetDetectorOrigin(sampleBoresight, lineBoresight);
@@ -92,11 +92,11 @@ namespace Isis {
   /**
    * @param filename
    */
-  void HrscCamera::ReadLineRates(IString filename) {
+  void HrscCamera::ReadLineRates(QString filename) {
     Table timesTable("LineScanTimes", filename);
 
     if(timesTable.Records() <= 0) {
-      string msg = "Table [LineScanTimes] in [";
+      QString msg = "Table [LineScanTimes] in [";
       msg += filename + "] must not be empty";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -108,7 +108,7 @@ namespace Isis {
     }
 
     if(p_lineRates.size() <= 0) {
-      string msg = "There is a problem with the data within the Table ";
+      QString msg = "There is a problem with the data within the Table ";
       msg += "[LineScanTimes] in [" + filename + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }

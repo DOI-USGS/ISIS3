@@ -1,4 +1,4 @@
-#if !defined(InterestOperatorFactory_h)
+#ifndef InterestOperatorFactory_h
 #define InterestOperatorFactory_h
 /**
  * @file

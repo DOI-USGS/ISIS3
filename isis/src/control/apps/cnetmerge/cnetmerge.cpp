@@ -15,12 +15,11 @@
 #include "IException.h"
 #include "iTime.h"
 
-using std::string;
 using namespace Isis;
 
 
 ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
-    IString networkId, IString description);
+    QString networkId, QString description);
 void mergeNetwork(ControlNet &baseNet, ControlNet &newNet, PvlObject &cnetLog);
 
 ControlPoint * mergePoint(
@@ -48,8 +47,8 @@ PvlObject createNetworkLog(ControlNet &cnet);
 PvlObject createPointLog(ControlPoint *point);
 PvlGroup createMeasureLog();
 
-void reportConflict(PvlObject &pointLog, IString conflict);
-void reportConflict(PvlGroup &measureLog, IString cn, IString conflict);
+void reportConflict(PvlObject &pointLog, QString conflict);
+void reportConflict(PvlGroup &measureLog, QString cn, QString conflict);
 
 void addLog(PvlObject &conflictLog, PvlObject &cnetLog);
 void addLog(PvlObject &cnetLog, PvlObject &pointLog, PvlGroup &measureLog);
@@ -62,7 +61,7 @@ bool overwriteMissing;
 bool report;
 bool mergePoints;
 
-string logName;
+QString logName;
 
 
 void IsisMain() {
@@ -74,7 +73,7 @@ void IsisMain() {
 
     if (ui.WasEntered("BASE")) {
       // User has chosen an explicit base network
-      string baseName = ui.GetFileName("BASE");
+      QString baseName = ui.GetFileName("BASE");
       FileName baseFileName(baseName);
 
       // Remove the base network from the list if it is present
@@ -101,7 +100,7 @@ void IsisMain() {
     // Check after taking into account an explicit base network if we have at
     // least two networks to merge
     if (filelist.size() < 2) {
-      string msg = "CLIST [" + ui.GetFileName("CLIST") + "] and BASE [" +
+      QString msg = "CLIST [" + ui.GetFileName("CLIST") + "] and BASE [" +
         (ui.WasEntered("BASE") ? ui.GetFileName("BASE") : "Automatic") +
         "] must total to at least two distinct filenames: "
         "a base network and a new network";
@@ -159,7 +158,7 @@ void IsisMain() {
 
 
 ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
-    IString networkId, IString description) {
+    QString networkId, QString description) {
 
   if (!mergePoints) {
     bool hasDuplicates = false;
@@ -179,16 +178,16 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
             PvlObject duplicate("Duplicate");
             duplicate.AddKeyword(PvlKeyword("PointId", point->GetId()));
             duplicate.AddKeyword(PvlKeyword(
-                  "SourceNetwork", pointSources[point->GetId()].toStdString()));
+                  "SourceNetwork", pointSources[point->GetId()]));
             duplicate.AddKeyword(PvlKeyword("AddNetwork", cnetName.name()));
             errors.AddObject(duplicate);
           }
           else {
             // User has disallowed merging points, so throw an error
-            string msg = "Add network [" + cnetName.name() + "] contains "
+            QString msg = "Add network [" + cnetName.name() + "] contains "
               "Control Point with ID [" + point->GetId() + "] already "
               "contained within source network [" +
-              pointSources[point->GetId()].toStdString() + "].  "
+              pointSources[point->GetId()] + "].  "
               "Set DUPLICATEPOINTS=MERGE to merge conflicting Control Points";
             throw IException(IException::User, msg, _FILEINFO_);
           }
@@ -204,7 +203,7 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
       outPvl.AddObject(errors);
       outPvl.Write(logName);
 
-      string msg = "Networks contained duplicate points.  See log file [" +
+      QString msg = "Networks contained duplicate points.  See log file [" +
         FileName(logName).name() + "] for details.  "
         "Set DUPLICATEPOINTS=MERGE to merge conflicting Control Points";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -234,8 +233,8 @@ ControlNet * mergeNetworks(FileList &filelist, PvlObject &conflictLog,
     ControlNet newNet(currentCnetFileName.expanded());
 
     // Networks can only be merged if the targets are the same
-    if (baseNet->GetTarget().DownCase() != newNet.GetTarget().DownCase()) {
-      string msg = "Input [" + newNet.GetNetworkId() + "] does not target the "
+    if (baseNet->GetTarget().toLower() != newNet.GetTarget().toLower()) {
+      QString msg = "Input [" + newNet.GetNetworkId() + "] does not target the "
           "same target as other Control Network(s)";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -488,7 +487,7 @@ PvlGroup createMeasureLog() {
 }
 
 
-void reportConflict(PvlObject &pointLog, IString conflict) {
+void reportConflict(PvlObject &pointLog, QString conflict) {
   // Add a point conflict message to the point log if we're reporting these
   // conflicts to a log file
   if (report) {
@@ -498,7 +497,7 @@ void reportConflict(PvlObject &pointLog, IString conflict) {
 }
 
 
-void reportConflict(PvlGroup &measureLog, IString sn, IString conflict) {
+void reportConflict(PvlGroup &measureLog, QString sn, QString conflict) {
   // Add a measure conflict message to the measure log if we're reporting these
   // conflicts to a log file
   if (report) {

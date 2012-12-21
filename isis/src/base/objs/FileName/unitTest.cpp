@@ -15,10 +15,10 @@
 using namespace std;
 using namespace Isis;
 
-void TestVersioning(IString prefix, IString name, bool containsDate = false);
-void TestExpanded(IString prefix, IString name);
-void TestExtensionChanges(IString prefix, IString name, bool showExpandedValues);
-void TestGenericAccessors(IString prefix, IString name, bool showExpandedValues);
+void TestVersioning(QString prefix, QString name, bool containsDate = false);
+void TestExpanded(QString prefix, QString name);
+void TestExtensionChanges(QString prefix, QString name, bool showExpandedValues);
+void TestGenericAccessors(QString prefix, QString name, bool showExpandedValues);
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
@@ -54,16 +54,16 @@ int main(int argc, char *argv[]) {
 
   // Test temp files thoroughly
   cout << "Testing temporary file name placement" << endl;
-  IString tempFileNameTestStr = "$TEMPORARY/tttt.tmp";
+  QString tempFileNameTestStr = "$TEMPORARY/tttt.tmp";
   FileName n = FileName::createTempFile(tempFileNameTestStr);
   cout << "\tInput name and extension : " << tempFileNameTestStr << endl;
   cout << "\tExtension:               : " << n.extension() << endl;
   cout << "\tOriginal Path:           : " << n.originalPath() << endl;
   cout << "\tExists:                  : " << n.fileExists() << endl;
   cout << "\tName (cleaned):          : " <<
-      IString(n.name().ToQt().mid(0, 4) +
+      QString(n.name().mid(0, 4) +
               QString("%1").arg("", n.name().size() - 8, '?') +
-              n.name().ToQt().mid(n.name().size() - 4)) << endl;
+              n.name().mid(n.name().size() - 4)) << endl;
   cout << endl;
 
   if (!QFile(n.toString()).remove()) {
@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
       todayFileName = todayFileName.newVersion();
       QDate today = QDate::currentDate();
       QString expected = today.toString("'tttt'dd'tt'yyyy'tt'MMM'.tmp'");
-      success = todayFileName.name() == expected.toStdString();
+      success = todayFileName.name() == expected;
       cout << "\tMade today's filename successfully? " << success << endl;
 
       if (!success)
@@ -190,7 +190,7 @@ int main(int argc, char *argv[]) {
 }
 
 
-void TestVersioning(IString prefix, IString name, bool containsDate) {
+void TestVersioning(QString prefix, QString name, bool containsDate) {
   cout << prefix << "Testing Versioning Methods [" << name << "]" << endl;
 
   try {
@@ -234,7 +234,7 @@ void TestVersioning(IString prefix, IString name, bool containsDate) {
 }
 
 
-void TestGenericAccessors(IString prefix, IString name, bool showExpandedValues) {
+void TestGenericAccessors(QString prefix, QString name, bool showExpandedValues) {
   FileName a(name);
 
   // Test our assignment & copy construct every time
@@ -267,7 +267,7 @@ void TestGenericAccessors(IString prefix, IString name, bool showExpandedValues)
 }
 
 
-void TestExtensionChanges(IString prefix, IString name, bool showExpandedValues) {
+void TestExtensionChanges(QString prefix, QString name, bool showExpandedValues) {
   FileName a(name);
 
   // Test our assignment & copy construct every time
@@ -277,7 +277,7 @@ void TestExtensionChanges(IString prefix, IString name, bool showExpandedValues)
   FileName test;
   test = c;
 
-  IString (FileName::*toStringMethod)() const = &FileName::toString;
+  QString (FileName::*toStringMethod)() const = &FileName::toString;
 
   FileName beforeLastChange = test;
 
@@ -327,7 +327,7 @@ void TestExtensionChanges(IString prefix, IString name, bool showExpandedValues)
 }
 
 
-void TestExpanded(IString prefix, IString name) {
+void TestExpanded(QString prefix, QString name) {
   FileName a(name);
 
   // Test our assignment & copy construct every time

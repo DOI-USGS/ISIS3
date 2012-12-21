@@ -61,7 +61,7 @@ namespace Isis {
   AutoReg *AutoRegFactory::Create(Pvl &pvl) {
     // Get the algorithm name to create
     PvlGroup &algo = pvl.FindGroup("Algorithm", Pvl::Traverse);
-    std::string algorithm = algo["Name"];
+    QString algorithm = algo["Name"];
 
     // Open the factory plugin file
     Plugin p;

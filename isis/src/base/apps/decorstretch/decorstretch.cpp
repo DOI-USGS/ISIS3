@@ -16,7 +16,7 @@ void NormalizeAndInvert(Buffer &in, Buffer &out);
 PrincipalComponentAnalysis pca(0);
 vector<GaussianStretch *> stretches;
 
-string tmpFileName = "Temporary_DecorrelationStretch_Transform.cub";
+QString tmpFileName = "Temporary_DecorrelationStretch_Transform.cub";
 
 void IsisMain() {
   ProcessByBrick p;
@@ -61,7 +61,7 @@ void IsisMain() {
 
   p.EndProcess();
 
-  remove(tmpFileName.c_str());
+  remove(tmpFileName.toAscii().data());
 }
 
 void GetData(Buffer &in) {

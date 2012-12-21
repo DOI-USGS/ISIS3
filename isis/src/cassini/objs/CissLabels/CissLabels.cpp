@@ -22,7 +22,7 @@ namespace Isis {
    *
    * @param file Name of Cassini ISS file
    */
-  CissLabels::CissLabels(const string &file) {
+  CissLabels::CissLabels(const QString &file) {
     Pvl lab(file);
     Init(lab);
   }
@@ -57,32 +57,32 @@ namespace Isis {
   void CissLabels::ReadLabels(Pvl &lab) {
     // Get values out of the instrument group
     PvlGroup &inst    = lab.FindGroup("Instrument", Pvl::Traverse);
-    p_ABflag                = (string) inst["AntiBloomingStateFlag"];   //valid values: On, Off, Unknown
+    p_ABflag                = (QString) inst["AntiBloomingStateFlag"];   //valid values: On, Off, Unknown
     p_biasStripMean         = (double) inst["BiasStripMean"];           //valid values: real numbers
-    p_compressionRatio      = (string) inst["CompressionRatio"];        //valid values: NotCompressed or real number
-    p_compressionType       = (string) inst["CompressionType"];         //valid values: Lossy, Lossless, NotCompressed
-    p_dataConversionType    = (string) inst["DataConversionType"];      //valid values: 12Bit, 8LSB, Table
-    p_delayedReadoutFlag    = (string) inst["DelayedReadoutFlag"];      //valid values: Yes, No, Unknown
+    p_compressionRatio      = (QString) inst["CompressionRatio"];        //valid values: NotCompressed or real number
+    p_compressionType       = (QString) inst["CompressionType"];         //valid values: Lossy, Lossless, NotCompressed
+    p_dataConversionType    = (QString) inst["DataConversionType"];      //valid values: 12Bit, 8LSB, Table
+    p_delayedReadoutFlag    = (QString) inst["DelayedReadoutFlag"];      //valid values: Yes, No, Unknown
     p_exposureDuration      = (double) inst["ExposureDuration"];        //valid values: real numbers
-    p_flightSoftwareVersion = (string) inst["FlightSoftwareVersionId"]; //valid values: Unknown, 1.2, 1.3, 1.4
+    p_flightSoftwareVersion = (QString) inst["FlightSoftwareVersionId"]; //valid values: Unknown, 1.2, 1.3, 1.4
     p_gainModeId            = (int)    inst["GainModeId"];              //valid values: 12, 29, 95, 215
     p_gainState             = (int)    inst["GainState"];               //valid values: 0, 1, 2, 3
     p_instrumentDataRate    = (double) inst["InstrumentDataRate"];      //valid values: 60.9, 121.9, 182.8, 243.7, 304.6, 365.6, -999.0
-    p_instrumentModeId      = (string) inst["InstrumentModeId"];        //valid values: Full, Sum2, Sum4
-    p_instrumentId          = (string) inst["InstrumentId"];            //valid values: ISSNA, ISSWA
-    p_readoutCycleIndex     = (string) inst["ReadoutCycleIndex"];       //valid values: Unknown or integers 0-15
+    p_instrumentModeId      = (QString) inst["InstrumentModeId"];        //valid values: Full, Sum2, Sum4
+    p_instrumentId          = (QString) inst["InstrumentId"];            //valid values: ISSNA, ISSWA
+    p_readoutCycleIndex     = (QString) inst["ReadoutCycleIndex"];       //valid values: Unknown or integers 0-15
     p_readoutOrder          = (int)    inst["ReadoutOrder"];            //valid values: 0 or 1
-    p_shutterModeId         = (string) inst["ShutterModeId"];           //valid values: BothSim, NacOnly, WacOnly
+    p_shutterModeId         = (QString) inst["ShutterModeId"];           //valid values: BothSim, NacOnly, WacOnly
     p_summingMode           = (int)    inst["SummingMode"];             //valid values: 1, 2, 4
-    p_frontOpticsTemp       = inst["OpticsTemperature"][0].ToDouble();  //valid values: real numbers
+    p_frontOpticsTemp       = toDouble(inst["OpticsTemperature"][0]);  //valid values: real numbers
     // Get values out of the archive group
     PvlGroup &arch    = lab.FindGroup("Archive", Pvl::Traverse);
     p_imageNumber           = (double) arch["ImageNumber"];
     // Get values out of the bandbin group
     PvlGroup &bandbin = lab.FindGroup("BandBin", Pvl::Traverse);
-    IString filter = (string) bandbin["FilterName"];
-    p_filter.push_back(filter.Token("/"));
-    p_filter.push_back(filter);
+    IString filter = (QString) bandbin["FilterName"];
+    p_filter.push_back(filter.Token("/").ToQt());
+    p_filter.push_back(filter.ToQt());
   }
 
 

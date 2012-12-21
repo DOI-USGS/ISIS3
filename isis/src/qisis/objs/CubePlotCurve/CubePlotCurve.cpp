@@ -272,7 +272,7 @@ namespace Isis {
                                 int band) {
 
     if (cvp) {
-      m_sourceCube << cvp->cube()->getFileName().ToQt();
+      m_sourceCube << cvp->cube()->getFileName();
 
       if (m_renameAutomatically) {
         setTitle(title().text() + " - " +

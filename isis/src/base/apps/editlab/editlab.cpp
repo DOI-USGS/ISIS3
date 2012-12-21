@@ -19,7 +19,7 @@ void IsisMain() {
   // Extract label from file
   Pvl *label = new Pvl(ui.GetFileName("FROM"));
   PvlObject *pvl = label;
-  string option = ui.GetString("OPTION");
+  QString option = ui.GetString("OPTION");
 
   // Get user entered option & create IsisCube Object if needed
   Cube *cube = NULL;
@@ -31,7 +31,7 @@ void IsisMain() {
 
   // Add Template File
   if(option == "ADDTEMP") {
-    string tempfile = ui.GetFileName("TEMPFILE");
+    QString tempfile = ui.GetFileName("TEMPFILE");
     Pvl tempobj(tempfile);
     for(int i = 0; i < tempobj.Groups(); ++i) {
       pvl->AddGroup(tempobj.Group(i));
@@ -39,7 +39,7 @@ void IsisMain() {
   }
 
   else {
-    string grpname = ui.GetString("GRPNAME");
+    QString grpname = ui.GetString("GRPNAME");
 
     // Add Group
     if(option == "ADDG") {
@@ -55,7 +55,7 @@ void IsisMain() {
     }
 
     else {
-      string key = ui.GetString("KEYWORD");
+      QString key = ui.GetString("KEYWORD");
       PvlGroup &grp = pvl->FindGroup(grpname, PvlObject::Traverse);
 
       // Add Keyword

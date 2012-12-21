@@ -69,8 +69,8 @@ void IsisMain() {
   p.StandardPdsLabel(ProcessExportPds::Image);
 
   FileName outFile(ui.GetFileName("TO", "img"));
-  string outFileName(outFile.expanded());
-  ofstream oCube(outFileName.c_str());
+  QString outFileName(outFile.expanded());
+  ofstream oCube(outFileName.toAscii().data());
   p.OutputLabel(oCube);
   p.StartProcess(oCube);
   oCube.close();
@@ -78,13 +78,13 @@ void IsisMain() {
 
   //Records what it did to the print.prt file
   PvlGroup results("DNs Used");
-  results += PvlKeyword("Null", p.OutputNull());
-  results += PvlKeyword("LRS", p.OutputLrs());
-  results += PvlKeyword("LIS", p.OutputLis());
-  results += PvlKeyword("HIS", p.OutputHis());
-  results += PvlKeyword("HRS", p.OutputHrs());
-  results += PvlKeyword("ValidMin", min);
-  results += PvlKeyword("ValidMax", max);
+  results += PvlKeyword("Null", toString(p.OutputNull()));
+  results += PvlKeyword("LRS", toString(p.OutputLrs()));
+  results += PvlKeyword("LIS", toString(p.OutputLis()));
+  results += PvlKeyword("HIS", toString(p.OutputHis()));
+  results += PvlKeyword("HRS", toString(p.OutputHrs()));
+  results += PvlKeyword("ValidMin", toString(min));
+  results += PvlKeyword("ValidMax", toString(max));
   Application::Log(results);
 
   return;

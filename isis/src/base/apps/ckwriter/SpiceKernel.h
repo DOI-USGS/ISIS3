@@ -1,4 +1,4 @@
-#if !defined(SpiceKernel_h)
+#ifndef SpiceKernel_h
 #define SpiceKernel_h
 /**                                                                       
  * @file                                                                  
@@ -74,12 +74,12 @@ class SpiceKernel {
     int size() const { return (_segments.size()); }
     const SpiceSegment &operator[](const int i) const;
 
-    void add(const std::string &fname);
+    void add(const QString &fname);
     void add(Cube &cube);
 
-    std::string getSummary(const std::string &commfile = "") const;
+    QString getSummary(const QString &commfile = "") const;
 
-    void write(const std::string &kname, const std::string &commfile = "",
+    void write(const QString &kname, const QString &commfile = "",
                const int ckType = 3) const;
 
   private:
@@ -87,7 +87,7 @@ class SpiceKernel {
     Segments  _segments;
 
     void init();
-    std::string getCkComment(const std::string &comFile = "") const;
+    QString getCkComment(const QString &comFile = "") const;
 };
 
 };     // namespace Isis

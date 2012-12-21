@@ -62,14 +62,14 @@ namespace Isis {
       // necessary
       if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
         double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
-        mapGroup += PvlKeyword("CenterLongitude", lon);
+        mapGroup += PvlKeyword("CenterLongitude", toString(lon));
       }
 
       // Compute and write the default center latitude if allowed and
       // necessary
       if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLatitude"))) {
         double lat = (m_minimumLatitude + m_maximumLatitude) / 2.0;
-        mapGroup += PvlKeyword("CenterLatitude", lat);
+        mapGroup += PvlKeyword("CenterLatitude", toString(lat));
       }
 
       // Get the center longitude  & latitude
@@ -117,7 +117,7 @@ namespace Isis {
 
       // Get the scale factor
       if ((allowDefaults) && (!mapGroup.HasKeyword("ScaleFactor"))) {
-        mapGroup += PvlKeyword("ScaleFactor", 1.0);
+        mapGroup += PvlKeyword("ScaleFactor", toString(1.0));
       }
       m_scalefactor = mapGroup["ScaleFactor"];
     }
@@ -154,7 +154,7 @@ namespace Isis {
    *
    * @return string Name of projection, "TransverseMercator"
    */
-  string TransverseMercator::Name() const {
+  QString TransverseMercator::Name() const {
     return "TransverseMercator";
   }
 
@@ -164,7 +164,7 @@ namespace Isis {
    *
    * @return string Version number
    */
-  string TransverseMercator::Version() const {
+  QString TransverseMercator::Version() const {
     return "1.0";
   }
 

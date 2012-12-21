@@ -1,4 +1,4 @@
-#if !defined(Hillier_h)
+#ifndef Hillier_h
 #define Hillier_h
 /**
  * @file
@@ -79,7 +79,7 @@ namespace Isis {
         double b0, b1, a0, a1, a2, a3, a4;  //<! Hillier parameters
         double wavelength;                  //<! Wavelength for correction
         double tolerance;                   //<! Wavelenght Range/Tolerance
-        IString units;                      //<! Phase units of Hiller eq.
+        QString units;                      //<! Phase units of Hiller eq.
         double phaUnit;  // 1 for degrees, Pi/180 for radians
         int band;                           //<! Cube band parameters
         double phoStd;                      //<! Computed photometric std.

@@ -67,7 +67,7 @@ namespace Isis {
   class CnetRefByEmission : public ControlNetValidMeasure {
     public:
       //! Constructor
-      CnetRefByEmission(Pvl *pPvlDef, std::string msSerialNumfile);
+      CnetRefByEmission(Pvl *pPvlDef, QString msSerialNumfile);
       virtual ~CnetRefByEmission() {};
 
       //! Get the Log updated by this object

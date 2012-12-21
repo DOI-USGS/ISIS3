@@ -57,20 +57,20 @@ namespace Isis {
     p_flightSoftware = cissLab.FlightSoftwareVersion();
     p_gainMode = cissLab.GainModeId();
     p_narrow = cissLab.NarrowAngle();
-    p_sum = cissLab.SummingMode();
+    p_sum = toString(cissLab.SummingMode());
 
     if(cissLab.ReadoutCycleIndex() == "Unknown") {
       p_readoutIndex = -999;
     }
     else {
-      p_readoutIndex = cissLab.ReadoutCycleIndex().ToInteger();
+      p_readoutIndex = toInt(cissLab.ReadoutCycleIndex());
     }
 
     if(p_compType == "NotCompressed") {
       p_compRatio = 1.0;
     }
     else {
-      p_compRatio = cissLab.CompressionRatio().ToDouble();
+      p_compRatio = toDouble(cissLab.CompressionRatio());
     }
 
     if(cissLab.DelayedReadoutFlag() == "No") {
@@ -96,7 +96,7 @@ namespace Isis {
 
     p_readoutOrder = cissLab.ReadoutOrder();
 
-    switch(p_sum.ToInteger()) {
+    switch(toInt(p_sum)) {
       case 1:
         p_lines   = 1024;
         break;
@@ -260,7 +260,7 @@ namespace Isis {
     if(p_flightSoftware == "Unknown") {
       fsw = 0.0;
     }
-    else fsw = p_flightSoftware.ToDouble();
+    else fsw = toDouble(p_flightSoftware);
 
     double linetime;
     double tlm = p_telemetryRate / 8;
@@ -1025,10 +1025,10 @@ namespace Isis {
   void DarkCurrent::FindDarkFiles() {
     // Get the directory where the CISS darkcurrent directory is
     PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
-    IString missionDir = (string) dataDir["Cassini"];
-    IString darkDir(missionDir + "/calibration/darkcurrent/");
+    QString missionDir = (QString) dataDir["Cassini"];
+    QString darkDir(missionDir + "/calibration/darkcurrent/");
 
-    IString instrumentId("");
+    QString instrumentId("");
 
     if(p_narrow) {
       instrumentId += "nac";
@@ -1037,8 +1037,8 @@ namespace Isis {
     else {
       instrumentId += "wac";
     }
-    IString instModeId("");
-    if(p_sum.ToInteger() > 1) {
+    QString instModeId("");
+    if(toInt(p_sum) > 1) {
       instModeId = instModeId + "sum" + p_sum;
     }
     else {
@@ -1210,16 +1210,14 @@ namespace Isis {
         CisscalFile *biasDist = new CisscalFile(p_bdpath.expanded());
         vector<double> samp, bias_distortion;
         for(int i = 0; i < biasDist->LineCount(); i++) {
-          IString line;
+          QString line;
           biasDist->GetLine(line);  //assigns value to line
-          line = line.ConvertWhiteSpace();
-          line = line.Compress();
-          line = line.TrimHead(" ");
+          line = line.simplified().trimmed();
           if(line == "") {
             break;
           }
-          samp.push_back(line.Token(" ").ToDouble());
-          bias_distortion.push_back(line.Trim(" ").ToDouble());
+          samp.push_back(toDouble(line.split(" ").first()));
+          bias_distortion.push_back(toDouble(line.split(" ")[1]));
         }
         biasDist->Close();
         for(int i = 0; i < 21; i++) {

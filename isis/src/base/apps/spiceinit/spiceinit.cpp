@@ -25,8 +25,8 @@ bool TryKernels(Cube *icube, Process &p,
                 Kernel iak, Kernel dem,
                 Kernel exk);
 
-void RequestSpice(Cube *icube, Pvl &labels, IString missionName);
-void GetUserEnteredKernel(const string &param, Kernel &kernel);
+void RequestSpice(Cube *icube, Pvl &labels, QString missionName);
+void GetUserEnteredKernel(const QString &param, Kernel &kernel);
 
 void IsisMain() {
   // Open the input cube
@@ -70,14 +70,14 @@ void IsisMain() {
 
   // Set up for getting the mission name
   // Get the directory where the system missions translation table is.
-  string transFile = p.MissionData("base",
-                                   "translations/MissionName2DataDir.trn");
+  QString transFile = p.MissionData("base",
+                                    "translations/MissionName2DataDir.trn");
 
   // Get the mission translation manager ready
   PvlTranslationManager missionXlater(lab, transFile);
 
   // Get the mission name so we can search the correct DB's for kernels
-  string mission = missionXlater.Translate("MissionName");
+  QString mission = missionXlater.Translate("MissionName");
 
   if (ui.GetBoolean("WEB")) {
     RequestSpice(icube, *icube->getLabel(), mission);
@@ -125,7 +125,7 @@ void IsisMain() {
 
     if (ui.GetBoolean("CKNADIR")) {
       // Only add nadir if no spacecraft pointing found
-      vector<string> kernels;
+      vector<QString> kernels;
       kernels.push_back("Nadir");
       ck.push(Kernel((spiceInit::kernelTypes)0, kernels));
     }
@@ -193,7 +193,7 @@ void IsisMain() {
  * @param param
  * @param kernel
  */
-void GetUserEnteredKernel(const string &param, Kernel &kernel) {
+void GetUserEnteredKernel(const QString &param, Kernel &kernel) {
   UserInterface &ui = Application::GetUserInterface();
 
   if (ui.WasEntered(param)) {
@@ -305,16 +305,16 @@ bool TryKernels(Cube *icube, Process &p,
   // Add any time padding the user specified to the spice group
   if (ui.GetDouble("STARTPAD") > DBL_EPSILON) {
     currentKernels.AddKeyword(PvlKeyword("StartPadding",
-                                         ui.GetDouble("STARTPAD"), "seconds"));
+                                         toString(ui.GetDouble("STARTPAD")), "seconds"));
   }
 
   if (ui.GetDouble("ENDPAD") > DBL_EPSILON) {
     currentKernels.AddKeyword(PvlKeyword("EndPadding",
-                                         ui.GetDouble("ENDPAD"), "seconds"));
+                                         toString(ui.GetDouble("ENDPAD")), "seconds"));
   }
 
   currentKernels.AddKeyword(
-      PvlKeyword("CameraVersion", CameraFactory::CameraVersion(lab)),
+      PvlKeyword("CameraVersion", toString(CameraFactory::CameraVersion(lab))),
       Pvl::Replace);
 
   // Add the modified Kernels group to the input cube labels
@@ -367,7 +367,7 @@ bool TryKernels(Cube *icube, Process &p,
         bodyTable.Label()["Kernels"].AddValue(pckKeyword[i]);
 
       bodyTable.Label() += PvlKeyword("SolarLongitude",
-          cam->solarLongitude().degrees());
+          toString(cam->solarLongitude().degrees()));
       icube->write(bodyTable);
 
       Table sunTable = cam->sunPosition()->Cache("SunPosition");
@@ -418,10 +418,10 @@ bool TryKernels(Cube *icube, Process &p,
       while (i < label->Objects()) {
         PvlObject currObj = label->Object(i);
         if (currObj.IsNamed("Table")) {
-          if (currObj["Name"][0] == IString("InstrumentPointing") ||
-              currObj["Name"][0] == IString("InstrumentPosition") ||
-              currObj["Name"][0] == IString("BodyRotation") ||
-              currObj["Name"][0] == IString("SunPosition")) {
+          if (currObj["Name"][0] == QString("InstrumentPointing") ||
+              currObj["Name"][0] == QString("InstrumentPosition") ||
+              currObj["Name"][0] == QString("BodyRotation") ||
+              currObj["Name"][0] == QString("SunPosition")) {
             label->DeleteObject(i);
           }
           else {
@@ -447,13 +447,13 @@ bool TryKernels(Cube *icube, Process &p,
   return true;
 }
 
-void RequestSpice(Cube *icube, Pvl &labels, IString missionName) {
+void RequestSpice(Cube *icube, Pvl &labels, QString missionName) {
   UserInterface &ui = Application::GetUserInterface();
 
-  IString instrumentId =
+  QString instrumentId =
       labels.FindGroup("Instrument", Pvl::Traverse)["InstrumentId"][0];
 
-  IString url       = ui.GetString("URL") + "?mission=" + missionName +
+  QString url       = ui.GetString("URL") + "?mission=" + missionName +
                                             "&instrument=" + instrumentId;
   int port          = ui.GetInteger("PORT");
   bool ckSmithed    = ui.GetBoolean("CKSMITHED");
@@ -463,10 +463,10 @@ void RequestSpice(Cube *icube, Pvl &labels, IString missionName) {
   bool spkSmithed   = ui.GetBoolean("SPKSMITHED");
   bool spkRecon     = ui.GetBoolean("SPKRECON");
   bool spkPredicted = ui.GetBoolean("SPKPREDICTED");
-  IString shape     = IString(ui.GetString("SHAPE")).DownCase();
+  QString shape     = QString(ui.GetString("SHAPE")).toLower();
 
   if (shape == "user") {
-    shape = IString(ui.GetAsString("MODEL"));
+    shape = QString(ui.GetAsString("MODEL"));
 
     // Test for valid labels with mapping group at least
     Pvl shapeTest(shape);

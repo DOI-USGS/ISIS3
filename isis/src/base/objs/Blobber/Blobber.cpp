@@ -31,7 +31,6 @@
 #include "Table.h"
 #include "TableField.h"
 
-using std::string;
 using std::vector;
 
 namespace Isis {
@@ -50,19 +49,19 @@ namespace Isis {
    * user to simply define the Table object and field names to establish these
    * for multiple reads from different cubes.
    *
-   * @param [in] blobname (const std::string&) specifies the name of the ISIS
+   * @param [in] blobname (const QString&) specifies the name of the ISIS
    *                                          BLOB that contains the field
    *                                          to read the data from
-   * @param [in] fieldname (const std::string&) specifies the name of the field
+   * @param [in] fieldname (const QString&) specifies the name of the field
    *                                           in blobname to read and convert
    *                                           to double precision floating point
    *                                           data
-   * @param [in] name (const std::string&) Associates a name of the implementors
+   * @param [in] name (const QString&) Associates a name of the implementors
    *                                      choosing that identifies an
    *                                      instantiation of this class
    */
-  Blobber::Blobber(const std::string &blobname, const std::string &fieldname,
-                   const std::string &name) : _blobname(blobname),
+  Blobber::Blobber(const QString &blobname, const QString &fieldname,
+                   const QString &name) : _blobname(blobname),
     _fieldname(fieldname), _name(name) {
   }
 
@@ -79,20 +78,20 @@ namespace Isis {
    *                         is expected to contain a Table object that is
    *                         named blobname and must contain a field called
    *                         fieldname.
-   * @param [in] blobname (const std::string&) specifies the name of the ISIS
+   * @param [in] blobname (const QString&) specifies the name of the ISIS
    *                                          BLOB that contains the field
    *                                          to read the data from
-   * @param [in] fieldname (const std::string&) specifies the name of the field
+   * @param [in] fieldname (const QString&) specifies the name of the field
    *                                           in blobname to read and convert
    *                                           to double precision floating point
    *                                           data
-   * @param [in] name (const std::string&) Associates a name of the implementors
+   * @param [in] name (const QString&) Associates a name of the implementors
    *                                      choosing that identifies an
    *                                      instantiation of this class
    */
-  Blobber::Blobber(Cube &cube, const std::string &blobname,
-                   const std::string &fieldname,
-                   const std::string &name) :
+  Blobber::Blobber(Cube &cube, const QString &blobname,
+                   const QString &fieldname,
+                   const QString &name) :
     _blobname(blobname),
     _fieldname(fieldname),
     _name(name) {
@@ -134,7 +133,7 @@ namespace Isis {
    *
    * @param [in] filename (string&) Name of ISIS cube file to read
    */
-  void Blobber::load(const std::string &filename) {
+  void Blobber::load(const QString &filename) {
     Cube cube;
     cube.open(filename);
     load(cube);
@@ -165,7 +164,7 @@ namespace Isis {
       loadInteger(tbl);
     }
     else {
-      string msg = "Field type for " + getFieldName() +
+      QString msg = "Field type for " + getFieldName() +
                    " is not double or integer";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

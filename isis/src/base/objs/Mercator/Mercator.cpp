@@ -60,14 +60,14 @@ namespace Isis {
       // necessary
       if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
         double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
-        mapGroup += PvlKeyword("CenterLongitude", lon);
+        mapGroup += PvlKeyword("CenterLongitude", toString(lon));
       }
 
       // Compute and write the default center latitude if allowed and
       // necessary
       if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLatitude"))) {
         double lat = (m_minimumLatitude + m_maximumLatitude) / 2.0;
-        mapGroup += PvlKeyword("CenterLatitude", lat);
+        mapGroup += PvlKeyword("CenterLatitude", toString(lat));
       }
 
       // Get the center longitude  & latitude
@@ -89,7 +89,7 @@ namespace Isis {
       m_scalefactor = cos_clat / sqrt(1.0 - m_eccsq * sin_clat * sin_clat);
     }
     catch (IException &e) {
-      string message = "Invalid label group [Mapping]";
+      QString message = "Invalid label group [Mapping]";
       throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }
@@ -119,9 +119,9 @@ namespace Isis {
   /**
    * Returns the name of the map projection, "Mercator"
    *
-   * @return string Name of projection, "Mercator"
+   * @return QString Name of projection, "Mercator"
    */
-  string Mercator::Name() const {
+  QString Mercator::Name() const {
     return "Mercator";
   }
 
@@ -129,9 +129,9 @@ namespace Isis {
    * Returns the version of the map projection
    *
    *
-   * @return string Version number
+   * @return QString Version number
    */
-  string Mercator::Version() const {
+  QString Mercator::Version() const {
     return "1.0";
   }
 

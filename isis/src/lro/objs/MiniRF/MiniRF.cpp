@@ -63,7 +63,7 @@ namespace Isis {
 
     // Get the start time from labels (the SpacecraftClockStartCount is set to
     // is set to UNK in the PDS labels, so StartTime is used instead)
-    SpiceDouble etStart = iTime((string)inst["StartTime"]).Et();
+    SpiceDouble etStart = iTime((QString)inst["StartTime"]).Et();
 
     // The line rate is in units of seconds in the PDS label. The exposure
     // is the sum of the burst and the delay for the return. The movement of the
@@ -94,7 +94,7 @@ namespace Isis {
 
     // Setup map from radar(sample,time) to radar(groundrange,time)
     Radar::LookDirection ldir = Radar::Right;
-    if((std::string)inst["LookDirection"] == "LEFT") {
+    if((QString)inst["LookDirection"] == "LEFT") {
       ldir = Radar::Left;
     }
     RadarGroundRangeMap::setTransform(naifIkCode(), groundRangeResolution,

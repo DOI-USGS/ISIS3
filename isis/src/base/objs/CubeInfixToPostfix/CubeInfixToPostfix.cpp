@@ -76,7 +76,7 @@ namespace Isis {
    *
    * @return bool True if it looks valid, false if it's not known
    */
-  bool CubeInfixToPostfix::isKnownSymbol(IString representation) {
+  bool CubeInfixToPostfix::isKnownSymbol(QString representation) {
     for(int i = 0; i < p_operators.size(); i++) {
       if(representation.compare(p_operators[i]->inputString()) == 0) {
         return true;
@@ -85,7 +85,7 @@ namespace Isis {
 
     bool isFunction = (representation.size() > 1);
     if(representation[0] == 'f') {
-      for(unsigned int i = 1; isFunction && i < representation.size(); i++) {
+      for(int i = 1; isFunction && i < representation.size(); i++) {
         isFunction &= (representation[i] >= '0' && representation[i] <= '9');
       }
     }
@@ -96,7 +96,7 @@ namespace Isis {
     return isFunction;
   }
 
-  InfixOperator *CubeInfixToPostfix::findOperator(IString representation) {
+  InfixOperator *CubeInfixToPostfix::findOperator(QString representation) {
     try {
       return InfixToPostfix::findOperator(representation);
     }
@@ -105,7 +105,7 @@ namespace Isis {
 
     bool isFunction = (representation.size() > 1);
     if(representation[0] == 'f') {
-      for(unsigned int i = 1; i < representation.size(); i++) {
+      for(int i = 1; i < representation.size(); i++) {
         isFunction &= (representation[i] >= '0' && representation[i] <= '9');
       }
     }

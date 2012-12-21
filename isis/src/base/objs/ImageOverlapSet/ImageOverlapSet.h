@@ -95,11 +95,11 @@ namespace Isis {
       virtual ~ImageOverlapSet();
 
       void FindImageOverlaps(SerialNumberList &boundaries);
-      void FindImageOverlaps(std::vector<std::string> sns,
+      void FindImageOverlaps(std::vector<QString> sns,
                              std::vector<geos::geom::MultiPolygon *> polygons);
-      void FindImageOverlaps(SerialNumberList &boundaries, std::string outputFile);
-      void ReadImageOverlaps(const std::string &filename);
-      void WriteImageOverlaps(const std::string &filename);
+      void FindImageOverlaps(SerialNumberList &boundaries, QString outputFile);
+      void ReadImageOverlaps(const QString &filename);
+      void WriteImageOverlaps(const QString &filename);
 
       /**
        * Returns the total number of latitude and longitude overlaps
@@ -122,7 +122,7 @@ namespace Isis {
         return p_lonLatOverlaps[index];
       };
 
-      std::vector<ImageOverlap *> operator[](std::string serialNumber);
+      std::vector<ImageOverlap *> operator[](QString serialNumber);
 
       //! Return the a list of errors encountered
       const std::vector<PvlGroup> &Errors() {
@@ -145,13 +145,13 @@ namespace Isis {
 
       QList<ImageOverlap *> p_lonLatOverlaps; //!< The list of lat/lon overlaps
 
-      ImageOverlap *CreateNewOverlap(std::string serialNumber,
+      ImageOverlap *CreateNewOverlap(QString serialNumber,
                                      geos::geom::MultiPolygon *lonLatPolygon);
 
       bool SetPolygon(geos::geom::Geometry *poly, int position, ImageOverlap *sncopy = NULL, bool insert = false);
-      void HandleError(IException &e, SerialNumberList *snlist, IString msg = "", int overlap1 = -1, int overlap2 = -1);
-      void HandleError(geos::util::GEOSException *exc, SerialNumberList *snlist, IString msg = "", int overlap1 = -1, int overlap2 = -1);
-      void HandleError(SerialNumberList *snlist, IString msg, int overlap1 = -1, int overlap2 = -1);
+      void HandleError(IException &e, SerialNumberList *snlist, QString msg = "", int overlap1 = -1, int overlap2 = -1);
+      void HandleError(geos::util::GEOSException *exc, SerialNumberList *snlist, QString msg = "", int overlap1 = -1, int overlap2 = -1);
+      void HandleError(SerialNumberList *snlist, QString msg, int overlap1 = -1, int overlap2 = -1);
 
       bool p_continueAfterError; //!< If false iExceptions will be thrown from FindImageOverlaps(...)
       bool p_threadedCalculate; //!< True if we want to do calculations in a threaded way

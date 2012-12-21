@@ -15,12 +15,12 @@ class QLineEdit;
 class QMenu;
 class QProgressBar;
 class QPushButton;
+class QString;
 
 template <typename A, typename B> class QMap;
 template <typename A, typename B> class QPair;
 
 namespace Isis {
-  class IString;
   class MdiCubeViewport;
   class UniversalGroundMap;
 

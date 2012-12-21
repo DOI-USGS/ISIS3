@@ -142,9 +142,9 @@ namespace Isis {
       ~ProcessImport();
       void StartProcess();
       void StartProcess(void funct(Isis::Buffer &out));
-      void SetInputFile(const std::string &file);
-      Isis::Cube *SetOutputCube(const std::string &parameter);
-      Isis::Cube *SetOutputCube(const std::string &parameter,
+      void SetInputFile(const QString &file);
+      Isis::Cube *SetOutputCube(const QString &parameter);
+      Isis::Cube *SetOutputCube(const QString &parameter,
                                 Isis::CubeAttributeOutput &att);
       void SetPixelType(const Isis::PixelType type);
       /**
@@ -253,7 +253,7 @@ namespace Isis {
 
 
     private:
-      std::string p_inFile;        //!< Input file name
+      QString p_inFile;        //!< Input file name
       Isis::PixelType p_pixelType; //!< Pixel type of input data
       int p_ns;                    //!< Number of samples
       int p_nl;                    //!< Number of lines
@@ -361,7 +361,7 @@ namespace Isis {
       void ProcessBip(void funct(Isis::Buffer &out) = NULL);
       void ProcessJp2(void funct(Isis::Buffer &out) = NULL);
 
-      void CheckPixelRange(std::string pixelName, double min, double max);
+      void CheckPixelRange(QString pixelName, double min, double max);
   };
 };
 #endif

@@ -6,46 +6,47 @@
 #include "Projection.h"
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
 
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
-  void doit(Isis::Pvl & lab);
-  void doit2(Isis::Pvl & lab);
+  void doit(Pvl & lab);
+  void doit2(Pvl & lab);
 
   try {
-    cout << "Unit test for Isis::ProjectionFactory" << endl;
+    cout << "Unit test for ProjectionFactory" << endl;
 
-    Isis::Pvl lab;
-    lab.AddGroup(Isis::PvlGroup("Mapping"));
-    Isis::PvlGroup &mapGroup = lab.FindGroup("Mapping");
-    mapGroup += Isis::PvlKeyword("EquatorialRadius", 3396190.0);
-    mapGroup += Isis::PvlKeyword("PolarRadius", 3376200.0);
+    Pvl lab;
+    lab.AddGroup(PvlGroup("Mapping"));
+    PvlGroup &mapGroup = lab.FindGroup("Mapping");
+    mapGroup += PvlKeyword("EquatorialRadius", toString(3396190.0));
+    mapGroup += PvlKeyword("PolarRadius", toString(3376200.0));
 
-    mapGroup += Isis::PvlKeyword("LatitudeType", "Planetographic");
-    mapGroup += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-    mapGroup += Isis::PvlKeyword("LongitudeDomain", 360);
+    mapGroup += PvlKeyword("LatitudeType", "Planetographic");
+    mapGroup += PvlKeyword("LongitudeDirection", "PositiveEast");
+    mapGroup += PvlKeyword("LongitudeDomain", toString(360));
 
-    mapGroup += Isis::PvlKeyword("ProjectionName", "SimpleCylindrical");
-    mapGroup += Isis::PvlKeyword("CenterLongitude", 220.0);
+    mapGroup += PvlKeyword("ProjectionName", "SimpleCylindrical");
+    mapGroup += PvlKeyword("CenterLongitude", toString(220.0));
 
     cout << "Test for missing pixel resolution ... " << endl;
     doit(lab);
     doit2(lab);
 
-    mapGroup += Isis::PvlKeyword("PixelResolution", 2000.0);
+    mapGroup += PvlKeyword("PixelResolution", toString(2000.0));
     cout << "Test for missing upper left X ... " << endl;
     doit(lab);
 
-    mapGroup += Isis::PvlKeyword("UpperLeftCornerX", -18000.0);
+    mapGroup += PvlKeyword("UpperLeftCornerX", toString(-18000.0));
     cout << "Test for missing upper left Y ... " << endl;
     doit(lab);
 
-    mapGroup += Isis::PvlKeyword("UpperLeftCornerY", 2062000.0);
+    mapGroup += PvlKeyword("UpperLeftCornerY", toString(2062000.0));
 
     cout << "Testing conversion from image to ground ... " << endl;
-    Isis::Projection *proj = Isis::ProjectionFactory::CreateFromCube(lab);
+    Projection *proj = ProjectionFactory::CreateFromCube(lab);
     proj->SetWorld(245.0, 355.0);
     cout << setprecision(14);
     cout << "Latitude:  " << proj->Latitude() << endl;
@@ -61,16 +62,16 @@ int main(int argc, char *argv[]) {
     cout << "Testing missing ground range on create method ... " << endl;
     doit2(lab);
 
-    mapGroup += Isis::PvlKeyword("MinimumLatitude", 10.8920539924144);
-    mapGroup += Isis::PvlKeyword("MaximumLatitude", 34.7603960060206);
-    mapGroup += Isis::PvlKeyword("MinimumLongitude", 219.72432466275);
-    mapGroup += Isis::PvlKeyword("MaximumLongitude", 236.186050244411);
+    mapGroup += PvlKeyword("MinimumLatitude", toString(10.8920539924144));
+    mapGroup += PvlKeyword("MaximumLatitude", toString(34.7603960060206));
+    mapGroup += PvlKeyword("MinimumLongitude", toString(219.72432466275));
+    mapGroup += PvlKeyword("MaximumLongitude", toString(236.186050244411));
     mapGroup.DeleteKeyword("UpperLeftCornerX");
     mapGroup.DeleteKeyword("UpperLeftCornerY");
 
     cout << "Testing create method ... " << endl;
     int lines, samples;
-    proj = Isis::ProjectionFactory::CreateForCube(lab, samples, lines);
+    proj = ProjectionFactory::CreateForCube(lab, samples, lines);
     cout << "Lines:       " << lines << endl;
     cout << "Samples:     " << samples << endl;
     cout << "UpperLeftX:  " << (double) mapGroup["UpperLeftCornerX"] << endl;
@@ -78,24 +79,24 @@ int main(int argc, char *argv[]) {
     cout << endl;
 
     cout << "Testing create method with existing cube labels" << endl;
-    mapGroup.AddKeyword(Isis::PvlKeyword("UpperLeftCornerX", -16000.0), Isis::Pvl::Replace);
-    mapGroup.AddKeyword(Isis::PvlKeyword("UpperLeftCornerY", 2060000.0), Isis::Pvl::Replace);
+    mapGroup.AddKeyword(PvlKeyword("UpperLeftCornerX", toString(-16000.0)), Pvl::Replace);
+    mapGroup.AddKeyword(PvlKeyword("UpperLeftCornerY", toString(2060000.0)), Pvl::Replace);
 
-    Isis::Pvl lab2;
-    Isis::PvlObject icube("IsisCube");
-    Isis::PvlObject core("Core");
-    Isis::PvlGroup dims("Dimensions");
-    dims += Isis::PvlKeyword("Lines", 400);
-    dims += Isis::PvlKeyword("Samples", 600);
+    Pvl lab2;
+    PvlObject icube("IsisCube");
+    PvlObject core("Core");
+    PvlGroup dims("Dimensions");
+    dims += PvlKeyword("Lines", toString(400));
+    dims += PvlKeyword("Samples", toString(600));
     core.AddGroup(dims);
     icube.AddObject(core);
     icube.AddGroup(mapGroup);
     lab2.AddObject(icube);
 
-    proj = Isis::ProjectionFactory::CreateForCube(lab2, samples, lines);
+    proj = ProjectionFactory::CreateForCube(lab2, samples, lines);
     cout << "Lines:       " << lines << endl;
     cout << "Samples:     " << samples << endl;
-    mapGroup = lab2.FindGroup("Mapping", Isis::Pvl::Traverse);
+    mapGroup = lab2.FindGroup("Mapping", Pvl::Traverse);
     cout << "UpperLeftX:  " << (double) mapGroup["UpperLeftCornerX"] << endl;
     cout << "UpperLeftY:  " << (double) mapGroup["UpperLeftCornerY"] << endl;
     cout << endl;
@@ -103,27 +104,27 @@ int main(int argc, char *argv[]) {
     cout << "Label results" << endl;
     cout << lab2 << endl;
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 }
 
-void doit(Isis::Pvl &lab) {
+void doit(Pvl &lab) {
   try {
-    Isis::ProjectionFactory::CreateFromCube(lab);
+    ProjectionFactory::CreateFromCube(lab);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
 }
 
-void doit2(Isis::Pvl &lab) {
+void doit2(Pvl &lab) {
   try {
     int lines, samples;
-    Isis::ProjectionFactory::CreateForCube(lab, samples, lines);
+    ProjectionFactory::CreateForCube(lab, samples, lines);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;

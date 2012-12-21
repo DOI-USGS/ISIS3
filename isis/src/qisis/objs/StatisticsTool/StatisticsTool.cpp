@@ -673,7 +673,7 @@ namespace Isis {
           if (!IsSpecial(dn))
             p.drawText(rect, Qt::AlignCenter, QString::number(dn));
           else
-            p.drawText(rect, Qt::AlignCenter, QString::fromStdString(PixelToString(dn)));
+            p.drawText(rect, Qt::AlignCenter, PixelToString(dn));
         }
         else {
           p.fillRect(rect, c);
@@ -730,7 +730,7 @@ namespace Isis {
       emit setLine(QString("Line: %1").arg(p_ulLine + y - 1));
       double dn = p_pixelData[y-1][x-1];
       if(IsSpecial(dn))
-        emit setDn(QString("DN: %1").arg(PixelToString(dn).c_str()));
+        emit setDn(QString("DN: %1").arg(PixelToString(dn)));
       else
         emit setDn(QString("DN: %1").arg(dn));
     }

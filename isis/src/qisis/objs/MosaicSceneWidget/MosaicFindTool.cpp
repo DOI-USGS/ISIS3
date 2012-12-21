@@ -167,7 +167,7 @@ namespace Isis {
 
     obj += PvlKeyword("Latitude", p_latLineEdit->text());
     obj += PvlKeyword("Longitude", p_lonLineEdit->text());
-    obj += PvlKeyword("Visible", (p_findSpot != NULL));
+    obj += PvlKeyword("Visible", toString(p_findSpot != NULL));
 
     return obj;
   }
@@ -176,13 +176,13 @@ namespace Isis {
   void MosaicFindTool::fromPvl(const PvlObject &obj) {
     p_latLineEdit->setText(obj["Latitude"][0]);
     p_lonLineEdit->setText(obj["Longitude"][0]);
-    if((int)obj["Visible"][0] != 0) {
+    if(toBool(obj["Visible"][0])) {
       getUserGroundPoint();
     }
   }
 
 
-  IString MosaicFindTool::projectPvlObjectName() const {
+  QString MosaicFindTool::projectPvlObjectName() const {
     return "MosaicFindTool";
   }
 

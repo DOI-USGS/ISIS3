@@ -7,16 +7,16 @@
 using namespace std;
 using namespace Isis;
 
-void print(vector<string> in);
+void print(QStringList in);
 
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
   // SQLite database is in memory
-  std::string dbname(":memory:");
+  QString dbname(":memory:");
 
   Database testdb("unittestdb", "SQLite");
-  testdb.setDatabaseName(dbname.c_str());
+  testdb.setDatabaseName(dbname);
   if(!testdb.open()) {
     throw IException(IException::User, "Connection failed", _FILEINFO_);
   }
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
 }
 
 // Print contents of a vector<string> to console
-void print(vector<string> in) {
+void print(QStringList in) {
   cout << "[";
   for(int i = 0; i < (int)in.size(); i++) {
     cout << " " << in[i] << " ";

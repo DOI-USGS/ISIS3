@@ -34,7 +34,7 @@ using namespace std;
 
 namespace Isis {
 
-  std::string Database::_actualConnectionName = "";
+  QString Database::_actualConnectionName = "";
 
   /**
    * @brief Default database constructor
@@ -67,7 +67,7 @@ namespace Isis {
     _name = _actualConnectionName;
     if((dbConn == Connect) && isValid()) {
       if(!open()) {
-        string mess = "Failed to open database default database [" + _name;
+        QString mess = "Failed to open database default database [" + _name;
         tossDbError(mess, _FILEINFO_);
       }
     }
@@ -85,12 +85,12 @@ namespace Isis {
    * @param dbConn If Connect, an immediate connection is attempted, otherwise
    *               connection is deferred.
    */
-  Database::Database(const std::string &name, Database::Access dbConn) :
+  Database::Database(const QString &name, Database::Access dbConn) :
     QSqlDatabase(init(name)), _name(name) {
     _name = _actualConnectionName;
     if((dbConn == Connect) && isValid()) {
       if(!open()) {
-        string mess = "Failed to open database specified as " + _name;
+        QString mess = "Failed to open database specified as " + _name;
         tossDbError(mess, _FILEINFO_);
       }
     }
@@ -114,7 +114,7 @@ namespace Isis {
    * @param driverType Type of database to created.  This is typically MySQL,
    *                   PostgreSQL or SQLite.
    */
-  Database::Database(const std::string &connName, const std::string &driverType) :
+  Database::Database(const QString &connName, const QString &driverType) :
     QSqlDatabase(init(connName, driverType)), _name(connName) {
     _name = _actualConnectionName;
   }
@@ -140,7 +140,7 @@ namespace Isis {
     _name = _actualConnectionName;
     if((dbConn == Connect) && isValid()) {
       if(!open()) {
-        string mess = "Failed to open database with profile " + _name;
+        QString mess = "Failed to open database with profile " + _name;
         tossDbError(mess, _FILEINFO_);
       }
     }
@@ -156,8 +156,8 @@ namespace Isis {
    * @param other   Database to clone from this one
    * @param newName New name of the cloned database (it can't be the same name)
    */
-  Database::Database(const QSqlDatabase &other, const std::string &newName) :
-    QSqlDatabase(QSqlDatabase::cloneDatabase(other, IString::ToQt(newName))),
+  Database::Database(const QSqlDatabase &other, const QString &newName) :
+    QSqlDatabase(QSqlDatabase::cloneDatabase(other, newName)),
     _name(newName) {  }
 
 
@@ -264,7 +264,7 @@ namespace Isis {
    *
    * @param name Name of database to remove (and destroy)
    */
-  void Database::remove(const std::string &name)  {
+  void Database::remove(const QString &name)  {
     DatabaseFactory *factory = DatabaseFactory::getInstance();
     factory->destroy(name);
     return;
@@ -285,7 +285,7 @@ namespace Isis {
    * @return bool True if successful, false if the file could not be opened or an
    *         error was found in the file.
    */
-  bool Database::addAccessConfig(const std::string &confFile) {
+  bool Database::addAccessConfig(const QString &confFile) {
     DatabaseFactory *factory = DatabaseFactory::getInstance();
     return (factory->addAccessProfile(confFile));
   }
@@ -322,7 +322,7 @@ namespace Isis {
    * @return DbProfile Requested profile.  Test its validity using the
    *         DbProfile::isValid() method.
    */
-  DbProfile Database::getProfile(const std::string &name) {
+  DbProfile Database::getProfile(const QString &name) {
     DatabaseFactory *factory = DatabaseFactory::getInstance();
     return (factory->getProfile(name));
   }
@@ -353,8 +353,8 @@ namespace Isis {
    *
    * @return QSqlDatabase The created database
    */
-  QSqlDatabase Database::init(const std::string &connName,
-                              const std::string &driverType) {
+  QSqlDatabase Database::init(const QString &connName,
+                              const QString &driverType) {
 
     _actualConnectionName = connName;
     DatabaseFactory *factory = DatabaseFactory::getInstance();
@@ -362,7 +362,7 @@ namespace Isis {
     // First test for condition where both name and type are not provided.
     //  This tests for the default profile and returns it if it exists,
     // otherwise it returns a default database.
-    if(connName.empty() && driverType.empty()) {
+    if(connName.isEmpty() && driverType.isEmpty()) {
       if(factory->isAvailable(factory->getDefault())) {
         _actualConnectionName = factory->getDefault();
         return (factory->create(_actualConnectionName));
@@ -376,7 +376,7 @@ namespace Isis {
     }
 
     // If only the name and no driver is provided, get an existing connection
-    if((!connName.empty()) && (driverType.empty())) {
+    if((!connName.isEmpty()) && (driverType.isEmpty())) {
       if(factory->isAvailable(connName)) {
         _actualConnectionName = connName;
         return (factory->create(connName));
@@ -435,7 +435,7 @@ namespace Isis {
       //  Go ahead and connect if requested
       if(dbConn == Connect) {
         if(!db.open()) {
-          string mess = "Failed to connect to database using profile " +
+          QString mess = "Failed to connect to database using profile " +
                         profile("Name");
           tossDbError(mess, _FILEINFO_);
         }
@@ -443,11 +443,11 @@ namespace Isis {
       return (db);
     }
     catch(IException &ie) {
-      string mess = "Unable to create database from " + profile.Name();
+      QString mess = "Unable to create database from " + profile.Name();
       throw IException(ie, IException::User, mess, _FILEINFO_);
     }
     catch(...) {
-      string mess = "Unknown exception while creating database from profile "
+      QString mess = "Unknown exception while creating database from profile "
                     + profile.Name();
       throw IException(IException::User, mess, _FILEINFO_);
     }
@@ -467,34 +467,34 @@ namespace Isis {
    */
   void Database::configureAccess(QSqlDatabase &db, const DbProfile &profile) {
     if(profile.exists("Host")) {
-      db.setHostName(IString::ToQt(profile("Host")));
+      db.setHostName(profile("Host"));
     }
 
     if(profile.exists("DbName")) {
-      db.setDatabaseName(IString::ToQt(profile("DbName")));
+      db.setDatabaseName(profile("DbName"));
     }
 
     if(profile.exists("User")) {
-      db.setUserName(IString::ToQt(profile("User")));
+      db.setUserName(profile("User"));
     }
 
     if(profile.exists("Password")) {
-      db.setPassword(IString::ToQt(profile("Password")));
+      db.setPassword(profile("Password"));
     }
 
     if(profile.exists("Port")) {
       bool ok;
-      db.setPort(IString::ToQt(profile("Port")).toInt(&ok));
+      db.setPort(profile("Port").toInt(&ok));
       if(!ok) {
         ostringstream mess;
         mess << "Invalid port number [" << profile("Port") << "] in profile "
              << profile("Name") << ends;
-        throw IException(IException::User, mess.str(), _FILEINFO_);
+        throw IException(IException::User, mess.str().c_str(), _FILEINFO_);
       }
     }
 
     if(profile.exists("Options")) {
-      db.setConnectOptions(IString::ToQt(profile("Options")));
+      db.setConnectOptions(profile("Options"));
     }
     return;
   }
@@ -509,7 +509,7 @@ namespace Isis {
    *
    * @return The cloned Database
    */
-  Database Database::clone(const std::string &name) const {
+  Database Database::clone(const QString &name) const {
     return (Database(*this, name));
   }
 
@@ -519,10 +519,10 @@ namespace Isis {
    * This method returns a complete list of accessable tables within the database.
    * It is assumed the database connections is established and open.
    *
-   * @return std::vector<std::string>  List of tables in the database
+   * @return std::vector<QString>  List of tables in the database
    */
-  std::vector<std::string> Database::getTables() const {
-    return (IString::ToStd(tables(QSql::Tables)));
+  QStringList Database::getTables() const {
+    return (tables(QSql::Tables));
   }
 
   /**
@@ -531,11 +531,11 @@ namespace Isis {
    * This method returns a vector of strings with all views accessable to the user
    * in each element in the vector.
    *
-   * @return std::vector<std::string>  List of all accessable views in the
+   * @return std::vector<QString>  List of all accessable views in the
    *         database
    */
-  std::vector<std::string> Database::getViews() const {
-    return (IString::ToStd(tables(QSql::Views)));
+  QStringList Database::getViews() const {
+    return (tables(QSql::Views));
   }
 
   /**
@@ -544,10 +544,10 @@ namespace Isis {
    * This method returns a vector of strings containing a list of all system
    * tables accessable to the user within the database.
    *
-   * @return std::vector<std::string>  List of system tables with the database
+   * @return std::vector<QString>  List of system tables with the database
    */
-  std::vector<std::string> Database::getSystemTables() const {
-    return (IString::ToStd(tables(QSql::SystemTables)));
+  QStringList Database::getSystemTables() const {
+    return (tables(QSql::SystemTables));
   }
 
   /**
@@ -560,9 +560,9 @@ namespace Isis {
    * @param f        Name of method initiating the exception
    * @param l        Line number the error occured
    */
-  void Database::tossDbError(const std::string &message, const char *f, int l) const {
-    string errmess = message + " - DatabaseError = " +
-                     IString::ToStd(lastError().text());
+  void Database::tossDbError(const QString &message, const char *f, int l) const {
+    QString errmess = message + " - DatabaseError = " +
+                      lastError().text();
     throw IException(IException::Programmer, errmess, f, l);
   }
 

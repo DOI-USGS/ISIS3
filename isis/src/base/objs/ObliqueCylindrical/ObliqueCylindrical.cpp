@@ -104,17 +104,17 @@ namespace Isis {
 
       if (!calculateVectors) {
         // Read in vectors
-        m_xAxisVector.push_back(mapGroup["XAxisVector"][0]);
-        m_xAxisVector.push_back(mapGroup["XAxisVector"][1]);
-        m_xAxisVector.push_back(mapGroup["XAxisVector"][2]);
+        m_xAxisVector.push_back(toDouble(mapGroup["XAxisVector"][0]));
+        m_xAxisVector.push_back(toDouble(mapGroup["XAxisVector"][1]));
+        m_xAxisVector.push_back(toDouble(mapGroup["XAxisVector"][2]));
 
-        m_yAxisVector.push_back(mapGroup["YAxisVector"][0]);
-        m_yAxisVector.push_back(mapGroup["YAxisVector"][1]);
-        m_yAxisVector.push_back(mapGroup["YAxisVector"][2]);
+        m_yAxisVector.push_back(toDouble(mapGroup["YAxisVector"][0]));
+        m_yAxisVector.push_back(toDouble(mapGroup["YAxisVector"][1]));
+        m_yAxisVector.push_back(toDouble(mapGroup["YAxisVector"][2]));
 
-        m_zAxisVector.push_back(mapGroup["ZAxisVector"][0]);
-        m_zAxisVector.push_back(mapGroup["ZAxisVector"][1]);
-        m_zAxisVector.push_back(mapGroup["ZAxisVector"][2]);
+        m_zAxisVector.push_back(toDouble(mapGroup["ZAxisVector"][0]));
+        m_zAxisVector.push_back(toDouble(mapGroup["ZAxisVector"][1]));
+        m_zAxisVector.push_back(toDouble(mapGroup["ZAxisVector"][2]));
       }
       else {
         // Calculate the vectors and store them in the labels
@@ -148,16 +148,16 @@ namespace Isis {
           m_yAxisVector.push_back(pvec[1][i]); //Y[i]
           m_zAxisVector.push_back(pvec[2][i]); //Z[i]
 
-          mapGroup["XAxisVector"] += pvec[0][i]; //X[i]
-          mapGroup["YAxisVector"] += pvec[1][i]; //Y[i]
-          mapGroup["ZAxisVector"] += pvec[2][i]; //Z[i]
+          mapGroup["XAxisVector"] += toString(pvec[0][i]); //X[i]
+          mapGroup["YAxisVector"] += toString(pvec[1][i]); //Y[i]
+          mapGroup["ZAxisVector"] += toString(pvec[2][i]); //Z[i]
         }
       }
 
       init();
     }
     catch(IException &e) {
-      string message = "Invalid label group [Mapping]";
+      QString message = "Invalid label group [Mapping]";
       throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }
@@ -189,9 +189,9 @@ namespace Isis {
   /**
    * Returns the name of the map projection, "ObliqueCylindrical"
    *
-   * @return string Name of projection, "ObliqueCylindrical"
+   * @return QString Name of projection, "ObliqueCylindrical"
    */
-  string ObliqueCylindrical::Name() const {
+  QString ObliqueCylindrical::Name() const {
     return "ObliqueCylindrical";
   }
 
@@ -199,9 +199,9 @@ namespace Isis {
    * Returns the version of the map projection
    *
    *
-   * @return std::string Version number
+   * @return std::QString Version number
    */
-  string ObliqueCylindrical::Version() const {
+  QString ObliqueCylindrical::Version() const {
     return "1.0";
   }
 

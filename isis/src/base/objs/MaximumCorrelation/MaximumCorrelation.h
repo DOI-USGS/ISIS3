@@ -1,4 +1,4 @@
-#if !defined(MaximumCorrelation_h)
+#ifndef MaximumCorrelation_h
 #define MaximumCorrelation_h
 /**
  * @file
@@ -60,7 +60,7 @@ namespace Isis {
       virtual double IdealFit() const {
         return 1.0;
       };
-      virtual IString AlgorithmName() const {
+      virtual QString AlgorithmName() const {
         return "MaximumCorrelation";
       };
 

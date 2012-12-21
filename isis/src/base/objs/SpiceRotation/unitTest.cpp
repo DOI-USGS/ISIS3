@@ -19,25 +19,25 @@ int main(int argc, char *argv[]) {
   // Test case is taken from moc red wide angle image ab102401
   // sn = MGS/561812335:32/MOC-WA/RED
   Isis::FileName f("$base/testData/kernels");
-  string dir = f.expanded() + "/";
-  string naif(dir + "naif0007.tls");
-  string mgs(dir + "MGS_SCLKSCET.00045.tsc");
-  string mocti(dir + "moc13.ti");
-  string mocbc(dir + "moc.bc");
-  string mocbsp(dir + "moc.bsp");
-  string de(dir + "de405.bsp");
-  string pck(dir + "pck00006.tpc");
-  //string mocadd(dir+"mocAddendum.ti");
-  string mocspice(dir + "mocSpiceRotationUnitTest.ti");
-  furnsh_c(naif.c_str());
-  furnsh_c(mgs.c_str());
-  furnsh_c(mocti.c_str());
-  furnsh_c(mocbc.c_str());
-  furnsh_c(mocbsp.c_str());
-  furnsh_c(de.c_str());
-  furnsh_c(pck.c_str());
-//  furnsh_c(mocadd.c_str());
-  furnsh_c(mocspice.c_str());
+  QString dir = f.expanded() + "/";
+  QString naif(dir + "naif0007.tls");
+  QString mgs(dir + "MGS_SCLKSCET.00045.tsc");
+  QString mocti(dir + "moc13.ti");
+  QString mocbc(dir + "moc.bc");
+  QString mocbsp(dir + "moc.bsp");
+  QString de(dir + "de405.bsp");
+  QString pck(dir + "pck00006.tpc");
+  //QString mocadd(dir+"mocAddendum.ti");
+  QString mocspice(dir + "mocSpiceRotationUnitTest.ti");
+  furnsh_c(naif.toAscii().data());
+  furnsh_c(mgs.toAscii().data());
+  furnsh_c(mocti.toAscii().data());
+  furnsh_c(mocbc.toAscii().data());
+  furnsh_c(mocbsp.toAscii().data());
+  furnsh_c(de.toAscii().data());
+  furnsh_c(pck.toAscii().data());
+//  furnsh_c(mocadd.toAscii().data());
+  furnsh_c(mocspice.toAscii().data());
 
   double startTime = -69382819.0;
   double endTime = -69382512.0;

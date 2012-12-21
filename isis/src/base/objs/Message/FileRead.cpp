@@ -25,8 +25,6 @@ using namespace std;
 
 #include "Message.h"
 
-string Isis::Message::FileRead(const string &filename) {
-  string message;
-  message = "Unable to read [" + filename + "]";
-  return message;
+QString Isis::Message::FileRead(const QString &filename) {
+  return "Unable to read [" + filename + "]";
 }

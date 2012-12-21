@@ -9,27 +9,24 @@
 #include "Preference.h"
 #include "Table.h"
 
-//  Convenience list
-typedef std::vector<std::string>  StrList;
-
 using namespace std;
 using namespace Isis;
 
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
-  string inputFile = "data/VIR_IR_1A_1_332974737_1_HK.LBL";
+  QString inputFile = "data/VIR_IR_1A_1_332974737_1_HK.LBL";
   if (--argc == 1) { inputFile = argv[1]; }
 
   cout << "\n\nTesting ImportPdsTable class using file " << inputFile << "\n";
 
   ImportPdsTable myTable(inputFile);
   cout << "\n\nList of Columns found - Total: " << myTable.columns() << "\n";
-  StrList kfiles = myTable.getColumnNames();
-  copy(kfiles.begin(), kfiles.end(), ostream_iterator<std::string>(cout, "\n"));
+  QStringList kfiles = myTable.getColumnNames();
+  cout << kfiles.join("\n");
 
   cout << "\n\nNow without Name Conversion: \n";
   kfiles = myTable.getColumnNames(false);
-  copy(kfiles.begin(), kfiles.end(), ostream_iterator<std::string>(cout, "\n"));
+  cout << kfiles.join("\n") << endl;
 
   // Update/correct column types
   myTable.setType("ShutterStatus", "CHARACTER");
@@ -81,9 +78,9 @@ int main(int argc, char *argv[]) {
   // The following tests were added when the class was expanded to import binary
   // PDS tables also...
 
-  string pdsTableDir = "data/";
-  string pdsLabelFile = "";
-  string pdsTableFile = "";
+  QString pdsTableDir = "data/";
+  QString pdsLabelFile = "";
+  QString pdsTableFile = "";
 
   cout << "\n\n\nImport PDS table from PDS table exported as MSB...\n";
   pdsLabelFile = pdsTableDir + "msb_pds_binary_table.lbl";
@@ -98,10 +95,10 @@ int main(int argc, char *argv[]) {
   cout << isisTableFromMsb[0][2].name() << "\t";
   cout << isisTableFromMsb[0][3].name() << "\n";
   for (int i = 0; i < isisTableFromMsb.Records(); i++) {
-    cout << IString((double) isisTableFromMsb[i][0]) << "\t\t\t";
-    cout << IString((int)    isisTableFromMsb[i][1]) << "\t\t\t\t";
-    cout << IString((string) isisTableFromMsb[i][2]) << "\t\t\t";
-    cout << IString((float)  isisTableFromMsb[i][3]) << "\n";
+    cout << toString((double) isisTableFromMsb[i][0]) << "\t\t\t";
+    cout << toString((int)    isisTableFromMsb[i][1]) << "\t\t\t\t";
+    cout << QString(          isisTableFromMsb[i][2]) << "\t\t\t";
+    cout << toString((float)  isisTableFromMsb[i][3]) << "\n";
   }
 
   cout << "\n\n\nImport PDS table from PDS table exported as LSB...\n";
@@ -121,10 +118,10 @@ int main(int argc, char *argv[]) {
   cout << isisTableFromLsb[0][2].name() << "\t";
   cout << isisTableFromLsb[0][3].name() << "\n";
   for (int i = 0; i < isisTableFromLsb.Records(); i++) {
-    cout << IString((double) isisTableFromLsb[i][0]) << "\t\t\t";
-    cout << IString((int)    isisTableFromLsb[i][1]) << "\t\t\t\t";
-    cout << IString((string) isisTableFromLsb[i][2]) << "\t\t\t";
-    cout << IString((float)  isisTableFromLsb[i][3]) << "\n";
+    cout << toString((double) isisTableFromLsb[i][0]) << "\t\t\t";
+    cout << toString((int)    isisTableFromLsb[i][1]) << "\t\t\t\t";
+    cout << QString(          isisTableFromLsb[i][2]) << "\t\t\t";
+    cout << toString((float)  isisTableFromLsb[i][3]) << "\n";
   }
   cout << endl;
 
@@ -164,8 +161,8 @@ int main(int argc, char *argv[]) {
   // 3) importTable(vector<string> colNames, string tableName) - Unable to import the PDS table into Isis. The requested column name does not exist in the table.
   try {
     cout << "Throw error for attempt to export non-existant columns: " << endl;
-    vector<string> columnNames;
-    columnNames.push_back("Invalid Column Name");
+    QStringList columnNames;
+    columnNames.append("Invalid Column Name");
     myTable.importTable(columnNames, "VIR_DATA");
   }
   catch (IException &e) {
@@ -326,8 +323,8 @@ int main(int argc, char *argv[]) {
   cout << "rows = " << pdsLsbTable.rows()                    << endl;
   cout << "has double = " << pdsLsbTable.hasColumn("Double Value") << endl;
   cout << "col 1 name = " << pdsLsbTable.getColumnName(1)          << endl;
-  vector<string> names = pdsLsbTable.getColumnNames();
-  for (unsigned int i = 0; i < names.size(); i++) { 
+  QStringList names = pdsLsbTable.getColumnNames();
+  for (int i = 0; i < names.size(); i++) { 
     cout << names[i] << endl;
   }
   cout << "type Double Value column = " << pdsLsbTable.getType("Double Value") << endl;

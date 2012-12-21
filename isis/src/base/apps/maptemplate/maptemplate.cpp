@@ -39,8 +39,8 @@ void helperButtonLogRadius();
 void helperButtonCalcRange();
 double helperButtonCalcResolution();
 
-map <string, void *> GuiHelpers() {
-  map <string, void *> helper;
+map <QString, void *> GuiHelpers() {
+  map <QString, void *> helper;
   helper ["helperButtonLogMap"] = (void *) helperButtonLogMap;
   helper ["helperButtonLoadMap"] = (void *) helperButtonLoadMap;
   helper ["helperButtonLogTargDef"] = (void *) helperButtonLogTargDef;
@@ -64,7 +64,7 @@ void IsisMain() {
   // user didnt enter an extension
   UserInterface &ui = Application::GetUserInterface();
   FileName out = ui.GetFileName("MAP");
-  string output = ui.GetFileName("MAP");
+  QString output = ui.GetFileName("MAP");
   if(out.extension() == "") {
     output += ".map";
   }
@@ -76,12 +76,12 @@ void IsisMain() {
 //Helper function to output map file to log.
 void helperButtonLogMap() {
   UserInterface &ui = Application::GetUserInterface();
-  string mapFile(ui.GetFileName("MAP"));
+  QString mapFile(ui.GetFileName("MAP"));
   Pvl p;
   p.Read(mapFile);
   PvlGroup t = p.FindGroup("mapping", Pvl::Traverse);
-  string Ostring = "***** Output of [" + mapFile + "] *****";
-  Application::GuiLog(Ostring);
+  QString OQString = "***** Output of [" + mapFile + "] *****";
+  Application::GuiLog(OQString);
   Application::GuiLog(t);
 }
 //...........end of helper function LogMap ........
@@ -89,7 +89,7 @@ void helperButtonLogMap() {
 //Helper 2 function to update GUI with map file values.
 void helperButtonLoadMap() {
   UserInterface &ui = Application::GetUserInterface();
-  string mapFile(ui.GetFileName("MAP"));
+  QString mapFile(ui.GetFileName("MAP"));
   Pvl p;
   p.Read(mapFile);
   PvlGroup t = p.FindGroup("mapping", Pvl::Traverse);
@@ -104,8 +104,8 @@ void helperButtonLoadMap() {
   ui.Clear("PROT");
 
   if(t.HasKeyword("ProjectionName")) {
-    IString projIn = (string)t["ProjectionName"];
-    projIn.UpCase();
+    QString projIn = (QString)t["ProjectionName"];
+    projIn = projIn.toUpper();
     ui.Clear("PROJECTION");
     ui.PutAsString("PROJECTION", projIn);
   }
@@ -151,7 +151,7 @@ void helperButtonLoadMap() {
   }
 
 //Target Parameters stuff
-  string use = "IMAGE";
+  QString use = "IMAGE";
   ui.Clear("TARGOPT");
   ui.PutAsString("TARGOPT", use);
   ui.Clear("TARGDEF");
@@ -162,31 +162,31 @@ void helperButtonLoadMap() {
   ui.Clear("POLRADIUS");
 
   if(t.HasKeyword("TargetName")) {
-    string use = "USER";
+    QString use = "USER";
     ui.Clear("TARGOPT");
     ui.PutAsString("TARGOPT", use);
-    string tNameIn = t["TargetName"];
+    QString tNameIn = t["TargetName"];
     ui.Clear("TARGETNAME");
     ui.PutAsString("TARGETNAME", tNameIn);
 
-    IString LTIn = (string)t["LatitudeType"];
-    LTIn.UpCase();
+    QString LTIn = (QString)t["LatitudeType"];
+    LTIn = LTIn.toUpper();
     ui.Clear("LATTYPE");
     ui.PutAsString("LATTYPE", LTIn);
 
-    IString LDIn = (string)t["LongitudeDirection"];
-    LDIn.UpCase();
+    QString LDIn = (QString)t["LongitudeDirection"];
+    LDIn = LDIn.toUpper();
     ui.Clear("LONDIR");
     ui.PutAsString("LONDIR", LDIn);
 
-    string LDomIn = t["LongitudeDomain"];
+    QString LDomIn = t["LongitudeDomain"];
     ui.Clear("LONDOM");
     ui.PutAsString("LONDOM", LDomIn);
 
-    string EQIn = t["EquatorialRadius"];
+    QString EQIn = t["EquatorialRadius"];
     ui.Clear("EQRADIUS");
     ui.PutAsString("EQRADIUS", EQIn);
-    string PRIn = t["PolarRadius"];
+    QString PRIn = t["PolarRadius"];
     ui.Clear("POLRADIUS");
     ui.PutAsString("POLRADIUS", PRIn);
   }
@@ -195,13 +195,13 @@ void helperButtonLoadMap() {
   ui.Clear("MAXLAT");
   ui.Clear("MINLON");
   ui.Clear("MAXLON");
-  string useR = "IMAGE";
+  QString useR = "IMAGE";
   ui.Clear("RNGOPT");
   ui.PutAsString("RNGOPT", useR);
 
   if(t.HasKeyword("MinimumLatitude")) {
     double minlatIn = t["MinimumLatitude"];
-    string useR = "USER";
+    QString useR = "USER";
     ui.Clear("RNGOPT");
     ui.PutAsString("RNGOPT", useR);
     ui.Clear("MINLAT");
@@ -218,7 +218,7 @@ void helperButtonLoadMap() {
   }
 //Resolution Parameter stuff
   if(t.HasKeyword("PixelResolution")) {
-    string useM = "MPP";
+    QString useM = "MPP";
     ui.Clear("RESOPT");
     ui.PutAsString("RESOPT", useM);
     double pixresIn = t["PixelResolution"];
@@ -226,7 +226,7 @@ void helperButtonLoadMap() {
     ui.PutDouble("RESOLUTION", pixresIn);
   }
   if(t.HasKeyword("Scale")) {
-    string useM = "PPD";
+    QString useM = "PPD";
     ui.Clear("RESOPT");
     ui.PutAsString("RESOPT", useM);
     double Mscale = t["Scale"];
@@ -239,12 +239,12 @@ void helperButtonLoadMap() {
 //helper function to output targdef to log
 void helperButtonLogTargDef() {
   UserInterface &ui = Application::GetUserInterface();
-  string targetFile(ui.GetFileName("TARGDEF"));
+  QString targetFile(ui.GetFileName("TARGDEF"));
   Pvl p;
   p.Read(targetFile);
   PvlGroup t = p.FindGroup("mapping", Pvl::Traverse);
-  string Ostring = "***** Output of [" + targetFile + "] *****";
-  Application::GuiLog(Ostring);
+  QString OQString = "***** Output of [" + targetFile + "] *****";
+  Application::GuiLog(OQString);
   Application::GuiLog(t);
 }
 //------------End Helper function to display targdef info to log -----
@@ -252,45 +252,45 @@ void helperButtonLogTargDef() {
 //helper function to load target def. to GUI
 void helperButtonLoadTargDef() {
   UserInterface &ui = Application::GetUserInterface();
-  string targetFile(ui.GetFileName("TARGDEF"));
+  QString targetFile(ui.GetFileName("TARGDEF"));
 
 // test if targdef was entered
   Pvl p;
   p.Read(targetFile);
   PvlGroup t = p.FindGroup("mapping", Pvl::Traverse);
 //Load the targdef values into the GUI
-  string tOpt = "USER";
+  QString tOpt = "USER";
   ui.Clear("TARGOPT");
   ui.PutAsString("TARGOPT", tOpt);
   if(t.HasKeyword("TargetName")) {
-    string tNameIn = t["TargetName"];
+    QString tNameIn = t["TargetName"];
     ui.Clear("TARGETNAME");
     ui.PutAsString("TARGETNAME", tNameIn);
   }
   if(t.HasKeyword("LatitudeType")) {
-    IString LTIn = (string)t["LatitudeType"];
-    LTIn.UpCase();
+    QString LTIn = (QString)t["LatitudeType"];
+    LTIn = LTIn.toUpper();
     ui.Clear("LATTYPE");
     ui.PutAsString("LATTYPE", LTIn);
   }
   if(t.HasKeyword("LongitudeDirection")) {
-    IString LDIn = (string)t["LongitudeDirection"];
-    LDIn.UpCase();
+    QString LDIn = (QString)t["LongitudeDirection"];
+    LDIn = LDIn.toUpper();
     ui.Clear("LONDIR");
     ui.PutAsString("LONDIR", LDIn);
   }
   if(t.HasKeyword("LongitudeDomain")) {
-    string LDomIn = t["LongitudeDomain"];
+    QString LDomIn = t["LongitudeDomain"];
     ui.Clear("LONDOM");
     ui.PutAsString("LONDOM", LDomIn);
   }
   if(t.HasKeyword("EquatorialRadius")) {
-    string EQIn = t["EquatorialRadius"];
+    QString EQIn = t["EquatorialRadius"];
     ui.Clear("EQRADIUS");
     ui.PutAsString("EQRADIUS", EQIn);
   }
   if(t.HasKeyword("PolarRadius")) {
-    string PRIn = t["PolarRadius"];
+    QString PRIn = t["PolarRadius"];
     ui.Clear("POLRADIUS");
     ui.PutAsString("POLRADIUS", PRIn);
   }
@@ -300,14 +300,14 @@ void helperButtonLoadTargDef() {
 //Helper function to show system radius in log.
 void helperButtonLogRadius() {
   UserInterface &ui = Application::GetUserInterface();
-  IString targetName = ui.GetString("TARGETNAME");
+  QString targetName = ui.GetString("TARGETNAME");
   Pvl tMap;
 //call function to get system radius
   PvlGroup tGrp = Projection::TargetRadii(targetName);
   tMap.AddGroup(tGrp);
-  string Ostring = "***** System radii for " + targetName + "*****";
-//writh to log string(Ostring and mapping group
-  Application::GuiLog(Ostring);
+  QString OQString = "***** System radii for " + targetName + "*****";
+//writh to log QString(OQString and mapping group
+  Application::GuiLog(OQString);
   Application::GuiLog(tMap);
 }
 //-----------end ot log radius helper function---------
@@ -322,7 +322,7 @@ void helperButtonCalcRange() {
 // Run the function calcRange of calculate range info
   calcRange(minLat, maxLat, minLon, maxLon);
 // Write ranges to the GUI
-  string use = "USER";
+  QString use = "USER";
   ui.Clear("RNGOPT");
   ui.PutAsString("RNGOPT", use);
   ui.Clear("MINLAT");
@@ -342,7 +342,7 @@ double helperButtonCalcResolution() {
 // Call calcResolution which will return a double
   double Res = calcResolution();
 //update the GUI with the new resolution
-  string resUse = "MPP";
+  QString resUse = "MPP";
   ui.Clear("RESOPT");
   ui.PutAsString("RESOPT", resUse);
   ui.Clear("RESOLUTION");
@@ -354,9 +354,9 @@ double helperButtonCalcResolution() {
 // Function to Add the projection information to the Mapping PVL
 void addProject(PvlGroup &mapping) {
   UserInterface &ui = Application::GetUserInterface();
-  IString projName = ui.GetString("PROJECTION");
+  QString projName = ui.GetString("PROJECTION");
 //setup a look up table for projection names
-  map <IString, IString> projLUT;
+  map <QString, QString> projLUT;
   projLUT ["SINUSOIDAL"] = "Sinusoidal";
   projLUT ["MERCATOR"] = "Mercator";
   projLUT ["TRANSVERSEMERCATOR"] = "TransverseMercator";
@@ -371,35 +371,35 @@ void addProject(PvlGroup &mapping) {
   mapping += PvlKeyword("ProjectionName", projLUT[projName]);
   if(ui.WasEntered("CLON")) {
     double clonOut = ui.GetDouble("CLON");
-    mapping += PvlKeyword("CenterLongitude", clonOut);
+    mapping += PvlKeyword("CenterLongitude", toString(clonOut));
   }
   if(ui.WasEntered("CLAT")) {
     double clatOut = ui.GetDouble("CLAT");
-    mapping += PvlKeyword("CenterLatitude", clatOut);
+    mapping += PvlKeyword("CenterLatitude", toString(clatOut));
   }
   if(ui.WasEntered("SCALEFACTOR")) {
     double scaleFactorOut = ui.GetDouble("SCALEFACTOR");
-    mapping += PvlKeyword("ScaleFactor", scaleFactorOut);
+    mapping += PvlKeyword("ScaleFactor", toString(scaleFactorOut));
   }
   if(ui.WasEntered("PAR1")) {
     double par1 = ui.GetDouble("PAR1");
-    mapping += PvlKeyword("FirstStandardParallel", par1);
+    mapping += PvlKeyword("FirstStandardParallel", toString(par1));
   }
   if(ui.WasEntered("PAR2")) {
     double par2 = ui.GetDouble("PAR2");
-    mapping += PvlKeyword("SecondStandardParallel", par2);
+    mapping += PvlKeyword("SecondStandardParallel", toString(par2));
   }
   if(ui.WasEntered("PLAT")) {
     double plat = ui.GetDouble("PLAT");
-    mapping += PvlKeyword("PoleLatitude", plat);
+    mapping += PvlKeyword("PoleLatitude", toString(plat));
   }
   if(ui.WasEntered("PLON")) {
     double plon = ui.GetDouble("PLON");
-    mapping += PvlKeyword("PoleLongitude", plon);
+    mapping += PvlKeyword("PoleLongitude", toString(plon));
   }
   if(ui.WasEntered("PROT")) {
     double prot = ui.GetDouble("PROT");
-    mapping += PvlKeyword("PoleRotation", prot);
+    mapping += PvlKeyword("PoleRotation", toString(prot));
   }
 }
 
@@ -407,7 +407,7 @@ void addProject(PvlGroup &mapping) {
 void addTarget(PvlGroup &mapping) {
   UserInterface &ui = Application::GetUserInterface();
   if(ui.GetString("TARGOPT") == "SYSTEM") {
-    string targetFile(ui.GetFileName("TARGDEF"));
+    QString targetFile(ui.GetFileName("TARGDEF"));
     Pvl p;
     p.Read(targetFile);
     PvlGroup t = p.FindGroup("mapping");
@@ -430,7 +430,7 @@ void addTarget(PvlGroup &mapping) {
 // if TARGOPT is user and no radii enter the run TargetRadii to get
 // the system radii for target name.
   else if(ui.GetString("TARGOPT") == "USER") {
-    IString targetName = ui.GetString("TARGETNAME");
+    QString targetName = ui.GetString("TARGETNAME");
     PvlGroup grp = Projection::TargetRadii(targetName);
     double equatorialRad = grp["EquatorialRadius"];
     double polarRad = grp["PolarRadius"];
@@ -441,25 +441,25 @@ void addTarget(PvlGroup &mapping) {
     if(ui.WasEntered("POLRADIUS")) {
       polarRad = ui.GetDouble("POLRADIUS");
     }
-    IString latType = ui.GetString("LATTYPE");
+    QString latType = ui.GetString("LATTYPE");
     if(latType == "PLANETOCENTRIC") {
       latType = "Planetocentric";
     }
     else if(latType == "PLANETOGRAPHIC") {
       latType = "Planetographic";
     }
-    IString lonDir = ui.GetString("LONDIR");
+    QString lonDir = ui.GetString("LONDIR");
     if(lonDir == "POSITIVEEAST") {
       lonDir = "PositiveEast";
     }
     else if(lonDir == "POSITIVEWEST") {
       lonDir = "PositiveWest";
     }
-    IString lonDom = ui.GetString("LONDOM");
+    QString lonDom = ui.GetString("LONDOM");
 //Add targdef values to the mapping pvl
     mapping += PvlKeyword("TargetName", targetName);
-    mapping += PvlKeyword("EquatorialRadius", equatorialRad, "meters");
-    mapping += PvlKeyword("PolarRadius", polarRad, "meters");
+    mapping += PvlKeyword("EquatorialRadius", toString(equatorialRad), "meters");
+    mapping += PvlKeyword("PolarRadius", toString(polarRad), "meters");
     mapping += PvlKeyword("LatitudeType", latType);
     mapping += PvlKeyword("LongitudeDirection", lonDir);
     mapping += PvlKeyword("LongitudeDomain", lonDom);
@@ -472,13 +472,13 @@ void addRange(PvlGroup &mapping) {
 //Use the values that have been entered in the GUI
   if(ui.GetString("RNGOPT") == "USER") {
     double minLat = ui.GetDouble("MINLAT");
-    mapping += PvlKeyword("MinimumLatitude", minLat);
+    mapping += PvlKeyword("MinimumLatitude", toString(minLat));
     double maxLat = ui.GetDouble("MAXLAT");
-    mapping += PvlKeyword("MaximumLatitude", maxLat);
+    mapping += PvlKeyword("MaximumLatitude", toString(maxLat));
     double minLon = ui.GetDouble("MINLON");
-    mapping += PvlKeyword("MinimumLongitude", minLon);
+    mapping += PvlKeyword("MinimumLongitude", toString(minLon));
     double maxLon = ui.GetDouble("MAXLON");
-    mapping += PvlKeyword("MaximumLongitude", maxLon);
+    mapping += PvlKeyword("MaximumLongitude", toString(maxLon));
   }
   else if(ui.GetString("RNGOPT") == "CALC") {
 // calculate range values using function calcRange and fromlist
@@ -488,10 +488,10 @@ void addRange(PvlGroup &mapping) {
     double maxLon;
 //Call calcRange to calculate min and max ground range values
     calcRange(minLat, maxLat, minLon, maxLon);
-    mapping += PvlKeyword("MinimumLatitude", minLat);
-    mapping += PvlKeyword("MaximumLatitude", maxLat);
-    mapping += PvlKeyword("MinimumLongitude", minLon);
-    mapping += PvlKeyword("MaximumLongitude", maxLon);
+    mapping += PvlKeyword("MinimumLatitude", toString(minLat));
+    mapping += PvlKeyword("MaximumLatitude", toString(maxLat));
+    mapping += PvlKeyword("MinimumLongitude", toString(minLon));
+    mapping += PvlKeyword("MaximumLongitude", toString(maxLon));
   }
 }
 
@@ -501,16 +501,16 @@ void addResolution(PvlGroup &mapping) {
   UserInterface &ui = Application::GetUserInterface();
   if(ui.GetString("RESOPT") == "PPD") {
     double res = ui.GetDouble("RESOLUTION");
-    mapping += PvlKeyword("Scale", IString(res), "pixels/degree");
+    mapping += PvlKeyword("Scale", toString(res), "pixels/degree");
   }
   else if(ui.GetString("RESOPT") == "MPP") {
     double res = ui.GetDouble("RESOLUTION");
-    mapping += PvlKeyword("PixelResolution", IString(res), "meters/pixel");
+    mapping += PvlKeyword("PixelResolution", toString(res), "meters/pixel");
   }
   else if(ui.GetString("RESOPT") == "CALC") {
 // run the function to calculate the resolution
     double Res = calcResolution();
-    mapping += PvlKeyword("PixelResolution", Res, "meters/pixel");
+    mapping += PvlKeyword("PixelResolution", toString(Res), "meters/pixel");
   }
 }
 
@@ -532,7 +532,7 @@ void calcRange(double &minLat, double &maxLat,
   }
   else if(ui.GetString("TARGOPT") == "USER") {
     userGrp += PvlKeyword("TargetName", ui.GetString("TARGETNAME"));
-    IString targetName = ui.GetString("TARGETNAME");
+    QString targetName = ui.GetString("TARGETNAME");
     PvlGroup grp = Projection::TargetRadii(targetName);
     double equatorialRad = grp["EquatorialRadius"];
     double polarRad = grp["PolarRadius"];
@@ -545,24 +545,24 @@ void calcRange(double &minLat, double &maxLat,
       polarRad = ui.GetDouble("POLRADIUS");
     }
     if(ui.GetString("LATTYPE") == "PLANETOCENTRIC") {
-      string latType = "Planetocentric";
+      QString latType = "Planetocentric";
       userGrp += PvlKeyword("LatitudeType", latType);
     }
     else if(ui.GetString("LATTYPE") == "PLANETOGRAPHIC") {
-      string latType = "Planetographic";
+      QString latType = "Planetographic";
       userGrp += PvlKeyword("LatitudeType", latType);
     }
     if(ui.GetString("LONDIR") == "POSITIVEEAST") {
-      string lonD = "PositiveEast";
+      QString lonD = "PositiveEast";
       userGrp += PvlKeyword("LongitudeDirection", lonD);
     }
     else if(ui.GetString("LONDIR") == "POSITIVEWEST") {
-      string lonD = "PositiveWest";
+      QString lonD = "PositiveWest";
       userGrp += PvlKeyword("LongitudeDirection", lonD);
     }
     userGrp += PvlKeyword("LongitudeDomain", ui.GetString("LONDOM"));
-    userGrp += PvlKeyword("EquatorialRadius", equatorialRad);
-    userGrp += PvlKeyword("PolarRadius", polarRad);
+    userGrp += PvlKeyword("EquatorialRadius", toString(equatorialRad));
+    userGrp += PvlKeyword("PolarRadius", toString(polarRad));
     userMap.AddGroup(userGrp);
   }
 

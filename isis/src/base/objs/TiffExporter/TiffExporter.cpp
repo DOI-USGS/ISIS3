@@ -5,6 +5,7 @@
 #include "Buffer.h"
 #include "FileName.h"
 #include "IException.h"
+#include "IString.h"
 
 using namespace Isis;
 
@@ -63,7 +64,7 @@ namespace Isis {
    */
   void TiffExporter::write(FileName outputName, int quality) {
     // Open the output image
-    m_image = TIFFOpen(outputName.expanded().c_str(), "w");
+    m_image = TIFFOpen(outputName.expanded().toAscii().data(), "w");
 
     if (m_image == NULL) {
       throw IException(IException::Programmer,
@@ -113,7 +114,7 @@ namespace Isis {
         break;
       default:
         throw IException(IException::Programmer,
-            "Invalid pixel type for data [" + IString(type) + "]",
+            "Invalid pixel type for data [" + toString(type) + "]",
             _FILEINFO_);
     }
   }
@@ -139,7 +140,7 @@ namespace Isis {
    *
    * @return True if "tiff", false otherwise
    */
-  bool TiffExporter::canWriteFormat(IString format) {
+  bool TiffExporter::canWriteFormat(QString format) {
     return format == "tiff";
   }
 };

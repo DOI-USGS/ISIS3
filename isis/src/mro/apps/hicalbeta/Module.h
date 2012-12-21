@@ -1,4 +1,4 @@
-#if !defined(Module_h)
+#ifndef Module_h
 #define Module_h
 /**
  * @file
@@ -62,13 +62,13 @@ namespace Isis {
       //  Constructors and Destructor
       Module() : _name("Module"), _csvFile(""), _data(), _history(),
                   _fmtWidth(DefaultWidth),  _fmtPrecision(DefaultPrecision) { }
-      Module(const std::string &name) : _name(name), _csvFile(""), _data(),
+      Module(const QString &name) : _name(name), _csvFile(""), _data(),
                  _history(),_fmtWidth(DefaultWidth),
                  _fmtPrecision(DefaultPrecision) { }
-      Module(const std::string &name, const HiHistory &history) :
+      Module(const QString &name, const HiHistory &history) :
                 _name(name), _csvFile(""), _data(), _history(history),
                 _fmtWidth(DefaultWidth),  _fmtPrecision(DefaultPrecision) { }
-      Module(const std::string &name, const Module &c) : _name(name),
+      Module(const QString &name, const Module &c) : _name(name),
                 _csvFile(c._csvFile), _data(c._data), _history(c._history),
                 _fmtWidth(c._fmtWidth),_fmtPrecision(c._fmtPrecision) { }
       Module(const Module &c) : _name(c._name), _csvFile(c._csvFile),
@@ -81,9 +81,9 @@ namespace Isis {
       virtual ~Module() { }
 
       /** Returns name of component */
-      inline std::string name() const { return (_name); }
+      inline QString name() const { return (_name); }
       /** Returns expanded name of last CSV file loaded by loadCsv */
-      inline std::string getcsvFile() const { return (_csvFile); }
+      inline QString getcsvFile() const { return (_csvFile); }
       /** Returns the size (number of elements) of data array */
       inline int size() const { return (_data.dim()); }
 
@@ -113,7 +113,7 @@ namespace Isis {
        *
        * @return HiVector
        */
-      HiVector loadCsv(const std::string &csvBase, const HiCalConf &conf,
+      HiVector loadCsv(const QString &csvBase, const HiCalConf &conf,
                        const DbProfile &prof, const int &elements = 0)  {
         LoadCSV csv(csvBase, conf, prof);
         _csvFile = csv.filename();
@@ -132,7 +132,7 @@ namespace Isis {
 
       /** Record history in Pvl group object */
       virtual void record(PvlGroup &pvl,
-                          const std::string keyname = "ModuleHistory")
+                          const QString keyname = "ModuleHistory")
                           const {
         pvl += _history.makekey(keyname);
         return;
@@ -143,12 +143,12 @@ namespace Isis {
        *
        * @param fname  Name of file to dump contents to
        */
-      void Dump(const std::string &fname) const {
+      void Dump(const QString &fname) const {
         FileName dumpc(fname);
-        std::string dumpcFile = dumpc.expanded();
-        std::ofstream ofile(dumpcFile.c_str(), std::ios::out);
+        QString dumpcFile = dumpc.expanded();
+        std::ofstream ofile(dumpcFile.toAscii().data(), std::ios::out);
         if (!ofile) {
-          std::string mess = "Unable to open/create module dump file " +
+          QString mess = "Unable to open/create module dump file " +
                              dumpc.expanded();
           throw IException(IException::User, mess, _FILEINFO_);
         }
@@ -161,8 +161,8 @@ namespace Isis {
     protected:
       enum { DefaultWidth = 10, DefaultPrecision = 6};
 
-      std::string   _name;         //!< Name of component
-      std::string   _csvFile;      //!< Fully expanded name of CSV file if present
+      QString   _name;         //!< Name of component
+      QString   _csvFile;      //!< Fully expanded name of CSV file if present
       HiVector      _data;         //!< Data vector
       HiHistory     _history;      //!< Hierarchial component history
       int           _fmtWidth;     //!< Default field with of double
@@ -181,16 +181,16 @@ namespace Isis {
        * @param[in] (int) prec  Precision used to format the value
        * @return (string) Formatted double value
        */
-      inline std::string formatDbl(const double &value) const {
+      inline QString formatDbl(const double &value) const {
         std::ostringstream ostr;
         if (IsSpecial(value)) {
           ostr << std::setw(_fmtWidth) << PixelToString(value);
-          return (std::string(ostr.str()));
+          return (QString(ostr.str().c_str()));
         }
         else {
         // Its not special so format to callers specs
           ostr << std::setw(_fmtWidth) << std::setprecision(_fmtPrecision) << value;
-          return (std::string(ostr.str()));
+          return (QString(ostr.str().c_str()));
         }
       }
 

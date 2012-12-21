@@ -555,7 +555,7 @@ namespace Isis {
    */
   BigInt Histogram::BinCount(const int index) const {
     if ((index < 0) || (index >= (int)p_bins.size())) {
-      string message = Message::ArraySubscriptNotInRange(index);
+      QString message = Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
@@ -577,7 +577,7 @@ namespace Isis {
   void Histogram::BinRange(const int index,
                            double &low, double &high) const {
     if ((index < 0) || (index >= (int)p_bins.size())) {
-      string message = Message::ArraySubscriptNotInRange(index);
+      QString message = Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
@@ -597,7 +597,7 @@ namespace Isis {
    */
   double Histogram::BinMiddle(const int index) const {
     if ((index < 0) || (index >= (int)p_bins.size())) {
-      string message = Message::ArraySubscriptNotInRange(index);
+      QString message = Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 

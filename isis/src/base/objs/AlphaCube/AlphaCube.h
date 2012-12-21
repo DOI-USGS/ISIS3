@@ -20,7 +20,7 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#if !defined(AlphaCube_h)
+#ifndef AlphaCube_h
 #define AlphaCube_h
 
 #include "Pvl.h"

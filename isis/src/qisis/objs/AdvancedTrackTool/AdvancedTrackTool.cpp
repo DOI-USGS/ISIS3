@@ -284,10 +284,10 @@ namespace Isis {
 
     // Write out the path, filename, and serial number
     FileName fname = FileName(cvp->cube()->getFileName()).expanded();
-    std::string fnamePath = fname.path();
-    std::string fnameName = fname.name();
-    p_tableWin->table()->item(row, PATH)->setText(fnamePath.c_str());
-    p_tableWin->table()->item(row, FILENAME)->setText(fnameName.c_str());
+    QString fnamePath = fname.path();
+    QString fnameName = fname.name();
+    p_tableWin->table()->item(row, PATH)->setText(fnamePath);
+    p_tableWin->table()->item(row, FILENAME)->setText(fnameName);
     //p_tableWin->table()->item(row,34)->setText(SerialNumber::Compose(*cvp->cube()).c_str());
 
     // If we are outside of the image then we are done
@@ -299,13 +299,13 @@ namespace Isis {
 
     // Otherwise write out col 4 (Pixel value)
     if(cvp->isGray()) {
-      std::string grayPixel = PixelToString(cvp->grayPixel(isample, iline));
-      QString p = grayPixel.c_str();
+      QString grayPixel = PixelToString(cvp->grayPixel(isample, iline));
+      QString p = grayPixel;
       p_tableWin->table()->item(row, PIXEL)->setText(p);
     }
     else {
-      std::string redPixel = PixelToString(cvp->redPixel(isample, iline));
-      QString p = redPixel.c_str();
+      QString redPixel = PixelToString(cvp->redPixel(isample, iline));
+      QString p = redPixel;
       p_tableWin->table()->item(row, PIXEL)->setText(p);
     }
 
@@ -401,8 +401,8 @@ namespace Isis {
       // Always write out columns et and utc
       iTime time(cvp->camera()->time());
       p_tableWin->table()->item(row, EPHEMERIS_TIME)->setText(QString::number(time.Et(), 'f', 15));
-      std::string time_utc = time.UTC();
-      p_tableWin->table()->item(row, UTC)->setText(time_utc.c_str());
+      QString time_utc = time.UTC();
+      p_tableWin->table()->item(row, UTC)->setText(time_utc);
 
       // Always out columns spacecraft position
       double pos[3];
@@ -455,13 +455,13 @@ namespace Isis {
 
     // Track the Mosaic Origin -  Index (Zero based) and FileName
     int iMosaicOrigin = -1;
-    std::string sSrcFileName = "";
-    std::string sSrcSerialNum = "";
+    QString sSrcFileName = "";
+    QString sSrcSerialNum = "";
     TrackMosaicOrigin(cvp, iline, isample, iMosaicOrigin, sSrcFileName, sSrcSerialNum);
     p_tableWin->table()->item(row, TRACK_MOSAIC_INDEX)->setText(QString::number(iMosaicOrigin));
-    p_tableWin->table()->item(row, TRACK_MOSAIC_FILENAME)->setText(QString(sSrcFileName.c_str()));
+    p_tableWin->table()->item(row, TRACK_MOSAIC_FILENAME)->setText(QString(sSrcFileName));
     p_tableWin->table()->item(row, TRACK_MOSAIC_SERIAL_NUM)->
-                         setText(QString(sSrcSerialNum.c_str()));
+                         setText(QString(sSrcSerialNum));
   }
 
 
@@ -482,8 +482,8 @@ namespace Isis {
    * @return void
    */
   void AdvancedTrackTool::TrackMosaicOrigin(MdiCubeViewport *cvp, int piLine,
-      int piSample, int &piOrigin, std::string &psSrcFileName,
-      std::string &psSrcSerialNum) {
+      int piSample, int &piOrigin, QString &psSrcFileName,
+      QString &psSrcSerialNum) {
     Cube *cCube = cvp->cube();
     int iTrackBand = -1;
 
@@ -527,8 +527,8 @@ namespace Isis {
         cCube->read(cFileTable);
         int iRecs =   cFileTable.Records();
         if(piOrigin >= 0 && piOrigin < iRecs) {
-          psSrcFileName = std::string(cFileTable[piOrigin][0]);
-          psSrcSerialNum = std::string(cFileTable[piOrigin][1]);
+          psSrcFileName = QString(cFileTable[piOrigin][0]);
+          psSrcSerialNum = QString(cFileTable[piOrigin][1]);
         }
       }
     }
@@ -693,6 +693,6 @@ namespace Isis {
     FileName config(FileName("$HOME/.Isis/" + QApplication::applicationName() + "/").path() + "/" +
                     "advancedTrackTool.config");
     
-    return config.expanded().ToQt();
+    return config.expanded();
   }
 }

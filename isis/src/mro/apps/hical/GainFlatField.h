@@ -1,4 +1,4 @@
-#if !defined(GainFlatField_h)
+#ifndef GainFlatField_h
 #define GainFlatField_h
 /**                                                                       
  * @file                                                                  
@@ -74,7 +74,7 @@ namespace Isis {
       const Statistics &Stats() const { return (_stats); }
 
     private:
-      std::string _amatrix;
+      QString _amatrix;
       Statistics _stats;      // Stats Results
 
       void init(const HiCalConf &conf) {

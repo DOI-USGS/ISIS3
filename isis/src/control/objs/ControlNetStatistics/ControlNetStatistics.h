@@ -9,8 +9,6 @@
 #include "SerialNumberList.h"
 #include "Statistics.h"
 
-using namespace std;
-
 /**
  * @file
  * $Revision: $
@@ -53,7 +51,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2010-08-24 Sharmila Prasad Original version
-   *   @history 2010-09-16 Sharmila Prasad Added individual image maps for each
+   *   @history 2010-09-16 Sharmila Prasad Added individual image std::maps for each
    *                                       Point stats to correct segmentation
    *                                       faults.
    *   @history 2010-10-26 Tracie Sucharski Added missing includes to cpp after
@@ -76,7 +74,7 @@ namespace Isis {
   class ControlNetStatistics {
     public:
       //! Constructor
-      ControlNetStatistics(ControlNet *pCNet, const string &psSerialNumFile, Progress *pProgress = 0);
+      ControlNetStatistics(ControlNet *pCNet, const QString &psSerialNumFile, Progress *pProgress = 0);
 
       //! Constructor
       ControlNetStatistics(ControlNet *pCNet, Progress *pProgress = 0);
@@ -108,13 +106,13 @@ namespace Isis {
       void GenerateImageStats();
 
       //! Print the Image Stats into specified output file
-      void PrintImageStats(const string &psImageFile);
+      void PrintImageStats(const QString &psImageFile);
 
       //! Returns the Image Stats by Serial Number
-      vector<double> GetImageStatsBySerialNum(string psSerialNum) const;
+      std::vector<double> GetImageStatsBySerialNum(QString psSerialNum) const;
 
       //! Generate stats like Ignored, Fixed, Total Measures, Ignored by Control Point
-      void GeneratePointStats(const string &psPointFile);
+      void GeneratePointStats(const QString &psPointFile);
 
       //! Generate the Control Net Stats into the PvlGroup
       void GenerateControlNetStats(PvlGroup &pStatsGrp);
@@ -246,10 +244,10 @@ namespace Isis {
       QList<ControlCubeGraphNode *> mCubeGraphNodes;
 
     private:
-      map<int, int> mPointIntStats;           //!< Contains map of different count stats
-      map<int, double> mPointDoubleStats;     //!< Contains map of different computed stats
-      map<string, vector<double> > mImageMap; //!< Contains stats by Image/Serial Num
-      map<string, bool> mSerialNumMap;        //!< Whether serial# is part of ControlNet
+      std::map<int, int> mPointIntStats;           //!< Contains std::map of different count stats
+      std::map<int, double> mPointDoubleStats;     //!< Contains std::map of different computed stats
+      std::map<QString, std::vector<double> > mImageMap; //!< Contains stats by Image/Serial Num
+      std::map<QString, bool> mSerialNumMap;        //!< Whether serial# is part of ControlNet
 
       //! Get point count stats
       void GetPointIntStats();
@@ -261,10 +259,10 @@ namespace Isis {
                              ePointDoubleStats min,
                              ePointDoubleStats max);
 
-      //! Init Pointstats vector
+      //! Init Pointstats std::vector
       void InitPointDoubleStats();
 
-      //! Init SerialNum map
+      //! Init SerialNum std::map
       void InitSerialNumMap();
 
       int numCNetImages;

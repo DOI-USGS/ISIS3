@@ -4,8 +4,7 @@
 
 #include <QList>
 
-using namespace Isis;
-
+#include "IString.h"
 
 namespace Isis {
   /**
@@ -56,7 +55,7 @@ namespace Isis {
         break;
       default:
         throw IException(IException::Programmer,
-            "Invalid export pixel type [" + IString(type) + "]",
+            "Invalid export pixel type [" + toString(type) + "]",
             _FILEINFO_);
     }
   }

@@ -65,7 +65,7 @@ class MyShape : public DemShape {
 
 int main() {
   Preference::Preferences(true);
-  string inputFile = "$mgs/testData/ab102401.cub";
+  QString inputFile = "$mgs/testData/ab102401.cub";
   Cube cube;
   cube.open(inputFile);
   Camera *c = cube.getCamera();
@@ -183,8 +183,8 @@ Local normal = -0.581842, -0.703663, 0.407823
   try {
     Pvl elPvl;
     PvlGroup kernels = pvl.FindGroup("Kernels", Pvl::Traverse);
-    IString demCubeFile;
-    demCubeFile = (std::string) kernels["ShapeModel"];
+    QString demCubeFile;
+    demCubeFile = (QString) kernels["ShapeModel"];
     kernels.DeleteKeyword("ShapeModel");
     PvlKeyword shapeKey("ElevationModel", demCubeFile);
     kernels.AddKeyword(shapeKey);

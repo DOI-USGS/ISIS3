@@ -140,7 +140,7 @@ namespace Isis {
                          const double maximum);
       void SetInputRange(const double minimum, const double middle,
                          const double maximum, const int index);
-      void CreateWorldFile(const std::string &worldFile);
+      void CreateWorldFile(const QString &worldFile);
       void SetOutputEndian(enum ByteOrder endianness);
       void SetOutputType(Isis::PixelType pixelIn);
 

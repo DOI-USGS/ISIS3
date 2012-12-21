@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <QFile>
+
 #include "Application.h"
 #include "Cube.h"
 #include "FileList.h"
@@ -17,35 +19,35 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   FileList cubes;
   cubes.read(ui.GetFileName("FROMLIST"));
-  string PRIORITY = ui.GetString("PRIORITY");
-  string HNS1 = ui.GetAsString("HNS1");
-  string HNL1 = ui.GetAsString("HNL1");
-  string HNS2 = ui.GetAsString("HNS2");
-  string HNL2 = ui.GetAsString("HNL2");
-  string LNS = ui.GetAsString("LNS");
-  string LNL = ui.GetAsString("LNL");
-  string GRANGE = ui.GetString("GRANGE");
-  string MINLAT, MAXLAT, MINLON, MAXLON;
+  QString PRIORITY = ui.GetString("PRIORITY");
+  QString HNS1 = ui.GetAsString("HNS1");
+  QString HNL1 = ui.GetAsString("HNL1");
+  QString HNS2 = ui.GetAsString("HNS2");
+  QString HNL2 = ui.GetAsString("HNL2");
+  QString LNS = ui.GetAsString("LNS");
+  QString LNL = ui.GetAsString("LNL");
+  QString GRANGE = ui.GetString("GRANGE");
+  QString MINLAT, MAXLAT, MINLON, MAXLON;
   if(GRANGE == "USER") {
     MINLAT = ui.GetAsString("MINLAT");
     MAXLAT = ui.GetAsString("MAXLAT");
     MINLON = ui.GetAsString("MINLON");
     MAXLON = ui.GetAsString("MAXLON");
   }
-  string MATCHBANDBIN = ui.GetAsString("MATCHBANDBIN");
+  QString MATCHBANDBIN = ui.GetAsString("MATCHBANDBIN");
 
   // Sets up the pathName to be used for most application calls
-  string pathName = FileName("$TEMPORARY/").path() + "/";
-  string cubeListBaseName = pathName + FileName(ui.GetFileName("FROMLIST")).baseName();
+  QString pathName = FileName("$TEMPORARY/").path() + "/";
+  QString cubeListBaseName = pathName + FileName(ui.GetFileName("FROMLIST")).baseName();
 
   //Creates the first highpass cubes
   std::ofstream firstHighPassList;
-  string firstHighPass(cubeListBaseName + "_FirstHighPassList.lis");
-  firstHighPassList.open(firstHighPass.c_str());
+  QString firstHighPass(cubeListBaseName + "_FirstHighPassList.lis");
+  firstHighPassList.open(firstHighPass.toAscii().data());
   for (int i = 0; i < cubes.size(); i++) {
     FileName inFile = cubes[i];
-    string outParam = pathName + inFile.baseName() + "_hpffirst.cub";
-    string parameters = "FROM=" + inFile.expanded()
+    QString outParam = pathName + inFile.baseName() + "_hpffirst.cub";
+    QString parameters = "FROM=" + inFile.expanded()
                         + " TO=" + outParam
                         + " SAMPLES= " + HNS1
                         + " LINES= " + HNL1;
@@ -57,12 +59,12 @@ void IsisMain() {
 
   //Creates the second highpass cubes
   std::ofstream secondHighPassList;
-  string secondHighPass(cubeListBaseName + "_SecondHighPassList.lis");
-  secondHighPassList.open(secondHighPass.c_str());
+  QString secondHighPass(cubeListBaseName + "_SecondHighPassList.lis");
+  secondHighPassList.open(secondHighPass.toAscii().data());
   for(int i = 0; i < cubes.size(); i++) {
     FileName inFile = cubes[i];
-    string outParam = pathName + inFile.baseName() + "_hpfsecond.cub";
-    string parameters = "FROM=" + inFile.expanded()
+    QString outParam = pathName + inFile.baseName() + "_hpfsecond.cub";
+    QString parameters = "FROM=" + inFile.expanded()
                         + " TO=" + outParam
                         + " SAMPLES= " + HNS2
                         + " LINES= " + HNL2;
@@ -73,7 +75,7 @@ void IsisMain() {
   secondHighPassList.close();
 
   //Makes a mosaic out of the first highpass cube filelist
-  string parameters = "FROM= " + cubeListBaseName + "_FirstHighPassList.lis MOSAIC="
+  QString parameters = "FROM= " + cubeListBaseName + "_FirstHighPassList.lis MOSAIC="
                       + cubeListBaseName + "_newmosFirst.cub"
                       + " MATCHBANDBIN=" + MATCHBANDBIN
                       + " GRANGE= " + GRANGE;
@@ -133,22 +135,22 @@ void IsisMain() {
 
   //Will remove all of the temp files by default
   if(ui.GetBoolean("REMOVETEMP")) {
-    string newmosFirst(cubeListBaseName + "_newmosFirst.cub");
-    string newmosSecond(cubeListBaseName + "_newmosSecond.cub");
-    string lpfmos(cubeListBaseName + "_lpfmos.cub");
-    string untrimmedmoc(cubeListBaseName + "_untrimmedmoc.cub");
-    remove(firstHighPass.c_str());
-    remove(secondHighPass.c_str());
-    remove(newmosFirst.c_str());
-    remove(newmosSecond.c_str());
-    remove(lpfmos.c_str());
-    remove(untrimmedmoc.c_str());
+    QString newmosFirst(cubeListBaseName + "_newmosFirst.cub");
+    QString newmosSecond(cubeListBaseName + "_newmosSecond.cub");
+    QString lpfmos(cubeListBaseName + "_lpfmos.cub");
+    QString untrimmedmoc(cubeListBaseName + "_untrimmedmoc.cub");
+    QFile::remove(firstHighPass);
+    QFile::remove(secondHighPass);
+    QFile::remove(newmosFirst);
+    QFile::remove(newmosSecond);
+    QFile::remove(lpfmos);
+    QFile::remove(untrimmedmoc);
     for(int i = 0; i < cubes.size(); i++) {
       FileName inFile = cubes[i];
-      string hpffirst(pathName + inFile.baseName() + "_hpffirst.cub");
-      string hpfsecond(pathName + inFile.baseName() + "_hpfsecond.cub");
-      remove(hpffirst.c_str());
-      remove(hpfsecond.c_str());
+      QString hpffirst(pathName + inFile.baseName() + "_hpffirst.cub");
+      QString hpfsecond(pathName + inFile.baseName() + "_hpfsecond.cub");
+      QFile::remove(hpffirst);
+      QFile::remove(hpfsecond);
     }
   }
 

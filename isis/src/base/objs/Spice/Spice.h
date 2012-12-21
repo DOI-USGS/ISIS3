@@ -281,13 +281,13 @@ namespace Isis {
       void subSolarPoint(double &lat, double &lon);
 
       Target *target() const;
-      IString targetName() const;
+      QString targetName() const;
 
-      iTime getClockTime(IString clockValue,
+      iTime getClockTime(QString clockValue,
                          int sclkCode = -1);
-      SpiceDouble getDouble(const IString &key, int index = 0);
-      SpiceInt getInteger(const IString &key,   int index = 0);
-      IString getString(const IString &key,     int index = 0);
+      SpiceDouble getDouble(const QString &key, int index = 0);
+      SpiceInt getInteger(const QString &key,   int index = 0);
+      QString getString(const QString &key,     int index = 0);
 
       SpicePosition *sunPosition() const;
       SpicePosition *instrumentPosition() const;
@@ -318,14 +318,14 @@ namespace Isis {
         SpiceByteCodeType //!< SpiceByteCode type
       };
 
-      QVariant readValue(IString key, SpiceValueType type, int index = 0);
+      QVariant readValue(QString key, SpiceValueType type, int index = 0);
 
-      void storeResult(IString name, SpiceValueType type, QVariant value);
-      QVariant getStoredResult(IString name, SpiceValueType type);
+      void storeResult(QString name, SpiceValueType type, QVariant value);
+      QVariant getStoredResult(QString name, SpiceValueType type);
 
-      void storeValue(IString key, int index, SpiceValueType type,
+      void storeValue(QString key, int index, SpiceValueType type,
                       QVariant value);
-      QVariant readStoredValue(IString key, SpiceValueType type, int index);
+      QVariant readStoredValue(QString key, SpiceValueType type, int index);
 
       // Leave these protected so that inheriting classes don't
       // have to convert between double and spicedouble
@@ -353,7 +353,7 @@ namespace Isis {
 
       Longitude *m_solarLongitude; //!< Body rotation solar longitude value
       iTime *m_et; //!< Ephemeris time (read NAIF documentation for a detailed description)
-      QVector<IString> * m_kernels; //!< Vector containing kernels filenames
+      QVector<QString> * m_kernels; //!< Vector containing kernels filenames
       Target *m_target; //!< Target of the observation
 
       // cache stuff

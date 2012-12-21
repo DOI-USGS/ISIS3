@@ -26,9 +26,10 @@
 #include <QList>
 #include <iostream>
 
+class QString;
+
 namespace Isis {
   class FileName;
-  class IString;
   /**
    * @brief Internalizes a list of files.
    *
@@ -65,7 +66,7 @@ namespace Isis {
    */
   class FileList : public QList<FileName> {
     public:
-      //FileList(IString  listFileString);
+      //FileList(QString  listFileString);
       FileList(FileName listFile);
       FileList(std::istream &in);
       FileList();
@@ -74,7 +75,7 @@ namespace Isis {
       ~FileList() {};
 
       void read(FileName listFile);
-      //void read(const std::string &list);
+      //void read(const QString &list);
       void read(std::istream &in);
       void write(FileName outputFileList);
       void write(std::ostream &out);

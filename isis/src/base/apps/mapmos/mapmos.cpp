@@ -22,7 +22,7 @@ void IsisMain() {
   m.SetTrackFlag(bTrack);
 
   // Gets the input file along with attributes
-  string sInputFile = ui.GetAsString("FROM");
+  QString sInputFile = ui.GetAsString("FROM");
 
   ProcessMosaic::ImageOverlay overlay = ProcessMosaic::StringToOverlay(
       ui.GetString("PRIORITY"));
@@ -54,10 +54,10 @@ void IsisMain() {
     PvlGroup mapGroup = inCube.getLabel()->FindGroup("Mapping", Pvl::Traverse);
     inCube.close();
 
-    mapGroup.AddKeyword(PvlKeyword("MinimumLatitude",  ui.GetDouble("MINLAT")), Pvl::Replace);
-    mapGroup.AddKeyword(PvlKeyword("MaximumLatitude",  ui.GetDouble("MAXLAT")), Pvl::Replace);
-    mapGroup.AddKeyword(PvlKeyword("MinimumLongitude", ui.GetDouble("MINLON")), Pvl::Replace);
-    mapGroup.AddKeyword(PvlKeyword("MaximumLongitude", ui.GetDouble("MAXLON")), Pvl::Replace);
+    mapGroup.AddKeyword(PvlKeyword("MinimumLatitude",  toString(ui.GetDouble("MINLAT"))), Pvl::Replace);
+    mapGroup.AddKeyword(PvlKeyword("MaximumLatitude",  toString(ui.GetDouble("MAXLAT"))), Pvl::Replace);
+    mapGroup.AddKeyword(PvlKeyword("MinimumLongitude", toString(ui.GetDouble("MINLON"))), Pvl::Replace);
+    mapGroup.AddKeyword(PvlKeyword("MaximumLongitude", toString(ui.GetDouble("MAXLON"))), Pvl::Replace);
 
     CubeAttributeOutput oAtt = ui.GetOutputAttribute("MOSAIC");
 

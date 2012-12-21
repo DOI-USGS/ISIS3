@@ -32,7 +32,7 @@ extern int errno;
 
 #include <fstream>
 //#include <stdlib.h>
-//#include <string>
+//#include <QString>
 
 #include <iostream>
 #include <sstream>
@@ -100,8 +100,8 @@ namespace Isis {
     putenv(env);
 
     // Verify ISISROOT was set
-    if (getenv("ISISROOT") == NULL || IString(getenv("ISISROOT")) == "") {
-      string message = "Please set ISISROOT before running any Isis "
+    if (getenv("ISISROOT") == NULL || QString(getenv("ISISROOT")) == "") {
+      QString message = "Please set ISISROOT before running any Isis "
           "applications";
       cerr << message << endl;
       abort();
@@ -115,7 +115,7 @@ namespace Isis {
 
     // Create user interface and log
     try {
-      FileName f(string(argv[0]) + ".xml");
+      FileName f(QString(argv[0]) + ".xml");
 
       // Create preferences
       Preference::Preferences(f.name() == "unitTest.xml");
@@ -123,11 +123,11 @@ namespace Isis {
       if (!f.fileExists()) {
         f = "$ISISROOT/bin/xml/" + f.name();
         if (!f.fileExists()) {
-          string message = Message::FileOpen(f.expanded());
+          QString message = Message::FileOpen(f.expanded());
           throw IException(IException::Io, message, _FILEINFO_);
         }
       }
-      string xmlfile = f.expanded();
+      QString xmlfile = f.expanded();
 
       p_ui = new UserInterface(xmlfile, argc, argv);
       if (!p_ui->IsInteractive()) {
@@ -150,8 +150,8 @@ namespace Isis {
     if (GetUserInterface().ParentId()) {
       p_connectionToParent = new QLocalSocket;
 
-      IString serverName = "isis_" + UserName() +
-          "_" + IString(iApp->GetUserInterface().ParentId());
+      QString serverName = "isis_" + UserName() +
+          "_" + toString(iApp->GetUserInterface().ParentId());
 
       p_connectionToParent->connectToServer(serverName);
       if (!p_connectionToParent->waitForConnected()) {
@@ -229,12 +229,12 @@ namespace Isis {
 
 #if 0
     catch (exception &e) {
-      string message = e.what();
+      QString message = e.what();
       Isis::iExceptionSystem i(message, _FILEINFO_);
       status = i.Report();
     }
     catch (...) {
-      string message = "Unknown error expection";
+      QString message = "Unknown error expection";
       Isis::iExceptionSystem i(message, _FILEINFO_);
       status = i.Report();
     }
@@ -287,7 +287,7 @@ namespace Isis {
     minutes = minutes - hours * 60;
     char temp[80];
     sprintf(temp, "%02d:%02d:%04.1f", hours, minutes, seconds);
-    string conTime = temp;
+    QString conTime = temp;
 
     //cerr << "Accounting GUI end time=" << endTime <<  " start time=" << p_startTime << "  total=" << seconds << endl;
 
@@ -299,7 +299,7 @@ namespace Isis {
     hours = minutes / 60;
     minutes = minutes - hours * 60;
     sprintf(temp, "%02d:%02d:%04.1f", hours, minutes, seconds);
-    string cpuTime = temp;
+    QString cpuTime = temp;
 
     // Add this information to the log
     PvlGroup acct("Accounting");
@@ -365,8 +365,8 @@ namespace Isis {
       ostringstream ostr;
       if (blankLine) ostr << endl;
       ostr << results << endl;
-      string data = ostr.str();
-      iApp->SendParentData(string("LOG"), data);
+      QString data = ostr.str().c_str();
+      iApp->SendParentData("LOG", data);
     }
 
     // Otherwise see if we need to write to our gui
@@ -374,7 +374,7 @@ namespace Isis {
       ostringstream ostr;
       if (blankLine) ostr << endl;
       ostr << results << endl;
-      iApp->GetUserInterface().TheGui()->Log(ostr.str());
+      iApp->GetUserInterface().TheGui()->Log(ostr.str().c_str());
       iApp->GetUserInterface().TheGui()->ShowLog();
     }
 
@@ -391,20 +391,22 @@ namespace Isis {
    *
    * @param results Pvl containing the results to add to the session log
    */
-  void Application::GuiLog(Pvl &results) {
+  void Application::GuiLog(const Pvl &results) {
     // See if we should write the info to our parents gui
+    Pvl copy(results);
+
     if (HasParent()) {
       ostringstream ostr;
-      ostr << results << endl;
-      string data = ostr.str();
-      iApp->SendParentData(string("GUILOG"), data);
+      ostr << copy << endl;
+      QString data = ostr.str().c_str();
+      iApp->SendParentData("GUILOG", data);
     }
 
     // Otherwise see if we need to write to our gui
     else if (iApp->GetUserInterface().IsInteractive()) {
       ostringstream ostr;
-      ostr << results << endl;
-      iApp->GetUserInterface().TheGui()->Log(ostr.str());
+      ostr << copy << endl;
+      iApp->GetUserInterface().TheGui()->Log(ostr.str().c_str());
       iApp->GetUserInterface().TheGui()->ShowLog();
     }
   }
@@ -414,20 +416,22 @@ namespace Isis {
    *
    * @param results PvlGroup containing the results to add to the session log
    */
-  void Application::GuiLog(PvlGroup &results) {
+  void Application::GuiLog(const PvlGroup &results) {
     // See if we should write the info to our parents gui
+    PvlGroup copy(results);
+
     if (HasParent()) {
       ostringstream ostr;
-      ostr << results << endl;
-      string data = ostr.str();
-      iApp->SendParentData(string("GUILOG"), data);
+      ostr << copy << endl;
+      QString data = ostr.str().c_str();
+      iApp->SendParentData("GUILOG", data);
     }
 
     // Otherwise see if we need to write to our gui
     else if (iApp->GetUserInterface().IsInteractive()) {
       ostringstream ostr;
-      ostr << results << endl;
-      iApp->GetUserInterface().TheGui()->Log(ostr.str());
+      ostr << copy << endl;
+      iApp->GetUserInterface().TheGui()->Log(ostr.str().c_str());
       iApp->GetUserInterface().TheGui()->ShowLog();
     }
   }
@@ -435,12 +439,12 @@ namespace Isis {
   /**
    * Writes the results to the sessionlog, but not to the printfile
    *
-   * @param results string containing the results to add to the session log
+   * @param results QString containing the results to add to the session log
    */
-  void Application::GuiLog(string &results) {
+  void Application::GuiLog(const QString &results) {
     // See if we should write the info to our parents gui
     if (HasParent()) {
-      iApp->SendParentData(string("GUILOG"), results);
+      iApp->SendParentData("GUILOG", results);
     }
 
     // Otherwise see if we need to write to our gui
@@ -482,8 +486,8 @@ namespace Isis {
     for (int i = 0; i < errors.Groups(); i++) {
       ostringstream ostr;
       ostr << errors.Group(i) << endl;
-      string data = ostr.str();
-      iApp->SendParentData(string("ERROR"), data);
+      QString data = ostr.str().c_str();
+      iApp->SendParentData("ERROR", data);
     }
   }
 
@@ -492,30 +496,30 @@ namespace Isis {
    * @param code
    * @param message
    */
-  void Application::SendParentData(const string code,
-      const string &message) {
+  void Application::SendParentData(const QString code,
+      const QString &message) {
     // See if we need to connect to the parent
     if (p_connectionToParent == NULL) {
-      IString msg = "This process (program) was executed by an existing Isis 3 "
+      QString msg = "This process (program) was executed by an existing Isis 3 "
           "process. However, we failed to establish a communication channel "
           "with the parent (launcher) process. The parent process has a PID of "
-          "[" + IString(iApp->GetUserInterface().ParentId()) + "]";
+          "[" + toString(iApp->GetUserInterface().ParentId()) + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
-    // Have connection so build data string and send it
-    string data = code;
+    // Have connection so build data QString and send it
+    QString data = code;
     data += char(27);
     data += message;
     data += char(27);
     data += '\n';
 
-    if (p_connectionToParent->write(data.c_str(), data.size()) == -1) {
-      IString msg = "This process (program) was executed by an exiting Isis 3 "
+    if (p_connectionToParent->write(data.toAscii().data(), data.toAscii().size()) == -1) {
+      QString msg = "This process (program) was executed by an exiting Isis 3 "
           "process. A communication channel was established with the parent "
           "(launcher) process, but when we tried to send data to the parent "
           "process an error occurred. The parent process has a PID of [" +
-          IString(iApp->GetUserInterface().ParentId()) + "]";
+          QString(iApp->GetUserInterface().ParentId()) + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
@@ -537,13 +541,13 @@ namespace Isis {
       if (HasParent()) {
         ostringstream ostr;
         ostr << SessionLog::TheLog() << endl;
-        string data = ostr.str();
-        iApp->SendParentData(string("LOG"), data);
+        QString data = ostr.str().c_str();
+        iApp->SendParentData("LOG", data);
       }
       else if (p_ui->IsInteractive()) {
         ostringstream ostr;
         ostr << SessionLog::TheLog() << endl;
-        p_ui->TheGui()->Log(ostr.str());
+        p_ui->TheGui()->Log(ostr.str().c_str());
         p_ui->TheGui()->ShowLog();
       }
       else {
@@ -553,9 +557,9 @@ namespace Isis {
 
     // If debugging flag on write debugging log
     if (p_ui->GetInfoFlag()) {
-      string filename = p_ui->GetInfoFileName();
+      QString filename = p_ui->GetInfoFileName();
       Pvl log;
-      IString app = (IString)QCoreApplication::applicationDirPath() + "/" + p_appName;
+      QString app = (QString)QCoreApplication::applicationDirPath() + "/" + p_appName;
       if (p_BatchlistPass == 0) {
         stringstream ss ;
         ss << SessionLog::TheLog();
@@ -571,9 +575,9 @@ namespace Isis {
       if (filename.compare("") != 0) {
 
         if (p_BatchlistPass == 0) {
-          ofstream debugingLog(filename.c_str());
+          ofstream debugingLog(filename.toAscii().data());
           if (!debugingLog.good()) {
-            string msg = "Error opening debugging log file [" + filename + "]";
+            QString msg = "Error opening debugging log file [" + filename + "]";
             throw IException(IException::Io, msg, _FILEINFO_);
           }
           debugingLog << log << endl;
@@ -586,7 +590,7 @@ namespace Isis {
           debugingLog.close();
         }
         else {
-          ofstream debugingLog(filename.c_str(), ios_base::app);
+          ofstream debugingLog(filename.toAscii().data(), ios_base::app);
           debugingLog << SessionLog::TheLog() << endl;
           debugingLog.close();
         }
@@ -639,9 +643,9 @@ namespace Isis {
 
     // If debugging flag on write debugging log
     if (p_ui->GetInfoFlag()) {
-      string filename = p_ui->GetInfoFileName();
+      QString filename = p_ui->GetInfoFileName();
       Pvl log;
-      IString app = (IString)QCoreApplication::applicationDirPath() + "/" + p_appName;
+      QString app = (QString)QCoreApplication::applicationDirPath() + "/" + p_appName;
       if (p_BatchlistPass == 0) {
         stringstream ss ;
         ss << SessionLog::TheLog();
@@ -656,9 +660,9 @@ namespace Isis {
       // Write to file
       if (filename.compare("") != 0) {
         if (p_BatchlistPass == 0) {
-          ofstream debugingLog(filename.c_str());
+          ofstream debugingLog(filename.toAscii().data());
           if (!debugingLog.good()) {
-            string msg = "Error opening debugging log file [" + filename + "]";
+            QString msg = "Error opening debugging log file [" + filename + "]";
             throw IException(IException::Io, msg, _FILEINFO_);
           }
           debugingLog << log << endl;
@@ -671,7 +675,7 @@ namespace Isis {
           debugingLog.close();
         }
         else {
-          ofstream debugingLog(filename.c_str(), ios_base::app);
+          ofstream debugingLog(filename.toAscii().data(), ios_base::app);
           debugingLog << SessionLog::TheLog() << endl;
           debugingLog.close();
         }
@@ -702,7 +706,7 @@ namespace Isis {
    * @param e The Isis::iException
    */
   void Application::GuiReportError(IException &e) {
-    IString errorMessage = e.toString();
+    QString errorMessage = e.toString();
     if (errorMessage == "") {
       p_ui->TheGui()->ProgressText("Stopped");
     }
@@ -715,14 +719,14 @@ namespace Isis {
       exit(0);
   }
 
-  IString Application::p_appName("Unknown"); //!<
+  QString Application::p_appName("Unknown"); //!<
   /**
    * Returns the name of the application.  Returns 'Unknown' if the application
    * or gui equal NULL
    *
-   * @return string The application name
+   * @return QString The application name
    */
-  IString Application::Name() {
+  QString Application::Name() {
     return p_appName;
   }
 
@@ -733,15 +737,15 @@ namespace Isis {
    *
    * @param print
    */
-  void Application::UpdateProgress(const string &text, bool print) {
+  void Application::UpdateProgress(const QString &text, bool print) {
     if (HasParent() && print) {
-      iApp->SendParentData(string("PROGRESSTEXT"), text);
+      iApp->SendParentData(QString("PROGRESSTEXT"), text);
     }
     else if (p_ui->IsInteractive()) {
       p_ui->TheGui()->ProgressText(text);
     }
     else if (print) {
-      string msg = p_ui->ProgramName() + ": " + text;
+      QString msg = p_ui->ProgramName() + ": " + text;
       cout << msg << endl;
     }
 
@@ -757,8 +761,8 @@ namespace Isis {
    */
   void Application::UpdateProgress(int percent, bool print) {
     if (HasParent() && print) {
-      string data = IString(percent);
-      iApp->SendParentData(string("PROGRESS"), data);
+      QString data = toString(percent);
+      iApp->SendParentData(QString("PROGRESS"), data);
     }
     else if (p_ui->IsInteractive()) {
       p_ui->TheGui()->Progress(percent);
@@ -789,45 +793,45 @@ namespace Isis {
 
 
   /**
-   * Returns the date and time as a string.
+   * Returns the date and time as a QString.
    *
    * @param *curtime
    *
-   * @return string The date and time
+   * @return QString The date and time
    */
-  IString Application::DateTime(time_t *curtime) {
+  QString Application::DateTime(time_t *curtime) {
     time_t startTime = time(NULL);
     if (curtime != 0) *curtime = startTime;
     struct tm *tmbuf = localtime(&startTime);
     char timestr[80];
     strftime(timestr, 80, "%Y-%m-%dT%H:%M:%S", tmbuf);
-    return(string) timestr;
+    return(QString) timestr;
   }
 
   /**
    * Returns the user name. Returns 'Unknown' if it cannot find the user name.
    *
-   * @return string User Name
+   * @return QString User Name
    */
-  IString Application::UserName() {
+  QString Application::UserName() {
     return userName();
   }
 
   /**
    * Returns the host name.  Returns 'Unknown' if it cannot find the host name.
    *
-   * @return string Host Name
+   * @return QString Host Name
    */
-  IString Application::HostName() {
+  QString Application::HostName() {
     return hostName();
   }
 
   /**
    * The Isis Version for this application.
-   * @return @b IString
+   * @return @b QString
    *
    */
-  IString Application::Version() {
+  QString Application::Version() {
     return isisVersion();
   }
 
@@ -840,7 +844,7 @@ namespace Isis {
   PvlGroup Application::GetUnameInfo() {
     // Create a temporary file to store console output to
     FileName temp = FileName::createTempFile("$temporary/UnameConsoleInfo.txt");
-    IString tempFile = temp.expanded();
+    QString tempFile = temp.expanded();
 
     // Uname commands output to temp file with each of the following
     // values on its own line in this order:
@@ -861,7 +865,7 @@ namespace Isis {
     ProgramLauncher::RunSystemCommand("uname -a > " + tempFile);
     // Read data from temp file
     char value[256];
-    readTemp.open(tempFile.c_str(), ifstream::in);
+    readTemp.open(tempFile.toAscii().data(), ifstream::in);
     readTemp.getline(value, 256);
     unameGroup.AddKeyword(PvlKeyword("MachineHardware", value));
     readTemp.getline(value, 256);
@@ -906,7 +910,7 @@ namespace Isis {
 #endif
 
     // remove temp file and return
-    remove(tempFile.c_str());
+    remove(tempFile.toAscii().data());
     return unameGroup;
   }
 
@@ -920,15 +924,15 @@ namespace Isis {
   PvlGroup Application::GetEnviromentInfo() {
     // Create a temporary file to store console output to
     FileName temp = FileName::createTempFile("$temporary/EnviromentInfo.txt");
-    IString tempFile = temp.expanded();
+    QString tempFile = temp.expanded();
     PvlGroup envGroup("EnviromentVariables");
     ifstream readTemp;
 
-    string env1 = "printenv SHELL >| " + tempFile;
-    string env2 = "printenv HOME >> " + tempFile;
-    string env3 = "printenv PWD >> " + tempFile;
-    string env5 = "printenv ISISROOT >> " + tempFile;
-    string env6 = "printenv ISIS3DATA >> " + tempFile;
+    QString env1 = "printenv SHELL >| " + tempFile;
+    QString env2 = "printenv HOME >> " + tempFile;
+    QString env3 = "printenv PWD >> " + tempFile;
+    QString env5 = "printenv ISISROOT >> " + tempFile;
+    QString env6 = "printenv ISIS3DATA >> " + tempFile;
     ProgramLauncher::RunSystemCommand(env1);
     ProgramLauncher::RunSystemCommand(env2);
     ProgramLauncher::RunSystemCommand(env3);
@@ -936,7 +940,7 @@ namespace Isis {
     ProgramLauncher::RunSystemCommand(env6);
     // Read data from temp file
     char value[511];
-    readTemp.open(tempFile.c_str(), ifstream::in);
+    readTemp.open(tempFile.toAscii().data(), ifstream::in);
     readTemp.getline(value, 255);
     envGroup.AddKeyword(PvlKeyword("Shell", value));
     readTemp.getline(value, 255);
@@ -949,7 +953,7 @@ namespace Isis {
     envGroup.AddKeyword(PvlKeyword("ISIS3DATA", value));
 
     // remove temp file and return
-    IString cleanup = "rm -f " + tempFile;
+    QString cleanup = "rm -f " + tempFile;
     ProgramLauncher::RunSystemCommand(cleanup);
     return envGroup;
   }
@@ -957,17 +961,17 @@ namespace Isis {
   /**
    * Runs df to see the disk space availability
    *
-   * @return IString containing df results
+   * @return QString containing df results
    */
-  IString Application::GetSystemDiskSpace() {
+  QString Application::GetSystemDiskSpace() {
     FileName temp = FileName::createTempFile("$temporary/SystemDiskSpace.txt");
-    IString tempFile = temp.expanded();
+    QString tempFile = temp.expanded();
     ifstream readTemp;
-    string diskspace = "df >| " + tempFile;
+    QString diskspace = "df >| " + tempFile;
     ProgramLauncher::RunSystemCommand(diskspace);
-    readTemp.open(tempFile.c_str(), ifstream::in);
+    readTemp.open(tempFile.toAscii().data(), ifstream::in);
 
-    IString results = "";
+    QString results = "";
     char tmp[512];
     while (!readTemp.eof()) {
       readTemp.getline(tmp, 512);
@@ -976,7 +980,7 @@ namespace Isis {
     }
 
     // remove temp file and return
-    IString cleanup = "rm -f " + tempFile;
+    QString cleanup = "rm -f " + tempFile;
     ProgramLauncher::RunSystemCommand(cleanup);
     return results;
   }
@@ -984,13 +988,13 @@ namespace Isis {
   /**
    * Runs ldd on linux and sun and otool on macs to get information about the applicaiton run
    *
-   * @return IString containing application information
+   * @return QString containing application information
    */
-  IString Application::GetLibraryDependencies(IString file) {
+  QString Application::GetLibraryDependencies(QString file) {
     FileName temp = FileName::createTempFile("$temporary/LibraryDependencies.txt");
-    IString tempFile = temp.expanded();
+    QString tempFile = temp.expanded();
     ifstream readTemp;
-    string dependencies = "";
+    QString dependencies = "";
 #if defined(__linux__)
     dependencies = "ldd -v " + file + " >| " + tempFile;
 #elif defined(__APPLE__)
@@ -999,9 +1003,9 @@ namespace Isis {
     dependencies = "ldd -v " + file + " >| " + tempFile;
 #endif
     ProgramLauncher::RunSystemCommand(dependencies);
-    readTemp.open(tempFile.c_str(), ifstream::in);
+    readTemp.open(tempFile.toAscii().data(), ifstream::in);
 
-    IString results = "";
+    QString results = "";
     char tmp[512];
     while (!readTemp.eof()) {
       readTemp.getline(tmp, 512);
@@ -1010,7 +1014,7 @@ namespace Isis {
     }
 
     // remove temp file and return
-    IString cleanup = "rm -f " + tempFile;
+    QString cleanup = "rm -f " + tempFile;
     ProgramLauncher::RunSystemCommand(cleanup);
     return results;
   }

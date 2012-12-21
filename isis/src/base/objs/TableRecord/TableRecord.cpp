@@ -73,7 +73,7 @@ namespace Isis {
    * @throws Isis::IException::Programmer - The field does not exist in the
    *                                        record
    */
-  TableField &TableRecord::operator[](const std::string &field) {
+  TableField &TableRecord::operator[](const QString &field) {
     Isis::IString upTemp = field;
     upTemp.UpCase();
     for (int i = 0; i < (int)p_fields.size(); i++) {
@@ -82,7 +82,7 @@ namespace Isis {
       if (upTemp == upField) return p_fields[i];
     }
 
-    string msg = "Field [" + field + "] does not exist in record";
+    QString msg = "Field [" + field + "] does not exist in record";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -134,10 +134,10 @@ namespace Isis {
         }
       }
       else if (field.isText()) {
-        string val = (string)field;
+        QString val = (QString)field;
         for (int i = 0; i < field.size(); i++) {
           if (i < (int)val.length()) {
-            buf[sbyte] = val[i];
+            buf[sbyte] = val[i].toAscii();
           }
           else {
             buf[sbyte] = 0;

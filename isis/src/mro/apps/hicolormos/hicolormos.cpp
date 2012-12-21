@@ -26,7 +26,7 @@ void IsisMain() {
 
   // Get the values for the from 1 cube
   UserInterface &ui = Application::GetUserInterface();
-  string from1 = ui.GetFileName("FROM1");
+  QString from1 = ui.GetFileName("FROM1");
 
   // Make a temporary list file for automos
   FileName tempFile = FileName::createTempFile("$TEMPORARY/hicolormos.temp.lis");
@@ -38,22 +38,22 @@ void IsisMain() {
   PvlGroup from1Mosaic = from1lab.FindGroup("Mosaic", Pvl::Traverse);
 
   // Make the procuct ID (from1 archive group)
-  string ProdId = from1lab.FindGroup("Archive", Pvl::Traverse)["ObservationId"];
+  QString ProdId = from1lab.FindGroup("Archive", Pvl::Traverse)["ObservationId"];
   ProdId += "_COLOR";
 
   // Prep for second image if we have one
   Pvl from2lab;
   PvlGroup from2Mosaic("Mosaic");
   if(ui.WasEntered("FROM2")) {
-    string from2 = ui.GetFileName("FROM2");
+    QString from2 = ui.GetFileName("FROM2");
     //Add from2 file to the temporary automos input list
     tf.PutLine(from2 + "\n");
     from2lab.Read(from2);
 
     // Test the observation ID between from1 and from2
-    if((string)from1lab.FindGroup("Archive", Pvl::Traverse)["ObservationId"] !=
-        (string)from2lab.FindGroup("Archive", Pvl::Traverse)["ObservationId"]) {
-      string msg = "Images not from the same observation";
+    if((QString)from1lab.FindGroup("Archive", Pvl::Traverse)["ObservationId"] !=
+        (QString)from2lab.FindGroup("Archive", Pvl::Traverse)["ObservationId"]) {
+      QString msg = "Images not from the same observation";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -190,23 +190,23 @@ void IsisMain() {
   }
 
   if(runXY) {
-    string tmp(tempFile.expanded());
-    remove(tmp.c_str());
-    string msg = "Camera did not intersect images to gather stats";
+    QString tmp(tempFile.expanded());
+    remove(tmp.toAscii().data());
+    QString msg = "Camera did not intersect images to gather stats";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   //work on the times (from mosaic group)
-  string startTime = from1Mosaic["StartTime"];
-  string stopTime = from1Mosaic["StopTime"];
-  string startClk = from1Mosaic["SpacecraftClockStartCount"];
-  string stopClk = from1Mosaic["SpacecraftClockStopCount"];
+  QString startTime = from1Mosaic["StartTime"];
+  QString stopTime = from1Mosaic["StopTime"];
+  QString startClk = from1Mosaic["SpacecraftClockStartCount"];
+  QString stopClk = from1Mosaic["SpacecraftClockStopCount"];
 
   if(ui.WasEntered("FROM2")) {
-    if((string)from2Mosaic["StartTime"] < startTime) startTime = (string)from2Mosaic["StartTime"];
-    if((string)from2Mosaic["StopTime"] > stopTime) stopTime = (string)from2Mosaic["StopTime"];
-    if((string)from2Mosaic["SpacecraftClockStartCount"] < startClk) startClk = (string)from2Mosaic["SpacecraftClockStartCount"];
-    if((string)from2Mosaic["SpacecraftClockStopCount"] < stopClk) stopClk = (string)from2Mosaic["SpacecraftClockStopCount"];
+    if((QString)from2Mosaic["StartTime"] < startTime) startTime = (QString)from2Mosaic["StartTime"];
+    if((QString)from2Mosaic["StopTime"] > stopTime) stopTime = (QString)from2Mosaic["StopTime"];
+    if((QString)from2Mosaic["SpacecraftClockStartCount"] < startClk) startClk = (QString)from2Mosaic["SpacecraftClockStartCount"];
+    if((QString)from2Mosaic["SpacecraftClockStopCount"] < stopClk) stopClk = (QString)from2Mosaic["SpacecraftClockStopCount"];
   }
 
   // Get TDI and summing array
@@ -229,9 +229,9 @@ void IsisMain() {
 
 
   // automos step
-  string MosaicPriority = ui.GetString("PRIORITY");
+  QString MosaicPriority = ui.GetString("PRIORITY");
 
-  string parameters = "FROMLIST=" + tempFile.expanded() +
+  QString parameters = "FROMLIST=" + tempFile.expanded() +
                       " MOSAIC=" + ui.GetFileName("TO") +
                       " PRIORITY=" + MosaicPriority;
   ProgramLauncher::RunIsisProgram("automos", parameters);
@@ -243,13 +243,13 @@ void IsisMain() {
   mos += PvlKeyword("SpacecraftClockStartCount ", startClk);
   mos += PvlKeyword("StopTime ", stopTime);
   mos += PvlKeyword("SpacecraftClockStopCount ", stopClk);
-  mos += PvlKeyword("IncidenceAngle ", Cincid, "DEG");
-  mos += PvlKeyword("EmissionAngle ", Cemiss, "DEG");
-  mos += PvlKeyword("PhaseAngle ", Cphase, "DEG");
-  mos += PvlKeyword("LocalTime ", ClocalSolTime, "LOCALDAY/24");
-  mos += PvlKeyword("SolarLongitude ", CsolarLong, "DEG");
-  mos += PvlKeyword("SubSolarAzimuth ", CsunAzimuth, "DEG");
-  mos += PvlKeyword("NorthAzimuth ", CnorthAzimuth, "DEG");
+  mos += PvlKeyword("IncidenceAngle ", toString(Cincid), "DEG");
+  mos += PvlKeyword("EmissionAngle ", toString(Cemiss), "DEG");
+  mos += PvlKeyword("PhaseAngle ", toString(Cphase), "DEG");
+  mos += PvlKeyword("LocalTime ", toString(ClocalSolTime), "LOCALDAY/24");
+  mos += PvlKeyword("SolarLongitude ", toString(CsolarLong), "DEG");
+  mos += PvlKeyword("SubSolarAzimuth ", toString(CsunAzimuth), "DEG");
+  mos += PvlKeyword("NorthAzimuth ", toString(CnorthAzimuth), "DEG");
   mos += cpmmTdiFlag;
   mos += cpmmSummingFlag;
   mos += specialProcessingFlag;
@@ -265,8 +265,8 @@ void IsisMain() {
   c.close();
 
   // Clean up the temporary automos list file
-  string tmp(tempFile.expanded());
-  remove(tmp.c_str());
+  QString tmp(tempFile.expanded());
+  remove(tmp.toAscii().data());
 } // end of isis main
 
 

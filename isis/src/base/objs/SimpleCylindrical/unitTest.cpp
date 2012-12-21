@@ -5,38 +5,40 @@
 #include "ProjectionFactory.h"
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
+
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   cout << "UNIT TEST FOR SimpleCylindrical" << endl << endl;
 
-  Isis::Pvl lab;
-  lab.AddGroup(Isis::PvlGroup("Mapping"));
-  Isis::PvlGroup &mapGrp = lab.FindGroup("Mapping");
-  mapGrp += Isis::PvlKeyword("EquatorialRadius", 1.0);
-  mapGrp += Isis::PvlKeyword("PolarRadius", 1.0);
-  mapGrp += Isis::PvlKeyword("LatitudeType", "Planetocentric");
-  mapGrp += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-  mapGrp += Isis::PvlKeyword("LongitudeDomain", 180);
-  mapGrp += Isis::PvlKeyword("MinimumLatitude", -90.0);
-  mapGrp += Isis::PvlKeyword("MaximumLatitude", 90.0);
-  mapGrp += Isis::PvlKeyword("MinimumLongitude", -180.0);
-  mapGrp += Isis::PvlKeyword("MaximumLongitude", 180.0);
-  mapGrp += Isis::PvlKeyword("ProjectionName", "SimpleCylindrical");
+  Pvl lab;
+  lab.AddGroup(PvlGroup("Mapping"));
+  PvlGroup &mapGrp = lab.FindGroup("Mapping");
+  mapGrp += PvlKeyword("EquatorialRadius", toString(1.0));
+  mapGrp += PvlKeyword("PolarRadius", toString(1.0));
+  mapGrp += PvlKeyword("LatitudeType", "Planetocentric");
+  mapGrp += PvlKeyword("LongitudeDirection", "PositiveEast");
+  mapGrp += PvlKeyword("LongitudeDomain", toString(180));
+  mapGrp += PvlKeyword("MinimumLatitude", toString(-90.0));
+  mapGrp += PvlKeyword("MaximumLatitude", toString(90.0));
+  mapGrp += PvlKeyword("MinimumLongitude", toString(-180.0));
+  mapGrp += PvlKeyword("MaximumLongitude", toString(180.0));
+  mapGrp += PvlKeyword("ProjectionName", "SimpleCylindrical");
 
   cout << "Test missing center longitude keyword ..." << endl;
   try {
-    Isis::SimpleCylindrical p(lab);
+    SimpleCylindrical p(lab);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
 
   try {
-    mapGrp += Isis::PvlKeyword("CenterLongitude", -90.0);
-    Isis::Projection &p = *Isis::ProjectionFactory::Create(lab);
+    mapGrp += PvlKeyword("CenterLongitude", toString(-90.0));
+    Projection &p = *ProjectionFactory::Create(lab);
 
     cout << "Test SetGround method ... " << endl;
     cout << std::setprecision(16);
@@ -67,7 +69,7 @@ int main(int argc, char *argv[]) {
     cout << "Maximum Y:  " << maxY << endl;
     cout << endl;
 
-    Isis::Projection *s = &p;
+    Projection *s = &p;
     cout << "Test Name and comparision method ... " << endl;
     cout << "Name:       " << s->Name() << endl;
     cout << "operator==  " << (*s == *s) << endl;
@@ -75,15 +77,15 @@ int main(int argc, char *argv[]) {
 
     cout << "Testing default option ... " << endl;
     mapGrp.DeleteKeyword("CenterLongitude");
-    Isis::SimpleCylindrical p2(lab, true);
+    SimpleCylindrical p2(lab, true);
     cout << lab << endl;
     cout << endl;
 
     cout << "Testing Mapping() methods ... " << endl;
 
-    Isis::Pvl tmp1;
-    Isis::Pvl tmp2;
-    Isis::Pvl tmp3;
+    Pvl tmp1;
+    Pvl tmp2;
+    Pvl tmp3;
     tmp1.AddGroup(p.Mapping());
     tmp2.AddGroup(p.MappingLatitudes());
     tmp3.AddGroup(p.MappingLongitudes());
@@ -96,7 +98,7 @@ int main(int argc, char *argv[]) {
     cout << tmp3 << endl;
     cout << endl;
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 }

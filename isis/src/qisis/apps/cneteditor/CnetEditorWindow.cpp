@@ -362,7 +362,7 @@ namespace Isis
   void CnetEditorWindow::readSettings()
   {
     QSettings settings(FileName(
-        "$HOME/.Isis/cneteditor/cneteditor.config").expanded().c_str(),
+        "$HOME/.Isis/cneteditor/cneteditor.config").expanded(),
         QSettings::NativeFormat);
 
     // load window position and size
@@ -380,7 +380,7 @@ namespace Isis
   void CnetEditorWindow::writeSettings()
   {
     QSettings settings(FileName(
-        "$HOME/.Isis/cneteditor/cneteditor.config").expanded().c_str(),
+        "$HOME/.Isis/cneteditor/cneteditor.config").expanded(),
         QSettings::NativeFormat);
 
     // save window position and size
@@ -702,7 +702,7 @@ namespace Isis
   {
     cnet = net;
     editorWidget = new CnetEditorWidget(cnet, FileName(
-        "$HOME/.Isis/cneteditor/cneteditor.config").expanded().c_str());
+        "$HOME/.Isis/cneteditor/cneteditor.config").expanded());
     populateMenus();
     populateToolBars();
     connect(editorWidget, SIGNAL(cnetModified()), this, SLOT(setDirty()));
@@ -719,7 +719,7 @@ namespace Isis
         editorWidget->connectionFilterWidget());
 
     setFileState(HasFile, *curFile);
-    saveAsPvl = !Pvl((IString) *curFile).HasObject("ProtoBuffer");
+    saveAsPvl = !Pvl(*curFile).HasObject("ProtoBuffer");
   }
 
 

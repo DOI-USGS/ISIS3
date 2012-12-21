@@ -1,4 +1,4 @@
-#if !defined(NoNormalization_h)
+#ifndef NoNormalization_h
 #define NoNormalization_h
 /**
  * @file

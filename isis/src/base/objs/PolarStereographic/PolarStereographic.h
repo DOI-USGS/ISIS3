@@ -81,8 +81,8 @@ namespace Isis {
       ~PolarStereographic();
       bool operator== (const Projection &proj);
 
-      std::string Name() const;
-      std::string Version() const;
+      QString Name() const;
+      QString Version() const;
       double TrueScaleLatitude() const;
 
       bool SetGround(const double lat, const double lon);

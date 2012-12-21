@@ -97,8 +97,8 @@ namespace Isis {
       void record();
       void updateID();
       void TrackMosaicOrigin(MdiCubeViewport *cvp, int piLine, int piSample,
-                             int &piOrigin, std::string &psSrcFileName,
-                             std::string &psSrcSerialNum);
+                             int &piOrigin, QString &psSrcFileName,
+                             QString &psSrcSerialNum);
       void helpDialog();
 
     private:

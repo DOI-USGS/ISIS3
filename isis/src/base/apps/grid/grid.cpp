@@ -40,7 +40,7 @@ void IsisMain() {
   Cube *icube = p.SetInputCube("FROM");
 
   UserInterface &ui = Application::GetUserInterface();
-  string mode = ui.GetString("MODE");
+  QString mode = ui.GetString("MODE");
 
   outline = ui.GetBoolean("OUTLINE");
   ticks = ui.GetBoolean("TICKS");
@@ -52,7 +52,7 @@ void IsisMain() {
 
   lineWidth = ui.GetInteger("LINEWIDTH") / 2;
 
-  IString lval = IString::UpCase(ui.GetString("LINEVALUE"));
+  QString lval = ui.GetString("LINEVALUE").toUpper();
   if (lval == "HRS") {
     lineValue = Isis::Hrs;
   }

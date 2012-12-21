@@ -61,7 +61,7 @@ namespace Isis {
       // necessary
       if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
         double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
-        mapGroup += PvlKeyword("CenterLongitude", lon);
+        mapGroup += PvlKeyword("CenterLongitude", toString(lon));
       }
 
       // Get the center longitude
@@ -72,7 +72,7 @@ namespace Isis {
       if (m_longitudeDirection == PositiveWest) m_centerLongitude *= -1.0;
     }
     catch(IException &e) {
-      string message = "Invalid label group [Mapping]";
+      QString message = "Invalid label group [Mapping]";
       throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }
@@ -101,9 +101,9 @@ namespace Isis {
   /**
    * Returns the name of the map projection, "Sinusoidal"
    *
-   * @return string Name of projection, "Sinusoidal"
+   * @return QString Name of projection, "Sinusoidal"
    */
-  string Sinusoidal::Name() const {
+  QString Sinusoidal::Name() const {
     return "Sinusoidal";
   }
 
@@ -111,9 +111,9 @@ namespace Isis {
    * Returns the version of the map projection
    *
    *
-   * @return string Version number
+   * @return QString Version number
    */
-  string Sinusoidal::Version() const {
+  QString Sinusoidal::Version() const {
     return "1.0";
   }
 

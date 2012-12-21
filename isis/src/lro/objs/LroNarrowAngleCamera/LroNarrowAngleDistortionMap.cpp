@@ -42,7 +42,7 @@ namespace Isis {
    * @param naifIkCode 
    */
   void LroNarrowAngleDistortionMap::SetDistortion(const int naifIkCode) {
-    std::string odkkey = "INS" + Isis::IString(naifIkCode) + "_OD_K";
+    QString odkkey = "INS" + toString(naifIkCode) + "_OD_K";
     p_odk.clear();
     p_odk.push_back(p_camera->getDouble(odkkey, 0));
   }

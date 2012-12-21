@@ -58,7 +58,7 @@ class MyCamera : public Camera {
 
 int main() {
   Preference::Preferences(true);
-  string inputFile = "$mgs/testData/ab102401.lev2.cub";
+  QString inputFile = "$mgs/testData/ab102401.lev2.cub";
   Cube cube;
   cube.open(inputFile);
   Camera *c = NULL;
@@ -136,7 +136,7 @@ int main() {
   pixRes2 *= 10000000;
   pixRes2 = round(pixRes2);
   pixRes2 /= 10000000;
-  pvl.FindGroup("Mapping")["PixelResolution"] = pixRes2;
+  pvl.FindGroup("Mapping")["PixelResolution"] = toString(pixRes2);
 
   cout << "BasicMapping PVL: " << endl << pvl << endl << endl;
   cout << "FocalLength: " << c->FocalLength() << endl;
@@ -227,19 +227,19 @@ int main() {
   minLat *= 100;
   minLat = round(minLat);
   minLat /= 100;
-  camMap.FindGroup("Mapping")["MinimumLatitude"] = minLat;
+  camMap.FindGroup("Mapping")["MinimumLatitude"] = toString(minLat);
 
   double pixRes = camMap.FindGroup("Mapping")["PixelResolution"];
   pixRes *= 100;
   pixRes = round(pixRes);
   pixRes /= 100;
-  camMap.FindGroup("Mapping")["PixelResolution"] = pixRes;
+  camMap.FindGroup("Mapping")["PixelResolution"] = toString(pixRes);
 
   double minLon = camMap.FindGroup("Mapping")["MinimumLongitude"];
   minLon *= 100000000000.0;
   minLon = round(minLon);
   minLon /= 100000000000.0;
-  camMap.FindGroup("Mapping")["MinimumLongitude"] = minLon;
+  camMap.FindGroup("Mapping")["MinimumLongitude"] = toString(minLon);
 
   cout << camMap << endl;
 

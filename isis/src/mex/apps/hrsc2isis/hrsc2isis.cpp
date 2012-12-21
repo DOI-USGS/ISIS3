@@ -146,7 +146,7 @@ void IsisMain() {
   else {
     //Checks if in file is rdr
     FileName inFile = ui.GetFileName("FROM");
-    string msg = "[" + inFile.name() + "] appears to be an rdr file.";
+    QString msg = "[" + inFile.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -225,7 +225,7 @@ void WriteOutput(Isis::Buffer &buf) {
 void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {
   // Get the directory where the MRO HiRISE translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  IString transDir = (string) dataDir["Mex"] + "/translations/";
+  QString transDir = (QString) dataDir["Mex"] + "/translations/";
 
   // Translate the Instrument group
   FileName transFile(transDir + "hrscInstrument.trn");
@@ -233,19 +233,19 @@ void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {
   instrumentXlater.Auto(outLabel);
 
   if(inLabels.HasKeyword("MACROPIXEL_SIZE")) {
-    outLabel.FindGroup("Instrument", Pvl::Traverse) += PvlKeyword("Summing", (int)inLabels["MACROPIXEL_SIZE"]);
+    outLabel.FindGroup("Instrument", Pvl::Traverse) += PvlKeyword("Summing", inLabels["MACROPIXEL_SIZE"][0]);
   }
   else {
-    outLabel.FindGroup("Instrument", Pvl::Traverse) += PvlKeyword("Summing", 1);
+    outLabel.FindGroup("Instrument", Pvl::Traverse) += PvlKeyword("Summing", "1");
   }
 
   // Remove 'Z' from times
-  IString startTime = outLabel.FindGroup("Instrument", Pvl::Traverse)["StartTime"][0];
-  startTime = startTime.substr(0, startTime.size() - 1);
+  QString startTime = outLabel.FindGroup("Instrument", Pvl::Traverse)["StartTime"][0];
+  startTime = startTime.mid(0, startTime.size() - 1);
   outLabel.FindGroup("Instrument", Pvl::Traverse)["StartTime"] = startTime;
 
-  IString stopTime = outLabel.FindGroup("Instrument", Pvl::Traverse)["StopTime"][0];
-  stopTime = stopTime.substr(0, stopTime.size() - 1);
+  QString stopTime = outLabel.FindGroup("Instrument", Pvl::Traverse)["StopTime"][0];
+  stopTime = stopTime.mid(0, stopTime.size() - 1);
   outLabel.FindGroup("Instrument", Pvl::Traverse)["StopTime"] = stopTime;
 
   // Translate the BandBin group
@@ -258,30 +258,30 @@ void TranslateHrscLabels(Pvl &inLabels, Pvl &outLabel) {
   PvlTranslationManager archiveXlater(inLabels, transFile.expanded());
   archiveXlater.Auto(outLabel);
 
-  std::map<std::string, int> naifIkCodes;
-  naifIkCodes.insert(std::pair<std::string, int>("MEX_HRSC_HEAD", -41210));
-  naifIkCodes.insert(std::pair<std::string, int>("MEX_HRSC_S2",   -41211));
-  naifIkCodes.insert(std::pair<std::string, int>("MEX_HRSC_RED",  -41212));
-  naifIkCodes.insert(std::pair<std::string, int>("MEX_HRSC_P2",   -41213));
-  naifIkCodes.insert(std::pair<std::string, int>("MEX_HRSC_BLUE", -41214));
-  naifIkCodes.insert(std::pair<std::string, int>("MEX_HRSC_NADIR", -41215));
-  naifIkCodes.insert(std::pair<std::string, int>("MEX_HRSC_GREEN", -41216));
-  naifIkCodes.insert(std::pair<std::string, int>("MEX_HRSC_P1",   -41217));
-  naifIkCodes.insert(std::pair<std::string, int>("MEX_HRSC_IR",   -41218));
-  naifIkCodes.insert(std::pair<std::string, int>("MEX_HRSC_S1",   -41219));
-  naifIkCodes.insert(std::pair<std::string, int>("MEX_HRSC_SRC",  -41220));
+  std::map<QString, int> naifIkCodes;
+  naifIkCodes.insert(std::pair<QString, int>("MEX_HRSC_HEAD", -41210));
+  naifIkCodes.insert(std::pair<QString, int>("MEX_HRSC_S2",   -41211));
+  naifIkCodes.insert(std::pair<QString, int>("MEX_HRSC_RED",  -41212));
+  naifIkCodes.insert(std::pair<QString, int>("MEX_HRSC_P2",   -41213));
+  naifIkCodes.insert(std::pair<QString, int>("MEX_HRSC_BLUE", -41214));
+  naifIkCodes.insert(std::pair<QString, int>("MEX_HRSC_NADIR", -41215));
+  naifIkCodes.insert(std::pair<QString, int>("MEX_HRSC_GREEN", -41216));
+  naifIkCodes.insert(std::pair<QString, int>("MEX_HRSC_P1",   -41217));
+  naifIkCodes.insert(std::pair<QString, int>("MEX_HRSC_IR",   -41218));
+  naifIkCodes.insert(std::pair<QString, int>("MEX_HRSC_S1",   -41219));
+  naifIkCodes.insert(std::pair<QString, int>("MEX_HRSC_SRC",  -41220));
 
-  std::string key = outLabel.FindGroup("Archive", Pvl::Traverse)["DetectorId"];
+  QString key = outLabel.FindGroup("Archive", Pvl::Traverse)["DetectorId"];
   int ikCode = naifIkCodes[key];
 
   if(ikCode < -41220 || ikCode > -41210) {
-    std::string msg = "Unrecognized Detector ID [";
+    QString msg = "Unrecognized Detector ID [";
     msg += key;
     msg += "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
   PvlGroup kerns("Kernels");
-  kerns += PvlKeyword("NaifIkCode", ikCode);
+  kerns += PvlKeyword("NaifIkCode", toString(ikCode));
   outLabel.AddGroup(kerns);
 }

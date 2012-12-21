@@ -651,7 +651,7 @@ namespace Isis {
           if (bandBin.HasKeyword("Center")) {
             PvlKeyword &wavelength = bandBin.FindKeyword("Center");
             if (wavelength.Size() > (band - 1)) {
-              labels.push_back(wavelength[band-1]);
+              labels.push_back(toDouble(wavelength[band-1]));
             }
           }
         }

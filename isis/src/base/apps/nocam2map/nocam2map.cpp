@@ -23,8 +23,8 @@ void LoadMapRes();
 void ComputeInputRange();
 void LoadMapRange();
 
-map <string, void *> GuiHelpers() {
-  map <string, void *> helper;
+map <QString, void *> GuiHelpers() {
+  map <QString, void *> helper;
   helper ["PrintMap"] = (void *) PrintMap;
   helper ["ComputePixRes"] = (void *) ComputePixRes;
   helper ["LoadMapRes"] = (void *) LoadMapRes;
@@ -147,18 +147,18 @@ void IsisMain() {
   if(ui.WasEntered("RESIDUALS")) {
     for(int i = 0; i < sampSol.Rows(); i++) {
       vector<double> data = sampSol.GetInput(i);
-      IString tmp = "";
-      tmp += IString(sampSol.GetExpected(i));
+      QString tmp = "";
+      tmp += toString(sampSol.GetExpected(i));
       tmp += ",\t";
-      tmp += IString(lineSol.GetExpected(i));
+      tmp += toString(lineSol.GetExpected(i));
       tmp += ",\t";
-      tmp += IString(data[0]);
+      tmp += toString(data[0]);
       tmp += ",\t";
-      tmp += IString(data[1]);
+      tmp += toString(data[1]);
       tmp += ",\t";
-      tmp += IString(sampResiduals[i]);
+      tmp += toString(sampResiduals[i]);
       tmp += ",\t";
-      tmp += IString(lineResiduals[i]);
+      tmp += toString(lineResiduals[i]);
       oFile.PutLine(tmp + "\n");
     }
   }
@@ -166,16 +166,16 @@ void IsisMain() {
 
   //Records the error to the log
   PvlGroup error("Error");
-  error += PvlKeyword("Degree", degree);
-  error += PvlKeyword("NumberOfPoints", (int)sampResiduals.size());
-  error += PvlKeyword("SampleMinimumError", sampErr.Minimum());
-  error += PvlKeyword("SampleAverageError", sampErr.Average());
-  error += PvlKeyword("SampleMaximumError", sampErr.Maximum());
-  error += PvlKeyword("SampleStdDeviationError", sampErr.StandardDeviation());
-  error += PvlKeyword("LineMinimumError", lineErr.Minimum());
-  error += PvlKeyword("LineAverageError", lineErr.Average());
-  error += PvlKeyword("LineMaximumError", lineErr.Maximum());
-  error += PvlKeyword("LineStdDeviationError", lineErr.StandardDeviation());
+  error += PvlKeyword("Degree", toString(degree));
+  error += PvlKeyword("NumberOfPoints", toString((int)sampResiduals.size()));
+  error += PvlKeyword("SampleMinimumError", toString(sampErr.Minimum()));
+  error += PvlKeyword("SampleAverageError", toString(sampErr.Average()));
+  error += PvlKeyword("SampleMaximumError", toString(sampErr.Maximum()));
+  error += PvlKeyword("SampleStdDeviationError", toString(sampErr.StandardDeviation()));
+  error += PvlKeyword("LineMinimumError", toString(lineErr.Minimum()));
+  error += PvlKeyword("LineAverageError", toString(lineErr.Average()));
+  error += PvlKeyword("LineMaximumError", toString(lineErr.Maximum()));
+  error += PvlKeyword("LineStdDeviationError", toString(lineErr.StandardDeviation()));
   Application::Log(error);
 
   //Close the input cubes for cleanup
@@ -218,26 +218,26 @@ void IsisMain() {
 
     //If the user entered the equatorial and polar radii
     if(ui.WasEntered("EQURADIUS") && ui.WasEntered("POLRADIUS")) {
-      equRadius = PvlKeyword("EquatorialRadius", ui.GetDouble("EQURADIUS"));
-      polRadius = PvlKeyword("PolarRadius", ui.GetDouble("POLRADIUS"));
+      equRadius = PvlKeyword("EquatorialRadius", toString(ui.GetDouble("EQURADIUS")));
+      polRadius = PvlKeyword("PolarRadius", toString(ui.GetDouble("POLRADIUS")));
     }
     //Else read them from the pck
     else {
       FileName pckFile("$base/kernels/pck/pck?????.tpc");
       pckFile = pckFile.highestVersion();
 
-      string pckFileName = pckFile.expanded();
+      QString pckFileName = pckFile.expanded();
 
-      furnsh_c(pckFileName.c_str());
+      furnsh_c(pckFileName.toAscii().data());
 
-      string target = targetName[0];
+      QString target = targetName[0];
       SpiceInt code;
       SpiceBoolean found;
 
-      bodn2c_c(target.c_str(), &code, &found);
+      bodn2c_c(target.toAscii().data(), &code, &found);
 
       if(!found) {
-        string msg = "Could not convert Target [" + target +
+        QString msg = "Could not convert Target [" + target +
                      "] to NAIF code";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
@@ -247,8 +247,8 @@ void IsisMain() {
 
       bodvar_c(code, "RADII", &n, radii);
 
-      equRadius = PvlKeyword("EquatorialRadius", radii[0] * 1000);
-      polRadius = PvlKeyword("PolarRadius", radii[2] * 1000);
+      equRadius = PvlKeyword("EquatorialRadius", toString(radii[0] * 1000));
+      polRadius = PvlKeyword("PolarRadius", toString(radii[2] * 1000));
     }
 
     mapGrp.AddKeyword(equRadius, Pvl::Replace);
@@ -293,7 +293,7 @@ void IsisMain() {
       double minLat = latStats->Minimum();
       double maxLat = latStats->Maximum();
 
-      bool isOcentric = ((std::string)mapGrp.FindKeyword("LatitudeType")) == "Planetocentric";
+      bool isOcentric = ((QString)mapGrp.FindKeyword("LatitudeType")) == "Planetocentric";
 
       if(isOcentric) {
         if(ui.GetString("LATTYPE") != "PLANETOCENTRIC") {
@@ -312,7 +312,7 @@ void IsisMain() {
       double minLon = lonDomain == 360 ? Projection::To360Domain(lonStats->Minimum()) : Projection::To180Domain(lonStats->Minimum());
       double maxLon = lonDomain == 360 ? Projection::To360Domain(lonStats->Maximum()) : Projection::To180Domain(lonStats->Maximum());
 
-      bool isPosEast = ((std::string)mapGrp.FindKeyword("LongitudeDirection")) == "PositiveEast";
+      bool isPosEast = ((QString)mapGrp.FindKeyword("LongitudeDirection")) == "PositiveEast";
 
       if(isPosEast) {
         if(ui.GetString("LONDIR") != "POSITIVEEAST") {
@@ -333,31 +333,31 @@ void IsisMain() {
         maxLon = temp;
       }
 
-      mapGrp.AddKeyword(PvlKeyword("MinimumLatitude", minLat), Pvl::Replace);
-      mapGrp.AddKeyword(PvlKeyword("MaximumLatitude", maxLat), Pvl::Replace);
-      mapGrp.AddKeyword(PvlKeyword("MinimumLongitude", minLon), Pvl::Replace);
-      mapGrp.AddKeyword(PvlKeyword("MaximumLongitude", maxLon), Pvl::Replace);
+      mapGrp.AddKeyword(PvlKeyword("MinimumLatitude", toString(minLat)), Pvl::Replace);
+      mapGrp.AddKeyword(PvlKeyword("MaximumLatitude", toString(maxLat)), Pvl::Replace);
+      mapGrp.AddKeyword(PvlKeyword("MinimumLongitude", toString(minLon)), Pvl::Replace);
+      mapGrp.AddKeyword(PvlKeyword("MaximumLongitude", toString(maxLon)), Pvl::Replace);
     }
 
     //If the user decided to enter a ground range then override
     if(ui.WasEntered("MINLAT")) {
       mapGrp.AddKeyword(PvlKeyword("MinimumLatitude",
-                                   ui.GetDouble("MINLAT")), Pvl::Replace);
+                                   toString(ui.GetDouble("MINLAT"))), Pvl::Replace);
     }
 
     if(ui.WasEntered("MAXLAT")) {
       mapGrp.AddKeyword(PvlKeyword("MaximumLatitude",
-                                   ui.GetDouble("MAXLAT")), Pvl::Replace);
+                                   toString(ui.GetDouble("MAXLAT"))), Pvl::Replace);
     }
 
     if(ui.WasEntered("MINLON")) {
       mapGrp.AddKeyword(PvlKeyword("MinimumLongitude",
-                                   ui.GetDouble("MINLON")), Pvl::Replace);
+                                   toString(ui.GetDouble("MINLON"))), Pvl::Replace);
     }
 
     if(ui.WasEntered("MAXLON")) {
       mapGrp.AddKeyword(PvlKeyword("MaximumLongitude",
-                                   ui.GetDouble("MAXLON")), Pvl::Replace);
+                                   toString(ui.GetDouble("MAXLON"))), Pvl::Replace);
     }
 
     //If the pixel resolution is to be computed, compute the pixels/degree from the input
@@ -392,7 +392,7 @@ void IsisMain() {
 
       //Add the scale in pixels/degree to the mapping group
       mapGrp.AddKeyword(PvlKeyword("Scale",
-                                   pixels / angle, "pixels/degree"),
+                                   toString(pixels / angle), "pixels/degree"),
                         Pvl::Replace);
       if(mapGrp.HasKeyword("PixelResolution")) {
         mapGrp.DeleteKeyword("PixelResolution");
@@ -403,7 +403,7 @@ void IsisMain() {
     // If the user decided to enter a resolution then override
     if(ui.GetString("PIXRES") == "MPP") {
       mapGrp.AddKeyword(PvlKeyword("PixelResolution",
-                                   ui.GetDouble("RESOLUTION"), "meters/pixel"),
+                                   toString(ui.GetDouble("RESOLUTION")), "meters/pixel"),
                         Pvl::Replace);
       if(mapGrp.HasKeyword("Scale")) {
         mapGrp.DeleteKeyword("Scale");
@@ -411,7 +411,7 @@ void IsisMain() {
     }
     else if(ui.GetString("PIXRES") == "PPD") {
       mapGrp.AddKeyword(PvlKeyword("Scale",
-                                   ui.GetDouble("RESOLUTION"), "pixels/degree"),
+                                   toString(ui.GetDouble("RESOLUTION")), "pixels/degree"),
                         Pvl::Replace);
       if(mapGrp.HasKeyword("PixelResolution")) {
         mapGrp.DeleteKeyword("PixelResolution");
@@ -774,7 +774,7 @@ void LoadMapRes() {
     ui.PutAsString("PIXRES", "MPP");
   }
   else {
-    string msg = "No resolution value found in [" + ui.GetFileName("MAP") + "]";
+    QString msg = "No resolution value found in [" + ui.GetFileName("MAP") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }
@@ -801,7 +801,7 @@ void ComputeInputRange() {
   double maxLon = lonDomain == 360 ? Projection::To360Domain(lonStats->Maximum()) : Projection::To180Domain(lonStats->Maximum());
 
   if(userGrp.HasKeyword("LatitudeType")) {
-    bool isOcentric = ((std::string)userGrp.FindKeyword("LatitudeType")) == "Planetocentric";
+    bool isOcentric = ((QString)userGrp.FindKeyword("LatitudeType")) == "Planetocentric";
 
     double equRadius;
     double polRadius;
@@ -816,11 +816,11 @@ void ComputeInputRange() {
       FileName pckFile("$base/kernels/pck/pck?????.tpc");
       pckFile = pckFile.highestVersion();
 
-      string pckFileName = pckFile.expanded();
+      QString pckFileName = pckFile.expanded();
 
-      furnsh_c(pckFileName.c_str());
+      furnsh_c(pckFileName.toAscii().data());
 
-      string target;
+      QString target;
 
       //If user entered target
       if(ui.WasEntered("TARGET")) {
@@ -830,16 +830,16 @@ void ComputeInputRange() {
       else {
         Pvl fromFile;
         fromFile.Read(ui.GetFileName("FROM"));
-        target = (string)fromFile.FindKeyword("TargetName", Pvl::Traverse);
+        target = (QString)fromFile.FindKeyword("TargetName", Pvl::Traverse);
       }
 
       SpiceInt code;
       SpiceBoolean found;
 
-      bodn2c_c(target.c_str(), &code, &found);
+      bodn2c_c(target.toAscii().data(), &code, &found);
 
       if(!found) {
-        string msg = "Could not convert Target [" + target +
+        QString msg = "Could not convert Target [" + target +
                      "] to NAIF code";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
@@ -868,7 +868,7 @@ void ComputeInputRange() {
   }
 
   if(userGrp.HasKeyword("LongitudeDirection")) {
-    bool isPosEast = ((std::string)userGrp.FindKeyword("LongitudeDirection")) == "PositiveEast";
+    bool isPosEast = ((QString)userGrp.FindKeyword("LongitudeDirection")) == "PositiveEast";
 
     if(isPosEast) {
       if(ui.GetString("LONDIR") != "POSITIVEEAST") {
@@ -950,7 +950,7 @@ void LoadMapRange() {
   ui.PutAsString("DEFAULTRANGE", "MAP");
 
   if(count < 4) {
-    string msg = "One or more of the values for the ground range was not found";
+    QString msg = "One or more of the values for the ground range was not found";
     msg += " in [" + ui.GetFileName("MAP") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }

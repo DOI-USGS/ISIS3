@@ -1,67 +1,71 @@
 #include <iostream>
 #include <iomanip>
+
+
 #include "TransverseMercator.h"
 #include "IException.h"
 #include "ProjectionFactory.h"
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
+
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   cout << "UNIT TEST FOR TransverseMercator" << endl << endl;
   cout << "Part 1: Sphere..." << endl;
 
-  Isis::Pvl lab;
-  lab.AddGroup(Isis::PvlGroup("Mapping"));
-  Isis::PvlGroup &mapGroup = lab.FindGroup("Mapping");
-  mapGroup += Isis::PvlKeyword("EquatorialRadius", 1.0);
-  mapGroup += Isis::PvlKeyword("PolarRadius", 1.0);
-  mapGroup += Isis::PvlKeyword("LatitudeType", "Planetographic");
-  mapGroup += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-  mapGroup += Isis::PvlKeyword("LongitudeDomain", 180);
-  mapGroup += Isis::PvlKeyword("MinimumLatitude", -70.0);
-  mapGroup += Isis::PvlKeyword("MaximumLatitude", 70.0);
-  mapGroup += Isis::PvlKeyword("MinimumLongitude", -90.0);
-  mapGroup += Isis::PvlKeyword("MaximumLongitude", -60.0);
-  mapGroup += Isis::PvlKeyword("ProjectionName", "TransverseMercator");
+  Pvl lab;
+  lab.AddGroup(PvlGroup("Mapping"));
+  PvlGroup &mapGroup = lab.FindGroup("Mapping");
+  mapGroup += PvlKeyword("EquatorialRadius", toString(1.0));
+  mapGroup += PvlKeyword("PolarRadius", toString(1.0));
+  mapGroup += PvlKeyword("LatitudeType", "Planetographic");
+  mapGroup += PvlKeyword("LongitudeDirection", "PositiveEast");
+  mapGroup += PvlKeyword("LongitudeDomain", toString(180));
+  mapGroup += PvlKeyword("MinimumLatitude", toString(-70.0));
+  mapGroup += PvlKeyword("MaximumLatitude", toString(70.0));
+  mapGroup += PvlKeyword("MinimumLongitude", toString(-90.0));
+  mapGroup += PvlKeyword("MaximumLongitude", toString(-60.0));
+  mapGroup += PvlKeyword("ProjectionName", "TransverseMercator");
 
   cout << "Test missing center longitude keyword ..." << endl;
   try {
-    Isis::TransverseMercator p(lab);
+    TransverseMercator p(lab);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
 
-  mapGroup += Isis::PvlKeyword("CenterLongitude", -75.0);
+  mapGroup += PvlKeyword("CenterLongitude", toString(-75.0));
 
   cout << "Test missing center latitude keyword..." << endl;
   try {
-    Isis::TransverseMercator p(lab);
+    TransverseMercator p(lab);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
 
-  mapGroup += Isis::PvlKeyword("CenterLatitude", 0.0);
+  mapGroup += PvlKeyword("CenterLatitude", toString(0.0));
 
   cout << "Test missing scale factor keyword..." << endl;
   try {
-    Isis::TransverseMercator p(lab);
+    TransverseMercator p(lab);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
 
-  mapGroup += Isis::PvlKeyword("ScaleFactor", 1.0);
+  mapGroup += PvlKeyword("ScaleFactor", toString(1.0));
 
   try {
-    Isis::Projection &p = *Isis::ProjectionFactory::Create(lab);
-    //  Isis::TransMercator p(lab);
+    Projection &p = *ProjectionFactory::Create(lab);
+    //  TransMercator p(lab);
 
     cout << "Test SetGround method ... " << endl;
     cout << std::setprecision(9);
@@ -92,7 +96,7 @@ int main(int argc, char *argv[]) {
     cout << "Maximum Y:  " << maxY << endl;
     cout << endl;
 
-    Isis::Projection *s = &p;
+    Projection *s = &p;
     cout << "Test Name and comparision method ... " << endl;
     cout << "Name:       " << s->Name() << endl;
     cout << "operator==  " << (*s == *s) << endl;
@@ -102,7 +106,7 @@ int main(int argc, char *argv[]) {
     mapGroup.DeleteKeyword("CenterLongitude");
     mapGroup.DeleteKeyword("CenterLatitude");
     mapGroup.DeleteKeyword("ScaleFactor");
-    Isis::TransverseMercator p2(lab, true);
+    TransverseMercator p2(lab, true);
     cout << lab << endl;
     cout << endl;
 
@@ -111,33 +115,33 @@ int main(int argc, char *argv[]) {
     cout << "  USGS Professional Paper 1395 by John P. Snyder" << endl;
     cout << "  Pages 268-269" << endl << endl;
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 
   cout << endl << "Part 2: Ellipsoid..." << endl;
 
-  Isis::Pvl lab2;
-  lab2.AddGroup(Isis::PvlGroup("Mapping"));
-  Isis::PvlGroup &mapGroup2 = lab2.FindGroup("Mapping");
-  mapGroup2 += Isis::PvlKeyword("EquatorialRadius", 6378206.4);
-  mapGroup2 += Isis::PvlKeyword("PolarRadius", 6356583.8);
-  mapGroup2 += Isis::PvlKeyword("LatitudeType", "Planetographic");
-  mapGroup2 += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-  mapGroup2 += Isis::PvlKeyword("LongitudeDomain", 180);
-  mapGroup2 += Isis::PvlKeyword("MinimumLatitude", -70.0);
-  mapGroup2 += Isis::PvlKeyword("MaximumLatitude", 70.0);
-  mapGroup2 += Isis::PvlKeyword("MinimumLongitude", -90.0);
-  mapGroup2 += Isis::PvlKeyword("MaximumLongitude", -60.0);
-  mapGroup2 += Isis::PvlKeyword("ProjectionName", "TransverseMercator");
-  mapGroup2 += Isis::PvlKeyword("CenterLongitude", -75.0);
-  mapGroup2 += Isis::PvlKeyword("CenterLatitude", 0.0);
-  mapGroup2 += Isis::PvlKeyword("ScaleFactor", 0.9996);
+  Pvl lab2;
+  lab2.AddGroup(PvlGroup("Mapping"));
+  PvlGroup &mapGroup2 = lab2.FindGroup("Mapping");
+  mapGroup2 += PvlKeyword("EquatorialRadius", toString(6378206.4));
+  mapGroup2 += PvlKeyword("PolarRadius", toString(6356583.8));
+  mapGroup2 += PvlKeyword("LatitudeType", "Planetographic");
+  mapGroup2 += PvlKeyword("LongitudeDirection", "PositiveEast");
+  mapGroup2 += PvlKeyword("LongitudeDomain", toString(180));
+  mapGroup2 += PvlKeyword("MinimumLatitude", toString(-70.0));
+  mapGroup2 += PvlKeyword("MaximumLatitude", toString(70.0));
+  mapGroup2 += PvlKeyword("MinimumLongitude", toString(-90.0));
+  mapGroup2 += PvlKeyword("MaximumLongitude", toString(-60.0));
+  mapGroup2 += PvlKeyword("ProjectionName", "TransverseMercator");
+  mapGroup2 += PvlKeyword("CenterLongitude", toString(-75.0));
+  mapGroup2 += PvlKeyword("CenterLatitude", toString(0.0));
+  mapGroup2 += PvlKeyword("ScaleFactor", toString(0.9996));
   cout << endl;
 
   try {
-    Isis::Projection &p = *Isis::ProjectionFactory::Create(lab2);
-    //  Isis::TransMercator p(lab);
+    Projection &p = *ProjectionFactory::Create(lab2);
+    //  TransMercator p(lab);
 
     cout << "Test SetGround method ... " << endl;
     cout << std::setprecision(9);
@@ -170,9 +174,9 @@ int main(int argc, char *argv[]) {
 
     cout << "Testing Mapping() methods ... " << endl;
 
-    Isis::Pvl tmp1;
-    Isis::Pvl tmp2;
-    Isis::Pvl tmp3;
+    Pvl tmp1;
+    Pvl tmp2;
+    Pvl tmp3;
     tmp1.AddGroup(p.Mapping());
     tmp2.AddGroup(p.MappingLatitudes());
     tmp3.AddGroup(p.MappingLongitudes());
@@ -190,7 +194,7 @@ int main(int argc, char *argv[]) {
     cout << "  USGS Professional Paper 1395 by John P. Snyder" << endl;
     cout << "  Pages 269-270" << endl;
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 }

@@ -1,4 +1,4 @@
-#if !defined(MinnaertEmpirical_h)
+#ifndef MinnaertEmpirical_h
 #define MinnaertEmpirical_h
 /**
  * @file
@@ -61,9 +61,9 @@ namespace Isis {
       MinnaertEmpirical(Pvl &pvl);
       virtual ~MinnaertEmpirical();
 
-      void SetPhotoPhaseList(const string phasestrlist);
-      void SetPhotoKList(const string kstrlist);
-      void SetPhotoPhaseCurveList(const string phasecurvestrlist);
+      void SetPhotoPhaseList(QString phasestrlist);
+      void SetPhotoKList(QString kstrlist);
+      void SetPhotoPhaseCurveList(QString phasecurvestrlist);
 
       //! Return photometric phase angle list
 //      inline std::vector<double> PhotoPhaseList() const {

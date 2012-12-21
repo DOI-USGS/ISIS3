@@ -39,41 +39,35 @@
 #include "UserInterface.h"
 
 using namespace Isis;
-using std::cerr;
-using std::cout;
-using std::endl;
-using std::ofstream;
-using std::set;
-using std::string;
-using std::stringstream;
+using namespace std;
 
-QMap< IString, set<IString> > constructPointSets(
-  set<IString> &index, ControlNet innet);
-QVector< set<IString> > findIslands(
-  set<IString> &index,
-  QMap< IString, set<IString> > adjCubes);
+QMap< QString, set<QString> > constructPointSets(
+  set<QString> &index, ControlNet innet);
+QVector< set<QString> > findIslands(
+  set<QString> &index,
+  QMap< QString, set<QString> > adjCubes);
 
 QList< ControlCubeGraphNode * > checkSerialList(
     SerialNumberList * serialNumbers, ControlNet * controlNet);
 
 void writeOutput(SerialNumberList num2cube,
-                 string filename,
-                 set<IString> sns,
-                 QMap< IString, set<IString> > cps);
+                 QString filename,
+                 set<QString> sns,
+                 QMap< QString, set<QString> > cps);
 
 double getControlFitness(const ControlCubeGraphNode * node, double tolerance, Cube * cube);
 void noLatLonCheck(ControlNet &cnet, CubeManager &manager, Progress &progress,
     bool ignore, SerialNumberList &num2cube,
-    set<IString> &noLatLonSerialNumbers,
-    QMap< IString, set<IString> > &noLatLonControlPoints);
+    set<QString> &noLatLonSerialNumbers,
+    QMap< QString, set<QString> > &noLatLonControlPoints);
 
-string buildRow(SerialNumberList &serials, string sn);
-string buildRow(SerialNumberList &serials, string sn, set<IString> &cps);
-string buildRow(SerialNumberList &serials, string sn, double value);
-void outputRow(ofstream &outStream, string rowText);
+QString buildRow(SerialNumberList &serials, QString sn);
+QString buildRow(SerialNumberList &serials, QString sn, set<QString> &cps);
+QString buildRow(SerialNumberList &serials, QString sn, double value);
+void outputRow(ofstream &outStream, QString rowText);
 
 
-IString g_delimiter;
+QString g_delimiter;
 
 
 // Main program
@@ -83,7 +77,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   ControlNet innet(ui.GetFileName("CNET"));
-  IString prefix(ui.GetString("PREFIX"));
+  QString prefix(ui.GetString("PREFIX"));
   bool ignore = ui.GetBoolean("IGNORE");
 
   // Set the character to separate the entries
@@ -102,9 +96,9 @@ void IsisMain() {
 
   // Sets up the list of serial numbers for
   FileList inlist(ui.GetFileName("FROMLIST"));
-  set<IString> inListNums;
-  QMap<IString, int> netSerialNumCount;
-  QVector<IString> listedSerialNumbers;
+  set<QString> inListNums;
+  QMap<QString, int> netSerialNumCount;
+  QVector<QString> listedSerialNumbers;
   SerialNumberList num2cube;
 
   if (inlist.size() > 0) {
@@ -115,24 +109,24 @@ void IsisMain() {
 
   for (int index = 0; index < inlist.size(); index++) {
     num2cube.Add(inlist[index].toString());
-    IString st = num2cube.SerialNumber(inlist[index].toString());
+    QString st = num2cube.SerialNumber(inlist[index].toString());
     inListNums.insert(st);
     listedSerialNumbers.push_back(st);   // Used with nonListedSerialNumbers
     progress.CheckStatus();
   }
 
-  QVector<IString> nonListedSerialNumbers;
+  QVector<QString> nonListedSerialNumbers;
 
-  set<IString> singleMeasureSerialNumbers;
-  QMap< IString, set<IString> > singleMeasureControlPoints;
+  set<QString> singleMeasureSerialNumbers;
+  QMap< QString, set<QString> > singleMeasureControlPoints;
 
-  QMap< IString, set<IString> > duplicateControlPoints;
+  QMap< QString, set<QString> > duplicateControlPoints;
 
-  set<IString> noLatLonSerialNumbers;
-  QMap< IString, set<IString> > noLatLonControlPoints;
-  set<IString> latlonchecked;
+  set<QString> noLatLonSerialNumbers;
+  QMap< QString, set<QString> > noLatLonControlPoints;
+  set<QString> latlonchecked;
 
-  QMap< IString, int > cubeMeasureCount;
+  QMap< QString, int > cubeMeasureCount;
 
   // Manage cubes used in NOLATLON
   CubeManager cbman;
@@ -157,7 +151,7 @@ void IsisMain() {
 
     // Checks of the ControlPoint has only 1 Measure
     if (controlpt->GetNumValidMeasures() == 1) {
-      IString sn = controlpt->GetMeasure(0)->GetCubeSerialNumber();
+      QString sn = controlpt->GetMeasure(0)->GetCubeSerialNumber();
       singleMeasureSerialNumbers.insert(sn);
       singleMeasureControlPoints[sn].insert(controlpt->GetId());
 
@@ -173,7 +167,7 @@ void IsisMain() {
         if (ignore  &&  controlms->IsIgnored()) continue;
 
         controlMeasures.append(controlms);
-        IString currentsn = controlms->GetCubeSerialNumber();
+        QString currentsn = controlms->GetCubeSerialNumber();
 
         // Records how many times a cube is in the ControlNet
         cubeMeasureCount[currentsn]++;
@@ -211,21 +205,21 @@ void IsisMain() {
 
 
   // Checks/detects islands
-  set<IString> index;
-  QMap< IString, set<IString> > adjCubes = constructPointSets(index, innet);
-  QVector< set<IString> > islands = findIslands(index, adjCubes);
+  set<QString> index;
+  QMap< QString, set<QString> > adjCubes = constructPointSets(index, innet);
+  QVector< set<QString> > islands = findIslands(index, adjCubes);
 
   // Output islands in the file-by-file format
   //  Islands that have no cubes listed in the input list will
   //  not be shown.
   for (int i = 0; i < (int)islands.size(); i++) {
-    IString name(FileName(prefix + "Island." + IString(i + 1)).expanded());
+    QString name(FileName(prefix + "Island." + toString(i + 1)).expanded());
     ofstream out_stream;
-    out_stream.open(name.c_str(), std::ios::out);
+    out_stream.open(name.toAscii().data(), std::ios::out);
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
     bool hasList = false;
-    for (set<IString>::iterator island = islands[i].begin();
+    for (set<QString>::iterator island = islands[i].begin();
          island != islands[i].end(); 
          island++) {
       if (num2cube.HasSerialNumber(*island)) {
@@ -237,7 +231,7 @@ void IsisMain() {
     out_stream.close();
 
     if (!hasList) {
-      remove(name.c_str());
+      remove(name.toAscii().data());
     }
   }
 
@@ -247,7 +241,7 @@ void IsisMain() {
 
   stringstream ss(stringstream::in | stringstream::out);
 
-  results.AddKeyword(PvlKeyword("Islands", IString((BigInt)islands.size())));
+  results.AddKeyword(PvlKeyword("Islands", toString((BigInt)islands.size())));
   ss << endl << "----------------------------------------" \
      "----------------------------------------" << endl;
   if (islands.size() == 1) {
@@ -264,9 +258,9 @@ void IsisMain() {
 
   if (ui.GetBoolean("SINGLEMEASURE")  &&  singleMeasureSerialNumbers.size() > 0) {
     results.AddKeyword(
-      PvlKeyword("SingleMeasure", IString((BigInt)singleMeasureSerialNumbers.size())));
+      PvlKeyword("SingleMeasure", toString((BigInt)singleMeasureSerialNumbers.size())));
 
-    IString name(FileName(prefix + "SinglePointCubes.txt").expanded());
+    QString name(FileName(prefix + "SinglePointCubes.txt").expanded());
     writeOutput(num2cube, name,
                 singleMeasureSerialNumbers, singleMeasureControlPoints);
 
@@ -282,9 +276,9 @@ void IsisMain() {
 
   if (ui.GetBoolean("NOLATLON")  &&  noLatLonSerialNumbers.size() > 0) {
     results.AddKeyword(
-      PvlKeyword("NoLatLonCubes", IString((BigInt)noLatLonSerialNumbers.size())));
+      PvlKeyword("NoLatLonCubes", toString((BigInt)noLatLonSerialNumbers.size())));
 
-    IString name(FileName(prefix + "NoLatLon.txt").expanded());
+    QString name(FileName(prefix + "NoLatLon.txt").expanded());
     writeOutput(num2cube, name,
                 noLatLonSerialNumbers, noLatLonControlPoints);
 
@@ -298,20 +292,20 @@ void IsisMain() {
   }
 
   // Perform Low Coverage check if it was selected
-  IString coverageOp = "LowCoverage";
+  QString coverageOp = "LowCoverage";
   int failedCoverageCheck = 0;
-  if (ui.GetBoolean(IString(coverageOp).UpCase())) {
+  if (ui.GetBoolean(QString(coverageOp).toUpper())) {
     QList< ControlCubeGraphNode * > nodes = innet.GetCubeGraphNodes();
 
     if (nodes.size() > 0) {
-      IString name(FileName(prefix + coverageOp + ".txt").expanded());
+      QString name(FileName(prefix + coverageOp + ".txt").expanded());
       ofstream out_stream;
-      out_stream.open(name.c_str(), std::ios::out);
+      out_stream.open(name.toAscii().data(), std::ios::out);
       out_stream.seekp(0, std::ios::beg); // Start writing from file beginning
 
       double tolerance = ui.GetDouble("TOLERANCE");
       foreach (ControlCubeGraphNode * node, nodes) {
-        IString sn = node->getSerialNumber();
+        QString sn = node->getSerialNumber();
 
         if (num2cube.HasSerialNumber(sn)) {
           // Create a convex hull
@@ -338,21 +332,21 @@ void IsisMain() {
         "coverages, are listed in [" << FileName(name).name() << "]" << endl;
 
       results.AddKeyword(
-          PvlKeyword(coverageOp, IString((BigInt) failedCoverageCheck)));
+          PvlKeyword(coverageOp, toString((BigInt) failedCoverageCheck)));
     }
   }
 
   // At this point, inListNums is the list of cubes NOT included in the
   //  ControlNet, and inListNums are their those cube's serial numbers.
   if (ui.GetBoolean("NOCONTROL") && !inListNums.empty()) {
-    results.AddKeyword(PvlKeyword("NoControl", IString((BigInt)inListNums.size())));
+    results.AddKeyword(PvlKeyword("NoControl", toString((BigInt)inListNums.size())));
 
-    IString name(FileName(prefix + "NoControl.txt").expanded());
+    QString name(FileName(prefix + "NoControl.txt").expanded());
     ofstream out_stream;
-    out_stream.open(name.c_str(), std::ios::out);
+    out_stream.open(name.toAscii().data(), std::ios::out);
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
-    for (set<IString>::iterator sn = inListNums.begin();
+    for (set<QString>::iterator sn = inListNums.begin();
          sn != inListNums.end();
          sn++) {
       outputRow(out_stream, buildRow(num2cube, *sn));
@@ -373,18 +367,18 @@ void IsisMain() {
   //  cube in the input list.
   if (ui.GetBoolean("NOCUBE")  &&  nonListedSerialNumbers.size() > 0) {
     results.AddKeyword(
-      PvlKeyword("NoCube", IString((BigInt)nonListedSerialNumbers.size())));
+      PvlKeyword("NoCube", toString((BigInt)nonListedSerialNumbers.size())));
 
-    IString name(FileName(prefix + "NoCube.txt").expanded());
+    QString name(FileName(prefix + "NoCube.txt").expanded());
     ofstream out_stream;
-    out_stream.open(name.c_str(), std::ios::out);
+    out_stream.open(name.toAscii().data(), std::ios::out);
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
     for (int sn = 0; sn < (int)nonListedSerialNumbers.size(); sn++) {
       int validMeasureCount = innet.getGraphNode(
           nonListedSerialNumbers[sn])->getValidMeasures().size();
-      string rowText = nonListedSerialNumbers[sn] + " (Valid Measures: " +
-          IString(validMeasureCount) + ")";
+      QString rowText = nonListedSerialNumbers[sn] + " (Valid Measures: " +
+          toString(validMeasureCount) + ")";
       outputRow(out_stream, rowText);
     }
 
@@ -404,8 +398,8 @@ void IsisMain() {
   // At this point cubeMeasureCount should be equal to the number of
   //  ControlMeasures associated with each serial number.
   if (ui.GetBoolean("SINGLECUBE")) {
-    set<IString> singleMeasureCubes;
-    for (QMap<IString, int>::iterator cube = cubeMeasureCount.begin();
+    set<QString> singleMeasureCubes;
+    for (QMap<QString, int>::iterator cube = cubeMeasureCount.begin();
          cube != cubeMeasureCount.end();
          cube++) {
       if (cube.value() == 1) {
@@ -415,14 +409,14 @@ void IsisMain() {
 
     if (singleMeasureCubes.size() > 0) {
       results.AddKeyword(
-        PvlKeyword("SingleCube", IString((BigInt)singleMeasureCubes.size())));
+        PvlKeyword("SingleCube", toString((BigInt)singleMeasureCubes.size())));
 
-      IString name(FileName(prefix + "SingleCube.txt").expanded());
+      QString name(FileName(prefix + "SingleCube.txt").expanded());
       ofstream out_stream;
-      out_stream.open(name.c_str(), std::ios::out);
+      out_stream.open(name.toAscii().data(), std::ios::out);
       out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
-      for (set<IString>::iterator sn = singleMeasureCubes.begin();
+      for (set<QString>::iterator sn = singleMeasureCubes.begin();
            sn != singleMeasureCubes.end();
            sn++) {
         outputRow(out_stream, buildRow(num2cube, *sn));
@@ -443,7 +437,7 @@ void IsisMain() {
 
   ss << "----------------------------------------" \
      "----------------------------------------" << endl << endl;
-  string log = ss.str();
+  QString log = ss.str().c_str();
   Application::Log(results);
 
   if (ui.IsInteractive()) {
@@ -457,9 +451,9 @@ void IsisMain() {
 
 
 // Links cubes to other cubes it shares control points with
-QMap< IString, set<IString> > constructPointSets(set<IString> & index,
+QMap< QString, set<QString> > constructPointSets(set<QString> & index,
     ControlNet innet) {
-  QMap< IString, set<IString > > adjPoints;
+  QMap< QString, set<QString > > adjPoints;
 
   bool ignore = Application::GetUserInterface().GetBoolean("IGNORE");
   for (int cp = 0; cp < innet.GetNumPoints(); cp++) {
@@ -473,7 +467,7 @@ QMap< IString, set<IString> > constructPointSets(set<IString> & index,
     for (int cm1 = 0; cm1 < controlpt->GetNumMeasures(); cm1++) {
       if (ignore && controlpt->IsIgnored()) continue;
 
-      IString sn = controlpt->GetMeasure(cm1)->GetCubeSerialNumber();
+      QString sn = controlpt->GetMeasure(cm1)->GetCubeSerialNumber();
       index.insert(sn);
       for (int cm2 = 0; cm2 < controlpt->GetNumMeasures(); cm2++) {
         if (ignore && controlpt->GetMeasure(cm2)->IsIgnored()) continue;
@@ -491,15 +485,15 @@ QMap< IString, set<IString> > constructPointSets(set<IString> & index,
 
 
 // Uses a depth-first search to construct the islands
-QVector< set<IString> > findIslands(set<IString> & index,
-    QMap< IString, set<IString> > adjCubes) {
-  QVector< set<IString> > islands;
+QVector< set<QString> > findIslands(set<QString> & index,
+    QMap< QString, set<QString> > adjCubes) {
+  QVector< set<QString> > islands;
 
   while(index.size() != 0) {
-    set<IString> connectedSet;
+    set<QString> connectedSet;
 
-    QStack<IString> str_stack;
-    set<IString>::iterator first = index.begin();
+    QStack<QString> str_stack;
+    set<QString>::iterator first = index.begin();
     str_stack.push(*first);
 
     // Depth search
@@ -508,9 +502,9 @@ QVector< set<IString> > findIslands(set<IString> & index,
       connectedSet.insert(str_stack.top());
 
       // Find the first connected unvisited node
-      IString nextNode = "";
-      set<IString> neighbors = adjCubes[str_stack.top()];
-      for (set<IString>::iterator i = neighbors.begin(); 
+      QString nextNode = "";
+      set<QString> neighbors = adjCubes[str_stack.top()];
+      for (set<QString>::iterator i = neighbors.begin(); 
            i != neighbors.end(); 
            i++) {
         if (index.count(*i) == 1) {
@@ -539,15 +533,15 @@ QVector< set<IString> > findIslands(set<IString> & index,
 
 
 // Writes the list of cubes [ SerialNumber, FileName, ControlPoints ] to the output file
-void writeOutput(SerialNumberList num2cube, string filename,
-                 set<IString> sns, QMap< IString, set<IString> > cps) {
+void writeOutput(SerialNumberList num2cube, QString filename,
+                 set<QString> sns, QMap< QString, set<QString> > cps) {
 
   // Set up the output file for writing
   ofstream out_stream;
-  out_stream.open(filename.c_str(), std::ios::out);
+  out_stream.open(filename.toAscii().data(), std::ios::out);
   out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
-  for (set<IString>::iterator sn = sns.begin();
+  for (set<QString>::iterator sn = sns.begin();
        sn != sns.end(); 
        sn++) {
     outputRow(out_stream, buildRow(num2cube, *sn, cps[*sn]));
@@ -578,7 +572,7 @@ double getControlFitness(const ControlCubeGraphNode * node, double tolerance, Cu
 
     // Calculate the area of the convex hull
     double convexArea = convexHull->getArea();
-    IString sn = node->getSerialNumber();
+    QString sn = node->getSerialNumber();
     double cubeArea = cube->getSampleCount() * cube->getLineCount();
 
     controlFitness = convexArea / cubeArea;
@@ -596,8 +590,8 @@ double getControlFitness(const ControlCubeGraphNode * node, double tolerance, Cu
 
 void noLatLonCheck(ControlNet &cnet, CubeManager &manager, Progress &progress,
     bool ignore, SerialNumberList &num2cube,
-    set<IString> &noLatLonSerialNumbers,
-    QMap< IString, set<IString> > &noLatLonControlPoints) {
+    set<QString> &noLatLonSerialNumbers,
+    QMap< QString, set<QString> > &noLatLonControlPoints) {
 
   // Set calculating progress
   QList<ControlCubeGraphNode *> graphNodes = cnet.GetCubeGraphNodes();
@@ -609,7 +603,7 @@ void noLatLonCheck(ControlNet &cnet, CubeManager &manager, Progress &progress,
 
   for (int sn = 0; sn < graphNodes.size(); sn++) {
     ControlCubeGraphNode *graphNode = graphNodes[sn];
-    IString serialNumber = graphNode->getSerialNumber();
+    QString serialNumber = graphNode->getSerialNumber();
 
     if (num2cube.HasSerialNumber(serialNumber)) {
       Cube *cube = manager.OpenCube(num2cube.FileName(serialNumber));
@@ -650,18 +644,18 @@ void noLatLonCheck(ControlNet &cnet, CubeManager &manager, Progress &progress,
 }
 
 
-string buildRow(SerialNumberList &serials, string sn) {
-  string cubeName = serials.HasSerialNumber(sn) ?
+QString buildRow(SerialNumberList &serials, QString sn) {
+  QString cubeName = serials.HasSerialNumber(sn) ?
       FileName(serials.FileName(sn)).expanded() : "UnknownFilename";
   return cubeName + g_delimiter + sn;
 }
 
 
-string buildRow(SerialNumberList &serials, string sn, set<IString> &cps) {
-  string rowText = buildRow(serials, sn);
+QString buildRow(SerialNumberList &serials, QString sn, set<QString> &cps) {
+  QString rowText = buildRow(serials, sn);
 
   // Control Points where the cube was found to have the issue
-  for (set<IString>::iterator cp = cps.begin(); cp != cps.end(); cp++) {
+  for (set<QString>::iterator cp = cps.begin(); cp != cps.end(); cp++) {
     rowText += g_delimiter + *cp;
   }
 
@@ -669,12 +663,12 @@ string buildRow(SerialNumberList &serials, string sn, set<IString> &cps) {
 }
 
 
-string buildRow(SerialNumberList &serials, string sn, double value) {
-  return buildRow(serials, sn) + g_delimiter + IString(value);
+QString buildRow(SerialNumberList &serials, QString sn, double value) {
+  return buildRow(serials, sn) + g_delimiter + toString(value);
 }
 
 
-void outputRow(ofstream &outStream, string rowText) {
+void outputRow(ofstream &outStream, QString rowText) {
   outStream << rowText << "\n";
 }
 

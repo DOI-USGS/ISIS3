@@ -111,9 +111,9 @@ namespace Isis {
  * 
  * @param correction Type of stellar aberration correction to apply
  */
-  void SpacecraftPosition::SetAberrationCorrection(const std::string &correction) {
+  void SpacecraftPosition::SetAberrationCorrection(const QString &correction) {
     SpicePosition::SetAberrationCorrection(correction);  // Checks for validity
-    m_abcorr.setAberrationCorrection(QString::fromStdString(correction));
+    m_abcorr.setAberrationCorrection(correction);
   }
 
 
@@ -122,8 +122,8 @@ namespace Isis {
  * 
  * @author 2012-10-29 Kris Becker
  */
-  std::string SpacecraftPosition::GetAberrationCorrection() const {
-    return (m_abcorr.getAberrationCorrection().toStdString());
+  QString SpacecraftPosition::GetAberrationCorrection() const {
+    return (m_abcorr.getAberrationCorrection());
   }
 
 /**

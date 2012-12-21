@@ -33,21 +33,18 @@ class QWidget;
 namespace Isis {
   class ControlMeasure;
   class ControlNet;
-  class Cube;
-  class IString;
-  class MatchToolNewPointDialog;
-  class Stretch;
-  class UniversalGroundMap;
-}
-
-namespace Isis {
   class ControlPointEdit;
+  class Cube;
   class CubeViewport;
   class MainWindow;
+  class MatchToolNewPointDialog;
   class MdiCubeViewport;
   class MatchHoldPointDialog;
   class SerialNumberList;
+  class Stretch;
   class ToolPad;
+  class UniversalGroundMap;
+
   /**
    * @brief Match tool operations
    *
@@ -182,7 +179,7 @@ namespace Isis {
    *                          already handled in ControlPointEdit::saveMeasure.
    *   @history 2012-05-08 Tracie Sucharski - Fixed bug where m_leftFile was not
    *                          being reset in mouseButtonRelease.  Change m_leftFile
-   *                          from a std::string to a QString.
+   *                          from a QString to a QString.
    *   @history 2012-06-12 Tracie Sucharski - Change made to measureSaved on 2012-04-26 caused a
    *                          bug where if no ground is loaded the checkReference was not being
    *                          called and reference measure could not be changed and there was no
@@ -314,7 +311,7 @@ namespace Isis {
       void createTemplateEditorWidget();
       void loadTemplateFile(QString);
       bool okToContinue();
-      bool IsMeasureLocked(IString serialNumber);
+      bool IsMeasureLocked(QString serialNumber);
       void addMeasure(MdiCubeViewport *mvp, double sample, double line);
       bool validateMeasureChange(ControlMeasure *m);
 
@@ -322,7 +319,7 @@ namespace Isis {
 
       // TODO  pointer, reference, what???
       SerialNumberList serialNumberList();
-      std::string serialNumber(MdiCubeViewport *mvp);
+      QString serialNumber(MdiCubeViewport *mvp);
       void addViewportToSerialNumberList(MdiCubeViewport *mvp);
 
       void readSettings();
@@ -338,7 +335,7 @@ namespace Isis {
       QString m_cnetFileName;
       QLabel *m_cnetFileNameLabel;
       bool m_coregNet;
-      IString m_coregReferenceSN;
+      QString m_coregReferenceSN;
       bool m_netChanged;
 
       QAction *m_createPoint;

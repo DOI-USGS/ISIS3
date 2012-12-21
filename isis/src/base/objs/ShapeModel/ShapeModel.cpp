@@ -56,7 +56,7 @@ namespace Isis {
    * Initialize the ShapeModel private variables.
    */
   void ShapeModel::Initialize() {
-    m_name = new IString();
+    m_name = new QString();
     m_surfacePoint = new SurfacePoint();
     m_hasIntersection = false;
     m_hasNormal = false;
@@ -320,7 +320,7 @@ namespace Isis {
   /** Set the shape name
    *
    */
-  void ShapeModel::setName(const IString name) {
+  void ShapeModel::setName(QString name) {
      *m_name = name;
   }
 
@@ -328,7 +328,7 @@ namespace Isis {
   /** Get the shape name
    *
    */
-  IString ShapeModel::name() const{
+  QString ShapeModel::name() const{
     return *m_name;
   }
 

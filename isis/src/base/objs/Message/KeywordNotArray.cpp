@@ -25,8 +25,6 @@ using namespace std;
 
 #include "Message.h"
 
-string Isis::Message::KeywordNotArray(const string &key) {
-  string message;
-  message = "Keyword [" + key + "] is not an array";
-  return message;
+QString Isis::Message::KeywordNotArray(const QString &key) {
+  return "Keyword [" + key + "] is not an array";
 }

@@ -202,8 +202,8 @@ namespace Isis {
     }
 
     // Create correct camera type
-    IString type = (string) inst["InstrumentType"];
-    if (type.UpCase() == "FRAMING") {
+    QString type = (QString) inst["InstrumentType"];
+    if (type.toUpper() == "FRAMING") {
       p_framing = true;
       new CameraDetectorMap(this);
       CameraFocalPlaneMap *fmap = new CameraFocalPlaneMap(this, 0);
@@ -216,7 +216,7 @@ namespace Isis {
       setTime(et);
       LoadCache();
     }
-    else if (type.UpCase() == "LINESCAN") {
+    else if (type.toUpper() == "LINESCAN") {
       p_framing = false;
       new LineScanCameraDetectorMap(this, et, exposureDuration);
       CameraFocalPlaneMap *fmap = new CameraFocalPlaneMap(this, 0);
@@ -230,8 +230,8 @@ namespace Isis {
       NaifStatus::CheckErrors();
     }
     else {
-      string msg = "Unknown InstrumentType [" +
-                        (string) inst["InstrumentType"] + "]";
+      QString msg = "Unknown InstrumentType [" +
+                        (QString) inst["InstrumentType"] + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }

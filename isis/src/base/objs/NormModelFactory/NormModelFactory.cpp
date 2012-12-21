@@ -53,15 +53,15 @@ namespace Isis {
     // Get the algorithm name to create
     PvlGroup &algo = pvl.FindObject("NormalizationModel")
                      .FindGroup("Algorithm", Pvl::Traverse);
-    std::string algorithm = "";
+    QString algorithm = "";
     if (algo.HasKeyword("NormName")) {
-      algorithm = std::string(algo["NormName"]);
+      algorithm = QString(algo["NormName"]);
     }
     else if (algo.HasKeyword("Name")) {
-      algorithm = std::string(algo["Name"]);
+      algorithm = QString(algo["Name"]);
     }
     else {
-      IString msg = "Keyword [Name] or keyword [NormName] must ";
+      QString msg = "Keyword [Name] or keyword [NormName] must ";
       msg += "exist in [Group = Algorithm]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -109,12 +109,12 @@ namespace Isis {
     // Get the algorithm name to create
     PvlGroup &algo = pvl.FindObject("NormalizationModel")
                      .FindGroup("Algorithm", Pvl::Traverse);
-    std::string algorithm = "";
+    QString algorithm = "";
     if (algo.HasKeyword("NormName")) {
-      algorithm = std::string(algo["NormName"]);
+      algorithm = QString(algo["NormName"]);
     }
     else if (algo.HasKeyword("Name")) {
-      algorithm = std::string(algo["Name"]);
+      algorithm = QString(algo["Name"]);
     }
     else {
       IString msg = "Keyword [Name] or keyword [NormName] must ";

@@ -40,7 +40,7 @@ SCCSID @(#)readBlock.h  1.1 10/04/99
 */
 /* SCCShid @(#)readBlock.h (readBlock.h) 1.4 */
 
-#if !defined(readBlock_h)
+#ifndef readBlock_h
 
 #define readBlock_h
 

@@ -1,4 +1,4 @@
-#if !defined(MinimumDifference_h)
+#ifndef MinimumDifference_h
 #define MinimumDifference_h
 /**
  * @file
@@ -84,7 +84,7 @@ namespace Isis {
       virtual double IdealFit() const {
         return 0.0;
       };
-      virtual IString AlgorithmName() const {
+      virtual QString AlgorithmName() const {
         return "MinimumDifference";
       };
 

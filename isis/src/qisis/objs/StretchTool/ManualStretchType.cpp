@@ -143,8 +143,8 @@ namespace Isis {
       }
     }
     catch (IException &e) {
-      p_errorMessage->setText(QString::fromStdString(
-          "<font color='red'>" + e.toString() + "</font>"));
+      p_errorMessage->setText(
+          "<font color='red'>" + e.toString() + "</font>");
     }
 
     return stretch;

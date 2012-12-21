@@ -19,7 +19,7 @@
 namespace Isis {
   MosaicMainWindow::MosaicMainWindow(QString title, QWidget *parent) :
       MainWindow(title, parent),
-      m_settings(FileName("$HOME/.Isis/qmos/qmos.config").expanded().c_str(),
+      m_settings(FileName("$HOME/.Isis/qmos/qmos.config").expanded(),
                  QSettings::NativeFormat) {
     m_filename = "";
     m_fileMenu = NULL;
@@ -104,8 +104,8 @@ namespace Isis {
           filesToOpen.append(argument);
         }
         else if (cubeListName.exactMatch(argument)) {
-          TextFile fileList(argument.toStdString());
-          IString line;
+          TextFile fileList(argument);
+          QString line;
 
           while(fileList.GetLine(line)) {
             filesToOpen.append(line);
@@ -611,10 +611,10 @@ namespace Isis {
 
     if (selected != "") {
       m_lastOpenedFile = QFileInfo(selected);
-      TextFile fileList((IString) selected);
+      TextFile fileList((QString) selected);
 
       QStringList filesInList;
-      IString line;
+      QString line;
 
       while(fileList.GetLine(line)) {
         filesInList.append(line);

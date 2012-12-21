@@ -25,57 +25,58 @@ void IsisMain() {
 
   Pvl labelPvl(inFile.expanded());
 
-  IString prodType;
+  QString prodType;
 
   if(labelPvl.HasKeyword("PRODUCT_TYPE")) {
-    prodType = (string)labelPvl.FindKeyword("PRODUCT_TYPE");
+    prodType = (QString)labelPvl.FindKeyword("PRODUCT_TYPE");
   }
   else {
-    string msg = "Unsupported CRISM file type, supported types are: DDR, MRDR, and TRDR";
+    QString msg = "Unsupported CRISM file type, supported types are: DDR, MRDR, and TRDR";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if(prodType.Equal("MAP_PROJECTED_MULTISPECTRAL_RDR")) {
-    IString prodId;
+  if(prodType.toUpper() == "MAP_PROJECTED_MULTISPECTRAL_RDR") {
+    QString prodId;
     if(labelPvl.HasKeyword("PRODUCT_ID")) {
-      prodId = (string)labelPvl.FindKeyword("PRODUCT_ID");
-      prodId = prodId.substr(prodId.find("_") + 1, prodId.find("_"));
+      prodId = (QString)labelPvl.FindKeyword("PRODUCT_ID");
+      prodId = prodId.mid(prodId.indexOf("_") + 1, prodId.indexOf("_"));
     }
     else {
-      string msg = "Could not find label PRODUCT_ID, invalid MRDR";
+      QString msg = "Could not find label PRODUCT_ID, invalid MRDR";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     //If the product type is AL (Lambert albedo) or IF (I/F)
     //Read the wavelength table and put the corresponding
     //widths in the band bin group
-    if(prodId.Equal("MRRAL") || prodId.Equal("MRRIF")) {
+    if(prodId.toUpper() == "MRRAL" || prodId.toUpper() == "MRRIF") {
       //If the wavelength file is specified in the label
       if(labelPvl.HasKeyword("MRO:WAVELENGTH_FILE_NAME")) {
         PvlGroup bandBin = PvlGroup("BandBin");
         PvlKeyword origBand = PvlKeyword("OriginalBand");
         PvlKeyword widths = PvlKeyword("Width");
-        IString tablePath = (string)labelPvl.FindKeyword("MRO:WAVELENGTH_FILE_NAME");
-        tablePath = tablePath.DownCase();
+        QString tablePath = (QString)labelPvl.FindKeyword("MRO:WAVELENGTH_FILE_NAME");
+        tablePath = tablePath.toLower();
         FileName tableFile(inFile.path() + "/" + tablePath);
         //Check if the wavelength file exists
         if(tableFile.fileExists()) {
           TextFile *fin = new TextFile(tableFile.expanded());
           // Open table file
           if(!fin->OpenChk()) {
-            string msg = "Cannot open wavelength table [" + tableFile.expanded() + "]";
+            QString msg = "Cannot open wavelength table [" + tableFile.expanded() + "]";
             throw IException(IException::Io, msg, _FILEINFO_);
           }
 
           //For each line in the wavelength table, add the width to
           //The band bin group
-          IString st;
+          QString st;
           int band = 1;
           while(fin->GetLine(st)) {
-            st.Token(",");
-            st.Token(",");
-            origBand += band;
-            widths += st.Token(",").ConvertWhiteSpace().Trim(" ").ToDouble();
+            st = st.simplified().trimmed();
+            QStringList cols = st.split(",");
+
+            origBand += toString(band);
+            widths += cols[2];
             band++;
           }
           delete fin;
@@ -86,7 +87,7 @@ void IsisMain() {
         }
         //Otherwise throw an error
         else {
-          string msg = "Cannot fine wavelength table [" + tableFile.expanded() + "]";
+          QString msg = "Cannot fine wavelength table [" + tableFile.expanded() + "]";
           throw IException(IException::Io, msg, _FILEINFO_);
         }
       }
@@ -94,13 +95,13 @@ void IsisMain() {
     //If the product type is DE (Derived products for I/F) or DL
     //(Derived products for Lambert albedo) write the band names
     //to the band bin group
-    else if(prodId.Equal("MRRDE") || prodId.Equal("MRRDL")) {
+    else if(prodId.toUpper() == "MRRDE" || prodId.toUpper() == "MRRDL") {
       PvlGroup bandBin = PvlGroup("BandBin");
       PvlKeyword origBand = PvlKeyword("OriginalBand");
       PvlKeyword bandName = PvlKeyword("BandName");
       PvlKeyword bandNames = labelPvl.FindObject("IMAGE").FindKeyword("BAND_NAME");
       for(int i = 0; i < bandNames.Size(); i++) {
-        origBand += (i + 1);
+        origBand += toString(i + 1);
         bandName += bandNames[i];
       }
       bandBin.AddKeyword(origBand);
@@ -111,15 +112,15 @@ void IsisMain() {
     p.TranslatePdsProjection(outLabel);
     ocube->putGroup(outLabel.FindGroup("Mapping", Pvl::Traverse));
   }
-  else if(prodType.Equal("TARGETED_RDR")) {
+  else if(prodType.toUpper() == "TARGETED_RDR") {
   }
-  else if(prodType.Equal("DDR")) {
+  else if(prodType.toUpper() == "DDR") {
     PvlGroup bandBin = PvlGroup("BandBin");
     PvlKeyword origBand = PvlKeyword("OriginalBand");
     PvlKeyword bandName = PvlKeyword("BandName");
     PvlKeyword bandNames = labelPvl.FindObject("FILE").FindObject("IMAGE").FindKeyword("BAND_NAME");
     for(int i = 0; i < bandNames.Size(); i++) {
-      origBand += (i + 1);
+      origBand += toString(i + 1);
       bandName += bandNames[i];
     }
     bandBin.AddKeyword(origBand);
@@ -127,7 +128,7 @@ void IsisMain() {
     ocube->putGroup(bandBin);
   }
   else {
-    string msg = "Unsupported CRISM file type, supported types are: DDR, MRDR, and TRDR";
+    QString msg = "Unsupported CRISM file type, supported types are: DDR, MRDR, and TRDR";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 

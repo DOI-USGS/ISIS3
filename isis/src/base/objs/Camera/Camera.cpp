@@ -701,17 +701,17 @@ namespace Isis {
     PvlGroup map = pvl.FindGroup("Mapping", Pvl::Traverse);
 
     if (map.HasKeyword("EquatorialRadius"))
-      a = Distance(map["EquatorialRadius"][0], Distance::Meters);
+      a = Distance(toDouble(map["EquatorialRadius"][0]), Distance::Meters);
 
     if (map.HasKeyword("PolarRadius"))
-      b = Distance(map["PolarRadius"][0], Distance::Meters);
+      b = Distance(toDouble(map["PolarRadius"][0]), Distance::Meters);
 
     // Convert to planetographic if necessary
     minlat = p_minlat;
     maxlat = p_maxlat;
     if (map.HasKeyword("LatitudeType")) {
-      IString latType = (string) map["LatitudeType"];
-      if (latType.UpCase() == "PLANETOGRAPHIC") {
+      QString latType = (QString) map["LatitudeType"];
+      if (latType.toUpper() == "PLANETOGRAPHIC") {
         if (abs(minlat) < 90.0) {  // So tan doesn't fail
           minlat *= PI / 180.0;
           minlat = atan(tan(minlat) * (a / b) * (a / b));
@@ -731,8 +731,8 @@ namespace Isis {
     maxlon = p_maxlon;
     bool domain360 = true;
     if (map.HasKeyword("LongitudeDomain")) {
-      IString lonDomain = (string) map["LongitudeDomain"];
-      if (lonDomain.UpCase() == "180") {
+      QString lonDomain = (QString) map["LongitudeDomain"];
+      if (lonDomain == "180") {
         minlon = p_minlon180;
         maxlon = p_maxlon180;
         domain360 = false;
@@ -741,8 +741,8 @@ namespace Isis {
 
     // Convert to the proper longitude direction
     if (map.HasKeyword("LongitudeDirection")) {
-      IString lonDirection = (string) map["LongitudeDirection"];
-      if (lonDirection.UpCase() == "POSITIVEWEST") {
+      QString lonDirection = (QString) map["LongitudeDirection"];
+      if (lonDirection.toUpper() == "POSITIVEWEST") {
         double swap = minlon;
         minlon = -maxlon;
         maxlon = -swap;
@@ -786,19 +786,19 @@ namespace Isis {
     map += PvlKeyword("TargetName", target()->name());
 
     std::vector<Distance> radii = target()->radii();
-    map += PvlKeyword("EquatorialRadius", radii[0].meters(), "meters");
-    map += PvlKeyword("PolarRadius", radii[2].meters(), "meters");
+    map += PvlKeyword("EquatorialRadius", toString(radii[0].meters()), "meters");
+    map += PvlKeyword("PolarRadius", toString(radii[2].meters()), "meters");
     
     map += PvlKeyword("LatitudeType", "Planetocentric");
     map += PvlKeyword("LongitudeDirection", "PositiveEast");
     map += PvlKeyword("LongitudeDomain", "360");
 
     GroundRangeResolution();
-    map += PvlKeyword("MinimumLatitude", p_minlat);
-    map += PvlKeyword("MaximumLatitude", p_maxlat);
-    map += PvlKeyword("MinimumLongitude", p_minlon);
-    map += PvlKeyword("MaximumLongitude", p_maxlon);
-    map += PvlKeyword("PixelResolution", p_minres);
+    map += PvlKeyword("MinimumLatitude", toString(p_minlat));
+    map += PvlKeyword("MaximumLatitude", toString(p_maxlat));
+    map += PvlKeyword("MinimumLongitude", toString(p_minlon));
+    map += PvlKeyword("MaximumLongitude", toString(p_maxlon));
+    map += PvlKeyword("PixelResolution", toString(p_minres));
 
     map += PvlKeyword("ProjectionName", "Sinusoidal");
     pvl.AddGroup(map);
@@ -807,14 +807,14 @@ namespace Isis {
   //! Reads the focal length from the instrument kernel
   void Camera::SetFocalLength() {
     int code = naifIkCode();
-    string key = "INS" + IString(code) + "_FOCAL_LENGTH";
+    QString key = "INS" + toString(code) + "_FOCAL_LENGTH";
     SetFocalLength(Spice::getDouble(key));
   }
 
   //! Reads the Pixel Pitch from the instrument kernel
   void Camera::SetPixelPitch() {
     int code = naifIkCode();
-    string key = "INS" + IString(code) + "_PIXEL_PITCH";
+    QString key = "INS" + toString(code) + "_PIXEL_PITCH";
     SetPixelPitch(Spice::getDouble(key));
   }
 

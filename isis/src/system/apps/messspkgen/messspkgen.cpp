@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <sstream>
-#include <string>
+#include <QString>
 
 #include <QString>
 
@@ -14,10 +14,9 @@
 
 
 using namespace Isis;
-using std::string;
 
 
-string convertUtcToTdb(string utcTime);
+QString convertUtcToTdb(QString utcTime);
 
 
 void IsisMain() {
@@ -29,7 +28,7 @@ void IsisMain() {
     dbFileName = ui.GetFileName("FROM");
   }
   else {
-    string dbString("$messenger/kernels/spk/kernels.????.db");
+    QString dbString("$messenger/kernels/spk/kernels.????.db");
     dbFileName = FileName(dbString).highestVersion();
   }
   Pvl kernelDb(dbFileName.expanded());
@@ -41,7 +40,7 @@ void IsisMain() {
   // cutoff
   PvlGroup &reconstructed = position.FindGroup("Selection");
   PvlKeyword &time = reconstructed[reconstructed.Keywords() - 3];
-  string reconstructedEnd = time[1];
+  QString reconstructedEnd = time[1];
   time[1] = convertUtcToTdb(ui.GetString("TIME"));
 
   // Get the predicted group from the previous file, set the start time to the
@@ -77,10 +76,10 @@ void IsisMain() {
 }
 
 
-string convertUtcToTdb(string utcTime) {
+QString convertUtcToTdb(QString utcTime) {
   // Remove any surrounding whitespace and the trailing " UTC", then replace
   // with TDB syntax
-  QString orbitCutoffRaw = QString::fromStdString(utcTime);
+  QString orbitCutoffRaw = utcTime;
   orbitCutoffRaw.trimmed();
   orbitCutoffRaw.remove(QRegExp(" UTC$"));
 
@@ -91,7 +90,7 @@ string convertUtcToTdb(string utcTime) {
   int pos = yearRx.indexIn(orbitCutoffRaw);
   QString year = (pos > -1) ? yearRx.cap(1) : "";
 
-  // The day will come at the beginning of the string, and will be 1 or 2
+  // The day will come at the beginning of the QString, and will be 1 or 2
   // characters.  If it's only 1, add an extra 0 to make it 2.
   QRegExp dayRx("(^\\d{1,2})");
   pos = dayRx.indexIn(orbitCutoffRaw);
@@ -103,7 +102,7 @@ string convertUtcToTdb(string utcTime) {
   orbitCutoffRaw.replace(dayRx, year);
 
   // Tack on the necessary TDB tail
-  string orbitCutoff = orbitCutoffRaw.toStdString();
+  QString orbitCutoff = orbitCutoffRaw;
   orbitCutoff += ".000 TDB";
   return orbitCutoff;
 }

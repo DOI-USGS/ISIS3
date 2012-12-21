@@ -30,7 +30,7 @@ void IsisMain() {
 
   // Open the input cube
   UserInterface &ui = Application::GetUserInterface();
-  string from = ui.GetAsString("FROM");
+  QString from = ui.GetAsString("FROM");
   CubeAttributeInput inAtt(from);
   cube.setVirtualBands(inAtt.bands());
   from = ui.GetFileName("FROM");
@@ -57,7 +57,7 @@ void IsisMain() {
 
   if(minSample == cube.getSampleCount() + 1) {
     cube.close();
-    string msg = "There are no valid pixels in the [FROM] cube";
+    QString msg = "There are no valid pixels in the [FROM] cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -89,14 +89,14 @@ void IsisMain() {
 
   // Construct a label with the results
   PvlGroup results("Results");
-  results += PvlKeyword("InputLines", cube.getLineCount());
-  results += PvlKeyword("InputSamples", cube.getSampleCount());
-  results += PvlKeyword("StartingLine", minLine);
-  results += PvlKeyword("StartingSample", minSample);
-  results += PvlKeyword("EndingLine", maxLine);
-  results += PvlKeyword("EndingSample", maxSample);
-  results += PvlKeyword("OutputLines", numLines);
-  results += PvlKeyword("OutputSamples", numSamples);
+  results += PvlKeyword("InputLines", toString(cube.getLineCount()));
+  results += PvlKeyword("InputSamples", toString(cube.getSampleCount()));
+  results += PvlKeyword("StartingLine", toString(minLine));
+  results += PvlKeyword("StartingSample", toString(minSample));
+  results += PvlKeyword("EndingLine", toString(maxLine));
+  results += PvlKeyword("EndingSample", toString(maxSample));
+  results += PvlKeyword("OutputLines", toString(numLines));
+  results += PvlKeyword("OutputSamples", toString(numSamples));
 
   // Create a buffer for reading the input cube
   in = new LineManager(cube);

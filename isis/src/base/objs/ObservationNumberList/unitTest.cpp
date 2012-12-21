@@ -29,12 +29,12 @@ int main(int argc, char *argv[]) {
     }
 
     cout << endl;
-    vector<std::string> filenames = onl.PossibleFileNames(onl.ObservationNumber(2));
+    vector<QString> filenames = onl.PossibleFileNames(onl.ObservationNumber(2));
     for(unsigned i = 0; i < filenames.size(); i++) {
       cout << "Possible filename for [" << onl.ObservationNumber(2)
            << "]: " << FileName(filenames[i]).name() << endl;
     }
-    vector<std::string> serials = onl.PossibleSerialNumbers(onl.ObservationNumber(2));
+    vector<QString> serials = onl.PossibleSerialNumbers(onl.ObservationNumber(2));
     for(unsigned i = 0; i < serials.size(); i++) {
       cout << "Possible serial number for [" << onl.ObservationNumber(2)
            << "]: " << serials[i] << endl;

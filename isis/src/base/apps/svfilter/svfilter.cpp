@@ -23,7 +23,7 @@ void IsisMain() {
   // Find out how to handle special pixels
   UserInterface &ui = Application::GetUserInterface();
   propagate = ui.GetBoolean("PROPAGATE");
-  string filt = ui.GetString("FILTER");
+  QString filt = ui.GetString("FILTER");
   stdDev = false;
   if(filt == "STDDEV") stdDev = true;
 

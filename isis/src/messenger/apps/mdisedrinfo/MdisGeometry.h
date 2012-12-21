@@ -1,4 +1,4 @@
-#if !defined(MdisGeometry_h)
+#ifndef MdisGeometry_h
 #define MdisGeometry_h
 /**
  * @file
@@ -79,20 +79,20 @@ namespace Isis {
       MdisGeometry() : _label(), _orglabel(), _nSubframes(0), _camera(0),
         _digitsPrecision(_defaultDigits),
         _NullDefault("\"N/A\""), _doUpdate(true), _spice() { }
-      MdisGeometry(const std::string &filename);
+      MdisGeometry(const QString &filename);
       MdisGeometry(Cube &cube);
       virtual ~MdisGeometry() {
         delete _camera;
       }
 
-      void setCube(const std::string &filename);
+      void setCube(const QString &filename);
       static bool validateTarget(Pvl &label, bool makeValid = true);
       virtual void refCenterCoord(double &sample, double &line) const;
       virtual void refUpperLeftCoord(double &sample, double &line) const;
       virtual void refUpperRightCoord(double &sample, double &line) const;
       virtual void refLowerLeftCoord(double &sample, double &line) const;
       virtual void refLowerRightCoord(double &sample, double &line) const;
-      Pvl getGeometry(const std::string &filename);
+      Pvl getGeometry(const QString &filename);
 
 
       /**
@@ -116,16 +116,16 @@ namespace Isis {
        *
        * @param nullstring Value of the string to use
        */
-      void setNull(const std::string &nullstring) {
+      void setNull(const QString &nullstring) {
         _NullDefault = nullstring;
       }
 
       /**
        * @brief Value in use for uncomputable values
        *
-       * @return std::string Uncomputed value string
+       * @return QString Uncomputed value string
        */
-      std::string getNull() const {
+      QString getNull() const {
         return (_NullDefault);
       }
 
@@ -161,7 +161,7 @@ namespace Isis {
       int           _nSubframes;       //!< Number subframes in image
       Camera       *_camera;           //!< Camera model initiated from cube label
       int           _digitsPrecision;  //!< Current digits of precision
-      std::string   _NullDefault;      //!< Current null string
+      QString   _NullDefault;      //!< Current null string
       bool          _doUpdate;         //!< Action when vlue is uncomputable
       SpiceManager _spice;             //!< SPICE kernel manager
 
@@ -177,14 +177,17 @@ namespace Isis {
       bool SmearComponents(double &smear_magnitude, double &smear_azimuth);
       std::vector<double> ScVelocityVector();
 
-      PvlKeyword format(const std::string &name, const double &value,
-                        const std::string &unit = "") const;
-      PvlKeyword format(const std::string &name, const std::vector<double> &values,
-                        const std::string &unit = "") const;
-      PvlKeyword format(const std::string &name,
+      PvlKeyword format(const QString &name, const double &value,
+                        const QString &unit = "") const;
+      PvlKeyword format(const QString &name, const std::vector<double> &values,
+                        const QString &unit = "") const;
+      PvlKeyword format(const QString &name,
+                        const std::vector<QString> &values,
+                        const QString &unit = "") const;
+      PvlKeyword format(const QString &name,
                         const std::vector<std::string> &values,
-                        const std::string &unit = "") const;
-      IString DoubleToString(const double &value) const;
+                        const QString &unit = "") const;
+      QString DoubleToString(const double &value) const;
   };
 
 }     // namespace Isis

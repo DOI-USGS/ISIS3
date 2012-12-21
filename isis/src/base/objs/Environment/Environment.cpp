@@ -60,7 +60,7 @@ namespace Isis {
   /**
    * @Returns the user name. Returns 'Unknown' if it cannot find the user name.
    */
-  IString Environment::userName() {
+  QString Environment::userName() {
     return getEnvironmentValue("USER", "Unknown");
   }
   
@@ -68,7 +68,7 @@ namespace Isis {
   /**
    * @returns the host name.  Returns 'Unknown' if it cannot find the host name.
    */
-  IString Environment::hostName() {
+  QString Environment::hostName() {
     return getEnvironmentValue("HOST", "Unknown");
   }
   
@@ -80,12 +80,12 @@ namespace Isis {
    *
    * @returns The value for the environment variable requested.
    */
-  IString Environment::getEnvironmentValue(IString variable,
-      IString defaultValue) {
+  QString Environment::getEnvironmentValue(QString variable,
+      QString defaultValue) {
       
-    IString value = defaultValue;
+    QString value = defaultValue;
     
-    char *envValue = getenv(variable.c_str());
+    char *envValue = getenv(variable.toAscii().data());
     if (envValue)
       value = envValue;
       
@@ -96,9 +96,9 @@ namespace Isis {
   /**
    * @returns the Isis version in the format isis?.?.?.?qualifier | date
    */
-  IString Environment::isisVersion() {
+  QString Environment::isisVersion() {
     TextFile versionFile("$ISISROOT/version");
-    IString line1, line2, line3, line4;
+    QString line1, line2, line3, line4;
     versionFile.GetLine(line1);
     versionFile.GetLine(line2);
     versionFile.GetLine(line3);

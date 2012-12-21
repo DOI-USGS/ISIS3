@@ -40,13 +40,13 @@ void IsisMain() {
     }
   }
   catch(IException &) {
-    string msg = "This program is intended for use on MARCI images only. [";
+    QString msg = "This program is intended for use on MARCI images only. [";
     msg += inFileName.expanded() + "] does not appear to be a MARCI image.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(icube.getGroup("Archive")["SampleBitModeId"][0] != "SQROOT") {
-    string msg = "Sample bit mode [" + icube.getGroup("Archive")["SampleBitModeId"][0] + "] is not supported.";
+    QString msg = "Sample bit mode [" + icube.getGroup("Archive")["SampleBitModeId"][0] + "] is not supported.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -62,7 +62,7 @@ void IsisMain() {
     decimation.push_back(1.0);
   }
 
-  IString startTime = icube.getLabel()->FindGroup("Instrument", Pvl::Traverse)["StartTime"][0];
+  QString startTime = icube.getLabel()->FindGroup("Instrument", Pvl::Traverse)["StartTime"][0];
   iTime start(startTime);
   iTime changeTime("November 6, 2006 21:30:00 UTC");
 
@@ -80,10 +80,10 @@ void IsisMain() {
   // Create the stretch pairs
   stretch.ClearPairs();
   for(int i = 0; i < stretchPairs.LineCount(); i++) {
-    IString line;
+    QString line;
     stretchPairs.GetLine(line, true);
-    int temp1 = line.Token(" ");
-    int temp2 = line.Trim(" ");
+    int temp1 = toInt(line.split(" ").first());
+    int temp2 = toInt(line.split(" ").last());
     stretch.AddPair(temp1, temp2);
   }
 
@@ -100,8 +100,8 @@ void IsisMain() {
 
   // Check our coefficient file
   if(calibrationData.Objects() != 7) {
-    IString msg = "Calibration file [" + calFile.expanded() + "] must contain data for 7 filters in ascending order;";
-    msg += " only [" + IString(calibrationData.Objects()) + "] objects were found";
+    QString msg = "Calibration file [" + calFile.expanded() + "] must contain data for 7 filters in ascending order;";
+    msg += " only [" + QString(calibrationData.Objects()) + "] objects were found";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -110,7 +110,7 @@ void IsisMain() {
     PvlObject &calObj = calibrationData.Object(obj);
 
     if((int)calObj["FilterNumber"] != obj + 1) {
-      IString msg = "Calibration file [" + calFile.expanded() + "] must have the filters in ascending order";
+      QString msg = "Calibration file [" + calFile.expanded() + "] must have the filters in ascending order";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -120,11 +120,11 @@ void IsisMain() {
 
   vector<Cube *> flatcubes;
   vector<LineManager *> fcubeMgrs;
-  int summing = icube.getGroup("Instrument")["SummingMode"][0];
+  int summing = toInt(icube.getGroup("Instrument")["SummingMode"][0]);
 
   // Read in the flat files
   for(int band = 0; band < 7; band++) {
-    string filePattern = "$mro/calibration/marci/";
+    QString filePattern = "$mro/calibration/marci/";
 
     if(band < 5) {
       filePattern += "vis";
@@ -139,8 +139,8 @@ void IsisMain() {
       continue;
     }
 
-    filePattern += "flat_band" + IString(band + 1);
-    filePattern += "_summing" + IString(summing) + "_v???.cub";
+    filePattern += "flat_band" + toString(band + 1);
+    filePattern += "_summing" + toString(summing) + "_v???.cub";
 
     FileName flatFile = FileName(filePattern).highestVersion();
     Cube *fcube = new Cube();
@@ -170,14 +170,14 @@ void IsisMain() {
   vector<int> filter;
 
   // Conversion from filter name to filter index
-  map<string, int> filterNameToFilterIndex;
-  filterNameToFilterIndex.insert(pair<string, int>("BLUE",     1));
-  filterNameToFilterIndex.insert(pair<string, int>("GREEN",    2));
-  filterNameToFilterIndex.insert(pair<string, int>("ORANGE",   3));
-  filterNameToFilterIndex.insert(pair<string, int>("RED",      4));
-  filterNameToFilterIndex.insert(pair<string, int>("NIR",      5));
-  filterNameToFilterIndex.insert(pair<string, int>("SHORT_UV", 6));
-  filterNameToFilterIndex.insert(pair<string, int>("LONG_UV",  7));
+  map<QString, int> filterNameToFilterIndex;
+  filterNameToFilterIndex.insert(pair<QString, int>("BLUE",     1));
+  filterNameToFilterIndex.insert(pair<QString, int>("GREEN",    2));
+  filterNameToFilterIndex.insert(pair<QString, int>("ORANGE",   3));
+  filterNameToFilterIndex.insert(pair<QString, int>("RED",      4));
+  filterNameToFilterIndex.insert(pair<QString, int>("NIR",      5));
+  filterNameToFilterIndex.insert(pair<QString, int>("SHORT_UV", 6));
+  filterNameToFilterIndex.insert(pair<QString, int>("LONG_UV",  7));
 
   PvlKeyword &filtNames = icube.getLabel()->FindGroup("BandBin", Pvl::Traverse)["FilterName"];;
   for(int i = 0; i < filtNames.Size(); i++) {
@@ -185,7 +185,7 @@ void IsisMain() {
       filter.push_back(filterNameToFilterIndex.find(filtNames[i])->second);
     }
     else {
-      IString msg = "Unrecognized filter name [" + IString(filtNames[i]) + "]";
+      QString msg = "Unrecognized filter name [" + QString(filtNames[i]) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }

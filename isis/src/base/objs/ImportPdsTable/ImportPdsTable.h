@@ -28,8 +28,9 @@
 #include <vector>
 #include <string>
 
+class QString;
+
 namespace Isis {
-  class IString;
   class Table;
   class TableField;
   class TableRecord;
@@ -105,58 +106,58 @@ namespace Isis {
   class ImportPdsTable {
     public:
       ImportPdsTable();
-      ImportPdsTable(const std::string &pdsLabFile, 
-                     const std::string &pdsTabFile="",
-                     const std::string &pdsTableName="TABLE");
+      ImportPdsTable(const QString &pdsLabFile, 
+                     const QString &pdsTabFile="",
+                     const QString &pdsTableName="TABLE");
       ~ImportPdsTable();
   
       int columns() const;
       int rows() const;
   
-      void load(const std::string &pdsLabFile, const std::string &pdsTabFile = "");
+      void load(const QString &pdsLabFile, const QString &pdsTabFile = "");
   
-      bool hasColumn(const std::string &colName) const;
-      std::string getColumnName(const unsigned int &index = 0, 
+      bool hasColumn(const QString &colName) const;
+      QString getColumnName(const unsigned int &index = 0, 
                                 const bool &formatted = true) const;
-      std::vector<std::string> getColumnNames(const bool &formatted = true) const;
-      std::string getFormattedName(const std::string &colname) const;
+      QStringList getColumnNames(const bool &formatted = true) const;
+      QString getFormattedName(const QString &colname) const;
   
-      std::string getType(const std::string &colName) const;
-      bool setType(const std::string &colName, const std::string &dataType);
+      QString getType(const QString &colName) const;
+      bool setType(const QString &colName, const QString &dataType);
  
-      Table importTable(const std::string &isisTableName);
-      Table importTable(const std::string &colNames,
-                        const std::string &isisTableName);
-      Table importTable(const std::vector<std::string> &colNames,
-                        const std::string &isisTableName);
+      Table importTable(const QString &isisTableName);
+      Table importTable(const QString &colNames,
+                        const QString &isisTableName);
+      Table importTable(const QStringList &colNames,
+                        const QString &isisTableName);
   
     private:
   
       struct ColumnDescr {
-        std::string m_name;       //!< Name of column
+        QString m_name;       //!< Name of column
         int         m_colnum;     //!< Column number
-        std::string m_dataType;   //!< PDS table DATA_TYPE of column
+        QString m_dataType;   //!< PDS table DATA_TYPE of column
         int         m_startByte;  //!< Starting byte of data
         int         m_numBytes;     //!< Number bytes in column
         int         m_itemBytes;  //!<
       };
   
       typedef std::vector<ColumnDescr> ColumnTypes;
-      typedef std::vector<IString>     Columns;
+      typedef std::vector<QString>     Columns;
       typedef std::vector<Columns>     Rows;
   
       void init();
 
-      void loadLabel(const std::string &labfile, std::string &tblfile);
-      void loadTable(const std::string &tabfile);
+      void loadLabel(const QString &labfile, QString &tblfile);
+      void loadTable(const QString &tabfile);
 
       ColumnDescr getColumnDescription(PvlObject &colobj, int nth) const;
-      ColumnDescr *findColumn(const std::string &colName);
-      const ColumnDescr *findColumn(const std::string &colName) const;
+      ColumnDescr *findColumn(const QString &colName);
+      const ColumnDescr *findColumn(const QString &colName) const;
 
-      std::string getColumnValue(const std::string &tline,
+      QString getColumnValue(const QString &tline,
                                  const ColumnDescr &cdesc) const;
-      std::string getGenericType(const std::string &ttype) const;
+      QString getGenericType(const QString &ttype) const;
 
       TableRecord makeRecord(const ColumnTypes &ctypes);
       TableField makeField(const ColumnDescr &cdesc);

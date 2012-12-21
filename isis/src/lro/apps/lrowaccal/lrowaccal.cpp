@@ -31,11 +31,11 @@ using namespace std;
 
 void ResetGlobals ();
 void Calibrate ( Buffer &in, Buffer &out );
-void CopyCubeIntoBuffer ( string &fileString, Buffer* &data);
+void CopyCubeIntoBuffer ( QString &fileString, Buffer* &data);
 double min ( double a, double b );
 
-void GetDark(string fileString, double temp, double time, Buffer* &data1, Buffer* &data2, double & temp1, double & temp2, string & file1, string & file2);
-void GetMask(string &fileString, double temp, Buffer* &data);
+void GetDark(QString fileString, double temp, double time, Buffer* &data1, Buffer* &data2, double & temp1, double & temp2, QString & file1, QString & file2);
+void GetMask(QString &fileString, double temp, Buffer* &data);
 
 vector<double> g_iofResponsivity;
 vector<double> g_radianceResponsivity;
@@ -62,22 +62,22 @@ void IsisMain () {
 
   // Make sure it is a WAC cube
   Isis::PvlGroup &inst = icube->getLabel()->FindGroup("Instrument", Pvl::Traverse);
-  IString instId = (string) inst["InstrumentId"];
-  instId.UpCase();
+  QString instId = (QString) inst["InstrumentId"];
+  instId = instId.toUpper();
   if (instId != "WAC-VIS" && instId != "WAC-UV") {
-    string msg = "This program is intended for use on LROC WAC images only. [";
+    QString msg = "This program is intended for use on LROC WAC images only. [";
     msg += icube->getFileName() + "] does not appear to be a WAC image.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // And check if it has already run through calibration
   if (icube->getLabel()->FindObject("IsisCube").HasGroup("Radiometry")) {
-    string msg = "This image has already been calibrated";
+    QString msg = "This image has already been calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (icube->getLabel()->FindObject("IsisCube").HasGroup("AlphaCube")) {
-    string msg = "This application can not be run on any image that has been geometrically transformed (i.e. scaled, rotated, sheared, or reflected) or cropped.";
+    QString msg = "This application can not be run on any image that has been geometrically transformed (i.e. scaled, rotated, sheared, or reflected) or cropped.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -88,12 +88,12 @@ void IsisMain () {
   g_specpix = ui.GetBoolean("SPECIALPIXELS");
 
   // Determine the dark/flat files to use
-  IString offset = (string) inst["BackgroundOffset"];
-  IString mode = (string) inst["Mode"];
-  IString instModeId = (string) inst["InstrumentModeId"];
-  instModeId.UpCase();
+  QString offset = (QString) inst["BackgroundOffset"];
+  QString mode = (QString) inst["Mode"];
+  QString instModeId = (QString) inst["InstrumentModeId"];
+  instModeId = instModeId.toUpper();
 
-  if (instModeId == "COLOR" && (string) inst["InstrumentId"] == "WAC-UV")
+  if (instModeId == "COLOR" && (QString) inst["InstrumentId"] == "WAC-UV")
     instModeId = "UV";
   else if (instModeId == "VIS")
     instModeId = "COLOR";
@@ -103,11 +103,11 @@ void IsisMain () {
 
   g_numFrames = (int) inst["NumFramelets"];
 
-  vector<string> darkFiles;
+  vector<QString> darkFiles;
   ui.GetAsString("DARKFILE", darkFiles);
-  IString flatFile = ui.GetAsString("FLATFIELDFILE");
-  IString radFile = ui.GetAsString("RADIOMETRICFILE");
-  IString specpixFile = ui.GetAsString("SPECIALPIXELSFILE");
+  QString flatFile = ui.GetAsString("FLATFIELDFILE");
+  QString radFile = ui.GetAsString("RADIOMETRICFILE");
+  QString specpixFile = ui.GetAsString("SPECIALPIXELSFILE");
 
   // Figure out which bands are input
   for (int i = 1; i <= icube->getBandCount(); i++) {
@@ -115,14 +115,14 @@ void IsisMain () {
   }
 
   Isis::PvlGroup &bandBin = icube->getLabel()->FindGroup("BandBin", Pvl::Traverse);
-  IString filter = (string) bandBin["Center"][0];
+  QString filter = (QString) bandBin["Center"][0];
 
   if (g_dark) {
     if (darkFiles.size() == 0 || darkFiles[0] =="Default" || darkFiles[0].length() == 0) {
       darkFiles.resize(2);
       double temp = (double) inst["MiddleTemperatureFpa"];
       double time = iTime(inst["StartTime"][0]).Et();
-      string darkFile = "$lro/calibration/wac_darks/WAC_" + instModeId;
+      QString darkFile = "$lro/calibration/wac_darks/WAC_" + instModeId;
       if (instModeId == "BW")
         darkFile += "_" + filter + "_Mode" + mode;
       darkFile += "_Offset" + offset + "_*C_*T_Dark.????.cub";
@@ -136,16 +136,16 @@ void IsisMain () {
     }
     else {
       CopyCubeIntoBuffer(darkFiles[0], g_darkCube1);
-      int index = darkFiles[0].find_last_of("_");
-      g_temp1 = IString(darkFiles[0].substr( darkFiles[0].find_last_of("_", index-1), index)).ToDouble();
+      int index = darkFiles[0].lastIndexOf("_");
+      g_temp1 = IString(darkFiles[0].mid( darkFiles[0].lastIndexOf("_", index-1), index)).ToDouble();
       CopyCubeIntoBuffer(darkFiles[1], g_darkCube2);
-      index = darkFiles[1].find_last_of("_");
-      g_temp2 = IString(darkFiles[1].substr( darkFiles[1].find_last_of("_", index-1), index)).ToDouble();
+      index = darkFiles[1].lastIndexOf("_");
+      g_temp2 = IString(darkFiles[1].mid( darkFiles[1].lastIndexOf("_", index-1), index)).ToDouble();
     }
   }
 
   if (g_flatfield) {
-    if (flatFile.Equal("Default") || flatFile.length() == 0) {
+    if (flatFile.toLower() == "default" || flatFile.length() == 0) {
       flatFile = "$lro/calibration/wac_flats/WAC_" + instModeId;
       if (instModeId == "BW")
         flatFile += "_" + filter + "_Mode" + mode;
@@ -165,14 +165,14 @@ void IsisMain () {
 
     Isis::PvlKeyword &bands = icube->getLabel()->FindGroup("BandBin", Pvl::Traverse).FindKeyword("FilterNumber");
 
-    if (radFile.Equal("Default") || radFile.length() == 0)
+    if (radFile.toLower() == "default" || radFile.length() == 0)
       radFile = "$lro/calibration/WAC_RadiometricResponsivity.????.pvl";
 
     FileName radFileName(radFile);
     if (radFileName.isVersioned())
       radFileName = radFileName.highestVersion();
     if (!radFileName.fileExists()) {
-      string msg = radFile + " does not exist.";
+      QString msg = radFile + " does not exist.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -182,46 +182,46 @@ void IsisMain () {
       responsivity = radPvl["IOF"];
 
       for (int i = 0; i < bands.Size(); i++)
-        g_iofResponsivity.push_back(responsivity[(int)bands[i] - 1]);
+        g_iofResponsivity.push_back(toDouble(responsivity[toInt(bands[i]) - 1]));
 
       try {
-        iTime startTime((string) inst["StartTime"]);
+        iTime startTime((QString) inst["StartTime"]);
         double etStart = startTime.Et();
         // Get the distance between the Moon and the Sun at the given time in
         // Astronomical Units (AU)
-        string bspKernel1 = p.MissionData("lro", "/kernels/tspk/moon_pa_de421_1900-2050.bpc", false);
-        string bspKernel2 = p.MissionData("lro", "/kernels/tspk/de421.bsp", false);
-        furnsh_c(bspKernel1.c_str());
-        furnsh_c(bspKernel2.c_str());
-        string pckKernel1 = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
-        string pckKernel2 = p.MissionData("lro", "/kernels/pck/moon_080317.tf", false);
-        string pckKernel3 = p.MissionData("lro", "/kernels/pck/moon_assoc_me.tf", false);
-        furnsh_c(pckKernel1.c_str());
-        furnsh_c(pckKernel2.c_str());
-        furnsh_c(pckKernel3.c_str());
+        QString bspKernel1 = p.MissionData("lro", "/kernels/tspk/moon_pa_de421_1900-2050.bpc", false);
+        QString bspKernel2 = p.MissionData("lro", "/kernels/tspk/de421.bsp", false);
+        furnsh_c(bspKernel1.toAscii().data());
+        furnsh_c(bspKernel2.toAscii().data());
+        QString pckKernel1 = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
+        QString pckKernel2 = p.MissionData("lro", "/kernels/pck/moon_080317.tf", false);
+        QString pckKernel3 = p.MissionData("lro", "/kernels/pck/moon_assoc_me.tf", false);
+        furnsh_c(pckKernel1.toAscii().data());
+        furnsh_c(pckKernel2.toAscii().data());
+        furnsh_c(pckKernel3.toAscii().data());
         double sunpos[6], lt;
         spkezr_c("sun", etStart, "MOON_ME", "LT+S", "MOON", sunpos, &lt);
         g_solarDistance = vnorm_c(sunpos) / KM_PER_AU;
-        unload_c(bspKernel1.c_str());
-        unload_c(bspKernel2.c_str());
-        unload_c(pckKernel1.c_str());
-        unload_c(pckKernel2.c_str());
-        unload_c(pckKernel3.c_str());
+        unload_c(bspKernel1.toAscii().data());
+        unload_c(bspKernel2.toAscii().data());
+        unload_c(pckKernel1.toAscii().data());
+        unload_c(pckKernel2.toAscii().data());
+        unload_c(pckKernel3.toAscii().data());
       }
       catch (IException &e) {
-        string msg = "Can not find necessary SPICE kernels for converting to IOF";
+        QString msg = "Can not find necessary SPICE kernels for converting to IOF";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
     }
     else {
       responsivity = radPvl["Radiance"];
       for (int i = 0; i < bands.Size(); i++)
-        g_radianceResponsivity.push_back(responsivity[(int)bands[i] - 1]);
+        g_radianceResponsivity.push_back(toDouble(responsivity[toInt(bands[i]) - 1]));
     }
   }
 
   if (g_specpix) {
-    if (specpixFile.Equal("Default") || specpixFile.length() == 0) {
+    if (specpixFile.toLower() == "default" || specpixFile.length() == 0) {
       specpixFile = "$lro/calibration/wac_masks/WAC_" + instModeId;
       double temp = (double) inst["MiddleTemperatureFpa"];
       if (instModeId == "BW")
@@ -267,15 +267,15 @@ void IsisMain () {
     if (g_iof) {
       calgrp += PvlKeyword("RadiometricType", "IOF");
       for (unsigned int i=0; i< g_iofResponsivity.size(); i++)
-        vals.AddValue(g_iofResponsivity[i]);
+        vals.AddValue(toString(g_iofResponsivity[i]));
     }
     else {
       calgrp += PvlKeyword("RadiometricType", "AbsoluteRadiance");
       for (unsigned int i=0; i< g_radianceResponsivity.size(); i++)
-        vals.AddValue(g_radianceResponsivity[i]);
+        vals.AddValue(toString(g_radianceResponsivity[i]));
     }
     calgrp += vals;
-    calgrp += PvlKeyword("SolarDistance", g_solarDistance);
+    calgrp += PvlKeyword("SolarDistance", toString(g_solarDistance));
   }
   if (g_specpix)
     calgrp += PvlKeyword("SpecialPixelsFile", specpixFile);
@@ -330,11 +330,11 @@ void Calibrate ( Buffer &inCube, Buffer &outCube ) {
       // We're bypassing Buffer::at for speed, so we need to make sure our
       // index will not overrun the buffer
       if(offset + frameSize > g_darkCube1->size()) {
-        string message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Dark cube 1)";
+        QString message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Dark cube 1)";
         throw IException(IException::Programmer, message, _FILEINFO_);
       }
       if(offset + frameSize > g_darkCube2->size()) {
-        string message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Dark cube 2)";
+        QString message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Dark cube 2)";
         throw IException(IException::Programmer, message, _FILEINFO_);
       }
 
@@ -384,7 +384,7 @@ void Calibrate ( Buffer &inCube, Buffer &outCube ) {
       // We're bypassing Buffer::at for speed, so we need to make sure our
       // index will not overrun the buffer
       if(offset + frameSize > g_flatCube->size()) {
-        string message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Flat-field cube)";
+        QString message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Flat-field cube)";
         throw IException(IException::Programmer, message, _FILEINFO_);
       }
 
@@ -428,13 +428,13 @@ void Calibrate ( Buffer &inCube, Buffer &outCube ) {
   }
 }
 
-void CopyCubeIntoBuffer ( string &fileString, Buffer* &data) {
+void CopyCubeIntoBuffer ( QString &fileString, Buffer* &data) {
   Cube cube;
   FileName filename(fileString);
   if (filename.isVersioned())
     filename = filename.highestVersion();
   if (!filename.fileExists()) {
-    string msg = fileString + " does not exist.";
+    QString msg = fileString + " does not exist.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   cube.open(filename.expanded());
@@ -510,21 +510,21 @@ struct DarkComp {
  * @param file1 Filename of dark file 1
  * @param file2 Filename of dark file 2
  */
-void GetDark(string fileString, double temp, double time, Buffer* &data1, Buffer* &data2, double & temp1, double & temp2, string & file1, string & file2) {
+void GetDark(QString fileString, double temp, double time, Buffer* &data1, Buffer* &data2, double & temp1, double & temp2, QString & file1, QString & file2) {
   FileName filename(fileString);
-  string basename = FileName(filename.baseName()).baseName(); // We do it twice to remove the ".????.cub"
+  QString basename = FileName(filename.baseName()).baseName(); // We do it twice to remove the ".????.cub"
 
   // create a regular expression to capture the temp and time from filenames
-  QString regexPattern(basename.c_str());
+  QString regexPattern(basename);
   regexPattern.replace("*", "([0-9\\.-]*)");
   QRegExp regex(regexPattern);
 
   // create a filter for the QDir to only load files matching our name
-  QString filter(basename.c_str());
+  QString filter(basename);
   filter.append(".*");
 
   // get a list of dark files that match our basename
-  QDir dir( (QString)filename.path().c_str(), filter );
+  QDir dir( filename.path(), filter );
 
   vector<DarkFileInfo> darkFiles;
   darkFiles.reserve(dir.count());
@@ -537,7 +537,7 @@ void GetDark(string fileString, double temp, double time, Buffer* &data1, Buffer
       continue; // filename did not match basename regex (time or temp contain non-digit)
     }
 
-    // Get a list of regex matches. Item 0 should be the full string, item 1
+    // Get a list of regex matches. Item 0 should be the full QString, item 1
     // is temp and item 2 is time.
     QStringList texts = regex.capturedTexts();
     if (texts.size() < 3) {
@@ -558,7 +558,7 @@ void GetDark(string fileString, double temp, double time, Buffer* &data1, Buffer
 
   // we require at least 2 different dark files to interpolate/extrapolate
   if (darkFiles.size() < 2) {
-    string msg = "Not enough Dark files exist for these image options [" + basename + "]. Need at least 2 files with different temperatures\n";
+    QString msg = "Not enough Dark files exist for these image options [" + basename + "]. Need at least 2 files with different temperatures\n";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -586,35 +586,35 @@ void GetDark(string fileString, double temp, double time, Buffer* &data1, Buffer
   int time1 = darkFiles[temp1Index].time;
   int time2 = darkFiles[temp2Index].time;
 
-  unsigned int tempIndex = fileString.find("*C");
-  unsigned int timeIndex = fileString.find("*T");
+  int tempIndex = fileString.indexOf("*C");
+  int timeIndex = fileString.indexOf("*T");
 
   file1 = fileString;
-  file1.replace(timeIndex, 1, IString(time1));
-  file1.replace(tempIndex, 1, IString((int)temp1));
+  file1.replace(timeIndex, 1, toString(time1));
+  file1.replace(tempIndex, 1, toString((int)temp1));
 
   file2 = fileString;
-  file2.replace(timeIndex, 1, IString(time2));
-  file2.replace(tempIndex, 1, IString((int)temp2));
+  file2.replace(timeIndex, 1, toString(time2));
+  file2.replace(tempIndex, 1, toString((int)temp2));
 
   CopyCubeIntoBuffer ( file1, data1 );
   CopyCubeIntoBuffer ( file2, data2 );
 }
 
-void GetMask(string &fileString, double temp, Buffer* &data) {
+void GetMask(QString &fileString, double temp, Buffer* &data) {
   FileName filename(fileString);
-  string basename = FileName(filename.baseName()).baseName(); // We do it twice to remove the ".????.cub"
+  QString basename = FileName(filename.baseName()).baseName(); // We do it twice to remove the ".????.cub"
 
-  unsigned int index = basename.find_first_of("*");
+  unsigned int index = basename.indexOf("*");
 
   // create a filter for the QDir to only load files matching our name
-  QString filter(basename.c_str());
+  QString filter(basename);
   filter.append(".*");
 
-  QDir dir( (QString)filename.path().c_str(), filter );
+  QDir dir( filename.path(), filter );
 
   // create a regular expression to capture the temp and time from filenames
-  QString regexPattern(basename.c_str());
+  QString regexPattern(basename);
   regexPattern.replace("*", "([0-9\\.-]*)");
   QRegExp regex(regexPattern);
 
@@ -626,7 +626,7 @@ void GetMask(string &fileString, double temp, Buffer* &data) {
       continue; // filename did not match basename regex (temp contain non-digit)
     }
 
-    // Get a list of regex matches. Item 0 should be the full string, item 1 is temp
+    // Get a list of regex matches. Item 0 should be the full QString, item 1 is temp
     QStringList texts = regex.capturedTexts();
     if (texts.size() < 2) {
       continue; // could not find temp
@@ -645,12 +645,12 @@ void GetMask(string &fileString, double temp, Buffer* &data) {
   }
 
   if (bestTemp == DBL_MAX) {
-    string msg = "No files exist for these mask options [" + basename + "]";
+    QString msg = "No files exist for these mask options [" + basename + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  index = fileString.find_first_of("*");
-  fileString.replace(index, 1, IString((int)bestTemp));
+  index = fileString.indexOf("*");
+  fileString.replace(index, 1, toString((int)bestTemp));
 
   CopyCubeIntoBuffer ( fileString, data );
 }

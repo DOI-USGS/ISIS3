@@ -23,8 +23,8 @@ using namespace Isis;
 
 void IsisMain() {
 
-  std::map <int, string> fscMap;
-  std::map <string, int> snMap;
+  std::map <int, QString> fscMap;
+  std::map <QString, int> snMap;
 
   UserInterface &ui = Application::GetUserInterface();
 
@@ -32,10 +32,10 @@ void IsisMain() {
 
   SerialNumberList snl(ui.GetFileName("LIST3"));
   for (int f = 0; f < list2.size(); f++) {
-    IString currFile(list2[f].toString());
+    QString currFile(list2[f].toString());
     Pvl lab(currFile);
     PvlObject qube(lab.FindObject("QUBE"));
-    string fsc;
+    QString fsc;
     if(qube.HasKeyword("IMAGE_NUMBER")) {
       fsc = qube.FindKeyword("IMAGE_NUMBER")[0];
     }
@@ -43,13 +43,13 @@ void IsisMain() {
       fsc = qube.FindKeyword("IMAGE_ID")[0];
     }
     else {
-      string msg = "Unable to find keyword [\"IMAGE_NUMBER\" or \"IMAGE_ID\"] in file [";
+      QString msg = "Unable to find keyword [\"IMAGE_NUMBER\" or \"IMAGE_ID\"] in file [";
       msg += fsc + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    IString sn(snl.SerialNumber(f));
-    fscMap.insert(std::pair<int, string>(f, fsc));
-    snMap.insert(std::pair<string, int>(sn, f));
+    QString sn(snl.SerialNumber(f));
+    fscMap.insert(std::pair<int, QString>(f, fsc));
+    snMap.insert(std::pair<QString, int>(sn, f));
   }
 
   ControlNet cnet(ui.GetFileName("CNET"));
@@ -63,38 +63,38 @@ void IsisMain() {
   TextFile mpFile(ui.GetFileName("MATCH"), "Overwrite", "");
 
   ostringstream str;
-  IString textLine;
+  QString textLine;
 
   textLine = "Matchpoint total =    ";
-  textLine += IString(mpTotal);
+  textLine += toString(mpTotal);
   mpFile.PutLine(textLine);
   str.clear();
   str.str("");
   str.width(40);
   str.setf(ios::left);
   str << "Point ID";
-  textLine = str.str();
+  textLine = str.str().c_str();
 
   str.clear();
   str.str("");
   str.width(7);
   str.setf(ios::left);
   str << "FSC";
-  textLine += str.str();
+  textLine += str.str().c_str();
 
   str.clear();
   str.str("");
   str.width(8);
   str.setf(ios::left);
   str << "LINE";
-  textLine += str.str();
+  textLine += str.str().c_str();
 
   str.clear();
   str.str("");
   str.width(5);
   str.setf(ios::left);
   str << "SAMP";
-  textLine += str.str();
+  textLine += str.str().c_str();
 
 
   str.clear();
@@ -102,14 +102,14 @@ void IsisMain() {
   str.width(14);
   str.setf(ios::left);
   str << "CLASS";
-  textLine += str.str();
+  textLine += str.str().c_str();
 
   str.clear();
   str.str("");
   str.width(8);
   str.setf(ios::left);
   str << "DIAMETER";
-  textLine += str.str();
+  textLine += str.str().c_str();
 
   mpFile.PutLine(textLine);
 
@@ -128,17 +128,17 @@ void IsisMain() {
       formatter.width(30);
       formatter.setf(ios::left);
       formatter << currPoint->GetId() << " ";
-      textLine = formatter.str();
+      textLine = formatter.str().c_str();
 
       //Set FSC
       formatter.clear();
       formatter.str("");
       formatter.width(12);
       formatter.setf(ios::right);
-      string sn = currMeas->GetCubeSerialNumber();
-      string fsc = fscMap[snMap[sn]];
+      QString sn = currMeas->GetCubeSerialNumber();
+      QString fsc = fscMap[snMap[sn]];
       formatter << fsc << " ";
-      textLine += formatter.str();
+      textLine += formatter.str().c_str();
 
       //Set Line
       formatter.clear();
@@ -148,7 +148,7 @@ void IsisMain() {
       formatter.setf(ios::fixed);
       formatter.precision(2);
       formatter << currMeas->GetLine() << " ";
-      textLine += formatter.str();
+      textLine += formatter.str().c_str();
 
       //Set Sample
       formatter.clear();
@@ -158,10 +158,10 @@ void IsisMain() {
       formatter.setf(ios::fixed);
       formatter.precision(2);
       formatter << currMeas->GetSample() << "   ";
-      textLine += formatter.str();
+      textLine += formatter.str().c_str();
 
       //Set Class
-      string ptClass;
+      QString ptClass;
       ControlMeasure::MeasureType mType = currMeas->GetType();
 
       if(currMeas->IsIgnored() || currPoint->IsIgnored()) {
@@ -195,7 +195,7 @@ void IsisMain() {
         diam = currMeas->GetDiameter();
       }
       formatter << diam;
-      textLine += formatter.str();
+      textLine += formatter.str().c_str();
 
       mpFile.PutLine(textLine);
     }

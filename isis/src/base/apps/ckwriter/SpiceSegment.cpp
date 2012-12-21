@@ -21,7 +21,7 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include <string>
+#include <QString>
 #include <vector>
 #include <numeric>
 #include <iostream>
@@ -54,7 +54,7 @@ SpiceSegment::SpiceSegment() {
 }
 
 /** Construct with an ISIS cube file */
-SpiceSegment::SpiceSegment(const std::string &fname) {
+SpiceSegment::SpiceSegment(const QString &fname) {
   init();
   Cube cube;
   cube.open(fname);
@@ -62,13 +62,13 @@ SpiceSegment::SpiceSegment(const std::string &fname) {
 }
 
 /** Construct with a Cube and optional naming of table */
-SpiceSegment::SpiceSegment(Cube &cube, const std::string &tblname) {
+SpiceSegment::SpiceSegment(Cube &cube, const QString &tblname) {
   init();
   import(cube, tblname);
 }
 
 /** Set the name of the CK SPICE segment */
-void SpiceSegment::setId(const std::string &name) {
+void SpiceSegment::setId(const QString &name) {
   _name = name;
   return;
 }
@@ -84,7 +84,7 @@ void SpiceSegment::setId(const std::string &name) {
  *
  * @return int Returns number of kernels loaded
  */
-int SpiceSegment::FurnshKernelType(const std::string &ktypes) const {
+int SpiceSegment::FurnshKernelType(const QString &ktypes) const {
   return (_kernels.Load(ktypes));
 }
 
@@ -100,7 +100,7 @@ int SpiceSegment::FurnshKernelType(const std::string &ktypes) const {
  *
  * @return int  Returns number of kernels unloaded
  */
-int SpiceSegment::UnloadKernelType(const std::string &ktypes) const {
+int SpiceSegment::UnloadKernelType(const QString &ktypes) const {
   return (_kernels.UnLoad(ktypes));
 }
 
@@ -151,16 +151,16 @@ SpiceSegment::SVector SpiceSegment::TickRate() const {
   return (SVector(1, _tickRate));
 }
 
-std::string SpiceSegment::getKeyValue(PvlObject &label,
-                                      const std::string &keyword) {
-  string value("");
+QString SpiceSegment::getKeyValue(PvlObject &label,
+                                      const QString &keyword) {
+  QString value("");
   if ( label.HasKeyword(keyword,Pvl::Traverse) ) {
     value = label.FindKeyword(keyword,Pvl::Traverse)[0];
   }
   return (value);
 }
 
-void SpiceSegment::import(Cube &cube, const std::string &tblname) {
+void SpiceSegment::import(Cube &cube, const QString &tblname) {
 
   _fname = cube.getFileName();
 
@@ -193,18 +193,18 @@ void SpiceSegment::import(Cube &cube, const std::string &tblname) {
     }
 
     //  Determine segment ID from product ID if it exists, otherwise basename
-    if ( _name.empty() ) {
+    if ( _name.isEmpty() ) {
       _name = getKeyValue(*label, "ProductId");
-      if (_name.empty() ) {
+      if (_name.isEmpty() ) {
         _name = FileName(_fname).baseName();
       }
     }
 
-    string value("");
+    QString value("");
     value = getKeyValue(*label, "InstrumentId");
-    if (!value.empty()) { _instId = value; }
+    if (!value.isEmpty()) { _instId = value; }
     value = getKeyValue(*label, "TargetName");
-    if (!value.empty()) { _target = value; }
+    if (!value.isEmpty()) { _target = value; }
      _camVersion = _kernels.CameraVersion();
 
     //  Get the SPICE data
@@ -315,7 +315,7 @@ bool SpiceSegment::getTimeDependentFrameIds(Table &table, int &toId, int &fromId
   if ( table.Label().HasKeyword("TimeDependentFrames") ) {
     PvlKeyword labelTimeFrames = table.Label()["TimeDependentFrames"];
     for (int i=0; i<labelTimeFrames.Size(); i++) {
-      tdfids.push_back(labelTimeFrames[i]);
+      tdfids.push_back(toInt(labelTimeFrames[i]));
     }
   }
   else {
@@ -329,10 +329,10 @@ bool SpiceSegment::getTimeDependentFrameIds(Table &table, int &toId, int &fromId
   return (true);
 }
 
-std::string SpiceSegment::getFrameName(int frameid) const {
+QString SpiceSegment::getFrameName(int frameid) const {
   SpiceChar frameBuf[40];
   frmnam_c ( (SpiceInt) frameid, sizeof(frameBuf), frameBuf);
-  return (string(frameBuf));
+  return (QString(frameBuf));
 }
 
 SpiceSegment::SMatrix SpiceSegment::getConstantRotation(Table &table) const {
@@ -342,7 +342,7 @@ SpiceSegment::SMatrix SpiceSegment::getConstantRotation(Table &table) const {
     PvlKeyword conrot = table.Label()["ConstantRotation"];
     SVector rot(9, crot[0]);
     for (int i=0; i < 9 ; i++) {  //  Loop count ensures valid matrices
-      rot[i] = conrot[i];
+      rot[i] = toDouble(conrot[i]);
     }
   } catch ( IException &ie ) {
     ostringstream mess;
@@ -386,20 +386,20 @@ SpiceSegment::SMatrix SpiceSegment::getIdentityRotation(const int &nelements) co
  *
  * @return SpiceSegment::SMatrix A 6x6 state rotation matrix
  */
-SpiceSegment::SMatrix SpiceSegment::computeStateRotation(const std::string &frame1,
-                                                         const std::string &frame2,
+SpiceSegment::SMatrix SpiceSegment::computeStateRotation(const QString &frame1,
+                                                         const QString &frame2,
                                                          double etTime) const {
   SMatrix state(6,6);
   NaifStatus::CheckErrors();
   try {
     // Get pointing w/AVs
-    sxform_c(frame1.c_str(), frame2.c_str(), etTime,
+    sxform_c(frame1.toAscii().data(), frame2.toAscii().data(), etTime,
              (SpiceDouble (*)[6]) state[0]);
     NaifStatus::CheckErrors();
   } catch ( IException & ) {
     try {
       SMatrix rot(3,3);
-      pxform_c(frame1.c_str(), frame2.c_str(), etTime,
+      pxform_c(frame1.toAscii().data(), frame2.toAscii().data(), etTime,
                (SpiceDouble (*)[3]) rot[0]);
       NaifStatus::CheckErrors();
       SVector av(3, 0.0);
@@ -422,7 +422,7 @@ void SpiceSegment::getRotationMatrices(Cube &cube, Camera &camera, Table &table,
 
   int LtoId, LfromId;
   if ( !getTimeDependentFrameIds(table, LtoId, LfromId) ) {
-    string mess = "Cannot determine time dependent frames! - perhaps a spiceinit is in order.";
+    QString mess = "Cannot determine time dependent frames! - perhaps a spiceinit is in order.";
     throw IException(IException::User, mess, _FILEINFO_);
   }
 
@@ -435,12 +435,12 @@ void SpiceSegment::getRotationMatrices(Cube &cube, Camera &camera, Table &table,
   // Load SPICE and extract necessary contents
   Spice mySpice(*cube.getLabel(), true);  // load w/out tables
 
-  string CLtoId = getFrameName(LtoId);
-  string CtoId = getFrameName(toId);
+  QString CLtoId = getFrameName(LtoId);
+  QString CtoId = getFrameName(toId);
   _instFrame = CtoId;
-  string CfromId = getFrameName(fromId);
+  QString CfromId = getFrameName(fromId);
   _refFrame = CfromId;
-  string CLfromId = getFrameName(LfromId);
+  QString CLfromId = getFrameName(LfromId);
 
   SMatSeq lmat(size(_times)), rmat(size(_times)), avr(size(_times));
   for ( int i = 0 ; i < size(_times) ; i++ ) {
@@ -532,7 +532,7 @@ void SpiceSegment::convert(const SpiceSegment::SMatrix &quats,
 }
 
 
-std::string SpiceSegment::getComment() const {
+QString SpiceSegment::getComment() const {
   ostringstream comment;
 
   FileName fname(_fname);
@@ -549,23 +549,23 @@ std::string SpiceSegment::getComment() const {
 "  RefFrame:   " << _refFrame << endl <<
 "  Records:    " << size() << endl;
 
-  string hasAV = (size(_avvs) > 0) ? "YES" : "NO";
+  QString hasAV = (size(_avvs) > 0) ? "YES" : "NO";
   comment <<
 "  HasAV:      " << hasAV << endl;
 
   comment <<
 "  CamVersion: " << _camVersion << endl;
-  std::vector<std::string> klist = _kernels.getKernelList();
+  QStringList klist = _kernels.getKernelList();
   if ( klist.size() > 0 ) {
     comment <<
 "  Kernels:    \n";
-    for ( unsigned int i = 0 ; i < klist.size() ; i++  ) {
+    for ( int i = 0 ; i < klist.size() ; i++  ) {
       comment <<
 "    " << klist[i] << endl;
     }
   }
 
-  return (string(comment.str()));
+  return (QString(comment.str().c_str()));
 }
 
 void SpiceSegment::init() {
@@ -733,11 +733,11 @@ double SpiceSegment::ETtoSCLK(SpiceInt scCode, double et) const {
   return (sclk);
 }
 
-std::string SpiceSegment::toUTC(const double &et) const {
+QString SpiceSegment::toUTC(const double &et) const {
   const int UTCLEN = 80;
   char utcout[UTCLEN];
   et2utc_c(et, "ISOC", 3, UTCLEN, utcout);
-  return (string(utcout));
+  return (QString(utcout));
 }
 
 };  // namespace Isis

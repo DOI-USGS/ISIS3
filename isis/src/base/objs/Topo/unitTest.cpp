@@ -29,8 +29,8 @@ int main() {
 
   PvlGroup algn("Algorithm");
   algn += PvlKeyword("Name", "Topo");
-  algn += PvlKeyword("Albedo", 0.0690507);
-  algn += PvlKeyword("Incref", 30.0);
+  algn += PvlKeyword("Albedo", "0.0690507");
+  algn += PvlKeyword("Incref", "30.0");
 
   PvlObject on("NormalizationModel");
   on.AddGroup(algn);

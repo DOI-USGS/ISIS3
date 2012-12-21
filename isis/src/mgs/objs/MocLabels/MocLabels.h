@@ -23,6 +23,9 @@
  */
 
 #include <map>
+
+#include <QString>
+
 #include "FileName.h"
 
 
@@ -40,7 +43,7 @@ namespace Isis {
    * @internal
    *  @history 2008-04-30  Steven Lambright corrected infinite loop
    *  @history 2008-05-29  Steven Lambright Fixed binary search indexing,
-   *          bad calls to std::string::_cstr() references
+   *          bad calls to QString::_cstr() references
    *  @history 2008-06-18  Steven Koechle - Fixed Documentation Errors
    *   @history 2008-08-11 Steven Lambright - Fixed definition of WAGO,
    *            problem pointed out by "novas0x2a" (Support Board Member)
@@ -57,7 +60,7 @@ namespace Isis {
   class MocLabels {
     public:
       MocLabels(Pvl &lab);
-      MocLabels(const std::string &file);
+      MocLabels(const QString &file);
       //! Empty destructor.
       ~MocLabels() {};
 
@@ -140,9 +143,9 @@ namespace Isis {
       };
       /**
        * Returns the value for StartTime from the instrument group.
-       * @return @b std::string Start time
+       * @return @b QString Start time
        */
-      inline std::string StartTime() const {
+      inline QString StartTime() const {
         return p_startTime;
       };
       /**
@@ -175,19 +178,19 @@ namespace Isis {
       bool p_mocNA;
       bool p_mocRedWA;
       bool p_mocBlueWA;
-      std::string p_instrumentId;
-      std::string p_filter;
-      std::string p_clockCount;
-      std::string p_gainModeId;
+      QString p_instrumentId;
+      QString p_filter;
+      QString p_clockCount;
+      QString p_gainModeId;
       int p_offsetModeId;
-      std::string p_startTime;
-      std::string p_dataQuality;
+      QString p_startTime;
+      QString p_dataQuality;
       double p_etStart;
       double p_etEnd;
 
       void InitGainMaps();
-      std::map<std::string, double> p_gainMapNA;
-      std::map<std::string, double> p_gainMapWA;
+      std::map<QString, double> p_gainMapNA;
+      std::map<QString, double> p_gainMapWA;
       double p_gain;
       double p_offset;
 

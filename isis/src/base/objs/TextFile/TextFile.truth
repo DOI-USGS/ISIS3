@@ -4,9 +4,9 @@ Unit test for TextFile
 
 2) Read file $temporary/TextFile.tmp into vector
 
-3) Create / Overwrite file $temporary/TextFile.tmp with prefilled string array
+3) Create / Overwrite file $temporary/TextFile.tmp with prefilled QString array
 
-4) Read file $temporary/TextFile.tmp into string array
+4) Read file $temporary/TextFile.tmp into QString array
 
 5) Overwrite file $temporary/TextFile.tmp
 
@@ -20,26 +20,20 @@ Unit test for TextFile
   a) Try to open non-existent file
 **I/O ERROR** TextFile:Open:-> Unable to open: [Input]:[./NoSuchDir/TextFile.tmp].
 
-
   b) Try open as output to pre-existing file
 **I/O ERROR** TextFile:Open: -> Output file already exists [Output]:[./TextFile.tmp].
-
 
   c) Open file with bad open mode
 **PROGRAMMER ERROR** TextFile::-> Unknown openmode: (input, output, overwrite, append):[xxxInputxxx]:[./TextFile.tmp].
 
-
   d) Try to write to Input - Read Only file
 **PROGRAMMER ERROR** TextFile:PutLine: -> Attempt to write to INPUT - Read Only text file: [./TextFile.tmp].
-
 
   e) Try to Write to a closed file
 **PROGRAMMER ERROR** TextFile::-> File not open: [./TextFile.tmp].
 
-
   f) Try to Read from a closed file
 **PROGRAMMER ERROR** TextFile::-> File not open: [./TextFile.tmp].
-
 
 testing GetLine for files that do not end in a newline: Passed
 

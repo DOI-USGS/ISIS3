@@ -4,16 +4,16 @@
 #include "Cube.h"
 #include "OriginalLabel.h"
 #include "ProgramLauncher.h"
-#include <string>
+#include <QString>
 
 using namespace std;
 using namespace Isis;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  string redFile = ui.GetFileName("RED");
-  string irFile  = ui.GetFileName("IR");
-  string bgFile  = ui.GetFileName("BG");
+  QString redFile = ui.GetFileName("RED");
+  QString irFile  = ui.GetFileName("IR");
+  QString bgFile  = ui.GetFileName("BG");
 
   FileName tempFile = FileName::createTempFile("$TEMPORARY/hicubeit.temp.lis");
   TextFile tf;
@@ -23,11 +23,11 @@ void IsisMain() {
   tf.PutLine(bgFile + "\n");
   tf.Close();
 
-  string parameters = string(" FROMLIST = ")    + tempFile.expanded() +
-                      string(" TO = ")      + ui.GetFileName("TO") +
-                      string(" PROPLAB = ") + redFile;
+  QString parameters = QString(" FROMLIST = ")    + tempFile.expanded() +
+                      QString(" TO = ")      + ui.GetFileName("TO") +
+                      QString(" PROPLAB = ") + redFile;
   ProgramLauncher::RunIsisProgram("cubeit", parameters);
-  remove(tempFile.expanded().c_str());
+  remove(tempFile.expanded().toAscii().data());
 
   // Get the instrument group from each file
   Pvl redLab(redFile);
@@ -41,37 +41,37 @@ void IsisMain() {
   // Error check to make sure the proper ccds are stacked
   if((int)redInst["CpmmNumber"] == 5) {
     if(((int)irInst["CpmmNumber"] != 6) || ((int)bgInst["CpmmNumber"] != 4)) {
-      string msg = "You can only stack color images with RED4, IR10, and BG12 ";
+      QString msg = "You can only stack color images with RED4, IR10, and BG12 ";
       msg += "or RED5, IR11, and BG13";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   else if((int)redInst["CpmmNumber"] == 8) {
     if(((int)irInst["CpmmNumber"] != 7) || ((int)bgInst["CpmmNumber"] != 9)) {
-      string msg = "You can only stack color images with RED4, IR10, and BG12 ";
+      QString msg = "You can only stack color images with RED4, IR10, and BG12 ";
       msg += "or RED5, IR11, and BG13";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   else {
-    string msg = "You can only stack color images with RED4, IR10, and BG12 ";
+    QString msg = "You can only stack color images with RED4, IR10, and BG12 ";
     msg += "or RED5, IR11, and BG13";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Concatenate all the source products into one keyword
   PvlKeyword sourceProductId("SourceProductId");
-  sourceProductId += (string)bgInst["StitchedProductIds"][0];
+  sourceProductId += (QString)bgInst["StitchedProductIds"][0];
   if(bgInst["StitchedProductIds"].Size() > 1) {
-    sourceProductId += (string)bgInst["StitchedProductIds"][1];
+    sourceProductId += (QString)bgInst["StitchedProductIds"][1];
   }
-  sourceProductId += (string)redInst["StitchedProductIds"][0];
+  sourceProductId += (QString)redInst["StitchedProductIds"][0];
   if(redInst["StitchedProductIds"].Size() > 1) {
-    sourceProductId += (string)redInst["StitchedProductIds"][1];
+    sourceProductId += (QString)redInst["StitchedProductIds"][1];
   }
-  sourceProductId += (string)irInst["StitchedProductIds"][0];
+  sourceProductId += (QString)irInst["StitchedProductIds"][0];
   if(irInst["StitchedProductIds"].Size() > 1) {
-    sourceProductId += (string)irInst["StitchedProductIds"][1];
+    sourceProductId += (QString)irInst["StitchedProductIds"][1];
   }
 
   // Get min start and max stop time
@@ -80,31 +80,31 @@ void IsisMain() {
   PvlKeyword startClk  = redInst["SpacecraftClockStartCount"];
   PvlKeyword stopClk   = redInst["SpacecraftClockStopCount"];
 
-  if((string) irInst["StartTime"] < (string)startTime) {
+  if((QString) irInst["StartTime"] < (QString)startTime) {
     startTime = irInst["StartTime"];
   }
-  if((string) bgInst["StartTime"] < (string)startTime) {
+  if((QString) bgInst["StartTime"] < (QString)startTime) {
     startTime = bgInst["StartTime"];
   }
 
-  if((string) irInst["StopTime"] > (string)stopTime) {
+  if((QString) irInst["StopTime"] > (QString)stopTime) {
     stopTime = irInst["StopTime"];
   }
-  if((string) bgInst["StopTime"] > (string)stopTime) {
+  if((QString) bgInst["StopTime"] > (QString)stopTime) {
     stopTime = bgInst["StopTime"];
   }
 
-  if((string) irInst["SpacecraftClockStartCount"] < (string)startClk) {
+  if((QString) irInst["SpacecraftClockStartCount"] < (QString)startClk) {
     startClk = irInst["SpacecraftClockStartCount"];
   }
-  if((string) bgInst["SpacecraftClockStartCount"] < (string)startClk) {
+  if((QString) bgInst["SpacecraftClockStartCount"] < (QString)startClk) {
     startClk = bgInst["SpacecraftClockStartCount"];
   }
 
-  if((string) irInst["SpacecraftClockStopCount"] > (string)stopClk) {
+  if((QString) irInst["SpacecraftClockStopCount"] > (QString)stopClk) {
     stopClk = irInst["SpacecraftClockStopCount"];
   }
-  if((string) bgInst["SpacecraftClockStopCount"] > (string)stopClk) {
+  if((QString) bgInst["SpacecraftClockStopCount"] > (QString)stopClk) {
     stopClk = bgInst["SpacecraftClockStopCount"];
   }
 
@@ -122,42 +122,42 @@ void IsisMain() {
 
   PvlKeyword cpmmTdiFlag("cpmmTdiFlag");
   for(int i = 0; i < 14; i++) {
-    cpmmTdiFlag += (string) "";
+    cpmmTdiFlag += (QString) "";
   }
-  cpmmTdiFlag[(int)redInst["CpmmNumber"]] = (string) redGrp["MRO:TDI"];
-  cpmmTdiFlag[(int)irInst["CpmmNumber"]] = (string) irGrp["MRO:TDI"];
-  cpmmTdiFlag[(int)bgInst["CpmmNumber"]] = (string) bgGrp["MRO:TDI"];
+  cpmmTdiFlag[(int)redInst["CpmmNumber"]] = (QString) redGrp["MRO:TDI"];
+  cpmmTdiFlag[(int)irInst["CpmmNumber"]] = (QString) irGrp["MRO:TDI"];
+  cpmmTdiFlag[(int)bgInst["CpmmNumber"]] = (QString) bgGrp["MRO:TDI"];
 
   // Concatenate all summing modes into one keyword
   PvlKeyword cpmmSummingFlag("cpmmSummingFlag");
   for(int i = 0; i < 14; i++) {
-    cpmmSummingFlag += (string) "";
+    cpmmSummingFlag += (QString) "";
   }
-  cpmmSummingFlag[(int)redInst["CpmmNumber"]] = (string) redGrp["MRO:BINNING"];
-  cpmmSummingFlag[(int)irInst["CpmmNumber"]] = (string) irGrp["MRO:BINNING"];
-  cpmmSummingFlag[(int)bgInst["CpmmNumber"]] = (string) bgGrp["MRO:BINNING"];
+  cpmmSummingFlag[(int)redInst["CpmmNumber"]] = (QString) redGrp["MRO:BINNING"];
+  cpmmSummingFlag[(int)irInst["CpmmNumber"]] = (QString) irGrp["MRO:BINNING"];
+  cpmmSummingFlag[(int)bgInst["CpmmNumber"]] = (QString) bgGrp["MRO:BINNING"];
 
   //Concatenate all the Special_Processing_Flag into one keyword
   PvlKeyword specialProcessingFlag("SpecialProcessingFlag");
   for(int i = 0; i < 14; i++) {
-    specialProcessingFlag += (string) "";
+    specialProcessingFlag += (QString) "";
   }
   //keyword Special_Processing_Flag may not be present so need to test
   // if not present set to NOMINAL
   if(redInst.HasKeyword("Special_Processing_Flag")) {
-    specialProcessingFlag[redInst["CpmmNumber"]] = (string) redInst["Special_Processing_Flag"];
+    specialProcessingFlag[redInst["CpmmNumber"]] = (QString) redInst["Special_Processing_Flag"];
   }
   else {
     specialProcessingFlag[redInst["CpmmNumber"]] = "NOMINAL";
   }
   if(irInst.HasKeyword("Special_Processing_Flag")) {
-    specialProcessingFlag[irInst["CpmmNumber"]] = (string) irInst["Special_Processing_Flag"];
+    specialProcessingFlag[irInst["CpmmNumber"]] = (QString) irInst["Special_Processing_Flag"];
   }
   else {
     specialProcessingFlag[irInst["CpmmNumber"]] = "NOMINAL";
   }
   if(bgInst.HasKeyword("Special_Processing_Flag")) {
-    specialProcessingFlag[bgInst["CpmmNumber"]] = (string) bgInst["Special_Processing_Flag"];
+    specialProcessingFlag[bgInst["CpmmNumber"]] = (QString) bgInst["Special_Processing_Flag"];
   }
   else {
     specialProcessingFlag[bgInst["CpmmNumber"]] = "NOMINAL";

@@ -1,4 +1,4 @@
-#if !defined(HiCalConf_h)
+#ifndef HiCalConf_h
 #define HiCalConf_h
 /**                                                                       
  * @file                                                                  
@@ -92,53 +92,53 @@ namespace Isis {
   class HiCalConf : public DbAccess { 
     public:
       typedef enum { Matrix, Scalar, Keyword } CalType;
-      typedef std::vector<std::string> ValueList;
+      typedef std::vector<QString> ValueList;
 
     public: 
       //  Constructors and Destructor
       HiCalConf();
       HiCalConf(Pvl &label);
-      HiCalConf(Pvl &label, const std::string &conf);
+      HiCalConf(Pvl &label, const QString &conf);
 
       /** Destructor ensures everything is cleaned up properly */
       virtual ~HiCalConf () { }
 
       void setLabel(Pvl &label);
-      PvlKeyword &getKey(const std::string &key, const std::string &group = "");
+      PvlKeyword &getKey(const QString &key, const QString &group = "");
 
-      std::string filepath(const std::string &fname) const;
-      void setConf(const std::string &conf);
-      void selectProfile(const std::string &profile = "");
+      QString filepath(const QString &fname) const;
+      void setConf(const QString &conf);
+      void selectProfile(const QString &profile = "");
 
-      std::string getProfileName() const;
-      std::string getMatrixSource(const std::string &name) const;
-      std::string getMatrixSource(const std::string &name,
+      QString getProfileName() const;
+      QString getMatrixSource(const QString &name) const;
+      QString getMatrixSource(const QString &name,
                                   const DbProfile &matconf) const;
-      HiVector getMatrix(const std::string &name, int expected_size = 0) const;
-      HiVector getMatrix(const std::string &name, const DbProfile &profile, 
+      HiVector getMatrix(const QString &name, int expected_size = 0) const;
+      HiVector getMatrix(const QString &name, const DbProfile &profile, 
                          int expected_size = 0) const;
-      HiVector getScalar(const std::string &name, const DbProfile &profile,
+      HiVector getScalar(const QString &name, const DbProfile &profile,
                                 int expected_size) const;
       int getMatrixBand() const;
       int getMatrixBand(const DbProfile &p) const;
 
       double sunDistanceAU();
 
-      DbProfile getMatrixProfile(const std::string &profile = "") const;
-      ValueList getList(const DbProfile &profile, const std::string &key) const;
-      std::string resolve(const std::string &composite, 
+      DbProfile getMatrixProfile(const QString &profile = "") const;
+      ValueList getList(const DbProfile &profile, const QString &key) const;
+      QString resolve(const QString &composite, 
                           const DbProfile &matconf) const;
 
     private:
       static bool  _naifLoaded;  //!< Ensures one instance of NAIF kernels
-      std::string  _profName;    //!< Specified name of profile
+      QString  _profName;    //!< Specified name of profile
       Pvl          _label;       //!< Hold label for future references
 
       int          _ccd;         //!< CCD Number
       int          _channel;     //!< Channel number
       int          _tdi;         //!< TDI mode of operation
       int          _binMode;     //!< Binning mode
-      std::string  _filter;      //!< Filter set name (RED, IR, BG)
+      QString  _filter;      //!< Filter set name (RED, IR, BG)
       
 
       void init();
@@ -148,8 +148,8 @@ namespace Isis {
       int getChannelIndex(const int &ccd, const int &channel) const;
       DbProfile makeParameters(Pvl &label) const;
       DbProfile makeParameters(const DbProfile &profile) const;
-      std::string makePattern(const std::string &str) const;
-      std::string parser(const std::string &s, const ValueList &options,
+      QString makePattern(const QString &str) const;
+      QString parser(const QString &s, const ValueList &options,
                          const DbProfile &prof ) const; 
     };
 

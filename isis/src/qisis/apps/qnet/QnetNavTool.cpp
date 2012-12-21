@@ -216,7 +216,7 @@ namespace Isis {
     gridLayout->addLayout(layout, 3, 0, 1, 2);
     p_navDialog->setLayout(gridLayout);
 
-    QSettings settings(FileName("$HOME/.Isis/qnet/NavTool.config").expanded().c_str(),
+    QSettings settings(FileName("$HOME/.Isis/qnet/NavTool.config").expanded(),
         QSettings::NativeFormat);
     p_navDialog->resize(settings.value("size").toSize());
     
@@ -235,7 +235,7 @@ namespace Isis {
 
 
   QnetNavTool::~QnetNavTool() {
-    QSettings settings(FileName("$HOME/.Isis/qnet/NavTool.config").expanded().c_str(),
+    QSettings settings(FileName("$HOME/.Isis/qnet/NavTool.config").expanded(),
         QSettings::NativeFormat);
 
     settings.setValue("size", p_navDialog->size());
@@ -465,8 +465,8 @@ namespace Isis {
           this, SLOT(editPoint(QListWidgetItem *)));
       //p_listBox->setSelectionMode(QAbstractItemView::SingleSelection);
       for (int i = 0; i < g_controlNetwork->GetNumPoints(); i++) {
-        string cNetId = (*g_controlNetwork)[i]->GetId();
-        QString itemString = cNetId.c_str();
+        QString cNetId = (*g_controlNetwork)[i]->GetId();
+        QString itemString = cNetId;
         p_listBox->insertItem(i, itemString);
         int images = (*g_controlNetwork)[i]->GetNumMeasures();
         p_listBox->item(i)->setToolTip(QString::number(images) + " image(s) in point");
@@ -487,8 +487,8 @@ namespace Isis {
       //p_listBox->setSelectionMode(QAbstractItemView::ExtendedSelection);
       for (int i = 0; i < g_serialNumberList->Size(); i++) {
         FileName filename = FileName(g_serialNumberList->FileName(i));
-        string tempFileName = filename.name();
-        p_listBox->insertItem(i, tempFileName.c_str());
+        QString tempFileName = filename.name();
+        p_listBox->insertItem(i, tempFileName);
       }
       QString msg = "Filter Count: " + QString::number(p_listBox->count()) +
           " / " + QString::number(g_serialNumberList->Size());
@@ -574,8 +574,8 @@ namespace Isis {
     // We are dealing with points so output the point numbers
     if (p_listCombo->currentIndex() == Points) {
       for (int i = 0; i < g_filteredPoints.size(); i++) {
-        string cNetId = (*g_controlNetwork)[g_filteredPoints[i]]->GetId();
-        QString itemString = cNetId.c_str();
+        QString cNetId = (*g_controlNetwork)[g_filteredPoints[i]]->GetId();
+        QString itemString = cNetId;
         p_listBox->insertItem(i, itemString);
         int images = (*g_controlNetwork)[g_filteredPoints[i]]->GetNumMeasures();
         p_listBox->item(i)->setToolTip(QString::number(images) + " image(s) in point");
@@ -588,8 +588,8 @@ namespace Isis {
     else if (p_listCombo->currentIndex() == Cubes) {
       for (int i = 0; i < g_filteredImages.size(); i++) {
         FileName filename = FileName(g_serialNumberList->FileName(g_filteredImages[i]));
-        string tempFileName = filename.name();
-        p_listBox->insertItem(i, tempFileName.c_str());
+        QString tempFileName = filename.name();
+        p_listBox->insertItem(i, tempFileName);
       }
       QString msg = "Filter Count: " + QString::number(p_listBox->count()) +
           " / " + QString::number(g_serialNumberList->Size());
@@ -644,13 +644,13 @@ namespace Isis {
       // Tell the filetool to load the given image
       else if (p_listCombo->currentIndex() == Cubes) {
         if (g_filteredImages.size() == 0) {
-          string serialNumberList = (*g_serialNumberList).SerialNumber(index);
-          QString sn = serialNumberList.c_str();
+          QString serialNumberList = (*g_serialNumberList).SerialNumber(index);
+          QString sn = serialNumberList;
           emit loadImage(sn);
         }
         else {
-          string serialNumberList = (*g_serialNumberList).SerialNumber(g_filteredImages[index]);
-          QString sn = serialNumberList.c_str();
+          QString serialNumberList = (*g_serialNumberList).SerialNumber(g_filteredImages[index]);
+          QString sn = serialNumberList;
           emit loadImage(sn);
         }
       }

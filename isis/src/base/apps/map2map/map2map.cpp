@@ -12,8 +12,8 @@ using namespace Isis;
 void PrintMap();
 void LoadMapRange();
 
-map <string, void *> GuiHelpers() {
-  map <string, void *> helper;
+map <QString, void *> GuiHelpers() {
+  map <QString, void *> helper;
   helper ["PrintMap"] = (void *) PrintMap;
   helper ["LoadMapRange"] = (void *) LoadMapRange;
   return helper;
@@ -58,19 +58,19 @@ void IsisMain() {
   // Deal with user overrides entered in the GUI. Do this by changing the user's mapping group, which
   // will then overlay anything in the output mapping group.
   if(ui.WasEntered("MINLAT") && !ui.GetBoolean("MATCHMAP")) {
-    userMappingGrp.AddKeyword(PvlKeyword("MinimumLatitude", ui.GetDouble("MINLAT")), Pvl::Replace);
+    userMappingGrp.AddKeyword(PvlKeyword("MinimumLatitude", toString(ui.GetDouble("MINLAT"))), Pvl::Replace);
   }
 
   if(ui.WasEntered("MAXLAT") && !ui.GetBoolean("MATCHMAP")) {
-    userMappingGrp.AddKeyword(PvlKeyword("MaximumLatitude", ui.GetDouble("MAXLAT")), Pvl::Replace);
+    userMappingGrp.AddKeyword(PvlKeyword("MaximumLatitude", toString(ui.GetDouble("MAXLAT"))), Pvl::Replace);
   }
 
   if(ui.WasEntered("MINLON") && !ui.GetBoolean("MATCHMAP")) {
-    userMappingGrp.AddKeyword(PvlKeyword("MinimumLongitude", ui.GetDouble("MINLON")), Pvl::Replace);
+    userMappingGrp.AddKeyword(PvlKeyword("MinimumLongitude", toString(ui.GetDouble("MINLON"))), Pvl::Replace);
   }
 
   if(ui.WasEntered("MAXLON") && !ui.GetBoolean("MATCHMAP")) {
-    userMappingGrp.AddKeyword(PvlKeyword("MaximumLongitude", ui.GetDouble("MAXLON")), Pvl::Replace);
+    userMappingGrp.AddKeyword(PvlKeyword("MaximumLongitude", toString(ui.GetDouble("MAXLON"))), Pvl::Replace);
   }
 
   /**
@@ -82,7 +82,7 @@ void IsisMain() {
    */
   bool sameDirection = true;
   if(userMappingGrp.HasKeyword("LongitudeDirection")) {
-    if(((string)userMappingGrp["LongitudeDirection"]).compare(fromMappingGrp["LongitudeDirection"]) != 0) {
+    if(((QString)userMappingGrp["LongitudeDirection"]).compare(fromMappingGrp["LongitudeDirection"]) != 0) {
       sameDirection = false;
     }
   }
@@ -93,8 +93,8 @@ void IsisMain() {
     double minLon = outMappingGrp["MinimumLongitude"];
     double maxLon = outMappingGrp["MaximumLongitude"];
 
-    outMappingGrp["MaximumLongitude"] = minLon;
-    outMappingGrp["MinimumLongitude"] = maxLon;
+    outMappingGrp["MaximumLongitude"] = toString(minLon);
+    outMappingGrp["MinimumLongitude"] = toString(maxLon);
   }
 
   if(ui.GetString("PIXRES").compare("FROM") == 0 && !ui.GetBoolean("MATCHMAP")) {
@@ -153,7 +153,7 @@ void IsisMain() {
       userMappingGrp.DeleteKeyword("PixelResolution");
     }
 
-    outMappingGrp.AddKeyword(PvlKeyword("PixelResolution", ui.GetDouble("RESOLUTION"), "meters/pixel"), Pvl::Replace);
+    outMappingGrp.AddKeyword(PvlKeyword("PixelResolution", toString(ui.GetDouble("RESOLUTION")), "meters/pixel"), Pvl::Replace);
   }
   else if(ui.GetString("PIXRES").compare("PPD") == 0) {
     // Resolution specified - delete all and add to outMappingGrp
@@ -181,7 +181,7 @@ void IsisMain() {
       userMappingGrp.DeleteKeyword("PixelResolution");
     }
 
-    outMappingGrp.AddKeyword(PvlKeyword("Scale", ui.GetDouble("RESOLUTION"), "pixels/degree"), Pvl::Replace);
+    outMappingGrp.AddKeyword(PvlKeyword("Scale", toString(ui.GetDouble("RESOLUTION")), "pixels/degree"), Pvl::Replace);
   }
 
   // Rotation will NOT Propagate
@@ -218,13 +218,13 @@ void IsisMain() {
     for(int index = 0; index < longitudes.Keywords(); index ++) {
       if(!userMappingGrp.HasKeyword(longitudes[index].Name())) {
         // use the from domain because that's where our values are coming from
-        if(((string)userMappingGrp["LongitudeDirection"]).compare("PositiveEast") == 0) {
-          outMappingGrp[longitudes[index].Name()] =
-            Projection::ToPositiveEast(outMappingGrp[longitudes[index].Name()], outMappingGrp["LongitudeDomain"]);
+        if(((QString)userMappingGrp["LongitudeDirection"]).compare("PositiveEast") == 0) {
+          outMappingGrp[longitudes[index].Name()] = toString(
+            Projection::ToPositiveEast(outMappingGrp[longitudes[index].Name()], outMappingGrp["LongitudeDomain"]));
         }
         else {
-          outMappingGrp[longitudes[index].Name()] =
-            Projection::ToPositiveWest(outMappingGrp[longitudes[index].Name()], outMappingGrp["LongitudeDomain"]);
+          outMappingGrp[longitudes[index].Name()] = toString(
+            Projection::ToPositiveWest(outMappingGrp[longitudes[index].Name()], outMappingGrp["LongitudeDomain"]));
         }
       }
     }
@@ -238,10 +238,10 @@ void IsisMain() {
       for(int index = 0; index < longitudes.Keywords(); index ++) {
         if(!userMappingGrp.HasKeyword(longitudes[index].Name())) {
           if((int)userMappingGrp["LongitudeDomain"] == 180) {
-            outMappingGrp[longitudes[index].Name()] = Projection::To180Domain(outMappingGrp[longitudes[index].Name()]);
+            outMappingGrp[longitudes[index].Name()] = toString(Projection::To180Domain(outMappingGrp[longitudes[index].Name()]));
           }
           else {
-            outMappingGrp[longitudes[index].Name()] = Projection::To360Domain(outMappingGrp[longitudes[index].Name()]);
+            outMappingGrp[longitudes[index].Name()] = toString(Projection::To360Domain(outMappingGrp[longitudes[index].Name()]));
           }
         }
       }
@@ -251,23 +251,23 @@ void IsisMain() {
 
   // Third, planetographic/planetocentric
   if(userMappingGrp.HasKeyword("LatitudeType")) { // user set a new domain?
-    if(((string)userMappingGrp["LatitudeType"]).compare(fromMappingGrp["LatitudeType"]) != 0) { // new lat type different?
+    if(((QString)userMappingGrp["LatitudeType"]).compare(fromMappingGrp["LatitudeType"]) != 0) { // new lat type different?
 
       PvlGroup latitudes = inproj->MappingLatitudes();
 
       for(int index = 0; index < latitudes.Keywords(); index ++) {
         if(!userMappingGrp.HasKeyword(latitudes[index].Name())) {
-          if(((string)userMappingGrp["LatitudeType"]).compare("Planetographic") == 0) {
-            outMappingGrp[latitudes[index].Name()] = Projection::ToPlanetographic(
+          if(((QString)userMappingGrp["LatitudeType"]).compare("Planetographic") == 0) {
+            outMappingGrp[latitudes[index].Name()] = toString(Projection::ToPlanetographic(
                   (double)fromMappingGrp[latitudes[index].Name()],
                   (double)fromMappingGrp["EquatorialRadius"],
-                  (double)fromMappingGrp["PolarRadius"]);
+                  (double)fromMappingGrp["PolarRadius"]));
           }
           else {
-            outMappingGrp[latitudes[index].Name()] = Projection::ToPlanetocentric(
+            outMappingGrp[latitudes[index].Name()] = toString(Projection::ToPlanetocentric(
                   (double)fromMappingGrp[latitudes[index].Name()],
                   (double)fromMappingGrp["EquatorialRadius"],
-                  (double)fromMappingGrp["PolarRadius"]);
+                  (double)fromMappingGrp["PolarRadius"]));
           }
         }
       }
@@ -279,19 +279,19 @@ void IsisMain() {
   if ((double)outMappingGrp["MinimumLongitude"] >=
       (double)outMappingGrp["MaximumLongitude"]) {
 
-    if ((string)outMappingGrp["MinimumLongitude"] == "180.0" &&
+    if ((QString)outMappingGrp["MinimumLongitude"] == "180.0" &&
         (int)userMappingGrp["LongitudeDomain"] == 180)
       outMappingGrp["MinimumLongitude"] = "-180";
 
-    if ((string)outMappingGrp["MaximumLongitude"] == "-180.0" &&
+    if ((QString)outMappingGrp["MaximumLongitude"] == "-180.0" &&
         (int)userMappingGrp["LongitudeDomain"] == 180)
       outMappingGrp["MaximumLongitude"] = "180";
 
-    if ((string)outMappingGrp["MinimumLongitude"] == "360.0" &&
+    if ((QString)outMappingGrp["MinimumLongitude"] == "360.0" &&
         (int)userMappingGrp["LongitudeDomain"] == 360)
       outMappingGrp["MinimumLongitude"] = "0";
 
-    if ((string)outMappingGrp["MaximumLongitude"] == "0.0" &&
+    if ((QString)outMappingGrp["MaximumLongitude"] == "0.0" &&
         (int)userMappingGrp["LongitudeDomain"] == 360)
       outMappingGrp["MaximumLongitude"] = "360";
   }
@@ -299,7 +299,7 @@ void IsisMain() {
   // If MinLon/MaxLon out of order, we weren't able to calculate the correct values
   if((double)outMappingGrp["MinimumLongitude"] >= (double)outMappingGrp["MaximumLongitude"]) {
     if(!ui.WasEntered("MINLON") || !ui.WasEntered("MAXLON")) {
-      string msg = "Unable to determine the correct [MinimumLongitude,MaximumLongitude].";
+      QString msg = "Unable to determine the correct [MinimumLongitude,MaximumLongitude].";
       msg += " Please specify these values in the [MINLON,MAXLON] parameters";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -361,7 +361,7 @@ void IsisMain() {
     interp = new Interpolator(Interpolator::CubicConvolutionType);
   }
   else {
-    string msg = "Unknow value for INTERP [" + ui.GetString("INTERP") + "]";
+    QString msg = "Unknow value for INTERP [" + ui.GetString("INTERP") + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -514,7 +514,7 @@ void LoadMapRange() {
 
   // Longitude conversions first
   if(userMapping.HasKeyword("LongitudeDirection")) {
-    if(((string)userMapping["LongitudeDirection"]).compare(fromMapping["LongitudeDirection"]) != 0) {
+    if(((QString)userMapping["LongitudeDirection"]).compare(fromMapping["LongitudeDirection"]) != 0) {
       double minLon = fromMapping["MinimumLongitude"];
       double maxLon = fromMapping["MaximumLongitude"];
       int domain = fromMapping["LongitudeDomain"];
@@ -523,39 +523,39 @@ void LoadMapRange() {
         domain = userMapping["LongitudeDomain"];
       }
 
-      if((string)userMapping["LongitudeDirection"] == "PositiveEast") {
-        fromMapping["MaximumLongitude"] = Projection::ToPositiveEast(minLon, domain);
-        fromMapping["MinimumLongitude"] = Projection::ToPositiveEast(maxLon, domain);
+      if((QString)userMapping["LongitudeDirection"] == "PositiveEast") {
+        fromMapping["MaximumLongitude"] = toString(Projection::ToPositiveEast(minLon, domain));
+        fromMapping["MinimumLongitude"] = toString(Projection::ToPositiveEast(maxLon, domain));
       }
-      else if((string)userMapping["LongitudeDirection"] == "PositiveWest") {
-        fromMapping["MaximumLongitude"] = Projection::ToPositiveWest(minLon, domain);
-        fromMapping["MinimumLongitude"] = Projection::ToPositiveWest(maxLon, domain);
+      else if((QString)userMapping["LongitudeDirection"] == "PositiveWest") {
+        fromMapping["MaximumLongitude"] = toString(Projection::ToPositiveWest(minLon, domain));
+        fromMapping["MinimumLongitude"] = toString(Projection::ToPositiveWest(maxLon, domain));
       }
     }
   }
 
   // Latitude conversions now
   if(userMapping.HasKeyword("LatitudeType")) { // user set a new domain?
-    if(((string)userMapping["LatitudeType"]).compare(fromMapping["LatitudeType"]) != 0) { // new lat type different?
-      if(((string)userMapping["LatitudeType"]).compare("Planetographic") == 0) {
-        fromMapping["MinimumLatitude"] = Projection::ToPlanetographic(
+    if(((QString)userMapping["LatitudeType"]).compare(fromMapping["LatitudeType"]) != 0) { // new lat type different?
+      if(((QString)userMapping["LatitudeType"]).compare("Planetographic") == 0) {
+        fromMapping["MinimumLatitude"] = toString(Projection::ToPlanetographic(
                                            (double)fromMapping["MinimumLatitude"],
                                            (double)fromMapping["EquatorialRadius"],
-                                           (double)fromMapping["PolarRadius"]);
-        fromMapping["MaximumLatitude"] = Projection::ToPlanetographic(
+                                           (double)fromMapping["PolarRadius"]));
+        fromMapping["MaximumLatitude"] = toString(Projection::ToPlanetographic(
                                            (double)fromMapping["MaximumLatitude"],
                                            (double)fromMapping["EquatorialRadius"],
-                                           (double)fromMapping["PolarRadius"]);
+                                           (double)fromMapping["PolarRadius"]));
       }
       else {
-        fromMapping["MinimumLatitude"] = Projection::ToPlanetocentric(
+        fromMapping["MinimumLatitude"] = toString(Projection::ToPlanetocentric(
                                            (double)fromMapping["MinimumLatitude"],
                                            (double)fromMapping["EquatorialRadius"],
-                                           (double)fromMapping["PolarRadius"]);
-        fromMapping["MaximumLatitude"] = Projection::ToPlanetocentric(
+                                           (double)fromMapping["PolarRadius"]));
+        fromMapping["MaximumLatitude"] = toString(Projection::ToPlanetocentric(
                                            (double)fromMapping["MaximumLatitude"],
                                            (double)fromMapping["EquatorialRadius"],
-                                           (double)fromMapping["PolarRadius"]);
+                                           (double)fromMapping["PolarRadius"]));
       }
     }
   }

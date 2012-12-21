@@ -28,21 +28,21 @@ namespace Isis {
       ProcessGroundPolygons();
 
       //Cube is an existing camera cube or projection cube
-      void SetOutputCube(const std::string &parameter, std::string &cube);
+      void SetOutputCube(const QString &parameter, QString &cube);
 
       //Determine cube size from the projection map
-      void SetOutputCube(const std::string &parameter, Isis::Pvl &map, int bands);
+      void SetOutputCube(const QString &parameter, Isis::Pvl &map, int bands);
 
-      void SetOutputCube(const std::string &avgFileName, const std::string
+      void SetOutputCube(const QString &avgFileName, const QString
                          &countFileName, Isis::CubeAttributeOutput &atts,
-                         std::string &cube);
+                         QString &cube);
 
-      void SetOutputCube(const std::string &avgFileName, const std::string
+      void SetOutputCube(const QString &avgFileName, const QString
                          &countFileName, Isis::CubeAttributeOutput &atts,
                          Isis::Pvl &map, int bands);
 
-      void AppendOutputCube(std::string &cube, const std::string &avgFileName,
-                            const std::string &countFileName = "");
+      void AppendOutputCube(QString &cube, const QString &avgFileName,
+                            const QString &countFileName = "");
 
       void Rasterize(std::vector<double> &lat,
                      std::vector<double> &lon,

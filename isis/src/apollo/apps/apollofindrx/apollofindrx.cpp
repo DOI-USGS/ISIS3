@@ -41,32 +41,32 @@ void IsisMain ()
     cube.open(ui.GetFileName("FROM"),"rw");
 
     PvlGroup &reseaus = cube.getLabel()->FindGroup("Reseaus",Pvl::Traverse);
-    string mission = (cube.getLabel()->FindGroup("Instrument",Pvl::Traverse))["SpacecraftName"];
-    string instrument = (cube.getLabel()->FindGroup("Instrument",Pvl::Traverse))["InstrumentId"];
+    QString mission = (cube.getLabel()->FindGroup("Instrument",Pvl::Traverse))["SpacecraftName"];
+    QString instrument = (cube.getLabel()->FindGroup("Instrument",Pvl::Traverse))["InstrumentId"];
     Apollo apollo(mission, instrument);
-    if (mission.substr(0,6) != "APOLLO") {
-      string msg = "This application is for use with Apollo spacecrafts only.";
+    if (mission.mid(0,6) != "APOLLO") {
+      QString msg = "This application is for use with Apollo spacecrafts only.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     // If the Keyword sizes don't match up, throw errors.
     int nres = reseaus["Line"].Size();
     if (nres != reseaus["Sample"].Size()) {
-      string msg = "Sample size incorrect [Sample size " +
-                    IString(reseaus["Sample"].Size()) + " != " + " Line size " +
-                    IString(reseaus["Line"].Size()) + "]";
+      QString msg = "Sample size incorrect [Sample size " +
+                    toString(reseaus["Sample"].Size()) + " != " + " Line size " +
+                    toString(reseaus["Line"].Size()) + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     if (nres != reseaus["Type"].Size()) {
-      string msg = "Type size incorrect [Type size " +
-                    IString(reseaus["Type"].Size()) + " != " + " Line size " +
-                    IString(reseaus["Line"].Size()) + "]";
+      QString msg = "Type size incorrect [Type size " +
+                    toString(reseaus["Type"].Size()) + " != " + " Line size " +
+                    toString(reseaus["Line"].Size()) + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     if (nres != reseaus["Valid"].Size()) {
-      string msg = "Valid size incorrect [Valid size " +
-                    IString(reseaus["Valid"].Size()) + " != " + " Line size " +
-                    IString(reseaus["Line"].Size()) + "]";
+      QString msg = "Valid size incorrect [Valid size " +
+                    toString(reseaus["Valid"].Size()) + " != " + " Line size " +
+                    toString(reseaus["Line"].Size()) + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
@@ -94,8 +94,8 @@ void IsisMain ()
     // for (int res=0; res<nres; res++)
     for (int res=0; res<nres; res++)
     {
-        currentLine = (int)((double)reseaus["Line"][res]+0.5);
-        currentSample = (int)((double)reseaus["Sample"][res]+0.5);
+        currentLine = (int)(toDouble(reseaus["Line"][res]+0.5));
+        currentSample = (int)(toDouble(reseaus["Sample"][res]+0.5));
 
       // Output chips
       chip.SetSize(patternSize + 2*ds , patternSize + 2*dl);
@@ -105,13 +105,13 @@ void IsisMain ()
       if  (Walk() ) {
         double dx = 0,
                     dy = 0;
-        if (res%dim > 0 && reseaus["Valid"][res-1] == "1") dy = currentLine - patternSize/2 - dl + bestLine-1 - (double)(reseaus["Line"][res]);
-        if (res/dim > 0 && reseaus["Valid"][res - dim] == "1") dx = currentSample - patternSize/2 - ds + bestSample-1 - (double)(reseaus["Sample"][res]);
-        double horizontalShift = currentSample - patternSize/2 - ds + bestSample-1 - (double)(reseaus["Sample"][res]) - dx,
-                    verticalShift = currentLine - patternSize/2 - dl + bestLine-1 - (double)(reseaus["Line"][res]) - dy;
+        if (res%dim > 0 && reseaus["Valid"][res-1] == "1") dy = currentLine - patternSize/2 - dl + bestLine-1 - toDouble(reseaus["Line"][res]);
+        if (res/dim > 0 && reseaus["Valid"][res - dim] == "1") dx = currentSample - patternSize/2 - ds + bestSample-1 - toDouble(reseaus["Sample"][res]);
+        double horizontalShift = currentSample - patternSize/2 - ds + bestSample-1 - toDouble(reseaus["Sample"][res]) - dx,
+                    verticalShift = currentLine - patternSize/2 - dl + bestLine-1 - toDouble(reseaus["Line"][res]) - dy;
         for (int i=res; i<nres; i++) {
-          reseaus["Sample"][i] = (double)(reseaus["Sample"][i]) + horizontalShift + ((i/dim) - (res/dim) + 1)*dx;
-          reseaus["Line"][i] = (double)(reseaus["Line"][i]) + verticalShift + ((i%dim) - (res%dim) + 1)*dy;
+          reseaus["Sample"][i] = toDouble(reseaus["Sample"][i]) + horizontalShift + ((i/dim) - (res/dim) + 1)*dx;
+          reseaus["Line"][i] = toDouble(reseaus["Line"][i]) + verticalShift + ((i%dim) - (res%dim) + 1)*dy;
         }
         reseaus["Valid"][res] = 1;
         validReseaus++;
@@ -119,14 +119,14 @@ void IsisMain ()
         std::vector< double > xy;
         xy.push_back(res%(int)sqrt(nres));
         xy.push_back(res/(int)sqrt(nres));
-        sampFunc.AddKnown(xy, reseaus["Sample"][res]);
-        lineFunc.AddKnown(xy, reseaus["Line"][res]);
+        sampFunc.AddKnown(xy, toDouble(reseaus["Sample"][res]));
+        lineFunc.AddKnown(xy, toDouble(reseaus["Line"][res]));
 
         ds = (int)(MIN_DISP+ abs(dx) + abs(horizontalShift));
         dl = (int)(MIN_DISP + abs(dy) + abs(verticalShift));
       }
       else {
-        reseaus["Valid"][res] = 0;
+        reseaus["Valid"][res] = "0";
       }
 
       prog.CheckStatus();
@@ -138,7 +138,7 @@ void IsisMain ()
 
     // for invalid reseaus, refine the estimated locations
     for (int res=0; res<nres; res++) {
-      if ((int)reseaus["Valid"][res]==0) {
+      if (toInt(reseaus["Valid"][res])==0) {
         std::vector< double > xy;
         xy.push_back(res%(int)sqrt(nres));
         xy.push_back(res/(int)sqrt(nres));
@@ -151,7 +151,7 @@ void IsisMain ()
     reseaus["Status"] = "Refined";
     }
     else {
-      string msg = "No Reseaus located. Labels will not be changed.";
+      QString msg = "No Reseaus located. Labels will not be changed.";
       msg += "Try changing the registration parameters.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }

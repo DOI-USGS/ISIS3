@@ -1,4 +1,4 @@
-#if !defined(GradientOperator_h)
+#ifndef GradientOperator_h
 #define GradientOperator_h
 /**
  * @file

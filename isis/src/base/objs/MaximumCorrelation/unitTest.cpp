@@ -16,18 +16,18 @@ int main() {
   try {
     PvlGroup alg("Algorithm");
     alg += PvlKeyword("Name", "MaximumCorrelation");
-    alg += PvlKeyword("Tolerance", 0.1);
+    alg += PvlKeyword("Tolerance", "0.1");
     alg += PvlKeyword("SubpixelAccuracy", "True");
 
     PvlGroup pchip("PatternChip");
-    pchip += PvlKeyword("Samples", 15);
-    pchip += PvlKeyword("Lines", 15);
-    pchip += PvlKeyword("Sampling", 50);
-    pchip += PvlKeyword("ValidPercent", 10);
+    pchip += PvlKeyword("Samples", "15");
+    pchip += PvlKeyword("Lines", "15");
+    pchip += PvlKeyword("Sampling", "50");
+    pchip += PvlKeyword("ValidPercent", "10");
 
     PvlGroup schip("SearchChip");
-    schip += PvlKeyword("Samples", 35);
-    schip += PvlKeyword("Lines", 35);
+    schip += PvlKeyword("Samples", "35");
+    schip += PvlKeyword("Lines", "35");
 
     PvlObject o("AutoRegistration");
     o.AddGroup(alg);

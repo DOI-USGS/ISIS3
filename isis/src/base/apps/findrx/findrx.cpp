@@ -30,21 +30,21 @@ void IsisMain() {
   // If the Keyword sizes don't match up, throw errors.
   int nres = reseaus["Line"].Size();
   if(nres != reseaus["Sample"].Size()) {
-    string msg = "Sample size incorrect [Sample size " +
-                 IString(reseaus["Sample"].Size()) + " != " + " Line size " +
-                 IString(reseaus["Line"].Size()) + "]";
+    QString msg = "Sample size incorrect [Sample size " +
+                 toString(reseaus["Sample"].Size()) + " != " + " Line size " +
+                 toString(reseaus["Line"].Size()) + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
   if(nres != reseaus["Type"].Size()) {
-    string msg = "Type size incorrect [Type size " +
-                 IString(reseaus["Type"].Size()) + " != " + " Line size " +
-                 IString(reseaus["Line"].Size()) + "]";
+    QString msg = "Type size incorrect [Type size " +
+                 toString(reseaus["Type"].Size()) + " != " + " Line size " +
+                 toString(reseaus["Line"].Size()) + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
   if(nres != reseaus["Valid"].Size()) {
-    string msg = "Valid size incorrect [Valid size " +
-                 IString(reseaus["Valid"].Size()) + " != " + " Line size " +
-                 IString(reseaus["Line"].Size()) + "]";
+    QString msg = "Valid size incorrect [Valid size " +
+                 toString(reseaus["Valid"].Size()) + " != " + " Line size " +
+                 toString(reseaus["Line"].Size()) + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
@@ -73,10 +73,10 @@ void IsisMain() {
   // And the loop...
   for(int res = 0; res < nres; ++res) {
     // Output chips
-    ar->SearchChip()->TackCube(reseaus["Sample"][res], reseaus["Line"][res]);
+    ar->SearchChip()->TackCube(toDouble(reseaus["Sample"][res]), toDouble(reseaus["Line"][res]));
     ar->SearchChip()->Load(cube);
     ar->PatternChip()->Load(pattern, 0, 1.0, res + 1);
-    int type = IString(reseaus["Type"][res]);
+    int type = toInt(reseaus["Type"][res]);
     // If the reseaus is in the center (type 5) use full percent value
     if(type == 5) {
       ar->SetPatternValidPercent(patternValidPercent);
@@ -96,18 +96,18 @@ void IsisMain() {
     ar->Register();
 
     if(ar->Success()) {
-      reseaus["Sample"][res] = ar->CubeSample();
-      reseaus["Line"][res] = ar->CubeLine();
-      reseaus["Valid"][res] = 1;
+      reseaus["Sample"][res] = toString(ar->CubeSample());
+      reseaus["Line"][res] = toString(ar->CubeLine());
+      reseaus["Valid"][res] = "1";
     }
     else {
-      reseaus["Valid"][res] = 0;
+      reseaus["Valid"][res] = "0";
     }
 
     // And if the reseaus are to be marked...mark em
     if(white != NULL) {
-      double line = reseaus["Line"][res];
-      double sample = reseaus["Sample"][res];
+      double line = toDouble(reseaus["Line"][res]);
+      double sample = toDouble(reseaus["Sample"][res]);
       white->SetBasePosition(int(sample), int(line), 1);
       cube.write(*white);
     }

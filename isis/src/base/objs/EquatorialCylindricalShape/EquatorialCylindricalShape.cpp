@@ -38,7 +38,7 @@ namespace Isis {
      // Read in the min/max radius of the DEM file and the Scale of the DEM
      // file in pixels/degree
     if (!demCube()->hasTable("ShapeModelStatistics")) {
-      std::string msg = "The input cube references a ShapeModel that has "
+      QString msg = "The input cube references a ShapeModel that has "
         "not been updated for the new ray tracing algorithm. All DEM "
         "files must now be padded at the poles and contain a "
         "ShapeModelStatistics table defining their minimum and maximum "

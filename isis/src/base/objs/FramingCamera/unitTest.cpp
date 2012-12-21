@@ -79,7 +79,7 @@ int main() {
   //NOTE: The following cube is not from a framing camera.  The test returns
   //true for framing camera type since MyCamera is a child class of FramingCamera
   try {
-    string inputFile = "$base/testData/ab102401_ideal.cub";
+    QString inputFile = "$base/testData/ab102401_ideal.cub";
     Pvl pvl(inputFile);
     MyCamera cam(pvl);
 
@@ -91,9 +91,9 @@ int main() {
 
     // test ShutterOpenCloseTimes() method
     PvlGroup inst = pvl.FindGroup ("Instrument",Pvl::Traverse);
-    string startTime = inst["StartTime"];
+    QString startTime = inst["StartTime"];
     double eTime = 0.0;
-    utc2et_c(startTime.c_str(), &eTime);
+    utc2et_c(startTime.toAscii().data(), &eTime);
     double expoDur = ((double) inst["ExposureDuration"])/1000; // in seconds
     pair <iTime, iTime> octime = cam.ShutterOpenCloseTimes(eTime,expoDur);
     cout.precision(12);

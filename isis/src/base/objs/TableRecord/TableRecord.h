@@ -61,7 +61,7 @@ namespace Isis {
 
       void operator+=(Isis::TableField &field);
       TableField &operator[](const int field);
-      TableField &operator[](const std::string &field);
+      TableField &operator[](const QString &field);
 
       int Fields() const;
       int RecordSize() const;

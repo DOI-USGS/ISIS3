@@ -18,7 +18,6 @@
 
 
 using namespace Isis;
-using std::string;
 
 
 int r1;
@@ -107,7 +106,7 @@ Chip * createRamp(Chip *pic1, Chip *pic2, int stop);
 void processNodes(QQueue<Node> &nodes, QVector<int> &ol,
     int &maxScore, int stop);
 
-void readOutputs(string outName, const FileList &inputs, FileList &outputs);
+void readOutputs(QString outName, const FileList &inputs, FileList &outputs);
 void generateOutputs(const FileList &inputs, FileList &outputs);
 
 
@@ -131,7 +130,7 @@ void IsisMain() {
 
   FileList inputs(ui.GetFileName("FROMLIST"));
   if (inputs.size() < 2) {
-    string msg = "FROMLIST must have at least two images to blend";
+    QString msg = "FROMLIST must have at least two images to blend";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -148,7 +147,7 @@ void IsisMain() {
 
     QFile::remove(output);
     if (!QFile::copy(input, output)) {
-      string msg = "Cannot create output cube [" + output.toStdString() + "]";
+      QString msg = "Cannot create output cube [" + output + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -165,8 +164,8 @@ void IsisMain() {
       OverlapStatistics oStats(from1, from2);
 
       if (oStats.HasOverlap()) {
-        overlapped.insert(QString::fromStdString(inputs[j].toString()));
-        overlapped.insert(QString::fromStdString(inputs[i].toString()));
+        overlapped.insert(inputs[j].toString());
+        overlapped.insert(inputs[i].toString());
 
         i1 = new Chip(oStats.Samples() + 2, oStats.Lines() + 2);
         int from1CenterSample =
@@ -200,7 +199,7 @@ void IsisMain() {
         ProcessByLine p;
         CubeAttributeInput att;
 
-        IString cubeName = outputs[i].toString();
+        QString cubeName = outputs[i].toString();
         p.SetInputCube(cubeName, att, ReadWrite);
 
         p.StartProcess(blend);
@@ -236,9 +235,9 @@ void IsisMain() {
   // Make sure cube projection overlaps at least one other cube
   if (ui.GetBoolean("ERROR")) {
     for (int i = 1; i < inputs.size(); i++) {
-      if (!overlapped.contains(QString::fromStdString(inputs[i].toString()))) {
-        string msg = "Input Cube [" + inputs[i].toString() +
-          "] does not overlap another cube";
+      if (!overlapped.contains(inputs[i].toString())) {
+        QString msg = "Input Cube [" + inputs[i].toString() +
+            "] does not overlap another cube";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -285,7 +284,7 @@ Chip * createRamp(Chip *pic1, Chip *pic2, int stop) {
   int y = pic1->Lines();
 
   if (x != pic2->Samples() || y != pic2->Lines()) {
-    string msg = "The two pictures need to be of the exact same dimensions";
+    QString msg = "The two pictures need to be of the exact same dimensions";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -391,12 +390,12 @@ void processNodes(QQueue<Node> &nodes, QVector<int> &ol,
 }
 
 
-void readOutputs(string outName, const FileList &inputs, FileList &outputs) {
+void readOutputs(QString outName, const FileList &inputs, FileList &outputs) {
   outputs.read(outName);
 
   // Make sure each file in the tolist matches a file in the fromlist
   if (outputs.size() != inputs.size()) {
-    string msg = "There must be exactly one output image in the TOLIST for "
+    QString msg = "There must be exactly one output image in the TOLIST for "
         "each input image in the FROMLIST";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -405,8 +404,8 @@ void readOutputs(string outName, const FileList &inputs, FileList &outputs) {
   // corresponding input file
   for (int i = 0; i < outputs.size(); i++) {
     if (outputs[i].toString().compare(inputs[i].toString()) == 0) {
-      string msg = "The to list file [" + outputs[i].toString() +
-        "] has the same name as its corresponding from list file.";
+      QString msg = "The to list file [" + outputs[i].toString() +
+          "] has the same name as its corresponding from list file.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -416,7 +415,7 @@ void readOutputs(string outName, const FileList &inputs, FileList &outputs) {
 void generateOutputs(const FileList &inputs, FileList &outputs) {
   for (int i = 0; i < inputs.size(); i++) {
     FileName file=inputs[i];
-    IString filename = file.path() + "/" + file.baseName() +
+    QString filename = file.path() + "/" + file.baseName() +
       ".blend." + file.extension();
     outputs.push_back(filename);
   }

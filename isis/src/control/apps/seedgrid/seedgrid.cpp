@@ -20,8 +20,8 @@ void checkLatitude(double minLat, double maxLat);
 void checkLongitude(double minLon, double maxLon, int lonDomain);
 void printMap();
 
-map<string, void *> GuiHelpers() {
-  map<string, void *> helper;
+map<QString, void *> GuiHelpers() {
+  map<QString, void *> helper;
   helper["PrintMap"] = (void *) printMap;
   return helper;
 }
@@ -35,7 +35,7 @@ void IsisMain() {
 
   double equatorialRadius = 0.0;
 
-  string spacing = ui.GetString("SPACING");
+  QString spacing = ui.GetString("SPACING");
   if (spacing == "METER") {
     Pvl userMap;
     userMap.Read(ui.GetFileName("MAP"));
@@ -43,7 +43,7 @@ void IsisMain() {
 
     // Construct a Projection for converting between Lon/Lat and X/Y
     // TODO: Should this be an option to include this in the program?
-    string target;
+    QString target;
     if (ui.WasEntered("TARGET")) {
       target = ui.GetString("TARGET");
     }
@@ -52,7 +52,7 @@ void IsisMain() {
       ui.PutAsString("TARGET", target);
     }
     else {
-      string msg = "A target must be specified either by the [TARGET] "
+      QString msg = "A target must be specified either by the [TARGET] "
           "parameter or included as a value for keyword [TargetName] in the "
           "projection file";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -65,17 +65,17 @@ void IsisMain() {
 
       PvlGroup radii = Projection::TargetRadii(target);
       mapGroup.AddKeyword(PvlKeyword("EquatorialRadius",
-            (string) radii["EquatorialRadius"]));
+            (QString) radii["EquatorialRadius"]));
       mapGroup.AddKeyword(PvlKeyword("PolarRadius",
-            (string) radii["PolarRadius"]));
+            (QString) radii["PolarRadius"]));
     }
 
     if (!ui.WasEntered("MAP")) {
       mapGroup.AddKeyword(PvlKeyword("LatitudeType", "Planetocentric"));
       mapGroup.AddKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"));
-      mapGroup.AddKeyword(PvlKeyword("LongitudeDomain", 360));
-      mapGroup.AddKeyword(PvlKeyword("CenterLatitude", 0));
-      mapGroup.AddKeyword(PvlKeyword("CenterLongitude", 0));
+      mapGroup.AddKeyword(PvlKeyword("LongitudeDomain", toString(360)));
+      mapGroup.AddKeyword(PvlKeyword("CenterLatitude", toString(0)));
+      mapGroup.AddKeyword(PvlKeyword("CenterLongitude", toString(0)));
     }
 
     double minLat = ui.GetDouble("MINLAT");
@@ -84,10 +84,10 @@ void IsisMain() {
     double maxLon = ui.GetDouble("MAXLON");
     checkLatitude(minLat, maxLat);
 
-    mapGroup.AddKeyword(PvlKeyword("MinimumLatitude", minLat), Pvl::Replace);
-    mapGroup.AddKeyword(PvlKeyword("MaximumLatitude", maxLat), Pvl::Replace);
-    mapGroup.AddKeyword(PvlKeyword("MinimumLongitude", minLon), Pvl::Replace);
-    mapGroup.AddKeyword(PvlKeyword("MaximumLongitude", maxLon), Pvl::Replace);
+    mapGroup.AddKeyword(PvlKeyword("MinimumLatitude", toString(minLat)), Pvl::Replace);
+    mapGroup.AddKeyword(PvlKeyword("MaximumLatitude", toString(maxLat)), Pvl::Replace);
+    mapGroup.AddKeyword(PvlKeyword("MinimumLongitude", toString(minLon)), Pvl::Replace);
+    mapGroup.AddKeyword(PvlKeyword("MaximumLongitude", toString(maxLon)), Pvl::Replace);
 
     Projection *proj = ProjectionFactory::Create(userMap);
 
@@ -101,13 +101,13 @@ void IsisMain() {
     double maxY;
     bool foundRange = proj->XYRange(minX, maxX, minY, maxY);
     if (!foundRange) {
-      string msg = "Cannot convert Lat/Long range to an X/Y range";
+      QString msg = "Cannot convert Lat/Long range to an X/Y range";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Create the control net to store the points in.
     cnet.SetTarget(target);
-    string networkId;
+    QString networkId;
     if (ui.WasEntered("NETWORKID")) {
       networkId = ui.GetString("NETWORKID");
       cnet.SetNetworkId(networkId);
@@ -123,7 +123,7 @@ void IsisMain() {
     double xStepSize = ui.GetDouble("XSTEP");
     double yStepSize = ui.GetDouble("YSTEP");
 
-    equatorialRadius = mapGroup.FindKeyword("EquatorialRadius")[0];
+    equatorialRadius = toDouble(mapGroup.FindKeyword("EquatorialRadius")[0]);
 
     Progress gridStatus;
 
@@ -171,18 +171,18 @@ void IsisMain() {
   else {
 
     if (!ui.WasEntered("TARGET")) {
-      string msg = "A target must be specified by the [TARGET] parameter ";
+      QString msg = "A target must be specified by the [TARGET] parameter ";
       msg += "or included as a value for keyword [TargetName] in the projection file";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    string target = ui.GetString("TARGET");
+    QString target = ui.GetString("TARGET");
     PvlGroup radii = Projection::TargetRadii(target);
     equatorialRadius = radii["EquatorialRadius"];
 
     // Create the control net to store the points in.
     cnet.SetTarget(target);
-    string networkId;
+    QString networkId;
     if (ui.WasEntered("NETWORKID")) {
       networkId = ui.GetString("NETWORKID");
       cnet.SetNetworkId(networkId);
@@ -246,8 +246,8 @@ void IsisMain() {
   }
 
   PvlGroup results("Results");
-  results += PvlKeyword("EquatorialRadius", equatorialRadius);
-  results += PvlKeyword("NumberControlPoints", cnet.GetNumPoints());
+  results += PvlKeyword("EquatorialRadius", toString(equatorialRadius));
+  results += PvlKeyword("NumberControlPoints", toString(cnet.GetNumPoints()));
   Application::Log(results);
 
   cnet.Write(ui.GetFileName("ONET"));
@@ -256,18 +256,18 @@ void IsisMain() {
 
 void checkLatitude(double minLat, double maxLat) {
   if (minLat > maxLat) {
-    string msg = "MINLAT [" + IString(minLat) +
-      "] is greater than MAXLAT [" + IString(maxLat) + "]";
+    QString msg = "MINLAT [" + toString(minLat) +
+      "] is greater than MAXLAT [" + toString(maxLat) + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (minLat < -90) {
-    string msg = "MINLAT [" + IString(minLat) + "] is less than -90";
+    QString msg = "MINLAT [" + toString(minLat) + "] is less than -90";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (maxLat > 90) {
-    string msg = "MAXLAT [" + IString(maxLat) + "] is greater than 90";
+    QString msg = "MAXLAT [" + toString(maxLat) + "] is greater than 90";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }
@@ -276,27 +276,27 @@ void checkLatitude(double minLat, double maxLat) {
 void checkLongitude(double minLon, double maxLon, int lonDomain) {
   if (minLon > maxLon) {
     double suggestedMaxLon = maxLon + lonDomain + (lonDomain - 360);
-    string msg = "MINLON [" + IString(minLon) +
-      "] is greater than MAXLON [" + IString(maxLon) + "].  " +
-      "If you meant to wrap around the [" + IString(lonDomain) +
+    QString msg = "MINLON [" + toString(minLon) +
+      "] is greater than MAXLON [" + toString(maxLon) + "].  " +
+      "If you meant to wrap around the [" + toString(lonDomain) +
       "] longitude " + "boundary, use a MAXLON of [" +
-      IString(suggestedMaxLon) + "]";
+      toString(suggestedMaxLon) + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (minLon < lonDomain - 360) {
-    string msg = "MINLON [" + IString(minLon) +
-      "] is less than [" + IString(lonDomain) + "] domain minimum [" +
-      IString(lonDomain - 360) + "]";
+    QString msg = "MINLON [" + toString(minLon) +
+      "] is less than [" + toString(lonDomain) + "] domain minimum [" +
+      toString(lonDomain - 360) + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (maxLon - minLon > 360) {
     int range = (int) (maxLon - minLon - 1);
     int loops = range / 360 + 1;
-    string msg = "The specified longitude range [" + IString(minLon) +
-      "] to [" + IString(maxLon) + "] seeds that same area of the target [" +
-      IString(loops) + "] times";
+    QString msg = "The specified longitude range [" + toString(minLon) +
+      "] to [" + toString(maxLon) + "] seeds that same area of the target [" +
+      toString(loops) + "] times";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }

@@ -11,8 +11,8 @@ void IFFT1(vector<Buffer *> &in, vector<Buffer *> &out);
 void IFFT2(vector<Buffer *> &in, vector<Buffer *> &out);
 
 FourierTransform fft;
-string tmpMagFileName = "Temporary_IFFT_Magnitude.cub";
-string tmpPhaseFileName = "Temporary_IFFT_Phase.cub";
+QString tmpMagFileName = "Temporary_IFFT_Magnitude.cub";
+QString tmpPhaseFileName = "Temporary_IFFT_Phase.cub";
 
 void IsisMain() {
   // We will be processing by line first
@@ -75,8 +75,8 @@ void IsisMain() {
   sProc.ProcessCubes(&IFFT1);
   sProc.Finalize();
 
-  remove(tmpMagFileName.c_str());
-  remove(tmpPhaseFileName.c_str());
+  remove(tmpMagFileName.toAscii().data());
+  remove(tmpPhaseFileName.toAscii().data());
 }
 
 // Processing routine for the inverse fft

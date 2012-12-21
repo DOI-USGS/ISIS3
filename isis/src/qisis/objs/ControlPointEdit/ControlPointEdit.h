@@ -23,18 +23,14 @@ class QVBoxLayout;
 namespace Isis {
   class AutoReg;
   class Chip;
+  class ChipViewport;
   class ControlMeasure;
   class ControlNet;
   class Cube;
-  class Stretch;
-  class UniversalGroundMap;
-}
-
-namespace Isis {
-  class ChipViewport;
   class CubeViewport;
+  class Stretch;
   class Tool;
-
+  class UniversalGroundMap;
 
   /**
     * @brief Point Editor Widget
@@ -135,7 +131,7 @@ namespace Isis {
       ControlPointEdit(ControlNet * cnetQ, QWidget *parent = 0,
                        bool allowLeftMouse = false, bool useGeometry = true);
       ~ControlPointEdit();
-      std::string templateFileName() {
+      QString templateFileName() {
         return p_templateFileName;
       };
       bool setTemplateFile(QString);
@@ -150,9 +146,9 @@ namespace Isis {
 
     public slots:
       void setLeftMeasure(ControlMeasure *leftMeasure,
-                          Cube *leftCube, std::string pointId);
+                          Cube *leftCube, QString pointId);
       void setRightMeasure(ControlMeasure *rightMeasure,
-                           Cube *rightCube, std::string pointId);
+                           Cube *rightCube, QString pointId);
       void colorizeSaveButton();
       void refreshChips();
       void saveChips();
@@ -185,7 +181,7 @@ namespace Isis {
       bool p_allowLeftMouse;
       bool p_useGeometry;
 
-      std::string p_templateFileName;
+      QString p_templateFileName;
       QLabel *p_leftZoomFactor;
       QLabel *p_rightZoomFactor;
       QLabel *p_leftSampLinePosition;
@@ -234,7 +230,7 @@ namespace Isis {
       UniversalGroundMap *p_rightGroundMap;
 
       AutoReg *p_autoRegFact;
-      std::string p_pointId;
+      QString p_pointId;
 
       int p_rotation;
       bool p_geomIt;

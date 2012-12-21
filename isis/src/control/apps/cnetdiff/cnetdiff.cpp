@@ -22,7 +22,7 @@ using namespace std;
 using namespace Isis;
 
 bool filesMatch;
-IString differenceReason;
+QString differenceReason;
 PvlGroup tolerances;
 PvlGroup ignorekeys;
 
@@ -127,14 +127,14 @@ void Compare(LatestControlNetFile *net1, LatestControlNetFile *net2) {
 
   if(net1NumPts != net2NumPts) {
     differenceReason = "The number of control points in the networks, [" +
-                       IString(net1NumPts) + "] and [" +
-                       IString(net2NumPts) + ", differ";
+                       toString(net1NumPts) + "] and [" +
+                       toString(net2NumPts) + ", differ";
     filesMatch = false;
     return;
   }
 
-  IString id1 = net1Obj["NetworkId"][0];
-  IString id2 = net2Obj["NetworkId"][0];
+  QString id1 = net1Obj["NetworkId"][0];
+  QString id2 = net2Obj["NetworkId"][0];
 
   if(id1 != id2) {
     differenceReason = "The network IDs [" +
@@ -144,8 +144,8 @@ void Compare(LatestControlNetFile *net1, LatestControlNetFile *net2) {
     return;
   }
 
-  IString target1 = net1Obj["TargetName"][0];
-  IString target2 = net2Obj["TargetName"][0];
+  QString target1 = net1Obj["TargetName"][0];
+  QString target2 = net2Obj["TargetName"][0];
 
   if(target1 != target2) {
     differenceReason = "The targets [" +
@@ -175,7 +175,7 @@ void Compare(LatestControlNetFile *net1, LatestControlNetFile *net2) {
 void Compare(const PvlObject &point1Pvl, const PvlObject &point2Pvl) {
   // both names must be at least equal, should be named ControlPoint
   if(point1Pvl.Name() != point2Pvl.Name()) {
-    IString msg = "The control points' CreatePvlOject method returned an "
+    QString msg = "The control points' CreatePvlOject method returned an "
                   "unexpected result";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
@@ -183,8 +183,8 @@ void Compare(const PvlObject &point1Pvl, const PvlObject &point2Pvl) {
   if(point1Pvl.Groups() != point2Pvl.Groups()) {
     filesMatch = false;
     differenceReason = "The number of control measures, [" +
-                       IString(point1Pvl.Groups()) + "] and [" +
-                       IString(point2Pvl.Groups()) + "] does not match";
+                       toString(point1Pvl.Groups()) + "] and [" +
+                       toString(point2Pvl.Groups()) + "] does not match";
   }
 
   // Start by comparing top level control point keywords.
@@ -247,7 +247,7 @@ void CompareGroups(const PvlContainer &pvl1, const PvlContainer &pvl2) {
 
 void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
   if(pvl1.Name().compare(pvl2.Name()) != 0) {
-    IString msg = "CompareKeywords should always be called with keywords that "
+    QString msg = "CompareKeywords should always be called with keywords that "
                   "have the same name";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
@@ -261,7 +261,7 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
   if(tolerances.HasKeyword(pvl1.Name()) &&
       tolerances[pvl1.Name()].Size() > 1 &&
       pvl1.Size() != tolerances[pvl1.Name()].Size()) {
-    string msg = "Size of value '" + pvl1.Name() + "' does not match with ";
+    QString msg = "Size of value '" + pvl1.Name() + "' does not match with ";
     msg += "its number of tolerances in the DIFF file.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -269,16 +269,16 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
   if(ignorekeys.HasKeyword(pvl1.Name()) &&
       ignorekeys[pvl1.Name()].Size() > 1 &&
       pvl1.Size() != ignorekeys[pvl1.Name()].Size()) {
-    string msg = "Size of value '" + pvl1.Name() + "' does not match with ";
+    QString msg = "Size of value '" + pvl1.Name() + "' does not match with ";
     msg += "its number of ignore keys in the DIFF file.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   for(int i = 0; i < pvl1.Size() && filesMatch; i++) {
-    IString val1 = pvl1[i];
-    IString val2 = pvl2[i];
-    IString unit1 = pvl1.Unit(i);
-    IString unit2 = pvl2.Unit(i);
+    QString val1 = pvl1[i];
+    QString val2 = pvl2[i];
+    QString unit1 = pvl1.Unit(i);
+    QString unit2 = pvl2.Unit(i);
 
     int ignoreIndex = 0;
     if(ignorekeys.HasKeyword(pvl1.Name()) && ignorekeys[pvl1.Name()].Size() > 1) {
@@ -289,37 +289,37 @@ void CompareKeywords(const PvlKeyword &pvl1, const PvlKeyword &pvl2) {
       if(!ignorekeys.HasKeyword(pvl1.Name()) ||
           ignorekeys[pvl1.Name()][ignoreIndex] == "false") {
 
-        if(!unit1.Equal(unit2)) {
+        if(unit1.toLower() != unit2.toLower()) {
           filesMatch = false;
           differenceReason = "Value '" + pvl1.Name() + "': units do not match.";
           return;
         }
 
         double tolerance = 0.0;
-        double difference = abs((double)val1 - (double)val2);
+        double difference = abs(toDouble(val1) - toDouble(val2));
 
         if(tolerances.HasKeyword(pvl1.Name())) {
-          tolerance = (tolerances[pvl1.Name()].Size() == 1) ?
-                      tolerances[pvl1.Name()][0] : tolerances[pvl1.Name()][i];
+          tolerance = toDouble((tolerances[pvl1.Name()].Size() == 1) ?
+                      tolerances[pvl1.Name()][0] : tolerances[pvl1.Name()][i]);
         }
 
         if(difference > tolerance) {
           filesMatch = false;
           if(pvl1.Size() == 1) {
             differenceReason = "Value [" + pvl1.Name() + "] difference is " +
-                               IString(difference);
+                               toString(difference);
           }
           else {
             differenceReason = "Value [" + pvl1.Name() + "] at index " +
-                               IString(i) + ": difference is " + IString(difference);
+                               toString(i) + ": difference is " + toString(difference);
           }
-          differenceReason += " (values are [" + IString(val1) + "] and [" +
-                              IString(val2) + "], tolerance is [" + IString(tolerance) + "])";
+          differenceReason += " (values are [" + val1 + "] and [" +
+                              val2 + "], tolerance is [" + toString(tolerance) + "])";
         }
       }
     }
     catch(IException &e) {
-      if(!val1.Equal(val2)) {
+      if(val1.toLower() != val2.toLower()) {
         filesMatch = false;
         differenceReason = "Value '" + pvl1.Name() + "': values do not match.";
       }

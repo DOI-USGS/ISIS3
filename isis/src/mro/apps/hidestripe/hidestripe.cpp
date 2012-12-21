@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 // system include files go first
-#include <string>
+#include <QString>
 #include <iostream>
 #include <iomanip>
 #include <vector>
@@ -54,7 +54,7 @@ void IsisMain() {
 
   //Check to make sure we got the cube properly
   if(!inputCube.isOpen()) {
-    string msg = "Could not open FROM cube" + fromFile.expanded();
+    QString msg = "Could not open FROM cube" + fromFile.expanded();
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -92,12 +92,12 @@ void IsisMain() {
 
     //Phases must be able to stretch across the entire cube
     if(totalSamples != phases[3]) {
-      IString required_samples(phases[3]);
-      IString bin_string(binning_mode);
-      string msg = "image must have exactly ";
+      QString required_samples(phases[3]);
+      QString bin_QString(binning_mode);
+      QString msg = "image must have exactly ";
       msg += required_samples;
       msg += " samples per line for binning mode ";
-      msg += bin_string;
+      msg += bin_QString;
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -112,7 +112,7 @@ void IsisMain() {
     // ones (2, 4, 6, etc.). The below algorithm determines which of these is the
     // case.
 
-    string parity = ui.GetString("PARITY");
+    QString parity = ui.GetString("PARITY");
     if(parity == "EVEN") {
       offset = 1;
     }
@@ -290,7 +290,7 @@ void fix(Buffer &in, Buffer &out) {
 void DestripeForOtherBinningModes(int piSamples)
 {
   int iBoxSample = (2 * piSamples) - 1;
-  IString sSamples(iBoxSample);
+  QString sSamples(toString(iBoxSample));
 
   Pipeline p("hidestripe");
   p.SetInputFile("FROM");

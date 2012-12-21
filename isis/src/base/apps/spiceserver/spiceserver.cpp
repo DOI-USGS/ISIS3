@@ -32,7 +32,7 @@ bool spkRecon = false;
 bool spkPredicted = false;
 double startPad = 0.0;
 double endPad = 0.0;
-IString shapeKernelStr;
+QString shapeKernelStr;
 
 bool TryKernels(Pvl &labels, Process &p,
                 Kernel lk, Kernel pck,
@@ -43,13 +43,13 @@ bool TryKernels(Pvl &labels, Process &p,
                 Kernel exk);
 
 //! Combines all the temp files into one final output file
-void PackageKernels(IString toFile);
+void PackageKernels(QString toFile);
 
 //! Read the spiceinit parameters
 void ParseParameters(QDomElement parametersElement);
 
 //! Convert a table into an xml tag
-IString TableToXml(IString tableName, IString file);
+QString TableToXml(QString tableName, QString file);
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
@@ -71,24 +71,24 @@ void IsisMain() {
     // Get the single line of encoded XML from the input file that the client,
     //   spiceinit, sent us.
     TextFile inFile(ui.GetFileName("FROM"));
-    IString hexCode;
+    QString hexCode;
 
     // GetLine returns false if it was the last line... so we can't check for
     //   problems really
     inFile.GetLine(hexCode);
 
     Pvl label;
-    IString otherVersion;
+    QString otherVersion;
 
-    if (!hexCode.empty()) {
+    if (!hexCode.isEmpty()) {
       // Convert HEX to XML
-      IString xml(QByteArray::fromHex(QByteArray(hexCode.c_str())).constData());
+      QString xml(QByteArray::fromHex(hexCode.toAscii()).constData());
 
       // Parse the XML with Qt's XML parser... kindof convoluted, I'm sorry
       QDomDocument document;
       QString error;
       int errorLine, errorCol;
-      if (document.setContent(QString(xml.c_str()), &error,
+      if (document.setContent(QString(xml), &error,
                               &errorLine, &errorCol)) {
         QDomElement rootElement = document.firstChild().toElement();
 
@@ -101,7 +101,7 @@ void IsisMain() {
           if (element.tagName() == "isis_version") {
             QString encoded = element.firstChild().toText().data();
             otherVersion =
-                IString(QByteArray::fromHex(encoded.toAscii()).constData());
+                QString(QByteArray::fromHex(encoded.toAscii()).constData());
           }
           else if (element.tagName() == "parameters") {
             // Read the spiceinit parameters
@@ -112,26 +112,26 @@ void IsisMain() {
             QString encoded = element.firstChild().toText().data();
             stringstream labStream;
             labStream <<
-                IString(QByteArray::fromHex(encoded.toAscii()).constData());
+                QString(QByteArray::fromHex(encoded.toAscii()).constData());
             labStream >> label;
           }
         }
       }
       else {
-        IString err = "Unable to read XML. The reason given was [";
-        err += error.toStdString();
-        err += "] on line [" + IString(errorLine) + "] column [";
-        err += IString(errorCol) + "]";
+        QString err = "Unable to read XML. The reason given was [";
+        err += error;
+        err += "] on line [" + toString(errorLine) + "] column [";
+        err += toString(errorCol) + "]";
         throw IException(IException::Io, err, _FILEINFO_);
       }
     }
     else {
-      IString msg = "Unable to read input file";
+      QString msg = "Unable to read input file";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if (otherVersion != Application::Version()) {
-      IString msg = "The SPICE server only supports the latest Isis version [" +
+      QString msg = "The SPICE server only supports the latest Isis version [" +
                     Application::Version() + "], version [" + otherVersion +
                     "] is not compatible";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -143,14 +143,14 @@ void IsisMain() {
 
     // Set up for getting the mission name
     // Get the directory where the system missions translation table is.
-    string transFile = p.MissionData("base",
-                                     "translations/MissionName2DataDir.trn");
+    QString transFile = p.MissionData("base",
+                                      "translations/MissionName2DataDir.trn");
 
     // Get the mission translation manager ready
     PvlTranslationManager missionXlater(label, transFile);
 
     // Get the mission name so we can search the correct DB's for kernels
-    string mission = missionXlater.Translate("MissionName");
+    QString mission = missionXlater.Translate("MissionName");
 
     // Get system base kernels
     unsigned int allowed = 0;
@@ -186,7 +186,7 @@ void IsisMain() {
 
     if (ckNadir) {
       // Only add nadir if no spacecraft pointing found
-      std::vector<std::string> kernels;
+      std::vector<QString> kernels;
       kernels.push_back("Nadir");
       ck.push(Kernel((spiceInit::kernelTypes)0, kernels));
     }
@@ -242,17 +242,17 @@ void IsisMain() {
   }
   catch (...) {
     // We failed at something, delete the temp files...
-    IString outFile = ui.GetFileName("TO");
-    QFile pointingFile(QString::fromStdString(outFile + ".pointing"));
+    QString outFile = ui.GetFileName("TO");
+    QFile pointingFile(outFile + ".pointing");
     if (pointingFile.exists()) pointingFile.remove();
 
-    QFile positionFile(QString::fromStdString(outFile + ".position"));
+    QFile positionFile(outFile + ".position");
     if (positionFile.exists()) positionFile.remove();
 
-    QFile bodyRotFile(QString::fromStdString(outFile + ".bodyrot"));
+    QFile bodyRotFile(outFile + ".bodyrot");
     if (bodyRotFile.exists()) bodyRotFile.remove();
 
-    QFile sunFile(QString::fromStdString(outFile + ".sun"));
+    QFile sunFile(outFile + ".sun");
     if (sunFile.exists()) sunFile.remove();
 
     throw;
@@ -361,13 +361,13 @@ bool TryKernels(Pvl &label, Process &p,
 
   // Add any time padding the user specified to the spice group
   if (startPad > DBL_EPSILON)
-    currentKernels.AddKeyword(PvlKeyword("StartPadding", startPad, "seconds"));
+    currentKernels.AddKeyword(PvlKeyword("StartPadding", toString(startPad), "seconds"));
 
   if (endPad > DBL_EPSILON)
-    currentKernels.AddKeyword(PvlKeyword("EndPadding", endPad, "seconds"));
+    currentKernels.AddKeyword(PvlKeyword("EndPadding", toString(endPad), "seconds"));
 
   currentKernels.AddKeyword(
-      PvlKeyword("CameraVersion", CameraFactory::CameraVersion(lab)),
+      PvlKeyword("CameraVersion", toString(CameraFactory::CameraVersion(lab))),
       Pvl::Replace);
 
   // Create the camera so we can get blobs if necessary
@@ -421,7 +421,7 @@ bool TryKernels(Pvl &label, Process &p,
       bodyTable.Label()["Kernels"].AddValue(pckKeyword[i]);
 
     bodyTable.Label() += PvlKeyword("SolarLongitude",
-                                    cam->solarLongitude().degrees());
+                                    toString(cam->solarLongitude().degrees()));
     bodyTable.Write(ui.GetFileName("TO") + ".bodyrot");
 
     Table sunTable = cam->sunPosition()->Cache("SunPosition");
@@ -462,18 +462,18 @@ bool TryKernels(Pvl &label, Process &p,
 }
 
 
-IString TableToXml(IString tableName, IString file) {
-  IString xml;
+QString TableToXml(QString tableName, QString file) {
+  QString xml;
   xml += "    <" + tableName + ">\n";
 
   QFile tableFile(file);
   if (!tableFile.open(QIODevice::ReadOnly)) {
-    IString msg = "Unable to read temporary file [" + file + "]";
+    QString msg = "Unable to read temporary file [" + file + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   QByteArray data = tableFile.readAll();
-  xml += IString(data.toHex().constData()) + "\n";
+  xml += QString(data.toHex().constData()) + "\n";
   tableFile.close();
   // we should now be completely done with this temp file
   tableFile.remove();
@@ -543,31 +543,31 @@ void ParseParameters(QDomElement parametersElement) {
 }
 
 
-void PackageKernels(IString toFile) {
-  IString xml;
+void PackageKernels(QString toFile) {
+  QString xml;
   xml += "<spice_data>\n";
 
   xml += "  <application_log>\n";
 
-  IString logFile(toFile + ".print");
+  QString logFile(toFile + ".print");
   Pvl logMessage(logFile);
-  remove(logFile.c_str());
+  remove(logFile.toAscii().data());
   stringstream logStream;
   logStream << logMessage;
   xml +=
-      IString(QByteArray(logStream.str().c_str()).toHex().constData()) + "\n";
+      QString(QByteArray(logStream.str().c_str()).toHex().constData()) + "\n";
   xml += "  </application_log>\n";
 
   xml += "  <kernels_label>\n";
 
-  IString kernLabelsFile(toFile + ".lab");
+  QString kernLabelsFile(toFile + ".lab");
   Pvl kernLabels(kernLabelsFile);
-  remove(kernLabelsFile.c_str());
+  remove(kernLabelsFile.toAscii().data());
   stringstream labelStream;
   labelStream << kernLabels;
 
   xml +=
-      IString(QByteArray(labelStream.str().c_str()).toHex().constData()) + "\n";
+      QString(QByteArray(labelStream.str().c_str()).toHex().constData()) + "\n";
 
   xml += "  </kernels_label>\n";
 
@@ -579,10 +579,10 @@ void PackageKernels(IString toFile) {
 
   xml += "  </tables>\n";
   xml += "</spice_data>\n";
-  IString encodedXml(QByteArray(xml.c_str()).toHex().constData());
+  QString encodedXml(xml.toAscii().toHex().constData());
 
   QFile finalOutput(toFile);
   finalOutput.open(QIODevice::WriteOnly);
-  finalOutput.write(encodedXml.c_str());
+  finalOutput.write(encodedXml.toAscii());
   finalOutput.close();
 }

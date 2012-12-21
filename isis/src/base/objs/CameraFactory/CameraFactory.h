@@ -1,4 +1,4 @@
-#if !defined(CameraFactory_h)
+#ifndef CameraFactory_h
 #define CameraFactory_h
 /**
  * @file

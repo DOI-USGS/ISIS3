@@ -14,7 +14,7 @@ namespace Isis {
   GuiParameter *GuiParameterFactory::Create(QGridLayout *grid,
       Isis::UserInterface &ui,
       int group, int param) {
-    std::string paramType = ui.ParamType(group, param);
+    QString paramType = ui.ParamType(group, param);
 
     GuiParameter *p = NULL;
     if(ui.ParamListSize(group, param) > 0) {
@@ -43,7 +43,7 @@ namespace Isis {
       p = new GuiBooleanParameter(grid, ui, group, param);
     }
     else {
-      std::string msg = "Invalid parameter type in XML [" + paramType + "]";
+      QString msg = "Invalid parameter type in XML [" + paramType + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

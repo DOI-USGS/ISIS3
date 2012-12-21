@@ -143,31 +143,31 @@ namespace Isis {
       Equalization();
 
     public:
-      Equalization(std::string fromListName);
+      Equalization(QString fromListName);
       virtual ~Equalization();
 
-      void addHolds(std::string holdListName);
+      void addHolds(QString holdListName);
 
       void calculateStatistics(double sampPercent, int mincnt,
           bool wtopt, int sType);
-      void importStatistics(std::string instatsFileName);
-      void applyCorrection(std::string toListName);
+      void importStatistics(QString instatsFileName);
+      void applyCorrection(QString toListName);
 
       PvlGroup getResults();
-      void write(std::string outstatsFileName);
+      void write(QString outstatsFileName);
 
       double evaluate(double dn, int imageIndex, int bandIndex) const;
 
     protected:
-      void loadInputs(std::string fromListName);
-      void setInput(int index, std::string value);
+      void loadInputs(QString fromListName);
+      void setInput(int index, QString value);
       const FileList & getInputs() const;
 
-      virtual void fillOutList(FileList &outList, std::string toListName);
-      virtual void errorCheck(std::string fromListName);
+      virtual void fillOutList(FileList &outList, QString toListName);
+      virtual void errorCheck(QString fromListName);
 
       void generateOutputs(FileList &outList);
-      void loadOutputs(FileList &outList, std::string toListName);
+      void loadOutputs(FileList &outList, QString toListName);
       void loadHolds(OverlapNormalization *oNorm);
 
       void setResults(std::vector<OverlapStatistics> &overlapStats);
@@ -181,7 +181,7 @@ namespace Isis {
 
     private:
       void init();
-      std::vector<int> validateInputStatistics(std::string instatsFileName);
+      std::vector<int> validateInputStatistics(QString instatsFileName);
 
       FileList m_imageList;
       std::vector<ImageAdjustment *> m_adjustments;

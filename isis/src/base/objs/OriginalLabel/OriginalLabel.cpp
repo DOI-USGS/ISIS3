@@ -42,7 +42,7 @@ namespace Isis {
    *
    * @param file File to read labels from
    */
-  OriginalLabel::OriginalLabel(const std::string &file) :
+  OriginalLabel::OriginalLabel(const QString &file) :
     Isis::Blob("IsisCube", "OriginalLabel") {
     Blob::Read(file);
   }

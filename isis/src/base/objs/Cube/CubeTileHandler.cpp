@@ -83,9 +83,9 @@ namespace Isis {
     PvlObject &core = labels.FindObject("IsisCube").FindObject("Core");
     core.AddKeyword(PvlKeyword("Format", "Tile"),
                     PvlContainer::Replace);
-    core.AddKeyword(PvlKeyword("TileSamples", getSampleCountInChunk()),
+    core.AddKeyword(PvlKeyword("TileSamples", toString(getSampleCountInChunk())),
                     PvlContainer::Replace);
-    core.AddKeyword(PvlKeyword("TileLines", getLineCountInChunk()),
+    core.AddKeyword(PvlKeyword("TileLines", toString(getLineCountInChunk())),
                     PvlContainer::Replace);
   }
 

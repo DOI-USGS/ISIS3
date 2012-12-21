@@ -1,4 +1,4 @@
-#if !defined(Brick_h)
+#ifndef Brick_h
 #define Brick_h
 /**
  * @file

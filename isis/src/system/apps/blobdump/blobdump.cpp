@@ -14,12 +14,12 @@ using namespace std;
 using namespace Isis;
 
 int pos = 0;
-string previousFile = "";
+QString previousFile = "";
 
 void helperButtonGetBlobList();
 
-map <string, void *> GuiHelpers() {
-  map <string, void *> helper;
+map <QString, void *> GuiHelpers() {
+  map <QString, void *> helper;
   helper ["helperButtonGetBlobList"] = (void *) helperButtonGetBlobList;
   return helper;
 }
@@ -27,8 +27,8 @@ map <string, void *> GuiHelpers() {
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   FileName file = ui.GetFileName("FROM");
-  string blobname = ui.GetString("NAME");
-  string blobtype = ui.GetString("TYPE");
+  QString blobname = ui.GetString("NAME");
+  QString blobtype = ui.GetString("TYPE");
   Blob blob(blobname, blobtype, file.expanded());
   FileName outfname = ui.GetFileName("TO");
   blob.Write(outfname.expanded());
@@ -36,11 +36,11 @@ void IsisMain() {
 
 // Function to find the available blob names/types and put them into the GUI
 void helperButtonGetBlobList() {
-  string name, type;
+  QString name, type;
   bool match = false;
 
   UserInterface &ui = Application::GetUserInterface();
-  string currentFile = ui.GetFileName("FROM");
+  QString currentFile = ui.GetFileName("FROM");
   const Pvl label(FileName(currentFile).expanded());
 
   // Check to see if the "FILE" parameter has changed since last press
@@ -57,7 +57,7 @@ void helperButtonGetBlobList() {
     // If we've gone through all objects and found nothing, throw an exception
     if(cnt >= label.Objects()) {
       pos = 0;
-      string msg = "Parameter [FROM] has no blobs.";
+      QString msg = "Parameter [FROM] has no blobs.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     // When the end of the objects is hit,
@@ -73,7 +73,7 @@ void helperButtonGetBlobList() {
             label.Object(pos).HasKeyword("Name") &&
             label.Object(pos).HasKeyword("StartByte") &&
             label.Object(pos).HasKeyword("Bytes")) {
-      name = label.Object(pos)["Name"][0].c_str();
+      name = label.Object(pos)["Name"][0];
       type = label.Object(pos).Name();
       match = true;
       pos++;

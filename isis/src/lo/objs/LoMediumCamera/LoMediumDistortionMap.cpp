@@ -91,7 +91,7 @@ namespace Isis {
     p_camera->FocalPlaneMap()->SetFocalPlane(0., 0.);
     double boreS = p_camera->FocalPlaneMap()->DetectorSample();
     double boreL = p_camera->FocalPlaneMap()->DetectorLine();
-    string centkey = "INS" + IString(naifIkCode) + "_POINT_OF_SYMMETRY";
+    QString centkey = "INS" + toString(naifIkCode) + "_POINT_OF_SYMMETRY";
     p_sample0 = boreS - p_camera->Spice::getDouble(centkey, 0);
     p_line0 = boreL + p_camera->Spice::getDouble(centkey, 1);
 

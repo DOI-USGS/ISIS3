@@ -21,15 +21,15 @@ using namespace Isis;
 
 void ResetGlobals ();
 void ProcessImage ( Buffer &in, Buffer &out );
-string MD5Checksum ( string filename );
+QString MD5Checksum ( QString filename );
 void OutputLabel ( std::ofstream &fout, Cube* cube );
 void CopyData ( std::ifstream &fin, std::ofstream &fout );
 
-string g_md5Checksum;
+QString g_md5Checksum;
 
 bool g_isIof;
 
-IString g_productVersionId = "N/A";
+QString g_productVersionId = "N/A";
 
 void IsisMain () {
     ResetGlobals();
@@ -42,7 +42,7 @@ void IsisMain () {
     ProcessByLine p;
     Cube *inCube = p.SetInputCube("FROM");
 
-    g_isIof = inCube->getLabel()->FindGroup("Radiometry", Pvl::Traverse).FindKeyword("RadiometricType")[0].Equal("IOF");
+    g_isIof = inCube->getLabel()->FindGroup("Radiometry", Pvl::Traverse).FindKeyword("RadiometricType")[0].toUpper() == "IOF";
 
     FileName scaledCube("$TEMPORARY/" + FileName(ui.GetFileName("FROM")).name());
     scaledCube.addExtension("cub");
@@ -89,8 +89,8 @@ void IsisMain () {
 
     FileName tempFile;
     tempFile = FileName::createTempFile("$TEMPORARY/" + FileName(ui.GetFileName("TO")).baseName() + ".temp");
-    string tempFileName(tempFile.expanded());
-    ofstream temporaryFile(tempFileName.c_str());
+    QString tempFileName(tempFile.expanded());
+    ofstream temporaryFile(tempFileName.toAscii().data());
 
     pe.StartProcess(temporaryFile);
     temporaryFile.close();
@@ -99,9 +99,9 @@ void IsisMain () {
     g_md5Checksum = MD5Checksum(tempFileName);
 
     FileName outFile(ui.GetFileName("TO"));
-    string outFileName(outFile.expanded());
-    ifstream inFile(tempFileName.c_str());
-    ofstream pdsFile(outFileName.c_str());
+    QString outFileName(outFile.expanded());
+    ifstream inFile(tempFileName.toAscii().data());
+    ofstream pdsFile(outFileName.toAscii().data());
 
     // Output the label
     OutputLabel(pdsFile, inCube);
@@ -113,8 +113,8 @@ void IsisMain () {
 
     pe.EndProcess();
 
-    remove((scaledCube.expanded()).c_str());
-    remove(tempFileName.c_str());
+    remove((scaledCube.expanded()).toAscii().data());
+    remove(tempFileName.toAscii().data());
     return;
 }
 
@@ -134,9 +134,9 @@ void ProcessImage ( Buffer &in, Buffer &out ) {
     }
 }
 
-string MD5Checksum ( string filename ) {
+QString MD5Checksum ( QString filename ) {
     md5wrapper md5;
-    std::string checkSum = md5.getHashFromFile(filename.c_str());
+    QString checkSum = md5.getHashFromFile(filename);
     return checkSum;
 }
 
@@ -151,10 +151,10 @@ void OutputLabel ( std::ofstream &fout, Cube* cube ) {
     labelPvl.SetTerminator("END");
     //Set up the directory where the translations are
     PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-    IString transDir = (string) dataDir["Lro"] + "/translations/";
+    QString transDir = (QString) dataDir["Lro"] + "/translations/";
 
     stringstream stream;
-    IString pdsLabel = "";
+    QString pdsLabel = "";
 
     //Translate the Original Pds Label
     FileName transFile(transDir + "lronacPdsLabelExport.trn");
@@ -164,13 +164,13 @@ void OutputLabel ( std::ofstream &fout, Cube* cube ) {
     // Copy any Translation changes over
     for (int i = 0; i < outLabel.Keywords(); i++) {
         bool hasUnit = false;
-        string unit = "";
+        QString unit = "";
         if (labelPvl[outLabel[i].Name()].Unit() != "") {
             hasUnit = true;
             unit = labelPvl[outLabel[i].Name()].Unit();
         }
         bool hasComment = false;
-        string comment = "";
+        QString comment = "";
         if (labelPvl[outLabel[i].Name()].Comments() > 0) {
             hasComment = true;
             comment = labelPvl[outLabel[i].Name()].Comment(0);
@@ -185,7 +185,7 @@ void OutputLabel ( std::ofstream &fout, Cube* cube ) {
 
     //Update the product ID
     //we switch the last char in the id from edr->cdr
-    string prod_id = labelPvl["PRODUCT_ID"][0];
+    QString prod_id = labelPvl["PRODUCT_ID"][0];
     labelPvl["PRODUCT_ID"][0].replace((prod_id.length()-1), 1, "C");
 
     // Update the product creation time
@@ -196,22 +196,22 @@ void OutputLabel ( std::ofstream &fout, Cube* cube ) {
     // Update the "IMAGE" Object
     PvlObject &imageObject = labelPvl.FindObject("IMAGE");
     imageObject.Clear();
-    imageObject += PvlKeyword("LINES", cube->getLineCount());
-    imageObject += PvlKeyword("LINE_SAMPLES", cube->getSampleCount());
+    imageObject += PvlKeyword("LINES", toString(cube->getLineCount()));
+    imageObject += PvlKeyword("LINE_SAMPLES", toString(cube->getSampleCount()));
     if (g_isIof) {
-        imageObject += PvlKeyword("SAMPLE_BITS", 16);
+        imageObject += PvlKeyword("SAMPLE_BITS", toString(16));
         imageObject += PvlKeyword("SAMPLE_TYPE", "LSB_INTEGER");
-        imageObject += PvlKeyword("SCALING_FACTOR", 1.0 / SCALING_FACTOR);
-        imageObject += PvlKeyword("VALID_MINIMUM", Isis::VALID_MIN2);
-        imageObject += PvlKeyword("NULL", Isis::NULL2);
-        imageObject += PvlKeyword("LOW_REPR_SATURATION", Isis::LOW_REPR_SAT2);
-        imageObject += PvlKeyword("LOW_INSTR_SATURATION", Isis::LOW_INSTR_SAT2);
-        imageObject += PvlKeyword("HIGH_INSTR_SATURATION", Isis::HIGH_INSTR_SAT2);
-        imageObject += PvlKeyword("HIGH_REPR_SATURATION", Isis::HIGH_REPR_SAT2);
+        imageObject += PvlKeyword("SCALING_FACTOR", toString(1.0 / SCALING_FACTOR));
+        imageObject += PvlKeyword("VALID_MINIMUM", toString(Isis::VALID_MIN2));
+        imageObject += PvlKeyword("NULL", toString(Isis::NULL2));
+        imageObject += PvlKeyword("LOW_REPR_SATURATION", toString(Isis::LOW_REPR_SAT2));
+        imageObject += PvlKeyword("LOW_INSTR_SATURATION", toString(Isis::LOW_INSTR_SAT2));
+        imageObject += PvlKeyword("HIGH_INSTR_SATURATION", toString(Isis::HIGH_INSTR_SAT2));
+        imageObject += PvlKeyword("HIGH_REPR_SATURATION", toString(Isis::HIGH_REPR_SAT2));
         imageObject += PvlKeyword("UNIT", "Scaled I/F");
     }
     else {
-        imageObject += PvlKeyword("SAMPLE_BITS", 32);
+        imageObject += PvlKeyword("SAMPLE_BITS", "32");
         imageObject += PvlKeyword("SAMPLE_TYPE", "PC_REAL");
         imageObject += PvlKeyword("VALID_MINIMUM", "16#FF7FFFFA#");
         imageObject += PvlKeyword("NULL", "16#FF7FFFFB#");
@@ -221,25 +221,25 @@ void OutputLabel ( std::ofstream &fout, Cube* cube ) {
         imageObject += PvlKeyword("HIGH_REPR_SATURATION", "16#FF7FFFFF#");
         imageObject += PvlKeyword("UNIT", "W / (m**2 micrometer sr)");
     }
-    imageObject += PvlKeyword("MD5_CHECKSUM", (IString) g_md5Checksum);
+    imageObject += PvlKeyword("MD5_CHECKSUM", g_md5Checksum);
 
     stream << labelPvl;
 
     int recordBytes = cube->getSampleCount();
     int labelRecords = (int) ((stream.str().length()) / recordBytes) + 1;
 
-    labelPvl["RECORD_BYTES"] = recordBytes;
+    labelPvl["RECORD_BYTES"] = toString(recordBytes);
     if (g_isIof)
-        labelPvl["FILE_RECORDS"] = (int) (cube->getLineCount() * 2 + labelRecords);
+        labelPvl["FILE_RECORDS"] = toString((int) (cube->getLineCount() * 2 + labelRecords));
     else
-        labelPvl["FILE_RECORDS"] = (int) (cube->getLineCount() * 4 + labelRecords);
-    labelPvl["LABEL_RECORDS"] = labelRecords;
-    labelPvl["^IMAGE"] = (int) (labelRecords + 1);
+        labelPvl["FILE_RECORDS"] = toString((int) (cube->getLineCount() * 4 + labelRecords));
+    labelPvl["LABEL_RECORDS"] = toString(labelRecords);
+    labelPvl["^IMAGE"] = toString((int) (labelRecords + 1));
 
     stream.str(std::string());
 
     stream << labelPvl;
-    pdsLabel += stream.str();
+    pdsLabel += stream.str().c_str();
 
     while (pdsLabel.length() < (unsigned int) (labelRecords * recordBytes)) {
         pdsLabel += '\n';

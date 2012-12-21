@@ -24,9 +24,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+class QString;
 
 namespace Isis {
-  class IString;
   
   /**
    * @author 2011-04-01 Eric Hyer & Steven Lambright
@@ -51,9 +51,9 @@ namespace Isis {
     public:
       ~Environment() {}
       
-      static IString userName();
-      static IString hostName();
-      static IString isisVersion();
+      static QString userName();
+      static QString hostName();
+      static QString isisVersion();
       
       
     protected:
@@ -61,7 +61,7 @@ namespace Isis {
       
       
     private:
-      static IString getEnvironmentValue(IString, IString);
+      static QString getEnvironmentValue(QString, QString);
       /**
        *  Construct an environment in static space to initialize some
        *    global Isis 3 environment options. This initialization

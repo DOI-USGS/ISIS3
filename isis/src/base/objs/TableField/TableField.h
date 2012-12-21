@@ -22,8 +22,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
 #include <vector>
+
+#include <QString>
 
 namespace Isis {
   class PvlGroup;
@@ -77,11 +78,11 @@ namespace Isis {
       };
 
       //Constructors and Destructor
-      TableField(const std::string &name, Type type, int size = 1);
+      TableField(const QString &name, Type type, int size = 1);
       TableField(PvlGroup &field);
       ~TableField();
 
-      std::string name() const;
+      QString name() const;
       Type type() const;
       bool isInteger() const;
       bool isDouble() const;
@@ -93,7 +94,7 @@ namespace Isis {
       operator int() const;
       operator double() const;
       operator float() const;
-      operator std::string() const;
+      operator QString() const;
       operator std::vector<int>() const;
       operator std::vector<double>() const;
       operator std::vector<float>() const;
@@ -101,7 +102,7 @@ namespace Isis {
       void operator=(const int value);
       void operator=(const double value);
       void operator=(const float value);
-      void operator=(const std::string &value);
+      void operator=(const QString &value);
       void operator=(const std::vector<int> &values);
       void operator=(const std::vector<double> &values);
       void operator=(const std::vector<float> &value);
@@ -111,7 +112,7 @@ namespace Isis {
       PvlGroup pvlGroup();
 
     private:
-      std::string m_name;            //!< Field name
+      QString m_name;            //!< Field name
       Type m_type;                   //!< Field value type
       int m_size;                    /**< Field size. This is the number of 
                                           values per field entry of the table.*/
@@ -125,7 +126,7 @@ namespace Isis {
       std::vector<float> m_rvalues;  /**< Vector containing Real field values.
                                           If the field Type is not Real, this
                                           vector will be empty.*/
-      std::string m_svalue;          /**< String containing text value of field.
+      QString m_svalue;          /**< String containing text value of field.
                                           If the field Type is not Text, this
                                           string will be empty.*/
   };

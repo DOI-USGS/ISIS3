@@ -35,7 +35,7 @@ namespace Isis {
 static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       const char* message) {
 
-    std::string errlog;
+    QString errlog;
 
     errlog = "SPARSE: ";
     errlog += message;
@@ -43,8 +43,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     PvlGroup gp(errlog);
 
     gp += PvlKeyword("File",file);
-    gp += PvlKeyword("Line_Number", nLineNo);
-    gp += PvlKeyword("Status", nStatus);
+    gp += PvlKeyword("Line_Number", toString(nLineNo));
+    gp += PvlKeyword("Status", toString(nStatus));
 
     Application::Log(gp);
 
@@ -52,8 +52,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     throw IException(IException::Unknown, errlog, _FILEINFO_);
   }
 
-  BundleAdjust::BundleAdjust(const std::string &cnetFile,
-                             const std::string &cubeList,
+  BundleAdjust::BundleAdjust(const QString &cnetFile,
+                             const QString &cubeList,
                              bool bPrintSummary) {
     Progress progress;
     m_bCleanUp = true;
@@ -78,9 +78,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     m_maxLikelihoodIndex=0;    
   }
 
-  BundleAdjust::BundleAdjust(const std::string &cnetFile,
-                             const std::string &cubeList,
-                             const std::string &heldList,
+  BundleAdjust::BundleAdjust(const QString &cnetFile,
+                             const QString &cubeList,
+                             const QString &heldList,
                              bool bPrintSummary) {
     Progress progress;
     m_bCleanUp = true;
@@ -187,7 +187,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     delete m_cumPro;
   }
 
-  bool BundleAdjust::ReadSCSigmas(const std::string &scsigmasList) {
+  bool BundleAdjust::ReadSCSigmas(const QString &scsigmasList) {
     CSVReader csv;
     csv.setSkip(20);
 
@@ -195,7 +195,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       csv.read(scsigmasList);
     }
     catch (IException &e) {
-      std::string msg = "Failed to read spacecraft sigmas file";
+      QString msg = "Failed to read spacecraft sigmas file";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
 
@@ -214,9 +214,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       scs.weights.resize(6);
 
       for (int j = 0; j < nsigmas; j++) {
-        std::string str = row[j+2];
+        QString str = row[j+2];
 
-        double d = atof(str.c_str());
+        double d = atof(str.toAscii().data());
         if (d == 0.0)
           continue;
 
@@ -394,7 +394,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     // verify measures exist for all images
     int nimagesWithInsufficientMeasures = 0;
-    std::string msg = "Images with one or less measures:\n";
+    QString msg = "Images with one or less measures:\n";
     int nImages = m_pSnList->Size();
     for (int i = 0; i < nImages; i++) {
       int nMeasures =
@@ -404,7 +404,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         continue;
 
       nimagesWithInsufficientMeasures++;
-      msg += m_pSnList->FileName(i) + ": " + IString(nMeasures) + "\n";
+      msg += m_pSnList->FileName(i) + ": " + toString(nMeasures) + "\n";
     }
     if ( nimagesWithInsufficientMeasures > 0 ) {
       throw IException(IException::User, msg, _FILEINFO_);
@@ -502,7 +502,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   void BundleAdjust::CheckHeldList() {
     for (int ih = 0; ih < m_pHeldSnList->Size(); ih++) {
       if (!(m_pSnList->HasSerialNumber(m_pHeldSnList->SerialNumber(ih)))) {
-        std::string msg = "Held image [" + m_pHeldSnList->SerialNumber(ih)
+        QString msg = "Held image [" + m_pHeldSnList->SerialNumber(ih)
                           + "not in FROMLIST";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -663,7 +663,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         if (m_pHeldSnList->HasSerialNumber(m_pSnList->SerialNumber(isn)))
           continue;
 
-        std::string msg = "Cube file " + m_pSnList->FileName(isn)
+        QString msg = "Cube file " + m_pSnList->FileName(isn)
                           + " must be held since it is on the same observation as held cube "
                           + m_pHeldSnList->FileName(ih);
         throw IException(IException::User, msg, _FILEINFO_);
@@ -711,7 +711,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     // Make sure the degree of the polynomial the user selected for
     // the camera angles fit is sufficient for the selected CAMSOLVE
     if (m_nNumberCamAngleCoefSolved > m_nsolveCKDegree + 1) {
-      std::string msg = "Selected SolveCameraDegree " + IString(m_nsolveCKDegree)
+      QString msg = "Selected SolveCameraDegree " + toString(m_nsolveCKDegree)
                         + " is not sufficient for the CAMSOLVE";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -748,7 +748,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     // Make sure the degree of the polynomial the user selected for
     // the camera position fit is sufficient for the selected CAMSOLVE
     if (m_nNumberCamPosCoefSolved > m_nsolveSPKDegree + 1) {
-      std::string msg = "Selected SolveCameraPositionDegree " + IString(m_nsolveSPKDegree)
+      QString msg = "Selected SolveCameraPositionDegree " + toString(m_nsolveSPKDegree)
                         + " is not sufficient for the CAMSOLVE";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -913,7 +913,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //      int nImages = Images();
 //      for (int i = 0; i < nImages; i++) {
 //        if (m_pCnet->Camera(i)->GetCameraType() == 0) {
-//          std::string msg = "At least one sensor is a frame camera. Spacecraft Option OVERHERMITE is not valid for frame cameras\n";
+//          QString msg = "At least one sensor is a frame camera. Spacecraft Option OVERHERMITE is not valid for frame cameras\n";
 //          throw IException(IException::User, msg, _FILEINFO_);
 //        }
 //      }
@@ -1101,7 +1101,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       else if (m_bDeltack && m_nDegreesOfFreedom == 0)
         m_dSigma0 = dvtpv;
       else {
-        std::string msg = "Degrees of Freedom " + IString(m_nDegreesOfFreedom)
+        QString msg = "Degrees of Freedom " + toString(m_nDegreesOfFreedom)
             + " is invalid (&lt;= 0)!";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
@@ -1203,7 +1203,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     return true;
 
-    std::string msg = "Need to return something here, or just change the whole darn thing? [";
+    QString msg = "Need to return something here, or just change the whole darn thing? [";
 //    msg += IString(tol) + "] in less than [";
 //    msg += IString(m_nMaxIterations) + "] iterations";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -1299,7 +1299,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
         if( point->IsRejected() ) {
             nRejected3DPoints++;
-//            sprintf(buf, "\tRejected %s - 3D Point %d of %d RejLimit = %lf\n", point.Id().c_str(),nPointIndex,n3DPoints,m_dRejectionLimit);
+//            sprintf(buf, "\tRejected %s - 3D Point %d of %d RejLimit = %lf\n", point.Id().toAscii().data(),nPointIndex,n3DPoints,m_dRejectionLimit);
 //            m_fp_log << buf;
 
             nPointIndex++;
@@ -1647,7 +1647,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
       if( point->IsRejected() ) {
         nRejected3DPoints++;
-//      sprintf(buf, "\tRejected %s - 3D Point %d of %d RejLimit = %lf\n", point.Id().c_str(),nPointIndex,n3DPoints,m_dRejectionLimit);
+//      sprintf(buf, "\tRejected %s - 3D Point %d of %d RejLimit = %lf\n", point.Id().toAscii().data(),nPointIndex,n3DPoints,m_dRejectionLimit);
 //      m_fp_log << buf;
 
         nPointIndex++;
@@ -2053,7 +2053,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //          Distance(apriorisigmas[2], Distance::Meters));
 //      }
 //      catch (iException &e) {
-//        std::string msg = "Required target radii not available for converting lat/lon sigmas from meters ";
+//        QString msg = "Required target radii not available for converting lat/lon sigmas from meters ";
 //        msg += "for control point " + Isis::IString(point->GetId());
 //        throw iException::Message(iException::Programmer, msg, _FILEINFO_);
 //    }
@@ -2349,7 +2349,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     // load cholmod triplet
     if ( !loadCholmodTriplet() ) {
-      std::string msg = "CHOLMOD: Failed to load Triplet matrix";
+      QString msg = "CHOLMOD: Failed to load Triplet matrix";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -2376,7 +2376,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     // check for "matrix not positive definite" error
     if ( m_cm.status == CHOLMOD_NOT_POSDEF ) {
-      std::string msg = "matrix NOT positive-definite: failure at column "
+      QString msg = "matrix NOT positive-definite: failure at column "
           + m_L->minor;
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -2822,7 +2822,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     //Compute the look vector in instrument coordinates based on time of observation and apriori lat/lon/radius
     if (!(pCamera->GroundMap()->GetXY(point.GetAdjustedSurfacePoint(), &dComputedx, &dComputedy))) {
-      std::string msg = "Unable to map apriori surface point for measure ";
+      QString msg = "Unable to map apriori surface point for measure ";
       msg += measure.GetCubeSerialNumber() + " on point " + point.GetId() + " into focal plane";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -3040,7 +3040,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     //Compute the look vector in instrument coordinates based on time of observation and apriori lat/lon/radius
     if (!(pCamera->GroundMap()->GetXY(point.GetAdjustedSurfacePoint(), &dComputedx, &dComputedy))) {
-      std::string msg = "Unable to map apriori surface point for measure ";
+      QString msg = "Unable to map apriori surface point for measure ";
       msg += measure.GetCubeSerialNumber() + " on point " + point.GetId() + " into focal plane";
       throw iException::Message(iException::User, msg, _FILEINFO_);
     }
@@ -3517,7 +3517,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           int zeroColumn = m_pLsq->Solve(Isis::LeastSquares::SPARSE);
 
           if (zeroColumn != 0) {
-            std::string msg;
+            QString msg;
             int imageColumns = Observations() * m_nNumImagePartials;
             if (zeroColumn <= imageColumns) {
               msg = "Solution matrix has a column of zeros which probably ";
@@ -3534,10 +3534,10 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         }
       }
       catch (IException &e) {
-        std::string msg = "Unable to solve in BundleAdjust, ";
-        msg += "Iteration " + Isis::IString(m_nIteration) + " of ";
-        msg += Isis::IString(m_nMaxIterations) + ", Sigma0 = ";
-        msg += Isis::IString(m_dConvergenceThreshold);
+        QString msg = "Unable to solve in BundleAdjust, ";
+        msg += "Iteration " + toString(m_nIteration) + " of ";
+        msg += toString(m_nMaxIterations) + ", Sigma0 = ";
+        msg += toString(m_dConvergenceThreshold);
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
@@ -3582,9 +3582,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
                sqrt(m_Statsy.SumSquare() / m_Statsy.TotalPixels()) : 0.;
     }
 
-    std::string msg = "Did not converge to Sigma0 criteria [";
-    msg += IString(m_dConvergenceThreshold) + "] in less than [";
-    msg += IString(m_nMaxIterations) + "] iterations";
+    QString msg = "Did not converge to Sigma0 criteria [";
+    msg += toString(m_dConvergenceThreshold) + "] in less than [";
+    msg += toString(m_nMaxIterations) + "] iterations";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -3704,7 +3704,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       //Compute the look vector in instrument coordinates based on time of observation and apriori lat/lon/radius
       double dComputedx, dComputedy;
       if (!(pCamera->GroundMap()->GetXY(point->GetAdjustedSurfacePoint(), &dComputedx, &dComputedy))) {
-        std::string msg = "Unable to map apriori surface point for measure ";
+        QString msg = "Unable to map apriori surface point for measure ";
         msg += measure->GetCubeSerialNumber() + " on point " + point->GetId() + " into focal plane";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -3910,7 +3910,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       //Compute the look vector in instrument coordinates based on time of observation and apriori lat/lon/radius
       double dComputedx, dComputedy;
       if (!(pCamera->GroundMap()->GetXY(point->GetAdjustedSurfacePoint(), &dComputedx, &dComputedy))) {
-        std::string msg = "Unable to map apriori surface point for measure ";
+        QString msg = "Unable to map apriori surface point for measure ";
         msg += measure->GetCubeSerialNumber() + " on point " + point->GetId() + " into focal plane";
         throw iException::Message(iException::User, msg, _FILEINFO_);
       }
@@ -4263,7 +4263,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
     int nClosetApproaches = 0;
 
-//  const char* buf = rPoint.Id().c_str();
+//  const char* buf = rPoint.Id().toAscii().data();
 
     // loop over observations (in Astro Terms "measures")
     int nObservations = rPoint.GetNumMeasures();
@@ -4471,7 +4471,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
              (double) rPoint.GetAdjustedSurfacePoint().GetLatitude().radians(),
              pB);
 
-//    printf("%s: %lf   %lf   %lf\n",rPoint.Id().c_str(), AveragePoint[0],AveragePoint[1],AveragePoint[2]);
+//    printf("%s: %lf   %lf   %lf\n",rPoint.Id().toAscii().data(), AveragePoint[0],AveragePoint[1],AveragePoint[2]);
 //    printf("    %lf   %lf   %lf\n", avglat,avglon,avgrad);
 //    printf("    %lf   %lf   %lf\n", lat,lon,rad);
 //    printf("    %lf   %lf   %lf\n",pB[0],pB[1],pB[2]);
@@ -4626,8 +4626,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       dLongCorr = NIC(1);
       dRadCorr = NIC(2);
 
-//      printf("Point %s Corrections\n Latitude: %20.10lf\nLongitude: %20.10lf\n   Radius: %20.10lf\n",point->GetId().c_str(),dLatCorr, dLongCorr, dRadCorr);
-//      std::cout <<"Point " <<  point->GetId().c_str() << " Corrections\n" << "Latitude: " << dLatCorr << std::endl << "Longitude: " << dLongCorr << std::endl << "Radius: " << dRadCorr << std::endl;
+//      printf("Point %s Corrections\n Latitude: %20.10lf\nLongitude: %20.10lf\n   Radius: %20.10lf\n",point->GetId().toAscii().data(),dLatCorr, dLongCorr, dRadCorr);
+//      std::cout <<"Point " <<  point->GetId().toAscii().data() << " Corrections\n" << "Latitude: " << dLatCorr << std::endl << "Longitude: " << dLongCorr << std::endl << "Radius: " << dRadCorr << std::endl;
 
       double dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
       double dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
@@ -4677,7 +4677,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //               (dLon * DEG2RAD),
 //               (dLat * DEG2RAD),
 //               pB);
-//      printf("%s %lf %lf %lf\n",point->Id().c_str(),pB[0],pB[1],pB[2]);
+//      printf("%s %lf %lf %lf\n",point->Id().toAscii().data(),pB[0],pB[1],pB[2]);
     } // end loop over point corrections
   }
 
@@ -4817,8 +4817,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       dLongCorr = NIC(1);
       dRadCorr = NIC(2);
 
-//      printf("Point %s Corrections\n Latitude: %20.10lf\nLongitude: %20.10lf\n   Radius: %20.10lf\n",point->GetId().c_str(),dLatCorr, dLongCorr, dRadCorr);
-//      std::cout <<"Point " <<  point->GetId().c_str() << " Corrections\n" << "Latitude: " << dLatCorr << std::endl << "Longitude: " << dLongCorr << std::endl << "Radius: " << dRadCorr << std::endl;
+//      printf("Point %s Corrections\n Latitude: %20.10lf\nLongitude: %20.10lf\n   Radius: %20.10lf\n",point->GetId().toAscii().data(),dLatCorr, dLongCorr, dRadCorr);
+//      std::cout <<"Point " <<  point->GetId().toAscii().data() << " Corrections\n" << "Latitude: " << dLatCorr << std::endl << "Longitude: " << dLongCorr << std::endl << "Radius: " << dRadCorr << std::endl;
 
       double dLat = point->GetAdjustedSurfacePoint().GetLatitude().degrees();
       double dLon = point->GetAdjustedSurfacePoint().GetLongitude().degrees();
@@ -4868,7 +4868,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 //               (dLon * DEG2RAD),
 //               (dLat * DEG2RAD),
 //               pB);
-//      printf("%s %lf %lf %lf\n",point->Id().c_str(),pB[0],pB[1],pB[2]);
+//      printf("%s %lf %lf %lf\n",point->Id().toAscii().data(),pB[0],pB[1],pB[2]);
     } // end loop over point corrections
   }
 
@@ -4930,7 +4930,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         m_Statsrxy.AddData(vx);
         m_Statsrxy.AddData(vy);
 
-//      printf("Point: %s rx: %20.10lf  ry: %20.10lf\n",point->Id().c_str(),rx,ry);
+//      printf("Point: %s rx: %20.10lf  ry: %20.10lf\n",point->Id().toAscii().data(),rx,ry);
 
         vtpv += vx * vx * dWeight + vy * vy * dWeight;
       }
@@ -4950,7 +4950,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       bounded_vector<double, 3>& weights = m_Point_Weights[nPointIndex];
       bounded_vector<double, 3>& corrections = m_Point_Corrections[nPointIndex];
 
-      //printf("Point: %s PointIndex: %d Loop(i): %d\n",point->GetId().c_str(),nPointIndex,i);
+      //printf("Point: %s PointIndex: %d Loop(i): %d\n",point->GetId().toAscii().data(),nPointIndex,i);
       //std::cout << weights << std::endl;
       //std::cout << corrections << std::endl;
 
@@ -5290,7 +5290,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
             // was it previously rejected?
             if( measure->IsRejected() ) {
-                  printf("Coming back in: %s\r",point->GetId().c_str());
+                  printf("Coming back in: %s\r",point->GetId().toAscii().data());
                   nComingBack++;
                   m_pCnet->DecrementNumberOfRejectedMeasuresInImage(measure->GetCubeSerialNumber());
               }
@@ -5339,14 +5339,14 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       // do we still have sufficient remaining observations for this 3D point?
       if( ( nMeasures-nRejected ) < 2 ) {
           point->SetRejected(true);
-          printf("Rejecting Entire Point: %s\r",point->GetId().c_str());
+          printf("Rejecting Entire Point: %s\r",point->GetId().toAscii().data());
       }
       else
           point->SetRejected(false);
 
 //      int ndummy = point->GetNumberOfRejectedMeasures();
-//      printf("Rejected for point %s = %d\n", point->GetId().c_str(), ndummy);
-//      printf("%s: %20.10lf  %20.10lf*\n",point->GetId().c_str(), rejected->GetSampleResidual(), rejected->GetLineResidual());
+//      printf("Rejected for point %s = %d\n", point->GetId().toAscii().data(), ndummy);
+//      printf("%s: %20.10lf  %20.10lf*\n",point->GetId().toAscii().data(), rejected->GetSampleResidual(), rejected->GetLineResidual());
   }
 
     m_nRejectedObservations = 2*ntotalrejected;
@@ -5667,7 +5667,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
                (dLon * DEG2RAD),
                (dLat * DEG2RAD),
                pB);
-//      printf("%s %lf %lf %lf\n",point->Id().c_str(),pB[0],pB[1],pB[2]);
+//      printf("%s %lf %lf %lf\n",point->Id().toAscii().data(),pB[0],pB[1],pB[2]);
 
       /*      else {  // Recompute radius to match updated lat/lon... Should this be removed?
               ControlMeasure &m = ((*m_pCnet)[i])[0];
@@ -5708,8 +5708,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   }
 
   //! Return the ith filename in the cube list file given to constructor
-  std::string BundleAdjust::FileName(int i) {
-//    std::string serialNumber = (*m_pSnList)[i];
+  QString BundleAdjust::FileName(int i) {
+//    QString serialNumber = (*m_pSnList)[i];
 //    return m_pSnList->FileName(serialNumber);
     return m_pSnList->FileName(i);
   }
@@ -5800,16 +5800,16 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   void BundleAdjust::IterationSummary(double avErr, double sigmaXY, double sigmaHat,
                                       double sigmaX, double sigmaY) {
     //Add this iteration to the summary pvl
-    std::string itlog = "Iteration" + IString(m_nIteration);
+    QString itlog = "Iteration" + toString(m_nIteration);
     PvlGroup gp(itlog);
 
-    gp += PvlKeyword("MaximumError", m_dError, "pixels");
-    gp += PvlKeyword("AverageError", avErr, "pixels");
-    gp += PvlKeyword("SigmaXY", sigmaXY, "mm");
+    gp += PvlKeyword("MaximumError", toString(m_dError), "pixels");
+    gp += PvlKeyword("AverageError", toString(avErr), "pixels");
+    gp += PvlKeyword("SigmaXY", toString(sigmaXY), "mm");
 //    gp += PvlKeyword("SigmaHat", sigmaHat, "mm");
-    gp += PvlKeyword("Sigma0", m_dSigma0, "mm");
-    gp += PvlKeyword("SigmaX", sigmaX, "mm");
-    gp += PvlKeyword("SigmaY", sigmaY, "mm");
+    gp += PvlKeyword("Sigma0", toString(m_dSigma0), "mm");
+    gp += PvlKeyword("SigmaX", toString(sigmaX), "mm");
+    gp += PvlKeyword("SigmaY", toString(sigmaY), "mm");
 
     std::ostringstream ostr;
     ostr<<gp<<endl;
@@ -5821,27 +5821,27 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   * the SpecialK BundleAdjust summary.
   */
   void BundleAdjust::SpecialKIterationSummary() {
-    std::string itlog;
+    QString itlog;
     if ( m_bConverged )
-        itlog = "Iteration" + IString(m_nIteration) + ": Final";
+        itlog = "Iteration" + toString(m_nIteration) + ": Final";
     else
-        itlog = "Iteration" + IString(m_nIteration);
+        itlog = "Iteration" + toString(m_nIteration);
     PvlGroup gp(itlog);
 
-    gp += PvlKeyword("Sigma0", m_dSigma0);
-    gp += PvlKeyword("Observations", m_nObservations);
-    gp += PvlKeyword("Constrained_Point_Parameters", m_nConstrainedPointParameters);
-    gp += PvlKeyword("Constrained_Image_Parameters", m_nConstrainedImageParameters);
-    gp += PvlKeyword("Unknown_Parameters", m_nUnknownParameters);
-    gp += PvlKeyword("Degrees_of_Freedom", m_nDegreesOfFreedom);
-    gp += PvlKeyword("Rejected_Measures", m_nRejectedObservations/2);
+    gp += PvlKeyword("Sigma0", toString(m_dSigma0));
+    gp += PvlKeyword("Observations", toString(m_nObservations));
+    gp += PvlKeyword("Constrained_Point_Parameters", toString(m_nConstrainedPointParameters));
+    gp += PvlKeyword("Constrained_Image_Parameters", toString(m_nConstrainedImageParameters));
+    gp += PvlKeyword("Unknown_Parameters", toString(m_nUnknownParameters));
+    gp += PvlKeyword("Degrees_of_Freedom", toString(m_nDegreesOfFreedom));
+    gp += PvlKeyword("Rejected_Measures", toString(m_nRejectedObservations/2));
 
     if ( m_bConverged ) {
         gp += PvlKeyword("Converged", "TRUE");
-        gp += PvlKeyword("TotalElapsedTime", m_dElapsedTime);
+        gp += PvlKeyword("TotalElapsedTime", toString(m_dElapsedTime));
 
         if ( m_bErrorPropagation )
-            gp += PvlKeyword("ErrorPropagationElapsedTime", m_dElapsedTimeErrorProp);
+            gp += PvlKeyword("ErrorPropagationElapsedTime", toString(m_dElapsedTimeErrorProp));
     }
 
     std::ostringstream ostr;
@@ -6059,15 +6059,15 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         sprintf(buf, "JIGSAW (DELTACK or QTIE): BUNDLE ADJUSTMENT\n=========================\n");
 
       fp_out << buf;
-      sprintf(buf, "\n                       Run Time: %s", Isis::iTime::CurrentLocalTime().c_str());
+      sprintf(buf, "\n                       Run Time: %s", Isis::iTime::CurrentLocalTime().toAscii().data());
       fp_out << buf;
-      sprintf(buf,"\n               Network Filename: %s", m_strCnetFileName.c_str());
+      sprintf(buf,"\n               Network Filename: %s", m_strCnetFileName.toAscii().data());
       fp_out << buf;
-      sprintf(buf,"\n                     Network Id: %s", m_pCnet->GetNetworkId().c_str());
+      sprintf(buf,"\n                     Network Id: %s", m_pCnet->GetNetworkId().toAscii().data());
       fp_out << buf;
-      sprintf(buf,"\n            Network Description: %s", m_pCnet->Description().c_str());
+      sprintf(buf,"\n            Network Description: %s", m_pCnet->Description().toAscii().data());
       fp_out << buf;
-      sprintf(buf,"\n                         Target: %s", m_pCnet->GetTarget().c_str());
+      sprintf(buf,"\n                         Target: %s", m_pCnet->GetTarget().toAscii().data());
       fp_out << buf;
       sprintf(buf,"\n\n                   Linear Units: kilometers");
       fp_out << buf;
@@ -6081,7 +6081,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       m_bSolveRadii ? sprintf(buf, "\n                         RADIUS: ON"):
               sprintf(buf, "\n                         RADIUS: OFF");
       fp_out << buf;
-      sprintf(buf,"\n                  SOLUTION TYPE: %s", m_strSolutionMethod.c_str());
+      sprintf(buf,"\n                  SOLUTION TYPE: %s", m_strSolutionMethod.toAscii().data());
       fp_out << buf;
       m_bErrorPropagation ? sprintf(buf, "\n              ERROR PROPAGATION: ON"):
               sprintf(buf, "\n              ERROR PROPAGATION: OFF");
@@ -6295,7 +6295,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           }
         }
         catch (IException &e) {
-          std::string msg = "Faiiled to output residual percentiles for bundleout";
+          QString msg = "Faiiled to output residual percentiles for bundleout";
           throw IException(e, IException::Io, msg, _FILEINFO_);
         }
         try {
@@ -6313,7 +6313,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           fp_out << buf;
         }
         catch (IException &e) {
-          std::string msg = "Faiiled to output residual box plot for bundleout";
+          QString msg = "Faiiled to output residual box plot for bundleout";
           throw IException(e, IException::Io, msg, _FILEINFO_);
         }
       }
@@ -6344,12 +6344,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
         if (nUsed == nMeasures)
           sprintf(buf,"%s   %5d of %5d %6.3lf %6.3lf %6.3lf\n",
-                  m_pSnList->FileName(i).c_str(),
+                  m_pSnList->FileName(i).toAscii().data(),
                   (nMeasures-nRejectedMeasures), nMeasures,
                   rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
         else
           sprintf(buf,"%s   %5d of %5d* %6.3lf %6.3lf %6.3lf\n",
-                  m_pSnList->FileName(i).c_str(),
+                  m_pSnList->FileName(i).toAscii().data(),
                   (nMeasures-nRejectedMeasures), nMeasures,
                   rmsSampleResiduals,rmsLineResiduals,rmsLandSResiduals);
         fp_out << buf;
@@ -6363,11 +6363,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
  */
     bool BundleAdjust::OutputWithErrorPropagation() {
 
-      std:: string ofname("bundleout.txt");
+      QString ofname("bundleout.txt");
       if( m_strOutputFilePrefix.length() != 0 )
           ofname = m_strOutputFilePrefix + "_" + ofname;
 
-      std::ofstream fp_out(ofname.c_str(), std::ios::out);
+      std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
       if (!fp_out)
           return false;
 
@@ -6447,9 +6447,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
             coefTWI.push_back(angles.at(2));
           }
 
-          sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->FileName(i).c_str());
+          sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->FileName(i).toAscii().data());
           fp_out << buf;
-          sprintf(buf, "\nImage Serial Number: %s\n", m_pSnList->SerialNumber(i).c_str());
+          sprintf(buf, "\nImage Serial Number: %s\n", m_pSnList->SerialNumber(i).toAscii().data());
           fp_out << buf;
           sprintf(buf, "\n    Image         Initial              Total               Final             Initial           Final\n"
                   "Parameter         Value              Correction            Value             Accuracy          Accuracy\n");
@@ -6673,29 +6673,29 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               m_drms_sigmaLat);
       fp_out << buf;
       sprintf(buf, " MIN Sigma Latitude(m)%20.8lf at %s\n",
-              m_dminSigmaLatitude,m_idMinSigmaLatitude.c_str());
+              m_dminSigmaLatitude,m_idMinSigmaLatitude.toAscii().data());
       fp_out << buf;
       sprintf(buf, " MAX Sigma Latitude(m)%20.8lf at %s\n\n",
-              m_dmaxSigmaLatitude,m_idMaxSigmaLatitude.c_str());
+              m_dmaxSigmaLatitude,m_idMaxSigmaLatitude.toAscii().data());
       fp_out << buf;
       sprintf(buf, "RMS Sigma Longitude(m)%20.8lf\n",
               m_drms_sigmaLon);
       fp_out << buf;
       sprintf(buf, "MIN Sigma Longitude(m)%20.8lf at %s\n",
-              m_dminSigmaLongitude,m_idMinSigmaLongitude.c_str());
+              m_dminSigmaLongitude,m_idMinSigmaLongitude.toAscii().data());
       fp_out << buf;
       sprintf(buf, "MAX Sigma Longitude(m)%20.8lf at %s\n\n",
-              m_dmaxSigmaLongitude,m_idMaxSigmaLongitude.c_str());
+              m_dmaxSigmaLongitude,m_idMaxSigmaLongitude.toAscii().data());
       fp_out << buf;
       if ( m_bSolveRadii ) {
         sprintf(buf, "   RMS Sigma Radius(m)%20.8lf\n",
                 m_drms_sigmaRad);
         fp_out << buf;
         sprintf(buf, "   MIN Sigma Radius(m)%20.8lf at %s\n",
-                m_dminSigmaRadius,m_idMinSigmaRadius.c_str());
+                m_dminSigmaRadius,m_idMinSigmaRadius.toAscii().data());
         fp_out << buf;
         sprintf(buf, "   MAX Sigma Radius(m)%20.8lf at %s\n",
-                m_dmaxSigmaRadius,m_idMaxSigmaRadius.c_str());
+                m_dmaxSigmaRadius,m_idMaxSigmaRadius.toAscii().data());
         fp_out << buf;
       }
       else {
@@ -6721,7 +6721,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       double dLatInit, dLonInit, dRadiusInit;
       int nGoodRays;
       double dResidualRms;
-      std::string strStatus;
+      QString strStatus;
       int nPointIndex = 0;
 
       int nPoints = m_pCnet->GetNumPoints();
@@ -6751,7 +6751,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               strStatus = "UNKNOWN";
 
           sprintf(buf, "%16s%15s%5d of %d%6.2lf%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf%16.8lf\n",
-                  point->GetId().c_str(), strStatus.c_str(), nGoodRays, nRays, dResidualRms, dLat,
+                  point->GetId().toAscii().data(), strStatus.toAscii().data(), nGoodRays, nRays, dResidualRms, dLat,
                   dLon, dRadius * 0.001, dSigmaLat, dSigmaLong, dSigmaRadius);
           fp_out << buf;
           nPointIndex++;
@@ -6802,7 +6802,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               strStatus = "UNKNOWN";
 
           sprintf(buf, " Label: %s\nStatus: %s\n  Rays: %d of %d\n",
-                  point->GetId().c_str(), strStatus.c_str(), nGoodRays, nRays);
+                  point->GetId().toAscii().data(), strStatus.toAscii().data(), nGoodRays, nRays);
           fp_out << buf;
 
           sprintf(buf, "\n     Point         Initial               Total               Total              Final             Initial             Final\n"
@@ -6844,11 +6844,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
    */
   bool BundleAdjust::OutputNoErrorPropagation() {
 
-      std:: string ofname("bundleout.txt");
-      if( !m_strOutputFilePrefix.empty() )
+      QString ofname("bundleout.txt");
+      if( !m_strOutputFilePrefix.isEmpty() )
           ofname = m_strOutputFilePrefix + "_" + ofname;
 
-      std::ofstream fp_out(ofname.c_str(), std::ios::out);
+      std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
       if (!fp_out)
           return false;
 
@@ -6920,9 +6920,9 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         coefTWI.push_back(angles.at(2));
       }
 
-      sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->FileName(i).c_str());
+      sprintf(buf, "\nImage Full File Name: %s\n", m_pSnList->FileName(i).toAscii().data());
       fp_out << buf;
-      sprintf(buf, "\n Image Serial Number: %s\n", m_pSnList->SerialNumber(i).c_str());
+      sprintf(buf, "\n Image Serial Number: %s\n", m_pSnList->SerialNumber(i).toAscii().data());
       fp_out << buf;
       sprintf(buf, "\n    Image         Initial              Total               Final             Initial           Final\n"
               "Parameter         Value              Correction            Value             Accuracy          Accuracy\n");
@@ -7129,7 +7129,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     double dLatInit,dLonInit,dRadiusInit;
     int nGoodRays;
 
-    std::string strStatus;
+    QString strStatus;
 
     int nPoints = m_pCnet->GetNumPoints();
     for (int i = 0; i < nPoints; i++) {
@@ -7155,7 +7155,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
             strStatus = "UNKNOWN";
 
         sprintf(buf, "%16s%12s%4d of %d%6.2lf%16.8lf%16.8lf%16.8lf%11s%16s%16s\n",
-                point->GetId().c_str(), strStatus.c_str(), nGoodRays, nRays, dResidualRms, dLat,
+                point->GetId().toAscii().data(), strStatus.toAscii().data(), nGoodRays, nRays, dResidualRms, dLat,
                 dLon, dRadius * 0.001,"N/A","N/A","N/A");
 
         fp_out << buf;
@@ -7202,7 +7202,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
             strStatus = "UNKNOWN";
 
         sprintf(buf," Label: %s\nStatus: %s\n  Rays: %d of %d\n",
-                point->GetId().c_str(),strStatus.c_str(),nGoodRays,nRays);
+                point->GetId().toAscii().data(),strStatus.toAscii().data(),nGoodRays,nRays);
         fp_out << buf;
 
         sprintf(buf,"\n     Point         Initial               Total               Total              Final             Initial             Final\n"
@@ -7237,11 +7237,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   bool BundleAdjust::OutputPointsCSV() {
     char buf[1056];
 
-    std:: string ofname("bundleout_points.csv");
-    if( !m_strOutputFilePrefix.empty() )
+    QString ofname("bundleout_points.csv");
+    if( !m_strOutputFilePrefix.isEmpty() )
         ofname = m_strOutputFilePrefix + "_" + ofname;
 
-    std::ofstream fp_out(ofname.c_str(), std::ios::out);
+    std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
     if (!fp_out)
         return false;
 
@@ -7250,7 +7250,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
     double dLat, dLon, dRadius;
     double dX, dY, dZ;
     double dSigmaLat, dSigmaLong, dSigmaRadius;
-    std::string strStatus;
+    QString strStatus;
     double cor_lat_m;
     double cor_lon_m;
     double cor_rad_m;
@@ -7316,12 +7316,12 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         dSigmaRadius = point->GetAdjustedSurfacePoint().GetLocalRadiusSigma().meters();
 
         sprintf(buf, "%s,%s,%d,%d,%6.2lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                point->GetId().c_str(), strStatus.c_str(), nMeasures, nRejectedMeasures, dResidualRms, dLat, dLon, dRadius,
+                point->GetId().toAscii().data(), strStatus.toAscii().data(), nMeasures, nRejectedMeasures, dResidualRms, dLat, dLon, dRadius,
                 dSigmaLat, dSigmaLong, dSigmaRadius, cor_lat_m, cor_lon_m, cor_rad_m, dX, dY, dZ);
       }
       else
         sprintf(buf, "%s,%s,%d,%d,%6.2lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                point->GetId().c_str(), strStatus.c_str(), nMeasures, nRejectedMeasures, dResidualRms, dLat, dLon, dRadius,
+                point->GetId().toAscii().data(), strStatus.toAscii().data(), nMeasures, nRejectedMeasures, dResidualRms, dLat, dLon, dRadius,
                 cor_lat_m, cor_lon_m, cor_rad_m, dX, dY, dZ);
 
       fp_out << buf;
@@ -7341,11 +7341,11 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   bool BundleAdjust::OutputResiduals() {
     char buf[1056];
 
-    std:: string ofname("residuals.csv");
-    if( !m_strOutputFilePrefix.empty() )
+    QString ofname("residuals.csv");
+    if( !m_strOutputFilePrefix.isEmpty() )
         ofname = m_strOutputFilePrefix + "_" + ofname;
 
-    std::ofstream fp_out(ofname.c_str(), std::ios::out);
+    std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
     if (!fp_out)
         return false;
 
@@ -7382,13 +7382,13 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
 
         if (measure->IsRejected())
           sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,*\n",
-                  point->GetId().c_str(), m_pSnList->FileName(nImageIndex).c_str(), m_pSnList->SerialNumber(nImageIndex).c_str(),
+                  point->GetId().toAscii().data(), m_pSnList->FileName(nImageIndex).toAscii().data(), m_pSnList->SerialNumber(nImageIndex).toAscii().data(),
                   measure->GetFocalPlaneMeasuredX(), measure->GetFocalPlaneMeasuredY(), measure->GetSample(),
                   measure->GetLine(), measure->GetSampleResidual(), measure->GetLineResidual(),
                   measure->GetResidualMagnitude());
         else
           sprintf(buf, "%s,%s,%s,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf,%16.8lf\n",
-                  point->GetId().c_str(), m_pSnList->FileName(nImageIndex).c_str(), m_pSnList->SerialNumber(nImageIndex).c_str(),
+                  point->GetId().toAscii().data(), m_pSnList->FileName(nImageIndex).toAscii().data(), m_pSnList->SerialNumber(nImageIndex).toAscii().data(),
                   measure->GetFocalPlaneMeasuredX(), measure->GetFocalPlaneMeasuredY(), measure->GetSample(),
                   measure->GetLine(), measure->GetSampleResidual(), measure->GetLineResidual(), measure->GetResidualMagnitude());
         fp_out << buf;
@@ -7406,16 +7406,16 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
   bool BundleAdjust::OutputImagesCSV() {
       char buf[1056];
 
-      std:: string ofname("bundleout_images.csv");
-      if( !m_strOutputFilePrefix.empty() )
+      QString ofname("bundleout_images.csv");
+      if( !m_strOutputFilePrefix.isEmpty() )
           ofname = m_strOutputFilePrefix + "_" + ofname;
 
-      std::ofstream fp_out(ofname.c_str(), std::ios::out);
+      std::ofstream fp_out(ofname.toAscii().data(), std::ios::out);
       if (!fp_out)
           return false;
 
       // setup column headers
-      std::vector<std::string> output_columns;
+      std::vector<QString> output_columns;
 
       output_columns.push_back("Image,");
 
@@ -7440,7 +7440,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               if( ncoeff == 1 )
                   output_columns.push_back("X,");
               else {
-                  std::string str = "X(";
+                  QString str = "X(";
                   str += ostr.str().c_str();
                   str += "),";
                   output_columns.push_back(str);
@@ -7461,7 +7461,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               if( ncoeff == 1 )
                   output_columns.push_back("Y,");
               else {
-                  std::string str = "Y(";
+                  QString str = "Y(";
                   str += ostr.str().c_str();
                   str += "),";
                   output_columns.push_back(str);
@@ -7485,7 +7485,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
             output_columns.push_back("Z,");
           }
           else {
-            std::string str = "Z(";
+            QString str = "Z(";
             str += ostr.str().c_str();
             str += "),";
             output_columns.push_back(str);
@@ -7509,7 +7509,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               if( m_nNumberCamAngleCoefSolved == 1 )
                   output_columns.push_back("RA,");
               else {
-                  std::string str = "RA(";
+                  QString str = "RA(";
                   str += ostr.str().c_str();
                   str += "),";
                   output_columns.push_back(str);
@@ -7530,7 +7530,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
               if( m_nNumberCamAngleCoefSolved == 1 )
                   output_columns.push_back("DEC,");
               else {
-                  std::string str = "DEC(";
+                  QString str = "DEC(";
                   str += ostr.str().c_str();
                   str += "),";
                   output_columns.push_back(str);
@@ -7555,7 +7555,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
             output_columns.push_back("TWIST,");
           }
           else {
-            std::string str = "TWIST(";
+            QString str = "TWIST(";
             str += ostr.str().c_str();
             str += "),";
             output_columns.push_back(str);
@@ -7570,8 +7570,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       // print first column header to buffer and output to file
       int ncolumns = output_columns.size();
       for ( int i = 0; i < ncolumns; i++) {
-          std::string str = output_columns.at(i);
-          sprintf(buf, "%s", (const char*)str.c_str());
+          QString str = output_columns.at(i);
+          sprintf(buf, "%s", (const char*)str.toAscii().data());
           fp_out << buf;
       }
       sprintf(buf, "\n");
@@ -7603,8 +7603,8 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
       // print second column header to buffer and output to file
       ncolumns = output_columns.size();
       for( int i = 0; i < ncolumns; i++) {
-          std::string str = output_columns.at(i);
-          sprintf(buf, "%s", (const char*)str.c_str());
+          QString str = output_columns.at(i);
+          sprintf(buf, "%s", (const char*)str.toAscii().data());
           fp_out << buf;
       }
       sprintf(buf, "\n");
@@ -7691,15 +7691,15 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         output_columns.clear();
 
         // add filename
-        output_columns.push_back(m_pSnList->FileName(i).c_str());
+        output_columns.push_back(m_pSnList->FileName(i).toAscii().data());
 
         // add rms of sample, line, total image coordinate residuals
-        output_columns.push_back(boost::lexical_cast<std::string>
-            (m_rmsImageSampleResiduals[i].Rms()));
-        output_columns.push_back(boost::lexical_cast<std::string>
-            (m_rmsImageLineResiduals[i].Rms()));
-        output_columns.push_back(boost::lexical_cast<std::string>
-            (m_rmsImageResiduals[i].Rms()));
+        output_columns.push_back(
+            toString(m_rmsImageSampleResiduals[i].Rms()));
+        output_columns.push_back(
+            toString(m_rmsImageLineResiduals[i].Rms()));
+        output_columns.push_back(
+            toString(m_rmsImageResiduals[i].Rms()));
 
         if ( m_nNumberCamPosCoefSolved > 0 ) {
           for ( int i = 0; i < m_nNumberCamPosCoefSolved; i++ ) {
@@ -7711,18 +7711,18 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
                 dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
             }
 
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (coefX[0] - m_Image_Corrections(nIndex)));
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (m_Image_Corrections(nIndex)));
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (coefX[i]));
-            output_columns.push_back(boost::lexical_cast<std::string>(
-                m_dGlobalSpacecraftPositionAprioriSigma[i]));
+            output_columns.push_back(
+                toString(coefX[0] - m_Image_Corrections(nIndex)));
+            output_columns.push_back(
+                toString(m_Image_Corrections(nIndex)));
+            output_columns.push_back(
+                toString(coefX[i]));
+            output_columns.push_back(
+                toString(m_dGlobalSpacecraftPositionAprioriSigma[i]));
 
             if ( m_bErrorPropagation && m_bConverged )
-              output_columns.push_back(boost::lexical_cast<std::string>
-                  (dSigma));
+              output_columns.push_back(
+                  toString(dSigma));
             else
               output_columns.push_back("N/A");
             nIndex++;
@@ -7736,18 +7736,18 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
                 dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
             }
 
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (coefY[0] - m_Image_Corrections(nIndex)));
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (m_Image_Corrections(nIndex)));
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (coefY[i]));
-            output_columns.push_back(boost::lexical_cast<std::string>(
-                m_dGlobalSpacecraftPositionAprioriSigma[i]));
+            output_columns.push_back(
+                toString(coefY[0] - m_Image_Corrections(nIndex)));
+            output_columns.push_back(
+                toString(m_Image_Corrections(nIndex)));
+            output_columns.push_back(
+                toString(coefY[i]));
+            output_columns.push_back(
+                toString(m_dGlobalSpacecraftPositionAprioriSigma[i]));
 
             if ( m_bErrorPropagation && m_bConverged )
-              output_columns.push_back(boost::lexical_cast<std::string>
-                  (dSigma));
+              output_columns.push_back(
+                  toString(dSigma));
             else
               output_columns.push_back("N/A");
             nIndex++;
@@ -7761,17 +7761,17 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
                 dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
             }
 
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (coefZ[0] - m_Image_Corrections(nIndex)));
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (m_Image_Corrections(nIndex)));
-            output_columns.push_back(boost::lexical_cast<std::string>
-                (coefZ[i]));
-            output_columns.push_back(boost::lexical_cast<std::string>(
-                m_dGlobalSpacecraftPositionAprioriSigma[i]));
+            output_columns.push_back(
+                toString(coefZ[0] - m_Image_Corrections(nIndex)));
+            output_columns.push_back(
+                toString(m_Image_Corrections(nIndex)));
+            output_columns.push_back(
+                toString(coefZ[i]));
+            output_columns.push_back(
+                toString(m_dGlobalSpacecraftPositionAprioriSigma[i]));
 
             if ( m_bErrorPropagation && m_bConverged )
-              output_columns.push_back(boost::lexical_cast<std::string>
+              output_columns.push_back(toString
                   (dSigma));
             else
               output_columns.push_back("N/A");
@@ -7779,20 +7779,20 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
           }
         }
         else {
-          output_columns.push_back(boost::lexical_cast<std::string>(coefX[0]));
-          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-          output_columns.push_back(boost::lexical_cast<std::string>(coefX[0]));
-          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back(toString(coefX[0]));
+          output_columns.push_back(toString(0));
+          output_columns.push_back(toString(coefX[0]));
+          output_columns.push_back(toString(0));
           output_columns.push_back("N/A");
-          output_columns.push_back(boost::lexical_cast<std::string>(coefY[0]));
-          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-          output_columns.push_back(boost::lexical_cast<std::string>(coefY[0]));
-          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back(toString(coefY[0]));
+          output_columns.push_back(toString(0));
+          output_columns.push_back(toString(coefY[0]));
+          output_columns.push_back(toString(0));
           output_columns.push_back("N/A");
-          output_columns.push_back(boost::lexical_cast<std::string>(coefZ[0]));
-          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-          output_columns.push_back(boost::lexical_cast<std::string>(coefZ[0]));
-          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back(toString(coefZ[0]));
+          output_columns.push_back(toString(0));
+          output_columns.push_back(toString(coefZ[0]));
+          output_columns.push_back(toString(0));
           output_columns.push_back("N/A");
         }
 
@@ -7806,17 +7806,17 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
                 dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
             }
 
-            output_columns.push_back(boost::lexical_cast<std::string>
+            output_columns.push_back(toString
                 ((coefRA[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
-            output_columns.push_back(boost::lexical_cast<std::string>
+            output_columns.push_back(toString
                 (m_Image_Corrections(nIndex) * RAD2DEG));
-            output_columns.push_back(boost::lexical_cast<std::string>
+            output_columns.push_back(toString
                 (coefRA[i] * RAD2DEG));
-            output_columns.push_back(boost::lexical_cast<std::string>(
+            output_columns.push_back(toString(
                 m_dGlobalCameraAnglesAprioriSigma[i]));
 
             if ( m_bErrorPropagation && m_bConverged )
-              output_columns.push_back(boost::lexical_cast<std::string>
+              output_columns.push_back(toString
                   (dSigma * RAD2DEG));
             else
               output_columns.push_back("N/A");
@@ -7831,29 +7831,29 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
                 dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
             }
 
-            output_columns.push_back(boost::lexical_cast<std::string>
+            output_columns.push_back(toString
                 ((coefDEC[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
-            output_columns.push_back(boost::lexical_cast<std::string>
+            output_columns.push_back(toString
                 (m_Image_Corrections(nIndex) * RAD2DEG));
-            output_columns.push_back(boost::lexical_cast<std::string>
+            output_columns.push_back(toString
                 (coefDEC[i] * RAD2DEG));
-            output_columns.push_back(boost::lexical_cast<std::string>
+            output_columns.push_back(toString
                 (m_dGlobalCameraAnglesAprioriSigma[i]));
 
             if ( m_bErrorPropagation && m_bConverged )
-              output_columns.push_back(boost::lexical_cast<std::string>
+              output_columns.push_back(toString
                   (dSigma * RAD2DEG));
             else
               output_columns.push_back("N/A");
             nIndex++;
           }
           if ( !m_bSolveTwist ) {
-            output_columns.push_back(boost::lexical_cast<std::string>
+            output_columns.push_back(toString
                 (coefTWI[0]*RAD2DEG));
-            output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-            output_columns.push_back(boost::lexical_cast<std::string>
+            output_columns.push_back(toString(0.0));
+            output_columns.push_back(toString
                 (coefTWI[0]*RAD2DEG));
-            output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+            output_columns.push_back(toString(0.0));
             output_columns.push_back("N/A");
           }
           else {
@@ -7866,17 +7866,17 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
                   dSigma = sqrt((double)(m_Normals(nIndex, nIndex))) * m_dSigma0;
               }
 
-              output_columns.push_back(boost::lexical_cast<std::string>
+              output_columns.push_back(toString
                   ((coefTWI[i] - m_Image_Corrections(nIndex)) * RAD2DEG));
-              output_columns.push_back(boost::lexical_cast<std::string>
+              output_columns.push_back(toString
                   (m_Image_Corrections(nIndex) * RAD2DEG));
-              output_columns.push_back(boost::lexical_cast<std::string>
+              output_columns.push_back(toString
                   (coefTWI[i] * RAD2DEG));
-              output_columns.push_back(boost::lexical_cast<std::string>
+              output_columns.push_back(toString
                   (m_dGlobalCameraAnglesAprioriSigma[i]));
 
               if ( m_bErrorPropagation && m_bConverged )
-                output_columns.push_back(boost::lexical_cast<std::string>
+                output_columns.push_back(toString
                     (dSigma * RAD2DEG));
               else
                 output_columns.push_back("N/A");
@@ -7886,38 +7886,38 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
         }
 
         else if ( pCamera->GetCameraType() != 3 ) {
-          output_columns.push_back(boost::lexical_cast<std::string>
+          output_columns.push_back(toString
               (coefRA[0]*RAD2DEG));
-          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-          output_columns.push_back(boost::lexical_cast<std::string>
+          output_columns.push_back(toString(0.0));
+          output_columns.push_back(toString
               (coefRA[0]*RAD2DEG));
-          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back(toString(0.0));
           output_columns.push_back("N/A");
-          output_columns.push_back(boost::lexical_cast<std::string>
+          output_columns.push_back(toString
               (coefDEC[0]*RAD2DEG));
-          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-          output_columns.push_back(boost::lexical_cast<std::string>
+          output_columns.push_back(toString(0.0));
+          output_columns.push_back(toString
               (coefDEC[0]*RAD2DEG));
-          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back(toString(0.0));
           output_columns.push_back("N/A");
-          output_columns.push_back(boost::lexical_cast<std::string>
+          output_columns.push_back(toString
               (coefTWI[0]*RAD2DEG));
-          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
-          output_columns.push_back(boost::lexical_cast<std::string>
+          output_columns.push_back(toString(0.0));
+          output_columns.push_back(toString
               (coefTWI[0]*RAD2DEG));
-          output_columns.push_back(boost::lexical_cast<std::string>(0.0));
+          output_columns.push_back(toString(0.0));
           output_columns.push_back("N/A");
         }
 
         // print column vector to buffer and output to file
         int ncolumns = output_columns.size();
         for ( int i = 0; i < ncolumns; i++) {
-          std::string str = output_columns.at(i);
+          QString str = output_columns.at(i);
 
           if (i < ncolumns-1)
-            sprintf(buf, "%s,", (const char*)str.c_str());
+            sprintf(buf, "%s,", (const char*)str.toAscii().data());
           else
-            sprintf(buf, "%s", (const char*)str.c_str());
+            sprintf(buf, "%s", (const char*)str.toAscii().data());
           fp_out << buf;
         }
         sprintf(buf, "\n");
@@ -7934,14 +7934,14 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
    * This method sets the solution method for solving the matrix and fills
    * the point index map, which is dependent on the solution method.
    */
-  void BundleAdjust::SetSolutionMethod(std::string str) {
+  void BundleAdjust::SetSolutionMethod(QString str) {
     m_strSolutionMethod = str;
     FillPointIndexMap();
   }
 
   /**  This method steps up the maximum likelihood estimation solution.  Zero to three successive solutions models are available.
    */
-   void BundleAdjust::maximumLikelihoodSetup( QList<std::string> models, QList<double> quantiles ) {
+   void BundleAdjust::maximumLikelihoodSetup( QList<QString> models, QList<double> quantiles ) {
      m_wFunc[0]=m_wFunc[1]=m_wFunc[2]=NULL;  //initialize to NULL
      m_maxLikelihoodFlag[0]=m_maxLikelihoodFlag[1]=m_maxLikelihoodFlag[2]=false; //NULL flag by defualt
      if (models.size() == 0) {  //MaximumLikeliHood Estimation not being used, so leave everything NULL
@@ -7962,7 +7962,7 @@ static void cholmod_error_handler(int nStatus, const char* file, int nLineNo,
          else if ( models[i].compare("CHEN") == 0 )
            m_wFunc[i]->setModel(MaximumLikelihoodWFunctions::Chen);
          else {
-            std::string msg = "Unsuported Maximum Likelihood estimation model: " + models[i] + "\n";
+            QString msg = "Unsuported Maximum Likelihood estimation model: " + models[i] + "\n";
             m_maxLikelihoodFlag[i] = false;
             throw IException(IException::Io, msg, _FILEINFO_);
          }

@@ -49,12 +49,12 @@ namespace Isis {
 
     PvlGroup &kernels = pvl.FindGroup("Kernels", Pvl::Traverse);
 
-    IString demCubeFile;
+    QString demCubeFile;
     if (kernels.HasKeyword("ElevationModel")) {
-      demCubeFile = (std::string) kernels["ElevationModel"];
+      demCubeFile = (QString) kernels["ElevationModel"];
     }
     else if(kernels.HasKeyword("ShapeModel")) {
-      demCubeFile = (std::string) kernels["ShapeModel"];
+      demCubeFile = (QString) kernels["ShapeModel"];
     }
 
     m_demCube = CubeManager::Open(demCubeFile);

@@ -72,7 +72,7 @@ namespace Isis {
         cube.open(sns.FileName(i));
       }
       catch(IException &error) {
-        std::string msg = "Unable to open cube for serial number [";
+        QString msg = "Unable to open cube for serial number [";
         msg += sns.SerialNumber(i) + "] filename [" + sns.FileName(i) + "]";
 
         HandleError(error, &sns, msg);
@@ -160,10 +160,10 @@ namespace Isis {
    * @param outputFile The output ImageOverlapSet file
    *
    */
-  void ImageOverlapSet::FindImageOverlaps(SerialNumberList &boundaries, std::string outputFile) {
+  void ImageOverlapSet::FindImageOverlaps(SerialNumberList &boundaries, QString outputFile) {
     // Do a common sense programmer check, this should be empty before we start
     if(!p_lonLatOverlaps.empty()) {
-      string msg = "FindImageOverlaps(SerialNumberList&,std::string) may not be called on " \
+      string msg = "FindImageOverlaps(SerialNumberList&,QString) may not be called on " \
                    "an ImageOverlapSet which already contains overlaps.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -202,10 +202,10 @@ namespace Isis {
 
   /** This is a strict pthread implementation of this class' multi-threading!
    *
-  void ImageOverlapSet::FindImageOverlaps(SerialNumberList &boundaries, std::string outputFile) {
+  void ImageOverlapSet::FindImageOverlaps(SerialNumberList &boundaries, QString outputFile) {
     // Do a common sense programmer check, this should be empty before we start
     if(!p_lonLatOverlaps.empty()) {
-      string msg = "FindImageOverlaps(SerialNumberList&,std::string) may not be called on an ImageOverlapSet " \
+      string msg = "FindImageOverlaps(SerialNumberList&,QString) may not be called on an ImageOverlapSet " \
                       "which already contains overlaps.";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }
@@ -288,7 +288,7 @@ namespace Isis {
    *
    * @see automaticRegistration.doc
    */
-  void ImageOverlapSet::FindImageOverlaps(std::vector<std::string> sns,
+  void ImageOverlapSet::FindImageOverlaps(std::vector<QString> sns,
                                           std::vector<geos::geom::MultiPolygon *> polygons) {
 
     if(sns.size() != polygons.size()) {
@@ -313,7 +313,7 @@ namespace Isis {
    *
    * @param filename The file to read the image overlaps from
    */
-  void ImageOverlapSet::ReadImageOverlaps(const std::string &filename) {
+  void ImageOverlapSet::ReadImageOverlaps(const QString &filename) {
     IString file = FileName(filename).expanded();
 
     try {
@@ -418,7 +418,7 @@ namespace Isis {
    *
    * @param filename The file to write the image overlaps to
    */
-  void ImageOverlapSet::WriteImageOverlaps(const std::string &filename) {
+  void ImageOverlapSet::WriteImageOverlaps(const QString &filename) {
     IString file = FileName(filename).expanded();
     bool failed = false;
     if(p_threadedCalculate) p_calculatePolygonMutex.lock();
@@ -543,7 +543,7 @@ namespace Isis {
           }
           catch(IException &e) {
             intersected = NULL;
-            string error = "Intersection of overlaps failed.";
+            QString error = "Intersection of overlaps failed.";
 
             // We never want to double seed, so we must delete one or both
             //   of these polygons because they more than likely have an intersection
@@ -755,7 +755,7 @@ namespace Isis {
    */
   void ImageOverlapSet::AddSerialNumbers(ImageOverlap *to, ImageOverlap *from) {
     for(int i = 0; i < from->Size(); i++) {
-      string s = (*from)[i];
+      QString s = (*from)[i];
       to->Add(s);
     }
   }
@@ -769,7 +769,7 @@ namespace Isis {
    * @param latLonPolygon The object to copy the serial numbers from
    *
    */
-  ImageOverlap *ImageOverlapSet::CreateNewOverlap(std::string serialNumber,
+  ImageOverlap *ImageOverlapSet::CreateNewOverlap(QString serialNumber,
       geos::geom::MultiPolygon *latLonPolygon) {
 
     return new ImageOverlap(serialNumber, *latLonPolygon);
@@ -788,7 +788,7 @@ namespace Isis {
    * @return List of related ImageOverlap objects, ownership is retained by
    *         ImageOverlapSet*
    */
-  std::vector<ImageOverlap *> ImageOverlapSet::operator[](std::string serialNumber) {
+  std::vector<ImageOverlap *> ImageOverlapSet::operator[](QString serialNumber) {
     vector<ImageOverlap *> matches;
 
     // Look at all the ImageOverlaps we have and return the ones that
@@ -814,7 +814,7 @@ namespace Isis {
    * @param overlap1 First problematic overlap
    * @param overlap2 Second problematic overlap
    */
-  void ImageOverlapSet::HandleError(IException &e, SerialNumberList *snlist, IString msg, int overlap1, int overlap2) {
+  void ImageOverlapSet::HandleError(IException &e, SerialNumberList *snlist, QString msg, int overlap1, int overlap2) {
     PvlGroup err("ImageOverlapError");
 
     if(overlap1 >= 0 && overlap1 < p_lonLatOverlaps.size()) {
@@ -829,7 +829,7 @@ namespace Isis {
           filename += snlist->FileName((*p_lonLatOverlaps.at(overlap1))[i]);
         }
       }
-      polygon += p_lonLatOverlaps.at(overlap1)->Polygon()->toString();
+      polygon += p_lonLatOverlaps.at(overlap1)->Polygon()->toString().c_str();
 
       err += serialNumbers;
 
@@ -852,7 +852,7 @@ namespace Isis {
           filename += snlist->FileName((*p_lonLatOverlaps.at(overlap2))[i]);
         }
       }
-      polygon += p_lonLatOverlaps.at(overlap2)->Polygon()->toString();
+      polygon += p_lonLatOverlaps.at(overlap2)->Polygon()->toString().c_str();
 
       err += serialNumbers;
 
@@ -865,7 +865,7 @@ namespace Isis {
 
     err += PvlKeyword("Error", e.what());
 
-    if(!msg.empty()) {
+    if(!msg.isEmpty()) {
       err += PvlKeyword("Description", msg);
     }
 
@@ -884,7 +884,7 @@ namespace Isis {
    * @param overlap1 First problematic overlap
    * @param overlap2 Second problematic overlap
    */
-  void ImageOverlapSet::HandleError(geos::util::GEOSException *exc, SerialNumberList *snlist, IString msg, int overlap1, int overlap2) {
+  void ImageOverlapSet::HandleError(geos::util::GEOSException *exc, SerialNumberList *snlist, QString msg, int overlap1, int overlap2) {
     PvlGroup err("ImageOverlapError");
 
     if(overlap1 >= 0 && overlap1 < p_lonLatOverlaps.size()) {
@@ -925,9 +925,9 @@ namespace Isis {
       }
     }
 
-    err += PvlKeyword("Error", IString(exc->what()));
+    err += PvlKeyword("Error", exc->what());
 
-    if(!msg.empty()) {
+    if(!msg.isEmpty()) {
       err += PvlKeyword("Description", msg);
     }
 
@@ -952,7 +952,7 @@ namespace Isis {
    * @param overlap1 First problematic overlap
    * @param overlap2 Second problematic overlap
    */
-  void ImageOverlapSet::HandleError(SerialNumberList *snlist, IString msg, int overlap1, int overlap2) {
+  void ImageOverlapSet::HandleError(SerialNumberList *snlist, QString msg, int overlap1, int overlap2) {
     PvlGroup err("ImageOverlapError");
 
     if(overlap1 >= 0 && overlap1 < p_lonLatOverlaps.size()) {

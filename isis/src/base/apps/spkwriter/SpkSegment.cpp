@@ -53,7 +53,7 @@ SpkSegment::SpkSegment() : SpiceSegment() {
 }
 
 /** Constructor from ISIS cube file by name of the cube */
-SpkSegment::SpkSegment(const std::string &fname) : SpiceSegment() {
+SpkSegment::SpkSegment(const QString &fname) : SpiceSegment() {
   init();
   Cube cube;
   cube.open(fname);
@@ -89,7 +89,7 @@ SpkSegment::SpkSegment(Cube &cube) : SpiceSegment(cube) {
  *                           This will need to be an option in the future.
  */
 void SpkSegment::import(Cube &cube) {
-  typedef std::vector<std::string>  StrList;
+  typedef std::vector<QString>  StrList;
 
   //  Extract ISIS SPK blob and transform to CK 3 content
   NaifStatus::CheckErrors();
@@ -235,11 +235,11 @@ void SpkSegment::getStates(Camera &camera, const SMatrix &spice,
   }
 
   //  Compute state rotations relative to the reference frame
-  string j2000 = getNaifName(1);  // ISIS stores in J2000
+  QString j2000 = getNaifName(1);  // ISIS stores in J2000
   if (j2000 != _refFrame) {
     for (int n = 0 ; n < nrecs ; n++) {
       SpiceDouble xform[6][6];
-      sxform_c(j2000.c_str(), _refFrame.c_str(), epochs[n], xform);
+      sxform_c(j2000.toAscii().data(), _refFrame.toAscii().data(), epochs[n], xform);
       mxvg_c(xform, states[n], 6, 6, states[n]);
     }
   }
@@ -292,9 +292,9 @@ SpkSegment::SVector SpkSegment::makeState(SpicePosition *position, const double 
  *
  * @author kbecker (5/2/2011)
  *
- * @return std::string Comment string for the segment
+ * @return QString Comment string for the segment
  */
-std::string SpkSegment::getComment() const {
+QString SpkSegment::getComment() const {
   ostringstream comment;
 
   comment <<
@@ -315,17 +315,17 @@ std::string SpkSegment::getComment() const {
   comment <<
 "  PolyDegree:  " << _degree << endl <<
 "  CamVersion:  " << CameraVersion() << endl;
-  std::vector<std::string> klist = getKernels().getKernelList();
+  QStringList klist = getKernels().getKernelList();
   if ( klist.size() > 0 ) {
     comment <<
 "  Kernels:     \n";
-    for ( unsigned int i = 0 ; i < klist.size() ; i++  ) {
+    for ( int i = 0 ; i < klist.size() ; i++  ) {
       comment <<
 "    " << klist[i] << endl;
     }
   }
 
-  return (string(comment.str()));
+  return ((comment.str().c_str()));
 }
 
 /**
@@ -420,7 +420,7 @@ SpkSegment::SVector SpkSegment::adjustTimes(Camera &camera,
   for ( int i = 0 ; i < epochs.dim1() ; i++ ) {
     SpiceDouble lt;
     SpiceDouble state[6];
-    spkez_c(observer, epochs[i], _refFrame.c_str(), "LT+S", target, state, &lt);
+    spkez_c(observer, epochs[i], _refFrame.toAscii().data(), "LT+S", target, state, &lt);
     ltEpochs[i] = epochs[i] - lt;
   }
   return (ltEpochs);

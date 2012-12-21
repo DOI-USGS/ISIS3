@@ -1,32 +1,34 @@
 #include <iostream>
 #include "Endian.h"
+#include "IString.h"
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
 
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   cout << "Unit test for IsisEndian" << endl;
 
-  if(Isis::IsLittleEndian() == true) {
-    cout << Isis::IsLittleEndian() << endl;
-    cout << Isis::IsBigEndian() << endl;
+  if(IsLittleEndian() == true) {
+    cout << IsLittleEndian() << endl;
+    cout << IsBigEndian() << endl;
   }
   else {
-    cout << Isis::IsBigEndian() << endl;
-    cout << Isis::IsLittleEndian() << endl;
+    cout << IsBigEndian() << endl;
+    cout << IsLittleEndian() << endl;
   }
 
-  if(Isis::IsLsb() == true) {
-    cout << Isis::IsLsb() << endl;
-    cout << Isis::IsMsb() << endl;
+  if(IsLsb() == true) {
+    cout << IsLsb() << endl;
+    cout << IsMsb() << endl;
   }
   else {
-    cout << Isis::IsMsb() << endl;
-    cout << Isis::IsLsb() << endl;
+    cout << IsMsb() << endl;
+    cout << IsLsb() << endl;
   }
 
-  cout << Isis::ByteOrderName(Isis::ByteOrderEnumeration("msb")) << endl;
-  cout << Isis::ByteOrderName(Isis::ByteOrderEnumeration("lsb")) << endl;
+  cout << ByteOrderName(ByteOrderEnumeration("msb")) << endl;
+  cout << ByteOrderName(ByteOrderEnumeration("lsb")) << endl;
 }

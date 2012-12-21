@@ -39,7 +39,7 @@ namespace Isis {
    * Constructs a PvlContainer object with a type.
    * @param type The type of the container.
    */
-  PvlContainer::PvlContainer(const std::string &type) {
+  PvlContainer::PvlContainer(const QString &type) {
     Init();
     p_name.SetName(type);
   }
@@ -50,7 +50,7 @@ namespace Isis {
    * @param type The type of container.
    * @param name The name of the container.
    */
-  PvlContainer::PvlContainer(const std::string &type, const std::string &name) {
+  PvlContainer::PvlContainer(const QString &type, const QString &name) {
     Init();
     p_name.SetName(type);
     SetName(name);
@@ -75,10 +75,10 @@ namespace Isis {
    * @return The PvlKeyword object.
    * @throws iException::Pvl The keyword doesn't exist.
    */
-  Isis::PvlKeyword &PvlContainer::FindKeyword(const std::string &name) {
+  Isis::PvlKeyword &PvlContainer::FindKeyword(const QString &name) {
     PvlKeywordIterator key = FindKeyword(name, Begin(), End());
     if(key == End()) {
-      string msg = "PVL Keyword [" + name + "] does not exist in [" +
+      QString msg = "PVL Keyword [" + name + "] does not exist in [" +
                    Type() + " = " + Name() + "]";
       if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -93,10 +93,10 @@ namespace Isis {
    * @return The PvlKeyword object.
    * @throws IException The keyword doesn't exist.
    */
-  const Isis::PvlKeyword &PvlContainer::FindKeyword(const std::string &name) const {
+  const Isis::PvlKeyword &PvlContainer::FindKeyword(const QString &name) const {
     ConstPvlKeywordIterator key = FindKeyword(name, Begin(), End());
     if(key == End()) {
-      string msg = "PVL Keyword [" + name + "] does not exist in [" +
+      QString msg = "PVL Keyword [" + name + "] does not exist in [" +
                    Type() + " = " + Name() + "]";
       if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -110,10 +110,10 @@ namespace Isis {
    * @param name The name of the keyword to remove.
    * @throws iException::Pvl Keyword doesn't exist.
    */
-  void PvlContainer::DeleteKeyword(const std::string &name) {
+  void PvlContainer::DeleteKeyword(const QString &name) {
     PvlKeywordIterator key = FindKeyword(name, Begin(), End());
     if(key == End()) {
-      string msg = "PVL Keyword [" + name + "] does not exist in [" +
+      QString msg = "PVL Keyword [" + name + "] does not exist in [" +
                    Type() + " = " + Name() + "]";
       if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -130,7 +130,7 @@ namespace Isis {
    */
   void PvlContainer::DeleteKeyword(const int index) {
     if(index >= (int)p_keywords.size() || index < 0) {
-      string msg = "The specified index is out of bounds in PVL [" +
+      QString msg = "The specified index is out of bounds in PVL [" +
                    Type() + " = " + Name() + "]";
       if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -172,7 +172,7 @@ namespace Isis {
    * @param name The name of the keyword to check for.
    * @return True if the keyword exists, false if it doesn't.
    */
-  bool PvlContainer::HasKeyword(const std::string &name) const {
+  bool PvlContainer::HasKeyword(const QString &name) const {
     ConstPvlKeywordIterator key = FindKeyword(name, Begin(), End());
     if(key == End()) return false;
     return true;
@@ -187,7 +187,7 @@ namespace Isis {
    */
   PvlKeyword &PvlContainer::operator[](const int index) {
     if(index < 0 || index >= (int)p_keywords.size()) {
-      string msg = Message::ArraySubscriptNotInRange(index);
+      QString msg = Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return *(p_keywords.begin() + index);
@@ -202,7 +202,7 @@ namespace Isis {
    */
   const Isis::PvlKeyword &PvlContainer::operator[](const int index) const {
     if(index < 0 || index >= (int)p_keywords.size()) {
-      string msg = Message::ArraySubscriptNotInRange(index);
+      QString msg = Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return *(p_keywords.begin() + index);
@@ -276,10 +276,10 @@ namespace Isis {
     // Include files take precedence over all other objects and groups
     for(int i = 0; i < outTemplate.Keywords(); i++) {
       if(outTemplate[i].IsNamed("Isis:PvlTemplate:File")) {
-        string filename = outTemplate[i];
+        QString filename = outTemplate[i];
         Isis::FileName file(filename);
         if(!file.fileExists()) {
-          string message = "Could not open the template file [" + filename + "]";
+          QString message = "Could not open the template file [" + filename + "]";
           throw IException(IException::Io, message, _FILEINFO_);
         }
         Isis::Pvl include(file.expanded());
@@ -298,7 +298,7 @@ namespace Isis {
     outTemplate = newTemp;
 
     // Figure out the longest keyword
-    unsigned int width = 0;
+    int width = 0;
     for(int i = 0; i < container.Keywords(); i++) {
       if(container[i].Name().length() > width) width = container[i].Name().length();
     }
@@ -364,7 +364,7 @@ namespace Isis {
    * @param end The ending iterator.
    * @return The keyword index.
    */
-  PvlContainer::PvlKeywordIterator PvlContainer::FindKeyword(const std::string &name,
+  PvlContainer::PvlKeywordIterator PvlContainer::FindKeyword(const QString &name,
       PvlContainer::PvlKeywordIterator beg,
       PvlContainer::PvlKeywordIterator end) {
     PvlKeyword temp(name);
@@ -379,7 +379,7 @@ namespace Isis {
    * @param end The ending iterator.
    * @return The keyword index.
    */
-  PvlContainer::ConstPvlKeywordIterator PvlContainer::FindKeyword(const std::string &name,
+  PvlContainer::ConstPvlKeywordIterator PvlContainer::FindKeyword(const QString &name,
       PvlContainer::ConstPvlKeywordIterator beg,
       PvlContainer::ConstPvlKeywordIterator end) const {
     PvlKeyword temp(name);
@@ -413,23 +413,23 @@ namespace Isis {
     int iTmplKeySize = Keywords();
     for(int i=0; i<iTmplKeySize; i++) {
       PvlKeyword & pvlTmplKwrd = (*this)[i];
-      string sKeyName = pvlTmplKwrd.Name();
+      QString sKeyName = pvlTmplKwrd.Name();
       bool bKwrdFound = false;
 
       // These are reserved keywords for properties like "Range", "Value", "Type",
       // "Required" or "Repeated"
-      if(sKeyName.find("__Required") != string::npos || sKeyName.find("__Repeated") != string::npos ||
-         sKeyName.find("__Range") != string::npos || sKeyName.find("__Value") != string::npos ||
-         sKeyName.find("__Type") != string::npos) {
+      if(sKeyName.contains("__Required") || sKeyName.contains("__Repeated") ||
+         sKeyName.contains("__Range") || sKeyName.contains("__Value") ||
+         sKeyName.contains("__Type")) {
         continue;
       }
 
       if(pPvlCont.HasKeyword(sKeyName)) {
         PvlKeyword & pvlKwrd = pPvlCont.FindKeyword(sKeyName);
-        string sTmplKwrdRange = sKeyName + "__Range";
-        string sTmplKwrdValue = sKeyName + "__Value";
-        string sTmplKwrdType  = sKeyName + "__Type";
-        string sType="";
+        QString sTmplKwrdRange = sKeyName + "__Range";
+        QString sTmplKwrdValue = sKeyName + "__Value";
+        QString sTmplKwrdType  = sKeyName + "__Type";
+        QString sType="";
         PvlKeyword pvlTmplKwrdRange, pvlTmplKwrdValue;
 
         // Check if Type is specified (positive or negative for numbers)
@@ -454,7 +454,7 @@ namespace Isis {
       }
       else {
         bKwrdFound = true;
-        string sOption = sKeyName + "__Required";
+        QString sOption = sKeyName + "__Required";
         if(HasKeyword(sOption)) {
           PvlKeyword pvlKeyOption = FindKeyword(sOption);
           if(pvlKeyOption[0] == "true") { // Required is true
@@ -463,7 +463,7 @@ namespace Isis {
         }
       }
       if (bKwrdFound == false) {
-        string sErrMsg = "Keyword \"" + sKeyName + "\" Not Found in the Template File\n";
+        QString sErrMsg = "Keyword \"" + sKeyName + "\" Not Found in the Template File\n";
         throw IException(IException::User, sErrMsg, _FILEINFO_);
       }
 
@@ -485,15 +485,15 @@ namespace Isis {
    */
   void PvlContainer::ValidateRepeatOption(PvlKeyword & pPvlTmplKwrd, PvlContainer & pPvlCont)
   {
-    string sTmplKeyName = pPvlTmplKwrd.Name();
+    QString sTmplKeyName = pPvlTmplKwrd.Name();
 
     // Check for the Type
-    string sType = sTmplKeyName + "__Type";
-    string sValueType ="";
+    QString sType = sTmplKeyName + "__Type";
+    QString sValueType ="";
     if(HasKeyword(sType)) {
       sValueType = FindKeyword(sType)[0];
     }
-    string sRepeatOption = sTmplKeyName + "__Repeated";
+    QString sRepeatOption = sTmplKeyName + "__Repeated";
     bool bRepeat =false;
     if(HasKeyword(sRepeatOption)) {
       PvlKeyword pvlKeyOption = FindKeyword(sRepeatOption);
@@ -505,7 +505,7 @@ namespace Isis {
       int iKeySize = pPvlCont.Keywords();
       for(int j=(iKeySize-1); j>=0; j--) {
         PvlKeyword & pvlKwrd = pPvlCont[j];
-        string sKeyName = pvlKwrd.Name();
+        QString sKeyName = pvlKwrd.Name();
         if(sTmplKeyName == sKeyName) {
           pPvlTmplKwrd.ValidateKeyword(pvlKwrd, sValueType);
           pPvlCont.DeleteKeyword(pvlKwrd.Name());

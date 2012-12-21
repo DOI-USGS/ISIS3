@@ -11,7 +11,7 @@ using namespace Isis;
 int main() {
   Isis::Preference::Preferences(true);
 
-  Isis::PvlKeyword dog("DOG", 5.2, "meters");
+  Isis::PvlKeyword dog("DOG", toString(5.2), "meters");
   Isis::PvlKeyword cat("CATTLE");
   cat = "Meow";
   cat.AddComment("Cats shed");
@@ -113,7 +113,7 @@ int main() {
   
   // PvlGroup to be Validated
   PvlGroup pvlGrp("Point_errormagnitude");
-  PvlKeyword pvlKwrd("LessThan", 2.5);
+  PvlKeyword pvlKwrd("LessThan", toString(2.5));
   
   try {
     pvlTmplGrp.ValidateGroup(pvlGrp);
@@ -127,19 +127,19 @@ int main() {
   // Test Repeated values
   try {
     pvlKwrd.Clear();
-    PvlKeyword pvlKwrd("LessThan", 2.5);
+    PvlKeyword pvlKwrd("LessThan", toString(2.5));
     pvlGrp += pvlKwrd;
     
     pvlKwrd.Clear();
-    pvlKwrd = PvlKeyword("GreaterThan", 3.5);
+    pvlKwrd = PvlKeyword("GreaterThan", toString(3.5));
     pvlGrp += pvlKwrd;
     
     pvlKwrd.Clear();
-    pvlKwrd = PvlKeyword("GreaterThan", 4.4545);
+    pvlKwrd = PvlKeyword("GreaterThan", toString(4.4545));
     pvlGrp += pvlKwrd;
     
     pvlKwrd.Clear();
-    pvlKwrd = PvlKeyword("GreaterThan", 100.8988095);
+    pvlKwrd = PvlKeyword("GreaterThan", toString(100.8988095));
     pvlGrp += pvlKwrd;
     pvlTmplGrp.ValidateGroup(pvlGrp);
     
@@ -154,11 +154,11 @@ int main() {
   // Test for unvalidated elements
   try {
     pvlKwrd.Clear();
-    PvlKeyword pvlKwrd("Less123Than", 2.5);
+    PvlKeyword pvlKwrd("Less123Than", toString(2.5));
     pvlGrp += pvlKwrd;
     
     pvlKwrd.Clear();
-    pvlKwrd = PvlKeyword("GreaterThan", 3.5);
+    pvlKwrd = PvlKeyword("GreaterThan", toString(3.5));
     pvlGrp += pvlKwrd;
 
     pvlTmplGrp.ValidateGroup(pvlGrp);

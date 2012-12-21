@@ -27,8 +27,6 @@ using namespace std;
 
 #include "Message.h"
 
-string Isis::Message::KeywordAmbiguous(const string &key) {
-  string message;
-  message = "Keyword [" + key + "] ambiguous";
-  return message;
+QString Isis::Message::KeywordAmbiguous(const QString &key) {
+  return "Keyword [" + key + "] ambiguous";
 }

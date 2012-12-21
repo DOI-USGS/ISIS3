@@ -1,5 +1,5 @@
 #include "Isis.h"
-#include <string>
+#include <QString>
 #include "ProcessBySample.h"
 #include "ProcessByLine.h"
 #include "ProcessBySpectra.h"
@@ -24,7 +24,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // set spline interpolation to user requested type
-  string splineType = ui.GetString("INTERP");
+  QString splineType = ui.GetString("INTERP");
   if(splineType == "LINEAR") {
     iType = NumericalApproximation::Linear;
   }
@@ -36,7 +36,7 @@ void IsisMain() {
   }
 
   //Set null direction to the user defined direction
-  string  Dir = ui.GetString("DIRECTION");
+  QString  Dir = ui.GetString("DIRECTION");
   if(Dir == "SAMPLE") {
     ProcessBySample p;
     p.SetInputCube("FROM");
@@ -63,7 +63,7 @@ void IsisMain() {
   if(numSpecPixKept > 0) {
     PvlGroup mLog("Messages");
     mLog += PvlKeyword("Warning",
-                       "Unable to fill " + IString(numSpecPixKept) + " special pixels.");
+                       "Unable to fill " + toString(numSpecPixKept) + " special pixels.");
     Application::Log(mLog);
   }
   return;

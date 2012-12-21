@@ -42,7 +42,7 @@ namespace Isis {
    * @f]
    * has three coefficients: C1, C2 & C3.
    */
-  BasisFunction::BasisFunction(const std::string &name, int numVars, int numCoefs) {
+  BasisFunction::BasisFunction(const QString &name, int numVars, int numCoefs) {
     p_name = name;
     p_numVars = numVars;
     p_numCoefs = numCoefs;
@@ -55,7 +55,7 @@ namespace Isis {
    */
   void BasisFunction::SetCoefficients(const std::vector<double> &coefs) {
     if((int)coefs.size() != p_numCoefs) {
-      IString msg = "[coefs] does not match number of coefficients ";
+      QString msg = "[coefs] does not match number of coefficients ";
       msg += "in the basis equation";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -73,14 +73,14 @@ namespace Isis {
    */
   double BasisFunction::Evaluate(const std::vector<double> &vars) {
     if((int)vars.size() != p_numVars) {
-      std::string msg = "[vars] does not match the number of variables ";
+      QString msg = "[vars] does not match the number of variables ";
       msg += "in the basis equation";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     Expand(vars);
     if((int)p_terms.size() != p_numCoefs) {
-      std::string msg = "Expansion of [terms] does not match number of ";
+      QString msg = "Expansion of [terms] does not match number of ";
       msg += "coefficients in the basis equation";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

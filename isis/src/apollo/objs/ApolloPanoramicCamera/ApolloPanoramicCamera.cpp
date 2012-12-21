@@ -35,26 +35,26 @@ namespace Isis {
 
 
       //following keywords in InstrumentAddendum file
-      IString ikernKey = "INS" + IString((int)naifIkCode()) + "_CONSTANT_TIME_OFFSET";
+      QString ikernKey = "INS" + toString((int)naifIkCode()) + "_CONSTANT_TIME_OFFSET";
       constantTimeOffset = getDouble(ikernKey);
 
-      ikernKey = "INS" + IString((int)naifIkCode()) + "_ADDITIONAL_PREROLL";
+      ikernKey = "INS" + toString((int)naifIkCode()) + "_ADDITIONAL_PREROLL";
       additionalPreroll = getDouble(ikernKey);
 
-      ikernKey = "INS" + IString((int)naifIkCode()) + "_ADDITIVE_LINE_ERROR";
+      ikernKey = "INS" + toString((int)naifIkCode()) + "_ADDITIVE_LINE_ERROR";
       additiveLineTimeError = getDouble(ikernKey);
 
-      ikernKey = "INS" + IString((int)naifIkCode()) + "_MULTIPLI_LINE_ERROR";
+      ikernKey = "INS" + toString((int)naifIkCode()) + "_MULTIPLI_LINE_ERROR";
       multiplicativeLineTimeError = getDouble(ikernKey);
  
       Isis::PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
-      IString stime = (string)inst["StartTime"];  
+      QString stime = (QString)inst["StartTime"];  
       SpiceDouble etStart;
-      str2et_c(stime.c_str(), &etStart);
-      stime = (string) inst["StopTime"];
+      str2et_c(stime.toAscii().data(), &etStart);
+      stime = (QString) inst["StopTime"];
       SpiceDouble etStop;
-      str2et_c(stime.c_str(), &etStop);
-      iTime isisTime( (string) inst["StartTime"]);
+      str2et_c(stime.toAscii().data(), &etStop);
+      iTime isisTime( (QString) inst["StartTime"]);
       
       // Get other info from labels
       // line exposure duration, sec/mm
@@ -101,7 +101,7 @@ namespace Isis {
       new LineScanCameraSkyMap(this);
 
       Isis::PvlGroup &instP = lab.FindGroup("Kernels", Isis::Pvl::Traverse);
-      m_CkFrameId = (int) instP["NaifFrameCode"][0];
+      m_CkFrameId = toInt(instP["NaifFrameCode"][0]);
       m_CkFrameId = -int(-m_CkFrameId/1000)*1000;
 
       LoadCache();

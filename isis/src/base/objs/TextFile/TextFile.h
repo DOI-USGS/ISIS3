@@ -25,6 +25,8 @@
 #include <fstream>
 #include <vector>
 
+#include <QString>
+
 namespace Isis {
   /**
    * @brief Provides access to sequential ASCII stream I/O
@@ -55,41 +57,41 @@ namespace Isis {
       std::fstream p_stream;           //!< File stream handle
       int     p_openmode;              /**< openmode of file: Input, Output,
                                            Overwrite, Append*/
-      std::string  p_filename;         //!< FileName of the opened file.
-      std::string  p_commentString;    /**< 'comment' string used by GetLine and
+      QString  p_filename;         //!< FileName of the opened file.
+      QString  p_commentString;    /**< 'comment' string used by GetLine and
                                            PutLineComment*/
-      std::string  p_newLineString;    /**< 'newline' string used by PutLine and
+      QString  p_newLineString;    /**< 'newline' string used by PutLine and
                                            PutLineComment*/
 
-      bool p_GetLine(std::string &line, bool chkComment);
+      bool p_GetLine(QString &line, bool chkComment);
 
     public:
       // Constructors and destructors
       TextFile();
 
       // implied open file
-      TextFile(const std::string &filename, const char *openmode = "input",
+      TextFile(const QString &filename, const char *openmode = "input",
                const char *extension = "");
 
       // implied getFile/putFile
       TextFile(const   char *filename, const char *openmode,
-               std::vector<std::string> &lines,
+               std::vector<QString> &lines,
                const int &maxLinesToReadWrite = 0,
                const bool skipComments = true);
-      TextFile(const std::string &filename,
-               const char *openmode, std::vector<std::string> &lines,
+      TextFile(const QString &filename,
+               const char *openmode, std::vector<QString> &lines,
                const int &maxLinesToReadWrite = 0,
                const bool skipComments = true);
       TextFile(const   char *filename,
-               const char *openmode, std::string *lines,
+               const char *openmode, QString *lines,
                const int &maxLinesToReadWrite, const bool skipComments = true);
-      TextFile(const std::string &filename,
-               const char *openmode, std::string *lines,
+      TextFile(const QString &filename,
+               const char *openmode, QString *lines,
                const int &maxLinesToReadWrite, const bool skipComments = true);
 
       ~TextFile();
 
-      void Open(const std::string &filename, const char *openmode = "input",
+      void Open(const QString &filename, const char *openmode = "input",
                 const char *extension = "");
       void Open(const char *filename, const char *openmode = "input",
                 const char *extension = "");
@@ -99,30 +101,30 @@ namespace Isis {
       void Rewind();
       void Close();
 
-      void GetFile(std::vector<std::string> &lines, 
+      void GetFile(std::vector<QString> &lines, 
                    const int &maxLinesToRead = 0, 
                    const bool skipComments = true);
-      void GetFile(std::string *lines, const int &maxLinesToRead, 
+      void GetFile(QString *lines, const int &maxLinesToRead, 
                    const bool skipComments = true);
 
-      void PutFile(std::vector<std::string> &lines, 
+      void PutFile(std::vector<QString> &lines, 
                    const int &maxLinesToWrite = 0);
-      void PutFile(const std::string *lines, const int &maxLinesToWrite);
+      void PutFile(const QString *lines, const int &maxLinesToWrite);
 
-      bool GetLine(std::string &line, const bool skipComments = true);
-      bool GetLineNoFilter(std::string &line);
+      bool GetLine(QString &line, const bool skipComments = true);
+      bool GetLineNoFilter(QString &line);
 
       bool GetLine(const bool skipComments = true);
       bool GetLineNoFilter();
 
-      void PutLine(const std::string &line);
+      void PutLine(const QString &line);
       void PutLine(const char *line = "");
 
-      void PutLineComment(const std::string &line);
+      void PutLineComment(const QString &line);
       void PutLineComment(const char *line = "");
 
-      std::string GetComment();
-      std::string GetNewLine();
+      QString GetComment();
+      QString GetNewLine();
 
       void SetComment(const char *commentString = "#");
       void SetNewLine(const char *newLineString = "\n");

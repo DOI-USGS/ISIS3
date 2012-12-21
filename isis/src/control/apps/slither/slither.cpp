@@ -23,12 +23,12 @@ void IsisMain() {
 
   // Get the control point file
   UserInterface &ui = Application::GetUserInterface();
-  string cfile = ui.GetFileName("CONTROL");
+  QString cfile = ui.GetFileName("CONTROL");
   ControlNet cn(cfile);
 
   //  Set default type to Cubic spline interpolation
   NumericalApproximation::InterpType iType(NumericalApproximation::CubicNatural);
-  string splineType = ui.GetString("SPLINE");
+  QString splineType = ui.GetString("SPLINE");
   if(splineType == "LINEAR") {
     iType = NumericalApproximation::Linear;
   }
@@ -47,7 +47,7 @@ void IsisMain() {
   SlitherTransform transform(*icube, cn, iType, iType);
   transform.addLineOffset(lineOffset);
   transform.addSampleOffset(sampleOffset);
-  string splineDir = ui.GetString("DIRECTION");
+  QString splineDir = ui.GetString("DIRECTION");
   if(splineDir == "REVERSE") {
     transform.setReverse();
   }
@@ -55,9 +55,9 @@ void IsisMain() {
   //  Dump the transform statistics
   if(ui.WasEntered("RESULTS")) {
     // Get the control point file
-    string rFile = FileName(ui.GetFileName("RESULTS")).expanded();
+    QString rFile = FileName(ui.GetFileName("RESULTS")).expanded();
     ofstream os;
-    os.open(rFile.c_str(), ios::out);
+    os.open(rFile.toAscii().data(), ios::out);
     os << "#  Slither Transform Results\n"
        << "#  RunDate: " << iTime::CurrentLocalTime() << endl
        << "#    FROM:     " << icube->getFileName() << endl
@@ -83,7 +83,7 @@ void IsisMain() {
     interp = new Interpolator(Interpolator::CubicConvolutionType);
   }
   else {
-    string msg = "Unknown value for INTERP [" +
+    QString msg = "Unknown value for INTERP [" +
                  ui.GetString("INTERP") + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }

@@ -22,8 +22,12 @@
  */
 
 #include <sstream>
+
+#include <QString>
+
 #include "PvlSequence.h"
 #include "Pvl.h"
+#include "IString.h"
 
 namespace Isis {
   /**
@@ -48,13 +52,13 @@ namespace Isis {
    *
    * @param  array  A string representing an array.
    */
-  PvlSequence &PvlSequence::operator+=(const std::string &array) {
+  PvlSequence &PvlSequence::operator+=(const QString &array) {
     std::stringstream str;
     str << "temp = " << array;
     Pvl pvl;
     str >> pvl;
     PvlKeyword &key = pvl["temp"];
-    std::vector<IString> temp;
+    std::vector<QString> temp;
     for(int i = 0; i < key.Size(); i++) {
       temp.push_back(key[i]);
     }
@@ -68,10 +72,10 @@ namespace Isis {
    *
    * @param  array  vector of strings
    */
-  PvlSequence &PvlSequence::operator+=(std::vector<std::string> &array) {
-    std::vector<IString> temp;
+  PvlSequence &PvlSequence::operator+=(std::vector<QString> &array) {
+    std::vector<QString> temp;
     for(int i = 0; i < (int)array.size(); i++) {
-      temp.push_back(IString(array[i]));
+      temp.push_back(array[i]);
     }
     p_sequence.push_back(temp);
     return *this;
@@ -84,9 +88,9 @@ namespace Isis {
    * @param  array  vector of integers
    */
   PvlSequence &PvlSequence::operator+=(std::vector<int> &array) {
-    std::vector<IString> temp;
+    std::vector<QString> temp;
     for(int i = 0; i < (int)array.size(); i++) {
-      temp.push_back(IString(array[i]));
+      temp.push_back(toString(array[i]));
     }
     p_sequence.push_back(temp);
     return *this;
@@ -99,9 +103,9 @@ namespace Isis {
    * @param  array  vector of doubles
    */
   PvlSequence &PvlSequence::operator+=(std::vector<double> &array) {
-    std::vector<IString> temp;
+    std::vector<QString> temp;
     for(int i = 0; i < (int)array.size(); i++) {
-      temp.push_back(IString(array[i]));
+      temp.push_back(toString(array[i]));
     }
     p_sequence.push_back(temp);
     return *this;

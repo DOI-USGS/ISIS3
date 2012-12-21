@@ -19,7 +19,7 @@ namespace Isis {
       FileList list(psListFile);
       int size = list.size();
       for(int i = 0; i < size; i++) {
-        qList.insert(i, list[i].toString().ToQt());
+        qList.insert(i, list[i].toString());
         mbFound.push_back(false);
       }
       mqCpList = QStringList(qList);
@@ -28,7 +28,7 @@ namespace Isis {
       mqCpList.sort();
     }
     catch(IException &e) {
-      std::string msg = "Can't open or invalid file list [" +
+      QString msg = "Can't open or invalid file list [" +
           psListFile.expanded() + "]";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
@@ -49,8 +49,8 @@ namespace Isis {
    *
    * @return bool
    */
-  bool ControlPointList::HasControlPoint(const std::string &psCpId) {
-    int index = mqCpList.indexOf(QString(psCpId.c_str()));
+  bool ControlPointList::HasControlPoint(const QString &psCpId) {
+    int index = mqCpList.indexOf(QString(psCpId));
 
     if(index == -1 || index >= Size())
       return false;
@@ -75,16 +75,16 @@ namespace Isis {
    *
    * @param piIndex The index of the desired control point id
    *
-   * @return std::string The control point id returned
+   * @return QString The control point id returned
    */
-  std::string ControlPointList::ControlPointId(int piIndex) {
+  QString ControlPointList::ControlPointId(int piIndex) {
     int size = Size();
     if(piIndex >= 0 && piIndex < size) {
-      return (mqCpList.value(piIndex).toStdString());
+      return (mqCpList.value(piIndex));
     }
     else {
-      IString num = IString(piIndex);
-      std::string msg = "Index [" + (std::string) num + "] is invalid";
+      QString num = toString(piIndex);
+      QString msg = "Index [" + num + "] is invalid";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -96,12 +96,12 @@ namespace Isis {
    *
    * @return int The index of the control point id
    */
-  int ControlPointList::ControlPointIndex(const std::string &psCpId) {
+  int ControlPointList::ControlPointIndex(const QString &psCpId) {
     if(HasControlPoint(psCpId)) {
-      return mqCpList.indexOf(QString(psCpId.c_str()));
+      return mqCpList.indexOf(QString(psCpId));
     }
     else {
-      std::string msg = "Requested control point id [" + psCpId + "] ";
+      QString msg = "Requested control point id [" + psCpId + "] ";
       msg += "does not exist in the list";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -116,21 +116,21 @@ namespace Isis {
   void ControlPointList::RegisterStatistics(Pvl &pcPvlLog) {
     int size = Size();
     int iNotFound = 0;
-    std::string sPointsNotFound = "";
+    QString sPointsNotFound = "";
 
     for(int i = 0; i < size; i++) {
       if(!mbFound[i]) {
         if(iNotFound) {
           sPointsNotFound += ", ";
         }
-        sPointsNotFound += mqCpList.value(i).toStdString();
+        sPointsNotFound += mqCpList.value(i);
         iNotFound++;
       }
     }
 
-    pcPvlLog += Isis::PvlKeyword("TotalPoints", size);
-    pcPvlLog += Isis::PvlKeyword("ValidPoints", size - iNotFound);
-    pcPvlLog += Isis::PvlKeyword("InvalidPoints", iNotFound);
+    pcPvlLog += Isis::PvlKeyword("TotalPoints", toString(size));
+    pcPvlLog += Isis::PvlKeyword("ValidPoints", toString(size - iNotFound));
+    pcPvlLog += Isis::PvlKeyword("InvalidPoints", toString(iNotFound));
     pcPvlLog += Isis::PvlKeyword("InvalidPointIds", sPointsNotFound);
   }
 }

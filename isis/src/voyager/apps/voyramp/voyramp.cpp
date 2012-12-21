@@ -64,15 +64,15 @@ void IsisMain() {
 
   // Verify Voyager1 spacecraft
   if (inst["SpacecraftName"][0] != "VOYAGER_1") {
-    string msg = "The cube [" + ui.GetFileName("FROM") + "] does not appear" +
-                 " to be a Voyager1 image";
+    QString msg = "The cube [" + ui.GetFileName("FROM") + "] does not appear" +
+                  " to be a Voyager1 image";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Verify has been radiometrically calibrated
   if (!isiscube.HasGroup("Radiometry")) {
-    string msg = "The cube [" + ui.GetFileName("FROM") + "] has not been" +
-                 "radiometrically corrected, run voycal first";
+    QString msg = "The cube [" + ui.GetFileName("FROM") + "] has not been" +
+                  "radiometrically corrected, run voycal first";
   }
 
   // Image time
@@ -84,9 +84,9 @@ void IsisMain() {
 
   // From Isis2, the time range is day 64, hours 1-16, inclusive.
   if (time < min || time >= max) {
-    string message = "The cube [" + ui.GetFileName("FROM") + "] has image" +
-                     " time [" + time.UTC() + "] outside of allowable" +
-                     "range [" + min.UTC() + "] to [" + max.UTC() + "]";
+    QString message = "The cube [" + ui.GetFileName("FROM") + "] has image" +
+                      " time [" + time.UTC() + "] outside of allowable" +
+                      "range [" + min.UTC() + "] to [" + max.UTC() + "]";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
@@ -147,10 +147,10 @@ void IsisMain() {
   plasmaC = detb3/deta;
 
   // Create data to go in Radiometry group
-  PvlKeyword top = PvlKeyword("TopCorrectiveDN", y1);
+  PvlKeyword top = PvlKeyword("TopCorrectiveDN", toString(y1));
   top.AddComment("Voyramp plasma torus corrective DN values:");
-  PvlKeyword mid = PvlKeyword("MiddleCorrectiveDN", y2);
-  PvlKeyword bot = PvlKeyword("BottomCorrectiveDN", y3);
+  PvlKeyword mid = PvlKeyword("MiddleCorrectiveDN", toString(y2));
+  PvlKeyword bot = PvlKeyword("BottomCorrectiveDN", toString(y3));
 
   // Add it
   radio += top;

@@ -69,25 +69,26 @@ namespace Isis {
     PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
 
     //  Vis or IR
-    p_channel = (string) inst ["Channel"];
+    p_channel = (QString) inst ["Channel"];
     // Get the start time in et
-    IString stime = (string) inst ["NativeStartTime"];
-    string intTime = stime.Token(".");
+    QString stime = (QString) inst ["NativeStartTime"];
+    QString intTime = stime.split(".").first();
+    stime = stime.split(".").last();
 
     p_etStart = p_camera->getClockTime(intTime).Et();
-    p_etStart += stime.ToDouble() / 15959.0;
+    p_etStart += toDouble(stime) / 15959.0;
 
     //----------------------------------------------------------------------
     //  Because of inaccuracy with the 15 Mhz clock, the IR exposure and
     //  interline delay need to be adjusted.
     //----------------------------------------------------------------------
     p_irExp = (double) inst ["ExposureDuration"] / 1000.;
-    p_visExp = (double) inst ["ExposureDuration"][1] / 1000.;
+    p_visExp = toDouble(inst ["ExposureDuration"][1]) / 1000.;
     p_interlineDelay =
       (double) inst ["InterlineDelayDuration"] / 1000.;
 
     // Get summation mode
-    string sampMode = IString((string)inst ["SamplingMode"]).UpCase();
+    QString sampMode = QString((QString)inst ["SamplingMode"]).toUpper();
 
     //  Get sample/line offsets
     int sampOffset = inst ["XOffset"];
@@ -107,7 +108,7 @@ namespace Isis {
     //tack on _HR or _NY for other summing modes.
     // Get the directory for the unit vector files.
     PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
-    IString vecDir = (string) dataDir["Cassini"] + "/unitVectors/";
+    QString vecDir = (QString) dataDir["Cassini"] + "/unitVectors/";
 
     FileName vectorFile;
     if(p_channel == "VIS") {
@@ -157,8 +158,8 @@ namespace Isis {
     }
 
     ifstream fin;
-    string vectorFileName(vectorFile.expanded());
-    fin.open(vectorFileName.c_str(), ios::in | ios::binary);
+    QString vectorFileName(vectorFile.expanded());
+    fin.open(vectorFileName.toAscii().data(), ios::in | ios::binary);
     if(!fin.is_open()) {
       string msg = "Can't open unit vector file";
       throw IException(IException::Io, msg, _FILEINFO_);

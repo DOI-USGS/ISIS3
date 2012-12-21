@@ -32,7 +32,7 @@ struct spRange {
 
 void specpix(Buffer &in, Buffer &out);
 bool descending(const spRange &r1, const spRange &r2);
-void addRange(string minName, string maxName, SpecPix pixel);
+void addRange(QString minName, QString maxName, SpecPix pixel);
 
 
 vector <spRange> rangeList;
@@ -91,13 +91,13 @@ void IsisMain() {
   //  Print out number of values changed
   PvlGroup results("Results");
   results.AddComment("The number and type of pixels created");
-  results += PvlKeyword("Null", nnull);
-  results += PvlKeyword("Lrs", nlrs);
-  results += PvlKeyword("Lis", nlis);
-  results += PvlKeyword("Hrs", nhrs);
-  results += PvlKeyword("His", nhis);
+  results += PvlKeyword("Null", toString(nnull));
+  results += PvlKeyword("Lrs", toString(nlrs));
+  results += PvlKeyword("Lis", toString(nlis));
+  results += PvlKeyword("Hrs", toString(nhrs));
+  results += PvlKeyword("His", toString(nhis));
   int total = nnull + nlrs + nhrs + nlis + nhis;
-  results += PvlKeyword("Total", total);
+  results += PvlKeyword("Total", toString(total));
 
   Application::Log(results);
 
@@ -159,7 +159,7 @@ bool descending(const spRange &r1, const spRange &r2) {
 }
 
 
-void addRange(string minName, string maxName, SpecPix pixel) {
+void addRange(QString minName, QString maxName, SpecPix pixel) {
   UserInterface &ui = Application::GetUserInterface();
 
   if (ui.WasEntered(minName) && ui.WasEntered(maxName)) {

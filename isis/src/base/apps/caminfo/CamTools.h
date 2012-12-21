@@ -49,14 +49,14 @@ namespace Isis {
    *
    * @return PvlKeyword Returns newly created keyword/value
    */
-  inline PvlKeyword ValidateKey(const std::string keyname,
+  inline PvlKeyword ValidateKey(const QString keyname,
                                 const double &value,
-                                const std::string &unit = "") {
+                                const QString &unit = "") {
     if(IsSpecial(value)) {
       return (PvlKeyword(keyname, "NULL"));
     }
     else {
-      return (PvlKeyword(keyname, value, unit));
+      return (PvlKeyword(keyname, toString(value), unit));
     }
   }
 
@@ -72,8 +72,8 @@ namespace Isis {
    * @return PvlKeyword Returns newly created keyword/value
    */
 
-  inline PvlKeyword ValidateKey(const std::string keyname, PvlKeyword &key,
-                                const std::string &unit = "") {
+  inline PvlKeyword ValidateKey(const QString keyname, PvlKeyword &key,
+                                const QString &unit = "") {
     if(key.IsNull()) {
       return (PvlKeyword(keyname, "NULL"));
     }
@@ -216,7 +216,7 @@ namespace Isis {
 
         int lines, samples, bands;
         int band, realBand;
-        std::string target;
+        QString target;
         double centerLine, centerSamp;
         double centerLatitude, centerLongitude;
         double radius;
@@ -232,7 +232,7 @@ namespace Isis {
         double localSolartime, targetCenterDistance, slantDistance;
         double subSolarLatitude, subSolarLongitude;
         double subSpacecraftLatitude, subSpacecraftLongitude;
-        std::string startTime, endTime;
+        QString startTime, endTime;
         double parallaxx, parallaxy, shadowx, shadowy;
         double upperLeftLongitude, upperLeftLatitude;
         double lowerLeftLongitude, lowerLeftLatitude;

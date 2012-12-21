@@ -23,15 +23,15 @@
  *   http://www.usgs.gov/privacy.html.
  */
 #include <cctype>
-#include <string>
+#include <QString>
 #include <map>
 #include <algorithm>
 #include <functional>
 #include <sstream>
 #include <iomanip>
 #include <exception>
-#include "IString.h"
 #include "IException.h"
+#include "IString.h"
 #include <gsl/gsl_math.h>
 
 
@@ -294,7 +294,7 @@ namespace Isis {
    * // keys without regard to case via the NoCaseStringCompare.
    *  #include "CollectorMap.h"
    *
-   *  CollectorMap<std::string, double, NoCaseStringCompare > dmap;
+   *  CollectorMap<QString, double, NoCaseStringCompare > dmap;
    *  cout << "\nSize of double map = " << dmap.size() << endl;
    *  dmap.add("one", 1.0);
    *  dmap.add("two", 2.0);
@@ -351,7 +351,7 @@ namespace Isis {
    *  @code
    *  #include "CollectorMap.h"
    *
-   *  typedef CollectorMap<int,std::string> IntStr;
+   *  typedef CollectorMap<int,QString> IntStr;
    *  IntStr dupstr(IntStr::DuplicateKeys);
    *  dupstr.add(1,"One");
    *  dupstr.add(1, "One #2");
@@ -568,7 +568,7 @@ namespace Isis {
       T &get(const K &key) {
         CollectorIter cItr = _list.find(key);
         if(cItr == _list.end()) {
-          std::string mess = "Requested value does not exist!";
+          QString mess = "Requested value does not exist!";
           throw IException(IException::Programmer, mess, _FILEINFO_);
         }
         return (cItr->second);
@@ -582,7 +582,7 @@ namespace Isis {
       const T &get(const K &key) const {
         CollectorConstIter cItr = _list.find(key);
         if(cItr == _list.end()) {
-          std::string mess = "Requested value does not exist!";
+          QString mess = "Requested value does not exist!";
           throw IException(IException::Programmer, mess, _FILEINFO_);
         }
         return (cItr->second);

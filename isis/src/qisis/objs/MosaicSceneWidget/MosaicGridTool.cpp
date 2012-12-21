@@ -138,7 +138,7 @@ namespace Isis {
   QString MosaicGridTool::latType() {
     QString result;
     if (getWidget()->getProjection())
-      result = QString::fromStdString(getWidget()->getProjection()->LatitudeTypeString());
+      result = getWidget()->getProjection()->LatitudeTypeString();
     return result;
   }
   
@@ -151,7 +151,7 @@ namespace Isis {
   QString MosaicGridTool::lonDomain() {
     QString result;
     if (getWidget()->getProjection())
-      result = QString::fromStdString(getWidget()->getProjection()->LongitudeDomainString());
+      result = getWidget()->getProjection()->LongitudeDomainString();
     return result;
   }
 
@@ -292,9 +292,9 @@ namespace Isis {
     if (proj) {
       PvlGroup mappingGroup(proj->Mapping());
 
-      Distance equatorialRadius(proj->Mapping()["EquatorialRadius"][0].ToDouble(),
+      Distance equatorialRadius(toDouble(proj->Mapping()["EquatorialRadius"][0]),
                                 Distance::Meters);
-      Distance polarRadius(proj->Mapping()["PolarRadius"][0].ToDouble(), Distance::Meters);
+      Distance polarRadius(toDouble(proj->Mapping()["PolarRadius"][0]), Distance::Meters);
 
       QRectF boundingRect = getWidget()->cubesBoundingRect();
 
@@ -523,59 +523,59 @@ namespace Isis {
 
     if (getWidget()->getProjection()) {
       Distance equatorialRadius(
-        getWidget()->getProjection()->Mapping()["EquatorialRadius"][0].ToDouble(),
+          toDouble(getWidget()->getProjection()->Mapping()["EquatorialRadius"][0]),
                                 Distance::Meters);
       Distance polarRadius(
-        getWidget()->getProjection()->Mapping()["PolarRadius"][0].ToDouble(),
+          toDouble(getWidget()->getProjection()->Mapping()["PolarRadius"][0]),
                                 Distance::Meters);
 
       if (obj["BaseLatitude"][0] != "Null")
-        m_baseLat = Latitude(obj["BaseLatitude"][0].ToDouble(), equatorialRadius, polarRadius,
+        m_baseLat = Latitude(toDouble(obj["BaseLatitude"][0]), equatorialRadius, polarRadius,
                             Latitude::Planetocentric, Angle::Degrees);
 
       if (obj["BaseLongitude"][0] != "Null")
-        m_baseLon = Longitude(obj["BaseLongitude"][0].ToDouble(), Angle::Degrees);
+        m_baseLon = Longitude(toDouble(obj["BaseLongitude"][0]), Angle::Degrees);
 
       if (obj["LatitudeIncrement"][0] != "Null")
-        m_latInc = Angle(obj["LatitudeIncrement"][0].ToDouble(), Angle::Degrees);
+        m_latInc = Angle(toDouble(obj["LatitudeIncrement"][0]), Angle::Degrees);
 
       if (obj["LongitudeIncrement"][0] != "Null")
-        m_lonInc = Angle(obj["LongitudeIncrement"][0].ToDouble(), Angle::Degrees);
+        m_lonInc = Angle(toDouble(obj["LongitudeIncrement"][0]), Angle::Degrees);
 
       if (obj.HasKeyword("LatitudeExtentType")) {
         if (obj["LatitudeExtentType"][0] != "Null")
-          m_latExtents = (GridExtentSource)obj["LatitudeExtentType"][0].ToInteger();
+          m_latExtents = (GridExtentSource)toInt(obj["LatitudeExtentType"][0]);
       }
 
       if (obj.HasKeyword("MinimumLatitude")) {
         if (obj["MinimumLatitude"][0] != "Null")
-          m_minLat = Latitude(obj["MinimumLatitude"][0].ToDouble(), equatorialRadius, polarRadius,
+          m_minLat = Latitude(toDouble(obj["MinimumLatitude"][0]), equatorialRadius, polarRadius,
                               Latitude::Planetocentric, Angle::Degrees);
       }
 
       if (obj.HasKeyword("MaximumLatitude")) {
         if (obj["MaximumLatitude"][0] != "Null")
-          m_maxLat = Latitude(obj["MaximumLatitude"][0].ToDouble(), equatorialRadius, polarRadius,
+          m_maxLat = Latitude(toDouble(obj["MaximumLatitude"][0]), equatorialRadius, polarRadius,
                               Latitude::Planetocentric, Angle::Degrees);
       }
 
       if (obj.HasKeyword("LongitudeExtentType")) {
         if (obj["LongitudeExtentType"][0] != "Null")
-          m_lonExtents = (GridExtentSource)obj["LongitudeExtentType"][0].ToInteger();
+          m_lonExtents = (GridExtentSource)toInt(obj["LongitudeExtentType"][0]);
       }
 
       if (obj.HasKeyword("MinimumLongitude")) {
         if (obj["MinimumLongitude"][0] != "Null")
-          m_minLon = Longitude(obj["MinimumLongitude"][0].ToDouble(), Angle::Degrees);
+          m_minLon = Longitude(toDouble(obj["MinimumLongitude"][0]), Angle::Degrees);
       }
 
       if (obj.HasKeyword("MaximumLongitude")) {
         if (obj["MaximumLongitude"][0] != "Null")
-          m_maxLon = Longitude(obj["MaximumLongitude"][0].ToDouble(), Angle::Degrees);
+          m_maxLon = Longitude(toDouble(obj["MaximumLongitude"][0]), Angle::Degrees);
       }
 
       if (obj["Density"][0] != "Null")
-        m_density = obj["Density"][0].ToDouble();
+        m_density = toDouble(obj["Density"][0]);
 
 
       if (obj.HasKeyword("CheckTheBoxes")) {
@@ -584,7 +584,7 @@ namespace Isis {
         }
       }
 
-      if((int)obj["Visible"][0] != 0) {
+      if(toBool(obj["Visible"][0])) {
         drawGrid();
       }
     }
@@ -596,7 +596,7 @@ namespace Isis {
    *
    * @return The name in string form.
    */
-  IString MosaicGridTool::projectPvlObjectName() const {
+  QString MosaicGridTool::projectPvlObjectName() const {
     return "MosaicGridTool";
   }
 
@@ -609,24 +609,24 @@ namespace Isis {
   PvlObject MosaicGridTool::toPvl() const {
     PvlObject obj(projectPvlObjectName());
 
-    obj += PvlKeyword("ShouleCheckBoxes", m_shouldCheckBoxes);
+    obj += PvlKeyword("ShouldCheckBoxes", toString(m_shouldCheckBoxes));
     
-    obj += PvlKeyword("BaseLatitude", m_baseLat.degrees());
-    obj += PvlKeyword("BaseLongitude", m_baseLon.degrees());
+    obj += PvlKeyword("BaseLatitude", toString(m_baseLat.degrees()));
+    obj += PvlKeyword("BaseLongitude", toString(m_baseLon.degrees()));
     
-    obj += PvlKeyword("LatitudeIncrement", m_latInc.degrees());
-    obj += PvlKeyword("LongitudeIncrement", m_lonInc.degrees());
+    obj += PvlKeyword("LatitudeIncrement", toString(m_latInc.degrees()));
+    obj += PvlKeyword("LongitudeIncrement", toString(m_lonInc.degrees()));
     
-    obj += PvlKeyword("LatitudeExtentType", m_latExtents);
-    obj += PvlKeyword("MaximumLatitude", m_maxLat.degrees());
-    obj += PvlKeyword("MinimumLongitude", m_minLon.degrees());
+    obj += PvlKeyword("LatitudeExtentType", toString(m_latExtents));
+    obj += PvlKeyword("MaximumLatitude", toString(m_maxLat.degrees()));
+    obj += PvlKeyword("MinimumLongitude", toString(m_minLon.degrees()));
   
-    obj += PvlKeyword("LongitudeExtentType", m_lonExtents);
-    obj += PvlKeyword("MinimumLatitude", m_minLat.degrees());
-    obj += PvlKeyword("MaximumLongitude", m_maxLon.degrees());
+    obj += PvlKeyword("LongitudeExtentType", toString(m_lonExtents));
+    obj += PvlKeyword("MinimumLatitude", toString(m_minLat.degrees()));
+    obj += PvlKeyword("MaximumLongitude", toString(m_maxLon.degrees()));
     
-    obj += PvlKeyword("Density", m_density);
-    obj += PvlKeyword("Visible", (m_gridItem != NULL));
+    obj += PvlKeyword("Density", toString(m_density));
+    obj += PvlKeyword("Visible", toString((m_gridItem)));
 
     return obj;
   }

@@ -34,25 +34,25 @@ void IsisMain() {
 
   // Setup and log results
   PvlGroup results("Range");
-  results += PvlKeyword("MinimumRightAscension", minRa, "degrees");
-  results += PvlKeyword("MaximumRightAscension", maxRa, "degrees");
-  results += PvlKeyword("MinimumDeclination", minDec, "degrees");
-  results += PvlKeyword("MaximumDeclination", maxDec, "degrees");
+  results += PvlKeyword("MinimumRightAscension", toString(minRa), "degrees");
+  results += PvlKeyword("MaximumRightAscension", toString(maxRa), "degrees");
+  results += PvlKeyword("MinimumDeclination", toString(minDec), "degrees");
+  results += PvlKeyword("MaximumDeclination", toString(maxDec), "degrees");
   results += PvlKeyword("MinimumRightAscension", Projection::ToHMS(minRa), "hms");
   results += PvlKeyword("MaximumRightAscension", Projection::ToHMS(maxRa), "hms");
   results += PvlKeyword("MinimumDeclination", Projection::ToDMS(minDec), "dms");
   results += PvlKeyword("MaximumDeclination", Projection::ToDMS(maxDec), "dms");
-  results += PvlKeyword("Resolution", res, "degrees/pixel");
+  results += PvlKeyword("Resolution", toString(res), "degrees/pixel");
   Application::Log(results);
 
   // Setup and log orientation
   PvlGroup orient("Orientation");
-  orient += PvlKeyword("CenterSample", icube->getSampleCount() / 2.0);
-  orient += PvlKeyword("CenterLine", icube->getLineCount() / 2.0);
-  orient += PvlKeyword("CenterRightAscension", centerRa, "degrees");
-  orient += PvlKeyword("CenterDeclination", centerDec, "degrees");
-  orient += PvlKeyword("CelestialNorthClockAngle", rot, "degrees");
-  orient += PvlKeyword("Resolution", res, "degrees/pixel");
+  orient += PvlKeyword("CenterSample", toString(icube->getSampleCount() / 2.0));
+  orient += PvlKeyword("CenterLine", toString(icube->getLineCount() / 2.0));
+  orient += PvlKeyword("CenterRightAscension", toString(centerRa), "degrees");
+  orient += PvlKeyword("CenterDeclination", toString(centerDec), "degrees");
+  orient += PvlKeyword("CelestialNorthClockAngle", toString(rot), "degrees");
+  orient += PvlKeyword("Resolution", toString(res), "degrees/pixel");
   Application::Log(orient);
 
   // Write the output file if requested

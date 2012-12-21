@@ -23,11 +23,11 @@ namespace Isis {
                           int group, int param);
       ~GuiBooleanParameter();
 
-      IString Value();
+      QString Value();
 
-      void Set(IString newValue);
+      void Set(QString newValue);
 
-      virtual std::vector<std::string> Exclusions();
+      virtual std::vector<QString> Exclusions();
 
       bool IsModified();
 

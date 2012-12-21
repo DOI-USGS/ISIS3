@@ -78,7 +78,7 @@ namespace Isis {
    **/
   void PolygonSeeder::Parse(Pvl &pvl) {
 
-    std::string errorSpot;
+    QString errorSpot;
 
     try {
       // Get info from Algorithm group
@@ -91,7 +91,7 @@ namespace Isis {
 
       // Set the algorithm name
       errorSpot = "Name";
-      p_algorithmName = (std::string) algo["Name"];
+      p_algorithmName = (QString) algo["Name"];
 
       if(invalgo.HasKeyword("Name"))
         invalgo.DeleteKeyword("Name");
@@ -117,7 +117,7 @@ namespace Isis {
         invalgo.DeleteKeyword("MinimumArea");
     }
     catch(IException &e) {
-      std::string msg = "Improper format for PolygonSeeder PVL [";
+      QString msg = "Improper format for PolygonSeeder PVL [";
       msg +=  pvl.FileName() + "]. Location [" + errorSpot + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -133,15 +133,15 @@ namespace Isis {
    *             of lon/lat
    * @param xyBoundBox The bounding box of the multipoly
    *
-   * @return std::string A string with an appropriate message to throw if
+   * @return QString A string with an appropriate message to throw if
    *             a test was unsuccessful or an empty string if all tests
    *             passed.
    */
-  std::string PolygonSeeder::StandardTests(const geos::geom::MultiPolygon *xymp,
+  QString PolygonSeeder::StandardTests(const geos::geom::MultiPolygon *xymp,
       const geos::geom::Envelope *xyBoundBox) {
     if(xymp->getArea() < MinimumArea()) {
-      std::string msg = "Polygon did not meet the minimum area of [";
-      msg += Isis::IString(MinimumArea()) + "]";
+      QString msg = "Polygon did not meet the minimum area of [";
+      msg += toString(MinimumArea()) + "]";
       return msg;
     }
 
@@ -149,8 +149,8 @@ namespace Isis {
       xymp->getArea() /
       pow(std::max(xyBoundBox->getWidth(), xyBoundBox->getHeight()), 2.0);
     if(thickness < MinimumThickness()) {
-      std::string msg = "Polygon did not meet the minimum thickness ratio of [";
-      msg += Isis::IString(MinimumThickness()) + "]";
+      QString msg = "Polygon did not meet the minimum thickness ratio of [";
+      msg += toString(MinimumThickness()) + "]";
       return msg;
     }
 
@@ -161,9 +161,9 @@ namespace Isis {
    * The name of the algorithm, read from the Name Keyword in the 
    * PolygonSeeder Pvl passed into the constructor. 
    *  
-   * @return @b std::string The value of the Name Keyword in the Pvl.
+   * @return @b QString The value of the Name Keyword in the Pvl.
    */
-  std::string PolygonSeeder::Algorithm() const {
+  QString PolygonSeeder::Algorithm() const {
     return p_algorithmName;
   }
 
@@ -201,12 +201,12 @@ namespace Isis {
    * @return @b PvlGroup The PvlGroup with the appropriate parameters added.
    * 
    */
-  PvlGroup PolygonSeeder::PluginParameters(std::string grpName) {
+  PvlGroup PolygonSeeder::PluginParameters(QString grpName) {
     PvlGroup pluginInfo(grpName);
 
     PvlKeyword name("Name", p_algorithmName);
-    PvlKeyword minThickness("MinimumThickness", p_minimumThickness);
-    PvlKeyword minArea("MinimumArea", p_minimumArea);
+    PvlKeyword minThickness("MinimumThickness", toString(p_minimumThickness));
+    PvlKeyword minArea("MinimumArea", toString(p_minimumArea));
 
     pluginInfo.AddKeyword(name);
     pluginInfo.AddKeyword(minThickness);

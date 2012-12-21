@@ -191,7 +191,7 @@ namespace Isis {
    * @param inCubes The input cubes
    * @param outCube The output cube
    */
-  void CubeCalculator::prepareCalculations(IString equation,
+  void CubeCalculator::prepareCalculations(QString equation,
       QVector<Cube *> &inCubes,
       Cube *outCube) {
     Clear();
@@ -218,7 +218,7 @@ namespace Isis {
         IString tok(token.substr(1));
         int file = tok.ToInteger() - 1;
         if (file < 0 || file >= (int)inCubes.size()) {
-          std::string msg = "Invalid file number [" + tok + "]";
+          QString msg = "Invalid file number [" + tok.ToQt() + "]";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 

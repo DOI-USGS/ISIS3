@@ -27,10 +27,10 @@ using namespace std;
 namespace Isis {
 
   //! String names for Point Type
-  extern string sPointType [];
+  extern QString sPointType [];
 
   //! String values for Boolean
-  extern string sBoolean[];
+  extern QString sBoolean[];
 
   /**
    * ControlNetFilter Constructor
@@ -41,7 +41,7 @@ namespace Isis {
    * @param psSerialNumFile - Corresponding Serial Num List
    * @param pProgress - Progress of the processing
    */
-  ControlNetFilter::ControlNetFilter(ControlNet *pCNet, string &psSerialNumFile, Progress *pProgress) :
+  ControlNetFilter::ControlNetFilter(ControlNet *pCNet, QString &psSerialNumFile, Progress *pProgress) :
     ControlNetStatistics(pCNet, psSerialNumFile, pProgress) {
     mSerialNumFilter  = SerialNumberList(psSerialNumFile);
   }
@@ -54,10 +54,10 @@ namespace Isis {
    * @param psPrintFile
    * @param pbPvl
    */
-  void ControlNetFilter::SetOutputFile(string psPrintFile) {
+  void ControlNetFilter::SetOutputFile(QString psPrintFile) {
     Isis::FileName outFile(psPrintFile);
-    string outName(outFile.expanded());
-    mOstm.open(outName.c_str(), std::ios::out);
+    QString outName(outFile.expanded());
+    mOstm.open(outName.toAscii().data(), std::ios::out);
     mOstm.precision(dbl::digits10);
   }
 
@@ -96,14 +96,14 @@ namespace Isis {
    *
    * @param serialNum - Serial Number
    */
-  void ControlNetFilter::FilterOutMeasuresBySerialNum(string serialNum){
-    QString sn(serialNum.c_str());
+  void ControlNetFilter::FilterOutMeasuresBySerialNum(QString serialNum){
+    QString sn(serialNum);
     const ControlCubeGraphNode *csn = mCNet->getGraphNode(sn);
     QList< ControlMeasure * > measures = csn->getMeasures();
 
     foreach(ControlMeasure * measure, measures) {
       bool pointEditFlag = false;
-      QString ptId(measure->Parent()->GetId().c_str());
+      QString ptId(measure->Parent()->GetId());
       ControlPoint * point = mCNet->GetPoint(ptId);
       if (point->IsEditLocked()) {
         point->SetEditLock(false);
@@ -177,11 +177,11 @@ namespace Isis {
     double dGreater = 0;
 
     if (pvlGrp.HasKeyword("LessThan")) {
-      dLesser = fabs((pvlGrp["LessThan"][0]).ToDouble());
+      dLesser = fabs((double)pvlGrp["LessThan"]);
     }
 
     if (pvlGrp.HasKeyword("GreaterThan")) {
-      dGreater = fabs((pvlGrp["GreaterThan"][0]).ToDouble());
+      dGreater = fabs((double)pvlGrp["GreaterThan"]);
     }
 
     if (dLesser < 0 || dGreater < 0 || dLesser <= dGreater) {
@@ -223,7 +223,7 @@ namespace Isis {
           const ControlMeasure *measure = cPoint->GetMeasure(j);
           PrintCubeFileSerialNum(*measure);
           double dPixelShift = measure->GetPixelShift();
-          mOstm << ", " <<  (dPixelShift == Null ? "Null" : IString(dPixelShift)) << ", "
+          mOstm << ", " <<  (dPixelShift == Null ? "Null" : toString(dPixelShift)) << ", "
                 << measure->GetMeasureTypeString() << ", "
                 << sBoolean[measure->IsIgnored()] << ", "
                 << sBoolean[measure->IsEditLocked()] << ", "
@@ -252,11 +252,11 @@ namespace Isis {
     int iGreater = 0;
 
     if (pvlGrp.HasKeyword("LessThan")) {
-      iLesser = pvlGrp["LessThan"][0];
+      iLesser = toInt(pvlGrp["LessThan"][0]);
     }
 
     if (pvlGrp.HasKeyword("GreaterThan")) {
-      iGreater = pvlGrp["GreaterThan"][0];
+      iGreater = toInt(pvlGrp["GreaterThan"][0]);
     }
 
     if (iLesser < 0 || iGreater < 0 || iLesser < iGreater) {
@@ -361,11 +361,15 @@ namespace Isis {
     double dGreater = 0;
 
     if (pvlGrp.HasKeyword("LessThan")) {
-      dLesser = fabs((pvlGrp["LessThan"][0]).ToDouble());
+      if (pvlGrp["LessThan"][0] != "") { 
+        dLesser = fabs((double)pvlGrp["LessThan"]);
+      }
     }
 
     if (pvlGrp.HasKeyword("GreaterThan")) {
-      dGreater = fabs((pvlGrp["GreaterThan"][0]).ToDouble());
+      if (pvlGrp["GreaterThan"][0] != "") { 
+        dGreater = fabs((double)pvlGrp["GreaterThan"]);
+      }
     }
 
     if (dLesser < 0 || dGreater < 0 || dLesser < dGreater) {
@@ -432,18 +436,9 @@ namespace Isis {
    * @param pbLastFilter - Flag to indicate whether this is the last filter to print the stats
    */
   void ControlNetFilter::PointIDFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
-    std::vector<string> strTokens;
-    IString sPointIDExpr = pvlGrp["Expression"][0];
-    IString sSeparator("*");
-
-    string strToken = sPointIDExpr.Token(sSeparator);
-    while (strToken != "") {
-      strTokens.push_back(strToken);
-      if (!sPointIDExpr.size()) {
-        break;
-      }
-      strToken = sPointIDExpr.Token(sSeparator);
-    }
+    QString sPointIDExpr = pvlGrp["Expression"][0];
+    QString sSeparator("*");
+    QStringList strTokens = sPointIDExpr.split(sSeparator, QString::SkipEmptyParts);
 
     int iTokenSize = (int)strTokens.size();
     int iNumPoints = mCNet->GetNumPoints();
@@ -458,13 +453,13 @@ namespace Isis {
 
     for (int i = (iNumPoints - 1); i >= 0; i--) {
       const ControlPoint *cPoint = mCNet->GetPoint(i);
-      string sPointID = cPoint->GetId();
+      QString sPointID = cPoint->GetId();
       int iPosition = 0;
       for (int j = (iTokenSize - 1); j >= 0; j--) {
         int iLen = strTokens[j].length();
         if (iLen > 0) {
-          size_t found = sPointID.find(strTokens[j], iPosition);
-          if (found != string::npos) {
+          int found = sPointID.indexOf(strTokens[j], iPosition);
+          if (found != -1) {
             iPosition = found + iLen;
             // End of the expression
             if (pbLastFilter && j == (iTokenSize - 1)) {
@@ -498,11 +493,15 @@ namespace Isis {
     int  iLesser = VALID_MAX2, iGreater = 0;
 
     if (pvlGrp.HasKeyword("LessThan")) {
-      iLesser = pvlGrp["LessThan"][0];
+      if (pvlGrp["LessThan"][0] != "") { 
+        iLesser = toInt(pvlGrp["LessThan"][0]);
+      }
     }
 
     if (pvlGrp.HasKeyword("GreaterThan")) {
-      iGreater = pvlGrp["GreaterThan"][0];
+      if (pvlGrp["GreaterThan"][0] != "") { 
+        iGreater = toInt(pvlGrp["GreaterThan"][0]);
+      }
     }
 
     if (iLesser < 0 || iGreater < 0 || iLesser < iGreater) {
@@ -559,8 +558,10 @@ namespace Isis {
     IString sTemp = "";
 
     if (pvlGrp.HasKeyword("PointType")) {
-      sType = pvlGrp["PointType"][0];
-      sType = sType.DownCase(sType);
+      if (pvlGrp["PointType"][0] != "") { 
+        sType = pvlGrp["PointType"][0];
+        sType = sType.DownCase(sType);
+      }
     }
 
     if (pvlGrp.HasKeyword("Ignore")) {
@@ -631,19 +632,27 @@ namespace Isis {
     double dMinLon = Isis::ValidMinimum, dMaxLon = Isis::ValidMaximum;
 
     if (pvlGrp.HasKeyword("MinLat")) {
-      dMinLat = pvlGrp["MinLat"][0];
+      if (pvlGrp["MinLat"][0] != "") { 
+        dMinLat = pvlGrp["MinLat"];
+      }
     }
 
     if (pvlGrp.HasKeyword("MaxLat")) {
-      dMaxLat = pvlGrp["MaxLat"][0];
+      if (pvlGrp["MaxLat"][0] != "") { 
+        dMaxLat = pvlGrp["MaxLat"];
+      }
     }
 
     if (pvlGrp.HasKeyword("MinLon")) {
-      dMinLon = pvlGrp["MinLon"][0];
+      if (pvlGrp["MinLon"][0] != "") { 
+        dMinLon = pvlGrp["MinLon"];
+      }
     }
 
     if (pvlGrp.HasKeyword("MaxLon")) {
-      dMaxLon = pvlGrp["MaxLon"][0];
+      if (pvlGrp["MaxLon"][0] != "") { 
+        dMaxLon = pvlGrp["MaxLon"];
+      }
     }
 
     if (dMinLat > dMaxLat || dMinLon > dMaxLon) {
@@ -666,8 +675,8 @@ namespace Isis {
       if (!cPointSurfPt.Valid()) {
         const ControlMeasure *cm = cPoint->GetRefMeasure();
 
-        string sn = cm->GetCubeSerialNumber();
-        string filename = mSerialNumList.FileName(sn);
+        QString sn = cm->GetCubeSerialNumber();
+        QString filename = mSerialNumList.FileName(sn);
         Pvl pvl(filename);
 
         Camera *camera = CameraFactory::Create(pvl);
@@ -709,10 +718,12 @@ namespace Isis {
    */
   void ControlNetFilter::PointDistanceFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
     double dMaxDistance = 0;
-    string sUnits = "pixels";
+    QString sUnits = "pixels";
 
     if (pvlGrp.HasKeyword("MaxDistance")) {
-      dMaxDistance = pvlGrp["MaxDistance"][0];
+      if (pvlGrp["MaxDistance"][0] != "") { 
+        dMaxDistance = pvlGrp["MaxDistance"];
+      }
     }
 
     if (pvlGrp.HasKeyword("Units")) {
@@ -738,8 +749,8 @@ namespace Isis {
         surfacePt1 = cp1->GetAdjustedSurfacePoint();
 
         if (!surfacePt1.Valid()) {
-          string sn1 = cp1RefMeasure->GetCubeSerialNumber();
-          string filename1 = mSerialNumList.FileName(sn1);
+          QString sn1 = cp1RefMeasure->GetCubeSerialNumber();
+          QString filename1 = mSerialNumList.FileName(sn1);
           Pvl pvl1(filename1);
           cam1 = CameraFactory::Create(pvl1);
           if (cam1->SetImage(cp1RefMeasure->GetSample(),
@@ -776,8 +787,8 @@ namespace Isis {
           surfacePt2 = cp2->GetAdjustedSurfacePoint();
 
           if (!surfacePt2.Valid()) {
-            string sn2 = cp2RefMeasure->GetCubeSerialNumber();
-            string filename2 = mSerialNumList.FileName(sn2);
+            QString sn2 = cp2RefMeasure->GetCubeSerialNumber();
+            QString filename2 = mSerialNumList.FileName(sn2);
             Pvl pvl2(filename2);
             cam2 = CameraFactory::Create(pvl2);
 
@@ -848,11 +859,15 @@ namespace Isis {
     double dLesser=Isis::ValidMaximum, dGreater=0;
 
     if (pvlGrp.HasKeyword("LessThan")){
-      dLesser = fabs((pvlGrp["LessThan"][0]).ToDouble());
+      if (pvlGrp["LessThan"][0] != "") { 
+        dLesser = fabs((double)(pvlGrp["LessThan"]));
+      }
     }
 
     if (pvlGrp.HasKeyword("GreaterThan")){
-      dGreater = fabs((pvlGrp["GreaterThan"][0]).ToDouble());
+      if (pvlGrp["GreaterThan"][0] != "") { 
+        dGreater = fabs((double)pvlGrp["GreaterThan"]);
+      }
     }
 
     if (pbLastFilter) {
@@ -965,7 +980,7 @@ namespace Isis {
         if (bMeasureFound) {
           if (pbLastFilter) {
             PointStats(*cPoint);
-            string sn = cMeasure->GetCubeSerialNumber();
+            QString sn = cMeasure->GetCubeSerialNumber();
             mOstm << mSerialNumList.FileName(sn) << ", " << sn << ","
                 << sBoolean[(int) cMeasure->IsIgnored()] << ", "
                 << cMeasure->GetMeasureTypeString() << ", "
@@ -997,7 +1012,7 @@ namespace Isis {
    * @param pbLastFilter - Flag to indicate whether this is the last filter to print the stats
    */
   void ControlNetFilter::PointCubeNamesFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
-    std::vector <string> sCubeNames;
+    std::vector <QString> sCubeNames;
 
     // Store the Cubenames from the PvlGroup
     for (int i = 0; i < pvlGrp.Keywords(); i++) {
@@ -1057,7 +1072,7 @@ namespace Isis {
                 << cPoint->GetNumLockedMeasures() << ", ";
 
           // Image Details
-          string sn = cMeasure->GetCubeSerialNumber();
+          QString sn = cMeasure->GetCubeSerialNumber();
           vector <double> imgStats = GetImageStatsBySerialNum(sn);
           mOstm << mSerialNumList.FileName(sn)   << ", " << sn << ", "
                 << imgStats[imgTotalPoints] << ", " << imgStats[imgIgnoredPoints] << ", "
@@ -1089,11 +1104,15 @@ namespace Isis {
     double dGreater = 0;
 
     if (pvlGrp.HasKeyword("LessThan")) {
-      dLesser = fabs((pvlGrp["LessThan"][0]).ToDouble());
+      if (pvlGrp["LessThan"][0] != "") { 
+        dLesser = fabs((double)pvlGrp["LessThan"]);
+      }
     }
 
     if (pvlGrp.HasKeyword("GreaterThan")) {
-      dGreater = fabs((pvlGrp["GreaterThan"][0]).ToDouble());
+      if (pvlGrp["GreaterThan"][0] != "") { 
+        dGreater = fabs((double)pvlGrp["GreaterThan"]);
+      }
     }
 
     if (dLesser < 0 || dGreater < 0 || dLesser <= dGreater) {
@@ -1110,7 +1129,7 @@ namespace Isis {
     int iNumCubes  = mSerialNumFilter.Size();
 
     for (int sn = (iNumCubes - 1); sn >= 0; sn--) {
-      string sSerialNum = mSerialNumFilter.SerialNumber(sn);
+      QString sSerialNum = mSerialNumFilter.SerialNumber(sn);
       vector<double> imgStats = GetImageStatsBySerialNum(sSerialNum);
       double convexHullRatio = imgStats[imgConvexHullRatio];
       if (convexHullRatio < dGreater || convexHullRatio > dLesser){
@@ -1139,21 +1158,13 @@ namespace Isis {
    * @param pbLastFilter - Flag to indicate whether this is the last filter to print the stats
    */
   void ControlNetFilter::CubeNameExpressionFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
-    IString sCubeExpr("");
+    QString sCubeExpr("");
     if (pvlGrp.HasKeyword("Expression")) {
-      sCubeExpr = IString(pvlGrp["Expression"][0]);
+      sCubeExpr = QString(pvlGrp["Expression"][0]);
     }
 
-    vector <string> strTokens;
-    IString sSeparator("*");
-    string strToken = sCubeExpr.Token(sSeparator);
-    while (strToken != "") {
-      strTokens.push_back(strToken);
-      if (!sCubeExpr.size()) {
-        break;
-      }
-      strToken = sCubeExpr.Token(sSeparator);
-    }
+    QString sSeparator("*");
+    QStringList strTokens = sCubeExpr.split(sSeparator, QString::SkipEmptyParts);
 
     int iTokenSize = (int)strTokens.size();
     int iNumCubes  = mSerialNumFilter.Size();
@@ -1164,14 +1175,14 @@ namespace Isis {
     }
 
     for (int i = (iNumCubes - 1); i >= 0;  i--) {
-      string sCubeName = mSerialNumFilter.FileName(i);
-      string sSerialNum = mSerialNumFilter.SerialNumber(i);
+      QString sCubeName = mSerialNumFilter.FileName(i);
+      QString sSerialNum = mSerialNumFilter.SerialNumber(i);
       int iPosition = 0;
       for (int j = (iTokenSize - 1); j >= 0; j--) {
         int iLen = strTokens[j].length();
         if (iLen > 0) {
-          size_t found = sSerialNum.find(strTokens[j], iPosition);
-          if (found != string::npos) {
+          int found = sSerialNum.indexOf(strTokens[j], iPosition);
+          if (found != -1) {
             iPosition = found + iLen;
             // End of the expression - Found
             if (j == (iTokenSize - 1)) {
@@ -1193,7 +1204,7 @@ namespace Isis {
     if (pbLastFilter) {
       iNumCubes = mSerialNumFilter.Size();
       for (int i = 0; i < iNumCubes; i++) {
-        string sSerialNum = mSerialNumFilter.SerialNumber(i);
+        QString sSerialNum = mSerialNumFilter.SerialNumber(i);
 
         mOstm << mSerialNumFilter.FileName(i) << ", " << sSerialNum << ", ";
         vector<double> imgStats = GetImageStatsBySerialNum(sSerialNum);
@@ -1217,16 +1228,19 @@ namespace Isis {
   void ControlNetFilter::CubeNumPointsFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
     int iLessPoints = VALID_MAX2, iGreaterPoints = 0;
     if (pvlGrp.HasKeyword("LessThan")) {
-      iLessPoints = pvlGrp["LessThan"][0];
+      if (pvlGrp["LessThan"][0] != "") { 
+        iLessPoints = toInt(pvlGrp["LessThan"][0]);
+      }
     }
     if (pvlGrp.HasKeyword("GreaterThan")) {
-      iGreaterPoints = pvlGrp["GreaterThan"][0];
+      if (pvlGrp["GreaterThan"][0] != "") { 
+        iGreaterPoints = toInt(pvlGrp["GreaterThan"][0]);
+      }
     }
 
     if (iLessPoints < 0 || iGreaterPoints < 0 || iLessPoints < iGreaterPoints) {
-      string sErrMsg = "Invalid Deffile - Check Cube_NumPoints Group\n";
+      QString sErrMsg = "Invalid Deffile - Check Cube_NumPoints Group\n";
       throw IException(IException::User, sErrMsg, _FILEINFO_);
-      return;
     }
 
     if (pbLastFilter) {
@@ -1237,7 +1251,7 @@ namespace Isis {
     int iNumCubes  = mSerialNumFilter.Size();
 
     for (int sn = (iNumCubes - 1); sn >= 0; sn--) {
-      string sSerialNum = mSerialNumFilter.SerialNumber(sn);
+      QString sSerialNum = mSerialNumFilter.SerialNumber(sn);
       vector<double> imgStats = GetImageStatsBySerialNum(sSerialNum);
       double numPoints = imgStats[imgTotalPoints];
       if (numPoints < iGreaterPoints || numPoints > iLessPoints){
@@ -1267,10 +1281,12 @@ namespace Isis {
    */
   void ControlNetFilter::CubeDistanceFilter(const PvlGroup &pvlGrp, bool pbLastFilter) {
     double dDistance = 0;
-    string sUnits = "pixels";
+    QString sUnits = "pixels";
 
     if (pvlGrp.HasKeyword("MaxDistance")) {
-      dDistance = pvlGrp["MaxDistance"][0];
+      if (pvlGrp["MaxDistance"][0] != "") { 
+        dDistance = pvlGrp["MaxDistance"];
+      }
     }
 
     if (pvlGrp.HasKeyword("Units")) {
@@ -1290,7 +1306,7 @@ namespace Isis {
 
     int iNumCubes = mSerialNumFilter.Size();
     for (int sn = (iNumCubes - 1); sn >= 0; sn--) {
-      string sSerialNum = mSerialNumFilter.SerialNumber(sn);
+      QString sSerialNum = mSerialNumFilter.SerialNumber(sn);
       Pvl pvl(mSerialNumList.FileName(sSerialNum));
       Camera *cam = CameraFactory::Create(pvl);
       double dDist = 0;
@@ -1433,13 +1449,13 @@ namespace Isis {
               << iPointsFixed << ", " << iPointsConstrained << ", " << iPointsFree << ", "
               << imgStats[ imgConvexHullRatio] << ", ";
         for (int j = 0; j < (int)sPointIndex1.size(); j++) {
-          IString sPointIDDist(dPointDistance[j]);
+          QString sPointIDDist = toString(dPointDistance[j]);
           sPointIDDist += "#";
           sPointIDDist += (*mCNet)[sPointIndex1[j]]->GetId();
           sPointIDDist += "#";
           sPointIDDist += (*mCNet)[sPointIndex2[j]]->GetId();
 
-          mOstm << (string)sPointIDDist << ",";
+          mOstm << sPointIDDist << ",";
         }
         mOstm << endl;
       }

@@ -1,4 +1,4 @@
-#if !defined(DarkModelPixel_h)
+#ifndef DarkModelPixel_h
 #define DarkModelPixel_h
 /**
  * @file
@@ -80,8 +80,8 @@ namespace Isis {
       }
 
 
-      std::string loadCoefficients(bool isNac, bool isFpuBinned) {
-        std::string filename = "$messenger/calibration/DARK_MODEL/MDIS";
+      QString loadCoefficients(bool isNac, bool isFpuBinned) {
+        QString filename = "$messenger/calibration/DARK_MODEL/MDIS";
         // FileName consists of binned/notbinned, camera, and filter
         filename += (isNac) ? "NAC" : "WAC";
         filename += (isFpuBinned) ? "_BINNED_" : "_NOTBIN_";
@@ -116,7 +116,7 @@ namespace Isis {
         return (filename);
       }
 
-      std::string getFileName() const {
+      QString getFileName() const {
         return (_filename);
       }
 
@@ -151,7 +151,7 @@ namespace Isis {
       double _ccdTemp;
       double _expTime;
       DVector _coefs;
-      std::string _filename;
+      QString _filename;
   };
 
 };

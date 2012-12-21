@@ -17,7 +17,7 @@ namespace Isis {
     this->setFileMode(QFileDialog::ExistingFiles);
     if(parent != 0) {
       parent->installEventFilter(this);
-      p_appName = parent->windowTitle().toStdString();
+      p_appName = parent->windowTitle();
     }
     connect(this, SIGNAL(accepted()), this, SLOT(sendSignal()));
 
@@ -136,13 +136,13 @@ namespace Isis {
    */
   void FileDialog::readSettings() {
     if(p_appName == "") {
-      p_appName = this->windowTitle().toStdString();
+      p_appName = this->windowTitle();
     }
 
-    std::string instanceName = this->windowTitle().toStdString();
+    QString instanceName = this->windowTitle();
     // FileName is a QFileDialog enum for DialogLabel
     Isis::FileName config("$HOME/.Isis/" + p_appName + "/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
+    QSettings settings(config.expanded(), QSettings::NativeFormat);
     QPoint pos = settings.value("pos", QPoint(300, 100)).toPoint();
     QSize size = settings.value("size", QSize(355, 350)).toSize();
     resize(size);
@@ -161,13 +161,13 @@ namespace Isis {
     if(!this->isVisible()) return;
 
     if(p_appName == "") {
-      p_appName = this->windowTitle().toStdString();
+      p_appName = this->windowTitle();
     }
 
-    std::string instanceName = this->windowTitle().toStdString();
+    QString instanceName = this->windowTitle();
     // FileName is a QFileDialog enum for DialogLabel
     Isis::FileName config("$HOME/.Isis/" + p_appName + "/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
+    QSettings settings(config.expanded(), QSettings::NativeFormat);
     settings.setValue("pos", pos());
     settings.setValue("size", size());
 

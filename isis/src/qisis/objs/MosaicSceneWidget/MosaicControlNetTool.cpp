@@ -128,27 +128,27 @@ namespace Isis {
 
     obj += PvlKeyword("FileName", m_controlNetFile);
     obj += PvlKeyword("Visible",
-        m_controlNetGraphics && m_controlNetGraphics->isVisible());
+        toString(m_controlNetGraphics && m_controlNetGraphics->isVisible()));
 
     return obj;
   }
 
 
   void MosaicControlNetTool::fromPvl(const PvlObject &obj) {
-    m_controlNetFile = QString::fromStdString(obj["FileName"][0]);
+    m_controlNetFile = obj["FileName"][0];
     if (m_controlNetFile == "Null")
       m_controlNetFile = "";
 
     loadNetwork();
 
     if (m_controlNetGraphics && m_displayControlNetButton) {
-      m_displayControlNetButton->setChecked( (int)obj["Visible"][0] );
+      m_displayControlNetButton->setChecked( toBool(obj["Visible"][0]) );
       displayControlNet();
     }
   }
 
 
-  IString MosaicControlNetTool::projectPvlObjectName() const {
+  QString MosaicControlNetTool::projectPvlObjectName() const {
     return "MosaicControlNetTool";
   }
 
@@ -367,8 +367,8 @@ namespace Isis {
     // for each mosaic item
     //---------------------------------------------------------------
     if (!netFile.isEmpty()) {
-      FileName controlNetFile(netFile.toStdString());
-      m_controlNetFile = QString::fromStdString(controlNetFile.expanded());
+      FileName controlNetFile(netFile);
+      m_controlNetFile = controlNetFile.expanded();
       loadNetwork();
 
       if (m_displayControlNetButton)
@@ -390,7 +390,7 @@ namespace Isis {
     if (m_controlNetFile.size() > 0) {
       try {
         m_controlNet = new ControlNet(
-            m_controlNetFile.toStdString());
+            m_controlNetFile);
         m_controlNetGraphics = new ControlNetGraphicsItem(m_controlNet,
             getWidget());
         connect(m_controlNetGraphics, SIGNAL(destroyed(QObject *)),
@@ -398,7 +398,7 @@ namespace Isis {
       }
       catch(IException &e) {
         QString message = "Invalid control network.\n";
-        message += e.toString().ToQt();
+        message += e.toString();
         QMessageBox::information(getWidget(), "Error", message);
         return;
       }

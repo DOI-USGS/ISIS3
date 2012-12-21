@@ -11,10 +11,10 @@
 #include "InterestOperatorFactory.h"
 #include "InterestOperator.h"
 #include "IException.h"
+#include "IString.h"
 #include "Progress.h"
 #include "Pvl.h"
 
-#include <string.h>
 
 using namespace std;
 using namespace Isis;
@@ -22,23 +22,23 @@ using namespace Isis;
 void ViewDefFile();
 void EditDefFile();
 
-map <string, void *> GuiHelpers() {
-  map <string, void *> helper;
+map <QString, void *> GuiHelpers() {
+  map <QString, void *> helper;
   helper ["View"] = (void *)ViewDefFile;
   helper ["Edit"] = (void *)EditDefFile;
   return helper;
 }
 
-ResolutionType GetResolutionType(std::string psType);
+ResolutionType GetResolutionType(QString psType);
 
 void IsisMain() {
 
   try {
     UserInterface &ui = Application::GetUserInterface();
-    std::string sSerialNumFile = ui.GetFileName("FROMLIST");
+    QString sSerialNumFile = ui.GetFileName("FROMLIST");
 
     // get the Criteria option
-    std::string sCriteria = ui.GetString("CRITERIA");
+    QString sCriteria = ui.GetString("CRITERIA");
 
     // Check format of Pvl DefFile
     bool bDefFile = false;
@@ -52,7 +52,7 @@ void IsisMain() {
       Application::Log(pvlDefFile->Group(0));
 
       if (pvlDefFile->Group(0).HasKeyword("PixelsFromEdge") && pvlDefFile->Group(0).HasKeyword("MetersFromEdge")) {
-        string message = "DefFile Error : Cannot have both \"PixelsFromEdge\" && \"MetersFromEdge\"" ;
+        QString message = "DefFile Error : Cannot have both \"PixelsFromEdge\" && \"MetersFromEdge\"" ;
         throw IException(IException::User, message, _FILEINFO_);
       }
 
@@ -66,7 +66,7 @@ void IsisMain() {
       pvlTemplate.ValidatePvl(*pvlDefFile, pvlResults);
       if (pvlResults.Groups() > 0 || pvlResults.Keywords() > 0) {
         Application::Log(pvlResults.Group(0));
-        string sErrMsg = "Invalid Deffile\n";
+        QString sErrMsg = "Invalid Deffile\n";
         throw IException(IException::User, sErrMsg, _FILEINFO_);
       }
     }
@@ -87,7 +87,7 @@ void IsisMain() {
 
     // Get the output Log file
     bool bLogFile = false;
-    string sLogFile;
+    QString sLogFile;
     if (ui.WasEntered("LOG")) {
       sLogFile = ui.GetFileName("LOG");
       bLogFile = true;
@@ -110,13 +110,13 @@ void IsisMain() {
 
     // Process Reference by Resolution
     else if (sCriteria == "RESOLUTION") {
-      std::string sType = ui.GetString("TYPE");
+      QString sType = ui.GetString("TYPE");
       double dResValue = 0;
       double dMinRes = 0, dMaxRes = 0;
       if (sType == "NEAREST") {
         dResValue = ui.GetDouble("RESVALUE");
         if (dResValue < 0) {
-          std::string message = "Invalid Nearest Resolution Value";
+          QString message = "Invalid Nearest Resolution Value";
           throw IException(IException::User, message, _FILEINFO_);
         }
       }
@@ -124,7 +124,7 @@ void IsisMain() {
         dMinRes = ui.GetDouble("MINRES");
         dMaxRes = ui.GetDouble("MAXRES");
         if (dMinRes < 0 || dMaxRes < 0 || dMinRes > dMaxRes) {
-          std::string message = "Invalid Resolution Range";
+          QString message = "Invalid Resolution Range";
           throw IException(IException::User, message, _FILEINFO_);
         }
       }
@@ -135,10 +135,10 @@ void IsisMain() {
     // Process Reference by Interest
     else if (sCriteria == "INTEREST") {
       if (!bDefFile) {
-        std::string msg = "Interest Option must have a DefFile";
+        QString msg = "Interest Option must have a DefFile";
         throw IException(IException::User, msg, _FILEINFO_);
       }
-      std::string sOverlapListFile = "";
+      QString sOverlapListFile = "";
       if (ui.WasEntered("LIMIT")) {
         if (ui.GetBoolean("LIMIT")) {
           sOverlapListFile = FileName(ui.GetFileName("OVERLAPLIST")).expanded();
@@ -188,22 +188,22 @@ void IsisMain() {
     throw;
   }
   catch (geos::util::GEOSException *exc) {
-    string message = "GEOS Exception: " + (IString)exc->what();
+    QString message = "GEOS Exception: " + (QString)exc->what();
     delete exc;
     throw IException(IException::User, message, _FILEINFO_);
   }
   catch (std::exception const &se) {
-    string message = "std::exception: " + (IString)se.what();
+    QString message = "std::exception: " + (QString)se.what();
     throw IException(IException::User, message, _FILEINFO_);
   }
   catch (...) {
-    string message = "Other Error";
+    QString message = "Other Error";
     throw IException(IException::User, message, _FILEINFO_);
   }
 }
 
 /**
- * Return the enumerated ResolutionType for a given string
+ * Return the enumerated ResolutionType for a given QString
  *
  * @author Sharmila Prasad (6/4/2010)
  *
@@ -211,7 +211,7 @@ void IsisMain() {
  *
  * @return ResolutionType
  */
-ResolutionType GetResolutionType(std::string psType) {
+ResolutionType GetResolutionType(QString psType) {
   if (psType == "LOW")
     return Low;
   else if (psType == "HIGH")
@@ -250,7 +250,7 @@ void ViewDefFile() {
  */
 void EditDefFile(void) {
   UserInterface &ui = Application::GetUserInterface();
-  string sDefFile = ui.GetAsString("DEFFILE");
+  QString sDefFile = ui.GetAsString("DEFFILE");
 
   GuiEditFile::EditFile(ui, sDefFile);
 }

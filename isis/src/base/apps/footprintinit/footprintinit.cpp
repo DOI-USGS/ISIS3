@@ -30,7 +30,7 @@ void IsisMain() {
   prog.SetMaximumSteps(1);
   prog.CheckStatus();
 
-  std::string sn = SerialNumber::Compose(cube);
+  QString sn = SerialNumber::Compose(cube);
 
   ImagePolygon poly;
   if(ui.WasEntered("MAXEMISSION")) {
@@ -68,14 +68,14 @@ void IsisMain() {
     poly.Create(cube, sinc, linc, 1, 1, 0, 0, 1, precision);
   }
   catch (IException &e) {
-    string msg = "Cannot generate polygon for [" + ui.GetFileName("FROM") + "]";
+    QString msg = "Cannot generate polygon for [" + ui.GetFileName("FROM") + "]";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
   if(ui.GetBoolean("TESTXY")) {
     Pvl cubeLab(ui.GetFileName("FROM"));
     PvlGroup inst = cubeLab.FindGroup("Instrument", Pvl::Traverse);
-    string target = inst["TargetName"];
+    QString target = inst["TargetName"];
     PvlGroup radii = Projection::TargetRadii(target);
 
     Pvl map(ui.GetFileName("MAP"));
@@ -84,19 +84,19 @@ void IsisMain() {
     if(!mapping.HasKeyword("TargetName"))
       mapping += Isis::PvlKeyword("TargetName", target);
     if(!mapping.HasKeyword("EquatorialRadius"))
-      mapping += Isis::PvlKeyword("EquatorialRadius", (string)radii["EquatorialRadius"]);
+      mapping += Isis::PvlKeyword("EquatorialRadius", (QString)radii["EquatorialRadius"]);
     if(!mapping.HasKeyword("PolarRadius"))
-      mapping += Isis::PvlKeyword("PolarRadius", (string)radii["PolarRadius"]);
+      mapping += Isis::PvlKeyword("PolarRadius", (QString)radii["PolarRadius"]);
     if(!mapping.HasKeyword("LatitudeType"))
       mapping += Isis::PvlKeyword("LatitudeType", "Planetocentric");
     if(!mapping.HasKeyword("LongitudeDirection"))
       mapping += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
     if(!mapping.HasKeyword("LongitudeDomain"))
-      mapping += Isis::PvlKeyword("LongitudeDomain", 360);
+      mapping += Isis::PvlKeyword("LongitudeDomain", "360");
     if(!mapping.HasKeyword("CenterLatitude"))
-      mapping += Isis::PvlKeyword("CenterLatitude", 0);
+      mapping += Isis::PvlKeyword("CenterLatitude", "0");
     if(!mapping.HasKeyword("CenterLongitude"))
-      mapping += Isis::PvlKeyword("CenterLongitude", 0);
+      mapping += Isis::PvlKeyword("CenterLongitude", "0");
 
     sinc = poly.getSinc();
     linc = poly.getLinc();
@@ -121,7 +121,7 @@ void IsisMain() {
           delete proj;
           delete xyPoly;
           e.print(); // This should be a NAIF error
-          string msg = "Cannot calculate XY for [";
+          QString msg = "Cannot calculate XY for [";
           msg += ui.GetFileName("FROM") + "]";
           throw IException(e, IException::User, msg, _FILEINFO_);
         }
@@ -137,8 +137,8 @@ void IsisMain() {
 
   if(precision) {
     PvlGroup results("Results");
-    results.AddKeyword(PvlKeyword("SINC", sinc));
-    results.AddKeyword(PvlKeyword("LINC", linc));
+    results.AddKeyword(PvlKeyword("SINC", toString(sinc)));
+    results.AddKeyword(PvlKeyword("LINC", toString(linc)));
     Application::Log(results);
   }
 

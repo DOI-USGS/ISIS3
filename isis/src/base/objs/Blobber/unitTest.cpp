@@ -14,13 +14,13 @@ int main(int argc, char *argv[]) {
 
     cout << "*** Blobber unitTest ***\n";
     Preference::Preferences(true);
-    string fname = "$base/testData/blobTruth.cub";
+    QString fname = "$base/testData/blobTruth.cub";
     cout << "\nFile Source: " << fname << endl;
 
 // This is assumed to be Hirise cube source
-    string blobName  = "HiRISE Calibration Ancillary";
-    string fieldName = "DarkPixels";
-    string name      = "Blobber";
+    QString blobName  = "HiRISE Calibration Ancillary";
+    QString fieldName = "DarkPixels";
+    QString name      = "Blobber";
 
 // Test access from Cube object class
     cout << "\n** Test Cube Class access...\n";

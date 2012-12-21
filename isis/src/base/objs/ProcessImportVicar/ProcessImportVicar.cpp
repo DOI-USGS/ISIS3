@@ -23,7 +23,7 @@
 #include "ProcessImportVicar.h"
 
 #include <iostream>
-#include <string>
+#include <QString>
 #include <sstream>
 
 #include "Preference.h"
@@ -45,12 +45,12 @@ namespace Isis {
    * @param vicarFile Name of the vicar file to open
    * @param vicarLab A PVL object which will contain the vicar labels.
    */
-  void ProcessImportVicar::SetVicarFile(const std::string &vicarFile, Pvl &vicarLab) {
+  void ProcessImportVicar::SetVicarFile(const QString &vicarFile, Pvl &vicarLab) {
     //  Open vicar file
-    ifstream vicFile(vicarFile.c_str(), ios::in);
+    ifstream vicFile(vicarFile.toAscii().data(), ios::in);
 
     if(!vicFile) {
-      string msg = "Cannot open vicar file [" + vicarFile + "]";
+      QString msg = "Cannot open vicar file [" + vicarFile + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -77,18 +77,18 @@ namespace Isis {
 
       SetDimensions(vLab["NS"], vLab["NL"], vLab["NB"]);
 
-      string pixType = vLab["FORMAT"];
+      QString pixType = vLab["FORMAT"];
       Isis::PixelType pixelType = None;
       if(pixType == "BYTE") pixelType = UnsignedByte;
       if(pixType == "HALF") pixelType = SignedWord;
       if(pixType == "REAL") pixelType = Real;
       if(pixelType == None) {
-        string msg = "Unsupported pixel type [FORMAT=" + pixType + "]";
+        QString msg = "Unsupported pixel type [FORMAT=" + pixType + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
       SetPixelType(pixelType);
 
-      string order = vLab["INTFMT"];
+      QString order = vLab["INTFMT"];
       if(order == "LOW") {
         SetByteOrder(Lsb);
       }
@@ -96,7 +96,7 @@ namespace Isis {
         SetByteOrder(Msb);
       }
 
-      string organization = vLab["ORG"];
+      QString organization = vLab["ORG"];
       if(organization == "BSQ") {
         SetOrganization(ProcessImport::BSQ);
       }
@@ -107,7 +107,7 @@ namespace Isis {
         SetOrganization(ProcessImport::BIP);
       }
       else {
-        string msg = "Unsupported file organization [" + organization + "]";
+        QString msg = "Unsupported file organization [" + organization + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
@@ -119,9 +119,9 @@ namespace Isis {
                           (int) vLab["NLB"] * (int) vLab["RECSIZE"] +
                           (int) vLab["NL"] * (int) vLab["NB"] *
                           (int) vLab["RECSIZE"];
-          ifstream vicFile(vicarFile.c_str(), ios::in);
+          ifstream vicFile(vicarFile.toAscii().data(), ios::in);
 
-          IString endPvlLabel = ExtractPvlLabel(startByte, vicFile);
+          QString endPvlLabel = ExtractPvlLabel(startByte, vicFile);
           stringstream lbl;
           lbl << endPvlLabel;
 
@@ -136,7 +136,7 @@ namespace Isis {
       }
     }
     catch(IException &e) {
-      string msg = "Input file [" + vicarFile + "] does not appear to be a vicar file";
+      QString msg = "Input file [" + vicarFile + "] does not appear to be a vicar file";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -151,12 +151,12 @@ namespace Isis {
    *
    * @return a valid PVL label
    */
-  IString ProcessImportVicar::ExtractPvlLabel(const int startPos, std::ifstream &vicarFile) const {
+  QString ProcessImportVicar::ExtractPvlLabel(int startPos, std::ifstream &vicarFile) const {
     vicarFile.seekg(startPos, ios::beg);
 
     // convert the LBLSIZE to an integer
     char *lblSizeValue = new char [1024];
-    vicarFile.seekg(string("LBLSIZE=").size(), ios_base::cur);
+    vicarFile.seekg(QString("LBLSIZE=").size(), ios_base::cur);
 
     for(int pos = 0; pos < 1024 - 1; pos++) {
       if(!vicarFile.good())
@@ -170,7 +170,7 @@ namespace Isis {
 
       // we're totally lost at this point
       if(pos == 1023) {
-        string msg = "Cannot find label size in VICAR file";
+        QString msg = "Cannot find label size in VICAR file";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -188,10 +188,10 @@ namespace Isis {
     vicarFile.close();
 
     // Transform the vicar labels into valid pvl labels
-    IString vicLabels = buf;
+    QString vicLabels = buf;
 
     bool inQuote = false;
-    for(unsigned int pos = 0; pos < vicLabels.size(); pos++) {
+    for(int pos = 0; pos < vicLabels.size(); pos++) {
       if(vicLabels[pos] == '\'' || vicLabels[pos] == '"') {
         inQuote = !inQuote;
       }

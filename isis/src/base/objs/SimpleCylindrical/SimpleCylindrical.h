@@ -86,8 +86,8 @@ namespace Isis {
       ~SimpleCylindrical();
       bool operator==(const Projection &proj);
 
-      std::string Name() const;
-      std::string Version() const;
+      QString Name() const;
+      QString Version() const;
       bool IsEquatorialCylindrical();
 
       bool SetGround(const double lat, const double lon);

@@ -75,7 +75,7 @@ namespace Isis {
       //! Destroys the Plugin object.
       virtual ~Plugin() {};
 
-      void *GetPlugin(const std::string &group);
+      void *GetPlugin(const QString &group);
   };
 };
 

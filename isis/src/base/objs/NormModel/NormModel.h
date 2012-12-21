@@ -1,4 +1,4 @@
-#if !defined(NormModel_h)
+#ifndef NormModel_h
 #define NormModel_h
 /**
  * @file

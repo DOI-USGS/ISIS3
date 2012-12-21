@@ -157,15 +157,15 @@ namespace Isis {
     ControlNetFileHeaderV0002 &header = m_versionerFile->GetNetworkHeader();
 
     if (header.has_targetname())
-      net->SetTarget(header.targetname());
+      net->SetTarget(header.targetname().c_str());
     else
       net->SetTarget("");
 
-    net->SetDescription(header.description());
-    net->SetUserName(header.username());
-    net->SetCreatedDate(header.created());
-    net->SetNetworkId(header.networkid());
-    net->SetModifiedDate(header.lastmodified());
+    net->SetDescription(header.description().c_str());
+    net->SetUserName(header.username().c_str());
+    net->SetCreatedDate(header.created().c_str());
+    net->SetNetworkId(header.networkid().c_str());
+    net->SetModifiedDate(header.lastmodified().c_str());
 
     delete m_versionerFile;
     m_versionerFile = NULL;
@@ -192,7 +192,7 @@ namespace Isis {
 
   LatestControlNetFile *
   ConcurrentControlNetReader::ReadNetworkFunctor::operator()() const {
-    return ControlNetVersioner::Read(FileName(m_networkFileName.toStdString()));
+    return ControlNetVersioner::Read(FileName(m_networkFileName));
   }
 
 
@@ -203,7 +203,7 @@ namespace Isis {
     m_targetThread = targetThread;
 
     if (!target.isEmpty()) {
-      PvlGroup pvlRadii = Projection::TargetRadii(target.toStdString());
+      PvlGroup pvlRadii = Projection::TargetRadii(target);
       m_majorRad = new Distance(pvlRadii["EquatorialRadius"], Distance::Meters);
       m_minorRad = new Distance(pvlRadii["EquatorialRadius"], Distance::Meters);
       m_polarRad = new Distance(pvlRadii["PolarRadius"], Distance::Meters);

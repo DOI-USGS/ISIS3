@@ -78,7 +78,7 @@ namespace Isis {
     }
 
     if(p_atmosWha == 1.0) {
-      std::string msg = "Anisotropic conservative case not implemented yet - WHA parameter cannot be set to 1.0.";
+      QString msg = "Anisotropic conservative case not implemented yet - WHA parameter cannot be set to 1.0.";
       msg += "This will cause negative planetary curvature to occur.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -255,7 +255,7 @@ namespace Isis {
                        AtmosModel::En(1, p_atmosTau * (1.0 + 1.0 / xx)));
     }
     else {
-      std::string msg = "Negative length of planetary curvature encountered";
+      QString msg = "Negative length of planetary curvature encountered";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
@@ -274,7 +274,7 @@ namespace Isis {
       f1mmu = xx * (log(1.0 + 1.0 / xx) - p_e1 * emu + AtmosModel::En(1, p_atmosTau * (1.0 + 1.0 / xx)));
     }
     else {
-      std::string msg = "Negative length of planetary curvature encountered";
+      QString msg = "Negative length of planetary curvature encountered";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 

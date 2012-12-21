@@ -160,7 +160,7 @@ namespace Isis {
 
     if(m_mapAction) {
       PvlKeyword projectionKeyword = mapping.FindKeyword("ProjectionName");
-      QString projName = QString::fromStdString(projectionKeyword[0]);
+      QString projName = projectionKeyword[0];
       m_mapAction->setText(projName);
     }
 
@@ -228,9 +228,9 @@ namespace Isis {
         cam->radii(radii);
 
         mappingGrp += PvlKeyword("TargetName", cam->target()->name());
-        mappingGrp += PvlKeyword("EquatorialRadius", radii[0].meters(),
+        mappingGrp += PvlKeyword("EquatorialRadius", toString(radii[0].meters()),
                                  "meters");
-        mappingGrp += PvlKeyword("PolarRadius", radii[2].meters(),
+        mappingGrp += PvlKeyword("PolarRadius", toString(radii[2].meters()),
                                  "meters");
 
       }
@@ -277,7 +277,7 @@ namespace Isis {
       if(m_projection) {
         PvlKeyword projectionKeyword =
             m_projection->Mapping().FindKeyword("ProjectionName");
-        QString projName = QString::fromStdString(projectionKeyword[0]);
+        QString projName = projectionKeyword[0];
         m_mapAction->setText(projName);
       }
     }
@@ -360,8 +360,8 @@ namespace Isis {
       mosaicScenePosition += PvlKeyword("ViewTransform",
                                         QString(dataBuffer.data().toHex()));
       PvlKeyword scrollPos("ScrollPosition");
-      scrollPos += getView()->horizontalScrollBar()->value();
-      scrollPos += getView()->verticalScrollBar()->value();
+      scrollPos += toString(getView()->horizontalScrollBar()->value());
+      scrollPos += toString(getView()->verticalScrollBar()->value());
       mosaicScenePosition += scrollPos;
 
       output += mosaicScenePosition;
@@ -378,8 +378,8 @@ namespace Isis {
       PvlObject zOrders("ZOrdering");
       foreach(MosaicSceneItem * mosaicSceneItem, *m_mosaicSceneItems) {
         PvlKeyword zValue("ZValue");
-        zValue += (IString)mosaicSceneItem->cubeDisplay()->fileName();
-        zValue += mosaicSceneItem->zValue();
+        zValue += mosaicSceneItem->cubeDisplay()->fileName();
+        zValue += toString(mosaicSceneItem->zValue());
         zOrders += zValue;
       }
 
@@ -429,7 +429,7 @@ namespace Isis {
                 (*m_mosaicSceneItems)[itemIndex];
 
             if (mosaicSceneItem->cubeDisplay()->fileName() == filenameToFind) {
-              mosaicSceneItem->setZValue(zOrder[1]);
+              mosaicSceneItem->setZValue(toDouble(zOrder[1]));
               found = true;
             }
           }
@@ -440,7 +440,7 @@ namespace Isis {
         const PvlObject &positionInfo =
             project.FindObject("SceneVisiblePosition");
 
-        QByteArray hexValues(positionInfo["ViewTransform"][0].c_str());
+        QByteArray hexValues(positionInfo["ViewTransform"][0].toAscii());
         QDataStream transformStream(QByteArray::fromHex(hexValues));
 
         QTransform viewTransform;
@@ -448,9 +448,9 @@ namespace Isis {
         getView()->setTransform(viewTransform);
 
         getView()->horizontalScrollBar()->setValue(
-            positionInfo["ScrollPosition"][0]);
+            toDouble(positionInfo["ScrollPosition"][0]));
         getView()->verticalScrollBar()->setValue(
-            positionInfo["ScrollPosition"][1]);
+            toDouble(positionInfo["ScrollPosition"][1]));
       }
     }
   }
@@ -1007,14 +1007,14 @@ namespace Isis {
           QString("List File (*.lis);;Text File (*.txt);;All Files (*.*)"));
     if(output.isEmpty()) return;
 
-    TextFile file(output.toStdString(), "overwrite");
+    TextFile file(output, "overwrite");
 
     QList<MosaicSceneItem *> sorted = *m_mosaicSceneItems;
     qSort(sorted.begin(), sorted.end(), zOrderGreaterThan);
 
     MosaicSceneItem *sceneItem;
     foreach(sceneItem, sorted) {
-      file.PutLine( sceneItem->cubeDisplay()->fileName().toStdString() );
+      file.PutLine( sceneItem->cubeDisplay()->fileName() );
     }
   }
 
@@ -1044,13 +1044,13 @@ namespace Isis {
     try {
       PvlGroup mapping(m_projection->Mapping());
       PvlKeyword minLatKeyword = mapping.FindKeyword("MinimumLatitude");
-      Latitude minLat(minLatKeyword[0], mapping, Angle::Degrees);
+      Latitude minLat(toDouble(minLatKeyword[0]), mapping, Angle::Degrees);
       PvlKeyword minLonKeyword = mapping.FindKeyword("MinimumLongitude");
-      Longitude minLon(minLonKeyword[0], mapping, Angle::Degrees);
+      Longitude minLon(toDouble(minLonKeyword[0]), mapping, Angle::Degrees);
       PvlKeyword maxLatKeyword = mapping.FindKeyword("MaximumLatitude");
-      Latitude maxLat(maxLatKeyword[0], mapping, Angle::Degrees);
+      Latitude maxLat(toDouble(maxLatKeyword[0]), mapping, Angle::Degrees);
       PvlKeyword maxLonKeyword = mapping.FindKeyword("MaximumLongitude");
-      Longitude maxLon(maxLonKeyword[0], mapping, Angle::Degrees);
+      Longitude maxLon(toDouble(maxLonKeyword[0]), mapping, Angle::Degrees);
 
       Angle increment(1, Angle::Degrees);
       if(m_projection->SetUniversalGround(minLat.degrees(),
@@ -1112,9 +1112,8 @@ namespace Isis {
 
     }
     catch(IException &e) {
-      std::string msg = e.toString();
-      QMessageBox::information(this, "Error", QString::fromStdString(msg),
-                               QMessageBox::Ok);
+      QString msg = e.toString();
+      QMessageBox::information(this, "Error", msg, QMessageBox::Ok);
       //m_showReference->setChecked(Qt::Unchecked);
       return;
     }
@@ -1160,35 +1159,35 @@ namespace Isis {
 
     try {
       Pvl pvl;
-      pvl.Read(mapFile.toStdString());
+      pvl.Read(mapFile);
 
       PvlGroup &mapping = pvl.FindGroup("Mapping", Pvl::Traverse);
 
       if(!mapping.HasKeyword("MinimumLatitude"))
-        mapping += PvlKeyword("MinimumLatitude", -90);
+        mapping += PvlKeyword("MinimumLatitude", toString(-90));
 
       if(!mapping.HasKeyword("MaximumLatitude"))
-        mapping += PvlKeyword("MaximumLatitude", 90);
+        mapping += PvlKeyword("MaximumLatitude", toString(90));
 
       if(!mapping.HasKeyword("MinimumLongitude")) {
         if(mapping["LongitudeDomain"][0] == "360")
           mapping += PvlKeyword("MinimumLongitude", 0);
         else
-          mapping += PvlKeyword("MinimumLongitude", -180);
+          mapping += PvlKeyword("MinimumLongitude", toString(-180));
       }
 
       if(!mapping.HasKeyword("MaximumLongitude")) {
         if(mapping["LongitudeDomain"][0] == "360")
-          mapping += PvlKeyword("MaximumLongitude", 360);
+          mapping += PvlKeyword("MaximumLongitude", toString(360));
         else
-          mapping += PvlKeyword("MaximumLongitude", 180);
+          mapping += PvlKeyword("MaximumLongitude", toString(180));
       }
 
       setProjection(mapping);
     }
     catch(IException &e) {
-      std::string msg = e.toString();
-      QMessageBox::information(this, "Error", QString::fromStdString(msg), QMessageBox::Ok);
+      QString msg = e.toString();
+      QMessageBox::information(this, "Error", msg, QMessageBox::Ok);
       return;
     }
   }

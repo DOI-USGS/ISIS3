@@ -57,10 +57,10 @@ namespace Isis {
     p_camera = parent;
 
     if (naifIkCode != 0) {
-      std::string xkey  = "INS" + Isis::IString(naifIkCode) + "_TRANSX";
-      std::string ykey  = "INS" + Isis::IString(naifIkCode) + "_TRANSY";
-      std::string ixkey = "INS" + Isis::IString(naifIkCode) + "_ITRANSS";
-      std::string iykey = "INS" + Isis::IString(naifIkCode) + "_ITRANSL";
+      QString xkey  = "INS" + toString(naifIkCode) + "_TRANSX";
+      QString ykey  = "INS" + toString(naifIkCode) + "_TRANSY";
+      QString ixkey = "INS" + toString(naifIkCode) + "_ITRANSS";
+      QString iykey = "INS" + toString(naifIkCode) + "_ITRANSL";
       for (int i = 0; i < 3; ++i) {
         p_transx[i]  = parent->getDouble(xkey, i);
         p_transy[i]  = parent->getDouble(ykey, i);
@@ -69,10 +69,10 @@ namespace Isis {
       }
     }
     else {
-      std::string xkey  = "IDEAL_TRANSX";
-      std::string ykey  = "IDEAL_TRANSY";
-      std::string ixkey = "IDEAL_TRANSS";
-      std::string iykey = "IDEAL_TRANSL";
+      QString xkey  = "IDEAL_TRANSX";
+      QString ykey  = "IDEAL_TRANSY";
+      QString ixkey = "IDEAL_TRANSS";
+      QString iykey = "IDEAL_TRANSL";
       for (int i = 0; i < 3; ++i) {
         p_transx[i]  = parent->getDouble(xkey, i);
         p_transy[i]  = parent->getDouble(ykey, i);

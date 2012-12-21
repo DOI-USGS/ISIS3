@@ -134,9 +134,9 @@ namespace Isis {
         pvl.AddComment("    F(mu,mu0,phase) = A1*exp(B1*phase) + A2*( mu0 + mu )exp(B2*phase) + A3*( mu0 + mu ) + A4");
 
         pvl += PvlKeyword("Algorithm", "HapkeExponential");
-        pvl += PvlKeyword("IncRef", _iRef, "degrees");
-        pvl += PvlKeyword("EmaRef", _eRef, "degrees");
-        pvl += PvlKeyword("PhaRef", _gRef, "degrees");
+        pvl += PvlKeyword("IncRef", toString(_iRef), "degrees");
+        pvl += PvlKeyword("EmaRef", toString(_eRef), "degrees");
+        pvl += PvlKeyword("PhaRef", toString(_gRef), "degrees");
         PvlKeyword units("HapkeExponentialUnits");
         PvlKeyword phostd("PhotometricStandard");
         PvlKeyword bbc("BandBinCenter");
@@ -146,21 +146,21 @@ namespace Isis {
         std::vector<PvlKeyword> aTermKeywords;
         std::vector<PvlKeyword> bTermKeywords;
         for (unsigned int i = 0; i < _bandpho[0].aTerms.size(); i++)
-            aTermKeywords.push_back(PvlKeyword("A" + IString((int) i+1)));
+            aTermKeywords.push_back(PvlKeyword("A" + toString((int) i+1)));
         for (unsigned int i = 0; i < _bandpho[0].bTerms.size(); i++)
-            bTermKeywords.push_back(PvlKeyword("B" + IString((int) i+1)));
+            bTermKeywords.push_back(PvlKeyword("B" + toString((int) i+1)));
 
         for (unsigned int i = 0; i < _bandpho.size(); i++) {
             Parameters &p = _bandpho[i];
             units.AddValue(p.units);
-            phostd.AddValue(p.phoStd);
-            bbc.AddValue(p.wavelength);
-            bbct.AddValue(p.tolerance);
-            bbn.AddValue(p.band);
+            phostd.AddValue(toString(p.phoStd));
+            bbc.AddValue(toString(p.wavelength));
+            bbct.AddValue(toString(p.tolerance));
+            bbn.AddValue(toString(p.band));
             for (unsigned int j = 0; j < aTermKeywords.size(); j++)
-                aTermKeywords[j].AddValue(p.aTerms[j]);
+                aTermKeywords[j].AddValue(toString(p.aTerms[j]));
             for (unsigned int j = 0; j < bTermKeywords.size(); j++)
-                bTermKeywords[j].AddValue(p.bTerms[j]);
+                bTermKeywords[j].AddValue(toString(p.bTerms[j]));
         }
         pvl += units;
         pvl += phostd;
@@ -199,8 +199,8 @@ namespace Isis {
         for (unsigned int i = 0; i < _profiles.size(); i++) {
             const DbProfile &p = _profiles[i];
             if (p.exists("BandBinCenter")) {
-                double p_center = ConfKey(p, "BandBinCenter", Null);
-                double tolerance = ConfKey(p, "BandBinCenterTolerance", 1.0E-6);
+                double p_center = toDouble(ConfKey(p, "BandBinCenter", toString(Null)));
+                double tolerance = toDouble(ConfKey(p, "BandBinCenterTolerance", toString(1.0E-6)));
                 if (fabs(wavelength - p_center) <= fabs(tolerance)) {
                     Parameters pars = extract(p);
                     pars.iProfile = i;
@@ -232,16 +232,16 @@ namespace Isis {
         Parameters pars;
 
         for (int i=1; i<=4; i++)
-            pars.aTerms.push_back(ConfKey(p, "A" + IString(i), 0.0));
+            pars.aTerms.push_back(toDouble(ConfKey(p, "A" + toString(i), toString(0.0))));
 
         for (int i=1; i<=2; i++)
-            pars.bTerms.push_back(ConfKey(p, "B" + IString(i), 0.0));
+            pars.bTerms.push_back(toDouble(ConfKey(p, "B" + toString(i), toString(0.0))));
 
-        pars.wavelength = ConfKey(p, "BandBinCenter", Null);
-        pars.tolerance = ConfKey(p, "BandBinCenterTolerance", Null);
+        pars.wavelength = toDouble(ConfKey(p, "BandBinCenter", toString(Null)));
+        pars.tolerance = toDouble(ConfKey(p, "BandBinCenterTolerance", toString(Null)));
         //  Determine equation units - defaults to Radians
-        pars.units = ConfKey(p, "HapkeExponentialUnits", IString("Radians"));
-        pars.phaUnit = (IString::Equal(pars.units, "Degrees")) ? 1.0 : rpd_c();
+        pars.units = ConfKey(p, "HapkeExponentialUnits", QString("Radians"));
+        pars.phaUnit = (pars.units.toLower() == "degrees") ? 1.0 : rpd_c();
         return (pars);
     }
 
@@ -266,15 +266,15 @@ namespace Isis {
 
         //  Interate over all Photometric groups
         _normProf = DbProfile(pvl.FindObject("NormalizationModel").FindGroup("Algorithm", Pvl::Traverse));
-        _iRef = ConfKey(_normProf, "IncRef", 30.0);
-        _eRef = ConfKey(_normProf, "EmaRef", 0.0);
-        _gRef = ConfKey(_normProf, "PhaRef", _iRef);
+        _iRef = toDouble(ConfKey(_normProf, "IncRef", toString(30.0)));
+        _eRef = toDouble(ConfKey(_normProf, "EmaRef", toString(0.0)));
+        _gRef = toDouble(ConfKey(_normProf, "PhaRef", toString(_iRef)));
 
         PvlObject &phoObj = pvl.FindObject("PhotometricModel");
         DbProfile phoProf = DbProfile(phoObj);
         PvlObject::PvlGroupIterator algo = phoObj.BeginGroup();
         while (algo != phoObj.EndGroup()) {
-            if (IString::Equal(algo->Name(), "Algorithm")) {
+            if (algo->Name().toLower() == "algorithm") {
                 _profiles.push_back(DbProfile(phoProf, DbProfile(*algo)));
             }
             ++algo;
@@ -282,9 +282,9 @@ namespace Isis {
 
         Pvl *label = cube.getLabel();
         PvlKeyword center = label->FindGroup("BandBin", Pvl::Traverse)["Center"];
-        string errs("");
+        QString errs("");
         for (int i = 0; i < cube.getBandCount(); i++) {
-            Parameters parms = findParameters(center[i]);
+            Parameters parms = findParameters(toDouble(center[i]));
             if (parms.IsValid()) {
                 parms.band = i + 1;
                 //_camera->SetBand(i + 1);
@@ -301,7 +301,7 @@ namespace Isis {
         }
 
         // Check for errors and throw them all at the same time
-        if (!errs.empty()) {
+        if (!errs.isEmpty()) {
             errs += " --> Errors in the input PVL file \"" + pvl.FileName() + "\"";
             throw IException(IException::User, errs, _FILEINFO_);
         }

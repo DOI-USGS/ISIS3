@@ -51,14 +51,14 @@ namespace Isis {
     public:
       CameraDistortionMap(Camera *parent, double zDirection = 1.0);
 
-      void SetDistortion(const int naifIkCode);
+      void SetDistortion(int naifIkCode);
 
       //! Destructor
       virtual ~CameraDistortionMap() {};
 
-      virtual bool SetFocalPlane(const double dx, const double dy);
+      virtual bool SetFocalPlane(double dx, double dy);
 
-      virtual bool SetUndistortedFocalPlane(const double ux, const double uy);
+      virtual bool SetUndistortedFocalPlane(double ux, double uy);
 
       //! Return distorted focal plane x
       inline double FocalPlaneX() const {

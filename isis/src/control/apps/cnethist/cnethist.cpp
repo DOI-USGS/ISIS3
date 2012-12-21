@@ -1,6 +1,6 @@
 #include "Isis.h"
 
-#include <string>
+#include <QString>
 #include  <QColor>
 #include <QMenuBar>
 
@@ -41,7 +41,7 @@ void IsisMain() {
   //setup plot tile and axis labels (if any)
   if(ui.IsInteractive()) { 
     // Set the title for the dialog
-    string title;
+    QString title;
     if(ui.WasEntered("TITLE")) {
       title = ui.GetString("TITLE");
     }
@@ -51,26 +51,26 @@ void IsisMain() {
 
     // Create the QHistogram, set the title & load the Isis::Histogram into it
 
-    plot = new HistogramPlotWindow(title.c_str(), ui.TheGui());
+    plot = new HistogramPlotWindow(title.toAscii().data(), ui.TheGui());
 
     // Set the xaxis title if they entered one
     if(ui.WasEntered("XAXIS")) {
-      string xaxis(ui.GetString("XAXIS"));
-      plot->setAxisLabel(QwtPlot::xBottom, xaxis.c_str());
+      QString xaxis(ui.GetString("XAXIS"));
+      plot->setAxisLabel(QwtPlot::xBottom, xaxis.toAscii().data());
     }
 
     // Set the yLeft axis title if they entered one
     if(ui.WasEntered("FREQAXIS")) {
-      string yaxis(ui.GetString("FREQAXIS"));
-      plot->setAxisLabel(QwtPlot::yLeft, yaxis.c_str());
+      QString yaxis(ui.GetString("FREQAXIS"));
+      plot->setAxisLabel(QwtPlot::yLeft, yaxis);
     }
     else {
-      string yaxis = "Frequencey";
-      plot->setAxisLabel(QwtPlot::yLeft, yaxis.c_str());
+      QString yaxis = "Frequencey";
+      plot->setAxisLabel(QwtPlot::yLeft, yaxis);
     }
 
-    string yaxis = "";
-    plot->setAxisLabel(QwtPlot::yRight, yaxis.c_str()); 
+    QString yaxis = "";
+    plot->setAxisLabel(QwtPlot::yRight, yaxis); 
   }
 
   //open text report file (if any)
@@ -79,11 +79,11 @@ void IsisMain() {
     // Write the results
 
     if(!ui.WasEntered("TO")) {
-      string msg = "The [TO] parameter must be entered";
+      QString msg = "The [TO] parameter must be entered";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    string outfile = ui.GetFileName("TO");     
-    fout.open(outfile.c_str());
+    QString outfile = ui.GetFileName("TO");     
+    fout.open(outfile.toAscii().data());
   }
 
   //loop throught the control nets writing reports and drawing histograms as needed
@@ -95,7 +95,7 @@ void IsisMain() {
       hist = new Histogram(net, &ControlMeasure::GetResidualMagnitude, ui.GetDouble("BIN_WIDTH"));
     }
     catch (IException &e) {
-      string msg = "The follwoing error was thrown while building a histogram from netfile [" + 
+      QString msg = "The follwoing error was thrown while building a histogram from netfile [" + 
                     fList[i].expanded() + "]: " +e.toString() + "\n";
       if (ui.IsInteractive())  //if in gui mode print the error message to the terminal
         Application::GuiLog(msg);
@@ -161,7 +161,7 @@ void IsisMain() {
       CubePlotCurve *histCurve = new CubePlotCurve(CubePlotCurve::CubeDN,
                                                 CubePlotCurve::Percentage);
       histCurve->setColor(curveColor(i));
-      IString baseName = FileName(fList[i]).baseName();
+      QString baseName = FileName(fList[i]).baseName();
       histCurve->setTitle(baseName);
 
  

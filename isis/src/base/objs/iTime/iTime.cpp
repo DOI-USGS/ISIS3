@@ -51,12 +51,12 @@ namespace Isis {
    * @param time A time string formatted in standard UTC or similar format.
    *             Example:"2000/12/31 23:59:01.6789" or "2000-12-31T23:59:01.6789"
    */
-  iTime::iTime(const std::string &time) {
+  iTime::iTime(const QString &time) {
     LoadLeapSecondKernel();
 
     // Convert the time string to a double ephemeris time
     SpiceDouble et;
-    str2et_c(time.c_str(), &et);
+    str2et_c(time.toAscii().data(), &et);
 
     p_et = et;
 
@@ -74,12 +74,12 @@ namespace Isis {
    * @param time A time string formatted in standard UTC or similar format.
    *             Example:"2000/12/31 23:59:01.6789" or "2000-12-31T23:59:01.6789"
    */
-  void iTime::operator=(const std::string &time) {
+  void iTime::operator=(const QString &time) {
     LoadLeapSecondKernel();
 
     // Convert the time string to a double ephemeris time
     SpiceDouble et;
-    str2et_c(time.c_str(), &et);
+    str2et_c(time.toAscii().data(), &et);
 
     p_et = et;
 
@@ -200,9 +200,8 @@ namespace Isis {
    *
    * @return string
    */
-  string iTime::YearString() const {
-    Isis::IString sYear(Year());
-    return sYear;
+  QString iTime::YearString() const {
+    return toString(Year());
   }
 
   /**
@@ -223,9 +222,8 @@ namespace Isis {
    *
    * @return string
    */
-  string iTime::MonthString() const {
-    Isis::IString sMonth(Month());
-    return sMonth;
+  QString iTime::MonthString() const {
+    return toString(Month());
   }
 
   /**
@@ -246,9 +244,8 @@ namespace Isis {
    *
    * @return string
    */
-  string iTime::DayString() const {
-    Isis::IString sDay(Day());
-    return sDay;
+  QString iTime::DayString() const {
+    return toString(Day());
   }
 
   /**
@@ -269,9 +266,8 @@ namespace Isis {
    *
    * @return string
    */
-  string iTime::HourString() const {
-    Isis::IString sHour(Hour());
-    return sHour;
+  QString iTime::HourString() const {
+    return toString(Hour());
   }
 
   /**
@@ -292,9 +288,8 @@ namespace Isis {
    *
    * @return string
    */
-  string iTime::MinuteString() const {
-    Isis::IString sMinute(Minute());
-    return sMinute;
+  QString iTime::MinuteString() const {
+    return toString(Minute());
   }
 
   /**
@@ -315,15 +310,16 @@ namespace Isis {
    *
    * @return string
    */
-  string iTime::SecondString() const {
+  QString iTime::SecondString() const {
     ostringstream osec;
     osec.setf(ios::fixed);
     osec << setprecision(8) << Second();
-    IString sSeconds(osec.str());
-    sSeconds.TrimTail("0");
-    sSeconds.TrimTail(".");
-    if(sSeconds.empty()) sSeconds = "0";
-    return (sSeconds);
+    QString sSeconds(osec.str().c_str());
+    sSeconds = sSeconds.remove(QRegExp("(\\.0*|0*)$"));
+
+    if(sSeconds.isEmpty()) sSeconds = "0";
+
+    return sSeconds;
   }
 
   /**
@@ -344,9 +340,8 @@ namespace Isis {
    *
    * @return string
    */
-  string iTime::DayOfYearString() const {
-    Isis::IString sDayOfYear(DayOfYear());
-    return sDayOfYear;
+  QString iTime::DayOfYearString() const {
+    return toString(DayOfYear());
   }
 
   /**
@@ -368,9 +363,8 @@ namespace Isis {
    *
    * @return string
    */
-  string iTime::EtString() const {
-    Isis::IString sEt(p_et);
-    return sEt;
+  QString iTime::EtString() const {
+    return toString(p_et);
   }
 
   /**
@@ -378,8 +372,8 @@ namespace Isis {
    *
    * @return string The internalized time, in UTC format
    */
-  string iTime::UTC() const {
-    string utc = YearString() + "-" ;
+  QString iTime::UTC() const {
+    QString utc = YearString() + "-" ;
     if(Month() < 10) utc += "0" + MonthString() + "-";
     else utc += MonthString() + "-";
 
@@ -405,11 +399,11 @@ namespace Isis {
       p_et = 0.0;
   }
 
-  void iTime::setUtc(IString utcString) {
+  void iTime::setUtc(QString utcString) {
     LoadLeapSecondKernel();
 
     double et;
-    utc2et_c(utcString.c_str(), &et);
+    utc2et_c(utcString.toAscii().data(), &et);
     setEt(et);
   }
 
@@ -426,12 +420,12 @@ namespace Isis {
 
     // Get the leap second kernel file open
     Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
-    string baseDir = dataDir["Base"];
+    QString baseDir = dataDir["Base"];
     baseDir += "/kernels/lsk/";
     FileName leapSecond(baseDir + "naif????.tls");
 
-    string leapSecondName(leapSecond.highestVersion().expanded());
-    furnsh_c(leapSecondName.c_str());
+    QString leapSecondName(leapSecond.highestVersion().expanded());
+    furnsh_c(leapSecondName.toAscii().data());
 
     p_lpInitialized = true;
   }
@@ -450,14 +444,14 @@ namespace Isis {
    * The time is based on the system time, so it is only as
    * accurate as the local system clock.
    *
-   * @return std::string The Current GMT
+   * @return QString The Current GMT
    */
-  std::string iTime::CurrentGMT() {
+  QString iTime::CurrentGMT() {
     time_t startTime = time(NULL);
     struct tm *tmbuf = gmtime(&startTime);
     char timestr[80];
     strftime(timestr, 80, "%Y-%m-%dT%H:%M:%S", tmbuf);
-    return (std::string) timestr;
+    return (QString) timestr;
   }
 
 
@@ -466,13 +460,13 @@ namespace Isis {
    * This time is taken directly from the system clock, so
    * if the system clock is off, this will be, too.
    *
-   * @return std::string The cutrrent local time
+   * @return QString The cutrrent local time
    */
-  std::string iTime::CurrentLocalTime() {
+  QString iTime::CurrentLocalTime() {
     time_t startTime = time(NULL);
     struct tm *tmbuf = localtime(&startTime);
     char timestr[80];
     strftime(timestr, 80, "%Y-%m-%dT%H:%M:%S", tmbuf);
-    return (std::string) timestr;
+    return (QString) timestr;
   }
 } // end namespace isis

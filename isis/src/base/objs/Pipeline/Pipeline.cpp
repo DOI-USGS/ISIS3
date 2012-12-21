@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <QFile>
+
 #include "Pipeline.h"
 #include "PipelineApplication.h"
 #include "ProgramLauncher.h"
@@ -25,7 +27,7 @@ namespace Isis {
    *   @history 2011-08-15 Debbie A. Cook Added initialization for new member
    *                                       p_pausePosition
    */
-  Pipeline::Pipeline(const IString &procAppName) {
+  Pipeline::Pipeline(const QString &procAppName) {
     p_pausePosition = -1;
     p_procAppName = procAppName;
     p_addedCubeatt = false;
@@ -75,11 +77,11 @@ namespace Isis {
 
       // Look to see if we need to eliminate virtual bands...
       for (unsigned int i = 0; i < p_virtualBands.size(); i++) {
-        mustElimBands |= !p_virtualBands[i].empty();
+        mustElimBands |= !p_virtualBands[i].isEmpty();
       }
 
       // Keep track of temp files for conflicts
-      vector<IString> tmpFiles;
+      vector<QString> tmpFiles;
 
       // Loop through all the pipeline apps, look for a good place to remove virtual
       //   bands and tell the apps the prepare themselves. Double check the first program
@@ -88,7 +90,7 @@ namespace Isis {
         if (p_apps[i] == NULL) continue;
         if (mustElimBands && p_apps[i]->SupportsVirtualBands()) {
           if (i != 0 && p_virtualBands.size() != 1) {
-            IString message = "If multiple original inputs were set in the pipeline, the first application must support virtual bands.";
+            QString message = "If multiple original inputs were set in the pipeline, the first application must support virtual bands.";
             throw IException(IException::Programmer, message, _FILEINFO_);
           }
 
@@ -111,7 +113,7 @@ namespace Isis {
         else {
           // Pipeline is responsible for the virtual bands, reset any apps
           //   who have an old virtual bands setting.
-          vector<IString> empty;
+          vector<QString> empty;
           p_apps[i]->SetVirtualBands(empty);
         }
 
@@ -120,10 +122,10 @@ namespace Isis {
         p_apps[i]->BuildParamString();
 
         // keep track of tmp files
-        vector<IString> theseTempFiles = p_apps[i]->TemporaryFiles();
+        vector<QString> theseTempFiles = p_apps[i]->TemporaryFiles();
         for (int tmpFile = 0; tmpFile < (int)theseTempFiles.size(); tmpFile++) {
           // no need to delete blank files
-          if (theseTempFiles[tmpFile].find("blank") == string::npos) {
+          if (theseTempFiles[tmpFile].contains("blank")) {
             tmpFiles.push_back(theseTempFiles[tmpFile]);
           }
         }
@@ -132,7 +134,7 @@ namespace Isis {
           foundFirst = true;
 
           if (p_apps[i]->InputBranches().size() != OriginalBranches().size()) {
-            string msg = "The program [" + p_apps[i]->Name() + "] can not be the first in the pipeline";
+            QString msg = "The program [" + p_apps[i]->Name() + "] can not be the first in the pipeline";
             msg += " because it must be run multiple times with unspecified varying inputs";
             throw IException(IException::Programmer, msg, _FILEINFO_);
           }
@@ -149,7 +151,7 @@ namespace Isis {
       for (int i = 0; successfulPrepare && i < (int)tmpFiles.size(); i++) {
         for (int j = i + 1; j < (int)tmpFiles.size(); j++) {
           if (tmpFiles[i] == tmpFiles[j]) {
-            string msg = "There is a conflict with the temporary file naming. The temporary file [";
+            QString msg = "There is a conflict with the temporary file naming. The temporary file [";
             msg += tmpFiles[i] + "] is created twice.";
             throw IException(IException::Programmer, msg, _FILEINFO_);
           }
@@ -216,20 +218,22 @@ namespace Isis {
         appName.CheckStatus();
          
         // grab the sets of parameters this program needs to be run with
-        const vector<IString> &params = Application(i).ParamString();
+        const vector<QString> &params = Application(i).ParamString();
         for (int j = 0; j < (int)params.size(); j++) {
 
           // check for non-program run special strings
-          IString special(params[j].substr(0, 7));
+          QString special(params[j].mid(0, 7));
 
           // If ">>LIST", then we need to make a list file
           if (special == ">>LIST ") {
-            IString cmd = params[j].substr(7);
-            IString listFileName = cmd.Token(" ");
+            QString cmd = params[j].mid(7);
+
+            QStringList listData = cmd.split(" ");
+            QString listFileName = listData.takeFirst();
             TextFile listFile(listFileName, "overwrite");
 
-            while (!cmd.empty()) {
-              listFile.PutLine(cmd.Token(" "));
+            while (!listData.isEmpty()) {
+              listFile.PutLine(listData.takeFirst());
             }
 
             listFile.Close();
@@ -258,9 +262,9 @@ namespace Isis {
       for (int i = 0; i < Size(); i++) {
         if (p_apps[i] == NULL) continue;
         if (Application(i).Enabled()) {
-          vector<IString> tmpFiles = Application(i).TemporaryFiles();
+          vector<QString> tmpFiles = Application(i).TemporaryFiles();
           for (int file = 0; file < (int)tmpFiles.size(); file++) {
-            remove(tmpFiles[file].c_str());
+            QFile::remove(tmpFiles[file]);
           }
         }
       }
@@ -280,7 +284,7 @@ namespace Isis {
    *                   the input file
    */
   void Pipeline::SetInputFile(const char *inputParam) {
-    SetInputFile(IString(inputParam));
+    SetInputFile(QString(inputParam));
   }
 
 
@@ -294,7 +298,7 @@ namespace Isis {
    * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array
    *                                       to p_inputBranches
    */
-  void Pipeline::SetInputFile(const IString &inputParam) {
+  void Pipeline::SetInputFile(const QString &inputParam) {
     UserInterface &ui = Application::GetUserInterface();
     p_originalInput.push_back(ui.GetFileName(inputParam));
     p_inputBranches.push_back(inputParam);
@@ -327,7 +331,7 @@ namespace Isis {
    *                   the input file
    */
   void Pipeline::SetInputListFile(const char *inputParam) {
-    SetInputListFile(IString(inputParam));
+    SetInputListFile(QString(inputParam));
   }
 
 
@@ -341,16 +345,16 @@ namespace Isis {
    * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array
    *                                       to p_inputBranches
    */
-  void Pipeline::SetInputListFile(const IString &inputParam) {
+  void Pipeline::SetInputListFile(const QString &inputParam) {
     UserInterface &ui = Application::GetUserInterface();
 
     TextFile filelist(FileName(ui.GetFileName(inputParam)).expanded());
-    string filename;
+    QString filename;
     int branch = 1;
 
     while (filelist.GetLineNoFilter(filename)) {
       p_originalInput.push_back(filename);
-      p_inputBranches.push_back(inputParam + IString(branch));
+      p_inputBranches.push_back(inputParam + toString(branch));
       p_virtualBands.push_back("");
       p_finalOutput.push_back(FileName(filename).name());
 
@@ -371,12 +375,12 @@ namespace Isis {
    */
   void Pipeline::SetInputListFile(const FileName &inputFileName) {
     TextFile filelist(inputFileName.expanded());
-    string filename;
+    QString filename;
     int branch = 1;
 
     while (filelist.GetLineNoFilter(filename)) {
       p_originalInput.push_back(filename);
-      p_inputBranches.push_back(FileName(inputFileName).expanded() + " " + IString(branch));
+      p_inputBranches.push_back(FileName(inputFileName).expanded() + " " + QString(branch));
       p_finalOutput.push_back(FileName(filename).name());
       p_virtualBands.push_back("");
 
@@ -399,7 +403,7 @@ namespace Isis {
    *                          parameter exists.
    */
   void Pipeline::SetInputFile(const char *inputParam, const char *virtualBandsParam) {
-    SetInputFile(IString(inputParam), IString(virtualBandsParam));
+    SetInputFile(QString(inputParam), QString(virtualBandsParam));
   }
 
 
@@ -416,12 +420,12 @@ namespace Isis {
    * @history 2010-12-20 Sharmila Prasad - Changed p_originalBranches array
    *                                       to p_inputBranches
    */
-  void Pipeline::SetInputFile(const IString &inputParam, const IString &virtualBandsParam) {
+  void Pipeline::SetInputFile(const QString &inputParam, const QString &virtualBandsParam) {
     UserInterface &ui = Application::GetUserInterface();
     p_originalInput.push_back(ui.GetAsString(inputParam));
     p_inputBranches.push_back(inputParam);
 
-    if (!virtualBandsParam.empty() && ui.WasEntered(virtualBandsParam)) {
+    if (!virtualBandsParam.isEmpty() && ui.WasEntered(virtualBandsParam)) {
       p_virtualBands.push_back(ui.GetAsString(virtualBandsParam));
     }
     else {
@@ -440,7 +444,7 @@ namespace Isis {
    *                    the output file; internal default is supported.
    */
   void Pipeline::SetOutputFile(const char *outputParam) {
-    SetOutputFile(IString(outputParam));
+    SetOutputFile(QString(outputParam));
   }
 
 
@@ -453,7 +457,7 @@ namespace Isis {
    * @param outputParam The parameter to get from the user interface that contains
    *                    the output file; internal default is supported.
    */
-  void Pipeline::SetOutputFile(const IString &outputParam) {
+  void Pipeline::SetOutputFile(const QString &outputParam) {
     UserInterface &ui = Application::GetUserInterface();
     p_finalOutput.clear();
 
@@ -486,7 +490,7 @@ namespace Isis {
    *                           list file
    */
   void Pipeline::SetOutputListFile(const char *outputFileNameParam) {
-    SetOutputListFile(IString(outputFileNameParam));
+    SetOutputListFile(QString(outputFileNameParam));
   }
 
 
@@ -498,7 +502,7 @@ namespace Isis {
    * @param outputFileNameList Parameter name containing the path to the output
    *                           list file
    */
-  void Pipeline::SetOutputListFile(const IString &outputFileNameParam) {
+  void Pipeline::SetOutputListFile(const QString &outputFileNameParam) {
     UserInterface &ui = Application::GetUserInterface();
 
     if (ui.WasEntered(outputFileNameParam)) {
@@ -527,7 +531,7 @@ namespace Isis {
     p_finalOutput.clear();
 
     TextFile filelist(outputFileNameList.expanded());
-    string filename;
+    QString filename;
 
     while (filelist.GetLineNoFilter(filename)) {
       p_finalOutput.push_back(filename);
@@ -557,7 +561,7 @@ namespace Isis {
    */
   void Pipeline::AddPause() {
     // Add the pause
-    IString pauseAppId = "";
+    QString pauseAppId = "";
     PipelineApplication *pauseApp = NULL;
 
     p_apps.push_back(pauseApp);
@@ -578,11 +582,11 @@ namespace Isis {
    *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps
    *
    */
-  void Pipeline::AddToPipeline(const IString &appname, const IString &identifier) {
+  void Pipeline::AddToPipeline(const QString &appname, const QString &identifier) {
     // Check uniqueness first
     for (unsigned int appIdentifier = 0; appIdentifier < p_appIdentifiers.size(); appIdentifier++) {
       if (p_appIdentifiers[appIdentifier] == identifier) {
-        IString message = "The application identifier [" + identifier + "] is not unique. " +
+        QString message = "The application identifier [" + identifier + "] is not unique. " +
                           "Please providing a unique identifier";
         throw IException(IException::Programmer, message, _FILEINFO_);
       }
@@ -590,7 +594,7 @@ namespace Isis {
 
     // If we've got cubeatt on our list of applications for band eliminating, take it away temporarily
     PipelineApplication *cubeAtt = NULL;
-    IString cubeAttId = "";
+    QString cubeAttId = "";
     if (p_addedCubeatt) {
       cubeAtt = p_apps[p_apps.size()-1];
       cubeAttId = p_appIdentifiers[p_appIdentifiers.size()-1];
@@ -601,7 +605,7 @@ namespace Isis {
 
     //Check for non nulls instead of size ie. find last non null or use this
     int appsSize = 0;
-    IString pauseAppId = "";
+    QString pauseAppId = "";
 
     for (int iapp = 0; iapp < (int) p_apps.size(); iapp++)
       if (p_apps[iapp] != NULL) appsSize++;
@@ -640,11 +644,11 @@ namespace Isis {
    *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps
    *
    */
-  void Pipeline::AddToPipeline(const IString &appname) {
+  void Pipeline::AddToPipeline(const QString &appname) {
     // Check uniqueness first
     for (unsigned int appIdentifier = 0; appIdentifier < p_appIdentifiers.size(); appIdentifier++) {
       if (p_appIdentifiers[appIdentifier] == appname) {
-        IString message = "The application identifier [" + appname + "] is not unique. Please use " +
+        QString message = "The application identifier [" + appname + "] is not unique. Please use " +
                           "the other AddToPipeline method providing a unique identifier";
         throw IException(IException::Programmer, message, _FILEINFO_);
       }
@@ -652,7 +656,7 @@ namespace Isis {
 
     // If we've got cubeatt on our list of applications for band eliminating, take it away temporarily
     PipelineApplication *cubeAtt = NULL;
-    IString cubeAttId = "";
+    QString cubeAttId = "";
     if (p_addedCubeatt) {
       cubeAtt = p_apps[p_apps.size()-1];
       cubeAttId = p_appIdentifiers[p_appIdentifiers.size()-1];
@@ -693,7 +697,7 @@ namespace Isis {
    *
    * @return PipelineApplication& The application's representation in the pipeline
    */
-  PipelineApplication &Pipeline::Application(const IString &identifier) {
+  PipelineApplication &Pipeline::Application(const QString &identifier) {
     int index = 0;
     bool found = false;
 
@@ -707,7 +711,7 @@ namespace Isis {
     }
 
     if (!found) {
-      IString msg = "Application identified by [" + identifier + "] has not been added to the pipeline";
+      QString msg = "Application identified by [" + identifier + "] has not been added to the pipeline";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -725,7 +729,7 @@ namespace Isis {
    */
   PipelineApplication &Pipeline::Application(const int &index) {
     if (index > Size()) {
-      IString msg = "Index [" + IString(index) + "] out of bounds";
+      QString msg = "Index [" + QString(index) + "] out of bounds";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -745,7 +749,7 @@ namespace Isis {
    *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps
    *
    */
-  void Pipeline::SetFirstApplication(const IString &appname) {
+  void Pipeline::SetFirstApplication(const QString &appname) {
     int appIndex = 0;
     for (appIndex = 0; appIndex < (int)p_apps.size() &&
                       p_apps[appIndex]->Name() != appname; appIndex++) {
@@ -757,7 +761,7 @@ namespace Isis {
     // }
 
     if (appIndex >= (int)p_apps.size()) {
-      string msg = "Pipeline could not find application [" + appname + "]";
+      QString msg = "Pipeline could not find application [" + appname + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -775,7 +779,7 @@ namespace Isis {
    *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps
    *
    */
-  void Pipeline::SetLastApplication(const IString &appname) {
+  void Pipeline::SetLastApplication(const QString &appname) {
     int appIndex = p_apps.size() - 1;
     for (appIndex = p_apps.size() - 1; appIndex >= 0 && p_apps[appIndex]->Name() != appname; appIndex --) {
       if (p_apps[appIndex] == NULL) continue;
@@ -783,7 +787,7 @@ namespace Isis {
     }
 
     if (appIndex < 0) {
-      string msg = "Pipeline could not find application [" + appname + "]";
+      QString msg = "Pipeline could not find application [" + appname + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -796,20 +800,20 @@ namespace Isis {
    * @param branch Branch index to get the final output for
    * @param addModifiers Whether or not to add the last name modifier
    *
-   * @return IString The final output string
+   * @return QString The final output string
    *
    * @internal
    *   @history 2011-08-15 Debbie A. Cook Added check for NULL pointers in p_apps
    *
    */
-  IString Pipeline::FinalOutput(int branch, bool addModifiers) {
-    IString output = ((p_finalOutput.size() != 0) ? p_finalOutput[0] : "");
+  QString Pipeline::FinalOutput(int branch, bool addModifiers) {
+    QString output = ((p_finalOutput.size() != 0) ? p_finalOutput[0] : "");
 
     if (p_apps.size() == 0) return output;
 
     if (p_finalOutput.size() > 1) {
       if ((unsigned int)branch >= p_finalOutput.size()) {
-        IString msg = "Output not set for branch [" + IString(branch) + "]";
+        QString msg = "Output not set for branch [" + QString(branch) + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
@@ -877,11 +881,11 @@ namespace Isis {
    * This method returns the user's temporary folder for temporary files. It's
    * simply a conveinient accessor to the user's preferences.
    *
-   * @return IString The temporary folder
+   * @return QString The temporary folder
    */
-  IString Pipeline::TemporaryFolder() {
+  QString Pipeline::TemporaryFolder() {
     Pvl &pref = Preference::Preferences();
-    return (string)pref.FindGroup("DataDirectory")["Temporary"];
+    return pref.FindGroup("DataDirectory")["Temporary"];
   }
 
 
@@ -919,20 +923,22 @@ namespace Isis {
   ostream &operator<<(ostream &os, Pipeline &pipeline) {
     pipeline.Prepare();
 
-    if (!pipeline.Name().empty()) {
+    if (!pipeline.Name().isEmpty()) {
       os << "PIPELINE -------> " << pipeline.Name() << " <------- PIPELINE" << endl;
     }
 
     for (int i = 0; i < pipeline.Size(); i++) {
       if (&(pipeline.Application(i)) == NULL) continue;
       if (pipeline.Application(i).Enabled()) {
-        const vector<IString> &params = pipeline.Application(i).ParamString();
+        const vector<QString> &params = pipeline.Application(i).ParamString();
         for (int j = 0; j < (int)params.size(); j++) {
-          IString special(params[j].substr(0, 7));
+          QString special(params[j].mid(0, 7));
           if (special == ">>LIST ") {
-            IString cmd = params[j].substr(7);
-            IString file = cmd.Token(" ");
-            os << "echo " << cmd << " > " << file << endl;
+            QString cmd = params[j].mid(7);
+
+            QStringList listFileData = cmd.split(" ");
+            QString file = listFileData.takeFirst();
+            os << "echo -e \"" << listFileData.join("\\n") << "\" > " << file << endl;
           }
           else {
             os << pipeline.Application(i).Name() << " " << params[j] << endl;
@@ -945,9 +951,9 @@ namespace Isis {
       for (int i = 0; i < pipeline.Size(); i++) {
         if (&(pipeline.Application(i)) == NULL) continue;
         if (pipeline.Application(i).Enabled()) {
-          vector<IString> tmpFiles = pipeline.Application(i).TemporaryFiles();
+          vector<QString> tmpFiles = pipeline.Application(i).TemporaryFiles();
           for (int file = 0; file < (int)tmpFiles.size(); file++) {
-            if (tmpFiles[file].find("blank") == string::npos) {
+            if (!tmpFiles[file].contains("blank")) {
               os << "rm " << tmpFiles[file] << endl;
             }
           }
@@ -955,7 +961,7 @@ namespace Isis {
       }
     }
 
-    if (!pipeline.Name().empty()) {
+    if (!pipeline.Name().isEmpty()) {
       os << "PIPELINE -------> " << pipeline.Name() << " <------- PIPELINE" << endl;
     }
 

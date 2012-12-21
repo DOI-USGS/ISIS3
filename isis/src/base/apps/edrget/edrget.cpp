@@ -1,7 +1,8 @@
 #include "Isis.h"
 
-#include <QtCore>
 #include <iostream>
+
+#include <QtCore>
 
 #include "httpget.h"
 #include "ftpget.h"
@@ -17,18 +18,18 @@ void IsisMain() {
 
   // Get the file name from the GUI
   UserInterface &ui = Application::GetUserInterface();
-  IString guiURL = ui.GetString("URL");
-  IString guiPath;
+  QString guiURL = ui.GetString("URL");
+  QString guiPath;
   if(ui.WasEntered("TOPATH")) {
     guiPath = ui.GetString("TOPATH");
   }
-  QUrl qurl(guiURL.c_str());
+  QUrl qurl(guiURL);
   //test if scheme is ftp and set port
   if(qurl.scheme().toLower() == "ftp") {
     qurl.setPort(21);
 
     if(ui.IsInteractive()) {
-      string parameters = "URL=" + guiURL;
+      QString parameters = "URL=" + guiURL;
       if(ui.WasEntered("TOPATH")) {
         parameters += " TOPATH=" + guiPath;
       }
@@ -44,13 +45,13 @@ void IsisMain() {
       if(getter.error()) {
         QString localFileName;
         if(ui.WasEntered("TOPATH")) {
-          localFileName += guiPath.c_str();
+          localFileName += guiPath;
           localFileName += "/";
         }
         localFileName +=  QFileInfo(qurl.path()).fileName();
-        string localFileNameStr(localFileName.toStdString());
-        remove(localFileNameStr.c_str());
-        IString msg = "Could not acquire [" + guiURL + "]";
+        QString localFileNameStr(localFileName);
+        QFile::remove(localFileNameStr);
+        QString msg = "Could not acquire [" + guiURL + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -60,7 +61,7 @@ void IsisMain() {
     qurl.setPort(80);
 
     if(ui.IsInteractive()) {
-      string parameters = "URL=" + guiURL;
+      QString parameters = "URL=" + guiURL;
       if(ui.WasEntered("TOPATH")) {
         parameters += " TOPATH=" + guiPath;
       }
@@ -75,19 +76,19 @@ void IsisMain() {
       if(getter.error()) {
         QString localFileName;
         if(ui.WasEntered("TOPATH")) {
-          localFileName += guiPath.c_str();
+          localFileName += guiPath;
           localFileName += "/";
         }
-        string localFileNameStr(localFileName.toStdString());
-        remove(localFileNameStr.c_str());
-        IString msg = "Could not acquire [" + guiURL + "]";
+        QString localFileNameStr(localFileName);
+        QFile::remove(localFileNameStr);
+        QString msg = "Could not acquire [" + guiURL + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
   }
   //if scheme is not ftp or http throw error
   else {
-    IString msg = "Scheme [" + qurl.scheme().toStdString() + "] not found, must be 'ftp' or 'http'";
+    QString msg = "Scheme [" + qurl.scheme() + "] not found, must be 'ftp' or 'http'";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }

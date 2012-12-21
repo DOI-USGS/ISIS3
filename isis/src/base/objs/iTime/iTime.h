@@ -30,8 +30,9 @@
 
 #include "FileName.h"
 
+class QString;
+
 namespace Isis {
-  class IString;
 
   /**
    * @brief Parse and return pieces of a time string
@@ -72,7 +73,7 @@ namespace Isis {
     public:
       // constructor
       iTime();
-      iTime(const std::string &time);
+      iTime(const QString &time);
 
       /**
       * Constructs a iTime object and initializes it to the time from the argument.
@@ -89,7 +90,7 @@ namespace Isis {
       // destructor
       ~iTime() {};
 
-      void operator=(const std::string &time);
+      void operator=(const QString &time);
       void operator=(const char *time);
       void operator=(const double time);
 
@@ -105,21 +106,21 @@ namespace Isis {
       friend iTime operator +(const double &secondsToAdd, iTime time);
 
       // Return the year
-      std::string YearString() const;
+      QString YearString() const;
       int Year() const;
-      std::string MonthString() const;
+      QString MonthString() const;
       int Month() const;
-      std::string DayString() const;
+      QString DayString() const;
       int Day() const;
-      std::string HourString() const;
+      QString HourString() const;
       int Hour() const;
-      std::string MinuteString() const;
+      QString MinuteString() const;
       int Minute() const;
-      std::string SecondString() const;
+      QString SecondString() const;
       double Second() const;
-      std::string DayOfYearString() const;
+      QString DayOfYearString() const;
       int DayOfYear() const;
-      std::string EtString() const;
+      QString EtString() const;
 
       /**
        * Returns the ephemeris time (TDB) representation of the time as a double
@@ -128,12 +129,12 @@ namespace Isis {
         return p_et;
       }
 
-      std::string UTC() const;
-      static std::string CurrentGMT();
-      static std::string CurrentLocalTime();
+      QString UTC() const;
+      static QString CurrentGMT();
+      static QString CurrentLocalTime();
       
       void setEt(double et);
-      void setUtc(IString utcString);
+      void setUtc(QString utcString);
 
     private:
       double p_et;     /**<The ephemeris representaion of the original string

@@ -76,7 +76,7 @@ namespace Isis {
 
     for (int i = 0; i < selected.size(); i++) {
       int index = p_listBox->row(selected[i]);
-      string selectedCubeSerNum = (*g_serialNumberList).SerialNumber(index);
+      QString selectedCubeSerNum = (*g_serialNumberList).SerialNumber(index);
 
       // Loop through each value of the filtered points list
       // checking the types of each control measure for each
@@ -121,8 +121,8 @@ namespace Isis {
 
     for (int i = 0; i < g_serialNumberList->Size(); i++) {
       FileName filename = FileName(g_serialNumberList->FileName(i));
-      string tempFileName = filename.name();
-      p_listBox->insertItem(i, tempFileName.c_str());
+      QString tempFileName = filename.name();
+      p_listBox->insertItem(i, tempFileName);
     }
   }
 }

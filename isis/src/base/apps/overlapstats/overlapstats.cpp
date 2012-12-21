@@ -20,7 +20,7 @@ using namespace Isis;
 bool full = false;
 bool tab = false;
 
-std::string FormatString(double input, int head, int tail);
+QString FormatString(double input, int head, int tail);
 
 void IsisMain() {
 
@@ -44,7 +44,7 @@ void IsisMain() {
   for (int i = 0; i < overlaps.Size(); i++) {
     ImageOverlap const * currOverlap = overlaps[i];
     for (int j = 0; j < currOverlap->Size(); j++) {
-      string currSerialNum = (*currOverlap)[j];
+      QString currSerialNum = (*currOverlap)[j];
       if (!serialNumbers.HasSerialNumber(currSerialNum)) {
         IString msg = "Found serial number [" + currSerialNum + "] in overlap "
             "list that was not in the provided cube list. Please ensure that "
@@ -56,7 +56,7 @@ void IsisMain() {
   }
 
   // Sets up the no overlap list
-  set<string> nooverlap;
+  set<QString> nooverlap;
   for(int i = 0; i < serialNumbers.Size(); i ++) {
     nooverlap.insert(serialNumbers.SerialNumber(i));
   }
@@ -66,8 +66,8 @@ void IsisMain() {
   output.precision(16);
   output.setf(ios::showpoint);
 
-  string delim = "";
-  string pretty = ""; // Makes tab tables look pretty, ignored in CSV
+  QString delim = "";
+  QString pretty = ""; // Makes tab tables look pretty, ignored in CSV
   bool singleLine = false;
   if(ui.WasEntered("DETAIL")) {
     if(ui.GetString("TABLETYPE") == "CSV") {
@@ -115,18 +115,18 @@ void IsisMain() {
       // Construct a Projection for converting between Lon/Lat and X/Y
       Pvl cubeLab(serialNumbers.FileName(0));
       PvlGroup inst = cubeLab.FindGroup("Instrument", Pvl::Traverse);
-      string target = inst["TargetName"];
+      QString target = inst["TargetName"];
       PvlGroup radii = Projection::TargetRadii(target);
       Isis::Pvl maplab;
       maplab.AddGroup(Isis::PvlGroup("Mapping"));
       Isis::PvlGroup &mapGroup = maplab.FindGroup("Mapping");
-      mapGroup += Isis::PvlKeyword("EquatorialRadius", (string)radii["EquatorialRadius"]);
-      mapGroup += Isis::PvlKeyword("PolarRadius", (string)radii["PolarRadius"]);
+      mapGroup += Isis::PvlKeyword("EquatorialRadius", (QString)radii["EquatorialRadius"]);
+      mapGroup += Isis::PvlKeyword("PolarRadius", (QString)radii["PolarRadius"]);
       mapGroup += Isis::PvlKeyword("LatitudeType", "Planetocentric");
       mapGroup += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-      mapGroup += Isis::PvlKeyword("LongitudeDomain", 360);
-      mapGroup += Isis::PvlKeyword("CenterLatitude", 0);
-      mapGroup += Isis::PvlKeyword("CenterLongitude", 0);
+      mapGroup += Isis::PvlKeyword("LongitudeDomain", toString(360));
+      mapGroup += Isis::PvlKeyword("CenterLatitude", toString(0));
+      mapGroup += Isis::PvlKeyword("CenterLongitude", toString(0));
       mapGroup += Isis::PvlKeyword("ProjectionName", "Sinusoidal");
       Projection *proj = Isis::ProjectionFactory::Create(maplab);
 
@@ -206,7 +206,7 @@ void IsisMain() {
 
   // Checks if there were overlaps to output results from
   if(overlapnum == 0) {
-    std::string msg = "The overlap file [";
+    QString msg = "The overlap file [";
     msg += FileName(ui.GetFileName("OVERLAPLIST")).name();
     msg += "] does not contain any overlaps across the provided cubes [";
     msg += FileName(ui.GetFileName("FROMLIST")).name() + "]";
@@ -217,29 +217,29 @@ void IsisMain() {
   //Create and Log the BRIEF description
   PvlGroup brief("Results");
 
-  brief += PvlKeyword("ThicknessMinimum", thickness.Minimum());
-  brief += PvlKeyword("ThicknessMaximum", thickness.Maximum());
-  brief += PvlKeyword("ThicknessAverage", thickness.Average());
-  brief += PvlKeyword("ThicknessStandardDeviation", thickness.StandardDeviation());
-  brief += PvlKeyword("ThicknessVariance", thickness.Variance());
+  brief += PvlKeyword("ThicknessMinimum", toString(thickness.Minimum()));
+  brief += PvlKeyword("ThicknessMaximum", toString(thickness.Maximum()));
+  brief += PvlKeyword("ThicknessAverage", toString(thickness.Average()));
+  brief += PvlKeyword("ThicknessStandardDeviation", toString(thickness.StandardDeviation()));
+  brief += PvlKeyword("ThicknessVariance", toString(thickness.Variance()));
 
-  brief += PvlKeyword("AreaMinimum", area.Minimum());
-  brief += PvlKeyword("AreaMaximum", area.Maximum());
-  brief += PvlKeyword("AreaAverage", area.Average());
-  brief += PvlKeyword("AreaStandardDeviation", area.StandardDeviation());
-  brief += PvlKeyword("AreaVariance", area.Variance());
+  brief += PvlKeyword("AreaMinimum", toString(area.Minimum()));
+  brief += PvlKeyword("AreaMaximum", toString(area.Maximum()));
+  brief += PvlKeyword("AreaAverage", toString(area.Average()));
+  brief += PvlKeyword("AreaStandardDeviation", toString(area.StandardDeviation()));
+  brief += PvlKeyword("AreaVariance", toString(area.Variance()));
 
-  brief += PvlKeyword("ImageStackMinimum", sncount.Minimum());
-  brief += PvlKeyword("ImageStackMaximum", sncount.Maximum());
-  brief += PvlKeyword("ImageStackAverage", sncount.Average());
-  brief += PvlKeyword("ImageStackStandardDeviation", sncount.StandardDeviation());
-  brief += PvlKeyword("ImageStackVariance", sncount.Variance());
+  brief += PvlKeyword("ImageStackMinimum", toString(sncount.Minimum()));
+  brief += PvlKeyword("ImageStackMaximum", toString(sncount.Maximum()));
+  brief += PvlKeyword("ImageStackAverage", toString(sncount.Average()));
+  brief += PvlKeyword("ImageStackStandardDeviation", toString(sncount.StandardDeviation()));
+  brief += PvlKeyword("ImageStackVariance", toString(sncount.Variance()));
 
-  brief += PvlKeyword("PolygonCount", overlaps.Size());
+  brief += PvlKeyword("PolygonCount", toString(overlaps.Size()));
 
   // Add non-overlapping cubes to the output
   if(!nooverlap.empty()) {
-    for(set<string>::iterator itt = nooverlap.begin(); itt != nooverlap.end(); itt ++) {
+    for(set<QString>::iterator itt = nooverlap.begin(); itt != nooverlap.end(); itt ++) {
       brief += PvlKeyword("NoOverlap", serialNumbers.FileName(*itt));
     }
   }
@@ -249,9 +249,9 @@ void IsisMain() {
 
   //Log the ERRORS file
   if(ui.WasEntered("ERRORS")) {
-    string errorname = ui.GetFileName("ERRORS");
+    QString errorname = ui.GetFileName("ERRORS");
     std::ofstream errorsfile;
-    errorsfile.open(errorname.c_str());
+    errorsfile.open(errorname.toAscii().data());
     errorsfile << errors.str();
     errorsfile.close();
   }
@@ -259,16 +259,16 @@ void IsisMain() {
   //Log error num in print.prt if there were errors
   if(errorNum > 0) {
     PvlGroup grp("OverlapStats");
-    PvlKeyword key("ErrorNumber", IString(errorNum));
+    PvlKeyword key("ErrorNumber", toString(errorNum));
     grp.AddKeyword(key);
     Application::Log(grp);
   }
 
   // Display FULL output
   if(full) {
-    string outname = ui.GetFileName("TO");
+    QString outname = ui.GetFileName("TO");
     std::ofstream outfile;
-    outfile.open(outname.c_str());
+    outfile.open(outname.toAscii().data());
     outfile << output.str();
     outfile.close();
     if(outfile.fail()) {
@@ -281,7 +281,7 @@ void IsisMain() {
 
 
 /**
- * Takes a string and formats the length of that string around the decimal
+ * Takes a QString and formats the length of that QString around the decimal
  * point.
  *
  * @param input The input double to be formatted
@@ -290,15 +290,15 @@ void IsisMain() {
  * @param tail  The desired character length for the double after the decimal
  *              point. It will be filled with "0".
  *
- * @return std::string The formatted double for display
+ * @return QString The formatted double for display
  */
-std::string FormatString(double input, int head, int tail) {
+QString FormatString(double input, int head, int tail) {
 
-  IString result(input);
+  QString result(toString(input));
 
-  int point = result.find_first_of(".");
-  IString resultHead(result.substr(0, point));
-  IString resultTail(result.substr(point + 1, result.size() - point - 1));
+  int point = result.indexOf(".");
+  QString resultHead(result.mid(0, point));
+  QString resultTail(result.mid(point + 1, result.size() - point - 1));
 
   for(int place = resultHead.size(); place < head; place ++) {
     resultHead = " " + resultHead;

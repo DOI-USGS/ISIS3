@@ -30,10 +30,10 @@ int main() {
     if(!alg.HasKeyword("Name")) {
       cout << "Test without subgrid" << endl;
       alg += PvlKeyword("Name", "Strip");
-      alg += PvlKeyword("MinimumThickness", 0.3);
-      alg += PvlKeyword("MinimumArea", 10);
-      alg += PvlKeyword("XSpacing", 1500);
-      alg += PvlKeyword("YSpacing", 1500);
+      alg += PvlKeyword("MinimumThickness", toString(0.3));
+      alg += PvlKeyword("MinimumArea", toString(10));
+      alg += PvlKeyword("XSpacing", toString(1500));
+      alg += PvlKeyword("YSpacing", toString(1500));
     }
 
     PvlObject o("AutoSeed");
@@ -74,13 +74,13 @@ int main() {
       Isis::Pvl maplab;
       maplab.AddGroup(Isis::PvlGroup("Mapping"));
       Isis::PvlGroup &mapGroup = maplab.FindGroup("Mapping");
-      mapGroup += Isis::PvlKeyword("EquatorialRadius", (string)radii["EquatorialRadius"]);
-      mapGroup += Isis::PvlKeyword("PolarRadius", (string)radii["PolarRadius"]);
+      mapGroup += Isis::PvlKeyword("EquatorialRadius", (QString)radii["EquatorialRadius"]);
+      mapGroup += Isis::PvlKeyword("PolarRadius", (QString)radii["PolarRadius"]);
       mapGroup += Isis::PvlKeyword("LatitudeType", "Planetocentric");
       mapGroup += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-      mapGroup += Isis::PvlKeyword("LongitudeDomain", 360);
-      mapGroup += Isis::PvlKeyword("CenterLatitude", 0);
-      mapGroup += Isis::PvlKeyword("CenterLongitude", 0);
+      mapGroup += Isis::PvlKeyword("LongitudeDomain", toString(360));
+      mapGroup += Isis::PvlKeyword("CenterLatitude", "0");
+      mapGroup += Isis::PvlKeyword("CenterLongitude", "0");
       mapGroup += Isis::PvlKeyword("ProjectionName", "Sinusoidal");
 
       Projection *proj = Isis::ProjectionFactory::Create(maplab);
@@ -151,13 +151,13 @@ int main() {
       Isis::Pvl maplab;
       maplab.AddGroup(Isis::PvlGroup("Mapping"));
       Isis::PvlGroup &mapGroup = maplab.FindGroup("Mapping");
-      mapGroup += Isis::PvlKeyword("EquatorialRadius", (string)radii["EquatorialRadius"]);
-      mapGroup += Isis::PvlKeyword("PolarRadius", (string)radii["PolarRadius"]);
+      mapGroup += Isis::PvlKeyword("EquatorialRadius", (QString)radii["EquatorialRadius"]);
+      mapGroup += Isis::PvlKeyword("PolarRadius", (QString)radii["PolarRadius"]);
       mapGroup += Isis::PvlKeyword("LatitudeType", "Planetocentric");
       mapGroup += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-      mapGroup += Isis::PvlKeyword("LongitudeDomain", 360);
-      mapGroup += Isis::PvlKeyword("CenterLatitude", 0);
-      mapGroup += Isis::PvlKeyword("CenterLongitude", 0);
+      mapGroup += Isis::PvlKeyword("LongitudeDomain", toString(360));
+      mapGroup += Isis::PvlKeyword("CenterLatitude", toString(0));
+      mapGroup += Isis::PvlKeyword("CenterLongitude", toString(0));
       mapGroup += Isis::PvlKeyword("ProjectionName", "Sinusoidal");
       Projection *proj = Isis::ProjectionFactory::Create(maplab);
 

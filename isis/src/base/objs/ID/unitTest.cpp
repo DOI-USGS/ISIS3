@@ -1,54 +1,61 @@
 #include <iostream>
+
+#include <QString>
+
 #include "IException.h"
+#include "IString.h"
 #include "ID.h"
 #include "Preference.h"
 
+using namespace Isis;
+using namespace std;
+
 int main() {
-  Isis::Preference::Preferences(true);
-  std::cout << "Test One: core test and limit test" << std::endl;
+  Preference::Preferences(true);
+  cout << "Test One: core test and limit test" << endl;
   try {
-    Isis::ID pid("ABCD??EFG");
+    ID pid("ABCD??EFG");
     for(int i = 0; i < 100; i++) {
-      std::string test = pid.Next();
+      QString test = pid.Next();
       if(i % 10 == 0) {
-        std::cout << test << std::endl;
+        cout << test << endl;
       }
     }
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 
-  std::cout << std::endl << "Test 2: No '?' test" << std::endl;
+  cout << endl << "Test 2: No '?' test" << endl;
   try {
-    Isis::ID pid2("Serial");
+    ID pid2("Serial");
     for(int i = 0; i < 5; i++) {
-      std::cout << pid2.Next() << std::endl;
+      cout << pid2.Next() << endl;
     }
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 
-  std::cout << std::endl << "Test 3: Broken replacement string" << std::endl;
+  cout << endl << "Test 3: Broken replacement string" << endl;
   try {
-    Isis::ID pid3("Serial??Number??");
+    ID pid3("Serial??Number??");
     for(int i = 0; i < 5; i++) {
-      std::cout << pid3.Next() << std::endl;
+      cout << pid3.Next() << endl;
     }
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 
-  std::cout << std::endl << "Test 4: differing start numbers" << std::endl;
+  cout << endl << "Test 4: differing start numbers" << endl;
   try {
-    Isis::ID pid4("Test??", 0);
+    ID pid4("Test??", 0);
     for(int i = 0; i < 5; i++) {
-      std::cout << pid4.Next() << std::endl;
+      cout << pid4.Next() << endl;
     }
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   return 0;

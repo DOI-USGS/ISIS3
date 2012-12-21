@@ -1,4 +1,4 @@
-#if !defined(ZeroDark_h)
+#ifndef ZeroDark_h
 #define ZeroDark_h
 /**                                                                       
  * @file                                                                  
@@ -107,11 +107,11 @@ namespace Isis {
         _intercept = loadCsv("DarkIntercept", conf, prof, 256);
 
         // Get temperation normalization factor
-        _refTemp = ConfKey(prof, "FpaReferenceTemperature", 21.0);
+        _refTemp = toDouble(ConfKey(prof, "FpaReferenceTemperature", toString(21.0)));
 
         //  Smooth/filter if requested
-        int width =  ConfKey(prof,"ZeroDarkFilterWidth",3);
-        int iters =  ConfKey(prof,"ZerDarkFilterIterations",0);
+        int width =  toInt(ConfKey(prof, "ZeroDarkFilterWidth", toString(3)));
+        int iters =  toInt(ConfKey(prof, "ZerDarkFilterIterations", toString(0)));
         LowPassFilter smooth(width, iters);
         _history.add("Smooth(Width["+ToString(width)+"],Iters["+ToString(iters)+"])");
 

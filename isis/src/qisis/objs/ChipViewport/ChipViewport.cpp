@@ -244,9 +244,9 @@ namespace Isis {
                           p_circleSize, p_circleSize);
     }
 
-    string serialNumber = SerialNumber::Compose(*p_chipCube);
+    QString serialNumber = SerialNumber::Compose(*p_chipCube);
     if (p_controlNet && p_controlNet->GetCubeSerials().contains(
-                             QString::fromStdString(serialNumber))) {
+                             serialNumber)) {
       // draw measure locations if we have a control network
       //  If the serial number is Unknown, we probably have a ground source
       //  file or level 2 which means it does not exist in the network
@@ -543,7 +543,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString msg = "Cannot geom chip.\n";
-      msg += e.toString().ToQt();
+      msg += e.toString();
       QMessageBox::information((QWidget *)parent(), "Error", msg);
       return;
     }
@@ -566,7 +566,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString msg = "Cannot load no geom chip.\n";
-      msg += e.toString().ToQt();
+      msg += e.toString();
       QMessageBox::information((QWidget *)parent(), "Error", msg);
       return;
     }
@@ -595,7 +595,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString msg = "Cannot load rotated chip.\n";
-      msg += e.toString().ToQt();
+      msg += e.toString();
       QMessageBox::information((QWidget *)parent(), "Error", msg);
       return;
     }
@@ -634,7 +634,7 @@ namespace Isis {
       }
       catch (IException &e) {
         QString msg = "Cannot reload chip.\n";
-        msg += e.toString().ToQt();
+        msg += e.toString();
         QMessageBox::information((QWidget *)parent(), "Error", msg);
         return;
       }
@@ -646,7 +646,7 @@ namespace Isis {
       }
       catch (IException &e) {
         QString msg = "Cannot reload chip.\n";
-        msg += e.toString().ToQt();
+        msg += e.toString();
         QMessageBox::information((QWidget *)parent(), "Error", msg);
         return;
       }

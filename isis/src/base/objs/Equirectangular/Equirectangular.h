@@ -81,8 +81,8 @@ namespace Isis {
       ~Equirectangular();
       bool operator==(const Projection &proj);
 
-      std::string Name() const;
-      std::string Version() const;
+      QString Name() const;
+      QString Version() const;
       double TrueScaleLatitude() const;
       bool IsEquatorialCylindrical();
 

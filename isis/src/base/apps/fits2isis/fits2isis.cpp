@@ -12,7 +12,7 @@
 
 #include <fstream>
 #include <iostream>
-#include <string>
+#include <QString>
 
 using namespace std;
 using namespace Isis;
@@ -21,15 +21,15 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
 
-  string from = ui.GetFileName("FROM");
+  QString from = ui.GetFileName("FROM");
 
   // Setup to read headers/labels
   ifstream input;
-  input.open(from.c_str(), ios::in | ios::binary);
+  input.open(from.toAscii().data(), ios::in | ios::binary);
 
   // Check stream open status
   if(!input.is_open()) {
-    string msg = "Cannot open input file [" + from + "]";
+    QString msg = "Cannot open input file [" + from + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
@@ -50,26 +50,26 @@ void IsisMain() {
     // Check for blank lines
     if(line.substr(0, 1) != " " && line.substr(0, 1) != "/") {
       // Name of keyword
-      PvlKeyword label(line.Token(" ="));
+      PvlKeyword label(line.Token(" =").ToQt());
       // Remove up to beginning of data
       line.TrimHead(" ='");
       line.TrimTail(" ");
       if(label.Name() == "COMMENT" || label.Name() == "HISTORY") {
-        label += line;
+        label += line.ToQt();
       }
       else {
         // Access the data without the comment if there is one
         IString value = line.Token("/");
         // Clear to end of data, including single quotes
         value.TrimTail(" '");
-        label += value;
+        label += value.ToQt();
         line.TrimHead(" ");
-        // If the remaining line string has anything, it is comments.
+        // If the remaining line QString has anything, it is comments.
         if(line.size() > 0) {
-          label.AddComment(line);
+          label.AddComment(line.ToQt());
           // A possible format for units, other possiblites exist.
           if(line != line.Token("[")) {
-            label.SetUnits(line.Token("[").Token("]"));
+            label.SetUnits(line.Token("[").Token("]").ToQt());
           }
         }
       }
@@ -88,7 +88,7 @@ void IsisMain() {
 
   // Its possible they could have this instead of T, in which case we won't even try
   if(labels["SIMPLE"][0] == "F") {
-    string msg = "The file [" + ui.GetFileName("FROM") + "] does not conform to the FITS standards";
+    QString msg = "The file [" + ui.GetFileName("FROM") + "] does not conform to the FITS standards";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -103,8 +103,8 @@ void IsisMain() {
 
   // Find pixel type, there are several unsupported possiblites
   Isis::PixelType type;
-  string msg = "";
-  switch(labels["BITPIX"][0].ToInteger()) {
+  QString msg = "";
+  switch(toInt(labels["BITPIX"][0])) {
     case 8:
       type = Isis::UnsignedByte;
       break;
@@ -136,23 +136,24 @@ void IsisMain() {
 
   // It is possible to have a NAXIS value of 0 meaning no data, the file could include
   // xtensions with data, however, those aren't supported as of Oct '09
-  if(labels["NAXIS"][0].ToInteger() == 2) {
-    pfits.SetDimensions(labels["NAXIS1"][0], labels["NAXIS2"][0], 1);
+  if(toInt(labels["NAXIS"][0]) == 2) {
+    pfits.SetDimensions(toInt(labels["NAXIS1"][0]), toInt(labels["NAXIS2"][0]), 1);
   }
-  else if(labels["NAXIS"][0].ToInteger() == 3) {
-    pfits.SetDimensions(labels["NAXIS1"][0], labels["NAXIS2"][0], labels["NAXIS3"][0]);
+  else if(toInt(labels["NAXIS"][0]) == 3) {
+    pfits.SetDimensions(toInt(labels["NAXIS1"][0]), toInt(labels["NAXIS2"][0]),
+                        toInt(labels["NAXIS3"][0]));
   }
   else {
-    string msg = "NAXIS count of [" + labels["NAXIS"][0] + "] is not supported at this time";
+    QString msg = "NAXIS count of [" + labels["NAXIS"][0] + "] is not supported at this time";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Base and multiplier
   if(labels.HasKeyword("BZERO")) {
-    pfits.SetBase(labels["BZERO"][0]);
+    pfits.SetBase(toDouble(labels["BZERO"][0]));
   }
   if(labels.HasKeyword("BSCALE")) {
-    pfits.SetMultiplier(labels["BSCALE"][0]);
+    pfits.SetMultiplier(toDouble(labels["BSCALE"][0]));
   }
 
   // Byte order

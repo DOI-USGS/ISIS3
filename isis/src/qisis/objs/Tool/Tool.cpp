@@ -28,8 +28,8 @@ namespace Isis {
     p_active = false;
     p_toolPadAction = NULL;
     p_toolBarWidget = NULL;
-    std::string tempFileName = FileName("$base/icons").expanded();
-    p_toolIconDir = tempFileName.c_str();
+    QString tempFileName = FileName("$base/icons").expanded();
+    p_toolIconDir = tempFileName;
   }
 
 

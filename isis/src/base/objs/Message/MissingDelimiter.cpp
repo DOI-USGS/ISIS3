@@ -1,23 +1,23 @@
 using namespace std;
 
 #include <sstream>
+
+#include "IString.h"
 #include "Message.h"
 
-string Isis::Message::MissingDelimiter(const char d) {
-  ostringstream os;
-  os << "Missing delimiter [" << d << "]";
-  return os.str();
+QString Isis::Message::MissingDelimiter(char d) {
+  return "Missing delimiter [" + toString(d) + "]";
 }
 
-string Isis::Message::MissingDelimiter(const char d, const string &near) {
-  ostringstream os;
-
-  os << "Missing delimiter [" << d << "] at or near [";
+QString Isis::Message::MissingDelimiter(char d, const QString &near) {
+  QString message = "Missing delimiter [" + toString(d) + "] at or near [";
+  
   if(near.size() <= 20) {
-    os << near << "]";
+    message += near + "]";
   }
   else {
-    os << near.substr(0, 20) << " ...]";
+    message += near.mid(0, 20) + " ...]";
   }
-  return os.str();
+
+  return message;
 }

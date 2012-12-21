@@ -52,7 +52,7 @@ namespace Isis {
    * @brief Constructor using an ISIS cube file name
    * @param filename Name of ISIS cube file
    */
-  MdisGeometry::MdisGeometry(const std::string &filename) {
+  MdisGeometry::MdisGeometry(const QString &filename) {
     Cube cube;
     cube.open(filename);
     init(cube);
@@ -75,7 +75,7 @@ namespace Isis {
    *
    * @param filename Name of ISIS cube file
    */
-  void MdisGeometry::setCube(const std::string &filename) {
+  void MdisGeometry::setCube(const QString &filename) {
     Cube cube;
     cube.open(filename);
     delete _camera;
@@ -114,7 +114,7 @@ namespace Isis {
     PvlKeyword &target = label.FindKeyword("TargetName", PvlObject::Traverse);
     SpiceInt tcode;
     SpiceBoolean found;
-    (void) bodn2c_c(target[0].c_str(), &tcode, &found);
+    (void) bodn2c_c(target[0].toAscii().data(), &tcode, &found);
     if(found) return (true);
 
     if(makeValid) {
@@ -250,7 +250,7 @@ namespace Isis {
    *
    * @return Pvl Contains PvlKeywords of all computed parameters
    */
-  Pvl MdisGeometry::getGeometry(const std::string &filename) {
+  Pvl MdisGeometry::getGeometry(const QString &filename) {
     Pvl geom;
 
     // Set initial keywords
@@ -554,8 +554,8 @@ namespace Isis {
 
     //  Now compute the reticle points of all subframes if they exist
     for(int i = 1 ; i <= 5 ; i++) {
-      IString n(i);
-      string object = "SUBFRAME" + n + "_PARAMETERS/";
+      QString n(i);
+      QString object = "SUBFRAME" + n + "_PARAMETERS/";
 
       double sample, line, width, height;
       if(!getSubframeCoordinates(i, sample, line, width, height)) {
@@ -663,7 +663,7 @@ namespace Isis {
     }
     else {
       //  It does exist, extract coordinates from original image label
-      IString n(frameno);
+      QString n(toString(frameno));
       sample  = (double) _orglabel.FindKeyword("MESS:SUBF_X" + n,
                 PvlObject::Traverse);
       line    = (double) _orglabel.FindKeyword("MESS:SUBF_Y" + n,
@@ -717,9 +717,9 @@ namespace Isis {
     // Get NAIF body codes
     SpiceInt scCode(-236), targCode(0);
     SpiceBoolean found;
-    string target(_camera->target()->name());
+    QString target(_camera->target()->name());
     (void) bodn2c_c("MESSENGER", &scCode, &found);
-    (void) bodn2c_c(target.c_str(), &targCode, &found);
+    (void) bodn2c_c(target.toAscii().data(), &targCode, &found);
     if(!found) {
       return (false);
     }
@@ -1066,8 +1066,8 @@ namespace Isis {
    *
    * @return PvlKeyword  Returns the formatted PVL keyword
    */
-  PvlKeyword MdisGeometry::format(const std::string &name, const double &value,
-                                  const std::string &unit) const {
+  PvlKeyword MdisGeometry::format(const QString &name, const double &value,
+                                  const QString &unit) const {
     if(IsSpecial(value)) {
       return (PvlKeyword(name, _NullDefault));
     }
@@ -1094,9 +1094,9 @@ namespace Isis {
    *
    * @return PvlKeyword  Returns the formatted PVL keyword
    */
-  PvlKeyword MdisGeometry::format(const std::string &name,
+  PvlKeyword MdisGeometry::format(const QString &name,
                                   const std::vector<double> &values,
-                                  const std::string &unit) const {
+                                  const QString &unit) const {
     PvlKeyword key(name);
     for(unsigned int i = 0 ; i < values.size() ; i++) {
       if(IsSpecial(values[i])) {
@@ -1124,12 +1124,42 @@ namespace Isis {
    *
    * @return PvlKeyword  Returns the formatted PVL keyword
    */
-  PvlKeyword MdisGeometry::format(const std::string &name,
+  PvlKeyword MdisGeometry::format(const QString &name,
                                   const std::vector<std::string> &values,
-                                  const std::string &unit) const {
+                                  const QString &unit) const {
     PvlKeyword key(name);
     for(unsigned int i = 0 ; i < values.size() ; i++) {
       if(values[i].empty()) {
+        key.AddValue(_NullDefault);
+      }
+      else {
+        key.AddValue(values[i].c_str(), unit);
+      }
+    }
+    return (key);
+  }
+
+  /**
+   * @brief Create a PvlKeyword from a vector of string values
+   *
+   * This method formats a vector of string values according to specifications
+   * of the PDS and mission definitions. If any one of the passed string values
+   * is a an empty string, the special null string is subsitituted.
+   *
+   * @param name   Name of the keyword to create
+   * @param values Vector of string values to format.  Empty strings are
+   *               substituted by the null string value.
+   * @param unit Optional unit for the value.  Pass an empty string to exclude
+   *             unit from format.
+   *
+   * @return PvlKeyword  Returns the formatted PVL keyword
+   */
+  PvlKeyword MdisGeometry::format(const QString &name,
+                                  const std::vector<QString> &values,
+                                  const QString &unit) const {
+    PvlKeyword key(name);
+    for(unsigned int i = 0 ; i < values.size() ; i++) {
+      if(values[i].isEmpty()) {
         key.AddValue(_NullDefault);
       }
       else {
@@ -1150,16 +1180,16 @@ namespace Isis {
    *
    * @return IString Returns the converted string
    */
-  IString MdisGeometry::DoubleToString(const double &value) const {
+  QString MdisGeometry::DoubleToString(const double &value) const {
     if(IsSpecial(value)) {
-      return (IString(_NullDefault));
+      return (QString(_NullDefault));
     }
 
     //  Format the string to specs
     ostringstream strcnv;
     strcnv.setf(std::ios::fixed);
     strcnv << setprecision(_digitsPrecision) << value;
-    return (IString(strcnv.str()));
+    return (QString(strcnv.str().c_str()));
   }
 }  // namespace Isis
 

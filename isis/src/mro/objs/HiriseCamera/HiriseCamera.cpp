@@ -57,7 +57,7 @@ namespace Isis {
     int chan = inst["ChannelNumber"];
     int cpmm = inst["CpmmNumber"];
     double deltaLineTimerCount = inst["DeltaLineTimerCount"];
-    string stime = inst["SpacecraftClockStartCount"];
+    QString stime = inst["SpacecraftClockStartCount"];
 
     // Convert CPMM number to CCD number
     static int cpmm2ccd[] = {0, 1, 2, 3, 12, 4, 10, 11, 5, 13, 6, 7, 8, 9};

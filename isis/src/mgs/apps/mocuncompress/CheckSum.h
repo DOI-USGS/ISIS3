@@ -39,7 +39,7 @@ Copyright (C) 1999 Malin Space Science Systems.  All Rights Reserved.
 SCCSID @(#)CheckSum.h  1.1 10/04/99
 */
 /* SCCShid @(#)CheckSum.h (CheckSum.h) 1.5 */
-#if !defined(CheckSum_h)
+#ifndef CheckSum_h
 #define CheckSum_h
 extern uint8 CS8EAC();
 extern void CS8EACA1();

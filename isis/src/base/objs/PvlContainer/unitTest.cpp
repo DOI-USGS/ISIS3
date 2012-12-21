@@ -1,16 +1,22 @@
 #include <iostream>
+
+#include "IString.h"
+
 #include "PvlContainer.h"
 #include "Preference.h"
-using namespace std;
-int main() {
-  Isis::Preference::Preferences(true);
 
-  Isis::PvlKeyword dog("DOG", 5.2, "meters");
-  Isis::PvlKeyword cat("CATTLE");
+using namespace Isis;
+using namespace std;
+
+int main() {
+  Preference::Preferences(true);
+
+  PvlKeyword dog("DOG", toString(5.2), "meters");
+  PvlKeyword cat("CATTLE");
   cat = "Meow";
   cat.AddComment("Cats shed");
 
-  Isis::PvlContainer ani("Animals");
+  PvlContainer ani("Animals");
   ani += dog;
   ani += cat;
   ani.AddComment("/* Pets are cool */");
@@ -30,7 +36,7 @@ int main() {
   cout << ani << endl;
 
   cout << "Test inserter ..." << endl;
-  Isis::PvlKeyword monkey("Orangutan", "gross");
+  PvlKeyword monkey("Orangutan", "gross");
   ani.AddKeyword(dog, ani.Begin());
   ani.AddKeyword(monkey, ani.Begin());
   cout << ani << endl;
@@ -38,11 +44,11 @@ int main() {
   // This is testing reallocation caused by adds,
   // was a problem when using std::vector
   cout << endl << "Test reallocation ..." << endl;
-  Isis::PvlKeyword * ptr1 = &ani["DOG"];
+  PvlKeyword * ptr1 = &ani["DOG"];
   for (int i = 0; i < 250; i++) 
-    ani += Isis::PvlKeyword("Test_keyword", i);
+    ani += PvlKeyword("Test_keyword", toString(i));
 
-  Isis::PvlKeyword * ptr2 = &ani["DOG"];
+  PvlKeyword * ptr2 = &ani["DOG"];
   if (ptr1 == ptr2) 
     cout << "Pointer to DOG is equivalent" << endl;
   else

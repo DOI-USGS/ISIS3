@@ -2,12 +2,13 @@
 #include <iostream>
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
 
 int main() {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
-  Isis::Parabola b("Parabola");
+  Parabola b("Parabola");
   vector<double> coefs;
   coefs.push_back(-6.0);
   coefs.push_back(5.0);

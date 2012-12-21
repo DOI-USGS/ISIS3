@@ -1,6 +1,6 @@
 #include "Isis.h"
 
-#include <string>
+#include <QString>
 
 #include "ProcessImport.h"
 
@@ -18,7 +18,7 @@ void IsisMain() {
   if(!ui.GetBoolean("INGESTION") &&
       !ui.GetBoolean("CALIBRATION") &&
       !ui.GetBoolean("MAPPING")) {
-    string m = "Please pick at least one of [INGESTION, CALIBRATION, MAPPING]";
+    QString m = "Please pick at least one of [INGESTION, CALIBRATION, MAPPING]";
     throw IException(IException::User, m, _FILEINFO_);
   }
 
@@ -64,12 +64,12 @@ void IsisMain() {
 
     if(inputPvl.HasKeyword("CROSSTRACK_SUMMING")) {
       summingMode = inputPvl["CROSSTRACK_SUMMING"];
-      isNarrowAngle = ((string)inputPvl["INSTRUMENT_ID"] == "MOC-NA");
+      isNarrowAngle = ((QString)inputPvl["INSTRUMENT_ID"] == "MOC-NA");
     }
     else {
       PvlGroup &inst = inputPvl.FindGroup("Instrument", Pvl::Traverse);
       summingMode = inst["CrosstrackSumming"];
-      isNarrowAngle = ((string)inst["InstrumentId"] == "MOC-NA");
+      isNarrowAngle = ((QString)inst["InstrumentId"] == "MOC-NA");
     }
 
     if(summingMode != 1) {

@@ -63,15 +63,15 @@ namespace Isis {
     PvlGroup &algo = pvl.FindObject("AtmosphericModel")
                      .FindGroup("Algorithm", Pvl::Traverse);
 
-    std::string algorithm = "";
+    QString algorithm = "";
     if(algo.HasKeyword("AtmName")) {
-      algorithm = std::string(algo["AtmName"]);
+      algorithm = QString(algo["AtmName"]);
     }
     else if(algo.HasKeyword("Name")) {
-      algorithm = std::string(algo["Name"]);
+      algorithm = QString(algo["Name"]);
     }
     else {
-      IString msg = "Keyword [Name] or keyword [AtmName] must ";
+      QString msg = "Keyword [Name] or keyword [AtmName] must ";
       msg += "exist in [Group = Algorithm]";
       throw IException(IException::User, msg, _FILEINFO_);
     }

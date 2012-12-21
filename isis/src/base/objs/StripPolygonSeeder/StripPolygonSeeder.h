@@ -60,7 +60,7 @@ namespace Isis {
    *   @history 2010-04-15 Eric Hyer - Now updates parent's invalidInput
    *                                   variable (see PolygonSeeder)
    *   @history 2010-04-20 Christopher Austin - adapted for generic/unitless
-   * 	                                        seeding
+   *                                            seeding
    *   @history 2010-05-05 Christopher Austin - Fixed major bug where the strip
    *                                            was not a strip.
    */
@@ -73,7 +73,7 @@ namespace Isis {
 
       std::vector<geos::geom::Point *> Seed(const geos::geom::MultiPolygon *mp);
 
-      virtual PvlGroup PluginParameters(std::string grpName);
+      virtual PvlGroup PluginParameters(QString grpName);
 
     protected:
       virtual void Parse(Pvl &pvl);

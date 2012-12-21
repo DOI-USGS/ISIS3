@@ -7,7 +7,7 @@ Create the aml object
     parameter 0, name = G0p0
       type = filename
       brief = G0P0 Filename
-      description = 	        Description for G0P0<p>Paragraph 2 of description for G0P0</p>End of description for G0P0
+      description = Description for G0P0<p>Paragraph 2 of description for G0P0</p>End of description for G0P0
       internal def = 
       helpers = 0
       count = 
@@ -1497,7 +1497,7 @@ Exact and partial name match tests:
   GetBoolean:
 **USER ERROR** Parameter [G6P0] has no value.
 
-**PROGRAMMER ERROR** Invalid boolean value [CCCC].
+**ERROR** Failed to convert string [cccc] to a boolean. Please specify one of [1, on, t, true, y, yes] for true, or one of [0, f, false, n, no, off] for false.
 
 **PROGRAMMER ERROR** Parameter [G1P1] is not a boolean.
 

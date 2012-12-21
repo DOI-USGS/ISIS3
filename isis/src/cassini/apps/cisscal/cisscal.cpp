@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <iterator>//unique
 #include <iostream> // unique
-#include <string>
+#include <QString>
 #include <sstream>
 #include <vector>
 #include "Brick.h"
@@ -48,8 +48,8 @@ namespace gbl {
   void DNtoElectrons();
   void FindShutterOffset();
   void DivideByAreaPixel();
-  void FindEfficiencyFactor(string fluxunits);
-  IString GetCalibrationDirectory(string calibrationType);
+  void FindEfficiencyFactor(QString fluxunits);
+  QString GetCalibrationDirectory(QString calibrationType);
 
   //global variables
   CissLabels *cissLab;
@@ -443,14 +443,13 @@ void gbl::CreateBitweightStretch(FileName bitweightTable) {
   double stretch1 = 0, stretch2;
   gbl::stretch.ClearPairs();
   for(int i = 0; i < stretchPairs->LineCount(); i++) {
-    IString line;
+    QString line;
     stretchPairs->GetLine(line);
-    line.ConvertWhiteSpace();//convert all \n, \r, \t to spaces
-    line.Compress();//compresses multiple spaces into single space
-    line = line.TrimTail(" ");//removes space from end of line
-    while(line.size() > 0) {
-      line = line.TrimHead(" ");//removes space before number, if there is one
-      stretch2 = line.Token(", ").ToDouble();//grabs number before comma or space
+    line = line.simplified().trimmed();
+
+    QStringList tokens = line.split(QRegExp("[, ]"), QString::SkipEmptyParts);
+    foreach (QString token, tokens) {
+      stretch2 = toDouble(token);
       gbl::stretch.AddPair(stretch1, stretch2);
       stretch1 = stretch1 + 1.0;
     }
@@ -476,7 +475,7 @@ void gbl::CreateBitweightStretch(FileName bitweightTable) {
  */
 FileName gbl::FindBitweightFile() {
   // Get the directory where the CISS bitweight directory is
-  IString bitweightName;
+  QString bitweightName;
 
   if(gbl::cissLab->NarrowAngle()) {
     bitweightName += "nac";
@@ -484,7 +483,7 @@ FileName gbl::FindBitweightFile() {
   else {
     bitweightName += "wac";
   }
-  IString gainState(gbl::cissLab->GainState());
+  QString gainState(toString(gbl::cissLab->GainState()));
   bitweightName = bitweightName + "g" + gainState;
 
   if(gbl::cissLab->FrontOpticsTemp() < -5.0) {
@@ -522,14 +521,14 @@ void gbl::ComputeBias() {
   gbl::calgrp += PvlKeyword("BiasSubtractionPerformed", "Yes");
   gbl::calgrp.FindKeyword("BiasSubtractionPerformed").AddComment("Bias Subtraction Parameters");
 
-  IString fsw(gbl::cissLab->FlightSoftwareVersion());
+  QString fsw(gbl::cissLab->FlightSoftwareVersion());
   double flightSoftwareVersion;
 
   if(fsw == "Unknown") {
     flightSoftwareVersion = 0.0;// cassimg_readlabels.pro sets this to 1.3, we treat this as 1.2???
   }
   else {
-    flightSoftwareVersion = fsw.ToDouble();
+    flightSoftwareVersion = toDouble(fsw);
   }
   //  check overclocked pixels exist
   if(gbl::cissLab->CompressionType() != "Lossy") {
@@ -576,7 +575,7 @@ void gbl::ComputeBias() {
     gbl::bias.resize(1);
     gbl::bias[0] = gbl::cissLab->BiasStripMean();
   }
-  gbl::calgrp += PvlKeyword("NumberOfOverclocks", gbl::numberOfOverclocks);
+  gbl::calgrp += PvlKeyword("NumberOfOverclocks", toString(gbl::numberOfOverclocks));
   return;
 }
 
@@ -671,7 +670,7 @@ void gbl::Linearize() {
 //  The correction is then performed as DN'=DN*Cdn
 //  Where Cdn is an interpolation for C from the tabulated values
 
-  IString lut;
+  QString lut;
   int gainState = gbl::cissLab->GainState();
   if(gbl::cissLab->NarrowAngle()) {
     switch(gainState) {
@@ -727,12 +726,12 @@ void gbl::Linearize() {
 
   TextFile *pairs = new TextFile(linearLUT.expanded());
   for(int i = 0; i < pairs->LineCount(); i++) {
-    IString line;
+    QString line;
     pairs->GetLine(line, true);
-    line.ConvertWhiteSpace();
-    line.Compress();
-    DN_VALS.push_back(line.Token(" ").ToDouble());
-    C_VALS.push_back(line.Trim(" ").ToDouble());
+    line = line.simplified();
+    QStringList tokens = line.split(" ");
+    DN_VALS.push_back(toDouble(tokens.takeFirst()));
+    C_VALS.push_back(toDouble(tokens.takeFirst()));
   }
   pairs->Close();
 
@@ -806,7 +805,7 @@ void gbl::FindDustRingParameters() {
   // No mottle correct for summation mode other than 1
   if(gbl::cissLab->SummingMode() != 1) {
     gbl::mottleCorrection = false;
-    gbl::calgrp += PvlKeyword("MottleCorrectionPerformed", "No: Summing mode is " + IString(gbl::cissLab->SummingMode()));
+    gbl::calgrp += PvlKeyword("MottleCorrectionPerformed", "No: Summing mode is " + toString(gbl::cissLab->SummingMode()));
     gbl::calgrp += PvlKeyword("MottleFile", "Not applicable: No mottle correction");
     gbl::calgrp += PvlKeyword("EffectiveWavelengthFile", "Not applicable: No mottle correction");
     gbl::calgrp += PvlKeyword("StrengthFactor", "Not applicable: No mottle correction");
@@ -825,7 +824,7 @@ void gbl::FindDustRingParameters() {
   }
 
   // Mottling correction for full images after 2003-286T10:28:04
-  gbl::mottleFile = (gbl::GetCalibrationDirectory("dustring") + "nac_mottle_1444733393.full.cub");
+  gbl::mottleFile = (gbl::GetCalibrationDirectory("duString") + "nac_mottle_1444733393.full.cub");
   if(!gbl::mottleFile.fileExists()) { // mottle file not found, stop calibration
     throw IException(IException::Io,
                      "Unable to calibrate image. MottleFile ***"
@@ -853,28 +852,30 @@ void gbl::FindDustRingParameters() {
     }
     gbl::calgrp += PvlKeyword("EffectiveWavelengthFile", effectiveWavelength.expanded());
     CisscalFile *effwlDB = new CisscalFile(effectiveWavelength.expanded());
-    IString col1, col2, col3, col4, col5;
+    QString col1, col2, col3, col4, col5;
     double effwl;
     for(int i = 0; i < effwlDB->LineCount(); i++) {
-      IString line;
+      QString line;
       effwlDB->GetLine(line);
-      line = line.ConvertWhiteSpace();
-      line = line.Compress();
-      col1 = line.Token(" ");
+      line = line.simplified();
+
+      QStringList cols = line.split(" ");
+
+      col1 = cols.takeFirst();
       if(col1 == gbl::cissLab->FilterName()[0]) {
-        col2 = line.Token(" ");
+        col2 = cols.takeFirst();
         if(col2 == gbl::cissLab->FilterName()[1]) {
-          col3 = line.Token(" ");  // central wavelength of filter combo
-          col4 = line.Token(" ");  // full-width at half-maximum (FWHM) of filter combo
-          col5 = line.Token(" ");  // effective wavelength
+          col3 = cols.takeFirst();  // central wavelength of filter combo
+          col4 = cols.takeFirst();  // full-width at half-maximum (FWHM) of filter combo
+          col5 = cols.takeFirst();  // effective wavelength
           if(col5 == "") {
             //       Couldn't find a match in the database
             gbl::calgrp.FindKeyword("MottleCorrectionPerformed").SetValue("Yes: EffectiveWavelengthFile contained no factor for filter combination, used strengthFactor of 1.0");
             gbl::strengthFactor = 1.0;
           }
           else {
-            effwl = col5.ToDouble();
-            gbl::calgrp += PvlKeyword("EffectiveWavelength", effwl);
+            effwl = toDouble(col5);
+            gbl::calgrp += PvlKeyword("EffectiveWavelength", toString(effwl));
             gbl::strengthFactor = 1.30280 - 0.000717552 * effwl;
           }
           break;
@@ -959,7 +960,7 @@ void gbl::FindDustRingParameters() {
         }
     }
   }
-  gbl::calgrp += PvlKeyword("StrengthFactor", gbl::strengthFactor);
+  gbl::calgrp += PvlKeyword("StrengthFactor", toString(gbl::strengthFactor));
   return;
 }
 
@@ -992,7 +993,7 @@ FileName gbl::FindFlatFile() {
 
   // Find the best-match flat file
   //  Choose a nominal optics temp name as per ISSCAL
-  IString frontOpticsTemp("");
+  QString frontOpticsTemp("");
   if(gbl::cissLab->FrontOpticsTemp() < -5.0) {
     frontOpticsTemp += "m10";
   }
@@ -1004,31 +1005,26 @@ FileName gbl::FindFlatFile() {
   }
   //  Require match for instrument, temperature range name, Filter1, filter2
   CisscalFile *slopeDB = new CisscalFile(slopeDatabaseName.expanded());
-  IString col1, col2, col3, col4, col5, col6, col7, col8;
+  QString col1, col2, col3, col4, col5, col6, col7, col8;
   for(int i = 0; i < slopeDB->LineCount(); i++) {
-    IString line;
+    QString line;
     slopeDB->GetLine(line);  //assigns value to line
-    line = line.ConvertWhiteSpace();
-    line = line.Compress(true);
-    col1 = line.Token(" ");
-    col1.Trim("'");
+    line = line.simplified();
+    QStringList cols = line.split(" ");
+    cols.replaceInStrings(QRegExp("(^'|'$)"), "");
+
+    col1 = cols.takeFirst();
     if(col1 == gbl::cissLab->InstrumentId()) {
-      col2 = line.Token(" ");
-      col2.Trim("'");
+      col2 = cols.takeFirst();
       if((col2 == frontOpticsTemp) || (gbl::cissLab->WideAngle())) {
-        col3 = line.Token(" ");
-        col3.Trim("'");
+        col3 = cols.takeFirst();
         if(col3 == gbl::cissLab->FilterName()[0]) {
-          col4 = line.Token(" ");
-          col4.Trim("'");
+          col4 = cols.takeFirst();
           if(col4 == gbl::cissLab->FilterName()[1]) {
-            col5 = line.Token(" ");
-            col5.Trim("'");  // col5 = gainstate (not used)
-            col6 = line.Token(" ");
-            col6.Trim("'");  // col6 = antiblooming state (not used)
-            col7 = line.Token(" ");
-            col7.Trim("'");  // col7 = file number (not used)
-            col8 = line.Trim(" ");                   // col8 = slope file name
+            col5 = cols.takeFirst();// col5 = gainstate (not used)
+            col6 = cols.takeFirst();// col6 = antiblooming state (not used)
+            col7 = cols.takeFirst();// col7 = file number (not used)
+            col8 = cols.takeFirst();// col8 = slope file name
             break;
           }
           else {
@@ -1058,11 +1054,11 @@ FileName gbl::FindFlatFile() {
                      _FILEINFO_);
   }
   //Column 8 contains version of slopefile from which our flatfiles are derived
-  int j = col8.find(".");
+  int j = col8.indexOf(".");
   //attatch version number to "flat" by skipping
   // the first 5 characters("SLOPE") and skipping
   // any thing after "." ("IMG")
-  col8 = "flat" + col8.substr(5, (j - 5) + 1);
+  col8 = "flat" + col8.mid(5, (j - 5) + 1);
   flatFile = (gbl::GetCalibrationDirectory("slope/flat") + col8
               + gbl::cissLab->InstrumentModeId() + ".cub");
   gbl::calgrp += PvlKeyword("FlatFile", flatFile.expanded());
@@ -1144,7 +1140,7 @@ void gbl::DNtoElectrons() {
                          _FILEINFO_);
     }
   }
-  gbl::calgrp += PvlKeyword("TrueGain", gbl::trueGain);
+  gbl::calgrp += PvlKeyword("TrueGain", toString(gbl::trueGain));
   return;
 }
 
@@ -1168,7 +1164,7 @@ void gbl::FindShutterOffset() {
   gbl::calgrp += PvlKeyword("DividedByExposureTime", "Yes");
   gbl::divideByExposure = true;
   //  Define whereabouts of shutter offset files
-  IString offsetFileName("");
+  QString offsetFileName("");
   if(gbl::cissLab->NarrowAngle()) {
     offsetFileName += (gbl::GetCalibrationDirectory("offset") + "nacfm_so_");
   }
@@ -1233,9 +1229,9 @@ void gbl::DivideByAreaPixel() {
   // it was expressed in IDL as the following:
   //       [gbl::sumFactor = (gbl::incube->getSampleCount()/1024.0)*(gbl::incube->getLineCount()/1024.0);]
   gbl::sumFactor = 1 / pow(gbl::cissLab->SummingMode(), 2.0);
-  gbl::calgrp += PvlKeyword("SolidAngle", gbl::solidAngle);
-  gbl::calgrp += PvlKeyword("OpticsArea", gbl::opticsArea);
-  gbl::calgrp += PvlKeyword("SumFactor", gbl::sumFactor);
+  gbl::calgrp += PvlKeyword("SolidAngle", toString(gbl::solidAngle));
+  gbl::calgrp += PvlKeyword("OpticsArea", toString(gbl::opticsArea));
+  gbl::calgrp += PvlKeyword("SumFactor", toString(gbl::sumFactor));
   return;
 }
 
@@ -1273,7 +1269,7 @@ void gbl::DivideByAreaPixel() {
  *            method is not far off from the I/F method.
  */
 
-void gbl::FindEfficiencyFactor(string fluxunits) {
+void gbl::FindEfficiencyFactor(QString fluxunits) {
 
   gbl::calgrp += PvlKeyword("DividedByEfficiency", "Yes");
   gbl::calgrp += PvlKeyword("EfficiencyFactorMethod", fluxunits);
@@ -1283,9 +1279,9 @@ void gbl::FindEfficiencyFactor(string fluxunits) {
   // find system transmission file (T0*T1*T2*QE)
 
   FileName transfile(gbl::GetCalibrationDirectory("efficiency/systrans")
-                     + gbl::cissLab->InstrumentId().DownCase()
-                     + gbl::cissLab->FilterName()[0].DownCase()
-                     + gbl::cissLab->FilterName()[1].DownCase() + "_systrans.tab");
+                     + gbl::cissLab->InstrumentId().toLower()
+                     + gbl::cissLab->FilterName()[0].toLower()
+                     + gbl::cissLab->FilterName()[1].toLower() + "_systrans.tab");
   if(!transfile.fileExists()) { // transmission file not found, stop calibration
     throw IException(IException::Io,
                      "Unable to calibrate image. TransmissionFile ***"
@@ -1297,16 +1293,14 @@ void gbl::FindEfficiencyFactor(string fluxunits) {
   vector<double> wavelengthT, transmittedFlux;
   double x, y;
   for(int i = 0; i < trans->LineCount(); i++) {
-    IString line;
+    QString line;
     trans->GetLine(line);  //assigns value to line
-    line = line.ConvertWhiteSpace();
-    line = line.Compress();
-    line = line.TrimHead(" ");
+    line = line.simplified().trimmed();
     if(line == "") {
       break;
     }
-    x = line.Token(" ").ToDouble();
-    y = line.Token(" ").ToDouble();
+    x = toDouble(line.split(" ")[0]);
+    y = toDouble(line.split(" ")[1]);
     wavelengthT.push_back(x);
     transmittedFlux.push_back(y);
   }
@@ -1342,16 +1336,14 @@ void gbl::FindEfficiencyFactor(string fluxunits) {
   CisscalFile *qeCorr = new CisscalFile(qecorrfile.expanded());
   vector<double> wavelengthQE, qecorrection;
   for(int i = 0; i < qeCorr->LineCount(); i++) {
-    IString line;
+    QString line;
     qeCorr->GetLine(line);  //assigns value to line
-    line = line.ConvertWhiteSpace();
-    line = line.Compress();
-    line = line.TrimHead(" ");
+    line = line.simplified().trimmed();
     if(line == "") {
       break;
     }
-    x = line.Token(" ").ToDouble();
-    y = line.Trim(" ").ToDouble();
+    x = toDouble(line.split(" ").first());
+    y = toDouble(line.split(" ").last());
     wavelengthQE.push_back(x);
     qecorrection.push_back(y);
     lambda.push_back(x);
@@ -1370,7 +1362,7 @@ void gbl::FindEfficiencyFactor(string fluxunits) {
 
 
   // these variables will be defined in the if-statement
-  IString units;
+  QString units;
   double minlam, maxlam;
   vector<double> fluxproduct1, fluxproduct2;
 
@@ -1451,22 +1443,20 @@ void gbl::FindEfficiencyFactor(string fluxunits) {
                        "Unable to calibrate image using I/F. Solar Distance calculated is less than or equal to 0.",
                        _FILEINFO_);
     }
-    gbl::calgrp += PvlKeyword("SolarDistance", distFromSun);
+    gbl::calgrp += PvlKeyword("SolarDistance", toString(distFromSun));
 
     // read spectral file to find wavelength and flux
     CisscalFile *spectral = new CisscalFile(specfile.expanded());
     vector<double> wavelengthF, flux;
     for(int i = 0; i < spectral->LineCount(); i++) {
-      IString line;
+      QString line;
       spectral->GetLine(line);  //assigns value to line
-      line = line.ConvertWhiteSpace();
-      line = line.Compress();
-      line = line.TrimHead(" ");
+      line = line.simplified().trimmed();
       if(line == "") {
         break;
       }
-      x = line.Token(" ").ToDouble() / angstromsToNm;
-      y = line.Trim(" ").ToDouble() * angstromsToNm;
+      x = toDouble(line.split(" ").first()) / angstromsToNm;
+      y = toDouble(line.split(" ").last()) * angstromsToNm;
       wavelengthF.push_back(x);
       flux.push_back(y);
       lambda.push_back(x);
@@ -1521,8 +1511,8 @@ void gbl::FindEfficiencyFactor(string fluxunits) {
   spline2.AddData(lambda, fluxproduct2);
   gbl::efficiencyFactor = spline1.BoolesRule(spline1.DomainMinimum(), spline1.DomainMaximum());
   double efficiency = spline2.BoolesRule(spline2.DomainMinimum(), spline2.DomainMaximum());
-  gbl::calgrp += PvlKeyword("EfficiencyFactor", gbl::efficiencyFactor, units);
-  gbl::calgrp += PvlKeyword("TotalEfficiency", efficiency);
+  gbl::calgrp += PvlKeyword("EfficiencyFactor", toString(gbl::efficiencyFactor), units);
+  gbl::calgrp += PvlKeyword("TotalEfficiency", toString(efficiency));
 
   // Cannot divide by 0.0
   if(gbl::efficiencyFactor == 0) {
@@ -1553,8 +1543,8 @@ void gbl::FindEfficiencyFactor(string fluxunits) {
  *            available.
  */
 void gbl::FindCorrectionFactors() {
-  string filter1 = gbl::cissLab->FilterName()[0];
-  string filter2 = gbl::cissLab->FilterName()[1];
+  QString filter1 = gbl::cissLab->FilterName()[0];
+  QString filter2 = gbl::cissLab->FilterName()[1];
   // check if polarized filters
   if(filter1 == "IRP0" || filter1 == "P120" || filter1 == "P60" || filter1 == "P0"
       || filter2 == "IRP90" || filter2 == "IRP0") {
@@ -1569,26 +1559,26 @@ void gbl::FindCorrectionFactors() {
     gbl::calgrp += PvlKeyword("PolarizationFactorFile", polarizationFactorFile.expanded());
     CisscalFile *polFact = new CisscalFile(polarizationFactorFile.expanded());
     gbl::polarizationFactor = 0.0;
-    IString col1, col2, col3, col4;
+    QString col1, col2, col3, col4;
     for(int i = 0; i < polFact->LineCount(); i++) {
-      IString line;
+      QString line;
       polFact->GetLine(line);  //assigns value to line
-      line = line.ConvertWhiteSpace();
-      line = line.Compress();
-      col1 = line.Token(" ");
+      line = line.simplified().trimmed();
+      QStringList cols = line.split(" ");
+      col1 = cols.takeFirst();
       if(col1 == gbl::cissLab->InstrumentId()) {
-        col2 = line.Token(" ");
+        col2 = cols.takeFirst();
         if(col2 == gbl::cissLab->FilterName()[0]) {
-          col3 = line.Token(" ");
+          col3 = cols.takeFirst();
           if(col3 == gbl::cissLab->FilterName()[1]) {
-            col4 = line.Trim(" ");
+            col4 = cols.takeFirst();
             if(col4 == "") {
               gbl::polarizationFactor = 1.0;
               // dividing by polarization factor of 1.0 implies this correction is not performed
               gbl::calgrp.FindKeyword("PolarizationFactorPerformed").SetValue("No: PolarizationFactorFile contained no factor for filter combination");
             }
             else {
-              gbl::polarizationFactor = col4.ToDouble();
+              gbl::polarizationFactor = toDouble(col4);
             }
             break;
           }
@@ -1621,7 +1611,7 @@ void gbl::FindCorrectionFactors() {
         filter2 = "CL2";
       }
     }
-    gbl::calgrp += PvlKeyword("PolarizationFactor", gbl::polarizationFactor);
+    gbl::calgrp += PvlKeyword("PolarizationFactor", toString(gbl::polarizationFactor));
 
   }
   else {
@@ -1640,26 +1630,26 @@ void gbl::FindCorrectionFactors() {
   gbl::calgrp += PvlKeyword("CorrectionFactorFile", correctionFactorFile.expanded());
   CisscalFile *corrFact = new CisscalFile(correctionFactorFile.expanded());
   gbl::correctionFactor = 0.0;
-  IString col1, col2, col3, col4;
+  QString col1, col2, col3, col4;
   for(int i = 0; i < corrFact->LineCount(); i++) {
-    IString line;
+    QString line;
     corrFact->GetLine(line);  //assigns value to line
-    line = line.ConvertWhiteSpace();
-    line = line.Compress();
-    col1 = line.Token(" ");
+    line = line.simplified().trimmed();
+    QStringList cols = line.split(" ");
+    col1 = cols.takeFirst();
     if(col1 == gbl::cissLab->InstrumentId()) {
-      col2 = line.Token(" ");
+      col2 = cols.takeFirst();
       if(col2 == filter1) {
-        col3 = line.Token(" ");
+        col3 = cols.takeFirst();
         if(col3 == filter2) {
-          col4 = line.Trim(" ");
+          col4 = cols.takeFirst();
           if(col4 == "") {
             gbl::correctionFactor = 1.0;
             // dividing by correction factor of 1.0 implies this correction is not performed
             gbl::calgrp.FindKeyword("CorrectionFactorPerformed").SetValue("No: CorrectionFactorFile contained no factor for filter combination");
           }
           else {
-            gbl::correctionFactor = col4.ToDouble();
+            gbl::correctionFactor = toDouble(col4);
           }
           break;
         }
@@ -1683,13 +1673,13 @@ void gbl::FindCorrectionFactors() {
     // dividing by correction factor of 1.0 implies this correction is not performed
     gbl::calgrp.FindKeyword("CorrectionFactorPerformed").SetValue("No: CorrectionFactorFile contained no factor for filter combination");
   }
-  gbl::calgrp += PvlKeyword("CorrectionFactor", gbl::correctionFactor);
+  gbl::calgrp += PvlKeyword("CorrectionFactor", toString(gbl::correctionFactor));
   return;
 }
 //=====End Correction Factor Methods=============================================================//
 
 /**
- * This method returns an IString containing the path of a
+ * This method returns an QString containing the path of a
  * Cassini calibration directory
  *
  * @param calibrationType
@@ -1698,10 +1688,10 @@ void gbl::FindCorrectionFactors() {
  * @internal
  *   @history 2008-11-05 Jeannie Walldren - Original version
  */
-IString gbl::GetCalibrationDirectory(string calibrationType) {
+QString gbl::GetCalibrationDirectory(QString calibrationType) {
   // Get the directory where the CISS calibration directories are.
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
-  IString missionDir = (string) dataDir["Cassini"];
+  QString missionDir = (QString) dataDir["Cassini"];
   return missionDir + "/calibration/" + calibrationType + "/";
 }
 

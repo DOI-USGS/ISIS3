@@ -45,7 +45,7 @@ namespace Isis {
    *
    * @param file The file containing the pvl formatted information
    */
-  Pvl::Pvl(const std::string &file) : Isis::PvlObject("Root") {
+  Pvl::Pvl(const QString &file) : Isis::PvlObject("Root") {
     Init();
     Read(file);
   }
@@ -73,16 +73,16 @@ namespace Isis {
    *
    * @throws Isis::iException::Io
    */
-  void Pvl::Read(const std::string &file) {
+  void Pvl::Read(const QString &file) {
     // Expand the filename
     Isis::FileName temp(file);
     p_filename = temp.expanded();
 
     // Open the file
     ifstream istm;
-    istm.open(p_filename.c_str(), std::ios::in);
+    istm.open(p_filename.toAscii().data(), std::ios::in);
     if(!istm) {
-      string message = Message::FileOpen(temp.expanded());
+      QString message = Message::FileOpen(temp.expanded());
       throw IException(IException::Io, message, _FILEINFO_);
     }
 
@@ -92,12 +92,12 @@ namespace Isis {
     }
     catch(IException &e) {
       istm.close();
-      string message = "Unable to read PVL file [" + temp.expanded() + "]";
+      QString message = "Unable to read PVL file [" + temp.expanded() + "]";
       throw IException(e, IException::Unknown, message, _FILEINFO_);
     }
     catch(...) {
       istm.close();
-      string message = "Unable to read PVL file [" + temp.expanded() + "]";
+      QString message = "Unable to read PVL file [" + temp.expanded() + "]";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
     istm.close();
@@ -113,7 +113,7 @@ namespace Isis {
    *
    * @throws Isis::iException::Io
    */
-  void Pvl::Write(const std::string &file) {
+  void Pvl::Write(const QString &file) {
     // Expand the filename
     Isis::FileName temp(file);
 
@@ -126,11 +126,11 @@ namespace Isis {
 
     // Open the file
     ofstream ostm;
-    string tempName(temp.expanded());
-    ostm.open(tempName.c_str(), std::ios::out);
+    QString tempName(temp.expanded());
+    ostm.open(tempName.toAscii().data(), std::ios::out);
     ostm.seekp(0, std::ios::beg);
     if(!ostm) {
-      string message = Isis::Message::FileCreate(temp.expanded());
+      QString message = Isis::Message::FileCreate(temp.expanded());
       throw IException(IException::Io, message, _FILEINFO_);
     }
 
@@ -141,12 +141,12 @@ namespace Isis {
     }
     catch(IException &e) {
       ostm.close();
-      string message = "Unable to write PVL to file [" + temp.expanded() + "]";
+      QString message = "Unable to write PVL to file [" + temp.expanded() + "]";
       throw IException(e, IException::Io, message, _FILEINFO_);
     }
     catch(...) {
       ostm.close();
-      string message = "Unable to write PVL to file [" + temp.expanded() + "]";
+      QString message = "Unable to write PVL to file [" + temp.expanded() + "]";
       throw IException(IException::Io, message, _FILEINFO_);
     }
 
@@ -167,7 +167,7 @@ namespace Isis {
    *
    * @throws Isis::iException::Io
    */
-  void Pvl::Append(const std::string &file) {
+  void Pvl::Append(const QString &file) {
     // Set up for opening and writing
     Isis::FileName temp(file);
 
@@ -180,11 +180,11 @@ namespace Isis {
 
     // Open the file
     ofstream ostm;
-    string tempName(temp.expanded());
-    ostm.open(tempName.c_str(), std::ios::app);
+    QString tempName(temp.expanded());
+    ostm.open(tempName.toAscii().data(), std::ios::app);
     ostm.seekp(0, std::ios::end);
     if(!ostm) {
-      string message = Message::FileOpen(temp.expanded());
+      QString message = Message::FileOpen(temp.expanded());
       throw IException(IException::Io, message, _FILEINFO_);
     }
 
@@ -195,7 +195,7 @@ namespace Isis {
     }
     catch(...) {
       ostm.close();
-      string message = "Unable to append PVL infomation to file [" +
+      QString message = "Unable to append PVL infomation to file [" +
                        temp.expanded() + "]";
       throw IException(IException::Io, message, _FILEINFO_);
     }
@@ -217,7 +217,7 @@ namespace Isis {
   }
 
 
-  void Pvl::SetFormatTemplate(const std::string &file) {
+  void Pvl::SetFormatTemplate(const QString &file) {
     if(p_internalTemplate) delete p_formatTemplate;
     p_internalTemplate = true;
     p_formatTemplate = new Isis::Pvl(file);
@@ -249,10 +249,10 @@ namespace Isis {
     Isis::Pvl newTemp;
     for(int i = 0; i < outTemplate.Keywords(); i++) {
       if(outTemplate[i].IsNamed("Isis:PvlTemplate:File")) {
-        string filename = outTemplate[i];
+        QString filename = outTemplate[i];
         Isis::FileName file(filename);
         if(!file.fileExists()) {
-          string message = "Could not open the template file [" + filename + "]";
+          QString message = "Could not open the template file [" + filename + "]";
           throw IException(IException::Io, message, _FILEINFO_);
         }
         Isis::Pvl include(file.expanded());
@@ -412,7 +412,7 @@ namespace Isis {
           if(readKeyword == errorKeywords[errorKey]) {
             is.seekg(beforeKeywordPos, ios::beg);
 
-            string msg = "Unexpected [";
+            QString msg = "Unexpected [";
             msg += readKeyword.Name();
             msg += "] in PVL Object [ROOT]";
             throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -522,7 +522,7 @@ namespace Isis {
     for(int i=0; i<iTmplObjSize; i++) {
       PvlObject & pvlTmplObj = Object(i);
 
-      string sObjName = pvlTmplObj.Name();
+      QString sObjName = pvlTmplObj.Name();
       bool bObjFound = false;
 
       // Pvl contains the Object Name
@@ -535,7 +535,7 @@ namespace Isis {
         bObjFound = true;
       }
       else {
-        string sOption = sObjName + "__Required";
+        QString sOption = sObjName + "__Required";
         bObjFound = true; // optional is the default
         if(pvlTmplObj.HasKeyword(sOption)) {
           PvlKeyword pvlKeyOption = pvlTmplObj.FindKeyword(sOption);
@@ -545,7 +545,7 @@ namespace Isis {
         }
       }
       if (bObjFound == false) {
-        string sErrMsg = "Object \"" + sObjName + "\" Not Found in the Template File\n";
+        QString sErrMsg = "Object \"" + sObjName + "\" Not Found in the Template File\n";
         throw IException(IException::User, sErrMsg, _FILEINFO_);
       }
     }
@@ -555,7 +555,7 @@ namespace Isis {
     for(int i=0; i<iTmplGrpSize; i++) {
       PvlGroup & pvlTmplGrp = Group(i);
 
-      string sGrpName  = pvlTmplGrp.Name();
+      QString sGrpName  = pvlTmplGrp.Name();
       bool bGrpFound = false;
 
       // Pvl contains the Object Name
@@ -569,7 +569,7 @@ namespace Isis {
       }
       else {
         bGrpFound = true;
-        string sOption = sGrpName + "__Required";
+        QString sOption = sGrpName + "__Required";
         if(pvlTmplGrp.HasKeyword(sOption)) {
           PvlKeyword pvlKeyOption = pvlTmplGrp.FindKeyword(sOption);
           if(pvlKeyOption[0] == "true") { // Required is true
@@ -578,7 +578,7 @@ namespace Isis {
         }
       }
       if (bGrpFound == false) {
-        string sErrMsg = "Group \"" + sGrpName + "\" Not Found in the Template File\n";
+        QString sErrMsg = "Group \"" + sGrpName + "\" Not Found in the Template File\n";
         throw IException(IException::User, sErrMsg, _FILEINFO_);
       }
     }

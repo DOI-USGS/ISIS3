@@ -25,8 +25,6 @@ using namespace std;
 
 #include "Message.h"
 
-string Isis::Message::KeywordValueExpected(const string &key) {
-  string message;
-  message = "Keyword value for [" + key + "] expected but was not found";
-  return message;
+QString Isis::Message::KeywordValueExpected(const QString &key) {
+  return "Keyword value for [" + key + "] expected but was not found";
 }

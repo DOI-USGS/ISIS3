@@ -1,7 +1,9 @@
 #include "Isis.h"
 
 #include <cstdio>
-#include <string>
+
+#include <QFile>
+#include <QString>
 
 #include "ProcessImportPds.h"
 #include "ProcessBySample.h"
@@ -19,33 +21,29 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   FileName inFile = ui.GetFileName("FROM");
-  IString instid;
-  IString missid;
+  QString instid;
+  QString missid;
 
   try {
     Pvl lab(inFile.expanded());
-    instid = (string) lab.FindKeyword("INSTRUMENT_ID");
-    missid = (string) lab.FindKeyword("MISSION_ID");
+    instid = (QString) lab.FindKeyword("INSTRUMENT_ID");
+    missid = (QString) lab.FindKeyword("MISSION_ID");
   }
   catch(IException &e) {
-    string msg = "Unable to read [INSTRUMENT_ID] or [MISSION_ID] from input file [" +
+    QString msg = "Unable to read [INSTRUMENT_ID] or [MISSION_ID] from input file [" +
                  inFile.expanded() + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
-  instid.ConvertWhiteSpace();
-  instid.Compress();
-  instid.Trim(" ");
-  missid.ConvertWhiteSpace();
-  missid.Compress();
-  missid.Trim(" ");
+  instid = instid.simplified().trimmed();
+  missid = missid.simplified().trimmed();
   if(missid != "DAWN" && instid != "FC1" && instid != "FC2") {
-    string msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
+    QString msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
                  "a DAWN Framing Camera (FC) EDR or RDR file.";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
-  std::string target;
+  QString target;
   if(ui.WasEntered("TARGET")) {
     target = ui.GetString("TARGET");
   }
@@ -53,7 +51,7 @@ void IsisMain() {
 
   p.SetPdsFile(inFile.expanded(), "", pdsLabel);
   p.SetOrganization(Isis::ProcessImport::BSQ);
-  string tmpName = "$TEMPORARY/" + inFile.baseName() + ".tmp.cub";
+  QString tmpName = "$TEMPORARY/" + inFile.baseName() + ".tmp.cub";
   FileName tmpFile(tmpName);
   CubeAttributeOutput outatt = CubeAttributeOutput("+Real");
   p.SetOutputCube(tmpFile.expanded(), outatt);
@@ -71,7 +69,7 @@ void IsisMain() {
 
   // Get the directory where the DAWN translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  IString transDir = (string) dataDir["Dawn"] + "/translations/";
+  QString transDir = (QString) dataDir["Dawn"] + "/translations/";
 
   // Create a PVL to store the translated labels in
   Pvl outLabel;
@@ -92,9 +90,9 @@ void IsisMain() {
   instrumentXlater.Auto(outLabel);
 
   //  Update target if user specifies it
-  if (!target.empty()) {
+  if (!target.isEmpty()) {
     PvlGroup &igrp = outLabel.FindGroup("Instrument",Pvl::Traverse);
-    igrp["TargetName"] = IString(target);
+    igrp["TargetName"] = target;
   }
 
   // Write the BandBin, Archive, and Instrument groups
@@ -109,7 +107,7 @@ void IsisMain() {
   int filtno = bbGrp["FilterNumber"];
   int center;
   int width;
-  string filtname;
+  QString filtname;
   if(filtno == 1) {
     center = 700;
     width = 700;
@@ -151,24 +149,24 @@ void IsisMain() {
     filtname = "Blue_F8";
   }
   else {
-    string msg = "Input file [" + inFile.expanded() + "] has an invalid " +
+    QString msg = "Input file [" + inFile.expanded() + "] has an invalid " +
                  "FilterNumber. The FilterNumber must fall in the range 1 to 8.";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
-  bbGrp.AddKeyword(PvlKeyword("Center", center));
-  bbGrp.AddKeyword(PvlKeyword("Width", width));
+  bbGrp.AddKeyword(PvlKeyword("Center", toString(center)));
+  bbGrp.AddKeyword(PvlKeyword("Width", toString(width)));
   bbGrp.AddKeyword(PvlKeyword("FilterName", filtname));
   outcube->putGroup(bbGrp);
 
   PvlGroup kerns("Kernels");
   if(instid == "FC1") {
-    kerns += PvlKeyword("NaifFrameCode", -203110-filtno);
+    kerns += PvlKeyword("NaifFrameCode", toString(-203110-filtno));
   }
   else if(instid == "FC2") {
-    kerns += PvlKeyword("NaifFrameCode", -203120-filtno);
+    kerns += PvlKeyword("NaifFrameCode", toString(-203120-filtno));
   }
   else {
-    string msg = "Input file [" + inFile.expanded() + "] has an invalid " +
+    QString msg = "Input file [" + inFile.expanded() + "] has an invalid " +
                  "InstrumentId.";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
@@ -177,8 +175,8 @@ void IsisMain() {
   p2.StartProcess(flipbyline);
   p2.EndProcess();
 
-  string tmp(tmpFile.expanded());
-  remove(tmp.c_str());
+  QString tmp(tmpFile.expanded());
+  QFile::remove(tmp);
 }
 
 // Flip image by line

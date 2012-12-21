@@ -59,8 +59,8 @@ namespace Isis {
        * Structure that contains all pertinent data for the cube
        */
       struct JitInfo {
-        std::string filename;
-        std::string productId;
+        QString filename;
+        QString productId;
         int lines;
         int samples;
         int sampOffset;
@@ -69,10 +69,10 @@ namespace Isis {
         int summing;
         int channelNumber;
         int cpmmNumber;
-        std::string ccdName;
+        QString ccdName;
         double dltCount;
-        std::string UTCStartTime;
-        std::string scStartTime;
+        QString UTCStartTime;
+        QString scStartTime;
         double obsStartTime;
         double unBinnedRate;
         double linerate;
@@ -102,8 +102,8 @@ namespace Isis {
 
     public:
       HiJitCube();
-      HiJitCube(const std::string &filename);
-      HiJitCube(const std::string &filename, PvlObject &shift);
+      HiJitCube(const QString &filename);
+      HiJitCube(const QString &filename, PvlObject &shift);
       ~HiJitCube();
 
       void setSampleOffset(int soff);
@@ -122,8 +122,8 @@ namespace Isis {
         return (jdata.lineOffset);
       }
 
-      void OpenCube(const std::string &filename);
-      void OpenCube(const std::string &filename, PvlObject &shift);
+      void OpenCube(const QString &filename);
+      void OpenCube(const QString &filename, PvlObject &shift);
       inline const JitInfo &GetInfo() const {
         return (jdata);
       }
@@ -140,8 +140,8 @@ namespace Isis {
       /**
        * Returns the string representation of the overlapping region
        */
-      std::string PolyToString() const {
-        return (fpGeom->toString());
+      QString PolyToString() const {
+        return (fpGeom->toString().c_str());
       }
 
     private:

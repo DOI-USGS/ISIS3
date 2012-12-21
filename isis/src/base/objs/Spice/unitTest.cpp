@@ -62,15 +62,15 @@ class MySpice : public Spice {
       cout << endl;
     }
 
-    int MyInteger(string key) {
+    int MyInteger(QString key) {
       return getInteger(key, 0);
     }
 
-    double MyDouble(string key) {
+    double MyDouble(QString key) {
       return getDouble(key, 0);
     }
 
-    string MyString(string key) {
+    QString MyString(QString key) {
       return getString(key, 0);
     }
 
@@ -109,8 +109,8 @@ int main(int argc, char *argv[]) {
 
   PvlGroup kern("Kernels");
   FileName f("$base/testData/kernels");
-  string dir = f.expanded() + "/";
-  kern += PvlKeyword("NaifFrameCode", -94031);
+  QString dir = f.expanded() + "/";
+  kern += PvlKeyword("NaifFrameCode", "-94031");
   kern += PvlKeyword("LeapSecond", dir + "naif0007.tls");
   kern += PvlKeyword("SpacecraftClock", dir + "MGS_SCLKSCET.00045.tsc");
   kern += PvlKeyword("TargetPosition", dir + "de405.bsp");
@@ -126,8 +126,8 @@ int main(int argc, char *argv[]) {
   double endTime = -69382512.0;
   double slope = (endTime - startTime) / (10 - 1);
 
-  kern += PvlKeyword("StartPadding", slope);
-  kern += PvlKeyword("EndPadding", slope);
+  kern += PvlKeyword("StartPadding", toString(slope));
+  kern += PvlKeyword("EndPadding", toString(slope));
 
   Pvl lab;
   lab.AddGroup(inst);

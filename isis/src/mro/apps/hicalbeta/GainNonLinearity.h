@@ -1,4 +1,4 @@
-#if !defined(GainNonLinearity_h)
+#ifndef GainNonLinearity_h
 #define GainNonLinearity_h
 /**                                                                       
  * @file                                                                  

@@ -12,7 +12,7 @@ void myFunct() {
 }
 
 void myError() {
-  std::string msg = "testing an error";
+  QString msg = "testing an error";
   throw Isis::IException(Isis::IException::Programmer, msg, _FILEINFO_);
 }
 
@@ -35,11 +35,11 @@ int main(int argc, char *argv[]) {
   std::cout << "Can't test Gui methods" << std::endl;
   std::cout << "  GuiLog(Pvl &results)" << std::endl;
   std::cout << "  GuiLog(PvlGroup &results)" << std::endl;
-  std::cout << "  GuiLog(std::string &results)" << std::endl;
+  std::cout << "  GuiLog(QString &results)" << std::endl;
   std::cout << "  GuiReportErrorLog(iException &e)" << std::endl;
   std::cout << std::endl;
 
-  std::map<std::string, void *> helpers;
+  std::map<QString, void *> helpers;
   helpers["helper"] = (void *) myFunct;
   a.RegisterGuiHelpers(helpers);
   if (a.GetGuiHelper("helper") == (void *) myFunct) {

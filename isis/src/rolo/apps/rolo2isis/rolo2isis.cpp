@@ -10,7 +10,7 @@ using namespace Isis;
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
-  string labelFile = ui.GetFileName("FROM");
+  QString labelFile = ui.GetFileName("FROM");
 
   ProcessImportPds p;
   Pvl label;
@@ -19,7 +19,7 @@ void IsisMain() {
   p.StartProcess();
 
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
-  IString transDir = (string) dataDir["Rolo"];
+  QString transDir = (QString) dataDir["Rolo"];
 
   FileName transFile;
   Pvl inputLabel(labelFile);

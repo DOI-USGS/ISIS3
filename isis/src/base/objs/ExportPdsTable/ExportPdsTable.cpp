@@ -81,7 +81,7 @@ namespace Isis {
    */ 
   PvlObject ExportPdsTable::exportTable(char *pdsTableBuffer, 
                                    int outputFileRecordBytes,
-                                   IString pdsTableByteOrder) {
+                                   QString pdsTableByteOrder) {
     // Currently, we will not allow our table rows to be wrapped. So we must
     // check that the rowbytes of the output table are no larger than the total
     // record bytes allowed in the output pds file
@@ -89,17 +89,17 @@ namespace Isis {
     if (m_rowBytes > m_outputRecordBytes) {
       throw IException(IException::Unknown, 
                        "Unable to export Isis::Table object to PDS. The "
-                       "Isis::Table record size [" + IString(m_rowBytes) 
+                       "Isis::Table record size [" + toString(m_rowBytes) 
                        + "] is larger than the record bytes allowed in the "
-                       "PDS file [" + IString(m_outputRecordBytes) + "].",
+                       "PDS file [" + toString(m_outputRecordBytes) + "].",
                         _FILEINFO_);
     }
 
     // update variables
-    m_pdsByteOrder = pdsTableByteOrder.UpCase();
+    m_pdsByteOrder = pdsTableByteOrder.toUpper();
     
     if (m_pdsByteOrder != "MSB" && m_pdsByteOrder != "LSB") {
-      IString msg = "Unable to export the Isis Table [" + m_isisTable->Name() 
+      QString msg = "Unable to export the Isis Table [" + m_isisTable->Name() 
                     + "] to a PDS table using the requested byte order [" 
                     + m_pdsByteOrder + "]. Valid values are MSB or LSB."; 
       throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -138,28 +138,28 @@ namespace Isis {
    * @return PvlObject containing PDS Table metadata.
    */
   PvlObject ExportPdsTable::fillMetaData() {
-    IString pdsTableName = formatPdsTableName();
+    QString pdsTableName = formatPdsTableName();
     PvlObject pdsTableLabelInfo(pdsTableName);
     // Data Object Descriptions
     // NOTE: this class is currently only exporting BINARY format PDS tables.
     //       implementation may be added later to export ASCII PDS tables.
     pdsTableLabelInfo.AddKeyword(PvlKeyword("INTERCHANGE_FORMAT", "BINARY"));
-    pdsTableLabelInfo.AddKeyword(PvlKeyword("ROWS", m_isisTable->Records()));
-    pdsTableLabelInfo.AddKeyword(PvlKeyword("COLUMNS", m_isisTable->RecordFields()));
-    pdsTableLabelInfo.AddKeyword(PvlKeyword("ROW_BYTES", m_rowBytes));
-    pdsTableLabelInfo.AddKeyword(PvlKeyword("ROW_SUFFIX_BYTES", m_outputRecordBytes - m_rowBytes));
+    pdsTableLabelInfo.AddKeyword(PvlKeyword("ROWS", toString(m_isisTable->Records())));
+    pdsTableLabelInfo.AddKeyword(PvlKeyword("COLUMNS", toString(m_isisTable->RecordFields())));
+    pdsTableLabelInfo.AddKeyword(PvlKeyword("ROW_BYTES", toString(m_rowBytes)));
+    pdsTableLabelInfo.AddKeyword(PvlKeyword("ROW_SUFFIX_BYTES", toString(m_outputRecordBytes - m_rowBytes)));
     int startByte = 1;  // PDS begins indexing at 1 
     for(int fieldIndex = 0; fieldIndex < m_isisTable->RecordFields(); fieldIndex++) {
       int columnBytes = 0;
       TableField field = (*m_isisTable)[0][fieldIndex];
       PvlObject columnObj("COLUMN");
-      columnObj.AddKeyword(PvlKeyword("COLUMN_NUMBER", fieldIndex + 1));
+      columnObj.AddKeyword(PvlKeyword("COLUMN_NUMBER", toString(fieldIndex + 1)));
       columnObj.AddKeyword(PvlKeyword("NAME", field.name()));
 
 
       if (field.type() == TableField::Text) {
         columnObj.AddKeyword(PvlKeyword("DATA_TYPE", "CHARACTER"));
-        string val = (string)field;
+        QString val = field;
         for(int i = 0; i < field.size(); i++) {
           columnBytes++;
         }
@@ -200,13 +200,13 @@ namespace Isis {
       else { // This error is not covered in the unitTest since currently, there
              // are no other valid values for TableField types. It is meant to 
              // catch other values if they are added to Table Field.
-        string msg = "Unable to export Isis::Table object to PDS. Invalid "
-                     "field type found for [" + field.name() + "].";
+        QString msg = "Unable to export Isis::Table object to PDS. Invalid "
+                      "field type found for [" + field.name() + "].";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
-      columnObj.AddKeyword(PvlKeyword("START_BYTE", startByte));
+      columnObj.AddKeyword(PvlKeyword("START_BYTE", toString(startByte)));
       startByte += columnBytes;
-      columnObj.AddKeyword(PvlKeyword("BYTES", IString(columnBytes)));
+      columnObj.AddKeyword(PvlKeyword("BYTES", toString(columnBytes)));
       pdsTableLabelInfo.AddObject(columnObj);
     }
     return pdsTableLabelInfo;
@@ -215,9 +215,9 @@ namespace Isis {
   /**
    * Format the PDS table object name using the Isis3 table name. 
    *  
-   * @return IString containing the formatted PDS table name.
+   * @return QString containing the formatted PDS table name.
    */
-  IString ExportPdsTable::formatPdsTableName() {
+  QString ExportPdsTable::formatPdsTableName() {
     return ExportPdsTable::formatPdsTableName(m_isisTable->Name());
   }
  
@@ -227,16 +227,15 @@ namespace Isis {
    * a PDS table name that is underscore separated, all upper case and 
    * with "_TABLE" appended to the end of the name, if not already present. 
    *  
-   * @param isisTableName An IString containing the Isis3 upper camel case
+   * @param isisTableName An QString containing the Isis3 upper camel case
    *        table name.
-   * @return IString containing the formatted PDS table name.
+   * @return QString containing the formatted PDS table name.
    */
-  IString ExportPdsTable::formatPdsTableName(IString isisTableName) { 
-    IString tableName = IString::ConvertWhiteSpace(isisTableName);
-    tableName.Compress();
-    IString pdsTableName;
+  QString ExportPdsTable::formatPdsTableName(QString isisTableName) { 
+    QString tableName = isisTableName.simplified();
+    QString pdsTableName;
     pdsTableName.push_back(tableName[0]);
-    for (unsigned int i = 1 ; i < tableName.size() ; i++) {
+    for (int i = 1 ; i < tableName.size() ; i++) {
       if (tableName[i] >= 65 && tableName[i] <= 90) {
         pdsTableName.push_back('_');
         pdsTableName.push_back(tableName[i]);
@@ -245,8 +244,8 @@ namespace Isis {
         pdsTableName.push_back(tableName[i]);
       }
     }
-    pdsTableName = pdsTableName.UpCase();
-    if (pdsTableName.find("_TABLE") != pdsTableName.length() - 6) {
+    pdsTableName = pdsTableName.toUpper();
+    if (pdsTableName.indexOf("_TABLE") != pdsTableName.length() - 6) {
       pdsTableName += "_TABLE";
     }
     return pdsTableName;
@@ -289,11 +288,11 @@ namespace Isis {
         }
       }
       else if(field.isText()) {
-        string val = (string)field;
+        QString val = field;
         // copy each character and count each byte individually
         for(int i = 0; i < field.size(); i++) {
           if(i < (int)val.length()) {
-            buffer[startByte] = val[i];
+            buffer[startByte] = val[i].toAscii();
           }
           else {
             // this line is not covered by unitTest since this is a case that
@@ -315,8 +314,8 @@ namespace Isis {
       else { // This error is not covered in the unitTest since currently, there
              // are no other valid values for TableField types. It is meant to 
              // catch other values if they are added to Table Field.
-        string msg = "Unable to export Isis::Table object to PDS. Invalid "
-                     "field type found for [" + field.name() + "].";
+        QString msg = "Unable to export Isis::Table object to PDS. Invalid "
+                      "field type found for [" + field.name() + "].";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
     }
@@ -326,7 +325,7 @@ namespace Isis {
                                    // tested since it should not be possible 
                                    // unless the number of bytes reserved for 
                                    // each of the types changes
-      IString msg = "Unable to export Isis::Table object [" + m_isisTable->Name()
+      QString msg = "Unable to export Isis::Table object [" + m_isisTable->Name()
                     + "] to PDS. Record lengths are uneven.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }

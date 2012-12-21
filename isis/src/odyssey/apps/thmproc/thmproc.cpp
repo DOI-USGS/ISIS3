@@ -10,15 +10,15 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   if(!ui.GetBoolean("INGESTION") && !ui.GetBoolean("MAPPING")) {
-    string msg = "You must pick one of [INGESTION,MAPPING]";
+    QString msg = "You must pick one of [INGESTION,MAPPING]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(ui.GetBoolean("INGESTION")) {
     Pvl labels(ui.GetFileName("FROM"));
 
-    if((IString)labels["DETECTOR_ID"][0] == "VIS") {
-      if(((string)labels["DATA_SET_ID"]).find("RDR") != string::npos) {
+    if((QString)labels["DETECTOR_ID"][0] == "VIS") {
+      if(((QString)labels["DATA_SET_ID"]).contains("RDR")) {
         ProcessVis(true);
       }
       else {

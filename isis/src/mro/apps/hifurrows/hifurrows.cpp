@@ -125,7 +125,7 @@ void IsisMain() {
         ss >> finish;
       }
       label += "Column" + begin + "to" + finish;
-      stats += PvlKeyword(label, furrows[i].mvstats[j].Correlation());
+      stats += PvlKeyword(label.c_str(), toString(furrows[i].mvstats[j].Correlation()));
     }
   }
   Application::Log(stats);
@@ -240,7 +240,7 @@ void RemoveFurrows_Version_1_42(void)
 #endif
 
   // apply trim filter if furrows found
-  IString sTempFile("./FixFurrows.cub");
+  QString sTempFile("./FixFurrows.cub");
   if(bFurrowsFound) {
     Pipeline p;
     p.SetInputFile(FileName(ui.GetFileName("TO")));
@@ -280,7 +280,7 @@ void RemoveFurrows_Version_1_42(void)
     procSample.EndProcess();
 
     // clean up
-    remove(sTempFile.c_str());
+    remove(sTempFile.toAscii().data());
   }
 }
 

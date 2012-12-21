@@ -401,8 +401,8 @@ namespace Isis {
       m_tableWin->table()->item(row, IncidenceAngleRadiansIndex)->setText("N/A");
     }
 
-    m_tableWin->table()->item(row, PathIndex)->setText(m_path.c_str());
-    m_tableWin->table()->item(row, FileNameIndex)->setText(m_fileName.c_str());
+    m_tableWin->table()->item(row, PathIndex)->setText(m_path);
+    m_tableWin->table()->item(row, FileNameIndex)->setText(m_fileName);
   }
 
 
@@ -565,11 +565,11 @@ namespace Isis {
       switch (displayUnits) {
         case Distance::Meters:
           m_shadowHeightLineEdit->setText(
-            IString(m_shadowHeight->meters()));
+              toString(m_shadowHeight->meters()));
           break;
         case Distance::Kilometers:
           m_shadowHeightLineEdit->setText(
-            IString(m_shadowHeight->kilometers()));
+              toString(m_shadowHeight->kilometers()));
           break;
         case Distance::Pixels:
           m_shadowHeightLineEdit->setText("Not Supported");

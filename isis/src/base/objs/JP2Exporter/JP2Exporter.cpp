@@ -3,6 +3,7 @@
 #include "Buffer.h"
 #include "FileName.h"
 #include "IException.h"
+#include "IString.h"
 #include "JP2Encoder.h"
 
 using namespace Isis;
@@ -84,7 +85,7 @@ namespace Isis {
         break;
       default:
         throw IException(IException::Programmer,
-            "Invalid pixel type for data [" + IString(type) + "]",
+            "Invalid pixel type for data [" + toString(type) + "]",
             _FILEINFO_);
     }
   }
@@ -111,7 +112,7 @@ namespace Isis {
    *
    * @return True if "jp2", false otherwise
    */
-  bool JP2Exporter::canWriteFormat(IString format) {
+  bool JP2Exporter::canWriteFormat(QString format) {
     return format == "jp2";
   }
 };

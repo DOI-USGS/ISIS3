@@ -1,4 +1,4 @@
-#if !defined(LineEquation_h)
+#ifndef LineEquation_h
 #define LineEquation_h
 /**
  * @file

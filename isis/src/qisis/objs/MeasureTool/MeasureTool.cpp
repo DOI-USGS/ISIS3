@@ -404,8 +404,8 @@ namespace Isis {
       m_tableWin->table()->item(row, AreaMIndex)->setText("N/A");
     }
 
-    m_tableWin->table()->item(row, PathIndex)->setText(m_path.c_str());
-    m_tableWin->table()->item(row, FileNameIndex)->setText(m_fname.c_str());
+    m_tableWin->table()->item(row, PathIndex)->setText(m_path);
+    m_tableWin->table()->item(row, FileNameIndex)->setText(m_fname);
   }
 
 
@@ -484,8 +484,8 @@ namespace Isis {
           m_tableWin->table()->item(row + i, DistanceMIndex)->setText("N/A");
         }
 
-        m_tableWin->table()->item(row + i, PathIndex)->setText(m_path.c_str());
-        m_tableWin->table()->item(row + i, FileNameIndex)->setText(m_fname.c_str());
+        m_tableWin->table()->item(row + i, PathIndex)->setText(m_path);
+        m_tableWin->table()->item(row + i, FileNameIndex)->setText(m_fname);
 
         distanceSum = (Distance(distanceSum, Distance::Kilometers) +
             Distance(m_distanceSegments[i], Distance::Kilometers)).kilometers();

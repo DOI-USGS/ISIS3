@@ -52,18 +52,6 @@ namespace Isis {
   }
 
 
-  FileName::FileName(const std::string &file) {
-    m_d = new Data;
-    m_d->setOriginal(file);
-  }
-
-
-  FileName::FileName(const IString &file) {
-    m_d = new Data;
-    m_d->setOriginal(file);
-  }
-
-
   FileName::FileName(const QString &file) {
     m_d = new Data;
     m_d->setOriginal(file);
@@ -79,7 +67,7 @@ namespace Isis {
   }
 
 
-  IString FileName::originalPath() const {
+  QString FileName::originalPath() const {
     return QFileInfo(m_d->original(false)).path();
   }
 
@@ -97,12 +85,12 @@ namespace Isis {
    *   "/home/me/img"
    * </pre>
    */
-  IString FileName::path() const {
+  QString FileName::path() const {
     return QFileInfo(expanded()).path();
   }
 
 
-  IString FileName::attributes() const {
+  QString FileName::attributes() const {
     QString result;
     QString fileNameWithAttribs = QFileInfo(m_d->original(true)).fileName();
 
@@ -115,36 +103,36 @@ namespace Isis {
   }
 
 
-  IString FileName::baseName() const {
+  QString FileName::baseName() const {
     return QFileInfo(m_d->original(false)).completeBaseName();
   }
 
 
-  IString FileName::name() const {
+  QString FileName::name() const {
     return QFileInfo(m_d->original(false)).fileName();
   }
 
 
-  IString FileName::extension() const {
+  QString FileName::extension() const {
     return QFileInfo(m_d->original(false)).suffix();
   }
 
 
-  IString FileName::expanded() const {
+  QString FileName::expanded() const {
     return m_d->expanded(false);
   }
 
 
-  IString FileName::original() const {
+  QString FileName::original() const {
     return m_d->original(true);
   }
 
 
-  FileName FileName::addExtension(const IString &newExtension) const {
+  FileName FileName::addExtension(const QString &newExtension) const {
     FileName result = *this;
 
     if (result.extension() != newExtension) {
-      IString attributesStr = result.attributes().ToQt();
+      QString attributesStr = result.attributes();
 
       if (attributesStr == "")
         result = FileName(result.originalPath() + "/" + result.name() + "." + newExtension);
@@ -158,7 +146,7 @@ namespace Isis {
 
 
   FileName FileName::removeExtension() const {
-    IString attributesStr = attributes().ToQt();
+    QString attributesStr = attributes();
 
     FileName result;
     if (attributesStr == "")
@@ -170,7 +158,7 @@ namespace Isis {
   }
 
 
-  FileName FileName::setExtension(const IString &newExtension) const {
+  FileName FileName::setExtension(const QString &newExtension) const {
     FileName result = *this;
 
     if (extension() != newExtension) {
@@ -189,12 +177,12 @@ namespace Isis {
 
 
   bool FileName::isNumericallyVersioned() const {
-    return FileName(expanded()).name().ToQt().contains("?");
+    return FileName(expanded()).name().contains("?");
   }
 
 
   bool FileName::isDateVersioned() const {
-    return FileName(expanded()).name().ToQt().contains(QRegExp("\\{.*\\}"));
+    return FileName(expanded()).name().contains(QRegExp("\\{.*\\}"));
   }
 
 
@@ -207,7 +195,7 @@ namespace Isis {
       throw IException(IException::Unknown,
                        QObject::tr("Asked for highest version of file named [%1] in [%2] but there "
                                    "are no version sequences in the name")
-                         .arg(name().ToQt()).arg(originalPath().ToQt()),
+                         .arg(name()).arg(originalPath()),
                        _FILEINFO_);
     }
 
@@ -234,7 +222,7 @@ namespace Isis {
       throw IException(IException::Unknown,
                        QObject::tr("Asked for new version of file named [%1] in [%2] but there "
                                    "are no version sequences in the name")
-                         .arg(name().ToQt()).arg(originalPath().ToQt()),
+                         .arg(name()).arg(originalPath()),
                        _FILEINFO_);
     }
 
@@ -257,7 +245,7 @@ namespace Isis {
       throw IException(IException::Unknown,
                        QObject::tr("Could not generate unique new version of file named [%1] in "
                                    "[%2] because the file [%3] exists")
-                         .arg(name().ToQt()).arg(originalPath().ToQt()).arg(result.name().ToQt()),
+                         .arg(name()).arg(originalPath()).arg(result.name()),
                        _FILEINFO_);
 
     }
@@ -275,7 +263,7 @@ namespace Isis {
       throw IException(IException::Unknown,
           QObject::tr("FileName does not support negative version numbers in the file name, "
                       "tried to get version [%1] in file named [%2]")
-            .arg(versionNumber).arg(originalPath().ToQt() + "/" + file),
+            .arg(versionNumber).arg(originalPath() + "/" + file),
           _FILEINFO_);
     }
 
@@ -283,7 +271,7 @@ namespace Isis {
       throw IException(IException::Unknown,
           QObject::tr("FileName does not support version numbers greater than what would fit in "
                       "the file name, tried to get version [%1] in file named [%2]")
-            .arg(versionNumber).arg(originalPath().ToQt() + "/" + file),
+            .arg(versionNumber).arg(originalPath() + "/" + file),
           _FILEINFO_);
     }
 
@@ -293,44 +281,44 @@ namespace Isis {
 
     file = before + QString("%1").arg(QString::number(versionNumber), width, '0') + after;
 
-    return FileName(originalPath().ToQt() + "/" + file);
+    return FileName(originalPath() + "/" + file);
   }
 
 
   FileName FileName::version(QDate versionDate) const {
     QString newName = versionDate.toString(fileNameQDatePattern());
 
-    return FileName(originalPath().ToQt() + "/" + newName);
+    return FileName(originalPath() + "/" + newName);
   }
 
 
   bool FileName::fileExists() const {
-    return QFileInfo(expanded().ToQt()).exists();
+    return QFileInfo(expanded()).exists();
   }
 
 
   QDir FileName::dir() const {
-    return QFileInfo(expanded().ToQt()).dir();
+    return QFileInfo(expanded()).dir();
   }
 
 
   FileName FileName::createTempFile(FileName templateFileName) {
-    QString preppedFileName = QString("%1/%2XXXXXX.%3").arg(templateFileName.path().ToQt())
-        .arg(templateFileName.baseName().ToQt()).arg(templateFileName.extension().ToQt());
+    QString preppedFileName = QString("%1/%2XXXXXX.%3").arg(templateFileName.path())
+        .arg(templateFileName.baseName()).arg(templateFileName.extension());
     QTemporaryFile tempFile(preppedFileName);
     tempFile.setAutoRemove(false);
 
     if (!tempFile.open()) {
       throw IException(IException::Io,
           QObject::tr("Could not create a unique temporary file name based on [%1]")
-            .arg(templateFileName.original().ToQt()),
+            .arg(templateFileName.original()),
           _FILEINFO_);
     }
 
     // We want to set the 'original' path as correctly as possible. So let's use the input original
     //   path with the output temp file's file name in our result.
     FileName result;
-    QString newTempFileNameStr = templateFileName.originalPath().ToQt() + "/" +
+    QString newTempFileNameStr = templateFileName.originalPath() + "/" +
         QFileInfo(tempFile.fileName()).fileName();
     result = FileName(newTempFileNameStr);
 
@@ -338,7 +326,7 @@ namespace Isis {
   }
 
 
-  IString FileName::toString() const {
+  QString FileName::toString() const {
     return expanded();
   }
 
@@ -387,13 +375,13 @@ namespace Isis {
 
     QPair<int, int> truncateRange(-1, -1);
     if (fileQDatePattern.contains("?")) {
-      QString trueLengthName = name().ToQt().replace(QRegExp("[{}]"), "");
+      QString trueLengthName = name().replace(QRegExp("[{}]"), "");
       truncateRange.first = trueLengthName.indexOf("?");
       truncateRange.second = trueLengthName.lastIndexOf("?");
       fileQDatePattern = fileQDatePattern.replace("?", "");
     }
 
-    QString file = name().ToQt();
+    QString file = name();
 
     QDate result;
     QDate sputnikLaunch(1957, 10, 4);
@@ -432,7 +420,7 @@ namespace Isis {
       throw IException(IException::Unknown,
                        QObject::tr("No existing files found with a date version matching [%1] in "
                                    "[%2]")
-                         .arg(FileName(expanded()).name().ToQt()).arg(path().ToQt()),
+                         .arg(FileName(expanded()).name()).arg(path()),
                        _FILEINFO_);
     }
 
@@ -468,7 +456,7 @@ namespace Isis {
       throw IException(IException::Unknown,
                        QObject::tr("No existing files found with a numerial version matching [%1] "
                                    "in [%2]")
-                         .arg(FileName(expanded()).name().ToQt()).arg(path().ToQt()),
+                         .arg(FileName(expanded()).name()).arg(path()),
                        _FILEINFO_);
     }
 
@@ -561,8 +549,8 @@ namespace Isis {
     m_originalFileNameString = NULL;
     m_expandedFileNameString = NULL;
 
-    m_originalFileNameString = new IString;
-    m_expandedFileNameString = new IString;
+    m_originalFileNameString = new QString;
+    m_expandedFileNameString = new QString;
   }
 
 
@@ -570,8 +558,8 @@ namespace Isis {
     m_originalFileNameString = NULL;
     m_expandedFileNameString = NULL;
 
-    m_originalFileNameString = new IString(*other.m_originalFileNameString);
-    m_expandedFileNameString = new IString(*other.m_expandedFileNameString);
+    m_originalFileNameString = new QString(*other.m_originalFileNameString);
+    m_expandedFileNameString = new QString(*other.m_expandedFileNameString);
   }
 
 
@@ -584,7 +572,7 @@ namespace Isis {
   }
 
 
-  IString FileName::Data::original(bool includeAttributes) const {
+  QString FileName::Data::original(bool includeAttributes) const {
     QString result = *m_originalFileNameString;
 
 
@@ -599,7 +587,7 @@ namespace Isis {
   }
 
 
-  void FileName::Data::setOriginal(const IString &originalStr) {
+  void FileName::Data::setOriginal(const QString &originalStr) {
     *m_originalFileNameString = originalStr;
 
     // Expand the file name and store that too.
@@ -629,8 +617,8 @@ namespace Isis {
           // Find the corresponding Isis Preference if one exists
           if(Preference::Preferences().HasGroup("DataDirectory")) {
             PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
-            if(dataDir.HasKeyword(varName.toStdString())) {
-              varValue = ((IString)dataDir[varName.toStdString().c_str()][0]).ToQt();
+            if(dataDir.HasKeyword(varName)) {
+              varValue = ((QString)dataDir[varName.toStdString().c_str()][0]);
             }
           }
 
@@ -665,7 +653,7 @@ namespace Isis {
   }
 
 
-  IString FileName::Data::expanded(bool includeAttributes) const {
+  QString FileName::Data::expanded(bool includeAttributes) const {
     QString result = *m_expandedFileNameString;
 
 

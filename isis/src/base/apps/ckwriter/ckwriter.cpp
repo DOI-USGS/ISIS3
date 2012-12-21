@@ -20,7 +20,7 @@ void IsisMain() {
   if (ui.WasEntered("FROM")) flist.push_back(FileName(ui.GetFileName("FROM")));
   if (ui.WasEntered("FROMLIST")) flist.read(FileName(ui.GetFileName("FROMLIST")));
   if (flist.size() < 1) {
-    string msg = "Files must be specified in FROM and/or FROMLIST - none found!";
+    QString msg = "Files must be specified in FROM and/or FROMLIST - none found!";
     throw IException(IException::User,msg,_FILEINFO_);
   }
 
@@ -36,7 +36,7 @@ void IsisMain() {
   }
 
   //  Get comment file
-  string comfile("");
+  QString comfile("");
   if (ui.WasEntered("COMFILE")) comfile = ui.GetFileName("COMFILE");
 
   // Write the output file if requested
@@ -47,11 +47,11 @@ void IsisMain() {
 
   // Write a summary of the documentation
   if (ui.WasEntered("SUMMARY")) {
-    string fFile = FileName(ui.GetFileName("SUMMARY")).expanded();
+    QString fFile = FileName(ui.GetFileName("SUMMARY")).expanded();
     ofstream os;
-    os.open(fFile.c_str(),ios::out);
+    os.open(fFile.toAscii().data(),ios::out);
     if (!os) {
-      string mess = "Cannot create SUMMARY output file " + fFile;
+      QString mess = "Cannot create SUMMARY output file " + fFile;
       throw IException(IException::User, mess, _FILEINFO_);
     }
     os << kernel.getSummary(comfile);

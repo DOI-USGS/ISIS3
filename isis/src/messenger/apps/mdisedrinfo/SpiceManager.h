@@ -1,4 +1,4 @@
-#if !defined(SpiceManager_h)
+#ifndef SpiceManager_h
 #define SpiceManager_h
 /**
  * @file
@@ -58,7 +58,7 @@ namespace Isis {
     public:
       /** Default Constructor */
       SpiceManager() : _kernlist(), _furnish(true) { }
-      SpiceManager(const std::string &filename, bool furnish = true);
+      SpiceManager(const QString &filename, bool furnish = true);
       SpiceManager(Cube &cube, bool furnish = true);
       SpiceManager(Pvl &pvl, bool furnish = true);
       /** Destructor always unloads the kernels from the pool */
@@ -72,19 +72,19 @@ namespace Isis {
       }
 
       void Load(Pvl &pvl, bool furnish = true);
-      void add(const std::string &kernel);
-      std::vector<std::string> getList(bool removePath = false) const;
+      void add(const QString &kernel);
+      std::vector<QString> getList(bool removePath = false) const;
       void Unload();
 
 
     private:
-      std::vector<std::string> _kernlist;  //!< The list of kernels
+      std::vector<QString> _kernlist;  //!< The list of kernels
       bool _furnish;                       //!< Load the kernels found?
 
       void loadKernel(PvlKeyword &key);
-      void loadKernelFromTable(PvlKeyword &key, const std::string &tblname,
+      void loadKernelFromTable(PvlKeyword &key, const QString &tblname,
                                Pvl &pvl);
-      void addKernelName(const std::string &kname);
+      void addKernelName(const QString &kname);
 
   };
 

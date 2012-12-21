@@ -56,7 +56,7 @@ void IsisMain() {
 
   // Iterate through the input kernel's data values to fill the coefs array
   for(int i = 0 ; i < kern["data"].Size() ; i ++) {
-    coefs.push_back(kern["data"][i]);
+    coefs.push_back(toDouble(kern["data"][i]));
   }
 
   // Weight for multiplication of resultant immidately before completion

@@ -74,10 +74,10 @@ namespace Isis {
    */
   class PvlTranslationManager : public PvlTranslationTable {
     public:
-      PvlTranslationManager(const std::string &transFile);
+      PvlTranslationManager(const QString &transFile);
 
       PvlTranslationManager(Isis::Pvl &inputLabel,
-                            const std::string &transFile);
+                            const QString &transFile);
 
       PvlTranslationManager(Isis::Pvl &inputLabel,
                             std::istream &transStrm);
@@ -87,16 +87,16 @@ namespace Isis {
 
       // Attempt to translate the requested output name to output value
       // using the input name and value/default value
-      std::string Translate(const std::string nName, int findex = 0);
+      QString Translate(QString nName, int findex = 0);
 
       // Translate all translation table groups which contain "Auto"
       void Auto(Isis::Pvl &outputLabel);
 
       // Return the ith input value associated with a output name
-      const PvlKeyword &InputKeyword(const std::string nName) const;
+      const PvlKeyword &InputKeyword(const QString nName) const;
 
       // Return true if the input lable contains the translated group and key names
-      bool InputHasKeyword(const std::string nName);
+      bool InputHasKeyword(const QString nName);
 
       void SetLabel(Isis::Pvl &lab) {
         p_fLabel = lab;
@@ -105,9 +105,9 @@ namespace Isis {
 
       Isis::Pvl p_fLabel; //!<A Pvl object for the input label file
 
-      Isis::PvlKeyword DoTranslation(const std::string nName);
+      Isis::PvlKeyword DoTranslation(const QString nName);
       const Isis::PvlContainer *GetContainer(const PvlKeyword &inputGroup) const;
-      Isis::PvlContainer *CreateContainer(const std::string nName, Isis::Pvl &pvl);
+      Isis::PvlContainer *CreateContainer(const QString nName, Isis::Pvl &pvl);
   };
 };
 

@@ -28,8 +28,8 @@ int main() {
 
   PvlGroup algn("Algorithm");
   algn += PvlKeyword("Name", "Mixed");
-  algn += PvlKeyword("Albedo", .0690507);
-  algn += PvlKeyword("Incmat", 51.0);
+  algn += PvlKeyword("Albedo", ".0690507");
+  algn += PvlKeyword("Incmat", "51.0");
 
   PvlObject on("NormalizationModel");
   on.AddGroup(algn);

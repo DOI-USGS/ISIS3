@@ -46,12 +46,12 @@ int main() {
 
   PvlGroup algp2("Algorithm");
   algp2 += PvlKeyword("Name", "HapkeHen");
-  algp2 += PvlKeyword("Wh", 0.52);
-  algp2 += PvlKeyword("B0", 1.0);
-  algp2 += PvlKeyword("Hh", 1.0);
-  algp2 += PvlKeyword("Theta", 30.0);
-  algp2 += PvlKeyword("Hg1", 0.213);
-  algp2 += PvlKeyword("Hg2", 1.0);
+  algp2 += PvlKeyword("Wh", toString(0.52));
+  algp2 += PvlKeyword("B0", toString(1.0));
+  algp2 += PvlKeyword("Hh", toString(1.0));
+  algp2 += PvlKeyword("Theta", toString(30.0));
+  algp2 += PvlKeyword("Hg1", toString(0.213));
+  algp2 += PvlKeyword("Hg2", toString(1.0));
   algp2 += PvlKeyword("ZeroB0St", "TRUE");
 
   PvlObject op2("PhotometricModel");
@@ -82,12 +82,12 @@ int main() {
 
   PvlGroup algp3("Algorithm");
   algp3 += PvlKeyword("Name", "HapkeHen");
-  algp3 += PvlKeyword("Wh", 0.52);
-  algp3 += PvlKeyword("B0", 1.0);
-  algp3 += PvlKeyword("Hh", 1.0);
-  algp3 += PvlKeyword("Theta", 30.0);
-  algp3 += PvlKeyword("Hg1", 0.213);
-  algp3 += PvlKeyword("Hg2", 1.0);
+  algp3 += PvlKeyword("Wh", toString(0.52));
+  algp3 += PvlKeyword("B0", toString(1.0));
+  algp3 += PvlKeyword("Hh", toString(1.0));
+  algp3 += PvlKeyword("Theta", toString(30.0));
+  algp3 += PvlKeyword("Hg1", toString(0.213));
+  algp3 += PvlKeyword("Hg2", toString(1.0));
   algp3 += PvlKeyword("ZeroB0St", "YES");
 
   PvlObject op3("PhotometricModel");
@@ -121,12 +121,12 @@ int main() {
 
   PvlGroup algp4("Algorithm");
   algp4 += PvlKeyword("Name", "HapkeLeg");
-  algp4 += PvlKeyword("Wh", 0.52);
-  algp4 += PvlKeyword("B0", 1.0);
-  algp4 += PvlKeyword("Hh", 1.0);
-  algp4 += PvlKeyword("Bh", 0.0);
-  algp4 += PvlKeyword("Ch", 0.0);
-  algp4 += PvlKeyword("Theta", 30.0);
+  algp4 += PvlKeyword("Wh", toString(0.52));
+  algp4 += PvlKeyword("B0", toString(1.0));
+  algp4 += PvlKeyword("Hh", toString(1.0));
+  algp4 += PvlKeyword("Bh", toString(0.0));
+  algp4 += PvlKeyword("Ch", toString(0.0));
+  algp4 += PvlKeyword("Theta", toString(30.0));
   algp4 += PvlKeyword("ZeroB0Standard", "FALSE");
 
   PvlObject op4("PhotometricModel");
@@ -157,12 +157,12 @@ int main() {
 
   PvlGroup algp5("Algorithm");
   algp5 += PvlKeyword("Name", "HapkeLeg");
-  algp5 += PvlKeyword("Wh", 0.52);
-  algp5 += PvlKeyword("B0", 1.0);
-  algp5 += PvlKeyword("Hh", 1.0);
-  algp5 += PvlKeyword("Bh", 0.0);
-  algp5 += PvlKeyword("Ch", 0.0);
-  algp5 += PvlKeyword("Theta", 30.0);
+  algp5 += PvlKeyword("Wh", toString(0.52));
+  algp5 += PvlKeyword("B0", toString(1.0));
+  algp5 += PvlKeyword("Hh", toString(1.0));
+  algp5 += PvlKeyword("Bh", toString(0.0));
+  algp5 += PvlKeyword("Ch", toString(0.0));
+  algp5 += PvlKeyword("Theta", toString(30.0));
   algp5 += PvlKeyword("ZeroB0Standard", "NO");
 
   PvlObject op5("PhotometricModel");
@@ -193,12 +193,12 @@ int main() {
 
   PvlGroup algp6("Algorithm");
   algp6 += PvlKeyword("Name", "HapkeLeg");
-  algp6 += PvlKeyword("Wh", 0.52);
-  algp6 += PvlKeyword("B0", 1.0);
-  algp6 += PvlKeyword("Hh", 1.0);
-  algp6 += PvlKeyword("Bh", 0.0);
-  algp6 += PvlKeyword("Ch", 0.0);
-  algp6 += PvlKeyword("Theta", 30.0);
+  algp6 += PvlKeyword("Wh", toString(0.52));
+  algp6 += PvlKeyword("B0", toString(1.0));
+  algp6 += PvlKeyword("Hh", toString(1.0));
+  algp6 += PvlKeyword("Bh", toString(0.0));
+  algp6 += PvlKeyword("Ch", toString(0.0));
+  algp6 += PvlKeyword("Theta", toString(30.0));
   algp6 += PvlKeyword("ZeroB0Standard", "MAYBE");
 
   PvlObject op6("PhotometricModel");

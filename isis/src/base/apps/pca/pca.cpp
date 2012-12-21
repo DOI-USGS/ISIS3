@@ -65,7 +65,7 @@ void IsisMain() {
   }
   else if(ui.GetString("MODE") == "INVERSE") {
     if(!(icube->hasTable("Transform Matrix"))) {
-      std::string m = "The input cube has not been transformed into its principal components";
+      QString m = "The input cube has not been transformed into its principal components";
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
     Isis::Table table("Transform Matrix");
@@ -92,7 +92,7 @@ void IsisMain() {
     p.EndProcess();
   }
   else {
-    std::string m = "Invalid option for MODE [" + ui.GetString("MODE") + "]";
+    QString m = "Invalid option for MODE [" + ui.GetString("MODE") + "]";
     throw IException(IException::Programmer, m, _FILEINFO_);
   }
 }

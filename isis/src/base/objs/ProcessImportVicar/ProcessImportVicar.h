@@ -62,10 +62,10 @@ namespace Isis {
   class ProcessImportVicar : public ProcessImport {
 
     public:
-      void SetVicarFile(const std::string &vicarFile, Pvl &vicarLab);
+      void SetVicarFile(const QString &vicarFile, Pvl &vicarLab);
 
     private:
-      IString ExtractPvlLabel(const int startPos, std::ifstream &vicarFile) const;
+      QString ExtractPvlLabel(int startPos, std::ifstream &vicarFile) const;
   };
 };
 

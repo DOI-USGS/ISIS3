@@ -27,11 +27,11 @@ namespace Isis {
     // Create a menu item in the combo box for each list item and add it
     // to the layout
     for(int item = 0; item < ui.ParamListSize(group, param); item++) {
-      IString btext = ui.ParamListBrief(group, param, item);
+      QString btext = ui.ParamListBrief(group, param, item);
       btext += " (";
       btext += ui.ParamListValue(group, param, item);
       btext += ")";
-      p_combo->insertItem(item, (IString)btext);
+      p_combo->insertItem(item, btext);
     }
     lo->addWidget(p_combo);
     connect(p_combo, SIGNAL(activated(int)),
@@ -47,7 +47,7 @@ namespace Isis {
   }
 
 
-  void GuiComboBoxParameter::Set(IString newValue) {
+  void GuiComboBoxParameter::Set(QString newValue) {
     IString value = newValue;
     value.UpCase();
 
@@ -67,18 +67,18 @@ namespace Isis {
   }
 
 
-  IString GuiComboBoxParameter::Value() {
-    return (IString)p_ui->ParamListValue(p_group, p_param,
-                                         p_combo->currentIndex());
+  QString GuiComboBoxParameter::Value() {
+    return p_ui->ParamListValue(p_group, p_param,
+                                p_combo->currentIndex());
   }
 
-  std::vector<std::string> GuiComboBoxParameter::Exclusions() {
-    std::vector<std::string> list;
+  std::vector<QString> GuiComboBoxParameter::Exclusions() {
+    std::vector<QString> list;
 
     int index = p_combo->currentIndex();
 
     for(int i = 0; i < p_ui->ParamListExcludeSize(p_group, p_param, index); i++) {
-      std::string s = p_ui->ParamListExclude(p_group, p_param, index, i);
+      QString s = p_ui->ParamListExclude(p_group, p_param, index, i);
       list.push_back(s);
     }
 

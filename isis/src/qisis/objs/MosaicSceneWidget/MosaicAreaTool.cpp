@@ -287,7 +287,7 @@ namespace Isis {
       obj += PvlKeyword("Latitude", m_latLineEdit->text());
       obj += PvlKeyword("Longitude", m_lonLineEdit->text());
       obj += PvlKeyword("Area", m_areaLineEdit->text());
-      obj += PvlKeyword("Visible", (m_box != NULL));
+      obj += PvlKeyword("Visible", toString((m_box != NULL)));
     }
 
     return obj;
@@ -305,14 +305,14 @@ namespace Isis {
       if(obj.HasKeyword("Area") && obj["Area"][0] != "Null")
         m_areaLineEdit->setText(obj["Area"][0]);
 
-      if((int)obj["Visible"][0] != 0) {
+      if(toBool(obj["Visible"][0]) != false) {
         userChangedBox();
       }
     }
   }
 
 
-  IString MosaicAreaTool::projectPvlObjectName() const {
+  QString MosaicAreaTool::projectPvlObjectName() const {
     return "MosaicAreaTool";
   }
 

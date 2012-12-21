@@ -68,7 +68,7 @@ namespace Isis {
     PvlGroup &algorithm = pvl.FindObject("AtmosphericModel").FindGroup("Algorithm", Pvl::Traverse);
 
     if(algorithm.HasKeyword("Nulneg")) {
-      SetAtmosNulneg(((string)algorithm["Nulneg"]).compare("YES") == 0);
+      SetAtmosNulneg(algorithm["Nulneg"][0] == "YES");
     }
     else {
       p_atmosNulneg = false;
@@ -111,14 +111,14 @@ namespace Isis {
     }
 
     if(algorithm.HasKeyword("Iord")) {
-      SetAtmosIord(((string)algorithm["Iord"]).compare("YES") == 0);
+      SetAtmosIord(algorithm["Iord"][0] == "YES");
     }
     else {
       p_atmosAddOffset = false;
     }
 
     if(algorithm.HasKeyword("EstTau")) {
-      SetAtmosEstTau(((string)algorithm["EstTau"]).compare("YES") == 0);
+      SetAtmosEstTau(algorithm["EstTau"][0] == "YES");
     }
     else {
       p_atmosEstTau = false;
@@ -961,7 +961,7 @@ namespace Isis {
    */
   void AtmosModel::SetAtmosHnorm(const double hnorm) {
     if(hnorm < 0.0) {
-      std::string msg = "Invalid value of Atmospheric hnorm [" + IString(hnorm) + "]";
+      QString msg = "Invalid value of Atmospheric hnorm [" + toString(hnorm) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     p_atmosHnorm = hnorm;

@@ -37,7 +37,7 @@ namespace Isis {
    *  Constructor for reading a history blob
    *  @param name
    */
-  History::History(const std::string &name) : Isis::Blob(name, "History") {
+  History::History(const QString &name) : Isis::Blob(name, "History") {
     p_history.SetTerminator("");
   }
 
@@ -46,7 +46,7 @@ namespace Isis {
    *  @param name
    *  @param file
    */
-  History::History(const std::string &name, const std::string &file) :
+  History::History(const QString &name, const QString &file) :
     Isis::Blob(name, "History") {
     Blob::Read(file);
   }

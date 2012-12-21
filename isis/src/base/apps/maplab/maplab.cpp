@@ -1,7 +1,7 @@
 #include "Isis.h"
 #include <iostream>
 #include <sstream>
-#include <string>
+#include <QString>
 #include "Pvl.h"
 #include "Cube.h"
 #include "History.h"
@@ -27,25 +27,25 @@ void IsisMain() {
   // Error checking to ensure the map projection file provided contains
   // information pertaining to a target, body radius, and longitude direction
   if(!mapGrp.HasKeyword("TargetName")) {
-    string msg = "The given MAP [" + userMap.Name() +
-                 "] does not have the TargetName keyword.";
+    QString msg = "The given MAP [" + userMap.Name() +
+                  "] does not have the TargetName keyword.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   else if(!mapGrp.HasKeyword("EquatorialRadius") ||
           !mapGrp.HasKeyword("PolarRadius")) {
-    string msg = "The given MAP [" + userMap.Name() +
-                 "] does not have the EquatorialRadius and PolarRadius keywords.";
+    QString msg = "The given MAP [" + userMap.Name() +
+                  "] does not have the EquatorialRadius and PolarRadius keywords.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   else if(!mapGrp.HasKeyword("LongitudeDomain")) {
-    string msg = "The given MAP [" + userMap.Name() +
-                 "] does not have the LongitudeDomain keyword.";
+    QString msg = "The given MAP [" + userMap.Name() +
+                  "] does not have the LongitudeDomain keyword.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
 
   // Get user entered option
-  string option = ui.GetString("COORDINATES");
+  QString option = ui.GetString("COORDINATES");
 
   double x = 0.0;
   double y = 0.0;
@@ -60,7 +60,7 @@ void IsisMain() {
     y = proj->YCoord();
   }
   else {
-    string message = "Invalid option [" + option + "] for parameter COORDINATES";
+    QString message = "Invalid option [" + option + "] for parameter COORDINATES";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
@@ -78,7 +78,7 @@ void IsisMain() {
     res = (2.0 * Isis::PI * localRadius) / (360.0 * scale);
   }
   else {
-    string msg = "The given MAP[" + userMap.Name() +
+    QString msg = "The given MAP[" + userMap.Name() +
                  "] does not have the PixelResolution or Scale keywords.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -90,14 +90,14 @@ void IsisMain() {
   y = y + res * (line - 0.5);
 
   //add origen values to Mapping Group
-  mapGrp.AddKeyword(PvlKeyword("UpperLeftCornerX", x, "meters"), Pvl::Replace);
-  mapGrp.AddKeyword(PvlKeyword("UpperLeftCornerY", y, "meters"), Pvl::Replace);
+  mapGrp.AddKeyword(PvlKeyword("UpperLeftCornerX", toString(x), "meters"), Pvl::Replace);
+  mapGrp.AddKeyword(PvlKeyword("UpperLeftCornerY", toString(y), "meters"), Pvl::Replace);
 
   if(!mapGrp.HasKeyword("PixelResolution")) {
-    mapGrp.AddKeyword(PvlKeyword("PixelResolution", res, "meters"));
+    mapGrp.AddKeyword(PvlKeyword("PixelResolution", toString(res), "meters"));
   }
   if(!mapGrp.HasKeyword("Scale")) {
-    mapGrp.AddKeyword(PvlKeyword("Scale", scale, "pixels/degree"));
+    mapGrp.AddKeyword(PvlKeyword("Scale", toString(scale), "pixels/degree"));
   }
 
 

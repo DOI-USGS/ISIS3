@@ -56,15 +56,15 @@ namespace Isis {
   /**
    * Mosaic Processing method, returns false if the cube is not inside the mosaic
    */
-  bool ProcessMapMosaic::StartProcess(std::string inputFile) {
+  bool ProcessMapMosaic::StartProcess(QString inputFile) {
     if (InputCubes.size() != 0) {
-      std::string msg = "Input cubes already exist; do not call SetInputCube when using ";
-      msg += "ProcessMosaic::StartProcess(std::string)";
+      QString msg = "Input cubes already exist; do not call SetInputCube when using ";
+      msg += "ProcessMosaic::StartProcess(QString)";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if (OutputCubes.size() == 0) {
-      std::string msg = "An output cube must be set before calling StartProcess";
+      QString msg = "An output cube must be set before calling StartProcess";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -78,7 +78,7 @@ namespace Isis {
     int nlMosaic = mosaicCube->getLineCount();
 
     if (*iproj != *oproj) {
-      string msg = "Mapping groups do not match between cube [" + inputFile + "] and mosaic";
+      QString msg = "Mapping groups do not match between cube [" + inputFile + "] and mosaic";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -159,7 +159,7 @@ namespace Isis {
         while (wrapPossible && outSample < nsMosaic);
       }
       catch (IException &e) {
-        string msg = "Unable to mosaic cube [" + FileName(inputFile).name() + "]";
+        QString msg = "Unable to mosaic cube [" + FileName(inputFile).name() + "]";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
     }
@@ -180,7 +180,7 @@ namespace Isis {
    * and output attributes
    */
   Isis::Cube *ProcessMapMosaic::SetOutputCube(FileList &propagationCubes, CubeAttributeOutput &oAtt,
-      const std::string &mosaicFile) {
+      const QString &mosaicFile) {
     int bands = 0;
     double xmin = DBL_MAX;
     double xmax = -DBL_MAX;
@@ -194,7 +194,7 @@ namespace Isis {
     Projection *proj = NULL;
 
     if (propagationCubes.size() < 1) {
-      string msg = "The list does not contain any data";
+      QString msg = "The list does not contain any data";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -209,7 +209,7 @@ namespace Isis {
       Projection *projNew =
           Isis::ProjectionFactory::CreateFromCube(*(cube.getLabel()));
       if ((proj != NULL) && (*proj != *projNew)) {
-        string msg = "Mapping groups do not match between cubes [" +
+        QString msg = "Mapping groups do not match between cubes [" +
                      propagationCubes[0].toString() + "] and [" + propagationCubes[i].toString() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -253,9 +253,9 @@ namespace Isis {
    */
   Isis::Cube *ProcessMapMosaic::SetOutputCube(FileList &propagationCubes,
       double slat, double elat, double slon, double elon,
-      CubeAttributeOutput &oAtt, const std::string &mosaicFile) {
+      CubeAttributeOutput &oAtt, const QString &mosaicFile) {
     if (propagationCubes.size() < 1) {
-      string msg = "The list does not contain any data";
+      QString msg = "The list does not contain any data";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -263,10 +263,10 @@ namespace Isis {
     Pvl label;
     label.Read(propagationCubes[0].toString());
     PvlGroup mGroup = label.FindGroup("Mapping", Pvl::Traverse);
-    mGroup.AddKeyword(PvlKeyword("MinimumLatitude", slat), Pvl::Replace);
-    mGroup.AddKeyword(PvlKeyword("MaximumLatitude", elat), Pvl::Replace);
-    mGroup.AddKeyword(PvlKeyword("MinimumLongitude", slon), Pvl::Replace);
-    mGroup.AddKeyword(PvlKeyword("MaximumLongitude", elon), Pvl::Replace);
+    mGroup.AddKeyword(PvlKeyword("MinimumLatitude", toString(slat)), Pvl::Replace);
+    mGroup.AddKeyword(PvlKeyword("MaximumLatitude", toString(elat)), Pvl::Replace);
+    mGroup.AddKeyword(PvlKeyword("MinimumLongitude", toString(slon)), Pvl::Replace);
+    mGroup.AddKeyword(PvlKeyword("MaximumLongitude", toString(elon)), Pvl::Replace);
 
     if (mGroup.HasKeyword("UpperLeftCornerX"))
       mGroup.DeleteKeyword("UpperLeftCornerX");
@@ -300,7 +300,7 @@ namespace Isis {
       if (proj == NULL) {
       }
       else if (*proj != *projNew) {
-        string msg = "Mapping groups do not match between cube [" + propagationCubes[i].toString() +
+        QString msg = "Mapping groups do not match between cube [" + propagationCubes[i].toString() +
                      "] and [" + propagationCubes[0].toString() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -321,19 +321,19 @@ namespace Isis {
    * Set the output cube to specified file name and specified input images
    * and output attributes and lat,lons
    */
-  Isis::Cube *ProcessMapMosaic::SetOutputCube(const std::string &inputFile,
+  Isis::Cube *ProcessMapMosaic::SetOutputCube(const QString &inputFile,
       double xmin, double xmax, double ymin, double ymax,
       double slat, double elat, double slon, double elon, int nbands,
-      CubeAttributeOutput &oAtt, const std::string &mosaicFile) {
+      CubeAttributeOutput &oAtt, const QString &mosaicFile) {
     Pvl fileLab(inputFile);
     PvlGroup &mapping = fileLab.FindGroup("Mapping", Pvl::Traverse);
 
-    mapping["UpperLeftCornerX"] = xmin;
-    mapping["UpperLeftCornerY"] = ymax;
-    mapping.AddKeyword(PvlKeyword("MinimumLatitude", slat), Pvl::Replace);
-    mapping.AddKeyword(PvlKeyword("MaximumLatitude", elat), Pvl::Replace);
-    mapping.AddKeyword(PvlKeyword("MinimumLongitude", slon), Pvl::Replace);
-    mapping.AddKeyword(PvlKeyword("MaximumLongitude", elon), Pvl::Replace);
+    mapping["UpperLeftCornerX"] = toString(xmin);
+    mapping["UpperLeftCornerY"] = toString(ymax);
+    mapping.AddKeyword(PvlKeyword("MinimumLatitude", toString(slat)), Pvl::Replace);
+    mapping.AddKeyword(PvlKeyword("MaximumLatitude", toString(elat)), Pvl::Replace);
+    mapping.AddKeyword(PvlKeyword("MinimumLongitude", toString(slon)), Pvl::Replace);
+    mapping.AddKeyword(PvlKeyword("MaximumLongitude", toString(elon)), Pvl::Replace);
 
     Projection *firstProj = ProjectionFactory::CreateFromCube(fileLab);
     int samps = (int)(ceil(firstProj->ToWorldX(xmax) - firstProj->ToWorldX(xmin)) + 0.5);
@@ -388,10 +388,10 @@ namespace Isis {
    * Set the output cube to specified file name and specified input images
    * and output attributes and lat,lons
    */
-  Isis::Cube *ProcessMapMosaic::SetOutputCube(const std::string &inputFile, PvlGroup mapping,
-      CubeAttributeOutput &oAtt, const std::string &mosaicFile) {
+  Isis::Cube *ProcessMapMosaic::SetOutputCube(const QString &inputFile, PvlGroup mapping,
+      CubeAttributeOutput &oAtt, const QString &mosaicFile) {
     if (OutputCubes.size() != 0) {
-      std::string msg = "You can only specify one output cube and projection";
+      QString msg = "You can only specify one output cube and projection";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -448,7 +448,7 @@ namespace Isis {
   /**
    * Mosaic output method for Mosaic Processing Method, this will use an existing mosaic
    */
-  Cube *ProcessMapMosaic::SetOutputCube(const std::string &mosaicFile) {
+  Cube *ProcessMapMosaic::SetOutputCube(const QString &mosaicFile) {
     p_createMosaic = false;
     Cube mosaic;
     mosaic.open(mosaicFile);

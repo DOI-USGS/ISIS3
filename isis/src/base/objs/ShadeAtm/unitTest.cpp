@@ -31,14 +31,14 @@ int main() {
 
   PvlGroup alga("Algorithm");
   alga += PvlKeyword("Name", "Anisotropic1");
-  alga += PvlKeyword("Bha", 0.85);
+  alga += PvlKeyword("Bha", "0.85");
 
   PvlObject oa("AtmosphericModel");
   oa.AddGroup(alga);
 
   PvlGroup algn("Algorithm");
   algn += PvlKeyword("Name", "ShadeAtm");
-  algn += PvlKeyword("Albedo", 0.0690507);
+  algn += PvlKeyword("Albedo", "0.0690507");
 
   PvlObject on("NormalizationModel");
   on.AddGroup(algn);

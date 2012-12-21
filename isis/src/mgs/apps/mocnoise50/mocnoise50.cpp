@@ -53,14 +53,14 @@ void IsisMain() {
 
   // Must be narrow angle
   if(moc.WideAngle()) {
-    string msg = "The 50 sample noise pattern does not occur in ";
+    QString msg = "The 50 sample noise pattern does not occur in ";
     msg += "MOC wide angle images";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Must have crosstrack summing of 1
   if(moc.CrosstrackSumming() != 1) {
-    string msg = "The 50 sample noise pattern does not occur in ";
+    QString msg = "The 50 sample noise pattern does not occur in ";
     msg += "MOC narrow angle images with crosstrack summing greater than one";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -152,11 +152,11 @@ void IsisMain() {
   p.SetOutputCube("TO");
 
   PvlGroup results("Results");
-  results += PvlKeyword("DeltaSample", gbl::delta);
-  results += PvlKeyword("StartingSample", gbl::ssFirst);
-  results += PvlKeyword("Coefficient1", gbl::avg1);
-  results += PvlKeyword("Coefficient2", gbl::avg2);
-  results += PvlKeyword("Coefficient3", gbl::avg3);
+  results += PvlKeyword("DeltaSample", toString(gbl::delta));
+  results += PvlKeyword("StartingSample", toString(gbl::ssFirst));
+  results += PvlKeyword("Coefficient1", toString(gbl::avg1));
+  results += PvlKeyword("Coefficient2", toString(gbl::avg2));
+  results += PvlKeyword("Coefficient3", toString(gbl::avg3));
 
   // If less than 50% of the lines do not agree on a delta then
   // we will assume no noise so just make a copy
@@ -164,7 +164,7 @@ void IsisMain() {
     p.Progress()->SetText("Copying cube");
     p.StartProcess(gbl::Copy);
     results += PvlKeyword("NoiseRemoved", "No");
-    string reason = "Less than 50% of the lines agreed on a delta sample";
+    QString reason = "Less than 50% of the lines agreed on a delta sample";
     results += PvlKeyword("Reason", reason);
   }
 
@@ -174,7 +174,7 @@ void IsisMain() {
     p.Progress()->SetText("Copying cube");
     p.StartProcess(gbl::Copy);
     results += PvlKeyword("NoiseRemoved", "No");
-    string reason = "Less than 50% of the lines agreed on a starting sample";
+    QString reason = "Less than 50% of the lines agreed on a starting sample";
     results += PvlKeyword("Reason", reason);
   }
 

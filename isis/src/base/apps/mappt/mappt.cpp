@@ -2,7 +2,7 @@
 
 #include "Isis.h"
 
-#include <string>
+#include <QString>
 #include <cmath>
 
 #include "Brick.h"
@@ -19,8 +19,8 @@ using namespace Isis;
 
 void PrintMap();
 
-map <string, void *> GuiHelpers() {
-  map <string, void *> helper;
+map <QString, void *> GuiHelpers() {
+  map <QString, void *> helper;
   helper ["PrintMap"] = (void *) PrintMap;
   return helper;
 }
@@ -50,8 +50,8 @@ void IsisMain() {
 
     // Make sure we have a valid latitude value
     if(fabs(lat) > 90.0) {
-      string msg = "Invalid value for LATITUDE ["
-                   + IString(lat) + "] outside range of ";
+      QString msg = "Invalid value for LATITUDE ["
+                   + toString(lat) + "] outside range of ";
       msg += "[-90,90]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -79,7 +79,7 @@ void IsisMain() {
 
       // Does it exist?
       if(!mapFile.fileExists()) {
-        string msg = "Filename [" + ui.GetFileName("MAP") + "] does not exist";
+        QString msg = "Filename [" + ui.GetFileName("MAP") + "] does not exist";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -144,35 +144,35 @@ void IsisMain() {
     PvlGroup results("Results");
     results += PvlKeyword("Filename",
                           FileName(ui.GetFileName("FROM")).expanded());
-    results += PvlKeyword("Sample", proj->WorldX());
-    results += PvlKeyword("Line", proj->WorldY());
+    results += PvlKeyword("Sample", toString(proj->WorldX()));
+    results += PvlKeyword("Line", toString(proj->WorldY()));
     results += PvlKeyword("PixelValue", PixelToString(b[0]));
-    results += PvlKeyword("X", proj->XCoord());
-    results += PvlKeyword("Y", proj->YCoord());
+    results += PvlKeyword("X", toString(proj->XCoord()));
+    results += PvlKeyword("Y", toString(proj->YCoord()));
 
     // Put together all the keywords for different coordinate systems.
     PvlKeyword centLat =
-      PvlKeyword("PlanetocentricLatitude", proj->UniversalLatitude());
+      PvlKeyword("PlanetocentricLatitude", toString(proj->UniversalLatitude()));
 
     PvlKeyword graphLat =
       PvlKeyword("PlanetographicLatitude",
-                 proj->ToPlanetographic(proj->UniversalLatitude()));
+                 toString(proj->ToPlanetographic(proj->UniversalLatitude())));
 
     PvlKeyword pE360 =
-      PvlKeyword("PositiveEast360Longitude", proj->UniversalLongitude());
+      PvlKeyword("PositiveEast360Longitude", toString(proj->UniversalLongitude()));
 
     PvlKeyword pW360 =
       PvlKeyword("PositiveWest360Longitude",
-                 proj->ToPositiveWest(proj->UniversalLongitude(), 360));
+                 toString(proj->ToPositiveWest(proj->UniversalLongitude(), 360)));
 
     PvlKeyword pE180 =
       PvlKeyword("PositiveEast180Longitude",
-                 proj->To180Domain(proj->UniversalLongitude()));
+                 toString(proj->To180Domain(proj->UniversalLongitude())));
 
     PvlKeyword pW180 =
       PvlKeyword("PositiveWest180Longitude",
-                 proj->To180Domain(proj->ToPositiveEast(
-                                     proj->UniversalLongitude(), 360)));
+                 toString(proj->To180Domain(proj->ToPositiveEast(
+                            proj->UniversalLongitude(), 360))));
 
     // Input map coordinate system location
     // Latitude
@@ -245,7 +245,7 @@ void IsisMain() {
     // Write an output label file if necessary
     if(ui.WasEntered("TO")) {
       // Get user params from ui
-      string outFile = FileName(ui.GetFileName("TO")).expanded();
+      QString outFile = FileName(ui.GetFileName("TO")).expanded();
       bool exists = FileName(outFile).fileExists();
       bool append = ui.GetBoolean("APPEND");
 
@@ -267,13 +267,13 @@ void IsisMain() {
         ofstream os;
         bool writeHeader = false;
         if(append) {
-          os.open(outFile.c_str(), ios::app);
+          os.open(outFile.toAscii().data(), ios::app);
           if(!exists) {
             writeHeader = true;
           }
         }
         else {
-          os.open(outFile.c_str(), ios::out);
+          os.open(outFile.toAscii().data(), ios::out);
           writeHeader = true;
         }
 
@@ -289,7 +289,7 @@ void IsisMain() {
         }
 
         for(int i = 0; i < results.Keywords(); i++) {
-          os << (string)results[i];
+          os << (QString)results[i];
 
           if(i < results.Keywords() - 1) {
             os << ",";
@@ -299,12 +299,12 @@ void IsisMain() {
       }
     }
     else if(ui.GetString("FORMAT") == "FLAT") {
-      string msg = "Flat file must have a name.";
+      QString msg = "Flat file must have a name.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   else {
-    string msg = "Could not project requested position";
+    QString msg = "Could not project requested position";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 }

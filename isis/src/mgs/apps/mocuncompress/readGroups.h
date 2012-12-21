@@ -40,7 +40,7 @@ SCCSID @(#)readGroups.h  1.1 10/04/99
 */
 /* SCCShid @(#)readGroups.h (readGroups.h) 1.2 */
 
-#if !defined(readGroups_h)
+#ifndef readGroups_h
 
 #define readGroups_h
 

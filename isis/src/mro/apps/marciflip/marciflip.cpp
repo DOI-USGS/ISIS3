@@ -33,7 +33,7 @@ void IsisMain() {
     PvlGroup inst = icube->getGroup("Instrument");
 
     // change flipped keyword
-    inst["DataFlipped"] = ((int)inst["DataFlipped"] + 1) % 2;
+    inst["DataFlipped"] = toString(((int)inst["DataFlipped"] + 1) % 2);
 
     outputCube->getLabel()->FindObject("IsisCube").AddGroup(inst);
   }

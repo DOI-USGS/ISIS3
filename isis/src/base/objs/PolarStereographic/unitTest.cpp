@@ -5,60 +5,62 @@
 #include "ProjectionFactory.h"
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
+
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   cout << "Unit Test For PolarStereographic" << endl << endl;
   cout << std::setprecision(14);
 
-  Isis::Pvl lab;
-  lab.AddGroup(Isis::PvlGroup("Mapping"));
-  Isis::PvlGroup &mg = lab.FindGroup("Mapping");
-  mg += Isis::PvlKeyword("EquatorialRadius", 6378388.0);
-  mg += Isis::PvlKeyword("PolarRadius", 6356911.9);
-  mg += Isis::PvlKeyword("LatitudeType", "Planetographic");
-  mg += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-  mg += Isis::PvlKeyword("LongitudeDomain", 180);
-  mg += Isis::PvlKeyword("MinimumLatitude", -90.0);
-  mg += Isis::PvlKeyword("MaximumLatitude", 0.0);
-  mg += Isis::PvlKeyword("MinimumLongitude", -180.0);
-  mg += Isis::PvlKeyword("MaximumLongitude", 180.0);
-  mg += Isis::PvlKeyword("ProjectionName", "PolarStereographic");
+  Pvl lab;
+  lab.AddGroup(PvlGroup("Mapping"));
+  PvlGroup &mg = lab.FindGroup("Mapping");
+  mg += PvlKeyword("EquatorialRadius", toString(6378388.0));
+  mg += PvlKeyword("PolarRadius", toString(6356911.9));
+  mg += PvlKeyword("LatitudeType", "Planetographic");
+  mg += PvlKeyword("LongitudeDirection", "PositiveEast");
+  mg += PvlKeyword("LongitudeDomain", toString(180));
+  mg += PvlKeyword("MinimumLatitude", toString(-90.0));
+  mg += PvlKeyword("MaximumLatitude", toString(0.0));
+  mg += PvlKeyword("MinimumLongitude", toString(-180.0));
+  mg += PvlKeyword("MaximumLongitude", toString(180.0));
+  mg += PvlKeyword("ProjectionName", "PolarStereographic");
 
 
   cout << "Test missing center longitude keyword ..." << endl;
   try {
-    Isis::PolarStereographic p(lab);
+    PolarStereographic p(lab);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
-  mg += Isis::PvlKeyword("CenterLongitude", -100.0);
+  mg += PvlKeyword("CenterLongitude", toString(-100.0));
 
   cout << "Test missing center latitude keyword ..." << endl;
   try {
-    Isis::PolarStereographic p(lab);
+    PolarStereographic p(lab);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
   cout << "Test invalid center latitude keyword ..." << endl;
-  mg += Isis::PvlKeyword("CenterLatitude", 0.0);
+  mg += PvlKeyword("CenterLatitude", toString(0.0));
   try {
-    Isis::PolarStereographic p(lab);
+    PolarStereographic p(lab);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
-  mg.AddKeyword(Isis::PvlKeyword("CenterLatitude", -71.0), Isis::PvlGroup::Replace);
+  mg.AddKeyword(PvlKeyword("CenterLatitude", toString(-71.0)), PvlGroup::Replace);
 
   try {
-    Isis::Projection &p = *Isis::ProjectionFactory::Create(lab);
-    //  Isis::PolarStereographic p(lab);
+    Projection &p = *ProjectionFactory::Create(lab);
+    //  PolarStereographic p(lab);
 
     cout << "Test SetGround method ... " << endl;
     cout << "Setting ground to (-75,150)" << endl;
@@ -109,7 +111,7 @@ int main(int argc, char *argv[]) {
     cout << "TrueScaleLatitude = " << p.TrueScaleLatitude() << endl;
     cout << endl;
 
-    Isis::Projection *s = &p;
+    Projection *s = &p;
     cout << "Test Name and comparision method ... " << endl;
     cout << "Name:       " << s->Name() << endl;
     cout << "operator==  " << (*s == *s) << endl;
@@ -118,15 +120,15 @@ int main(int argc, char *argv[]) {
     cout << "Test default computation ... " << endl;
     mg.DeleteKeyword("CenterLongitude");
     mg.DeleteKeyword("CenterLatitude");
-    Isis::PolarStereographic p2(lab, true);
+    PolarStereographic p2(lab, true);
     cout << lab << endl;
     cout << endl;
 
     cout << "Testing Mapping() methods ... " << endl;
 
-    Isis::Pvl tmp1;
-    Isis::Pvl tmp2;
-    Isis::Pvl tmp3;
+    Pvl tmp1;
+    Pvl tmp2;
+    Pvl tmp3;
     tmp1.AddGroup(p.Mapping());
     tmp2.AddGroup(p.MappingLatitudes());
     tmp3.AddGroup(p.MappingLongitudes());
@@ -144,7 +146,7 @@ int main(int argc, char *argv[]) {
     cout << "  USGS Professional Paper 1395 by John P. Snyder" << endl;
     cout << "  Pages 315-319" << endl;
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 }

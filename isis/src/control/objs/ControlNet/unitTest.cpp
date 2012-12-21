@@ -293,7 +293,7 @@ int main() {
     std::stringstream oss1;
     oss1.flush();
     oss1 << pointId << i;
-    ControlPoint *cp = new ControlPoint(oss1.str());
+    ControlPoint *cp = new ControlPoint(oss1.str().c_str());
 
     if (i == 0) {
       cp->SetType(ControlPoint::Fixed);
@@ -324,7 +324,7 @@ int main() {
       std::stringstream oss2;
       oss2.flush();
       oss2 << id << k;
-      cm->SetCubeSerialNumber(oss2.str());
+      cm->SetCubeSerialNumber(oss2.str().c_str());
       cm->SetType(ControlMeasure::RegisteredSubPixel);
       cm->SetLogData(
         ControlMeasureLogData(ControlMeasureLogData::GoodnessOfFit,
@@ -375,7 +375,7 @@ int main() {
   cout << endl;
 
   //  Delete point with invalid point type, first save id for next test
-  string id2 = cn1[2]->GetId();
+  QString id2 = cn1[2]->GetId();
   cn1.DeletePoint(2);
 
   cout << "Test deleting nonexistant control point id ..." << endl;

@@ -25,8 +25,6 @@ using namespace std;
 
 #include "Message.h"
 
-string Isis::Message::FileWrite(const string &filename) {
-  string message;
-  message = "Unable to write [" + filename + "]";
-  return message;
+QString Isis::Message::FileWrite(const QString &filename) {
+  return "Unable to write [" + filename + "]";
 }

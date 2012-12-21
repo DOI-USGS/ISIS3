@@ -37,16 +37,16 @@
 
 namespace Isis {
   //! Convenience access to dialog
-  int GuiInputAttribute::GetAttributes(const std::string &defaultAttribute,
-                                       std::string &newAttribute,
-                                       const std::string &title,
+  int GuiInputAttribute::GetAttributes(const QString &defaultAttribute,
+                                       QString &newAttribute,
+                                       const QString &title,
                                        QWidget *parent) {
     // Construct dialog if necessary
     static GuiInputAttribute *p_dialog = 0;
     if(p_dialog == 0) {
       p_dialog = new GuiInputAttribute(parent);
     }
-    p_dialog->setWindowTitle(title.c_str());
+    p_dialog->setWindowTitle(title);
 
     // Load default attributes and then get the new ones
     p_dialog->SetAttributes(defaultAttribute);
@@ -115,30 +115,26 @@ namespace Isis {
 
 
   // Return the attributes in the dialog
-  std::string GuiInputAttribute::GetAttributes() {
+  QString GuiInputAttribute::GetAttributes() {
     if(p_lineEdit->isEnabled()) {
-      Isis::IString s = p_lineEdit->text().toStdString();
-      s.Remove(" ");
-      s.Trim("+");
-      if(s == "") return s;
-      return (std::string)"+" + s;
+      return FileName(p_lineEdit->text()).attributes();
     }
     else {
-      return std::string("");
+      return QString("");
     }
   }
 
   // Set the attributes in the dialog
-  void GuiInputAttribute::SetAttributes(const std::string &value) {
+  void GuiInputAttribute::SetAttributes(const QString &value) {
     Isis::CubeAttributeInput att(value);
-    std::vector<std::string> bands = att.bands();
+    std::vector<QString> bands = att.bands();
     if(bands.size() == 0) {
       p_buttonGroup->buttons()[0]->setChecked(true);
       p_lineEdit->setText("");
     }
     else {
       p_buttonGroup->buttons()[1]->setChecked(true);
-      p_lineEdit->setText((IString)att.toString());
+      p_lineEdit->setText(att.toString());
     }
   }
 }

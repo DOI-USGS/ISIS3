@@ -35,26 +35,24 @@ void IsisMain() {
   try {
     Pvl lab(in.expanded());
     projected = lab.HasObject("IMAGE_MAP_PROJECTION");
-    IString id;
-    id = (string)lab["DATA_SET_ID"];
-    id.ConvertWhiteSpace();
-    id.Compress();
-    id.Trim(" ");
-    if(id.find("ODY-M-THM") == string::npos) {
-      string msg = "Invalid DATA_SET_ID [" + id + "]";
+    QString id;
+    id = (QString)lab["DATA_SET_ID"];
+    id = id.simplified().trimmed();
+    if(!id.startsWith("ODY-M-THM")) {
+      QString msg = "Invalid DATA_SET_ID [" + id + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
   catch(IException &e) {
-    string msg = "Input file [" + in.expanded() +
-                 "] does not appear to be " +
-                 "in Themis EDR/RDR format";
+    QString msg = "Input file [" + in.expanded() +
+                  "] does not appear to be " +
+                  "in Themis EDR/RDR format";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   //Checks if in file is rdr
   if(projected) {
-    string msg = "[" + in.name() + "] appears to be an rdr file.";
+    QString msg = "[" + in.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -72,7 +70,7 @@ void IsisMain() {
   FileName outFile(ui.GetFileName("TO"));
   PvlGroup &inst = isis3Lab.FindGroup("Instrument", Pvl::Traverse);
 
-  if((string)inst["InstrumentId"] == "THEMIS_VIS") {
+  if((QString)inst["InstrumentId"] == "THEMIS_VIS") {
     Cube *even = new Cube();
     Cube *odd = new Cube();
 
@@ -81,8 +79,8 @@ void IsisMain() {
     odd->setDimensions(p.Samples(), p.Lines(), p.Bands());
     odd->setPixelType(Isis::Real);
 
-    string evenFile = outFile.path() + "/" + outFile.baseName() + ".even.cub";
-    string oddFile = outFile.path() + "/" + outFile.baseName() + ".odd.cub";
+    QString evenFile = outFile.path() + "/" + outFile.baseName() + ".even.cub";
+    QString oddFile = outFile.path() + "/" + outFile.baseName() + ".odd.cub";
 
     even->create(evenFile);
     odd->create(oddFile);
@@ -112,10 +110,10 @@ void IsisMain() {
       if(outputCubes.size() != 1) {
         int numFramelets = p.Lines() / frameletLines;
         isis3Lab.FindGroup("Instrument").AddKeyword(
-          PvlKeyword("NumFramelets", numFramelets), Pvl::Replace
+          PvlKeyword("NumFramelets", toString(numFramelets)), Pvl::Replace
         );
 
-        string frameletType = ((i == 0) ? "Odd" : "Even");
+        QString frameletType = ((i == 0) ? "Odd" : "Even");
         isis3Lab.FindGroup("Instrument").AddKeyword(
           PvlKeyword("Framelets", frameletType), Pvl::Replace
         );
@@ -164,37 +162,37 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3, int numBands) {
   // Create the Instrument Group
   PvlGroup inst("Instrument");
   inst += PvlKeyword("SpacecraftName", "MARS_ODYSSEY");
-  string instId = (string) pdsLab["InstrumentId"] + "_" +
-                  (string) pdsLab["DetectorId"];
+  QString instId = (QString) pdsLab["InstrumentId"] + "_" +
+                  (QString) pdsLab["DetectorId"];
   inst += PvlKeyword("InstrumentId", instId);
-  inst += PvlKeyword("TargetName", (string) pdsLab["TargetName"]);
-  inst += PvlKeyword("MissionPhaseName", (string) pdsLab["MissionPhaseName"]);
-  inst += PvlKeyword("StartTime", (string)pdsLab["StartTime"]);
-  inst += PvlKeyword("StopTime", (string)pdsLab["StopTime"]);
+  inst += PvlKeyword("TargetName", (QString) pdsLab["TargetName"]);
+  inst += PvlKeyword("MissionPhaseName", (QString) pdsLab["MissionPhaseName"]);
+  inst += PvlKeyword("StartTime", (QString)pdsLab["StartTime"]);
+  inst += PvlKeyword("StopTime", (QString)pdsLab["StopTime"]);
   inst += PvlKeyword("SpacecraftClockCount",
-                     (string) pdsLab["SpacecraftClockStartCount"]);
+                     (QString) pdsLab["SpacecraftClockStartCount"]);
 
   PvlObject &sqube = pdsLab.FindObject("SPECTRAL_QUBE");
   if(instId == "THEMIS_IR") {
-    inst += PvlKeyword("GainNumber", (string)sqube["GainNumber"]);
-    inst += PvlKeyword("OffsetNumber", (string)sqube["OffsetNumber"]);
-    inst += PvlKeyword("MissingScanLines", (string)sqube["MissingScanLines"]);
+    inst += PvlKeyword("GainNumber", (QString)sqube["GainNumber"]);
+    inst += PvlKeyword("OffsetNumber", (QString)sqube["OffsetNumber"]);
+    inst += PvlKeyword("MissingScanLines", (QString)sqube["MissingScanLines"]);
     inst += PvlKeyword("TimeDelayIntegration",
-                       (string)sqube["TimeDelayIntegrationFlag"]);
+                       (QString)sqube["TimeDelayIntegrationFlag"]);
     if(sqube.HasKeyword("SpatialSumming")) {
-      inst += PvlKeyword("SpatialSumming", (string)sqube["SpatialSumming"]);
+      inst += PvlKeyword("SpatialSumming", (QString)sqube["SpatialSumming"]);
     }
   }
   else {
-    inst += PvlKeyword("ExposureDuration", (string)sqube["ExposureDuration"]);
-    inst += PvlKeyword("InterframeDelay", (string)sqube["InterframeDelay"]);
-    inst += PvlKeyword("SpatialSumming", (string)sqube["SpatialSumming"]);
+    inst += PvlKeyword("ExposureDuration", (QString)sqube["ExposureDuration"]);
+    inst += PvlKeyword("InterframeDelay", (QString)sqube["InterframeDelay"]);
+    inst += PvlKeyword("SpatialSumming", (QString)sqube["SpatialSumming"]);
   }
 
   // Add at time offset to the Instrument group
   UserInterface &ui = Application::GetUserInterface();
   double spacecraftClockOffset = ui.GetDouble("TIMEOFFSET");
-  inst += PvlKeyword("SpacecraftClockOffset", spacecraftClockOffset, "seconds");
+  inst += PvlKeyword("SpacecraftClockOffset", toString(spacecraftClockOffset), "seconds");
 
   isis3.AddGroup(inst);
 
@@ -202,7 +200,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3, int numBands) {
   PvlGroup bandBin("BandBin");
   PvlKeyword originalBand("OriginalBand");
   for(int i = 1; i <= numBands; i++) {
-    originalBand.AddValue(i);
+    originalBand.AddValue(toString(i));
   }
   bandBin += originalBand;
   bandBin += sqube.FindGroup("BandBin")["BandBinCenter"];
@@ -215,29 +213,29 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3, int numBands) {
 
   // Create the archive Group
   PvlGroup arch("Archive");
-  arch += PvlKeyword("DataSetId", (string)pdsLab["DataSetId"]);
-  arch += PvlKeyword("ProducerId", (string)pdsLab["ProducerId"]);
-  arch += PvlKeyword("ProductId", (string)pdsLab["ProductId"]);
+  arch += PvlKeyword("DataSetId", (QString)pdsLab["DataSetId"]);
+  arch += PvlKeyword("ProducerId", (QString)pdsLab["ProducerId"]);
+  arch += PvlKeyword("ProductId", (QString)pdsLab["ProductId"]);
   arch += PvlKeyword("ProductCreationTime",
-                     (string)pdsLab["ProductCreationTime"]);
-  arch += PvlKeyword("ProductVersionId", (string)pdsLab["ProductVersionId"]);
+                     (QString)pdsLab["ProductCreationTime"]);
+  arch += PvlKeyword("ProductVersionId", (QString)pdsLab["ProductVersionId"]);
 //  arch += PvlKeyword("ReleaseId",(string)pdsLab["ReleaseId"]);
-  arch += PvlKeyword("OrbitNumber", (string)pdsLab["OrbitNumber"]);
+  arch += PvlKeyword("OrbitNumber", (QString)pdsLab["OrbitNumber"]);
 
   arch += PvlKeyword("FlightSoftwareVersionId",
-                     (string)sqube["FlightSoftwareVersionId"]);
+                     (QString)sqube["FlightSoftwareVersionId"]);
   arch += PvlKeyword("CommandSequenceNumber",
-                     (string)sqube["CommandSequenceNumber"]);
-  arch += PvlKeyword("Description", (string)sqube["Description"]);
+                     (QString)sqube["CommandSequenceNumber"]);
+  arch += PvlKeyword("Description", (QString)sqube["Description"]);
   isis3.AddGroup(arch);
 
   // Create the Kernel Group
   PvlGroup kerns("Kernels");
   if(instId == "THEMIS_IR") {
-    kerns += PvlKeyword("NaifFrameCode", -53031);
+    kerns += PvlKeyword("NaifFrameCode", toString(-53031));
   }
   else {
-    kerns += PvlKeyword("NaifFrameCode", -53032);
+    kerns += PvlKeyword("NaifFrameCode", toString(-53032));
   }
   isis3.AddGroup(kerns);
 }

@@ -167,7 +167,7 @@ thmvistrim FROM="./out.flat.even.cub" TO="./out.cal.even.cub"
 thmvistrim FROM="./out.flat.odd.cub" TO="./out.cal.odd.cub"
 cam2map FROM="./out.cal.even.cub" TO="./out.lev2.even.cub"
 cam2map FROM="./out.cal.odd.cub" TO="./out.lev2.odd.cub" MAP="./out.lev2.even.cub" PIXRES="MAP" DEFAULTRANGE="MAP"
-echo  ./out.lev2.even.cub ./out.lev2.odd.cub > ./out.lis
+echo -e "\n./out.lev2.even.cub\n./out.lev2.odd.cub" > ./out.lis
 automos FROMLIST="./out.lis" TO="/work1/out.cub"
 rm ./out.lev1.even.cub
 rm ./out.lev1.odd.cub
@@ -190,7 +190,7 @@ thmvistrim FROM="./out.flat.even.cub" TO="./out.cal.even.cub"
 thmvistrim FROM="./out.flat.odd.cub" TO="./out.cal.odd.cub"
 cam2map FROM="./out.cal.even.cub" TO="./out.lev2.even.cub"
 cam2map FROM="./out.cal.odd.cub" TO="./out.lev2.odd.cub" MAP="./out.lev2.even.cub" PIXRES="MAP" DEFAULTRANGE="MAP"
-echo  ./out.lev2.even.cub ./out.lev2.odd.cub > ./out.lis
+echo -e "\n./out.lev2.even.cub\n./out.lev2.odd.cub" > ./out.lis
 automos FROMLIST="./out.lis" TO="/work1/out.cub"
 rm ./out.lev1.even.cub
 rm ./out.lev1.odd.cub
@@ -213,7 +213,7 @@ thmvistrim FROM="./out.flat.even.cub" TO="./out.cal.even.cub"
 thmvistrim FROM="./out.flat.odd.cub" TO="./out.cal.odd.cub"
 cam2map FROM="./out.cal.even.cub" TO="./out.lev2.even.cub"
 cam2map FROM="./out.cal.odd.cub" TO="./out.lev2.odd.cub" MAP="./out.lev2.even.cub" PIXRES="MAP" DEFAULTRANGE="MAP"
-echo  ./out.lev2.even.cub ./out.lev2.odd.cub > ./out.lis
+echo -e "\n./out.lev2.even.cub\n./out.lev2.odd.cub" > ./out.lis
 automos FROMLIST="./out.lis" TO="/work1/out.cub"
 rm ./out.lev1.even.cub
 rm ./out.lev1.odd.cub
@@ -315,7 +315,7 @@ thmvistrim FROM="./out.flat.even.cub" TO="./out.cal.even.cub"
 thmvistrim FROM="./out.flat.odd.cub" TO="./out.cal.odd.cub"
 cam2map FROM="./out.cal.even.cub" TO="./out.lev2.even.cub"
 cam2map FROM="./out.cal.odd.cub" TO="./out.lev2.odd.cub" MAP="./out.lev2.even.cub" PIXRES="MAP" DEFAULTRANGE="MAP"
-echo  ./out.lev2.even.cub ./out.lev2.odd.cub > ./out.lis
+echo -e "\n./out.lev2.even.cub\n./out.lev2.odd.cub" > ./out.lis
 automos FROMLIST="./out.lis" TO="/work1/out.cub"
 rm ./out.lev1.even.cub
 rm ./out.lev1.odd.cub
@@ -338,7 +338,7 @@ thmvistrim FROM="./out.flat.even.cub" TO="./out.cal.even.cub"
 thmvistrim FROM="./out.flat.odd.cub" TO="./out.cal.odd.cub"
 cam2map FROM="./out.cal.even.cub" TO="./out.lev2.even.cub"
 cam2map FROM="./out.cal.odd.cub" TO="./out.lev2.odd.cub" MAP="./out.lev2.even.cub" PIXRES="MAP" DEFAULTRANGE="MAP"
-echo  ./out.lev2.even.cub ./out.lev2.odd.cub > ./out.lis
+echo -e "\n./out.lev2.even.cub\n./out.lev2.odd.cub" > ./out.lis
 automos FROMLIST="./out.lis" TO="/work1/out.cub"
 rm ./out.lev1.even.cub
 rm ./out.lev1.odd.cub
@@ -374,7 +374,7 @@ PIPELINE -------> unitTest3 <------- PIPELINE
 PIPELINE -------> unitTest3 <------- PIPELINE
 fft FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub+2,4-5" MAGNITUDE="./out.fft.FROM.mag.cub" MAGNITUDE="./out.fft.FROM2.mag.cub" PHASE="./out.fft.FROM2.phase.cub" PHASE="./out.fft.FROM.phase.cub"
 fft FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.odd.cub+2,4-5" MAGNITUDE="./out.fft.FROM2.mag.cub" PHASE="./out.fft.FROM2.phase.cub"
-echo  ./out.fft.FROM.mag.cub ./out.fft.FROM2.mag.cub ./out.fft.FROM2.phase.cub ./out.fft.FROM.phase.cub > ./out.FROM.mag.lis
+echo -e "\n./out.fft.FROM.mag.cub\n./out.fft.FROM2.mag.cub\n./out.fft.FROM2.phase.cub\n./out.fft.FROM.phase.cub" > ./out.FROM.mag.lis
 fx FILELIST="./out.FROM.mag.lis" TO="/work1/out.FROM.mag.cub" equation="1+2" MODE="list"
 fx FILELIST="./out.FROM.mag.lis" TO="/work1/out.FROM2.phase.cub" MODE="list" equation="1+3"
 rm ./out.fft.FROM.mag.cub
@@ -387,7 +387,7 @@ PIPELINE -------> unitTest3 <------- PIPELINE
 PIPELINE -------> unitTest3 <------- PIPELINE
 fft FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub+2,4-5" MAGNITUDE="./out.fft.FROM.mag.cub" MAGNITUDE="./out.fft.FROM2.mag.cub" PHASE="./out.fft.FROM2.phase.cub" PHASE="./out.fft.FROM.phase.cub"
 fft FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.odd.cub+2,4-5" MAGNITUDE="./out.fft.FROM2.mag.cub" PHASE="./out.fft.FROM2.phase.cub"
-echo  ./out.fft.FROM.mag.cub ./out.fft.FROM2.mag.cub ./out.fft.FROM2.phase.cub ./out.fft.FROM.phase.cub > ./out.fx2.FROM.mag.lis
+echo -e "\n./out.fft.FROM.mag.cub\n./out.fft.FROM2.mag.cub\n./out.fft.FROM2.phase.cub\n./out.fft.FROM.phase.cub" > ./out.fx2.FROM.mag.lis
 fx FILELIST="./out.fx2.FROM.mag.lis" TO="./out.fx2.FROM.mag.cub" equation="1+2" MODE="list"
 fx FILELIST="./out.fx2.FROM.mag.lis" TO="./out.fx2.FROM2.phase.cub" MODE="list" equation="1+3"
 ifft MAGNITUDE="./out.fx2.FROM.mag.cub" TO="/work1/out.cub" PHASE="./out.fx2.FROM2.phase.cub"
@@ -403,7 +403,7 @@ PIPELINE -------> unitTest3 <------- PIPELINE
 PIPELINE -------> unitTest3 <------- PIPELINE
 fft FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.even.cub+2,4-5" MAGNITUDE="./out.fft.FROM.mag.cub" MAGNITUDE="./out.fft.FROM2.mag.cub" PHASE="./out.fft.FROM2.phase.cub" PHASE="./out.fft.FROM.phase.cub"
 fft FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.odd.cub+2,4-5" MAGNITUDE="./out.fft.FROM2.mag.cub" PHASE="./out.fft.FROM2.phase.cub"
-echo  ./out.fft.FROM.mag.cub ./out.fft.FROM2.mag.cub ./out.fft.FROM2.phase.cub ./out.fft.FROM.phase.cub > ./out.fx2.FROM.mag.lis
+echo -e "\n./out.fft.FROM.mag.cub\n./out.fft.FROM2.mag.cub\n./out.fft.FROM2.phase.cub\n./out.fft.FROM.phase.cub" > ./out.fx2.FROM.mag.lis
 fx FILELIST="./out.fx2.FROM.mag.lis" TO="./out.fx2.FROM.mag.cub" equation="1+2" MODE="list"
 fx FILELIST="./out.fx2.FROM.mag.lis" TO="./out.fx2.FROM2.phase.cub" MODE="list" equation="1+3"
 ifft MAGNITUDE="./out.fx2.FROM.mag.cub" TO="./out.untranslated.cub" PHASE="./out.fx2.FROM2.phase.cub"
@@ -426,7 +426,7 @@ cubeatt FROM="fileC" TO="./fileC.jitter.copy.FROM3.cub"
 spiceinit FROM="./fileA.jitter.copy.FROM1.cub" ATTACH="NO"
 spiceinit FROM="./fileB.jitter.copy.FROM2.cub" ATTACH="NO"
 spiceinit FROM="./fileC.jitter.copy.FROM3.cub" ATTACH="NO"
-echo  ./fileA.jitter.copy.FROM1.cub ./fileB.jitter.copy.FROM2.cub ./fileC.jitter.copy.FROM3.cub > ./appjit.lis
+echo -e "\n./fileA.jitter.copy.FROM1.cub\n./fileB.jitter.copy.FROM2.cub\n./fileC.jitter.copy.FROM3.cub" > ./appjit.lis
 appjit FROMLIST="./appjit.lis" MASTER="MASTER.cub" DEGREE="1"
 noproj FROM="./fileA.jitter.copy.FROM1.cub" TO="./fileA.jitter.cub" MATCH="MATCH.cub"
 noproj FROM="./fileB.jitter.copy.FROM2.cub" TO="./fileB.jitter.cub" MATCH="MATCH.cub"
@@ -441,7 +441,7 @@ PIPELINE -------> unitTest4 <------- PIPELINE
 PIPELINE -------> unitTest5 <------- PIPELINE
 lowpass FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.cub" TO="./out.lowpass.lpf.cub" SAMPLES="3" LINES="3"
 highpass FROM="$ISIS3DATA/odyssey/testData/I00831002RDR.cub" TO="./out.highpass.hpf.cub" SAMPLES="3" LINES="3"
-echo  ./out.highpass.hpf.cub ./out.lowpass.lpf.cub > ./out.add.lis
+echo -e "\n./out.highpass.hpf.cub\n./out.lowpass.lpf.cub" > ./out.add.lis
 fx FROMLIST="./out.add.lis" TO="./out.add.cub" MODE="LIST" EQUATION="f1+f2"
 cubeatt FROM="./out.add.cub+2,4-5" TO="./out.cub"
 rm ./out.lowpass.lpf.cub

@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 #include <cstdio>
-#include <string>
+#include <QString>
 
 #include "ProcessImportPds.h"
 
@@ -36,24 +36,24 @@ void IsisMain() {
 
   //Checks if in file is rdr
   if(lab.HasObject("IMAGE_MAP_PROJECTION")) {
-    string msg = "[" + inFile.name() + "] appears to be an rdr file.";
+    QString msg = "[" + inFile.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
   // data set id value must contain "SSI-2-REDR-V1.0"(valid SSI image)
   // or "SSI-4-REDR-V1.0"(reconstructed from garbled SSI image)
-  string dataSetId;
-  dataSetId = (string)lab["DATA_SET_ID"];
+  QString dataSetId;
+  dataSetId = (QString)lab["DATA_SET_ID"];
   try {
-    if(dataSetId.find("SSI-2-REDR-V1.0") == string::npos
-        && dataSetId.find("SSI-4-REDR-V1.0") == string::npos) {
-      string msg = "Invalid DATA_SET_ID [" + dataSetId + "]";
+    if(!dataSetId.contains("SSI-2-REDR-V1.0")
+        && !dataSetId.contains("SSI-4-REDR-V1.0")) {
+      QString msg = "Invalid DATA_SET_ID [" + dataSetId + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
   catch(IException &e) {
-    string msg = "Unable to read [DATA_SET_ID] from input file [" +
+    QString msg = "Unable to read [DATA_SET_ID] from input file [" +
                  inFile.expanded() + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
@@ -64,7 +64,7 @@ void IsisMain() {
     // reconstructed images are 800x800 (i.e. not summed)
     // even though they have frame duration of 2.333
     // (which ordinarily indicates a summed image)
-    if(dataSetId.find("SSI-4-REDR-V1.0") != string::npos) {
+    if(dataSetId.contains("SSI-4-REDR-V1.0")) {
       summed = false;
     }
     else if(frameDuration > 2.0 && frameDuration < 3.0) {
@@ -123,7 +123,7 @@ void TranslateLabels(Pvl &pdsLabel, Cube *ocube) {
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
 
   // Transfer the instrument group to the output cube
-  IString transDir = (string) dataDir["Galileo"];
+  QString transDir = (QString) dataDir["Galileo"];
   FileName transFile(transDir + "/translations/galileoSsi.trn");
 
   // Get the translation manager ready
@@ -136,23 +136,23 @@ void TranslateLabels(Pvl &pdsLabel, Cube *ocube) {
   PvlGroup &arch = outputLabel->FindGroup("Archive", Pvl::Traverse);
   PvlGroup &inst = outputLabel->FindGroup("Instrument", Pvl::Traverse);
   arch.AddKeyword(PvlKeyword("DataType", "RADIANCE"));
-  string CTC = (string) arch.FindKeyword("ObservationId");
-  string CTCout = CTC.substr(0, 2);
+  QString CTC = (QString) arch.FindKeyword("ObservationId");
+  QString CTCout = CTC.mid(0, 2);
   arch.AddKeyword(PvlKeyword("CalTargetCode", CTCout));
 
   // Add to the Instrument Group
-  IString itest = (string) inst.FindKeyword("StartTime");
-  itest.Remove("Z");
+  QString itest = (QString) inst.FindKeyword("StartTime");
+  itest.remove("Z");
   inst.FindKeyword("StartTime").SetValue(itest);
   //change exposure duration to seconds
   double expDur = inst.FindKeyword("exposureDuration");
   double expDurOut = expDur / 1000.0;
-  inst.FindKeyword("exposureDuration").SetValue(expDurOut, "seconds");
+  inst.FindKeyword("exposureDuration").SetValue(toString(expDurOut), "seconds");
   inst.AddKeyword(PvlKeyword("FrameDuration",
-                             (string) pdsLabel["frameDuration"], "seconds"));
+                             (QString) pdsLabel["frameDuration"], "seconds"));
 
   //Calculate the Frame_Rate_Id keyword
-  string frameModeId = "FULL";
+  QString frameModeId = "FULL";
   int summingMode = 1;
 
   if(summed) {
@@ -160,14 +160,14 @@ void TranslateLabels(Pvl &pdsLabel, Cube *ocube) {
     summingMode = 2;
   }
 
-  inst.AddKeyword(PvlKeyword("Summing", summingMode));
+  inst.AddKeyword(PvlKeyword("Summing", toString(summingMode)));
   inst.AddKeyword(PvlKeyword("FrameModeId", frameModeId));
 
   // Create the Band bin Group
   PvlGroup &bandBin = outputLabel->FindGroup("BandBin", Pvl::Traverse);
-  string filterName = pdsLabel["FILTER_NAME"];
-  string waveLength = "";
-  string width = "";
+  QString filterName = pdsLabel["FILTER_NAME"];
+  QString waveLength = "";
+  QString width = "";
   if(filterName == "CLEAR") {
     waveLength = "0.611";
     width = ".44";
@@ -205,6 +205,6 @@ void TranslateLabels(Pvl &pdsLabel, Cube *ocube) {
 
   //create the kernel group
   PvlGroup kern("Kernels");
-  kern += PvlKeyword("NaifFrameCode", -77001);
+  kern += PvlKeyword("NaifFrameCode", "-77001");
   ocube->putGroup(kern);
 }

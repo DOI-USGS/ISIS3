@@ -59,13 +59,13 @@ namespace Isis {
     */
     if(imageDate < removeCoverDate) {
       int code = naifIkCode();
-      string key = "INS" + IString(code) + "_FOCAL_LENGTH_COVER";
+      QString key = "INS" + toString(code) + "_FOCAL_LENGTH_COVER";
       SetFocalLength(Spice::getDouble(key));
-      k1 = Spice::getDouble("INS" + (IString)(int)naifIkCode() + "_K1_COVER");
+      k1 = Spice::getDouble("INS" + toString(naifIkCode()) + "_K1_COVER");
     }
     else {
       SetFocalLength();
-      k1 = Spice::getDouble("INS" + (IString)(int)naifIkCode() + "_K1");
+      k1 = Spice::getDouble("INS" + toString(naifIkCode()) + "_K1");
     }
 
     SetPixelPitch();
@@ -73,7 +73,7 @@ namespace Isis {
     // Get the start time in et
     PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
 
-    double et = iTime((string)inst["StartTime"]).Et();
+    double et = iTime((QString)inst["StartTime"]).Et();
 
     //?????????? NEED THESE??????
     // exposure duration keyword value is measured in seconds
@@ -92,9 +92,9 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     focalMap->SetDetectorOrigin(
-      Spice::getDouble("INS" + (IString)(int)naifIkCode() + 
+      Spice::getDouble("INS" + toString(naifIkCode()) + 
                        "_BORESIGHT_SAMPLE"),
-      Spice::getDouble("INS" + (IString)(int)naifIkCode() + 
+      Spice::getDouble("INS" + toString(naifIkCode()) + 
                        "_BORESIGHT_LINE"));
 
     // Setup distortion map

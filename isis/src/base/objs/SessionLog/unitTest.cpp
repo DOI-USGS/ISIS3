@@ -7,26 +7,27 @@
 #include "IException.h"
 #include "Pvl.h"
 
+using namespace Isis;
 using namespace std;
 
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
-  Isis::PvlGroup &g = Isis::Preference::Preferences().FindGroup("SessionLog");
+  Preference::Preferences(true);
+  PvlGroup &g = Preference::Preferences().FindGroup("SessionLog");
   g["TerminalOutput"] = "On";
   try {
-    Isis::PvlGroup results("Results");;
+    PvlGroup results("Results");;
     results.AddComment("// This is an example of the results group");
-    results += Isis::PvlKeyword("Average", 13.5, "Meters");
+    results += PvlKeyword("Average", toString(13.5), "Meters");
     results[0].AddComment("// Average size of a rock");
 
-    Isis::Pvl error;
-    Isis::PvlGroup temp("Error");
-    temp += Isis::PvlKeyword("Program", "ratio");
-    temp += Isis::PvlKeyword("Class", "I/O ERROR");
-    temp += Isis::PvlKeyword("Status", -1);
-    temp += Isis::PvlKeyword("Message", "Unable to open file");
-    temp += Isis::PvlKeyword("File", "unitTest.cpp");
-    temp += Isis::PvlKeyword("Line", 501);
+    Pvl error;
+    PvlGroup temp("Error");
+    temp += PvlKeyword("Program", "ratio");
+    temp += PvlKeyword("Class", "I/O ERROR");
+    temp += PvlKeyword("Status", toString(-1));
+    temp += PvlKeyword("Message", "Unable to open file");
+    temp += PvlKeyword("File", "unitTest.cpp");
+    temp += PvlKeyword("Line", toString(501));
     error.AddGroup(temp);
     char **s_argv;
     s_argv = new char*[10];
@@ -42,28 +43,28 @@ int main(int argc, char *argv[]) {
 
     int s_argc = 4;
     try {
-      Isis::Application app(s_argc, (char**)s_argv);
-      Isis::SessionLog &log = Isis::SessionLog::TheLog(true);
+      Application app(s_argc, (char**)s_argv);
+      SessionLog &log = SessionLog::TheLog(true);
       log.AddResults(results);
       std::cout << log << std::endl;
     }
-    catch(Isis::IException &e) {
+    catch(IException &e) {
       e.print();
     }
 
     try {
-      Isis::Application app(s_argc, (char**)s_argv);
-      Isis::SessionLog &log = Isis::SessionLog::TheLog(true);
+      Application app(s_argc, (char**)s_argv);
+      SessionLog &log = SessionLog::TheLog(true);
       log.AddResults(results);
       log.AddError(error);
       std::cout << log << std::endl;
     }
-    catch(Isis::IException &e) {
+    catch(IException &e) {
       e.print();
     }
 
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 

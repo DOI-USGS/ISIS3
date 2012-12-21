@@ -25,8 +25,6 @@ using namespace std;
 
 #include "Message.h"
 
-string Isis::Message::KeywordUnrecognized(const string &key) {
-  string message;
-  message = "Keyword [" + key + "] unrecognized";
-  return message;
+QString Isis::Message::KeywordUnrecognized(const QString &key) {
+  return "Keyword [" + key + "] unrecognized";
 }

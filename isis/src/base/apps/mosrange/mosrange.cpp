@@ -67,15 +67,15 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   flist.read(ui.GetFileName("FROMLIST"));
   if(flist.size() < 1) {
-    string msg = "The list file[" + ui.GetFileName("FROMLIST") +
-                 " does not contain any filenames";
+    QString msg = "The list file[" + ui.GetFileName("FROMLIST") +
+                  " does not contain any filenames";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  string projection("Equirectangular");
+  QString projection("Equirectangular");
   if(ui.WasEntered("MAP")) {
     Pvl mapfile(ui.GetFileName("MAP"));
-    projection = (string) mapfile.FindGroup("Mapping")["ProjectionName"];
+    projection = (QString) mapfile.FindGroup("Mapping")["ProjectionName"];
   }
 
   if(ui.WasEntered("PROJECTION")) {
@@ -83,9 +83,9 @@ void IsisMain() {
   }
 
   // Gather other user inputs to projection
-  string lattype = ui.GetString("LATTYPE");
-  string londir  = ui.GetString("LONDIR");
-  string londom  = ui.GetString("LONDOM");
+  QString lattype = ui.GetString("LATTYPE");
+  QString londir  = ui.GetString("LONDIR");
+  QString londom  = ui.GetString("LONDOM");
   int digits = ui.GetInteger("PRECISION");
 
   // Fix them for mapping group
@@ -107,7 +107,7 @@ void IsisMain() {
   double eqRad;
   double poleRad;
 
-  string target("Unknown");
+  QString target("Unknown");
   for(int i = 0 ; i < flist.size() ; i++) {
     try {
       // Set the input image, get the camera model, and a basic mapping
@@ -121,8 +121,8 @@ void IsisMain() {
 
       PvlObject fmap("File");
       fmap += PvlKeyword("Name", flist[i].toString());
-      fmap += PvlKeyword("Lines", lines);
-      fmap += PvlKeyword("Samples", samples);
+      fmap += PvlKeyword("Lines", toString(lines));
+      fmap += PvlKeyword("Samples", toString(samples));
 
       Camera *cam = cube.getCamera();
       Pvl mapping;
@@ -152,18 +152,18 @@ void IsisMain() {
 
       double pixres = (lowres + hires) / 2.0;
       double scale = Scale(pixres, poleRad, eqRad);
-      mapgrp.AddKeyword(PvlKeyword("PixelResolution", pixres), Pvl::Replace);
-      mapgrp.AddKeyword(PvlKeyword("Scale", scale, "pixels/degree"), Pvl::Replace);
-      mapgrp += PvlKeyword("MinPixelResolution", lowres, "meters");
-      mapgrp += PvlKeyword("MaxPixelResolution", hires, "meters");
+      mapgrp.AddKeyword(PvlKeyword("PixelResolution", toString(pixres)), Pvl::Replace);
+      mapgrp.AddKeyword(PvlKeyword("Scale", toString(scale), "pixels/degree"), Pvl::Replace);
+      mapgrp += PvlKeyword("MinPixelResolution", toString(lowres), "meters");
+      mapgrp += PvlKeyword("MaxPixelResolution", toString(hires), "meters");
 
       // Get the universal ground range
       double minlat, maxlat, minlon, maxlon;
       cam->GroundRange(minlat, maxlat, minlon, maxlon, mapping);
-      mapgrp.AddKeyword(PvlKeyword("MinimumLatitude", minlat), Pvl::Replace);
-      mapgrp.AddKeyword(PvlKeyword("MaximumLatitude", maxlat), Pvl::Replace);
-      mapgrp.AddKeyword(PvlKeyword("MinimumLongitude", minlon), Pvl::Replace);
-      mapgrp.AddKeyword(PvlKeyword("MaximumLongitude", maxlon), Pvl::Replace);
+      mapgrp.AddKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
+      mapgrp.AddKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
+      mapgrp.AddKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
+      mapgrp.AddKeyword(PvlKeyword("MaximumLongitude", toString(maxlon)), Pvl::Replace);
 
       fmap.AddGroup(mapgrp);
       fileset.AddObject(fmap);
@@ -174,7 +174,7 @@ void IsisMain() {
       latitudeStat.AddData(&maxlat, 1);
     }
     catch(IException &ie) {
-      string mess = "Problems with file " + flist[i].toString() + "\n" +
+      QString mess = "Problems with file " + flist[i].toString() + "\n" +
                      ie.what();
       throw IException(IException::User, mess, _FILEINFO_);
     }
@@ -194,30 +194,30 @@ void IsisMain() {
 
   mapping += PvlKeyword("ProjectionName", projection);
   mapping += PvlKeyword("TargetName", target);
-  mapping += PvlKeyword("EquatorialRadius", eqRad, "meters");
-  mapping += PvlKeyword("PolarRadius", poleRad, "meters");
+  mapping += PvlKeyword("EquatorialRadius", toString(eqRad), "meters");
+  mapping += PvlKeyword("PolarRadius", toString(poleRad), "meters");
   mapping += PvlKeyword("LatitudeType", lattype);
   mapping += PvlKeyword("LongitudeDirection", londir);
   mapping += PvlKeyword("LongitudeDomain", londom);
-  mapping += PvlKeyword("PixelResolution", SetRound(avgPixRes, digits), "meters/pixel");
-  mapping += PvlKeyword("Scale", SetRound(scale, digits), "pixels/degree");
-  mapping += PvlKeyword("MinPixelResolution", scaleStat.Minimum(), "meters");
-  mapping += PvlKeyword("MaxPixelResolution", scaleStat.Maximum(), "meters");
-  mapping += PvlKeyword("CenterLongitude", SetRound(avgLon, digits));
-  mapping += PvlKeyword("CenterLatitude",  SetRound(avgLat, digits));
-  mapping += PvlKeyword("MinimumLatitude", MAX(SetFloor(latitudeStat.Minimum(), digits), -90.0));
-  mapping += PvlKeyword("MaximumLatitude", MIN(SetCeil(latitudeStat.Maximum(), digits), 90.0));
-  mapping += PvlKeyword("MinimumLongitude", MAX(SetFloor(longitudeStat.Minimum(), digits), -180.0));
-  mapping += PvlKeyword("MaximumLongitude", MIN(SetCeil(longitudeStat.Maximum(), digits), 360.0));
+  mapping += PvlKeyword("PixelResolution", toString(SetRound(avgPixRes, digits)), "meters/pixel");
+  mapping += PvlKeyword("Scale", toString(SetRound(scale, digits)), "pixels/degree");
+  mapping += PvlKeyword("MinPixelResolution", toString(scaleStat.Minimum()), "meters");
+  mapping += PvlKeyword("MaxPixelResolution", toString(scaleStat.Maximum()), "meters");
+  mapping += PvlKeyword("CenterLongitude", toString(SetRound(avgLon, digits)));
+  mapping += PvlKeyword("CenterLatitude",  toString(SetRound(avgLat, digits)));
+  mapping += PvlKeyword("MinimumLatitude", toString(MAX(SetFloor(latitudeStat.Minimum(), digits), -90.0)));
+  mapping += PvlKeyword("MaximumLatitude", toString(MIN(SetCeil(latitudeStat.Maximum(), digits), 90.0)));
+  mapping += PvlKeyword("MinimumLongitude", toString(MAX(SetFloor(longitudeStat.Minimum(), digits), -180.0)));
+  mapping += PvlKeyword("MaximumLongitude", toString(MIN(SetCeil(longitudeStat.Maximum(), digits), 360.0)));
 
-  PvlKeyword clat("PreciseCenterLongitude", avgLon);
+  PvlKeyword clat("PreciseCenterLongitude", toString(avgLon));
   clat.AddComment("Actual Parameters without precision applied");
   mapping += clat;
-  mapping += PvlKeyword("PreciseCenterLatitude",  avgLat);
-  mapping += PvlKeyword("PreciseMinimumLatitude", latitudeStat.Minimum());
-  mapping += PvlKeyword("PreciseMaximumLatitude", latitudeStat.Maximum());
-  mapping += PvlKeyword("PreciseMinimumLongitude", longitudeStat.Minimum());
-  mapping += PvlKeyword("PreciseMaximumLongitude", longitudeStat.Maximum());
+  mapping += PvlKeyword("PreciseCenterLatitude",  toString(avgLat));
+  mapping += PvlKeyword("PreciseMinimumLatitude", toString(latitudeStat.Minimum()));
+  mapping += PvlKeyword("PreciseMaximumLatitude", toString(latitudeStat.Maximum()));
+  mapping += PvlKeyword("PreciseMinimumLongitude", toString(longitudeStat.Minimum()));
+  mapping += PvlKeyword("PreciseMaximumLongitude", toString(longitudeStat.Maximum()));
 
 
   Application::Log(mapping);

@@ -203,7 +203,7 @@ namespace Isis {
 //    addMeasureLayout->addStretch();
 
     p_templateFileNameLabel = new QLabel("Template File: " +
-        QString::fromStdString(p_pointEditor->templateFileName()));
+        (p_pointEditor->templateFileName()));
     p_templateFileNameLabel->setToolTip("Sub-pixel registration template File.");
 //  QString patternMatchDoc =
 //          FileName("$ISISROOT/doc/documents/PatternMatch/PatternMatch.html").fileName();
@@ -863,8 +863,8 @@ namespace Isis {
       if (response == QMessageBox::Yes) {
         //  Update measure file combo boxes:  old reference normal font,
         //    new reference bold font
-        IString file = g_serialNumberList->FileName(p_leftMeasure->GetCubeSerialNumber());
-        QString fname = FileName(file).name().c_str();
+        QString file = g_serialNumberList->FileName(p_leftMeasure->GetCubeSerialNumber());
+        QString fname = FileName(file).name();
         int iref = p_leftCombo->findText(fname);
 
         //  Save normal font from new reference measure
@@ -874,7 +874,7 @@ namespace Isis {
         p_rightCombo->setItemData(iref,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
 
         file = g_serialNumberList->FileName(refMeasure->GetCubeSerialNumber());
-        fname = FileName(file).name().c_str();
+        fname = FileName(file).name();
         iref = p_leftCombo->findText(fname);
         p_leftCombo->setItemData(iref,font,Qt::FontRole);
         iref = p_rightCombo->findText(fname);
@@ -1039,7 +1039,7 @@ namespace Isis {
       message += "Latitude = " + QString::number(lat);
       message += "  Longitude = " + QString::number(lon);
       message += "  Radius = " + QString::number(radius) + "\n";
-      message += e.toString().c_str();
+      message += e.toString();
       QMessageBox::critical(p_qnetTool,"Error",message);
     }
     p_editPoint->SetAprioriSurfacePointSource(p_groundSurfacePointSource);
@@ -1344,7 +1344,7 @@ namespace Isis {
       return;
     }
     emit qnetToolSave();
-    //g_controlNetwork->Write(p_cnetFileName.toStdString());
+    //g_controlNetwork->Write(p_cnetFileName);
   }
 
 
@@ -1445,8 +1445,8 @@ namespace Isis {
     MdiCubeViewport *cvp = cubeViewport();
     if (cvp  == NULL) return;
 
-    IString file = cvp->cube()->getFileName();
-    IString sn = g_serialNumberList->SerialNumber(file);
+    QString file = cvp->cube()->getFileName();
+    QString sn = g_serialNumberList->SerialNumber(file);
 
     double samp,line;
     cvp->viewportToCube(p.x(),p.y(),samp,line);
@@ -1469,7 +1469,7 @@ namespace Isis {
       }
 
       //  Find closest control point in network
-      IString sn = g_serialNumberList->SerialNumber(file);
+      QString sn = g_serialNumberList->SerialNumber(file);
       ControlPoint *point = g_controlNetwork->FindClosest(sn, samp, line);
 
       modifyPoint(point);
@@ -1494,7 +1494,7 @@ namespace Isis {
       deletePoint(point);
     }
     else if (s == Qt::RightButton) {
-      p_leftFile = file.c_str();
+      p_leftFile = file;
       UniversalGroundMap *gmap = cvp->universalGroundMap();
       if (!gmap->SetImage(samp,line)) {
         QString message = "Invalid latitude or longitude at this point. ";
@@ -1576,7 +1576,7 @@ namespace Isis {
         double line = cam->Line();
         if (samp >= 1 && samp <= cam->Samples() &&
             line >= 1 && line <= cam->Lines()) {
-          pointFiles<<g_serialNumberList->FileName(i).c_str();
+          pointFiles<<g_serialNumberList->FileName(i);
         }
       }
     }
@@ -1586,14 +1586,14 @@ namespace Isis {
     if (newPointDialog->exec()) {
 
       ControlPoint *newPoint =
-        new ControlPoint(newPointDialog->ptIdValue->text().toStdString());
+        new ControlPoint(newPointDialog->ptIdValue->text());
 
       // If this ControlPointId already exists, message box pops up and user is
       // asked to enter a new value.
       if (g_controlNetwork->ContainsPoint(newPoint->GetId())) {
-        IString message = "A ControlPoint with Point Id = [" + newPoint->GetId();
+        QString message = "A ControlPoint with Point Id = [" + newPoint->GetId();
         message += "] already exists.  Re-enter Point Id for this ControlPoint.";
-        QMessageBox::warning(p_qnetTool, "New Point Id", message.c_str());
+        QMessageBox::warning(p_qnetTool, "New Point Id", message);
         pointFiles.clear();
         delete newPoint;
         newPoint = NULL;
@@ -1601,7 +1601,7 @@ namespace Isis {
         return;
       }
 
-      newPoint->SetId(newPointDialog->ptIdValue->text().toStdString());
+      newPoint->SetId(newPointDialog->ptIdValue->text());
       newPoint->SetChooserName(Application::UserName());
 
       for (int i=0; i<newPointDialog->fileList->count(); i++) {
@@ -1610,11 +1610,11 @@ namespace Isis {
         //  Create measure for any file selected
         ControlMeasure *m = new ControlMeasure;
         //  Find serial number for this file
-        IString sn =
-                  g_serialNumberList->SerialNumber(item->text().toStdString());
+        QString sn =
+                  g_serialNumberList->SerialNumber(item->text());
         m->SetCubeSerialNumber(sn);
         int camIndex =
-              g_serialNumberList->FileNameIndex(item->text().toStdString());
+              g_serialNumberList->FileNameIndex(item->text());
         cam = g_controlNetwork->Camera(camIndex);
         cam->SetUniversalGround(lat,lon);
         m->SetCoordinate(cam->Sample(),cam->Line());
@@ -1644,7 +1644,7 @@ namespace Isis {
       p_qnetTool->setShown(true);
       p_qnetTool->raise();
 
-      loadTemplateFile(QString::fromStdString(
+      loadTemplateFile((
           p_pointEditor->templateFileName()));
 
 
@@ -1691,7 +1691,7 @@ namespace Isis {
         double line = cam->Line();
         if (samp >= 1 && samp <= cam->Samples() &&
             line >= 1 && line <= cam->Lines()) {
-          pointFiles<<g_serialNumberList->FileName(i).c_str();
+          pointFiles<<g_serialNumberList->FileName(i);
         }
       }
     }
@@ -1706,7 +1706,7 @@ namespace Isis {
     fixedPointDialog->SetFiles(pointFiles);
     if (fixedPointDialog->exec()) {
       ControlPoint *fixedPoint =
-      new ControlPoint(fixedPointDialog->ptIdValue->text().toStdString());
+      new ControlPoint(fixedPointDialog->ptIdValue->text());
 
       if (fixedPointDialog->fixed->isChecked()) {
         fixedPoint->SetType(ControlPoint::Fixed);
@@ -1718,9 +1718,9 @@ namespace Isis {
       // If this ControlPointId already exists, message box pops up and user is
       // asked to enter a new value.
       if (g_controlNetwork->ContainsPoint(fixedPoint->GetId())) {
-        string message = "A ControlPoint with Point Id = [" + fixedPoint->GetId();
+        QString message = "A ControlPoint with Point Id = [" + fixedPoint->GetId();
         message += "] already exists.  Re-enter Point Id for this ControlPoint.";
-        QMessageBox::warning(p_qnetTool, "New Point Id", message.c_str());
+        QMessageBox::warning(p_qnetTool, "New Point Id", message);
         pointFiles.clear();
         delete fixedPoint;
         fixedPoint = NULL;
@@ -1736,14 +1736,14 @@ namespace Isis {
         //  Create measure for any file selected
         ControlMeasure *m = new ControlMeasure;
         //  Find serial number for this file
-        string sn =
-        g_serialNumberList->SerialNumber(item->text().toStdString());
+        QString sn =
+        g_serialNumberList->SerialNumber(item->text());
 
         //  If ground, do not add measure, it will be added in loadPoint
         if (sn == p_groundSN) continue;
         m->SetCubeSerialNumber(sn);
         int camIndex =
-                 g_serialNumberList->FileNameIndex(item->text().toStdString());
+                 g_serialNumberList->FileNameIndex(item->text());
         cam = g_controlNetwork->Camera(camIndex);
         cam->SetUniversalGround(lat,lon);
         m->SetCoordinate(cam->Sample(),cam->Line());
@@ -1863,13 +1863,13 @@ namespace Isis {
     emit editPointChanged(p_editPoint->GetId());
 
     QnetDeletePointDialog *deletePointDialog = new QnetDeletePointDialog;
-    IString CPId = p_editPoint->GetId();
-    deletePointDialog->pointIdValue->setText(CPId.c_str());
+    QString CPId = p_editPoint->GetId();
+    deletePointDialog->pointIdValue->setText(CPId);
     //  Need all files for this point
     for (int i=0; i<p_editPoint->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*p_editPoint)[i];
-      IString file = g_serialNumberList->FileName(m.GetCubeSerialNumber());
-      deletePointDialog->fileList->addItem(file.c_str());
+      QString file = g_serialNumberList->FileName(m.GetCubeSerialNumber());
+      deletePointDialog->fileList->addItem(file);
     }
 
     if (deletePointDialog->exec()) {
@@ -1939,7 +1939,7 @@ namespace Isis {
         p_qnetTool->setShown(true);
         p_qnetTool->raise();
 
-        loadTemplateFile(QString::fromStdString(
+        loadTemplateFile((
             p_pointEditor->templateFileName()));
       }
 
@@ -2002,7 +2002,7 @@ namespace Isis {
     loadPoint();
     p_qnetTool->setShown(true);
     p_qnetTool->raise();
-    loadTemplateFile(QString::fromStdString(
+    loadTemplateFile((
         p_pointEditor->templateFileName()));
 
     // emit signal so the nav tool can update edit point
@@ -2034,7 +2034,7 @@ namespace Isis {
   void QnetTool::loadPoint () {
 
     //  Write pointId
-    IString CPId = p_editPoint->GetId();
+    QString CPId = p_editPoint->GetId();
     QString ptId("Point ID:  ");
     ptId += (QString) CPId;
     p_ptIdValue->setText(ptId);
@@ -2118,9 +2118,9 @@ namespace Isis {
     //  Need all files for this point
     for (int i=0; i<p_editPoint->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*p_editPoint)[i];
-      IString file = g_serialNumberList->FileName(m.GetCubeSerialNumber());
+      QString file = g_serialNumberList->FileName(m.GetCubeSerialNumber());
       p_pointFiles<<file;
-      QString tempFileName = FileName(file).name().c_str();
+      QString tempFileName = FileName(file).name();
       p_leftCombo->addItem(tempFileName);
       p_rightCombo->addItem(tempFileName);
       if (p_editPoint->IsReferenceExplicit() &&
@@ -2225,7 +2225,7 @@ namespace Isis {
       int column = 0;
       ControlMeasure &m = *(*p_editPoint)[row];
 
-      QString file = QString::fromStdString(
+      QString file = (
                        g_serialNumberList->FileName(m.GetCubeSerialNumber()));
       QTableWidgetItem *tableItem = new QTableWidgetItem(QString(file));
       p_measureTable->setItem(row,column++,tableItem);
@@ -2337,7 +2337,7 @@ namespace Isis {
         tableItem = new QTableWidgetItem("False");
       p_measureTable->setItem(row,column++,tableItem);
 
-      tableItem = new QTableWidgetItem(QString::fromStdString(
+      tableItem = new QTableWidgetItem((
                   ControlMeasure::MeasureTypeToString(m.GetType())));
       p_measureTable->setItem(row,column,tableItem);
 
@@ -2529,9 +2529,9 @@ namespace Isis {
    *                          reference, lock the measure.
    */
   void QnetTool::selectLeftMeasure(int index) {
-    IString file = p_pointFiles[index];
+    QString file = p_pointFiles[index];
 
-    IString serial = g_serialNumberList->SerialNumber(file);
+    QString serial = g_serialNumberList->SerialNumber(file);
 
     // Make sure to clear out leftMeasure before making a copy of the selected
     // measure.
@@ -2567,9 +2567,9 @@ namespace Isis {
    */
   void QnetTool::selectRightMeasure(int index) {
 
-    IString file = p_pointFiles[index];
+    QString file = p_pointFiles[index];
 
-    IString serial = g_serialNumberList->SerialNumber(file);
+    QString serial = g_serialNumberList->SerialNumber(file);
 
     // Make sure to clear out rightMeasure before making a copy of the selected
     // measure.
@@ -2812,7 +2812,7 @@ namespace Isis {
         double line = cam->Line();
         if (samp >= 1 && samp <= cam->Samples() &&
             line >= 1 && line <= cam->Lines()) {
-          pointFiles<<g_serialNumberList->FileName(i).c_str();
+          pointFiles<<g_serialNumberList->FileName(i);
         }
       }
     }
@@ -2826,10 +2826,10 @@ namespace Isis {
         //  Create measure for any file selected
         ControlMeasure *m = new ControlMeasure;
         //  Find serial number for this file
-        IString sn = g_serialNumberList->SerialNumber((IString) item->text());
+        QString sn = g_serialNumberList->SerialNumber((QString) item->text());
         m->SetCubeSerialNumber(sn);
         int camIndex =
-              g_serialNumberList->FileNameIndex(item->text().toStdString());
+              g_serialNumberList->FileNameIndex(item->text());
         cam = g_controlNetwork->Camera(camIndex);
         cam->SetUniversalGround(lat,lon);
         m->SetCoordinate(cam->Sample(),cam->Line());
@@ -2843,7 +2843,7 @@ namespace Isis {
       p_qnetTool->setShown(true);
       p_qnetTool->raise();
 
-      loadTemplateFile(QString::fromStdString(
+      loadTemplateFile((
           p_pointEditor->templateFileName()));
 
 
@@ -2945,14 +2945,14 @@ namespace Isis {
     // Don't show the measurments on cubes not in the serial number list
     // TODO: Should we show them anyway
     // TODO: Should we add the SN to the viewPort
-    string serialNumber = SerialNumber::Compose(*vp->cube(), true);
+    QString serialNumber = SerialNumber::Compose(*vp->cube(), true);
 
     if (serialNumber == p_groundSN) {
       drawGroundMeasures(vp, painter);
       return;
     }
     if (!g_controlNetwork->GetCubeSerials().contains(
-                      QString::fromStdString(serialNumber))) return;
+                      (serialNumber))) return;
     if (!g_serialNumberList->HasSerialNumber(serialNumber)) return;
     QList<ControlMeasure *> measures =
         g_controlNetwork->GetMeasuresInCube(serialNumber);
@@ -3117,7 +3117,7 @@ namespace Isis {
    */
   void QnetTool::loadTemplateFile(QString fn) {
 
-    QFile file(QString::fromStdString(FileName((IString) fn).expanded()));
+    QFile file((FileName((QString) fn).expanded()));
     if (!file.open(QIODevice::ReadOnly)) {
       QString msg = "Failed to open template file \"" + fn + "\"";
       QMessageBox::warning(p_qnetTool, "IO Error", msg);
@@ -3150,7 +3150,7 @@ namespace Isis {
     if (!p_templateModified)
       return;
 
-    QString filename = QString::fromStdString(
+    QString filename = (
         p_pointEditor->templateFileName());
 
     writeTemplateFile(filename);
@@ -3182,7 +3182,7 @@ namespace Isis {
 
     // catch errors in Pvl format when populating pvl object
     stringstream ss;
-    ss << contents.toStdString();
+    ss << contents;
     try {
       Pvl pvl;
       ss >> pvl;
@@ -3193,8 +3193,8 @@ namespace Isis {
       return;
     }
 
-    QString expandedFileName(QString::fromStdString(
-        FileName((IString) fn).expanded()));
+    QString expandedFileName((
+        FileName((QString) fn).expanded()));
 
     QFile file(expandedFileName);
 
@@ -3239,12 +3239,12 @@ namespace Isis {
       // to view and/or edit the template
       PvlEditDialog registrationDialog(templatePvl);
       registrationDialog.setWindowTitle("View or Edit Template File: "
-                                         + QString::fromStdString(templatePvl.FileName()));
+                                         + (templatePvl.FileName()));
       registrationDialog.resize(550,360);
       registrationDialog.exec();
     }
     catch (IException &e) {
-      QString message = e.toString().c_str();
+      QString message = e.toString();
       QMessageBox::information(p_qnetTool, "Error", message);
     }
   }
@@ -3426,16 +3426,16 @@ namespace Isis {
     if (ground.isEmpty()) return;
 
     //  First off, find serial number of new ground, it is needed for a couple of error checks.
-    IString newGroundSN = SerialNumber::Compose(ground.toStdString(), true);
+    QString newGroundSN = SerialNumber::Compose(ground, true);
 
       //  If new ground same file as old ground file simply set as active window. 
-    if (p_groundOpen && p_groundFile == FileName(ground).name().ToQt()) {
+    if (p_groundOpen && p_groundFile == FileName(ground).name()) {
       //  See if ground source is already opened in a cubeviewport.  If so, simply
       //  activate the viewport and return.
       MdiCubeViewport *vp;
       for (int i=0; i<(int)cubeViewportList()->size(); i++) {
         vp = (*(cubeViewportList()))[i];
-        if (vp->cube()->getFileName() == ground.toStdString()) {
+        if (vp->cube()->getFileName() == ground) {
           g_vpMainWindow->workspace()->setActiveSubWindow(
               (QMdiSubWindow *)vp->parentWidget()->parent());
           return;
@@ -3477,10 +3477,10 @@ namespace Isis {
     //  loaded)
     p_groundCube = new Cube();
     try {
-      p_groundCube->open(ground.toStdString());
+      p_groundCube->open(ground);
       p_groundGmap = new UniversalGroundMap(*p_groundCube);
-      p_groundFile = FileName(p_groundCube->getFileName()).name().c_str();
-      g_serialNumberList->Add(ground.toStdString(), true);
+      p_groundFile = FileName(p_groundCube->getFileName()).name();
+      g_serialNumberList->Add(ground, true);
     }
     catch (IException &e) {
       QApplication::restoreOverrideCursor();
@@ -3525,8 +3525,8 @@ namespace Isis {
           // TODO p_groundRadiusSource = ControlPoint::RadiusSource::Basemap;
           p_groundRadiusSource = ControlPoint::RadiusSource::Ellipsoid;
           PvlGroup mapping = p_groundCube->getGroup("Mapping");
-          p_demFile = QString::fromStdString(mapping ["EquatorialRadius"])
-                         + ", " + QString::fromStdString(mapping ["PolarRadius"]);
+          p_demFile = (mapping ["EquatorialRadius"][0])
+                         + ", " + (mapping ["PolarRadius"][0]);
           //
           p_radiusSourceFile = "";
         }
@@ -3538,7 +3538,7 @@ namespace Isis {
           if (!p_demOpen) {
             //  If level 1, determine the shape model
             PvlGroup kernels = p_groundCube->getGroup("Kernels");
-            QString shapeFile = QString::fromStdString(kernels ["ShapeModel"]);
+            QString shapeFile = (kernels ["ShapeModel"]);
             if (shapeFile.contains("dem")) {
               p_groundRadiusSource = ControlPoint::RadiusSource::DEM;
               p_radiusSourceFile = shapeFile;
@@ -3549,7 +3549,7 @@ namespace Isis {
               p_groundRadiusSource = ControlPoint::RadiusSource::Ellipsoid;
               p_demFile = "Ellipsoid";
               //  Find pck file from Kernels group
-              p_radiusSourceFile = (string) kernels["TargetAttitudeShape"];
+              p_radiusSourceFile = (QString) kernels["TargetAttitudeShape"];
             }
           }
         }
@@ -3629,8 +3629,8 @@ namespace Isis {
       p_demCube = new Cube();
 
       try {
-        p_demCube->open(demFile.toStdString());
-        p_demFile = FileName(p_demCube->getFileName()).name().c_str();
+        p_demCube->open(demFile);
+        p_demFile = FileName(p_demCube->getFileName()).name();
       } catch (IException &e) {
         QString message = e.toString();
         QMessageBox::critical(p_qnetTool, "Error", message);
@@ -3781,7 +3781,7 @@ namespace Isis {
    *
    * @author 2011-07-06 Tracie Sucharski
    */
-  bool QnetTool::IsMeasureLocked (IString serialNumber) {
+  bool QnetTool::IsMeasureLocked (QString serialNumber) {
 
     if (p_editPoint == NULL) return false;
 
@@ -3806,7 +3806,7 @@ namespace Isis {
    */
   void QnetTool::readSettings() {
     FileName config("$HOME/.Isis/qnet/QnetTool.config");
-    QSettings settings(QString::fromStdString(config.expanded()),
+    QSettings settings((config.expanded()),
                        QSettings::NativeFormat);
     QPoint pos = settings.value("pos", QPoint(300, 100)).toPoint();
     QSize size = settings.value("size", QSize(900, 500)).toSize();
@@ -3826,7 +3826,7 @@ namespace Isis {
       visible at the time of closing the application*/
     if(!p_qnetTool->isVisible()) return;
     FileName config("$HOME/.Isis/qnet/QnetTool.config");
-    QSettings settings(QString::fromStdString(config.expanded()),
+    QSettings settings((config.expanded()),
                        QSettings::NativeFormat);
     settings.setValue("pos", p_qnetTool->pos());
     settings.setValue("size", p_qnetTool->size());

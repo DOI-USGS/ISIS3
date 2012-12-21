@@ -94,15 +94,15 @@ namespace Isis {
     p_fullCacheSize = 0;
 
     // Determine the axis for the velocity vector
-    std::string key = "INS" + Isis::IString(frameCode) + "_TRANSX";
+    QString key = "INS" + toString(frameCode) + "_TRANSX";
     SpiceDouble transX[2];
     SpiceInt number;
     SpiceBoolean found;
     //Read starting at element 1 (skipping element 0)
-    gdpool_c(key.c_str(), 1, 2, &number, transX, &found);
+    gdpool_c(key.toAscii().data(), 1, 2, &number, transX, &found);
 
     if(!found) {
-      std::string msg = "Cannot find [" + key + "] in text kernels";
+      QString msg = "Cannot find [" + key + "] in text kernels";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
@@ -239,23 +239,23 @@ namespace Isis {
 
     // Check for valid arguments
     if(size <= 0) {
-      std::string msg = "Argument cacheSize must not be less or equal to zero";
+      QString msg = "Argument cacheSize must not be less or equal to zero";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(startTime > endTime) {
-      std::string msg = "Argument startTime must be less than or equal to endTime";
+      QString msg = "Argument startTime must be less than or equal to endTime";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if((startTime != endTime) && (size == 1)) {
-      std::string msg = "Cache size must be more than 1 if startTime endTime differ";
+      QString msg = "Cache size must be more than 1 if startTime endTime differ";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // Make sure cache isn't already loaded
     if(p_source == Memcache) {
-      std::string msg = "A SpiceRotation cache has already been created";
+      QString msg = "A SpiceRotation cache has already been created";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -336,7 +336,7 @@ namespace Isis {
     if(table.Label().HasKeyword("TimeDependentFrames")) {
       PvlKeyword labelTimeFrames = table.Label()["TimeDependentFrames"];
       for(int i = 0; i < labelTimeFrames.Size(); i++) {
-        p_timeFrames.push_back(labelTimeFrames[i]);
+        p_timeFrames.push_back(toInt(labelTimeFrames[i]));
       }
     }
     else {
@@ -349,12 +349,12 @@ namespace Isis {
       p_constantFrames.clear();
 
       for(int i = 0; i < labelConstantFrames.Size(); i++) {
-        p_constantFrames.push_back(labelConstantFrames[i]);
+        p_constantFrames.push_back(toInt(labelConstantFrames[i]));
       }
       PvlKeyword labelConstantRotation = table.Label()["ConstantRotation"];
 
       for(int i = 0; i < labelConstantRotation.Size(); i++) {
-        p_TC.push_back(labelConstantRotation[i]);
+        p_TC.push_back(toDouble(labelConstantRotation[i]));
       }
     }
     else {
@@ -364,13 +364,13 @@ namespace Isis {
 
     // Load the full cache time information from the label if available
     if(table.Label().HasKeyword("CkTableStartTime")) {
-      p_fullCacheStartTime = table.Label().FindKeyword("CkTableStartTime")[0];
+      p_fullCacheStartTime = toDouble(table.Label().FindKeyword("CkTableStartTime")[0]);
     }
     if(table.Label().HasKeyword("CkTableEndTime")) {
-      p_fullCacheEndTime = table.Label().FindKeyword("CkTableEndTime")[0];
+      p_fullCacheEndTime = toDouble(table.Label().FindKeyword("CkTableEndTime")[0]);
     }
     if(table.Label().HasKeyword("CkTableOriginalSize")) {
-      p_fullCacheSize = table.Label().FindKeyword("CkTableOriginalSize")[0];
+      p_fullCacheSize = toInt(table.Label().FindKeyword("CkTableOriginalSize")[0]);
     }
 
     int recFields = table[0].Fields();
@@ -461,7 +461,7 @@ namespace Isis {
       if(degree == 0  && p_cacheAv.size() > 0) p_hasAngularVelocity = true;
     }
     else  {
-      std::string msg = "Expecting either three, five, or eight fields in the SpiceRotation table";
+      QString msg = "Expecting either three, five, or eight fields in the SpiceRotation table";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -528,7 +528,7 @@ namespace Isis {
       }
     }
     else { //(p_source < PolyFunction) 
-      std::string msg = "The SpiceRotation has not yet been fit to a function";
+      QString msg = "The SpiceRotation has not yet been fit to a function";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -549,13 +549,13 @@ namespace Isis {
    *
    * @param tableName    Name of the table to create and return
    */
-  Table SpiceRotation::LineCache(const std::string &tableName) {
+  Table SpiceRotation::LineCache(const QString &tableName) {
 
     // Apply the function and fill the caches
     if(p_source >= PolyFunction)  ReloadCache();
 
     if(p_source != Memcache) {
-      std::string msg = "Only cached rotations can be  returned as a line cache of quaternions and time";
+      QString msg = "Only cached rotations can be  returned as a line cache of quaternions and time";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     // Load the table and return it to caller
@@ -580,7 +580,7 @@ namespace Isis {
    *
    * @param tableName    Name of the table to create and return
    */
-  Table SpiceRotation::Cache(const std::string &tableName) {
+  Table SpiceRotation::Cache(const QString &tableName) {
    // First handle conversion of PolyFunctionOverSpiceConstant
     // by converting it to the full Memcache and try to downsize it
     if (p_source == PolyFunctionOverSpice) {
@@ -679,7 +679,7 @@ namespace Isis {
     }
     else {
       // throw an error -- should not get here -- invalid Spice Source
-      std::string msg = "To create table source of data must be either Memcache or PolyFunction";
+      QString msg = "To create table source of data must be either Memcache or PolyFunction";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -700,7 +700,7 @@ namespace Isis {
       table.Label() += PvlKeyword("TimeDependentFrames");
 
       for(int i = 0; i < (int) p_timeFrames.size(); i++) {
-        table.Label()["TimeDependentFrames"].AddValue(p_timeFrames[i]);
+        table.Label()["TimeDependentFrames"].AddValue(toString(p_timeFrames[i]));
       }
     }
 
@@ -708,28 +708,28 @@ namespace Isis {
       table.Label() += PvlKeyword("ConstantFrames");
 
       for(int i = 0; i < (int) p_constantFrames.size(); i++) {
-        table.Label()["ConstantFrames"].AddValue(p_constantFrames[i]);
+        table.Label()["ConstantFrames"].AddValue(toString(p_constantFrames[i]));
       }
 
       table.Label() += PvlKeyword("ConstantRotation");
 
       for(int i = 0; i < (int) p_TC.size(); i++) {
-        table.Label()["ConstantRotation"].AddValue(p_TC[i]);
+        table.Label()["ConstantRotation"].AddValue(toString(p_TC[i]));
       }
     }
 
     // Write original time coverage
     if(p_fullCacheStartTime != 0) {
       table.Label() += PvlKeyword("CkTableStartTime");
-      table.Label()["CkTableStartTime"].AddValue(p_fullCacheStartTime);
+      table.Label()["CkTableStartTime"].AddValue(toString(p_fullCacheStartTime));
     }
     if(p_fullCacheEndTime != 0) {
       table.Label() += PvlKeyword("CkTableEndTime");
-      table.Label()["CkTableEndTime"].AddValue(p_fullCacheEndTime);
+      table.Label()["CkTableEndTime"].AddValue(toString(p_fullCacheEndTime));
     }
     if(p_fullCacheSize != 0) {
       table.Label() += PvlKeyword("CkTableOriginalSize");
-      table.Label()["CkTableOriginalSize"].AddValue(p_fullCacheSize);
+      table.Label()["CkTableOriginalSize"].AddValue(toString(p_fullCacheSize));
     }
     NaifStatus::CheckErrors();
   }
@@ -860,7 +860,7 @@ namespace Isis {
     if(p_source == PolyFunction) {
       // Nothing to do
       return;
-//      std::string msg = "Rotation already fit to a polynomial -- spiceint first to refit";
+//      QString msg = "Rotation already fit to a polynomial -- spiceint first to refit";
 //      throw IException(IException::User,msg,_FILEINFO_);
     }
 
@@ -1288,7 +1288,7 @@ namespace Isis {
    */
   void SpiceRotation::SetAxes(int axis1, int axis2, int axis3) {
     if(axis1 < 1  ||  axis2 < 1  || axis3 < 1  || axis1 > 3  || axis2 > 3  || axis3 > 3) {
-      std::string msg = "A rotation axis is outside the valid range of 1 to 3";
+      QString msg = "A rotation axis is outside the valid range of 1 to 3";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     p_axis1 = axis1;
@@ -1414,7 +1414,7 @@ namespace Isis {
         // Don't read type 5 ck here
         if(ic[2] == 5) break;
         if(ic[2] != 3) {
-          std::string msg = "Time fetching method only works on type 3 and 5 ck";
+          QString msg = "Time fetching method only works on type 3 and 5 ck";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
@@ -1431,7 +1431,7 @@ namespace Isis {
             // Check for a gap in the time coverage by making sure the time span of the observation does not
             // cross a segment unless the next segment starts where the current one ends
             if(observationSpansToNextSegment && currentTime > segStartEt) {
-              std::string msg = "Observation crosses segment boundary--unable to interpolate pointing";
+              QString msg = "Observation crosses segment boundary--unable to interpolate pointing";
               throw IException(IException::Programmer, msg, _FILEINFO_);
             }
             if(observEnd > segStopEt) {
@@ -1491,7 +1491,7 @@ namespace Isis {
       }
     }
     else if(count == 0  &&  p_source != Nadir  &&  p_minimizeCache == Yes) {
-      std::string msg = "No camera kernels loaded...Unable to determine time cache to downsize";
+      QString msg = "No camera kernels loaded...Unable to determine time cache to downsize";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -1515,7 +1515,7 @@ namespace Isis {
 
     // No time cache was initialized -- throw an error
     if(p_fullCacheSize < 1) {
-      std::string msg = "Time cache not available -- rerun spiceinit";
+      QString msg = "Time cache not available -- rerun spiceinit";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -1557,7 +1557,7 @@ namespace Isis {
           break;
         }
 
-        std::string msg = "The frame" + IString((int) frameCodes[frmidx]) + " is not supported by Naif";
+        QString msg = "The frame" + toString((int) frameCodes[frmidx]) + " is not supported by Naif";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
@@ -1577,7 +1577,7 @@ namespace Isis {
             break;
           }
 
-          std::string msg = "The ck rotation from frame " + IString(frameCodes[frmidx]) + " can not be found"
+          QString msg = "The ck rotation from frame " + toString(frameCodes[frmidx]) + " can not be found"
                             + " due to no pointing available at requested time or a problem with the frame";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
@@ -1585,7 +1585,7 @@ namespace Isis {
       else if(type == TK) {
         tkfram_((SpiceInt *) &typid, (double *) matrix, &nextFrame, (logical *) &found);
         if(!found) {
-          std::string msg = "The tk rotation from frame " + IString(frameCodes[frmidx]) + " can not be found";
+          QString msg = "The tk rotation from frame " + toString(frameCodes[frmidx]) + " can not be found";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
       }
@@ -1600,8 +1600,8 @@ namespace Isis {
       }
 
       else {
-        std::string msg = "The frame " + IString(frameCodes[frmidx]) +
-                          " has a type " + IString(type) + " not supported by your version of Naif Spicelib." +
+        QString msg = "The frame " + toString(frameCodes[frmidx]) +
+                          " has a type " + toString(type) + " not supported by your version of Naif Spicelib." +
                           "You need to update.";
         throw IException(IException::Programmer, msg, _FILEINFO_);
 
@@ -1708,7 +1708,7 @@ namespace Isis {
 
     // Make sure the angles have been fit to polynomials
     if(p_source < PolyFunction) {
-      std::string msg = "The SpiceRotation pointing angles must be fit to polynomials in order to compute angular velocity";
+      QString msg = "The SpiceRotation pointing angles must be fit to polynomials in order to compute angular velocity";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

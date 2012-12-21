@@ -53,7 +53,7 @@ namespace Isis {
     // bool planeTarget = false;
     
     // shape model file name
-    IString shapeModelFilenames = "";
+    QString shapeModelFilenames = "";
 
     // TODO: We differentiate between "Elevation" and "Shape" models on the
     // labels, but we assign either one to the shapeModelFilename. Do we
@@ -64,11 +64,11 @@ namespace Isis {
     }
     else if (kernelsPvlGroup.HasKeyword("ElevationModel") &&
              !kernelsPvlGroup["ElevationModel"].IsNull())  {//&&
-      shapeModelFilenames = (string) kernelsPvlGroup["ElevationModel"];
+      shapeModelFilenames = (QString) kernelsPvlGroup["ElevationModel"];
     }
     else if (kernelsPvlGroup.HasKeyword("ShapeModel") &&
              !kernelsPvlGroup["ShapeModel"].IsNull()) {//&&
-      shapeModelFilenames = (string) kernelsPvlGroup["ShapeModel"];
+      shapeModelFilenames = (QString) kernelsPvlGroup["ShapeModel"];
     }
 
     // Create shape model
@@ -89,10 +89,10 @@ namespace Isis {
         Isis::Cube shapeModelCube;
         try {
           // first, try to open the shape model file as an Isis3 cube
-          shapeModelCube.open(shapeModelFilenames, "r" );
+          shapeModelCube.open(FileName(shapeModelFilenames).expanded(), "r" );
         }
         catch (IException &e) {
-          IString msg = "Shape file" + shapeModelFilenames + " does not exist or is not an Isis cube";
+          IString msg = "Shape file " + shapeModelFilenames + " does not exist or is not an Isis cube";
           throw IException(e, IException::Unknown, msg, _FILEINFO_);
         }
         
@@ -107,13 +107,13 @@ namespace Isis {
             shapeModel = new DemShape(target, pvl);
         }
         catch (IException &e) {
-          IString msg = "Shape model cube must be an Isis DEM file, meaning it must " \
+          QString msg = "Shape model cube must be an Isis DEM file, meaning it must " \
                         "be map-projected. This cube is NOT map projected.";
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }
       catch (IException &e) {
-        IString msg = "Failed opening shape file" + shapeModelFilenames;
+        IString msg = "Failed opening shape file " + shapeModelFilenames;
         throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
     }

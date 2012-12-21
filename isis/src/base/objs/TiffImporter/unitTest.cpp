@@ -1,7 +1,10 @@
 #include <iomanip>
 
+#include <QFile>
+
 #include "FileName.h"
 #include "IException.h"
+#include "IString.h"
 #include "Preference.h"
 #include "TiffImporter.h"
 
@@ -26,7 +29,7 @@ int main(int argc, char *argv[]) {
 
     cout << "Clean-up" << endl;
     delete importer;
-    remove(outputName.expanded().c_str());
+    QFile::remove(outputName.expanded());
 
     cout << endl << "Done" << endl;
   }

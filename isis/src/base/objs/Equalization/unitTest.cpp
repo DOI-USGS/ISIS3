@@ -49,8 +49,8 @@ int main(int argc, char *argv[]) {
   cout << setprecision(9);
 
   try {
-    string fromList = "FromList.lst";
-    string holdList = "HoldList.lst";
+    QString fromList = "FromList.lst";
+    QString holdList = "HoldList.lst";
 
     cout << "UnitTest for Equalization" << endl;
     Equalization equalizer(fromList);
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < imageList.size(); i++) {
       ProcessByLine p;
       CubeAttributeInput att;
-      const string inp = imageList[i].toString();
+      const QString inp = imageList[i].toString();
       Cube *inputCube = p.SetInputCube(inp, att);
       TestFunctor func(&equalizer, inputCube->getLineCount(), i);
       p.ProcessCubeInPlace(func, false);

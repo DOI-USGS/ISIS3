@@ -1,10 +1,13 @@
 #include <iostream>
 #include <iomanip>
 #include "IException.h"
+#include "IString.h"
 #include "SpecialPixel.h"
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
+
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
@@ -181,8 +184,8 @@ int main(int argc, char *argv[]) {
   cout << "-6.0 to String:\t\t" << Isis::PixelToString(d) << endl;
   cout << endl;
 
-  cout << "Testing StringToPixel(string):" << endl;
-  string s = "NuLl";
+  cout << "Testing StringToPixel(QString):" << endl;
+  QString s = "NuLl";
   cout << "NuLl to Pixel:\t\t" << Isis::StringToPixel(s) << endl;
   s = "lrs";
   cout << "lrs to Pixel:\t\t" << Isis::StringToPixel(s) << endl;
@@ -201,7 +204,7 @@ int main(int argc, char *argv[]) {
   cout << Isis::PixelToString(d) << " to Pixel:\t" << Isis::StringToPixel(Isis::PixelToString(d)) << endl;
   cout << endl;
 
-  cout << "Testing unique value shortcut for StringToPixel(string):" << endl;
+  cout << "Testing unique value shortcut for StringToPixel(QString):" << endl;
   s = "Nul";
   cout << "Nul to Pixel:\t\t" << Isis::StringToPixel(s) << endl;
   s = "N";
@@ -216,7 +219,7 @@ int main(int argc, char *argv[]) {
   cout << "Li to Pixel:\t\t" << Isis::StringToPixel(s) << endl;
   cout << endl;
 
-  cout << "Testing illegal shortcuts/expressions for StringToPixel(string):" << endl;
+  cout << "Testing illegal shortcuts/expressions for StringToPixel(QString):" << endl;
   try {
     s = "Nl";
     Isis::StringToPixel(s);

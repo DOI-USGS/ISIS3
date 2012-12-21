@@ -85,32 +85,32 @@ void IsisMain() {
   }
   else {
     results += PvlKeyword("Compare", "Different");
-    results += PvlKeyword("Sample", sample);
-    results += PvlKeyword("Line", line);
-    results += PvlKeyword("Band", band);
+    results += PvlKeyword("Sample", toString(sample));
+    results += PvlKeyword("Line", toString(line));
+    results += PvlKeyword("Band", toString(band));
     if(stats.TotalPixels() < 1) {
-      results += PvlKeyword("AverageDifference", 0);
-      results += PvlKeyword("StandardDeviation", 0);
-      results += PvlKeyword("Variance", 0);
-      results += PvlKeyword("MinimumDifference", 0);
-      results += PvlKeyword("MaximumDifference", 0);
+      results += PvlKeyword("AverageDifference", "0");
+      results += PvlKeyword("StandardDeviation", "0");
+      results += PvlKeyword("Variance", "0");
+      results += PvlKeyword("MinimumDifference", "0");
+      results += PvlKeyword("MaximumDifference", "0");
     }
     else {
-      results += PvlKeyword("AverageDifference", (double)stats.Average());
-      results += PvlKeyword("StandardDeviation", (double)stats.StandardDeviation());
-      results += PvlKeyword("Variance", (double)stats.Variance());
-      results += PvlKeyword("MinimumDifference", (double)stats.Minimum());
-      results += PvlKeyword("MaximumDifference", (double)stats.Maximum());
-      results += PvlKeyword("MaxDifferenceSample", (int)gMaxDiffSample);
-      results += PvlKeyword("MaxDifferenceLine", (int)gMaxDiffLine);
-      results += PvlKeyword("MaxDifferenceBand", (int)gMaxDiffBand);
+      results += PvlKeyword("AverageDifference", toString(stats.Average()));
+      results += PvlKeyword("StandardDeviation", toString(stats.StandardDeviation()));
+      results += PvlKeyword("Variance", toString(stats.Variance()));
+      results += PvlKeyword("MinimumDifference", toString(stats.Minimum()));
+      results += PvlKeyword("MaximumDifference", toString(stats.Maximum()));
+      results += PvlKeyword("MaxDifferenceSample", toString(gMaxDiffSample));
+      results += PvlKeyword("MaxDifferenceLine", toString(gMaxDiffLine));
+      results += PvlKeyword("MaxDifferenceBand", toString(gMaxDiffBand));
     }
-    results += PvlKeyword("ValidPixelDifferences", stats.TotalPixels());
-    results += PvlKeyword("SpecialPixelDifferences", spCount);
-    results += PvlKeyword("SigFigAccuracy", (int)sigFigAccuracy);
-    results += PvlKeyword("SigFigMaxDifferenceSample", (int)sigFigSample);
-    results += PvlKeyword("SigFigMaxDifferenceLine", (int)sigFigLine);
-    results += PvlKeyword("SigFigMaxDifferenceBand", (int)sigFigBand);
+    results += PvlKeyword("ValidPixelDifferences", toString(stats.TotalPixels()));
+    results += PvlKeyword("SpecialPixelDifferences", toString(spCount));
+    results += PvlKeyword("SigFigAccuracy", toString(sigFigAccuracy));
+    results += PvlKeyword("SigFigMaxDifferenceSample", toString(sigFigSample));
+    results += PvlKeyword("SigFigMaxDifferenceLine", toString(sigFigLine));
+    results += PvlKeyword("SigFigMaxDifferenceBand", toString(sigFigBand));
   }
   Application::Log(results);
 
@@ -121,8 +121,8 @@ void IsisMain() {
     lab.Write(ui.GetFileName("TO", "txt"));
   }
   if(doTable) {
-    string filename = FileName(ui.GetFileName("TO", "txt")).expanded();
-    ofstream ofile(filename.c_str(), ios_base::app);
+    QString filename = FileName(ui.GetFileName("TO", "txt")).expanded();
+    ofstream ofile(filename.toAscii().data(), ios_base::app);
     diffTable(ofile, ui.GetInteger("PRECISION"));
   }
 
@@ -278,7 +278,7 @@ void diffTable(ofstream &target, int precision) {
   for(unsigned int i = 0; i < samps.size(); i++) {
     Column currCol;
     //Prepare and add the first file's column
-    currCol.SetName(IString("File1_") + IString(samps[i]));
+    currCol.SetName(QString("File1_") + toString(samps[i]));
     if((unsigned int)(colWidth + precision + 1) < currCol.Name().length()) {
       currCol.SetWidth(currCol.Name().length() + 1);
     }
@@ -290,7 +290,7 @@ void diffTable(ofstream &target, int precision) {
     cols.push_back(currCol);
 
     //Prepare and add the second file's column
-    currCol.SetName(IString("File2_") + IString(samps[i]));
+    currCol.SetName(QString("File2_") + toString(samps[i]));
     cols.push_back(currCol);
   }
 

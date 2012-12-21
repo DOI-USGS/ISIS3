@@ -31,10 +31,10 @@ using namespace std;
 namespace Isis {
 
   //! String names for Point Type
-  string sPointType [] = { "Fixed", "Constrained", "Free" };
+  QString sPointType [] = { "Fixed", "Constrained", "Free" };
 
   //! String values for Boolean
-  string sBoolean[]    = { "False", "True" };
+  QString sBoolean[]    = { "False", "True" };
 
   /**
    * ControlNetStatistics Constructor has ctor to it's base Control Network
@@ -45,7 +45,7 @@ namespace Isis {
    * @param psSerialNumFile - Serial Number List file
    * @param pProgress - Check Progress if not Null
    */
-  ControlNetStatistics::ControlNetStatistics(ControlNet *pCNet, const string &psSerialNumFile,
+  ControlNetStatistics::ControlNetStatistics(ControlNet *pCNet, const QString &psSerialNumFile,
                                              Progress *pProgress) {
     numCNetImages = 0;
     mCNet = pCNet;
@@ -94,7 +94,7 @@ namespace Isis {
     int numSn = mSerialNumList.Size();
     numCNetImages = 0;
     for (int i=0; i<numSn; i++) {
-      string sn = mSerialNumList.SerialNumber(i);
+      QString sn = mSerialNumList.SerialNumber(i);
       mSerialNumMap[sn] = false;
     }
   }
@@ -114,94 +114,94 @@ namespace Isis {
     int numSN = mSerialNumList.Size();
 
     if (numSN) {
-      pStatsGrp += PvlKeyword("TotalImages",             numSN);
-      pStatsGrp += PvlKeyword("ImagesInControlNet", numCNetImages);
+      pStatsGrp += PvlKeyword("TotalImages",             toString(numSN));
+      pStatsGrp += PvlKeyword("ImagesInControlNet", toString(numCNetImages));
     }
 
-    pStatsGrp += PvlKeyword("TotalPoints",       mCNet->GetNumPoints());
-    pStatsGrp += PvlKeyword("ValidPoints",       NumValidPoints());
-    pStatsGrp += PvlKeyword("IgnoredPoints",     mCNet->GetNumPoints() - NumValidPoints());
-    pStatsGrp += PvlKeyword("FixedPoints",       NumFixedPoints());
-    pStatsGrp += PvlKeyword("ConstrainedPoints", NumConstrainedPoints());
-    pStatsGrp += PvlKeyword("FreePoints",        NumFreePoints());
-    pStatsGrp += PvlKeyword("EditLockPoints",    mCNet->GetNumEditLockPoints());
+    pStatsGrp += PvlKeyword("TotalPoints",       toString(mCNet->GetNumPoints()));
+    pStatsGrp += PvlKeyword("ValidPoints",       toString(NumValidPoints()));
+    pStatsGrp += PvlKeyword("IgnoredPoints",     toString(mCNet->GetNumPoints() - NumValidPoints()));
+    pStatsGrp += PvlKeyword("FixedPoints",       toString(NumFixedPoints()));
+    pStatsGrp += PvlKeyword("ConstrainedPoints", toString(NumConstrainedPoints()));
+    pStatsGrp += PvlKeyword("FreePoints",        toString(NumFreePoints()));
+    pStatsGrp += PvlKeyword("EditLockPoints",    toString(mCNet->GetNumEditLockPoints()));
 
-    pStatsGrp += PvlKeyword("TotalMeasures",     NumMeasures());
-    pStatsGrp += PvlKeyword("ValidMeasures",     NumValidMeasures());
-    pStatsGrp += PvlKeyword("IgnoredMeasures",   NumIgnoredMeasures());
-    pStatsGrp += PvlKeyword("EditLockMeasures",  mCNet->GetNumEditLockMeasures());
+    pStatsGrp += PvlKeyword("TotalMeasures",     toString(NumMeasures()));
+    pStatsGrp += PvlKeyword("ValidMeasures",     toString(NumValidMeasures()));
+    pStatsGrp += PvlKeyword("IgnoredMeasures",   toString(NumIgnoredMeasures()));
+    pStatsGrp += PvlKeyword("EditLockMeasures",  toString(mCNet->GetNumEditLockMeasures()));
 
     double dValue = GetAverageResidual();
-    pStatsGrp += PvlKeyword("AvgResidual",       (dValue == Null ? "Null" : IString(dValue)));
+    pStatsGrp += PvlKeyword("AvgResidual",       (dValue == Null ? "Null" : toString(dValue)));
 
     dValue = GetMinimumResidual();
-    pStatsGrp += PvlKeyword("MinResidual",       (dValue == Null ? "Null" : IString(dValue)));
+    pStatsGrp += PvlKeyword("MinResidual",       (dValue == Null ? "Null" : toString(dValue)));
 
     dValue = GetMaximumResidual();
-    pStatsGrp += PvlKeyword("MaxResidual",       (dValue == Null ? "Null" : IString(dValue)));
+    pStatsGrp += PvlKeyword("MaxResidual",       (dValue == Null ? "Null" : toString(dValue)));
 
     dValue = GetMinLineResidual();
-    pStatsGrp += PvlKeyword("MinLineResidual",   (dValue == Null ? "Null" : IString(dValue)));
+    pStatsGrp += PvlKeyword("MinLineResidual",   (dValue == Null ? "Null" : toString(dValue)));
 
     dValue = GetMaxLineResidual();
-    pStatsGrp += PvlKeyword("MaxLineResidual",   (dValue == Null ? "Null" : IString(dValue)));
+    pStatsGrp += PvlKeyword("MaxLineResidual",   (dValue == Null ? "Null" : toString(dValue)));
 
     dValue = GetMinSampleResidual();
-    pStatsGrp += PvlKeyword("MinSampleResidual", (dValue == Null ? "Null" : IString(dValue)));
+    pStatsGrp += PvlKeyword("MinSampleResidual", (dValue == Null ? "Null" : toString(dValue)));
 
     dValue = GetMaxSampleResidual();
-    pStatsGrp += PvlKeyword("MaxSampleResidual", (dValue == Null ? "Null" : IString(dValue)));
+    pStatsGrp += PvlKeyword("MaxSampleResidual", (dValue == Null ? "Null" : toString(dValue)));
 
     // Shifts - Line, Sample, Pixel
     dValue = GetMinLineShift();
-    pStatsGrp += PvlKeyword("MinLineShift",      (dValue == Null ? "Null" : IString(dValue)));
+    pStatsGrp += PvlKeyword("MinLineShift",      (dValue == Null ? "Null" : toString(dValue)));
 
     dValue = GetMaxLineShift();
-    pStatsGrp += PvlKeyword("MaxLineShift",      (dValue == Null ? "Null" : IString(dValue)));
+    pStatsGrp += PvlKeyword("MaxLineShift",      (dValue == Null ? "Null" : toString(dValue)));
 
     dValue = GetMinSampleShift();
-    pStatsGrp += PvlKeyword("MinSampleShift",    (dValue == Null ? "Null" : IString(dValue)));
+    pStatsGrp += PvlKeyword("MinSampleShift",    (dValue == Null ? "Null" : toString(dValue)));
 
     dValue = GetMaxSampleShift();
-    pStatsGrp += PvlKeyword("MaxSampleShift",    (dValue == Null ? "Null" : IString(dValue)));
+    pStatsGrp += PvlKeyword("MaxSampleShift",    (dValue == Null ? "Null" : toString(dValue)));
 
     dValue = GetAvgPixelShift();
-    pStatsGrp += PvlKeyword("AvgPixelShift",     (dValue == Null ? "NA" : IString(dValue)));
+    pStatsGrp += PvlKeyword("AvgPixelShift",     (dValue == Null ? "NA" : toString(dValue)));
 
     dValue = GetMinPixelShift();
-    pStatsGrp += PvlKeyword("MinPixelShift",     (dValue == Null ? "NA" : IString(dValue)));
+    pStatsGrp += PvlKeyword("MinPixelShift",     (dValue == Null ? "NA" : toString(dValue)));
 
     dValue = GetMaxPixelShift();
-    pStatsGrp += PvlKeyword("MaxPixelShift",     (dValue == Null ? "NA" : IString(dValue)));
+    pStatsGrp += PvlKeyword("MaxPixelShift",     (dValue == Null ? "NA" : toString(dValue)));
 
     dValue = mPointDoubleStats[minGFit];
-    pStatsGrp += PvlKeyword("MinGoodnessOfFit",  (dValue == Null ? "NA" : IString(dValue)));
+    pStatsGrp += PvlKeyword("MinGoodnessOfFit",  (dValue == Null ? "NA" : toString(dValue)));
 
     dValue = mPointDoubleStats[maxGFit];
-    pStatsGrp += PvlKeyword("MaxGoodnessOfFit",  (dValue == Null ? "NA" : IString(dValue)));
+    pStatsGrp += PvlKeyword("MaxGoodnessOfFit",  (dValue == Null ? "NA" : toString(dValue)));
 
     dValue = mPointDoubleStats[minEccentricity];
-    pStatsGrp += PvlKeyword("MinEccentricity",   (dValue == Null ? "NA" : IString(dValue)));
+    pStatsGrp += PvlKeyword("MinEccentricity",   (dValue == Null ? "NA" : toString(dValue)));
 
     dValue = mPointDoubleStats[maxEccentricity];
-    pStatsGrp += PvlKeyword("MaxEccentricity",   (dValue == Null ? "NA" : IString(dValue)));
+    pStatsGrp += PvlKeyword("MaxEccentricity",   (dValue == Null ? "NA" : toString(dValue)));
 
     dValue = mPointDoubleStats[minPixelZScore];
-    pStatsGrp += PvlKeyword("MinPixelZScore",    (dValue == Null ? "NA" : IString(dValue)));
+    pStatsGrp += PvlKeyword("MinPixelZScore",    (dValue == Null ? "NA" : toString(dValue)));
 
     dValue = mPointDoubleStats[maxPixelZScore];
-    pStatsGrp += PvlKeyword("MaxPixelZScore",    (dValue == Null ? "NA" : IString(dValue)));
+    pStatsGrp += PvlKeyword("MaxPixelZScore",    (dValue == Null ? "NA" : toString(dValue)));
 
     // Convex Hull
     if (mSerialNumList.Size()) {
       dValue = mConvexHullRatioStats.Minimum();
-      pStatsGrp += PvlKeyword("MinConvexHullRatio", (dValue == Null ? "Null" : IString(dValue)));
+      pStatsGrp += PvlKeyword("MinConvexHullRatio", (dValue == Null ? "Null" : toString(dValue)));
 
       dValue = mConvexHullRatioStats.Maximum();
-      pStatsGrp += PvlKeyword("MaxConvexHullRatio", (dValue == Null ? "Null" : IString(dValue)));
+      pStatsGrp += PvlKeyword("MaxConvexHullRatio", (dValue == Null ? "Null" : toString(dValue)));
 
       dValue = mConvexHullRatioStats.Average();
-      pStatsGrp += PvlKeyword("AvgConvexHullRatio", (dValue == Null ? "Null" : IString(dValue)));
+      pStatsGrp += PvlKeyword("AvgConvexHullRatio", (dValue == Null ? "Null" : toString(dValue)));
     }
   }
 
@@ -235,7 +235,7 @@ namespace Isis {
       vector<double> imgStats(numImageStats, 0);
 
       // Open the cube to get the dimensions
-      IString sn = node->getSerialNumber();
+      QString sn = node->getSerialNumber();
       Cube *cube = cubeMgr.OpenCube(mSerialNumList.FileName(sn));
 
       mSerialNumMap[sn] = true;
@@ -317,20 +317,20 @@ namespace Isis {
    *
    * @param psImageFile - Output Image Stats File
    */
-  void ControlNetStatistics::PrintImageStats(const string &psImageFile) {
+  void ControlNetStatistics::PrintImageStats(const QString &psImageFile) {
     // Check if the image list has been provided
     if (!mSerialNumList.Size()) {
-      string msg = "Serial Number of Images has not been provided to get Image Stats";
+      QString msg = "Serial Number of Images has not been provided to get Image Stats";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     FileName outFile(psImageFile);
     ofstream ostm;
-    string outName(outFile.expanded());
-    ostm.open(outName.c_str(), std::ios::out);
+    QString outName(outFile.expanded());
+    ostm.open(outName.toAscii().data(), std::ios::out);
 
-    //map< string, vector<double> >::iterator it;
-    map<string, bool>::iterator it;
+    //map< QString, vector<double> >::iterator it;
+    map<QString, bool>::iterator it;
     // imgSamples, imgLines, imgTotalPoints, imgIgnoredPoints, imgFixedPoints, imgLockedPoints, imgLocked, imgConstrainedPoints, imgFreePoints, imgConvexHullArea, imgConvexHullRatio
 
     // Log into the output file
@@ -363,7 +363,7 @@ namespace Isis {
    *
    * @return const vector<double>
    */
-  vector<double> ControlNetStatistics::GetImageStatsBySerialNum(string psSerialNum) const {
+  vector<double> ControlNetStatistics::GetImageStatsBySerialNum(QString psSerialNum) const {
     return (*mImageMap.find(psSerialNum)).second;
   }
 
@@ -377,12 +377,12 @@ namespace Isis {
    *
    * @param psPointFile - Output Point Statisitics File
    */
-  void ControlNetStatistics::GeneratePointStats(const string &psPointFile) {
+  void ControlNetStatistics::GeneratePointStats(const QString &psPointFile) {
     Isis::FileName outFile(psPointFile);
 
     ofstream ostm;
-    string outName(outFile.expanded());
-    ostm.open(outName.c_str(), std::ios::out);
+    QString outName(outFile.expanded());
+    ostm.open(outName.toAscii().data(), std::ios::out);
     ostm << " PointId, PointType, PointIgnore, PointEditLock, TotalMeasures, MeasuresValid, MeasuresIgnore, MeasuresEditLock," << endl;
 
     int iNumPoints = mCNet->GetNumPoints();

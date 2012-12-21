@@ -1,4 +1,4 @@
-#if !defined(Database_h)
+#ifndef Database_h
 #define Database_h
 /**
  * @file
@@ -76,7 +76,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2007-06-05 Brendan George - Modified to work with
-   *          IString/StringTools merge
+   *          QString/StringTools merge
    *   @history 2008-10-30 Steven Lambright - tossDbError now accepts a const
    *            char* for a filename, issue pointed out by "novus0x2a" (Support
    *            Board Member)
@@ -91,47 +91,47 @@ namespace Isis {
 
       Database();
       Database(Access dbConn);
-      Database(const std::string &connName, const std::string &driverType);
-      Database(const std::string &name, Access dbConn = Connect);
+      Database(const QString &connName, const QString &driverType);
+      Database(const QString &name, Access dbConn = Connect);
       Database(const DbProfile &profile, Access dbConn = Connect);
       virtual ~Database();
 
       /**
        * @brief Return the name of this database as specifed upon creation
        *
-       * @return std::string The name of this database
+       * @return QString The name of this database
        */
-      std::string Name() const {
+      QString Name() const {
         return (_name);
       }
 
       void makePersistant();
       bool isPersistant() const;
       void setAsDefault();
-      Database clone(const std::string &name) const;
-      std::vector<std::string> getTables() const;
-      std::vector<std::string> getViews() const;
-      std::vector<std::string> getSystemTables() const;
+      Database clone(const QString &name) const;
+      QStringList getTables() const;
+      QStringList getViews() const;
+      QStringList getSystemTables() const;
 
-      static void remove(const std::string &name);
+      static void remove(const QString &name);
 
-      static bool addAccessConfig(const std::string &confFile);
-      static DbProfile getProfile(const std::string &name);
+      static bool addAccessConfig(const QString &confFile);
+      static DbProfile getProfile(const QString &name);
 
     protected:
-      Database(const QSqlDatabase &other, const std::string &name);
+      Database(const QSqlDatabase &other, const QString &name);
       QSqlDatabase init(const DbProfile &profile, Access dbConn = Connect);
-      QSqlDatabase init(const std::string &name = "",
-                        const std::string &driverType = "");
+      QSqlDatabase init(const QString &name = "",
+                        const QString &driverType = "");
       void configureAccess(QSqlDatabase &db, const DbProfile &profile);
 
     private:
-      static std::string _actualConnectionName; /** Needed due to peculiar
+      static QString _actualConnectionName; /** Needed due to peculiar
                                                  * issues with Database
                                                  * construction techniques */
-      std::string _name;           //!<  Name of the connection
+      QString _name;           //!<  Name of the connection
 
-      void tossDbError(const std::string &message, const char *f, int l) const;
+      void tossDbError(const QString &message, const char *f, int l) const;
   };
 
 }

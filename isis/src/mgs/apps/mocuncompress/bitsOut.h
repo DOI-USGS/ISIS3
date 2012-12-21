@@ -40,7 +40,7 @@ SCCSID @(#)bitsOut.h  1.1 10/04/99
 */
 /* SCCShid @(#)bitsOut.h (bitsOut.h) 1.4 */
 
-#if !defined(bitsOut_h)
+#ifndef bitsOut_h
 
 #define bitsOut_h
 

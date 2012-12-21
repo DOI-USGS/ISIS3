@@ -51,7 +51,7 @@ IsisXMLHandler::IsisXMLHandler() {
 IsisXMLHandler::IsisXMLHandler(char *PencodingName,
                                bool &PexpandNamespaces,
                                XERCES::SAX2XMLReader* &Pparser,
-                               std::string *Pvalue) {
+                               QString *Pvalue) {
 
   encodingName = PencodingName;
   expandNamespaces = PexpandNamespaces;
@@ -121,9 +121,9 @@ void IsisXMLHandler::characters(const XMLCh *const chars,
                                 const XMLSize_t length) {
 
   if(value != NULL) {
-    Isis::IString str;
-    str = (string)XERCES::XMLString::transcode(chars);
-    str.Trim(" \n\r");
+    QString str;
+    str = XERCES::XMLString::transcode(chars);
+    str = str.trimmed();
     *value += str;
   }
 }
@@ -138,8 +138,8 @@ void IsisXMLHandler::endElement(const XMLCh *const uri,
                                 const XMLCh *const qname) {
 
   if(outputEndTag > 0) {
-    Isis::IString str;
-    str = (string)XERCES::XMLString::transcode(localname);
+    QString str;
+    str = XERCES::XMLString::transcode(localname);
     *value += "</" + str + ">";
     outputEndTag--;
   }
@@ -171,8 +171,8 @@ void IsisXMLHandler::startElement(const XMLCh *const uri,
                                   const XERCES::Attributes &attributes) {
 
   if(value != NULL) {
-    Isis::IString str;
-    str = (string)XERCES::XMLString::transcode(localname);
+    QString str;
+    str = XERCES::XMLString::transcode(localname);
     // Note: need to build the attributes into the string too
     *value += "<" + str + ">";
     outputEndTag++;

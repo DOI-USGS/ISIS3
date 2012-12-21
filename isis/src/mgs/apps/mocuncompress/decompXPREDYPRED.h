@@ -40,7 +40,7 @@ SCCSID @(#)decompXPREDYPRED.h  1.1 10/04/99
 */
 /* SCCShid @(#)decompXPREDYPRED.h (decompXPREDYPRED.h) 1.2 */
 
-#if !defined(decompXPREDYPRED_h)
+#ifndef decompXPREDYPRED_h
 
 #define decompXPREDYPRED_h
 

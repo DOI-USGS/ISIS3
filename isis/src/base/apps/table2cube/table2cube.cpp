@@ -10,7 +10,7 @@ using namespace std;
 using namespace Isis;
 
 Table *g_table;
-IString g_field;
+QString g_field;
 int g_startRecord;
 int g_numRecords;
 int g_startElement;

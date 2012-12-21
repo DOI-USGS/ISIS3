@@ -30,19 +30,16 @@ class QWidget;
 namespace Isis {
   class ControlMeasure;
   class ControlNet;
-  class Cube;
-  class IString;
-  class Stretch;
-  class UniversalGroundMap;
-}
-
-namespace Isis {
   class ControlPointEdit;
+  class Cube;
   class CubeViewport;
   class MainWindow;
   class MdiCubeViewport;
   class QnetHoldPointDialog;
+  class Stretch;
   class ToolPad;
+  class UniversalGroundMap;
+
   /**
    * @brief Qnet tool operations
    *
@@ -321,7 +318,7 @@ namespace Isis {
       void initDem(QString demFile);
       double demRadius(double latitude, double longitude);
       void clearGroundSource();
-      bool IsMeasureLocked(IString serialNumber);
+      bool IsMeasureLocked(QString serialNumber);
 
       void readSettings();
       void writeSettings() const;
@@ -415,7 +412,7 @@ namespace Isis {
 
       QString p_groundFile;
       Cube *p_groundCube;
-      IString p_groundSN;
+      QString p_groundSN;
       UniversalGroundMap *p_groundGmap;
       bool p_groundOpen;
       ControlPoint::SurfacePointSource::Source p_groundSurfacePointSource;
@@ -423,8 +420,8 @@ namespace Isis {
       //  TODO:  Combine the following p_groundSourceFile, p_radiusSourceFile
       //           with p_groundFile and p_demFile.  Is it just a matter of
       //           full path vs filename only?
-      IString p_groundSourceFile;
-      IString p_radiusSourceFile;
+      QString p_groundSourceFile;
+      QString p_radiusSourceFile;
       QString p_demFile;
       bool p_demOpen;
       Cube *p_demCube;

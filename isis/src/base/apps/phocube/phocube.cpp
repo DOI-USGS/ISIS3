@@ -46,7 +46,7 @@ void phocube(Buffer &out);
 
 
 // Function to create a keyword with same values of a specified count
-template <typename T> PvlKeyword makeKey(const std::string &name, 
+template <typename T> PvlKeyword makeKey(const QString &name, 
                                          const int &nvals, 
                                          const T &value);
 
@@ -60,8 +60,8 @@ struct MosData {
 // Computes the special MORPHOLOGY and ALBEDO planes
 MosData *getMosaicIndicies(Camera &camera, MosData &md);
 // Updates BandBin keyword
-void UpdateBandKey(const std::string &keyname, PvlGroup &bb, const int &nvals, 
-                   const std::string &default_value = "Null");
+void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals, 
+                   const QString &default_value = "Null");
 
 
 
@@ -84,7 +84,7 @@ void IsisMain() {
       proj = icube->getProjection();
     }
     catch(IException &e) {
-      string msg = "Mosaic files must contain mapping labels";
+      QString msg = "Mosaic files must contain mapping labels";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
   } 
@@ -93,7 +93,7 @@ void IsisMain() {
       cam = icube->getCamera();
     }
     catch(IException &e) {
-      string msg = "Input file needs to have spiceinit run on it - if this file ";
+      QString msg = "Input file needs to have spiceinit run on it - if this file ";
       msg += "is a mosaic, then check the MOSAICONLY box";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
@@ -144,14 +144,14 @@ void IsisMain() {
   if((pixelResolution = ui.GetBoolean("PIXELRESOLUTION"))) nbands++;
 
   if(nbands < 1) {
-    string message = "At least one photometry parameter must be entered"
+    QString message = "At least one photometry parameter must be entered"
                      "[PHASE, EMISSION, INCIDENCE, LATITUDE, LONGITUDE...]";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
   // Retrieve the orignal values from the input cube band
   PvlGroup &mybb = icube->getGroup("BandBin");
-  string bname("DN");
+  QString bname("DN");
   if ( mybb.HasKeyword("Name") ) {
     bname = mybb["Name"][0];
   }
@@ -407,7 +407,7 @@ void phocube(Buffer &out) {
 
 // Function to create a keyword with same values of a specified count
 template <typename T>
-  PvlKeyword makeKey(const std::string &name, const int &nvals,
+  PvlKeyword makeKey(const QString &name, const int &nvals,
                      const T &value) {
     PvlKeyword key(name);
     for (int i = 0 ; i < nvals ; i++) {
@@ -458,10 +458,10 @@ MosData *getMosaicIndicies(Camera &camera, MosData &md) {
 //  existance of the keyword and uses its (assumed) first value to set nvals
 //  values to a constant.  If the keyword doesn't exist, it uses the default
 //  value.
-void UpdateBandKey(const std::string &keyname, PvlGroup &bb, const int &nvals,
-                   const std::string &default_value) {
+void UpdateBandKey(const QString &keyname, PvlGroup &bb, const int &nvals,
+                   const QString &default_value) {
 
-  string defVal(default_value);
+  QString defVal(default_value);
   if ( bb.HasKeyword(keyname) ) {
     defVal = bb[keyname][0];
   }

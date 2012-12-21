@@ -25,11 +25,9 @@
 
 #include "Equalization.h"
 
-// TODO Qt instead
 #include <string>
 #include <vector>
 
-// TODO Don't include
 #include "FileList.h"
 
 
@@ -74,14 +72,14 @@ namespace Isis {
       };
 
     public:
-      HiEqualization(std::string fromListName);
+      HiEqualization(QString fromListName);
       virtual ~HiEqualization();
 
       void calculateStatistics();
 
     protected:
-      virtual void fillOutList(FileList &outList, std::string toListName);
-      virtual void errorCheck(std::string fromListName);
+      virtual void fillOutList(FileList &outList, QString toListName);
+      virtual void errorCheck(QString fromListName);
 
     private:
       int getCCDType(int ccd);

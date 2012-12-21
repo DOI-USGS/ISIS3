@@ -40,7 +40,7 @@ SCCSID @(#)predictiveDecompressor.h  1.1 10/04/99
 */
 /* SCCShid @(#)predictiveDecompressor.h (predictiveDecompressor.h) 1.4 */
 
-#if !defined(predictiveDecompressor_h)
+#ifndef predictiveDecompressor_h
 
 #define predictiveDecompressor_h
 

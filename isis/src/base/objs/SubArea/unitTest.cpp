@@ -25,7 +25,7 @@ void IsisMain() {
   int onl, ons;
 
   p1.SetInputCube("FROM1");
-  string from1 = ui.GetFileName("FROM1");
+  QString from1 = ui.GetFileName("FROM1");
   Cube inomapcube;
   inomapcube.open(from1);
   inl = inomapcube.getLineCount();
@@ -41,16 +41,16 @@ void IsisMain() {
   Cube *onomapcube = p1.SetOutputCube("TO", ons, onl, 1);
 
   PvlGroup results("Results");
-  results += PvlKeyword("InputLines", inl);
-  results += PvlKeyword("InputSamples", ins);
-  results += PvlKeyword("StartingLine", sl);
-  results += PvlKeyword("StartingSample", ss);
-  results += PvlKeyword("EndingLine", el);
-  results += PvlKeyword("EndingSample", es);
-  results += PvlKeyword("LineIncrement", linc);
-  results += PvlKeyword("SampleIncrement", sinc);
-  results += PvlKeyword("OutputLines", onl);
-  results += PvlKeyword("OutputSamples", ons);
+  results += PvlKeyword("InputLines", toString(inl));
+  results += PvlKeyword("InputSamples", toString(ins));
+  results += PvlKeyword("StartingLine", toString(sl));
+  results += PvlKeyword("StartingSample", toString(ss));
+  results += PvlKeyword("EndingLine", toString(el));
+  results += PvlKeyword("EndingSample", toString(es));
+  results += PvlKeyword("LineIncrement", toString(linc));
+  results += PvlKeyword("SampleIncrement", toString(sinc));
+  results += PvlKeyword("OutputLines", toString(onl));
+  results += PvlKeyword("OutputSamples", toString(ons));
 
   SubArea s;
   s.SetSubArea(inl, ins, sl, ss, el, es, linc, sinc);
@@ -75,7 +75,7 @@ void IsisMain() {
   p1.EndProcess();
 
   cout << "Output cube label: " << endl << endl;
-  string file = ui.GetFileName("TO");
+  QString file = ui.GetFileName("TO");
   Pvl label(file);
   cout << label.FindObject("IsisCube").FindObject("Core").FindGroup("Dimensions") << endl << endl;
   if(label.FindObject("IsisCube").HasGroup("Instrument")) {
@@ -101,16 +101,16 @@ void IsisMain() {
   ons = (int)ceil((double)(es - ss + 1) / sinc);
   onomapcube = p2.SetOutputCube("TO", ons, onl, 1);
 
-  results += PvlKeyword("InputLines", inl);
-  results += PvlKeyword("InputSamples", ins);
-  results += PvlKeyword("StartingLine", sl);
-  results += PvlKeyword("StartingSample", ss);
-  results += PvlKeyword("EndingLine", el);
-  results += PvlKeyword("EndingSample", es);
-  results += PvlKeyword("LineIncrement", linc);
-  results += PvlKeyword("SampleIncrement", sinc);
-  results += PvlKeyword("OutputLines", onl);
-  results += PvlKeyword("OutputSamples", ons);
+  results += PvlKeyword("InputLines", toString(inl));
+  results += PvlKeyword("InputSamples", toString(ins));
+  results += PvlKeyword("StartingLine", toString(sl));
+  results += PvlKeyword("StartingSample", toString(ss));
+  results += PvlKeyword("EndingLine", toString(el));
+  results += PvlKeyword("EndingSample", toString(es));
+  results += PvlKeyword("LineIncrement", toString(linc));
+  results += PvlKeyword("SampleIncrement", toString(sinc));
+  results += PvlKeyword("OutputLines", toString(onl));
+  results += PvlKeyword("OutputSamples", toString(ons));
 
   s.SetSubArea(inl, ins, sl, ss, el, es, linc, sinc);
   s.UpdateLabel(&inomapcube, onomapcube, results);
@@ -147,16 +147,16 @@ void IsisMain() {
   ons = (int)ceil((double)(es - ss + 1) / sinc);
   onomapcube = p3.SetOutputCube("TO", ons, onl, 1);
 
-  results += PvlKeyword("InputLines", inl);
-  results += PvlKeyword("InputSamples", ins);
-  results += PvlKeyword("StartingLine", sl);
-  results += PvlKeyword("StartingSample", ss);
-  results += PvlKeyword("EndingLine", el);
-  results += PvlKeyword("EndingSample", es);
-  results += PvlKeyword("LineIncrement", linc);
-  results += PvlKeyword("SampleIncrement", sinc);
-  results += PvlKeyword("OutputLines", onl);
-  results += PvlKeyword("OutputSamples", ons);
+  results += PvlKeyword("InputLines", toString(inl));
+  results += PvlKeyword("InputSamples", toString(ins));
+  results += PvlKeyword("StartingLine", toString(sl));
+  results += PvlKeyword("StartingSample", toString(ss));
+  results += PvlKeyword("EndingLine", toString(el));
+  results += PvlKeyword("EndingSample", toString(es));
+  results += PvlKeyword("LineIncrement", toString(linc));
+  results += PvlKeyword("SampleIncrement", toString(sinc));
+  results += PvlKeyword("OutputLines", toString(onl));
+  results += PvlKeyword("OutputSamples", toString(ons));
 
   s.SetSubArea(inl, ins, sl, ss, el, es, linc, sinc);
   s.UpdateLabel(&inomapcube, onomapcube, results);
@@ -197,16 +197,16 @@ void IsisMain() {
   ons = (int)ceil((double)(es - ss + 1) / sinc);
   onomapcube = p4.SetOutputCube("TO", ons, onl, 1);
 
-  results += PvlKeyword("InputLines", inl);
-  results += PvlKeyword("InputSamples", ins);
-  results += PvlKeyword("StartingLine", sl);
-  results += PvlKeyword("StartingSample", ss);
-  results += PvlKeyword("EndingLine", el);
-  results += PvlKeyword("EndingSample", es);
-  results += PvlKeyword("LineIncrement", linc);
-  results += PvlKeyword("SampleIncrement", sinc);
-  results += PvlKeyword("OutputLines", onl);
-  results += PvlKeyword("OutputSamples", ons);
+  results += PvlKeyword("InputLines", toString(inl));
+  results += PvlKeyword("InputSamples", toString(ins));
+  results += PvlKeyword("StartingLine", toString(sl));
+  results += PvlKeyword("StartingSample", toString(ss));
+  results += PvlKeyword("EndingLine", toString(el));
+  results += PvlKeyword("EndingSample", toString(es));
+  results += PvlKeyword("LineIncrement", toString(linc));
+  results += PvlKeyword("SampleIncrement", toString(sinc));
+  results += PvlKeyword("OutputLines", toString(onl));
+  results += PvlKeyword("OutputSamples", toString(ons));
 
   s.SetSubArea(inl, ins, sl, ss, el, es, linc, sinc);
   s.UpdateLabel(&inomapcube, onomapcube, results);
@@ -243,16 +243,16 @@ void IsisMain() {
   ons = (int)ceil((double)(es - ss + 1) / sinc);
   onomapcube = p5.SetOutputCube("TO", ons, onl, 1);
 
-  results += PvlKeyword("InputLines", inl);
-  results += PvlKeyword("InputSamples", ins);
-  results += PvlKeyword("StartingLine", sl);
-  results += PvlKeyword("StartingSample", ss);
-  results += PvlKeyword("EndingLine", el);
-  results += PvlKeyword("EndingSample", es);
-  results += PvlKeyword("LineIncrement", linc);
-  results += PvlKeyword("SampleIncrement", sinc);
-  results += PvlKeyword("OutputLines", onl);
-  results += PvlKeyword("OutputSamples", ons);
+  results += PvlKeyword("InputLines", toString(inl));
+  results += PvlKeyword("InputSamples", toString(ins));
+  results += PvlKeyword("StartingLine", toString(sl));
+  results += PvlKeyword("StartingSample", toString(ss));
+  results += PvlKeyword("EndingLine", toString(el));
+  results += PvlKeyword("EndingSample", toString(es));
+  results += PvlKeyword("LineIncrement", toString(linc));
+  results += PvlKeyword("SampleIncrement", toString(sinc));
+  results += PvlKeyword("OutputLines", toString(onl));
+  results += PvlKeyword("OutputSamples", toString(ons));
 
   s.SetSubArea(inl, ins, sl, ss, el, es, linc, sinc);
   s.UpdateLabel(&inomapcube, onomapcube, results);
@@ -285,7 +285,7 @@ void IsisMain() {
 
   ProcessByLine p6;
   p6.SetInputCube("FROM2");
-  string from2 = ui.GetFileName("FROM2");
+  QString from2 = ui.GetFileName("FROM2");
   Cube imapcube;
   imapcube.open(from2);
   inl = imapcube.getLineCount();
@@ -300,16 +300,16 @@ void IsisMain() {
   ons = (int)ceil((double)(es - ss + 1) / sinc);
   Cube *omapcube = p6.SetOutputCube("TO", ons, onl, 1);
 
-  results += PvlKeyword("InputLines", inl);
-  results += PvlKeyword("InputSamples", ins);
-  results += PvlKeyword("StartingLine", sl);
-  results += PvlKeyword("StartingSample", ss);
-  results += PvlKeyword("EndingLine", el);
-  results += PvlKeyword("EndingSample", es);
-  results += PvlKeyword("LineIncrement", linc);
-  results += PvlKeyword("SampleIncrement", sinc);
-  results += PvlKeyword("OutputLines", onl);
-  results += PvlKeyword("OutputSamples", ons);
+  results += PvlKeyword("InputLines", toString(inl));
+  results += PvlKeyword("InputSamples", toString(ins));
+  results += PvlKeyword("StartingLine", toString(sl));
+  results += PvlKeyword("StartingSample", toString(ss));
+  results += PvlKeyword("EndingLine", toString(el));
+  results += PvlKeyword("EndingSample", toString(es));
+  results += PvlKeyword("LineIncrement", toString(linc));
+  results += PvlKeyword("SampleIncrement", toString(sinc));
+  results += PvlKeyword("OutputLines", toString(onl));
+  results += PvlKeyword("OutputSamples", toString(ons));
 
   s.SetSubArea(inl, ins, sl, ss, el, es, linc, sinc);
   s.UpdateLabel(&imapcube, omapcube, results);
@@ -357,16 +357,16 @@ void IsisMain() {
   ons = (int)ceil((double)(es - ss + 1) / sinc);
   omapcube = p7.SetOutputCube("TO", ons, onl, 1);
 
-  results += PvlKeyword("InputLines", inl);
-  results += PvlKeyword("InputSamples", ins);
-  results += PvlKeyword("StartingLine", sl);
-  results += PvlKeyword("StartingSample", ss);
-  results += PvlKeyword("EndingLine", el);
-  results += PvlKeyword("EndingSample", es);
-  results += PvlKeyword("LineIncrement", linc);
-  results += PvlKeyword("SampleIncrement", sinc);
-  results += PvlKeyword("OutputLines", onl);
-  results += PvlKeyword("OutputSamples", ons);
+  results += PvlKeyword("InputLines", toString(inl));
+  results += PvlKeyword("InputSamples", toString(ins));
+  results += PvlKeyword("StartingLine", toString(sl));
+  results += PvlKeyword("StartingSample", toString(ss));
+  results += PvlKeyword("EndingLine", toString(el));
+  results += PvlKeyword("EndingSample", toString(es));
+  results += PvlKeyword("LineIncrement", toString(linc));
+  results += PvlKeyword("SampleIncrement", toString(sinc));
+  results += PvlKeyword("OutputLines", toString(onl));
+  results += PvlKeyword("OutputSamples", toString(ons));
 
   s.SetSubArea(inl, ins, sl, ss, el, es, linc, sinc);
   s.UpdateLabel(&imapcube, omapcube, results);
@@ -403,16 +403,16 @@ void IsisMain() {
   ons = (int)ceil((double)(es - ss + 1) / sinc);
   omapcube = p8.SetOutputCube("TO", ons, onl, 1);
 
-  results += PvlKeyword("InputLines", inl);
-  results += PvlKeyword("InputSamples", ins);
-  results += PvlKeyword("StartingLine", sl);
-  results += PvlKeyword("StartingSample", ss);
-  results += PvlKeyword("EndingLine", el);
-  results += PvlKeyword("EndingSample", es);
-  results += PvlKeyword("LineIncrement", linc);
-  results += PvlKeyword("SampleIncrement", sinc);
-  results += PvlKeyword("OutputLines", onl);
-  results += PvlKeyword("OutputSamples", ons);
+  results += PvlKeyword("InputLines", toString(inl));
+  results += PvlKeyword("InputSamples", toString(ins));
+  results += PvlKeyword("StartingLine", toString(sl));
+  results += PvlKeyword("StartingSample", toString(ss));
+  results += PvlKeyword("EndingLine", toString(el));
+  results += PvlKeyword("EndingSample", toString(es));
+  results += PvlKeyword("LineIncrement", toString(linc));
+  results += PvlKeyword("SampleIncrement", toString(sinc));
+  results += PvlKeyword("OutputLines", toString(onl));
+  results += PvlKeyword("OutputSamples", toString(ons));
 
   s.SetSubArea(inl, ins, sl, ss, el, es, linc, sinc);
   s.UpdateLabel(&imapcube, omapcube, results);
@@ -453,16 +453,16 @@ void IsisMain() {
   ons = (int)ceil((double)(es - ss + 1) / sinc);
   omapcube = p9.SetOutputCube("TO", ons, onl, 1);
 
-  results += PvlKeyword("InputLines", inl);
-  results += PvlKeyword("InputSamples", ins);
-  results += PvlKeyword("StartingLine", sl);
-  results += PvlKeyword("StartingSample", ss);
-  results += PvlKeyword("EndingLine", el);
-  results += PvlKeyword("EndingSample", es);
-  results += PvlKeyword("LineIncrement", linc);
-  results += PvlKeyword("SampleIncrement", sinc);
-  results += PvlKeyword("OutputLines", onl);
-  results += PvlKeyword("OutputSamples", ons);
+  results += PvlKeyword("InputLines", toString(inl));
+  results += PvlKeyword("InputSamples", toString(ins));
+  results += PvlKeyword("StartingLine", toString(sl));
+  results += PvlKeyword("StartingSample", toString(ss));
+  results += PvlKeyword("EndingLine", toString(el));
+  results += PvlKeyword("EndingSample", toString(es));
+  results += PvlKeyword("LineIncrement", toString(linc));
+  results += PvlKeyword("SampleIncrement", toString(sinc));
+  results += PvlKeyword("OutputLines", toString(onl));
+  results += PvlKeyword("OutputSamples", toString(ons));
 
   s.SetSubArea(inl, ins, sl, ss, el, es, linc, sinc);
   s.UpdateLabel(&imapcube, omapcube, results);
@@ -499,16 +499,16 @@ void IsisMain() {
   ons = (int)ceil((double)(es - ss + 1) / sinc);
   omapcube = p10.SetOutputCube("TO", ons, onl, 1);
 
-  results += PvlKeyword("InputLines", inl);
-  results += PvlKeyword("InputSamples", ins);
-  results += PvlKeyword("StartingLine", sl);
-  results += PvlKeyword("StartingSample", ss);
-  results += PvlKeyword("EndingLine", el);
-  results += PvlKeyword("EndingSample", es);
-  results += PvlKeyword("LineIncrement", linc);
-  results += PvlKeyword("SampleIncrement", sinc);
-  results += PvlKeyword("OutputLines", onl);
-  results += PvlKeyword("OutputSamples", ons);
+  results += PvlKeyword("InputLines", toString(inl));
+  results += PvlKeyword("InputSamples", toString(ins));
+  results += PvlKeyword("StartingLine", toString(sl));
+  results += PvlKeyword("StartingSample", toString(ss));
+  results += PvlKeyword("EndingLine", toString(el));
+  results += PvlKeyword("EndingSample", toString(es));
+  results += PvlKeyword("LineIncrement", toString(linc));
+  results += PvlKeyword("SampleIncrement", toString(sinc));
+  results += PvlKeyword("OutputLines", toString(onl));
+  results += PvlKeyword("OutputSamples", toString(ons));
 
   s.SetSubArea(inl, ins, sl, ss, el, es, linc, sinc);
   s.UpdateLabel(&imapcube, omapcube, results);

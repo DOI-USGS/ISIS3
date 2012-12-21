@@ -38,7 +38,7 @@ namespace Isis {
    * @f]
    * has three coefficients: C1, C2 & C3.
    */
-  Basis1VariableFunction::Basis1VariableFunction(const std::string &name, int numCoefs) :
+  Basis1VariableFunction::Basis1VariableFunction(const QString &name, int numCoefs) :
     Isis::BasisFunction(name, 1, numCoefs) {
   }
 

@@ -57,14 +57,14 @@ namespace Isis {
     m_emissionAngle = Null;
 
     try {
-      Table table("CameraStatistics", m_filename.toStdString());
+      Table table("CameraStatistics", m_filename);
       //Table table("CameraStatistics", m_filename.Name());
       for (int i = 0; i < table.Records(); i++) {
         for (int j = 0; j < table[i].Fields(); j++) {
           QString label;
 
           if (table[i][j].isText()) {
-            label = QString::fromStdString((std::string)table[i][j]);
+            label = (QString)table[i][j];
             label.truncate(10);
           }
 
@@ -138,7 +138,7 @@ namespace Isis {
 
 
   void CubeDisplayProperties::fromPvl(const PvlObject &pvl) {
-    QByteArray hexValues(pvl["Values"][0].c_str());
+    QByteArray hexValues(pvl["Values"][0].toAscii());
     QDataStream valuesStream(QByteArray::fromHex(hexValues));
     valuesStream >> *m_propertyValues;
   }
@@ -213,7 +213,7 @@ namespace Isis {
   Cube *CubeDisplayProperties::cube() {
     if (!m_cube) {
       m_cube = new Cube;
-      m_cube->open(m_filename.toStdString());
+      m_cube->open(m_filename);
     }
 
     return m_cube;
@@ -226,7 +226,7 @@ namespace Isis {
    */
   UniversalGroundMap *CubeDisplayProperties::groundMap() {
     if (m_gMap == NULL) {
-      Pvl lab(m_filename.toStdString());
+      Pvl lab(m_filename);
       m_gMap = new UniversalGroundMap(lab);
     }
 
@@ -238,7 +238,7 @@ namespace Isis {
    * Returns the display name
    */
   QString CubeDisplayProperties::displayName() const {
-    return FileName(m_filename.toStdString()).name();
+    return FileName(m_filename).name();
   }
 
 

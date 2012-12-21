@@ -12,7 +12,7 @@ using namespace Isis;
 int main() {
   Isis::Preference::Preferences(true);
 
-  string keywordsToTry[] = {
+  QString keywordsToTry[] = {
     "KEYWORD",
     "KEYWORD X",
     "KEYWORD =",
@@ -62,12 +62,12 @@ int main() {
   cout << "----- Testing Basic Read/Write -----" << endl;
   PvlKeyword keyword;
   for(unsigned int key = 0;
-      key < sizeof(keywordsToTry) / sizeof(string);
+      key < sizeof(keywordsToTry) / sizeof(QString);
       key++) {
-    string keywordCpy = keywordsToTry[key];
-    while(keywordCpy.find("\n") != string::npos) {
-      cout << keywordCpy.substr(0, keywordCpy.find("\n") + 1);
-      keywordCpy = keywordCpy.substr(keywordCpy.find("\n") + 1);
+    QString keywordCpy = keywordsToTry[key];
+    while(keywordCpy.contains("\n")) {
+      cout << keywordCpy.mid(0, keywordCpy.indexOf("\n") + 1);
+      keywordCpy = keywordCpy.mid(keywordCpy.indexOf("\n") + 1);
     }
 
     cout << "'" << keywordCpy << "' ";
@@ -78,9 +78,9 @@ int main() {
 
     cout << "> ";
 
-    vector< string > keywordComments;
-    string keywordName;
-    vector< pair<string, string> > keywordValues;
+    vector< QString > keywordComments;
+    QString keywordName;
+    vector< pair<QString, QString> > keywordValues;
 
     bool result = false;
 
@@ -109,7 +109,7 @@ int main() {
       for(unsigned int value = 0; value < keywordValues.size(); value++) {
         cout << "    VALUE: " << keywordValues[value].first;
 
-        if(!keywordValues[value].second.empty()) {
+        if(!keywordValues[value].second.isEmpty()) {
           cout << " <" << keywordValues[value].second << ">";
         }
 
@@ -122,7 +122,7 @@ int main() {
   cout << endl << endl;
   cout << "----- Testing Stream Read/Write -----" << endl;
   for(unsigned int key = 0;
-      key < sizeof(keywordsToTry) / sizeof(string);
+      key < sizeof(keywordsToTry) / sizeof(QString);
       key ++) {
     stringstream stream;
     PvlKeyword someKey;
@@ -131,7 +131,7 @@ int main() {
 
     cout << endl << "Output: " << endl;
     try {
-      stream.write(keywordsToTry[key].c_str(), keywordsToTry[key].size());
+      stream.write(keywordsToTry[key].toAscii().data(), keywordsToTry[key].size());
       stream >> someKey;
       cout << someKey << endl;
     }
@@ -165,9 +165,9 @@ int main() {
     streamZ >> keyZRead;
     cout << keyZRead << endl;
 
-    Isis::PvlKeyword keyU("ARRAY_TEST", 5.87, "lightyears");
-    keyU.AddValue(5465.6, "lightyears");
-    keyU.AddValue(574.6, "lightyears");
+    Isis::PvlKeyword keyU("ARRAY_TEST", toString(5.87), "lightyears");
+    keyU.AddValue("5465.6", "lightyears");
+    keyU.AddValue("574.6", "lightyears");
 
     PvlKeyword keyURead;
     stringstream streamU;
@@ -200,18 +200,18 @@ int main() {
     cout << keyBRead << endl;
 
     Isis::PvlKeyword keyW("UGHHHHHHHHHHHH");
-    keyW += 59999.0;
-    keyW += 59999.0;
-    keyW += 59999.0;
-    keyW += 59999.0;
-    keyW += 59999.0;
-    keyW += 59999.0;
-    keyW += 59999.0;
-    keyW += 59999.0;
-    keyW += 59999.0;
-    keyW += 59999.0;
-    keyW += 59999.0;
-    keyW += 59999.0;
+    keyW += toString(59999.0);
+    keyW += toString(59999.0);
+    keyW += toString(59999.0);
+    keyW += toString(59999.0);
+    keyW += toString(59999.0);
+    keyW += toString(59999.0);
+    keyW += toString(59999.0);
+    keyW += toString(59999.0);
+    keyW += toString(59999.0);
+    keyW += toString(59999.0);
+    keyW += toString(59999.0);
+    keyW += toString(59999.0);
 
     PvlKeyword keyWRead;
     stringstream streamW;
@@ -219,25 +219,25 @@ int main() {
     streamW >> keyWRead;
     cout << keyWRead << endl;
 
-    const Isis::PvlKeyword key("NAME", 5.2, "meters");
+    const Isis::PvlKeyword key("NAME", "5.2", "meters");
 
     cout << key << endl;
 
     Isis::PvlKeyword key2("KEY");
     cout << key2 << endl;
 
-    key2 += 5;
-    key2 += string("");
-    key2.AddValue(3.3, "feet");
+    key2 += "5";
+    key2 += QString("");
+    key2.AddValue("3.3", "feet");
     key2.AddValue("Hello World!");
-    string str = "Hello World! This is a really really long comment that needs to"
-                 " be wrapped onto several different lines to make the PVL file "
-                 "look really pretty!";
+    QString str = "Hello World! This is a really really long comment that needs to"
+                  " be wrapped onto several different lines to make the PVL file "
+                  "look really pretty!";
     key2.AddCommentWrapped(str);
     cout << key2 << endl;
 
     cout << key2[1] << endl;
-    key2[1] = 88;
+    key2[1] = toString(88);
     cout << key2 << endl;
 
     Isis::PvlSequence seq;
@@ -270,7 +270,7 @@ int main() {
     Isis::PvlKeyword cast01("cast1", "I'm being casted");
     Isis::PvlKeyword cast02("cast2", "465721");
     Isis::PvlKeyword cast03("cast3", "131.2435");
-    cout << "string     = " << (string)cast01 << endl;
+    cout << "string     = " << (QString)cast01 << endl;
     cout << "int     = " << (int)cast02 << endl;
     cout << "BigInt     = " << (Isis::BigInt)cast02 << endl;
     cout << "double     = " << (double)cast03 << endl;
@@ -306,7 +306,7 @@ int main() {
   try {
     // Template Keyword
     PvlKeyword pvlTmplKwrd("KeyName", "integer");
-    PvlKeyword pvlKwrd("KeyName", 3);
+    PvlKeyword pvlKwrd("KeyName", "3");
     pvlTmplKwrd.ValidateKeyword(pvlKwrd);
     pvlKwrd.Clear();
 
@@ -314,7 +314,7 @@ int main() {
     pvlTmplKwrd.ValidateKeyword(pvlKwrd);
     pvlKwrd.Clear();
     
-    pvlKwrd=PvlKeyword("KeyName", 3.5);
+    pvlKwrd=PvlKeyword("KeyName", toString(3.5));
     pvlTmplKwrd.ValidateKeyword(pvlKwrd);
   } 
   catch(Isis::IException &e) {
@@ -324,7 +324,7 @@ int main() {
   // Test keyword__Type
   try {
     PvlKeyword pvlTmplKwrd("KeyName", "integer");
-    PvlKeyword pvlKwrd("KeyName", -3);
+    PvlKeyword pvlKwrd("KeyName", toString(-3));
     pvlTmplKwrd.ValidateKeyword(pvlKwrd, "positive");
   } catch(Isis::IException &e) {
     cerr <<"Positive number Expected" << endl;
@@ -333,8 +333,8 @@ int main() {
   // Test keyword__Type
   try {
     PvlKeyword pvlTmplKwrd("KeyName", "integer");
-    PvlKeyword pvlTmplKwrdRange("KeyName__Range", (0-10));
-    PvlKeyword pvlKwrd("KeyName", 11);
+    PvlKeyword pvlTmplKwrdRange("KeyName__Range", toString(0-10));
+    PvlKeyword pvlKwrd("KeyName", toString(11));
     pvlTmplKwrd.ValidateKeyword(pvlKwrd, "", &pvlTmplKwrdRange);
   } catch(Isis::IException &e) {
     cerr <<"Integer not in the Range. Expected (0-10)" << endl;

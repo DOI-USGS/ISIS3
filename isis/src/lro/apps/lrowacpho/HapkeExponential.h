@@ -1,4 +1,4 @@
-#if !defined(HapkeExponential_h)
+#ifndef HapkeExponential_h
 #define HapkeExponential_h
 /**
  * @file
@@ -84,7 +84,7 @@ namespace Isis {
                     std::vector<double> bTerms; //<! b-terms for exponential in form a*e^(b*x)
                     double wavelength; //<! Wavelength for correction
                     double tolerance; //<! Wavelength Range/Tolerance
-                    IString units; //<! Phase units of Hiller eq.
+                    QString units; //<! Phase units of Hiller eq.
                     double phaUnit; // 1 for degrees, Pi/180 for radians
                     int band; //<! Cube band parameters
                     double phoStd; //<! Computed photometric std.

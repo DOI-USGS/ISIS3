@@ -11,19 +11,19 @@ namespace Isis {
     if (algo.HasKeyword("PhaseList")) {
       SetPhotoPhaseList(algo["PhaseList"]);
     } else {
-      std::string msg = "The empirical Lunar Lambert phase list was not provided by user";
+      QString msg = "The empirical Lunar Lambert phase list was not provided by user";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     if (algo.HasKeyword("LList")) {
       SetPhotoLList(algo["LList"]);
     } else {
-      std::string msg = "The empirical Lunar Lambert l exponent list was not provided by user";
+      QString msg = "The empirical Lunar Lambert l exponent list was not provided by user";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     if (algo.HasKeyword("PhaseCurveList")) {
       SetPhotoPhaseCurveList(algo["PhaseCurveList"]);
     } else {
-      std::string msg = "The empirical Lunar Lambert phase brightness list was not provided by user";
+      QString msg = "The empirical Lunar Lambert phase brightness list was not provided by user";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -31,13 +31,13 @@ namespace Isis {
     p_photoPhaseAngleCount = (int)p_photoPhaseList.size();
 
     if (p_photoPhaseAngleCount != (int)p_photoLList.size()) {
-      std::string msg = "Number of empirical Lunar Lambert l list values must be equal";
+      QString msg = "Number of empirical Lunar Lambert l list values must be equal";
       msg += "to number of phase angles provided";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if (p_photoPhaseAngleCount != (int)p_photoPhaseCurveList.size()) {
-      std::string msg = "Number of empirical Lunar Lambert phase curve list values must be equal";
+      QString msg = "Number of empirical Lunar Lambert phase curve list values must be equal";
       msg += "to number of phase angles provided";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -70,7 +70,7 @@ namespace Isis {
     *
     * @param phaselist  List of phase angles to interpolate
     */
-  void LunarLambertEmpirical::SetPhotoPhaseList(const string phasestrlist) {
+  void LunarLambertEmpirical::SetPhotoPhaseList(QString phasestrlist) {
     double phaseangle;
     IString strlist(phasestrlist);
     p_photoPhaseList.clear();
@@ -78,8 +78,8 @@ namespace Isis {
     while (strlist.length()) {
       phaseangle = strlist.Token(",");
       if (phaseangle < 0.0 || phaseangle > 180.0) {
-        std::string msg = "Invalid value of empirical Lunar Lambert phase angle list value [" +
-                          IString(phaseangle) + "]";
+        QString msg = "Invalid value of empirical Lunar Lambert phase angle list value [" +
+                          toString(phaseangle) + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
       p_photoPhaseList.push_back(phaseangle);
@@ -96,7 +96,7 @@ namespace Isis {
     *
     * @param llist  List of Lunar Lambert function exponents to interpolate
     */
-  void LunarLambertEmpirical::SetPhotoLList(const string lstrlist) {
+  void LunarLambertEmpirical::SetPhotoLList(QString lstrlist) {
     double lvalue;
     IString strlist(lstrlist);
     p_photoLList.clear();
@@ -114,7 +114,7 @@ namespace Isis {
     *
     * @param phasecurvelist  List of brightness values corresponding to Lunar Lambert function exponents
     */
-  void LunarLambertEmpirical::SetPhotoPhaseCurveList(const string phasecurvestrlist) {
+  void LunarLambertEmpirical::SetPhotoPhaseCurveList(QString phasecurvestrlist) {
     double phasecurve;
     IString strlist(phasecurvestrlist);
     p_photoPhaseCurveList.clear();

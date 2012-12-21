@@ -15,7 +15,7 @@ commands:
 	  JITTERCK=$(OUTPUT)/jitter.bc \
 	  REGDEF=$(INPUT)/hijitreg.p0745.s1570.def \
 	  crop=true \
-	  TO=$(OUTPUT)/outlist.lis > $(OUTPUT)/output.txt;
+	  TO=$(OUTPUT)/outlist.lis | grep -v "Processed" > $(OUTPUT)/output.txt;
 	$(CP) $(INPUT)/PSP_007556_2010_RED5.balance.cropped.cub $(OUTPUT)/red5.cub;
 	spiceinit from=$(OUTPUT)/red5.cub \
 	  ck=$(OUTPUT)/jitter.bc > /dev/null;

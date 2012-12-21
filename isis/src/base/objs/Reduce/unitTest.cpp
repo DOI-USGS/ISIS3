@@ -21,7 +21,7 @@ void IsisMain() {
   Preference::Preferences(true);
   ProcessByLine p;
   UserInterface &ui = Application::GetUserInterface();
-  vector<string> bands;
+  vector<QString> bands;
 
   p.SetInputCube("FROM");
   Cube icube;
@@ -59,6 +59,6 @@ void IsisMain() {
 
   p.Finalize();
   icube.close();
-  QFile::remove(ui.GetFileName("TO").c_str());
-  QFile::remove(ui.GetFileName("TO2").c_str());
+  QFile::remove(ui.GetFileName("TO"));
+  QFile::remove(ui.GetFileName("TO2"));
 }

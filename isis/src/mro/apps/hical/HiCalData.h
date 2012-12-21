@@ -1,4 +1,4 @@
-#if !defined(HiCalData_h)
+#ifndef HiCalData_h
 #define HiCalData_h
 /**
  * @file

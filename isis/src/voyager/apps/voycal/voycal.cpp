@@ -22,7 +22,7 @@ using namespace Isis;
 void calibration(vector<Buffer *> &in,
                  vector<Buffer *> &out);
 PvlObject fetchCoefficients(Pvl &calibration, QList<QString> &hierarchy);
-void checkCoefficient(PvlObject &coefficients, IString keyName);
+void checkCoefficient(PvlObject &coefficients, QString keyName);
 
 // Linearity correction
 bool linear;
@@ -57,8 +57,8 @@ void IsisMain() {
 
   // Check for projection
   if (incube->isProjected()) {
-    string msg = "The cube [" + ui.GetFileName("FROM") + "] has a projection" +
-                 " and cannot be radiometrically calibrated";
+    QString msg = "The cube [" + ui.GetFileName("FROM") + "] has a projection" +
+                  " and cannot be radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -70,16 +70,16 @@ void IsisMain() {
 
   // Verify not radiometrically corrected
   if (isiscube.HasGroup("Radiometry")) {
-    string msg = "Cube [" + ui.GetFileName("FROM") + "] has already been" +
-                 " radiometrically corrected";
+    QString msg = "Cube [" + ui.GetFileName("FROM") + "] has already been" +
+                  " radiometrically corrected";
     throw IException(IException::User,msg,_FILEINFO_);
   }
 
   // Verify Voyager spacecraft and get number, 1 or 2
-  string scNumber = instrument["SpacecraftName"][0];
+  QString scNumber = instrument["SpacecraftName"][0];
   if (scNumber != "VOYAGER_1" && scNumber != "VOYAGER_2") {
-    string msg = "The cube [" + ui.GetFileName("FROM") + "] does not appear" +
-                 " to be a Voyager image";
+    QString msg = "The cube [" + ui.GetFileName("FROM") + "] does not appear" +
+                  " to be a Voyager image";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   scNumber = scNumber[8];
@@ -94,12 +94,12 @@ void IsisMain() {
     hierarchy.append(instrument.FindKeyword("SpacecraftName")[0]);
     hierarchy.append(instrument.FindKeyword("InstrumentId")[0]);
     hierarchy.append(
-        IString("ShutterMode" + instrument.FindKeyword("CameraState2")[0]));
+        QString("ShutterMode" + instrument.FindKeyword("CameraState2")[0]));
     hierarchy.append(archive.FindKeyword("MissionPhaseName")[0]);
     hierarchy.append(
-        IString("ScanRate" + instrument.FindKeyword("CameraState1")[0]));
+        QString("ScanRate" + instrument.FindKeyword("CameraState1")[0]));
     hierarchy.append(
-        IString(bandbin["FilterName"][0] + "_" + bandbin["FilterNumber"][0]));
+        QString(bandbin["FilterName"][0] + "_" + bandbin["FilterNumber"][0]));
 
     calib = fetchCoefficients(calibra, hierarchy);
 
@@ -119,10 +119,10 @@ void IsisMain() {
   // Get appropriate calibration files
   CubeAttributeInput in1;
   p.SetInputCube(FileName("$voyager" + scNumber + "/calibration/" +
-                          (string)calib["OffsetCorrectionFile"]).expanded(), in1);
+                          (QString)calib["OffsetCorrectionFile"]).expanded(), in1);
   CubeAttributeInput in2;
   p.SetInputCube(FileName("$voyager" + scNumber + "/calibration/" +
-                          (string)calib["GainCorrectionFile"]).expanded(), in2);
+                          (QString)calib["GainCorrectionFile"]).expanded(), in2);
 
   // Constants from voycal.pvl for correction
   omegaNaught = calib["OmegaNaught"];
@@ -193,11 +193,11 @@ void IsisMain() {
   calgrp.AddKeyword(calib[4]);
   calgrp.AddKeyword(calib[5]);
   calgrp.AddKeyword(calib[6]);
-  calgrp.AddKeyword(PvlKeyword("CalcSunDistance",dist1));
+  calgrp.AddKeyword(PvlKeyword("CalcSunDistance",toString(dist1)));
   calgrp.AddKeyword(instrument["ExposureDuration"]);
-  calgrp.AddKeyword(PvlKeyword("XMLT",XMLT));
-  calgrp.AddKeyword(PvlKeyword("Omega_W1",w1));
-  calgrp.AddKeyword(PvlKeyword("CalcExpoDuration",newExpo));
+  calgrp.AddKeyword(PvlKeyword("XMLT",toString(XMLT)));
+  calgrp.AddKeyword(PvlKeyword("Omega_W1",toString(w1)));
+  calgrp.AddKeyword(PvlKeyword("CalcExpoDuration",toString(newExpo)));
 
   // Linear correction equation and constants
   if (linear) {
@@ -209,10 +209,10 @@ void IsisMain() {
     linearity.AddComment("XNORM = NormalizingPower");
     linearity.AddComment("KPOWER = K_PowerOfNon-Linearity");
     calgrp.AddKeyword(linearity);
-    calgrp.AddKeyword(PvlKeyword("ACoefficient",aCoef));
-    calgrp.AddKeyword(PvlKeyword("B_HighEndNon-LinearityCorrection",bHighEnd));
-    calgrp.AddKeyword(PvlKeyword("K_PowerOfNon-Linearity",kPowerOf));
-    calgrp.AddKeyword(PvlKeyword("NormalizingPower",normalizingPower));
+    calgrp.AddKeyword(PvlKeyword("ACoefficient",toString(aCoef)));
+    calgrp.AddKeyword(PvlKeyword("B_HighEndNon-LinearityCorrection",toString(bHighEnd)));
+    calgrp.AddKeyword(PvlKeyword("K_PowerOfNon-Linearity",toString(kPowerOf)));
+    calgrp.AddKeyword(PvlKeyword("NormalizingPower",toString(normalizingPower)));
   }
   else {
     calgrp.AddKeyword(PvlKeyword("LinearityCorrection","False"));
@@ -289,7 +289,7 @@ PvlObject fetchCoefficients(Pvl &calibration, QList<QString> &hierarchy) {
   bool validHierarchy = true;
   PvlObject *parent = &calibration;
   for (int o = 0; o < hierarchy.size() && validHierarchy; o++) {
-    IString objectName = hierarchy[o].toStdString();
+    QString objectName = hierarchy[o];
 
     if (parent->HasObject(objectName)) {
       // The object named in the hierarchy exists in the calibration file, so
@@ -328,7 +328,7 @@ PvlObject fetchCoefficients(Pvl &calibration, QList<QString> &hierarchy) {
 }
 
 
-void checkCoefficient(PvlObject &coefficients, IString keyName) {
+void checkCoefficient(PvlObject &coefficients, QString keyName) {
   if (!coefficients.HasKeyword(keyName))
     throw IException(
         IException::Programmer,

@@ -309,7 +309,7 @@ namespace Isis {
     QVector< MdiCubeViewport *> *vwportList = p_workSpace->cubeViewportList();
     QVector<MdiCubeViewport *>::iterator it;
     for (it = vwportList->begin(); it != vwportList->end(); ++it){
-      if(QString((*it)->cube()->getFileName().c_str()) ==  psOutFile) {
+      if(QString((*it)->cube()->getFileName()) ==  psOutFile) {
         QMessageBox::information((QWidget *)parent(), "Error",
             "Output File is already open\n\""+ psOutFile + "\"");
         return;
@@ -318,7 +318,7 @@ namespace Isis {
 
     //If the filename is the same as the current cube's filename, just save it
     if(p_saveAsDialog->getSaveAsType() == SaveAsDialog::FullImage &&
-       psOutFile.toStdString() == cubeViewport()->cube()->getFileName()) {
+       psOutFile == cubeViewport()->cube()->getFileName()) {
       save();
       return;
     }
@@ -389,7 +389,7 @@ namespace Isis {
     try {
       ProcessRubberSheet p;
       p.SetInputCube (icube);
-      Cube *ocube = p.SetOutputCube(psOutFile.toStdString(), CubeAttributeOutput(" "),
+      Cube *ocube = p.SetOutputCube(psOutFile, CubeAttributeOutput(" "),
                        ons , onl, icube->getBandCount());
 
       Interpolator *interp = new Interpolator(Interpolator::NearestNeighborType);
@@ -436,13 +436,13 @@ namespace Isis {
     onl = (int)ceil(inl * dScale);
 
     CubeAttributeInput cai(icube->getFileName());
-    vector<string> bands = cai.bands();
+    std::vector<QString> bands = cai.bands();
     int inb = bands.size();
 
     if(inb == 0) {
       inb = cubeViewport()->cube()->getBandCount();
       for(int i = 1; i <= inb; i++) {
-        bands.push_back((IString)i);
+        bands.push_back(toString(i));
       }
     }
 
@@ -450,7 +450,7 @@ namespace Isis {
     p.SetInputCube (icube);
     Cube *ocube = NULL;
     try {
-      ocube = p.SetOutputCube(psOutFile.toStdString(), CubeAttributeOutput(""), ons+1, onl+1, inb);
+      ocube = p.SetOutputCube(psOutFile, CubeAttributeOutput(""), ons+1, onl+1, inb);
       // Our processing routine only needs 1
       // the original set was for info about the cube only
       p.ClearInputCubes();
@@ -512,7 +512,7 @@ namespace Isis {
   void FileTool::copyCubeDetails(const QString & psOutFile, Cube *icube,
       Cube *ocube, int piNumSamples, int piNumLines, int piNumBands) {
     //Create the default output attribute with the output filename
-    CubeAttributeOutput outAtt(psOutFile.toStdString());
+    CubeAttributeOutput outAtt(psOutFile);
 
     //Propagate all labels, tables, blobs, etc from the input to output cube
     try {
@@ -540,13 +540,13 @@ namespace Isis {
         else if((ocube->getPixelType() != Real) &&
                 (ocube->getPixelType() != UnsignedByte) &&
                 (ocube->getPixelType() != SignedWord)) {
-          std::string msg = "Looks like your refactoring to add different pixel types";
+          QString msg = "Looks like your refactoring to add different pixel types";
           msg += " you'll need to make changes here";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
         else {
-          std::string msg = "You've chosen to reduce your output PixelType for [" +
-                            psOutFile.toStdString() + "] you must specify the output pixel range too";
+          QString msg = "You've chosen to reduce your output PixelType for [" +
+                            psOutFile + "] you must specify the output pixel range too";
           throw IException(IException::User, msg, _FILEINFO_);
         }
       }
@@ -561,7 +561,7 @@ namespace Isis {
       }
 
       // Allocate the cube
-      ocube->create(psOutFile.toStdString());
+      ocube->create(psOutFile);
 
       // Transfer labels from the first input cube
       PvlObject &incube = icube->getLabel()->FindObject("IsisCube");
@@ -574,7 +574,7 @@ namespace Isis {
       Pvl &inlab = *icube->getLabel();
       for(int i = 0; i < inlab.Objects(); i++) {
         if(inlab.Object(i).IsNamed("Table")) {
-          Blob t((std::string)inlab.Object(i)["Name"], inlab.Object(i).Name());
+          Blob t((QString)inlab.Object(i)["Name"], inlab.Object(i).Name());
           icube->read(t);
           ocube->write(t);
         }
@@ -584,7 +584,7 @@ namespace Isis {
       inlab = *icube->getLabel();
       for(int i = 0; i < inlab.Objects(); i++) {
         if(inlab.Object(i).IsNamed("Polygon")) {
-          Blob t((std::string)inlab.Object(i)["Name"], inlab.Object(i).Name());
+          Blob t((QString)inlab.Object(i)["Name"], inlab.Object(i).Name());
           icube->read(t);
           ocube->write(t);
         }
@@ -704,7 +704,7 @@ namespace Isis {
 
     Pvl whatsThisPvl;
     cubeViewport()->getAllWhatsThisInfo(whatsThisPvl);
-    whatsThisPvl.Write(output.toStdString());
+    whatsThisPvl.Write(output);
   }
 
   /**
@@ -765,7 +765,7 @@ namespace Isis {
 
     QPixmap pm = QPixmap::grabWidget(cubeViewport()->viewport());
 
-    //if (!cubeViewport()->pixmap().save(output,format.toStdString().c_str())) {
+    //if (!cubeViewport()->pixmap().save(output,format)) {
 
     if(!pm.save(output)) {
       QMessageBox::information((QWidget *)parent(), "Error", "Unable to save " + output);

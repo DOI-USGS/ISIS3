@@ -21,7 +21,7 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include <string>
+#include <QString>
 #include <vector>
 #include <numeric>
 #include <iostream>
@@ -50,7 +50,7 @@ namespace Isis {
    init();
  }
 
-void SpiceKernel::add(const std::string &cfile) {
+void SpiceKernel::add(const QString &cfile) {
  Cube cube;
  cube.open(cfile);
  add(cube);
@@ -70,7 +70,7 @@ bool CheckSegment(const SpiceSegment *s1, const SpiceSegment *s2) {
   return (s1->startTime() < s2->startTime());
 }
 
-std::string SpiceKernel::getSummary(const std::string &commfile) const {
+QString SpiceKernel::getSummary(const QString &commfile) const {
   vector<const SpiceSegment *> seglist;
   for ( int i = 0 ; i < size() ; i++) {
     seglist.push_back(&_segments[i]);
@@ -79,7 +79,7 @@ std::string SpiceKernel::getSummary(const std::string &commfile) const {
   // Sorts the Segment pointers
   stable_sort(seglist.begin(), seglist.end(), CheckSegment);
 
-  string comment = getCkComment(commfile);
+  QString comment = getCkComment(commfile);
 
   // Collect comments from each segment
   for ( unsigned int i = 0 ; i < seglist.size() ; i++ ) {
@@ -88,7 +88,7 @@ std::string SpiceKernel::getSummary(const std::string &commfile) const {
   return (comment);
 }
 
- void SpiceKernel::write(const std::string &kname, const std::string &comfile,
+ void SpiceKernel::write(const QString &kname, const QString &comfile,
                          const int cktype) const {
    vector<const SpiceSegment *> seglist;
    int comChars(0);
@@ -99,7 +99,7 @@ std::string SpiceKernel::getSummary(const std::string &commfile) const {
 
    stable_sort(seglist.begin(), seglist.end(), CheckSegment);
 
-   string comment = getCkComment(comfile);
+   QString comment = getCkComment(comfile);
    comChars += comment.size();
 
    //  Create the output file.
@@ -136,11 +136,11 @@ std::string SpiceKernel::getSummary(const std::string &commfile) const {
    return;
  }
 
- std::string SpiceKernel::getCkComment(const std::string &comFile) const {
+ QString SpiceKernel::getCkComment(const QString &comFile) const {
    ostringstream comment;
-   if ( !comFile.empty() ) {
+   if ( !comFile.isEmpty() ) {
      TextFile txt(comFile);
-     string cline;
+     QString cline;
      while ( txt.GetLineNoFilter(cline )) {
        comment << cline << "\n";
      }
@@ -222,7 +222,7 @@ Segment (by file) Summary\n\
 \n";
    }
 
-   return (string(comment.str()));
+   return (QString(comment.str().c_str()));
 }
 
 };  // namespace Isis

@@ -26,13 +26,13 @@
 
 #include <vector>
 
+#include <geos/geom/MultiPolygon.h>
+
 #include "Affine.h"
 #include "Interpolator.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
-#include "geos/geom/MultiPolygon.h"
 
-using namespace std;
 namespace Isis {
   class Cube;
   class Statistics;
@@ -134,7 +134,7 @@ namespace Isis {
 
       //! Returns the expanded filename of the cube from
       //! which this chip was chipped.
-      inline string FileName() const {
+      inline QString FileName() const {
         return p_filename;
       };
 
@@ -253,7 +253,7 @@ namespace Isis {
       void Extract(int samp, int line, Chip &output);
       Isis::Statistics *Statistics();
       void Extract(Chip &output, Affine &affine);
-      void Write(const string &filename);
+      void Write(const QString &filename);
 
       void SetClipPolygon(const geos::geom::MultiPolygon &clipPolygon);
 
@@ -330,25 +330,25 @@ namespace Isis {
           return;
         }
         // Interpolator::None is not valid type
-        string msg = "Invalid Interpolator type.  Cannot use [";
-        msg += IString(type) + "] to read cube into chip.";
+        QString msg = "Invalid Interpolator type.  Cannot use [";
+        msg += toString(type) + "] to read cube into chip.";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
     private:
       void Init(const int samples, const int lines);
       void Read(Cube &cube, const int band);
-      vector<int> MovePoints(const int startSamp, const int startLine,
-                             const int endSamp, const int endLine);
-      bool PointsColinear(const double x0, const double y0,
-                          const double x1, const double y1,
-                          const double x2, const double y2,
-                          const double tol);
+      std::vector<int> MovePoints(int startSamp, int startLine,
+                             int endSamp, int endLine);
+      bool PointsColinear(double x0, double y0,
+                          double x1, double y1,
+                          double x2, double y2,
+                          double tol);
 
 
       int p_chipSamples;                           //!< Number of samples in the chip
       int p_chipLines;                             //!< Number of lines in the chip
-      vector<vector <double> > p_buf;              //!< Chip buffer
+      std::vector< std::vector<double> > p_buf;    //!< Chip buffer
       int p_tackSample;                            //!< Middle sample of the chip
       int p_tackLine;                              //!< Middle line of the chip
 
@@ -366,7 +366,7 @@ namespace Isis {
 
       Affine p_affine;                             //!< Transform set by SetTransform.  Used to load cubes into chip
       Interpolator::interpType p_readInterpolator; //!< Interpolator type set by SetReadInterpolator. Used to read cubes into chip.
-      string p_filename;                           //!< FileName of loaded cube
+      QString p_filename;                           //!< FileName of loaded cube
   };
 };
 

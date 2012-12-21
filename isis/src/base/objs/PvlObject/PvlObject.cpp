@@ -23,7 +23,7 @@
 #include "FileName.h"
 #include "Pvl.h"
 #include "IException.h"
-#include "IException.h"
+#include "IString.h"
 #include "Message.h"
 #include "PvlFormat.h"
 #include "PvlObject.h"
@@ -46,7 +46,7 @@ namespace Isis {
    *
    * @param name The name of the PvlObject.
    */
-  PvlObject::PvlObject(const std::string &name) :
+  PvlObject::PvlObject(const QString &name) :
     Isis::PvlContainer("Object", name) {
   }
 
@@ -69,7 +69,7 @@ namespace Isis {
    *
    * @throws IException
    */
-  Isis::PvlGroup &PvlObject::FindGroup(const std::string &name,
+  Isis::PvlGroup &PvlObject::FindGroup(const QString &name,
                                        PvlObject::FindOptions opts) {
     vector<PvlObject *> searchList;
     searchList.push_back(this);
@@ -88,7 +88,7 @@ namespace Isis {
       searchList.erase(searchList.begin());
     }
 
-    string msg = "Unable to find PVL group [" + name + "]";
+    QString msg = "Unable to find PVL group [" + name + "]";
     if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
@@ -104,7 +104,7 @@ namespace Isis {
    *
    * @throws IException
    */
-  const Isis::PvlGroup &PvlObject::FindGroup(const std::string &name,
+  const Isis::PvlGroup &PvlObject::FindGroup(const QString &name,
       PvlObject::FindOptions opts) const {
     vector<const PvlObject *> searchList;
     searchList.push_back(this);
@@ -123,7 +123,7 @@ namespace Isis {
       searchList.erase(searchList.begin());
     }
 
-    string msg = "Unable to find PVL group [" + name + "]";
+    QString msg = "Unable to find PVL group [" + name + "]";
     if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
@@ -145,7 +145,7 @@ namespace Isis {
    *
    * @throws IException
    */
-  PvlKeyword &PvlObject::FindKeyword(const std::string &kname,
+  PvlKeyword &PvlObject::FindKeyword(const QString &kname,
                                      FindOptions opts) {
 
     // Call the parent's version if they don't want to dig deeper
@@ -186,7 +186,7 @@ namespace Isis {
     }
 
     // No where else to look for the Keyword so throw an error
-    string msg = "Unable to find PVL keyword [" + kname + "]";
+    QString msg = "Unable to find PVL keyword [" + kname + "]";
     if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
@@ -204,7 +204,7 @@ namespace Isis {
    *
    * @return True if the Keyword exists False otherwise.
    */
-  bool PvlObject::HasKeyword(const std::string &kname,
+  bool PvlObject::HasKeyword(const QString &kname,
                              FindOptions opts) const {
 
     // Call the parent's version if they don't want to dig deeper
@@ -258,7 +258,7 @@ namespace Isis {
    *
    * @throws IException
    */
-  PvlObject &PvlObject::FindObject(const std::string &name,
+  PvlObject &PvlObject::FindObject(const QString &name,
                                    PvlObject::FindOptions opts) {
     vector<PvlObject *> searchList;
     searchList.push_back(this);
@@ -277,7 +277,7 @@ namespace Isis {
       searchList.erase(searchList.begin());
     }
 
-    string msg = "Unable to find PVL object [" + name + "]";
+    QString msg = "Unable to find PVL object [" + name + "]";
     if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
@@ -293,7 +293,7 @@ namespace Isis {
    *
    * @throws IException
    */
-  const PvlObject &PvlObject::FindObject(const std::string &name,
+  const PvlObject &PvlObject::FindObject(const QString &name,
                                          FindOptions opts) const {
     vector<const PvlObject *> searchList;
     searchList.push_back(this);
@@ -317,7 +317,7 @@ namespace Isis {
       searchList.erase(searchList.begin());
     }
 
-    string msg = "Unable to find PVL object [" + name + "]";
+    QString msg = "Unable to find PVL object [" + name + "]";
 
     if(p_filename.size() > 0) {
       msg += " in file [" + p_filename + "]";
@@ -334,10 +334,10 @@ namespace Isis {
    *
    * @throws IException
    */
-  void PvlObject::DeleteObject(const std::string &name) {
+  void PvlObject::DeleteObject(const QString &name) {
     PvlObjectIterator key = FindObject(name, BeginObject(), EndObject());
     if(key == EndObject()) {
-      string msg = "Unable to find PVL object [" + name + "] in " + Type() +
+      QString msg = "Unable to find PVL object [" + name + "] in " + Type() +
                    " [" + Name() + "]";
       if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -356,7 +356,7 @@ namespace Isis {
    */
   void PvlObject::DeleteObject(const int index) {
     if(index >= (int)p_objects.size() || index < 0) {
-      string msg = "The specified index is out of bounds in PVL " + Type() +
+      QString msg = "The specified index is out of bounds in PVL " + Type() +
                    " [" + Name() + "]";
       if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -376,10 +376,10 @@ namespace Isis {
    *
    * @throws IException
    */
-  void PvlObject::DeleteGroup(const std::string &name) {
+  void PvlObject::DeleteGroup(const QString &name) {
     PvlGroupIterator key = FindGroup(name, BeginGroup(), EndGroup());
     if(key == EndGroup()) {
-      string msg = "Unable to find PVL group [" + name + "] in " + Type() +
+      QString msg = "Unable to find PVL group [" + name + "] in " + Type() +
                    " [" + Name() + "]";
       if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -398,7 +398,7 @@ namespace Isis {
    */
   void PvlObject::DeleteGroup(const int index) {
     if(index >= (int)p_groups.size() || index < 0) {
-      string msg = "The specified index is out of bounds in PVL " + Type() +
+      QString msg = "The specified index is out of bounds in PVL " + Type() +
                    " [" + Name() + "]";
       if(p_filename.size() > 0) msg += " in file [" + p_filename + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -422,7 +422,7 @@ namespace Isis {
    */
   Isis::PvlGroup &PvlObject::Group(const int index) {
     if(index < 0 || index >= (int)p_groups.size()) {
-      string msg = Message::ArraySubscriptNotInRange(index);
+      QString msg = Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -441,7 +441,7 @@ namespace Isis {
    */
   const Isis::PvlGroup &PvlObject::Group(const int index) const {
     if(index < 0 || index >= (int)p_groups.size()) {
-      string msg = Message::ArraySubscriptNotInRange(index);
+      QString msg = Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -459,7 +459,7 @@ namespace Isis {
    */
   PvlObject &PvlObject::Object(const int index) {
     if(index < 0 || index >= (int)p_objects.size()) {
-      string msg = Message::ArraySubscriptNotInRange(index);
+      QString msg = Message::ArraySubscriptNotInRange(index);
       throw IException(Isis::IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -477,7 +477,7 @@ namespace Isis {
    */
   const PvlObject &PvlObject::Object(const int index) const {
     if(index < 0 || index >= (int)p_objects.size()) {
-      string msg = Message::ArraySubscriptNotInRange(index);
+      QString msg = Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -515,10 +515,10 @@ namespace Isis {
     // Include files take precedence to all other objects and groups
     for(int i = 0; i < outTemplate.Keywords(); i++) {
       if(outTemplate[i].IsNamed("Isis:PvlTemplate:File")) {
-        string filename = outTemplate[i];
+        QString filename = outTemplate[i];
         Isis::FileName file(filename);
         if(!file.fileExists()) {
-          string message = "Could not open the following PVL template file: ";
+          QString message = "Could not open the following PVL template file: ";
           message += filename;
           throw IException(IException::Io, message, _FILEINFO_);
         }
@@ -692,7 +692,7 @@ namespace Isis {
 
       is.seekg(beforeKeywordPos, ios::beg);
 
-      string msg = "Expected PVL keyword named [Object], found keyword named [";
+      QString msg = "Expected PVL keyword named [Object], found keyword named [";
       msg += readKeyword.Name();
       msg += "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -704,7 +704,7 @@ namespace Isis {
     else {
       is.seekg(beforeKeywordPos, ios::beg);
 
-      string msg = "Expected a single value for PVL object name, found [(";
+      QString msg = "Expected a single value for PVL object name, found [(";
 
       for(int i = 0; i < readKeyword.Size(); i++) {
         if(i != 0) msg += ", ";
@@ -735,7 +735,7 @@ namespace Isis {
 
           is.seekg(beforeKeywordPos, ios::beg);
 
-          string msg = "Unexpected [";
+          QString msg = "Unexpected [";
           msg += readKeyword.Name();
           msg += "] in PVL Object [";
           msg += result.Name();
@@ -779,7 +779,7 @@ namespace Isis {
 
       is.seekg(beforeKeywordPos, ios::beg);
 
-      string msg = "PVL Object [" + result.Name();
+      QString msg = "PVL Object [" + result.Name();
       msg += "] EndObject not found before end of file";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
@@ -817,7 +817,7 @@ namespace Isis {
     for(int i=0; i<iObjSize; i++) {
       PvlObject & pvlTmplObj = Object(i);
 
-      string sObjName = pvlTmplObj.Name();
+      QString sObjName = pvlTmplObj.Name();
       bool bObjFound = false;
 
       // Pvl contains the Object Name
@@ -830,7 +830,7 @@ namespace Isis {
         bObjFound = true;
       }
       else {
-        string sOption = sObjName + "__Required";
+        QString sOption = sObjName + "__Required";
         bObjFound = true; // optional is the default
         if(pvlTmplObj.HasKeyword(sOption)) {
           PvlKeyword pvlKeyOption = pvlTmplObj.FindKeyword(sOption);
@@ -840,7 +840,7 @@ namespace Isis {
         }
       }
       if (bObjFound == false) {
-        string sErrMsg = "Object \"" + sObjName + "\" Not Found in the Template File\n";
+        QString sErrMsg = "Object \"" + sObjName + "\" Not Found in the Template File\n";
         throw IException(IException::User, sErrMsg, _FILEINFO_);
       }
     }
@@ -850,7 +850,7 @@ namespace Isis {
     for(int i=0; i<iTmplGrpSize; i++) {
       PvlGroup & pvlTmplGrp = Group(i);
       bool bGrpFound = false;
-      string sGrpName = pvlTmplGrp.Name();
+      QString sGrpName = pvlTmplGrp.Name();
 
       // Pvl contains the Object Name
       if(pPvlObj.HasGroup(sGrpName)) {
@@ -863,7 +863,7 @@ namespace Isis {
       }
       else {
         bGrpFound = true;
-        string sOption = sGrpName + "__Required";
+        QString sOption = sGrpName + "__Required";
         if(pvlTmplGrp.HasKeyword(sOption)) {
           PvlKeyword pvlKeyOption = pvlTmplGrp.FindKeyword(sOption);
           if(pvlKeyOption[0] == "true") { // Required is true
@@ -872,7 +872,7 @@ namespace Isis {
         }
       }
       if (bGrpFound == false) {
-        string sErrMsg = "Group \"" + sGrpName + "\" Not Found in the Template File\n";
+        QString sErrMsg = "Group \"" + sGrpName + "\" Not Found in the Template File\n";
         throw IException(IException::User, sErrMsg, _FILEINFO_);
       }
     }

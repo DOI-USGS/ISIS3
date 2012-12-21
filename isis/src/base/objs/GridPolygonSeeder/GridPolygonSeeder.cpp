@@ -68,7 +68,7 @@ namespace Isis {
   std::vector<geos::geom::Point *> GridPolygonSeeder::Seed(const geos::geom::MultiPolygon *lonLatPoly) {
     //Projection *proj) {
     /*if (proj == NULL) {
-      std::string msg = "No Projection object available";
+      QString msg = "No Projection object available";
       throw iException::Message(iException::Programmer, msg, _FILEINFO_);
     }*/
 
@@ -90,8 +90,8 @@ namespace Isis {
     const geos::geom::Envelope *polyBoundBox = multiPoly->getEnvelopeInternal();
 
     // Call the parents standardTests member
-    std::string msg = StandardTests(multiPoly, polyBoundBox);
-    if(!msg.empty()) {
+    QString msg = StandardTests(multiPoly, polyBoundBox);
+    if(!msg.isEmpty()) {
       return points;
     }
 
@@ -147,8 +147,8 @@ namespace Isis {
     const geos::geom::Envelope *polyBoundBox = multiPoly->getEnvelopeInternal();
 
     // Call the parents standardTests member
-    std::string msg = StandardTests(multiPoly, polyBoundBox);
-    if(!msg.empty()) {
+    QString msg = StandardTests(multiPoly, polyBoundBox);
+    if(!msg.isEmpty()) {
       return points;
     }
 
@@ -414,7 +414,7 @@ namespace Isis {
         }
       }
       else {
-        std::string msg = "PVL for GridPolygonSeeder must contain [XSpacing] in [";
+        QString msg = "PVL for GridPolygonSeeder must contain [XSpacing] in [";
         msg += pvl.FileName() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -427,21 +427,21 @@ namespace Isis {
         }
       }
       else {
-        std::string msg = "PVL for GridPolygonSeeder must contain [YSpacing] in [";
+        QString msg = "PVL for GridPolygonSeeder must contain [YSpacing] in [";
         msg += pvl.FileName() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
       p_subGrid = false;
       if(algo.HasKeyword("SubGrid")) {
-        p_subGrid = IString((std::string)algo["SubGrid"]).UpCase() != "FALSE";
+        p_subGrid = IString((QString)algo["SubGrid"]).UpCase() != "FALSE";
         if(invalgo.HasKeyword("SubGrid")) {
           invalgo.DeleteKeyword("SubGrid");
         }
       }
     }
     catch(IException &e) {
-      std::string msg = "Improper format for PolygonSeeder PVL [" + pvl.FileName() + "]";
+      QString msg = "Improper format for PolygonSeeder PVL [" + pvl.FileName() + "]";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
 
@@ -455,15 +455,15 @@ namespace Isis {
     }
   }
 
-  PvlGroup GridPolygonSeeder::PluginParameters(std::string grpName) {
+  PvlGroup GridPolygonSeeder::PluginParameters(QString grpName) {
     PvlGroup pluginInfo(grpName);
 
     PvlKeyword name("Name", Algorithm());
-    PvlKeyword minThickness("MinimumThickness", MinimumThickness());
-    PvlKeyword minArea("MinimumArea", MinimumArea());
-    PvlKeyword xSpac("XSpacing", p_Xspacing);
-    PvlKeyword ySpac("YSpacing", p_Yspacing);
-    PvlKeyword subGrid("SubGrid", p_subGrid);
+    PvlKeyword minThickness("MinimumThickness", toString(MinimumThickness()));
+    PvlKeyword minArea("MinimumArea", toString(MinimumArea()));
+    PvlKeyword xSpac("XSpacing", toString(p_Xspacing));
+    PvlKeyword ySpac("YSpacing", toString(p_Yspacing));
+    PvlKeyword subGrid("SubGrid", toString(p_subGrid));
 
     pluginInfo.AddKeyword(name);
     pluginInfo.AddKeyword(minThickness);

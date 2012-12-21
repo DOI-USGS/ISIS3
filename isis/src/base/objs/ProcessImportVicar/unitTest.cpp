@@ -1,29 +1,34 @@
 #include "Isis.h"
+
+#include <QFile>
+
 #include "ProcessImportVicar.h"
 #include "Application.h"
 #include "Cube.h"
 #include "Statistics.h"
 
+using namespace Isis;
 using namespace std;
+
 void IsisMain() {
 
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
-  Isis::ProcessImportVicar p;
-  Isis::Pvl vlab;
+  ProcessImportVicar p;
+  Pvl vlab;
   p.SetVicarFile("unitTest.img", vlab);
   p.SetOutputCube("TO");
   p.StartProcess();
   p.EndProcess();
 
   cout << vlab << endl;
-  Isis::Process p2;
-  Isis::CubeAttributeInput att;
-  string file = Isis::Application::GetUserInterface().GetFileName("TO");
-  Isis::Cube *icube = p2.SetInputCube(file, att);
-  Isis::Statistics *stat = icube->getStatistics();
+  Process p2;
+  CubeAttributeInput att;
+  QString file = Application::GetUserInterface().GetFileName("TO");
+  Cube *icube = p2.SetInputCube(file, att);
+  Statistics *stat = icube->getStatistics();
   cout << stat->Average() << endl;
   cout << stat->Variance() << endl;
   p2.EndProcess();
-  remove(file.c_str());
+  QFile::remove(file);
 }

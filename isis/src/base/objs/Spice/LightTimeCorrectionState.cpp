@@ -121,7 +121,7 @@ namespace Isis {
   bool LightTimeCorrectionState::checkAberrationCorrection(int ikCode, 
                                                          Spice *spice) {
     try {
-      std::string ikernKey = "INS" + IString(ikCode) + "_LIGHTTIME_CORRECTION";
+      QString ikernKey = "INS" + toString(ikCode) + "_LIGHTTIME_CORRECTION";
       QString abcorr = spice->getString(ikernKey);
       m_abcorr = abcorr;
       return (true);
@@ -196,15 +196,15 @@ namespace Isis {
     QString abcorr("");
 
     //  Retrieve list of loaded SPKs from Kernel object
-    std::vector<std::string> spks = kernels.getKernelList("SPK");
-    for ( unsigned int k = 0 ; k < spks.size() ; k++ ) {
-      std::string spkFile = spks[k];
+    QStringList spks = kernels.getKernelList("SPK");
+    for ( int k = 0 ; k < spks.size() ; k++ ) {
+      QString spkFile = spks[k];
       SpiceChar ktype[32];
       SpiceChar source[128];
       SpiceInt  handle;
       SpiceBoolean found;
       //  Get info on SPK kernel mainly the NAIF handle for comment parsing
-      (void) kinfo_c(spkFile.c_str(), sizeof(ktype), sizeof(source), ktype,
+      (void) kinfo_c(spkFile.toAscii().data(), sizeof(ktype), sizeof(source), ktype,
                      source, &handle, &found);
       if (found == SPICETRUE) {
         // SPK is open so read and parse all the comments.
@@ -267,8 +267,8 @@ namespace Isis {
                                                          Spice *spice) {
 
     try {
-      std::string ikernKey = "INS" + IString(ikCode) + "_SWAP_OBSERVER_TARGET";
-      std::string value = spice->getString(ikernKey).UpCase();
+      QString ikernKey = "INS" + toString(ikCode) + "_SWAP_OBSERVER_TARGET";
+      QString value = spice->getString(ikernKey).toUpper();
       m_swapObserverTarget = ("TRUE" == value);
     }
     catch (IException &ie) {
@@ -319,8 +319,8 @@ namespace Isis {
                                                                 Spice *spice) {
 
     try {
-      std::string ikernKey = "INS" + IString(ikCode) + "_LT_SURFACE_CORRECT";
-      std::string value = spice->getString(ikernKey).UpCase();
+      QString ikernKey = "INS" + toString(ikCode) + "_LT_SURFACE_CORRECT";
+      QString value = spice->getString(ikernKey).toUpper();
       m_sc_to_surf_ltcorr = ("TRUE" == value);
     }
     catch (IException &ie) {

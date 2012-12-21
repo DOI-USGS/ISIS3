@@ -190,8 +190,8 @@ namespace Isis {
       void SetTimeBias(double timeBias);
       double GetTimeBias() const;
 
-      virtual void SetAberrationCorrection(const std::string &correction);
-      virtual std::string GetAberrationCorrection() const;
+      virtual void SetAberrationCorrection(const QString &correction);
+      virtual QString GetAberrationCorrection() const;
       double GetLightTime() const;
 
       const std::vector<double> &SetEphemerisTime(double et);
@@ -221,13 +221,13 @@ namespace Isis {
       void LoadCache(double time);
       void LoadCache(Table &table);
 
-      Table LineCache(const std::string &tableName);
-      Table LoadHermiteCache(const std::string &tableName);
+      Table LineCache(const QString &tableName);
+      Table LoadHermiteCache(const QString &tableName);
 
       void ReloadCache();
       void ReloadCache(Table &table);
 
-      Table Cache(const std::string &tableName);
+      Table Cache(const QString &tableName);
 
       //! Is this position cached
       bool IsCached() const {
@@ -292,8 +292,8 @@ namespace Isis {
       int getTargetCode() const;
       double getAdjustedEphemerisTime() const;
       void computeStateVector(double et, int target, int observer, 
-                              const std::string &refFrame, 
-                              const std::string &abcorr, 
+                              const QString &refFrame, 
+                              const QString &abcorr, 
                               double state[6], bool &hasVelocity,
                               double &lightTime) const;
       void setStateVector(const double state[6], const bool &hasVelocity);
@@ -312,7 +312,7 @@ namespace Isis {
       int p_observerCode;                 //!< observer body code
 
       double p_timeBias;                  //!< iTime bias when reading kernels
-      std::string p_aberrationCorrection; //!< Light time correction to apply
+      QString p_aberrationCorrection; //!< Light time correction to apply
 
       double p_et;                        //!< Current ephemeris time
       std::vector<double> p_coordinate;   //!< J2000 position at time et

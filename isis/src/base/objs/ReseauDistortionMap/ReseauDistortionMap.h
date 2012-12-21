@@ -42,7 +42,7 @@ namespace Isis {
    */
   class ReseauDistortionMap : public CameraDistortionMap {
     public:
-      ReseauDistortionMap(Camera *parent, Pvl &labels, const std::string &fname);
+      ReseauDistortionMap(Camera *parent, Pvl &labels, const QString &fname);
 
       virtual bool SetFocalPlane(const double dx, const double dy);
 

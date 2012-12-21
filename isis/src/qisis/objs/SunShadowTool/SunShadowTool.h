@@ -3,20 +3,20 @@
 
 #include "Tool.h"
 
-// FIXME: remove these includes
 #include <QAction>
-#include "TableMainWindow.h"
-#include "IString.h"
 
-class QDialog;
-class QMenu;
-class QLineEdit;
+#include "IString.h"
+#include "TableMainWindow.h"
+
 class QComboBox;
+class QDialog;
+class QLineEdit;
+class QMenu;
+class QString;
 
 namespace Isis {
   class Angle;
   class Distance;
-  class IString;
   class MdiCubeViewport;
   class SurfacePoint;
 
@@ -129,9 +129,9 @@ namespace Isis {
       Distance *m_shadowLength;
 
       //! Current cube file path
-      IString m_path;
+      QString m_path;
       //! Current cube file name
-      IString m_fileName;
+      QString m_fileName;
 
       //! Table window for displaying all of the table information
       TableMainWindow *m_tableWin;

@@ -9,7 +9,7 @@ void IsisMain() {
 
   // Get user entered file name & mode
   UserInterface &ui = Application::GetUserInterface();
-  string file = ui.GetFileName("FROM");
+  QString file = ui.GetFileName("FROM");
 
   // Extract history from file
   OriginalLabel origLab(file);
