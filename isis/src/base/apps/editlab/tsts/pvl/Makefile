@@ -1,3 +1,5 @@
+# This test edits a detached pvl label. It adds keyword Z to Numbers, 
+# sets keyword X, modifies keyword Z, and modifies keyword Y.
 APPNAME = editlab
 
 include $(ISISROOT)/make/isismake.tsts

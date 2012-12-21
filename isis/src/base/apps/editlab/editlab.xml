@@ -46,6 +46,11 @@
        Added the SETKEY parameter to prevent non-explicit duplicate keywords,
        greatly cleaned and reduced code, and added support for non-cube Pvls.
     </change>
+    <change name="Jeannie Backer" date="2012-12-20">
+       Modified to update history in the labels and show appropriate files 
+       in the dialog box for choosing FROM parameter filenames.
+       Fixes #655. Fixes #1084
+    </change>
   </history>
 
   <groups>
@@ -60,7 +65,7 @@
           The pvl or cube file containing the label to be modified.
         </description>
         <filter>
-          *.cub, *.pvl
+          *.cub *.pvl
         </filter>
       </parameter>
     </group>
