@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include <QDebug>
+
 #include "ControlNetFile.h"
 #include "ControlNetFileV0001.h"
 #include "ControlNetFileV0002.h"
@@ -468,7 +470,13 @@ namespace Isis {
       radii = Projection::TargetRadii(network["TargetName"]);
     }
     catch(IException &e) {
-      IString msg = "The target name is not recognized";
+      try {
+        NaifStatus::CheckErrors();
+      }
+      catch (IException &) {
+      }
+
+      QString msg = "The target name is not recognized";
       throw IException(e, IException::Io, msg, _FILEINFO_);
     }
 
