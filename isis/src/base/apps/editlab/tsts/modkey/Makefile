@@ -2,7 +2,6 @@
 # adds 2 keywords called key2 to the group.
 APPNAME = editlab
 editlabTruth1.txt.IGNORELINES = ByteOrder TileSamples TileLines StartByte
-history.pvl.IGNORELINES = ExecutionDateTime HostName IsisVersion ProgramVersion ProgramPath UserName
 
 include $(ISISROOT)/make/isismake.tsts
 

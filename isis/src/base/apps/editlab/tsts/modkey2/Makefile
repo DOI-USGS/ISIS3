@@ -3,7 +3,6 @@
 APPNAME = editlab
 editlabTruth3.txt.IGNORELINES = ByteOrder TileSamples TileLines StartByte
 tempLab3.txt.IGNORELINES = Bytes ByteOrder TileSamples TileLines StartByte
-history.pvl.IGNORELINES = ExecutionDateTime HostName IsisVersion ProgramVersion ProgramPath UserName
 
 include $(ISISROOT)/make/isismake.tsts
 
