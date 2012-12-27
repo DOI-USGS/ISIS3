@@ -486,7 +486,7 @@ namespace Isis {
       for(i=0;i<5;i++)
         atf[i] =0.0;
       for(i=0;i<15;i++)
-        ata[0] =0.0;
+        ata[i] =0.0;
       //printf("Debug a: %lf b: %lf theta: %lf center: %lf %lf\n",ell->semiMajor,ell->semiMinor,ell->majorAxis[0],ell->cen[0],ell->cen[1]);getchar();
       for (i=0,l=0; i<int((*pts).size()); i++) {
         dpt[0] = (*pts)[i][0];  //integer pixel locations coverted to double for calcualations

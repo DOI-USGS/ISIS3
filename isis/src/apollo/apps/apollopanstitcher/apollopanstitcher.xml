@@ -21,8 +21,14 @@
       Application name changed from apollopansticher to apollopanstitcher
     </change>
     <change name="Raad A. Saleh" date="2012-08-08">
-     Program has been modified to accept long (more than 128 characters) file names without error.
-     This fixes Mantis ticket # 1024. 
+      Program has been modified to accept long (more than 128 characters) file names without error.
+      This fixes Mantis ticket # 1024. 
+    </change>
+    <change name="Steven Lambright" date="2012-12-26">
+      Fixed a bug that caused this program to produce erroneous outputs a small percentage of
+      the times it was run (less than 3% failure rate). The bad outputs looked valid - visually -
+      but the stitching was incorrect (pixels would be in the wrong place). This was a general
+      failure, not caused by a particular input or set of parameter values. Fixes #1053.
     </change>
   </history>
 
