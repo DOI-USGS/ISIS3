@@ -55,7 +55,7 @@ namespace Isis {
         IString key = MosaicTreeWidgetItem::treeColumnToString(col) + "Visible";
         key = key.Convert(" ", '_');
 
-        bool visible = toBool(pvl[key][0]);
+        bool visible = toBool(pvl[key.ToQt()][0]);
 
         if(visible) {
           p_tree->showColumn(col);
