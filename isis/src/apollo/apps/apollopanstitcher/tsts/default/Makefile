@@ -21,4 +21,4 @@ commands:
 	#form the histogram output grep the total valid Pixels
 	cat $(OUTPUT)/hist.txt | grep "Valid Pixels:" >> $(OUTPUT)/CubeStats.txt;
 	#remove the intermediate files
-	#$(RM) $(OUTPUT)/fx.cub $(OUTPUT)/hist.txt $(OUTPUT)/reduced8.cub
+	$(RM) $(OUTPUT)/fx.cub $(OUTPUT)/hist.txt $(OUTPUT)/reduced8.cub
