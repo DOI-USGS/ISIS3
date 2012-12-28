@@ -29,6 +29,17 @@
 using namespace std;
 using namespace Isis;
 
+/**
+ * @brief unitTest for MRO CTX Camera Model
+ *
+ * This is the unitTest for the Mars Reconnaissance Orbiter Context Camera (CTX) camera model. 
+ *
+ * @author ????-??-?? Unknown
+ *
+ * @internal
+ *   @history 2012-12-27  Tracie Sucharski, Add image with SpatialSumming=2.
+*/
+
 void TestLineSamp(Camera *cam, double samp, double line);
 
 int main(int argc, char *argv[]) {
@@ -43,9 +54,11 @@ int main(int argc, char *argv[]) {
     // These should be lat/lon at center of image. To obtain these numbers for a new cube/camera,
     // set both the known lat and known lon to zero and copy the unit test output "Latitude off by: "
     // and "Longitude off by: " values directly into these variables.
-    double knownLat[2] = { -22.00026732942671, -15.08829558278137 };
-    double knownLon[2] = { 307.9160921848336, 309.8677351454377 };
-    char files[2][1024] = { "$mro/testData/ctx_pmoi_i_00003.bottom.cub", "$mro/testData/ctx_pmoi_i_00003.top.cub" };
+    double knownLat[3] = { -22.00026732942671, -15.08829558278137, -40.6918887505667115 };
+    double knownLon[3] = { 307.9160921848336, 309.8677351454377, 102.4181750964207964 };
+    char files[3][1024] = { "$mro/testData/ctx_pmoi_i_00003.bottom.cub",
+                            "$mro/testData/ctx_pmoi_i_00003.top.cub",
+                            "$mro/testData/G02_019106_1390_XN_41S257W.cub" };
 
     for(unsigned int i = 0; i < sizeof(knownLat) / sizeof(double); i++) {
       Pvl p(files[i]);

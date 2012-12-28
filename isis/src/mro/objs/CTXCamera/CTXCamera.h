@@ -57,6 +57,12 @@ namespace Isis {
    *            NAIF error check to constructor.
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
    *            coding standards. References #972.
+   *   @history 2012-12-27 Tracie Sucharski, Fixed bug for images with a SpatialSumming=2.
+   *            The images were compressed in the y-direction.  There was a line of code commented
+   *            out, "lineRate *= csum;".  From the MRO_ctx_pds_sis.pdf, "Note that CTX implements
+   *            downtrack summing by increasing the line time; for example, a 2X2 summed image has
+   *            an actual line time twice that given by this fïeld.".  Uncommenting the line fixed
+   *            the y-direction scale problem.  Fixes #826.
    */
   class CTXCamera : public LineScanCamera {
     public:

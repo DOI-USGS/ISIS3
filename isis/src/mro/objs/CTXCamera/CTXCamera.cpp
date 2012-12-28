@@ -54,7 +54,7 @@ namespace Isis {
     // Get other info from labels
     double csum = inst["SpatialSumming"];
     double lineRate = (double) inst["LineExposureDuration"] / 1000.0;
-//      lineRate *= csum;
+    lineRate *= csum;
     double ss = inst["SampleFirstPixel"];
     ss += 1.0;
 
