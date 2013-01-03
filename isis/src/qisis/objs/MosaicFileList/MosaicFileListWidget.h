@@ -20,14 +20,18 @@ namespace Isis {
    *
    * @internal
    *    @history 2011-07-29 Steven Lambright - Expansion state is now stored in
-   *                            the project file. This change will cause older
-   *                            versions of qmos to fail to read newer project
-   *                            files. References #275.
+   *                           the project file. This change will cause older
+   *                           versions of qmos to fail to read newer project
+   *                           files. References #275.
    *    @history 2011-08-12 Steven Lambright - Added export options,
-   *                            references #342
+   *                           references #342
    *    @history 2011-08-29 Steven Lambright - Reworded save file list export
-   *                            action, references #342
+   *                           action, references #342
    *   @history 2011-09-27 Steven Lambright - Improved user documentation
+   *   @history 2012-12-27 Steven Lambright - Added support for projects that
+   *                           are missing column visibility states; this is
+   *                           to support old projects (made before Phase Angle
+   *                           was added as a column). References #1093.
    */
   class MosaicFileListWidget : public QWidget {
       Q_OBJECT

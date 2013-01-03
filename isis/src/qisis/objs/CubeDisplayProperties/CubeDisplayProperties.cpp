@@ -54,6 +54,7 @@ namespace Isis {
 
     m_incidenceAngle = Null;
     m_resolution = Null;
+    m_phaseAngle = Null;
     m_emissionAngle = Null;
 
     try {
@@ -101,6 +102,19 @@ namespace Isis {
               }
               else if (table[i][j+3].isDouble()) {
                 m_incidenceAngle = (double)table[i][j+3];
+              }
+              else if (table[i][j+3].isText()) {
+              }
+            }
+          }
+
+          // Get the average incidence angle for this mosaic item.
+          if (table[i][j].isText() && label.compare("PhaseAngle") == 0) {
+            if (j + 3 < table[i].Fields()) {
+              if (table[i][j+3].isInteger()) {
+              }
+              else if (table[i][j+3].isDouble()) {
+                m_phaseAngle = (double)table[i][j+3];
               }
               else if (table[i][j+3].isText()) {
               }
@@ -251,6 +265,34 @@ namespace Isis {
       delete m_cube;
       m_cube = NULL;
     }
+  }
+
+
+  double CubeDisplayProperties::incidenceAngle() const {
+    return m_incidenceAngle;
+  }
+
+
+  /**
+   * Retrieve the mean phase angle for the cube. This value
+   *   originates from the attached CameraStatistics blob (from
+   *   camstats). If camstats was not run (with attach=true), then
+   *   this will return Null.
+   *
+   * @return Phase angle of this cube
+   */
+  double CubeDisplayProperties::phaseAngle() const {
+    return m_phaseAngle;
+  }
+
+
+  double CubeDisplayProperties::emissionAngle() const {
+    return m_emissionAngle;
+  }
+
+
+  double CubeDisplayProperties::resolution() const {
+    return m_resolution;
   }
 
 

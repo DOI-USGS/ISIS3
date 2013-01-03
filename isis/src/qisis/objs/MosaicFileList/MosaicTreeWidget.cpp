@@ -39,6 +39,7 @@ namespace Isis {
     hideColumn(MosaicTreeWidgetItem::LabelColumn);
     hideColumn(MosaicTreeWidgetItem::ResolutionColumn);
     hideColumn(MosaicTreeWidgetItem::EmissionAngleColumn);
+    hideColumn(MosaicTreeWidgetItem::PhaseAngleColumn);
     hideColumn(MosaicTreeWidgetItem::IncidenceAngleColumn);
     hideColumn(MosaicTreeWidgetItem::BlankColumn);
 

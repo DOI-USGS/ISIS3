@@ -60,6 +60,8 @@ namespace Isis {
    *                           methods to lower camel case. Fixed history
    *                           entry indentation. Added padding to control
    *                           statements. References #1169.
+   *   @history 2012-12-27 Steven Lambright - Added phaseAngle() accessor (along with
+   *                           code to read and store the phase angle). References #1093.
    */
   class CubeDisplayProperties : public QObject {
       Q_OBJECT
@@ -111,17 +113,10 @@ namespace Isis {
 
       void closeCube();
 
-      double incidenceAngle() const {
-        return m_incidenceAngle;
-      }
-
-      double emissionAngle() const {
-        return m_emissionAngle;
-      }
-
-      double resolution() const {
-        return m_resolution;
-      }
+      double incidenceAngle() const;
+      double phaseAngle() const;
+      double emissionAngle() const;
+      double resolution() const;
 
       geos::geom::MultiPolygon *footprint(QMutex *lock = NULL);
 
@@ -211,6 +206,7 @@ namespace Isis {
       geos::geom::MultiPolygon *m_footprint;
       double m_incidenceAngle;
       double m_resolution;
+      double m_phaseAngle;
       double m_emissionAngle;
   };
 }

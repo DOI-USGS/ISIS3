@@ -1,0 +1,12 @@
+:File List.Tree_Isis::MosaicTreeWidget	{container=':qmos.File List_QDockWidget' name='Tree' type='Isis::MosaicTreeWidget' visible='1'}
+:Group1.42.5087_QModelIndex	{column='7' container=':Tree.Group1_QModelIndex' text='42.5087' type='QModelIndex'}
+:Open Cubes.File name:_QLabel	{name='fileNameLabel' text='File name:' type='QLabel' visible='1' window=':Open Cubes_QFileDialog'}
+:Open Cubes_QFileDialog	{name='QFileDialog' type='QFileDialog' visible='1' windowTitle='Open Cubes'}
+:Tree.Group1_QModelIndex	{column='0' container=':File List.Tree_Isis::MosaicTreeWidget' text='Group1' type='QModelIndex'}
+:_QListView	{type='QListView' unnamed='1' visible='1'}
+:fileNameEdit_QLineEdit	{buddy=':Open Cubes.File name:_QLabel' name='fileNameEdit' type='QLineEdit' visible='1'}
+:qmos.File List_QDockWidget	{name='FileListDock' type='QDockWidget' visible='1' window=':qmos_Isis::MosaicMainWindow' windowTitle='File List'}
+:qmos.File_QMenu	{title='File' type='QMenu' unnamed='1' visible='1' window=':qmos_Isis::MosaicMainWindow'}
+:qmos.View_QMenu	{title='View' type='QMenu' unnamed='1' visible='1' window=':qmos_Isis::MosaicMainWindow'}
+:qmos_Isis::MosaicMainWindow	{name='MosaicMainWindow' type='Isis::MosaicMainWindow' visible='1' windowTitle='qmos'}
+:qmos_QMenuBar	{type='QMenuBar' unnamed='1' visible='1' window=':qmos_Isis::MosaicMainWindow'}

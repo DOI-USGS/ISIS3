@@ -35,6 +35,10 @@ namespace Isis {
       setText(EmissionAngleColumn,
               QString::number(p_cubeDisplay->emissionAngle()));
 
+    if(!IsSpecial(p_cubeDisplay->phaseAngle()))
+      setText(PhaseAngleColumn,
+              QString::number(p_cubeDisplay->phaseAngle()));
+
     if(!IsSpecial(p_cubeDisplay->incidenceAngle()))
       setText(IncidenceAngleColumn,
               QString::number(p_cubeDisplay->incidenceAngle()));
@@ -127,6 +131,8 @@ namespace Isis {
         return "Resolution";
       case EmissionAngleColumn:
         return "Emission Angle";
+      case PhaseAngleColumn:
+        return "Phase Angle";
       case IncidenceAngleColumn:
         return "Incidence Angle";
       case BlankColumn:
@@ -150,6 +156,7 @@ namespace Isis {
         return text(column) < other.text(column);
 
       case EmissionAngleColumn:
+      case PhaseAngleColumn:
       case IncidenceAngleColumn:
       case ResolutionColumn:
         return text(column).toDouble() <
