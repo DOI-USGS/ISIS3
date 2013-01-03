@@ -12,4 +12,6 @@ commands:
           to=$(OUTPUT)/${FILE}.vis.odd.cal.cub > /dev/null;
 	$(APPNAME) from=$(INPUT)/${FILE}.vis.even.cub \
           to=$(OUTPUT)/${FILE}.vis.even.cal.cub > /dev/null;
+	$(APPNAME) from=$(INPUT)/${FILE}.vis.even.cub+4 \
+          to=$(OUTPUT)/${FILE}.vis.even.cal.band4.cub > /dev/null;
 

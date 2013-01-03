@@ -46,6 +46,7 @@ double g_exposure; // Exposure duration
 double g_solarDistance = 1.01; //!< average distance in [AU]
 double g_startTemperature, g_endTemperature;
 double g_temp1, g_temp2;
+QString instModeId;
 
 int g_numFrames;
 
@@ -116,6 +117,13 @@ void IsisMain () {
 
   Isis::PvlGroup &bandBin = icube->getLabel()->FindGroup("BandBin", Pvl::Traverse);
   QString filter = (QString) bandBin["Center"][0];
+  QString filterNum = (QString) bandBin["FilterNumber"][0];
+  //We have to pay special attention incase we are passed a 
+  //single band image that has been "exploded" from a multiband wac
+  if (instModeId == "COLOR" && g_bands.size() == 1)
+   g_bands[0] = (toInt(filterNum) -2);
+  else if (instModeId == "UV" && g_bands.size() == 1)
+   g_bands[0] = (toInt(filterNum));
 
   if (g_dark) {
     if (darkFiles.size() == 0 || darkFiles[0] =="Default" || darkFiles[0].length() == 0) {
@@ -311,6 +319,11 @@ void ResetGlobals () {
 
 // Calibrate each framelet
 void Calibrate ( Buffer &inCube, Buffer &outCube ) {
+  int correctBand = -1;
+  //If we are passed in a single band (img.cub+4) we need to pay special attention that we don't start with band1
+  if (inCube.BandDimension() == 1 && g_bands.size() == 1)
+    correctBand = g_bands.front();
+
   int frameHeight = inCube.LineDimension();
   int frameSize = inCube.SampleDimension()*inCube.LineDimension();
   int frame = inCube.Line() / frameHeight;
@@ -325,7 +338,11 @@ void Calibrate ( Buffer &inCube, Buffer &outCube ) {
 
     for ( int b=0; b<inCube.BandDimension(); b++) {
       // We find the index of the corresponding dark frame band as the offset
-      int offset = g_darkCube1->Index(1, frameHeight * (int) min(frame, g_darkCube1->LineDimension()/frameHeight - 1) + 1, b+1);
+      int offset;
+      if (correctBand != -1)
+        offset = g_darkCube1->Index(1, frameHeight * (int) min(frame, g_darkCube1->LineDimension()/frameHeight - 1) + 1, correctBand);
+      else
+        offset = g_darkCube1->Index(1, frameHeight * (int) min(frame, g_darkCube1->LineDimension()/frameHeight - 1) + 1, b+1);
 
       // We're bypassing Buffer::at for speed, so we need to make sure our
       // index will not overrun the buffer
@@ -379,7 +396,11 @@ void Calibrate ( Buffer &inCube, Buffer &outCube ) {
   if (g_flatfield) {
     for ( int b=0; b<inCube.BandDimension(); b++) {
       // We find the index of the corresponding flat frame band as the offset
-      int offset = g_flatCube->Index(1, frameHeight * (int) min(frame, (g_flatCube->LineDimension()-1) / frameHeight)+1, b+1);
+      int offset;
+      if (correctBand != -1)
+        offset = g_flatCube->Index(1, frameHeight * (int) min(frame, (g_flatCube->LineDimension()-1) / frameHeight)+1, correctBand);
+      else
+        offset = g_flatCube->Index(1, frameHeight * (int) min(frame, (g_flatCube->LineDimension()-1) / frameHeight)+1, b+1);
 
       // We're bypassing Buffer::at for speed, so we need to make sure our
       // index will not overrun the buffer
@@ -418,7 +439,11 @@ void Calibrate ( Buffer &inCube, Buffer &outCube ) {
   if (g_specpix) {
     for ( int b=0; b<inCube.BandDimension(); b++) {
       // We find the index of the corresponding flat frame band as the offset
-      int offset = g_specpixCube->Index(1, frameHeight * (int) min(frame, (g_specpixCube->LineDimension()-1) / frameHeight)+1, b+1);
+      int offset;
+      if (correctBand != -1)
+        offset = g_specpixCube->Index(1, frameHeight * (int) min(frame, (g_specpixCube->LineDimension()-1) / frameHeight)+1, correctBand);
+      else
+        offset = g_specpixCube->Index(1, frameHeight * (int) min(frame, (g_specpixCube->LineDimension()-1) / frameHeight)+1, b+1);
 
       for (int i = 0; i < frameSize; i++) {
         if (IsSpecial(g_specpixCube->at(offset + i)))
