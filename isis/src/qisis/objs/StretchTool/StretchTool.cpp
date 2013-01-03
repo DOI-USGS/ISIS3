@@ -1073,12 +1073,12 @@ namespace Isis {
    */
   Statistics StretchTool::statsFromCube(Cube *cube, int band) {
     Statistics stats;
-    Brick brick(cube->getSampleCount(), 1, 1, cube->getPixelType());
+    Brick brick(cube->sampleCount(), 1, 1, cube->pixelType());
 
-    for(int line = 0; line < cube->getLineCount(); line++) {
+    for(int line = 0; line < cube->lineCount(); line++) {
       brick.SetBasePosition(0, line, band);
       cube->read(brick);
-      stats.AddData(brick.DoubleBuffer(), cube->getSampleCount());
+      stats.AddData(brick.DoubleBuffer(), cube->sampleCount());
     }
 
     return stats;
@@ -1132,12 +1132,12 @@ namespace Isis {
   Histogram StretchTool::histFromCube(Cube *cube, int band,
       double min, double max) {
     Histogram hist(min, max);
-    Brick brick(cube->getSampleCount(), 1, 1, cube->getPixelType());
+    Brick brick(cube->sampleCount(), 1, 1, cube->pixelType());
 
-    for(int line = 0; line < cube->getLineCount(); line++) {
+    for(int line = 0; line < cube->lineCount(); line++) {
       brick.SetBasePosition(0, line, band);
       cube->read(brick);
-      hist.AddData(brick.DoubleBuffer(), cube->getSampleCount());
+      hist.AddData(brick.DoubleBuffer(), cube->sampleCount());
     }
 
     return hist;

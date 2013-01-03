@@ -65,13 +65,13 @@ void IsisMain() {
 
   // Input cube Lines and Samples must be the same and each must have only
   // one band
-  if((trans.getLineCount() != match.getLineCount()) ||
-      (trans.getSampleCount() != match.getSampleCount())) {
+  if((trans.lineCount() != match.lineCount()) ||
+      (trans.sampleCount() != match.sampleCount())) {
     QString msg = "Input Cube Lines and Samples must be equal!";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if(trans.getBandCount() != 1 || match.getBandCount() != 1) {
+  if(trans.bandCount() != 1 || match.bandCount() != 1) {
     QString msg = "Input Cubes must have only one band!";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -82,8 +82,8 @@ void IsisMain() {
 
 //  This still precludes band to band registrations.
   if(serialTrans == serialMatch) {
-    QString sTrans = FileName(trans.getFileName()).name();
-    QString sMatch = FileName(match.getFileName()).name();
+    QString sTrans = FileName(trans.fileName()).name();
+    QString sMatch = FileName(match.fileName()).name();
     if(sTrans == sMatch) {
       QString msg = "Cube Serial Numbers must be unique - FROM=" + serialTrans +
                    ", MATCH=" + serialMatch;
@@ -108,13 +108,13 @@ void IsisMain() {
     rows = ui.GetInteger("ROWS");
   }
   else {
-    rows = (int)((trans.getLineCount() - 1) / ar->SearchChip()->Lines() + 1);
+    rows = (int)((trans.lineCount() - 1) / ar->SearchChip()->Lines() + 1);
   }
   if(ui.WasEntered("COLUMNS")) {
     cols = ui.GetInteger("COLUMNS");
   }
   else {
-    cols = (int)((trans.getSampleCount() - 1)
+    cols = (int)((trans.sampleCount() - 1)
                  / ar->SearchChip()->Samples() + 1);
   }
 
@@ -124,15 +124,15 @@ void IsisMain() {
   prog.CheckStatus();
 
   // Calculate spacing for the grid of points
-  double lSpacing = (double)trans.getLineCount() / rows;
-  double sSpacing = (double)trans.getSampleCount() / cols;
+  double lSpacing = (double)trans.lineCount() / rows;
+  double sSpacing = (double)trans.sampleCount() / cols;
 
   // Initialize control point network and set target name (only required
   // field)
   ControlNet cn;
   cn.SetNetworkId("Coreg");
   if (match.hasGroup("Instrument")) {
-    PvlGroup inst = match.getGroup("Instrument");
+    PvlGroup inst = match.group("Instrument");
     PvlKeyword &targname = inst.FindKeyword("TargetName");
     QString targetname = targname;
     cn.SetTarget(targetname);

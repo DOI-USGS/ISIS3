@@ -178,10 +178,10 @@ namespace Isis {
     Camera *measureCamera = NULL;
     if(mbCameraRequired) {
       try {
-        measureCamera = pCube->getCamera();
+        measureCamera = pCube->camera();
       }
       catch(IException &e) {
-        QString msg = "Cannot Create Camera for Image:" + pCube->getFileName();
+        QString msg = "Cannot Create Camera for Image:" + pCube->fileName();
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -246,7 +246,7 @@ namespace Isis {
     }
 
     if(mbValidateDN) {
-      Isis::Portal inPortal(1, 1, pCube->getPixelType());
+      Isis::Portal inPortal(1, 1, pCube->pixelType());
       inPortal.SetPosition(pSample, pLine, 1);
       pCube->read(inPortal);
       mdDnValue = inPortal[0];
@@ -813,8 +813,8 @@ namespace Isis {
       return true;
     }
 
-    int iNumSamples = pCube->getSampleCount();
-    int iNumLines   = pCube->getLineCount();
+    int iNumSamples = pCube->sampleCount();
+    int iNumLines   = pCube->lineCount();
 
     // test right
     if((iNumSamples - piSample) < miPixelsFromEdge) {
@@ -855,12 +855,12 @@ namespace Isis {
       return true;
     }
 
-    int iNumSamples = pCube->getSampleCount();
-    int iNumLines   = pCube->getLineCount();
+    int iNumSamples = pCube->sampleCount();
+    int iNumLines   = pCube->lineCount();
 
     try {
       // Get the image's camera to get pixel resolution
-      Camera *camera = pCube->getCamera();
+      Camera *camera = pCube->camera();
       double resMetersTotal = 0;
       bool bMinDistance     = false;
 
@@ -925,7 +925,7 @@ namespace Isis {
     }
     catch(IException &e) {
       QString msg = "Cannot Create Camera for Image [" +
-          pCube->getFileName() + "]";
+          pCube->fileName() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }

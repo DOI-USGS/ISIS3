@@ -31,11 +31,11 @@ void IsisMain() {
   // Make sure it is a Marci cube
   FileName inFileName = ui.GetFileName("FROM");
   try {
-    if(icube.getGroup("Instrument")["InstrumentID"][0] != "Marci") {
+    if(icube.group("Instrument")["InstrumentID"][0] != "Marci") {
       throw IException();
     }
 
-    if(!icube.getGroup("Archive").HasKeyword("SampleBitModeId")) {
+    if(!icube.group("Archive").HasKeyword("SampleBitModeId")) {
       throw IException();
     }
   }
@@ -45,8 +45,8 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if(icube.getGroup("Archive")["SampleBitModeId"][0] != "SQROOT") {
-    QString msg = "Sample bit mode [" + icube.getGroup("Archive")["SampleBitModeId"][0] + "] is not supported.";
+  if(icube.group("Archive")["SampleBitModeId"][0] != "SQROOT") {
+    QString msg = "Sample bit mode [" + icube.group("Archive")["SampleBitModeId"][0] + "] is not supported.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -62,7 +62,7 @@ void IsisMain() {
     decimation.push_back(1.0);
   }
 
-  QString startTime = icube.getLabel()->FindGroup("Instrument", Pvl::Traverse)["StartTime"][0];
+  QString startTime = icube.label()->FindGroup("Instrument", Pvl::Traverse)["StartTime"][0];
   iTime start(startTime);
   iTime changeTime("November 6, 2006 21:30:00 UTC");
 
@@ -120,7 +120,7 @@ void IsisMain() {
 
   vector<Cube *> flatcubes;
   vector<LineManager *> fcubeMgrs;
-  int summing = toInt(icube.getGroup("Instrument")["SummingMode"][0]);
+  int summing = toInt(icube.group("Instrument")["SummingMode"][0]);
 
   // Read in the flat files
   for(int band = 0; band < 7; band++) {
@@ -156,7 +156,7 @@ void IsisMain() {
   Cube ocube;
 
   CubeAttributeOutput outAtt = ui.GetOutputAttribute("TO");
-  ocube.setDimensions(icube.getSampleCount(), icube.getLineCount(), icube.getBandCount());
+  ocube.setDimensions(icube.sampleCount(), icube.lineCount(), icube.bandCount());
   ocube.setByteOrder(outAtt.byteOrder());
   ocube.setFormat(outAtt.fileFormat());
   ocube.setLabelsAttached(outAtt.labelAttachment() == AttachedLabel);
@@ -179,7 +179,7 @@ void IsisMain() {
   filterNameToFilterIndex.insert(pair<QString, int>("SHORT_UV", 6));
   filterNameToFilterIndex.insert(pair<QString, int>("LONG_UV",  7));
 
-  PvlKeyword &filtNames = icube.getLabel()->FindGroup("BandBin", Pvl::Traverse)["FilterName"];;
+  PvlKeyword &filtNames = icube.label()->FindGroup("BandBin", Pvl::Traverse)["FilterName"];;
   for(int i = 0; i < filtNames.Size(); i++) {
     if(filterNameToFilterIndex.find(filtNames[i]) != filterNameToFilterIndex.end()) {
       filter.push_back(filterNameToFilterIndex.find(filtNames[i])->second);
@@ -191,12 +191,12 @@ void IsisMain() {
   }
 
   bool iof = ui.GetBoolean("IOF");
-  double exposure = ((double)icube.getLabel()->FindGroup("Instrument", Pvl::Traverse)["ExposureDuration"]) * 1000.0;
+  double exposure = ((double)icube.label()->FindGroup("Instrument", Pvl::Traverse)["ExposureDuration"]) * 1000.0;
   Camera *cam = NULL;
   double solarDist = Isis::Null;
 
   if(iof) {
-    cam = icube.getCamera();
+    cam = icube.camera();
     cam->SetImage(icubeMgr.size() / 2.0, 0.5 + (16 / 2) / summing);
     solarDist = cam->SolarDistance();
   }
@@ -206,7 +206,7 @@ void IsisMain() {
 
   Progress prog;
   prog.SetText("Calibrating Image");
-  prog.SetMaximumSteps(ocube.getLineCount() * ocube.getBandCount());
+  prog.SetMaximumSteps(ocube.lineCount() * ocube.bandCount());
   prog.CheckStatus();
 
   Statistics stats;
@@ -265,16 +265,16 @@ void IsisMain() {
   while(!ocubeMgr.end());
 
   // Propagate labels and objects (in case of spice data)
-  PvlObject &inCubeObj = icube.getLabel()->FindObject("IsisCube");
-  PvlObject &outCubeObj = ocube.getLabel()->FindObject("IsisCube");
+  PvlObject &inCubeObj = icube.label()->FindObject("IsisCube");
+  PvlObject &outCubeObj = ocube.label()->FindObject("IsisCube");
 
   for(int g = 0; g < inCubeObj.Groups(); g++) {
     outCubeObj.AddGroup(inCubeObj.Group(g));
   }
 
-  for(int o = 0; o < icube.getLabel()->Objects(); o++) {
-    if(icube.getLabel()->Object(o).IsNamed("Table")) {
-      Blob t(icube.getLabel()->Object(o)["Name"], icube.getLabel()->Object(o).Name());
+  for(int o = 0; o < icube.label()->Objects(); o++) {
+    if(icube.label()->Object(o).IsNamed("Table")) {
+      Blob t(icube.label()->Object(o)["Name"], icube.label()->Object(o).Name());
       icube.read(t);
       ocube.write(t);
     }

@@ -739,10 +739,10 @@ namespace Isis {
     // We need to walk the polygon...
     ImagePolygon imgPoly;
 
-    int sampleStepSize = cube()->getSampleCount() / 10;
+    int sampleStepSize = cube()->sampleCount() / 10;
     if (sampleStepSize <= 0) sampleStepSize = 1;
 
-    int lineStepSize = cube()->getLineCount() / 10;
+    int lineStepSize = cube()->lineCount() / 10;
     if (lineStepSize <= 0) lineStepSize = 1;
 
     imgPoly.Create(*cube(), sampleStepSize, lineStepSize);

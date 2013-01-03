@@ -60,7 +60,7 @@ void IsisMain() {
 
   ProcessByLine processByLine;
   Cube *icube = processByLine.SetInputCube("FROM");
-  int totalSamples = icube->getSampleCount();
+  int totalSamples = icube->sampleCount();
 
   //We'll be going through the cube by line, manually differentiating
   // between phases
@@ -69,7 +69,7 @@ void IsisMain() {
 
 
   Table hifix("HiRISE Ancillary");
-  int channel = icube->getGroup("Instrument")["ChannelNumber"];
+  int channel = icube->group("Instrument")["ChannelNumber"];
 
   if(channel == 0) {
     phases = channel0Phases;
@@ -77,7 +77,7 @@ void IsisMain() {
   else {
     phases = channel1Phases;
   }
-  int binning_mode = icube->getGroup("Instrument")["Summing"];
+  int binning_mode = icube->group("Instrument")["Summing"];
   if(binning_mode != 1 && binning_mode != 2) {
     /*IString msg = "You may only use input with binning mode 1 or 2, not";
     msg += binning_mode;

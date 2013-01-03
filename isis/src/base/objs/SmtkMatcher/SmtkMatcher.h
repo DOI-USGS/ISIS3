@@ -125,8 +125,8 @@ class SmtkMatcher {
     void randomNumberSetup();
     bool validate(const bool &throwError = true) const;
 
-    inline Camera &lhCamera() { return (*m_lhCube->getCamera());   }
-    inline Camera &rhCamera() { return (*m_rhCube->getCamera());   }
+    inline Camera &lhCamera() { return (*m_lhCube->camera());   }
+    inline Camera &rhCamera() { return (*m_rhCube->camera());   }
 
     Coordinate getLineSample(Camera &camera, const Coordinate &geom);
     Coordinate getLatLon(Camera &camera, const Coordinate &pnt);

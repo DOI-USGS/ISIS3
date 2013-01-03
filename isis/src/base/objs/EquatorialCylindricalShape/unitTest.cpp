@@ -45,9 +45,9 @@ int main() {
   // string inputFile = "/work/projects/isis/latest/m00775/test/M123149061RE.lev1.cub";
   Cube cube;
   cube.open(inputFile);
-  Camera *c = cube.getCamera();
+  Camera *c = cube.camera();
   std::vector<Distance> radii = c->target()->radii();
-  Pvl pvl = *cube.getLabel();
+  Pvl pvl = *cube.label();
   Spice spi(pvl);
   Target targ(&spi, pvl);
   targ.setRadii(radii);

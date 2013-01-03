@@ -691,13 +691,13 @@ void cropLines(QString inFile, double eTime1, double eTime2, int & line1, int & 
   Cube *inCube = new Cube;
   inCube->open(inFile);
 
-  Camera *cam = inCube->getCamera();
+  Camera *cam = inCube->camera();
 
   iTime etTime = cam->Spice::cacheStartTime();
   double etStart = etTime.Et();
   double lineRate = ((LineScanCameraDetectorMap*) cam->DetectorMap())->LineRate();
 
-  int imgLines = inCube->getLineCount();
+  int imgLines = inCube->lineCount();
   line1 = int ((eTime1 - etStart) / lineRate + 0.5 );
   line2 = int ((eTime2 - etStart) / lineRate + 0.5 );
 

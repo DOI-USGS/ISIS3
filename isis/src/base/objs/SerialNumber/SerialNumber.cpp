@@ -65,7 +65,7 @@ namespace Isis {
    * @return Calculated SerialNumber or FileName
   */
   QString SerialNumber::Compose(Cube &cube, bool def2filename) {
-    return Compose(*cube.getLabel(), def2filename);
+    return Compose(*cube.label(), def2filename);
   }
 
   /**

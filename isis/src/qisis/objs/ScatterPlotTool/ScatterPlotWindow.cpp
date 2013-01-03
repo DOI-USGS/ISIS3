@@ -97,11 +97,11 @@ namespace Isis {
     plot()->enableAxis(QwtPlot::yRight);
 
     plot()->setAxisTitle(QwtPlot::xBottom,
-        QFileInfo(xAxisCube->getFileName()).baseName() + " Band " +
+        QFileInfo(xAxisCube->fileName()).baseName() + " Band " +
         QString::number(xAxisBand) + " " +
         plot()->axisTitle(QwtPlot::xBottom).text());
     plot()->setAxisTitle(QwtPlot::yLeft,
-        QFileInfo(yAxisCube->getFileName()).baseName() + " Band " +
+        QFileInfo(yAxisCube->fileName()).baseName() + " Band " +
         QString::number(yAxisBand) + " " +
         plot()->axisTitle(QwtPlot::yLeft).text());
 
@@ -334,9 +334,9 @@ namespace Isis {
         //   viewport. For example, if we're painting X, we're missing the
         //   corresponding Y DN values.
         if (isXCube(vp))
-          portal.reset(new Portal(1, 1, m_yAxisCube->getPixelType()));
+          portal.reset(new Portal(1, 1, m_yAxisCube->pixelType()));
         else
-          portal.reset(new Portal(1, 1, m_xAxisCube->getPixelType()));
+          portal.reset(new Portal(1, 1, m_xAxisCube->pixelType()));
 
         // Iterate through the in-memory DN values for the passed in viewport
         for (int yIndex = 0; yIndex < numLines; yIndex++) {
@@ -412,10 +412,10 @@ namespace Isis {
       if (alarmingPlot() && (isXCube(vp) || isYCube(vp))) {
         QScopedPointer<Portal> xCubePortal(
             new Portal(m_alarmPlotSamples, m_alarmPlotLines,
-                       m_xAxisCube->getPixelType()));
+                       m_xAxisCube->pixelType()));
         QScopedPointer<Portal> yCubePortal(
             new Portal(m_alarmPlotSamples, m_alarmPlotLines,
-                       m_yAxisCube->getPixelType()));
+                       m_yAxisCube->pixelType()));
 
         double cubeSample = Null;
         double cubeLine = Null;

@@ -250,7 +250,7 @@ namespace Isis {
     double pixelValue = 0;
 
     if(m_cubeDisplay) {
-      Brick gryBrick(1, 1, 1, m_cubeDisplay->cube()->getPixelType());
+      Brick gryBrick(1, 1, 1, m_cubeDisplay->cube()->pixelType());
       gryBrick.SetBasePosition((int)(sample + 0.5), (int)(line + 0.5), 1);
       m_cubeDisplay->cube()->read(gryBrick);
 

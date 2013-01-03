@@ -160,8 +160,8 @@ namespace Isis {
    * @param painter The painter to use for painting onto the viewport
    */
   void CubePlotCurve::paint(CubeViewport *vp, QPainter *painter) {
-    if (m_sourceCube.contains(vp->cube()->getFileName())) {
-      int i = m_sourceCube.indexOf(vp->cube()->getFileName());
+    if (m_sourceCube.contains(vp->cube()->fileName())) {
+      int i = m_sourceCube.indexOf(vp->cube()->fileName());
       QPen customPen;
       customPen.setColor(pen().color());
       customPen.setWidth(pen().width());
@@ -272,7 +272,7 @@ namespace Isis {
                                 int band) {
 
     if (cvp) {
-      m_sourceCube << cvp->cube()->getFileName();
+      m_sourceCube << cvp->cube()->fileName();
 
       if (m_renameAutomatically) {
         setTitle(title().text() + " - " +

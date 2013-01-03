@@ -137,7 +137,7 @@ void TranslateVoyagerLabels(Pvl &inputLabel, Cube *ocube) {
   PvlTranslationManager labelXlater(inputLabel, transFile.expanded());
 
   // Pvl output label
-  Pvl *outputLabel = ocube->getLabel();
+  Pvl *outputLabel = ocube->label();
   labelXlater.Auto(*(outputLabel));
 
   // Add needed keywords that are not in the translation table

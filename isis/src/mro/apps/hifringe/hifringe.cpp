@@ -54,14 +54,14 @@ void IsisMain() {
   Process p;
   Cube *icube = p.SetInputCube("FROM");
 
-  int totalSamples = icube->getSampleCount();
-  int totalLines   = icube->getLineCount();
+  int totalSamples = icube->sampleCount();
+  int totalLines   = icube->lineCount();
 
   Isis::LineManager lineManager(inputCube);
   lineManager.begin();
 
   int leftFringe, rightFringe;
-  int binningMode = icube->getGroup("Instrument")["Summing"];
+  int binningMode = icube->group("Instrument")["Summing"];
 
   //determine the edges between which no statistics should be gathered
   leftFringe = 48 / binningMode;
@@ -171,7 +171,7 @@ void IsisMain() {
   PvlGroup sourceInfo("SourceInfo");
 
   sourceInfo += PvlKeyword("From", fromFile.expanded());
-  sourceInfo += icube->getGroup("Archive")["ProductId"];
+  sourceInfo += icube->group("Archive")["ProductId"];
   outputPvl.AddGroup(sourceInfo);
   if(numSections > 0) {
     outputPvl.AddObject(leftSide);

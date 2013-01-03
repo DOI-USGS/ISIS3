@@ -51,8 +51,8 @@ void IsisMain() {
     cout << "Functor2 - ProcessCube One Thread\n";
     Cube *icube = p.SetInputCube("FROM");
     p.SetBrickSize(10, 10, 2);
-    p.SetOutputCube("TO", icube->getSampleCount(), icube->getLineCount(),
-                    icube->getBandCount());
+    p.SetOutputCube("TO", icube->sampleCount(), icube->lineCount(),
+                    icube->bandCount());
     Functor2 functor;
     p.ProcessCube(functor, false);
     p.EndProcess();
@@ -64,8 +64,8 @@ void IsisMain() {
     Cube *icube = p.SetInputCube("FROM");
     p.SetInputCube("FROM2");
     p.SetBrickSize(10, 10, 2);
-    p.SetOutputCube("TO", icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
-    p.SetOutputCube("TO2", icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
+    p.SetOutputCube("TO", icube->sampleCount(), icube->lineCount(), icube->bandCount());
+    p.SetOutputCube("TO2", icube->sampleCount(), icube->lineCount(), icube->bandCount());
 
     Functor3 functor;
     p.ProcessCubes(functor, false);
@@ -77,15 +77,15 @@ void IsisMain() {
     cout << "Functor4 - ProcessCube Threaded\n";
     Cube *icube = p.SetInputCube("FROM");
     p.SetBrickSize(10, 10, 2);
-    p.SetOutputCube("TO", icube->getSampleCount(), icube->getLineCount(),
-                    icube->getBandCount());
+    p.SetOutputCube("TO", icube->sampleCount(), icube->lineCount(),
+                    icube->bandCount());
     Functor4 functor;
     p.ProcessCube(functor);
     p.EndProcess();
     Cube cube;
     cube.open(Application::GetUserInterface().GetFileName("TO"));
-    Statistics *statsBand1 = cube.getStatistics(1);
-    Statistics *statsBand2 = cube.getStatistics(2);
+    Statistics *statsBand1 = cube.statistics(1);
+    Statistics *statsBand2 = cube.statistics(2);
     std::cerr << "Averages: " << statsBand1->Average() << ", " <<
                                  statsBand2->Average() << "\n";
     cout << "\n";
@@ -103,8 +103,8 @@ void IsisMain() {
     cube->close();
     cube = new Cube;
     cube->open(Application::GetUserInterface().GetFileName("TO"), "rw");
-    Statistics *statsBand1 = cube->getStatistics(1);
-    Statistics *statsBand2 = cube->getStatistics(2);
+    Statistics *statsBand1 = cube->statistics(1);
+    Statistics *statsBand2 = cube->statistics(2);
     delete cube;
     std::cerr << "Averages: " << statsBand1->Average() << ", " <<
                                  statsBand2->Average() << "\n";
@@ -118,8 +118,8 @@ void IsisMain() {
     Cube *icube = p.SetInputCube("FROM");
     p.SetInputCube("FROM2");
     p.SetBrickSize(10, 10, 2);
-    p.SetOutputCube("TO", icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
-    p.SetOutputCube("TO2", icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
+    p.SetOutputCube("TO", icube->sampleCount(), icube->lineCount(), icube->bandCount());
+    p.SetOutputCube("TO2", icube->sampleCount(), icube->lineCount(), icube->bandCount());
     p.StartProcess(twoInAndOut);
     p.EndProcess();
   }

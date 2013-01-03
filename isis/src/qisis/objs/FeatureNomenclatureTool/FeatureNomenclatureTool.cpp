@@ -582,7 +582,7 @@ namespace Isis {
       features = viewportFeatureDisplay(vp)->features();
 
       QProgressDialog updatingFeaturesProgress(
-          tr("Projecting Features for [%1]").arg(vp->cube()->getFileName().section('/',-1)),
+          tr("Projecting Features for [%1]").arg(vp->cube()->fileName().section('/',-1)),
           QString(), 0, 100);
           
       updatingFeaturesProgress.setWindowModality(Qt::WindowModal);
@@ -609,7 +609,7 @@ namespace Isis {
             (m_showApprovedOnly && feature.status() == FeatureNomenclature::Approved) ) {
 
           QString displayName = feature.cleanName() +
-              " (" + FileName(vp->cube()->getFileName()).name() + ")";
+              " (" + FileName(vp->cube()->fileName()).name() + ")";
 
           QString targetName = feature.target().toUpper();
 

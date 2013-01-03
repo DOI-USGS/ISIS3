@@ -82,7 +82,7 @@ namespace Isis {
 
     if (addCubeData) {
       Brick cubeDataBrick((int)(endSample - startSample + 1),
-                          1, 1, cube.getPixelType());
+                          1, 1, cube.pixelType());
 
       // if band == 0, then we're gathering data for all bands.
       int startBand = statsBand;
@@ -90,7 +90,7 @@ namespace Isis {
 
       if (statsBand == 0) {
         startBand = 1;
-        endBand = cube.getBandCount();
+        endBand = cube.bandCount();
       }
 
       if (progress != NULL) {
@@ -248,7 +248,7 @@ namespace Isis {
       Progress *progress, int nbins, double startSample, double startLine,
       double endSample, double endLine) {
     // Make sure band is valid, 0 is valid (means all bands)
-    if ((statsBand < 0) || (statsBand > cube.getBandCount())) {
+    if ((statsBand < 0) || (statsBand > cube.bandCount())) {
       string msg = "Cannot gather histogram for band [" + IString(statsBand) +
           "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -259,23 +259,23 @@ namespace Isis {
     double minDnValue = Null;
     double maxDnValue = Null;
 
-    if (cube.getPixelType() == UnsignedByte) {
+    if (cube.pixelType() == UnsignedByte) {
       // If we can discretely store every data point, then we can use the
       //   possible extent of the data range as our min/max dn values.
       if (nbins == 0) {
-        minDnValue = 0.0 * cube.getMultiplier() + cube.getBase();
-        maxDnValue = 255.0 * cube.getMultiplier() + cube.getBase();
+        minDnValue = 0.0 * cube.multiplier() + cube.base();
+        maxDnValue = 255.0 * cube.multiplier() + cube.base();
         nbins = 256;
       }
     }
-    else if (cube.getPixelType() == SignedWord) {
+    else if (cube.pixelType() == SignedWord) {
       if (nbins == 0) {
-        minDnValue = -32768.0 * cube.getMultiplier() + cube.getBase();
-        maxDnValue = 32767.0 * cube.getMultiplier() + cube.getBase();
+        minDnValue = -32768.0 * cube.multiplier() + cube.base();
+        maxDnValue = 32767.0 * cube.multiplier() + cube.base();
         nbins = 65536;
       }
     }
-    else if (cube.getPixelType() == Real) {
+    else if (cube.pixelType() == Real) {
       // We can't account for all the possibilities of a double inside of any
       //   data range, so don't guess min/max DN values.
       if (nbins == 0) {
@@ -291,19 +291,19 @@ namespace Isis {
       startSample = 1.0;
 
     if (endSample == Null)
-      endSample = cube.getSampleCount();
+      endSample = cube.sampleCount();
 
     if (startLine == Null)
       startLine = 1.0;
 
     if (endLine == Null)
-      endLine = cube.getLineCount();
+      endLine = cube.lineCount();
 
     // If we still need our min/max DN values, find them.
     if (minDnValue == Null || maxDnValue == Null) {
 
       Brick cubeDataBrick((int)(endSample - startSample + 1),
-                          1, 1, cube.getPixelType());
+                          1, 1, cube.pixelType());
       Statistics stats;
 
       // if band == 0, then we're gathering stats for all bands. I'm really
@@ -314,7 +314,7 @@ namespace Isis {
 
       if (statsBand == 0) {
         startBand = 1;
-        endBand = cube.getBandCount();
+        endBand = cube.bandCount();
       }
 
       if (progress != NULL) {

@@ -63,7 +63,7 @@ void IsisMain() {
   }
 
   // access important label objects, will be used later.
-  PvlObject isiscube = incube->getLabel()->FindObject("IsisCube");
+  PvlObject isiscube = incube->label()->FindObject("IsisCube");
   PvlGroup instrument = isiscube.FindGroup("Instrument");
   PvlGroup archive = isiscube.FindGroup("Archive");
   PvlGroup bandbin = isiscube.FindGroup("BandBin");
@@ -167,7 +167,7 @@ void IsisMain() {
   newExpo = ((double)instrument["ExposureDuration"] * 1000) + (double)calib["DeltaExposureTime"];
 
   // Camera for sun position/distance, so we have to have spice data
-  Camera * cam = incube->getCamera();
+  Camera * cam = incube->camera();
   double sunPos[3];
   cam->sunPosition(sunPos);
   // Magnitude of sun vector ||s||

@@ -123,7 +123,7 @@ namespace Isis {
       try {
         Cube cube1;
         cube1.open(imageList[i].toString());
-        PvlGroup &from1Instrument = cube1.getGroup("INSTRUMENT");
+        PvlGroup &from1Instrument = cube1.group("INSTRUMENT");
         int cpmmNumber = from1Instrument["CpmmNumber"];
         ccds.push_back(cpmm2ccd[cpmmNumber]);
 

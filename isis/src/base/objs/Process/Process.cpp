@@ -104,23 +104,23 @@ namespace Isis {
     // Test for same size or one in all dimensions
     if(requirements & Isis::AllMatchOrOne) {
       if(InputCubes.size() > 0) {
-        if(cube->getLineCount() != 1) {
-          if(cube->getLineCount() != InputCubes[0]->getLineCount()) {
+        if(cube->lineCount() != 1) {
+          if(cube->lineCount() != InputCubes[0]->lineCount()) {
             QString message = "The number of lines in the secondary input cubes must match";
             message += " the primary input cube or be exactly one";
             throw IException(IException::User, message, _FILEINFO_);
           }
         }
 
-        if(cube->getSampleCount() != 1) {
-          if(cube->getSampleCount() != InputCubes[0]->getSampleCount()) {
+        if(cube->sampleCount() != 1) {
+          if(cube->sampleCount() != InputCubes[0]->sampleCount()) {
             QString message = "The number of samples in the secondary input cubes must match";
             message += " the primary input cube or be exactly one";
             throw IException(IException::User, message, _FILEINFO_);
           }
         }
-        if(cube->getBandCount() != 1) {
-          if(cube->getBandCount() != InputCubes[0]->getBandCount()) {
+        if(cube->bandCount() != 1) {
+          if(cube->bandCount() != InputCubes[0]->bandCount()) {
             QString message = "The number of bands in the secondary input cubes must match";
             message += " the primary input cube or be exactly one";
             throw IException(IException::User, message, _FILEINFO_);
@@ -135,15 +135,15 @@ namespace Isis {
     // Test for size match if requested
     if(requirements & Isis::SizeMatch) {
       if(InputCubes.size() > 0) {
-        if(cube->getLineCount() != InputCubes[0]->getLineCount()) {
+        if(cube->lineCount() != InputCubes[0]->lineCount()) {
           QString message = "The number of lines in the input cubes must match";
           throw IException(IException::User, message, _FILEINFO_);
         }
-        if(cube->getSampleCount() != InputCubes[0]->getSampleCount()) {
+        if(cube->sampleCount() != InputCubes[0]->sampleCount()) {
           QString message = "The number of samples in the input cubes must match";
           throw IException(IException::User, message, _FILEINFO_);
         }
-        if(cube->getBandCount() != InputCubes[0]->getBandCount()) {
+        if(cube->bandCount() != InputCubes[0]->bandCount()) {
           QString message = "The number of bands in the input cubes must match";
           throw IException(IException::User, message, _FILEINFO_);
         }
@@ -153,11 +153,11 @@ namespace Isis {
     // Test for spatial match if requested
     if(requirements & Isis::SpatialMatch) {
       if(InputCubes.size() > 0) {
-        if(cube->getLineCount() != InputCubes[0]->getLineCount()) {
+        if(cube->lineCount() != InputCubes[0]->lineCount()) {
           QString message = "The number of lines in the input cubes must match";
           throw IException(IException::User, message, _FILEINFO_);
         }
-        if(cube->getSampleCount() != InputCubes[0]->getSampleCount()) {
+        if(cube->sampleCount() != InputCubes[0]->sampleCount()) {
           QString message = "The number of samples in the input cubes must match";
           throw IException(IException::User, message, _FILEINFO_);
         }
@@ -166,7 +166,7 @@ namespace Isis {
 
     // Test for one band
     if(requirements & Isis::OneBand) {
-      if(cube->getBandCount() != 1) {
+      if(cube->bandCount() != 1) {
         QString message = "Input cube [" + fname + "] must have one band";
         throw IException(IException::User, message, _FILEINFO_);
       }
@@ -174,9 +174,9 @@ namespace Isis {
 
     // Test for same bands or one band
     if(requirements & Isis::BandMatchOrOne) {
-      if(cube->getBandCount() != 1) {
+      if(cube->bandCount() != 1) {
         if(InputCubes.size() > 0) {
-          if(cube->getBandCount() != InputCubes[0]->getBandCount()) {
+          if(cube->bandCount() != InputCubes[0]->bandCount()) {
             QString message = "The number of bands in the secondary input cubes must match";
             message += " the primary input cube or be exactly one";
             throw IException(IException::User, message, _FILEINFO_);
@@ -271,9 +271,9 @@ namespace Isis {
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
-    int nl = InputCubes[0]->getLineCount();
-    int ns = InputCubes[0]->getSampleCount();
-    int nb = InputCubes[0]->getBandCount();
+    int nl = InputCubes[0]->lineCount();
+    int ns = InputCubes[0]->sampleCount();
+    int nb = InputCubes[0]->bandCount();
     return SetOutputCube(parameter, ns, nl, nb);
   }
 
@@ -353,7 +353,7 @@ namespace Isis {
 
       if(att.propagatePixelType()) {
         if(InputCubes.size() > 0) {
-          cube->setPixelType(InputCubes[0]->getPixelType());
+          cube->setPixelType(InputCubes[0]->pixelType());
         }
         else {
           QString msg = "You told me to propagate PixelType from input to output";
@@ -366,7 +366,7 @@ namespace Isis {
       }
 
       if(att.propagateMinimumMaximum()) {
-        if(cube->getPixelType() == Isis::Real) {
+        if(cube->pixelType() == Isis::Real) {
           cube->setBaseMultiplier(0.0, 1.0);
         }
         else if(InputCubes.size() == 0) {
@@ -374,14 +374,14 @@ namespace Isis {
           msg += " cube but there are no input cubes loaded";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
-        else if(cube->getPixelType() >= InputCubes[0]->getPixelType()) {
-          double base = InputCubes[0]->getBase();
-          double mult = InputCubes[0]->getMultiplier();
+        else if(cube->pixelType() >= InputCubes[0]->pixelType()) {
+          double base = InputCubes[0]->base();
+          double mult = InputCubes[0]->multiplier();
           cube->setBaseMultiplier(base, mult);
         }
-        else if((cube->getPixelType() != Isis::Real) &&
-                (cube->getPixelType() != Isis::UnsignedByte) &&
-                (cube->getPixelType() != Isis::SignedWord)) {
+        else if((cube->pixelType() != Isis::Real) &&
+                (cube->pixelType() != Isis::UnsignedByte) &&
+                (cube->pixelType() != Isis::SignedWord)) {
           QString msg = "Looks like your refactoring to add different pixel types";
           msg += " you'll need to make changes here";
           throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -398,8 +398,8 @@ namespace Isis {
       }
 
       if(InputCubes.size() > 0) {
-        int needLabBytes = InputCubes[0]->getLabelSize(true) + (1024 * 6);
-        if(needLabBytes > cube->getLabelSize()) {
+        int needLabBytes = InputCubes[0]->labelSize(true) + (1024 * 6);
+        if(needLabBytes > cube->labelSize()) {
           cube->setLabelSize(needLabBytes);
         }
       }
@@ -410,21 +410,21 @@ namespace Isis {
       // Transfer labels from the first input cube
       if((p_propagateLabels) && (InputCubes.size() > 0)) {
         Isis::PvlObject &incube =
-            InputCubes[0]->getLabel()->FindObject("IsisCube");
-        Isis::PvlObject &outcube = cube->getLabel()->FindObject("IsisCube");
+            InputCubes[0]->label()->FindObject("IsisCube");
+        Isis::PvlObject &outcube = cube->label()->FindObject("IsisCube");
         for(int i = 0; i < incube.Groups(); i++) {
           outcube.AddGroup(incube.Group(i));
         }
 
-        if (InputCubes[0]->getLabel()->HasObject("NaifKeywords")) {
-          cube->getLabel()->AddObject(
-              InputCubes[0]->getLabel()->FindObject("NaifKeywords"));
+        if (InputCubes[0]->label()->HasObject("NaifKeywords")) {
+          cube->label()->AddObject(
+              InputCubes[0]->label()->FindObject("NaifKeywords"));
         }
       }
 
       // Transfer tables from the first input cube
       if((p_propagateTables) && (InputCubes.size() > 0)) {
-        Isis::Pvl &inlab = *InputCubes[0]->getLabel();
+        Isis::Pvl &inlab = *InputCubes[0]->label();
         for(int i = 0; i < inlab.Objects(); i++) {
           if(inlab.Object(i).IsNamed("Table")) {
             Isis::Blob t((QString)inlab.Object(i)["Name"], inlab.Object(i).Name());
@@ -436,7 +436,7 @@ namespace Isis {
 
       // Transfer blobs from the first input cube
       if((p_propagatePolygons) && (InputCubes.size() > 0)) {
-        Isis::Pvl &inlab = *InputCubes[0]->getLabel();
+        Isis::Pvl &inlab = *InputCubes[0]->label();
         for(int i = 0; i < inlab.Objects(); i++) {
           if(inlab.Object(i).IsNamed("Polygon")) {
             Isis::Blob t((QString)inlab.Object(i)["Name"], inlab.Object(i).Name());
@@ -448,7 +448,7 @@ namespace Isis {
 
       // Transfer tables from the first input cube
       if((p_propagateOriginalLabel) && (InputCubes.size() > 0)) {
-        Isis::Pvl &inlab = *InputCubes[0]->getLabel();
+        Isis::Pvl &inlab = *InputCubes[0]->label();
         for(int i = 0; i < inlab.Objects(); i++) {
           if(inlab.Object(i).IsNamed("OriginalLabel")) {
             Isis::OriginalLabel ol;
@@ -568,7 +568,7 @@ namespace Isis {
     for(int i = 0; i < (int)OutputCubes.size(); i++) {
       Isis::PvlObject &inCubeLabels = inLabels.FindObject("IsisCube");
 
-      Isis::Pvl &outLabels(*OutputCubes[i]->getLabel());
+      Isis::Pvl &outLabels(*OutputCubes[i]->label());
       Isis::PvlObject &outCubeLabels = outLabels.FindObject("IsisCube");
 
       for(int g = 0; g < inCubeLabels.Groups(); g++) {
@@ -600,7 +600,7 @@ namespace Isis {
   void Process::PropagateTables(const QString &fromName) {
     Cube *fromCube = new Isis::Cube;
     fromCube->open(fromName);
-    const Pvl *fromLabels = fromCube->getLabel();
+    const Pvl *fromLabels = fromCube->label();
 
     for (unsigned int i = 0; i < OutputCubes.size(); i++) {
       for (int j = 0; j < fromLabels->Objects(); j++) {
@@ -688,7 +688,7 @@ namespace Isis {
     if(p_propagateHistory) {
       bool addedHist = false;
       if(InputCubes.size() > 0) {
-        Isis::Pvl & inlab = *InputCubes[0]->getLabel();
+        Isis::Pvl & inlab = *InputCubes[0]->label();
         for(int i = 0; i < inlab.Objects(); i++) {
           if(inlab.Object(i).IsNamed("History") && Isis::iApp != NULL) {
             Isis::History h((QString)inlab.Object(i)["Name"]);
@@ -727,8 +727,8 @@ namespace Isis {
       Isis::Statistics *cubeStats = new Isis::Statistics();
 
       int bandStart = 1;
-      int bandStop = cube->getBandCount();
-      int maxSteps = cube->getLineCount() * cube->getBandCount();
+      int bandStop = cube->bandCount();
+      int maxSteps = cube->lineCount() * cube->bandCount();
 
       QString cubeNumStr = toString(cubeNum + 1);
       QString totalCubes = toString((int)InputCubes.size());
@@ -744,7 +744,7 @@ namespace Isis {
       for(int useBand = bandStart; useBand <= bandStop; useBand++) {
         Isis::Statistics *bandStats = new Isis::Statistics();
 
-        for(int i = 1; i <= cube->getLineCount(); i++) {
+        for(int i = 1; i <= cube->lineCount(); i++) {
           line.SetLine(i, useBand);
           cube->read(line);
           bandStats->AddData(line.DoubleBuffer(), line.size());

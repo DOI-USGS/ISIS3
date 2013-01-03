@@ -62,22 +62,22 @@ void IsisMain () {
   Cube *icube = p.SetInputCube("FROM");
 
   // Make sure it is a WAC cube
-  Isis::PvlGroup &inst = icube->getLabel()->FindGroup("Instrument", Pvl::Traverse);
+  Isis::PvlGroup &inst = icube->label()->FindGroup("Instrument", Pvl::Traverse);
   QString instId = (QString) inst["InstrumentId"];
   instId = instId.toUpper();
   if (instId != "WAC-VIS" && instId != "WAC-UV") {
     QString msg = "This program is intended for use on LROC WAC images only. [";
-    msg += icube->getFileName() + "] does not appear to be a WAC image.";
+    msg += icube->fileName() + "] does not appear to be a WAC image.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // And check if it has already run through calibration
-  if (icube->getLabel()->FindObject("IsisCube").HasGroup("Radiometry")) {
+  if (icube->label()->FindObject("IsisCube").HasGroup("Radiometry")) {
     QString msg = "This image has already been calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if (icube->getLabel()->FindObject("IsisCube").HasGroup("AlphaCube")) {
+  if (icube->label()->FindObject("IsisCube").HasGroup("AlphaCube")) {
     QString msg = "This application can not be run on any image that has been geometrically transformed (i.e. scaled, rotated, sheared, or reflected) or cropped.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -111,11 +111,11 @@ void IsisMain () {
   QString specpixFile = ui.GetAsString("SPECIALPIXELSFILE");
 
   // Figure out which bands are input
-  for (int i = 1; i <= icube->getBandCount(); i++) {
-    g_bands.push_back(icube->getPhysicalBand(i));
+  for (int i = 1; i <= icube->bandCount(); i++) {
+    g_bands.push_back(icube->physicalBand(i));
   }
 
-  Isis::PvlGroup &bandBin = icube->getLabel()->FindGroup("BandBin", Pvl::Traverse);
+  Isis::PvlGroup &bandBin = icube->label()->FindGroup("BandBin", Pvl::Traverse);
   QString filter = (QString) bandBin["Center"][0];
   QString filterNum = (QString) bandBin["FilterNumber"][0];
   //We have to pay special attention incase we are passed a 
@@ -171,7 +171,7 @@ void IsisMain () {
 
   if (g_radiometric) {
 
-    Isis::PvlKeyword &bands = icube->getLabel()->FindGroup("BandBin", Pvl::Traverse).FindKeyword("FilterNumber");
+    Isis::PvlKeyword &bands = icube->label()->FindGroup("BandBin", Pvl::Traverse).FindKeyword("FilterNumber");
 
     if (radFile.toLower() == "default" || radFile.length() == 0)
       radFile = "$lro/calibration/WAC_RadiometricResponsivity.????.pvl";
@@ -463,7 +463,7 @@ void CopyCubeIntoBuffer ( QString &fileString, Buffer* &data) {
     throw IException(IException::User, msg, _FILEINFO_);
   }
   cube.open(filename.expanded());
-  Brick brick(cube.getSampleCount(), cube.getLineCount(), cube.getBandCount(), cube.getPixelType());
+  Brick brick(cube.sampleCount(), cube.lineCount(), cube.bandCount(), cube.pixelType());
   brick.SetBasePosition(1, 1, 1);
   cube.read(brick);
 

@@ -156,7 +156,7 @@ namespace Isis {
       // Level 3 images/mosaic or bad image
     {
       QString msg = "Cannot run interest on images with no camera. Image " +
-                        pCube.getFileName() + " has no Camera";
+                        pCube.fileName() + " has no Camera";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -422,7 +422,7 @@ namespace Isis {
           // Get the Camera for the reference image and get the lat/lon from that measurment
           Camera *bestCamera;
           try {
-            bestCamera = bestCube->getCamera();
+            bestCamera = bestCube->camera();
           }
           catch (IException &e) {
             QString msg = "Cannot Create Camera for Image:" + mSerialNumbers.FileName(sn);
@@ -467,7 +467,7 @@ namespace Isis {
             // Get the Camera
             Camera *measureCamera;
             try {
-              measureCamera = measureCube->getCamera();
+              measureCamera = measureCube->camera();
             }
             catch (IException &e) {
               QString msg = "Cannot Create Camera for Image:" + mSerialNumbers.FileName(sn);
@@ -784,7 +784,7 @@ namespace Isis {
       // Get the Camera
       Camera *camera;
       try {
-        camera = pCube.getCamera();
+        camera = pCube.camera();
       }
       catch (IException &e) {
         QString msg = "Cannot Create Camera for Image:" + mSerialNumbers.FileName(serialNum);
@@ -792,7 +792,7 @@ namespace Isis {
       }
 
       if (camera->SetImage(iOrigSample, iOrigLine)) {
-        Portal inPortal(1, 1, pCube.getPixelType());
+        Portal inPortal(1, 1, pCube.pixelType());
         inPortal.SetPosition(iOrigSample, iOrigLine, 1);
         pCube.read(inPortal);
 

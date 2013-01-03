@@ -32,8 +32,8 @@ void IsisMain() {
   Cube *icube = p.SetInputCube("FROM");
 
   // Get the mapping group
-  PvlGroup fromMappingGrp = icube->getGroup("Mapping");
-  Projection *inproj = icube->getProjection();
+  PvlGroup fromMappingGrp = icube->group("Mapping");
+  Projection *inproj = icube->projection();
   PvlGroup outMappingGrp = fromMappingGrp;
 
   // If the default range is FROM, then wipe out any range data in user mapping file
@@ -324,9 +324,9 @@ void IsisMain() {
 
   // Set up the transform object which will simply map
   // output line/samps -> output lat/lons -> input line/samps
-  Transform *transform = new map2map(icube->getSampleCount(),
-                                     icube->getLineCount(),
-                                     icube->getProjection(),
+  Transform *transform = new map2map(icube->sampleCount(),
+                                     icube->lineCount(),
+                                     icube->projection(),
                                      samples,
                                      lines,
                                      outproj,
@@ -335,7 +335,7 @@ void IsisMain() {
   // Allocate the output cube and add the mapping labels
   Cube *ocube = p.SetOutputCube("TO", transform->OutputSamples(),
                                 transform->OutputLines(),
-                                icube->getBandCount());
+                                icube->bandCount());
 
   PvlGroup cleanOutGrp = outproj->Mapping();
 

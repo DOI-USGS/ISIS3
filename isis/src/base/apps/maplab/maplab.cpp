@@ -104,7 +104,7 @@ void IsisMain() {
   // Output the mapping group used to the Gui session log
   Application::GuiLog(userMap);
   // Extract label from cube file
-  Pvl *label = cube.getLabel();
+  Pvl *label = cube.label();
   PvlObject &o = label->FindObject("IsisCube");
   // Add Mapping Group to input cube
   if(o.HasGroup("Mapping")) {

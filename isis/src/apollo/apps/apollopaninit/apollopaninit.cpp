@@ -292,22 +292,24 @@ void IsisMain() {
   posJ20.resize(3);
 
   double  temp,
-          vel[3],  //the total velocity vector (combined Horizonatal and normal components) 
+          vel[3] = { 0.0, 0.0, 0.0 },  //the total velocity vector (combined Horizonatal and normal components) 
                    //  in km/sec
-          M[3][3],    //rotation matrix
-          zDir[] = {0,0,1},  //selenographic Z axis
-          northPN[3], //normal to the plane containing all the north/south directions, 
+          M[3][3] = { { 0.0, 0.0, 0.0 },
+                      { 0.0, 0.0, 0.0 },
+                      { 0.0, 0.0, 0.0 } },    //rotation matrix
+          zDir[] = { 0.0, 0.0, 1.0 },  //selenographic Z axis
+          northPN[3]  = { 0.0, 0.0, 0.0 }, //normal to the plane containing all the north/south directions, 
                       //  that is plane containing 
                       //  the origin, the z axis, and the primary point of intersection
-          northL[3],    //north direction vector in local horizontal plane
-          azm[3],   //azm direction of the veclocity vector in selenographic coordinates
-          azmP[3],  //azm rotated (partially) and projected into the image plane
-          norm[3],  //normal to the local horizontal plane
-          look[3];  //unit direction vector in the pincipal cameral look direction, 
+          northL[3] = { 0.0, 0.0, 0.0 },    //north direction vector in local horizontal plane
+          azm[3] = { 0.0, 0.0, 0.0 },   //azm direction of the veclocity vector in selenographic coordinates
+          azmP[3] = { 0.0, 0.0, 0.0 },  //azm rotated (partially) and projected into the image plane
+          norm[3] = { 0.0, 0.0, 0.0 },  //normal to the local horizontal plane
+          look[3] = { 0.0, 0.0, 0.0 };  //unit direction vector in the pincipal cameral look direction, 
                     //  parallel to the vector from the center of the moon through the spacecraft
 
-  double  pos0[3],  //coordinate of the camera position
-          pInt[3];  //coordinate of the principle intersection point
+  double  pos0[3] = { 0.0, 0.0, 0.0 },  //coordinate of the camera position
+          pInt[3] = { 0.0, 0.0, 0.0 };  //coordinate of the principle intersection point
 
   /////////////////calculating the camera position for the center (principal scan line)
   pos0[1] = ui.GetDouble("LON_NADIR")*deg2rad;
@@ -599,7 +601,7 @@ void IsisMain() {
 
   QString fileName;
 
-  panS = panCube.getSampleCount();
+  panS = panCube.sampleCount();
 
   //Table definition
   TableRecord recordFid;
@@ -631,8 +633,8 @@ void IsisMain() {
     QString msg = "Unable to open the fiducial patternS cube: ApolloPanFiducialMark.cub\n";
     throw IException(IException::User, msg, _FILEINFO_);
   }
-  refL = fidC.getLineCount();
-  refS = fidC.getSampleCount();
+  refL = fidC.lineCount();
+  refS = fidC.sampleCount();
   //scaled pattern chip for fast matching
   patternS.SetSize(int((refS-2)/SCALE), int((refL-2)/SCALE));  
   patternS.TackCube((refS-1)/2, (refL-1)/2);
@@ -651,7 +653,7 @@ void IsisMain() {
   Chip inputChip,selectionChip;
   inputChip.SetSize(int(ceil(200*5.0/resolution)), int(ceil(200*5.0/resolution)));
   fileName = ui.GetFileName("FROM");
-  if( panCube.getPixelType() == 1)  //UnsignedByte
+  if( panCube.pixelType() == 1)  //UnsignedByte
     centroid.setDNRange(12, 1e99);  //8 bit bright target
   else
     centroid.setDNRange(3500, 1e99);  //16 bit bright target
@@ -785,7 +787,7 @@ void IsisMain() {
   delete spRot;
 
   //now instantiate a camera to make sure all of this is working
-  ApolloPanoramicCamera* cam = (ApolloPanoramicCamera*)(panCube.getCamera());
+  ApolloPanoramicCamera* cam = (ApolloPanoramicCamera*)(panCube.camera());
   //log the residual report from interior orientation 
   PvlGroup residualStats("InteriorOrientationStats");
   residualStats += PvlKeyword("FiducialsFound",  toString(tableFid.Records()));

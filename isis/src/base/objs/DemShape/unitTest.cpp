@@ -57,8 +57,8 @@ class MyShape : public DemShape {
 
    void testDemCube()  {
      // Cube *demCube();
-     IString fileName = demCube()->getFileName();
-     cout << "    Using dem cube file = " << demCube()->getFileName() << endl;
+     IString fileName = demCube()->fileName();
+     cout << "    Using dem cube file = " << demCube()->fileName() << endl;
    }
 };
 
@@ -68,9 +68,9 @@ int main() {
   QString inputFile = "$mgs/testData/ab102401.cub";
   Cube cube;
   cube.open(inputFile);
-  Camera *c = cube.getCamera();
+  Camera *c = cube.camera();
   std::vector<Distance> radii = c->target()->radii();
-  Pvl pvl = *cube.getLabel();
+  Pvl pvl = *cube.label();
   Spice spi(pvl);
   Target targ(&spi, pvl);
   targ.setRadii(radii);

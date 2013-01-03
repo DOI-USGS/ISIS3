@@ -140,7 +140,7 @@ namespace Isis {
    */
   void SubArea::UpdateLabel(Cube *icube, Cube *ocube, PvlGroup &results) {
 
-    Pvl inlabel = *icube->getLabel();
+    Pvl inlabel = *icube->label();
 
     // If the linc and sinc are not equal, then the Instrument and
     // Mapping groups are no longer valid.
@@ -163,7 +163,7 @@ namespace Isis {
       // Update the upper left corner X,Y values if the starting line or
       // starting sample are changed.
       if(p_sl != 1 || p_ss != 1) {
-        Projection &proj = *icube->getProjection();
+        Projection &proj = *icube->projection();
         proj.SetWorld(p_ss - 0.5, p_sl - 0.5);
         PvlGroup &mapgroup = inlabel.FindObject("IsisCube").FindGroup("Mapping", Pvl::Traverse);
         mapgroup.AddKeyword(PvlKeyword("UpperLeftCornerX", toString(proj.XCoord())),
@@ -226,8 +226,8 @@ namespace Isis {
 
     // Update the AlphaCube group - this group will only be updated if
     // a Mapping group does not exist in the labels.
-    AlphaCube aCube(p_ns, p_nl, ocube->getSampleCount(), ocube->getLineCount(),
+    AlphaCube aCube(p_ns, p_nl, ocube->sampleCount(), ocube->lineCount(),
                     p_ss - 0.5, p_sl - 0.5, p_es + 0.5, p_el + 0.5);
-    aCube.UpdateGroup(*ocube->getLabel());
+    aCube.UpdateGroup(*ocube->label());
   }
 }

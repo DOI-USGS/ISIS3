@@ -27,7 +27,7 @@ namespace Isis {
   CameraStatistics::CameraStatistics(QString filename, int sinc, int linc) {
     Cube cube;
     cube.open(filename);
-    Camera *cam = cube.getCamera();
+    Camera *cam = cube.camera();
     init(cam, sinc, linc, filename);
   }
 

@@ -57,7 +57,7 @@ namespace Isis {
    * @param furnish Do we load the kernels we find?
    */
   SpiceManager::SpiceManager(Cube &cube, bool furnish) {
-    Load(*cube.getLabel(), furnish);
+    Load(*cube.label(), furnish);
   }
 
   /**

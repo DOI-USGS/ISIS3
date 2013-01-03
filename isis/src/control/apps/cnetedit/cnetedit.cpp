@@ -857,10 +857,10 @@ void checkAllMeasureValidity(ControlNet &cnet, QString cubeList) {
 
       if (validator->IsCameraRequired()) {
         try {
-          camera = cube->getCamera();
+          camera = cube->camera();
         }
         catch (IException &e) {
-          QString msg = "Cannot Create Camera for Image:" + cube->getFileName();
+          QString msg = "Cannot Create Camera for Image:" + cube->fileName();
           throw IException(e, IException::User, msg, _FILEINFO_);
         }
       }

@@ -123,7 +123,7 @@ namespace Isis {
       QMutex *dataFileMutex();
 
     protected:
-      int getBandCount() const;
+      int bandCount() const;
       int getBandCountInChunk() const;
       BigInt getBytesPerChunk() const;
       int getChunkCountInBandDimension() const;
@@ -132,10 +132,10 @@ namespace Isis {
       int getChunkIndex(const RawCubeChunk &)  const;
       BigInt getDataStartByte() const;
       QFile * getDataFile();
-      int getLineCount() const;
+      int lineCount() const;
       int getLineCountInChunk() const;
-      PixelType getPixelType() const;
-      int getSampleCount() const;
+      PixelType pixelType() const;
+      int sampleCount() const;
       int getSampleCountInChunk() const;
 
       void setChunkSizes(int numSamples, int numLines, int numBands);

@@ -32,7 +32,7 @@ namespace Isis {
    * @param priority Try to make a camera or projection first
    */
   UniversalGroundMap::UniversalGroundMap(Cube &cube, CameraPriority priority) {
-    Init(*(cube.getLabel()), priority);
+    Init(*(cube.label()), priority);
   }
 
   /**
@@ -392,8 +392,8 @@ namespace Isis {
            * We'll test at the edges, a plus (+) and an (X) to help DEMs work.
            */
 
-          int sampleCount = cube->getSampleCount();
-          int lineCount = cube->getLineCount();
+          int sampleCount = cube->sampleCount();
+          int lineCount = cube->lineCount();
 
           int stepsPerLength = 20; //number of steps per length
           double aspectRatio = (double)lineCount / (double)sampleCount;

@@ -203,7 +203,7 @@ namespace Isis {
       CubeDisplayProperties * cubeDisplay) {
     Projection *proj = NULL;
     Cube *cube = cubeDisplay->cube();
-    Pvl *label = cube->getLabel();
+    Pvl *label = cube->label();
 
     try {
       proj = ProjectionFactory::CreateFromCube(*label);
@@ -223,7 +223,7 @@ namespace Isis {
       mappingGrp += PvlKeyword("MaximumLongitude", "360");
 
       try {
-        Camera * cam = cube->getCamera();
+        Camera * cam = cube->camera();
         Distance radii[3];
         cam->radii(radii);
 

@@ -72,10 +72,10 @@ namespace Isis {
     Cube *inCube = ProcessMosaic::SetInputCube(inputFile, inAtt);
 
     Cube *mosaicCube = OutputCubes[0];
-    Projection *iproj = inCube->getProjection();
-    Projection *oproj = mosaicCube->getProjection();
-    int nsMosaic = mosaicCube->getSampleCount();
-    int nlMosaic = mosaicCube->getLineCount();
+    Projection *iproj = inCube->projection();
+    Projection *oproj = mosaicCube->projection();
+    int nsMosaic = mosaicCube->sampleCount();
+    int nlMosaic = mosaicCube->lineCount();
 
     if (*iproj != *oproj) {
       QString msg = "Mapping groups do not match between cube [" + inputFile + "] and mosaic";
@@ -86,8 +86,8 @@ namespace Isis {
     outSample = (int)(oproj->ToWorldX(iproj->ToProjectionX(1.0)) + 0.5);
     outLine   = (int)(oproj->ToWorldY(iproj->ToProjectionY(1.0)) + 0.5);
 
-    int ins = InputCubes[0]->getSampleCount();
-    int inl =  InputCubes[0]->getLineCount();
+    int ins = InputCubes[0]->sampleCount();
+    int inl =  InputCubes[0]->lineCount();
     outSampleEnd = outSample + ins;
     outLineEnd   = outLine + inl;
 
@@ -202,12 +202,12 @@ namespace Isis {
       // Open the cube and get the maximum number of band in all cubes
       Cube cube;
       cube.open(propagationCubes[i].toString());
-      bands = max(bands, cube.getBandCount());
+      bands = max(bands, cube.bandCount());
 
       // See if the cube has a projection and make sure it matches
       // previous input cubes
       Projection *projNew =
-          Isis::ProjectionFactory::CreateFromCube(*(cube.getLabel()));
+          Isis::ProjectionFactory::CreateFromCube(*(cube.label()));
       if ((proj != NULL) && (*proj != *projNew)) {
         QString msg = "Mapping groups do not match between cubes [" +
                      propagationCubes[0].toString() + "] and [" + propagationCubes[i].toString() + "]";
@@ -222,8 +222,8 @@ namespace Isis {
       if (x > xmax) xmax = x;
       if (y > ymax) ymax = y;
 
-      x = projNew->ToProjectionX(cube.getSampleCount() + 0.5);
-      y = projNew->ToProjectionY(cube.getLineCount() + 0.5);
+      x = projNew->ToProjectionX(cube.sampleCount() + 0.5);
+      y = projNew->ToProjectionY(cube.lineCount() + 0.5);
       if (x < xmin) xmin = x;
       if (y < ymin) ymin = y;
       if (x > xmax) xmax = x;
@@ -290,12 +290,12 @@ namespace Isis {
     for (int i = 0; i < propagationCubes.size(); i++) {
       Cube cube;
       cube.open(propagationCubes[i].toString());
-      bands = max(cube.getBandCount(), bands);
+      bands = max(cube.bandCount(), bands);
 
       // See if the cube has a projection and make sure it matches
       // previous input cubes
       Projection *projNew =
-          Isis::ProjectionFactory::CreateFromCube(*(cube.getLabel()));
+          Isis::ProjectionFactory::CreateFromCube(*(cube.label()));
 
       if (proj == NULL) {
       }
@@ -411,7 +411,7 @@ namespace Isis {
       ProcessByLine p;
       CubeAttributeInput inAtt(inputFile);
       Cube *propCube = p.SetInputCube(inputFile, inAtt);
-      bands = propCube->getBandCount();
+      bands = propCube->bandCount();
 
       // If track set, create the origin band
       if (GetTrackFlag()) {
@@ -453,7 +453,7 @@ namespace Isis {
     Cube mosaic;
     mosaic.open(mosaicFile);
 
-    PvlGroup &mapping = mosaic.getLabel()->FindGroup("Mapping", Pvl::Traverse);
+    PvlGroup &mapping = mosaic.label()->FindGroup("Mapping", Pvl::Traverse);
     CubeAttributeOutput oAtt;
     // The other SetOutput will not use the attribute or filename
     Cube *ocube = SetOutputCube("", mapping, oAtt, mosaicFile);

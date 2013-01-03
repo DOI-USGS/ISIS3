@@ -39,7 +39,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();  
   ProcessExportPds p;
   Cube *inputCube = p.SetInputCube("FROM");
-  PvlObject *isisCubeLab = inputCube->getLabel();
+  PvlObject *isisCubeLab = inputCube->label();
 
   // Error check to make sure this is a valid cube for this program
   QString origInstrument = isisCubeLab->FindObject("IsisCube")
@@ -94,7 +94,7 @@ void IsisMain() {
   QString isisLabelFile = ui.GetFileName("FROM");
 
   // Translate the keywords from the input cube label that go in the PDS label
-  PvlTranslationManager cubeLab(*(inputCube->getLabel()), 
+  PvlTranslationManager cubeLab(*(inputCube->label()), 
                                 "$mro/translations/hiriseIdealPdsExportCubeLabel.trn");
   cubeLab.Auto(pdsLabel);
 
@@ -110,7 +110,7 @@ void IsisMain() {
 
   updatePdsLabelTimeParametersGroup(pdsLabel);
   updatePdsLabelImageObject(isisCubeLab, pdsLabel);
-  Camera *cam = inputCube->getCamera();
+  Camera *cam = inputCube->camera();
   updatePdsLabelRootObject(isisCubeLab, pdsLabel, ui, cam);
 
   // Export each of the spice tables and update table keywords in PDS file
@@ -246,10 +246,10 @@ pair<double, double> inputRange(Cube *inputCube) {
 
   // Loop and accumulate histogram
   histProcess.Progress()->SetText("Gathering Histogram to Find Input Range");
-  histProcess.Progress()->SetMaximumSteps(inputCube->getLineCount());
+  histProcess.Progress()->SetMaximumSteps(inputCube->lineCount());
   histProcess.Progress()->CheckStatus();
   LineManager line(*inputCube);
-  for(int i = 1; i <= inputCube->getLineCount(); i++) {
+  for(int i = 1; i <= inputCube->lineCount(); i++) {
     line.SetLine(i, band);
     inputCube->read(line);
     hist.AddData(line.DoubleBuffer(), line.size());

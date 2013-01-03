@@ -46,7 +46,7 @@ void IsisMain() {
   vector<QString> bandFrom = attFrom.bands();
   from.setVirtualBands(bandFrom);
   from.open(ui.GetFileName("FROM"), "r");
-  Camera *fcamera = from.getCamera();
+  Camera *fcamera = from.camera();
   CameraDistortionMap *dmap = fcamera->DistortionMap();
 
 

@@ -42,7 +42,7 @@ void IsisMain () {
     ProcessByLine p;
     Cube *inCube = p.SetInputCube("FROM");
 
-    g_isIof = inCube->getLabel()->FindGroup("Radiometry", Pvl::Traverse).FindKeyword("RadiometricType")[0].toUpper() == "IOF";
+    g_isIof = inCube->label()->FindGroup("Radiometry", Pvl::Traverse).FindKeyword("RadiometricType")[0].toUpper() == "IOF";
 
     FileName scaledCube("$TEMPORARY/" + FileName(ui.GetFileName("FROM")).name());
     scaledCube.addExtension("cub");
@@ -50,8 +50,8 @@ void IsisMain () {
     scaledCube = FileName::createTempFile(scaledCube);
     p.SetOutputCube(
         scaledCube.expanded(), CubeAttributeOutput(),
-        inCube->getSampleCount(), inCube->getLineCount(),
-        inCube->getBandCount());
+        inCube->sampleCount(), inCube->lineCount(),
+        inCube->bandCount());
 
     // Scale image and calculate max and min values
     p.StartProcess(ProcessImage);
@@ -141,7 +141,7 @@ QString MD5Checksum ( QString filename ) {
 }
 
 void OutputLabel ( std::ofstream &fout, Cube* cube ) {
-    OriginalLabel origLab(cube->getFileName());
+    OriginalLabel origLab(cube->fileName());
     Pvl labelPvl = origLab.ReturnLabels();
 
     //Pvl to store the labels
@@ -196,8 +196,8 @@ void OutputLabel ( std::ofstream &fout, Cube* cube ) {
     // Update the "IMAGE" Object
     PvlObject &imageObject = labelPvl.FindObject("IMAGE");
     imageObject.Clear();
-    imageObject += PvlKeyword("LINES", toString(cube->getLineCount()));
-    imageObject += PvlKeyword("LINE_SAMPLES", toString(cube->getSampleCount()));
+    imageObject += PvlKeyword("LINES", toString(cube->lineCount()));
+    imageObject += PvlKeyword("LINE_SAMPLES", toString(cube->sampleCount()));
     if (g_isIof) {
         imageObject += PvlKeyword("SAMPLE_BITS", toString(16));
         imageObject += PvlKeyword("SAMPLE_TYPE", "LSB_INTEGER");
@@ -225,14 +225,14 @@ void OutputLabel ( std::ofstream &fout, Cube* cube ) {
 
     stream << labelPvl;
 
-    int recordBytes = cube->getSampleCount();
+    int recordBytes = cube->sampleCount();
     int labelRecords = (int) ((stream.str().length()) / recordBytes) + 1;
 
     labelPvl["RECORD_BYTES"] = toString(recordBytes);
     if (g_isIof)
-        labelPvl["FILE_RECORDS"] = toString((int) (cube->getLineCount() * 2 + labelRecords));
+        labelPvl["FILE_RECORDS"] = toString((int) (cube->lineCount() * 2 + labelRecords));
     else
-        labelPvl["FILE_RECORDS"] = toString((int) (cube->getLineCount() * 4 + labelRecords));
+        labelPvl["FILE_RECORDS"] = toString((int) (cube->lineCount() * 4 + labelRecords));
     labelPvl["LABEL_RECORDS"] = toString(labelRecords);
     labelPvl["^IMAGE"] = toString((int) (labelRecords + 1));
 

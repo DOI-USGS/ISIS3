@@ -555,7 +555,7 @@ namespace Isis {
 
     // Write out col 8 (the file name)
     Isis::FileName fname = Isis::FileName(
-        cvp->cube()->getFileName()).expanded();
+        cvp->cube()->fileName()).expanded();
     m_path  = fname.path();
     m_fname = fname.name();
 

@@ -165,10 +165,10 @@ int main() {
   QString inputFile = "$ISIS3DATA/mgs/testData/ab102401.cub";
   Cube cube;
   cube.open(inputFile);
-  Camera *c = cube.getCamera();
+  Camera *c = cube.camera();
   vector<Distance> radii(3,Distance());
   radii = c->target()->radii();
-  Pvl pvl = *cube.getLabel();
+  Pvl pvl = *cube.label();
   Spice spi(pvl);
   Target targ(&spi, pvl);
   targ.setRadii(radii);
@@ -181,9 +181,9 @@ int main() {
   cout << endl << "  Testing ellipsoid shape..." << endl;
   inputFile = "$ISIS3DATA/galileo/testData/1213r.cub";
   cube.open(inputFile);
-  c = cube.getCamera();
+  c = cube.camera();
   radii = c->target()->radii();
-  pvl = *cube.getLabel();
+  pvl = *cube.label();
   Spice spi2(pvl);
   Target targ2(&spi2, pvl);
   targ2.setRadii(radii);
@@ -195,9 +195,9 @@ int main() {
   // Test plane shape  TBD
   // inputFile = "$ISIS3DATA/;
   // cube.open(inputFile);
-  // c = cube.getCamera();
+  // c = cube.camera();
   // radii = c->target()->radii();
-  // pvl = *cube.getLabel();
+  // pvl = *cube.label();
   // Target targ2(pvl);
   // targ3.setRadii(radii);
   // sm = ShapeModelFactory::Create(&targ3, pvl);

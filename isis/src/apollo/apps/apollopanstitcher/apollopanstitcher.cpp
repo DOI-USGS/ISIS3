@@ -138,8 +138,8 @@ void IsisMain() {
     string msg = "Unable to open the fiducial patternS cube: ApolloPanFiducialMark.cub\n";
     throw IException(IException::User, msg, _FILEINFO_);
   }
-  refL = fidC.getLineCount();
-  refS = fidC.getSampleCount();
+  refL = fidC.lineCount();
+  refS = fidC.sampleCount();
   //scaled pattern chip for fast matching
   patternS.SetSize((int)floor((refS-2)/SCALE), (int)floor((refL-2)/SCALE));  
   patternS.TackCube((refS-1)/2, (refL-1)/2);
@@ -169,7 +169,7 @@ void IsisMain() {
   //Centroid centroid;
   CentroidApolloPan centroid(resolution);
   Chip inputChip,selectionChip;
-  if( panC[0]->getPixelType() == 1)  //UnsignedByte
+  if( panC[0]->pixelType() == 1)  //UnsignedByte
     centroid.setDNRange(12, 1e99);  //8 bit bright target
   else
     centroid.setDNRange(3500, 1e99);  //16 bit bright target
@@ -184,7 +184,7 @@ void IsisMain() {
     //   measurements)
 
     //Step 1:  find the probable conjugate fiducials (those with the smallest sample coordinates)
-    scanS = panC[i+1]->getSampleCount();
+    scanS = panC[i+1]->sampleCount();
 
     scanFid.clear();
 
@@ -223,7 +223,7 @@ void IsisMain() {
       }
     }
     if(s>=averageLines+searchCellSize/2.0) {
-       QString msg = "Unable to locate a fiducial mark in the input cube [" + panC[i]->getFileName()
+       QString msg = "Unable to locate a fiducial mark in the input cube [" + panC[i]->fileName()
                       + "].  Check FROM and MICRONS parameters.";
        throw IException(IException::Io, msg, _FILEINFO_);
        return;
@@ -588,13 +588,13 @@ void IsisMain() {
 
   //now lets find the extents of the stiched image
   double minS=1,
-         maxS=panC[7]->getSampleCount(),
+         maxS=panC[7]->sampleCount(),
          minL =1,
-         maxL = panC[7]->getLineCount();
+         maxL = panC[7]->lineCount();
 
   for (i=0;i<7;i++) {
-    scanS = panC[i]->getSampleCount();
-    scanL = panC[i]->getLineCount();
+    scanS = panC[i]->sampleCount();
+    scanL = panC[i]->lineCount();
 
     //convert the four corner points to the scan 8 domain and determine the greatest extents
     temp = cos(trans[i].theta) - sin(trans[i].theta) + trans[i].dx;
@@ -680,9 +680,9 @@ void IsisMain() {
   attI.setAttributes("some.cub+1"); //will only be processing one band from the input
 
   //make output attributes match the input
-  att.setFileFormat( panC[0]->getFormat() );
-  att.setByteOrder(  panC[0]->getByteOrder() );
-  att.setPixelType(  panC[0]->getPixelType() );
+  att.setFileFormat( panC[0]->format() );
+  att.setByteOrder(  panC[0]->byteOrder() );
+  att.setPixelType(  panC[0]->pixelType() );
   if (panC[0]->labelsAttached())
     att.setLabelAttachment(AttachedLabel);
   else
@@ -690,7 +690,7 @@ void IsisMain() {
 
   //define an output cube
   outputC.setDimensions(int(maxS),int(maxL),1);
-  outputC.setPixelType(panC[0]->getPixelType());  //set pixel type
+  outputC.setPixelType(panC[0]->pixelType());  //set pixel type
   tempString = ui.GetFileName("TO");
   outputC.create(tempString);
   outputC.close();  //closing the output cube so that it can be opened by the mosaic process
@@ -703,8 +703,8 @@ void IsisMain() {
   for (i=0; i<8; i++) {  //for each scan
     FileName tempFile = FileName::createTempFile("$temporary/tempscan.cub");
 
-    scanS = panC[i]->getSampleCount();
-    scanL = panC[i]->getLineCount();
+    scanS = panC[i]->sampleCount();
+    scanL = panC[i]->lineCount();
 
     //define the sample range
     if (i==0) sampleTo = maxS;

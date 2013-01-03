@@ -1445,7 +1445,7 @@ namespace Isis {
     MdiCubeViewport *cvp = cubeViewport();
     if (cvp  == NULL) return;
 
-    QString file = cvp->cube()->getFileName();
+    QString file = cvp->cube()->fileName();
     QString sn = g_serialNumberList->SerialNumber(file);
 
     double samp,line;
@@ -1475,7 +1475,7 @@ namespace Isis {
       modifyPoint(point);
     }
     else if (s == Qt::MidButton) {
-      if (p_groundOpen && file == p_groundCube->getFileName()) {
+      if (p_groundOpen && file == p_groundCube->fileName()) {
         QString message = "Cannot select point for deleting on ground source.  Select ";
         message += "point using un-projected images or the Navigator Window.";
         QMessageBox::critical(p_qnetTool, "Error", message);
@@ -1503,7 +1503,7 @@ namespace Isis {
       }
       double lat = gmap->UniversalLatitude();
       double lon = gmap->UniversalLongitude();
-      if (p_groundOpen && file == p_groundCube->getFileName()) {
+      if (p_groundOpen && file == p_groundCube->fileName()) {
         createFixedPoint (lat,lon);
       }
       else {
@@ -3435,7 +3435,7 @@ namespace Isis {
       MdiCubeViewport *vp;
       for (int i=0; i<(int)cubeViewportList()->size(); i++) {
         vp = (*(cubeViewportList()))[i];
-        if (vp->cube()->getFileName() == ground) {
+        if (vp->cube()->fileName() == ground) {
           g_vpMainWindow->workspace()->setActiveSubWindow(
               (QMdiSubWindow *)vp->parentWidget()->parent());
           return;
@@ -3479,7 +3479,7 @@ namespace Isis {
     try {
       p_groundCube->open(ground);
       p_groundGmap = new UniversalGroundMap(*p_groundCube);
-      p_groundFile = FileName(p_groundCube->getFileName()).name();
+      p_groundFile = FileName(p_groundCube->fileName()).name();
       g_serialNumberList->Add(ground, true);
     }
     catch (IException &e) {
@@ -3524,7 +3524,7 @@ namespace Isis {
         if (!p_demOpen) {
           // TODO p_groundRadiusSource = ControlPoint::RadiusSource::Basemap;
           p_groundRadiusSource = ControlPoint::RadiusSource::Ellipsoid;
-          PvlGroup mapping = p_groundCube->getGroup("Mapping");
+          PvlGroup mapping = p_groundCube->group("Mapping");
           p_demFile = (mapping ["EquatorialRadius"][0])
                          + ", " + (mapping ["PolarRadius"][0]);
           //
@@ -3533,11 +3533,11 @@ namespace Isis {
       }
       catch (IException &) {
         try {
-          CameraFactory::Create(*(p_groundCube->getLabel()));
+          CameraFactory::Create(*(p_groundCube->label()));
           p_groundSurfacePointSource = ControlPoint::SurfacePointSource::Reference;
           if (!p_demOpen) {
             //  If level 1, determine the shape model
-            PvlGroup kernels = p_groundCube->getGroup("Kernels");
+            PvlGroup kernels = p_groundCube->group("Kernels");
             QString shapeFile = (kernels ["ShapeModel"]);
             if (shapeFile.contains("dem")) {
               p_groundRadiusSource = ControlPoint::RadiusSource::DEM;
@@ -3630,7 +3630,7 @@ namespace Isis {
 
       try {
         p_demCube->open(demFile);
-        p_demFile = FileName(p_demCube->getFileName()).name();
+        p_demFile = FileName(p_demCube->fileName()).name();
       } catch (IException &e) {
         QString message = e.toString();
         QMessageBox::critical(p_qnetTool, "Error", message);
@@ -3732,7 +3732,7 @@ namespace Isis {
 
     //   Buffer used to read from the model
     Portal *portal = new Portal(interp->Samples(), interp->Lines(),
-                                p_demCube->getPixelType(),
+                                p_demCube->pixelType(),
                                 interp->HotSample(), interp->HotLine());
     portal->SetPosition(demMap->Sample(), demMap->Line(), 1);
     p_demCube->read(*portal);

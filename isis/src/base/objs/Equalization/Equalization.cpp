@@ -300,8 +300,8 @@ namespace Isis {
       // Allocate output cube
       QString out = outList[img].toString();
       CubeAttributeOutput outAtt;
-      p.SetOutputCube(out, outAtt, icube->getSampleCount(),
-          icube->getLineCount(), icube->getBandCount());
+      p.SetOutputCube(out, outAtt, icube->sampleCount(),
+          icube->lineCount(), icube->bandCount());
 
       // Apply gain/offset to the image
       ApplyFunctor func(m_adjustments[img]);
@@ -368,7 +368,7 @@ namespace Isis {
 
     Cube tempCube;
     tempCube.open(m_imageList[0].toString());
-    m_maxBand = tempCube.getBandCount();
+    m_maxBand = tempCube.bandCount();
 
     errorCheck(fromListName);
   }
@@ -404,15 +404,15 @@ namespace Isis {
         cube2.open(m_imageList[j].toString());
 
         // Make sure number of bands match
-        if (m_maxBand != cube2.getBandCount()) {
+        if (m_maxBand != cube2.bandCount()) {
           QString msg = "Number of bands do not match between cubes [" +
             m_imageList[i].toString() + "] and [" + m_imageList[j].toString() + "]";
           throw IException(IException::User, msg, _FILEINFO_);
         }
 
         //Create projection from each cube
-        Projection *proj1 = cube1.getProjection();
-        Projection *proj2 = cube2.getProjection();
+        Projection *proj1 = cube1.projection();
+        Projection *proj2 = cube2.projection();
 
         // Test to make sure projection parameters match
         if (*proj1 != *proj2) {

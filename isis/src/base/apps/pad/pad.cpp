@@ -15,9 +15,9 @@ void IsisMain() {
   // We will be use a mosaic technique so get the size of the input file
   ProcessMosaic p;
   Cube *icube = p.SetInputCube("FROM");
-  int ins = icube->getSampleCount();
-  int inl = icube->getLineCount();
-  int inb = icube->getBandCount();
+  int ins = icube->sampleCount();
+  int inl = icube->lineCount();
+  int inb = icube->bandCount();
 
   // Retrieve the padding parameters
   UserInterface &ui = Application::GetUserInterface();

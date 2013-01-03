@@ -18,8 +18,8 @@ void IsisMain() {
   p.SetOutputCube("TO");
 
   // Compute the defaults for user parameters
-  cline = icube->getLineCount() / 2;
-  csamp = icube->getSampleCount() / 2;
+  cline = icube->lineCount() / 2;
+  csamp = icube->sampleCount() / 2;
   radius = (cline < csamp) ? cline : csamp;
 
   // Override the defaults if the user entered a value

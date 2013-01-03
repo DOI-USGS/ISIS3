@@ -164,7 +164,7 @@ namespace Isis {
 
     // Create a portal buffer for the input file
     Portal iportal(interp.Samples(), interp.Lines(),
-                         InputCubes[0]->getPixelType() ,
+                         InputCubes[0]->pixelType() ,
                          interp.HotSample(), interp.HotLine());
 
     // Start the progress meter
@@ -174,14 +174,14 @@ namespace Isis {
     if(p_bandChangeFunct == NULL) {
       // A portal could read up to four chunks so we need to cache four times the number of bands to 
       // minimize I/O thrashing
-      InputCubes[0]->addCachingAlgorithm(new UniqueIOCachingAlgorithm(2 * InputCubes[0]->getBandCount()));
+      InputCubes[0]->addCachingAlgorithm(new UniqueIOCachingAlgorithm(2 * InputCubes[0]->bandCount()));
       OutputCubes[0]->addCachingAlgorithm(new BoxcarCachingAlgorithm());
 
-      int tilesPerBand = otile.Tiles() / OutputCubes[0]->getBandCount();
+      int tilesPerBand = otile.Tiles() / OutputCubes[0]->bandCount();
 
       for(int tile = 1; tile <= tilesPerBand; tile++) {
         bool useLastTileMap = false;
-        for(int band = 1; band <= OutputCubes[0]->getBandCount(); band++) {
+        for(int band = 1; band <= OutputCubes[0]->bandCount(); band++) {
           otile.SetTile(tile, band);
 
           if(p_startQuadSize <= 2) {
@@ -251,8 +251,8 @@ namespace Isis {
       // pixel came from
       if(trans.Xform(inputSamp, inputLine, outputSamp, outputLine)) {
         if((inputSamp < 0.5) || (inputLine < 0.5) ||
-            (inputLine > InputCubes[0]->getLineCount() + 0.5) ||
-            (inputSamp > InputCubes[0]->getSampleCount() + 0.5)) {
+            (inputLine > InputCubes[0]->lineCount() + 0.5) ||
+            (inputSamp > InputCubes[0]->sampleCount() + 0.5)) {
           otile[i] = NULL8;
         }
         else {
@@ -677,8 +677,8 @@ namespace Isis {
         if(trans.Xform(isamp, iline, (double) osamp, (double) oline)) {
           if((isamp >= 0.5) ||
               (iline >= 0.5) ||
-              (iline <= InputCubes[0]->getLineCount() + 0.5) ||
-              (isamp <= InputCubes[0]->getSampleCount() + 0.5)) {
+              (iline <= InputCubes[0]->lineCount() + 0.5) ||
+              (isamp <= InputCubes[0]->sampleCount() + 0.5)) {
             lineMap[lineIndex][sampIndex] = iline;
             sampMap[lineIndex][sampIndex] = isamp;
           }
@@ -789,7 +789,7 @@ namespace Isis {
 
     // Create a portal buffer for reading from the input file
     Portal iportal(interp.Samples(), interp.Lines(),
-                   InputCubes[0]->getPixelType() ,
+                   InputCubes[0]->pixelType() ,
                    interp.HotSample(), interp.HotLine());
 
     // Create a buffer for writing to the output file
@@ -797,16 +797,16 @@ namespace Isis {
 
     // Setup the progress meter
     int patchesPerBand = 0;
-    for (int line = m_patchStartLine; line <= InputCubes[0]->getLineCount(); 
+    for (int line = m_patchStartLine; line <= InputCubes[0]->lineCount(); 
           line += m_patchLineIncrement) {
       for (int samp = m_patchStartSample; 
-            samp <= InputCubes[0]->getSampleCount(); 
+            samp <= InputCubes[0]->sampleCount(); 
             samp += m_patchSampleIncrement) {
         patchesPerBand++;
       }
     }
 
-    int patchCount = InputCubes[0]->getBandCount() * patchesPerBand;
+    int patchCount = InputCubes[0]->bandCount() * patchesPerBand;
     p_progress->SetMaximumSteps(patchCount);
     p_progress->CheckStatus();
 
@@ -830,14 +830,14 @@ namespace Isis {
     // expection would be for PushFrameCameras which should increment lines by
     // twice the framelet height.
 
-    for (int band=1; band <= InputCubes[0]->getBandCount(); band++) {
+    for (int band=1; band <= InputCubes[0]->bandCount(); band++) {
       if(p_bandChangeFunct != NULL) p_bandChangeFunct(band);
       iportal.SetPosition(1,1,band);
 
-      for (int line = m_patchStartLine; line <= InputCubes[0]->getLineCount(); 
+      for (int line = m_patchStartLine; line <= InputCubes[0]->lineCount(); 
             line += m_patchLineIncrement) {
         for (int samp = m_patchStartSample; 
-              samp <= InputCubes[0]->getSampleCount(); 
+              samp <= InputCubes[0]->sampleCount(); 
               samp += m_patchSampleIncrement, p_progress->CheckStatus()) {
           transformPatch((double)samp, (double)(samp + m_patchSamples - 1),
                          (double)line, (double)(line + m_patchLines - 1),
@@ -856,12 +856,12 @@ namespace Isis {
                                            Interpolator &interp) {
     // Let's make sure our patch is contained in the input file
     // TODO:  Think about the image edges should I be adding 0.5
-    if (esamp > InputCubes[0]->getSampleCount()) {
-      esamp = InputCubes[0]->getSampleCount();
+    if (esamp > InputCubes[0]->sampleCount()) {
+      esamp = InputCubes[0]->sampleCount();
       if (ssamp == esamp) ssamp = esamp - 1;
     }
-    if (eline > InputCubes[0]->getLineCount()) {
-      eline = InputCubes[0]->getLineCount();
+    if (eline > InputCubes[0]->lineCount()) {
+      eline = InputCubes[0]->lineCount();
       if (sline == eline) sline = eline - 1;
     }
 
@@ -931,17 +931,17 @@ namespace Isis {
     // sense in computing the affine if we don't have to.
     if (osampMax < 1) return;
     if (olineMax < 1) return;
-    if (osampMin > OutputCubes[0]->getSampleCount()) return;
-    if (olineMin > OutputCubes[0]->getLineCount()) return;
+    if (osampMin > OutputCubes[0]->sampleCount()) return;
+    if (olineMin > OutputCubes[0]->lineCount()) return;
 
     // Adjust our output patch if it extends outside the output cube
     if (osampMin < 1) osampMin = 1;
     if (olineMin < 1) olineMin = 1;
-    if (osampMax > OutputCubes[0]->getSampleCount()) {
-      osampMax = OutputCubes[0]->getSampleCount();
+    if (osampMax > OutputCubes[0]->sampleCount()) {
+      osampMax = OutputCubes[0]->sampleCount();
     }
-    if (olineMax > OutputCubes[0]->getLineCount()) {
-      olineMax = OutputCubes[0]->getLineCount();
+    if (olineMax > OutputCubes[0]->lineCount()) {
+      olineMax = OutputCubes[0]->lineCount();
     }
 
     /* A small input patch should create a small output patch.  If we had
@@ -953,11 +953,11 @@ namespace Isis {
      * rounding error on different machines) of the image it is split.
      */
     
-    if (osampMax - osampMin + 1.0 > OutputCubes[0]->getSampleCount() * 0.50) {
+    if (osampMax - osampMin + 1.0 > OutputCubes[0]->sampleCount() * 0.50) {
       splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
       return;
     } 
-    if (olineMax - olineMin + 1.0 > OutputCubes[0]->getLineCount() * 0.50) {
+    if (olineMax - olineMin + 1.0 > OutputCubes[0]->lineCount() * 0.50) {
       splitPatch(ssamp, esamp, sline, eline, obrick, iportal, trans, interp);
       return;
     } 

@@ -38,7 +38,7 @@ int main() {
     poly.Create(cube);
   }
   catch(IException &e) {
-    QString msg = "Cannot create polygon for [" + cube.getFileName() + "]";
+    QString msg = "Cannot create polygon for [" + cube.fileName() + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -54,7 +54,7 @@ int main() {
     poly.Create(cube, 12, 1, 384, 640, 385);
   }
   catch(IException &e) {
-    QString msg = "Cannot create sub-polygon for [" + cube.getFileName() + "]";
+    QString msg = "Cannot create sub-polygon for [" + cube.fileName() + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -71,7 +71,7 @@ int main() {
   }
   catch(IException &e) {
     QString msg = "Cannot create lower quality polygon for [" +
-        cube.getFileName() + "]";
+        cube.fileName() + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
   //  write poly as WKT

@@ -197,7 +197,7 @@ void IsisMain() {
     p.CheckStatus();
 
     // Translates the ISIS labels along with the original EDR labels
-    origLabel.AddObject(*from.getLabel());
+    origLabel.AddObject(*from.label());
     PvlTranslationManager labels(origLabel,
                                  "$messenger/translations/mdisDDRLabel.trn");
     labels.Auto(pdsLabel);

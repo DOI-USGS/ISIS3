@@ -168,7 +168,7 @@ void IsisMain() {
   else if(seedDomain == SampleLine) {
     Cube cube;
     cube.open(serialNumbers.FileName(0));
-    ugmap = new UniversalGroundMap(*cube.getLabel());
+    ugmap = new UniversalGroundMap(*cube.label());
   }
 
   // Create the control net to store the points in.
@@ -394,7 +394,7 @@ void IsisMain() {
           Cube cube;
           QString c = serialNumbers.FileName((*overlaps[ov])[sn]);
           cube.open(c);
-          Isis::Brick brick(1, 1, 1, cube.getPixelType());
+          Isis::Brick brick(1, 1, 1, cube.pixelType());
           brick.SetBasePosition((int)gmap->Camera()->Sample(), (int)gmap->Camera()->Line(), (int)gmap->Camera()->Band());
           cube.read(brick);
           if(Isis::IsSpecial(brick[0]) || brick[0] > maxDN || brick[0] < minDN) {

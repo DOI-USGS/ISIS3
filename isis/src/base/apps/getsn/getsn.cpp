@@ -47,7 +47,7 @@ void IsisMain() {
   }
 
   // Extract label from cube file
-  Pvl *label = cube.getLabel();
+  Pvl *label = cube.label();
 
   PvlGroup sn("Results");
 

@@ -105,7 +105,7 @@ namespace Isis {
       try {
         baseCube->open(baseFile);
         try {
-          baseCube->getProjection();
+          baseCube->projection();
         }
         catch (IException &) {
           QString message = "Base must be projected";
@@ -190,7 +190,7 @@ namespace Isis {
     }
 
     // Find target
-    QString target = matchCube->getCamera()->target()->name();
+    QString target = matchCube->camera()->target()->name();
 
     // Find directory and save for use in file dialog for control net
     FileName fname(matchFile);
@@ -271,10 +271,10 @@ namespace Isis {
     }
 
     // Make sure targets match
-    if (cnet->GetTarget() != matchCube->getCamera()->target()->name()) {
+    if (cnet->GetTarget() != matchCube->camera()->target()->name()) {
       QString message = tr("Control Net target, [%1], is not the same as the cube target, [%2].")
                         .arg(QString(cnet->GetTarget()))
-        .arg(QString(matchCube->getCamera()->target()->name()));
+        .arg(QString(matchCube->camera()->target()->name()));
       QMessageBox::critical((QWidget *)parent(), "Invalid Control Network", message);
       return false;
     }
@@ -302,8 +302,8 @@ namespace Isis {
         if (baseGM->SetGround(p.GetBestSurfacePoint())) {
           baseSamp = baseGM->Sample();
           baseLine = baseGM->Line();
-          if (baseSamp < 1 || baseSamp > baseCube->getSampleCount() ||
-              baseLine < 1 || baseLine > baseCube->getLineCount()) {
+          if (baseSamp < 1 || baseSamp > baseCube->sampleCount() ||
+              baseLine < 1 || baseLine > baseCube->lineCount()) {
             // throw error? point not on base
             QString message = "Error parsing input control net.  Lat/Lon for Point Id: " +
                               (p.GetId()) + " computes to a sample/line off " +

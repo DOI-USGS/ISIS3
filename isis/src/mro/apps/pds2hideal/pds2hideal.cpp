@@ -64,7 +64,7 @@ void IsisMain() {
   outputCube->putGroup(kernelGroup);
 
 
-  Pvl *isisLabel = outputCube->getLabel();
+  Pvl *isisLabel = outputCube->label();
   PvlTranslationManager labelXlater(pdsLabelPvl, 
                                     "$mro/translations/hiriseIdealPdsImportLabel.trn");
   labelXlater.Auto(*isisLabel);

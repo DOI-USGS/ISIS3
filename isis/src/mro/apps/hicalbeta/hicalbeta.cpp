@@ -120,18 +120,18 @@ void IsisMain(){
     ProcessByLine p;
 
     Cube *hifrom = p.SetInputCube("FROM");
-    int nsamps = hifrom->getSampleCount();
-    int nlines = hifrom->getLineCount();
+    int nsamps = hifrom->sampleCount();
+    int nlines = hifrom->lineCount();
 
 //  Initialize the configuration file
     QString conf(ui.GetAsString("CONF"));
-    HiCalConf hiconf(*(hifrom->getLabel()), conf);
+    HiCalConf hiconf(*(hifrom->label()), conf);
     DbProfile hiprof = hiconf.getMatrixProfile();
 
 // Check for label propagation and set the output cube
     Cube *ocube = p.SetOutputCube("TO");
     if ( !IsTrueValue(hiprof,"PropagateTables", "TRUE") ) {
-      RemoveHiBlobs(*(ocube->getLabel()));
+      RemoveHiBlobs(*(ocube->label()));
     }
 
 //  Set specified profile if entered by user
@@ -146,7 +146,7 @@ void IsisMain(){
     }
     else {
       //  Set default to output directory
-      hiconf.add("OPATH", FileName(ocube->getFileName()).path());
+      hiconf.add("OPATH", FileName(ocube->fileName()).path());
     }
 
 //  Do I/F output DN conversions
@@ -406,8 +406,8 @@ void IsisMain(){
         ofile << "Version:  " << hical_version << endl;
         ofile << "Revision: " << hical_revision << endl << endl;
 
-        ofile << "FROM:     " << hifrom->getFileName() << endl;
-        ofile << "TO:       " << ocube->getFileName()  << endl;
+        ofile << "FROM:     " << hifrom->fileName() << endl;
+        ofile << "TO:       " << ocube->fileName()  << endl;
         ofile << "CONF:     " << conf_file  << endl << endl;
 
         ofile << "/* " << hical_program << " application equation */\n"
@@ -438,7 +438,7 @@ void IsisMain(){
       ocube->putGroup(temp);
     }
 
-    PvlGroup &rcal = ocube->getGroup(rcalGroup);
+    PvlGroup &rcal = ocube->group(rcalGroup);
     rcal += PvlKeyword("Program", hical_program);
     rcal += PvlKeyword("RunTime", hical_runtime);
     rcal += PvlKeyword("Version",hical_version);

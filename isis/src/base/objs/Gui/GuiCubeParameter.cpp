@@ -181,7 +181,7 @@ namespace Isis {
         temp.open(cubeName);
 
         // Get the label and write it out to the log
-        Isis::Pvl *label = temp.getLabel();
+        Isis::Pvl *label = temp.label();
         Isis::Application::GuiLog(*label);
 
         // Close the cube

@@ -34,15 +34,15 @@ void IsisMain() {
   Pvl mainpvl;
   
   // Get the number of bands to process
-  int bandcount = icube->getBandCount();
+  int bandcount = icube->bandCount();
   
   for (int i = 1; i <= bandcount; i++) {
-    Histogram *stats = icube->getHistogram(i, validMin, validMax);
+    Histogram *stats = icube->histogram(i, validMin, validMax);
 
     // Construct a label with the results
     PvlGroup results("Results");  
-    results += PvlKeyword("From", icube->getFileName());
-    results += PvlKeyword("Band", toString(icube->getPhysicalBand(i)));
+    results += PvlKeyword("From", icube->fileName());
+    results += PvlKeyword("Band", toString(icube->physicalBand(i)));
     if(stats->ValidPixels() != 0) {
       results += PvlKeyword("Average", toString(stats->Average()));
       results += PvlKeyword("StandardDeviation", toString(stats->StandardDeviation()));

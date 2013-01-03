@@ -107,7 +107,7 @@ void TranslateLabels(FileName in, Cube *ocube) {
   PvlTranslationManager labelXlater(pdsLab, transFile.expanded());
 
   // Pvl outputLabels;
-  Pvl *outputLabel = ocube->getLabel();
+  Pvl *outputLabel = ocube->label();
   labelXlater.Auto(*(outputLabel));
 
   //Instrument group

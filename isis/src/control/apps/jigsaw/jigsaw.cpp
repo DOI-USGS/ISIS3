@@ -201,16 +201,16 @@ void IsisMain() {
           CubeAttributeInput inAtt;
           Cube *c = p.SetInputCube(b->FileName(i), inAtt, ReadWrite);
           //check for existing polygon, if exists delete it
-          if (c->getLabel()->HasObject("Polygon")) {
-            c->getLabel()->DeleteObject("Polygon");
+          if (c->label()->HasObject("Polygon")) {
+            c->label()->DeleteObject("Polygon");
           }
 
           // check for CameraStatistics Table, if exists, delete
-          for (int iobj = 0; iobj < c->getLabel()->Objects(); iobj++) {
-            PvlObject obj = c->getLabel()->Object(iobj);
+          for (int iobj = 0; iobj < c->label()->Objects(); iobj++) {
+            PvlObject obj = c->label()->Object(iobj);
             if (obj.Name() != "Table") continue;
             if (obj["Name"][0] != QString("CameraStatistics")) continue;
-            c->getLabel()->DeleteObject(iobj);
+            c->label()->DeleteObject(iobj);
             break;
           }
 

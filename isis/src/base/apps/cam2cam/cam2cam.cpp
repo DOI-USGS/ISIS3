@@ -20,7 +20,7 @@ void IsisMain() {
 
   // Set up the default reference band to the middle of the cube
   // If we have even bands it will be close to the middle
-  int referenceBand = ocube->getBandCount();
+  int referenceBand = ocube->bandCount();
   referenceBand += (referenceBand % 2);
   referenceBand /= 2;
 
@@ -34,10 +34,10 @@ void IsisMain() {
   // filename required by the Camera is not passed by the process class in this
   // case.  Use the CameraFactory to create the Camera instead to get around this
   // problem.
-  Camera *outcam = CameraFactory::Create(*(mcube->getLabel()));
+  Camera *outcam = CameraFactory::Create(*(mcube->label()));
 
   // Set the reference band we want to match
-  PvlGroup instgrp = mcube->getGroup("Instrument");
+  PvlGroup instgrp = mcube->group("Instrument");
   if(!outcam->IsBandIndependent()) {
     PvlKeyword rBand("ReferenceBand", toString(referenceBand));
     rBand.AddComment("# All bands are aligned to reference band");
@@ -48,22 +48,22 @@ void IsisMain() {
   }
 
   // Only recreate the output camera if it was band dependent
-  if(outcam == NULL) outcam = CameraFactory::Create(*(mcube->getLabel()));
+  if(outcam == NULL) outcam = CameraFactory::Create(*(mcube->label()));
 
   // We might need the instrument group later, so get a copy before clearing the input
   //   cubes.
   m.ClearInputCubes();
 
   Cube *icube = m.SetInputCube("FROM");
-  incam = icube->getCamera();
+  incam = icube->camera();
 
   // Set up the transform object which will simply map
   // output line/samps -> output lat/lons -> input line/samps
-  Transform *transform = new cam2cam(icube->getSampleCount(),
-                                     icube->getLineCount(),
+  Transform *transform = new cam2cam(icube->sampleCount(),
+                                     icube->lineCount(),
                                      incam,
-                                     ocube->getSampleCount(),
-                                     ocube->getLineCount(),
+                                     ocube->sampleCount(),
+                                     ocube->lineCount(),
                                      outcam);
 
 

@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
       CubeAttributeInput att;
       const QString inp = imageList[i].toString();
       Cube *inputCube = p.SetInputCube(inp, att);
-      TestFunctor func(&equalizer, inputCube->getLineCount(), i);
+      TestFunctor func(&equalizer, inputCube->lineCount(), i);
       p.ProcessCubeInPlace(func, false);
     }
   }

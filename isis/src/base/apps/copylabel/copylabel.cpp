@@ -28,7 +28,7 @@ void IsisMain() {
   Pvl * mergeTo = NULL;
   Pvl * source = NULL;
   QString sourceFileName = ui.GetFileName("Source");
-  mergeTo = inOut.getLabel();
+  mergeTo = inOut.label();
   source = new Pvl(sourceFileName);
 
   // We have 3 possible running options, those are
@@ -52,7 +52,7 @@ void IsisMain() {
       delete source;
       source = NULL;
     }
-    source = sourceCube.getLabel();
+    source = sourceCube.label();
   }
 
   // Check if we need an alpha cube group.
@@ -67,10 +67,10 @@ void IsisMain() {
 
   // Check, do we have the same size cubes? how about same sample line scale?
   if (isACube) {
-    sourceSamps = sourceCube.getSampleCount();
-    sourceLines = sourceCube.getLineCount();
-    outSamps = inOut.getSampleCount();
-    outLines = inOut.getLineCount();
+    sourceSamps = sourceCube.sampleCount();
+    sourceLines = sourceCube.lineCount();
+    outSamps = inOut.sampleCount();
+    outLines = inOut.lineCount();
     sampScale = (double)outSamps/(double)sourceSamps;
     lineScale = (double)outLines/(double)sourceLines;
     if (isACube) {
@@ -104,7 +104,7 @@ void IsisMain() {
   if (ui.GetBoolean("Bandbin")) {
     if (isACube) {
       // If the number of bands doesn't match, we can't continue
-      if (inOut.getBandCount() != sourceCube.getBandCount()) {
+      if (inOut.bandCount() != sourceCube.bandCount()) {
         string msg = "Cannot copy BandBin group when the number of bands does"
                      " not match";
         throw IException(IException::User, msg, _FILEINFO_);

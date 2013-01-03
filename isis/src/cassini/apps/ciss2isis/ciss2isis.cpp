@@ -97,7 +97,7 @@ void IsisMain() {
     validMax = 4095;
     CreateStretchPairs();
     // Pvl outputLabels;
-    Pvl *outputLabel = ocube->getLabel();
+    Pvl *outputLabel = ocube->label();
     //Adjust Table-encoded values from 8 bit back to 12 bit.
     PvlGroup &inst = outputLabel->FindGroup("Instrument", Pvl::Traverse);
     double biasStripMean = inst.FindKeyword("BiasStripMean");
@@ -118,7 +118,7 @@ void IsisMain() {
   unsigned char *header = (unsigned char *) p.FileHeader();
   int roo = *(header + 50 + vicarLabelBytes) / 32 % 2; //**** THIS MAY NEED TO BE CHANGED,
   // SEE BOTTOM OF THIS FILE FOR IN DEPTH COMMENTS ON READOUTORDER
-  PvlGroup &inst = ocube->getLabel()->FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &inst = ocube->label()->FindGroup("Instrument", Pvl::Traverse);
   inst.AddKeyword(PvlKeyword("ReadoutOrder", toString(roo)));
   p.EndProcess();
 
@@ -278,7 +278,7 @@ void TranslateCassIssLabels(FileName &labelFile, Cube *ocube) {
   PvlTranslationManager labelXlater(inputLabel, transFile.expanded());
 
   // Pvl outputLabels;
-  Pvl *outputLabel = ocube->getLabel();
+  Pvl *outputLabel = ocube->label();
   labelXlater.Auto(*(outputLabel));
 
   //Add needed keywords that are not in translation table to cube's instrument group

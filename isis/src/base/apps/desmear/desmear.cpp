@@ -25,7 +25,7 @@ void IsisMain() {
     expTime = ui.GetDouble("DURATION");
   }
   else {
-    PvlGroup grp = icube->getGroup("ISIS_INSTRUMENT");
+    PvlGroup grp = icube->group("ISIS_INSTRUMENT");
     expTime = grp["EXPOSURE_DURATION"];
   }
 
@@ -33,12 +33,12 @@ void IsisMain() {
     xferTime = ui.GetDouble("TRANSFER");
   }
   else {
-    PvlGroup grp = icube->getGroup("ISIS_INSTRUMENT");
+    PvlGroup grp = icube->group("ISIS_INSTRUMENT");
     xferTime = grp["TRANSFER_TIME"];
   }
 
   // Calculate the smear scale
-  smearScale = xferTime / expTime / icube->getLineCount();
+  smearScale = xferTime / expTime / icube->lineCount();
 
   // Start the processing
   p.StartProcess(desmear);

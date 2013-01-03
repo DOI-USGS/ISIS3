@@ -47,7 +47,7 @@ void IsisMain() {
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
   QString transDir = (QString) dataDir["Kaguya"] + "/translations/";
   Pvl inputLabel(inFile.expanded());
-  Pvl *outputLabel = outcube->getLabel();
+  Pvl *outputLabel = outcube->label();
   FileName transFile;
 
   // Translate the Archive group
@@ -98,12 +98,12 @@ void IsisMain() {
 
   //At the time of this writing there was no expectation that Kaguya ever did any binning
   //  so this is check to make sure an error is thrown if an image was binned
-  if (lab.FindKeyword("INSTRUMENT_ID")[0] == "MI-VIS" && outcube->getSampleCount() != 962 ) {
+  if (lab.FindKeyword("INSTRUMENT_ID")[0] == "MI-VIS" && outcube->sampleCount() != 962 ) {
     QString msg = "Input file [" + inFile.expanded() + "]" + " appears to be binned.  Binning was "
                   "unexpected, and is unsupported by the camera model";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
-  if (lab.FindKeyword("INSTRUMENT_ID")[0] == "MI-NIR" && outcube->getSampleCount() != 320 ) {
+  if (lab.FindKeyword("INSTRUMENT_ID")[0] == "MI-NIR" && outcube->sampleCount() != 320 ) {
     QString msg = "Input file [" + inFile.expanded() + "]" + " appears to be binned.  Binning was "
                   "unexpected, and is unsupported by the camera model";
     throw IException(IException::Unknown, msg, _FILEINFO_);

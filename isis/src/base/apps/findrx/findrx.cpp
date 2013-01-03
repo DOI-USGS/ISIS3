@@ -25,7 +25,7 @@ void IsisMain() {
   else {
     regdef = new Pvl("$base/templates/autoreg/findrx.def");
   }
-  PvlGroup &reseaus = cube.getLabel()->FindGroup("Reseaus", Pvl::Traverse);
+  PvlGroup &reseaus = cube.label()->FindGroup("Reseaus", Pvl::Traverse);
 
   // If the Keyword sizes don't match up, throw errors.
   int nres = reseaus["Line"].Size();

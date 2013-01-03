@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Create a portal buffer for the cube with a size of 1x1
-  Isis::Portal portal(1, 1, cube->getPixelType());
+  Isis::Portal portal(1, 1, cube->pixelType());
 
   // Get some portals and output the sample, line and band of the upper left corner
   cout << "Coordinates and value of upper left pixel in several portals:" << endl;

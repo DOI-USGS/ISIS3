@@ -31,7 +31,7 @@ void IsisMain() {
 
   // Open the input cube and initialize the projection
   Cube *icube = p.SetInputCube("FROM");
-  Projection *proj = icube->getProjection();
+  Projection *proj = icube->projection();
 
   // Get the coordinate
   UserInterface &ui = Application::GetUserInterface();
@@ -133,7 +133,7 @@ void IsisMain() {
   }
 
   // Create Brick on samp, line to get the dn value of the pixel
-  Brick b(1, 1, 1, icube->getPixelType());
+  Brick b(1, 1, 1, icube->pixelType());
   int intSamp = (int)(proj->WorldX() + 0.5);
   int intLine = (int)(proj->WorldY() + 0.5);
   b.SetBasePosition(intSamp, intLine, 1);

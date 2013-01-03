@@ -48,8 +48,8 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    // Table table("ShapeModelStatistics", demCubeFile(), *demCube()->getLabel()));
-    Table table("ShapeModelStatistics", demCube()->getFileName(), *demCube()->getLabel());
+    // Table table("ShapeModelStatistics", demCubeFile(), *demCube()->label()));
+    Table table("ShapeModelStatistics", demCube()->fileName(), *demCube()->label());
 
     // Find minimum and maximum radius
     m_minRadius = new Distance(table[0]["MinimumRadius"], Distance::Kilometers);

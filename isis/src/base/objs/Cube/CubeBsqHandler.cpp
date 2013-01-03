@@ -50,17 +50,17 @@ namespace Isis {
   CubeBsqHandler::CubeBsqHandler(QFile * dataFile,
       const QList<int> *virtualBandList, const Pvl &labels, bool alreadyOnDisk)
       : CubeIoHandler(dataFile, virtualBandList, labels, alreadyOnDisk) {
-    int numSamplesInChunk = getSampleCount();
+    int numSamplesInChunk = sampleCount();
     int numLinesInChunk = 1;
 
     // The chunk size must evenly divide into the cube size...
-    if(getLineCount() < 1024)
-      numLinesInChunk = getLineCount();
+    if(lineCount() < 1024)
+      numLinesInChunk = lineCount();
     else {
       int attemptedSize = 1024;
 
       while(numLinesInChunk == 1 && attemptedSize > 1) {
-        if(getLineCount() % attemptedSize == 0)
+        if(lineCount() % attemptedSize == 0)
           numLinesInChunk = attemptedSize;
         else
           attemptedSize /= 2;

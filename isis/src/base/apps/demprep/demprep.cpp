@@ -32,12 +32,12 @@ void IsisMain() {
   ProcessByLine p;
   UserInterface &ui = Application::GetUserInterface();
   Cube *icube = p.SetInputCube("FROM");
-  int ins = icube->getSampleCount();
-  inl = icube->getLineCount();
-  int inb = icube->getBandCount();
+  int ins = icube->sampleCount();
+  inl = icube->lineCount();
+  int inb = icube->bandCount();
   outCubeStats.Reset();
 
-  PvlGroup mapgrp = icube->getLabel()->FindGroup("Mapping", Pvl::Traverse);
+  PvlGroup mapgrp = icube->label()->FindGroup("Mapping", Pvl::Traverse);
   bool hasExtents = false;
   bool isGlobal = false;
   double minLat,maxLat,minLon,maxLon;
@@ -51,7 +51,7 @@ void IsisMain() {
     if ((maxLat - minLat) >= 180.0 && (maxLon - minLon) >= 360.0) isGlobal = true;
   }
 
-  Projection *proj = icube->getProjection();
+  Projection *proj = icube->projection();
   if(proj == NULL) {
     IString message = "The input cube must be a DEM file, which means it must be projected. ";
     message += "This file is not map projected.";

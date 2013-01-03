@@ -484,14 +484,14 @@ void TestIn(int iss, int isl, int isb, int ins, int inl, int inb) {
   cInCube.open(sFrom);
 
   cout << "\n***  Input Image  ***  ";
-  if (ins == 0) ins = cInCube.getSampleCount() - iss + 1;
-  if (inl == 0) inl = cInCube.getLineCount()   - isl + 1;
-  if (inb == 0) inb = cInCube.getBandCount()   - isb + 1;
+  if (ins == 0) ins = cInCube.sampleCount() - iss + 1;
+  if (inl == 0) inl = cInCube.lineCount()   - isl + 1;
+  if (inb == 0) inb = cInCube.bandCount()   - isb + 1;
 
   printf("Stats %d, %d, %d, %d, %d, %d\n", isl, iss, isb, inl, ins, inb);
 
   int iS;
-  Portal ciPortal(ins, 1, cInCube.getPixelType());
+  Portal ciPortal(ins, 1, cInCube.pixelType());
   for (int band = isb; band <= (isb + inb - 1); band++) {
     for (int line = isl; line <= (isl + inl - 1); line++) {
       iS = iss;
@@ -531,11 +531,11 @@ void TestOut(int piSamples, int piLines,
     sTo = ui.GetFileName("TO");
   cOutCube.open(sTo);
 
-  int iBands = cOutCube.getBandCount();
+  int iBands = cOutCube.bandCount();
 
   cout << "\n***  Mosaic Image  ***  ";
   printf("Start Stats %d, %d, %d\nTotal Bands=%d\n", piLines, piSamples, piBands, iBands);
-  Portal coPortal(5, 1, cOutCube.getPixelType());
+  Portal coPortal(5, 1, cOutCube.pixelType());
   int band = piBands;
   while (band <= iBands) {
     for (int line = 1; line <= 5; line++) {
@@ -545,7 +545,7 @@ void TestOut(int piSamples, int piLines,
         int iDefault = 0;
         int iFileIndexOffset = 0;
 
-        switch (SizeOf(cOutCube.getPixelType())) {
+        switch (SizeOf(cOutCube.pixelType())) {
           case 1:
             iDefault = NULL1;
             iFileIndexOffset = -VALID_MIN1;

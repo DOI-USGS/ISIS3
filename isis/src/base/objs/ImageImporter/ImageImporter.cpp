@@ -110,7 +110,7 @@ namespace Isis {
     ProcessByLine p;
     Cube *cube = createOutput(outputName, att);
 
-    Pvl *label = cube->getLabel();
+    Pvl *label = cube->label();
     PvlGroup bandBin("BandBin");
 
     PvlKeyword name("Name");

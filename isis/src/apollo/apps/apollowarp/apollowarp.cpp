@@ -18,8 +18,8 @@ void IsisMain() {
 
   // Check to see if it is an Apollo image and if the reseaus have been refined
   //    (note: a status of 'Removed' implies it is also 'Refined')
-  PvlGroup &reseaus = ipacket->getGroup("Reseaus");
-  QString mission = (ipacket->getGroup("Instrument"))["SpacecraftName"];
+  PvlGroup &reseaus = ipacket->group("Reseaus");
+  QString mission = (ipacket->group("Instrument"))["SpacecraftName"];
   if (mission.mid(0,6) != "APOLLO") {
     QString msg = "This application is for use with Apollo spacecrafts only. ";
     throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -57,10 +57,10 @@ void IsisMain() {
   bool weighted = ui.GetBoolean("WEIGHTED");
 
   // Set up the transform object
-  WarpTransform *transform = new WarpTransform(*basisLine,*basisSamp,weighted,inputLine,inputSample,outputLine,outputSample,ipacket->getLineCount(),ipacket->getSampleCount(),onl,ons);
+  WarpTransform *transform = new WarpTransform(*basisLine,*basisSamp,weighted,inputLine,inputSample,outputLine,outputSample,ipacket->lineCount(),ipacket->sampleCount(),onl,ons);
 
   // Allocate the output file, same size as input
-  p.SetOutputCube ("TO",transform->OutputSamples(),transform->OutputLines(),ipacket->getBandCount());
+  p.SetOutputCube ("TO",transform->OutputSamples(),transform->OutputLines(),ipacket->bandCount());
 
   // Set up the interpolator
   Interpolator *interp;

@@ -241,8 +241,8 @@ namespace Isis {
       mSerialNumMap[sn] = true;
       numCNetImages++;
 
-      imgStats[imgSamples] = cube->getSampleCount();
-      imgStats[imgLines]   = cube->getLineCount();
+      imgStats[imgSamples] = cube->sampleCount();
+      imgStats[imgLines]   = cube->lineCount();
       double cubeArea      = imgStats[imgSamples] * imgStats[imgLines];
 
       QList< ControlMeasure * > measures = node->getMeasures();

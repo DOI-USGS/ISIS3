@@ -55,8 +55,8 @@ void IsisMain() {
     PvlKeyword sourceProductId("SourceProductId");
     QString ProdId;
     for(int i = 0; i < (int)clist.size(); i++) {
-      Pvl *pmatch = clist[0]->getLabel();
-      Pvl *pcomp = clist[i]->getLabel();
+      Pvl *pmatch = clist[0]->label();
+      Pvl *pcomp = clist[i]->label();
       CompareLabels(*pmatch, *pcomp);
       PvlGroup g = pcomp->FindGroup("Instrument", Pvl::Traverse);
       if(g.HasKeyword("StitchedProductIds")) {
@@ -80,7 +80,7 @@ void IsisMain() {
     double avgLat;
     double avgLon;
     for(int i = 0; i < (int)clist.size(); i++) {
-      Projection *proj = clist[i]->getProjection();
+      Projection *proj = clist[i]->projection();
       if(proj->MinimumLatitude() < minLat) minLat = proj->MinimumLatitude();
       if(proj->MaximumLatitude() > maxLat) maxLat = proj->MaximumLatitude();
       if(proj->MinimumLongitude() < minLon) minLon = proj->MinimumLongitude();
@@ -88,7 +88,7 @@ void IsisMain() {
     }
     avgLat = (minLat + maxLat) / 2;
     avgLon = (minLon + maxLon) / 2;
-    Projection *proj = clist[0]->getProjection();
+    Projection *proj = clist[0]->projection();
     proj->SetGround(avgLat, avgLon);
     avgLat = proj->UniversalLatitude();
     avgLon = proj->UniversalLongitude();
@@ -102,7 +102,7 @@ void IsisMain() {
     double CsunAzimuth;
     double CnorthAzimuth;
     for(int i = 0; i < (int)clist.size(); i++) {
-      Camera *cam = clist[i]->getCamera();
+      Camera *cam = clist[i]->camera();
       if(cam->SetUniversalGround(avgLat, avgLon)) {
         Cemiss = cam->EmissionAngle();
         Cphase = cam->PhaseAngle();
@@ -126,7 +126,7 @@ void IsisMain() {
       double startY = DBL_MAX;
       double endY =  DBL_MIN;
       for(int i = 0; i < (int)clist.size(); i++) {
-        Projection *proj = clist[i]->getProjection();
+        Projection *proj = clist[i]->projection();
         proj->SetWorld(0.5, 0.5);
         if(i == 0) {
           startX = proj->XCoord();
@@ -136,7 +136,7 @@ void IsisMain() {
           if(proj->XCoord() < startX) startX =  proj->XCoord();
           if(proj->YCoord() > endY) endY = proj->YCoord();
         }
-        Pvl *p = clist[i]->getLabel();
+        Pvl *p = clist[i]->label();
         double nlines = p->FindGroup("Dimensions", Pvl::Traverse)["Lines"];
         double nsamps = p->FindGroup("Dimensions", Pvl::Traverse)["Samples"];
 
@@ -157,7 +157,7 @@ void IsisMain() {
       double line = proj->ToWorldY(avgY);
 
       for(int i = 0; i < (int)clist.size(); i++) {
-        Camera *cam = clist[i]->getCamera();
+        Camera *cam = clist[i]->camera();
         if(cam->SetImage(sample, line)) {
           Cemiss = cam->EmissionAngle();
           Cphase = cam->PhaseAngle();
@@ -217,7 +217,7 @@ void IsisMain() {
     }
 
     for(int i = 0; i < (int)clist.size(); i++) {
-      Pvl *clab = clist[i]->getLabel();
+      Pvl *clab = clist[i]->label();
       PvlGroup cInst = clab->FindGroup("Instrument", Pvl::Traverse);
       OriginalLabel cOrgLab;
       clist[i]->read(cOrgLab);
@@ -277,7 +277,7 @@ void IsisMain() {
 
     Cube mosCube;
     mosCube.open(ui.GetFileName("TO"), "rw");
-    PvlObject &lab = mosCube.getLabel()->FindObject("IsisCube");
+    PvlObject &lab = mosCube.label()->FindObject("IsisCube");
     lab.AddGroup(mos);
     //add orginal label blob to the output cube
     mosCube.write(org);

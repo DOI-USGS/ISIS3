@@ -50,7 +50,7 @@ void IsisMain() {
   // Make sure it is not projected
   Projection *proj = NULL;
   try {
-    proj = icube->getProjection();
+    proj = icube->projection();
   }
   catch(IException &) {
     proj = NULL;
@@ -61,11 +61,11 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  Pvl lab = *icube->getLabel();
+  Pvl lab = *icube->label();
 
   // if cube has existing polygon delete it
-  if (icube->getLabel()->HasObject("Polygon")) {
-    icube->getLabel()->DeleteObject("Polygon");
+  if (icube->label()->HasObject("Polygon")) {
+    icube->label()->DeleteObject("Polygon");
   }
 
   // Set up for getting the mission name
@@ -80,7 +80,7 @@ void IsisMain() {
   QString mission = missionXlater.Translate("MissionName");
 
   if (ui.GetBoolean("WEB")) {
-    RequestSpice(icube, *icube->getLabel(), mission);
+    RequestSpice(icube, *icube->label(), mission);
   }
   else {
     // Get system base kernels
@@ -209,7 +209,7 @@ bool TryKernels(Cube *icube, Process &p,
                 Kernel fk, Kernel ik, Kernel sclk,
                 Kernel spk, Kernel iak,
                 Kernel dem, Kernel exk) {
-  Pvl lab = *icube->getLabel();
+  Pvl lab = *icube->label();
 
   // Add the new kernel files to the existing kernels group
   PvlKeyword lkKeyword("LeapSecond");
@@ -254,7 +254,7 @@ bool TryKernels(Cube *icube, Process &p,
     exkKeyword.AddValue(exk[i]);
   }
 
-  PvlGroup originalKernels = icube->getGroup("Kernels");
+  PvlGroup originalKernels = icube->group("Kernels");
   PvlGroup currentKernels = originalKernels;
   currentKernels.AddKeyword(lkKeyword, Pvl::Replace);
   currentKernels.AddKeyword(pckKeyword, Pvl::Replace);
@@ -324,7 +324,7 @@ bool TryKernels(Cube *icube, Process &p,
   try {
     Camera *cam;
     try {
-      cam = icube->getCamera();
+      cam = icube->camera();
       Application::Log(currentKernels);
     }
     catch(IException &e) {
@@ -397,7 +397,7 @@ bool TryKernels(Cube *icube, Process &p,
 
       icube->putGroup(currentKernels);
 
-      Pvl *label = icube->getLabel();
+      Pvl *label = icube->label();
       int i = 0;
       while (i < label->Objects()) {
         PvlObject currObj = label->Object(i);
@@ -409,11 +409,11 @@ bool TryKernels(Cube *icube, Process &p,
         }
       }
 
-      *icube->getLabel() += cam->getStoredNaifKeywords();
+      *icube->label() += cam->getStoredNaifKeywords();
     }
     //modify Kernels group only
     else {
-      Pvl *label = icube->getLabel();
+      Pvl *label = icube->label();
       int i = 0;
       while (i < label->Objects()) {
         PvlObject currObj = label->Object(i);
@@ -536,7 +536,7 @@ void RequestSpice(Cube *icube, Pvl &labels, QString missionName) {
   Application::Log(logGrp);
 
   icube->putGroup(kernelsGroup);
-  icube->getLabel()->AddObject(naifKeywords);
+  icube->label()->AddObject(naifKeywords);
 
   icube->write(*pointingTable);
   icube->write(*positionTable);
@@ -544,7 +544,7 @@ void RequestSpice(Cube *icube, Pvl &labels, QString missionName) {
   icube->write(*sunPosTable);
 
   try {
-    icube->getCamera();
+    icube->camera();
   }
   catch (IException &e) {
     throw IException(e, IException::Unknown,

@@ -131,11 +131,11 @@ namespace Isis {
 
     setCaption();
 
-    p_redBrick = new Brick(4, 1, 1, cube->getPixelType());
-    p_grnBrick = new Brick(4, 1, 1, cube->getPixelType());
-    p_bluBrick = new Brick(4, 1, 1, cube->getPixelType());
-    p_gryBrick = new Brick(4, 1, 1, cube->getPixelType());
-    p_pntBrick = new Brick(4, 1, 1, cube->getPixelType());
+    p_redBrick = new Brick(4, 1, 1, cube->pixelType());
+    p_grnBrick = new Brick(4, 1, 1, cube->pixelType());
+    p_bluBrick = new Brick(4, 1, 1, cube->pixelType());
+    p_gryBrick = new Brick(4, 1, 1, cube->pixelType());
+    p_pntBrick = new Brick(4, 1, 1, cube->pixelType());
 
     p_paintPixmap = false;
     p_image = NULL;
@@ -161,7 +161,7 @@ namespace Isis {
         p_camera = p_groundMap->Camera();
         if(p_camera->HasProjection()) {
           try {
-            p_projection = cube->getProjection();
+            p_projection = cube->projection();
           }
           catch(IException &) {
           }
@@ -174,20 +174,20 @@ namespace Isis {
 
 
     // Setup context sensitive help
-    QString cubeFileName = p_cube->getFileName();
+    QString cubeFileName = p_cube->fileName();
     p_whatsThisText = QString("<b>Function: </b>Viewport to ") + cubeFileName;
 
     p_cubeWhatsThisText =
       "<p><b>Cube Dimensions:</b> \
       <blockQuote>Samples = " +
-      QString::number(cube->getSampleCount()) + "<br>" +
+      QString::number(cube->sampleCount()) + "<br>" +
       "Lines = " +
-      QString::number(cube->getLineCount()) + "<br>" +
+      QString::number(cube->lineCount()) + "<br>" +
       "Bands = " +
-      QString::number(cube->getBandCount()) + "</blockquote></p>";
+      QString::number(cube->bandCount()) + "</blockquote></p>";
 
     /*setting up the qlist of CubeBandsStretch objs.
-    for( int b = 0; b < p_cube->getBandCount(); b++) {
+    for( int b = 0; b < p_cube->bandCount(); b++) {
       CubeBandsStretch *stretch = new CubeBandsStretch();
       p_bandsStretchList.push_back(stretch);
     }*/
@@ -208,7 +208,7 @@ namespace Isis {
     p_knownStretches = new QVector< Stretch * >();
     p_globalStretches = new QVector< Stretch * >();
 
-    while(p_cube->getBandCount() > p_knownStretches->size()) {
+    while(p_cube->bandCount() > p_knownStretches->size()) {
       p_knownStretches->push_back(NULL);
       p_globalStretches->push_back(NULL);
     }
@@ -421,19 +421,19 @@ namespace Isis {
 
   //! Return the number of samples in the cube
   int CubeViewport::cubeSamples() const {
-    return p_cube->getSampleCount();
+    return p_cube->sampleCount();
   }
 
 
   //! Return the number of lines in the cube
   int CubeViewport::cubeLines() const {
-    return p_cube->getLineCount();
+    return p_cube->lineCount();
   }
 
 
   //! Return the number of bands in the cube
   int CubeViewport::cubeBands() const {
-    return p_cube->getBandCount();
+    return p_cube->bandCount();
   }
 
 
@@ -457,11 +457,11 @@ namespace Isis {
       if(sl < 0.5){
         sl = 0.5;
       }
-      if(es > cube()->getSampleCount() + 0.5){
-        es = cube()->getSampleCount() + 0.5;
+      if(es > cube()->sampleCount() + 0.5){
+        es = cube()->sampleCount() + 0.5;
       }
-      if(el > cube()->getLineCount() + 0.5){
-        el = cube()->getLineCount() + 0.5;
+      if(el > cube()->lineCount() + 0.5){
+        el = cube()->lineCount() + 0.5;
       }
 
       int sx, sy, ex, ey;
@@ -518,7 +518,7 @@ namespace Isis {
       // Enter == button 0, Escape == button 2
       switch(QMessageBox::information(this, tr("Confirm Save"),
         tr("The cube [<font color='red'>%1</font>] contains unsaved changes. "
-           "Do you want to save the changes before exiting?").arg(cube()->getFileName()),
+           "Do you want to save the changes before exiting?").arg(cube()->fileName()),
            QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel)) {
         //Save changes and close viewport
         case QMessageBox::Save:
@@ -978,7 +978,7 @@ namespace Isis {
    *
    */
   void CubeViewport::setCaption() {
-    QString cubeFileName = p_cube->getFileName();
+    QString cubeFileName = p_cube->fileName();
     QString str = QFileInfo(cubeFileName).fileName();
     str += QString(" @ ");
     str += QString::number(p_scale * 100.0);
@@ -1360,12 +1360,12 @@ namespace Isis {
   {
     // Get Cube Info
     PvlObject whatsThisObj = PvlObject("WhatsThis");
-    whatsThisObj += PvlKeyword("Cube", p_cube->getFileName());
+    whatsThisObj += PvlKeyword("Cube", p_cube->fileName());
 
     PvlGroup cubeGrp("CubeDimensions");
-    cubeGrp += PvlKeyword("Samples", toString(p_cube->getSampleCount()));
-    cubeGrp += PvlKeyword("Lines",   toString(p_cube->getLineCount()));
-    cubeGrp += PvlKeyword("Bands",   toString(p_cube->getBandCount()));
+    cubeGrp += PvlKeyword("Samples", toString(p_cube->sampleCount()));
+    cubeGrp += PvlKeyword("Lines",   toString(p_cube->lineCount()));
+    cubeGrp += PvlKeyword("Bands",   toString(p_cube->bandCount()));
     whatsThisObj += cubeGrp;
 
     // Get Viewport Info
@@ -1396,9 +1396,9 @@ namespace Isis {
       virtualKey += toString(iBlueBand);
       bandGrp   += virtualKey;
 
-      physicalKey =  toString(p_cube->getPhysicalBand(iRedBand));
-      physicalKey += toString(p_cube->getPhysicalBand(iGreenBand));
-      physicalKey += toString(p_cube->getPhysicalBand(iBlueBand));
+      physicalKey =  toString(p_cube->physicalBand(iRedBand));
+      physicalKey += toString(p_cube->physicalBand(iGreenBand));
+      physicalKey += toString(p_cube->physicalBand(iBlueBand));
       bandGrp += physicalKey;
 
       if(iFilterSize) {
@@ -1431,7 +1431,7 @@ namespace Isis {
       bandGrp  += PvlKeyword("Color", "Gray");
 
       bandGrp  += PvlKeyword("Virtual", toString(iGrayBand));
-      bandGrp  += PvlKeyword("Physical", toString(p_cube->getPhysicalBand(iGrayBand)));
+      bandGrp  += PvlKeyword("Physical", toString(p_cube->physicalBand(iGrayBand)));
 
       if(iFilterSize && iGrayBand <= iFilterSize) {
         bandGrp  += PvlKeyword("FilterName", filterName[iGrayBand-1]);
@@ -1461,7 +1461,7 @@ namespace Isis {
   void CubeViewport::getBandFilterName(PvlKeyword & pFilterNameKey)
   {
     // get the band info
-    Pvl* cubeLbl = p_cube->getLabel();
+    Pvl* cubeLbl = p_cube->label();
     PvlObject isisObj = cubeLbl->FindObject("IsisCube");
     if (isisObj.HasGroup("BandBin")) {
       PvlGroup bandBinGrp = isisObj.FindGroup("BandBin");
@@ -1526,9 +1526,9 @@ namespace Isis {
       sBandInfo += QString::number(iBlueBand) + " ";
 
       sBandInfo += "Physical = " +
-          QString::number(p_cube->getPhysicalBand(iRedBand)) + ", ";
-      sBandInfo += QString::number(p_cube->getPhysicalBand(iGreenBand)) + ", ";
-      sBandInfo += QString::number(p_cube->getPhysicalBand(iBlueBand));
+          QString::number(p_cube->physicalBand(iRedBand)) + ", ";
+      sBandInfo += QString::number(p_cube->physicalBand(iGreenBand)) + ", ";
+      sBandInfo += QString::number(p_cube->physicalBand(iBlueBand));
 
       if(iFilterSize) {
         sBandInfo += "<br>FilterName = ";
@@ -1561,7 +1561,7 @@ namespace Isis {
 
       sBandInfo = "Band(Gray)&nbsp;Virtual = " + QString::number(iGrayBand) + " ";
 
-      sBandInfo += "Physical = " + QString::number(p_cube->getPhysicalBand(iGrayBand));
+      sBandInfo += "Physical = " + QString::number(p_cube->physicalBand(iGrayBand));
 
       if(iFilterSize && iGrayBand <= iFilterSize) {
         sBandInfo += "<br>FilterName = " + QString(filterNameKey[iGrayBand-1]);
@@ -2293,11 +2293,11 @@ namespace Isis {
     if(sl < 1){
       sl = 0.5;
     }
-    if(es > cube()->getSampleCount()){
-      es = cube()->getSampleCount() + 0.5;
+    if(es > cube()->sampleCount()){
+      es = cube()->sampleCount() + 0.5;
     }
-    if(el > cube()->getLineCount()){
-      el = cube()->getLineCount() + 0.5;
+    if(el > cube()->lineCount()){
+      el = cube()->lineCount() + 0.5;
     }
 
     //start x/y and end x/y

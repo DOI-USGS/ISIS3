@@ -47,8 +47,8 @@ void IsisMain() {
     pixelResolution = ui.GetDouble("PIXELRESOL");
   }
   else {
-    if(inCube->getLabel()->FindObject("IsisCube").HasGroup("Mapping")) {
-      pixelResolution = inCube->getLabel()->FindObject("IsisCube").FindGroup("Mapping")["PixelResolution"];
+    if(inCube->label()->FindObject("IsisCube").HasGroup("Mapping")) {
+      pixelResolution = inCube->label()->FindObject("IsisCube").FindGroup("Mapping")["PixelResolution"];
     }
     else {
       QString msg = "The file [" + ui.GetFileName("FROM") + "] does not have a mapping group,"

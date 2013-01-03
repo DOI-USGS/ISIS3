@@ -85,7 +85,7 @@ namespace Isis {
         QListIterator<RawCubeChunk *> allocatedIterator(allocated);
         while (allocatedIterator.hasNext()) {
           RawCubeChunk *chunk = allocatedIterator.next();
-          int currentEnd = chunk->getStartLine() + chunk->getLineCount() - 1;
+          int currentEnd = chunk->getStartLine() + chunk->lineCount() - 1;
 
           if (currentEnd < minLine) {
             //std::cerr << "minLine = " << minLine << " | maxLine = " << maxLine << std::endl;

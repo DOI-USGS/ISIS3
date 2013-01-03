@@ -13,8 +13,8 @@ void IsisMain() {
   Isis::Cube *icube = p.SetInputCube("FROM");
   p.SetInputCube("FROM2");
   p.SetTileSize(10, 10);
-  p.SetOutputCube("TO", icube->getSampleCount() + 10, icube->getLineCount(), icube->getBandCount());
-  p.SetOutputCube("TO2", icube->getSampleCount() + 10, icube->getLineCount(), icube->getBandCount());
+  p.SetOutputCube("TO", icube->sampleCount() + 10, icube->lineCount(), icube->bandCount());
+  p.SetOutputCube("TO2", icube->sampleCount() + 10, icube->lineCount(), icube->bandCount());
   p.StartProcess(twoInAndOut);
   p.EndProcess();
 

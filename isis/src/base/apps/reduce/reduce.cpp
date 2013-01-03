@@ -34,9 +34,9 @@ void IsisMain() {
     QString from = ui.GetFileName("FROM");
     inCube.open(from);
 
-    ins = inCube.getSampleCount();
-    inl = inCube.getLineCount();
-    inb = inCube.getBandCount();
+    ins = inCube.sampleCount();
+    inl = inCube.lineCount();
+    inb = inCube.bandCount();
 
     QString alg  = ui.GetString("ALGORITHM");
     double vper = ui.GetDouble("VALIDPER") / 100.;

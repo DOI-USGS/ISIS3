@@ -306,7 +306,7 @@ namespace Isis {
     int iline = (int)(line + 0.5);
 
     Statistics stats;
-    Brick *brick = new Brick(1, 1, 1, cvp->cube()->getPixelType());
+    Brick *brick = new Brick(1, 1, 1, cvp->cube()->pixelType());
 
 
     QVector<QVector<double> > pixelData(p_boxLines, QVector<double>(p_boxSamps, Null));

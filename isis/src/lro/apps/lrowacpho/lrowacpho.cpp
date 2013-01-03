@@ -48,7 +48,7 @@ void IsisMain () {
             throw IException(IException::User, msg, _FILEINFO_);
         }
 
-        if (icube->getBandCount() != 1) {
+        if (icube->bandCount() != 1) {
             string msg = "Invalid Image: The backplane option can only be used with a single image band at a time.";
             throw IException(IException::User, msg, _FILEINFO_);
         }

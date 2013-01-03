@@ -25,14 +25,14 @@ void IsisMain() {
   Interpolator *interp = new Interpolator(Interpolator::NearestNeighborType);
 
   // Calculate the output size. If there is a fractional pixel, round up
-  int ons = (int)ceil(inCube->getSampleCount() * sampleScale);
-  int onl = (int)ceil(inCube->getLineCount() * lineScale);
-  Cube *outCube = p.SetOutputCube("TO", ons, onl, inCube->getBandCount());
+  int ons = (int)ceil(inCube->sampleCount() * sampleScale);
+  int onl = (int)ceil(inCube->lineCount() * lineScale);
+  Cube *outCube = p.SetOutputCube("TO", ons, onl, inCube->bandCount());
 
   cerr << "Testing Enlarge Class ... " << endl;
   p.StartProcess(*trans, *interp);
   trans->UpdateOutputLabel(outCube);
-  Pvl *outLabel = outCube->getLabel();
+  Pvl *outLabel = outCube->label();
   outLabel->DeleteObject("History");
   cerr << *outLabel;
   p.EndProcess();

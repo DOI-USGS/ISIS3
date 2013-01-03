@@ -239,25 +239,25 @@ bool HiCalConf::_naifLoaded = false;
 
 //  Check for proper size if specifeid
     if (expected_size != 0) {
-      if (cube.getSampleCount() != expected_size) {
+      if (cube.sampleCount() != expected_size) {
         ostringstream mess;
         mess << "Specifed matrix  (" << name
              << ") from file \"" << mfile
              << "\" does not have expected samples (" << expected_size
-             << ") but has " << cube.getSampleCount();
+             << ") but has " << cube.sampleCount();
         cube.close();
         throw IException(IException::User, mess.str(), _FILEINFO_);
       }
     }
 
 //  Read the specifed region
-    Brick bandio(cube.getSampleCount(), 1, 1, Real);
+    Brick bandio(cube.sampleCount(), 1, 1, Real);
     bandio.SetBasePosition(1,1,getMatrixBand(profile));
     cube.read(bandio);
 
 //  Now create the output buffer with some TNT funny business
-    HiVector temp(cube.getSampleCount(), bandio.DoubleBuffer());
-    HiVector out(cube.getSampleCount());
+    HiVector temp(cube.sampleCount(), bandio.DoubleBuffer());
+    HiVector out(cube.sampleCount());
     out.inject(temp);
     cube.close();
     return (out);

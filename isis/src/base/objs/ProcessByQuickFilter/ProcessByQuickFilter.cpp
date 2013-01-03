@@ -60,19 +60,19 @@ namespace Isis {
     }
 
     // The lines in the input and output must match
-    if(InputCubes[0]->getLineCount() != OutputCubes[0]->getLineCount()) {
+    if(InputCubes[0]->lineCount() != OutputCubes[0]->lineCount()) {
       string m = "The lines in the input and output cube must match";
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // The samples in the input and output must match
-    if(InputCubes[0]->getSampleCount() != OutputCubes[0]->getSampleCount()) {
+    if(InputCubes[0]->sampleCount() != OutputCubes[0]->sampleCount()) {
       string m = "The samples in the input and output cube must match";
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // The bands in the input and output must match
-    if(InputCubes[0]->getBandCount() != OutputCubes[0]->getBandCount()) {
+    if(InputCubes[0]->bandCount() != OutputCubes[0]->bandCount()) {
       string m = "The bands in the input and output cube must match";
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
@@ -83,9 +83,9 @@ namespace Isis {
     Isis::LineManager *botline = new Isis::LineManager(*InputCubes[0]);
     Isis::LineManager *oline = new Isis::LineManager(*OutputCubes[0]);
 
-    int lines = InputCubes[0]->getLineCount();
-    int samples = InputCubes[0]->getSampleCount();
-    int bands = InputCubes[0]->getBandCount();
+    int lines = InputCubes[0]->lineCount();
+    int samples = InputCubes[0]->sampleCount();
+    int bands = InputCubes[0]->bandCount();
 
     // See if we need to get parameters from the user
     if(p_getParametersFromUser) GetFilterParameters();
@@ -151,7 +151,7 @@ namespace Isis {
         p_progress->CheckStatus();
         if(line == lines) continue;
 
-        if(bot <= InputCubes[0]->getLineCount()) {
+        if(bot <= InputCubes[0]->lineCount()) {
           botline->SetLine(bot, band);
         }
         else {

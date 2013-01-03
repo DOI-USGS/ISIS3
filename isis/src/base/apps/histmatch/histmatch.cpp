@@ -16,10 +16,10 @@ void IsisMain() {
   // Setup the input and output cubes along with histograms
   ProcessByLine p;
   Cube *mcube = p.SetInputCube("MATCH", Isis::OneBand);
-  Histogram *match = mcube->getHistogram();
+  Histogram *match = mcube->histogram();
   p.ClearInputCubes();
   Cube *icube = p.SetInputCube("FROM", Isis::OneBand);
-  Histogram *from = icube->getHistogram();
+  Histogram *from = icube->histogram();
   p.SetOutputCube("TO");
 
   // Histogram specifications

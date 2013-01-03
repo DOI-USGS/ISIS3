@@ -21,13 +21,13 @@ void IsisMain() {
   ProcessBySpectra p;
   p.SetType(ProcessBySpectra::PerPixel);
   Cube *icube = p.SetInputCube("FROM");
-  Cube *ocube = p.SetOutputCube("TO", icube->getSampleCount(), icube->getLineCount(), 1);
+  Cube *ocube = p.SetOutputCube("TO", icube->sampleCount(), icube->lineCount(), 1);
 
   //Get user parameters and sets outputcube's BandBin
   UserInterface &ui = Application::GetUserInterface();
   if(ui.GetString("BANDBIN") == "COMPUTE") {
     if(icube->hasGroup("BandBin")) {
-      PvlGroup &pvlg = icube->getGroup("BandBin");
+      PvlGroup &pvlg = icube->group("BandBin");
       removekeywords(pvlg);
       if(pvlg.HasKeyword("Center")) {
         bool hasWidth = pvlg.HasKeyword("Width");
@@ -37,9 +37,9 @@ void IsisMain() {
           pvlWidth = & pvlg.FindKeyword("Width");
         }
         std::vector<double> centers;
-        centers.resize(icube->getBandCount());
+        centers.resize(icube->bandCount());
         std::vector<double> widths;
-        widths.resize(icube->getBandCount());
+        widths.resize(icube->bandCount());
         for(int i = 0; i < pvlCenter.Size(); i++) {
           centers[i] = toDouble(pvlCenter[i]);
           if(hasWidth)
@@ -67,7 +67,7 @@ void IsisMain() {
       icube->putGroup(pvlg);
     }
     else {
-      pvlg = ocube->getGroup("BandBin");
+      pvlg = ocube->group("BandBin");
       removekeywords(pvlg);
     }
     QString Units = "";
@@ -132,7 +132,7 @@ void removekeywords(PvlGroup &pvlg) {
 //BandBin Computeing
 void compute(vector<double> centers, vector<double> widths,
              Cube *ocube) {
-  PvlGroup &pvlg = ocube->getGroup("BandBin");
+  PvlGroup &pvlg = ocube->group("BandBin");
   PvlKeyword &pvlCenter = pvlg.FindKeyword("Center");
   QString centerUnit = pvlCenter.Unit();
   bool hasWidth  = pvlg.HasKeyword("Width");

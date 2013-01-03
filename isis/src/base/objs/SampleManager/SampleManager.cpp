@@ -42,9 +42,9 @@ namespace Isis {
    */
 
   SampleManager::SampleManager(const Isis::Cube &cube, const bool reverse) :
-    Isis::BufferManager(cube.getSampleCount(), cube.getLineCount(),
-                        cube.getBandCount(), 1, cube.getLineCount(), 1,
-                        cube.getPixelType(), reverse) {
+    Isis::BufferManager(cube.sampleCount(), cube.lineCount(),
+                        cube.bandCount(), 1, cube.lineCount(), 1,
+                        cube.pixelType(), reverse) {
   }
 
   /**

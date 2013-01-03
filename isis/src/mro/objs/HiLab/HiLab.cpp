@@ -28,7 +28,7 @@ namespace Isis {
    * @param cube The cube containing the HiRise labels to be processed. 
    */
   HiLab::HiLab(Cube *cube) {
-    PvlGroup group = cube->getGroup("Instrument");
+    PvlGroup group = cube->group("Instrument");
     p_cpmmNumber = group["CpmmNumber"];
     p_channel = group["ChannelNumber"];
   

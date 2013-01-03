@@ -135,11 +135,11 @@ void calcRange(double &minLat, double &maxLat, double &minLon, double &maxLon) {
     // Open the cube and get the maximum number of band in all cubes
     Cube cube;
     cube.open(list[i].toString());
-    if(cube.getBandCount() > nbands) nbands = cube.getBandCount();
+    if(cube.bandCount() > nbands) nbands = cube.bandCount();
 
     // See if the cube has a projection and make sure it matches
     // previous input cubes
-    Projection *proj = Isis::ProjectionFactory::CreateFromCube(*(cube.getLabel()));
+    Projection *proj = Isis::ProjectionFactory::CreateFromCube(*(cube.label()));
     if(firstProj == NULL) {
       firstProj = proj;
     }

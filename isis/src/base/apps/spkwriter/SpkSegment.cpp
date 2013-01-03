@@ -95,7 +95,7 @@ void SpkSegment::import(Cube &cube) {
   NaifStatus::CheckErrors();
   try {
 
-    Camera *camera(cube.getCamera());
+    Camera *camera(cube.camera());
     Kernels kernels = getKernels();
 
     // Load necessary kernels and id frames

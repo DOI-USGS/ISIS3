@@ -271,7 +271,7 @@ namespace Isis {
       cubeViewport()->viewportToCube(p.x(), p.y(),
                                      m_startSamp, m_startLine);
 
-      Camera *cam = cubeViewport()->cube()->getCamera();
+      Camera *cam = cubeViewport()->cube()->camera();
 
       if (cam->SetImage(m_startSamp, m_startLine)) {
         m_tracking = true;
@@ -448,8 +448,8 @@ namespace Isis {
     try {
       if (m_startSamp != Null && m_startLine != Null &&
           m_endSamp != Null && m_endLine != Null) {
-        m_path = FileName(cubeViewport()->cube()->getFileName()).path();
-        m_fileName = FileName(cubeViewport()->cube()->getFileName()).name();
+        m_path = FileName(cubeViewport()->cube()->fileName()).path();
+        m_fileName = FileName(cubeViewport()->cube()->fileName()).name();
 
         //
         // \  |  /
@@ -483,7 +483,7 @@ namespace Isis {
         //   P2: m_endSurfacePoint
 
         bool success = true;
-        Camera *cam = cubeViewport()->cube()->getCamera();
+        Camera *cam = cubeViewport()->cube()->camera();
         success = cam->SetImage(m_startSamp, m_startLine);
 
         // Vector is in meters
@@ -593,7 +593,7 @@ namespace Isis {
     bool hasCamera = true;
     try {
       hasCamera = activeViewport &&
-                  (activeViewport->cube()->getCamera() != NULL);
+                  (activeViewport->cube()->camera() != NULL);
     }
     catch (IException &) {
       hasCamera = false;

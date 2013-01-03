@@ -129,7 +129,7 @@ void TranslateLabels(Pvl &pdsLabel, Cube *ocube) {
   // Get the translation manager ready
   PvlTranslationManager labelXlater(pdsLabel, transFile.expanded());
   // Pvl outputLabels;
-  Pvl *outputLabel = ocube->getLabel();
+  Pvl *outputLabel = ocube->label();
   labelXlater.Auto(*(outputLabel));
 
   //Add to the Archive Group

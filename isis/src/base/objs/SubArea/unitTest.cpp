@@ -28,8 +28,8 @@ void IsisMain() {
   QString from1 = ui.GetFileName("FROM1");
   Cube inomapcube;
   inomapcube.open(from1);
-  inl = inomapcube.getLineCount();
-  ins = inomapcube.getSampleCount();
+  inl = inomapcube.lineCount();
+  ins = inomapcube.sampleCount();
   sl = 1;
   ss = 1;
   el = inl;
@@ -57,7 +57,7 @@ void IsisMain() {
   s.UpdateLabel(&inomapcube, onomapcube, results);
 
   cout << "Input unprojected cube label: " << endl << endl;
-  inlabel = *inomapcube.getLabel();
+  inlabel = *inomapcube.label();
   cout << inlabel.FindObject("IsisCube").FindObject("Core").FindGroup("Dimensions") << endl << endl;
   if(inlabel.FindObject("IsisCube").HasGroup("Instrument")) {
     cout << inlabel.FindObject("IsisCube").FindGroup("Instrument") << endl << endl;
@@ -124,7 +124,7 @@ void IsisMain() {
 
   cout << "Output cube label: " << endl << endl;
   cube.open(file);
-  label = *cube.getLabel();
+  label = *cube.label();
   cube.close(true);
   cout << label.FindObject("IsisCube").FindObject("Core").FindGroup("Dimensions") << endl << endl;
   if(label.FindObject("IsisCube").HasGroup("Instrument")) {
@@ -170,7 +170,7 @@ void IsisMain() {
 
   cout << "Output cube label: " << endl << endl;
   cube.open(file);
-  label = *cube.getLabel();
+  label = *cube.label();
   cube.close(true);
   cout << label.FindObject("IsisCube").FindObject("Core").FindGroup("Dimensions") << endl << endl;
   if(label.FindObject("IsisCube").HasGroup("Instrument")) {
@@ -220,7 +220,7 @@ void IsisMain() {
 
   cout << "Output cube label: " << endl << endl;
   cube.open(file);
-  label = *cube.getLabel();
+  label = *cube.label();
   cube.close(true);
   cout << label.FindObject("IsisCube").FindObject("Core").FindGroup("Dimensions") << endl << endl;
   if(label.FindObject("IsisCube").HasGroup("Instrument")) {
@@ -266,7 +266,7 @@ void IsisMain() {
 
   cout << "Output cube label: " << endl << endl;
   cube.open(file);
-  label = *cube.getLabel();
+  label = *cube.label();
   cube.close(true);
   cout << label.FindObject("IsisCube").FindObject("Core").FindGroup("Dimensions") << endl << endl;
   if(label.FindObject("IsisCube").HasGroup("Instrument")) {
@@ -288,8 +288,8 @@ void IsisMain() {
   QString from2 = ui.GetFileName("FROM2");
   Cube imapcube;
   imapcube.open(from2);
-  inl = imapcube.getLineCount();
-  ins = imapcube.getSampleCount();
+  inl = imapcube.lineCount();
+  ins = imapcube.sampleCount();
   sl = 1;
   ss = 1;
   el = inl;
@@ -315,7 +315,7 @@ void IsisMain() {
   s.UpdateLabel(&imapcube, omapcube, results);
 
   cout << "Input projected cube label: " << endl << endl;
-  inlabel = *imapcube.getLabel();
+  inlabel = *imapcube.label();
   cout << inlabel.FindObject("IsisCube").FindObject("Core").FindGroup("Dimensions") << endl << endl;
   if(inlabel.FindObject("IsisCube").HasGroup("Instrument")) {
     cout << inlabel.FindObject("IsisCube").FindGroup("Instrument") << endl << endl;
@@ -334,7 +334,7 @@ void IsisMain() {
 
   cout << "Output cube label: " << endl << endl;
   cube.open(file);
-  label = *cube.getLabel();
+  label = *cube.label();
   cube.close(true);
   cout << label.FindObject("IsisCube").FindObject("Core").FindGroup("Dimensions") << endl << endl;
   if(label.FindObject("IsisCube").HasGroup("Instrument")) {
@@ -380,7 +380,7 @@ void IsisMain() {
 
   cout << "Output cube label: " << endl << endl;
   cube.open(file);
-  label = *cube.getLabel();
+  label = *cube.label();
   cube.close(true);
   cout << label.FindObject("IsisCube").FindObject("Core").FindGroup("Dimensions") << endl << endl;
   if(label.FindObject("IsisCube").HasGroup("Instrument")) {
@@ -426,7 +426,7 @@ void IsisMain() {
 
   cout << "Output cube label: " << endl << endl;
   cube.open(file);
-  label = *cube.getLabel();
+  label = *cube.label();
   cube.close(true);
   cout << label.FindObject("IsisCube").FindObject("Core").FindGroup("Dimensions") << endl << endl;
   if(label.FindObject("IsisCube").HasGroup("Instrument")) {
@@ -476,7 +476,7 @@ void IsisMain() {
 
   cout << "Output cube label: " << endl << endl;
   cube.open(file);
-  label = *cube.getLabel();
+  label = *cube.label();
   cube.close(true);
   cout << label.FindObject("IsisCube").FindObject("Core").FindGroup("Dimensions") << endl << endl;
   if(label.FindObject("IsisCube").HasGroup("Instrument")) {
@@ -522,7 +522,7 @@ void IsisMain() {
 
   cout << "Output cube label: " << endl << endl;
   cube.open(file);
-  label = *cube.getLabel();
+  label = *cube.label();
   cube.close(true);
   cout << label.FindObject("IsisCube").FindObject("Core").FindGroup("Dimensions") << endl << endl;
   if(label.FindObject("IsisCube").HasGroup("Instrument")) {

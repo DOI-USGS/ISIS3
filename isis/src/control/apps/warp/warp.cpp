@@ -53,8 +53,8 @@ void IsisMain() {
   if (ui.GetString("OSIZE") == "MATCH") {
     Cube c;
     c.open(ui.GetFileName("CUBE"), "r");
-    onl = c.getLineCount();
-    ons = c.getSampleCount();
+    onl = c.lineCount();
+    ons = c.sampleCount();
     c.close();
   }
   else if (ui.GetString("OSIZE") == "COMPUTE") {
@@ -76,13 +76,13 @@ void IsisMain() {
   WarpTransform *transform = new WarpTransform(*basisLine, *basisSamp, weighted,
       inputLine, inputSample,
       outputLine, outputSample,
-      icube->getLineCount(), icube->getSampleCount(),
+      icube->lineCount(), icube->sampleCount(),
       onl, ons);
 
   // Allocate the output file, same size as input
   p.SetOutputCube("TO", transform->OutputSamples(),
                   transform->OutputLines(),
-                  icube->getBandCount());
+                  icube->bandCount());
 
   // Set up the interpolator
   Interpolator *interp;

@@ -943,19 +943,25 @@ namespace Isis {
         SpiceDouble kernelValue;
         gdpool_c(key.toAscii().data(), (SpiceInt)index, 1,
                  &numValuesRead, &kernelValue, &found);
-        result = kernelValue;
+
+        if (found)
+          result = kernelValue;
       }
       else if (type == SpiceStringType) {
         char kernelValue[512];
         gcpool_c(key.toAscii().data(), (SpiceInt)index, 1, sizeof(kernelValue),
                  &numValuesRead, kernelValue, &found);
-        result = kernelValue;
+
+        if (found)
+          result = kernelValue;
       }
       else if (type == SpiceIntType) {
         SpiceInt kernelValue;
         gipool_c(key.toAscii().data(), (SpiceInt)index, 1, &numValuesRead,
                  &kernelValue, &found);
-        result = (int)kernelValue;
+
+        if (found)
+          result = (int)kernelValue;
       }
 
       if (!found) {

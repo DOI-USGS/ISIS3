@@ -56,7 +56,7 @@ void IsisMain() {
   if(bitpix == "-32") p.SetOutputType(Isis::Real);
 
   // determine core base and multiplier, set up the stretch
-  PvlGroup pix = icube->getLabel()->FindObject("IsisCube").FindObject("Core").FindGroup("Pixels");
+  PvlGroup pix = icube->label()->FindObject("IsisCube").FindObject("Core").FindGroup("Pixels");
   double scale = toDouble(pix["Multiplier"][0]);
   double base = toDouble(pix["Base"][0]);
 
@@ -96,20 +96,20 @@ void IsisMain() {
 
   // specify the number of data axes (2: samples by lines)
   int axes = 2;
-  if(icube->getBandCount() > 1) {
+  if(icube->bandCount() > 1) {
     axes = 3;
   }
 
   header += FitsKeyword("NAXIS", true, toString(axes));
 
   // specify the limit on data axis 1 (number of samples)
-  header += FitsKeyword("NAXIS1", true, toString(icube->getSampleCount()));
+  header += FitsKeyword("NAXIS1", true, toString(icube->sampleCount()));
 
   // specify the limit on data axis 2 (number of lines)
-  header += FitsKeyword("NAXIS2", true, toString(icube->getLineCount()));
+  header += FitsKeyword("NAXIS2", true, toString(icube->lineCount()));
 
   if(axes == 3) {
-    header += FitsKeyword("NAXIS3", true, toString(icube->getBandCount()));
+    header += FitsKeyword("NAXIS3", true, toString(icube->bandCount()));
   }
 
   header += FitsKeyword("BZERO", true,  toString(base));
@@ -122,7 +122,7 @@ void IsisMain() {
     PvlGroup map;
 
     if(icube->hasGroup("mapping")) {
-      map = icube->getGroup("mapping");
+      map = icube->group("mapping");
       msg = (QString)map["targetname"];
     }
     // If we have sky we want it
@@ -151,7 +151,7 @@ void IsisMain() {
       header += WritePvl("DATE-OBS", "Instrument", "StartTime", icube, true);
       // Some cameras don't have StopTime
       if(icube->hasGroup("Instrument")) {
-        PvlGroup inst = icube->getGroup("Instrument");
+        PvlGroup inst = icube->group("Instrument");
         if(inst.HasKeyword("StopTime")) {
           header += WritePvl("TIME_END", "Instrument", "StopTime", icube, true);
         }
@@ -236,7 +236,7 @@ QString FitsKeyword(QString key, bool isValue, QString value, QString unit) {
 
 QString WritePvl(QString fitsKey, QString group, IString key, Cube *icube, bool isString) {
   if(icube->hasGroup(group)) {
-    PvlGroup theGroup = icube->getGroup(group);
+    PvlGroup theGroup = icube->group(group);
     QString name = (QString)theGroup[key];
     if(isString) {
       name = "'" + name + "'";

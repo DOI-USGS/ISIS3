@@ -19,10 +19,10 @@ void IsisMain() {
   Cube *icube = p.SetInputCube("FROM");
   numIgnoredLines = 0;
 
-  cubeAverage.resize(icube->getBandCount());
-  lineAverages.resize(icube->getBandCount());
+  cubeAverage.resize(icube->bandCount());
+  lineAverages.resize(icube->bandCount());
 
-  for(int i = 0; i < icube->getBandCount(); i++) {
+  for(int i = 0; i < icube->bandCount(); i++) {
     cubeAverage[i] = 0;
     lineAverages[i] = NULL;
   }
@@ -30,13 +30,13 @@ void IsisMain() {
   int boxcarSize;
 
   if(ui.GetString("BOXTYPE").compare("NONE") == 0) {
-    boxcarSize = (int)(icube->getLineCount() * 0.10);
+    boxcarSize = (int)(icube->lineCount() * 0.10);
   }
   else if(ui.GetString("BOXTYPE").compare("ABSOLUTE") == 0) {
     boxcarSize = ui.GetInteger("BOXSIZE");
   }
   else if(ui.GetString("BOXTYPE").compare("PERCENTAGE") == 0) {
-    boxcarSize = (int)(((double)ui.GetInteger("BOXSIZE") / 100.0) * icube->getLineCount());
+    boxcarSize = (int)(((double)ui.GetInteger("BOXSIZE") / 100.0) * icube->lineCount());
   }
 
   // Boxcar must be odd size
@@ -57,8 +57,8 @@ void IsisMain() {
 
   Application::Log(data);
 
-  for(int band = 0; band < icube->getBandCount(); band ++) {
-    lineAverages[band] = new double[icube->getLineCount()];
+  for(int band = 0; band < icube->bandCount(); band ++) {
+    lineAverages[band] = new double[icube->lineCount()];
   }
 
   p.Progress()->SetText("Gathering line averages");
@@ -66,19 +66,19 @@ void IsisMain() {
 
   // Now filter the bands
   p.Progress()->SetText("Smoothing line averages");
-  p.Progress()->SetMaximumSteps((icube->getBandCount() + 1) * icube->getLineCount());
+  p.Progress()->SetMaximumSteps((icube->bandCount() + 1) * icube->lineCount());
   p.Progress()->CheckStatus();
-  QuickFilter filter(icube->getLineCount(), boxcarSize, 1);
+  QuickFilter filter(icube->lineCount(), boxcarSize, 1);
 
-  if(icube->getLineCount() <= numIgnoredLines) {
+  if(icube->lineCount() <= numIgnoredLines) {
     throw IException(IException::User, "Image does not contain any valid data.", _FILEINFO_);
   }
 
-  for(int band = 0; band < icube->getBandCount(); band ++) {
-    cubeAverage[band] /= (icube->getLineCount() - numIgnoredLines);
+  for(int band = 0; band < icube->bandCount(); band ++) {
+    cubeAverage[band] /= (icube->lineCount() - numIgnoredLines);
     filter.AddLine(lineAverages[band]);
 
-    for(int line = 0; line < icube->getLineCount(); line ++) {
+    for(int line = 0; line < icube->lineCount(); line ++) {
       p.Progress()->CheckStatus();
 
       double filteredLine = filter.Average(line);
@@ -102,7 +102,7 @@ void IsisMain() {
   p.Progress()->SetText("Applying Equalization");
   p.StartProcess(apply);
 
-  for(int band = 0; band < icube->getBandCount(); band ++) {
+  for(int band = 0; band < icube->bandCount(); band ++) {
     delete [] lineAverages[band];
     lineAverages[band] = NULL;
   }

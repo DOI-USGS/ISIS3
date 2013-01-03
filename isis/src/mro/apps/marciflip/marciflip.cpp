@@ -20,30 +20,30 @@ void IsisMain() {
 
   Cube *icube = p.SetInputCube("FROM");
 
-  filterHeight = 16 / (int)icube->getGroup("Instrument")["SummingMode"];
-  p.SetBrickSize(icube->getSampleCount(), filterHeight, icube->getBandCount());
-  currentLine = icube->getLineCount();
+  filterHeight = 16 / (int)icube->group("Instrument")["SummingMode"];
+  p.SetBrickSize(icube->sampleCount(), filterHeight, icube->bandCount());
+  currentLine = icube->lineCount();
 
   UserInterface &ui = Application::GetUserInterface();
   outputCube = new Isis::Cube();
-  outputCube->setDimensions(icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
+  outputCube->setDimensions(icube->sampleCount(), icube->lineCount(), icube->bandCount());
   outputCube->create(ui.GetFileName("TO"));
 
   if(icube->hasGroup("Instrument")) {
-    PvlGroup inst = icube->getGroup("Instrument");
+    PvlGroup inst = icube->group("Instrument");
 
     // change flipped keyword
     inst["DataFlipped"] = toString(((int)inst["DataFlipped"] + 1) % 2);
 
-    outputCube->getLabel()->FindObject("IsisCube").AddGroup(inst);
+    outputCube->label()->FindObject("IsisCube").AddGroup(inst);
   }
 
   if(icube->hasGroup("BandBin")) {
-    outputCube->getLabel()->FindObject("IsisCube").AddGroup(
-        icube->getGroup("BandBin"));
+    outputCube->label()->FindObject("IsisCube").AddGroup(
+        icube->group("BandBin"));
   }
 
-  if(icube->getLabel()->HasObject("OriginalLabel")) {
+  if(icube->label()->HasObject("OriginalLabel")) {
     OriginalLabel origLabel;
     icube->read(origLabel);
     outputCube->write(origLabel);

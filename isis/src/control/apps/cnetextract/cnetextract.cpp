@@ -634,12 +634,12 @@ void ExtractLatLonRange(ControlNet &outNet, QVector<QString> nonLatLonPoints,
         bool remove = false;
 
         Cube *cube = manager.OpenCube(sn2filename[sn]);
-        Camera *camera = cube->getCamera();
+        Camera *camera = cube->camera();
 
         if(camera == NULL) {
           try {
             Projection *projection =
-              ProjectionFactory::Create((*(cube->getLabel())));
+              ProjectionFactory::Create((*(cube->label())));
 
             if(!projection->SetCoordinate(controlPt->GetMeasure(cm)->GetSample(),
                                           controlPt->GetMeasure(cm)->GetLine())) {

@@ -15,7 +15,7 @@ void IsisMain() {
   // Set the input image, get the camera model, and a basic mapping
   // group
   Cube *icube = p.SetInputCube("FROM");
-  Camera *cam = icube->getCamera();
+  Camera *cam = icube->camera();
   Pvl mapping;
   cam->BasicMapping(mapping);
   PvlGroup &mapgrp = mapping.FindGroup("Mapping");

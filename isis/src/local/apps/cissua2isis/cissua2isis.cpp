@@ -38,7 +38,7 @@ void IsisMain() {
   TranslateUoACassiniLabels(pdsLabel, ocube);
 
   // Fix the StartTime and StopTime keywords from having the 'Z' value at the end
-  Pvl *outLabel = ocube->getLabel();
+  Pvl *outLabel = ocube->label();
   PvlGroup &inst = outLabel->FindGroup("Instrument", Isis::PvlObject::Traverse);
   PvlKeyword &start = inst.FindKeyword("StartTime");
   PvlKeyword &stop  = inst.FindKeyword("StopTime");
@@ -117,7 +117,7 @@ void CreateStretchPairs() {
 void TranslateUoACassiniLabels(Pvl &labelPvl, Cube *ocube) {
 
   //Create a PVL to store the translated labels
-  Pvl *outLabel = ocube->getLabel();
+  Pvl *outLabel = ocube->label();
 
   // Get the directory where the CISS translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));

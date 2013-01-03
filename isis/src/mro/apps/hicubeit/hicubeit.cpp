@@ -176,6 +176,6 @@ void IsisMain() {
   // Add the group to the output cube
   Cube c;
   c.open(ui.GetFileName("TO"), "rw");
-  c.getLabel()->FindObject("IsisCube", Pvl::Traverse).AddGroup(mos);
+  c.label()->FindObject("IsisCube", Pvl::Traverse).AddGroup(mos);
   c.close();
 }

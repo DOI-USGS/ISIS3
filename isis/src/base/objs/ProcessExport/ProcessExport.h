@@ -164,9 +164,9 @@ namespace Isis {
 
       template <typename Functor> void ProcessCubes(const Functor & functor) {
         int length = (p_format == BIP) ?
-          InputCubes[0]->getBandCount() : InputCubes[0]->getLineCount();
+          InputCubes[0]->bandCount() : InputCubes[0]->lineCount();
 
-        int samples = InputCubes[0]->getSampleCount();
+        int samples = InputCubes[0]->sampleCount();
 
         // Loop and let the app programmer fiddle with the lines
         std::vector<BufferManager *> imgrs = GetBuffers();

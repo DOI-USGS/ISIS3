@@ -63,9 +63,9 @@ void IsisMain() {
 
   cout << "Testing SetInputCube/SetInputWorkCube ... " << endl;
   Isis::Cube *icube = p.SetInputCube("FROM");
-  cout << "Samples:  " << icube->getSampleCount() << endl;
-  cout << "Lines:  " << icube->getLineCount() << endl;
-  cout << "Bands:  " << icube->getBandCount() << endl;
+  cout << "Samples:  " << icube->sampleCount() << endl;
+  cout << "Lines:  " << icube->lineCount() << endl;
+  cout << "Bands:  " << icube->bandCount() << endl;
   cout << endl;
 
   cout << "Testing SetInputWorkCube OneBand Error ..." << endl;
@@ -190,7 +190,7 @@ void IsisMain() {
   Isis::Process p3;
   p3.SetInputCube("FROM");
   Isis::Cube *ocube = p3.SetOutputCube("TO");
-  Isis::PvlGroup lab = ocube->getGroup("Test");
+  Isis::PvlGroup lab = ocube->group("Test");
   cout << lab["Keyword"] << endl;
   cout << endl;
 
@@ -245,7 +245,7 @@ void IsisMain() {
   p6.SetInputCube("FROM");
   Isis::Cube *ocube8 = p6.SetOutputCube("TO");
 
-  Isis::Pvl *inlab1 = ocube8->getLabel();
+  Isis::Pvl *inlab1 = ocube8->label();
   for(int i = 0; i < inlab1->Objects(); i++) {
     if(inlab1->Object(i).IsNamed("Polygon")) {
       cout << "Image Polygon does exist" << endl;
@@ -258,7 +258,7 @@ void IsisMain() {
   p6.PropagatePolygons(false);
   bool exists = false;
   Isis::Cube *ocube9 = p6.SetOutputCube("TO4", 126, 126, 1);
-  Isis::Pvl *inlab2 = ocube9->getLabel();
+  Isis::Pvl *inlab2 = ocube9->label();
   for(int i = 0; i < inlab2->Objects(); i++) {
     if(inlab2->Object(i).IsNamed("Polygon")) {
       cout << "Image Polygon does exist" << endl;

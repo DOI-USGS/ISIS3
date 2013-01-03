@@ -322,7 +322,7 @@ namespace Isis {
             m_interpolationCombo->currentIndex()).toInt());
 
       Portal dataReader(interp.Samples(), interp.Lines(),
-                        cvp->cube()->getPixelType());
+                        cvp->cube()->pixelType());
 
       int band = ((cvp->isGray()) ? cvp->grayBand() : cvp->redBand());
 

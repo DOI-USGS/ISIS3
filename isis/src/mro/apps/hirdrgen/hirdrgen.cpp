@@ -38,7 +38,7 @@ void IsisMain() {
   Cube *icube = pHist.SetInputCube("FROM");
 
   // Check to see if the input cube looks like a HiRISE RDR
-  if (icube->getBandCount() > 3) {
+  if (icube->bandCount() > 3) {
     QString msg = "Input file [" +
                  Application::GetUserInterface().GetFileName("FROM") +
                  "] does not appear to be a HiRISE RDR product. Number of " +
@@ -47,8 +47,8 @@ void IsisMain() {
   }
 
   // Setup to get a histogram for each band
-  g_min = new double[icube->getBandCount()];
-  g_max = new double[icube->getBandCount()];
+  g_min = new double[icube->bandCount()];
+  g_max = new double[icube->bandCount()];
 
   UserInterface &ui = Application::GetUserInterface();
 
@@ -56,7 +56,7 @@ void IsisMain() {
   IString enctype = ui.GetString("ENCODING_TYPE");
   enctype.DownCase();
 
-  for (int band = 1; band <= icube->getBandCount(); ++band) {
+  for (int band = 1; band <= icube->bandCount(); ++band) {
 
     if (ui.GetString("TYPE").compare("AUTOMATIC") == 0) {
       // Set up a histogram for this band. This call sets the input range
@@ -65,10 +65,10 @@ void IsisMain() {
 
       // Loop and accumulate histogram
       pHist.Progress()->SetText("Gathering Histogram");
-      pHist.Progress()->SetMaximumSteps(icube->getLineCount());
+      pHist.Progress()->SetMaximumSteps(icube->lineCount());
       pHist.Progress()->CheckStatus();
       LineManager line(*icube);
-      for (int i = 1; i <= icube->getLineCount(); i++) {
+      for (int i = 1; i <= icube->lineCount(); i++) {
         line.SetLine(i, band);
         icube->read(line);
         hist.AddData(line.DoubleBuffer(), line.size());
@@ -88,7 +88,7 @@ void IsisMain() {
   // Find the minimum min and maximum max for all bands
   double minmin = g_min[0];
   double maxmax = g_max[0];
-  for (int band = 1; band < icube->getBandCount(); ++band) {
+  for (int band = 1; band < icube->bandCount(); ++band) {
     if (g_min[band] < minmin) minmin = g_min[band];
     if (g_max[band] > maxmax) maxmax = g_max[band];
   }
@@ -100,7 +100,7 @@ void IsisMain() {
   Cube *icube2 = p.SetInputCube("FROM");
 
   if (enctype.Equal("jp2")) {
-    g_jp2buf = new char* [icube2->getBandCount()];
+    g_jp2buf = new char* [icube2->bandCount()];
     FileName lblFile(ui.GetFileName("TO"));
     QString lblFileName = lblFile.path() + "/" + lblFile.baseName() + ".lbl";
     p.SetDetached(lblFileName);
@@ -111,8 +111,8 @@ void IsisMain() {
   int nbits = ui.GetInteger("BITS");
   if (nbits == 8) {
     if (enctype.Equal("jp2")) {
-      for (int i = 0; i < icube2->getBandCount(); i++) {
-        g_jp2buf[i] = new char[icube2->getSampleCount()];
+      for (int i = 0; i < icube2->bandCount(); i++) {
+        g_jp2buf[i] = new char[icube2->sampleCount()];
       }
     }
     g_oType = Isis::UnsignedByte;
@@ -126,8 +126,8 @@ void IsisMain() {
   }
   else if (nbits == 16) {
     if (enctype.Equal("jp2")) {
-      for (int i = 0; i < icube2->getBandCount(); i++) {
-        g_jp2buf[i] = new char[icube2->getSampleCount()*2];
+      for (int i = 0; i < icube2->bandCount(); i++) {
+        g_jp2buf[i] = new char[icube2->sampleCount()*2];
       }
     }
     g_oType = UnsignedWord;
@@ -141,8 +141,8 @@ void IsisMain() {
   }
   else {
     if (enctype.Equal("jp2")) {
-      for (int i = 0; i < icube2->getBandCount(); i++) {
-        g_jp2buf[i] = new char[icube2->getSampleCount()*2];
+      for (int i = 0; i < icube2->bandCount(); i++) {
+        g_jp2buf[i] = new char[icube2->sampleCount()*2];
       }
     }
     g_oType = UnsignedWord;
@@ -168,7 +168,7 @@ void IsisMain() {
   Pvl &pdsLabel = p.StandardPdsLabel(type);
 
   // Translate the keywords from the input cube label that go in the PDS label
-  PvlTranslationManager cubeLab(*(icube2->getLabel()),
+  PvlTranslationManager cubeLab(*(icube2->label()),
                                 "$mro/translations/hirisePdsRdrCubeLabel.trn");
   cubeLab.Auto(pdsLabel);
 
@@ -223,13 +223,13 @@ void IsisMain() {
                          FindGroup("INSTRUMENT_SETTING_PARAMETERS").
                          FindKeyword("MRO:POWERED_CPMM_FLAG");
   PvlKeyword ccdBin("MRO:BINNING");
-  PvlKeyword &cpmmBin = icube2->getLabel()->FindObject("IsisCube").
+  PvlKeyword &cpmmBin = icube2->label()->FindObject("IsisCube").
                         FindGroup("Mosaic")["cpmmSummingFlag"];
   PvlKeyword ccdTdi("MRO:TDI");
-  PvlKeyword &cpmmTdi = icube2->getLabel()->FindObject("IsisCube").
+  PvlKeyword &cpmmTdi = icube2->label()->FindObject("IsisCube").
                         FindGroup("Mosaic")["cpmmTdiFlag"];
   PvlKeyword ccdSpecial("MRO:SPECIAL_PROCESSING_FLAG");
-  PvlKeyword &cpmmSpecial = icube2->getLabel()->FindObject("IsisCube").
+  PvlKeyword &cpmmSpecial = icube2->label()->FindObject("IsisCube").
                             FindGroup("Mosaic")["SpecialProcessingFlag"];
   for (int ccd = 0; ccd < 14; ++ccd) {
     const unsigned int cpmmByCcd[] = {0, 1, 2, 3, 5, 8, 10,
@@ -297,7 +297,7 @@ void IsisMain() {
     // instead of the target radii from NAIF
     if (mapObject["MAP_PROJECTION_TYPE"][0] == "EQUIRECTANGULAR") {
       Projection *proj = ProjectionFactory::CreateFromCube(*icube2);
-      PvlGroup &mapping = icube2->getLabel()->FindGroup("MAPPING", Pvl::Traverse);
+      PvlGroup &mapping = icube2->label()->FindGroup("MAPPING", Pvl::Traverse);
       double radius = proj->LocalRadius((double)mapping["CenterLatitude"]) / 1000.0;
       mapObject["A_AXIS_RADIUS"].SetValue(toString(radius), "KM");
       mapObject["B_AXIS_RADIUS"].SetValue(toString(radius), "KM");
@@ -314,7 +314,7 @@ void IsisMain() {
   double intercept = p.GetOutputMaximum() - slope * maxmax;
   PvlKeyword minimum("MRO:MINIMUM_STRETCH", toString(slope * g_min[0] + intercept));
   PvlKeyword maximum("MRO:MAXIMUM_STRETCH", toString(slope * g_max[0] + intercept));
-  for (int band = 1; band < icube2->getBandCount(); ++band) {
+  for (int band = 1; band < icube2->bandCount(); ++band) {
     minimum += toString(slope * g_min[band] + intercept);
     maximum += toString(slope * g_max[band] + intercept);
   }
@@ -498,16 +498,16 @@ void IsisMain() {
   // Open the output PDS file and dump the label and cube data
   if (enctype.Equal("jp2")) {
     p.OutputDetachedLabel();
-    g_jp2Encoder = new JP2Encoder(ui.GetFileName("TO"), icube2->getSampleCount(),
-                                 icube2->getLineCount(), icube2->getBandCount(), g_oType);
+    g_jp2Encoder = new JP2Encoder(ui.GetFileName("TO"), icube2->sampleCount(),
+                                 icube2->lineCount(), icube2->bandCount(), g_oType);
     g_jp2Encoder->OpenFile();
-    g_jp2ns = icube2->getSampleCount();
-    g_jp2nb = icube2->getBandCount();
+    g_jp2ns = icube2->sampleCount();
+    g_jp2nb = icube2->bandCount();
     g_jp2band = 0;
     p.StartProcess(writeJP2Image);
     p.EndProcess();
     delete g_jp2Encoder;
-    for (int i = 0; i < icube2->getBandCount(); i++) {
+    for (int i = 0; i < icube2->bandCount(); i++) {
       delete [] g_jp2buf[i];
     }
   }

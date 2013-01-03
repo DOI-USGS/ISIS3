@@ -120,11 +120,11 @@ void IsisMain() {
   Cube *outcube = secondpass.SetOutputCube("TO"); // Calibrate() parameter out[0]
 
   // resize 2dimensional vectors
-  gbl::bitweightCorrected.resize(gbl::incube->getSampleCount());
-  gbl::dark_DN.resize(gbl::incube->getSampleCount());
+  gbl::bitweightCorrected.resize(gbl::incube->sampleCount());
+  gbl::dark_DN.resize(gbl::incube->sampleCount());
   for(unsigned int i = 0; i < gbl::bitweightCorrected.size(); i++) {
-    gbl::bitweightCorrected[i].resize(gbl::incube->getLineCount());
-    gbl::dark_DN[i].resize(gbl::incube->getLineCount());
+    gbl::bitweightCorrected[i].resize(gbl::incube->lineCount());
+    gbl::dark_DN[i].resize(gbl::incube->lineCount());
   }
 
   // Add the radiometry group
@@ -1190,7 +1190,7 @@ void gbl::FindShutterOffset() {
   gbl::calgrp += PvlKeyword("ShutterOffsetFile", shutterOffsetFile.expanded());
   Cube offsetCube;
   offsetCube.open(shutterOffsetFile.expanded());
-  gbl::offset = new Brick(gbl::incube->getSampleCount(), 1, 1, offsetCube.getPixelType());
+  gbl::offset = new Brick(gbl::incube->sampleCount(), 1, 1, offsetCube.pixelType());
   gbl::offset->SetBasePosition(1, 1, 1);
   offsetCube.read(*gbl::offset);
   offsetCube.close();
@@ -1227,7 +1227,7 @@ void gbl::DivideByAreaPixel() {
 
   // sumFactor is the inverse of the square of the summing mode,
   // it was expressed in IDL as the following:
-  //       [gbl::sumFactor = (gbl::incube->getSampleCount()/1024.0)*(gbl::incube->getLineCount()/1024.0);]
+  //       [gbl::sumFactor = (gbl::incube->sampleCount()/1024.0)*(gbl::incube->lineCount()/1024.0);]
   gbl::sumFactor = 1 / pow(gbl::cissLab->SummingMode(), 2.0);
   gbl::calgrp += PvlKeyword("SolidAngle", toString(gbl::solidAngle));
   gbl::calgrp += PvlKeyword("OpticsArea", toString(gbl::opticsArea));
@@ -1422,8 +1422,8 @@ void gbl::FindEfficiencyFactor(QString fluxunits) {
     double angstromsToNm = 10.0;
     double distFromSun = 0;
     try {
-      Camera *cam = gbl::incube->getCamera();
-      bool camSuccess = cam->SetImage(gbl::incube->getSampleCount() / 2, gbl::incube->getLineCount() / 2);
+      Camera *cam = gbl::incube->camera();
+      bool camSuccess = cam->SetImage(gbl::incube->sampleCount() / 2, gbl::incube->lineCount() / 2);
       if(!camSuccess) {// the camera was unable to find the planet at the center of the image
         double lat, lon;
         // find values for lat/lon directly below spacecraft

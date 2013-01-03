@@ -574,7 +574,7 @@ void calcRange(double &minLat, double &maxLat,
     double camMaxLon;
     Cube c;
     c.open(flist[i].toString());
-    Camera *cam = c.getCamera();
+    Camera *cam = c.camera();
     Pvl defaultMap;
     cam->BasicMapping(defaultMap);
     PvlGroup &defaultGrp = defaultMap.FindGroup("Mapping");
@@ -614,7 +614,7 @@ double calcResolution() {
   for(int i = 0; i < flist.size(); i++) {
     Cube c;
     c.open(flist[i].toString());
-    Camera *cam = c.getCamera();
+    Camera *cam = c.camera();
     double camLowRes = cam->LowestImageResolution();
     double camHighRes = cam->HighestImageResolution();
     if(camLowRes > lowRes) lowRes = camLowRes;

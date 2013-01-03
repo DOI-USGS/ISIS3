@@ -413,8 +413,8 @@ void OutputLabel ( std::ofstream &fout, Cube* cube, Pvl &labelPvl ) {
     // Update the "IMAGE" Object
     PvlObject &imageObject = labelPvl.FindObject("IMAGE");
     imageObject.Clear();
-    imageObject += PvlKeyword("LINES", toString(cube->getLineCount()));
-    imageObject += PvlKeyword("LINE_SAMPLES", toString(cube->getSampleCount()));
+    imageObject += PvlKeyword("LINES", toString(cube->lineCount()));
+    imageObject += PvlKeyword("LINE_SAMPLES", toString(cube->sampleCount()));
     imageObject += PvlKeyword("SAMPLE_BITS", toString(32));
     imageObject += PvlKeyword("SAMPLE_TYPE", "PC_REAL");
     imageObject += PvlKeyword("VALID_MINIMUM", "16#FF7FFFFA#");
@@ -431,11 +431,11 @@ void OutputLabel ( std::ofstream &fout, Cube* cube, Pvl &labelPvl ) {
 
     stream << labelPvl;
 
-    int recordBytes = cube->getSampleCount();
+    int recordBytes = cube->sampleCount();
     int labelRecords = (int) ((stream.str().length()) / recordBytes) + 1;
 
     labelPvl["RECORD_BYTES"] = toString(recordBytes);
-    labelPvl["FILE_RECORDS"] = toString((int) (cube->getLineCount() * 4 + labelRecords));
+    labelPvl["FILE_RECORDS"] = toString((int) (cube->lineCount() * 4 + labelRecords));
     labelPvl["LABEL_RECORDS"] = toString(labelRecords);
     labelPvl["^IMAGE"] = toString((int) (labelRecords + 1));
 

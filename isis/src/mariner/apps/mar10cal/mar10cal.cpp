@@ -47,7 +47,7 @@ void IsisMain() {
 
   // If it is already calibrated then complain
   if (icube->hasGroup("Radiometry")) {
-    QString msg = "This Mariner 10 image [" + icube->getFileName() + "] has "
+    QString msg = "This Mariner 10 image [" + icube->fileName() + "] has "
                   "already been radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -56,7 +56,7 @@ void IsisMain() {
   QString instId = inst["InstrumentId"];
   QString camera = instId.mid(instId.size()-1);
 
-  QString filter = (QString)(icube->getGroup("BandBin"))["FilterName"];
+  QString filter = (QString)(icube->group("BandBin"))["FilterName"];
   filter = filter.toUpper().mid(0,3);
 
   QString target = inst["TargetName"];
@@ -118,7 +118,7 @@ void IsisMain() {
         camera + "_coef.cub");
     coCube.open(coFile.expanded());
   }
-  coef = new Brick(icube->getSampleCount(), 1, 6, coCube.getPixelType());
+  coef = new Brick(icube->sampleCount(), 1, 6, coCube.pixelType());
 
   if (ui.WasEntered("ABSCOEF")) {
     absCoef = ui.GetDouble("ABSCOEF");
@@ -141,12 +141,12 @@ void IsisMain() {
 
   // Get the distance between Mars and the Sun at the given time in
   // Astronomical Units (AU)
-  Camera * cam = icube->getCamera();
-  bool camSuccess = cam->SetImage(icube->getSampleCount()/2,icube->getLineCount()/2);
+  Camera * cam = icube->camera();
+  bool camSuccess = cam->SetImage(icube->sampleCount()/2,icube->lineCount()/2);
   if (!camSuccess) {
     throw IException(IException::Unknown,
         "Unable to calculate the Solar Distance on [" +
-        icube->getFileName() + "]", _FILEINFO_);
+        icube->fileName() + "]", _FILEINFO_);
   }
   sunDist = cam->SolarDistance();
 
@@ -156,11 +156,11 @@ void IsisMain() {
   // Add the radiometry group
   PvlGroup calgrp("Radiometry");
 
-  calgrp += PvlKeyword("DarkCurrentCube", dcCube->getFileName());
+  calgrp += PvlKeyword("DarkCurrentCube", dcCube->fileName());
   if (useBlem) {
-    calgrp += PvlKeyword("BlemishRemovalCube", blemCube->getFileName());
+    calgrp += PvlKeyword("BlemishRemovalCube", blemCube->fileName());
   }
-  calgrp += PvlKeyword("CoefficientCube", coCube.getFileName());
+  calgrp += PvlKeyword("CoefficientCube", coCube.fileName());
   calgrp += PvlKeyword("AbsoluteCoefficient", toString(absCoef));
 
   ocube->putGroup(calgrp);

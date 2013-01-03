@@ -74,7 +74,7 @@ void IsisMain() {
   bool isVims = true;
 
   try {
-    isVims = (icube->getLabel()->FindGroup("Instrument",
+    isVims = (icube->label()->FindGroup("Instrument",
               Pvl::Traverse)["InstrumentId"][0] == "VIMS");
   }
   catch(IException &e) {
@@ -86,7 +86,7 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if(icube->getLabel()->FindObject("IsisCube").HasGroup("AlphaCube")) {
+  if(icube->label()->FindObject("IsisCube").HasGroup("AlphaCube")) {
     QString msg = "The input cube [" + QString(ui.GetAsString("FROM")) + "] has had its dimensions modified and can not be calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -186,11 +186,11 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
   Camera *cam = NULL;
 
   try {
-    cam = icube->getCamera();
+    cam = icube->camera();
   }
   catch(IException &e) {
     QString msg = "Unable to create a camera model from [" +
-                  icube->getFileName() + "]. Please run "
+                  icube->fileName() + "]. Please run "
                   "spiceinit on this file";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
@@ -199,7 +199,7 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
   solarRemoveCoefficient = -1;
 
   // try center first
-  if(cam->SetImage(icube->getSampleCount() / 2, icube->getLineCount() / 2)) {
+  if(cam->SetImage(icube->sampleCount() / 2, icube->lineCount() / 2)) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
@@ -208,35 +208,35 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
-  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->getSampleCount(), 1.0)) {
+  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->sampleCount(), 1.0)) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
-  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->getSampleCount(),
-      icube->getLineCount())) {
+  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->sampleCount(),
+      icube->lineCount())) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
-  if(solarRemoveCoefficient < 0 && cam->SetImage(1.0, icube->getLineCount())) {
+  if(solarRemoveCoefficient < 0 && cam->SetImage(1.0, icube->lineCount())) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
   // try center of 4 edges
-  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->getSampleCount() / 2, 1.0)) {
+  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->sampleCount() / 2, 1.0)) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
-  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->getSampleCount(),
-      icube->getLineCount() / 2)) {
+  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->sampleCount(),
+      icube->lineCount() / 2)) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
-  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->getSampleCount() / 2,
-      icube->getLineCount())) {
+  if(solarRemoveCoefficient < 0 && cam->SetImage(icube->sampleCount() / 2,
+      icube->lineCount())) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
-  if(solarRemoveCoefficient < 0 && cam->SetImage(1.0, icube->getLineCount() / 2)) {
+  if(solarRemoveCoefficient < 0 && cam->SetImage(1.0, icube->lineCount() / 2)) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
@@ -252,7 +252,7 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
     */
   }
 
-  bool vis = (icube->getLabel()->
+  bool vis = (icube->label()->
               FindGroup("Instrument", Pvl::Traverse)["Channel"][0] != "IR");
 
   QString attributes;
@@ -278,7 +278,7 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
  * This calculates the coefficients for specific energy corrections
  */
 void calculateSpecificEnergy(Cube *icube) {
-  PvlGroup &inst = icube->getLabel()->FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &inst = icube->label()->FindGroup("Instrument", Pvl::Traverse);
   bool vis = (inst["Channel"][0] != "IR");
 
   double coefficient = 1.0;
@@ -324,7 +324,7 @@ void calculateSpecificEnergy(Cube *icube) {
   LineManager specEnergyMgr(specEnergyCube);
   LineManager waveCalMgr(waveCalCube);
 
-  for(int i = 0; i < icube->getBandCount(); i++) {
+  for(int i = 0; i < icube->bandCount(); i++) {
     Statistics specEnergyStats;
     Statistics waveCalStats;
 
@@ -357,7 +357,7 @@ void calculateSpecificEnergy(Cube *icube) {
  * @param currCube
  */
 void calculateDarkCurrent(Cube *icube) {
-  PvlGroup &inst = icube->getLabel()->FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &inst = icube->label()->FindGroup("Instrument", Pvl::Traverse);
   bool vis = (inst["Channel"][0] != "IR");
 
   calibInfo += PvlKeyword("Vis", ((vis) ? "true" : "false"));
@@ -379,7 +379,7 @@ void calculateDarkCurrent(Cube *icube) {
  * @param icube
  */
 void calculateVisDarkCurrent(Cube *icube) {
-  PvlGroup &inst = icube->getLabel()->FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &inst = icube->label()->FindGroup("Instrument", Pvl::Traverse);
 
   // This is the dark current corrections for VIS
   bool hires = ((inst["SamplingMode"][0] == "HIGH") || (inst["SamplingMode"][0] == "HI-RES"));
@@ -408,7 +408,7 @@ void calculateVisDarkCurrent(Cube *icube) {
   double visExposure = toDouble(inst["ExposureDuration"][1]);
 
   int sampleOffset, lineOffset;
-  GetOffsets(*icube->getLabel(), sampleOffset, lineOffset);
+  GetOffsets(*icube->label(), sampleOffset, lineOffset);
 
   /**
    * Reading in one parameter at a time:
@@ -490,8 +490,8 @@ void calculateIrDarkCurrent(Cube *icube) {
   bool found = false;
 
   // verify if IR we have sideplane data
-  for(int obj = 0; !found && obj < icube->getLabel()->Objects(); obj++) {
-    PvlObject &object = icube->getLabel()->Object(obj);
+  for(int obj = 0; !found && obj < icube->label()->Objects(); obj++) {
+    PvlObject &object = icube->label()->Object(obj);
 
     if(object.Name() != "Table") continue;
 
@@ -507,7 +507,7 @@ void calculateIrDarkCurrent(Cube *icube) {
 
   // If spectal summing is on OR compressor_id isnt N/A then
   //   just return.
-  PvlGroup &archive = icube->getLabel()->FindGroup("Archive", Pvl::Traverse);
+  PvlGroup &archive = icube->label()->FindGroup("Archive", Pvl::Traverse);
 
   // If dark subtracted (compressorid is valid) and cant do linear
   //   correction (spectral editing flag on) then do not do dark
@@ -526,10 +526,10 @@ void calculateIrDarkCurrent(Cube *icube) {
   if(archive["SpectralSummingFlag"][0] == "ON") return;
 
   // Insert the sideplane data into our lineBasedDarkCorrections map (line,band to correction)
-  for(int line = 1; line <= icube->getLineCount(); line++) {
-    for(int band = 1; band <= icube->getBandCount(); band++) {
+  for(int line = 1; line <= icube->lineCount(); line++) {
+    for(int band = 1; band <= icube->bandCount(); band++) {
       pair<int, int> index = pair<int, int>(line, band);
-      int value = (int)sideplane[(line-1)*icube->getBandCount() + (band-1)][2];
+      int value = (int)sideplane[(line-1)*icube->bandCount() + (band-1)][2];
 
       if(value != 57344)
         lineBasedDarkCorrections.insert(pair< pair<int, int>, double>(index, value));
@@ -544,11 +544,11 @@ void calculateIrDarkCurrent(Cube *icube) {
   }
 
   // do linear fits
-  for(int band = 1; band <= icube->getBandCount(); band++) {
+  for(int band = 1; band <= icube->bandCount(); band++) {
     PolynomialUnivariate basis(1);
     LeastSquares lsq(basis);
 
-    for(int line = 1; line <= icube->getLineCount(); line++) {
+    for(int line = 1; line <= icube->lineCount(); line++) {
       pair<int, int> index = pair<int, int>(line, band);
       map< pair<int, int>, double>::iterator val = lineBasedDarkCorrections.find(index);
 
@@ -570,7 +570,7 @@ void calculateIrDarkCurrent(Cube *icube) {
       basis.Coefficient(1)
     };
 
-    for(int line = 1; line <= icube->getLineCount(); line++) {
+    for(int line = 1; line <= icube->lineCount(); line++) {
       pair<int, int> index = pair<int, int>(line, band);
 
       map< pair<int, int>, double>::iterator val = lineBasedDarkCorrections.find(index);
@@ -609,7 +609,7 @@ void calculateIrDarkCurrent(Cube *icube) {
  * @param p
  */
 void chooseFlatFile(Cube *icube, ProcessByLine *p) {
-  PvlGroup &inst = icube->getLabel()->FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &inst = icube->label()->FindGroup("Instrument", Pvl::Traverse);
   bool vis = (inst["Channel"][0] != "IR");
   bool hires = ((inst["SamplingMode"][0] == "HIGH") || (inst["SamplingMode"][0] == "HI-RES"));
 
@@ -652,18 +652,18 @@ QString createCroppedFile(Cube *icube, QString cubeFileName, bool flatFile) {
   int lineOffset = 1;
 
   if(flatFile) {
-    GetOffsets(*icube->getLabel(), sampOffset, lineOffset);
+    GetOffsets(*icube->label(), sampOffset, lineOffset);
   }
 
 
   QString appArgs = "from=" + cubeFileName + " ";
   appArgs += "sample=" + toString(sampOffset) + " ";
   appArgs += "line=" + toString(lineOffset) + " ";
-  appArgs += "nsamples=" + toString(icube->getSampleCount()) + " ";
-  appArgs += "nlines=" + toString(icube->getLineCount()) + " ";
+  appArgs += "nsamples=" + toString(icube->sampleCount()) + " ";
+  appArgs += "nlines=" + toString(icube->lineCount()) + " ";
 
   FileName tempFile("$TEMPORARY/tmp_" + FileName(cubeFileName).baseName() +
-                    "_" + FileName(icube->getFileName()).name());
+                    "_" + FileName(icube->fileName()).name());
 
   appArgs += "to=" + tempFile.expanded();
 

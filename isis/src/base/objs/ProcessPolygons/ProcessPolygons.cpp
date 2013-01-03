@@ -403,10 +403,10 @@ namespace Isis {
     geos::geom::CoordinateArraySequence imagePts;
 
     imagePts.add(geos::geom::Coordinate(0.0, 0.0));
-    imagePts.add(geos::geom::Coordinate(0.0, this->OutputCubes[0]->getLineCount()));
-    imagePts.add(geos::geom::Coordinate(this->OutputCubes[0]->getSampleCount(),
-                                        this->OutputCubes[0]->getLineCount()));
-    imagePts.add(geos::geom::Coordinate(this->OutputCubes[0]->getSampleCount(), 0.0));
+    imagePts.add(geos::geom::Coordinate(0.0, this->OutputCubes[0]->lineCount()));
+    imagePts.add(geos::geom::Coordinate(this->OutputCubes[0]->sampleCount(),
+                                        this->OutputCubes[0]->lineCount()));
+    imagePts.add(geos::geom::Coordinate(this->OutputCubes[0]->sampleCount(), 0.0));
     imagePts.add(geos::geom::Coordinate(0.0, 0.0));
 
     p_imagePoly = Isis::globalFactory.createPolygon(

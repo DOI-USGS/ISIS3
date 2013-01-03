@@ -127,8 +127,8 @@ namespace Isis {
     if(jdata.summing != other.summing) {
       ostringstream msg;
       msg << "Summing mode (" << jdata.summing
-          << ") in file " << getFileName() << " is not equal to summing mode ("
-          << other.summing << ") in file " << cube.getFileName() << endl;
+          << ") in file " << fileName() << " is not equal to summing mode ("
+          << other.summing << ") in file " << cube.fileName() << endl;
       throw IException(IException::User, msg.str(), _FILEINFO_);
     }
     return;
@@ -221,31 +221,31 @@ namespace Isis {
 
   void HiJitCube::Init() {
     // Get required keywords from instrument group
-    Pvl *label(getLabel());
+    Pvl *labelPvl(label());
     Isis::PvlGroup inst;
     Isis::PvlGroup idinst;
-    jdata.filename = getFileName();
-    Isis::PvlGroup &archive = label->FindGroup("Archive", Isis::Pvl::Traverse);
+    jdata.filename = fileName();
+    Isis::PvlGroup &archive = labelPvl->FindGroup("Archive", Isis::Pvl::Traverse);
     jdata.productId = (QString) archive["ProductId"];
 
-    jdata.lines = getLineCount();
-    if(label->FindObject("IsisCube").HasGroup("OriginalInstrument")) {
-      inst = label->FindGroup("OriginalInstrument", Isis::Pvl::Traverse);
+    jdata.lines = lineCount();
+    if(labelPvl->FindObject("IsisCube").HasGroup("OriginalInstrument")) {
+      inst = labelPvl->FindGroup("OriginalInstrument", Isis::Pvl::Traverse);
       originst = true;
     }
     else {
-      inst = label->FindGroup("Instrument", Isis::Pvl::Traverse);
+      inst = labelPvl->FindGroup("Instrument", Isis::Pvl::Traverse);
       originst = false;
     }
     jdata.tdiMode = inst["Tdi"];
     jdata.summing = inst["Summing"];
-    if(label->FindObject("IsisCube").HasGroup("Instrument") && originst) {
-      idinst = label->FindGroup("Instrument", Isis::Pvl::Traverse);
+    if(labelPvl->FindObject("IsisCube").HasGroup("Instrument") && originst) {
+      idinst = labelPvl->FindGroup("Instrument", Isis::Pvl::Traverse);
       if (idinst.HasKeyword("PixelPitch")) {
         jdata.pixpitch = idinst["PixelPitch"];
       }
       else {
-        jdata.pixpitch = label->FindObject("NaifKeywords")["IDEAL_PIXEL_PITCH"];
+        jdata.pixpitch = labelPvl->FindObject("NaifKeywords")["IDEAL_PIXEL_PITCH"];
       }
       jdata.summing = (int)(jdata.pixpitch / .012);
     }
@@ -262,7 +262,7 @@ namespace Isis {
       jdata.samples = npSamps[jdata.cpmmNumber];
     }
     else {
-      jdata.samples = getSampleCount();
+      jdata.samples = sampleCount();
     }
     jdata.ccdName = Instrument::CCD_NAMES[jdata.cpmmNumber];
     jdata.dltCount = inst["DeltaLineTimerCount"];
@@ -282,7 +282,7 @@ namespace Isis {
       ostringstream msg;
       msg << "Summing mode (" << jdata.summing
           << ") is illegal (must be > 0) or CPMM number (" << jdata.cpmmNumber
-          << ") is invalid in file " << getFileName() << endl;
+          << ") is invalid in file " << fileName() << endl;
       throw IException(IException::User, msg.str(), _FILEINFO_);
     }
 
@@ -293,7 +293,7 @@ namespace Isis {
     if((jdata.channelNumber > 2) || (jdata.channelNumber < 0)) {
       ostringstream msg;
       msg << "Channel number (" << jdata.channelNumber
-          << ") is invalid (must be 0, 1 or 2) in file " << getFileName()
+          << ") is invalid (must be 0, 1 or 2) in file " << fileName()
           << endl;
       throw IException(IException::User, msg.str(), _FILEINFO_);
     }
@@ -302,7 +302,7 @@ namespace Isis {
         if(jdata.channelNumber == 0) jdata.fpSamp0 += npSamps[jdata.cpmmNumber];
       }
       else {
-        if(jdata.channelNumber == 0) jdata.fpSamp0 += getSampleCount();
+        if(jdata.channelNumber == 0) jdata.fpSamp0 += sampleCount();
       }
     }
 
@@ -323,7 +323,7 @@ namespace Isis {
 
     ostringstream msg;
     msg << "Invalid summing mode (" << summing << ") for file " <<
-        getFileName() << std::endl;
+        fileName() << std::endl;
     throw IException(IException::User, msg.str(), _FILEINFO_);
   }
 
@@ -338,9 +338,9 @@ namespace Isis {
     }
     else {
       samp0 = jdata.fpSamp0 + jdata.sampOffset;
-      sampN = samp0 + getSampleCount() - 1;
+      sampN = samp0 + sampleCount() - 1;
     }
-    int line0(jdata.fpLine0 + jdata.lineOffset), lineN(line0 + getLineCount() - 1);
+    int line0(jdata.fpLine0 + jdata.lineOffset), lineN(line0 + lineCount() - 1);
 
 //  Allocate a new coordinate sequence and define it
     geos::geom::CoordinateSequence *pts = new geos::geom::CoordinateArraySequence();

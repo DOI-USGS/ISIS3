@@ -109,7 +109,7 @@ void SpiceSegment::init(Cube &cube) {
   _kernels.UnLoad();  // Unload all active, owned kernels
   init();            // Init local variables
 
-  _fname = cube.getFileName();
+  _fname = cube.fileName();
 
   //  Extract ISIS CK blob and transform to CK 3 content
   NaifStatus::CheckErrors();
@@ -118,9 +118,9 @@ void SpiceSegment::init(Cube &cube) {
     // Order is somewhat important here.  The call to initialize Kernels
     // object checks the NAIF pool for existance.  It logs their NAIF
     // status as loaded which may cause trouble from here on...
-    Pvl *label = cube.getLabel();
+    Pvl *label = cube.label();
     _kernels.Init(*label);
-    Camera *camera = cube.getCamera();
+    Camera *camera = cube.camera();
 
     //  Determine segment ID from product ID if it exists, otherwise basename
     if ( _name.isEmpty() ) {

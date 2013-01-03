@@ -98,7 +98,7 @@ namespace Isis {
         
         try {
           // get projection of shape model cube
-          Projection *projection = shapeModelCube.getProjection();
+          Projection *projection = shapeModelCube.projection();
 
           // Next, check if ISIS DEM cube is an equatorial cylindrical projection
           if (projection->IsEquatorialCylindrical())

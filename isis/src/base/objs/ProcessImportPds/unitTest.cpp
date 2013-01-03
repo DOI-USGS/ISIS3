@@ -35,7 +35,7 @@ void IsisMain() {
     Isis::CubeAttributeInput att;
     QString file = Isis::Application::GetUserInterface().GetFileName("TO");
     Isis::Cube *cube = p2.SetInputCube(file, att);
-    Isis::Statistics *stat = cube->getStatistics();
+    Isis::Statistics *stat = cube->statistics();
     cout << stat->Average() << endl;
     cout << stat->Variance() << endl;
     p2.EndProcess();
@@ -65,7 +65,7 @@ void IsisMain() {
     Isis::CubeAttributeInput att;
     QString file = Isis::Application::GetUserInterface().GetFileName("TO");
     Isis::Cube *cube = p2.SetInputCube(file, att);
-    Isis::Statistics *stat = cube->getStatistics();
+    Isis::Statistics *stat = cube->statistics();
     cout << stat->Average() << endl;
     cout << stat->Variance() << endl;
     p2.EndProcess();
@@ -121,7 +121,7 @@ void IsisMain() {
     Isis::CubeAttributeInput att;
     QString file = Isis::Application::GetUserInterface().GetFileName("TO");
     Isis::Cube *cube = p2.SetInputCube(file, att);
-    Pvl isisCubeLab = *(cube->getLabel());
+    Pvl isisCubeLab = *(cube->label());
     (isisCubeLab.FindObject("IsisCube").FindObject("Core")["StartByte"]).SetValue("");
     (isisCubeLab.FindObject("Table")["StartByte"]).SetValue("");
     (isisCubeLab.FindObject("Table")["Bytes"]).SetValue("");
@@ -130,7 +130,7 @@ void IsisMain() {
     (isisCubeLab.FindObject("OriginalLabel")["StartByte"]).SetValue("");
     (isisCubeLab.FindObject("OriginalLabel")["Bytes"]).SetValue("");
     cout << isisCubeLab << endl;
-    Isis::Statistics *stat = cube->getStatistics();
+    Isis::Statistics *stat = cube->statistics();
     cout << stat->Average() << endl;
     cout << stat->Variance() << endl;
     p2.EndProcess();

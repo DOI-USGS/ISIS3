@@ -157,7 +157,7 @@ void IsisMain() {
     Cube *cube = new Cube();
     cube->open(list[i].toString());
 
-    PvlGroup arch = cube->getLabel()->FindGroup("Archive", Pvl::Traverse);
+    PvlGroup arch = cube->label()->FindGroup("Archive", Pvl::Traverse);
     if(first) {
       obsId = (QString) arch["ObservationId"];
       first = false;
@@ -170,7 +170,7 @@ void IsisMain() {
       }
     }
 
-    PvlGroup inst = cube->getLabel()->FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup inst = cube->label()->FindGroup("Instrument", Pvl::Traverse);
     int chan = inst["ChannelNumber"];
     if(chan != 2) {
       QString msg = "Input file " + list[i].toString() + " contains a single channel";
@@ -198,9 +198,9 @@ void IsisMain() {
     CCDinfo.trimLines = arch["TrimLines"];
     CCDinfo.fpsamp = xoffset[ccd];
     CCDinfo.fpline = yoffset[ccd];
-    CCDinfo.ns = cube->getSampleCount();
-    CCDinfo.nl = cube->getLineCount();
-    CCDinfo.nb = cube->getBandCount();
+    CCDinfo.ns = cube->sampleCount();
+    CCDinfo.nl = cube->lineCount();
+    CCDinfo.nb = cube->bandCount();
     if(CCDinfo.nb > maxBands) maxBands = CCDinfo.nb;
     CCDinfo.outss = 1;
     CCDinfo.outsl = 1;
@@ -251,7 +251,7 @@ void IsisMain() {
 
     //  Set up portal
     CCDinfo.portal = new Portal(interp->Samples(), interp->Lines(),
-                                cube->getPixelType(),
+                                cube->pixelType(),
                                 interp->HotSample(), interp->HotLine());
     CCDlist.push_back(CCDinfo);
 
@@ -348,7 +348,7 @@ void IsisMain() {
   Cube *ocube = placing.SetOutputCube("TO", outns, outnl, maxBands);
 
   //  Delete ChannelNumber and CpmmNumber so that the output cannot be projected.
-  PvlGroup oinst = ocube->getGroup("Instrument");
+  PvlGroup oinst = ocube->group("Instrument");
   oinst.DeleteKeyword("ChannelNumber");
   oinst.DeleteKeyword("CpmmNumber");
   ocube->putGroup(oinst);

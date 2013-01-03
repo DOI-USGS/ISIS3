@@ -50,7 +50,7 @@ void IsisMain() {
     ProcessByLine p;
     Cube *iCube = p.SetInputCube("FROM");
 
-    FindGapsFunctor gapsFunctor(iCube->getLineCount(), corTol, bufferSizeBeforeGap,
+    FindGapsFunctor gapsFunctor(iCube->lineCount(), corTol, bufferSizeBeforeGap,
                                 bufferSizeAfterGap);
     p.ProcessCubeInPlace(gapsFunctor, false);
 

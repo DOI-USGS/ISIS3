@@ -25,13 +25,13 @@ namespace Isis {
     miBandIndex = 1;
     // Set input image area to defaults
     miStartSample = 1;
-    miEndSample   = mInCube->getSampleCount();
+    miEndSample   = mInCube->sampleCount();
     miStartLine   = 1;
-    miEndLine     = mInCube->getLineCount();
+    miEndLine     = mInCube->lineCount();
   
-    miInputSamples= mInCube->getSampleCount();
-    miInputLines  = mInCube->getLineCount();
-    miInputBands  = mInCube->getBandCount();
+    miInputSamples= mInCube->sampleCount();
+    miInputLines  = mInCube->lineCount();
+    miInputBands  = mInCube->bandCount();
       
     // Save off the sample and mdLine magnification
     mdSampleScale = sampleScale;
@@ -42,7 +42,7 @@ namespace Isis {
     miOutputLines   = (int)ceil((double)(miInputLines) / mdLineScale);
     
     // Initialize the input portal
-    m_iPortal = new Isis::Portal(miInputSamples, 1, mInCube->getPixelType());
+    m_iPortal = new Isis::Portal(miInputSamples, 1, mInCube->pixelType());
   }
   
   /**
@@ -109,7 +109,7 @@ namespace Isis {
     resultsGrp += PvlKeyword("OutputSamples",   toString(miOutputLines));
    
     Isis::SubArea subArea;
-    subArea.SetSubArea(mInCube->getLineCount(), mInCube->getSampleCount(), miStartLine, miStartSample, 
+    subArea.SetSubArea(mInCube->lineCount(), mInCube->sampleCount(), miStartLine, miStartSample, 
                        miEndLine, miEndSample, mdLineScale, mdSampleScale);
     subArea.UpdateLabel(mInCube, pOutCube, resultsGrp);
     

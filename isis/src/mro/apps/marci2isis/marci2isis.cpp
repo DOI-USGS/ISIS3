@@ -147,9 +147,9 @@ void IsisMain() {
 
   // Translate labels to every image and close output cubes before calling EndProcess
   for(unsigned int i = 0; i < outputCubes.size(); i++) {
-    translateMarciLabels(pdsLab, *outputCubes[i]->getLabel());
+    translateMarciLabels(pdsLab, *outputCubes[i]->label());
 
-    PvlObject &isisCube = outputCubes[i]->getLabel()->FindObject("IsisCube");
+    PvlObject &isisCube = outputCubes[i]->label()->FindObject("IsisCube");
     isisCube.FindGroup("Instrument").AddKeyword(PvlKeyword("Framelets", framelets[i]));
 
     outputCubes[i]->write(origLabel);
@@ -244,7 +244,7 @@ void writeCubeOutput(Isis::Buffer &data) {
       output.SetBasePosition(1, currentLine[band] + padding[band], band + 1);
     }
     else if(flip == 1) {
-      int outLine = outputCubes[cube]->getLineCount() - filterHeight -
+      int outLine = outputCubes[cube]->lineCount() - filterHeight -
                     ((currentLine[band] - 1) / filterHeight) * filterHeight + (currentLine[band] - 1) % filterHeight;
 
       output.SetBasePosition(1, outLine + 1 - padding[band], band + 1);
@@ -382,7 +382,7 @@ void writeFlipBricks() {
           }
         }
         else {
-          int outLine = outputCubes[cube]->getLineCount() - (filterHeight * (framelet + 1)) - padding[band];
+          int outLine = outputCubes[cube]->lineCount() - (filterHeight * (framelet + 1)) - padding[band];
           outBrick.SetBasePosition(1, outLine + 1, band + 1);
         }
 
@@ -403,7 +403,7 @@ void writeOutputPadding() {
   if(paddingHeight == 0) return; // no padding
 
   for(unsigned int cube = 0; cube < outputCubes.size(); cube++) {
-    Isis::Brick nullBrick(outputCubes[cube]->getSampleCount(), paddingHeight, outputCubes[cube]->getBandCount(), Isis::Real);
+    Isis::Brick nullBrick(outputCubes[cube]->sampleCount(), paddingHeight, outputCubes[cube]->bandCount(), Isis::Real);
 
     for(int i = 0; i < nullBrick.size(); i++) {
       nullBrick[i] = Isis::Null;
@@ -413,7 +413,7 @@ void writeOutputPadding() {
     nullBrick.SetBasePosition(1, 1, 1);
     outputCubes[cube]->write(nullBrick);
 
-    nullBrick.SetBasePosition(1, outputCubes[cube]->getLineCount() - paddingHeight, 1);
+    nullBrick.SetBasePosition(1, outputCubes[cube]->lineCount() - paddingHeight, 1);
     outputCubes[cube]->write(nullBrick);
   }
 }

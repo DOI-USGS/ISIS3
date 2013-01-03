@@ -636,7 +636,7 @@ namespace Isis {
               if (i != 0 &&
                   functorBricks.first.size() &&
                   inputBrick->Band() != functorBricks.first[0]->Band() &&
-                  m_inputCubes[i]->getBandCount() != 1) {
+                  m_inputCubes[i]->bandCount() != 1) {
                 inputBrick->SetBaseBand(functorBricks.first[0]->Band());
               }
 

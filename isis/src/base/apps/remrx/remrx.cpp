@@ -25,7 +25,7 @@ void IsisMain() {
 
   // Setup the input and output cubes
   Cube *icube = p.SetInputCube("FROM");
-  PvlKeyword &status = icube->getGroup("RESEAUS")["STATUS"];
+  PvlKeyword &status = icube->group("RESEAUS")["STATUS"];
   UserInterface &ui = Application::GetUserInterface();
   QString in = ui.GetFileName("FROM");
 
@@ -62,7 +62,7 @@ void IsisMain() {
   Cube cube;
   cube.open(out, "rw");
 
-  PvlGroup &res = cube.getLabel()->FindGroup("RESEAUS", Pvl::Traverse);
+  PvlGroup &res = cube.label()->FindGroup("RESEAUS", Pvl::Traverse);
 
   // Get reseau line, sample, type, and valid Keywords
   PvlKeyword lines = res.FindKeyword("LINE");
@@ -71,7 +71,7 @@ void IsisMain() {
   PvlKeyword valid = res.FindKeyword("VALID");
   int numres = lines.Size();
 
-  Brick brick(sdim, ldim, 1, cube.getPixelType());
+  Brick brick(sdim, ldim, 1, cube.pixelType());
   for(int res = 0; res < numres; res++) {
     if((resvalid == 0 || toInt(valid[res]) == 1) && toInt(type[res]) != 0) {
       int baseSamp = (int)(toDouble(samps[res]) + 0.5) - (sdim / 2);

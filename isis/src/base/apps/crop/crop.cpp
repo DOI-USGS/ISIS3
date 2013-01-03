@@ -38,39 +38,39 @@ void IsisMain() {
   sl = ui.GetInteger("LINE");
   sb = 1;
 
-  int origns = cube.getSampleCount();
-  int orignl = cube.getLineCount();
-  int es = cube.getSampleCount();
+  int origns = cube.sampleCount();
+  int orignl = cube.lineCount();
+  int es = cube.sampleCount();
   if(ui.WasEntered("NSAMPLES")) es = ui.GetInteger("NSAMPLES") + ss - 1;
-  int el = cube.getLineCount();
+  int el = cube.lineCount();
   if(ui.WasEntered("NLINES")) el = ui.GetInteger("NLINES") + sl - 1;
-  int eb = cube.getBandCount();
+  int eb = cube.bandCount();
 
   sinc = ui.GetInteger("SINC");
   linc = ui.GetInteger("LINC");
 
   // Make sure starting positions fall within the cube
-  if(ss > cube.getSampleCount()) {
+  if(ss > cube.sampleCount()) {
     cube.close();
     QString msg = "[SAMPLE] exceeds number of samples in the [FROM] cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if(sl > cube.getLineCount()) {
+  if(sl > cube.lineCount()) {
     cube.close();
     QString msg = "[LINE] exceeds number of lines in the [FROM] cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Make sure the number of elements do not fall outside the cube
-  if(es > cube.getSampleCount()) {
+  if(es > cube.sampleCount()) {
     cube.close();
     QString msg = "[SAMPLE+NSAMPLES-1] exceeds number of ";
     msg += "samples in the [FROM] cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if(el > cube.getLineCount()) {
+  if(el > cube.lineCount()) {
     cube.close();
     QString msg = "[LINE+NLINES-1] exceeds number of ";
     msg += "lines in the [FROM] cube";
@@ -93,7 +93,7 @@ void IsisMain() {
   p.ClearInputCubes();
 
   // propagate tables manually
-  Pvl &inLabels = *cube.getLabel();
+  Pvl &inLabels = *cube.label();
 
   // Loop through the labels looking for object = Table
   for(int labelObj = 0; labelObj < inLabels.Objects(); labelObj++) {
@@ -119,7 +119,7 @@ void IsisMain() {
     /* Deal with associations, sample first
     if(table.IsSampleAssociated()) {
       int numDeleted = 0;
-      for(int samp = 0; samp < cube.getSampleCount(); samp++) {
+      for(int samp = 0; samp < cube.sampleCount(); samp++) {
         // This tests checks to see if we would include this sample.
         //   samp - (ss-1)) / sinc must be a whole number less than ns.
         if((samp - (ss-1)) % sinc != 0 || (samp - (ss-1)) / sinc >= ns || (samp - (ss-1)) < 0) {
@@ -132,7 +132,7 @@ void IsisMain() {
     // Deal with line association
     if(table.IsLineAssociated()) {
       int numDeleted = 0;
-      for(int line = 0; line < cube.getLineCount(); line++) {
+      for(int line = 0; line < cube.lineCount(); line++) {
         // This tests checks to see if we would include this line.
         //   line - (sl-1)) / linc must be a whole number less than nl.
         if((line - (sl-1)) % linc != 0 || (line - (sl-1)) / linc >= nl || (line - (sl-1)) < 0) {
@@ -146,7 +146,7 @@ void IsisMain() {
     ocube->write(table);
   }
 
-  Pvl &outLabels = *ocube->getLabel();
+  Pvl &outLabels = *ocube->label();
   if(!ui.GetBoolean("PROPSPICE") && outLabels.FindObject("IsisCube").HasGroup("Kernels")) {
     PvlGroup &kerns = outLabels.FindObject("IsisCube").FindGroup("Kernels");
 
