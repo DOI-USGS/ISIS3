@@ -2,6 +2,7 @@ Begin testing Shape Model base class....
 
   Shape name is Test
     Do we have an intersection? 0
+    Do we have an ellipsoid intersection? 0
     Test resolution() error message when there is no intersection:
 **PROGRAMMER ERROR** No valid intersection point for computing resolution.
     Set a pixel in the image and check again.
@@ -10,6 +11,7 @@ Begin testing Shape Model base class....
     intersectSurface called with observer position = -2399.54, -2374.03, 1277.68
                                  lookDirection = 0.957458, -0.0219727, -0.287736
     Do we have an intersection? 1
+    Do we have an ellipsoid intersection? 1
     Get the resolution:         1
     surface point = (-2123.36, -2380.37, 1194.68
 

@@ -60,12 +60,17 @@ class MyShape : public ShapeModel {
         observerPos[0] << ", " << observerPos[1] << ", " <<
         observerPos[2] << endl << "                                 lookDirection = " <<
         lookDirection[0] << ", " <<  lookDirection[1] << ", " << lookDirection[2] << endl;
+      intersectEllipsoid(observerPos, lookDirection);
       SpiceDouble intersectionPoint[3] = {-2123.362258286, -2380.3717812236, 1194.6783966636};
       
       surfaceIntersection()->FromNaifArray(intersectionPoint);
       setHasIntersection(true);
       return true;
    }
+
+  bool ellipsoidIntersection() {
+    return hasEllipsoidIntersection();
+  }
 
   virtual void calculateDefaultNormal()  {
       calculateSurfaceNormal();
@@ -213,6 +218,7 @@ int main() {
 
   cout << endl << "  Shape name is " << shape.name() << endl;
   cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
+  cout << "    Do we have an ellipsoid intersection? " << shape.ellipsoidIntersection() << endl;
   try {
     cout << "    Get the resolution:         " << shape.resolution() << endl;
   }
@@ -244,6 +250,7 @@ Local normal = -0.581842, -0.703663, 0.407823
       return -1;
   }
   cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
+  cout << "    Do we have an ellipsoid intersection? " << shape.ellipsoidIntersection() << endl;
   try {
     cout << "    Get the resolution:         " << shape.resolution() << endl;
   }

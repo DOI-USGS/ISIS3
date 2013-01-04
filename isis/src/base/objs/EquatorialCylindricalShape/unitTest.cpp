@@ -58,9 +58,9 @@ int main() {
 
   cout << "Shape name is " << shape.name() << endl;
 
-  cout << "Testing method intersectSurface..." << endl; 
+  cout << endl << "Testing method intersectSurface..." << endl; 
   cout << "  Do we have an intersection? " << shape.hasIntersection() << endl;
-  cout << " Set a pixel in the image and check again." << endl;
+  cout << endl << " Set a pixel in the image and check again." << endl;
   double line = 453.0;
   double sample = 534.0;
   // The next point goes with the LRO image /work/projects/isis/latest/m00775/test/M123149061RE.lev1.cub
@@ -89,9 +89,22 @@ Local normal = -0.581842, -0.703663, 0.407823
   cout << "  Do we have an intersection? " << shape.hasIntersection() << endl;
   SurfacePoint *sp = shape.surfaceIntersection();
   cout << "   surface point = (" << sp->GetX().kilometers() << ", " << 
-    sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << endl;
+    sp->GetY().kilometers() << ", " << sp->GetZ().kilometers() << ")" << endl;
 
- // TODO 
+   /*
+  Set the look vector straight up to cause it to fail in the EllipsoidalShape intersection
+  This tests a bug introduced when the ShapeModel classes were added that caused
+  qview and spiceinit to hang if the look vector pointed off the target body.  DAC
+  */
+  cout << endl << "Testing a condition that previously caused qview and spiceinit to hang instead of failing." << endl;
+  lookB[0] = 1.;
+  lookB[1] = -0.9;
+  lookB[2] = -0.01;
+  if (!shape.intersectSurface(sB, lookB)) { 
+      cout << "...  intersectSurface method failed" << endl;
+  }
+
+// TODO 
   // Test alternate constructors DemShape() and DemShape(target)
 
 

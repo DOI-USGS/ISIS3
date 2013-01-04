@@ -41,6 +41,8 @@ namespace Isis {
    * @author 2010-08-02 Debbie A. Cook
    *
    * @internal
+   *   @history 2012-12-21 - Debbie A. Cook - Cleaned up intersectSurface method to
+   *                             reflect changes made to ShapeModel class.  References #1343.
    */
   class EllipsoidShape : public Isis::ShapeModel {
     public:
