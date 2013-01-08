@@ -61,7 +61,7 @@ namespace Isis {
    *            The images were compressed in the y-direction.  There was a line of code commented
    *            out, "lineRate *= csum;".  From the MRO_ctx_pds_sis.pdf, "Note that CTX implements
    *            downtrack summing by increasing the line time; for example, a 2X2 summed image has
-   *            an actual line time twice that given by this fïeld.".  Uncommenting the line fixed
+   *            an actual line time twice that given by this field.".  Uncommenting the line fixed
    *            the y-direction scale problem.  Fixes #826.
    */
   class CTXCamera : public LineScanCamera {
