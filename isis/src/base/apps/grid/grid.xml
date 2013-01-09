@@ -93,6 +93,17 @@
       Tested and documented for the January 2012 release. The documentation
       updates included were recommended by Chris Isbell.
     </change>
+    <change name="Adam Licht" date="2012-12-26">
+      Added functionality to choose the source of image background. Pixel Values
+      for behind the grid can now be the image pixel value, HRS, LRS, NULL, or a DN.
+    </change>
+    <change name="Steven Lambright" date="2012-12-31">
+      Incorporated Adam Licht's changes into Isis. This included re-formatting to match
+      current Isis 3 coding standards, removal of error checking of conditions that
+      cannot happen, fixes with running in batch mode/resetting of variable states
+      between runs, some re-positioning of parameter locations, and creating
+      tests. These changes shouldn't break any existing scripts that utilize grid. Fixes #917.
+    </change>
   </history>
 
   <groups>
@@ -125,8 +136,8 @@
       </parameter>
     </group>
 
-    <group name = "Grid type">
-      <parameter name = "MODE">
+    <group name="Grid Type">
+      <parameter name="MODE">
         <type>string</type>
         <default><item>GROUND</item></default> 
         <brief>Grid options</brief>
@@ -153,7 +164,7 @@
             </exclusions>
           </option>
 
-          <option value = "GROUND">
+          <option value="GROUND">
             <brief>Add a grid (graticule) in terms of lat/lon coordinates</brief>
             <description>
               A grid will be inserted into the image with spacing and position
@@ -169,7 +180,7 @@
         </list>
       </parameter>
 
-       <parameter name="TICKS">
+      <parameter name="TICKS">
         <type>boolean</type>
         <default><item>false</item></default>
         <brief>Draw ticks instead of lines</brief>
@@ -182,7 +193,7 @@
         </inclusions>
       </parameter>
 
-       <parameter name="OUTLINE">
+      <parameter name="OUTLINE">
         <type>boolean</type>
         <default><item>false</item></default>
         <brief>Outline the image</brief>
@@ -422,6 +433,70 @@
         <description>
           This is the DN value to be used as the value of the grid lines when
           LINEVALUE=DN. It may be beneficial to first run the stats application
+          in determining image minimum and maximum values.
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Background Type">
+      <parameter name="BKGNDVALUE">
+        <type>string</type>
+        <default><item>IMAGE</item></default>
+        <brief>Select background DN value</brief>
+        <description>
+          This option allows for any DN value, or any of three special pixel
+          values to be chosen as the background value.
+        </description>
+        <list>
+          <option value="IMAGE">
+            <brief>Use the input cub value</brief>
+            <description>
+              Use the input cub pixel value as the background value. This will
+              superimpose the grid on top of the input image.
+            </description>
+            <exclusions><item>BKGNDDNVALUE</item></exclusions>
+          </option>
+          <option value="HRS">
+            <brief>Use HRS DN value</brief>
+            <description>
+              Use the special pixel value HRS (High Representation Saturation)
+              as the background value. This may vary with bittype used.
+            </description>
+            <exclusions><item>BKGNDDNVALUE</item></exclusions>
+          </option>
+          <option value="LRS">
+            <brief>Use LRS DN value</brief>
+            <description>
+              Use the special pixel value LRS (Low Representation Saturation)
+              as the background value. This may vary with bittype used.
+            </description>
+            <exclusions><item>BKGNDDNVALUE</item></exclusions>
+          </option>
+          <option value="NULL">
+            <brief>Use NULL DN value</brief>
+            <description>
+              Use the special pixel value NULL as the background value. This may
+              vary with bittype used.
+            </description>
+            <exclusions><item>BKGNDDNVALUE</item></exclusions>
+          </option>
+          <option value="DN">
+            <brief>Use given DN value</brief>
+            <description>
+              Use the DN value specified in the BKGNDDNVALUE parameter. It is a good
+              idea to run the application stats on a cube before selecting a DN
+              value.
+            </description>
+            <inclusions><item>BKGNDDNVALUE</item></inclusions>
+          </option>
+        </list>
+      </parameter>
+      <parameter name="BKGNDDNVALUE">
+        <type>double</type>
+        <brief>DN value to be used</brief>
+        <description>
+          This is the DN value to be used as the value of the background when
+          BKGNDVALUE=DN. It may be beneficial to first run the stats application
           in determining image minimum and maximum values.
         </description>
       </parameter>
