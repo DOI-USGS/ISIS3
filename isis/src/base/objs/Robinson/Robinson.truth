@@ -1,0 +1,108 @@
+Unit Test For Robinson Projection
+
+Test missing center longitude keyword ...
+
+Test SetGround method ... 
+Setting ground to (30, 50)
+Latitude:               30
+Longitude:              50
+XCoord:                 0.7110052493604421
+YCoord:                 0.5030556
+
+Test SetCoordinate method ... 
+Setting coordinate to (0.7110052493604421, 0.5030556)
+Latitude:               30
+Longitude:              50.00000000000001
+XCoord:                 0.7110052493604421
+YCoord:                 0.5030556
+
+Test XYRange method ... 
+Minimum X:  -2.666269685101657
+Maximum X:  2.666269685101657
+Minimum Y:  -1.3523
+Maximum Y:  1.3523
+
+Test Name and comparision method ... 
+Name:       Robinson
+operator==  1
+
+Test default computation ... 
+Group = Mapping
+  EquatorialRadius   = 1.0
+  PolarRadius        = 1.0
+  LatitudeType       = Planetocentric
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 180
+  MinimumLatitude    = -90.0
+  MaximumLatitude    = 90.0
+  MinimumLongitude   = -180.0
+  MaximumLongitude   = 180.0
+  ProjectionName     = Robinson
+  CenterLongitude    = 0.0
+End_Group
+End
+
+Testing Mapping() methods ... 
+Mapping() = 
+Group = Mapping
+  ProjectionName     = Robinson
+  EquatorialRadius   = 1.0
+  PolarRadius        = 1.0
+  LatitudeType       = Planetocentric
+  LongitudeDirection = PositiveEast
+  LongitudeDomain    = 180
+  MinimumLatitude    = -90.0
+  MaximumLatitude    = 90.0
+  MinimumLongitude   = -180.0
+  MaximumLongitude   = 180.0
+  CenterLongitude    = 0.0
+End_Group
+End
+MappingLatitudes() = 
+Group = Mapping
+  MinimumLatitude = -90.0
+  MaximumLatitude = 90.0
+End_Group
+End
+MappingLongitudes() = 
+Group = Mapping
+  MinimumLongitude = -180.0
+  MaximumLongitude = 180.0
+  CenterLongitude  = 0.0
+End_Group
+End
+
+
+Test SetGround method ... 
+Setting ground to (-47, -102)
+Latitude:               -47
+Longitude:              -102
+XCoord:                 -8521072.970798777
+YCoord:                 -5009016.797941369
+
+Test SetCoordinate method ... 
+Setting coordinate to (-8521072.970798777, -5009016.797941369)
+Latitude:               -46.99995403627828
+Longitude:              -102.0000065914941
+XCoord:                 -8521076
+YCoord:                 -5009012
+
+Test SetGround method ... 
+Setting ground to (0, 360)
+Latitude:               0
+Longitude:              360
+XCoord:                 33973592.32994721
+YCoord:                 0
+
+Test SetCoordinate method ... 
+Setting coordinate to (33973592.32994721, 0)
+Latitude:               0
+Longitude:              360
+XCoord:                 33973592.32994721
+YCoord:                 0
+
+Unit test was obtained from:
+
+  The Robinson Projection-A Computation Algorithm by John P. Snyder
+  Cartography and Geographic Information Systems
+  Vol. 17, No. 4, 1990, Pages 301-305
