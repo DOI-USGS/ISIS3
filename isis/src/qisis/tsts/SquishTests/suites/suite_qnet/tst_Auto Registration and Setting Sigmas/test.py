@@ -172,4 +172,5 @@ def main():
     
     activateItem(waitForObjectItem(":qnet_QMenuBar", "File"))
     activateItem(waitForObjectItem(":qnet.File_QMenu", "Exit"))
+    snooze(1)
 

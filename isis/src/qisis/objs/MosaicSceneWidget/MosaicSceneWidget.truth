@@ -1,0 +1,8 @@
+********* Start testing of Isis::MosaicSceneWidgetTester *********
+Config: Using QTest library 4.8.0, Qt 4.8.0
+PASS   : Isis::MosaicSceneWidgetTester::initTestCase()
+PASS   : Isis::MosaicSceneWidgetTester::testBasicFunctionality()
+PASS   : Isis::MosaicSceneWidgetTester::testSynchronization()
+PASS   : Isis::MosaicSceneWidgetTester::cleanupTestCase()
+Totals: 4 passed, 0 failed, 0 skipped
+********* Finished testing of Isis::MosaicSceneWidgetTester *********
