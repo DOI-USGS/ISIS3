@@ -32,7 +32,7 @@ config: Makefile
 
 Makefile: FORCE config.pro
 	if [ -f "$(QMAKE)" ]; then       \
-	  $(QMAKE) -o Makefile config.pro; \
+	  $(QMAKE) -o Makefile config.pro 2>&1 | grep -v MESSAGE; \
 	  $(MAKE) isis_conf;               \
 	fi;
 

@@ -4,6 +4,8 @@ error:
 	echo "This can be found at $$ISISROOT/make/Makefile.apps";
 endif
 
+include $(ISISROOT)/make/isismake.os
+
 
 INCS  := $(wildcard *.h)
 
@@ -11,7 +13,7 @@ INCS  := $(wildcard *.h)
 
 # QT - get all header files with 'Q_OBJECT' Output: '%.h: QOBJECT'
 ifneq ($(INCS), $(BLANK))
-  QOBJ  := $(shell grep -HI -m1 '^ *Q_OBJECT *$$' $(INCS))
+  QOBJ  := $(shell $(GREP) -HI -m1 '^ *Q_OBJECT *$$' $(INCS))
 
   # filter out 'Q_OBJECT' from '%.h: QOBJECT'
   QCOLN := $(filter-out Q_OBJECT, $(QOBJ))
@@ -52,8 +54,6 @@ CSMES := $(OBJS:%.o=%.o.csmes)
 
 BINS  := $(shell basename `pwd`)
 
-
-include $(ISISROOT)/make/isismake.os
 
 MOCINC       = $(wildcard *.h)
 MOCGEN       = $(wildcard moc_*.cpp)
@@ -99,7 +99,7 @@ ui_%.h: %.ui
 qtmoc: $(MOCINC:%.h=moc_%.cpp)
 
 moc_%.cpp: %.h
-	if [ "$(filter-out ' ', $(shell grep -sIE -m1 '^ *Q_OBJECT *$$' $(<F)))" == "Q_OBJECT" ]; \
+	if [ "$(filter-out ' ', $(shell $(GREP) -sIE -m1 '^ *Q_OBJECT *$$' $(<F)))" == "Q_OBJECT" ]; \
 	then \
 	  $(MOC) $(MOCDEFINES) -o $@ $(<F); \
 	fi
@@ -129,7 +129,7 @@ clean:  localclean
 	fi
 
 localclean:
-	if [ "$(findstring cleanlocal,$(shell grep cleanlocal Makefile))" = "cleanlocal" ]; \
+	if [ "$(findstring cleanlocal,$(shell $(GREP) cleanlocal Makefile))" = "cleanlocal" ]; \
 	then                                                                                \
 	  $(MAKE) cleanlocal;                                                               \
 	fi

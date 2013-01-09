@@ -7,6 +7,8 @@ include $(ISISROOT)/make/isis.conf
 
 MAC_ARCH_FLAGS = $(MAC_ARCH) $(MAC_XARCH) $(MAC_OS_MIN)
 
+DOT_PATH := /opt/usgs/v002/ports/bin
+
 #  Basically is GNU g++/gcc
 CXX           = c++
 CC            = cc
@@ -84,29 +86,22 @@ CWDLIB    =
 #---------------------------------------------------------------------------
 QTDARWINFLAGS += -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED
 QTDIR        = $(ISIS3OPT)
-
-QTFRAMEWORKDIR     = $(QTDIR)/lib
-
-ifeq (,$(findstring $(QTFRAMEWORKDIR)/QtCore.framework,$(wildcard $(QTFRAMEWORKDIR)/QtCore.framework )))
-  QTFRAMEWORKDIR   = $(ISIS3OPT)/Library/Frameworks
-endif
-
 QTINCDIR  = -I$(QTDIR)/share/qt4/mkspecs/macx-g++
-QTINCDIR += -I$(QTFRAMEWORKDIR)/QtCore.framework/Headers
-QTINCDIR += -I$(QTFRAMEWORKDIR)/QtAssistant.framework/Headers
-QTINCDIR += -I$(QTFRAMEWORKDIR)/QtGui.framework/Headers
-QTINCDIR += -I$(QTFRAMEWORKDIR)/QtNetwork.framework/Headers
-QTINCDIR += -I$(QTFRAMEWORKDIR)/QtOpenGL.framework/Headers
-QTINCDIR += -I$(QTFRAMEWORKDIR)/QtScript.framework/Headers
-QTINCDIR += -I$(QTFRAMEWORKDIR)/QtScriptTools.framework/Headers
-QTINCDIR += -I$(QTFRAMEWORKDIR)/QtSql.framework/Headers
-QTINCDIR += -I$(QTFRAMEWORKDIR)/QtSvg.framework/Headers
-QTINCDIR += -I$(QTFRAMEWORKDIR)/QtTest.framework/Headers
-QTINCDIR += -I$(QTFRAMEWORKDIR)/QtWebKit.framework/Headers
-QTINCDIR += -I$(QTFRAMEWORKDIR)/QtXml.framework/Headers
-QTINCDIR += -I$(QTFRAMEWORKDIR)/QtXmlPatterns.framework/Headers
-QTINCDIR += -F$(QTFRAMEWORKDIR)
-QTLIBDIR  = -L$(QTFRAMEWORKDIR) -F$(QTFRAMEWORKDIR)
+QTINCDIR += -I$(QTDIR)/Library/Frameworks/QtCore.framework/Headers
+QTINCDIR += -I$(QTDIR)/Library/Frameworks/QtAssistant.framework/Headers
+QTINCDIR += -I$(QTDIR)/Library/Frameworks/QtGui.framework/Headers
+QTINCDIR += -I$(QTDIR)/Library/Frameworks/QtNetwork.framework/Headers
+QTINCDIR += -I$(QTDIR)/Library/Frameworks/QtOpenGL.framework/Headers
+QTINCDIR += -I$(QTDIR)/Library/Frameworks/QtScript.framework/Headers
+QTINCDIR += -I$(QTDIR)/Library/Frameworks/QtScriptTools.framework/Headers
+QTINCDIR += -I$(QTDIR)/Library/Frameworks/QtSql.framework/Headers
+QTINCDIR += -I$(QTDIR)/Library/Frameworks/QtSvg.framework/Headers
+QTINCDIR += -I$(QTDIR)/Library/Frameworks/QtTest.framework/Headers
+QTINCDIR += -I$(QTDIR)/Library/Frameworks/QtWebKit.framework/Headers
+QTINCDIR += -I$(QTDIR)/Library/Frameworks/QtXml.framework/Headers
+QTINCDIR += -I$(QTDIR)/Library/Frameworks/QtXmlPatterns.framework/Headers
+QTINCDIR += -F$(QTDIR)/Library/Frameworks
+QTLIBDIR  = -L$(QTDIR)/Library/Frameworks -F$(QTDIR)/Library/Frameworks
 
 ISISCPPFLAGS       += $(QTDARWINFLAGS)
 QTCOMMONFRAMEWORKS  =
@@ -262,16 +257,16 @@ CHOLMODLIB   = -lcholmod -lamd -lcolamd -framework Accelerate
 #---------------------------------------------------------------------------
 
 #  Libraries
-THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtXmlPatterns.framework"
-THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtXml.framework"
-THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtNetwork.framework"
-THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtSql.framework"
-THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtGui.framework"
-THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtCore.framework"
-THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtSvg.framework"
-THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtWebKit.framework"
-THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtOpenGL.framework"
-THIRDPARTYLIBS    += "$(QTFRAMEWORKDIR)/QtTest.framework"
+THIRDPARTYLIBS    += "$(QTDIR)/Library/Frameworks/QtXmlPatterns.framework"
+THIRDPARTYLIBS    += "$(QTDIR)/Library/Frameworks/QtXml.framework"
+THIRDPARTYLIBS    += "$(QTDIR)/Library/Frameworks/QtNetwork.framework"
+THIRDPARTYLIBS    += "$(QTDIR)/Library/Frameworks/QtSql.framework"
+THIRDPARTYLIBS    += "$(QTDIR)/Library/Frameworks/QtGui.framework"
+THIRDPARTYLIBS    += "$(QTDIR)/Library/Frameworks/QtCore.framework"
+THIRDPARTYLIBS    += "$(QTDIR)/Library/Frameworks/QtSvg.framework"
+THIRDPARTYLIBS    += "$(QTDIR)/Library/Frameworks/QtWebKit.framework"
+THIRDPARTYLIBS    += "$(QTDIR)/Library/Frameworks/QtOpenGL.framework"
+THIRDPARTYLIBS    += "$(QTDIR)/Library/Frameworks/QtTest.framework"
 THIRDPARTYLIBS    += "$(ISIS3OPT)/lib/qwt.framework"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libcspice*.dylib"
 THIRDPARTYLIBS    += "$(ISIS3LOCAL)/lib/libsuperlu*.dylib"

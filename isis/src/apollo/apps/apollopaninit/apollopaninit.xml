@@ -17,6 +17,10 @@
     <change name="Orrin Thomas" date="2010-09-08">
       Ripped of std2isis JPEG2000 import code to create ApolloPan2Isis
     </change>
+    <change name="Steven Lambright and Mat Eis" date="2013-01-09">
+      Fixed a memory error that came to light when adding support for
+      Mac OSX10.8. References #1354.
+    </change>
   </history>
 
   <category>
