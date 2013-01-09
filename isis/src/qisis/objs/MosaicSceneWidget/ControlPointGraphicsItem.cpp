@@ -9,11 +9,13 @@
 #include <QMessageBox>
 
 #include "Constants.h"
+#include "ControlMeasure.h"
 #include "ControlPoint.h"
 #include "FileName.h"
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
 #include "SerialNumberList.h"
+#include "Statistics.h"
 
 using namespace std;
 
@@ -30,6 +32,11 @@ namespace Isis {
     m_mosaicScene = boundingRectSrc;
     m_controlPoint = cp;
     m_showArrow = false;
+    m_colorByMeasureCount = false;
+    m_colorByResidualMagnitude = false;
+
+    m_measureCount = -1;
+    m_residualMagnitude = Null;
 
     setZValue(DBL_MAX);
 
@@ -96,8 +103,50 @@ namespace Isis {
 
       if(!m_origPoint->isNull() && *m_origPoint != *m_centerPoint
          && m_showArrow) {
-        painter->setPen(Qt::black);
-        painter->setBrush(Qt::black);
+
+        if (!m_colorByMeasureCount && !m_colorByResidualMagnitude) {
+          painter->setPen(Qt::black);
+          painter->setBrush(Qt::black);
+        }
+        else {
+          QColor zeroColor(Qt::black);
+          QColor fullColor(Qt::green);
+
+          bool isColored = false;
+
+          if (m_colorByMeasureCount) {
+            int fullColorMeasureCount = qMax(1, m_measureCount);
+            int measureCount = m_controlPoint->getMeasures(true).count();
+            isColored = (measureCount >= fullColorMeasureCount);
+          }
+          else {
+            fullColor = QColor(Qt::red);
+
+            double fullColorErrorMag = 0.0;
+
+            if (!IsSpecial(m_residualMagnitude)) {
+              fullColorErrorMag = m_residualMagnitude;
+            }
+
+            Statistics residualStats;
+            foreach (ControlMeasure *cm, m_controlPoint->getMeasures(true)) {
+              residualStats.AddData(cm->GetResidualMagnitude());
+            }
+
+            if (residualStats.Average() != Null) {
+              double errorMag = residualStats.Maximum();
+              if (errorMag >= fullColorErrorMag) {
+                isColored = true;
+              }
+            }
+          }
+
+          QColor finalColor = isColored? fullColor : zeroColor;
+
+          painter->setPen(finalColor);
+          painter->setBrush(finalColor);
+        }
+
         painter->drawLine(*m_origPoint, *m_centerPoint);
 
         QPolygonF arrowHead = calcArrowHead();
@@ -209,17 +258,18 @@ namespace Isis {
 
 
   QString ControlPointGraphicsItem::makeToolTip(SerialNumberList *snList) {
-    QString toolTip = "Point ID: " +
+    QString toolTip = "<div>Point ID: " +
         m_controlPoint->GetId();
-    toolTip += "\nPoint Type: " +
+    toolTip += "<br />Point Type: " +
         m_controlPoint->GetPointTypeString();
-    toolTip += "\nNumber of Measures: ";
-    toolTip += QString::number(m_controlPoint->GetNumMeasures());
-    toolTip += "\nIgnored: ";
+    toolTip += "<br />Number of Measures: ";
+    toolTip += toString(m_controlPoint->GetNumMeasures());
+    toolTip += "<br />Ignored: ";
     toolTip += m_controlPoint->IsIgnored() ? "Yes" : "No";
-    toolTip += "\nEdit Locked: ";
+    toolTip += "<br />Edit Locked: ";
     toolTip += m_controlPoint->IsEditLocked() ? "Yes" : "No";
-    toolTip += "\n";
+
+    toolTip += "<br />";
 
     if(snList == NULL) {
       toolTip += QStringList(m_controlPoint->getCubeSerialNumbers()).join("\n");
@@ -231,7 +281,7 @@ namespace Isis {
         QString serialNum = serialNums[snIndex];
 
         if(snIndex > 0)
-          toolTip += "\n";
+          toolTip += "<br />";
 
         if(snList->HasSerialNumber(serialNum)) {
           toolTip +=
@@ -241,8 +291,15 @@ namespace Isis {
         else {
           toolTip += serialNum;
         }
+
+        double residMag = m_controlPoint->GetMeasure(serialNum)->GetResidualMagnitude();
+        if (residMag != Null) {
+          toolTip += " [residual: <font color='red'>" + toString(residMag) + "</font>]";
+        }
       }
     }
+
+    toolTip += "</div>";
 
     return toolTip;
   }

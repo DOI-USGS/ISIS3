@@ -10,8 +10,10 @@
 #include "FileDialog.h"
 #include "IException.h"
 #include "IString.h"
+#include "MosaicControlNetToolMovementConfigDialog.h"
 #include "MosaicSceneWidget.h"
 #include "PvlObject.h"
+#include "SpecialPixel.h"
 
 namespace Isis {
 
@@ -30,6 +32,10 @@ namespace Isis {
     m_closeNetwork = NULL;
     m_controlNetFileLabel = NULL;
     m_randomizeColors = NULL;
+
+    m_movementArrowColorSource = NoMovement;
+    m_measureCount = 10;
+    m_residualMagnitude = 5.0;
 
     // Create the action buttons
 
@@ -56,16 +62,13 @@ namespace Isis {
     connect(m_randomizeColors, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
 
-    m_displayArrows = new QPushButton("Show Movement");
-    m_displayArrows->setCheckable(true);
-    m_displayArrows->setChecked(false);
-    m_displayArrows->setToolTip("Show arrow from the apriori surface point to "
+    m_configMovement = new QPushButton(tr("Configure Movement Display"));
+    m_configMovement->setToolTip(tr("Show arrow from the apriori surface point to "
         "the adjusted surface point for each control point with this "
-        "information");
-    connect(m_displayArrows, SIGNAL(clicked()), this, SLOT(displayArrows()));
-    connect(m_displayArrows, SIGNAL(destroyed(QObject *)),
+        "information"));
+    connect(m_configMovement, SIGNAL(clicked()), this, SLOT(configMovement()));
+    connect(m_configMovement, SIGNAL(destroyed(QObject *)),
             this, SLOT(objectDestroyed(QObject *)));
-    m_displayArrows->setEnabled(false);
 
     m_closeNetwork = new QPushButton("Close Network");
     m_closeNetwork->setEnabled(false);
@@ -96,7 +99,7 @@ namespace Isis {
     delete m_loadControlNetButton;
     delete m_displayControlNetButton;
     delete m_displayConnectivity;
-    delete m_displayArrows;
+    delete m_configMovement;
     delete m_closeNetwork;
     delete m_controlNetFileLabel;
     delete m_randomizeColors;
@@ -125,10 +128,23 @@ namespace Isis {
 
   PvlObject MosaicControlNetTool::toPvl() const {
     PvlObject obj(projectPvlObjectName());
+    qDebug() << "Warning: Project file should not be used with other versions of Isis";
+    obj.AddComment("This was created by mantis ticket #479 - intermediate version - this project "
+                   "format is not supported");
 
     obj += PvlKeyword("FileName", m_controlNetFile);
     obj += PvlKeyword("Visible",
-        toString(m_controlNetGraphics && m_controlNetGraphics->isVisible()));
+        Isis::toString(m_controlNetGraphics && m_controlNetGraphics->isVisible()));
+    obj += PvlKeyword("Movement", toString(m_movementArrowColorSource));
+
+    if (maxMovementColorMeasureCount() != -1) {
+      obj += PvlKeyword("MovementColorMaxMeasureCount", Isis::toString(m_measureCount));
+    }
+
+    if (maxMovementColorResidualMagnitude() != Null) {
+      obj += PvlKeyword("MovementColorMaxResidualMagnitude",
+                        Isis::toString(m_residualMagnitude));
+    }
 
     return obj;
   }
@@ -138,6 +154,18 @@ namespace Isis {
     m_controlNetFile = obj["FileName"][0];
     if (m_controlNetFile == "Null")
       m_controlNetFile = "";
+
+    if (obj.HasKeyword("Movement")) {
+      m_movementArrowColorSource = fromMovementColorSourceString(obj["Movement"]);
+    }
+
+    if (obj.HasKeyword("MovementColorMaxMeasureCount")) {
+      m_measureCount = toInt(obj["MovementColorMaxMeasureCount"][0]);
+    }
+
+    if (obj.HasKeyword("MovementColorMaxResidualMagnitude")) {
+      m_residualMagnitude = toDouble(obj["MovementColorMaxResidualMagnitude"][0]);
+    }
 
     loadNetwork();
 
@@ -150,6 +178,112 @@ namespace Isis {
 
   QString MosaicControlNetTool::projectPvlObjectName() const {
     return "MosaicControlNetTool";
+  }
+
+
+  /**
+   * Define how the movement arrows should be drawn. This includes if movement arrows should be
+   *   drawn, what criteria should be used, and how to stretch (where to transition colors) the
+   *   arrows.
+   *
+   * NOTE: This is just a quick implementation and is probably not designed correctly. This is
+   *       subject to change.
+   *
+   * @param colorSource If and how to draw and color the arrows
+   * @param maxMeasureCount The measure count to become fully colored
+   * @param maxResidualMagnitude The max residual magnitude to become fully colored
+   */
+  void MosaicControlNetTool::setMovementArrowColorSource(MovementColorSource colorSource,
+      int maxMeasureCount, double maxResidualMagnitude) {
+    m_movementArrowColorSource = colorSource;
+    m_measureCount = maxMeasureCount;
+    m_residualMagnitude = maxResidualMagnitude;
+
+    if (m_controlNetGraphics) {
+      m_controlNetGraphics->setArrowsVisible(m_movementArrowColorSource != NoMovement,
+          m_movementArrowColorSource == MeasureCount, m_measureCount,
+          m_movementArrowColorSource == ResidualMagnitude, m_residualMagnitude);
+    }
+  }
+
+
+  /**
+   * Get the current setting for the movement arrows.
+   */
+  MosaicControlNetTool::MovementColorSource MosaicControlNetTool::movementArrowColorSource() const {
+    return m_movementArrowColorSource;
+  }
+
+
+  /**
+   * Get the current measure count to become fully colored. This will return -1 if it's undefined.
+   */
+  int MosaicControlNetTool::maxMovementColorMeasureCount() const {
+    int result = -1;
+
+    if (m_measureCount > 0)
+      result = m_measureCount;
+
+    return result;
+  }
+
+
+  /**
+   * Get the current max. residual magnitude to become fully colored. This will return Null if it's
+   *   undefined.
+   */
+  double MosaicControlNetTool::maxMovementColorResidualMagnitude() const {
+    double result = Null;
+
+    if (!IsSpecial(m_residualMagnitude))
+      result = m_residualMagnitude;
+
+    return result;
+  }
+
+
+  /**
+   * Convert a MovementColorSource to a string for serialization purposes.
+   */
+  QString MosaicControlNetTool::toString(MovementColorSource source) {
+    QString result;
+
+    switch (source) {
+      case NoMovement:
+        result = "No movement arrows";
+        break;
+
+      case NoColor:
+        result = "Black movement arrows";
+        break;
+
+      case MeasureCount:
+        result = "Movement arrows colored by measure count";
+        break;
+
+      case ResidualMagnitude:
+        result = "Movement arrows colored by residual magnitude";
+        break;
+    }
+
+    return result;
+  }
+
+
+  /**
+   * Convert a string back to a MovementColorSource (for serialization purposes).
+   */
+  MosaicControlNetTool::MovementColorSource MosaicControlNetTool::fromMovementColorSourceString(
+      QString string) {
+    MovementColorSource result = NoMovement;
+
+    for (int i = 0; i < NUM_MOVEMENT_COLOR_SOURCE_VALUES; i++) {
+      if (string.toLower() == toString((MovementColorSource)i).toLower()) {
+        result = (MovementColorSource)i;
+      }
+    }
+
+    return result;
   }
 
 
@@ -190,8 +324,8 @@ namespace Isis {
     if (m_randomizeColors)
       actionLayout->addWidget(m_randomizeColors);
 
-    if (m_displayArrows)
-      actionLayout->addWidget(m_displayArrows);
+    if (m_configMovement)
+      actionLayout->addWidget(m_configMovement);
 
     if (m_closeNetwork)
       actionLayout->addWidget(m_closeNetwork);
@@ -212,22 +346,23 @@ namespace Isis {
 
 
   /**
+   * Bring up a movement arrow configuration dialog
+   */
+  void MosaicControlNetTool::configMovement() {
+    MosaicControlNetToolMovementConfigDialog *configDialog =
+        new MosaicControlNetToolMovementConfigDialog(this, qobject_cast<QWidget *>(parent()));
+    configDialog->setAttribute(Qt::WA_DeleteOnClose);
+    configDialog->show();
+  }
+
+
+  /**
    * This slot opens and reopens this tool properly
    */
   void MosaicControlNetTool::updateTool() {
     if (isActive() && m_controlNetFile == "") {
       openControlNet();
     }
-  }
-
-
-  /**
-   * The user toggled the cnet visibility - re-sync the graphics item visibility
-   *   with the action.
-   */
-  void MosaicControlNetTool::displayArrows() {
-    if (m_controlNetGraphics && m_displayArrows)
-      m_controlNetGraphics->setArrowsVisible(m_displayArrows->isChecked());
   }
 
 
@@ -304,12 +439,6 @@ namespace Isis {
     if (m_displayConnectivity)
       m_displayConnectivity->setEnabled(false);
 
-    if (m_displayArrows)
-      m_displayArrows->setChecked(false);
-
-    if (m_displayArrows)
-      m_displayArrows->setEnabled(false);
-
     if (m_closeNetwork) {
       m_closeNetwork->setEnabled(false);
       m_closeNetwork->setVisible(false);
@@ -341,8 +470,8 @@ namespace Isis {
       m_closeNetwork = NULL;
     else if (obj == m_controlNetGraphics)
       m_controlNetGraphics = NULL;
-    else if (obj == m_displayArrows)
-      m_displayArrows = NULL;
+    else if (obj == m_configMovement)
+      m_configMovement = NULL;
     else if (obj == m_controlNetFileLabel)
       m_controlNetFileLabel = NULL;
     else if (obj == m_randomizeColors)
@@ -393,6 +522,10 @@ namespace Isis {
             m_controlNetFile);
         m_controlNetGraphics = new ControlNetGraphicsItem(m_controlNet,
             getWidget());
+
+        setMovementArrowColorSource(m_movementArrowColorSource,
+                                    m_measureCount, m_residualMagnitude);
+
         connect(m_controlNetGraphics, SIGNAL(destroyed(QObject *)),
                 this, SLOT(objectDestroyed(QObject *)));
       }
@@ -408,9 +541,6 @@ namespace Isis {
 
       if (m_displayConnectivity)
         m_displayConnectivity->setEnabled(true);
-
-      if (m_displayArrows)
-        m_displayArrows->setEnabled(true);
 
       if (m_closeNetwork) {
         m_closeNetwork->setEnabled(true);

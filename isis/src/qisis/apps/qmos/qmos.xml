@@ -80,5 +80,10 @@
       Added a 'Phase Angle' column to the list of opened files. This column behaves exactly
       like the other camera angle columns with respect to visibility and sorting. Fixes #1093.
     </change>
+    <change name="Steven Lambright" date="2013-01-09">
+      Added some color coding options for the jigsaw movement arrows in the control network
+      tool. You can now color code this arrows on the number of measures in a point or on the
+      maximum residual magnitude of the measures in the point. Fixes #479.
+    </change>
   </history>
 </application>
