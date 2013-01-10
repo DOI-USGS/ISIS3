@@ -85,7 +85,7 @@ namespace Isis {
     mainLayout->addWidget(m_brightestMeasureCountValueLabel, row, 0, 1, 1);
 
     m_brightestMeasureCountValueLineEdit = new QLineEdit;
-    m_brightestMeasureCountValueLineEdit->setValidator(new QIntValidator(1, INT_MAX));
+    m_brightestMeasureCountValueLineEdit->setValidator(new QIntValidator(1, INT_MAX, NULL));
     connect(m_brightestMeasureCountValueLineEdit, SIGNAL(textChanged(const QString &)),
             this, SLOT(refreshWidgetStates()));
 
@@ -102,7 +102,7 @@ namespace Isis {
     mainLayout->addWidget(m_brightestResidualMagValueLabel, row, 0, 1, 1);
 
     m_brightestResidualMagValueLineEdit = new QLineEdit;
-    m_brightestResidualMagValueLineEdit->setValidator(new QDoubleValidator(0.0, DBL_MAX, 8));
+    m_brightestResidualMagValueLineEdit->setValidator(new QDoubleValidator(0.0, DBL_MAX, 8, NULL));
     connect(m_brightestResidualMagValueLineEdit, SIGNAL(textChanged(const QString &)),
             this, SLOT(refreshWidgetStates()));
 
