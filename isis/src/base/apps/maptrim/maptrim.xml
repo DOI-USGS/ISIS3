@@ -69,6 +69,11 @@
       tests to test getting the lat/lon range from the cube labels and the
       processing of level 1 images.
     </change>
+    <change name="Kimberly Oyama" date="2013-1-14">
+      Changed the temporary file name to be unique between executions so there
+      are no conflicts when multiple instances of the program are running. Added
+      an app test to exercise this change. Fixes #1216.
+    </change>      
   </history>
 
   <oldName>
