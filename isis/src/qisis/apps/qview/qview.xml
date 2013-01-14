@@ -113,5 +113,12 @@
       Fixed bug in the match tool which caused qview to to print error messages and possibly
       crash when closing cube viewports either individually or from the File Menu.
     </change>
+    <change name="Tracie Sucharski" date="2013-01-08">
+      Add the AlphaCube to the labels of and exported cropped cube.  Fixes #706.
+    </change>
+    <change name="Tracie Sucharski" date="2013-01-08">
+      Fixed bug when saving a cube viewport that is displayed at full resolution,  the application
+      would seg fault.  Fixes #1386.
+    </change>
   </history>
 </application>
