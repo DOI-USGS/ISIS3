@@ -39,6 +39,11 @@ namespace Isis {
    *                            to be solved at a later date). Fixes #854.
    *   @history  2012-06-04 Steven Lambright - Fixed a problem with the save button. References
    *                            #854.
+   *   @history  2013-01-07 Tracie Sucharski - Added AlphaCube to output cube for saving the
+   *                            full resolution viewport image.  Fixes # 706.
+   *   @history  2013-01-09 Tracie Sucharski - Fixed saveAsCubeByOption which was not creating the
+   *                            cube for the case where the scale was 1 and saveAs_FullResolution
+   *                            was being called without an initialized ocube.  Fixes #1386.
    */
   class FileTool : public Tool {
       Q_OBJECT

@@ -27,6 +27,7 @@
 #include "Pvl.h"
 #include "Reduce.h"
 #include "SaveAsDialog.h"
+#include "SubArea.h"
 #include "Workspace.h"
 
 namespace Isis {
@@ -329,7 +330,11 @@ namespace Isis {
     icube->open(cubeViewport()->cube()->fileName(), "rw");
     Cube *ocube = NULL;
 
-    if(p_saveAsDialog->getSaveAsType() != SaveAsDialog::ExportAsIs) {
+    // The output cube needs to be created if the scale is 1 since saveAs_FullResolution will be
+    //  called, which expects a cube.  
+    //  NOTE:  This really should be cleaned up and the cube should be created in 1 place.
+    if(p_saveAsDialog->getSaveAsType() != SaveAsDialog::ExportAsIs ||
+       p_lastViewport->scale() == 1) {
       //Create the output cube
       ocube = new Cube;
     }
@@ -345,7 +350,8 @@ namespace Isis {
       double dStartSample=0, dEndSample=0, dStartLine=0, dEndLine=0;
       p_lastViewport->getCubeArea(dStartSample, dEndSample, dStartLine, dEndLine);
 
-      if(p_saveAsDialog->getSaveAsType() == SaveAsDialog::ExportFullRes || p_lastViewport->scale() == 1) {
+      if(p_saveAsDialog->getSaveAsType() == SaveAsDialog::ExportFullRes ||
+         p_lastViewport->scale() == 1) {
         int numSamples = (int)ceil(dEndSample-dStartSample);
         int numLines = (int)ceil(dEndLine-dStartLine);
         copyCubeDetails(psOutFile, icube, ocube, numSamples, numLines, icube->bandCount());
@@ -655,6 +661,22 @@ namespace Isis {
     double dStartSample=0, dEndSample=0, dStartLine=0, dEndLine=0;
     p_lastViewport->getCubeArea(dStartSample, dEndSample, dStartLine, dEndLine);
     int iNumBands   = pInCube->bandCount();
+
+    PvlGroup results("Results");
+    results += PvlKeyword("InputLines",      toString(pInCube->lineCount()));
+    results += PvlKeyword("InputSamples",    toString(pInCube->sampleCount()));
+    results += PvlKeyword("StartingLine",    toString(dStartLine));
+    results += PvlKeyword("StartingSample",  toString(dStartSample));
+    results += PvlKeyword("EndingLine",      toString(dEndLine));
+    results += PvlKeyword("EndingSample",    toString(dEndSample));
+    results += PvlKeyword("LineIncrement",   toString(1));
+    results += PvlKeyword("SampleIncrement", toString(1));
+    results += PvlKeyword("OutputLines",     toString(pNumSamples));
+    results += PvlKeyword("OutputSamples",   toString(pNumLines));
+    SubArea subArea;
+    subArea.SetSubArea(pInCube->lineCount(), pInCube->sampleCount(), dStartLine, dStartSample,
+                       dEndLine, dEndSample, 1.0, 1.0);
+    subArea.UpdateLabel(pInCube, pOutCube, results);
 
     Portal iPortal (pNumSamples, 1, pInCube->pixelType());
     Portal oPortal (pNumSamples, 1, pOutCube->pixelType());
