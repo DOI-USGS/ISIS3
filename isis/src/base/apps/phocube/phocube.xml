@@ -243,6 +243,9 @@
     <change name="Ella Mae Lee" date="2012-11-15">
        Improved documentation, fixes #1254.
     </change>
+    <change name="Tracie Sucharski" date="2013-01-10">
+      Allow input cubes without the BandBin label group.  Fixes #929.
+    </change>
 </history>
 
   <category>

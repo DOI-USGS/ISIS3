@@ -2,6 +2,7 @@
 
 #include "Angle.h"
 #include "Camera.h"
+#include "Cube.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
 #include "ProcessByBrick.h"
@@ -149,11 +150,17 @@ void IsisMain() {
     throw IException(IException::User, message, _FILEINFO_);
   }
 
-  // Retrieve the orignal values from the input cube band
-  PvlGroup &mybb = icube->group("BandBin");
-  QString bname("DN");
-  if ( mybb.HasKeyword("Name") ) {
-    bname = mybb["Name"][0];
+  // If outputting a a dn band, retrieve the orignal values for the filter name from the input cube,
+  // if it exists.  Otherwise, the default will be "DN"
+  QString bname = "DN";
+  if ( dn && icube->hasGroup("BandBin") ) {
+    PvlGroup &mybb = icube->group("BandBin");
+    if ( mybb.HasKeyword("Name") ) {
+      bname = mybb["Name"][0];
+    }
+    else if ( mybb.HasKeyword("FilterName") ) {
+      bname = mybb["FilterName"][0];
+    }
   }
 
   // Create a bandbin group for the output label
