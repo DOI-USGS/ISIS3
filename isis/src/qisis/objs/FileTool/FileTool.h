@@ -44,6 +44,9 @@ namespace Isis {
    *   @history  2013-01-09 Tracie Sucharski - Fixed saveAsCubeByOption which was not creating the
    *                            cube for the case where the scale was 1 and saveAs_FullResolution
    *                            was being called without an initialized ocube.  Fixes #1386.
+   *   @history  2013-01-17 Tracie Sucharski - Fixed some round-off errors when calculating
+   *                            output lines/samples.  Fixed printing of Results pvl group where
+   *                            samples and lines were swapped.  References #1385.
    */
   class FileTool : public Tool {
       Q_OBJECT

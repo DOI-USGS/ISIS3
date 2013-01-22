@@ -32,6 +32,12 @@ namespace Isis {
    *                           $temporary variable instead of /tmp directory.
    *   @history 2012-02-01 Sharmila Prasad - Remove unused band data member
    *                           Fixes #00681
+   *   @history 2013-01-16  Tracie Sucharski - Fixed bug caused by a round off error when
+   *                           calculating scales when output line and sample are entered.  This
+   *                           resulted in output bands beyond band 1 being NULL in the output cube.
+   *                           This only happened with certain values of output lines and scales.
+   *                           Also, fixed the the swapping of output samples and lines in the
+   *                           Results group in the print.prt file.  Fixes #1385.
    */
   class Reduce {
   public:

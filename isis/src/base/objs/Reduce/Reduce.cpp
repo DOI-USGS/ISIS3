@@ -15,6 +15,13 @@ namespace Isis {
    * @param psBands     - Bands list
    * @param sampleScale - Sample scale
    * @param lineScale   - Line scale
+   *  
+   * @internal 
+   *   @history 2013-01-16  Tracie Sucharski - Use rounding instead of ceil function to prevent
+   *                           errors that were caused by round off.  The reduce application
+   *                           would get ons, onl from the user, calculate scale and pass the scale
+   *                           in to this class, which would calculate ons, onl, which could be
+   *                           different from the user entered values.
    */
   Reduce::Reduce(Isis::Cube *pInCube, const double sampleScale, const double lineScale)
   {
@@ -38,8 +45,8 @@ namespace Isis {
     mdLineScale   = lineScale;
 
     // Calculate output size based on the sample and line scales
-    miOutputSamples = (int)ceil((double)(miInputSamples) / mdSampleScale);
-    miOutputLines   = (int)ceil((double)(miInputLines) / mdLineScale);
+    miOutputSamples = (int)((double)miInputSamples / mdSampleScale + 0.5);
+    miOutputLines   = (int)((double)miInputLines / mdLineScale + 0.5);
     
     // Initialize the input portal
     m_iPortal = new Isis::Portal(miInputSamples, 1, mInCube->pixelType());
@@ -62,7 +69,14 @@ namespace Isis {
    * @param startSample - input image start sample
    * @param endSample   - input image end sample
    * @param startLine   - input image start line
-   * @param endLine     - input image end line
+   * @param endLine     - input image end line 
+   *  
+   * @internal 
+   *   @history 2013-01-16  Tracie Sucharski - Use rounding instead of ceil function to prevent
+   *                           errors that were caused by round off.  The reduce application
+   *                           would get ons, onl from the user, calculate scale and pass the scale
+   *                           in to this class, which would calculate ons, onl, which could be
+   *                           different from the user entered values.
    */
   void Reduce::setInputBoundary(int startSample, int endSample, int startLine, int endLine){
     miStartSample  = startSample;
@@ -75,8 +89,8 @@ namespace Isis {
     mdLine       = miStartLine;  
 
     // Calculate output size based on the sample and line scales
-    miOutputSamples = (int)ceil((double)(miInputSamples) / mdSampleScale);
-    miOutputLines   = (int)ceil((double)(miInputLines) / mdLineScale);
+    miOutputSamples = (int)((double)miInputSamples / mdSampleScale + 0.5);
+    miOutputLines   = (int)((double)miInputLines / mdLineScale + 0.5);
   }
   
   /**
@@ -105,8 +119,8 @@ namespace Isis {
     resultsGrp += PvlKeyword("EndingSample",    toString(miEndSample));
     resultsGrp += PvlKeyword("LineIncrement",   toString(mdLineScale));
     resultsGrp += PvlKeyword("SampleIncrement", toString(mdSampleScale));
-    resultsGrp += PvlKeyword("OutputLines",     toString(miOutputSamples));
-    resultsGrp += PvlKeyword("OutputSamples",   toString(miOutputLines));
+    resultsGrp += PvlKeyword("OutputLines",     toString(miOutputLines));
+    resultsGrp += PvlKeyword("OutputSamples",   toString(miOutputSamples));
    
     Isis::SubArea subArea;
     subArea.SetSubArea(mInCube->lineCount(), mInCube->sampleCount(), miStartLine, miStartSample, 

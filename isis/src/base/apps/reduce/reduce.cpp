@@ -50,8 +50,8 @@ void IsisMain() {
     else {
       sscale = ui.GetDouble("SSCALE");
       lscale = ui.GetDouble("LSCALE");
-      ons = (int)ceil((double)ins / sscale);
-      onl = (int)ceil((double)inl / lscale);
+      ons = (int)((double)ins / sscale + 0.5);
+      onl = (int)((double)inl / lscale + 0.5);
     }
 
     if(ons > ins || onl > inl) {

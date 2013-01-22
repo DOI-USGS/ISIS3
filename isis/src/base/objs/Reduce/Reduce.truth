@@ -10,8 +10,8 @@ Group = Results
   EndingSample    = 126
   LineIncrement   = 4.0
   SampleIncrement = 3.0
-  OutputLines     = 42
-  OutputSamples   = 32
+  OutputLines     = 32
+  OutputSamples   = 42
 End_Group
 
 Reduce by Average
@@ -26,6 +26,6 @@ Group = Results
   EndingSample    = 126
   LineIncrement   = 4.0
   SampleIncrement = 3.0
-  OutputLines     = 42
-  OutputSamples   = 32
+  OutputLines     = 32
+  OutputSamples   = 42
 End_Group

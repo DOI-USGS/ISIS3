@@ -89,6 +89,10 @@
     <change name="Sharmila Prasad" date="2012-02-01">
       Fixed bug #0000681 - reduce in ISIS 3.3.0 is ignoring the +N band identifier 
     </change>
+    <change name="Tracie Sucharski" date="2013-01-16">
+      Fixed an intermittent bug which caused a round off error which resulted in the output bands
+      beyond band 1 being all NULL.  Fixes #1385.
+    </change>
     </history> 
 
   <category>
