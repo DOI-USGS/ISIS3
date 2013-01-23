@@ -34,7 +34,7 @@ void IsisMain() {
   try {
     for(int i = 0; i < cubeList.size(); i++) {
       Cube cube;
-      CubeAttributeInput inatt(cubeList[i].toString());
+      CubeAttributeInput inatt(cubeList[i].original());
       vector<QString> bands = inatt.bands();
       cube.setVirtualBands(bands);
       cube.open(cubeList[i].toString());
