@@ -21,10 +21,13 @@
       Fixed a memory error that came to light when adding support for
       Mac OSX10.8. References #1354.
     </change>
+    <change name="Lynn Weller" date="2012-01-22">
+      Application category name changed from Import and Export to Apollo.  Fixes mantis ticket #951.
+    </change>
   </history>
 
   <category>
-    <categoryItem>Import and Export</categoryItem>
+    <missionItem>Apollo</missionItem>
   </category>
 
   <seeAlso>

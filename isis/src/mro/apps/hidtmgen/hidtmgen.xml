@@ -16,7 +16,7 @@
   </description>
 
   <category>
-    <categoryItem>Import and Export</categoryItem>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
   </category>
 
   <seeAlso>
@@ -33,6 +33,9 @@
   <history>
     <change name="Mackenzie Boyd" date="2011-05-13">
       0riginal Version
+    </change>
+    <change name="Lynn Weller" date="2012-01-22">
+      Application category name changed from Import and Export to Mars Reconnaissance Orbiter.  Fixes mantis ticket #951.
     </change>
   </history>
   

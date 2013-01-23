@@ -27,12 +27,15 @@
   </description>
 
   <category>
-    <categoryItem>Trim and Mask</categoryItem>
+    <missionItem>Mars Reconnaissance Orbiter</missionItem>
   </category>
 
   <history>
     <change name="Jeannie Backer" date="2012-11-21">
       Original version
+    </change>
+    <change name="Lynn Weller" date="2012-01-22">
+      Application category name changed from Trim and Mask to Mars Reconnaissance Orbiter.  Fixes mantis ticket #951.
     </change>
   </history>
 

@@ -3,14 +3,14 @@
 <application name="apollopanstitcher" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
 
   <brief>
-    Stiches together the typically eight individual scans of an Apollo Panoramic Image
+    Stitches together the typically eight individual scans of an Apollo Panoramic Image
   </brief>
 
   <description>
     This program uses the Selection and CentroidApolloPan classes to find the centers of the fiducial marks along the image segments.  Conjugate fiducial marks between segments are used
-	to calculate transformations to united the segments.  The transformation math model is limited to three parameters (2 transformations and 1 rotation) because it is unlikely the
-	film is undergoing any measureable demensional changes during the scanning.  Thus, the intent of this program is to stich together the image that would have been produced had there
-	been a large enough scaner, and not to correct for any film degradation or other systematic error sources.  Those corrections are left to the camera model.
+	to calculate transformations to unite the segments.  The transformation math model is limited to three parameters (2 transformations and 1 rotation) because it is unlikely the
+	film is undergoing any measureable dimensional changes during the scanning.  Thus, the intent of this program is to stitch together the image that would have been produced had there
+	been a large enough scanner, and not to correct for any film degradation or other systematic error sources.  Those corrections are left to the camera model.
   </description>
 
   <history>
@@ -30,10 +30,13 @@
       but the stitching was incorrect (pixels would be in the wrong place). This was a general
       failure, not caused by a particular input or set of parameter values. Fixes #1053.
     </change>
+    <change name="Lynn Weller" date="2012-01-22">
+      Application category name changed from Import and Export to Apollo.  Fixes mantis ticket #951.
+    </change>
   </history>
 
   <category>
-    <categoryItem>Import and Export</categoryItem>
+    <missionItem>Apollo</missionItem>
   </category>
 
    <groups>
