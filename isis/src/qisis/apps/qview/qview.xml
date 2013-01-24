@@ -120,5 +120,8 @@
       Fixed bug when saving a cube viewport that is displayed at full resolution,  the application
       would seg fault.  Fixes #1386.
     </change>
+    <change name="Steven Lambright" date="2013-01-24">
+      Fixed spatial plot tool functionality on single line images. Fixes #997.
+    </change>
   </history>
 </application>

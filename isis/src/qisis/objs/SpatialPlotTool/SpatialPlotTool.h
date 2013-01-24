@@ -41,6 +41,8 @@ namespace Isis {
    *                           Fixes #234.
    *   @history 2011-07-03 Steven Lambright - Added options for plotting meters/kilometers
    *                           on the x-axis instead of just pixel number. Fixes #853.
+   *   @history 2013-01-24 Steven Lambright - Fixed positioning of portal/interpolator used
+   *                           when reading DN data to create a plot. Fixes #997.
    */
   class SpatialPlotTool : public AbstractPlotTool {
       Q_OBJECT

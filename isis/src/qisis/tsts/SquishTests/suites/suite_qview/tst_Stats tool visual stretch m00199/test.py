@@ -46,8 +46,10 @@ def main():
     clickButton(waitForObject(":Display Mode.Show Pixel Values_QRadioButton"))
     test.vp("stretchedDnDisplay")
     
+    clickButton(waitForObject(":qview.Spatial Plot Tool_QToolButton"))
+    mouseDrag(waitForObject(":viewport1_contents"), 63, 94, 250, 0, 1, Qt.LeftButton)
+    test.vp("spatialPlot")
     sendEvent("QCloseEvent", waitForObject(":qview_Isis::ViewportMainWindow"))
-
 
     snooze(1)
     

@@ -362,15 +362,16 @@ namespace Isis {
           double sample = (index / (double)lineLength) * (endSample - startSample) +
                      startSample;
           // move back for interpolation
-          sample -= (interp.Samples() / 2.0);
+          sample -= (interp.Samples() / 2.0 - 0.5);
 
           double line = (index / (double)lineLength) * (endLine - startLine) +
                      startLine;
-          line -= (interp.Lines() / 2.0);
+          line -= (interp.Lines() / 2.0 - 0.5);
 
           dataReader.SetPosition(sample, line, band);
           cvp->cube()->read(dataReader);
-          double result = interp.Interpolate(sample, line, dataReader.DoubleBuffer());
+
+          double result = interp.Interpolate(sample + 0.5, line + 0.5, dataReader.DoubleBuffer());
 
           if (!IsSpecial(result)) {
             double plotXValue = index + 1;
@@ -483,11 +484,11 @@ namespace Isis {
           double sample = (index / (double)rectangleLength) * lengthVectorSample +
                      clickSample;
           // move back for interpolation
-          sample -= (interp.Samples() / 2.0);
+          sample -= (interp.Samples() / 2.0 - 0.5);
 
           double line = (index / (double)rectangleLength) * lengthVectorLine +
                      clickLine;
-          line -= (interp.Lines() / 2.0);
+          line -= (interp.Lines() / 2.0 - 0.5);
 
           double sampleMid = sample + (acrossLength / 2.0) * sampleStepAcross;
           double lineMid = line + (acrossLength / 2.0) * lineStepAcross;
@@ -497,7 +498,7 @@ namespace Isis {
               acrossPixel++) {
             dataReader.SetPosition(sample, line, band);
             cvp->cube()->read(dataReader);
-            double pixelValue = interp.Interpolate(sample, line,
+            double pixelValue = interp.Interpolate(sample + 0.5, line + 0.5,
                                                    dataReader.DoubleBuffer());
 
             if (!IsSpecial(pixelValue)) {
