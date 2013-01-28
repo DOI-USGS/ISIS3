@@ -23,32 +23,94 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-// TODO Qt instead
-#include <string>
 #include <vector>
 
 // TODO Don't include
 #include "FileList.h"
+// The following includes are needed since class enumerations are used as input
+// parameters (calculateStatistics)
+#include "LeastSquares.h"
+#include "OverlapNormalization.h"
 
 
 namespace Isis {
   class Buffer;
   class Cube;
   class FileList;
-  class OverlapNormalization;
   class OverlapStatistics;
   class Pvl;
   class PvlGroup;
   class Statistics;
-
-
-  /**
+  /** 
+   * This class can be used to calculate, read in, and/or apply equalization 
+   * statistics for a list of files. 
+   * <ul>
+   *   <li> Calculating equalization statistics
+   *     <ul>
+   *       <li> An optional list of images to hold may be given before
+   *       calculations.
+   *       <li> In order to calculate statistics, the class will need to know
+   *       the following:
+   *       <ul>
+   *         <li>percentage of lines to be used for calculations,
+   *         <li>the minimum number of points in overlapping area to be used,
+   *         <li>whether overlapping areas should be weighted based on number of
+   *         valid pixels,
+   *         <li>whether to calculate gain, offset, or both
+   *         <li>which LeastSquares solve method.
+   *        </ul>
+   *       <li> Once calculated, these statistics can be returned as a PvlGroup,
+   *       written to a text file, and/or applied to the images in the input
+   *       file list.
+   *     </ul>
+   *   <li> Importing equalization statistics
+   *     <ul>
+   *       <li> Statistics may be imported from a given file name and then
+   *       applied to the images in the input file list.
+   *     </ul>
+   *   <li> Applying equalization statistics
+   *     <ul>
+   *       <li> Statistics must be calculated or imported before they can be
+   *       applied to the images in the input file list.
+   *     </ul>
+   * </ul> 
+   * 
+   * Code example for calculating statistics, writing results to a Pvl, writing 
+   * results to a file, and applying results: 
+   * <code> 
+   * Equalization eq(inputCubeListFileName); 
+   * // calculate 
+   * eq.addHolds(holdListFileName); 
+   * eq.calculateStatistics(sampPercent, mincnt, wtopt, sType, methodType); 
+   * // write to PvlGroup 
+   * PvlGroup resultsGroup = eq.getResults(); 
+   * // write to file 
+   * eq.write(outputStatisticsFileName); 
+   * // apply corrections to cubes in input list  
+   * eq.applyCorrection(); 
+   * </code> 
+   *  
+   * Code example for importing statistics and applying them. 
+   * <code> 
+   * Equalization eq(listFileName); 
+   * eq.importStatistics(inputStatisticsFileName); 
+   * // create new output cubes from equalized cube list and apply corrections 
+   * eq.applyCorrection(equalizedCubeListFileName); 
+   * </code> 
+   *  
+   * This class contains the classes ImageAdjustment, CalculateFunctor, and 
+   * ApplyFunctor. 
+   *  
+   *  
    * @author ????-??-?? Unknown
    *
    * @internal
    *   @history 2012-04-26 Jeannie Backer - Added includes to Filelist, Pvl,
    *                           PvlGroup, and Statistics classes to the
    *                           implementation file.
+   *   @history 2013-01-29 Jeannie Backer - Added input parameter to 
+   *                           calculateStatistics() method. Added error catch
+   *                           to improve thrown message. Fixes #962.
    */
   class Equalization {
     protected:
@@ -149,7 +211,8 @@ namespace Isis {
       void addHolds(QString holdListName);
 
       void calculateStatistics(double sampPercent, int mincnt,
-          bool wtopt, int sType);
+          bool wtopt, OverlapNormalization::SolutionType sType, 
+          LeastSquares::SolveMethod methodType);
       void importStatistics(QString instatsFileName);
       void applyCorrection(QString toListName);
 

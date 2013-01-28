@@ -24,7 +24,10 @@
 
 #include <iomanip>
 
+#include "BasisFunction.h"
 #include "IException.h"
+#include "LeastSquares.h"
+#include "Statistics.h"
 
 using namespace std;
 
@@ -144,11 +147,12 @@ namespace Isis {
   }
 
   /**
-   * Attempts to solve the least squares equation for all data
-   * sets, and returns the success or failure of that attempt.
+   * Attempts to solve the least squares equation for all data sets. 
    *
-   * @param type The enumeration clarifying whether the offset,
-   *             gain, or both should be solved here
+   * @param type The enumeration clarifying whether the offset, gain, or both 
+   *             should be solved here
+   * @param method The enumeration clarifying the LeastSquares::SolveMethod to 
+   *             be used.
    *
    * @return bool Is the least squares equation now solved
    *
@@ -156,10 +160,11 @@ namespace Isis {
    *             holds must be greater than the number of data
    *             sets
    */
-  void OverlapNormalization::Solve(SolutionType type) {
+  void OverlapNormalization::Solve(SolutionType type, 
+                                   LeastSquares::SolveMethod method) {
     // Make sure that there is at least one overlap
     if (m_overlapList.size() == 0) {
-      std::string msg = "None of the input images overlap";
+      string msg = "None of the input images overlap";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -167,9 +172,24 @@ namespace Isis {
     // number of input images (otherwise the least squares equation will be
     // unsolvable due to having more unknowns than knowns)
     if (m_overlapList.size() + m_idHoldList.size() < m_statsList.size()) {
-      std::string msg = "The number of overlaps and holds must be greater than";
-      msg += " the number of input images";
+      string msg = "Unable to normalize overlaps. The number of overlaps and "
+                   "holds must be greater than the number of input images";
       throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    if ( method == LeastSquares::SPARSE ) {
+      m_offsetLsq = NULL;
+      m_gainLsq = NULL;
+      delete m_offsetLsq;
+      delete m_gainLsq;
+      int sparseMatrixRows = m_overlapList.size() + m_idHoldList.size();
+      int sparseMatrixCols = m_offsetFunction->Coefficients();
+      m_offsetLsq = new LeastSquares(*m_offsetFunction, true, sparseMatrixRows, sparseMatrixCols, true);
+      sparseMatrixCols = m_gainFunction->Coefficients();
+      m_gainLsq = new LeastSquares(*m_gainFunction, true, sparseMatrixRows, sparseMatrixCols, true);
+      const std::vector<double> alphaWeight(sparseMatrixCols, 1/1000.0);
+      m_offsetLsq->SetParameterWeights( alphaWeight );
+      m_gainLsq->SetParameterWeights( alphaWeight );
     }
 
     // Calculate offsets
@@ -203,7 +223,7 @@ namespace Isis {
       // Solve the least squares and get the offset coefficients to apply to the
       // images
       m_offsets.resize(m_statsList.size());
-      m_offsetLsq->Solve(Isis::LeastSquares::QRD);
+      m_offsetLsq->Solve(method);
       for (int i = 0; i < m_offsetFunction->Coefficients(); i++) {
         m_offsets[i] = m_offsetFunction->Coefficient(i);
       }
@@ -255,7 +275,7 @@ namespace Isis {
       // Solve the least squares and get the gain coefficients to apply to the
       // images
       m_gains.resize(m_statsList.size());
-      m_gainLsq->Solve(Isis::LeastSquares::QRD);
+      m_gainLsq->Solve(method);
       for (int i = 0; i < m_gainFunction->Coefficients(); i++) {
         m_gains[i] = exp(m_gainFunction->Coefficient(i));
       }

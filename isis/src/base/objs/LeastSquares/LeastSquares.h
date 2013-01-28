@@ -108,7 +108,8 @@ namespace Isis {
    *                            it to the p_sqrtweight vector.
    *   @history  2010-04-20 Debbie A. Cook, Replaced SparseReset with Reset
    *                            to reset all solution methods
-   *   @history  2010-11-22 Debbie A. Cook, Merged with Ken Edmundson version
+   *   @history  2010-11-22 Debbie A. Cook - Merged with Ken Edmundson version
+   *   @history  2013-12-29 Jeannie Backer - Improved error messages. Fixes #962.
    *
    */
   class LeastSquares {

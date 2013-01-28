@@ -60,8 +60,9 @@ int main(int argc, char *argv[]) {
     int mincount = 1000;
     bool weight = false;
     OverlapNormalization::SolutionType adjust = OverlapNormalization::Both;
+    LeastSquares::SolveMethod solvemethod = LeastSquares::QRD;
 
-    equalizer.calculateStatistics(percent, mincount, weight, adjust);
+    equalizer.calculateStatistics(percent, mincount, weight, adjust, solvemethod);
 
     // Open input cube
     FileList imageList(fromList);
