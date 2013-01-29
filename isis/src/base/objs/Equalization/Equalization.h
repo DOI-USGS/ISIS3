@@ -111,6 +111,9 @@ namespace Isis {
    *   @history 2013-01-29 Jeannie Backer - Added input parameter to 
    *                           calculateStatistics() method. Added error catch
    *                           to improve thrown message. Fixes #962.
+   *   @history 2013-01-29 Jeannie Backer - Fixed bugs from previous checkin.
+   *                           Improved test coverage by more than 23% for each
+   *                           coverage type.
    */
   class Equalization {
     protected:

@@ -199,9 +199,9 @@ namespace Isis {
 
         for (unsigned int img = 0; img < m_adjustments.size(); img++) {
           m_adjustments[img]->addGain(oNormList[band]->Gain(img));
-          if (oNormList[band] == 0.0) {
+          if (qFuzzyCompare(oNormList[band]->Gain(img), 0.0)) {// if gain == 0
             throw IException(IException::Unknown, 
-                             "Calculation for equalization statistics failed. Gain = 0."
+                             "Calculation for equalization statistics failed. Gain = 0.",
                              _FILEINFO_);
           }
           m_adjustments[img]->addOffset(oNormList[band]->Offset(img));
