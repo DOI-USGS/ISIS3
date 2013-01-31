@@ -123,5 +123,8 @@
     <change name="Steven Lambright" date="2013-01-24">
       Fixed spatial plot tool functionality on single line images. Fixes #997.
     </change>
+    <change name="Steven Lambright" date="2013-01-31">
+      Improved upon the accuracy of the find tool's sync scale option. Fixes #953.
+    </change>
   </history>
 </application>
