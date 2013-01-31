@@ -37,6 +37,8 @@ namespace Isis {
    *                           movementArrowColorSource(), maxMovementColorMeasureCount(),
    *                           maxMovementColorResidualMagnitude(), toString(),
    *                           and fromMovementColorSourceString(). Fixes #479.
+   *   @history 2013-01-31 Steven Lambright - Removed some debugging statements that were left
+   *                           around from the last change. Fixes #1459.
    */
   class MosaicControlNetTool : public MosaicTool {
       Q_OBJECT

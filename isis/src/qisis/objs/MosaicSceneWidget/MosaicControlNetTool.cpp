@@ -128,9 +128,6 @@ namespace Isis {
 
   PvlObject MosaicControlNetTool::toPvl() const {
     PvlObject obj(projectPvlObjectName());
-    qDebug() << "Warning: Project file should not be used with other versions of Isis";
-    obj.AddComment("This was created by mantis ticket #479 - intermediate version - this project "
-                   "format is not supported");
 
     obj += PvlKeyword("FileName", m_controlNetFile);
     obj += PvlKeyword("Visible",
