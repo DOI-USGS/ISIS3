@@ -1171,7 +1171,7 @@ namespace Isis {
 
       if(!mapping.HasKeyword("MinimumLongitude")) {
         if(mapping["LongitudeDomain"][0] == "360")
-          mapping += PvlKeyword("MinimumLongitude", 0);
+          mapping += PvlKeyword("MinimumLongitude", toString(0));
         else
           mapping += PvlKeyword("MinimumLongitude", toString(-180));
       }
