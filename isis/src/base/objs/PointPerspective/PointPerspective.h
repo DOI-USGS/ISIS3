@@ -22,7 +22,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "Projection.h"
+#include "TProjection.h"
 
 namespace Isis {
   class Pvl;
@@ -54,8 +54,10 @@ namespace Isis {
    *                           the implementation file.
    *   @history 2012-06-15 Jeannie Backer - Minor modifications to comply with
    *                           some coding standards. References #928.
+   *   @history 2012-01-20 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *                           References #775.
    */
-  class PointPerspective : public Projection {
+  class PointPerspective : public TProjection {
     public:
       PointPerspective(Pvl &label, bool allowDefaults = false);
       ~PointPerspective();

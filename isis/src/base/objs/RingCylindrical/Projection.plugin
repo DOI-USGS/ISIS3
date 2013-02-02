@@ -1,0 +1,6 @@
+Group = RingCylindrical
+  Library = RingCylindrical
+  Routine = RingCylindricalPlugin
+  Keyword = CenterLongitude
+EndGroup
+ 

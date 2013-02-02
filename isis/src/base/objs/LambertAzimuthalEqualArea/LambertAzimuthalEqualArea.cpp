@@ -31,7 +31,7 @@
 #include "Constants.h"
 #include "IException.h"
 #include "IString.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
@@ -78,7 +78,7 @@ namespace Isis {
   LambertAzimuthalEqualArea::LambertAzimuthalEqualArea(
       Pvl &label, 
       bool allowDefaults) :
-      Projection::Projection(label) {
+      TProjection::TProjection(label) {
     try {
       // This algorithm can be found in the USGS Professional Paper 1395
       // Map Projections--A Working Manual by John P. Snyder
@@ -170,7 +170,7 @@ namespace Isis {
    */
   bool LambertAzimuthalEqualArea::operator== (const Projection &proj) {
     if (!Projection::operator==(proj)) return false;
-    // don't do the below it is a recusive plunge
+    // don't do the below it is a recursive plunge
     //  if (Projection::operator!=(proj)) return false;
     LambertAzimuthalEqualArea *lama = (LambertAzimuthalEqualArea *) &proj;
     if ((lama->m_phi1 != m_phi1) ||
@@ -1250,7 +1250,7 @@ namespace Isis {
    *   @history 2012-07-25 Jeannie Backer - Original version.
    */
   PvlGroup LambertAzimuthalEqualArea::Mapping() {
-    PvlGroup mapping = Projection::Mapping();
+    PvlGroup mapping = TProjection::Mapping();
 
     mapping += m_mappingGrp["CenterLatitude"];
     mapping += m_mappingGrp["CenterLongitude"];
@@ -1276,7 +1276,7 @@ namespace Isis {
    *   @history 2012-07-25 Jeannie Backer - Original version.
    */
   PvlGroup LambertAzimuthalEqualArea::MappingLatitudes() {
-    PvlGroup mapping = Projection::MappingLatitudes();
+    PvlGroup mapping = TProjection::MappingLatitudes();
 
     mapping += m_mappingGrp["CenterLatitude"];
 
@@ -1301,7 +1301,7 @@ namespace Isis {
    *   @history 2012-07-25 Jeannie Backer - Original version.
    */
   PvlGroup LambertAzimuthalEqualArea::MappingLongitudes() {
-    PvlGroup mapping = Projection::MappingLongitudes();
+    PvlGroup mapping = TProjection::MappingLongitudes();
 
     mapping += m_mappingGrp["CenterLongitude"];
 

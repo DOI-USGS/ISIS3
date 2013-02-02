@@ -6,7 +6,7 @@
 #include "FileName.h"
 #include "IString.h"
 #include "ProcessExportPds.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "Pvl.h"
 #include "PvlFormatPds.h"
@@ -100,7 +100,7 @@ void IsisMain() {
     isEquirectangular = true;
 
     // Get projection and use radius for new radius
-    Projection * proj = ProjectionFactory::CreateFromCube(*inCube);
+    TProjection * proj = (TProjection *) ProjectionFactory::CreateFromCube(*inCube);
     newRadius = proj->LocalRadius((double)mapping["CENTER_LATITUDE"]);
 
     // Convert radius to KM
@@ -428,7 +428,7 @@ void IsisMain() {
 
     if (isEquirectangular) {
       // Get projection and use radius for new radius
-      Projection * proj = ProjectionFactory::CreateFromCube(*orthoInCube);
+      TProjection * proj = (TProjection *) ProjectionFactory::CreateFromCube(*orthoInCube);
       newRadius = proj->LocalRadius((double)orthoMap["CENTER_LATITUDE"]);
 
       // Convert radius to KM

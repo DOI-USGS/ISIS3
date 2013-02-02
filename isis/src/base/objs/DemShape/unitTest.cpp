@@ -215,7 +215,7 @@ Local normal = -0.581842, -0.703663, 0.407823
   cout << endl << "  Testing method calculateLocalNormal with magnitude = 0" << endl;
   shape.calculateLocalNormal(neighborPoints);
   myNormal = shape.normal();
-  cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << endl;
+  cout << "    local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
   }
   catch(Isis::IException &e) {
     e.print();

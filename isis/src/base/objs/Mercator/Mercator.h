@@ -22,7 +22,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "Projection.h"
+#include "TProjection.h"
 
 namespace Isis {
   class Pvl;
@@ -66,9 +66,11 @@ namespace Isis {
    *                           Name, Version, IsEquatorialCylindrical, and
    *                           TrueScaleLatitude to the implementation file.
    *                           Minor modifications to comply with some coding
-                               standards. References #928.
+   *                           standards. References #928.
+   *   @history 2012-01-20 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *                           References #775.
    */
-  class Mercator : public Projection {
+  class Mercator : public TProjection {
     public:
       Mercator(Pvl &label, bool allowDefaults = false);
       ~Mercator();

@@ -27,7 +27,7 @@
 #include "IException.h"
 #include "ProcessByLine.h"
 #include "Preference.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
@@ -206,8 +206,8 @@ namespace Isis {
 
       // See if the cube has a projection and make sure it matches
       // previous input cubes
-      Projection *projNew =
-          Isis::ProjectionFactory::CreateFromCube(*(cube.getLabel()));
+      TProjection *projNew =
+        (TProjection *) Isis::ProjectionFactory::CreateFromCube(*(cube.getLabel()));
       if ((proj != NULL) && (*proj != *projNew)) {
         string msg = "Mapping groups do not match between cubes [" +
                      propagationCubes[0].toString() + "] and [" + propagationCubes[i].toString() + "]";

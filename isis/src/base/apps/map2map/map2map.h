@@ -7,11 +7,13 @@
  * @author ????-??-?? Unknown
  *
  * @internal
+ *   @history 2012-12-06 Debbie A. Cook - Changed to use TProjection instead of Projection.
+ *                          References #775.
  */
 class map2map : public Isis::Transform {
   private:
-    Isis::Projection *p_inmap;
-    Isis::Projection *p_outmap;
+    Isis::TProjection *p_inmap;
+    Isis::TProjection *p_outmap;
     int p_inputSamples;
     int p_inputLines;
     bool p_trim;
@@ -21,8 +23,8 @@ class map2map : public Isis::Transform {
 
   public:
     // constructor
-    map2map(const int inputSamples, const int inputLines, Isis::Projection *inmap,
-            const int outputSamples, const int outputLines, Isis::Projection *outmap,
+    map2map(const int inputSamples, const int inputLines, Isis::TProjection *inmap,
+            const int outputSamples, const int outputLines, Isis::TProjection *outmap,
             bool trim);
 
     // destructor

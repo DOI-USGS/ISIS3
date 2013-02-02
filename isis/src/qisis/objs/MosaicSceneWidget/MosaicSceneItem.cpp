@@ -26,6 +26,7 @@
 #include "Statistics.h"
 #include "Stretch.h"
 #include "Table.h"
+#include "TProjection.h"
 
 using namespace geos::geom;
 
@@ -164,76 +165,79 @@ namespace Isis {
 
     MultiPolygon *mp;
     Projection *proj = m_scene->getProjection();
+    if (proj->projectionType() == Projection::Triaxial) {
+      TProjection *tproj = (TProjection *) proj;
 
-    // Remove current polygons from the scene
-    while(m_polygons->size()) {
-      QGraphicsPolygonItem *polyItem = m_polygons->at(0);
-      m_scene->getScene()->removeItem(polyItem);
-      m_polygons->removeAll(polyItem);
+      // Remove current polygons from the scene
+      while(m_polygons->size()) {
+        QGraphicsPolygonItem *polyItem = m_polygons->at(0);
+        m_scene->getScene()->removeItem(polyItem);
+        m_polygons->removeAll(polyItem);
 
-      delete polyItem;
-      polyItem = NULL;
-    }
-
-    if (proj->Has180Domain()) {
-      m_180mp = PolygonTools::To180(m_mp);
-      mp = m_180mp;
-    }
-    else {
-      mp = m_mp;
-    }
-
-    //----------------------------------------------------------
-    // We need to loop thru the num. geom. because some of the
-    // cubes will have more than one geom. if it crosses lat/lon
-    // boundries.
-    //----------------------------------------------------------
-    for (unsigned int i = 0; i < mp->getNumGeometries(); i++) {
-      const Geometry *geom = mp->getGeometryN(i);
-      CoordinateSequence *pts;
-
-      pts = geom->getCoordinates();
-      double lat, lon;
-      QVector<QPointF> polyPoints;
-
-      //--------------------------------------------------------------
-      // We need to convert the footprint polygons from lat/lon to x/y
-      // in order to display them in the QGraphicsScene
-      //--------------------------------------------------------------
-      for (unsigned int j = 0; j < pts->getSize(); j++) {
-        lat = pts->getY(j);
-        lon = pts->getX(j);
-        if (proj->SetUniversalGround(lat, lon)) {
-          double x = proj->XCoord();
-          double y = -1 * (proj->YCoord());
-
-          polyPoints.push_back(QPointF(x, y));
-        }
+        delete polyItem;
+        polyItem = NULL;
+      }
+ 
+      if (tproj->Has180Domain()) {
+        m_180mp = PolygonTools::To180(m_mp);
+        mp = m_180mp;
+      }
+      else {
+        mp = m_mp;
       }
 
-      setFlag(QGraphicsItem::ItemIsSelectable);
+      //----------------------------------------------------------
+      // We need to loop thru the num. geom. because some of the
+      // cubes will have more than one geom. if it crosses lat/lon
+      // boundries.
+      //----------------------------------------------------------
+      for (unsigned int i = 0; i < mp->getNumGeometries(); i++) {
+        const Geometry *geom = mp->getGeometryN(i);
+        CoordinateSequence *pts;
 
-      QGraphicsPolygonItem *polyItem = new QGraphicsPolygonItem(this);
-      polyItem->setPolygon(QPolygonF(polyPoints));
+        pts = geom->getCoordinates();
+        double lat, lon;
+        QVector<QPointF> polyPoints;
 
-      QGraphicsSimpleTextItem *label = new QGraphicsSimpleTextItem(polyItem);
-      if(m_cubeDisplay)
-        label->setText(m_cubeDisplay->displayName());
-      label->setFlag(QGraphicsItem::ItemIsMovable);
-      label->setFont(QFont("Helvetica", 10));
-      label->setPos(polyItem->polygon().boundingRect().center());
-      label->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+        //--------------------------------------------------------------
+        // We need to convert the footprint polygons from lat/lon to x/y
+        // in order to display them in the QGraphicsScene
+        //--------------------------------------------------------------
+        for (unsigned int j = 0; j < pts->getSize(); j++) {
+          lat = pts->getY(j);
+          lon = pts->getX(j);
+          if (tproj->SetUniversalGround(lat, lon)) {
+            double x = tproj->XCoord();
+            double y = -1 * (tproj->YCoord());
 
-      QRectF boundingRect = polyItem->boundingRect();
-      if(boundingRect.width() < boundingRect.height())
-        label->rotate(90);
+            polyPoints.push_back(QPointF(x, y));
+          }
+        }
 
-      m_polygons->append(polyItem);
+        setFlag(QGraphicsItem::ItemIsSelectable);
 
-      delete pts;
+        QGraphicsPolygonItem *polyItem = new QGraphicsPolygonItem(this);
+        polyItem->setPolygon(QPolygonF(polyPoints));
+
+        QGraphicsSimpleTextItem *label = new QGraphicsSimpleTextItem(polyItem);
+        if(m_cubeDisplay)
+          label->setText(m_cubeDisplay->displayName());
+        label->setFlag(QGraphicsItem::ItemIsMovable);
+        label->setFont(QFont("Helvetica", 10));
+        label->setPos(polyItem->polygon().boundingRect().center());
+        label->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+
+        QRectF boundingRect = polyItem->boundingRect();
+        if(boundingRect.width() < boundingRect.height())
+          label->rotate(90);
+
+        m_polygons->append(polyItem);
+
+        delete pts;
+      }
+
+      updateChildren();
     }
-
-    updateChildren();
   }
 
 
@@ -273,6 +277,9 @@ namespace Isis {
    */
   void MosaicSceneItem::drawImage(QPainter *painter,
       const QStyleOptionGraphicsItem *option) {
+
+    //Only draw if projection type is triaxial
+    if (m_scene->getProjection()->projectionType() != Projection::Triaxial) return;
     Stretch *stretch = getStretch();
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -293,6 +300,7 @@ namespace Isis {
         int bbBottom = visibleBox.bottom();
 
         QImage image(bbWidth, bbHeight, QImage::Format_ARGB32);
+        TProjection *tproj = (TProjection *) m_scene->getProjection();
 
         for (int y = bbTop; y <= bbBottom; y++) {
           QRgb *lineData = (QRgb *)image.scanLine(y - bbTop);
@@ -308,12 +316,9 @@ namespace Isis {
             if(polygon->polygon().containsPoint(scenePos, Qt::OddEvenFill)) {
               // This is likely in the cube... use the projection to go to
               //   lat/lon and use that lat/lon to go to cube sample,line
-              m_scene->getProjection()->SetCoordinate(scenePos.x(),
-                                                      -1 * scenePos.y());
-
-              double lat = m_scene->getProjection()->UniversalLatitude();
-              double lon = m_scene->getProjection()->UniversalLongitude();
-
+              tproj->SetCoordinate(scenePos.x(), -1 * scenePos.y());
+              double lat = tproj->UniversalLatitude();
+              double lon = tproj->UniversalLongitude();
               if(m_cubeDisplay) {
                 if(!groundMap) {
                   groundMap = new UniversalGroundMap(*m_cubeDisplay->cube());

@@ -91,7 +91,7 @@ namespace Isis {
     if (p_camera->target()->shape()->name() == "Plane") {
       double radius = lat.degrees();
       double longitude = lon.degrees();
-      if (radius < 0.0) radius = 0.0; // TODO: massive, temporary kluge to get around testing latitude at -90 in caminfo app (are there more issues like this? Probably)
+      if (radius < 0.0) radius = 0.0; // TODO: massive, temporary kluge to get around testing latitude at -90 in caminfo app (are there more issues like this? Probably)KE
       if(p_camera->Sensor::SetUniversalGround(0.0, longitude, radius)) {
          LookCtoFocalPlaneXY();
          return true;

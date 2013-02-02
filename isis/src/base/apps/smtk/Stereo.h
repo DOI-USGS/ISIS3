@@ -36,6 +36,8 @@ namespace Isis {
    * @internal
    *  @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
    *                     coding standards. References #972.
+   *  @history 2012-12-06 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *                     References #775.
    */
   class Stereo  {
     public:

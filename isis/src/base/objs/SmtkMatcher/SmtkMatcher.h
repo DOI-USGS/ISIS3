@@ -50,6 +50,8 @@ namespace Isis {
  * @author 2011-05-28 Kris Becker
  *
  * @internal
+ *   @history 2012-12-20 Debbie A. Cook - Removed unused Projection.h
+ *                           References #775.
  */
 class SmtkMatcher {
   public:

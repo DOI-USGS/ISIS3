@@ -11,8 +11,10 @@
 #include "Longitude.h"
 #include "PolygonTools.h"
 #include "Projection.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "SurfacePoint.h"
+#include "Target.h"
 
 namespace Isis {
   /**
@@ -100,15 +102,15 @@ namespace Isis {
    * Returns whether the lat/lon position was set successfully in the camera
    * model or projection
    *
-   * @param lat The universal latitude
-   * @param lon The universal longitude
+   * @param lat The universal latitude or radius for ring planes
+   * @param lon The universal longitude or azimuth for ring planes
    *
    * @return Returns true if the lat/lon position was set successfully, and
    *         false if it was not
    */
   bool UniversalGroundMap::SetUniversalGround(double lat, double lon) {
     if (p_camera != NULL) {
-      if (p_camera->SetUniversalGround(lat, lon)) {
+      if (p_camera->SetUniversalGround(lat, lon)) {  // This should work for rings (radius,azimuth)
         return p_camera->InCube();
       }
       else {
@@ -116,7 +118,7 @@ namespace Isis {
       }
     }
     else {
-      return p_projection->SetUniversalGround(lat, lon);
+      return p_projection->SetUniversalGround(lat, lon); // This should work for rings (radius,azimuth)
     }
   }
 
@@ -133,7 +135,7 @@ namespace Isis {
    */
   bool UniversalGroundMap::SetGround(Latitude lat, Longitude lon) {
     if(p_camera != NULL) {
-      if(p_camera->SetGround(lat, lon)) {
+      if(p_camera->SetGround(lat, lon)) {  // This should work for rings (radius,azimuth)
         return p_camera->InCube();
       }
       else {
@@ -143,7 +145,7 @@ namespace Isis {
     else {
       double universalLat = lat.degrees();
       double universalLon = lon.degrees();
-      return p_projection->SetUniversalGround(universalLat, universalLon);
+      return p_projection->SetUniversalGround(universalLat, universalLon);  // This should work for rings (radius,azimuth)
     }
   }
 
@@ -168,7 +170,7 @@ namespace Isis {
     }
     else {
       return p_projection->SetUniversalGround(sp.GetLatitude().degrees(),
-                                              sp.GetLongitude().degrees());
+                                              sp.GetLongitude().degrees());   // This should work for rings (radius,azimuth)
     }
   }
 
@@ -225,11 +227,13 @@ namespace Isis {
    * @return Universal Latitude
    */
   double UniversalGroundMap::UniversalLatitude() const {
+    //TODO Should we check for ring plane?
     if (p_camera != NULL) {
       return p_camera->UniversalLatitude();
     }
     else {
-      return p_projection->UniversalLatitude();
+      TProjection *tproj = (TProjection *) p_projection;
+      return tproj->UniversalLatitude();
     }
   }
 
@@ -239,11 +243,13 @@ namespace Isis {
    * @return Universal Longitude
    */
   double UniversalGroundMap::UniversalLongitude() const {
+    //TODO Should we check for ring plane?
     if (p_camera != NULL) {
       return p_camera->UniversalLongitude();
     }
     else {
-      return p_projection->UniversalLongitude();
+      TProjection *tproj = (TProjection *) p_projection;
+      return tproj->UniversalLongitude();
     }
   }
 
@@ -281,6 +287,13 @@ namespace Isis {
   bool UniversalGroundMap::GroundRange(Cube *cube, Latitude &minLat,
       Latitude &maxLat, Longitude &minLon, Longitude &maxLon,
       bool allowEstimation) {
+    // Do we need a RingRange method?
+    // For now just return false
+    if (HasCamera())
+      if (p_camera->target()->shape()->name() == "Plane") return false;
+    if (HasProjection()) 
+      if (p_projection->projectionType() == Projection::RingPlane) return false;
+
     minLat = Latitude();
     maxLat = Latitude();
     minLon = Longitude();
@@ -374,6 +387,9 @@ namespace Isis {
           //   extent.
           QList<QPointF> imagePoints;
 
+          // Reset to TProjection
+          TProjection *tproj = (TProjection *) p_projection;
+
                     /*
            * This is where we're testing:
            *
@@ -456,10 +472,10 @@ namespace Isis {
           }
 
           foreach (QPointF imagePoint, imagePoints) {
-            if (p_projection->SetWorld(imagePoint.x(), imagePoint.y())) {
-              Latitude latResult(p_projection->UniversalLatitude(),
+            if (tproj->SetWorld(imagePoint.x(), imagePoint.y())) {
+              Latitude latResult(tproj->UniversalLatitude(),
                                  Angle::Degrees);
-              Longitude lonResult(p_projection->UniversalLongitude(),
+              Longitude lonResult(tproj->UniversalLongitude(),
                                   Angle::Degrees);
               if (minLat.isValid())
                 minLat = qMin(minLat, latResult);

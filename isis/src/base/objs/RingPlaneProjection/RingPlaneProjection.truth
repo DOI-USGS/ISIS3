@@ -1,0 +1,289 @@
+Unit test for RingPlaneProjection ...
+
+///////////////////////////////////////////////////////////
+Test Error Throws from the constructor...
+
+Test for missing Mapping Group
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Unable to find PVL group [Mapping].
+
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** PVL Keyword [AzimuthDirection] does not exist in [Group = Mapping].
+
+Test for missing azimuth direction in the mapping group
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** PVL Keyword [AzimuthDirection] does not exist in [Group = Mapping].
+
+Test for invalid azimuth direction value
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. Invalid value for keyword [AzimuthDirection] must be [Clockwise or CounterClockwise].
+
+Test for missing azimuth domain in the mapping group
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** PVL Keyword [AzimuthDomain] does not exist in [Group = Mapping].
+
+Test for invalid azimuth domain value in the mapping group
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. Invalid value for keyword [AzimuthDomain] must be [180 or 360].
+///////////////////////////////////////////////////////////
+
+Projection Specifications
+Is Equatorial Cylindrical: 0
+Azimuth Direction:       Clockwise
+Is Clockwise:           1
+Is CounterClockwise:           0
+Azimuth Domain:          360
+Has 360 domain:            1
+Has 180 domain:            0
+Has ground range:          0
+Rotation:                  0
+Scale:                  1
+
+
+///////////////////////////////////////////////////////////
+Test More Error Throws...
+
+Testing invalid minimum radius...
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. [MinimumRadius] of [-45.0] is not valid.
+
+Testing invalid maximum radius
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. [MaximumRadius] of [-80.0] is not valid.
+
+Testing unordered radius range
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. [MinimumRadius,MaximumRadius] of [80.0,45.0] are not properly ordered.
+
+Testing unordered azimuth range
+**ERROR** Projection failed.  Invalid label group [Mapping].
+**ERROR** Projection failed. [MinimumAzimuth,MaximumAzimuth] of [15.0,-190.0] are not properly ordered.
+///////////////////////////////////////////////////////////
+
+Testing xyRange methods...
+
+Get ground range from the labels...  
+Has as azimuth range:  1
+Minimum radius:        80
+Maximum radius:        180
+Minimum azimuth:       15
+Maximum azimuth:       190
+Find coordinate range ...  
+Minimum X:              150
+Maximum X:              1900
+Minimum Y:              170
+Maximum Y:              270
+
+Testing Ground coordinate routines
+Setting radius to (91,  0):  1
+Is Good:                        1
+Setting azimuth to ( 0,  91):  0
+Is Good:                        0
+Setting position to (60,  -5):  1
+Is Good:                        1
+Radius:                       60
+Local Radius:              60
+Azimuth:                      -5
+XCoord:                         -50
+YCoord:                         150
+UniversalRadius:              60
+UniversalAzimuth:             355
+
+Testing Universal Ground coordinate routines
+Setting position to (57.3920057293825,  355):  1
+Is Good:                                       1
+Radius:                                      57.39200572938
+Azimuth:                                     355
+XCoord:                                        3550
+YCoord:                                        147.3920057294
+UniversalRadius:                             57.39200572938
+UniversalAzimuth:                            355
+Setting bad position...0
+
+Planar Projection Specifications
+Is Equatorial Cylindrical: 0
+Azimuth Direction:       Clockwise
+Is Clockwise:           1
+Is CounterClockwise:           0
+Azimuth Domain:          180
+Has 360 domain:            0
+Has 180 domain:            1
+Has ground range:          1
+Rotation:                  0
+
+Setting position to (9000.0, 0.0)
+Is Good:                                       1
+Radius:                                      9000
+Azimuth:                                     0
+XCoord:                                        9000
+YCoord:                                        0
+UniversalRadius:                             9000
+UniversalAzimuth:                            0
+
+Setting position to (9000.0, 360.0)
+Is Good:                                       1
+Radius:                                      9000
+Azimuth:                                     0
+XCoord:                                        9000
+YCoord:                                        0
+UniversalRadius:                             9000
+UniversalAzimuth:                            0
+
+Testing == operator Projection conditions...None
+Projection 1 name and resolution = None 1
+Projection 2 name = None 1
+Projection 3 name = Planar 1
+Projection 1 = Projection 2
+Projection 1 != Projection3
+
+Testing projection coordinate routines
+Setting x/y position to (-90,15):  1
+Is Good:                             1
+Radius:                            -75
+Azimuth:                           -9
+XCoord:                              -90
+YCoord:                              15
+UniversalRadius:                   -75
+UniversalAzimuth:                  351
+WorldX:                              -90
+WorldY:                              15
+
+Testing world coordinate routines
+Setting world x/y position to (-45,45):  1
+Is Good:                                   1
+Radius:                                  -75
+Azimuth:                                 -2.25
+XCoord:                                    -22.5
+YCoord:                                    15
+UniversalRadius:                         -75
+UniversalAzimuth:                        357.75
+WorldX:                                    -45
+WorldY:                                    45
+Resolution:                                0.5
+Scale:                                     1.570796326795
+TrueScaleRadius:                         45
+
+Testing IsSky method
+0
+1
+
+Testing == operator condition in class...
+Projection 1 name and resolution = None 1
+Projection 1 azimuth direction = Clockwise
+Projection 4 name and resolution = None 1
+Projection 4 azimuth direction string = CounterClockwise
+Projection 1 != Projection 4
+
+Testing string routines
+Clockwise
+360
+
+Testing Name and comparision routines
+Name:        None
+Version:     1.0
+operator==:  0
+operator!=:  1
+
+Testing no projection
+Radius:    45
+Azimuth:   90
+Is clockwise?0
+Is counterclockwise?1
+Azimuth direction = CounterClockwise
+Has 180 domain?1
+Has 360 domain?0
+Azimuth domain  = 180
+True scale radius = 0
+
+Testing radius methods 
+45
+
+///////////////////////////////////////////////////////////
+
+Testing bad coordinates 
+Testing bad radius/azimuth... Is good?  0
+Testing bad x/y... Is good?  0
+
+///////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////
+Test Error Throws for invalid inputs to conversion methods 
+**ERROR** Unable to convert to 180 degree domain. The given azimuth value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert to 360 degree domain. The given azimuth value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert to Clockwise. The given azimuth value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert azimuth.  Domain [-2147483648] is not 180 or 360.
+**ERROR** Unable to convert to Clockwise. The given azimuth value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert azimuth.  Domain [-2147483648] is not 180 or 360.
+**ERROR** Unable to convert to CounterClockwise. The given azimuth value [-1.79769313486231e+308] is invalid.
+
+///////////////////////////////////////////////////////////
+Testing conversion routines with valid inputs...
+60 clockwise converted to 300 in 360 domain. 
+60 clockwise converted to -60 in 180 domain. 
+60 counterclockwise converted to 300 in 360 domain. 
+60 counterclockwise converted to -60 in 180 domain. 
+**ERROR** Unable to convert to world x.  The given x-value [-1.79769313486231e+308] is invalid.
+**ERROR** Unable to convert to world y.  The given y-value [-1.79769313486231e+308] is invalid.
+///////////////////////////////////////////////////////////
+
+
+Rotation Tests
+Rotation:     90
+Testing Ground coordinate routines
+Setting radius to (-91,  0):  0
+Is Good:                        0
+Setting radius to ( 9001,  0):  1
+Is Good:                        1
+Setting position to (60,  -5):  1
+Is Good:                        1
+Radius:                       60
+Azimuth:                      -5
+XCoord:                         150
+YCoord:                         50
+UniversalRadius:              60
+UniversalAzimuth:             355
+
+Testing projection coordinate routines
+Setting x/y position to (150,50):  1
+Is Good:                             1
+Radius:                            60
+Azimuth:                           -5
+XCoord:                              150
+YCoord:                              50
+UniversalRadius:                   60
+UniversalAzimuth:                  355
+WorldX:                              150
+WorldY:                              50
+
+Testing Mapping() methods
+Mapping() = 
+Group = Mapping
+  TargetName       = SKY
+  ProjectionName   = MyProjection
+  AzimuthDirection = Clockwise
+  AzimuthDomain    = 180
+  PixelResolution  = 1.0
+  Scale            = 1.0
+  UpperLeftCornerX = 1.0
+  UpperLeftCornerY = 1.0
+  MinimumRadius    = 80.0
+  MaximumRadius    = 180.0 <units>
+  MinimumAzimuth   = 15.0
+  MaximumAzimuth   = 190.0
+  Rotation         = 90.0
+End_Group
+End
+MappingRadii() = 
+Group = Mapping
+  MinimumRadius = 80.0
+  MaximumRadius = 180.0 <units>
+End_Group
+End
+MappingAzimuths() = 
+Group = Mapping
+  MinimumAzimuth = 15.0
+  MaximumAzimuth = 190.0
+End_Group
+End
+

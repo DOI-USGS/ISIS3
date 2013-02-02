@@ -20,6 +20,8 @@
 #include "Longitude.h"
 #include "MdiCubeViewport.h"
 #include "Projection.h"
+#include "RingPlaneProjection.h"
+#include "TProjection.h"
 #include "SurfacePoint.h"
 #include "ToolPad.h"
 
@@ -676,6 +678,12 @@ namespace Isis {
     m_mDist   = Null;
     m_kmDist  = Null;
     double radius = Null;
+    TProjection *tproj = NULL;
+    RingPlaneProjection *rproj = NULL;
+    Projection::ProjectionType projType = Projection::Triaxial;
+
+    // Get set for dealing with projection types
+    if (cvp->projection() != NULL)  projType = cvp->projection()->projectionType();
 
     // Don't write anything if we are outside the cube
     if ((m_startSamp >= 0.5) && (m_endSamp >= 0.5) &&
@@ -690,28 +698,44 @@ namespace Isis {
         if (cvp->projection()->SetWorld(m_startSamp, m_startLine)) {
           // If our projection is sky, the lat & lons are switched
           if (cvp->projection()->IsSky()) {
-            m_startLat = cvp->projection()->UniversalLongitude();
-            m_startLon = cvp->projection()->UniversalLatitude();
+            tproj = (TProjection *) cvp->projection();
+            m_startLat = tproj->UniversalLongitude();
+            m_startLon = tproj->UniversalLatitude();
           }
-          else {
-            m_startLat = cvp->projection()->UniversalLatitude();
-            m_startLon = cvp->projection()->UniversalLongitude();
+          else if (projType == Projection::Triaxial) {
+            tproj = (TProjection *) cvp->projection();
+            m_startLat = tproj->UniversalLatitude();
+            m_startLon = tproj->UniversalLongitude();
+          }
+          else { // RingPlaneProjection
+            rproj = (RingPlaneProjection *) cvp->projection();
+            m_startLat = rproj->UniversalRadius();
+            m_startLon = rproj->UniversalAzimuth();
           }
 
           if (cvp->projection()->SetWorld(m_endSamp, m_endLine)) {
             // If our projection is sky, the lat & lons are switched
             if (cvp->projection()->IsSky()) {
-              m_endLat = cvp->projection()->UniversalLongitude();
-              m_endLon = cvp->projection()->UniversalLatitude();
+              m_endLat = tproj->UniversalLongitude();
+              m_endLon = tproj->UniversalLatitude();
             }
+            else if (projType == Projection::Triaxial) {
+              m_endLat = tproj->UniversalLongitude();
+              m_endLon = tproj->UniversalLatitude();
+            } // RingPlaneProjection
             else {
-              m_endLat = cvp->projection()->UniversalLatitude();
-              m_endLon = cvp->projection()->UniversalLongitude();
+              m_endLat = rproj->UniversalRadius();
+              m_endLon = rproj->UniversalAzimuth();
             }
           }
 
           // Calculate and write out the distance between the two points
-          radius = cvp->projection()->LocalRadius();
+          if (projType != Projection::RingPlane) {
+             radius = tproj->LocalRadius();
+          }
+          else {
+            radius = rproj->Radius();
+          }
         }
       }
       // Do we have a camera model?

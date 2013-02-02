@@ -22,7 +22,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "Projection.h"
+#include "RingPlaneProjection.h"
 
 namespace Isis {
   class Pvl;
@@ -48,8 +48,10 @@ namespace Isis {
    *
    * @internal
    *   @history 2012-08-09 Ken Edmundson - initial version
+   *   @history 2012-01-20 Debbie A. Cook - Changed to use RingPlaneProjection instead of Projection.
+   *                           References #775.
    */
-  class Planar : public Projection {
+  class Planar : public RingPlaneProjection {
     public:
       Planar(Pvl &label, bool allowDefaults = false);
       ~Planar();
@@ -57,6 +59,10 @@ namespace Isis {
 
       std::string Name() const;
       std::string Version() const;
+      double TrueScaleRadius() const;
+
+      double CenterAzimuth() const;
+      double CenterRadius() const;
 
       bool SetGround(const double radius, const double lon);
       bool SetCoordinate(const double x, const double y);
@@ -64,22 +70,12 @@ namespace Isis {
 
       PvlGroup Mapping();
       PvlGroup MappingRadii();
-      PvlGroup MappingLongitudes();
-
-      double Radius() const;
+      PvlGroup MappingAzimuths();
 
   protected:
-      double m_radius;
-
-      double m_minimumRingRadius;   /**< Contains minimum radius for entire ring
-                                       range. Only usable if m_ringRangeGood is
-                                       true.*/
-      double m_maximumRingRadius;   /**< Contains maximum radius for entire ring
-                                       range. Only usable if m_ringRangeGood is
-                                       true.*/
 
     private:
-      double m_centerLongitude; //!< The center longitude for the map projection
+      double m_centerAzimuth; //!< The center longitude for the map projection
       double m_centerRadius;    //!< The center radius for the map projection
   };
 };

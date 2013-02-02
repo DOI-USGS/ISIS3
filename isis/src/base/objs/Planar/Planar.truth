@@ -1,24 +1,24 @@
 UNIT TEST FOR Planar Projection
 
-Test missing center longitude keyword ...
+Test missing center azimuth keyword ...
 **I/O ERROR** Invalid label group [Mapping].
-**ERROR** PVL Keyword [CenterLongitude] does not exist in [Group = Mapping].
+**ERROR** PVL Keyword [CenterAzimuth] does not exist in [Group = Mapping].
 
-Test missing center radius  keyword ...
+Test missing CenterRadius keyword ...
 **I/O ERROR** Invalid label group [Mapping].
 **ERROR** PVL Keyword [CenterRadius] does not exist in [Group = Mapping].
 
 Test SetGround method ... 
 Setting ground to (1000.0,45.0)
-Latitude:               0
-Longitude:              45
+Radius:               1000
+Azimuth:              45
 XCoord:                 707.1067811865476
 YCoord:                 707.1067811865474
 
 Test SetCoordinate method ... 
 Setting coordinate to (0.2617993877991494,-0.8726646259971648)
-Latitude:               0
-Longitude:              -73.30075576600629
+Radius:               0.9110886174894191
+Azimuth:              -73.30075576600629
 XCoord:                 0.2617993877991494
 YCoord:                 -0.8726646259971648
 
@@ -28,20 +28,31 @@ operator==  1
 
 Testing default option ... 
 Group = Mapping
-  ProjectionName     = Planar
-  TargetName         = Saturn
-  LatitudeType       = Planetocentric
-  LongitudeDirection = PositiveEast
-  LongitudeDomain    = 180
-  MinimumRadius      = 0.0
-  MaximumRadius      = 2000000.0
-  MinimumLongitude   = -20.0
-  MaximumLongitude   = 130.0
-  CenterLongitude    = 0.0
-  CenterRadius       = 1000000.0
+  ProjectionName   = Planar
+  TargetName       = Saturn
+  AzimuthDirection = Clockwise
+  AzimuthDomain    = 180
+  MinimumRadius    = 0.0
+  MaximumRadius    = 2000000.0
+  MinimumAzimuth   = -20.0
+  MaximumAzimuth   = 130.0
+  CenterAzimuth    = 55.0
+  CenterRadius     = 1000000.0
 End_Group
 End
 
 Testing Mapping() methods ... 
-terminate called after throwing an instance of 'Isis::IException'
-  what():  **ERROR** PVL Keyword [EquatorialRadius] does not exist in [Group = Mapping].
+Mapping() = 
+Group = Mapping
+  TargetName       = Saturn
+  ProjectionName   = Planar
+  AzimuthDirection = Clockwise
+  AzimuthDomain    = 180
+  MinimumRadius    = 0.0
+  MaximumRadius    = 2000000.0
+  MinimumAzimuth   = -20.0
+  MaximumAzimuth   = 130.0
+  CenterRadius     = 200000.0
+  CenterAzimuth    = 0.0
+End_Group
+End

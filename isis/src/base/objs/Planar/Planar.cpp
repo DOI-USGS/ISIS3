@@ -27,10 +27,10 @@
 
 #include "Constants.h"
 #include "IException.h"
-#include "Projection.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
+#include "RingPlaneProjection.h"
 
 using namespace std;
 namespace Isis {
@@ -41,112 +41,48 @@ namespace Isis {
    *
    * @param label This argument must be a Label containing the proper mapping
    *              information as indicated in the Projection class. Additionally,
-   *              the orthographic projection requires the center longitude to be
-   *              defined in the keyword CenterLongitude.
+   *              the orthographic projection requires the center azimuth to be
+   *              defined in the keyword CenterAzimuth.
    *
    * @param allowDefaults If set to false the constructor expects that a keyword
-   *                      of CenterLongitude will be in the label. Otherwise it
-   *                      will attempt to compute the center longitude using the
-   *                      middle of the longitude range specified in the labels.
+   *                      of CenterAzimuth will be in the label. Otherwise it
+   *                      will attempt to compute the center azimuth using the
+   *                      middle of the azimuth range specified in the labels.
    *                      Defaults to false.
    *
    * @throws IException
    */
   Planar::Planar(Pvl &label, bool allowDefaults) :
-    Projection::Projection(label) {
+    RingPlaneProjection::RingPlaneProjection(label) {
 
     // latitude in ring plane is always zero
-    m_latitude = 0.0;
-    m_minimumLatitude = 0.0;
-    m_maximumLatitude = 1.0;
-
-    if (m_mappingGrp.HasKeyword("MinimumRingRadius"))
-      m_minimumRingRadius = m_mappingGrp["MinimumRingRadius"];
-    if (m_mappingGrp.HasKeyword("MaximumRingRadius"))
-      m_maximumRingRadius = m_mappingGrp["MaximumRingRadius"];
+    m_radius = 0.0;
 
     try {
       // Try to read the mapping group
       PvlGroup &mapGroup = label.FindGroup("Mapping", Pvl::Traverse);
 
-      // Compute and write the default center longitude if allowed and
+      // Compute and write the default center azimuth if allowed and
       // necessary
-      if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
-        double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
-        mapGroup += PvlKeyword("CenterLongitude", lon);
+      if ((allowDefaults) && (!mapGroup.HasKeyword("CenterAzimuth"))) {
+        double az = (m_minimumAzimuth + m_maximumAzimuth) / 2.0;
+        mapGroup += PvlKeyword("CenterAzimuth", az);
       }
 
       // Compute and write the default center radius if allowed and
       // necessary
       if ((allowDefaults) && (!mapGroup.HasKeyword("CenterRadius"))) {
-        double radius = (m_minimumRingRadius + m_maximumRingRadius) / 2.0;
+        double radius = (m_minimumRadius + m_maximumRadius) / 2.0;
         mapGroup += PvlKeyword("CenterRadius", radius);
       }
 
-      // Get the center longitude  & radius
-      m_centerLongitude = mapGroup["CenterLongitude"];
+      // Get the center azimuth  & radius
+      m_centerAzimuth = mapGroup["CenterAzimuth"];
       m_centerRadius = mapGroup["CenterRadius"];
 
-      // convert to radians, adjust for longitude direction
-      m_centerLongitude *= DEG2RAD;
-      if (m_longitudeDirection == PositiveWest) m_centerLongitude *= -1.0;
-/*
-      // Calculate sine & cosine of center latitude
-      m_sinph0 = sin(m_centerLatitude);
-      m_cosph0 = cos(m_centerLatitude);
-
-      // Let's apply this equation at the extremes to minimize our lat/lon range
-      double sinphi, cosphi, coslon;
-
-      // Can we project at the minlat, center lon? If not, then we should move
-      // up the min lat to be inside the image.
-      sinphi = sin(m_minimumLatitude * DEG2RAD);
-      cosphi = cos(m_minimumLatitude * DEG2RAD);
-      coslon = 1.0; // at lon=centerLon: cos(lon-centerLon) = cos(0) = 1
-      if (m_sinph0 * sinphi + m_cosph0 * cosphi * coslon < 1E-10) {
-        // solve for x: a * sin(x) + b * cos(x) * 1 = 0
-        // a * sin(x) + b * cos(x) = 0
-        // a * sin(x) = - b * cos(x)
-        // -(a * sin(x)) / b = cos(x)
-        // -(a / b) = cos(x) / sin(x)
-        // -(b / a) = sin(x) / cos(x)
-        // -(b / a) = tan(x)
-        // arctan(-(b / a)) = x
-        // arctan(-(m_cosph0 / m_sinph0)) = x
-        double newMin = atan2(- m_cosph0, m_sinph0) * 180.0 / PI;
-        if (newMin > m_minimumLatitude) {
-          m_minimumLatitude = newMin;
-        } // else something else is off (i.e. longitude range)
-      }
-
-      sinphi = sin(m_minimumLatitude * PI / 180.0);
-      cosphi = cos(m_minimumLatitude * PI / 180.0);
-
-      // Can we project at the maxlat, center lon? If not, then we should move
-      // down the max lat to be inside the image.
-      sinphi = sin(m_maximumLatitude * PI / 180.0);
-      cosphi = cos(m_maximumLatitude * PI / 180.0);
-      coslon = 1.0; // at lon=centerLon: cos(lon-centerLon) = cos(0) = 1
-      if (m_sinph0 * sinphi + m_cosph0 * cosphi * coslon < 1E-10) {
-        // see above equations for latitude
-        double newMax = atan2(- m_cosph0, m_sinph0) * 180.8 / PI;
-        if (newMax < m_maximumLatitude && newMax > m_minimumLatitude) {
-          m_maximumLatitude = newMax;
-        } // else something else is off (i.e. longitude range)
-      }
-
-      // If we are looking at the side of the planet (clat = 0), then make sure
-      // the longitude range is limited to 90 degrees to either direction
-      if (m_centerLatitude == 0.0) {
-        if (m_maximumLongitude - m_centerLongitude * 180.0 / PI > 90) {
-          m_maximumLongitude = (m_centerLongitude * 180.0 / PI) + 90;
-        }
-
-        if (m_centerLongitude * 180.0 / PI - m_minimumLongitude > 90) {
-          m_minimumLongitude = (m_centerLongitude * 180.0 / PI) - 90;
-        }
-      }
-*/
+      // convert to radians, adjust for azimuth direction
+      m_centerAzimuth *= DEG2RAD;
+      if (m_azimuthDirection == CounterClockwise) m_centerAzimuth *= -1.0;
     }
     catch(IException &e) {
       string message = "Invalid label group [Mapping]";
@@ -167,11 +103,11 @@ namespace Isis {
    *              they are not
    */
   bool Planar::operator== (const Projection &proj) {
-    if (!Projection::operator==(proj)) return false;
-    // dont do the below it is a recusive plunge
+    if (!RingPlaneProjection::operator==(proj)) return false;
+    // dont do the below it is a recursive plunge
     //  if (Projection::operator!=(proj)) return false;
     Planar *planar = (Planar *) &proj;
-    if ((planar->m_centerLongitude != m_centerLongitude) ||
+    if ((planar->m_centerAzimuth != m_centerAzimuth) ||
         (planar->m_centerRadius != m_centerRadius)) return false;
     return true;
   }
@@ -186,21 +122,42 @@ namespace Isis {
    }
 
    /**
-    * Returns the center latitude, in degrees.
+    * Returns the center radius, in meters.
     *
     * TODO: Correct this comment for planar projection, assuming right now scale
     * at center of projection.
     * (believe scale is uniform across planar projection)
     *
-    * **NOTE** In the case of Planar projections, there is NO latitude
+    * **NOTE** In the case of Planar projections, there is NO radius
     * that is entirely true to scale. The only true scale for this projection is
-    * at the single point, (center latitude, center longitude).
+    * at the single point, (center radius, center azimuth).
     *
-    * @return double The center latitude.
+    * @return double The center radius.
     */
-//   double Planar::TrueScaleLatitude() const {
-//     return m_centerLongitude * RAD2DEG;
-//   }
+  double Planar::TrueScaleRadius() const {
+    return m_centerRadius;
+  }
+
+
+   /**
+    * Returns the center azimuth, in degrees.
+    *
+    * @return double The center azimuth.
+    */
+  double Planar::CenterAzimuth() const {
+    return m_centerAzimuth;
+  }
+
+
+   /**
+    * Returns the center radius, in meters.
+    *
+    * @return double The center radius.
+    */
+  double Planar::CenterRadius() const {
+    return m_centerRadius;
+  }
+
 
    /**
     * Returns the version of the map projection
@@ -212,41 +169,38 @@ namespace Isis {
      return "1.0";
    }
 
-   /**
-    * This returns a radius with correct type as specified in the label object.
-    * The method can only be used if SetGround, SetCoordinate,
-    * SetUniversalGround, or SetWorld return with success. Success can also
-    * be checked using the IsGood method.
-    *
-    * @return double
-    */
-   double Planar::Radius() const {
-     return m_radius;
-   }
-
 
   /**
-   * This method is used to set the radius/longitude (assumed to be of the
-   * correct LatitudeType, LongitudeDirection, a nd LongitudeDomain. The Set
+   * This method is used to set the radius/azimuth (assumed to be of the
+   * correct AzimuthDirection, a nd AzimuthDomain. The Set
    * forces an attempted calculation of the projection X/Y values. This may or
    * may not be successful and a status is returned as such.
    *
-   * @param radius Radius value to project
+   * @param radius Radius value to project in meters
    *
-   * @param lon Longitude value to project
+   * @param az Azimuth value to project in degrees
    *
    * @return bool
    */
-  bool Planar::SetGround(const double radius, const double lon) {
+  bool Planar::SetGround(const double radius, const double az) {
 
-    // Convert longitude to radians & clean up
-    m_longitude = lon;
-    double lonRadians = lon * DEG2RAD;
-    if (m_longitudeDirection == PositiveWest) lonRadians *= -1.0;
+    // Convert azimuth to radians & clean up
+    m_azimuth = az;
+    double azRadians = az * DEG2RAD;
+    if (m_azimuthDirection == CounterClockwise) azRadians *= -1.0;
+
+    // Check to make sure radius is valid
+    if (radius < 0) {
+      throw IException(IException::Unknown,
+                       "Unable to set radius. The given radius value ["
+                       + IString(radius) + "] is invalid.",
+                       _FILEINFO_);
+    }
+    m_radius = radius;
 
 
     // Compute helper variables
-    double deltaLon = (lonRadians - m_centerLongitude);
+    double deltaAz = (azRadians - m_centerAzimuth);
 //  double coslon = cos(deltaLon);
 
     // Lat/Lon cannot be projected
@@ -257,8 +211,8 @@ namespace Isis {
 //    }
 
     // Compute the coordinates
-    double x = radius * cos(deltaLon);
-    double y = radius * sin(deltaLon);
+    double x = radius * cos(deltaAz);
+    double y = radius * sin(deltaAz);
 //    double x = radius;
 //    double y = deltaLon;
 
@@ -269,7 +223,7 @@ namespace Isis {
 
   /**
    * This method is used to set the projection x/y. The Set forces an attempted
-   * calculation of the corresponding radius/longitude position. This may or
+   * calculation of the corresponding radius/azimuth position. This may or
    * may not be successful and a status is returned as such.
    *
    * @param x X coordinate of the projection in units that are the same as the
@@ -285,19 +239,19 @@ namespace Isis {
     // Save the coordinate
     SetXY(x, y);
 
-    // compute radius and longitude
+    // compute radius and azimuth
     m_radius = sqrt(x*x + y*y);
-    m_longitude = atan2(y,x) * RAD2DEG;
-    if ( m_longitude < 0.0 )
-      m_longitude += 360.0;
+    m_azimuth = atan2(y,x) * RAD2DEG;
+    if ( m_azimuth < 0.0 )
+      m_azimuth += 360.0;
 
-    // Cleanup the longitude
-    if (m_longitudeDirection == PositiveWest) m_longitude *= -1.0;
+    // Cleanup the azimuth
+    if (m_azimuthDirection == CounterClockwise) m_azimuth *= -1.0;
 
     // These need to be done for circular type projections
-    m_longitude = To360Domain(m_longitude);
-    if (m_longitudeDomain == 180)
-      m_longitude = To180Domain(m_longitude);
+    m_azimuth = To360Domain(m_azimuth);
+    if (m_azimuthDomain == 180)
+      m_azimuth = To180Domain(m_azimuth);
 
     m_good = true;
     return m_good;
@@ -496,9 +450,9 @@ namespace Isis {
     // Return X/Y min/maxs
     // TODO: get rid of hard-coding
 
-    m_maximumX = m_maximumRingRadius*cos(m_maximumLongitude);
+    m_maximumX = m_maximumRadius*cos(m_maximumAzimuth);
     m_minimumX = -m_maximumX;
-    m_maximumY = m_maximumRingRadius*sin(m_maximumLongitude);
+    m_maximumY = m_maximumRadius*sin(m_maximumAzimuth);
     m_minimumY = -m_maximumY;
 
     minX = m_minimumX;
@@ -516,10 +470,10 @@ namespace Isis {
    * @return PvlGroup The keywords that this projection uses
    */
   PvlGroup Planar::Mapping() {
-    PvlGroup mapping = Projection::ringMapping();
+    PvlGroup mapping = RingPlaneProjection::Mapping();
 
     mapping += PvlKeyword("CenterRadius", m_centerRadius);
-    mapping += PvlKeyword("CenterLongitude", m_centerLongitude);
+    mapping += PvlKeyword("CenterAzimuth", m_centerAzimuth);
 
     return mapping;
   }
@@ -530,65 +484,28 @@ namespace Isis {
    * @return PvlGroup The radius keywords that this projection uses
    */
   PvlGroup Planar::MappingRadii() {
-    PvlGroup mapping("Mapping");
+    PvlGroup mapping = RingPlaneProjection::MappingRadii();
 
-    if (HasGroundRange()) {
-      mapping += m_mappingGrp["MinimumRadius"];
-      mapping += m_mappingGrp["MaximumRadius"];
-    }
+    if (HasGroundRange()) 
+      mapping += m_mappingGrp["CenterRadius"];
 
     return mapping;
   }
 
 
   /**
-   * This function returns the longitude keywords that this projection uses
+   * This function returns the azimuth keywords that this projection uses
    *
-   * @return PvlGroup The longitude keywords that this projection uses
+   * @return PvlGroup The azimuth keywords that this projection uses
    */
-  PvlGroup Planar::MappingLongitudes() {
-    PvlGroup mapping = Projection::MappingLongitudes();
+  PvlGroup Planar::MappingAzimuths() {
+    PvlGroup mapping = RingPlaneProjection::MappingAzimuths();
 
-    mapping += m_mappingGrp["CenterLongitude"];
+    if (HasGroundRange()) 
+      mapping += m_mappingGrp["CenterAzimuth"];
 
     return mapping;
   }
-
-  /**
-   * This method returns the local radius in meters at the specified longitude.
-   * For this method, the local radius is defined as the distance
-   * from the center of the planet to the given longitude in the ring plane.
-   *
-   * @param longitude A longitude in degrees (assumed to be of the correct
-   *                 LongitudeType).
-   *
-   * @throw IException::Unknown - "The given longitude is invalid."
-   *
-   * @return double The value for the local radius, in meters, at the given
-   *                latitude.
-   */
-  /*
-  double Planar::LocalRadius(double longitude) const {
-
-    if (longitude == Null) {
-      throw IException(IException::Unknown,
-                       "Unable to calculate local radius. The given latitude value ["
-                       + iString(latitude) + "] is invalid.",
-                       _FILEINFO_);
-    }
-
-    double a = m_equatorialRadius;
-    double c = m_polarRadius;
-    // to save calculations, if the target is spherical, return the eq. rad
-    if (a - c < DBL_EPSILON) {
-      return a;
-    }
-    else {
-      double lat = latitude * PI / 180.0;
-      return  a * c / sqrt(pow(c * cos(lat), 2) + pow(a * sin(lat), 2));
-    }
-  }
-*/
 
 } // end namespace isis
 
@@ -599,7 +516,7 @@ namespace Isis {
  * @param lab Cube labels with appropriate Mapping information.
  *  
  * @param allowDefaults If the label does not contain the value for 
- *                      CenterLongitude, this method indicates
+ *                      CenterAzimuth, this method indicates
  *                      whether the constructor should compute this value.
  * 
  * @return @b Isis::Projection* Pointer to an Planar projection

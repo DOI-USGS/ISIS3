@@ -38,6 +38,7 @@
 #include "MosaicZoomTool.h"
 #include "ProgressBar.h"
 #include "Projection.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "PvlObject.h"
 #include "Pvl.h"
@@ -143,7 +144,7 @@ namespace Isis {
     tmp += mapping;
 
     if(!mapping.HasKeyword("EquatorialRadius")) {
-      PvlGroup radii = Projection::TargetRadii(mapping["TargetName"]);
+      PvlGroup radii = TProjection::TargetRadii(mapping["TargetName"]);
       tmp.FindGroup("Mapping") += radii["EquatorialRadius"];
       tmp.FindGroup("Mapping") += radii["PolarRadius"];
     }
@@ -1052,63 +1053,60 @@ namespace Isis {
       PvlKeyword maxLonKeyword = mapping.FindKeyword("MaximumLongitude");
       Longitude maxLon(maxLonKeyword[0], mapping, Angle::Degrees);
 
-      Angle increment(1, Angle::Degrees);
-      if(m_projection->SetUniversalGround(minLat.degrees(),
-         minLon.degrees())) {
-        x = m_projection->XCoord();
-        y = -1 * (m_projection->YCoord());
-        footprintPoints.push_back(QPointF(x, y));
-      }
+      if (m_projection->projectionType() == Projection::Triaxial) {
+        TProjection *tproj = (TProjection *) m_projection;
+        Angle increment(1, Angle::Degrees);
+        if (tproj->SetUniversalGround(minLat.degrees(), minLon.degrees())) {
+          x = tproj->XCoord();
+          y = -1 * (tproj->YCoord());
+          footprintPoints.push_back(QPointF(x, y));
+        }
 
-      for(Angle lat = minLat + increment; lat < maxLat; lat += increment) {
-        if(m_projection->SetUniversalGround(lat.degrees(),
-           minLon.degrees())) {
-          x = m_projection->XCoord();
-          y = -1 * (m_projection->YCoord());
-          footprintPoints.push_back(QPointF(x, y));
+        for (Angle lat = minLat + increment; lat < maxLat; lat += increment) {
+          if (tproj->SetUniversalGround(lat.degrees(),  minLon.degrees())) {
+            x = tproj->XCoord();
+            y = -1 * (tproj->YCoord());
+            footprintPoints.push_back(QPointF(x, y));
+          }
         }
-      }
-      for(Angle lon = minLon + increment; lon < maxLon; lon += increment) {
-        if(m_projection->SetUniversalGround(maxLat.degrees(),
-           lon.degrees())) {
-          x = m_projection->XCoord();
-          y = -1 * (m_projection->YCoord());
-          footprintPoints.push_back(QPointF(x, y));
+        for (Angle lon = minLon + increment; lon < maxLon; lon += increment) {
+          if (tproj->SetUniversalGround(maxLat.degrees(), lon.degrees())) {
+            x = tproj->XCoord();
+            y = -1 * (tproj->YCoord());
+            footprintPoints.push_back(QPointF(x, y));
+          }
         }
-      }
-      for(Angle lat = maxLat; lat > minLat + increment; lat -= increment) {
-        if(m_projection->SetUniversalGround(lat.degrees(),
-           maxLon.degrees())) {
-          x = m_projection->XCoord();
-          y = -1 * (m_projection->YCoord());
-          footprintPoints.push_back(QPointF(x, y));
+        for (Angle lat = maxLat; lat > minLat + increment; lat -= increment) {
+          if (tproj->SetUniversalGround(lat.degrees(), maxLon.degrees())) {
+            x = tproj->XCoord();
+            y = -1 * (tproj->YCoord());
+            footprintPoints.push_back(QPointF(x, y));
+          }
         }
-      }
-      for(Angle lon = maxLon; lon > minLon + increment; lon -= increment) {
-        if(m_projection->SetUniversalGround(minLat.degrees(),
-           lon.degrees())) {
-          x = m_projection->XCoord();
-          y = -1 * (m_projection->YCoord());
-          footprintPoints.push_back(QPointF(x, y));
+        for (Angle lon = maxLon; lon > minLon + increment; lon -= increment) {
+          if (tproj->SetUniversalGround(minLat.degrees(), lon.degrees())) {
+            x = tproj->XCoord();
+            y = -1 * (tproj->YCoord());
+            footprintPoints.push_back(QPointF(x, y));
+          }
         }
-      }
 
       //Now close the polygon.
-      if(m_projection->SetUniversalGround(minLat.degrees(),
-         minLon.degrees())) {
-        x = m_projection->XCoord();
-        y = -1 * (m_projection->YCoord());
-        footprintPoints.push_back(QPointF(x, y));
+        if  (tproj->SetUniversalGround(minLat.degrees(), minLon.degrees())) {
+          x = tproj->XCoord();
+          y = -1 * (tproj->YCoord());
+          footprintPoints.push_back(QPointF(x, y));
+        }
+        footprintPoly = QPolygonF(footprintPoints);
+        m_projectionFootprint->setPolygon(footprintPoly);
+        m_projectionFootprint->setBrush(QBrush(QColor(255, 255, 0, 100)));
+        m_projectionFootprint->setPen(QColor(Qt::black));
+        m_projectionFootprint->setZValue(-FLT_MAX);
+        m_projectionFootprint->setFlag(QGraphicsItem::ItemIsSelectable, false);
+        m_graphicsScene->addItem(m_projectionFootprint);
+        //m_graphicsView->fitInView(m_footprintItem, Qt::KeepAspectRatio);
+        m_projectionFootprint->show();
       }
-      footprintPoly = QPolygonF(footprintPoints);
-      m_projectionFootprint->setPolygon(footprintPoly);
-      m_projectionFootprint->setBrush(QBrush(QColor(255, 255, 0, 100)));
-      m_projectionFootprint->setPen(QColor(Qt::black));
-      m_projectionFootprint->setZValue(-FLT_MAX);
-      m_projectionFootprint->setFlag(QGraphicsItem::ItemIsSelectable, false);
-      m_graphicsScene->addItem(m_projectionFootprint);
-      //m_graphicsView->fitInView(m_footprintItem, Qt::KeepAspectRatio);
-      m_projectionFootprint->show();
 
     }
     catch(IException &e) {

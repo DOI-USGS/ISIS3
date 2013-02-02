@@ -200,7 +200,7 @@ namespace Isis {
       QPoint *m_rubberBandOrigin;
       QGraphicsScene *m_graphicsScene; //!< The graphics scene that makes up this widget.
       MosaicGraphicsView *m_graphicsView; //!< The graphics view
-      Projection *m_projection; //!< The current projection type.
+      Projection *m_projection; //!< The current projection.
       QGraphicsPolygonItem *m_projectionFootprint;
       QList<MosaicSceneItem *> *m_mosaicSceneItems;
       QGraphicsRectItem *m_outlineRect;

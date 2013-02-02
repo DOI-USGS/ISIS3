@@ -27,7 +27,7 @@
 #include "IException.h"
 #include "iTime.h"
 #include "Progress.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "SerialNumberList.h"
 #include "SpecialPixel.h"
 #include "Statistics.h"
@@ -1569,7 +1569,7 @@ namespace Isis {
 
     p_targetRadii.clear();
     if (p_targetName != "") {
-      PvlGroup pvlRadii = Projection::TargetRadii(target);
+      PvlGroup pvlRadii = TProjection::TargetRadii(target);
       p_targetRadii.push_back(Distance(pvlRadii["EquatorialRadius"],
                                        Distance::Meters));
       // The method Projection::Radii does not provide the B radius

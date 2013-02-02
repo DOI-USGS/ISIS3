@@ -166,6 +166,8 @@ namespace Isis {
    *                           false prior to bundle adjustment.
    *   @history 2012-04-13 Orrin Thomas Added method sortedMeasureList, and functor
    *                           ControlMeasureLessThanFunctor
+   *   @history 2012-11-22 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *                           References #775.
    */
   class ControlNet : public QObject {
       Q_OBJECT

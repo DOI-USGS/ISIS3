@@ -45,8 +45,10 @@ int main(void) {
     // and "Longitude off by: " values directly into these variables.
 //    double knownLat = -0.1890205755726288;  // Version 1 values
 //    double knownLon = 225.0221110457575264; // Version 1 values
-    double knownLat = -0.1923383009013995;
-    double knownLon = 225.0671436738516888;
+//   double knownLat = -0.1923383009013995;
+//    double knownLon = 225.0671436738516888;
+    double knownLat =  -0.1987371828743253;
+    double knownLon = 225.0531249933427489;
 
     //Pvl p("$mgs/testData/lub0428b.cub");
     Pvl p("$messenger/testData/EW0089570936I.cub");

@@ -4,6 +4,7 @@
 #include "Sinusoidal.h"
 #include "ProjectionFactory.h"
 #include "Preference.h"
+#include "TProjection.h"
 
 using namespace std;
 int main(int argc, char *argv[]) {
@@ -37,39 +38,39 @@ int main(int argc, char *argv[]) {
   mapGroup += Isis::PvlKeyword("CenterLongitude", -90.0);
 
   try {
-    Isis::Projection &p = *Isis::ProjectionFactory::Create(lab);
+    Isis::TProjection *p = (Isis::TProjection *) Isis::ProjectionFactory::Create(lab);
     //  Isis::Sinusoidal p(lab);
 
     cout << "Test SetGround method ... " << endl;
     cout << std::setprecision(16);
     cout << "Setting ground to (-50,-75)" << endl;
-    p.SetGround(-50.0, -75.0);
-    cout << "Latitude:               " << p.Latitude() << endl;
-    cout << "Longitude:              " << p.Longitude() << endl;
-    cout << "XCoord:                 " << p.XCoord() << endl;
-    cout << "YCoord:                 " << p.YCoord() << endl;
+    p->SetGround(-50.0, -75.0);
+    cout << "Latitude:               " << p->Latitude() << endl;
+    cout << "Longitude:              " << p->Longitude() << endl;
+    cout << "XCoord:                 " << p->XCoord() << endl;
+    cout << "YCoord:                 " << p->YCoord() << endl;
     cout << endl;
 
 
     cout << "Test SetCoordinate method ... " << endl;
     cout << "Setting coordinate to (0.1682814027008146,-0.8726646259971648)" << endl;
-    p.SetCoordinate(0.1682814027008146, -0.8726646259971648);
-    cout << "Latitude:               " << p.Latitude() << endl;
-    cout << "Longitude:              " << p.Longitude() << endl;
-    cout << "XCoord:                 " << p.XCoord() << endl;
-    cout << "YCoord:                 " << p.YCoord() << endl;
+    p->SetCoordinate(0.1682814027008146, -0.8726646259971648);
+    cout << "Latitude:               " << p->Latitude() << endl;
+    cout << "Longitude:              " << p->Longitude() << endl;
+    cout << "XCoord:                 " << p->XCoord() << endl;
+    cout << "YCoord:                 " << p->YCoord() << endl;
     cout << endl;
 
     cout << "Test XYRange method ... " << endl;
     double minX, maxX, minY, maxY;
-    p.XYRange(minX, maxX, minY, maxY);
+    p->XYRange(minX, maxX, minY, maxY);
     cout << "Minimum X:  " << minX << endl;
     cout << "Maximum X:  " << maxX << endl;
     cout << "Minimum Y:  " << minY << endl;
     cout << "Maximum Y:  " << maxY << endl;
     cout << endl;
 
-    Isis::Projection *s = &p;
+    Isis::Projection *s = p;
     cout << "Test Name and comparision method ... " << endl;
     cout << "Name:       " << s->Name() << endl;
     cout << "operator==  " << (*s == *s) << endl;
@@ -86,9 +87,9 @@ int main(int argc, char *argv[]) {
     Isis::Pvl tmp1;
     Isis::Pvl tmp2;
     Isis::Pvl tmp3;
-    tmp1.AddGroup(p.Mapping());
-    tmp2.AddGroup(p.MappingLatitudes());
-    tmp3.AddGroup(p.MappingLongitudes());
+    tmp1.AddGroup(p->Mapping());
+    tmp2.AddGroup(p->MappingLatitudes());
+    tmp3.AddGroup(p->MappingLongitudes());
 
     cout << "Mapping() = " << endl;
     cout << tmp1 << endl;

@@ -255,6 +255,9 @@
       output reports for [PREFIX]IgnoredMeasures.txt and 
       [PREFIX]NonCubeMeasures.txt Fixes #927.
     </change>
+    <change name="Debbie A. Cook" date="2012-11-30">
+      Changed to use TProjection instead of Projection.  References #775.
+    </change>
   </history>
 
   <category>

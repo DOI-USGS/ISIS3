@@ -6,10 +6,10 @@
 
 #include "IException.h"
 #include "PolygonTools.h"
-#include "Projection.h"
 #include "ProjectionFactory.h"
 #include "Preference.h"
 #include "UniversalGroundMap.h"
+#include "TProjection.h"
 
 using namespace std;
 using namespace Isis;
@@ -78,7 +78,7 @@ int main() {
     mapGroup += Isis::PvlKeyword("CenterLongitude", 0);
     mapGroup += Isis::PvlKeyword("ProjectionName", "Sinusoidal");
 
-    Projection *proj = ProjectionFactory::Create(lab);
+    TProjection *proj = (TProjection *) ProjectionFactory::Create(lab);
 
     cout << "Lon/Lat polygon = " << mPolygon->toString() << endl << endl;
 
@@ -94,7 +94,7 @@ int main() {
     mapGroup.DeleteKeyword("PolarRadius");
     mapGroup += Isis::PvlKeyword("PolarRadius", 10.0);
 
-    proj = ProjectionFactory::Create(lab);
+    proj = (TProjection *) ProjectionFactory::Create(lab);
     cout << "X/Y polygon radius (10) = "
          << (PolygonTools::LatLonToXY(*mPolygon, proj))->toString() << endl << endl;
 

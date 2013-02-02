@@ -33,6 +33,8 @@
 #include "IException.h"
 #include "Plugin.h"
 #include "Projection.h"
+#include "RingPlaneProjection.h"
+#include "TProjection.h"
 
 using namespace std;
 
@@ -93,10 +95,78 @@ namespace Isis {
       }
 
       // Now cast that pointer in the proper way
-      Isis::Projection * (*plugin)(Isis::Pvl & label, bool flag);
-      plugin = (Isis::Projection * ( *)(Isis::Pvl & label, bool flag)) ptr;
+      Isis::TProjection * (*plugin)(Isis::Pvl & label, bool flag);
+      // plugin = (Isis::TProjection * ( *)(Isis::Pvl & label, bool flag)) ptr;
+      plugin = (Isis::TProjection * ( *)(Isis::Pvl & label, bool flag)) ptr;
       // Create the projection as requested
-      return (*plugin)(label, allowDefaults);
+      return (Isis::Projection *) (*plugin)(label, allowDefaults);
+    }
+    catch(IException &e) {
+      string message = "Unable to initialize Projection information ";
+      message += "from group [Mapping]";
+      throw IException(e, IException::Io, message, _FILEINFO_);
+    }
+  }
+
+
+  /**
+   * This method returns a pointer to a RingPlaneProjection object. The projection is
+   * intialized using information contained in a Label object. The information
+   * must be a valid Mapping group as defined in the Isis Map Projection Users
+   * Guide.
+   *
+   * @param label The label object containing a valid mapping group.
+   *
+   * @param allowDefaults If false then the projection class as indicated by the
+   *                      ProjectionName keyword will require that projection
+   *                      specific parameters such as CenterRadius,
+   *                      CenterAzimuth, etc must be in the Pvl label object.
+   *                      Otherwise if true then those parameters that are not in
+   *                      the Pvl object will be initialized using the
+   *                      latitude/longitude range.
+   *
+   * @return A pointer to a RingPlaneProjection object.
+   *
+   * @throws Isis::iException::System - Unsupported projection, unable to find
+   *                                    plugin
+   */
+  Isis::Projection *ProjectionFactory::RingsCreate(Isis::Pvl &label,
+      bool allowDefaults) {
+    // Try to load a plugin file in the current working directory and then
+    // load the system file
+    Plugin p;
+
+    if(m_projPlugin.FileName() == "") {
+      FileName localFile("Projection.plugin");
+      if(localFile.fileExists())
+        m_projPlugin.Read(localFile.expanded());
+
+      FileName systemFile("$ISISROOT/lib/Projection.plugin");
+      if(systemFile.fileExists())
+        m_projPlugin.Read(systemFile.expanded());
+    }
+
+    try {
+      // Look for info in the mapping group
+      Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
+      string proj = mapGroup["ProjectionName"];
+
+      // Now get the plugin for the projection
+      void *ptr;
+      try {
+        ptr = m_projPlugin.GetPlugin(proj);
+      }
+      catch(IException &e) {
+        string msg = "Unsupported projection, unable to find plugin for [" +
+                     proj + "]";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
+      }
+
+      // Now cast that pointer in the proper way
+      Isis::RingPlaneProjection * (*plugin)(Isis::Pvl & label, bool flag);
+      plugin = (Isis::RingPlaneProjection * ( *)(Isis::Pvl & label, bool flag)) ptr;
+      // Create the projection as requested
+      return (Projection *) (*plugin)(label, allowDefaults);
     }
     catch(IException &e) {
       string message = "Unable to initialize Projection information ";
@@ -132,7 +202,7 @@ namespace Isis {
       int &samples, int &lines,
       bool sizeMatch) {
     // Create a temporary projection and get the radius at the special latitude
-    Isis::Projection *proj = Create(label, true);
+    Isis::TProjection *proj = (Isis::TProjection *) Create(label, true);
     double trueScaleLat = proj->TrueScaleLatitude();
     double localRadius = proj->LocalRadius(trueScaleLat);
     delete proj;
@@ -178,7 +248,7 @@ namespace Isis {
       if(!sizeMatch) sizeFound = false;
 
       // Initialize the rest of the projection
-      proj = Create(label, true);
+      proj = (Isis::TProjection *) Create(label, true);
 
       // Couldn't find the cube size from the labels so compute it
       if(!sizeFound) {
@@ -281,11 +351,11 @@ namespace Isis {
       finalError.append(e);
       throw finalError;
     }
-    return proj;
+    return (Isis::Projection *) proj;
   }
 
   /**
-   * This method creates a projection for a cube to a plane given a label.
+   * This method creates a projection for a cube to a ring plane given a label.
    * Currently this is utilized only for projecting images of rings to the ring
    * plane (i.e the equatorial plane). The label must contain all the proper
    * mapping information (radii, projection name, parameters, pixel resolution,
@@ -308,14 +378,14 @@ namespace Isis {
    * @return A pointer to a Projection object.
    *
    */
-  Isis::Projection *ProjectionFactory::CreatePlanarForCube(Isis::Pvl &label,
+  Isis::Projection *ProjectionFactory::RingsCreateForCube(Isis::Pvl &label,
       int &samples, int &lines, bool sizeMatch) {
 
     // Create a temporary projection and get the radius at the special latitude
     // NOTE: by "special latitude" we mean that latitude where the projection is
     // not distorted
-    //DON'T THINK THIS IS NEEDED FOR PLANAR PROJECTIONS
-    Isis::Projection *proj = Create(label, true);
+    //DON'T THINK THIS IS NEEDED FOR RING PLANE PROJECTIONS
+    Isis::RingPlaneProjection *proj = (Isis::RingPlaneProjection *) RingsCreate(label, true);
 //    double trueScaleLat = proj->TrueScaleLatitude();
 //    double localRadius = proj->LocalRadius(trueScaleLat);
 //    delete proj;
@@ -459,7 +529,7 @@ namespace Isis {
       finalError.append(e);
       throw finalError;
     }
-    return proj;
+    return (Isis::Projection *) proj;
   }
 
 
@@ -491,7 +561,7 @@ namespace Isis {
       int &samples, int &lines,
       Camera &cam) {
     // Create a temporary projection and get the radius at the special latitude
-    Isis::Projection *proj = Create(label, true);
+    Isis::TProjection *proj = (Isis::TProjection *) Create(label, true);
     double trueScaleLat = proj->TrueScaleLatitude();
     double localRadius = proj->LocalRadius(trueScaleLat);
     delete proj;
@@ -518,7 +588,7 @@ namespace Isis {
       //                                    Isis::Pvl::Replace);
 
       // Initialize the rest of the projection
-      proj = Create(label, true);
+      proj = (Isis::TProjection *) Create(label, true);
       double minX = DBL_MAX;
       double maxX = -DBL_MAX;
       double minY = DBL_MAX;
@@ -701,12 +771,12 @@ namespace Isis {
       if(label.FileName() != "") msg += " from file [" + label.FileName() + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
-    return proj;
+    return (Isis::Projection *) proj;
   }
 
 
   /**
-   * @brief Create a planar map projection group for a cube using a
+   * @brief Create a ring plane map projection group for a cube using a
    * camera.
    *
    * This method walks the boundary of the cube computing lat/lons
@@ -729,11 +799,11 @@ namespace Isis {
    * @return A pointer to a Projection object.
    *
    */
-  Isis::Projection *ProjectionFactory::CreatePlanarForCube(Isis::Pvl &label,
+  Isis::Projection *ProjectionFactory::RingsCreateForCube(Isis::Pvl &label,
       int &samples, int &lines, Camera &cam) {
 
     // Create a temporary projection
-    Isis::Projection *proj = Create(label, true);
+    Isis::RingPlaneProjection *proj = (Isis::RingPlaneProjection *) RingsCreate(label, true);
 //    double trueScaleLat = proj->TrueScaleLatitude();
 //    double localRadius = proj->LocalRadius(trueScaleLat);
 //    delete proj;
@@ -761,7 +831,7 @@ namespace Isis {
                           Isis::Pvl::Replace);
 
       // Initialize the rest of the projection
-      proj = Create(label, true);
+      proj = (Isis::RingPlaneProjection *) RingsCreate(label, true);
       double minX = DBL_MAX;
       double maxX = -DBL_MAX;
       double minY = DBL_MAX;
@@ -940,7 +1010,7 @@ namespace Isis {
       if(label.FileName() != "") msg += " from file [" + label.FileName() + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
-    return proj;
+    return (Isis::Projection *) proj;
   }
 
 
@@ -965,7 +1035,7 @@ namespace Isis {
    * @return (Isis::Projection) A pointer to a Projection object.
    */
   Isis::Projection *ProjectionFactory::CreateFromCube(Isis::Pvl &label) {
-    Isis::Projection *proj;
+    Isis::TProjection *proj;
     try {
       // Get the pixel resolution
       Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
@@ -976,7 +1046,7 @@ namespace Isis {
       double upperLeftY = mapGroup["UpperLeftCornerY"];
 
       // Initialize the rest of the projection
-      proj = Create(label, true);
+      proj = (Isis::TProjection *) Create(label, true);
 
       // Create a mapper to transform pixels into projection x/y and vice versa
       PFPixelMapper *pixelMapper = new PFPixelMapper(pixelResolution, upperLeftX, upperLeftY);
@@ -990,6 +1060,6 @@ namespace Isis {
       if(label.FileName() != "") msg += " from file [" + label.FileName() + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
-    return proj;
+    return (Isis::Projection *) proj;
   }
 } //end namespace isis

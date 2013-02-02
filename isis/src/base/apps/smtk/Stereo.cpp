@@ -28,7 +28,7 @@
 #include <iomanip>
 
 #include "Camera.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "SpecialPixel.h"
 #include "Stereo.h"
 
@@ -163,7 +163,7 @@ namespace Isis {
      reclat_c(&rec[0], &radius, &longitude, &latitude);
      longitude *= dpr_c();
      latitude *= dpr_c();
-     longitude = Projection::To360Domain(longitude);
+     longitude = TProjection::To360Domain(longitude);
      return;
      return;
    }

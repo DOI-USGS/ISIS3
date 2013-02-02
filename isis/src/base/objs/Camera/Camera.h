@@ -221,6 +221,8 @@ namespace Isis {
    *                           References Mantis ticket #775 and #1114.
    *   @history 2012-10-25 Jeannie Backer - Changed resolution() method to lower
    *                           camel case. References #1181.
+   *   @history 2012-12-20 Debbie A. Cook - Changed to use TProjection and RingPlaneProjection
+   *                           instead of Projection as needed.  References #775.
    */
 
   class Camera : public Sensor {

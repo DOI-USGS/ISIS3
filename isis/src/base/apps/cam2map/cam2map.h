@@ -9,11 +9,13 @@ using namespace Isis;
  * @author ????-??-?? Unknown
  *
  * @internal
+ *   @history 2012-12-06 Debbie A. Cook - Changed to use TProjection instead of Projection.
+ *                          References #775.
  */
 class cam2mapReverse : public Transform {
   private:
     Camera *p_incam;
-    Projection *p_outmap;
+    TProjection *p_outmap;
     int p_inputSamples;
     int p_inputLines;
     bool p_trim;
@@ -25,7 +27,7 @@ class cam2mapReverse : public Transform {
     cam2mapReverse(const int inputSamples, const int inputLines, 
                    Camera *incam,
                    const int outputSamples, const int outputLines, 
-                   Projection *outmap,
+                   TProjection *outmap,
                    bool trim);
 
     // destructor
@@ -46,7 +48,7 @@ class cam2mapReverse : public Transform {
 class cam2mapForward : public Transform {
   private:
     Camera *p_incam;
-    Projection *p_outmap;
+    TProjection *p_outmap;
     int p_inputSamples;
     int p_inputLines;
     bool p_trim;
@@ -58,7 +60,7 @@ class cam2mapForward : public Transform {
     cam2mapForward(const int inputSamples, const int inputLines, 
                    Camera *incam,
                    const int outputSamples, const int outputLines, 
-                   Projection *outmap,
+                   TProjection *outmap,
                    bool trim);
 
     // destructor

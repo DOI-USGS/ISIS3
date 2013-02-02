@@ -312,6 +312,7 @@ namespace Isis {
       normal[1] = 0.;
       normal[2] = 0.;
       setHasNormal(false);
+      return;
    }
     else {
       setHasNormal(true);

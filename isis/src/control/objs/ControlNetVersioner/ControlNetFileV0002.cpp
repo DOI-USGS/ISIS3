@@ -16,7 +16,7 @@
 #include "Latitude.h"
 #include "Longitude.h"
 #include "NaifStatus.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "Pvl.h"
 #include "SurfacePoint.h"
 
@@ -263,7 +263,7 @@ namespace Isis {
     if (target != "") {
       try {
         NaifStatus::CheckErrors();
-        pvlRadii = Projection::TargetRadii(target);
+        pvlRadii = TProjection::TargetRadii(target);
       }
       catch(IException &e) {
         IString msg = "The target name, " + target + ", is not recognized.";

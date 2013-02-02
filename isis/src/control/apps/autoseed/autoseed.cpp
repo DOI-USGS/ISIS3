@@ -26,6 +26,7 @@
 #include "PvlKeyword.h"
 #include "SerialNumberList.h"
 #include "SpecialPixel.h"
+#include "TProjection.h"
 #include "UniversalGroundMap.h"
 #include "IException.h"
 #include "IString.h"
@@ -145,7 +146,7 @@ void IsisMain() {
   // Note: Should this be an option to include this in the program?
   PvlGroup inst = cubeLab.FindGroup("Instrument", Pvl::Traverse);
   string target = inst["TargetName"];
-  PvlGroup radii = Projection::TargetRadii(target);
+  PvlGroup radii = TProjection::TargetRadii(target);
   Isis::Pvl maplab;
   maplab.AddGroup(Isis::PvlGroup("Mapping"));
   Isis::PvlGroup &mapGroup = maplab.FindGroup("Mapping");
@@ -160,10 +161,10 @@ void IsisMain() {
 
   //PolygonSeeder *seeder = PolygonSeederFactory::Create(seedDef);
 
-  Projection *proj = NULL;
+  TProjection *proj = NULL;
   UniversalGroundMap *ugmap = NULL;
   if(seedDomain == XY) {
-    proj = Isis::ProjectionFactory::Create(maplab);
+    proj = (Isis::TProjection *) Isis::ProjectionFactory::Create(maplab);
   }
   else if(seedDomain == SampleLine) {
     Cube cube;

@@ -22,7 +22,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "Projection.h"
+#include "TProjection.h"
 
 namespace Isis {
   class Pvl;
@@ -79,8 +79,10 @@ namespace Isis {
    *                           implementation file. Minor modifications to
    *                           comply with some coding standards. References
    *                           #928.
+   *   @history 2012-01-20 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *                           References #775.
    */
-  class SimpleCylindrical : public Projection {
+  class SimpleCylindrical : public TProjection {
     public:
       SimpleCylindrical(Pvl &label, bool allowDefaults = false);
       ~SimpleCylindrical();

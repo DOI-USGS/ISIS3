@@ -22,7 +22,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "Projection.h"
+#include "TProjection.h"
 
 namespace Isis {
   class Pvl;
@@ -82,9 +82,11 @@ namespace Isis {
    *                           Name and Version to the implementation file.
    *                           Minor modifications to comply with some coding
    *                           standards. References #928.
+   *   @history 2012-11-22 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *                           References #775.
    */
 
-  class Sinusoidal : public Projection {
+  class Sinusoidal : public TProjection {
     public:
       Sinusoidal(Pvl &label, bool allowDefaults = false);
       ~Sinusoidal();

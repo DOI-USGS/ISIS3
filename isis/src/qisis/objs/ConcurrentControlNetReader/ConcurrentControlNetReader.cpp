@@ -39,7 +39,7 @@
 #include "ControlPoint.h"
 #include "Distance.h"
 #include "FileName.h"
-#include "Projection.h"
+#include "TProjection.h"
 
 
 using std::cerr;
@@ -203,7 +203,7 @@ namespace Isis {
     m_targetThread = targetThread;
 
     if (!target.isEmpty()) {
-      PvlGroup pvlRadii = Projection::TargetRadii(target.toStdString());
+      PvlGroup pvlRadii = TProjection::TargetRadii(target.toStdString());
       m_majorRad = new Distance(pvlRadii["EquatorialRadius"], Distance::Meters);
       m_minorRad = new Distance(pvlRadii["EquatorialRadius"], Distance::Meters);
       m_polarRad = new Distance(pvlRadii["PolarRadius"], Distance::Meters);

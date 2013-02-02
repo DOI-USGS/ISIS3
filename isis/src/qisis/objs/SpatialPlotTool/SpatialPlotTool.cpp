@@ -24,6 +24,8 @@
 #include "PlotWindow.h"
 #include "PolygonTools.h"
 #include "Projection.h"
+#include "RingPlaneProjection.h"
+#include "TProjection.h"
 #include "Pvl.h"
 #include "RubberBandComboBox.h"
 #include "RubberBandTool.h"
@@ -287,10 +289,12 @@ namespace Isis {
     if (groundMap) {
       Distance radius;
 
-      if (groundMap->Camera())
+      if (groundMap->Camera()) {
         radius = groundMap->Camera()->LocalRadius();
-      else if (groundMap->Projection())
+      }
+      else if (groundMap->Projection()) {
         radius = Distance(groundMap->Projection()->LocalRadius(), Distance::Meters);
+      }
 
       result = SurfacePoint(Latitude(groundMap->UniversalLatitude(), Angle::Degrees),
           Longitude(groundMap->UniversalLongitude(), Angle::Degrees), radius);

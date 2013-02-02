@@ -2,7 +2,7 @@
 
 #include "Angle.h"
 #include "Camera.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "ProcessByBrick.h"
 #include "ProcessByLine.h"
@@ -16,7 +16,7 @@ using namespace Isis;
 
 // Global variables
 Camera *cam;
-Projection *proj;
+TProjection *proj;
 int nbands;
 bool noCamera;
 
@@ -81,7 +81,7 @@ void IsisMain() {
 
   if(noCamera) {
     try {
-      proj = icube->getProjection();
+      proj = (TProjection *) icube->getProjection();
     }
     catch(IException &e) {
       string msg = "Mosaic files must contain mapping labels";

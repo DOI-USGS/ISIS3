@@ -84,6 +84,7 @@ namespace Isis {
    *                             SampleResolution and LineResolution
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
    *                          coding standards. References #972.
+   *   @history 2012-12-20 Debbie A. Cook - Changed to use TProjection.  References #775.
    */
   class CameraPointInfo {
 

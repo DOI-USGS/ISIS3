@@ -10,7 +10,7 @@
 #include "FileList.h"
 #include "IException.h"
 #include "IString.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "ProjectionFactory.h"
 #include "PvlGroup.h"
 #include "SpecialPixel.h"
@@ -303,7 +303,7 @@ void helperButtonLogRadius() {
   IString targetName = ui.GetString("TARGETNAME");
   Pvl tMap;
 //call function to get system radius
-  PvlGroup tGrp = Projection::TargetRadii(targetName);
+  PvlGroup tGrp = TProjection::TargetRadii(targetName);
   tMap.AddGroup(tGrp);
   string Ostring = "***** System radii for " + targetName + "*****";
 //writh to log string(Ostring and mapping group
@@ -431,7 +431,7 @@ void addTarget(PvlGroup &mapping) {
 // the system radii for target name.
   else if(ui.GetString("TARGOPT") == "USER") {
     IString targetName = ui.GetString("TARGETNAME");
-    PvlGroup grp = Projection::TargetRadii(targetName);
+    PvlGroup grp = TProjection::TargetRadii(targetName);
     double equatorialRad = grp["EquatorialRadius"];
     double polarRad = grp["PolarRadius"];
 // if radii were entered in GUI then set radii to entered value
@@ -533,7 +533,7 @@ void calcRange(double &minLat, double &maxLat,
   else if(ui.GetString("TARGOPT") == "USER") {
     userGrp += PvlKeyword("TargetName", ui.GetString("TARGETNAME"));
     IString targetName = ui.GetString("TARGETNAME");
-    PvlGroup grp = Projection::TargetRadii(targetName);
+    PvlGroup grp = TProjection::TargetRadii(targetName);
     double equatorialRad = grp["EquatorialRadius"];
     double polarRad = grp["PolarRadius"];
 

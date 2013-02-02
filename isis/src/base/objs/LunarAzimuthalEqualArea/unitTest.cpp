@@ -7,6 +7,7 @@
 #include "IException.h"
 #include "ProjectionFactory.h"
 #include "Preference.h"
+#include "TProjection.h"
 
 using namespace std;
 int main(int argc, char *argv[]) {
@@ -31,7 +32,7 @@ int main(int argc, char *argv[]) {
                                "LunarAzimuthalEqualArea");
 
   try {
-    Isis::Projection &p = *Isis::ProjectionFactory::Create(lab);
+    Isis::TProjection *p = (Isis::TProjection *) Isis::ProjectionFactory::Create(lab);
 
     cout << "\n******* Test SetGround and SetCoordinate methods ********"
          << "\n\nfor all lat and lon in [-90..90] step 45"
@@ -48,11 +49,11 @@ int main(int argc, char *argv[]) {
              << setw(4) << j << "\n"
              << "testing SetCoordinate and SetGround";
 
-        p.SetGround(i * 1.0, j * 1.0);
-        p.SetCoordinate(p.XCoord(), p.YCoord());
+        p->SetGround(i * 1.0, j * 1.0);
+        p->SetCoordinate(p->XCoord(), p->YCoord());
 
-        if((fabs(fabs(p.Latitude()) - fabs(i)) > 0.00001) ||
-            (fabs(i) != 90 &&  fabs(fabs(p.Longitude()) - fabs(j)) > 0.00001))
+        if((fabs(fabs(p->Latitude()) - fabs(i)) > 0.00001) ||
+            (fabs(i) != 90 &&  fabs(fabs(p->Longitude()) - fabs(j)) > 0.00001))
           cout << " ......................... [ FAILED ]\n\n";
         else
           cout << " ......................... [   OK   ]\n\n";
@@ -63,35 +64,35 @@ int main(int argc, char *argv[]) {
          << "\nprint the output of the XYRange and Mapping methods...\n\n\n";
 
     cout << "Name method returns \"LunarAzimuthalEqualArea\"................ ";
-    if(p.Name() == "LunarAzimuthalEqualArea")
+    if(p->Name() == "LunarAzimuthalEqualArea")
       cout << "[   OK   ]\n";
     else
       cout << "[ FAILED ]\n";
 
-    Isis::Projection *s = &p;
-    cout << "\nIsis::Projection * s = &p; // p is this projection"
+    Isis::TProjection *s = p;
+    cout << "\nIsis::Projection * s = p; // p is pointer to this projection"
          << "\n(*s == p) returns ";
-    if(*s == p)
+    if(*s == *p)
       cout << "true! ..................................... [   OK   ]\n";
     else
       cout << "false! .................................... [ FAILED ]\n";
     mapGroup["PolarRadius"].SetValue(42);
     Isis::Pvl tmp1;
-    Isis::Projection &p2 = *Isis::ProjectionFactory::Create(lab);
-    tmp1.AddGroup(p2.Mapping());
-    s = &p2;
+    Isis::TProjection *p2 = (Isis::TProjection *) Isis::ProjectionFactory::Create(lab);
+    tmp1.AddGroup(p2->Mapping());
+    s = p2;
     cout << "created a second Projection reference p2"
          << "\nusing the same pvl as p except for that PolarRadius = 42"
          << "\nPvl for p2...\n" << tmp1
          << "\ns = &p2"
          << "\n(*s == p) returns ";
-    if(*s == p)
+    if(*s == *p)
       cout << "true! ..................................... [ FAILED ]\n";
     else
       cout << "false! .................................... [   OK   ]\n";
 
     double minX, maxX, minY, maxY;
-    p.XYRange(minX, maxX, minY, maxY);
+    p->XYRange(minX, maxX, minY, maxY);
     cout << "\nXYRange..."
          << "\n  Minimum X:  " << minX
          << "\n  Maximum X:  " << maxX
@@ -99,7 +100,7 @@ int main(int argc, char *argv[]) {
          << "\n  Maximum Y:  " << maxY << "\n";
 
     Isis::Pvl tmp2;
-    tmp2.AddGroup(p.Mapping());
+    tmp2.AddGroup(p->Mapping());
 
   }
   catch(Isis::IException &e) {

@@ -21,6 +21,7 @@
 #include "MosaicGraphicsView.h"
 #include "MosaicSceneWidget.h"
 #include "Projection.h"
+#include "TProjection.h"
 #include "PvlKeyword.h"
 #include "PvlObject.h"
 
@@ -115,85 +116,89 @@ namespace Isis {
       double area = IString(areaString.toStdString()).ToDouble();
 
       Projection *projection = getWidget()->getProjection();
+      Projection::ProjectionType ptype = projection->projectionType();
 
-      if(projection && projection->SetGround(lat, lon)) {
-        QPointF scenePos(projection->XCoord(), -1 * projection->YCoord());
-        QRectF sceneRect(getWidget()->getView()->sceneRect());
+      if (projection && ptype == Projection::Triaxial) {
+        TProjection * tproj = (TProjection *) projection;
+        if (tproj->SetGround(lat, lon)) {
+          QPointF scenePos(projection->XCoord(), -1 * projection->YCoord());
+          QRectF sceneRect(getWidget()->getView()->sceneRect());
 
-        if(sceneRect.contains(scenePos)) {
-          if(m_box != NULL) {
-            clearBox();
-          }
+          if(sceneRect.contains(scenePos)) {
+            if(m_box != NULL) {
+              clearBox();
+            }
 
-          Distance distance(area, Distance::Meters);
+            Distance distance(area, Distance::Meters);
 
-          QPolygonF boxPoly;
-          QRectF latLonRange = calcLatLonRange(QPointF(lon, lat), distance);
+            QPolygonF boxPoly;
+            QRectF latLonRange = calcLatLonRange(QPointF(lon, lat), distance);
 
-          double xStep = latLonRange.width() / 100.0;
-          double yStep = latLonRange.height() / 100.0;
+            double xStep = latLonRange.width() / 100.0;
+            double yStep = latLonRange.height() / 100.0;
 
-          bool hasPole = (latLonRange.top() == -90 ||
-                          latLonRange.bottom() == 90);
+            bool hasPole = (latLonRange.top() == -90 ||
+                            latLonRange.bottom() == 90);
 
-          double yPos = latLonRange.top();
-          if(yPos != -90) {
-            for(double xPos = latLonRange.left();
+            double yPos = latLonRange.top();
+            if (yPos != -90) {
+              for(double xPos = latLonRange.left();
                 xPos <= latLonRange.right();
                 xPos += xStep) {
-              if(projection->SetGround(yPos, xPos)) {
-                QPointF pos(projection->XCoord(), -1 * projection->YCoord());
+                if (tproj->SetGround(yPos, xPos)) {
+                  QPointF pos(tproj->XCoord(), -1 * tproj->YCoord());
+                  boxPoly << pos;
+                }
+              }
+            }
+
+            double xPos = latLonRange.right();
+            for (double yPos = latLonRange.top();
+                !hasPole && yPos <= latLonRange.bottom();
+                yPos += yStep) {
+              if (tproj->SetGround(yPos, xPos)) {
+                QPointF pos(tproj->XCoord(), -1 * tproj->YCoord());
                 boxPoly << pos;
               }
             }
-          }
 
-          double xPos = latLonRange.right();
-          for(double yPos = latLonRange.top();
-              !hasPole && yPos <= latLonRange.bottom();
-              yPos += yStep) {
-            if(projection->SetGround(yPos, xPos)) {
-              QPointF pos(projection->XCoord(), -1 * projection->YCoord());
-              boxPoly << pos;
-            }
-          }
-
-          yPos = latLonRange.bottom();
-          if(yPos != 90) {
-            for(double xPos = latLonRange.right();
+            yPos = latLonRange.bottom();
+            if (yPos != 90) {
+              for (double xPos = latLonRange.right();
                 xPos >= latLonRange.left();
                 xPos -= xStep) {
-              if(projection->SetGround(yPos, xPos)) {
-                QPointF pos(projection->XCoord(), -1 * projection->YCoord());
+                if (tproj->SetGround(yPos, xPos)) {
+                  QPointF pos(tproj->XCoord(), -1 * tproj->YCoord());
+                  boxPoly << pos;
+                }
+              }
+            }
+
+            xPos = latLonRange.left();
+            for (double yPos = latLonRange.bottom();
+              !hasPole && yPos >= latLonRange.top();
+              yPos -= yStep) {
+              if (tproj->SetGround(yPos, xPos)) {
+                QPointF pos(tproj->XCoord(), -1 * tproj->YCoord());
                 boxPoly << pos;
               }
             }
-          }
 
-          xPos = latLonRange.left();
-          for(double yPos = latLonRange.bottom();
-              !hasPole && yPos >= latLonRange.top();
-              yPos -= yStep) {
-            if(projection->SetGround(yPos, xPos)) {
-              QPointF pos(projection->XCoord(), -1 * projection->YCoord());
-              boxPoly << pos;
+            if (boxPoly.size() > 0) {
+              boxPoly << boxPoly[0];
+
+              m_box = new QGraphicsPolygonItem(boxPoly);
+              m_box->setZValue(DBL_MAX);
+
+              getWidget()->getScene()->addItem(m_box);
+              getWidget()->getView()->centerOn(scenePos);
             }
           }
-
-          if(boxPoly.size() > 0) {
-            boxPoly << boxPoly[0];
-
-            m_box = new QGraphicsPolygonItem(boxPoly);
-            m_box->setZValue(DBL_MAX);
-
-            getWidget()->getScene()->addItem(m_box);
-            getWidget()->getView()->centerOn(scenePos);
-          }
-        }
-        else {
+          else {
           QString message = "Lat/Lon not within this view.";
           QMessageBox::information(getWidget(), "Cannot Calculate Box",
                                   message, QMessageBox::Ok);
+          }
         }
       }
     }
@@ -336,16 +341,16 @@ namespace Isis {
       return;
 
     if(s == Qt::LeftButton) {
-      Projection *proj = getWidget()->getProjection();
+      TProjection *tproj = (TProjection *) getWidget()->getProjection();
 
-      if(proj && getWidget()->getView()->sceneRect().contains(mouseLoc)) {
-        if(proj->SetCoordinate(mouseLoc.x(), -1 * mouseLoc.y())) {
+      if(tproj && getWidget()->getView()->sceneRect().contains(mouseLoc)) {
+        if(tproj->SetCoordinate(mouseLoc.x(), -1 * mouseLoc.y())) {
           if(m_drawBox != NULL) {
             clearBox();
           }
 
-          m_latLineEdit->setText(QString::number(proj->Latitude(), 'g', 10));
-          m_lonLineEdit->setText(QString::number(proj->Longitude(), 'g', 10));
+          m_latLineEdit->setText(QString::number(tproj->Latitude(), 'g', 10));
+          m_lonLineEdit->setText(QString::number(tproj->Longitude(), 'g', 10));
 
           userChangedBox();
         }
@@ -383,11 +388,11 @@ namespace Isis {
     Angle centerLat(centerLatLon.y(), Angle::Degrees);
     Angle centerLon(centerLatLon.x(), Angle::Degrees);
 
-    Projection *proj = getWidget()->getProjection();
+    TProjection *tproj = (TProjection *) getWidget()->getProjection();
 
-    if(proj) {
+    if (tproj) {
       bool longitudeWraps = false;
-      Distance radius(proj->LocalRadius(centerLat.degrees()),
+      Distance radius(tproj->LocalRadius(centerLat.degrees()),
           Distance::Meters);
 
       // First we can get the angle between the latitudes...
@@ -396,10 +401,10 @@ namespace Isis {
 
       latLonBoundingBox.setTop( (centerLat - deltaLat).degrees() );
 
-      if(latLonBoundingBox.top() < -90 && centerLatLon.y() != -90) {
+      if (latLonBoundingBox.top() < -90 && centerLatLon.y() != -90) {
 
         // Block infinite recursion
-        if(centerLatLon.y() != 90) {
+        if (centerLatLon.y() != 90) {
           qWarning("The pole is included in the area but not centered");
           centerLatLon.setY(-90);
           return calcLatLonRange(centerLatLon, size);
@@ -407,16 +412,16 @@ namespace Isis {
         else
           return QRectF();
       }
-      else if(centerLatLon.y() == -90) {
+      else if (centerLatLon.y() == -90) {
         longitudeWraps = true;
       }
 
       latLonBoundingBox.setBottom( (centerLat + deltaLat).degrees() );
 
-      if(latLonBoundingBox.bottom() > 90 && centerLatLon.y() != 90) {
+      if (latLonBoundingBox.bottom() > 90 && centerLatLon.y() != 90) {
 
         // Block infinite recursion
-        if(centerLatLon.y() != -90) {
+        if (centerLatLon.y() != -90) {
           qWarning("The pole is included in the area but not centered");
           centerLatLon.setY(90);
           return calcLatLonRange(centerLatLon, size);
@@ -424,7 +429,7 @@ namespace Isis {
         else
           return QRectF();
       }
-      else if(centerLatLon.y() == 90) {
+      else if (centerLatLon.y() == 90) {
         longitudeWraps = true;
       }
 
@@ -441,8 +446,8 @@ namespace Isis {
         longitudeWraps = true;
 
       // Longitude wraps
-      if(longitudeWraps) {
-        if(proj->Has360Domain()) {
+      if (longitudeWraps) {
+        if (tproj->Has360Domain()) {
           latLonBoundingBox.setLeft( 0 );
           latLonBoundingBox.setRight( 360 );
         }

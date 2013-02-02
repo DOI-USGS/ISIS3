@@ -5,7 +5,7 @@
 #include "IException.h"
 #include "ProjectionFactory.h"
 #include "Progress.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "Pvl.h"
 #include "UserInterface.h"
 
@@ -57,9 +57,9 @@ void IsisMain() {
   mapping += PvlKeyword("MinimumLongitude", lonStart);
   mapping += PvlKeyword("MaximumLongitude", lonEnd);
 
-  Projection *proj;
+  TProjection *proj;
   try {
-    proj = ProjectionFactory::Create(p);
+    proj = (TProjection *) ProjectionFactory::Create(p);
   }
   catch(IException &e) {
     string msg = "Cannot create grid - MapFile [" + mapFile +

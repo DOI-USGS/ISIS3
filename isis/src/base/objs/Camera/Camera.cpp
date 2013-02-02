@@ -22,14 +22,14 @@
  */
 #include "Camera.h"
 
+#include <cfloat>
+#include <cmath>
+#include <iomanip>
+
 #include <QList>
 #include <QPair>
 #include <QTime>
 #include <QVector>
-
-#include <cfloat>
-#include <cmath>
-#include <iomanip>
 
 #include "Angle.h"
 #include "Constants.h"
@@ -47,9 +47,11 @@
 #include "NaifStatus.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
+#include "RingPlaneProjection.h"
 #include "ShapeModel.h"
 #include "SurfacePoint.h"
 #include "Target.h"
+#include "TProjection.h"
 
 using namespace std;
 
@@ -103,7 +105,6 @@ namespace Isis {
 
     p_groundRangeComputed = false;
     p_raDecRangeComputed = false;
-    p_ringRangeComputed = false;
     p_pointComputed = false;
   }
 
@@ -196,9 +197,10 @@ namespace Isis {
 
     // The projection is a sky map
     else if (p_projection->IsSky()) {
-      if (p_projection->SetWorld(sample, line)) {
-        if (SetRightAscensionDeclination(p_projection->Longitude(),
-                                        p_projection->UniversalLatitude())) {
+      TProjection *tproj = (TProjection *) p_projection;
+      if (tproj->SetWorld(sample, line)) {
+        if (SetRightAscensionDeclination(tproj->Longitude(),
+                                        tproj->UniversalLatitude())) {
           p_childSample = sample;
           p_childLine = line;
 
@@ -209,48 +211,47 @@ namespace Isis {
 
     // We have map projected camera model
     else {
+      Latitude lat;
+      Longitude lon;
+      Distance rad;
       if (shape->name() != "Plane") { // this is the normal behavior
         if (p_projection->SetWorld(sample, line)) {
-          Latitude lat(p_projection->UniversalLatitude(), Angle::Degrees);
-          Longitude lon(p_projection->UniversalLongitude(), Angle::Degrees);
-          Distance rad(LocalRadius(lat, lon));
+          TProjection *tproj = (TProjection *) p_projection;
+          lat = Latitude(tproj->UniversalLatitude(), Angle::Degrees);
+          lon = Longitude(tproj->UniversalLongitude(), Angle::Degrees);
+          rad = Distance(LocalRadius(lat, lon));
           if (!rad.isValid()) {
-            shape->clearSurfacePoint();
+            shape->setHasIntersection(false);
             return false;
-          }
-          SurfacePoint surfPt(lat, lon, rad);
-          if (SetGround(surfPt)) {
-            p_childSample = sample;
-            p_childLine = line;
-
-            shape->setHasIntersection(true);
-            return true;
           }
         }
       }
       else { // shape is Plane
         if(p_projection->SetWorld(sample, line)) {
+          RingPlaneProjection *rproj = (RingPlaneProjection *) p_projection;
           Latitude lat(0.0, Angle::Degrees);
-          Longitude lon(p_projection->UniversalLongitude(), Angle::Degrees);
-          Distance rad(LocalRadius(lat, lon));
+          Longitude lon(rproj->UniversalAzimuth(), Angle::Degrees);
+          Distance rad(rproj->UniversalRadius(),Distance::Kilometers);
+
           if (!rad.isValid()) {
             shape->setHasIntersection(false);
             return false;
           }
-          SurfacePoint surfPt(lat, lon, rad);
-          if (SetGround(surfPt)) {
-            p_childSample = sample;
-            p_childLine = line;
-
-            shape->setHasIntersection(true);
-            return true;
-          }
         }
+      }
+
+      SurfacePoint surfPt(lat, lon, rad);
+      if (SetGround(surfPt)) {
+        p_childSample = sample;
+        p_childLine = line;
+
+        shape->setHasIntersection(true);
+        return true;
       }
     }
 
     // failure
-    shape->clearSurfacePoint();
+    shape->setHasIntersection(false);
     return false;
   }
 
@@ -285,9 +286,18 @@ namespace Isis {
    *              false if it was not
    */
   bool Camera::SetGround(Latitude latitude, Longitude longitude) {
-    Distance localRadius(LocalRadius(latitude, longitude));
+    ShapeModel *shape = target()->shape();
+    Distance localRadius;
 
-    if (!localRadius.isValid()) {
+    if (shape->name() != "Plane") { // this is the normal behavior
+      localRadius = LocalRadius(latitude, longitude);
+    }
+    else {
+      localRadius = Distance(latitude.degrees(),Distance::Kilometers);
+      latitude = Latitude(0.,Angle::Degrees);
+    }
+
+      if (!localRadius.isValid()) {
       target()->shape()->clearSurfacePoint();
       return false;
     }
@@ -372,8 +382,17 @@ namespace Isis {
               return true;
             }
           }
-          else {
+          else  if (p_projection->projectionType() == Projection::Triaxial) { 
             if (p_projection->SetUniversalGround(UniversalLatitude(), UniversalLongitude())) {
+              p_childSample = p_projection->WorldX();
+              p_childLine = p_projection->WorldY();
+              shape->setHasIntersection(true);
+              return true;
+            }
+          }
+          else { // this should work for rings too
+            // TODO change UniversalLongitude to azimuth???
+            if (p_projection->SetUniversalGround(LocalRadius().kilometers(), UniversalLongitude())) {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
               shape->setHasIntersection(true);
@@ -1007,9 +1026,6 @@ namespace Isis {
     // See if the PVL overrides the radii
     PvlGroup map = pvl.FindGroup("Mapping", Pvl::Traverse);
 
-    minrad = p_minRingRadius;
-    maxrad = p_maxRingRadius;
-
     // Assume 0 to 360 domain but change it if necessary
     minlon = p_minlon;
     maxlon = p_maxlon;
@@ -1107,8 +1123,8 @@ namespace Isis {
     ringRangeResolution();
     map += PvlKeyword("MinimumRingRadius", p_minRingRadius);
     map += PvlKeyword("MaximumRingRadius", p_maxRingRadius);
-    map += PvlKeyword("MinimumLongitude", p_minlon);
-    map += PvlKeyword("MaximumLongitude", p_maxlon);
+    map += PvlKeyword("MinimumAzimuth", p_minlon);
+    map += PvlKeyword("MaximumAzimuth", p_maxlon);
     map += PvlKeyword("PixelResolution", p_minres);
 
     map += PvlKeyword("ProjectionName", "Planar");
@@ -1390,7 +1406,8 @@ namespace Isis {
    */
   bool Camera::RaDecRange(double &minra, double &maxra,
                           double &mindec, double &maxdec) {
-    if (p_projection != NULL && !p_projection->IsSky()) {
+    TProjection *tproj = (TProjection *) p_projection;
+    if (p_projection != NULL && !tproj->IsSky()) {
       IString msg = "Camera::RaDecRange can not calculate a right ascension, declination range";
       msg += " for projected images which are not projected to sky";
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -1535,7 +1552,8 @@ namespace Isis {
    * @return @b double The resutant RaDec resolution
    */
   double Camera::RaDecResolution() {
-    if (p_projection != NULL && !p_projection->IsSky()) {
+    TProjection *tproj = (TProjection *) p_projection;
+    if (p_projection != NULL && !tproj->IsSky()) {
       IString msg = "Camera::RaDecResolution can not calculate a right ascension, declination resolution";
       msg += " for projected images which are not projected to sky";
       throw IException(IException::Programmer, msg, _FILEINFO_);

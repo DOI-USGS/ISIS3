@@ -73,6 +73,8 @@ namespace Isis {
    *                          a plus that intersects in the center of the image. This
    *                          ensures that the entire longitude range is returned.
    *                          Fixes #855.
+   *   @history 2012-12-20 Debbie A. Cook - Changed to use TProjection 
+   *                           instead of Projection.  References #775.
    */
   class UniversalGroundMap {
     public:

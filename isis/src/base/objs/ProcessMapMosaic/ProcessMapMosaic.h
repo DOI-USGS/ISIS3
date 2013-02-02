@@ -78,6 +78,8 @@ namespace Isis {
    *                          Added caught exception to new thrown exception.
    *                          Moved method implementation to cpp. References
    *                          #1169.
+   *  @history 2012-01-20 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *                           References #775.
    *
    *  @todo 2005-02-11 Stuart Sides - add coded example and implementation
    *                          example to class documentation

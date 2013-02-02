@@ -29,7 +29,7 @@
 #include "IException.h"
 #include "iTime.h"
 #include "Longitude.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "PvlGroup.h"
 
 using namespace std;
@@ -303,7 +303,7 @@ namespace Isis {
         // Convert lat to planetographic
         Distance radii[3];
         camera->radii(radii);
-        oglat = Isis::Projection::ToPlanetographic(camera->UniversalLatitude(),
+        oglat = Isis::TProjection::ToPlanetographic(camera->UniversalLatitude(),
                 radii[0].kilometers(), radii[2].kilometers());
         gp->FindKeyword("PlanetographicLatitude").SetValue(oglat);
 
@@ -312,17 +312,17 @@ namespace Isis {
 
         //Convert lon to -180 - 180 range
         gp->FindKeyword("PositiveEast180Longitude").SetValue(
-          Isis::Projection::To180Domain(
+          Isis::TProjection::To180Domain(
             camera->UniversalLongitude()));
 
         //Convert lon to positive west
-        pwlon = Isis::Projection::ToPositiveWest(camera->UniversalLongitude(),
+        pwlon = Isis::TProjection::ToPositiveWest(camera->UniversalLongitude(),
                 360);
         gp->FindKeyword("PositiveWest360Longitude").SetValue(pwlon);
 
         //Convert pwlon to -180 - 180 range
         gp->FindKeyword("PositiveWest180Longitude").SetValue(
-          Isis::Projection::To180Domain(pwlon));
+          Isis::TProjection::To180Domain(pwlon));
 
         camera->Coordinate(pB);
         gp->FindKeyword("BodyFixedCoordinate").AddValue(pB[0], "km");

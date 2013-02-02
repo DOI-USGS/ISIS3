@@ -12,7 +12,7 @@
 #include "OriginalLabel.h"
 #include "Process.h"
 #include "ProgramLauncher.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "TextFile.h"
@@ -72,13 +72,13 @@ void IsisMain() {
   }
 
   // Work with latitude and longitude use projection factory (from1)
-  Projection *proj = ProjectionFactory::CreateFromCube(from1lab);
+  TProjection *proj = (TProjection *) ProjectionFactory::CreateFromCube(from1lab);
   double minLat = proj->MinimumLatitude();
   double maxLat = proj->MaximumLatitude();
   double minLon = proj->MinimumLongitude();
   double maxLon = proj->MaximumLongitude();
   if(ui.WasEntered("FROM2")) {
-    Projection *proj = ProjectionFactory::CreateFromCube(from2lab);
+    TProjection *proj = (TProjection *) ProjectionFactory::CreateFromCube(from2lab);
     if(proj->MinimumLatitude() < minLat) minLat = proj->MinimumLatitude();
     if(proj->MaximumLatitude() > maxLat) maxLat = proj->MaximumLatitude();
     if(proj->MinimumLongitude() < minLon) minLon = proj->MinimumLongitude();
@@ -137,7 +137,7 @@ void IsisMain() {
   // This is run if no intersect is found when using lat and lon in
   // projection space.
   if(runXY) {
-    Projection *proj = ProjectionFactory::CreateFromCube(from1lab);
+    TProjection *proj = (TProjection *) ProjectionFactory::CreateFromCube(from1lab);
     proj->SetWorld(0.5, 0.5);
     double startX = proj->XCoord();
     double endY = proj->YCoord();
@@ -148,7 +148,7 @@ void IsisMain() {
     double startY = proj->YCoord();
 
     if(ui.WasEntered("FROM2")) {
-      Projection *proj = ProjectionFactory::CreateFromCube(from2lab);
+      TProjection *proj = (TProjection *) ProjectionFactory::CreateFromCube(from2lab);
       proj->SetWorld(0.5, 0.5);
       if(proj->XCoord() < startX) startX = proj->XCoord();
       if(proj->YCoord() > endY) endY = proj->YCoord();

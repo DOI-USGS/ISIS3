@@ -31,6 +31,8 @@ namespace Isis {
    *   @history 2011-04-25 Steven Lambright - Fixed updates at the bottom right
    *   @history 2012-06-18 Steven Lambright - Fixed access of viewport DN data to
    *                           not access out of range data. Fixes #896.
+   *   @history 2012-11-30 Debbie A. Cook - Changed to use TProjection instead of Projection.
+   *                           References #775.
    */
   class TrackTool : public Tool {
       Q_OBJECT

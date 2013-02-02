@@ -54,6 +54,8 @@ namespace Isis {
    *   @history 2011-08-01 Steven Lambright - Fixed signals/slots not being
    *                           in correct thread.
    *   @history 2011-10-06 Steven Lambright - Target name is now optional
+   *   @history 2012-11-30 Debbie A. Cook - Changed to use TProjection and RingPlaneProjection
+   *                           instead of Projection.  References #775.
    *     
    */
   class ConcurrentControlNetReader : public QObject {

@@ -5,7 +5,9 @@
 #include <QCursor>
 
 #include "Camera.h"
+#include "RingPlaneProjection.h"
 #include "Projection.h"
+#include "TProjection.h"
 #include "MdiCubeViewport.h"
 #include "SpecialPixel.h"
 #include "ViewportBuffer.h"
@@ -166,14 +168,26 @@ namespace Isis {
 
     // Do we have a projection?
     if(cvp->projection() != NULL) {
+      // Set up for projection types
+      Projection::ProjectionType projType = cvp->projection()->projectionType();
       p_latLabel->show();
       p_lonLabel->show();
 
       if(cvp->projection()->SetWorld(sample, line)) {
-        double lat = cvp->projection()->Latitude();
-        double lon = cvp->projection()->Longitude();
-        p_latLabel->setText(QString("Lat %1").arg(lat));
-        p_lonLabel->setText(QString("Lon %1").arg(lon));
+        if (projType == Projection::Triaxial) {
+          TProjection *tproj = (TProjection *) cvp->projection();
+          double lat = tproj->Latitude();
+          double lon = tproj->Longitude();
+          p_latLabel->setText(QString("Lat %1").arg(lat));
+          p_lonLabel->setText(QString("Lon %1").arg(lon));
+        }
+        else { // RingPlane TODO write out radius azimuth instead of lat/lon
+          RingPlaneProjection *rproj = (RingPlaneProjection *) cvp->projection();
+          double lat = rproj->Radius();
+          double lon = rproj->Azimuth();
+          p_latLabel->setText(QString("Lat %1").arg(lat));
+          p_lonLabel->setText(QString("Lon %1").arg(lon));
+        }
       }
       else {
         p_latLabel->setText("Lat n/a");

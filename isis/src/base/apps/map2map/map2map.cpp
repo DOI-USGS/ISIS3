@@ -3,7 +3,7 @@
 #include "Isis.h"
 #include "ProcessRubberSheet.h"
 #include "ProjectionFactory.h"
-#include "Projection.h"
+#include "TProjection.h"
 #include "map2map.h"
 
 using namespace std;
@@ -33,7 +33,7 @@ void IsisMain() {
 
   // Get the mapping group
   PvlGroup fromMappingGrp = icube->getGroup("Mapping");
-  Projection *inproj = icube->getProjection();
+  TProjection *inproj = (TProjection *) icube->getProjection();
   PvlGroup outMappingGrp = fromMappingGrp;
 
   // If the default range is FROM, then wipe out any range data in user mapping file
@@ -220,11 +220,13 @@ void IsisMain() {
         // use the from domain because that's where our values are coming from
         if(((string)userMappingGrp["LongitudeDirection"]).compare("PositiveEast") == 0) {
           outMappingGrp[longitudes[index].Name()] =
-            Projection::ToPositiveEast(outMappingGrp[longitudes[index].Name()], outMappingGrp["LongitudeDomain"]);
+            TProjection::ToPositiveEast(outMappingGrp[longitudes[index].Name()],
+                                        outMappingGrp["LongitudeDomain"]);
         }
         else {
           outMappingGrp[longitudes[index].Name()] =
-            Projection::ToPositiveWest(outMappingGrp[longitudes[index].Name()], outMappingGrp["LongitudeDomain"]);
+            TProjection::ToPositiveWest(outMappingGrp[longitudes[index].Name()],
+                                        outMappingGrp["LongitudeDomain"]);
         }
       }
     }
@@ -238,10 +240,12 @@ void IsisMain() {
       for(int index = 0; index < longitudes.Keywords(); index ++) {
         if(!userMappingGrp.HasKeyword(longitudes[index].Name())) {
           if((int)userMappingGrp["LongitudeDomain"] == 180) {
-            outMappingGrp[longitudes[index].Name()] = Projection::To180Domain(outMappingGrp[longitudes[index].Name()]);
+            outMappingGrp[longitudes[index].Name()] = TProjection::To180Domain(
+                                                        outMappingGrp[longitudes[index].Name()]);
           }
           else {
-            outMappingGrp[longitudes[index].Name()] = Projection::To360Domain(outMappingGrp[longitudes[index].Name()]);
+            outMappingGrp[longitudes[index].Name()] = TProjection::To360Domain(
+                                                        outMappingGrp[longitudes[index].Name()]);
           }
         }
       }
@@ -258,13 +262,13 @@ void IsisMain() {
       for(int index = 0; index < latitudes.Keywords(); index ++) {
         if(!userMappingGrp.HasKeyword(latitudes[index].Name())) {
           if(((string)userMappingGrp["LatitudeType"]).compare("Planetographic") == 0) {
-            outMappingGrp[latitudes[index].Name()] = Projection::ToPlanetographic(
+            outMappingGrp[latitudes[index].Name()] = TProjection::ToPlanetographic(
                   (double)fromMappingGrp[latitudes[index].Name()],
                   (double)fromMappingGrp["EquatorialRadius"],
                   (double)fromMappingGrp["PolarRadius"]);
           }
           else {
-            outMappingGrp[latitudes[index].Name()] = Projection::ToPlanetocentric(
+            outMappingGrp[latitudes[index].Name()] = TProjection::ToPlanetocentric(
                   (double)fromMappingGrp[latitudes[index].Name()],
                   (double)fromMappingGrp["EquatorialRadius"],
                   (double)fromMappingGrp["PolarRadius"]);
@@ -319,14 +323,14 @@ void IsisMain() {
 
   // *NOTE: The UpperLeftX,UpperLeftY keywords will not be used in the CreateForCube
   //   method, and they will instead be recalculated. This is correct.
-  Projection *outproj = ProjectionFactory::CreateForCube(mapData, samples, lines,
+  TProjection *outproj = (TProjection *) ProjectionFactory::CreateForCube(mapData, samples, lines,
                         ui.GetBoolean("MATCHMAP"));
 
   // Set up the transform object which will simply map
   // output line/samps -> output lat/lons -> input line/samps
   Transform *transform = new map2map(icube->getSampleCount(),
                                      icube->getLineCount(),
-                                     icube->getProjection(),
+                                     (TProjection *) icube->getProjection(),
                                      samples,
                                      lines,
                                      outproj,
@@ -377,8 +381,8 @@ void IsisMain() {
 }
 
 // Transform object constructor
-map2map::map2map(const int inputSamples, const int inputLines, Projection *inmap,
-                 const int outputSamples, const int outputLines, Projection *outmap,
+map2map::map2map(const int inputSamples, const int inputLines, TProjection *inmap,
+                 const int outputSamples, const int outputLines, TProjection *outmap,
                  bool trim) {
   p_inputSamples = inputSamples;
   p_inputLines = inputLines;
@@ -524,12 +528,12 @@ void LoadMapRange() {
       }
 
       if((string)userMapping["LongitudeDirection"] == "PositiveEast") {
-        fromMapping["MaximumLongitude"] = Projection::ToPositiveEast(minLon, domain);
-        fromMapping["MinimumLongitude"] = Projection::ToPositiveEast(maxLon, domain);
+        fromMapping["MaximumLongitude"] = TProjection::ToPositiveEast(minLon, domain);
+        fromMapping["MinimumLongitude"] = TProjection::ToPositiveEast(maxLon, domain);
       }
       else if((string)userMapping["LongitudeDirection"] == "PositiveWest") {
-        fromMapping["MaximumLongitude"] = Projection::ToPositiveWest(minLon, domain);
-        fromMapping["MinimumLongitude"] = Projection::ToPositiveWest(maxLon, domain);
+        fromMapping["MaximumLongitude"] = TProjection::ToPositiveWest(minLon, domain);
+        fromMapping["MinimumLongitude"] = TProjection::ToPositiveWest(maxLon, domain);
       }
     }
   }
@@ -538,21 +542,21 @@ void LoadMapRange() {
   if(userMapping.HasKeyword("LatitudeType")) { // user set a new domain?
     if(((string)userMapping["LatitudeType"]).compare(fromMapping["LatitudeType"]) != 0) { // new lat type different?
       if(((string)userMapping["LatitudeType"]).compare("Planetographic") == 0) {
-        fromMapping["MinimumLatitude"] = Projection::ToPlanetographic(
+        fromMapping["MinimumLatitude"] = TProjection::ToPlanetographic(
                                            (double)fromMapping["MinimumLatitude"],
                                            (double)fromMapping["EquatorialRadius"],
                                            (double)fromMapping["PolarRadius"]);
-        fromMapping["MaximumLatitude"] = Projection::ToPlanetographic(
+        fromMapping["MaximumLatitude"] = TProjection::ToPlanetographic(
                                            (double)fromMapping["MaximumLatitude"],
                                            (double)fromMapping["EquatorialRadius"],
                                            (double)fromMapping["PolarRadius"]);
       }
       else {
-        fromMapping["MinimumLatitude"] = Projection::ToPlanetocentric(
+        fromMapping["MinimumLatitude"] = TProjection::ToPlanetocentric(
                                            (double)fromMapping["MinimumLatitude"],
                                            (double)fromMapping["EquatorialRadius"],
                                            (double)fromMapping["PolarRadius"]);
-        fromMapping["MaximumLatitude"] = Projection::ToPlanetocentric(
+        fromMapping["MaximumLatitude"] = TProjection::ToPlanetocentric(
                                            (double)fromMapping["MaximumLatitude"],
                                            (double)fromMapping["EquatorialRadius"],
                                            (double)fromMapping["PolarRadius"]);
