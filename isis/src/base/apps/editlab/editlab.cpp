@@ -1,9 +1,12 @@
 #include "Isis.h"
 
 #include "Cube.h"
+#include "History.h"
+#include "Process.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
+#include "PvlObject.h"
 
 using namespace Isis;
 using namespace std;
@@ -95,8 +98,21 @@ void IsisMain() {
     }
   }
 
-  // Write and clean the data
+  // Add history, write, and clean the data
   if(cube) {
+    History hist = History("IsisCube");
+    try {
+      // read history from cube, if it exists.
+      cube->read(hist);
+    }
+    catch(IException &e) {
+      // if the history does not exist in the cube, continue. In this case, 
+      // editlab will be the first History entry.
+    }
+    hist.AddEntry();
+    cube->write(hist);
+
+    // clean up
     cube->close();
     delete cube;
     cube = NULL;
@@ -109,6 +125,15 @@ void IsisMain() {
   label = NULL;
 }
 
+/**
+ * Modifies the given keyword with the user entered value, units, and/or
+ * comment.
+ * 
+ * @param ui UserInterface object for this application.
+ * @param keyword PvlKeyword to be modified.
+ * 
+ * @return PvlKeyword Modified keyword.
+ */
 PvlKeyword &modifyKeyword(UserInterface &ui, PvlKeyword &keyword) {
   if(ui.WasEntered("UNITS"))
     keyword.SetValue(ui.GetString("VALUE"), ui.GetString("UNITS"));

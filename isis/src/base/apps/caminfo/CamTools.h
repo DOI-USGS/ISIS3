@@ -142,6 +142,8 @@ namespace Isis {
    *                          tickets #775 and #1114.
    *   @history 2012-01-20 Debbie A. Cook - Changed to use TProjection and RingPlaneProjection
    *                           instead of Projection.  References #775.
+   *   @history 2012-11-23 Kris Becker Corrected computations for parallaxx,
+   *                          parallaxy, shadowx, shadowy.  Fixes #1296
    */
   class BandGeometry {
 

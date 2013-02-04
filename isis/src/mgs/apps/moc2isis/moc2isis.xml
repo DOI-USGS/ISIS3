@@ -44,7 +44,7 @@
       only keyword (for now) is "NaifFrameCode".
     </change>
     <change name="Stuart Sides" date="2004-02-17">
-        Updated to use the new IsisImportPds class instead of the 
+        Updated to use the new IsisImportPds class instead of the
         IsisImport class.
     </change>
     <change name="Stuart Sides" date="2004-02-17">
@@ -52,13 +52,13 @@
     </change>
     <change name="Jeff Anderson" date="2004-04-21">
        Will attempt decompression using the ENCODING_TYPE keyword
-       instead of the DATA_SET_ID 
+       instead of the DATA_SET_ID
     </change>
     <change name="Jeff Anderson" date="2004-06-02">
-       Fixed bug due to PVL refactor 
+       Fixed bug due to PVL refactor
     </change>
     <change name="Brendan George" date="2006-11-14">
-        Modified to comply with changes to PvlTranslationManager and 
+        Modified to comply with changes to PvlTranslationManager and
         PvlTranslationTable
     </change>
     <change name="Kris Becker" date="2007-09-25">
@@ -74,7 +74,11 @@
       Checks if input file is rdr.
     </change>
     <change name="Steven Lambright" date="2008-05-13">
-      Removed references to CubeInfo 
+      Removed references to CubeInfo
+    </change>
+    <change name="Steven Lambright and Mathew Eis" date="2012-11-07">
+      Temporary files are no longer created if not needed. As a result,
+      temporary files are now deleted properly. Fixes #1009.
     </change>
   </history>
 

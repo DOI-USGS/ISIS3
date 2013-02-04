@@ -56,15 +56,16 @@ void IsisMain() {
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
-
-  // Get a temporary file for the uncompressed version incase we need it
-  FileName uncompressed = FileName::createTempFile("$TEMPORARY/" + in.baseName() + ".img");
+  FileName uncompressed;
 
   // Set up conditional transfer of PDS labels to output cube
   FileName &translbl(in);
 
   // If the input file is compressed, use "mocuncompress" to uncompress it
   if(compressed) {
+    // Get a temporary file for the uncompressed version incase we need it
+    uncompressed = FileName::createTempFile("$TEMPORARY/" + in.baseName() + ".img");
+
     IString command = "mocuncompress " + in.expanded() + " " +
                       uncompressed.expanded();
     if(system(command.c_str()) == 1) {
@@ -73,7 +74,6 @@ void IsisMain() {
     }
     p.SetPdsFile(uncompressed.expanded(), "", pdsLabel);
     translbl = uncompressed;
-
   }
   else {
     p.SetPdsFile(in.expanded(), "", pdsLabel);

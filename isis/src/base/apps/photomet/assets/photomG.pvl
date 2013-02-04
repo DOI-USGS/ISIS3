@@ -1,0 +1,19 @@
+Object = PhotometricModel 
+  Group = Algorithm 
+    PhtName = HapkeHen 
+    Wh=0.218651419
+    Hh=0.085
+    B0=2.7
+    Theta=9.0
+    HG1=0.17896499
+    HG2=0.971492702
+  EndGroup 
+EndObject 
+
+Object = NormalizationModel 
+  Group = Algorithm 
+    NormName = Albedo 
+    Incref=0.0
+    Thresh=10E30
+  EndGroup 
+EndObject 

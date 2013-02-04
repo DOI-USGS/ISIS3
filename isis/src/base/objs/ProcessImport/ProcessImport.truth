@@ -3,9 +3,12 @@ unittest: Importing
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 unittest: Gathering statistics
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
-0
-3.69653e+38
 
+Average: 0
+
+Variance: 3.69653e+38
+
+Check the settings of the special pixel ranges
 
 **USER ERROR** The LRS range [35.0,55.0] overlaps the NULL range [0.0,45.0].
 
@@ -19,3 +22,10 @@ unittest: Gathering statistics
 **USER ERROR** The HIS range [-10.0,155.0] overlaps the LRS range [10.0,145.0].
 
 
+Testing ProcessBil()
+unittest: Importing
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
+
+Testing ProcessBip()
+unittest: Importing
+0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed

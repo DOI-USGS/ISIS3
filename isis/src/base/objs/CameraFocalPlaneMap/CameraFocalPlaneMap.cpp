@@ -20,9 +20,12 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#include "Spice.h"
 #include "CameraFocalPlaneMap.h"
+
 #include <cmath>
+
+#include "Camera.h"
+#include "Spice.h"
 
 namespace Isis {
   /** Construct mapping between detectors and focal plane x/y
@@ -43,6 +46,8 @@ namespace Isis {
   CameraFocalPlaneMap::CameraFocalPlaneMap(const int naifIkCode) {
     Init(0, naifIkCode);
   }
+  CameraFocalPlaneMap::~CameraFocalPlaneMap(){
+  }
 
   void CameraFocalPlaneMap::Init(Camera *parent, const int naifIkCode) {
     p_detectorSampleOrigin = 0.0;
@@ -51,12 +56,12 @@ namespace Isis {
     p_detectorLineOffset = 0.0;
     p_camera = parent;
 
-    if(naifIkCode != 0) {
+    if (naifIkCode != 0) {
       std::string xkey  = "INS" + Isis::IString(naifIkCode) + "_TRANSX";
       std::string ykey  = "INS" + Isis::IString(naifIkCode) + "_TRANSY";
       std::string ixkey = "INS" + Isis::IString(naifIkCode) + "_ITRANSS";
       std::string iykey = "INS" + Isis::IString(naifIkCode) + "_ITRANSL";
-      for(int i = 0; i < 3; ++i) {
+      for (int i = 0; i < 3; ++i) {
         p_transx[i]  = parent->getDouble(xkey, i);
         p_transy[i]  = parent->getDouble(ykey, i);
         p_itranss[i] = parent->getDouble(ixkey, i);
@@ -68,7 +73,7 @@ namespace Isis {
       std::string ykey  = "IDEAL_TRANSY";
       std::string ixkey = "IDEAL_TRANSS";
       std::string iykey = "IDEAL_TRANSL";
-      for(int i = 0; i < 3; ++i) {
+      for (int i = 0; i < 3; ++i) {
         p_transx[i]  = parent->getDouble(xkey, i);
         p_transy[i]  = parent->getDouble(ykey, i);
         p_itranss[i] = parent->getDouble(ixkey, i);
@@ -76,7 +81,7 @@ namespace Isis {
       }
     }
 
-    if(parent != 0) {
+    if (parent != 0) {
       p_camera->SetFocalPlaneMap(this);
     }
   }
@@ -133,7 +138,7 @@ namespace Isis {
    */
 //  CameraFocalPlaneMap::FocalPlaneXDependencyType CameraFocalPlaneMap::FocalPlaneXDependency() {
   int CameraFocalPlaneMap::FocalPlaneXDependency() {
-    if(p_transx[1] > p_transx[2]) {
+    if (p_transx[1] > p_transx[2]) {
       return Sample;
     }
     else {
@@ -155,7 +160,7 @@ namespace Isis {
     double magCoef1 = fabs(p_transx[1]);
     double magCoef2 = fabs(p_transx[2]);
 
-    if(magCoef1 > magCoef2) {
+    if (magCoef1 > magCoef2) {
       return (magCoef1 / p_transx[1]);
     }
     else {
@@ -178,12 +183,115 @@ namespace Isis {
     double magCoef1 = fabs(p_transy[1]);
     double magCoef2 = fabs(p_transy[2]);
 
-    if(magCoef1 > magCoef2) {
+    if (magCoef1 > magCoef2) {
       return (magCoef1 / p_transy[1]);
     }
     else {
       return (magCoef2 / p_transy[2]);
     }
+  }
+
+    //! Return distorted focal plane x
+  double CameraFocalPlaneMap::FocalPlaneX() const {
+    return p_focalPlaneX;
+  }
+
+  //! Return distorted focal plane y
+  double CameraFocalPlaneMap::FocalPlaneY() const {
+    return p_focalPlaneY;
+  }
+
+  //! Return detector sample
+  double CameraFocalPlaneMap::DetectorSample() const {
+    return p_detectorSample;
+  }
+
+  //! Return detector line
+  double CameraFocalPlaneMap::DetectorLine() const {
+    return p_detectorLine;
+  }
+
+  //! Return centered detector sample
+  double CameraFocalPlaneMap::CenteredDetectorSample() const {
+    return p_centeredDetectorSample;
+  }
+
+  //! Return centered detector line
+  double CameraFocalPlaneMap::CenteredDetectorLine() const {
+    return p_centeredDetectorLine;
+  }
+
+  /** Set the detector origin
+   *
+   * This is used to set the origin of the detector.  Typically the middle
+   * of the detector.  For example, a 512x512 dectector would have the
+   * origin at (256.5,256.5).  If not set both are 0.
+   *
+   * @param sample  detector sample at the origin
+   * @param line    detector line at the origin
+   */
+  void CameraFocalPlaneMap::SetDetectorOrigin(const double sample, const double line) {
+    p_detectorSampleOrigin = sample;
+    p_detectorLineOrigin = line;
+  }
+
+  //! Return detector line origin
+  double CameraFocalPlaneMap::DetectorLineOrigin() const {
+    return p_detectorLineOrigin;
+  }
+
+  //! Return detector sample origin
+  double CameraFocalPlaneMap::DetectorSampleOrigin() const {
+    return p_detectorSampleOrigin;
+  }
+
+  /** Set the detector offset
+   *
+   * This is used to set the offset between the detector origin and
+   * the average location in detector pixels where the image is being
+   * viewed.  If not set the offset are both 0.0
+   *
+   * @param sampleOffset sample offset in pixels
+   * @param lineOffset sample offset in lines
+   */
+  void CameraFocalPlaneMap::SetDetectorOffset(const double sampleOffset,
+                                const double lineOffset) {
+    p_detectorSampleOffset = sampleOffset;
+    p_detectorLineOffset = lineOffset;
+  }
+
+  //! Return detector line offset
+  double CameraFocalPlaneMap::DetectorLineOffset() const {
+    return p_detectorLineOffset;
+  }
+
+  //! Return detector sample offset
+  double CameraFocalPlaneMap::DetectorSampleOffset() const {
+    return p_detectorSampleOffset;
+  }
+
+  const double *CameraFocalPlaneMap::TransX() const{
+    return p_transx;
+  }
+  const double *CameraFocalPlaneMap::TransY() const{
+    return p_transy;
+  }
+  const double *CameraFocalPlaneMap::TransS() const{
+    return p_itranss;
+  }
+  const double *CameraFocalPlaneMap::TransL() const{
+    return p_itransl;
+  }
+  //! Convenience method to center detector origin (use when inheriting)
+  void CameraFocalPlaneMap::ComputeCentered() {
+    p_centeredDetectorSample = p_detectorSample - p_detectorSampleOrigin;
+    p_centeredDetectorLine   = p_detectorLine   - p_detectorLineOrigin;
+  }
+
+  //! Convenience method to center detector origin (use when inheriting)
+  void CameraFocalPlaneMap::ComputeUncentered() {
+    p_detectorSample = p_centeredDetectorSample + p_detectorSampleOrigin;
+    p_detectorLine   = p_centeredDetectorLine   + p_detectorLineOrigin;
   }
 
 }

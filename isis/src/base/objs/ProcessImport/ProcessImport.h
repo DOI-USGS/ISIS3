@@ -128,6 +128,11 @@ namespace Isis {
    *                           files.
    *   @history 2011-08-19 Jeannie Backer - Modified unitTest to use
    *                           $temporary variable instead of /tmp directory.
+   *   @history 2012-11-21 Kimberly Oyama and Steven Lambright - Modified the
+   *                           ProcessBil() and ProcessBip() methods to use the
+   *                           BoxcarCachingAlgorithm instead of the
+   *                           RegionalCachingAlgorithm. Also added unit tests
+   *                           to exercise the modified methods. Fixes #819.
    *
    */
 

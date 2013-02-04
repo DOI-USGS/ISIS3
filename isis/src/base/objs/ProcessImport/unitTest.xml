@@ -25,6 +25,9 @@
     <change name="Jeannie Backer" date="2011-08-19">
       Replaced test cube path /tmp/... with $temporary/...
     </change>
+    <change name="Kimberly Oyama" date="2012-10-26">
+      Added tests for the ProcessBil() and ProcessBip() methods. References #819.
+    </change>
   </history>
 
   <groups>

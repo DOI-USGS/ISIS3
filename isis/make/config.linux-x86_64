@@ -94,7 +94,7 @@ QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtWebKit
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtXml
 QTINCDIR += -I$(ISIS3LOCAL)/include/qt/qt4.8.0/QtXmlPatterns
 QTLIBDIR = -L$(ISIS3LOCAL)/lib
-QTLIB    = -lQtXmlPatterns -lQtXml -lQtNetwork -lQtSql -lQtGui -lQtCore -lQtSvg -lQtTest -lQtOpenGL -lQtWebKit
+QTLIB    = -lQtXmlPatterns -lQtXml -lQtNetwork -lQtSql -lQtGui -lQtCore -lQtSvg -lQtTest -lQtOpenGL -lQtWebKit -lQtDBus
 
 UIC      = $(ISIS3LOCAL)/bin/uic
 MOC      = $(ISIS3LOCAL)/bin/moc

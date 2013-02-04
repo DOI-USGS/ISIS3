@@ -102,6 +102,44 @@ void IsisMain() {
     e.print();
   }
 
+  try{// this file is saved locally since it is not needed in the data area for 
+      // the rest of isis
+    cout << "Testing PDS file containing an ^IMAGE pointer and ^TABLE pointer" << endl;
+    Isis::ProcessImportPds p;
+    Isis::Pvl plab;
+    p.SetPdsFile("data/pdsImageWithTables.lbl", "data/pdsImageWithTables.img", plab);
+    p.SetOutputCube("TO");
+    p.ImportTable("SUN_POSITION_TABLE");
+    p.StartProcess();
+    p.EndProcess();
+    
+    cout << plab << endl;
+    Isis::Process p2;
+    Isis::CubeAttributeInput att;
+    string file = Isis::Application::GetUserInterface().GetFileName("TO");
+    Isis::Cube *cube = p2.SetInputCube(file, att);
+    Pvl isisCubeLab = *(cube->getLabel());
+    (isisCubeLab.FindObject("IsisCube").FindObject("Core")["StartByte"]).SetValue("");
+    (isisCubeLab.FindObject("Table")["StartByte"]).SetValue("");
+    (isisCubeLab.FindObject("Table")["Bytes"]).SetValue("");
+    (isisCubeLab.FindObject("History")["StartByte"]).SetValue("");
+    (isisCubeLab.FindObject("History")["Bytes"]).SetValue("");
+    (isisCubeLab.FindObject("OriginalLabel")["StartByte"]).SetValue("");
+    (isisCubeLab.FindObject("OriginalLabel")["Bytes"]).SetValue("");
+    cout << isisCubeLab << endl;
+    Isis::Statistics *stat = cube->getStatistics();
+    cout << stat->Average() << endl;
+    cout << stat->Variance() << endl;
+    p2.EndProcess();
+    Isis::OriginalLabel ol(file);
+    Isis::Pvl label = ol.ReturnLabels();
+    cout << label << endl;
+    remove(file.c_str());
+  }
+  catch(Isis::IException &e) {
+    e.print();
+  }
+
   //  Test an invalid label file
   try {
     cout << endl;

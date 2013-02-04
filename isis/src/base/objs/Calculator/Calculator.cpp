@@ -277,6 +277,9 @@ namespace Isis {
    * @return The larger of the two
    */
   double MaximumOperator(double a, double b) {
+
+    if (isnan(a)) return (a);
+    if (isnan(b)) return (b);
     return (a > b) ? a : b;
   }
 
@@ -289,6 +292,8 @@ namespace Isis {
    * @return The smaller of the two
    */
   double MinimumOperator(double a, double b) {
+    if (isnan(a)) return (a);
+    if (isnan(b)) return (b);
     return (a < b) ? a : b;
   }
 

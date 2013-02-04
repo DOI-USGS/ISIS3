@@ -731,6 +731,7 @@ string IsisAml::GetString(const string &paramName) const {
     if(param->listOptions.size() > 0) {
       value = value.UpCase();
       int found = -1;
+      int foundcount = 0;
       for(unsigned int p = 0; p < param->listOptions.size(); p++) {
         Isis::IString option = param->listOptions[p].value;
         option = option.UpCase();
@@ -739,13 +740,19 @@ string IsisAml::GetString(const string &paramName) const {
         }
         else if(value.compare(0, min(value.size(), option.size()),
                               option , 0, min(value.size(), option.size())) == 0) {
-          if(found != -1) {
-            string message = "Value [" + value + "] for parameter [" +
-                             paramName + "] is not unique.";
-            throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
-          }
           found = p;
+          foundcount = foundcount + 1;
         }
+      }
+      if(foundcount == 0) {
+        string message = "Value [" + value + "] for parameter [" +
+                          paramName + "] is not a valid value.";
+        throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
+      }
+      if(foundcount > 1) {
+        string message = "Value [" + value + "] for parameter [" +
+                          paramName + "] is not unique.";
+        throw Isis::IException(Isis::IException::User, message, _FILEINFO_);
       }
       return param->listOptions[found].value;
     }

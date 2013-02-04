@@ -40,7 +40,7 @@ void IsisMain() {
   FileName outFile(ui.GetFileName("TO", "lbl"));
   string outFileName(outFile.expanded());
 
-  cProcess.SetDetached(true, outFileName);
+  cProcess.SetDetached(outFileName);
 
   cProcess.SetExportType(ProcessExportPds::Fixed);
 
@@ -151,7 +151,7 @@ void IsisMain() {
   size_t iFound = outFileName.find(".lbl");
   outFileName.replace(iFound, 4, ".img");
   ofstream oCube(outFileName.c_str());
-  cProcess.OutputDetatchedLabel();
+  cProcess.OutputDetachedLabel();
   //cProcess.OutputLabel(oCube);
   cProcess.StartProcess(oCube);
   oCube.close();

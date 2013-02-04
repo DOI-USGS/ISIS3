@@ -177,7 +177,7 @@ namespace Isis {
   }
 
   /**
-   * Returns the size of the field
+   * Returns the number of values stored for the field at each record.
    *
    * @return @b int The size of the TableField
    */
@@ -191,7 +191,9 @@ namespace Isis {
    *  
    * <code> 
    *   TableField field("Field 1", FieldType::Integer, 1);
+   *   // The following lines are equivalent
    *   int value = int(field);
+   *   int value = (int) field;
    * </code> 
    *
    * @return @b int The value of the field.
@@ -218,7 +220,9 @@ namespace Isis {
    *  
    * <code> 
    *   TableField field("Field 1", FieldType::Double, 1);
+   *   // The following lines are equivalent
    *   double value = double(field);
+   *   double value = (double) field;
    * </code> 
    *
    * @return @b double The value of the field.
@@ -245,7 +249,9 @@ namespace Isis {
    *  
    * <code> 
    *   TableField field("Field 1", FieldType::Real, 1);
+   *   // The following lines are equivalent
    *   float value = float(field);
+   *   float value = (float) field;
    * </code> 
    *
    * @return @b float The value of the field.
@@ -270,10 +276,12 @@ namespace Isis {
    * Casts the table field value to string if the type is Text. 
    *  
    * <code> 
-   *   TableField field("Field 1", FieldType::String);
+   *   TableField field("Field 1", FieldType::Text, 9);
+   *   // The following lines are equivalent
    *   string value = std::string(field);
+   *   string value = (string) field;
    * </code> 
-   *
+   *  
    * @return @b string The value of the field.
    *
    * @throws IException::Programmer - Field is not a string
@@ -426,12 +434,27 @@ namespace Isis {
    * @throws IException::Programmer - Field is not a string
    */
   void TableField::operator=(const std::string &value) {
+    QString val = QString::fromStdString(value);
     if (m_type != TableField::Text) {
       string msg = "Unable to set field to the given string value. Field [" 
                    + m_name + "] Type is not Text.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    m_svalue = value;
+    if (m_size < (int) val.size()) {// automos with tracking ???
+      for (int i = m_size; i < val.size(); i++) {
+        // if the extra characters are not spaces or nulls, throw an erro
+        if (val[i] != ' ' && val[i] != '\0') {
+          string msg = "Unable to set the Text TableField to the given string. "
+                       "The number of bytes allowed for this field value [" 
+                       + IString(m_size) + "] is less than the length of the "
+                       "given string [" + value + "].";
+          throw IException(IException::Unknown, msg, _FILEINFO_);
+        }
+      }
+      // if the extra characters are spaces and nulls, concatenate the string 
+      val.resize(m_size);
+    }
+    m_svalue = val.toStdString();
   }
 
   /**

@@ -8,13 +8,30 @@
 :Choose filename to save under.toParentButton_QToolButton	{name='toParentButton' type='QToolButton' visible='1' window=':Choose filename to save under_QFileDialog'}
 :Choose filename to save under_QFileDialog	{name='QFileDialog' type='QFileDialog' visible='1' windowTitle='Choose filename to save under'}
 :Control Network Navigator.Filter_QPushButton	{text='Filter' type='QPushButton' unnamed='1' visible='1' window=':Navigator'}
+:Control Network Navigator.Modify Point_QPushButton	{text='Modify Point' type='QPushButton' unnamed='1' visible='1' window=':Navigator'}
+:Control Network Navigator.Set Apriori/Sigmas_QPushButton	{text='Set Apriori/Sigmas' type='QPushButton' unnamed='1' visible='1' window=':Navigator'}
+:Control Network Navigator.View Cube(s)_QPushButton	{text='View Cube(s)' type='QPushButton' unnamed='1' visible='1' window=':Navigator'}
 :Control Network Navigator.qt_tabwidget_stackedwidget_QStackedWidget	{name='qt_tabwidget_stackedwidget' type='QStackedWidget' visible='1' window=':Navigator'}
 :Control Network Navigator.qt_tabwidget_tabbar_QTabBar	{name='qt_tabwidget_tabbar' type='QTabBar' visible='1' window=':Navigator'}
 :Control Network Navigator_QToolButton	{occurrence='2' type='QToolButton' unnamed='1' visible='1' window=':Navigator'}
+:Create Fixed or Constrained ControlPoint.Cancel_QPushButton	{text='Cancel' type='QPushButton' unnamed='1' visible='1' window=':Create Fixed or Constrained ControlPoint_Isis::QnetFixedPointDialog'}
+:Create Fixed or Constrained ControlPoint.Point ID:_QLabel	{text='Point ID:' type='QLabel' unnamed='1' visible='1' window=':Create Fixed or Constrained ControlPoint_Isis::QnetFixedPointDialog'}
+:Create Fixed or Constrained ControlPoint_Isis::QnetFixedPointDialog	{type='Isis::QnetFixedPointDialog' unnamed='1' visible='1' windowTitle='Create Fixed or Constrained ControlPoint'}
+:Create New ControlPoint.OK_QPushButton	{text='OK' type='QPushButton' unnamed='1' visible='1' window=':Create New ControlPoint_Isis::QnetNewPointDialog'}
+:Create New ControlPoint.Point ID:_QLabel	{text='Point ID:' type='QLabel' unnamed='1' visible='1' window=':Create New ControlPoint_Isis::QnetNewPointDialog'}
+:Create New ControlPoint_Isis::QnetNewPointDialog	{type='Isis::QnetNewPointDialog' unnamed='1' visible='1' windowTitle='Create New ControlPoint'}
+:Delete ControlPoint.pointIdValue_QLineEdit	{name='pointIdValue' type='QLineEdit' visible='1' window=':Delete ControlPoint_QnetDeletePointDialog'}
+:Delete ControlPoint_QnetDeletePointDialog	{name='QnetDeletePointDialog' type='QnetDeletePointDialog' visible='1' windowTitle='Delete ControlPoint'}
 :File.E&xit_QAction	{container=':qnet.File_QMenu_2' text='E&xit' type='QAction' unnamed='1' visible='true'}
 :Filter by Point Type(s).Constrained_QCheckBox	{container=':Filter by Point Type(s)_QGroupBox' text='Constrained' type='QCheckBox' unnamed='1' visible='1'}
 :Filter by Point Type(s).Free_QCheckBox	{container=':Filter by Point Type(s)_QGroupBox' text='Free' type='QCheckBox' unnamed='1' visible='1'}
 :Filter by Point Type(s)_QGroupBox	{container=':qt_tabwidget_stackedwidget_Isis::QnetPointTypeFilter' title='Filter by Point Type(s)' type='QGroupBox' unnamed='1' visible='1'}
+:IO Error.OK_QPushButton	{text='OK' type='QPushButton' unnamed='1' visible='1' window=':IO Error_QMessageBox'}
+:IO Error_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='IO Error'}
+:Isis::ViewportMdiSubWindow - I08528020RDR.cub	{type='Isis::ViewportMdiSubWindow' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow' windowTitle?='I08528020RDR.cub*'}
+:Isis::ViewportMdiSubWindow - I27759024RDR.cub	{type='Isis::ViewportMdiSubWindow' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow' windowTitle?='I27759024RDR.cub*'}
+:Latitude Constraints.Latitude Sigma:_QLabel	{container=':Set Apriori Point and Constraints.Latitude Constraints_QGroupBox' name='latSigmaLabel' text='Latitude Sigma:' type='QLabel' visible='1'}
+:Longitude Constraints.Longitude Sigma:_QLabel	{container=':Set Apriori Point and Constraints.Longitude Constraints_QGroupBox' name='longSigmaLabel' text='Longitude Sigma:' type='QLabel' visible='1'}
 :MdiArea	{occurrence='2' type='QWidget' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow'}
 :Navigator	{type='QDialog' unnamed='1' visible='1' windowTitle='Control Network Navigator'}
 :Navigator_CP1	{container=':Navigator_List' row='0' type='QModelIndex'}
@@ -23,6 +40,10 @@
 :Navigator_CP3	{container=':Navigator_List' text='ssides3' type='QModelIndex'}
 :Navigator_CP37	{container=':Navigator_List' text='ssides37' type='QModelIndex'}
 :Navigator_List	{parent=':Navigator' type='QListWidget' unnamed='1' visible='1'}
+:New Point Id.OK_QPushButton	{text='OK' type='QPushButton' unnamed='1' visible='1' window=':New Point Id_QMessageBox'}
+:New Point Id_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='New Point Id'}
+:No intersection.OK_QPushButton	{text='OK' type='QPushButton' unnamed='1' visible='1' window=':No intersection_QMessageBox'}
+:No intersection_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='No intersection'}
 :Open DEM.File name:_QLabel	{name='fileNameLabel' text='File name:' type='QLabel' visible='1' window=':Open DEM_QFileDialog'}
 :Open DEM.lookInCombo_QComboBox	{name='lookInCombo' type='QComboBox' visible='1' window=':Open DEM_QFileDialog'}
 :Open DEM.splitter_QSplitter	{name='splitter' type='QSplitter' visible='1' window=':Open DEM_QFileDialog'}
@@ -32,25 +53,50 @@
 :Open ground source.splitter_QSplitter	{name='splitter' type='QSplitter' visible='1' window=':Open ground source_QFileDialog'}
 :Open ground source.toParentButton_QToolButton	{name='toParentButton' type='QToolButton' visible='1' window=':Open ground source_QFileDialog'}
 :Open ground source_QFileDialog	{name='QFileDialog' type='QFileDialog' visible='1' windowTitle='Open ground source'}
+:Point ID:_QLineEdit	{buddy=':Create Fixed or Constrained ControlPoint.Point ID:_QLabel' type='QLineEdit' unnamed='1' visible='1'}
+:Point ID:_QLineEdit_2	{buddy=':Create New ControlPoint.Point ID:_QLabel' type='QLineEdit' unnamed='1' visible='1'}
 :Qnet Tool	{objectName='QnetTool' type='Isis::MainWindow' visible='1'}
+:Qnet Tool Save Measure.Yes_QPushButton	{text='Yes' type='QPushButton' unnamed='1' visible='1' window=':Qnet Tool Save Measure_QMessageBox'}
+:Qnet Tool Save Measure_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Qnet Tool Save Measure'}
 :Qnet Tool.Geom_QRadioButton	{text='Geom' type='QRadioButton' unnamed='1' visible='1' window=':Qnet Tool'}
 :Qnet Tool_QMenuBar	{type='QMenuBar' unnamed='1' visible='1' window=':Qnet Tool'}
 :Qnet Tool_QScrollArea	{aboveWidget=':Qnet Tool_QToolBar' type='QScrollArea' unnamed='1' visible='1' window=':Qnet Tool'}
 :Qnet Tool_QToolBar	{name='TemplateEditorToolBar' type='QToolBar' visible='1' window=':Qnet Tool'}
 :QnetTool.QnetToolScroll_QScrollArea	{name='QnetToolScroll' type='QScrollArea' visible='1' window=':Qnet Tool'}
+:QnetTool.View/edit registration template_QToolButton	{text='View/edit registration template' type='QToolButton' unnamed='1' visible='1' window=':Qnet Tool'}
 :QnetToolScroll.Add Measure(s) to Point_QPushButton	{container=':QnetTool.QnetToolScroll_QScrollArea' text='Add Measure(s) to Point' type='QPushButton' unnamed='1' visible='1'}
+:QnetToolScroll.Latitude: -2.60529    Longitude:  297.374_QLabel	{container=':QnetTool.QnetToolScroll_QScrollArea' text='Latitude: -2.60529    Longitude:  297.374' type='QLabel' unnamed='1' visible='1'}
+:QnetToolScroll.Latitude: -2.60529    Longitude:  297.374_QToolButton	{aboveWidget=':QnetToolScroll.Latitude: -2.60529    Longitude:  297.374_QLabel' container=':QnetTool.QnetToolScroll_QScrollArea' occurrence='2' type='QToolButton' unnamed='1' visible='1'}
+:QnetToolScroll.Latitude: -2.60529    Longitude:  297.374_QToolButton_2	{aboveWidget=':QnetToolScroll.Latitude: -2.60529    Longitude:  297.374_QLabel' container=':QnetTool.QnetToolScroll_QScrollArea' type='QToolButton' unnamed='1' visible='1'}
 :QnetToolScroll.Latitude: 17.1381    Longitude:  300.307_QDoubleSpinBox	{aboveWidget=':QnetToolScroll.Latitude: 17.1381    Longitude:  300.307_QLabel' container=':QnetTool.QnetToolScroll_QScrollArea' type='QDoubleSpinBox' unnamed='1' visible='1'}
 :QnetToolScroll.Latitude: 17.1381    Longitude:  300.307_QLabel	{container=':QnetTool.QnetToolScroll_QScrollArea' text='Latitude: 17.1381    Longitude:  300.307' type='QLabel' unnamed='1' visible='1'}
 :QnetToolScroll.Latitude: 17.1381    Longitude:  300.307_QToolButton	{aboveWidget=':QnetToolScroll.Latitude: 17.1381    Longitude:  300.307_QLabel' container=':QnetTool.QnetToolScroll_QScrollArea' occurrence='2' type='QToolButton' unnamed='1' visible='1'}
 :QnetToolScroll.Latitude: 17.1381    Longitude:  300.307_QToolButton_2	{aboveWidget=':QnetToolScroll.Latitude: 17.1381    Longitude:  300.307_QLabel' container=':QnetTool.QnetToolScroll_QScrollArea' type='QToolButton' unnamed='1' visible='1'}
+:QnetToolScroll.No geom/rotate_QRadioButton	{container=':QnetTool.QnetToolScroll_QScrollArea' text='No geom/rotate' type='QRadioButton' unnamed='1' visible='1'}
+:QnetToolScroll.OK_QPushButton	{container=':QnetTool.QnetToolScroll_QScrollArea' text='OK' type='QPushButton' unnamed='1' visible='1'}
+:QnetToolScroll.Open registration template_QToolButton	{container=':QnetTool.QnetToolScroll_QScrollArea' text='Open registration template' type='QToolButton' unnamed='1' visible='1'}
+:QnetToolScroll.Register_QPushButton	{container=':QnetTool.QnetToolScroll_QScrollArea' text='Register' type='QPushButton' unnamed='1' visible='1'}
 :QnetToolScroll.Right Measure_QGroupBox	{container=':QnetTool.QnetToolScroll_QScrollArea' title='Right Measure' type='QGroupBox' unnamed='1' visible='1'}
 :QnetToolScroll.Save Measure_QPushButton	{container=':QnetTool.QnetToolScroll_QScrollArea' text='Save Measure' type='QPushButton' unnamed='1' visible='1'}
 :QnetToolScroll.Save Point_QPushButton	{container=':QnetTool.QnetToolScroll_QScrollArea' text='Save Point' type='QPushButton' unnamed='1' visible='1'}
+:QnetToolScroll.Save template as_QToolButton	{container=':QnetTool.QnetToolScroll_QScrollArea' text='Save template as' type='QToolButton' unnamed='1' visible='1'}
+:QnetToolScroll.Save template file_QToolButton	{container=':QnetTool.QnetToolScroll_QScrollArea' text='Save template file' type='QToolButton' unnamed='1' visible='1'}
+:QnetToolScroll.Template Editor ToolBar_QTextEdit	{aboveWidget=':QnetToolScroll.Template Editor ToolBar_QToolBar' container=':QnetTool.QnetToolScroll_QScrollArea' type='QTextEdit' unnamed='1' visible='1'}
+:QnetToolScroll.Template Editor ToolBar_QToolBar	{container=':QnetTool.QnetToolScroll_QScrollArea' type='QToolBar' unnamed='1' visible='1' windowTitle='Template Editor ToolBar'}
 :QnetToolScroll.Zoom Factor: 1_QLabel	{container=':QnetTool.QnetToolScroll_QScrollArea' text='Zoom Factor: 1' type='QLabel' unnamed='1' visible='1'}
 :QnetToolScroll.Zoom Factor: 1_QLabel_2	{container=':QnetTool.QnetToolScroll_QScrollArea' occurrence='2' text='Zoom Factor: 1' type='QLabel' unnamed='1' visible='1'}
 :QnetToolScroll_Isis::ControlPointEdit	{container=':QnetTool.QnetToolScroll_QScrollArea' type='Isis::ControlPointEdit' unnamed='1' visible='1'}
+:QnetToolScroll_QToolButton	{container=':QnetTool.QnetToolScroll_QScrollArea' occurrence='8' type='QToolButton' unnamed='1' visible='1'}
+:QnetToolScroll_QToolButton_2	{container=':QnetTool.QnetToolScroll_QScrollArea' occurrence='7' type='QToolButton' unnamed='1' visible='1'}
 :QnetToolScroll_QWidget	{container=':QnetTool.QnetToolScroll_QScrollArea' type='QWidget' unnamed='1' visible='1'}
+:Radius Constraints.Radius Sigma:_QLabel	{container=':Set Apriori Point and Constraints.Radius Constraints_QGroupBox' name='radiusSigmaLabel' text='Radius Sigma:' type='QLabel' visible='1'}
 :Right Measure_QComboBox	{container=':QnetToolScroll.Right Measure_QGroupBox' type='QComboBox' unnamed='1' visible='1'}
+:Save registration template.File name:_QLabel	{name='fileNameLabel' text='File name:' type='QLabel' visible='1' window=':Save registration template_QFileDialog'}
+:Save registration template.Yes_QPushButton	{text='Yes' type='QPushButton' unnamed='1' visible='1' window=':Save registration template_QMessageBox'}
+:Save registration template.splitter_QSplitter	{name='splitter' type='QSplitter' visible='1' window=':Save registration template_QFileDialog'}
+:Save registration template.toParentButton_QToolButton	{name='toParentButton' type='QToolButton' visible='1' window=':Save registration template_QFileDialog'}
+:Save registration template_QFileDialog	{name='QFileDialog' type='QFileDialog' visible='1' windowTitle='Save registration template'}
+:Save registration template_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Save registration template'}
 :Select Files:_QScrollBar	{container=':Add Measures to ControlPoint.Select Files:_QListWidget' type='QScrollBar' unnamed='1' visible='1'}
 :Select a control network.splitter_QSplitter	{name='splitter' type='QSplitter' visible='1' window=':Select a control network_QFileDialog'}
 :Select a control network_QFileDialog	{name='QFileDialog' type='QFileDialog' visible='1' windowTitle='Select a control network'}
@@ -61,31 +107,60 @@
 :Select a list of cubes.splitter_QSplitter	{name='splitter' type='QSplitter' visible='1' window=':Select a list of cubes_QFileDialog'}
 :Select a list of cubes.toParentButton_QToolButton	{name='toParentButton' type='QToolButton' visible='1' window=':Select a list of cubes_QFileDialog'}
 :Select a list of cubes_QFileDialog	{name='QFileDialog' type='QFileDialog' visible='1' windowTitle='Select a list of cubes'}
+:Select a registration template.File name:_QLabel	{name='fileNameLabel' text='File name:' type='QLabel' visible='1' window=':Select a registration template_QFileDialog'}
+:Select a registration template.splitter_QSplitter	{name='splitter' type='QSplitter' visible='1' window=':Select a registration template_QFileDialog'}
+:Select a registration template_QFileDialog	{name='QFileDialog' type='QFileDialog' visible='1' windowTitle='Select a registration template'}
+:Set Apriori Point and Constraints.Close_QPushButton	{name='closeButton' text='Close' type='QPushButton' visible='1' window=':Set Apriori Point and Constraints_QnetSetAprioriDialog'}
+:Set Apriori Point and Constraints.Latitude Constraints_QGroupBox	{name='latitudeConstraintsGroupBox' title='Latitude Constraints' type='QGroupBox' visible='1' window=':Set Apriori Point and Constraints_QnetSetAprioriDialog'}
+:Set Apriori Point and Constraints.Longitude Constraints_QGroupBox	{name='longitudeConstraintsGroupBox' title='Longitude Constraints' type='QGroupBox' visible='1' window=':Set Apriori Point and Constraints_QnetSetAprioriDialog'}
+:Set Apriori Point and Constraints.Radius Constraints_QGroupBox	{name='radiusConstraintsGroupBox' title='Radius Constraints' type='QGroupBox' visible='1' window=':Set Apriori Point and Constraints_QnetSetAprioriDialog'}
+:Set Apriori Point and Constraints.Set Apriori_QPushButton	{name='setAprioriButton' text='Set Apriori' type='QPushButton' visible='1' window=':Set Apriori Point and Constraints_QnetSetAprioriDialog'}
+:Set Apriori Point and Constraints_QnetSetAprioriDialog	{name='QnetSetAprioriDialog' type='QnetSetAprioriDialog' visible='1' windowTitle='Set Apriori Point and Constraints'}
 :VP1	{aboveWidget=':QnetToolScroll.Zoom Factor: 1_QLabel' container=':QnetTool.QnetToolScroll_QScrollArea' type='Isis::ChipViewport' unnamed='1' visible='1'}
 :VP2	{aboveWidget=':QnetToolScroll.Zoom Factor: 1_QLabel_2' container=':QnetTool.QnetToolScroll_QScrollArea' type='Isis::ChipViewport' unnamed='1' visible='1'}
+:Warning.OK_QPushButton	{text='OK' type='QPushButton' unnamed='1' visible='1' window=':Warning_QMessageBox'}
+:Warning_QMessageBox	{type='QMessageBox' unnamed='1' visible='1' windowTitle='Warning'}
 :_Isis::QnetTool	{type='Isis::QnetTool' unnamed='1'}
 :_QListView	{occurrence='3' type='QListView' unnamed='1' visible='1'}
+:_QWhatsThat	{type='QWhatsThat' unnamed='1' visible='1'}
 :fileNameEdit_QLineEdit	{buddy=':Select a list of cubes.File name:_QLabel' name='fileNameEdit' type='QLineEdit' visible='1'}
 :fileNameEdit_QLineEdit_2	{buddy=':Open ground source.File name:_QLabel' name='fileNameEdit' type='QLineEdit' visible='1'}
 :fileNameEdit_QLineEdit_3	{buddy=':Choose filename to save under.File name:_QLabel' name='fileNameEdit' type='QLineEdit' visible='1'}
 :fileNameEdit_QLineEdit_4	{buddy=':Open DEM.File name:_QLabel' name='fileNameEdit' type='QLineEdit' visible='1'}
+:fileNameEdit_QLineEdit_5	{buddy=':Select a registration template.File name:_QLabel' name='fileNameEdit' type='QLineEdit' visible='1'}
+:fileNameEdit_QLineEdit_6	{buddy=':Save registration template.File name:_QLabel' name='fileNameEdit' type='QLineEdit' visible='1'}
 :frame.stackedWidget_QStackedWidget	{container=':splitter.frame_QFrame' name='stackedWidget' type='QStackedWidget' visible='1'}
 :frame.stackedWidget_QStackedWidget_2	{container=':splitter.frame_QFrame_2' name='stackedWidget' type='QStackedWidget' visible='1'}
 :frame.stackedWidget_QStackedWidget_3	{container=':splitter.frame_QFrame_3' name='stackedWidget' type='QStackedWidget' visible='1'}
 :frame.stackedWidget_QStackedWidget_4	{container=':splitter.frame_QFrame_4' name='stackedWidget' type='QStackedWidget' visible='1'}
+:frame.stackedWidget_QStackedWidget_5	{container=':splitter.frame_QFrame_5' name='stackedWidget' type='QStackedWidget' visible='1'}
+:frame.stackedWidget_QStackedWidget_6	{container=':splitter.frame_QFrame_6' name='stackedWidget' type='QStackedWidget' visible='1'}
+:latSigmaEdit_QLineEdit	{buddy=':Latitude Constraints.Latitude Sigma:_QLabel' name='latSigmaEdit' type='QLineEdit' visible='1'}
+:lonSigmaEdit_QLineEdit	{buddy=':Longitude Constraints.Longitude Sigma:_QLabel' name='lonSigmaEdit' type='QLineEdit' visible='1'}
 :qnet.Exit_QToolButton	{text='Exit' type='QToolButton' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow'}
 :qnet.File_QMenu	{title='File' type='QMenu' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow'}
 :qnet.File_QMenu_2	{title='File' type='QMenu' unnamed='1' visible='0' window=':qnet_Isis::ViewportMainWindow'}
+:qnet.I08528020RDR.cub @ 3.45596% (Gray = 1)_Isis::ViewportMdiSubWindow	{type='Isis::ViewportMdiSubWindow' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow' windowTitle='I08528020RDR.cub @ 3.45596% (Gray = 1)'}
 :qnet.Open control network  cube list_QToolButton	{text='Open control network  cube list' type='QToolButton' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow'}
+:qnet.What's This?_QToolButton	{text='What\\'s This?' type='QToolButton' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow'}
+:qnet.viewport_QWidget	{name='viewport' type='QWidget' visible='1' window=':qnet_Isis::ViewportMainWindow'}
+:qnet.viewport_QWidget_2	{name='viewport' occurrence='2' type='QWidget' visible='1' window=':qnet_Isis::ViewportMainWindow'}
+:qnet.viewport_QWidget_3	{name='viewport' occurrence='3' type='QWidget' visible='1' window=':qnet_Isis::ViewportMainWindow'}
 :qnetToolMainWindow	{name='QnetTool' type='Isis::MainWindow' visible='0' windowTitle?='Qnet Tool - Control Network File:*'}
 :qnet_Isis::ViewportMainWindow	{name='MainWindow' type='Isis::ViewportMainWindow' visible='1' windowTitle='qnet'}
 :qnet_QMenuBar	{type='QMenuBar' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow'}
+:qnet_QWidget	{occurrence='31' type='QWidget' unnamed='1' visible='1' window=':qnet_Isis::ViewportMainWindow'}
 :qt_tabwidget_stackedwidget_Isis::QnetPointTypeFilter	{container=':Control Network Navigator.qt_tabwidget_stackedwidget_QStackedWidget' type='Isis::QnetPointTypeFilter' unnamed='1' visible='1'}
+:radiusSigmaEdit_QLineEdit	{buddy=':Radius Constraints.Radius Sigma:_QLabel' name='radiusSigmaEdit' type='QLineEdit' visible='1'}
 :splitter.frame_QFrame	{container=':Select a list of cubes.splitter_QSplitter' name='frame' type='QFrame' visible='1'}
 :splitter.frame_QFrame_2	{container=':Select a control network.splitter_QSplitter' name='frame' type='QFrame' visible='1'}
 :splitter.frame_QFrame_3	{container=':Open ground source.splitter_QSplitter' name='frame' type='QFrame' visible='1'}
 :splitter.frame_QFrame_4	{container=':Open DEM.splitter_QSplitter' name='frame' type='QFrame' visible='1'}
+:splitter.frame_QFrame_5	{container=':Select a registration template.splitter_QSplitter' name='frame' type='QFrame' visible='1'}
+:splitter.frame_QFrame_6	{container=':Save registration template.splitter_QSplitter' name='frame' type='QFrame' visible='1'}
 :stackedWidget.treeView_QTreeView	{container=':frame.stackedWidget_QStackedWidget' name='treeView' type='QTreeView' visible='1'}
 :stackedWidget.treeView_QTreeView_2	{container=':frame.stackedWidget_QStackedWidget_2' name='treeView' type='QTreeView' visible='1'}
 :stackedWidget.treeView_QTreeView_3	{container=':frame.stackedWidget_QStackedWidget_3' name='treeView' type='QTreeView' visible='1'}
 :stackedWidget.treeView_QTreeView_4	{container=':frame.stackedWidget_QStackedWidget_4' name='treeView' type='QTreeView' visible='1'}
+:stackedWidget.treeView_QTreeView_5	{container=':frame.stackedWidget_QStackedWidget_5' name='treeView' type='QTreeView' visible='1'}
+:stackedWidget.treeView_QTreeView_6	{container=':frame.stackedWidget_QStackedWidget_6' name='treeView' type='QTreeView' visible='1'}

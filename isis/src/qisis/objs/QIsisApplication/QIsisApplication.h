@@ -43,7 +43,7 @@ namespace Isis {
    * @internal
    *   @history 2010-06-29 Steven Lambright - Added a setlocale to english for
    *                           numeric values
-   *   @history 2013-03-22 Steven Lambright - Added the Url handler for http://
+   *   @history 2012-03-22 Steven Lambright - Added the Url handler for http://
    *                           links. Currently using QWebView - we may want
    *                           options later.
    */

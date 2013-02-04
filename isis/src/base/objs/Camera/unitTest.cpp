@@ -85,6 +85,17 @@ int main() {
   cout << "SpacecraftAzimuth: " << c->SpacecraftAzimuth() << endl;
   cout << "OffNadirAngle: " << c->OffNadirAngle() << endl << endl;
 
+  cout << "GroundAzimuth in North: " << c->GroundAzimuth(18.221, 226.671, 20.0, 230.0) << endl;
+  cout << "GroundAzimuth in North: " << c->GroundAzimuth(20.0, 226.671, 20.0, 230.0) << endl;
+  cout << "GroundAzimuth in North: " << c->GroundAzimuth(18.221, 355.0, 20.0, 6.671) << endl;
+  cout << "GroundAzimuth in North: " << c->GroundAzimuth(18.221, 6.671, 20.0, 355.0) << endl;
+  cout << "GroundAzimuth in North: " << c->GroundAzimuth(18.221, 6.671, 20.0, 6.671) << endl;
+  cout << "GroundAzimuth in South: " << c->GroundAzimuth(-18.221, 226.671, -20.0, 230.0) << endl;
+  cout << "GroundAzimuth in South: " << c->GroundAzimuth(-20.0, 226.671, -20.0, 230.0) << endl;
+  cout << "GroundAzimuth in South: " << c->GroundAzimuth(-18.221, 355.0, -20.0, 6.671) << endl;
+  cout << "GroundAzimuth in South: " << c->GroundAzimuth(-18.221, 6.671, -20.0, 355.0) << endl;
+  cout << "GroundAzimuth in South: " << c->GroundAzimuth(-18.221, 6.671, -20.0, 6.671) << endl << endl;
+
   cout << "SetUniversalGround(lat, lon): "
        << c->SetGround(lat, lon) << endl;
 

@@ -38,6 +38,9 @@ void TestLineSamp(Camera *cam, double samp, double line);
  * @internal
  *   @history 2009-08-19 Tracie Sucharski, Added all new tests, including
  *                         ir and vis, normal and hires modes with offsets.
+ *   @history 2012-12-03 Tracie Sucharski, Added new test image to test validity even if none of
+ *                         pixels' centers intersect the ground.  Error checking was added to
+ *                         SetGround which returns false if any of the min/max lat/lons are invalid.
  */
 int main(void) {
   Preference::Preferences(true);
@@ -60,6 +63,11 @@ int main(void) {
     //  Vis Normal partial field of view (17,17,48,48): CM_1514390782_1.vis.cub
     //  Ir Hires partial field of view (17,26,48,36):   CM_1515945709_1.ir.cub
     //  Vis Hires partial field of view (17,26,48,36):  CM_1515945709_1.vis.cub
+
+    //  Tested separatedly:  Ir Normal partial field of view -none of the    C1465336166_1.ir.cub
+    //      pixels' centers intersect with the ground.
+    //      However, right around the bottom of pixel, samp:3 line:4 and top of samp:3 line:5 there
+    //      are some intersections, which means we can get lat/lon, but we cannot back project.          
     char files[5][1024] = { "$cassini/testData/CM_1515951157_1.ir.cub",
                             "$cassini/testData/CM_1514390782_1.ir.cub",
                             "$cassini/testData/CM_1514390782_1.vis.cub",
@@ -105,6 +113,12 @@ int main(void) {
     corners.push_back(std::make_pair(48, 26));
 
     //  CM_1515945709_1.vis.cub
+    corners.push_back(std::make_pair(26, 8));
+    corners.push_back(std::make_pair(36, 8));
+    corners.push_back(std::make_pair(26, 29));
+    corners.push_back(std::make_pair(36, 29));
+
+    //  C1465336166_1.ir.cub
     corners.push_back(std::make_pair(26, 8));
     corners.push_back(std::make_pair(36, 8));
     corners.push_back(std::make_pair(26, 29));
@@ -160,9 +174,56 @@ int main(void) {
       else {
         cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon[i] << endl;
       }
-
       cout << endl;
     }
+
+    //  Test C1465336166_1.ir.cub
+    //string file = "/usgs/cpkgs/isis3/data/cassini/testData/C1465336166_1.ir.cub";
+    Pvl p("/usgs/cpkgs/isis3/data/cassini/testData/C1465336166_1.ir.cub");
+    Camera *cam = CameraFactory::Create(p);
+    cout << "FileName: " << FileName(p.FileName()).name() << endl;
+    cout << "CK Frame: " << cam->instrumentRotation()->Frame() << endl << endl;
+    cout.setf(std::ios::fixed);
+    cout << setprecision(9);
+
+    // Test kernel IDs
+    cout << "Kernel IDs: " << endl;
+    cout << "CK Frame ID = " << cam->CkFrameId() << endl;
+    cout << "CK Reference ID = " << cam->CkReferenceId() << endl;
+    cout << "SPK Target ID = " << cam->SpkTargetId() << endl;
+    cout << "SPK Reference ID = " << cam->SpkReferenceId() << endl << endl;
+    
+    //  Test a non-intersecting pixel
+    double samp = 3.;
+    double line = 4.;
+    if (!cam->SetImage(samp, line)) {
+      cout << "Sample:3  Line:4   No Intersection" << endl;
+    }
+    //  Test intersecting pixel and back project
+    samp = 3.0121;
+    line = 4.39113;
+    cout << "Sample:3.0121    Line:4.39113" << endl;
+    double expectedLat = -19.449323030297;
+    double expectedLon = 45.696549423913;
+    if (!cam->SetImage(samp, line)) {
+      cout << "ERROR" << endl;
+    }
+
+    if (abs(cam->UniversalLatitude() - expectedLat) < 1E-8) {
+      cout << "Latitude OK" << endl;
+    }
+    else {
+      cout << setprecision(16) << "Latitude off by: " << cam->UniversalLatitude() - expectedLat << endl;
+    }
+
+    if(abs(cam->UniversalLongitude() - expectedLon) < 1E-8) {
+      cout << "Longitude OK" << endl;
+    }
+    else {
+      cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - expectedLon << endl;
+    }
+
+    cout << endl;
   }
   catch(IException &e) {
     e.print();

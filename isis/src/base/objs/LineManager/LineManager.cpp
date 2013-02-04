@@ -57,12 +57,14 @@ namespace Isis {
 
   bool LineManager::SetLine(const int line, const int band) {
     if(line < 1) {
-      string message = "Invalid value for argument [line]";
+      string message = "LineManager is unable to set the line to [" 
+                       + IString(line) + "]. Minimum line value is 1.";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     if(band < 1) {
-      string message = "Invalid value for argument [band]";
+      string message = "LineManager is unable to set the line for band [" 
+                       + IString(band) + "]. Minimum band value is 1.";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 

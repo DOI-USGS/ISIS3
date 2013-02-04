@@ -12,11 +12,20 @@
     </description>
 
     <history>
-        <change name="Sharmila Prasad" date="2009-10-27">Original Version</change>
-        <change name="Sharmila Prasad" date="2010-02-09">Added Level3 conversion capability</change>
-        <change name="Sharmila Prasad" date="2010-03-09">Use class 
-             ProcessExportMiniRFLroPds instead of ProcessExportLroPds with 
-             class name change</change>
+        <change name="Sharmila Prasad" date="2009-10-27">
+          Original Version
+        </change>
+        <change name="Sharmila Prasad" date="2010-02-09">
+          Added Level3 conversion capability
+        </change>
+        <change name="Sharmila Prasad" date="2010-03-09">
+          Use class ProcessExportMiniRFLroPds instead of ProcessExportLroPds 
+          with class name change
+        </change>
+        <change name="Jeannie Backer" date="2012-11-21">
+          Fixed call to misspelled ProcessExportPds method. Improved code to 
+          bring closer to standards. References #678.
+        </change>
    </history>
 
     <category>

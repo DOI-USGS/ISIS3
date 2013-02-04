@@ -35,12 +35,15 @@ namespace Isis {
    *   @history 2010-03-09 Sharmila Prasad - Changed class name to
    *                           ProcessExportMiniRFLroPds to avoid conflicts with
    *                           functionality of LRO objects
+   *   @history 2012-11-21 Jeannie Backer - Changed m_ to p_ to fit parent class
+   *                           member variables. Moved constructor and destructor
+   *                           implementation to cpp file. References #678
    */
 
   class ProcessExportMiniRFLroPds : public Isis::ProcessExportPds {
     public:
-      ProcessExportMiniRFLroPds() {};
-      ~ProcessExportMiniRFLroPds() {};
+      ProcessExportMiniRFLroPds();
+      ~ProcessExportMiniRFLroPds();
 
       virtual Pvl &StandardPdsLabel(const ProcessExportPds::PdsFileType type = ProcessExportPds::Image);
       virtual void CreateImageLabel(void);

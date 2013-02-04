@@ -1,10 +1,15 @@
 #include "Isis.h"
-#include "Transform.h"
+
+#include <QFile>
+
 #include "Interpolator.h"
+#include "Transform.h"
 #include "ProcessRubberSheet.h"
 
 using namespace std;
-class UnitTestTrans : public Isis::Transform {
+using namespace Isis;
+
+class UnitTestTrans : public Transform {
   private:
     int p_outSamps;
     int p_outLines;
@@ -14,18 +19,18 @@ class UnitTestTrans : public Isis::Transform {
     UnitTestTrans(const int inSamps, const int inLines) {
       p_outSamps = inSamps;
       p_outLines = inLines;
-    };
+    }
 
     // destructor
-    ~UnitTestTrans() {};
+    ~UnitTestTrans() {}
 
     // Instantiation of pure virtual members
     int OutputSamples() const {
       return p_outSamps;
-    };
+    }
     int OutputLines() const {
       return p_outLines;
-    };
+    }
     bool Xform(double &inSample, double &inLine,
                const double outSample,
                const double outLine) {
@@ -48,23 +53,23 @@ class UnitTestTrans : public Isis::Transform {
       }
 
       return true;
-    };
+    }
 };
 
 void IsisMain() {
 
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   void myBandChange(const int b);
 
-  Isis::ProcessRubberSheet p;
+  ProcessRubberSheet p;
   p.BandChange(myBandChange);
-  Isis::Transform *trans = new UnitTestTrans(126, 126);
+  Transform *trans = new UnitTestTrans(126, 126);
 
-  Isis::Interpolator *interp;
-  interp = new Isis::Interpolator(Isis::Interpolator::NearestNeighborType);
+  Interpolator *interp;
+  interp = new Interpolator(Interpolator::NearestNeighborType);
 
-  cout << "Testing Isis::ProcessRubberSheet Class ... " << endl;
+  cout << "Testing ProcessRubberSheet Class ... " << endl;
   p.SetInputCube("FROM");
   p.SetOutputCube("TO", 126, 126, 2);
   p.StartProcess(*trans, *interp);
@@ -76,7 +81,7 @@ void IsisMain() {
     p.SetOutputCube("TO", 1, 1, 1);
     p.StartProcess(*trans, *interp);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
     p.EndProcess();
     cout << endl;
@@ -87,7 +92,7 @@ void IsisMain() {
     p.SetInputCube("FROM");
     p.StartProcess(*trans, *interp);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
     p.EndProcess();
     cout << endl;
@@ -95,7 +100,9 @@ void IsisMain() {
 
   delete trans;
   delete interp;
-  remove("$temporary/isisRubberSheet_01.cub");
+
+  UserInterface &ui = Application::GetUserInterface();
+  QFile::remove(ui.GetFileName("TO").c_str());
 }
 
 

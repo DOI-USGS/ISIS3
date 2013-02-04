@@ -1,6 +1,9 @@
+# This test creates a new group, adds key1 and key2 to the group, and 
+# modifies key2 by adding units and comment.
 APPNAME = editlab
 editlabTruth3.txt.IGNORELINES = ByteOrder TileSamples TileLines StartByte
 tempLab3.txt.IGNORELINES = Bytes ByteOrder TileSamples TileLines StartByte
+history.pvl.IGNORELINES = ExecutionDateTime HostName
 
 include $(ISISROOT)/make/isismake.tsts
 
@@ -16,3 +19,4 @@ commands:
 	$(APPNAME) from=$(OUTPUT)/tempCube.cub option=modkey grpname=NewGroup keyword=Key2 value=value units=meters comment="Hello World";
 	catlab from=$(OUTPUT)/tempCube.cub >& $(OUTPUT)/tempLab3.txt;
 	head -n 31 $(OUTPUT)/tempLab3.txt > $(OUTPUT)/editlabTruth3.txt;
+	cathist from=$(OUTPUT)/tempCube.cub >& $(OUTPUT)/history.pvl;

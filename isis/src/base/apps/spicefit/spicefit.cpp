@@ -33,8 +33,17 @@ void IsisMain() {
     Isis::PvlGroup kernels =
       cube.getLabel()->FindGroup("Kernels", Isis::Pvl::Traverse);
 
+    // Save original kernels in keyword before changing to "Table" in the kernels group
+    PvlKeyword origCk = kernels["InstrumentPointing"];
+
     // Write out the "Table" label to the tabled kernels in the kernels group
     kernels["InstrumentPointing"] = "Table";
+
+    // And finally write out the original kernels after Table
+    for (int i = 0;  i < origCk.Size();  i++) {
+      kernels["InstrumentPointing"].AddValue(origCk[i]);
+    }
+
     cube.putGroup(kernels);
 
     // Pull out the pointing cache as a table and write it

@@ -24,7 +24,14 @@
 
 #include "ProcessImport.h"
 
+#include <vector>
+
+#include "Pvl.h"
+#include "IString.h"
+
 namespace Isis {
+  class PvlTranslationManager;
+  class Table;
   /**
    * @brief Convert PDS archive files to Isis format
    *
@@ -51,107 +58,91 @@ namespace Isis {
    *
    * @internal
    *  @history 2003-01-24 Tracie Sucharski - Fixed bug in processing 8bit data.
-   *                                         In the Swap method needed to return
-   *                                         unsigned char, not char.
+   *                          In the Swap method needed to return unsigned char,
+   *                          not char.
    *  @history 2003-02-13 Stuart Sides - Added a unit test.
    *  @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
-   *                                     isis.astrogeology...
+   *                          isis.astrogeology...
    *  @history 2003-05-30 Stuart Sides - Fixed compiler error after -O1 flag was
-   *                                     added to g++
+   *                          added to g++
    *  @history 2003-09-10 Tracie Sucharski - Complete redesign to handle
-   *                                         different raw file formats.
-   *  @history 2003-10-09 Stuart Sides - Added capabilities for reading PDS files
+   *                          different raw file formats.
+   *  @history 2003-10-09 Stuart Sides - Added capabilities for reading PDS
+   *                          files
    *  @history 2003-10-10 Stuart Sides - Added capabilities to get the
-   *                                     translation files from the user
-   *                                     preferences BASE directory.
+   *                          translation files from the user preferences BASE
+   *                          directory.
    *  @history 2003-10-10 Stuart Sides - Fixed bug for PDS files. When the image
-   *                                     name was explicitly given the open
-   *                                     statement was attempting to open the
-   *                                     label file.
+   *                          name was explicitly given the open statement was
+   *                          attempting to open the label file.
    *  @history 2003-10-16 Stuart Sides - Added a section for debuging all the
-   *                                     parameters which can be set before
-   *                                     processing starts.
+   *                          parameters which can be set before processing
+   *                          starts.
    *  @history 2003-10-16 Stuart Sides - Added a second parameter to the Pvl
-   *                                     constructor in SetVicarFile. This allows
-   *                                     the vicar label to be read into a Pvl
-   *                                     without modifying the repeated
-   *                                     "PROPERTY" keyword.
+   *                          constructor in SetVicarFile. This allows the vicar
+   *                          label to be read into a Pvl without modifying the
+   *                          repeated "PROPERTY" keyword.
    *  @history 2003-10-23 Stuart Sides - Added new member functions
-   *                                    "AddImportLabel()"and"AddImportLabel(Pvl).
-   *                                     AddImportLabel() uses the original label
-   *                                     file to create a Pvl and write it to the
-   *                                     output cube label. AddImportLabel(Pvl)
-   *                                     uses the Pvl argument to write the
-   *                                     import label to the output cube.
+   *                          "AddImportLabel()" and "AddImportLabel(Pvl).
+   *                          AddImportLabel() uses the original label file to
+   *                          create a Pvl and write it to the output cube label.
+   *                          AddImportLabel(Pvl) uses the Pvl argument to write
+   *                          the import label to the output cube.
    *  @history 2004-01-21 Jeff Anderson - Modified SetOutputCube method to
-   *                                      propagate the input pixel type, base,
-   *                                      and multipliers to the output cube. The
-   *                                      old method always generated real pixel
-   *                                      values in the output.
+   *                          propagate the input pixel type, base, and
+   *                          multipliers to the output cube. The old method
+   *                          always generated real pixel values in the output.
    *  @history 2004-01-22 Jeff Anderson - Modified the SetVicarFile method to
-   *                                      return the vicar labels internalized
-   *                                      in a PVL object.
+   *                          return the vicar labels internalized in a PVL
+   *                          object.
    *  @history 2004-02-04 Jeff Anderson - Modified SetPdsFile method to allow for
-   *                                      SPECTRAL_QUBE objects to handle Themis
-   *                                      data.
+   *                          SPECTRAL_QUBE objects to handle Themis data.
    *  @history 2004-02-10 Stuart Sides - Separated PDS capabilities from Import.
    *  @history 2005-02-09 Elizabeth Ribelin - Modified file to support Doxygen
-   *                                          documentation
+   *                          documentation
    *  @history 2006-06-13 Brendan George - Modified to add OriginalLabel blob
-   *                                       automatically, and added a function to
-   *                                       allow the user to prevent this.
+   *                          automatically, and added a function to allow the
+   *                          user to prevent this.
    *  @history 2006-07-12 Stuart Sides - Modified the translation of projection
-   *                                     keywords such as CenterLongitude, so
-   *                                     the would not throw and error if the
-   *                                     keywods was not a number. This was
-   *                                     necessary because map a planet creates
-   *                                     PDS labels with "N/A" in several
-   *                                     keywords.
-   *
+   *                          keywords such as CenterLongitude, so the would not
+   *                          throw and error if the keywods was not a number.
+   *                          This was necessary because map a planet creates
+   *                          PDS labels with "N/A" in several keywords.
    *  @history 2006-10-26 Stuart Sides - Added unsigned 16 bit ability
-   *
-   *  @history 2006-11-16 Brendan George - Changed instances of "Foreign" to "Input"
-   *                                       and "Native" to "Output"
-   *
-   *  @history 2007-01-24 Stuart Sides - Added ability to identify the difference
-   *                                     between PDS and ISIS2 files, and process
-   *                                     them differently.
-   *
+   *  @history 2006-11-16 Brendan George - Changed instances of "Foreign" to
+   *                          "Input" and "Native" to "Output"
+   *  @history 2007-01-24 Stuart Sides - Added ability to identify the
+   *                          difference between PDS and ISIS2 files, and
+   *                          process them differently.
    *  @history 2007-02-08 Brendan George - Fixed TranslateIsis2Instrument to
-   *                                       remove the appended z in the StartTime
-   *                                       keyword, if present.
-   *
+   *                          remove the appended z in the StartTime keyword,
+   *                          if present.
    *  @history 2007-04-09 Tracie Sucharski - Added GetProjectionOffsetMults
-   *                            method which will find the correct multiplication
-   *                            factors for the projection offsets depending
-   *                            on the keyword and pattern in
-   *                            pdsProjectionLineSampToXY.def.
-   *                            Added IsIsis2 method.
-   *                            Made changes to projection translation tables for
-   *                            additional values for Longitude direction,
-   *                            latitude type and if the min or max longitude
-   *                            values is greater than 180, change longitude
-   *                            domain to 360.
-   *
+   *                          method which will find the correct multiplication
+   *                          factors for the projection offsets depending on
+   *                          the keyword and pattern in
+   *                          pdsProjectionLineSampToXY.def. Added IsIsis2
+   *                          method. Made changes to projection translation
+   *                          tables for additional values for Longitude
+   *                          direction, latitude type and if the min or max
+   *                          longitude values is greater than 180, change
+   *                          longitude domain to 360.
    *  @history 2007-05-31 Steven Koechle -Moddified to assume all signed bytes
-   *                           input pixels are actually unsigned.
-   *
+   *                          input pixels are actually unsigned.
    *  @history 2007-06-04 Jeff Anderson - Modified to deal with projection
-   *                           conversion generically
-   *
-   *  @history 2007-08-07 Steven Lambright - Modified to support translating some
-   *                         PDS labels for pds2isis and default longitude domain is
-   *                         now 360.
-   *
-   *  @history 2007-08-29 Steven Koechle - Modified to use new SetSpecialValues method
-   *                          from ProcessImport
-   *
+   *                          conversion generically
+   *  @history 2007-08-07 Steven Lambright - Modified to support translating
+   *                          some PDS labels for pds2isis and default longitude
+   *                          domain is now 360.
+   *  @history 2007-08-29 Steven Koechle - Modified to use new SetSpecialValues
+   *                          method from ProcessImport
    *  @history 2007-10-16 Steven Koechle - Modified TranslatePdsProjection() to
-   *                          not add the min & max lat long keywords if they have
-   *                          null values.
+   *                          not add the min & max lat long keywords if they
+   *                          have null values.
    *  @history 2008-05-12 Steven Lambright - Removed references to CubeInfo
-   *  @history 2008-06-13 Steven Lambright - Updated algorithm to decide domain and
-   *                          calculate correct longitudes in ExtractPdsProjection
+   *  @history 2008-06-13 Steven Lambright - Updated algorithm to decide domain
+   *                          and calculate correct longitudes in
+   *                          ExtractPdsProjection
    *  @history 2008-06-13 Noah Hild - Added support for the FILE object
    *  @history 2008-06-13 Steven Lambright - Updated ExtractPdsProjection to
    *                          change the latitude type to planetocentric if both
@@ -171,18 +162,23 @@ namespace Isis {
    *                          for center and pole longitude keywords in PDS
    *                          projections
    *  @history 2010-11-17 Eric Hyer - Inside ProcessPdsImageLabel method
-   *               Absolute paths are now supported for the ^IMAGE Keyword
-   *  @history 2010-12-09 Sharmila Prasad - Set default offset to be 1 for detatched label 
-   *                                       and  offset not set
+   *                          Absolute paths are now supported for the ^IMAGE
+   *                          Keyword
+   *  @history 2010-12-09 Sharmila Prasad - Set default offset to be 1 for
+   *                          detatched label and  offset not set
    *  @history 2011-02-11 Mackenzie Boyd - Added methods ProcessDataFilePointer,
-   *                          ProcessPixelBitandType, and ProcessSpecialPixels, removed
-   *                          duplicate code in ProcessImage and ProcessQube labels.
-   *                          Fixed functionality regarding ^QUBE pointer having no offest.
+   *                          ProcessPixelBitandType, and ProcessSpecialPixels,
+   *                          removed duplicate code in ProcessImage and
+   *                          ProcessQube labels. Fixed functionality regarding
+   *                          ^QUBE pointer having no offest.
    *  @history 2011-04-27 Mackenzie Boyd - Changed ProcessQubeLabels to set BIP 
    *                          for BANDSAMPLELINE axes instead of LINEBANDSAMPLE
    *                          and added exception for unknown storage order.
-   *  @history 2012-05-03 Tracie Sucharski - Added a try/catch in SetPdsFile when attempting
-   *                          to read PDS label.
+   *  @history 2012-05-03 Tracie Sucharski - Added a try/catch in SetPdsFile
+   *                          when attempting to read PDS label
+   *  @history 2012-11-21 Jeannie Backer - Added methods and member variables to 
+   *                          import binary PDS tables found in the PDS file.
+   *                          Added a default destructor. References #700.
    *  
    *  @todo 2005-02-09 Finish documentation-lots of holes with variable
    *                   definitions in .h file and .cpp methods, and  insert
@@ -192,92 +188,111 @@ namespace Isis {
 
     public:
       ProcessImportPds();
+      ~ProcessImportPds();
       void SetPdsFile(const std::string &pdsLabelFile, const std::string &pdsDataFile,
-                      Isis::Pvl &pdsLabel);
+                      Pvl &pdsLabel);
 
-      void TranslatePdsProjection(Isis::Pvl &lab);
-      void TranslateIsis2Labels(Isis::Pvl &lab);
-      void TranslatePdsLabels(Isis::Pvl &lab);
+      void TranslatePdsProjection(Pvl &lab);
+      void TranslateIsis2Labels(Pvl &lab);
+      void TranslatePdsLabels(Pvl &lab);
 
       bool IsIsis2();
 
       void OmitOriginalLabel();
 
+      void ImportTable(IString pdsTableName);
+      // since we are overriding StartProcess(), we must specify for other 
+      // overloaded calls to StartProcess(), the ProcessImport class method
+      // definitions should be used.
+      using ProcessImport::StartProcess;
+      void StartProcess();
       void EndProcess();
 
     private:
 
-      enum Source { NOSOURCE, PDS, ISIS2 };
-      enum EncodingType { NONE, JP2 };
 
-      Isis::Pvl p_pdsLabel;      //!<Internalized PDS label
-      std::string p_labelFile;   //!<The filename where the PDS label came from
+      enum Source { 
+        NOSOURCE, 
+        PDS, 
+        ISIS2 
+      };
 
-      Isis::IString p_transDir;  //!Base data directory
+      enum EncodingType { 
+        NONE, 
+        JP2 
+      };
+
+      void ProcessDataFilePointer(PvlTranslationManager & pdsXlater, 
+                                  const bool & calcOffsetOnly);
+      void ProcessPixelBitandType(PvlTranslationManager & pdsXlater);
+      void ProcessSpecialPixels(PvlTranslationManager & pdsXlater, const bool & isQube);
+
+      void ProcessPdsImageLabel(const std::string &pdsDataFile);
+      void ProcessPdsQubeLabel(const std::string &pdsDataFile, const std::string &transFile);
+
+      void ExtractPdsProjection(PvlTranslationManager &pdsXlater);
+      void GetProjectionOffsetMults(double &xoff, double &yoff,
+                                    double &xmult, double &ymult);
+
+      void IdentifySource(Pvl &lab);
+
+      void TranslateIsis2BandBin(Pvl &lab);
+      void TranslateIsis2Instrument(Pvl &lab);
+      void TranslatePdsBandBin(Pvl &lab);
+      void TranslatePdsArchive(Pvl &lab);
+
+      Pvl p_pdsLabel;            //!< Internalized PDS label
+      std::string p_labelFile;   //!< The filename where the PDS label came from
+
+      IString p_transDir;        //!< Base data directory
 
       // Encoding info
-      EncodingType p_encodingType;       /**<The encoding type of the image data.
-                                            The only encoding type currently
+      EncodingType p_encodingType;    /**< The encoding type of the image data.
+                                           The only encoding type currently
                                             supported is JP2 (JPEG2000).*/
-      std::string p_jp2File;             /**<The name of the file containing the
-                                            encoded JP2 data.*/
+      std::string p_jp2File;          /**< The name of the file containing the
+                                           encoded JP2 data.*/
 
       // Projection info
-      std::string p_projection;          /**<The name of the projection found in
+      std::string p_projection;       /**< The name of the projection found in
                                              the PDS projection labels*/
-      std::string p_targetName;          //!<
-      double p_equatorialRadius;         /**<Equatorial radius found in the PDS
-                                             projection labels*/
-      double p_polarRadius;              /**<The polar radius found in the PDS
-                                             projection labels*/
-      std::string p_longitudeDirection;  /**<Longitude direction found in the
+      std::string p_targetName;       //!<
+      double p_equatorialRadius;      /**< Equatorial radius found in the PDS
+                                           projection labels*/
+      double p_polarRadius;           /**< The polar radius found in the PDS
+                                           projection labels*/
+      std::string p_longitudeDirection; /**< Longitude direction found in the
                                              PDS projection labels*/
-      int p_longitudeDomain;             /**<Longitude domain found in the PDS
+      int p_longitudeDomain;            /**< Longitude domain found in the PDS
                                              projection labels*/
-      std::string p_latitudeType;        /**<The latitude type found in the PDS
+      std::string p_latitudeType;       /**< The latitude type found in the PDS
                                              projection labels*/
-      double p_minimumLatitude;          /**<Minimum latitude found in the PDS
+      double p_minimumLatitude;         /**< Minimum latitude found in the PDS
                                              projection labels*/
-      double p_maximumLatitude;          /**<Maximum latitude found in the PDS
+      double p_maximumLatitude;         /**< Maximum latitude found in the PDS
                                              projection labels*/
-      double p_minimumLongitude;         /**<Minimum longitude found in the PDS
+      double p_minimumLongitude;        /**< Minimum longitude found in the PDS
                                              projection labels*/
-      double p_maximumLongitude;         /**<Maximum longitude found in the PDS
+      double p_maximumLongitude;        /**< Maximum longitude found in the PDS
                                              projection labels*/
-      double p_pixelResolution;          /**<Pixel resolution found in the PDS
+      double p_pixelResolution;         /**< Pixel resolution found in the PDS
                                              projection labels*/
-      double p_scaleFactor;              /**<The scale factor found in the PDS
+      double p_scaleFactor;             /**< The scale factor found in the PDS
                                              projection labels*/
-      double p_rotation;                 /**<The rotation found in the PDS
-                                            labels*/
+      double p_rotation;                /**< The rotation found in the PDS
+                                             labels*/
       double p_sampleProjectionOffset;   //!<
       double p_lineProjectionOffset;     //!<
       double p_upperLeftX;               //!<
       double p_upperLeftY;               //!<
 
-      bool p_keepOriginalLabel;           /**<determines whether or not to keep the
-                                             OriginalLabel blob.*/
+      bool p_keepOriginalLabel;       /**< determines whether or not to keep the
+                                           OriginalLabel blob.*/
+      std::vector<Table> p_tables; /**< Vector of Isis Table objects that 
+                                        were imported from PDS and need to be 
+                                        added to the imported cube file. */
 
       Source p_source;
-
-      void ProcessDataFilePointer(Isis::PvlTranslationManager & pdsXlater, const bool & calcOffsetOnly);
-      void ProcessPixelBitandType(Isis::PvlTranslationManager & pdsXlater);
-      void ProcessSpecialPixels(Isis::PvlTranslationManager & pdsXlater, const bool & isQube);
-        
-      void ProcessPdsImageLabel(const std::string &pdsDataFile);
-      void ProcessPdsQubeLabel(const std::string &pdsDataFile, const std::string &transFile);
-
-      void ExtractPdsProjection(Isis::PvlTranslationManager &pdsXlater);
-      void GetProjectionOffsetMults(double &xoff, double &yoff,
-                                    double &xmult, double &ymult);
-
-      void IdentifySource(Isis::Pvl &lab);
-
-      void TranslateIsis2BandBin(Isis::Pvl &lab);
-      void TranslateIsis2Instrument(Isis::Pvl &lab);
-      void TranslatePdsBandBin(Isis::Pvl &lab);
-      void TranslatePdsArchive(Isis::Pvl &lab);
-
   };
 };
 

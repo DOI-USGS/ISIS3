@@ -27,9 +27,10 @@
 #include <sstream>
 
 #include "Application.h"
+#include "BoxcarCachingAlgorithm.h"
+#include "Brick.h"
 #include "Cube.h"
 #include "CubeAttribute.h"
-#include "Brick.h"
 #include "IException.h"
 #include "IString.h"
 #include "JP2Decoder.h"
@@ -1350,6 +1351,8 @@ namespace Isis {
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
+    OutputCubes[0]->addCachingAlgorithm(new BoxcarCachingAlgorithm());
+    
     // Construct a line buffer manager
     Isis::Buffer *out = NULL;
 
@@ -1580,6 +1583,8 @@ namespace Isis {
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
+    OutputCubes[0]->addCachingAlgorithm(new BoxcarCachingAlgorithm());
+        
     // Construct a line buffer manager
     Isis::Buffer *out = NULL;
 

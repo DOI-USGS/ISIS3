@@ -1,0 +1,373 @@
+mirPDS_VERSION_ID                = "PDS3"                                         
+DATA_SET_ID                   = "DAWN-X-VIR-2-EDR-IR-CRUISE-SPECTRA-V1.0"                                        
+PRODUCT_ID                    = "VIR_IR_1A_1_332974737_1_HK.LBL"               
+PRODUCT_TYPE                  = "ENGINEERING_DATA"                                      
+PRODUCT_VERSION_ID            = "01"                                           
+PRODUCT_CREATION_TIME         = 2010-12-09T10:33:24.00
+                                                                               
+RECORD_TYPE                   = FIXED_LENGTH                                   
+RECORD_BYTES                  = 512                                            
+FILE_RECORDS                  = 108                                            
+                                                                               
+START_TIME                    = 2010-07-21T09:58:56.86                         
+STOP_TIME                     = 2010-07-21T10:58:36.60                         
+SPACECRAFT_CLOCK_START_COUNT  = "1/332974736.8578"                             
+SPACECRAFT_CLOCK_STOP_COUNT   = "1/332978316.6000"                             
+                                                                               
+INSTRUMENT_HOST_NAME          = "DAWN"                                         
+INSTRUMENT_HOST_ID            = "DAWN"                                         
+MISSION_PHASE_NAME            = "MARS-VESTA CRUISE (MVC)"                                                          
+TARGET_NAME                   = "CANOPO"                                                                          
+INSTRUMENT_NAME               = "VISIBLE AND INFRARED SPECTROMETER"            
+INSTRUMENT_ID                 = "VIR"                                          
+DESCRIPTION                   = ""                                                                                                                                                                                                        
+                                                                               
+^TABLE                        = invalidTextTable.tab               
+OBJECT                        = TABLE                                          
+  INTERCHANGE_FORMAT          = ASCII                                          
+  ROWS                        = 180                                                
+  COLUMNS                     = 34                                             
+  ROW_BYTES                   = 305                                            
+  DESCRIPTION                 = ""                                             
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "VERSION, TYPE, SECONDARY HEADER FLAG"                       
+    COLUMN_NUMBER             = 1                                              
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 1                                              
+    BYTES                     = 2                                              
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                               
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "APID"                                         
+    COLUMN_NUMBER             = 2                                              
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 4                                              
+    BYTES                     = 3                                              
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "PACKET SEQUENCE CONTROL"                       
+    COLUMN_NUMBER             = 3                                              
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = DATE                                           
+    START_BYTE                = 8                                              
+    BYTES                     = 5                                              
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "PACKETS LENGTH"                               
+    COLUMN_NUMBER             = 4                                              
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 14                                             
+    BYTES                     = 4                                              
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "SCET TIME (CLOCK)"                            
+    COLUMN_NUMBER             = 5                                              
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 19                                             
+    BYTES                     = 10                                             
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "SCET TIME (UTC)"                              
+    COLUMN_NUMBER             = 6                                              
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = DATE                                           
+    START_BYTE                = 30                                             
+    BYTES                     = 22                                             
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "FRAME NUMBER"                                 
+    COLUMN_NUMBER             = 7                                              
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 53                                             
+    BYTES                     = 4                                              
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "FRAME COUNT"                                  
+    COLUMN_NUMBER             = 8                                              
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 58                                             
+    BYTES                     = 2                                              
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "SUBFRAME COUNT"                               
+    COLUMN_NUMBER             = 9                                              
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 61                                             
+    BYTES                     = 2                                              
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "PACKETS COUNT"                                
+    COLUMN_NUMBER             = 10                                             
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 64                                             
+    BYTES                     = 2                                              
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "SHUTTER STATUS"                               
+    COLUMN_NUMBER             = 11                                             
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 67                                             
+    BYTES                     = 8                                              
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "CHANNEL ID"                                   
+    COLUMN_NUMBER             = 12                                             
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 76                                             
+    BYTES                     = 3                                              
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "COMPRESSION MODE"                             
+    COLUMN_NUMBER             = 13                                             
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 80                                             
+    BYTES                     = 20                                             
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                            
+  OBJECT                      = COLUMN                                           
+    NAME                      = "SPECTRAL RANGE"                               
+    COLUMN_NUMBER             = 14                                             
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 101                                             
+    BYTES                     = 24                                             
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "CURRENT MODE"                                 
+    COLUMN_NUMBER             = 15                                             
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 126                                             
+    BYTES                     = 12                                             
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "SUB CURRENT MODE"                             
+    COLUMN_NUMBER             = 16                                             
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 139                                             
+    BYTES                     = 14                                             
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                  
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "IR EXPO"                                      
+    COLUMN_NUMBER             = 17                                             
+    UNIT                      = "S"                                            
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 154                                             
+    BYTES                     = 10                                             
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "IR TEMP"                                      
+    COLUMN_NUMBER             = 18                                             
+    UNIT                      = "K"                                            
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 165                                             
+    BYTES                     = 10                                             
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "CCD EXPO"                                     
+    COLUMN_NUMBER             = 19                                             
+    UNIT                      = "S"                                            
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 176                                             
+    BYTES                     = 10                                             
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "CCD TEMP"                                     
+    COLUMN_NUMBER             = 20                                             
+    UNIT                      = "K"                                            
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 187                                             
+    BYTES                     = 10                                             
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "MIRROR SIN"                                   
+    COLUMN_NUMBER             = 21                                             
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 198                                             
+    BYTES                     = 10                                             
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "MIRROR"                                       
+    COLUMN_NUMBER             = 22                                             
+    UNIT                      = "DEG"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 209                                             
+    BYTES                     = 10                                             
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "SPECT TEMP"                                   
+    COLUMN_NUMBER             = 23                                             
+    UNIT                      = "K"                                            
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 220                                             
+    BYTES                     = 10                                             
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "TELE TEMP"                                    
+    COLUMN_NUMBER             = 24                                             
+    UNIT                      = "K"                                            
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 231                                             
+    BYTES                     = 10                                             
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "COLD TIP TEMP"                                
+    COLUMN_NUMBER             = 25                                             
+    UNIT                      = "K"                                            
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 242                                             
+    BYTES                     = 10                                             
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "RADIATOR TEMP"                                
+    COLUMN_NUMBER             = 26                                             
+    UNIT                      = "K"                                            
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 253                                             
+    BYTES                     = 10                                             
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "SU MOTOR CURR"                                
+    COLUMN_NUMBER             = 27                                             
+    UNIT                      = "A"                                            
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 264                                             
+    BYTES                     = 10                                             
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "LEDGE TEMP"                                   
+    COLUMN_NUMBER             = 28                                             
+    UNIT                      = "K"                                            
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 275                                             
+    BYTES                     = 10                                             
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "START NOISY BITS"                             
+    COLUMN_NUMBER             = 29                                             
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 286                                             
+    BYTES                     = 2                                              
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "END NOISY BITS"                               
+    COLUMN_NUMBER             = 30                                             
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 289                                             
+    BYTES                     = 2                                              
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "CR ORW"                                       
+    COLUMN_NUMBER             = 31                                             
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 292                                             
+    BYTES                     = 2                                              
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                   
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "NOF NOISY BITS"                               
+    COLUMN_NUMBER             = 32                                             
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 295                                             
+    BYTES                     = 2                                              
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                 
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "SUBFRAME DATA"                                
+    COLUMN_NUMBER             = 33                                             
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 299                                             
+    BYTES                     = 5                                              
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                 
+                                                                               
+  OBJECT                      = COLUMN                                         
+    NAME                      = "SEQ STEP"                                     
+    COLUMN_NUMBER             = 34                                             
+    UNIT                      = "N/A"                                          
+    DATA_TYPE                 = MSB_INTEGER                                          
+    START_BYTE                = 305                                             
+    BYTES                     = 2                                              
+    DESCRIPTION               = ""                                             
+  END_OBJECT                  = COLUMN                                                 
+END_OBJECT                    = TABLE                                          
+END                                                                            

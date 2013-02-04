@@ -402,7 +402,8 @@ void OutputLabel ( std::ofstream &fout, Cube* cube, Pvl &labelPvl ) {
     }
 
     //Update the product ID
-    labelPvl["PRODUCT_ID"][0].replace(11, 1, "C");
+    string prod_id = labelPvl["PRODUCT_ID"][0];
+    labelPvl["PRODUCT_ID"][0].replace((prod_id.length()-1), 1, "C");
 
     // Update the product creation time
     labelPvl["PRODUCT_CREATION_TIME"].SetValue(iTime::CurrentGMT());

@@ -1,3 +1,5 @@
+#ifndef CameraFocalPlaneMap_h
+#define CameraFocalPlaneMap_h
 /**
  * @file
  * $Revision: 1.3 $
@@ -20,12 +22,10 @@
  *   http://isis.astrogeology.usgs.gov, and the USGS privacy and disclaimers on
  *   http://www.usgs.gov/privacy.html.
  */
-#ifndef CameraFocalPlaneMap_h
-#define CameraFocalPlaneMap_h
 
-#include "Camera.h"
 
 namespace Isis {
+  class Camera;
   /** Convert between distorted focal plane and detector coordinates
    *
    * This base class is used to convert between distorted focal plane
@@ -71,106 +71,58 @@ namespace Isis {
    *
    * @internal
    *   @history 2007-02-13 Debbie A. Cook - Added methods SignMostSigX() and
-   *                                      SignMostSigY()
+   *                           SignMostSigY()
    *   @history 2011-05-25 Janet Barrett and Steven Lambright - Spice::GetDouble
-   *                                      is no longer static. 
-   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *                                     coding standards. References #972.
+   *                           is no longer static. 
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more
+   *                           compliant with Isis coding standards.
+   *                           References #972.
+   *   @history 2012-11-21 Jeannie Backer - Added accesssor methods:
+   *                           TransX(), TransY(), TransS(), and TransL().
+   *                           These are tested by application hideal2pds
+   *                           since no unitTest exists. Fixed indentation
+   *                           of history entries, order of includes,
+   *                           moved method implementations to cpp, and
+   *                           fixed control statement padding to be more
+   *                           compliant with Isis standards. Added
+   *                           documentation to member
+   *                           variables.References #678.
+   *  
    */
   class CameraFocalPlaneMap {
     public:
       CameraFocalPlaneMap(Camera *parent, const int naifIkCode);
       CameraFocalPlaneMap(const int naifIkCode);
-
-      //! Destructor
-      virtual ~CameraFocalPlaneMap() {};
+      virtual ~CameraFocalPlaneMap();
 
       virtual bool SetDetector(const double sample, const double line);
-
       virtual bool SetFocalPlane(const double dx, const double dy);
 
-      //! Return distorted focal plane x
-      inline double FocalPlaneX() const {
-        return p_focalPlaneX;
-      };
+      double FocalPlaneX() const;
+      double FocalPlaneY() const;
+      double DetectorSample() const;
+      double DetectorLine() const;
+      double CenteredDetectorSample() const;
+      double CenteredDetectorLine() const;
+      void SetDetectorOrigin(const double sample, const double line);
+      double DetectorLineOrigin() const;
+      double DetectorSampleOrigin() const;
+      void SetDetectorOffset(const double sampleOffset,
+                                    const double lineOffset);
+      double DetectorLineOffset() const;
+      double DetectorSampleOffset() const;
+      const double *TransX() const;
+      const double *TransY() const;
+      const double *TransS() const;
+      const double *TransL() const;
 
-      //! Return distorted focal plane y
-      inline double FocalPlaneY() const {
-        return p_focalPlaneY;
-      };
-
-      //! Return detector sample
-      inline double DetectorSample() const {
-        return p_detectorSample;
-      };
-
-      //! Return detector line
-      inline double DetectorLine() const {
-        return p_detectorLine;
-      };
-
-      //! Return centered detector sample
-      inline double CenteredDetectorSample() const {
-        return p_centeredDetectorSample;
-      };
-
-      //! Return centered detector line
-      inline double CenteredDetectorLine() const {
-        return p_centeredDetectorLine;
-      };
-
-      /** Set the detector origin
-       *
-       * This is used to set the origin of the detector.  Typically the middle
-       * of the detector.  For example, a 512x512 dectector would have the
-       * origin at (256.5,256.5).  If not set both are 0.
-       *
-       * @param sample  detector sample at the origin
-       * @param line    detector line at the origin
+      /**
+       * Focal plane x dependency indicates whether the x value of the focal 
+       * plane coordinate maps to a sample or a line. 
        */
-      inline void SetDetectorOrigin(const double sample, const double line) {
-        p_detectorSampleOrigin = sample;
-        p_detectorLineOrigin = line;
-      };
-
-      //! Return detector line origin
-      inline double DetectorLineOrigin() const {
-        return p_detectorLineOrigin;
-      };
-
-      //! Return detector sample origin
-      inline double DetectorSampleOrigin() const {
-        return p_detectorSampleOrigin;
-      };
-
-      /** Set the detector offset
-       *
-       * This is used to set the offset between the detector origin and
-       * the average location in detector pixels where the image is being
-       * viewed.  If not set the offset are both 0.0
-       *
-       * @param sampleOffset sample offset in pixels
-       * @param lineOffset sample offset in lines
-       */
-      inline void SetDetectorOffset(const double sampleOffset,
-                                    const double lineOffset) {
-        p_detectorSampleOffset = sampleOffset;
-        p_detectorLineOffset = lineOffset;
-      };
-
-      //! Return detector line offset
-      inline double DetectorLineOffset() const {
-        return p_detectorLineOffset;
-      };
-
-      //! Return detector sample offset
-      inline double DetectorSampleOffset() const {
-        return p_detectorSampleOffset;
-      };
-
       enum FocalPlaneXDependencyType {
-        Sample = 1,
-        Line = 2
+        Sample = 1, //!< The x value of the focal plane maps to a sample
+        Line = 2    //!< The x value of the focal plane maps to a line
       };
 
 //      FocalPlaneXDependencyType FocalPlaneXDependency();
@@ -179,35 +131,28 @@ namespace Isis {
       double SignMostSigY();
 
     protected:
-      //! Convenience method to center detector origin (use when inheriting)
-      inline void ComputeCentered() {
-        p_centeredDetectorSample = p_detectorSample - p_detectorSampleOrigin;
-        p_centeredDetectorLine   = p_detectorLine   - p_detectorLineOrigin;
-      }
+      void ComputeCentered();
+      void ComputeUncentered();
 
-      //! Convenience method to center detector origin (use when inheriting)
-      inline void ComputeUncentered() {
-        p_detectorSample = p_centeredDetectorSample + p_detectorSampleOrigin;
-        p_detectorLine   = p_centeredDetectorLine   + p_detectorLineOrigin;
-      }
+      Camera *p_camera; //!< 
 
-      Camera *p_camera;
+      double p_detectorLineOrigin;   //!< 
+      double p_detectorSampleOrigin; //!< 
 
-      double p_detectorLineOrigin;
-      double p_detectorSampleOrigin;
+      double p_focalPlaneX;            //!< x value of focal plane coordinate
+      double p_focalPlaneY;            //!< y value of focal plane coordinate
+      double p_detectorLine;           //!< line value of the detector
+      double p_detectorSample;         //!< sample value of the detector
+      double p_centeredDetectorSample; //!< 
+      double p_centeredDetectorLine;   //!< 
 
-      double p_focalPlaneX;
-      double p_focalPlaneY;
-      double p_detectorLine;
-      double p_detectorSample;
-      double p_centeredDetectorSample;
-      double p_centeredDetectorLine;
+      double p_detectorLineOffset;   //!< 
+      double p_detectorSampleOffset; //!< 
 
-      double p_detectorLineOffset;
-      double p_detectorSampleOffset;
-
-      double p_transx[3], p_transy[3];
-      double p_itranss[3], p_itransl[3];
+      double p_transx[3];  //!< 
+      double p_transy[3];  //!< 
+      double p_itranss[3]; //!< 
+      double p_itransl[3]; //!< 
 
     private:
       void Init(Camera *parent, const int naifIkCode);

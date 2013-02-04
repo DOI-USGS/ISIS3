@@ -556,7 +556,7 @@ int main(int argc, char *argv[]) {
     catch (IException &e) {
       e.print();
     }
-    
+
     try {
       in4.reopen("rw");
     }
@@ -748,6 +748,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  remove("IsisCube_00.cub");
   remove("IsisCube_01.cub");
   remove("IsisCube_02.cub");
   remove("IsisCube_02.lbl");
@@ -755,7 +756,10 @@ int main(int argc, char *argv[]) {
   remove("IsisCube_04.cub");
   remove("IsisCube_05.cub");
   remove("IsisCube_boundary.cub");
-//   remove("isisTruth_external.ecub");
+  remove("isisTruth_external.ecub");
+  remove("isisTruth_external2.ecub");
+  remove("isisTruth_external3.ecub");
+  remove("isisTruth_external3.copy.ecub");
 
   return 0;
 }

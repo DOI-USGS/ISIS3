@@ -1,4 +1,9 @@
 #include "Isis.h"
+
+#include <sstream>
+
+#include <QDebug>
+
 #include "ProcessExport.h"
 #include "ProcessByLine.h"
 #include "Pvl.h"
@@ -8,7 +13,6 @@
 #include "iTime.h"
 #include "md5.h"
 #include "md5wrapper.h"
-#include <sstream>
 
 #define SCALING_FACTOR 32767
 
@@ -40,8 +44,10 @@ void IsisMain () {
 
     g_isIof = inCube->getLabel()->FindGroup("Radiometry", Pvl::Traverse).FindKeyword("RadiometricType")[0].Equal("IOF");
 
-    FileName scaledCube = ui.GetFileName("FROM");
-    scaledCube = FileName::createTempFile("$TEMPORARY/" + FileName(ui.GetFileName("FROM")).baseName());
+    FileName scaledCube("$TEMPORARY/" + FileName(ui.GetFileName("FROM")).name());
+    scaledCube.addExtension("cub");
+
+    scaledCube = FileName::createTempFile(scaledCube);
     p.SetOutputCube(
         scaledCube.expanded(), CubeAttributeOutput(),
         inCube->getSampleCount(), inCube->getLineCount(),
@@ -81,7 +87,7 @@ void IsisMain () {
         pe.SetOutputHrs(Isis::HIGH_REPR_SAT4);
     }
 
-    FileName tempFile(ui.GetFileName("TO"));
+    FileName tempFile;
     tempFile = FileName::createTempFile("$TEMPORARY/" + FileName(ui.GetFileName("TO")).baseName() + ".temp");
     string tempFileName(tempFile.expanded());
     ofstream temporaryFile(tempFileName.c_str());
@@ -178,7 +184,9 @@ void OutputLabel ( std::ofstream &fout, Cube* cube ) {
     }
 
     //Update the product ID
-    labelPvl["PRODUCT_ID"][0].replace(11, 1, "C");
+    //we switch the last char in the id from edr->cdr
+    string prod_id = labelPvl["PRODUCT_ID"][0];
+    labelPvl["PRODUCT_ID"][0].replace((prod_id.length()-1), 1, "C");
 
     // Update the product creation time
     labelPvl["PRODUCT_CREATION_TIME"].SetValue(iTime::CurrentGMT());
