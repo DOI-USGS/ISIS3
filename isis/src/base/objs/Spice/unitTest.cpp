@@ -91,7 +91,7 @@ class MySpice : public Spice {
       }
     }
 
-    double Resolution() {
+    double resolution() {
       return 1.;
     }
 };
@@ -197,7 +197,7 @@ int main(int argc, char *argv[]) {
   cout << "Radii[2]:  " << radii[2].kilometers() << endl;
   cout << endl;
   cout << "Solar Longitude = " << spi.solarLongitude().positiveEast() << endl;
-  cout << "Resolution      = " << spi.Resolution() << endl;
+  cout << "Resolution      = " << spi.resolution() << endl;
 
   // Normal testing (no cache)
   cout << "Testing without cache ... " << endl;

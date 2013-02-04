@@ -54,6 +54,8 @@ namespace Isis {
    *                             #1181.
    *   @history 2012-10-31 - Ken Edmundson - Added another SetNormal method and fixed original to 
    *                             set the m_hasNormal to true.
+   *   @history 2012-11-14 - Jeannie Backer - Removed cout lines left in while
+   *                             testing code. References #1181.
    */
   class ShapeModel {
     public:

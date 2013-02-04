@@ -16,6 +16,8 @@
 #include "PvlGroup.h"
 #include "SpecialPixel.h"
 
+#include <QDebug>
+
 using namespace std;
 using namespace Isis;
 
@@ -77,462 +79,469 @@ void LoadPvl() {
   atmName = atmName.UpCase();
   IString nrmName = ui.GetAsString("NORMNAME");
   nrmName = nrmName.UpCase();
-  if (phtName == "NONE" && atmName == "NONE" && nrmName == "NONE") {
-    string message = "A photometric or atmospheric or normalization model must be specified before it can be loaded from the PVL";
-    throw IException(IException::User, message, _FILEINFO_);
-  }
-  if (phtName != "NONE") {
-    if (inPvl.HasObject("PhotometricModel")) {
-      PvlObject phtObj = inPvl.FindObject("PhotometricModel");
-      IString phtVal;
-      if (phtObj.HasGroup("Algorithm")) {
-        PvlObject::PvlGroupIterator phtGrp = phtObj.BeginGroup();
-        bool wasFound = false;
-        if (phtGrp->HasKeyword("PHTNAME")) {
-          phtVal = (string)phtGrp->FindKeyword("PHTNAME");
-        } else if (phtGrp->HasKeyword("NAME")) {
-          phtVal = (string)phtGrp->FindKeyword("NAME");
-        } else {
-          phtVal = "NONE";
-        }
-        phtVal = phtVal.UpCase();
-        if (phtName == phtVal) {
-          wasFound = true;
-        }
-        if (ui.WasEntered("PHTNAME") && !wasFound) {
-          phtName = ui.GetAsString("PHTNAME");
-          phtName = phtName.UpCase();
-          while (phtGrp != phtObj.EndGroup()) {
-            if (phtGrp->HasKeyword("PHTNAME") || phtGrp->HasKeyword("NAME")) {
-              if (phtGrp->HasKeyword("PHTNAME")) {
-                phtVal = (string)phtGrp->FindKeyword("PHTNAME");
-              } else if (phtGrp->HasKeyword("NAME")) {
-                phtVal = (string)phtGrp->FindKeyword("NAME");
-              } else {
-                phtVal = "NONE";
-              }
-              phtVal = phtVal.UpCase();
-              if (phtName == phtVal) {
-                wasFound = true;
-                break;
-              }
+
+  IString phtVal;
+  if (inPvl.HasObject("PhotometricModel")) {
+    PvlObject phtObj = inPvl.FindObject("PhotometricModel");
+    if (!phtObj.HasGroup("Algorithm")) {
+      string message = "The input PVL does not contain a valid photometric model so you must specify one ";
+      message += "- the [Algorithm] group is missing in your [PhotometricModel]";
+      throw IException(IException::User, message, _FILEINFO_);
+    }
+    else {
+      PvlObject::PvlGroupIterator phtGrp = phtObj.BeginGroup();
+      bool wasFound = false;
+      if (phtGrp->HasKeyword("PHTNAME")) {
+        phtVal = (string)phtGrp->FindKeyword("PHTNAME");
+      } else if (phtGrp->HasKeyword("NAME")) {
+        phtVal = (string)phtGrp->FindKeyword("NAME");
+      } else {
+        string message = "The input PVL does not contain a valid photometric model so you must specify one ";
+        message += "- the [Phtname] keyword is missing in your [Algorithm] group";
+        throw IException(IException::User, message, _FILEINFO_);
+      }
+      phtVal = phtVal.UpCase();
+      if (phtName == phtVal || phtName == "NONE" || phtName == "FROMPVL") {
+        wasFound = true;
+      }
+      if (!wasFound) {
+        while (phtGrp != phtObj.EndGroup()) {
+          if (phtGrp->HasKeyword("PHTNAME") || phtGrp->HasKeyword("NAME")) {
+            if (phtGrp->HasKeyword("PHTNAME")) {
+              phtVal = (string)phtGrp->FindKeyword("PHTNAME");
+            } else if (phtGrp->HasKeyword("NAME")) {
+              phtVal = (string)phtGrp->FindKeyword("NAME");
+            } else {
+              string message = "The input PVL does not contain a valid photometric model so you must specify one ";
+              message += "- the [Phtname] keyword is missing in your [Algorithm] group";
+              throw IException(IException::User, message, _FILEINFO_);
             }
-            phtGrp++;
+            phtVal = phtVal.UpCase();
+            if (phtName == phtVal) {
+              wasFound = true;
+              break;
+            }
           }
+          phtGrp++;
         }
-        if (wasFound) {
-          ui.Clear("PHTNAME");
-          ui.Clear("THETA");
-          ui.Clear("WH");
-          ui.Clear("HG1");
-          ui.Clear("HG2");
-          ui.Clear("HH");
-          ui.Clear("B0");
-          ui.Clear("ZEROB0STANDARD");
-          ui.Clear("BH");
-          ui.Clear("CH");
-          ui.Clear("L");
-          ui.Clear("K");
-          ui.Clear("PHASELIST");
-          ui.Clear("KLIST");
-          ui.Clear("LLIST");
-          ui.Clear("PHASECURVELIST");
-          if (phtGrp->HasKeyword("PHTNAME")) {
-            phtVal = (string)phtGrp->FindKeyword("PHTNAME");
-          } else if (phtGrp->HasKeyword("NAME")) {
-            phtVal = (string)phtGrp->FindKeyword("NAME");
-          } else {
-            phtVal = "NONE";
+      }
+      if (wasFound) {
+        ui.Clear("PHTNAME");
+        ui.Clear("THETA");
+        ui.Clear("WH");
+        ui.Clear("HG1");
+        ui.Clear("HG2");
+        ui.Clear("HH");
+        ui.Clear("B0");
+        ui.Clear("ZEROB0ST");
+        ui.Clear("BH");
+        ui.Clear("CH");
+        ui.Clear("L");
+        ui.Clear("K");
+        ui.Clear("PHASELIST");
+        ui.Clear("KLIST");
+        ui.Clear("LLIST");
+        ui.Clear("PHASECURVELIST");
+        if (phtVal == "HAPKEHEN" || phtVal == "HAPKELEG") {
+          if (phtGrp->HasKeyword("THETA")) {
+            double theta = phtGrp->FindKeyword("THETA");
+            os.str("");
+            os << theta;
+            ui.PutAsString("THETA", os.str());
           }
-          phtVal = phtVal.UpCase();
-          if (phtVal == "HAPKEHEN" || phtVal == "HAPKELEG") {
-            if (phtGrp->HasKeyword("THETA")) {
-              double theta = phtGrp->FindKeyword("THETA");
-              os.str("");
-              os << theta;
-              ui.PutAsString("THETA", os.str());
-            }
-            if (phtGrp->HasKeyword("WH")) {
-              double wh = phtGrp->FindKeyword("WH");
-              os.str("");
-              os << wh;
-              ui.PutAsString("WH", os.str());
-            }
-            if (phtGrp->HasKeyword("HH")) {
-              double hh = phtGrp->FindKeyword("HH");
-              os.str("");
-              os << hh;
-              ui.PutAsString("HH", os.str());
-            }
-            if (phtGrp->HasKeyword("B0")) {
-              double b0 = phtGrp->FindKeyword("B0");
-              os.str("");
-              os << b0;
-              ui.PutAsString("B0", os.str());
-            }
-            if (phtGrp->HasKeyword("ZEROB0STANDARD")) {
-              string zerob0 = (string)phtGrp->FindKeyword("ZEROB0STANDARD");
-              if (zerob0.compare("TRUE")) {
-                ui.PutString("ZEROB0STANDARD", "TRUE");
-              } else if (zerob0.compare("FALSE")) {
-                ui.PutString("ZEROB0STANDARD", "FALSE");
-              } else {
-                string message = "The ZEROB0STANDARD value is invalid - must be set to TRUE or FALSE";
-                throw IException(IException::User, message, _FILEINFO_);
-              }
-            }
-            if (phtVal == "HAPKEHEN") {
-              if (phtGrp->HasKeyword("HG1")) {
-                double hg1 = phtGrp->FindKeyword("HG1");
-                os.str("");
-                os << hg1;
-                ui.PutAsString("HG1", os.str());
-              }
-              if (phtGrp->HasKeyword("HG2")) {
-                double hg2 = phtGrp->FindKeyword("HG2");
-                os.str("");
-                os << hg2;
-                ui.PutAsString("HG2", os.str());
-              }
-            }
-            if (phtVal == "HAPKELEG") {
-              if (phtGrp->HasKeyword("BH")) {
-                double bh = phtGrp->FindKeyword("BH");
-                os.str("");
-                os << bh;
-                ui.PutAsString("BH", os.str());
-              }
-              if (phtGrp->HasKeyword("CH")) {
-                double ch = phtGrp->FindKeyword("CH");
-                os.str("");
-                os << ch;
-                ui.PutAsString("CH", os.str());
-              }
-            }
-          } else if (phtVal == "LUNARLAMBERTEMPIRICAL" || phtVal == "MINNAERTEMPIRICAL") {
-            if (phtGrp->HasKeyword("PHASELIST")) {
-              string phaselist = (string)phtGrp->FindKeyword("PHASELIST");
-              ui.PutAsString("PHASELIST", phaselist);
-            }
-            if (phtGrp->HasKeyword("PHASECURVELIST")) {
-              string phasecurvelist = (string)phtGrp->FindKeyword("PHASECURVELIST");
-              ui.PutAsString("PHASECURVELIST", phasecurvelist);
-            }
-            if (phtVal == "LUNARLAMBERTEMPIRICAL") {
-              if (phtGrp->HasKeyword("LLIST")) {
-                string llist = (string)phtGrp->FindKeyword("LLIST");
-                ui.PutAsString("LLIST", llist);
-              }
-            }
-            if (phtVal == "MINNAERTEMPIRICAL") {
-              if (phtGrp->HasKeyword("KLIST")) {
-                string klist = (string)phtGrp->FindKeyword("KLIST");
-                ui.PutAsString("KLIST", klist);
-              }
-            }
-          } else if (phtVal == "LUNARLAMBERT") {
-            if (phtGrp->HasKeyword("L")) {
-              double l = phtGrp->FindKeyword("L");
-              os.str("");
-              os << l;
-              ui.PutAsString("L", os.str());
-            }
-          } else if (phtVal == "MINNAERT") {
-            if (phtGrp->HasKeyword("K")) {
-              double k = phtGrp->FindKeyword("K");
-              os.str("");
-              os << k;
-              ui.PutAsString("K", os.str());
-            }
-          } else if (phtVal != "LAMBERT" && phtVal != "LOMMELSEELIGER" &&
-                     phtVal != "LUNARLAMBERTMCEWEN") {
-            string message = "Unsupported photometric model [" + phtVal + "].";
-            throw IException(IException::User, message, _FILEINFO_);
+          if (phtGrp->HasKeyword("WH")) {
+            double wh = phtGrp->FindKeyword("WH");
+            os.str("");
+            os << wh;
+            ui.PutAsString("WH", os.str());
           }
-          ui.PutAsString("PHTNAME", phtVal);
+          if (phtGrp->HasKeyword("HH")) {
+            double hh = phtGrp->FindKeyword("HH");
+            os.str("");
+            os << hh;
+            ui.PutAsString("HH", os.str());
+          }
+          if (phtGrp->HasKeyword("B0")) {
+            double b0 = phtGrp->FindKeyword("B0");
+            os.str("");
+            os << b0;
+            ui.PutAsString("B0", os.str());
+          }
+          if (phtGrp->HasKeyword("ZEROB0STANDARD")) {
+            string zerob0 = (string)phtGrp->FindKeyword("ZEROB0STANDARD");
+            if (zerob0.compare("TRUE")) {
+              ui.PutString("ZEROB0STANDARD", "TRUE");
+            } else if (zerob0.compare("FALSE")) {
+              ui.PutString("ZEROB0STANDARD", "FALSE");
+            } else {
+              string message = "The ZEROB0STANDARD value is invalid - must be set to TRUE or FALSE";
+              throw IException(IException::User, message, _FILEINFO_);
+            }
+          }
+          else if (phtGrp->HasKeyword("ZEROB0ST")) {
+            string zerob0 = (string)phtGrp->FindKeyword("ZEROB0ST");
+            if (zerob0.compare("TRUE")) {
+              ui.PutString("ZEROB0ST", "TRUE");
+            } else if (zerob0.compare("FALSE")) {
+              ui.PutString("ZEROB0ST", "FALSE");
+            } else {
+              string message = "The ZEROB0ST value is invalid - must be set to TRUE or FALSE";
+              throw IException(IException::User, message, _FILEINFO_);
+            }
+          }
+          if (phtVal == "HAPKEHEN") {
+            if (phtGrp->HasKeyword("HG1")) {
+              double hg1 = phtGrp->FindKeyword("HG1");
+              os.str("");
+              os << hg1;
+              ui.PutAsString("HG1", os.str());
+            }
+            if (phtGrp->HasKeyword("HG2")) {
+              double hg2 = phtGrp->FindKeyword("HG2");
+              os.str("");
+              os << hg2;
+              ui.PutAsString("HG2", os.str());
+            }
+          }
+          if (phtVal == "HAPKELEG") {
+            if (phtGrp->HasKeyword("BH")) {
+              double bh = phtGrp->FindKeyword("BH");
+              os.str("");
+              os << bh;
+              ui.PutAsString("BH", os.str());
+            }
+            if (phtGrp->HasKeyword("CH")) {
+              double ch = phtGrp->FindKeyword("CH");
+              os.str("");
+              os << ch;
+              ui.PutAsString("CH", os.str());
+            }
+          }
+        } else if (phtVal == "LUNARLAMBERTEMPIRICAL" || phtVal == "MINNAERTEMPIRICAL") {
+          if (phtGrp->HasKeyword("PHASELIST")) {
+            string phaselist = (string)phtGrp->FindKeyword("PHASELIST");
+            ui.PutAsString("PHASELIST", phaselist);
+          }
+          if (phtGrp->HasKeyword("PHASECURVELIST")) {
+            string phasecurvelist = (string)phtGrp->FindKeyword("PHASECURVELIST");
+            ui.PutAsString("PHASECURVELIST", phasecurvelist);
+          }
+          if (phtVal == "LUNARLAMBERTEMPIRICAL") {
+            if (phtGrp->HasKeyword("LLIST")) {
+              string llist = (string)phtGrp->FindKeyword("LLIST");
+              ui.PutAsString("LLIST", llist);
+            }
+          }
+          if (phtVal == "MINNAERTEMPIRICAL") {
+            if (phtGrp->HasKeyword("KLIST")) {
+              string klist = (string)phtGrp->FindKeyword("KLIST");
+              ui.PutAsString("KLIST", klist);
+            }
+          }
+        } else if (phtVal == "LUNARLAMBERT") {
+          if (phtGrp->HasKeyword("L")) {
+            double l = phtGrp->FindKeyword("L");
+            os.str("");
+            os << l;
+            ui.PutAsString("L", os.str());
+          }
+        } else if (phtVal == "MINNAERT") {
+          if (phtGrp->HasKeyword("K")) {
+            double k = phtGrp->FindKeyword("K");
+            os.str("");
+            os << k;
+            ui.PutAsString("K", os.str());
+          }
+        } else if (phtVal != "LAMBERT" && phtVal != "LOMMELSEELIGER" &&
+                   phtVal != "LUNARLAMBERTMCEWEN") {
+          string message = "Unsupported photometric model [" + phtVal + "].";
+          throw IException(IException::User, message, _FILEINFO_);
         }
+        ui.PutAsString("PHTNAME", phtVal);
       }
     }
   }
 
   IString nrmVal;
-//  if (nrmName == "NONE") {
-//    string message = "A normalization model must be specified before it can be loaded from the PVL";
-//    throw IException(IException::User, message, _FILEINFO_);
-//  }
-  if (nrmName != "NONE") {
-    if (inPvl.HasObject("NormalizationModel")) {
-      PvlObject nrmObj = inPvl.FindObject("NormalizationModel");
-      if (nrmObj.HasGroup("Algorithm")) {
-        PvlObject::PvlGroupIterator nrmGrp = nrmObj.BeginGroup();
-        bool wasFound = false;
-        if (nrmGrp->HasKeyword("NORMNAME")) {
-          nrmVal = (string)nrmGrp->FindKeyword("NORMNAME");
-        } else if (nrmGrp->HasKeyword("NAME")) {
-          nrmVal = (string)nrmGrp->FindKeyword("NAME");
-        } else {
-          nrmVal = "NONE";
-        }
-        nrmVal = nrmVal.UpCase();
-        if (nrmName == nrmVal) {
-          wasFound = true;
-        }
-        if (ui.WasEntered("NORMNAME") && !wasFound) {
-          while (nrmGrp != nrmObj.EndGroup()) {
-            if (nrmGrp->HasKeyword("NORMNAME") || nrmGrp->HasKeyword("NAME")) {
-              if (nrmGrp->HasKeyword("NORMNAME")) {
-                nrmVal = (string)nrmGrp->FindKeyword("NORMNAME");
-              } else if (nrmGrp->HasKeyword("NAME")) {
-                nrmVal = (string)nrmGrp->FindKeyword("NAME");
-              } else {
-                nrmVal = "NONE";
-              }
-              nrmVal = nrmVal.UpCase();
-              if (nrmName == nrmVal) {
-                wasFound = true;
-                break;
-              }
-            }
-            nrmGrp++;
-          }
-        }
-        if (wasFound) {
-          if (nrmName != "ALBEDOATM" && nrmName != "SHADEATM" && nrmName != "TOPOATM") {
-            ui.Clear("ATMNAME");
-          }
-          ui.Clear("NORMNAME");
-          ui.Clear("INCREF");
-          ui.Clear("INCMAT");
-          ui.Clear("THRESH");
-          ui.Clear("ALBEDO");
-          ui.Clear("D");
-          ui.Clear("E");
-          ui.Clear("F");
-          ui.Clear("G2");
-          ui.Clear("XMUL");
-          ui.Clear("WL");
-          ui.Clear("H");
-          ui.Clear("BSH1");
-          ui.Clear("XB1");
-          ui.Clear("XB2");
-          if (nrmGrp->HasKeyword("NORMNAME")) {
-            nrmVal = (string)nrmGrp->FindKeyword("NORMNAME");
-          } else if (nrmGrp->HasKeyword("NAME")) {
-            nrmVal = (string)nrmGrp->FindKeyword("NAME");
-          } else {
-            nrmVal = "NONE";
-          }
-          nrmVal = nrmVal.UpCase();
-          if (nrmVal != "MOONALBEDO") {
-            if (nrmVal == "ALBEDO" || nrmVal == "MIXED") {
-              if (nrmGrp->HasKeyword("INCREF")) {
-                double incref = nrmGrp->FindKeyword("INCREF");
-                os.str("");
-                os << incref;
-                ui.PutAsString("INCREF", os.str());
-              }
-              if (nrmGrp->HasKeyword("INCMAT")) {
-                double incmat = nrmGrp->FindKeyword("INCMAT");
-                os.str("");
-                os << incmat;
-                ui.PutAsString("INCMAT", os.str());
-              }
-              if (nrmGrp->HasKeyword("THRESH")) {
-                double thresh = nrmGrp->FindKeyword("THRESH");
-                os.str("");
-                os << thresh;
-                ui.PutAsString("THRESH", os.str());
-              }
-              if (nrmGrp->HasKeyword("ALBEDO")) {
-                double albedo = nrmGrp->FindKeyword("ALBEDO");
-                os.str("");
-                os << albedo;
-                ui.PutAsString("ALBEDO", os.str());
-              }
-            } else if (nrmVal == "SHADE") {
-              if (nrmGrp->HasKeyword("INCREF")) {
-                double incref = nrmGrp->FindKeyword("INCREF");
-                os.str("");
-                os << incref;
-                ui.PutAsString("INCREF", os.str());
-              }
-              if (nrmGrp->HasKeyword("ALBEDO")) {
-                double albedo = nrmGrp->FindKeyword("ALBEDO");
-                os.str("");
-                os << albedo;
-                ui.PutAsString("ALBEDO", os.str());
-              }
-            } else if (nrmVal == "TOPO") {
-              if (nrmGrp->HasKeyword("INCREF")) {
-                double incref = nrmGrp->FindKeyword("INCREF");
-                os.str("");
-                os << incref;
-                ui.PutAsString("INCREF", os.str());
-              }
-              if (nrmGrp->HasKeyword("ALBEDO")) {
-                double albedo = nrmGrp->FindKeyword("ALBEDO");
-                os.str("");
-                os << albedo;
-                ui.PutAsString("ALBEDO", os.str());
-              }
-              if (nrmGrp->HasKeyword("THRESH")) {
-                double thresh = nrmGrp->FindKeyword("THRESH");
-                os.str("");
-                os << thresh;
-                ui.PutAsString("THRESH", os.str());
-              }
-            } else if (nrmVal == "ALBEDOATM") {
-              if (nrmGrp->HasKeyword("INCREF")) {
-                double incref = nrmGrp->FindKeyword("INCREF");
-                os.str("");
-                os << incref;
-                ui.PutAsString("INCREF", os.str());
-              }
-            } else if (nrmVal == "SHADEATM") {
-              if (nrmGrp->HasKeyword("INCREF")) {
-                double incref = nrmGrp->FindKeyword("INCREF");
-                os.str("");
-                os << incref;
-                ui.PutAsString("INCREF", os.str());
-              }
-              if (nrmGrp->HasKeyword("ALBEDO")) {
-                double albedo = nrmGrp->FindKeyword("ALBEDO");
-                os.str("");
-                os << albedo;
-                ui.PutAsString("ALBEDO", os.str());
-              }
-            } else if (nrmVal == "TOPOATM") {
-              if (nrmGrp->HasKeyword("INCREF")) {
-                double incref = nrmGrp->FindKeyword("INCREF");
-                os.str("");
-                os << incref;
-                ui.PutAsString("INCREF", os.str());
-              }
-              if (nrmGrp->HasKeyword("ALBEDO")) {
-                double albedo = nrmGrp->FindKeyword("ALBEDO");
-                os.str("");
-                os << albedo;
-                ui.PutAsString("ALBEDO", os.str());
-              }
+  if (inPvl.HasObject("NormalizationModel")) {
+    PvlObject nrmObj = inPvl.FindObject("NormalizationModel");
+    if (!nrmObj.HasGroup("Algorithm")) {
+      string message = "The input PVL does not contain a valid normalization model so you must specify one ";
+      message += "- the [Algorithm] group is missing in your [NormalizationModel]";
+      throw IException(IException::User, message, _FILEINFO_);
+    }
+    else {
+      PvlObject::PvlGroupIterator nrmGrp = nrmObj.BeginGroup();
+      bool wasFound = false;
+      if (nrmGrp->HasKeyword("NORMNAME")) {
+        nrmVal = (string)nrmGrp->FindKeyword("NORMNAME");
+      } else if (nrmGrp->HasKeyword("NAME")) {
+        nrmVal = (string)nrmGrp->FindKeyword("NAME");
+      } else {
+        string message = "The input PVL does not contain a valid normalization model so you must specify one ";
+        message += "- the [Normname] keyword is missing in your [Algorithm] group";
+        throw IException(IException::User, message, _FILEINFO_);
+      }
+      nrmVal = nrmVal.UpCase();
+      if (nrmName == nrmVal || nrmName == "NONE" || nrmName == "FROMPVL") {
+        wasFound = true;
+      }
+      if (!wasFound) {
+        while (nrmGrp != nrmObj.EndGroup()) {
+          if (nrmGrp->HasKeyword("NORMNAME") || nrmGrp->HasKeyword("NAME")) {
+            if (nrmGrp->HasKeyword("NORMNAME")) {
+              nrmVal = (string)nrmGrp->FindKeyword("NORMNAME");
+            } else if (nrmGrp->HasKeyword("NAME")) {
+              nrmVal = (string)nrmGrp->FindKeyword("NAME");
             } else {
-              string message = "Unsupported normalization model [" + nrmVal + "].";
+              string message = "The input PVL does not contain a valid normalization model so you must specify one ";
+              message += "- the [Normname] keyword is missing in your [Algorithm] group";
               throw IException(IException::User, message, _FILEINFO_);
             }
-          } else {
-            if (nrmGrp->HasKeyword("D")) {
-              double d = nrmGrp->FindKeyword("D");
-              os.str("");
-              os << d;
-              ui.PutAsString("D", os.str());
-            }
-            if (nrmGrp->HasKeyword("E")) {
-              double e = nrmGrp->FindKeyword("E");
-              os.str("");
-              os << e;
-              ui.PutAsString("E", os.str());
-            }
-            if (nrmGrp->HasKeyword("F")) {
-              double f = nrmGrp->FindKeyword("F");
-              os.str("");
-              os << f;
-              ui.PutAsString("F", os.str());
-            }
-            if (nrmGrp->HasKeyword("G2")) {
-              double g2 = nrmGrp->FindKeyword("G2");
-              os.str("");
-              os << g2;
-              ui.PutAsString("G2", os.str());
-            }
-            if (nrmGrp->HasKeyword("XMUL")) {
-              double xmul = nrmGrp->FindKeyword("XMUL");
-              os.str("");
-              os << xmul;
-              ui.PutAsString("XMUL", os.str());
-            }
-            if (nrmGrp->HasKeyword("WL")) {
-              double wl = nrmGrp->FindKeyword("WL");
-              os.str("");
-              os << wl;
-              ui.PutAsString("WL", os.str());
-            }
-            if (nrmGrp->HasKeyword("H")) {
-              double h = nrmGrp->FindKeyword("H");
-              os.str("");
-              os << h;
-              ui.PutAsString("H", os.str());
-            }
-            if (nrmGrp->HasKeyword("BSH1")) {
-              double bsh1 = nrmGrp->FindKeyword("BSH1");
-              os.str("");
-              os << bsh1;
-              ui.PutAsString("BSH1", os.str());
-            }
-            if (nrmGrp->HasKeyword("XB1")) {
-              double xb1 = nrmGrp->FindKeyword("XB1");
-              os.str("");
-              os << xb1;
-              ui.PutAsString("XB1", os.str());
-            }
-            if (nrmGrp->HasKeyword("XB2")) {
-              double xb2 = nrmGrp->FindKeyword("XB2");
-              os.str("");
-              os << xb2;
-              ui.PutAsString("XB2", os.str());
+            nrmVal = nrmVal.UpCase();
+            if (nrmName == nrmVal) {
+              wasFound = true;
+              break;
             }
           }
-          ui.PutAsString("NORMNAME", nrmVal);
+          nrmGrp++;
         }
+      }
+      if (wasFound) {
+        if (nrmVal != "ALBEDOATM" && nrmVal != "SHADEATM" && nrmVal != "TOPOATM") {
+          ui.Clear("ATMNAME");
+        }
+        ui.Clear("NORMNAME");
+        ui.Clear("INCREF");
+        ui.Clear("INCMAT");
+        ui.Clear("THRESH");
+        ui.Clear("ALBEDO");
+        ui.Clear("D");
+        ui.Clear("E");
+        ui.Clear("F");
+        ui.Clear("G2");
+        ui.Clear("XMUL");
+        ui.Clear("WL");
+        ui.Clear("H");
+        ui.Clear("BSH1");
+        ui.Clear("XB1");
+        ui.Clear("XB2");
+        if (nrmVal != "MOONALBEDO") {
+          if (nrmVal == "ALBEDO" || nrmVal == "MIXED") {
+            if (nrmGrp->HasKeyword("INCREF")) {
+              double incref = nrmGrp->FindKeyword("INCREF");
+              os.str("");
+              os << incref;
+              ui.PutAsString("INCREF", os.str());
+            }
+            if (nrmGrp->HasKeyword("INCMAT") && nrmVal == "MIXED") {
+              double incmat = nrmGrp->FindKeyword("INCMAT");
+              os.str("");
+              os << incmat;
+              ui.PutAsString("INCMAT", os.str());
+            }
+            if (nrmGrp->HasKeyword("THRESH")) {
+              double thresh = nrmGrp->FindKeyword("THRESH");
+              os.str("");
+              os << thresh;
+              ui.PutAsString("THRESH", os.str());
+            }
+            if (nrmGrp->HasKeyword("ALBEDO")) {
+              double albedo = nrmGrp->FindKeyword("ALBEDO");
+              os.str("");
+              os << albedo;
+              ui.PutAsString("ALBEDO", os.str());
+            }
+          } else if (nrmVal == "SHADE") {
+            if (nrmGrp->HasKeyword("INCREF")) {
+              double incref = nrmGrp->FindKeyword("INCREF");
+              os.str("");
+              os << incref;
+              ui.PutAsString("INCREF", os.str());
+            }
+            if (nrmGrp->HasKeyword("ALBEDO")) {
+              double albedo = nrmGrp->FindKeyword("ALBEDO");
+              os.str("");
+              os << albedo;
+              ui.PutAsString("ALBEDO", os.str());
+            }
+          } else if (nrmVal == "TOPO") {
+            if (nrmGrp->HasKeyword("INCREF")) {
+              double incref = nrmGrp->FindKeyword("INCREF");
+              os.str("");
+              os << incref;
+              ui.PutAsString("INCREF", os.str());
+            }
+            if (nrmGrp->HasKeyword("ALBEDO")) {
+              double albedo = nrmGrp->FindKeyword("ALBEDO");
+              os.str("");
+              os << albedo;
+              ui.PutAsString("ALBEDO", os.str());
+            }
+            if (nrmGrp->HasKeyword("THRESH")) {
+              double thresh = nrmGrp->FindKeyword("THRESH");
+              os.str("");
+              os << thresh;
+              ui.PutAsString("THRESH", os.str());
+            }
+          } else if (nrmVal == "ALBEDOATM") {
+            if (nrmGrp->HasKeyword("INCREF")) {
+              double incref = nrmGrp->FindKeyword("INCREF");
+              os.str("");
+              os << incref;
+              ui.PutAsString("INCREF", os.str());
+            }
+          } else if (nrmVal == "SHADEATM") {
+            if (nrmGrp->HasKeyword("INCREF")) {
+              double incref = nrmGrp->FindKeyword("INCREF");
+              os.str("");
+              os << incref;
+              ui.PutAsString("INCREF", os.str());
+            }
+            if (nrmGrp->HasKeyword("ALBEDO")) {
+              double albedo = nrmGrp->FindKeyword("ALBEDO");
+              os.str("");
+              os << albedo;
+              ui.PutAsString("ALBEDO", os.str());
+            }
+          } else if (nrmVal == "TOPOATM") {
+            if (nrmGrp->HasKeyword("INCREF")) {
+              double incref = nrmGrp->FindKeyword("INCREF");
+              os.str("");
+              os << incref;
+              ui.PutAsString("INCREF", os.str());
+            }
+            if (nrmGrp->HasKeyword("ALBEDO")) {
+              double albedo = nrmGrp->FindKeyword("ALBEDO");
+              os.str("");
+              os << albedo;
+              ui.PutAsString("ALBEDO", os.str());
+            }
+          } else {
+            string message = "Unsupported normalization model [" + nrmVal + "].";
+            throw IException(IException::User, message, _FILEINFO_);
+          }
+        } else {
+          if (nrmGrp->HasKeyword("D")) {
+            double d = nrmGrp->FindKeyword("D");
+            os.str("");
+            os << d;
+            ui.PutAsString("D", os.str());
+          }
+          if (nrmGrp->HasKeyword("E")) {
+            double e = nrmGrp->FindKeyword("E");
+            os.str("");
+            os << e;
+            ui.PutAsString("E", os.str());
+          }
+          if (nrmGrp->HasKeyword("F")) {
+            double f = nrmGrp->FindKeyword("F");
+            os.str("");
+            os << f;
+            ui.PutAsString("F", os.str());
+          }
+          if (nrmGrp->HasKeyword("G2")) {
+            double g2 = nrmGrp->FindKeyword("G2");
+            os.str("");
+            os << g2;
+            ui.PutAsString("G2", os.str());
+          }
+          if (nrmGrp->HasKeyword("XMUL")) {
+            double xmul = nrmGrp->FindKeyword("XMUL");
+            os.str("");
+            os << xmul;
+            ui.PutAsString("XMUL", os.str());
+          }
+          if (nrmGrp->HasKeyword("WL")) {
+            double wl = nrmGrp->FindKeyword("WL");
+            os.str("");
+            os << wl;
+            ui.PutAsString("WL", os.str());
+          }
+          if (nrmGrp->HasKeyword("H")) {
+            double h = nrmGrp->FindKeyword("H");
+            os.str("");
+            os << h;
+            ui.PutAsString("H", os.str());
+          }
+          if (nrmGrp->HasKeyword("BSH1")) {
+            double bsh1 = nrmGrp->FindKeyword("BSH1");
+            os.str("");
+            os << bsh1;
+            ui.PutAsString("BSH1", os.str());
+          }
+          if (nrmGrp->HasKeyword("XB1")) {
+            double xb1 = nrmGrp->FindKeyword("XB1");
+            os.str("");
+            os << xb1;
+            ui.PutAsString("XB1", os.str());
+          }
+          if (nrmGrp->HasKeyword("XB2")) {
+            double xb2 = nrmGrp->FindKeyword("XB2");
+            os.str("");
+            os << xb2;
+            ui.PutAsString("XB2", os.str());
+          }
+        }
+        ui.PutAsString("NORMNAME", nrmVal);
       }
     }
   }
 
-  if (nrmName != "ALBEDOATM" && nrmName != "SHADEATM" && nrmName != "TOPOATM") {
+  if (nrmName == "NONE" || nrmName == "FROMPVL") {
+    if (nrmVal != "ALBEDOATM" && nrmVal != "SHADEATM" && nrmVal != "TOPOATM") {
+      return;
+    }
+  }
+  else if (nrmName != "ALBEDOATM" && nrmName != "SHADEATM" && nrmName != "TOPOATM") {
     return;
   }
-//  if (atmName == "NONE") {
-//    string message = "An atmospheric model must be specified before it can be loaded from the PVL";
-//    throw IException(IException::User, message, _FILEINFO_);
-//  }
-  if (atmName != "NONE") {
-    if (inPvl.HasObject("AtmosphericModel")) {
-      PvlObject atmObj = inPvl.FindObject("AtmosphericModel");
-      IString atmVal;
-      if (atmObj.HasGroup("Algorithm")) {
-        PvlObject::PvlGroupIterator atmGrp = atmObj.BeginGroup();
-        bool wasFound = false;
-        if (atmGrp->HasKeyword("ATMNAME")) {
-          atmVal = (string)atmGrp->FindKeyword("ATMNAME");
-        } else if (atmGrp->HasKeyword("NAME")) {
-          atmVal = (string)atmGrp->FindKeyword("NAME");
-        } else {
-          atmVal = "NONE";
-        }
-        atmVal = atmVal.UpCase();
-        if (atmName == atmVal) {
-          wasFound = true;
-        }
-        if (ui.WasEntered("ATMNAME") && !wasFound) {
-          while (atmGrp != atmObj.EndGroup()) {
-            if (atmGrp->HasKeyword("ATMNAME") || atmGrp->HasKeyword("NAME")) {
-              if (atmGrp->HasKeyword("ATMNAME")) {
-                atmVal = (string)atmGrp->FindKeyword("ATMNAME");
-              } else if (atmGrp->HasKeyword("NAME")) {
-                atmVal = (string)atmGrp->FindKeyword("NAME");
-              } else {
-                atmVal = "NONE";
-              }
-              atmVal = atmVal.UpCase();
-              if (atmName == atmVal) {
-                wasFound = true;
-                break;
-              }
+  IString atmVal;
+  if (inPvl.HasObject("AtmosphericModel")) {
+    PvlObject atmObj = inPvl.FindObject("AtmosphericModel");
+    if (!atmObj.HasGroup("Algorithm")) {
+      string message = "The input PVL does not contain a valid atmospheric model so you must specify one ";
+      message += "- the [Algorithm] group is missing in your [AtmosphericModel]";
+      throw IException(IException::User, message, _FILEINFO_);
+    }
+    else {
+      PvlObject::PvlGroupIterator atmGrp = atmObj.BeginGroup();
+      bool wasFound = false;
+      if (atmGrp->HasKeyword("ATMNAME")) {
+        atmVal = (string)atmGrp->FindKeyword("ATMNAME");
+      } else if (atmGrp->HasKeyword("NAME")) {
+        atmVal = (string)atmGrp->FindKeyword("NAME");
+      } else {
+        string message = "The input PVL does not contain a valid atmospheric model so you must specify one ";
+        message += "- the [Atmname] keyword is missing in your [Algorithm] group";
+        throw IException(IException::User, message, _FILEINFO_);
+      }
+      atmVal = atmVal.UpCase();
+      if (atmName == atmVal || atmName == "NONE" || atmName == "FROMPVL") {
+        wasFound = true;
+      }
+      if (!wasFound) {
+        while (atmGrp != atmObj.EndGroup()) {
+          if (atmGrp->HasKeyword("ATMNAME") || atmGrp->HasKeyword("NAME")) {
+            if (atmGrp->HasKeyword("ATMNAME")) {
+              atmVal = (string)atmGrp->FindKeyword("ATMNAME");
+            } else if (atmGrp->HasKeyword("NAME")) {
+              atmVal = (string)atmGrp->FindKeyword("NAME");
+            } else {
+              string message = "The input PVL does not contain a valid atmospheric model so you must specify one ";
+              message += "- the [Atmname] keyword is missing in your [Algorithm] group";
+              throw IException(IException::User, message, _FILEINFO_);
             }
-            atmGrp++;
+            atmVal = atmVal.UpCase();
+            if (atmName == atmVal) {
+              wasFound = true;
+              break;
+            }
           }
+          atmGrp++;
         }
-        if (!wasFound) {
-          return;
-        }
+      }
+      if (wasFound) {
         ui.Clear("ATMNAME");
         ui.Clear("HNORM");
         ui.Clear("BHA");
@@ -540,14 +549,7 @@ void LoadPvl() {
         ui.Clear("TAUREF");
         ui.Clear("WHA");
         ui.Clear("HGA");
-        if (atmGrp->HasKeyword("ATMNAME")) {
-          atmVal = (string)atmGrp->FindKeyword("ATMNAME");
-        } else if (atmGrp->HasKeyword("NAME")) {
-          atmVal = (string)atmGrp->FindKeyword("NAME");
-        } else {
-          atmVal = "NONE";
-        }
-        atmVal = atmVal.UpCase();
+        ui.Clear("NULNEG");
         if (atmVal == "ANISOTROPIC1" || atmVal == "ANISOTROPIC2" ||
             atmVal == "HAPKEATM1" || atmVal == "HAPKEATM2" ||
             atmVal == "ISOTROPIC1" || atmVal == "ISOTROPIC2") {
@@ -577,9 +579,11 @@ void LoadPvl() {
           }
           if (atmGrp->HasKeyword("NULNEG")) {
             string nulneg = (string)atmGrp->FindKeyword("NULNEG");
-            if (nulneg.compare("YES")) {
+            IString inulneg = nulneg;
+            inulneg = inulneg.UpCase();
+            if (inulneg == "YES") {
               ui.PutString("NULNEG", "YES");
-            } else if (nulneg.compare("NO")) {
+            } else if (inulneg == "NO") {
               ui.PutString("NULNEG", "NO");
             } else {
               string message = "The NULNEG value is invalid - must be set to YES or NO";
@@ -603,7 +607,7 @@ void LoadPvl() {
             ui.PutAsString("HGA", os.str());
           }
         }
-
+  
         if (atmVal != "ANISOTROPIC1" && atmVal != "ANISOTROPIC2" &&
             atmVal != "HAPKEATM1" && atmVal != "HAPKEATM2" &&
             atmVal != "ISOTROPIC1" && atmVal != "ISOTROPIC2") {
@@ -614,7 +618,6 @@ void LoadPvl() {
       }
     }
   }
-
 }
 
 void IsisMain() {
@@ -624,7 +627,35 @@ void IsisMain() {
   // Set up the user interface
   UserInterface &ui = Application::GetUserInterface();
 
+  // get string of parameter changes to make
+  QString changePar = (IString)ui.GetString("CHNGPAR");
+  changePar = changePar.toUpper();
+  changePar.simplified();
+  changePar.replace(" =","=");
+  changePar.replace("= ","=");
+  changePar.remove('"');
+  bool useChangePar = true;
+  if (changePar == "NONE" || changePar == "") {
+    useChangePar = false;
+  }
+  QMap <QString, QString> parMap;
+  if (useChangePar) {
+    QStringList parList = changePar.split(" ");
+    for (int i=0; i<parList.size(); i++) {
+      QString parPair = parList.at(i);
+      parPair = parPair.toUpper();
+      QStringList parvalList = parPair.split("=");
+      if (parvalList.size() != 2) {
+        string message = "The value you entered for CHNGPAR is invalid. You must enter pairs of ";
+        message += "data that are formatted as parname=value and each pair is separated by spaces.";
+        throw IException(IException::User, message, _FILEINFO_);
+      } 
+      parMap[parvalList.at(0)] = parvalList.at(1);
+    }
+  }
+
   Pvl toNormPvl;
+  PvlGroup normLog("NormalizationModelParametersUsed");
   IString normName = ui.GetAsString("NORMNAME");
   normName = normName.UpCase();
   bool wasFound = false;
@@ -650,7 +681,7 @@ void IsisMain() {
         if (normName == normVal && normVal != "NONE") {
           wasFound = true;
         }
-        if (normName == "NONE" && normVal != "NONE" && !wasFound) {
+        if ((normName == "NONE" || normName == "FROMPVL") && normVal != "NONE" && !wasFound) {
           normName = normVal;
           wasFound = true;
         }
@@ -669,7 +700,7 @@ void IsisMain() {
                 wasFound = true;
                 break;
               }
-              if (normName == "NONE" && normVal != "NONE" && !wasFound) {
+              if ((normName == "NONE" || normName == "FROMPVL") && normVal != "NONE" && !wasFound) {
                 normName = normVal;
                 wasFound = true;
                 break;
@@ -681,7 +712,7 @@ void IsisMain() {
       }
     }
     // Check to make sure that a normalization model was specified
-    if (normName == "NONE") {
+    if (normName == "NONE" || normName == "FROMPVL") {
       string message = "A Normalization model must be specified before running this program. ";
       message += "You need to provide a Normalization model through an input PVL (FROMPVL) or ";
       message += "you need to specify a Normalization model through the program interface.";
@@ -696,14 +727,25 @@ void IsisMain() {
                 AddKeyword(PvlKeyword("NORMNAME",normName),Pvl::Replace);
     }
   } else {
+    // Check to make sure that a normalization model was specified
+    if (normName == "NONE" || normName == "FROMPVL") {
+      string message = "A Normalization model must be specified before running this program. ";
+      message += "You need to provide a Normalization model through an input PVL (FROMPVL) or ";
+      message += "you need to specify a Normalization model through the program interface.";
+      throw IException(IException::User, message, _FILEINFO_);
+    }
     toNormPvl.AddObject(PvlObject("NormalizationModel"));
     toNormPvl.FindObject("NormalizationModel").AddGroup(PvlGroup("Algorithm"));
     toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
               AddKeyword(PvlKeyword("NORMNAME",normName),Pvl::Replace);
   }
+  normLog += PvlKeyword("NORMNAME", normName);
 
   if (normName == "ALBEDO" || normName == "MIXED") {
-    if (ui.WasEntered("INCREF")) {
+    if (parMap.contains("INCREF")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("INCREF",parMap["INCREF"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("INCREF")) {
       IString keyval = ui.GetString("INCREF");
       double incref = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -715,20 +757,30 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("INCMAT")) {
-      IString keyval = ui.GetString("INCMAT");
-      double incmat = keyval.ToDouble();
-      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
-                AddKeyword(PvlKeyword("INCMAT",incmat),Pvl::Replace);
-    } else {
-      if (!toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
-                     HasKeyword("INCMAT")) {
-        string message = "The " + normName + " Normalization model requires a value for the INCMAT parameter.";
-        message += "The normal range for INCMAT is: 0 <= INCMAT < 90";
-        throw IException(IException::User, message, _FILEINFO_);
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("INCREF");
+    if (normName == "MIXED") {
+      if (parMap.contains("INCMAT")) {
+        toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                  AddKeyword(PvlKeyword("INCMAT",parMap["INCMAT"].toDouble()),Pvl::Replace);
+      } else if (ui.WasEntered("INCMAT")) {
+        IString keyval = ui.GetString("INCMAT");
+        double incmat = keyval.ToDouble();
+        toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                  AddKeyword(PvlKeyword("INCMAT",incmat),Pvl::Replace);
+      } else {
+        if (!toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                       HasKeyword("INCMAT")) {
+          string message = "The " + normName + " Normalization model requires a value for the INCMAT parameter.";
+          message += "The normal range for INCMAT is: 0 <= INCMAT < 90";
+          throw IException(IException::User, message, _FILEINFO_);
+        }
       }
+      normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("INCMAT");
     }
-    if (ui.WasEntered("THRESH")) {
+    if (parMap.contains("THRESH")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("THRESH",parMap["THRESH"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("THRESH")) {
       IString keyval = ui.GetString("THRESH");
       double thresh = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -740,7 +792,11 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("ALBEDO")) {
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("THRESH");
+    if (parMap.contains("ALBEDO")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("ALBEDO",parMap["ALBEDO"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("ALBEDO")) {
       IString keyval = ui.GetString("ALBEDO");
       double albedo = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -753,8 +809,12 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("ALBEDO");
   } else if (normName == "MOONALBEDO") {
-    if (ui.WasEntered("D")) {
+    if (parMap.contains("D")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("D",parMap["D"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("D")) {
       IString keyval = ui.GetString("D");
       double d = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -767,7 +827,11 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("E")) {
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("D");
+    if (parMap.contains("E")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("E",parMap["E"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("E")) {
       IString keyval = ui.GetString("E");
       double e = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -780,7 +844,11 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("F")) {
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("E");
+    if (parMap.contains("F")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("F",parMap["F"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("F")) {
       IString keyval = ui.GetString("F");
       double f = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -793,7 +861,11 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("G2")) {
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("F");
+    if (parMap.contains("G2")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("G2",parMap["G2"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("G2")) {
       IString keyval = ui.GetString("G2");
       double g2 = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -806,7 +878,11 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("XMUL")) {
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("G2");
+    if (parMap.contains("XMUL")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("XMUL",parMap["XMUL"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("XMUL")) {
       IString keyval = ui.GetString("XMUL");
       double xmul = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -819,7 +895,11 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("WL")) {
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("XMUL");
+    if (parMap.contains("WL")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("WL",parMap["WL"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("WL")) {
       IString keyval = ui.GetString("WL");
       double wl = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -832,7 +912,11 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("H")) {
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("WL");
+    if (parMap.contains("H")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("H",parMap["H"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("H")) {
       IString keyval = ui.GetString("H");
       double h = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -845,7 +929,11 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("BSH1")) {
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("H");
+    if (parMap.contains("BSH1")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("BSH1",parMap["BSH1"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("BSH1")) {
       IString keyval = ui.GetString("BSH1");
       double bsh1 = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -858,7 +946,11 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("XB1")) {
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("BSH1");
+    if (parMap.contains("XB1")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("XB1",parMap["XB1"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("XB1")) {
       IString keyval = ui.GetString("XB1");
       double xb1 = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -871,7 +963,11 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("XB2")) {
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("XB1");
+    if (parMap.contains("XB2")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("XB2",parMap["XB2"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("XB2")) {
       IString keyval = ui.GetString("XB2");
       double xb2 = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -884,8 +980,12 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("XB2");
   } else if (normName == "SHADE") {
-    if (ui.WasEntered("INCREF")) {
+    if (parMap.contains("INCREF")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("INCREF",parMap["INCREF"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("INCREF")) {
       IString keyval = ui.GetString("INCREF");
       double incref = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -898,7 +998,11 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("ALBEDO")) {
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("INCREF");
+    if (parMap.contains("ALBEDO")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("ALBEDO",parMap["ALBEDO"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("ALBEDO")) {
       IString keyval = ui.GetString("ALBEDO");
       double albedo = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -910,8 +1014,12 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("ALBEDO");
   } else if (normName == "TOPO") {
-    if (ui.WasEntered("INCREF")) {
+    if (parMap.contains("INCREF")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("INCREF",parMap["INCREF"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("INCREF")) {
       IString keyval = ui.GetString("INCREF");
       double incref = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -923,7 +1031,11 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("THRESH")) {
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("INCREF");
+    if (parMap.contains("THRESH")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("THRESH",parMap["THRESH"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("THRESH")) {
       IString keyval = ui.GetString("THRESH");
       double thresh = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -936,7 +1048,11 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("ALBEDO")) {
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("THRESH");
+    if (parMap.contains("ALBEDO")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("ALBEDO",parMap["ALBEDO"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("ALBEDO")) {
       IString keyval = ui.GetString("ALBEDO");
       double albedo = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -948,8 +1064,12 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("ALBEDO");
   } else if (normName == "ALBEDOATM") {
-    if (ui.WasEntered("INCREF")) {
+    if (parMap.contains("INCREF")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("INCREF",parMap["INCREF"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("INCREF")) {
       IString keyval = ui.GetString("INCREF");
       double incref = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -961,8 +1081,12 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("INCREF");
   } else if (normName == "SHADEATM") {
-    if (ui.WasEntered("INCREF")) {
+    if (parMap.contains("INCREF")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("INCREF",parMap["INCREF"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("INCREF")) {
       IString keyval = ui.GetString("INCREF");
       double incref = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -974,7 +1098,11 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("ALBEDO")) {
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("INCREF");
+    if (parMap.contains("ALBEDO")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("ALBEDO",parMap["ALBEDO"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("ALBEDO")) {
       IString keyval = ui.GetString("ALBEDO");
       double albedo = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -986,8 +1114,12 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("ALBEDO");
   } else if (normName == "TOPOATM") {
-    if (ui.WasEntered("INCREF")) {
+    if (parMap.contains("INCREF")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("INCREF",parMap["INCREF"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("INCREF")) {
       IString keyval = ui.GetString("INCREF");
       double incref = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -999,7 +1131,11 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("ALBEDO")) {
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("INCREF");
+    if (parMap.contains("ALBEDO")) {
+      toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("ALBEDO",parMap["ALBEDO"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("ALBEDO")) {
       IString keyval = ui.GetString("ALBEDO");
       double albedo = keyval.ToDouble();
       toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").
@@ -1011,9 +1147,12 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
+    normLog += toNormPvl.FindObject("NormalizationModel").FindGroup("Algorithm").FindKeyword("ALBEDO");
   }
+  Application::Log(normLog);
 
   Pvl toAtmPvl;
+  PvlGroup atmLog("AtmosphericModelParametersUsed");
   IString atmName = ui.GetAsString("ATMNAME");
   atmName = atmName.UpCase();
   // Check to make sure that an atmospheric model was specified (if the
@@ -1042,7 +1181,7 @@ void IsisMain() {
           if (atmName == atmVal && atmVal != "NONE") {
             wasFound = true;
           }
-          if (atmName == "NONE" && atmVal != "NONE" && !wasFound) {
+          if ((atmName == "NONE" || atmName == "FROMPVL") && atmVal != "NONE" && !wasFound) {
             atmName = atmVal;
             wasFound = true;
           }
@@ -1061,7 +1200,7 @@ void IsisMain() {
                   wasFound = true;
                   break;
                 }
-                if (atmName == "NONE" && atmVal != "NONE" && !wasFound) {
+                if ((atmName == "NONE" || atmName == "FROMPVL") && atmVal != "NONE" && !wasFound) {
                   atmName = atmVal;
                   wasFound = true;
                   break;
@@ -1072,7 +1211,7 @@ void IsisMain() {
           }
         }
       }
-      if (atmName == "NONE") {
+      if (atmName == "NONE" || atmName == "FROMPVL") {
         string message = "An Atmospheric model must be specified when doing normalization with atmosphere.";
         message += "You need to provide an Atmospheric model through an input PVL (FROMPVL) or ";
         message += "you need to specify an Atmospheric model through the program interface.";
@@ -1087,17 +1226,26 @@ void IsisMain() {
                  AddKeyword(PvlKeyword("ATMNAME",atmName),Pvl::Replace);
       }
     } else {
+      if (atmName == "NONE" || atmName == "FROMPVL") {
+        string message = "An Atmospheric model must be specified when doing normalization with atmosphere.";
+        message += "You need to provide an Atmospheric model through an input PVL (FROMPVL) or ";
+        message += "you need to specify an Atmospheric model through the program interface.";
+        throw IException(IException::User, message, _FILEINFO_);
+      }
       toAtmPvl.AddObject(PvlObject("AtmosphericModel"));
       toAtmPvl.FindObject("AtmosphericModel").AddGroup(PvlGroup("Algorithm"));
       toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                AddKeyword(PvlKeyword("ATMNAME",atmName),Pvl::Replace);
     }
-
+    atmLog += PvlKeyword("ATMNAME", atmName);
 
     if (atmName == "ANISOTROPIC1" || atmName == "ANISOTROPIC2" ||
         atmName == "HAPKEATM1" || atmName == "HAPKEATM2" ||
         atmName == "ISOTROPIC1" || atmName == "ISOTROPIC2") {
-      if (ui.WasEntered("HNORM")) {
+      if (parMap.contains("HNORM")) {
+        toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
+                 AddKeyword(PvlKeyword("HNORM",parMap["HNORM"].toDouble()),Pvl::Replace);
+      } else if (ui.WasEntered("HNORM")) {
         IString keyval = ui.GetString("HNORM");
         double hnorm = keyval.ToDouble();
         toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
@@ -1110,7 +1258,11 @@ void IsisMain() {
           throw IException(IException::User, message, _FILEINFO_);
         }
       }
-      if (ui.WasEntered("TAU")) {
+      atmLog += toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").FindKeyword("HNORM");
+      if (parMap.contains("TAU")) {
+        toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("TAU",parMap["TAU"].toDouble()),Pvl::Replace);
+      } else if (ui.WasEntered("TAU")) {
         IString keyval = ui.GetString("TAU");
         double tau = keyval.ToDouble();
         toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
@@ -1123,7 +1275,11 @@ void IsisMain() {
           throw IException(IException::User, message, _FILEINFO_);
         }
       }
-      if (ui.WasEntered("TAUREF")) {
+      atmLog += toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").FindKeyword("TAU");
+      if (parMap.contains("TAUREF")) {
+        toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("TAUREF",parMap["TAUREF"].toDouble()),Pvl::Replace);
+      } else if (ui.WasEntered("TAUREF")) {
         IString keyval = ui.GetString("TAUREF");
         double tauref = keyval.ToDouble();
         toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
@@ -1136,7 +1292,11 @@ void IsisMain() {
           throw IException(IException::User, message, _FILEINFO_);
         }
       }
-      if (ui.WasEntered("WHA")) {
+      atmLog += toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").FindKeyword("TAUREF");
+      if (parMap.contains("WHA")) {
+        toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("WHA",parMap["WHA"].toDouble()),Pvl::Replace);
+      } else if (ui.WasEntered("WHA")) {
         IString keyval = ui.GetString("WHA");
         double wha = keyval.ToDouble();
         toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
@@ -1149,24 +1309,41 @@ void IsisMain() {
           throw IException(IException::User, message, _FILEINFO_);
         }
       }
-      if (ui.GetString("NULNEG") == "YES") {
-        toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
-                 AddKeyword(PvlKeyword("NULNEG","YES"),Pvl::Replace);
-      } else if (ui.GetString("NULNEG") == "NO") {
-        toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
-                 AddKeyword(PvlKeyword("NULNEG","NO"),Pvl::Replace);
-      } else {
-        if (!toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
-                      HasKeyword("NULNEG")) {
+      atmLog += toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").FindKeyword("WHA");
+      if (parMap.contains("NULNEG")) {
+        if (parMap["NULNEG"].toStdString() == "YES") {
+          toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
+                   AddKeyword(PvlKeyword("NULNEG","YES"),Pvl::Replace);
+        } else if (parMap["NULNEG"].toStdString() == "NO") {
+          toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
+                   AddKeyword(PvlKeyword("NULNEG","NO"),Pvl::Replace);
+        } else {
+          string message = "The " + atmName + " Atmospheric model requires a value for the NULNEG parameter.";
+          message += "The valid values for NULNEG are: YES, NO";
+          throw IException(IException::User, message, _FILEINFO_);
+        }
+      } else if (!toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
+                    HasKeyword("NULNEG")) {
+        if (ui.GetString("NULNEG") == "YES") {
+          toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
+                   AddKeyword(PvlKeyword("NULNEG","YES"),Pvl::Replace);
+        } else if (ui.GetString("NULNEG") == "NO") {
+          toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
+                   AddKeyword(PvlKeyword("NULNEG","NO"),Pvl::Replace);
+        } else {
           string message = "The " + atmName + " Atmospheric model requires a value for the NULNEG parameter.";
           message += "The valid values for NULNEG are: YES, NO";
           throw IException(IException::User, message, _FILEINFO_);
         }
       }
+      atmLog += toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").FindKeyword("NULNEG");
     }
 
     if (atmName == "ANISOTROPIC1" || atmName == "ANISOTROPIC2") {
-      if (ui.WasEntered("BHA")) {
+      if (parMap.contains("BHA")) {
+        toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("BHA",parMap["BHA"].toDouble()),Pvl::Replace);
+      } else if (ui.WasEntered("BHA")) {
         IString keyval = ui.GetString("BHA");
         double bha = keyval.ToDouble();
         toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
@@ -1179,9 +1356,13 @@ void IsisMain() {
           throw IException(IException::User, message, _FILEINFO_);
         }
       }
+      atmLog += toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").FindKeyword("BHA");
     }
     if (atmName == "HAPKEATM1" || atmName == "HAPKEATM2") {
-      if (ui.WasEntered("HGA")) {
+      if (parMap.contains("HGA")) {
+        toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
+                AddKeyword(PvlKeyword("HGA",parMap["HGA"].toDouble()),Pvl::Replace);
+      } else if (ui.WasEntered("HGA")) {
         IString keyval = ui.GetString("HGA");
         double hga = keyval.ToDouble();
         toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
@@ -1194,11 +1375,14 @@ void IsisMain() {
           throw IException(IException::User, message, _FILEINFO_);
         }
       }
+      atmLog += toAtmPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").FindKeyword("HGA");
     }
   }
+  Application::Log(atmLog);
 
 
   Pvl toPhtPvl;
+  PvlGroup phtLog("PhotometricModelParametersUsed");
   IString phtName = ui.GetAsString("PHTNAME");
   phtName = phtName.UpCase();
   wasFound = false;
@@ -1224,7 +1408,7 @@ void IsisMain() {
         if (phtName == phtVal && phtVal != "NONE") {
           wasFound = true;
         }
-        if (phtName == "NONE" && phtVal != "NONE" && !wasFound) {
+        if ((phtName == "NONE" || phtName == "FROMPVL") && phtVal != "NONE" && !wasFound) {
           phtName = phtVal;
           wasFound = true;
         }
@@ -1243,7 +1427,7 @@ void IsisMain() {
                 wasFound = true;
                 break;
               }
-              if (phtName == "NONE" && phtVal != "NONE" && !wasFound) {
+              if ((phtName == "NONE" || phtName == "FROMPVL") && phtVal != "NONE" && !wasFound) {
                 phtName = phtVal;
                 wasFound = true;
                 break;
@@ -1255,7 +1439,7 @@ void IsisMain() {
       }
     }
     // Check to make sure that a photometric model was specified
-    if (phtName == "NONE") {
+    if (phtName == "NONE" || phtName == "FROMPVL") {
       string message = "A Photometric model must be specified before running this program.";
       message += "You need to provide a Photometric model through an input PVL (FROMPVL) or ";
       message += "you need to specify a Photometric model through the program interface.";
@@ -1270,14 +1454,25 @@ void IsisMain() {
                AddKeyword(PvlKeyword("PHTNAME",phtName),Pvl::Replace);
     }
   } else {
+    // Check to make sure that a photometric model was specified
+    if (phtName == "NONE" || phtName == "FROMPVL") {
+      string message = "A Photometric model must be specified before running this program.";
+      message += "You need to provide a Photometric model through an input PVL (FROMPVL) or ";
+      message += "you need to specify a Photometric model through the program interface.";
+      throw IException(IException::User, message, _FILEINFO_);
+    }
     toPhtPvl.AddObject(PvlObject("PhotometricModel"));
     toPhtPvl.FindObject("PhotometricModel").AddGroup(PvlGroup("Algorithm"));
     toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
              AddKeyword(PvlKeyword("PHTNAME",phtName),Pvl::Replace);
   }
+  phtLog += PvlKeyword("PHTNAME", phtName);
 
   if (phtName == "HAPKEHEN" || phtName == "HAPKELEG") {
-    if (ui.WasEntered("THETA")) {
+    if (parMap.contains("THETA")) {
+      toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+               AddKeyword(PvlKeyword("THETA",parMap["THETA"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("THETA")) {
       IString keyval = ui.GetString("THETA");
       double theta = keyval.ToDouble();
       toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
@@ -1290,7 +1485,11 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("WH")) {
+    phtLog += toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("THETA");
+    if (parMap.contains("WH")) {
+      toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+               AddKeyword(PvlKeyword("WH",parMap["WH"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("WH")) {
       IString keyval = ui.GetString("WH");
       double wh = keyval.ToDouble();
       toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
@@ -1303,7 +1502,11 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("HH")) {
+    phtLog += toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("WH");
+    if (parMap.contains("HH")) {
+      toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+               AddKeyword(PvlKeyword("HH",parMap["HH"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("HH")) {
       IString keyval = ui.GetString("HH");
       double hh = keyval.ToDouble();
       toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
@@ -1316,7 +1519,11 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("B0")) {
+    phtLog += toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("HH");
+    if (parMap.contains("B0")) {
+      toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+               AddKeyword(PvlKeyword("B0",parMap["B0"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("B0")) {
       IString keyval = ui.GetString("B0");
       double b0 = keyval.ToDouble();
       toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
@@ -1329,22 +1536,57 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.GetString("ZEROB0STANDARD") == "TRUE") {
-      toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-               AddKeyword(PvlKeyword("ZEROB0STANDARD","TRUE"),Pvl::Replace);
-    } else if (ui.GetString("ZEROB0STANDARD") == "FALSE") {
-      toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-               AddKeyword(PvlKeyword("ZEROB0STANDARD","FALSE"),Pvl::Replace);
-    } else {
-      if (!toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
-                    HasKeyword("ZEROB0STANDARD")) {
+    phtLog += toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("B0");
+    if (parMap.contains("ZEROB0STANDARD")) {
+      if (parMap["ZEROB0STANDARD"].toStdString() == "TRUE") {
+        toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+                 AddKeyword(PvlKeyword("ZEROB0ST","TRUE"),Pvl::Replace);
+      } else if (parMap["ZEROB0STANDARD"].toStdString() == "FALSE") {
+        toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+                 AddKeyword(PvlKeyword("ZEROB0ST","FALSE"),Pvl::Replace);
+      } else {
         string message = "The " + phtName + " Photometric model requires a value for the ZEROB0STANDARD parameter.";
         message += "The valid values for ZEROB0STANDARD are: TRUE, FALSE";
         throw IException(IException::User, message, _FILEINFO_);
       }
+    } else if (parMap.contains("ZEROB0ST")) {
+      if (parMap["ZEROB0ST"].toStdString() == "TRUE") {
+        toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+                 AddKeyword(PvlKeyword("ZEROB0ST","TRUE"),Pvl::Replace);
+      } else if (parMap["ZEROB0ST"].toStdString() == "FALSE") {
+        toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+                 AddKeyword(PvlKeyword("ZEROB0ST","FALSE"),Pvl::Replace);
+      } else {
+        string message = "The " + phtName + " Photometric model requires a value for the ZEROB0ST parameter.";
+        message += "The valid values for ZEROB0ST are: TRUE, FALSE";
+        throw IException(IException::User, message, _FILEINFO_);
+      }
+    } else if (!toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+                 HasKeyword("ZEROB0STANDARD") && !toPhtPvl.FindObject("PhotometricModel").
+                 FindGroup("Algorithm").HasKeyword("ZEROB0ST")) {
+      if (ui.GetString("ZEROB0ST") == "TRUE") {
+        toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+                 AddKeyword(PvlKeyword("ZEROB0ST","TRUE"),Pvl::Replace);
+      } else if (ui.GetString("ZEROB0ST") == "FALSE") {
+        toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+                 AddKeyword(PvlKeyword("ZEROB0ST","FALSE"),Pvl::Replace);
+      } else {
+        string message = "The " + phtName + " Photometric model requires a value for the ZEROB0ST parameter.";
+        message += "The valid values for ZEROB0ST are: TRUE, FALSE";
+        throw IException(IException::User, message, _FILEINFO_);
+      }
+    }
+    if (toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").HasKeyword("ZEROB0STANDARD")) {
+      string zerob0 = (string)toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("ZEROB0STANDARD");
+      phtLog.AddKeyword(PvlKeyword("ZEROB0ST",zerob0));
+    } else {
+      phtLog += toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("ZEROB0ST");
     }
     if (phtName == "HAPKEHEN") {
-      if (ui.WasEntered("HG1")) {
+      if (parMap.contains("HG1")) {
+        toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+                 AddKeyword(PvlKeyword("HG1",parMap["HG1"].toDouble()),Pvl::Replace);
+      } else if (ui.WasEntered("HG1")) {
         IString keyval = ui.GetString("HG1");
         double hg1 = keyval.ToDouble();
         toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
@@ -1357,7 +1599,11 @@ void IsisMain() {
           throw IException(IException::User, message, _FILEINFO_);
         }
       }
-      if (ui.WasEntered("HG2")) {
+      phtLog += toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("HG1");
+      if (parMap.contains("HG2")) {
+        toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+                 AddKeyword(PvlKeyword("HG2",parMap["HG2"].toDouble()),Pvl::Replace);
+      } else if (ui.WasEntered("HG2")) {
         IString keyval = ui.GetString("HG2");
         double hg2 = keyval.ToDouble();
         toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
@@ -1370,8 +1616,12 @@ void IsisMain() {
           throw IException(IException::User, message, _FILEINFO_);
         }
       }
+      phtLog += toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("HG2");
     } else {
-      if (ui.WasEntered("BH")) {
+      if (parMap.contains("BH")) {
+        toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+                 AddKeyword(PvlKeyword("BH",parMap["BH"].toDouble()),Pvl::Replace);
+      } else if (ui.WasEntered("BH")) {
         IString keyval = ui.GetString("BH");
         double bh = keyval.ToDouble();
         toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
@@ -1384,7 +1634,11 @@ void IsisMain() {
           throw IException(IException::User, message, _FILEINFO_);
         }
       }
-      if (ui.WasEntered("CH")) {
+      phtLog += toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("BH");
+      if (parMap.contains("CH")) {
+        toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+                 AddKeyword(PvlKeyword("CH",parMap["CH"].toDouble()),Pvl::Replace);
+      } else if (ui.WasEntered("CH")) {
         IString keyval = ui.GetString("CH");
         double ch = keyval.ToDouble();
         toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
@@ -1397,9 +1651,13 @@ void IsisMain() {
           throw IException(IException::User, message, _FILEINFO_);
         }
       }
+      phtLog += toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("CH");
     }
   } else if (phtName == "LUNARLAMBERTEMPIRICAL" || phtName == "MINNAERTEMPIRICAL") {
-    if (ui.WasEntered("PHASELIST")) {
+    if (parMap.contains("PHASELIST")) {
+      toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+               AddKeyword(PvlKeyword("PHASELIST",parMap["PHASELIST"].toStdString()),Pvl::Replace);
+    } else if (ui.WasEntered("PHASELIST")) {
       IString keyval = ui.GetString("PHASELIST");
       toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                AddKeyword(PvlKeyword("PHASELIST",keyval),Pvl::Replace);
@@ -1410,7 +1668,11 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
-    if (ui.WasEntered("PHASECURVELIST")) {
+    phtLog += toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("PHASELIST");
+    if (parMap.contains("PHASECURVELIST")) {
+      toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+               AddKeyword(PvlKeyword("PHASECURVELIST",parMap["PHASECURVELIST"].toStdString()),Pvl::Replace);
+    } else if (ui.WasEntered("PHASECURVELIST")) {
       IString keyval = ui.GetString("PHASECURVELIST");
       toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                AddKeyword(PvlKeyword("PHASECURVELIST",keyval),Pvl::Replace);
@@ -1421,8 +1683,12 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
+    phtLog += toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("PHASECURVELIST");
     if (phtName == "LUNARLAMBERTEMPIRICAL") {
-      if (ui.WasEntered("LLIST")) {
+      if (parMap.contains("LLIST")) {
+        toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+                 AddKeyword(PvlKeyword("LLIST",parMap["LLIST"].toStdString()),Pvl::Replace);
+      } else if (ui.WasEntered("LLIST")) {
         IString keyval = ui.GetString("LLIST");
         toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                  AddKeyword(PvlKeyword("LLIST",keyval),Pvl::Replace);
@@ -1433,8 +1699,12 @@ void IsisMain() {
           throw IException(IException::User, message, _FILEINFO_);
         }
       }
+      phtLog += toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("LLIST");
     } else {
-      if (ui.WasEntered("KLIST")) {
+      if (parMap.contains("KLIST")) {
+        toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+                 AddKeyword(PvlKeyword("KLIST",parMap["KLIST"].toStdString()),Pvl::Replace);
+      } else if (ui.WasEntered("KLIST")) {
         IString keyval = ui.GetString("KLIST");
         toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                  AddKeyword(PvlKeyword("KLIST",keyval),Pvl::Replace);
@@ -1445,9 +1715,13 @@ void IsisMain() {
           throw IException(IException::User, message, _FILEINFO_);
         }
       }
+      phtLog += toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("KLIST");
     }
   } else if (phtName == "LUNARLAMBERT") {
-    if (ui.WasEntered("L")) {
+    if (parMap.contains("L")) {
+      toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+               AddKeyword(PvlKeyword("L",parMap["L"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("L")) {
       IString keyval = ui.GetString("L");
       double l = keyval.ToDouble();
       toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
@@ -1460,8 +1734,12 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
+    phtLog += toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("L");
   } else if (phtName == "MINNAERT") {
-    if (ui.WasEntered("K")) {
+    if (parMap.contains("K")) {
+      toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
+               AddKeyword(PvlKeyword("K",parMap["K"].toDouble()),Pvl::Replace);
+    } else if (ui.WasEntered("K")) {
       IString keyval = ui.GetString("K");
       double k = keyval.ToDouble();
       toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
@@ -1474,7 +1752,9 @@ void IsisMain() {
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
+    phtLog += toPhtPvl.FindObject("PhotometricModel").FindGroup("Algorithm").FindKeyword("K");
   }
+  Application::Log(phtLog);
 
   PvlObject normObj = toNormPvl.FindObject("NormalizationModel");
   PvlObject phtObj = toPhtPvl.FindObject("PhotometricModel");

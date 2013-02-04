@@ -51,6 +51,12 @@ namespace Isis {
    *                           the base class.
    *   @history 2008-11-05 Jeannie Walldren - Added documentation
    *                           from Isis2 files
+   *   @history 2012-10-15 Janet Barrett - Shortened the ZEROB0STANDARD 
+   *                           parameter name to ZEROB0ST. This was done so that
+   *                           the GUI interface does not have to be resized every
+   *                           time it is opened. The shortened name helps to keep
+   *                           the parameters within the default GUI size when it is
+   *                           first opened. References #453. Fixes #1288.
    */
   class Hapke : public PhotoModel {
     public:

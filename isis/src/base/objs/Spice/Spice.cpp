@@ -1,7 +1,7 @@
 /**
  * @file
- * $Revision: 1.24 $
- * $Date: 2010/04/09 22:31:16 $
+ * $Revision$
+ * $Date$
  *
  *   Unless noted otherwise, the portions of Isis written by the USGS are public
  *   domain. See individual third-party library and package descriptions for
@@ -35,8 +35,10 @@
 #include "IString.h"
 #include "iTime.h"
 #include "Longitude.h"
+#include "LightTimeCorrectionState.h"
 #include "NaifStatus.h"
 #include "ShapeModel.h"
+#include "SpacecraftPosition.h"
 #include "Target.h"
 
 #include "getSpkAbCorrState.hpp"
@@ -279,7 +281,17 @@ namespace Isis {
     }
 
     m_instrumentRotation = new SpiceRotation(*m_ckCode);
-    m_instrumentPosition = new SpicePosition(*m_spkCode, *m_spkBodyCode);
+
+    //  Set up for observer/target and light time correction to between s/c 
+    // and target body.
+    LightTimeCorrectionState ltState(*m_ikCode, this);
+    ltState.checkSpkKernelsForAberrationCorrection();
+
+    vector<Distance> radius = m_target->radii();
+    Distance targetRadius((radius[0] + radius[2])/2.0);
+    m_instrumentPosition = new SpacecraftPosition(*m_spkCode, *m_spkBodyCode,
+                                                  ltState, targetRadius);
+
     m_sunPosition = new SpicePosition(10, m_target->naifBodyCode());
 
     // Check to see if we have nadir pointing that needs to be computed &

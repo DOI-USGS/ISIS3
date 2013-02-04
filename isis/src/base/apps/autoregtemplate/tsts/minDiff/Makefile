@@ -6,8 +6,7 @@ commands:
 	$(APPNAME) algorithm=MinimumDifference \
 	  tolerance=0.7 \
 	  reductionfactor=2 \
-	  chipinterpolator=true \
-	  interpolatortype=NEARESTNEIGHBORTYPE \
+	  interp=NEARESTNEIGHBORTYPE \
 	  psamp=15 \
 	  pline=15 \
 	  pmin=1200 \
@@ -21,8 +20,4 @@ commands:
 	  ssubchipvalidpercent=75 \
 	  distancetolerance=2.5 \
 	  windowsize=11 \
-	  eccentricitytesting=true \
-	  eccentricityratio=5.0 \
-	  residualtesting=true \
-	  residualtolerance=0.001 \
-	  to=$(OUTPUT)/autoregtemplateTruth2.txt > /dev/null;
+	  topvl=$(OUTPUT)/autoregtemplateTruth2.txt > /dev/null;
