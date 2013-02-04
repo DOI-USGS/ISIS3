@@ -438,7 +438,7 @@ m_container = container;
       issamp = (int)(ssamp + 0.5);
       isline = (int)(sline + 0.5);
       Brick *pntBrick = new Brick(1, 1, 1,
-                                              vp->cube()->getPixelType());
+                                              vp->cube()->pixelType());
       pntBrick->SetBasePosition(issamp, isline, vp->grayBand());
       vp->cube()->read(*pntBrick);
       p_dn = (*pntBrick)[0];
@@ -462,11 +462,11 @@ m_container = container;
       ieline = isline;
       if (p_shapeComboBox->currentIndex() == HorizLine) {
         issamp = 1;
-        iesamp = vp->cube()->getSampleCount();
+        iesamp = vp->cube()->sampleCount();
       }
       if (p_shapeComboBox->currentIndex() == VertLine) {
         isline = 1;
-        ieline = vp->cube()->getLineCount();
+        ieline = vp->cube()->lineCount();
       }
       // Write the changes to the cube.
       writeToCube(iesamp, issamp, ieline, isline, NULL);
@@ -492,7 +492,7 @@ m_container = container;
       int nsamps = iesamp - issamp + 1;
       int nlines = ieline - isline + 1;
 
-      brick = new Brick(nsamps, nlines, 1, vp->cube()->getPixelType());
+      brick = new Brick(nsamps, nlines, 1, vp->cube()->pixelType());
       brick->SetBasePosition(issamp, isline, vp->grayBand());
       vp->cube()->read(*brick);
 
@@ -520,7 +520,7 @@ m_container = container;
       }
 
       //  no deep copy constructor so re-read brick for editing....
-      brick = new Brick(nsamps, nlines, 1, vp->cube()->getPixelType());
+      brick = new Brick(nsamps, nlines, 1, vp->cube()->pixelType());
       brick->SetBasePosition(issamp, isline, vp->grayBand());
       vp->cube()->read(*brick);
 
@@ -590,7 +590,7 @@ m_container = container;
       Brick *brick = s->top();
 
       //Write the current cube to the a brick and add it to the redo stack
-      redoBrick = new Brick(brick->SampleDimension(), brick->LineDimension(), 1, vp->cube()->getPixelType());
+      redoBrick = new Brick(brick->SampleDimension(), brick->LineDimension(), 1, vp->cube()->pixelType());
       redoBrick->SetBasePosition(brick->Sample(), brick->Line(), vp->grayBand());
       vp->cube()->read(*(redoBrick));
 
@@ -726,7 +726,7 @@ m_container = container;
       //Write the current cube to the a brick and add it to the undo stack
       undoBrick = new Brick(brick->SampleDimension(),
                                   brick->LineDimension(), 1,
-                                  vp->cube()->getPixelType());
+                                  vp->cube()->pixelType());
       undoBrick->SetBasePosition(brick->Sample(), brick->Line(), vp->grayBand());
       vp->cube()->read(*(undoBrick));
 

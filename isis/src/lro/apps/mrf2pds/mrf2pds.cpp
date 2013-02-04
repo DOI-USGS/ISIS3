@@ -34,7 +34,7 @@ void IsisMain() {
 
   // Setup the input cube
   Cube *cInCube = cProcess.SetInputCube("FROM");
-  Pvl *cInLabel =  cInCube->getLabel();
+  Pvl *cInLabel =  cInCube->label();
 
   // Get the output label file
   FileName outFile(ui.GetFileName("TO", "lbl"));
@@ -84,7 +84,7 @@ void IsisMain() {
     cOrigLabel.AddObject(cOrigLabelObj);
 
     // Translates the ISIS labels along with the original EDR labels
-    cOrigLabel.AddObject(*(cInCube->getLabel()));
+    cOrigLabel.AddObject(*(cInCube->label()));
     PvlTranslationManager cCubeLabel2(cOrigLabel, "$lro/translations/mrfExportOrigLabel.trn");
     cCubeLabel2.Auto(pdsLabel);
 
@@ -103,7 +103,7 @@ void IsisMain() {
     }
   }
   else { //Level3 - add Band_Name keyword
-    PvlGroup &cBandBinGrp = cInCube->getGroup("BandBin");
+    PvlGroup &cBandBinGrp = cInCube->group("BandBin");
     PvlKeyword cKeyBandBin = PvlKeyword("BAND_NAME");
     PvlKeyword cKeyInBandBin;
     if(cBandBinGrp.HasKeyword("OriginalBand")) {
@@ -133,7 +133,7 @@ void IsisMain() {
   }
 
   // Calculate CheckSum
-  Statistics *cStats =  cInCube->getStatistics();
+  Statistics *cStats =  cInCube->statistics();
   iCheckSum = (unsigned int)cStats->Sum();
 
   FixLabel(pdsLabel, bLevel2);

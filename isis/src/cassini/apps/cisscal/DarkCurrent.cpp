@@ -1153,7 +1153,7 @@ namespace Isis {
       Brick *darkCoefficients;
       Cube dparamCube;
       dparamCube.open(p_dparamfile.expanded());
-      darkCoefficients = new Brick(p_samples, p_lines, 8, dparamCube.getPixelType());
+      darkCoefficients = new Brick(p_samples, p_lines, 8, dparamCube.pixelType());
       darkCoefficients->SetBasePosition(1, 1, 1);
       dparamCube.read(*darkCoefficients);
       dparamCube.close();

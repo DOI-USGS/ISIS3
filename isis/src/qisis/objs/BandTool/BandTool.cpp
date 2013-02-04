@@ -464,7 +464,7 @@ namespace Isis {
     MdiCubeViewport *cvp = cubeViewport();
     if(cvp != NULL) {
       if(p_bandBinViewport != cvp) {
-        setBandBin(*cvp->cube()->getLabel());
+        setBandBin(*cvp->cube()->label());
       }
 
       if(cvp->isGray()) {

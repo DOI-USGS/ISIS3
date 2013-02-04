@@ -49,7 +49,7 @@ void IsisMain() {
 
   // Open the input cube and get the camera
   icube = p.SetInputCube("FROM");
-  incam = icube->getCamera();
+  incam = icube->camera();
 
   // Make sure it is not the sky
   if(incam->target()->isSky()) {
@@ -236,7 +236,7 @@ void IsisMain() {
   Application::GuiLog(cleanMapping);
 
   // Allocate the output cube and add the mapping labels
-  Cube *ocube = p.SetOutputCube("TO", samples, lines, icube->getBandCount());
+  Cube *ocube = p.SetOutputCube("TO", samples, lines, icube->bandCount());
 
   ocube->putGroup(cleanMapping);
 
@@ -260,8 +260,8 @@ void IsisMain() {
   //  See if center of input image projects.  If it does, force tile
   //  containing this center to be processed in ProcessRubberSheet.
   //  TODO:  WEIRD ... why is this needed ... Talk to Tracie ... JAA??
-  double centerSamp = icube->getSampleCount() / 2.;
-  double centerLine = icube->getLineCount() / 2.;
+  double centerSamp = icube->sampleCount() / 2.;
+  double centerLine = icube->lineCount() / 2.;
   if(incam->SetImage(centerSamp, centerLine)) {
     if(outmap->SetUniversalGround(incam->UniversalLatitude(),
                                   incam->UniversalLongitude())) {
@@ -271,14 +271,14 @@ void IsisMain() {
   // Create an alpha cube group for the output cube
   if(!ocube->hasGroup("AlphaCube")) {
     PvlGroup alpha("AlphaCube");
-    alpha += PvlKeyword("AlphaSamples", toString(icube->getSampleCount()));
-    alpha += PvlKeyword("AlphaLines", toString(icube->getLineCount()));
+    alpha += PvlKeyword("AlphaSamples", toString(icube->sampleCount()));
+    alpha += PvlKeyword("AlphaLines", toString(icube->lineCount()));
     alpha += PvlKeyword("AlphaStartingSample", toString(0.5));
     alpha += PvlKeyword("AlphaStartingLine", toString(0.5));
-    alpha += PvlKeyword("AlphaEndingSample", toString(icube->getSampleCount() + 0.5));
-    alpha += PvlKeyword("AlphaEndingLine", toString(icube->getLineCount() + 0.5));
-    alpha += PvlKeyword("BetaSamples", toString(icube->getSampleCount()));
-    alpha += PvlKeyword("BetaLines", toString(icube->getLineCount()));
+    alpha += PvlKeyword("AlphaEndingSample", toString(icube->sampleCount() + 0.5));
+    alpha += PvlKeyword("AlphaEndingLine", toString(icube->lineCount() + 0.5));
+    alpha += PvlKeyword("BetaSamples", toString(icube->sampleCount()));
+    alpha += PvlKeyword("BetaLines", toString(icube->lineCount()));
     ocube->putGroup(alpha);
   }
 
@@ -288,8 +288,8 @@ void IsisMain() {
   // Okay we need to decide how to apply the rubbersheeting for the transform
   // Does the user want to define how it is done?
   if (ui.GetString("WARPALGORITHM") == "FORWARDPATCH") {
-    transform = new cam2mapForward(icube->getSampleCount(),
-                                   icube->getLineCount(), incam, samples,lines,
+    transform = new cam2mapForward(icube->sampleCount(),
+                                   icube->lineCount(), incam, samples,lines,
                                    outmap, trim);
 
     if (ui.WasEntered("PATCHSIZE")) {
@@ -303,8 +303,8 @@ void IsisMain() {
   }
 
   else if (ui.GetString("WARPALGORITHM") == "REVERSEPATCH") {
-    transform = new cam2mapReverse(icube->getSampleCount(),
-                                   icube->getLineCount(), incam, samples,lines,
+    transform = new cam2mapReverse(icube->sampleCount(),
+                                   icube->lineCount(), incam, samples,lines,
                                    outmap, trim);
 
     if (ui.WasEntered("PATCHSIZE")) {
@@ -321,8 +321,8 @@ void IsisMain() {
   // Handle framing cameras.  Always process using the backward
   // driven system (tfile).  
   else if (incam->GetCameraType() == Camera::Framing) {
-    transform = new cam2mapReverse(icube->getSampleCount(),
-                                   icube->getLineCount(), incam, samples,lines,
+    transform = new cam2mapReverse(icube->sampleCount(),
+                                   icube->lineCount(), incam, samples,lines,
                                    outmap, trim);
     p.SetTiling(4, 4);
     p.StartProcess(*transform, *interp);
@@ -336,8 +336,8 @@ void IsisMain() {
   // to determine patch size based on 1) if the limb is in the file
   // or 2) if the DTM is much coarser than the image
   else if (incam->GetCameraType() == Camera::LineScan) {
-    transform = new cam2mapForward(icube->getSampleCount(),
-                                   icube->getLineCount(), incam, samples,lines,
+    transform = new cam2mapForward(icube->sampleCount(),
+                                   icube->lineCount(), incam, samples,lines,
                                    outmap, trim);
 
     p.processPatchTransform(*transform, *interp);
@@ -353,8 +353,8 @@ void IsisMain() {
   // TODO: What about the THEMIS VIS Camera.  Will tall narrow (128x4) patches
   // work okay?
   else if (incam->GetCameraType() == Camera::PushFrame) {
-    transform = new cam2mapForward(icube->getSampleCount(),
-                                   icube->getLineCount(), incam, samples,lines,
+    transform = new cam2mapForward(icube->sampleCount(),
+                                   icube->lineCount(), incam, samples,lines,
                                    outmap, trim);
 
     // Get the frame height
@@ -362,11 +362,11 @@ void IsisMain() {
     int frameSize = dmap->frameletHeight() / dmap->LineScaleFactor();
 
     // Check for even/odd cube to determine starting line
-    PvlGroup &instGrp = icube->getLabel()->FindGroup("Instrument", Pvl::Traverse);
+    PvlGroup &instGrp = icube->label()->FindGroup("Instrument", Pvl::Traverse);
     int startLine = 1;
 
     // Get the alpha cube group in case they cropped the image
-    AlphaCube acube(*icube->getLabel());
+    AlphaCube acube(*icube->label());
     double betaLine = acube.AlphaLine(1.0);
     if (fabs(betaLine - 1.0) > 0.0000000001) {
       if (fabs(betaLine - (int) betaLine) > 0.00001) {
@@ -392,8 +392,8 @@ void IsisMain() {
   // types have not be analyized.  This includes Radar and Point.  Continue to
   // use the reverse geom option with the default tiling hints
   else {
-    transform = new cam2mapReverse(icube->getSampleCount(),
-                                   icube->getLineCount(), incam, samples,lines,
+    transform = new cam2mapReverse(icube->sampleCount(),
+                                   icube->lineCount(), incam, samples,lines,
                                    outmap, trim);
 
     int tileStart, tileEnd;
@@ -583,7 +583,7 @@ void LoadCameraRes() {
   // Open the input cube, get the camera object, and the cam map projection
   Cube c;
   c.open(file);
-  Camera *cam = c.getCamera();
+  Camera *cam = c.camera();
   Pvl camMap;
   cam->BasicMapping(camMap);
   PvlGroup &camGrp = camMap.FindGroup("Mapping");
@@ -650,7 +650,7 @@ void LoadCameraRange() {
   // Open the input cube, get the camera object, and the cam map projection
   Cube c;
   c.open(file);
-  Camera *cam = c.getCamera();
+  Camera *cam = c.camera();
 
   // Make the target info match the user mapfile
   double minlat, maxlat, minlon, maxlon;

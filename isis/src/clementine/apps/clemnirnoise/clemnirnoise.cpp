@@ -21,7 +21,7 @@ void IsisMain() {
   p.SetOutputCube("TO");
 
   // Start the processing
-  p.SetBrickSize(icube->getSampleCount(), icube->getLineCount(), 1);
+  p.SetBrickSize(icube->sampleCount(), icube->lineCount(), 1);
   p.StartProcess(NoiseFilter);
   p.EndProcess();
 }

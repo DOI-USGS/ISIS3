@@ -642,7 +642,7 @@ namespace Isis {
         //  Attempt to Compose Serial number and see if list already has duplicate.  If so,
         //  use filenames as serial numbers for both cubes.  This needs to be checked because
         //  coreg networks will often have 2 cubes with the same serial number.make cl
-        QString sn = SerialNumber::Compose(mvp->cube()->getFileName(), true);
+        QString sn = SerialNumber::Compose(mvp->cube()->fileName(), true);
         if (list.HasSerialNumber(sn)) {
           // TODO  Before removing serial number, make sure current network does not have
           // measures with old serial number.  If it does, now what?  Print error?
@@ -652,11 +652,11 @@ namespace Isis {
           list.Delete(sn);
           list.Add(fileName.name(),fileName.expanded());
           // Add new serial number as filename
-          list.Add(Isis::FileName(mvp->cube()->getFileName()).name(),
-                                  mvp->cube()->getFileName());
+          list.Add(Isis::FileName(mvp->cube()->fileName()).name(),
+                                  mvp->cube()->fileName());
         }
         else {
-          list.Add(mvp->cube()->getFileName(), true);
+          list.Add(mvp->cube()->fileName(), true);
         }
       }
       catch (...) {
@@ -672,8 +672,8 @@ namespace Isis {
     QString serialNumber;
     try {
       SerialNumberList list = serialNumberList();
-      serialNumber = list.SerialNumber(mvp->cube()->getFileName());
-//    serialNumber = serialNumberList().SerialNumber(mvp->cube()->getFileName());
+      serialNumber = list.SerialNumber(mvp->cube()->fileName());
+//    serialNumber = serialNumberList().SerialNumber(mvp->cube()->fileName());
     }
     catch (IException &e) {
       serialNumber = "Unknown";
@@ -1409,7 +1409,7 @@ namespace Isis {
     MdiCubeViewport *mvp = cubeViewport();
     if (mvp  == NULL) return;
 
-    QString file = mvp->cube()->getFileName();
+    QString file = mvp->cube()->fileName();
     QString sn = serialNumberList().SerialNumber(file);
 
     double samp,line;
@@ -1466,7 +1466,7 @@ namespace Isis {
       else {
         try {
           createPoint(mvp, samp, line);
-          m_leftFile = mvp->cube()->getFileName();
+          m_leftFile = mvp->cube()->fileName();
         }
         catch (IException &e) {
           QString message = "Cannot create control point.\n\n";
@@ -1509,14 +1509,14 @@ namespace Isis {
 
     QStringList images;
     for (int i = 0; i < (int)cubeViewportList()->size(); i++) {
-      FileName cubeFile = (*(cubeViewportList()))[i]->cube()->getFileName();
+      FileName cubeFile = (*(cubeViewportList()))[i]->cube()->fileName();
       images<<cubeFile.name();
     }
     m_newPointDialog->setFiles(images);
     m_newPointDialog->show();
 
     //  Highlight the current cubeViewport
-    QString current = FileName(cvp->cube()->getFileName()).name();
+    QString current = FileName(cvp->cube()->fileName()).name();
     m_newPointDialog->highlightFile(current);
 
     m_newPoint = new ControlPoint();
@@ -1539,7 +1539,7 @@ namespace Isis {
   void MatchTool::addMeasure(MdiCubeViewport *cvp, double sample, double line) {
 
     //  Highlight the current cubeViewport
-    QString current = FileName(cvp->cube()->getFileName()).name();
+    QString current = FileName(cvp->cube()->fileName()).name();
     m_newPointDialog->highlightFile(current);
     m_newPointDialog->raise();
 

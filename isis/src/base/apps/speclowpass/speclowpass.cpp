@@ -20,14 +20,14 @@ void IsisMain() {
 
   // Obtain input cube, get bands dimension from input cube and user input number bands
   Cube *icube = p.SetInputCube("FROM");
-  int maxBands = (2 * icube->getBandCount()) - 1;
+  int maxBands = (2 * icube->bandCount()) - 1;
   UserInterface &ui = Application::GetUserInterface();
   bands = ui.GetInteger("BANDS");
 
   // Check for cases of too many bands
   if(bands > maxBands) {
     QString msg = "Parameter bands [" + toString(bands) + "] exceeds maximum allowable size "
-                  + "of [" + toString(maxBands) + "] for cube [" + icube->getFileName() + "]";
+                  + "of [" + toString(maxBands) + "] for cube [" + icube->fileName() + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 

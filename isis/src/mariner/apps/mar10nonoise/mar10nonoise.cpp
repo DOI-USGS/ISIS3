@@ -14,7 +14,7 @@ void IsisMain() {
   // Check that it is a Mariner10 cube.
   Cube iCube;
   iCube.open(ui.GetFileName("FROM"));
-  Pvl * labels = iCube.getLabel();
+  Pvl * labels = iCube.label();
   if ("Mariner_10" != (QString)labels->FindKeyword("SpacecraftName", Pvl::Traverse)) {
     QString msg = "The cube [" + ui.GetFileName("FROM") + "] does not appear" +
         " to be a Mariner10 cube";

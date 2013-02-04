@@ -56,7 +56,7 @@ void IsisMain() {
 // Ensure a proper target before initialization
       Cube cube;
       cube.open(temp.expanded(), "rw");
-      Pvl *label = cube.getLabel();
+      Pvl *label = cube.label();
       MdisGeometry::validateTarget(*label, true);
       cube.close();
 

@@ -23,10 +23,10 @@
  */
 
 #include "Statistics.h"
-#include "BasisFunction.h"
 #include "LeastSquares.h"
 
 namespace Isis {
+  class BasisFunction;
 
   /**
    * Calculate the bases and multipliers for normalizing
@@ -56,15 +56,18 @@ namespace Isis {
    * @internal
    *   @history 2009-06-05 Mackenzie Boyd - fixed unittest to work on all systems
    *   @history 2009-06-12 Travis Addair - changed public interface
-   *            to use indices instead of file names and renamed
-   *            from IntersectionStatistics
+   *                           to use indices instead of file names and renamed
+   *                           from IntersectionStatistics
    *   @history 2009-06-15 Travis Addair - documented all
-   *            variables/enums
+   *                           variables/enums
    *   @history 2009-06-24 Travis Addair - changed gain and offset vectors to
-   *            itialize to 1.0 and 0.0, respectively
+   *                           itialize to 1.0 and 0.0, respectively
    *   @history 2009-11-25 Travis Addair - held images are now
-   *            weighted to ensure gain and offset of 1.0 and 0.0,
-   *            respectively
+   *                           weighted to ensure gain and offset of 1.0 and 0.0,
+   *                           respectively
+   *   @history 2013-12-29 Jeannie Backer - Added LeastSquares::SolveMethod
+   *                           input parameter to Solve() method. Improved error
+   *                           message. Fixes #962,
    */
 
   class OverlapNormalization {
@@ -135,7 +138,8 @@ namespace Isis {
         Both
       };
 
-      void Solve(SolutionType type = Both);
+      void Solve(SolutionType type = Both, 
+                 LeastSquares::SolveMethod method=LeastSquares::QRD);
 
       double Average(const unsigned index) const;
       double Gain(const unsigned index) const;
@@ -233,22 +237,22 @@ namespace Isis {
       /**
        * The gain function to be solved
        */
-      Isis::BasisFunction *m_gainFunction;
+      BasisFunction *m_gainFunction;
 
       /**
        * The offset function to be solved
        */
-      Isis::BasisFunction *m_offsetFunction;
+      BasisFunction *m_offsetFunction;
 
       /**
        * The least squares object that solves for the new gains
        */
-      Isis::LeastSquares *m_gainLsq;
+      LeastSquares *m_gainLsq;
 
       /**
        * The least squares object that calculates offsets
        */
-      Isis::LeastSquares *m_offsetLsq;
+      LeastSquares *m_offsetLsq;
 
       //! Cannot copy this object
       OverlapNormalization &operator=(const OverlapNormalization &);

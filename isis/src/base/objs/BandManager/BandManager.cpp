@@ -40,9 +40,9 @@ namespace Isis {
    */
 
   BandManager::BandManager(const Isis::Cube &cube, const bool reverse) :
-    Isis::BufferManager(cube.getSampleCount(), cube.getLineCount(),
-                        cube.getBandCount(), 1, 1, cube.getBandCount(),
-                        cube.getPixelType(), reverse) {
+    Isis::BufferManager(cube.sampleCount(), cube.lineCount(),
+                        cube.bandCount(), 1, 1, cube.bandCount(),
+                        cube.pixelType(), reverse) {
   }
 
   /**

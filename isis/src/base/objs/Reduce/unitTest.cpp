@@ -34,11 +34,11 @@ void IsisMain() {
 
   double sscale = 3;
   double lscale = 4;
-  int ons = (int)ceil((double)icube.getSampleCount() / sscale);
-  int onl = (int)ceil((double)icube.getLineCount() / lscale);
+  int ons = (int)ceil((double)icube.sampleCount() / sscale);
+  int onl = (int)ceil((double)icube.lineCount() / lscale);
 
   // Reduce by "Near"
-  Cube *ocube = p.SetOutputCube("TO", ons, onl, icube.getBandCount());
+  Cube *ocube = p.SetOutputCube("TO", ons, onl, icube.bandCount());
   Nearest near(&icube, sscale, lscale);
   p.ClearInputCubes();
   cout << "Reduce by Near\n";
@@ -49,7 +49,7 @@ void IsisMain() {
 
   // Reduce by "Average"
   p.SetInputCube("FROM");
-  ocube=p.SetOutputCube("TO2", ons, onl, icube.getBandCount());
+  ocube=p.SetOutputCube("TO2", ons, onl, icube.bandCount());
   p.ClearInputCubes();
   Average avg(&icube, sscale, lscale, 0.5, "scale");
   cout << "\nReduce by Average\n";

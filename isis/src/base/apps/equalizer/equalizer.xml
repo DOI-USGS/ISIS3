@@ -24,53 +24,68 @@
         corrective factors. The actual equation to be used for equalization on 
         each band in each cube is:
         <pre>
-            newdn(s,l,b)   =   (olddn(s,l,b) - avg(b)) * GAIN(b) + avg(b) + OFFSET(b)
+          newdn(s,l,b)   =   (olddn(s,l,b) - avg(b)) * GAIN(b) + (avg(b) + OFFSET(b))
         </pre>
         where
         <pre>
-            s = sample index
-            l = line index
-            b = band index
+          s = sample index
+          l = line index
+          b = band index
         </pre>
       </p>
 
       <p>
-        Prior to equalizing, the user can choose whether to adjust the brightness and/or contrast of the cubes. 
-        The default is to adjust both, however, if the brightness (average) of all the cubes is the same,
-        then simply adjusting the contrast may suffice.   Likewise, if the standard deviation of all the 
-        cubes is similar, then a contrast adjustment is not necessary.  Adjusting for contrast only implies
+        Prior to equalizing, the user can choose whether to adjust the 
+        brightness and/or contrast of the cubes. The default is to adjust both,
+        however, if the brightness (average) of all the cubes is the same,
+        then simply adjusting the contrast may suffice.   Likewise, if the
+        standard deviation of all the cubes is similar, then a contrast 
+        adjustment is not necessary.  Adjusting for contrast only implies
         the OFFSET values will be held to zero.  Similarly, adjusting for 
         brightness implies the GAIN values will be held to one.
       </p>
 
       <p>
-          The OFFSET and GAIN values are computed independently for each image, therefore we have two
-          least squares computations with N unknowns, where N is the number of cubes to be equalized.
-          The overlaps, M, between all the cubes are computed, and in some cases 
-          M &lt; N.  This implies an underdetermined system, and the program 
-          will report an error if this occurs.  You can hold one or more images 
-          to alleviate this problem.  Holding an image forces GAIN and OFFSET to 
-          1.0 and 0.0 for that image, respectively. 
+        The OFFSET and GAIN values are computed independently for each image, 
+        therefore we have two least squares computations with N unknowns, 
+        where N is the number of cubes to be equalized. The overlaps, M, 
+        between all the cubes are computed, and in some cases M &lt; N. 
+        This implies an underdetermined system, and the program will report 
+        an error if this occurs.  You can hold one or more images to alleviate
+        this problem.  Holding an image forces GAIN and OFFSET to 1.0 and 0.0 
+        for that image, respectively. 
       </p>
 
       <p>
-         If the the user chooses to apply correction to the images, then a list
-         of output file names can be specified with the TOLIST parameter.  If no
-         TOLIST is specified, the equalized cubes will be named the same as the 
-         input cubes with the addition of a '.equ' prior to the '.cub' 
-         extension, and placed in the same directories as their input files.
+        If the the user chooses to apply correction to the images, then a list
+        of output file names can be specified with the TOLIST parameter.  If no
+        TOLIST is specified, the equalized cubes will be named the same as the 
+        input cubes with the addition of a '.equ' prior to the '.cub' 
+        extension, and placed in the same directories as their input files.
       </p>
 
       <p>
-          For the sake of efficiency, the user may choose to set the "sampling 
-          percent" to be less than its default value of 100.0.  By doing so, the
-          program will likely perform its statistic gathering noticeably faster,
-          but at the risk of losing accuracy in the results.  It should 
-          be noted that the user also runs the risk of encountering an error if
-          decreasing the sampling percent results in the amount of valid data in
-          the calculated overlaps being less than the minimum set by the
-          MINCOUNT parameter (default value of 1000).  Sampling percent must be 
-          a decimal value between 0.0 (exclusive) and 100.0 (inclusive).
+        For the sake of efficiency, the user may choose to set the "sampling 
+        percent" to be less than its default value of 100.0.  By doing so, the
+        program will likely perform its statistic gathering noticeably faster,
+        but at the risk of losing accuracy in the results.  It should 
+        be noted that the user also runs the risk of encountering an error if
+        decreasing the sampling percent results in the amount of valid data in
+        the calculated overlaps being less than the minimum set by the
+        MINCOUNT parameter (default value of 1000).  Sampling percent must be 
+        a decimal value between 0.0 (exclusive) and 100.0 (inclusive).
+      </p>
+
+      <p>
+        This program defaults to solving the least-squares system using the 
+        SPARSE matrix method. This method is able to find valid solutions, even
+        when no hold list is provided. Two other solution methods are also 
+        available, a QR decomposition (QRD) method or single value decompostion
+        (SVD) method. The QRD method is fairly accurate and fast, but does not
+        produce valid results in all cases, especially if no images are held. 
+        Previous versions of equalizer used this method to solve. The SVD method
+        tends to be slower than QRD, but it tends to return more accurate results
+        and will sometimes produce valid results when no hold list is provided. 
       </p>
   </description>
 
@@ -140,6 +155,13 @@
      <change name="Travis Addair" date="2009-11-19">
       Updated documentation and examples to reflect the most recent changes to 
       using the program.
+     </change>
+     <change name="Jeannie Backer" date="2013-01-29">
+      Added parameter SOLVEMETHOD to allow user to choose the method in which 
+      the system of equations will be solved. Removed unnecessary error throws 
+      from implementation file, now use xml to require OUTSTATS when 
+      PROCESS=CALCULATE and require the PERCENT enterend to be in the interval
+      (0, 100]. Improve test coverage to 100%. Fixes #962. 
      </change>
   </history>
 
@@ -299,9 +321,59 @@
                         <item>MINCOUNT</item>
                         <item>WEIGHT</item>
                         <item>PERCENT</item>
+                        <item>SOLVEMETHOD</item>
                     </exclusions>
                 </option>
                                
+            </list>
+        </parameter>
+        <parameter name="SOLVEMETHOD">
+            <type>string</type>
+            <brief>
+              The solve method to be used to calculate the equalization statistics. 
+            </brief>
+            <description>
+              This option allows the user to choose the solve method for the least-squares system.
+              The default is SPARSE.
+            </description>
+            <default><item>SPARSE</item></default>
+            <list>
+                <option value="QRD">
+                    <brief>
+                      The QR Decomposition method is least accurate when no 
+                      hold list is provided.
+                    </brief>
+                    <description>
+                     Solve the least-squares system using QR decomposition. 
+                     This solve method is faster than SVD and good to use when
+                     the user can provide a hold list. However, it is likely to 
+                     result in invalid values when no hold list is provided.
+                    </description>
+                </option>
+                <option value="SVD">
+                    <brief>
+                     The SV Decomposition method is more accurate than QRD when
+                     no hold list is provided. 
+                    </brief>
+                    <description>
+                      Solve the least-squares system using SV (Singular value) 
+                      decomposition. This method is more accurate than QRD when
+                      no hold list is provided, but slower to run. While this 
+                      method will produce valid values more often than QRD when
+                      no hold list is provided, it does not always result in valid 
+                      values.
+                    </description>
+                </option>
+                <option value="SPARSE">
+                    <brief>
+                     The SPARSE is the most accurate when no hold list is provided.
+                    </brief>
+                    <description>
+                      Solve the least-squares system using a sparse matrix 
+                      formuation of the LU decomposition. This is the best method
+                      to use if no hold list is provided.
+                    </description>
+                </option>
             </list>
         </parameter>
     </group>
@@ -334,24 +406,24 @@
                 </option>
                 <option value="BRIGHTNESS">
                     <brief>
-                        Adjust the Brightness of the images only
+                        Adjust the brightness of the images using calculated offsets
                     </brief>
                     <description>
                         This option will use an algorithm that only equalizes
-                        the brightness of the images.  This option should be
-                        used only if the variance/standard deviation of the
-                        images is close.
+                        the brightness of the images by calculating the offset
+                        for each. This option should be used only if the 
+                        variances/standard deviations of the images are close.
                     </description>
                 </option>
                 <option value="CONTRAST">
                     <brief>
-                        Adjust the Contrast of the images only
+                        Adjust the contrast of the images only using calculated gains
                     </brief>
                     <description>
                         This option will use an algorithm that only equalizes
-                        the contrast of the images.  This option should only
-                        be used if the brightness of the images are already
-                        close.
+                        the contrast of the images by calculating the gain for
+                        each.  This option should only be used if the brightness
+                        of the images are already close.
                     </description>
                 </option>                
             </list>
@@ -389,6 +461,8 @@
 
         <parameter name="PERCENT">
             <type>double</type>
+            <minimum inclusive="no">0.0</minimum>
+            <maximum inclusive="yes">100.0</maximum>
             <brief>
                 Percentage of the lines to consider when gathering overall cube
                 statistics and overlap statistics

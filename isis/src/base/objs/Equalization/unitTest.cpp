@@ -51,17 +51,33 @@ int main(int argc, char *argv[]) {
   try {
     QString fromList = "FromList.lst";
     QString holdList = "HoldList.lst";
+    QString toList   = "ToList.lst";
 
     cout << "UnitTest for Equalization" << endl;
+    cout << "Create object without fromlist file." << endl;
+    Equalization equalizerNoFromList();
+
+    cout << "Create object using fromlist file." << endl;
     Equalization equalizer(fromList);
+    cout << "     Add hold list..." << endl;
     equalizer.addHolds(holdList);
 
     double percent = 100.0;
     int mincount = 1000;
     bool weight = false;
     OverlapNormalization::SolutionType adjust = OverlapNormalization::Both;
+    LeastSquares::SolveMethod solvemethod = LeastSquares::QRD;
 
-    equalizer.calculateStatistics(percent, mincount, weight, adjust);
+    cout << "     Calculate statistics for contrast and brightness using QRD method..." << endl;
+    equalizer.calculateStatistics(percent, mincount, weight, adjust, solvemethod);
+
+    PvlGroup results = equalizer.getResults();
+    cout << "Results:" << endl;
+    cout << results << endl;
+
+    cout << "     Write results to file..." << endl;
+    FileName outputStatsFile("$TEMPORARY/results.tmp.cub");
+    equalizer.write(outputStatsFile.expanded());
 
     // Open input cube
     FileList imageList(fromList);
@@ -70,9 +86,31 @@ int main(int argc, char *argv[]) {
       CubeAttributeInput att;
       const QString inp = imageList[i].toString();
       Cube *inputCube = p.SetInputCube(inp, att);
-      TestFunctor func(&equalizer, inputCube->getLineCount(), i);
+      TestFunctor func(&equalizer, inputCube->lineCount(), i);
       p.ProcessCubeInPlace(func, false);
     }
+
+    cout << "     Apply corrections to temporary output cubes..." << endl;
+    equalizer.applyCorrection(toList);
+
+    cout << "     Import statistics from results file..." << endl;
+    equalizer.importStatistics(outputStatsFile.expanded());
+    for (int i = 0; i < imageList.size(); i++) {
+      ProcessByLine p;
+      CubeAttributeInput att;
+      const QString inp = imageList[i].toString();
+      Cube *inputCube = p.SetInputCube(inp, att);
+      TestFunctor func(&equalizer, inputCube->lineCount(), i);
+      p.ProcessCubeInPlace(func, false);
+    }
+
+    remove(outputStatsFile.expanded().toAscii());
+    FileList toFileList(toList);
+    for (int i = 0; i < toFileList.size(); i++) {
+      remove(toFileList[i].expanded().toAscii());
+    }
+
+
   }
   catch (IException &e) {
     e.print();

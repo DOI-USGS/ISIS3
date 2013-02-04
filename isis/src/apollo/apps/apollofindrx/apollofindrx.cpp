@@ -40,9 +40,9 @@ void IsisMain ()
     MAX_DISPY = ui.GetInteger("DELTAY");
     cube.open(ui.GetFileName("FROM"),"rw");
 
-    PvlGroup &reseaus = cube.getLabel()->FindGroup("Reseaus",Pvl::Traverse);
-    QString mission = (cube.getLabel()->FindGroup("Instrument",Pvl::Traverse))["SpacecraftName"];
-    QString instrument = (cube.getLabel()->FindGroup("Instrument",Pvl::Traverse))["InstrumentId"];
+    PvlGroup &reseaus = cube.label()->FindGroup("Reseaus",Pvl::Traverse);
+    QString mission = (cube.label()->FindGroup("Instrument",Pvl::Traverse))["SpacecraftName"];
+    QString instrument = (cube.label()->FindGroup("Instrument",Pvl::Traverse))["InstrumentId"];
     Apollo apollo(mission, instrument);
     if (mission.mid(0,6) != "APOLLO") {
       QString msg = "This application is for use with Apollo spacecrafts only.";

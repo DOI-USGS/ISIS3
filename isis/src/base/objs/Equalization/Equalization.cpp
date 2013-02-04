@@ -6,6 +6,7 @@
 #include "Cube.h"
 #include "FileList.h"
 #include "IException.h"
+#include "LeastSquares.h"
 #include "LineManager.h"
 #include "OverlapNormalization.h"
 #include "OverlapStatistics.h"
@@ -16,8 +17,7 @@
 #include "PvlGroup.h"
 #include "Statistics.h"
 
-using std::vector;
-
+using namespace std;
 
 namespace Isis {
 
@@ -73,8 +73,20 @@ namespace Isis {
   }
 
 
+  /** 
+   * @param percent Percentage of the lines to consider when gathering overall 
+   *            cube statistics and overlap statistics 
+   * @param mincnt Minimum number of points in overlapping area required to be 
+   *            used in the solution 
+   * @param wtopt Indicates whether overlaps should be weighted
+   * @param sType An integer value corresponding to the enumerated value of the 
+   *              OverlapNormalization::SolutionType to be used.
+   * @param methodType An integer value corresponding to the enumerated value of 
+   *            the desired LeastSquares::SolveMethod to be used.
+   */
   void Equalization::calculateStatistics(double percent, int mincnt,
-      bool wtopt, int sType) {
+      bool wtopt, OverlapNormalization::SolutionType sType, 
+      LeastSquares::SolveMethod methodType) {
 
     clearAdjustments();
 
@@ -115,8 +127,9 @@ namespace Isis {
     // A list for keeping track of which input cubes are known to overlap
     // another
     vector<bool> doesOverlapList;
-    for (int i = 0; i < m_imageList.size(); i++)
+    for (int i = 0; i < m_imageList.size(); i++) {
       doesOverlapList.push_back(false);
+    }
 
     // Find overlapping areas and add them to the set of known overlaps for
     // each band shared amongst cubes
@@ -150,7 +163,7 @@ namespace Isis {
             int weight = 1;
             if (wtopt) weight = oStats.GetMStats(band).ValidPixels();
 
-            // Make sure overlap has at least MINCOUNT pixels and add
+            // Make sure overlap has at least MINCOUNT valid pixels and add
             if (oStats.GetMStats(band).ValidPixels() >= mincnt) {
               oNormList[band - 1]->AddOverlap(
                   oStats.GetMStats(band).X(), i,
@@ -180,16 +193,28 @@ namespace Isis {
     }
 
     // Loop through each band making all necessary calculations
-    for (int band = 0; band < m_maxBand; band++) {
-      oNormList[band]->Solve((OverlapNormalization::SolutionType) sType);
+    try {
+      for (int band = 0; band < m_maxBand; band++) {
+        oNormList[band]->Solve(sType, methodType);
 
-      for (unsigned int img = 0; img < m_adjustments.size(); img++) {
-        m_adjustments[img]->addGain(oNormList[band]->Gain(img));
-        m_adjustments[img]->addOffset(oNormList[band]->Offset(img));
-        m_adjustments[img]->addAverage(oNormList[band]->Average(img));
+        for (unsigned int img = 0; img < m_adjustments.size(); img++) {
+          m_adjustments[img]->addGain(oNormList[band]->Gain(img));
+          if (qFuzzyCompare(oNormList[band]->Gain(img), 0.0)) {// if gain == 0
+            throw IException(IException::Unknown, 
+                             "Calculation for equalization statistics failed. Gain = 0.",
+                             _FILEINFO_);
+          }
+          m_adjustments[img]->addOffset(oNormList[band]->Offset(img));
+          m_adjustments[img]->addAverage(oNormList[band]->Average(img));
+        }
       }
-    }
 
+    }
+    catch (IException &e) {
+      string msg = "Unable to calculate the equalization statistics. You may "
+                   "want to try another LeastSquares::SolveMethod.";
+      throw IException(e, IException::Unknown,  msg, _FILEINFO_);
+    }
     // Compute the number valid and invalid overlaps
     for (unsigned int o = 0; o < overlapList.size(); o++) {
       for (int band = 1; band <= m_maxBand; band++) {
@@ -300,8 +325,8 @@ namespace Isis {
       // Allocate output cube
       QString out = outList[img].toString();
       CubeAttributeOutput outAtt;
-      p.SetOutputCube(out, outAtt, icube->getSampleCount(),
-          icube->getLineCount(), icube->getBandCount());
+      p.SetOutputCube(out, outAtt, icube->sampleCount(),
+          icube->lineCount(), icube->bandCount());
 
       // Apply gain/offset to the image
       ApplyFunctor func(m_adjustments[img]);
@@ -368,7 +393,7 @@ namespace Isis {
 
     Cube tempCube;
     tempCube.open(m_imageList[0].toString());
-    m_maxBand = tempCube.getBandCount();
+    m_maxBand = tempCube.bandCount();
 
     errorCheck(fromListName);
   }
@@ -404,15 +429,15 @@ namespace Isis {
         cube2.open(m_imageList[j].toString());
 
         // Make sure number of bands match
-        if (m_maxBand != cube2.getBandCount()) {
+        if (m_maxBand != cube2.bandCount()) {
           QString msg = "Number of bands do not match between cubes [" +
             m_imageList[i].toString() + "] and [" + m_imageList[j].toString() + "]";
           throw IException(IException::User, msg, _FILEINFO_);
         }
 
         //Create projection from each cube
-        Projection *proj1 = cube1.getProjection();
-        Projection *proj2 = cube2.getProjection();
+        Projection *proj1 = cube1.projection();
+        Projection *proj2 = cube2.projection();
 
         // Test to make sure projection parameters match
         if (*proj1 != *proj2) {

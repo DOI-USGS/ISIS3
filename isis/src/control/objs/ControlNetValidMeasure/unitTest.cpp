@@ -174,7 +174,9 @@ int main(void) {
       pvlLog += op;
 
       ControlNetValidMeasure cnetVM(pvlLog);
-      cout << cnetVM.GetLogPvl();
+      cout << cnetVM.GetLogPvl() << endl;
+
+      cout << "Test LocationString: " << cnetVM.LocationString(0.6, 1.6) << endl;
     }
     catch(IException &e) {
       e.print();

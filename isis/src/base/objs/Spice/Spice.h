@@ -250,6 +250,10 @@ namespace Isis {
    *                           See the documention in SpacecraftPosition.h for a
    *                           more detailed description of these changes.
    *                           References #909, #1136 and #1223.
+   *   @history 2013-01-09 Steven Lambright and Mathew Eis - Fixed a possible crash
+   *                           condition that never exhibited any problems, but valgrind
+   *                           caught it. This was discovered when adding support for Mac
+   *                           OSX 10.8. References #1354.
    *                           
    */
   class Spice {

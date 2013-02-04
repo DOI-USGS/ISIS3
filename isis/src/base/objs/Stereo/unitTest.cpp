@@ -32,11 +32,11 @@ int main(int argc, char *argv[]) {
     Cube rightCube;
     rightCube.open("$mariner10/testData/0166613_clean_equi.cub");
 
-    leftCube.getCamera()->SetImage(1054.19, 624.194);
-    rightCube.getCamera()->SetImage(1052.19, 624.194);
+    leftCube.camera()->SetImage(1054.19, 624.194);
+    rightCube.camera()->SetImage(1052.19, 624.194);
 
     double radius, lat, lon, sepang, error;
-    Stereo::elevation(*(leftCube.getCamera()), *(rightCube.getCamera()),
+    Stereo::elevation(*(leftCube.camera()), *(rightCube.camera()),
                       radius, lat, lon, sepang, error);
 
     cout << "Radius = " << radius << endl;

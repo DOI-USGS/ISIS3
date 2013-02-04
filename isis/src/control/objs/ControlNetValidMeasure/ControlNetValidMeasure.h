@@ -69,6 +69,9 @@ namespace Isis {
     *                          specified in the DefFile to improve run time
     *  @history 2011-11-21 Sharmila Prasad - Validate/Parse Pvl only if
     *                          ValidMeasure Group is found. Fixes Mantis #584
+    *  @history 2013-01-31 Steven Lambright - Fixed LocationString() to return
+    *                          valid text. Also, added a test for this text.
+    *                          Fixes #1436. 
     */
 
   class ControlNetValidMeasure {
@@ -169,7 +172,7 @@ namespace Isis {
 
       //! API to display location in the form "Sample,Line"
       QString LocationString(double pdSample, double pdLine) const {
-        return QString((int)pdSample) + "," + QString((int)pdLine);
+        return toString((int)pdSample) + "," + toString((int)pdLine);
       };
 
       //! Test for a point to be user defined number of pixels from the edge

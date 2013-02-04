@@ -57,6 +57,8 @@ namespace Isis {
    *                             set the m_hasNormal to true.
    *   @history 2012-11-14 - Jeannie Backer - Removed cout lines left in while
    *                             testing code. References #1181.
+   *   @history 2012-12-21 - Debbie A. Cook - Added new members m_hasEllipsoidIntersection
+   *                             and method hasEllipsoidIntersection().   Fixes Mantis ticket #1343
    */
   class ShapeModel {
     public:
@@ -131,6 +133,7 @@ namespace Isis {
       void setName(QString name);
  
       void calculateEllipsoidalSurfaceNormal();
+      bool hasEllipsoidIntersection();
 
       // Intersect ellipse
       bool intersectEllipsoid(const std::vector<double> observerPosRelativeToTarget,
@@ -140,6 +143,7 @@ namespace Isis {
       double resolution();
 
     private:
+      bool m_hasEllipsoidIntersection;  // Indicates the ellipsoid was successfully intersected
       bool m_hasIntersection;       //!< indicates good intersection exists
       bool m_hasNormal;             //!< indicates normal has been computed
       std::vector<double> m_normal; //!< Local normal of current intersection point

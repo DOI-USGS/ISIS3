@@ -166,14 +166,14 @@ namespace Isis {
 
     int ns, nl, nb;
     if(InputCubes.size() == 1) {
-      ns = InputCubes[0]->getSampleCount();
-      nl = InputCubes[0]->getLineCount();
-      nb = InputCubes[0]->getBandCount();
+      ns = InputCubes[0]->sampleCount();
+      nl = InputCubes[0]->lineCount();
+      nb = InputCubes[0]->bandCount();
     }
     else {
-      ns = OutputCubes[0]->getSampleCount();
-      nl = OutputCubes[0]->getLineCount();
-      nb = OutputCubes[0]->getBandCount();
+      ns = OutputCubes[0]->sampleCount();
+      nl = OutputCubes[0]->lineCount();
+      nb = OutputCubes[0]->bandCount();
     }
     if(Type() == PerPixel) SetBrickSize(1, 1, nb);
     else if(Type() == ByLine) SetBrickSize(ns, 1, nb);
@@ -196,20 +196,20 @@ namespace Isis {
     }
 
     if(Type() == PerPixel) {
-      SetInputBrickSize(1, 1, InputCubes[0]->getBandCount());
-      SetOutputBrickSize(1, 1, OutputCubes[0]->getBandCount());
+      SetInputBrickSize(1, 1, InputCubes[0]->bandCount());
+      SetOutputBrickSize(1, 1, OutputCubes[0]->bandCount());
     }
     else if(Type() == ByLine) {
-      SetInputBrickSize(InputCubes[0]->getSampleCount(), 1,
-                        InputCubes[0]->getBandCount());
-      SetOutputBrickSize(OutputCubes[0]->getSampleCount(), 1,
-                         OutputCubes[0]->getBandCount());
+      SetInputBrickSize(InputCubes[0]->sampleCount(), 1,
+                        InputCubes[0]->bandCount());
+      SetOutputBrickSize(OutputCubes[0]->sampleCount(), 1,
+                         OutputCubes[0]->bandCount());
     }
     else {
-      SetInputBrickSize(1, InputCubes[0]->getLineCount(),
-                        InputCubes[0]->getBandCount());
-      SetOutputBrickSize(1, OutputCubes[0]->getLineCount(),
-                         OutputCubes[0]->getBandCount());
+      SetInputBrickSize(1, InputCubes[0]->lineCount(),
+                        InputCubes[0]->bandCount());
+      SetOutputBrickSize(1, OutputCubes[0]->lineCount(),
+                         OutputCubes[0]->bandCount());
     }
   }
 
@@ -220,30 +220,30 @@ namespace Isis {
   void ProcessBySpectra::SetBrickSizesForProcessCubes() {
     if(Type() == PerPixel) {
       for(unsigned int i = 0; i < InputCubes.size(); i++) {
-        SetInputBrickSize(1, 1, InputCubes[i]->getBandCount(), i + 1);
+        SetInputBrickSize(1, 1, InputCubes[i]->bandCount(), i + 1);
       }
       for(unsigned int i = 0; i < OutputCubes.size(); i++) {
-        SetOutputBrickSize(1, 1, OutputCubes[i]->getBandCount(), i + 1);
+        SetOutputBrickSize(1, 1, OutputCubes[i]->bandCount(), i + 1);
       }
     }
     else if(Type() == ByLine) {
       for(unsigned int i = 0; i < InputCubes.size(); i++) {
-        SetInputBrickSize(InputCubes[i]->getSampleCount(), 1,
-                          InputCubes[i]->getBandCount(), i + 1);
+        SetInputBrickSize(InputCubes[i]->sampleCount(), 1,
+                          InputCubes[i]->bandCount(), i + 1);
       }
       for(unsigned int i = 0; i < OutputCubes.size(); i++) {
-        SetOutputBrickSize(OutputCubes[i]->getSampleCount(), 1,
-                           OutputCubes[i]->getBandCount(), i + 1);
+        SetOutputBrickSize(OutputCubes[i]->sampleCount(), 1,
+                           OutputCubes[i]->bandCount(), i + 1);
       }
     }
     else {
       for(unsigned int i = 0; i < InputCubes.size(); i++) {
-        SetInputBrickSize(1, InputCubes[i]->getLineCount(),
-                          InputCubes[i]->getBandCount(), i + 1);
+        SetInputBrickSize(1, InputCubes[i]->lineCount(),
+                          InputCubes[i]->bandCount(), i + 1);
       }
       for(unsigned int i = 0; i < OutputCubes.size(); i++) {
-        SetOutputBrickSize(1, OutputCubes[i]->getLineCount(),
-                           OutputCubes[i]->getBandCount(), i + 1);
+        SetOutputBrickSize(1, OutputCubes[i]->lineCount(),
+                           OutputCubes[i]->bandCount(), i + 1);
       }
     }
   }

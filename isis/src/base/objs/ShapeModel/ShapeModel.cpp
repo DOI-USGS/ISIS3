@@ -61,6 +61,7 @@ namespace Isis {
     m_hasIntersection = false;
     m_hasNormal = false;
     m_normal.resize(3,0.);
+    m_hasEllipsoidIntersection = false;   
   }
 
   //! Destroys the ShapeModel
@@ -143,6 +144,15 @@ namespace Isis {
 
 
   /**
+   * Returns the status of the ellipsoid model intersection.
+   *
+   */
+  bool ShapeModel::hasEllipsoidIntersection() {
+    return m_hasEllipsoidIntersection;
+  }
+
+
+  /**
    * Returns the incidence angle in degrees. This does not use the surface model.
    *
    * @return @b double Incidence angle, in degrees.
@@ -170,8 +180,8 @@ namespace Isis {
   }
 
 
-  /** Find the intersection point on the ellipsoid model
-   * 
+  /** 
+   * Find the intersection point on the ellipsoid model
    */
   bool ShapeModel::intersectEllipsoid(const std::vector<double> observerBodyFixedPosition,
                               const std::vector<double> &observerLookVectorToTarget) {
@@ -209,6 +219,7 @@ namespace Isis {
       m_hasIntersection = false;
     }
    
+    m_hasEllipsoidIntersection = m_hasIntersection;   
     return m_hasIntersection;
   }
 
@@ -274,6 +285,7 @@ namespace Isis {
    */
   void ShapeModel::clearSurfacePoint() {
     setHasIntersection(false);
+    m_hasEllipsoidIntersection = false;
   }
 
 

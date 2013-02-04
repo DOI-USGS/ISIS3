@@ -51,6 +51,10 @@ namespace Isis {
    * @internal                                                              
    *   @history 2011-10-12 Orrin Thomas - Original version
    *   @history 2012-02-14 Orrin Thomas - add centerOfMassWeighted routine to support using Selection/Centroid for subpixel registration
+   *   @history 2012-12-26 Steven Lambright - Fixed an error with uninitialized memory inside of the
+   *                           method bestFitEllipse(). The array 'ata' wasn't fully initialized and
+   *                           was then used (only the 0th element was initialized). This caused
+   *                           unpredictable results in apollopanstitcher. Fixes #1053.
    */        
   class Selection {
   public:

@@ -7,3 +7,4 @@
 /opt/local/lib                 @rpath/3rdParty/lib
 #  Add new MacPorts structure
 /opt/usgs/(.*?)lib             @rpath/3rdParty/lib
+/opt/usgs/(.*?)Frameworks      @rpath/3rdParty/lib

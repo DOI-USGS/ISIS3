@@ -192,11 +192,19 @@ namespace Isis {
   }
 
 
-  void ControlNetGraphicsItem::setArrowsVisible(bool visible) {
-    QList<QGraphicsItem *> children = childItems();
-    QGraphicsItem *child;
-    foreach(child, children) {
-      ((ControlPointGraphicsItem *)child)->setArrowVisible(visible);
+  /**
+   * Enable/disable and configure movement arrows for all CP displays in the network.
+   *
+   * @see ControlPointGraphicsItem::setArrowsVisible()
+   * @see MosaicControlNetTool::setMovementArrowColorSource()
+   */
+  void ControlNetGraphicsItem::setArrowsVisible(bool visible,
+      bool colorByMeasureCount, int maxMeasureCount,
+      bool colorByJigsawError, double maxResidualMagnitude) {
+
+    foreach(QGraphicsItem *child, childItems()) {
+      ((ControlPointGraphicsItem *)child)->setArrowVisible(
+          visible, colorByMeasureCount, maxMeasureCount, colorByJigsawError, maxResidualMagnitude);
     }
   }
 

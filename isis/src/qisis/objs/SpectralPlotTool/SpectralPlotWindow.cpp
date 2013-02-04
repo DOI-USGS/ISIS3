@@ -98,7 +98,7 @@ namespace Isis {
       int redBand = 0, greenBand = 0, blueBand = 0, grayBand = 0;
 
       Cube *cube = m_cvp->cube();
-      Pvl &pvl = *cube->getLabel();
+      Pvl &pvl = *cube->label();
       PvlKeyword wavelengths;
 
       if (pvl.FindObject("IsisCube").HasGroup("BandBin")) {

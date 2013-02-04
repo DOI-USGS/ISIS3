@@ -64,76 +64,66 @@ namespace Isis {
    *         class. Also, it needs an example.
    *   @history 2003-03-31 Jeff Anderson - updated unitTest truth file.
    *   @history 2003-05-16 Stuart Sides  - modified schema from
-   *                                       astrogeology...isis.astrogeology
+   *                           astrogeology...isis.astrogeology
    *   @history 2003-05-21 Jeff Anderson - added read/write methods to improve
-   *                                       speed for IsisLine buffer managers.
-   *                                       Also added error checks on reads,
-   *                                       writes, and seeks.
-   *   @history 2003-05-30 Jeff Anderson - added PhysicalBand method and updated
-   *                                       unitTest.
-   *   @history 2003-10-06 Jeff Anderson - added PVL to create method to allow for
-   *                                       propagation of Pixel specifications.
-   *   @history 2003-10-15 Jeff Anderson - fixed bad error check in PhysicalBand
-   *                                       method.
-   *   @history 2004-01-30 Jeff Anderson - added many Set methods. Major refractor
-   *                                       of the class.
-   *   @history 2004-02-12 Jeff Anderson - added pruning of the band bin group
-   *                                       given the virtual band list.
-   *   @history 2004-02-17 Jeff Anderson - modified the number of bands in the
-   *                                       label if a virtual band list was given.
-   *   @history 2004-03-01 Jeff Anderson - added ability to read Isis 2.1 cube
-   *                                       format.
-   *   @history 2004-04-01 Jeff Anderson - fixed bug swapping NULL cache tile for
-   *                                       non-native cubes in move method.
-   *   @history 2005-03-24 Jeff Anderson - Added methods to return a camera or
-   *                                       projection associated with the cube.
-   *   @history 2005-07-18 Elizabeth Ribelin - Fixed bug in method that returns a
-   *                                           projection associated with the cube
+   *                           speed for IsisLine buffer managers. Also added error checks on reads,
+   *                           writes, and seeks.
+   *   @history 2003-05-30 Jeff Anderson - added PhysicalBand method and updated unitTest.
+   *   @history 2003-10-06 Jeff Anderson - added PVL to create method to allow for propagation of
+   *                           Pixel specifications.
+   *   @history 2003-10-15 Jeff Anderson - fixed bad error check in PhysicalBand method.
+   *   @history 2004-01-30 Jeff Anderson - added many Set methods. Major refractor of the class.
+   *   @history 2004-02-12 Jeff Anderson - added pruning of the band bin group given the virtual
+   *                           band list.
+   *   @history 2004-02-17 Jeff Anderson - modified the number of bands in the label if a virtual
+   *                           band list was given.
+   *   @history 2004-03-01 Jeff Anderson - added ability to read Isis 2.1 cube format.
+   *   @history 2004-04-01 Jeff Anderson - fixed bug swapping NULL cache tile for non-native cubes
+   *                           in move method.
+   *   @history 2005-03-24 Jeff Anderson - Added methods to return a camera or projection associated
+   *                           with the cube.
+   *   @history 2005-07-18 Elizabeth Ribelin - Fixed bug in method that returns a projection
+   *                           associated with the cube
    *   @history 2005-10-03 Elizabeth Miller - Added error check to Write(blob)
-   *   @history 2006-02-24 Kris Becker - Made the destructor virtual to properly
-   *                                     allow the class to be inherited.
-   *   @history 2006-04-21 Jacob Danton - Modified the WriteLabel method to use
-   *                                      the Pvl's format template abilities.
-   *   @history 2006-05-17 Elizabeth Miller - Depricated CameraManger to
-   *                                          CameraFactory
+   *   @history 2006-02-24 Kris Becker - Made the destructor virtual to properly allow the class to
+   *                           be inherited.
+   *   @history 2006-04-21 Jacob Danton - Modified the WriteLabel method to use the Pvl's format
+   *                           template abilities.
+   *   @history 2006-05-17 Elizabeth Miller - Depricated CameraManger to CameraFactory
    *   @history 2006-07-10 Elizabeth Miller - Added max size preference
    *   @history 2006-11-28 Jeff Anderson - Fixed detached blob bug
    *   @history 2007-01-05 Jeff Anderson - Fixed bug when reading/writing outside
-   *                 cube
+   *                           cube
    *   @history 2007-02-07 Tracie Sucharski - Added ReOpen method
-   *   @history 2008-05-09 Steven Lambright - Added Statistics, Histogram, PutGroup,
-   *                 GetGroup, DeleteGroup, HasGroup conveinience methods. Removed excess
-   *                 references to CubeInfo.
-   *   @history 2008-05-27 Jeff Anderson - Fixed bug in open method where
-   *                       virtual bands were not handled correctly if a
-   *                       BandBin group did not exist
-   *   @history 2008-06-09 Christopher Austin - Improved maximum cube size error
-   *                                            message.
+   *   @history 2008-05-09 Steven Lambright - Added Statistics, Histogram, PutGroup, GetGroup,
+   *                           DeleteGroup, HasGroup conveinience methods. Removed excess references
+   *                           to CubeInfo.
+   *   @history 2008-05-27 Jeff Anderson - Fixed bug in open method where virtual bands were not
+   *                           handled correctly if a BandBin group did not exist
+   *   @history 2008-06-09 Christopher Austin - Improved maximum cube size error message.
    *   @history 2008-06-11 Steven Lambright - Changed prototype for SetVirtualBands
    *   @history 2008-06-18 Christopher Austin - Fixed documentation errors
-   *   @history 2008-08-11 Steven Lambright - Added another Statistics method
-   *                 which accepts a valid range -- also added another Histogram
-   *                 method which accepts a bin/valid range (applies both).
-   *   @history 2008-08-11 Steven Lambright - Fixed definition of IsisCubeDef,
-   *            problem pointed out by "novas0x2a" (Support Board Member)
-   *   @history 2008-12-15 Steven Koechle - Added a method to delete blobs from a
-   *                cube
+   *   @history 2008-08-11 Steven Lambright - Added another Statistics method which accepts a valid
+   *                           range -- also added another Histogram method which accepts a
+   *                           bin/valid range (applies both).
+   *   @history 2008-08-11 Steven Lambright - Fixed definition of IsisCubeDef, problem pointed out
+   *                           by "novas0x2a" (Support Board Member)
+   *   @history 2008-12-15 Steven Koechle - Added a method to delete blobs from a cube
    *   @history 2008-12-17 Steven Koechle - BlobDelete method was broken, fixed
    *   @history 2009-06-30 Steven Lambright - Added "HasProjection" for uniform
-   *                projection existance test
+   *                           projection existance test
    *   @history 2010-03-22 Steven Lambright - Added a mutex for reading and writing,
-   *                which makes these methods thread safe.
+   *                           which makes these methods thread safe.
    *   @history 2011-03-23 Steven Lambright - Added ClearCache method.
-   *   @history 2011-06-01 Jai Rideout and Steven Lambright - Updated API to
-   *                conform to new Isis standards, re-implemented IO handler and
-   *                implemented new caching algorithms that can automatically apply
-   *                themselves when the behavior of the caller changes.
+   *   @history 2011-06-01 Jai Rideout and Steven Lambright - Updated API to conform to new Isis
+   *                           standards, re-implemented IO handler and implemented new caching
+   *                           algorithms that can automatically apply themselves when the behavior
+   *                           of the caller changes.
    *   @history 2011-06-27 Steven Lambright - Added addCachingAlgorithm
-   *   @history 2011-07-08 Steven Lambright - getProjection() and getCamera()
-   *                will now return NULL if the cube is not open, instead of
-   *                crashing, references #161
-   *   @history 2012-02-17 Steven Lambright - Made the read() method const.
-   *                Added mutex lock calls around data file accesses.
+   *   @history 2011-07-08 Steven Lambright - projection() and camera() will now return NULL if the
+   *                           cube is not open, instead of crashing, references #161
+   *   @history 2012-02-17 Steven Lambright - Made the read() method const. Added mutex lock calls
+   *                           around data file accesses.
    *   @history 2012-07-02 Steven Lambright and Stuart Sides - Added copy() and added support for
    *                           external cube label files (.ecub). This was done so that cubes can
    *                           be imported into projects without copying the DN data. Also, multiple
@@ -141,6 +131,7 @@ namespace Isis {
    *                           again, not copying DN data). Fixes #961.
    *   @history 2012-11-06 Steven Lambright and Mathew Eis - Fixed (the lack of) deletion of
    *                           temporary files in the unit test. Fixes #1009.
+   *   @history 2012-12-31 Steven Lambright - Removed 'get' prefix from accessors. Fixes #1356.
    *
    */
   class Cube {
@@ -239,37 +230,37 @@ namespace Isis {
       void setVirtualBands(const QList<QString> &vbands);
       void setVirtualBands(const std::vector<QString> &vbands);
 
-      int getBandCount() const;
-      double getBase() const;
-      ByteOrder getByteOrder() const;
-      Camera *getCamera();
-      QString getFileName() const;
-      Format getFormat() const;
-      Histogram *getHistogram(const int &band = 1,
-                               QString msg = "Gathering histogram");
-      Histogram *getHistogram(const int &band, const double &validMin,
-                               const double &validMax,
-                               QString msg = "Gathering histogram");
-      Pvl *getLabel() const;
-      int getLabelSize(bool actual = false) const;
-      int getLineCount() const;
-      double getMultiplier() const;
-      PixelType getPixelType() const;
-      int getPhysicalBand(const int &virtualBand) const;
-      Projection *getProjection();
-      int getSampleCount() const;
-      Statistics *getStatistics(const int &band = 1,
-                                 QString msg = "Gathering statistics");
-      Statistics *getStatistics(const int &band, const double &validMin,
-                                 const double &validMax,
-                                 QString msg = "Gathering statistics");
-      bool getStoresDnData() const;
+      int bandCount() const;
+      double base() const;
+      ByteOrder byteOrder() const;
+      Camera *camera();
+      QString fileName() const;
+      Format format() const;
+      Histogram *histogram(const int &band = 1,
+                           QString msg = "Gathering histogram");
+      Histogram *histogram(const int &band, const double &validMin,
+                           const double &validMax,
+                           QString msg = "Gathering histogram");
+      Pvl *label() const;
+      int labelSize(bool actual = false) const;
+      int lineCount() const;
+      double multiplier() const;
+      PixelType pixelType() const;
+      int physicalBand(const int &virtualBand) const;
+      Projection *projection();
+      int sampleCount() const;
+      Statistics *statistics(const int &band = 1,
+                             QString msg = "Gathering statistics");
+      Statistics *statistics(const int &band, const double &validMin,
+                             const double &validMax,
+                             QString msg = "Gathering statistics");
+      bool storesDnData() const;
 
       void addCachingAlgorithm(CubeCachingAlgorithm *);
       void clearIoCache();
       bool deleteBlob(QString BlobType, QString BlobName);
       void deleteGroup(const QString &group);
-      PvlGroup &getGroup(const QString &group) const;
+      PvlGroup &group(const QString &group) const;
       bool hasGroup(const QString &group) const;
       bool hasTable(const QString &name);
       void putGroup(const PvlGroup &group);
@@ -277,8 +268,8 @@ namespace Isis {
     private:
       void applyVirtualBandsToLabel();
       void cleanUp(bool remove);
-      QFile *getDataFile() const;
-      FileName getRealDataFileName() const;
+      QFile *dataFile() const;
+      FileName realDataFileName() const;
       void initialize();
       void initCoreFromLabel(const Pvl &label);
       void initLabelFromFile(FileName labelFileName, bool readWrite);
@@ -291,7 +282,7 @@ namespace Isis {
       /**
        * This is the file that contains the labels always; if labels are
        *   attached then this contains the file data also. The method
-       *   getDataFile() will always give you the appropriate QFile member for
+       *   dataFile() will always give you the appropriate QFile member for
        *   reading cube data; this should always be used for the labels.
        *
        * If isOpen() is true, then this is allocated.
@@ -334,10 +325,10 @@ namespace Isis {
       //! Basic thread-safety mutex; this class is not optimized for threads.
       QMutex *m_mutex;
 
-      //! Camera allocated from the getCamera() method.
+      //! Camera allocated from the camera() method.
       Camera *m_camera;
 
-      //! Projection allocated from the getProjection() method.
+      //! Projection allocated from the projection() method.
       Projection *m_projection;
 
       //! The full filename of the label file (.lbl or .cub)

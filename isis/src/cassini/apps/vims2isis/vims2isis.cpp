@@ -431,7 +431,7 @@ void ProcessBands(Pvl &pdsLab, Cube *vimsCube, VimsType vtype) {
   //input band specific information
   if(vtype == VIS) {
     vims.mi32OrigBandStart   = 1;
-    vims.mi32OrigBinEnd      = vimsCube->getBandCount();
+    vims.mi32OrigBinEnd      = vimsCube->bandCount();
     vims.mi32BandCenterStart = 0;
     vims.mi32BandCenterEnd   = 96;
     vims.mi32NaifFrameCode   = -82370;

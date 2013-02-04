@@ -23,7 +23,7 @@ string valueToString(const double &value);
 void IsisMain() {
   Process p;
   Cube *icube = p.SetInputCube("FROM");
-  Camera *cam = icube->getCamera();
+  Camera *cam = icube->camera();
 
   UserInterface &ui = Application::GetUserInterface();
 

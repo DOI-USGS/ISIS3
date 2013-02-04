@@ -23,12 +23,12 @@ void IsisMain() {
 
   // Setup the input and output cubes
   Cube* info = p.SetInputCube("FROM");
-  PvlKeyword &status = info ->getGroup("RESEAUS")["STATUS"];
+  PvlKeyword &status = info ->group("RESEAUS")["STATUS"];
   UserInterface &ui = Application::GetUserInterface();
   QString in = ui.GetFileName("FROM");
 
-  QString spacecraft = (info->getGroup("Instrument")["SpacecraftName"]);
-  QString instrument = (info->getGroup("Instrument")["InstrumentId"]);
+  QString spacecraft = (info->group("Instrument")["SpacecraftName"]);
+  QString instrument = (info->group("Instrument")["InstrumentId"]);
   Apollo apollo(spacecraft, instrument);
   if (spacecraft.mid(0,6) != "APOLLO") {
     QString msg = "This application is for use with Apollo spacecrafts only. ";
@@ -66,7 +66,7 @@ void IsisMain() {
   Cube cube;
   cube.open(out, "rw");
 
-  PvlGroup &res = cube.getLabel()->FindGroup("RESEAUS",Pvl::Traverse);
+  PvlGroup &res = cube.label()->FindGroup("RESEAUS",Pvl::Traverse);
 
   // Get reseau line, sample, type, and valid Keywords
   PvlKeyword lines = res.FindKeyword("LINE");
@@ -75,7 +75,7 @@ void IsisMain() {
   PvlKeyword valid = res.FindKeyword("VALID");
   int numres = lines.Size();
 
-  Brick brick(dim,dim,1,cube.getPixelType());
+  Brick brick(dim,dim,1,cube.pixelType());
   int width = ui.GetInteger("WIDTH");
   for (int res=0; res<numres; res++) {
     if ((resvalid == 0 || toInt(valid[res]) == 1)) {

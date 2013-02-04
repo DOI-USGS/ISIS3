@@ -156,15 +156,15 @@ void IsisMain() {
     PvlGroup &group =  outLabel.FindGroup("Instrument", Pvl::Traverse);
     group.AddKeyword(PvlKeyword("Unlutted", toString((int)true)));
     group.AddKeyword(PvlKeyword("LutInversionTable", lutfile));
-    outCube->getLabel()->FindObject("IsisCube").AddGroup(group);
+    outCube->label()->FindObject("IsisCube").AddGroup(group);
 
     group = outLabel.FindGroup("Archive", Pvl::Traverse);
     sourceId.AddValue('"' + lutid + '"');
     group.AddKeyword(sourceId);
-    outCube->getLabel()->FindObject("IsisCube").AddGroup(group);
+    outCube->label()->FindObject("IsisCube").AddGroup(group);
 
-    outCube->getLabel()->FindObject("IsisCube").AddGroup(outLabel.FindGroup("BandBin", Pvl::Traverse));
-    outCube->getLabel()->FindObject("IsisCube").AddGroup(outLabel.FindGroup("Kernels", Pvl::Traverse));
+    outCube->label()->FindObject("IsisCube").AddGroup(outLabel.FindGroup("BandBin", Pvl::Traverse));
+    outCube->label()->FindObject("IsisCube").AddGroup(outLabel.FindGroup("Kernels", Pvl::Traverse));
 
     p.StartProcess(UnlutData);
 

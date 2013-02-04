@@ -56,14 +56,7 @@ namespace Isis {
   bool EllipsoidShape::intersectSurface (std::vector<double> observerPos,
                                          std::vector<double> lookDirection) {
     
-      if (intersectEllipsoid(observerPos, lookDirection)) {
-        setHasIntersection(true);
-      return true;
-    }
-    else {
-      setHasIntersection(false);
-      return false;
-    }
+    return (intersectEllipsoid(observerPos, lookDirection));
   }
 
 

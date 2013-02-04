@@ -262,8 +262,8 @@ void IsisMain() {
      * If we haven't determined how many samples the output
      *   should have, we can do so now
      */
-    if(numOutputSamples == 0 && tmp.getBandCount() == 1) {
-      numOutputSamples = tmp.getSampleCount();
+    if(numOutputSamples == 0 && tmp.bandCount() == 1) {
+      numOutputSamples = tmp.sampleCount();
     }
 
     /**
@@ -274,14 +274,14 @@ void IsisMain() {
     bool imageValid = true;
 
     // Only single band images are acceptable
-    imageValid &= (tmp.getBandCount() == 1);
+    imageValid &= (tmp.bandCount() == 1);
 
     // Sample sizes must always match
-    imageValid &= (numOutputSamples == tmp.getSampleCount());
+    imageValid &= (numOutputSamples == tmp.sampleCount());
 
     // For push frame cameras, there must be valid all framelets
     if(cameraType == PushFrame) {
-      imageValid &= (tmp.getLineCount() % numFrameLines == 0);
+      imageValid &= (tmp.lineCount() % numFrameLines == 0);
     }
 
     // For framing cameras, we need to figure out the size...
@@ -290,12 +290,12 @@ void IsisMain() {
     bool setTempFileLength = false;
     if(cameraType == Framing) {
       if(tempFileLength == 0 && imageValid) {
-        tempFileLength = tmp.getLineCount();
+        tempFileLength = tmp.lineCount();
         numFrameLines = tempFileLength;
         setTempFileLength = true;
       }
 
-      imageValid &= (tempFileLength == tmp.getLineCount());
+      imageValid &= (tempFileLength == tmp.lineCount());
     }
 
     // Statistics are necessary at this point for push frame and framing cameras
@@ -307,7 +307,7 @@ void IsisMain() {
       prog += toString((int)inList.size()) + " (" + inList[currImage].name() + ")";
 
       if(cameraType == Framing) {
-        Statistics *stats = tmp.getStatistics(1, prog);
+        Statistics *stats = tmp.statistics(1, prog);
         imageValid &= !IsSpecial(stats->StandardDeviation());
         imageValid &= !IsSpecial(stats->Average());
         imageValid &= stats->StandardDeviation() <= maxStdev;
@@ -330,10 +330,10 @@ void IsisMain() {
     // The line scan camera needs to actually count the number of lines in each image to know
     //   how many total frames there are before beginning pass 2.
     if(imageValid && (cameraType == LineScan)) {
-      int lines = (tmp.getLineCount() / numFrameLines);
+      int lines = (tmp.lineCount() / numFrameLines);
 
       // partial frame?
-      if(tmp.getLineCount() % numFrameLines != 0) {
+      if(tmp.lineCount() % numFrameLines != 0) {
         lines ++;
       }
 
@@ -570,7 +570,7 @@ bool CheckFramelets(QString progress, Cube &theCube) {
   LineManager mgr(theCube);
   Progress prog;
   prog.SetText(progress);
-  prog.SetMaximumSteps(theCube.getLineCount());
+  prog.SetMaximumSteps(theCube.lineCount());
   prog.CheckStatus();
 
   vector<double> frameletAvgs;
@@ -580,7 +580,7 @@ bool CheckFramelets(QString progress, Cube &theCube) {
   vector< pair<int, double> > excludedFrameletsTmp;
   Statistics frameletStats;
 
-  for(int line = 1; line <= theCube.getLineCount(); line++) {
+  for(int line = 1; line <= theCube.lineCount(); line++) {
     if((line - 1) % numFrameLines == 0) {
       frameletStats.Reset();
     }
@@ -777,7 +777,7 @@ void CreateTemporaryData(Buffer &in) {
         (*oLineMgr)[i] = Isis::Null;
       }
 
-      if(ocube->getLineCount() == oLineMgr->Line())
+      if(ocube->lineCount() == oLineMgr->Line())
         cubeInitialized = true;
     }
 
@@ -843,7 +843,7 @@ void ProcessTemporaryData(Buffer &in) {
 
     ocube->write(*oLineMgr);
 
-    if(ocube->getLineCount() == oLineMgr->Line())
+    if(ocube->lineCount() == oLineMgr->Line())
       cubeInitialized = true;
   }
 }

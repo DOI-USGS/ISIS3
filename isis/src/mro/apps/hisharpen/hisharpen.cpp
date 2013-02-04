@@ -134,7 +134,7 @@ void CreatePsf(Pipeline &p) {
 
   // Verify the image looks like a hirise image
   try {
-    const PvlGroup &instGrp = fromCube.getLabel()->FindGroup("Instrument", Pvl::Traverse);
+    const PvlGroup &instGrp = fromCube.label()->FindGroup("Instrument", Pvl::Traverse);
     QString instrument = (QString)instGrp["InstrumentId"];
 
     if(instrument != "HIRISE") {
@@ -149,16 +149,16 @@ void CreatePsf(Pipeline &p) {
     throw IException(IException::User, message, _FILEINFO_);
   }
 
-  if(fromCube.getLineCount() != fromCube.getSampleCount()) {
+  if(fromCube.lineCount() != fromCube.sampleCount()) {
     QString message = "This program only works on square cubes, the number of samples [" +
-                      QString(fromCube.getSampleCount()) + "] must match the number of lines [" +
-                      QString(fromCube.getLineCount()) + "]";
+                      QString(fromCube.sampleCount()) + "] must match the number of lines [" +
+                      QString(fromCube.lineCount()) + "]";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
   // Let's figure out which point spread function we're supposed to be using
   QString psfFile = "$mro/calibration/psf/PSF_";
-  QString filter = (QString)fromCube.getLabel()->FindGroup("Instrument", Pvl::Traverse)["CcdId"];
+  QString filter = (QString)fromCube.label()->FindGroup("Instrument", Pvl::Traverse)["CcdId"];
 
   if(filter.contains("RED")) {
     psfFile += "RED";
@@ -179,15 +179,15 @@ void CreatePsf(Pipeline &p) {
   Cube psfCube;
   psfCube.open(psfFile);
 
-  if(psfCube.getLineCount() > fromCube.getLineCount()) {
-    QString message = "The input cube dimensions must be at least [" + QString(psfCube.getLineCount());
+  if(psfCube.lineCount() > fromCube.lineCount()) {
+    QString message = "The input cube dimensions must be at least [" + QString(psfCube.lineCount());
     message += "] pixels in the line and sample dimensions";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
-  if(!IsPowerOf2(fromCube.getLineCount())) {
+  if(!IsPowerOf2(fromCube.lineCount())) {
     QString message = "The input cube dimensions must be a power of 2 (found [" +
-                      QString(fromCube.getLineCount()) + "])";
+                      QString(fromCube.lineCount()) + "])";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
@@ -196,7 +196,7 @@ void CreatePsf(Pipeline &p) {
 
   // We also need the output temp psf cube
   Cube outPsfCube;
-  outPsfCube.setDimensions(fromCube.getSampleCount(), fromCube.getLineCount(), 1);
+  outPsfCube.setDimensions(fromCube.sampleCount(), fromCube.lineCount(), 1);
   outPsfCube.create(tmpFile);
 
   LineManager outMgr(outPsfCube);
@@ -204,19 +204,19 @@ void CreatePsf(Pipeline &p) {
 
   Progress progress;
   progress.SetText("Creating PSF File");
-  progress.SetMaximumSteps(fromCube.getLineCount());
+  progress.SetMaximumSteps(fromCube.lineCount());
   progress.CheckStatus();
 
-  const int halfInSamples = psfCube.getSampleCount() / 2;
-  for(int line = 0; line < outPsfCube.getLineCount(); line++) {
+  const int halfInSamples = psfCube.sampleCount() / 2;
+  for(int line = 0; line < outPsfCube.lineCount(); line++) {
     psfCube.read(psfMgr);
 
-    for(int sample = 0; sample < outPsfCube.getSampleCount(); sample++) {
+    for(int sample = 0; sample < outPsfCube.sampleCount(); sample++) {
       if(sample < halfInSamples) {
         outMgr[sample] = psfMgr[sample];
       }
-      else if(sample >= outPsfCube.getSampleCount() - halfInSamples) {
-        outMgr[sample] = psfMgr[psfCube.getSampleCount() - (outPsfCube.getSampleCount() - sample)];
+      else if(sample >= outPsfCube.sampleCount() - halfInSamples) {
+        outMgr[sample] = psfMgr[psfCube.sampleCount() - (outPsfCube.sampleCount() - sample)];
       }
       else {
         outMgr[sample] = 0.0;
@@ -225,10 +225,10 @@ void CreatePsf(Pipeline &p) {
 
     outPsfCube.write(outMgr);
 
-    if(line < psfCube.getLineCount() / 2) {
+    if(line < psfCube.lineCount() / 2) {
       psfMgr ++;
     }
-    else if(line >= outPsfCube.getLineCount() - psfCube.getLineCount() / 2) {
+    else if(line >= outPsfCube.lineCount() - psfCube.lineCount() / 2) {
       psfMgr ++;
     }
 

@@ -173,7 +173,7 @@ namespace Isis {
       throw IException(e,
                        IException::Programmer,
                        tr("Error when attempting to show cube [%1]")
-                         .arg(cube->getFileName()),
+                         .arg(cube->fileName()),
                        _FILEINFO_);
     }
 

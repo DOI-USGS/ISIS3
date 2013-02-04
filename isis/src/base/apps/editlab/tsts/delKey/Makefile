@@ -1,7 +1,6 @@
 # This test adds a new group, adds key1 and key2 to the group, and deletes key1
 APPNAME = editlab
 editlabTruth2.txt.IGNORELINES = ByteOrder TileSamples TileLines StartByte
-history.pvl.IGNORELINES = ExecutionDateTime HostName IsisVersion ProgramVersion ProgramPath UserName
 
 include $(ISISROOT)/make/isismake.tsts
 

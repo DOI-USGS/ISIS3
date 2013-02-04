@@ -91,6 +91,9 @@ namespace Isis {
       else if (i == (int)MosaicTreeWidgetItem::IncidenceAngleColumn) {
         QCOMPARE(imageTreeItem->text(i), QString("36.9066"));
       }
+      else if (i == (int)MosaicTreeWidgetItem::PhaseAngleColumn) {
+        QCOMPARE(imageTreeItem->text(i), QString("80.1092"));
+      }
       else {
         QCOMPARE(imageTreeItem->text(i), QString());
       }

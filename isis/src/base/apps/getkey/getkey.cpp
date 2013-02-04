@@ -94,7 +94,7 @@ void IsisMain() {
       ostringstream os;
       os << key;
       QString temp = os.str().c_str();
-      value = temp.mid(temp.indexOf("("), temp.indexOf(")" - temp.indexOf("("))).simplified();
+      value = temp.mid(temp.indexOf("(") + 1, temp.indexOf(")") - temp.indexOf("(") - 1).simplified();
     }
     // Just get the keyword value since it isnt a list
     else value = (QString)key;

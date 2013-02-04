@@ -42,9 +42,9 @@ void IsisMain() {
   cropHis = ui.GetBoolean("HIS");
   cropLis = ui.GetBoolean("LIS");
 
-  minSample = cube.getSampleCount() + 1;
-  minLine = cube.getLineCount() + 1;
-  numBands = cube.getBandCount();
+  minSample = cube.sampleCount() + 1;
+  minLine = cube.lineCount() + 1;
+  numBands = cube.bandCount();
 
   // Setup the input cube
   ProcessByLine p1;
@@ -55,7 +55,7 @@ void IsisMain() {
   p1.StartProcess(FindPerimeter);
   p1.EndProcess();
 
-  if(minSample == cube.getSampleCount() + 1) {
+  if(minSample == cube.sampleCount() + 1) {
     cube.close();
     QString msg = "There are no valid pixels in the [FROM] cube";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -73,7 +73,7 @@ void IsisMain() {
   p2.ClearInputCubes();
 
   // propagate tables manually
-  Pvl &inLabels = *cube.getLabel();
+  Pvl &inLabels = *cube.label();
 
   // Loop through the labels looking for object = Table
   for(int labelObj = 0; labelObj < inLabels.Objects(); labelObj++) {
@@ -89,8 +89,8 @@ void IsisMain() {
 
   // Construct a label with the results
   PvlGroup results("Results");
-  results += PvlKeyword("InputLines", toString(cube.getLineCount()));
-  results += PvlKeyword("InputSamples", toString(cube.getSampleCount()));
+  results += PvlKeyword("InputLines", toString(cube.lineCount()));
+  results += PvlKeyword("InputSamples", toString(cube.sampleCount()));
   results += PvlKeyword("StartingLine", toString(minLine));
   results += PvlKeyword("StartingSample", toString(minSample));
   results += PvlKeyword("EndingLine", toString(maxLine));
@@ -107,7 +107,7 @@ void IsisMain() {
   // Update the Mapping, Instrument, and AlphaCube groups in the output
   // cube label
   SubArea s;
-  s.SetSubArea(cube.getLineCount(), cube.getSampleCount(), minLine, minSample, minLine + numLines - 1,
+  s.SetSubArea(cube.lineCount(), cube.sampleCount(), minLine, minSample, minLine + numLines - 1,
                minSample + numSamples - 1, 1.0, 1.0);
   s.UpdateLabel(&cube, ocube, results);
 

@@ -26,7 +26,7 @@ void IsisMain() {
 
   // Open the input cube
   Cube *icube = p.SetInputCube("FROM");
-  cam = icube->getCamera();
+  cam = icube->camera();
   p.SetOutputCube("TO");
 
   IString format = ui.GetString("FORMAT");

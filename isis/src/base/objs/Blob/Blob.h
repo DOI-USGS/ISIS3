@@ -54,6 +54,10 @@ namespace Isis {
    *                           documentation. Improved test coverage in all
    *                           categories. Added padding to control statements.
    *                           References #1169.
+   *   @history 2013-01-11 Steven Lambright and Tracie Sucharski - Fixed support of writing blobs
+   *                           in very large cubes.  This was caused by calling the wrong number
+   *                           to string conversion function.  Introduced when refactoring the
+   *                           IString class.  Fixes #1388.
    *
    * @todo Write class description, history, etc.
    */

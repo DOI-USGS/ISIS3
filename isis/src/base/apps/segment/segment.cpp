@@ -28,14 +28,14 @@ void IsisMain() {
   int cropNum = 1;
   int startLine = 1;
   bool hasReachedEndOfCube = false;
-  while(startLine <= cube.getLineCount()  &&  not hasReachedEndOfCube) {
+  while(startLine <= cube.lineCount()  &&  not hasReachedEndOfCube) {
     //! Sets up the proper paramaters for running the crop program
     QString parameters = "FROM=" + inFile.expanded() +
                          " TO=" + inFile.path() + "/" + inFile.baseName() + ".segment" + toString(cropNum) + ".cub"
                          + " LINE=" + toString(startLine) + " NLINES=";
 
-    if(startLine + numberOfLines > cube.getLineCount()) {
-      parameters += toString(cube.getLineCount() - (startLine - 1));
+    if(startLine + numberOfLines > cube.lineCount()) {
+      parameters += toString(cube.lineCount() - (startLine - 1));
       hasReachedEndOfCube = true;
     }
     else {

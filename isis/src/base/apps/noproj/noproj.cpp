@@ -58,11 +58,11 @@ void IsisMain() {
     mcube = icube = p.SetInputCube("FROM");
   }
 
-  Camera *incam = mcube->getCamera();
+  Camera *incam = mcube->camera();
 
   // Extract Instrument groups from input labels for the output match and noproj'd cubes
-  PvlGroup inst = mcube->getGroup("Instrument");
-  PvlGroup fromInst = icube->getGroup("Instrument");
+  PvlGroup inst = mcube->group("Instrument");
+  PvlGroup fromInst = icube->group("Instrument");
   QString groupName = (QString) inst["SpacecraftName"] + "/";
   groupName += (QString) inst.FindKeyword("InstrumentId");
 
@@ -85,10 +85,10 @@ void IsisMain() {
   if(idealGp.HasKeyword("TransY")) transy = idealGp["TransY"];
   if(idealGp.HasKeyword("ItransL")) transl = idealGp["ItransL"];
   if(idealGp.HasKeyword("ItransS")) transs = idealGp["ItransS"];
-  int detectorSamples = mcube->getSampleCount();
+  int detectorSamples = mcube->sampleCount();
   if(idealGp.HasKeyword("DetectorSamples")) detectorSamples = idealGp["DetectorSamples"];
-  int numberLines = mcube->getLineCount();
-  int numberBands = mcube->getBandCount();
+  int numberLines = mcube->lineCount();
+  int numberBands = mcube->bandCount();
 
   if(idealGp.HasKeyword("DetectorLines")) numberLines = idealGp["DetectorLines"];
 
@@ -149,7 +149,7 @@ void IsisMain() {
   }
 
   // Get the start time for parent line 1
-  AlphaCube alpha(*(icube->getLabel()));
+  AlphaCube alpha(*(icube->label()));
   double sample = alpha.BetaSample(.5);
   double line = alpha.BetaLine(.5);
   incam->SetImage(sample, line);
@@ -211,7 +211,7 @@ void IsisMain() {
   key.SetValue(instType);
   inst.AddKeyword(key);
 
-  Pvl &ocubeLabel = *ocube->getLabel();
+  Pvl &ocubeLabel = *ocube->label();
   PvlObject *naifKeywordsObject = NULL;
 
   if (ocubeLabel.HasObject("NaifKeywords")) {
@@ -228,7 +228,7 @@ void IsisMain() {
 
     // Clean up the kernels group... delete everything that isn't internalized or the orig frame
     //   code
-    PvlGroup &kernelsGroup = ocube->getGroup("Kernels");
+    PvlGroup &kernelsGroup = ocube->group("Kernels");
     for (int keyIndex = kernelsGroup.Keywords() - 1; keyIndex >= 0; keyIndex--) {
       PvlKeyword &kernelsKeyword = kernelsGroup[keyIndex];
 
@@ -317,7 +317,7 @@ void IsisMain() {
   }
 
   key.SetName("MatchedCube");
-  key.SetValue(mcube->getFileName());
+  key.SetValue(mcube->fileName());
   inst.AddKeyword(key);
 
   ocube->putGroup(inst);
@@ -359,7 +359,7 @@ void IsisMain() {
   Cube toCube;
   toCube.open(ui.GetFileName("TO"), "rw");
 // Extract label and create cube object
-  Pvl *toLabel = toCube.getLabel();
+  Pvl *toLabel = toCube.label();
   PvlObject &o = toLabel->FindObject("IsisCube");
   o.DeleteGroup("OriginalInstrument");
   o.AddGroup(fromInst);
@@ -382,7 +382,7 @@ void LoadMatchSummingMode() {
 // Open the input cube and get the camera object
   Cube c;
   c.open(file);
-  Camera *cam = c.getCamera();
+  Camera *cam = c.camera();
 
   ui.Clear("SUMMINGMODE");
   ui.PutDouble("SUMMINGMODE", cam->DetectorMap()->SampleScaleFactor());
@@ -425,7 +425,7 @@ void LoadInputSummingMode() {
   // Open the input cube and get the camera object
   Cube c;
   c.open(file);
-  Camera *cam = c.getCamera();
+  Camera *cam = c.camera();
 
   ui.Clear("SUMMINGMODE");
   ui.PutDouble("SUMMINGMODE", cam->DetectorMap()->SampleScaleFactor());

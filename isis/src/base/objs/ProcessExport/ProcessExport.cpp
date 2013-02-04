@@ -380,7 +380,7 @@ namespace Isis {
 
       // Or get the automatic parameters
       else if(strType != "NONE") {
-        Isis::Histogram *hist = InputCubes[i]->getHistogram(0);
+        Isis::Histogram *hist = InputCubes[i]->histogram(0);
         p_inputMinimum.push_back(hist->Percent(
                                    Application::GetUserInterface().GetDouble("MINPERCENT")));
         p_inputMaximum.push_back(hist->Percent(
@@ -688,10 +688,10 @@ namespace Isis {
 
     // Construct a line buffer manager
     if(p_format == BIP) {
-      p_progress->SetMaximumSteps((InputCubes[0]->getSampleCount()) * (InputCubes[0]->getLineCount()));
+      p_progress->SetMaximumSteps((InputCubes[0]->sampleCount()) * (InputCubes[0]->lineCount()));
     }
     else {
-      p_progress->SetMaximumSteps((InputCubes[0]->getLineCount()) * (InputCubes[0]->getBandCount()));
+      p_progress->SetMaximumSteps((InputCubes[0]->lineCount()) * (InputCubes[0]->bandCount()));
     }
 
 
@@ -792,7 +792,7 @@ namespace Isis {
   */
   void ProcessExport::StartProcess(void funct(vector<Buffer *> &in)) {
     int length = (p_format == BIP) ?
-      InputCubes[0]->getBandCount() : InputCubes[0]->getLineCount();
+      InputCubes[0]->bandCount() : InputCubes[0]->lineCount();
 
     // Loop and let the app programmer fiddle with the lines
     vector<BufferManager *> imgrs = GetBuffers();
@@ -804,7 +804,7 @@ namespace Isis {
         InputCubes[j]->read(*imgrs[j]);
 
         // Stretch the pixels into the desired range
-        for (int i = 0; i < InputCubes[0]->getSampleCount(); i++)
+        for (int i = 0; i < InputCubes[0]->sampleCount(); i++)
           (*imgrs[j])[i] = p_str[j]->Map((*imgrs[j])[i]);
 
         ibufs.push_back(imgrs[j]);
@@ -855,13 +855,13 @@ namespace Isis {
   *
   */
   vector<BufferManager *> ProcessExport::GetBuffersBSQ() {
-    int samples = InputCubes[0]->getSampleCount();
-    int lines = InputCubes[0]->getLineCount();
+    int samples = InputCubes[0]->sampleCount();
+    int lines = InputCubes[0]->lineCount();
 
     vector<BufferManager *> imgrs;
     for (unsigned int i = 0; i < InputCubes.size(); i++) {
-      if((InputCubes[i]->getSampleCount() == samples) &&
-          (InputCubes[i]->getLineCount() == lines)) {
+      if((InputCubes[i]->sampleCount() == samples) &&
+          (InputCubes[i]->lineCount() == lines)) {
 
         Isis::LineManager *iline = new Isis::LineManager(*InputCubes[i]);
         iline->begin();
@@ -894,13 +894,13 @@ namespace Isis {
    *
    */
   vector<BufferManager *> ProcessExport::GetBuffersBIL() {
-    int samples = InputCubes[0]->getSampleCount();
-    int lines = InputCubes[0]->getLineCount();
+    int samples = InputCubes[0]->sampleCount();
+    int lines = InputCubes[0]->lineCount();
 
     vector<BufferManager *> imgrs;
     for (unsigned int i = 0; i < InputCubes.size(); i++) {
-      if ((InputCubes[i]->getSampleCount() == samples) &&
-          (InputCubes[i]->getLineCount() == lines)) {
+      if ((InputCubes[i]->sampleCount() == samples) &&
+          (InputCubes[i]->lineCount() == lines)) {
 
         Isis::LineManager *iline = new Isis::LineManager(*InputCubes[i], true);
         iline->begin();
@@ -932,12 +932,12 @@ namespace Isis {
    *
    */
   vector<BufferManager *> ProcessExport::GetBuffersBIP() {
-    int bands = InputCubes[0]->getBandCount();
-    int samples = InputCubes[0]->getSampleCount();
+    int bands = InputCubes[0]->bandCount();
+    int samples = InputCubes[0]->sampleCount();
 
     vector<BufferManager *> imgrs;
     for(unsigned int i = 0; i < InputCubes.size(); i++) {
-      if((InputCubes[i]->getBandCount() == bands) && (InputCubes[i]->getSampleCount() == samples)) {
+      if((InputCubes[i]->bandCount() == bands) && (InputCubes[i]->sampleCount() == samples)) {
         Isis::BandManager *iband = new Isis::BandManager(*InputCubes[i]);
         iband->begin();
         imgrs.push_back(iband);
@@ -1181,7 +1181,7 @@ namespace Isis {
   */
   void ProcessExport::CreateWorldFile(const QString &worldFile) {
     try {
-      Projection *proj = InputCubes[0]->getProjection();
+      Projection *proj = InputCubes[0]->projection();
       proj->SetWorld(1.0, 1.0);
       ofstream os;
       os.open(worldFile.toAscii().data(), ios::out);

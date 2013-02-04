@@ -59,3 +59,33 @@ Latitude OK
 Longitude OK
 
 --------------------------------------------
+FileName: G02_019106_1390_XN_41S257W.cub
+CK Frame: -74021
+
+Kernel IDs: 
+CK Frame ID = -74000
+CK Reference ID = -74900
+SPK Target ID = -74
+SPK Reference ID = 1
+
+For upper left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For center pixel position ...
+Latitude OK
+Longitude OK
+
+--------------------------------------------

@@ -633,8 +633,8 @@ namespace Isis {
     else if (m_radiusBox->currentText() == "DEM Radius") {
       //  If cubes set, make sure they have an elevation model
       if (m_leftCube) {
-        m_leftCube->getCamera()->IgnoreElevationModel(false);
-        if (m_leftCube->getCamera()->target()->shape()->name() == "Ellipsoid") {
+        m_leftCube->camera()->IgnoreElevationModel(false);
+        if (m_leftCube->camera()->target()->shape()->name() == "Ellipsoid") {
         QString message = "No valid Dem on cube.  Run <i>spicinit</i> using a "
            "dem shape model.  The local radius will default back to the ellipsoid.";
         QMessageBox::warning(m_stereoTool, "Warning", message);
@@ -704,7 +704,7 @@ namespace Isis {
     //  as the current control net.
     if (m_controlNet) {
       if (m_controlNet->GetTarget() !=
-          m_linkedViewports.at(0)->cube()->getCamera()->target()->name()) {
+          m_linkedViewports.at(0)->cube()->camera()->target()->name()) {
         //  Allow opportunity to save current data before clearing for new
         //  target.
         QString message = "You have changed targets.  All data must be re-set";
@@ -721,14 +721,14 @@ namespace Isis {
         clearNetData();
         m_controlNet = new ControlNet();
         m_controlNet->SetTarget(
-                                m_linkedViewports.at(0)->cube()->getCamera()->target()->name());
+                                m_linkedViewports.at(0)->cube()->camera()->target()->name());
         m_serialNumberList = new SerialNumberList(false);
       }
     }
     else {
       m_controlNet = new ControlNet();
       m_controlNet->SetTarget(
-                              m_linkedViewports.at(0)->cube()->getCamera()->target()->name());
+                              m_linkedViewports.at(0)->cube()->camera()->target()->name());
       m_serialNumberList = new SerialNumberList(false);
     }
 
@@ -780,8 +780,8 @@ namespace Isis {
     m_leftCube = leftCube;
     m_rightCube = rightCube;
 
-    QString leftName = FileName(m_leftCube->getFileName()).name();
-    QString rightName = FileName(m_rightCube->getFileName()).name();
+    QString leftName = FileName(m_leftCube->fileName()).name();
+    QString rightName = FileName(m_rightCube->fileName()).name();
     //  Update cube name labels
     m_leftCubeLabel->setText(leftName);
     m_rightCubeLabel->setText(rightName);
@@ -791,10 +791,10 @@ namespace Isis {
 
     //  TODO   Do I need list?
     if (!m_serialNumberList->HasSerialNumber(m_leftSN)) {
-      m_serialNumberList->Add(m_leftCube->getFileName());
+      m_serialNumberList->Add(m_leftCube->fileName());
     }
     if (!m_serialNumberList->HasSerialNumber(m_rightSN)) {
-      m_serialNumberList->Add(m_rightCube->getFileName());
+      m_serialNumberList->Add(m_rightCube->fileName());
     }
 
     vector<Distance> targetRadius = m_controlNet->GetTargetRadii();
@@ -815,7 +815,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString message = "Cannot initialize universal ground map for " +
-                        m_leftCube->getFileName() + ".\n";
+                        m_leftCube->fileName() + ".\n";
       message += e.toString();
       QMessageBox::critical(m_stereoTool, "Error", message);
       return;
@@ -825,7 +825,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString message = "Cannot initialize universal ground map for" +
-                        m_rightCube->getFileName() + ".\n";
+                        m_rightCube->fileName() + ".\n";
       message += e.toString();
       QMessageBox::critical(m_stereoTool, "Error", message);
       return;
@@ -903,7 +903,7 @@ namespace Isis {
     if (cvp  == NULL)
       return;
     
-    QString file = cvp->cube()->getFileName();
+    QString file = cvp->cube()->fileName();
     QString sn;
     try {
       sn = m_serialNumberList->SerialNumber(file);
@@ -1163,33 +1163,33 @@ namespace Isis {
         //  Make sure point on Right cube
         rightSamp = m_rightGM->Sample();
         rightLine = m_rightGM->Line();
-        if (rightSamp < 1 || rightSamp > m_rightCube->getSampleCount() ||
-            rightLine < 1 || rightLine > m_rightCube->getLineCount()) {
+        if (rightSamp < 1 || rightSamp > m_rightCube->sampleCount() ||
+            rightLine < 1 || rightLine > m_rightCube->lineCount()) {
           IString message = "Point does not exist on cube, " +
-                            m_rightCube->getFileName() + ".";
+                            m_rightCube->fileName() + ".";
           throw IException(IException::User, message, _FILEINFO_);
 //        QString message = "Point does not exist on cube, " +
-//                          QString(m_rightCube->getFileName().c_str()) + ".";
+//                          QString(m_rightCube->fileName().c_str()) + ".";
 //        QMessageBox::critical(m_stereoTool, "Error", message);
 //        return;
         }
       }
       else {
         IString message = "Point does not exist on cube, " +
-                          m_rightCube->getFileName() + ".";
+                          m_rightCube->fileName() + ".";
         throw IException(IException::User, message, _FILEINFO_);
 //      QString message = "Point does not exist on cube, " +
-//                        QString(m_rightCube->getFileName().c_str()) + ".";
+//                        QString(m_rightCube->fileName().c_str()) + ".";
 //      QMessageBox::critical(m_stereoTool, "Error", message);
 //      return;
       }
     }
     else {
       IString message = "Point does not exist on cube, " +
-                        m_leftCube->getFileName() + ".";
+                        m_leftCube->fileName() + ".";
       throw IException(IException::User, message, _FILEINFO_);
 //    QString message = "Point does not exist on cube, " +
-//                      QString(m_leftCube->getFileName().c_str()) + ".";
+//                      QString(m_leftCube->fileName().c_str()) + ".";
 //    QMessageBox::critical(m_stereoTool, "Error", message);
 //    return;
     }
@@ -1463,7 +1463,7 @@ namespace Isis {
   void StereoTool::calculateElevation(ControlPoint *point) {
 
     double elevation=0., elevationError=0.;
-    Camera *leftCamera = m_leftCube->getCamera();
+    Camera *leftCamera = m_leftCube->camera();
 
     //  If the local radius combo box is set to DEM, get the dem radius
     //  First, SetImage using the Elevation model, before turning off
@@ -1484,7 +1484,7 @@ namespace Isis {
     leftCamera->IgnoreElevationModel(true);
     leftCamera->SetImage((*point)[Left]->GetSample(),
                          (*point)[Left]->GetLine());
-    Camera *rightCamera = m_rightCube->getCamera();
+    Camera *rightCamera = m_rightCube->camera();
     rightCamera->IgnoreElevationModel(true);
     rightCamera->SetImage((*point)[Right]->GetSample(),
                           (*point)[Right]->GetLine());
@@ -1614,8 +1614,8 @@ namespace Isis {
     header += "Image 1, Sample, Line, Image  2, Sample, Line";
     text << header << endl;
 
-    QString leftFile = FileName(m_leftCube->getFileName()).name();
-    QString rightFile = FileName(m_rightCube->getFileName()).name();
+    QString leftFile = FileName(m_leftCube->fileName()).name();
+    QString rightFile = FileName(m_rightCube->fileName()).name();
     QString data;
     for (int i = 0; i < m_controlNet->GetNumPoints(); i++) {
       ControlPoint &p = *((*m_controlNet)[i]);
@@ -1757,11 +1757,11 @@ namespace Isis {
           //  First, SetImage using the Elevation model, before turning off
           //  to get camera angles.
           if (m_radiusBox->currentText() == "DEM Radius") {
-            shortCube->getCamera()->IgnoreElevationModel(false);
-            shortCube->getCamera()->SetImage(shortSamp, shortLine);
-            m_baseRadius = shortCube->getCamera()->LocalRadius(
-                                  shortCube->getCamera()->GetLatitude(),
-                                  shortCube->getCamera()->GetLongitude());
+            shortCube->camera()->IgnoreElevationModel(false);
+            shortCube->camera()->SetImage(shortSamp, shortLine);
+            m_baseRadius = shortCube->camera()->LocalRadius(
+                                  shortCube->camera()->GetLatitude(),
+                                  shortCube->camera()->GetLongitude());
             if (!m_baseRadius.isValid()) {
               QString message = "Invalid Dem radius, defaulting to ellipsoidal.";
               QMessageBox::warning(m_stereoTool, "Invalid Dem radius", message);
@@ -1769,13 +1769,13 @@ namespace Isis {
             }
           }
 
-          shortCube->getCamera()->IgnoreElevationModel(true);
-          longCube->getCamera()->IgnoreElevationModel(true);
+          shortCube->camera()->IgnoreElevationModel(true);
+          longCube->camera()->IgnoreElevationModel(true);
 
-          shortCube->getCamera()->SetImage(shortSamp, shortLine);
-          longCube->getCamera()->SetImage(longSamp,longLine);
+          shortCube->camera()->SetImage(shortSamp, shortLine);
+          longCube->camera()->SetImage(longSamp,longLine);
           double radius, lat, lon, sepang;
-          if (Stereo::elevation(*shortCube->getCamera(), *longCube->getCamera(),
+          if (Stereo::elevation(*shortCube->camera(), *longCube->camera(),
                                 radius, lat, lon, sepang, elevationError))
           elevation = radius - m_baseRadius.meters();
           profileData.append(QPointF(i, elevation));
@@ -1861,7 +1861,7 @@ namespace Isis {
       baseRadiiLabel = "Local Radii:  " + QString::number(
                          m_baseRadius.meters(), 'f', 6);
 
-      Camera *leftCamera = m_leftCube->getCamera();
+      Camera *leftCamera = m_leftCube->camera();
       leftCamera->SetImage((*m_editPoint)[Left]->GetSample(),
                            (*m_editPoint)[Left]->GetLine());
       double leftDemRadii =
@@ -1869,7 +1869,7 @@ namespace Isis {
       leftDemRadiiLabel = "Left DEM Radii:  " +
                           QString::number(leftDemRadii, 'f', 6);
 
-      Camera *rightCamera = m_rightCube->getCamera();
+      Camera *rightCamera = m_rightCube->camera();
       rightCamera->SetImage((*m_editPoint)[Right]->GetSample(),
                             (*m_editPoint)[Right]->GetLine());
       double rightDemRadii =

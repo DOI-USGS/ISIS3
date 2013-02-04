@@ -115,6 +115,8 @@ namespace Isis {
    *                          So when you looked for a line/sample it would
    *                          infinite loop. Sync scale does not work for
    *                          image coordinates - is it supposed to?
+   *  @history 2013-01-10 Steven Lambright - Improved sync scale calculations
+   *                          to work in more cases. Fixes #953.
    */
   class FindTool : public Tool {
       Q_OBJECT

@@ -66,7 +66,7 @@ void IsisMain() {
 
   // If it is already calibrated then complain
   if(icube->hasGroup("Radiometry")) {
-    QString msg = "The MOC image [" + icube->getFileName() + "] has already "
+    QString msg = "The MOC image [" + icube->fileName() + "] has already "
                  "been radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -118,7 +118,7 @@ void IsisMain() {
   gbl::g = calCamera["G"];
   gbl::w0 = calCamera["W0"];
   QString coefFile = calCamera["CoefFile"];
-  gbl::LoadCoefficients(coefFile, icube->getSampleCount());
+  gbl::LoadCoefficients(coefFile, icube->sampleCount());
 
 #if 0
   // Override with these with any user selected parameters
@@ -310,7 +310,7 @@ void gbl::FixWagoLines(QString file) {
   // Open the cube to repair
   Cube fix;
   fix.open(file, "rw");
-  const int nl = fix.getLineCount();
+  const int nl = fix.lineCount();
 
   // Create a line manager on the cube for I/O
   LineManager lbuf(fix);

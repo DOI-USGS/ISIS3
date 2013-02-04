@@ -440,7 +440,7 @@ namespace Isis {
 
         // Enforce same band
         if(imgrs[i]->Band() != imgrs[0]->Band() &&
-           InputCubes[i]->getBandCount() != 1) {
+           InputCubes[i]->bandCount() != 1) {
           imgrs[i]->SetBaseBand(imgrs[0]->Band());
         }
       }
@@ -537,9 +537,9 @@ namespace Isis {
     int maxBands = 0;
 
     for (unsigned int i = 0; i < cubes.size(); i++) {
-      int sampleCount = cubes[i]->getSampleCount();
-      int lineCount = cubes[i]->getLineCount();
-      int bandCount = cubes[i]->getBandCount();
+      int sampleCount = cubes[i]->sampleCount();
+      int lineCount = cubes[i]->lineCount();
+      int bandCount = cubes[i]->bandCount();
 
       if (sampleCount > maxSamples)
         maxSamples = sampleCount;
@@ -690,13 +690,13 @@ namespace Isis {
                                 p_inputBrickSamples[1],
                                 p_inputBrickLines[1],
                                 p_inputBrickBands[1],
-                                InputCubes[0]->getPixelType(),
+                                InputCubes[0]->pixelType(),
                                 p_reverse);
       *obrick = new Brick(maxSamples, maxLines, maxBands,
                                 p_outputBrickSamples[1],
                                 p_outputBrickLines[1],
                                 p_outputBrickBands[1],
-                                OutputCubes[0]->getPixelType(),
+                                OutputCubes[0]->pixelType(),
                                 p_reverse);
     }
 
@@ -796,7 +796,7 @@ namespace Isis {
                             p_inputBrickSamples[i],
                             p_inputBrickLines[i],
                             p_inputBrickBands[i],
-                            InputCubes[i - 1]->getPixelType(),
+                            InputCubes[i - 1]->pixelType(),
                             p_reverse);
       }
       ibrick->begin();
@@ -821,7 +821,7 @@ namespace Isis {
                             p_outputBrickSamples[i],
                             p_outputBrickLines[i],
                             p_outputBrickBands[i],
-                            OutputCubes[i - 1]->getPixelType(),
+                            OutputCubes[i - 1]->pixelType(),
                             p_reverse);
       }
       obrick->begin();

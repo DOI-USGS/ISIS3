@@ -573,7 +573,7 @@ double getControlFitness(const ControlCubeGraphNode * node, double tolerance, Cu
     // Calculate the area of the convex hull
     double convexArea = convexHull->getArea();
     QString sn = node->getSerialNumber();
-    double cubeArea = cube->getSampleCount() * cube->getLineCount();
+    double cubeArea = cube->sampleCount() * cube->lineCount();
 
     controlFitness = convexArea / cubeArea;
 
@@ -612,7 +612,7 @@ void noLatLonCheck(ControlNet &cnet, CubeManager &manager, Progress &progress,
       Camera *cam = NULL;
       bool createdCamera = true;
       try {
-        cam = cube->getCamera();
+        cam = cube->camera();
       }
       catch (IException &) {
         createdCamera = false;

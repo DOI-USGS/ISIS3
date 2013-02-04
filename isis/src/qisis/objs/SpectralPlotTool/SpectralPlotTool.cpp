@@ -251,10 +251,10 @@ namespace Isis {
     bool supportsWavelength = true;
 
     foreach (MdiCubeViewport *cvp, viewportsToPlot()) {
-      int bandCount = cvp->cube()->getBandCount();
+      int bandCount = cvp->cube()->bandCount();
 
       // if single band then disable spectral plot
-      Pvl &pvl = *cvp->cube()->getLabel();
+      Pvl &pvl = *cvp->cube()->label();
       supportsWavelength = supportsWavelength &&
                            pvl.FindObject("IsisCube").HasGroup("BandBin");
 
@@ -573,7 +573,7 @@ namespace Isis {
     if (samps < 1) samps = 1;
     Cube *cube = viewport->cube();
     Brick *brick = new Brick(*cube, samps, 1, 1);
-    Pvl &pvl = *viewport->cube()->getLabel();
+    Pvl &pvl = *viewport->cube()->label();
 
     if (RubberBandTool::getMode() == RubberBandTool::Polygon) {
       samps = 1;
@@ -616,7 +616,7 @@ namespace Isis {
     }
 
 
-    for (int band = 1; band <= cube->getBandCount(); band++) {
+    for (int band = 1; band <= cube->bandCount(); band++) {
       Statistics stats;
 
       /*Rectangle*/

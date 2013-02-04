@@ -20,6 +20,9 @@ namespace Isis {
    *   @history 2011-05-10 Steven Lambright - Added arrow capabilities for CPs
    *   @history 2012-04-16 Jeannie Backer - Added #include for Pvl class in
    *                           implementation file.
+   *   @history 2013-01-02 Steven Lambright - Updated setArrowVisible() to support new coloring
+   *                           options. The design of this configuration is wrong/needs fixed, but
+   *                           I'm leaving it alone due to time constraints. Fixes #479.
    */
   class ControlNetGraphicsItem : public QGraphicsObject {
       Q_OBJECT
@@ -34,7 +37,8 @@ namespace Isis {
                  QWidget * widget = 0);
       QString snToFileName(QString sn);
 
-      void setArrowsVisible(bool visible);
+      void setArrowsVisible(bool visible, bool colorByMeasureCount, int measureCount,
+                            bool colorByJigsawError, double residualMagnitude);
 
     private slots:
       void buildChildren();

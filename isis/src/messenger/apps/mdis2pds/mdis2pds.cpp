@@ -101,7 +101,7 @@ void IsisMain() {
   ProcessExportPds processPds;
   Cube *incube = processPds.SetInputCube("FROM");
 
-  Histogram *hist = incube->getHistogram(0);
+  Histogram *hist = incube->histogram(0);
   double minmin = 0.0;
   double maxmax = 0.0;
   if(ui.GetString("TYPE").compare("AUTOMATIC") == 0) {
@@ -191,7 +191,7 @@ void IsisMain() {
   p.CheckStatus();
 
   // Translates the ISIS labels along with the original EDR labels
-  origLabel.AddObject(*(incube->getLabel()));
+  origLabel.AddObject(*(incube->label()));
   PvlTranslationManager labels(origLabel,
                                "$messenger/translations/mdisCdrLabel.trn");
   labels.Auto(pdsLabel);

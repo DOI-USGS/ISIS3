@@ -35,7 +35,7 @@ namespace Isis {
       m_alarmedBins(new QMap<int, bool>) {
     int startLine = qRound(lineRange.minValue());
     int endLine = qRound(lineRange.maxValue());
-    ASSERT(xCube->getLineCount() == yCube->getLineCount());
+    ASSERT(xCube->lineCount() == yCube->lineCount());
 
     Histogram *xCubeHist = new Histogram(*xCube, xCubeBand, NULL,
         sampleRange.minValue(), lineRange.minValue(),
@@ -62,10 +62,10 @@ namespace Isis {
     m_maxCount = 0;
 
     Brick brick1((int)(sampleRange.maxValue() - sampleRange.minValue() + 1),
-                 1, 1, xCube->getPixelType());
+                 1, 1, xCube->pixelType());
     Brick brick2((int)(sampleRange.maxValue() - sampleRange.minValue() + 1),
-                 1, 1, yCube->getPixelType());
-    ASSERT(xCube->getSampleCount() == yCube->getSampleCount());
+                 1, 1, yCube->pixelType());
+    ASSERT(xCube->sampleCount() == yCube->sampleCount());
     ASSERT(brick1.size() == brick2.size());
 
     for (int line = startLine; line <= endLine; line++) {

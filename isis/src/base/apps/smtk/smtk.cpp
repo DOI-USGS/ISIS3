@@ -111,7 +111,7 @@ void IsisMain() {
   rhImage.open(ui.GetFileName("MATCH"),"r");
 
   // Ensure only single bands
-  if (lhImage.getBandCount() != 1 || rhImage.getBandCount() != 1) {
+  if (lhImage.bandCount() != 1 || rhImage.bandCount() != 1) {
     QString msg = "Input Cubes must have only one band!";
     throw IException(IException::User,msg,_FILEINFO_);
   }
@@ -122,8 +122,8 @@ void IsisMain() {
   Camera *lhCamera = NULL;
   Camera *rhCamera = NULL;
   try {
-    lhCamera = lhImage.getCamera();
-    rhCamera = rhImage.getCamera();
+    lhCamera = lhImage.camera();
+    rhCamera = rhImage.camera();
   }
   catch (IException &ie) {
     QString msg = "Both input images must have a camera";
@@ -141,8 +141,8 @@ void IsisMain() {
 
 //  This still precludes band to band registrations.
   if (serialLeft == serialRight) {
-    QString sLeft = FileName(lhImage.getFileName()).name();
-    QString sRight = FileName(rhImage.getFileName()).name();
+    QString sLeft = FileName(lhImage.fileName()).name();
+    QString sRight = FileName(rhImage.fileName()).name();
     if (sLeft == sRight) {
       QString msg = "Cube Serial Numbers must be unique - FROM=" + serialLeft +
                    ", MATCH=" + serialRight;
@@ -155,8 +155,8 @@ void IsisMain() {
   Progress prog;
   prog.SetText("Finding Initial Seeds");
 
-  int nl = lhImage.getLineCount();
-  int ns = lhImage.getSampleCount();
+  int nl = lhImage.lineCount();
+  int ns = lhImage.sampleCount();
   BigInt numAttemptedInitialPoints = 0;
 
   //  Declare Gruen matcher
@@ -217,8 +217,8 @@ void IsisMain() {
   else {
   // We want to create a grid of control points that is N rows by M columns.
 
-    int rows = (lhImage.getLineCount() + linc - 1)/linc;
-    int cols = (lhImage.getSampleCount() + sinc - 1)/sinc;
+    int rows = (lhImage.lineCount() + linc - 1)/linc;
+    int cols = (lhImage.sampleCount() + sinc - 1)/sinc;
 
     prog.SetMaximumSteps(rows * cols);
     prog.CheckStatus();
@@ -413,8 +413,8 @@ void IsisMain() {
     cout << "\nCreating output DEM from " << bmf.size() << " points.\n";
     Process  p;
     Cube *icube = p.SetInputCube("FROM");
-    Cube *ocube = p.SetOutputCube("TO", icube->getSampleCount(),
-                                  icube->getLineCount(), 3);
+    Cube *ocube = p.SetOutputCube("TO", icube->sampleCount(),
+                                  icube->lineCount(), 3);
     p.ClearInputCubes();
 
     int boxsize = ui.GetInteger("BOXSIZE");
@@ -463,7 +463,7 @@ void IsisMain() {
     center.AddValue("1.0");
     center.AddValue("1.0");
 
-    PvlGroup &bandbin = ocube->getLabel()->FindGroup("BandBin", PvlObject::Traverse);
+    PvlGroup &bandbin = ocube->label()->FindGroup("BandBin", PvlObject::Traverse);
     bandbin.AddKeyword(filter, PvlContainer::Replace);
     bandbin.AddKeyword(center, PvlContainer::Replace);
     center.SetName("Width");

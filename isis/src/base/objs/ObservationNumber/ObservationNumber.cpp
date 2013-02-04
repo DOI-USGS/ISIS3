@@ -54,7 +54,7 @@ namespace Isis {
    * @param cube An opened Isis cube
    */
   QString ObservationNumber::Compose(Cube &cube, bool def2filename) {
-    return Compose(*cube.getLabel(), def2filename);
+    return Compose(*cube.label(), def2filename);
   }
 
   /**

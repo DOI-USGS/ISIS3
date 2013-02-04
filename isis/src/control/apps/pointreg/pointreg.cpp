@@ -574,7 +574,7 @@ void registerPoint(ControlPoint *outPoint, ControlMeasure *patternCM,
           if (ar->Success()) {
             // Check to make sure the newly calculated measure position is on
             // the surface of the planet
-            Camera *cam = searchCube.getCamera();
+            Camera *cam = searchCube.camera();
             bool foundLatLon = cam->SetImage(ar->CubeSample(), ar->CubeLine());
 
             if (foundLatLon) {
@@ -747,7 +747,7 @@ Validation backRegister(ControlMeasure *reference, ControlMeasure *measure,
     if (validator->Success()) {
       // Check to make sure the newly calculated measure position is on
       // the surface of the planet
-      Camera *cam = searchCube.getCamera();
+      Camera *cam = searchCube.camera();
       bool foundLatLon = cam->SetImage(
           validator->CubeSample(), validator->CubeLine());
 
@@ -766,7 +766,7 @@ Validation backRegister(ControlMeasure *reference, ControlMeasure *measure,
 
 double getResolution(Cube &cube, ControlMeasure &measure) {
   // TODO retrieve for projection
-  Camera *camera = cube.getCamera();
+  Camera *camera = cube.camera();
   camera->SetImage(measure.GetSample(), measure.GetLine());
   return camera->PixelResolution();
 }
@@ -775,11 +775,11 @@ double getResolution(Cube &cube, ControlMeasure &measure) {
 // Verify a cube has either a Camera or a Projection, throw an exception if not
 void verifyCube(Cube & cube) {
   try {
-    cube.getCamera();
+    cube.camera();
   }
   catch (IException &camError) {
     try {
-      cube.getProjection();
+      cube.projection();
     }
     catch (IException &projError) {
       projError.append(camError);

@@ -68,8 +68,8 @@ void IsisMain() {
   Table hifix("HiRISE Ancillary");
   icube->read(hifix);
   Statistics darkStats, bufStats, rampDarkStats;
-  int tdi = icube->getGroup("Instrument")["Tdi"];
-  int binning_mode = icube->getGroup("Instrument")["Summing"];
+  int tdi = icube->group("Instrument")["Tdi"];
+  int binning_mode = icube->group("Instrument")["Summing"];
 
   //This gets us the statistics for the dark and buffer pixels
   // alongside of the image itself
@@ -264,7 +264,7 @@ void IsisMain() {
     imageBuffer++;
   }
 
-  for(int imageLine = LINES_POSTRAMP; imageLine < inputCube.getLineCount(); imageLine++) {
+  for(int imageLine = LINES_POSTRAMP; imageLine < inputCube.lineCount(); imageLine++) {
     inputCube.read(imageBuffer);
     for(int imageSample = 0 ; imageSample < out.SampleDimension(); imageSample++) {
       out[imageSample] = imageBuffer[imageSample + imageLeft];

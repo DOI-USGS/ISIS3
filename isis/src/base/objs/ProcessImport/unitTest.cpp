@@ -40,7 +40,7 @@ void IsisMain() {
   CubeAttributeInput att;
   QString file = Application::GetUserInterface().GetFileName("TO");
   Cube *icube = p2.SetInputCube(file, att);
-  Statistics *stat = icube->getStatistics();
+  Statistics *stat = icube->statistics();
   cout << endl << "Average: " << stat->Average() << endl;
   cout << endl << "Variance: " << stat->Variance() << endl;
   p2.EndProcess();

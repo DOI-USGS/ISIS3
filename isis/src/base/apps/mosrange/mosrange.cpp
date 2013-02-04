@@ -115,8 +115,8 @@ void IsisMain() {
       Cube cube;
       cube.open(flist[i].toString());
 
-      int lines = cube.getLineCount();
-      int samples = cube.getSampleCount();
+      int lines = cube.lineCount();
+      int samples = cube.sampleCount();
 
 
       PvlObject fmap("File");
@@ -124,7 +124,7 @@ void IsisMain() {
       fmap += PvlKeyword("Lines", toString(lines));
       fmap += PvlKeyword("Samples", toString(samples));
 
-      Camera *cam = cube.getCamera();
+      Camera *cam = cube.camera();
       Pvl mapping;
       cam->BasicMapping(mapping);
       PvlGroup &mapgrp = mapping.FindGroup("Mapping");

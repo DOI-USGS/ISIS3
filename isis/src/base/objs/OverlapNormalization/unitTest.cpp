@@ -19,9 +19,9 @@ int main(int argc, char *argv[]) {
     cube1.open("$odyssey/testData/I00824006RDR.lev2.cub");
     cube2.open("$odyssey/testData/I01523019RDR.lev2.cub");
     cube3.open("$odyssey/testData/I02609002RDR.lev2.cub");
-    Isis::Statistics *stats1 = cube1.getStatistics();
-    Isis::Statistics *stats2 = cube2.getStatistics();
-    Isis::Statistics *stats3 = cube3.getStatistics();
+    Isis::Statistics *stats1 = cube1.statistics();
+    Isis::Statistics *stats2 = cube2.statistics();
+    Isis::Statistics *stats3 = cube3.statistics();
 
     vector<Isis::Statistics *> statsList;
     statsList.push_back(stats1);

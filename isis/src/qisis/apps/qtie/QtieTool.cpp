@@ -308,7 +308,7 @@ namespace Isis {
     p_baseSN = SerialNumber::Compose(*p_baseCube, true);
     p_matchSN = SerialNumber::Compose(*p_matchCube);
 
-    p_serialNumberList->Add(matchCube->getFileName());
+    p_serialNumberList->Add(matchCube->fileName());
 
     //  Save off universal ground maps
     try {
@@ -444,7 +444,7 @@ namespace Isis {
     // ???  do we only allow mouse clicks on level1???
     //    If we allow on both, need to find samp,line on level1 if
     //    they clicked on basemap.
-    QString file = cvp->cube()->getFileName();
+    QString file = cvp->cube()->fileName();
     QString sn = p_serialNumberList->SerialNumber(file);
 
     double samp, line;
@@ -525,8 +525,8 @@ namespace Isis {
       //  Make sure point on base cube
       baseSamp = p_baseGM->Sample();
       baseLine = p_baseGM->Line();
-      if (baseSamp < 1 || baseSamp > p_baseCube->getSampleCount() ||
-          baseLine < 1 || baseLine > p_baseCube->getLineCount()) {
+      if (baseSamp < 1 || baseSamp > p_baseCube->sampleCount() ||
+          baseLine < 1 || baseLine > p_baseCube->lineCount()) {
         // throw error? point not on base
         QString message = "Point does not exist on base map.";
         QMessageBox::warning((QWidget *)parent(), "Warning", message);
@@ -719,7 +719,7 @@ namespace Isis {
       }
 
       double samp, line;
-      if (vp->cube()->getFileName() == p_baseCube->getFileName()) {
+      if (vp->cube()->fileName() == p_baseCube->fileName()) {
         // Draw on left viewport (base)
         samp = p[Base]->GetSample();
         line = p[Base]->GetLine();
@@ -761,7 +761,7 @@ namespace Isis {
     //  Create temporary network for solution which will not contain measures for
     //  the basemap.
     ControlNet net;
-    net.SetTarget(p_matchCube->getCamera()->target()->name());
+    net.SetTarget(p_matchCube->camera()->target()->name());
 
     // Bundle adjust to solve for new pointing
     try {
@@ -850,8 +850,8 @@ namespace Isis {
   void QtieTool::writeNewCmatrix(Table *cmatrix) {
 
     //check for existing polygon, if exists delete it
-    if (p_matchCube->getLabel()->HasObject("Polygon")) {
-      p_matchCube->getLabel()->DeleteObject("Polygon");
+    if (p_matchCube->label()->HasObject("Polygon")) {
+      p_matchCube->label()->DeleteObject("Polygon");
     }
 
     // Update the cube history
@@ -878,7 +878,7 @@ namespace Isis {
     history += PvlKeyword("UserName", Application::UserName());
     PvlGroup results("Results");
     results += PvlKeyword("CameraAnglesUpdated", "True");
-    results += PvlKeyword("BaseMap", p_baseCube->getFileName());
+    results += PvlKeyword("BaseMap", p_baseCube->fileName());
     history += results;
 
     h.AddEntry(history);
@@ -962,7 +962,7 @@ namespace Isis {
             if (pt->GetMeasure(m)->IsIgnored())
               pt->Delete(m);
           }
-          net.SetTarget(p_matchCube->getCamera()->target()->name());
+          net.SetTarget(p_matchCube->camera()->target()->name());
           net.SetNetworkId("Qtie");
           net.SetUserName(Application::UserName());
           net.SetCreatedDate(Application::DateTime());

@@ -87,7 +87,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   // Make sure it is a Themis EDR/RDR
   try {
-    if(evenCube->getGroup("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
+    if(evenCube->group("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
       throw IException(IException::User, "", _FILEINFO_);
     }
   }
@@ -99,7 +99,7 @@ void IsisMain() {
   }
 
   try {
-    if(oddCube->getGroup("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
+    if(oddCube->group("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
       throw IException(IException::User, "", _FILEINFO_);
     }
   }
@@ -110,19 +110,19 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if (evenCube->getGroup("Instrument")["Framelets"][0] != "Even") {
+  if (evenCube->group("Instrument")["Framelets"][0] != "Even") {
     QString msg = "The image [" + ui.GetFileName("INEVEN") + "] does not appear "
         "to contain the EVEN framelets of a Themis VIS cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if (oddCube->getGroup("Instrument")["Framelets"][0] != "Odd") {
+  if (oddCube->group("Instrument")["Framelets"][0] != "Odd") {
     QString msg = "The image [" + ui.GetFileName("ODDEVEN") + "] does not appear "
         "to contain the ODD framelets of a Themis VIS cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  PvlGroup &inputInstrumentGrp = evenCube->getGroup("Instrument");
+  PvlGroup &inputInstrumentGrp = evenCube->group("Instrument");
   PvlKeyword &spatialSumming = inputInstrumentGrp["SpatialSumming"];
   frameletSize = 192 / toInt(spatialSumming[0]);
   overlapSize = FrameletOverlapSize();
@@ -132,14 +132,14 @@ void IsisMain() {
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
-  p.SetBrickSize(evenCube->getSampleCount(), frameletSize, 1);
+  p.SetBrickSize(evenCube->sampleCount(), frameletSize, 1);
 
   p.StartProcess(FixSeams);
 
-  PvlGroup &evenInst = outEven->getGroup("Instrument");
+  PvlGroup &evenInst = outEven->group("Instrument");
   evenInst["Framelets"] = "Even";
 
-  PvlGroup &oddInst = outOdd->getGroup("Instrument");
+  PvlGroup &oddInst = outOdd->group("Instrument");
   oddInst["Framelets"] = "Odd";
 
   p.EndProcess();
@@ -174,8 +174,8 @@ void RemoveSeam(Buffer &out, int framelet, int band,
   // "badData" is the bottom of the current framelet, what we were given.
   Cube *badDataCube  = (matchIsEven) ? oddCube  : evenCube;
 
-  Camera *goodCam = goodDataCube->getCamera();
-  Camera *badCam  = badDataCube->getCamera();
+  Camera *goodCam = goodDataCube->camera();
+  Camera *badCam  = badDataCube->camera();
 
   // Verify we're at the correct band
   goodCam->SetBand(band);
@@ -255,7 +255,7 @@ void RemoveSeam(Buffer &out, int framelet, int band,
       double goodLine = offsetLine + badLine;
 
       // Get the pixel we're missing (good)
-      Portal p(1, 1, goodDataCube->getPixelType());
+      Portal p(1, 1, goodDataCube->pixelType());
       p.SetPosition(goodSample, goodLine, band);
       goodDataCube->read(p);
 
@@ -318,8 +318,8 @@ void FixSeams(vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers) {
  * This calculates the number of lines of overlap between framelets.
  */
 int FrameletOverlapSize() {
-  Camera *camEven = evenCube->getCamera();
-  Camera *camOdd = oddCube->getCamera();
+  Camera *camEven = evenCube->camera();
+  Camera *camOdd = oddCube->camera();
 
   if(camEven == NULL || camOdd == NULL) {
     QString msg = "A camera is required to automatically calculate the overlap "

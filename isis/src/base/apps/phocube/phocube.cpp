@@ -2,12 +2,13 @@
 
 #include "Angle.h"
 #include "Camera.h"
-#include "TProjection.h"
+#include "Cube.h"
+#include "IException.h"
 #include "ProjectionFactory.h"
 #include "ProcessByBrick.h"
 #include "ProcessByLine.h"
 #include "SpecialPixel.h"
-#include "IException.h"
+#include "TProjection.h"
 
 #include <cmath>
 
@@ -81,7 +82,7 @@ void IsisMain() {
 
   if(noCamera) {
     try {
-      proj = (TProjection *) icube->getProjection();
+      proj = (TProjection *) icube->projection();
     }
     catch(IException &e) {
       QString msg = "Mosaic files must contain mapping labels";
@@ -90,7 +91,7 @@ void IsisMain() {
   } 
   else {
     try {
-      cam = icube->getCamera();
+      cam = icube->camera();
     }
     catch(IException &e) {
       QString msg = "Input file needs to have spiceinit run on it - if this file ";
@@ -149,11 +150,17 @@ void IsisMain() {
     throw IException(IException::User, message, _FILEINFO_);
   }
 
-  // Retrieve the orignal values from the input cube band
-  PvlGroup &mybb = icube->getGroup("BandBin");
-  QString bname("DN");
-  if ( mybb.HasKeyword("Name") ) {
-    bname = mybb["Name"][0];
+  // If outputting a a dn band, retrieve the orignal values for the filter name from the input cube,
+  // if it exists.  Otherwise, the default will be "DN"
+  QString bname = "DN";
+  if ( dn && icube->hasGroup("BandBin") ) {
+    PvlGroup &mybb = icube->group("BandBin");
+    if ( mybb.HasKeyword("Name") ) {
+      bname = mybb["Name"][0];
+    }
+    else if ( mybb.HasKeyword("FilterName") ) {
+      bname = mybb["FilterName"][0];
+    }
   }
 
   // Create a bandbin group for the output label
@@ -186,8 +193,8 @@ void IsisMain() {
   // If DN is chosen by the user, then we propagate the input buffer with a 
   // different function - one that accepts both input and output buffers.
   (void) p.SetInputCube("FROM", OneBand);
-  Cube *ocube = p.SetOutputCube("TO", icube->getSampleCount(), 
-                                icube->getLineCount(), nbands);
+  Cube *ocube = p.SetOutputCube("TO", icube->sampleCount(), 
+                                icube->lineCount(), nbands);
   p.SetBrickSize(64, 64, nbands);
 
   if (dn) {
@@ -205,7 +212,7 @@ void IsisMain() {
   // Add the bandbin group to the output label.  If a BandBin group already
   // exists, remove all existing keywords and add the keywords for this app.
   // Otherwise, just put the group in.
-  PvlObject &cobj = ocube->getLabel()->FindObject("IsisCube");
+  PvlObject &cobj = ocube->label()->FindObject("IsisCube");
   if(!cobj.HasGroup("BandBin")) {
     cobj.AddGroup(PvlGroup("BandBin"));
   }

@@ -24,7 +24,7 @@ void IsisMain() {
   // Make sure it is a Themis EDR/RDR
   FileName inFileName = ui.GetFileName("FROM");
   try {
-    if(icube.getGroup("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
+    if(icube.group("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
       QString msg = "This program is intended for use on THEMIS VIS images only. [";
       msg += inFileName.expanded() + "] does not appear to be a THEMIS VIS image.";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -38,7 +38,7 @@ void IsisMain() {
 
   vector<Cube *> flatcubes;
   vector<LineManager *> fcubeMgrs;
-  int summing = toInt(icube.getGroup("Instrument")["SpatialSumming"][0]);
+  int summing = toInt(icube.group("Instrument")["SpatialSumming"][0]);
 
   for(int filt = 0; filt < 5; filt++) {
     QString filePattern = "$odyssey/calibration/flat_filter_";
@@ -57,7 +57,7 @@ void IsisMain() {
   Cube ocube;
 
   CubeAttributeOutput outAtt = ui.GetOutputAttribute("TO");
-  ocube.setDimensions(icube.getSampleCount(), icube.getLineCount(), icube.getBandCount());
+  ocube.setDimensions(icube.sampleCount(), icube.lineCount(), icube.bandCount());
   ocube.setByteOrder(outAtt.byteOrder());
   ocube.setFormat(outAtt.fileFormat());
   ocube.setLabelsAttached(outAtt.labelAttachment() == AttachedLabel);
@@ -69,7 +69,7 @@ void IsisMain() {
   vector<int> filter;
 
   PvlKeyword &filtNums =
-      icube.getLabel()->FindGroup("BandBin", Pvl::Traverse)["FilterNumber"];
+      icube.label()->FindGroup("BandBin", Pvl::Traverse)["FilterNumber"];
   for(int i = 0; i < filtNums.Size(); i++) {
     filter.push_back(toInt(filtNums[i]));
   }
@@ -79,7 +79,7 @@ void IsisMain() {
 
   Progress prog;
   prog.SetText("Applying Flat-Field Correction");
-  prog.SetMaximumSteps(ocube.getLineCount() * ocube.getBandCount());
+  prog.SetMaximumSteps(ocube.lineCount() * ocube.bandCount());
   prog.CheckStatus();
 
   do {
@@ -119,17 +119,17 @@ void IsisMain() {
   while(!ocubeMgr.end());
 
   // Propagate labels and objects (in case of spice data)
-  PvlObject &inCubeObj = icube.getLabel()->FindObject("IsisCube");
-  PvlObject &outCubeObj = ocube.getLabel()->FindObject("IsisCube");
+  PvlObject &inCubeObj = icube.label()->FindObject("IsisCube");
+  PvlObject &outCubeObj = ocube.label()->FindObject("IsisCube");
 
   for(int g = 0; g < inCubeObj.Groups(); g++) {
     outCubeObj.AddGroup(inCubeObj.Group(g));
   }
 
-  for(int o = 0; o < icube.getLabel()->Objects(); o++) {
-    if(icube.getLabel()->Object(o).IsNamed("Table")) {
-      Blob t(icube.getLabel()->Object(o)["Name"],
-             icube.getLabel()->Object(o).Name());
+  for(int o = 0; o < icube.label()->Objects(); o++) {
+    if(icube.label()->Object(o).IsNamed("Table")) {
+      Blob t(icube.label()->Object(o)["Name"],
+             icube.label()->Object(o).Name());
       icube.read(t);
       ocube.write(t);
     }

@@ -59,10 +59,13 @@
       Got rid of FROM parameter. The input file(s) must now be
       specified through the FROMLIST parameter.
     </change>
+    <change name="Lynn Weller" date="2012-01-22">
+      Application category name changed from Utility to Mars Odyssey.  Fixes mantis ticket #951.
+    </change>
   </history>
 
   <category>
-    <categoryItem>Utility</categoryItem>
+    <missionItem>Mars Odyssey</missionItem> 
   </category>
 
   <groups>

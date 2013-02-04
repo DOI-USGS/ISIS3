@@ -54,9 +54,9 @@ namespace Isis {
    */
   void QtExporter::setGrayscale(ExportDescription &desc) {
     Cube *cube = setInput(desc);
-    checkDataSize(cube->getSampleCount(), cube->getLineCount(), 1);
+    checkDataSize(cube->sampleCount(), cube->lineCount(), 1);
     m_qimage = new QImage(
-        cube->getSampleCount(), cube->getLineCount(), QImage::Format_Indexed8);
+        cube->sampleCount(), cube->lineCount(), QImage::Format_Indexed8);
     m_qimage->setNumColors(256);
 
     // Create the color table (black = 0 to white = 255)
@@ -75,9 +75,9 @@ namespace Isis {
    */
   void QtExporter::setRgb(ExportDescription &desc) {
     Cube *cube = setInput(desc);
-    checkDataSize(cube->getSampleCount(), cube->getLineCount(), 3);
+    checkDataSize(cube->sampleCount(), cube->lineCount(), 3);
     m_qimage = new QImage(
-        cube->getSampleCount(), cube->getLineCount(), QImage::Format_RGB32);
+        cube->sampleCount(), cube->lineCount(), QImage::Format_RGB32);
   }
 
 
@@ -90,9 +90,9 @@ namespace Isis {
    */
   void QtExporter::setRgba(ExportDescription &desc) {
     Cube *cube = setInput(desc);
-    checkDataSize(cube->getSampleCount(), cube->getLineCount(), 4);
+    checkDataSize(cube->sampleCount(), cube->lineCount(), 4);
     m_qimage = new QImage(
-        cube->getSampleCount(), cube->getLineCount(), QImage::Format_ARGB32);
+        cube->sampleCount(), cube->lineCount(), QImage::Format_ARGB32);
   }
 
 

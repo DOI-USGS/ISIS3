@@ -34,28 +34,28 @@ void IsisMain() {
   try {
     for(int i = 0; i < cubeList.size(); i++) {
       Cube cube;
-      CubeAttributeInput inatt(cubeList[i].toString());
+      CubeAttributeInput inatt(cubeList[i].original());
       vector<QString> bands = inatt.bands();
       cube.setVirtualBands(bands);
       cube.open(cubeList[i].toString());
       if(i == 0) {
-        nsamps = cube.getSampleCount();
-        nlines = cube.getLineCount();
-        nbands = cube.getBandCount();
+        nsamps = cube.sampleCount();
+        nlines = cube.lineCount();
+        nbands = cube.bandCount();
       }
       else {
         // Make sure they are all the same size
-        if((nsamps != cube.getSampleCount()) || (nlines != cube.getLineCount())) {
+        if((nsamps != cube.sampleCount()) || (nlines != cube.lineCount())) {
           QString msg = "Spatial dimensions of cube [" +
                         cubeList[i].toString() + "] does not match other cubes in list";
           throw IException(IException::User, msg, _FILEINFO_);
         }
         // Get the total number of bands
-        nbands += cube.getBandCount();
+        nbands += cube.bandCount();
       }
 
       // Build up the band bin group
-      PvlObject &isiscube = cube.getLabel()->FindObject("IsisCube");
+      PvlObject &isiscube = cube.label()->FindObject("IsisCube");
       if(isiscube.HasGroup("BandBin")) {
         PvlGroup &inBandBin = isiscube.FindGroup("BandBin");
         for(int key = 0; key < inBandBin.Keywords(); key++) {
@@ -131,7 +131,7 @@ void IsisMain() {
     Cube *icube = m.SetInputCube(cubeList[i].toString(), attrib);
     m.SetImageOverlay(ProcessMosaic::PlaceImagesOnTop);
     m.StartProcess(1, 1, sband);
-    sband += icube->getBandCount();
+    sband += icube->bandCount();
     m.EndProcess();
   }
 }

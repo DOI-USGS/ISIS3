@@ -39,8 +39,8 @@ namespace Isis {
     _rows(), _badRows(),
     _pntsTotal(0), _pntsUsed(0), _pntsTossed(0),
     _iDir(1.0),
-    _outputLines(cube.getLineCount()),
-    _outputSamples(cube.getSampleCount()),
+    _outputLines(cube.lineCount()),
+    _outputSamples(cube.sampleCount()),
     _lineOffset(0.0), _sampOffset(0.0) {
 
     // Collect the points from the control file

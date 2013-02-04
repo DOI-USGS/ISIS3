@@ -21,14 +21,14 @@ QString tmpFileName = "Temporary_DecorrelationStretch_Transform.cub";
 void IsisMain() {
   ProcessByBrick p;
   Cube *icube = p.SetInputCube("FROM");
-  int numDimensions = icube->getBandCount();
+  int numDimensions = icube->bandCount();
   p.SetBrickSize(128, 128, numDimensions);
 
   // The output cube with no attributes and real pixel type
   Isis::CubeAttributeOutput cao;
   cao.setPixelType(Isis::Real);
 
-  p.SetOutputCube(tmpFileName, cao, icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
+  p.SetOutputCube(tmpFileName, cao, icube->sampleCount(), icube->lineCount(), icube->bandCount());
 
   // Get the data for the transform matrix
   pca = Isis::PrincipalComponentAnalysis(numDimensions);
@@ -48,7 +48,7 @@ void IsisMain() {
 
   Cube *icube2 = p.SetInputCube(tmpFileName, cai);
   for(int i = 0; i < numDimensions; i++) {
-    stretches.push_back(new GaussianStretch(*(icube2->getHistogram(i + 1))));
+    stretches.push_back(new GaussianStretch(*(icube2->histogram(i + 1))));
   }
   p.SetOutputCube("TO");
 

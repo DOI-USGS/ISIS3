@@ -89,7 +89,7 @@ void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
   // Get the translation manager ready
   PvlTranslationManager commonlabelXlater(inputLabel, transFile.expanded());
   // Pvl outputLabels;
-  Pvl *outputLabel = ocube->getLabel();
+  Pvl *outputLabel = ocube->label();
   commonlabelXlater.Auto(*(outputLabel));
 
   PvlTranslationManager labelXlater(inputLabel, bandBinTransFile.expanded());

@@ -43,10 +43,7 @@ void TestNetwork(const QString &filename, bool printNetwork) {
     //   The reason for the intermediate Pvl is described in
     //   ControlNetVersioner.h.
     cerr << "Read network..." << endl;
-    QTime timer;
-    timer.start();
     test = ControlNetVersioner::Read(networkFileName);
-//     cerr << "Elapsed time to read: " << timer.elapsed() << "ms" << endl;
 
     if(printNetwork) {
       cerr << "Converted directly to Pvl:" << endl;
@@ -60,10 +57,7 @@ void TestNetwork(const QString &filename, bool printNetwork) {
     ControlNetVersioner::Write(FileName("./tmp"), *test);
 
     try {
-      QTime timer2;
-      timer2.start();
       test2 = ControlNetVersioner::Read(FileName("./tmp"));
-//       cerr << "Elapsed time to read: " << timer2.elapsed() << "ms" << endl;
     }
     catch(IException &e) {
       remove("./tmp");
@@ -101,7 +95,9 @@ void TestNetwork(const QString &filename, bool printNetwork) {
     }
   }
   catch(IException &e) {
-    e.print();
+    QStringList errors = e.toString().split("\n");
+    errors.removeLast();
+    cerr << errors.join("\n") << endl;
   }
 
   if(test) {

@@ -1,5 +1,18 @@
 include $(ISISROOT)/make/isismake.utils
 
+#---------------------------------------------------------------------------
+#  Set up ISIS versioning
+#---------------------------------------------------------------------------
+ISISVERSIONFULL      := $(shell head -n 1 $(ISISROOT)/version | sed 's/\#.*//' | sed 's/ *$$//')
+ISISMAJOR            := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f1)
+ISISMINOR            := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f2)
+ISISMINORMINOR       := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f3)
+ISISMINORMINORMINOR  := $(shell echo $(ISISVERSIONFULL) | cut -d"." -f4)
+ISISVERSION          := $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR).$(ISISMINORMINORMINOR)
+ISISLIBVERSION       := $(shell echo $(ISISMAJOR).$(ISISMINOR).$(ISISMINORMINOR) | sed 's/[a-z].*$$//')
+ISISLOCALVERSION     := $(shell head -n 3 $(ISISROOT)/version | tail -n 1 | sed 's/\#.*//' | sed 's/ *$$//')
+ISISRELEASE          := REL_0_0
+
 .NOTPARALLEL:
 
 #----------------------------------------------------------------------------
@@ -154,9 +167,9 @@ coverage:
 	  exit 1;                                                             \
 	fi;                                                                   \
 	$(ECHO) $(CURTIMESTAMP) "Finding coverage information...";            \
-	CSMESFILES=( lib/libisis3.4.1.so.csmes                                \
+	CSMESFILES=( lib/libisis$(ISISLIBVERSION).so.csmes                    \
 	             `find src/*/apps -name "*.o.csmes" | grep -v moc_` );    \
-	CSEXEFILES=(`find src/ -name "*.csexe"`);                             \
+	CSEXEFILES=(`find src/ -name "*.csexe"` `find bin/ -name "*.csexe"`); \
 	if [ "$${#CSMESFILES[@]}" == "0" ] ||                                 \
 	   [ "$${#CSEXEFILES[@]}" == "0" ]; then                              \
 	  echo "Please build Isis and run the tests with MODE=TC before "     \
@@ -171,7 +184,8 @@ coverage:
 	  APPTESTAPPNAME=`echo $$CSEXEFILE | sed 's#\\(.*/apps/\\)\\([a-zA-Z0-9]*\\)\\(/tsts/\\)\([^/]*\)\(/.*\)#\\2#'`; \
 	  CSEXEAPPNAME=`basename $$CSEXEFILE | sed 's/.csexe//'`;             \
 	  if [ "$$APPTESTAPPNAME" == "$$CSEXEFILE" ] ||                       \
-	     [ "$$APPTESTAPPNAME" == "$$CSEXEAPPNAME" ]; then                 \
+	     [ "$$APPTESTAPPNAME" == "$$CSEXEAPPNAME" ] ||                    \
+	     [ "`dirname $$CSEXEFILE`" == "bin" ]; then                       \
 	    EXETESTNAME=`echo $$EXETESTNAME | sed 's#\\(.*/apps/\\)\\([a-zA-Z0-9]*\\)\\(/tsts/\\)\([^/]*\)\(/.*\)#\\2 Application Test (case \\4\\)#'`;      \
 	    EXETESTNAME=`echo $$EXETESTNAME | sed 's#\\(src/\\)\\([a-zA-Z0-9]*\\)\\(/tsts/\\)\\([a-zA-Z0-9]*\\)\\(.*\\)#\\2 Category Test (case \\4\\)#'`; \
 	    EXETESTNAME=`echo $$EXETESTNAME | sed 's#\\(.*/\\)\\([^/]*\\)\\(/unitTest.csexe\\)#\\2 Unit Test#'`;                                           \

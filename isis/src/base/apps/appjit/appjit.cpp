@@ -58,12 +58,12 @@ void IsisMain() {
     cube.open(ui.GetFileName("MASTER"), "rw");
 
     //check for existing polygon, if exists delete it
-    if(cube.getLabel()->HasObject("Polygon")) {
-      cube.getLabel()->DeleteObject("Polygon");
+    if(cube.label()->HasObject("Polygon")) {
+      cube.label()->DeleteObject("Polygon");
     }
 
     // Get the camera
-    Camera *cam = cube.getCamera();
+    Camera *cam = cube.camera();
     if(cam->DetectorMap()->LineRate() == 0.0) {
       QString msg = "[" + ui.GetFileName("MASTER") + "] is not a line scan camera image";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -71,14 +71,14 @@ void IsisMain() {
 
     // Create the master rotation to be corrected
     int frameCode = cam->instrumentRotation()->Frame();
-    cam->SetImage(int(cube.getSampleCount() / 2), int(cube.getLineCount() / 2));
+    cam->SetImage(int(cube.sampleCount() / 2), int(cube.lineCount() / 2));
     double tol = cam->PixelResolution();
 
     if(tol < 0.) {
       // Alternative calculation of .01*ground resolution of a pixel
       tol = cam->PixelPitch() * cam->SpacecraftAltitude() * 1000. / cam->FocalLength() / 100.;
     }
-    LineScanCameraRotation crot(frameCode, *(cube.getLabel()), cam->instrumentRotation()->GetFullCacheTime(), tol);
+    LineScanCameraRotation crot(frameCode, *(cube.label()), cam->instrumentRotation()->GetFullCacheTime(), tol);
     crot.SetPolynomialDegree(ui.GetInteger("DEGREE"));
     crot.SetAxes(1, 2, 3);
     if(ui.WasEntered("PITCHRATE")) crot.ResetPitchRate(ui.GetDouble("PITCHRATE"));
@@ -113,7 +113,7 @@ void IsisMain() {
     cube.write(cmatrix);
 
     // Write out the instrument position table
-    Isis::PvlGroup kernels = cube.getLabel()->FindGroup("Kernels", Isis::Pvl::Traverse);
+    Isis::PvlGroup kernels = cube.label()->FindGroup("Kernels", Isis::Pvl::Traverse);
 
     // Save original kernels in keyword before changing to "Table" in the kernels group
     PvlKeyword origCk = kernels["InstrumentPointing"];
@@ -134,11 +134,11 @@ void IsisMain() {
         // Open the cube
         cube.open(list[ifile].toString(), "rw");
         //check for existing polygon, if exists delete it
-        if(cube.getLabel()->HasObject("Polygon")) {
-          cube.getLabel()->DeleteObject("Polygon");
+        if(cube.label()->HasObject("Polygon")) {
+          cube.label()->DeleteObject("Polygon");
         }
         // Get the camera and make sure it is a line scan camera
-        Camera *cam = cube.getCamera();
+        Camera *cam = cube.camera();
         if(cam->DetectorMap()->LineRate() == 0.0) {
           QString msg = "[" + ui.GetFileName("FROM") + "] is not a line scan camera";
           throw IException(IException::User, msg, _FILEINFO_);
@@ -147,7 +147,7 @@ void IsisMain() {
         cube.write(cmatrix);
 
         // Write out the new instrument pointing table
-        Isis::PvlGroup kernels = cube.getLabel()->FindGroup("Kernels", Isis::Pvl::Traverse);
+        Isis::PvlGroup kernels = cube.label()->FindGroup("Kernels", Isis::Pvl::Traverse);
 
         // Save original kernels in keyword before changing to "Table" in the kernels group
         PvlKeyword origCk = kernels["InstrumentPointing"];

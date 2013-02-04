@@ -58,7 +58,7 @@ void IsisMain() {
   Isis::CubeAttributeInput inAtt1;
   FileName darkFileName = FindDarkFile(icube);
   Cube *darkcube = p.SetInputCube(darkFileName.expanded(), inAtt1);
-  dcScaleFactor = toDouble(darkcube->getGroup("Instrument")["PicScale"][0]);
+  dcScaleFactor = toDouble(darkcube->group("Instrument")["PicScale"][0]);
 
   Isis::CubeAttributeInput inAtt2;
   FileName gainFileName = FindGainFile(icube);
@@ -83,9 +83,9 @@ void IsisMain() {
 
   calculateScaleFactor0(icube, gaincube);
 
-  exposureDuration = toDouble(icube->getGroup("Instrument")["ExposureDuration"][0]) * 1000;
+  exposureDuration = toDouble(icube->group("Instrument")["ExposureDuration"][0]) * 1000;
 
-  if(darkcube->getPixelType() == Isis::UnsignedByte) {
+  if(darkcube->pixelType() == Isis::UnsignedByte) {
     eightBitDarkCube = true;
   }
   else {
@@ -210,13 +210,13 @@ FileName FindDarkFile(Cube *icube) {
    * 4 = 60 2/3
    * 5 = 15 1/6
    */
-  if((int)(toDouble(icube->getGroup("Instrument")["FrameDuration"][0])) == 2) frameRateId = 1;
-  if((int)(toDouble(icube->getGroup("Instrument")["FrameDuration"][0])) == 8) frameRateId = 2;
-  if((int)(toDouble(icube->getGroup("Instrument")["FrameDuration"][0])) == 30) frameRateId = 3;
-  if((int)(toDouble(icube->getGroup("Instrument")["FrameDuration"][0])) == 60) frameRateId = 4;
-  if((int)(toDouble(icube->getGroup("Instrument")["FrameDuration"][0])) == 15) frameRateId = 5;
+  if((int)(toDouble(icube->group("Instrument")["FrameDuration"][0])) == 2) frameRateId = 1;
+  if((int)(toDouble(icube->group("Instrument")["FrameDuration"][0])) == 8) frameRateId = 2;
+  if((int)(toDouble(icube->group("Instrument")["FrameDuration"][0])) == 30) frameRateId = 3;
+  if((int)(toDouble(icube->group("Instrument")["FrameDuration"][0])) == 60) frameRateId = 4;
+  if((int)(toDouble(icube->group("Instrument")["FrameDuration"][0])) == 15) frameRateId = 5;
 
-  int exposureTypeId = (icube->getGroup("Instrument")["ExposureType"][0] == "NORMAL") ? 0 : 1;
+  int exposureTypeId = (icube->group("Instrument")["ExposureType"][0] == "NORMAL") ? 0 : 1;
 
   // We have what we need from the image label, now go through the text file that is our table line by line
   // looking for a match.
@@ -230,7 +230,7 @@ FileName FindDarkFile(Cube *icube) {
     }
 
     QString frameMode = (tokens.count()? tokens.takeFirst() : "");
-    if(frameMode.at(0) != icube->getGroup("Instrument")["FrameModeId"][0].at(0)) {
+    if(frameMode.at(0) != icube->group("Instrument")["FrameModeId"][0].at(0)) {
       continue;
     }
 
@@ -250,15 +250,15 @@ FileName FindDarkFile(Cube *icube) {
     }
 
     QString readout = (tokens.count()? tokens.takeFirst() : "");
-    if(readout.at(0) != icube->getGroup("Instrument")["ReadoutMode"][0].at(0)) {
+    if(readout.at(0) != icube->group("Instrument")["ReadoutMode"][0].at(0)) {
       continue;
     }
 
     int minImageNum = toInt(tokens.takeFirst());
     int maxImageNum = toInt(tokens.takeFirst());
 
-    int imageNumber = (int)(toDouble(icube->getGroup("Instrument")["SpacecraftClockStartCount"]) * 100 + 0.5);
-    QString telemetry = icube->getGroup("Instrument")["TelemetryFormat"][0];
+    int imageNumber = (int)(toDouble(icube->group("Instrument")["SpacecraftClockStartCount"]) * 100 + 0.5);
+    QString telemetry = icube->group("Instrument")["TelemetryFormat"][0];
     if(imageNumber > 99757701 && imageNumber < 159999999) {
       if((telemetry == "AI8" && (gainState == "1" || gainState == "2")) ||
           (telemetry == "IM4" && (gainState == "3" || gainState == "4"))) {
@@ -287,7 +287,7 @@ FileName FindGainFile(Cube *icube) {
   gainFile.SetComment("C");
   QString data;
 
-  int imageNumber = (int)((double)icube->getGroup("Instrument")["SpacecraftClockStartCount"] * 100 + 0.5);
+  int imageNumber = (int)((double)icube->group("Instrument")["SpacecraftClockStartCount"] * 100 + 0.5);
 
   while(gainFile.GetLine(data)) {
     data = data.simplified().trimmed();
@@ -303,13 +303,13 @@ FileName FindGainFile(Cube *icube) {
      * Filter codes
      * 0=clear,1=green,2=red,3=violet,4=7560,5=9680,6=7270,7=8890
      */
-    QString filter = icube->getGroup("BandBin")["FilterNumber"][0];
+    QString filter = icube->group("BandBin")["FilterNumber"][0];
     if(filter != tokens.takeFirst()) {
       continue;
     }
 
     QString frameMode = tokens.count()? tokens.takeFirst() : "";
-    if(frameMode.at(0) != icube->getGroup("Instrument")["FrameModeId"][0].at(0)) {
+    if(frameMode.at(0) != icube->group("Instrument")["FrameModeId"][0].at(0)) {
       continue;
     }
 
@@ -331,7 +331,7 @@ FileName ReadWeightTable(Cube *icube) {
   FileName weightFile(file);
   weightFile = weightFile.highestVersion();
   Pvl weightTables(weightFile.expanded());
-  QString group = QString("FrameMode") + icube->getGroup("Instrument")["FrameModeId"][0].at(0);
+  QString group = QString("FrameMode") + icube->group("Instrument")["FrameModeId"][0].at(0);
   PvlGroup &frameGrp = weightTables.FindGroup(group);
   QString keyword = QString("GainState") + ((getGainModeID(icube) < 3) ? QString("12") : QString("34"));
 
@@ -351,22 +351,22 @@ int getGainModeID(Cube *icube) {
    * 3 = 40,000
    * 4 = 10,000
    */
-  if((int)toDouble(icube->getGroup("Instrument")["GainModeId"][0]) == 4E5) {
+  if((int)toDouble(icube->group("Instrument")["GainModeId"][0]) == 4E5) {
     gainModeId = 1;
   }
-  else if((int)toDouble(icube->getGroup("Instrument")["GainModeId"][0]) == 1E5) {
+  else if((int)toDouble(icube->group("Instrument")["GainModeId"][0]) == 1E5) {
     gainModeId = 2;
   }
-  else if((int)toDouble(icube->getGroup("Instrument")["GainModeId"][0]) == 4E4) {
+  else if((int)toDouble(icube->group("Instrument")["GainModeId"][0]) == 4E4) {
     gainModeId = 3;
   }
-  else if((int)toDouble(icube->getGroup("Instrument")["GainModeId"][0]) == 1E4) {
+  else if((int)toDouble(icube->group("Instrument")["GainModeId"][0]) == 1E4) {
     gainModeId = 4;
   }
   else {
     throw IException(IException::Unknown,
                      "Invalid value for Gain Mode ID [" +
-                     icube->getGroup("Instrument")["GainModeId"][0] +
+                     icube->group("Instrument")["GainModeId"][0] +
                      "].", _FILEINFO_);
   }
 
@@ -397,7 +397,7 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
 
     // Match target name
     if(currGrp.HasKeyword("TargetName")) {
-      if(!icube->getGroup("Archive")["CalTargetCode"][0].startsWith(currGrp["TargetName"][0])) {
+      if(!icube->group("Archive")["CalTargetCode"][0].startsWith(currGrp["TargetName"][0])) {
         continue;
       }
     }
@@ -406,7 +406,7 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
     if(currGrp.HasKeyword("MinimumTargetName")) {
       try {
         if((int)currGrp["MinimumTargetName"] >
-            (int)toInt(icube->getGroup("Archive")["CalTargetCode"][0].mid(0, 2))) {
+            (int)toInt(icube->group("Archive")["CalTargetCode"][0].mid(0, 2))) {
           continue;
         }
       }
@@ -419,12 +419,12 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
     fltToRad = currGrp["FloatToRad"];
   }
 
-  int filterNumber = toInt(icube->getGroup("BandBin")["FilterNumber"][0]);
+  int filterNumber = toInt(icube->group("BandBin")["FilterNumber"][0]);
 
   if(fltToRef.Size() == 0) {
     throw IException(IException::Unknown,
                      "Unable to find matching reflectance and radiance values for target [" +
-                     icube->getGroup("Instrument")["TargetName"][0] + "] in [" +
+                     icube->group("Instrument")["TargetName"][0] + "] in [" +
                      GetScaleFactorFile().expanded() + "]",
                      _FILEINFO_);
   }
@@ -435,13 +435,13 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
   gainConversion = toDouble(conversionFactors["GainRatios"][getGainModeID(gaincube)-1]);
 
   if (iof) {
-    Camera *cam = icube->getCamera();
-    bool camSuccess = cam->SetImage(icube->getSampleCount() / 2, icube->getLineCount() / 2);
+    Camera *cam = icube->camera();
+    bool camSuccess = cam->SetImage(icube->sampleCount() / 2, icube->lineCount() / 2);
 
     if(!camSuccess) {
       throw IException(IException::Unknown,
                        "Unable to calculate the Solar Distance on [" +
-                       icube->getFileName() + "]", _FILEINFO_);
+                       icube->fileName() + "]", _FILEINFO_);
     }
 
 
@@ -476,7 +476,7 @@ FileName GetScaleFactorFile() {
 
 FileName FindShutterFile(Cube *icube) {
   QString file = "$galileo/calibration/shutter/calibration.so02";
-  file += icube->getGroup("Instrument")["FrameModeId"][0].at(0);
+  file += icube->group("Instrument")["FrameModeId"][0].at(0);
   file += ".cub";
   FileName shutterFile(file);
   return shutterFile;

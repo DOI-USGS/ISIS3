@@ -115,7 +115,7 @@ namespace Isis {
    * @param cube    Cube object of ISIS file
    */
   Kernels::Kernels(Cube &cube) {
-    Init(*cube.getLabel());
+    Init(*cube.label());
   }
 
   /**

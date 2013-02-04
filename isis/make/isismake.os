@@ -55,7 +55,8 @@ else
   else
     testFile = $(wildcard /usr/bin/sw_vers)
     ifeq ($(testFile), /usr/bin/sw_vers)
-      HOST_OS = $(shell sw_vers -productVersion | cut -d '.' -f1,2 | sed 's/\./_/g')
+      HOST_OS := $(shell sw_vers -productVersion | cut -d '.' -f1,2 | sed 's/\./_/g')
+      HOST_OS := MacOSX$(HOST_OS)
     else
       testFile = $(wildcard /etc/lsb-release)
       ifeq ($(testFile), /etc/lsb-release)
@@ -94,6 +95,10 @@ endif
 
 ifneq "$(or $(findstring Fedora, $(HOST_OS)), $(findstring ScientificLinux, $(HOST_OS)))" ""
   XALAN = $(ISIS3LOCAL)/bin/Xalan
+endif
+
+ifneq "$(or $(findstring MacOSX10_7, $(HOST_OS)), $(findstring MacOSX10_8, $(HOST_OS)))" ""
+  GREP = /opt/usgs/$(ISISLOCALVERSION)/ports/bin/grep
 endif
 
 #---------------------------------------------------------------------------

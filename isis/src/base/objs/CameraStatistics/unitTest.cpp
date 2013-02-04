@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
     cout << "UnitTest for Camera Statistics" << endl;
     Cube cube;
     cube.open("$Clementine1/testData/lna1391h.cub");
-    Camera *cam = cube.getCamera();
+    Camera *cam = cube.camera();
     cout << setprecision(6);
 
     CameraStatistics camStats(cam, 1, 1);

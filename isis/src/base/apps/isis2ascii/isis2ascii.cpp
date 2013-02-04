@@ -24,9 +24,9 @@ void IsisMain() {
 
   // Print header if needed
   if(ui.GetBoolean("HEADER")) {
-    fout << "Input Cube:  " << icube->getFileName() << endl;
-    fout << "Samples:Lines:Bands:  " << icube->getSampleCount() << ":" <<
-         icube->getLineCount() << ":" << icube->getBandCount() << endl;
+    fout << "Input Cube:  " << icube->fileName() << endl;
+    fout << "Samples:Lines:Bands:  " << icube->sampleCount() << ":" <<
+         icube->lineCount() << ":" << icube->bandCount() << endl;
   }
 
   // List the cube

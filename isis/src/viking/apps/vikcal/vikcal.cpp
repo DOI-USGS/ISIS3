@@ -39,7 +39,7 @@ void IsisMain() {
 
   // If the file has already been calibrated, throw an error
   if(icube.hasGroup("Radiometry")) {
-    QString msg = "The Viking image [" + icube.getFileName() + "] has already "
+    QString msg = "The Viking image [" + icube.fileName() + "] has already "
         "been radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }

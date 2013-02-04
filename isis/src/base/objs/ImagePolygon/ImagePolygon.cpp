@@ -122,16 +122,16 @@ namespace Isis {
     p_isProjected = false;
 
     try {
-      cam = cube.getCamera();
+      cam = cube.camera();
     }
     catch(IException &camError) {
       try {
-        cube.getProjection();
+        cube.projection();
         p_isProjected = true;
       }
       catch(IException &projError) {
         QString msg = "Can not create polygon, ";
-        msg += "cube [" + cube.getFileName();
+        msg += "cube [" + cube.fileName();
         msg += "] is not a camera or map projection";
 
         IException polyError(IException::User, msg, _FILEINFO_);
@@ -145,13 +145,13 @@ namespace Isis {
     if (cam != NULL) p_isProjected = cam->HasProjection();
 
     //  Create brick for use in SetImage
-    p_brick = new Brick(1, 1, 1, cube.getPixelType());
+    p_brick = new Brick(1, 1, 1, cube.pixelType());
 
     //------------------------------------------------------------------------
     //  Save cube number of samples and lines for later use.
     //------------------------------------------------------------------------
-    p_cubeSamps = cube.getSampleCount();
-    p_cubeLines = cube.getLineCount();
+    p_cubeSamps = cube.sampleCount();
+    p_cubeLines = cube.lineCount();
 
     if (ns != 0) {
       p_cubeSamps = std::min(p_cubeSamps, ss + ns);
@@ -245,7 +245,7 @@ namespace Isis {
         else {
           e.print(); // This should be a NAIF error
           QString msg = "Cannot find polygon for image "
-              "[" + cube.getFileName() + "]: ";
+              "[" + cube.fileName() + "]: ";
           msg += increasePrecision ? "Cannot increase precision any further" :
               "The increment/step size might be too large";
           throw IException(IException::User, msg, _FILEINFO_);
@@ -593,7 +593,7 @@ namespace Isis {
 
     if (m_leftCoord && m_rightCoord && m_topCoord) {
       for (int sample = (int)m_leftCoord->x; !m_botCoord && sample <= m_rightCoord->x; sample++) {
-        for (int line = p_cube->getLineCount(); !m_botCoord && line >= m_topCoord->y; line--) {
+        for (int line = p_cube->lineCount(); !m_botCoord && line >= m_topCoord->y; line--) {
           if (SetImage(sample, line)) {
             m_botCoord = new geos::geom::Coordinate(sample, line);
           }
@@ -826,8 +826,8 @@ namespace Isis {
       }
 
       if (nPoleSample >= 0.5 && nPoleLine >= 0.5 &&
-         nPoleSample <= p_cube->getSampleCount() + 0.5 &&
-         nPoleLine <= p_cube->getLineCount() + 0.5) {
+         nPoleSample <= p_cube->sampleCount() + 0.5 &&
+         nPoleLine <= p_cube->lineCount() + 0.5) {
         hasNorthPole = true;
       }
     }
@@ -846,8 +846,8 @@ namespace Isis {
       }
 
       if (sPoleSample >= 0.5 && sPoleLine >= 0.5 &&
-         sPoleSample <= p_cube->getSampleCount() + 0.5 &&
-         sPoleLine <= p_cube->getLineCount() + 0.5) {
+         sPoleSample <= p_cube->sampleCount() + 0.5 &&
+         sPoleLine <= p_cube->lineCount() + 0.5) {
         hasSouthPole = true;
       }
     }

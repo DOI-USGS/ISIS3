@@ -599,29 +599,29 @@ namespace Isis {
       double samp = groundMap->Sample();
       double line = groundMap->Line();
 
-      if (groundMap->HasProjection()) {
-        if (groundMap->SetImage(samp - 0.5, line - 0.5)) {
-          double lat1 = groundMap->UniversalLatitude();
-          double lon1 = groundMap->UniversalLongitude();
+      if (groundMap->SetImage(samp - 0.5, line - 0.5)) {
+        double lat1 = groundMap->UniversalLatitude();
+        double lon1 = groundMap->UniversalLongitude();
 
-          if (groundMap->SetImage(samp + 0.5, line + 0.5)) {
-            double lat2 = groundMap->UniversalLatitude();
-            double lon2 = groundMap->UniversalLongitude();
+        if (groundMap->SetImage(samp + 0.5, line + 0.5)) {
+          double lat2 = groundMap->UniversalLatitude();
+          double lon2 = groundMap->UniversalLongitude();
 
-            double radius = groundMap->Projection()->LocalRadius();
+          double radius = groundMap->HasProjection()?
+              groundMap->Projection()->LocalRadius() :
+              groundMap->Camera()->LocalRadius().meters();
 
-            SurfacePoint point1(
-                Latitude(lat1, Angle::Degrees),
-                Longitude(lon1, Angle::Degrees),
-                Distance(radius, Distance::Meters));
+          SurfacePoint point1(
+              Latitude(lat1, Angle::Degrees),
+              Longitude(lon1, Angle::Degrees),
+              Distance(radius, Distance::Meters));
 
-            SurfacePoint point2(
-                Latitude(lat2, Angle::Degrees),
-                Longitude(lon2, Angle::Degrees),
-                Distance(radius, Distance::Meters));
+          SurfacePoint point2(
+              Latitude(lat2, Angle::Degrees),
+              Longitude(lon2, Angle::Degrees),
+              Distance(radius, Distance::Meters));
 
-            viewportResolution = point1.GetDistanceToPoint(point2);
-          }
+          viewportResolution = point1.GetDistanceToPoint(point2);
         }
       }
     }

@@ -104,7 +104,7 @@ void IsisMain() {
 
     // get values from the labels needed to compute the line rate and the
     // actual start time of the input cube
-    Pvl &inLabels = *g_cube.getLabel();
+    Pvl &inLabels = *g_cube.label();
     PvlGroup &inputInst = inLabels.FindObject("IsisCube").FindGroup("Instrument");
     QString instId = (inputInst["InstrumentId"]);
     if (instId.toUpper() != "HIRISE") {
@@ -214,8 +214,8 @@ void IsisMain() {
       // decimal value.
       double stopTime2Line = et2line(lastValidTime, lineRate, originalStartEt);
       double decimalValue = stopTime2Line - qFloor(stopTime2Line);
-      if (stopTime2Line > (double) g_cube.getLineCount()) {
-        g_cropEndLine = g_cube.getLineCount();
+      if (stopTime2Line > (double) g_cube.lineCount()) {
+        g_cropEndLine = g_cube.lineCount();
       }
       else {
         // we need to be sure that the entire last ilne has coverage.
@@ -306,9 +306,9 @@ void IsisMain() {
     ProcessByLine p;
     p.SetInputCube("FROM");
     p.PropagateTables(false);
-    int numSamps = g_cube.getSampleCount();
-    int numBands = g_cube.getBandCount();
-    int inputLineCount = g_cube.getLineCount();
+    int numSamps = g_cube.sampleCount();
+    int numBands = g_cube.bandCount();
+    int inputLineCount = g_cube.lineCount();
     Cube *ocube = p.SetOutputCube("TO", numSamps, g_cropLineCount, numBands);
     p.ClearInputCubes();
 
@@ -326,7 +326,7 @@ void IsisMain() {
     }
 
     // test to see what happens if I don't have this code ???
-    Pvl &outLabels = *ocube->getLabel();
+    Pvl &outLabels = *ocube->label();
     // Change the start/end times and spacecraft start/stop counts in the labels
     PvlGroup &outputInst = outLabels.FindObject("IsisCube").FindGroup("Instrument");
     outputInst["StartTime"][0] = cropStartTime.UTC(); //??? use actual or adjusted like clock counts ???

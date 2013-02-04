@@ -18,7 +18,7 @@ class BandStretch {
     BandStretch(Cube *cube, int band, double variance) {
       m_variance = variance;
 
-      Statistics *stats = cube->getStatistics(band);
+      Statistics *stats = cube->statistics(band);
       m_average = stats->Average();
       m_standardDeviation = stats->StandardDeviation();
       delete stats;
@@ -73,7 +73,7 @@ void IsisMain() {
 
   SigmaStretcher stretcher;
   double variance = Application::GetUserInterface().GetDouble("VARIANCE");
-  for (int i = 1; i <= cube->getBandCount(); i++)
+  for (int i = 1; i <= cube->bandCount(); i++)
     stretcher.addStretch(new BandStretch(cube, i, variance));
 
   p.ProcessCube(stretcher);

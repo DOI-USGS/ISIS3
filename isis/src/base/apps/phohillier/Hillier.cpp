@@ -49,7 +49,7 @@ namespace Isis {
    * @param cube Input cube file
    */
   Hillier::Hillier(PvlObject &pvl, Cube &cube) {
-    _camera = cube.getCamera();
+    _camera = cube.camera();
     init(pvl, cube);
   }
   /**
@@ -331,10 +331,10 @@ namespace Isis {
       ++algo;
     }
 
-    Pvl *label = cube.getLabel();
+    Pvl *label = cube.label();
     PvlKeyword center = label->FindGroup("BandBin", Pvl::Traverse)["Center"];
     QString errs("");
-    for(int i = 0; i < cube.getBandCount() ; i++) {
+    for(int i = 0; i < cube.bandCount() ; i++) {
       Parameters parms = findParameters(toDouble(center[i]));
       if(parms.IsValid()) {
         parms.band = i + 1;

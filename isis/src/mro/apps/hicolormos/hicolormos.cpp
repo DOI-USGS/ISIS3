@@ -260,7 +260,7 @@ void IsisMain() {
 
   Cube c;
   c.open(ui.GetFileName("TO"), "rw");
-  c.getLabel()->FindObject("IsisCube", Pvl::Traverse).AddGroup(mos);
+  c.label()->FindObject("IsisCube", Pvl::Traverse).AddGroup(mos);
   c.write(from1OrgLab);
   c.close();
 

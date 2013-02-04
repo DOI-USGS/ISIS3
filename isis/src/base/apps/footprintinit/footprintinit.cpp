@@ -20,7 +20,7 @@ void IsisMain() {
 
   // Make sure cube has been run through spiceinit
   try {
-    cube.getCamera();
+    cube.camera();
   }
   catch(IException &e) {
     string msg = "Spiceinit must be run before initializing the polygon";

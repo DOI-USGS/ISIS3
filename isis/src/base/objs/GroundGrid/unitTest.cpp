@@ -31,7 +31,7 @@ void IsisMain() {
 
   cout << "Create grid..." << endl;
   Progress progress;
-  GroundGrid grid(&gmap, false, someCube.getSampleCount(), someCube.getLineCount());
+  GroundGrid grid(&gmap, false, someCube.sampleCount(), someCube.lineCount());
   grid.SetGroundLimits(Latitude(28.572438078395002, Angle::Degrees),
                        Longitude(-133.284402721991682, Angle::Degrees),
                        Latitude(34.340453944831125, Angle::Degrees),
@@ -43,10 +43,10 @@ void IsisMain() {
 
   cout << "\n\nGrid cutout: \n" << endl;
 
-  for(int line = 0; line < someCube.getLineCount() / 4; line++) {
+  for(int line = 0; line < someCube.lineCount() / 4; line++) {
 
-    for(int i = (int)(someCube.getSampleCount() * 3.0 / 7.0);
-            i < (someCube.getSampleCount() * 3.5 / 7.0); i++) {
+    for(int i = (int)(someCube.sampleCount() * 3.0 / 7.0);
+            i < (someCube.sampleCount() * 3.5 / 7.0); i++) {
       cout << grid.PixelOnGrid(i, line);
     }
 
@@ -59,10 +59,10 @@ void IsisMain() {
 
   cout << "\n\nGrid cutout with boundary walk: \n" << endl;
 
-  for(int line = 0; line < someCube.getLineCount() / 4; line++) {
+  for(int line = 0; line < someCube.lineCount() / 4; line++) {
 
-    for(int i = (int)(someCube.getSampleCount() * 3.0 / 7.0);
-            i < (someCube.getSampleCount() * 3.5 / 7.0); i++) {
+    for(int i = (int)(someCube.sampleCount() * 3.0 / 7.0);
+            i < (someCube.sampleCount() * 3.5 / 7.0); i++) {
       cout << grid.PixelOnGrid(i, line);
     }
 
@@ -78,7 +78,7 @@ void IsisMain() {
     incompleteLabelsCube.open("./unitTest.cub");
     UniversalGroundMap gmap(incompleteLabelsCube,
         UniversalGroundMap::ProjectionFirst);
-    GroundGrid tmp(&gmap, false, someCube.getSampleCount(), someCube.getLineCount());
+    GroundGrid tmp(&gmap, false, someCube.sampleCount(), someCube.lineCount());
     Longitude invalidLon;
     Latitude invalidLat;
     tmp.SetGroundLimits(Latitude(28.572438078395002, Angle::Degrees),

@@ -16,7 +16,7 @@ void IsisMain() {
   QString channel = ui.GetFileName("FROM");
   Cube cube;
   cube.open(channel);
-  Camera *cam = cube.getCamera();
+  Camera *cam = cube.camera();
 
   // Get the type of conversion that we are doing
   QString type = ui.GetString("TYPE");
@@ -42,7 +42,7 @@ void IsisMain() {
   }
 
   // Create Brick on samp, line to get the dn value of the pixel
-  Brick b(3, 3, 1, cube.getPixelType());
+  Brick b(3, 3, 1, cube.pixelType());
   int intSamp = (int)(samp + 0.5);
   int intLine = (int)(line + 0.5);
   b.SetBasePosition(intSamp, intLine, 1);

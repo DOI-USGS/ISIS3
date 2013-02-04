@@ -11,6 +11,9 @@ namespace Isis {
    *
    * @internal
    *   @history 2011-05-18 Steven Lambright - Resolution now sorts correctly
+   *   @history 2012-12-27 Steven Lambright - Added PhaseAngleColumn to TreeColumn enumeration.
+   *                           Also added the necessary code to support this new column.
+   *                           References #1093.
    */
   class MosaicTreeWidgetItem : public QTreeWidgetItem {
     public:
@@ -35,6 +38,7 @@ namespace Isis {
         LabelColumn,
         ResolutionColumn,
         EmissionAngleColumn,
+        PhaseAngleColumn,
         IncidenceAngleColumn,
         BlankColumn
       };

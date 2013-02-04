@@ -47,20 +47,20 @@ void IsisMain() {
   Cube *ocube = p.SetOutputCube("TO");
   Cube *ffcube, *ofcube, *afcube, *dccube, *biascube, *bpcube;
 
-  QString filter = (QString)(icube->getGroup("BandBin"))["FilterName"];
+  QString filter = (QString)(icube->group("BandBin"))["FilterName"];
   filter = filter.toLower();
-  QString productID = (QString)(icube->getGroup("Archive"))["ProductID"];
+  QString productID = (QString)(icube->group("Archive"))["ProductID"];
   QString orbit = productID.mid(productID.indexOf('.') + 1, productID.length() - 1);
 
   // If hemisphere code greater than 'I' set to 'n' else set to 's'
   char hemisphereCode = (productID[productID.indexOf('.')-1] > 'I') ? 'n' : 's';
-  QString compressionType = (QString)(icube->getGroup("Instrument"))["EncodingFormat"];
-  offsetModeID = (icube->getGroup("Instrument"))["OffsetModeID"];
-  int gainModeID = (icube->getGroup("Instrument"))["GainModeID"];
+  QString compressionType = (QString)(icube->group("Instrument"))["EncodingFormat"];
+  offsetModeID = (icube->group("Instrument"))["OffsetModeID"];
+  int gainModeID = (icube->group("Instrument"))["GainModeID"];
   QString gainModeIDStr = toString(gainModeID);
-  double exposureDuration = (double)(icube->getGroup("Instrument"))["ExposureDuration"];
+  double exposureDuration = (double)(icube->group("Instrument"))["ExposureDuration"];
   optimalExposureDuration = (exposureDuration * 0.984675) + 0.233398;
-  cryocoolerDuration = (icube->getGroup("Instrument"))["CryocoolerDuration"];
+  cryocoolerDuration = (icube->group("Instrument"))["CryocoolerDuration"];
 
   if(ui.WasEntered("FFFILE")) {
     ffcube = p.SetInputCube("FFFILE");
@@ -231,12 +231,12 @@ void IsisMain() {
 
   // Add the radiometry group
   PvlGroup calgrp("Radiometry");
-  calgrp += PvlKeyword("FlatFieldFile", ffcube->getFileName());
-  calgrp += PvlKeyword("OrbitFlatFieldFile", ofcube->getFileName());
-  calgrp += PvlKeyword("AdditiveFile", afcube->getFileName());
-  calgrp += PvlKeyword("DarkCurrentFile", dccube->getFileName());
-  calgrp += PvlKeyword("BiasFile", biascube->getFileName());
-  calgrp += PvlKeyword("BadPixelFile", bpcube->getFileName());
+  calgrp += PvlKeyword("FlatFieldFile", ffcube->fileName());
+  calgrp += PvlKeyword("OrbitFlatFieldFile", ofcube->fileName());
+  calgrp += PvlKeyword("AdditiveFile", afcube->fileName());
+  calgrp += PvlKeyword("DarkCurrentFile", dccube->fileName());
+  calgrp += PvlKeyword("BiasFile", biascube->fileName());
+  calgrp += PvlKeyword("BadPixelFile", bpcube->fileName());
 
   //Table files
   calgrp += PvlKeyword("ThermalCorrectionTable", thermTbl);

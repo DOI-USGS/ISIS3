@@ -44,9 +44,9 @@ namespace Isis {
                                   justRequested.BandDimension());
 
       // They'll all be roughly the same size, so the first one is good enough
-      int largestChunkDim = max( max( allocated[0]->getSampleCount(),
-                                      allocated[0]->getLineCount()),
-                                 allocated[0]->getBandCount());
+      int largestChunkDim = max( max( allocated[0]->sampleCount(),
+                                      allocated[0]->lineCount()),
+                                 allocated[0]->bandCount());
       // The average needed per request ought to be
       //   avgLargestDim / largestChunkDim. Let's keep an extra few around
       //   since it's cheap, and because we are uncertain of request patterns.

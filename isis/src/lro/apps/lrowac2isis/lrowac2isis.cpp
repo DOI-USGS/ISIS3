@@ -402,7 +402,7 @@ void separateFramelets(Buffer &in) {
   }
 
   if(flip) {
-    outLine = outfile->getLineCount() - (outLine - 1);
+    outLine = outfile->lineCount() - (outLine - 1);
   }
 
   outLine += frameletLineOffset;
@@ -484,7 +484,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
   genericInstrument.push_back(PvlKeyword("DataFlipped", "No"));//(ui.GetBoolean("FLIP")? "Yes" : "No")));
 
   // color offset doesn't apply to BW mode (single band cubes)
-  if(colorOffset && viseven && viseven->getBandCount() == 1) {
+  if(colorOffset && viseven && viseven->bandCount() == 1) {
     genericInstrument.push_back(PvlKeyword("ColorOffset", 0));
   }
   else {
@@ -510,14 +510,14 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
   // add labels unique to particular files
   if(viseven) {
     visEvenInst.AddKeyword(PvlKeyword("Framelets", "Even"));
-    visEvenInst.AddKeyword(PvlKeyword("NumFramelets", toString(viseven->getLineCount() / 14)));
+    visEvenInst.AddKeyword(PvlKeyword("NumFramelets", toString(viseven->lineCount() / 14)));
     visEvenInst.AddKeyword(PvlKeyword("InstrumentId", "WAC-VIS"), Pvl::Replace);
     visEvenInst.AddKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
   }
 
   if(visodd) {
     visOddInst.AddKeyword(PvlKeyword("Framelets", "Odd"));
-    visOddInst.AddKeyword(PvlKeyword("NumFramelets", toString(visodd->getLineCount() / 14)));
+    visOddInst.AddKeyword(PvlKeyword("NumFramelets", toString(visodd->lineCount() / 14)));
     visOddInst.AddKeyword(PvlKeyword("InstrumentId", "WAC-VIS"), Pvl::Replace);
     visOddInst.AddKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
   }
@@ -529,7 +529,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
   PvlKeyword visFilterNum("FilterNumber");
   PvlKeyword visBandwidth("Width");
 
-  if(viseven && viseven->getBandCount() == 1) {
+  if(viseven && viseven->bandCount() == 1) {
     visWavelength = pdsLab["CENTER_FILTER_WAVELENGTH"][0];
     visFilterNum = pdsLab["FILTER_NUMBER"][0];
 
@@ -567,14 +567,14 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
 
   if(uveven) {
     uvEvenInst.AddKeyword(PvlKeyword("Framelets", "Even"));
-    uvEvenInst.AddKeyword(PvlKeyword("NumFramelets", toString(uveven->getLineCount() / 4)));
+    uvEvenInst.AddKeyword(PvlKeyword("NumFramelets", toString(uveven->lineCount() / 4)));
     uvEvenInst.AddKeyword(PvlKeyword("InstrumentId", "WAC-UV"), Pvl::Replace);
     uvEvenInst.AddKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
   }
 
   if(uvodd) {
     uvOddInst.AddKeyword(PvlKeyword("Framelets", "Odd"));
-    uvOddInst.AddKeyword(PvlKeyword("NumFramelets", toString(uvodd->getLineCount() / 4)));
+    uvOddInst.AddKeyword(PvlKeyword("NumFramelets", toString(uvodd->lineCount() / 4)));
     uvOddInst.AddKeyword(PvlKeyword("InstrumentId", "WAC-UV"), Pvl::Replace);
     uvOddInst.AddKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
   }

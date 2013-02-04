@@ -196,7 +196,7 @@ namespace Isis {
       Cube *outCube) {
     Clear();
 
-    m_outputSamples = outCube->getSampleCount();
+    m_outputSamples = outCube->sampleCount();
 
     IString eq = equation;
     while (eq != "") {
@@ -503,8 +503,8 @@ namespace Isis {
       else if ((token == "phac") || (token == "inac") || (token == "emac")) {
         int cubeIndex = lastPushToCubeCameras(inCubes);
 
-        double centerLine = inCubes[cubeIndex]->getLineCount() / 2.0 + 0.5;
-        double centerSamp = inCubes[cubeIndex]->getSampleCount() / 2.0 + 0.5;
+        double centerLine = inCubes[cubeIndex]->lineCount() / 2.0 + 0.5;
+        double centerSamp = inCubes[cubeIndex]->sampleCount() / 2.0 + 0.5;
         Camera *cam = (*m_cubeCameras)[cubeIndex];
 
         if (cam->SetImage(centerSamp, centerLine)) {
@@ -664,7 +664,7 @@ namespace Isis {
     // Now we can for sure put the stats object in the right place... put it
     //   there
     if ((*m_cubeStats)[cubeStatsIndex] == NULL) {
-      (*m_cubeStats)[cubeStatsIndex] = inCubes[cubeStatsIndex]->getStatistics();
+      (*m_cubeStats)[cubeStatsIndex] = inCubes[cubeStatsIndex]->statistics();
     }
 
     return cubeStatsIndex;
@@ -713,7 +713,7 @@ namespace Isis {
     if ((*m_cubeCameras)[cubeIndex] == NULL) {
       Camera *cam;
       try {
-        cam = inCubes[cubeIndex]->getCamera();
+        cam = inCubes[cubeIndex]->camera();
         if (cam == NULL) {
           string msg = "This function requires a camera and the input cube does";
           msg += " not have one. You may need to run spiceinit";

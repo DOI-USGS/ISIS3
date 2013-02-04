@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
 
     // Test Histogram object on a single band, 1 by default
     cerr << "Testing histogram method, band 1 ... " << endl;
-    Histogram *bandOneHist = in.getHistogram();
+    Histogram *bandOneHist = in.histogram();
     cerr << "Average:        " << bandOneHist->Average() << endl;
     cerr << "Standard Dev:   " << bandOneHist->StandardDeviation() << endl;
     cerr << "Mode:           " << bandOneHist->Mode() << endl;
@@ -189,7 +189,7 @@ int main(int argc, char *argv[]) {
 
     // Test histogram object on all bands
     cerr << "Testing histogram method, all bands ... " << endl;
-    Histogram *allBandsHistogram = in.getHistogram(0);
+    Histogram *allBandsHistogram = in.histogram(0);
     cerr << "Average:        " << allBandsHistogram->Average() << endl;
     cerr << "Standard Dev:   " << allBandsHistogram->StandardDeviation() << endl;
     cerr << "Mode:           " << allBandsHistogram->Mode() << endl;
@@ -201,7 +201,7 @@ int main(int argc, char *argv[]) {
 
     // Check error for too few (negative) bands
     try {
-      in.getHistogram(-1);
+      in.histogram(-1);
     }
     catch (IException &e) {
       e.print();
@@ -209,7 +209,7 @@ int main(int argc, char *argv[]) {
 
     // Test statistics object on a single band, 1 by default
     cerr << "Testing statistics method, band 1 ... " << endl;
-    Statistics *bandOneStats = in.getStatistics();
+    Statistics *bandOneStats = in.statistics();
     cerr << "Average:        " << bandOneStats->Average() << endl;
     cerr << "Standard Dev:   " << bandOneStats->StandardDeviation() << endl;
     cerr << "Total Pixels:   " << bandOneStats->TotalPixels() << endl;
@@ -220,7 +220,7 @@ int main(int argc, char *argv[]) {
 
     // Test statistics object on all bands
     cerr << "Testing statistics method, all bands ... " << endl;
-    Statistics *allBandsStats = in.getStatistics(0);
+    Statistics *allBandsStats = in.statistics(0);
     cerr << "Average:        " << allBandsStats->Average() << endl;
     cerr << "Standard Dev:   " << allBandsStats->StandardDeviation() << endl;
     cerr << "Total Pixels:   " << allBandsStats->TotalPixels() << endl;
@@ -231,7 +231,7 @@ int main(int argc, char *argv[]) {
 
     // Check error for too few (negative) bands
     try {
-      in.getStatistics(-1);
+      in.statistics(-1);
     }
     catch (IException &e) {
       e.print();
@@ -241,9 +241,9 @@ int main(int argc, char *argv[]) {
 
     cerr << "Virtual band tests" << endl;  // Virtual Band tests
 
-    cerr << "Nbands = " << in.getBandCount() << endl;
-    cerr << "Band 1 = " << in.getPhysicalBand(1) << endl;
-    cerr << "Band 2 = " << in.getPhysicalBand(2) << endl;
+    cerr << "Nbands = " << in.bandCount() << endl;
+    cerr << "Band 1 = " << in.physicalBand(1) << endl;
+    cerr << "Band 2 = " << in.physicalBand(2) << endl;
     in.close();
     cerr << endl;
 
@@ -251,8 +251,8 @@ int main(int argc, char *argv[]) {
     vbands.push_back("2");
     in.setVirtualBands(vbands);
     in.open("IsisCube_01");
-    cerr << "Nbands = " << in.getBandCount() << endl;
-    cerr << "Band 1 = " << in.getPhysicalBand(1) << endl;
+    cerr << "Nbands = " << in.bandCount() << endl;
+    cerr << "Band 1 = " << in.physicalBand(1) << endl;
     cerr << endl;
 
 
@@ -289,7 +289,7 @@ int main(int argc, char *argv[]) {
     // our cube is entirely filled with ones, and any parts that fall outside of
     // the cube should be nulls.
     cerr << "Reading completely within cube boundaries ... " << endl;
-    Brick readBrick(1, 1, 2, boundaryTestCube.getPixelType());
+    Brick readBrick(1, 1, 2, boundaryTestCube.pixelType());
     readBrick.SetBasePosition(1, 1, 1);
     boundaryTestCube.read(readBrick);
 
@@ -462,14 +462,14 @@ int main(int argc, char *argv[]) {
     }
 
     try {
-      in.getPhysicalBand(2);
+      in.physicalBand(2);
     }
     catch (IException &e) {
       e.print();
     }
 
     try {
-      in.getPhysicalBand(0);
+      in.physicalBand(0);
     }
     catch (IException &e) {
       e.print();
@@ -585,9 +585,9 @@ int main(int argc, char *argv[]) {
     externalData.setExternalDnData("$base/testData/isisTruth.cub");
     externalData.create("isisTruth_external.ecub");
     externalData.putGroup(PvlGroup("TestGroup"));
-    cerr << *externalData.getLabel() << endl;
+    cerr << *externalData.label() << endl;
 
-    Brick readBrick(3, 3, 2, externalData.getPixelType());
+    Brick readBrick(3, 3, 2, externalData.pixelType());
     readBrick.SetBasePosition(1, 1, 1);
     externalData.read(readBrick);
     for (int index = 0; index < readBrick.size(); index++) {
@@ -613,9 +613,9 @@ int main(int argc, char *argv[]) {
     Cube externalData;
     externalData.setExternalDnData("isisTruth_external.ecub");
     externalData.create("isisTruth_external2.ecub");
-    cerr << *externalData.getLabel() << endl;
+    cerr << *externalData.label() << endl;
 
-    Brick readBrick(3, 3, 2, externalData.getPixelType());
+    Brick readBrick(3, 3, 2, externalData.pixelType());
     readBrick.SetBasePosition(1, 1, 1);
     externalData.read(readBrick);
     for (int index = 0; index < readBrick.size(); index++) {
@@ -641,9 +641,9 @@ int main(int argc, char *argv[]) {
     Cube externalData;
     externalData.open("isisTruth_external");
     externalData.putGroup(PvlGroup("TestGroup2"));
-    cerr << *externalData.getLabel() << endl;
+    cerr << *externalData.label() << endl;
 
-    Brick readBrick(3, 3, 2, externalData.getPixelType());
+    Brick readBrick(3, 3, 2, externalData.pixelType());
     readBrick.SetBasePosition(1, 1, 1);
     externalData.read(readBrick);
     for (int index = 0; index < readBrick.size(); index++) {
@@ -668,9 +668,9 @@ int main(int argc, char *argv[]) {
   {
     Cube externalData;
     externalData.open("isisTruth_external2");
-    cerr << *externalData.getLabel() << endl;
+    cerr << *externalData.label() << endl;
 
-    Brick readBrick(3, 3, 2, externalData.getPixelType());
+    Brick readBrick(3, 3, 2, externalData.pixelType());
     readBrick.SetBasePosition(1, 1, 1);
     externalData.read(readBrick);
     for (int index = 0; index < readBrick.size(); index++) {
@@ -696,9 +696,9 @@ int main(int argc, char *argv[]) {
     Cube externalData;
     externalData.setExternalDnData("IsisCube_02.lbl");
     externalData.create("isisTruth_external3.ecub");
-    cerr << *externalData.getLabel() << endl;
+    cerr << *externalData.label() << endl;
 
-    Brick readBrick(3, 3, 2, externalData.getPixelType());
+    Brick readBrick(3, 3, 2, externalData.pixelType());
     readBrick.SetBasePosition(1, 1, 1);
     externalData.read(readBrick);
     for (int index = 0; index < readBrick.size(); index++) {
@@ -725,9 +725,9 @@ int main(int argc, char *argv[]) {
     externalData.open("isisTruth_external3.ecub");
     Cube *copiedCube = externalData.copy("isisTruth_external3.copy.ecub",
                                          CubeAttributeOutput("+External"));
-    cerr << *copiedCube->getLabel() << endl;
+    cerr << *copiedCube->label() << endl;
 
-    Brick readBrick(3, 3, 2, copiedCube->getPixelType());
+    Brick readBrick(3, 3, 2, copiedCube->pixelType());
     readBrick.SetBasePosition(1, 1, 1);
     copiedCube->read(readBrick);
     for (int index = 0; index < readBrick.size(); index++) {
@@ -766,16 +766,16 @@ int main(int argc, char *argv[]) {
 
 
 void Report(Cube &c) {
-  cerr << "File   = " << IString(QFileInfo(c.getFileName()).fileName()) << endl;
-  cerr << "Samps  = " << c.getSampleCount() << endl;
-  cerr << "Lines  = " << c.getLineCount() << endl;
-  cerr << "Bands  = " << c.getBandCount() << endl;
-  cerr << "Base   = " << c.getBase() << endl;
-  cerr << "Mult   = " << c.getMultiplier() << endl;
-  cerr << "Type   = " << c.getPixelType() << endl;
+  cerr << "File   = " << IString(QFileInfo(c.fileName()).fileName()) << endl;
+  cerr << "Samps  = " << c.sampleCount() << endl;
+  cerr << "Lines  = " << c.lineCount() << endl;
+  cerr << "Bands  = " << c.bandCount() << endl;
+  cerr << "Base   = " << c.base() << endl;
+  cerr << "Mult   = " << c.multiplier() << endl;
+  cerr << "Type   = " << c.pixelType() << endl;
 //  cerr << "Order  = " << c.ByteOrder() << endl; // Needs to be system independent
   cerr << "Atchd  = " << c.labelsAttached() << endl;
-  cerr << "Format = " << c.getFormat() << endl;
+  cerr << "Format = " << c.format() << endl;
   cerr << "Open   = " << c.isOpen() << endl;
   try {
     cerr << "R/O    = ";
@@ -798,6 +798,6 @@ void Report(Cube &c) {
   }
 
   cerr << endl;
-  cerr << "Lbytes = " << c.getLabelSize() << endl;
+  cerr << "Lbytes = " << c.labelSize() << endl;
   cerr << endl;
 }

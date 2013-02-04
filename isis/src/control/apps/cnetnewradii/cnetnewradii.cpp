@@ -45,7 +45,7 @@ void IsisMain() {
 
   //   Buffer used to read from the model
   Portal *portal = new Portal(interp->Samples(), interp->Lines(),
-                              demCube.getPixelType(),
+                              demCube.pixelType(),
                               interp->HotSample(), interp->HotLine());;
 
 

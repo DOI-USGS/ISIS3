@@ -481,7 +481,7 @@ namespace Isis {
   /**
    * @return the number of physical bands in the cube.
    */
-  int CubeIoHandler::getBandCount() const {
+  int CubeIoHandler::bandCount() const {
     return m_numBands;
   }
 
@@ -546,9 +546,9 @@ namespace Isis {
    * @return The chunk's index into the file
    */
   int CubeIoHandler::getChunkIndex(const RawCubeChunk &chunk)  const {
-//     ASSERT(chunk.getStartSample() <= getSampleCount());
-//     ASSERT(chunk.getStartLine() <= getLineCount());
-//     ASSERT(chunk.getStartBand() <= getBandCount());
+//     ASSERT(chunk.getStartSample() <= sampleCount());
+//     ASSERT(chunk.getStartLine() <= lineCount());
+//     ASSERT(chunk.getStartBand() <= bandCount());
 
     int sampleIndex = (chunk.getStartSample() - 1) / getSampleCountInChunk();
     int lineIndex = (chunk.getStartLine() - 1) / getLineCountInChunk();
@@ -586,7 +586,7 @@ namespace Isis {
    * @return the number of lines in the cube. This does not include lines created
    *   by the chunk overflowing the line dimension.
    */
-  int CubeIoHandler::getLineCount() const {
+  int CubeIoHandler::lineCount() const {
     return m_numLines;
   }
 
@@ -602,7 +602,7 @@ namespace Isis {
   /**
    * @return the physical cube DN format.
    */
-  PixelType CubeIoHandler::getPixelType() const {
+  PixelType CubeIoHandler::pixelType() const {
     return m_pixelType;
   }
 
@@ -611,7 +611,7 @@ namespace Isis {
    * @return the number of samples in the cube. This does not include samples
    *   created by the chunk overflowing the sample dimension.
    */
-  int CubeIoHandler::getSampleCount() const {
+  int CubeIoHandler::sampleCount() const {
     return m_numSamples;
   }
 
@@ -758,15 +758,15 @@ namespace Isis {
     QList<RawCubeChunk *> results;
 
     int lastBand = min(startBand + numBands - 1,
-                       getBandCount());
+                       bandCount());
 
     QRect areaInBand(
         QPoint(max(startSample, 1),
                 max(startLine, 1)),
         QPoint(min(startSample + numSamples - 1,
-                   getSampleCount()),
+                   sampleCount()),
                 min(startLine + numLines - 1,
-                    getLineCount())));
+                    lineCount())));
 
     // We are considering only 1 band at a time.. we can't use m_bandsInChunk
     //   because of virtual bands, but every extra loop should not need extra
@@ -850,7 +850,7 @@ namespace Isis {
         // current band, and the chunk's initial band must be between 1 and the
         // number of physical bands in the cube (inclusive).
         while(chunkRect.intersects(areaLeftInBand) &&
-              (initialChunkBand >= 1 && initialChunkBand <= getBandCount())) {
+              (initialChunkBand >= 1 && initialChunkBand <= bandCount())) {
           int chunkXPos = (chunkRect.left() - 1) / m_samplesInChunk;
           int chunkYPos = (chunkRect.top() - 1) / m_linesInChunk;
           int chunkZPos = initialChunkZPos;
@@ -941,11 +941,11 @@ namespace Isis {
     startX = max(cube1.getStartSample(), cube2.Sample());
     startY = max(cube1.getStartLine(), cube2.Line());
     startZ = max(cube1.getStartBand(), startPhysicalBand);
-    endX = min(cube1.getStartSample() + cube1.getSampleCount() - 1,
+    endX = min(cube1.getStartSample() + cube1.sampleCount() - 1,
                cube2.Sample() + cube2.SampleDimension() - 1);
-    endY = min(cube1.getStartLine() + cube1.getLineCount() - 1,
+    endY = min(cube1.getStartLine() + cube1.lineCount() - 1,
                cube2.Line() + cube2.LineDimension() - 1);
-    endZ = min(cube1.getStartBand() + cube1.getBandCount() - 1,
+    endZ = min(cube1.getStartBand() + cube1.bandCount() - 1,
                endPhysicalBand);
   }
 
@@ -1176,9 +1176,9 @@ namespace Isis {
 
     if(!m_nullChunkData) {
       // the pixel type doesn't really matter, so pick something small
-      Brick nullBuffer(result->getSampleCount(),
-                      result->getLineCount(),
-                      result->getBandCount(),
+      Brick nullBuffer(result->sampleCount(),
+                      result->lineCount(),
+                      result->bandCount(),
                       UnsignedByte);
 
       nullBuffer.SetBasePosition(result->getStartSample(),
@@ -1270,7 +1270,7 @@ namespace Isis {
        m_lastProcessByLineChunks->size()) {
       // Not optimized yet, let's see if we can optimize
       if(bufferToWrite.Sample() == 1 &&
-         bufferSampleCount == getSampleCount() &&
+         bufferSampleCount == sampleCount() &&
          bufferLineCount == 1 &&
          bufferBandCount == 1) {
         // We look like a process by line, are we using the same chunks as
@@ -1279,12 +1279,12 @@ namespace Isis {
         int chunkStartLine =
             (*m_lastProcessByLineChunks)[0]->getStartLine();
         int chunkLines =
-            (*m_lastProcessByLineChunks)[0]->getLineCount();
+            (*m_lastProcessByLineChunks)[0]->lineCount();
         int bufferBand = bufferToWrite.Band();
         int chunkStartBand =
             (*m_lastProcessByLineChunks)[0]->getStartBand();
         int chunkBands =
-            (*m_lastProcessByLineChunks)[0]->getBandCount();
+            (*m_lastProcessByLineChunks)[0]->bandCount();
 
         if(bufferLine >= chunkStartLine &&
            bufferLine <= chunkStartLine + chunkLines - 1 &&
@@ -1340,7 +1340,7 @@ namespace Isis {
 
     // process by line optimization
     if(bufferToWrite.Sample() == 1 &&
-        bufferSampleCount == getSampleCount() &&
+        bufferSampleCount == sampleCount() &&
         bufferLineCount == 1 &&
         bufferBandCount == 1) {
       if(!m_lastProcessByLineChunks)
@@ -1387,8 +1387,8 @@ namespace Isis {
     int chunkStartSample = chunk.getStartSample();
     int chunkStartLine = chunk.getStartLine();
     int chunkStartBand = chunk.getStartBand();
-    int chunkLineSize = chunk.getSampleCount();
-    int chunkBandSize = chunkLineSize * chunk.getLineCount();
+    int chunkLineSize = chunk.sampleCount();
+    int chunkBandSize = chunkLineSize * chunk.lineCount();
     //double *buffersDoubleBuf = output.p_buf;
     double *buffersDoubleBuf = output.DoubleBuffer();
     const char *chunkBuf = chunk.getRawData().data();
@@ -1522,8 +1522,8 @@ namespace Isis {
     int outputStartSample = output.getStartSample();
     int outputStartLine = output.getStartLine();
     int outputStartBand = output.getStartBand();
-    int lineSize = output.getSampleCount();
-    int bandSize = lineSize * output.getLineCount();
+    int lineSize = output.sampleCount();
+    int bandSize = lineSize * output.lineCount();
     double *buffersDoubleBuf = buffer.DoubleBuffer();
     char *chunkBuf = output.getRawData().data();
 

@@ -26,7 +26,7 @@ void IsisMain() {
   if(label->HasObject("IsisCube")) {
     cube = new Cube();
     cube->open(ui.GetFileName("FROM"), "rw");
-    pvl = &(cube->getLabel()->FindObject("IsisCube"));
+    pvl = &(cube->label()->FindObject("IsisCube"));
   }
 
   // Add Template File

@@ -46,6 +46,7 @@ double g_exposure; // Exposure duration
 double g_solarDistance = 1.01; //!< average distance in [AU]
 double g_startTemperature, g_endTemperature;
 double g_temp1, g_temp2;
+QString instModeId;
 
 int g_numFrames;
 
@@ -61,22 +62,22 @@ void IsisMain () {
   Cube *icube = p.SetInputCube("FROM");
 
   // Make sure it is a WAC cube
-  Isis::PvlGroup &inst = icube->getLabel()->FindGroup("Instrument", Pvl::Traverse);
+  Isis::PvlGroup &inst = icube->label()->FindGroup("Instrument", Pvl::Traverse);
   QString instId = (QString) inst["InstrumentId"];
   instId = instId.toUpper();
   if (instId != "WAC-VIS" && instId != "WAC-UV") {
     QString msg = "This program is intended for use on LROC WAC images only. [";
-    msg += icube->getFileName() + "] does not appear to be a WAC image.";
+    msg += icube->fileName() + "] does not appear to be a WAC image.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // And check if it has already run through calibration
-  if (icube->getLabel()->FindObject("IsisCube").HasGroup("Radiometry")) {
+  if (icube->label()->FindObject("IsisCube").HasGroup("Radiometry")) {
     QString msg = "This image has already been calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if (icube->getLabel()->FindObject("IsisCube").HasGroup("AlphaCube")) {
+  if (icube->label()->FindObject("IsisCube").HasGroup("AlphaCube")) {
     QString msg = "This application can not be run on any image that has been geometrically transformed (i.e. scaled, rotated, sheared, or reflected) or cropped.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -110,12 +111,19 @@ void IsisMain () {
   QString specpixFile = ui.GetAsString("SPECIALPIXELSFILE");
 
   // Figure out which bands are input
-  for (int i = 1; i <= icube->getBandCount(); i++) {
-    g_bands.push_back(icube->getPhysicalBand(i));
+  for (int i = 1; i <= icube->bandCount(); i++) {
+    g_bands.push_back(icube->physicalBand(i));
   }
 
-  Isis::PvlGroup &bandBin = icube->getLabel()->FindGroup("BandBin", Pvl::Traverse);
+  Isis::PvlGroup &bandBin = icube->label()->FindGroup("BandBin", Pvl::Traverse);
   QString filter = (QString) bandBin["Center"][0];
+  QString filterNum = (QString) bandBin["FilterNumber"][0];
+  //We have to pay special attention incase we are passed a 
+  //single band image that has been "exploded" from a multiband wac
+  if (instModeId == "COLOR" && g_bands.size() == 1)
+   g_bands[0] = (toInt(filterNum) -2);
+  else if (instModeId == "UV" && g_bands.size() == 1)
+   g_bands[0] = (toInt(filterNum));
 
   if (g_dark) {
     if (darkFiles.size() == 0 || darkFiles[0] =="Default" || darkFiles[0].length() == 0) {
@@ -163,7 +171,7 @@ void IsisMain () {
 
   if (g_radiometric) {
 
-    Isis::PvlKeyword &bands = icube->getLabel()->FindGroup("BandBin", Pvl::Traverse).FindKeyword("FilterNumber");
+    Isis::PvlKeyword &bands = icube->label()->FindGroup("BandBin", Pvl::Traverse).FindKeyword("FilterNumber");
 
     if (radFile.toLower() == "default" || radFile.length() == 0)
       radFile = "$lro/calibration/WAC_RadiometricResponsivity.????.pvl";
@@ -311,6 +319,11 @@ void ResetGlobals () {
 
 // Calibrate each framelet
 void Calibrate ( Buffer &inCube, Buffer &outCube ) {
+  int correctBand = -1;
+  //If we are passed in a single band (img.cub+4) we need to pay special attention that we don't start with band1
+  if (inCube.BandDimension() == 1 && g_bands.size() == 1)
+    correctBand = g_bands.front();
+
   int frameHeight = inCube.LineDimension();
   int frameSize = inCube.SampleDimension()*inCube.LineDimension();
   int frame = inCube.Line() / frameHeight;
@@ -325,7 +338,11 @@ void Calibrate ( Buffer &inCube, Buffer &outCube ) {
 
     for ( int b=0; b<inCube.BandDimension(); b++) {
       // We find the index of the corresponding dark frame band as the offset
-      int offset = g_darkCube1->Index(1, frameHeight * (int) min(frame, g_darkCube1->LineDimension()/frameHeight - 1) + 1, b+1);
+      int offset;
+      if (correctBand != -1)
+        offset = g_darkCube1->Index(1, frameHeight * (int) min(frame, g_darkCube1->LineDimension()/frameHeight - 1) + 1, correctBand);
+      else
+        offset = g_darkCube1->Index(1, frameHeight * (int) min(frame, g_darkCube1->LineDimension()/frameHeight - 1) + 1, b+1);
 
       // We're bypassing Buffer::at for speed, so we need to make sure our
       // index will not overrun the buffer
@@ -379,7 +396,11 @@ void Calibrate ( Buffer &inCube, Buffer &outCube ) {
   if (g_flatfield) {
     for ( int b=0; b<inCube.BandDimension(); b++) {
       // We find the index of the corresponding flat frame band as the offset
-      int offset = g_flatCube->Index(1, frameHeight * (int) min(frame, (g_flatCube->LineDimension()-1) / frameHeight)+1, b+1);
+      int offset;
+      if (correctBand != -1)
+        offset = g_flatCube->Index(1, frameHeight * (int) min(frame, (g_flatCube->LineDimension()-1) / frameHeight)+1, correctBand);
+      else
+        offset = g_flatCube->Index(1, frameHeight * (int) min(frame, (g_flatCube->LineDimension()-1) / frameHeight)+1, b+1);
 
       // We're bypassing Buffer::at for speed, so we need to make sure our
       // index will not overrun the buffer
@@ -418,7 +439,11 @@ void Calibrate ( Buffer &inCube, Buffer &outCube ) {
   if (g_specpix) {
     for ( int b=0; b<inCube.BandDimension(); b++) {
       // We find the index of the corresponding flat frame band as the offset
-      int offset = g_specpixCube->Index(1, frameHeight * (int) min(frame, (g_specpixCube->LineDimension()-1) / frameHeight)+1, b+1);
+      int offset;
+      if (correctBand != -1)
+        offset = g_specpixCube->Index(1, frameHeight * (int) min(frame, (g_specpixCube->LineDimension()-1) / frameHeight)+1, correctBand);
+      else
+        offset = g_specpixCube->Index(1, frameHeight * (int) min(frame, (g_specpixCube->LineDimension()-1) / frameHeight)+1, b+1);
 
       for (int i = 0; i < frameSize; i++) {
         if (IsSpecial(g_specpixCube->at(offset + i)))
@@ -438,7 +463,7 @@ void CopyCubeIntoBuffer ( QString &fileString, Buffer* &data) {
     throw IException(IException::User, msg, _FILEINFO_);
   }
   cube.open(filename.expanded());
-  Brick brick(cube.getSampleCount(), cube.getLineCount(), cube.getBandCount(), cube.getPixelType());
+  Brick brick(cube.sampleCount(), cube.lineCount(), cube.bandCount(), cube.pixelType());
   brick.SetBasePosition(1, 1, 1);
   cube.read(brick);
 

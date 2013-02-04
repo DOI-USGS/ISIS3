@@ -146,21 +146,21 @@ namespace Isis {
    */
   void ProcessByTile::SetBrickSizesForProcessCube() {
     // The lines in the input and output must match
-    if(InputCubes[0]->getLineCount() != OutputCubes[0]->getLineCount()) {
+    if(InputCubes[0]->lineCount() != OutputCubes[0]->lineCount()) {
       string m = "The number of lines in the input and output cubes ";
       m += "must match";
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // The samples in the input and output must match
-    if(InputCubes[0]->getSampleCount() != OutputCubes[0]->getSampleCount()) {
+    if(InputCubes[0]->sampleCount() != OutputCubes[0]->sampleCount()) {
       string m = "The number of samples in the input and output cubes ";
       m += "must match";
       throw IException(IException::Programmer, m, _FILEINFO_);
     }
 
     // The bands in the input and output must match
-    if(InputCubes[0]->getBandCount() != OutputCubes[0]->getBandCount()) {
+    if(InputCubes[0]->bandCount() != OutputCubes[0]->bandCount()) {
       string m = "The number of bands in the input and output cubes ";
       m += "must match";
       throw IException(IException::Programmer, m, _FILEINFO_);
@@ -189,7 +189,7 @@ namespace Isis {
     // Make sure all the output images have the same number of bands as
     // the first input/output cube
     for(unsigned int i = 0; i < OutputCubes.size(); i++) {
-      if(OutputCubes[i]->getBandCount() != InputCubes[0]->getBandCount()) {
+      if(OutputCubes[i]->bandCount() != InputCubes[0]->bandCount()) {
         string m = "All output cubes must have the same number of bands ";
         m += "as the first input cube or output cube";
         throw IException(IException::Programmer, m, _FILEINFO_);

@@ -227,7 +227,7 @@ namespace Isis {
 
     // Store off the cube address in case someone wants to match
     // this chip
-    p_filename = cube.getFileName();
+    p_filename = cube.fileName();
   }
 
   /**
@@ -273,7 +273,7 @@ namespace Isis {
 
     // Store off the cube address in case someone wants to match
     // this chip
-    p_filename = cube.getFileName();
+    p_filename = cube.fileName();
   }
 
 
@@ -322,15 +322,15 @@ namespace Isis {
     Camera *matchCam = NULL;
     TProjection *matchProj = NULL;
     try {
-      matchCam = matchChipCube.getCamera();
+      matchCam = matchChipCube.camera();
     }
     catch(IException &error1) {
       try {
-        matchProj = (TProjection *) matchChipCube.getProjection();
+        matchProj = (TProjection *) matchChipCube.projection();
       }
       catch(IException &error2) {
         QString msg = "Can not geom chip.  ";
-        msg += "Match chip cube [" + matchChipCube.getFileName();
+        msg += "Match chip cube [" + matchChipCube.fileName();
         msg += "] is not a camera or map projection";
 
         IException fullError(IException::User, msg, _FILEINFO_);
@@ -345,15 +345,15 @@ namespace Isis {
     Camera *cam = NULL;
     Projection *proj = NULL;
     try {
-      cam = cube.getCamera();
+      cam = cube.camera();
     }
     catch(IException &error1) {
       try {
-        proj = cube.getProjection();
+        proj = cube.projection();
       }
       catch(IException &error2) {
         QString msg = "Can not geom chip.  ";
-        msg += "Chip cube [" + cube.getFileName();
+        msg += "Chip cube [" + cube.fileName();
         msg += "] is not a camera or map projection";
 
         IException fullError(IException::User, msg, _FILEINFO_);
@@ -483,8 +483,8 @@ namespace Isis {
           line = proj->WorldY();
         }
 
-        //     if (line < 1 || line > cube.getLineCount()) continue;
-        //     if (samp < 1 || samp > cube.getSampleCount()) continue;
+        //     if (line < 1 || line > cube.lineCount()) continue;
+        //     if (samp < 1 || samp > cube.sampleCount()) continue;
 
         // Ok save this control point
         pointfound = true;
@@ -517,8 +517,8 @@ namespace Isis {
 
     if(xp.size() < 3) {
       QString msg = "Cannot find enough points to perform Affine transformation.  ";
-      msg += "Unable to load chip from [" + cube.getFileName();
-      msg += "] to match chip from [" + matchChipCube.getFileName() + "].";
+      msg += "Unable to load chip from [" + cube.fileName();
+      msg += "] to match chip from [" + matchChipCube.fileName() + "].";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -540,7 +540,7 @@ namespace Isis {
 
     // Store off the cube address in case someone wants to match
     // this chip
-    p_filename = cube.getFileName();
+    p_filename = cube.fileName();
   }
 
 
@@ -993,15 +993,15 @@ namespace Isis {
   void Chip::Read(Cube &cube, const int band) {
     // Create an interpolator and portal for geoming
     Interpolator interp(p_readInterpolator);
-    Portal port(interp.Samples(), interp.Lines(), cube.getPixelType(),
+    Portal port(interp.Samples(), interp.Lines(), cube.pixelType(),
                 interp.HotSample(), interp.HotLine());
     // Loop through the pixels in the chip and geom them
     for(int line = 1; line <= Lines(); line++) {
       for(int samp = 1; samp <= Samples(); samp++) {
         SetChipPosition((double)samp, (double)line);
         if((CubeSample() < 0.5) || (CubeLine() < 0.5) ||
-            (CubeSample() > cube.getSampleCount() + 0.5) ||
-            (CubeLine() > cube.getLineCount() + 0.5)) {
+            (CubeSample() > cube.sampleCount() + 0.5) ||
+            (CubeLine() > cube.lineCount() + 0.5)) {
           p_buf[line-1][samp-1] = Isis::NULL8;
         }
         else if(p_clipPolygon == NULL) {

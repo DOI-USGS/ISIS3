@@ -10,7 +10,7 @@ void BandTrim(Buffer &in, Buffer &out);
 void IsisMain() {
   ProcessByBrick p;
   Cube *icube = p.SetInputCube("FROM");
-  p.SetBrickSize(1, 1, icube->getBandCount());
+  p.SetBrickSize(1, 1, icube->bandCount());
   p.SetOutputCube("TO");
   p.StartProcess(BandTrim);
   p.EndProcess();

@@ -27,7 +27,6 @@
 #include "gmm/gmm_superlu_interface.h"
 #endif
 
-#include <string>
 #include "LeastSquares.h"
 #include "IException.h"
 #include "IString.h"
@@ -55,8 +54,8 @@ namespace Isis {
 
       //  make sure sparse nrows/ncols have been set
       if (sparseRows == 0  ||  sparseCols == 0) {
-        std::string msg = "If solving using sparse matrices, you must enter";
-        msg += " the number of rows/columns";
+        QString msg = "If solving using sparse matrices, you must enter the "
+                      "number of rows/columns";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
@@ -184,8 +183,7 @@ namespace Isis {
    */
   std::vector<double> LeastSquares::GetInput(int row) const {
     if((row >= Rows()) || (row < 0)) {
-      std::string msg = "Index out of bounds ";
-      msg += "[Given = " + Isis::IString(row) + "]";
+      QString msg = "Index out of bounds [Given = " + toString(row) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_input[row];
@@ -200,8 +198,7 @@ namespace Isis {
    */
   double LeastSquares::GetExpected(int row) const {
     if((row >= Rows()) || (row < 0)) {
-      std::string msg = "Index out of bounds ";
-      msg += "[Given = " + Isis::IString(row) + "]";
+      QString msg = "Index out of bounds [Given = " + toString(row) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_expected[row];
@@ -240,8 +237,7 @@ namespace Isis {
     if((method == SPARSE  &&  p_sparseRows == 0)  ||
        (method != SPARSE  &&  Rows() == 0 )) {
       p_solved = false;
-      std::string msg = "No solution available because no input data was "
-                        "provided";
+      QString msg = "No solution available because no input data was provided";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
@@ -326,10 +322,11 @@ namespace Isis {
     // If the rank of the matrix is not large enough we don't
     // have enough coefficients for the solution
     if (coefs.dim1() < p_basis->Coefficients()) {
-      std::string msg = "No solution available ... ";
-      msg += "Not enough knowns or knowns are co-linear ... ";
-      msg += "[Unknowns = " + Isis::IString(p_basis->Coefficients()) + "] ";
-      msg += "[Knowns = " + Isis::IString(coefs.dim1()) + "]";
+      QString msg = "Unable to solve least-squares using SVD method. No "
+                    "solution available. Not enough knowns or knowns are "
+                    "co-linear ... [Unknowns = " 
+                    + toString(p_basis->Coefficients()) + "] [Knowns = " 
+                    + toString(coefs.dim1()) + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
@@ -373,7 +370,7 @@ namespace Isis {
    */
   void LeastSquares::SolveQRD() {
 
-    // We are solving Ax=b ... start by creating A
+    // We are solving Ax=b ... start by creating an MxN matrix, A
     TNT::Array2D<double> A(p_input.size(), p_basis->Coefficients());
     for(int r = 0; r < A.dim1(); r++) {
       p_basis->Expand(p_input[r]);
@@ -385,21 +382,23 @@ namespace Isis {
     // Ok use  to solve for the coefficients
     // [A] = [Q][R]  where [Q] is MxN and orthogonal and  [R] is an NxN,
     // upper triangular matrix.  TNT provides the solve method that inverts
-    // [Q] and backsolves [R] to get the coefficients in the vector x
+    // [Q] and backsolves [R] to get the coefficients in the vector x.
+    // That is, we solve the system Rx = Q^T b
     JAMA::QR<double> qr(A);
 
     // Using A and our b we can solve for the coefficients
     TNT::Array1D<double> b(p_expected.size());
     for(int r = 0; r < (int)p_expected.size(); r++) {
       b[r] = p_expected[r] * p_sqrtWeight[r];
-    }
+    }// by construction, we know the size of b is equal to M, so b is conformant
 
-// Check to make sure the matrix is full rank before solving -- rectangular matrices must
-// be full rank in order for the solve method to be successful
-//
+    // Check to make sure the matrix is full rank before solving
+    // -- rectangular matrices must be full rank in order for the solve method
+    //    to be successful
     int full = qr.isFullRank();
     if(full == 0) {
-      std::string msg = "Not full rank";
+      QString msg = "Unable to solve-least squares using QR Decomposition. "
+                    "The upper triangular R matrix is not full rank";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
@@ -407,7 +406,9 @@ namespace Isis {
 
     // Set the coefficients in our basis equation
     std::vector<double> bcoefs;
-    for(int i = 0; i < coefs.dim1(); i++) bcoefs.push_back(coefs[i]);
+    for(int i = 0; i < coefs.dim1(); i++) {
+      bcoefs.push_back(coefs[i]);
+    }
     p_basis->SetCoefficients(bcoefs);
 
     // Compute the errors
@@ -508,7 +509,6 @@ namespace Isis {
     int perm = 2;     //  confirm meaning and necessity of
 //  double recond;    //  variables perm and recond
     p_SLU_Factor.solve(p_xSparse,gmm::mat_const_col(p_ATb,0), perm);
-
     // Set the coefficients in our basis equation
     p_basis->SetCoefficients(p_xSparse);
 
@@ -551,8 +551,6 @@ namespace Isis {
         p_sigma0 += p_residuals[i]*p_residuals[i]*p_sqrtWeight[i]*p_sqrtWeight[i];
     }
 
-//    std::cout << p_residuals << std::endl;
-
     // if Jigsaw (bundle adjustment)
     // add contibution to Sigma0 from constrained parameters
     if ( p_jigsaw ) {
@@ -566,14 +564,7 @@ namespace Isis {
 
         constrained_vTPv += p_epsilonsSparse[i]*p_epsilonsSparse[i]*weight;
       }
-
-//      std::cout << "vtpv image = " << p_sigma0 << std::endl;
-//      std::cout << "sqrtWeight = " << p_sqrtWeight[0] << std::endl;
-
       p_sigma0 += constrained_vTPv;
-
-//      std::cout << "vtpv constrained = " << constrained_vTPv << std::endl;
-
     }
     // calculate degrees of freedom (or redundancy)
     // DOF = # observations + # constrained parameters - # unknown parameters
@@ -586,9 +577,6 @@ namespace Isis {
     }
     else
       p_sigma0 = p_sigma0/(double)p_degreesOfFreedom;
-
-
-//    std::cout << "degrees of freedom = " << p_degreesOfFreedom << std::endl;
 
     // check for p_sigma0 < 0
     p_sigma0 = sqrt(p_sigma0);
@@ -743,7 +731,7 @@ namespace Isis {
    */
   double LeastSquares::Evaluate(const std::vector<double> &data) {
     if(!p_solved) {
-      std::string msg = "Unable to evaluate until a solution has been computed";
+      QString msg = "Unable to evaluate until a solution has been computed";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_basis->Evaluate(data);
@@ -760,7 +748,7 @@ namespace Isis {
    */
   std::vector<double> LeastSquares::Residuals() const {
     if(!p_solved) {
-      std::string msg = "Unable to return residuals until a solution has been computed";
+      QString msg = "Unable to return residuals until a solution has been computed";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_residuals;
@@ -780,7 +768,7 @@ namespace Isis {
    */
   double LeastSquares::Residual(int i) const {
     if(!p_solved) {
-      std::string msg = "Unable to return residuals until a solution has been computed";
+      QString msg = "Unable to return residuals until a solution has been computed";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return p_residuals[i];

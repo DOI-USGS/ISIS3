@@ -23,9 +23,9 @@ void IsisMain() {
   PvlTranslationTable tTable(
       (QString)p.MissionData("base", "translations/MissionName2DataDir.trn"));
   QString missionDir = dataDir[tTable.Translate("MissionName",
-      (inCube->getGroup("Instrument")).FindKeyword("SpacecraftName")[0])][0];
+      (inCube->group("Instrument")).FindKeyword("SpacecraftName")[0])][0];
   QString camera =
-      (inCube->getGroup("Instrument")).FindKeyword("InstrumentId")[0];
+      (inCube->group("Instrument")).FindKeyword("InstrumentId")[0];
 
   CubeAttributeInput cai;
   p.SetInputCube(missionDir + "/calibration/" + camera + "_flatfield.cub", cai);
@@ -34,8 +34,8 @@ void IsisMain() {
   cao.setPixelType(Real);
   p.SetOutputCube(
       FileName(Application::GetUserInterface().GetAsString("TO")).expanded(),
-      cao, inCube->getSampleCount(), inCube->getLineCount(),
-      inCube->getBandCount());
+      cao, inCube->sampleCount(), inCube->lineCount(),
+      inCube->bandCount());
 
   p.StartProcess(cal);
   p.EndProcess();

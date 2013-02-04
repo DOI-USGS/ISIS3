@@ -39,9 +39,13 @@ using namespace std;
 
 namespace Isis {
   /**
-   * Convert from a string to a boolean. Known string values include anything that remotely looks
-   *   like a true or false.
-   *  
+   * Global function to convert from a string to a boolean. Known string values 
+   * include anything that remotely looks like a true or false.  For example, 
+   * the following strings will return true:
+   * "true", "t", "yes", "y", "on", "1".
+   * 
+   * This function will throw an IException if the conversion is unsuccessful.
+   *
    * @param string QString to be converted to a boolean.
    * @return The boolean equivalent to the string
    */
@@ -93,7 +97,9 @@ namespace Isis {
 
 
   /**
-   * Convert from a string to an integer.
+   * Global function to convert from a string to an integer. This function is 
+   * preferred over the QString::toInt() method since this function will throw an 
+   * IException if the conversion is unsuccessful.
    *
    * @param string QString to be converted to an integer.
    * @return The integer equivalent to the string
@@ -113,7 +119,9 @@ namespace Isis {
 
 
   /**
-   * Convert from a string to a "big" integer.
+   * Global function to convert from a string to a "big" integer.
+   *
+   * This function will throw an IException if the conversion is unsuccessful.
    *
    * @param string QString to be converted to a big integer.
    * @return The BigInt equivalent to the string
@@ -142,9 +150,14 @@ namespace Isis {
 
 
   /**
-   * Convert from a string to a double.
+   * Global function to convert from a string to a double. If the string begins
+   * with 16# and ends with #, the function will assume it is hexadecimal and
+   * attempt to convert to a double. This function is preferred over the 
+   * QString::toDouble() method since this function will throw an IException 
+   * if the conversion is unsuccessful.
    *
-   * @param string QString to be converted to a double.
+   * @param string QString to be converted to a double. This may be a 
+   *               hexadecimal string.
    * @return The double equivalent to the string
    */
   double toDouble(const QString &string) {
@@ -203,7 +216,8 @@ namespace Isis {
 
 
   /**
-   * Convert a boolean to a string. The resulting string will be "Yes" (true) or "No" (false).
+   * Global function to convert a boolean to a string. The resulting string will 
+   * be "Yes" (true) or "No" (false).
    *  
    * @param boolToConvert Boolean value to be converted to a QString.
    * @return string Converted QString (Yes or No).
@@ -214,8 +228,8 @@ namespace Isis {
 
 
   /**
-   * Convert a character to a string. The resulting string will be 
-   * a string with length 1 which contains only the given ASCII 
+   * Global function to convert a character to a string. The resulting string will 
+   * be a string with length 1 which contains only the given ASCII 
    * character. 
    *  
    * @param charToConvert Character value to be converted to a QString.
@@ -229,7 +243,7 @@ namespace Isis {
 
 
   /**
-   * Convert an integer to a string. 
+   * Global function to convert an integer to a string. 
    * 
    * @param intToConvert Integer value to be converted to a QString.
    * @return string Converted QString. 
@@ -240,7 +254,7 @@ namespace Isis {
 
 
   /**
-   * Convert an unsigned integer to a string. 
+   * Global function to convert an unsigned integer to a string. 
    * 
    * @param intToConvert Unsigned integer value to be converted to a QString.
    * @return string Converted QString.  
@@ -251,7 +265,7 @@ namespace Isis {
 
 
   /**
-   * Convert a big integer to a string. 
+   * Global function to convert a big integer to a string. 
    * 
    * @param intToConvert Big integer value to be converted to a QString.
    * @return string Converted QString.  
@@ -262,7 +276,7 @@ namespace Isis {
 
 
   /**
-   * Convert a double to a string with the given precision (significant figures).
+   * Global function to convert a double to a string with the given precision (significant figures).
    *
    * The conversion is handled in the following manner:
    *   If (log10(num) < -3.0) it is presented in scientific notation

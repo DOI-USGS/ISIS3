@@ -64,9 +64,9 @@ void IsisMain() {
     Cube c;
     c.open(filename, "rw");
     //check for target name
-    if(c.getLabel()->HasKeyword("TargetName", PvlObject::Traverse)) {
+    if(c.label()->HasKeyword("TargetName", PvlObject::Traverse)) {
 //       c.Label()->FindKeyword("TargetName");
-      PvlGroup inst = c.getLabel()->FindGroup("Instrument", PvlObject::Traverse);
+      PvlGroup inst = c.label()->FindGroup("Instrument", PvlObject::Traverse);
       QString targetName = inst["TargetName"];
       cnet.SetTarget(targetName);
     }
@@ -125,8 +125,8 @@ void IsisMain() {
     c.open(filename, "rw");
 
     //check for existing polygon, if exists delete it
-    if(c.getLabel()->HasObject("Polygon")) {
-      c.getLabel()->DeleteObject("Polygon");
+    if(c.label()->HasObject("Polygon")) {
+      c.label()->DeleteObject("Polygon");
     }
 
     Table cmatrix = b.Cmatrix(0);

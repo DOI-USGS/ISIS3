@@ -71,9 +71,9 @@ void IsisMain() {
   // Setup the input cube;
   // Obtain information from the input file
   Cube *icube = p.SetInputCube("FROM");
-  totalSamples = icube->getSampleCount();
-  totalLines   = icube->getLineCount();
-  totalBands   = icube->getBandCount();
+  totalSamples = icube->sampleCount();
+  totalLines   = icube->lineCount();
+  totalBands   = icube->bandCount();
 
   // Setup the tile size based on the direction of normalization
   direction = ui.GetString("DIRECTION");

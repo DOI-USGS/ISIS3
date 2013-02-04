@@ -1,7 +1,12 @@
 Begin testing Dem Shape Model class....
 Shape name is EquatorialCylindricalShape
+
 Testing method intersectSurface...
   Do we have an intersection? 0
+
  Set a pixel in the image and check again.
   Do we have an intersection? 1
-   surface point = (-2123.36, -2380.37, 1194.68
+   surface point = (-2123.36, -2380.37, 1194.68)
+
+Testing a condition that previously caused qview and spiceinit to hang instead of failing.
+...  intersectSurface method failed

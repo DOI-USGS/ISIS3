@@ -48,8 +48,8 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    // Table table("ShapeModelStatistics", demCubeFile(), *demCube()->getLabel()));
-    Table table("ShapeModelStatistics", demCube()->getFileName(), *demCube()->getLabel());
+    // Table table("ShapeModelStatistics", demCubeFile(), *demCube()->label()));
+    Table table("ShapeModelStatistics", demCube()->fileName(), *demCube()->label());
 
     // Find minimum and maximum radius
     m_minRadius = new Distance(table[0]["MinimumRadius"], Distance::Kilometers);
@@ -76,7 +76,13 @@ namespace Isis {
   bool EquatorialCylindricalShape::intersectSurface(
          std::vector<double> observerPos, std::vector<double> lookDirection) {
     
+    // try to intersect the target body ellipsoid as a first approximation
+    // for the iterative DEM intersection method (this method is in the ShapeModel base class).
+    // If the Ellipsoid intersection fails, we're done
     if (!DemShape::intersectSurface(observerPos, lookDirection)) {
+
+      if (!hasEllipsoidIntersection()) 
+        return hasIntersection();
 
       SpiceDouble a = targetRadii()[0].kilometers();
       
@@ -130,7 +136,17 @@ namespace Isis {
       double tlen = vnorm_c(tvec);
 
       // Calculate distance along look vector to first and last test point
-      double radiusDiff = sqrt(maxRadiusMetersSquared - tlen * tlen);
+      double radiusDiff = maxRadiusMetersSquared - tlen * tlen;
+
+      // Make sure radiusDiff makes sense
+      if (radiusDiff >= 0.0) {
+        radiusDiff = sqrt(radiusDiff);
+      }
+      else {
+        setHasIntersection(false);
+        return hasIntersection();
+      }
+
       double d0 = observerdist * cospsi0 - radiusDiff;
       double dm = observerdist * cospsi0 + radiusDiff;
 
@@ -347,5 +363,6 @@ namespace Isis {
     setHasIntersection(true);
     return hasIntersection();
   }
+  // Do nothing since the DEM intersection was already successful
 }
 

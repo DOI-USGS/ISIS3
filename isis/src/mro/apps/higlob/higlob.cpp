@@ -34,9 +34,9 @@ void IsisMain() {
   QString from = ui.GetFileName("FROM");
   g_cube.open(from);
 
-  samples = g_cube.getSampleCount();
-  lines = g_cube.getLineCount();
-  bands = g_cube.getBandCount();
+  samples = g_cube.sampleCount();
+  lines = g_cube.lineCount();
+  bands = g_cube.bandCount();
 
   // Get a cube packet to the input file
   Cube *icube = p.SetInputCube("FROM");
@@ -58,7 +58,7 @@ void IsisMain() {
 
   // Decide if the calibration and observation data should be flipped.
   g_flip = false;
-  PvlGroup &ins = icube->getGroup("Instrument");
+  PvlGroup &ins = icube->group("Instrument");
   int chan = ins["ChannelNumber"];
 
   IString flipChan = ui.GetString("FLIP");

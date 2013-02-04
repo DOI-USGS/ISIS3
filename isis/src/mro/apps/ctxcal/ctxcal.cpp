@@ -54,13 +54,13 @@ void IsisMain() {
     FileName flat = FileName("$mro/calibration/ctxFlat_????.cub").highestVersion();
     flatFile.open(flat.expanded());
   }
-  flat = new Brick(5000, 1, 1, flatFile.getPixelType());
+  flat = new Brick(5000, 1, 1, flatFile.pixelType());
   flat->SetBasePosition(1, 1, 1);
   flatFile.read(*flat);
 
   // If it is already calibrated then complain
   if(icube->hasGroup("Radiometry")) {
-    QString msg = "The CTX image [" + icube->getFileName() + "] has already "
+    QString msg = "The CTX image [" + icube->fileName() + "] has already "
                  "been radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -147,7 +147,7 @@ void IsisMain() {
     double w0 = 3660.5;
     double w1 = w0 * ((dist * dist) / (dist1 * dist1));
     if(exposure *w1 == 0.0) {
-      QString msg = icube->getFileName() + ": exposure or w1 has value of 0.0 ";
+      QString msg = icube->fileName() + ": exposure or w1 has value of 0.0 ";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     iof = 1.0 / (exposure * w1);
@@ -162,7 +162,7 @@ void IsisMain() {
   // Add the radiometry group
   PvlGroup calgrp("Radiometry");
 
-  calgrp += PvlKeyword("FlatFile", flatFile.getFileName());
+  calgrp += PvlKeyword("FlatFile", flatFile.fileName());
   calgrp += PvlKeyword("iof", toString(iof));
 
 

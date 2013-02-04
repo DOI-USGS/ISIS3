@@ -44,7 +44,7 @@ void IsisMain() {
 
     // Make sure cube has been run through spiceinit
     try {
-      cube.getCamera();
+      cube.camera();
     }
     catch(IException &e) {
       QString msg = "Spiceinit must be run prior to running footprintmerge";

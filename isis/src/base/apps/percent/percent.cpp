@@ -32,7 +32,7 @@ void IsisMain() {
   for(int i = 0; i < tokens.size(); i++) {
     double percentage = toDouble(tokens[i]);
     // Obtain the Histogram and the value at the percentage
-    Histogram *hist = icube->getHistogram();
+    Histogram *hist = icube->histogram();
     double value = hist->Percent(percentage);
     kwPercent += toString(percentage);
     kwValue += toString(value);

@@ -86,21 +86,21 @@ namespace Isis {
       /**
        * @returns the number of samples in the cube chunk.
        */
-      int getSampleCount() const {
+      int sampleCount() const {
         return m_sampleCount;
       }
 
       /**
        * @returns the number of lines in the cube chunk.
        */
-      int getLineCount() const {
+      int lineCount() const {
         return m_lineCount;
       }
 
       /**
        * @returns the number of bands in the cube chunk.
        */
-      int getBandCount() const {
+      int bandCount() const {
         return m_bandCount;
       }
 

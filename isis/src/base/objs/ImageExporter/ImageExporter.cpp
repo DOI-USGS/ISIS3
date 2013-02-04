@@ -194,8 +194,8 @@ namespace Isis {
 
     ProcessExport &p = getProcess();
     Cube *cube = addChannel(desc, 0);
-    m_samples = cube->getSampleCount();
-    m_lines = cube->getLineCount();
+    m_samples = cube->sampleCount();
+    m_lines = cube->lineCount();
     m_bands = desc.channelCount();
 
     for (int i = 1; i < desc.channelCount(); i++) addChannel(desc, i);

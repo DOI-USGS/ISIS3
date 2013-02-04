@@ -60,7 +60,7 @@ void IsisMain() {
     os.open(rFile.toAscii().data(), ios::out);
     os << "#  Slither Transform Results\n"
        << "#  RunDate: " << iTime::CurrentLocalTime() << endl
-       << "#    FROM:     " << icube->getFileName() << endl
+       << "#    FROM:     " << icube->fileName() << endl
        << "#    CNETFILE: " << cfile << endl << endl;
 
     transform.dumpState(os);
@@ -69,7 +69,7 @@ void IsisMain() {
   // Allocate the output file, same size as input
   p.SetOutputCube("TO", transform.OutputSamples(),
                   transform.OutputLines(),
-                  icube->getBandCount());
+                  icube->bandCount());
 
   // Set up the interpolator
   Interpolator *interp;

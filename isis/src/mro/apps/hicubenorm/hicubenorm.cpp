@@ -74,10 +74,10 @@ void IsisMain() {
   // Setup the input cube;
   // Obtain information from the input file
   Cube *icube = p.SetInputCube("FROM");
-  totalSamples = icube->getSampleCount();
-  totalLines   = icube->getLineCount();
-  totalBands   = icube->getBandCount();
-  channel = icube->getGroup("Instrument")["ChannelNumber"];
+  totalSamples = icube->sampleCount();
+  totalLines   = icube->lineCount();
+  totalBands   = icube->bandCount();
+  channel = icube->group("Instrument")["ChannelNumber"];
 
   // Cubenorm New Version Flag
   bool bNewVersion = ui.GetBoolean("NEW_VERSION");

@@ -51,7 +51,7 @@ void IsisMain() {
     m.SetCreateFlag(true);
 
     // Use the input projection as a starting point for the mosaic
-    PvlGroup mapGroup = inCube.getLabel()->FindGroup("Mapping", Pvl::Traverse);
+    PvlGroup mapGroup = inCube.label()->FindGroup("Mapping", Pvl::Traverse);
     inCube.close();
 
     mapGroup.AddKeyword(PvlKeyword("MinimumLatitude",  toString(ui.GetDouble("MINLAT"))), Pvl::Replace);

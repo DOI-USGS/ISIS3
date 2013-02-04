@@ -23,7 +23,7 @@ void IsisMain() {
 
   ProcessByBrick p;
   Cube *icube = p.SetInputCube("FROM");
-  p.SetBrickSize(128, 128, icube->getBandCount());
+  p.SetBrickSize(128, 128, icube->bandCount());
 
   // The output cube with no attributes and real pixel type
   Isis::CubeAttributeOutput cao;
@@ -31,11 +31,11 @@ void IsisMain() {
 
   // Start the sample processing
   if(ui.GetString("MODE") == "TRANSFORM") {
-    Cube *ocube = p.SetOutputCube(ui.GetAsString("TO"), cao, icube->getSampleCount(), icube->getLineCount(), icube->getBandCount());
-    numDimensions = icube->getBandCount();
+    Cube *ocube = p.SetOutputCube(ui.GetAsString("TO"), cao, icube->sampleCount(), icube->lineCount(), icube->bandCount());
+    numDimensions = icube->bandCount();
     pca = Isis::PrincipalComponentAnalysis(numDimensions);
     ProcessByBrick p2;
-    p2.SetBrickSize(128, 128, icube->getBandCount());
+    p2.SetBrickSize(128, 128, icube->bandCount());
     p2.SetInputCube("FROM");
     p2.Progress()->SetText("Computing Transform");
     p2.StartProcess(PCA);
@@ -80,8 +80,8 @@ void IsisMain() {
     }
 
     pca = Isis::PrincipalComponentAnalysis(transform);
-    Cube *ocube = p.SetOutputCube(ui.GetAsString("TO"), cao, icube->getSampleCount(), icube->getLineCount(), numDimensions);
-    Pvl *label = ocube->getLabel();
+    Cube *ocube = p.SetOutputCube(ui.GetAsString("TO"), cao, icube->sampleCount(), icube->lineCount(), numDimensions);
+    Pvl *label = ocube->label();
     // remove the transform matrix table from the cube
     for(int i = 0; i < label->Objects(); i++) {
       if(label->Object(i).HasKeyword("Name")

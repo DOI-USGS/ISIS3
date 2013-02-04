@@ -197,9 +197,9 @@ namespace Isis {
     /*setup input cube to transfer projection or camera labels*/
     CubeAttributeInput inAtts;
     Isis::Process::SetInputCube(cube, inAtts, 0);
-    int nBands = this->InputCubes[0]->getBandCount();
-    int nLines = this->InputCubes[0]->getLineCount();
-    int nSamples = this->InputCubes[0]->getSampleCount();
+    int nBands = this->InputCubes[0]->bandCount();
+    int nLines = this->InputCubes[0]->lineCount();
+    int nSamples = this->InputCubes[0]->sampleCount();
 
     this->Process::SetOutputCube(avgFileName, outAtts, nSamples, nLines, nBands);
     this->Process::SetOutputCube(countFileName, outAtts, nSamples, nLines, nBands);
@@ -289,7 +289,7 @@ namespace Isis {
     OutputCubes[1]->putGroup(group);
 
     /*We need a ground map for converting lat/long to line/sample  see Convert()*/
-    p_groundMap = new UniversalGroundMap(*OutputCubes[0]->getLabel());
+    p_groundMap = new UniversalGroundMap(*OutputCubes[0]->label());
 
     delete proj;
   }

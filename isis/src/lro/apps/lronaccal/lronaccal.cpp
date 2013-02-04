@@ -98,7 +98,7 @@ void IsisMain() {
 
   // If there is any pixel in the image with a DN > 1000
   //  then the "left" masked pixels are likely wiped out and useless
-  if(iCube->getStatistics()->Maximum() > 1000)
+  if(iCube->statistics()->Maximum() > 1000)
     g_maskedLeftOnly = true;
 
   QString darkFile, flatFile, offsetFile, coefficientFile;
@@ -335,12 +335,12 @@ void CopyCubeIntoArray(QString &fileString, vector<double> &data) {
     throw IException(IException::User, msg, _FILEINFO_);
   }
   cube.open(filename.expanded());
-  Brick brick(cube.getSampleCount(), cube.getLineCount(), cube.getBandCount(),
-              cube.getPixelType());
+  Brick brick(cube.sampleCount(), cube.lineCount(), cube.bandCount(),
+              cube.pixelType());
   brick.SetBasePosition(1, 1, 1);
   cube.read(brick);
   data.clear();
-  for(int i = 0; i < cube.getSampleCount(); i++)
+  for(int i = 0; i < cube.sampleCount(); i++)
     data.push_back(brick[i]);
 
   fileString = filename.expanded();

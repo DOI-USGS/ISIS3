@@ -161,9 +161,9 @@ void IsisMain() {
   for (int img = 0; img < addList.size(); img++) {
     Cube cube;
     cube.open(addList[img].toString());
-    Pvl *cubepvl = cube.getLabel();
+    Pvl *cubepvl = cube.label();
     QString sn = SerialNumber::Compose(*cubepvl);
-    Camera *cam = cube.getCamera();
+    Camera *cam = cube.camera();
 
     // Loop through all the control points
     QList<ControlPoint *> validPoints = usePolygon ?
@@ -221,7 +221,7 @@ void IsisMain() {
               newCm->SetIgnored(true);
             }
             else {
-              Portal portal(1, 1, cube.getPixelType());
+              Portal portal(1, 1, cube.pixelType());
               portal.SetPosition(cam->Sample(), cam->Line(), 1);
               cube.read(portal);
               if (!validator.ValidDnValue(portal[0])) {
@@ -370,8 +370,8 @@ void setControlPointLatLon(SerialNumberList &snl, ControlNet &cnet) {
 
     Cube *cube = manager.OpenCube(snl.FileName(cm->GetCubeSerialNumber()));
     try {
-      cube->getCamera()->SetImage(cm->GetSample(), cm->GetLine());
-      g_surfacePoints[point->GetId()] = cube->getCamera()->GetSurfacePoint();
+      cube->camera()->SetImage(cm->GetSample(), cm->GetLine());
+      g_surfacePoints[point->GetId()] = cube->camera()->GetSurfacePoint();
     }
     catch (IException &e) {
       QString msg = "Unable to create camera for cube file [";
@@ -394,7 +394,7 @@ QList<ControlPoint *> getValidPoints(Cube &cube, STRtree &coordTree) {
   }
   catch (IException &e) {
     QString msg = "Footprintinit must be run prior to running cnetadd";
-    msg += " with POLYGON=TRUE for cube [" + cube.getFileName() + "]";
+    msg += " with POLYGON=TRUE for cube [" + cube.fileName() + "]";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 

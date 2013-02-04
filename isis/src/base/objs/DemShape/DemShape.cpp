@@ -66,14 +66,14 @@ namespace Isis {
     //   from iteration 1 of setlookdirection (first algorithm) at iteration
     //   4 and the next setimage has to re-read the data.
     m_demCube->addCachingAlgorithm(new UniqueIOCachingAlgorithm(5));
-    m_demProj = m_demCube->getProjection();
+    m_demProj = m_demCube->projection();
     m_interp = new Interpolator(Interpolator::BiLinearType);
     m_portal = new Portal(m_interp->Samples(), m_interp->Lines(),
-                            m_demCube->getPixelType(),
+                            m_demCube->pixelType(),
                             m_interp->HotSample(), m_interp->HotLine());
 
     // Read in the Scale of the DEM file in pixels/degree
-    const PvlGroup &mapgrp = m_demCube->getLabel()->FindGroup("Mapping", Pvl::Traverse);
+    const PvlGroup &mapgrp = m_demCube->label()->FindGroup("Mapping", Pvl::Traverse);
 
     // Save map scale in pixels per degree
     m_pixPerDegree = (double) mapgrp["Scale"];

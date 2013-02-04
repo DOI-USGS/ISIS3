@@ -130,7 +130,7 @@ void Import(Buffer &in) {
   LineManager outLines(*g_ocube);
   outLines.SetLine(in.Line(), in.Band());
   Buffer buf(in.SampleDimension(), in.LineDimension(), in.BandDimension(),
-             g_ocube->getPixelType());
+             g_ocube->pixelType());
 
   // Do the decompanding
   for(int pixin = 0; pixin < in.size(); pixin++) {

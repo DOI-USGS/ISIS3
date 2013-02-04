@@ -134,20 +134,20 @@ void IsisMain() {
 // are obtained from the first input file only unless provided from a
 // second file
   Cube *icube1 = p.SetInputCube("FROM1");
-  fromData[0].nLines   = fromData[1].nLines   = icube1->getLineCount();
-  fromData[0].nSamples = fromData[1].nSamples = icube1->getSampleCount();
-  fromData[0].mult = HiVector(icube1->getLineCount(), 1.0);
-  fromData[0].add = HiVector(icube1->getLineCount(), 0.0);
+  fromData[0].nLines   = fromData[1].nLines   = icube1->lineCount();
+  fromData[0].nSamples = fromData[1].nSamples = icube1->sampleCount();
+  fromData[0].mult = HiVector(icube1->lineCount(), 1.0);
+  fromData[0].add = HiVector(icube1->lineCount(), 0.0);
 
-  if(seamSize + skipSize > icube1->getSampleCount()) {
+  if(seamSize + skipSize > icube1->sampleCount()) {
     QString msg = "SEAMSIZE [" + toString(seamSize) + "] + SKIP [" + toString(skipSize) + "] must ";
-    msg += " be less than the number of samples [" + toString(icube1->getSampleCount()) + "] in ";
+    msg += " be less than the number of samples [" + toString(icube1->sampleCount()) + "] in ";
     msg += "[" + ui.GetAsString("FROM1") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  PvlGroup &from1Archive = icube1->getGroup("ARCHIVE");
-  PvlGroup &from1Instrument = icube1->getGroup("INSTRUMENT");
+  PvlGroup &from1Archive = icube1->group("ARCHIVE");
+  PvlGroup &from1Instrument = icube1->group("INSTRUMENT");
   fromData[0].ChnNumber = from1Instrument["ChannelNumber"];
 
   stitchedProductIds = (QString)from1Archive["ProductId"][0];
@@ -167,20 +167,20 @@ void IsisMain() {
 //  Only get the second input file if entered by the user
   if(ui.WasEntered("FROM2")) {
     Cube *icube2 = p.SetInputCube("FROM2");
-    fromData[1].nLines   = icube2->getLineCount();
-    fromData[1].nSamples = icube2->getSampleCount();
-    fromData[1].mult = HiVector(icube2->getLineCount(), 1.0);
-    fromData[1].add = HiVector(icube2->getLineCount(), 0.0);
+    fromData[1].nLines   = icube2->lineCount();
+    fromData[1].nSamples = icube2->sampleCount();
+    fromData[1].mult = HiVector(icube2->lineCount(), 1.0);
+    fromData[1].add = HiVector(icube2->lineCount(), 0.0);
 
-    if(seamSize + skipSize > icube2->getSampleCount()) {
+    if(seamSize + skipSize > icube2->sampleCount()) {
       QString msg = "SEAMSIZE [" + toString(seamSize) + "] + SKIP [" + toString(skipSize) + "] must ";
-      msg += " be less than the number of samples [" + toString(icube2->getSampleCount()) + " in ";
+      msg += " be less than the number of samples [" + toString(icube2->sampleCount()) + " in ";
       msg += "[" + ui.GetAsString("FROM2") + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     //Test to make sure input files are compatable
-    PvlGroup &from2Archive = icube2->getGroup("ARCHIVE");
+    PvlGroup &from2Archive = icube2->group("ARCHIVE");
 
     //Make sure observation id's are the same
     QString from1ObsId = from1Archive["ObservationId"];
@@ -192,7 +192,7 @@ void IsisMain() {
     stitchedProductIds = "(" + stitchedProductIds + ", " +
                          (QString)from2Archive["ProductId"][0] + ")";
 
-    PvlGroup &from2Instrument = icube2->getGroup("INSTRUMENT");
+    PvlGroup &from2Instrument = icube2->group("INSTRUMENT");
 
     //Make sure CCD Id's are the same
     QString from1CcdId = from1Instrument["CCDId"];
@@ -228,7 +228,7 @@ void IsisMain() {
   Cube *ocube = p.SetOutputCube("TO", SampsOut, LinesOut, BandsOut);
 
   // Change Channel Number on output cube to 2
-  PvlGroup &InstrumentOut = ocube->getGroup("INSTRUMENT");
+  PvlGroup &InstrumentOut = ocube->group("INSTRUMENT");
   InstrumentOut["ChannelNumber"] = "2";
 
   // Set StitchedChannels and Stitched ProductIds keywords
@@ -265,8 +265,8 @@ void IsisMain() {
       }
 
       stats.Reset();
-      f0LineAvg = HiVector(icube1->getLineCount());
-      f1LineAvg = HiVector(icube1->getLineCount());
+      f0LineAvg = HiVector(icube1->lineCount());
+      f1LineAvg = HiVector(icube1->lineCount());
       pAvg.StartProcess(getStats);
       pAvg.EndProcess();
 
@@ -311,8 +311,8 @@ void IsisMain() {
         results += PvlKeyword("TruthChannel", toString(hiChannel));
         results += PvlKeyword("Operator", fixop);
         int nunfilled(0);
-        HiVector ch0_fixed(icube1->getLineCount(), 1.0);
-        HiVector ch1_fixed(icube1->getLineCount(), 1.0);
+        HiVector ch0_fixed(icube1->lineCount(), 1.0);
+        HiVector ch1_fixed(icube1->lineCount(), 1.0);
         if(fixop == "MULTIPLY") {
           if(hiChannel == 0) {
             fromData[ch1Index].mult = compRatio(f0LineAvg, f1LineAvg, nunfilled);

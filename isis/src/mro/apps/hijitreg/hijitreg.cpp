@@ -99,7 +99,7 @@ void IsisMain() {
   match.OpenCube(ui.GetFileName("MATCH"), stitch);
 
 //  Ensure only one band
-  if((trans.getBandCount() != 1) || (match.getBandCount() != 1)) {
+  if((trans.bandCount() != 1) || (match.bandCount() != 1)) {
     QString msg = "Input Cubes must have only one band!";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -186,7 +186,7 @@ void IsisMain() {
   QString transSN = SerialNumber::Compose(trans, true);
   QString matchSN = SerialNumber::Compose(match, true);
 
-  PvlGroup &instrument = trans.getLabel()->FindGroup("Instrument", Pvl::Traverse);
+  PvlGroup &instrument = trans.label()->FindGroup("Instrument", Pvl::Traverse);
   cn.SetTarget(instrument["TargetName"][0]);
   cn.SetDescription("Records s/c jitter between two adjacent HiRISE images");
 

@@ -57,9 +57,9 @@ namespace Isis {
     else {
       // up to 1MB chunks
       int sampleChunkSize =
-          findGoodSize(512 * 4 / SizeOf(getPixelType()), getSampleCount());
+          findGoodSize(512 * 4 / SizeOf(pixelType()), sampleCount());
       int lineChunkSize =
-          findGoodSize(512 * 4 / SizeOf(getPixelType()), getLineCount());
+          findGoodSize(512 * 4 / SizeOf(pixelType()), lineCount());
 
       setChunkSizes(sampleChunkSize, lineChunkSize, 1);
     }

@@ -75,7 +75,7 @@ void TranslateMerEdrLabels(FileName &labelFile, Cube *ocube) {
 
   // Pull out MiCCD and MiElectronic from the TemperatureName in the instrument group
   void MiFixLab(PvlGroup & instGroup);
-  PvlGroup instGroup = ocube->getGroup("INSTRUMENT");
+  PvlGroup instGroup = ocube->group("INSTRUMENT");
   MiFixLab(instGroup);
   ocube->putGroup(instGroup);
 

@@ -1,12 +1,17 @@
 #include "Isis.h"
 
+#include <QString>
+
 #include "Application.h"
+#include "FileName.h"
+#include "IException.h"
+#include "IString.h"
 #include "LineManager.h"
 #include "ProcessByLine.h"
 #include "ProgramLauncher.h"
+#include "Projection.h"
 #include "ProjectionFactory.h"
 #include "TProjection.h"
-#include "IException.h"
 #include "SpecialPixel.h"
 
 using namespace std;
@@ -44,7 +49,8 @@ void IsisMain() {
   }
 
   QString mode = ui.GetString("MODE");
-
+  IString tempFileName;
+  
   if(mode != "TRIM") {
     smallestLine = smallestSample = INT_MAX;
     biggestLine = biggestSample = -INT_MAX;
@@ -59,12 +65,13 @@ void IsisMain() {
 
     // Run external crop
     QString cropParams = "";
-    cropParams += "from=\"" + ui.GetFileName("FROM") + "\"";
+    cropParams += "from=" + ui.GetFileName("FROM");
     if(mode == "CROP") {
-      cropParams += " to=\"" + ui.GetAsString("TO") + "\"";
+      cropParams += " to=" + ui.GetAsString("TO");
     }
     else {
-      cropParams += " to=TEMPORARYcropped.cub ";
+      tempFileName = FileName::createTempFile("TEMPORARYcropped.cub").name();
+      cropParams += " to=" + tempFileName.ToQt();
     }
 
     cropParams += " sample= "   + toString(smallestSample);
@@ -82,7 +89,7 @@ void IsisMain() {
     if(mode == "BOTH") {
       delete proj;
       proj = NULL;
-      Pvl pvl("TEMPORARYcropped.cub");
+      Pvl pvl(tempFileName.ToQt());
       proj = (TProjection *) ProjectionFactory::CreateFromCube(pvl);
     }
   }
@@ -92,7 +99,7 @@ void IsisMain() {
     ProcessByLine p;
     CubeAttributeInput att;
     if(mode == "BOTH") {
-      p.SetInputCube("TEMPORARYcropped.cub", att);
+      p.SetInputCube(tempFileName.ToQt(), att);
     }
     else { //if its trim
       p.SetInputCube("FROM");
@@ -100,9 +107,10 @@ void IsisMain() {
     p.SetOutputCube("TO");
     p.StartProcess(trim);
     p.EndProcess();
-    if(mode == "BOTH") remove("TEMPORARYcropped.cub");
+    if(mode == "BOTH") {
+      remove(tempFileName.c_str());
+    }
   }
-
   // Add mapping to print.prt
   PvlGroup mapping = proj->Mapping();
   Application::Log(mapping);

@@ -364,7 +364,7 @@ namespace Isis {
     QList<Cube *> missingXCubes = removeFromList(allXCubes, listedXCubes);
     foreach (Cube *cubeToAdd, missingXCubes) {
       if (m_xAxisCubeCombo->findData(qVariantFromValue(cubeToAdd)) == -1) {
-        QString cubeName = QFileInfo(cubeToAdd->getFileName()).baseName();
+        QString cubeName = QFileInfo(cubeToAdd->fileName()).baseName();
         m_xAxisCubeCombo->addItem(cubeName, qVariantFromValue(cubeToAdd));
       }
     }
@@ -377,7 +377,7 @@ namespace Isis {
       m_useViewportRangesCheckBox->setEnabled(true);
       m_yAxisCubeCombo->setEnabled(true);
 
-      m_xAxisCubeBandSpinBox->setMaximum(xAxisCube()->getBandCount());
+      m_xAxisCubeBandSpinBox->setMaximum(xAxisCube()->bandCount());
 
       QList<Cube *> listedYCubes;
       for (int i = 0; i < m_yAxisCubeCombo->count(); i++) {
@@ -388,8 +388,8 @@ namespace Isis {
       foreach (MdiCubeViewport *viewport, *m_workspace->cubeViewportList()) {
         Cube *cube = viewport->cube();
 
-        if (cube->getSampleCount() == xAxisCube()->getSampleCount() &&
-            cube->getLineCount() == xAxisCube()->getLineCount()) {
+        if (cube->sampleCount() == xAxisCube()->sampleCount() &&
+            cube->lineCount() == xAxisCube()->lineCount()) {
           allYCubes.append(cube);
         }
       }
@@ -405,7 +405,7 @@ namespace Isis {
       QList<Cube *> missingYCubes = removeFromList(allYCubes, listedYCubes);
       foreach (Cube *cubeToAdd, missingYCubes) {
         if (m_yAxisCubeCombo->findData(qVariantFromValue(cubeToAdd)) == -1) {
-          QString cubeName = QFileInfo(cubeToAdd->getFileName()).baseName();
+          QString cubeName = QFileInfo(cubeToAdd->fileName()).baseName();
           m_yAxisCubeCombo->addItem(cubeName, qVariantFromValue(cubeToAdd));
         }
       }
@@ -426,7 +426,7 @@ namespace Isis {
       m_yAxisBinCountSpinBox->setEnabled(yAxisCube() != NULL);
 
       if (yAxisCube()) {
-        m_yAxisCubeBandSpinBox->setMaximum(yAxisCube()->getBandCount());
+        m_yAxisCubeBandSpinBox->setMaximum(yAxisCube()->bandCount());
       }
     }
     else {
@@ -496,8 +496,8 @@ namespace Isis {
       MdiCubeViewport * container = xAxisCubeViewport();
       if (!container && xAxisCube()) {
         ASSERT(0);
-        sampleRange.setInterval(1.0, xAxisCube()->getSampleCount());
-        lineRange.setInterval(1.0, xAxisCube()->getLineCount());
+        sampleRange.setInterval(1.0, xAxisCube()->sampleCount());
+        lineRange.setInterval(1.0, xAxisCube()->lineCount());
       }
       else if (container && xAxisCube()) {
         double startSample = Null;
@@ -514,8 +514,8 @@ namespace Isis {
       }
     }
     else {
-      sampleRange.setInterval(1.0, xAxisCube()->getSampleCount());
-      lineRange.setInterval(1.0, xAxisCube()->getLineCount());
+      sampleRange.setInterval(1.0, xAxisCube()->sampleCount());
+      lineRange.setInterval(1.0, xAxisCube()->lineCount());
     }
 
     if (rangeType == SampleRange)

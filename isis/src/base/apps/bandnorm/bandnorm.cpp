@@ -58,7 +58,7 @@ void IsisMain() {
   else if(avg == "PENCIL") {
     TextFile pencil;
     pencil.Open(ui.GetFileName("SPECTRUM"));
-    if(pencil.LineCount() - 1 < icube->getBandCount()) {
+    if(pencil.LineCount() - 1 < icube->bandCount()) {
       QString msg = "The spectral pencil file [" + ui.GetAsString("SPECTRUM") +
                     "] does not contain enough data for all bands.";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -85,7 +85,7 @@ void IsisMain() {
       throw IException(IException::User, msg, _FILEINFO_);
     }
     // Add the correct column of data to normalizer
-    for(int i = 0; i < icube->getBandCount(); i++) {
+    for(int i = 0; i < icube->bandCount(); i++) {
       tokens.clear();
       pencil.GetLine(st);
       Tokenize(st, tokens, ", \"");
@@ -97,7 +97,7 @@ void IsisMain() {
     for(int i = 0; i < (int)average.size(); i++) {
       stats.AddData(&average[i], (unsigned int)1);
     }
-    for(int b = 0; b < icube->getBandCount(); b++) {
+    for(int b = 0; b < icube->bandCount(); b++) {
       normalizer.push_back(stats.Average());
     }
   }

@@ -16,12 +16,12 @@ void IsisMain() {
     cube.open(ui.GetFileName("FROM"), "rw");
 
     //check for existing polygon, if exists delete it
-    if(cube.getLabel()->HasObject("Polygon")) {
-      cube.getLabel()->DeleteObject("Polygon");
+    if(cube.label()->HasObject("Polygon")) {
+      cube.label()->DeleteObject("Polygon");
     }
 
     // Get the camera, interpolate to a parabola
-    Camera *cam = cube.getCamera();
+    Camera *cam = cube.camera();
     if(cam->DetectorMap()->LineRate() == 0.0) {
       QString msg = "[" + ui.GetFileName("FROM") + "] is not a line scan camera";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -31,7 +31,7 @@ void IsisMain() {
     // Get the instrument pointing keyword from the kernels group and update
     // its value to table.
     Isis::PvlGroup kernels =
-      cube.getLabel()->FindGroup("Kernels", Isis::Pvl::Traverse);
+      cube.label()->FindGroup("Kernels", Isis::Pvl::Traverse);
 
     // Save original kernels in keyword before changing to "Table" in the kernels group
     PvlKeyword origCk = kernels["InstrumentPointing"];

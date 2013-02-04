@@ -48,6 +48,10 @@
     <change name="Mackenzie Boyd" date="2011-04-11">
       Changed parameter LIST to FROMLIST 
     </change>
+    <change name="Steven Lambright" date="2013-01-10">
+      Fixed handling of band specifications in the list file. The band bin group is still incorrect,
+      but the correct bands are now placed in the output cube. Fixes #964.
+    </change>
   </history>
 
   <groups>

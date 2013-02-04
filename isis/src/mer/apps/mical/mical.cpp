@@ -54,7 +54,7 @@ void IsisMain() {
 
   //check if the image is calibrated
   if(pack->hasGroup("Radiometry")) {
-    QString msg = "The MI image [" + pack->getFileName() + "] has already "
+    QString msg = "The MI image [" + pack->fileName() + "] has already "
                  "been radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -121,7 +121,7 @@ void IsisMain() {
     Brick *b;
     Cube ERPfile;
     ERPfile.open(ui.GetFileName("REFPIXIMAGE"));
-    b = new Brick(11, 201, 1, ERPfile.getPixelType());
+    b = new Brick(11, 201, 1, ERPfile.pixelType());
     b->SetBasePosition(4, 412, 1);
     ERPfile.read(*b);
 
