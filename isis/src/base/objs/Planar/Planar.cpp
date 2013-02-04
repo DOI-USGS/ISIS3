@@ -66,14 +66,14 @@ namespace Isis {
       // necessary
       if ((allowDefaults) && (!mapGroup.HasKeyword("CenterAzimuth"))) {
         double az = (m_minimumAzimuth + m_maximumAzimuth) / 2.0;
-        mapGroup += PvlKeyword("CenterAzimuth", az);
+        mapGroup += PvlKeyword("CenterAzimuth", toString(az));
       }
 
       // Compute and write the default center radius if allowed and
       // necessary
       if ((allowDefaults) && (!mapGroup.HasKeyword("CenterRadius"))) {
         double radius = (m_minimumRadius + m_maximumRadius) / 2.0;
-        mapGroup += PvlKeyword("CenterRadius", radius);
+        mapGroup += PvlKeyword("CenterRadius", toString(radius));
       }
 
       // Get the center azimuth  & radius
@@ -117,7 +117,7 @@ namespace Isis {
     *
     * @return string Name of projection, "Planar"
     */
-   string Planar::Name() const {
+   QString Planar::Name() const {
      return "Planar";
    }
 
@@ -165,7 +165,7 @@ namespace Isis {
     *
     * @return string Version number
     */
-   string Planar::Version() const {
+   QString Planar::Version() const {
      return "1.0";
    }
 
@@ -472,8 +472,8 @@ namespace Isis {
   PvlGroup Planar::Mapping() {
     PvlGroup mapping = RingPlaneProjection::Mapping();
 
-    mapping += PvlKeyword("CenterRadius", m_centerRadius);
-    mapping += PvlKeyword("CenterAzimuth", m_centerAzimuth);
+    mapping += PvlKeyword("CenterRadius", toString(m_centerRadius));
+    mapping += PvlKeyword("CenterAzimuth", toString(m_centerAzimuth));
 
     return mapping;
   }

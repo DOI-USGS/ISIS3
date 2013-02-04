@@ -480,7 +480,7 @@ void IsisMain() {
 void TestIn(int iss, int isl, int isb, int ins, int inl, int inb) {
   Cube cInCube;
   UserInterface &ui = Isis::Application::GetUserInterface();
-  string sFrom = ui.GetFileName("FROM");
+  QString sFrom = ui.GetFileName("FROM");
   cInCube.open(sFrom);
 
   cout << "\n***  Input Image  ***  ";
@@ -524,7 +524,7 @@ void TestOut(int piSamples, int piLines,
              int piBands, int piPriority, int originBand) {
   Cube cOutCube;
   UserInterface &ui = Isis::Application::GetUserInterface();
-  string sTo;
+  QString sTo;
   if (piPriority == ProcessMosaic::AverageImageWithMosaic)
     sTo = ui.GetFileName("TO_AVG");
   else

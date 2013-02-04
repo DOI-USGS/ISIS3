@@ -16,27 +16,25 @@ void IsisMain() {
   Pvl label;
   UserInterface &ui = Application::GetUserInterface();
 
-  string labelFile = ui.GetFileName("FROM");
+  QString labelFile = ui.GetFileName("FROM");
   FileName inFile = ui.GetFileName("FROM");
-  IString id;
+  QString id;
   Pvl lab(inFile.expanded());
 
   try {
-    id = (string) lab.FindKeyword("DATA_SET_ID");
+    id = (QString) lab.FindKeyword("DATA_SET_ID");
   }
   catch(IException &e) {
-    string msg = "Unable to read [DATA_SET_ID] from input file [" +
+    QString msg = "Unable to read [DATA_SET_ID] from input file [" +
                  inFile.expanded() + "]";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
 
-  id.ConvertWhiteSpace();
-  id.Compress();
-  id.Trim(" ");
+  id = id.simplified().trimmed();
   if(id != "TC_MAP" && id != "TCO_MAP") {
-    string msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
-                 "in Kaguya Terrain Camera level 2 format. " +
-                 "DATA_SET_ID is [" + id + "]";
+    QString msg = "Input file [" + inFile.expanded() + "] does not appear to be " +
+                  "in Kaguya Terrain Camera level 2 format. " +
+                  "DATA_SET_ID is [" + id + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
@@ -53,7 +51,7 @@ void IsisMain() {
 
   // Get the directory where the generic pds2isis level 2 translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  IString transDir = (string) dataDir["base"] + "/translations/";
+  QString transDir = (QString) dataDir["base"] + "/translations/";
 
   // Translate the Archive group
   FileName transFile(transDir + "pdsImageArchive.trn");

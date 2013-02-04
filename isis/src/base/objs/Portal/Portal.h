@@ -1,4 +1,4 @@
-#if !defined(Portal_h)
+#ifndef Portal_h
 #define Portal_h
 /**
  * @file

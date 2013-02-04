@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 #include <cstdio>
-#include <string>
+#include <QString>
 
 #include "ProcessImportPds.h"
 
@@ -17,7 +17,7 @@ void IsisMain() {
   Pvl label;
   UserInterface &ui = Application::GetUserInterface();
 
-  string labelFile = ui.GetFileName("FROM");
+  QString labelFile = ui.GetFileName("FROM");
 
   p.SetPdsFile(labelFile, "", label);
   Cube *ocube = p.SetOutputCube("TO");
@@ -30,7 +30,7 @@ void IsisMain() {
 
   // Get the directory where the MRO HiRISE RDR translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  IString transDir = (string) dataDir["Mro"] + "/translations/";
+  QString transDir = (QString) dataDir["Mro"] + "/translations/";
 
   // Translate the BandBin group
   FileName transFile(transDir + "hiriseRdrBandBin.trn");
@@ -67,12 +67,12 @@ void IsisMain() {
 //  Modify the output Mosaic group if the Projection is of type
 //  Equirectangular.
   PvlGroup mapgrp = otherLabels.FindGroup("Mapping");
-  if(IString::UpCase(mapgrp["ProjectionName"]) == "EQUIRECTANGULAR") {
+  if(mapgrp["ProjectionName"][0].toUpper() == "EQUIRECTANGULAR") {
     static bool pckLoaded(false);
     if(!pckLoaded) {
       FileName pck("$base/kernels/pck/pck?????.tpc");
       pck = pck.highestVersion();
-      furnsh_c(pck.expanded().c_str());
+      furnsh_c(pck.expanded().toAscii().data());
       pckLoaded = true;
     }
 
@@ -80,7 +80,7 @@ void IsisMain() {
     PvlKeyword &target = label.FindKeyword("TargetName", PvlObject::Traverse);
     SpiceInt tcode;
     SpiceBoolean found;
-    (void) bodn2c_c(target[0].c_str(), &tcode, &found);
+    (void) bodn2c_c(target[0].toAscii().data(), &tcode, &found);
     if(found) {
       // Get radii and fix labels
       SpiceInt n;
@@ -97,8 +97,8 @@ void IsisMain() {
       clatrad.SetName("CenterLatitudeRadius");
 
       //  Assign the proper radii to the group keywords
-      eqRadius.SetValue(IString(radii[0] * 1000.0), "meters");
-      polRadius.SetValue(IString(radii[2] * 1000.0), "meters");
+      eqRadius.SetValue(toString(radii[0] * 1000.0), "meters");
+      polRadius.SetValue(toString(radii[2] * 1000.0), "meters");
       mapgrp += clatrad;  // Don't do this before updating the above
       // keyword references!  Bad things happen!
     }

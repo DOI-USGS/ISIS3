@@ -50,7 +50,7 @@ typedef struct {
 // Linear Fit params designed to fit the parameter for data type gsl_function
 // of the Gnu Scientific Library
 struct linearFitParams {
-  string empirical;
+  QString empirical;
   HapkeArrs hapkeArrs;
   Datum datum;
   Pvl pvl;
@@ -94,7 +94,7 @@ void IsisMain() {
 
   // Should contains parameter names matching GUI not to be included
   // in the Pvl defFile
-  vector<string> inclusion;
+  vector<QString> inclusion;
   inclusion.clear();
   inclusion.push_back("PHTNAME");
   inclusion.push_back("WH");
@@ -111,7 +111,7 @@ void IsisMain() {
     inclusion.push_back("CH");
   }
   else {
-    string sErrMsg = "Invalid Hapke Function\n";
+    QString sErrMsg = "Invalid Hapke Function\n";
     throw IException(IException::User, sErrMsg, _FILEINFO_);
   }
 
@@ -125,8 +125,8 @@ void IsisMain() {
   PhotoModel *hapkeModel = PhotoModelFactory::Create(hapkePvl);
 
   // Type of photometric function to fit (lunar-lambert, Minnaert) to the Hapke Model
-  IString sEmpirical = ui.GetAsString("MODEL");
-  sEmpirical = sEmpirical.UpCase();
+  QString sEmpirical = ui.GetAsString("MODEL");
+  sEmpirical = sEmpirical.toUpper();
 
   Pvl empPvl;
   empPvl.AddObject(PvlObject("PhotometricModel"));
@@ -144,7 +144,7 @@ void IsisMain() {
   datum.m_rmsSlope  = ui.GetDouble("RMS_SLOPE");
 
   // Save output to the Results group
-  std::stringstream os;
+  stringstream os;
   os << "Group = Results" << endl;
   os << "# EMPIRICAL PHOTOMETRIC PARAMETER AND PHASE CURVES CREATED BY PHO_EMP_LOCAL" << endl;
   os << "# HAPKE PARAMETERS:" << endl;
@@ -164,7 +164,7 @@ void IsisMain() {
     os << "CH = " << ui.GetDouble("CH") << endl;
   }
   else {
-    string errMsg = "Undefined Hapke Model\n";
+    QString errMsg = "Undefined Hapke Model\n";
     throw IException(IException::User, errMsg, _FILEINFO_);
   }
 
@@ -214,7 +214,7 @@ void IsisMain() {
       os << "# SECOND ORDER HAPKE ATMOSPHERIC SCATTERING MODEL" << endl;
     }
     else {
-      string errMsg = "Undefined Atmospheric Scattering Model\n";
+      QString errMsg = "Undefined Atmospheric Scattering Model\n";
       throw IException(IException::User, errMsg, _FILEINFO_);
     }
 
@@ -251,7 +251,7 @@ void IsisMain() {
   }
 
   if (datum.m_phase > (datum.m_emission + datum.m_incidence)) {
-    string sErrMsg = "No valid fit points\n";
+    QString sErrMsg = "No valid fit points\n";
     throw IException(IException::User, sErrMsg, _FILEINFO_);
   }
   else {
@@ -293,10 +293,10 @@ void IsisMain() {
     os << "BEST_FIT_MULTIPLIER = " << lFitParams.c1 << endl;
     os << "RMS_ERROR_OF_FIT = " << parmin << endl;
     PvlGroup fitParams("Results");
-    fitParams += PvlKeyword("PhaseAngle", datum.m_phase, "degrees");
-    fitParams += PvlKeyword("LimbDarkeningParameter", xb);
-    fitParams += PvlKeyword("BestFitMultiplier", lFitParams.c1);
-    fitParams += PvlKeyword("RMSErrorOfFit", parmin);
+    fitParams += PvlKeyword("PhaseAngle", toString(datum.m_phase), "degrees");
+    fitParams += PvlKeyword("LimbDarkeningParameter", toString(xb));
+    fitParams += PvlKeyword("BestFitMultiplier", toString(lFitParams.c1));
+    fitParams += PvlKeyword("RMSErrorOfFit", toString(parmin));
     Application::Log(fitParams);
   }
   else {
@@ -305,11 +305,11 @@ void IsisMain() {
     os << "BEST_FIT_MULTIPLIER = " << lFitParams.c1 << endl;
     os << "RMS_ERROR_OF_FIT = " << parmin << endl;
     PvlGroup fitParams("Results");
-    fitParams += PvlKeyword("PhaseAngle", datum.m_phase, "degrees");
-    fitParams += PvlKeyword("LimbDarkeningParameter", xb);
-    fitParams += PvlKeyword("BestFitAdditiveTerm", lFitParams.c0);
-    fitParams += PvlKeyword("BestFitMultiplier", lFitParams.c1);
-    fitParams += PvlKeyword("RMSErrorOfFit", parmin);
+    fitParams += PvlKeyword("PhaseAngle", toString(datum.m_phase), "degrees");
+    fitParams += PvlKeyword("LimbDarkeningParameter", toString(xb));
+    fitParams += PvlKeyword("BestFitAdditiveTerm", toString(lFitParams.c0));
+    fitParams += PvlKeyword("BestFitMultiplier", toString(lFitParams.c1));
+    fitParams += PvlKeyword("RMSErrorOfFit", toString(parmin));
     Application::Log(fitParams);
   }
 
@@ -328,7 +328,7 @@ void IsisMain() {
       mainpvl.AddGroup(note);
     }
     mainpvl.AddGroup(results);
-    string sOutFile = ui.GetFileName("TO");
+    QString sOutFile = ui.GetFileName("TO");
     bool append = ui.GetBoolean("APPEND");
     ofstream os;
     if (append) {
@@ -392,7 +392,7 @@ double LinearFitPhotometricToHapke(double pPar, void* pParams){
                           // fit of empirical fn to Hapke @ fixed PAR
 
   struct linearFitParams * lFitParams = (struct linearFitParams *)pParams;
-  const string pEmpirical    = lFitParams->empirical;
+  const QString pEmpirical    = lFitParams->empirical;
   const HapkeArrs pHapkeArrs = lFitParams->hapkeArrs;
   const Datum pDatum         = lFitParams->datum;
   const bool iord            = lFitParams->iord;
@@ -482,7 +482,7 @@ double LinearFitPhotometricToHapke(double pPar, void* pParams){
  */
 void GetHapkeImgLocation(PhotoModel *pHapke, AtmosModel *pAsmModel, HapkeArrs & pHapkeArrs, Datum & pDatum) {
   if (NS != (NL * 2 - 1)) {
-    string errMsg = "Bad Buffer Dimensions\n";
+    QString errMsg = "Bad Buffer Dimensions\n";
     throw IException(IException::User, errMsg, _FILEINFO_);
   }
 

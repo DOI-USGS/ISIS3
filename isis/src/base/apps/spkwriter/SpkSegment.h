@@ -1,4 +1,4 @@
-#if !defined(SpkSegment_h)
+#ifndef SpkSegment_h
 #define SpkSegment_h
 /**                                                                       
  * @file                                                                  
@@ -62,7 +62,7 @@ class SpkSegment : public SpiceSegment {
     typedef SpiceSegment::SMatrix SMatrix;
 
     SpkSegment();
-    SpkSegment(const std::string &fname);
+    SpkSegment(const QString &fname);
     SpkSegment(Cube &cube);
     virtual ~SpkSegment() { }
 
@@ -76,7 +76,7 @@ class SpkSegment : public SpiceSegment {
     /** NAIF SPICE instrument code */
     int CenterCode() const { return (_center); }
     /** Returns CK segment reference frame */
-    std::string ReferenceFrame() const { return (_refFrame); }
+    QString ReferenceFrame() const { return (_refFrame); }
     /** Get times of each entry */
     SVector Epochs() const { return (_epochs); }
     /** Returns instance of quaternions */
@@ -87,16 +87,16 @@ class SpkSegment : public SpiceSegment {
     bool HasVelocityVectors() const { return (_hasVV); }
 
     /** Returns a comment summarizing the segment */
-    std::string getComment() const;
+    QString getComment() const;
 
   private:
     enum { MinimumStates = 3, MaximumDegree = 7};  // Sensible? NAIF extremes
 
     int         _body;         //  NAIF body code of the SPICE segment
-    std::string _bodyFrame;    //  NAIF body frame
+    QString _bodyFrame;    //  NAIF body frame
     int         _center;       //  NAIF center code of the SPICE segment
-    std::string _centerFrame;  //  NAIF center frame
-    std::string _refFrame;     //  NAIF reference frame
+    QString _centerFrame;  //  NAIF center frame
+    QString _refFrame;     //  NAIF reference frame
     SMatrix     _states;       //  Position states
     SVector     _epochs;       //  ET times of records
     bool        _hasVV;        //  Has velocity vectors?

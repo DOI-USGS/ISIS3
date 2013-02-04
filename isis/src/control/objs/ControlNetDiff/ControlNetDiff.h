@@ -23,12 +23,10 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "IString.h"
+#include <QString>
 
 template< typename A, typename B > class QMap;
 template< typename T > class QSet;
-
-class QString;
 
 namespace Isis {
   class ControlNet;
@@ -79,15 +77,15 @@ namespace Isis {
       void compareGroups(PvlContainer &g1, PvlContainer &g2, PvlObject &report);
       void compare(PvlKeyword &k1, PvlKeyword &k2, PvlContainer &report);
 
-      void diff(IString name, PvlObject &o1, PvlObject &o2, PvlContainer &report);
-      void diff(IString name, IString v1, IString v2, PvlContainer &report);
-      PvlKeyword makeKeyword(IString name, IString v1, IString v2);
+      void diff(QString name, PvlObject &o1, PvlObject &o2, PvlContainer &report);
+      void diff(QString name, QString v1, QString v2, PvlContainer &report);
+      PvlKeyword makeKeyword(QString name, QString v1, QString v2);
 
-      void diff(IString name, double v1, double v2, double tol, PvlContainer &report);
-      PvlKeyword makeKeyword(IString name, double v1, double v2, double tol);
+      void diff(QString name, double v1, double v2, double tol, PvlContainer &report);
+      PvlKeyword makeKeyword(QString name, double v1, double v2, double tol);
 
-      void addUniquePoint(IString label, IString v1, IString v2, PvlObject &parent);
-      void addUniqueMeasure(IString label, IString v1, IString v2, PvlObject &parent);
+      void addUniquePoint(QString label, QString v1, QString v2, PvlObject &parent);
+      void addUniqueMeasure(QString label, QString v1, QString v2, PvlObject &parent);
 
 
     private:

@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 // system include files go first
-#include <string>
+#include <QString>
 #include <iostream>
 #include <iomanip>
 #include <vector>
@@ -42,13 +42,13 @@ enum Mode {SUBTRACT, DIVIDE};
 void getStats            (Buffer &in);
 void multiply            (Buffer &in, Buffer &out);
 void subtract            (Buffer &in, Buffer &out);
-void pvlOut              (const string &pv);
-void tableOut            (const string &pv);
+void pvlOut              (const QString &pv);
+void tableOut            (const QString &pv);
 void PVLIn               (const Isis::FileName &filename);
 void tableIn             (const Isis::FileName &filename);
 void keepSame            (int &totalBands, int &rowcol, Mode mode);
 void filterStats         (vector<double> &filter, int &filtsize, bool &pause_crop,int &channel);
-void CorrectCubenormStats(int piFilterSize, bool pbPauseCrop, int piChannelNum, string psMode);
+void CorrectCubenormStats(int piFilterSize, bool pbPauseCrop, int piChannelNum, QString psMode);
 
 // Main Program
 void IsisMain() {
@@ -64,7 +64,7 @@ void IsisMain() {
   // parameters.
   UserInterface &ui = Application::GetUserInterface();
   if(!(ui.WasEntered("TO")) && !(ui.WasEntered("STATS"))) {
-    string msg = "User must specify a TO and/or STATS file.";
+    QString msg = "User must specify a TO and/or STATS file.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -100,8 +100,8 @@ void IsisMain() {
   // Check to make sure the first vector has as many elements as the last
   // vector, and that there is a vector element for each row/col
   if(!bNewVersion && band.size() != (unsigned int)(rowcol * totalBands)) {
-    string message = "You have entered an invalid input file " +
-                     ui.GetFileName("FROMSTATS");
+    QString message = "You have entered an invalid input file " +
+                      ui.GetFileName("FROMSTATS");
     throw IException(IException::Io, message, _FILEINFO_);
   }
 
@@ -126,7 +126,7 @@ void IsisMain() {
 
   // If a STATS file was specified then create statistics file
   if(ui.WasEntered("STATS")) {
-    string op = ui.GetString("FORMAT");
+    QString op = ui.GetString("FORMAT");
     if(op == "PVL"){
       pvlOut(ui.GetFileName("STATS"));
     }
@@ -153,7 +153,7 @@ void IsisMain() {
     if(ui.GetString("MODE") == "MULTIPLY") {
       for(unsigned int i = 0; i < band.size(); i++) {
         if(IsValidPixel(normalizer[i]) && normalizer[i] <= 0.0) {
-          string msg = "Cube file can not be normalized with [MULTIPLY] ";
+          QString msg = "Cube file can not be normalized with [MULTIPLY] ";
           msg += "option, some column averages <= 0.0";
           throw IException(IException::User, msg, _FILEINFO_);
         }
@@ -240,25 +240,25 @@ void getStats(Buffer &in) {
 //********************************************************
 // Create PVL output of statistics
 //*******************************************************
-void pvlOut(const string &StatFile) {
+void pvlOut(const QString &StatFile) {
   PvlGroup results("Results");
   for(unsigned int i = 0; i < band.size(); i++) {
-    results += PvlKeyword("Band", band[i]);
-    results += PvlKeyword("RowCol", element[i]);
-    results += PvlKeyword("ValidPixels", validpixels[i]);
+    results += PvlKeyword("Band", toString(band[i]));
+    results += PvlKeyword("RowCol", toString(element[i]));
+    results += PvlKeyword("ValidPixels", toString(validpixels[i]));
     if(validpixels[i] > 0) {
-      results += PvlKeyword("Mean", average[i]);
-      results += PvlKeyword("Median", median[i]);
-      results += PvlKeyword("Std", stddev[i]);
-      results += PvlKeyword("Minimum", minimum[i]);
-      results += PvlKeyword("Maximum", maximum[i]);
+      results += PvlKeyword("Mean", toString(average[i]));
+      results += PvlKeyword("Median", toString(median[i]));
+      results += PvlKeyword("Std", toString(stddev[i]));
+      results += PvlKeyword("Minimum", toString(minimum[i]));
+      results += PvlKeyword("Maximum", toString(maximum[i]));
     }
     else {
-      results += PvlKeyword("Mean", 0.0);
-      results += PvlKeyword("Median", 0.0);
-      results += PvlKeyword("Std", 0.0);
-      results += PvlKeyword("Minimum", 0.0);
-      results += PvlKeyword("Maximum", 0.0);
+      results += PvlKeyword("Mean", toString(0.0));
+      results += PvlKeyword("Median", toString(0.0));
+      results += PvlKeyword("Std", toString(0.0));
+      results += PvlKeyword("Minimum", toString(0.0));
+      results += PvlKeyword("Maximum", toString(0.0));
     }
   }
 
@@ -270,11 +270,11 @@ void pvlOut(const string &StatFile) {
 //********************************************************
 // Create Tabular output of statistics
 //*******************************************************
-void tableOut(const string &StatFile) {
+void tableOut(const QString &StatFile) {
   // Open output file
   // TODO check status and throw error
   ofstream out;
-  out.open(StatFile.c_str(), std::ios::out);
+  out.open(StatFile.toAscii().data(), std::ios::out);
 
   // Output a header
   out << std::setw(8)  << "Band";
@@ -327,21 +327,21 @@ void PVLIn(const Isis::FileName &filename) {
   PvlObject::PvlKeywordIterator itr = results.Begin();
 
   while(itr != results.End()) {
-    band.push_back((*itr)[0]);
+    band.push_back(toInt((*itr)[0]));
     itr++;
-    element.push_back((*itr)[0]);
+    element.push_back(toInt((*itr)[0]));
     itr++;
-    validpixels.push_back((*itr)[0]);
+    validpixels.push_back(toInt((*itr)[0]));
     itr++;
-    average.push_back((*itr)[0]);
+    average.push_back(toDouble((*itr)[0]));
     itr++;
-    median.push_back((*itr)[0]);
+    median.push_back(toDouble((*itr)[0]));
     itr++;
-    stddev.push_back((*itr)[0]);
+    stddev.push_back(toDouble((*itr)[0]));
     itr++;
-    minimum.push_back((*itr)[0]);
+    minimum.push_back(toDouble((*itr)[0]));
     itr++;
-    maximum.push_back((*itr)[0]);
+    maximum.push_back(toDouble((*itr)[0]));
     itr++;
   }
 }
@@ -351,12 +351,12 @@ void PVLIn(const Isis::FileName &filename) {
 //*******************************************************
 void tableIn(const Isis::FileName &filename) {
   ifstream in;
-  string expanded(filename.expanded());
-  in.open(expanded.c_str(), std::ios::in);
+  QString expanded(filename.expanded());
+  in.open(expanded.toAscii().data(), std::ios::in);
 
 
   if(!in) {
-    string message = "Error opening " + filename.expanded();
+    QString message = "Error opening " + filename.expanded();
     throw IException(IException::Io, message, _FILEINFO_);
   }
 
@@ -495,7 +495,7 @@ void filterStats(vector<double> &filter, int &filtsize, bool &pause_crop,
   const int ch_pause_cnt = 3;
   const int ch_pause[2][ch_pause_cnt] = {{252, 515, 778}, {247, 510, 773}};
   const int ch_width[2][ch_pause_cnt] = {{11, 11, 11}, {11, 11, 11}};
-  const string ch_direc[2] = {"RIGHT", "LEFT"};
+  const QString ch_direc[2] = {"RIGHT", "LEFT"};
   const int iterations = 10;
   vector<double> filtin;
   vector<double> filtout;
@@ -581,14 +581,14 @@ void filterStats(vector<double> &filter, int &filtsize, bool &pause_crop,
  * @param piChannelNum - Input image Channel number
  * @param psMode       - Highpass Mode (Divide/Subtract)
  */
-void CorrectCubenormStats(int piFilterSize, bool pbPauseCrop, int piChannelNum, string psMode)
+void CorrectCubenormStats(int piFilterSize, bool pbPauseCrop, int piChannelNum, QString psMode)
 {
   const int MARKER       = -999999;
   const int iChannelSize = 3;
   const int iIterations  = 50;
   const int iChannelPause[2][iChannelSize] = {{252, 515, 778}, {247, 510, 773}};
   const int iChannelWidth[2][iChannelSize] = {{17, 17, 17}, {17, 17, 17}};
-  const string sChannelDirection[2]        = {"RIGHT", "LEFT"};
+  const QString sChannelDirection[2]        = {"RIGHT", "LEFT"};
 
   int iLeftCut   = 6;
   int iRightCut  = 6;

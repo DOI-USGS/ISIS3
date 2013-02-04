@@ -24,11 +24,15 @@
 
 #include <string>
 #include <vector>
+
 #include <QString>
 #include <QStringList>
+
 #include "Constants.h"
 
 namespace Isis {
+  class IString;
+
   bool toBool(const QString &);
   int toInt(const QString &);
   BigInt toBigInt(const QString &);
@@ -37,6 +41,7 @@ namespace Isis {
   QString toString(bool);
   QString toString(char);
   QString toString(const int &);
+  QString toString(const unsigned int &);
   QString toString(const BigInt &);
   QString toString(double, int precision = 14);
 
@@ -122,36 +127,36 @@ namespace Isis {
    *  @history 2010-10-04 Sharmila Prasad - Remove redundant ParseExpression
    *  @history 2011-06-16 Jai Rideout - Fixed size of double string buffer to
    *                                    work with doubles that are -DBLMAX
-   *  @history 2012-08-20 Steven Lambright - Deprecated. Please use QString instead of IString or
+   *  @history 2012-08-20 Steven Lambright - Deprecated. Please use IString instead of IString or
    *                          std::string. This file now provides toBool(), toInt(), toBigInt(),
    *                          toDouble(), and toString() which are not deprecated. Renamed from
    *                          iString to IString to better match our new naming conventions and
    *                          because this class isn't going to be removed overnight. Here are
    *                          some equivalents to IString functionality:
-   *                            Trim() - Please use QString::trimmed(), QString::simplified() or
-   *                                     QString::remove(QRegExp("(^[abc]*|[abc]*$)"))
-   *                            TrimHead() - Please use QString::trimmed(), QString::simplified() or
-   *                                         QString::remove(QRegExp("^[abc]*"))
-   *                            TrimTail() - Please use QString::trimmed(), QString::simplified() or
-   *                                         QString::remove(QRegExp("[abc]*$"))
-   *                            UpCase() - Please use QString::toUpper()
-   *                            DownCase() - Please use QString::toLower()
+   *                            Trim() - Please use IString::trimmed(), IString::simplified() or
+   *                                     IString::remove(QRegExp("(^[abc]*|[abc]*$)"))
+   *                            TrimHead() - Please use IString::trimmed(), IString::simplified() or
+   *                                         IString::remove(QRegExp("^[abc]*"))
+   *                            TrimTail() - Please use IString::trimmed(), IString::simplified() or
+   *                                         IString::remove(QRegExp("[abc]*$"))
+   *                            UpCase() - Please use IString::toUpper()
+   *                            DownCase() - Please use IString::toLower()
    *                            ToQt() - N/A
-   *                            Token() - Please use QString::split() or QString::section()
-   *                            Split() - Please use QString::split()
-   *                            Replace() - Please use QString::replace(). If you need to respect
+   *                            Token() - Please use IString::split() or IString::section()
+   *                            Split() - Please use IString::split()
+   *                            Replace() - Please use IString::replace(). If you need to respect
    *                                       quotes, please create a standard-compliant static
    *                                       method
-   *                            Convert() - Please use QString::replace()
-   *                            ConvertWhiteSpace() - Please use QString::simplified() or
-   *                                                 QString::replace(QRegExp("\\s"), " ")
-   *                            Remove() - Please use QString::remove()
-   *                            operator QString() - N/A
+   *                            Convert() - Please use IString::replace()
+   *                            ConvertWhiteSpace() - Please use IString::simplified() or
+   *                                                 IString::replace(QRegExp("\\s"), " ")
+   *                            Remove() - Please use IString::remove()
+   *                            operator IString() - N/A
    *                            Equal() - Please use operator==()
-   *                            ToStd() - Please use QString::toStdString()
+   *                            ToStd() - Please use IString::toStdString()
    *                            ToQt(vector) - This is not a string operation, it's more of a string
    *                                           list operation.
-   *                            ToStd(QStringList) - This is not a string operation, it's more of
+   *                            ToStd(IStringList) - This is not a string operation, it's more of
    *                                                 a string list operation.
    *                            operator int()/ToInteger() - see the new function toInt()
    *                            operator double()/ToDouble() - see the new function toDouble()
@@ -161,10 +166,15 @@ namespace Isis {
    *                            operator=(const double &) - toString() handles this
    *                            SetDouble() - No longer necessary, only one method converts from a
    *                                          double to a string
-   *                            Compress() - Please use QString::trimmed(), QString::simplified()
-   *                                         or QString::replace(). If you need to respect quotes,
+   *                            Compress() - Please use IString::trimmed(), IString::simplified()
+   *                                         or IString::replace(). If you need to respect quotes,
    *                                         please create a standard-compliant static method.
    *  @history 2012-10-13 Kris Becker - Fixed compatability issue with Qt on MacOSX
+   *  @history 2012-12-18 Steven Lambright - Isis' API now only utilizes QStrings. Please use the
+   *                          toString(...) and to*(QString) (i.e. toBool(QString), toInt(QString),
+   *                          ...) methods. All public API's should use/expect QString (not IString,
+   *                          not std::string). This affects virtually every class in Isis. 
+   *                          Fixes #1312.
    */
   class IString : public std::string {
     public:
@@ -266,11 +276,11 @@ namespace Isis {
       };
 
       /**
-       * Attempts to convert the stirng to a QStirng (Qt) and return that QString
+       * Attempts to convert the stirng to a QStirng (Qt) and return that IString
        *
-       * @return QString
+       * @return IString
        */
-      operator QString() const {
+      operator IString() const {
         return ToQt();
       };
 
@@ -283,7 +293,7 @@ namespace Isis {
        *
        * @param value [in] The double to be converted to a string
        *
-       * @return The Isis::IString representation of the double
+       * @return The IString representation of the double
        */
       IString &operator= (const double &value) {
         SetDouble(value);

@@ -23,7 +23,7 @@ void IsisMain() {
   p.SetOutputCube("TO");
 
   // Start the processing
-  string option = ui.GetString("OPTION");
+  QString option = ui.GetString("OPTION");
   if(option == "GRADIENT") {
     p.StartProcess(SumLineSample);
   }

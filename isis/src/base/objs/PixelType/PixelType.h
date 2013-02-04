@@ -1,4 +1,4 @@
-#if !defined(PixelType_h)
+#ifndef PixelType_h
 #define PixelType_h
 /**
  * @file
@@ -22,8 +22,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
-#include "IString.h"
+#include <QString>
 
 namespace Isis {
   /**
@@ -80,7 +79,7 @@ namespace Isis {
    *
    * @return string Name of PixelType
    */
-  inline std::string PixelTypeName(Isis::PixelType pixelType) {
+  inline QString PixelTypeName(Isis::PixelType pixelType) {
     if(pixelType == Isis::None) return "None";
     if(pixelType == Isis::UnsignedByte) return "UnsignedByte";
     if(pixelType == Isis::SignedByte) return "SignedByte";
@@ -96,16 +95,15 @@ namespace Isis {
   /**
    * Returns PixelType enumeration given a string
    *
-   * @param type IString containing the name of pixel type. Acceptable values are
+   * @param type QString containing the name of pixel type. Acceptable values are
    *             UnsignedByte, SignedByte, UnsignedWord, SignedWord,
    *             UnsignedInteger, SignedInteger, Read, and Double (not case
    *             sensitive)
    *
    * @return Isis::PixelType
    */
-  inline Isis::PixelType PixelTypeEnumeration(const std::string &type) {
-    Isis::IString temp(type);
-    temp = temp.UpCase();
+  inline Isis::PixelType PixelTypeEnumeration(const QString &type) {
+    QString temp = type.toUpper();
     if(temp == "UNSIGNEDBYTE" || temp == "8BIT" || temp == "8-BIT") return Isis::UnsignedByte;
     if(temp == "SIGNEDBYTE") return Isis::SignedByte;
     if(temp == "UNSIGNEDWORD") return Isis::UnsignedWord;

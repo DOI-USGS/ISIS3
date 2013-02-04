@@ -6,37 +6,39 @@
 #include "Cube.h"
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
+
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
-  Isis::PvlGroup g("Instrument");
-  g += Isis::PvlKeyword("SpacecraftName", "MySpacecraft");
-  g += Isis::PvlKeyword("InstrumentId", "MyInstrumentId");
-  g += Isis::PvlKeyword("SpacecraftClockCount", "987654321");
+  PvlGroup g("Instrument");
+  g += PvlKeyword("SpacecraftName", "MySpacecraft");
+  g += PvlKeyword("InstrumentId", "MyInstrumentId");
+  g += PvlKeyword("SpacecraftClockCount", "987654321");
 
-  Isis::PvlObject o("IsisCube");
+  PvlObject o("IsisCube");
   o.AddGroup(g);
 
-  Isis::Pvl p;
+  Pvl p;
   p.AddObject(o);
 
-  std::cout << Isis::SerialNumber::Compose(p) << std::endl;
+  cout << SerialNumber::Compose(p) << endl;
 
-  p.FindGroup("Instrument", Isis::Pvl::Traverse).DeleteKeyword("InstrumentId");
-  std::cout << Isis::SerialNumber::Compose(p) << std::endl;
+  p.FindGroup("Instrument", Pvl::Traverse).DeleteKeyword("InstrumentId");
+  cout << SerialNumber::Compose(p) << endl;
 
-  Isis::Cube cube;
+  Cube cube;
   cube.open("$base/testData/isisTruth.cub");
-  std::cout << Isis::SerialNumber::Compose(cube, true) << std::endl;
+  cout << SerialNumber::Compose(cube, true) << endl;
 
-  Isis::FileName file("$lo/testData/3133_h1.cub");
-  Isis::Pvl p1(file.expanded());
+  FileName file("$lo/testData/3133_h1.cub");
+  Pvl p1(file.expanded());
 
-  std::cout << Isis::SerialNumber::Compose(p1) << std::endl;
+  cout << SerialNumber::Compose(p1) << endl;
 
-  std::cout << std::endl << "Testing ObservationKeys" << std::endl;
+  cout << endl << "Testing ObservationKeys" << endl;
 
-  std::cout << Isis::ObservationNumber::Compose(p1) << std::endl;
+  cout << ObservationNumber::Compose(p1) << endl;
   return (0);
 }

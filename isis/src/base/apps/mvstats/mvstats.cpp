@@ -1,6 +1,6 @@
 #include "Isis.h"
 
-#include <string>
+#include <QString>
 #include <vector>
 
 #include "ProcessByLine.h"
@@ -16,7 +16,7 @@ std::vector< vector<double> > correlation;
 MultivariateStatistics stats;
 
 void MakeStats(vector<Buffer *> &in, vector<Buffer *> &out);
-void WriteText(int size, string filename);
+void WriteText(int size, QString filename);
 void WriteCube(Buffer &inout);
 
 void IsisMain() {
@@ -24,11 +24,11 @@ void IsisMain() {
   //Check to see if an output file was specified
   UserInterface &ui = Application::GetUserInterface();
   if(!ui.WasEntered("CUBE") && !ui.WasEntered("FLATFILE")) {
-    string message = "At least one output file must be entered";
+    QString message = "At least one output file must be entered";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
-  string file = ui.GetFileName("FROM");
+  QString file = ui.GetFileName("FROM");
 
   //Use a Process to get the number of bands in the input cube
   Process q;
@@ -37,7 +37,7 @@ void IsisMain() {
 
   //Check to see if the input cube has enough bands
   if(bands < 2) {
-    string message = "Input band must have at least two bands!";
+    QString message = "Input band must have at least two bands!";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
@@ -55,17 +55,17 @@ void IsisMain() {
     for(int j = i ; j <= bands ; j++) {
       //Reset Stat accumulators and set the Progress Display Text
       stats.Reset();
-      string progText = "Band " + IString(i) +
+      QString progText = "Band " + toString(i) +
                         " vs. " +
-                        "Band " +  IString(j);
+                        "Band " +  toString(j);
 
       //Cube will be processed by line
       ProcessByLine p;
 
       //Set CubeAttributeInputs to tell the ProcessByLine which
       //bands to compare
-      CubeAttributeInput band_a("d+" + IString(icube->getPhysicalBand(i)));
-      CubeAttributeInput band_b("d+" + IString(icube->getPhysicalBand(j)));
+      CubeAttributeInput band_a("d+" + toString(icube->getPhysicalBand(i)));
+      CubeAttributeInput band_b("d+" + toString(icube->getPhysicalBand(j)));
 
       //Set Input files and process, to accumulate the statistics
       p.SetInputCube(file, band_a);
@@ -130,14 +130,14 @@ void MakeStats(vector<Buffer *> &in, vector<Buffer *> &out) {
 }
 
 //Function to generate a flatfile to represent the matrices
-void WriteText(int size, string filename) {
+void WriteText(int size, QString filename) {
   ofstream outputFile;
-  outputFile.open(filename.c_str());
-  string line = " ";
+  outputFile.open(filename.toAscii().data());
+  QString line = " ";
   outputFile << "Correlation:" << endl << endl;
   for(int i = 0; i < size; ++i) {
     for(int j = 0; j < size; ++j) {
-      line += " " + IString(correlation[i][j]) + " ";
+      line += " " + toString(correlation[i][j]) + " ";
     }
     outputFile << line << endl;
     line = " ";
@@ -146,7 +146,7 @@ void WriteText(int size, string filename) {
   outputFile << endl << endl << "Covariance:" << endl << endl;
   for(int i = 0; i < size; ++i) {
     for(int j = 0; j < size; ++j) {
-      line += " " + IString(covariance[i][j]) + " ";
+      line += " " + toString(covariance[i][j]) + " ";
     }
     outputFile << line << endl;
     line = " ";

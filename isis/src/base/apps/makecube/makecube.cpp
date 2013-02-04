@@ -46,7 +46,7 @@ void IsisMain() {
 
   // Get the value to put in the cube
   UserInterface &ui = Application::GetUserInterface();
-  string pixels = ui.GetString("PIXELS");
+  QString pixels = ui.GetString("PIXELS");
 
   double value = Null;
   if(pixels == "NULL") {

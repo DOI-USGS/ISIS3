@@ -44,9 +44,9 @@ namespace Isis {
    */
   ControlMeasure::ControlMeasure() {
     InitializeToNull();
-    p_serialNumber = new IString;
-    p_chooserName = new IString;
-    p_dateTime = new IString;
+    p_serialNumber = new QString;
+    p_chooserName = new QString;
+    p_dateTime = new QString;
     p_loggedData = new QVector<ControlMeasureLogData>();
 
     p_measureType = Candidate;
@@ -69,9 +69,9 @@ namespace Isis {
       const ControlPointFileEntryV0002_Measure &protoBuf) {
     InitializeToNull();
 
-    p_serialNumber = new IString(protoBuf.serialnumber());
-    p_chooserName = new IString(protoBuf.choosername());
-    p_dateTime = new IString(protoBuf.datetime());
+    p_serialNumber = new QString(protoBuf.serialnumber().c_str());
+    p_chooserName = new QString(protoBuf.choosername().c_str());
+    p_dateTime = new QString(protoBuf.datetime().c_str());
     p_loggedData = new QVector<ControlMeasureLogData>();
 
     switch (protoBuf.type()) {
@@ -134,9 +134,9 @@ namespace Isis {
   ControlMeasure::ControlMeasure(const ControlMeasure &other) {
     InitializeToNull();
 
-    p_serialNumber = new IString(*other.p_serialNumber);
-    p_chooserName = new IString(*other.p_chooserName);
-    p_dateTime = new IString(*other.p_dateTime);
+    p_serialNumber = new QString(*other.p_serialNumber);
+    p_chooserName = new QString(*other.p_chooserName);
+    p_dateTime = new QString(*other.p_dateTime);
 
     p_loggedData = new QVector<ControlMeasureLogData>(*other.p_loggedData);
 
@@ -265,7 +265,7 @@ namespace Isis {
    * @return Status Success or MeasureLocked
    *
    */
-  ControlMeasure::Status ControlMeasure::SetCubeSerialNumber(IString newSerialNumber) {
+  ControlMeasure::Status ControlMeasure::SetCubeSerialNumber(QString newSerialNumber) {
     if (IsEditLocked())
       return MeasureLocked;
     *p_serialNumber = newSerialNumber;
@@ -283,7 +283,7 @@ namespace Isis {
 
 
   //! Set the chooser name to an application that last changed the coordinate
-  ControlMeasure::Status ControlMeasure::SetChooserName(IString name) {
+  ControlMeasure::Status ControlMeasure::SetChooserName(QString name) {
     if (IsEditLocked())
       return MeasureLocked;
     *p_chooserName = name;
@@ -332,7 +332,7 @@ namespace Isis {
 
 
   //! Set date/time the coordinate was last changed to specified date/time
-  ControlMeasure::Status ControlMeasure::SetDateTime(IString datetime) {
+  ControlMeasure::Status ControlMeasure::SetDateTime(QString datetime) {
     if (IsEditLocked())
       return MeasureLocked;
     *p_dateTime = datetime;
@@ -609,7 +609,7 @@ namespace Isis {
 
 
   //! Return the chooser name
-  IString ControlMeasure::GetChooserName() const {
+  QString ControlMeasure::GetChooserName() const {
     if (*p_chooserName != "") {
       return *p_chooserName;
     }
@@ -620,13 +620,13 @@ namespace Isis {
 
 
   //! Return the serial number of the cube containing the coordinate
-  IString ControlMeasure::GetCubeSerialNumber() const {
+  QString ControlMeasure::GetCubeSerialNumber() const {
     return *p_serialNumber;
   }
 
 
   //! Return the date/time the coordinate was last changed
-  IString ControlMeasure::GetDateTime() const {
+  QString ControlMeasure::GetDateTime() const {
     if (*p_dateTime != "") {
       return *p_dateTime;
     }
@@ -843,7 +843,7 @@ namespace Isis {
 
 
   //! One Getter to rule them all
-  double ControlMeasure::GetMeasureData(IString data) const {
+  double ControlMeasure::GetMeasureData(QString data) const {
     if (data == "SampleResidual")
       return p_sampleResidual;
     else if (data == "LineResidual")
@@ -864,8 +864,8 @@ namespace Isis {
 
 
   //! Returns a list of all valid options to pass to GetMeasureData
-  QVector< IString > ControlMeasure::GetMeasureDataNames() {
-    QVector< IString > names;
+  QVector< QString > ControlMeasure::GetMeasureDataNames() {
+    QVector< QString > names;
 
     names.push_back("SampleResidual");
     names.push_back("LineResidual");
@@ -983,8 +983,8 @@ namespace Isis {
    *                                        added exception.
    *   @history 2010-12-08 Tracie Sucharski - Added measure type of Ground.
    */
-  IString ControlMeasure::MeasureTypeToString(MeasureType type) {
-    IString sPrintable;
+  QString ControlMeasure::MeasureTypeToString(MeasureType type) {
+    QString sPrintable;
 
     switch (type) {
       case ControlMeasure::Candidate:
@@ -1005,7 +1005,7 @@ namespace Isis {
     }
 
     if (sPrintable == "") {
-      IString msg = "Measure type [" + IString(type) + "] cannot be converted "
+      QString msg = "Measure type [" + toString(type) + "] cannot be converted "
           "to a string";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -1018,7 +1018,7 @@ namespace Isis {
    *
    * @return A string representation of the MeasureType
    */
-  IString ControlMeasure::GetMeasureTypeString() const {
+  QString ControlMeasure::GetMeasureTypeString() const {
     return MeasureTypeToString(p_measureType);
   }
 
@@ -1053,9 +1053,9 @@ namespace Isis {
       p_loggedData = NULL;
     }
 
-    p_serialNumber = new IString;
-    p_chooserName = new IString;
-    p_dateTime = new IString;
+    p_serialNumber = new QString;
+    p_chooserName = new QString;
+    p_dateTime = new QString;
     p_loggedData = new QVector<ControlMeasureLogData>();
 
     *p_serialNumber = *other.p_serialNumber;
@@ -1148,7 +1148,7 @@ namespace Isis {
   ControlPointFileEntryV0002_Measure ControlMeasure::ToProtocolBuffer() const {
     ControlPointFileEntryV0002_Measure protoBufMeasure;
 
-    protoBufMeasure.set_serialnumber(GetCubeSerialNumber());
+    protoBufMeasure.set_serialnumber(GetCubeSerialNumber().toAscii().data());
     switch (GetType()) {
       case ControlMeasure::Candidate:
         protoBufMeasure.set_type(ControlPointFileEntryV0002_Measure::Candidate);
@@ -1165,10 +1165,10 @@ namespace Isis {
     }
 
     if (GetChooserName() != "") {
-      protoBufMeasure.set_choosername(GetChooserName());
+      protoBufMeasure.set_choosername(GetChooserName().toAscii().data());
     }
     if (GetDateTime() != "") {
-      protoBufMeasure.set_datetime(GetDateTime());
+      protoBufMeasure.set_datetime(GetDateTime().toAscii().data());
     }
     if (IsEditLocked())
       protoBufMeasure.set_editlock(true);

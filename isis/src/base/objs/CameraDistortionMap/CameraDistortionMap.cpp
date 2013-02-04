@@ -61,8 +61,8 @@ namespace Isis {
    * @todo Generalize to read variable number of coefficients
    * @todo Add latex equation to the documentation
    */
-  void CameraDistortionMap::SetDistortion(const int naifIkCode) {
-    std::string odkkey = "INS" + Isis::IString(naifIkCode) + "_OD_K";
+  void CameraDistortionMap::SetDistortion(int naifIkCode) {
+    QString odkkey = "INS" + toString(naifIkCode) + "_OD_K";
     for(int i = 0; i < 3; ++i) {
       p_odk.push_back(p_camera->Spice::getDouble(odkkey, i));
     }
@@ -84,7 +84,7 @@ namespace Isis {
    * @see SetDistortion
    * @todo Generalize polynomial equation
    */
-  bool CameraDistortionMap::SetFocalPlane(const double dx, const double dy) {
+  bool CameraDistortionMap::SetFocalPlane(double dx, double dy) {
     p_focalPlaneX = dx;
     p_focalPlaneY = dy;
 

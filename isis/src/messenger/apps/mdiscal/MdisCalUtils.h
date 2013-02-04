@@ -1,4 +1,4 @@
-#if !defined(MdisCalUtils_h)
+#ifndef MdisCalUtils_h
 #define MdisCalUtils_h
 /**
  * @file
@@ -41,11 +41,11 @@ namespace Isis {
    * @return double Converted value
    */
   template <typename T> double ToDouble(const T &value) {
-    return (IString(value).Trim(" \r\t\n").ToDouble());
+    return toDouble(QString(value).trimmed());
   }
 
   template <typename T> int ToInteger(const T &value) {
-    return (IString(value).Trim(" \r\t\n").ToInteger());
+    return toInt(QString(value).trimmed());
   }
 
   template <typename T> inline T MIN(const T &A, const T &B) {
@@ -56,10 +56,10 @@ namespace Isis {
     return (((A) > (B)) ? (A) : (B));
   }
 
-  inline std::string Quote(const std::string &value) {
-    if(value.empty()) return (value);
+  inline QString Quote(const QString &value) {
+    if(value.isEmpty()) return (value);
     if(value[0] == '"') return (value);
-    return (std::string('"' + value + '"'));
+    return (QString('"' + value + '"'));
   }
 
   /**
@@ -83,12 +83,12 @@ namespace Isis {
       pck = pck.highestVersion();
 
 //  Load the kernels
-      std::string leapsecondsName(leapseconds.expanded());
-      std::string sclkName(sclk.expanded());
-      std::string pckName(pck.expanded());
-      furnsh_c(leapsecondsName.c_str());
-      furnsh_c(sclkName.c_str());
-      furnsh_c(pckName.c_str());
+      QString leapsecondsName(leapseconds.expanded());
+      QString sclkName(sclk.expanded());
+      QString pckName(pck.expanded());
+      furnsh_c(leapsecondsName.toAscii().data());
+      furnsh_c(sclkName.toAscii().data());
+      furnsh_c(pckName.toAscii().data());
 
 //  Ensure it is loaded only once
       _naifLoaded = true;
@@ -104,8 +104,8 @@ namespace Isis {
    *
    * @return double Distance in AU between Sun and observed body
    */
-  static bool sunDistanceAU(const std::string &scStartTime,
-                            const std::string &target,
+  static bool sunDistanceAU(const QString &scStartTime,
+                            const QString &target,
                             double &sunDist) {
 
     //  Ensure NAIF kernels are loaded
@@ -115,17 +115,17 @@ namespace Isis {
     //  Determine if the target is a valid NAIF target
     SpiceInt tcode;
     SpiceBoolean found;
-    (void) bodn2c_c(target.c_str(), &tcode, &found);
+    (void) bodn2c_c(target.toAscii().data(), &tcode, &found);
     if(!found) return (false);
 
     //  Convert starttime to et
     double obsStartTime;
-    scs2e_c(-236, scStartTime.c_str(), &obsStartTime);
+    scs2e_c(-236, scStartTime.toAscii().data(), &obsStartTime);
 
     //  Get the vector from target to sun and determine its length
     double sunv[3];
     double lt;
-    (void) spkpos_c(target.c_str(), obsStartTime, "J2000", "LT+S", "sun",
+    (void) spkpos_c(target.toAscii().data(), obsStartTime, "J2000", "LT+S", "sun",
                     sunv, &lt);
     double sunkm = vnorm_c(sunv);
 
@@ -134,7 +134,7 @@ namespace Isis {
     return (true);
   }
 
-  std::vector<double> loadWACCSV(const std::string &fname, int filter,
+  std::vector<double> loadWACCSV(const QString &fname, int filter,
                                  int nvalues, bool header = true, int skip = 0) {
     //  Open the CSV file
     FileName csvfile(fname);
@@ -143,11 +143,11 @@ namespace Isis {
       CSVReader::CSVAxis row = csv.getRow(i);
       if(ToInteger(row[0]) == filter) {
         if((row.dim1() - 1) < nvalues) {
-          std::string mess = "Number values (" + IString(row.dim1() - 1) +
+          QString mess = "Number values (" + QString(row.dim1() - 1) +
                              ") in file " + fname +
                              " less than number requested (" +
-                             IString(nvalues) + ")!";
-          throw IException(IException::User, mess.c_str(), _FILEINFO_);
+                             QString(nvalues) + ")!";
+          throw IException(IException::User, mess, _FILEINFO_);
         }
 
         std::vector<double> rsp;
@@ -166,17 +166,17 @@ namespace Isis {
   }
 
 
-  std::vector<double> loadNACCSV(const std::string &fname, int nvalues,
+  std::vector<double> loadNACCSV(const QString &fname, int nvalues,
                                  bool header = true, int skip = 0) {
     //  Open the CSV file
     FileName csvfile(fname);
     CSVReader csv(csvfile.expanded(), header, skip);
     CSVReader::CSVAxis row = csv.getRow(0);
     if(row.dim1() < nvalues) {
-      std::string mess = "Number values (" + IString(row.dim1()) +
+      QString mess = "Number values (" + QString(row.dim1()) +
                          ") in file " + fname + " less than number requested (" +
-                         IString(nvalues) + ")!";
-      throw IException(IException::User, mess.c_str(), _FILEINFO_);
+                         QString(nvalues) + ")!";
+      throw IException(IException::User, mess, _FILEINFO_);
 
     }
     std::vector<double> rsp;
@@ -188,13 +188,13 @@ namespace Isis {
 
 
   std::vector<double> loadResponsivity(bool isNAC, bool binned, int filter,
-                                       std::string &fname) {
+                                       QString &fname) {
 
     FileName resfile(fname);
-    if(fname.empty()) {
-      std::string camstr = (isNAC) ? "NAC" : "WAC";
-      std::string binstr = (binned)       ? "_BINNED" : "_NOTBIN";
-      std::string base   = "$messenger/calibration/RESPONSIVITY/";
+    if(fname.isEmpty()) {
+      QString camstr = (isNAC) ? "NAC" : "WAC";
+      QString binstr = (binned)       ? "_BINNED" : "_NOTBIN";
+      QString base   = "$messenger/calibration/RESPONSIVITY/";
       resfile = base + "MDIS" + camstr + binstr + "_RESP_?.TAB";
       resfile = resfile.highestVersion();
       fname = resfile.originalPath() + "/" + resfile.name();
@@ -213,12 +213,12 @@ namespace Isis {
 
 
   std::vector<double> loadSolarIrr(bool isNAC, bool binned, int filter,
-                                   std::string &fname)  {
+                                   QString &fname)  {
 
     FileName solfile(fname);
-    if(fname.empty()) {
-      std::string camstr = (isNAC) ? "NAC" : "WAC";
-      std::string base   = "$messenger/calibration/SOLAR/";
+    if(fname.isEmpty()) {
+      QString camstr = (isNAC) ? "NAC" : "WAC";
+      QString base   = "$messenger/calibration/SOLAR/";
       solfile = base + "MDIS" + camstr + "_SOLAR_?.TAB";
       solfile = solfile.highestVersion();
       fname = solfile.originalPath() + "/" + solfile.name();
@@ -232,12 +232,12 @@ namespace Isis {
     }
   }
 
-  double loadSmearComponent(bool isNAC, int filter, std::string &fname) {
+  double loadSmearComponent(bool isNAC, int filter, QString &fname) {
 
     FileName smearfile(fname);
-    if(fname.empty()) {
-      std::string camstr = (isNAC) ? "NAC" : "WAC";
-      std::string base   = "$messenger/calibration/smear/";
+    if(fname.isEmpty()) {
+      QString camstr = (isNAC) ? "NAC" : "WAC";
+      QString base   = "$messenger/calibration/smear/";
       smearfile = base + "MDIS" + camstr + "_FRAME_TRANSFER_??.TAB";
       smearfile = smearfile.highestVersion();
       fname = smearfile.originalPath() + "/" + smearfile.name();
@@ -325,8 +325,8 @@ namespace Isis {
  * @return double     - Event correction factor at the selected time to apply 
  *                      to WAC filter data.
  */
- double loadContaminationEvent(const std::string &scStartTime, const int filter, 
-                               std::string &ename, std::string &eDate) {
+ double loadContaminationEvent(const QString &scStartTime, const int filter, 
+                               QString &ename, QString &eDate) {
 
    //  This table maps the filter number extracted from BandBin/Number keyword
    //  to the columns (index) in the contamination table
@@ -351,7 +351,7 @@ namespace Isis {
    }
 
    //  File name not provided by caller.  Determine the event table name
-    if ( ename.empty() ) {
+    if ( ename.isEmpty() ) {
       FileName eventfile("$messenger/calibration/events/event_table_ratioed_v?.txt");
       eventfile = eventfile.highestVersion();
       ename = eventfile.originalPath() + "/" + eventfile.name();
@@ -364,10 +364,10 @@ namespace Isis {
     const int nvalues(13);     // Expected columns in table
     CSVReader csv(csvfile.expanded(), header, skip);
     if (csv.columns() < nvalues) {  // All rows should have same # columns 
-      std::string mess = "Number values (" + IString(csv.columns()) +
+      QString mess = "Number values (" + QString(csv.columns()) +
                          ") in file " + ename + " less than number requested (" +
-                         IString(nvalues) + ")!";
-      throw IException(IException::User, mess.c_str(), _FILEINFO_);
+                         QString(nvalues) + ")!";
+      throw IException(IException::User, mess, _FILEINFO_);
     }
 
     // Ensure NAIF kernels are loaded for NAIF time computations
@@ -375,7 +375,7 @@ namespace Isis {
 
     //  Convert s/c clock start time to et
     double obsStartTime;
-    (void) scs2e_c(-236, scStartTime.c_str(), &obsStartTime);
+    (void) scs2e_c(-236, scStartTime.toAscii().data(), &obsStartTime);
 
     // Set initial conditions and loop through all rows in the event table
     double evalue(1.0);
@@ -383,9 +383,9 @@ namespace Isis {
     double preEventTime(0.0);
     for (int i = 0 ; i < csv.rows() ; i++) {
       CSVReader::CSVAxis eRow = csv.getRow(i);
-      std::string utcTime = eRow[0];
+      QString utcTime = eRow[0];
       double eTime;
-      (void) utc2et_c(utcTime.c_str(), &eTime);
+      (void) utc2et_c(utcTime.toAscii().data(), &eTime);
 
       // If current time is greater than start time this is the post event case
       if (eTime > obsStartTime) {
@@ -393,7 +393,7 @@ namespace Isis {
         if ( fabs(obsStartTime-preEventTime) > fabs(eTime-obsStartTime) ) {
           //  Post-event time closer to SCLK than Pre-event time
           eDate = utcTime;
-          evalue = eRow[column].ToDouble();
+          evalue = toDouble(eRow[column]);
         }
 
         break;  //  Terminate loop and return
@@ -402,7 +402,7 @@ namespace Isis {
       // Record pre-event time slot - Sets return variables as well
       eDate = utcTime;
       preEventTime = eTime;
-      evalue = eRow[column].ToDouble();
+      evalue = toDouble(eRow[column]);
     }
  
     // Return the factor

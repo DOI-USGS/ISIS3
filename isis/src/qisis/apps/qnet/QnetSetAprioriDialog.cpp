@@ -247,7 +247,7 @@ void QnetSetAprioriDialog::setApriori() {
     }
     catch (IException &e)  {
       QString message = "Error setting sigmas. \n";
-      message += e.toString().c_str();
+      message += e.toString();
       QMessageBox::critical((QWidget *)parent(),"Error",message);
       QApplication::restoreOverrideCursor();
       // Sigmas failed, but surface pt coordinate was set

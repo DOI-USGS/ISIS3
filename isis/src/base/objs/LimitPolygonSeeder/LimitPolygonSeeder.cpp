@@ -69,8 +69,8 @@ namespace Isis {
     const geos::geom::Envelope *polyBoundBox = multiPoly->getEnvelopeInternal();
 
     // Call the parents standardTests member
-    std::string msg = StandardTests(multiPoly, polyBoundBox);
-    if(!msg.empty()) {
+    QString msg = StandardTests(multiPoly, polyBoundBox);
+    if(!msg.isEmpty()) {
       return points;
     }
 
@@ -177,7 +177,7 @@ namespace Isis {
         }
       }
       else {
-        std::string msg = "PVL for LimitPolygonSeeder must contain [MajorAxisPoints] in [";
+        QString msg = "PVL for LimitPolygonSeeder must contain [MajorAxisPoints] in [";
         msg += pvl.FileName() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -190,13 +190,13 @@ namespace Isis {
         }
       }
       else {
-        std::string msg = "PVL for LimitPolygonSeeder must contain [MinorAxisPoints] in [";
+        QString msg = "PVL for LimitPolygonSeeder must contain [MinorAxisPoints] in [";
         msg += pvl.FileName() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     catch(IException &e) {
-      std::string msg = "Improper format for PolygonSeeder PVL [" + pvl.FileName() + "]";
+      QString msg = "Improper format for PolygonSeeder PVL [" + pvl.FileName() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -211,14 +211,14 @@ namespace Isis {
     }
   }
 
-  PvlGroup LimitPolygonSeeder::PluginParameters(std::string grpName) {
+  PvlGroup LimitPolygonSeeder::PluginParameters(QString grpName) {
     PvlGroup pluginInfo(grpName);
 
     PvlKeyword name("Name", Algorithm());
-    PvlKeyword minThickness("MinimumThickness", MinimumThickness());
-    PvlKeyword minArea("MinimumArea", MinimumArea());
-    PvlKeyword majAxis("MajorAxisPoints", p_majorAxisPts);
-    PvlKeyword minAxis("MinorAxisPoints", p_minorAxisPts);
+    PvlKeyword minThickness("MinimumThickness", toString(MinimumThickness()));
+    PvlKeyword minArea("MinimumArea", toString(MinimumArea()));
+    PvlKeyword majAxis("MajorAxisPoints", toString(p_majorAxisPts));
+    PvlKeyword minAxis("MinorAxisPoints", toString(p_minorAxisPts));
 
     pluginInfo.AddKeyword(name);
     pluginInfo.AddKeyword(minThickness);

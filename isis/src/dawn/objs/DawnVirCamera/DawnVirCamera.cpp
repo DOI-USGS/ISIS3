@@ -36,10 +36,10 @@ namespace Isis {
 
       // Get the start time from labels
       PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
-      string channelId = inst["ChannelId"];
+      QString channelId = inst["ChannelId"];
 
-      string instMode = inst["InstrumentModeId"];
-      m_slitMode = instMode[14];   // "F" for full slit, Q for quarter slit
+      QString instMode = inst["InstrumentModeId"];
+      m_slitMode = instMode[14].toAscii();   // "F" for full slit, Q for quarter slit
 
       // Check for presence of articulation kernel
       bool hasArtCK = hasArticulationKernel(lab);
@@ -66,9 +66,9 @@ namespace Isis {
 
       // Get other info from labels
       PvlKeyword &frameParam = inst["FrameParameter"];
-      m_exposureTime = frameParam[0].ToDouble();
-      m_summing  = frameParam[1].ToInteger();
-      m_scanRate = frameParam[2].ToDouble();
+      m_exposureTime = toDouble(frameParam[0]);
+      m_summing  = toDouble(frameParam[1]);
+      m_scanRate = toDouble(frameParam[2]);
 
       // Setup detector map
       //  Get the line scan rates/times
@@ -80,10 +80,10 @@ namespace Isis {
       new CameraFocalPlaneMap(this, naifIkCode());
 
       //  Retrieve boresight location from instrument kernel (IK) (addendum?)
-      IString ikernKey = "INS" + IString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
+      QString ikernKey = "INS" + toString(naifIkCode()) + "_BORESIGHT_SAMPLE";
       double sampleBoreSight = getDouble(ikernKey);
 
-      ikernKey = "INS" + IString((int)naifIkCode()) + "_BORESIGHT_LINE";
+      ikernKey = "INS" + toString(naifIkCode()) + "_BORESIGHT_LINE";
       double lineBoreSight = getDouble(ikernKey);
 
       FocalPlaneMap()->SetDetectorOrigin(sampleBoreSight, lineBoreSight);
@@ -150,12 +150,12 @@ namespace Isis {
     *
     * @param text         String to scrub
     *
-    * @return std::string Returns scrubs strings
+    * @return QString Returns scrubs strings
     */
-   std::string DawnVirCamera::scrub(const std::string &text) const {
-     string ostr;
-     for (unsigned int i = 0 ; i < text.size() ; i++) {
-       if ((text[i] > ' ') &&  (text[i] <= 'z')) ostr.push_back(text[i]);
+   QString DawnVirCamera::scrub(const QString &text) const {
+     QString ostr;
+     for (int i = 0 ; i < text.size() ; i++) {
+       if ((text[i] > ' ') &&  (text[i] <= 'z')) ostr += text[i];
      }
      return (ostr);
    }
@@ -213,8 +213,8 @@ namespace Isis {
    *
    * @history 2011-07-22 Kris Becker
    */
-   void DawnVirCamera::readHouseKeeping(const std::string &filename,
-                                       double lineRate) {
+   void DawnVirCamera::readHouseKeeping(const QString &filename,
+                                        double lineRate) {
     //  Open the ISIS table object
     Table hktable("VIRHouseKeeping", filename);
 
@@ -223,8 +223,8 @@ namespace Isis {
     NumericalApproximation angFit;
     for (int i = 0; i < hktable.Records(); i++) {
       TableRecord &trec = hktable[i];
-      string scet = scrub(trec["ScetTimeClock"]);
-      string shutterMode = scrub(trec["ShutterStatus"]);
+      QString scet = scrub(trec["ScetTimeClock"]);
+      QString shutterMode = scrub(trec["ShutterStatus"]);
 
       // Compute the optical mirror angle
       double mirrorSin = trec["MirrorSin"];
@@ -238,7 +238,7 @@ namespace Isis {
       double lineMidTime;
       //  scs2e_c(naifSpkCode(), scet.c_str(), &lineMidTime);
       lineMidTime = getClockTime(scet, naifSpkCode()).Et();
-      bool isDark = IString::Equal("closed", shutterMode);
+      bool isDark = shutterMode.toLower() == "closed";
 
       // Add fit data for all open angles
       if ( ! isDark ) {  angFit.AddData(lineno, optAng);   }
@@ -301,7 +301,7 @@ namespace Isis {
    *
    * @history 2011-07-22 Kris Becker
    */
-  Table DawnVirCamera::getPointingTable(const std::string &virChannel,
+  Table DawnVirCamera::getPointingTable(const QString &virChannel,
                                         const int zeroFrame)  {
 
     // Create Spice Pointing table
@@ -328,8 +328,8 @@ namespace Isis {
     Table quats("SpiceRotation", record);
     int nfields = record.Fields();
 
-    string virId = "DAWN_VIR_" + virChannel;
-    string virZero = virId + "_ZERO";
+    QString virId = "DAWN_VIR_" + virChannel;
+    QString virZero = virId + "_ZERO";
 
     // Allocate output arrays
     int nvals = nfields - 1;
@@ -374,21 +374,21 @@ namespace Isis {
     }
 
     // Add some necessary keywords
-    quats.Label() += PvlKeyword("CkTableStartTime", startTime());
-    quats.Label() += PvlKeyword("CkTableEndTime", endTime());
-    quats.Label() += PvlKeyword("CkTableOriginalSize", quats.Records());
+    quats.Label() += PvlKeyword("CkTableStartTime", toString(startTime()));
+    quats.Label() += PvlKeyword("CkTableEndTime", toString(endTime()));
+    quats.Label() += PvlKeyword("CkTableOriginalSize", toString(quats.Records()));
 
     // Create the time dependant frames keyword
     int virZeroId = getInteger("FRAME_" + virZero);
-    PvlKeyword tdf("TimeDependentFrames", virZeroId); // DAWN_VIR_{ID}_ZERO
-    tdf.AddValue(-203200);  // DAWN_VIR
-    tdf.AddValue(-203000);  // DAWN_SPACECRAFT
-    tdf.AddValue(1);        // J2000
+    PvlKeyword tdf("TimeDependentFrames", toString(virZeroId)); // DAWN_VIR_{ID}_ZERO
+    tdf.AddValue("-203200");  // DAWN_VIR
+    tdf.AddValue("-203000");  // DAWN_SPACECRAFT
+    tdf.AddValue("1");        // J2000
     quats.Label() += tdf;
 
     //  Create constant rotation frames
-    PvlKeyword cf("ConstantFrames", virZeroId);
-    cf.AddValue(virZeroId);
+    PvlKeyword cf("ConstantFrames", toString(virZeroId));
+    cf.AddValue(toString(virZeroId));
     quats.Label() += cf;
 
     SpiceDouble identity[3][3];
@@ -398,7 +398,7 @@ namespace Isis {
     PvlKeyword crot("ConstantRotation");
     for (int i = 0 ; i < 3 ; i++) {
       for (int j = 0 ; j < 3 ; j++) {
-        crot.AddValue(identity[i][j]);
+        crot.AddValue(toString(identity[i][j]));
       }
     }
 
@@ -423,22 +423,22 @@ namespace Isis {
    * @history 2011-07-22 Kris Becker
    */
 
-  DawnVirCamera::SMatrix DawnVirCamera::getStateRotation(const std::string &frame1,
-                                                         const std::string &frame2,
+  DawnVirCamera::SMatrix DawnVirCamera::getStateRotation(const QString &frame1,
+                                                         const QString &frame2,
                                                          const double &etTime)
                                                          const {
     SMatrix state(6,6);
     NaifStatus::CheckErrors();
     try {
       // Get pointing w/AVs
-      sxform_c(frame1.c_str(), frame2.c_str(), etTime,
+      sxform_c(frame1.toAscii().data(), frame2.toAscii().data(), etTime,
                (SpiceDouble (*)[6]) state[0]);
       NaifStatus::CheckErrors();
     }
     catch (IException &) {
       try {
         SMatrix rot(3,3);
-        pxform_c(frame1.c_str(), frame2.c_str(), etTime,
+        pxform_c(frame1.toAscii().data(), frame2.toAscii().data(), etTime,
                  (SpiceDouble (*)[3]) rot[0]);
         NaifStatus::CheckErrors();
         SpiceDouble av[3] = {0.0, 0.0, 0.0 };
@@ -471,11 +471,11 @@ namespace Isis {
   */
   bool DawnVirCamera::hasArticulationKernel(Pvl &label) const {
     Kernels kerns(label);
-    std::vector<std::string> cks = kerns.getKernelList("CK");
+    QStringList cks = kerns.getKernelList("CK");
     QRegExp virCk("*dawn_vir_?????????_?.bc");
     virCk.setPatternSyntax(QRegExp::Wildcard);
-    for (unsigned int i = 0 ; i < cks.size() ; i++) {
-      if ( virCk.exactMatch(IString::ToQt(cks[i])) ) return (true);
+    for (int i = 0 ; i < cks.size() ; i++) {
+      if ( virCk.exactMatch(cks[i]) ) return (true);
     }
     return (false);
   }

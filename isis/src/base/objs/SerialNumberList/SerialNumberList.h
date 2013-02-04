@@ -28,9 +28,7 @@
 #include <vector>
 #include "Progress.h"
 
-
 class QString;
-
 
 namespace Isis {
   /**
@@ -89,44 +87,43 @@ namespace Isis {
   class SerialNumberList {
     public:
       SerialNumberList(bool checkTarget = true);
-      SerialNumberList(const std::string &list, bool checkTarget = true,
+      SerialNumberList(const QString &list, bool checkTarget = true,
                        Progress *progress = NULL);
       virtual ~SerialNumberList();
 
-      void Add(const std::string &filename, bool def2filename = false);
-      void Add(const std::string &serialNumber, const std::string &filename);
+      void Add(const QString &filename, bool def2filename = false);
+      void Add(const QString &serialNumber, const QString &filename);
       void Add(const char *serialNumber, const char *filename);
-      bool HasSerialNumber(const std::string &sn);
       bool HasSerialNumber(QString sn);
       
       //!< Delete a serial number off of the list
-      void Delete(const std::string &sn);
+      void Delete(const QString &sn);
 
       int Size() const;
-      std::string FileName(const std::string &sn);
-      std::string FileName(int index);
-      std::string SerialNumber(const std::string &filename);
-      std::string SerialNumber(int index);
-      std::string ObservationNumber(int index);
+      QString FileName(const QString &sn);
+      QString FileName(int index);
+      QString SerialNumber(const QString &filename);
+      QString SerialNumber(int index);
+      QString ObservationNumber(int index);
 
-      int SerialNumberIndex(const std::string &sn);
-      int FileNameIndex(const std::string &filename);
+      int SerialNumberIndex(const QString &sn);
+      int FileNameIndex(const QString &filename);
 
-      std::vector<std::string> PossibleSerialNumbers(const std::string &on);
+      std::vector<QString> PossibleSerialNumbers(const QString &on);
 
     protected:
       struct Pair {
-        std::string filename;
-        std::string serialNumber;
-        std::string observationNumber;
+        QString filename;
+        QString serialNumber;
+        QString observationNumber;
       };
 
       std::vector<Pair> p_pairs;
-      std::map<std::string, int> p_serialMap;
-      std::map<std::string, int> p_fileMap;
+      std::map<QString, int> p_serialMap;
+      std::map<QString, int> p_fileMap;
 
       bool p_checkTarget;
-      std::string p_target;
+      QString p_target;
 
   };
 };

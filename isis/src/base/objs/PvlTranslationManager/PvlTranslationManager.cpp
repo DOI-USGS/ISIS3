@@ -28,7 +28,7 @@
 using namespace std;
 namespace Isis {
 
-  PvlTranslationManager::PvlTranslationManager(const std::string &transFile) {
+  PvlTranslationManager::PvlTranslationManager(const QString &transFile) {
     AddTable(transFile);
   }
 
@@ -41,7 +41,7 @@ namespace Isis {
    *                  the input label.
    */
   PvlTranslationManager::PvlTranslationManager(Isis::Pvl &inputLabel,
-      const std::string &transFile) {
+      const QString &transFile) {
     p_fLabel = inputLabel;
 
     // Internalize the translation table
@@ -79,7 +79,7 @@ namespace Isis {
    *
    * @return string
    */
-  string PvlTranslationManager::Translate(const std::string nName, int findex) {
+  QString PvlTranslationManager::Translate(QString nName, int findex) {
     const Isis::PvlContainer *con;
     int inst = 0;
     PvlKeyword grp;
@@ -106,7 +106,7 @@ namespace Isis {
    * @return Isis::PvlKeyword
    */
   Isis::PvlKeyword PvlTranslationManager::DoTranslation(
-    const std::string nName) {
+    const QString nName) {
     const Isis::PvlContainer *con = NULL;
     Isis::PvlKeyword key;
 
@@ -167,7 +167,7 @@ namespace Isis {
    * @throws Isis::IException::Programmer
    */
   const PvlKeyword &PvlTranslationManager::InputKeyword(
-    const std::string nName) const {
+    const QString nName) const {
 
     int instanceNumber = 0;
     PvlKeyword inputGroupKeyword = InputGroup(nName, instanceNumber);
@@ -188,12 +188,12 @@ namespace Isis {
     }
 
     if(anInputGroupFound) {
-      string msg = "Unable to find input keyword [" + InputKeywordName(nName) +
+      QString msg = "Unable to find input keyword [" + InputKeywordName(nName) +
                    "] for output name [" + nName + "] in file [" + TranslationTable().FileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else {
-      string container = "";
+      QString container = "";
 
       for(int i = 0; i < InputGroup(nName).Size(); i++) {
         if(i > 0) container += ",";
@@ -201,7 +201,7 @@ namespace Isis {
         container += InputGroup(nName)[i];
       }
 
-      string msg = "Unable to find input group [" + container +
+      QString msg = "Unable to find input group [" + container +
                    "] for output name [" + nName + "] in file [" + TranslationTable().FileName() + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -214,7 +214,7 @@ namespace Isis {
    *
    * @param nName The output name used to identify the input keyword.
    */
-  bool PvlTranslationManager::InputHasKeyword(const std::string nName) {
+  bool PvlTranslationManager::InputHasKeyword(const QString nName) {
 
     // Set the current position in the input label pvl
     // by finding the input group corresponding to the output group
@@ -239,7 +239,7 @@ namespace Isis {
    *
    * @param nName The output name used to identify the input keyword.
 
-   bool PvlTranslationManager::InputHasGroup (const std::string nName) {
+   bool PvlTranslationManager::InputHasGroup (const QString nName) {
 
      if (GetContainer (InputGroup(nName)) != NULL) {
        return true;
@@ -291,7 +291,7 @@ namespace Isis {
   // Create the requsted container and any containers above it and
   // return a reference to the container
   // list is an Isis::PvlKeyword with an array of container types an their names
-  Isis::PvlContainer *PvlTranslationManager::CreateContainer(const std::string nName,
+  Isis::PvlContainer *PvlTranslationManager::CreateContainer(const QString nName,
       Isis::Pvl &pvl) {
 
     // Get the array of Objects/Groups from the OutputName keyword
@@ -302,7 +302,7 @@ namespace Isis {
     // Look at every pair in the output position
     for(int c = 0; c < np.Size(); c += 2) {
       // If this pair is an object
-      if(np[c].UpCase() == "OBJECT") {
+      if(np[c].toUpper() == "OBJECT") {
         // If the object doesn't exist create it
         if(!obj->HasObject(np[c+1])) {
           obj->AddObject(np[c+1]);
@@ -310,7 +310,7 @@ namespace Isis {
         obj = &(obj->FindObject(np[c+1]));
       }
       // If this pair is a group
-      else if(np[c].UpCase() == "GROUP") {
+      else if(np[c].toUpper() == "GROUP") {
         // If the group doesn't exist create it
         if(!obj->HasGroup(np[c+1])) {
           obj->AddGroup(np[c+1]);

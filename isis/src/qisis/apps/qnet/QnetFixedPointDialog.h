@@ -11,12 +11,10 @@ class QPushButton;
 class QString;
 class QStringList;
 
+
 namespace Isis {
   class ControlPoint;
-}
 
-
-namespace Isis {
   /**
    * @author ????-??-?? Unknown
    * @internal

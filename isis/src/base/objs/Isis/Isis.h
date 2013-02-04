@@ -82,10 +82,10 @@
  *   @history 2006-03-18 Elizabeth Miller - Added gui helper stuff
  *   @history 2006-05-17 Elizabeth Miller - Removed .xml and documented .h file
  */
-std::map<std::string, void *> GuiHelpers();
+std::map<QString, void *> GuiHelpers();
 #ifndef GUIHELPERS
-std::map<std::string, void *> GuiHelpers() {
-  std::map<std::string, void *> empty;
+std::map<QString, void *> GuiHelpers() {
+  std::map<QString, void *> empty;
   return empty;
 }
 #endif

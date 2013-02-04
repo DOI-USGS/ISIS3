@@ -38,13 +38,13 @@ namespace Isis {
 
   LoadCSV::LoadCSV() : _base(), _csvSpecs("LoadCSV"), _data(0,0), _history() { }
 
-  LoadCSV::LoadCSV(const std::string &base, const HiCalConf &conf,
+  LoadCSV::LoadCSV(const QString &base, const HiCalConf &conf,
                    const DbProfile &profile) : _base(), _csvSpecs("LoadCSV"),
                    _data(0,0), _history() {
     load(base, conf, profile);
   }
 
-  void LoadCSV::load(const std::string &base, const HiCalConf &conf,
+  void LoadCSV::load(const QString &base, const HiCalConf &conf,
                      const DbProfile &profile) {
 
     //  Initialize the object with necessary info
@@ -53,12 +53,12 @@ namespace Isis {
     // Set up access to the CSV table.  Note that HiCalConf.getMatrixSource()
     // method is typically used, but the parsing has been broken up here for
     // implementation purposes.
-    string csvfile(conf.filepath(getValue()));
+    QString csvfile(conf.filepath(getValue()));
     addHistory("File", csvfile);
     CSVReader csv;
 
     //  Retrieve information regarding the format within the CSV
-    bool colHeader(IsEqual(ConfKey(_csvSpecs,makeKey("Header"), string("FALSE")), "TRUE"));
+    bool colHeader(IsEqual(ConfKey(_csvSpecs,makeKey("Header"), QString("FALSE")), "TRUE"));
     bool rowHeader(colHeader);  // Both default to state of the {BASE}Header
     if (IsEqual(getValue("ColumnHeader"), "TRUE"))  colHeader = true;
     if (IsEqual(getValue("RowHeader"), "TRUE"))  rowHeader = true;
@@ -66,17 +66,17 @@ namespace Isis {
     if (_csvSpecs.exists(makeKey("RowName")   )) rowHeader = true;
 
     // Skip lines, comment headers and separator
-    int skip = ConfKey(_csvSpecs, makeKey("SkipLines"), 0);
+    int skip = toInt(ConfKey(_csvSpecs, makeKey("SkipLines"), toString(0)));
     addHistory("SkipLines", ToString(skip));
-    bool comments = IsEqual(ConfKey(_csvSpecs, makeKey("IgnoreComments"), string("TRUE")));
-    string separator = ConfKey(_csvSpecs, makeKey("Separator"), string(","));
-    if (separator.empty()) separator = ",";   // Guarantees content
+    bool comments = IsEqual(ConfKey(_csvSpecs, makeKey("IgnoreComments"), QString("TRUE")));
+    QString separator = ConfKey(_csvSpecs, makeKey("Separator"), QString(","));
+    if (separator.isEmpty()) separator = ",";   // Guarantees content
 
     // Apply conditions
     csv.setComment(comments);
     csv.setSkip(skip);
     csv.setHeader(colHeader);
-    csv.setDelimiter(separator[0]);
+    csv.setDelimiter(separator[0].toAscii());
     if (separator[0] == ' ') csv.setSkipEmptyParts();
 
     //  Now read the file
@@ -85,7 +85,7 @@ namespace Isis {
     try {
       csv.read(csvfile);
     } catch (IException &ie) {
-      string mess =  "Could not read CSV file \'" + csvfile + "\'";
+      QString mess =  "Could not read CSV file \'" + csvfile + "\'";
       throw IException(IException::User, mess, _FILEINFO_);
     }
 
@@ -98,20 +98,20 @@ namespace Isis {
     int startRow(0), endRow(nrows-1);
 
     // Update columns
-    string colName(getValue("ColumnName"));
-    if (!colName.empty()) {
+    QString colName(getValue("ColumnName"));
+    if (!colName.isEmpty()) {
       addHistory("ColumnName", colName);
       CSVReader::CSVAxis chead = csv.getHeader();
       startColumn = getAxisIndex(colName, chead);
       if (startColumn < 0) {
-        string mess = "Column name " + colName +
-                      " not found in CSV file " + csvfile;
+        QString mess = "Column name " + colName +
+                       " not found in CSV file " + csvfile;
         throw IException(IException::User, mess, _FILEINFO_);
       }
       endColumn = startColumn;
       addHistory("ColumnIndex", ToString(startColumn));
     }
-    else if (!(getValue("ColumnIndex").empty())) {
+    else if (!(getValue("ColumnIndex").isEmpty())) {
        startColumn = ToInteger(getValue("ColumnIndex")) +
                                  ((rowHeader) ? 1 : 0);
        endColumn = startColumn;
@@ -120,8 +120,8 @@ namespace Isis {
     }
 
     // Update row indicies
-    string rowName(getValue("RowName"));
-    if (!rowName.empty()) {
+    QString rowName(getValue("RowName"));
+    if (!rowName.isEmpty()) {
       addHistory("RowName", rowName);
       if (!rowHeader) {
         string mess = "Row name given but config does not specify presence of row header!";
@@ -130,13 +130,13 @@ namespace Isis {
       CSVReader::CSVAxis rhead = csv.getColumn(0);
       startRow = getAxisIndex(rowName, rhead);
       if (startRow < 0) {
-        string mess = "Row name " + rowName + " not found in CSV file " + csvfile;
+        QString mess = "Row name " + rowName + " not found in CSV file " + csvfile;
         throw IException(IException::User, mess, _FILEINFO_);
       }
       endRow = startRow;
       addHistory("RowIndex", ToString(startRow));
     }
-    else if (!(getValue("RowIndex").empty())) {
+    else if (!(getValue("RowIndex").isEmpty())) {
        startRow = ToInteger(getValue("RowIndex"));
        if (rowHeader) startRow++;
        endRow = startRow;
@@ -148,7 +148,7 @@ namespace Isis {
     int drows(endRow-startRow+1);
     int dcols(endColumn-startColumn+1);
     HiMatrix d(drows, dcols);
-    vector<string> errors;
+    vector<QString> errors;
     for (int r = startRow, hr = 0 ; r <= endRow ; r++, hr++) {
       CSVReader::CSVAxis row = csv.getRow(r);
       for (int c = startColumn, hc = 0 ; c <= endColumn ; c++, hc++) {
@@ -158,10 +158,10 @@ namespace Isis {
         catch (...) {
           std::ostringstream mess;
           mess << "Invalid real value (" << row[c] << ") in row index " << r;
-          if (!rowName.empty()) mess << " (Name:" << rowName << ")";
+          if (!rowName.isEmpty()) mess << " (Name:" << rowName << ")";
           mess << ", column index " << c;
-          if (!colName.empty()) mess << " (Name:" << colName << ")";
-          errors.push_back(mess.str());
+          if (!colName.isEmpty()) mess << " (Name:" << colName << ")";
+          errors.push_back(mess.str().c_str());
           d[hr][hc] = Null;
         }
       }
@@ -175,15 +175,20 @@ namespace Isis {
       //iException::Clear(); Not sure how this could ever do anything
       std::ostringstream mess;
       mess << "Conversion errors in CSV file " + csvfile + ": Errors: ";
-      std::copy(errors.begin(), errors.end(),
-                std::ostream_iterator<std::string>(mess,"; "));
+
+      std::vector<QString>::const_iterator it = errors.begin();
+
+      while (it != errors.end()) {
+        mess << *it << "; ";
+        it++;
+      }
       throw IException(IException::User, mess.str(), _FILEINFO_);
     }
     return;
   }
 
 
-  std::string LoadCSV::filename() const {
+  QString LoadCSV::filename() const {
     return (getValue());
   }
 
@@ -222,11 +227,11 @@ namespace Isis {
       comma = ",";
     }
     mess << ")";
-    history.add(mess.str());
+    history.add(mess.str().c_str());
     return;
   }
 
-  void LoadCSV::init(const std::string &base, const HiCalConf &conf,
+  void LoadCSV::init(const QString &base, const HiCalConf &conf,
                      const DbProfile &profile) {
     _base = base;
     _csvSpecs = ResolveKeys(base, conf, profile);
@@ -234,15 +239,15 @@ namespace Isis {
     return;
   }
 
-  void LoadCSV::addHistory(const std::string &element,
-                           const std::string &desc) {
+  void LoadCSV::addHistory(const QString &element,
+                           const QString &desc) {
     std::ostringstream mess;
     mess << element << "[" << desc << "]";
-    _history.push_back(mess.str());
+    _history.push_back(mess.str().c_str());
   }
 
-  void LoadCSV::getKeyList(const std::string &base,
-                           std::vector<std::string> &keys) const {
+  void LoadCSV::getKeyList(const QString &base,
+                           std::vector<QString> &keys) const {
     keys.clear();
     keys.push_back(base);
     keys.push_back(base+"IgnoreComments");
@@ -258,44 +263,44 @@ namespace Isis {
     return;
   }
 
-  DbProfile LoadCSV::ResolveKeys(const std::string &base, const HiCalConf &conf,
+  DbProfile LoadCSV::ResolveKeys(const QString &base, const HiCalConf &conf,
                                  const DbProfile &prof) const {
-    vector<string> keys;
+    vector<QString> keys;
     getKeyList(base, keys);
     DbProfile keyprof("LoadCSV");
     for (unsigned int i = 0 ; i < keys.size() ; i++) {
-      string kvalue = ParsedKey(keys[i], conf, prof);
-      if (!kvalue.empty())  keyprof.add(keys[i], kvalue);
+      QString kvalue = ParsedKey(keys[i], conf, prof);
+      if (!kvalue.isEmpty())  keyprof.add(keys[i], kvalue);
     }
     return (keyprof);
   }
 
-  std::string LoadCSV::ParsedKey(const std::string &key, const HiCalConf &conf,
+  QString LoadCSV::ParsedKey(const QString &key, const HiCalConf &conf,
                         const DbProfile &prof) const {
-    string value("");
+    QString value("");
     if (prof.exists(key)) {
       value = conf.resolve(prof(key), prof);
     }
     return (value);
   }
 
-  std::string LoadCSV::makeKey(const std::string &suffix) const {
-    string key = _base + suffix;
+  QString LoadCSV::makeKey(const QString &suffix) const {
+    QString key = _base + suffix;
     return (key);
   }
 
-  std::string LoadCSV::getValue(const std::string &suffix) const {
-    string key = makeKey(suffix);
-    string value("");
+  QString LoadCSV::getValue(const QString &suffix) const {
+    QString key = makeKey(suffix);
+    QString value("");
     if (_csvSpecs.exists(key)) value = _csvSpecs(key);
     return (value);
   }
 
-  int LoadCSV::getAxisIndex(const std::string &name,
+  int LoadCSV::getAxisIndex(const QString &name,
                             const CSVReader::CSVAxis &header) const {
-    std::string head = IString(name).Trim(" \r\n\t");
+    QString head = QString(name).trimmed();
     for (int i = 0 ; i < header.dim() ; i++) {
-      if (IString::Equal(head,IString(header[i]).Trim(" \r\n\t"))) {
+      if (head.toLower() == QString(header[i]).toLower().trimmed()) {
         return (i);
       }
     }

@@ -40,7 +40,7 @@ SCCSID @(#)nextValue.h  1.1 10/04/99
 */
 /* SCCShid @(#)nextValue.h (nextValue.h) 1.3 */
 
-#if !defined(nextValue_h)
+#ifndef nextValue_h
 
 #define nextValue_h
 

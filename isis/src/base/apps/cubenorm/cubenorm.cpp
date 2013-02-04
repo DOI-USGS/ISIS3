@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 // system include files go first
-#include <string>
+#include <QString>
 #include <iostream>
 #include <iomanip>
 #include <vector>
@@ -41,14 +41,14 @@ int totalLines;
 int totalSamples;
 int totalBands;
 
-string direction;
+QString direction;
 
 // function prototypes
 void getStats(Buffer &in);
 void multiply(Buffer &in, Buffer &out);
 void subtract(Buffer &in, Buffer &out);
-void pvlOut(const string &pv);
-void tableOut(const string &pv);
+void pvlOut(const QString &pv);
+void tableOut(const QString &pv);
 void PVLIn(const Isis::FileName &filename);
 void tableIn(const Isis::FileName &filename);
 void subSame();
@@ -60,7 +60,7 @@ void IsisMain() {
   // parameters.
   UserInterface &ui = Application::GetUserInterface();
   if(!(ui.WasEntered("TO")) && !(ui.WasEntered("STATS"))) {
-    string msg = "User must specify a TO and/or STATS file.";
+    QString msg = "User must specify a TO and/or STATS file.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -104,14 +104,14 @@ void IsisMain() {
   // vector, and that there is a vector element for each row/col
   if((band.size() != (unsigned int)(rowcol * totalBands)) ||
       (st.size() != (unsigned int)(rowcol * totalBands))) {
-    string message = "You have entered an invalid input file " +
-                     ui.GetFileName("FROMSTATS");
+    QString message = "You have entered an invalid input file " +
+                      ui.GetFileName("FROMSTATS");
     throw IException(IException::Io, message, _FILEINFO_);
   }
 
   //If a STATS file was specified then create statistics file
   if(ui.WasEntered("STATS")) {
-    string op = ui.GetString("FORMAT");
+    QString op = ui.GetString("FORMAT");
     if(op == "PVL")    pvlOut(ui.GetFileName("STATS"));
     if(op == "TABLE")  tableOut(ui.GetFileName("STATS"));
   }
@@ -123,7 +123,7 @@ void IsisMain() {
     if(ui.GetString("MODE") == "MULTIPLY") {
       for(unsigned int i = 0; i < st.size(); i++) {
         if(IsValidPixel(normalizer[i]) && normalizer[i] <= 0.0) {
-          string msg = "Cube file can not be normalized with [MULTIPLY] ";
+          QString msg = "Cube file can not be normalized with [MULTIPLY] ";
           msg += "option, some column averages <= 0.0";
           throw IException(IException::User, msg, _FILEINFO_);
         }
@@ -216,25 +216,25 @@ void getStats(Buffer &in) {
 //********************************************************
 // Create PVL output of statistics
 //*******************************************************
-void pvlOut(const string &StatFile) {
+void pvlOut(const QString &StatFile) {
   PvlGroup results("Results");
   for(unsigned int i = 0; i < st.size(); i++) {
-    results += PvlKeyword("Band", band[i]);
-    results += PvlKeyword("RowCol", element[i]);
-    results += PvlKeyword("ValidPixels", st[i].ValidPixels());
+    results += PvlKeyword("Band", toString(band[i]));
+    results += PvlKeyword("RowCol", toString(element[i]));
+    results += PvlKeyword("ValidPixels", toString(st[i].ValidPixels()));
     if(st[i].ValidPixels() > 0) {
-      results += PvlKeyword("Mean", st[i].Average());
-      results += PvlKeyword("Median", median[i]);
-      results += PvlKeyword("Std", st[i].StandardDeviation());
-      results += PvlKeyword("Minimum", st[i].Minimum());
-      results += PvlKeyword("Maximum", st[i].Maximum());
+      results += PvlKeyword("Mean", toString(st[i].Average()));
+      results += PvlKeyword("Median", toString(median[i]));
+      results += PvlKeyword("Std", toString(st[i].StandardDeviation()));
+      results += PvlKeyword("Minimum", toString(st[i].Minimum()));
+      results += PvlKeyword("Maximum", toString(st[i].Maximum()));
     }
     else {
-      results += PvlKeyword("Mean", 0.0);
-      results += PvlKeyword("Median", 0.0);
-      results += PvlKeyword("Std", 0.0);
-      results += PvlKeyword("Minimum", 0.0);
-      results += PvlKeyword("Maximum", 0.0);
+      results += PvlKeyword("Mean", "0.0");
+      results += PvlKeyword("Median", "0.0");
+      results += PvlKeyword("Std", "0.0");
+      results += PvlKeyword("Minimum", "0.0");
+      results += PvlKeyword("Maximum", "0.0");
     }
   }
 
@@ -246,11 +246,11 @@ void pvlOut(const string &StatFile) {
 //********************************************************
 // Create Tabular output of statistics
 //*******************************************************
-void tableOut(const string &StatFile) {
+void tableOut(const QString &StatFile) {
   // Open output file
   // TODO check status and throw error
   ofstream out;
-  out.open(StatFile.c_str(), std::ios::out);
+  out.open(StatFile.toAscii().data(), std::ios::out);
 
   // Output a header
   out << std::setw(8)  << "Band";
@@ -304,21 +304,21 @@ void PVLIn(const Isis::FileName &filename) {
 
   while(itr != results.End()) {
     StaticStats newStat;
-    band.push_back((*itr)[0]);
+    band.push_back(toInt((*itr)[0]));
     itr++;
-    element.push_back((*itr)[0]);
+    element.push_back(toInt((*itr)[0]));
     itr++;
-    newStat.setValidPixels((*itr)[0]);
+    newStat.setValidPixels(toInt((*itr)[0]));
     itr++;
-    newStat.setMean((*itr)[0]);
+    newStat.setMean(toDouble((*itr)[0]));
     itr++;
-    median.push_back((*itr)[0]);
+    median.push_back(toDouble((*itr)[0]));
     itr++;
-    newStat.setStandardDeviation((*itr)[0]);
+    newStat.setStandardDeviation(toDouble((*itr)[0]));
     itr++;
-    newStat.setMinimum((*itr)[0]);
+    newStat.setMinimum(toDouble((*itr)[0]));
     itr++;
-    newStat.setMaximum((*itr)[0]);
+    newStat.setMaximum(toDouble((*itr)[0]));
     itr++;
     st.push_back(newStat);
 
@@ -337,12 +337,12 @@ void PVLIn(const Isis::FileName &filename) {
 //*******************************************************
 void tableIn(const Isis::FileName &filename) {
   ifstream in;
-  string expanded(filename.expanded());
-  in.open(expanded.c_str(), std::ios::in);
+  QString expanded(filename.expanded());
+  in.open(expanded.toAscii().data(), std::ios::in);
 
 
   if(!in) {
-    string message = "Error opening " + filename.expanded();
+    QString message = "Error opening " + filename.expanded();
     throw IException(IException::Io, message, _FILEINFO_);
   }
 

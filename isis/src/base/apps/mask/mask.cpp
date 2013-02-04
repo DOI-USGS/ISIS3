@@ -39,13 +39,13 @@ void IsisMain() {
 
   //  Will we preserve inside or outside of min/max range
   preserve = INSIDE;
-  string Preserve;
+  QString Preserve;
   if(ui.WasEntered("PRESERVE")) Preserve = ui.GetString("PRESERVE");
   if(Preserve == "OUTSIDE") preserve = OUTSIDE;
 
   //  How are special pixels handled?
   spixels = NULLP;
-  string Spixels;
+  QString Spixels;
   if(ui.WasEntered("SPIXELS")) Spixels = ui.GetString("SPIXELS");
   if(Spixels == "NONE") spixels = NONE;
   if(Spixels == "ALL") spixels = ALL;
@@ -56,7 +56,7 @@ void IsisMain() {
 
   //  Report if no masking occurred
   if(!masked) {
-    string message = "No mask was performed-the output file is the same as ";
+    QString message = "No mask was performed-the output file is the same as ";
     message += "the input file.";
     throw IException(IException::User, message, _FILEINFO_);
   }

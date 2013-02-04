@@ -22,9 +22,10 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
 #include <vector>
 #include <cctype>
+
+#include <QString>
 
 namespace Isis {
   /**
@@ -50,27 +51,27 @@ namespace Isis {
 
   class PvlToken {
     private:
-      std::string key;                 //!< Storage for the keyword name
-      std::vector<std::string> value;   /**<Vector storage for a list of values.
+      QString key;                 //!< Storage for the keyword name
+      std::vector<QString> value;   /**<Vector storage for a list of values.
                                             See the standard template library
                                             for more information on vectors.*/
 
     public:
-      PvlToken(const std::string &k);
+      PvlToken(const QString &k);
       PvlToken();
       ~PvlToken();
 
-      void SetKey(const std::string &k);
-      std::string GetKey() const;
-      std::string GetKeyUpper() const;
+      void SetKey(const QString &k);
+      QString GetKey() const;
+      QString GetKeyUpper() const;
 
-      void AddValue(const std::string &v);
-      std::string GetValue(const int index = 0) const;
-      std::string GetValueUpper(const int index = 0) const;
+      void AddValue(const QString &v);
+      QString GetValue(const int index = 0) const;
+      QString GetValueUpper(const int index = 0) const;
       int ValueSize() const;
       void ValueClear();
 
-      inline const std::vector<std::string> &ValueVector() const {
+      inline const std::vector<QString> &ValueVector() const {
         return value;
       };
   };

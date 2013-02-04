@@ -47,7 +47,7 @@
 template< typename T > class QList;
 template< typename A, typename B > class QMap;
 
-#if !defined(__sun__)
+#ifndef __sun__
 #include "gmm/gmm.h"
 #endif
 
@@ -154,17 +154,17 @@ namespace Isis {
    */
   class BundleAdjust {
     public:
-      BundleAdjust(const std::string &cnetFile, const std::string &cubeList,
+      BundleAdjust(const QString &cnetFile, const QString &cubeList,
                    bool printSummary = true);
-      BundleAdjust(const std::string &cnetFile, const std::string &cubeList,
-                   const std::string &heldList, bool printSummary = true);
+      BundleAdjust(const QString &cnetFile, const QString &cubeList,
+                   const QString &heldList, bool printSummary = true);
       BundleAdjust(Isis::ControlNet &cnet, Isis::SerialNumberList &snlist,
                    bool printSummary = true);
       BundleAdjust(Isis::ControlNet &cnet, Isis::SerialNumberList &snlist,
                    Isis::SerialNumberList &heldsnlist, bool printSummary = true);
       ~BundleAdjust();
 
-      bool ReadSCSigmas(const std::string &scsigmasList);
+      bool ReadSCSigmas(const QString &scsigmasList);
 
       double Solve();
       bool SolveCholesky();
@@ -174,7 +174,7 @@ namespace Isis {
       Isis::SerialNumberList *SerialNumberList() { return m_pSnList; }
       int Images() const { return m_pSnList->Size(); }
       int Observations() const;
-      std::string FileName(int index);
+      QString FileName(int index);
       bool IsHeld(int index);
       Table Cmatrix(int index);
       Table SpVector(int index);
@@ -217,7 +217,7 @@ namespace Isis {
       void SetStandardOutput(bool b) { m_bOutputStandard = b; }
       void SetCSVOutput(bool b) { m_bOutputCSV = b; }
       void SetResidualOutput(bool b) { m_bOutputResiduals = b; }
-      void SetOutputFilePrefix(const std::string &str) { m_strOutputFilePrefix = str; }
+      void SetOutputFilePrefix(const QString &str) { m_strOutputFilePrefix = str; }
 
       enum DecompositionMethod {
         NoneSelected,
@@ -242,8 +242,8 @@ namespace Isis {
       };
 
       struct SpacecraftWeights {
-        std::string SpacecraftName;
-        std::string InstrumentId;
+        QString SpacecraftName;
+        QString InstrumentId;
         std::vector<double> weights;
       };
 
@@ -278,7 +278,7 @@ namespace Isis {
 
       void SetConvergenceThreshold(double d) { m_dConvergenceThreshold = d; }
       void SetMaxIterations(int n) { m_nMaxIterations = n; }
-      void SetSolutionMethod(std::string str);
+      void SetSolutionMethod(QString str);
 
       void GetSparseParameterCorrections();
 
@@ -390,17 +390,17 @@ namespace Isis {
       double m_drms_sigmaLon;                          //!< rms of adjusted Longitude sigmas
       double m_drms_sigmaRad;                          //!< rms of adjusted Radius sigmas
       double m_dminSigmaLatitude;
-      std::string m_idMinSigmaLatitude;
+      QString m_idMinSigmaLatitude;
       double m_dmaxSigmaLatitude;
-      std::string m_idMaxSigmaLatitude;
+      QString m_idMaxSigmaLatitude;
       double m_dminSigmaLongitude;
-      std::string m_idMinSigmaLongitude;
+      QString m_idMinSigmaLongitude;
       double m_dmaxSigmaLongitude;
-      std::string m_idMaxSigmaLongitude;
+      QString m_idMaxSigmaLongitude;
       double m_dminSigmaRadius;
-      std::string m_idMinSigmaRadius;
+      QString m_idMinSigmaRadius;
       double m_dmaxSigmaRadius;
-      std::string m_idMaxSigmaRadius;
+      QString m_idMaxSigmaRadius;
 
       double m_dRejectionLimit;                              //!< current rejection limit
 
@@ -445,9 +445,9 @@ namespace Isis {
       std::vector<double> m_dxKnowns;
       std::vector<double> m_dyKnowns;
 
-      std::string m_strCnetFileName;                         //!< Control Net file specification
-      std::string m_strSolutionMethod;                       //!< solution method string (QR,SVD,SPARSE-LU,SPECIALK)
-      std::string m_strOutputFilePrefix;                     //!< output file prefix
+      QString m_strCnetFileName;                         //!< Control Net file specification
+      QString m_strSolutionMethod;                       //!< solution method string (QR,SVD,SPARSE-LU,SPECIALK)
+      QString m_strOutputFilePrefix;                     //!< output file prefix
 
       //!< pointers to...
       Isis::LeastSquares *m_pLsq;                            //!< 'LeastSquares' object
@@ -674,7 +674,7 @@ namespace Isis {
        */
       double m_maxLikelihoodQuan[3];
 
-      public: void maximumLikelihoodSetup( QList<std::string> models, QList<double> quantiles );
+      public: void maximumLikelihoodSetup( QList<QString> models, QList<double> quantiles );
   };
 
 }

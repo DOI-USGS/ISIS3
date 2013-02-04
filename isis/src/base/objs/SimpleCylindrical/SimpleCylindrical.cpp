@@ -60,7 +60,7 @@ namespace Isis {
       // Compute the default value if allowed and needed
       if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
         double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
-        mapGroup += PvlKeyword("CenterLongitude", lon);
+        mapGroup += PvlKeyword("CenterLongitude", toString(lon));
       }
 
       // Get the center longitude, convert to radians, adjust for longitude
@@ -70,7 +70,7 @@ namespace Isis {
       if (m_longitudeDirection == PositiveWest) m_centerLongitude *= -1.0;
     }
     catch(IException &e) {
-      string message = "Invalid label group [Mapping]";
+      QString message = "Invalid label group [Mapping]";
       throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }
@@ -99,18 +99,18 @@ namespace Isis {
   /**
    * Returns the name of the map projection, "SimpleCylindrical"
    *
-   * @return string Name of projection, "SimpleCylindrical"
+   * @return QString Name of projection, "SimpleCylindrical"
    */
-  string SimpleCylindrical::Name() const {
+  QString SimpleCylindrical::Name() const {
     return "SimpleCylindrical";
   }
 
   /**
    * Returns the version of the map projection
    *
-   * @return std::string Version number
+   * @return std::QString Version number
    */
-  string SimpleCylindrical::Version() const {
+  QString SimpleCylindrical::Version() const {
     return "1.0";
   }
 

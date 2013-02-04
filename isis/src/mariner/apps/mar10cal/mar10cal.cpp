@@ -37,7 +37,7 @@ void IsisMain() {
   Isis::Pvl lab(ui.GetFileName("FROM"));
   Isis::PvlGroup & inst = lab.FindGroup("Instrument", Pvl::Traverse);
 
-  std::string mission = inst["SpacecraftName"];
+  QString mission = inst["SpacecraftName"];
   if (mission != "Mariner_10") {
     string msg = "This is not a Mariner 10 image.  Mar10cal requires a Mariner 10 image.";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -47,21 +47,21 @@ void IsisMain() {
 
   // If it is already calibrated then complain
   if (icube->hasGroup("Radiometry")) {
-    string msg = "This Mariner 10 image [" + icube->getFileName() + "] has "
-                 "already been radiometrically calibrated";
+    QString msg = "This Mariner 10 image [" + icube->getFileName() + "] has "
+                  "already been radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Get label parameters we will need for calibration equation
-  std::string instId = inst["InstrumentId"];
-  string camera = instId.substr(instId.size()-1);
+  QString instId = inst["InstrumentId"];
+  QString camera = instId.mid(instId.size()-1);
 
-  IString filter = (string)(icube->getGroup("BandBin"))["FilterName"];
-  filter = filter.UpCase().substr(0,3);
+  QString filter = (QString)(icube->getGroup("BandBin"))["FilterName"];
+  filter = filter.toUpper().mid(0,3);
 
-  string target = inst["TargetName"];
+  QString target = inst["TargetName"];
 
-  iTime startTime((string) inst["StartTime"]);
+  iTime startTime((QString) inst["StartTime"]);
 
   double exposure = inst["ExposureDuration"];
   double exposureOffset = 0.0;
@@ -76,7 +76,7 @@ void IsisMain() {
       exposureOffset = 3.060;
     }
     else {
-      string msg = "Camera [" + camera + "] is not supported.";
+      QString msg = "Camera [" + camera + "] is not supported.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -89,7 +89,7 @@ void IsisMain() {
   else {
     //  Mercury Dark current
     //   ??? NOTE:  Need to find Mark's dc for venus and moon ????
-    string dcFile("$mariner10/calibration/mariner_10_" + camera +
+    QString dcFile("$mariner10/calibration/mariner_10_" + camera +
                   "_dc.cub");
     CubeAttributeInput cubeAtt;
     dcCube = p.SetInputCube(dcFile, cubeAtt);
@@ -100,13 +100,13 @@ void IsisMain() {
   Cube * blemCube = 0;
   useBlem = (ui.GetBoolean("BLEMMASK")) ? true : false;
   if (useBlem) {
-    string blemFile("$mariner10/calibration/mariner_10_blem_" + camera + ".cub");
+    QString blemFile("$mariner10/calibration/mariner_10_blem_" + camera + ".cub");
     CubeAttributeInput cubeAtt;
     blemCube = p.SetInputCube(blemFile, cubeAtt);
   }
 
   if (filter == "FAB" || filter == "WAF") {
-    string msg = "Filter type [" + filter + "] is not supported at this time.";
+    QString msg = "Filter type [" + filter + "] is not supported at this time.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -131,7 +131,7 @@ void IsisMain() {
       absCoef = 750.0;
     }
     else {
-      string msg = "Camera [" + camera + "] is not supported.";
+      QString msg = "Camera [" + camera + "] is not supported.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -161,7 +161,7 @@ void IsisMain() {
     calgrp += PvlKeyword("BlemishRemovalCube", blemCube->getFileName());
   }
   calgrp += PvlKeyword("CoefficientCube", coCube.getFileName());
-  calgrp += PvlKeyword("AbsoluteCoefficient", absCoef);
+  calgrp += PvlKeyword("AbsoluteCoefficient", toString(absCoef));
 
   ocube->putGroup(calgrp);
 

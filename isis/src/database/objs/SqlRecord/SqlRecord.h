@@ -1,4 +1,4 @@
-#if !defined(SqlRecord_h)
+#ifndef SqlRecord_h
 #define SqlRecord_h
 /**
  * @file
@@ -29,10 +29,11 @@
 #include "IException.h"
 #include <QSqlRecord>
 
+class QString;
+
 namespace Isis {
 
   class SqlQuery;
-  class IString;
 
   /**
    * @brief Provide simplified access to resulting SQL query row
@@ -40,9 +41,9 @@ namespace Isis {
    * This class is derived from
    * <a href="http://doc.trolltech.com/4.1/qsqlrecord.html">Qt's QSqlRecord</a>
    * class and is provided for convenience and simplifed use in a standard C++
-   * environment.  Mainly, it provides strings and values as Standard std::strings
+   * environment.  Mainly, it provides strings and values as Standard QStrings
    * and other more common C++ constructs as well as taking advantage of some
-   * unique Isis provisions (e.g., IString). One can still use Qt's rich features
+   * unique Isis provisions (e.g., QString). One can still use Qt's rich features
    * interchangeably with this class.
    *
    * SqlRecord is intended to be used by the SqlQuery class provided in this
@@ -56,7 +57,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2007-06-05 Brendan George - Modified to work with
-   *                           IString/StringTools merge
+   *                           QString/StringTools merge
    */
   class SqlRecord : public QSqlRecord {
     public:
@@ -76,19 +77,19 @@ namespace Isis {
         return (count());
       }
 
-      bool hasField(const std::string &name) const;
-      int getFieldIndex(const std::string &name) const;
-      std::string getFieldName(int index) const;
+      bool hasField(const QString &name) const;
+      int getFieldIndex(const QString &name) const;
+      QString getFieldName(int index) const;
 
-      std::string getType(int index) const;
-      std::string getType(const std::string &name) const;
+      QString getType(int index) const;
+      QString getType(const QString &name) const;
 
-      bool isNull(const std::string &name) const;
-      IString getValue(int index) const;
-      IString getValue(const std::string &name) const;
+      bool isNull(const QString &name) const;
+      QString getValue(int index) const;
+      QString getValue(const QString &name) const;
 
     private:
-      std::string QtTypeField(const char *ctype) const;
+      QString QtTypeField(const char *ctype) const;
 
   };
 }

@@ -176,8 +176,8 @@ namespace Isis {
    *          parameters options in the NAIF spkezX functions.
    *  
    */
-  void SpicePosition::SetAberrationCorrection(const std::string &correction) {
-    QString abcorr(correction.c_str());
+  void SpicePosition::SetAberrationCorrection(const QString &correction) {
+    QString abcorr(correction);
     abcorr.remove(QChar(' '));
     abcorr = abcorr.toUpper();
     QStringList validAbcorr;
@@ -185,10 +185,10 @@ namespace Isis {
                 << "XLT" << "XLT+S" << "XCN" << "XCN+S";
 
     if (validAbcorr.indexOf(abcorr) >= 0) {
-      p_aberrationCorrection = abcorr.toStdString();
+      p_aberrationCorrection = abcorr;
     }
     else {
-      std::string msg = "Invalid abberation correction [" + correction + "]";
+      QString msg = "Invalid abberation correction [" + correction + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -203,7 +203,7 @@ namespace Isis {
  * 
  * @author 2012-10-29 Kris Becker
  */
-  std::string SpicePosition::GetAberrationCorrection() const {
+  QString SpicePosition::GetAberrationCorrection() const {
     return (p_aberrationCorrection);
   }
 
@@ -287,17 +287,17 @@ namespace Isis {
   void SpicePosition::LoadCache(double startTime, double endTime, int size) {
     // Make sure cache isn't already loaded
     if(p_source == Memcache || p_source == HermiteCache) {
-      std::string msg = "A SpicePosition cache has already been created";
+      QString msg = "A SpicePosition cache has already been created";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if(startTime > endTime) {
-      std::string msg = "Argument startTime must be less than or equal to endTime";
+      QString msg = "Argument startTime must be less than or equal to endTime";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     if((startTime != endTime) && (size == 1)) {
-      std::string msg = "Cache size must be more than 1 if startTime endTime differ";
+      QString msg = "Cache size must be more than 1 if startTime endTime differ";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -363,19 +363,19 @@ namespace Isis {
 
     // Make sure cache isn't alread loaded
     if(p_source == Memcache || p_source == HermiteCache) {
-      std::string msg = "A SpicePosition cache has already been created";
+      QString msg = "A SpicePosition cache has already been created";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     // Load the full cache time information from the label if available
     if(table.Label().HasKeyword("SpkTableStartTime")) {
-      p_fullCacheStartTime = table.Label().FindKeyword("SpkTableStartTime")[0];
+      p_fullCacheStartTime = toDouble(table.Label().FindKeyword("SpkTableStartTime")[0]);
     }
     if(table.Label().HasKeyword("SpkTableEndTime")) {
-      p_fullCacheEndTime = table.Label().FindKeyword("SpkTableEndTime")[0];
+      p_fullCacheEndTime = toDouble(table.Label().FindKeyword("SpkTableEndTime")[0]);
     }
     if(table.Label().HasKeyword("SpkTableOriginalSize")) {
-      p_fullCacheSize = table.Label().FindKeyword("SpkTableOriginalSize")[0];
+      p_fullCacheSize = toDouble(table.Label().FindKeyword("SpkTableOriginalSize")[0]);
     }
 
 
@@ -412,7 +412,7 @@ namespace Isis {
           p_hasVelocity = false;
         }
         else  {
-          std::string msg = "Expecting four or seven fields in the SpicePosition table";
+          QString msg = "Expecting four or seven fields in the SpicePosition table";
           throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
@@ -476,7 +476,7 @@ namespace Isis {
    *            p_source and will be read by LoadCache(Table).
    *   @history 2011-01-05 Debbie A. Cook - Added PolyFunction
    */
-  Table SpicePosition::Cache(const std::string &tableName) {
+  Table SpicePosition::Cache(const QString &tableName) {
     if (p_source == PolyFunctionOverHermiteConstant) {
       LineCache(tableName);
       // TODO Figure out how to get the tolerance -- for now hard code .01
@@ -588,7 +588,7 @@ namespace Isis {
    */
   void SpicePosition::CacheLabel(Table &table) {
     // determine type of table to return
-    std::string tabletype = "";
+    QString tabletype = "";
 
     if(p_source == Memcache) {
       tabletype = "Linear";
@@ -605,15 +605,15 @@ namespace Isis {
     // Write original time coverage
     if(p_fullCacheStartTime != 0) {
       table.Label() += PvlKeyword("SpkTableStartTime");
-      table.Label()["SpkTableStartTime"].AddValue(p_fullCacheStartTime);
+      table.Label()["SpkTableStartTime"].AddValue(toString(p_fullCacheStartTime));
     }
     if(p_fullCacheEndTime != 0) {
       table.Label() += PvlKeyword("SpkTableEndTime");
-      table.Label()["SpkTableEndTime"].AddValue(p_fullCacheEndTime);
+      table.Label()["SpkTableEndTime"].AddValue(toString(p_fullCacheEndTime));
     }
     if(p_fullCacheSize != 0) {
       table.Label() += PvlKeyword("SpkTableOriginalSize");
-      table.Label()["SpkTableOriginalSize"].AddValue(p_fullCacheSize);
+      table.Label()["SpkTableOriginalSize"].AddValue(toString(p_fullCacheSize));
     }
   }
 
@@ -632,13 +632,13 @@ namespace Isis {
    *   @history 2012-01-25 Debbie A. Cook - Modified error checking for p_source
    *                         to allow all function sources (>=HermiteCache)
    */
-  Table SpicePosition::LineCache(const std::string &tableName) {
+  Table SpicePosition::LineCache(const QString &tableName) {
 
     // Apply the function and fill the caches
     if(p_source >= HermiteCache)  ReloadCache();
 
     if(p_source != Memcache) {
-      std::string msg = "Only cached positions can be returned as a line cache of positions and time";
+      QString msg = "Only cached positions can be returned as a line cache of positions and time";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     // Load the table and return it to caller
@@ -665,7 +665,7 @@ namespace Isis {
 
     // Make sure source is a function
     if(p_source < HermiteCache) {
-      std::string msg = "The SpicePosition has not yet been fit to a function";
+      QString msg = "The SpicePosition has not yet been fit to a function";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -717,7 +717,7 @@ namespace Isis {
    * from the polynomial function.
    *
    */
-   Table SpicePosition::LoadHermiteCache(const std::string &tableName) {
+   Table SpicePosition::LoadHermiteCache(const QString &tableName) {
     // find the first and last time values
     double firstTime = p_fullCacheStartTime;
     double lastTime = p_fullCacheEndTime;
@@ -736,7 +736,7 @@ namespace Isis {
 
     // Make sure a polynomial function is already loaded
     if(p_source != PolyFunction) {
-      std::string msg = "A SpicePosition polynomial function has not been created yet";
+      QString msg = "A SpicePosition polynomial function has not been created yet";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -1093,7 +1093,7 @@ namespace Isis {
     int coordIndex = partialVar;
 
 //  if(coeffIndex > 2) {
-//    std::string msg = "SpicePosition only supports up to a 2nd order fit for the spacecraft position";
+//    QString msg = "SpicePosition only supports up to a 2nd order fit for the spacecraft position";
 //    throw IException(IException::Programmer, msg, _FILEINFO_);
 //  }
 //
@@ -1181,7 +1181,7 @@ namespace Isis {
       return p_velocity;
     }
     else {
-      std::string msg = "No velocity vector available";
+      QString msg = "No velocity vector available";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -1861,16 +1861,16 @@ namespace Isis {
  *                    if applicable
  */
   void SpicePosition::computeStateVector(double et, int target, int observer, 
-                                         const std::string &refFrame, 
-                                         const std::string &abcorr, 
+                                         const QString &refFrame, 
+                                         const QString &abcorr, 
                                          double state[6], bool &hasVelocity,
                                          double &lightTime) const {
 
     // First try getting the entire state (including the velocity vector)
     hasVelocity = true;
     lightTime = 0.0;
-    spkez_c((SpiceInt) target, (SpiceDouble) et, refFrame.c_str(), 
-            abcorr.c_str(), (SpiceInt) observer, state, &lightTime);
+    spkez_c((SpiceInt) target, (SpiceDouble) et, refFrame.toAscii().data(), 
+            abcorr.toAscii().data(), (SpiceInt) observer, state, &lightTime);
 
     // If Naif fails attempting to get the entire state, assume the velocity vector is
     // not available and just get the position.  First turn off Naif error reporting and
@@ -1880,8 +1880,8 @@ namespace Isis {
     if ( spfailure ) {
       hasVelocity = false;
       lightTime = 0.0;
-      spkezp_c((SpiceInt) target, (SpiceDouble) et, refFrame.c_str(), 
-               abcorr.c_str(), (SpiceInt) observer, state, &lightTime);
+      spkezp_c((SpiceInt) target, (SpiceDouble) et, refFrame.toAscii().data(), 
+               abcorr.toAscii().data(), (SpiceInt) observer, state, &lightTime);
     }
 
     return;

@@ -1,4 +1,4 @@
-Unit test for Isis::iTime
+Unit test for iTime
   Test of date = 2003/01/02 12:15:01.1234
    Year        = 2003
    Year        = 2003
@@ -56,30 +56,30 @@ Unit test for Isis::iTime
    Et          = 31579205.9
    UTC         = 2000-12-31T23:59:01.6789
 
-  Test of Isis::iTime operator>= member
+  Test of iTime operator>= member
     94781765.307363 >= 94781765.307363 = 1
     94781765.307363 >= 94781765.307413 = 0
     94781765.307363 >= 94781765.306963 = 1
 
-  Test of Isis::iTime operator<= member
+  Test of iTime operator<= member
     94781765.307363 <= 94781765.307363 = 1
     94781765.307363 <= 94781765.307413 = 1
     94781765.307363 <= 94781765.306963 = 0
 
-  Test of Isis::iTime operator> member
+  Test of iTime operator> member
     94781765.307363 > 94781765.307363 = 0
     94781765.307363 > 94781765.307413 = 0
     94781765.307363 > 94781765.306963 = 1
 
-  Test of Isis::iTime operator< member
+  Test of iTime operator< member
     94781765.307363 < 94781765.307363 = 0
     94781765.307363 < 94781765.307413 = 1
     94781765.307363 < 94781765.306963 = 0
 
-  Test of Isis::iTime operator!= member
+  Test of iTime operator!= member
     94781765.307363 != 94781765.307363 = 0
     94781765.307363 != 94781765.307413 = 1
 
-  Test of Isis::iTime operator== member
+  Test of iTime operator== member
     94781765.307363 == 94781765.307363 = 1
     94781765.307363 == 94781765.307413 = 0

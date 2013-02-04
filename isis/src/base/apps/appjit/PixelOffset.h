@@ -22,13 +22,15 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
 #include <vector>
-#include "PolynomialUnivariate.h"
-#include "naif/SpiceUsr.h"
-#include "naif/SpiceZfc.h"
-#include "naif/SpiceZmc.h"
 
+#include <naif/SpiceUsr.h>
+#include <naif/SpiceZfc.h>
+#include <naif/SpiceZmc.h>
+
+#include <QString>
+
+#include "PolynomialUnivariate.h"
 
 namespace Isis {
   /**
@@ -58,7 +60,7 @@ namespace Isis {
   class PixelOffset {
     public:
       //! Constructors
-      PixelOffset(const std::string &tableList, double fl, double pixPitch, double baseTime,
+      PixelOffset(const QString &tableList, double fl, double pixPitch, double baseTime,
                   double timeScale, int degree);
 
       //! Destructor

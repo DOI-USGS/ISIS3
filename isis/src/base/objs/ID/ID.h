@@ -1,4 +1,4 @@
-#if !defined(ID_h)
+#ifndef ID_h
 #define ID_h
 
 /**
@@ -23,7 +23,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
+#include <QString>
 
 namespace Isis {
   /**
@@ -43,14 +43,14 @@ namespace Isis {
    */
   class ID {
     public:
-      ID(const std::string &name, int basenum = 1);
+      ID(const QString &name, int basenum = 1);
 
       ~ID();
 
-      std::string Next();
+      QString Next();
 
     private:
-      std::string p_namebase;
+      QString p_namebase;
       int p_current;
       int p_numLength;
       int p_numStart;

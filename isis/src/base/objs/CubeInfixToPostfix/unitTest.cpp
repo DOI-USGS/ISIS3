@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
   cout << "Test CubeInfixToPostfix" << endl;
 
   const int NUM_EQUATIONS = 25;
-  IString equations[NUM_EQUATIONS] = {
+  QString equations[NUM_EQUATIONS] = {
     "-4",
     "1*2",
     "((1)+(1))",

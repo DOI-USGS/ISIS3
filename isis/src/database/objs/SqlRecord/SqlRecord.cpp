@@ -24,9 +24,9 @@
 #include <vector>
 #include <iostream>
 
+#include "IString.h"
 #include "SqlRecord.h"
 #include "SqlQuery.h"
-#include "IString.h"
 
 #include <QSqlField>
 #include <QVariant>
@@ -64,8 +64,8 @@ namespace Isis {
    *
    * @return bool  True if the field/column exists, false otherwise.
    */
-  bool SqlRecord::hasField(const std::string &name) const {
-    return (contains(IString::ToQt(name)));
+  bool SqlRecord::hasField(const QString &name) const {
+    return (contains(name));
   }
 
   /**
@@ -76,10 +76,10 @@ namespace Isis {
    *
    * @param index  Index of the desired column name to return.
    *
-   * @return std::string  Name of the column at the requested index
+   * @return QString  Name of the column at the requested index
    */
-  std::string SqlRecord::getFieldName(int index) const {
-    return (IString::ToStd(fieldName(index)));
+  QString SqlRecord::getFieldName(int index) const {
+    return (fieldName(index));
   }
 
   /**
@@ -91,8 +91,8 @@ namespace Isis {
    *
    * @return int Index of the named column
    */
-  int SqlRecord::getFieldIndex(const std::string &name) const {
-    return(indexOf(IString::ToQt(name)));
+  int SqlRecord::getFieldIndex(const QString &name) const {
+    return(indexOf(name));
   }
 
   /**
@@ -113,10 +113,10 @@ namespace Isis {
    *
    * @param name Field/column name to determine type for
    *
-   * @return std::string  Type of the field/column
+   * @return QString  Type of the field/column
    */
-  std::string SqlRecord::getType(const std::string &name) const {
-    QVariant ftype(field(IString::ToQt(name)).type());
+  QString SqlRecord::getType(const QString &name) const {
+    QVariant ftype(field(name).type());
     return (QtTypeField(ftype.typeName()));
   }
 
@@ -134,13 +134,13 @@ namespace Isis {
    * The \b double type is returned as is, \b double.
    *
    * @see QtTypeField().
-   * @see getType(const std::string &name).
+   * @see getType(const QString &name).
    *
    * @param index Index of the desired field/column to return type for.
    *
-   * @return std::string Type of the field/column at given index.
+   * @return QString Type of the field/column at given index.
    */
-  std::string SqlRecord::getType(int index) const {
+  QString SqlRecord::getType(int index) const {
     QVariant ftype(field(index).type());
     return (QtTypeField(ftype.typeName()));
   }
@@ -152,8 +152,8 @@ namespace Isis {
    *
    * @return bool True if NULL, otherwise false.
    */
-  bool SqlRecord::isNull(const std::string &name) const {
-    return (field(IString::ToQt(name)).isNull());
+  bool SqlRecord::isNull(const QString &name) const {
+    return (field(name).isNull());
   }
 
   /**
@@ -164,10 +164,10 @@ namespace Isis {
    *
    * @param index Index of field/column get value from.
    *
-   * @return IString Value of the field/column index.
+   * @return QString Value of the field/column index.
    */
-  IString SqlRecord::getValue(int index) const {
-    return (IString(IString::ToStd(field(index).value().toString())));
+  QString SqlRecord::getValue(int index) const {
+    return (QString(field(index).value().toString()));
   }
 
   /**
@@ -178,10 +178,10 @@ namespace Isis {
    *
    * @param name  Name of the field/column to get value for.
    *
-   * @return IString Value of the named field/column.
+   * @return QString Value of the named field/column.
    */
-  IString SqlRecord::getValue(const std::string &name) const {
-    return (IString(IString::ToStd(field(IString::ToQt(name)).value().toString())));
+  QString SqlRecord::getValue(const QString &name) const {
+    return (QString(field(name).value().toString()));
   }
 
   /**
@@ -195,15 +195,15 @@ namespace Isis {
    *
    * @param ctype A Qt QVariant::Type description
    *
-   * @return std::string  A generic type for the Qt type.
+   * @return QString  A generic type for the Qt type.
    */
-  std::string SqlRecord::QtTypeField(const char *ctype) const {
-    string retType("");
+  QString SqlRecord::QtTypeField(const char *ctype) const {
+    QString retType("");
     if(ctype == 0) {
       return (retType);
     }
     else {
-      retType = IString::DownCase((tolower(ctype[0]) == 'q') ? &ctype[1] : ctype);
+      retType = QString((tolower(ctype[0]) == 'q') ? &ctype[1] : ctype).toLower();
     }
     return(retType);
   }

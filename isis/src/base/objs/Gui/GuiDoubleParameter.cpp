@@ -29,13 +29,13 @@ namespace Isis {
   GuiDoubleParameter::~GuiDoubleParameter() {}
 
 
-  void GuiDoubleParameter::Set(IString newValue) {
-    p_lineEdit->setText(newValue.c_str());
+  void GuiDoubleParameter::Set(QString newValue) {
+    p_lineEdit->setText(newValue);
   }
 
 
-  IString GuiDoubleParameter::Value() {
-    return p_lineEdit->text().toStdString();
+  QString GuiDoubleParameter::Value() {
+    return p_lineEdit->text();
   }
 
 }

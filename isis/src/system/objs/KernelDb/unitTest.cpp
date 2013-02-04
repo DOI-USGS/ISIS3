@@ -4,23 +4,24 @@
 #include "Preference.h"
 #include "Pvl.h"
 
+using namespace Isis;
 using namespace std;
 
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   KernelDb kdb("test.db", 15);
 
-  Isis::Pvl lab;
-  Isis::PvlObject obj("IsisCube");
-  Isis::PvlGroup group("Instrument");
-  Isis::PvlGroup group2("TestGroup");
-  Isis::PvlKeyword keyword("TestKeyword", "TestValue");
-  Isis::PvlKeyword startKey("StartTime", "2005 JUN 15 12:00:00.000 TDB");
-  Isis::PvlKeyword spacecraft("SpacecraftName", "IdealSpacecraft");
-  Isis::PvlKeyword instrument("InstrumentId", "IdealCamera");
-  Isis::PvlKeyword endKey("StopTime", "2005 DEC 15 12:00:00.000 TDB");
-  Isis::PvlKeyword endKey2("StopTime", "2005 JUN 15 12:14:00.000 TDB");
+  Pvl lab;
+  PvlObject obj("IsisCube");
+  PvlGroup group("Instrument");
+  PvlGroup group2("TestGroup");
+  PvlKeyword keyword("TestKeyword", "TestValue");
+  PvlKeyword startKey("StartTime", "2005 JUN 15 12:00:00.000 TDB");
+  PvlKeyword spacecraft("SpacecraftName", "IdealSpacecraft");
+  PvlKeyword instrument("InstrumentId", "IdealCamera");
+  PvlKeyword endKey("StopTime", "2005 DEC 15 12:00:00.000 TDB");
+  PvlKeyword endKey2("StopTime", "2005 JUN 15 12:14:00.000 TDB");
   group2.AddKeyword(keyword);
   group.AddKeyword(startKey);
   group.AddKeyword(endKey);
@@ -29,11 +30,11 @@ int main(int argc, char *argv[]) {
   obj.AddGroup(group);
   obj.AddGroup(group2);
   lab.AddObject(obj);
-  std::vector<std::string> temp;
+  std::vector<QString> temp;
 
-  Isis::Pvl lab2;
-  Isis::PvlObject obj2("IsisCube");
-  group.AddKeyword(endKey2, Isis::Pvl::Replace);
+  Pvl lab2;
+  PvlObject obj2("IsisCube");
+  group.AddKeyword(endKey2, Pvl::Replace);
   obj2.AddGroup(group);
   obj2.AddGroup(group2);
   lab2.AddObject(obj2);

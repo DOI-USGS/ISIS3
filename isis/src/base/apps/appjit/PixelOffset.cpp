@@ -25,7 +25,7 @@ namespace Isis {
    * @param fl Focal length of instrument in mm.
    * @param pixpitch Pixel pitch of instrument in mm/pixel.
    */
-  PixelOffset::PixelOffset(const std::string &tableList, double fl, double pixPitch, double baseTime,
+  PixelOffset::PixelOffset(const QString &tableList, double fl, double pixPitch, double baseTime,
                            double timeScale, int degree) {
     p_focalLen = fl;
     p_pixPitch = pixPitch;
@@ -35,9 +35,9 @@ namespace Isis {
     p_baseTime = baseTime;
     p_timeScale = timeScale;
     p_angleScale = p_pixPitch / p_focalLen;
-    std::vector<std::string> lines;
+    std::vector<QString> lines;
     Isis::TextFile inputFile(tableList, "input", lines);
-    std::vector<std::string> fields;
+    QStringList fields;
     p_I.push_back(1.0);
     p_I.push_back(0.0);
     p_I.push_back(0.0);
@@ -59,14 +59,14 @@ namespace Isis {
 
 
     for(size_t iline = 0; iline < lines.size(); iline++) {
-      int num = IString::Split(' ', IString::ConvertWhiteSpace(lines[iline]), fields, false);
-      if(num != 3) {
-        Isis::IString msg = "Three fields are required:  sample, line, and ephemeris time.";
+      fields = lines[iline].simplified().split(" ", QString::SkipEmptyParts);
+      if(fields.count() != 3) {
+        QString msg = "Three fields are required:  sample, line, and ephemeris time.";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
-      p_samples.push_back(IString::ToDouble(fields[0]));
-      p_lines.push_back(IString::ToDouble(fields[1]));
-      p_times.push_back(IString::ToDouble(fields[2]));
+      p_samples.push_back(toDouble(fields[0]));
+      p_lines.push_back(toDouble(fields[1]));
+      p_times.push_back(toDouble(fields[2]));
     }
 
     // Compute scalers
@@ -125,7 +125,7 @@ namespace Isis {
       loc0 = p_lines[index];
     }
     else  {
-      std::string msg;
+      QString msg;
       msg = "Error in extrapolation code";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -165,7 +165,7 @@ namespace Isis {
 
     // Make sure angles aren't already loaded TBD
     /*    if () {
-          std::string msg = "An angle cache has already been created";
+          QString msg = "An angle cache has already been created";
           throw Isis::iException::Message(Isis::iException::Programmer,msg,_FILEINFO_);
         } */
 
@@ -237,7 +237,7 @@ namespace Isis {
     }
 
     if(fitAng1->Knowns() == 0) {
-      std::string msg;
+      QString msg;
       msg = "Cube time range is not covered by jitter file";
       throw IException(IException::User, msg, _FILEINFO_);
     }

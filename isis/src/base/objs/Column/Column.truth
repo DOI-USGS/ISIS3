@@ -7,7 +7,7 @@ Column ""
 	Alignment() = 0
 	Precision() = 4
 
-**USER ERROR** Name[test column] is wider than width.
+**USER ERROR** Name [test column] is wider than width.
 **USER ERROR** Setting precision only makes sense for Decimal Alignment.
 **USER ERROR** Width is insufficient to contain name[test column].
 Column ""

@@ -114,8 +114,8 @@ namespace Isis {
    *
    * @return Pvl group of gaps to be displayed
    */
-  void FindGapsFunctor::setModification(IString newModValue) {
-    m_gaps->FindKeyword("Modification").SetValue(newModValue.ToQt());
+  void FindGapsFunctor::setModification(QString newModValue) {
+    m_gaps->FindKeyword("Modification").SetValue(newModValue);
   }
 
   
@@ -151,18 +151,18 @@ namespace Isis {
         if( !(*m_inGap) ) {
 
           *m_inGap = true;
-          m_gap->AddKeyword(PvlKeyword("NewGapInBand", in.Band()));
-          m_gap->AddKeyword(PvlKeyword("StartLine", in.Line()));
+          m_gap->AddKeyword(PvlKeyword("NewGapInBand", toString(in.Band())));
+          m_gap->AddKeyword(PvlKeyword("StartLine", toString(in.Line())));
           
           if(correlation == Isis::Null) {
             correlation = 0.0;
           }
-          m_gap->AddKeyword(PvlKeyword("Correlation", correlation));
+          m_gap->AddKeyword(PvlKeyword("Correlation", toString(correlation)));
         }
         
         if (in.Line() == m_lineCount) {
-          m_gap->AddKeyword(PvlKeyword("LastGapLine", in.Line()));
-          m_gap->AddKeyword(PvlKeyword("ToEndOfBand", m_lineCount));
+          m_gap->AddKeyword(PvlKeyword("LastGapLine", toString(in.Line())));
+          m_gap->AddKeyword(PvlKeyword("ToEndOfBand", toString(m_lineCount)));
 
           addGapToGroup();
         }
@@ -174,7 +174,7 @@ namespace Isis {
          * correlate. Or this line is the last line and it is in the gap.
          */
 
-        m_gap->AddKeyword(PvlKeyword("LastGapLine", in.Line() - 2));
+        m_gap->AddKeyword(PvlKeyword("LastGapLine", toString(in.Line() - 2)));
         addGapToGroup();
       }
       
@@ -195,9 +195,9 @@ namespace Isis {
 
     for (int i = 0; i < m_gaps->Groups(); i++) {
 
-      int gapBand = (*m_gaps).Group(i).FindKeyword(" NewGapInBand")[0].ToInteger();
-      int gapStart = (*m_gaps).Group(i).FindKeyword("StartLine")[0].ToInteger();
-      int gapEnd = (*m_gaps).Group(i).FindKeyword("LastGapLine")[0].ToInteger();
+      int gapBand = toInt((*m_gaps).Group(i).FindKeyword(" NewGapInBand")[0]);
+      int gapStart = toInt((*m_gaps).Group(i).FindKeyword("StartLine")[0]);
+      int gapEnd = toInt((*m_gaps).Group(i).FindKeyword("LastGapLine")[0]);
 
       if ( (in.Line() >= gapStart - m_bufferSizeBeforeGap) &&
            (in.Line() <= gapEnd + m_bufferSizeAfterGap) &&
@@ -239,8 +239,8 @@ namespace Isis {
     * In case the gap is a flase positive. The end of the gap will end up being the line
     * before the start of the gap.
     */
-    if (m_gap->FindKeyword("StartLine")[0].ToInteger() <
-        m_gap->FindKeyword("LastGapLine")[0].ToInteger()) {
+    if (toInt(m_gap->FindKeyword("StartLine")[0]) <
+        toInt(m_gap->FindKeyword("LastGapLine")[0])) {
 
       m_gaps->AddGroup(*m_gap);
     }

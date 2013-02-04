@@ -6,51 +6,53 @@
 #include "Preference.h"
 #include "TProjection.h"
 
+using namespace Isis;
 using namespace std;
+
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   cout << "UNIT TEST FOR Orthographic" << endl << endl;
 
-  Isis::Pvl lab;
-  lab.AddGroup(Isis::PvlGroup("Mapping"));
-  Isis::PvlGroup &mapGroup = lab.FindGroup("Mapping");
-  mapGroup += Isis::PvlKeyword("EquatorialRadius", 1.0);
-  mapGroup += Isis::PvlKeyword("PolarRadius", 1.0);
-  mapGroup += Isis::PvlKeyword("LatitudeType", "Planetographic");
-  mapGroup += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-  mapGroup += Isis::PvlKeyword("LongitudeDomain", 180);
-  mapGroup += Isis::PvlKeyword("MinimumLatitude", -70.0);
-  mapGroup += Isis::PvlKeyword("MaximumLatitude", 70.0);
-  mapGroup += Isis::PvlKeyword("MinimumLongitude", -180.0);
-  mapGroup += Isis::PvlKeyword("MaximumLongitude", 180.0);
-  mapGroup += Isis::PvlKeyword("ProjectionName", "Orthographic");
+  Pvl lab;
+  lab.AddGroup(PvlGroup("Mapping"));
+  PvlGroup &mapGroup = lab.FindGroup("Mapping");
+  mapGroup += PvlKeyword("EquatorialRadius", "1.0");
+  mapGroup += PvlKeyword("PolarRadius", "1.0");
+  mapGroup += PvlKeyword("LatitudeType", "Planetographic");
+  mapGroup += PvlKeyword("LongitudeDirection", "PositiveEast");
+  mapGroup += PvlKeyword("LongitudeDomain", "180");
+  mapGroup += PvlKeyword("MinimumLatitude", "-70.0");
+  mapGroup += PvlKeyword("MaximumLatitude", "70.0");
+  mapGroup += PvlKeyword("MinimumLongitude", "-180.0");
+  mapGroup += PvlKeyword("MaximumLongitude", "180.0");
+  mapGroup += PvlKeyword("ProjectionName", "Orthographic");
 
   cout << "Test missing center longitude keyword ..." << endl;
   try {
-    Isis::Orthographic p(lab);
+    Orthographic p(lab);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
 
-  mapGroup += Isis::PvlKeyword("CenterLongitude", -100.0);
+  mapGroup += PvlKeyword("CenterLongitude", "-100.0");
 
   cout << "Test missing center latitude keyword..." << endl;
   try {
-    Isis::Orthographic p(lab);
+    Orthographic p(lab);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
 
-  mapGroup += Isis::PvlKeyword("CenterLatitude", 40.0);
+  mapGroup += PvlKeyword("CenterLatitude", "40.0");
 
   try {
-    Isis::TProjection *p = (Isis::TProjection *) Isis::ProjectionFactory::Create(lab);
-    //  Isis::Orthographic p(lab);
+    TProjection *p = (TProjection *) ProjectionFactory::Create(lab);
+    //  Orthographic p(lab);
 
     cout << "Test TrueScaleLatitude method... " << endl;
     cout << "TrueScaleLatitude = " << p->TrueScaleLatitude() << endl;
@@ -85,7 +87,7 @@ int main(int argc, char *argv[]) {
     cout << "Maximum Y:  " << maxY << endl;
     cout << endl;
 
-    Isis::Projection *s = p;
+    Projection *s = p;
     cout << "Test Name and comparision method ... " << endl;
     cout << "Name:       " << s->Name() << endl;
     cout << "operator==  " << (*s == *s) << endl;
@@ -94,15 +96,15 @@ int main(int argc, char *argv[]) {
     cout << "Test default computation ... " << endl;
     mapGroup.DeleteKeyword("CenterLongitude");
     mapGroup.DeleteKeyword("CenterLatitude");
-    Isis::Orthographic p2(lab, true);
+    Orthographic p2(lab, true);
     cout << lab << endl;
     cout << endl;
 
     cout << "Testing Mapping() methods ... " << endl;
 
-    Isis::Pvl tmp1;
-    Isis::Pvl tmp2;
-    Isis::Pvl tmp3;
+    Pvl tmp1;
+    Pvl tmp2;
+    Pvl tmp3;
     tmp1.AddGroup(p->Mapping());
     tmp2.AddGroup(p->MappingLatitudes());
     tmp3.AddGroup(p->MappingLongitudes());
@@ -120,7 +122,7 @@ int main(int argc, char *argv[]) {
     cout << "  USGS Professional Paper 1395 by John P. Snyder" << endl;
     cout << "  Pages 311-312" << endl;
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 }

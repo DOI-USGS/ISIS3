@@ -1,4 +1,4 @@
-#if !defined(SpkKernelWriter_h)
+#ifndef SpkKernelWriter_h
 #define SpkKernelWriter_h
 /**
  * @file
@@ -81,7 +81,7 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
      */
     void setType(const int spktype) {
       if ( (spktype != 9) && (spktype != 13) ) {
-        std::string mess = "SPK kernel type " + IString(spktype) +
+        QString mess = "SPK kernel type " + QString(spktype) +
                            " not valid/supported -  must 9 or 13";
         throw IException(IException::User, mess, _FILEINFO_);
       }
@@ -90,21 +90,21 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
 
 
   protected:
-    int k_open(const std::string &kfile, const int &comsize = 512) {
+    int k_open(const QString &kfile, const int &comsize = 512) {
       FileName kf(kfile);
       if ( kf.fileExists() ) {
-        std::string full_kf = kf.expanded();
-        std::remove(full_kf.c_str());
+        QString full_kf = kf.expanded();
+        std::remove(full_kf.toAscii().data());
       }
       SpiceInt  myHandle;
 
       NaifStatus::CheckErrors();
-      spkopn_c(kf.expanded().c_str(), "USGS_SPK_FILE", comsize, &myHandle);
+      spkopn_c(kf.expanded().toAscii().data(), "USGS_SPK_FILE", comsize, &myHandle);
       NaifStatus::CheckErrors();
       return (myHandle);
     }
 
-    std::string k_header() const;
+    QString k_header() const;
 
     void k_write(const SpiceInt &handle, const SpkKernel &kernels) {
       if ( _spkType == 9 ) {
@@ -137,8 +137,8 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
       void operator()(const K &segment) const {
         SpiceInt body   = segment.BodyCode();
         SpiceInt center = segment.CenterCode();
-        std::string   frame  = segment.ReferenceFrame();
-        std::string   segId  = segment.Id();
+        QString   frame  = segment.ReferenceFrame();
+        QString   segId  = segment.Id();
 
         const SVector &epochs = segment.Epochs();
         const SMatrix &states = segment.States();
@@ -148,8 +148,8 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
         segment.LoadKernelType("FK");
         NaifStatus::CheckErrors();
 
-        spkw09_c(_handle, body, center, frame.c_str(), epochs[0], epochs[nrecs-1],
-                 segId.c_str(), degree, nrecs, states[0], &epochs[0]);
+        spkw09_c(_handle, body, center, frame.toAscii().data(), epochs[0], epochs[nrecs-1],
+                 segId.toAscii().data(), degree, nrecs, states[0], &epochs[0]);
 
         NaifStatus::CheckErrors();
         segment.UnloadKernelType("FK");
@@ -170,8 +170,8 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
         // Collect frames
         SpiceInt body   = segment.BodyCode();
         SpiceInt center = segment.CenterCode();
-        std::string   frame  = segment.ReferenceFrame();
-        std::string   segId  = segment.Id();
+        QString   frame  = segment.ReferenceFrame();
+        QString   segId  = segment.Id();
 
         // Collect data
         const SVector &epochs = segment.Epochs();
@@ -182,8 +182,8 @@ class SpkKernelWriter : public KernelWriter<SpkKernel> {
         // Ensure the FK is loaded
         segment.LoadKernelType("FK");
         NaifStatus::CheckErrors();
-        spkw13_c(_handle, body, center, frame.c_str(), epochs[0], epochs[nrecs-1],
-                 segId.c_str(), degree, nrecs, states[0], &epochs[0]);
+        spkw13_c(_handle, body, center, frame.toAscii().data(), epochs[0], epochs[nrecs-1],
+                 segId.toAscii().data(), degree, nrecs, states[0], &epochs[0]);
         NaifStatus::CheckErrors();
         segment.UnloadKernelType("FK");
         return;

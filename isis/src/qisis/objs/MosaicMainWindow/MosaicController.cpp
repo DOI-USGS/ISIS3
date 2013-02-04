@@ -131,7 +131,7 @@ namespace Isis {
     projFile += p_fileList->toPvl();
     projFile += p_scene->toPvl();
 
-    projFile.Write(projFileName.toStdString());
+    projFile.Write(projFileName);
   }
 
 
@@ -206,7 +206,7 @@ namespace Isis {
       const QString &filename) {
     try {
       CubeDisplayProperties *prop = new CubeDisplayProperties(
-          QString(FileName(filename.toStdString()).expanded().c_str()),
+          QString(FileName(filename).expanded()),
           m_mutex);
       prop->setShowFill(m_openFilled);
 
@@ -463,7 +463,7 @@ namespace Isis {
 
   void MosaicController::readProject(QString filename) {
     try {
-      m_projectPvl = new Pvl(filename.toStdString());
+      m_projectPvl = new Pvl(filename);
       PvlObject &cubes(m_projectPvl->FindObject("Cubes"));
 
       QList<PvlObject> cubesList;
@@ -494,11 +494,11 @@ namespace Isis {
           QString("List File (*.lis);;Text File (*.txt);;All Files (*.*)"));
     if(output.isEmpty()) return;
 
-    TextFile file(output.toStdString(), "output");
+    TextFile file(output, "output");
 
     CubeDisplayProperties *cube;
     foreach(cube, p_cubes) {
-      file.PutLine( cube->fileName().toStdString() );
+      file.PutLine( cube->fileName() );
     }
   }
 

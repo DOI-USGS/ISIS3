@@ -41,7 +41,7 @@ double average1 = Isis::Null;
 HiVector f0LineAvg;
 HiVector f1LineAvg;
 double coeff;
-string balance;
+QString balance;
 int seamSize;
 int skipSize;
 
@@ -121,14 +121,14 @@ void IsisMain() {
   int filterWidth = ui.GetInteger("WIDTH");
   bool fillNull = ui.GetBoolean("FILL");
   int hiChannel = ui.GetInteger("CHANNEL");
-  string fixop = ui.GetString("OPERATOR");
+  QString fixop = ui.GetString("OPERATOR");
   coeff = 1;
 
   // Define the processing to be by line
   ProcessByLine p;
 
   //Set string to gather ProductIds.
-  string stitchedProductIds;
+  QString stitchedProductIds;
 
 // Obtain lines and samples of the input files.  Note that conditions
 // are obtained from the first input file only unless provided from a
@@ -140,8 +140,8 @@ void IsisMain() {
   fromData[0].add = HiVector(icube1->getLineCount(), 0.0);
 
   if(seamSize + skipSize > icube1->getSampleCount()) {
-    string msg = "SEAMSIZE [" + IString(seamSize) + "] + SKIP [" + IString(skipSize) + "] must ";
-    msg += " be less than the number of samples [" + IString(icube1->getSampleCount()) + "] in ";
+    QString msg = "SEAMSIZE [" + toString(seamSize) + "] + SKIP [" + toString(skipSize) + "] must ";
+    msg += " be less than the number of samples [" + toString(icube1->getSampleCount()) + "] in ";
     msg += "[" + ui.GetAsString("FROM1") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -150,7 +150,7 @@ void IsisMain() {
   PvlGroup &from1Instrument = icube1->getGroup("INSTRUMENT");
   fromData[0].ChnNumber = from1Instrument["ChannelNumber"];
 
-  stitchedProductIds = (string)from1Archive["ProductId"][0];
+  stitchedProductIds = (QString)from1Archive["ProductId"][0];
 
 //  Set initial conditions for one input file
   if(fromData[0].ChnNumber == 1) {
@@ -173,8 +173,8 @@ void IsisMain() {
     fromData[1].add = HiVector(icube2->getLineCount(), 0.0);
 
     if(seamSize + skipSize > icube2->getSampleCount()) {
-      string msg = "SEAMSIZE [" + IString(seamSize) + "] + SKIP [" + IString(skipSize) + "] must ";
-      msg += " be less than the number of samples [" + IString(icube2->getSampleCount()) + " in ";
+      QString msg = "SEAMSIZE [" + toString(seamSize) + "] + SKIP [" + toString(skipSize) + "] must ";
+      msg += " be less than the number of samples [" + toString(icube2->getSampleCount()) + " in ";
       msg += "[" + ui.GetAsString("FROM2") + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -183,20 +183,20 @@ void IsisMain() {
     PvlGroup &from2Archive = icube2->getGroup("ARCHIVE");
 
     //Make sure observation id's are the same
-    string from1ObsId = from1Archive["ObservationId"];
-    string from2ObsId = from2Archive["ObservationId"];
+    QString from1ObsId = from1Archive["ObservationId"];
+    QString from2ObsId = from2Archive["ObservationId"];
     if(from1ObsId != from2ObsId) {
-      string msg = "The input files Observation Id's are not compatable";
+      QString msg = "The input files Observation Id's are not compatable";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     stitchedProductIds = "(" + stitchedProductIds + ", " +
-                         (string)from2Archive["ProductId"][0] + ")";
+                         (QString)from2Archive["ProductId"][0] + ")";
 
     PvlGroup &from2Instrument = icube2->getGroup("INSTRUMENT");
 
     //Make sure CCD Id's are the same
-    string from1CcdId = from1Instrument["CCDId"];
-    string from2CcdId = from2Instrument["CCDId"];
+    QString from1CcdId = from1Instrument["CCDId"];
+    QString from2CcdId = from2Instrument["CCDId"];
     if(from1CcdId != from2CcdId) {
       string msg = "The input files CCD Id's are not compatable";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -229,7 +229,7 @@ void IsisMain() {
 
   // Change Channel Number on output cube to 2
   PvlGroup &InstrumentOut = ocube->getGroup("INSTRUMENT");
-  InstrumentOut["ChannelNumber"] = 2;
+  InstrumentOut["ChannelNumber"] = "2";
 
   // Set StitchedChannels and Stitched ProductIds keywords
   if(ui.WasEntered("FROM2")) {
@@ -237,7 +237,7 @@ void IsisMain() {
     InstrumentOut += PvlKeyword("StitchedProductIds", stitchedProductIds);
   }
   else {
-    InstrumentOut += PvlKeyword("StitchedChannels", IString(fromData[0].ChnNumber));
+    InstrumentOut += PvlKeyword("StitchedChannels", toString(fromData[0].ChnNumber));
     InstrumentOut += PvlKeyword("StitchedProductIds", stitchedProductIds);
   }
 
@@ -285,15 +285,15 @@ void IsisMain() {
             fromData[ch0Index].mult = coeff;
           }
         }
-        results += PvlKeyword("TruthChannel", hiChannel);
-        results += PvlKeyword("BalanceRatio", coeff);
+        results += PvlKeyword("TruthChannel", toString(hiChannel));
+        results += PvlKeyword("BalanceRatio", toString(coeff));
       }
       else {
         //  Store off original averages for table
         HiVector ch0_org = f0LineAvg;
         HiVector ch1_org = f1LineAvg;
 
-        results += PvlKeyword("FilterWidth", filterWidth);
+        results += PvlKeyword("FilterWidth", toString(filterWidth));
         if(filterWidth > 0) {
           f0LineAvg = filter(f0LineAvg, filterWidth);
           f1LineAvg = filter(f1LineAvg, filterWidth);
@@ -303,12 +303,12 @@ void IsisMain() {
         if(fillNull) {
           int nfilled;
           f0LineAvg = filler(f0LineAvg, nfilled);
-          results += PvlKeyword("Channel0Filled", nfilled);
+          results += PvlKeyword("Channel0Filled", toString(nfilled));
           f1LineAvg = filler(f1LineAvg, nfilled);
-          results += PvlKeyword("Channel1Filled", nfilled);
+          results += PvlKeyword("Channel1Filled", toString(nfilled));
         }
 
-        results += PvlKeyword("TruthChannel", hiChannel);
+        results += PvlKeyword("TruthChannel", toString(hiChannel));
         results += PvlKeyword("Operator", fixop);
         int nunfilled(0);
         HiVector ch0_fixed(icube1->getLineCount(), 1.0);
@@ -335,7 +335,7 @@ void IsisMain() {
             ch1_fixed = 0.0;
           }
         }
-        results += PvlKeyword("UnFilled", nunfilled);
+        results += PvlKeyword("UnFilled", toString(nunfilled));
 
         //  Add a table to the output file of the data values
         TableField f1("Channel1Original", Isis::TableField::Double);

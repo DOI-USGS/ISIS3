@@ -388,7 +388,7 @@ Object = AutoSeed
     MinimumArea      = 10
     XSpacing         = 1500
     YSpacing         = 1500
-    SubGrid          = 1
+    SubGrid          = Yes
   End_Group
 End_Object
 End

@@ -247,7 +247,7 @@ int main(int argc, char *argv[]) {
     in.close();
     cerr << endl;
 
-    QList<IString> vbands;
+    QList<QString> vbands;
     vbands.push_back("2");
     in.setVirtualBands(vbands);
     in.open("IsisCube_01");
@@ -347,7 +347,7 @@ int main(int argc, char *argv[]) {
 
     // Test reading outside a cube with virtual bands.
     cerr << "Testing reading past cube boundaries with virtual bands ... \n";
-    QList<IString> virtualBands;
+    QList<QString> virtualBands;
     virtualBands.push_back("2");
     boundaryTestCube.setVirtualBands(virtualBands);
     boundaryTestCube.open("IsisCube_boundary");
@@ -561,7 +561,7 @@ int main(int argc, char *argv[]) {
       in4.reopen("rw");
     }
     catch (IException &e) {
-      QString error = QString::fromStdString(e.toString());
+      QString error = e.toString();
       error = error.replace(QRegExp("\\[[^\\]]*\\]"), "[...]");
       cerr << error.toStdString() << endl;
     }

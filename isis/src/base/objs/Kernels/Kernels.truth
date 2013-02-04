@@ -25,6 +25,7 @@ SPK
 
 Initial currently loaded kernel files = 0
 
+
 After LoadALL option, kernels loaded = 8
 $base/kernels/spk/de405.bsp
 $mgs/kernels/spk/mgs_ab1.bsp
@@ -101,6 +102,7 @@ SCLK
 SPK
 
 Unknown kernels in list: 0
+
 
 Loading all, total loaded: 7
 $base/kernels/lsk/naif0009.tls

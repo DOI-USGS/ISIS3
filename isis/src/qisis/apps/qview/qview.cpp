@@ -61,11 +61,11 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  std::string p_socketFile = "/tmp/isis_qview_" + Application::UserName();
+  QString p_socketFile = "/tmp/isis_qview_" + Application::UserName();
   if(newWindow < 0) {
     struct sockaddr_un p_socketName;
     p_socketName.sun_family = AF_UNIX;
-    strcpy(p_socketName.sun_path, p_socketFile.c_str());
+    strcpy(p_socketName.sun_path, p_socketFile.toAscii().data());
     int p_socket;
 
     if(((FileName)p_socketFile).fileExists()) {
@@ -74,22 +74,22 @@ int main(int argc, char *argv[]) {
         // Try to connect to the socket
         if((connect(p_socket, (struct sockaddr *)&p_socketName,
                     sizeof(p_socketName))) >= 0) {
-          std::string temp;
+          QString temp;
           for(int i = 1; i < argc; i++) {
             temp += QFileInfo(
-                  FileName(argv[i]).expanded()).absoluteFilePath().toStdString()
+                  FileName(argv[i]).expanded()).absoluteFilePath()
                 + " ";
           }
           temp += "raise ";
           // Try to send data to the socket
-          if(send(p_socket, temp.c_str(), temp.size(), 0) >= 0) {
+          if(send(p_socket, temp.toAscii().data(), temp.size(), 0) >= 0) {
             // Success, the other qview will open this file.
             exit(0);
           }
           else {
-            std::string msg = "Unable to write to socket";
+            QString msg = "Unable to write to socket";
             std::cout << msg << std::endl;
-            remove(p_socketFile.c_str());
+            remove(p_socketFile.toAscii().data());
           }
         }
 
@@ -97,13 +97,13 @@ int main(int argc, char *argv[]) {
         //   socket is no longer running & remove the tmp file...it falls out &
         //   create a new one. This happens if qview is not already running.
         else {
-          remove(p_socketFile.c_str());
+          remove(p_socketFile.toAscii().data());
         }
       }
       else {
-        std::string msg = "Unable to create socket";
+        QString msg = "Unable to create socket";
         std::cout << msg << std::endl;
-        remove(p_socketFile.c_str());
+        remove(p_socketFile.toAscii().data());
       }
     }
   }
@@ -116,13 +116,13 @@ int main(int argc, char *argv[]) {
   PvlGroup &uiPref = Preference::Preferences().FindGroup(
                              "UserInterface");
   if(uiPref.HasKeyword("GuiStyle")) {
-    std::string style = uiPref["GuiStyle"];
-    QApplication::setStyle((IString) style);
+    QString style = uiPref["GuiStyle"];
+    QApplication::setStyle((QString) style);
   }
 
   // Add the Qt plugin directory to the library path
   FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
-  QCoreApplication::addLibraryPath(qtpluginpath.expanded().c_str());
+  QCoreApplication::addLibraryPath(qtpluginpath.expanded().toAscii().data());
 
   ViewportMainWindow *vw = new ViewportMainWindow("qview");
 
@@ -256,7 +256,7 @@ int main(int argc, char *argv[]) {
     temp->wait(); // wait for the stop to finish
     delete temp;
 
-    remove(p_socketFile.c_str());
+    remove(p_socketFile.toAscii().data());
   }
 
   delete helpTool;

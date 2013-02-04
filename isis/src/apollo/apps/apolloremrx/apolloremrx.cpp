@@ -5,7 +5,7 @@
 #include "UserInterface.h"
 #include "Brick.h"
 #include "Apollo.h"
-#include <string>
+#include <QString>
 #include <cstdlib>
 
 using namespace std;
@@ -14,7 +14,7 @@ using namespace Isis;
 void cpy(Buffer &in, Buffer &out);
 static int dim;
 static bool resvalid;
-static string action;
+static QString action;
 
 void IsisMain() {
   // We will be processing by line
@@ -25,24 +25,24 @@ void IsisMain() {
   Cube* info = p.SetInputCube("FROM");
   PvlKeyword &status = info ->getGroup("RESEAUS")["STATUS"];
   UserInterface &ui = Application::GetUserInterface();
-  string in = ui.GetFileName("FROM");
+  QString in = ui.GetFileName("FROM");
 
-  string spacecraft = (info->getGroup("Instrument")["SpacecraftName"]);
-  string instrument = (info->getGroup("Instrument")["InstrumentId"]);
+  QString spacecraft = (info->getGroup("Instrument")["SpacecraftName"]);
+  QString instrument = (info->getGroup("Instrument")["InstrumentId"]);
   Apollo apollo(spacecraft, instrument);
-  if (spacecraft.substr(0,6) != "APOLLO") {
-    string msg = "This application is for use with Apollo spacecrafts only. ";
+  if (spacecraft.mid(0,6) != "APOLLO") {
+    QString msg = "This application is for use with Apollo spacecrafts only. ";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
   // Check reseau status and make sure it is not nominal or removed
-  if ((string)status == "Nominal") {
-    string msg = "Input file [" + in +
+  if ((QString)status == "Nominal") {
+    QString msg = "Input file [" + in +
           "] appears to have nominal reseau status. You must run findrx first.";
     throw IException(IException::User,msg, _FILEINFO_);
   }
-  if ((string)status == "Removed") {
-    string msg = "Input file [" + in +
+  if ((QString)status == "Removed") {
+    QString msg = "Input file [" + in +
           "] appears to already have reseaus removed.";
     throw IException(IException::User,msg, _FILEINFO_);
   }
@@ -58,7 +58,7 @@ void IsisMain() {
   dim = apollo.ReseauDimension();
 
   // Get other user entered options
-  string out= ui.GetFileName("TO");
+  QString out= ui.GetFileName("TO");
   resvalid = ui.GetBoolean("RESVALID");
   action = ui.GetString("ACTION");
 
@@ -78,9 +78,9 @@ void IsisMain() {
   Brick brick(dim,dim,1,cube.getPixelType());
   int width = ui.GetInteger("WIDTH");
   for (int res=0; res<numres; res++) {
-    if ((resvalid == 0 || (int)valid[res] == 1)) {
-      int baseSamp = (int)((double)samps[res]+0.5) - (dim/2);
-      int baseLine = (int)((double)lines[res]+0.5) - (dim/2);
+    if ((resvalid == 0 || toInt(valid[res]) == 1)) {
+      int baseSamp = (int)(toDouble(samps[res]+0.5)) - (dim/2);
+      int baseLine = (int)(toDouble(lines[res]+0.5)) - (dim/2);
       brick.SetBasePosition(baseSamp,baseLine,1);
       cube.read(brick);
       if (action == "NULL") {

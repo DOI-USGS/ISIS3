@@ -8,9 +8,8 @@
 #include "Preference.h"
 #include "SpecialPixel.h"
 
+using namespace Isis;
 using namespace std;
-using Isis::Angle;
-using Isis::PI;
 
 class MyAngle : public Isis::Angle {
 public:

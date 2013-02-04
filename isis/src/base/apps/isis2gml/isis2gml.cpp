@@ -24,17 +24,17 @@ void IsisMain() {
 
   geos::geom::MultiPolygon *mPolygon = poly.Polys();
 
-  std::string polyString;
+  QString polyString;
 
   if(ui.WasEntered("LABEL")) {
-    string fid = ui.GetString("LABEL");
+    QString fid = ui.GetString("LABEL");
     polyString = PolygonTools::ToGML(mPolygon, fid);
   }
   else {
     polyString = PolygonTools::ToGML(mPolygon);
   }
 
-  string outfile;
+  QString outfile;
   ofstream fout;
   if(ui.WasEntered("TO")) {
     outfile = ui.GetFileName("TO");
@@ -45,7 +45,7 @@ void IsisMain() {
     inputFile.addExtension("gml");
     outfile = inputFile.name();
   }
-  fout.open(outfile.c_str());
+  fout.open(outfile.toAscii().data());
 
   fout << polyString << endl;
 

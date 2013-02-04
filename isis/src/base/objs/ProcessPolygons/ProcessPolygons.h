@@ -26,15 +26,15 @@ namespace Isis {
     public:
       ProcessPolygons();
 
-      void SetOutputCube(const std::string &parameter, const int nsamps,
+      void SetOutputCube(const QString &parameter, const int nsamps,
                          const int nlines, int nbands = 1);
 
-      void SetOutputCube(const std::string &avgFileName, const std::string
+      void SetOutputCube(const QString &avgFileName, const QString
                          &countFileName, Isis::CubeAttributeOutput &atts,
                          const int nsamps, const int nlines, int nbands = 1);
 
-      Isis::Cube *AppendOutputCube(const std::string &avgFileName,
-                                   const std::string &countFileName = "");
+      Isis::Cube *AppendOutputCube(const QString &avgFileName,
+                                   const QString &countFileName = "");
 
       void Rasterize(std::vector<double> &samples,
                      std::vector<double> &lines,

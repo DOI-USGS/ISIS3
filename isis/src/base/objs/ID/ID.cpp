@@ -30,24 +30,24 @@ namespace Isis {
    * @param basenum The number to start the count at. Defaults to
    *                one.
    */
-  ID::ID(const std::string &name, int basenum) {
+  ID::ID(const QString &name, int basenum) {
     p_current = basenum;
     p_namebase = name;
-    if(p_namebase.find("?", 0) == std::string::npos) {
-      std::string msg = "No replacement set in string [" + p_namebase + "]";
+    if(!p_namebase.contains("?")) {
+      QString msg = "No replacement set in string [" + p_namebase + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    p_numStart = ((int) p_namebase.find("?", 0));
-    int endPos = (int)p_namebase.find_last_of("?", p_namebase.size());
+    p_numStart = ((int) p_namebase.indexOf("?", 0));
+    int endPos = (int)p_namebase.lastIndexOf("?");
     p_numLength = (endPos - p_numStart) + 1;
-    std::string sub = p_namebase.substr(p_numStart, p_numLength);
+    QString sub = p_namebase.mid(p_numStart, p_numLength);
     for(int i = 0; i < (int)sub.length(); i++) {
       if(sub[i] != '?') {
-        std::string msg = "IString [" + p_namebase + "] contains more than one replacement set";
+        QString msg = "IString [" + p_namebase + "] contains more than one replacement set";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
-    p_namebase.erase(p_numStart, p_numLength);
+    p_namebase.remove(p_numStart, p_numLength);
   }
 
   /**
@@ -59,25 +59,25 @@ namespace Isis {
   /**
    * Returns the next ID in the sequence.
    *
-   * @return std::string The next ID in the sequence
+   * @return QString The next ID in the sequence
    */
-  std::string ID::Next() {
+  QString ID::Next() {
     IString num(p_current);
     if((int)num.size() > p_numLength) {
-      std::string replacement = "?";
+      QString replacement = "?";
       while((int)replacement.size() < p_numLength) {
         replacement += "?";
       }
-      std::string original = p_namebase;
+      QString original = p_namebase;
       original.insert(p_numStart, replacement);
-      std::string msg = "Maximum number reached for string [" + original + "]";
+      QString msg = "Maximum number reached for string [" + original + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     while((int)num.size() < p_numLength) {
       num = "0" + num;
     }
     p_current++;
-    std::string temp = p_namebase;
+    QString temp = p_namebase;
     return temp.insert((p_numStart), num.c_str());
   }
 

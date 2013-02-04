@@ -20,8 +20,8 @@ namespace Isis {
   WarningWidget::WarningWidget(QStatusBar *pParent): QObject(pParent) {
     mSBar = pParent;
 
-    std::string sToolIconDir = FileName("$base/icons").expanded();
-    QString qsIconFile(sToolIconDir.c_str());
+    QString sToolIconDir = FileName("$base/icons").expanded();
+    QString qsIconFile(sToolIconDir);
 
     // default Action - No warning
     mNoWarning = new QPushButton(mSBar);

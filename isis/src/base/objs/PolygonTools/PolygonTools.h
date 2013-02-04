@@ -22,9 +22,11 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include "geos/geom/GeometryFactory.h"
-#include "geos/geom/MultiPolygon.h"
-#include "geos/geom/CoordinateSequence.h"
+#include <geos/geom/GeometryFactory.h>
+#include <geos/geom/MultiPolygon.h>
+#include <geos/geom/CoordinateSequence.h>
+
+#include <QString>
 
 namespace Isis {
 
@@ -150,7 +152,7 @@ namespace Isis {
       static geos::geom::MultiPolygon *To180(geos::geom::MultiPolygon *poly360);
 
       //Return a polygon in GML format
-      static std::string ToGML(const geos::geom::MultiPolygon *mpolygon, std::string idString = "0");
+      static QString ToGML(const geos::geom::MultiPolygon *mpolygon, QString idString = QString("0"));
 
       //Return the thickness of a polygon
       static double Thickness(const geos::geom::MultiPolygon *mpolygon);
@@ -160,7 +162,7 @@ namespace Isis {
 
       static geos::geom::MultiPolygon *MakeMultiPolygon(const geos::geom::Geometry *geom);
 
-      static std::string GetGeometryName(const geos::geom::Geometry *geom);
+      static QString GetGeometryName(const geos::geom::Geometry *geom);
 
       static bool Equal(const geos::geom::MultiPolygon *poly1, const geos::geom::MultiPolygon *poly2);
       static bool Equal(const geos::geom::Polygon *poly1, const geos::geom::Polygon *poly2);

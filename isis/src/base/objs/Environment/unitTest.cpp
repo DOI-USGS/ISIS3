@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
   cerr << "userName: " << Environment::userName() << "\n";
   cerr << "hostName: " << Environment::hostName() << "\n";
   
-  IString cmd = "echo 'version:  isis" + Environment::isisVersion() + "' | cut -d . -f1";
+  QString cmd = "echo 'version:  isis" + Environment::isisVersion() + "' | cut -d . -f1";
   ProgramLauncher::RunSystemCommand(cmd);
 
   return 0;

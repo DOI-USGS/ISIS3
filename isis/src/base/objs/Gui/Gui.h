@@ -84,17 +84,17 @@ namespace Isis {
       
       static Gui *Create(Isis::UserInterface &ui, int &argc, char *argv[]);
 
-      void ProgressText(const std::string &text);
+      void ProgressText(const QString &text);
       void Progress(int percent);
 
       int Exec(void (*funct)());
       bool ProcessEvents();
 
-      void LoadMessage(const std::string &message);
+      void LoadMessage(const QString &message);
       int ShowWarning();
 
       void ShowLog() {};
-      void Log(const std::string &text);
+      void Log(const QString &text);
 
       Gui(Isis::UserInterface &ui);
       ~Gui();
@@ -139,7 +139,7 @@ namespace Isis {
       QAction *p_previousHistoryAction;
       QAction *p_nextHistoryAction;
 
-      QMap<std::string, QGridLayout *> p_grids;
+      QMap<QString, QGridLayout *> p_grids;
 
       std::vector<GuiParameter *> p_parameters;
 

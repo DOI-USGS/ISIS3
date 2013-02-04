@@ -23,13 +23,13 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
+#include <QString>
 #include <vector>
 #include <fstream>
-#include "tnt/tnt_array1d.h"
-#include "IString.h"
+#include <tnt/tnt_array1d.h>
 #include "CollectorMap.h"
 #include "IException.h"
+#include "IString.h"
 
 namespace Isis {
 
@@ -51,7 +51,7 @@ namespace Isis {
    * own list.
    *
    * This is a templated class that allows the user to select the token storage
-   * type.  This type, which defaults to the Isis::IString class (I will explain
+   * type.  This type, which defaults to the QString class (I will explain
    * the reason for this shortly), must provide a few features that are
    * explicitly used in providing support for tokenization.
    *
@@ -74,10 +74,10 @@ namespace Isis {
    *
    * @internal
    *   @history 2007-06-05 Brendan George - Modified to work with
-   *                           IString/StringTools merge
+   *                           QString/StringTools merge
    *   @history 2008-06-18 Christopher Austin - Fixed documentation
    */
-  template <typename TokenStore = IString>
+  template <typename TokenStore = QString>
   class CSVParser {
     public:
       typedef TokenStore              TokenType;  //!< Token storage type
@@ -95,13 +95,13 @@ namespace Isis {
        * words and indicate whether successive occurances of the delimiter
        * translates into a single value or they are taken as empty tokens.
        *
-       * @param str  IString to parse
+       * @param str  QString to parse
        * @param delimiter Character that separates individual tokens in the string
        * @param keepEmptyParts Specifies the occurance of successive tokens is to
        *                       treated as one token (false) or each delimiter
        *                       indicates an empty token (true)
        */
-      CSVParser(const std::string &str, const char &delimiter = ',',
+      CSVParser(const QString &str, const char &delimiter = ',',
                 bool keepEmptyParts = true) {
         parse(str, delimiter, keepEmptyParts);
       }
@@ -135,7 +135,7 @@ namespace Isis {
        * construction of this lightweight class, but this allows the same instance
        * to be resued.
        *
-       * @param str IString to parse into tokens separated by the delimiter
+       * @param str QString to parse into tokens separated by the delimiter
        * @param delimiter Character that separates each token in str
        * @param keepEmptyParts Specifies the occurance of successive tokens is to
        *                       treated as one token (false) or each delimiter
@@ -143,12 +143,12 @@ namespace Isis {
        *
        * @return int Number of tokens found/parsed in the input string
        */
-      int parse(const std::string &str, const char &delimiter = ',',
+      int parse(const QString &str, const char &delimiter = ',',
                 bool keepEmptyParts = true) {
-        std::vector<std::string> tokens;
-        IString::Split(delimiter, str, tokens, keepEmptyParts);
+        QStringList tokens =
+            str.split(delimiter, keepEmptyParts? QString::KeepEmptyParts : QString::SkipEmptyParts);
         TokenList slist(tokens.size());
-        for(unsigned int i = 0 ; i < tokens.size() ; i++) {
+        for(int i = 0 ; i < tokens.size() ; i++) {
           slist[i] = TokenType(tokens[i]);
         }
         _elements = slist;
@@ -218,7 +218,7 @@ namespace Isis {
    * well:
    * @code
    *  cout << "\n\nProcessing comma table...\n";
-   *  std::string csvfile("comma.csv");
+   *  QString csvfile("comma.csv");
    *  CSVReader csv(csvfile,true,2,','true);
    * @endcode
    *
@@ -226,7 +226,7 @@ namespace Isis {
    * as follows:
    * @code
    *  cout << "\n\nProcessing comma table using methods...\n";
-   *  std::string csvfile("comma.csv");
+   *  QString csvfile("comma.csv");
    *  CSVReader csv;
    *  csv.setSkip(2);
    *  csv.setHeader(true);
@@ -248,7 +248,7 @@ namespace Isis {
   class CSVReader {
 
     private:
-      typedef CSVParser<IString> Parser;    //!<  Defines single line parser
+      typedef CSVParser<QString> Parser;    //!<  Defines single line parser
 
     public:
       friend std::istream &operator>>(std::istream &is, CSVReader &csv);
@@ -262,7 +262,7 @@ namespace Isis {
 
       // Constructors and Destructor
       CSVReader();
-      CSVReader(const std::string &csvfile, bool header = false, int skip = 0,
+      CSVReader(const QString &csvfile, bool header = false, int skip = 0,
                 const char &delimiter = ',', const bool keepEmptyParts = true,
                 const bool ignoreComments = true);
 
@@ -449,12 +449,12 @@ namespace Isis {
         return (_keepParts);
       }
 
-      void read(const std::string &fname);
+      void read(const QString &fname);
 
       CSVAxis getHeader() const;
       CSVAxis getRow(int index) const;
       CSVAxis getColumn(int index) const;
-      CSVAxis getColumn(const std::string &hname) const;
+      CSVAxis getColumn(const QString &hname) const;
       CSVTable   getTable() const;
       bool isTableValid(const CSVTable &table) const;
 
@@ -473,7 +473,7 @@ namespace Isis {
       }
 
     private:
-      typedef std::vector<std::string> CSVList; //!< Input source line container
+      typedef std::vector<QString> CSVList; //!< Input source line container
       bool          _header;     //!<  Indicates presences of header
       int           _skip;       //!<  Number of lines to skip
       char          _delimiter;  //!<  Separator of values
@@ -511,9 +511,9 @@ namespace Isis {
    *   CSVReader::CSVDblVector dcol = csv.convert<double>(scol);
    * @endcode
    *
-   * At present, this class uses the Isis IString class as its token storage type
+   * At present, this class uses the Isis QString class as its token storage type
    * (TokenType).  All that is required is that it have a cast operator for a
-   * given type.  If the Isis IString class has the operator, it can be invoked
+   * given type.  If the Isis QString class has the operator, it can be invoked
    * for that type.  The precise statement used to convert the token to the
    * explict type is:
    * @code
@@ -536,7 +536,7 @@ namespace Isis {
     TNT::Array1D<T> out(data.dim());
     for(int i = 0 ; i < data.dim() ; i++) {
       Parser::TokenType s = data[i];
-      out[i] = (T) s;
+      out[i] = toDouble(s);
     }
     return (out);
   }

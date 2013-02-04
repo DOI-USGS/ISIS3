@@ -1,5 +1,10 @@
 #include "Isis.h"
 
+#include <algorithm>
+#include <stdio.h>
+
+#include <QFile>
+
 #include "Brick.h"
 #include "EndianSwapper.h"
 #include "FileName.h"
@@ -11,9 +16,6 @@
 #include "Pvl.h"
 #include "Table.h"
 #include "UserInterface.h"
-
-#include <algorithm>
-#include <stdio.h>
 
 using namespace std;
 using namespace Isis;
@@ -28,7 +30,7 @@ typedef struct {
 
 enum VimsType { VIS, IR };
 
-void ReadVimsBIL(std::string inFile, const PvlKeyword &suffixItems, std::string outFile);
+void ReadVimsBIL(QString inFile, const PvlKeyword &suffixItems, QString outFile);
 void TranslateVimsLabels(Pvl &pdsLab, Cube *vimscube, VimsType vType);
 void ProcessCube(Buffer &in, Buffer &out);
 void ProcessBands(Pvl &pdsLab, Cube *vimscube, VimsType vtype);
@@ -45,7 +47,7 @@ void IsisMain() {
 
   //Checks if in file is rdr
   if(lab.HasObject("IMAGE_MAP_PROJECTION")) {
-    string msg = "[" + in.name() + "] appears to be an rdr file.";
+    QString msg = "[" + in.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -53,18 +55,16 @@ void IsisMain() {
   //Make sure it is a vims cube
   try {
     PvlObject qube(lab.FindObject("QUBE"));
-    IString id;
-    id = (string)qube["INSTRUMENT_ID"];
-    id.ConvertWhiteSpace();
-    id.Compress();
-    id.Trim(" ");
+    QString id;
+    id = (QString)qube["INSTRUMENT_ID"];
+    id = id.simplified().trimmed();
     if(id != "VIMS") {
-      string msg = "Invalid INSTRUMENT_ID [" + id + "]";
+      QString msg = "Invalid INSTRUMENT_ID [" + id + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
   catch(IException &e) {
-    string msg = "Input file [" + in.expanded() +
+    QString msg = "Input file [" + in.expanded() +
                  "] does not appear to be " +
                  "in VIMS EDR/RDR format";
     throw IException(IException::Io, msg, _FILEINFO_);
@@ -74,7 +74,7 @@ void IsisMain() {
   Pvl pdsLab(in.expanded());
 
   // It's VIMS, let's figure out if it has the suffix data or not
-  if((int)lab.FindObject("QUBE")["SUFFIX_ITEMS"][0] == 0) {
+  if(toInt(lab.FindObject("QUBE")["SUFFIX_ITEMS"][0]) == 0) {
     // No suffix data, we can use processimportpds
     ProcessImportPds p;
 
@@ -135,8 +135,8 @@ void IsisMain() {
   Application::Log(status);
 
   //Clean up
-  string tmp(tempname.expanded());
-  remove(tmp.c_str());
+  QString tmp(tempname.expanded());
+  QFile::remove(tmp);
 }
 
 /**
@@ -155,9 +155,9 @@ void IsisMain() {
  * @param inFileName FileName of the input file
  * @param outFile FileName of the output file
  */
-void ReadVimsBIL(std::string inFileName, const PvlKeyword &suffixItems, std::string outFile) {
+void ReadVimsBIL(QString inFileName, const PvlKeyword &suffixItems, QString outFile) {
   Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
-  string transDir = (string) dataDir["Base"];
+  QString transDir = (QString) dataDir["Base"];
 
   Pvl pdsLabel(inFileName);
   Isis::FileName transFile(transDir + "/" + "translations/pdsQube.trn");
@@ -178,9 +178,9 @@ void ReadVimsBIL(std::string inFileName, const PvlKeyword &suffixItems, std::str
   sideplaneVisTable.SetAssociation(Table::Lines);
   sideplaneIrTable.SetAssociation(Table::Lines);
 
-  Isis::IString str;
+  QString str;
   str = pdsXlater.Translate("CoreBitsPerPixel");
-  int bitsPerPixel = str.ToInteger();
+  int bitsPerPixel = toInt(str);
   str = pdsXlater.Translate("CorePixelType");
   PixelType pixelType = Isis::Real;
 
@@ -209,8 +209,8 @@ void ReadVimsBIL(std::string inFileName, const PvlKeyword &suffixItems, std::str
     pixelType = Isis::UnsignedInteger;
   }
   else {
-    string msg = "Invalid PixelType and BitsPerPixel combination [" + str +
-                 ", " + Isis::IString(bitsPerPixel) + "]";
+    QString msg = "Invalid PixelType and BitsPerPixel combination [" + str +
+                 ", " + toString(bitsPerPixel) + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
@@ -218,21 +218,21 @@ void ReadVimsBIL(std::string inFileName, const PvlKeyword &suffixItems, std::str
   Isis::ByteOrder byteOrder = Isis::ByteOrderEnumeration(str);
 
   str = pdsXlater.Translate("CoreSamples", 0);
-  int ns = str.ToInteger();
+  int ns = toInt(str);
   str = pdsXlater.Translate("CoreLines", 2);
-  int nl = str.ToInteger();
+  int nl = toInt(str);
   str = pdsXlater.Translate("CoreBands", 1);
-  int nb = str.ToInteger();
+  int nb = toInt(str);
 
   std::vector<double> baseList;
   std::vector<double> multList;
 
   str = pdsXlater.Translate("CoreBase");
   baseList.clear();
-  baseList.push_back(str.ToDouble());
+  baseList.push_back(toDouble(str));
   str = pdsXlater.Translate("CoreMultiplier");
   multList.clear();
-  multList.push_back(str.ToDouble());
+  multList.push_back(toDouble(str));
 
   Cube outCube;
   outCube.setPixelType(Isis::Real);
@@ -245,16 +245,16 @@ void ReadVimsBIL(std::string inFileName, const PvlKeyword &suffixItems, std::str
   char *in = new char [readBytes];
 
   // Set up an Isis::EndianSwapper object
-  Isis::IString tok(Isis::ByteOrderName(byteOrder));
-  tok.UpCase();
+  QString tok(Isis::ByteOrderName(byteOrder));
+  tok = tok.toUpper();
   Isis::EndianSwapper swapper(tok);
 
   ifstream fin;
   // Open input file
   Isis::FileName inFile(inFileName);
-  fin.open(inFileName.c_str(), ios::in | ios::binary);
+  fin.open(inFileName.toAscii().data(), ios::in | ios::binary);
   if(!fin.is_open()) {
-    string msg = "Cannot open input file [" + inFileName + "]";
+    QString msg = "Cannot open input file [" + inFileName + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
@@ -267,9 +267,9 @@ void ReadVimsBIL(std::string inFileName, const PvlKeyword &suffixItems, std::str
 
   // Check the last io
   if(!fin.good()) {
-    string msg = "Cannot read file [" + inFileName + "]. Position [" +
-                 Isis::IString((int)pos) + "]. Byte count [" +
-                 Isis::IString(fileHeaderBytes) + "]" ;
+    QString msg = "Cannot read file [" + inFileName + "]. Position [" +
+                 toString((int)pos) + "]. Byte count [" +
+                 toString(fileHeaderBytes) + "]" ;
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
@@ -296,9 +296,9 @@ void ReadVimsBIL(std::string inFileName, const PvlKeyword &suffixItems, std::str
       fin.read(in, readBytes);
 
       if(!fin.good()) {
-        string msg = "Cannot read file [" + inFileName + "]. Position [" +
-                     Isis::IString((int)pos) + "]. Byte count [" +
-                     Isis::IString(readBytes) + "]" ;
+        QString msg = "Cannot read file [" + inFileName + "]. Position [" +
+                     toString((int)pos) + "]. Byte count [" +
+                     toString(readBytes) + "]" ;
         throw IException(IException::Io, msg, _FILEINFO_);
       }
 
@@ -334,10 +334,10 @@ void ReadVimsBIL(std::string inFileName, const PvlKeyword &suffixItems, std::str
       out.SetBasePosition(1, line + 1, band + 1);
       outCube.write(out);
 
-      if((int)suffixItems[0] != 0) {
+      if(toInt(suffixItems[0]) != 0) {
         pos = fin.tellg();
-        char *sideplaneData = new char[4*(int)suffixItems[0]];
-        fin.read(sideplaneData, 4 * (int)suffixItems[0]);
+        char *sideplaneData = new char[4*toInt(suffixItems[0])];
+        fin.read(sideplaneData, 4 * toInt(suffixItems[0]));
         int suffixData = (int)swapper.Int((int *)sideplaneData);
         record[0] = line + 1;
         record[1] = band + 1;
@@ -369,22 +369,22 @@ void ReadVimsBIL(std::string inFileName, const PvlKeyword &suffixItems, std::str
 
         // Check the last io
         if(!fin.good()) {
-          string msg = "Cannot read file [" + inFileName + "]. Position [" +
-                       Isis::IString((int)pos) + "]. Byte count [" +
-                       Isis::IString(4) + "]" ;
+          QString msg = "Cannot read file [" + inFileName + "]. Position [" +
+                       toString((int)pos) + "]. Byte count [" +
+                       toString(4) + "]" ;
           throw IException(IException::Io, msg, _FILEINFO_);
         }
       }
     } // End band loop
 
-    int backplaneSize = (int)suffixItems[1] * (4 * (ns + (int)suffixItems[0]));
+    int backplaneSize = toInt(suffixItems[1]) * (4 * (ns + toInt(suffixItems[0])));
     fin.seekg(backplaneSize, ios_base::cur);
 
     // Check the last io
     if(!fin.good()) {
-      string msg = "Cannot read file [" + inFileName + "]. Position [" +
-                   Isis::IString((int)pos) + "]. Byte count [" +
-                   Isis::IString(4 * (4 * ns + 4)) + "]" ;
+      QString msg = "Cannot read file [" + inFileName + "]. Position [" +
+                   toString((int)pos) + "]. Byte count [" +
+                   toString(4 * (4 * ns + 4)) + "]" ;
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
@@ -449,13 +449,13 @@ void ProcessBands(Pvl &pdsLab, Cube *vimsCube, VimsType vtype) {
   PvlGroup bandbin("BandBin");
   PvlKeyword originalBand("OriginalBand");
   for(int i = vims.mi32OrigBandStart; i <= vims.mi32OrigBinEnd; i++) {
-    originalBand.AddValue(i);
+    originalBand.AddValue(toString(i));
   }
   bandbin += originalBand;
   PvlKeyword center("Center");
   PvlGroup bbin(qube.FindGroup("BandBin"));
   for(int i = vims.mi32BandCenterStart; i < vims.mi32BandCenterEnd; i++) {
-    center += (string) bbin["BandBinCenter"][i];
+    center += (QString) bbin["BandBinCenter"][i];
   }
   bandbin += center;
 
@@ -463,7 +463,7 @@ void ProcessBands(Pvl &pdsLab, Cube *vimsCube, VimsType vtype) {
 
   //Create the Kernels Group
   PvlGroup kern("Kernels");
-  kern += PvlKeyword("NaifFrameCode", vims.mi32NaifFrameCode);
+  kern += PvlKeyword("NaifFrameCode", toString(vims.mi32NaifFrameCode));
   vimsCube->putGroup(kern);
 }
 
@@ -485,7 +485,7 @@ void ProcessBands(Pvl &pdsLab, Cube *vimsCube, VimsType vtype) {
 void TranslateVimsLabels(Pvl &pdsLab, Cube *vimscube, VimsType vType) {
 
   Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
-  string transDir = (string) dataDir["Cassini"];
+  QString transDir = (QString) dataDir["Cassini"];
 
   Isis::FileName transFile(transDir + "/" + "translations/vimsPds.trn");
   PvlObject qube(pdsLab.FindObject("Qube"));
@@ -499,16 +499,16 @@ void TranslateVimsLabels(Pvl &pdsLab, Cube *vimscube, VimsType vType) {
   PvlGroup &inst = outputLabel.FindGroup("Instrument", Pvl::Traverse);
 
   //trim start and stop time
-  string strTime = inst.FindKeyword("StartTime")[0];
-  inst.FindKeyword("StartTime").SetValue((string)((IString)strTime).Trim("Z"));
-  strTime = (string)qube["StopTime"];
-  inst.FindKeyword("StopTime").SetValue((string)((IString)strTime).Trim("Z"));
+  QString strTime = inst.FindKeyword("StartTime")[0];
+  inst.FindKeyword("StartTime").SetValue(strTime.remove("Z"));
+  strTime = (QString)qube["StopTime"];
+  inst.FindKeyword("StopTime").SetValue(strTime.remove("Z"));
 
   if(vType == IR) {
-    inst += PvlKeyword("SamplingMode", (string)qube["SamplingModeId"][0]);
+    inst += PvlKeyword("SamplingMode", (QString)qube["SamplingModeId"][0]);
   }
   else {
-    inst += PvlKeyword("SamplingMode", (string)qube["SamplingModeId"][1]);
+    inst += PvlKeyword("SamplingMode", (QString)qube["SamplingModeId"][1]);
   }
   if(vType == VIS) {
     inst += PvlKeyword("Channel", "VIS");
@@ -523,10 +523,10 @@ void TranslateVimsLabels(Pvl &pdsLab, Cube *vimscube, VimsType vType) {
   inst += expDuration;
 
   if(vType == IR) {
-    inst += PvlKeyword("GainMode", (string)qube["GainModeId"][0]);
+    inst += PvlKeyword("GainMode", (QString)qube["GainModeId"][0]);
   }
   else {
-    inst += PvlKeyword("GainMode", (string)qube["GainModeId"][1]);
+    inst += PvlKeyword("GainMode", (QString)qube["GainModeId"][1]);
   }
 
   vimscube->putGroup(inst);

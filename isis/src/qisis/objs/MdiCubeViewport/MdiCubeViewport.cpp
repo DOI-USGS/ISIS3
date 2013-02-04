@@ -41,8 +41,8 @@ namespace Isis {
       QWidget *parent) : CubeViewport(cube, cdt, parent) {
     p_linked = false;
 
-    string unlinkedIcon = FileName("$base/icons/unlinked.png").expanded();
-    static QIcon unlinked(unlinkedIcon.c_str());
+    QString unlinkedIcon = FileName("$base/icons/unlinked.png").expanded();
+    static QIcon unlinked(unlinkedIcon);
     parentWidget()->setWindowIcon(unlinked);
 
   }
@@ -71,10 +71,10 @@ namespace Isis {
     if(!parentWidget() || !parentWidget()->parentWidget())
       return;
 
-    string unlinkedIcon = FileName("$base/icons/unlinked.png").expanded();
-    static QIcon unlinked(unlinkedIcon.c_str());
-    string linkedIcon = FileName("$base/icons/linked.png").expanded();
-    static QIcon linked(linkedIcon.c_str());
+    QString unlinkedIcon = FileName("$base/icons/unlinked.png").expanded();
+    static QIcon unlinked(unlinkedIcon);
+    QString linkedIcon = FileName("$base/icons/linked.png").expanded();
+    static QIcon linked(linkedIcon);
 
     bool notify = false;
     if(b != p_linked)

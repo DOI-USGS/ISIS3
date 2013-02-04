@@ -24,7 +24,7 @@
 #ifndef Message_h
 #define Message_h
 
-#include <string>
+#include <QString>
 #include <vector>
 
 namespace Isis {
@@ -32,17 +32,16 @@ namespace Isis {
   *    isis/src/docsys/Object/build/isisDoxyDefs.doxydef
   */
   namespace Message {
-    using namespace std;
     /**
      * This error should be used when an Isis object or application is checking
      * array bounds and the legal range has been violated.
      *
      * @param index - Array index which is out of bounds
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string ArraySubscriptNotInRange(const int index);
+    QString ArraySubscriptNotInRange(int index);
 
     /**
      * This error should be used when a supplied keyword for an Isis application
@@ -51,10 +50,10 @@ namespace Isis {
      *
      * @param key - The name of the keyword which is ambiguous
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string KeywordAmbiguous(const string &key);
+    QString KeywordAmbiguous(const QString &key);
 
     /**
      * This error should be used when a supplied keyword for an Isis application
@@ -62,10 +61,10 @@ namespace Isis {
      *
      * @param key - The name of the keyword which is unrecognized
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string KeywordUnrecognized(const string &key);
+    QString KeywordUnrecognized(const QString &key);
 
     /**
      * This error should be used when a supplied keyword for an Isis application
@@ -73,10 +72,10 @@ namespace Isis {
      *
      * @param key - The name of the keyword which has been duplicated
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string KeywordDuplicated(const string &key);
+    QString KeywordDuplicated(const QString &key);
 
     /**
      * This error should be used when a supplied keyword is being used as an
@@ -84,10 +83,10 @@ namespace Isis {
      *
      * @param key - The name of the keyword which is not an array
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string KeywordNotArray(const string &key);
+    QString KeywordNotArray(const QString &key);
 
     /**
      * This error should be used when a supplied keyword is not defined in the
@@ -95,42 +94,42 @@ namespace Isis {
      *
      * @param key - The name of the keyword which was not found
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string KeywordNotFound(const string &key);
+    QString KeywordNotFound(const QString &key);
 
     /**
      * This error has been deprecated and should not be used in new code.
      *
      * @param block - The name of the invalid keyword block
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string KeywordBlockInvalid(const string &block);
+    QString KeywordBlockInvalid(const QString &block);
 
     /**
      * This error has been deprecated and should not be used in new code.
      *
      * @param block - The name of the block with the missing start tag
-     * @param found - The string found in the place of the missing block start
+     * @param found - The QString found in the place of the missing block start
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string KeywordBlockStartMissing(const string &block, const string &found);
+    QString KeywordBlockStartMissing(const QString &block, const QString &found);
 
     /**
      * This error has been deprecated and should not be used in new code.
      *
      * @param block - The name of the block with the missing end tag
-     * @param found - The string found in the place of the missing block end
+     * @param found - The QString found in the place of the missing block end
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string KeywordBlockEndMissing(const string &block, const string &found);
+    QString KeywordBlockEndMissing(const QString &block, const QString &found);
 
     /**
      * This error should be used when a supplied keyword does not appear in
@@ -138,10 +137,10 @@ namespace Isis {
      *
      * @param key - The name of the keyword which is bad
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string KeywordValueBad(const string &key);
+    QString KeywordValueBad(const QString &key);
 
     /**
      * This error should be used when the value of a supplied keyword is
@@ -150,10 +149,10 @@ namespace Isis {
      * @param key - The keyword name which is bad
      * @param value - The value of the keyword which is bad
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string KeywordValueBad(const string &key, const string &value);
+    QString KeywordValueBad(const QString &key, const QString &value);
 
     /**
      * This error should be used when the value of a supplied keyword was
@@ -161,10 +160,10 @@ namespace Isis {
      *
      * @param key - The keyword name which is bad
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string KeywordValueExpected(const string &key);
+    QString KeywordValueExpected(const QString &key);
 
     /**
      * This error should be used when the value of a supplied keyword is
@@ -173,13 +172,13 @@ namespace Isis {
      * @param key - The keyword name which has a bad value
      * @param value - The value of the keyword
      * @param range - The minimum and maximum allowed values for the keyword
-     *                formatted and inserted into a string
+     *                formatted and inserted into a QString
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string KeywordValueNotInRange(const string &key, const string &value,
-                                  const string &range);
+    QString KeywordValueNotInRange(const QString &key, const QString &value,
+                                  const QString &range);
 
     /**
      * This error should be used when the value of a supplied keyword is
@@ -189,21 +188,21 @@ namespace Isis {
      * @param value - The value of the keyword
      * @param list - A vector of all the legal values for the keyword
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string KeywordValueNotInList(const string &key, const string &value,
-                                 const vector<string> &list);
+    QString KeywordValueNotInList(const QString &key, const QString &value,
+                                  const std::vector<QString> &list);
 
     /**
      * This error should be used when a delimiter is missing.
      *
      * @param delimiter - The delimiter that is missing
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string MissingDelimiter(const char delimiter);
+    QString MissingDelimiter(const char delimiter);
 
     /**
      * This error should be used when a delimiter is missing.
@@ -211,59 +210,59 @@ namespace Isis {
      * @param delimiter - The delimiter that is missing
      * @param near - The value the missing delimiter is near
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string MissingDelimiter(const char delimiter, const string &near);
+    QString MissingDelimiter(const char delimiter, const QString &near);
 
     /**
      * This error should be used when a file could not be opened.
      *
      * @param filename - The name of the file
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string FileOpen(const string &filename);
+    QString FileOpen(const QString &filename);
 
     /**
      * This error should be used when a file could not be created.
      *
      * @param filename - The name of the file
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string FileCreate(const string &filename);
+    QString FileCreate(const QString &filename);
 
     /**
      * This error should be used when an error accrues during a read of a file.
      *
      * @param filename - The name of the file
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string FileRead(const string &filename);
+    QString FileRead(const QString &filename);
 
     /**
      * This error should be used when an error accrues during a write to a file.
      *
      * @param filename - The name of the file
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string FileWrite(const string &filename);
+    QString FileWrite(const QString &filename);
 
     /**
      * This error should be used when an error accrues during a memory
      * allocation such as "new".
      *
-     * @return string - A standardized Isis error message with the parameter
+     * @return QString - A standardized Isis error message with the parameter
      *                  inserted
      */
-    string MemoryAllocationFailed();
+    QString MemoryAllocationFailed();
   }
 }
 

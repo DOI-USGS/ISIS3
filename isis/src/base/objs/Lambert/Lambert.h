@@ -1,4 +1,4 @@
-#if !defined(Lambert_h)
+#ifndef Lambert_h
 #define Lambert_h
 /**
  * @file

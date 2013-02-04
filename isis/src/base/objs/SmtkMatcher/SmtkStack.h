@@ -1,4 +1,4 @@
-#if !defined(SmtkStack_h)
+#ifndef SmtkStack_h
 #define SmtkStack_h
 
 /**                                                                       

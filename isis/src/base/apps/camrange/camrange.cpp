@@ -29,16 +29,16 @@ void IsisMain() {
   PvlGroup target("Target");
   target += PvlKeyword("From", ui.GetFileName("FROM"));
   target += PvlKeyword("TargetName", cam->target()->name());
-  target += PvlKeyword("RadiusA", radii[0].meters(), "meters");
-  target += PvlKeyword("RadiusB", radii[1].meters(), "meters");
-  target += PvlKeyword("RadiusC", radii[2].meters(), "meters");
+  target += PvlKeyword("RadiusA", toString(radii[0].meters()), "meters");
+  target += PvlKeyword("RadiusB", toString(radii[1].meters()), "meters");
+  target += PvlKeyword("RadiusC", toString(radii[2].meters()), "meters");
 
   // Get resolution
   PvlGroup res("PixelResolution");
   double lowres = cam->LowestImageResolution();
   double hires = cam->HighestImageResolution();
-  res += PvlKeyword("Lowest", lowres, "meters");
-  res += PvlKeyword("Highest", hires, "meters");
+  res += PvlKeyword("Lowest", toString(lowres), "meters");
+  res += PvlKeyword("Highest", toString(hires), "meters");
 
   // Get the universal ground range
   PvlGroup ugr("UniversalGroundRange");
@@ -46,11 +46,11 @@ void IsisMain() {
   cam->GroundRange(minlat, maxlat, minlon, maxlon, mapping);
   ugr += PvlKeyword("LatitudeType", "Planetocentric");
   ugr += PvlKeyword("LongitudeDirection", "PositiveEast");
-  ugr += PvlKeyword("LongitudeDomain", 360);
-  ugr += PvlKeyword("MinimumLatitude", minlat);
-  ugr += PvlKeyword("MaximumLatitude", maxlat);
-  ugr += PvlKeyword("MinimumLongitude", minlon);
-  ugr += PvlKeyword("MaximumLongitude", maxlon);
+  ugr += PvlKeyword("LongitudeDomain", "360");
+  ugr += PvlKeyword("MinimumLatitude", toString(minlat));
+  ugr += PvlKeyword("MaximumLatitude", toString(maxlat));
+  ugr += PvlKeyword("MinimumLongitude", toString(minlon));
+  ugr += PvlKeyword("MaximumLongitude", toString(maxlon));
 
   // Get the ographic latitude range
   mapgrp.AddKeyword(PvlKeyword("LatitudeType", "Planetographic"),
@@ -58,8 +58,8 @@ void IsisMain() {
   cam->GroundRange(minlat, maxlat, minlon, maxlon, mapping);
   PvlGroup ogr("LatitudeRange");
   ogr += PvlKeyword("LatitudeType", "Planetographic");
-  ogr += PvlKeyword("MinimumLatitude", minlat);
-  ogr += PvlKeyword("MaximumLatitude", maxlat);
+  ogr += PvlKeyword("MinimumLatitude", toString(minlat));
+  ogr += PvlKeyword("MaximumLatitude", toString(maxlat));
 
   // Get positive west longitude coordinates in 360 domain
   mapgrp.AddKeyword(PvlKeyword("LongitudeDirection", "PositiveWest"),
@@ -67,9 +67,9 @@ void IsisMain() {
   cam->GroundRange(minlat, maxlat, minlon, maxlon, mapping);
   PvlGroup pos360("PositiveWest360");
   pos360 += PvlKeyword("LongitudeDirection", "PositiveWest");
-  pos360 += PvlKeyword("LongitudeDomain", 360);
-  pos360 += PvlKeyword("MinimumLongitude", minlon);
-  pos360 += PvlKeyword("MaximumLongitude", maxlon);
+  pos360 += PvlKeyword("LongitudeDomain", "360");
+  pos360 += PvlKeyword("MinimumLongitude", toString(minlon));
+  pos360 += PvlKeyword("MaximumLongitude", toString(maxlon));
 
   // Get positive east longitude coordinates in 180 domain
   mapgrp.AddKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"),
@@ -79,9 +79,9 @@ void IsisMain() {
   cam->GroundRange(minlat, maxlat, minlon, maxlon, mapping);
   PvlGroup pos180("PositiveEast180");
   pos180 += PvlKeyword("LongitudeDirection", "PositiveEast");
-  pos180 += PvlKeyword("LongitudeDomain", 180);
-  pos180 += PvlKeyword("MinimumLongitude", minlon);
-  pos180 += PvlKeyword("MaximumLongitude", maxlon);
+  pos180 += PvlKeyword("LongitudeDomain", "180");
+  pos180 += PvlKeyword("MinimumLongitude", toString(minlon));
+  pos180 += PvlKeyword("MaximumLongitude", toString(maxlon));
 
   // Get positive west longitude coordinates in 180 domain
   mapgrp.AddKeyword(PvlKeyword("LongitudeDirection", "PositiveWest"),
@@ -89,9 +89,9 @@ void IsisMain() {
   cam->GroundRange(minlat, maxlat, minlon, maxlon, mapping);
   PvlGroup neg180("PositiveWest180");
   neg180 += PvlKeyword("LongitudeDirection", "PositiveWest");
-  neg180 += PvlKeyword("LongitudeDomain", 180);
-  neg180 += PvlKeyword("MinimumLongitude", minlon);
-  neg180 += PvlKeyword("MaximumLongitude", maxlon);
+  neg180 += PvlKeyword("LongitudeDomain", "180");
+  neg180 += PvlKeyword("MinimumLongitude", toString(minlon));
+  neg180 += PvlKeyword("MaximumLongitude", toString(maxlon));
 
   // Write it to the log
   Application::Log(target);

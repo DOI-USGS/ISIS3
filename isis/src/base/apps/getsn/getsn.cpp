@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <sstream>
-#include <string>
+#include <QString>
 
 #include "Blob.h"
 #include "Cube.h"
@@ -25,7 +25,7 @@ void IsisMain() {
   // Open the input cube
   UserInterface &ui = Application::GetUserInterface();
   Cube cube;
-  string from = ui.GetFileName("FROM");
+  QString from = ui.GetFileName("FROM");
   cube.open(from, "r");
 
   // Determine if output should be written base on parameters
@@ -33,7 +33,7 @@ void IsisMain() {
   bool WriteSN = ui.GetBoolean("SN");
   bool WriteObservation = ui.GetBoolean("OBSERVATION");
 
-  string format = ui.GetString("FORMAT");
+  QString format = ui.GetString("FORMAT");
   bool pvl = true;
   if (format == "PVL") {
     pvl = true;
@@ -42,7 +42,7 @@ void IsisMain() {
     pvl = false;
   }
   else {
-    string msg = "Invalid format string [" + format + "]";
+    QString msg = "Invalid format QString [" + format + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -72,8 +72,8 @@ void IsisMain() {
       // Open in append or overwrite
       TextFile txt(ui.GetFileName("TO"), append ? "append" : "overwrite");
 
-      // Build string
-      string line = "";
+      // Build QString
+      QString line = "";
       for (int i = 0; i < sn.Keywords(); i++) {
         if (i != 0)
           line += ",";

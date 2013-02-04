@@ -193,7 +193,7 @@ namespace Isis {
        *
        * @return string The name of the map projection.
        */
-      virtual std::string Name() const = 0;
+      virtual QString Name() const = 0;
 
       // These return properties of the target
       virtual double LocalRadius() const = 0; // requires SetGround or SetCoordinate
@@ -204,9 +204,8 @@ namespace Isis {
        *
        * @return string The Version number of the map projection.
        */
-      virtual std::string Version() const = 0;
+      virtual QString Version() const = 0;
       virtual bool IsEquatorialCylindrical();
-
 
       // Check azimuth /longitude domain or get domain as a string  
       // TODO** check implementation to see if this can be generalized to
@@ -215,7 +214,7 @@ namespace Isis {
       // Check longitude domain or get longitude domain as a string
       /*      bool Has180Domain() const;
       bool Has360Domain() const;
-      std::string LongitudeDomainString() const;
+      QString LongitudeDomainString() const;
       */
 
       // Check if labels contain min/max lat/lon or comparable
@@ -272,8 +271,8 @@ namespace Isis {
 
       // Static conversion methods
       static double ToHours(double angle);
-      static std::string ToDMS(double angle);
-      static std::string ToHMS(double angle);
+      static QString ToDMS(double angle);
+      static QString ToHMS(double angle);
  
     protected:
       virtual void XYRangeCheck(const double latitude, const double longitude) = 0;

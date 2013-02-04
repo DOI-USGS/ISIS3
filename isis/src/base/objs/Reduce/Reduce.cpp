@@ -97,16 +97,16 @@ namespace Isis {
     // Information will be added to it if the Mapping or Instrument
     // groups are deleted from the output image label
     PvlGroup resultsGrp("Results");
-    resultsGrp += PvlKeyword("InputLines",      miInputLines);
-    resultsGrp += PvlKeyword("InputSamples",    miInputSamples);
-    resultsGrp += PvlKeyword("StartingLine",    miStartLine);
-    resultsGrp += PvlKeyword("StartingSample",  miStartSample);
-    resultsGrp += PvlKeyword("EndingLine",      miEndLine);
-    resultsGrp += PvlKeyword("EndingSample",    miEndSample);
-    resultsGrp += PvlKeyword("LineIncrement",   mdLineScale);
-    resultsGrp += PvlKeyword("SampleIncrement", mdSampleScale);
-    resultsGrp += PvlKeyword("OutputLines",     miOutputSamples);
-    resultsGrp += PvlKeyword("OutputSamples",   miOutputLines);
+    resultsGrp += PvlKeyword("InputLines",      toString(miInputLines));
+    resultsGrp += PvlKeyword("InputSamples",    toString(miInputSamples));
+    resultsGrp += PvlKeyword("StartingLine",    toString(miStartLine));
+    resultsGrp += PvlKeyword("StartingSample",  toString(miStartSample));
+    resultsGrp += PvlKeyword("EndingLine",      toString(miEndLine));
+    resultsGrp += PvlKeyword("EndingSample",    toString(miEndSample));
+    resultsGrp += PvlKeyword("LineIncrement",   toString(mdLineScale));
+    resultsGrp += PvlKeyword("SampleIncrement", toString(mdSampleScale));
+    resultsGrp += PvlKeyword("OutputLines",     toString(miOutputSamples));
+    resultsGrp += PvlKeyword("OutputSamples",   toString(miOutputLines));
    
     Isis::SubArea subArea;
     subArea.SetSubArea(mInCube->getLineCount(), mInCube->getSampleCount(), miStartLine, miStartSample, 

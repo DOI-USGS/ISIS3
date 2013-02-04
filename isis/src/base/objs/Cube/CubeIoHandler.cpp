@@ -122,9 +122,9 @@ namespace Isis {
       const PvlObject &core = label.FindObject("IsisCube").FindObject("Core");
       const PvlGroup &pixelGroup = core.FindGroup("Pixels");
 
-      IString byteOrderStr = pixelGroup.FindKeyword("ByteOrder")[0];
+      QString byteOrderStr = pixelGroup.FindKeyword("ByteOrder")[0];
       m_byteSwapper = new EndianSwapper(
-          byteOrderStr.UpCase());
+          byteOrderStr.toUpper());
       m_base = pixelGroup.FindKeyword("Base");
       m_multiplier = pixelGroup.FindKeyword("Multiplier");
       m_pixelType = PixelTypeEnumeration(pixelGroup.FindKeyword("Type"));

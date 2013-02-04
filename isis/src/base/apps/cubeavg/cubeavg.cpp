@@ -41,21 +41,21 @@ void IsisMain() {
         std::vector<double> widths;
         widths.resize(icube->getBandCount());
         for(int i = 0; i < pvlCenter.Size(); i++) {
-          centers[i] = pvlCenter[i];
+          centers[i] = toDouble(pvlCenter[i]);
           if(hasWidth)
-            widths[i] = (*pvlWidth)[i];
+            widths[i] = toDouble((*pvlWidth)[i]);
           else
             widths[i] = 0.0;
         }
         compute(centers, widths, ocube);
       }
       else {
-        string message = "The BandBin in your input cube does not have a Center value.";
+        QString message = "The BandBin in your input cube does not have a Center value.";
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
     else {
-      string message = "There is not a BandBin Group in the input cube.";
+      QString message = "There is not a BandBin Group in the input cube.";
       throw IException(IException::User, message, _FILEINFO_);
     }
   }
@@ -70,7 +70,7 @@ void IsisMain() {
       pvlg = ocube->getGroup("BandBin");
       removekeywords(pvlg);
     }
-    string Units = "";
+    QString Units = "";
     PvlKeyword pvlCenter;
     if(pvlg.HasKeyword("Center")) {
       pvlCenter = pvlg.FindKeyword("Center");
@@ -134,7 +134,7 @@ void compute(vector<double> centers, vector<double> widths,
              Cube *ocube) {
   PvlGroup &pvlg = ocube->getGroup("BandBin");
   PvlKeyword &pvlCenter = pvlg.FindKeyword("Center");
-  string centerUnit = pvlCenter.Unit();
+  QString centerUnit = pvlCenter.Unit();
   bool hasWidth  = pvlg.HasKeyword("Width");
   double large = centers[0] + widths[0] / 2;
   double small = centers[0] - widths[0] / 2;
@@ -146,14 +146,14 @@ void compute(vector<double> centers, vector<double> widths,
       small = (double)centers[i] - (double)widths[i] / 2.0;
     }
   }
-  pvlCenter.SetValue(IString((large - small) / 2 + small), centerUnit);
+  pvlCenter.SetValue(toString((large - small) / 2 + small), centerUnit);
   if(hasWidth) {
     PvlKeyword &pvlWidth  = pvlg.FindKeyword("Width");
-    pvlWidth.SetValue(large - small, pvlWidth.Unit());
+    pvlWidth.SetValue(toString(large - small), pvlWidth.Unit());
   }
   else {
     PvlKeyword pvlWidth = PvlKeyword("Width");
-    pvlWidth.SetValue(large - small, centerUnit);
+    pvlWidth.SetValue(toString(large - small), centerUnit);
     pvlg.AddKeyword(pvlWidth);
   }
 

@@ -129,7 +129,7 @@ namespace Isis {
 
   class UserInterface : public IsisAml {
     public:
-      UserInterface(const std::string &xmlfile, int &argc, char *argv[]);
+      UserInterface(const QString &xmlfile, int &argc, char *argv[]);
       ~UserInterface();
 
       /**
@@ -183,7 +183,7 @@ namespace Isis {
       void SetErrorList(int i);
 
       bool GetInfoFlag();
-      std::string GetInfoFileName();
+      QString GetInfoFileName();
 
     private:
       std::vector<char *> p_cmdline; /**< This variable will contain argv.*/
@@ -191,28 +191,28 @@ namespace Isis {
                                         is running or not.*/
 
       void LoadCommandLine(int argc, char *argv[]);
-      void LoadBatchList(const std::string file);
-      void LoadHistory(const std::string file);
-      void EvaluateOption(const std::string name, const std::string value);
+      void LoadBatchList(const QString file);
+      void LoadHistory(const QString file);
+      void EvaluateOption(const QString name, const QString value);
       void GetNextParameter(unsigned int &curPos,
-                            std::string &name, std::vector<std::string> &value);
-      std::vector<std::string> ReadArray(IString arrayString);
+                            QString &name, std::vector<QString> &value);
+      std::vector<QString> ReadArray(QString arrayString);
 
       //! Boolean value representing whether to abort or continue on error
       bool p_abortOnError;
-      std::string p_saveFile;        //!< FileName to save last history to
-      std::string p_progName;        //!< Name of program to run
+      QString p_saveFile;        //!< FileName to save last history to
+      QString p_progName;        //!< Name of program to run
 
       //!FileName to write batchlist line that caused error on
-      std::string p_errList;
+      QString p_errList;
 
       //!Vector of batchlist data
-      std::vector<std::vector<std::string> > p_batchList;
+      std::vector<std::vector<QString> > p_batchList;
 
       bool p_interactive;  /**< Boolean value representing whether the
                                 program is interactive or not.*/
       bool p_info;  //!< Boolean value representing if its in debug mode.
-      std::string p_infoFileName;  //!< FileName to save debugging info
+      QString p_infoFileName;  //!< FileName to save debugging info
       Gui *p_gui;                  //!< Pointer to the gui object
   };
 };

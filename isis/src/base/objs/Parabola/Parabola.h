@@ -53,7 +53,7 @@ namespace Isis {
 
       // Get help to figure out why I have to pass the name in even with the
       // default set
-      Parabola(const std::string &bname = "Parabola") :
+      Parabola(const QString &bname = "Parabola") :
         Isis::BasisFunction(bname, 1, 3) { }
 
       //! Destroys the Parabola object

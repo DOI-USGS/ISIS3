@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 #include <cstdio>
-#include <string>
+#include <QString>
 #include <iostream>
 
 #include "CameraStatistics.h"
@@ -27,35 +27,35 @@
 using namespace std;
 using namespace Isis;
 
-QPair<IString, IString> MakePair(IString key, IString val);
+QPair<QString, QString> MakePair(QString key, QString val);
 void GeneratePVLOutput(Cube *incube,
-                       QList< QPair<IString, IString> > *general,
-                       QList< QPair<IString, IString> > *camstats,
-                       QList< QPair<IString, IString> > *statistics,
+                       QList< QPair<QString, QString> > *general,
+                       QList< QPair<QString, QString> > *camstats,
+                       QList< QPair<QString, QString> > *statistics,
                        BandGeometry *bandGeom);
 void GenerateCSVOutput(Cube *incube,
-                       QList< QPair<IString, IString> > *general,
-                       QList< QPair<IString, IString> > *camstats,
-                       QList< QPair<IString, IString> > *statistics,
+                       QList< QPair<QString, QString> > *general,
+                       QList< QPair<QString, QString> > *camstats,
+                       QList< QPair<QString, QString> > *statistics,
                        BandGeometry *bandGeom);
 
 void IsisMain() {
-  const string caminfo_program  = "caminfo";
+  const QString caminfo_program  = "caminfo";
   UserInterface &ui = Application::GetUserInterface();
 
-  QList< QPair<IString, IString> > *general = NULL, *camstats = NULL, *statistics = NULL;
+  QList< QPair<QString, QString> > *general = NULL, *camstats = NULL, *statistics = NULL;
   BandGeometry *bandGeom = NULL;
 
   // Get input filename
   FileName in = ui.GetFileName("FROM");
 
   // Get the format
-  IString sFormat = ui.GetAsString("FORMAT");
+  QString sFormat = ui.GetAsString("FORMAT");
 
   // if true then run spiceinit, xml default is FALSE
   // spiceinit will use system kernels
   if(ui.GetBoolean("SPICE")) {
-    string parameters = "FROM=" + in.expanded();
+    QString parameters = "FROM=" + in.expanded();
     ProgramLauncher::RunIsisProgram("spiceinit", parameters);
   }
 
@@ -63,23 +63,23 @@ void IsisMain() {
   Cube *incube = p.SetInputCube("FROM");
 
   // General data gathering
-  general = new QList< QPair<IString, IString> >;
+  general = new QList< QPair<QString, QString> >;
   general->append(MakePair("Program",     caminfo_program));
   general->append(MakePair("IsisVersion", Application::Version()));
   general->append(MakePair("RunDate",     iTime::CurrentGMT()));
   general->append(MakePair("IsisId",      SerialNumber::Compose(*incube)));
   general->append(MakePair("From",        in.baseName() + ".cub"));
-  general->append(MakePair("Lines",       incube->getLineCount()));
-  general->append(MakePair("Samples",     incube->getSampleCount()));
-  general->append(MakePair("Bands",       incube->getBandCount()));
+  general->append(MakePair("Lines",       toString(incube->getLineCount())));
+  general->append(MakePair("Samples",     toString(incube->getSampleCount())));
+  general->append(MakePair("Bands",       toString(incube->getBandCount())));
 
   // Run camstats on the entire image (all bands)
   // another camstats will be run for each band and output
   // for each band.
   if(ui.GetBoolean("CAMSTATS")) {
-    camstats = new QList< QPair<IString, IString> >;
+    camstats = new QList< QPair<QString, QString> >;
 
-    string filename = ui.GetAsString("FROM");
+    QString filename = ui.GetAsString("FROM");
     int sinc = ui.GetInteger("SINC");
     int linc = ui.GetInteger("LINC");
     CameraStatistics stats(filename, sinc, linc);
@@ -116,7 +116,7 @@ void IsisMain() {
 
   // Compute statistics for entire cube
   if(ui.GetBoolean("STATISTICS")) {
-    statistics = new QList< QPair<IString, IString> >;
+    statistics = new QList< QPair<QString, QString> >;
 
     LineManager iline(*incube);
     Statistics stats;
@@ -140,16 +140,16 @@ void IsisMain() {
     double lrspercent  = (stats.LrsPixels() / (nPixels)) * 100;
 
     // Statitics output for band
-    statistics->append(MakePair("MeanValue", stats.Average()));
-    statistics->append(MakePair("StandardDeviation", stats.StandardDeviation()));
-    statistics->append(MakePair("MinimumValue", stats.Minimum()));
-    statistics->append(MakePair("MaximumValue", stats.Maximum()));
-    statistics->append(MakePair("PercentHIS", hispercent));
-    statistics->append(MakePair("PercentHRS", hrspercent));
-    statistics->append(MakePair("PercentLIS", lispercent));
-    statistics->append(MakePair("PercentLRS", lrspercent));
-    statistics->append(MakePair("PercentNull", nullpercent));
-    statistics->append(MakePair("TotalPixels", stats.TotalPixels()));
+    statistics->append(MakePair("MeanValue", toString(stats.Average())));
+    statistics->append(MakePair("StandardDeviation", toString(stats.StandardDeviation())));
+    statistics->append(MakePair("MinimumValue", toString(stats.Minimum())));
+    statistics->append(MakePair("MaximumValue", toString(stats.Maximum())));
+    statistics->append(MakePair("PercentHIS", toString(hispercent)));
+    statistics->append(MakePair("PercentHRS", toString(hrspercent)));
+    statistics->append(MakePair("PercentLIS", toString(lispercent)));
+    statistics->append(MakePair("PercentLRS", toString(lrspercent)));
+    statistics->append(MakePair("PercentNull", toString(nullpercent)));
+    statistics->append(MakePair("TotalPixels", toString(stats.TotalPixels())));
   }
 
   bool doGeometry = ui.GetBoolean("GEOMETRY");
@@ -157,16 +157,16 @@ void IsisMain() {
   if(doGeometry || doPolygon) {
     Camera *cam = incube->getCamera();
 
-    IString incType = ui.GetString("INCTYPE");
+    QString incType = ui.GetString("INCTYPE");
     int polySinc, polyLinc;
-    if(doPolygon && incType.UpCase() == "VERTICES") {
+    if(doPolygon && incType.toUpper() == "VERTICES") {
       ImagePolygon poly;
       poly.initCube(*incube);
       polySinc = polyLinc = (int)(0.5 + (((poly.validSampleDim() * 2) +
                                  (poly.validLineDim() * 2) - 3.0) /
                                  ui.GetInteger("NUMVERTICES")));
     }
-    else if (incType.UpCase() == "LINCSINC"){
+    else if (incType.toUpper() == "LINCSINC"){
       if(ui.WasEntered("POLYSINC")) {
         polySinc = ui.GetInteger("POLYSINC");
       }
@@ -183,7 +183,7 @@ void IsisMain() {
       }
     }
     else {
-      string msg = "Invalid INCTYPE option[" + incType + "]";
+      QString msg = "Invalid INCTYPE option[" + incType + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -198,12 +198,12 @@ void IsisMain() {
 
     // Check if the user requires valid image center geometry
     if(ui.GetBoolean("VCAMERA") && (!bandGeom->hasCenterGeometry())) {
-      string msg = "Image center does not project in camera model";
+      QString msg = "Image center does not project in camera model";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }
 
-  if(sFormat.UpCase() == "PVL")
+  if(sFormat.toUpper() == "PVL")
     GeneratePVLOutput(incube, general, camstats, statistics, bandGeom);
   else
     GenerateCSVOutput(incube, general, camstats, statistics, bandGeom);
@@ -230,8 +230,8 @@ void IsisMain() {
 /**
  * Convience method for gracefully staying in 80 characters
  */
-QPair<IString, IString> MakePair(IString key, IString val) {
-  return QPair<IString, IString>(key, val);
+QPair<QString, QString> MakePair(QString key, QString val) {
+  return QPair<QString, QString>(key, val);
 }
 
 
@@ -239,9 +239,9 @@ QPair<IString, IString> MakePair(IString key, IString val) {
  * Get the output in PVL format
  */
 void GeneratePVLOutput(Cube *incube,
-                       QList< QPair<IString, IString> > *general,
-                       QList< QPair<IString, IString> > *camstats,
-                       QList< QPair<IString, IString> > *statistics,
+                       QList< QPair<QString, QString> > *general,
+                       QList< QPair<QString, QString> > *camstats,
+                       QList< QPair<QString, QString> > *statistics,
                        BandGeometry *bandGeom) {
   UserInterface &ui = Application::GetUserInterface();
 
@@ -256,7 +256,7 @@ void GeneratePVLOutput(Cube *incube,
   if(camstats) {
     PvlObject pcband("Camstats");
     for(int i = 0; i < camstats->size(); i++)
-      pcband += ValidateKey((*camstats)[i].first, (*camstats)[i].second);
+      pcband += ValidateKey((*camstats)[i].first, toDouble((*camstats)[i].second));
     params.AddObject(pcband);
   }
 
@@ -280,7 +280,7 @@ void GeneratePVLOutput(Cube *incube,
   if(statistics) {
     PvlObject sgroup("Statistics");
     for(int i = 0; i < statistics->size(); i++)
-      sgroup += ValidateKey((*statistics)[i].first, (*statistics)[i].second);
+      sgroup += ValidateKey((*statistics)[i].first, toDouble((*statistics)[i].second));
     params.AddObject(sgroup);
   }
 
@@ -301,7 +301,7 @@ void GeneratePVLOutput(Cube *incube,
 
   // Output the result
   Pvl pout;
-  string outFile = ui.GetFileName("TO");
+  QString outFile = ui.GetFileName("TO");
   pout.AddObject(params);
 
   if(ui.GetBoolean("APPEND"))
@@ -316,25 +316,25 @@ void GeneratePVLOutput(Cube *incube,
  * CamStats, Stats, Geometry are info are recorded.
  */
 void GenerateCSVOutput(Cube *incube,
-                       QList< QPair<IString, IString> > *general,
-                       QList< QPair<IString, IString> > *camstats,
-                       QList< QPair<IString, IString> > *statistics,
+                       QList< QPair<QString, QString> > *general,
+                       QList< QPair<QString, QString> > *camstats,
+                       QList< QPair<QString, QString> > *statistics,
                        BandGeometry *bandGeom) {
   UserInterface &ui = Application::GetUserInterface();
 
   // Create the vars for holding the info
-  IString keys;
-  IString values;
-  const IString delim = ",";
+  QString keys;
+  QString values;
+  const QString delim = ",";
 
   // Output the result
   fstream outFile;
-  string sOutFile = ui.GetAsString("TO");
+  QString sOutFile = ui.GetAsString("TO");
   bool appending = ui.GetBoolean("APPEND") && FileName(sOutFile).fileExists();
   if(appending)
-    outFile.open(sOutFile.c_str(), std::ios::out | std::ios::app);
+    outFile.open(sOutFile.toAscii().data(), std::ios::out | std::ios::app);
   else
-    outFile.open(sOutFile.c_str(), std::ios::out);
+    outFile.open(sOutFile.toAscii().data(), std::ios::out);
 
   // Add some common/general things
   for(int i = 0; i < general->size(); i++)
@@ -369,8 +369,8 @@ void GenerateCSVOutput(Cube *incube,
     }
   }
 
-  keys.TrimTail(delim); // Get rid of the extra delim char (",")
-  values.TrimTail(delim); // Get rid of the extra delim char (",")
+  keys.remove(QRegExp(delim + "$")); // Get rid of the extra delim char (",")
+  values.remove(QRegExp(delim + "$")); // Get rid of the extra delim char (",")
   outFile << keys << endl << values << endl;
   outFile.close();
 }

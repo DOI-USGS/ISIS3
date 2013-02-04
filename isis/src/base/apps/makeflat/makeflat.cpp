@@ -27,7 +27,7 @@ bool Excluded(int fileNum, int frameletNum, double &stdev);
 
 // This method populates the framelet exclusion list given
 //   a cube. *Uses currImage.
-bool CheckFramelets(string progress, Cube &theCube);
+bool CheckFramelets(QString progress, Cube &theCube);
 
 // This method resets the global variables for another run
 void ResetGlobals();
@@ -303,8 +303,8 @@ void IsisMain() {
     //   entire images, and push frame framelet exclusion stats can not be collected
     //   during pass 2 cleanly
     if((cameraType == Framing || cameraType == PushFrame) && imageValid) {
-      string prog = "Calculating Standard Deviation " + IString((int)currImage + 1) + "/";
-      prog += IString((int)inList.size()) + " (" + inList[currImage].name() + ")";
+      QString prog = "Calculating Standard Deviation " + toString((int)currImage + 1) + "/";
+      prog += toString((int)inList.size()) + " (" + inList[currImage].name() + ")";
 
       if(cameraType == Framing) {
         Statistics *stats = tmp.getStatistics(1, prog);
@@ -355,7 +355,7 @@ void IsisMain() {
    *   found a legitimate cube.
    */
   if(numOutputSamples <= 0) {
-    string msg = "No valid input cubes were found";
+    QString msg = "No valid input cubes were found";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -364,7 +364,7 @@ void IsisMain() {
    *   the input cubes, then we havent found any valid data.
    */
   if(tempFileLength <= 0) {
-    string msg = "No valid input data was found";
+    QString msg = "No valid input data was found";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -374,7 +374,7 @@ void IsisMain() {
   ocube = new Cube();
   ocube->setDimensions(numOutputSamples, tempFileLength, 2);
   PvlGroup &prefs = Preference::Preferences().FindGroup("DataDirectory", Pvl::Traverse);
-  IString outTmpName = (string)prefs["Temporary"][0] + "/";
+  QString outTmpName = (QString)prefs["Temporary"][0] + "/";
   outTmpName += FileName(ui.GetFileName("TO")).baseName() + ".tmp.cub";
   ocube->create(outTmpName);
   oLineMgr = new LineManager(*ocube);
@@ -398,13 +398,13 @@ void IsisMain() {
 
     PvlObject currFile("Exclusions");
     currFile += PvlKeyword("FileName", inList[currImage].toString());
-    currFile += PvlKeyword("Tolerance", maxStdev);
+    currFile += PvlKeyword("Tolerance", toString(maxStdev));
 
     if(cameraType == LineScan) {
-      currFile += PvlKeyword("FrameLines", numFrameLines);
+      currFile += PvlKeyword("FrameLines", toString(numFrameLines));
     }
     else if(cameraType == PushFrame) {
-      currFile += PvlKeyword("FrameletLines", numFrameLines);
+      currFile += PvlKeyword("FrameletLines", toString(numFrameLines));
     }
 
     excludedDetails.push_back(currFile);
@@ -421,8 +421,8 @@ void IsisMain() {
     }
 
     p.SetInputCube(inList[currImage].toString(), inAtt);
-    IString progText = "Calculating Averages " + IString((int)currImage + 1);
-    progText += "/" + IString((int)inList.size());
+    QString progText = "Calculating Averages " + toString((int)currImage + 1);
+    progText += "/" + toString((int)inList.size());
     progText += " (" + inList[currImage].name() + ")";
     p.Progress()->SetText(progText);
 
@@ -518,7 +518,7 @@ void IsisMain() {
     excludeFile.Write(FileName(ui.GetFileName("EXCLUDE")).expanded());
   }
 
-  remove(outTmpName.c_str());
+  remove(outTmpName.toAscii().data());
 
   // Clean up settings
   ResetGlobals();
@@ -565,7 +565,7 @@ void ResetGlobals() {
  *
  * @return bool True if the file contains a valid framelet
  */
-bool CheckFramelets(string progress, Cube &theCube) {
+bool CheckFramelets(QString progress, Cube &theCube) {
   bool foundValidFramelet = false;
   LineManager mgr(theCube);
   Progress prog;
@@ -665,11 +665,11 @@ void CreateTemporaryData(Buffer &in) {
 
         // Record the exclusion
         PvlGroup currExclusion("ExcludedLines");
-        currExclusion += PvlKeyword("FrameStartLine", IString(in.Line()));
-        currExclusion += PvlKeyword("ValidPixels", IString(inputFrameStats.ValidPixels()));
+        currExclusion += PvlKeyword("FrameStartLine", toString(in.Line()));
+        currExclusion += PvlKeyword("ValidPixels", toString(inputFrameStats.ValidPixels()));
 
         if(!IsSpecial(inputFrameStats.StandardDeviation()))
-          currExclusion += PvlKeyword("StandardDeviation", inputFrameStats.StandardDeviation());
+          currExclusion += PvlKeyword("StandardDeviation", toString(inputFrameStats.StandardDeviation()));
         else
           currExclusion += PvlKeyword("StandardDeviation", "N/A");
 
@@ -713,12 +713,12 @@ void CreateTemporaryData(Buffer &in) {
 
     if(excluded && ((in.Line() - 1) % numFrameLines == 0)) {
       PvlGroup currExclusion("ExcludedFramelet");
-      currExclusion += PvlKeyword("FrameletStartLine", IString(in.Line()));
-      currExclusion += PvlKeyword("FrameletNumber", (in.Line() - 1) / numFrameLines);
+      currExclusion += PvlKeyword("FrameletStartLine", toString(in.Line()));
+      currExclusion += PvlKeyword("FrameletNumber", toString((in.Line() - 1) / numFrameLines));
 
       if(!IsSpecial(stdev)) {
         currExclusion += PvlKeyword("StandardDeviation",
-                                    stdev);
+                                    toString(stdev));
       }
       else {
         currExclusion += PvlKeyword("StandardDeviation",

@@ -13,7 +13,7 @@ namespace Isis {
   TiffImporter::TiffImporter(FileName inputName) : ImageImporter(inputName) {
     // Open the TIFF image
     m_image = NULL;
-    if ((m_image = TIFFOpen(inputName.expanded().c_str(), "r")) == NULL) {
+    if ((m_image = TIFFOpen(inputName.expanded().toAscii().data(), "r")) == NULL) {
       throw IException(IException::Programmer,
           "Could not open incoming image", _FILEINFO_);
     }

@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 #include <cmath>
-#include <string>
+#include <QString>
 #include <sstream>
 #include <fstream>
 
@@ -25,12 +25,12 @@ using namespace std;
 using namespace Isis;
 
 
-typedef CollectorMap<std::string, int> BandMap;
+typedef CollectorMap<IString, int> BandMap;
 
-inline std::string Quote(const std::string &value, const char qChar = '"') {
-  if(value.empty()) return (value);
+inline QString Quote(const QString &value, const char qChar = '"') {
+  if(value.isEmpty()) return (value);
   if(value[0] == qChar) return (value);
-  return (std::string(qChar + value + qChar));
+  return (QString(qChar + value + qChar));
 }
 
 inline double SetRound(double value, const int precision) {
@@ -39,15 +39,15 @@ inline double SetRound(double value, const int precision) {
   return (value);
 }
 
-inline void ValidateUnit(PvlKeyword &key, const std::string &kunit) {
+inline void ValidateUnit(PvlKeyword &key, const QString &kunit) {
   PvlKeyword temp = key;
   key.Clear();
   for(int i = 0 ; i < temp.Size() ; i++) {
     try {
       //  If this works, check unit, otherwise an exception is thrown
-      (void) temp[i].ToDouble();
-      string unit = temp.Unit(i);
-      if(unit.empty()) unit = kunit;
+      (void) toDouble(temp[i]);
+      QString unit = temp.Unit(i);
+      if(unit.isEmpty()) unit = kunit;
       key.AddValue(temp[i], unit);
     }
     catch(...) {
@@ -57,14 +57,14 @@ inline void ValidateUnit(PvlKeyword &key, const std::string &kunit) {
   return;
 }
 
-inline void FixUnit(PvlObject &obj, const string &key, const string &unit) {
+inline void FixUnit(PvlObject &obj, const QString &key, const QString &unit) {
   if(obj.HasKeyword(key, PvlObject::Traverse)) {
     ValidateUnit(obj.FindKeyword(key, PvlObject::Traverse), unit);
   }
   return;
 }
 
-inline void FixQuotes(PvlContainer &kcont, const string &value = "N/A") {
+inline void FixQuotes(PvlContainer &kcont, const QString &value = "N/A") {
   PvlContainer::PvlKeywordIterator kiter;
   for(kiter = kcont.Begin() ; kiter != kcont.End() ; ++kiter) {
     for(int nv = 0 ; nv < kiter->Size() ; nv++) {
@@ -92,30 +92,30 @@ inline void FixLabels(PvlObject &obj) {
 }
 
 inline void WriteBand(ProcessExportPds &process, ofstream &out,
-                      const std::string &fname, int band)  {
+                      const QString &fname, int band)  {
   process.ClearInputCubes();
-  (void) process.SetInputCube(fname, CubeAttributeInput("+" + IString(band)));
+  (void) process.SetInputCube(fname, CubeAttributeInput("+" + toString(band)));
   process.StartProcess(out);
   return;
 }
 
 
 void IsisMain() {
-  const std::string mdisddr_program = "mdisddr";
-  const std::string mdisddr_version = "1.0";
-  const std::string mdisddr_revision = "$Revision$";
-  const std::string mdisddr_runtime = Application::DateTime();
-  const std::string dataSetID = "MESS-E/V/H-MDIS-6-DDR-GEOMDATA-V1.0";
+  const QString mdisddr_program = "mdisddr";
+  const QString mdisddr_version = "1.0";
+  const QString mdisddr_revision = "$Revision$";
+  const QString mdisddr_runtime = Application::DateTime();
+  const QString dataSetID = "MESS-E/V/H-MDIS-6-DDR-GEOMDATA-V1.0";
 
   UserInterface &ui = Application::GetUserInterface();
   FileName input(ui.GetFileName("FROM"));
-  string to("");
+  QString to("");
   bool toEntered = ui.WasEntered("TO");
   if(toEntered) {
     to = ui.GetAsString("TO");
   }
 
-  string opath(".");    // Set default to local directory
+  QString opath(".");    // Set default to local directory
   if(ui.WasEntered("OPATH")) {
     opath = ui.GetString("OPATH");
   }
@@ -125,8 +125,8 @@ void IsisMain() {
 
   //  Generate the image cube that phocube produces for the DDR data
   FileName phoFile = FileName::createTempFile("$TEMPORARY/" + input.baseName() + "_phocube.cub");
-  string pfile = phoFile.expanded();
-  string parameters = "FROM=" + input.expanded() + " TO=" + pfile +
+  QString pfile = phoFile.expanded();
+  QString parameters = "FROM=" + input.expanded() + " TO=" + pfile +
                       " LATITUDE=TRUE LONGITUDE=TRUE PHASE=TRUE EMISSION=TRUE INCIDENCE=TRUE";
   ProgramLauncher::RunIsisProgram("phocube", parameters);
 
@@ -204,7 +204,7 @@ void IsisMain() {
     p.CheckStatus();
 
     //  Add any new keywords
-    string lnote = "2007-12-20, S. Murchie (JHU/APL); "
+    QString lnote = "2007-12-20, S. Murchie (JHU/APL); "
                    "2008-01-02, S. Murchie (JHU/APL); "
                    "2008-01-11, J. Ward (GEO)";
     pdsLabel += PvlKeyword("LABEL_REVISION_NOTE", lnote);
@@ -213,18 +213,15 @@ void IsisMain() {
     // Fixes bad keywords
     PvlKeyword &data_set_id = pdsLabel.FindKeyword("DATA_SET_ID", Pvl::Traverse);
     data_set_id.SetValue(dataSetID);
-    string prodid(input.baseName());
+    QString prodid(input.baseName());
     PvlKeyword &product_id = pdsLabel.FindKeyword("PRODUCT_ID", Pvl::Traverse);
     if((product_id.Size() == 0) || ((product_id.Size() > 0) && (product_id[0] == "N/A"))) {
       product_id.SetValue(prodid);
     }
     else {
-      string pid = product_id[0];
+      QString pid = product_id[0];
       pid[0] = 'D';
-      string::size_type pos = pid.find_first_of("_");
-      if(pos != string::npos) {
-        pid.erase(pos);
-      }
+      pid.remove(QRegExp("_.*"));
       pid.append("_DE_0");
       product_id.SetValue(pid);
       prodid = pid;
@@ -264,10 +261,10 @@ void IsisMain() {
     //  For DDRs, the SOURCE_PRODUCT_ID is made up of SPICE kernels.  I need to
     //  go get em.
     Kernels kernels(from);
-    vector<string> kfiles = kernels.getKernelList();
+    QStringList kfiles = kernels.getKernelList();
     PvlKeyword &source_product_id = pdsLabel.FindKeyword("SOURCE_PRODUCT_ID", Pvl::Traverse);
     source_product_id.Clear();
-    for(unsigned int i = 0; i < kfiles.size(); i++) {
+    for(int i = 0; i < kfiles.size(); i++) {
       FileName kfile(kfiles[i]);
       source_product_id.AddValue(Quote(kfile.name()));
     }
@@ -308,8 +305,8 @@ void IsisMain() {
 
     //  Now address nested keywords in SUBFRAME groups
     for(int i = 1 ; i <= 5 ; i++) {
-      IString n(i);
-      string group = "SUBFRAME" + n + "_PARAMETERS";
+      QString n(toString(i));
+      QString group = "SUBFRAME" + n + "_PARAMETERS";
       if(pdsLabel.HasGroup(group)) {
         PvlGroup &grp = pdsLabel.FindGroup(group);
         ValidateUnit(grp.FindKeyword("RETICLE_POINT_LATITUDE"), "DEG");
@@ -325,8 +322,8 @@ void IsisMain() {
 
     // All done...write result.
     pdsLabel.SetFormatTemplate("$messenger/templates/labels/mdisPdsDDR.pft");
-    string ofile(output.expanded());
-    ofstream outstream(ofile.c_str());
+    QString ofile(output.expanded());
+    ofstream outstream(ofile.toAscii().data());
     processPds.OutputLabel(outstream);
 
     // Writing out the 5 bands is a bit tricky for this product.  The bands
@@ -344,14 +341,14 @@ void IsisMain() {
     WriteBand(processPds, outstream, pfile, bandmap.get("Phase Angle"));
     outstream.close();
     processPds.EndProcess();
-    remove(pfile.c_str());
+    remove(pfile.toAscii().data());
   }
   catch(IException &) {
-    remove(pfile.c_str());
+    remove(pfile.toAscii().data());
     throw;
   }
   catch(...) {
-    remove(pfile.c_str());
+    remove(pfile.toAscii().data());
     throw IException(IException::Unknown, "Unexpected exception caught!",
                      _FILEINFO_);
   }

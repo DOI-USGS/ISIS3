@@ -101,17 +101,17 @@ namespace Isis {
     }
 
     //  Set up instrument and filter code strings
-    IString ikCode((int) naifIkCode());
+    QString ikCode = toString(naifIkCode());
     int fnCode(naifIkCode() - filterNumber);
-    IString filterCode(fnCode);
-    string ikernKey;
+    QString filterCode = toString(fnCode);
+    QString ikernKey;
 
     // Fetch the frame translations from the instrument kernels
     ikernKey = "INS" + ikCode + "_REFERENCE_FRAME";
-    IString baseFrame = getString(ikernKey);
+    QString baseFrame = getString(ikernKey);
 
     ikernKey = "INS" + filterCode + "_FRAME";
-    IString ikFrame = getString(ikernKey);
+    QString ikFrame = getString(ikernKey);
 
     // Set up the camera info from ik/iak kernels
 
@@ -131,7 +131,7 @@ namespace Isis {
     //  !!NOTE:  The ephemeris time MUST be set prior to creating the
     //           cache (CreateCache) because the kernels are all unloaded
     //           after the cache is done and this operation will fail!!
-    string stime = inst["SpacecraftClockCount"];
+    QString stime = inst["SpacecraftClockCount"];
     double exposureDuration = ((double) inst["ExposureDuration"]) / 1000.0;// divide by 1000 to convert to seconds
 
     iTime etStart = getClockTime(stime);
@@ -280,11 +280,11 @@ namespace Isis {
  * 
  * @return double    Computed temperature dependant focal length
  */
-  double MdisCamera::computeFocalLength(const std::string &filterCode,
+  double MdisCamera::computeFocalLength(const QString &filterCode,
                                         Pvl &label) {
 
     double focalLength(0.0);
-    IString tdflKey("TempDependentFocalLength");
+    QString tdflKey("TempDependentFocalLength");
 
     //  Determine if the desired value is already computed.  We are interested
     //  in the temperature dependent value firstly.  Backward compatibility is
@@ -302,7 +302,7 @@ namespace Isis {
 
       //  Check for disabling of temperature dependent focal length
       bool tdfl_disabled(false);
-#if !defined(DISABLE_TDFL_DISABLING)
+#ifndef DISABLE_TDFL_DISABLING
       try {
         IString tdfl_state = getString("DISABLE_MDIS_TD_FOCAL_LENGTH");
         tdfl_disabled = ( "TRUE" == tdfl_state.UpCase() );
@@ -321,7 +321,7 @@ namespace Isis {
           PvlGroup &inst = label.FindGroup("Instrument", Pvl::Traverse);      
           double fpTemp = inst["FocalPlaneTemperature"];
           double fl(0.0);
-          IString fptCoeffs = "INS" + filterCode + "_FL_TEMP_COEFFS";
+          QString fptCoeffs = "INS" + filterCode + "_FL_TEMP_COEFFS";
           //  Compute 5th order polynomial
           for (int i = 0 ; i < 6 ;  i++) {
             fl += getDouble(fptCoeffs, i) * pow(fpTemp, (double) i);

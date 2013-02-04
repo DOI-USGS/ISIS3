@@ -30,16 +30,16 @@ void IsisMain() {
   bool hasReachedEndOfCube = false;
   while(startLine <= cube.getLineCount()  &&  not hasReachedEndOfCube) {
     //! Sets up the proper paramaters for running the crop program
-    string parameters = "FROM=" + inFile.expanded() +
-                        " TO=" + inFile.path() + "/" + inFile.baseName() + ".segment" + IString(cropNum) + ".cub"
-                        + " LINE=" + IString(startLine) + " NLINES=";
+    QString parameters = "FROM=" + inFile.expanded() +
+                         " TO=" + inFile.path() + "/" + inFile.baseName() + ".segment" + toString(cropNum) + ".cub"
+                         + " LINE=" + toString(startLine) + " NLINES=";
 
     if(startLine + numberOfLines > cube.getLineCount()) {
-      parameters += IString(cube.getLineCount() - (startLine - 1));
+      parameters += toString(cube.getLineCount() - (startLine - 1));
       hasReachedEndOfCube = true;
     }
     else {
-      parameters += IString(numberOfLines);
+      parameters += toString(numberOfLines);
     }
     ProgramLauncher::RunIsisProgram("crop", parameters);
     //The starting line for next crop

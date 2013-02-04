@@ -1,4 +1,4 @@
-#if !defined(ProgramAnalyzer_h)
+#ifndef ProgramAnalyzer_h
 #define ProgramAnalyzer_h
 /**
  * @file
@@ -56,7 +56,7 @@ namespace Isis {
     public:
       //  Constructors and Destructor
       ProgramAnalyzer();
-      ProgramAnalyzer(const std::string &logfile);
+      ProgramAnalyzer(const QString &logfile);
 
       /** Destructor ensures everything is cleaned up properly */
       virtual ~ProgramAnalyzer() { }
@@ -79,17 +79,17 @@ namespace Isis {
       /** Returns total number of unique programs */
       int Programs() const { return (_programs.size()); }
 
-      void setExclude(const std::string &name);
-      void exclude(const std::string &exclude);
-      void setInclude(const std::string &name);
-      void include(const std::string &include);
+      void setExclude(const QString &name);
+      void exclude(const QString &exclude);
+      void setInclude(const QString &name);
+      void include(const QString &include);
 
-      void add(const std::string &logfile);
+      void add(const QString &logfile);
       void add(PvlObject &program);
 
-      PvlGroup review(const std::string &name = "Results") const;
-      PvlGroup cumulative(const std::string &name = "ProgramTotals") const;
-      PvlGroup summarize(const std::string &name) const;
+      PvlGroup review(const QString &name = "Results") const;
+      PvlGroup cumulative(const QString &name = "ProgramTotals") const;
+      PvlGroup summarize(const QString &name) const;
       PvlGroup summarize(const int index) const;
 
       std::ostream &header(std::ostream &out) const;
@@ -100,12 +100,12 @@ namespace Isis {
 
       /** Container for runtime status of a programs */
       struct RunTimeStats {
-        std::string pname;
+        QString pname;
         Statistics  contime;
         Statistics  cputime;
         Statistics  iotime;
         RunTimeStats() : pname(""), contime(), cputime(), iotime() { }
-        RunTimeStats(const std::string &name) : pname(name), contime(), 
+        RunTimeStats(const QString &name) : pname(name), contime(), 
                                                 cputime(), iotime() { }
       };
 
@@ -113,10 +113,10 @@ namespace Isis {
       /** Container for program data */
       struct ProgramData {
         Status      status;
-        std::string name;
-        std::string runtime;
-        std::string from;
-        std::string to;
+        QString name;
+        QString runtime;
+        QString from;
+        QString to;
         double      cpuTime;
         double      connectTime;
         ProgramData() : status(BADDATA), name(""), runtime(""), 
@@ -124,8 +124,8 @@ namespace Isis {
       };
 
       /* Containers for program lists */
-      typedef CollectorMap<std::string, int> LogList;
-      typedef CollectorMap<std::string, RunTimeStats> RunList;
+      typedef CollectorMap<QString, int> LogList;
+      typedef CollectorMap<QString, RunTimeStats> RunList;
 
       int     _count;                    //!< Count of all programs
       LogList _excludes;                 //!< Program exclusion list
@@ -137,25 +137,25 @@ namespace Isis {
 
       void init();
       int getCount (Status status) const;
-      std::string getKey(PvlObject &obj, const std::string &key, 
-                         const std::string &grp = "") const;
+      QString getKey(PvlObject &obj, const QString &key, 
+                         const QString &grp = "") const;
 
       /** Find a string in a PvlContainer */
-      std::string findKey(PvlContainer &kset, const std::string &key) const {
-        std::string value("");
+      QString findKey(PvlContainer &kset, const QString &key) const {
+        QString value("");
         if ( kset.HasKeyword(key) ) {
           value = kset[key][0];
         }
         return (value);
       }
 
-      Status convertTime(const std::string &time, double &ptime) const;
+      Status convertTime(const QString &time, double &ptime) const;
       bool accounting(PvlObject &obj, ProgramData &data) const;
       bool analyze(const ProgramData &data);
 
-      IString format(const std::string &s) const;
-      IString DblToStr(const double &value, const int precision = 2) const;
-      PvlGroup toPvl(const RunTimeStats &stats, const std::string &name = "") const;
+      QString format(const QString &s) const;
+      QString DblToStr(const double &value, const int precision = 2) const;
+      PvlGroup toPvl(const RunTimeStats &stats, const QString &name = "") const;
       int LimitTotals(const LogList &limit) const;
   };
 }

@@ -24,7 +24,7 @@
 #include <QString>
 
 #include <iostream>
-#include <string>
+#include <QString>
 #include <sstream>
 
 #include "IException.h"
@@ -57,7 +57,7 @@ namespace Isis {
 
     // Set up a translater for PDS file of type IMAGE
     Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
-    p_transDir = (string) dataDir["Base"];
+    p_transDir = (QString) dataDir["Base"];
   }
 
 
@@ -73,7 +73,7 @@ namespace Isis {
    *                     label.
    *
    * @param pdsDataFile The name of the PDS data file where the actual image/cube
-   *                    data is stored. This parameter can be an empty string, in
+   *                    data is stored. This parameter can be an empty QString, in
    *                    which case the label information will be searched to find
    *                    the data file name or the data will be assumed to be
    *                    after the label information.
@@ -82,8 +82,8 @@ namespace Isis {
    *
    * @throws Isis::iException::Message
    */
-  void ProcessImportPds::SetPdsFile(const std::string &pdsLabelFile,
-                                    const std::string &pdsDataFile,
+  void ProcessImportPds::SetPdsFile(const QString &pdsLabelFile,
+                                    const QString &pdsDataFile,
                                     Isis::Pvl &pdsLabel) {
 
     // Internalize the PDS label in the PVL that was passed in
@@ -131,27 +131,27 @@ namespace Isis {
     Isis::PvlTranslationManager pdsXlater(p_pdsLabel, trnsStrm);
 
     // Check to see if we are dealing with a JPEG2000 file
-    Isis::IString str;
+    QString str;
     if(pdsXlater.InputHasKeyword("PdsEncodingType")) {
       str = pdsXlater.Translate("PdsEncodingType");
       if(str == "JP2") {
         p_encodingType = JP2;
         str = pdsXlater.Translate("PdsCompressedFile");
-        if(pdsDataFile.empty()) {
+        if(pdsDataFile.isEmpty()) {
           Isis::FileName lfile(p_labelFile);
           Isis::FileName ifile(lfile.path() + "/" + str);
           if(ifile.fileExists()) {
             p_jp2File = ifile.expanded();
           }
           else {
-            string tmp = ifile.expanded();
-            str.DownCase();
+            QString tmp = ifile.expanded();
+            str = str.toLower();
             ifile = lfile.path() + "/" + str;
             if(ifile.fileExists()) {
               p_jp2File = ifile.expanded();
             }
             else {
-              string msg = "Unable to find input file [" + tmp + "] or [" +
+              QString msg = "Unable to find input file [" + tmp + "] or [" +
                            ifile.expanded() + "]";
               throw IException(IException::Io, msg, _FILEINFO_);
             }
@@ -159,7 +159,7 @@ namespace Isis {
         }
       }
       else {
-        string msg = "Unsupported encoding type in [" + p_labelFile + "]";
+        QString msg = "Unsupported encoding type in [" + p_labelFile + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
     }
@@ -175,7 +175,7 @@ namespace Isis {
       ProcessPdsQubeLabel(pdsDataFile, "pdsSpectralQube.trn");
     }
     else {
-      string msg = "Unknown label type in [" + p_labelFile + "]";
+      QString msg = "Unknown label type in [" + p_labelFile + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
@@ -194,9 +194,9 @@ namespace Isis {
   void ProcessImportPds::ProcessDataFilePointer(Isis::PvlTranslationManager & pdsXlater, const bool & calcOffsetOnly) {
     const PvlKeyword & dataFilePointer = pdsXlater.InputKeyword("DataFilePointer");
 
-    Isis::IString dataFileName;
-    Isis::IString units;
-    Isis::IString str;
+    QString dataFileName;
+    QString units;
+    QString str;
     int offset = -1;
 
     // If only size 1, we either have a file name or an offset
@@ -205,7 +205,7 @@ namespace Isis {
     if (dataFilePointer.Size() == 1) {
       try {
         str = pdsXlater.Translate("DataFilePointer");
-        offset = str.ToInteger();
+        offset = toInt(str);
         units = dataFilePointer.Unit();
         // Successful? we have an offset, means current, p_labelFile
         // is the location of the data as well
@@ -228,14 +228,14 @@ namespace Isis {
     }
     // Error, no value
     else if (dataFilePointer.Size() == 0) {
-      string msg = "Data file pointer ^IMAGE or ^QUBE has no value, must"
+      QString msg = "Data file pointer ^IMAGE or ^QUBE has no value, must"
                    "have either file name or offset or both, in [" +
                    p_labelFile + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     // Error, more than two values
     else {
-      string msg = "Improperly formatted data file pointer keyword ^IMAGE or "
+      QString msg = "Improperly formatted data file pointer keyword ^IMAGE or "
                    "^QUBE, in [" + p_labelFile + "], must contain filename "
                    " or offset or both";
       throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -260,14 +260,14 @@ namespace Isis {
       }
       // Retry with downcased name, if still no luck, fail
       else {
-        string tmp = dataFile.expanded();
-        dataFileName.DownCase();
+        QString tmp = dataFile.expanded();
+        dataFileName = dataFileName.toLower();
         dataFile = FileName(labelFile.path() + "/" + dataFileName);
         if (dataFile.fileExists()) {
           SetInputFile(dataFile.expanded());
         }
         else {
-          string msg = "Unable to find input file [" + tmp + "] or [" +
+          QString msg = "Unable to find input file [" + tmp + "] or [" +
                        dataFile.expanded() + "]";
           throw IException(IException::Io, msg, _FILEINFO_);
         }
@@ -275,13 +275,13 @@ namespace Isis {
     }
 
     // Now, to handle the offset
-    units.Trim(" \t\r\v\n");
+    units = units.trimmed();
     if (units == "BYTES" || units == "B") {
       SetFileHeaderBytes(offset - 1);
     }
     else {
-      Isis::IString recSize = pdsXlater.Translate("DataFileRecordBytes");
-      SetFileHeaderBytes((offset - 1) * recSize.ToInteger());
+      QString recSize = pdsXlater.Translate("DataFileRecordBytes");
+      SetFileHeaderBytes((offset - 1) * toInt(recSize));
     }
   }
 
@@ -290,9 +290,9 @@ namespace Isis {
    * Calls SetPixelType with the correct values
    */
   void ProcessImportPds::ProcessPixelBitandType(Isis::PvlTranslationManager & pdsXlater) {
-    IString str;
+    QString str;
     str = pdsXlater.Translate("CoreBitsPerPixel");
-    int bitsPerPixel = str.ToInteger();
+    int bitsPerPixel = toInt(str);
     str = pdsXlater.Translate("CorePixelType");
     if((str == "Real") && (bitsPerPixel == 32)) {
       SetPixelType(Isis::Real);
@@ -319,8 +319,8 @@ namespace Isis {
       SetPixelType(Isis::UnsignedInteger);
     }
     else {
-      string msg = "Invalid PixelType and BitsPerPixel combination [" + str +
-                   ", " + Isis::IString(bitsPerPixel) + "]";
+      QString msg = "Invalid PixelType and BitsPerPixel combination [" + str +
+                   ", " + toString(bitsPerPixel) + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
@@ -329,19 +329,19 @@ namespace Isis {
    * Handles all special pixel setting, ultimately, calls SetSpecialValues.
    */
   void ProcessImportPds::ProcessSpecialPixels(Isis::PvlTranslationManager & pdsXlater, const bool & isQube) {
-    IString str;
+    QString str;
     // Set any special pixel values
     double pdsNull = Isis::NULL8;
     if(pdsXlater.InputHasKeyword("CoreNull")) {
       str = pdsXlater.Translate("CoreNull");
       if(str != "NULL") {
-        pdsNull = str.ToDouble();
+        pdsNull = toDouble(str);
       }
     }
     else if(!isQube && pdsXlater.InputHasKeyword("CoreNull2")) {
       str = pdsXlater.Translate("CoreNull2");
       if(str != "NULL") {
-        pdsNull = str.ToDouble();
+        pdsNull = toDouble(str);
       }
     }
 
@@ -349,13 +349,13 @@ namespace Isis {
     if(pdsXlater.InputHasKeyword("CoreLrs")) {
       str = pdsXlater.Translate("CoreLrs");
       if(str != "NULL") {
-        pdsLrs = str.ToDouble();
+        pdsLrs = toDouble(str);
       }
     }
     else if(!isQube && pdsXlater.InputHasKeyword("CoreLrs2")) {
       str = pdsXlater.Translate("CoreLrs2");
       if(str != "NULL") {
-        pdsLrs = str.ToDouble();
+        pdsLrs = toDouble(str);
       }
     }
 
@@ -363,13 +363,13 @@ namespace Isis {
     if(pdsXlater.InputHasKeyword("CoreLis")) {
       str = pdsXlater.Translate("CoreLis");
       if(str != "NULL") {
-        pdsLis = str.ToDouble();
+        pdsLis = toDouble(str);
       }
     }
     else if(!isQube && pdsXlater.InputHasKeyword("CoreLis2")) {
       str = pdsXlater.Translate("CoreLis2");
       if(str != "NULL") {
-        pdsLis = str.ToDouble();
+        pdsLis = toDouble(str);
       }
     }
 
@@ -377,13 +377,13 @@ namespace Isis {
     if(pdsXlater.InputHasKeyword("CoreHrs")) {
       str = pdsXlater.Translate("CoreHrs");
       if(str != "NULL") {
-        pdsHrs = str.ToDouble();
+        pdsHrs = toDouble(str);
       }
     }
     else if(!isQube && pdsXlater.InputHasKeyword("CoreHrs2")) {
       str = pdsXlater.Translate("CoreHrs2");
       if(str != "NULL") {
-        pdsHrs = str.ToDouble();
+        pdsHrs = toDouble(str);
       }
     }
 
@@ -391,13 +391,13 @@ namespace Isis {
     if(pdsXlater.InputHasKeyword("CoreHis")) {
       str = pdsXlater.Translate("CoreHis");
       if(str != "NULL") {
-        pdsHis = str.ToDouble();
+        pdsHis = toDouble(str);
       }
     }
     else if(!isQube && pdsXlater.InputHasKeyword("CoreHis2")) {
       str = pdsXlater.Translate("CoreHis2");
       if(str != "NULL") {
-        pdsHis = str.ToDouble();
+        pdsHis = toDouble(str);
       }
     }
 
@@ -408,24 +408,24 @@ namespace Isis {
    * Process the PDS label of type IMAGE.
    *
    * @param pdsDataFile The name of the PDS data file where the actual image/cube
-   *                    data is stored. This parameter can be an empty string, in
+   *                    data is stored. This parameter can be an empty QString, in
    *                    which case the label information will be searched to find
    *                    the data file name or the data will be assumed to be
    *                    after the label information.
    *
    * @throws Isis::iException::Message
    */
-  void ProcessImportPds::ProcessPdsImageLabel(const std::string &pdsDataFile) {
+  void ProcessImportPds::ProcessPdsImageLabel(const QString &pdsDataFile) {
     Isis::FileName transFile(p_transDir + "/translations/pdsImage.trn");
     Isis::PvlTranslationManager pdsXlater(p_pdsLabel, transFile.expanded());
 
-    Isis::IString str;
+    QString str;
 
     str = pdsXlater.Translate("CoreLinePrefixBytes");
-    SetDataPrefixBytes(str.ToInteger());
+    SetDataPrefixBytes(toInt(str));
 
     str = pdsXlater.Translate("CoreLineSuffixBytes");
-    SetDataSuffixBytes(str.ToInteger());
+    SetDataSuffixBytes(toInt(str));
 
     ProcessPixelBitandType(pdsXlater);
 
@@ -433,11 +433,11 @@ namespace Isis {
     SetByteOrder(Isis::ByteOrderEnumeration(str));
 
     str = pdsXlater.Translate("CoreSamples");
-    int ns = str.ToInteger();
+    int ns = toInt(str);
     str = pdsXlater.Translate("CoreLines");
-    int nl = str.ToInteger();
+    int nl = toInt(str);
     str = pdsXlater.Translate("CoreBands");
-    int nb = str.ToInteger();
+    int nb = toInt(str);
     SetDimensions(ns, nl, nb);
 
     // Set any special pixel values, not qube, so use false
@@ -470,9 +470,9 @@ namespace Isis {
     // Find the image data base and multiplier
     //------------------------------------------------------------
     str = pdsXlater.Translate("CoreBase");
-    SetBase(str.ToDouble());
+    SetBase(toDouble(str));
     str = pdsXlater.Translate("CoreMultiplier");
-    SetMultiplier(str.ToDouble());
+    SetMultiplier(toDouble(str));
 
     // Find the organization of the image data
     str = pdsXlater.Translate("CoreOrganization");
@@ -490,7 +490,7 @@ namespace Isis {
       SetOrganization(ProcessImport::BIL);
     }
     else {
-      string msg = "Unsupported axis order [" + str + "]";
+      QString msg = "Unsupported axis order [" + str + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -500,7 +500,7 @@ namespace Isis {
    * Process the PDS label of type QUBE or SPECTRALQUBE.
    *
    * @param pdsDataFile The name of the PDS data file where the actual image/cube
-   *                    data is stored. This parameter can be an empty string, in
+   *                    data is stored. This parameter can be an empty QString, in
    *                    which case the label information will be searched to find
    *                    the data file name or the data will be assumed to be
    *                    after the label information.
@@ -512,14 +512,14 @@ namespace Isis {
    * @history 2010-12-09 Sharmila Prasad - Set default offset to be 1 for detatched label
    *                                       and offset not set
    */
-  void ProcessImportPds::ProcessPdsQubeLabel(const std::string &pdsDataFile,
-      const std::string &transFile) {
+  void ProcessImportPds::ProcessPdsQubeLabel(const QString &pdsDataFile,
+      const QString &transFile) {
 
     Isis::FileName tFile(p_transDir + "/translations/" + transFile);
 
     Isis::PvlTranslationManager pdsXlater(p_pdsLabel, tFile.expanded());
 
-    Isis::IString str;
+    QString str;
 
     // Find the organization of the image data
     // Save off which axis the samples, lines and bands are on
@@ -527,7 +527,7 @@ namespace Isis {
     int samplePos = 0;
     int bandPos = 0;
     int val = pdsXlater.InputKeyword("CoreOrganization").Size();
-    Isis::IString tmp = "";
+    QString tmp = "";
     for(int i = 0; i < val; i++) {
       str = pdsXlater.Translate("CoreOrganization", i);
       tmp += str;
@@ -541,7 +541,7 @@ namespace Isis {
         bandPos = i;
       }
       else {
-        string message = "Unknown file axis name [" + str + "]";
+        QString message = "Unknown file axis name [" + str + "]";
         throw IException(IException::User, message, _FILEINFO_);
       }
     }
@@ -559,12 +559,13 @@ namespace Isis {
       SetOrganization(ProcessImport::BIL);
     }
     else {
-      PvlKeyword pdsCoreOrg = p_pdsLabel.FindKeyword(pdsXlater.                           InputKeywordName("CoreOrganization"), Pvl::Traverse);
+      PvlKeyword pdsCoreOrg = p_pdsLabel.FindKeyword(pdsXlater.
+          InputKeywordName("CoreOrganization"), Pvl::Traverse);
 
       stringstream pdsCoreOrgStream;
       pdsCoreOrgStream << pdsCoreOrg;
 
-      string msg = "Unsupported axis order [" + pdsCoreOrgStream.str() + "]";
+      QString msg = "Unsupported axis order [" + QString(pdsCoreOrgStream.str().c_str()) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -575,17 +576,17 @@ namespace Isis {
 
     // Set the number of bytes following the second dimension (right side plane)
     str = pdsXlater.Translate("SuffixItemSize");
-    int suffix = str.ToInteger();
+    int suffix = toInt(str);
     str = pdsXlater.Translate("AxisSuffixCount", 0);
-    suffix *= str.ToInteger();
+    suffix *= toInt(str);
     SetDataSuffixBytes(suffix);
 
     str = pdsXlater.Translate("SuffixItemSize");
-    int trailer = str.ToInteger();
+    int trailer = toInt(str);
     str = pdsXlater.Translate("AxisSuffixCount", 1);
-    trailer *= str.ToInteger();
+    trailer *= toInt(str);
     str = pdsXlater.Translate("CoreSamples", samplePos);
-    trailer *= str.ToInteger();
+    trailer *= toInt(str);
     trailer += suffix;
     SetDataTrailerBytes(trailer);
 
@@ -597,11 +598,11 @@ namespace Isis {
 
     // Set the number of samples, lines and bands
     str = pdsXlater.Translate("CoreSamples", samplePos);
-    int ns = str.ToInteger();
+    int ns = toInt(str);
     str = pdsXlater.Translate("CoreLines", linePos);
-    int nl = str.ToInteger();
+    int nl = toInt(str);
     str = pdsXlater.Translate("CoreBands", bandPos);
-    int nb = str.ToInteger();
+    int nb = toInt(str);
     SetDimensions(ns, nl, nb);
 
     // Set any special pixels values, qube, so use true
@@ -639,18 +640,18 @@ namespace Isis {
       vector<double> mults;
       for(int i = 0; i < pdsXlater.InputKeyword("BandBase").Size(); i++) {
         str = pdsXlater.Translate("BandBase", i);
-        bases.push_back(str.ToDouble());
+        bases.push_back(toDouble(str));
         str = pdsXlater.Translate("BandMultiplier", i);
-        mults.push_back(str.ToDouble());
+        mults.push_back(toDouble(str));
       }
       SetBase(bases);
       SetMultiplier(mults);
     }
     else {
       str = pdsXlater.Translate("CoreBase");
-      SetBase(str.ToDouble());
+      SetBase(toDouble(str));
       str = pdsXlater.Translate("CoreMultiplier");
-      SetMultiplier(str.ToDouble());
+      SetMultiplier(toDouble(str));
     }
   }
 
@@ -689,7 +690,7 @@ namespace Isis {
 
     // Set up the correct projection translation table for this label
     Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
-    Isis::IString transDir = (string) dataDir["Base"];
+    QString transDir = (QString) dataDir["Base"];
 
     Isis::FileName transFile;
     if(projType.InputHasKeyword("PdsProjectionTypeImage")) {
@@ -712,44 +713,44 @@ namespace Isis {
     Isis::PvlGroup mapGroup("Mapping");
     mapGroup += Isis::PvlKeyword("ProjectionName", p_projection);
     mapGroup += Isis::PvlKeyword("TargetName", p_targetName);
-    mapGroup += Isis::PvlKeyword("EquatorialRadius", p_equatorialRadius, "meters");
-    mapGroup += Isis::PvlKeyword("PolarRadius", p_polarRadius, "meters");
+    mapGroup += Isis::PvlKeyword("EquatorialRadius", toString(p_equatorialRadius), "meters");
+    mapGroup += Isis::PvlKeyword("PolarRadius", toString(p_polarRadius), "meters");
     mapGroup += Isis::PvlKeyword("LongitudeDirection", p_longitudeDirection);
-    mapGroup += Isis::PvlKeyword("LongitudeDomain", p_longitudeDomain);
+    mapGroup += Isis::PvlKeyword("LongitudeDomain", toString(p_longitudeDomain));
     mapGroup += Isis::PvlKeyword("LatitudeType", p_latitudeType);
     if(p_minimumLatitude != Isis::NULL8) {
-      mapGroup += Isis::PvlKeyword("MinimumLatitude", p_minimumLatitude);
+      mapGroup += Isis::PvlKeyword("MinimumLatitude", toString(p_minimumLatitude));
     }
     if(p_maximumLatitude != Isis::NULL8) {
-      mapGroup += Isis::PvlKeyword("MaximumLatitude", p_maximumLatitude);
+      mapGroup += Isis::PvlKeyword("MaximumLatitude", toString(p_maximumLatitude));
     }
     if(p_minimumLongitude != Isis::NULL8) {
-      mapGroup += Isis::PvlKeyword("MinimumLongitude", p_minimumLongitude);
+      mapGroup += Isis::PvlKeyword("MinimumLongitude", toString(p_minimumLongitude));
     }
     if(p_maximumLongitude != Isis::NULL8) {
-      mapGroup += Isis::PvlKeyword("MaximumLongitude", p_maximumLongitude);
+      mapGroup += Isis::PvlKeyword("MaximumLongitude", toString(p_maximumLongitude));
     }
 
     // if both longitudes exist, verify they are ordered correctly
     if(p_minimumLongitude != Isis::NULL8 && p_maximumLongitude != Isis::NULL8) {
       if(p_maximumLongitude <= p_minimumLongitude) {
         if(p_longitudeDomain == 180) {
-          mapGroup["MinimumLongitude"] = -180;
-          mapGroup["MaximumLongitude"] =  180;
+          mapGroup["MinimumLongitude"] = toString(-180);
+          mapGroup["MaximumLongitude"] = toString(180);
         }
         else {
-          mapGroup["MinimumLongitude"] = 0;
-          mapGroup["MaximumLongitude"] = 360;
+          mapGroup["MinimumLongitude"] = toString(0);
+          mapGroup["MaximumLongitude"] = toString(360);
         }
       }
     }
 
-    mapGroup += Isis::PvlKeyword("PixelResolution", p_pixelResolution, "meters/pixel");
-    mapGroup += Isis::PvlKeyword("Scale", p_scaleFactor, "pixels/degree");
-    mapGroup += Isis::PvlKeyword("UpperLeftCornerX", p_upperLeftX, "meters");
-    mapGroup += Isis::PvlKeyword("UpperLeftCornerY", p_upperLeftY, "meters");
+    mapGroup += Isis::PvlKeyword("PixelResolution", toString(p_pixelResolution), "meters/pixel");
+    mapGroup += Isis::PvlKeyword("Scale", toString(p_scaleFactor), "pixels/degree");
+    mapGroup += Isis::PvlKeyword("UpperLeftCornerX", toString(p_upperLeftX), "meters");
+    mapGroup += Isis::PvlKeyword("UpperLeftCornerY", toString(p_upperLeftY), "meters");
     if(p_rotation != 0.0) {
-      mapGroup += Isis::PvlKeyword("Rotation", p_rotation);
+      mapGroup += Isis::PvlKeyword("Rotation", toString(p_rotation));
     }
 
     // To handle new projections without the need to modify source code
@@ -757,7 +758,7 @@ namespace Isis {
     // contain the projection specific translations from PDS to ISIS for each
     // projection
 
-    string projSpecificFileName = "$base/translations/pdsImport";
+    QString projSpecificFileName = "$base/translations/pdsImport";
     projSpecificFileName += p_projection + ".trn";
     Isis::PvlTranslationManager specificXlater(p_pdsLabel, projSpecificFileName);
 
@@ -767,17 +768,17 @@ namespace Isis {
     if(lab.FindGroup("Mapping").HasKeyword("CenterLongitude")) {
       PvlKeyword &centerLon = lab.FindGroup("Mapping")["CenterLongitude"];
       if(p_longitudeDomain == 180)
-        centerLon = TProjection::To180Domain((double)centerLon);
+        centerLon = toString(TProjection::To180Domain((double)centerLon));
       else
-        centerLon = TProjection::To360Domain((double)centerLon);
+        centerLon = toString(TProjection::To360Domain((double)centerLon));
     }
 
     if(lab.FindGroup("Mapping").HasKeyword("PoleLongitude")) {
       PvlKeyword &poleLon = lab.FindGroup("Mapping")["PoleLongitude"];
       if(p_longitudeDomain == 180)
-        poleLon = TProjection::To180Domain((double)poleLon);
+        poleLon = toString(TProjection::To180Domain((double)poleLon));
       else
-        poleLon = TProjection::To360Domain((double)poleLon);
+        poleLon = toString(TProjection::To360Domain((double)poleLon));
     }
 
     OutputCubes[0]->putGroup(lab.FindGroup("Mapping"));
@@ -809,13 +810,13 @@ namespace Isis {
    */
   void ProcessImportPds::ExtractPdsProjection(Isis::PvlTranslationManager &pdsXlater) {
 
-    Isis::IString str;
+    QString str;
 
     if(pdsXlater.InputHasKeyword("ProjectionName")) {
       p_projection = pdsXlater.Translate("ProjectionName");
     }
     else {
-      string message = "No projection name in labels";
+      QString message = "No projection name in labels";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
 
@@ -823,25 +824,25 @@ namespace Isis {
       p_targetName = pdsXlater.Translate("TargetName");
     }
     else {
-      string message = "No target name in labels";
+      QString message = "No target name in labels";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
 
     if(pdsXlater.InputHasKeyword("EquatorialRadius")) {
       str = pdsXlater.Translate("EquatorialRadius");
-      p_equatorialRadius = str.ToDouble() * 1000.0;
+      p_equatorialRadius = toDouble(str) * 1000.0;
     }
     else {
-      string message = "No equatorial radius name in labels";
+      QString message = "No equatorial radius name in labels";
       throw IException(IException::User, message, _FILEINFO_);
     }
 
     if(pdsXlater.InputHasKeyword("PolarRadius")) {
       str = pdsXlater.Translate("PolarRadius");
-      p_polarRadius = str.ToDouble() * 1000.0;
+      p_polarRadius = toDouble(str) * 1000.0;
     }
     else {
-      string message = "No polar radius in labels";
+      QString message = "No polar radius in labels";
       throw IException(IException::User, message, _FILEINFO_);
     }
 
@@ -865,7 +866,7 @@ namespace Isis {
     if(pdsXlater.InputHasKeyword("MinimumLatitude")) {
       str = pdsXlater.Translate("MinimumLatitude");
       try {
-        p_minimumLatitude = str.ToDouble();
+        p_minimumLatitude = toDouble(str);
       }
       catch(IException &e) {
         p_minimumLatitude = Isis::NULL8;
@@ -878,7 +879,7 @@ namespace Isis {
     if(pdsXlater.InputHasKeyword("MaximumLatitude")) {
       str = pdsXlater.Translate("MaximumLatitude");
       try {
-        p_maximumLatitude = str.ToDouble();
+        p_maximumLatitude = toDouble(str);
       }
       catch(IException &e) {
         p_maximumLatitude = Isis::NULL8;
@@ -895,7 +896,7 @@ namespace Isis {
       str = pdsXlater.Translate("MinimumLongitude");
       try {
         positiveWest = true;
-        p_minimumLongitude = str.ToDouble();
+        p_minimumLongitude = toDouble(str);
       }
       catch(IException &e) {
         p_minimumLongitude = Isis::NULL8;
@@ -904,7 +905,7 @@ namespace Isis {
     else if(pdsXlater.InputHasKeyword("MinimumLongitude2")) {
       str = pdsXlater.Translate("MinimumLongitude2");
       try {
-        p_minimumLongitude = str.ToDouble();
+        p_minimumLongitude = toDouble(str);
       }
       catch(IException &e) {
         p_minimumLongitude = Isis::NULL8;
@@ -918,7 +919,7 @@ namespace Isis {
       str = pdsXlater.Translate("MaximumLongitude");
       try {
         positiveWest = true;
-        p_maximumLongitude = str.ToDouble();
+        p_maximumLongitude = toDouble(str);
       }
       catch(IException &e) {
         p_maximumLongitude = Isis::NULL8;
@@ -927,7 +928,7 @@ namespace Isis {
     else if(pdsXlater.InputHasKeyword("MaximumLongitude2")) {
       str = pdsXlater.Translate("MaximumLongitude2");
       try {
-        p_maximumLongitude = str.ToDouble();
+        p_maximumLongitude = toDouble(str);
       }
       catch(IException &e) {
         p_maximumLongitude = Isis::NULL8;
@@ -938,7 +939,7 @@ namespace Isis {
     }
 
     str = pdsXlater.Translate("LongitudeDomain");
-    p_longitudeDomain = str.ToInteger();
+    p_longitudeDomain = toInt(str);
 
     /**
      * The input file does not have a longitude domain.
@@ -977,20 +978,19 @@ namespace Isis {
     }
 
     str = pdsXlater.Translate("PixelResolution");
-    p_pixelResolution = str.ToDouble();
-    str = pdsXlater.InputKeyword("PixelResolution").Unit();
-    str.UpCase();
+    p_pixelResolution = toDouble(str);
+    str = pdsXlater.InputKeyword("PixelResolution").Unit().toUpper();
     // Assume KM/PIXEL if the unit doesn't exist or is not METERS/PIXEL
     if((str != "METERS/PIXEL") && (str != "M/PIXEL") && (str != "M/PIX")) {
       p_pixelResolution *= 1000.0;
     }
 
     str = pdsXlater.Translate("Scale");
-    p_scaleFactor = str.ToDouble();
+    p_scaleFactor = toDouble(str);
 
     try {
       str = pdsXlater.Translate("Rotation");
-      p_rotation = str.ToDouble();
+      p_rotation = toDouble(str);
     }
     catch(IException &) {
       // assume no rotation if the value isn't a number
@@ -1007,7 +1007,7 @@ namespace Isis {
     else {
       str = pdsXlater.Translate("LineProjectionOffset2");
     }
-    p_lineProjectionOffset = str.ToDouble();
+    p_lineProjectionOffset = toDouble(str);
     p_upperLeftY = ymult * (p_lineProjectionOffset + yoff) * p_pixelResolution;
 
     if(pdsXlater.InputHasKeyword("SampleProjectionOffset")) {
@@ -1016,7 +1016,7 @@ namespace Isis {
     else {
       str = pdsXlater.Translate("SampleProjectionOffset2");
     }
-    p_sampleProjectionOffset = str.ToDouble();
+    p_sampleProjectionOffset = toDouble(str);
     p_upperLeftX = xmult * (p_sampleProjectionOffset + xoff) * p_pixelResolution;
 
 
@@ -1136,7 +1136,7 @@ namespace Isis {
   void ProcessImportPds::TranslateIsis2BandBin(Isis::Pvl &lab) {
     // Set up a translater for Isis2 labels
     Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
-    Isis::IString transDir = (string) dataDir["Base"];
+    QString transDir = (QString) dataDir["Base"];
 
     Isis::FileName transFile(transDir + "/" + "translations/isis2bandbin.trn");
     Isis::PvlTranslationManager isis2Xlater(p_pdsLabel, transFile.expanded());
@@ -1154,7 +1154,7 @@ namespace Isis {
   void ProcessImportPds::TranslateIsis2Instrument(Isis::Pvl &lab) {
     // Set up a translater for Isis2 labels
     Isis::PvlGroup &dataDir = Isis::Preference::Preferences().FindGroup("DataDirectory");
-    Isis::IString transDir = (string) dataDir["Base"];
+    QString transDir = (QString) dataDir["Base"];
     Isis::FileName transFile(transDir + "/" + "translations/isis2instrument.trn");
     Isis::PvlTranslationManager isis2Xlater(p_pdsLabel, transFile.expanded());
 
@@ -1166,8 +1166,8 @@ namespace Isis {
 
     if(inst.HasKeyword("StartTime")) {
       Isis::PvlKeyword &stkey = inst["StartTime"];
-      Isis::IString stime = stkey[0];
-      stime = stime.Trim("Zz");
+      QString stime = stkey[0];
+      stime = stime.remove(QRegExp("[Zz]$"));
       stkey = stime;
     }
   }
@@ -1229,12 +1229,12 @@ namespace Isis {
                                             Pvl::Traverse);
 
     for(int g = 0; g < projDef.Groups(); g++) {
-      string key = projDef.Group(g)["Keyword"];
+      QString key = projDef.Group(g)["Keyword"];
       if(p_pdsLabel.HasKeyword(key)) {
-        string value = p_pdsLabel[key];
-        string pattern = projDef.Group(g)["Pattern"];
+        QString value = p_pdsLabel[key];
+        QString pattern = projDef.Group(g)["Pattern"];
         //  If value contains pattern, then set the mults to what is in translation file
-        if(value.find(pattern) != std::string::npos) {
+        if(value.contains(pattern)) {
           xmult = projDef.Group(g)["xMult"];
           ymult = projDef.Group(g)["yMult"];
           xoff = projDef.Group(g)["xOff"];
@@ -1252,16 +1252,16 @@ namespace Isis {
    * 
    * @param pdsTableName Name of the PDS table object to be imported.
    */
-  void ProcessImportPds::ImportTable(IString pdsTableName) {
+  void ProcessImportPds::ImportTable(QString pdsTableName) {
     // No table file given, let ImportPdsTable find it.
     ImportPdsTable pdsTable(p_labelFile, "", pdsTableName);
     // reformat the table name. If the name ends with the word "Table", remove
     // it. (So, for example, INSTRUMENT_POINTING_TABLE gets formatted to
     // InstrumentPointingTable and then to InstrumentPointing)
-    IString isisTableName = pdsTable.getFormattedName(pdsTableName);
-    size_t found = isisTableName.rfind("Table");
+    QString isisTableName = pdsTable.getFormattedName(pdsTableName);
+    int found = isisTableName.lastIndexOf("Table");
     if (found == isisTableName.length() - 5) {
-      isisTableName.erase(found, 5);
+      isisTableName.remove(found, 5);
     }
 
     Table isisTable = pdsTable.importTable(isisTableName);

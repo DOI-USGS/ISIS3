@@ -38,7 +38,7 @@ namespace Isis {
    * @param size The size of the field. This is the number of values for a 
    *             single table entry. Defaults to 1.
    */
-  TableField::TableField(const std::string &name, TableField::Type type,
+  TableField::TableField(const QString &name, TableField::Type type,
                          int size) {
     m_name = name;
     m_type = type;
@@ -73,30 +73,30 @@ namespace Isis {
    * @throws IException::Programmer - Invalid field type
    */
   TableField::TableField(PvlGroup &field) {
-    m_name = (string) field["Name"];
+    m_name = (QString) field["Name"];
     m_size = (int) field["Size"];
-    if ((string) field["Type"] == "Integer") {
+    if ((QString) field["Type"] == "Integer") {
       m_type = TableField::Integer;
       m_bytes = 4 * m_size;
       m_ivalues.resize(m_size);
     }
-    else if ((string) field["Type"] == "Double") {
+    else if ((QString) field["Type"] == "Double") {
       m_type = TableField::Double;
       m_bytes = 8 * m_size;
       m_dvalues.resize(m_size);
     }
-    else if ((string) field["Type"] == "Text") {
+    else if ((QString) field["Type"] == "Text") {
       m_type = TableField::Text;
       m_bytes = 1 * m_size;
       m_svalue.resize(m_size);
     }
-    else if ((string) field["Type"] == "Real") {
+    else if ((QString) field["Type"] == "Real") {
       m_type = TableField::Real;
       m_bytes = 4 * m_size;
       m_rvalues.resize(m_size);
     }
     else {
-      string msg = "Field [" + m_name + "] has invalid type.";
+      QString msg = "Field [" + m_name + "] has invalid type.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }
@@ -110,7 +110,7 @@ namespace Isis {
    *
    * @return @b string Name of TableField
    */
-  std::string TableField::name() const {
+  QString TableField::name() const {
     return m_name;
   }
 
@@ -203,11 +203,11 @@ namespace Isis {
    */
   TableField::operator int() const {
     if (m_type != TableField::Integer) {
-      string msg = "Field [" + m_name + "] is not Integer.";
+      QString msg = "Field [" + m_name + "] is not Integer.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if (m_ivalues.size() > 1) {
-      string msg = "Field [" + m_name + "] has multiple Integer values. "
+      QString msg = "Field [" + m_name + "] has multiple Integer values. "
                    "Use std::vector<int>().";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -232,11 +232,11 @@ namespace Isis {
    */
   TableField::operator double() const {
     if (m_type != TableField::Double) {
-      string msg = "Field [" + m_name + "] is not a Double.";
+      QString msg = "Field [" + m_name + "] is not a Double.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if (m_dvalues.size() > 1) {
-      string msg = "Field [" + m_name + "] has multiple Double values. "
+      QString msg = "Field [" + m_name + "] has multiple Double values. "
                    "Use std::vector<double>().";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -261,11 +261,11 @@ namespace Isis {
    */
   TableField::operator float() const {
     if (m_type != TableField::Real) {
-      string msg = "Field [" + m_name + "] is not Real.";
+      QString msg = "Field [" + m_name + "] is not Real.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if (m_rvalues.size() > 1) {
-      string msg = "Field [" + m_name + "] has multiple Real values. "
+      QString msg = "Field [" + m_name + "] has multiple Real values. "
                    "Use std::vector<float>().";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -278,20 +278,20 @@ namespace Isis {
    * <code> 
    *   TableField field("Field 1", FieldType::Text, 9);
    *   // The following lines are equivalent
-   *   string value = std::string(field);
-   *   string value = (string) field;
+   *   string value = QString(field);
+   *   string value = (QString) field;
    * </code> 
    *  
    * @return @b string The value of the field.
    *
    * @throws IException::Programmer - Field is not a string
    */
-  TableField::operator std::string() const {
+  TableField::operator QString() const {
     if (m_type != TableField::Text) {
-      string msg = "Field [" + m_name + "] is not Text.";
+      QString msg = "Field [" + m_name + "] is not Text.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
-    return m_svalue;
+    return QString(m_svalue.toAscii().data());
   }
 
   /**
@@ -308,7 +308,7 @@ namespace Isis {
    */
   TableField::operator std::vector<int>() const {
     if (m_type != TableField::Integer) {
-      string msg = "Field [" + m_name + "] is not an Integer array.";
+      QString msg = "Field [" + m_name + "] is not an Integer array.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return m_ivalues;
@@ -328,7 +328,7 @@ namespace Isis {
    */
   TableField::operator std::vector<double>() const {
     if (m_type != TableField::Double) {
-      string msg = "Field [" + m_name + "] is not a Double array.";
+      QString msg = "Field [" + m_name + "] is not a Double array.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return m_dvalues;
@@ -348,7 +348,7 @@ namespace Isis {
    */
   TableField::operator std::vector<float>() const {
     if (m_type != TableField::Real) {
-      string msg = "Field [" + m_name + "] is not a Real array.";
+      QString msg = "Field [" + m_name + "] is not a Real array.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     return m_rvalues;
@@ -365,13 +365,13 @@ namespace Isis {
    */
   void TableField::operator=(const int value) {
     if (m_type != TableField::Integer) {
-      string msg = "Unable to set field to the given int value. Field [" 
+      QString msg = "Unable to set field to the given int value. Field [" 
                    + m_name + "] Type is not Integer.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if (m_size > 1) {
-      string msg = "Unable to set field to the given int value. "
-                   "Field [" + m_name + "] has [" + IString(m_size) + "] "
+      QString msg = "Unable to set field to the given int value. "
+                   "Field [" + m_name + "] has [" + toString(m_size) + "] "
                   "Integer values. Use operator=(vector<int>).";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -389,13 +389,13 @@ namespace Isis {
    */
   void TableField::operator=(const double value) {
     if (m_type != TableField::Double) {
-      string msg = "Unable to set field to the given double value. Field [" 
+      QString msg = "Unable to set field to the given double value. Field [" 
                    + m_name + "] Type is not Double.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if (m_size > 1) {
-      string msg = "Unable to set field to the given double value. "
-                   "Field [" + m_name + "] has [" + IString(m_size) + "] "
+      QString msg = "Unable to set field to the given double value. "
+                   "Field [" + m_name + "] has [" + toString(m_size) + "] "
                    "Double values. Use operator=(vector<double>).";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -413,13 +413,13 @@ namespace Isis {
    */
   void TableField::operator=(const float value) {
     if (m_type != TableField::Real) {
-      string msg = "Unable to set field to the given float value. Field [" 
+      QString msg = "Unable to set field to the given float value. Field [" 
                    + m_name + "] Type is not Real.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if (m_size > 1) {
-      string msg = "Unable to set field to the given float value. "
-                   "Field [" + m_name + "] has [" + IString(m_size) + "] "
+      QString msg = "Unable to set field to the given float value. "
+                   "Field [" + m_name + "] has [" + toString(m_size) + "] "
                    "Real values. Use operator=(vector<float>).";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -433,28 +433,28 @@ namespace Isis {
    *
    * @throws IException::Programmer - Field is not a string
    */
-  void TableField::operator=(const std::string &value) {
-    QString val = QString::fromStdString(value);
+  void TableField::operator=(const QString &value) {
+    QString val = value;
     if (m_type != TableField::Text) {
-      string msg = "Unable to set field to the given string value. Field [" 
-                   + m_name + "] Type is not Text.";
+      QString msg = "Unable to set field to the given string value. Field [" 
+                    + m_name + "] Type is not Text.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if (m_size < (int) val.size()) {// automos with tracking ???
       for (int i = m_size; i < val.size(); i++) {
         // if the extra characters are not spaces or nulls, throw an erro
         if (val[i] != ' ' && val[i] != '\0') {
-          string msg = "Unable to set the Text TableField to the given string. "
-                       "The number of bytes allowed for this field value [" 
-                       + IString(m_size) + "] is less than the length of the "
-                       "given string [" + value + "].";
+          QString msg = "Unable to set the Text TableField to the given string. "
+                        "The number of bytes allowed for this field value [" 
+                        + toString(m_size) + "] is less than the length of the "
+                        "given string [" + value + "].";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
       }
       // if the extra characters are spaces and nulls, concatenate the string 
       val.resize(m_size);
     }
-    m_svalue = val.toStdString();
+    m_svalue = val;
   }
 
   /**
@@ -468,14 +468,14 @@ namespace Isis {
    */
   void TableField::operator=(const std::vector<int> &values) {
     if (m_type != TableField::Integer) {
-      string msg = "Unable to set field to the given vector of int values. "
-                   "Field [" + m_name + "] Type is not Integer.";
+      QString msg = "Unable to set field to the given vector of int values. "
+                    "Field [" + m_name + "] Type is not Integer.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else if ((int) values.size() != m_size) {
-      string msg = "Unable to set field to the given vector of int values. "
+      QString msg = "Unable to set field to the given vector of int values. "
                    "Field [" + m_name + "] values has size [" 
-                   + IString(m_size) + "].";
+                    + toString(m_size) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     m_ivalues = values;
@@ -492,14 +492,14 @@ namespace Isis {
    */
   void TableField::operator=(const std::vector<double> &values) {
     if (m_type != TableField::Double) {
-      string msg = "Unable to set field to the given vector of double values. "
-                   "Field [" + m_name + "] Type is not Double.";
+      QString msg = "Unable to set field to the given vector of double values. "
+                    "Field [" + m_name + "] Type is not Double.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else if ((int) values.size() != m_size) {
-      string msg = "Unable to set field to the given vector of double values. "
-                   "Field [" + m_name + "] values has size [" 
-                   + IString(m_size) + "].";
+      QString msg = "Unable to set field to the given vector of double values. "
+                    "Field [" + m_name + "] values has size [" 
+                    + toString(m_size) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     m_dvalues = values;
@@ -517,14 +517,14 @@ namespace Isis {
    */
   void TableField::operator=(const std::vector<float> &values) {
     if (m_type != TableField::Real) {
-      string msg = "Unable to set field to the given vector of float values. "
-                   "Field [" + m_name + "] Type is not Real.";
+      QString msg = "Unable to set field to the given vector of float values. "
+                    "Field [" + m_name + "] Type is not Real.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     else if ((int) values.size() != m_size) {
-      string msg = "Unable to set field to the given vector of float values. "
-                   "Field [" + m_name + "] values has size [" 
-                   + IString(m_size) + "].";
+      QString msg = "Unable to set field to the given vector of float values. "
+                    "Field [" + m_name + "] values has size [" 
+                    + toString(m_size) + "].";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     m_rvalues = values;
@@ -590,7 +590,7 @@ namespace Isis {
    */
   void TableField::operator=(const char *buf) {
     if (m_type != TableField::Text) {
-      string msg = "Field [" + m_name + "] is not Text.";
+      QString msg = "Unable to set field to the given string value. Field [" + m_name + "] Type is not Text.";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     m_svalue = buf;
@@ -617,7 +617,7 @@ namespace Isis {
     else if (m_type == TableField::Real) {
       group += PvlKeyword("Type", "Real");
     }
-    group += PvlKeyword("Size", m_size);
+    group += PvlKeyword("Size", toString(m_size));
 
     return group;
   }

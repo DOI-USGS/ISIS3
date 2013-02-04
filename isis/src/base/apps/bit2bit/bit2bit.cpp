@@ -98,16 +98,16 @@ void IsisMain(){
   
     //!Write bit2bit summary to print.prt logfile
     PvlGroup results("bit2bit_Results");
-    results += PvlKeyword ("INPUT_LRS",iLrs);
-    results += PvlKeyword ("INPUT_HRS",iHrs);
-    results += PvlKeyword ("INPUT_NULL",iNull);
-    results += PvlKeyword ("INPUT_INVALID_PERCENT",invalid_pi);
-    results += PvlKeyword ("OUTPUT_MIN",validMin);
-    results += PvlKeyword ("OUTPUT_MAX",validMax);
-    results += PvlKeyword ("OUTPUT_LRS",oLrs);
-    results += PvlKeyword ("OUTPUT_HRS",oHrs);
-    results += PvlKeyword ("OUTPUT_NULL",oNull);
-    results += PvlKeyword ("OUTPUT_INVALID_PERCENT",invalid_po);
+    results += PvlKeyword ("INPUT_LRS",toString(iLrs));
+    results += PvlKeyword ("INPUT_HRS",toString(iHrs));
+    results += PvlKeyword ("INPUT_NULL",toString(iNull));
+    results += PvlKeyword ("INPUT_INVALID_PERCENT",toString(invalid_pi));
+    results += PvlKeyword ("OUTPUT_MIN",toString(validMin));
+    results += PvlKeyword ("OUTPUT_MAX",toString(validMax));
+    results += PvlKeyword ("OUTPUT_LRS",toString(oLrs));
+    results += PvlKeyword ("OUTPUT_HRS",toString(oHrs));
+    results += PvlKeyword ("OUTPUT_NULL",toString(oNull));
+    results += PvlKeyword ("OUTPUT_INVALID_PERCENT",toString(invalid_po));
     Application::Log(results);
   
     delete histptr;
@@ -134,12 +134,12 @@ void IsisMain(){
   
     //!Write bit2bit summary to print.prt logfile
     PvlGroup results("bit2bit_Results");
-    results += PvlKeyword ("INPUT_LRS",iLrs);
-    results += PvlKeyword ("INPUT_HRS",iHrs);
-    results += PvlKeyword ("INPUT_NULL",iNull);
-    results += PvlKeyword ("INPUT_INVALID_PERCENT",invalid_pi);
-    results += PvlKeyword ("OUTPUT_MIN",validMin);
-    results += PvlKeyword ("OUTPUT_MAX",validMax);
+    results += PvlKeyword ("INPUT_LRS",toString(iLrs));
+    results += PvlKeyword ("INPUT_HRS",toString(iHrs));
+    results += PvlKeyword ("INPUT_NULL",toString(iNull));
+    results += PvlKeyword ("INPUT_INVALID_PERCENT",toString(invalid_pi));
+    results += PvlKeyword ("OUTPUT_MIN",toString(validMin));
+    results += PvlKeyword ("OUTPUT_MAX",toString(validMax));
     Application::Log(results);
   
     delete histptr;

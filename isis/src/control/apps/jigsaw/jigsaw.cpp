@@ -15,15 +15,15 @@ void IsisMain() {
 
   // Get the control network and image list
   UserInterface &ui = Application::GetUserInterface();
-  std::string cnetFile = ui.GetFileName("CNET");
-  std::string cubeList = ui.GetFileName("FROMLIST");
+  QString cnetFile = ui.GetFileName("CNET");
+  QString cubeList = ui.GetFileName("FROMLIST");
 
   
   BundleAdjust *b = NULL;
 
   // Get the held list if entered and prep for bundle adjustment, to determine which constructor to use
   if (ui.WasEntered("HELDLIST")) {
-    std::string heldList = ui.GetFileName("HELDLIST");
+    QString heldList = ui.GetFileName("HELDLIST");
     b = new BundleAdjust(cnetFile, cubeList, heldList);
   }
   else {
@@ -31,7 +31,7 @@ void IsisMain() {
    }
 
   //build lists of maximum likelihood estimation model strings and quantiles
-  QList<string> maxLikeModels;
+  QList<QString> maxLikeModels;
   QList<double> maxQuan;
   if ( ui.GetString("MODEL1").compare("NONE") !=0 ) {
     maxLikeModels.push_back(ui.GetString("MODEL1"));
@@ -60,7 +60,7 @@ void IsisMain() {
 
   b->SetCKDegree(ui.GetInteger("CKDEGREE"));
   b->SetSolveCKDegree(ui.GetInteger("CKSOLVEDEGREE"));
-  std::string camsolve = ui.GetString("CAMSOLVE");
+  QString camsolve = ui.GetString("CAMSOLVE");
 
   if (camsolve == "NONE") {
     b->SetSolveCmatrix(BundleAdjust::None);
@@ -84,7 +84,7 @@ void IsisMain() {
 
   b->SetSPKDegree(ui.GetInteger("SPKDEGREE"));
   b->SetSolveSPKDegree(ui.GetInteger("SPKSOLVEDEGREE"));
-  std::string spsolve = ui.GetString("SPSOLVE");
+  QString spsolve = ui.GetString("SPSOLVE");
   if(spsolve == "NONE") {
     b->SetSolveSpacecraftPosition(BundleAdjust::Nothing);
   }
@@ -151,7 +151,7 @@ void IsisMain() {
 
   // output options
   if (ui.WasEntered("FILE_PREFIX"))  {
-      std::string outputfileprefix = ui.GetString("FILE_PREFIX");
+      QString outputfileprefix = ui.GetString("FILE_PREFIX");
       b->SetOutputFilePrefix(outputfileprefix);
   }
 
@@ -209,7 +209,7 @@ void IsisMain() {
           for (int iobj = 0; iobj < c->getLabel()->Objects(); iobj++) {
             PvlObject obj = c->getLabel()->Object(iobj);
             if (obj.Name() != "Table") continue;
-            if (obj["Name"][0] != IString("CameraStatistics")) continue;
+            if (obj["Name"][0] != QString("CameraStatistics")) continue;
             c->getLabel()->DeleteObject(iobj);
             break;
           }
@@ -218,7 +218,7 @@ void IsisMain() {
           //  keyword.
           if (b->IsHeld(i)) continue;   // Don't update held images at all
           Table cmatrix = b->Cmatrix(i);
-          std::string jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
+          QString jigComment = "Jigged = " + Isis::iTime::CurrentLocalTime();
           cmatrix.Label().AddComment(jigComment);
           Table spvector = b->SpVector(i);
           spvector.Label().AddComment(jigComment);
@@ -237,7 +237,7 @@ void IsisMain() {
 
   catch(IException &e) {
     b->ControlNet()->Write(ui.GetFileName("ONET"));
-    string msg = "Unable to bundle adjust network [" + cnetFile + "]";
+    QString msg = "Unable to bundle adjust network [" + cnetFile + "]";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 

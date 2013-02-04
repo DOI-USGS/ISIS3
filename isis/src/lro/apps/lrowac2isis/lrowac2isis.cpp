@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 #include <cstdio>
-#include <string>
+#include <QString>
 
 #include <QRegExp>
 
@@ -53,7 +53,7 @@ void IsisMain() {
   Pvl pdsLab;
 
   UserInterface &ui = Application::GetUserInterface();
-  string fromFile = ui.GetFileName("FROM");
+  QString fromFile = ui.GetFileName("FROM");
 
   flip = false;//ui.GetBoolean("FLIP");
 
@@ -71,13 +71,13 @@ void IsisMain() {
       IString lutPair = lutKeyword[i];
       lutPair.ConvertWhiteSpace();
       lutPair.Remove("() ");
-      IString outValueMin = lutPair.Token(" ,");
-      IString outValueMax = lutPair.Token(" ,");
-      lookupTable.AddPair(i, ((double)outValueMin + (double)outValueMax) / 2.0);
+      QString outValueMin = lutPair.Token(" ,").ToQt();
+      QString outValueMax = lutPair.Token(" ,").ToQt();
+      lookupTable.AddPair(i, (toDouble(outValueMin) + toDouble(outValueMax)) / 2.0);
     }
   }
 
-  string instModeId = pdsLab["INSTRUMENT_MODE_ID"];
+  QString instModeId = pdsLab["INSTRUMENT_MODE_ID"];
 
   // this will be used to convert num input lines to num output lines,
   //   only changed for when both uv and vis exist (varying summing)
@@ -173,7 +173,7 @@ void IsisMain() {
     uveven->setDimensions(numSamples, numLines, numBands);
     uveven->setPixelType(Isis::Real);
 
-    string filename = baseFileName.path() + "/" + baseFileName.baseName() + ".uv.even.cub";
+    QString filename = baseFileName.path() + "/" + baseFileName.baseName() + ".uv.even.cub";
     uveven->create(filename);
 
     uvodd->setDimensions(numSamples, numLines, numBands);
@@ -192,7 +192,7 @@ void IsisMain() {
     viseven->setDimensions(numSamples, numLines, numBands);
     viseven->setPixelType(Isis::Real);
 
-    string filename = baseFileName.path() + "/" + baseFileName.baseName() + ".vis.even.cub";
+    QString filename = baseFileName.path() + "/" + baseFileName.baseName() + ".vis.even.cub";
     viseven->create(filename);
 
     visodd->setDimensions(numSamples, numLines, numBands);
@@ -213,7 +213,7 @@ void IsisMain() {
   OriginalLabel origLabel(pdsLab);
 
   int numFramelets = padding.size();
-  PvlKeyword numFrameletsKeyword("NumFramelets", numFramelets);
+  PvlKeyword numFrameletsKeyword("NumFramelets", toString(numFramelets));
 
   if(uveven) {
     for(int grp = 0; grp < isis3UvEvenLab.Groups(); grp++) {
@@ -412,7 +412,7 @@ void separateFramelets(Buffer &in) {
   if(!extractMiddleSamples) {
     for(int i = 0; i < in.size(); i++) {
       if(i >= mgr.size()) {
-        string msg = "The input file has an unexpected number of samples";
+        QString msg = "The input file has an unexpected number of samples";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
@@ -425,7 +425,7 @@ void separateFramelets(Buffer &in) {
     int endSamp = (in.size() / 2) + mgr.size() / 2;
 
     if(mgr.size() > in.size()) {
-      string msg = "Output number of samples calculated is invalid";
+      QString msg = "Output number of samples calculated is invalid";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
@@ -458,7 +458,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
 
   // Get the directory where the translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  IString transDir = (string) dataDir["Lro"] + "/translations/";
+  QString transDir = (QString) dataDir["Lro"] + "/translations/";
 
   // Translate the in
   FileName transFile(transDir + "lrowacInstrument.trn");
@@ -488,7 +488,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
     genericInstrument.push_back(PvlKeyword("ColorOffset", 0));
   }
   else {
-    genericInstrument.push_back(PvlKeyword("ColorOffset", colorOffset));
+    genericInstrument.push_back(PvlKeyword("ColorOffset", toString(colorOffset)));
   }
 
   genericInstrument.push_back(PvlKeyword("Decompanded", (ui.GetBoolean("UNLUT") ? "Yes" : "No")));
@@ -510,16 +510,16 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
   // add labels unique to particular files
   if(viseven) {
     visEvenInst.AddKeyword(PvlKeyword("Framelets", "Even"));
-    visEvenInst.AddKeyword(PvlKeyword("NumFramelets", viseven->getLineCount() / 14));
+    visEvenInst.AddKeyword(PvlKeyword("NumFramelets", toString(viseven->getLineCount() / 14)));
     visEvenInst.AddKeyword(PvlKeyword("InstrumentId", "WAC-VIS"), Pvl::Replace);
-    visEvenInst.AddKeyword(PvlKeyword("InstrumentModeId", (std::string) pdsLab["INSTRUMENT_MODE_ID"]));
+    visEvenInst.AddKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
   }
 
   if(visodd) {
     visOddInst.AddKeyword(PvlKeyword("Framelets", "Odd"));
-    visOddInst.AddKeyword(PvlKeyword("NumFramelets", visodd->getLineCount() / 14));
+    visOddInst.AddKeyword(PvlKeyword("NumFramelets", toString(visodd->getLineCount() / 14)));
     visOddInst.AddKeyword(PvlKeyword("InstrumentId", "WAC-VIS"), Pvl::Replace);
-    visOddInst.AddKeyword(PvlKeyword("InstrumentModeId", (std::string) pdsLab["INSTRUMENT_MODE_ID"]));
+    visOddInst.AddKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
   }
 
   // **TEMPORARY. This should be done by a translation table.
@@ -539,7 +539,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
   }
   else {
     for(int i = 0; i < pdsLab["FILTER_NUMBER"].Size(); i++) {
-      if((int) pdsLab["FILTER_NUMBER"][i] > 2) {
+      if(toInt(pdsLab["FILTER_NUMBER"][i]) > 2) {
         visWavelength += pdsLab["CENTER_FILTER_WAVELENGTH"][i];
         visFilterNum += pdsLab["FILTER_NUMBER"][i];
 
@@ -567,16 +567,16 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
 
   if(uveven) {
     uvEvenInst.AddKeyword(PvlKeyword("Framelets", "Even"));
-    uvEvenInst.AddKeyword(PvlKeyword("NumFramelets", uveven->getLineCount() / 4));
+    uvEvenInst.AddKeyword(PvlKeyword("NumFramelets", toString(uveven->getLineCount() / 4)));
     uvEvenInst.AddKeyword(PvlKeyword("InstrumentId", "WAC-UV"), Pvl::Replace);
-    uvEvenInst.AddKeyword(PvlKeyword("InstrumentModeId", (std::string) pdsLab["INSTRUMENT_MODE_ID"]));
+    uvEvenInst.AddKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
   }
 
   if(uvodd) {
     uvOddInst.AddKeyword(PvlKeyword("Framelets", "Odd"));
-    uvOddInst.AddKeyword(PvlKeyword("NumFramelets", uvodd->getLineCount() / 4));
+    uvOddInst.AddKeyword(PvlKeyword("NumFramelets", toString(uvodd->getLineCount() / 4)));
     uvOddInst.AddKeyword(PvlKeyword("InstrumentId", "WAC-UV"), Pvl::Replace);
-    uvOddInst.AddKeyword(PvlKeyword("InstrumentModeId", (std::string) pdsLab["INSTRUMENT_MODE_ID"]));
+    uvOddInst.AddKeyword(PvlKeyword("InstrumentModeId", (QString) pdsLab["INSTRUMENT_MODE_ID"]));
   }
 
   // Translate the BandBin group
@@ -586,7 +586,7 @@ void TranslateLabels(Pvl &pdsLab, Pvl &isis3VisEven, Pvl &isis3VisOdd,
   PvlKeyword uvBandwidth("Width");
 
   for(int i = 0; i < pdsLab["FILTER_NUMBER"].Size(); i++) {
-    if((int) pdsLab["FILTER_NUMBER"][i] <= 2) {
+    if(toInt(pdsLab["FILTER_NUMBER"][i]) <= 2) {
       uvWavelength += pdsLab["CENTER_FILTER_WAVELENGTH"][i];
       uvFilterNum += pdsLab["FILTER_NUMBER"][i];
 
@@ -671,68 +671,68 @@ void ValidateInputLabels(Pvl &pdsLab) {
     PvlKeyword &lut = pdsLab["LRO:LOOKUP_CONVERSION_TABLE"];
 
     if(lut.Size() != 256) {
-      IString msg = "Keyword [LRO:LOOKUP_CONVERSION_TABLE] has the wrong number of values";
+      QString msg = "Keyword [LRO:LOOKUP_CONVERSION_TABLE] has the wrong number of values";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     PvlKeyword &missionName = pdsLab["MISSION_NAME"];
 
     if(missionName.Size() != 1 || missionName[0] != "LUNAR RECONNAISSANCE ORBITER") {
-      IString msg = "Keyword [MISSION_NAME] does not have a value of [LUNAR RECONNAISSANCER ORBITER]";
+      QString msg = "Keyword [MISSION_NAME] does not have a value of [LUNAR RECONNAISSANCER ORBITER]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     PvlKeyword &instrumentId = pdsLab["INSTRUMENT_ID"];
 
     if(instrumentId.Size() != 1 || instrumentId[0] != "LROC") {
-      IString msg = "Keyword [INSTRUMENT_ID] does not have a value of [LROC]";
+      QString msg = "Keyword [INSTRUMENT_ID] does not have a value of [LROC]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     // Make sure CENTER_FILTER_WAVELENGTH/FILTER_NUMBER makes sense
     if(pdsLab["FILTER_NUMBER"].Size() != pdsLab["CENTER_FILTER_WAVELENGTH"].Size()) {
-      IString msg = "Keywords [FILTER_NUMBER,CENTER_FILTER_WAVELENGTH] must have the same number of values";
+      QString msg = "Keywords [FILTER_NUMBER,CENTER_FILTER_WAVELENGTH] must have the same number of values";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     if(pdsLab["INSTRUMENT_MODE_ID"][0] == "BW" && pdsLab["FILTER_NUMBER"].Size() != 1) {
-      IString msg = "Keyword [FILTER_NUMBER] must have size 1 if [INSTRUMENT_MODE_ID] is [BW]";
+      QString msg = "Keyword [FILTER_NUMBER] must have size 1 if [INSTRUMENT_MODE_ID] is [BW]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     else if(pdsLab["INSTRUMENT_MODE_ID"][0] == "COLOR" && (pdsLab["FILTER_NUMBER"].Size() < 5
             || pdsLab["FILTER_NUMBER"].Size() > 7 || pdsLab["FILTER_NUMBER"].Size() == 6)) {
-      IString msg = "Keyword [FILTER_NUMBER] must have size 5 or 7 if [INSTRUMENT_MODE_ID] is [COLOR]";
+      QString msg = "Keyword [FILTER_NUMBER] must have size 5 or 7 if [INSTRUMENT_MODE_ID] is [COLOR]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     else if(pdsLab["INSTRUMENT_MODE_ID"][0] == "UV" && pdsLab["FILTER_NUMBER"].Size() != 2) {
-      IString msg = "Keyword [FILTER_NUMBER] must have size 2 if [INSTRUMENT_MODE_ID] is [UV]";
+      QString msg = "Keyword [FILTER_NUMBER] must have size 2 if [INSTRUMENT_MODE_ID] is [UV]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     else if(pdsLab["INSTRUMENT_MODE_ID"][0] == "VIS" && pdsLab["FILTER_NUMBER"].Size() != 5) {
-      IString msg = "Keyword [FILTER_NUMBER] must have size 5 if [INSTRUMENT_MODE_ID] is [VIS]";
+      QString msg = "Keyword [FILTER_NUMBER] must have size 5 if [INSTRUMENT_MODE_ID] is [VIS]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     else if(pdsLab["INSTRUMENT_MODE_ID"][0] != "BW" && pdsLab["INSTRUMENT_MODE_ID"][0] != "COLOR" &&
             pdsLab["INSTRUMENT_MODE_ID"][0] != "UV" && pdsLab["INSTRUMENT_MODE_ID"][0] != "VIS") {
-      IString msg = "The value of keyword [INSTRUMENT_MODE_ID] is not recognized";
+      QString msg = "The value of keyword [INSTRUMENT_MODE_ID] is not recognized";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     // number/bandwidth matches for filters
-    vector< pair<int, IString> > filters;
-    filters.push_back(pair<int, IString>(1, "321"));
-    filters.push_back(pair<int, IString>(2, "360"));
-    filters.push_back(pair<int, IString>(3, "415"));
-    filters.push_back(pair<int, IString>(4, "566"));
-    filters.push_back(pair<int, IString>(5, "604"));
-    filters.push_back(pair<int, IString>(6, "643"));
-    filters.push_back(pair<int, IString>(7, "689"));
+    vector< pair<int, QString> > filters;
+    filters.push_back(pair<int, QString>(1, "321"));
+    filters.push_back(pair<int, QString>(2, "360"));
+    filters.push_back(pair<int, QString>(3, "415"));
+    filters.push_back(pair<int, QString>(4, "566"));
+    filters.push_back(pair<int, QString>(5, "604"));
+    filters.push_back(pair<int, QString>(6, "643"));
+    filters.push_back(pair<int, QString>(7, "689"));
 
     for(int i = 0; i < pdsLab["FILTER_NUMBER"].Size(); i++) {
       bool found = false;
       bool match = false;
       for(int j = 0; !found && j < (int) filters.size(); j++) {
-        if((int) pdsLab["FILTER_NUMBER"][i] == filters[j].first) {
+        if(toInt(pdsLab["FILTER_NUMBER"][i]) == filters[j].first) {
           found = true;
 
           match = (pdsLab["CENTER_FILTER_WAVELENGTH"][i] == filters[j].second);
@@ -740,24 +740,24 @@ void ValidateInputLabels(Pvl &pdsLab) {
       }
 
       if(found && !match) {
-        IString msg = "The [FILTER_NUMBER] and [CENTER_FILTER_WAVELENGTH] keywords do not correspond properly";
+        QString msg = "The [FILTER_NUMBER] and [CENTER_FILTER_WAVELENGTH] keywords do not correspond properly";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
       if(!found) {
-        IString msg = "The value of the keyword [FILTER_NUMBER] is invalid";
+        QString msg = "The value of the keyword [FILTER_NUMBER] is invalid";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
 
     // Now make sure keywords that shouldn't exist dont
-    IString invalidKeywords[] = {
+    QString invalidKeywords[] = {
       "SPACECRAFT_CLOCK_CNT_PARTITION"
     };
 
-    for(unsigned int i = 0; i < sizeof(IString) / sizeof(invalidKeywords); i++) {
+    for(unsigned int i = 0; i < sizeof(QString) / sizeof(invalidKeywords); i++) {
       if(pdsLab.HasKeyword(invalidKeywords[i])) {
-        IString msg = "Keyword [";
+        QString msg = "Keyword [";
         msg += invalidKeywords[i];
         msg += "] must not exist";
         throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -769,13 +769,13 @@ void ValidateInputLabels(Pvl &pdsLab) {
     QRegExp integerRegex("[0-9]+");
 
     if(orbitNumber.Size() != 1 || !integerRegex.exactMatch(orbitNumber[0])) {
-      IString msg = "The value of keyword [ORBIT_NUMBER] is not valid";
+      QString msg = "The value of keyword [ORBIT_NUMBER] is not valid";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     // Check for keywords that must be doubles or integers
     QRegExp numberRegex("[-+]{0,1}([0-9]*\\.[0-9]+)|([0-9]+\\.[0-9]*)|([0-9]+)");
-    IString numericKeywords[] = {
+    QString numericKeywords[] = {
       "LRO:BEGIN_TEMPERATURE_SCS",
       "LRO:MIDDLE_TEMPERATURE_SCS",
       "LRO:END_TEMPERATURE_SCS",
@@ -786,9 +786,9 @@ void ValidateInputLabels(Pvl &pdsLab) {
       "EXPOSURE_DURATION"
     };
 
-    for(unsigned int i = 0; i < sizeof(numericKeywords) / sizeof(IString); i++) {
+    for(unsigned int i = 0; i < sizeof(numericKeywords) / sizeof(QString); i++) {
       if(pdsLab[numericKeywords[i]].Size() != 1 || !numberRegex.exactMatch(pdsLab[numericKeywords[i]][0])) {
-        IString msg = "The value of keyword [";
+        QString msg = "The value of keyword [";
         msg += numericKeywords[i];
         msg += "] is not valid";
         throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -797,14 +797,14 @@ void ValidateInputLabels(Pvl &pdsLab) {
 
     // Now check for keywords that must be dateTtime
     QRegExp timeRegex("[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]*");
-    IString timeKeywords[] = {
+    QString timeKeywords[] = {
       "START_TIME",
       "STOP_TIME"
     };
 
-    for(unsigned int i = 0; i < sizeof(timeKeywords) / sizeof(IString); i++) {
+    for(unsigned int i = 0; i < sizeof(timeKeywords) / sizeof(QString); i++) {
       if(pdsLab[timeKeywords[i]].Size() != 1 || !timeRegex.exactMatch(pdsLab[timeKeywords[i]][0])) {
-        IString msg = "The value of keyword [";
+        QString msg = "The value of keyword [";
         msg += timeKeywords[i];
         msg += "] is not valid";
         throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -813,14 +813,14 @@ void ValidateInputLabels(Pvl &pdsLab) {
 
     // Now check keywords that must be clock counts
     QRegExp clockRegex("[0-9]+/[0-9]+:[0-9]+\\.{0,1}[0-9]*");
-    IString clockKeywords[] = {
+    QString clockKeywords[] = {
       "SPACECRAFT_CLOCK_START_COUNT",
       "SPACECRAFT_CLOCK_STOP_COUNT"
     };
 
-    for(unsigned int i = 0; i < sizeof(clockKeywords) / sizeof(IString); i++) {
+    for(unsigned int i = 0; i < sizeof(clockKeywords) / sizeof(QString); i++) {
       if(pdsLab[clockKeywords[i]].Size() != 1 || !clockRegex.exactMatch(pdsLab[clockKeywords[i]][0])) {
-        IString msg = "The value of keyword [";
+        QString msg = "The value of keyword [";
         msg += clockKeywords[i];
         msg += "] is not valid";
         throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -828,7 +828,7 @@ void ValidateInputLabels(Pvl &pdsLab) {
     }
   }
   catch(IException &e) {
-    IString msg = "The input product is out of date and has invalid labels. Please get an up to date version from the ASU LROC Team";
+    QString msg = "The input product is out of date and has invalid labels. Please get an up to date version from the ASU LROC Team";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
 }

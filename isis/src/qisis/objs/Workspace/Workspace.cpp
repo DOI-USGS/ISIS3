@@ -116,12 +116,12 @@ namespace Isis {
     Cube *cube = new Cube;
 
     //Read in the CubeAttribueInput from the cube name
-    CubeAttributeInput inAtt(cubename.toStdString());
-    std::vector<std::string> bands = inAtt.bands();
+    CubeAttributeInput inAtt(cubename);
+    std::vector<QString> bands = inAtt.bands();
 
     //Set the virtual bands to the bands specified by the input
     cube->setVirtualBands(bands);
-    cube->open(cubename.toStdString());
+    cube->open(cubename);
 
     MdiCubeViewport *cvp = addCubeViewport(cube);
 
@@ -173,7 +173,7 @@ namespace Isis {
       throw IException(e,
                        IException::Programmer,
                        tr("Error when attempting to show cube [%1]")
-                         .arg(cube->getFileName().ToQt()),
+                         .arg(cube->getFileName()),
                        _FILEINFO_);
     }
 

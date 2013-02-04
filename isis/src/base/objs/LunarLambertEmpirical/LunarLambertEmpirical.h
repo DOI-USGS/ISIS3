@@ -1,4 +1,4 @@
-#if !defined(LunarLambertEmpirical_h)
+#ifndef LunarLambertEmpirical_h
 #define LunarLambertEmpirical_h
 /**
  * @file
@@ -61,9 +61,9 @@ namespace Isis {
       LunarLambertEmpirical(Pvl &pvl);
       virtual ~LunarLambertEmpirical();
 
-      void SetPhotoPhaseList(const string phasestrlist);
-      void SetPhotoLList(const string kstrlist);
-      void SetPhotoPhaseCurveList(const string phasecurvestrlist);
+      void SetPhotoPhaseList(QString phasestrlist);
+      void SetPhotoLList(QString kstrlist);
+      void SetPhotoPhaseCurveList(QString phasecurvestrlist);
 
       //! Return photometric phase angle list
 //      inline std::vector<double> PhotoPhaseList() const {

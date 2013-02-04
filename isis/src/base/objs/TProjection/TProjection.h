@@ -183,14 +183,14 @@ namespace Isis {
        *
        * @return string The name of the map projection.
        */
-      virtual std::string Name() const = 0;
+      virtual QString Name() const = 0;
       /**
        * This method returns the Version of the map projection.  It is a pure 
        * virtual method (requires all subclasses to override).
        *
        * @return string The Version number of the map projection.
        */
-      virtual std::string Version() const = 0;
+      virtual QString Version() const = 0;
       virtual double TrueScaleLatitude() const;
       virtual bool IsEquatorialCylindrical();
       /**
@@ -211,7 +211,7 @@ namespace Isis {
       // Check latitude type or get latitude type as a string
       bool IsPlanetocentric() const;
       bool IsPlanetographic() const;
-      std::string LatitudeTypeString() const;
+      QString LatitudeTypeString() const;
       // change latitude type
       double ToPlanetocentric(const double lat) const;
       double ToPlanetographic(const double lat) const;
@@ -229,12 +229,12 @@ namespace Isis {
       // Check longitude direction or get longitude direction as a string
       bool IsPositiveEast() const;
       bool IsPositiveWest() const;
-      std::string LongitudeDirectionString() const;
+      QString LongitudeDirectionString() const;
 
       // Check longitude domain or get longitude domain as a string
       bool Has180Domain() const;
       bool Has360Domain() const;
-      std::string LongitudeDomainString() const;
+      QString LongitudeDomainString() const;
 
       // Get min/max lat/lon
       double MinimumLatitude() const;
@@ -272,7 +272,7 @@ namespace Isis {
       virtual PvlGroup MappingLongitudes();
 
       // Static conversion methods
-      static PvlGroup TargetRadii(std::string target);
+      static PvlGroup TargetRadii(QString target);
       static PvlGroup TargetRadii(Pvl &cubeLab, PvlGroup &mapGroup);
 
       // change latitude type

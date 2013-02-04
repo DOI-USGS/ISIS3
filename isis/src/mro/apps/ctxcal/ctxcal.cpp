@@ -38,9 +38,9 @@ void IsisMain() {
   Isis::PvlGroup &inst =
     lab.FindGroup("Instrument", Pvl::Traverse);
 
-  std::string instId = inst["InstrumentId"];
+  QString instId = inst["InstrumentId"];
   if(instId != "CTX") {
-    string msg = "This is not a CTX image.  Ctxcal requires a CTX image.";
+    QString msg = "This is not a CTX image.  Ctxcal requires a CTX image.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -60,13 +60,13 @@ void IsisMain() {
 
   // If it is already calibrated then complain
   if(icube->hasGroup("Radiometry")) {
-    string msg = "The CTX image [" + icube->getFileName() + "] has already "
+    QString msg = "The CTX image [" + icube->getFileName() + "] has already "
                  "been radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Get label parameters we will need for calibration equation
-  iTime startTime((string) inst["StartTime"]);
+  iTime startTime((QString) inst["StartTime"]);
   double etStart = startTime.Et();
 
   //  Read exposure and convert to milliseconds
@@ -133,21 +133,21 @@ void IsisMain() {
   if(convertIOF) {
     // Get the distance between Mars and the Sun at the given time in
     // Astronomical Units (AU)
-    string bspKernel = p.MissionData("base", "/kernels/spk/de???.bsp", true);
-    furnsh_c(bspKernel.c_str());
-    string pckKernel = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
-    furnsh_c(pckKernel.c_str());
+    QString bspKernel = p.MissionData("base", "/kernels/spk/de???.bsp", true);
+    furnsh_c(bspKernel.toAscii().data());
+    QString pckKernel = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
+    furnsh_c(pckKernel.toAscii().data());
     double sunpos[6], lt;
     spkezr_c("sun", etStart, "iau_mars", "LT+S", "mars", sunpos, &lt);
     double dist1 = vnorm_c(sunpos);
-    unload_c(bspKernel.c_str());
-    unload_c(pckKernel.c_str());
+    unload_c(bspKernel.toAscii().data());
+    unload_c(pckKernel.toAscii().data());
 
     double dist = 2.07E8;
     double w0 = 3660.5;
     double w1 = w0 * ((dist * dist) / (dist1 * dist1));
     if(exposure *w1 == 0.0) {
-      string msg = icube->getFileName() + ": exposure or w1 has value of 0.0 ";
+      QString msg = icube->getFileName() + ": exposure or w1 has value of 0.0 ";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     iof = 1.0 / (exposure * w1);
@@ -163,7 +163,7 @@ void IsisMain() {
   PvlGroup calgrp("Radiometry");
 
   calgrp += PvlKeyword("FlatFile", flatFile.getFileName());
-  calgrp += PvlKeyword("iof", iof);
+  calgrp += PvlKeyword("iof", toString(iof));
 
 
   ocube->putGroup(calgrp);

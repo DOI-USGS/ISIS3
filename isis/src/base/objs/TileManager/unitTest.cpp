@@ -6,28 +6,30 @@
 #include "TileManager.h"
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
-int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
 
-  string fname = "IsisTileUnitTest";
+int main(int argc, char *argv[]) {
+  Preference::Preferences(true);
+
+  QString fname = "IsisTileUnitTest";
   const int ns = 254;
   const int nl = 300;
   const int nb = 2;
 
   // Allocate a cube
-  Isis::Cube *cube = new Isis::Cube;
+  Cube *cube = new Cube;
   try {
     cube->setDimensions(ns, nl, nb);
     cube->create(fname);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     delete cube;
     e.print();
   }
 
   // Create a tile buffer for the cube with default size (128,128)
-  Isis::TileManager tile(*cube);
+  TileManager tile(*cube);
   cout << "tiles = " << tile.Tiles() << endl;
 
   // Get each tile and output the sample, line and band of the upper left corner
@@ -41,7 +43,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Create a tile buffer for the cube with (91,113)
-  Isis::TileManager tile2(*cube, 91, 113);
+  TileManager tile2(*cube, 91, 113);
 
   // Get each tile and output the sample, line and band of the upper left corner
   cout << "Coordinates of upper left pixel in each 91 x 113 tile" << endl;

@@ -134,7 +134,7 @@ namespace Isis {
   class Pvl : public Isis::PvlObject {
     public:
       Pvl();
-      Pvl(const std::string &file);
+      Pvl(const QString &file);
       Pvl(const Pvl &other);
 
       friend std::istream &operator>>(std::istream &is, Pvl &pvl);
@@ -144,10 +144,10 @@ namespace Isis {
         if(p_internalTemplate) delete p_formatTemplate;
       };
 
-      void Read(const std::string &file);
+      void Read(const QString &file);
 
-      void Write(const std::string &file);
-      void Append(const std::string &file);
+      void Write(const QString &file);
+      void Append(const QString &file);
 
       /**
        * Sets the terminator used to signify the end of the PVL
@@ -155,7 +155,7 @@ namespace Isis {
        *
        * @param term The user-defined terminator
        */
-      void SetTerminator(const std::string &term) {
+      void SetTerminator(const QString &term) {
         p_terminator = term;
       };
       /**
@@ -164,12 +164,12 @@ namespace Isis {
        *
        * @return The terminator used by the Pvl object.
        */
-      std::string Terminator() const {
+      QString Terminator() const {
         return p_terminator;
       };
 
       void SetFormatTemplate(Isis::Pvl &temp);
-      void SetFormatTemplate(const std::string &filename);
+      void SetFormatTemplate(const QString &filename);
 
       const Pvl &operator=(const Pvl &other);
       
@@ -179,7 +179,7 @@ namespace Isis {
     private:
       void Init();
       bool p_internalTemplate;
-      std::string p_terminator; /**<Terminator used to signify the end of the
+      QString p_terminator; /**<Terminator used to signify the end of the
                                     PVL informationDefaults to "END"*/
   };
 };

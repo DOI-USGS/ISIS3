@@ -26,6 +26,8 @@
 #include <vector>
 #include <string>
 
+#include <QString>
+
 namespace Isis {
   /**
    * @brief Generic linear equation class
@@ -58,7 +60,7 @@ namespace Isis {
    */
   class BasisFunction {
     public:
-      BasisFunction(const std::string &name, int numVars, int numCoefs);
+      BasisFunction(const QString &name, int numVars, int numCoefs);
       //! Destroys the BasisFunction object.
       virtual ~BasisFunction() {};
 
@@ -87,7 +89,7 @@ namespace Isis {
        *
        * @return The name of the equation.
        */
-      std::string Name() const {
+      QString Name() const {
         return p_name;
       };
       /**
@@ -120,7 +122,7 @@ namespace Isis {
 
     protected:
       //! The name of the equation. Call it by using Name()
-      std::string p_name;
+      QString p_name;
       //! The number of variables in the equation. Call it by using Variables()
       int p_numVars;
       /** The number of coefficients in the equation. Call it by using

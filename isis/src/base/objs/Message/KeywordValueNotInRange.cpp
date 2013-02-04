@@ -25,10 +25,6 @@ using namespace std;
 
 #include "Message.h"
 
-string Isis::Message::KeywordValueNotInRange
-(const string &key, const string &value, const string &range) {
-  string message;
-  message = "Keyword [" + key + "=" + value + "] " +
-            "is not in the range of " + range;
-  return message;
+QString Isis::Message::KeywordValueNotInRange(const QString &key, const QString &value, const QString &range) {
+  return "Keyword [" + key + "=" + value + "] is not in the range of " + range;
 }

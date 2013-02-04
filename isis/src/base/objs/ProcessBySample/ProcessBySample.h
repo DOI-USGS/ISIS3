@@ -56,9 +56,9 @@ namespace Isis {
         SetWrap(true);
       };
 
-      Isis::Cube *SetInputCube(const std::string &parameter,
+      Isis::Cube *SetInputCube(const QString &parameter,
                                int requirements = 0);
-      Isis::Cube *SetInputCube(const std::string &file,
+      Isis::Cube *SetInputCube(const QString &file,
                                Isis::CubeAttributeInput &att,
                                int requirements = 0);
 

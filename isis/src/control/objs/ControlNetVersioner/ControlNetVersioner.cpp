@@ -97,9 +97,9 @@ namespace Isis {
     PvlObject &network = pvl.FindObject("ControlNetwork");
 
     if(!network.HasKeyword("Version"))
-      network += PvlKeyword("Version", 1);
+      network += PvlKeyword("Version", "1");
 
-    int version = network["Version"][0];
+    int version = toInt(network["Version"][0]);
 
     while(version != LATEST_PVL_VERSION) {
       int previousVersion = version;
@@ -123,7 +123,7 @@ namespace Isis {
           throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
-      version = network["Version"][0];
+      version = toInt(network["Version"][0]);
 
       if(version == previousVersion) {
         IString msg = "Cannot update from version [" + IString(version) + "] "
@@ -154,12 +154,12 @@ namespace Isis {
 
     ControlNetFileHeaderV0002 &header = latest->GetNetworkHeader();
 
-    header.set_networkid(network.FindKeyword("NetworkId"));
-    header.set_targetname(network.FindKeyword("TargetName"));
-    header.set_created(network.FindKeyword("Created"));
-    header.set_lastmodified(network.FindKeyword("LastModified"));
-    header.set_description(network.FindKeyword("Description"));
-    header.set_username(network.FindKeyword("UserName"));
+    header.set_networkid(network.FindKeyword("NetworkId")[0].toAscii().data());
+    header.set_targetname(network.FindKeyword("TargetName")[0].toAscii().data());
+    header.set_created(network.FindKeyword("Created")[0].toAscii().data());
+    header.set_lastmodified(network.FindKeyword("LastModified")[0].toAscii().data());
+    header.set_description(network.FindKeyword("Description")[0].toAscii().data());
+    header.set_username(network.FindKeyword("UserName")[0].toAscii().data());
     header.add_pointmessagesizes(0); // Just to pass the "IsInitialized" test
 
     if(!header.IsInitialized()) {
@@ -279,23 +279,23 @@ namespace Isis {
       if (object.HasKeyword("AprioriCovarianceMatrix")) {
         PvlKeyword &matrix = object["AprioriCovarianceMatrix"];
 
-        point.add_aprioricovar(matrix[0]);
-        point.add_aprioricovar(matrix[1]);
-        point.add_aprioricovar(matrix[2]);
-        point.add_aprioricovar(matrix[3]);
-        point.add_aprioricovar(matrix[4]);
-        point.add_aprioricovar(matrix[5]);
+        point.add_aprioricovar(toDouble(matrix[0]));
+        point.add_aprioricovar(toDouble(matrix[1]));
+        point.add_aprioricovar(toDouble(matrix[2]));
+        point.add_aprioricovar(toDouble(matrix[3]));
+        point.add_aprioricovar(toDouble(matrix[4]));
+        point.add_aprioricovar(toDouble(matrix[5]));
       }
 
       if(object.HasKeyword("AdjustedCovarianceMatrix")) {
         PvlKeyword &matrix = object["AdjustedCovarianceMatrix"];
 
-        point.add_adjustedcovar(matrix[0]);
-        point.add_adjustedcovar(matrix[1]);
-        point.add_adjustedcovar(matrix[2]);
-        point.add_adjustedcovar(matrix[3]);
-        point.add_adjustedcovar(matrix[4]);
-        point.add_adjustedcovar(matrix[5]);
+        point.add_adjustedcovar(toDouble(matrix[0]));
+        point.add_adjustedcovar(toDouble(matrix[1]));
+        point.add_adjustedcovar(toDouble(matrix[2]));
+        point.add_adjustedcovar(toDouble(matrix[3]));
+        point.add_adjustedcovar(toDouble(matrix[4]));
+        point.add_adjustedcovar(toDouble(matrix[5]));
       }
 
       //  Process Measures
@@ -335,13 +335,13 @@ namespace Isis {
              measure, &ControlPointFileEntryV0002::Measure::set_linesigma);
 
         if(group.HasKeyword("Reference")) {
-          if(group["Reference"][0].DownCase() == "true")
+          if(group["Reference"][0].toLower() == "true")
             point.set_referenceindex(groupIndex);
 
           group.DeleteKeyword("Reference");
         }
 
-        IString type = group["MeasureType"][0].DownCase();
+        QString type = group["MeasureType"][0].toLower();
         if(type == "candidate")
           measure.set_type(ControlPointFileEntryV0002::Measure::Candidate);
         else if(type == "manual")
@@ -403,7 +403,7 @@ namespace Isis {
     const PvlGroup &netInfo = protoBuf.FindGroup("ControlNetworkInfo");
 
     if(netInfo.HasKeyword("Version"))
-      version = netInfo["Version"][0];
+      version = toInt(netInfo["Version"][0]);
 
     // Okay, let's instantiate the correct ControlNetFile for this version
     ControlNetFile *cnetFile;
@@ -458,7 +458,7 @@ namespace Isis {
    */
   void ControlNetVersioner::ConvertVersion1ToVersion2(
       PvlObject &network) {
-    network["Version"] = 2;
+    network["Version"] = "2";
 
     // Really... Projection::TargetRadii should be making this call
     NaifStatus::CheckErrors();
@@ -489,29 +489,29 @@ namespace Isis {
 
       if(cp.HasKeyword("AprioriLatitude")) {
         SurfacePoint apriori(
-            Latitude(cp["AprioriLatitude"][0], Angle::Degrees),
-            Longitude(cp["AprioriLongitude"][0], Angle::Degrees),
-            Distance(cp["AprioriRadius"][0], Distance::Meters));
+            Latitude(toDouble(cp["AprioriLatitude"][0]), Angle::Degrees),
+            Longitude(toDouble(cp["AprioriLongitude"][0]), Angle::Degrees),
+            Distance(toDouble(cp["AprioriRadius"][0]), Distance::Meters));
 
-        cp += PvlKeyword("AprioriX", apriori.GetX().meters(), "meters");
-        cp += PvlKeyword("AprioriY", apriori.GetY().meters(), "meters");
-        cp += PvlKeyword("AprioriZ", apriori.GetZ().meters(), "meters");
+        cp += PvlKeyword("AprioriX", toString(apriori.GetX().meters()), "meters");
+        cp += PvlKeyword("AprioriY", toString(apriori.GetY().meters()), "meters");
+        cp += PvlKeyword("AprioriZ", toString(apriori.GetZ().meters()), "meters");
       }
 
       if(cp.HasKeyword("Latitude")) {
         SurfacePoint adjusted(
-            Latitude(cp["Latitude"][0], Angle::Degrees),
-            Longitude(cp["Longitude"][0], Angle::Degrees),
-            Distance(cp["Radius"][0], Distance::Meters));
+            Latitude(toDouble(cp["Latitude"][0]), Angle::Degrees),
+            Longitude(toDouble(cp["Longitude"][0]), Angle::Degrees),
+            Distance(toDouble(cp["Radius"][0]), Distance::Meters));
 
-        cp += PvlKeyword("AdjustedX", adjusted.GetX().meters(), "meters");
-        cp += PvlKeyword("AdjustedY", adjusted.GetY().meters(), "meters");
-        cp += PvlKeyword("AdjustedZ", adjusted.GetZ().meters(), "meters");
+        cp += PvlKeyword("AdjustedX", toString(adjusted.GetX().meters()), "meters");
+        cp += PvlKeyword("AdjustedY", toString(adjusted.GetY().meters()), "meters");
+        cp += PvlKeyword("AdjustedZ", toString(adjusted.GetZ().meters()), "meters");
 
         if(!cp.HasKeyword("AprioriLatitude")) {
-          cp += PvlKeyword("AprioriX", adjusted.GetX().meters(), "meters");
-          cp += PvlKeyword("AprioriY", adjusted.GetY().meters(), "meters");
-          cp += PvlKeyword("AprioriZ", adjusted.GetZ().meters(), "meters");
+          cp += PvlKeyword("AprioriX", toString(adjusted.GetX().meters()), "meters");
+          cp += PvlKeyword("AprioriY", toString(adjusted.GetY().meters()), "meters");
+          cp += PvlKeyword("AprioriZ", toString(adjusted.GetZ().meters()), "meters");
         }
       }
 
@@ -532,24 +532,24 @@ namespace Isis {
         double sigmaRad = 10000.0;
 
         if(cp.HasKeyword("AprioriSigmaLatitude")) {
-          if((double)cp["AprioriSigmaLatitude"][0] > 0 &&
-             (double)cp["AprioriSigmaLatitude"][0] < sigmaLat)
+          if(toDouble(cp["AprioriSigmaLatitude"][0]) > 0 &&
+             toDouble(cp["AprioriSigmaLatitude"][0]) < sigmaLat)
             sigmaLat = cp["AprioriSigmaLatitude"];
 
           cp += PvlKeyword("LatitudeConstrained", "True");
         }
 
         if(cp.HasKeyword("AprioriSigmaLongitude")) {
-          if((double)cp["AprioriSigmaLongitude"][0] > 0 &&
-             (double)cp["AprioriSigmaLongitude"][0] < sigmaLon)
+          if(toDouble(cp["AprioriSigmaLongitude"][0]) > 0 &&
+             toDouble(cp["AprioriSigmaLongitude"][0]) < sigmaLon)
             sigmaLon = cp["AprioriSigmaLongitude"];
 
           cp += PvlKeyword("LongitudeConstrained", "True");
         }
 
         if(cp.HasKeyword("AprioriSigmaRadius")) {
-          if((double)cp["AprioriSigmaRadius"][0] > 0 &&
-             (double)cp["AprioriSigmaRadius"][0] < sigmaRad)
+          if(toDouble(cp["AprioriSigmaRadius"][0]) > 0 &&
+             toDouble(cp["AprioriSigmaRadius"][0]) < sigmaRad)
             sigmaRad = cp["AprioriSigmaRadius"];
 
           cp += PvlKeyword("RadiusConstrained", "True");
@@ -567,12 +567,12 @@ namespace Isis {
           Distance(sigmaRad, Distance::Meters));
 
         PvlKeyword aprioriCovarMatrix("AprioriCovarianceMatrix");
-        aprioriCovarMatrix += tmp.GetRectangularMatrix()(0, 0);
-        aprioriCovarMatrix += tmp.GetRectangularMatrix()(0, 1);
-        aprioriCovarMatrix += tmp.GetRectangularMatrix()(0, 2);
-        aprioriCovarMatrix += tmp.GetRectangularMatrix()(1, 1);
-        aprioriCovarMatrix += tmp.GetRectangularMatrix()(1, 2);
-        aprioriCovarMatrix += tmp.GetRectangularMatrix()(2, 2);
+        aprioriCovarMatrix += toString(tmp.GetRectangularMatrix()(0, 0));
+        aprioriCovarMatrix += toString(tmp.GetRectangularMatrix()(0, 1));
+        aprioriCovarMatrix += toString(tmp.GetRectangularMatrix()(0, 2));
+        aprioriCovarMatrix += toString(tmp.GetRectangularMatrix()(1, 1));
+        aprioriCovarMatrix += toString(tmp.GetRectangularMatrix()(1, 2));
+        aprioriCovarMatrix += toString(tmp.GetRectangularMatrix()(2, 2));
 
         cp += aprioriCovarMatrix;
       }
@@ -585,20 +585,20 @@ namespace Isis {
         double sigmaRad = 10000.0;
 
         if(cp.HasKeyword("AdjustedSigmaLatitude")) {
-          if((double)cp["AdjustedSigmaLatitude"][0] > 0 &&
-             (double)cp["AdjustedSigmaLatitude"][0] < sigmaLat)
+          if(toDouble(cp["AdjustedSigmaLatitude"][0]) > 0 &&
+             toDouble(cp["AdjustedSigmaLatitude"][0]) < sigmaLat)
             sigmaLat = cp["AdjustedSigmaLatitude"];
         }
 
         if(cp.HasKeyword("AdjustedSigmaLongitude")) {
-          if((double)cp["AdjustedSigmaLongitude"][0] > 0 &&
-             (double)cp["AdjustedSigmaLongitude"][0] < sigmaLon)
+          if(toDouble(cp["AdjustedSigmaLongitude"][0]) > 0 &&
+             toDouble(cp["AdjustedSigmaLongitude"][0]) < sigmaLon)
             sigmaLon = cp["AdjustedSigmaLongitude"];
         }
 
         if(cp.HasKeyword("AdjustedSigmaRadius")) {
-          if((double)cp["AdjustedSigmaRadius"][0] > 0 &&
-             (double)cp["AdjustedSigmaRadius"][0] < sigmaRad)
+          if(toDouble(cp["AdjustedSigmaRadius"][0]) > 0 &&
+             toDouble(cp["AdjustedSigmaRadius"][0]) < sigmaRad)
             sigmaRad = cp["AdjustedSigmaRadius"];
         }
 
@@ -614,12 +614,12 @@ namespace Isis {
           Distance(sigmaRad, Distance::Meters));
 
         PvlKeyword adjustedCovarMatrix("AdjustedCovarianceMatrix");
-        adjustedCovarMatrix += tmp.GetRectangularMatrix()(0, 0);
-        adjustedCovarMatrix += tmp.GetRectangularMatrix()(0, 1);
-        adjustedCovarMatrix += tmp.GetRectangularMatrix()(0, 2);
-        adjustedCovarMatrix += tmp.GetRectangularMatrix()(1, 1);
-        adjustedCovarMatrix += tmp.GetRectangularMatrix()(1, 2);
-        adjustedCovarMatrix += tmp.GetRectangularMatrix()(2, 2);
+        adjustedCovarMatrix += toString(tmp.GetRectangularMatrix()(0, 0));
+        adjustedCovarMatrix += toString(tmp.GetRectangularMatrix()(0, 1));
+        adjustedCovarMatrix += toString(tmp.GetRectangularMatrix()(0, 2));
+        adjustedCovarMatrix += toString(tmp.GetRectangularMatrix()(1, 1));
+        adjustedCovarMatrix += toString(tmp.GetRectangularMatrix()(1, 2));
+        adjustedCovarMatrix += toString(tmp.GetRectangularMatrix()(2, 2));
 
         cp += adjustedCovarMatrix;
       }
@@ -684,15 +684,15 @@ namespace Isis {
 
         // Delete some extraneous values we once printed
         if(cm.HasKeyword("SampleResidual") &&
-           (double)cm["SampleResidual"][0] == 0.0)
+           toDouble(cm["SampleResidual"][0]) == 0.0)
           cm.DeleteKeyword("SampleResidual");
 
         if(cm.HasKeyword("LineResidual") &&
-           (double)cm["LineResidual"][0] == 0.0)
+           toDouble(cm["LineResidual"][0]) == 0.0)
           cm.DeleteKeyword("LineResidual");
 
         if(cm.HasKeyword("Diameter") &&
-           (double)cm["Diameter"][0] == 0.0)
+           toDouble(cm["Diameter"][0]) == 0.0)
           cm.DeleteKeyword("Diameter");
 
         if(cm.HasKeyword("ErrorMagnitude"))
@@ -722,7 +722,7 @@ namespace Isis {
    */
   void ControlNetVersioner::ConvertVersion2ToVersion3(
       PvlObject &network) {
-    network["Version"] = 3;
+    network["Version"] = "3";
 
     for(int cpIndex = 0; cpIndex < network.Objects(); cpIndex ++) {
       PvlObject &cp = network.Object(cpIndex);
@@ -743,7 +743,7 @@ namespace Isis {
    */
   void ControlNetVersioner::ConvertVersion3ToVersion4(
       PvlObject &network) {
-    network["Version"] = 4;
+    network["Version"] = "4";
 
     for (int cpIndex = 0; cpIndex < network.Objects(); cpIndex ++) {
       PvlObject &cp = network.Object(cpIndex);
@@ -768,14 +768,14 @@ namespace Isis {
    * @param setter The protocol buffer setter method
    */
   void ControlNetVersioner::Copy(PvlContainer &container,
-      IString keyName, ControlPointFileEntryV0002 &point,
+      QString keyName, ControlPointFileEntryV0002 &point,
       void (ControlPointFileEntryV0002::*setter)(bool)) {
     if(!container.HasKeyword(keyName))
       return;
 
-    IString value = container[keyName][0];
+    QString value = container[keyName][0];
     container.DeleteKeyword(keyName);
-    value.DownCase();
+    value = value.toLower();
     if(value == "true" || value == "yes")
       (point.*setter)(true);
   }
@@ -795,12 +795,12 @@ namespace Isis {
    * @param setter The protocol buffer setter method
    */
   void ControlNetVersioner::Copy(PvlContainer &container,
-      IString keyName, ControlPointFileEntryV0002 &point,
+      QString keyName, ControlPointFileEntryV0002 &point,
       void (ControlPointFileEntryV0002::*setter)(double)) {
     if(!container.HasKeyword(keyName))
       return;
 
-    double value = container[keyName][0];
+    double value = toDouble(container[keyName][0]);
     container.DeleteKeyword(keyName);
     (point.*setter)(value);
   }
@@ -820,7 +820,7 @@ namespace Isis {
    * @param setter The protocol buffer setter method
    */
   void ControlNetVersioner::Copy(PvlContainer &container,
-      IString keyName, ControlPointFileEntryV0002 &point,
+      QString keyName, ControlPointFileEntryV0002 &point,
       void (ControlPointFileEntryV0002::*setter)(const std::string&)) {
     if(!container.HasKeyword(keyName))
       return;
@@ -844,15 +844,15 @@ namespace Isis {
    * @param measure The protocol buffer point instance to set the value in
    * @param setter The protocol buffer setter method
    */
-  void ControlNetVersioner::Copy(PvlContainer &container, IString keyName,
+  void ControlNetVersioner::Copy(PvlContainer &container, QString keyName,
       ControlPointFileEntryV0002::Measure &measure,
       void (ControlPointFileEntryV0002::Measure::*setter)(bool)) {
     if(!container.HasKeyword(keyName))
       return;
 
-    IString value = container[keyName][0];
+    QString value = container[keyName][0];
     container.DeleteKeyword(keyName);
-    value.DownCase();
+    value = value.toLower();
     if(value == "true" || value == "yes")
       (measure.*setter)(true);
   }
@@ -871,13 +871,13 @@ namespace Isis {
    * @param measure The protocol buffer point instance to set the value in
    * @param setter The protocol buffer setter method
    */
-  void ControlNetVersioner::Copy(PvlContainer &container, IString keyName,
+  void ControlNetVersioner::Copy(PvlContainer &container, QString keyName,
       ControlPointFileEntryV0002::Measure &measure,
       void (ControlPointFileEntryV0002::Measure::*setter)(double)) {
     if(!container.HasKeyword(keyName))
       return;
 
-    double value = container[keyName][0];
+    double value = toDouble(container[keyName][0]);
     container.DeleteKeyword(keyName);
     (measure.*setter)(value);
   }
@@ -896,7 +896,7 @@ namespace Isis {
    * @param measure The protocol buffer point instance to set the value in
    * @param set The protocol buffer setter method
    */
-  void ControlNetVersioner::Copy(PvlContainer &container, IString keyName,
+  void ControlNetVersioner::Copy(PvlContainer &container, QString keyName,
       ControlPointFileEntryV0002::Measure &measure,
       void (ControlPointFileEntryV0002::Measure::*set)(const std::string &)) {
     if(!container.HasKeyword(keyName))

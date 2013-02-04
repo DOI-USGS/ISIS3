@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
           cout << (double) t2[i][j] << "\t";
         }
         else if (j == 2) {
-          cout << std::string(t2[i][j]) << "\t";
+          cout << QString(t2[i][j]) << "\t";
         }
       }
       cout << endl;
@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
           cout << (double) t3[i][j] << "\t";
         }
         else if (j == 2) {
-          cout << std::string(t3[i][j]) << "\t";
+          cout << QString(t3[i][j]) << "\t";
         }
       }
       cout << endl;
@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
           cout << (double) t4[i][j] << "\t";
         }
         else if (j == 2) {
-          cout << std::string(t4[i][j]) << "\t";
+          cout << QString(t4[i][j]) << "\t";
         }
       }
       cout << endl;
@@ -132,12 +132,12 @@ int main(int argc, char *argv[]) {
     remove("tTest");
 
     cout << "InstrumentPointing Table..." << endl;
-    string name1 = "InstrumentPointing";
+    QString name1 = "InstrumentPointing";
     Table instPoint(name1, "truth.cub");
     for(int i = 0; i < instPoint.Records(); i++) {
       for(int j = 0; j < instPoint[i].Fields(); j++) {
         if(instPoint[i][j].isText()) {
-          cout << (string)instPoint[i][j] << ",  ";
+          cout << (QString)instPoint[i][j] << ",  ";
         }
         else if(instPoint[i][j].isDouble()) {
           cout << (double)instPoint[i][j] << ",  ";
@@ -147,12 +147,12 @@ int main(int argc, char *argv[]) {
     }
     cout << endl;
     cout << "Camera Statistics Table..." << endl;
-    string name2 = "CameraStatistics";
+    QString name2 = "CameraStatistics";
     Table camStats(name2, "truth.cub");
     for(int i = 0; i < camStats.Records(); i++) {
       for(int j = 0; j < camStats[i].Fields(); j++) {
         if(camStats[i][j].isText()) {
-          cout << (string)camStats[i][j] << ",  ";
+          cout << (QString)camStats[i][j] << ",  ";
         }
         else if(camStats[i][j].isDouble()) {
           cout << (double)camStats[i][j] << ",  ";

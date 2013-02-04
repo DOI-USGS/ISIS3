@@ -31,6 +31,8 @@
 #include "IException.h"
 #include "SpecialPixel.h"
 
+using std::stringstream;
+
 namespace Isis {
 
   /**
@@ -64,16 +66,16 @@ namespace Isis {
   void WriteTabular::SetColumns(std::vector <Column> cols) {
     for(unsigned int index = 0; index < cols.size(); index++) {
       Column thisCol = cols[index];
-      std::string thisTitle = thisCol.Name();
+      QString thisTitle = thisCol.Name();
 
-      if(thisTitle.length() > thisCol.Width()) {
-        std::string message = "Column header [" + thisTitle + "] is wider " +
-                              "than the set width for column [" + IString((int)index) + "]";
+      if((int)thisTitle.length() > (int)thisCol.Width()) {
+        QString message = "Column header [" + thisTitle + "] is wider " +
+                              "than the set width for column [" + toString((int)index) + "]";
         throw IException(IException::User, message, _FILEINFO_);
       }
 
       int iteration = 0;
-      while(thisTitle.length() < thisCol.Width()) {
+      while((int)thisTitle.length() < (int)thisCol.Width()) {
         if(thisCol.Alignment() == Column::Left) {
           thisTitle += " ";
         }
@@ -82,7 +84,7 @@ namespace Isis {
           thisTitle = " " + thisTitle;
         }
         else {
-          std::string message = "Alignment is improperly set";
+          QString message = "Alignment is improperly set";
           throw IException(IException::User, message, _FILEINFO_);
         }
         iteration++;
@@ -103,13 +105,13 @@ namespace Isis {
   void WriteTabular::Write() {
     Column thisCol = p_cols[p_curCol];
 
-    std::string item = "";
+    QString item = "";
 
-    std::stringstream tempStream;
+    stringstream tempStream;
     tempStream.width(thisCol.Width());
     tempStream.fill(' ');
     tempStream << item;
-    item = tempStream.str();
+    item = tempStream.str().c_str();
 
     if(p_curCol == 0) {
       p_rows++;
@@ -140,17 +142,17 @@ namespace Isis {
         Write((double)item);
         return;
       }
-      std::string message = "Wrong data type for this Column";
+      QString message = "Wrong data type for this Column";
       throw IException(IException::User, message, _FILEINFO_);
     }
-    IString thisItem(item);
-    if(thisItem.length() > thisCol.Width()) {
+    QString thisItem(toString(item));
+    if(thisItem.length() > (int)thisCol.Width()) {
       thisItem = "*";
-      while(thisItem.length() < thisCol.Width()) {
+      while(thisItem.length() < (int)thisCol.Width()) {
         thisItem += "*";
       }
     }
-    std::stringstream tempStream;
+    stringstream tempStream;
     tempStream.width(thisCol.Width());
     tempStream.fill(' ');
 
@@ -160,7 +162,7 @@ namespace Isis {
     else tempStream.setf(std::ios::right);
 
     tempStream << thisItem;
-    thisItem = tempStream.str();
+    thisItem = tempStream.str().c_str();
 
     if(p_curCol == 0) {
       p_rows++;
@@ -174,7 +176,7 @@ namespace Isis {
       thisItem += "\n";
       p_curCol = 0;
     }
-    p_outfile << thisItem.c_str();
+    p_outfile << thisItem;
   }
 
   /**
@@ -182,20 +184,22 @@ namespace Isis {
    *
    * @param item The string to write out
    */
-  void WriteTabular::Write(std::string item) {
+  void WriteTabular::Write(const char *itemCStr) {
     Column thisCol = p_cols[p_curCol];
     if(thisCol.DataType() != Column::String &&
         thisCol.DataType() != Column::Pixel) {
-      std::string message = "Wrong data type for this Column";
+      QString message = "Wrong data type for this Column";
       throw IException(IException::User, message, _FILEINFO_);
     }
-    if(item.length() > thisCol.Width()) {
+
+    QString item(itemCStr);
+    if(item.length() > (int)thisCol.Width()) {
       item = "*";
-      while(item.length() < thisCol.Width()) {
+      while(item.length() < (int)thisCol.Width()) {
         item += "*";
       }
     }
-    std::stringstream tempStream;
+    stringstream tempStream;
     tempStream.width(thisCol.Width());
     tempStream.fill(' ');
 
@@ -205,7 +209,7 @@ namespace Isis {
     else tempStream.setf(std::ios::right);
 
     tempStream << item;
-    item = tempStream.str();
+    item = tempStream.str().c_str();
 
     if(p_curCol == 0) {
       p_rows++;
@@ -231,7 +235,7 @@ namespace Isis {
     Column thisCol = p_cols[p_curCol];
     if(thisCol.DataType() != Column::Real &&
         thisCol.DataType() != Column::Pixel) {
-      std::string message = "Wrong data type for this Column";
+      QString message = "Wrong data type for this Column";
       throw IException(IException::User, message, _FILEINFO_);
     }
 
@@ -259,7 +263,7 @@ namespace Isis {
       }
     }
 
-    IString thisItem(item);
+    QString thisItem(toString(item));
 
 
     if(thisCol.Alignment() == Column::Decimal) {
@@ -267,40 +271,44 @@ namespace Isis {
       //Format and round the number
 
       //First, split the number at the decimal point
-      IString tempString = thisItem;
-      IString intPart = tempString.Token(".");
+      QStringList tempString = thisItem.split(".");
+      QString intPart = tempString.takeFirst();
+
       //Make the fractional portion appear as such, so the iomanipulators
       //handle it properly
-      if(tempString != "") {
-        tempString = "0." + tempString;
+      if(!tempString.isEmpty()) {
+        tempString.prepend("0");
       }
-      else tempString = "0.0";
+      else {
+        tempString.append("0");
+        tempString.append("0");
+      }
 
       //Put the fractional portion into a stringstream, and use
       //stream manipulators to round it properly
-      std::stringstream b;
+      stringstream b;
       b << std::showpoint
         << std::setprecision(thisCol.Precision())
-        << tempString.ToDouble();
+        << toDouble(tempString.join("."));
 
       //if the rounding causes a rollover (i.e. the decimal portion is greater
       //than 0.95) increment the integer portion
-      if(IString(b.str()).ToDouble() >= 1) {
-        intPart = IString(intPart.ToInteger() + 1);
+      if(toDouble(QString(b.str().c_str())) >= 1) {
+        intPart = toString(toInt(intPart) + 1);
       }
 
-      //Put it back into an IString, for easier manipulation
-      tempString = b.str();
-      tempString.Token(".");
+      //Put it back into an QString, for easier manipulation
+      QString tempString2 = b.str().c_str();
+      tempString2.remove(QRegExp("[^.]*\\."));
       //Add any zeros necessary to pad the number
-      while(tempString.size() < thisCol.Precision()) {
-        tempString += "0";
+      while(tempString2.size() < (int)thisCol.Precision()) {
+        tempString2 += "0";
       }
 
       //Put the number back together, adding the decimal point in the right location
-      thisItem = intPart + "." + tempString;
+      thisItem = intPart + "." + tempString2;
     }
-    std::stringstream tempStream;
+    stringstream tempStream;
     tempStream.width(thisCol.Width());
     tempStream.fill(' ');
 
@@ -310,16 +318,16 @@ namespace Isis {
     else tempStream.setf(std::ios::right);
 
     tempStream << thisItem;
-    thisItem = tempStream.str();
+    thisItem = tempStream.str().c_str();
 
     if(p_curCol == 0) {
       p_rows++;
     }
 
     //If the number is too wide for the column, replace with a string of stars
-    if(thisItem.length() > thisCol.Width()) {
+    if(thisItem.length() > (int)thisCol.Width()) {
       thisItem = "*";
-      while(thisItem.length() < thisCol.Width()) {
+      while(thisItem.length() < (int)thisCol.Width()) {
         thisItem += "*";
       }
     }
@@ -341,7 +349,7 @@ namespace Isis {
    *
    * @param delim The string to separate columns
    */
-  void WriteTabular::SetDelimiter(std::string delim) {
+  void WriteTabular::SetDelimiter(QString delim) {
     p_delimiter = delim;
   }
 

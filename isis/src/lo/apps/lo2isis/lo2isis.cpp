@@ -5,7 +5,7 @@
 #include "Pvl.h"
 #include "IException.h"
 #include "TextFile.h"
-#include <string>
+#include <QString>
 
 using namespace std;
 using namespace Isis;
@@ -21,7 +21,7 @@ void IsisMain() {
   //Checks if in file is rdr
   label = in.expanded();
   if(label.HasObject("IMAGE_MAP_PROJECTION")) {
-    string msg = "[" + in.name() + "] appears to be an rdr file.";
+    QString msg = "[" + in.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -41,7 +41,7 @@ void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
 
   // Transfer the instrument group to the output cube
-  IString transDir = (string) dataDir["Lo"] + "/translations/";
+  QString transDir = (QString) dataDir["Lo"] + "/translations/";
   Pvl inputLabel(labelFile.expanded());
   FileName transFile;
   FileName bandBinTransFile;
@@ -49,7 +49,7 @@ void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
   bool hasFiducial = false;
   // Check to see if file is PDS
   if(inputLabel.HasKeyword("PDS_VERSION_ID", Pvl::None)) {
-    IString pdsVersion = inputLabel.FindKeyword("PDS_VERSION_ID", Pvl::None)[0];
+    QString pdsVersion = inputLabel.FindKeyword("PDS_VERSION_ID", Pvl::None)[0];
 
     if(pdsVersion == "PDS3") {
       if(inputLabel.HasKeyword("LO:FIDUCIAL_ID", Pvl::Traverse)) {
@@ -60,12 +60,12 @@ void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
         bandBinTransFile = transDir + "LoPdsBoresightImport.trn";
       }
       else {
-        string msg = "[" + labelFile.name() + "] does not contain boresight or fiducial information";
+        QString msg = "[" + labelFile.name() + "] does not contain boresight or fiducial information";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else {
-      string msg = "[" + labelFile.name() + "] contains unknown PDS version [" +
+      QString msg = "[" + labelFile.name() + "] contains unknown PDS version [" +
                    pdsVersion + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -80,7 +80,7 @@ void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
       bandBinTransFile = transDir + "LoIsis2BoresightImport.trn";
     }
     else {
-      string msg = "[" + labelFile.name() + "] does not contain boresight or fiducial information";
+      QString msg = "[" + labelFile.name() + "] does not contain boresight or fiducial information";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -99,11 +99,11 @@ void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
 
   //Creates FiducialCoordinateMicron with the proper units
   if(!inputLabel.HasKeyword("LO:BORESIGHT_SAMPLE", Pvl::Traverse)) {
-    IString fcm = (string) inst.FindKeyword("FiducialCoordinateMicron");
-    IString fcmUnits = fcm;
-    fcmUnits = IString::TrimHead("0123456789.", fcmUnits);
-    fcm = IString::TrimTail("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", fcm);
-    inst.FindKeyword("FiducialCoordinateMicron").SetValue((int)fcm, fcmUnits);
+    QString fcm = (QString) inst.FindKeyword("FiducialCoordinateMicron");
+    QString fcmUnits = fcm;
+    fcmUnits.remove(QRegExp("^[0-9.]*"));
+    fcm.remove(QRegExp("[a-zA-Z]*$"));
+    inst.FindKeyword("FiducialCoordinateMicron").SetValue(fcm, fcmUnits);
   }
 
   // High Resolution & Fiducial Medium Case
@@ -137,12 +137,12 @@ void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
     //What needs to be done if it contains Boresight info
   }
 
-  string instrumentID = inst.FindKeyword("InstrumentId");
-  string spacecraftName = inst.FindKeyword("SpacecraftName");
+  QString instrumentID = inst.FindKeyword("InstrumentId");
+  QString spacecraftName = inst.FindKeyword("SpacecraftName");
 
   //Determines the NaifFrameCode
   PvlGroup kerns("Kernels");
-  IString frameCode;
+  QString frameCode;
   if(spacecraftName.compare("Lunar Orbiter 3") == 0) {
     frameCode = "-533";
   }
@@ -161,10 +161,10 @@ void TranslateLunarLabels(FileName &labelFile, Cube *ocube) {
   }
 
   //Create subframe and frame keywords
-  IString imgNumber = (string) inst.FindKeyword("ImageNumber");
-  int subFrame = ((IString)imgNumber.substr(5)).ToInteger();
+  QString imgNumber = (QString) inst.FindKeyword("ImageNumber");
+  int subFrame = toInt(imgNumber.mid(5));
 
-  inst.AddKeyword(PvlKeyword("SubFrame", subFrame));
+  inst.AddKeyword(PvlKeyword("SubFrame", toString(subFrame)));
   //ImageNumber is auto translated, and no longer needed
   inst.DeleteKeyword("ImageNumber");
 

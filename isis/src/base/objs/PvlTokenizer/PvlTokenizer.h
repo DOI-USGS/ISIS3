@@ -25,6 +25,8 @@
 #include <iostream>
 #include "PvlToken.h"
 
+#include <QString>
+
 namespace Isis {
   /**
    * @brief Construct Token list from a stream
@@ -94,21 +96,21 @@ namespace Isis {
                                               the stream*/
 
 
-      std::string ReadComment(std::istream &stream);
-      std::string ReadToken(std::istream &stream);
+      QString ReadComment(std::istream &stream);
+      QString ReadToken(std::istream &stream);
       bool SkipWhiteSpace(std::istream &stream);
-      std::string ReadToSingleQuote(std::istream &stream);
-      std::string ReadToDoubleQuote(std::istream &stream);
-      std::string ReadToParen(std::istream &stream);
-      std::string ReadToBrace(std::istream &stream);
-      void ParseCommaList(Isis::PvlToken &t, const std::string &cl);
+      QString ReadToSingleQuote(std::istream &stream);
+      QString ReadToDoubleQuote(std::istream &stream);
+      QString ReadToParen(std::istream &stream);
+      QString ReadToBrace(std::istream &stream);
+      void ParseCommaList(Isis::PvlToken &t, const QString &cl);
       void ValidateCharacter(int c);
 
     public:
       PvlTokenizer();
       ~PvlTokenizer();
 
-      void Load(std::istream &stream, const std::string &terminator = "END");
+      void Load(std::istream &stream, const QString &terminator = "END");
       void Clear();
 
       std::vector<Isis::PvlToken> & GetTokenList();

@@ -115,9 +115,9 @@ namespace Isis {
         p_photoThetaold = theta;
       }
 
-      void SetPhoto0B0Standard(const std::string &b0standard);
+      void SetPhoto0B0Standard(const QString &b0standard);
       //! Return photometric B0 standardization value
-/*      inline std::string Photo0B0Standard() const {
+/*      inline QString Photo0B0Standard() const {
         return p_photo0B0Standard;
       }*/
 
@@ -143,8 +143,8 @@ namespace Isis {
       double p_photoTant;
       double p_photoSr;
       double p_photoOsr;
-      IString p_algName;
-      std::string p_photo0B0Standard;
+      QString p_algName;
+      QString p_photo0B0Standard;
       double p_photoWh;
       double p_photoHh;
       double p_photoB0;

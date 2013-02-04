@@ -12,16 +12,16 @@ using namespace Isis;
 
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
-  void ReportError(IString err);
+  void ReportError(QString err);
 
   cout << "Unit test for TextFile" << endl << endl;
 
 
 // ----------------------------------------------------------------------------------
 
-  string testFile = "$temporary/TextFile.tmp";
+  QString testFile = "$temporary/TextFile.tmp";
   // setup test data
-  string testLines[21];
+  QString testLines[21];
 
   // setup line test data
   testLines[0]  = "#   0  zero     line";
@@ -53,14 +53,14 @@ int main(int argc, char *argv[]) {
   streamsize numBytes = 0;
   streamsize numBytesFiltered = 0;
 
-  vector<string> testLinesVector;
+  vector<QString> testLinesVector;
 
   for(int i = 0; i <= 19; i++) {
     numBytes += testLines[i].length() + strlen("\n");
     testLineBytes[i] = numBytes;
     testLinesVector.push_back(testLines[i]);
-    int locComment = testLines[i].find("#", 0);
-    if((locComment != (int) string::npos) && (locComment != 1)) {
+    int locComment = testLines[i].indexOf("#", 0);
+    if((locComment != -1) && (locComment != 1)) {
       numBytesFiltered += testLines[i].length() + strlen("\n");
     }
   }
@@ -91,14 +91,14 @@ int main(int argc, char *argv[]) {
   cout << "2) Read file " << testFile << " into vector" << endl;
 
   try {
-    vector<string> linesIn;
+    vector<QString> linesIn;
 
     // read entire file, filter comments
     Isis::TextFile g(testFile, "input", linesIn);
 
     int chkVectorSize = 0;                               // chk num bytes read
     for(int i = 0; i < (int) linesIn.size(); i++) {
-      chkVectorSize += string(linesIn[i]).length() + strlen("\n");
+      chkVectorSize += QString(linesIn[i]).length() + strlen("\n");
     }
     if(chkVectorSize != numBytesFiltered) {
       cout << " *** Failed Size Test Filtered *** " << endl;
@@ -136,14 +136,14 @@ int main(int argc, char *argv[]) {
 
 // ----------------------------------------------------------------------------------
 
-  cout << "3) Create / Overwrite file " << testFile << " with prefilled string array" << endl;
+  cout << "3) Create / Overwrite file " << testFile << " with prefilled QString array" << endl;
 
   try {
     // write first four lines
     Isis::TextFile p(testFile, "overwrite", testLines, 4);
 
     if(p.Size() != testLineBytes[4]) {                   // chk num bytes
-      cout << " *** Failed Size Test WRITE sense NULL in string array*** " << endl;
+      cout << " *** Failed Size Test WRITE sense NULL in QString array*** " << endl;
       cout << "Calc bytes = " << testLineBytes[4] << " methodSize = "
            << p.Size() << endl;
     }
@@ -156,20 +156,20 @@ int main(int argc, char *argv[]) {
 
 // ----------------------------------------------------------------------------------
 
-  cout << "4) Read file " << testFile << " into string array" << endl;
+  cout << "4) Read file " << testFile << " into QString array" << endl;
 
   try {
-    // prefill string array to nonnull, set last element to null
+    // prefill QString array to nonnull, set last element to null
     // the read file call below will not specify howmany lines to read
-    // so TextFile will stop filling string array when it encounters a null in output array
+    // so TextFile will stop filling QString array when it encounters a null in output array
 
-    string linesIn[4] = {" ", " ", " ", ""};
+    QString linesIn[4] = {" ", " ", " ", ""};
 
     Isis::TextFile g(testFile, "input", linesIn, 0, false); // read entire file unfiltered
 
     for(int i = 0; i <= 2; i++) {                         // chk orig data against data read
       if(linesIn[i] != testLines[i]) {
-        cout << " *** Failed Compare Test READ sense NULL in string array*** " << endl;
+        cout << " *** Failed Compare Test READ sense NULL in QString array*** " << endl;
         break;
       }
     }
@@ -206,7 +206,7 @@ int main(int argc, char *argv[]) {
     f.PutLine("#   0  zero     line\n");                 // char output
 
     f.SetNewLine();                                      // reset default append new line
-    f.SetComment();                                      // reset default comment string
+    f.SetComment();                                      // reset default comment QString
 
     f.PutLineComment("   1  first    line");             // char output
     f.PutLineComment("   2  second   line");             // char output
@@ -293,7 +293,7 @@ int main(int argc, char *argv[]) {
   try {
     Isis::TextFile f(testFile, "Input");
 
-    string line;
+    QString line;
 
     for(int i = 0; i <= 12; i++) {      // chk each file line against internal array
       f.GetLineNoFilter(line);
@@ -327,7 +327,7 @@ int main(int argc, char *argv[]) {
     f.Rewind();                                           // set input ptr back to beginning
     f.SetComment("/*");                                   // set comment to '/*'
 
-    string lastLine;
+    QString lastLine;
 
     while(f.GetLine(line)) {                              // read file's 12 lines
       lastLine = line;
@@ -379,7 +379,7 @@ int main(int argc, char *argv[]) {
 
     f.Rewind();                                          // set ptr back to begining
 
-    string(line);
+    QString(line);
     // re-read file to line 3
     for(int i = 1; i <= 3; i++) {                        //  to chk replacement
       f.GetLineNoFilter(line);
@@ -494,14 +494,14 @@ int main(int argc, char *argv[]) {
   // create file that doesn't end in a newline and then test GetLine
   FILE *fp;
   FileName testFileName(testFile);
-  fp = fopen(testFileName.expanded().c_str(), "w");
+  fp = fopen(testFileName.expanded().toAscii().data(), "w");
   fprintf(fp, "this file has no newline chars in it!");   //???SEG FAULT HERE!!!!!!!
   fclose(fp);
   TextFile tf;
   tf.Open(testFile);
 
-  string fileContents = "";
-  string line = "";
+  QString fileContents = "";
+  QString line = "";
   while(tf.GetLine(line, true)) {
     fileContents += line;
     line = "";
@@ -511,7 +511,7 @@ int main(int argc, char *argv[]) {
   // call to getline returned false.
   fileContents += line;
 
-  string passed = "Failed";
+  QString passed = "Failed";
   if(fileContents != "")
     passed = "Passed";
 
@@ -523,61 +523,19 @@ int main(int argc, char *argv[]) {
 
   cout << "11) Remove temp file -> " << testFile << " <-\n" << endl;
 
-  if(std::remove(testFileName.expanded().c_str())) {                    // cleanup tmp file
+  if(std::remove(testFileName.expanded().toAscii().data())) {                    // cleanup tmp file
     cout << "*** Failed to remove tmp file: " << testFile << endl;
   }
 }
 
 /**
  * Reports error messages from Isis:iException without full paths of filenames
- * @param err Error string of iException
+ * @param err Error QString of iException
  * @author Jeannie Walldren
  * @internal
  *   @history 2011-08-05 Jeannie Backer - Copied from Cube class.
  */
-void ReportError(IString err) {
-  IString report = ""; // report will be modified error message
-  IString errorLine = ""; // read message one line at a time
-  FileName expandedfile;
-  while(err != "") {
-    // pull off first line
-    errorLine = err.Token("\n");
-    while(errorLine != "") {
-      size_t openBrace = errorLine.find('[');
-      if(openBrace != string::npos) {
-        // if open brace is found, look to see if a filename is inside (indicated by '/')
-        if(errorLine.at(openBrace + 1) == '/') {
-          // add message up to
-          report += errorLine.Token("[");
-          // and including [
-          report += "[";
-          // read entire path into FileName object
-          expandedfile = errorLine.Token("]");
-          // only keep the name of the immediate directory
-          IString path = expandedfile.originalPath();
-          while (path.find("/") != string::npos) {
-            path.Token("/");
-          }
-          // only report immediate directory and file name, (rather than fully
-          // expanded path since this may differ on each system
-          report += "../" + path + "/" + expandedfile.name();
-          report += "]";
-        }
-        else {
-          // not a filename inside braces, add message up to and including ]
-          report += errorLine.Token("]");
-          report += "]";
-          continue;
-        }
-      }
-      else {
-        // no more braces are found, add rest of error message
-        report += errorLine;
-        break;
-      }
-    }
-    report += "\n";
-  }
-  cout << report << endl;
+void ReportError(QString err) {
+  cout << err.replace(QRegExp("\\[[^\\]*\\]"), "[]") << endl;
 }
 

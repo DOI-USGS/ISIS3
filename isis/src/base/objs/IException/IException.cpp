@@ -30,11 +30,11 @@
 #include <cstring>
 #include <iostream>
 #include <sstream>
+#include <string>
 
 #include <QList>
 
 #include "Application.h"
-#include "IString.h"
 #include "Preference.h"
 #include "Pvl.h"
 
@@ -73,6 +73,44 @@ namespace Isis {
    *
    * @code
    *   throw IException(IException::Unknown,
+   *                    tr("While doing an important process, we could not do ... "
+   *                       "because the data [%1] is invalid").arg(...),
+   *                    _FILEINFO_);
+   * @endcode
+   *
+   * @param type the source of the error that this exception represents
+   * @param message the string message containing details about the error, which
+   *          may be displayed to the user
+   * @param fileName the filename of the file that this exception was thrown in
+   * @param lineNumber the line in the source code file that threw this
+   *          exception
+   */
+  IException::IException(ErrorType type, const QString &message,
+                         const char *fileName, int lineNumber) {
+    m_what = NULL;
+    m_message = NULL;
+    m_fileName = NULL;
+    m_previousExceptions = NULL;
+
+    m_errorType = type;
+    m_message = new QString(QString(message).trimmed());
+    m_fileName = new QString(fileName);
+    m_lineNumber = lineNumber;
+
+    deleteEmptyMemberStrings();
+
+    m_what = buildWhat();
+  }
+
+
+  /**
+   * This version of the constructor creates an IException instance with the
+   * given error type, message, and file info. The IException instance will not
+   * have any previous exceptions associated with it initially (i.e. no
+   * exception caused this one to be thrown).
+   *
+   * @code
+   *   throw IException(IException::Unknown,
    *                    "While doing an important process, we could not do ... "
    *                    "because the data [" ... "] is invalid",
    *                    _FILEINFO_);
@@ -93,8 +131,8 @@ namespace Isis {
     m_previousExceptions = NULL;
 
     m_errorType = type;
-    m_message = new IString(IString(message).Trim(" \n\t"));
-    m_fileName = new IString(fileName);
+    m_message = new QString(QString(message).trimmed());
+    m_fileName = new QString(fileName);
     m_lineNumber = lineNumber;
 
     deleteEmptyMemberStrings();
@@ -107,10 +145,11 @@ namespace Isis {
    * This version of the constructor creates an IException instance with the
    * given error type, message, and file info. The IException instance will not
    * have any previous exceptions associated with it initially (i.e. no
-   * exception caused this one to be thrown).
+   * exception caused this one to be thrown). The QString version of
+   * this constructor is preferred over this one.
    *
    * @code
-   *   IString message = "While doing an important process, we could not do .. "
+   *   std::string message = "While doing an important process, we could not do .. "
    *                     "because the data [" ... "] is invalid";
    *   throw IException(IException::Unknown, message, _FILEINFO_);
    * @endcode
@@ -122,7 +161,7 @@ namespace Isis {
    * @param lineNumber the line in the source code file that threw this
    *          exception
    */
-  IException::IException(ErrorType type, const IString &message,
+  IException::IException(ErrorType type, const std::string &message,
                          const char *fileName, int lineNumber) {
     m_what = NULL;
     m_message = NULL;
@@ -130,8 +169,8 @@ namespace Isis {
     m_previousExceptions = NULL;
 
     m_errorType = type;
-    m_message = new IString(IString(message).Trim(" \n\t"));
-    m_fileName = new IString(fileName);
+    m_message = new QString(QString(message.c_str()).trimmed());
+    m_fileName = new QString(fileName);
     m_lineNumber = lineNumber;
 
     deleteEmptyMemberStrings();
@@ -179,8 +218,56 @@ namespace Isis {
     m_previousExceptions = NULL;
 
     m_errorType = type;
-    m_message = new IString(IString(message).Trim(" \n\t"));
-    m_fileName = new IString(fileName);
+    m_message = new QString(QString(message).trimmed());
+    m_fileName = new QString(fileName);
+    m_lineNumber = lineNumber;
+
+    deleteEmptyMemberStrings();
+
+    append(caughtException);
+  }
+
+
+  /**
+   * This version of the constructor creates an IException instance with the
+   * given error type, message, file info. The IException instance will append
+   * the given exception to its list of previous exceptions (as well as any
+   * previous exceptions associated with the caught exception). Use this
+   * constructor when you want to rethrow a new exception after catching an
+   * exception and preserve the previous message(s). The QString version of
+   * this constructor is preferred over this one.
+   *
+   * @code
+   *   try {
+   *     ...
+   *   }
+   *   catch (IException &e) {
+   *     string message = "While doing an important process, we could not do "
+   *                       "... ";
+   *     throw IException(e, IException::Unknown, message, _FILEINFO_);
+   *   }
+   * @endcode
+   *
+   * @param caughtException the previous exception that caused this exception to
+   *          be thrown
+   * @param type the source of the error that this exception represents
+   * @param message the string message containing details about the error, which
+   *          may be displayed to the user
+   * @param fileName the filename of the file that this exception was thrown in
+   * @param lineNumber the line in the source code file that threw this
+   *          exception
+   */
+  IException::IException(const IException &caughtException,
+      ErrorType type, const std::string &message,
+      const char *fileName, int lineNumber) {
+    m_what = NULL;
+    m_message = NULL;
+    m_fileName = NULL;
+    m_previousExceptions = NULL;
+
+    m_errorType = type;
+    m_message = new QString(QString(message.c_str()).trimmed());
+    m_fileName = new QString(fileName);
     m_lineNumber = lineNumber;
 
     deleteEmptyMemberStrings();
@@ -202,7 +289,7 @@ namespace Isis {
    *     ...
    *   }
    *   catch (IException &e) {
-   *     IString message = "While doing an important process, we could not do "
+   *     QString message = "While doing an important process, we could not do "
    *                       "... ";
    *     throw IException(e, IException::Unknown, message, _FILEINFO_);
    *   }
@@ -218,7 +305,7 @@ namespace Isis {
    *          exception
    */
   IException::IException(const IException &caughtException,
-      ErrorType type, const IString &message,
+      ErrorType type, const QString &message,
       const char *fileName, int lineNumber) {
     m_what = NULL;
     m_message = NULL;
@@ -226,8 +313,8 @@ namespace Isis {
     m_previousExceptions = NULL;
 
     m_errorType = type;
-    m_message = new IString(IString(message).Trim(" \n\t"));
-    m_fileName = new IString(fileName);
+    m_message = new QString(message.trimmed());
+    m_fileName = new QString(fileName);
     m_lineNumber = lineNumber;
 
     deleteEmptyMemberStrings();
@@ -258,11 +345,11 @@ namespace Isis {
     }
 
     if (other.m_message) {
-      m_message = new IString(*other.m_message);
+      m_message = new QString(*other.m_message);
     }
 
     if (other.m_fileName) {
-      m_fileName = new IString(*other.m_fileName);
+      m_fileName = new QString(*other.m_fileName);
     }
 
     if (other.m_previousExceptions) {
@@ -372,9 +459,9 @@ namespace Isis {
    * exceptions thrown by your class.
    */
   void IException::print() const {
-    IString errorString = toString();
+    QString errorString = toString();
     if (errorString != "")
-      cerr << errorString << endl;
+      cerr << errorString.toAscii().data() << endl;
   }
 
 
@@ -388,9 +475,9 @@ namespace Isis {
    *          user's preferences file regarding file info.
    */
   void IException::print(bool printFileInfo) const {
-    IString errorString = toString(printFileInfo);
+    QString errorString = toString(printFileInfo);
     if (errorString != "")
-      cerr << errorString << endl;
+      cerr << errorString.toAscii().data() << endl;
   }
 
 
@@ -427,14 +514,14 @@ namespace Isis {
         exceptionIsBlank = false;
       }
 
-      errGroup += PvlKeyword("Code", (int)exception.m_errorType);
+      errGroup += PvlKeyword("Code", Isis::toString(exception.m_errorType));
 
       if (exception.m_message) {
         exceptionIsBlank = false;
-        IString message(*exception.m_message);
+        QString message(*exception.m_message);
 
         if (message.size() && message[message.size() - 1] == '.')
-          message = message.substr(0, message.size() - 1);
+          message = message.mid(0, message.size() - 1);
         errGroup += PvlKeyword("Message", message);
       }
 
@@ -443,7 +530,7 @@ namespace Isis {
         errGroup += PvlKeyword("File", *exception.m_fileName);
 
         if (exception.m_lineNumber != -1)
-          errGroup += PvlKeyword("Line", exception.m_lineNumber);
+          errGroup += PvlKeyword("Line", Isis::toString(exception.m_lineNumber));
       }
 
       if (!exceptionIsBlank)
@@ -463,15 +550,15 @@ namespace Isis {
    *
    * @return a string representation of this exception
    */
-  IString IException::toString() const {
+  QString IException::toString() const {
     bool reportFileLine = true;
 
     if (Preference::Preferences().HasGroup("ErrorFacility")) {
       PvlGroup &errorFacility =
           Preference::Preferences().FindGroup("ErrorFacility");
       if (errorFacility.HasKeyword("FileLine")) {
-        IString fileLine = errorFacility["FileLine"][0];
-        reportFileLine = (fileLine.UpCase() == "ON");
+        QString fileLine = errorFacility["FileLine"][0];
+        reportFileLine = (fileLine.toUpper() == "ON");
       }
     }
 
@@ -490,8 +577,8 @@ namespace Isis {
    *          the user's preferences file regarding file info.
    * @return a string representation of this exception
    */
-  IString IException::toString(bool includeFileInfo) const {
-    IString result;
+  QString IException::toString(bool includeFileInfo) const {
+    QString result;
 
     bool usePvlFormat = false;
 
@@ -499,8 +586,8 @@ namespace Isis {
       PvlGroup &errorFacility =
           Preference::Preferences().FindGroup("ErrorFacility");
       if (errorFacility.HasKeyword("Format")) {
-        IString format = errorFacility["Format"][0];
-        usePvlFormat = (format.UpCase() == "PVL");
+        QString format = errorFacility["Format"][0];
+        usePvlFormat = (format.toUpper() == "PVL");
       }
     }
 
@@ -510,7 +597,7 @@ namespace Isis {
       if (errors.Groups() != 0) {
         stringstream stringStream;
         stringStream << errors;
-        result = stringStream.str();
+        result = stringStream.str().c_str();
       }
     }
     else {
@@ -533,10 +620,10 @@ namespace Isis {
 
         bool needsPeriod = false;
         if (exception.m_message) {
-          IString message(*exception.m_message);
+          QString message(*exception.m_message);
 
           if (message.size() && message[message.size() - 1] == '.')
-            message = message.substr(0, message.size() - 1);
+            message = message.mid(0, message.size() - 1);
           // There is always a **TYPE** already in the string, so prefix the
           //   message with a space.
           result += " " + message;
@@ -546,7 +633,7 @@ namespace Isis {
         if(includeFileInfo && exception.m_fileName) {
           result += " in " + *exception.m_fileName;
           if (exception.m_lineNumber != -1)
-            result += " at " + IString(exception.m_lineNumber);
+            result += " at " + Isis::toString(exception.m_lineNumber);
           needsPeriod = true;
         }
 
@@ -558,7 +645,7 @@ namespace Isis {
       }
     }
 
-    return result.Trim(" \n\t");
+    return result.trimmed();
   }
 
 
@@ -602,10 +689,10 @@ namespace Isis {
   IException IException::createStackTrace() {
     vector<string> theStack;
     StackTrace::GetStackTrace(&theStack);
-    IString message;
+    QString message;
 
     for(unsigned int i = 1; i < theStack.size(); i++) {
-      message += theStack[i] + "\n";
+      message += (theStack[i] + "\n").c_str();
     }
 
     IException result;
@@ -624,8 +711,8 @@ namespace Isis {
    * @return a string representation of the error type. For example,
    *     "USER ERROR" if the error type is User
    */
-  IString IException::errorTypeToString(ErrorType type) {
-    IString result;
+  QString IException::errorTypeToString(ErrorType type) {
+    QString result;
 
     switch(type) {
       case User:
@@ -654,7 +741,7 @@ namespace Isis {
    *     if the string reads "USER ERROR", will return type User.
    */
   IException::ErrorType IException::stringToErrorType(
-      const IString &string) {
+      const QString &string) {
     ErrorType result = Unknown;
 
     if(string == "USER ERROR")
@@ -677,10 +764,10 @@ namespace Isis {
    * @return a C string representation of this exception
    */
   char *IException::buildWhat() const {
-    IString whatStr = toString();
+    QString whatStr = toString();
 
     char *result = new char[whatStr.size() + 1];
-    strncpy(result, whatStr.c_str(), whatStr.size());
+    strncpy(result, whatStr.toAscii().data(), whatStr.size());
     result[whatStr.size()] = '\0';
 
     return result;

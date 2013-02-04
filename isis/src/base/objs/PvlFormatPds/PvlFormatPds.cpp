@@ -23,6 +23,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include <QDebug>
+
 #include "IException.h"
 #include "Message.h"
 #include "IString.h"
@@ -51,14 +53,14 @@ namespace Isis {
   * @param file A file name with keyword=type. Where KEYWORD is the name of a
   * keyword and TYPE is one of [string | integer | float | ...]
   */
-  PvlFormatPds::PvlFormatPds(const std::string &file) : PvlFormat(file) {
+  PvlFormatPds::PvlFormatPds(const QString &file) : PvlFormat(file) {
     Init();
   }
 
 
   /*
   * Constructs a PvlFormatPds using the specified pre populated map of keyword name
-  * (std::string) vs keyword type (KeywordType).
+  * (QString) vs keyword type (KeywordType).
   *
   * @param keywordType A map with keyword, type. Where keyword is the name of a
   * keyword in a PvlKeyword and type is one of [string | integer | float ]
@@ -79,13 +81,12 @@ namespace Isis {
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
-  std::string PvlFormatPds::FormatValue(const PvlKeyword &keyword, int num) {
+  QString PvlFormatPds::FormatValue(const PvlKeyword &keyword, int num) {
 
-    IString name = keyword.Name();
-    name.UpCase();
+    QString name = keyword.Name().toUpper();
     if(name == "OBJECT" || (name == "GROUP")) {
-      IString val = (string)keyword;
-      return val.UpCase();
+      QString val = (QString)keyword;
+      return val.toUpper();
     }
 
     // Find out what type this keyword is
@@ -140,10 +141,9 @@ namespace Isis {
   *                                          the if portion of the code already
   *                                          adds quotes automatically
   */
-  std::string PvlFormatPds::FormatString(const PvlKeyword &keyword, int num) {
+  QString PvlFormatPds::FormatString(const PvlKeyword &keyword, int num) {
 
-    IString val;
-    val.clear();
+    QString val;
     bool singleUnit = false;
 
     // Create a Null value if the value index is greater than the number of values
@@ -152,8 +152,7 @@ namespace Isis {
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
-    IString tmp = keyword[num];
-    tmp.UpCase();
+    QString tmp = keyword[num][0].toUpper();
     if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
     }
@@ -170,7 +169,7 @@ namespace Isis {
 
     // Add the units to this value
     if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      IString unit = keyword.Unit(num);
+      QString unit = keyword.Unit(num);
       // For now PDS units are case sensitive, so we should not UpCase them
       //      unit.UpCase();
       val += " <" + unit + ">";
@@ -188,7 +187,7 @@ namespace Isis {
     // Add the units to the end if all values have the same units
     if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
-      IString unit = keyword.Unit(num);
+      QString unit = keyword.Unit(num);
       // For now PDS units are case sensitive, so we should not UpCase them
       //      unit.UpCase();
       val += " <" + unit + ">";
@@ -204,10 +203,10 @@ namespace Isis {
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
-  std::string PvlFormatPds::FormatReal(const PvlKeyword &keyword, int num,
-                                       int places) {
+  QString PvlFormatPds::FormatReal(const PvlKeyword &keyword, int num,
+                                   int places) {
 
-    IString val;
+    QString val;
     val.clear();
     bool singleUnit = false;
 
@@ -222,15 +221,14 @@ namespace Isis {
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
-    IString tmp = keyword[num];
-    tmp.UpCase();
+    QString tmp = keyword[num].toUpper();
     if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
     }
     else if(places >= 0) {
       stringstream out;
-      out << setiosflags(ios::fixed) << setprecision(places) << (double)keyword[num];
-      val += out.str();
+      out << setiosflags(ios::fixed) << setprecision(places) << toDouble((QString)keyword[num]);
+      val += out.str().c_str();
     }
     else {
       val += keyword[num];
@@ -238,7 +236,7 @@ namespace Isis {
 
     // Add the units to this value
     if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      IString unit = keyword.Unit(num);
+      QString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -255,7 +253,7 @@ namespace Isis {
     // Add the units to the end if all values have the same units
     if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
-      IString unit = keyword.Unit(num);
+      QString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -270,9 +268,9 @@ namespace Isis {
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
-  std::string PvlFormatPds::FormatEnum(const PvlKeyword &keyword, int num) {
+  QString PvlFormatPds::FormatEnum(const PvlKeyword &keyword, int num) {
 
-    IString val;
+    QString val;
     val.clear();
     bool singleUnit = false;
 
@@ -287,8 +285,7 @@ namespace Isis {
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
-    IString tmp = keyword[num];
-    tmp.UpCase();
+    QString tmp = keyword[num].toUpper();
     if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
     }
@@ -298,7 +295,7 @@ namespace Isis {
 
     // Add the units to this value
     if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      IString unit = keyword.Unit(num);
+      QString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -315,7 +312,7 @@ namespace Isis {
     // Add the units to the end if all values have the same units
     if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
-      IString unit = keyword.Unit(num);
+      QString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -335,9 +332,9 @@ namespace Isis {
   *                                          the if portion of the code already
   *                                          adds quotes automatically
   */
-  std::string PvlFormatPds::FormatUnknown(const PvlKeyword &keyword, int num) {
+  QString PvlFormatPds::FormatUnknown(const PvlKeyword &keyword, int num) {
 
-    IString val;
+    QString val;
     val.clear();
     bool singleUnit = false;
 
@@ -347,8 +344,7 @@ namespace Isis {
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
-    IString tmp = keyword[num];
-    tmp.UpCase();
+    QString tmp = keyword[num].toUpper();
     if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
     }
@@ -365,7 +361,7 @@ namespace Isis {
 
     // Add the units to this value
     if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      IString unit = keyword.Unit(num);
+      QString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -382,7 +378,7 @@ namespace Isis {
     // Add the units to the end if all values have the same units
     if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
-      IString unit = keyword.Unit(num);
+      QString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -397,9 +393,9 @@ namespace Isis {
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
-  std::string PvlFormatPds::FormatInteger(const PvlKeyword &keyword, int num, int bytes) {
+  QString PvlFormatPds::FormatInteger(const PvlKeyword &keyword, int num, int bytes) {
 
-    IString val;
+    QString val;
     val.clear();
     bool singleUnit = false;
 
@@ -414,8 +410,7 @@ namespace Isis {
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
-    IString tmp = keyword[num];
-    tmp.UpCase();
+    QString tmp = keyword[num].toUpper();
     if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
     }
@@ -425,7 +420,7 @@ namespace Isis {
 
     // Add the units to this value
     if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      IString unit = keyword.Unit(num);
+      QString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -442,7 +437,7 @@ namespace Isis {
     // Add the units to the end if all values have the same units
     if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
-      IString unit = keyword.Unit(num);
+      QString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -457,9 +452,9 @@ namespace Isis {
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
-  std::string PvlFormatPds::FormatBinary(const PvlKeyword &keyword, int num, int bits) {
+  QString PvlFormatPds::FormatBinary(const PvlKeyword &keyword, int num, int bits) {
 
-    IString val;
+    QString val;
     val.clear();
     bool singleUnit = false;
 
@@ -475,14 +470,13 @@ namespace Isis {
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
-    IString tmp = keyword[num];
-    tmp.UpCase();
+    QString tmp = keyword[num].toUpper();
     if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
     }
     else {
       tmp.clear();
-      BigInt value = (BigInt)keyword[num];
+      BigInt value = toBigInt((QString)keyword[num]);
       string binDig = "01";
       do {
         tmp = binDig[value % 2] + tmp;
@@ -491,13 +485,13 @@ namespace Isis {
       while(value);
 
       ss << right << setfill('0') << setw(bits) << tmp;
-      tmp = ss.str();
+      tmp = ss.str().c_str();
       val += "2#" + tmp + "#";
     }
 
     // Add the units to this value
     if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      IString unit = keyword.Unit(num);
+      QString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -514,7 +508,7 @@ namespace Isis {
     // Add the units to the end if all values have the same units
     if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
-      IString unit = keyword.Unit(num);
+      QString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -531,9 +525,9 @@ namespace Isis {
   */
 
 
-  std::string PvlFormatPds::FormatHex(const PvlKeyword &keyword, int num, int bytes) {
+  QString PvlFormatPds::FormatHex(const PvlKeyword &keyword, int num, int bytes) {
 
-    IString val;
+    QString val;
     val.clear();
     bool singleUnit = false;
 
@@ -548,30 +542,29 @@ namespace Isis {
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
-    IString tmp = keyword[num];
-    tmp.UpCase();
+    QString tmp = keyword[num].toUpper();
     if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
     }
     else {
       stringstream ss;
       if(bytes == 2) {
-        ss << hex << (unsigned short int)(int)keyword[num];
+        ss << hex << (unsigned short int)toInt((QString)keyword[num]);
       }
       else if(bytes == 4) {
-        ss << hex << (unsigned int)(int)keyword[num];
+        ss << hex << (unsigned int)toInt((QString)keyword[num]);
       }
       else {
-        ss << hex << (BigInt)keyword[num];
+        ss << hex << toBigInt((QString)keyword[num]);
       }
-      IString h = ss.str();
-      h.UpCase();
+      QString h = ss.str().c_str();
+      h = h.toUpper();
       val += "16#" + h + "#";
     }
 
     // Add the units to this value
     if((!singleUnit) && (keyword.Unit(num).size() > 0)) {
-      IString unit = keyword.Unit(num);
+      QString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -588,7 +581,7 @@ namespace Isis {
     // Add the units to the end if all values have the same units
     if((singleUnit) && (num == keyword.Size() - 1) &&
         (keyword.Unit(num).size() > 0)) {
-      IString unit = keyword.Unit(num);
+      QString unit = keyword.Unit(num);
       // unit.UpCase();
       val += " <" + unit + ">";
     }
@@ -603,9 +596,9 @@ namespace Isis {
   * @param keyword The PvlKeyword to be formatted
   * @param num Use the ith value of the keyword
   */
-  std::string PvlFormatPds::FormatBool(const PvlKeyword &keyword, int num) {
+  QString PvlFormatPds::FormatBool(const PvlKeyword &keyword, int num) {
 
-    IString val;
+    QString val;
     val.clear();
 
     // Create a Null value if the value index is greater than the number of values
@@ -619,8 +612,8 @@ namespace Isis {
     }
 
     // Handle PDS special values "N/A" "NULL" "UNK"
-    IString tmp = keyword[num];
-    tmp.UpCase();
+    QString tmp = keyword[num];
+    tmp = tmp.toUpper();
     if((tmp == "N/A") || (tmp == "NULL") || (tmp == "UNK")) {
       val += "\"" + tmp + "\"";
     }
@@ -648,9 +641,9 @@ namespace Isis {
   *
   * @param keyword The keyword (i.e., the Object or Group)
   */
-  std::string PvlFormatPds::FormatName(const PvlKeyword &keyword) {
-    IString text = keyword.Name();
-    text.UpCase();
+  QString PvlFormatPds::FormatName(const PvlKeyword &keyword) {
+    QString text = keyword.Name();
+    text = text.toUpper();
     return text;
   };
 
@@ -661,13 +654,12 @@ namespace Isis {
   * @param name A string representing the end text.
   * @param keyword The keyword (i.e., the Object or Group) that is ending
   */
-  std::string PvlFormatPds::FormatEnd(const std::string name,
+  QString PvlFormatPds::FormatEnd(const QString name,
                                       const PvlKeyword &keyword) {
-    IString left = name;
-    left.UpCase();
+    QString left = name.toUpper();
     left += " = ";
-    IString right = (string)keyword;
-    right.UpCase();
+    QString right = (QString)keyword;
+    right = right.toUpper();
     return left + right;
   };
 
@@ -682,14 +674,14 @@ namespace Isis {
   *                                          the first character of the
   *                                          string is " or '
   */
-  std::string PvlFormatPds::AddQuotes(const std::string value) {
+  QString PvlFormatPds::AddQuotes(const QString value) {
 
-    std::string val = value;
+    QString val = value;
 
     bool quoteValue = true;
     bool singleQuoteValue = false;
-    if(val.find(" ") != std::string::npos) {
-      if(val.find("\"") != std::string::npos) {
+    if(val.contains(" ")) {
+      if(val.contains("\"")) {
         singleQuoteValue = true;
         quoteValue = false;
       }

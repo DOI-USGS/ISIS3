@@ -55,7 +55,7 @@ namespace Isis {
     BigInt headerStartPos = protoBufferCore["HeaderStartByte"];
     BigInt headerLength = protoBufferCore["HeaderBytes"];
 
-    fstream input(file.expanded().c_str(), ios::in | ios::binary);
+    fstream input(file.expanded().toAscii().data(), ios::in | ios::binary);
     if (!input.is_open()) {
       IString msg = "Failed to open control network file" + file.name();
       throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -99,7 +99,7 @@ namespace Isis {
 
         if(pointInStream == NULL) {
           input.close();
-          input.open(file.expanded().c_str(), ios::in | ios::binary);
+          input.open(file.expanded().toAscii().data(), ios::in | ios::binary);
           input.seekg(filePos, ios::beg);
 
           pointInStream = new IstreamInputStream(&input);
@@ -157,7 +157,7 @@ namespace Isis {
     streampos coreHeaderSize = p_networkHeader->ByteSize();
 
     const int labelBytes = 65536;
-    fstream output(file.expanded().c_str(),
+    fstream output(file.expanded().toAscii().data(),
                    ios::out | ios::trunc | ios::binary);
 
     char *blankLabel = new char[labelBytes];
@@ -196,24 +196,24 @@ namespace Isis {
 
     PvlObject protoCore("Core");
     protoCore.AddKeyword(PvlKeyword("HeaderStartByte",
-                         IString((BigInt) startCoreHeaderPos)));
-    protoCore.AddKeyword(PvlKeyword("HeaderBytes", IString((BigInt) coreHeaderSize)));
+                         toString((BigInt) startCoreHeaderPos)));
+    protoCore.AddKeyword(PvlKeyword("HeaderBytes", toString((BigInt) coreHeaderSize)));
     protoCore.AddKeyword(PvlKeyword("PointsStartByte",
-        IString((BigInt) ( startCoreHeaderPos + coreHeaderSize))));
+        toString((BigInt) ( startCoreHeaderPos + coreHeaderSize))));
     protoCore.AddKeyword(PvlKeyword("PointsBytes",
-        (BigInt) IString(pointsSize)));
+        toString(pointsSize)));
     protoObj.AddObject(protoCore);
 
     PvlGroup netInfo("ControlNetworkInfo");
     netInfo.AddComment("This group is for informational purposes only");
-    netInfo += PvlKeyword("NetworkId", p_networkHeader->networkid());
-    netInfo += PvlKeyword("TargetName", p_networkHeader->targetname());
-    netInfo += PvlKeyword("UserName", p_networkHeader->username());
-    netInfo += PvlKeyword("Created", p_networkHeader->created());
-    netInfo += PvlKeyword("LastModified", p_networkHeader->lastmodified());
-    netInfo += PvlKeyword("Description", p_networkHeader->description());
-    netInfo += PvlKeyword("NumberOfPoints", p_controlPoints->size());
-    netInfo += PvlKeyword("NumberOfMeasures", numMeasures);
+    netInfo += PvlKeyword("NetworkId", p_networkHeader->networkid().c_str());
+    netInfo += PvlKeyword("TargetName", p_networkHeader->targetname().c_str());
+    netInfo += PvlKeyword("UserName", p_networkHeader->username().c_str());
+    netInfo += PvlKeyword("Created", p_networkHeader->created().c_str());
+    netInfo += PvlKeyword("LastModified", p_networkHeader->lastmodified().c_str());
+    netInfo += PvlKeyword("Description", p_networkHeader->description().c_str());
+    netInfo += PvlKeyword("NumberOfPoints", toString(p_controlPoints->size()));
+    netInfo += PvlKeyword("NumberOfMeasures", toString(numMeasures));
     netInfo += PvlKeyword("Version", "2");
     protoObj.AddGroup(netInfo);
 
@@ -247,19 +247,19 @@ namespace Isis {
     pvl.AddObject(PvlObject("ControlNetwork"));
     PvlObject &network = pvl.FindObject("ControlNetwork");
 
-    network += PvlKeyword("NetworkId", p_networkHeader->networkid());
-    network += PvlKeyword("TargetName", p_networkHeader->targetname());
-    network += PvlKeyword("UserName", p_networkHeader->username());
-    network += PvlKeyword("Created", p_networkHeader->created());
-    network += PvlKeyword("LastModified", p_networkHeader->lastmodified());
-    network += PvlKeyword("Description", p_networkHeader->description());
+    network += PvlKeyword("NetworkId", p_networkHeader->networkid().c_str());
+    network += PvlKeyword("TargetName", p_networkHeader->targetname().c_str());
+    network += PvlKeyword("UserName", p_networkHeader->username().c_str());
+    network += PvlKeyword("Created", p_networkHeader->created().c_str());
+    network += PvlKeyword("LastModified", p_networkHeader->lastmodified().c_str());
+    network += PvlKeyword("Description", p_networkHeader->description().c_str());
 
     // This is the Pvl version we're converting to
     network += PvlKeyword("Version", "3");
 
     //  Get Target Radii from naif kernel
     PvlGroup pvlRadii;
-    string target = (string)network.FindKeyword("TargetName",Pvl::Traverse);
+    QString target = (QString)network.FindKeyword("TargetName",Pvl::Traverse);
     if (target != "") {
       try {
         NaifStatus::CheckErrors();
@@ -282,9 +282,9 @@ namespace Isis {
       else
         pvlPoint += PvlKeyword("PointType", "Free");
 
-      pvlPoint += PvlKeyword("PointId", binaryPoint.id());
-      pvlPoint += PvlKeyword("ChooserName", binaryPoint.choosername());
-      pvlPoint += PvlKeyword("DateTime", binaryPoint.datetime());
+      pvlPoint += PvlKeyword("PointId", binaryPoint.id().c_str());
+      pvlPoint += PvlKeyword("ChooserName", binaryPoint.choosername().c_str());
+      pvlPoint += PvlKeyword("DateTime", binaryPoint.datetime().c_str());
 
       if (binaryPoint.editlock()) {
         pvlPoint += PvlKeyword("EditLock", "True");
@@ -319,7 +319,7 @@ namespace Isis {
 
       if (binaryPoint.has_apriorisurfpointsourcefile())
         pvlPoint += PvlKeyword("AprioriXYZSourceFile",
-                        binaryPoint.apriorisurfpointsourcefile());
+                        binaryPoint.apriorisurfpointsourcefile().c_str());
 
       switch (binaryPoint.aprioriradiussource()) {
         case ControlPointFileEntryV0002::None:
@@ -349,12 +349,12 @@ namespace Isis {
 
       if (binaryPoint.has_aprioriradiussourcefile())
         pvlPoint += PvlKeyword("AprioriRadiusSourceFile",
-                        binaryPoint.aprioriradiussourcefile());
+                        binaryPoint.aprioriradiussourcefile().c_str());
 
       if(binaryPoint.has_apriorix()) {
-        pvlPoint += PvlKeyword("AprioriX", binaryPoint.apriorix(), "meters");
-        pvlPoint += PvlKeyword("AprioriY", binaryPoint.aprioriy(), "meters");
-        pvlPoint += PvlKeyword("AprioriZ", binaryPoint.aprioriz(), "meters");
+        pvlPoint += PvlKeyword("AprioriX", toString(binaryPoint.apriorix()), "meters");
+        pvlPoint += PvlKeyword("AprioriY", toString(binaryPoint.aprioriy()), "meters");
+        pvlPoint += PvlKeyword("AprioriZ", toString(binaryPoint.aprioriz()), "meters");
 
         // Get surface point, convert to lat,lon,radius and output as comment
         SurfacePoint apriori;
@@ -363,23 +363,23 @@ namespace Isis {
                 Displacement(binaryPoint.aprioriy(),Displacement::Meters),
                 Displacement(binaryPoint.aprioriz(),Displacement::Meters));
         pvlPoint.FindKeyword("AprioriX").AddComment("AprioriLatitude = " +
-                                 IString(apriori.GetLatitude().degrees()) +
+                                 toString(apriori.GetLatitude().degrees()) +
                                  " <degrees>");
         pvlPoint.FindKeyword("AprioriY").AddComment("AprioriLongitude = " +
-                                 IString(apriori.GetLongitude().degrees()) +
+                                 toString(apriori.GetLongitude().degrees()) +
                                  " <degrees>");
         pvlPoint.FindKeyword("AprioriZ").AddComment("AprioriRadius = " +
-                                 IString(apriori.GetLocalRadius().meters()) +
+                                 toString(apriori.GetLocalRadius().meters()) +
                                  " <meters>");
 
         if(binaryPoint.aprioricovar_size()) {
           PvlKeyword matrix("AprioriCovarianceMatrix");
-          matrix += binaryPoint.aprioricovar(0);
-          matrix += binaryPoint.aprioricovar(1);
-          matrix += binaryPoint.aprioricovar(2);
-          matrix += binaryPoint.aprioricovar(3);
-          matrix += binaryPoint.aprioricovar(4);
-          matrix += binaryPoint.aprioricovar(5);
+          matrix += toString(binaryPoint.aprioricovar(0));
+          matrix += toString(binaryPoint.aprioricovar(1));
+          matrix += toString(binaryPoint.aprioricovar(2));
+          matrix += toString(binaryPoint.aprioricovar(3));
+          matrix += toString(binaryPoint.aprioricovar(4));
+          matrix += toString(binaryPoint.aprioricovar(5));
           pvlPoint += matrix;
 
           if (pvlRadii.HasKeyword("EquatorialRadius")) {
@@ -397,12 +397,12 @@ namespace Isis {
             covar(1, 2) = binaryPoint.aprioricovar(4);
             covar(2, 2) = binaryPoint.aprioricovar(5);
             apriori.SetRectangularMatrix(covar);
-            IString sigmas = "AprioriLatitudeSigma = " +
-                             IString(apriori.GetLatSigmaDistance().meters()) +
+            QString sigmas = "AprioriLatitudeSigma = " +
+                             toString(apriori.GetLatSigmaDistance().meters()) +
                              " <meters>  AprioriLongitudeSigma = " +
-                             IString(apriori.GetLonSigmaDistance().meters()) +
+                             toString(apriori.GetLonSigmaDistance().meters()) +
                              " <meters>  AprioriRadiusSigma = " +
-                             IString(apriori.GetLocalRadiusSigma().meters()) +
+                             toString(apriori.GetLocalRadiusSigma().meters()) +
                              " <meters>";
             pvlPoint.FindKeyword("AprioriCovarianceMatrix").AddComment(sigmas);
           }
@@ -419,9 +419,9 @@ namespace Isis {
         pvlPoint += PvlKeyword("RadiusConstrained", "True");
 
       if(binaryPoint.has_adjustedx()) {
-        pvlPoint += PvlKeyword("AdjustedX", binaryPoint.adjustedx(), "meters");
-        pvlPoint += PvlKeyword("AdjustedY", binaryPoint.adjustedy(), "meters");
-        pvlPoint += PvlKeyword("AdjustedZ", binaryPoint.adjustedz(), "meters");
+        pvlPoint += PvlKeyword("AdjustedX", toString(binaryPoint.adjustedx()), "meters");
+        pvlPoint += PvlKeyword("AdjustedY", toString(binaryPoint.adjustedy()), "meters");
+        pvlPoint += PvlKeyword("AdjustedZ", toString(binaryPoint.adjustedz()), "meters");
 
         // Get surface point, convert to lat,lon,radius and output as comment
         SurfacePoint adjusted;
@@ -430,23 +430,23 @@ namespace Isis {
                 Displacement(binaryPoint.adjustedy(),Displacement::Meters),
                 Displacement(binaryPoint.adjustedz(),Displacement::Meters));
         pvlPoint.FindKeyword("AdjustedX").AddComment("AdjustedLatitude = " +
-                                 IString(adjusted.GetLatitude().degrees()) +
+                                 toString(adjusted.GetLatitude().degrees()) +
                                  " <degrees>");
         pvlPoint.FindKeyword("AdjustedY").AddComment("AdjustedLongitude = " +
-                                 IString(adjusted.GetLongitude().degrees()) +
+                                 toString(adjusted.GetLongitude().degrees()) +
                                  " <degrees>");
         pvlPoint.FindKeyword("AdjustedZ").AddComment("AdjustedRadius = " +
-                                 IString(adjusted.GetLocalRadius().meters()) +
+                                 toString(adjusted.GetLocalRadius().meters()) +
                                  " <meters>");
 
         if(binaryPoint.adjustedcovar_size()) {
           PvlKeyword matrix("AdjustedCovarianceMatrix");
-          matrix += binaryPoint.adjustedcovar(0);
-          matrix += binaryPoint.adjustedcovar(1);
-          matrix += binaryPoint.adjustedcovar(2);
-          matrix += binaryPoint.adjustedcovar(3);
-          matrix += binaryPoint.adjustedcovar(4);
-          matrix += binaryPoint.adjustedcovar(5);
+          matrix += toString(binaryPoint.adjustedcovar(0));
+          matrix += toString(binaryPoint.adjustedcovar(1));
+          matrix += toString(binaryPoint.adjustedcovar(2));
+          matrix += toString(binaryPoint.adjustedcovar(3));
+          matrix += toString(binaryPoint.adjustedcovar(4));
+          matrix += toString(binaryPoint.adjustedcovar(5));
           pvlPoint += matrix;
 
           if (pvlRadii.HasKeyword("EquatorialRadius")) {
@@ -464,12 +464,12 @@ namespace Isis {
             covar(1, 2) = binaryPoint.adjustedcovar(4);
             covar(2, 2) = binaryPoint.adjustedcovar(5);
             adjusted.SetRectangularMatrix(covar);
-            IString sigmas = "AdjustedLatitudeSigma = " +
-                             IString(adjusted.GetLatSigmaDistance().meters()) +
+            QString sigmas = "AdjustedLatitudeSigma = " +
+                             toString(adjusted.GetLatSigmaDistance().meters()) +
                              " <meters>  AdjustedLongitudeSigma = " +
-                             IString(adjusted.GetLonSigmaDistance().meters()) +
+                             toString(adjusted.GetLonSigmaDistance().meters()) +
                              " <meters>  AdjustedRadiusSigma = " +
-                             IString(adjusted.GetLocalRadiusSigma().meters()) +
+                             toString(adjusted.GetLocalRadiusSigma().meters()) +
                              " <meters>";
             pvlPoint.FindKeyword("AdjustedCovarianceMatrix").AddComment(sigmas);
           }
@@ -480,7 +480,7 @@ namespace Isis {
         PvlGroup pvlMeasure("ControlMeasure");
         const ControlPointFileEntryV0002_Measure &
             binaryMeasure = binaryPoint.measures(j);
-        pvlMeasure += PvlKeyword("SerialNumber", binaryMeasure.serialnumber());
+        pvlMeasure += PvlKeyword("SerialNumber", binaryMeasure.serialnumber().c_str());
 
         switch(binaryMeasure.type()) {
           case ControlPointFileEntryV0002_Measure_MeasureType_Candidate:
@@ -498,10 +498,10 @@ namespace Isis {
         }
 
         if(binaryMeasure.has_choosername())
-          pvlMeasure += PvlKeyword("ChooserName", binaryMeasure.choosername());
+          pvlMeasure += PvlKeyword("ChooserName", binaryMeasure.choosername().c_str());
 
         if(binaryMeasure.has_datetime())
-          pvlMeasure += PvlKeyword("DateTime", binaryMeasure.datetime());
+          pvlMeasure += PvlKeyword("DateTime", binaryMeasure.datetime().c_str());
 
         if(binaryMeasure.editlock())
           pvlMeasure += PvlKeyword("EditLock", "True");
@@ -510,34 +510,34 @@ namespace Isis {
           pvlMeasure += PvlKeyword("Ignore", "True");
 
         if(binaryMeasure.has_sample())
-          pvlMeasure += PvlKeyword("Sample", binaryMeasure.sample());
+          pvlMeasure += PvlKeyword("Sample", toString(binaryMeasure.sample()));
 
         if(binaryMeasure.has_line())
-          pvlMeasure += PvlKeyword("Line", binaryMeasure.line());
+          pvlMeasure += PvlKeyword("Line", toString(binaryMeasure.line()));
 
         if (binaryMeasure.has_diameter())
-          pvlMeasure += PvlKeyword("Diameter", binaryMeasure.diameter());
+          pvlMeasure += PvlKeyword("Diameter", toString(binaryMeasure.diameter()));
 
         if (binaryMeasure.has_apriorisample())
-          pvlMeasure += PvlKeyword("AprioriSample", binaryMeasure.apriorisample());
+          pvlMeasure += PvlKeyword("AprioriSample", toString(binaryMeasure.apriorisample()));
 
         if (binaryMeasure.has_aprioriline())
-          pvlMeasure += PvlKeyword("AprioriLine", binaryMeasure.aprioriline());
+          pvlMeasure += PvlKeyword("AprioriLine", toString(binaryMeasure.aprioriline()));
 
         if (binaryMeasure.has_samplesigma())
-          pvlMeasure += PvlKeyword("SampleSigma", binaryMeasure.samplesigma(),
+          pvlMeasure += PvlKeyword("SampleSigma", toString(binaryMeasure.samplesigma()),
                                    "pixels");
 
         if (binaryMeasure.has_samplesigma())
-          pvlMeasure += PvlKeyword("LineSigma", binaryMeasure.linesigma(),
+          pvlMeasure += PvlKeyword("LineSigma", toString(binaryMeasure.linesigma()),
                                    "pixels");
 
         if(binaryMeasure.has_sampleresidual())
-          pvlMeasure += PvlKeyword("SampleResidual", binaryMeasure.sampleresidual(),
+          pvlMeasure += PvlKeyword("SampleResidual", toString(binaryMeasure.sampleresidual()),
                                    "pixels");
 
         if(binaryMeasure.has_lineresidual())
-          pvlMeasure += PvlKeyword("LineResidual", binaryMeasure.lineresidual(),
+          pvlMeasure += PvlKeyword("LineResidual", toString(binaryMeasure.lineresidual()),
                                    "pixels");
 
         for(int logEntry = 0;

@@ -35,8 +35,8 @@ void IsisMain() {
   vector<Cube *> clist;
   try {
     if(flist.size() < 1) {
-      string msg = "the list file [" + ui.GetFileName("FROMLIST") +
-                   "does not contain any data";
+      QString msg = "the list file [" + ui.GetFileName("FROMLIST") +
+                    "does not contain any data";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -53,7 +53,7 @@ void IsisMain() {
     // run the compair function here.  This will conpair the
     // labels of the first cube to the labels of each following cube.
     PvlKeyword sourceProductId("SourceProductId");
-    string ProdId;
+    QString ProdId;
     for(int i = 0; i < (int)clist.size(); i++) {
       Pvl *pmatch = clist[0]->getLabel();
       Pvl *pcomp = clist[i]->getLabel();
@@ -65,9 +65,9 @@ void IsisMain() {
           sourceProductId += g["stitchedProductIds"][j];
         }
       }
-      ProdId = (string)pmatch->FindGroup("Archive", Pvl::Traverse)["ObservationId"];
-      IString bandname = (string)pmatch->FindGroup("BandBin", Pvl::Traverse)["Name"];
-      bandname = bandname.UpCase();
+      ProdId = (QString)pmatch->FindGroup("Archive", Pvl::Traverse)["ObservationId"];
+      QString bandname = (QString)pmatch->FindGroup("BandBin", Pvl::Traverse)["Name"];
+      bandname = bandname.toUpper();
       ProdId = ProdId + "_" + bandname;
     }
     bool runXY = true;
@@ -172,36 +172,36 @@ void IsisMain() {
       }
     }
     if(runXY) {
-      string msg = "Camera did not intersect images to gather stats";
+      QString msg = "Camera did not intersect images to gather stats";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    // get the min and max SCLK values ( do this with string comp.)
+    // get the min and max SCLK values ( do this with QString comp.)
     // get the value from the original label blob
-    string startClock;
-    string stopClock;
-    string startTime;
-    string stopTime;
+    QString startClock;
+    QString stopClock;
+    QString startTime;
+    QString stopTime;
     for(int i = 0; i < (int)clist.size(); i++) {
       OriginalLabel origLab;
       clist[i]->read(origLab);
       PvlGroup timegrp = origLab.ReturnLabels().FindGroup("TIME_PARAMETERS", Pvl::Traverse);
       if(i == 0) {
-        startClock = (string)timegrp["SpacecraftClockStartCount"];
-        stopClock = (string)timegrp["SpacecraftClockStopCount"];
-        startTime = (string)timegrp["StartTime"];
-        stopTime = (string)timegrp["StopTime"];
+        startClock = (QString)timegrp["SpacecraftClockStartCount"];
+        stopClock = (QString)timegrp["SpacecraftClockStopCount"];
+        startTime = (QString)timegrp["StartTime"];
+        stopTime = (QString)timegrp["StopTime"];
       }
       else {
-        string testStartTime = (string)timegrp["StartTime"];
-        string testStopTime = (string)timegrp["StopTime"];
+        QString testStartTime = (QString)timegrp["StartTime"];
+        QString testStopTime = (QString)timegrp["StopTime"];
         if(testStartTime < startTime) {
           startTime = testStartTime;
-          startClock = (string)timegrp["SpacecraftClockStartCount"];
+          startClock = (QString)timegrp["SpacecraftClockStartCount"];
         }
         if(testStopTime > stopTime) {
           stopTime = testStopTime;
-          stopClock = (string)timegrp["spacecraftClockStopCount"];
+          stopClock = (QString)timegrp["spacecraftClockStopCount"];
         }
       }
     }
@@ -211,9 +211,9 @@ void IsisMain() {
     PvlKeyword cpmmSummingFlag("cpmmSummingFlag");
     PvlKeyword specialProcessingFlag("SpecialProcessingFlag");
     for(int i = 0; i < 14; i++) {
-      cpmmTdiFlag += (string)"";
-      cpmmSummingFlag += (string)"";
-      specialProcessingFlag += (string)"";
+      cpmmTdiFlag += (QString)"";
+      cpmmSummingFlag += (QString)"";
+      specialProcessingFlag += (QString)"";
     }
 
     for(int i = 0; i < (int)clist.size(); i++) {
@@ -222,11 +222,11 @@ void IsisMain() {
       OriginalLabel cOrgLab;
       clist[i]->read(cOrgLab);
       PvlGroup cGrp = cOrgLab.ReturnLabels().FindGroup("INSTRUMENT_SETTING_PARAMETERS", Pvl::Traverse);
-      cpmmTdiFlag[(int)cInst["CpmmNumber"]] = (string) cGrp["MRO:TDI"];
-      cpmmSummingFlag[(int)cInst["CpmmNumber"]] = (string) cGrp["MRO:BINNING"];
+      cpmmTdiFlag[(int)cInst["CpmmNumber"]] = (QString) cGrp["MRO:TDI"];
+      cpmmSummingFlag[(int)cInst["CpmmNumber"]] = (QString) cGrp["MRO:BINNING"];
 
       if(cInst.HasKeyword("Special_Processing_Flag")) {
-        specialProcessingFlag[cInst["CpmmNumber"]] = (string) cInst["Special_Processing_Flag"];
+        specialProcessingFlag[cInst["CpmmNumber"]] = (QString) cInst["Special_Processing_Flag"];
       }
       else {
         // there may not be the keyword Special_Processing_Flag if no
@@ -248,11 +248,11 @@ void IsisMain() {
     clist.clear();
 
     // automos step
-    string list = ui.GetFileName("FROMLIST");
-    string toMosaic = ui.GetFileName("TO");
-    string MosaicPriority = ui.GetString("PRIORITY");
+    QString list = ui.GetFileName("FROMLIST");
+    QString toMosaic = ui.GetFileName("TO");
+    QString MosaicPriority = ui.GetString("PRIORITY");
 
-    string parameters = "FROMLIST=" + list + " MOSAIC=" + toMosaic + " PRIORITY=" + MosaicPriority;
+    QString parameters = "FROMLIST=" + list + " MOSAIC=" + toMosaic + " PRIORITY=" + MosaicPriority;
     ProgramLauncher::RunIsisProgram("automos", parameters);
 
     // write out new information to new group mosaic
@@ -264,13 +264,13 @@ void IsisMain() {
     mos += PvlKeyword("SpacecraftClockStartCount ", startClock);
     mos += PvlKeyword("StopTime ", stopTime);
     mos += PvlKeyword("SpacecraftClockStopCount ", stopClock);
-    mos += PvlKeyword("IncidenceAngle ", Cincid, "DEG");
-    mos += PvlKeyword("EmissionAngle ", Cemiss, "DEG");
-    mos += PvlKeyword("PhaseAngle ", Cphase, "DEG");
-    mos += PvlKeyword("LocalTime ", ClocalSolTime, "LOCALDAY/24");
-    mos += PvlKeyword("SolarLongitude ", CsolarLong, "DEG");
-    mos += PvlKeyword("SubSolarAzimuth ", CsunAzimuth, "DEG");
-    mos += PvlKeyword("NorthAzimuth ", CnorthAzimuth, "DEG");
+    mos += PvlKeyword("IncidenceAngle ", toString(Cincid), "DEG");
+    mos += PvlKeyword("EmissionAngle ", toString(Cemiss), "DEG");
+    mos += PvlKeyword("PhaseAngle ", toString(Cphase), "DEG");
+    mos += PvlKeyword("LocalTime ", toString(ClocalSolTime), "LOCALDAY/24");
+    mos += PvlKeyword("SolarLongitude ", toString(CsolarLong), "DEG");
+    mos += PvlKeyword("SubSolarAzimuth ", toString(CsunAzimuth), "DEG");
+    mos += PvlKeyword("NorthAzimuth ", toString(CnorthAzimuth), "DEG");
     mos += cpmmTdiFlag;
     mos += cpmmSummingFlag;
     mos += specialProcessingFlag;
@@ -289,7 +289,7 @@ void IsisMain() {
       clist[i]->close();
       delete clist[i];
     }
-    string msg = "The mosaic [" + ui.GetFileName("TO") + "] was NOT created";
+    QString msg = "The mosaic [" + ui.GetFileName("TO") + "] was NOT created";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 } // end of isis main
@@ -299,22 +299,22 @@ void CompareLabels(Pvl &pmatch, Pvl &pcomp) {
   // test of the ObservationId
   PvlGroup matchgrp = pmatch.FindGroup("Archive", Pvl::Traverse);
   PvlGroup compgrp = pcomp.FindGroup("Archive", Pvl::Traverse);
-  string obsMatch = matchgrp["ObservationId"];
-  string obsComp = compgrp["ObservationId"];
+  QString obsMatch = matchgrp["ObservationId"];
+  QString obsComp = compgrp["ObservationId"];
 
   if(obsMatch != obsComp) {
-    string msg = "Images not from the same observation";
+    QString msg = "Images not from the same observation";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Test of the BandBin filter name
   PvlGroup bmatchgrp = pmatch.FindGroup("BandBin", Pvl::Traverse);
   PvlGroup bcompgrp = pcomp.FindGroup("BandBin", Pvl::Traverse);
-  string bandMatch = bmatchgrp["Name"];
-  string bandComp = bcompgrp["Name"];
+  QString bandMatch = bmatchgrp["Name"];
+  QString bandComp = bcompgrp["Name"];
 
   if(bandMatch != bandComp) {
-    string msg = "Images not the same filter";
+    QString msg = "Images not the same filter";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }

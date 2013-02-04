@@ -70,7 +70,7 @@ namespace Isis {
     *
     * @param phaselist  List of phase angles to interpolate
     */
-  void MinnaertEmpirical::SetPhotoPhaseList(const string phasestrlist) {
+  void MinnaertEmpirical::SetPhotoPhaseList(QString phasestrlist) {
     double phaseangle;
     IString strlist(phasestrlist);
     p_photoPhaseList.clear();
@@ -95,7 +95,7 @@ namespace Isis {
     *
     * @param klist  List of Minnaert function exponents to interpolate
     */
-  void MinnaertEmpirical::SetPhotoKList(const string kstrlist) {
+  void MinnaertEmpirical::SetPhotoKList(QString kstrlist) {
     double kvalue;
     IString strlist(kstrlist);
     p_photoKList.clear();
@@ -118,7 +118,7 @@ namespace Isis {
     *
     * @param phasecurvelist  List of brightness values corresponding to Minnaert function exponents
     */
-  void MinnaertEmpirical::SetPhotoPhaseCurveList(const string phasecurvestrlist) {
+  void MinnaertEmpirical::SetPhotoPhaseCurveList(QString phasecurvestrlist) {
     double phasecurve;
     IString strlist(phasecurvestrlist);
     p_photoPhaseCurveList.clear();

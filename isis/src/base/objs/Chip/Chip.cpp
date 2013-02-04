@@ -329,7 +329,7 @@ namespace Isis {
         matchProj = (TProjection *) matchChipCube.getProjection();
       }
       catch(IException &error2) {
-        string msg = "Can not geom chip.  ";
+        QString msg = "Can not geom chip.  ";
         msg += "Match chip cube [" + matchChipCube.getFileName();
         msg += "] is not a camera or map projection";
 
@@ -352,7 +352,7 @@ namespace Isis {
         proj = cube.getProjection();
       }
       catch(IException &error2) {
-        string msg = "Can not geom chip.  ";
+        QString msg = "Can not geom chip.  ";
         msg += "Chip cube [" + cube.getFileName();
         msg += "] is not a camera or map projection";
 
@@ -516,7 +516,7 @@ namespace Isis {
     }
 
     if(xp.size() < 3) {
-      string msg = "Cannot find enough points to perform Affine transformation.  ";
+      QString msg = "Cannot find enough points to perform Affine transformation.  ";
       msg += "Unable to load chip from [" + cube.getFileName();
       msg += "] to match chip from [" + matchChipCube.getFileName() + "].";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -1034,7 +1034,7 @@ namespace Isis {
    *
    * @param filename  Name of the cube to create
    */
-  void Chip::Write(const string &filename) {
+  void Chip::Write(const QString &filename) {
     Cube c;
     c.setDimensions(Samples(), Lines(), 1);
     c.create(filename);

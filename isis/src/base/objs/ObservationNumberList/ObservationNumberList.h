@@ -53,29 +53,29 @@ namespace Isis {
    */
   class ObservationNumberList : public Isis::SerialNumberList {
     public:
-      ObservationNumberList(const std::string &list, bool checkTarget = true);
+      ObservationNumberList(const QString &list, bool checkTarget = true);
       ObservationNumberList(Isis::SerialNumberList *snlist);
       ~ObservationNumberList();
 
-      void Add(int isn, const int observationIndex, std::string observationNumber) ;
+      void Add(int isn, const int observationIndex, QString observationNumber) ;
       int ObservationSize() const;
 
       int ObservationNumberMapIndex(const int serialNumberIndex);
 
       void Remove(Isis::SerialNumberList *snlist);
-      void Remove(const std::string &listfile);
+      void Remove(const QString &listfile);
 
-      bool HasObservationNumber(const std::string &on);
+      bool HasObservationNumber(const QString &on);
 
-      std::string ObservationNumber(const std::string &filename);
-      std::string ObservationNumber(int index);
-      std::vector<std::string> PossibleFileNames(const std::string &on);
+      QString ObservationNumber(const QString &filename);
+      QString ObservationNumber(int index);
+      std::vector<QString> PossibleFileNames(const QString &on);
 
     private:
       struct ObservationSet {
         int serialNumberIndex;
         int observationNumberIndex;
-        std::string observationNumber;
+        QString observationNumber;
       };
 
       void init(Isis::SerialNumberList *snlist);

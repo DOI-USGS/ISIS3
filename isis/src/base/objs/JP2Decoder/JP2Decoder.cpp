@@ -39,7 +39,7 @@ namespace Isis {
    * @param jp2file The name of the JP2 file that needs to be decoded.
    *
    */
-  JP2Decoder::JP2Decoder(const std::string &jp2file) {
+  JP2Decoder::JP2Decoder(const QString &jp2file) {
 
 #if ENABLEJP2K
     p_jp2File = jp2file;
@@ -66,12 +66,12 @@ namespace Isis {
 
       // Open the JP2 file stream
       JP2_Stream = new jp2_family_src();
-      JP2_Stream->open(p_jp2File.c_str());
+      JP2_Stream->open(p_jp2File.toAscii().data());
 
       // Open the JP2 source
       JP2_Source = new jp2_source();
       if(!JP2_Source->open(JP2_Stream)) {
-        std::string msg = "Unable to open the decoder because the source file ";
+        QString msg = "Unable to open the decoder because the source file ";
         msg += "does not have valid JP2 format content [" + p_jp2File + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -96,7 +96,7 @@ namespace Isis {
       p_pixelBytes = (p_pixelBits >> 3) + ((p_pixelBits % 8) ? 1 : 0);
       if(p_pixelBytes == 3) p_pixelBytes = 4;
       if(p_pixelBits > 16 || p_pixelBytes > 2) {
-        std::string msg = "The source file has unsupported pixel type ";
+        QString msg = "The source file has unsupported pixel type ";
         msg += "[" + p_jp2File + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -229,10 +229,10 @@ namespace Isis {
   }
 
 
-  bool JP2Decoder::IsJP2(string filename) {
+  bool JP2Decoder::IsJP2(QString filename) {
 #if ENABLEJP2K
     jp2_family_src *stream = new jp2_family_src();
-    stream->open(filename.c_str());
+    stream->open(filename.toAscii().data());
     jp2_source *source = new jp2_source();
 
     bool result = source->open(stream);

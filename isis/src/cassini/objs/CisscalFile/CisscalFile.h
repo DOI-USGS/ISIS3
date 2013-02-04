@@ -22,9 +22,12 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
 #include <vector>
+
+#include <QString>
+
 #include "TextFile.h"
+
 namespace Isis {
   /**
    * @brief Extends <b>TextFile</b>  to handle Cassini ISS
@@ -45,16 +48,16 @@ namespace Isis {
    */
   class CisscalFile : public TextFile {
     public:
-      CisscalFile(const std::string &filename, const char *openmode = "input",
+      CisscalFile(const QString &filename, const char *openmode = "input",
                   const char *extension = "");
       //!> Destructor closes the text file.
       ~CisscalFile() {
         TextFile::Close();
       }; 
-      bool GetLine(std::string &line);
+      bool GetLine(QString &line);
     protected:
       bool p_begindataFound; //!> Flag variable indicates whether the tag <code>"\begindata"</code> has been found.
-      bool p_GetLine(std::string &line);
+      bool p_GetLine(QString &line);
   };
 };
 #endif

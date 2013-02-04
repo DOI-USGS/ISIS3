@@ -42,25 +42,25 @@ void IsisMain() {
   PvlObject *isisCubeLab = inputCube->getLabel();
 
   // Error check to make sure this is a valid cube for this program
-  IString origInstrument = isisCubeLab->FindObject("IsisCube")
+  QString origInstrument = isisCubeLab->FindObject("IsisCube")
                            .FindGroup("OriginalInstrument")["InstrumentId"][0];
   if (origInstrument != "HIRISE") {
-    IString msg = "Input cube must from a HiRISE image. The original "
+    QString msg = "Input cube must from a HiRISE image. The original "
                   "InstrumentId = [" + origInstrument 
                   + "] is unsupported by hideal2pds.";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
-  IString instrumentId = isisCubeLab->FindObject("IsisCube")
+  QString instrumentId = isisCubeLab->FindObject("IsisCube")
                                     .FindGroup("Instrument")["InstrumentId"][0];
   if (instrumentId != "IdealCamera") {
-    IString msg = "Input cube must be IdealCamera. InstrumentId = [" 
+    QString msg = "Input cube must be IdealCamera. InstrumentId = [" 
                   + instrumentId + "] is unsupported by hideal2pds.";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
-  IString target = isisCubeLab->FindObject("IsisCube")
+  QString target = isisCubeLab->FindObject("IsisCube")
                               .FindGroup("Instrument")["TargetName"][0];
-  if (target.UpCase() != "MARS") {
-    IString msg = "Input cube must from a HiRise image. The target = [" 
+  if (target.toUpper() != "MARS") {
+    QString msg = "Input cube must from a HiRise image. The target = [" 
                   + target + "] is unsupported by hideal2pds.";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
@@ -86,12 +86,12 @@ void IsisMain() {
 
   // output PDS file with detached labels and tables for this application
   FileName outPdsFile(ui.GetFileName("TO", "img"));
-  IString pdsLabelFile = outPdsFile.path() + "/" + outPdsFile.baseName() + ".lbl";
+  QString pdsLabelFile = outPdsFile.path() + "/" + outPdsFile.baseName() + ".lbl";
   p.SetDetached(pdsLabelFile);
   // create generic pds label - this will be finalized with proper line/byte counts later
   Pvl &pdsLabel = p.StandardPdsLabel(ProcessExportPds::Image);
 
-  IString isisLabelFile = ui.GetFileName("FROM");
+  QString isisLabelFile = ui.GetFileName("FROM");
 
   // Translate the keywords from the input cube label that go in the PDS label
   PvlTranslationManager cubeLab(*(inputCube->getLabel()), 
@@ -120,7 +120,7 @@ void IsisMain() {
   //    already been set in the labels by the ExportTable call. This is not
   //    a problem since our tables are detached.  However, it could be a
   //    problem if we decide to allow attached PDS products in the future.
-  IString pdsTableFile = "";
+  QString pdsTableFile = "";
   pdsTableFile = outPdsFile.baseName() + "_INSTRUMENT_POINTING_TABLE.dat"; 
   Table instRotationTable = cam->instrumentRotation()->Cache("InstrumentPointing");
   p.ExportTable(instRotationTable, pdsTableFile);
@@ -186,8 +186,8 @@ void IsisMain() {
   }
   else {
     tableKeyword = PvlKeyword("SOLAR_LONGITUDE", 
-                              cam->solarLongitude().force360Domain()
-                                   .positiveEast(Angle::Degrees), 
+                              toString(cam->solarLongitude().force360Domain()
+                                   .positiveEast(Angle::Degrees)), 
                               "DEGREES");
   }
   bodyRotTabLab += tableKeyword;
@@ -222,8 +222,8 @@ void IsisMain() {
   // now that all translations/additions/modifications to the labels have been
   // completed
   p.OutputDetachedLabel();
-  string outFileName(outPdsFile.expanded());
-  ofstream outputStream(outFileName.c_str());
+  QString outFileName(outPdsFile.expanded());
+  ofstream outputStream(outFileName.toAscii().data());
   p.StartProcess(outputStream);
   p.EndProcess();
   outputStream.close();
@@ -314,7 +314,7 @@ void updatePdsLabelImageObject(PvlObject *isisCubeLab, Pvl &pdsLabel) {
       // The given input cube is not supported for export to PDS. The AlphaCube
       // group values indicate that this cube has been not only cropped, but
       // also scaled (reduced or enlarged)
-      IString msg = "The AlphaCube group values of the input Isis cube indicate "
+      QString msg = "The AlphaCube group values of the input Isis cube indicate "
                     "that this cube has been scaled. Unable to export scaled "
                     "cubes to PDS using hideal2pds.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -324,17 +324,17 @@ void updatePdsLabelImageObject(PvlObject *isisCubeLab, Pvl &pdsLabel) {
     firstSample = alphaStartingSample;
     firstLine = alphaStartingLine;
   }
-  image += PvlKeyword("SOURCE_LINE_SAMPLES", sourceSamples);
-  image += PvlKeyword("SOURCE_LINES", sourceLines);
-  image += PvlKeyword("FIRST_LINE_SAMPLE", firstSample);
-  image += PvlKeyword("FIRST_LINE", firstLine);
+  image += PvlKeyword("SOURCE_LINE_SAMPLES", toString(sourceSamples));
+  image += PvlKeyword("SOURCE_LINES", toString(sourceLines));
+  image += PvlKeyword("FIRST_LINE_SAMPLE", toString(firstSample));
+  image += PvlKeyword("FIRST_LINE", toString(firstLine));
 
 
   // Add center wavelength and bandwidth with correct units to the IMAGE object
   PvlKeyword &oldCenter = image["CENTER_FILTER_WAVELENGTH"];
   PvlKeyword newCenter("CENTER_FILTER_WAVELENGTH");
   for(int val = 0; val < oldCenter.Size(); ++val) {
-    if(((IString)(oldCenter.Unit(val))).UpCase() == "NANOMETERS") {
+    if(((QString)(oldCenter.Unit(val))).toUpper() == "NANOMETERS") {
       newCenter.AddValue(oldCenter[val], "NM");
     }
     else {
@@ -346,7 +346,7 @@ void updatePdsLabelImageObject(PvlObject *isisCubeLab, Pvl &pdsLabel) {
   PvlKeyword &oldBandWidth = image["BAND_WIDTH"];
   PvlKeyword newBandWidth("BAND_WIDTH");
   for(int val = 0; val < oldBandWidth.Size(); ++val) {
-    if(((IString)(oldBandWidth.Unit(val))).UpCase() == "NANOMETERS") {
+    if(((QString)(oldBandWidth.Unit(val))).toUpper() == "NANOMETERS") {
       newBandWidth.AddValue(oldBandWidth[val], "NM");
     }
     else {
@@ -399,8 +399,8 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
     pdsLabel.AddKeyword(rationale, PvlContainer::Replace);
   }
   else if ( !pdsLabel.HasKeyword("RATIONALE_DESC") 
-            || string(pdsLabel["RATIONALE_DESC"]) == "NULL" ){
-    IString msg = "Unable to export HiRise product to PDS without "
+            || QString(pdsLabel["RATIONALE_DESC"]) == "NULL" ){
+    QString msg = "Unable to export HiRise product to PDS without "
                   "RationaleDescription value. The input cube value for this "
                   "keyword is Null, the user is required to enter a value.";
     throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -408,15 +408,15 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
   pdsLabel += PvlKeyword("PRODUCT_VERSION_ID", ui.GetString("VERSION"));
 
   // Add the N/A constant keyword to the ROOT object
-  pdsLabel += PvlKeyword("NOT_APPLICABLE_CONSTANT", -9998);
+  pdsLabel += PvlKeyword("NOT_APPLICABLE_CONSTANT", toString(-9998));
 
   // Compute and add SOFTWARE_NAME to the ROOT object
-  IString sfname;
+  QString sfname;
   sfname.clear();
   sfname += "Isis " + Application::Version() + " " +
             Application::GetUserInterface().ProgramName();
   pdsLabel += PvlKeyword("SOFTWARE_NAME", sfname);
-  IString matchedCube = isisCubeLab->FindObject("IsisCube").FindGroup("Instrument")
+  QString matchedCube = isisCubeLab->FindObject("IsisCube").FindGroup("Instrument")
                                   .FindKeyword("MatchedCube")[0];
   FileName matchedCubeFileNoPath(matchedCube);
   pdsLabel += PvlKeyword("MATCHED_CUBE", matchedCubeFileNoPath.name());
@@ -425,16 +425,16 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
   bool jitter = false;
   if (isisCubeLab->FindObject("IsisCube").FindGroup("Instrument")
                  .HasKeyword("ImageJitterCorrected")) {
-    jitter = int(isisCubeLab->FindObject("IsisCube")
+    jitter = toInt(isisCubeLab->FindObject("IsisCube")
                             .FindGroup("Instrument")["ImageJitterCorrected"][0]);
-    pdsLabel += PvlKeyword("IMAGE_JITTER_CORRECTED", jitter);          
+    pdsLabel += PvlKeyword("IMAGE_JITTER_CORRECTED", toString((int)jitter));          
   }
   else {
     pdsLabel += PvlKeyword("IMAGE_JITTER_CORRECTED", "UNK");
   }                                                                  
 
   // Add Isis Kernels group keywords to the ROOT object
-  IString shapeModel = isisCubeLab->FindObject("IsisCube").FindGroup("Kernels")
+  QString shapeModel = isisCubeLab->FindObject("IsisCube").FindGroup("Kernels")
                                   .FindKeyword("ShapeModel")[0];
   FileName shapeModelFileNoPath(shapeModel);
   pdsLabel += PvlKeyword("SHAPE_MODEL", shapeModelFileNoPath.name());
@@ -443,7 +443,7 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
   // mosaic input cube.
   
   // Add NaifKeywords Object values to the ROOT object
-  IString radiiName = "BODY" + IString(cam->naifBodyCode()) + "_RADII";
+  QString radiiName = "BODY" + QString(cam->naifBodyCode()) + "_RADII";
   PvlObject naifKeywordGroup = cam->getStoredNaifKeywords();
 
   if (naifKeywordGroup.HasKeyword(radiiName)) {
@@ -455,30 +455,30 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
   else {
     Distance naifBodyRadii[3];
     cam->radii(naifBodyRadii);
-    pdsLabel += PvlKeyword("A_AXIS_RADIUS", naifBodyRadii[0].kilometers(), "KILOMETERS");
-    pdsLabel += PvlKeyword("B_AXIS_RADIUS", naifBodyRadii[1].kilometers(), "KILOMETERS");
-    pdsLabel += PvlKeyword("C_AXIS_RADIUS", naifBodyRadii[2].kilometers(), "KILOMETERS");
+    pdsLabel += PvlKeyword("A_AXIS_RADIUS", toString(naifBodyRadii[0].kilometers()), "KILOMETERS");
+    pdsLabel += PvlKeyword("B_AXIS_RADIUS", toString(naifBodyRadii[1].kilometers()), "KILOMETERS");
+    pdsLabel += PvlKeyword("C_AXIS_RADIUS", toString(naifBodyRadii[2].kilometers()), "KILOMETERS");
   }
 
   if (naifKeywordGroup.HasKeyword("BODY_FRAME_CODE")) {
     pdsLabel += naifKeywordGroup.FindKeyword("BODY_FRAME_CODE");
   }
   else {
-    pdsLabel += PvlKeyword("BODY_FRAME_CODE", cam->naifBodyFrameCode());
+    pdsLabel += PvlKeyword("BODY_FRAME_CODE", toString(cam->naifBodyFrameCode()));
   }
 
   if (naifKeywordGroup.HasKeyword("IDEAL_FOCAL_LENGTH")) {
     pdsLabel += naifKeywordGroup.FindKeyword("IDEAL_FOCAL_LENGTH");
   }
   else {
-    pdsLabel += PvlKeyword("IDEAL_FOCAL_LENGTH", cam->FocalLength());
+    pdsLabel += PvlKeyword("IDEAL_FOCAL_LENGTH", toString(cam->FocalLength()));
   }
 
   if (naifKeywordGroup.HasKeyword("IDEAL_PIXEL_PITCH")) {
     pdsLabel += naifKeywordGroup.FindKeyword("IDEAL_PIXEL_PITCH");
   }
   else {
-    pdsLabel += PvlKeyword("IDEAL_PIXEL_PITCH", cam->PixelPitch());
+    pdsLabel += PvlKeyword("IDEAL_PIXEL_PITCH", toString(cam->PixelPitch()));
   }
 
   if (naifKeywordGroup.HasKeyword("IDEAL_TRANSX")) {
@@ -488,7 +488,7 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
     const double *transXValues = cam->FocalPlaneMap()->TransX();
     PvlKeyword transX("IDEAL_TRANSX");
     for (int i = 0; i < 3; i++) {
-      transX += transXValues[i];
+      transX += toString(transXValues[i]);
     }
     pdsLabel += transX;
   }
@@ -500,7 +500,7 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
     const double *transYValues = cam->FocalPlaneMap()->TransY();
     PvlKeyword transY("IDEAL_TRANSY");
     for (int i = 0; i < 3; i++) {
-      transY += transYValues[i];
+      transY += toString(transYValues[i]);
     }
     pdsLabel += transY;
   }
@@ -512,7 +512,7 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
     const double *transSValues = cam->FocalPlaneMap()->TransS();
     PvlKeyword transS("IDEAL_TRANSS");
     for (int i = 0; i < 3; i++) {
-      transS += transSValues[i];
+      transS += toString(transSValues[i]);
     }
     pdsLabel += transS;
   }
@@ -524,7 +524,7 @@ void updatePdsLabelRootObject(PvlObject *isisCubeLab, Pvl &pdsLabel,
     const double *transLValues = cam->FocalPlaneMap()->TransL();
     PvlKeyword transL("IDEAL_TRANSL");
     for (int i = 0; i < 3; i++) {
-      transL += transLValues[i];
+      transL += toString(transLValues[i]);
     }
     pdsLabel += transL;
   }
@@ -546,7 +546,7 @@ void updatePdsLabelTimeParametersGroup(Pvl &pdsLabel) {
   struct tm *tmbuf = gmtime(&startTime);
   char timestr[80];
   strftime(timestr, 80, "%Y-%m-%dT%H:%M:%S", tmbuf);
-  string dateTime = (string) timestr;
+  QString dateTime = (QString) timestr;
   iTime tmpDateTime(dateTime);
   PvlGroup &timeParam = pdsLabel.FindGroup("TIME_PARAMETERS");
   timeParam += PvlKeyword("PRODUCT_CREATION_TIME", tmpDateTime.UTC());

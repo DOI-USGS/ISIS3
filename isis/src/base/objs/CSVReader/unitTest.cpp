@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 
   try {
     cout << "\n\nProcessing comma table...\n";
-    std::string csvfile("comma.csv");
+    QString csvfile("comma.csv");
     CSVReader csv(csvfile, true, 2);
     CSVReader::CSVTable table = summarize(csv);
 

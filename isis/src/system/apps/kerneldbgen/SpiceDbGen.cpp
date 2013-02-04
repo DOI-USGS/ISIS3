@@ -38,7 +38,7 @@ const char *SpiceDbGen::calForm = "YYYY MON DD HR:MN:SC.### TDB ::TDB";
  *
  * @param type The type of kernel to be processed. Either, "SPK" or "CK.
 */
-SpiceDbGen::SpiceDbGen(IString type) {
+SpiceDbGen::SpiceDbGen(QString type) {
   p_type = type;
 //  calForm = "YYYY MON DD HR:MN:SC.### TDB ::TDB";
 }
@@ -53,7 +53,7 @@ SpiceDbGen::SpiceDbGen(IString type) {
  *
  * @param location  The directory in which the method searches for kernels.
  *
- * @param filter    Vector of strings containing regular expression used to
+ * @param filter    Vector of QStrings containing regular expression used to
  *                  match kernels of a particular quality. This parameter is
  *                  used to distinguish between kernels of different qualities
  *                  and/or different missions that may be placed in the same
@@ -67,10 +67,10 @@ SpiceDbGen::SpiceDbGen(IString type) {
  *
  * @throws Isis::iException::Message
 */
-PvlObject SpiceDbGen::Direct(IString quality, IString location,
-                             std::vector<std::string> &filter) {
+PvlObject SpiceDbGen::Direct(QString quality, QString location,
+                             std::vector<QString> &filter) {
   PvlObject result;
-  IString type = "none";
+  QString type = "none";
 
   for(unsigned int i = 0; i < filter.size(); ++i) {
     //Create a list of all of the files matching the current filter
@@ -80,13 +80,13 @@ PvlObject SpiceDbGen::Direct(IString quality, IString location,
     // Throw an error if no files are being added to this database for
     // this filter/regex
     if(files.size() == 0) {
-      string message = "Your filter [" + location + "/" + filter[i] + "]"
+      QString message = "Your filter [" + location + "/" + filter[i] + "]"
                        + "has not detected any " + quality + " kernels";
       throw IException(IException::User, message, _FILEINFO_);
     }
 
     for(int fileNum = 0 ; fileNum < files.size() ; fileNum++) {
-      FileName currFile((string) location + "/" + files[fileNum].toStdString());
+      FileName currFile((QString) location + "/" + files[fileNum]);
       PvlGroup selection = AddSelection(currFile);
       selection += PvlKeyword("Type", quality);
       result.AddGroup(selection);
@@ -110,7 +110,7 @@ PvlObject SpiceDbGen::Direct(IString quality, IString location,
       grp++;
     }
     else {
-      string message = "A kernel of type [" + grp->Name() + "] has been found in a directory for type [" + type + "]" ;
+      QString message = "A kernel of type [" + grp->Name() + "] has been found in a directory for type [" + type + "]" ;
       throw IException(IException::Programmer, message, _FILEINFO_);
       break;
     }
@@ -143,9 +143,9 @@ PvlObject SpiceDbGen::Direct(IString quality, IString location,
   * @return QStringList
   *
   */
-QStringList SpiceDbGen::GetFiles(FileName location, IString filter) {
-  filter.Remove("\\");
-  QDir dir(location.expanded().c_str(), filter.c_str(),
+QStringList SpiceDbGen::GetFiles(FileName location, QString filter) {
+  filter.remove("\\");
+  QDir dir(location.expanded(), filter,
            QDir::Name, QDir::Files);
   return dir.entryList();
 }
@@ -164,15 +164,15 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
   NaifStatus::CheckErrors();
 
   //finalize the filename so that it may be used in spice routines
-  std::string tmp = fileIn.expanded();
+  QString tmp = fileIn.expanded();
 //  const char* file = fileIn.expanded().c_str();
-  furnsh_c(tmp.c_str());
+  furnsh_c(tmp.toAscii().data());
   SpiceChar fileType[32], source[2048];
   SpiceInt handle;
 
   SpiceBoolean found;
-  kinfo_c(tmp.c_str(), 32, 2048, fileType, source, &handle, &found);
-  IString currFile = fileType;
+  kinfo_c(tmp.toAscii().data(), 32, 2048, fileType, source, &handle, &found);
+  QString currFile = fileType;
 
   //create a spice cell capable of containing all the objects in the kernel.
   SPICEINT_CELL(currCell, 1000);
@@ -185,10 +185,10 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
   //will be returned here and weeded out at the end of Direct(). This helps
   //to protect the user from inadvertently adding "." and ".." to their filters
   if(currFile == "SPK") {
-    spkobj_c(tmp.c_str(), &currCell);
+    spkobj_c(tmp.toAscii().data(), &currCell);
   }
   else if(currFile == "CK") {
-    ckobj_c(tmp.c_str(), &currCell);
+    ckobj_c(tmp.toAscii().data(), &currCell);
   }
   else if(currFile == "TEXT") {
     return PvlGroup("No coverage");
@@ -212,7 +212,7 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
         SPICEDOUBLE_CELL(cover, 2000);
         ssize_c(0, &cover);
         ssize_c(2000, &cover);
-        spkcov_c(tmp.c_str(), body, &cover);
+        spkcov_c(tmp.toAscii().data(), body, &cover);
 
         NaifStatus::CheckErrors();
 
@@ -223,7 +223,7 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
         SPICEDOUBLE_CELL(cover, 200000);
         ssize_c(0, &cover);
         ssize_c(200000, &cover);
-        ckcov_c(tmp.c_str(), body, SPICEFALSE, "SEGMENT", 0.0, "TDB", &cover);
+        ckcov_c(tmp.toAscii().data(), body, SPICEFALSE, "SEGMENT", 0.0, "TDB", &cover);
 
         NaifStatus::CheckErrors();
 
@@ -232,19 +232,19 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn) {
     }
   }
 
-  IString outFile = fileIn.originalPath();
+  QString outFile = fileIn.originalPath();
   result += PvlKeyword("File", outFile + "/" + fileIn.name());
 
   NaifStatus::CheckErrors();
 
   // Unfurnishes tmp file to prevent file table overflow
-  unload_c(tmp.c_str());
+  unload_c(tmp.toAscii().data());
 
   return result;
 }
 
 
-PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, string type) {
+PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, QString type) {
   NaifStatus::CheckErrors();
 
   PvlGroup result(type);
@@ -259,8 +259,8 @@ PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, string type) {
     //Convert the endpoints to TDB calendar
     timout_c(begin, calForm, 32, begStr);
     timout_c(end, calForm, 32, endStr);
-    result += PvlKeyword("Time", "(\"" + (string)begStr +
-                         "\", \"" + (string)endStr + "\")");
+    result += PvlKeyword("Time", "(\"" + (QString)begStr +
+                         "\", \"" + (QString)endStr + "\")");
   }
 
   NaifStatus::CheckErrors();
@@ -269,15 +269,15 @@ PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, string type) {
 }
 
 
-void SpiceDbGen::FurnishDependencies(string sclk, string lsk) {
+void SpiceDbGen::FurnishDependencies(QString sclk, QString lsk) {
   NaifStatus::CheckErrors();
 
   //furnish the lsk file
-  furnsh_c(lsk.c_str());
+  furnsh_c(lsk.toAscii().data());
 
   //get the sclk, if such a file was specified
   if(sclk != "") {
-    furnsh_c(sclk.c_str());
+    furnsh_c(sclk.toAscii().data());
   }
 
   NaifStatus::CheckErrors();

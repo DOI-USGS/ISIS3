@@ -92,8 +92,8 @@ namespace Isis {
    *
    * @return string Converted value
    */
-  template <typename T> std::string ToString(const T &value) {
-    return (IString(value).Trim(" \r\t\n"));
+  template <typename T> QString ToString(const T &value) {
+    return (toString(value).trimmed());
   }
 
 
@@ -346,16 +346,16 @@ namespace Isis {
 
   void BandGeometry::generateGeometryKeys(PvlObject &pband) {
     if(size() <= 0) {
-      std::string mess = "No Band geometry available!";
+      QString mess = "No Band geometry available!";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
     GProperties g = getGeometrySummary();
 
 //geometry keywords for band output
-    pband += PvlKeyword("BandsUsed", size());
-    pband += PvlKeyword("ReferenceBand", g.band);
-    pband += PvlKeyword("OriginalBand", g.realBand);
+    pband += PvlKeyword("BandsUsed", toString(size()));
+    pband += PvlKeyword("ReferenceBand", toString(g.band));
+    pband += PvlKeyword("OriginalBand", toString(g.realBand));
 
     pband += PvlKeyword("Target", g.target);
 
@@ -580,7 +580,7 @@ namespace Isis {
       }
     }
 
-    mapping += PvlKeyword("CenterLongitude", clon);
+    mapping += PvlKeyword("CenterLongitude", toString(clon));
 
     TProjection *sinu = (TProjection *) ProjectionFactory::Create(sinuMap, true);
     geos::geom::MultiPolygon *sPoly = PolygonTools::LatLonToXY(*poly, sinu);
@@ -606,7 +606,7 @@ namespace Isis {
 
   void BandGeometry::generatePolygonKeys(PvlObject &pband) {
     if(size() <= 0) {
-      std::string mess = "No Band geometry available!";
+      QString mess = "No Band geometry available!";
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
@@ -627,19 +627,19 @@ namespace Isis {
     pband += ValidateKey("SurfaceArea", _summary.surfaceArea, "km^2");
     pband += ValidateKey("GlobalCoverage", globalCoverage, "percent");
     if(_combined != 0) {
-      pband += PvlKeyword("SampleIncrement", _sampleInc);
-      pband += PvlKeyword("LineIncrement", _lineInc);
+      pband += PvlKeyword("SampleIncrement", toString(_sampleInc));
+      pband += PvlKeyword("LineIncrement", toString(_lineInc));
       if(_combined->getGeometryTypeId() != geos::geom::GEOS_MULTIPOLYGON) {
         geos::geom::MultiPolygon *geom = makeMultiPolygon(_combined);
-        pband += PvlKeyword("GisFootprint", geom->toString());
+        pband += PvlKeyword("GisFootprint", geom->toString().c_str());
         delete geom;
       }
       else {
-        pband += PvlKeyword("GisFootprint", _combined->toString());
+        pband += PvlKeyword("GisFootprint", _combined->toString().c_str());
       }
     }
     else {
-      pband += PvlKeyword("GisFootprint", Null);
+      pband += PvlKeyword("GisFootprint", "Null");
     }
 
     // Add the mapping group used to project polygon

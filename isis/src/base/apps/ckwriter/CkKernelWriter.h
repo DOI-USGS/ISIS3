@@ -1,4 +1,4 @@
-#if !defined(CkKernelWriter_h)
+#ifndef CkKernelWriter_h
 #define CkKernelWriter_h
 /**                                                                       
  * @file                                                                  
@@ -24,7 +24,7 @@
  *  
  *   $Id$
  */                                                                       
-#include <string>
+#include <QString>
 
 namespace Isis {
 
@@ -59,7 +59,7 @@ class SpiceSegment;
 class CkKernelWriter {
   public:
     CkKernelWriter();
-    CkKernelWriter(const std::string &kfile, const int &csize = 0, 
+    CkKernelWriter(const QString &kfile, const int &csize = 0, 
                    const int &cktype = 3);
     virtual ~CkKernelWriter() { close(); }
 
@@ -69,11 +69,11 @@ class CkKernelWriter {
     int getCommentSize() const { return (_comSize); }
     int getCommentWrittenCount() const { return (_comCharsWritten); }
 
-    bool addComment(const std::string &comment);
-    bool addCommentFile(const std::string &comfile);
+    bool addComment(const QString &comment);
+    bool addCommentFile(const QString &comfile);
 
-    void open(const std::string &kfile, 
-              const std::string &intCkName = "USGS_CK_File");
+    void open(const QString &kfile, 
+              const QString &intCkName = "USGS_CK_File");
     void write(const SpiceSegment &segment) const;
     void close();
 
@@ -86,7 +86,7 @@ class CkKernelWriter {
     mutable unsigned int _comCharsWritten;
 
     void init();
-    bool writeComment(const std::string &comment) const;
+    bool writeComment(const QString &comment) const;
     void writeCk1(const SpiceSegment &segment) const;
     void writeCk2(const SpiceSegment &segment) const;
     void writeCk3(const SpiceSegment &segment) const;

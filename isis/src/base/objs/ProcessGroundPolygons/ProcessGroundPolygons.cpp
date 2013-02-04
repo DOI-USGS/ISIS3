@@ -167,9 +167,9 @@ namespace Isis {
    * @param avgFileName
    * @param countFileName
    */
-  void ProcessGroundPolygons::AppendOutputCube(std::string &cube,
-      const std::string &avgFileName,
-      const std::string &countFileName) {
+  void ProcessGroundPolygons::AppendOutputCube(QString &cube,
+      const QString &avgFileName,
+      const QString &countFileName) {
     /*We need a ground map for converting lat/long to line/sample  see Convert()*/
     Pvl pvl(cube);
     p_groundMap = new UniversalGroundMap(pvl);
@@ -186,10 +186,10 @@ namespace Isis {
    * @param outAtts
    * @param cube
    */
-  void ProcessGroundPolygons::SetOutputCube(const std::string &avgFileName,
-      const std::string &countFileName,
+  void ProcessGroundPolygons::SetOutputCube(const QString &avgFileName,
+      const QString &countFileName,
       Isis::CubeAttributeOutput &outAtts,
-      std::string &cube) {
+      QString &cube) {
     /*We need a ground map for converting lat/long to line/sample  see Convert()*/
     Pvl pvl(cube);
     p_groundMap = new UniversalGroundMap(pvl);
@@ -218,18 +218,18 @@ namespace Isis {
    * @param parameter
    * @param cube
    */
-  void ProcessGroundPolygons::SetOutputCube(const std::string &parameter,
-      std::string &cube) {
+  void ProcessGroundPolygons::SetOutputCube(const QString &parameter,
+      QString &cube) {
 
-    std::string avgString =
+    QString avgString =
       Application::GetUserInterface().GetFileName(parameter);
     CubeAttributeOutput atts =
       Application::GetUserInterface().GetOutputAttribute(parameter);
 
     FileName file(avgString);
-    std::string path = file.path();
-    std::string filename = file.baseName();
-    std::string countString = path + "/" + filename + "-count-";
+    QString path = file.path();
+    QString filename = file.baseName();
+    QString countString = path + "/" + filename + "-count-";
 
     SetOutputCube(avgString, countString, atts, cube);
 
@@ -242,18 +242,18 @@ namespace Isis {
    * @param map
    * @param bands
    */
-  void ProcessGroundPolygons::SetOutputCube(const std::string &parameter,
+  void ProcessGroundPolygons::SetOutputCube(const QString &parameter,
       Isis::Pvl &map, int bands) {
 
-    std::string avgString =
+    QString avgString =
       Application::GetUserInterface().GetFileName(parameter);
     CubeAttributeOutput atts =
       Application::GetUserInterface().GetOutputAttribute(parameter);
 
     FileName file(avgString);
-    std::string path = file.path();
-    std::string filename = file.baseName();
-    std::string countString = path + "/" + filename + "-count-";
+    QString path = file.path();
+    QString filename = file.baseName();
+    QString countString = path + "/" + filename + "-count-";
 
     SetOutputCube(avgString, countString, atts, map, bands);
 
@@ -269,8 +269,8 @@ namespace Isis {
    * @param map
    * @param bands
    */
-  void ProcessGroundPolygons::SetOutputCube(const std::string &avgFileName,
-      const std::string &countFileName,
+  void ProcessGroundPolygons::SetOutputCube(const QString &avgFileName,
+      const QString &countFileName,
       Isis::CubeAttributeOutput &atts,
       Isis::Pvl &map, int bands) {
     int samples, lines;

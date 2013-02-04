@@ -1,7 +1,7 @@
 Testing toBool
 	True:  1
 	False: 0
-	**ERROR** Failed to convert string [...] to a boolean. Please specify one of [1, on, true, y, yes] for true, or one of [0, false, n, no, off] for false.
+	**ERROR** Failed to convert string [...] to a boolean. Please specify one of [1, on, t, true, y, yes] for true, or one of [0, f, false, n, no, off] for false.
 
 Testing toInt
 	0
@@ -25,8 +25,10 @@ Testing toDouble
 	0
 	5.25
 	-5.25
+	-3.4028226550889e+38
 	1e+100
 	-1e+100
+	1.7976931348623e+308
 	**ERROR** Failed to convert string [fred] to a double.
 
 Testing toString
@@ -34,6 +36,7 @@ Testing toString
 	bool(true):         Yes
 	char(A):            A
 	int(2147483647):    2147483647
+	uint(2147483648):   2147483648
 	BigInt(2147483648): 2147483648
 	double(0.0):        0.0
 	double(DBL_MIN):    2.2250738585072e-308

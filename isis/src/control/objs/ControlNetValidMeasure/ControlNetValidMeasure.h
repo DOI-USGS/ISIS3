@@ -8,7 +8,6 @@
 #include "Progress.h"
 #include "SerialNumberList.h"
 
-#include <string.h>
 /**
  * @file
  * $Revision: $
@@ -169,8 +168,8 @@ namespace Isis {
       };
 
       //! API to display location in the form "Sample,Line"
-      IString LocationString(double pdSample, double pdLine) const {
-        return IString((int)pdSample) + "," + IString((int)pdLine);
+      QString LocationString(double pdSample, double pdLine) const {
+        return QString((int)pdSample) + "," + QString((int)pdLine);
       };
 
       //! Test for a point to be user defined number of pixels from the edge
@@ -236,7 +235,7 @@ namespace Isis {
       void ValidatePvlShiftTolerances();
       
       //! Read the Serial Numbers from the file and open assocaited cubes
-      void ReadSerialNumbers(std::string psSerialNumfile);
+      void ReadSerialNumbers(QString psSerialNumfile);
       
       /**
        * Set the CameraRequired Flag. This flag indicates whether a camera is required 

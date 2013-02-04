@@ -18,18 +18,18 @@ void IsisMain() {
   Pvl p(ui.GetFileName("FROM"));
   PvlGroup &inst = p.FindGroup("Instrument", Pvl::Traverse);
   int spn;
-  string scn = (string)inst["SpacecraftName"];
+  QString scn = (QString)inst["SpacecraftName"];
   if(scn == "VIKING_ORBITER_1") spn = 1;
   else if(scn == "VIKING_ORBITER_2") spn = 2;
   else {
-    string msg = "Invalid spacecraftname [" + scn + "]";
+    QString msg = "Invalid spacecraftname [" + scn + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
   // determine if # of cols is even or odd
   bool even = true;
   PvlGroup &arch = p.FindGroup("Archive", Pvl::Traverse);
-  string id = (string)arch["ProductId"];
-  int num = IString(id.substr(5, 1)).ToInteger();
+  QString id = (QString)arch["ProductId"];
+  int num = toInt(id.mid(5, 1));
   if(num == 1 || num == 3 || num == 5 || num == 7 || num == 9) even = false;
 
   // Run a standard deviation filter on the cube
@@ -59,8 +59,8 @@ void IsisMain() {
   pipeline.Application("mask").SetInputParameter("FROM", false);
   pipeline.Application("mask").SetOutputParameter("TO", "step3");
 
-  IString maskParameter = "$ISIS3DATA/viking" + IString(spn) +
-    "/calibration/vik" + IString(spn);
+  QString maskParameter = "$ISIS3DATA/viking" + toString(spn) +
+    "/calibration/vik" + toString(spn);
   if(even) maskParameter += "evenMask.cub";
   else maskParameter += "oddMask.cub";
   pipeline.Application("mask").AddConstParameter("mask", maskParameter);

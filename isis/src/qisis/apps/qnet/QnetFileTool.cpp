@@ -136,7 +136,7 @@ namespace Isis {
       return;
 
     // Find directory and save for use in file dialog for net file
-    FileName file(list.toStdString());
+    FileName file(list);
     QString dir = file.path();
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -146,7 +146,7 @@ namespace Isis {
         delete g_serialNumberList;
         g_serialNumberList = NULL;
       }
-      g_serialNumberList = new SerialNumberList(list.toStdString());
+      g_serialNumberList = new SerialNumberList(list);
 
       if (g_controlNetwork != NULL) {
         delete g_controlNetwork;
@@ -155,8 +155,8 @@ namespace Isis {
     }
     catch (IException &e) {
       QString message = "Error processing cube list.  \n";
-      string errors = e.toString();
-      message += errors.c_str();
+      QString errors = e.toString();
+      message += errors;
       QMessageBox::information((QWidget *)parent(), "Error", message);
       QApplication::restoreOverrideCursor();
       return;
@@ -186,13 +186,13 @@ namespace Isis {
     else {
       try {
         Progress progress;
-        g_controlNetwork = new ControlNet(cNetFileName.toStdString(),
+        g_controlNetwork = new ControlNet(cNetFileName,
                                                 &progress);
       }
       catch (IException &e) {
         QString message = "Invalid control network.  \n";
-        string errors = e.toString();
-        message += errors.c_str();
+        QString errors = e.toString();
+        message += errors;
         QMessageBox::information((QWidget *)parent(), "Error", message);
         QApplication::restoreOverrideCursor();
         return;
@@ -206,8 +206,8 @@ namespace Isis {
     }
     catch (IException &e) {
       QString message = "Cannot initialize images in control network.  \n";
-      string errors = e.toString();
-      message += errors.c_str();
+      QString errors = e.toString();
+      message += errors;
       QMessageBox::information((QWidget *)parent(), "Error", message);
       QApplication::restoreOverrideCursor();
       return;
@@ -259,7 +259,7 @@ namespace Isis {
    *
    */
   void QnetFileTool::save() {
-    g_controlNetwork->Write(p_cnetFileName.toStdString());
+    g_controlNetwork->Write(p_cnetFileName);
     p_saveNet = false;
   }
 
@@ -284,12 +284,12 @@ namespace Isis {
         ".", filter);
     if (!fn.isEmpty()) {
       try {
-        g_controlNetwork->Write(fn.toStdString());
+        g_controlNetwork->Write(fn);
       }
       catch (IException &e) {
         QString message = "Error saving control network.  \n";
-        string errors = e.toString();
-        message += errors.c_str();
+        QString errors = e.toString();
+        message += errors;
         QMessageBox::information((QWidget *)parent(), "Error", message);
         return;
       }
@@ -324,14 +324,14 @@ namespace Isis {
    */
   void QnetFileTool::loadImage(const QString &serialNumber) {
 
-    string tempFileName = g_serialNumberList->FileName(serialNumber.toStdString());
-    QString filename = tempFileName.c_str();
+    QString tempFileName = g_serialNumberList->FileName(serialNumber);
+    QString filename = tempFileName;
     QVector< MdiCubeViewport * > * cvpList =
       g_vpMainWindow->workspace()->cubeViewportList();
     bool found = false;
     for (int i = 0; i < (int)cvpList->size(); i++) {
-      string sn = SerialNumber::Compose(*((*cvpList)[i]->cube()));
-      if (sn == serialNumber.toStdString()) {
+      QString sn = SerialNumber::Compose(*((*cvpList)[i]->cube()));
+      if (sn == serialNumber) {
         g_vpMainWindow->workspace()->
         setActiveSubWindow((QMdiSubWindow *)(*cvpList)[i]->parentWidget()->parent());
         found = true;
@@ -355,8 +355,8 @@ namespace Isis {
    */
   void QnetFileTool::loadPointImages(ControlPoint *point) {
     for (int i = 0; i < point->GetNumMeasures(); i++) {
-      string cubeSN = (*point)[i]->GetCubeSerialNumber();
-      loadImage(cubeSN.c_str());
+      QString cubeSN = (*point)[i]->GetCubeSerialNumber();
+      loadImage(cubeSN);
     }
   }
 

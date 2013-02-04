@@ -55,7 +55,7 @@ namespace Isis {
         IString key = MosaicTreeWidgetItem::treeColumnToString(col) + "Visible";
         key = key.Convert(" ", '_');
 
-        bool visible = (int)pvl[key][0];
+        bool visible = toBool(pvl[key][0]);
 
         if(visible) {
           p_tree->showColumn(col);
@@ -85,7 +85,7 @@ namespace Isis {
       for(int cubeGrp = 0; cubeGrp < pvl.Objects(); cubeGrp ++) {
         PvlObject &cubes = pvl.Object(cubeGrp);
 
-        QTreeWidgetItem *newCubeGrp = p_tree->addGroup(cubes.Name().c_str());
+        QTreeWidgetItem *newCubeGrp = p_tree->addGroup(cubes.Name());
 
         if (cubes.HasKeyword("Expanded")) {
           bool expanded = (cubes["Expanded"][0] != "No");
@@ -96,7 +96,7 @@ namespace Isis {
             cubeFileNameIndex < cubes.Keywords();
             cubeFileNameIndex ++) {
           if (cubes[cubeFileNameIndex].IsNamed("Cube")) {
-            IString cubeFileName = cubes[cubeFileNameIndex][0];
+            QString cubeFileName = cubes[cubeFileNameIndex][0];
             newCubeGrp->addChild(takeItem(cubeFileName, allCubes));
           }
         }
@@ -123,21 +123,21 @@ namespace Isis {
     MosaicTreeWidgetItem::TreeColumn col =
         MosaicTreeWidgetItem::FootprintColumn;
     while(col < MosaicTreeWidgetItem::BlankColumn) {
-      IString key = MosaicTreeWidgetItem::treeColumnToString(col) + "Visible";
-      key = key.Convert(" ", '_');
+      QString key = MosaicTreeWidgetItem::treeColumnToString(col) + "Visible";
+      key = key.replace(" ", "_");
       bool visible = !p_tree->isColumnHidden(col);
 
-      output += PvlKeyword(key, visible);
+      output += PvlKeyword(key, toString(visible));
       col = (MosaicTreeWidgetItem::TreeColumn)(col + 1);
     }
 
-    output += PvlKeyword("SortColumn", p_tree->sortColumn());
+    output += PvlKeyword("SortColumn", toString(p_tree->sortColumn()));
 
     // Now store groups and the cubes that are in those groups
     for(int i = 0; i < p_tree->topLevelItemCount(); i++) {
       QTreeWidgetItem *group = p_tree->topLevelItem(i);
       PvlObject cubeGroup(
-          group->text(MosaicTreeWidgetItem::NameColumn).toStdString());
+          group->text(MosaicTreeWidgetItem::NameColumn));
       cubeGroup += PvlKeyword("Expanded", group->isExpanded() ? "Yes" : "No");
 
       for(int j = 0; j < group->childCount(); j++) {
@@ -257,7 +257,7 @@ namespace Isis {
           QString("List File (*.lis);;Text File (*.txt);;All Files (*.*)"));
     if(output.isEmpty()) return;
 
-    TextFile file(output.toStdString(), "overwrite");
+    TextFile file(output, "overwrite");
 
     for(int i = 0; i < p_tree->topLevelItemCount(); i++) {
       QTreeWidgetItem *group = p_tree->topLevelItem(i);
@@ -267,7 +267,7 @@ namespace Isis {
 
         if(item->type() == QTreeWidgetItem::UserType) {
           MosaicTreeWidgetItem *cubeItem = (MosaicTreeWidgetItem *)item;
-          file.PutLine(cubeItem->cubeDisplay()->fileName().toStdString());
+          file.PutLine(cubeItem->cubeDisplay()->fileName());
         }
       }
     }

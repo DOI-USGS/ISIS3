@@ -106,14 +106,14 @@ namespace Isis {
   }
 
 
-  IString MosaicTool::projectPvlObjectName() const {
+  QString MosaicTool::projectPvlObjectName() const {
     return "";
   }
 
 
-  QPixmap MosaicTool::getIcon(IString iconName) const {
-    IString path = FileName("$base/icons").expanded();
-    QString fullPathToFile = IString(path + "/" + iconName);
+  QPixmap MosaicTool::getIcon(QString iconName) const {
+    QString path = FileName("$base/icons").expanded();
+    QString fullPathToFile = QString(path + "/" + iconName);
     return QPixmap(fullPathToFile);
   }
 

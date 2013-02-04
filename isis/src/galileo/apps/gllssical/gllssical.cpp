@@ -58,7 +58,7 @@ void IsisMain() {
   Isis::CubeAttributeInput inAtt1;
   FileName darkFileName = FindDarkFile(icube);
   Cube *darkcube = p.SetInputCube(darkFileName.expanded(), inAtt1);
-  dcScaleFactor = darkcube->getGroup("Instrument")["PicScale"][0];
+  dcScaleFactor = toDouble(darkcube->getGroup("Instrument")["PicScale"][0]);
 
   Isis::CubeAttributeInput inAtt2;
   FileName gainFileName = FindGainFile(icube);
@@ -83,7 +83,7 @@ void IsisMain() {
 
   calculateScaleFactor0(icube, gaincube);
 
-  exposureDuration = ((double)icube->getGroup("Instrument")["ExposureDuration"][0]) * 1000;
+  exposureDuration = toDouble(icube->getGroup("Instrument")["ExposureDuration"][0]) * 1000;
 
   if(darkcube->getPixelType() == Isis::UnsignedByte) {
     eightBitDarkCube = true;
@@ -95,7 +95,7 @@ void IsisMain() {
   p.StartProcess(Calibrate);
 
   PvlGroup calibrationLog("RadiometricCalibration");
-  calibrationLog.AddKeyword(PvlKeyword("From", (std::string)ui.GetFileName("FROM")));
+  calibrationLog.AddKeyword(PvlKeyword("From", ui.GetFileName("FROM")));
 
   FileName shutterFileName = FindShutterFile(icube);
   calibrationLog.AddKeyword(PvlKeyword("DarkCurrentFile", darkFileName.originalPath() + "/" +
@@ -104,23 +104,23 @@ void IsisMain() {
                                        gainFileName.name()));
   calibrationLog.AddKeyword(PvlKeyword("ShutterFile", shutterFileName.originalPath() + "/" +
                                        shutterFileName.name()));
-  calibrationLog.AddKeyword(PvlKeyword("ScaleFactor", scaleFactor));
+  calibrationLog.AddKeyword(PvlKeyword("ScaleFactor", toString(scaleFactor)));
   calibrationLog.AddKeyword(PvlKeyword("OutputUnits", iof ? "I/F" : "Radiance"));
   if (iof) {
-    calibrationLog.AddKeyword(PvlKeyword("S1", s1, "I/F per Ft-Lambert"));
-    calibrationLog.AddKeyword(PvlKeyword("RSUN", rsun, "(Planet-Sun range)/5.2 A.U."));
-    calibrationLog.AddKeyword(PvlKeyword("Scale", scaleFactor, "I/F units per DN"));
-    calibrationLog.AddKeyword(PvlKeyword("GC", cubeConversion, "Cube gain conversion"));
-    calibrationLog.AddKeyword(PvlKeyword("GG", gainConversion, "Gain file gain conversion"));
-    calibrationLog.AddKeyword(PvlKeyword("IOF-SCALE0", scaleFactor0, "(S1/Scale)*(GC/GG)/RSUN**2"));
+    calibrationLog.AddKeyword(PvlKeyword("S1", toString(s1), "I/F per Ft-Lambert"));
+    calibrationLog.AddKeyword(PvlKeyword("RSUN", toString(rsun), "(Planet-Sun range)/5.2 A.U."));
+    calibrationLog.AddKeyword(PvlKeyword("Scale", toString(scaleFactor), "I/F units per DN"));
+    calibrationLog.AddKeyword(PvlKeyword("GC", toString(cubeConversion), "Cube gain conversion"));
+    calibrationLog.AddKeyword(PvlKeyword("GG", toString(gainConversion), "Gain file gain conversion"));
+    calibrationLog.AddKeyword(PvlKeyword("IOF-SCALE0", toString(scaleFactor0), "(S1/Scale)*(GC/GG)/RSUN**2"));
   }
   else {
-    calibrationLog.AddKeyword(PvlKeyword("S2", s2, "Nanowatts per Ft-Lambert"));
-    calibrationLog.AddKeyword(PvlKeyword("Scale", scaleFactor,
+    calibrationLog.AddKeyword(PvlKeyword("S2", toString(s2), "Nanowatts per Ft-Lambert"));
+    calibrationLog.AddKeyword(PvlKeyword("Scale", toString(scaleFactor),
                                          "Nanowatts/cm**2/steradian/nanometer/DN"));
-    calibrationLog.AddKeyword(PvlKeyword("GC", cubeConversion, "Cube gain conversion"));
-    calibrationLog.AddKeyword(PvlKeyword("GG", gainConversion, "Gain file gain conversion"));
-    calibrationLog.AddKeyword(PvlKeyword("Radiance-SCALE0", scaleFactor0, "(S2/Scale)*(GC/GG)"));
+    calibrationLog.AddKeyword(PvlKeyword("GC", toString(cubeConversion), "Cube gain conversion"));
+    calibrationLog.AddKeyword(PvlKeyword("GG", toString(gainConversion), "Gain file gain conversion"));
+    calibrationLog.AddKeyword(PvlKeyword("Radiance-SCALE0", toString(scaleFactor0), "(S2/Scale)*(GC/GG)"));
   }
 
   ocube->putGroup(calibrationLog);
@@ -188,11 +188,11 @@ void Calibrate(vector<Buffer *> &in, vector<Buffer *> &out) {
 }
 
 FileName FindDarkFile(Cube *icube) {
-  string file = "$galileo/calibration/gll_dc.sav";
+  QString file = "$galileo/calibration/gll_dc.sav";
 
   TextFile darkFile(file);
   darkFile.SetComment("C");
-  IString data;
+  QString data;
 
   /**
    * The dark current table requires the following information to match:
@@ -210,54 +210,55 @@ FileName FindDarkFile(Cube *icube) {
    * 4 = 60 2/3
    * 5 = 15 1/6
    */
-  if((int)(double)icube->getGroup("Instrument")["FrameDuration"][0] == 2) frameRateId = 1;
-  if((int)(double)icube->getGroup("Instrument")["FrameDuration"][0] == 8) frameRateId = 2;
-  if((int)(double)icube->getGroup("Instrument")["FrameDuration"][0] == 30) frameRateId = 3;
-  if((int)(double)icube->getGroup("Instrument")["FrameDuration"][0] == 60) frameRateId = 4;
-  if((int)(double)icube->getGroup("Instrument")["FrameDuration"][0] == 15) frameRateId = 5;
+  if((int)(toDouble(icube->getGroup("Instrument")["FrameDuration"][0])) == 2) frameRateId = 1;
+  if((int)(toDouble(icube->getGroup("Instrument")["FrameDuration"][0])) == 8) frameRateId = 2;
+  if((int)(toDouble(icube->getGroup("Instrument")["FrameDuration"][0])) == 30) frameRateId = 3;
+  if((int)(toDouble(icube->getGroup("Instrument")["FrameDuration"][0])) == 60) frameRateId = 4;
+  if((int)(toDouble(icube->getGroup("Instrument")["FrameDuration"][0])) == 15) frameRateId = 5;
 
   int exposureTypeId = (icube->getGroup("Instrument")["ExposureType"][0] == "NORMAL") ? 0 : 1;
 
   // We have what we need from the image label, now go through the text file that is our table line by line
   // looking for a match.
   while(darkFile.GetLine(data)) {
-    data = data.Compress();
+    data = data.simplified().trimmed();
 
-    IString mission = data.Token(" ");
+    QStringList tokens = data.split(" ");
+    QString mission = (tokens.count()? tokens.takeFirst() : "");
     if(mission != "GALILEO") {
       continue;
     }
 
-    IString frameMode = data.Token(" ");
+    QString frameMode = (tokens.count()? tokens.takeFirst() : "");
     if(frameMode.at(0) != icube->getGroup("Instrument")["FrameModeId"][0].at(0)) {
       continue;
     }
 
-    IString gainState = data.Token(" ");
-    if((int)gainState != gainModeId) {
+    QString gainState = (tokens.count()? tokens.takeFirst() : "");
+    if(toInt(gainState) != gainModeId) {
       continue;
     }
 
-    IString frameRate = data.Token(" ");
-    if(frameRateId != (int)frameRate) {
+    QString frameRate = (tokens.count()? tokens.takeFirst() : "");
+    if(frameRateId != toInt(frameRate)) {
       continue;
     }
 
-    IString tableExposureTypeId = data.Token(" ");
-    if((int)tableExposureTypeId != exposureTypeId) {
+    QString tableExposureTypeId = (tokens.count()? tokens.takeFirst() : "");
+    if(toInt(tableExposureTypeId) != exposureTypeId) {
       continue;
     }
 
-    IString readout = data.Token(" ");
+    QString readout = (tokens.count()? tokens.takeFirst() : "");
     if(readout.at(0) != icube->getGroup("Instrument")["ReadoutMode"][0].at(0)) {
       continue;
     }
 
-    int minImageNum = data.Token(" ");
-    int maxImageNum = data.Token(" ");
+    int minImageNum = toInt(tokens.takeFirst());
+    int maxImageNum = toInt(tokens.takeFirst());
 
-    int imageNumber = (int)((double)icube->getGroup("Instrument")["SpacecraftClockStartCount"] * 100 + 0.5);
-    IString telemetry = icube->getGroup("Instrument")["TelemetryFormat"][0];
+    int imageNumber = (int)(toDouble(icube->getGroup("Instrument")["SpacecraftClockStartCount"]) * 100 + 0.5);
+    QString telemetry = icube->getGroup("Instrument")["TelemetryFormat"][0];
     if(imageNumber > 99757701 && imageNumber < 159999999) {
       if((telemetry == "AI8" && (gainState == "1" || gainState == "2")) ||
           (telemetry == "IM4" && (gainState == "3" || gainState == "4"))) {
@@ -273,25 +274,27 @@ FileName FindDarkFile(Cube *icube) {
     }
 
     // By process of elimination, we found the dark current file successfully. Return it.
-    return FileName(string("$galileo/calibration/darkcurrent/") + data.Token(" ") + string(".cub"));
+    return FileName("$galileo/calibration/darkcurrent/" + tokens.takeFirst() + ".cub");
   }
 
   throw IException(IException::Unknown, "Dark current file could not be determined.", _FILEINFO_);
 }
 
 FileName FindGainFile(Cube *icube) {
-  string file = "$galileo/calibration/gll_gain.sav";
+  QString file = "$galileo/calibration/gll_gain.sav";
 
   TextFile gainFile(file);
   gainFile.SetComment("C");
-  IString data;
+  QString data;
 
   int imageNumber = (int)((double)icube->getGroup("Instrument")["SpacecraftClockStartCount"] * 100 + 0.5);
 
   while(gainFile.GetLine(data)) {
-    data = data.Compress();
+    data = data.simplified().trimmed();
 
-    IString mission = data.Token(" ");
+    QStringList tokens = data.split(" ");
+
+    QString mission = tokens.count()? tokens.takeFirst() : "";
     if(mission != "GALILEO") {
       continue;
     }
@@ -300,40 +303,40 @@ FileName FindGainFile(Cube *icube) {
      * Filter codes
      * 0=clear,1=green,2=red,3=violet,4=7560,5=9680,6=7270,7=8890
      */
-    IString filter = icube->getGroup("BandBin")["FilterNumber"][0];
-    if(filter != data.Token(" ")) {
+    QString filter = icube->getGroup("BandBin")["FilterNumber"][0];
+    if(filter != tokens.takeFirst()) {
       continue;
     }
 
-    IString frameMode = data.Token(" ");
+    QString frameMode = tokens.count()? tokens.takeFirst() : "";
     if(frameMode.at(0) != icube->getGroup("Instrument")["FrameModeId"][0].at(0)) {
       continue;
     }
 
-    int minImageNum = data.Token(" ");
-    int maxImageNum = data.Token(" ");
+    int minImageNum = toInt(tokens.takeFirst());
+    int maxImageNum = toInt(tokens.takeFirst());
     if(imageNumber < minImageNum || imageNumber > maxImageNum) {
       continue;
     }
 
-    return FileName(string("$galileo/calibration/gain/") + data.Token(" ") + string(".cub"));
+    return FileName("$galileo/calibration/gain/" + tokens.takeFirst() + ".cub");
   }
 
   throw IException(IException::Unknown, "Gain file could not be determined.", _FILEINFO_);
 }
 
 FileName ReadWeightTable(Cube *icube) {
-  string file = "$galileo/calibration/weightTables_v???.sav";
+  QString file = "$galileo/calibration/weightTables_v???.sav";
 
   FileName weightFile(file);
   weightFile = weightFile.highestVersion();
   Pvl weightTables(weightFile.expanded());
-  IString group = IString("FrameMode") + (char)icube->getGroup("Instrument")["FrameModeId"][0].at(0);
+  QString group = QString("FrameMode") + icube->getGroup("Instrument")["FrameModeId"][0].at(0);
   PvlGroup &frameGrp = weightTables.FindGroup(group);
-  IString keyword = IString("GainState") + ((getGainModeID(icube) < 3) ? IString("12") : IString("34"));
+  QString keyword = QString("GainState") + ((getGainModeID(icube) < 3) ? QString("12") : QString("34"));
 
   for(int i = 0; i < frameGrp[keyword].Size(); i++) {
-    weight.push_back(frameGrp[keyword][i]);
+    weight.push_back(toDouble(frameGrp[keyword][i]));
   }
 
   return weightFile;
@@ -348,16 +351,16 @@ int getGainModeID(Cube *icube) {
    * 3 = 40,000
    * 4 = 10,000
    */
-  if((int)(double)icube->getGroup("Instrument")["GainModeId"][0] == 4E5) {
+  if((int)toDouble(icube->getGroup("Instrument")["GainModeId"][0]) == 4E5) {
     gainModeId = 1;
   }
-  else if((int)(double)icube->getGroup("Instrument")["GainModeId"][0] == 1E5) {
+  else if((int)toDouble(icube->getGroup("Instrument")["GainModeId"][0]) == 1E5) {
     gainModeId = 2;
   }
-  else if((int)(double)icube->getGroup("Instrument")["GainModeId"][0] == 4E4) {
+  else if((int)toDouble(icube->getGroup("Instrument")["GainModeId"][0]) == 4E4) {
     gainModeId = 3;
   }
-  else if((int)(double)icube->getGroup("Instrument")["GainModeId"][0] == 1E4) {
+  else if((int)toDouble(icube->getGroup("Instrument")["GainModeId"][0]) == 1E4) {
     gainModeId = 4;
   }
   else {
@@ -394,7 +397,7 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
 
     // Match target name
     if(currGrp.HasKeyword("TargetName")) {
-      if(icube->getGroup("Archive")["CalTargetCode"][0].find(currGrp["TargetName"][0]) != 0) {
+      if(!icube->getGroup("Archive")["CalTargetCode"][0].startsWith(currGrp["TargetName"][0])) {
         continue;
       }
     }
@@ -403,7 +406,7 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
     if(currGrp.HasKeyword("MinimumTargetName")) {
       try {
         if((int)currGrp["MinimumTargetName"] >
-            (int)(IString)icube->getGroup("Archive")["CalTargetCode"][0].substr(0, 2)) {
+            (int)toInt(icube->getGroup("Archive")["CalTargetCode"][0].mid(0, 2))) {
           continue;
         }
       }
@@ -416,7 +419,7 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
     fltToRad = currGrp["FloatToRad"];
   }
 
-  int filterNumber = (int)icube->getGroup("BandBin")["FilterNumber"][0];
+  int filterNumber = toInt(icube->getGroup("BandBin")["FilterNumber"][0]);
 
   if(fltToRef.Size() == 0) {
     throw IException(IException::Unknown,
@@ -426,10 +429,10 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
                      _FILEINFO_);
   }
 
-  s1 = fltToRef[filterNumber];
-  s2 = fltToRad[filterNumber];
-  cubeConversion = (double) conversionFactors["GainRatios"][getGainModeID(icube)-1];
-  gainConversion = (double)conversionFactors["GainRatios"][getGainModeID(gaincube)-1];
+  s1 = toDouble(fltToRef[filterNumber]);
+  s2 = toDouble(fltToRad[filterNumber]);
+  cubeConversion = toDouble( conversionFactors["GainRatios"][getGainModeID(icube)-1]);
+  gainConversion = toDouble(conversionFactors["GainRatios"][getGainModeID(gaincube)-1]);
 
   if (iof) {
     Camera *cam = icube->getCamera();
@@ -465,14 +468,14 @@ void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
 }
 
 FileName GetScaleFactorFile() {
-  string file = "$galileo/calibration/conversionFactors_v???.sav";
+  QString file = "$galileo/calibration/conversionFactors_v???.sav";
   FileName scaleFactor(file);
   scaleFactor = scaleFactor.highestVersion();
   return scaleFactor;
 }
 
 FileName FindShutterFile(Cube *icube) {
-  string file = "$galileo/calibration/shutter/calibration.so02";
+  QString file = "$galileo/calibration/shutter/calibration.so02";
   file += icube->getGroup("Instrument")["FrameModeId"][0].at(0);
   file += ".cub";
   FileName shutterFile(file);

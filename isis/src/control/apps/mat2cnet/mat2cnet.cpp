@@ -24,14 +24,14 @@
 using namespace std;
 using namespace Isis;
 
-std::map <int, string> snMap;
+std::map <int, QString> snMap;
 //std::map <string,int> fscMap;
 
 void IsisMain() {
   // The following steps can take a significant amount of time, so
   // set up a progress object, incrementing at 1%, to keep the user informed
   PvlGroup &uip = Preference::Preferences().FindGroup("UserInterface");
-  uip["ProgressBarPercent"] = 1;
+  uip["ProgressBarPercent"] = "1";
   UserInterface &ui = Application::GetUserInterface();
   Progress progress;
 
@@ -43,7 +43,7 @@ void IsisMain() {
   progress.CheckStatus();
 
   if (list2.size() != snl.Size()) {
-    IString msg = "Invalid input file number of lines. The ISIS2 file list [";
+    QString msg = "Invalid input file number of lines. The ISIS2 file list [";
     msg += ui.GetAsString("LIST2") + "] must contain the same number of lines ";
     msg += "as the ISIS3 file list [" + ui.GetAsString("LIST3") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -60,7 +60,7 @@ void IsisMain() {
   //   Jeannie Backer 2011-06-30
   for (int f = 0; f < list2.size(); f++) {
     progress.CheckStatus();
-    IString currFile(list2[f].toString());
+    QString currFile(list2[f].toString());
     Pvl lab(currFile);
     PvlObject qube(lab.FindObject("QUBE"));
 
@@ -78,8 +78,8 @@ void IsisMain() {
           _FILEINFO_);
     }
 
-    IString sn(snl.SerialNumber(f));
-    snMap.insert(std::pair<int, string>((int)fsc, sn));
+    QString sn(snl.SerialNumber(f));
+    snMap.insert(std::pair<int, QString>((int)fsc, sn));
   }
   progress.CheckStatus();
 
@@ -93,15 +93,16 @@ void IsisMain() {
 
   // Open the match point file
   TextFile mpFile(ui.GetFileName("MATCH"));
-  IString currLine;
+  QString currLine;
   int inTotalMeas = 0;
 
   // Read the first line with the number of measurments
   mpFile.GetLine(currLine);
-  currLine.Token("=");
-  currLine.Token(" ");
+  currLine = currLine.simplified();
+  currLine.remove(0, currLine.indexOf("="));
+  currLine.remove(0, currLine.indexOf(" "));
   try {
-    inTotalMeas = int(currLine);
+    inTotalMeas = toInt(currLine);
   }
   catch (IException &e) {
     throw IException(e,
@@ -114,14 +115,14 @@ void IsisMain() {
 
   // Read line 2, the column header line
   mpFile.GetLine(currLine);
-  currLine.ConvertWhiteSpace();
-  currLine.Compress();
-  while (currLine != "") {
-    IString label = currLine.Token(" ");
+  currLine = currLine.simplified();
+  QStringList tokens = currLine.split(" ", QString::SkipEmptyParts);
+  while (!tokens.isEmpty()) {
+    QString label = tokens.takeFirst();
     // this line should contain only text labels,
     double error = 0;
     try {
-      error = label;
+      error = toDouble(label);
       // if we are able to convert label to a double, we have an error
       throw IException(IException::User, "Invalid match point file "
                          "header for [" + ui.GetAsString("MATCH")
@@ -154,12 +155,12 @@ void IsisMain() {
       progress.CheckStatus();
     }
     catch (IException &e) {
-      string msg = "\"Matchpoint total\" keyword at the top of the match point "
+      QString msg = "\"Matchpoint total\" keyword at the top of the match point "
                    "file [";
-      msg += ui.GetAsString("MATCH") + "] equals [" + IString(inTotalMeas);
+      msg += ui.GetAsString("MATCH") + "] equals [" + toString(inTotalMeas);
       msg += "] and is likely incorrect. Number of measures in match point file"
              " exceeds this value at line [";
-      msg += IString(line) + "].";
+      msg += toString(line) + "].";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
 
@@ -169,66 +170,70 @@ void IsisMain() {
     ControlMeasure *cmeasure = new ControlMeasure;
 
     // Section the match point line into the important pieces
-    currLine.ConvertWhiteSpace();
-    currLine.Compress();
-    IString pid = "";
-    IString fsc = "";
+    currLine = currLine.simplified();
+    QString pid = "";
+    QString fsc = "";
     double lineNum, sampNum, diam;
-    string matClass = "";
+    QString matClass = "";
     try {
-      pid = currLine.Token(" ");      // ID of the point
-      fsc = currLine.Token(" ");      // FSC of the ISIS2 cube
-      lineNum = currLine.Token(" ");  // line number
-      sampNum = currLine.Token(" ");  // sample number
-      matClass = currLine.Token(" "); // Match Point Class
-      diam = currLine.Token(" ");     // Diameter, in case of a crater
+      QStringList tokens = currLine.split(" ");
+
+      if (tokens.count() < 6)
+        throw IException();
+
+      pid = tokens.takeFirst();                // ID of the point
+      fsc = tokens.takeFirst();                // FSC of the ISIS2 cube
+      lineNum = toDouble(tokens.takeFirst());  // line number
+      sampNum = toDouble(tokens.takeFirst());  // sample number
+      matClass = tokens.takeFirst();           // Match Point Class
+      diam = toDouble(tokens.takeFirst());     // Diameter, in case of a crater
     }
     catch (IException &e) {
-      IString msg = "Invalid value(s) in match point file [";
-      msg += ui.GetAsString("MATCH") + "] at line [" + IString(line);
+      QString msg = "Invalid value(s) in match point file [";
+      msg += ui.GetAsString("MATCH") + "] at line [" + toString(line);
       msg += "]. Verify line, sample, diameter values are doubles.";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
 
     // Set the coordinate and serial number for this measure
     cmeasure->SetCoordinate(sampNum, lineNum);
-    cmeasure->SetCubeSerialNumber(snMap[(int)fsc]);
+    cmeasure->SetCubeSerialNumber(snMap[toInt(fsc)]);
 
-    if (snMap[(int)fsc].empty()) {
-      std::string msg = "None of the images specified in the ISIS2 file list [";
+    if (snMap[toInt(fsc)].isEmpty()) {
+      QString msg = "None of the images specified in the ISIS2 file list [";
       msg += ui.GetAsString("LIST2");
       msg += "] have an IMAGE_NUMBER or IMAGE_ID that matches the FSC [" + fsc;
       msg += "], from the match point file [" + ui.GetAsString("MATCH");
-      msg += "] at line [" + IString(line) + "]";
+      msg += "] at line [" + toString(line) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     bool isReferenceMeasure = false;
 
     //Set the Measure Type
-    if (IString::Equal(matClass, "U")) {//Unmeasured -these are ignored in isis2
+    if (matClass.toUpper() == "U") {//Unmeasured -these are ignored in isis2
       cmeasure->SetType(ControlMeasure::Candidate);
       cmeasure->SetIgnored(true);
     }
-    else if (IString::Equal(matClass, "T")) {
+    else if (matClass.toUpper() == "T") {
       // Truth type, aka reference measure, is no longer a measure type
       // what this means is it has to be handled by the control point.
       // So, further down the boolean set here will be used.
       isReferenceMeasure = true;
     }
-    else if (IString::Equal(matClass, "S")) { //SubPixel
+    else if (matClass.toUpper() == "S") { //SubPixel
       cmeasure->SetType(ControlMeasure::RegisteredSubPixel);
     }
-    else if (IString::Equal(matClass, "M")) { //Measured
+    else if (matClass.toUpper() == "M") { //Measured
       cmeasure->SetType(ControlMeasure::RegisteredPixel);
     }
-    else if (IString::Equal(matClass, "A")) { //Approximate
+    else if (matClass.toUpper() == "A") { //Approximate
       cmeasure->SetType(ControlMeasure::Candidate);
     }
     else {
-      IString msg = "Unknown measurment type [" + matClass + "] ";
+      QString msg = "Unknown measurment type [" + matClass + "] ";
       msg += "in match point file [" + ui.GetAsString("MATCH") + "] ";
-      msg += "at line [" + IString(line) + "]";
+      msg += "at line [" + toString(line) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -265,9 +270,9 @@ void IsisMain() {
       }
     }
     catch (IException &e) {
-      IString msg = "Invalid match point file [" + ui.GetAsString("MATCH") +"]";
+      QString msg = "Invalid match point file [" + ui.GetAsString("MATCH") +"]";
       msg += ".  Repeated PointID/FSC combination [" + pid + ", " + fsc;
-      msg += "] in match point file at line [" + IString(line) + "].";
+      msg += "] in match point file at line [" + toString(line) + "].";
       throw IException(e, IException::User, msg, _FILEINFO_);
     }
   }
@@ -277,12 +282,12 @@ void IsisMain() {
     progress.CheckStatus();
   }
   catch (IException &e) {
-    string msg = "\"Matchpoint total\" keyword at the top of the match point "
+    QString msg = "\"Matchpoint total\" keyword at the top of the match point "
                  "file [";
-    msg += ui.GetAsString("MATCH") + "] equals [" + IString(inTotalMeas);
+    msg += ui.GetAsString("MATCH") + "] equals [" + toString(inTotalMeas);
     msg += "] and is likely incorrect. Number of measures in match point file "
            "exceeds this value at line [";
-    msg += IString(line) + "].";
+    msg += toString(line) + "].";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
@@ -293,7 +298,7 @@ void IsisMain() {
   // Open the RAND PPP file
   if (ui.GetBoolean("INPUTPPP")) {
     int numRandOnly = 0;
-    vector<string> randOnlyIDs;
+    vector<QString> randOnlyIDs;
     TextFile randFile(ui.GetFileName("PPP"));
     progress.SetText("Converting RAND PPP file");
     randFile.GetLine(currLine);
@@ -310,10 +315,10 @@ void IsisMain() {
         progress.CheckStatus();
       }
       catch (IException &e) {
-        IString msg = "RAND PPP file may not be valid. Line count calculated [";
-        msg += IString(inTotalLine) + "] for RAND PPP file [";
+        QString msg = "RAND PPP file may not be valid. Line count calculated [";
+        msg += toString(inTotalLine) + "] for RAND PPP file [";
         msg += ui.GetAsString("PPP") + "] appears invalid at line [";
-        msg += IString(line) + "].";
+        msg += toString(line) + "].";
         throw IException(e, IException::Programmer, msg, _FILEINFO_);
       }
 
@@ -321,7 +326,7 @@ void IsisMain() {
       ControlPoint *cpoint = NULL;
 
       // if end of valid data, break, stop processing
-      if (currLine.find("JULIAN") != string::npos) {
+      if (currLine.contains("JULIAN")) {
         // Since Progress MaximumSteps was approximated using the number of
         // lines in the RAND PPP file, we need to subtract the number of lines
         // left from the Progress steps since the following lines are not going
@@ -337,61 +342,61 @@ void IsisMain() {
 
       // column 1 = latitude, begins the line and is 24 characters
       double lat;
-      IString col1 = currLine.substr(0, 24);
+      QString col1 = currLine.mid(0, 24);
       // remove any white space from beginning of string
       //col1.ConvertWhiteSpace();
       //col1.TrimHead(" ");
       try {
         // convert to double
-        lat = col1;
+        lat = toDouble(col1);
       }
       catch (IException &e) {
-        IString msg = "Invalid value(s) in RAND PPP file [";
-        msg += ui.GetAsString("PPP") + "] at line [" + IString(line);
+        QString msg = "Invalid value(s) in RAND PPP file [";
+        msg += ui.GetAsString("PPP") + "] at line [" + toString(line);
         msg += "]. Verify latitude value is a double.";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
 
       // column 2 = longitude, begins at 25th char and is 24 characters
       double lon;
-      IString col2 = currLine.substr(24, 24);
+      QString col2 = currLine.mid(24, 24);
       // remove any white space from beginning of string
       //col2.TrimHead(" ");
       try {
         // convert to double
-        lon = col2;
+        lon = toDouble(col2);
       }
       catch (IException &e) {
-        IString msg = "Invalid value(s) in RAND PPP file [";
-        msg += ui.GetAsString("PPP") + "] at line [" + IString(line);
+        QString msg = "Invalid value(s) in RAND PPP file [";
+        msg += ui.GetAsString("PPP") + "] at line [" + toString(line);
         msg += "]. Verify longitude value is a double.";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
 
       // column 3 = radius, begins at 49th char and is 24 characters
       double rad;
-      IString col3 = currLine.substr(48, 24);
+      QString col3 = currLine.mid(48, 24);
       // remove any white space from beginning of string
       //col3.TrimHead(" ");
       try {
         // convert to double and convert km to meters
-        rad = col3;
+        rad = toDouble(col3);
         rad = rad * 1000;
       }
       catch (IException &e) {
-        IString msg = "Invalid value(s) in RAND PPP file [";
-        msg += ui.GetAsString("PPP") + "] at line [" + IString(line);
+        QString msg = "Invalid value(s) in RAND PPP file [";
+        msg += ui.GetAsString("PPP") + "] at line [" + toString(line);
         msg += "]. Verify radius value is a double.";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
 
       // column 4 = point id, begins at 73rd char and is 7 characters
-      IString pid = currLine.substr(72);
+      QString pid = currLine.mid(72);
       // remove any white space from beginning of string
-      pid.TrimHead(" ");
+      pid = pid.remove(QRegExp("^ *"));
       if (pid.length() > 7) {
-        IString msg = "Invalid value(s) in RAND PPP file [";
-        msg += ui.GetAsString("PPP") + "] at line [" + IString(line);
+        QString msg = "Invalid value(s) in RAND PPP file [";
+        msg += ui.GetAsString("PPP") + "] at line [" + toString(line);
         msg += "]. Point ID [" + pid + "] has more than 7 characters.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -429,9 +434,9 @@ void IsisMain() {
           cpoint->SetEditLock(ui.GetBoolean("POINTLOCK"));
         }
         catch (IException &e) {
-          IString msg = "Unable to set universal ground point to control "
+          QString msg = "Unable to set universal ground point to control "
                         "network from line [";
-          msg += IString(line) + "] of RAND PPP file [";
+          msg += toString(line) + "] of RAND PPP file [";
           msg += ui.GetAsString("PPP") + "]";
           throw IException(e, IException::User, msg, _FILEINFO_);
         }
@@ -443,17 +448,17 @@ void IsisMain() {
       progress.CheckStatus();
     }
     catch (IException &e) {
-      IString msg = "RAND PPP file may not be valid.  Line count calculated [";
-      msg += IString(inTotalLine) + "] for RAND PPP file [";
+      QString msg = "RAND PPP file may not be valid.  Line count calculated [";
+      msg += toString(inTotalLine) + "] for RAND PPP file [";
       msg += ui.GetAsString("PPP");
-      msg += "] appears invalid at line [" + IString(line) + "].";
+      msg += "] appears invalid at line [" + toString(line) + "].";
       throw IException(e, IException::Programmer, msg, _FILEINFO_);
     }
 
     // Write results to Logs
     // Summary group is created with the counts of RAND PPP only points
     PvlGroup summaryGroup = PvlGroup("Summary");
-    summaryGroup.AddKeyword(PvlKeyword("RandOnlyPoints", numRandOnly));
+    summaryGroup.AddKeyword(PvlKeyword("RandOnlyPoints", toString(numRandOnly)));
 
     bool log;
     FileName logFile;

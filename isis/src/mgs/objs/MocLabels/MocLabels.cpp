@@ -18,7 +18,7 @@ namespace Isis {
   /**
    * Construct MocLabels object using the file name
    */
-  MocLabels::MocLabels(const string &file) {
+  MocLabels::MocLabels(const QString &file) {
     Pvl lab(file);
     Init(lab);
   }
@@ -55,31 +55,31 @@ namespace Isis {
   void MocLabels::ReadLabels(Pvl &lab) {
     // Get stuff out of the instrument group
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
-    p_instrumentId = (string) inst["InstrumentId"];
+    p_instrumentId = (QString) inst["InstrumentId"];
     p_startingSample = inst["FirstLineSample"];
     p_crosstrackSumming = inst["CrosstrackSumming"];
     p_downtrackSumming = inst["DowntrackSumming"];
     p_exposureDuration = inst["LineExposureDuration"];
     p_focalPlaneTemp = inst["FocalPlaneTemperature"];
-    p_clockCount = (string) inst["SpacecraftClockCount"];
+    p_clockCount = (QString) inst["SpacecraftClockCount"];
     p_orbitNumber = 0;
     if(inst.HasKeyword("OrbitNumber")) {
       p_orbitNumber = inst["OrbitNumber"];
     }
-    p_gainModeId = (string) inst["GainModeId"];
+    p_gainModeId = (QString) inst["GainModeId"];
     p_offsetModeId = inst["OffsetModeId"];
-    p_startTime = (string) inst["StartTime"];
+    p_startTime = (QString) inst["StartTime"];
 
     // Get stuff out of the archive group
     p_dataQuality = "Unknown";
     PvlGroup &arch = lab.FindGroup("Archive", Pvl::Traverse);
     if(arch.HasKeyword("DataQualityDesc")) {
-      p_dataQuality = (string) arch["DataQualityDesc"];
+      p_dataQuality = (QString) arch["DataQualityDesc"];
     }
 
     // Get Stuff out of the band bind group
     PvlGroup &bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
-    p_filter = (string) bandBin["FilterName"];
+    p_filter = (QString) bandBin["FilterName"];
 
     // Get the number of samples in the initial cube as it may have been
     // cropped or projected
@@ -109,8 +109,8 @@ namespace Isis {
     }
 
     if(!p_mocNA && !p_mocRedWA && !p_mocBlueWA) {
-      string msg = "InstrumentID [" + p_instrumentId + "] and/or FilterName ["
-                   + p_filter + "] are inappropriate for the MOC camera";
+      QString msg = "InstrumentID [" + p_instrumentId + "] and/or FilterName ["
+                    + p_filter + "] are inappropriate for the MOC camera";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
@@ -158,20 +158,20 @@ namespace Isis {
     }
 
     // Lookup the gain using the gain mode in the gain maps
-    map<string, double>::iterator p;
+    map<QString, double>::iterator p;
     if(NarrowAngle()) {
       p = p_gainMapNA.find(p_gainModeId);
       if(p == p_gainMapNA.end()) {
-        string msg = "Invalid value for PVL keyword GainModeId [" +
-                     p_gainModeId + "]";
+        QString msg = "Invalid value for PVL keyword GainModeId [" +
+                      p_gainModeId + "]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
     else {
       p = p_gainMapWA.find(p_gainModeId);
       if(p == p_gainMapWA.end()) {
-        string msg = "Invalid value for PVL keyword GainModeId [" +
-                     p_gainModeId + "]";
+        QString msg = "Invalid value for PVL keyword GainModeId [" +
+                      p_gainModeId + "]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
     }
@@ -189,8 +189,8 @@ namespace Isis {
       if(currentTime < mappingPhaseBeginTime) {
         double newGain = p_gain / (double) p_downtrackSumming;
         double mindiff = DBL_MAX;
-        map<string, double>::iterator p;
-        string index = "";
+        map<QString, double>::iterator p;
+        QString index = "";
         p = p_gainMapNA.begin();
         while(p != p_gainMapNA.end()) {
           double diff = abs(newGain - p->second);
@@ -215,18 +215,18 @@ namespace Isis {
     InitDetectorMaps();
 
     // Temporarily load some naif kernels
-    string lsk = p_lsk.expanded();
-    string sclk = p_sclk.expanded();
-    furnsh_c(lsk.c_str());
-    furnsh_c(sclk.c_str());
+    QString lsk = p_lsk.expanded();
+    QString sclk = p_sclk.expanded();
+    furnsh_c(lsk.toAscii().data());
+    furnsh_c(sclk.toAscii().data());
 
     // Compute the starting ephemeris time
-    scs2e_c(-94, p_clockCount.c_str(), &p_etStart);
+    scs2e_c(-94, p_clockCount.toAscii().data(), &p_etStart);
     p_etEnd = EphemerisTime((double)p_nl);
 
     // Unload the naif kernels
-    unload_c(lsk.c_str());
-    unload_c(sclk.c_str());
+    unload_c(lsk.toAscii().data());
+    unload_c(sclk.toAscii().data());
   }
 
   /**
@@ -417,16 +417,16 @@ namespace Isis {
     firstTime = false;
 
     // Load naif kernels
-    string lskKern = p_lsk.expanded();
-    string sclkKern = p_sclk.expanded();
-    furnsh_c(lskKern.c_str());
-    furnsh_c(sclkKern.c_str());
+    QString lskKern = p_lsk.expanded();
+    QString sclkKern = p_sclk.expanded();
+    furnsh_c(lskKern.toAscii().data());
+    furnsh_c(sclkKern.toAscii().data());
 
     //Set up file for reading
     FileName wagoFile("$mgs/calibration/MGSC_????_wago.tab");
     wagoFile = wagoFile.highestVersion();
-    string nameOfFile = wagoFile.expanded();
-    ifstream temp(nameOfFile.c_str());
+    QString nameOfFile = wagoFile.expanded();
+    ifstream temp(nameOfFile.toAscii().data());
     vector<int> wholeFile;
 
     // Read file into a vector of bytes, ignoring EOL chars
@@ -442,7 +442,8 @@ namespace Isis {
     int low = 1;
     int high = wholeFile.size() / 35;
     int middle;
-    IString line, filter, sclk, gainId, offsetId;
+    IString line, filter, sclk, offsetId;
+    QString gainId;
     WAGO wago;
 
     //Binary search. This determines the middle of the current range and
@@ -541,9 +542,7 @@ namespace Isis {
           scs2e_c(-94, sclk.c_str(), &et);
 
           // Get the gain mode id
-          gainId = line.Token(",");
-          gainId.Remove("\"");
-          gainId.Trim(" ");
+          gainId = line.Token(",").ToQt().remove("\"").trimmed();
 
           // Get the offset mode id
           offsetId = line;
@@ -552,14 +551,14 @@ namespace Isis {
           offsetId.Trim(" ");
 
           // Compute the gain
-          map<string, double>::iterator p;
+          map<QString, double>::iterator p;
           p = p_gainMapWA.find(gainId);
           if(p == p_gainMapWA.end()) {
             // Unload the naif kernels
-            unload_c(lskKern.c_str());
-            unload_c(sclkKern.c_str());
+            unload_c(lskKern.toAscii().data());
+            unload_c(sclkKern.toAscii().data());
 
-            string msg = "Invalid GainModeId [" + gainId + "] in wago table";
+            QString msg = "Invalid GainModeId [" + gainId + "] in wago table";
             throw IException(IException::Unknown, msg, _FILEINFO_);
           }
           double gain = p->second;
@@ -592,8 +591,8 @@ namespace Isis {
     unique(p_wagos.begin(), p_wagos.end());
 
     // Unload the naif kernels
-    unload_c(lskKern.c_str());
-    unload_c(sclkKern.c_str());
+    unload_c(lskKern.toAscii().data());
+    unload_c(sclkKern.toAscii().data());
   }
 }
 

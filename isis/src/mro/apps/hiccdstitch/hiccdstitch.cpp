@@ -23,8 +23,8 @@ using namespace Isis;
 //helper button functins in the code
 void helperButtonLog();
 
-map <string, void *> GuiHelpers() {
-  map <string, void *> helper;
+map <QString, void *> GuiHelpers() {
+  map <QString, void *> helper;
   helper ["helperButtonLog"] = (void *) helperButtonLog;
   return helper;
 }
@@ -33,8 +33,8 @@ map <string, void *> GuiHelpers() {
 typedef struct {
   Cube *cube;         // Cube object
   Portal *portal;     // Portal for interpolation
-  string filename;    // Name of the CCD file
-  string ccdName;     // Name of ccd
+  QString filename;    // Name of the CCD file
+  QString ccdName;     // Name of ccd
   int ccdNumber;
   int mosOrder;       // Mosaic order, default is summing mode
   int summing;        // Summing mode
@@ -107,7 +107,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   list.read(ui.GetFileName("FROMLIST"));
   if(list.size() < 1) {
-    string msg = "The list file[" + ui.GetFileName("FROMLIST") +
+    QString msg = "The list file[" + ui.GetFileName("FROMLIST") +
                  " does not contain any filenames";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -116,7 +116,7 @@ void IsisMain() {
 //  Commented out as HiRISE Team is requesting a single file to be processed
 //  to simplify pipeline logic
   if(list.size() == 1) {
-    string msg = "The list file[" + ui.GetFileName("FROMLIST") +
+    QString msg = "The list file[" + ui.GetFileName("FROMLIST") +
                  " must contain at least two filenames";
     throw iException::Message(iException::User, msg, _FILEINFO_);
   }
@@ -133,7 +133,7 @@ void IsisMain() {
     interp = new Interpolator(Interpolator::CubicConvolutionType);
   }
   else {
-    string msg = "Unknow value for INTERP [" +
+    QString msg = "Unknow value for INTERP [" +
                  ui.GetString("INTERP") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -149,7 +149,7 @@ void IsisMain() {
   bool gotNir = false;
   bool gotBg = false;
   bool first = true;
-  string obsId;     // ObservationId keyword value
+  QString obsId;     // ObservationId keyword value
   int maxBands = 0;
 
   for(int i = 0; i < list.size(); i++) {
@@ -159,12 +159,12 @@ void IsisMain() {
 
     PvlGroup arch = cube->getLabel()->FindGroup("Archive", Pvl::Traverse);
     if(first) {
-      obsId = (string) arch["ObservationId"];
+      obsId = (QString) arch["ObservationId"];
       first = false;
     }
     else {
-      if(obsId != (string) arch["ObservationId"]) {
-        string msg = "Input file " + list[i].toString()
+      if(obsId != (QString) arch["ObservationId"]) {
+        QString msg = "Input file " + list[i].toString()
                      + " has a different ObservationId";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -173,7 +173,7 @@ void IsisMain() {
     PvlGroup inst = cube->getLabel()->FindGroup("Instrument", Pvl::Traverse);
     int chan = inst["ChannelNumber"];
     if(chan != 2) {
-      string msg = "Input file " + list[i].toString() + " contains a single channel";
+      QString msg = "Input file " + list[i].toString() + " contains a single channel";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     int cpmm = inst["CpmmNumber"];
@@ -221,11 +221,11 @@ void IsisMain() {
     CCDinfo.mosOrder = (int)(1. / (float)CCDinfo.summing * 10. + 14.);
 
     //  Determine if a shift of the CCD exists in the definitions file
-    //  Combine summing/tdi into a string
-    std::string sumTdi = Isis::IString(CCDinfo.summing) + "/" +
-                         Isis::IString(CCDinfo.tdi);
+    //  Combine summing/tdi into a QString
+    QString sumTdi = toString(CCDinfo.summing) + "/" +
+                     toString(CCDinfo.tdi);
 
-    std::string ccdId = ccdNames[ccd];
+    QString ccdId = ccdNames[ccd];
     if(stitch.HasObject(ccdId)) {
       PvlObject &ccddef = stitch.FindObject(ccdId, Pvl::Traverse);
       if(ccddef.HasKeyword("MosaicOrder")) {
@@ -262,7 +262,7 @@ void IsisMain() {
 
   // Check for consistent filters
   if((gotRed && gotNir) || (gotRed && gotBg) || (gotNir && gotBg)) {
-    string msg = "Cannot stitch together different filter images";
+    QString msg = "Cannot stitch together different filter images";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -274,7 +274,7 @@ void IsisMain() {
   int prevCCD = CCDlist[0].ccdNumber;
   for(vec_sz i = 1; i < CCDlist.size(); ++i) {
     if(CCDlist[i].ccdNumber != prevCCD + 1) {
-      string msg = "CCD numbers are not adjacent";
+      QString msg = "CCD numbers are not adjacent";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     prevCCD = CCDlist[i].ccdNumber;
@@ -322,7 +322,7 @@ void IsisMain() {
     CCDlist[i].outss = ((CCDlist[i].fpsamp - CCDlist[0].fpsamp) / minSum) + 1;
     // Check for appropriate bands
     if(CCDlist[i].nb != maxBands) {
-      std::ostringstream mess;
+      ostringstream mess;
       mess << "File " << CCDlist[i].filename << " does not have the required "
            << maxBands << " bands, but only " << CCDlist[i].nb;
       IException(IException::User, mess.str(), _FILEINFO_);
@@ -332,8 +332,8 @@ void IsisMain() {
 
 //  If we find any band count inconsistancies, gotta give up the ghost
   if(nBandErrs > 0) {
-    std::string mess = "Band count inconsistancies exist in input cubes!";
-    throw IException(IException::User, mess.c_str(), _FILEINFO_);
+    QString mess = "Band count inconsistancies exist in input cubes!";
+    throw IException(IException::User, mess, _FILEINFO_);
   }
 
   // Compute number of samples in output file
@@ -369,14 +369,14 @@ void IsisMain() {
     PvlGroup ccdGroup(CCDlist[CCDindex].ccdName);
 
     ccdGroup += PvlKeyword("File", CCDlist[CCDindex].filename);
-    ccdGroup += PvlKeyword("FocalPlaneSample", CCDlist[CCDindex].fpsamp);
-    ccdGroup += PvlKeyword("FocalPlaneLine", CCDlist[CCDindex].fpline);
-    ccdGroup += PvlKeyword("ImageSample", CCDlist[CCDindex].outss);
-    ccdGroup += PvlKeyword("ImageLine", CCDlist[CCDindex].outsl);
+    ccdGroup += PvlKeyword("FocalPlaneSample", toString(CCDlist[CCDindex].fpsamp));
+    ccdGroup += PvlKeyword("FocalPlaneLine", toString(CCDlist[CCDindex].fpline));
+    ccdGroup += PvlKeyword("ImageSample", toString(CCDlist[CCDindex].outss));
+    ccdGroup += PvlKeyword("ImageLine", toString(CCDlist[CCDindex].outsl));
 
     int ccd =  CCDlist[CCDindex].ccdNumber;
-    ccdGroup += PvlKeyword("SampleOffset", CCDlist[CCDindex].fpsamp - xoffset[ccd]);
-    ccdGroup += PvlKeyword("LineOffset", CCDlist[CCDindex].fpline - yoffset[ccd]);
+    ccdGroup += PvlKeyword("SampleOffset", toString(CCDlist[CCDindex].fpsamp - xoffset[ccd]));
+    ccdGroup += PvlKeyword("LineOffset", toString(CCDlist[CCDindex].fpline - yoffset[ccd]));
 
     results.AddGroup(ccdGroup);
   }
@@ -393,9 +393,9 @@ void IsisMain() {
 
 //  Write the object if requested
   if(ui.WasEntered("PLACEMENT")) {
-    std::string placefile = ui.GetFileName("PLACEMENT");
+    QString placefile = ui.GetFileName("PLACEMENT");
     std::ofstream pfile;
-    pfile.open(placefile.c_str(), std::ios::out | std::ios::trunc);
+    pfile.open(placefile.toAscii().data(), std::ios::out | std::ios::trunc);
     pfile << results << endl;
     pfile.close();
   }
@@ -518,7 +518,7 @@ void PlaceCCD(Buffer &buf) {
 //Helper function to output the regdeft file to log.
 void helperButtonLog() {
   UserInterface &ui = Application::GetUserInterface();
-  string file(ui.GetFileName("SHIFTDEF"));
+  QString file(ui.GetFileName("SHIFTDEF"));
   Pvl p;
   p.Read(file);
   Application::GuiLog(p);

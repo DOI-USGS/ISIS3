@@ -61,7 +61,7 @@ namespace Isis {
       // Compute the default value if allowed and needed
       if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
         double lon = 0.0;
-        mapGroup += PvlKeyword("CenterLongitude", lon);
+        mapGroup += PvlKeyword("CenterLongitude", toString(lon));
       }
 
       if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLatitude"))) {
@@ -75,7 +75,7 @@ namespace Isis {
         else {
           lat = 0.0;
         }
-        mapGroup += PvlKeyword("CenterLatitude", lat);
+        mapGroup += PvlKeyword("CenterLatitude", toString(lat));
       }
 
       // Get the center longitude, convert to radians, adjust for longitude
@@ -94,19 +94,19 @@ namespace Isis {
         mapGroup += PvlKeyword("CenterLatitudeRadius");
       }
 
-      mapGroup["CenterLatitudeRadius"] = m_clatRadius;
+      mapGroup["CenterLatitudeRadius"] = toString(m_clatRadius);
 
       // Compute cos of the center latitude and make sure it is valid as
       // we will be dividing with it later on
       m_cosCenterLatitude = cos(m_centerLatitude);
       if (fabs(m_cosCenterLatitude) < DBL_EPSILON) {
-        string message = "Keyword value for CenterLatitude is "
+        QString message = "Keyword value for CenterLatitude is "
                          "too close to the pole";
         throw IException(IException::Io, message, _FILEINFO_);
       }
     }
     catch(IException &e) {
-      string message = "Invalid label group [Mapping]";
+      QString message = "Invalid label group [Mapping]";
       throw IException(e, IException::Io, message, _FILEINFO_);
     }
   }
@@ -136,18 +136,18 @@ namespace Isis {
   /**
    * Returns the name of the map projection, "Equirectangular"
    *
-   * @return string Name of projection, "Equirectangular"
+   * @return QString Name of projection, "Equirectangular"
    */
-  string Equirectangular::Name() const {
+  QString Equirectangular::Name() const {
     return "Equirectangular";
   }
 
   /**
    * Returns the version of the map projection
    *
-   * @return string Version number
+   * @return QString Version number
    */
-  string Equirectangular::Version() const {
+  QString Equirectangular::Version() const {
     return "1.0";
   }
 

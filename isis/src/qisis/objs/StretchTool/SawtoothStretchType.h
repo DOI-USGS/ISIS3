@@ -3,17 +3,15 @@
 
 #include "StretchType.h"
 
-namespace Isis {
-  class Stretch;
-  class Histogram;
-}
-
-class QSlider;
-class QLineEdit;
 class QColor;
+class QLineEdit;
+class QSlider;
 class QString;
 
 namespace Isis {
+  class Stretch;
+  class Histogram;
+
   /**
    * @brief This handles the advanced sawtooth stretch
    *

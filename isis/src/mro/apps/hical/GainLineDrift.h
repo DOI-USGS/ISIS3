@@ -1,4 +1,4 @@
-#if !defined(GainLineDrift_h)
+#ifndef GainLineDrift_h
 #define GainLineDrift_h
 /**                                                                       
  * @file                                                                  
@@ -65,7 +65,7 @@ namespace Isis {
       virtual ~GainLineDrift() { }
 
     private:
-      std::string _gdfile;
+      QString _gdfile;
       int _ccd;
       int _channel;
       HiVector _coefs;

@@ -1,4 +1,4 @@
-#if !defined(GSLUtility_h)
+#ifndef GSLUtility_h
 #define GSLUtility_h
 /**
  * @file
@@ -30,17 +30,19 @@
 #include <vector>
 #include <algorithm>
 
-#include "tnt/tnt_array1d.h"
-#include "tnt/tnt_array1d_utils.h"
-#include "tnt/tnt_array2d.h"
-#include "tnt/tnt_array2d_utils.h"
+#include <QString>
+
+#include <tnt/tnt_array1d.h>
+#include <tnt/tnt_array1d_utils.h>
+#include <tnt/tnt_array2d.h>
+#include <tnt/tnt_array2d_utils.h>
 
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
 
 //  Some GSL optimization on by default, off if DEBUG or SAFE_GSL is defined
-#if !defined(DEBUG)
-#if !defined(SAFE_GSL)
+#ifndef DEBUG
+#ifndef SAFE_GSL
 #define GSL_RANGE_CHECK_OFF 1
 #endif
 #endif
@@ -97,10 +99,10 @@ namespace Isis {
          * @brief Returns GSL specific error text
          *
          * @param gsl_errno GSL error number
-         * @return std::string Textual context of GSL error
+         * @return QString Textual context of GSL error
          */
-        inline std::string status(int gsl_errno) const {
-          return (std::string(gsl_strerror(gsl_errno)));
+        inline QString status(int gsl_errno) const {
+          return (QString(gsl_strerror(gsl_errno)));
         }
 
         void check(int gsl_status, const char *src = __FILE__, int line = __LINE__)

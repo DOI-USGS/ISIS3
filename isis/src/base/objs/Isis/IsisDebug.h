@@ -27,10 +27,10 @@ void InterruptSignal(int);
 /**
  * The next two includes are bad, but are necessary without complicating code to
  * an extreme. These shouldn't cause an issue because they are not included in
- * release mode, or ever on systems without libcwd. IString is necessary for
+ * release mode, or ever on systems without libcwd. QString is necessary for
  * string conversions and Constants.h for the definition of BigInt.
  */
-#include "IString.h"
+#include "QString.h"
 #include "Constants.h"
 
 /**
@@ -88,7 +88,7 @@ class StackTrace {
           currElement +=
             std::string(addrInfo.file()) +
             std::string(":") +
-            Isis::IString((Isis::BigInt)addrInfo.line()) +
+            QString((Isis::BigInt)addrInfo.line()) +
             std::string(" --- ") +
             demangled_name;
         }

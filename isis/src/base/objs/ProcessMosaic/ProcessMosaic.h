@@ -206,7 +206,7 @@ namespace Isis {
 
       //! Set input cube to specified image name at the starting and count of
       //! samples, lines, bands
-      Isis::Cube *SetInputCube(const std::string &parameter,
+      Isis::Cube *SetInputCube(const QString &parameter,
                                const int ss = 1, const int sl = 1,
                                const int sb = 1,
                                const int ns = -1, const int nl = -1,
@@ -214,7 +214,7 @@ namespace Isis {
 
       //! Set input cube to specified image name with specified attributes at the
       //! starting and count of samples, lines, bands
-      Isis::Cube *SetInputCube(const std::string &fname,
+      Isis::Cube *SetInputCube(const QString &fname,
                                Isis::CubeAttributeInput &att,
                                const int ss = 1, const int sl = 1,
                                const int sb = 1,
@@ -222,13 +222,13 @@ namespace Isis {
                                const int nb = -1);
 
       //! Set output cube to specified image name
-      Isis::Cube *SetOutputCube(const std::string &psParameter);
+      Isis::Cube *SetOutputCube(const QString &psParameter);
 
       void SetBandBinMatch(bool enforceBandBinMatch);
       void SetMosaicOrigin(int &piIndex);
 
 
-      void SetBandKeyword(IString bandPriorityKeyName, IString bandPriorityKeyValue);
+      void SetBandKeyword(QString bandPriorityKeyName, QString bandPriorityKeyValue);
       void SetBandNumber(int bandPriorityBandNumber);
       void SetBandUseMaxValue(bool useMax);
       void SetCreateFlag(bool createOutputMosaic);
@@ -249,8 +249,8 @@ namespace Isis {
       int GetInputStartSampleInMosaic() const;
       int GetInputStartBandInMosaic() const;
 
-      static IString OverlayToString(ImageOverlay);
-      static ImageOverlay StringToOverlay(IString);
+      static QString OverlayToString(ImageOverlay);
+      static ImageOverlay StringToOverlay(QString);
 
     private:
       //! Get the file index offset to be saved in the band by pixel type
@@ -302,8 +302,8 @@ namespace Isis {
       bool m_trackingEnabled;
       bool m_createOutputMosaic;
       int  m_bandPriorityBandNumber;
-      IString m_bandPriorityKeyName;
-      IString m_bandPriorityKeyValue;
+      QString m_bandPriorityKeyName;
+      QString m_bandPriorityKeyValue;
       bool m_bandPriorityUseMaxValue;
 
 

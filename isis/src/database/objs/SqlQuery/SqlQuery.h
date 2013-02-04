@@ -1,4 +1,4 @@
-#if !defined(SqlQuery_h)
+#ifndef SqlQuery_h
 #define SqlQuery_h
 /**
  * @file
@@ -92,7 +92,7 @@ namespace Isis {
    *  finder.setThrowOnFailure();
    *  string pntDist  = "distance(giscpt,UPCPoint(%longitude,%latitude))";
    *  string pntQuery = "SELECT pointid, latitude, longitude, radius FROM "
-   *                    + pntTable + " WHERE (%distance <= " + IString(maxDist) +
+   *                    + pntTable + " WHERE (%distance <= " + QString(maxDist) +
    *                    ")";
    *
    *  Progress progress;
@@ -102,15 +102,15 @@ namespace Isis {
    *    CSVReader::CSVAxis pntR = pnts.getRow(row);
    *
    *    // Convert longitude to proper system if requested
-   *    double longitude = IString(pntR[1]).ToDouble();
+   *    double longitude = QString(pntR[1]).ToDouble();
    *    if ((make360) && (longitude < 0.0)) { longitude += 360.0; }
-   *    double latitude = IString(pntR[0]).ToDouble();
-   *    double radius = IString(pntR[2]).ToDouble();
+   *    double latitude = QString(pntR[0]).ToDouble();
+   *    double radius = QString(pntR[2]).ToDouble();
    *
    *    // Prepare the query, converting the longitude
-   *    string dcheck(IString::Replace(pntDist, "%longitude",
-   *    IString(longitude))); dcheck = IString::Replace(dcheck, "%latitude",
-   *    IString(latitude)); string query = IString::Replace(pntQuery, "%distance",
+   *    string dcheck(QString::Replace(pntDist, "%longitude",
+   *    QString(longitude))); dcheck = QString::Replace(dcheck, "%latitude",
+   *    QString(latitude)); string query = QString::Replace(pntQuery, "%distance",
    *    dcheck);
    *
    *    finder.exec(query);
@@ -120,10 +120,10 @@ namespace Isis {
    *      while (finder.next()) {
    *        SqlRecord record = finder.getRecord();
    *        OutPoint point;
-   *        point.latitude = IString(record.getValue("latitude")).ToDouble(),
-   *        point.longitude = IString(record.getValue("longitude")).ToDouble(),
-   *        point.radius = IString(record.getValue("radius")).ToDouble(),
-   *        point.pointid = IString(record.getValue("pointid")),
+   *        point.latitude = QString(record.getValue("latitude")).ToDouble(),
+   *        point.longitude = QString(record.getValue("longitude")).ToDouble(),
+   *        point.radius = QString(record.getValue("radius")).ToDouble(),
+   *        point.pointid = QString(record.getValue("pointid")),
    *        stats.AddData(&point.radius, 1);
    *        pointList.push_back(point);
    *      }
@@ -133,7 +133,7 @@ namespace Isis {
    *
    * @endcode
    *
-   * @see IString
+   * @see QString
    *
    * @ingroup Database
    *
@@ -144,7 +144,7 @@ namespace Isis {
    *                                    to first try lastQuery(), then
    *                                    executedQuery().
    *  @history 2007-06-05 Brendan George - Modified to work with
-   *           IString/StringTools merge
+   *           QString/StringTools merge
    *   @history 2008-10-30 Steven Lambright - tossQueryError now accepts a const
    *            char* for a filename, issue pointed out by "novus0x2a" (Support
    *            Board Member)

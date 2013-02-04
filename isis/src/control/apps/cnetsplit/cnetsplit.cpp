@@ -34,9 +34,9 @@ void IsisMain() {
 
     if (numOutputFiles > numPoints) {
       FileName inputNet(ui.GetFileName("CNET"));
-      string msg = "The number of output files is greater than total number of "
-                   "Control Points in the given Control Network ["
-                   + ui.GetFileName("CNET") + "].";
+      QString msg = "The number of output files is greater than total number of "
+                    "Control Points in the given Control Network ["
+                    + ui.GetFileName("CNET") + "].";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 

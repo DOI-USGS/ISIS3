@@ -62,19 +62,19 @@ namespace Isis {
        *
        * @return Cube* Pointer to the cube (guaranteed not null)
        */
-      static Cube *Open(const std::string &cubeFileName) {
+      static Cube *Open(const QString &cubeFileName) {
         return p_instance.OpenCube(cubeFileName);
       }
 
       /**
-       * This method calls CleanCubes(const std::string &cubeFileName)  on the static
+       * This method calls CleanCubes(const QString &cubeFileName)  on the static
        * instance
        *
-       * @see CleanCubes(const std::string &cubeFileName)
+       * @see CleanCubes(const QString &cubeFileName)
        *
        * @param cubeFileName The filename of the cube to destroy from memory
        */
-      static void CleanUp(const std::string &cubeFileName) {
+      static void CleanUp(const QString &cubeFileName) {
         p_instance.CleanCubes(cubeFileName);
       }
 
@@ -87,10 +87,10 @@ namespace Isis {
         p_instance.CleanCubes();
       };
 
-      void CleanCubes(const std::string &cubeFileName);
+      void CleanCubes(const QString &cubeFileName);
       void CleanCubes();
 
-      Cube *OpenCube(const std::string &cubeFileName);
+      Cube *OpenCube(const QString &cubeFileName);
 
       /**
        * This sets the maximum number of opened cubes for this instance of

@@ -55,7 +55,7 @@ namespace Isis {
     // Set up the camera characteristics
     SetFocalLength();
 
-    string pixelPitchKey = "INS" + IString((int)naifIkCode()) + "_PIXEL_SIZE";
+    QString pixelPitchKey = "INS" + toString(naifIkCode()) + "_PIXEL_SIZE";
     SetPixelPitch(getDouble(pixelPitchKey));
 
     // Get necessary variables
@@ -65,41 +65,41 @@ namespace Isis {
 
     // Get the start and end time
     double et;
-    string stime = inst["SpacecraftClockCount"];
+    QString stime = inst["SpacecraftClockCount"];
     et = getClockTime(stime).Et();
     p_etStart = et - ((p_exposureDur / 1000.0) / 2.0);
     p_nframelets = ParentLines() / sumMode;
 
     // These numbers came from "MARCI_CTX_Cal_Report_v1.5.pdf" page 7 (Bandpasses & downlinked detector rows)
-    std::map<string, int> filterToDetectorOffset;
-    filterToDetectorOffset.insert(pair<string, int>("BLUE",     709));
-    filterToDetectorOffset.insert(pair<string, int>("GREEN",    734));
-    filterToDetectorOffset.insert(pair<string, int>("ORANGE",   760));
-    filterToDetectorOffset.insert(pair<string, int>("RED",      786));
-    filterToDetectorOffset.insert(pair<string, int>("NIR",      811));
-    filterToDetectorOffset.insert(pair<string, int>("LONG_UV",  266));
-    filterToDetectorOffset.insert(pair<string, int>("SHORT_UV", 293));
+    map<QString, int> filterToDetectorOffset;
+    filterToDetectorOffset.insert(pair<QString, int>("BLUE",     709));
+    filterToDetectorOffset.insert(pair<QString, int>("GREEN",    734));
+    filterToDetectorOffset.insert(pair<QString, int>("ORANGE",   760));
+    filterToDetectorOffset.insert(pair<QString, int>("RED",      786));
+    filterToDetectorOffset.insert(pair<QString, int>("NIR",      811));
+    filterToDetectorOffset.insert(pair<QString, int>("LONG_UV",  266));
+    filterToDetectorOffset.insert(pair<QString, int>("SHORT_UV", 293));
 
-    std::map<string, int> filterToFilterNumbers;
-    filterToFilterNumbers.insert(pair<string, int>("BLUE",     0));
-    filterToFilterNumbers.insert(pair<string, int>("GREEN",    1));
-    filterToFilterNumbers.insert(pair<string, int>("ORANGE",   2));
-    filterToFilterNumbers.insert(pair<string, int>("RED",      3));
-    filterToFilterNumbers.insert(pair<string, int>("NIR",      4));
-    filterToFilterNumbers.insert(pair<string, int>("LONG_UV",  5));
-    filterToFilterNumbers.insert(pair<string, int>("SHORT_UV", 6));
+    map<QString, int> filterToFilterNumbers;
+    filterToFilterNumbers.insert(pair<QString, int>("BLUE",     0));
+    filterToFilterNumbers.insert(pair<QString, int>("GREEN",    1));
+    filterToFilterNumbers.insert(pair<QString, int>("ORANGE",   2));
+    filterToFilterNumbers.insert(pair<QString, int>("RED",      3));
+    filterToFilterNumbers.insert(pair<QString, int>("NIR",      4));
+    filterToFilterNumbers.insert(pair<QString, int>("LONG_UV",  5));
+    filterToFilterNumbers.insert(pair<QString, int>("SHORT_UV", 6));
 
     int frameletOffsetFactor = inst["ColorOffset"];
 
     if((int)inst["DataFlipped"] != 0) frameletOffsetFactor *= -1;
-    std::map<string, int> filterToFrameletOffset;
-    filterToFrameletOffset.insert(pair<string, int>("NIR",      0 * frameletOffsetFactor));
-    filterToFrameletOffset.insert(pair<string, int>("RED",      1 * frameletOffsetFactor));
-    filterToFrameletOffset.insert(pair<string, int>("ORANGE",   2 * frameletOffsetFactor));
-    filterToFrameletOffset.insert(pair<string, int>("GREEN",    3 * frameletOffsetFactor));
-    filterToFrameletOffset.insert(pair<string, int>("BLUE",     4 * frameletOffsetFactor));
-    filterToFrameletOffset.insert(pair<string, int>("LONG_UV",  5 * frameletOffsetFactor));
-    filterToFrameletOffset.insert(pair<string, int>("SHORT_UV", 6 * frameletOffsetFactor));
+    map<QString, int> filterToFrameletOffset;
+    filterToFrameletOffset.insert(pair<QString, int>("NIR",      0 * frameletOffsetFactor));
+    filterToFrameletOffset.insert(pair<QString, int>("RED",      1 * frameletOffsetFactor));
+    filterToFrameletOffset.insert(pair<QString, int>("ORANGE",   2 * frameletOffsetFactor));
+    filterToFrameletOffset.insert(pair<QString, int>("GREEN",    3 * frameletOffsetFactor));
+    filterToFrameletOffset.insert(pair<QString, int>("BLUE",     4 * frameletOffsetFactor));
+    filterToFrameletOffset.insert(pair<QString, int>("LONG_UV",  5 * frameletOffsetFactor));
+    filterToFrameletOffset.insert(pair<QString, int>("SHORT_UV", 6 * frameletOffsetFactor));
 
     // Get the keywords from labels
     const PvlGroup &bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
@@ -107,7 +107,7 @@ namespace Isis {
 
     for(int i = 0; i < filtNames.Size(); i++) {
       if(filterToDetectorOffset.find(filtNames[i]) == filterToDetectorOffset.end()) {
-        string msg = "Unrecognized filter name [" + filtNames[i] + "]";
+        QString msg = "Unrecognized filter name [" + filtNames[i] + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 

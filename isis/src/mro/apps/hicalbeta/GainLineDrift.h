@@ -1,4 +1,4 @@
-#if !defined(GainLineDrift_h)
+#ifndef GainLineDrift_h
 #define GainLineDrift_h
 /**                                                                       
  * @file                                                                  

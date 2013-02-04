@@ -51,8 +51,8 @@ void IsisMain() {
       pixelResolution = inCube->getLabel()->FindObject("IsisCube").FindGroup("Mapping")["PixelResolution"];
     }
     else {
-      string msg = "The file [" + ui.GetFileName("FROM") + "] does not have a mapping group,"
-                   + " you must enter a Pixel Resolution";
+      QString msg = "The file [" + ui.GetFileName("FROM") + "] does not have a mapping group,"
+                    + " you must enter a Pixel Resolution";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }

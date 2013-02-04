@@ -27,7 +27,7 @@ namespace Isis {
    * @param pdMinRes        - Min Resolution value
    * @param pdMaxRes        - Max Resolution value
    */
-  CnetRefByResolution::CnetRefByResolution(Pvl *pPvlDef, std::string psSerialNumfile,
+  CnetRefByResolution::CnetRefByResolution(Pvl *pPvlDef, QString psSerialNumfile,
       ResolutionType peType, double pdResValue, double pdMinRes, double pdMaxRes)
     : ControlNetValidMeasure(pPvlDef) {
     mdResValue = pdResValue;
@@ -91,7 +91,7 @@ namespace Isis {
       int iRefIndex = -1;
       if (newPnt->IsReferenceExplicit())
         iRefIndex = newPnt->IndexOfRefMeasure();
-      IString istrTemp;
+      QString istrTemp;
 
       std::vector <PvlGroup> pvlGrpVector;
       int iBestIndex = 0;
@@ -103,13 +103,13 @@ namespace Isis {
       if (!newPnt->IsIgnored() && newPnt->GetType() == ControlPoint::Free && numMeasures > 0 &&
           (iNumMeasuresLocked == 0 || (iNumMeasuresLocked > 0 && bRefLocked))) {
         int iNumIgnore = 0;
-        IString istrTemp;
+        QString istrTemp;
         for (int measure = 0; measure < newPnt->GetNumMeasures(); ++measure) {
           ControlMeasure *newMsr = newPnt->GetMeasure(measure);
           bool bMeasureLocked = newMsr->IsEditLocked();
           double dSample      = newMsr->GetSample();
           double dLine        = newMsr->GetLine();
-          std::string sn      = newMsr->GetCubeSerialNumber();
+          QString sn      = newMsr->GetCubeSerialNumber();
 
           if (!bPntEditLock && !bMeasureLocked) {
             newMsr->SetDateTime(Application::DateTime());
@@ -202,25 +202,25 @@ namespace Isis {
       else {
         int iComment = 0;
         if (numMeasures == 0) {
-          IString sComment = "Comment";
-          sComment += IString(++iComment);
+          QString sComment = "Comment";
+          sComment += QString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "No Measures in the Point");
         }
 
         if (newPnt->IsIgnored()) {
-          IString sComment = "Comment";
-          sComment += IString(++iComment);
+          QString sComment = "Comment";
+          sComment += QString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Point was originally Ignored");
         }
 
         if (newPnt->GetType() == ControlPoint::Fixed) {
-          IString sComment = "Comment";
-          sComment += IString(++iComment);
+          QString sComment = "Comment";
+          sComment += QString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Fixed Point");
         }
         else if (newPnt->GetType() == ControlPoint::Constrained) {
-          IString sComment = "Comment";
-          sComment += IString(++iComment);
+          QString sComment = "Comment";
+          sComment += QString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Constrained Point");
         }
 
@@ -250,11 +250,11 @@ namespace Isis {
         if (iRefIndex >= 0) {
           pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber",
               origPnt.GetMeasure(iRefIndex)->GetCubeSerialNumber());
-          pvlRefChangeGrp += Isis::PvlKeyword("PrevResolution",   mdResVector[iRefIndex]);
+          pvlRefChangeGrp += Isis::PvlKeyword("PrevResolution",   toString(mdResVector[iRefIndex]));
   
-          istrTemp = IString((int)origPnt.GetMeasure(iRefIndex)->GetSample());
+          istrTemp = QString((int)origPnt.GetMeasure(iRefIndex)->GetSample());
           istrTemp += ",";
-          istrTemp += IString((int)origPnt.GetMeasure(iRefIndex)->GetLine());
+          istrTemp += QString((int)origPnt.GetMeasure(iRefIndex)->GetLine());
           pvlRefChangeGrp += Isis::PvlKeyword("PrevLocation",     istrTemp);
         }
         else {
@@ -263,12 +263,12 @@ namespace Isis {
         
         pvlRefChangeGrp += Isis::PvlKeyword("NewSerialNumber",
             newPnt->GetMeasure(iBestIndex)->GetCubeSerialNumber());
-        std::string sKeyName = "NewHighestResolution";
+        QString sKeyName = "NewHighestResolution";
         if (meType == Low) {
           sKeyName = "NewLeastResolution";
         }
         else if (meType == Mean) {
-          pvlRefChangeGrp += Isis::PvlKeyword("MeanResolution",  GetMeanResolution());
+          pvlRefChangeGrp += Isis::PvlKeyword("MeanResolution",  toString(GetMeanResolution()));
           sKeyName = "NewResolutionNeartoMean";
         }
         else if (meType == Nearest) {
@@ -277,11 +277,11 @@ namespace Isis {
         else if (meType == Range) {
           sKeyName = "NewResolutionInRange";
         }
-        pvlRefChangeGrp += Isis::PvlKeyword(sKeyName,  mdResVector[iBestIndex]);
+        pvlRefChangeGrp += Isis::PvlKeyword(sKeyName,  toString(mdResVector[iBestIndex]));
 
-        istrTemp = IString((int)newPnt->GetMeasure(iBestIndex)->GetSample());
+        istrTemp = QString((int)newPnt->GetMeasure(iBestIndex)->GetSample());
         istrTemp += ",";
-        istrTemp += IString((int)newPnt->GetMeasure(iBestIndex)->GetLine());
+        istrTemp += QString((int)newPnt->GetMeasure(iBestIndex)->GetLine());
         pvlRefChangeGrp += Isis::PvlKeyword("NewLocation",      istrTemp);
 
         pvlPointObj += pvlRefChangeGrp;
@@ -296,9 +296,9 @@ namespace Isis {
     }// end Point
 
     // CnetRef Change Statistics
-    mStatisticsGrp += Isis::PvlKeyword("PointsModified",   iPointsModified);
-    mStatisticsGrp += Isis::PvlKeyword("ReferenceChanged", iRefChanged);
-    mStatisticsGrp += Isis::PvlKeyword("MeasuresModified", iMeasuresModified);
+    mStatisticsGrp += Isis::PvlKeyword("PointsModified",   toString(iPointsModified));
+    mStatisticsGrp += Isis::PvlKeyword("ReferenceChanged", toString(iRefChanged));
+    mStatisticsGrp += Isis::PvlKeyword("MeasuresModified", toString(iMeasuresModified));
 
     mPvlLog += mStatisticsGrp;
   }

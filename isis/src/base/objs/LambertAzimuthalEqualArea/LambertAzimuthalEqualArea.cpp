@@ -91,7 +91,7 @@ namespace Isis {
       if (!mapGroup.HasKeyword("CenterLongitude")) {
         if (allowDefaults) {
           double centerLon = (MinimumLongitude() + MaximumLongitude()) / 2.0;
-          mapGroup += PvlKeyword("CenterLongitude", centerLon, "Degrees");
+          mapGroup += PvlKeyword("CenterLongitude", toString(centerLon), "Degrees");
         }
         else {
           IString message = "Cannot project using Lambert Azimuthal equal-area";
@@ -106,7 +106,7 @@ namespace Isis {
       if (!mapGroup.HasKeyword("CenterLatitude")) {
         if (allowDefaults) {
           double centerLat = (MinimumLatitude() + MaximumLatitude()) / 2.0;
-          mapGroup += PvlKeyword("CenterLatitude", centerLat, "Degrees");
+          mapGroup += PvlKeyword("CenterLatitude", toString(centerLat), "Degrees");
         }
         else {
           IString message = "Cannot project using Lambert Azimuthal equal-area";
@@ -184,22 +184,22 @@ namespace Isis {
   /**
    * Returns the name of the map projection.
    *
-   * @return string Name of projection
+   * @return QString Name of projection
    * 
    * @author 2012-07-25 Jeannie Backer 
    * @internal
    *   @history 2012-07-25 Jeannie Backer - Original version.
    */
-  string LambertAzimuthalEqualArea::Name() const {
+  QString LambertAzimuthalEqualArea::Name() const {
     return "LambertAzimuthalEqualArea";
   }
 
   /**
    * Returns the version of the map projection.
    *
-   * @return std::string Version number
+   * @return QString Version number
    */
-  string  LambertAzimuthalEqualArea::Version() const {
+  QString  LambertAzimuthalEqualArea::Version() const {
     return "1.0";
   }
 

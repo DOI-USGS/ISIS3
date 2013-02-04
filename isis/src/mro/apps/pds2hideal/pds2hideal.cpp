@@ -21,14 +21,14 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   // Copy the input image to specified output cube in BSQ format
   FileName from = ui.GetFileName("FROM");
-  IString pdsLabelFile = from.expanded();
+  QString pdsLabelFile = from.expanded();
   Pvl pdsLabelPvl;
   ProcessImportPds p;
   p.SetPdsFile(pdsLabelFile, "", pdsLabelPvl);
 
-  IString instId = pdsLabelPvl["INSTRUMENT_ID"][0];
+  QString instId = pdsLabelPvl["INSTRUMENT_ID"][0];
   if(instId != "HIRISE_IDEAL_CAMERA") {
-    IString msg = "Invalid PDS label [" + from.expanded() + "]. The PDS product"
+    QString msg = "Invalid PDS label [" + from.expanded() + "]. The PDS product"
                   " must be from an Ideal camera model derived from a HiRISE"
                   " image. The INSTRUMENT_ID = [" + instId + "] is unsupported"
                   " by pds2hideal.";
@@ -51,16 +51,16 @@ void IsisMain() {
   outputCube->putGroup(otherGroups.FindGroup("Archive"));
 
   PvlGroup kernelGroup("Kernels");
-  kernelGroup += PvlKeyword("NaifIkCode", IString(-74699));
+  kernelGroup += PvlKeyword("NaifIkCode", toString(-74699));
   kernelGroup += PvlKeyword("TargetPosition", "Table");
   kernelGroup += PvlKeyword("InstrumentPointing", "Table");
   kernelGroup += PvlKeyword("InstrumentPosition", "Table");
-  QString shapeModelPath = IString(ui.GetString("SHAPEMODELPATH")).ToQt();
+  QString shapeModelPath = ui.GetString("SHAPEMODELPATH");
   if (!shapeModelPath.endsWith('/')) {
     shapeModelPath += "/";
   }
-  QString shapeModelValue = shapeModelPath + QString::fromStdString(pdsLabelPvl["SHAPE_MODEL"]);
-  kernelGroup += PvlKeyword("ShapeModel", shapeModelValue.toStdString());
+  QString shapeModelValue = shapeModelPath + pdsLabelPvl["SHAPE_MODEL"][0];
+  kernelGroup += PvlKeyword("ShapeModel", shapeModelValue);
   outputCube->putGroup(kernelGroup);
 
 
@@ -71,14 +71,14 @@ void IsisMain() {
   
   PvlObject &naifKeywords = isisLabel->FindObject("NaifKeywords");
   PvlKeyword bodyRadii("BODY499_RADII");
-  bodyRadii.AddValue(double(pdsLabelPvl["A_AXIS_RADIUS"]));
-  bodyRadii.AddValue(double(pdsLabelPvl["B_AXIS_RADIUS"]));
-  bodyRadii.AddValue(double(pdsLabelPvl["C_AXIS_RADIUS"]));
+  bodyRadii.AddValue(QString(pdsLabelPvl["A_AXIS_RADIUS"]));
+  bodyRadii.AddValue(QString(pdsLabelPvl["B_AXIS_RADIUS"]));
+  bodyRadii.AddValue(QString(pdsLabelPvl["C_AXIS_RADIUS"]));
   naifKeywords += bodyRadii;
 
   PvlObject &isisCubeObject = isisLabel->FindObject("IsisCube");
   // Compute and add SOFTWARE_NAME to the Archive Group
-  IString sfname = "Isis " + Application::Version() + " " +
+  QString sfname = "Isis " + Application::Version() + " " +
             Application::GetUserInterface().ProgramName();
   PvlGroup &archiveGroup = isisCubeObject.FindGroup("Archive");
   archiveGroup += PvlKeyword("SOFTWARE_NAME", sfname);
@@ -93,14 +93,14 @@ void IsisMain() {
   if (sourceLines != lines) {
     // this image is cropped, create an AlphaCube group
     PvlGroup alphaCube("AlphaCube");
-    alphaCube += PvlKeyword("AlphaSamples", sourceSamps);
-    alphaCube += PvlKeyword("AlphaLines", sourceLines);
-    alphaCube += PvlKeyword("AlphaStartingSample", firstSamp);
-    alphaCube += PvlKeyword("AlphaEndingSample", (double) firstSamp + samples);
-    alphaCube += PvlKeyword("AlphaStartingLine", firstLine);
-    alphaCube += PvlKeyword("AlphaEndingLine", (double) firstLine + lines);
-    alphaCube += PvlKeyword("BetaSamples", samples);
-    alphaCube += PvlKeyword("BetaLines", lines);
+    alphaCube += PvlKeyword("AlphaSamples", toString(sourceSamps));
+    alphaCube += PvlKeyword("AlphaLines", toString(sourceLines));
+    alphaCube += PvlKeyword("AlphaStartingSample", toString(firstSamp));
+    alphaCube += PvlKeyword("AlphaEndingSample", toString((double) firstSamp + samples));
+    alphaCube += PvlKeyword("AlphaStartingLine", toString(firstLine));
+    alphaCube += PvlKeyword("AlphaEndingLine", toString((double) firstLine + lines));
+    alphaCube += PvlKeyword("BetaSamples", toString(samples));
+    alphaCube += PvlKeyword("BetaLines", toString(lines));
     isisCubeObject += alphaCube;
   }
 

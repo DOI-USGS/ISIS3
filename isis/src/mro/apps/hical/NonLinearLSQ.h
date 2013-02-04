@@ -1,4 +1,4 @@
-#if !defined(NonLinearLSQ_h)
+#ifndef NonLinearLSQ_h
 #define NonLinearLSQ_h
 /**                                                                       
  * @file                                                                  
@@ -30,10 +30,12 @@
 #include <vector>
 #include <algorithm>
 
-#include "tnt_array1d.h"
-#include "tnt_array1d_utils.h"
-#include "tnt_array2d.h"
-#include "tnt_array2d_utils.h"
+#include <QString>
+
+#include <tnt_array1d.h>
+#include <tnt_array1d_utils.h>
+#include <tnt_array2d.h>
+#include <tnt_array2d_utils.h>
 
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
@@ -101,12 +103,12 @@ namespace Isis {
       /** Check status for success of the given condition  */
       inline bool success(int status) const { return (status == GSL_SUCCESS); }
       /** Return error message pertaining to last fit procesing */
-      inline std::string statusstr() const { 
-        return (std::string(gsl_strerror(_status)));
+      inline QString statusstr() const { 
+        return (QString(gsl_strerror(_status)));
       }
       /** Return error message given status condition */
-      inline std::string statusstr(int status) const { 
-        return (std::string(gsl_strerror(status)));
+      inline QString statusstr(int status) const { 
+        return (QString(gsl_strerror(status)));
       }
 
       /** Default interation test simply returns input status */
@@ -124,8 +126,8 @@ namespace Isis {
       inline int nIterations() const { return (_nIters); }
 
     protected:
-      void Terminate(const std::string &message = "");
-      void Abort(const std::string &reason = "");
+      void Terminate(const QString &message = "");
+      void Abort(const QString &reason = "");
 
       bool doContinue() const { return (!_userTerminated); }
 
@@ -137,7 +139,7 @@ namespace Isis {
       int         _maxIters;
       int         _status;
       bool        _userTerminated;
-      std::string _userMessage;
+      QString _userMessage;
 
       struct _nlsqPointer {
           NonLinearLSQ *nlsq;

@@ -282,12 +282,12 @@ namespace Isis
 
     for (int i = 0; *interruptFlag == 0 && i < fileNames.size(); i++)
     {
-      IString fileName = fileNames[i];
+      QString fileName = fileNames[i];
 
       Cube cube;
       cube.open(fileName);
 
-      newMap.insert(SerialNumber::Compose(fileName).c_str(), fileNames[i]);
+      newMap.insert(SerialNumber::Compose(fileName), fileNames[i]);
 
       composedCount->fetchAndAddRelaxed(1);
     }

@@ -1,4 +1,4 @@
-#if !defined(StandardDeviationOperator_h)
+#ifndef StandardDeviationOperator_h
 #define StandardDeviationOperator_h
 /**
  * @file

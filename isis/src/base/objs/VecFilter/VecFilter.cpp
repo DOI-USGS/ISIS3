@@ -132,7 +132,7 @@ namespace Isis {
    * @return vector<double>   - Resulting vector after highpass
    */
   vector<double> VecFilter::HighPass(vector<double> pdInVector1, vector<double> pdInVector2,
-                 vector<int> piValidPntsVector, int piMaxPoints, const IString & psMode)
+                 vector<int> piValidPntsVector, int piMaxPoints, const QString & psMode)
   {
     vector<double> dOutVector;
 

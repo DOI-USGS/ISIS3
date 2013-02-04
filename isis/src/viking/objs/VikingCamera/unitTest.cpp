@@ -69,9 +69,9 @@ int main(void) {
     // Test Shutter Open/Close 
     const PvlGroup &inst = p.FindGroup("Instrument", Pvl::Traverse);
     double exposureDuration = ((double) inst["ExposureDuration"])/1000; 
-    string stime = inst["StartTime"];
+    QString stime = inst["StartTime"];
     double et; // StartTime keyword is the center exposure time
-    str2et_c(stime.c_str(), &et);
+    str2et_c(stime.toAscii().data(), &et);
     pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);
     cout << "Shutter open = " << shuttertimes.first.Et() << endl;
     cout << "Shutter close = " << shuttertimes.second.Et() << endl << endl;

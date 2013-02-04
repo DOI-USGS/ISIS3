@@ -85,28 +85,28 @@ namespace Isis {
     try {
       // Mapping group is read by the parent (Projection)
       // Get the Azimuth Direction
-      if ((string) m_mappingGrp["AzimuthDirection"] == "Clockwise") {
+      if ((QString) m_mappingGrp["AzimuthDirection"] == "Clockwise") {
         m_azimuthDirection = Clockwise;
       }
-      else if ((string) m_mappingGrp["AzimuthDirection"] == "CounterClockwise") {
+      else if ((QString) m_mappingGrp["AzimuthDirection"] == "CounterClockwise") {
         m_azimuthDirection = CounterClockwise;
       }
       else {
-        IString msg = "Projection failed. Invalid value for keyword "
+        QString msg = "Projection failed. Invalid value for keyword "
                       "[AzimuthDirection] must be "
                       "[Clockwise or CounterClockwise]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
       // Get the AzimuthDomain
-      if ((string) m_mappingGrp["AzimuthDomain"] == "360") {
+      if ((QString) m_mappingGrp["AzimuthDomain"] == "360") {
         m_azimuthDomain = 360;
       }
-      else if ((string) m_mappingGrp["AzimuthDomain"] == "180") {
+      else if ((QString) m_mappingGrp["AzimuthDomain"] == "180") {
         m_azimuthDomain = 180;
       }
       else {
-        IString msg = "Projection failed. Invalid value for keyword "
+        QString msg = "Projection failed. Invalid value for keyword "
                       "[AzimuthDomain] must be [180 or 360]";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }

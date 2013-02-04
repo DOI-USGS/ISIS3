@@ -52,7 +52,7 @@ int main() {
   cout << "-----------------------------------" << endl;
   cout << "Test for missing PatternChip Group" << endl;
   cout << "-----------------------------------" << endl;
-  mg += Isis::PvlKeyword("Tolerance", 0.3);
+  mg += Isis::PvlKeyword("Tolerance", "0.3");
   Doit(obj);
   cout << endl;
 
@@ -74,8 +74,8 @@ int main() {
 
   obj.AddGroup(Isis::PvlGroup("PatternChip"));
   Isis::PvlGroup &pc = obj.FindGroup("PatternChip");
-  pc += Isis::PvlKeyword("Lines", 90);
-  pc += Isis::PvlKeyword("Samples", 90);
+  pc += Isis::PvlKeyword("Lines", "90");
+  pc += Isis::PvlKeyword("Samples", "90");
 
   cout << "-------------------------------" << endl;
   cout << "Test for missing Lines Keyword" << endl;
@@ -87,7 +87,7 @@ int main() {
   cout << "---------------------------------" << endl;
   cout << "Test for missing Samples Keyword" << endl;
   cout << "---------------------------------" << endl;
-  pc += Isis::PvlKeyword("Lines", 90);
+  pc += Isis::PvlKeyword("Lines", "90");
   pc.DeleteKeyword("Samples");
   Doit(obj);
   cout << endl;
@@ -95,30 +95,30 @@ int main() {
   cout << "---------------------------------" << endl;
   cout << "Test for invalid Lines Keyword" << endl;
   cout << "---------------------------------" << endl;
-  pc += Isis::PvlKeyword("Samples", 90);
-  pc["Lines"] = -90;
+  pc += Isis::PvlKeyword("Samples", "90");
+  pc["Lines"] = "-90";
   Doit(obj);
   cout << endl;
 
   cout << "---------------------------------" << endl;
   cout << "Test for invalid Samples Keyword" << endl;
   cout << "---------------------------------" << endl;
-  pc["Lines"] = 90;
-  pc["Samples"] = -90;
+  pc["Lines"] = "90";
+  pc["Samples"] = "-90";
   Doit(obj);
   cout << endl;
 
   cout << "----------------------------------" << endl;
   cout << "Test for missing SearchChip group" << endl;
   cout << "----------------------------------" << endl;
-  pc["Samples"] = 90;
+  pc["Samples"] = "90";
   Doit(obj);
   cout << endl;
 
   obj.AddGroup(Isis::PvlGroup("SearchChip"));
   Isis::PvlGroup &sc = obj.FindGroup("SearchChip");
-  sc += Isis::PvlKeyword("Lines", 150);
-  sc += Isis::PvlKeyword("Samples", 150);
+  sc += Isis::PvlKeyword("Lines", "150");
+  sc += Isis::PvlKeyword("Samples", "150");
 
   cout << "-------------------------------" << endl;
   cout << "Test for missing Lines Keyword" << endl;
@@ -130,12 +130,12 @@ int main() {
   cout << "---------------------------------" << endl;
   cout << "Test for missing Samples Keyword" << endl;
   cout << "---------------------------------" << endl;
-  sc += Isis::PvlKeyword("Lines", 150);
+  sc += Isis::PvlKeyword("Lines", "150");
   sc.DeleteKeyword("Samples");
   Doit(obj);
   cout << endl;
 
-  sc += Isis::PvlKeyword("Samples", 150);
+  sc += Isis::PvlKeyword("Samples", "150");
   Doit(obj);
   cout << endl;
 

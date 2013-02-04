@@ -100,7 +100,7 @@ namespace Isis {
       void setFiles(Cube *leftCube, Cube *rightCube);
       void clearFiles();
       void paintProfile(MdiCubeViewport *vp, QPainter *painter,
-                        std::string serialNumber);
+                        QString serialNumber);
       void calculateElevation(ControlPoint *point);
 
       void createMenus();
@@ -146,8 +146,8 @@ namespace Isis {
 
       Cube *m_leftCube;
       Cube *m_rightCube;
-      std::string m_leftSN;
-      std::string m_rightSN;
+      QString m_leftSN;
+      QString m_rightSN;
       UniversalGroundMap *m_leftGM;
       UniversalGroundMap *m_rightGM;
 

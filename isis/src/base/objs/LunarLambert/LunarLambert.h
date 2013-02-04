@@ -1,4 +1,4 @@
-#if !defined(LunarLambert_h)
+#ifndef LunarLambert_h
 #define LunarLambert_h
 /**
  * @file

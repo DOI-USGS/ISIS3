@@ -4,15 +4,17 @@
 #include "IException.h"
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
+
 int main(void) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
 //*****************************************************************************
 // Create Instances of the Tokenizer
 //*****************************************************************************
 
-  Isis::PvlTokenizer tizer;
+  PvlTokenizer tizer;
 
 //*****************************************************************************
 // Create a stream and load it
@@ -39,11 +41,11 @@ int main(void) {
   try {
     tizer.Load(os);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 
-  vector<Isis::PvlToken> t = tizer.GetTokenList();
+  vector<PvlToken> t = tizer.GetTokenList();
 
   cout << "TESTING TOKENIZER" << endl;
   int i, j;
@@ -58,7 +60,7 @@ int main(void) {
 
   cout << "TESTING TOKENIZER CLEAR" << endl;
   tizer.Clear();
-  vector<Isis::PvlToken> t2 = tizer.GetTokenList();
+  vector<PvlToken> t2 = tizer.GetTokenList();
   cout << t2.size() << endl << endl;
 
   stringstream os2;
@@ -67,7 +69,7 @@ int main(void) {
   try {
     tizer.Load(os2);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
@@ -78,7 +80,7 @@ int main(void) {
   try {
     tizer.Load(os3);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
@@ -89,7 +91,7 @@ int main(void) {
   try {
     tizer.Load(os4);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
@@ -100,7 +102,7 @@ int main(void) {
   try {
     tizer.Load(os5);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
@@ -111,7 +113,7 @@ int main(void) {
   try {
     tizer.Load(os6);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
@@ -122,7 +124,7 @@ int main(void) {
   try {
     tizer.Load(os7);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
@@ -133,7 +135,7 @@ int main(void) {
   try {
     tizer.Load(os8);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;

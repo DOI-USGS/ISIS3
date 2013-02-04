@@ -22,7 +22,7 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
+#include <QString>
 
 namespace Isis {
   /**
@@ -55,7 +55,7 @@ namespace Isis {
 
   class Progress {
     private:
-      std::string p_text;     /**< Text string to output at the initial call to
+      QString p_text;     /**< Text string to output at the initial call to
                                    CheckStatus (0% processed)*/
       int p_maximumSteps;     /**< Number of steps in your processing sequence.
                                    For example, if there are 20 lines in an cube.
@@ -78,11 +78,11 @@ namespace Isis {
       // destructor
       ~Progress();
 
-      // Change the text std::string
-      void SetText(const std::string &text);
+      // Change the text QString
+      void SetText(const QString &text);
 
       // Get the text string
-      std::string Text() const;
+      QString Text() const;
 
       // Change the maximum steps
       void SetMaximumSteps(const int steps);

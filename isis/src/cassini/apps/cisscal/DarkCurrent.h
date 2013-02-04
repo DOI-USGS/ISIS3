@@ -22,11 +22,9 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
+#include <QString>
 #include <vector>
 #include "FileName.h"
-
-using namespace std;
 
 namespace Isis {
   class CissLabels;
@@ -43,7 +41,7 @@ namespace Isis {
    * @internal
    *  @history 2008-11-05 Jeannie Walldren - Original Version
    *  @history 2009-01-26 Jeannie Walldren - Changed declarations of 2
-   *           dimensional vectors
+   *           dimensional std::vectors
    *  @history 2009-05-27 Jeannie Walldren - Added p_flightSoftware variable.
    *                         Updated ComputeLineTime() code with algorithm from
    *                         the new version of linetime.pro in idl cisscal 3.6.
@@ -57,7 +55,7 @@ namespace Isis {
       DarkCurrent(CissLabels &cissLab);
       ~DarkCurrent() {};  //!< Empty Destructor
 
-      vector <vector <double> > ComputeDarkDN();
+      std::vector <std::vector <double> > ComputeDarkDN();
       //! Retrieves the name of the bias distortion table
       FileName BiasDistortionTable() {
         return p_bdpath;
@@ -72,8 +70,8 @@ namespace Isis {
       double ComputeLineTime(int lline);
       void   FindDarkFiles();
       void   ComputeTimeArrays();
-      vector <vector <double> > MakeDarkArray();
-      vector <vector <double> > MakeManyLineDark(Brick &darkBrick);
+      std::vector <std::vector <double> > MakeDarkArray();
+      std::vector <std::vector <double> > MakeManyLineDark(Brick &darkBrick);
 
 
       int p_lines;            //!< Number of lines in the image.
@@ -84,21 +82,21 @@ namespace Isis {
       //LABEL VARIABLES
       int p_btsm;                   //!< Value dependent upon <b>PvlKeyword</b> DelayedReadoutFlag. Valid values are: "No"=0, "Yes"=1, "Unknown"=-1.  Called "botsim" or "btsm" in IDL code.
       double p_compRatio;           //!< Value of <b>PvlKeyword</b> CompressionRatio from the labels of the image.  Called "ratio" in IDL code.
-      string p_compType;            //!< Value of <b>PvlKeyword</b> CompressionType from the labels of the image.  Called "comp" in IDL code.
-      string p_dataConvType;        //!< Value of <b>PvlKeyword</b> DataConversionType from the labels of the image.  Called "conv" in IDL code.
+      QString p_compType;            //!< Value of <b>PvlKeyword</b> CompressionType from the labels of the image.  Called "comp" in IDL code.
+      QString p_dataConvType;        //!< Value of <b>PvlKeyword</b> DataConversionType from the labels of the image.  Called "conv" in IDL code.
       double p_expDur;              //!< Value of <b>PvlKeyword</b> ExposureDuration from the labels of the image.  Called "exposure" or "time" in IDL code.
-      IString p_flightSoftware;     //!< Value of <b>PvlKeyword</b> FlightSoftwareVersion from the labels of the image.  Called "fsw" in IDL code.
+      QString p_flightSoftware;     //!< Value of <b>PvlKeyword</b> FlightSoftwareVersion from the labels of the image.  Called "fsw" in IDL code.
       int p_gainMode;               //!< Value of <b>PvlKeyword</b> GainModeId from the labels of the image.
       double p_instDataRate;        //!< Value of <b>PvlKeyword</b> InstrumentDataRate from the labels of the image.
       bool p_narrow;                //!< Indicates whether the image is from a narrow-angle camera
       int p_readoutIndex;           //!< Value of <b>PvlKeyword</b> InstrumentDataRate from the labels of the image.  Called "rdind" or "roindex" in IDL code.
       int p_readoutOrder;           //!< Value of <b>PvlKeyword</b> ReadoutOrder from the labels of the image. Valid values are: NAC first = 0, WAC first = 1.  Called "roo" in IDL code.
-      IString p_sum;                //!< Summing mode, as found in the labels of the image.  This integer is created as an IString so that it may be added to a string.  Called "sum" in IDL code.
+      QString p_sum;                //!< Summing mode, as found in the labels of the image.  This integer is created as an QString so that it may be added to a QString.  Called "sum" in IDL code.
       int p_telemetryRate;          //!< Telemetry rate of the image in packets per second.  This is dependent on the range of the instrument data rate.  Called "cdsr" in IDL code.
 
-      vector <vector <double> > p_startTime;    //!< Array of start times for each pixel of the image.
-      vector <vector <double> > p_endTime;      //!< Array of end times for each pixel of the image.
-      vector <vector <double> > p_duration;     //!< Array of durations for each pixel of the image.
+      std::vector <std::vector <double> > p_startTime;    //!< Array of start times for each pixel of the image.
+      std::vector <std::vector <double> > p_endTime;      //!< Array of end times for each pixel of the image.
+      std::vector <std::vector <double> > p_duration;     //!< Array of durations for each pixel of the image.
   };
 };
 #endif

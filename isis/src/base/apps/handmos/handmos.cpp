@@ -30,14 +30,14 @@ void IsisMain() {
   bool bTrack = ui.GetBoolean("TRACK");
   p.SetTrackFlag(bTrack);
 
-  string inputFile = ui.GetAsString("FROM");
-  string mosaicFile = ui.GetFileName("MOSAIC");
+  QString inputFile = ui.GetAsString("FROM");
+  QString mosaicFile = ui.GetFileName("MOSAIC");
 
   // Set up the mosaic priority, either the input cube will be
   // placed ontop of the mosaic or beneath it
   ProcessMosaic::ImageOverlay overlay = ProcessMosaic::StringToOverlay(
       ui.GetString("PRIORITY"));
-  string sType;
+  QString sType;
 
   if (overlay == ProcessMosaic::UseBandPlacementCriteria) {
     if (ui.GetString("TYPE") == "BANDNUMBER") {

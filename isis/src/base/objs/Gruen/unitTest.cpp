@@ -17,18 +17,18 @@ int main() {
   try {
     PvlGroup alg("Algorithm");
     alg += PvlKeyword("Name", "Gruen");
-    alg += PvlKeyword("Tolerance", 100.0);
-    alg += PvlKeyword("AffineTranslationTolerance", 0.15);
-    alg += PvlKeyword("AffineScaleTolerance", 0.3);
-    alg += PvlKeyword("MaximumIterations", 30);
+    alg += PvlKeyword("Tolerance", toString(100.0));
+    alg += PvlKeyword("AffineTranslationTolerance", toString(0.15));
+    alg += PvlKeyword("AffineScaleTolerance", toString(0.3));
+    alg += PvlKeyword("MaximumIterations", toString(30));
 
     PvlGroup pchip("PatternChip");
-    pchip += PvlKeyword("Samples", 19);
-    pchip += PvlKeyword("Lines", 19);
+    pchip += PvlKeyword("Samples", toString(19));
+    pchip += PvlKeyword("Lines", toString(19));
 
     PvlGroup schip("SearchChip");
-    schip += PvlKeyword("Samples", 25);
-    schip += PvlKeyword("Lines", 25);
+    schip += PvlKeyword("Samples", toString(25));
+    schip += PvlKeyword("Lines", toString(25));
 
     PvlObject o("AutoRegistration");
     o.AddGroup(alg);

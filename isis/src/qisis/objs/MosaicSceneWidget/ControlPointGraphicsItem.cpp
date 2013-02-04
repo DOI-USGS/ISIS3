@@ -8,6 +8,7 @@
 #include <QMenu>
 #include <QMessageBox>
 
+#include "Constants.h"
 #include "ControlPoint.h"
 #include "FileName.h"
 #include "MosaicGraphicsView.h"
@@ -111,7 +112,7 @@ namespace Isis {
     QMenu menu;
 
     QAction *title = menu.addAction(
-        QString::fromStdString(m_controlPoint->GetId()));
+        m_controlPoint->GetId());
     title->setEnabled(false);
     menu.addSeparator();
 
@@ -209,9 +210,9 @@ namespace Isis {
 
   QString ControlPointGraphicsItem::makeToolTip(SerialNumberList *snList) {
     QString toolTip = "Point ID: " +
-        QString::fromStdString(m_controlPoint->GetId());
+        m_controlPoint->GetId();
     toolTip += "\nPoint Type: " +
-        QString::fromStdString(m_controlPoint->GetPointTypeString());
+        m_controlPoint->GetPointTypeString();
     toolTip += "\nNumber of Measures: ";
     toolTip += QString::number(m_controlPoint->GetNumMeasures());
     toolTip += "\nIgnored: ";
@@ -234,7 +235,7 @@ namespace Isis {
 
         if(snList->HasSerialNumber(serialNum)) {
           toolTip +=
-              FileName(snList->FileName(serialNum.toStdString())).name().ToQt();
+              FileName(snList->FileName(serialNum)).name();
           toolTip += " (" + serialNum + ")";
         }
         else {

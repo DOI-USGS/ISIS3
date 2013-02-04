@@ -25,9 +25,9 @@ static vector<double> normalizer;
 // function prototypes
 void getStats(Buffer &in);
 void normalize(Buffer &in, Buffer &out);
-void Tokenize(const string &str,
-              vector<string> & tokens,
-              const string &delimiters = " ");
+void Tokenize(const QString &str,
+              vector<QString> & tokens,
+              const QString &delimiters = " ");
 
 void IsisMain() {
   // We will be processing by line
@@ -38,7 +38,7 @@ void IsisMain() {
   Cube *icube = p.SetInputCube("FROM");
 
   // Now get the statistics for each band or the entire cube
-  string avg = ui.GetString("AVERAGE");
+  QString avg = ui.GetString("AVERAGE");
   p.StartProcess(getStats);
   if(avg == "BAND") {
     int b = 0;
@@ -59,13 +59,13 @@ void IsisMain() {
     TextFile pencil;
     pencil.Open(ui.GetFileName("SPECTRUM"));
     if(pencil.LineCount() - 1 < icube->getBandCount()) {
-      string msg = "The spectral pencil file [" + ui.GetAsString("SPECTRUM") +
-                   "] does not contain enough data for all bands.";
+      QString msg = "The spectral pencil file [" + ui.GetAsString("SPECTRUM") +
+                    "] does not contain enough data for all bands.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    string st;
+    QString st;
     int column = -1;
-    vector<string> tokens;
+    vector<QString> tokens;
     pencil.GetLine(st);     //Takes care of title line
     Tokenize(st, tokens, ", \"-+");
     if(ui.GetAsString("METHOD") == "number") {
@@ -80,8 +80,8 @@ void IsisMain() {
       }
     }
     if(column < 0  || (unsigned)column > tokens.size()) {
-      string msg = "The column specified in file [" + ui.GetFileName("SPECTRUM")
-                   + "] was not found.";
+      QString msg = "The column specified in file [" + ui.GetFileName("SPECTRUM")
+                    + "] was not found.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     // Add the correct column of data to normalizer
@@ -142,9 +142,12 @@ void normalize(Buffer &in, Buffer &out) {
 }
 
 // Tokenizer
-void Tokenize(const string &str,
-              vector<string> & tokens,
-              const string &delimiters) {
+void Tokenize(const QString &strQStr,
+              vector<QString> & tokens,
+              const QString &delimitersQStr) {
+  IString str = strQStr;
+  IString delimiters = delimitersQStr;
+
   //Skip delimiters at the beginning
   string::size_type lastPos = str.find_first_not_of(delimiters, 0);
   // Find first "non-delimiter".
@@ -152,7 +155,7 @@ void Tokenize(const string &str,
 
   while(string::npos != pos  ||  string::npos != lastPos) {
     // Found a token, add it to the vector
-    tokens.push_back(str.substr(lastPos, pos - lastPos));
+    tokens.push_back(str.substr(lastPos, pos - lastPos).c_str());
     // Skip delimiters
     lastPos = str.find_first_not_of(delimiters, pos);
     // Find next "non-delimiter"

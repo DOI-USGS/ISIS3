@@ -1,4 +1,4 @@
-#if !defined(MdisEdrKeys_h)
+#ifndef MdisEdrKeys_h
 #define MdisEdrKeys_h
 /**
  * @file
@@ -79,7 +79,7 @@ namespace Isis {
        *
        * @param edrfile  File containing the PDS EDR label
        */
-      MdisEdrKeys(const std::string &edrfile) {
+      MdisEdrKeys(const QString &edrfile) {
         _edrLabel = Pvl(edrfile);
         LoadKeys(_edrLabel, _keys);
       }
@@ -120,8 +120,8 @@ namespace Isis {
        * @param key PvlKeyword to add to the container
        * @param name  Optional name other than what the keyword is named
        */
-      void add(const PvlKeyword &key, const std::string &name = "") {
-        if(name.empty()) {
+      void add(const PvlKeyword &key, const QString &name = "") {
+        if(name.isEmpty()) {
           _keys.add(key.Name(), key);
         }
         else {
@@ -158,7 +158,7 @@ namespace Isis {
        *
        * @return PvlKeyword& Reference to named keyword
        */
-      PvlKeyword &get(const std::string &name) {
+      PvlKeyword &get(const QString &name) {
         return (_keys.get(name));
       }
 
@@ -173,7 +173,7 @@ namespace Isis {
        * @return const PvlKeyword& Returns a const reference to the named
        *         keyword
        */
-      const PvlKeyword &get(const std::string &name) const {
+      const PvlKeyword &get(const QString &name) const {
         return (_keys.get(name));
       }
 
@@ -203,18 +203,18 @@ namespace Isis {
        * @param keylist List of keywords to extract
        * @param NAstr String used to specify no value (used mainly so a unit
        *              qualifer is not added to the value)
-       * @return std::string Returns a comma delineated string of keyword values
+       * @return QString Returns a comma delineated string of keyword values
        */
-      std::string extract(const std::vector<std::string> &keylist,
-                          const std::string &NAstr, PvlGroup *group = 0) {
+      QString extract(const QStringList &keylist,
+                      const QString &NAstr, PvlGroup *group = 0) {
         std::ostringstream out;
 
-        std::string loopSep("");
+        QString loopSep("");
         int nbad(0);
         IException errors;
-        for(unsigned int i = 0 ; i < keylist.size() ; i++) {
-          IString keyname(keylist[i]);
-          keyname.Trim(" \n\t");
+        for(int i = 0 ; i < keylist.size() ; i++) {
+          QString keyname(keylist[i]);
+          keyname = keyname.trimmed();
           try {
             PvlKeyword &key = _keys.get(keyname);
             if(group) group->AddKeyword(key);
@@ -226,7 +226,7 @@ namespace Isis {
             }
             else {
               out << loopSep << "(";
-              std::string vsep("");
+              QString vsep("");
               for(int iv = 0 ; iv < key.Size() ; iv++) {
                 out << vsep << key[iv];
                 if(key[iv] != NAstr) {
@@ -240,24 +240,24 @@ namespace Isis {
           }
           catch(IException &ie) {
             nbad++;
-            std::string mess = "Keyword \"" + keyname + "\" does not exist!";
+            QString mess = "Keyword \"" + keyname + "\" does not exist!";
             errors.append(
-                IException(IException::User, mess.c_str(), _FILEINFO_));
+                IException(IException::User, mess, _FILEINFO_));
           }
         }
 
         // Check to see if all keywords are found
         if(nbad > 0) {
-          std::string mess = "One or more keywords in list do not exist!";
-          throw IException(errors, IException::User, mess.c_str(), _FILEINFO_);
+          QString mess = "One or more keywords in list do not exist!";
+          throw IException(errors, IException::User, mess, _FILEINFO_);
         }
 
-        return (out.str());
+        return (out.str().c_str());
       }
 
     private:
 //!< Define the keyword container for systematic processing
-      typedef CollectorMap<std::string, PvlKeyword, NoCaseStringCompare> KeyList;
+      typedef CollectorMap<IString, PvlKeyword, NoCaseStringCompare> KeyList;
       Pvl     _edrLabel;  //!< Label used to populate the container
       KeyList _keys;      //!<  The container
 
@@ -271,12 +271,12 @@ namespace Isis {
        * @param keys Container to receive the keywords
        */
       void MapKeys(PvlContainer &p, KeyList &keys,
-                   const std::string prefix = "") {
-        std::string prekey(prefix);
-        if(!prefix.empty()) prekey += "/";
+                   const QString prefix = "") {
+        QString prekey(prefix);
+        if(!prefix.isEmpty()) prekey += "/";
         PvlContainer::PvlKeywordIterator keyIter = p.Begin();
         for(; keyIter != p.End() ;  ++keyIter) {
-          std::string keyname = prefix + keyIter->Name();
+          QString keyname = prefix + keyIter->Name();
           PvlKeyword key = *keyIter;
           key.SetName(keyname);
           keys.add(keyname, key);
@@ -311,7 +311,7 @@ namespace Isis {
        * @param keys The container to add keywords to
        */
       void LoadKeys(PvlObject &obj, KeyList &keys,
-                    const std::string prefix = "") {
+                    const QString prefix = "") {
         MapKeys(obj, keys, prefix);   // Load object level keywords
         LoadGroups(obj, keys);  // Load all groups in this object
 
@@ -319,10 +319,10 @@ namespace Isis {
         //  all SUBFRAME[12345]_PARAMETERS since they are unsupported.
         PvlObject::PvlObjectIterator objIter = obj.BeginObject();
         for(; objIter != obj.EndObject() ; ++objIter) {
-          IString objname(objIter->Name());
-          objname.UpCase();
-          std::string::size_type gotSubframe = objname.find("SUBFRAME");
-          if(gotSubframe != std::string::npos) {
+          QString objname(objIter->Name());
+          objname = objname.toUpper();
+          int gotSubframe = objname.indexOf("SUBFRAME");
+          if(gotSubframe != -1) {
             LoadKeys(*objIter, keys, objIter->Name());
           }
           else {
@@ -339,10 +339,10 @@ namespace Isis {
        * @param unit value of unit.  If empty returns empty string otherwise
        *             places "<" and ">" on the ends.
        *
-       * @return std::string  The formatted unit
+       * @return QString  The formatted unit
        */
-      std::string formatUnit(const std::string &unit) const {
-        if(!unit.empty()) {
+      QString formatUnit(const QString &unit) const {
+        if(!unit.isEmpty()) {
           return (" <" + unit + ">");
         }
         return (unit);

@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
   std::cout << "CubeCalculator unit test" << std::endl;
   std::cout << "------------------------" << std::endl << std::endl;
 
-  std::string postfix = "sample line + -- band *";
+  QString postfix = "sample line + -- band *";
   QVector<Isis::Cube *> iCubes;
   iCubes.push_back(icube);
   c.prepareCalculations(postfix, iCubes, icube);

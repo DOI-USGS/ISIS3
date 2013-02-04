@@ -4,7 +4,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
-#include <string>
+#include <QString>
 #include <set>
 #include <vector>
 
@@ -35,7 +35,7 @@ const int NL(NLP);
 // Linear Fit params designed to fit the parameter for data type gsl_function
 // of the Gnu Scientific Library
 struct linearFitParams {
-  string empirical;
+  QString empirical;
   double **hapke_img;
   PhotoModel *pmodel;
   double phase;
@@ -66,11 +66,11 @@ void IsisMain() {
   }
 
   // Get Hapke function and parameters
-  IString sHapkeFunc = ui.GetAsString("PHTNAME");
-  sHapkeFunc = sHapkeFunc.UpCase();
+  QString sHapkeFunc = ui.GetAsString("PHTNAME");
+  sHapkeFunc = sHapkeFunc.toUpper();
 
   // Should contains parameter names matching GUI to be included in the Pvl defFile
-  vector<string> inclusion;
+  vector<QString> inclusion;
   inclusion.push_back("PHTNAME");
   inclusion.push_back("WH");
   inclusion.push_back("HH");
@@ -86,7 +86,7 @@ void IsisMain() {
     inclusion.push_back("CH");
   }
   else {
-    string sErrMsg = "Invalid Hapke Function\n";
+    QString sErrMsg = "Invalid Hapke Function\n";
     throw IException(IException::User, sErrMsg, _FILEINFO_);
   }
 
@@ -100,8 +100,8 @@ void IsisMain() {
   PhotoModel *hapkeModel = PhotoModelFactory::Create(hapkePvl);
 
   // Type of photometric function to fit (lunar-lambert, Minnaert) to the Hapke Model
-  IString sEmpirical = ui.GetAsString("MODEL");
-  sEmpirical = sEmpirical.UpCase();
+  QString sEmpirical = ui.GetAsString("MODEL");
+  sEmpirical = sEmpirical.toUpper();
 
   PvlKeyword limbValue;
   if (sEmpirical == "MINNAERT") {
@@ -109,7 +109,7 @@ void IsisMain() {
   } else if (sEmpirical == "LUNARLAMBERT") {
     limbValue.SetName("LList");
   } else {
-    string sErrMsg = "Invalid Photometric Model\n";
+    QString sErrMsg = "Invalid Photometric Model\n";
     throw IException(IException::User, sErrMsg, _FILEINFO_);
   }
 
@@ -122,8 +122,8 @@ void IsisMain() {
 
   // Order of approximation in atmospheric scatter model
   bool doAsm = false;
-  IString sAsmType = ui.GetAsString("ATMNAME");
-  sAsmType = sAsmType.UpCase();
+  QString sAsmType = ui.GetAsString("ATMNAME");
+  sAsmType = sAsmType.toUpper();
   if (sAsmType != "NONE") {
     doAsm = true;
   }
@@ -247,21 +247,21 @@ void IsisMain() {
     if (!iord) {
       // Fit with no additive offset:  output multiplier normalized to
       // zero phase, which is the desired phase curve B, and unnormalized
-      phaseAngle.AddValue(lFitParams.phase);
-      limbValue.AddValue(rmsmin);
-      phaseCurve.AddValue(c1/c1_0);
+      phaseAngle.AddValue(toString(lFitParams.phase));
+      limbValue.AddValue(toString(rmsmin));
+      phaseCurve.AddValue(toString(c1/c1_0));
     }
     else {
       // Fit with additive offset:  normalizing would make no sense, just
       // output additive offset and multiplier from fit
-      phaseAngle.AddValue(lFitParams.phase);
-      limbValue.AddValue(rmsmin);
-      phaseCurve.AddValue(c1);
+      phaseAngle.AddValue(toString(lFitParams.phase));
+      limbValue.AddValue(toString(rmsmin));
+      phaseCurve.AddValue(toString(c1));
     }
   }
 
   if (ui.WasEntered("TO")) {
-    string sOutfile = ui.GetFileName("TO");
+    QString sOutfile = ui.GetFileName("TO");
     Pvl mainPvl;
     PvlObject photoObj("PhotometricModel");
     PvlGroup photoGrp("Algorithm");
@@ -347,7 +347,7 @@ double LinearFitPhotometricToHapkeGlobal(double pPar, void* pParams){
   double lfit_pho_global; // Output: RMS error of fit
 
   struct linearFitParams * lFitParams = (struct linearFitParams *)pParams;
-  const string pEmpirical = lFitParams->empirical;
+  const QString pEmpirical = lFitParams->empirical;
   double ** hapke_img     = lFitParams->hapke_img;
   const bool iord         = lFitParams->iord;
   PhotoModel *pmodel      = lFitParams->pmodel;

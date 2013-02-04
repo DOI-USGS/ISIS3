@@ -1,4 +1,4 @@
-#if !defined(SessionLog_h)
+#ifndef SessionLog_h
 #define SessionLog_h
 /**
  * @file
@@ -67,8 +67,8 @@ namespace Isis {
 
       bool p_termOutput;
       bool p_fileOutput;
-      std::string p_outputFile;
-      std::string p_access;
+      QString p_outputFile;
+      QString p_access;
 
       static SessionLog *p_log;
 

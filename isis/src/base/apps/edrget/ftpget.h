@@ -18,7 +18,7 @@ namespace Isis {
     public:
       FtpGet(QObject *parent = 0);
 
-      bool getFile(const QUrl &url, std::string topath);
+      bool getFile(const QUrl &url, QString topath);
 
       bool error() const {
         return p_error;

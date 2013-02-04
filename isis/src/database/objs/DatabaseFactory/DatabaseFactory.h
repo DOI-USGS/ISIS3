@@ -1,4 +1,4 @@
-#if !defined(DatabaseFactory_h)
+#ifndef DatabaseFactory_h
 #define DatabaseFactory_h
 /**
  * @file
@@ -250,7 +250,7 @@ namespace Isis {
    *
    * @internal
    *   @history 2007-06-05 Brendan George - Modified to work with
-   *                           IString/StringTools merge
+   *                           QString/StringTools merge
    *   @history 2009-11-27 Kris Becker - Made argc parameter for
    *                           QCoreApplication so persistence of the parameter
    *                           is preserve as required for Qt.
@@ -269,7 +269,7 @@ namespace Isis {
        *
        * @param name Name of the default database
        */
-      void setDefault(const std::string &name) {
+      void setDefault(const QString &name) {
         _defDatabase = name;
       }
 
@@ -280,16 +280,16 @@ namespace Isis {
        * call to the create method is attempted without a name, this is the one
        * used to return an instance of database.
        *
-       * @return std::string  Name of default database
+       * @return QString  Name of default database
        */
-      std::string getDefault() const {
+      QString getDefault() const {
         return (_defDatabase);
       }
 
-      bool addAccessProfile(const std::string &profileFile);
+      bool addAccessProfile(const QString &profileFile);
       void addProfile(const DbProfile &profile);
-      std::vector<std::string> getProfileList() const;
-      DbProfile getProfile(const std::string &name = "") const;
+      std::vector<QString> getProfileList() const;
+      DbProfile getProfile(const QString &name = "") const;
 
       /**
        * @brief Returns the name of the default profile
@@ -298,9 +298,9 @@ namespace Isis {
        * name of the default profile.  If none are loaded, an empty string is
        * returned.
        *
-       * @return std::string  Name of default profile, empty if undetermined
+       * @return QString  Name of default profile, empty if undetermined
        */
-      std::string getDefaultProfileName() const {
+      QString getDefaultProfileName() const {
         return (_defProfName);
       }
 
@@ -315,23 +315,23 @@ namespace Isis {
        *
        * @return bool True if it named profile exists, false otherwise
        */
-      bool setDefaultProfileName(const std::string &name) {
+      bool setDefaultProfileName(const QString &name) {
         _defProfName = name;
         return (_profiles.exists(name));
       }
 
-      std::vector<std::string> available() const;
-      bool isDriverAvailable(const std::string &driver) const;
-      bool isAvailable(const std::string &dbname = "") const;
-      bool isConnected(const std::string &dbname) const;
-      bool isPersistant(const std::string &name) const;
+      std::vector<QString> available() const;
+      bool isDriverAvailable(const QString &driver) const;
+      bool isAvailable(const QString &dbname = "") const;
+      bool isConnected(const QString &dbname) const;
+      bool isPersistant(const QString &name) const;
 
-      QSqlDatabase create(const std::string &driver, const std::string &dbname);
-      QSqlDatabase create(const std::string &name);
-      void add(const QSqlDatabase &db, const std::string &name,
+      QSqlDatabase create(const QString &driver, const QString &dbname);
+      QSqlDatabase create(const QString &name);
+      void add(const QSqlDatabase &db, const QString &name,
                bool setAsDefault = false);
-      void remove(const std::string &dbname);
-      void destroy(const std::string &dbname);
+      void remove(const QString &dbname);
+      void destroy(const QString &dbname);
 
     private:
       //  Gain access through Singleton interface
@@ -343,15 +343,15 @@ namespace Isis {
       static DatabaseFactory *_factory;  //!< Pointer to self (singleton)
 
       /** Define list of drivers and/or databases   */
-      typedef CollectorMap<std::string, std::string, NoCaseStringCompare> Drivers;
+      typedef CollectorMap<IString, QString, NoCaseStringCompare> Drivers;
       /** Define list of Profiles */
-      typedef CollectorMap<std::string, DbProfile, NoCaseStringCompare> Profiles;
+      typedef CollectorMap<IString, DbProfile, NoCaseStringCompare> Profiles;
       /** Define active database maintainer */
-      typedef CollectorMap<std::string, QSqlDatabase, NoCaseStringCompare> Databases;
+      typedef CollectorMap<IString, QSqlDatabase, NoCaseStringCompare> Databases;
 
-      std::string _defProfName;         //!<  Default profile name
+      QString _defProfName;         //!<  Default profile name
       Profiles    _profiles;            //!<  Maintain list of profiles
-      std::string _defDatabase;         //!<  Name of default database
+      QString _defDatabase;         //!<  Name of default database
       Databases   _dbList;              //!<  Maintains active databases
 
       void init();

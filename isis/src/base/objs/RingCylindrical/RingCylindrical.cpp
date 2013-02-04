@@ -62,7 +62,7 @@ namespace Isis {
       // Compute the default value if allowed and needed
       if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
         double az = (m_minimumAzimuth + m_maximumAzimuth) / 2.0;
-        mapGroup += PvlKeyword("CenterAzimuth", az);
+        mapGroup += PvlKeyword("CenterAzimuth", toString(az));
       }
 
       // Get the center azimuth, convert to radians, adjust for azimuth
@@ -103,7 +103,7 @@ namespace Isis {
    *
    * @return string Name of projection, "RingCylindrical"
    */
-  string RingCylindrical::Name() const {
+  QString RingCylindrical::Name() const {
     return "RingCylindrical";
   }
 
@@ -112,7 +112,7 @@ namespace Isis {
    *
    * @return std::string Version number
    */
-  string RingCylindrical::Version() const {
+  QString RingCylindrical::Version() const {
     return "1.0";
   }
 

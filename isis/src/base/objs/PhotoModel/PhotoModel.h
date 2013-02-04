@@ -58,7 +58,7 @@ namespace Isis {
       virtual ~PhotoModel() {};
 
       //! Return algorithm name found in Pvl file from constructor
-      inline std::string AlgorithmName() const {
+      inline QString AlgorithmName() const {
         return p_photoAlgorithmName;
       };
 
@@ -200,7 +200,7 @@ namespace Isis {
       double p_photoTant;
       double p_photoSr;
       double p_photoOsr;
-      IString p_algName;
+      QString p_algName;
       std::string p_photo0B0Standard;
       double p_photoWh;
       double p_photoHh;
@@ -220,7 +220,7 @@ namespace Isis {
 
     private:
       //! Unique name of the photometric model
-      std::string p_photoAlgorithmName;
+      QString p_photoAlgorithmName;
       //! Indicates whether standard conditions are used
       bool p_standardConditions;
   };

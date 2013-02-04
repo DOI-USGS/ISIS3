@@ -56,10 +56,10 @@ namespace Isis {
         list.clear();
         if(bandBin[i].Size() == p_bands) {
           for(int j = 0; j < bandBin[i].Size(); j++) {
-            list.push_back(QString(bandBin[i][j].c_str()));
+            list.push_back(QString(bandBin[i][j]));
           }
-          std::string bandBinName = bandBin[i].Name();
-          p_map[bandBinName.c_str()] = list;
+          QString bandBinName = bandBin[i].Name();
+          p_map[bandBinName] = list;
         }
       }
     }

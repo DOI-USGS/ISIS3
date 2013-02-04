@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
   cout << "Adding a couple profiles..." << endl;
   df->addProfile(p1);
   df->addProfile(p2);
-  vector<string> strings = df->getProfileList();
+  vector<QString> strings = df->getProfileList();
   /*  Removed to keep from having to change truth data every install.
    *  Added specific checks below for databases we care about.
     for(int i = 0; i < (int)strings.size(); i++) {
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
   cout << df->setDefaultProfileName("default name") << endl;
   cout << "Default profile name: " << df->getDefaultProfileName() << endl;
 
-  vector<string> available = df->available();
+  vector<QString> available = df->available();
   cout << "Driver available [doesntexist]: " << df->isDriverAvailable("doesntexist") << endl;
   cout << "Driver available [mysql]: " << df->isDriverAvailable("mysql") << endl;
   cout << "Driver available [postgresql]: " << df->isDriverAvailable("postgresql") << endl;

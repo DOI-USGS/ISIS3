@@ -51,8 +51,8 @@ void IsisMain() {
     p.StartProcess(bandstop);
   }
   else {
-    string msg = "Unknow value for TYPE [" +
-                 ui.GetString("TYPE") + "]";
+    QString msg = "Unknow value for TYPE [" +
+                  ui.GetString("TYPE") + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 

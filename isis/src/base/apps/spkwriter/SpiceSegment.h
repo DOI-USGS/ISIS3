@@ -1,4 +1,4 @@
-#if !defined(SpiceSegment_h)
+#ifndef SpiceSegment_h
 #define SpiceSegment_h
 /**                                                                       
  * @file                                                                  
@@ -73,24 +73,24 @@ class SpiceSegment {
     virtual int size() const = 0;
 
     /** Return name of cube file associated with segment */
-    std::string Source() const { return (_fname);     }
+    QString Source() const { return (_fname);     }
 
     /** Returns the name of the segment, typically the ProductId */
-    std::string Id() const { return (_name); }
-    void setId(const std::string &id);
+    QString Id() const { return (_name); }
+    void setId(const QString &id);
 
     /** Return name of instrument */
-    std::string Instrument() const { return (_instId); }
+    QString Instrument() const { return (_instId); }
     /** Return name of target */
-    std::string target() const { return (_target); }
+    QString target() const { return (_target); }
 
     /** Start time of segment in ET */
     double startTime() const { return (_startTime); }
     /** End time of segment in ET */
     double endTime() const { return (_endTime); }
 
-    std::string utcStartTime() const { return (_utcStartTime);  }
-    std::string utcEndTime() const { return (_utcEndTime);  }
+    QString utcStartTime() const { return (_utcStartTime);  }
+    QString utcEndTime() const { return (_utcEndTime);  }
 
     inline bool operator<(const SpiceSegment &segment) const {
       return (startTime() < segment.startTime());
@@ -99,16 +99,16 @@ class SpiceSegment {
     virtual bool HasVelocityVectors() const { return (false);  }
 
     // Elements for writing NAIF SPICE kernels
-    int LoadKernelType(const std::string &ktypes) const;
-    int UnloadKernelType(const std::string &ktypes = "") const;
+    int LoadKernelType(const QString &ktypes) const;
+    int UnloadKernelType(const QString &ktypes = "") const;
     int CameraVersion() const { return (_kernels.CameraVersion()); }
 
     /** Returns a comment summarizing the segment */
-    virtual std::string getComment() const = 0;
+    virtual QString getComment() const = 0;
 
   protected:
     void init(Cube &cube); 
-    std::string getKeyValue(PvlObject &label, const std::string &keyword);
+    QString getKeyValue(PvlObject &label, const QString &keyword);
     const Kernels &getKernels() const { return (_kernels); }
     bool getImageTimes(Pvl &lab, double &start, double &end) const;
     SMatrix expand(int ntop, int nbot, const SMatrix &matrix) const;
@@ -117,20 +117,20 @@ class SpiceSegment {
     void setStartTime(double et);
     void setEndTime(double et);
      
-    std::string getNaifName(int naifid) const;
-    std::string toUTC(const double &et) const;
-    double UTCtoET(const std::string &utc) const;
+    QString getNaifName(int naifid) const;
+    QString toUTC(const double &et) const;
+    double UTCtoET(const QString &utc) const;
 
   private:
-    std::string _name;
-    std::string _fname;
-    std::string _instId;
-    std::string _target;
+    QString _name;
+    QString _fname;
+    QString _instId;
+    QString _target;
     
     double      _startTime;
     double      _endTime;
-    std::string _utcStartTime; //  Need to store these as conversion from ET
-    std::string _utcEndTime;   //  requires leap seconds kernel 
+    QString _utcStartTime; //  Need to store these as conversion from ET
+    QString _utcEndTime;   //  requires leap seconds kernel 
 
     mutable Kernels _kernels;  // Kernel manager
     void init();

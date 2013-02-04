@@ -85,8 +85,8 @@ namespace Isis {
     // However, Isis supports overriding this with a setting in IsisPreferences.
     // Here we check to see if this has been done and force the style if needed.
     if(uiPref.HasKeyword("GuiStyle")) {
-      std::string style = uiPref["GuiStyle"];
-      QApplication::setStyle((IString)style);
+      QString style = uiPref["GuiStyle"];
+      QApplication::setStyle(style);
     }
 
     // Create the main window
@@ -271,7 +271,7 @@ namespace Isis {
   // Create the "Begin/Start Processing" action
   QAction *Gui::CreateProcessAction() {
     QAction *processAction = new QAction(this);
-    QString baseDir = (IString)FileName("$BASE/icons").expanded();
+    QString baseDir = FileName("$BASE/icons").expanded();
     processAction->setIcon(QPixmap(baseDir + "/guiRun.png"));
     processAction->setText("&Run");
     processAction->setToolTip("Run");
@@ -307,10 +307,7 @@ namespace Isis {
       GuiParameter &param = *(p_parameters[p]);
       ui.Clear(param.Name());
       if(param.IsEnabled() && param.IsModified()) {
-        Isis::IString value = param.Value();
-        value.ConvertWhiteSpace();
-        value.Compress();
-        value.Trim(" ");
+        QString value = param.Value().simplified().trimmed();
         if(value.length() > 0) {
           ui.PutAsString(param.Name(), value);
         }
@@ -356,7 +353,7 @@ namespace Isis {
   // Create the "Exit" action
   QAction *Gui::CreateExitAction() {
     QAction *exitAction = new QAction(this);
-    QString baseDir = (IString)FileName("$BASE/icons").expanded();
+    QString baseDir = FileName("$BASE/icons").expanded();
     exitAction->setIcon(QPixmap(baseDir + "/guiExit.png"));
     exitAction->setText("&Exit");
     exitAction->setToolTip("Exit");
@@ -371,7 +368,7 @@ namespace Isis {
   // Create the "Reset" action
   QAction *Gui::CreateResetAction() {
     QAction *resetAction = new QAction(this);
-    QString baseDir = (IString)FileName("$BASE/icons").expanded();
+    QString baseDir = FileName("$BASE/icons").expanded();
     resetAction->setIcon(QPixmap(baseDir + "/guiReset.png"));
     resetAction->setText("&Reset");
     resetAction->setToolTip("Reset parameters");
@@ -388,7 +385,7 @@ namespace Isis {
   // Create the "Stop" action
   QAction *Gui::CreateStopAction() {
     QAction *stopAction = new QAction(this);
-    QString baseDir = (IString)FileName("$BASE/icons").expanded();
+    QString baseDir = FileName("$BASE/icons").expanded();
     stopAction->setIcon(QPixmap(baseDir + "/guiStop.png"));
     stopAction->setText("&Stop");
     stopAction->setToolTip("Stop");
@@ -405,7 +402,7 @@ namespace Isis {
   // Create the "SaveLog" action
   QAction *Gui::CreateSaveLogAction() {
     QAction *saveLogAction = new QAction(this);
-    QString baseDir = (IString)FileName("$BASE/icons").expanded();
+    QString baseDir = FileName("$BASE/icons").expanded();
     saveLogAction->setIcon(QPixmap(baseDir + "/guiSaveLog.png"));
     saveLogAction->setText("&Save Log...");
     saveLogAction->setToolTip("Save log");
@@ -421,7 +418,7 @@ namespace Isis {
   // Create the "ClearLog" action
   QAction *Gui::CreateClearLogAction() {
     QAction *clearlogAction = new QAction(this);
-    QString baseDir = (IString)FileName("$BASE/icons").expanded();
+    QString baseDir = FileName("$BASE/icons").expanded();
     clearlogAction->setIcon(QPixmap(baseDir + "/guiClearLog.png"));
     clearlogAction->setText("&Clear Log");
     clearlogAction->setToolTip("Clear log");
@@ -438,7 +435,7 @@ namespace Isis {
   // Create the "Previous History" action
   QAction *Gui::CreatePreviousHistoryAction() {
     QAction *previousHistoryAction = new QAction(this);
-    QString baseDir = (IString)FileName("$BASE/icons").expanded();
+    QString baseDir = FileName("$BASE/icons").expanded();
     previousHistoryAction->setIcon(QPixmap(baseDir + "/guiPrevHistory.png"));
     previousHistoryAction->setText("&Previous");
     previousHistoryAction->setToolTip("Previous parameters");
@@ -455,7 +452,7 @@ namespace Isis {
   // Create the "Next History" action
   QAction *Gui::CreateNextHistoryAction() {
     QAction *nextHistoryAction = new QAction(this);
-    QString baseDir = (IString)FileName("$BASE/icons").expanded();
+    QString baseDir = FileName("$BASE/icons").expanded();
     nextHistoryAction->setIcon(QPixmap(baseDir + "/guiNextHistory.png"));
     nextHistoryAction->setText("&Next");
     nextHistoryAction->setToolTip("Next parameters");
@@ -472,7 +469,7 @@ namespace Isis {
   // Create the Whats Action action
   QAction *Gui::CreateWhatsThisAction() {
     QAction *action = new QAction(this);
-    QString baseDir = (IString)FileName("$BASE/icons").expanded();
+    QString baseDir = FileName("$BASE/icons").expanded();
     action->setIcon(QPixmap(baseDir + "/contexthelp.png"));
     action->setText("&What's This");
     action->setToolTip("What's This");
@@ -492,7 +489,7 @@ namespace Isis {
     QGridLayout *gridLayout = NULL;
     if(!p_grids.contains(ui.GroupName(group))) {
       // Create a new groupbox and add it to the scroll layout
-      QGroupBox *groupBox = new QGroupBox((IString)ui.GroupName(group));
+      QGroupBox *groupBox = new QGroupBox(ui.GroupName(group));
       p_scrollLayout->addWidget(groupBox);
       groupBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
       groupBox->setAlignment(Qt::AlignHCenter);
@@ -523,8 +520,8 @@ namespace Isis {
   }
 
   //! Change progress text
-  void Gui::ProgressText(const std::string &text) {
-    p_statusText->setText((IString)text);
+  void Gui::ProgressText(const QString &text) {
+    p_statusText->setText(text);
     qApp->processEvents();  // Needed when programs run programs
   }
 
@@ -544,33 +541,30 @@ namespace Isis {
   }
 
   //! Add more information to the error message
-  void Gui::LoadMessage(const std::string &message) {
+  void Gui::LoadMessage(const QString &message) {
     // Convert newlines to breaks
-    std::string m = message;
-    while(m.find("\n") != std::string::npos) {
-      m.replace(m.find("\n"), 1, "<br>");
-    }
+    QString m = QString(message).replace("\n", "<br>");
 
     // If there is a set of "[]" change everything between them to red text
-    if((message.find("[") >= 0) &&
-        (message.rfind("]") < message.size()) &&
-        (message.find("[") < message.rfind("]"))) {
+    if(message.contains("[") &&
+       message.contains("]") &&
+       (message.indexOf("[") < message.indexOf("]"))) {
 
       int indx = 0;
-      while(m.find("[", indx) != std::string::npos) {
-        m.insert(m.find("[", indx) + 1, "<font color=#ff0000>");
-        m.insert(m.find("]", indx), "</font>");
-        indx = m.find("]", indx) + 1;
+      while(m.indexOf("[", indx) != -1) {
+        m.insert(m.indexOf("[", indx) + 1, "<font color=#ff0000>");
+        m.insert(m.indexOf("]", indx), "</font>");
+        indx = m.indexOf("]", indx) + 1;
       }
     }
-    p_errorString += (QString)(IString)m;
+    p_errorString += m;
   }
 
   //! Show an error message and return if the user wants to continue/abort
   int Gui::ShowWarning() {
     Isis::UserInterface &ui = Isis::iApp->GetUserInterface();
     int status = QMessageBox::warning(this,
-                                      (IString)ui.ProgramName(),
+                                      ui.ProgramName(),
                                       p_errorString,
                                       "Ok", "Abort", "", 0, 1);
     p_errorString.clear();
@@ -578,9 +572,8 @@ namespace Isis {
   }
 
   //! Write text to the gui log
-  void Gui::Log(const std::string &text) {
-    QString s = (IString)text;
-    p_log->Write(s);
+  void Gui::Log(const QString &text) {
+    p_log->Write(text);
   }
 
   //! Reset the Progress bar when the user moves the mouse onto the toolbar
@@ -600,7 +593,7 @@ namespace Isis {
 
     Isis::UserInterface &ui = Application::GetUserInterface();
     switch(QMessageBox::information(this,
-                                    (IString)ui.ProgramName(),
+                                    ui.ProgramName(),
                                     QString("Program suspended, choose to ") +
                                     QString("continue processing, stop ") +
                                     QString("processing or exit the program"),
@@ -689,7 +682,7 @@ namespace Isis {
     }
     catch(...) {
       p_historyEntry =  -1;
-      std::string msg = "A corrupt parameter history file [" + progHist.expanded() +
+      QString msg = "A corrupt parameter history file [" + progHist.expanded() +
                         "] has been detected. Please fix or remove this file";
       LoadMessage(msg);
       if(ShowWarning()) exit(0);
@@ -713,8 +706,8 @@ namespace Isis {
     try {
       Isis::PvlGroup &up = hist.Group(useEntry);
       for(int k = 0; k < up.Keywords(); k++) {
-        std::string key = up[k].Name();
-        std::string val = up[k];
+        QString key = up[k].Name();
+        QString val = up[k];
         ui.Clear(key);
         ui.PutAsString(key, val);
       }
@@ -745,7 +738,7 @@ namespace Isis {
     // Now disable things
     for(unsigned int p = 0; p < p_parameters.size(); p++) {
       GuiParameter &param = *(p_parameters[p]);
-      std::vector<std::string> excludeList = param.Exclusions();
+      std::vector<QString> excludeList = param.Exclusions();
       for(int i = 0; i < (int)excludeList.size(); i++) {
         for(unsigned int e = 0; e < p_parameters.size(); e++) {
           GuiParameter &exclude = *(p_parameters[e]);
@@ -758,18 +751,17 @@ namespace Isis {
 
   //! Update the command line toolbar
   void Gui::UpdateCommandLine() {
-    std::string cline = Isis::Application::GetUserInterface().ProgramName();
+    QString cline = Isis::Application::GetUserInterface().ProgramName();
     for(int p = 0; p < (int)p_parameters.size(); p++) {
       GuiParameter &param = *(p_parameters[p]);
       if(param.IsEnabled() && param.IsModified()) {
         cline += " ";
-        IString name = param.Name();
-        name.DownCase();
+        QString name = param.Name().toLower();
         cline += name;
         cline += "=";
-        IString value = param.Value();
+        QString value = param.Value();
         if(param.Type() == GuiParameter::StringWidget) {
-          if(value.find(" ") != std::string::npos) {
+          if(value.contains(" ")) {
             cline += "\"" + value + "\"";
           }
           else {
@@ -781,12 +773,12 @@ namespace Isis {
           cline += value;
         }
         else {
-          value.DownCase();
+          value = value.toLower();
           cline += value;
         }
       }
     }
-    p_commandLineEdit->setText(cline.c_str());
+    p_commandLineEdit->setText(cline);
   }
 
   //! Update Parameters
@@ -805,14 +797,14 @@ namespace Isis {
   // Show help for Isis
   void Gui::AboutIsis() {
     Isis::PvlGroup &uig = Isis::Preference::Preferences().FindGroup("UserInterface");
-    std::string command = (std::string) uig["GuiHelpBrowser"] +
+    QString command = (QString) uig["GuiHelpBrowser"] +
                           " http://isis.astrogeology.usgs.gov >> /dev/null &";
     ProgramLauncher::RunSystemCommand(command);
   }
 
   // Show help for the current app
   void Gui::AboutProgram() {
-    Isis::FileName file((std::string)
+    Isis::FileName file((QString)
                         "$ISISROOT/doc/Application/presentation/PrinterFriendly/" +
                         Isis::Application::GetUserInterface().ProgramName() +
                         "/" +
@@ -820,8 +812,8 @@ namespace Isis {
                         ".html");
 
     Isis::PvlGroup &uig = Isis::Preference::Preferences().FindGroup("UserInterface");
-    std::string command = (std::string) uig["GuiHelpBrowser"] +
-                          (std::string)" file:" + file.expanded() + " &";
+    QString command = (QString) uig["GuiHelpBrowser"] +
+                          (QString)" file:" + file.expanded() + " &";
     ProgramLauncher::RunSystemCommand(command);
   }
 
@@ -836,10 +828,7 @@ namespace Isis {
         GuiParameter &param = *(p_parameters[p]);
         ui.Clear(param.Name());
         if(param.IsEnabled() && param.IsModified()) {
-          Isis::IString value = param.Value();
-          value.ConvertWhiteSpace();
-          value.Compress();
-          value.Trim(" ");
+          QString value = param.Value().simplified().trimmed();
           if(value.length() > 0) {
             ui.PutAsString(param.Name(), value);
           }
@@ -847,7 +836,7 @@ namespace Isis {
       }
 
       // Get the helper function and run
-      void *ptr = Isis::iApp->GetGuiHelper(funct.toStdString());
+      void *ptr = Isis::iApp->GetGuiHelper(funct);
       void (*helper)();
       helper = (void ( *)())ptr;
       helper();

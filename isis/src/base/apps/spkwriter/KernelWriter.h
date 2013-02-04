@@ -1,4 +1,4 @@
-#if !defined(KernelWriter_h)
+#ifndef KernelWriter_h
 #define KernelWriter_h
 /**
  * @file
@@ -50,13 +50,13 @@ namespace Isis {
  * writing of all CK/SPK types directly in this class.  The template class K
  * must provide some internal virtual methods.  These methods are:
  * @code
- *   int k_open(const std::string &fname, const int commnt_size);
+ *   int k_open(const QString &fname, const int commnt_size);
  *   void k_write(int _handle, const K kernels);
  *   void k_close(int handle);
  * @endcode
  *
  * The class K may also provide a WriteComment(const int handle, const
- * std::string &comment) method that will write comments to the output kernel
+ * QString &comment) method that will write comments to the output kernel
  * file if the provided one is not adequate.
  *
  * @author 2010-11-10 Kris Becker
@@ -74,13 +74,13 @@ class KernelWriter {
     virtual ~KernelWriter() { }
 
     /** Open a kernel file using virtual method provided in K */
-    void open(const std::string &kfile, const int &commnt_size = 5120) {
+    void open(const QString &kfile, const int &commnt_size = 5120) {
       _handle = k_open(kfile, commnt_size);
 
     }
 
     /** Write header with comments provided   */
-    void header(const std::string &comment) {
+    void header(const QString &comment) {
       WriteComment(_handle, comment);
     }
 
@@ -97,12 +97,12 @@ class KernelWriter {
      * list of kernels.
      *
      * @param K Kernel container with segments to write
-     * @param std::string Name of file to write kernel to
-     * @param std::string Name
+     * @param QString Name of file to write kernel to
+     * @param QString Name
      */
-    void write(const K &kernels, const std::string &kfile,
-               const std::string &comfile = "") {
-      std::string comments = getComment(kernels, comfile);
+    void write(const K &kernels, const QString &kfile,
+               const QString &comfile = "") {
+      QString comments = getComment(kernels, comfile);
       open(kfile, comments.size() + 512);
       header(comments);  // Writes header
       write(kernels);
@@ -117,19 +117,19 @@ class KernelWriter {
     }
 
     /** Accumulate comment from K object and individed set */
-    std::string getComment(const K &kernels, const std::string &comfile) {
+    QString getComment(const K &kernels, const QString &comfile) {
       Commentor<SegmentType> commentor(comfile);
-      if (comfile.empty()) { commentor.setCommentHeader(k_header()); }
+      if (comfile.isEmpty()) { commentor.setCommentHeader(k_header()); }
       kernels.Accept(commentor);
       return (commentor.Comments());
     }
 
   protected:
     /** These virtual methods must be provided by the K class */
-    virtual int k_open(const std::string &kfile, const int &comsize = 512) = 0;
+    virtual int k_open(const QString &kfile, const int &comsize = 512) = 0;
     virtual void k_write(const SpiceInt &handle, const K &kernels) = 0;
     virtual void k_close(SpiceInt &handle) = 0;
-    virtual std::string k_header() const = 0;
+    virtual QString k_header() const = 0;
 
   private:
     SpiceInt    _handle;    ///< SPICE file handle
@@ -140,22 +140,22 @@ class KernelWriter {
      *
      * @return bool Returns success if so.
      */
-    virtual bool WriteComment(SpiceInt handle, const std::string &comment)
+    virtual bool WriteComment(SpiceInt handle, const QString &comment)
                               const {
       if ( handle == 0 ) {
-        std::string mess = "Comments cannot be written as the file is not open";
+        QString mess = "Comments cannot be written as the file is not open";
         throw IException(IException::Programmer, mess, _FILEINFO_);
       }
 
       // Trap errors so they are not fatal if the comment section fills up.
       // Calling environments can decide how to handle it.
       try {
-        std::string commOut;
+        QString commOut;
         NaifStatus::CheckErrors();
-        for ( unsigned int i = 0 ; i < comment.size() ; i++ ) {
+        for ( int i = 0 ; i < comment.size() ; i++ ) {
            if ( comment[i] == '\n' ) {
              while ( commOut.size() < 2 ) { commOut.append(" "); }
-             dafac_c(handle, 1, commOut.size(), commOut.c_str());
+             dafac_c(handle, 1, commOut.size(), commOut.toAscii().data());
              NaifStatus::CheckErrors();
              commOut.clear();
            }
@@ -167,7 +167,7 @@ class KernelWriter {
         // See if there is residual to write
         if ( commOut.size() > 0 ) {
           while ( commOut.size() < 2 ) { commOut.append(" "); }
-          dafac_c(handle, 1, commOut.size(), commOut.c_str());
+          dafac_c(handle, 1, commOut.size(), commOut.toAscii().data());
           NaifStatus::CheckErrors();
         }
       }

@@ -1,5 +1,5 @@
 
-#if !defined(ObservationNumber_h)
+#ifndef ObservationNumber_h
 #define ObservationNumber_h
 
 /**
@@ -63,13 +63,13 @@ namespace Isis {
 
       virtual ~ObservationNumber();
 
-      static std::string Compose(Pvl &label, bool def2filename = false);
+      static QString Compose(Pvl &label, bool def2filename = false);
 
-      static std::string Compose(Cube &cube, bool def2filename = false);
+      static QString Compose(Cube &cube, bool def2filename = false);
 
-      static std::string Compose(const std::string &filename, bool def2filename = false);
+      static QString Compose(const QString &filename, bool def2filename = false);
 
-      std::vector<std::string> PossibleSerial(const std::string &on, SerialNumberList &list);
+      std::vector<QString> PossibleSerial(const QString &on, SerialNumberList &list);
 
     private:
 

@@ -67,10 +67,10 @@ namespace Isis {
 
     PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
     // Get utc start time
-    string stime = inst["StartTime"];
+    QString stime = inst["StartTime"];
 
     iTime startTime;
-    startTime.setUtc((string)inst["StartTime"]);
+    startTime.setUtc((QString)inst["StartTime"]);
     setTime(startTime);
 
     // Setup detector map
@@ -79,18 +79,18 @@ namespace Isis {
     // Setup focal plane map, and detector origin
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
-    IString ikernKey = "INS" + IString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
+    QString ikernKey = "INS" + toString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
     double sampleBoresight = getDouble(ikernKey);
-    ikernKey = "INS" + IString((int)naifIkCode()) + "_BORESIGHT_LINE";
+    ikernKey = "INS" + toString((int)naifIkCode()) + "_BORESIGHT_LINE";
     double lineBoresight = getDouble(ikernKey);
 
     focalMap->SetDetectorOrigin(sampleBoresight, lineBoresight);
 
     // Setup distortion map which is dependent on encounter, use start time
     // MOON:  1973-11-08T03:16:26.350
-    IString spacecraft = (string)inst["SpacecraftName"];
-    IString instId = (string)inst["InstrumentId"];
-    string cam;
+    QString spacecraft = (QString)inst["SpacecraftName"];
+    QString instId = (QString)inst["InstrumentId"];
+    QString cam;
     if(instId == "M10_VIDICON_A") {
       cam = "a";
     }
@@ -98,13 +98,13 @@ namespace Isis {
       cam = "b";
     }
     else {
-      string msg = "File does not appear to be a Mariner10 image. InstrumentId ["
-        + instId + "] is invalid Mariner 10 value.";
+      QString msg = "File does not appear to be a Mariner10 image. InstrumentId ["
+          + instId + "] is invalid Mariner 10 value.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    const string fname = FileName("$mariner10/reseaus/mar10" + cam
-                                  + "MasterReseaus.pvl").expanded();
+    QString fname = FileName("$mariner10/reseaus/mar10" + cam
+                             + "MasterReseaus.pvl").expanded();
 
     try {
       new ReseauDistortionMap(this, lab, fname);

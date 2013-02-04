@@ -32,15 +32,15 @@ using namespace Isis;
 //helper button functins in the code
 void helperButtonLog();
 
-map <string,void*> GuiHelpers(){
-  map <string,void*> helper;
+map <QString,void*> GuiHelpers(){
+  map <QString,void*> helper;
   helper ["helperButtonLog"] = (void*) helperButtonLog;
   return helper;
 }
 
 /** Function to create a Control point from an SmtkPoint */
-ControlPoint CreatePoint(const SmtkPoint &spnt, const std::string &pid,
-                         const std::string &lcn, const std::string &rcn) {
+ControlPoint CreatePoint(const SmtkPoint &spnt, const QString &pid,
+                         const QString &lcn, const QString &rcn) {
   ControlPoint pnt(pid);
   Coordinate geom = spnt.getGeometry().getLeft();
   SurfacePoint surpnt(Latitude(geom.getLatitude(), Angle::Degrees),
@@ -71,9 +71,9 @@ ControlPoint CreatePoint(const SmtkPoint &spnt, const std::string &pid,
 }
 
 /** Function that creates and writes a control network from a SmtkQStack */
-void WriteCnet(const std::string &netfile, SmtkQStack &points,
-               const std::string &target, const std::string &lcn,
-               const std::string &rcn) {
+void WriteCnet(const QString &netfile, SmtkQStack &points,
+               const QString &target, const QString &lcn,
+               const QString &rcn) {
    // Initialize control point network
   ControlNet cn;
 //  cn.SetType(ControlNet::ImageToImage);
@@ -82,7 +82,7 @@ void WriteCnet(const std::string &netfile, SmtkQStack &points,
   cn.SetCreatedDate(iTime::CurrentLocalTime());
   SmtkQStackIter pnt = points.begin();
   for (int i = 0 ; pnt != points.end() ; i++, ++pnt) {
-    string pntid = "Point_" + IString(i);
+    QString pntid = "Point_" + toString(i);
     cn.AddPoint(new ControlPoint(CreatePoint(pnt.value(), pntid, lcn, rcn)));
   }
 
@@ -98,7 +98,7 @@ void IsisMain() {
   // Open the first cube.  It is the left hand image.
   Cube lhImage;
   CubeAttributeInput &attLeft = ui.GetInputAttribute("FROM");
-  vector<string> bandLeft = attLeft.bands();
+  vector<QString> bandLeft = attLeft.bands();
   lhImage.setVirtualBands(bandLeft);
   lhImage.open(ui.GetFileName("FROM"),"r");
 
@@ -106,13 +106,13 @@ void IsisMain() {
   // first to this one by attempting to compute a sample/line offsets
   Cube rhImage;
   CubeAttributeInput &attRight = ui.GetInputAttribute("MATCH");
-  vector<string> bandRight = attRight.bands();
+  vector<QString> bandRight = attRight.bands();
   rhImage.setVirtualBands(bandRight);
   rhImage.open(ui.GetFileName("MATCH"),"r");
 
   // Ensure only single bands
   if (lhImage.getBandCount() != 1 || rhImage.getBandCount() != 1) {
-    string msg = "Input Cubes must have only one band!";
+    QString msg = "Input Cubes must have only one band!";
     throw IException(IException::User,msg,_FILEINFO_);
   }
 
@@ -126,7 +126,7 @@ void IsisMain() {
     rhCamera = rhImage.getCamera();
   }
   catch (IException &ie) {
-    string msg = "Both input images must have a camera";
+    QString msg = "Both input images must have a camera";
     throw IException(ie, IException::User, msg, _FILEINFO_);
   }
 
@@ -136,15 +136,15 @@ void IsisMain() {
   rhCamera->IgnoreElevationModel(true);
 
   // Get serial number
-  string serialLeft = SerialNumber::Compose(lhImage, true);
-  string serialRight = SerialNumber::Compose(rhImage, true);
+  QString serialLeft = SerialNumber::Compose(lhImage, true);
+  QString serialRight = SerialNumber::Compose(rhImage, true);
 
 //  This still precludes band to band registrations.
   if (serialLeft == serialRight) {
-    string sLeft = FileName(lhImage.getFileName()).name();
-    string sRight = FileName(rhImage.getFileName()).name();
+    QString sLeft = FileName(lhImage.getFileName()).name();
+    QString sRight = FileName(rhImage.getFileName()).name();
     if (sLeft == sRight) {
-      string msg = "Cube Serial Numbers must be unique - FROM=" + serialLeft +
+      QString msg = "Cube Serial Numbers must be unique - FROM=" + serialLeft +
                    ", MATCH=" + serialRight;
       throw IException(IException::User,msg,_FILEINFO_);
     }
@@ -292,7 +292,7 @@ void IsisMain() {
   // some.
   ///////////////////////////////////////////////////////////////////////
   if (gstack.size() <= 0) {
-    string msg = "No seed points found - may need to check Gruen parameters.";
+    QString msg = "No seed points found - may need to check Gruen parameters.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -449,10 +449,10 @@ void IsisMain() {
 
     //  Report Stereo separation angles
     PvlGroup stresultsPvl("StereoSeparationAngle");
-    stresultsPvl += PvlKeyword("Minimum", stAng.Minimum(), "deg");
-    stresultsPvl += PvlKeyword("Average", stAng.Average(), "deg");
-    stresultsPvl += PvlKeyword("Maximum", stAng.Maximum(), "deg");
-    stresultsPvl += PvlKeyword("StandardDeviation", stAng.StandardDeviation(), "deg");
+    stresultsPvl += PvlKeyword("Minimum", toString(stAng.Minimum()), "deg");
+    stresultsPvl += PvlKeyword("Average", toString(stAng.Average()), "deg");
+    stresultsPvl += PvlKeyword("Maximum", toString(stAng.Maximum()), "deg");
+    stresultsPvl += PvlKeyword("StandardDeviation", toString(stAng.StandardDeviation()), "deg");
     Application::Log(stresultsPvl);
 
     // Update the label with BandBin keywords
@@ -481,17 +481,17 @@ void IsisMain() {
 
   // Create output data
   PvlGroup totalPointsPvl("Totals");
-  totalPointsPvl += PvlKeyword("AttemptedPoints", numAttemptedInitialPoints);
-  totalPointsPvl += PvlKeyword("InitialSuccesses", numOrigPoints);
-  totalPointsPvl += PvlKeyword("GrowSuccesses", passpix2);
-  totalPointsPvl += PvlKeyword("ResultingPoints", bmf.size());
+  totalPointsPvl += PvlKeyword("AttemptedPoints", toString(numAttemptedInitialPoints));
+  totalPointsPvl += PvlKeyword("InitialSuccesses", toString(numOrigPoints));
+  totalPointsPvl += PvlKeyword("GrowSuccesses", toString(passpix2));
+  totalPointsPvl += PvlKeyword("ResultingPoints", toString(bmf.size()));
 
   Application::Log(totalPointsPvl);
 
   Pvl arPvl = matcher.RegistrationStatistics();
   PvlGroup smtkresultsPvl("SmtkResults");
-  smtkresultsPvl += PvlKeyword("SpiceOffImage", matcher.OffImageErrorCount());
-  smtkresultsPvl += PvlKeyword("SpiceDistanceError", matcher.SpiceErrorCount());
+  smtkresultsPvl += PvlKeyword("SpiceOffImage", toString(matcher.OffImageErrorCount()));
+  smtkresultsPvl += PvlKeyword("SpiceDistanceError", toString(matcher.SpiceErrorCount()));
   arPvl.AddGroup(smtkresultsPvl);
 
   for(int i = 0; i < arPvl.Groups(); i++) {
@@ -511,7 +511,7 @@ void IsisMain() {
 //Helper function to output the regdeft file to log.
 void helperButtonLog () {
   UserInterface &ui = Application::GetUserInterface();
-  string file(ui.GetFileName("REGDEF"));
+  QString file(ui.GetFileName("REGDEF"));
   Pvl p;
   p.Read(file);
   Application::GuiLog(p);

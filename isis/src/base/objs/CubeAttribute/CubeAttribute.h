@@ -23,19 +23,17 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
 #include <typeinfo>
 
 #include <QDebug>
+#include <QStringList>
 
 #include "Cube.h"
 #include "Endian.h"
 #include "FileName.h"
 #include "IException.h"
-#include "IString.h"
 #include "PixelType.h"
 
-class QStringList;
 
 namespace Isis {
   /**
@@ -67,12 +65,12 @@ namespace Isis {
    *
    * @return A string representation of the parameter
    */
-  inline std::string LabelAttachmentName(LabelAttachment labelType) {
+  inline QString LabelAttachmentName(LabelAttachment labelType) {
     if(labelType == AttachedLabel) return "Attached";
     if(labelType == DetachedLabel) return "Detached";
     if(labelType == ExternalLabel) return "External";
 
-    std::string msg = "Invalid label attachment type [" + IString(labelType) + "]";
+    QString msg = "Invalid label attachment type [" + QString(labelType) + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -85,14 +83,13 @@ namespace Isis {
    *
    * @return The RangeType enum corresponding to the string parameter
    */
-  inline LabelAttachment LabelAttachmentEnumeration(const std::string &labelType) {
-    IString temp(labelType);
-    temp = temp.UpCase();
+  inline LabelAttachment LabelAttachmentEnumeration(const QString &labelType) {
+    QString temp = labelType.toUpper();
     if(temp == "ATTACHED") return AttachedLabel;
     if(temp == "DETACHED") return DetachedLabel;
     if(temp == "External") return ExternalLabel;
 
-    std::string msg = "Invalid label attachment type string [" + labelType + "]";
+    QString msg = "Invalid label attachment type string [" + labelType + "]";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 
@@ -137,7 +134,7 @@ namespace Isis {
     public:
 
       //! Constructs an empty CubeAttribute
-      CubeAttribute(QList< bool (ChildClass::*)(IString) const > testers) {
+      CubeAttribute(QList< bool (ChildClass::*)(QString) const > testers) {
         m_attributeTypeTesters = testers;
       }
 
@@ -153,7 +150,7 @@ namespace Isis {
        *               before the first "+" are assumed to be the filename
        *               and are ignored.
        */
-      CubeAttribute(QList< bool (ChildClass::*)(IString) const > testers,
+      CubeAttribute(QList< bool (ChildClass::*)(QString) const > testers,
                     const FileName &fileName) {
         m_attributeTypeTesters = testers;
         setAttributes(fileName);
@@ -173,8 +170,8 @@ namespace Isis {
        *
        * @return The cube attributes in string form
        */
-      IString toString() const {
-        IString result;
+      QString toString() const {
+        QString result;
 
         if (!m_attributes.isEmpty())
           result = "+" + m_attributes.join("+");
@@ -193,10 +190,10 @@ namespace Isis {
        *
        * @param attribute The attribute we're adding to the current cube attributes
        */
-      void addAttribute(IString attribute) {
-        IString upcaseAtt = IString(attribute).UpCase();
+      void addAttribute(QString attribute) {
+        QString upcaseAtt = attribute.toUpper();
 
-        if (attribute.ToQt().contains("+")) {
+        if (attribute.contains("+")) {
           throw IException(IException::Unknown,
                            "Individual attributes (for example, BSQ) cannot contain the '+' "
                            "character because that is used to denote the separation of individual "
@@ -206,12 +203,12 @@ namespace Isis {
 
         // Verify this attribute is legal
         bool legal = false;
-        bool (ChildClass::*tester)(IString) const;
+        bool (ChildClass::*tester)(QString) const;
         foreach (tester, m_attributeTypeTesters) {
           if ( (static_cast<const ChildClass *>(this)->*tester)(upcaseAtt) ) {
             if (legal) {
               throw IException(IException::Unknown,
-                               QObject::tr("Attribute [%1] is ambiguous").arg(attribute.ToQt()),
+                               QObject::tr("Attribute [%1] is ambiguous").arg(attribute),
                                _FILEINFO_);
             }
 
@@ -221,11 +218,11 @@ namespace Isis {
 
         if (!legal) {
           throw IException(IException::Unknown,
-                           QObject::tr("Attribute [%1] is not recognized").arg(attribute.ToQt()),
+                           QObject::tr("Attribute [%1] is not recognized").arg(attribute),
                            _FILEINFO_);
         }
 
-        m_attributes.append(attribute.ToQt());
+        m_attributes.append(attribute);
       }
 
 
@@ -251,7 +248,7 @@ namespace Isis {
        *                         "+Bsq+Real" or "Bsq+Real"
        */
       void addAttributes(const char *attributesString) {
-        addAttributes(IString(attributesString));
+        addAttributes(QString(attributesString));
       }
 
 
@@ -263,7 +260,7 @@ namespace Isis {
        * @param attributesString A string of recognizable attributes, for example
        *                         "+Bsq+Real" or "Bsq+Real"
        */
-      void addAttributes(const IString &attributesString) {
+      void addAttributes(const QString &attributesString) {
         setAttributes(toString() + "+" + attributesString);
       }
 
@@ -278,7 +275,7 @@ namespace Isis {
        *                 FileName("out.cub+Bsq")
        */
       void setAttributes(const FileName &fileName) {
-        QStringList attributes = fileName.attributes().ToQt().split("+", QString::SkipEmptyParts);
+        QStringList attributes = fileName.attributes().split("+", QString::SkipEmptyParts);
 
         m_attributes.clear();
         foreach (QString attribute, attributes)
@@ -295,11 +292,11 @@ namespace Isis {
        * @param tester A method that determines whether the attribute should be returned/is relevant
        * @return A list of attributes for which the tester returns true on.
        */
-      QStringList attributeList(bool (ChildClass::*tester)(IString) const) const {
+      QStringList attributeList(bool (ChildClass::*tester)(QString) const) const {
         QStringList relevantAttributes;
 
         foreach (QString attribute, m_attributes) {
-          IString upcaseAtt = IString(attribute).UpCase();
+          QString upcaseAtt = attribute.toUpper();
           if ( (static_cast<const ChildClass *>(this)->*tester)(upcaseAtt) ) {
             relevantAttributes.append(upcaseAtt);
           }
@@ -320,14 +317,14 @@ namespace Isis {
        * @param tester A method that determines if an attribute is of the same type of newValue, so
        *               that existing attributes can be overwritten.
        */
-      void setAttribute(IString newValue, bool (ChildClass::*tester)(IString) const) {
+      void setAttribute(QString newValue, bool (ChildClass::*tester)(QString) const) {
         QMutableListIterator<QString> it(m_attributes);
 
         bool found = false;
         while (it.hasNext()) {
           QString &attribute = it.next();
 
-          IString upcaseAtt = IString(attribute).UpCase();
+          QString upcaseAtt = attribute.toUpper();
           if ( (static_cast<const ChildClass *>(this)->*tester)(upcaseAtt) ) {
             if (found || newValue == "") {
               // already found one (remove the duplicate) or just deleting it
@@ -335,7 +332,7 @@ namespace Isis {
             }
             else {
               // modify existing attribute value
-              attribute = newValue.ToQt();
+              attribute = newValue;
             }
 
             found = true;
@@ -363,7 +360,7 @@ namespace Isis {
        *   and only one data type (is unambiguous and is known). This list will not change after
        *   this class is instantiated.
        */
-      QList< bool (ChildClass::*)(IString) const > m_attributeTypeTesters;
+      QList< bool (ChildClass::*)(QString) const > m_attributeTypeTesters;
   };
 
 
@@ -419,7 +416,7 @@ namespace Isis {
 
 
       //! Return a vector of the input bands specified
-      std::vector<std::string> bands() const;
+      std::vector<QString> bands() const;
 
       /**
        * @brief Return a string representation of all the bands
@@ -432,21 +429,21 @@ namespace Isis {
        *
        * @return A comma delimited string of all bands from the input attribute
        */
-      IString bandsString() const;
+      QString bandsString() const;
 
       //! Set the band attribute according to the list of bands
-      void setBands(const std::vector<std::string> &bands);
+      void setBands(const std::vector<QString> &bands);
 
       using CubeAttribute<CubeAttributeInput>::toString;
 
     private:
-      bool isBandRange(IString attribute) const;
+      bool isBandRange(QString attribute) const;
 
-      static IString toString(const std::vector<std::string> &bands);
-      static QList<bool (CubeAttributeInput::*)(IString) const> testers();
+      static QString toString(const std::vector<QString> &bands);
+      static QList<bool (CubeAttributeInput::*)(QString) const> testers();
 
     private:
-      std::vector<std::string> m_bands; //!< A list of the specified bands
+      std::vector<QString> m_bands; //!< A list of the specified bands
   };
 
 
@@ -520,7 +517,7 @@ namespace Isis {
       Cube::Format fileFormat() const;
 
       //! Return the file format as a string
-      IString fileFormatString() const;
+      QString fileFormatString() const;
 
       //! Set the format to the fmt parameter
       void setFileFormat(Cube::Format fmt);
@@ -529,7 +526,7 @@ namespace Isis {
       ByteOrder byteOrder() const;
 
       //! Return the byte order as a string
-      IString byteOrderString() const;
+      QString byteOrderString() const;
 
       //! Set the order according to the parameter order
       void setByteOrder(ByteOrder order);
@@ -561,13 +558,13 @@ namespace Isis {
 
 
     private:
-      bool isByteOrder(IString attribute) const;
-      bool isFileFormat(IString attribute) const;
-      bool isLabelAttachment(IString attribute) const;
-      bool isPixelType(IString attribute) const;
-      bool isRange(IString attribute) const;
+      bool isByteOrder(QString attribute) const;
+      bool isFileFormat(QString attribute) const;
+      bool isLabelAttachment(QString attribute) const;
+      bool isPixelType(QString attribute) const;
+      bool isRange(QString attribute) const;
 
-      static IString toString(Cube::Format);
+      static QString toString(Cube::Format);
 
       /**
        * @brief Output cube range tracker
@@ -580,7 +577,7 @@ namespace Isis {
         RangeSet,       //!< The range has been set
       };
 
-      static QList<bool (CubeAttributeOutput::*)(IString) const> testers();
+      static QList<bool (CubeAttributeOutput::*)(QString) const> testers();
   };
 };
 

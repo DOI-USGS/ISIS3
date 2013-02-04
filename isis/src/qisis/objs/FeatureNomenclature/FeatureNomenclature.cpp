@@ -96,7 +96,7 @@ namespace Isis {
    * @param endLat The maximum latitude of the ground range to search
    * @param endLon The maximum longitude of the ground range to search
    */
-  void FeatureNomenclature::queryFeatures(IString target,
+  void FeatureNomenclature::queryFeatures(QString target,
                                           Latitude startLat, Longitude startLon,
                                           Latitude endLat, Longitude endLon) {
     
@@ -267,10 +267,10 @@ namespace Isis {
     layout->addWidget(titleLabel, row, 0, 1, 2);
     row++;
 
-    QList< QPair<IString, IString (FeatureNomenclature::Feature::*)() const> >
+    QList< QPair<QString, QString (FeatureNomenclature::Feature::*)() const> >
         displayValues;
 
-    QPair<IString, IString (FeatureNomenclature::Feature::*)() const>
+    QPair<QString, QString (FeatureNomenclature::Feature::*)() const>
         displayValue;
 
     displayValue.first = "Feature Name:";
@@ -377,7 +377,7 @@ namespace Isis {
     displayValues.append(displayValue);
 
     for (int i = 0; i < displayValues.count(); i++) {
-      QLabel *titleLabel = new QLabel(displayValues[i].first.ToQt());
+      QLabel *titleLabel = new QLabel(displayValues[i].first);
       QLabel *valueLabel = new QLabel( (this->*(displayValues[i].second))() );
       valueLabel->setOpenExternalLinks(true);
       valueLabel->setWordWrap(true);
@@ -401,15 +401,15 @@ namespace Isis {
   /**
    * @return The feature ID (typically a number)
    */
-  IString FeatureNomenclature::Feature::id() const {
+  QString FeatureNomenclature::Feature::id() const {
     return getTagText("id");
   }
 
 
   /**
-   * @return The feature name (not always compatible with IString)
+   * @return The feature name (not always compatible with QString)
    */
-  IString FeatureNomenclature::Feature::name() const {
+  QString FeatureNomenclature::Feature::name() const {
     return getTagText("name");
   }
 
@@ -417,7 +417,7 @@ namespace Isis {
   /**
    * @return The 'clean' feature name (non-ascii characters cleaned up)
    */
-  IString FeatureNomenclature::Feature::cleanName() const {
+  QString FeatureNomenclature::Feature::cleanName() const {
     return getTagText("cleanName");
   }
 
@@ -427,15 +427,15 @@ namespace Isis {
    *           This is implied by what's currently available for targets, since
    *           the database does not return this information.
    */
-  IString FeatureNomenclature::Feature::controlNet() const {
-    IString targetStr = target();
-    IString cnet = "";
+  QString FeatureNomenclature::Feature::controlNet() const {
+    QString targetStr = target();
+    QString cnet = "";
 
-    if (targetStr.UpCase() == "MOON")
+    if (targetStr.toUpper() == "MOON")
       cnet = "LOLA";
-    else if (targetStr.UpCase() == "MARS")
+    else if (targetStr.toUpper() == "MARS")
       cnet = "MDIM 2.1";
-    else if (targetStr.UpCase() == "MERCURY")
+    else if (targetStr.toUpper() == "MERCURY")
       cnet = "Preliminary MESSENGER";
 
     return cnet;
@@ -445,11 +445,11 @@ namespace Isis {
   /**
    * @return The recommended feature name to display to the users
    */
-  IString FeatureNomenclature::Feature::displayName() const {
-    IString nameString = name();
-    IString cleanNameString = cleanName();
+  QString FeatureNomenclature::Feature::displayName() const {
+    QString nameString = name();
+    QString cleanNameString = cleanName();
 
-    IString displayNameString = nameString;
+    QString displayNameString = nameString;
 
     if (nameString != cleanNameString)
       displayNameString = nameString + " (" + cleanNameString + ")";
@@ -461,7 +461,7 @@ namespace Isis {
   /**
    * @return The target name
    */
-  IString FeatureNomenclature::Feature::target() const {
+  QString FeatureNomenclature::Feature::target() const {
     return getTagText("target");
   }
 
@@ -469,7 +469,7 @@ namespace Isis {
   /**
    * @return The target's system (i.e. Target: Moon, System: Earth)
    */
-  IString FeatureNomenclature::Feature::system() const {
+  QString FeatureNomenclature::Feature::system() const {
     return getTagText("system");
   }
 
@@ -481,7 +481,7 @@ namespace Isis {
     Distance result;
 
     try {
-      result = Distance((double)getTagText("diameter"),
+      result = Distance(toDouble(getTagText("diameter")),
                         Distance::Kilometers);
     }
     catch (IException &) {
@@ -494,7 +494,7 @@ namespace Isis {
   /**
    * @return The feature's diameter as a human readable string.
    */
-  IString FeatureNomenclature::Feature::diameterString() const {
+  QString FeatureNomenclature::Feature::diameterString() const {
     return diameter().toString();
   }
 
@@ -506,7 +506,7 @@ namespace Isis {
     Latitude result;
 
     try {
-      result = Latitude((double)getTagText("centerlatitude"), Angle::Degrees);
+      result = Latitude(toDouble(getTagText("centerlatitude")), Angle::Degrees);
     }
     catch (IException &) {
     }
@@ -518,7 +518,7 @@ namespace Isis {
   /**
    * @return The feature's center latitude as a human readable string.
    */
-  IString FeatureNomenclature::Feature::centerLatitudeString() const {
+  QString FeatureNomenclature::Feature::centerLatitudeString() const {
     return centerLatitude().toString();
   }
 
@@ -530,7 +530,7 @@ namespace Isis {
     Longitude result;
 
     try {
-      result = Longitude((double)getTagText("centerlongitude"),
+      result = Longitude(toDouble(getTagText("centerlongitude")),
                          Angle::Degrees);
     }
     catch (IException &) {
@@ -543,7 +543,7 @@ namespace Isis {
   /**
    * @return The feature's center longitude as a human readable string.
    */
-  IString FeatureNomenclature::Feature::centerLongitudeString() const {
+  QString FeatureNomenclature::Feature::centerLongitudeString() const {
     return centerLongitude().toString();
   }
 
@@ -555,7 +555,7 @@ namespace Isis {
     Latitude result;
 
     try {
-      result = Latitude((double)getTagText("northernLatitude"), Angle::Degrees);
+      result = Latitude(toDouble(getTagText("northernLatitude")), Angle::Degrees);
     }
     catch (IException &) {
     }
@@ -568,7 +568,7 @@ namespace Isis {
    * @return The feature's northernmost (max) latitude as a human readable
    *         string.
    */
-  IString FeatureNomenclature::Feature::northernLatitudeString() const {
+  QString FeatureNomenclature::Feature::northernLatitudeString() const {
     return northernLatitude().toString();
   }
 
@@ -580,7 +580,7 @@ namespace Isis {
     Latitude result;
 
     try {
-      result = Latitude((double)getTagText("southernLatitude"), Angle::Degrees);
+      result = Latitude(toDouble(getTagText("southernLatitude")), Angle::Degrees);
     }
     catch (IException &) {
     }
@@ -593,7 +593,7 @@ namespace Isis {
    * @return The feature's southernmost (min) latitude as a human readable
    *         string.
    */
-  IString FeatureNomenclature::Feature::southernLatitudeString() const {
+  QString FeatureNomenclature::Feature::southernLatitudeString() const {
     return southernLatitude().toString();
   }
 
@@ -605,7 +605,7 @@ namespace Isis {
     Longitude result;
 
     try {
-      result = Longitude((double)getTagText("easternLongitude"),
+      result = Longitude(toDouble(getTagText("easternLongitude")),
                          Angle::Degrees);
     }
     catch (IException &) {
@@ -619,7 +619,7 @@ namespace Isis {
    * @return The feature's easternmost (max) longitude as a human readable
    *         string.
    */
-  IString FeatureNomenclature::Feature::easternLongitudeString() const {
+  QString FeatureNomenclature::Feature::easternLongitudeString() const {
     return easternLongitude().toString();
   }
 
@@ -631,7 +631,7 @@ namespace Isis {
     Longitude result;
 
     try {
-      result = Longitude((double)getTagText("westernLongitude"),
+      result = Longitude(toDouble(getTagText("westernLongitude")),
                          Angle::Degrees);
     }
     catch (IException &) {
@@ -645,7 +645,7 @@ namespace Isis {
    * @return The feature's westernmost (min) longitude as a human readable
    *         string.
    */
-  IString FeatureNomenclature::Feature::westernLongitudeString() const {
+  QString FeatureNomenclature::Feature::westernLongitudeString() const {
     return westernLongitude().toString();
   }
 
@@ -654,7 +654,7 @@ namespace Isis {
    * @return The continent from which the person who named the feature
    *         originated.
    */
-  IString FeatureNomenclature::Feature::originatingContinent() const {
+  QString FeatureNomenclature::Feature::originatingContinent() const {
     return getTagText("continent");
   }
 
@@ -662,7 +662,7 @@ namespace Isis {
   /**
    * @return The ethnicity of the person who named the feature.
    */
-  IString FeatureNomenclature::Feature::originatingEthnicity() const {
+  QString FeatureNomenclature::Feature::originatingEthnicity() const {
     return getTagText("ethnicity");
   }
 
@@ -670,7 +670,7 @@ namespace Isis {
   /**
    * @return The IAU approval status of the feature.
    */
-  IString FeatureNomenclature::Feature::approvalStatus() const {
+  QString FeatureNomenclature::Feature::approvalStatus() const {
     return getTagText("approvalstatus");
   }
 
@@ -678,7 +678,7 @@ namespace Isis {
   /**
    * @return The approval date of the feature.
    */
-  IString FeatureNomenclature::Feature::approvalDate() const {
+  QString FeatureNomenclature::Feature::approvalDate() const {
     return getTagText("approvaldate");
   }
 
@@ -686,7 +686,7 @@ namespace Isis {
   /**
    * @return The type of feature (for example, crater)
    */
-  IString FeatureNomenclature::Feature::featureType() const {
+  QString FeatureNomenclature::Feature::featureType() const {
     return getTagText("featuretype");
   }
 
@@ -694,7 +694,7 @@ namespace Isis {
   /**
    * @return The feature's reference (bibliography) information
    */
-  IString FeatureNomenclature::Feature::referenceString() const {
+  QString FeatureNomenclature::Feature::referenceString() const {
     return getTagText("reference");
   }
 
@@ -702,7 +702,7 @@ namespace Isis {
   /**
    * @return The feature's origin
    */
-  IString FeatureNomenclature::Feature::origin() const {
+  QString FeatureNomenclature::Feature::origin() const {
     return getTagText("origin");
   }
 
@@ -710,7 +710,7 @@ namespace Isis {
   /**
    * @return The feature's last updated time as a string.
    */
-  IString FeatureNomenclature::Feature::lastUpdated() const {
+  QString FeatureNomenclature::Feature::lastUpdated() const {
     return getTagText("lastUpdated");
   }
 
@@ -719,14 +719,14 @@ namespace Isis {
    * @return The feature's online URL.
    */
   QUrl FeatureNomenclature::Feature::referenceUrl() const {
-    return QUrl("http://planetarynames.wr.usgs.gov/Feature/" + id().ToQt());
+    return QUrl("http://planetarynames.wr.usgs.gov/Feature/" + id());
   }
 
 
   /**
    * @return The feature's online URL as a HTML string (it is hyperlinked).
    */
-  IString FeatureNomenclature::Feature::referenceUrlString() const {
+  QString FeatureNomenclature::Feature::referenceUrlString() const {
     return "<a href='" + referenceUrl().toString() + "'>" +
              referenceUrl().toString() +
            "</a>";
@@ -775,12 +775,12 @@ namespace Isis {
    *        want
    * @return The data in the tag
    */
-  IString FeatureNomenclature::Feature::getTagText(IString tagName) const {
-    IString text;
+  QString FeatureNomenclature::Feature::getTagText(QString tagName) const {
+    QString text;
 
     if (m_xmlRepresenation) {
       QDomNodeList nodes =
-          m_xmlRepresenation->elementsByTagName(tagName.ToQt());
+          m_xmlRepresenation->elementsByTagName(tagName);
 
       if (nodes.count())
         text = nodes.at(0).toElement().text().trimmed();
@@ -822,8 +822,8 @@ namespace Isis {
                            "from the nomenclature database. "
                            "The XML result was invalid. The parse is [" +
                            errorMsg + "] on line [" +
-                           IString(errorLine).ToQt() +"], column [" +
-                           IString(errorCol).ToQt() + "]");
+                           QString(errorLine) +"], column [" +
+                           QString(errorCol) + "]");
       }
     }
     else {
@@ -897,9 +897,9 @@ namespace Isis {
    * @param endLat The maximum latitude of the ground range to search
    * @param endLon The maximum longitude of the ground range to search
    */
-  void FeatureNomenclature::runQuery(IString target,
-                                          Latitude startLat, Longitude startLon,
-                                          Latitude endLat, Longitude endLon) {
+  void FeatureNomenclature::runQuery(QString target,
+                                     Latitude startLat, Longitude startLon,
+                                     Latitude endLat, Longitude endLon) {
 
     QUrl encodedFormData;
 
@@ -946,7 +946,7 @@ namespace Isis {
     encodedFormData.addQueryItem("reference", "");
     encodedFormData.addQueryItem("system", "");
 
-    encodedFormData.addQueryItem("target", target.UpCase().ToQt());
+    encodedFormData.addQueryItem("target", target.toUpper());
     encodedFormData.addQueryItem("easternLongitude",
                                 QString::number(endLon.degrees()));
     encodedFormData.addQueryItem("westernLongitude",

@@ -120,18 +120,18 @@ void IsisMain() {
     throw IException(IException::Unknown, "Not enough information", _FILEINFO_);
   }
 
-  IString inEquationX = "X = " + IString(eq1[0]);
-  inEquationX += " + " + IString(eq1[1]) + "S";
-  inEquationX += " + " + IString(eq1[2]) + "L";
-  IString inEquationY = "Y = " + IString(eq2[0]);
-  inEquationY += " + " + IString(eq2[1]) + "S";
-  inEquationY += " + " + IString(eq2[2]) + "L";
-  IString outEquationS = "S = " + IString(res1[0]);
-  outEquationS += " + " + IString(res1[1]) + "X";
-  outEquationS += " + " + IString(res1[2]) + "Y";
-  IString outEquationL = "L = " + IString(res2[0]);
-  outEquationL += " + " + IString(res2[1]) + "X";
-  outEquationL += " + " + IString(res2[2]) + "Y";
+  QString inEquationX = "X = " + toString(eq1[0]);
+  inEquationX += " + " + toString(eq1[1]) + "S";
+  inEquationX += " + " + toString(eq1[2]) + "L";
+  QString inEquationY = "Y = " + toString(eq2[0]);
+  inEquationY += " + " + toString(eq2[1]) + "S";
+  inEquationY += " + " + toString(eq2[2]) + "L";
+  QString outEquationS = "S = " + toString(res1[0]);
+  outEquationS += " + " + toString(res1[1]) + "X";
+  outEquationS += " + " + toString(res1[2]) + "Y";
+  QString outEquationL = "L = " + toString(res2[0]);
+  outEquationL += " + " + toString(res2[1]) + "X";
+  outEquationL += " + " + toString(res2[2]) + "Y";
 
   // check....
   /*
@@ -153,21 +153,21 @@ void IsisMain() {
 
   if(ui.WasEntered("IAKCODE")) {
     PvlKeyword naifFormatX("INS" + ui.GetString("IAKCODE") + "_TRANSX");
-    naifFormatX += eq1[0];
-    naifFormatX += eq1[1];
-    naifFormatX += eq1[2];
+    naifFormatX += toString(eq1[0]);
+    naifFormatX += toString(eq1[1]);
+    naifFormatX += toString(eq1[2]);
     PvlKeyword naifFormatY("INS" + ui.GetString("IAKCODE") + "_TRANSY");
-    naifFormatY += eq2[0];
-    naifFormatY += eq2[1];
-    naifFormatY += eq2[2];
+    naifFormatY += toString(eq2[0]);
+    naifFormatY += toString(eq2[1]);
+    naifFormatY += toString(eq2[2]);
     PvlKeyword naifFormatS("INS" + ui.GetString("IAKCODE") + "_ITRANSS");
-    naifFormatS += res1[0];
-    naifFormatS += res1[1];
-    naifFormatS += res1[2];
+    naifFormatS += toString(res1[0]);
+    naifFormatS += toString(res1[1]);
+    naifFormatS += toString(res1[2]);
     PvlKeyword naifFormatL("INS" + ui.GetString("IAKCODE") + "_ITRANSL");
-    naifFormatL += res2[0];
-    naifFormatL += res2[1];
-    naifFormatL += res2[2];
+    naifFormatL += toString(res2[0]);
+    naifFormatL += toString(res2[1]);
+    naifFormatL += toString(res2[2]);
 
     res += naifFormatX;
     res += naifFormatY;

@@ -169,7 +169,7 @@ namespace Isis {
     Stretch stretch = getStretch();
 
     //Add the pairs to the file
-    stream << stretch.Text().c_str() << endl;
+    stream << stretch.Text() << endl;
 
     outfile.close();
   }

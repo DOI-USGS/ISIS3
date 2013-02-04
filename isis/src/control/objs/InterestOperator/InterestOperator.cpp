@@ -89,23 +89,23 @@ namespace Isis {
       mOperatorGrp += Isis::PvlKeyword(op["Name"]);
 
       p_samples   = op["Samples"];
-      mOperatorGrp += Isis::PvlKeyword("Samples", p_samples);
+      mOperatorGrp += Isis::PvlKeyword("Samples", toString(p_samples));
 
       p_lines     = op["Lines"];
-      mOperatorGrp += Isis::PvlKeyword("Lines", p_lines);
+      mOperatorGrp += Isis::PvlKeyword("Lines", toString(p_lines));
 
       p_deltaLine = op["DeltaLine"];
-      mOperatorGrp += Isis::PvlKeyword("DeltaLine", p_deltaLine);
+      mOperatorGrp += Isis::PvlKeyword("DeltaLine", toString(p_deltaLine));
 
       p_deltaSamp = op["DeltaSamp"];
-      mOperatorGrp += Isis::PvlKeyword("DeltaSamp", p_deltaSamp);
+      mOperatorGrp += Isis::PvlKeyword("DeltaSamp", toString(p_deltaSamp));
 
       p_minimumInterest = op["MinimumInterest"];
-      mOperatorGrp += Isis::PvlKeyword("MinimumInterest", p_minimumInterest);
+      mOperatorGrp += Isis::PvlKeyword("MinimumInterest", toString(p_minimumInterest));
 
     }
     catch (IException &e) {
-      std::string msg = "Improper format for InterestOperator PVL [" + pPvl.FileName() + "]";
+      QString msg = "Improper format for InterestOperator PVL [" + pPvl.FileName() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -155,7 +155,7 @@ namespace Isis {
     if (!pUnivGrndMap.HasCamera())
       // Level 3 images/mosaic or bad image
     {
-      std::string msg = "Cannot run interest on images with no camera. Image " +
+      QString msg = "Cannot run interest on images with no camera. Image " +
                         pCube.getFileName() + " has no Camera";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -240,8 +240,8 @@ namespace Isis {
    * @history 10/15/2010 Sharmila Prasad - Use a single copy of Control Net
    *
    */
-  void InterestOperator::Operate(ControlNet &pNewNet, std::string psSerialNumFile,
-                                 std::string psOverlapListFile) {
+  void InterestOperator::Operate(ControlNet &pNewNet, QString psSerialNumFile,
+                                 QString psOverlapListFile) {
     ReadSerialNumbers(psSerialNumFile);
 
     // Find all the overlaps between the images in the FROMLIST
@@ -281,7 +281,7 @@ namespace Isis {
       newMeasure->SetChooserName("Application cnetref(interest)");
       bool bMeasureLocked = newMeasure->IsEditLocked();
 
-      std::string sn = newMeasure->GetCubeSerialNumber();
+      QString sn = newMeasure->GetCubeSerialNumber();
       //double dSample = newMeasure->GetSample();
       //double dLine   = newMeasure->GetLine();
 
@@ -416,7 +416,7 @@ namespace Isis {
         // Process for point with good interest and a best index
         double dReferenceLat = 0, dReferenceLon = 0;
         if (iBestMeasureIndex >= 0) {
-          std::string sn = mtInterestResults[iBestMeasureIndex].msSerialNum;
+          QString sn = mtInterestResults[iBestMeasureIndex].msSerialNum;
           Cube *bestCube = mCubeMgr.OpenCube(mSerialNumbers.FileName(sn));
 
           // Get the Camera for the reference image and get the lat/lon from that measurment
@@ -425,7 +425,7 @@ namespace Isis {
             bestCamera = bestCube->getCamera();
           }
           catch (IException &e) {
-            std::string msg = "Cannot Create Camera for Image:" + mSerialNumbers.FileName(sn);
+            QString msg = "Cannot Create Camera for Image:" + mSerialNumbers.FileName(sn);
             throw IException(IException::User, msg, _FILEINFO_);
           }
 
@@ -447,7 +447,7 @@ namespace Isis {
           ControlMeasure *newMeasure = newPnt->GetMeasure(measure);
           newMeasure->SetDateTime();
           newMeasure->SetChooserName("Application cnetref(interest)");
-          std::string sn = newMeasure->GetCubeSerialNumber();
+          QString sn = newMeasure->GetCubeSerialNumber();
 
           // Log
           PvlGroup pvlMeasureGrp("MeasureDetails");
@@ -470,7 +470,7 @@ namespace Isis {
               measureCamera = measureCube->getCamera();
             }
             catch (IException &e) {
-              std::string msg = "Cannot Create Camera for Image:" + mSerialNumbers.FileName(sn);
+              QString msg = "Cannot Create Camera for Image:" + mSerialNumbers.FileName(sn);
               throw IException(e, IException::User, msg, _FILEINFO_);
             }
 
@@ -486,8 +486,8 @@ namespace Isis {
 
                 pvlMeasureGrp += Isis::PvlKeyword("NewLocation",  LocationString(mtInterestResults[measure].mdBestSample,
                                                   mtInterestResults[measure].mdBestLine));
-                pvlMeasureGrp += Isis::PvlKeyword("DeltaSample",  mtInterestResults[measure].miDeltaSample);
-                pvlMeasureGrp += Isis::PvlKeyword("DeltaLine",    mtInterestResults[measure].miDeltaLine);
+                pvlMeasureGrp += Isis::PvlKeyword("DeltaSample",  toString(mtInterestResults[measure].miDeltaSample));
+                pvlMeasureGrp += Isis::PvlKeyword("DeltaLine",    toString(mtInterestResults[measure].miDeltaLine));
                 pvlMeasureGrp += Isis::PvlKeyword("Reference",    "true");
               }
               else {
@@ -503,12 +503,12 @@ namespace Isis {
                   ValidStandardOptions(newMeasure, measureCube);
                 if (!results.isValid()) {
                   iNumIgnore++;
-                  pvlMeasureGrp += Isis::PvlKeyword("Ignored",   "Failed Validation Test-" + results.toString().toStdString());
+                  pvlMeasureGrp += Isis::PvlKeyword("Ignored",   "Failed Validation Test-" + results.toString());
                   newMeasure->SetIgnored(true);
                 }
                 pvlMeasureGrp += Isis::PvlKeyword("NewLocation", LocationString(dSample, dLine));
-                pvlMeasureGrp += Isis::PvlKeyword("DeltaSample", (int)abs((int)dSample - (int)origSample));
-                pvlMeasureGrp += Isis::PvlKeyword("DeltaLine", (int)abs((int)dLine - (int)origLine));
+                pvlMeasureGrp += Isis::PvlKeyword("DeltaSample", toString((int)abs((int)dSample - (int)origSample)));
+                pvlMeasureGrp += Isis::PvlKeyword("DeltaLine", toString((int)abs((int)dLine - (int)origLine)));
                 pvlMeasureGrp += Isis::PvlKeyword("Reference",   "false");
               }
             }
@@ -532,11 +532,11 @@ namespace Isis {
             iMeasuresModified ++;
           }
 
-          pvlMeasureGrp += Isis::PvlKeyword("BestInterest",   mtInterestResults[measure].mdInterest);
-          pvlMeasureGrp += Isis::PvlKeyword("EmissionAngle",  mtInterestResults[measure].mdEmission);
-          pvlMeasureGrp += Isis::PvlKeyword("IncidenceAngle", mtInterestResults[measure].mdIncidence);
-          pvlMeasureGrp += Isis::PvlKeyword("Resolution",     mtInterestResults[measure].mdResolution);
-          pvlMeasureGrp += Isis::PvlKeyword("DNValue",        mtInterestResults[measure].mdDn);
+          pvlMeasureGrp += Isis::PvlKeyword("BestInterest",   toString(mtInterestResults[measure].mdInterest));
+          pvlMeasureGrp += Isis::PvlKeyword("EmissionAngle",  toString(mtInterestResults[measure].mdEmission));
+          pvlMeasureGrp += Isis::PvlKeyword("IncidenceAngle", toString(mtInterestResults[measure].mdIncidence));
+          pvlMeasureGrp += Isis::PvlKeyword("Resolution",     toString(mtInterestResults[measure].mdResolution));
+          pvlMeasureGrp += Isis::PvlKeyword("DNValue",        toString(mtInterestResults[measure].mdDn));
           pvlPointObj += pvlMeasureGrp;
         } // Measures Loop
 
@@ -557,7 +557,7 @@ namespace Isis {
           PvlGroup pvlRefChangeGrp("ReferenceChangeDetails");
           if (iOrigRefIndex >= 0) {
             pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber", mtInterestResults[iOrigRefIndex].msSerialNum);
-            pvlRefChangeGrp += Isis::PvlKeyword("PrevBestInterest", mtInterestResults[iOrigRefIndex].mdInterest);
+            pvlRefChangeGrp += Isis::PvlKeyword("PrevBestInterest", toString(mtInterestResults[iOrigRefIndex].mdInterest));
             pvlRefChangeGrp += Isis::PvlKeyword("PrevLocation",     LocationString(mtInterestResults[iOrigRefIndex].mdOrigSample,
                                                 mtInterestResults[iOrigRefIndex].mdOrigLine));
           }
@@ -565,7 +565,7 @@ namespace Isis {
             pvlRefChangeGrp += Isis::PvlKeyword("PrevReference", "Not Set");
           }
           pvlRefChangeGrp += Isis::PvlKeyword("NewSerialNumber",  mtInterestResults[iBestMeasureIndex].msSerialNum);
-          pvlRefChangeGrp += Isis::PvlKeyword("NewBestInterest",  mtInterestResults[iBestMeasureIndex].mdInterest);
+          pvlRefChangeGrp += Isis::PvlKeyword("NewBestInterest",  toString(mtInterestResults[iBestMeasureIndex].mdInterest));
           pvlRefChangeGrp += Isis::PvlKeyword("NewLocation",      LocationString(mtInterestResults[iBestMeasureIndex].mdBestSample,
                                               mtInterestResults[iBestMeasureIndex].mdBestLine));
 
@@ -587,25 +587,25 @@ namespace Isis {
         int iComment = 0;
 
         if (numMeasures == 0) {
-          IString sComment = "Comment";
-          sComment += IString(++iComment);
+          QString sComment = "Comment";
+          sComment += toString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "No Measures in the Point");
         }
 
         if (newPnt->IsIgnored()) {
-          IString sComment = "Comment";
-          sComment += IString(++iComment);
+          QString sComment = "Comment";
+          sComment += toString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Point was originally Ignored");
         }
 
         if (newPnt->GetType() == ControlPoint::Fixed) {
-          IString sComment = "Comment";
-          sComment += IString(++iComment);
+          QString sComment = "Comment";
+          sComment += toString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Fixed Point");
         }
         else if (newPnt->GetType() == ControlPoint::Constrained) {
-          IString sComment = "Comment";
-          sComment += IString(++iComment);
+          QString sComment = "Comment";
+          sComment += toString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Constrained Point");
         }
 
@@ -628,9 +628,9 @@ namespace Isis {
     } // Point loop
 
     // CnetRef Change Statistics
-    mStatisticsGrp += Isis::PvlKeyword("PointsModified",   iPointsModified);
-    mStatisticsGrp += Isis::PvlKeyword("ReferenceChanged", iRefChanged);
-    mStatisticsGrp += Isis::PvlKeyword("MeasuresModified", iMeasuresModified);
+    mStatisticsGrp += Isis::PvlKeyword("PointsModified",   toString(iPointsModified));
+    mStatisticsGrp += Isis::PvlKeyword("ReferenceChanged", toString(iRefChanged));
+    mStatisticsGrp += Isis::PvlKeyword("MeasuresModified", toString(iMeasuresModified));
 
     mPvlLog += mStatisticsGrp;
   }
@@ -650,8 +650,8 @@ namespace Isis {
     if (mbOverlaps) {
       overlapPoly = FindOverlap(pCnetPoint);
       if (overlapPoly == NULL) {
-        string msg = "Unable to find overlap polygon for point [" +
-                     pCnetPoint.GetId() + "]";
+        QString msg = "Unable to find overlap polygon for point [" +
+                      pCnetPoint.GetId() + "]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -666,7 +666,7 @@ namespace Isis {
 
     for (int measure = 0; measure < pCnetPoint.GetNumMeasures(); ++measure) {
       ControlMeasure *origMsr = pCnetPoint[measure];
-      std::string sn = origMsr->GetCubeSerialNumber();
+      QString sn = origMsr->GetCubeSerialNumber();
 
       // Do not process Ignored Measures
       if (!origMsr->IsIgnored()) {
@@ -710,7 +710,7 @@ namespace Isis {
    */
   bool InterestOperator::InterestByMeasure(int piMeasure, ControlMeasure &pCnetMeasure,
       Cube &pCube) {
-    std::string serialNum = pCnetMeasure.GetCubeSerialNumber();
+    QString serialNum = pCnetMeasure.GetCubeSerialNumber();
 
     int iOrigSample = (int)(pCnetMeasure.GetSample() + 0.5);
     int iOrigLine   = (int)(pCnetMeasure.GetLine() + 0.5);
@@ -787,7 +787,7 @@ namespace Isis {
         camera = pCube.getCamera();
       }
       catch (IException &e) {
-        std::string msg = "Cannot Create Camera for Image:" + mSerialNumbers.FileName(serialNum);
+        QString msg = "Cannot Create Camera for Image:" + mSerialNumbers.FileName(serialNum);
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -846,7 +846,7 @@ namespace Isis {
            measureIndex ++) {
         if (measureIndex == numMatches) {
           const ControlMeasure &controlMeasure = *pCnetPoint[measureIndex];
-          IString serialNum = controlMeasure.GetCubeSerialNumber();
+          QString serialNum = controlMeasure.GetCubeSerialNumber();
           if (overlap->HasSerialNumber(serialNum)) {
             numMatches++;
           }
@@ -881,12 +881,12 @@ namespace Isis {
     geos::geom::Geometry *geomIntersect1, *geomIntersect2;
 
     // Create Multipolygon for the first Control Measure
-    std::string sn1 = pCnetPoint[0]->GetCubeSerialNumber();
+    QString sn1 = pCnetPoint[0]->GetCubeSerialNumber();
     Cube *inCube1 = mCubeMgr.OpenCube(mSerialNumbers.FileName(sn1));
     inCube1->read((Blob &)measPolygon1);
 
     // Create Multipolygon for the Second Control Measure
-    std::string sn2 = pCnetPoint[1]->GetCubeSerialNumber();
+    QString sn2 = pCnetPoint[1]->GetCubeSerialNumber();
     Cube *inCube2 = mCubeMgr.OpenCube(mSerialNumbers.FileName(sn2));
     inCube2->read((Blob &)measPolygon2);
 
@@ -895,7 +895,7 @@ namespace Isis {
                      (const geos::geom::Geometry *)measPolygon2.Polys());
 
     for (int measureIndex = 2; measureIndex < pCnetPoint.GetNumMeasures(); measureIndex ++) {
-      std::string sn3 = pCnetPoint[measureIndex]->GetCubeSerialNumber();
+      QString sn3 = pCnetPoint[measureIndex]->GetCubeSerialNumber();
       Cube *inCube3 = mCubeMgr.OpenCube(mSerialNumbers.FileName(sn3));
       inCube3->read((Blob &)measPolygon3);
 

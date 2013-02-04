@@ -43,7 +43,7 @@ namespace Isis {
    * @param type    Pixel type of data that will be encoded.
    *
    */
-  JP2Encoder::JP2Encoder(const std::string &jp2file, const unsigned int nsamps,
+  JP2Encoder::JP2Encoder(const QString &jp2file, const unsigned int nsamps,
                          const unsigned int nlines, const unsigned int nbands,
                          const Isis::PixelType type) {
 
@@ -119,7 +119,7 @@ namespace Isis {
 #if ENABLEJP2K
     // Open the JP2 file stream
     JP2_Stream = new jp2_family_tgt();
-    JP2_Stream->open(p_jp2File.c_str());
+    JP2_Stream->open(p_jp2File.toAscii().data());
 
     // Open the JP2 boxes
     JP2_Boxes = new jp2_target();

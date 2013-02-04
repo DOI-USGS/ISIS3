@@ -51,25 +51,25 @@ namespace Isis {
 
     p_label = new QLabel(p_name);
     p_label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    p_label->setToolTip((IString)p_ui->ParamBrief(group, param));
+    p_label->setToolTip(p_ui->ParamBrief(group, param));
     grid->addWidget(p_label, param, 0, Qt::AlignCenter);
 
     QString whatsThis;
-    whatsThis  = (QString)(IString)("<b>Parameter:</b> " + p_ui->ParamName(group, param));
-    whatsThis += (QString)(IString)("<p><b>Type:</b> " + p_ui->ParamType(group, param) + "</p>");
-    whatsThis += (QString)(IString)("<p><b>Brief:</b> " + p_ui->ParamBrief(group, param) + "</p>");
-    IString def = p_ui->ParamDefault(group, param);
+    whatsThis  = (QString)("<b>Parameter:</b> " + p_ui->ParamName(group, param));
+    whatsThis += (QString)("<p><b>Type:</b> " + p_ui->ParamType(group, param) + "</p>");
+    whatsThis += (QString)("<p><b>Brief:</b> " + p_ui->ParamBrief(group, param) + "</p>");
+    QString def = p_ui->ParamDefault(group, param);
     if(def == "") def = "None";
     whatsThis += "<p><b>Default: </b>" + QString(def) + "</p>";
-    IString intdef = p_ui->ParamInternalDefault(group, param);
+    QString intdef = p_ui->ParamInternalDefault(group, param);
     if(intdef != "") {
       whatsThis += "<p><b>Internal Default: </b> " + QString(intdef) + "</p>";
     }
-    IString pixtype = p_ui->PixelType(group, param);
+    QString pixtype = p_ui->PixelType(group, param);
     if(pixtype != "") {
       whatsThis += "<p><b>Pixel Type: </b> " + QString(pixtype) + "</p>";
     }
-    IString pmin = p_ui->ParamMinimum(group, param);
+    QString pmin = p_ui->ParamMinimum(group, param);
     if(pmin != "") {
       if(p_ui->ParamMinimumInclusive(group, param) == "YES") {
         whatsThis += "<p><b>Greater Than Or Equal To: </b>" +
@@ -79,7 +79,7 @@ namespace Isis {
         whatsThis += "<p><b>Greater Than: </b>" + QString(pmin) + "</p>";
       }
     }
-    IString pmax = p_ui->ParamMaximum(group, param);
+    QString pmax = p_ui->ParamMaximum(group, param);
     if(pmax != "") {
       if(p_ui->ParamMaximumInclusive(group, param) == "YES") {
         whatsThis += "<p><b>Less Than Or Equal To: </b>" +
@@ -91,68 +91,68 @@ namespace Isis {
     }
     if(p_ui->ParamLessThanSize(group, param) > 0) {
       whatsThis += "<p><b>Less Than: </b>" +
-                   QString((IString)p_ui->ParamLessThan(group, param, 0));
+                   QString(p_ui->ParamLessThan(group, param, 0));
       for(int l = 1; l < p_ui->ParamLessThanSize(group, param); l++) {
-        whatsThis += ", " + QString((IString)p_ui->ParamLessThan(group, param, l));
+        whatsThis += ", " + QString(p_ui->ParamLessThan(group, param, l));
       }
       whatsThis += "</p>";
     }
     if(p_ui->ParamLessThanOrEqualSize(group, param) > 0) {
       whatsThis += "<p><b>Less Than Or Equal: </b>" +
-                   QString((IString)p_ui->ParamLessThanOrEqual(group, param, 0));
+                   QString(p_ui->ParamLessThanOrEqual(group, param, 0));
       for(int l = 1; l < p_ui->ParamLessThanOrEqualSize(group, param); l++) {
         whatsThis += ", " +
-                     QString((IString)p_ui->ParamLessThanOrEqual(group, param, l));
+                     QString(p_ui->ParamLessThanOrEqual(group, param, l));
       }
       whatsThis += "</p>";
     }
     if(p_ui->ParamNotEqualSize(group, param) > 0) {
       whatsThis += "<p><b>Not Equal: </b>" +
-                   QString((IString)p_ui->ParamNotEqual(group, param, 0));
+                   QString(p_ui->ParamNotEqual(group, param, 0));
       for(int l = 1; l < p_ui->ParamNotEqualSize(group, param); l++) {
-        whatsThis += ", " + QString((IString)p_ui->ParamNotEqual(group, param, l));
+        whatsThis += ", " + QString(p_ui->ParamNotEqual(group, param, l));
       }
       whatsThis += "</p>";
     }
     if(p_ui->ParamGreaterThanSize(group, param) > 0) {
       whatsThis += "<p><b>Greater Than: </b>" +
-                   QString((IString)p_ui->ParamGreaterThan(group, param, 0));
+                   QString(p_ui->ParamGreaterThan(group, param, 0));
       for(int l = 1; l < p_ui->ParamGreaterThanSize(group, param); l++) {
         whatsThis += ", " +
-                     QString((IString)p_ui->ParamGreaterThan(group, param, l));
+                     QString(p_ui->ParamGreaterThan(group, param, l));
       }
       whatsThis += "</p>";
     }
     if(p_ui->ParamGreaterThanOrEqualSize(group, param) > 0) {
       whatsThis += "<p><b>Greater Than Or Equal: </b>" +
-                   QString((IString)p_ui->ParamGreaterThanOrEqual(group, param, 0));
+                   QString(p_ui->ParamGreaterThanOrEqual(group, param, 0));
       for(int l = 1; l < p_ui->ParamGreaterThanOrEqualSize(group, param); l++) {
         whatsThis += ", " +
-                     QString((IString)p_ui->ParamGreaterThanOrEqual(group, param, l));
+                     QString(p_ui->ParamGreaterThanOrEqual(group, param, l));
       }
       whatsThis += "</p>";
     }
     if(p_ui->ParamIncludeSize(group, param) > 0) {
       whatsThis += "<p><b>Inclusions: </b>" +
-                   QString((IString)p_ui->ParamInclude(group, param, 0));
+                   QString(p_ui->ParamInclude(group, param, 0));
       for(int l = 1; l < p_ui->ParamIncludeSize(group, param); l++) {
         whatsThis += ", " +
-                     QString((IString)p_ui->ParamInclude(group, param, l));
+                     QString(p_ui->ParamInclude(group, param, l));
       }
       whatsThis += "</p>";
     }
     if(p_ui->ParamExcludeSize(group, param) > 0) {
       whatsThis += "<p><b>Exclusions: </b>" +
-                   QString((IString)p_ui->ParamExclude(group, param, 0));
+                   QString(p_ui->ParamExclude(group, param, 0));
       for(int l = 1; l < p_ui->ParamExcludeSize(group, param); l++) {
         whatsThis += ", " +
-                     QString((IString)p_ui->ParamExclude(group, param, l));
+                     QString(p_ui->ParamExclude(group, param, l));
       }
       whatsThis += "</p>";
     }
     if(p_ui->ParamOdd(group, param) != "") {
       whatsThis += "<p><b>Odd: </b>" +
-                   QString((IString)p_ui->ParamOdd(group, param)) + "</p>";
+                   QString(p_ui->ParamOdd(group, param)) + "</p>";
     }
     p_label->setWhatsThis(whatsThis);
 
@@ -252,8 +252,8 @@ namespace Isis {
   }
 
   //! Return list of current exclusions
-  std::vector<std::string> GuiParameter::Exclusions() {
-    std::vector<std::string> list;
+  std::vector<QString> GuiParameter::Exclusions() {
+    std::vector<QString> list;
     return list;
   }
 
@@ -262,29 +262,29 @@ namespace Isis {
     // Just make one single helper button
     if(p_ui->HelpersSize(p_group, p_param) == 1) {
       GuiHelperAction *action =
-        new GuiHelperAction(lo, (IString)p_ui->HelperFunction(p_group, p_param, 0));
+        new GuiHelperAction(lo, p_ui->HelperFunction(p_group, p_param, 0));
       if(p_ui->HelperIcon(p_group, p_param, 0) != "") {
-        IString file = FileName(
+        QString file = FileName(
                          p_ui->HelperIcon(p_group, p_param, 0)).expanded();
         action->setIcon(QIcon(QPixmap(file)));
       }
       else {
-        action->setText((IString)p_ui->HelperButtonName(p_group, p_param, 0));
+        action->setText(p_ui->HelperButtonName(p_group, p_param, 0));
       }
-      action->setToolTip((IString)p_ui->HelperBrief(p_group, p_param, 0));
+      action->setToolTip(p_ui->HelperBrief(p_group, p_param, 0));
       QString helperText = "<p><b>Function:</b> " +
-                           QString((IString)p_ui->HelperDescription(p_group, p_param, 0)) + "</p>";
+                           QString(p_ui->HelperDescription(p_group, p_param, 0)) + "</p>";
       action->setWhatsThis(helperText);
       connect(action, SIGNAL(trigger(const QString &)), this,
               SIGNAL(HelperTrigger(const QString &)));
 
       QToolButton *helper = new QToolButton();
-      helper->setText((IString)p_ui->HelperButtonName(p_group, p_param, 0));
+      helper->setText(p_ui->HelperButtonName(p_group, p_param, 0));
       helper->setDefaultAction(action);
 
       if(p_ui->HelperIcon(p_group, p_param, 0) != "") {
         helper->setText("");
-        IString file = FileName(
+        QString file = FileName(
                          p_ui->HelperIcon(p_group, p_param, 0)).expanded();
         helper->setIconSize(QSize(22, 22));
         helper->setIcon(QIcon(QPixmap(file)));
@@ -309,34 +309,34 @@ namespace Isis {
 
       // Create default action item
       GuiHelperAction *action =
-        new GuiHelperAction(lo, (IString)p_ui->HelperFunction(p_group, p_param, 0));
+        new GuiHelperAction(lo, p_ui->HelperFunction(p_group, p_param, 0));
       if(p_ui->HelperIcon(p_group, p_param, 0) != "") {
-        IString file = FileName(
+        QString file = FileName(
                          p_ui->HelperIcon(p_group, p_param, 0)).expanded();
         action->setIcon(QIcon(QPixmap(file)));
       }
       else {
-        action->setText((IString)p_ui->HelperButtonName(p_group, p_param, 0));
+        action->setText(p_ui->HelperButtonName(p_group, p_param, 0));
       }
       connect(action, SIGNAL(trigger(const QString &)), this,
               SIGNAL(HelperTrigger(const QString &)));
 
       // Set up helper button
       QToolButton *helper = new QToolButton();
-      helper->setText((IString)p_ui->HelperButtonName(p_group, p_param, 0));
+      helper->setText(p_ui->HelperButtonName(p_group, p_param, 0));
 
       helper->setMenu(p_helperMenu);
       helper->setPopupMode(QToolButton::MenuButtonPopup);
       helper->setDefaultAction(action);
-      helper->setToolTip((IString)p_ui->HelperBrief(p_group, p_param, 0));
+      helper->setToolTip(p_ui->HelperBrief(p_group, p_param, 0));
       QString text = "<p><b>Function:</b> " +
-                     QString((IString)p_ui->HelperDescription(p_group, p_param, 0)) + "</p>" +
+                     QString(p_ui->HelperDescription(p_group, p_param, 0)) + "</p>" +
                      "<p><b>Hint: </b> Click on the arrow to see more helper functions</p>";
       helper->setWhatsThis(text);
 
       if(p_ui->HelperIcon(p_group, p_param, 0) != "") {
         helper->setText("");
-        IString file = FileName(
+        QString file = FileName(
                          p_ui->HelperIcon(p_group, p_param, 0)).expanded();
         helper->setIconSize(QSize(22, 22));
         helper->setIcon(QIcon(QPixmap(file)));
@@ -348,11 +348,11 @@ namespace Isis {
 
       // Set up default action item in menu list
       GuiHelperAction *action2 =
-        new GuiHelperAction(lo, (IString)p_ui->HelperFunction(p_group, p_param, 0));
-      action2->setText((IString)p_ui->HelperBrief(p_group, p_param, 0));
-      action2->setToolTip((IString)p_ui->HelperBrief(p_group, p_param, 0));
+        new GuiHelperAction(lo, p_ui->HelperFunction(p_group, p_param, 0));
+      action2->setText(p_ui->HelperBrief(p_group, p_param, 0));
+      action2->setToolTip(p_ui->HelperBrief(p_group, p_param, 0));
       QString helperText = "<p><b>Function:</b> " +
-                           QString((IString)p_ui->HelperDescription(p_group, p_param, 0)) + "</p>";
+                           QString(p_ui->HelperDescription(p_group, p_param, 0)) + "</p>";
       action2->setWhatsThis(helperText);
       connect(action2, SIGNAL(trigger(const QString &)), this,
               SIGNAL(HelperTrigger(const QString &)));
@@ -362,11 +362,11 @@ namespace Isis {
       // Add each additional helper button to the menu list
       for(int i = 1; i < p_ui->HelpersSize(p_group, p_param); i++) {
         GuiHelperAction *helperAction =
-          new GuiHelperAction(lo, (IString)p_ui->HelperFunction(p_group, p_param, i));
-        helperAction->setText((IString)p_ui->HelperBrief(p_group, p_param, i));
-        helperAction->setToolTip((IString)p_ui->HelperBrief(p_group, p_param, i));
+          new GuiHelperAction(lo, p_ui->HelperFunction(p_group, p_param, i));
+        helperAction->setText(p_ui->HelperBrief(p_group, p_param, i));
+        helperAction->setToolTip(p_ui->HelperBrief(p_group, p_param, i));
         QString helperText = "<p><b>Function:</b> " +
-                             QString((IString)p_ui->HelperDescription(p_group, p_param, i)) + "</p>";
+                             QString(p_ui->HelperDescription(p_group, p_param, i)) + "</p>";
         helperAction->setWhatsThis(helperText);
         connect(helperAction, SIGNAL(trigger(const QString &)), this,
                 SIGNAL(HelperTrigger(const QString &)));

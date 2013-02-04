@@ -11,11 +11,12 @@
 #include "geos/geom/LinearRing.h"
 #include "geos/geom/CoordinateArraySequence.h"
 
+using namespace Isis;
 using namespace std;
 
 int main() {
-  Isis::Preference::Preferences(true);
-  void PrintImageOverlap(const Isis::ImageOverlap * poi);
+  Preference::Preferences(true);
+  void PrintImageOverlap(const ImageOverlap * poi);
 
   // Create 6 multi polygons
   //     01 02 03 04 05 06 07 08 09 10 11 12 13 14 15
@@ -62,7 +63,7 @@ int main() {
 
   // Fill a vector of MultiPolygon* and serial numbers
   vector<geos::geom::MultiPolygon *> boundaries;
-  vector<string> sns;
+  vector<QString> sns;
 
   // Reusable variables
   geos::geom::CoordinateSequence *pts;
@@ -76,10 +77,10 @@ int main() {
   pts->add(geos::geom::Coordinate(1, 4));
   pts->add(geos::geom::Coordinate(1, 9));
 
-  polys.push_back(Isis::globalFactory.createPolygon(
-                    Isis::globalFactory.createLinearRing(pts), NULL));
+  polys.push_back(globalFactory.createPolygon(
+                    globalFactory.createLinearRing(pts), NULL));
 
-  boundaries.push_back(Isis::globalFactory.createMultiPolygon(polys));
+  boundaries.push_back(globalFactory.createMultiPolygon(polys));
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
@@ -93,9 +94,9 @@ int main() {
   pts->add(geos::geom::Coordinate(3, 7));
   pts->add(geos::geom::Coordinate(3, 10));
 
-  polys.push_back(Isis::globalFactory.createPolygon(
-                    Isis::globalFactory.createLinearRing(pts), NULL));
-  boundaries.push_back(Isis::globalFactory.createMultiPolygon(polys));
+  polys.push_back(globalFactory.createPolygon(
+                    globalFactory.createLinearRing(pts), NULL));
+  boundaries.push_back(globalFactory.createMultiPolygon(polys));
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
@@ -109,9 +110,9 @@ int main() {
   pts->add(geos::geom::Coordinate(15, 5));
   pts->add(geos::geom::Coordinate(11, 5));
 
-  polys.push_back(Isis::globalFactory.createPolygon(
-                    Isis::globalFactory.createLinearRing(pts), NULL));
-  boundaries.push_back(Isis::globalFactory.createMultiPolygon(polys));
+  polys.push_back(globalFactory.createPolygon(
+                    globalFactory.createLinearRing(pts), NULL));
+  boundaries.push_back(globalFactory.createMultiPolygon(polys));
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
@@ -125,9 +126,9 @@ int main() {
   pts->add(geos::geom::Coordinate(5, 8));
   pts->add(geos::geom::Coordinate(14, 8));
 
-  polys.push_back(Isis::globalFactory.createPolygon(
-                    Isis::globalFactory.createLinearRing(pts), NULL));
-  boundaries.push_back(Isis::globalFactory.createMultiPolygon(polys));
+  polys.push_back(globalFactory.createPolygon(
+                    globalFactory.createLinearRing(pts), NULL));
+  boundaries.push_back(globalFactory.createMultiPolygon(polys));
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
@@ -141,9 +142,9 @@ int main() {
   pts->add(geos::geom::Coordinate(10, 4));
   pts->add(geos::geom::Coordinate(10, 6));
 
-  polys.push_back(Isis::globalFactory.createPolygon(
-                    Isis::globalFactory.createLinearRing(pts), NULL));
-  boundaries.push_back(Isis::globalFactory.createMultiPolygon(polys));
+  polys.push_back(globalFactory.createPolygon(
+                    globalFactory.createLinearRing(pts), NULL));
+  boundaries.push_back(globalFactory.createMultiPolygon(polys));
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
@@ -157,17 +158,17 @@ int main() {
   pts->add(geos::geom::Coordinate(4, 1));
   pts->add(geos::geom::Coordinate(1, 1));
 
-  polys.push_back(Isis::globalFactory.createPolygon(
-                    Isis::globalFactory.createLinearRing(pts), NULL));
-  boundaries.push_back(Isis::globalFactory.createMultiPolygon(polys));
+  polys.push_back(globalFactory.createPolygon(
+                    globalFactory.createLinearRing(pts), NULL));
+  boundaries.push_back(globalFactory.createMultiPolygon(polys));
 
   for(unsigned int i = 0; i < polys.size(); ++i) delete polys[i];
   polys.clear();
   sns.push_back("F");
 
   // Create a ImageOverlapSet object with the multipolys and sns from above
-  Isis::ImageOverlapSet overlapSet1(true);
-  Isis::ImageOverlapSet overlapSet2(true);
+  ImageOverlapSet overlapSet1(true);
+  ImageOverlapSet overlapSet2(true);
   overlapSet1.FindImageOverlaps(sns, boundaries);
 
   // Test read/write methods
@@ -188,7 +189,7 @@ int main() {
 
 
 // Print an ImageOverlap
-void PrintImageOverlap(const Isis::ImageOverlap *poi) {
+void PrintImageOverlap(const ImageOverlap *poi) {
 
   // Write the wkt version of the multi polygon to the screen
   const geos::geom::MultiPolygon *mp = poi->Polygon();

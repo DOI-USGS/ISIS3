@@ -36,11 +36,11 @@
  */
 class IsisListOptionData {
   public:
-    std::string value;
-    std::string brief;
-    std::string description;
-    std::vector<std::string> exclude;
-    std::vector<std::string> include;
+    QString value;
+    QString brief;
+    QString description;
+    std::vector<QString> exclude;
+    std::vector<QString> include;
 
     IsisListOptionData();
     ~IsisListOptionData();
@@ -53,11 +53,11 @@ class IsisListOptionData {
  */
 class IsisHelperData {
   public:
-    std::string name;
-    std::string icon;
-    std::string brief;
-    std::string description;
-    std::string function;
+    QString name;
+    QString icon;
+    QString brief;
+    QString description;
+    QString function;
 
     IsisHelperData();
     ~IsisHelperData();
@@ -70,33 +70,33 @@ class IsisHelperData {
  */
 class IsisParameterData {
   public:
-    std::vector <std::string> values;
-    std::string name;
-    std::string brief;
-    std::string description;
-    std::string type;
-    std::vector <std::string> defaultValues;
-    std::string internalDefault;
-    std::string count;
+    std::vector <QString> values;
+    QString name;
+    QString brief;
+    QString description;
+    QString type;
+    std::vector <QString> defaultValues;
+    QString internalDefault;
+    QString count;
     std::vector <IsisListOptionData> listOptions;
-    std::string minimum_inclusive;
-    std::string minimum;
-    std::string maximum_inclusive;
-    std::string maximum;
-    std::vector<std::string> greaterThan;
-    std::vector<std::string> greaterThanOrEqual;
-    std::vector<std::string> lessThan;
-    std::vector<std::string> lessThanOrEqual;
-    std::vector<std::string> notEqual;
-    std::vector<std::string> exclude;
-    std::vector<std::string> include;
-    std::string odd;
-    std::string filter;
-    std::string path;
-    std::string fileMode;
+    QString minimum_inclusive;
+    QString minimum;
+    QString maximum_inclusive;
+    QString maximum;
+    std::vector<QString> greaterThan;
+    std::vector<QString> greaterThanOrEqual;
+    std::vector<QString> lessThan;
+    std::vector<QString> lessThanOrEqual;
+    std::vector<QString> notEqual;
+    std::vector<QString> exclude;
+    std::vector<QString> include;
+    QString odd;
+    QString filter;
+    QString path;
+    QString fileMode;
     Isis::CubeAttributeOutput outCubeAtt;
     Isis::CubeAttributeInput inCubeAtt;
-    std::string pixelType;
+    QString pixelType;
     std::vector<IsisHelperData> helpers;
 
     IsisParameterData();
@@ -111,7 +111,7 @@ class IsisParameterData {
  */
 class IsisGroupData {
   public:
-    std::string name;
+    QString name;
     std::vector<IsisParameterData> parameters;
 
     IsisGroupData();
@@ -125,9 +125,9 @@ class IsisGroupData {
  */
 class IsisChangeData {
   public:
-    std::string name;
-    std::string date;
-    std::string description;
+    QString name;
+    QString date;
+    QString description;
 
     IsisChangeData();
     ~IsisChangeData();
@@ -141,11 +141,11 @@ class IsisChangeData {
  */
 class IsisAmlData {
   public:
-    std::string name;
-    std::string brief;
-    std::string description;
+    QString name;
+    QString brief;
+    QString description;
     std::vector<IsisGroupData> groups;
-    std::vector<std::string> categorys;
+    std::vector<QString> categorys;
     std::vector<IsisChangeData> changes;
 
     IsisAmlData();

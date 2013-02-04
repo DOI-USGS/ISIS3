@@ -51,8 +51,8 @@ namespace Isis {
     NaifStatus::CheckErrors();
     // Get the Instrument label information needed to define the camera for this frame
     PvlGroup inst = lab.FindGroup("Instrument", Pvl::Traverse);
-    IString spacecraft = (string)inst["SpacecraftName"];
-    IString instId = (string)inst["InstrumentId"];
+    QString spacecraft = inst["SpacecraftName"];
+    QString instId = inst["InstrumentId"];
 
     LoMediumCamera::FocalPlaneMapType type;
     if(inst.HasKeyword("FiducialSamples")) {
@@ -75,7 +75,7 @@ namespace Isis {
     SetPixelPitch();
 
     // Get the start time in et
-    double time = iTime((string)inst["StartTime"]).Et();
+    double time = iTime((QString)inst["StartTime"]).Et();
 
     // Setup focal plane map
     if(type == Fiducial) {

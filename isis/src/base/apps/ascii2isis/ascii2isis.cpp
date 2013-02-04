@@ -14,7 +14,7 @@ using namespace Isis;
 double TestSpecial(const double pixel);
 void ascii2isis(Buffer &out);
 ifstream fin;
-string order;
+QString order;
 //Initialize values to make special pixels invalid
 double null_min = DBL_MAX;
 double null_max = DBL_MIN;
@@ -27,7 +27,7 @@ void IsisMain() {
 
   //  Open input text file
   UserInterface &ui = Application::GetUserInterface();
-  string from = ui.GetFileName("FROM");
+  QString from = ui.GetFileName("FROM");
   // Get storage order of data
   order = ui.GetString("ORDER");
 
@@ -54,9 +54,9 @@ void IsisMain() {
     lrs_max = ui.GetDouble("LRSMAX");
   }
 
-  fin.open(from.c_str(), std::ios::in);
+  fin.open(from.toAscii().data(), std::ios::in);
   if(!fin.is_open()) {
-    string msg = "Cannot open input file [" + from + "]";
+    QString msg = "Cannot open input file [" + from + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 

@@ -43,7 +43,7 @@ namespace Isis {
    * Here is an example of how to use JP2Decoder
    * @code
    *   JP2Decoder *JP2_decoder;
-   *   JP2_decoder = new JP2Decoder(IString(ui.GetFileName("FROM")));
+   *   JP2_decoder = new JP2Decoder(QString(ui.GetFileName("FROM")));
    *   JP2_decoder->OpenFile();
    *   int nsamps = JP2_decoder->GetSampleDimension();
    *   int nlines = JP2_decoder->GetLineDimension();
@@ -66,7 +66,7 @@ namespace Isis {
    *       "The file [" + ui.GetFileName("FROM") + "] contains unsupported data type.",
    *       _FILEINFO_);
    *   }
-   *   jp.SetInputFile(IString(ui.GetFileName("FROM")));
+   *   jp.SetInputFile(QString(ui.GetFileName("FROM")));
    *   jp.SetOutputCube("TO");
    *   jp.SetOrganization(ProcessImport::JP2);
    *   jp.StartProcess();
@@ -91,7 +91,7 @@ namespace Isis {
    */
   class JP2Decoder {
     public:
-      JP2Decoder(const std::string &jp2file);
+      JP2Decoder(const QString &jp2file);
       ~JP2Decoder();
 
       // Register with the Kakadu error facility
@@ -133,10 +133,10 @@ namespace Isis {
       // Read 16-bit data from the JP2 file
       void Read(short int **inbuf);
 
-      static bool IsJP2(std::string filename);
+      static bool IsJP2(QString filename);
 
     private:
-      std::string p_jp2File;          //!<Input file name
+      QString p_jp2File;          //!<Input file name
       unsigned int p_resolutionLevel; //!<Resolution level that file will be decompressed
       //!<at. Always full resolution.
       unsigned int p_numSamples;      //!<Number of samples in JP2 file

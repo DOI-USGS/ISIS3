@@ -16,19 +16,19 @@ int main() {
   try {
     PvlGroup alg("Algorithm");
     alg += PvlKeyword("Name", "MinimumDifference");
-    alg += PvlKeyword("Tolerance", 5.0);
+    alg += PvlKeyword("Tolerance", "5.0");
     alg += PvlKeyword("SubpixelAccuracy", "True");
 
     PvlGroup pchip("PatternChip");
-    pchip += PvlKeyword("Samples", 15);
-    pchip += PvlKeyword("Lines", 15);
-    pchip += PvlKeyword("Sampling", 25);
-    pchip += PvlKeyword("ValidPercent", 10);
+    pchip += PvlKeyword("Samples", "15");
+    pchip += PvlKeyword("Lines", "15");
+    pchip += PvlKeyword("Sampling", "25");
+    pchip += PvlKeyword("ValidPercent", "10");
 
     PvlGroup schip("SearchChip");
-    schip += PvlKeyword("Samples", 35);
-    schip += PvlKeyword("Lines", 35);
-    schip += PvlKeyword("Sampling", 50);
+    schip += PvlKeyword("Samples", "35");
+    schip += PvlKeyword("Lines", "35");
+    schip += PvlKeyword("Sampling", "50");
 
     PvlObject o("AutoRegistration");
     o.AddGroup(alg);

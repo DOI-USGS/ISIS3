@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
   catch (IException &e) {
     cerr << "\t" << e.toString() << endl;
   }
-  
+
   cerr << endl;
   cerr << "Testing toInt" << endl;
   cerr << "\t" << toInt("0") << endl;
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
   catch (IException &e) {
     cerr << "\t" << e.toString() << endl;
   }
-  
+
   try {
     toBigInt("9223372036854775808");
   }
@@ -81,8 +81,10 @@ int main(int argc, char *argv[]) {
   cerr << "\t" << toDouble("0.0") << endl;
   cerr << "\t" << toDouble("5.25") << endl;
   cerr << "\t" << toDouble("-5.25") << endl;
+  cerr << "\t" << toDouble("16#FF7FFFFB#") << endl;
   cerr << "\t" << toDouble("1e100") << endl;
   cerr << "\t" << toDouble("-1E100") << endl;
+  cerr << "\t" << toDouble("1.79769313486232e+308") << endl;
 
   try {
     toDouble("fred");
@@ -97,6 +99,7 @@ int main(int argc, char *argv[]) {
   cerr << "\tbool(true):         " << toString(true) << endl;
   cerr << "\tchar(A):            " << toString('A') << endl;
   cerr << "\tint(2147483647):    " << toString(2147483647) << endl;
+  cerr << "\tuint(2147483648):   " << toString((unsigned int)2147483648) << endl;
   cerr << "\tBigInt(2147483648): " << toString(2147483648) << endl;
   cerr << "\tdouble(0.0):        " << toString(0.0) << endl;
   cerr << "\tdouble(DBL_MIN):    " << toString(DBL_MIN) << endl;

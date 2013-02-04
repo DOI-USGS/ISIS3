@@ -31,7 +31,7 @@ void IsisMain() {
   list.read(ui.GetFileName("FROMLIST"));
 
   if(list.size() < 1) {
-    string msg = "The input list file [" + ui.GetFileName("FROMLIST") + "is empty";
+    QString msg = "The input list file [" + ui.GetFileName("FROMLIST") + "is empty";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -42,7 +42,7 @@ void IsisMain() {
   }
 
   if(ifile >= list.size()) {
-    string msg = "The master file, [" + FileName(ui.GetFileName("MASTER")).expanded() + " is not included in " +
+    QString msg = "The master file, [" + FileName(ui.GetFileName("MASTER")).expanded() + " is not included in " +
                  "the input list file " + ui.GetFileName("FROMLIST") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -65,7 +65,7 @@ void IsisMain() {
     // Get the camera
     Camera *cam = cube.getCamera();
     if(cam->DetectorMap()->LineRate() == 0.0) {
-      string msg = "[" + ui.GetFileName("MASTER") + "] is not a line scan camera image";
+      QString msg = "[" + ui.GetFileName("MASTER") + "] is not a line scan camera image";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -140,7 +140,7 @@ void IsisMain() {
         // Get the camera and make sure it is a line scan camera
         Camera *cam = cube.getCamera();
         if(cam->DetectorMap()->LineRate() == 0.0) {
-          string msg = "[" + ui.GetFileName("FROM") + "] is not a line scan camera";
+          QString msg = "[" + ui.GetFileName("FROM") + "] is not a line scan camera";
           throw IException(IException::User, msg, _FILEINFO_);
         }
         // Write out the pointing cache as a table
@@ -158,13 +158,13 @@ void IsisMain() {
         }
         cube.putGroup(kernels);
         cube.close();
-        gp += PvlKeyword("Status" + IString(ifile), list[ifile].toString() + ":  camera pointing updated");
+        gp += PvlKeyword("Status" + toString(ifile), list[ifile].toString() + ":  camera pointing updated");
       }
     }
     Application::Log(gp);
   }
   catch(IException &e) {
-    string msg;
+    QString msg;
     if(!step2) {
       msg = "Unable to fit pointing for [" + ui.GetFileName("MASTER") + "]";
     }

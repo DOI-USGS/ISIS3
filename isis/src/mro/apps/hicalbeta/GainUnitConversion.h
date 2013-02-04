@@ -1,4 +1,4 @@
-#if !defined(GainUnitConversion_h)
+#ifndef GainUnitConversion_h
 #define GainUnitConversion_h
 /**                                                                       
  * @file                                                                  
@@ -56,7 +56,7 @@ namespace Isis {
     public: 
       //  Constructors and Destructor
       GainUnitConversion() : Module("GainUnitConversion"), _units("DN") { }
-      GainUnitConversion(HiCalConf &conf, const std::string &units) : 
+      GainUnitConversion(HiCalConf &conf, const QString &units) : 
                  Module("GainUnitConversion"),  _units(units) {
         init(conf);
       }
@@ -65,7 +65,7 @@ namespace Isis {
       virtual ~GainUnitConversion() { }
 
     private:
-      std::string   _units;
+      QString   _units;
 
       void init(HiCalConf &conf) {
         _history.clear();

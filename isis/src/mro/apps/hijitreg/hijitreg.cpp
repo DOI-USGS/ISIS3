@@ -49,7 +49,7 @@ struct JitterParms {
   HiJitCube::JitInfo matchJit;
   HiJitCube::Corners fromCorns;
   HiJitCube::Corners matchCorns;
-  std::string regFile;
+  QString regFile;
   int rows;
   int cols;
   double lSpacing;
@@ -85,7 +85,7 @@ void IsisMain() {
   // Open the first cube.  It will be matched to the second input cube.
   HiJitCube trans;
   CubeAttributeInput &attTrans = ui.GetInputAttribute("FROM");
-  vector<string> bandTrans = attTrans.bands();
+  vector<QString> bandTrans = attTrans.bands();
   trans.setVirtualBands(bandTrans);
   trans.OpenCube(ui.GetFileName("FROM"), stitch);
 
@@ -94,13 +94,13 @@ void IsisMain() {
   // first to this one by attempting to compute a sample/line translation
   HiJitCube match;
   CubeAttributeInput &attMatch = ui.GetInputAttribute("MATCH");
-  vector<string> bandMatch = attMatch.bands();
+  vector<QString> bandMatch = attMatch.bands();
   match.setVirtualBands(bandMatch);
   match.OpenCube(ui.GetFileName("MATCH"), stitch);
 
 //  Ensure only one band
   if((trans.getBandCount() != 1) || (match.getBandCount() != 1)) {
-    string msg = "Input Cubes must have only one band!";
+    QString msg = "Input Cubes must have only one band!";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -109,7 +109,7 @@ void IsisMain() {
 
 //  Determine intersection
   if(!trans.intersects(match)) {
-    string msg = "Input Cubes do not overlap!";
+    QString msg = "Input Cubes do not overlap!";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -183,8 +183,8 @@ void IsisMain() {
   cn.SetCreatedDate(iTime::CurrentLocalTime());
 
   //  Get serial numbers for input cubes
-  string transSN = SerialNumber::Compose(trans, true);
-  string matchSN = SerialNumber::Compose(match, true);
+  QString transSN = SerialNumber::Compose(trans, true);
+  QString matchSN = SerialNumber::Compose(match, true);
 
   PvlGroup &instrument = trans.getLabel()->FindGroup("Instrument", Pvl::Traverse);
   cn.SetTarget(instrument["TargetName"][0]);
@@ -276,8 +276,8 @@ void IsisMain() {
 #if defined(ISIS_DEBUG)
           ostringstream tstr;
           tstr << "R" << r << "C" << c << "_chip.cub";
-          string fcname("from"  + tstr.str());
-          string mcname("match" + tstr.str());
+          QString fcname("from"  + tstr.str());
+          QString mcname("match" + tstr.str());
 
           pchip.Write(mcname);
           fchip.Write(fcname);
@@ -310,7 +310,7 @@ void IsisMain() {
       }
 
       // Add the measures to a control point
-      string str = "Row " + IString(r) + " Column " + IString(c);
+      QString str = "Row " + toString(r) + " Column " + toString(c);
       ControlPoint * cp = new ControlPoint(str);
       cp->SetType(ControlPoint::Free);
       cp->Add(cmTrans);
@@ -326,10 +326,10 @@ void IsisMain() {
   // The flatfile is comma seperated and can be imported into an excel
   // spreadsheet
   if(ui.WasEntered("FLATFILE")) {
-    string fFile = ui.GetFileName("FLATFILE");
+    QString fFile = ui.GetFileName("FLATFILE");
     ofstream os;
-    string fFileExpanded = FileName(fFile).expanded();
-    os.open(fFileExpanded.c_str(), ios::out);
+    QString fFileExpanded = FileName(fFile).expanded();
+    os.open(fFileExpanded.toAscii().data(), ios::out);
     dumpResults(os, reglist, jparms, *ar);
   }
 
@@ -348,9 +348,9 @@ void IsisMain() {
   if(jparms.sStats.ValidPixels() > 0) {
     double sTrans = (int)(jparms.sStats.Average() * 100.0) / 100.0;
     double lTrans = (int)(jparms.lStats.Average() * 100.0) / 100.0;
-    results += PvlKeyword("Sample", sTrans);
-    results += PvlKeyword("Line", lTrans);
-    results += PvlKeyword("NSuspects", jparms.nSuspects);
+    results += PvlKeyword("Sample", toString(sTrans));
+    results += PvlKeyword("Line", toString(lTrans));
+    results += PvlKeyword("NSuspects", toString(jparms.nSuspects));
   }
   else {
     results += PvlKeyword("Sample", "NULL");

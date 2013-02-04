@@ -54,7 +54,7 @@ namespace Isis {
    * @param extension Extension to be added to filename (added only if not
    *                  already on filename). Defaults to ""
    */
-  TextFile::TextFile(const std::string &filename,
+  TextFile::TextFile(const QString &filename,
                      const char *openmode, const char *extension) {
     SetComment();
     SetNewLine();
@@ -85,8 +85,8 @@ namespace Isis {
    *                     true=filter, false=return any line read from
    *                     fileDefaults to true
    */
-  TextFile::TextFile(const std::string &filename, const char *openmode,
-                     std::vector<std::string> &lines, const int &maxLinesToReadWrite,
+  TextFile::TextFile(const QString &filename, const char *openmode,
+                     std::vector<QString> &lines, const int &maxLinesToReadWrite,
                      const bool skipComments) {
     SetComment();
     SetNewLine();
@@ -123,10 +123,9 @@ namespace Isis {
    *                     fileDefaults to true
    */
   TextFile::TextFile(const char *filename, const char *openmode,
-                     std::vector<std::string> &lines, const int &maxLinesToReadWrite,
+                     std::vector<QString> &lines, const int &maxLinesToReadWrite,
                      const bool skipComments) {
-    string FileName = filename;
-    TextFile(FileName, openmode, lines, maxLinesToReadWrite, skipComments);
+    TextFile(QString(filename), openmode, lines, maxLinesToReadWrite, skipComments);
   }
 
   /**
@@ -154,8 +153,8 @@ namespace Isis {
    *                     true=filter, false=return any line read from
    *                     fileDefaults to true
    */
-  TextFile::TextFile(const std::string &filename, const char *openmode,
-                     std::string *lines, const int &maxLinesToReadWrite,
+  TextFile::TextFile(const QString &filename, const char *openmode,
+                     QString *lines, const int &maxLinesToReadWrite,
                      const bool skipComments) {
     SetComment();
     SetNewLine();
@@ -193,10 +192,9 @@ namespace Isis {
    *                     fileDefaults to true
    */
   TextFile::TextFile(const char *filename, const char *openmode,
-                     std::string *lines, const int &maxLinesToReadWrite,
+                     QString *lines, const int &maxLinesToReadWrite,
                      const bool skipComments) {
-    string FileName = filename;
-    TextFile(FileName, openmode, lines, maxLinesToReadWrite, skipComments);
+    TextFile(QString(filename), openmode, lines, maxLinesToReadWrite, skipComments);
   }
 
 
@@ -232,7 +230,7 @@ namespace Isis {
    * @throws Isis::IException::Io - output file already exists
    * @throws Isis::IException::Io - unable to open file
    */
-  void TextFile::Open(const std::string &filename, const char *openmode,
+  void TextFile::Open(const QString &filename, const char *openmode,
                       const char *extension) {
     // Open (filename [,openmode] [, with_extension ])
     // default openmode = 'input'
@@ -243,8 +241,8 @@ namespace Isis {
 
     // Don't open if it already is
     if(p_stream.is_open()) {
-      string message = "TextFile:Open:-> Already opened with this object: ["
-                       + string(openmode) + "]:[" + p_filename + "]";
+      QString message = "TextFile:Open:-> Already opened with this object: ["
+                        + QString(openmode) + "]:[" + p_filename + "]";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
@@ -273,45 +271,45 @@ namespace Isis {
       p_openmode = 4;
     }
     else {
-      string message = "TextFile::-> Unknown openmode: (input, output, overwrite, append):["
-                       + string(openmode) + "]:[" + p_filename + "]";
+      QString message = "TextFile::-> Unknown openmode: (input, output, overwrite, append):["
+                       + QString(openmode) + "]:[" + p_filename + "]";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     // Input
     if(p_openmode == 1) {
-      p_stream.open(p_filename.c_str(), fstream::in);
+      p_stream.open(p_filename.toAscii().data(), fstream::in);
     }
     // Output
     else if(p_openmode == 2) {
       // first check if file already exists
       if(filenameTmp.fileExists() && QFileInfo(filenameTmp.toString()).size() > 0) {
-        string message = "TextFile:Open: -> Output file already exists ["
-                         + string(openmode) + "]:[" + p_filename + "]";
+        QString message = "TextFile:Open: -> Output file already exists ["
+                          + QString(openmode) + "]:[" + p_filename + "]";
         throw IException(IException::Io, message, _FILEINFO_);
       }
 
-      p_stream.open(p_filename.c_str(), fstream::in | fstream::out | fstream::trunc);
+      p_stream.open(p_filename.toAscii().data(), fstream::in | fstream::out | fstream::trunc);
       p_stream.clear();
     }
     // Overwrite
     else if(p_openmode == 3) {
-      p_stream.open(p_filename.c_str(), fstream::in | fstream::out | fstream::trunc);
+      p_stream.open(p_filename.toAscii().data(), fstream::in | fstream::out | fstream::trunc);
     }
     // Append
     else if(p_openmode == 4) {
       // Open in append if it does exist, otherwise, open in overwrite mode
       if(filenameTmp.fileExists()) {
-        p_stream.open(p_filename.c_str(), fstream::in | fstream::out | fstream::ate);
+        p_stream.open(p_filename.toAscii().data(), fstream::in | fstream::out | fstream::ate);
       }
       else {
-        p_stream.open(p_filename.c_str(), fstream::in | fstream::out | fstream::trunc);
+        p_stream.open(p_filename.toAscii().data(), fstream::in | fstream::out | fstream::trunc);
       }
     }
 
     if(!p_stream.is_open()) {
-      string message = "TextFile:Open:-> Unable to open: ["
-                       + string(openmode) + "]:[" + p_filename + "]";
+      QString message = "TextFile:Open:-> Unable to open: ["
+                       + QString(openmode) + "]:[" + p_filename + "]";
       throw IException(IException::Io, message, _FILEINFO_);
     }
   }
@@ -322,7 +320,7 @@ namespace Isis {
     }
     else {
       if(bailIfNotOpen) {
-        string message = "TextFile::-> File not open: [" + p_filename + "]";
+        QString message = "TextFile::-> File not open: [" + p_filename + "]";
         throw IException(IException::Programmer, message, _FILEINFO_);
       }
       else {
@@ -349,10 +347,10 @@ namespace Isis {
   }
 
   // vector array
-  void TextFile::GetFile(std::vector<std::string> &lines, const int &maxLinesToRead,
+  void TextFile::GetFile(std::vector<QString> &lines, const int &maxLinesToRead,
                          const bool skipComments) {
     OpenChk(true);
-    string line;
+    QString line;
     int lineCount = 0;
     while(GetLine(line, skipComments)) {
       if(maxLinesToRead > 0) {
@@ -365,10 +363,10 @@ namespace Isis {
   }
 
   // string array
-  void TextFile::GetFile(std::string *lines, const int &maxLinesToRead,
+  void TextFile::GetFile(QString *lines, const int &maxLinesToRead,
                          const bool skipComments) {
     OpenChk(true);
-    string line;
+    QString line;
     int lineCount = 0;
     while(GetLine(line, skipComments)) {
       if(maxLinesToRead > 0) {
@@ -385,7 +383,7 @@ namespace Isis {
   }
 
   // vector array
-  void TextFile::PutFile(std::vector<std::string> &lines, const int &maxLinesToWrite) {
+  void TextFile::PutFile(std::vector<QString> &lines, const int &maxLinesToWrite) {
     OpenChk(true);
     for(int lineCount = 0; lineCount < (int) lines.size(); lineCount++) {
       if(maxLinesToWrite > 0) {
@@ -398,7 +396,7 @@ namespace Isis {
   }
 
   // string array
-  void TextFile::PutFile(const std::string *lines, const int &maxLinesToWrite) {
+  void TextFile::PutFile(const QString *lines, const int &maxLinesToWrite) {
     OpenChk(true);
     int lineCount = 0;
     while(true) {
@@ -426,7 +424,7 @@ namespace Isis {
    *
    * @return bool
    */
-  bool TextFile::GetLine(std::string &line, bool skipComments) {
+  bool TextFile::GetLine(QString &line, bool skipComments) {
     return (p_GetLine(line, skipComments));
   }
 
@@ -440,7 +438,7 @@ namespace Isis {
    * @return bool
    */
   bool TextFile::GetLine(bool skipComments) {
-    string line;
+    QString line;
     return (p_GetLine(line, skipComments));
   }
 
@@ -452,7 +450,7 @@ namespace Isis {
    *
    * @return bool
    */
-  bool TextFile::GetLineNoFilter(std::string &line) {
+  bool TextFile::GetLineNoFilter(QString &line) {
     return (p_GetLine(line, false));
   }
 
@@ -463,7 +461,7 @@ namespace Isis {
    * @return bool
    */
   bool TextFile::GetLineNoFilter() {
-    string line;
+    QString line;
     return (p_GetLine(line, false));
   }
 
@@ -478,13 +476,15 @@ namespace Isis {
    *
    * @throws Isis::IException::Io - error reading text file
    */
-  bool TextFile::p_GetLine(std::string &line, bool chkComment) {
+  bool TextFile::p_GetLine(QString &line, bool chkComment) {
     OpenChk(true);
 
     line = "";
 
     // Try to read the next line
-    getline(p_stream, line);
+    std::string lineStdString;
+    getline(p_stream, lineStdString);
+    line = lineStdString.c_str();
 
     // Check for end of file
     if(p_stream.eof()) {
@@ -494,7 +494,7 @@ namespace Isis {
     // See if an error occured
     if(!p_stream.good()) {
       line = "";
-      string message = "TextFile:GetLine: -> Error reading text file: ["
+      QString message = "TextFile:GetLine: -> Error reading text file: ["
                        + p_filename + "]";
       throw IException(IException::Io, message, _FILEINFO_);
     }
@@ -502,9 +502,9 @@ namespace Isis {
     // See if we have a comment and if we need to ignore
     if(chkComment) {
       if(p_commentString.length()) {
-        std::string::size_type locComment = line.find(p_commentString, 0);
-        if(locComment != string::npos) {
-          unsigned int afterWhiteSpace = line.find_first_not_of(" \t\v\b\a", 0);
+        int locComment = line.indexOf(p_commentString);
+        if(locComment != -1) {
+          int afterWhiteSpace = line.indexOf(QRegExp("[^\\s]"));
           if((locComment == 0) || (locComment == afterWhiteSpace)) {
             return p_GetLine(line, chkComment);
           }
@@ -521,8 +521,8 @@ namespace Isis {
    *
    * @param line IString to be written to file. Defaults to ""
    */
-  void TextFile::PutLine(const std::string &line) {
-    PutLine(line.c_str());
+  void TextFile::PutLine(const QString &line) {
+    PutLine(line.toAscii().data());
   }
 
   /**
@@ -543,12 +543,12 @@ namespace Isis {
     // See if an error occured
     if(!p_stream.good()) {
       if(p_openmode != 1) {
-        string message = "TextFile:PutLine: -> Error writing text file: ["
+        QString message = "TextFile:PutLine: -> Error writing text file: ["
                          + p_filename + "]";
         throw IException(IException::Io, message, _FILEINFO_);
       }
       else {
-        string message =
+        QString message =
           "TextFile:PutLine: -> Attempt to write to INPUT - Read Only text file: ["
           + p_filename + "]";
         throw IException(IException::Programmer, message, _FILEINFO_);
@@ -562,7 +562,7 @@ namespace Isis {
    *
    * @param line IString to be written to file.Defaults to ""
    */
-  void TextFile::PutLineComment(const std::string &line) {
+  void TextFile::PutLineComment(const QString &line) {
     PutLine(p_commentString + line);
   }
 
@@ -573,11 +573,11 @@ namespace Isis {
    * @param line Char string to be written to file.Defaults to ""
    */
   void TextFile::PutLineComment(const char *line) {
-    PutLine(p_commentString + string(line));
+    PutLine(p_commentString + QString(line));
   }
 
 
-  string TextFile::GetComment() {
+  QString TextFile::GetComment() {
     return(p_commentString);
   }
 
@@ -595,7 +595,7 @@ namespace Isis {
   }
 
 
-  string TextFile::GetNewLine() {
+  QString TextFile::GetNewLine() {
     return(p_newLineString);
   }
 

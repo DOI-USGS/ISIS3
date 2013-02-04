@@ -28,7 +28,7 @@ void IsisMain() {
   // segment found in the CalParameters documentation to the vikcal.xml file
   linear = false;
 // linear = ui.GetBoolean("LINEAR");
-  const string in = ui.GetFileName("FROM");
+  const QString in = ui.GetFileName("FROM");
 
   calParam = new CalParameters(in);
 
@@ -39,15 +39,15 @@ void IsisMain() {
 
   // If the file has already been calibrated, throw an error
   if(icube.hasGroup("Radiometry")) {
-    string msg = "The Viking image [" + icube.getFileName() + "] has already "
+    QString msg = "The Viking image [" + icube.getFileName() + "] has already "
         "been radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   CubeAttributeInput dcf;
   CubeAttributeInput fff;
-  const string gainFile = (string)FileName(calParam->GainFile()).expanded();
-  const string offsetFile = (string)FileName(calParam->OffsetFile()).expanded();
+  const QString gainFile = (QString)FileName(calParam->GainFile()).expanded();
+  const QString offsetFile = (QString)FileName(calParam->OffsetFile()).expanded();
 
   // Setup the input cubes
   p.SetInputCube("FROM");
@@ -64,24 +64,24 @@ void IsisMain() {
   calgrp.AddComment("DI(l,s) = (1.0/(exp*w1))*G(l,s)*(gain*DR(l,s)+DC(l,s)+offt+offc)");
   calgrp.AddComment("with  w1 = w0*((dist0*dist0) / (dist1*dist1))");
   calgrp.AddComment("and  offt(l,s) = A*l + B*l*l + C*s + D*l*s + E");
-  calgrp += PvlKeyword("offc", calParam->Offset());
-  calgrp += PvlKeyword("exp", calParam->Exposure());
-  calgrp += PvlKeyword("gain", calParam->Gain());
+  calgrp += PvlKeyword("offc", toString(calParam->Offset()));
+  calgrp += PvlKeyword("exp", toString(calParam->Exposure()));
+  calgrp += PvlKeyword("gain", toString(calParam->Gain()));
   calgrp += PvlKeyword("DR", in);
   calgrp += PvlKeyword("DC", calParam->OffsetFile());
   calgrp += PvlKeyword("G", calParam->GainFile());
 
-  calgrp += PvlKeyword("w0", calParam->Omega0());
-  calgrp += PvlKeyword("w1", calParam->Omega1());
-  calgrp += PvlKeyword("dist0", calParam->Distance());
-  calgrp += PvlKeyword("dist1", calParam->Dist1());
-  calgrp += PvlKeyword("1.0/exp*w1", 1.0 / (calParam->Exposure() * calParam->Omega1()));
+  calgrp += PvlKeyword("w0", toString(calParam->Omega0()));
+  calgrp += PvlKeyword("w1", toString(calParam->Omega1()));
+  calgrp += PvlKeyword("dist0", toString(calParam->Distance()));
+  calgrp += PvlKeyword("dist1", toString(calParam->Dist1()));
+  calgrp += PvlKeyword("1.0/exp*w1", toString(1.0 / (calParam->Exposure() * calParam->Omega1())));
 
-  calgrp += PvlKeyword("Acoeff", calParam->Acoeff());
-  calgrp += PvlKeyword("Bcoeff", calParam->Bcoeff());
-  calgrp += PvlKeyword("Ccoeff", calParam->Ccoeff());
-  calgrp += PvlKeyword("Dcoeff", calParam->Dcoeff());
-  calgrp += PvlKeyword("Ecoeff", calParam->Ecoeff());
+  calgrp += PvlKeyword("Acoeff", toString(calParam->Acoeff()));
+  calgrp += PvlKeyword("Bcoeff", toString(calParam->Bcoeff()));
+  calgrp += PvlKeyword("Ccoeff", toString(calParam->Ccoeff()));
+  calgrp += PvlKeyword("Dcoeff", toString(calParam->Dcoeff()));
+  calgrp += PvlKeyword("Ecoeff", toString(calParam->Ecoeff()));
 
   ocube->putGroup(calgrp);
 

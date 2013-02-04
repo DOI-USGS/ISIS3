@@ -48,7 +48,7 @@ using namespace Isis;
 void setControlPointLatLon(SerialNumberList &snl, ControlNet &cnet);
 QList<ControlPoint *> getValidPoints(Cube &cube, STRtree &coordTree);
 
-std::map< std::string, SurfacePoint > g_surfacePoints;
+std::map< QString, SurfacePoint > g_surfacePoints;
 QMap< QString, QSet<QString> > g_modifications;
 
 
@@ -84,7 +84,7 @@ void IsisMain() {
   inNet.SetUserName(Application::UserName());
   inNet.SetModifiedDate(iTime::CurrentLocalTime()); //This should be done in ControlNet's Write fn
 
-  std::string retrievalOpt = ui.GetString("RETRIEVAL");
+  QString retrievalOpt = ui.GetString("RETRIEVAL");
   PvlKeyword duplicates("DupSerialNumbers");
   if (retrievalOpt == "REFERENCE") {
     FileList list1(ui.GetFileName("FROMLIST"));
@@ -101,7 +101,7 @@ void IsisMain() {
       // Check for duplicate SNs within the addlist
       for (int j = i + 1; j < addSerials.Size(); j++) {
         if (addSerials.SerialNumber(i) == addSerials.SerialNumber(j)) {
-          std::string msg = "Add list files [" + addSerials.FileName(i) + "] and [";
+          QString msg = "Add list files [" + addSerials.FileName(i) + "] and [";
           msg += addSerials.FileName(j) + "] share the same serial number.";
           throw IException(IException::User, msg, _FILEINFO_);
         }
@@ -118,7 +118,7 @@ void IsisMain() {
       SurfacePoint surfacePoint = point->GetBestSurfacePoint();
 
       if (!surfacePoint.Valid()) {
-        std::string msg = "Unable to retreive lat/lon from Control Point [";
+        QString msg = "Unable to retreive lat/lon from Control Point [";
         msg += point->GetId() + "]. RETREIVAL=POINT cannot be used unless ";
         msg += "all Control Points have Latitude/Longitude keywords.";
         throw IException(IException::User, msg, _FILEINFO_);
@@ -162,7 +162,7 @@ void IsisMain() {
     Cube cube;
     cube.open(addList[img].toString());
     Pvl *cubepvl = cube.getLabel();
-    std::string sn = SerialNumber::Compose(*cubepvl);
+    QString sn = SerialNumber::Compose(*cubepvl);
     Camera *cam = cube.getCamera();
 
     // Loop through all the control points
@@ -278,7 +278,7 @@ void IsisMain() {
 
     // Set up the output file for writing
     std::ofstream out_stream;
-    out_stream.open(pointList.expanded().c_str(), std::ios::out);
+    out_stream.open(pointList.expanded().toAscii().data(), std::ios::out);
     out_stream.seekp(0, std::ios::beg);   //Start writing from beginning of file
 
     QList<QString> modifiedPointsList = g_modifications.keys();
@@ -324,7 +324,7 @@ void IsisMain() {
 
     const QList<QString> snList = inNet.GetCubeSerials();
     for (int i = 0; i < snList.size(); i++) {
-      IString sn = snList[i];
+      QString sn = snList[i];
 
       if (addSerials.HasSerialNumber(sn))
         toList.Add(addSerials.FileName(sn));
@@ -374,7 +374,7 @@ void setControlPointLatLon(SerialNumberList &snl, ControlNet &cnet) {
       g_surfacePoints[point->GetId()] = cube->getCamera()->GetSurfacePoint();
     }
     catch (IException &e) {
-      std::string msg = "Unable to create camera for cube file [";
+      QString msg = "Unable to create camera for cube file [";
       msg += snl.FileName(cm->GetCubeSerialNumber()) + "]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
@@ -393,7 +393,7 @@ QList<ControlPoint *> getValidPoints(Cube &cube, STRtree &coordTree) {
     cube.read(poly);
   }
   catch (IException &e) {
-    std::string msg = "Footprintinit must be run prior to running cnetadd";
+    QString msg = "Footprintinit must be run prior to running cnetadd";
     msg += " with POLYGON=TRUE for cube [" + cube.getFileName() + "]";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }

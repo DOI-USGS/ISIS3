@@ -170,18 +170,18 @@ int main(int argc, char *argv[]) {
     latRangeTest.AddGroup(Isis::PvlGroup("Mapping"));
     Isis::PvlGroup &latTestGroup = latRangeTest.FindGroup("Mapping");
     latTestGroup += Isis::PvlKeyword("ProjectionName", "Equirectangular");
-    latTestGroup += Isis::PvlKeyword("EquatorialRadius", 5000.0);
-    latTestGroup += Isis::PvlKeyword("PolarRadius", 1000.0);
+    latTestGroup += Isis::PvlKeyword("EquatorialRadius", "5000.0");
+    latTestGroup += Isis::PvlKeyword("PolarRadius", "1000.0");
     latTestGroup += Isis::PvlKeyword("LatitudeType", "Planetographic");
     latTestGroup += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-    latTestGroup += Isis::PvlKeyword("LongitudeDomain", 360);
-    latTestGroup += Isis::PvlKeyword("Scale", 5.0);
-    latTestGroup += Isis::PvlKeyword("MinimumLatitude", -90.0);
-    latTestGroup += Isis::PvlKeyword("MaximumLatitude", 90.0);
-    latTestGroup += Isis::PvlKeyword("MinimumLongitude", 0.0);
-    latTestGroup += Isis::PvlKeyword("MaximumLongitude", 360.0);
-    latTestGroup += Isis::PvlKeyword("CenterLatitude", 0.0);
-    latTestGroup += Isis::PvlKeyword("CenterLongitude", 0.0);
+    latTestGroup += Isis::PvlKeyword("LongitudeDomain", "360");
+    latTestGroup += Isis::PvlKeyword("Scale", "5.0");
+    latTestGroup += Isis::PvlKeyword("MinimumLatitude", "-90.0");
+    latTestGroup += Isis::PvlKeyword("MaximumLatitude", "90.0");
+    latTestGroup += Isis::PvlKeyword("MinimumLongitude", "0.0");
+    latTestGroup += Isis::PvlKeyword("MaximumLongitude", "360.0");
+    latTestGroup += Isis::PvlKeyword("CenterLatitude", "0.0");
+    latTestGroup += Isis::PvlKeyword("CenterLongitude", "0.0");
   
     Latitude ographicLat(25, latTestGroup, Angle::Degrees);
     Angle ographicAngle(30, Angle::Degrees);

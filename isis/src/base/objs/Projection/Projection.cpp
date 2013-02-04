@@ -145,8 +145,8 @@ namespace Isis {
 
       m_sky = false;
       if (m_mappingGrp.HasKeyword("TargetName")) {
-        IString str = (string) m_mappingGrp["TargetName"];
-        if (str.UpCase() == "SKY") m_sky = true;
+        QString str = m_mappingGrp["TargetName"];
+        if (str.toUpper() == "SKY") m_sky = true;
       }
 
       // initialize the rest of the x,y,lat,lon member variables
@@ -154,7 +154,7 @@ namespace Isis {
       m_y = Null;
     }
     catch(IException &e) {
-      IString msg = "Projection failed.  Invalid label group [Mapping]";
+      QString msg = "Projection failed.  Invalid label group [Mapping]";
       throw IException(e, IException::Unknown, msg, _FILEINFO_);
     }
   }
@@ -688,7 +688,7 @@ namespace Isis {
    *
    * @return string The angle in Degrees, minutes, seconds
    */
-  string Projection::ToDMS(double angle) {
+  QString Projection::ToDMS(double angle) {
     int iangle = (int)angle;
     double mins = abs(angle - iangle) * 60.0;
     int imins = (int)mins;
@@ -711,7 +711,7 @@ namespace Isis {
     s << iangle << " " << setw(2) << setfill('0')
       << imins << "m " << setw(2) << setfill('0') << isecs << "."  <<
       setprecision(3) << frac << "s";
-    return s.str();
+    return s.str().c_str();
   }
 
   /**
@@ -723,7 +723,7 @@ namespace Isis {
    *
    * @return string The angle in Hours, minutes, seconds
    */
-  string Projection::ToHMS(double angle) {
+  QString Projection::ToHMS(double angle) {
     double tangle = angle;
     while (tangle < 0.0) tangle += 360.0;
     while (tangle > 360.0) tangle -= 360.0;
@@ -750,7 +750,7 @@ namespace Isis {
     stringstream s;
     s << setw(2) << setfill('0') << ihrs << "h " << setw(2) << setfill('0') <<
       imins << "m " << setw(2) << setfill('0') << isecs << "." << imsecs << "s";
-    return s.str();
+    return s.str().c_str();
   }
 
   /**
@@ -1357,8 +1357,8 @@ namespace Isis {
    */
   void Projection::SetUpperLeftCorner(const Displacement &x, 
                                       const Displacement &y) {
-    PvlKeyword xKeyword("UpperLeftCornerX", x.meters(), "meters");
-    PvlKeyword yKeyword("UpperLeftCornerY", y.meters(), "meters");
+    PvlKeyword xKeyword("UpperLeftCornerX", toString(x.meters()), "meters");
+    PvlKeyword yKeyword("UpperLeftCornerY", toString(y.meters()), "meters");
     m_mappingGrp.AddKeyword(xKeyword,Pvl::Replace);
     m_mappingGrp.AddKeyword(yKeyword,Pvl::Replace);
   }

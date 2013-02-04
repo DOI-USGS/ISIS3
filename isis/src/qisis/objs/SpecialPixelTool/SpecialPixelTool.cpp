@@ -457,13 +457,13 @@ namespace Isis {
    */
   void SpecialPixelTool::readSettings() {
     /*Now read the settings that are specific to this window.*/
-    std::string appName = p_parent->windowTitle().toStdString();
+    QString appName = p_parent->windowTitle();
 
     /*Now read the settings that are specific to this window.*/
-    std::string instanceName = p_dialog->windowTitle().toStdString();
+    QString instanceName = p_dialog->windowTitle();
 
     FileName config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
-    p_settings = new QSettings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
+    p_settings = new QSettings(config.expanded(), QSettings::NativeFormat);
 
     //For each special pixel value, if it exists set it, otherwise set
     //it to the system defaults.
@@ -540,14 +540,14 @@ namespace Isis {
    *
    */
   void SpecialPixelTool::writeSettings() {
-    std::string appName = p_parent->windowTitle().toStdString();
+    QString appName = p_parent->windowTitle();
 
     /*Now read the settings that are specific to this window.*/
-    std::string instanceName = p_dialog->windowTitle().toStdString();
+    QString instanceName = p_dialog->windowTitle();
 
     //Write all of the special pixel value colors
     FileName config("$HOME/.Isis/" + appName + "/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.expanded()), QSettings::NativeFormat);
+    QSettings settings(config.expanded(), QSettings::NativeFormat);
     settings.setValue("defaultNull", p_nullDefault);
     settings.setValue("defaultLis", p_lisDefault);
     settings.setValue("defaultLrs", p_lrsDefault);

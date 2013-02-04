@@ -8,15 +8,15 @@
 using namespace Isis;
 
 
-int addChannel(ExportDescription &desc, IString param, IString mode);
+int addChannel(ExportDescription &desc, QString param, QString mode);
 void addResults(PvlGroup &results, ImageExporter *exporter,
-    IString channel, int index);
+    QString channel, int index);
 
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
-  IString format = ui.GetString("FORMAT");
+  QString format = ui.GetString("FORMAT");
   ImageExporter *exporter = ImageExporter::fromFormat(format);
 
   ExportDescription desc;
@@ -32,7 +32,7 @@ void IsisMain() {
   int blueIndex = -1;
   int alphaIndex = -1;
 
-  IString mode = ui.GetString("MODE");
+  QString mode = ui.GetString("MODE");
   if (mode == "GRAYSCALE") {
     addChannel(desc, "FROM", mode);
     exporter->setGrayscale(desc);
@@ -93,14 +93,14 @@ void IsisMain() {
 }
 
 
-int addChannel(ExportDescription &desc, IString param, IString mode) {
+int addChannel(ExportDescription &desc, QString param, QString mode) {
   UserInterface &ui = Application::GetUserInterface();
   FileName name = ui.GetFileName(param);
   CubeAttributeInput &att = ui.GetInputAttribute(param);
 
   int index = -1;
   if (mode != "GRAYSCALE" && ui.GetString("STRETCH") == "MANUAL") {
-    IString bandId = param.substr(0, 1);
+    QString bandId = param.mid(0, 1);
     double min = ui.GetDouble(bandId + "MIN");
     double max = ui.GetDouble(bandId + "MAX");
 
@@ -115,11 +115,11 @@ int addChannel(ExportDescription &desc, IString param, IString mode) {
 
 
 void addResults(PvlGroup &results, ImageExporter *exporter,
-    IString channel, int index) {
+    QString channel, int index) {
 
   results += PvlKeyword(
-      channel + "InputMinimum", exporter->getInputMinimum(index));
+      channel + "InputMinimum", toString(exporter->getInputMinimum(index)));
   results += PvlKeyword(
-      channel + "InputMaximum", exporter->getInputMaximum(index));
+      channel + "InputMaximum", toString(exporter->getInputMaximum(index)));
 }
 

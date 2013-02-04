@@ -70,14 +70,14 @@ namespace Isis {
     //  Add all entries in the SerialNumberList
     for (int i = 0; i < g_serialNumberList->Size(); i++) {
 
-      IString curSerialNum = g_serialNumberList->SerialNumber(i);
+      QString curSerialNum = g_serialNumberList->SerialNumber(i);
 
       //  Don't add if already in this point
       if (point.HasSerialNumber(curSerialNum))
         continue;
 
       // build new item...
-      IString label(g_serialNumberList->FileName(i));
+      QString label(g_serialNumberList->FileName(i));
       QListWidgetItem *item = new QListWidgetItem(label);
 
       // if this entry of the SerialNumberList is also in the pointFiles then

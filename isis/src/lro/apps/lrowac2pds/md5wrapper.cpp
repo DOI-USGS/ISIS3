@@ -1,13 +1,13 @@
 /*
- *	This is part of my wrapper-class to create
- *	a MD5 Hash from a string and a file.
+ * This is part of my wrapper-class to create
+ * a MD5 Hash from a string and a file.
  *
- *	This code is completly free, you
- *	can copy it, modify it, or do
- *	what ever you want with it.
+ * This code is completly free, you
+ * can copy it, modify it, or do
+ * what ever you want with it.
  *
- *	Feb. 2005
- *	Benjamin Grüdelbach
+ * Feb. 2005
+ * Benjamin Grüdelbach
  */
 
 //----------------------------------------------------------------------
@@ -25,14 +25,14 @@
  * internal hash function, calling
  * the basic methods from md5.h
  */
-std::string md5wrapper::hashit(std::string text) {
+QString md5wrapper::hashit(QString text) {
   MD5_CTX ctx;
 
   //init md5
   md5->MD5Init(&ctx);
   //update with our string
   md5->MD5Update(&ctx,
-                 (unsigned char *)text.c_str(),
+                 (unsigned char *)text.toAscii().data(),
                  text.length());
 
   //create the hash
@@ -45,11 +45,11 @@ std::string md5wrapper::hashit(std::string text) {
 
 /*
  * converts the numeric hash to
- * a valid std::string.
+ * a valid QString.
  * (based on Jim Howard's code;
  * http://www.codeproject.com/cpp/cmd5.asp)
  */
-std::string md5wrapper::convToString(unsigned char *bytes) {
+QString md5wrapper::convToString(unsigned char *bytes) {
   char asciihash[33];
 
   int p = 0;
@@ -58,7 +58,7 @@ std::string md5wrapper::convToString(unsigned char *bytes) {
     p += 2;
   }
   asciihash[32] = '\0';
-  return std::string(asciihash);
+  return QString(asciihash);
 }
 
 //---------publics--------------------------
@@ -79,7 +79,7 @@ md5wrapper::~md5wrapper() {
  * "text" and returns it as
  * string
  */
-std::string md5wrapper::getHashFromString(std::string text) {
+QString md5wrapper::getHashFromString(QString text) {
   return this->hashit(text);
 }
 
@@ -91,7 +91,7 @@ std::string md5wrapper::getHashFromString(std::string text) {
  * (based on Ronald L. Rivest's code
  * from RFC1321 "The MD5 Message-Digest Algorithm")
  */
-std::string md5wrapper::getHashFromFile(std::string filename) {
+QString md5wrapper::getHashFromFile(QString filename) {
   FILE *file;
   MD5_CTX context;
 
@@ -99,7 +99,7 @@ std::string md5wrapper::getHashFromFile(std::string filename) {
   unsigned char buffer[1024], digest[16];
 
   //open file
-  if((file = fopen(filename.c_str(), "rb")) == NULL) {
+  if((file = fopen(filename.toAscii().data(), "rb")) == NULL) {
     return "-1";
   }
 
@@ -113,7 +113,7 @@ std::string md5wrapper::getHashFromFile(std::string filename) {
 
   /*
   generate hash, close the file and return the
-  hash as std::string
+  hash as QString
   */
   md5->MD5Final(digest, &context);
   fclose(file);

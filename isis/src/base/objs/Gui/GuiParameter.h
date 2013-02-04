@@ -29,9 +29,8 @@
 #include <QLineEdit>
 #include <QMenu>
 #include <QObject>
+#include <QString>
 #include <QToolButton>
-
-#include "IString.h"
 
 namespace Isis {
   class UserInterface;
@@ -58,7 +57,7 @@ namespace Isis {
       virtual ~GuiParameter();
 
       //! Return the name of the parameter
-      IString Name() const {
+      QString Name() const {
         return p_name;
       };
 
@@ -66,9 +65,9 @@ namespace Isis {
 
       void SetToCurrent();
 
-      virtual IString Value() = 0;
+      virtual QString Value() = 0;
 
-      virtual void Set(IString newValue) = 0;
+      virtual void Set(QString newValue) = 0;
 
       void SetEnabled(bool enabled, bool isParentCombo=false);
 
@@ -85,7 +84,7 @@ namespace Isis {
 
       QWidget *AddHelpers(QObject *lo);
 
-      virtual std::vector<std::string> Exclusions();
+      virtual std::vector<QString> Exclusions();
 
       enum ParameterType { IntegerWidget, DoubleWidget, StringWidget,
                            ListWidget, FileNameWidget, CubeWidget,
@@ -102,7 +101,7 @@ namespace Isis {
 
       int p_group;
       int p_param;
-      IString p_name;
+      QString p_name;
       UserInterface *p_ui;
 
       QLabel *p_label;

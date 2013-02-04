@@ -31,7 +31,7 @@ namespace Isis {
 
   //! Starts the socket thread
   void SocketThread::run() {
-    std::string p_socketFile = "/tmp/isis_qview_" + Application::UserName();
+    std::string p_socketFile = ("/tmp/isis_qview_" + Application::UserName()).toAscii().data();
     struct sockaddr_un p_socketName;
     p_socketName.sun_family = AF_UNIX;
     strcpy(p_socketName.sun_path, p_socketFile.c_str());

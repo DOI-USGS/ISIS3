@@ -1,6 +1,6 @@
 #include "Isis.h"
 
-#include <string>
+#include <QString>
 
 using namespace std;
 using namespace Isis;
@@ -15,7 +15,7 @@ void IsisMain() {
   // Check to see if output file exists
   FileName outFile = ui.GetFileName("TO");
   if(outFile.fileExists() && !append) {
-    string msg = "Output file [" + outFile.expanded() + "] already exists.";
+    QString msg = "Output file [" + outFile.expanded() + "] already exists.";
     msg += " Append option set to False.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -29,7 +29,7 @@ void IsisMain() {
       numErrors++;
     }
   }
-  PvlKeyword errors("TotalErrors", numErrors);
+  PvlKeyword errors("TotalErrors", toString(numErrors));
   output.AddKeyword(errors);
   // write output to file
   if(!append) {

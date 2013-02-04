@@ -30,48 +30,49 @@
 #include "naif/SpiceUsr.h"
 #include "naif/SpiceZfc.h"
 #include "naif/SpiceZmc.h"
-#include <string>
+#include <QString>
 #include <vector>
 
 using namespace std;
 namespace Isis {
 
-  CalParameters::CalParameters(const string &fname) {
+  CalParameters::CalParameters(const QString &fname) {
     try {
       // Extract Pvl Information from the file
-      Pvl pvl(fname);
+      Pvl pvl(fname.toAscii().data());
 
       // Get keywords from input cube label
       PvlGroup &instrument = pvl.FindGroup("INSTRUMENT", Pvl::Traverse);
 
       // Make sure it is a viking mission
-      IString spacecraft = (string)instrument["SPACECRAFTNAME"];
-      IString mission = spacecraft.Token("_");
+      QString spacecraft = (QString)instrument["SPACECRAFTNAME"];
+      QString mission = spacecraft.split("_").first();
+      spacecraft = spacecraft.split("_").last();
       if(mission != "VIKING") {
-        string msg = "Invalid Keyword [SpacecraftName]. " +  spacecraft +
+        QString msg = "Invalid Keyword [SpacecraftName]. " +  spacecraft +
                      "must start with 'VIKING'";
         throw IException(IException::User, msg, _FILEINFO_);
       }
       int spn = 0;
-      if((char)spacecraft[spacecraft.size() - 1] == '1') spn = 1;
-      if((char)spacecraft[spacecraft.size() - 1] == '2') spn = 2;
+      if((QChar)spacecraft[spacecraft.size() - 1] == '1') spn = 1;
+      if((QChar)spacecraft[spacecraft.size() - 1] == '2') spn = 2;
       if(spn == 0) {
-        string msg = "Invalid Keyword [SpacecraftName]. " + spacecraft +
+        QString msg = "Invalid Keyword [SpacecraftName]. " + spacecraft +
                      "must terminate with '1' or '2'";
         throw IException(IException::User, msg, _FILEINFO_);
       }
       double clock = instrument["SPACECRAFTCLOCKCOUNT"];
-      IString instId = (string)instrument["INSTRUMENTID"];
+      QString instId = (QString)instrument["INSTRUMENTID"];
       int cam;
       // Camera State 4 is used to indicate an extended mission. This is
       // necessary because the dust spot changed position during the extended
       // mission, requiring a new set of calibration files.
       int cs4 = 0;
-      if((char)instId[instId.size() - 1] == 'A') {
+      if((QChar)instId[instId.size() - 1] == 'A') {
         if(spn == 1) cam = 7;
         else cam = 8;
       }
-      else if((char)instId[instId.size() - 1] == 'B') {
+      else if((QChar)instId[instId.size() - 1] == 'B') {
         if(spn == 1) {
           cam = 4;
           if(clock > 44800000) cs4 = 1;
@@ -79,24 +80,24 @@ namespace Isis {
         else cam = 6;
       }
       else {
-        string msg = "Invalid Keyword [InstrumentID]. " + instId;
+        QString msg = "Invalid Keyword [InstrumentID]. " + instId;
         msg += "must terminate with an 'A' or 'B'";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
-      string startTime = instrument["STARTTIME"];
+      QString startTime = instrument["STARTTIME"];
       CalcSunDist(startTime);
       p_labexp = (double)instrument["EXPOSUREDURATION"] * 1000.0;  // convert to msec
-      string target = " ";
+      QString target = " ";
       PvlKeyword cs1 = instrument["FLOODMODEID"];
-      if((string)cs1 == "ON") cs1 = 1;
-      else if((string)cs1 == "OFF") cs1 = 0;
+      if((QString)cs1 == "ON") cs1 = "1";
+      else if((QString)cs1 == "OFF") cs1 = "0";
       PvlKeyword cs2 = instrument["GAINMODEID"];
-      if((string)cs2 == "LOW") cs2 = 0;
-      else if((string)cs2 == "HIGH") cs2 = 1;
+      if((QString)cs2 == "LOW") cs2 = "0";
+      else if((QString)cs2 == "HIGH") cs2 = "1";
       PvlKeyword cs3 = instrument["OFFSETMODEID"];
-      if((string)cs3 == "ON") cs3 = 1;
-      else if((string)cs3 == "OFF") cs3 = 0;
+      if((QString)cs3 == "ON") cs3 = "1";
+      else if((QString)cs3 == "OFF") cs3 = "0";
       PvlKeyword wav = pvl.FindGroup("BANDBIN", Pvl::Traverse)["FILTERID"];
 
       // Set up calibration, linearity, and offset variables for the input file
@@ -105,7 +106,7 @@ namespace Isis {
       vikoffSetup(mission, spn, target, cam, clock, (int)cs3);
     }
     catch(IException &e) {
-      string msg = "Input file [" + fname + "] does not appear to be a viking image";
+      QString msg = "Input file [" + fname + "] does not appear to be a viking image";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -128,65 +129,46 @@ namespace Isis {
    *
    * @throws Isis::IException::Programmer - Could not find match in vikcal.sav
    */
-  void CalParameters::vikcalSetup(string mission, int spn, string target,
-                                  int cam, string wav, int cs1, int cs2, int cs3, int cs4) {
-    vector<string> line;
+  void CalParameters::vikcalSetup(QString mission, int spn, QString target,
+                                  int cam, QString wav, int cs1, int cs2, int cs3, int cs4) {
+    vector<QString> line;
 
     // Read in vikcal.sav calibration file
-    TextFile cal("$viking" + IString(spn) + "/calibration/vikcal.sav",
+    TextFile cal("$viking" + toString(spn) + "/calibration/vikcal.sav",
                  "input", line, 0, true);
 
     // Search for a line in the vikcal.sav file that matches our data from the
     // input label
     for(int i = 0; i < (int)line.size(); i++) {
-      IString temp = line[i];
-      temp.ConvertWhiteSpace();
-      IString token = temp.Token(" ");
-      temp.TrimHead(" ");
-      if(token != mission) continue;
-      token = temp.Token(" ");
-      temp.TrimHead(" ");
-      if(int(token) != spn) continue;
-      token = temp.Token(" ");
-      temp.TrimHead(" ");
-      if(int(token) != cam) continue;
-      token = temp.Token(" ");
-      temp.TrimHead(" ");
-      if(token != wav) continue;
-      token = temp.Token(" ");
-      temp.TrimHead(" ");
-      if(int(token) != cs1) continue;
-      token = temp.Token(" ");
-      temp.TrimHead(" ");
-      if(int(token) != cs2) continue;
-      token = temp.Token(" ");
-      temp.TrimHead(" ");
-      if(int(token) != cs3) continue;
-      token = temp.Token(" ");
-      temp.TrimHead(" ");
-      if(int(token) != cs4) continue;
+      QString temp = line[i].simplified();
+
+      QStringList tokens = temp.split(" ");
+
+      if(tokens.count() < 15) continue;
+      if(tokens[0] != mission) continue;
+      if(toInt(tokens[1]) != spn) continue;
+      if(toInt(tokens[2]) != cam) continue;
+      if(tokens[3] != wav) continue;
+      if(toInt(tokens[4]) != cs1) continue;
+      if(toInt(tokens[5]) != cs2) continue;
+      if(toInt(tokens[6]) != cs3) continue;
+      if(toInt(tokens[7]) != cs4) continue;
 
 
       // The line is a match for our data, so set all the
       // Calibration variables to their correct values
-      p_w0 = temp.Token(" ");
-      temp.TrimHead(" ");
-      p_dist = temp.Token(" ");
-      temp.TrimHead(" ");
-      p_gain = temp.Token(" ");
-      temp.TrimHead(" ");
-      p_offset = temp.Token(" ");
-      temp.TrimHead(" ");
-      p_exp = temp.Token(" ");
-      temp.TrimHead(" ");
-      p_gainFile = "$viking" + IString(spn) + "/calibration/" + temp.Token(" ")
+      p_w0 = toDouble(tokens[8]);
+      p_dist = toDouble(tokens[9]);
+      p_gain = toDouble(tokens[10]);
+      p_offset = toDouble(tokens[11]);
+      p_exp = toDouble(tokens[12]);
+      p_gainFile = "$viking" + toString(spn) + "/calibration/" + tokens[13]
                    + ".cub";
-      temp.TrimHead(" ");
-      p_offsetFile = "$viking" + IString(spn) + "/calibration/" +
-                     temp.Token(" ") + ".cub";
+      p_offsetFile = "$viking" + toString(spn) + "/calibration/" +
+                     tokens[14] + ".cub";
       return;
     }
-    string msg = "Could not find match in [vikcal.sav] calibration file";
+    QString msg = "Could not find match in [vikcal.sav] calibration file";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -229,47 +211,34 @@ namespace Isis {
    *
    * @throws Isis::IException::Programmer - Could not find match in viklin.sav
    */
-  void CalParameters::viklinSetup(string mission, int spn, string target,
-                                  int cam, string wav, int cs1, int cs2, int cs3, int cs4) {
+  void CalParameters::viklinSetup(QString mission, int spn, QString target,
+                                  int cam, QString wav, int cs1, int cs2, int cs3, int cs4) {
 
-    vector<string> line;
-    TextFile lin("$viking" + IString(spn) + "/calibration/viklin.sav",
+    vector<QString> line;
+    TextFile lin("$viking" + toString(spn) + "/calibration/viklin.sav",
                  "input", line, 0, true);
 
     for(int i = 0; i < (int)line.size(); i++) {
-      IString temp = line[i];
-      temp.ConvertWhiteSpace();
-      IString token = temp.Token(" ");
-      temp.TrimHead(" ");
-      if(token != mission) continue;
-      token = temp.Token(" ");
-      temp.TrimHead(" ");
-      if(int(token) != spn) continue;
-      token = temp.Token(" ");
-      temp.TrimHead(" ");
-      if(int(token) != cam) continue;
-      token = temp.Token(" ");
-      temp.TrimHead(" ");
-      if(token != wav) continue;
-      token = temp.Token(" ");
-      temp.TrimHead(" ");
-      if(int(token) != cs1) continue;
-      token = temp.Token(" ");
-      temp.TrimHead(" ");
-      if(int(token) != cs2) continue;
-      token = temp.Token(" ");
-      temp.TrimHead(" ");
-      if(int(token) != cs3) continue;
+      QString temp = line[i].simplified();
+
+      QStringList tokens = temp.split(" ");
+
+      if(tokens.count() < 10) continue;
+      if(tokens[0] != mission) continue;
+      if(toInt(tokens[1]) != spn) continue;
+      if(toInt(tokens[2]) != cam) continue;
+      if(tokens[3] != wav) continue;
+      if(toInt(tokens[4]) != cs1) continue;
+      if(toInt(tokens[5]) != cs2) continue;
+      if(toInt(tokens[6]) != cs3) continue;
 
       // Set all Linearity variables to the correct values
-      p_b = temp.Token(" ");
-      temp.TrimHead(" ");
-      p_k = temp.Token(" ");
-      temp.TrimHead(" ");
-      p_normpow = temp.Token(" ");
+      p_b = toDouble(tokens[7]);
+      p_k = toDouble(tokens[8]);
+      p_normpow = toDouble(tokens[9]);
       return;
     }
-    string msg = "Could not find match in [viklin.sav] calibration file";
+    QString msg = "Could not find match in [viklin.sav] calibration file";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -287,14 +256,14 @@ namespace Isis {
    *
    * @throws Isis::IException::Programmer - Could not find match in vikoff.sav
    */
-  void CalParameters::vikoffSetup(string mission, int spn, string target,
+  void CalParameters::vikoffSetup(QString mission, int spn, QString target,
                                   int cam, double clock, int cs3) {
-    vector<string> line;
+    vector<QString> line;
 
     // Get the correct offset file - depends on which camera the input image is
     // from
-    string fname = "$viking" + IString(spn) + "/calibration/vikoffcam" +
-                   IString(cam) + ".sav";
+    QString fname = "$viking" + toString(spn) + "/calibration/vikoffcam" +
+                   toString(cam) + ".sav";
     TextFile off(fname, "input", line, 0, true);
     vector<double> pp[5], off3;
     double pp1_off[5], pp2_off[5], pp_off[5];
@@ -302,72 +271,56 @@ namespace Isis {
     double frm1 = -1.0;
     double frm2 = -1.0;
     for(int i = 0; i < (int)line.size(); i++) {
-      IString temp = line[i];
-      temp.ConvertWhiteSpace();
-      temp.TrimHead(" ");
-      IString token = temp.Token(" ");
-      temp.TrimHead(" ");
+      QString temp = line[i].simplified();
+
+      QStringList tokens = temp.split(" ");
+
+      if(tokens.isEmpty()) continue;
 
       // Go through the first line of the offset file and set all the principle
       // point locations
-      if(token == "VIKING") {
-        if(int(temp.Token(" ")) == spn) { }
-        temp.TrimHead(" ");
-        if(int(temp.Token(" ")) == cam) { }
-        temp.TrimHead(" ");
-        pp[0].push_back((double)temp.Token(" "));
-        temp.TrimHead(" ");
-        pp[0].push_back((double)temp.Token(" "));
-        temp.TrimHead(" ");
-        pp[1].push_back((double)temp.Token(" "));
-        temp.TrimHead(" ");
-        pp[1].push_back((double)temp.Token(" "));
-        temp.TrimHead(" ");
-        pp[2].push_back((double)temp.Token(" "));
-        temp.TrimHead(" ");
-        pp[2].push_back((double)temp.Token(" "));
-        temp.TrimHead(" ");
-        pp[3].push_back((double)temp.Token(" "));
-        temp.TrimHead(" ");
-        pp[3].push_back((double)temp.Token(" "));
-        temp.TrimHead(" ");
-        pp[4].push_back((double)temp.Token(" "));
-        temp.TrimHead(" ");
-        pp[4].push_back((double)temp.Token(" "));
-        temp.TrimHead(" ");
+      if(tokens[0] == "VIKING") {
+        if (tokens.count() < 12) continue;
+
+        if(toInt(tokens[1]) == spn) { }
+        if(toInt(tokens[2]) == cam) { }
+        pp[0].push_back(toDouble(tokens[3]));
+        pp[0].push_back(toDouble(tokens[4]));
+        pp[1].push_back(toDouble(tokens[5]));
+        pp[1].push_back(toDouble(tokens[6]));
+        pp[2].push_back(toDouble(tokens[7]));
+        pp[2].push_back(toDouble(tokens[8]));
+        pp[3].push_back(toDouble(tokens[9]));
+        pp[3].push_back(toDouble(tokens[10]));
+        pp[4].push_back(toDouble(tokens[11]));
+        pp[4].push_back(toDouble(tokens[12]));
         continue;
       }
-      if(double(token) < clock) {
-        frm1 = token;
-        off3.push_back((double)temp.Token(" "));
-        temp.TrimHead(" ");
-        pp1_off[2] = temp.Token(" ");
-        temp.TrimHead(" ");
-        pp1_off[0] = pp1_off[2] + (double)temp.Token(" ");
-        temp.TrimHead(" ");
-        pp1_off[1] = pp1_off[2] + (double)temp.Token(" ");
-        temp.TrimHead(" ");
-        pp1_off[3] = pp1_off[2] + (double)temp.Token(" ");
-        temp.TrimHead(" ");
-        pp1_off[4] = pp1_off[2] + (double)temp.Token(" ");
+      if(toDouble(tokens[0]) < clock) {
+        if (tokens.count() < 7) continue;
+
+        frm1 = toDouble(tokens[0]);
+        off3.push_back(toDouble(tokens[1]));
+        pp1_off[2] = toDouble(tokens[2]);
+        pp1_off[0] = pp1_off[2] + toDouble(tokens[3]);
+        pp1_off[1] = pp1_off[2] + toDouble(tokens[4]);
+        pp1_off[3] = pp1_off[2] + toDouble(tokens[5]);
+        pp1_off[4] = pp1_off[2] + toDouble(tokens[6]);
         continue;
       }
       else {
-        frm2 = token;
-        off3.push_back((double)temp.Token(" "));
-        temp.TrimHead(" ");
-        pp2_off[2] = temp.Token(" ");
-        temp.TrimHead(" ");
-        pp2_off[0] = pp2_off[2] + (double)temp.Token(" ");
-        temp.TrimHead(" ");
-        pp2_off[1] = pp2_off[2] + (double)temp.Token(" ");
-        temp.TrimHead(" ");
-        pp2_off[3] = pp2_off[2] + (double)temp.Token(" ");
-        temp.TrimHead(" ");
-        pp2_off[4] = pp2_off[2] + (double)temp.Token(" ");
+        if (tokens.count() < 7) continue;
+
+        frm2 = toDouble(tokens[0]);
+        off3.push_back(toDouble(tokens[1]));
+        pp2_off[2] = toDouble(tokens[2]);
+        pp2_off[0] = pp2_off[2] + toDouble(tokens[3]);
+        pp2_off[1] = pp2_off[2] + toDouble(tokens[4]);
+        pp2_off[3] = pp2_off[2] + toDouble(tokens[5]);
+        pp2_off[4] = pp2_off[2] + toDouble(tokens[6]);
       }
       if(frm1 == -1.0 || frm2 == -1.0) {
-        string msg = "Could not find match in [vikoff.sav] calibration file";
+        QString msg = "Could not find match in [vikoff.sav] calibration file";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
@@ -412,7 +365,7 @@ namespace Isis {
 
       return;
     }
-    string msg = "Could not find match in [vikoff.sav] calibration file";
+    QString msg = "Could not find match in [vikoff.sav] calibration file";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
@@ -421,16 +374,16 @@ namespace Isis {
    *
    * @param t iTime
    */
-  void CalParameters::CalcSunDist(string t) {
+  void CalParameters::CalcSunDist(QString t) {
     double sunv[3];
     SpiceDouble lt, et;
     FileName fname1 = (FileName)"$base/kernels/lsk/naif0007.tls";
     FileName fname2 = (FileName)"$base/kernels/spk/de405.bsp";
-    string tempfname1 = fname1.expanded();
-    string tempfname2 = fname2.expanded();
-    furnsh_c(tempfname1.c_str());
-    furnsh_c(tempfname2.c_str());
-    utc2et_c(t.c_str(), &et);
+    QString tempfname1 = fname1.expanded();
+    QString tempfname2 = fname2.expanded();
+    furnsh_c(tempfname1.toAscii().data());
+    furnsh_c(tempfname2.toAscii().data());
+    utc2et_c(t.toAscii().data(), &et);
     spkezp_c(10, et, "J2000", "LT+S", 499, sunv, &lt);
     p_dist1 = sqrt(sunv[0] * sunv[0] + sunv[1] * sunv[1] + sunv[2] * sunv[2]);
   }

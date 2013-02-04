@@ -57,9 +57,9 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
     focalMap->SetDetectorOrigin(ParentSamples() / 2.0, ParentLines() / 2.0);
 
-    IString ppKey("INS" + IString((int)naifIkCode()) + "_PP");
-    IString odkKey("INS" + IString((int)naifIkCode()) + "_OD_K");
-    IString decenterKey("INS" + IString((int)naifIkCode()) + "_DECENTER");
+    QString ppKey("INS" + toString(naifIkCode()) + "_PP");
+    QString odkKey("INS" + toString(naifIkCode()) + "_OD_K");
+    QString decenterKey("INS" + toString(naifIkCode()) + "_DECENTER");
 
     new ApolloMetricDistortionMap(this, getDouble(ppKey, 0),
                                   getDouble(ppKey, 1), getDouble(odkKey, 0), getDouble(odkKey, 1),
@@ -75,31 +75,31 @@ namespace Isis {
     // The Spacecraft Name should be either Apollo 15, 16, or 17.  The name
     // itself could be formatted any number of ways, but the number contained
     // in the name should be unique between the missions
-    string spacecraft = inst.FindKeyword("SpacecraftName")[0];
-    if (spacecraft.find("15") != string::npos) {
+    QString spacecraft = inst.FindKeyword("SpacecraftName")[0];
+    if (spacecraft.contains("15")) {
       p_ckFrameId = -915240;
       p_ckReferenceId = 1400015;
       p_spkTargetId = -915;
     }
-    else if (spacecraft.find("16") != string::npos) {
+    else if (spacecraft.contains("16")) {
       p_ckFrameId = -916240;
       p_ckReferenceId = 1400016;
       p_spkTargetId = -916;
     }
-    else if (spacecraft.find("17") != string::npos) {
+    else if (spacecraft.contains("17")) {
       p_ckFrameId = -917240;
       p_ckReferenceId = 1400017;
       p_spkTargetId = -917;
     }
     else {
-      string msg = "File does not appear to be an Apollo image";
+      QString msg = "File does not appear to be an Apollo image";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     // Create a cache and grab spice info since it does not change for
     // a framing camera (fixed spacecraft position and pointing)
     // Convert the start time to et
-    setTime((string)inst["StartTime"]);
+    setTime((QString)inst["StartTime"]);
     LoadCache();
     NaifStatus::CheckErrors();
   }

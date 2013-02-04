@@ -26,10 +26,10 @@ void IsisMain() {
 
   // Make sure the user enters an "OUTSTATS" file if the CALCULATE option
   // is selected
-  std::string processOpt = ui.GetString("PROCESS");
+  QString processOpt = ui.GetString("PROCESS");
   if (processOpt == "CALCULATE") {
     if (!ui.WasEntered("OUTSTATS")) {
-      std::string msg = "If the CALCULATE option is selected, you must enter";
+      QString msg = "If the CALCULATE option is selected, you must enter";
       msg += " an OUTSTATS file";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -54,7 +54,7 @@ void IsisMain() {
     bool wtopt = ui.GetBoolean("WEIGHT");
 
     // Determine whether to calculate gains or offsets
-    std::string adjust = ui.GetString("ADJUST");
+    QString adjust = ui.GetString("ADJUST");
     OverlapNormalization::SolutionType sType = OverlapNormalization::Both;
     if (adjust == "CONTRAST") {
       sType = OverlapNormalization::Gains;

@@ -36,8 +36,8 @@ void IsisMain() {
   // Verify HiRISE
   if (inCube->getBandCount() > 1 ||
       inCube->getLabel()->HasObject("Instrument")) {
-    string msg = "Input cube [" + ui.GetFileName("FROM") + "] does not appear"
-               + "to be a DTM";
+    QString msg = "Input cube [" + ui.GetFileName("FROM") + "] does not appear"
+                + "to be a DTM";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -105,20 +105,20 @@ void IsisMain() {
 
     // Convert radius to KM
     newRadius /= 1000;
-    mapping.FindKeyword("A_AXIS_RADIUS").SetValue(newRadius);
+    mapping.FindKeyword("A_AXIS_RADIUS").SetValue(toString(newRadius));
     mapping.FindKeyword("A_AXIS_RADIUS").SetUnits("KM");
-    mapping.FindKeyword("B_AXIS_RADIUS").SetValue(newRadius);
+    mapping.FindKeyword("B_AXIS_RADIUS").SetValue(toString(newRadius));
     mapping.FindKeyword("B_AXIS_RADIUS").SetUnits("KM");
-    mapping.FindKeyword("C_AXIS_RADIUS").SetValue(newRadius);
+    mapping.FindKeyword("C_AXIS_RADIUS").SetValue(toString(newRadius));
     mapping.FindKeyword("C_AXIS_RADIUS").SetUnits("KM");
   }
   else if (mapping["MAP_PROJECTION_TYPE"][0] == "POLAR STEREOGRAPHIC") {
-    double clat = ((mapping["MAXIMUM_LATITUDE"][0].ToDouble() -
-                  mapping["MINIMUM_LATITUDE"][0].ToDouble() ) / 2) +
-                  mapping["MINIMUM_LATITUDE"][0].ToDouble() ;
-    double clon = ((mapping["EASTERNMOST_LONGITUDE"][0].ToDouble()  -
-                  mapping["WESTERNMOST_LONGITUDE"][0].ToDouble() ) / 2) +
-                  mapping["WESTERNMOST_LONGITUDE"][0].ToDouble() ;
+    double clat = ((toDouble(mapping["MAXIMUM_LATITUDE"][0]) -
+                  toDouble(mapping["MINIMUM_LATITUDE"][0]) ) / 2) +
+                  toDouble(mapping["MINIMUM_LATITUDE"][0]) ;
+    double clon = ((toDouble(mapping["EASTERNMOST_LONGITUDE"][0])  -
+                  toDouble(mapping["WESTERNMOST_LONGITUDE"][0]) ) / 2) +
+                  toDouble(mapping["WESTERNMOST_LONGITUDE"][0]) ;
     isEquirectangular = false;
 
     // North polar case
@@ -139,7 +139,7 @@ void IsisMain() {
   }
   // Unsupported projection
   else {
-    string msg = "The projection type [" +
+    QString msg = "The projection type [" +
         mapping["MAP_PROJECTION_TYPE"][0]
         + "] is not supported";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -150,7 +150,7 @@ void IsisMain() {
 
   // Create and then add object, this will be used later in orthos as well.
   PvlObject viewingParameters("VIEWING_PARAMETERS");
-  viewingParameters.AddKeyword(PvlKeyword("NORTH_AZIMUTH",northAzimuth,"DEG"));
+  viewingParameters.AddKeyword(PvlKeyword("NORTH_AZIMUTH",toString(northAzimuth),"DEG"));
 
   pdsLabel.AddObject(viewingParameters);
 
@@ -191,7 +191,7 @@ void IsisMain() {
   form->Add(format);
   pdsLabel.SetFormat(form);
 
-  string note = "Pixel values in this file represent elevations in meters "
+  QString note = "Pixel values in this file represent elevations in meters "
       "above the martian equipotential surface (Mars 2000 Datum) defined by "
       "Smith, et al. (2001). Conversion from pixel units to geophysical "
       "units is given by the keyvalues for SCALING_FACTOR and OFFSET. This "
@@ -224,7 +224,7 @@ void IsisMain() {
   FileName ortho1(ui.GetFileName("ORTHO1"));
   FileName ortho3(ui.GetFileName("ORTHO3"));
 
-  IString vers; // Version string, will be used in orthos
+  QString vers; // Version string, will be used in orthos
   if (!defaultNames) {
     IString pId = ui.GetFileName("DTMTO");
     pId.substr(0, pId.find_first_of('.')+1);
@@ -233,18 +233,18 @@ void IsisMain() {
   }
   else {
     // Set projection letter
-    IString pId = "DTE";
+    QString pId = "DTE";
     pId += isEquirectangular ? "E" : "P";
 
     // Find scale letter
     pId += findScaleLetter(projection.FindKeyword("MAP_SCALE"));
 
     // Product ids of orthos
-    pId += ortho1.baseName().substr(3,12);
-    pId += ortho3.baseName().substr(3,12);
-    IString producing = inputParameters["PRODUCING_INSTITUTION"][0];
+    pId += ortho1.baseName().mid(3,12);
+    pId += ortho3.baseName().mid(3,12);
+    QString producing = inputParameters["PRODUCING_INSTITUTION"][0];
     if (producing.size() > 1) {
-      string msg = "PRODUCTING_INSTITUTION value [" + producing + "] must be a single character";
+      QString msg = "PRODUCTING_INSTITUTION value [" + producing + "] must be a single character";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     pId += "_" + producing;
@@ -258,30 +258,30 @@ void IsisMain() {
     // >10, takes first two digits
     // The number found here is used in ortho images as well.
     if (version >= 10.0) {
-      vers = IString(version).substr(0,2);
+      vers = IString(IString(version).substr(0,2)).ToQt();
     }
     else if (version >= 1.0) {
-      vers = IString(version);
+      vers = IString(version).ToQt();
       bool wasInt = false;
       // Checking for integer values, if so, make #.0 into 0#
       // necessary because in DTMgen version 1.0 corresponded to a 01 in names.
       if (vers.size() == 3) {
         if (vers.at(2) == '0') {
-          vers = "0" + vers.substr(0,1);
+          vers = "0" + IString(vers.mid(0,1)).ToQt();
           wasInt = true;
         }
       }
       // Wasn't int, make #.# into ##
       if (!wasInt) {
-        vers = IString(version).Remove(".");
-        if (vers.size() > 2) vers = vers.substr(0,2);
+        vers = IString(IString(version).Remove(".")).ToQt();
+        if (vers.size() > 2) vers = vers.mid(0,2);
       }
     }
     // 0 - <1, if 0.#, is 0#, is 0.#####, is first two ##
     else if (version >= 0.001) { // Any less and we get E... not dealing with that.
-      vers = IString(version).Remove(".");
-      int nonZero = vers.find_first_not_of('0');
-      if (vers.size() > 2) vers = vers.substr(nonZero-1,2);
+      vers = IString(IString(version).Remove(".")).ToQt();
+      int nonZero = vers.lastIndexOf('0');
+      if (vers.size() > 2) vers = vers.mid(nonZero-1,2);
     }
     // It was negative, or something else crazy?
     else {
@@ -294,9 +294,9 @@ void IsisMain() {
     pdsLabel.AddKeyword(PvlKeyword("PRODUCT_ID",pId));
 
     // Source product ids
-    IString orthoS1 = ortho1.baseName().substr(0,15);
-    IString orthoS3 = ortho3.baseName().substr(0,15);
-    IString sourceId = "("+orthoS1+","+orthoS3+")"; // (######_####,######_####)
+    QString orthoS1 = ortho1.baseName().mid(0,15);
+    QString orthoS3 = ortho3.baseName().mid(0,15);
+    QString sourceId = "("+orthoS1+","+orthoS3+")"; // (######_####,######_####)
     pdsLabel.AddKeyword(PvlKeyword("SOURCE_PRODUCT_ID",sourceId));
   } // End scope of defaultNames true
 
@@ -318,16 +318,16 @@ void IsisMain() {
 
   // Create statistics and add to image group
   Statistics * stat = inCube->getStatistics();
-  image.AddKeyword(PvlKeyword("VALID_MINIMUM",stat->Minimum()));
-  image.AddKeyword(PvlKeyword("VALID_MAXIMUM",stat->Maximum()));
+  image.AddKeyword(PvlKeyword("VALID_MINIMUM",toString(stat->Minimum())));
+  image.AddKeyword(PvlKeyword("VALID_MAXIMUM",toString(stat->Maximum())));
 
   // The output directory, will be used for ortho images as well
   FileName outDir = FileName(ui.GetString("OUTPUTDIR"));
   if (!outDir.fileExists()) {
     outDir.dir().mkpath(".");
   }
-  string outDirString = outDir.expanded();
-  if (outDirString.substr(outDirString.size()-1, 1) != "/") {
+  QString outDirString = outDir.expanded();
+  if (outDirString.mid(outDirString.size()-1, 1) != "/") {
     outDirString += "/";
     outDir = FileName(outDirString);
   }
@@ -335,13 +335,13 @@ void IsisMain() {
   // Output the DTM, it should be ready
   FileName outFile;
   if (defaultNames) {
-    string dir = outDir.expanded();
+    QString dir = outDir.expanded();
     outFile = FileName(dir + pdsLabel.FindKeyword("PRODUCT_ID")[0] + ".IMG");
   }
   else {
     outFile = FileName(ui.GetFileName("DTMTO"));
   }
-  ofstream oCube(outFile.expanded().c_str());
+  ofstream oCube(outFile.expanded().toAscii().data());
 
   p.OutputLabel(oCube);
 
@@ -387,13 +387,13 @@ void IsisMain() {
 
   // Loop through 4 ortho images
   for (int i = 0; i < 4; /*4 = Number of ortho images*/ i++) {
-    IString ortho("ORTHO" + IString(i + 1));
+    QString ortho("ORTHO" + toString(i + 1));
     Cube * orthoInCube = p.SetInputCube(ortho);
 
     Pvl & orthoLabel = p.StandardPdsLabel(ProcessExportPds::Image);
     PvlObject & orthoMap = orthoLabel.FindObject("IMAGE_MAP_PROJECTION");
 
-    IString orthoOut;
+    QString orthoOut;
     if (!defaultNames) {
       orthoOut = ui.GetFileName(ortho);
     }
@@ -409,11 +409,11 @@ void IsisMain() {
       orthoOut += findScaleLetter(orthoMap.FindKeyword("MAP_SCALE"));
 
       // continue building name
-      orthoOut += ortho1.baseName().substr(3,12);
-      orthoOut += ortho3.baseName().substr(3,12);
-      IString producing = inputParameters["PRODUCING_INSTITUTION"][0];
+      orthoOut += ortho1.baseName().mid(3,12);
+      orthoOut += ortho3.baseName().mid(3,12);
+      QString producing = inputParameters["PRODUCING_INSTITUTION"][0];
       if (producing.size() > 1) {
-        string msg = "PRODUCTING_INSTITUTION value [" + producing + "] must be a single character";
+        QString msg = "PRODUCTING_INSTITUTION value [" + producing + "] must be a single character";
         throw IException(IException::User, msg, _FILEINFO_);
       }
       orthoOut += "_" + producing;
@@ -433,11 +433,11 @@ void IsisMain() {
 
       // Convert radius to KM
       newRadius /= 1000;
-      orthoMap.FindKeyword("A_AXIS_RADIUS").SetValue(newRadius);
+      orthoMap.FindKeyword("A_AXIS_RADIUS").SetValue(toString(newRadius));
       orthoMap.FindKeyword("A_AXIS_RADIUS").SetUnits("KM");
-      orthoMap.FindKeyword("B_AXIS_RADIUS").SetValue(newRadius);
+      orthoMap.FindKeyword("B_AXIS_RADIUS").SetValue(toString(newRadius));
       orthoMap.FindKeyword("B_AXIS_RADIUS").SetUnits("KM");
-      orthoMap.FindKeyword("C_AXIS_RADIUS").SetValue(newRadius);
+      orthoMap.FindKeyword("C_AXIS_RADIUS").SetValue(toString(newRadius));
       orthoMap.FindKeyword("C_AXIS_RADIUS").SetUnits("KM");
     }
     // Else case for Polar Stereographic is unnecessary as all it does is
@@ -457,9 +457,9 @@ void IsisMain() {
       orthoLabel.AddKeyword(PvlKeyword("SOURCE_PRODUCT_ID",ui.GetString("SOURCE_PRODUCT_ID")));
     }
     else {
-      IString orthoS1 = ortho1.baseName().substr(0,15);
-      IString orthoS3 = ortho3.baseName().substr(0,15);
-      IString sourceId = "("+orthoS1+","+orthoS3+")"; // (######_####,######_####)
+      QString orthoS1 = ortho1.baseName().mid(0,15);
+      QString orthoS3 = ortho3.baseName().mid(0,15);
+      QString sourceId = "("+orthoS1+","+orthoS3+")"; // (######_####,######_####)
       orthoLabel.AddKeyword(PvlKeyword("SOURCE_PRODUCT_ID",sourceId));
     }
 
@@ -493,14 +493,14 @@ void IsisMain() {
 
     FileName orthoFile;
     if (defaultNames) {
-      string dir = outDir.expanded();
+      QString dir = outDir.expanded();
       orthoFile = FileName(dir + orthoLabel.FindKeyword("PRODUCT_ID")[0] + ".IMG");
     }
     else {
       orthoFile = FileName(ui.GetFileName(ortho + "TO"));
     }
 
-    ofstream orthoPdsOut(orthoFile.expanded().c_str());
+    ofstream orthoPdsOut(orthoFile.expanded().toAscii().data());
     p.OutputLabel(orthoPdsOut);
     p.StartProcess(orthoPdsOut);
     orthoPdsOut.close();

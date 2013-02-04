@@ -12,18 +12,18 @@ using namespace Isis;
 using namespace std;
 
 void ReadDefFile(ControlNetFilter & pcNetFilter, Pvl & pvlDefFile);
-void (ControlNetFilter::*GetPtr2Filter(const string sFilter)) (const PvlGroup & pvlGrp, bool pbLastFilter);
+void (ControlNetFilter::*GetPtr2Filter(const QString sFilter)) (const PvlGroup & pvlGrp, bool pbLastFilter);
 
 void IsisMain() {
 
   try {
     // Process all the inputs first, for errors and to satisfy requirements
     UserInterface &ui = Application::GetUserInterface();
-    string sSerialNumFile = ui.GetFileName("FROMLIST");
+    QString sSerialNumFile = ui.GetFileName("FROMLIST");
 
     // Get the DefFile
-    string sDefFile = "";
-    string sOutFile = "";
+    QString sDefFile = "";
+    QString sOutFile = "";
     Pvl pvlDefFile;
     if (ui.WasEntered("DEFFILE")) {
       sDefFile = ui.GetFileName("DEFFILE");
@@ -50,19 +50,19 @@ void IsisMain() {
             Application::Log(pvlObj.Group(j));
           }
         }
-        string sErrMsg = "Invalid Deffile\n";
+        QString sErrMsg = "Invalid Deffile\n";
         throw IException(IException::User, sErrMsg, _FILEINFO_);
       }
     }
 
     // Get the Image Stats File
-    string sImageFile= "";
+    QString sImageFile= "";
     if (ui.WasEntered("CREATE_IMAGE_STATS") && ui.GetBoolean("CREATE_IMAGE_STATS")) {
       sImageFile = ui.GetFileName("IMAGE_STATS_FILE");
     }
 
     // Get the Point Stats File
-    string sPointFile="";
+    QString sPointFile="";
     if (ui.WasEntered("CREATE_POINT_STATS") && ui.GetBoolean("CREATE_POINT_STATS")) {
       sPointFile = ui.GetFileName("POINT_STATS_FILE");
     }
@@ -130,13 +130,13 @@ void ReadDefFile(ControlNetFilter & pcNetFilter, Pvl & pvlDefFile)
 }
 
 /**
- * Returns the pointer to filter function based on the Group name string
+ * Returns the pointer to filter function based on the Group name QString
  *
  * @author Sharmila Prasad (8/11/2010)
  *
  * @return void(ControlNetFilter::*GetPtr2Filter)(const PvlGroup&pvlGrp)
  */
-void (ControlNetFilter::*GetPtr2Filter(const string psFilter)) (const PvlGroup & pvlGrp, bool pbLastFilter)
+void (ControlNetFilter::*GetPtr2Filter(const QString psFilter)) (const PvlGroup & pvlGrp, bool pbLastFilter)
 {
   // Point Filters
   if (psFilter == "Point_PixelShift") {

@@ -1,4 +1,4 @@
-#if !defined(Hillier_h)
+#ifndef Hillier_h
 #define Hillier_h
 /**
  * @file
@@ -109,7 +109,7 @@ namespace Isis {
         double b0, b1, a0, a1, a2, a3, a4;  //<! Hillier parameters
         double wavelength;                  //<! Wavelength for correction
         double tolerance;                   //<! Wavelenght Range/Tolerance
-        IString units;                      //<! Phase units of Hiller eq.
+        QString units;                      //<! Phase units of Hiller eq.
         double phaUnit;  // 1 for degrees, Pi/180 for radians
         int band;                           //<! Cube band parameters
         double phoStd;                      //<! Computed photometric std.
@@ -147,7 +147,7 @@ namespace Isis {
        * @return T Return type
        */
       template <typename T>
-      T ConfKey(const DbProfile &conf, const std::string &keyname,
+      T ConfKey(const DbProfile &conf, const QString &keyname,
                 const T &defval, int index = 0) const {
         if(!conf.exists(keyname)) {
           return (defval);
@@ -155,7 +155,7 @@ namespace Isis {
         if(conf.count(keyname) < index) {
           return (defval);
         }
-        IString iValue(conf.value(keyname, index));
+        QString iValue(conf.value(keyname, index));
         T value = iValue;  // This makes it work with a string?
         return (value);
       }

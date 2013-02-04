@@ -12,16 +12,13 @@ class QGraphicsView;
 class QMenu;
 class QPixmap;
 class QPoint;
+class QString;
 class QToolBar;
 
 namespace Isis {
-  class ToolPad;
-}
-
-namespace Isis {
-  class IString;
   class MosaicSceneWidget;
   class PvlObject;
+  class ToolPad;
 
   /**
    * @brief Base class for the MosaicTools
@@ -61,7 +58,7 @@ namespace Isis {
        *
        * @return QString
        */
-      QPixmap getIcon(IString iconName) const;
+      QPixmap getIcon(QString iconName) const;
 
       virtual void addTo(QMenu *menu) {}
       virtual void addTo(ToolPad *toolPad);
@@ -71,7 +68,7 @@ namespace Isis {
 
       virtual PvlObject toPvl() const;
       virtual void fromPvl(const PvlObject &obj);
-      virtual IString projectPvlObjectName() const;
+      virtual QString projectPvlObjectName() const;
 
     signals:
       void activated(bool);

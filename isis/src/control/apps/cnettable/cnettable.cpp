@@ -30,8 +30,8 @@
 using namespace std;
 using namespace Isis;
 
-IString CheckValue(double value);
-IString CheckValue(IString value);
+QString CheckValue(double value);
+QString CheckValue(QString value);
 void Write(PvlGroup *point, const ControlMeasure &cm);
 
 // Allows for column names to be written on the first pass
@@ -41,7 +41,7 @@ bool append;
 TextFile *txt = NULL;
 
 // For control measure related data and labels
-IString measureInfo;
+QString measureInfo;
 QString measureLabels;
 
 void IsisMain() {
@@ -165,105 +165,105 @@ void IsisMain() {
     measureInfo.clear();
     measureInfo += cpoint->GetId() + ",";
     measureInfo += cpoint->GetPointTypeString() + ",";
-    measureInfo += IString(cpoint->GetChooserName()) + ",";
-    measureInfo += IString(cpoint->GetDateTime()) + ",";
-    measureInfo += IString(cpoint->IsEditLocked()) + ",";
-    measureInfo += IString(cpoint->IsIgnored()) + ",";
+    measureInfo += QString(cpoint->GetChooserName()) + ",";
+    measureInfo += QString(cpoint->GetDateTime()) + ",";
+    measureInfo += toString((int)(cpoint->IsEditLocked())) + ",";
+    measureInfo += toString((int)(cpoint->IsIgnored())) + ",";
 
-    measureInfo += IString(cpoint->GetSurfacePointSourceString()) + ",";
-    measureInfo += IString(cpoint->GetAprioriSurfacePointSourceFile()) + ",";
-    measureInfo += IString(cpoint->GetRadiusSourceString()) + ",";
-    measureInfo += IString(cpoint->GetAprioriRadiusSourceFile()) + ",";
+    measureInfo += QString(cpoint->GetSurfacePointSourceString()) + ",";
+    measureInfo += QString(cpoint->GetAprioriSurfacePointSourceFile()) + ",";
+    measureInfo += QString(cpoint->GetRadiusSourceString()) + ",";
+    measureInfo += QString(cpoint->GetAprioriRadiusSourceFile()) + ",";
 
     SurfacePoint Asp = cpoint->GetAprioriSurfacePoint();
-    measureInfo += IString(CheckValue(Asp.GetX().kilometers())) + ",";
-    measureInfo += IString(CheckValue(Asp.GetY().kilometers())) + ",";
-    measureInfo += IString(CheckValue(Asp.GetZ().kilometers())) + ",";
-    measureInfo += IString(CheckValue(Asp.GetXSigma().kilometers())) + ",";
-    measureInfo += IString(CheckValue(Asp.GetYSigma().kilometers())) + ",";
-    measureInfo += IString(CheckValue(Asp.GetZSigma().kilometers())) + ",";
-    measureInfo += IString(CheckValue(Asp.GetLatitude().planetocentric(Angle::Degrees))) + ",";
-    measureInfo += IString(CheckValue(Asp.GetLongitude().positiveEast(Angle::Degrees))) + ",";
-    measureInfo += IString(CheckValue(Asp.GetLocalRadius().kilometers())) + ",";
-    measureInfo += IString(CheckValue(Asp.GetLatSigma().degrees())) + ",";
-    measureInfo += IString(CheckValue(Asp.GetLonSigma().degrees())) + ",";
-    measureInfo += IString(CheckValue(Asp.GetLocalRadiusSigma().kilometers())) + ",";
-    try { measureInfo += IString(CheckValue(Asp.GetLatSigmaDistance().kilometers())) + ","; }
+    measureInfo += QString(CheckValue(Asp.GetX().kilometers())) + ",";
+    measureInfo += QString(CheckValue(Asp.GetY().kilometers())) + ",";
+    measureInfo += QString(CheckValue(Asp.GetZ().kilometers())) + ",";
+    measureInfo += QString(CheckValue(Asp.GetXSigma().kilometers())) + ",";
+    measureInfo += QString(CheckValue(Asp.GetYSigma().kilometers())) + ",";
+    measureInfo += QString(CheckValue(Asp.GetZSigma().kilometers())) + ",";
+    measureInfo += QString(CheckValue(Asp.GetLatitude().planetocentric(Angle::Degrees))) + ",";
+    measureInfo += QString(CheckValue(Asp.GetLongitude().positiveEast(Angle::Degrees))) + ",";
+    measureInfo += QString(CheckValue(Asp.GetLocalRadius().kilometers())) + ",";
+    measureInfo += QString(CheckValue(Asp.GetLatSigma().degrees())) + ",";
+    measureInfo += QString(CheckValue(Asp.GetLonSigma().degrees())) + ",";
+    measureInfo += QString(CheckValue(Asp.GetLocalRadiusSigma().kilometers())) + ",";
+    try { measureInfo += QString(CheckValue(Asp.GetLatSigmaDistance().kilometers())) + ","; }
     catch (IException &) {
       measureInfo += ",";
     }
-    try { measureInfo += IString(CheckValue(Asp.GetLonSigmaDistance().kilometers())) + ","; }
+    try { measureInfo += QString(CheckValue(Asp.GetLonSigmaDistance().kilometers())) + ","; }
     catch (IException &) {
       measureInfo += ",";
     }
 
     SurfacePoint sp = cpoint->GetAdjustedSurfacePoint();
-    measureInfo += IString(CheckValue(sp.GetX().kilometers())) + ",";
-    measureInfo += IString(CheckValue(sp.GetY().kilometers())) + ",";
-    measureInfo += IString(CheckValue(sp.GetZ().kilometers())) + ",";
-    measureInfo += IString(CheckValue(sp.GetXSigma().kilometers())) + ",";
-    measureInfo += IString(CheckValue(sp.GetYSigma().kilometers())) + ",";
-    measureInfo += IString(CheckValue(sp.GetZSigma().kilometers())) + ",";
-    measureInfo += IString(CheckValue(sp.GetLatitude().planetocentric(Angle::Degrees))) + ",";
-    measureInfo += IString(CheckValue(sp.GetLongitude().positiveEast(Angle::Degrees))) + ",";
-    measureInfo += IString(CheckValue(sp.GetLocalRadius().kilometers())) + ",";
-    measureInfo += IString(CheckValue(sp.GetLatSigma().degrees())) + ",";
-    measureInfo += IString(CheckValue(sp.GetLonSigma().degrees())) + ",";
-    measureInfo += IString(CheckValue(sp.GetLocalRadiusSigma().kilometers())) + ",";
-    try { measureInfo += IString(CheckValue(sp.GetLatSigmaDistance().kilometers())) + ","; }
+    measureInfo += QString(CheckValue(sp.GetX().kilometers())) + ",";
+    measureInfo += QString(CheckValue(sp.GetY().kilometers())) + ",";
+    measureInfo += QString(CheckValue(sp.GetZ().kilometers())) + ",";
+    measureInfo += QString(CheckValue(sp.GetXSigma().kilometers())) + ",";
+    measureInfo += QString(CheckValue(sp.GetYSigma().kilometers())) + ",";
+    measureInfo += QString(CheckValue(sp.GetZSigma().kilometers())) + ",";
+    measureInfo += QString(CheckValue(sp.GetLatitude().planetocentric(Angle::Degrees))) + ",";
+    measureInfo += QString(CheckValue(sp.GetLongitude().positiveEast(Angle::Degrees))) + ",";
+    measureInfo += QString(CheckValue(sp.GetLocalRadius().kilometers())) + ",";
+    measureInfo += QString(CheckValue(sp.GetLatSigma().degrees())) + ",";
+    measureInfo += QString(CheckValue(sp.GetLonSigma().degrees())) + ",";
+    measureInfo += QString(CheckValue(sp.GetLocalRadiusSigma().kilometers())) + ",";
+    try { measureInfo += QString(CheckValue(sp.GetLatSigmaDistance().kilometers())) + ","; }
     catch (IException &e) {
       measureInfo += ",";
     }
-    try { measureInfo += IString(CheckValue(sp.GetLonSigmaDistance().kilometers())) + ","; }
+    try { measureInfo += QString(CheckValue(sp.GetLonSigmaDistance().kilometers())) + ","; }
     catch (IException &e) {
       measureInfo += ",";
     }
 
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         &ControlMeasure::GetResidualMagnitude).Minimum())) + ",";
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         &ControlMeasure::GetResidualMagnitude).Maximum())) + ",";
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         &ControlMeasure::GetResidualMagnitude).Average())) + ",";
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         &ControlMeasure::GetSampleResidual).Minimum())) + ",";
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         &ControlMeasure::GetSampleResidual).Maximum())) + ",";
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         &ControlMeasure::GetLineResidual).Minimum())) + ",";
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         &ControlMeasure::GetLineResidual).Maximum())) + ",";
 
 
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         &ControlMeasure::GetSampleShift).Maximum())) + ",";
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         &ControlMeasure::GetSampleShift).Minimum())) + ",";
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         &ControlMeasure::GetSampleShift).Average())) + ",";
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         &ControlMeasure::GetLineShift).Maximum())) + ",";
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         &ControlMeasure::GetLineShift).Minimum())) + ",";
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         &ControlMeasure::GetLineShift).Average())) + ",";
 
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         &ControlMeasure::GetPixelShift).Maximum())) + ",";
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         &ControlMeasure::GetPixelShift).Minimum())) + ",";
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         &ControlMeasure::GetPixelShift).Average())) + ",";
 
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         ControlMeasureLogData::MaximumPixelZScore).Maximum())) + ",";
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         ControlMeasureLogData::MinimumPixelZScore).Minimum())) + ",";
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         ControlMeasureLogData::GoodnessOfFit).Maximum())) + ",";
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         ControlMeasureLogData::GoodnessOfFit).Minimum())) + ",";
-    measureInfo += IString(CheckValue(cpoint->GetStatistic(
+    measureInfo += QString(CheckValue(cpoint->GetStatistic(
         ControlMeasureLogData::GoodnessOfFit).Average())) + ",";
 
     // Loop through all measures in controlpoint
@@ -299,38 +299,26 @@ void IsisMain() {
 
 // This function is meant to check a value, and, if it is a special pixel
 // return " " instead of the special pixel value.
-IString CheckValue(double value) {
+QString CheckValue(double value) {
   if (IsSpecial(value)) {
-    return IString("");
+    return QString("");
   }
   else {
-    return CheckValue(IString(value));
+    return CheckValue(toString(value));
   }
 }
 
-IString CheckValue(IString value) {
-  if (value == IString(Isis::Null) ||
-      value == IString(Isis::Hrs) ||
-      value == IString(Isis::His) ||
-      value == IString(Isis::Lrs) ||
-      value == IString(Isis::Lis)) {
-    return IString("");
+QString CheckValue(QString value) {
+  if (value == toString(Isis::Null) ||
+      value == toString(Isis::Hrs) ||
+      value == toString(Isis::His) ||
+      value == toString(Isis::Lrs) ||
+      value == toString(Isis::Lis) ||
+      value == QString::number(Isis::Null)) {
+    return QString("");
   }
   else {
     return value;
-  }
-}
-
-IString CheckValue(QString value) {
-  if (value == QString::number(Isis::Null) ||
-      value == QString::number(Isis::Hrs) ||
-      value == QString::number(Isis::His) ||
-      value == QString::number(Isis::Lrs) ||
-      value == QString::number(Isis::Lis)) {
-    return IString("");
-  }
-  else {
-    return value.toStdString();
   }
 }
 
@@ -366,12 +354,12 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
     // point information
     for(int i = 0; i < maxCount; i++) {
       if((*point)[i].Size() == 3) {
-        output += QString((*point)[i].Name().c_str()) + "X,";
-        output += QString((*point)[i].Name().c_str()) + "Y,";
-        output += QString((*point)[i].Name().c_str()) + "Z,";
+        output += QString((*point)[i].Name()) + "X,";
+        output += QString((*point)[i].Name()) + "Y,";
+        output += QString((*point)[i].Name()) + "Z,";
       }
       else {
-        output += QString((*point)[i].Name().c_str()) + ",";
+        output += QString((*point)[i].Name()) + ",";
       }
     }
 
@@ -382,10 +370,10 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
     //}
 
 
-    if(errors) output += QString((*point)[maxCount].Name().c_str());
+    if(errors) output += QString((*point)[maxCount].Name());
     isFirst = false;
     measureLabels += output;
-    txt->PutLine(measureLabels.toStdString());
+    txt->PutLine(measureLabels);
   }
   output.clear();
   measureLabels.clear();
@@ -393,7 +381,7 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
   QList< QStringList > printableMeasureData = cm.PrintableClassData();
   QStringList nameValuePair;
   foreach (nameValuePair, printableMeasureData) {
-    output += CheckValue(nameValuePair.at(1)).ToQt() + ",";
+    output += CheckValue(nameValuePair.at(1)) + ",";
   }
 
   // Write out date values
@@ -420,10 +408,10 @@ void Write(PvlGroup *point, const ControlMeasure &cm) {
 
   // Meaure info comes first
   QString pri = "";
-  pri += measureInfo.ToQt();
+  pri += measureInfo;
   pri += output;
 
-  txt->PutLine(pri.toStdString());
+  txt->PutLine(pri);
 
   output.clear();
   pri.clear();

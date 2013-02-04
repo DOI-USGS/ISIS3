@@ -370,7 +370,7 @@ namespace Isis {
 
     for(unsigned int i = 0; i < InputCubes.size(); i++) {
       // Get the manual stretch parameters if needed
-      string strType = Application::GetUserInterface().GetString("STRETCH");
+      QString strType = Application::GetUserInterface().GetString("STRETCH");
       if(strType == "MANUAL") {
         p_inputMinimum.push_back(Application::GetUserInterface().GetDouble("MINIMUM"));
         p_inputMaximum.push_back(Application::GetUserInterface().GetDouble("MAXIMUM"));
@@ -1179,12 +1179,12 @@ namespace Isis {
   *          to write the world information to.
   *
   */
-  void ProcessExport::CreateWorldFile(const std::string &worldFile) {
+  void ProcessExport::CreateWorldFile(const QString &worldFile) {
     try {
       Projection *proj = InputCubes[0]->getProjection();
       proj->SetWorld(1.0, 1.0);
       ofstream os;
-      os.open(worldFile.c_str(), ios::out);
+      os.open(worldFile.toAscii().data(), ios::out);
 
       // X resolution
       os << std::fixed << setprecision(15)

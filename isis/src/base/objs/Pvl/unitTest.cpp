@@ -57,17 +57,17 @@ int main() {
     cout.flush();
 
     // make this error work regardless of directory...
-    string errors = e.toString();
+    QString errors = e.toString();
 
-    while(errors.find("/") != string::npos) {
-      int pos = errors.find("/");
+    while(errors.indexOf("/") != -1) {
+      int pos = errors.indexOf("/");
 
-      if(errors.find("/", pos + 1) < errors.find("]")) {
-        errors = errors.substr(0, pos + 1) +
-                 errors.substr(errors.find("/", pos + 1) + 1);
+      if(errors.indexOf("/", pos + 1) < errors.indexOf("]")) {
+        errors = errors.mid(0, pos + 1) +
+                 errors.mid(errors.indexOf("/", pos + 1) + 1);
       }
       else {
-        errors = errors.substr(0, pos - 1) + errors.substr(pos + 1);
+        errors = errors.mid(0, pos - 1) + errors.mid(pos + 1);
       }
     }
 
@@ -85,17 +85,17 @@ int main() {
     cout.flush();
 
     // make this error work regardless of directory...
-    string errors = e.toString();
+    QString errors = e.toString();
 
-    while(errors.find("/") != string::npos) {
-      int pos = errors.find("/");
+    while(errors.indexOf("/") != -1) {
+      int pos = errors.indexOf("/");
 
-      if(errors.find("/", pos + 1) < errors.find("]")) {
-        errors = errors.substr(0, pos + 1) +
-                 errors.substr(errors.find("/", pos + 1) + 1);
+      if(errors.indexOf("/", pos + 1) < errors.indexOf("]")) {
+        errors = errors.mid(0, pos + 1) +
+                 errors.mid(errors.indexOf("/", pos + 1) + 1);
       }
       else {
-        errors = errors.substr(0, pos - 1) + errors.substr(pos + 1);
+        errors = errors.mid(0, pos - 1) + errors.mid(pos + 1);
       }
     }
 
@@ -114,17 +114,17 @@ int main() {
     cout.flush();
 
     // make this error work regardless of directory...
-    string errors = e.toString();
+    QString errors = e.toString();
 
-    while(errors.find("/") != string::npos) {
-      int pos = errors.find("/");
+    while(errors.indexOf("/") != -1) {
+      int pos = errors.indexOf("/");
 
-      if(errors.find("/", pos + 1) < errors.find("]")) {
-        errors = errors.substr(0, pos + 1) +
-                 errors.substr(errors.find("/", pos + 1) + 1);
+      if(errors.indexOf("/", pos + 1) < errors.indexOf("]")) {
+        errors = errors.mid(0, pos + 1) +
+                 errors.mid(errors.indexOf("/", pos + 1) + 1);
       }
       else {
-        errors = errors.substr(0, pos - 1) + errors.substr(pos + 1);
+        errors = errors.mid(0, pos - 1) + errors.mid(pos + 1);
       }
     }
 

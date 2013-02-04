@@ -24,10 +24,10 @@ class MyProjection : public Isis::TProjection {
       TProjection(lab) {
     }
     // override pure virtual methods
-    string Name() const {
+    QString Name() const {
       return "None";
     }
-    string Version() const {
+    QString Version() const {
       return "1.0";
     }
 
@@ -104,10 +104,10 @@ class EmptyProjection : public TProjection {
     }
 
     // pure virtuals, must be overriden, no need to test since MyProjection will test these
-    string Name() const {
+    QString Name() const {
       return "None";
     }
-    string Version() const {
+    QString Version() const {
       return "1.0";
     }
 };
@@ -159,23 +159,23 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   cout << "Test for missing polar radius in the mapping group" << endl;
-  mg += PvlKeyword("EquatorialRadius", -1.0);
+  mg += PvlKeyword("EquatorialRadius", "-1.0");
   Doit(lab);
   cout << endl;
 
   cout << "Test for invalid Equatoral Radius value" << endl;
-  mg += PvlKeyword("PolarRadius", -0.95);
+  mg += PvlKeyword("PolarRadius", "-0.95");
   Doit(lab);
   cout << endl;
 
   cout << "Test for invalid polar radius value" << endl;
-  mg["EquatorialRadius"] = 1.0;
-  mg += PvlKeyword("PolarRadius", -0.95);
+  mg["EquatorialRadius"] = "1.0";
+  mg += PvlKeyword("PolarRadius", "-0.95");
   Doit(lab);
   cout << endl;
 
   cout << "Test for missing latitude type in the mapping group" << endl;
-  mg["PolarRadius"] = 0.95;
+  mg["PolarRadius"] = "0.95";
   Doit(lab);
   cout << endl;
 
@@ -200,12 +200,12 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   cout << "Test for invalid longitude domain value in the mapping group" << endl;
-  mg += PvlKeyword("LongitudeDomain", 75);
+  mg += PvlKeyword("LongitudeDomain", "75");
   Doit(lab);
   cout << "///////////////////////////////////////////////////////////" << endl;
   cout << endl;
 
-  mg["LongitudeDomain"] = 360;
+  mg["LongitudeDomain"] = "360";
   mg += PvlKeyword("ProjectionName", "MyProjection");
 
   cout << "Projection Specifications" << endl;
@@ -268,31 +268,31 @@ int main(int argc, char *argv[]) {
   cout << "///////////////////////////////////////////////////////////" << endl;
   cout << "Test More Error Throws...\n" << endl;
   cout << "Testing unordered latitude range" << endl;
-  mg += PvlKeyword("MinimumLatitude", 45.0);
-  mg += PvlKeyword("MaximumLatitude", -80.0);
-  mg += PvlKeyword("MinimumLongitude", 15.0);
-  mg += PvlKeyword("MaximumLongitude", -190.0);
+  mg += PvlKeyword("MinimumLatitude", "45.0");
+  mg += PvlKeyword("MaximumLatitude", "-80.0");
+  mg += PvlKeyword("MinimumLongitude", "15.0");
+  mg += PvlKeyword("MaximumLongitude", "-190.0");
   Doit(lab);
   cout << endl;
 
   cout << "Testing invalid minimum latitude" << endl;
-  mg["MinimumLatitude"] = -95.0;
+  mg["MinimumLatitude"] = "-95.0";
   Doit(lab);
   cout << endl;
 
   cout << "Testing invalid maximum latitude" << endl;
-  mg["MinimumLatitude"].SetValue(45.0, "units");
-  mg["MaximumLatitude"].SetValue(95.0, "units");
+  mg["MinimumLatitude"].SetValue("45.0", "units");
+  mg["MaximumLatitude"].SetValue("95.0", "units");
   Doit(lab);
   cout << endl;
 
   cout << "Testing unordered longitude range" << endl;
-  mg["MaximumLatitude"].SetValue(80.0, "units");
+  mg["MaximumLatitude"].SetValue("80.0", "units");
   Doit(lab);
   cout << "///////////////////////////////////////////////////////////" << endl;
   cout << endl;
 
-  mg["MaximumLongitude"] = 190.0;
+  mg["MaximumLongitude"] = "190.0";
 
   cout << "Testing xyRange methods...\n" << endl;
   MyProjection p2(lab);
@@ -355,18 +355,18 @@ int main(int argc, char *argv[]) {
   Isis::PvlGroup &latTestGroup = latRangeTest.FindGroup("Mapping");
   latTestGroup += Isis::PvlKeyword("TargetName", "Moon");
   latTestGroup += Isis::PvlKeyword("ProjectionName", "PolarStereographic");
-  latTestGroup += Isis::PvlKeyword("EquatorialRadius", 1737400.0);
-  latTestGroup += Isis::PvlKeyword("PolarRadius", 1737400.0);
+  latTestGroup += Isis::PvlKeyword("EquatorialRadius", "1737400.0");
+  latTestGroup += Isis::PvlKeyword("PolarRadius", "1737400.0");
   latTestGroup += Isis::PvlKeyword("LatitudeType", "Planetocentric");
   latTestGroup += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-  latTestGroup += Isis::PvlKeyword("LongitudeDomain", 360);
-  latTestGroup += Isis::PvlKeyword("Scale", 5.0);
-  latTestGroup += Isis::PvlKeyword("MinimumLatitude", -90.0);
-  latTestGroup += Isis::PvlKeyword("MaximumLatitude", -45.0);
-  latTestGroup += Isis::PvlKeyword("MinimumLongitude", 0.0);
-  latTestGroup += Isis::PvlKeyword("MaximumLongitude", 360.0);
-  latTestGroup += Isis::PvlKeyword("CenterLatitude", -90.0);
-  latTestGroup += Isis::PvlKeyword("CenterLongitude", 0.0);
+  latTestGroup += Isis::PvlKeyword("LongitudeDomain", "360");
+  latTestGroup += Isis::PvlKeyword("Scale", "5.0");
+  latTestGroup += Isis::PvlKeyword("MinimumLatitude", "-90.0");
+  latTestGroup += Isis::PvlKeyword("MaximumLatitude", "-45.0");
+  latTestGroup += Isis::PvlKeyword("MinimumLongitude", "0.0");
+  latTestGroup += Isis::PvlKeyword("MaximumLongitude", "360.0");
+  latTestGroup += Isis::PvlKeyword("CenterLatitude", "-90.0");
+  latTestGroup += Isis::PvlKeyword("CenterLongitude", "0.0");
   Isis::TProjection *latTestProjection = 
       (Isis::TProjection *) Isis::ProjectionFactory::Create(latRangeTest);
 
@@ -490,7 +490,7 @@ int main(int argc, char *argv[]) {
   cout << "operator!=:  " << (p != p2) << endl;
 
   mg["LongitudeDirection"] = "PositiveWest";
-  mg["LongitudeDomain"] = 180;
+  mg["LongitudeDomain"] = "180";
   EmptyProjection noproj(lab);
   cout << endl;
 
@@ -525,7 +525,7 @@ int main(int argc, char *argv[]) {
   cout << "Test Error Throw for compute methods..." << endl;
   // qCompute is not used for spherical targets
   // set polar radius = equatorial radius
-  mg["PolarRadius"] = 1.0;
+  mg["PolarRadius"] = "1.0";
   Doit(lab);
   MyProjection p3a(lab);
   try {
@@ -534,7 +534,7 @@ int main(int argc, char *argv[]) {
   catch(IException &error) {
     error.print();
   }
-  mg["PolarRadius"] = 0.95;
+  mg["PolarRadius"] = "0.95";
   cout << "///////////////////////////////////////////////////////////" << endl;
   cout << endl;
 
@@ -701,7 +701,7 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   cout << "Rotation Tests" << endl;
-  mg += PvlKeyword("Rotation", 90.0);
+  mg += PvlKeyword("Rotation", "90.0");
   mg["LongitudeDirection"] = "PositiveEast";
   MyProjection p4(lab);
   cout << "Rotation:     " << p4.Rotation() << endl;

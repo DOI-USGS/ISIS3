@@ -25,25 +25,25 @@ void IsisMain() {
   FileName inFileName = ui.GetFileName("FROM");
   try {
     if(icube.getGroup("Instrument")["InstrumentID"][0] != "THEMIS_VIS") {
-      string msg = "This program is intended for use on THEMIS VIS images only. [";
+      QString msg = "This program is intended for use on THEMIS VIS images only. [";
       msg += inFileName.expanded() + "] does not appear to be a THEMIS VIS image.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
   catch(IException &e) {
-    string msg = "This program is intended for use on THEMIS VIS images only. [";
+    QString msg = "This program is intended for use on THEMIS VIS images only. [";
     msg += inFileName.expanded() + "] does not appear to be a THEMIS VIS image.";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 
   vector<Cube *> flatcubes;
   vector<LineManager *> fcubeMgrs;
-  int summing = icube.getGroup("Instrument")["SpatialSumming"][0];
+  int summing = toInt(icube.getGroup("Instrument")["SpatialSumming"][0]);
 
   for(int filt = 0; filt < 5; filt++) {
-    string filePattern = "$odyssey/calibration/flat_filter_";
-    filePattern += IString(filt + 1) + "_summing_";
-    filePattern += IString(summing) + "_v????.cub";
+    QString filePattern = "$odyssey/calibration/flat_filter_";
+    filePattern += toString(filt + 1) + "_summing_";
+    filePattern += toString(summing) + "_v????.cub";
     FileName flatFile = FileName(filePattern).highestVersion();
     Cube *fcube = new Cube();
     fcube->open(flatFile.expanded());
@@ -71,7 +71,7 @@ void IsisMain() {
   PvlKeyword &filtNums =
       icube.getLabel()->FindGroup("BandBin", Pvl::Traverse)["FilterNumber"];
   for(int i = 0; i < filtNums.Size(); i++) {
-    filter.push_back(filtNums[i]);
+    filter.push_back(toInt(filtNums[i]));
   }
 
   LineManager ocubeMgr(ocube);

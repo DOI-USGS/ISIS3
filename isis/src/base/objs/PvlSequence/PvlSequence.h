@@ -25,8 +25,10 @@
 #define PvlSequence_h
 
 #include <vector>
+
+#include <QString>
+
 #include "PvlKeyword.h"
-#include "IString.h"
 
 namespace Isis {
   /**
@@ -69,16 +71,16 @@ namespace Isis {
 
       PvlSequence &operator=(PvlKeyword &key);
 
-      PvlSequence &operator+=(const std::string &array);
+      PvlSequence &operator+=(const QString &array);
 
-      PvlSequence &operator+=(std::vector<std::string> &array);
+      PvlSequence &operator+=(std::vector<QString> &array);
 
       PvlSequence &operator+=(std::vector<int> &array);
 
       PvlSequence &operator+=(std::vector<double> &array);
 
       //! Return the ith Array of the sequence
-      std::vector<IString> &operator[](int i) {
+      std::vector<QString> &operator[](int i) {
         return p_sequence[i];
       };
 
@@ -93,7 +95,7 @@ namespace Isis {
       };
 
     private:
-      std::vector<std::vector<IString> > p_sequence; /**<A vector of Strings
+      std::vector<std::vector<QString> > p_sequence; /**<A vector of Strings
                                                         that contains the values
                                                         for the keyword. */
 

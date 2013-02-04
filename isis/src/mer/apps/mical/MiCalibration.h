@@ -23,29 +23,29 @@ namespace Isis {
         int InstrumentSerialNumber() const {
           return p_instrumentSerialNumber;
         };
-        inline std::string ShutterEffectCorrectionFlag()
+        inline QString ShutterEffectCorrectionFlag()
         const {
           return p_shuttereffectcorrectionflag;
         };
-        inline std::string ReferencePixelImage() const {
+        inline QString ReferencePixelImage() const {
           return p_ReferencePixelImage;
         };
-        inline std::string ZeroExposureImage() const {
+        inline QString ZeroExposureImage() const {
           return p_ZeroExposureImage;
         };
-        inline std::string ActiveAreaImage() const {
+        inline QString ActiveAreaImage() const {
           return p_ActiveAreaImage;
         };
-        inline std::string FlatImageOpen() const {
+        inline QString FlatImageOpen() const {
           return p_FlatImageOpen;
         };
-        inline std::string FlatImageClosed() const {
+        inline QString FlatImageClosed() const {
           return p_FlatImageClosed;
         };
-        inline std::string FilterName() const {
+        inline QString FilterName() const {
           return p_filterName;
         };
-        inline std::string StartTime() const {
+        inline QString StartTime() const {
           return p_startTime;
         };
         inline double TransferTime() const {
@@ -87,9 +87,9 @@ namespace Isis {
         double p_PCBTemperature;
         double p_CCDTemperatureCorrect;
         double p_OffsetModeId;
-        std::string p_shuttereffectcorrectionflag;
-        std::string p_filterName;
-        std::string p_startTime;
+        QString p_shuttereffectcorrectionflag;
+        QString p_filterName;
+        QString p_startTime;
 
         double p_ReferencePixelModel;
         double p_ZeroExposureValue;
@@ -111,11 +111,11 @@ namespace Isis {
         double p_ACTAREAb;
         double p_temperatureOffset;
         double p_transfertime;
-        std::string p_ReferencePixelImage;
-        std::string p_ZeroExposureImage;
-        std::string p_ActiveAreaImage;
-        std::string p_FlatImageOpen;
-        std::string p_FlatImageClosed;
+        QString p_ReferencePixelImage;
+        QString p_ZeroExposureImage;
+        QString p_ActiveAreaImage;
+        QString p_FlatImageOpen;
+        QString p_FlatImageClosed;
         double p_RPswitch;
         double p_ZEswitch;
         double p_AAswitch;

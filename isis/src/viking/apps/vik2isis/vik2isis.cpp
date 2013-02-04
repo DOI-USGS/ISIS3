@@ -1,7 +1,7 @@
 #include "Isis.h"
 
 #include <cstdio>
-#include <string>
+#include <QString>
 #include "stdlib.h"
 
 #include "ProcessImportPds.h"
@@ -22,7 +22,7 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   FileName in = ui.GetFileName("FROM");
 
-  string tempName = "$TEMPORARY/" + in.baseName() + ".img";
+  QString tempName = "$TEMPORARY/" + in.baseName() + ".img";
   FileName temp(tempName);
   bool tempFile = false;
 
@@ -40,11 +40,11 @@ void IsisMain() {
   }
   catch(IException &e) {
     tempFile = true;
-    string command = "$ISISROOT/bin/vdcomp " + in.expanded() + " " +
+    QString command = "$ISISROOT/bin/vdcomp " + in.expanded() + " " +
                      temp.expanded() + " > /dev/null 2>&1";
-    int returnValue = system(command.c_str()) >> 8;
+    int returnValue = system(command.toAscii().data()) >> 8;
     if(returnValue) {
-      string msg = "Error running vdcomp";
+      QString msg = "Error running vdcomp";
       IException::ErrorType msgTarget = IException::Programmer;
       switch(returnValue) {
         case 1:
@@ -53,7 +53,7 @@ void IsisMain() {
           break;
         case 2:
           msg =  "vdcomp could not write its output file.\n" +
-                 msg += "Check disk space or for duplicate filename.";
+                 msg + "Check disk space or for duplicate filename.";
           break;
         case 3:
           msg = "vdcomp could not open the input file!";
@@ -87,7 +87,7 @@ void IsisMain() {
     p.SetPdsFile(in.expanded(), "", pdsLabel);
   }
   catch(IException &e) {
-    string msg = "Input file [" + in.expanded() +
+    QString msg = "Input file [" + in.expanded() +
                  "] does not appear to be a Viking PDS product";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
@@ -97,42 +97,42 @@ void IsisMain() {
   TranslateVikingLabels(pdsLabel, ocube);
   p.EndProcess();
 
-  if(tempFile) remove(temp.expanded().c_str());
+  if(tempFile) remove(temp.expanded().toAscii().data());
   return;
 }
 
 void TranslateVikingLabels(Pvl &pdsLabel, Cube *ocube) {
   // Setup the archive group
   PvlGroup arch("Archive");
-  arch += PvlKeyword("DataSetId", (string)pdsLabel["DATA_SET_ID"]);
-  arch += PvlKeyword("ProductId", (string)pdsLabel["IMAGE_ID"]);
-  arch += PvlKeyword("MissonPhaseName", (string)pdsLabel["MISSION_PHASE_NAME"]);
-  arch += PvlKeyword("ImageNumber", (string)pdsLabel["IMAGE_NUMBER"]);
-  arch += PvlKeyword("OrbitNumber", (string)pdsLabel["ORBIT_NUMBER"]);
+  arch += PvlKeyword("DataSetId", (QString)pdsLabel["DATA_SET_ID"]);
+  arch += PvlKeyword("ProductId", (QString)pdsLabel["IMAGE_ID"]);
+  arch += PvlKeyword("MissonPhaseName", (QString)pdsLabel["MISSION_PHASE_NAME"]);
+  arch += PvlKeyword("ImageNumber", (QString)pdsLabel["IMAGE_NUMBER"]);
+  arch += PvlKeyword("OrbitNumber", (QString)pdsLabel["ORBIT_NUMBER"]);
   ocube->putGroup(arch);
 
   // Setup the instrument group
   // Note SpacecraftClockCount used to be FDS_COUNT
   PvlGroup inst("Instrument");
-  inst += PvlKeyword("SpacecraftName", (string)pdsLabel["SPACECRAFT_NAME"]);
-  inst += PvlKeyword("InstrumentId", (string)pdsLabel["INSTRUMENT_NAME"]);
-  inst += PvlKeyword("TargetName", (string)pdsLabel["TARGET_NAME"]);
+  inst += PvlKeyword("SpacecraftName", (QString)pdsLabel["SPACECRAFT_NAME"]);
+  inst += PvlKeyword("InstrumentId", (QString)pdsLabel["INSTRUMENT_NAME"]);
+  inst += PvlKeyword("TargetName", (QString)pdsLabel["TARGET_NAME"]);
 
-  IString stime = (string) pdsLabel["IMAGE_TIME"];
-  stime.Trim("Z");
+  QString stime = (QString) pdsLabel["IMAGE_TIME"];
+  stime.remove(QRegExp("Z$"));
   inst += PvlKeyword("StartTime", stime);
 
   inst += PvlKeyword("ExposureDuration",
-                     (string)pdsLabel["EXPOSURE_DURATION"], "seconds");
-  inst += PvlKeyword("SpacecraftClockCount", (string)pdsLabel["IMAGE_NUMBER"]);
-  inst += PvlKeyword("FloodModeId", (string)pdsLabel["FLOOD_MODE_ID"]);
-  inst += PvlKeyword("GainModeId", (string)pdsLabel["GAIN_MODE_ID"]);
-  inst += PvlKeyword("OffsetModeId", (string)pdsLabel["OFFSET_MODE_ID"]);
+                     (QString)pdsLabel["EXPOSURE_DURATION"], "seconds");
+  inst += PvlKeyword("SpacecraftClockCount", (QString)pdsLabel["IMAGE_NUMBER"]);
+  inst += PvlKeyword("FloodModeId", (QString)pdsLabel["FLOOD_MODE_ID"]);
+  inst += PvlKeyword("GainModeId", (QString)pdsLabel["GAIN_MODE_ID"]);
+  inst += PvlKeyword("OffsetModeId", (QString)pdsLabel["OFFSET_MODE_ID"]);
   ocube->putGroup(inst);
 
   // Setup the band bin group
   PvlGroup bandBin("BandBin");
-  string filterName = pdsLabel["FILTER_NAME"];
+  QString filterName = pdsLabel["FILTER_NAME"];
   bandBin += PvlKeyword("FilterName", filterName);
 
   int filterId;
@@ -168,31 +168,31 @@ void TranslateVikingLabels(Pvl &pdsLabel, Cube *ocube) {
     filterCenter = 0.590000;
     filterWidth = 0.150000;
   }
-  bandBin += PvlKeyword("FilterId", filterId);
-  bandBin += PvlKeyword("Center", filterCenter, "micrometers");
-  bandBin += PvlKeyword("Width", filterWidth, "micrometers");
+  bandBin += PvlKeyword("FilterId", toString(filterId));
+  bandBin += PvlKeyword("Center", toString(filterCenter), "micrometers");
+  bandBin += PvlKeyword("Width", toString(filterWidth), "micrometers");
   ocube->putGroup(bandBin);
 
   // Setup the kernel group
   PvlGroup kern("Kernels");
   int spn;
-  if((string) pdsLabel["SPACECRAFT_NAME"] == "VIKING_ORBITER_1") {
-    if((string) pdsLabel["INSTRUMENT_NAME"] ==
+  if((QString) pdsLabel["SPACECRAFT_NAME"] == "VIKING_ORBITER_1") {
+    if((QString) pdsLabel["INSTRUMENT_NAME"] ==
         "VISUAL_IMAGING_SUBSYSTEM_CAMERA_A") {
-      kern += PvlKeyword("NaifFrameCode", -27001);
+      kern += PvlKeyword("NaifFrameCode", "-27001");
     }
     else {
-      kern += PvlKeyword("NaifFrameCode", -27002);
+      kern += PvlKeyword("NaifFrameCode", "-27002");
     }
     spn = 1;
   }
   else {
-    if((string) pdsLabel["INSTRUMENT_NAME"] ==
+    if((QString) pdsLabel["INSTRUMENT_NAME"] ==
         "VISUAL_IMAGING_SUBSYSTEM_CAMERA_A") {
-      kern += PvlKeyword("NaifFrameCode", -30001);
+      kern += PvlKeyword("NaifFrameCode", "-30001");
     }
     else {
-      kern += PvlKeyword("NaifFrameCode", -30002);
+      kern += PvlKeyword("NaifFrameCode", "-30002");
     }
     spn = 2;
   }
@@ -200,15 +200,15 @@ void TranslateVikingLabels(Pvl &pdsLabel, Cube *ocube) {
 
   // Set up the nominal reseaus group
   PvlGroup res("Reseaus");
-  Pvl nomRes("$viking" + IString(spn) + "/reseaus/nominal.pvl");
+  Pvl nomRes("$viking" + toString(spn) + "/reseaus/nominal.pvl");
   PvlKeyword samps, lines, type, valid;
   lines = PvlKeyword("Line");
   samps = PvlKeyword("Sample");
   type = PvlKeyword("Type");
   valid = PvlKeyword("Valid");
-  string prefix;
-  if((string) pdsLabel["SPACECRAFT_NAME"] == "VIKING_ORBITER_1") {
-    if((string) pdsLabel["INSTRUMENT_NAME"] ==
+  QString prefix;
+  if((QString) pdsLabel["SPACECRAFT_NAME"] == "VIKING_ORBITER_1") {
+    if((QString) pdsLabel["INSTRUMENT_NAME"] ==
         "VISUAL_IMAGING_SUBSYSTEM_CAMERA_A") {
       prefix = "VO1_VISA_";
     }
@@ -217,7 +217,7 @@ void TranslateVikingLabels(Pvl &pdsLabel, Cube *ocube) {
     }
   }
   else {
-    if((string) pdsLabel["INSTRUMENT_NAME"] ==
+    if((QString) pdsLabel["INSTRUMENT_NAME"] ==
         "VISUAL_IMAGING_SUBSYSTEM_CAMERA_A") {
       prefix = "VO2_VISA_";
     }

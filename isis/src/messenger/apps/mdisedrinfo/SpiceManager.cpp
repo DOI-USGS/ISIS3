@@ -45,7 +45,7 @@ namespace Isis {
    * @param filename Name of ISIS cube file
    * @param furnish Do we load the kernels we find?
    */
-  SpiceManager::SpiceManager(const std::string &filename, bool furnish) {
+  SpiceManager::SpiceManager(const QString &filename, bool furnish) {
     Pvl pvl(filename);
     Load(pvl, furnish);
   }
@@ -86,7 +86,7 @@ namespace Isis {
     Unload();
     _furnish = furnish;
 
-    std::string kernlist;
+    QString kernlist;
     // Get the kernel group and load main kernels
     PvlGroup kernels = pvl.FindGroup("Kernels", Pvl::Traverse);
     //  Changed 2008-02-27 to load planetary ephemeris before spacecraft
@@ -136,9 +136,9 @@ namespace Isis {
    *
    * @param kernel  Name of kernel file (or pattern) to add
    */
-  void SpiceManager::add(const std::string &kernfile) {
+  void SpiceManager::add(const QString &kernfile) {
 
-    string kfile(kernfile);
+    QString kfile(kernfile);
 
     //  Check for versioned file naming
     FileName efile(kfile);
@@ -164,10 +164,10 @@ namespace Isis {
    * @param removePath Do we remove the file paths and return only the file
    *                   names?
    *
-   * @return std::vector<std::string> A vector of filenames of SPICE kernels
+   * @return std::vector<QString> A vector of filenames of SPICE kernels
    */
-  std::vector<std::string> SpiceManager::getList(bool removePath) const {
-    std::vector<std::string> flist;
+  std::vector<QString> SpiceManager::getList(bool removePath) const {
+    std::vector<QString> flist;
     for(unsigned int i = 0 ; i < _kernlist.size() ; i++) {
       if(removePath) {
         FileName kfile(_kernlist[i]);
@@ -192,8 +192,8 @@ namespace Isis {
         *  unload_c(kernName.c_str());
         */
         FileName f(_kernlist[i]);
-        string kernName(f.expanded());
-        unload_c(kernName.c_str());
+        QString kernName(f.expanded());
+        unload_c(kernName.toAscii().data());
       }
     }
     _kernlist.clear();
@@ -222,12 +222,12 @@ namespace Isis {
       if(IString(key[i]).UpCase() == "TABLE") continue;
       Isis::FileName file(key[i]);
       if(!file.fileExists()) {
-        string msg = "Spice file does not exist [" + file.expanded() + "]";
+        QString msg = "Spice file does not exist [" + file.expanded() + "]";
         throw IException(IException::Io, msg, _FILEINFO_);
       }
-      string fileName(file.expanded());
-      if(_furnish) furnsh_c(fileName.c_str());
-      addKernelName((string)key[i]);
+      QString fileName(file.expanded());
+      if(_furnish) furnsh_c(fileName.toAscii().data());
+      addKernelName((QString)key[i]);
     }
   }
 
@@ -243,16 +243,16 @@ namespace Isis {
    * @param pvl Pvl label to search for the SPICE Table Object Blob
    */
   void SpiceManager::loadKernelFromTable(PvlKeyword &key,
-                                         const std::string &tblname, Pvl &pvl) {
-    if(IString::UpCase(key[0]) != "TABLE") {
+                                         const QString &tblname, Pvl &pvl) {
+    if(key[0].toUpper() != "TABLE") {
       loadKernel(key);
     }
     else {
       PvlObject::PvlObjectIterator objIter;
       for(objIter = pvl.BeginObject() ; objIter != pvl.EndObject() ; ++objIter) {
-        if(IString::UpCase(objIter->Name()) == "TABLE") {
+        if(objIter->Name().toUpper() == "TABLE") {
           if(objIter->HasKeyword("Name")) {
-            if(IString::Equal(objIter->FindKeyword("Name")[0], tblname)) {
+            if(objIter->FindKeyword("Name")[0].toUpper() == tblname.toUpper()) {
               loadKernel(objIter->FindKeyword("Kernels"));
               return;
             }
@@ -271,7 +271,7 @@ namespace Isis {
    *
    * @param kname Name of SPICE kernel file to add
    */
-  void SpiceManager::addKernelName(const std::string &kname) {
+  void SpiceManager::addKernelName(const QString &kname) {
     for(unsigned int i = 0 ; i < _kernlist.size() ; i++) {
       if(_kernlist[i] == kname)  return;
     }

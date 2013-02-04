@@ -30,7 +30,7 @@ int main() {
 
   PvlGroup alga("Algorithm");
   alga += PvlKeyword("Name", "Anisotropic2");
-  alga += PvlKeyword("Tau", 0.28);
+  alga += PvlKeyword("Tau", "0.28");
 
   PvlObject oa("AtmosphericModel");
   oa.AddGroup(alga);

@@ -72,8 +72,8 @@ namespace Isis {
     // Loop in reverse order since removal list of elements affects index number
     for (int i = g_filteredPoints.size() - 1; i >= 0; i--) {
 
-      string cNetId = (*g_controlNetwork)[g_filteredPoints[i]]->GetId();
-      if (rx.indexIn(QString(cNetId.c_str())) != -1) {
+      QString cNetId = (*g_controlNetwork)[g_filteredPoints[i]]->GetId();
+      if (rx.indexIn(QString(cNetId)) != -1) {
         continue;
       }
       else

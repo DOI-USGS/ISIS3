@@ -35,6 +35,7 @@ class QFile;
 class QMutex;
 class QTime;
 template <typename A> class QList;
+template <typename A, typename B> class QMap;
 template <typename A, typename B> class QPair;
 
 namespace Isis {

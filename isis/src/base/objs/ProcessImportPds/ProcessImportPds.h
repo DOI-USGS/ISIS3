@@ -27,7 +27,7 @@
 #include <vector>
 
 #include "Pvl.h"
-#include "IString.h"
+#include <QString>
 
 namespace Isis {
   class PvlTranslationManager;
@@ -189,7 +189,7 @@ namespace Isis {
     public:
       ProcessImportPds();
       ~ProcessImportPds();
-      void SetPdsFile(const std::string &pdsLabelFile, const std::string &pdsDataFile,
+      void SetPdsFile(const QString &pdsLabelFile, const QString &pdsDataFile,
                       Pvl &pdsLabel);
 
       void TranslatePdsProjection(Pvl &lab);
@@ -200,7 +200,7 @@ namespace Isis {
 
       void OmitOriginalLabel();
 
-      void ImportTable(IString pdsTableName);
+      void ImportTable(QString pdsTableName);
       // since we are overriding StartProcess(), we must specify for other 
       // overloaded calls to StartProcess(), the ProcessImport class method
       // definitions should be used.
@@ -227,8 +227,8 @@ namespace Isis {
       void ProcessPixelBitandType(PvlTranslationManager & pdsXlater);
       void ProcessSpecialPixels(PvlTranslationManager & pdsXlater, const bool & isQube);
 
-      void ProcessPdsImageLabel(const std::string &pdsDataFile);
-      void ProcessPdsQubeLabel(const std::string &pdsDataFile, const std::string &transFile);
+      void ProcessPdsImageLabel(const QString &pdsDataFile);
+      void ProcessPdsQubeLabel(const QString &pdsDataFile, const QString &transFile);
 
       void ExtractPdsProjection(PvlTranslationManager &pdsXlater);
       void GetProjectionOffsetMults(double &xoff, double &yoff,
@@ -242,30 +242,30 @@ namespace Isis {
       void TranslatePdsArchive(Pvl &lab);
 
       Pvl p_pdsLabel;            //!< Internalized PDS label
-      std::string p_labelFile;   //!< The filename where the PDS label came from
+      QString p_labelFile;   //!< The filename where the PDS label came from
 
-      IString p_transDir;        //!< Base data directory
+      QString p_transDir;        //!< Base data directory
 
       // Encoding info
       EncodingType p_encodingType;    /**< The encoding type of the image data.
                                            The only encoding type currently
                                             supported is JP2 (JPEG2000).*/
-      std::string p_jp2File;          /**< The name of the file containing the
+      QString p_jp2File;          /**< The name of the file containing the
                                            encoded JP2 data.*/
 
       // Projection info
-      std::string p_projection;       /**< The name of the projection found in
+      QString p_projection;       /**< The name of the projection found in
                                              the PDS projection labels*/
-      std::string p_targetName;       //!<
+      QString p_targetName;       //!<
       double p_equatorialRadius;      /**< Equatorial radius found in the PDS
                                            projection labels*/
       double p_polarRadius;           /**< The polar radius found in the PDS
                                            projection labels*/
-      std::string p_longitudeDirection; /**< Longitude direction found in the
+      QString p_longitudeDirection; /**< Longitude direction found in the
                                              PDS projection labels*/
       int p_longitudeDomain;            /**< Longitude domain found in the PDS
                                              projection labels*/
-      std::string p_latitudeType;       /**< The latitude type found in the PDS
+      QString p_latitudeType;       /**< The latitude type found in the PDS
                                              projection labels*/
       double p_minimumLatitude;         /**< Minimum latitude found in the PDS
                                              projection labels*/

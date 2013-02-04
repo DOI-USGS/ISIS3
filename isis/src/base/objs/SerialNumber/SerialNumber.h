@@ -88,17 +88,17 @@ namespace Isis {
 
       virtual ~SerialNumber();
 
-      static std::string Compose(Pvl &label, bool def2filename = false);
+      static QString Compose(Pvl &label, bool def2filename = false);
 
-      static std::string Compose(Cube &cube, bool def2filename = false);
+      static QString Compose(Cube &cube, bool def2filename = false);
 
-      static std::string Compose(const std::string &filename, bool def2filename = false);
+      static QString Compose(const QString &filename, bool def2filename = false);
 
-      static std::string ComposeObservation(const std::string &sn, SerialNumberList &list, bool def2filename = false);
+      static QString ComposeObservation(const QString &sn, SerialNumberList &list, bool def2filename = false);
 
     protected:
 
-      static std::string CreateSerialNumber(PvlGroup &snGroup, int key);
+      static QString CreateSerialNumber(PvlGroup &snGroup, int key);
 
     private:
 

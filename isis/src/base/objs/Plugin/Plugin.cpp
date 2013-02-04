@@ -52,32 +52,32 @@ namespace Isis {
    *                            try to load from current working directory,
    *                            then from $ISISROOT/lib.
    */
-  void *Plugin::GetPlugin(const std::string &group) {
+  void *Plugin::GetPlugin(const QString &group) {
     // Get the library and plugin to load
     PvlGroup &g = FindGroup(group);
-    string library = g["Library"];
+    QString library = g["Library"];
 
-    string path = "./";
+    QString path = "./";
     Isis::FileName libraryFile(path + library);
 
-    string pluginName = g["Routine"];
+    QString pluginName = g["Routine"];
 
     // Open the library, resolve the routine name, and return the function
     // address. The function will stay in memory until the application exists
     // so the scope of lib does not matter.
-    QLibrary lib(libraryFile.expanded().c_str());
+    QLibrary lib(libraryFile.expanded());
     bool loadedOk = lib.load();
 
     if(!loadedOk) {
       path = "$ISISROOT/lib/";
       libraryFile = path + library;
     }
-    lib.setFileName(libraryFile.expanded().c_str());
+    lib.setFileName(libraryFile.expanded());
 
-    void *plugin = lib.resolve(pluginName.c_str());
+    void *plugin = lib.resolve(pluginName.toAscii().data());
     if(plugin == 0) {
-      string msg = "Unable to find plugin [" + pluginName +
-                   "] in shared library [" + lib.fileName().toStdString() + "]";
+      QString msg = "Unable to find plugin [" + pluginName +
+                    "] in shared library [" + lib.fileName() + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 

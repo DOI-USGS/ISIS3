@@ -42,13 +42,13 @@ namespace Isis {
 
       ~GuiInputAttribute();
 
-      std::string GetAttributes();
+      QString GetAttributes();
 
-      void SetAttributes(const std::string &value);
+      void SetAttributes(const QString &value);
 
-      static int GetAttributes(const std::string &defaultAttribute,
-                               std::string &newAttribute,
-                               const std::string &title,
+      static int GetAttributes(const QString &defaultAttribute,
+                               QString &newAttribute,
+                               const QString &title,
                                QWidget *parent);
     private:
       QLineEdit *p_lineEdit;

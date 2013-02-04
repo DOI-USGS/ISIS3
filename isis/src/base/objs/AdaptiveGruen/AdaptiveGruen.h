@@ -1,4 +1,4 @@
-#if !defined(AdaptiveGruen_h)
+#ifndef AdaptiveGruen_h
 #define AdaptiveGruen_h
 /**
  * @file
@@ -71,7 +71,7 @@ namespace Isis {
 
     protected:
       /** Return name of Algorithm */
-      virtual IString AlgorithmName() const {
+      virtual QString AlgorithmName() const {
         return ("AdaptiveGruen");
       }
 

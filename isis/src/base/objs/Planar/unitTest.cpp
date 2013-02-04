@@ -23,11 +23,11 @@ int main(int argc, char *argv[]) {
   mapGroup += PvlKeyword("ProjectionName", "Planar");
   mapGroup += PvlKeyword("TargetName", "Saturn");
   mapGroup += PvlKeyword("AzimuthDirection", "Clockwise");
-  mapGroup += PvlKeyword("AzimuthDomain", 180);
-  mapGroup += PvlKeyword("MinimumRadius", 0.0);
-  mapGroup += PvlKeyword("MaximumRadius", 2000000.0);
-  mapGroup += PvlKeyword("MinimumAzimuth", -20.0);
-  mapGroup += PvlKeyword("MaximumAzimuth", 130.0);
+  mapGroup += PvlKeyword("AzimuthDomain", "180");
+  mapGroup += PvlKeyword("MinimumRadius", "0.0");
+  mapGroup += PvlKeyword("MaximumRadius", "2000000.0");
+  mapGroup += PvlKeyword("MinimumAzimuth", "-20.0");
+  mapGroup += PvlKeyword("MaximumAzimuth", "130.0");
 
   cout << "Test missing center azimuth keyword ..." << endl;
   try {
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
   }
   cout << endl;
 
-  mapGroup += PvlKeyword("CenterAzimuth", 0.0);
+  mapGroup += PvlKeyword("CenterAzimuth", "0.0");
 
   cout << "Test missing CenterRadius keyword ..." << endl;
   try {
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
   }
   cout << endl;
 
-  mapGroup += PvlKeyword("CenterRadius", 200000.0);
+  mapGroup += PvlKeyword("CenterRadius", "200000.0");
 
   try {
     Isis::Planar *p = (Planar *) ProjectionFactory::Create(lab);

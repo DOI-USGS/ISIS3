@@ -9,13 +9,10 @@ class QString;
 class QColor;
 
 namespace Isis {
-  class Stretch;
-  class Histogram;
-};
-
-namespace Isis {
   class AdvancedStretch;
   class CubeViewport;
+  class Histogram;
+  class Stretch;
 
   /**
    * @brief Advanced Stretch Dialog

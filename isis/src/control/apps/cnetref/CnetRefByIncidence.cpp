@@ -19,7 +19,7 @@ namespace Isis {
    * @param pPvlDef         - Pvl Definition File
    * @param psSerialNumfile - Serial Number file attached to the ControlNet
    */
-  CnetRefByIncidence::CnetRefByIncidence(Pvl *pPvlDef, std::string psSerialNumfile)
+  CnetRefByIncidence::CnetRefByIncidence(Pvl *pPvlDef, QString psSerialNumfile)
     : ControlNetValidMeasure(pPvlDef) {
     ReadSerialNumbers(psSerialNumfile);
     SetCameraRequiredFlag(true);
@@ -74,7 +74,7 @@ namespace Isis {
       int iRefIndex = -1;
       if (newPnt->IsReferenceExplicit())
         iRefIndex = newPnt->IndexOfRefMeasure();
-      IString istrTemp;
+      QString istrTemp;
 
       std::vector <PvlGroup> pvlGrpVector;
       std::vector <double>   bestIncidenceAngle;
@@ -87,7 +87,7 @@ namespace Isis {
       if (!newPnt->IsIgnored() && newPnt->GetType() == ControlPoint::Free && numMeasures > 0 &&
           (iNumMeasuresLocked == 0 || (iNumMeasuresLocked > 0 && bRefLocked))) {
         int iNumIgnore = 0;
-        IString istrTemp;
+        QString istrTemp;
         double dBestIncidenceAngle = 135;
 
         for (int measure = 0; measure < numMeasures; ++measure) {
@@ -100,7 +100,7 @@ namespace Isis {
             newMsr->SetChooserName("Application cnetref(Incidence)");
           }
 
-          std::string sn = newMsr->GetCubeSerialNumber();
+          QString sn = newMsr->GetCubeSerialNumber();
           double dSample = newMsr->GetSample();
           double dLine   = newMsr->GetLine();
 
@@ -185,25 +185,25 @@ namespace Isis {
       else {
         int iComment = 0;
         if (numMeasures == 0) {
-          IString sComment = "Comment";
-          sComment += IString(++iComment);
+          QString sComment = "Comment";
+          sComment += toString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "No Measures in the Point");
         }
 
         if (newPnt->IsIgnored()) {
-          IString sComment = "Comment";
-          sComment += IString(++iComment);
+          QString sComment = "Comment";
+          sComment += toString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Point was originally Ignored");
         }
 
         if (origPnt.GetType() == ControlPoint::Fixed) {
-          IString sComment = "Comment";
-          sComment += IString(++iComment);
+          QString sComment = "Comment";
+          sComment += toString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Fixed Point");
         }
         else if (newPnt->GetType() == ControlPoint::Constrained) {
-          IString sComment = "Comment";
-          sComment += IString(++iComment);
+          QString sComment = "Comment";
+          sComment += toString(++iComment);
           pvlPointObj += Isis::PvlKeyword(sComment, "Constrained Point");
         }
 
@@ -233,11 +233,11 @@ namespace Isis {
         if (iRefIndex >= 0) {
           pvlRefChangeGrp += Isis::PvlKeyword("PrevSerialNumber",
                                               origPnt.GetMeasure(iRefIndex)->GetCubeSerialNumber());
-          pvlRefChangeGrp += Isis::PvlKeyword("PrevIncAngle",     bestIncidenceAngle[iRefIndex]);
+          pvlRefChangeGrp += Isis::PvlKeyword("PrevIncAngle",     toString(bestIncidenceAngle[iRefIndex]));
 
-          istrTemp = IString((int)origPnt.GetMeasure(iRefIndex)->GetSample());
+          istrTemp = toString((int)origPnt.GetMeasure(iRefIndex)->GetSample());
           istrTemp += ",";
-          istrTemp += IString((int)origPnt.GetMeasure(iRefIndex)->GetLine());
+          istrTemp += toString((int)origPnt.GetMeasure(iRefIndex)->GetLine());
           pvlRefChangeGrp += Isis::PvlKeyword("PrevLocation",     istrTemp);
         }
         else {
@@ -246,11 +246,11 @@ namespace Isis {
 
         pvlRefChangeGrp += Isis::PvlKeyword("NewSerialNumber",
             newPnt->GetMeasure(iBestIndex)->GetCubeSerialNumber());
-        pvlRefChangeGrp += Isis::PvlKeyword("NewLeastIncAngle", bestIncidenceAngle[iBestIndex]);
+        pvlRefChangeGrp += Isis::PvlKeyword("NewLeastIncAngle", toString(bestIncidenceAngle[iBestIndex]));
 
-        istrTemp = IString((int)newPnt->GetMeasure(iBestIndex)->GetSample());
+        istrTemp = toString((int)newPnt->GetMeasure(iBestIndex)->GetSample());
         istrTemp += ",";
-        istrTemp += IString((int)newPnt->GetMeasure(iBestIndex)->GetLine());
+        istrTemp += toString((int)newPnt->GetMeasure(iBestIndex)->GetLine());
         pvlRefChangeGrp += Isis::PvlKeyword("NewLocation",      istrTemp);
 
         pvlPointObj += pvlRefChangeGrp;
@@ -264,9 +264,9 @@ namespace Isis {
     }// end Point
 
     // CnetRef Change Statistics
-    mStatisticsGrp += Isis::PvlKeyword("PointsModified",   iPointsModified);
-    mStatisticsGrp += Isis::PvlKeyword("ReferenceChanged", iRefChanged);
-    mStatisticsGrp += Isis::PvlKeyword("MeasuresModified", iMeasuresModified);
+    mStatisticsGrp += Isis::PvlKeyword("PointsModified",   toString(iPointsModified));
+    mStatisticsGrp += Isis::PvlKeyword("ReferenceChanged", toString(iRefChanged));
+    mStatisticsGrp += Isis::PvlKeyword("MeasuresModified", toString(iMeasuresModified));
 
     mPvlLog += mStatisticsGrp;
   }

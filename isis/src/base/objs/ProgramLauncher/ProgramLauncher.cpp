@@ -50,8 +50,8 @@ namespace Isis {
    * @param programName The Isis program name to be run (i.e. catlab, cubeatt)
    * @param parameters The arguments to give to the program that is being run
    */
-  void ProgramLauncher::RunIsisProgram(IString programName,
-                                       IString parameters) {
+  void ProgramLauncher::RunIsisProgram(QString programName,
+                                       QString parameters) {
     FileName program(programName);
     FileName isisExecutableFileName("$ISISROOT/bin/" + program.name());
     bool isIsisProgram = false;
@@ -61,17 +61,17 @@ namespace Isis {
       program = isisExecutableFileName;
     }
 
-    IString command = program.expanded() + " " + parameters +
-        " -pid=" + IString(getpid());
+    QString command = program.expanded() + " " + parameters +
+        " -pid=" + toString(getpid());
 
     if(!isIsisProgram) {
-      IString msg = "Program [" + programName + "] does not appear to be a "
+      QString msg = "Program [" + programName + "] does not appear to be a "
           "valid Isis 3 program";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
-    IString serverName = "isis_" + Application::UserName() +
-        "_" + IString(getpid());
+    QString serverName = "isis_" + Application::UserName() +
+        "_" + toString(getpid());
 
     QLocalServer server;
     server.listen(serverName);
@@ -91,7 +91,7 @@ namespace Isis {
     }
 
     if(!connected) {
-      IString msg = "Isis child process failed to communicate with parent";
+      QString msg = "Isis child process failed to communicate with parent";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -103,8 +103,8 @@ namespace Isis {
       bool insideCode = true;
       bool messageDone = false;
 
-      IString code;
-      IString message;
+      QString code;
+      QString message;
       QByteArray lineData;
 
       if(childSocket->waitForReadyRead(1000)) {
@@ -144,8 +144,8 @@ namespace Isis {
     childProcess.waitForFinished();
 
     if(childProcess.exitCode() != 0) {
-      IString msg = "Running Isis program [" + programName + "] failed with "
-                    "return status [" + IString(childProcess.exitCode()) + "]";
+      QString msg = "Running Isis program [" + programName + "] failed with "
+                    "return status [" + toString(childProcess.exitCode()) + "]";
       throw IException(errors, IException::Unknown, msg, _FILEINFO_);
     }
   }
@@ -162,14 +162,14 @@ namespace Isis {
    *            parameter.
    */
   IException
-      ProgramLauncher::ProcessIsisMessageFromChild(IString code, IString msg) {
+      ProgramLauncher::ProcessIsisMessageFromChild(QString code, QString msg) {
     IException errors;
 
     if(code == "PROGRESSTEXT" && iApp) {
       iApp->UpdateProgress(msg, true);
     }
     else if(code == "PROGRESS" && iApp) {
-      iApp->UpdateProgress((int)msg, true);
+      iApp->UpdateProgress(toInt(msg), true);
     }
     else if(code == "LOG" && iApp) {
       stringstream msgStream;
@@ -194,14 +194,14 @@ namespace Isis {
 
       for(int i = 0; i < errorPvl.Groups(); i++) {
         PvlGroup &g = errorPvl.Group(i);
-        std::string eclass = g["Class"];
-        std::string emsg = g["Message"];
+        QString eclass = g["Class"];
+        QString emsg = g["Message"];
         int ecode = g["Code"];
-        std::string efile = g["File"];
+        QString efile = g["File"];
         int eline = g["Line"];
 
         errors.append(
-          IException((IException::ErrorType)ecode, emsg, efile.c_str(), eline));
+          IException((IException::ErrorType)ecode, emsg, efile.toAscii().data(), eline));
       }
     }
 
@@ -220,12 +220,12 @@ namespace Isis {
    * @param fullCommand A string containing the command formatted like what
    *                    you would type in a terminal
    */
-  void ProgramLauncher::RunSystemCommand(IString fullCommand) {
-    int status = system(fullCommand.c_str());
+  void ProgramLauncher::RunSystemCommand(QString fullCommand) {
+    int status = system(fullCommand.toAscii().data());
 
     if(status != 0) {
-      IString msg = "Executing command [" + fullCommand +
-                    "] failed with return status [" + IString(status) + "]";
+      QString msg = "Executing command [" + fullCommand +
+                    "] failed with return status [" + toString(status) + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
   }

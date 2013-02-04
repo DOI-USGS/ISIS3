@@ -53,7 +53,7 @@ namespace Isis {
     setWindowFlags(Qt::Tool);
 #endif
 
-#if !defined(__APPLE__)
+#ifndef __APPLE__
     setWindowFlags(Qt::Dialog);
 #endif
 

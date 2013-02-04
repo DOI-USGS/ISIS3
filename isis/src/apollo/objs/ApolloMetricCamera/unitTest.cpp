@@ -62,9 +62,9 @@ int main(void) {
     
     // Test Shutter Open/Close 
     const PvlGroup &inst = p.FindGroup("Instrument", Pvl::Traverse);
-    string stime = inst["StartTime"];
+    QString stime = inst["StartTime"];
     double et; // StartTime keyword is the center exposure time
-    str2et_c(stime.c_str(), &et);
+    str2et_c(stime.toAscii().data(), &et);
     // approximate 1 tenth of a second since Apollo did not provide
     double exposureDuration = .1; 
     pair <iTime, iTime> shuttertimes = cam->ShutterOpenCloseTimes(et, exposureDuration);

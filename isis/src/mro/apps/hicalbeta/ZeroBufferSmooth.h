@@ -1,4 +1,4 @@
-#if !defined(ZeroBufferSmooth_h)
+#ifndef ZeroBufferSmooth_h
 #define ZeroBufferSmooth_h
 /**                                                                       
  * @file                                                                  
@@ -113,15 +113,15 @@ namespace Isis {
         _history.clear();
         _history.add("Profile["+ prof.Name()+"]");
 
-        int samp0 = ConfKey(prof,"ZeroBufferSmoothFirstSample",0);
-        int sampN = ConfKey(prof,"ZeroBufferSmoothLastSample",11);
+        int samp0 = toInt(ConfKey(prof,"ZeroBufferSmoothFirstSample",QString("0")));
+        int sampN = toInt(ConfKey(prof,"ZeroBufferSmoothLastSample",QString("11")));
         _buffer = averageSamples(cal.getBuffer(), samp0, sampN);
         _history.add("AveCols(Buffer["+ToString(samp0)+","+ToString(sampN)+"])");
 
         //  Smooth/filter the averages
         LowPassFilter bufter(_buffer, _history,
-                          ConfKey(prof,"ZeroBufferSmoothFilterWidth",201),
-                          ConfKey(prof,"ZeroBufferSmoothFilterIterations",2));
+                          toInt(ConfKey(prof,"ZeroBufferSmoothFilterWidth",QString("201"))),
+                          toInt(ConfKey(prof,"ZeroBufferSmoothFilterIterations",QString("2"))));
         //  If need be, fill the data with a cubic spline
         SplineFill spline(bufter);
         _data = spline.ref();

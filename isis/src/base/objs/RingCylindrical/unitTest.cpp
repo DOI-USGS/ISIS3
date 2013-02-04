@@ -6,38 +6,40 @@
 #include "Preference.h"
 #include "Projection.h"
 
+using namespace Isis;
 using namespace std;
+
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   cout << "UNIT TEST FOR RingCylindrical" << endl << endl;
 
-  Isis::Pvl lab;
-  lab.AddGroup(Isis::PvlGroup("Mapping"));
-  Isis::PvlGroup &mapGrp = lab.FindGroup("Mapping");
-  // mapGrp += Isis::PvlKeyword("EquatorialRadius", 1.0);
-  // mapGrp += Isis::PvlKeyword("PolarRadius", 1.0);
+  Pvl lab;
+  lab.AddGroup(PvlGroup("Mapping"));
+  PvlGroup &mapGrp = lab.FindGroup("Mapping");
+  // mapGrp += PvlKeyword("EquatorialRadius", 1.0);
+  // mapGrp += PvlKeyword("PolarRadius", 1.0);
   // mapGroup += PvlKeyword("TargetName", "Saturn");
-  mapGrp += Isis::PvlKeyword("LongitudeDirection", "PositiveEast");
-  mapGrp += Isis::PvlKeyword("LongitudeDomain", 180);
-  mapGrp += Isis::PvlKeyword("MinimumRadius", 0.0);
-  mapGrp += Isis::PvlKeyword("MaximumRadius", 20000000.0);
-  mapGrp += Isis::PvlKeyword("MinimumAzimuth", -20.0);
-  mapGrp += Isis::PvlKeyword("MaximumAzimuth", 130.0);
-  mapGrp += Isis::PvlKeyword("ProjectionName", "RingCylindrical");
+  mapGrp += PvlKeyword("LongitudeDirection", "PositiveEast");
+  mapGrp += PvlKeyword("LongitudeDomain", "180");
+  mapGrp += PvlKeyword("MinimumRadius", "0.0");
+  mapGrp += PvlKeyword("MaximumRadius", "20000000.0");
+  mapGrp += PvlKeyword("MinimumAzimuth", "-20.0");
+  mapGrp += PvlKeyword("MaximumAzimuth", "130.0");
+  mapGrp += PvlKeyword("ProjectionName", "RingCylindrical");
 
   cout << "Test missing center azimuth keyword ..." << endl;
   try {
-    Isis::RingCylindrical p(lab);
+    RingCylindrical p(lab);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
   cout << endl;
 
   try {
-    mapGrp += Isis::PvlKeyword("CenterAzimuth", 0.0);
-    Isis::RingCylindrical *p = (Isis::RingCylindrical *) Isis::ProjectionFactory::Create(lab);
+    mapGrp += PvlKeyword("CenterAzimuth", "0.0");
+    RingCylindrical *p = (RingCylindrical *) ProjectionFactory::Create(lab);
 
     cout << "Test SetGround method ... " << endl;
     cout << std::setprecision(16);
@@ -68,7 +70,7 @@ int main(int argc, char *argv[]) {
     cout << "Maximum Y:  " << maxY << endl;
     cout << endl;
 
-    Isis::RingCylindrical *s = p;
+    RingCylindrical *s = p;
     cout << "Test Name and comparision method ... " << endl;
     cout << "Name:       " << s->Name() << endl;
     cout << "operator==  " << (*s == *s) << endl;
@@ -76,15 +78,15 @@ int main(int argc, char *argv[]) {
 
     cout << "Testing default option ... " << endl;
     mapGrp.DeleteKeyword("CenterAzimuth");
-    Isis::RingCylindrical p2(lab, true);
+    RingCylindrical p2(lab, true);
     cout << lab << endl;
     cout << endl;
 
     cout << "Testing Mapping() methods ... " << endl;
 
-    Isis::Pvl tmp1;
-    Isis::Pvl tmp2;
-    Isis::Pvl tmp3;
+    Pvl tmp1;
+    Pvl tmp2;
+    Pvl tmp3;
     tmp1.AddGroup(p->Mapping());
     // tmp2.AddGroup(p->MappingRadii());
     tmp3.AddGroup(p->MappingAzimuths());
@@ -97,7 +99,7 @@ int main(int argc, char *argv[]) {
     cout << tmp3 << endl;
     cout << endl;
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 }

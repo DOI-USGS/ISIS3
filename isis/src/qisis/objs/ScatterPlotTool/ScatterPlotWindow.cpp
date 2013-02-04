@@ -153,9 +153,9 @@ namespace Isis {
 
     replot();
 
-    std::string instanceName = windowTitle().toStdString();
+    QString instanceName = windowTitle();
     FileName config("$HOME/.Isis/qview/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.expanded()),
+    QSettings settings(config.expanded(),
                        QSettings::NativeFormat);
     m_alarmPlot = settings.value("alarmOntoPlot", true).toBool();
     m_alarmViewport = settings.value("alarmOntoViewport", true).toBool();
@@ -179,9 +179,9 @@ namespace Isis {
 
 
   ScatterPlotWindow::~ScatterPlotWindow() {
-    std::string instanceName = windowTitle().toStdString();
+    QString instanceName = windowTitle();
     FileName config("$HOME/.Isis/qview/" + instanceName + ".config");
-    QSettings settings(QString::fromStdString(config.expanded()),
+    QSettings settings(config.expanded(),
                        QSettings::NativeFormat);
     settings.setValue("alarmOntoPlot", m_alarmPlot);
     settings.setValue("alarmOntoViewport", m_alarmViewport);

@@ -42,6 +42,6 @@ commands:
 	source=jitterfile \
         jitter=$(INPUT)/PSP_008469_2040_zeroLineOffset.txt >& $(OUTPUT)/resultsLog4.txt;
 	catlab from=$(OUTPUT)/cropped4.cub to=$(OUTPUT)/croppedLabel4.pvl;
-	cubediff from=$(OUTPUT)/cropped1.cub from2=$(OUTPUT)/cropped2.cub >& $(OUTPUT)/cubediff12.txt;
-	cubediff from=$(OUTPUT)/cropped2.cub from2=$(OUTPUT)/cropped3.cub >& $(OUTPUT)/cubediff23.txt;
-	cubediff from=$(OUTPUT)/cropped3.cub from2=$(OUTPUT)/cropped4.cub >& $(OUTPUT)/cubediff34.txt;
+	cubediff from=$(OUTPUT)/cropped1.cub from2=$(OUTPUT)/cropped2.cub | grep -v "Processed" >& $(OUTPUT)/cubediff12.txt;
+	cubediff from=$(OUTPUT)/cropped2.cub from2=$(OUTPUT)/cropped3.cub | grep -v "Processed" >& $(OUTPUT)/cubediff23.txt;
+	cubediff from=$(OUTPUT)/cropped3.cub from2=$(OUTPUT)/cropped4.cub | grep -v "Processed" >& $(OUTPUT)/cubediff34.txt;

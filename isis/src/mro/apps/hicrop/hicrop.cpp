@@ -44,8 +44,8 @@ pair<double, double> ckBeginEndTimes(IString ckFileName);
 // methods for converting between lines/times/clock counts
 iTime line2time(double lineNumber, double lineRate, double originalStartEt);
 double et2line(double et, double lineRate, double originalStartEt);
-IString time2clock(iTime time);
-iTime clock2time(IString spacecraftClockCount);
+QString time2clock(iTime time);
+iTime clock2time(QString spacecraftClockCount);
 // method to validate calculated or user-entered cropped line and time values
 void validateCropLines();
 void validateCropTimes(double cropStart, double  cropStop, 
@@ -64,7 +64,7 @@ void IsisMain() {
 
   // get user inputs for input cube and open
   UserInterface &ui = Application::GetUserInterface();
-  IString inputFileName = ui.GetFileName("FROM");
+  QString inputFileName = ui.GetFileName("FROM");
   try {
     CubeAttributeInput inAtt(inputFileName);
     g_cube.setVirtualBands(inAtt.bands());
@@ -106,14 +106,14 @@ void IsisMain() {
     // actual start time of the input cube
     Pvl &inLabels = *g_cube.getLabel();
     PvlGroup &inputInst = inLabels.FindObject("IsisCube").FindGroup("Instrument");
-    IString instId = string(inputInst["InstrumentId"]);
-    if (instId.UpCase() != "HIRISE") {
+    QString instId = (inputInst["InstrumentId"]);
+    if (instId.toUpper() != "HIRISE") {
       IString msg = "Input cube has invalid InstrumentId = [" + instId + "]. "
                     "A HiRise image is required.";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
     double tdiMode = inputInst["Tdi"]; //Original Instrument
-    string labelStartClockCount = inputInst["SpacecraftClockStartCount"];
+    QString labelStartClockCount = inputInst["SpacecraftClockStartCount"];
     double binMode = inputInst["Summing"];
     double deltaLineTimerCount = inputInst["DeltaLineTimerCount"];
 
@@ -147,24 +147,24 @@ void IsisMain() {
       }
       else if (ui.GetString("SOURCE") == "JITTERFILE") {
         // Read the start and end times from the jitter file
-        IString jitterFileName = ui.GetFileName("JITTER");
+        QString jitterFileName = ui.GetFileName("JITTER");
         TextFile jitterFile(jitterFileName);
         jitterFile.SetComment("#");
-        IString currLine;
+        QString currLine;
         jitterFile.GetLine(currLine, true);
-        QString firstFileLine = currLine.ToQt().simplified();
-        double firstSampleOffset = (double) IString(firstFileLine.split(" ")[0]);
-        double firstLineOffset = (double) IString(firstFileLine.split(" ")[1]);
+        QString firstFileLine = currLine.simplified();
+        double firstSampleOffset = (double) toDouble(firstFileLine.split(" ")[0]);
+        double firstLineOffset = (double) toDouble(firstFileLine.split(" ")[1]);
         if (firstSampleOffset == 0.0 && firstLineOffset == 0.0) {
           jitterFile.GetLine(currLine, true);
         }
-        iTime time = (double) IString(
-                                currLine.ToQt().simplified().split(" ").last());
+        iTime time = (double) toDouble(
+                                currLine.simplified().split(" ").last());
         firstValidTime = time.Et();
         lastValidTime = time.Et();
         while (jitterFile.GetLine(currLine)) {
-          time = (double) IString(
-                            currLine.ToQt().simplified().split(" ").last());
+          time = (double) toDouble(
+                            currLine.simplified().split(" ").last());
           if (time.Et() < firstValidTime) {
             firstValidTime = time.Et();
           }
@@ -276,10 +276,10 @@ void IsisMain() {
     // spacecraft clock start count for the labels of the cropped cube
     iTime adjustedCropStartTime = labelClockCountTime(cropStartTime, tdiMode, 
                                                       unbinnedRate, binMode);
-    IString adjustedCropStartClockCount = time2clock(adjustedCropStartTime);
+    QString adjustedCropStartClockCount = time2clock(adjustedCropStartTime);
     iTime adjustedCropStopTime = labelClockCountTime(cropStopTime, tdiMode, 
                                                      unbinnedRate, binMode);
-    IString adjustedCropStopClockCount = time2clock(adjustedCropStopTime);
+    QString adjustedCropStopClockCount = time2clock(adjustedCropStopTime);
 
 
 
@@ -342,11 +342,11 @@ void IsisMain() {
 
     // Construct a label with the results
     PvlGroup results("Results");
-    results += PvlKeyword("InputLines", inputLineCount);
-    results += PvlKeyword("NumberOfLinesCropped", inputLineCount-g_cropLineCount);
-    results += PvlKeyword("OututStartingLine", g_cropStartLine);
-    results += PvlKeyword("OututEndingLine", g_cropEndLine);
-    results += PvlKeyword("OututLineCount", g_cropLineCount);
+    results += PvlKeyword("InputLines", toString(inputLineCount));
+    results += PvlKeyword("NumberOfLinesCropped", toString(inputLineCount-g_cropLineCount));
+    results += PvlKeyword("OututStartingLine", toString(g_cropStartLine));
+    results += PvlKeyword("OututEndingLine", toString(g_cropEndLine));
+    results += PvlKeyword("OututLineCount", toString(g_cropLineCount));
     results += PvlKeyword("OututStartTime", cropStartTime.UTC());
     results += PvlKeyword("OututStopTime", cropStopTime.UTC()); //??? adjustedCropStopTime
     results += PvlKeyword("OututStartClock", adjustedCropStartClockCount);
@@ -577,7 +577,7 @@ double et2line(double et, double lineRate, double originalStartEt) {
  * @return A string containing the spacecraft clock count corresponding 
  *         to the given time.
  */
-IString time2clock(iTime time) {
+QString time2clock(iTime time) {
   // char
   char stringOutput[19];
   double et = time.Et();
@@ -596,13 +596,13 @@ IString time2clock(iTime time) {
  *  
  * @see Spice::getClockTime(clockCountString, sclkCode)
  */
-iTime clock2time(IString spacecraftClockCount) {
+iTime clock2time(QString spacecraftClockCount) {
   // Convert the spacecraft clock count to ephemeris time
   SpiceDouble timeOutput;
   // The -74999 is the code to select the transformation from
   // high-precision MRO SCLK to ET
   NaifStatus::CheckErrors();
-  scs2e_c(-74999, spacecraftClockCount.c_str(), &timeOutput);
+  scs2e_c(-74999, spacecraftClockCount.toAscii().data(), &timeOutput);
   NaifStatus::CheckErrors();
   QVariant clockTime = timeOutput;
   iTime time = clockTime.toDouble();

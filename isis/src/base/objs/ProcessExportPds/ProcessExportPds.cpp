@@ -117,7 +117,7 @@ namespace Isis {
       CreateImageLabel();
     }
     else {
-      IString msg = "Unsupported PDS output type";
+      QString msg = "Unsupported PDS output type";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -149,7 +149,7 @@ namespace Isis {
       }
     }
     else {
-      IString msg = "Invalid PDS export type";
+      QString msg = "Invalid PDS export type";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -222,9 +222,9 @@ namespace Isis {
     // must also changes the corresponding lines in the OutputLabel member
     mainPvl += PvlKeyword("LABEL_RECORDS", "???????", "BYTES");
     if(m_detachedLabel) {
-      IString sImageFile = m_detachedPdsLabelFile;
-      size_t iFound = sImageFile.find(".lbl");
-      if(iFound != std::string::npos) {
+      QString sImageFile = m_detachedPdsLabelFile;
+      int iFound = sImageFile.indexOf(".lbl");
+      if(iFound != -1) {
         sImageFile.replace(iFound, 4, ".img");
       }
       else {
@@ -248,10 +248,10 @@ namespace Isis {
     mainPvl.GetFormat()->Add("$base/translations/pdsExportImageJP2.typ");
     // Create standard ROOT object keywords
     mainPvl += PvlKeyword("PDS_VERSION_ID", "PDS3");
-    IString sImageFile = m_detachedPdsLabelFile;
+    QString sImageFile = m_detachedPdsLabelFile;
     if(m_detachedLabel) {
-      size_t iFound = sImageFile.find(".lbl");
-      if(iFound != std::string::npos) {
+      int iFound = sImageFile.indexOf(".lbl");
+      if(iFound != -1) {
         sImageFile.replace(iFound, 4, ".jp2");
       }
       else {
@@ -259,7 +259,7 @@ namespace Isis {
       }
     }
     else {
-      IString msg = "Labels must be detached for JP2 files";
+      QString msg = "Labels must be detached for JP2 files";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     FileName outFile(sImageFile);
@@ -273,13 +273,13 @@ namespace Isis {
     cmpObj += PvlKeyword("UNCOMPRESSED_FILE_NAME", infilename.name());
     int storagebytes = InputCubes[0]->getSampleCount() * InputCubes[0]->getLineCount();
     if(p_pixelType == Isis::Real) {
-      IString msg = "JPEG2000 does not support floating point data";
+      QString msg = "JPEG2000 does not support floating point data";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if(p_pixelType == Isis::UnsignedWord || p_pixelType == Isis::SignedWord) {
       storagebytes = storagebytes * 2;
     }
-    cmpObj += PvlKeyword("REQUIRED_STORAGE_BYTES", storagebytes);
+    cmpObj += PvlKeyword("REQUIRED_STORAGE_BYTES", toString(storagebytes));
     mainPvl.AddObject(cmpObj);
     PvlObject ucmpObj("UNCOMPRESSED_FILE");
     ucmpObj += PvlKeyword("FILE_NAME", infilename.name());
@@ -288,8 +288,8 @@ namespace Isis {
     if(p_pixelType == Isis::UnsignedWord || p_pixelType == Isis::SignedWord) {
       recordbytes = recordbytes * 2;
     }
-    ucmpObj += PvlKeyword("RECORD_BYTES", recordbytes);
-    ucmpObj += PvlKeyword("FILE_RECORDS", InputCubes[0]->getLineCount());
+    ucmpObj += PvlKeyword("RECORD_BYTES", toString(recordbytes));
+    ucmpObj += PvlKeyword("FILE_RECORDS", toString(InputCubes[0]->getLineCount()));
     ucmpObj += PvlKeyword("^IMAGE", infilename.name());
     mainPvl.AddObject(ucmpObj);
   }
@@ -310,9 +310,9 @@ namespace Isis {
     mainPvl += PvlKeyword("FILE_RECORDS", "???????");
     mainPvl += PvlKeyword("LABEL_RECORDS", "????");
     if(m_detachedLabel) {
-      IString sImageFile = m_detachedPdsLabelFile;
-      size_t iFound = sImageFile.find(".lbl");
-      if(iFound != std::string::npos) {
+      QString sImageFile = m_detachedPdsLabelFile;
+      int iFound = sImageFile.indexOf(".lbl");
+      if(iFound != -1) {
         sImageFile.replace(iFound, 4, ".img");
       }
       else {
@@ -336,10 +336,10 @@ namespace Isis {
     mainPvl.GetFormat()->Add("$base/translations/pdsExportImageJP2.typ");
     //Create fixed ROOT object keywords
     mainPvl += PvlKeyword("PDS_VERSION_ID", "PDS3");
-    IString sImageFile = m_detachedPdsLabelFile;
+    QString sImageFile = m_detachedPdsLabelFile;
     if(m_detachedLabel) {
-      size_t iFound = sImageFile.find(".lbl");
-      if(iFound != std::string::npos) {
+      int iFound = sImageFile.indexOf(".lbl");
+      if(iFound != -1) {
         sImageFile.replace(iFound, 4, ".jp2");
       }
       else {
@@ -347,7 +347,7 @@ namespace Isis {
       }
     }
     else {
-      IString msg = "Labels must be detached for JP2 files";
+      QString msg = "Labels must be detached for JP2 files";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     FileName outFile(sImageFile);
@@ -361,13 +361,13 @@ namespace Isis {
     cmpObj += PvlKeyword("UNCOMPRESSED_FILE_NAME", infilename.name());
     int storagebytes = InputCubes[0]->getSampleCount() * InputCubes[0]->getLineCount();
     if(p_pixelType == Isis::Real) {
-      IString msg = "JPEG2000 does not support floating point data";
+      QString msg = "JPEG2000 does not support floating point data";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if(p_pixelType == Isis::UnsignedWord || p_pixelType == Isis::SignedWord) {
       storagebytes = storagebytes * 2;
     }
-    cmpObj += PvlKeyword("REQUIRED_STORAGE_BYTES", storagebytes);
+    cmpObj += PvlKeyword("REQUIRED_STORAGE_BYTES", toString(storagebytes));
     mainPvl.AddObject(cmpObj);
     PvlObject ucmpObj("UNCOMPRESSED_FILE");
     ucmpObj += PvlKeyword("FILE_NAME", infilename.name());
@@ -376,8 +376,8 @@ namespace Isis {
     if(p_pixelType == Isis::UnsignedWord || p_pixelType == Isis::SignedWord) {
       recordbytes = recordbytes * 2;
     }
-    ucmpObj += PvlKeyword("RECORD_BYTES", recordbytes);
-    ucmpObj += PvlKeyword("FILE_RECORDS", InputCubes[0]->getLineCount());
+    ucmpObj += PvlKeyword("RECORD_BYTES", toString(recordbytes));
+    ucmpObj += PvlKeyword("FILE_RECORDS", toString(InputCubes[0]->getLineCount()));
     ucmpObj += PvlKeyword("^IMAGE", infilename.name());
     mainPvl.AddObject(ucmpObj);
   }
@@ -441,68 +441,68 @@ namespace Isis {
     if(!m_forceBandwidth && imgObj.HasKeyword("BANDWIDTH")) imgObj.DeleteKeyword("BANDWIDTH");
 
     if(m_forceBandStorageType) imgObj += PvlKeyword("BAND_STORAGE_TYPE", "BAND_SEQUENTIAL");
-    if(m_forceOffset) imgObj += PvlKeyword("OFFSET", base);
-    if(m_forceScalingFactor) imgObj += PvlKeyword("SCALING_FACTOR", multiplier);
+    if(m_forceOffset) imgObj += PvlKeyword("OFFSET", toString(base));
+    if(m_forceScalingFactor) imgObj += PvlKeyword("SCALING_FACTOR", toString(multiplier));
 
     // Manually set the keyword for pixel type and special pixels
     if(p_pixelType == Isis::UnsignedByte) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "8");
-      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", 0xff);
+      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", toString(0xff));
       if(m_forceSampleType) imgObj += PvlKeyword("SAMPLE_TYPE", "MSB_UNSIGNED_INTEGER");
-      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", (int)OutputNull());
-      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", (int)OutputLrs());
-      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", (int)OutputLis());
-      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", (int)OutputHrs());
-      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", (int)OutputHis());
+      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", toString((int)OutputNull()));
+      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", toString((int)OutputLrs()));
+      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
+      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
+      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
       mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel8.typ");
     }
     else if((p_pixelType == Isis::UnsignedWord) && (p_endianType == Isis::Msb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
-      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", 0xffff);
+      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", toString(0xffff));
       if(m_forceSampleType) imgObj += PvlKeyword("SAMPLE_TYPE", "MSB_UNSIGNED_INTEGER");
-      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", (int)OutputNull());
-      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", (int)OutputLrs());
-      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", (int)OutputLis());
-      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", (int)OutputHrs());
-      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", (int)OutputHis());
+      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", toString((int)OutputNull()));
+      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", toString((int)OutputLrs()));
+      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
+      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
+      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
       mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel16.typ");
     }
     else if((p_pixelType == Isis::UnsignedWord) && (p_endianType == Isis::Lsb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
-      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", 0xffff);
+      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", toString(0xffff));
       if(m_forceSampleType) imgObj += PvlKeyword("SAMPLE_TYPE", "LSB_UNSIGNED_INTEGER");
-      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", (int)OutputNull());
-      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", (int)OutputLrs());
-      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", (int)OutputLis());
-      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", (int)OutputHrs());
-      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", (int)OutputHis());
+      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", toString((int)OutputNull()));
+      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", toString((int)OutputLrs()));
+      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
+      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
+      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
       mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel16.typ");
     }
     else if((p_pixelType == Isis::SignedWord) && (p_endianType == Isis::Msb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
-      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", 0xffff);
+      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", toString(0xffff));
       if(m_forceSampleType) imgObj += PvlKeyword("SAMPLE_TYPE", "MSB_INTEGER");
-      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", (int)OutputNull());
-      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", (int)OutputLrs());
-      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", (int)OutputLis());
-      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", (int)OutputHrs());
-      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", (int)OutputHis());
+      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", toString((int)OutputNull()));
+      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", toString((int)OutputLrs()));
+      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
+      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
+      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
       mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel16.typ");
     }
     else if((p_pixelType == Isis::SignedWord) && (p_endianType == Isis::Lsb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
-      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", (BigInt)0xffff);
+      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", toString((BigInt)0xffff));
       if(m_forceSampleType) imgObj += PvlKeyword("SAMPLE_TYPE", "LSB_INTEGER");
-      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", (int)OutputNull());
-      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", (int)OutputLrs());
-      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", (int)OutputLis());
-      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", (int)OutputHrs());
-      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", (int)OutputHis());
+      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", toString((int)OutputNull()));
+      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", toString((int)OutputLrs()));
+      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
+      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
+      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
       mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel16.typ");
     }
     else if(p_pixelType == Isis::Real) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "32");
-      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", (BigInt)0xffffffff);
+      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", toString((BigInt)0xffffffff));
 
       if(p_endianType == Isis::Msb) {
         if(m_forceSampleType) imgObj += PvlKeyword("SAMPLE_TYPE", "IEEE_REAL");
@@ -510,15 +510,15 @@ namespace Isis {
       else {
         if(m_forceSampleType) imgObj += PvlKeyword("SAMPLE_TYPE", "PC_REAL");
       }
-      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", Isis::INULL4);
-      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", Isis::ILOW_REPR_SAT4);
-      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", Isis::ILOW_INSTR_SAT4);
-      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", Isis::IHIGH_REPR_SAT4);
-      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", Isis::IHIGH_INSTR_SAT4);
+      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", toString(Isis::INULL4));
+      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", toString(Isis::ILOW_REPR_SAT4));
+      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString(Isis::ILOW_INSTR_SAT4));
+      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString(Isis::IHIGH_REPR_SAT4));
+      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString(Isis::IHIGH_INSTR_SAT4));
       mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel32.typ");
     }
     else {
-      IString msg = "Unsupported PDS pixel type or sample size";
+      QString msg = "Unsupported PDS pixel type or sample size";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -585,68 +585,68 @@ namespace Isis {
     if(!m_forceBandwidth && imgObj.HasKeyword("BANDWIDTH")) imgObj.DeleteKeyword("BANDWIDTH");
 
     if(m_forceBandStorageType) imgObj += PvlKeyword("BAND_STORAGE_TYPE", "BAND_SEQUENTIAL");
-    if(m_forceOffset) imgObj += PvlKeyword("OFFSET", base);
-    if(m_forceScalingFactor) imgObj += PvlKeyword("SCALING_FACTOR", multiplier);
+    if(m_forceOffset) imgObj += PvlKeyword("OFFSET", toString(base));
+    if(m_forceScalingFactor) imgObj += PvlKeyword("SCALING_FACTOR", toString(multiplier));
 
     // Manually set the keyword for pixel type and special pixels
     if(p_pixelType == Isis::UnsignedByte) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "8");
-      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", 0xff);
+      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", toString(0xff));
       if(m_forceSampleType) imgObj += PvlKeyword("SAMPLE_TYPE", "MSB_UNSIGNED_INTEGER");
-      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", (int)OutputNull());
-      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", (int)OutputLrs());
-      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", (int)OutputLis());
-      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", (int)OutputHrs());
-      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", (int)OutputHis());
+      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", toString((int)OutputNull()));
+      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", toString((int)OutputLrs()));
+      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
+      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
+      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
       mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel8.typ");
     }
     else if((p_pixelType == Isis::UnsignedWord) && (p_endianType == Isis::Msb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
-      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", 0xffff);
+      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", toString(0xffff));
       if(m_forceSampleType) imgObj += PvlKeyword("SAMPLE_TYPE", "MSB_UNSIGNED_INTEGER");
-      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", (int)OutputNull());
-      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", (int)OutputLrs());
-      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", (int)OutputLis());
-      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", (int)OutputHrs());
-      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", (int)OutputHis());
+      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", toString((int)OutputNull()));
+      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", toString((int)OutputLrs()));
+      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
+      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
+      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
       mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel16.typ");
     }
     else if((p_pixelType == Isis::UnsignedWord) && (p_endianType == Isis::Lsb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
-      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", 0xffff);
+      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", toString(0xffff));
       if(m_forceSampleType) imgObj += PvlKeyword("SAMPLE_TYPE", "LSB_UNSIGNED_INTEGER");
-      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", (int)OutputNull());
-      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", (int)OutputLrs());
-      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", (int)OutputLis());
-      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", (int)OutputHrs());
-      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", (int)OutputHis());
+      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", toString((int)OutputNull()));
+      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", toString((int)OutputLrs()));
+      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
+      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
+      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
       mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel16.typ");
     }
     else if((p_pixelType == Isis::SignedWord) && (p_endianType == Isis::Msb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
-      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", 0xffff);
+      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", toString(0xffff));
       if(m_forceSampleType) imgObj += PvlKeyword("SAMPLE_TYPE", "MSB_INTEGER");
-      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", (int)OutputNull());
-      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", (int)OutputLrs());
-      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", (int)OutputLis());
-      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", (int)OutputHrs());
-      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", (int)OutputHis());
+      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", toString((int)OutputNull()));
+      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", toString((int)OutputLrs()));
+      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
+      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
+      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
       mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel16.typ");
     }
     else if((p_pixelType == Isis::SignedWord) && (p_endianType == Isis::Lsb)) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "16");
-      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", (BigInt)0xffff);
+      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", toString((BigInt)0xffff));
       if(m_forceSampleType) imgObj += PvlKeyword("SAMPLE_TYPE", "LSB_INTEGER");
-      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", (int)OutputNull());
-      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", (int)OutputLrs());
-      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", (int)OutputLis());
-      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", (int)OutputHrs());
-      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", (int)OutputHis());
+      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", toString((int)OutputNull()));
+      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", toString((int)OutputLrs()));
+      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString((int)OutputLis()));
+      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString((int)OutputHrs()));
+      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString((int)OutputHis()));
       mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel16.typ");
     }
     else if(p_pixelType == Isis::Real) {
       if(m_forceSampleBits) imgObj += PvlKeyword("SAMPLE_BITS", "32");
-      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", (BigInt)0xffffffff);
+      if(m_forceSampleBitMask) imgObj += PvlKeyword("SAMPLE_BIT_MASK", toString((BigInt)0xffffffff));
 
       if(p_endianType == Isis::Msb) {
         if(m_forceSampleType) imgObj += PvlKeyword("SAMPLE_TYPE", "IEEE_REAL");
@@ -654,15 +654,15 @@ namespace Isis {
       else {
         if(m_forceSampleType) imgObj += PvlKeyword("SAMPLE_TYPE", "PC_REAL");
       }
-      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", Isis::INULL4);
-      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", Isis::ILOW_REPR_SAT4);
-      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", Isis::ILOW_INSTR_SAT4);
-      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", Isis::IHIGH_REPR_SAT4);
-      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", Isis::IHIGH_INSTR_SAT4);
+      if(m_forceCoreNull) imgObj += PvlKeyword("CORE_NULL", toString(Isis::INULL4));
+      if(m_forceCoreLrs) imgObj += PvlKeyword("CORE_LOW_REPR_SATURATION", toString(Isis::ILOW_REPR_SAT4));
+      if(m_forceCoreLis) imgObj += PvlKeyword("CORE_LOW_INSTR_SATURATION", toString(Isis::ILOW_INSTR_SAT4));
+      if(m_forceCoreHrs) imgObj += PvlKeyword("CORE_HIGH_REPR_SATURATION", toString(Isis::IHIGH_REPR_SAT4));
+      if(m_forceCoreHis) imgObj += PvlKeyword("CORE_HIGH_INSTR_SATURATION", toString(Isis::IHIGH_INSTR_SAT4));
       mainPvl.GetFormat()->Add("$base/translations/pdsExportImageImagePixel32.typ");
     }
     else {
-      IString msg = "Unsupported PDS pixel type or sample size";
+      QString msg = "Unsupported PDS pixel type or sample size";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -689,7 +689,7 @@ namespace Isis {
     xlatGenProj.Auto(outputPvl);
 
     // Translate the projection specific keywords for a PDS IMAGE_MAP_PROJECTION
-    IString projName = ProjectionName(*inputLabel);
+    QString projName = ProjectionName(*inputLabel);
     PvlTranslationManager xlatSpecProj(*inputLabel,
                                        "$base/translations/pdsExport" + projName + ".trn");
     xlatSpecProj.Auto(outputPvl);
@@ -703,66 +703,66 @@ namespace Isis {
     PvlObject &pdsMapObj = outputPvl.FindObject("IMAGE_MAP_PROJECTION");
 
     // Add the projection name
-//    pdsMapObj += PvlKeyword ("MAP_PROJECTION_TYPE", projName.UpCase());
+//    pdsMapObj += PvlKeyword ("MAP_PROJECTION_TYPE", projName.toUpper());
 
     // Modify the radii to be km
     PvlKeyword &aRadius = pdsMapObj["A_AXIS_RADIUS"];
-    IString unit = aRadius.Unit();
-    if(unit.UpCase() == "METERS") {
+    QString unit = aRadius.Unit();
+    if(unit.toUpper() == "METERS") {
       double dValue = (double)aRadius;
       dValue /= 1000.0;
-      aRadius.SetValue(dValue, "KM");
+      aRadius.SetValue(toString(dValue), "KM");
     }
     PvlKeyword &bRadius = pdsMapObj["B_AXIS_RADIUS"];
     unit = bRadius.Unit();
-    if(unit.UpCase() == "METERS") {
+    if(unit.toUpper() == "METERS") {
       double dValue = (double)bRadius;
       dValue /= 1000.0;
-      bRadius.SetValue(dValue, "KM");
+      bRadius.SetValue(toString(dValue), "KM");
     }
     PvlKeyword &cRadius = pdsMapObj["C_AXIS_RADIUS"];
     unit = cRadius.Unit();
-    if(unit.UpCase() == "METERS") {
+    if(unit.toUpper() == "METERS") {
       double dValue = (double)cRadius;
       dValue /= 1000.0;
-      cRadius.SetValue(dValue, "KM");
+      cRadius.SetValue(toString(dValue), "KM");
     }
 
     // Modify the units on MAP_SCALE and MAP_RESOLUTION
     PvlKeyword &mapScale = pdsMapObj["MAP_SCALE"];
     unit = mapScale.Unit();
-    if((unit.UpCase() == "METERS/PIX") || (unit.UpCase() == "METERS/PIXEL")) {
+    if((unit.toUpper() == "METERS/PIX") || (unit.toUpper() == "METERS/PIXEL")) {
       if(m_exportResolution == Kilometer) {
         double dValue = (double)mapScale;
         dValue /= 1000.0;
-        mapScale.SetValue(dValue, "KM/PIXEL");
+        mapScale.SetValue(toString(dValue), "KM/PIXEL");
       }
       else {
-        mapScale.SetValue((double)mapScale, "METERS/PIXEL");
+        mapScale.SetValue(toString((double)mapScale), "METERS/PIXEL");
       }
     }
     PvlKeyword &mapRes = pdsMapObj["MAP_RESOLUTION"];
     unit = mapRes.Unit();
-    if(unit.UpCase() == "PIXELS/DEGREE") {
-      mapRes.SetValue((string)mapRes, "PIX/DEG");
+    if(unit.toUpper() == "PIXELS/DEGREE") {
+      mapRes.SetValue((QString)mapRes, "PIX/DEG");
     }
 
 
     // Add the EASTERNMOST AND WESTERNMOST LONGITUDE keywords
     PvlKeyword &isisLonDir = inputMapping.FindKeyword("LongitudeDirection");
-    IString lonDir = isisLonDir[0];
-    lonDir.UpCase();
+    QString lonDir = isisLonDir[0];
+    lonDir = lonDir.toUpper();
     if(lonDir == "POSITIVEEAST") {
       double maxLon = inputMapping.FindKeyword("MaximumLongitude");
-      pdsMapObj += PvlKeyword("EASTERNMOST_LONGITUDE", maxLon);
+      pdsMapObj += PvlKeyword("EASTERNMOST_LONGITUDE", toString(maxLon));
       double minLon = inputMapping.FindKeyword("MinimumLongitude");
-      pdsMapObj += PvlKeyword("WESTERNMOST_LONGITUDE", minLon);
+      pdsMapObj += PvlKeyword("WESTERNMOST_LONGITUDE", toString(minLon));
     }
     else {
       double minLon = inputMapping.FindKeyword("MinimumLongitude");
-      pdsMapObj += PvlKeyword("EASTERNMOST_LONGITUDE", minLon);
+      pdsMapObj += PvlKeyword("EASTERNMOST_LONGITUDE", toString(minLon));
       double maxLon = inputMapping.FindKeyword("MaximumLongitude");
-      pdsMapObj += PvlKeyword("WESTERNMOST_LONGITUDE", maxLon);
+      pdsMapObj += PvlKeyword("WESTERNMOST_LONGITUDE", toString(maxLon));
     }
 
     // Add the LINE_PROJECTION_OFFSET and SAMPLE_PROJECTION_OFFSET keywords
@@ -773,12 +773,12 @@ namespace Isis {
     lineOffset /= (double)inputMapping.FindKeyword("PixelResolution");
     lineOffset *= 1.0;
     lineOffset += 0.5; // Add half a line to get to the center of (1,1)
-    pdsMapObj += PvlKeyword("LINE_PROJECTION_OFFSET", lineOffset, "PIXEL");
+    pdsMapObj += PvlKeyword("LINE_PROJECTION_OFFSET", toString(lineOffset), "PIXEL");
     double sampleOffset = inputMapping.FindKeyword("UpperLeftCornerX");
     sampleOffset /= (double)inputMapping.FindKeyword("PixelResolution");
     sampleOffset *= -1.0;
     sampleOffset += 0.5; // Add half a sample to get to the center of (1,1)
-    pdsMapObj += PvlKeyword("SAMPLE_PROJECTION_OFFSET", sampleOffset, "PIXEL");
+    pdsMapObj += PvlKeyword("SAMPLE_PROJECTION_OFFSET", toString(sampleOffset), "PIXEL");
 
     // Add units to keywords already in the IMAGE_MAP_PROJECTION object as necessary
     if(pdsMapObj.HasKeyword("CENTER_LATITUDE")) {
@@ -828,9 +828,9 @@ namespace Isis {
    *  
    * @return String containing the name of the projection
    */
-  string ProcessExportPds::ProjectionName(Pvl &inputLabel) {
+  QString ProcessExportPds::ProjectionName(Pvl &inputLabel) {
     Projection *proj = ProjectionFactory::Create(inputLabel);
-    IString name = proj->Name();
+    QString name = proj->Name();
     delete proj;
     return name;
   }
@@ -873,12 +873,12 @@ namespace Isis {
    */ 
   void ProcessExportPds::OutputDetachedLabel() {
     if(!m_detachedLabel) {
-      IString msg = "Unable to output detached label. Use "
+      QString msg = "Unable to output detached label. Use "
                     "ProcessExportPds::SetDetached() to set the "
                     "output PDS label file name.";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
-    std::ofstream sOutLabelStream(m_detachedPdsLabelFile.c_str());
+    std::ofstream sOutLabelStream(m_detachedPdsLabelFile.toAscii().data());
     OutputLabel(sOutLabelStream);
     sOutLabelStream.close();
   }
@@ -896,9 +896,9 @@ namespace Isis {
     // corresponding lines in the StandardImageRoot member
     if(m_exportType == Stream) {
       if(m_pdsFileType != ProcessExportPds::JP2Image) {
-        (*m_label)["LABEL_RECORDS"].SetValue(IString(labSize), "BYTES");
+        (*m_label)["LABEL_RECORDS"].SetValue(toString(labSize), "BYTES");
         if(!m_detachedLabel) {
-          (*m_label)["^IMAGE"].SetValue(IString(labSize + 1), "BYTES");
+          (*m_label)["^IMAGE"].SetValue(toString(labSize + 1), "BYTES");
         }
       }
       if(m_label->GetFormat() != NULL) {
@@ -917,13 +917,13 @@ namespace Isis {
       int labelRecords;
       if(m_pdsFileType != ProcessExportPds::JP2Image) {
         lineBytes = LineBytes();
-        (*m_label)["RECORD_BYTES"].SetValue(IString(lineBytes));
+        (*m_label)["RECORD_BYTES"].SetValue(toString(lineBytes));
 
         // The number of label records is dependent on the number of label bytes
         // and the lint bytes
         labelRecords = (int)ceil((double)labSize / (double)lineBytes);
         if(m_label->HasKeyword("LABEL_RECORDS")) { //LRO MRF doesn't have this keyword
-          (*m_label)["LABEL_RECORDS"].SetValue(IString(labelRecords));
+          (*m_label)["LABEL_RECORDS"].SetValue(toString(labelRecords));
         }
         int totalTableRecords = 0;
         for (unsigned int i = 0; i < m_tableRecords.size(); i++) {
@@ -932,10 +932,10 @@ namespace Isis {
         int imageRecords = InputCubes[0]->getLineCount() 
                            * InputCubes[0]->getBandCount();
         int fileRecords = labelRecords + imageRecords + totalTableRecords;
-        (*m_label)["FILE_RECORDS"].SetValue(IString(fileRecords));
+        (*m_label)["FILE_RECORDS"].SetValue(toString(fileRecords));
 
         if(!m_detachedLabel) {
-          (*m_label)["^IMAGE"].SetValue(IString(labelRecords + 1));
+          (*m_label)["^IMAGE"].SetValue(toString(labelRecords + 1));
         }
       }
       if(m_label->GetFormat() != NULL) {
@@ -982,10 +982,10 @@ namespace Isis {
    *                                 include a path.  The path from the label
    *                                 file will be used.
    */ 
-  void ProcessExportPds::ExportTable(Table isisTable, IString detachedPdsTableFileName) {
+  void ProcessExportPds::ExportTable(Table isisTable, QString detachedPdsTableFileName) {
 
     if(Attached() && detachedPdsTableFileName != "") {
-      IString msg = "The output PDS file has been set to attached and a "
+      QString msg = "The output PDS file has been set to attached and a "
                     "detached PDS table file name has been given. If detached "
                     "is preferred, set the process to detached SetDetached() "
                     "and call StandardPdsLabel() before calling ExportTable().";
@@ -993,7 +993,7 @@ namespace Isis {
     }
 
     if(Detached() && detachedPdsTableFileName == "") {
-      IString msg = "The output PDS file has been set to detached. A file name "
+      QString msg = "The output PDS file has been set to detached. A file name "
                     "for the detached ouput PDS table file is required. "
                     "If an attached output file is prefered, use the method "
                     "ProcessExportPds::SetAttached() before calling ExportTable().";
@@ -1009,7 +1009,7 @@ namespace Isis {
     PvlObject metadata = pdsTable.exportTable(tableBuffer, 
                                               fileRecordBytes, 
                                               ByteOrderName(p_endianType));
-    IString pdsTableName = pdsTable.formatPdsTableName();
+    QString pdsTableName = pdsTable.formatPdsTableName();
     Pvl &mainPvl = *m_label;
     if (Attached()) {
       m_tableBuffers.push_back(tableBuffer);
@@ -1023,14 +1023,14 @@ namespace Isis {
       }
       // for start record values, indexing begins with 1
       int tableStartRecord = 1 + labelRecords + imageRecords + totalTableRecords;
-      mainPvl += PvlKeyword("^" + pdsTableName, IString(tableStartRecord));
+      mainPvl += PvlKeyword("^" + pdsTableName, toString(tableStartRecord));
     }
     else {
       mainPvl += PvlKeyword("^" + pdsTableName, detachedPdsTableFileName);
       FileName labelFile(m_detachedPdsLabelFile);
-      IString tableFileWithPath = labelFile.path() + "/" 
+      QString tableFileWithPath = labelFile.path() + "/" 
                                   + detachedPdsTableFileName;
-      ofstream os(tableFileWithPath.c_str());
+      ofstream os(tableFileWithPath.toAscii().data());
       os.write(tableBuffer, isisTable.Records() * fileRecordBytes);
       os.close();
     }
@@ -1047,7 +1047,7 @@ namespace Isis {
    * @param detachedLabelFile A string containing the name of the detached
    *                          PDS label file
    */ 
-  void ProcessExportPds::SetDetached(const std::string detachedLabelFile) {
+  void ProcessExportPds::SetDetached(QString detachedLabelFile) {
     m_detachedLabel = true;
     m_detachedPdsLabelFile = detachedLabelFile;
     return;
@@ -1311,7 +1311,7 @@ namespace Isis {
     if (!m_detachedLabel) {
       for (unsigned int i = 0; i < m_tableBuffers.size(); i++) {
         if (m_tableBuffers[i] == NULL) {
-          IString msg = "Unable to add tables to PDS output file.";
+          QString msg = "Unable to add tables to PDS output file.";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
         // write each table buffer to fout.

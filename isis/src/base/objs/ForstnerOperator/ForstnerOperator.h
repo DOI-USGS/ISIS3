@@ -1,4 +1,4 @@
-#if !defined(ForstnerOperator_h)
+#ifndef ForstnerOperator_h
 #define ForstnerOperator_h
 /**
  * @file

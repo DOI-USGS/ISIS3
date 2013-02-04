@@ -96,10 +96,10 @@ namespace Isis {
       };
 
       using Process::SetInputCube;
-      Cube *SetInputCube(const std::string &parameter,
+      Cube *SetInputCube(const QString &parameter,
                          int requirements = 0);
 
-      Cube *SetInputCube(const std::string &fname,
+      Cube *SetInputCube(const QString &fname,
                          const CubeAttributeInput &att,
                          int requirements = 0);
 

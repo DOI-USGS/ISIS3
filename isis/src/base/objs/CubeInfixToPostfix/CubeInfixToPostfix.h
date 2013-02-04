@@ -23,7 +23,6 @@
 #ifndef CUBEINFIXTOPOSTFIX_H_
 #define CUBEINFIXTOPOSTFIX_H_
 
-#include "IString.h"
 #include "InfixToPostfix.h"
 #include <stack>
 #include <iostream>
@@ -56,8 +55,8 @@ namespace Isis {
       ~CubeInfixToPostfix() {};
 
     protected:
-      bool isKnownSymbol(IString representation);
-      InfixOperator *findOperator(IString representation);
+      bool isKnownSymbol(QString representation);
+      InfixOperator *findOperator(QString representation);
 
     private:
       void initialize();

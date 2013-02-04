@@ -7,6 +7,7 @@
 #include "ExportDescription.h"
 #include "FileName.h"
 #include "IException.h"
+#include "IString.h"
 
 using namespace Isis;
 
@@ -17,7 +18,7 @@ namespace Isis {
    *
    * @param format The format to export to
    */
-  QtExporter::QtExporter(IString format) : ImageExporter() {
+  QtExporter::QtExporter(QString format) : ImageExporter() {
     m_qimage = NULL;
     m_format = format;
 
@@ -113,7 +114,7 @@ namespace Isis {
       //  the following if statement does it informally.
       m_qimage->setPixel(s, l, dn);
       if (!m_qimage->valid(s, l)) {
-        IString msg = "QT has detected your file size as exceeding 2GB.";
+        QString msg = "QT has detected your file size as exceeding 2GB.";
         msg += " While your image might be under 2GB, your image labels are more";
         msg += " than likely pushing the file size over 2GB.";
         throw IException(IException::User, msg, _FILEINFO_);
@@ -178,10 +179,10 @@ namespace Isis {
 
     // The return status is wrong for JPEG images, so the code will always
     // continue
-    if (!m_qimage->save(outputName.expanded().c_str(), m_format.c_str(),
+    if (!m_qimage->save(outputName.expanded(), m_format.toAscii().data(),
           quality)) {
 
-      IString err = "Unable to save [" + outputName.expanded() +
+      QString err = "Unable to save [" + outputName.expanded() +
         "] to the disk";
       throw IException(IException::Programmer, err, _FILEINFO_);
     }
@@ -202,8 +203,8 @@ namespace Isis {
 
     BigInt size = samples * lines * bands;
     if (size >= maxSize) {
-      IString gigaBytes = size / (1024.0 * 1024.0 * 1024.0);
-      IString msg = "Cube exceeds max size of 2GB. Qimage cannot support ";
+      QString gigaBytes = toString(size / (1024.0 * 1024.0 * 1024.0));
+      QString msg = "Cube exceeds max size of 2GB. Qimage cannot support ";
       msg += "that much raw data. Your cube is " + gigaBytes + " GB.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -217,12 +218,12 @@ namespace Isis {
    *
    * @return True if supported in Qt, false otherwise
    */
-  bool QtExporter::canWriteFormat(IString format) {
+  bool QtExporter::canWriteFormat(QString format) {
     bool supported = false;
     QList<QByteArray> list = QImageWriter::supportedImageFormats();
     QList<QByteArray>::Iterator it = list.begin();
     while (it != list.end() && !supported) {
-      if (*it == QString(format.c_str())) supported = true;
+      if (*it == QString(format)) supported = true;
       it++;
     }
     return supported;

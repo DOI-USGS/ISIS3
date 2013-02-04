@@ -20,9 +20,10 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
+class QString;
+
 namespace Isis {
   class Displacement;
-  class IString;
 
   /**
    * @brief Distance measurement, usually in meters
@@ -72,7 +73,7 @@ namespace Isis {
       double pixels(double pixelsPerMeter = 1.0) const;
       void setPixels(double distanceInPixels, double pixelsPerMeter = 1.0);
 
-      IString toString() const;
+      QString toString() const;
       bool isValid() const;
 
       bool operator >(const Distance &otherDistance) const;

@@ -82,8 +82,8 @@ int main() {
     Isis::PvlObject &isiscube = lab.FindObject("IsisCube");
     isiscube.AddGroup(Isis::PvlGroup("Dimensions"));
     Isis::PvlGroup &dims = isiscube.FindGroup("Dimensions");
-    dims += Isis::PvlKeyword("Samples", 4);
-    dims += Isis::PvlKeyword("Lines", 8);
+    dims += Isis::PvlKeyword("Samples", "4");
+    dims += Isis::PvlKeyword("Lines", "8");
     c.UpdateGroup(lab);
     cout << lab << endl;
   }

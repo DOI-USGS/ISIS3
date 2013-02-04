@@ -25,7 +25,7 @@ namespace Isis {
       bool eventFilter(QObject *o, QEvent *e);
 
     private:
-      std::string p_appName; //!< Application name.
+      QString p_appName; //!< Application name.
 
 
   };

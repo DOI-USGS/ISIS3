@@ -1,4 +1,4 @@
-#if !defined(NonLinearLSQ_h)
+#ifndef NonLinearLSQ_h
 #define NonLinearLSQ_h
 /**                                                                       
  * @file                                                                  

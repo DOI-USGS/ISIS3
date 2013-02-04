@@ -130,7 +130,7 @@ namespace Isis {
         p_isProjected = true;
       }
       catch(IException &projError) {
-        std::string msg = "Can not create polygon, ";
+        QString msg = "Can not create polygon, ";
         msg += "cube [" + cube.getFileName();
         msg += "] is not a camera or map projection";
 
@@ -244,7 +244,7 @@ namespace Isis {
         }
         else {
           e.print(); // This should be a NAIF error
-          std::string msg = "Cannot find polygon for image "
+          QString msg = "Cannot find polygon for image "
               "[" + cube.getFileName() + "]: ";
           msg += increasePrecision ? "Cannot increase precision any further" :
               "The increment/step size might be too large";
@@ -1325,7 +1325,7 @@ namespace Isis {
     streampos sbyte = p_startByte - 1;
     is.seekg(sbyte, std::ios::beg);
     if (!is.good()) {
-      string msg = "Error preparing to read data from " + p_type +
+      QString msg = "Error preparing to read data from " + p_type +
                    " [" + p_blobName + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
@@ -1340,7 +1340,7 @@ namespace Isis {
     delete [] buf;
 
     if (!is.good()) {
-      string msg = "Error reading data from " + p_type + " [" +
+      QString msg = "Error reading data from " + p_type + " [" +
                    p_blobName + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }

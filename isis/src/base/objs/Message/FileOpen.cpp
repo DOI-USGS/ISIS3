@@ -25,8 +25,6 @@ using namespace std;
 
 #include "Message.h"
 
-string Isis::Message::FileOpen(const string &filename) {
-  string message;
-  message = "Unable to open [" + filename + "]";
-  return message;
+QString Isis::Message::FileOpen(const QString &filename) {
+  return "Unable to open [" + filename + "]";
 }

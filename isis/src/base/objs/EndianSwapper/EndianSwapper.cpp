@@ -36,7 +36,7 @@ namespace Isis {
    *
    * @param inputEndian Byte order of input value (MSB or LSB).
    */
-  EndianSwapper::EndianSwapper(std::string inputEndian) {
+  EndianSwapper::EndianSwapper(QString inputEndian) {
 
     if(inputEndian != "LSB" && inputEndian != "MSB") {
       string message = "Invalid parameter-InputEndian must be LSB or MSB";

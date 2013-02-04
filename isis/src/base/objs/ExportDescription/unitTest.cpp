@@ -79,9 +79,9 @@ int main() {
     compareEqual(innerName + "::filename()",
         filenames[i].name(), channel.filename().name());
     compareEqual(innerName + "::attributes()",
-        IString("1"),
-        IString(
-            QString::fromStdString(channel.attributes().toString()).mid(1)));
+        QString("1"),
+        QString(
+            channel.attributes().toString()).mid(1));
 
     if (i == 0) {
       compareEqual(innerName + "::hasCustomRange()",

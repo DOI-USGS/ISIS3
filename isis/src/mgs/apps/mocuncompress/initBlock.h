@@ -40,7 +40,7 @@ SCCSID @(#)initBlock.h  1.1 10/04/99
 */
 /* SCCShid @(#)initBlock.h (initBlock.h) 1.2 */
 
-#if !defined(initBlock_h)
+#ifndef initBlock_h
 
 #define initBlock_h
 

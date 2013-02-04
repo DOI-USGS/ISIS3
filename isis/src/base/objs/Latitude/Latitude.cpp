@@ -95,9 +95,9 @@ namespace Isis {
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
 
-    m_equatorialRadius = new Distance(mapping["EquatorialRadius"][0],
+    m_equatorialRadius = new Distance(toDouble(mapping["EquatorialRadius"][0]),
         Distance::Meters);
-    m_polarRadius = new Distance(mapping["PolarRadius"][0],
+    m_polarRadius = new Distance(toDouble(mapping["PolarRadius"][0]),
         Distance::Meters);
 
     m_errors = errors;
@@ -109,7 +109,7 @@ namespace Isis {
       setPlanetocentric(latitude.radians(), Radians);
     }
     else {
-      IString msg = "Latitude type [" + IString(mapping["LatitudeType"][0]) +
+      QString msg = "Latitude type [" + mapping["LatitudeType"][0] +
         "] is not recognized";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
@@ -135,9 +135,9 @@ namespace Isis {
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
 
-    m_equatorialRadius = new Distance(mapping["EquatorialRadius"][0],
+    m_equatorialRadius = new Distance(toDouble(mapping["EquatorialRadius"][0]),
         Distance::Meters);
-    m_polarRadius = new Distance(mapping["PolarRadius"][0],
+    m_polarRadius = new Distance(toDouble(mapping["PolarRadius"][0]),
         Distance::Meters);
 
     m_errors = errors;
@@ -408,8 +408,8 @@ namespace Isis {
   Latitude Latitude::add(Angle angleToAdd, PvlGroup mapping) {
 
     CoordinateType latType;
-    Distance equatorialRadius(mapping["EquatorialRadius"][0], Distance::Meters);
-    Distance polarRadius(mapping["PolarRadius"][0], Distance::Meters);
+    Distance equatorialRadius(toDouble(mapping["EquatorialRadius"][0]), Distance::Meters);
+    Distance polarRadius(toDouble(mapping["PolarRadius"][0]), Distance::Meters);
 
     if(mapping["LatitudeType"][0] == "Planetocentric")
       latType = Planetocentric;

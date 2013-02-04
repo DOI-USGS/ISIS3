@@ -41,7 +41,7 @@ namespace Isis {
     atexit(Shutdown);
   }
 
-  void Preference::Load(const std::string &file) {
+  void Preference::Load(const QString &file) {
     // Read the input PVL preference file
     Isis::Pvl pvl;
 

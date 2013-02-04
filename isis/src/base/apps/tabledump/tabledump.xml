@@ -49,9 +49,15 @@
       Added a newline to the last line of the output TO file.
     </change>
     <change name="Jeannie Backer" date="2012-10-04">
-      PROG: Changed references to TableField methods to lower camel case. 
+      Changed references to TableField methods to lower camel case. 
       Ordered includes. Added g_ prefix to global variables. Added padding to 
       control statements. References #1169.
+    </change>
+    <change name="Steven Lambright" date="2012-12-10">
+      Text field outputs are no longer padded with NULL (ASCII 0) characters; these
+      characters were not intended to be part of the output. This was fixed because
+      preserving this behavior would have been much more difficult than fixing it.
+      References #1312.
     </change>
   </history>
 

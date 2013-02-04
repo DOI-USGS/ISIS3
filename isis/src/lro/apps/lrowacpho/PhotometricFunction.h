@@ -1,4 +1,4 @@
-#if !defined(PhotometricFunction_h)
+#ifndef PhotometricFunction_h
 #define PhotometricFunction_h
 /**
  * @file
@@ -86,7 +86,7 @@ namespace Isis {
                 _camera = cam;
             }
 
-            static IString AlgorithmName ( const PvlObject &pvl ) {
+            static QString AlgorithmName ( const PvlObject &pvl ) {
                 return pvl.FindObject("PhotometricModel").FindGroup("Algorithm", Pvl::Traverse).FindKeyword("Name")[0];
             }
 
@@ -164,16 +164,14 @@ namespace Isis {
              * @return T Return type
              */
             template<typename T>
-            T ConfKey ( const DbProfile &conf, const std::string &keyname, const T &defval, int index = 0 ) const {
+            T ConfKey ( const DbProfile &conf, const QString &keyname, const T &defval, int index = 0 ) const {
                 if (!conf.exists(keyname)) {
                     return (defval);
                 }
                 if (conf.count(keyname) < index) {
                     return (defval);
                 }
-                IString iValue(conf.value(keyname, index));
-                T value = iValue; // This makes it work with a string?
-                return (value);
+                return conf.value(keyname, index);
             }
 
     };

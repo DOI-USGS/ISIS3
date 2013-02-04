@@ -51,7 +51,7 @@ namespace Isis {
 
       virtual void write(FileName outputName, int quality=100);
 
-      static bool canWriteFormat(IString format);
+      static bool canWriteFormat(QString format);
 
     protected:
       virtual void createBuffer();

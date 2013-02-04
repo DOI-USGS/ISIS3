@@ -1,4 +1,4 @@
-#if !defined(LoadCSV_h)
+#ifndef LoadCSV_h
 #define LoadCSV_h
 /**
  * @file
@@ -70,16 +70,16 @@ namespace Isis {
     public:
       //  Constructors and Destructor
       LoadCSV();
-      LoadCSV(const std::string &base, const HiCalConf &conf,
+      LoadCSV(const QString &base, const HiCalConf &conf,
               const DbProfile &profile);
 
       /** Destructor */
       virtual ~LoadCSV() { }
 
-      void load(const std::string &base, const HiCalConf &conf,
+      void load(const QString &base, const HiCalConf &conf,
                const DbProfile &profile);
 
-      std::string filename() const;
+      QString filename() const;
       int size() const;
 
       bool validateSize(const int &expected,
@@ -92,24 +92,24 @@ namespace Isis {
       void History(HiHistory &history) const;
 
     private:
-      std::string              _base;
+      QString              _base;
       DbProfile                _csvSpecs;
       HiMatrix                 _data;
-      std::vector<std::string> _history;
+      std::vector<QString> _history;
 
-      void init(const std::string &base,  const HiCalConf &conf,
+      void init(const QString &base,  const HiCalConf &conf,
                 const DbProfile &profile);
-      void addHistory(const std::string &element, const std::string &desc);
-      void getKeyList(const std::string &base, std::vector<std::string> &keys)
+      void addHistory(const QString &element, const QString &desc);
+      void getKeyList(const QString &base, std::vector<QString> &keys)
                       const;
-      DbProfile ResolveKeys(const std::string &base, const HiCalConf &conf,
+      DbProfile ResolveKeys(const QString &base, const HiCalConf &conf,
                             const DbProfile &prof) const;
-      std::string ParsedKey(const std::string &key, const HiCalConf &conf,
+      QString ParsedKey(const QString &key, const HiCalConf &conf,
                             const DbProfile &prof) const;
-      std::string makeKey(const std::string &ksuffix = "") const;
-      std::string getValue(const std::string &ksuffix = "") const;
+      QString makeKey(const QString &ksuffix = "") const;
+      QString getValue(const QString &ksuffix = "") const;
       HiMatrix extract (const CSVReader &csv);
-      int getAxisIndex(const std::string &name,
+      int getAxisIndex(const QString &name,
                        const CSVReader::CSVAxis &header) const;
 
   };

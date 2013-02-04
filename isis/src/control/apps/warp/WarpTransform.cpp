@@ -139,9 +139,9 @@ namespace Isis {
   PvlGroup WarpTransform::Residuals() {
     PvlGroup errs("Residuals");
     for (int i = 0; i < p_lsqInputLine->Knowns(); i++) {
-      PvlKeyword p("POINT" + IString(i + 1));
-      p += p_lsqInputLine->Residual(i);
-      p += p_lsqInputSamp->Residual(i);
+      PvlKeyword p("POINT" + toString(i + 1));
+      p += toString(p_lsqInputLine->Residual(i));
+      p += toString(p_lsqInputSamp->Residual(i));
       errs += p;
     }
     return errs;

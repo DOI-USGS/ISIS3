@@ -1,4 +1,4 @@
-#if !defined(Commentor_h)
+#ifndef Commentor_h
 #define Commentor_h
 /**                                                                       
  * @file                                                                  
@@ -49,9 +49,9 @@ template <class K>
       /** Constructor w/initialization  */
       Commentor() { init(); }
       /** Constructor w/caller provided file containing comments */
-      Commentor(const std::string &comfile) {
+      Commentor(const QString &comfile) {
         init();
-        if ( !comfile.empty() ) {
+        if ( !comfile.isEmpty() ) {
           loadCommentFile(comfile);
         }
       }
@@ -83,7 +83,7 @@ template <class K>
        * @history Debbie A. Cook - Added spkwriter signature keyword to user's
        *                           comment
        */
-      void loadCommentFile(const std::string &comFile) {
+      void loadCommentFile(const QString &comFile) {
         _comComment = readCommentFile(comFile);
         // The following line was added to ensure that a
         // user's entered comment file includes the
@@ -94,13 +94,13 @@ template <class K>
       }
 
       /** Allows user to set comment header string */
-      void setCommentHeader(const std::string &comment) {
+      void setCommentHeader(const QString &comment) {
         _comComment = comment;
         return;
       }
 
       /** Returns the current contents of the collected comments */
-      std::string Comments() const { 
+      QString Comments() const { 
         return (_comComment + _comSetComments);
       }
 
@@ -111,9 +111,9 @@ template <class K>
       }
 
     private:
-      std::string _comFile;
-      std::string _comComment;
-      std::string _comSetComments;
+      QString _comFile;
+      QString _comComment;
+      QString _comSetComments;
 
       /**
        * @brief Read comments from a file
@@ -121,12 +121,12 @@ template <class K>
        * This method reads a text file containing comments that will be written 
        * to the SPICE kernel written. 
        *                          
-       * @return std::string Returns contents of of comment file
+       * @return QString Returns contents of of comment file
        */
-      std::string readCommentFile(const std::string comfile) {
+      QString readCommentFile(const QString comfile) {
         TextFile t(comfile);
-        std::string comment;
-        std::string cline;
+        QString comment;
+        QString cline;
         while ( t.GetLine(cline, false) ) {
           cline.push_back('\n');
           comment += cline;

@@ -58,7 +58,7 @@ namespace Isis {
   */
   bool Brick::SetBrick(const int brick) {
     if(brick < 1) {
-      std::string message = "Invalid value for argument [brick]";
+      QString message = "Invalid value for argument [brick]";
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 

@@ -24,10 +24,10 @@ class MyProjection : public RingPlaneProjection {
     MyProjection(Pvl &lab) : RingPlaneProjection(lab) {
     }
     // override pure virtual methods
-    string Name() const {
+    QString Name() const {
       return "None";
     }
-    string Version() const {
+    QString Version() const {
       return "1.0";
     }
 
@@ -82,10 +82,10 @@ class EmptyProjection : public RingPlaneProjection {
     }
 
     // pure virtuals, must be overriden, no need to test since MyProjection will test these
-    string Name() const {
+    QString Name() const {
       return "None";
     }
-    string Version() const {
+    QString Version() const {
       return "1.0";
     }
 };
@@ -150,12 +150,12 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   cout << "Test for invalid azimuth domain value in the mapping group" << endl;
-  mg += PvlKeyword("AzimuthDomain", 75);
+  mg += PvlKeyword("AzimuthDomain", "75");
   Doit(lab);
   cout << "///////////////////////////////////////////////////////////" << endl;
   cout << endl;
 
-  mg["AzimuthDomain"] = 360;
+  mg["AzimuthDomain"] = "360";
   mg += PvlKeyword("ProjectionName", "MyProjection");
 
   cout << "Projection Specifications" << endl;
@@ -179,30 +179,30 @@ int main(int argc, char *argv[]) {
   cout << "///////////////////////////////////////////////////////////" << endl;
   cout << "Test More Error Throws...\n" << endl;
   cout << "Testing invalid minimum radius..." << endl;
-  mg += PvlKeyword("MinimumRadius", -45.0);
-  mg += PvlKeyword("MaximumRadius", -80.0);
-  mg += PvlKeyword("MinimumAzimuth", 15.0);
-  mg += PvlKeyword("MaximumAzimuth", -190.0);
+  mg += PvlKeyword("MinimumRadius", "-45.0");
+  mg += PvlKeyword("MaximumRadius", "-80.0");
+  mg += PvlKeyword("MinimumAzimuth", "15.0");
+  mg += PvlKeyword("MaximumAzimuth", "-190.0");
   Doit(lab);
   cout << endl;
 
   cout << "Testing invalid maximum radius" << endl;
-  mg["MinimumRadius"] = 80.0;
+  mg["MinimumRadius"] = "80.0";
   Doit(lab);
   cout << endl;
 
   cout << "Testing unordered radius range" << endl;
-  mg["MaximumRadius"].SetValue(45.0, "units");
+  mg["MaximumRadius"].SetValue("45.0", "units");
   Doit(lab);
   cout << endl;
 
   cout << "Testing unordered azimuth range" << endl;
-  mg["MaximumRadius"].SetValue(180.0, "units");
+  mg["MaximumRadius"].SetValue("180.0", "units");
   Doit(lab);
   cout << "///////////////////////////////////////////////////////////" << endl;
   cout << endl;
 
-  mg["MaximumAzimuth"] = 190.0;
+  mg["MaximumAzimuth"] = "190.0";
 
   cout << "Testing xyRange methods...\n" << endl;
   MyProjection p2(lab);
@@ -262,14 +262,14 @@ int main(int argc, char *argv[]) {
   radTestGroup += Isis::PvlKeyword("TargetName", "Saturn");
   radTestGroup += Isis::PvlKeyword("ProjectionName", "Planar");
   radTestGroup += Isis::PvlKeyword("AzimuthDirection", "Clockwise");
-  radTestGroup += Isis::PvlKeyword("AzimuthDomain", 180);
-  radTestGroup += Isis::PvlKeyword("Scale", 5.0);
-  radTestGroup += Isis::PvlKeyword("MinimumRadius", 2000.0);
-  radTestGroup += Isis::PvlKeyword("MaximumRadius", 20000.0);
-  radTestGroup += Isis::PvlKeyword("MinimumAzimuth", 0.0);
-  radTestGroup += Isis::PvlKeyword("MaximumAzimuth", 360.0);
-  radTestGroup += Isis::PvlKeyword("CenterRadius", 12000.0);
-  radTestGroup += Isis::PvlKeyword("CenterAzimuth", 0.0);
+  radTestGroup += Isis::PvlKeyword("AzimuthDomain", "180");
+  radTestGroup += Isis::PvlKeyword("Scale", "5.0");
+  radTestGroup += Isis::PvlKeyword("MinimumRadius", "2000.0");
+  radTestGroup += Isis::PvlKeyword("MaximumRadius", "20000.0");
+  radTestGroup += Isis::PvlKeyword("MinimumAzimuth", "0.0");
+  radTestGroup += Isis::PvlKeyword("MaximumAzimuth", "360.0");
+  radTestGroup += Isis::PvlKeyword("CenterRadius", "12000.0");
+  radTestGroup += Isis::PvlKeyword("CenterAzimuth", "0.0");
   Isis::Planar *radTestProjection = (Isis::Planar *) Isis::ProjectionFactory::Create(radRangeTest);
 
   cout << "Planar Projection Specifications" << endl;
@@ -413,7 +413,7 @@ int main(int argc, char *argv[]) {
   cout << "operator!=:  " << (p != p2) << endl;
 
   mg["AzimuthDirection"] = "CounterClockwise";
-  mg["AzimuthDomain"] = 180;
+  mg["AzimuthDomain"] = "180";
   EmptyProjection noproj(lab);
   cout << endl;
 
@@ -528,13 +528,13 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   // Add remaining keywords for Mapping() test 
-  mg += PvlKeyword("PixelResolution", 1.0);
-  mg += PvlKeyword("Scale", 1.0);
-  mg += PvlKeyword("UpperLeftCornerX", 1.0);
-  mg += PvlKeyword("UpperLeftCornerY", 1.0);
+  mg += PvlKeyword("PixelResolution", "1.0");
+  mg += PvlKeyword("Scale", "1.0");
+  mg += PvlKeyword("UpperLeftCornerX", "1.0");
+  mg += PvlKeyword("UpperLeftCornerY", "1.0");
 
   cout << "Rotation Tests" << endl;
-  mg += PvlKeyword("Rotation", 90.0);
+  mg += PvlKeyword("Rotation", "90.0");
   mg["AzimuthDirection"] = "Clockwise";
   MyProjection p4(lab);
   cout << "Rotation:     " << p4.Rotation() << endl;

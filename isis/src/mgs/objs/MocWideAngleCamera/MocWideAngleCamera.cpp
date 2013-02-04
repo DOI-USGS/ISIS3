@@ -66,7 +66,7 @@ namespace Isis {
 
     // Get the start time from labels
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
-    string stime = inst["SpacecraftClockCount"];
+    QString stime = inst["SpacecraftClockCount"];
     double etStart = getClockTime(stime).Et();
 
     // Setup detector map

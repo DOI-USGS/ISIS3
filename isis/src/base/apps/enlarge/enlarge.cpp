@@ -64,8 +64,8 @@ void IsisMain() {
     interp = new Interpolator(Interpolator::CubicConvolutionType);
   }
   else {
-    string msg = "Unknown value for INTERP [" +
-                 ui.GetString("INTERP") + "]";
+    QString msg = "Unknown value for INTERP [" +
+                  ui.GetString("INTERP") + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 

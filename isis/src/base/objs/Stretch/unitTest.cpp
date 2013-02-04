@@ -1,15 +1,20 @@
 #include <iostream>
+
+#include <QFile>
+
 #include "SpecialPixel.h"
 #include "Stretch.h"
 #include "IException.h"
 #include "Preference.h"
 #include "Histogram.h"
 
+using namespace Isis;
 using namespace std;
-int main() {
-  Isis::Preference::Preferences(true);
 
-  Isis::Stretch s;
+int main() {
+  Preference::Preferences(true);
+
+  Stretch s;
 
   s.AddPair(0.0, 1.0);
   s.AddPair(0.25, 50.0);
@@ -35,11 +40,11 @@ int main() {
   s.SetHrs(5.0);
 
 
-  cout << "Stretch(Null):   " << s.Map(Isis::NULL8) << endl;
-  cout << "Stretch(Lis):    " << s.Map(Isis::LOW_INSTR_SAT8) << endl;
-  cout << "Stretch(Lrs):    " << s.Map(Isis::LOW_REPR_SAT8) << endl;
-  cout << "Stretch(His):    " << s.Map(Isis::HIGH_INSTR_SAT8) << endl;
-  cout << "Stretch(Hrs):    " << s.Map(Isis::HIGH_REPR_SAT8) << endl;
+  cout << "Stretch(Null):   " << s.Map(NULL8) << endl;
+  cout << "Stretch(Lis):    " << s.Map(LOW_INSTR_SAT8) << endl;
+  cout << "Stretch(Lrs):    " << s.Map(LOW_REPR_SAT8) << endl;
+  cout << "Stretch(His):    " << s.Map(HIGH_INSTR_SAT8) << endl;
+  cout << "Stretch(Hrs):    " << s.Map(HIGH_REPR_SAT8) << endl;
   cout << endl;
 
   cout << "Stretch(-0.1):   " << s.Map(-0.1) << endl;
@@ -60,7 +65,7 @@ int main() {
   try {
     s.AddPair(1.0, 200.0);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 
@@ -72,22 +77,22 @@ int main() {
   try {
     s.Parse("0:0 50:0 49:255 255:255");
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 
   try {
     s.Parse("-5xyzzy:0 50:0 100:255 255:255");
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 
   // test the Parse for when inputs are %'s
   cout << endl << "Testing new Parse that takes %'s for input side of pairs" << endl;
 
-  Isis::Histogram temp(0.0, 100.0, 101);
-  Isis::Histogram *h = &temp;
+  Histogram temp(0.0, 100.0, 101);
+  Histogram *h = &temp;
   for(double i = 0.0; i <= 100.0; i++) {
     h->AddData(&i, 1);
   }
@@ -99,7 +104,7 @@ int main() {
   try {
     s.Parse("0:0 50:0 49:255 100:255", h);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 
@@ -107,7 +112,7 @@ int main() {
   try {
     s.Parse("-5:10", h);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 
@@ -115,7 +120,7 @@ int main() {
   try {
     s.Parse("121:215", h);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 
@@ -123,30 +128,30 @@ int main() {
   try {
     s.Parse("-5xyzzy:0 50:0 100:255", h);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 
   try {
     s.ClearPairs();
-    std::string fname = "unitTest.pvl";
-    std::string grp = "Pairs";
+    QString fname = "unitTest.pvl";
+    QString grp = "Pairs";
     s.Load(fname, grp);
     for(int i = 0; i < s.Pairs(); i++) {
       std::cout << s.Input(i) << ", " << s.Output(i) << std::endl;
     }
     std::cout << "testing save" << std::endl;
-    std::string output = "saveTest.pvl";
+    QString output = "saveTest.pvl";
     s.Save(output, grp);
     s.ClearPairs();
     s.Load(output, grp);
     for(int i = 0; i < s.Pairs(); i++) {
       std::cout << s.Input(i) << ", " << s.Output(i) << std::endl;
     }
-    remove(output.c_str());
+    QFile::remove(output);
 
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 
@@ -160,7 +165,7 @@ int main() {
     std::cout << s.Input(i) << ", " << s.Output(i) << std::endl;
   }
 
-  Isis::Stretch sCopy;
+  Stretch sCopy;
   sCopy.CopyPairs(s);
   std::cout << "copy stretch pairs" << std::endl;
   for(int i = 0; i < s.Pairs(); i++) {

@@ -1,6 +1,6 @@
 #include "Isis.h"
 
-#include <string>
+#include <QString>
 
 #include <QList>
 #include <QPair>
@@ -92,7 +92,7 @@ void IsisMain() {
     }
   }
   catch(IException &) {
-    string msg = "This program is intended for use on THEMIS VIS images only";
+    QString msg = "This program is intended for use on THEMIS VIS images only";
     msg += " [" + ui.GetFileName("INEVEN") + "] does not appear to be a ";
     msg += "THEMIS VIS image.";
     throw IException(IException::User, msg, _FILEINFO_);
@@ -104,27 +104,27 @@ void IsisMain() {
     }
   }
   catch(IException &e) {
-    string msg = "This program is intended for use on THEMIS VIS images only";
+    QString msg = "This program is intended for use on THEMIS VIS images only";
     msg += " [" + ui.GetFileName("INODD") + "] does not appear to be a ";
     msg += "THEMIS VIS image.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (evenCube->getGroup("Instrument")["Framelets"][0] != "Even") {
-    string msg = "The image [" + ui.GetFileName("INEVEN") + "] does not appear "
+    QString msg = "The image [" + ui.GetFileName("INEVEN") + "] does not appear "
         "to contain the EVEN framelets of a Themis VIS cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if (oddCube->getGroup("Instrument")["Framelets"][0] != "Odd") {
-    string msg = "The image [" + ui.GetFileName("ODDEVEN") + "] does not appear "
+    QString msg = "The image [" + ui.GetFileName("ODDEVEN") + "] does not appear "
         "to contain the ODD framelets of a Themis VIS cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   PvlGroup &inputInstrumentGrp = evenCube->getGroup("Instrument");
   PvlKeyword &spatialSumming = inputInstrumentGrp["SpatialSumming"];
-  frameletSize = 192 / (int)spatialSumming[0];
+  frameletSize = 192 / toInt(spatialSumming[0]);
   overlapSize = FrameletOverlapSize();
 
   if(overlapSize == 0) {
@@ -322,7 +322,7 @@ int FrameletOverlapSize() {
   Camera *camOdd = oddCube->getCamera();
 
   if(camEven == NULL || camOdd == NULL) {
-    string msg = "A camera is required to automatically calculate the overlap "
+    QString msg = "A camera is required to automatically calculate the overlap "
                  "between framelets. Please run spiceinit on the input cube";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }

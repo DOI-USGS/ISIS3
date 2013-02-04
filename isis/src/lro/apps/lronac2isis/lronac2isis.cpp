@@ -31,21 +31,21 @@ void IsisMain() {
   //Check that the file comes from the right camera
   UserInterface &ui = Application::GetUserInterface();
   FileName inFile = ui.GetFileName("FROM");
-  IString id;
+  QString id;
   try {
     Pvl lab(inFile.expanded());
 
     if(lab.HasKeyword("DATA_SET_ID"))
-      id = (string) lab.FindKeyword("DATA_SET_ID");
+      id = (QString) lab.FindKeyword("DATA_SET_ID");
     else {
-      string msg = "Unable to read [DATA_SET_ID] from input file [" + inFile.expanded() + "]";
+      QString msg = "Unable to read [DATA_SET_ID] from input file [" + inFile.expanded() + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
     //Checks if in file is rdr
     bool projected = lab.HasObject("IMAGE_MAP_PROJECTION");
     if(projected) {
-      string msg = "[" + inFile.name() + "] appears to be an rdr file.";
+      QString msg = "[" + inFile.name() + "] appears to be an rdr file.";
       msg += " Use pds2isis.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -56,17 +56,17 @@ void IsisMain() {
                btermKeyword = lab.FindKeyword("LRO:BTERM");
 
     if(mtermKeyword.Size() != xtermKeyword.Size() || btermKeyword.Size() != xtermKeyword.Size()) {
-      string msg = "The decompanding terms do not have the same dimensions";
+      QString msg = "The decompanding terms do not have the same dimensions";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
 
     for(int i = 0; i < xtermKeyword.Size(); i++) {
-      g_xterm.push_back(xtermKeyword[i]);
-      g_mterm.push_back(mtermKeyword[i]);
-      g_bterm.push_back(btermKeyword[i]);
+      g_xterm.push_back(toDouble(xtermKeyword[i]));
+      g_mterm.push_back(toDouble(mtermKeyword[i]));
+      g_bterm.push_back(toDouble(btermKeyword[i]));
     }
 
-    double versionId = (double)(lab.FindKeyword("PRODUCT_VERSION_ID")[0]).Trim("v");
+    double versionId = toDouble(lab.FindKeyword("PRODUCT_VERSION_ID")[0].remove(QRegExp("^v")));
 
     if(lab.FindKeyword("FRAME_ID")[0] == "RIGHT" && versionId < 1.30)
       g_flip = true;
@@ -74,15 +74,13 @@ void IsisMain() {
       g_flip = false;
   }
   catch(IException &e) {
-    string msg = "The PDS header is missing important keyword(s).";
+    QString msg = "The PDS header is missing important keyword(s).";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
 
-  id.ConvertWhiteSpace();
-  id.Compress();
-  id.Trim(" ");
-  if(id.substr(13, 3) != "EDR") {
-    string msg = "Input file [" + inFile.expanded() + "] does not appear to be "
+  id = id.simplified().trimmed();
+  if(id.mid(13, 3) != "EDR") {
+    QString msg = "Input file [" + inFile.expanded() + "] does not appear to be "
                  + "in LROC-NAC EDR format. DATA_SET_ID is [" + id + "]";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
@@ -186,7 +184,7 @@ void TranslateLrocNacLabels(FileName &labelFile, Cube *ocube) {
   Pvl outLabel;
   //Set up the directory where the translations are
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  IString transDir = (string) dataDir["Lro"] + "/translations/";
+  QString transDir = (QString) dataDir["Lro"] + "/translations/";
   Pvl labelPvl(labelFile.expanded());
 
   //Translate the Instrument group
@@ -209,9 +207,9 @@ void TranslateLrocNacLabels(FileName &labelFile, Cube *ocube) {
   //Set up the Kernels group
   PvlGroup kern("Kernels");
   if(lab.FindKeyword("FRAME_ID")[0] == "LEFT")
-    kern += PvlKeyword("NaifFrameCode", -85600);
+    kern += PvlKeyword("NaifFrameCode", "-85600");
   else
-    kern += PvlKeyword("NaifFrameCode", -85610);
+    kern += PvlKeyword("NaifFrameCode", "-85610");
 
   PvlGroup inst = outLabel.FindGroup("Instrument", Pvl::Traverse);
   if(lab.FindKeyword("FRAME_ID")[0] == "LEFT") {

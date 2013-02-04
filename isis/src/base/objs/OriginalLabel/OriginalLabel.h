@@ -51,7 +51,7 @@ namespace Isis {
   class OriginalLabel : public Isis::Blob {
     public:
       OriginalLabel();
-      OriginalLabel(const std::string &file);
+      OriginalLabel(const QString &file);
       OriginalLabel(Pvl pvl);
       ~OriginalLabel();
 

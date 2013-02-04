@@ -30,7 +30,7 @@
 using namespace std;
 using namespace Isis;
 
-void cubeConvexHullAndMeasures(IString &serialNum,ControlNet &net, double &area, int &validMeasures, 
+void cubeConvexHullAndMeasures(QString &serialNum,ControlNet &net, double &area, int &validMeasures, 
                           QList <ControlMeasure *> *measToIgnor=NULL);
 
 
@@ -65,14 +65,14 @@ void IsisMain() {
 
     //make sure there was some residual data in the control network
   if (hist.ValidPixels() < 1) {
-    string msg = "Error no valid residual data found in network [" + ui.GetFileName("CNET") + "]";
+    QString msg = "Error no valid residual data found in network [" + ui.GetFileName("CNET") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
     return;
   }
 
   FILE *guiltyFile;
   char fileName[1028];
-  strcpy(fileName,ui.GetString("FILE_PREFIX").data());
+  strcpy(fileName,ui.GetString("FILE_PREFIX").toAscii().data());
   strcat(fileName,"Guilty.csv");
   guiltyFile = fopen(fileName,"w");
   if (guiltyFile == NULL) {
@@ -82,7 +82,7 @@ void IsisMain() {
   }
 
   FILE *ignoredReport;
-  strcpy(fileName,ui.GetString("FILE_PREFIX").data());
+  strcpy(fileName,ui.GetString("FILE_PREFIX").toAscii().data());
   strcat(fileName,"Ignored.csv");
   ignoredReport = fopen(fileName,"w");
   if (guiltyFile == NULL) {
@@ -264,9 +264,9 @@ void IsisMain() {
       QList<double> hullAndValidMeasures;
       double area;
       int validMeasures;
-      IString serialNum = measGroup[j]->GetCubeSerialNumber();
+      QString serialNum = measGroup[j]->GetCubeSerialNumber();
       //check to see if the initial stats are already calculated for this image
-      if (originalCubeStats.contains(serialNum.ToQt())) continue;
+      if (originalCubeStats.contains(serialNum)) continue;
       //otherwise do the calculations
       cubeConvexHullAndMeasures(serialNum,net,area,validMeasures);
       hullAndValidMeasures.push_back(area);
@@ -283,7 +283,7 @@ void IsisMain() {
       else
         ableToEditFlag[j] = false; //test fail
 
-      IString serialNum = measGroup[j]->GetCubeSerialNumber();
+      QString serialNum = measGroup[j]->GetCubeSerialNumber();
       cubeConvexHullAndMeasures(serialNum,net,hullArea[j],measNum[j],&measGroup);
 
       //get the original values for this cube
@@ -358,10 +358,10 @@ void IsisMain() {
 
     for( int j=0;j<measGroup.size();j++) {
       sprintf(line,"%s,%s,%s,%lf,%4.2lf,%4.2lf,%d,%d,%s,%s,%s\n",
-                    measGroup[j]->Parent()->GetId().ToQt().toStdString().data(),
+                    measGroup[j]->Parent()->GetId().toStdString().data(),
                     serialNumList.FileName(measGroup[j]->GetCubeSerialNumber()
-                      .ToQt().toStdString()).data(),        
-                    measGroup[j]->GetCubeSerialNumber().ToQt().toStdString().data(),
+                      ).toAscii().data(),
+                    measGroup[j]->GetCubeSerialNumber().toAscii().data(),
                     measGroup[j]->GetResidualMagnitude(),
                     hullReduction[j]*100.0,
                     measReduction[j]*100.0,
@@ -403,7 +403,7 @@ void IsisMain() {
 
 
 
-void cubeConvexHullAndMeasures(IString &serialNum,ControlNet &net, double &area, int &validMeasures, 
+void cubeConvexHullAndMeasures(QString &serialNum,ControlNet &net, double &area, int &validMeasures, 
                           QList <ControlMeasure *> *measToIgnor) {
 
   int i,j,firstIndex=0;

@@ -23,11 +23,11 @@
  */
 
 #include <fstream>
-#include "IString.h"
+
+#include <QString>
  
 namespace Isis {
   class EndianSwapper;
-  class IString;
   class Pvl;
   class PvlObject;
   class Table;
@@ -69,9 +69,9 @@ namespace Isis {
       ExportPdsTable(Table isisTable);
       ~ExportPdsTable();
       PvlObject exportTable(char *pdsTableBuffer, int pdsFileRecordBytes,
-                            IString pdsByteOrder);
-      IString formatPdsTableName(); 
-      static IString formatPdsTableName(IString isisTableName); 
+                            QString pdsByteOrder);
+      QString formatPdsTableName(); 
+      static QString formatPdsTableName(QString isisTableName); 
     private:
       void Pack(TableRecord record, char *buffer, EndianSwapper *endianSwap);
       PvlObject fillMetaData();
@@ -85,7 +85,7 @@ namespace Isis {
                                     PDS table. This value is the same as the 
                                     RecordSize (number of bytes per record) of 
                                     the Isis3 Table.**/
-      IString m_pdsByteOrder;  /**< A string indicating the byte order of the 
+      QString m_pdsByteOrder;  /**< A string indicating the byte order of the 
                                     exported PDS file.**/ 
   };
 }

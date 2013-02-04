@@ -50,8 +50,8 @@ namespace Isis {
   */
   class History : public Isis::Blob {
     public:
-      History(const std::string &name);
-      History(const std::string &name, const std::string &file);
+      History(const QString &name);
+      History(const QString &name, const QString &file);
       ~History();
 
       void AddEntry();

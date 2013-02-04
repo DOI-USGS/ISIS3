@@ -5,7 +5,7 @@
 APPNAME = editlab
 editlabTruth1.txt.IGNORELINES = ByteOrder TileSamples TileLines StartByte
 tempLab1.txt.IGNORELINES = Bytes TileSamples TileLines StartByte
-history.pvl.IGNORELINES = ExecutionDateTime HostName
+history.pvl.IGNORELINES = ExecutionDateTime HostName IsisVersion ProgramVersion ProgramPath UserName
 
 include $(ISISROOT)/make/isismake.tsts
 

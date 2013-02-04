@@ -1,9 +1,12 @@
 #include <iostream>
+
 #include "UserInterface.h"
 #include "IException.h"
+#include "IString.h"
 #include "Preference.h"
 #include "FileName.h"
 
+using namespace Isis;
 using namespace std;
 
 int main(int argc, char *argv[]) {
@@ -11,8 +14,8 @@ int main(int argc, char *argv[]) {
 
   cout << "Unit test for Isis::UserInterface ..." << endl;
 
-  Isis::IString unitTestXml = Isis::FileName("unitTest.xml").expanded();
-  string highpass = Isis::FileName("$ISISROOT/src/base/apps/highpass/highpass.xml").expanded();
+  QString unitTestXml = Isis::FileName("unitTest.xml").expanded();
+  QString highpass = Isis::FileName("$ISISROOT/src/base/apps/highpass/highpass.xml").expanded();
   char *myArgv[15];// = {"unitTest", "from=input.cub", "to=output.cub"};
 
   for(int i = 0; i < 15; i++)
@@ -76,7 +79,7 @@ int main(int argc, char *argv[]) {
       strcpy(myArgv[myArgc ++], "3");
 
       Isis::UserInterface ui(highpass, myArgc, myArgv);
-      vector<string> vals;
+      vector<QString> vals;
       cout << "FROM:    " << ui.GetAsString("FROM") << endl;
       cout << "TO:      ";
       ui.GetAsString("TO", vals);
@@ -104,7 +107,7 @@ int main(int argc, char *argv[]) {
       strcpy(myArgv[myArgc ++], "3");
 
       Isis::UserInterface ui(highpass, myArgc, myArgv);
-      vector<string> vals;
+      vector<QString> vals;
       cout << "FROM:    " << ui.GetAsString("FROM") << endl;
       cout << "TO:      " << endl;
       ui.GetAsString("TO", vals);
@@ -130,7 +133,7 @@ int main(int argc, char *argv[]) {
       strcpy(myArgv[myArgc ++], "3");
 
       Isis::UserInterface ui(highpass, myArgc, myArgv);
-      vector<string> vals;
+      vector<QString> vals;
       cout << "FROM:    " << ui.GetAsString("FROM") << endl;
       cout << "TO:      " << endl;
       ui.GetAsString("TO", vals);
@@ -162,7 +165,7 @@ int main(int argc, char *argv[]) {
       strcpy(myArgv[myArgc ++], "3");
 
       Isis::UserInterface ui(highpass, myArgc, myArgv);
-      vector<string> vals;
+      vector<QString> vals;
       cout << "FROM:    " << ui.GetAsString("FROM") << endl;
       cout << "TO:      " << ui.GetAsString("TO") << endl;
       cout << "GUI:     " << ui.IsInteractive() << endl;
@@ -256,7 +259,7 @@ int main(int argc, char *argv[]) {
       strcpy(myArgv[myArgc ++], "3");
 
       Isis::UserInterface ui(highpass, myArgc, myArgv);
-      vector<string> vals;
+      vector<QString> vals;
       cout << "FROM:    " << ui.GetAsString("FROM") << endl;
       cout << "TO:      " << ui.GetAsString("TO") << endl;
       cout << "GUI:     " << ui.IsInteractive() << endl;

@@ -51,7 +51,7 @@ using namespace Isis;
 class MyShape : public ShapeModel {
   public:
   MyShape(Target *target, Pvl &lab) : ShapeModel (target, lab) {
-    setName(IString("Test"));
+    setName("Test");
   }
 
    bool intersectSurface(std::vector<double> observerPos,
@@ -132,11 +132,11 @@ class MyShape : public ShapeModel {
 class MyEllipse : public ShapeModel {
   public:
   MyEllipse(Target *target) : ShapeModel (target) {
-    setName(IString("Ellipsoid"));
+    setName("Ellipsoid");
   }
 
   MyEllipse() : ShapeModel() {
-    setName(IString("DefaultConstructor"));
+    setName("DefaultConstructor");
   }
 
   bool intersectSurface(std::vector<double> observerPos,
@@ -197,7 +197,7 @@ class MyEllipse : public ShapeModel {
 
 int main() {
   Preference::Preferences(true);
-  string inputFile = "$mgs/testData/ab102401.cub";
+  QString inputFile = "$mgs/testData/ab102401.cub";
   Cube cube;
   cube.open(inputFile);
   Camera *c = cube.getCamera();

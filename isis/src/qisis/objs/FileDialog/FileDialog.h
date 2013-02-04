@@ -49,7 +49,7 @@ namespace Isis {
     private:
       QList<QComboBox *> p_comboBoxes;
       QList<QPushButton *> p_allPButtons;
-      std::string p_appName;
+      QString p_appName;
       QDialog *p_mainDialog;
       QWidget *p_parent;
       QPushButton *p_filterButton;

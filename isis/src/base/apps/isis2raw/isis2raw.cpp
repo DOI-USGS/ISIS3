@@ -75,9 +75,9 @@ void IsisMain() {
   else if(ui.GetString("ENDIAN") == "LSB")
     p.SetOutputEndian(Isis::Lsb);
   // Open the cube for writing
-  string to = ui.GetFileName("TO", "raw");
+  QString to = ui.GetFileName("TO", "raw");
   ofstream fout;
-  fout.open(to.c_str(), ios::out | ios::binary);
+  fout.open(to.toAscii().data(), ios::out | ios::binary);
   if(!fout.is_open()) {
     string msg = "Cannot open raw output file";
     throw IException(IException::Programmer, msg, _FILEINFO_);
@@ -100,13 +100,13 @@ void IsisMain() {
   // Records what output values were used, then sends it to the print.prt file
   // as well as the terminal.
   PvlGroup results("DNs Used");
-  results += PvlKeyword("Null", p.OutputNull());
-  results += PvlKeyword("LRS", p.OutputLrs());
-  results += PvlKeyword("LIS", p.OutputLis());
-  results += PvlKeyword("HIS", p.OutputHis());
-  results += PvlKeyword("HRS", p.OutputHrs());
-  results += PvlKeyword("ValidMin", min);
-  results += PvlKeyword("ValidMax", max);
+  results += PvlKeyword("Null", toString(p.OutputNull()));
+  results += PvlKeyword("LRS", toString(p.OutputLrs()));
+  results += PvlKeyword("LIS", toString(p.OutputLis()));
+  results += PvlKeyword("HIS", toString(p.OutputHis()));
+  results += PvlKeyword("HRS", toString(p.OutputHrs()));
+  results += PvlKeyword("ValidMin", toString(min));
+  results += PvlKeyword("ValidMax", toString(max));
   Application::Log(results);
 
   return;
@@ -116,7 +116,7 @@ void IsisMain() {
 void checkRange(UserInterface &ui, double &min, double &max) {
   if(ui.WasEntered("OMIN")) {
     if(ui.GetDouble("OMIN") < min) {
-      string message = "OMIN [" + IString(min) + "] is too small for the provided BITTYPE [";
+      QString message = "OMIN [" + toString(min) + "] is too small for the provided BITTYPE [";
       message += ui.GetString("BITTYPE") + "]";
       throw IException(IException::User, message, _FILEINFO_);
     }
@@ -126,7 +126,7 @@ void checkRange(UserInterface &ui, double &min, double &max) {
   }
   if(ui.WasEntered("OMAX")) {
     if(ui.GetDouble("OMAX") > max) {
-      string message = "OMAX [" + IString(max) + "] is too large for the provided BITTYPE [";
+      QString message = "OMAX [" + toString(max) + "] is too large for the provided BITTYPE [";
       message += ui.GetString("BITTYPE") + "]";
       throw IException(IException::User, message, _FILEINFO_);
     }

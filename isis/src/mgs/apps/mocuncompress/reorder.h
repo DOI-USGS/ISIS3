@@ -40,7 +40,7 @@ SCCSID @(#)reorder.h  1.1 10/04/99
 */
 /* SCCShid @(#)reorder.h (reorder.h) 1.2 */
 
-#if !defined(reorder_h)
+#ifndef reorder_h
 
 #define reorder_h
 

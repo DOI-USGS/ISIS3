@@ -34,26 +34,26 @@ class MyProjectionType : public Projection {
 
 
       // Get the LatitudeType
-      if ((string) m_mappingGrp["LatitudeType"] == "Planetographic") {
+      if ((QString) m_mappingGrp["LatitudeType"] == "Planetographic") {
         m_latitudeType = Planetographic;
       }
-      else if ((string) m_mappingGrp["LatitudeType"] == "Planetocentric") {
+      else if ((QString) m_mappingGrp["LatitudeType"] == "Planetocentric") {
         m_latitudeType = Planetocentric;
       }
 
       // Get the LongitudeDirection
-      if ((string) m_mappingGrp["LongitudeDirection"] == "PositiveWest") {
+      if ((QString) m_mappingGrp["LongitudeDirection"] == "PositiveWest") {
         m_longitudeDirection = PositiveWest;
       }
-      else if ((string) m_mappingGrp["LongitudeDirection"] == "PositiveEast") {
+      else if ((QString) m_mappingGrp["LongitudeDirection"] == "PositiveEast") {
         m_longitudeDirection = PositiveEast;
       }
 
       // Get the LongitudeDomain
-      if ((string) m_mappingGrp["LongitudeDomain"] == "360") {
+      if ((QString) m_mappingGrp["LongitudeDomain"] == "360") {
         m_longitudeDomain = 360;
       }
-      else if ((string) m_mappingGrp["LongitudeDomain"] == "180") {
+      else if ((QString) m_mappingGrp["LongitudeDomain"] == "180") {
         m_longitudeDomain = 180;
       }
 
@@ -127,8 +127,8 @@ class MyProjectionType : public Projection {
       return LocalRadius(m_latitude);
     }
 
-    virtual std::string Name() const = 0;
-    virtual std::string Version() const = 0;
+    virtual QString Name() const = 0;
+    virtual QString Version() const = 0;
     virtual double TrueScaleLatitude() const  {return 0.0;}
 
     bool SetGround(const double lat, const double lon) {
@@ -331,10 +331,10 @@ class MyProjection : public MyProjectionType {
       MyProjectionType(lab) {}
 
     // override pure virtual methods
-    string Name() const {
+    QString Name() const {
       return "None";
     }
-    string Version() const {
+    QString Version() const {
       return "1.0";
     }
 
@@ -351,10 +351,10 @@ class MyProjection2 : public MyProjectionType {
       MyProjectionType(lab) {}
 
     // override pure virtual methods
-    string Name() const {
+    QString Name() const {
       return "Something";
     }
-    string Version() const {
+    QString Version() const {
       return "1.0";
     }
 
@@ -407,16 +407,16 @@ int main(int argc, char *argv[]) {
 
   lab.AddGroup(PvlGroup("Mapping"));
   PvlGroup &mg = lab.FindGroup("Mapping");
-  mg += PvlKeyword("EquatorialRadius", 1.0);
-  mg += PvlKeyword("PolarRadius", 0.95);
+  mg += PvlKeyword("EquatorialRadius", "1.0");
+  mg += PvlKeyword("PolarRadius", "0.95");
   mg += PvlKeyword("LatitudeType", "Planetographic");
   mg += PvlKeyword("LongitudeDirection", "PositiveEast");
-  mg += PvlKeyword("LongitudeDomain", 360);
+  mg += PvlKeyword("LongitudeDomain", "360");
   mg += PvlKeyword("ProjectionName", "MyProjection");
-  mg += PvlKeyword("MinimumLatitude", 45);
-  mg += PvlKeyword("MaximumLatitude", 80.0);
-  mg += PvlKeyword("MinimumLongitude", 15.0);
-  mg += PvlKeyword("MaximumLongitude", 190.0);
+  mg += PvlKeyword("MinimumLatitude", "45");
+  mg += PvlKeyword("MaximumLatitude", "80.0");
+  mg += PvlKeyword("MinimumLongitude", "15.0");
+  mg += PvlKeyword("MaximumLongitude", "190.0");
 
   cout << "Projection Specifications" << endl;
   MyProjection p(lab);
@@ -644,7 +644,7 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   cout << "Rotation Tests" << endl;
-  mg += PvlKeyword("Rotation", 90.0);
+  mg += PvlKeyword("Rotation", toString(90.0));
   mg["LongitudeDirection"] = "PositiveEast";
   MyProjection p4(lab);
   cout << "Rotation:     " << p4.Rotation() << endl;

@@ -22,7 +22,7 @@ void IsisMain() {
   if (ui.WasEntered("FROM")) flist.push_back(ui.GetFileName("FROM"));
   if (ui.WasEntered("FROMLIST")) flist.read(ui.GetFileName("FROMLIST"));
   if (flist.size() < 1) {
-    string msg = "Files must be specified in FROM and/or FROMLIST - none found!";
+    QString msg = "Files must be specified in FROM and/or FROMLIST - none found!";
     throw IException(IException::User,msg,_FILEINFO_);
   }
 
@@ -38,7 +38,7 @@ void IsisMain() {
   }
 
   //  Process CK kernel requests
-  string comfile("");
+  QString comfile("");
   if (ui.WasEntered("COMFILE")) comfile = ui.GetFileName("COMFILE");
 
   SpkKernelWriter kwriter(ui.GetInteger("TYPE"));
@@ -50,11 +50,11 @@ void IsisMain() {
 
   // Write a summary of the documentation
   if (ui.WasEntered("SUMMARY")) {
-    string fFile = FileName(ui.GetFileName("SUMMARY")).expanded();
+    QString fFile = FileName(ui.GetFileName("SUMMARY")).expanded();
     ofstream os;
-    os.open(fFile.c_str(),ios::out);
+    os.open(fFile.toAscii().data(),ios::out);
     if (!os) {
-      string mess = "Cannot create SPK SUMMARY output file " + fFile;
+      QString mess = "Cannot create SPK SUMMARY output file " + fFile;
       throw IException(IException::User, mess, _FILEINFO_);
     }
     os << kwriter.getComment(kernel, comfile) << endl;

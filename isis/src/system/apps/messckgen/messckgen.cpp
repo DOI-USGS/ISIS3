@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <sstream>
-#include <string>
+#include <QString>
 
 #include <QFile>
 #include <QHash>
@@ -19,8 +19,6 @@
 
 
 using namespace Isis;
-using std::string;
-
 
 void updatePointing(PvlGroup &ckGroup,
     PvlObject &pivotPointing, PvlObject &atthistPointing);
@@ -30,7 +28,7 @@ PvlGroup* insertGroup(PvlObject &object, PvlGroup &group, int index);
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
-  // Convert between integer representations of months to abbreviated strings,
+  // Convert between integer representations of months to abbreviated QStrings,
   // as used in the TDB time format of the kernel date ranges
   QHash<int, QString> MONTH_TO_STRING;
   MONTH_TO_STRING[1] = "JAN";
@@ -53,7 +51,7 @@ void IsisMain() {
   }
   else {
     // If not provided, assume the latest pivot file in the data area
-    string pivotString("$messenger/kernels/ck/pivot_kernels.????.db");
+    QString pivotString("$messenger/kernels/ck/pivot_kernels.????.db");
     pivotFileName = FileName(pivotString).highestVersion();
   }
   Pvl pivot(pivotFileName.expanded());
@@ -65,7 +63,7 @@ void IsisMain() {
   }
   else {
     // If not provided, assume the latest atthist file in the data area
-    string atthistString("$messenger/kernels/ck/atthist_kernels.????.db");
+    QString atthistString("$messenger/kernels/ck/atthist_kernels.????.db");
     atthistFileName = FileName(atthistString).highestVersion();
   }
   Pvl atthist(atthistFileName.expanded());
@@ -76,7 +74,7 @@ void IsisMain() {
     dbFileName = ui.GetFileName("FROM");
   }
   else {
-    string dbString("$messenger/kernels/ck/kernels.????.db");
+    QString dbString("$messenger/kernels/ck/kernels.????.db");
     dbFileName = FileName(dbString).highestVersion();
   }
   Pvl kernelDb(dbFileName.expanded());
@@ -112,7 +110,7 @@ void IsisMain() {
       // We're looking for the group with a comment that says MAPPING,
       // signifying the beginning of the section we wish to update
       for (int j = 0; j < ckGroup.Comments(); j++) {
-        QString comment = QString::fromStdString(ckGroup.Comment(j));
+        QString comment = ckGroup.Comment(j);
         if (comment.contains("MAPPING")) {
           foundMapping = true;
           updatePointing(ckGroup, pivotPointing, atthistPointing);
@@ -126,20 +124,20 @@ void IsisMain() {
           for (int k = pivotSelection.Keywords() - 1; k >= 0; k--) {
             PvlKeyword &keyword = pivotSelection[k];
             if (keyword.IsNamed("Time")) {
-              pivotEndRaw = QString::fromStdString(keyword[1]);
+              pivotEndRaw = keyword[1];
               break;
             }
           }
 
           // Remove the trailing " TDB" as it confuses the time conversion
-          string newEnd = pivotEndRaw.toStdString();
+          QString newEnd = pivotEndRaw;
           pivotEndRaw.remove(QRegExp(" TDB$"));
-          string pivotEnd = pivotEndRaw.toStdString();
+          QString pivotEnd = pivotEndRaw;
 
           PvlKeyword &time = ckGroup.FindKeyword("Time");
-          QString currentStartRaw = QString::fromStdString(time[0]);
+          QString currentStartRaw = time[0];
           currentStartRaw.remove(QRegExp(" TDB$"));
-          string currentStart = currentStartRaw.toStdString();
+          QString currentStart = currentStartRaw;
 
           // Add 7 days (in units of seconds) to the current start time to
           // signify a week's time from the start time
@@ -164,20 +162,20 @@ void IsisMain() {
             // Until our covered time has exceeded a week past the current
             // group's start time, add new files to the current group
             while (coveredTime <= weekFromStart && coveredTime <= pivotEndTime) {
-              // Construct the string used to identify the day's BC file
-              string year = coveredTime.YearString();
-              string month = coveredTime.MonthString();
+              // Construct the QString used to identify the day's BC file
+              QString year = coveredTime.YearString();
+              QString month = coveredTime.MonthString();
               if (month.size() < 2) month = "0" + month;
-              string day = coveredTime.DayString();
+              QString day = coveredTime.DayString();
               if (day.size() < 2) day = "0" + day;
 
-              string bcFileName = "$messenger/kernels/ck/";
+              QString bcFileName = "$messenger/kernels/ck/";
               bcFileName += "msgr" + year + month + day + ".bc";
 
               // Check that the current day's BC file exists
-              string bcExpanded = FileName(bcFileName).expanded();
-              if (!QFile(QString::fromStdString(bcExpanded)).exists()) {
-                string msg = "The BC file [" + bcExpanded + "] does not exist";
+              QString bcExpanded = FileName(bcFileName).expanded();
+              if (!QFile(bcExpanded).exists()) {
+                QString msg = "The BC file [" + bcExpanded + "] does not exist";
                 throw IException(IException::User, msg, _FILEINFO_);
               }
 
@@ -197,8 +195,8 @@ void IsisMain() {
             if (coveredTime <= pivotEndTime) {
               // Set the end of the previous range and the beginning of the new
               // range to a week past the previous beginning
-              IString newEndTime = weekFromStart.YearString() + " ";
-              newEndTime += MONTH_TO_STRING[weekFromStart.Month()].toStdString() + " ";
+              QString newEndTime = weekFromStart.YearString() + " ";
+              newEndTime += MONTH_TO_STRING[weekFromStart.Month()] + " ";
               newEndTime += weekFromStart.DayString() + " ";
               newEndTime += "00:00:00.000 TDB";
 
@@ -294,7 +292,7 @@ PvlGroup* insertGroup(PvlObject &object, PvlGroup &group, int index) {
       PvlGroup &currentGroup = object.Group(i);
       bool foundMapping = false;
       for (int j = 0; j < currentGroup.Comments(); j++) {
-        QString comment = QString::fromStdString(currentGroup.Comment(j));
+        QString comment = currentGroup.Comment(j);
         mappingComments.append(comment);
 
         if (comment.contains("MAPPING"))
@@ -320,7 +318,7 @@ PvlGroup* insertGroup(PvlObject &object, PvlGroup &group, int index) {
   // Add all the mapping comments
   PvlGroup &currentGroup = object.Group(index);
   for (int i = 0; i < mappingComments.size(); i++)
-    currentGroup.AddComment(mappingComments[i].toStdString());
+    currentGroup.AddComment(mappingComments[i]);
 
   // Return the location of the new group
   return &currentGroup;

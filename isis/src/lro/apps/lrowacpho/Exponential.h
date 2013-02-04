@@ -1,4 +1,4 @@
-#if !defined(Exponential_h)
+#ifndef Exponential_h
 #define Exponential_h
 /**
  * @file
@@ -29,9 +29,9 @@
 #include <vector>
 
 #include "PhotometricFunction.h"
-#include "IString.h"
 #include "Camera.h"
 #include "DbProfile.h"
+#include "IString.h"
 #include "SpecialPixel.h"
 
 namespace Isis {
@@ -85,7 +85,7 @@ namespace Isis {
                     std::vector<double> bTerms; //<! b-terms for exponential in form a*e^(b*x)
                     double wavelength; //<! Wavelength for correction
                     double tolerance; //<! Wavelength Range/Tolerance
-                    IString units; //<! Phase units of Hiller eq.
+                    QString units; //<! Phase units of Hiller eq.
                     double phaUnit; // 1 for degrees, Pi/180 for radians
                     int band; //<! Cube band parameters
                     double phoStd; //<! Computed photometric std.

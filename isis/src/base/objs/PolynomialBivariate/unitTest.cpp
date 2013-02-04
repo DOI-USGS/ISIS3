@@ -2,12 +2,13 @@
 #include <iostream>
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
 
 int main() {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
-  Isis::PolynomialBivariate b(1);
+  PolynomialBivariate b(1);
   vector<double> coefs;
   coefs.push_back(0.5);
   coefs.push_back(0.5);
@@ -40,7 +41,7 @@ int main() {
 
   // Test 2nd order
   // 0.5 + 0.5*v1 + 0.5*v2 + 1.0*v1*v1 + 1.0*v1*v2 + 1.0*v2*v2
-  Isis::PolynomialBivariate c(2);
+  PolynomialBivariate c(2);
   cout << "---- 2nd order ----" << endl;
   cout << "Name   = " << c.Name() << endl;
   cout << "Ncoefs = " << c.Coefficients() << endl;

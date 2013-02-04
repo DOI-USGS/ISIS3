@@ -43,7 +43,7 @@ using namespace Isis;
 int main() {
   Preference::Preferences(true);
   //string inputFile = "$mgs/testData/ab102401.cub";
-  string inputFile = "W1591510834_1_cal.cub";
+  QString inputFile = "W1591510834_1_cal.cub";
   Cube cube;
   cube.open(inputFile);
   Camera *c = cube.getCamera();

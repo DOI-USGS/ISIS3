@@ -229,7 +229,7 @@ namespace Isis {
     std::vector<std::string> types;
     SqlRecord rec = getRecord();
     for(int i = 0 ; i < rec.count() ; i++) {
-      types.push_back(rec.getType(i));
+      types.push_back(rec.getType(i).toAscii().data());
     }
     return (types);
   }

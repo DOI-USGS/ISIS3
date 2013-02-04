@@ -3,17 +3,15 @@
 
 #include "StretchType.h"
 
-namespace Isis {
-  class Stretch;
-  class Histogram;
-}
-
-class QSlider;
-class QLineEdit;
-class QString;
 class QColor;
+class QLineEdit;
+class QSlider;
+class QString;
 
 namespace Isis {
+  class Histogram;
+  class Stretch;
+
   /**
    * @brief This handles the advanced binary stretch
    *

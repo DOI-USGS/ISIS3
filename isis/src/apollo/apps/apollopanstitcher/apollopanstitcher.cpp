@@ -11,7 +11,7 @@ Program uses the fiducial marks along the edges of Apollo Panoramic Images to st
 #include <stdio.h>
 
 //QT libraries if needed if needed
-
+#include <QFile>
 
 //third party libraries if needed
 #include <Ransac.h>
@@ -103,8 +103,8 @@ void IsisMain() {
 
   TRANS2d3p trans[8];    //final solutions for the transformations-one for each sub-scan
 
-  IString fileName,tempIString;
-  std::string fileBaseName, tempString;
+  QString fileName,tempIString;
+  QString fileBaseName, tempString;
   UserInterface &ui = Application::GetUserInterface();
 
   double l=1,s=1,sample,line,temp,  //line and sample coordinates for looping through the panC
@@ -149,7 +149,7 @@ void IsisMain() {
   fileBaseName = ui.GetString("FILE_BASE");
   for (i=1; i<=8; i++) {
     panC[i-1] = new Cube;
-    fileName = fileBaseName + IString("-000") + IString(i) + IString(".cub");
+    fileName = fileBaseName + "-000" + toString(i) + ".cub";
     panC[i-1]->open(fileName, "r");
     if (!panC[i-1]->isOpen()){
       string msg = "Unable to open input cube: " + IString(fileName) + "\n";
@@ -223,8 +223,8 @@ void IsisMain() {
       }
     }
     if(s>=averageLines+searchCellSize/2.0) {
-       string msg = "Unable to locate a fiducial mark in the input cube [" + panC[i]->getFileName()
-                     + "].  Check FROM and MICRONS parameters.";
+       QString msg = "Unable to locate a fiducial mark in the input cube [" + panC[i]->getFileName()
+                      + "].  Check FROM and MICRONS parameters.";
        throw IException(IException::Io, msg, _FILEINFO_);
        return;
     }
@@ -691,8 +691,8 @@ void IsisMain() {
   //define an output cube
   outputC.setDimensions(int(maxS),int(maxL),1);
   outputC.setPixelType(panC[0]->getPixelType());  //set pixel type
-  tempIString = ui.GetFileName("TO");
-  outputC.create(tempIString);
+  tempString = ui.GetFileName("TO");
+  outputC.create(tempString);
   outputC.close();  //closing the output cube so that it can be opened by the mosaic process
   ProcessMosaic mosaic;
   mosaic.SetOutputCube("TO");
@@ -745,7 +745,7 @@ void IsisMain() {
     //clear input cube
     mosaic.ClearInputCubes();
 
-    remove(tempFile.expanded().c_str());  //delete temporary cube if it exists
+    QFile::remove(tempFile.expanded());  //delete temporary cube if it exists
   }
   mosaic.EndProcess();
 }

@@ -15,15 +15,16 @@
 #include "PvlFormatPds.h"
 
 #include <sstream>
-#include <string>
+
+#include <QString>
 
 using namespace std;
 using namespace Isis;
 
-void UpdateLabels(Cube *cube, const string &labels);
+void UpdateLabels(Cube *cube, const QString &labels);
 void TranslateIsis2Labels(FileName &labelFile, Cube *oCube);
-string EbcdicToAscii(unsigned char *header);
-string DaysToDate(int days);
+QString EbcdicToAscii(unsigned char *header);
+QString DaysToDate(int days);
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
@@ -55,7 +56,7 @@ void IsisMain() {
 
     p.StartProcess();
     unsigned char *header = (unsigned char *) p.FileHeader();
-    string labels = EbcdicToAscii(header);
+    QString labels = EbcdicToAscii(header);
     UpdateLabels(oCube, labels);
     p.EndProcess();
   }
@@ -80,62 +81,62 @@ void IsisMain() {
 
 // Converts labels into standard pvl format and adds necessary
 // information not included in original labels
-void UpdateLabels(Cube *cube, const string &labels) {
+void UpdateLabels(Cube *cube, const QString &labels) {
   // First, we parse out as much valid information as possible from the
   // original labels
-  string key;
+  QString key;
   int keyPosition;
   int consumeChars;
 
   // Image number
   key = "FDS=";
-  keyPosition = labels.find(key);
-  consumeChars = labels.find("IM-1") - keyPosition - key.length();
-  IString fds(labels.substr(keyPosition + key.length(), consumeChars));
-  fds.Trim(" ");
+  keyPosition = labels.indexOf(key);
+  consumeChars = labels.indexOf("IM-1") - keyPosition - key.length();
+  QString fds(labels.mid(keyPosition + key.length(), consumeChars));
+  fds = fds.trimmed();
 
   // Year the image was taken
   key = "YR=";
-  keyPosition = labels.find(key);
-  consumeChars = labels.find("DAY") - keyPosition - key.length();
-  IString yr(labels.substr(keyPosition + key.length(), consumeChars));
-  yr.Trim(" ");
+  keyPosition = labels.indexOf(key);
+  consumeChars = labels.indexOf("DAY") - keyPosition - key.length();
+  QString yr(labels.mid(keyPosition + key.length(), consumeChars));
+  yr = yr.trimmed();
 
   // Day the image was taken
   key = "DAY=";
-  keyPosition = labels.find(key);
-  consumeChars = labels.find("GMT") - keyPosition - key.length();
-  IString day(labels.substr(keyPosition + key.length(), consumeChars));
-  day.Trim(" ");
+  keyPosition = labels.indexOf(key);
+  consumeChars = labels.indexOf("GMT") - keyPosition - key.length();
+  QString day(labels.mid(keyPosition + key.length(), consumeChars));
+  day = day.trimmed();
 
   // Greenwich Mean Time
   key = "GMT=";
-  keyPosition = labels.find(key);
-  consumeChars = labels.find("CCAMERA") - keyPosition - key.length();
-  IString gmt(labels.substr(keyPosition + key.length(), consumeChars));
-  gmt.Trim(" ");
+  keyPosition = labels.indexOf(key);
+  consumeChars = labels.indexOf("CCAMERA") - keyPosition - key.length();
+  QString gmt(labels.mid(keyPosition + key.length(), consumeChars));
+  gmt = gmt.trimmed();
 
   // Which of the two cameras took the image
   key = "CCAMERA=";
-  keyPosition = labels.find(key);
-  consumeChars = labels.find("FILTER") - keyPosition - key.length();
-  IString ccamera(labels.substr(keyPosition + key.length(), consumeChars));
-  ccamera.Trim(" ");
+  keyPosition = labels.indexOf(key);
+  consumeChars = labels.indexOf("FILTER") - keyPosition - key.length();
+  QString ccamera(labels.mid(keyPosition + key.length(), consumeChars));
+  ccamera = ccamera.trimmed();
 
   // Filter number
   key = "FILTER=";
-  keyPosition = labels.find(key);
-  consumeChars = labels.find("(") - keyPosition - key.length();
-  IString filterNum(labels.substr(keyPosition + key.length(), consumeChars));
-  filterNum.Trim(" ");
+  keyPosition = labels.indexOf(key);
+  consumeChars = labels.indexOf("(") - keyPosition - key.length();
+  QString filterNum(labels.mid(keyPosition + key.length(), consumeChars));
+  filterNum = filterNum.trimmed();
 
   // Filter name
-  consumeChars = labels.find(")") - keyPosition - key.length() - consumeChars;
-  IString filterName(labels.substr(labels.find("(") + 1, consumeChars));
-  filterName.Trim(" ");
+  consumeChars = labels.indexOf(")") - keyPosition - key.length() - consumeChars;
+  QString filterName(labels.mid(labels.indexOf("(") + 1, consumeChars));
+  filterName = filterName.trimmed();
 
   // Center wavelength
-  int fnum = filterNum.ToInteger();
+  int fnum = toInt(filterNum);
   double filterCenter = 0.;
   switch(fnum) {
     case 0:
@@ -162,10 +163,10 @@ void UpdateLabels(Cube *cube, const string &labels) {
 
   // Exposure duration
   key = "EXPOSURE=";
-  keyPosition = labels.find(key);
-  consumeChars = labels.find("MSEC") - keyPosition - key.length();
-  IString exposure(labels.substr(keyPosition + key.length(), consumeChars));
-  exposure.Trim(" ");
+  keyPosition = labels.indexOf(key);
+  consumeChars = labels.indexOf("MSEC") - keyPosition - key.length();
+  QString exposure(labels.mid(keyPosition + key.length(), consumeChars));
+  exposure = exposure.trimmed();
 
   // Create the instrument group
   PvlGroup inst("Instrument");
@@ -173,35 +174,35 @@ void UpdateLabels(Cube *cube, const string &labels) {
   inst += PvlKeyword("InstrumentId", "M10_VIDICON_" + ccamera);
 
   // Get the date
-  int days = day.ToInteger();
-  IString date = DaysToDate(days);
+  int days = toInt(day);
+  QString date = DaysToDate(days);
 
   // Get the time
-  IString time = gmt;
-  time = time.Replace("/", ":");
+  QString time = gmt;
+  time = time.replace("/", ":");
 
   // Construct the Start Time in yyyy-mm-ddThh:mm:ss format
-  string fullTime = date + "T" + time + ".000";
+  QString fullTime = date + "T" + time + ".000";
   iTime startTime(fullTime);
 
   // Create the archive group
   PvlGroup archive("Archive");
 
-  int year = yr.ToInteger();
+  int year = toInt(yr);
   year += 1900;
-  string fullGMT = IString(year) + ":" + day + ":" + time;
+  QString fullGMT = toString(year) + ":" + day + ":" + time;
   archive += PvlKeyword("GMT", fullGMT);
   archive += PvlKeyword("ImageNumber", fds);
 
   // Create the band bin group
   PvlGroup bandBin("BandBin");
-  IString filter = filterName;
-  filter = filter.Replace(")", "");
+  QString filter = filterName;
+  filter = filter.replace(")", "");
   bandBin += PvlKeyword("FilterName", filter);
-  IString number = filterNum;
+  QString number = filterNum;
   bandBin += PvlKeyword("FilterNumber", number);
   bandBin += PvlKeyword("OriginalBand", "1");
-  IString center = filterCenter;
+  QString center = toString(filterCenter);
   bandBin += PvlKeyword("Center", center);
   bandBin.FindKeyword("Center").SetUnits("micrometers");
 
@@ -210,7 +211,7 @@ void UpdateLabels(Cube *cube, const string &labels) {
   // under fast facts. Mariner encountered the Moon, Venus, and Mercury three times.
   // Date used for all is two days before date of first encounter on website. Information
   // is important for nominal reseaus used and for Keyword encounter
-  string target = "";
+  QString target = "";
   if(startTime < iTime("1974-2-3T12:00:00")) {
     target = "$mariner10/reseaus/mar10MoonNominal.pvl";
     inst += PvlKeyword("TargetName", "Moon");
@@ -243,7 +244,7 @@ void UpdateLabels(Cube *cube, const string &labels) {
   inst += PvlKeyword("StartTime", fullTime);
   inst += PvlKeyword("ExposureDuration", exposure, "milliseconds");
 
-  // Open nominal positions pvl named by string encounter
+  // Open nominal positions pvl named by QString encounter
   Pvl nomRx(target);
 
   // Allocate all keywords within reseaus groups well as the group its self
@@ -255,7 +256,7 @@ void UpdateLabels(Cube *cube, const string &labels) {
   PvlKeyword templ("Template");
   PvlKeyword status("Status");
 
-  // All cubes will stay this way until findrx is run on them
+  // All cubes will stay this way until indexOfrx is run on them
   status = "Nominal";
 
   // Kernels group
@@ -263,8 +264,8 @@ void UpdateLabels(Cube *cube, const string &labels) {
   PvlKeyword naif("NaifFrameCode");
 
   // Camera dependent information
-  string camera = "";
-  if(IString("M10_VIDICON_A") == inst["InstrumentId"][0]) {
+  QString camera = "";
+  if(QString("M10_VIDICON_A") == inst["InstrumentId"][0]) {
     templ = "$mariner10/reseaus/mar10a.template.cub";
     naif += "-76110";
     camera = "M10_VIDICON_A_RESEAUS";
@@ -293,7 +294,7 @@ void UpdateLabels(Cube *cube, const string &labels) {
     i++;
     type += resnom[i];
     i++;
-    valid += 0;
+    valid += "0";
   }
 
   // Add all the PvlKeywords to the PvlGroup Reseaus
@@ -326,7 +327,7 @@ void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
 
   // Transfer the instrument group to the output cube
-  IString transDir = (string) dataDir["Mariner10"] + "/translations/";
+  QString transDir = (QString) dataDir["Mariner10"] + "/translations/";
   Pvl inputLabel(labelFile.expanded());
   FileName transFile;
 
@@ -344,17 +345,17 @@ void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
   instrumentId.SetValue("M10_VIDICON_" + instrumentId[0]);
 
   PvlKeyword &targetName = inst.FindKeyword("TargetName");
-  IString targetTail(targetName[0].substr(1));
-  targetTail = targetTail.DownCase();
+  QString targetTail(targetName[0].mid(1));
+  targetTail = targetTail.toLower();
   targetName.SetValue(targetName[0].at(0) + targetTail);
 
   PvlKeyword &startTime = inst.FindKeyword("StartTime");
-  startTime.SetValue(startTime[0].substr(0, startTime[0].size() - 1));
+  startTime.SetValue(startTime[0].mid(0, startTime[0].size() - 1));
 
   PvlGroup &archive = outputLabel->FindGroup("Archive", Pvl::Traverse);
   PvlKeyword &imgNo = archive.FindKeyword("ImageNumber");
-  IString ino = imgNo[0];
-  ino.Trim(" ");
+  QString ino = imgNo[0];
+  ino = ino.trimmed();
   imgNo.SetValue(ino);
 
   iTime time(startTime[0]);
@@ -377,7 +378,7 @@ void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
   inst.FindKeyword("ExposureDuration").SetUnits("milliseconds");
 
   PvlGroup &bBin = outputLabel->FindGroup("BandBin", Pvl::Traverse);
-  std::string filter = inputLabel.FindObject("QUBE")["FILTER_NAME"];
+  QString filter = inputLabel.FindObject("QUBE")["FILTER_NAME"];
   if(filter != "F") {
     //Band Bin group
     bBin.FindKeyword("Center").SetUnits("micrometers");
@@ -390,12 +391,12 @@ void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
   PvlKeyword &valid = reseaus.FindKeyword("Valid");
 
   for(int i = 0; i < valid.Size(); i++) {
-    valid[i] = valid[i].substr(0, 1);
+    valid[i] = valid[i].mid(0, 1);
   }
 
   // Camera dependent information
-  string camera = "";
-  if(IString("M10_VIDICON_A") == inst["InstrumentId"][0]) {
+  QString camera = "";
+  if(QString("M10_VIDICON_A") == inst["InstrumentId"][0]) {
     templ = "$mariner10/reseaus/mar10a.template.cub";
     kernels.FindKeyword("NaifFrameCode").SetValue("-76110");
     camera = "M10_VIDICON_A_RESEAUS";
@@ -411,7 +412,7 @@ void TranslateIsis2Labels(FileName &labelFile, Cube *oCube) {
 // a conversion table is necessary then to get the characters over to ascii. For
 // more info: http://en.wikipedia.org/wiki/Extended_Binary_Coded_Decimal_Interchange_Code
 //! Converts ebsidic Mariner10 labels to ascii
-string EbcdicToAscii(unsigned char *header) {
+QString EbcdicToAscii(unsigned char *header) {
   // Table to convert ebcdic to ascii
   unsigned char xlate[] = {
     0x00, 0x01, 0x02, 0x03, 0x9C, 0x09, 0x86, 0x7F, 0x97, 0x8D, 0x8E, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
@@ -437,16 +438,16 @@ string EbcdicToAscii(unsigned char *header) {
     header[i] = xlate[header[i]];
   }
 
-  // Put in a end of string mark and return
+  // Put in a end of QString mark and return
   header[215] = 0;
-  return string((const char *)header);
+  return QString((const char *)header);
 }
 
 // Mariner 10 labels provide the number of days since the beginning of the year
 // 1974 in the GMT keyword, but not always a start time.  In order to derive an
 // estimated start time, with an actual date attached, a conversion must be
 // performed.
-string DaysToDate(int days) {
+QString DaysToDate(int days) {
   int currentMonth = 12;
   int currentDay = 31;
   int currentYear = 1973;
@@ -477,8 +478,8 @@ string DaysToDate(int days) {
     }
     days--;
   }
-  IString year = currentYear;
-  IString month = (currentMonth < 10) ? "0" + IString(currentMonth) : IString(currentMonth);
-  IString day = (currentDay < 10) ? "0" + IString(currentDay) : IString(currentDay);
+  QString year = toString(currentYear);
+  QString month = (currentMonth < 10) ? "0" + toString(currentMonth) : toString(currentMonth);
+  QString day = (currentDay < 10) ? "0" + toString(currentDay) : toString(currentDay);
   return year + "-" + month + "-" + day;
 }

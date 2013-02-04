@@ -164,11 +164,11 @@ namespace Isis {
    *
    * @return XXX meters (or empty string if not valid).
    */
-  IString Distance::toString() const {
-    IString string;
+  QString Distance::toString() const {
+    QString string;
 
     if (isValid())
-      string = IString(meters()) + " meters";
+      string = Isis::toString(meters()) + " meters";
 
     return string;
   }

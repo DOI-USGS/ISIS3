@@ -21,6 +21,9 @@
  */
 
 #include <iostream>
+
+#include <QDebug>
+
 #include "Stretch.h"
 #include "Histogram.h"
 #include "IString.h"
@@ -154,25 +157,27 @@ namespace Isis {
   * @return std::pair of doubles where first is the first input and
   *         second is the first output
   */
-  std::pair<double, double> Stretch::NextPair(Isis::IString &pairs) {
+  std::pair<double, double> Stretch::NextPair(QString &pairs) {
     std::pair<double, double> io;
+    io.first = Null;
+    io.second = Null;
 
-    // do input side
-    Isis::IString temp = pairs.Token(":");
-    temp.Trim(" \t\r\n\v\f");
-    io.first = temp.ToDouble();
+    pairs = pairs.simplified().trimmed();
 
-    // do output side but first check for empty string
-    if(pairs.length() == 0) {
-      throw IException(IException::User, "Invalid stretch pairs [" +
-                       pairs + "]", _FILEINFO_);
+    if (pairs.contains(":")) {
+      QStringList pairList = pairs.split(" ");
+
+      QString firstPair = pairList.takeFirst();
+
+      QStringList firstPairValues = firstPair.split(":");
+
+      if (firstPairValues.count() == 2) {
+        io.first = toDouble(firstPairValues.first());
+        io.second = toDouble(firstPairValues.last());
+
+        pairs = pairList.join(" ");
+      }
     }
-    pairs.TrimHead(" \t\r\n\v\f");
-    temp = pairs.Token(" \t\r\n\v\f");
-    io.second = temp.ToDouble();
-
-    // trim so p will return empty if it should
-    pairs.TrimHead(" \t\r\n\v\f");
 
     return io;
   }
@@ -188,23 +193,25 @@ namespace Isis {
    *
    * @throws Isis::IException::User - invalid stretch pair
    */
-  void Stretch::Parse(const std::string &pairs) {
+  void Stretch::Parse(const QString &pairs) {
     // Zero out the stretch arrays
     p_input.clear();
     p_output.clear();
     p_pairs = 0;
 
-    Isis::IString p(pairs);
     std::pair<double, double> pear;
 
-    p.TrimHead(" \t\r\n\v\f");
+    QString p = pairs.simplified().trimmed();
+    p.replace(QRegExp("[\\s]*:"), ":");
+    p.replace(QRegExp(":[\\s]*"), ":");
+    QStringList pairList = p.split(" ", QString::SkipEmptyParts);
+
     try {
-      while(p.size() > 0) {
-        pear = Stretch::NextPair(p);
+      foreach(QString singlePair, pairList) {
+        pear = Stretch::NextPair(singlePair);
         Stretch::AddPair(pear.first, pear.second);
       }
     }
-
     catch(IException &e) {
       throw IException(e, IException::User, "Invalid stretch pairs [" + pairs + "]", _FILEINFO_);
     }
@@ -223,20 +230,19 @@ namespace Isis {
    *
    * @throws Isis::IException::User - invalid stretch pair
    */
-  void Stretch::Parse(const std::string &pairs, const Isis::Histogram *hist) {
+  void Stretch::Parse(const QString &pairs, const Isis::Histogram *hist) {
     // Zero out the stretch arrays
     p_input.clear();
     p_output.clear();
     p_pairs = 0;
 
-    Isis::IString p(pairs);
+    QString p(pairs);
     std::pair<double, double> pear;
 
     // need to save the input dn values in order to
     // to detect collisions
     std::vector<double> converted;
 
-    p.TrimHead(" \t\r\n\v\f");
     try {
       while(p.size() > 0) {
         pear = Stretch::NextPair(p);
@@ -274,15 +280,15 @@ namespace Isis {
    *
    * @return string The stretch pair as a string
    */
-  string Stretch::Text() const {
+  QString Stretch::Text() const {
 
     if(p_pairs < 0) return "";
 
-    Isis::IString p("");
+    QString p("");
     for(int i = 0; i < p_pairs; i++) {
-      p += Isis::IString(p_input[i]) + ":" + Isis::IString(p_output[i]) + " ";
+      p += toString(p_input[i]) + ":" + toString(p_output[i]) + " ";
     }
-    return p.TrimTail(" ");
+    return p.trimmed();
   }
 
   /**
@@ -329,7 +335,7 @@ namespace Isis {
    * @param grpName - The group name to get the input and output
    *                keywords from
    */
-  void Stretch::Load(std::string &file, std::string &grpName) {
+  void Stretch::Load(QString &file, QString &grpName) {
     Pvl pvl(file);
     Load(pvl, grpName);
   }
@@ -348,17 +354,17 @@ namespace Isis {
    * @param grpName - The group name to get the input and output
    *                keywords from
    */
-  void Stretch::Load(Isis::Pvl &pvl, std::string &grpName) {
+  void Stretch::Load(Isis::Pvl &pvl, QString &grpName) {
     PvlGroup grp = pvl.FindGroup(grpName, Isis::PvlObject::Traverse);
     PvlKeyword inputs = grp.FindKeyword("Input");
     PvlKeyword outputs = grp.FindKeyword("Output");
 
     if(inputs.Size() != outputs.Size()) {
-      std::string msg = "Invalid Pvl file: The number of Input values must equal the number of Output values";
+      QString msg = "Invalid Pvl file: The number of Input values must equal the number of Output values";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     for(int i = 0; i < inputs.Size(); i++) {
-      AddPair(inputs[i], outputs[i]);
+      AddPair(toDouble(inputs[i]), toDouble(outputs[i]));
     }
   }
 
@@ -373,19 +379,19 @@ namespace Isis {
    *                stretch pairs into.  The group will contain
    *                two keywords, Input, and Output.
    */
-  void Stretch::Save(std::string &file, std::string &grpName) {
+  void Stretch::Save(QString &file, QString &grpName) {
     Pvl p;
     Save(p, grpName);
     p.Write(file);
   }
 
-  void Stretch::Save(Isis::Pvl &pvl, std::string &grpName) {
+  void Stretch::Save(Isis::Pvl &pvl, QString &grpName) {
     PvlGroup *grp = new PvlGroup(grpName);
     PvlKeyword inputs("Input");
     PvlKeyword outputs("Output");
     for(int i = 0; i < Pairs(); i++) {
-      inputs.AddValue(Input(i));
-      outputs.AddValue(Output(i));
+      inputs.AddValue(toString(Input(i)));
+      outputs.AddValue(toString(Output(i)));
     }
     grp->AddKeyword(inputs);
     grp->AddKeyword(outputs);

@@ -25,7 +25,6 @@
 #include <sstream>
 #include <iostream>
 
-using std::string;
 using std::ostringstream;
 
 #include "DbAccess.h"
@@ -58,8 +57,8 @@ namespace Isis {
    *                       specifications for a database
    * @param defProfileName Optional name of the default access profile
    */
-  DbAccess::DbAccess(const std::string &dbaccFile,
-                     const std::string &defProfileName) : DbProfile("Database"),
+  DbAccess::DbAccess(const QString &dbaccFile,
+                     const QString &defProfileName) : DbProfile("Database"),
     _defProfileName(defProfileName), _profiles() {
     load(dbaccFile);
   }
@@ -74,7 +73,7 @@ namespace Isis {
    * @param  pvl A Database PvlObject containing access information
    * @param  defProfileName Optional name of the default profile
    */
-  DbAccess::DbAccess(PvlObject &pvl, const std::string &defProfileName) :
+  DbAccess::DbAccess(PvlObject &pvl, const QString &defProfileName) :
     DbProfile("Database"), _defProfileName(defProfileName),
     _profiles() {
     load(pvl);
@@ -104,9 +103,9 @@ namespace Isis {
    *         validatity of the profile returned as this is the only indication of
    *         success.
    */
-  const DbProfile DbAccess::getProfile(const std::string &name) const {
-    string defName(name);
-    if(defName.empty()) {
+  const DbProfile DbAccess::getProfile(const QString &name) const {
+    QString defName(name);
+    if(defName.isEmpty()) {
       defName = getDefaultProfileName();
     }
     else {
@@ -154,7 +153,7 @@ namespace Isis {
    *
    * @param filename Name of Pvl file to open.
    */
-  void DbAccess::load(const std::string &filename) {
+  void DbAccess::load(const QString &filename) {
     Pvl pvl(filename);
     PvlObject db = pvl.FindObject("Database");
     load(db);
@@ -198,17 +197,17 @@ namespace Isis {
    * default specified in the configuration Database object, the \b DefaultProfile
    * keyword, or provided by the application progirammer in the constructor.
    *
-   * @return std::string  Name of default profile it it can be determined
+   * @return QString  Name of default profile it it can be determined
    *                      otherwise an empty string is returned.
    */
-  std::string DbAccess::getDefaultProfileName() const {
-    if(!_defProfileName.empty()) {
+  QString DbAccess::getDefaultProfileName() const {
+    if(!_defProfileName.isEmpty()) {
       return (_defProfileName);
     }
     else if(exists("DefaultProfile")) {
       return (value("DefaultProfile"));
     }
-    return (string(""));
+    return ("");
   }
 
 

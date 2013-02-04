@@ -57,7 +57,7 @@ namespace Isis {
    *   @history 2010-04-15 Eric Hyer - Now updates parent's invalidInput
    *                                   variable
    *   @history 2010-04-20 Christopher Austin - adapted for generic/unitless
-   * 	                                        seeding
+   *                                            seeding
    */
   class LimitPolygonSeeder : public PolygonSeeder {
     public:
@@ -68,7 +68,7 @@ namespace Isis {
 
       std::vector<geos::geom::Point *> Seed(const geos::geom::MultiPolygon *mp);
 
-      virtual PvlGroup PluginParameters(std::string grpName);
+      virtual PvlGroup PluginParameters(QString grpName);
 
     protected:
       virtual void Parse(Pvl &pvl);

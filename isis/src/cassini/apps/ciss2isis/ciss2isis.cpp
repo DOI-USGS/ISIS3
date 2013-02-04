@@ -2,7 +2,7 @@
 
 #include "Isis.h"
 
-#include <string>
+#include <QString>
 #include <vector>
 
 #include <QString>
@@ -34,8 +34,8 @@ void CreateStretchPairs();
 void FixDns(Buffer &buf);
 void TranslateCassIssLabels(FileName &labelFile, Cube *ocube);
 //Global variables
-string compressionType;
-string dataConversionType;
+QString compressionType;
+QString dataConversionType;
 double flightSoftware;
 Stretch stretch;
 int sumMode;
@@ -59,7 +59,7 @@ void IsisMain() {
 
   //Checks if in file is rdr
   if(label.HasObject("IMAGE_MAP_PROJECTION")) {
-    string msg = "[" + in.name() + "] appears to be an rdr file.";
+    QString msg = "[" + in.name() + "] appears to be an rdr file.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -101,7 +101,7 @@ void IsisMain() {
     //Adjust Table-encoded values from 8 bit back to 12 bit.
     PvlGroup &inst = outputLabel->FindGroup("Instrument", Pvl::Traverse);
     double biasStripMean = inst.FindKeyword("BiasStripMean");
-    inst.FindKeyword("BiasStripMean").SetValue(stretch.Map(biasStripMean));
+    inst.FindKeyword("BiasStripMean").SetValue(toString(stretch.Map(biasStripMean)));
     inst.FindKeyword("BiasStripMean").AddComment("BiasStripMean value converted back to 12 bit.");
     p.Progress()->SetText("Image was converted using 12-to-8 bit table. \nConverting prefix pixels back to 12 bit and saving line prefix data...");
   }
@@ -119,12 +119,12 @@ void IsisMain() {
   int roo = *(header + 50 + vicarLabelBytes) / 32 % 2; //**** THIS MAY NEED TO BE CHANGED,
   // SEE BOTTOM OF THIS FILE FOR IN DEPTH COMMENTS ON READOUTORDER
   PvlGroup &inst = ocube->getLabel()->FindGroup("Instrument", Pvl::Traverse);
-  inst.AddKeyword(PvlKeyword("ReadoutOrder", roo));
+  inst.AddKeyword(PvlKeyword("ReadoutOrder", toString(roo)));
   p.EndProcess();
 
   // PROCESS 2 : Do 8 bit to 12 bit conversion for image ==============================================//
   ProcessByLine p2;
-  string ioFile = ui.GetFileName("TO");
+  QString ioFile = ui.GetFileName("TO");
   CubeAttributeInput att;
   p2.SetInputCube(ioFile, att, ReadWrite);
   //if ConversionType == 12Bit or 8LSB, only save off overclocked pixels
@@ -209,20 +209,19 @@ vector<double> ConvertLinePrefixPixels(unsigned char *data) {
 void CreateStretchPairs() {
   // Set up the strech for the 8 to 12 bit conversion from file
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
-  IString missionDir = (string) dataDir["Cassini"];
+  QString missionDir = (QString) dataDir["Cassini"];
   FileName *lutFile = new FileName(missionDir + "/calibration/lut/lut.tab");
   CisscalFile *stretchPairs = new CisscalFile(lutFile->expanded());
   // Create the stretch pairs
-  double temp1 = 0, temp2 = 0;
+  double temp1 = 0;
   stretch.ClearPairs();
   for(int i = 0; i < stretchPairs->LineCount(); i++) {
-    IString line;
+    QString line;
     stretchPairs->GetLine(line);  //assigns value to line
-    line = line.TrimTail(", \t\n\r");
-    while(line.size() > 0) {
-      line = line.TrimHead(", \t");
-      temp2 = line.Token(", \t\n\r").ToDouble();
-      stretch.AddPair(temp1, temp2);
+    line = line.simplified();
+
+    foreach (QString value, line.split(QRegExp("[\\s,]"), QString::SkipEmptyParts)) {
+      stretch.AddPair(temp1, toDouble(value));
       temp1++;
     }
   }
@@ -271,7 +270,7 @@ void FixDns(Buffer &buf) {
 void TranslateCassIssLabels(FileName &labelFile, Cube *ocube) {
   // Get the directory where the CISS translation tables are.
   PvlGroup &dataDir = Preference::Preferences().FindGroup("DataDirectory");
-  IString missionDir = (string) dataDir["Cassini"];
+  QString missionDir = (QString) dataDir["Cassini"];
   FileName transFile(missionDir + "/translations/cassiniIss.trn");
 
   // Get the translation manager ready
@@ -284,29 +283,29 @@ void TranslateCassIssLabels(FileName &labelFile, Cube *ocube) {
 
   //Add needed keywords that are not in translation table to cube's instrument group
   PvlGroup &inst = outputLabel->FindGroup("Instrument", Pvl::Traverse);
-  string scc = inputLabel.FindKeyword("SPACECRAFT_CLOCK_CNT_PARTITION");
-  scc += "/" + (string) inputLabel.FindKeyword("SPACECRAFT_CLOCK_START_COUNT");
+  QString scc = inputLabel.FindKeyword("SPACECRAFT_CLOCK_CNT_PARTITION");
+  scc += "/" + (QString) inputLabel.FindKeyword("SPACECRAFT_CLOCK_START_COUNT");
   inst.AddKeyword(PvlKeyword("SpacecraftClockCount", scc));
 
   //Add units of measurement to keywords from translation table
   double exposureDuration = inst.FindKeyword("ExposureDuration");
-  inst.FindKeyword("ExposureDuration").SetValue(exposureDuration, "Milliseconds");
+  inst.FindKeyword("ExposureDuration").SetValue(toString(exposureDuration), "Milliseconds");
 
   int gainModeId = inst.FindKeyword("GainModeId");
-  inst.FindKeyword("GainModeId").SetValue(gainModeId, "ElectronsPerDN");
+  inst.FindKeyword("GainModeId").SetValue(toString(gainModeId), "ElectronsPerDN");
 
   PvlKeyword opticsTemp = inst.FindKeyword("OpticsTemperature");
   inst.FindKeyword("OpticsTemperature").SetValue(opticsTemp[0]);
   inst.FindKeyword("OpticsTemperature").AddValue(opticsTemp[1], "DegreesCelcius");
 
   double instDataRate = inst.FindKeyword("InstrumentDataRate");
-  inst.FindKeyword("InstrumentDataRate").SetValue(instDataRate, "KilobitsPerSecond");
+  inst.FindKeyword("InstrumentDataRate").SetValue(toString(instDataRate), "KilobitsPerSecond");
 
   //  initialize global variables
-  dataConversionType = (string) inst.FindKeyword("DataConversionType");
+  dataConversionType = (QString) inst.FindKeyword("DataConversionType");
   sumMode = inst.FindKeyword("SummingMode");
-  compressionType = (string) inst.FindKeyword("CompressionType");
-  IString fsw((string) inst.FindKeyword("FlightSoftwareVersionId"));
+  compressionType = (QString) inst.FindKeyword("CompressionType");
+  IString fsw((QString) inst.FindKeyword("FlightSoftwareVersionId"));
   if(fsw == "Unknown") {
     flightSoftware = 0.0;
   }
@@ -315,25 +314,25 @@ void TranslateCassIssLabels(FileName &labelFile, Cube *ocube) {
   }
 
   // Remove the trailing 'Z' in some pds labels
-  IString sUpdateTime = inst.FindKeyword("StartTime")[0];
-  sUpdateTime.Trim("Zz");
+  QString sUpdateTime = inst.FindKeyword("StartTime")[0];
+  sUpdateTime.remove(QRegExp("[Zz]"));
   inst.FindKeyword("StartTime").SetValue(sUpdateTime);
 
   sUpdateTime = inst.FindKeyword("StopTime")[0];
-  sUpdateTime.Trim("Zz");
+  sUpdateTime.remove(QRegExp("[Zz]"));
   inst.FindKeyword("StopTime").SetValue(sUpdateTime);
 
   sUpdateTime = inst.FindKeyword("ImageTime")[0];
-  sUpdateTime.Trim("Zz");
+  sUpdateTime.remove(QRegExp("[Zz]"));
   inst.FindKeyword("ImageTime").SetValue(sUpdateTime);
 
 
   // create BandBin group
-  IString filter = inputLabel.FindKeyword("FilterName")[0] + "/" +
+  QString filter = inputLabel.FindKeyword("FilterName")[0] + "/" +
                    inputLabel.FindKeyword("FilterName")[1];
 
-  string instrumentID = inst.FindKeyword("InstrumentId");
-  string cameraAngleDefs;
+  QString instrumentID = inst.FindKeyword("InstrumentId");
+  QString cameraAngleDefs;
   if(instrumentID.at(3) == 'N') {
     cameraAngleDefs = missionDir + "/translations/narrowAngle.def";
   }
@@ -348,25 +347,24 @@ void TranslateCassIssLabels(FileName &labelFile, Cube *ocube) {
   int numLines = cameraAngle.LineCount();
   bool foundfilter = false;
   for(int i = 0; i < numLines; i++) {
-    IString line;
+    QString line;
     cameraAngle.GetLine(line, true);
-    IString token = line.Token(" ");
-    if(token == filter) {
-      line = line.Trim(" ");
-      center = line.Token(" ");
-      line = line.Trim(" ");
-      width = line.Token(" ");
+
+    QStringList tokens = line.simplified().split(" ");
+    if(tokens.count() > 2 && tokens.first() == filter) {
+      center = toDouble(tokens[1]);
+      width = toDouble(tokens[2]);
       foundfilter = true;
       break;
     }
   }
   PvlGroup bandBin("BandBin");
   bandBin += PvlKeyword("FilterName", filter);
-  bandBin += PvlKeyword("OriginalBand", 1);
+  bandBin += PvlKeyword("OriginalBand", "1");
 
   if(foundfilter) {
-    bandBin += PvlKeyword("Center", center);
-    bandBin += PvlKeyword("Width", width);
+    bandBin += PvlKeyword("Center", toString(center));
+    bandBin += PvlKeyword("Width", toString(width));
   }
   else {
     PvlGroup msgGrp("Warnings");
@@ -380,13 +378,13 @@ void TranslateCassIssLabels(FileName &labelFile, Cube *ocube) {
   PvlGroup kerns("Kernels");
 
   if(instrumentID == "ISSNA") {
-    kerns += PvlKeyword("NaifFrameCode", -82360);
+    kerns += PvlKeyword("NaifFrameCode", "-82360");
   }
   else if(instrumentID == "ISSWA") {
-    kerns += PvlKeyword("NaifFrameCode", -82361);
+    kerns += PvlKeyword("NaifFrameCode", "-82361");
   }
   else {
-    string msg = "CISS2ISIS only imports Cassini ISS narrow ";
+    QString msg = "CISS2ISIS only imports Cassini ISS narrow ";
     msg += "angle or wide angle images";
     throw IException(IException::User, msg, _FILEINFO_);
   }

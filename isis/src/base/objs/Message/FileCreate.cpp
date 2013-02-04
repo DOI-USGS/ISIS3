@@ -25,8 +25,6 @@ using namespace std;
 
 #include "Message.h"
 
-string Isis::Message::FileCreate(const string &filename) {
-  string message;
-  message = "Unable to create [" + filename + "]";
-  return message;
+QString Isis::Message::FileCreate(const QString &filename) {
+  return "Unable to create [" + filename + "]";
 }

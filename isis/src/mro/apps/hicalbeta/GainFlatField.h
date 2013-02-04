@@ -1,4 +1,4 @@
-#if !defined(GainFlatField_h)
+#ifndef GainFlatField_h
 #define GainFlatField_h
 /**                                                                       
  * @file                                                                  

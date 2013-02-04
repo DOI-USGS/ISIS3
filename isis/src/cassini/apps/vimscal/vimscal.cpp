@@ -3,6 +3,8 @@
 #include <vector>
 #include <stdio.h>
 
+#include <QFile>
+
 #include "Camera.h"
 #include "EndianSwapper.h"
 #include "IException.h"
@@ -29,7 +31,7 @@ map< pair<int, int>, double > lineBasedDarkCorrections;
 vector<double> specificEnergyCorrections;
 
 //! list of temp files that need deleted
-vector<string> tempFiles;
+vector<QString> tempFiles;
 
 //! solar remove coefficient
 double solarRemoveCoefficient;
@@ -48,7 +50,7 @@ void calculateSolarRemove(Cube *, ProcessByLine *);
 
 void calibrate(vector<Buffer *> &in, vector<Buffer *> &out);
 
-IString createCroppedFile(Cube *icube, IString cubeFileName, bool flatFile = false);
+QString createCroppedFile(Cube *icube, QString cubeFileName, bool flatFile = false);
 void GetOffsets(const Pvl &lab, int &finalSampOffset, int &finalLineOffset);
 
 // This is the results group
@@ -80,12 +82,12 @@ void IsisMain() {
   }
 
   if(!isVims) {
-    IString msg = "The input cube [" + IString(ui.GetAsString("FROM")) + "] is not a Cassini VIMS cube";
+    QString msg = "The input cube [" + QString(ui.GetAsString("FROM")) + "] is not a Cassini VIMS cube";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(icube->getLabel()->FindObject("IsisCube").HasGroup("AlphaCube")) {
-    IString msg = "The input cube [" + IString(ui.GetAsString("FROM")) + "] has had its dimensions modified and can not be calibrated";
+    QString msg = "The input cube [" + QString(ui.GetAsString("FROM")) + "] has had its dimensions modified and can not be calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -107,7 +109,7 @@ void IsisMain() {
   p.EndProcess();
 
   for(unsigned int i = 0; i < tempFiles.size(); i++) {
-    remove(tempFiles[i].c_str());
+    QFile::remove(tempFiles[i]);
   }
 
   tempFiles.clear();
@@ -187,7 +189,7 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
     cam = icube->getCamera();
   }
   catch(IException &e) {
-    IString msg = "Unable to create a camera model from [" +
+    QString msg = "Unable to create a camera model from [" +
                   icube->getFileName() + "]. Please run "
                   "spiceinit on this file";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
@@ -242,7 +244,7 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
   if(solarRemoveCoefficient < 0) {
     solarRemoveCoefficient = 81.595089;
     /*
-    string msg = "Unable to project image at four corners, center of edges or ";
+    QString msg = "Unable to project image at four corners, center of edges or ";
     msg += "at center. The solar distance can not be calculated, try using";
     msg += " [UNITS=SPECENERGY] on [";
     msg += icube->FileName() + "]";
@@ -253,7 +255,7 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
   bool vis = (icube->getLabel()->
               FindGroup("Instrument", Pvl::Traverse)["Channel"][0] != "IR");
 
-  IString attributes;
+  QString attributes;
 
   // vis is bands 1-96, ir is bands 97-352 in this calibration file
   if(vis) {
@@ -290,13 +292,13 @@ void calculateSpecificEnergy(Cube *icube) {
   }
 
   if(vis) {
-    coefficient /= (double)inst["ExposureDuration"][1] / 1000.0;
+    coefficient /= toDouble(inst["ExposureDuration"][1]) / 1000.0;
   }
   else {
-    coefficient /= ((double)inst["ExposureDuration"][0]) / 1000.0 - 0.004;
+    coefficient /= (toDouble(inst["ExposureDuration"][0])) / 1000.0 - 0.004;
   }
 
-  IString specEnergyFile = "$cassini/calibration/vims/";
+  QString specEnergyFile = "$cassini/calibration/vims/";
 
   if(vis) {
     specEnergyFile += "vis_perf_v????.cub";
@@ -305,7 +307,7 @@ void calculateSpecificEnergy(Cube *icube) {
     specEnergyFile += "ir_perf_v????.cub";
   }
 
-  IString waveCalFile = "$cassini/calibration/vims/wavecal_v????.cub";
+  QString waveCalFile = "$cassini/calibration/vims/wavecal_v????.cub";
 
   FileName specEnergyFileName(specEnergyFile);
   specEnergyFileName = specEnergyFileName.highestVersion();
@@ -381,7 +383,7 @@ void calculateVisDarkCurrent(Cube *icube) {
 
   // This is the dark current corrections for VIS
   bool hires = ((inst["SamplingMode"][0] == "HIGH") || (inst["SamplingMode"][0] == "HI-RES"));
-  IString calFile = "$cassini/calibration/vims/vis_";
+  QString calFile = "$cassini/calibration/vims/vis_";
 
   if(hires) {
     calFile += "hires";
@@ -401,9 +403,9 @@ void calculateVisDarkCurrent(Cube *icube) {
 
   EndianSwapper swapper("LSB");
 
-  FILE *calFilePtr = fopen(calFile.c_str(), "r");
+  FILE *calFilePtr = fopen(calFile.toAscii().data(), "r");
 
-  double visExposure = inst["ExposureDuration"][1];
+  double visExposure = toDouble(inst["ExposureDuration"][1]);
 
   int sampleOffset, lineOffset;
   GetOffsets(*icube->getLabel(), sampleOffset, lineOffset);
@@ -423,7 +425,7 @@ void calculateVisDarkCurrent(Cube *icube) {
 
         if(fread(&calData, sizeof(calData), 1, calFilePtr) != 1) {
           // error!
-          string msg = "Error reading file [" + calFile + "]";
+          QString msg = "Error reading file [" + calFile + "]";
           throw IException(IException::Io, msg, _FILEINFO_);
         }
 
@@ -611,7 +613,7 @@ void chooseFlatFile(Cube *icube, ProcessByLine *p) {
   bool vis = (inst["Channel"][0] != "IR");
   bool hires = ((inst["SamplingMode"][0] == "HIGH") || (inst["SamplingMode"][0] == "HI-RES"));
 
-  IString calFile = "$cassini/calibration/vims/flatfield/";
+  QString calFile = "$cassini/calibration/vims/flatfield/";
 
   if(vis) {
     calFile += "vis_";
@@ -643,9 +645,9 @@ void chooseFlatFile(Cube *icube, ProcessByLine *p) {
  * @param icube
  * @param cubeFileName
  *
- * @return IString
+ * @return QString
  */
-IString createCroppedFile(Cube *icube, IString cubeFileName, bool flatFile) {
+QString createCroppedFile(Cube *icube, QString cubeFileName, bool flatFile) {
   int sampOffset = 1;
   int lineOffset = 1;
 
@@ -654,11 +656,11 @@ IString createCroppedFile(Cube *icube, IString cubeFileName, bool flatFile) {
   }
 
 
-  IString appArgs = "from=" + cubeFileName + " ";
-  appArgs += "sample=" + IString(sampOffset) + " ";
-  appArgs += "line=" + IString(lineOffset) + " ";
-  appArgs += "nsamples=" + IString(icube->getSampleCount()) + " ";
-  appArgs += "nlines=" + IString(icube->getLineCount()) + " ";
+  QString appArgs = "from=" + cubeFileName + " ";
+  appArgs += "sample=" + toString(sampOffset) + " ";
+  appArgs += "line=" + toString(lineOffset) + " ";
+  appArgs += "nsamples=" + toString(icube->getSampleCount()) + " ";
+  appArgs += "nlines=" + toString(icube->getLineCount()) + " ";
 
   FileName tempFile("$TEMPORARY/tmp_" + FileName(cubeFileName).baseName() +
                     "_" + FileName(icube->getFileName()).name());
@@ -685,7 +687,7 @@ void GetOffsets(const Pvl &lab, int &finalSampOffset, int &finalLineOffset) {
   finalSampOffset = sampOffset;
   finalLineOffset = lineOffset;
 
-  string samplingMode = IString((string)inst ["SamplingMode"]).UpCase();
+  QString samplingMode = QString(inst["SamplingMode"]).toUpper();
   if(vis) {
     if(samplingMode == "NORMAL") {
       finalSampOffset = sampOffset - 1;
@@ -696,7 +698,7 @@ void GetOffsets(const Pvl &lab, int &finalSampOffset, int &finalLineOffset) {
       finalLineOffset = (3 * (lineOffset + swathLength / 2)) - swathLength / 2;
     }
     else {
-      string msg = "Unsupported sampling mode [" + samplingMode + "]";
+      QString msg = "Unsupported sampling mode [" + samplingMode + "]";
       throw IException(IException::Io, msg, _FILEINFO_);
     }
   }
@@ -710,11 +712,11 @@ void GetOffsets(const Pvl &lab, int &finalSampOffset, int &finalLineOffset) {
       finalLineOffset = lineOffset - 1;
     }
     else if(samplingMode == "NYQUIST") {
-      string msg = "Cannot process NYQUIST (undersampled) mode ";
+      QString msg = "Cannot process NYQUIST (undersampled) mode ";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
     else {
-      string msg = "Unsupported sampling mode [" + samplingMode + "]";
+      QString msg = "Unsupported sampling mode [" + samplingMode + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
   }

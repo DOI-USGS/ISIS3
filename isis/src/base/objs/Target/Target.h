@@ -29,9 +29,10 @@
 #include "naif/SpiceZfc.h"
 #include "naif/SpiceZmc.h"
 
+class QString;
+
 namespace Isis {
   class Distance;
-  class IString;
   class Pvl;
   class ShapeModel;
   class Spice;
@@ -55,7 +56,7 @@ namespace Isis {
       void init();
       bool isSky() const;
       SpiceInt naifBodyCode() const;
-      IString name() const;
+      QString name() const;
       std::vector<Distance> radii() const;
       void restoreShape();
       void setShapeEllipsoid();
@@ -70,7 +71,7 @@ namespace Isis {
                                     labels. Otherwise, if the target is sky,
                                     it's the SPK code and if not sky then it's
                                     calculated by the NaifBodyCode() method.*/
-      IString *m_name;   //!< Name of the target
+      QString *m_name;   //!< Name of the target
       std::vector<Distance> m_radii; //!< The radii of the target
       ShapeModel *m_originalShape; //!< The shape model of the target
       ShapeModel *m_shape; //!< The shape model of the target

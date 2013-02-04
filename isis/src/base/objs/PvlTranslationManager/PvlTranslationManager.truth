@@ -1,4 +1,4 @@
-Testing Isis::PvlTranslationManager object
+Testing PvlTranslationManager object
   Testing InputValue member
     DataFileName    = SomeFile.dat
     StartByte       = 32

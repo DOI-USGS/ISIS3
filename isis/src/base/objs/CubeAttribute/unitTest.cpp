@@ -33,7 +33,7 @@
 using namespace std;
 using namespace Isis;
 
-void reportOutput(const CubeAttributeOutput &att, IString oh);
+void reportOutput(const CubeAttributeOutput &att, QString oh);
 
 int main(int argc, char *argv[]) {
   Preference::Preferences(true);
@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
     CubeAttributeInput att("+3");
     cout << att.toString() << endl;
 
-    vector<string> bands = att.bands();
+    vector<QString> bands = att.bands();
     cout << "vector[" << bands.size() << "]:" << endl;
 
     for (unsigned int i = 0; i < bands.size(); i++)
@@ -163,7 +163,7 @@ int main(int argc, char *argv[]) {
     CubeAttributeInput att("+3,5-9,99");
     cout << att.toString() << endl;
 
-    vector<string> bands = att.bands();
+    vector<QString> bands = att.bands();
     cout << "vector[" << bands.size() << "]:" << endl;
 
     for (unsigned int i = 0; i < bands.size(); i++)
@@ -179,7 +179,7 @@ int main(int argc, char *argv[]) {
     CubeAttributeInput att("+7-10");
     cout << att.toString() << endl;
 
-    vector<string> bands = att.bands();
+    vector<QString> bands = att.bands();
     cout << "vector[" << bands.size() << "]:" << endl;
 
     for (unsigned int i = 0; i < bands.size(); i++)
@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
   try {
     CubeAttributeOutput att;
     att.setFileFormat(Cube::Bsq);
-    att.addAttributes(IString("8bit"));
+    att.addAttributes(QString("8bit"));
     att.addAttributes("msb");
     att.setByteOrder(Msb);
     att.addAttributes(FileName("+dETacHEd"));
@@ -224,7 +224,7 @@ int main(int argc, char *argv[]) {
   cout << "Testing CubeAttributeInput mutators" << endl;
   try {
     CubeAttributeInput att("+1-3,4,5,6,99-32");
-    vector<string> bandsVector(1, "+1-99");
+    vector<QString> bandsVector(1, "+1-99");
     att.setBands(bandsVector);
     cout << att.toString() << endl;
   }
@@ -261,7 +261,7 @@ int main(int argc, char *argv[]) {
 
 
 // Function to report everything about an output cube attribute
-void reportOutput(const CubeAttributeOutput &att, IString orderHint) {
+void reportOutput(const CubeAttributeOutput &att, QString orderHint) {
   cout << att.toString() << endl;
 
 //   Pvl pvl;
@@ -270,7 +270,7 @@ void reportOutput(const CubeAttributeOutput &att, IString orderHint) {
 //   cout << endl;
   cout << "Propagate Pixel Type = " << att.propagatePixelType() << endl;
   try {
-    string tmp =   PixelTypeName(att.pixelType());
+    QString tmp =   PixelTypeName(att.pixelType());
     cout << "PixelType            = " << tmp << endl;
   }
   catch(IException &e) {

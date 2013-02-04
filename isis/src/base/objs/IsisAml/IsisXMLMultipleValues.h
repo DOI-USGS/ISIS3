@@ -45,7 +45,7 @@ class IsisXMLMultipleValues : public IsisXMLHandler {
     IsisXMLMultipleValues(char *PencodingName,
                           bool &PexpandNamespaces,
                           XERCES::SAX2XMLReader* &Pparser,
-                          std::vector<std::string> *PmultipleValues);
+                          std::vector<QString> *PmultipleValues);
 
     ~IsisXMLMultipleValues();
 
@@ -69,7 +69,7 @@ class IsisXMLMultipleValues : public IsisXMLHandler {
     char *encodingName;
     bool expandNamespaces;
     XERCES::SAX2XMLReader *parser;
-    std::vector<std::string> *multipleValues;
+    std::vector<QString> *multipleValues;
 
     // Handlers this handler knows how to create
     IsisXMLHandler *generalHandler;

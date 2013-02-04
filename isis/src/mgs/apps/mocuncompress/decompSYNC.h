@@ -40,7 +40,7 @@ SCCSID @(#)decompSYNC.h  1.1 10/04/99
 */
 /* SCCShid @(#)decompSYNC.h (decompSYNC.h) 1.2 */
 
-#if !defined(decompSYNC_h)
+#ifndef decompSYNC_h
 
 #define decompSYNC_h
 

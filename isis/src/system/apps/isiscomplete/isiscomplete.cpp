@@ -6,9 +6,9 @@
 using namespace std;
 using namespace Isis;
 
-void MakeCompletion(const string &appName);
-string GetParamCompletion(int grp, int param);
-string BuildStaticCompletes(std::string paramList);
+void MakeCompletion(const QString &appName);
+QString GetParamCompletion(int grp, int param);
+QString BuildStaticCompletes(QString paramList);
 void PrintHelp();
 
 int main(int argc, char *argv[]) {
@@ -33,10 +33,12 @@ void PrintHelp() {
   cout << "Usage: isiscomplete isisappname [isisappname2 isisappname3 ...]" << endl;
 }
 
-void MakeCompletion(const string &appName) {
+void MakeCompletion(const QString &appName) {
   char *argv[2] = { 0, 0 };
   int argc = 2;
-  argv[0] = (char *)appName.c_str();
+
+  QByteArray appNameBytes = appName.toAscii();
+  argv[0] = appNameBytes.data();
   argv[1] = new char[16];
   strcpy(argv[1], "-nogui");
 
@@ -62,7 +64,7 @@ void MakeCompletion(const string &appName) {
   }
 
   if(appName.compare("isisui") == 0) {
-    string binPath = FileName("$ISISROOT/bin").expanded();
+    QString binPath = FileName("$ISISROOT/bin").expanded();
     cout << "complete isisui 'n@*@F:" << binPath << "/@'; ";
     return;
   }
@@ -72,13 +74,13 @@ void MakeCompletion(const string &appName) {
 
   Application app(argc, argv);
   UserInterface &ui = Application::GetUserInterface();
-  string paramList = "";
-  string completeCommand;
-  vector<string> paramDetails;
+  QString paramList = "";
+  QString completeCommand;
+  vector<QString> paramDetails;
 
   for(int grp = 0; grp < ui.NumGroups(); grp++) {
     for(int param = 0; param < ui.NumParams(grp); param++) {
-      paramList += " " + IString(ui.ParamName(grp, param)).DownCase();
+      paramList += " " + ui.ParamName(grp, param).toLower();
       paramDetails.push_back(GetParamCompletion(grp, param));
     }
   }
@@ -96,8 +98,8 @@ void MakeCompletion(const string &appName) {
   argv[1] = 0;
 }
 
-string BuildStaticCompletes(std::string paramList) {
-  string completion = "";
+QString BuildStaticCompletes(QString paramList) {
+  QString completion = "";
 
   // Batchlist
   completion += " 'c/-[bB][aA][tT][cC][hH][lL][iI][sS][tT]=/f/'";
@@ -132,17 +134,17 @@ string BuildStaticCompletes(std::string paramList) {
   return completion;
 }
 
-string GetParamCompletion(int grp, int param) {
-  string completion = "c/";
+QString GetParamCompletion(int grp, int param) {
+  QString completion = "c/";
   UserInterface &ui = Application::GetUserInterface();
 
 
-  string paramName = ui.ParamName(grp, param);
-  for(unsigned int curIndex = 0; curIndex < paramName.length(); curIndex++) {
-    if(isalpha(paramName[curIndex])) {
+  QString paramName = ui.ParamName(grp, param);
+  for(int curIndex = 0; curIndex < paramName.length(); curIndex++) {
+    if(paramName[curIndex].isLetter()) {
       completion += "[";
-      completion += toupper(paramName[curIndex]);
-      completion += tolower(paramName[curIndex]);
+      completion += paramName[curIndex].toUpper();
+      completion += paramName[curIndex].toLower();
       completion += "]";
     }
     else {
@@ -151,7 +153,7 @@ string GetParamCompletion(int grp, int param) {
   }
   completion += "=/";
 
-  string type = ui.ParamType(grp, param);
+  QString type = ui.ParamType(grp, param);
 
   if(type == "cube") {
     completion += "f:*.[cC][uU][bB]";

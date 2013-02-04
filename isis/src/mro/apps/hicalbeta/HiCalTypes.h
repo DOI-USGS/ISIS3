@@ -1,4 +1,4 @@
-#if !defined(HiCalTypes_h)
+#ifndef HiCalTypes_h
 #define HiCalTypes_h
 /**                                                                       
  * @file                                                                  
@@ -31,6 +31,8 @@
 #include "tnt_array1d_utils.h"
 #include "tnt_array2d.h"
 #include "tnt_array2d_utils.h"
+
+#include "IString.h"
 #include "PvlKeyword.h"
 
 namespace Isis {
@@ -48,8 +50,12 @@ class HiHistory {
      * @return std::ostream& Returns new state of stream
      */
     friend std::ostream &operator<<(std::ostream &o, const HiHistory &h) {
-      std::copy(h._events.begin(), h._events.end(), 
-                std::ostream_iterator<std::string>(o,"; "));
+      std::vector<QString>::const_iterator it = h._events.begin();
+
+      while (it != h._events.end()) {
+        o << *it << "; ";
+        it++;
+      }
       return (o);
     }
 
@@ -59,19 +65,19 @@ class HiHistory {
     virtual ~HiHistory() { }
 
     inline int size() const { return (_events.size()); }
-    void add(const std::string &event) { _events.push_back(event); }
-    std::string get(unsigned int index = 0) const { 
+    void add(const QString &event) { _events.push_back(event); }
+    QString get(unsigned int index = 0) const { 
       if (index < _events.size()) { 
         return (_events[index]);
       }
       else {
-        return (std::string(""));
+        return (QString(""));
       }
     }
 
     void clear() { _events.clear(); }
 
-    PvlKeyword makekey(const std::string &name = "History") const {
+    PvlKeyword makekey(const QString &name = "History") const {
       PvlKeyword key(name);
       for (unsigned int i = 0 ; i < _events.size() ; i++) {
         key.AddValue(_events[i]);
@@ -80,7 +86,7 @@ class HiHistory {
     }
 
   private:
-    std::vector<std::string> _events;
+    std::vector<QString> _events;
 };
 
 };

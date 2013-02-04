@@ -392,7 +392,7 @@ namespace Isis {
    *         lon,lat format vertices and GML header
    */
 
-  string PolygonTools::ToGML(const geos::geom::MultiPolygon *mpolygon, std::string idString) {
+  QString PolygonTools::ToGML(const geos::geom::MultiPolygon *mpolygon, QString idString) {
 
     ostringstream os;
 
@@ -432,7 +432,7 @@ namespace Isis {
     os << "</gml:featureMember>" << endl;
     os << "</ogr:FeatureCollection>" << endl;
 
-    return os.str();
+    return os.str().c_str();
   }
 
 
@@ -1704,9 +1704,9 @@ namespace Isis {
    *
    * @param geom The geometry to test which type it really is
    *
-   * @return std::string
+   * @return QString
    */
-  std::string PolygonTools::GetGeometryName(const geos::geom::Geometry *geom) {
+  QString PolygonTools::GetGeometryName(const geos::geom::Geometry *geom) {
     switch(geom->getGeometryTypeId()) {
       case geos::geom::GEOS_POINT:
         return "Point";

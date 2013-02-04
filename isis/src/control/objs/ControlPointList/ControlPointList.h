@@ -53,10 +53,10 @@ namespace Isis {
       ControlPointList(const FileName &psFileName);
       virtual ~ControlPointList();
 
-      std::string ControlPointId(int piIndex);
-      int ControlPointIndex(const std::string &psCpId);
+      QString ControlPointId(int piIndex);
+      int ControlPointIndex(const QString &psCpId);
 
-      bool HasControlPoint(const std::string &psCpId);
+      bool HasControlPoint(const QString &psCpId);
 
       int Size() const;
 

@@ -24,7 +24,8 @@
 #include <vector>
 #include <iostream>
 #include <string>
-#include "jama/jama_svd.h"
+
+#include <jama/jama_svd.h>
 
 #include "Constants.h"
 #include "IException.h"

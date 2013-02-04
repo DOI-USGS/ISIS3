@@ -24,10 +24,10 @@
 using namespace std;
 
 #include <sstream>
+
+#include "IString.h"
 #include "Message.h"
 
-string Isis::Message::ArraySubscriptNotInRange(const int index) {
-  ostringstream os;
-  os << "Array subscript [" << index << "] is out of array bounds";
-  return os.str();
+QString Isis::Message::ArraySubscriptNotInRange(int index) {
+  return "Array subscript [" + toString(index) + "] is out of array bounds";
 }

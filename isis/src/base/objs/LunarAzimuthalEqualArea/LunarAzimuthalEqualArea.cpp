@@ -54,7 +54,7 @@ namespace Isis {
       m_maxLibration *= PI / 180.0;
     }
     catch(IException &e) {
-      string message = "Invalid label group [Mapping]";
+      QString message = "Invalid label group [Mapping]";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
   }
@@ -86,9 +86,9 @@ namespace Isis {
   /**
    * Returns the name of the map projection, "LunarAzimuthalEqualArea"
    *
-   * @return string Name of projection, "LunarAzimuthalEqualArea"
+   * @return QString Name of projection, "LunarAzimuthalEqualArea"
    */
-   string LunarAzimuthalEqualArea::Name() const {
+   QString LunarAzimuthalEqualArea::Name() const {
      return "LunarAzimuthalEqualArea";
    }
 
@@ -96,9 +96,9 @@ namespace Isis {
    * Returns the version of the map projection
    *
    *
-   * @return string Version number
+   * @return QString Version number
    */
-   string LunarAzimuthalEqualArea::Version() const {
+   QString LunarAzimuthalEqualArea::Version() const {
      return "0.1";
    }
 

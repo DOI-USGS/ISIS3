@@ -48,7 +48,7 @@ namespace Isis {
 
     // Get the start time from labels
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
-    string stime = inst["SpacecraftClockCount"];
+    QString stime = inst["SpacecraftClockCount"];
     double etStart = getClockTime(stime).Et();
 
     // Get other info from labels
@@ -68,10 +68,10 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     //  Retrieve boresight location from instrument kernel (IK) (addendum?)
-    IString ikernKey = "INS" + IString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
+    QString ikernKey = "INS" + toString((int)naifIkCode()) + "_BORESIGHT_SAMPLE";
     double sampleBoreSight = getDouble(ikernKey);
 
-    ikernKey = "INS" + IString((int)naifIkCode()) + "_BORESIGHT_LINE";
+    ikernKey = "INS" + toString((int)naifIkCode()) + "_BORESIGHT_LINE";
     double lineBoreSight = getDouble(ikernKey);
 
     focalMap->SetDetectorOrigin(sampleBoreSight, lineBoreSight);

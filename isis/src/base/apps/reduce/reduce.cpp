@@ -16,7 +16,7 @@ void IsisMain() {
     double sscale, lscale;
     int ins, inl, inb;
     int ons, onl;
-    vector<string> bands;
+    vector<QString> bands;
     Cube inCube;
 
     // To propogate labels, set input cube,
@@ -25,20 +25,20 @@ void IsisMain() {
 
     // Setup the input and output cubes
     UserInterface &ui = Application::GetUserInterface();
-    string replaceMode = ui.GetAsString("VPER_REPLACE");
+    QString replaceMode = ui.GetAsString("VPER_REPLACE");
     CubeAttributeInput cai(ui.GetAsString("FROM"));
     bands = cai.bands();
 
     inCube.setVirtualBands(bands);
 
-    string from = ui.GetFileName("FROM");
+    QString from = ui.GetFileName("FROM");
     inCube.open(from);
 
     ins = inCube.getSampleCount();
     inl = inCube.getLineCount();
     inb = inCube.getBandCount();
 
-    string alg  = ui.GetString("ALGORITHM");
+    QString alg  = ui.GetString("ALGORITHM");
     double vper = ui.GetDouble("VALIDPER") / 100.;
 
     if(ui.GetString("MODE") == "TOTAL") {
@@ -55,7 +55,7 @@ void IsisMain() {
     }
 
     if(ons > ins || onl > inl) {
-      string msg = "Number of output samples/lines must be less than or equal";
+      QString msg = "Number of output samples/lines must be less than or equal";
       msg = msg + " to the input samples/lines.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -90,11 +90,11 @@ void IsisMain() {
     throw;
   }
   catch (std::exception const &se) {
-    string message = "std::exception: " + (IString)se.what();
+    QString message = "std::exception: " + (QString)se.what();
     throw IException(IException::User, message, _FILEINFO_);
   }
   catch (...) {
-    string message = "Other Error";
+    QString message = "Other Error";
     throw IException(IException::User, message, _FILEINFO_);
   }
 }

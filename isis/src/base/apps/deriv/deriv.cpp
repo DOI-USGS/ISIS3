@@ -20,7 +20,7 @@ void IsisMain() {
   p.SetOutputCube("TO");
 
   //  Which deriv (horizontal or vetical)?
-  string derivDir = ui.GetString("DIRECTION");
+  QString derivDir = ui.GetString("DIRECTION");
   //  Set boxcar size depending on the derivative direction
   if(derivDir == "HORZ") {
     p.SetBoxcarSize(2, 1);

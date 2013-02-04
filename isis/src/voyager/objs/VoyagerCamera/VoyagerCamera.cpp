@@ -68,10 +68,10 @@ namespace Isis {
     // Find out what camera is being used, and set the focal length, altinstcode,
     // and camera
     PvlGroup inst = lab.FindGroup ("Instrument",Pvl::Traverse);
-    IString spacecraft = (string)inst["SpacecraftName"];
-    IString instId = (string)inst["InstrumentId"];
+    QString spacecraft = (QString)inst["SpacecraftName"];
+    QString instId = (QString)inst["InstrumentId"];
 
-    IString reseauFileName = "";
+    QString reseauFileName = "";
 
     // These set up which kernel and other files to access,
     if (spacecraft == "VOYAGER_1") {
@@ -87,8 +87,8 @@ namespace Isis {
         reseauFileName += "wa";
       }
       else {
-        string msg = "File does not appear to be a Voyager image. InstrumentId ["
-          + instId + "] is invalid Voyager value.";
+        QString msg = "File does not appear to be a Voyager image. InstrumentId ["
+            + instId + "] is invalid Voyager value.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -105,13 +105,13 @@ namespace Isis {
         reseauFileName += "wa";
       }
       else {
-        string msg = "File does not appear to be a Voyager image. InstrumentId ["
-          + instId + "] is invalid Voyager value.";
+        QString msg = "File does not appear to be a Voyager image. InstrumentId ["
+            + instId + "] is invalid Voyager value.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
     else {
-      string msg = "File does not appear to be a Voyager image. SpacecraftName ["
+      QString msg = "File does not appear to be a Voyager image. SpacecraftName ["
           + spacecraft + "] is invalid Voyager value.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -140,7 +140,7 @@ namespace Isis {
     // exposure duration keyword value is measured in seconds
     double exposureDuration = inst["ExposureDuration"];
     iTime startTime;
-    startTime.setUtc((string)inst["StartTime"]);
+    startTime.setUtc((QString)inst["StartTime"]);
 
     // set the start (shutter open) and end (shutter close) times for the image
     /*****************************************************************************

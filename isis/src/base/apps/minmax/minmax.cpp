@@ -31,7 +31,7 @@ void IsisMain() {
   p.SetBoxcarSize(nSamples, nLines);
 
   // Set which filter is being used
-  string filterType = ui.GetString("FILTER");
+  QString filterType = ui.GetString("FILTER");
 
   if(filterType == "MIN") {
     p.StartProcess(minimumFilter);

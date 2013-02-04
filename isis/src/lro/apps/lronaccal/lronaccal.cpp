@@ -16,9 +16,9 @@ using namespace Isis;
 
 // Working functions and parameters
 void ResetGlobals();
-void CopyCubeIntoArray(string &fileString, vector<double> &data);
-void ReadTextDataFile(string &fileString, vector<double> &data);
-void ReadTextDataFile(string &fileString, vector<vector<double> > &data);
+void CopyCubeIntoArray(QString &fileString, vector<double> &data);
+void ReadTextDataFile(QString &fileString, vector<double> &data);
+void ReadTextDataFile(QString &fileString, vector<vector<double> > &data);
 void Calibrate(Buffer &in, Buffer &out);
 void RemoveMaskedOffset(Buffer &line);
 void CorrectDark(Buffer &in);
@@ -65,20 +65,20 @@ void IsisMain() {
   Isis::PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
 
   // Check if it is a NAC image
-  std::string instId = inst["InstrumentId"];
+  QString instId = inst["InstrumentId"];
   if(instId != "NACL" && instId != "NACR") {
-    string msg = "This is not a NAC image.  lrocnaccal requires a NAC image.";
+    QString msg = "This is not a NAC image.  lrocnaccal requires a NAC image.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // And check if it has already run through calibration
   if(lab.FindObject("IsisCube").HasGroup("Radiometry")) {
-    string msg = "This image has already been calibrated";
+    QString msg = "This image has already been calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(lab.FindObject("IsisCube").HasGroup("AlphaCube")) {
-    string msg = "This application can not be run on any image that has been geometrically transformed (i.e. scaled, rotated, sheared, or reflected) or cropped.";
+    QString msg = "This application can not be run on any image that has been geometrically transformed (i.e. scaled, rotated, sheared, or reflected) or cropped.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -101,19 +101,19 @@ void IsisMain() {
   if(iCube->getStatistics()->Maximum() > 1000)
     g_maskedLeftOnly = true;
 
-  IString darkFile, flatFile, offsetFile, coefficientFile;
+  QString darkFile, flatFile, offsetFile, coefficientFile;
 
   if(g_masked) {
-    IString maskedFile = ui.GetAsString("MASKEDFILE");
+    QString maskedFile = ui.GetAsString("MASKEDFILE");
 
-    if(maskedFile.Equal("Default") || maskedFile.length() == 0)
+    if(maskedFile.toLower() == "default" || maskedFile.length() == 0)
       maskedFile = "$lro/calibration/" + instId + "_MaskedPixels.????.pvl";
 
     FileName maskedFileName(maskedFile);
     if(maskedFileName.isVersioned())
       maskedFileName = maskedFileName.highestVersion();
     if(!maskedFileName.fileExists()) {
-      string msg = maskedFile + " does not exist.";
+      QString msg = maskedFile + " does not exist.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -130,16 +130,16 @@ void IsisMain() {
     }
 
     for(int i = 0; i < maskedPixels.Size(); i++)
-      if((g_isLeftNac && (int) maskedPixels[i] < cutoff) || (!g_isLeftNac && (int) maskedPixels[i] > cutoff))
-        g_maskedPixelsLeft.push_back(maskedPixels[i]);
+      if((g_isLeftNac && toInt(maskedPixels[i]) < cutoff) || (!g_isLeftNac && toInt(maskedPixels[i]) > cutoff))
+        g_maskedPixelsLeft.push_back(toInt(maskedPixels[i]));
       else
-        g_maskedPixelsRight.push_back(maskedPixels[i]);
+        g_maskedPixelsRight.push_back(toInt(maskedPixels[i]));
   }
 
   if(g_dark) {
     darkFile = ui.GetAsString("DARKFILE");
 
-    if(darkFile.Equal("Default") || darkFile.length() == 0) {
+    if(darkFile.toLower() == "default" || darkFile.length() == 0) {
       darkFile = "$lro/calibration/" + instId + "_AverageDarks";
       if(g_summed)
         darkFile += "_Summed";
@@ -151,7 +151,7 @@ void IsisMain() {
   if(g_nonlinear) {
     offsetFile = ui.GetAsString("OFFSETFILE");
 
-    if(offsetFile.Equal("Default") || offsetFile.length() == 0) {
+    if(offsetFile.toLower() == "default" || offsetFile.length() == 0) {
       offsetFile = "$lro/calibration/" + instId + "_LinearizationOffsets";
       if(g_summed)
         offsetFile += "_Summed";
@@ -160,7 +160,7 @@ void IsisMain() {
     CopyCubeIntoArray(offsetFile, g_linearOffsetLine);
 
     coefficientFile = ui.GetAsString("NONLINEARITYFILE");
-    if(coefficientFile.Equal("Default") || coefficientFile.length() == 0) {
+    if(coefficientFile.toLower() == "default" || coefficientFile.length() == 0) {
       coefficientFile = "$lro/calibration/" + instId + "_LinearizationCoefficients.????.txt";
     }
     ReadTextDataFile(coefficientFile, g_linearityCoefficients);
@@ -169,7 +169,7 @@ void IsisMain() {
   if(g_flatfield) {
     flatFile = ui.GetAsString("FLATFIELDFILE");
 
-    if(flatFile.Equal("Default") || flatFile.length() == 0) {
+    if(flatFile.toLower() == "default" || flatFile.length() == 0) {
       flatFile = "$lro/calibration/" + instId + "_Flatfield";
       ;
       if(g_summed)
@@ -180,16 +180,16 @@ void IsisMain() {
   }
 
   if(g_radiometric) {
-    IString radFile = ui.GetAsString("RADIOMETRICFILE");
+    QString radFile = ui.GetAsString("RADIOMETRICFILE");
 
-    if(radFile.Equal("Default") || radFile.length() == 0)
+    if(radFile.toLower() == "default" || radFile.length() == 0)
       radFile = "$lro/calibration/NAC_RadiometricResponsivity.????.pvl";
 
     FileName radFileName(radFile);
     if(radFileName.isVersioned())
       radFileName = radFileName.highestVersion();
     if(!radFileName.fileExists()) {
-      string msg = radFile + " does not exist.";
+      QString msg = radFile + " does not exist.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -197,31 +197,31 @@ void IsisMain() {
 
     if(g_iof) {
       try {
-        iTime startTime((string) inst["StartTime"]);
+        iTime startTime((QString) inst["StartTime"]);
         double etStart = startTime.Et();
         // Get the distance between the Moon and the Sun at the given time in
         // Astronomical Units (AU)
-        string bspKernel1 = p.MissionData("lro", "/kernels/tspk/moon_pa_de421_1900-2050.bpc", false);
-        string bspKernel2 = p.MissionData("lro", "/kernels/tspk/de421.bsp", false);
-        furnsh_c(bspKernel1.c_str());
-        furnsh_c(bspKernel2.c_str());
-        string pckKernel1 = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
-        string pckKernel2 = p.MissionData("lro", "/kernels/pck/moon_080317.tf", false);
-        string pckKernel3 = p.MissionData("lro", "/kernels/pck/moon_assoc_me.tf", false);
-        furnsh_c(pckKernel1.c_str());
-        furnsh_c(pckKernel2.c_str());
-        furnsh_c(pckKernel3.c_str());
+        QString bspKernel1 = p.MissionData("lro", "/kernels/tspk/moon_pa_de421_1900-2050.bpc", false);
+        QString bspKernel2 = p.MissionData("lro", "/kernels/tspk/de421.bsp", false);
+        furnsh_c(bspKernel1.toAscii().data());
+        furnsh_c(bspKernel2.toAscii().data());
+        QString pckKernel1 = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
+        QString pckKernel2 = p.MissionData("lro", "/kernels/pck/moon_080317.tf", false);
+        QString pckKernel3 = p.MissionData("lro", "/kernels/pck/moon_assoc_me.tf", false);
+        furnsh_c(pckKernel1.toAscii().data());
+        furnsh_c(pckKernel2.toAscii().data());
+        furnsh_c(pckKernel3.toAscii().data());
         double sunpos[6], lt;
         spkezr_c("sun", etStart, "MOON_ME", "LT+S", "MOON", sunpos, &lt);
         g_solarDistance = vnorm_c(sunpos) / KM_PER_AU;
-        unload_c(bspKernel1.c_str());
-        unload_c(bspKernel2.c_str());
-        unload_c(pckKernel1.c_str());
-        unload_c(pckKernel2.c_str());
-        unload_c(pckKernel3.c_str());
+        unload_c(bspKernel1.toAscii().data());
+        unload_c(bspKernel2.toAscii().data());
+        unload_c(pckKernel1.toAscii().data());
+        unload_c(pckKernel2.toAscii().data());
+        unload_c(pckKernel3.toAscii().data());
       }
       catch(IException &e) {
-        string msg = "Unable to find the necessary SPICE kernels for converting to IOF";
+        QString msg = "Unable to find the necessary SPICE kernels for converting to IOF";
         throw IException(e, IException::User, msg, _FILEINFO_);
       }
       g_iofLeft = radPvl["IOF_LEFT"];
@@ -243,9 +243,9 @@ void IsisMain() {
   if(g_masked) {
     PvlKeyword darkColumns("DarkColumns");
     for(unsigned int i = 0; i < g_maskedPixelsLeft.size(); i++)
-      darkColumns += g_maskedPixelsLeft[i];
+      darkColumns += toString(g_maskedPixelsLeft[i]);
     for(unsigned int i = 0; i < g_maskedPixelsRight.size(); i++)
-      darkColumns += g_maskedPixelsRight[i];
+      darkColumns += toString(g_maskedPixelsRight[i]);
     calgrp += darkColumns;
   }
   if(g_dark)
@@ -260,18 +260,18 @@ void IsisMain() {
     if(g_iof) {
       calgrp += PvlKeyword("RadiometricType", "IOF");
       if(g_isLeftNac)
-        calgrp += PvlKeyword("ResponsivityValue", g_iofLeft);
+        calgrp += PvlKeyword("ResponsivityValue", toString(g_iofLeft));
       else
-        calgrp += PvlKeyword("ResponsivityValue", g_iofRight);
+        calgrp += PvlKeyword("ResponsivityValue", toString(g_iofRight));
     }
     else {
       calgrp += PvlKeyword("RadiometricType", "AbsoluteRadiance");
       if(g_isLeftNac)
-        calgrp += PvlKeyword("ResponsivityValue", g_radianceLeft);
+        calgrp += PvlKeyword("ResponsivityValue", toString(g_radianceLeft));
       else
-        calgrp += PvlKeyword("ResponsivityValue", g_radianceRight);
+        calgrp += PvlKeyword("ResponsivityValue", toString(g_radianceRight));
     }
-    calgrp += PvlKeyword("SolarDistance", g_solarDistance);
+    calgrp += PvlKeyword("SolarDistance", toString(g_solarDistance));
   }
   ocube->putGroup(calgrp);
   p.EndProcess();
@@ -325,13 +325,13 @@ void Calibrate(Buffer &in, Buffer &out) {
     RadiometricCalibration(out);
 }
 
-void CopyCubeIntoArray(string &fileString, vector<double> &data) {
+void CopyCubeIntoArray(QString &fileString, vector<double> &data) {
   Cube cube;
   FileName filename(fileString);
   if(filename.isVersioned())
     filename = filename.highestVersion();
   if(!filename.fileExists()) {
-    string msg = fileString + " does not exist.";
+    QString msg = fileString + " does not exist.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   cube.open(filename.expanded());
@@ -346,41 +346,41 @@ void CopyCubeIntoArray(string &fileString, vector<double> &data) {
   fileString = filename.expanded();
 }
 
-void ReadTextDataFile(string &fileString, vector<double> &data) {
+void ReadTextDataFile(QString &fileString, vector<double> &data) {
   FileName filename(fileString);
   if(filename.isVersioned())
     filename = filename.highestVersion();
   if(!filename.fileExists()) {
-    string msg = fileString + " does not exist.";
+    QString msg = fileString + " does not exist.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   TextFile file(filename.expanded());
-  IString lineString;
+  QString lineString;
   unsigned int line = 0;
   while(file.GetLine(lineString)) {
-    data.push_back((lineString.Token(" ,;")).ToDouble());
+    data.push_back(toDouble(lineString.split(QRegExp("[ ,;]")).first()));
     line++;
   }
   fileString = filename.expanded();
 }
 
-void ReadTextDataFile(string &fileString, vector<vector<double> > &data) {
+void ReadTextDataFile(QString &fileString, vector<vector<double> > &data) {
   FileName filename(fileString);
   if(filename.isVersioned())
     filename = filename.highestVersion();
   if(!filename.fileExists()) {
-    string msg = fileString + " does not exist.";
+    QString msg = fileString + " does not exist.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   TextFile file(filename.expanded());
-  IString lineString;
+  QString lineString;
   while(file.GetLine(lineString)) {
     vector<double> line;
-    lineString.ConvertWhiteSpace();
-    lineString.Compress();
-    lineString.TrimHead(" ,");
-    while(lineString.size() > 0) {
-      line.push_back((lineString.Token(" ,")).ToDouble());
+    lineString = lineString.simplified().remove(QRegExp("^[ ,]*")).trimmed();
+
+    QStringList lineTokens = lineString.split(QRegExp("[ ,]"), QString::SkipEmptyParts);
+    foreach (QString value, lineTokens) {
+      line.push_back(toDouble(value));
     }
 
     data.push_back(line);

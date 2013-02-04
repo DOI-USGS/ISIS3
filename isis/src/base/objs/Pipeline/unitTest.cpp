@@ -345,8 +345,8 @@ void PipeContinue(void)
   //p.Application("mask").SetContinue(true);
   pc1.Application("mask").SetInputParameter("FROM",     false);
   pc1.Application("mask").SetOutputParameter("TO",      "mask");
-  pc1.Application("mask").AddConstParameter("MINIMUM",  IString(VALID_MIN4));
-  pc1.Application("mask").AddConstParameter("MAXIMUM",  IString(VALID_MAX4));
+  pc1.Application("mask").AddConstParameter("MINIMUM",  toString(VALID_MIN4));
+  pc1.Application("mask").AddConstParameter("MAXIMUM",  toString(VALID_MAX4));
   pc1.Application("mask").AddConstParameter("PRESERVE", "INSIDE");
   pc1.Application("mask").AddConstParameter("SPIXELS",  "NONE");
   
@@ -372,8 +372,8 @@ void PipeContinue(void)
   pc2.Application("mask1").SetContinue(true);
   pc2.Application("mask1").SetInputParameter("FROM",     false);
   pc2.Application("mask1").SetOutputParameter("TO",      "mask1");
-  pc2.Application("mask1").AddConstParameter("MINIMUM",  IString(VALID_MIN4));
-  pc2.Application("mask1").AddConstParameter("MAXIMUM",  IString(VALID_MAX4));
+  pc2.Application("mask1").AddConstParameter("MINIMUM",  toString(VALID_MIN4));
+  pc2.Application("mask1").AddConstParameter("MAXIMUM",  toString(VALID_MAX4));
   pc2.Application("mask1").AddConstParameter("PRESERVE", "INSIDE");
   pc2.Application("mask1").AddConstParameter("SPIXELS",  "NONE");
   

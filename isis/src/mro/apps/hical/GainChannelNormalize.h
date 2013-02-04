@@ -1,4 +1,4 @@
-#if !defined(GainChannelNormalize_h)
+#ifndef GainChannelNormalize_h
 #define GainChannelNormalize_h
 /**
  * @file

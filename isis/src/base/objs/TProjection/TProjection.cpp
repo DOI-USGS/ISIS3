@@ -112,7 +112,7 @@ namespace Isis {
       }
       // Get the radii using the "TargetName" keyword and NAIF
       else  if (m_mappingGrp.HasKeyword("TargetName")) {
-        PvlGroup radii = TargetRadii((string) m_mappingGrp["TargetName"]);
+        PvlGroup radii = TargetRadii((QString) m_mappingGrp["TargetName"]);
         m_equatorialRadius = radii["EquatorialRadius"];
         m_polarRadius = radii["PolarRadius"];
       }
@@ -136,10 +136,10 @@ namespace Isis {
       }
 
       // Get the LatitudeType
-      if ((string) m_mappingGrp["LatitudeType"] == "Planetographic") {
+      if ((QString) m_mappingGrp["LatitudeType"] == "Planetographic") {
         m_latitudeType = Planetographic;
       }
-      else if ((string) m_mappingGrp["LatitudeType"] == "Planetocentric") {
+      else if ((QString) m_mappingGrp["LatitudeType"] == "Planetocentric") {
         m_latitudeType = Planetocentric;
       }
       else {
@@ -150,10 +150,10 @@ namespace Isis {
       }
 
       // Get the LongitudeDirection
-      if ((string) m_mappingGrp["LongitudeDirection"] == "PositiveWest") {
+      if ((QString) m_mappingGrp["LongitudeDirection"] == "PositiveWest") {
         m_longitudeDirection = PositiveWest;
       }
-      else if ((string) m_mappingGrp["LongitudeDirection"] == "PositiveEast") {
+      else if ((QString) m_mappingGrp["LongitudeDirection"] == "PositiveEast") {
         m_longitudeDirection = PositiveEast;
       }
       else {
@@ -164,10 +164,10 @@ namespace Isis {
       }
 
       // Get the LongitudeDomain
-      if ((string) m_mappingGrp["LongitudeDomain"] == "360") {
+      if ((QString) m_mappingGrp["LongitudeDomain"] == "360") {
         m_longitudeDomain = 360;
       }
-      else if ((string) m_mappingGrp["LongitudeDomain"] == "180") {
+      else if ((QString) m_mappingGrp["LongitudeDomain"] == "180") {
         m_longitudeDomain = 180;
       }
       else {
@@ -382,11 +382,11 @@ namespace Isis {
    *             EquatorialRadius, and PolarRadius.
    */
 
-  PvlGroup TProjection::TargetRadii(std::string target) {
+  PvlGroup TProjection::TargetRadii(QString target) {
     // Convert the target name to a NAIF code
     SpiceInt code;
     SpiceBoolean found;
-    bodn2c_c(target.c_str(), &code, &found);
+    bodn2c_c(target.toAscii().data(), &code, &found);
     if (!found) {
       IString msg = "Could not convert target name [" + target +"] to NAIF code";
       throw IException(IException::Io, msg, _FILEINFO_);
@@ -395,15 +395,15 @@ namespace Isis {
     // Load the most recent target attitude and shape kernel for NAIF
     FileName kern("$Base/kernels/pck/pck?????.tpc");
     kern = kern.highestVersion();
-    string kernName(kern.expanded());
-    furnsh_c(kernName.c_str());
+    QString kernName(kern.expanded());
+    furnsh_c(kernName.toAscii().data());
 
     // Get the radii from NAIF
     NaifStatus::CheckErrors();
     SpiceInt n;
     SpiceDouble radii[3];
     bodvar_c(code, "RADII", &n, radii);
-    unload_c(kernName.c_str());
+    unload_c(kernName.toAscii().data());
 
     try {
       NaifStatus::CheckErrors();
@@ -412,14 +412,14 @@ namespace Isis {
       throw IException(e,
                        IException::Unknown,
                        QObject::tr("The target name [%1] does not correspond to a target body "
-                                   "with known radii").arg(QString::fromStdString(target)),
+                                   "with known radii").arg(target),
                        _FILEINFO_);
     }
 
     PvlGroup mapping("Mapping");
     mapping += PvlKeyword("TargetName",  target);
-    mapping += PvlKeyword("EquatorialRadius",  radii[0] * 1000.0, "meters");
-    mapping += PvlKeyword("PolarRadius", radii[2] * 1000.0, "meters");
+    mapping += PvlKeyword("EquatorialRadius",  toString(radii[0] * 1000.0), "meters");
+    mapping += PvlKeyword("PolarRadius", toString(radii[2] * 1000.0), "meters");
 
     return mapping;
   }
@@ -456,7 +456,7 @@ namespace Isis {
     }
 
     PvlGroup inst = cubeLab.FindGroup("Instrument", Pvl::Traverse);
-    string target = inst["TargetName"];
+    QString target = inst["TargetName"];
     PvlGroup radii = TProjection::TargetRadii(target);
     //Now INSERT the EquatorialRadius and PolorRadius into the mapGroup pvl.
     mapGroup += PvlKeyword("EquatorialRadius",  
@@ -617,7 +617,7 @@ namespace Isis {
    *
    * @return string The latitude type, "Planetocentric" or "Planetographic".
    */
-  string TProjection::LatitudeTypeString() const {
+  QString TProjection::LatitudeTypeString() const {
     if (m_latitudeType == Planetographic) return "Planetographic";
     return "Planetocentric";
   }
@@ -729,7 +729,7 @@ namespace Isis {
    * @return string The longitude direction, "PositiveEast" or 
    *         "PositiveWest".
    */
-  string TProjection::LongitudeDirectionString() const {
+  QString TProjection::LongitudeDirectionString() const {
     if (m_longitudeDirection == PositiveEast) return "PositiveEast";
     return "PositiveWest";
   }
@@ -807,7 +807,7 @@ namespace Isis {
    *
    * @return string The longitude domain, "180" or "360".
    */
-  string TProjection::LongitudeDomainString() const {
+  QString TProjection::LongitudeDomainString() const {
     if (m_longitudeDomain == 360) return "360";
     return "180";
   }

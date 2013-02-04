@@ -63,7 +63,7 @@ namespace Isis {
     i = groupedStats->constFind(statType);
 
     if(i == groupedStats->constEnd()) {
-      std::string msg = statType.toStdString();
+      QString msg = statType;
       msg += " passed to GetStats but does not exist within the map";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

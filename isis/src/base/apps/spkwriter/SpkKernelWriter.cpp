@@ -43,14 +43,14 @@ namespace Isis {
    * @brief Provide general comments for an SPK kernel header
    * 
    * 
-   * @return std::string Comment generated for SPK SPICE kernel header 
+   * @return QString Comment generated for SPK SPICE kernel header 
    *  
    * @internal 
    * @history 2012-05-23 Kris Becker Added creation of special tag to ID the 
    *                                 kernel as needing special light time and
    *                                 stellar aberration correction in spiceinit
    */
-  std::string SpkKernelWriter::k_header() const {
+  QString SpkKernelWriter::k_header() const {
     ostringstream comment;
     comment << "\
  ****************************************************************************\n\
@@ -131,7 +131,7 @@ namespace Isis {
        geometry can be reproduced accurately.\n\
  \n";
 
-    return (string(comment.str()));
+    return (QString(comment.str().c_str()));
  }
 
 

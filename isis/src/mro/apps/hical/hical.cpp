@@ -2,7 +2,7 @@
 #include "Isis.h"
 
 #include <cstdio>
-#include <string>
+#include <QString>
 #include <vector>
 #include <algorithm>
 #include <sstream>
@@ -38,7 +38,7 @@ using namespace Isis;
 using namespace std;
 
 //!< Define the matrix container for systematic processing
-typedef CollectorMap<std::string, HiVector, NoCaseStringCompare> MatrixList;
+typedef CollectorMap<IString, HiVector, NoCaseStringCompare> MatrixList;
 
 //  Calibration parameter container
 MatrixList *calVars = 0;
@@ -107,14 +107,14 @@ void calibrate(Buffer &in, Buffer &out) {
 
 void IsisMain(){
 
-  const std::string hical_program = "hical";
-  const std::string hical_version = "5.0";
-  const std::string hical_revision = "$Revision$";
-  const std::string hical_runtime = Application::DateTime();
+  const QString hical_program = "hical";
+  const QString hical_version = "5.0";
+  const QString hical_revision = "$Revision$";
+  const QString hical_runtime = Application::DateTime();
 
   UserInterface &ui = Application::GetUserInterface();
 
-  string procStep("prepping phase");
+  QString procStep("prepping phase");
   try {
 //  The output from the last processing is the input into subsequent processing
     ProcessByLine p;
@@ -124,7 +124,7 @@ void IsisMain(){
     int nlines = hifrom->getLineCount();
 
 //  Initialize the configuration file
-    string conf(ui.GetAsString("CONF"));
+    QString conf(ui.GetAsString("CONF"));
     HiCalConf hiconf(*(hifrom->getLabel()), conf);
     DbProfile hiprof = hiconf.getMatrixProfile();
 
@@ -150,7 +150,7 @@ void IsisMain(){
     }
 
 //  Do I/F output DN conversions
-    string units = ui.GetString("UNITS");
+    QString units = ui.GetString("UNITS");
 
     //  Allocate the calibration list
     calVars = new MatrixList;
@@ -386,17 +386,17 @@ void IsisMain(){
 
     // Get the default profile for logging purposes
     hiprof = hiconf.getMatrixProfile();
-    const std::string conf_file = hiconf.filepath(conf);
+    const QString conf_file = hiconf.filepath(conf);
 
     // Quitely dumps parameter history to alternative format file.  This
     // is completely controlled by the configuration file
     if ( hiprof.exists("DumpHistoryFile") ) {
       procStep = "logging/reporting phase";
       FileName hdump(hiconf.getMatrixSource("DumpHistoryFile",hiprof));
-      string hdumpFile = hdump.expanded();
-      ofstream ofile(hdumpFile.c_str(), ios::out);
+      QString hdumpFile = hdump.expanded();
+      ofstream ofile(hdumpFile.toAscii().data(), ios::out);
       if (!ofile) {
-        string mess = "Unable to open/create history dump file " +
+        QString mess = "Unable to open/create history dump file " +
                       hdump.expanded();
         IException(IException::User, mess, _FILEINFO_).print();
       }
@@ -432,7 +432,7 @@ void IsisMain(){
     }
 
 //  Ensure the RadiometricCalibration group is out there
-    const std::string rcalGroup("RadiometricCalibration");
+    const QString rcalGroup("RadiometricCalibration");
     if (!ocube->hasGroup(rcalGroup)) {
       PvlGroup temp(rcalGroup);
       ocube->putGroup(temp);
@@ -456,7 +456,7 @@ void IsisMain(){
     //  Record parameter generation history.  Controllable in configuration
     //  file.  Note this is optional because of a BUG!! in the ISIS label
     //  writer as this application was initially developed
-    if ( IsEqual(ConfKey(hiprof,"LogParameterHistory",string("TRUE")),"TRUE")) {
+    if ( IsEqual(ConfKey(hiprof,"LogParameterHistory",QString("TRUE")),"TRUE")) {
       rcal += ZbsHist.makekey("ZeroBufferSmooth");
       rcal += ZbfHist.makekey("ZeroBufferFit");
       rcal += ZrHist.makekey("ZeroReverse");
@@ -474,8 +474,8 @@ void IsisMain(){
   catch (IException &ie) {
     delete calVars;
     calVars = 0;
-    string mess = "Failed in " + procStep;
-    throw IException(ie, IException::User, mess.c_str(), _FILEINFO_);
+    QString mess = "Failed in " + procStep;
+    throw IException(ie, IException::User, mess.toAscii().data(), _FILEINFO_);
   }
 
 // Clean up parameters

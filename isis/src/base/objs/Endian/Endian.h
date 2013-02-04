@@ -21,10 +21,10 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#if !defined(Endian_h)
+#ifndef Endian_h
 #define Endian_h
 
-#include "IString.h"
+#include <QString>
 
 namespace Isis {
   /**
@@ -62,16 +62,15 @@ namespace Isis {
     Msb
   };
 
-  inline std::string ByteOrderName(Isis::ByteOrder byteOrder) {
+  inline QString ByteOrderName(Isis::ByteOrder byteOrder) {
     if(byteOrder == Isis::NoByteOrder) return "None";
     if(byteOrder == Isis::Lsb) return "Lsb";
     if(byteOrder == Isis::Msb) return "Msb";
     return "Error";
   }
 
-  inline Isis::ByteOrder ByteOrderEnumeration(const std::string &order) {
-    Isis::IString temp(order);
-    temp = temp.UpCase();
+  inline Isis::ByteOrder ByteOrderEnumeration(const QString &order) {
+    QString temp = order.toUpper();
     if(temp == "LSB") return Isis::Lsb;
     if(temp == "MSB") return Isis::Msb;
     return Isis::NoByteOrder;

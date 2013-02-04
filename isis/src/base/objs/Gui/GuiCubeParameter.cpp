@@ -105,15 +105,15 @@ namespace Isis {
    */
   void GuiCubeParameter::SelectAttribute() {
     if(p_ui->ParamFileMode(p_group, p_param) == "input") {
-      Isis::CubeAttributeInput att(p_lineEdit->text().toStdString());
-      std::string curAtt = att.toString();
-      std::string newAtt;
+      Isis::CubeAttributeInput att(p_lineEdit->text());
+      QString curAtt = att.toString();
+      QString newAtt;
       int status = GuiInputAttribute::GetAttributes(curAtt, newAtt,
                    p_ui->ParamName(p_group, p_param),
                    p_fileButton);
       if((status == 1) && (curAtt != newAtt)) {
-        Isis::FileName f(p_lineEdit->text().toStdString());
-        p_lineEdit->setText((IString)(f.expanded() + newAtt));
+        Isis::FileName f(p_lineEdit->text());
+        p_lineEdit->setText(f.expanded() + newAtt);
       }
     }
     else {
@@ -121,15 +121,15 @@ namespace Isis {
       bool allowProp = att.propagatePixelType();
       att.addAttributes(FileName(p_lineEdit->text()));
 
-      std::string curAtt = att.toString();
-      std::string newAtt;
+      QString curAtt = att.toString();
+      QString newAtt;
       int status = GuiOutputAttribute::GetAttributes(curAtt, newAtt,
                    p_ui->ParamName(p_group, p_param),
                    allowProp,
                    p_fileButton);
       if((status == 1) && (curAtt != newAtt)) {
-        Isis::FileName f(p_lineEdit->text().toStdString());
-        p_lineEdit->setText((IString)(f.expanded() + newAtt));
+        Isis::FileName f(p_lineEdit->text());
+        p_lineEdit->setText(f.expanded() + newAtt);
       }
     }
 
@@ -144,7 +144,7 @@ namespace Isis {
     try {
       // Make sure the user entered a value
       if(IsModified()) {
-        std::string cubeName = Value();
+        QString cubeName = Value();
 
         // Check to make sure the cube can be opened
         Isis::Cube temp;
@@ -152,12 +152,12 @@ namespace Isis {
         temp.close();
 
         // Open the cube in Qview
-        IString command = "$ISISROOT/bin/qview " + cubeName + " &";
+        QString command = "$ISISROOT/bin/qview " + cubeName + " &";
         ProgramLauncher::RunSystemCommand(command);
       }
       // Throw an error if no cube name was entered
       else {
-        std::string msg = "You must enter a cube name to open";
+        QString msg = "You must enter a cube name to open";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -174,7 +174,7 @@ namespace Isis {
     try {
       // Make sure the user entered a value
       if(IsModified()) {
-        std::string cubeName = Value();
+        QString cubeName = Value();
 
         // Check to make sure the cube can be opened
         Isis::Cube temp;
@@ -189,7 +189,7 @@ namespace Isis {
 
       }
       else {
-        std::string msg = "You must enter a cube name to open";
+        QString msg = "You must enter a cube name to open";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }

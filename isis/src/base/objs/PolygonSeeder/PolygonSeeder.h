@@ -77,16 +77,16 @@ namespace Isis {
 
       double MinimumThickness();
       double MinimumArea();
-      std::string Algorithm() const;
+      QString Algorithm() const;
 
-      virtual PvlGroup PluginParameters(std::string grpName);
+      virtual PvlGroup PluginParameters(QString grpName);
       Pvl InvalidInput();
 
       const PolygonSeeder &operator=(const PolygonSeeder &other);
 
     protected:
       virtual void Parse(Pvl &pvl);
-      std::string StandardTests(const geos::geom::MultiPolygon *multiPoly,
+      QString StandardTests(const geos::geom::MultiPolygon *multiPoly,
                                 const geos::geom::Envelope *polyBoundBox);
 
     protected:
@@ -94,7 +94,7 @@ namespace Isis {
                               was used.*/
 
     private:
-      std::string p_algorithmName; /**< The value for the 'Name' Keyword in the
+      QString p_algorithmName; /**< The value for the 'Name' Keyword in the
                                         PolygonSeederAlgorithm group of the Pvl
                                         that is passed into the constructor.*/
       double p_minimumThickness;   /**< The value for the 'MinimumThickness' 

@@ -53,7 +53,7 @@ namespace Isis {
    *
    * @throws Isis::iException::Message
    */
-  Isis::Cube *ProcessBySpectra::SetInputCube(const std::string &parameter,
+  Isis::Cube *ProcessBySpectra::SetInputCube(const QString &parameter,
       const int requirements) {
     return ProcessByBrick::SetInputCube(parameter,
                                         Isis::SpatialMatch | requirements);
@@ -71,7 +71,7 @@ namespace Isis {
    *                     Defaults to 0
    *
    */
-  Isis::Cube *ProcessBySpectra::SetInputCube(const std::string &file,
+  Isis::Cube *ProcessBySpectra::SetInputCube(const QString &file,
       Isis::CubeAttributeInput &att,
       const int requirements) {
     return ProcessByBrick::SetInputCube(file, att,

@@ -26,8 +26,8 @@ using namespace Isis;
 //helper button functins in the code
 void helperButtonLog();
 
-map <string, void *> GuiHelpers() {
-  map <string, void *> helper;
+map <QString, void *> GuiHelpers() {
+  map <QString, void *> helper;
   helper ["helperButtonLog"] = (void *) helperButtonLog;
   return helper;
 }
@@ -40,7 +40,7 @@ void IsisMain() {
   if(ui.WasEntered("TO")) {
     if(ui.GetString("TRANSFORM") == "WARP") {
       if(!ui.WasEntered("ONET")) {
-        string msg = "A Control Net file must be entered if the TO parameter is ";
+        QString msg = "A Control Net file must be entered if the TO parameter is ";
         msg += "entered";
         throw IException(IException::User, msg, _FILEINFO_);
       }
@@ -50,7 +50,7 @@ void IsisMain() {
   // Open the first cube.  It will be matched to the second input cube.
   Cube trans;
   CubeAttributeInput &attTrans = ui.GetInputAttribute("FROM");
-  std::vector<string> bandTrans = attTrans.bands();
+  std::vector<QString> bandTrans = attTrans.bands();
   trans.setVirtualBands(bandTrans);
   trans.open(ui.GetFileName("FROM"), "r");
 
@@ -59,7 +59,7 @@ void IsisMain() {
   // first to this one by attempting to compute a sample/line translation
   Cube match;
   CubeAttributeInput &attMatch = ui.GetInputAttribute("MATCH");
-  std::vector<string> bandMatch = attMatch.bands();
+  std::vector<QString> bandMatch = attMatch.bands();
   match.setVirtualBands(bandMatch);
   match.open(ui.GetFileName("MATCH"), "r");
 
@@ -67,25 +67,25 @@ void IsisMain() {
   // one band
   if((trans.getLineCount() != match.getLineCount()) ||
       (trans.getSampleCount() != match.getSampleCount())) {
-    string msg = "Input Cube Lines and Samples must be equal!";
+    QString msg = "Input Cube Lines and Samples must be equal!";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   if(trans.getBandCount() != 1 || match.getBandCount() != 1) {
-    string msg = "Input Cubes must have only one band!";
+    QString msg = "Input Cubes must have only one band!";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Get serial number
-  string serialTrans = SerialNumber::Compose(trans, true);
-  string serialMatch = SerialNumber::Compose(match, true);
+  QString serialTrans = SerialNumber::Compose(trans, true);
+  QString serialMatch = SerialNumber::Compose(match, true);
 
 //  This still precludes band to band registrations.
   if(serialTrans == serialMatch) {
-    string sTrans = FileName(trans.getFileName()).name();
-    string sMatch = FileName(match.getFileName()).name();
+    QString sTrans = FileName(trans.getFileName()).name();
+    QString sMatch = FileName(match.getFileName()).name();
     if(sTrans == sMatch) {
-      string msg = "Cube Serial Numbers must be unique - FROM=" + serialTrans +
+      QString msg = "Cube Serial Numbers must be unique - FROM=" + serialTrans +
                    ", MATCH=" + serialMatch;
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -134,7 +134,7 @@ void IsisMain() {
   if (match.hasGroup("Instrument")) {
     PvlGroup inst = match.getGroup("Instrument");
     PvlKeyword &targname = inst.FindKeyword("TargetName");
-    string targetname = targname;
+    QString targetname = targname;
     cn.SetTarget(targetname);
   }
 
@@ -179,7 +179,7 @@ void IsisMain() {
       }
 
       // Add the measures to a control point
-      string str = "Row " + IString(r) + " Column " + IString(c);
+      QString str = "Row " + toString(r) + " Column " + toString(c);
       ControlPoint * cp = new ControlPoint(str);
       cp->SetType(ControlPoint::Free);
       cp->Add(cmTrans);
@@ -202,14 +202,14 @@ void IsisMain() {
   double lMax = (int)(lStats.Maximum() * 100.0) / 100.0;
   double lDev = (int)(lStats.StandardDeviation() * 100.0) / 100.0;
 
-  results += PvlKeyword("SampleMinimum", sMin);
-  results += PvlKeyword("SampleAverage", sTrans);
-  results += PvlKeyword("SampleMaximum", sMax);
-  results += PvlKeyword("SampleStandardDeviation", sDev);
-  results += PvlKeyword("LineMinimum", lMin);
-  results += PvlKeyword("LineAverage", lTrans);
-  results += PvlKeyword("LineMaximum", lMax);
-  results += PvlKeyword("LineStandardDeviation", lDev);
+  results += PvlKeyword("SampleMinimum", toString(sMin));
+  results += PvlKeyword("SampleAverage", toString(sTrans));
+  results += PvlKeyword("SampleMaximum", toString(sMax));
+  results += PvlKeyword("SampleStandardDeviation", toString(sDev));
+  results += PvlKeyword("LineMinimum", toString(lMin));
+  results += PvlKeyword("LineAverage", toString(lTrans));
+  results += PvlKeyword("LineMaximum", toString(lMax));
+  results += PvlKeyword("LineStandardDeviation", toString(lDev));
   Application::Log(results);
 
   Pvl arPvl = ar->RegistrationStatistics();
@@ -224,7 +224,7 @@ void IsisMain() {
 
   // If none of the points registered, throw an error
   if(sStats.TotalPixels() < 1) {
-    string msg = "Coreg was unable to register any points. Check your algorithm definition.";
+    QString msg = "Coreg was unable to register any points. Check your algorithm definition.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -241,9 +241,9 @@ void IsisMain() {
   // The flatfile is comma seperated and can be imported into an excel
   // spreadsheet
   if(ui.WasEntered("FLATFILE")) {
-    string fFile = FileName(ui.GetFileName("FLATFILE")).expanded();
+    QString fFile = FileName(ui.GetFileName("FLATFILE")).expanded();
     ofstream os;
-    os.open(fFile.c_str(), ios::out);
+    os.open(fFile.toAscii().data(), ios::out);
     os << "Sample,Line,TranslatedSample,TranslatedLine," <<
        "SampleDifference,LineDifference,GoodnessOfFit" << endl;
     for(int i = 0; i < cn.GetNumPoints(); i++) {
@@ -266,20 +266,20 @@ void IsisMain() {
   // second input image
   if(ui.WasEntered("TO")) {
     if(ui.GetString("TRANSFORM") == "TRANSLATE") {
-      string params = " from="   + ui.GetFileName("FROM") +
+      QString params = " from="   + ui.GetFileName("FROM") +
                       " to="     + ui.GetFileName("TO") +
-                      " strans=" + IString(sTrans) +
-                      " ltrans=" + IString(lTrans) +
+                      " strans=" + toString(sTrans) +
+                      " ltrans=" + toString(lTrans) +
                       " interp=" + ui.GetString("INTERP");
       ProgramLauncher::RunIsisProgram("translate", params);
     }
     else {
-      string params = " from="    + ui.GetFileName("FROM") +
+      QString params = " from="    + ui.GetFileName("FROM") +
                       " to="     + ui.GetFileName("TO") +
                       " cube="   + ui.GetFileName("MATCH") +
                       " cnet="   + ui.GetFileName("ONET") +
                       " interp=" + ui.GetString("INTERP") +
-                      " degree=" + IString(ui.GetInteger("DEGREE"));
+                      " degree=" + toString(ui.GetInteger("DEGREE"));
       ProgramLauncher::RunIsisProgram("warp", params);
     }
   }
@@ -288,7 +288,7 @@ void IsisMain() {
 //Helper function to output the regdeft file to log.
 void helperButtonLog() {
   UserInterface &ui = Application::GetUserInterface();
-  string file(ui.GetFileName("DEFFILE"));
+  QString file(ui.GetFileName("DEFFILE"));
   Pvl p;
   p.Read(file);
   Application::GuiLog(p);

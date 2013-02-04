@@ -1,14 +1,16 @@
 #include <iostream>
 #include "Blob.h"
 #include "IException.h"
+#include "IString.h"
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
 
 class MyBlob : public Isis::Blob {
   public:
-    MyBlob(const string &name) : Isis::Blob(name, "Blob") {};
-    MyBlob(const string &name, const string &file) : Isis::Blob(name, "Blob", file) {};
+    MyBlob(const QString &name) : Isis::Blob(name, "Blob") {};
+    MyBlob(const QString &name, const QString &file) : Isis::Blob(name, "Blob", file) {};
     void MyBuf(char *buf, int size) {
       p_buffer = new char[size];
       p_nbytes = size;

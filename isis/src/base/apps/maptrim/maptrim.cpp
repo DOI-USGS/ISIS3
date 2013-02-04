@@ -43,7 +43,7 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  string mode = ui.GetString("MODE");
+  QString mode = ui.GetString("MODE");
 
   if(mode != "TRIM") {
     smallestLine = smallestSample = INT_MAX;
@@ -58,7 +58,7 @@ void IsisMain() {
     int lines = biggestLine - smallestLine + 1;
 
     // Run external crop
-    string cropParams = "";
+    QString cropParams = "";
     cropParams += "from=\"" + ui.GetFileName("FROM") + "\"";
     if(mode == "CROP") {
       cropParams += " to=\"" + ui.GetAsString("TO") + "\"";
@@ -67,16 +67,16 @@ void IsisMain() {
       cropParams += " to=TEMPORARYcropped.cub ";
     }
 
-    cropParams += " sample= "   + IString(smallestSample);
-    cropParams += " nsamples= " + IString(samples);
-    cropParams += " line= "     + IString(smallestLine);
-    cropParams += " nlines= "   + IString(lines);
+    cropParams += " sample= "   + toString(smallestSample);
+    cropParams += " nsamples= " + toString(samples);
+    cropParams += " line= "     + toString(smallestLine);
+    cropParams += " nlines= "   + toString(lines);
 
     try {
       ProgramLauncher::RunIsisProgram("crop", cropParams);
     }
     catch(IException &e) {
-      string msg = "Could not execute crop with params: [" + cropParams + "]";
+      QString msg = "Could not execute crop with params: [" + cropParams + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     if(mode == "BOTH") {

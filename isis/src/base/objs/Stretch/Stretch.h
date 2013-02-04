@@ -88,7 +88,7 @@ namespace Isis {
       double p_minimum; //!<By default this value is set to p_lrs
       double p_maximum; //!<By default this value is set to p_hrs
 
-      std::pair<double, double> NextPair(Isis::IString &pairs);
+      std::pair<double, double> NextPair(QString &pairs);
 
     public:
       Stretch();
@@ -160,17 +160,17 @@ namespace Isis {
         p_maximum = value;
       }
 
-      void Load(Pvl &pvl, std::string &grpName);
-      void Save(Pvl &pvl, std::string &grpName);
-      void Load(std::string &file, std::string &grpName);
-      void Save(std::string &file, std::string &grpName);
+      void Load(Pvl &pvl, QString &grpName);
+      void Save(Pvl &pvl, QString &grpName);
+      void Load(QString &file, QString &grpName);
+      void Save(QString &file, QString &grpName);
 
       double Map(const double value) const;
 
-      void Parse(const std::string &pairs);
-      void Parse(const std::string &pairs, const Isis::Histogram *hist);
+      void Parse(const QString &pairs);
+      void Parse(const QString &pairs, const Isis::Histogram *hist);
 
-      std::string Text() const;
+      QString Text() const;
 
       //! Returns the number of stretch pairs
       int Pairs() const {

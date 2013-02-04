@@ -1,4 +1,4 @@
-#if !defined(Minnaert_h)
+#ifndef Minnaert_h
 #define Minnaert_h
 /**
  * @file

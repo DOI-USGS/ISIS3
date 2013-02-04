@@ -159,8 +159,8 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
     }
     unsigned int index = parameter->listOptions.size();
     parameter->listOptions.resize(index + 1);
-    Isis::IString lo = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
-    lo.UpCase();
+    QString lo = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
+    lo = lo.toUpper();
     parameter->listOptions[index].value = lo;
     listHandler = new IsisXMLList(encodingName, expandNamespaces, parser,
                                   &parameter->listOptions[index]);
@@ -170,9 +170,8 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
       delete generalHandler;
       generalHandler = NULL;
     }
-    Isis::IString mi = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
-    mi.DownCase();
-    parameter->minimum_inclusive = mi;
+    QString mi = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
+    parameter->minimum_inclusive = mi.toLower();
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces,
                                         parser, &parameter->minimum);
   }
@@ -181,9 +180,8 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
       delete generalHandler;
       generalHandler = NULL;
     }
-    Isis::IString mi = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
-    mi.DownCase();
-    parameter->maximum_inclusive = mi;
+    QString mi = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
+    parameter->maximum_inclusive = mi.toLower();
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces, parser,
                                         &parameter->maximum);
   }

@@ -21,8 +21,8 @@ void LoadCameraRes();
 void LoadMapRange();
 void LoadCameraRange();
 
-map <string, void *> GuiHelpers() {
-  map <string, void *> helper;
+map <QString, void *> GuiHelpers() {
+  map <QString, void *> helper;
   helper ["PrintMap"] = (void *) PrintMap;
   helper ["LoadMapRes"] = (void *) LoadMapRes;
   helper ["LoadCameraRes"] = (void *) LoadCameraRes;
@@ -53,8 +53,8 @@ void IsisMain() {
 
   // Make sure it is not the sky
   if(incam->target()->isSky()) {
-    string msg = "The image [" + ui.GetFileName("FROM") +
-                 "] is targeting the sky, use skymap instead.";
+    QString msg = "The image [" + ui.GetFileName("FROM") +
+                  "] is targeting the sky, use skymap instead.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -67,10 +67,10 @@ void IsisMain() {
   // Make the target info match the user mapfile
   double minlat, maxlat, minlon, maxlon;
   incam->GroundRange(minlat, maxlat, minlon, maxlon, userMap);
-  camGrp.AddKeyword(PvlKeyword("MinimumLatitude", minlat), Pvl::Replace);
-  camGrp.AddKeyword(PvlKeyword("MaximumLatitude", maxlat), Pvl::Replace);
-  camGrp.AddKeyword(PvlKeyword("MinimumLongitude", minlon), Pvl::Replace);
-  camGrp.AddKeyword(PvlKeyword("MaximumLongitude", maxlon), Pvl::Replace);
+  camGrp.AddKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
+  camGrp.AddKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
+  camGrp.AddKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
+  camGrp.AddKeyword(PvlKeyword("MaximumLongitude", toString(maxlon)), Pvl::Replace);
 
 
   // We want to delete the keywords we just added if the user wants the range
@@ -102,22 +102,22 @@ void IsisMain() {
   // If the user decided to enter a ground range then override
   if(ui.WasEntered("MINLON") && !ui.GetBoolean("MATCHMAP")) {
     userGrp.AddKeyword(PvlKeyword("MinimumLongitude",
-                                  ui.GetDouble("MINLON")), Pvl::Replace);
+                                  toString(ui.GetDouble("MINLON"))), Pvl::Replace);
   }
 
   if(ui.WasEntered("MAXLON") && !ui.GetBoolean("MATCHMAP")) {
     userGrp.AddKeyword(PvlKeyword("MaximumLongitude",
-                                  ui.GetDouble("MAXLON")), Pvl::Replace);
+                                  toString(ui.GetDouble("MAXLON"))), Pvl::Replace);
   }
 
   if(ui.WasEntered("MINLAT") && !ui.GetBoolean("MATCHMAP")) {
     userGrp.AddKeyword(PvlKeyword("MinimumLatitude",
-                                  ui.GetDouble("MINLAT")), Pvl::Replace);
+                                  toString(ui.GetDouble("MINLAT"))), Pvl::Replace);
   }
 
   if(ui.WasEntered("MAXLAT") && !ui.GetBoolean("MATCHMAP")) {
     userGrp.AddKeyword(PvlKeyword("MaximumLatitude",
-                                  ui.GetDouble("MAXLAT")), Pvl::Replace);
+                                  toString(ui.GetDouble("MAXLAT"))), Pvl::Replace);
   }
 
   // If they want the res. from the mapfile, delete it from the camera so
@@ -146,7 +146,7 @@ void IsisMain() {
   // If the user decided to enter a resolution then override
   if(ui.GetString("PIXRES") == "MPP" && !ui.GetBoolean("MATCHMAP")) {
     userGrp.AddKeyword(PvlKeyword("PixelResolution",
-                                  ui.GetDouble("RESOLUTION")),
+                                  toString(ui.GetDouble("RESOLUTION"))),
                        Pvl::Replace);
     if(userGrp.HasKeyword("Scale")) {
       userGrp.DeleteKeyword("Scale");
@@ -154,7 +154,7 @@ void IsisMain() {
   }
   else if(ui.GetString("PIXRES") == "PPD" && !ui.GetBoolean("MATCHMAP")) {
     userGrp.AddKeyword(PvlKeyword("Scale",
-                                  ui.GetDouble("RESOLUTION")),
+                                  toString(ui.GetDouble("RESOLUTION"))),
                        Pvl::Replace);
     if(userGrp.HasKeyword("PixelResolution")) {
       userGrp.DeleteKeyword("PixelResolution");
@@ -167,22 +167,22 @@ void IsisMain() {
     if(incam->IntersectsLongitudeDomain(userMap)) {
       if(ui.GetString("LONSEAM") == "AUTO") {
         if((int) userGrp["LongitudeDomain"] == 360) {
-          userGrp.AddKeyword(PvlKeyword("LongitudeDomain", 180),
+          userGrp.AddKeyword(PvlKeyword("LongitudeDomain", "180"),
                              Pvl::Replace);
           if(incam->IntersectsLongitudeDomain(userMap)) {
             // Its looks like a global image so switch back to the
             // users preference
-            userGrp.AddKeyword(PvlKeyword("LongitudeDomain", 360),
+            userGrp.AddKeyword(PvlKeyword("LongitudeDomain", "360"),
                                Pvl::Replace);
           }
         }
         else {
-          userGrp.AddKeyword(PvlKeyword("LongitudeDomain", 360),
+          userGrp.AddKeyword(PvlKeyword("LongitudeDomain", "360"),
                              Pvl::Replace);
           if(incam->IntersectsLongitudeDomain(userMap)) {
             // Its looks like a global image so switch back to the
             // users preference
-            userGrp.AddKeyword(PvlKeyword("LongitudeDomain", 180),
+            userGrp.AddKeyword(PvlKeyword("LongitudeDomain", "180"),
                                Pvl::Replace);
           }
         }
@@ -190,22 +190,22 @@ void IsisMain() {
         double minlat, maxlat, minlon, maxlon;
         incam->GroundRange(minlat, maxlat, minlon, maxlon, userMap);
         if(!ui.WasEntered("MINLAT")) {
-          userGrp.AddKeyword(PvlKeyword("MinimumLatitude", minlat), Pvl::Replace);
+          userGrp.AddKeyword(PvlKeyword("MinimumLatitude", toString(minlat)), Pvl::Replace);
         }
         if(!ui.WasEntered("MAXLAT")) {
-          userGrp.AddKeyword(PvlKeyword("MaximumLatitude", maxlat), Pvl::Replace);
+          userGrp.AddKeyword(PvlKeyword("MaximumLatitude", toString(maxlat)), Pvl::Replace);
         }
         if(!ui.WasEntered("MINLON")) {
-          userGrp.AddKeyword(PvlKeyword("MinimumLongitude", minlon), Pvl::Replace);
+          userGrp.AddKeyword(PvlKeyword("MinimumLongitude", toString(minlon)), Pvl::Replace);
         }
         if(!ui.WasEntered("MAXLON")) {
-          userGrp.AddKeyword(PvlKeyword("MaximumLongitude", maxlon), Pvl::Replace);
+          userGrp.AddKeyword(PvlKeyword("MaximumLongitude", toString(maxlon)), Pvl::Replace);
         }
       }
 
       else if(ui.GetString("LONSEAM") == "ERROR") {
-        string msg = "The image [" + ui.GetFileName("FROM") + "] crosses the " +
-                     "longitude seam";
+        QString msg = "The image [" + ui.GetFileName("FROM") + "] crosses the " +
+                      "longitude seam";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -271,14 +271,14 @@ void IsisMain() {
   // Create an alpha cube group for the output cube
   if(!ocube->hasGroup("AlphaCube")) {
     PvlGroup alpha("AlphaCube");
-    alpha += PvlKeyword("AlphaSamples", icube->getSampleCount());
-    alpha += PvlKeyword("AlphaLines", icube->getLineCount());
-    alpha += PvlKeyword("AlphaStartingSample", 0.5);
-    alpha += PvlKeyword("AlphaStartingLine", 0.5);
-    alpha += PvlKeyword("AlphaEndingSample", icube->getSampleCount() + 0.5);
-    alpha += PvlKeyword("AlphaEndingLine", icube->getLineCount() + 0.5);
-    alpha += PvlKeyword("BetaSamples", icube->getSampleCount());
-    alpha += PvlKeyword("BetaLines", icube->getLineCount());
+    alpha += PvlKeyword("AlphaSamples", toString(icube->getSampleCount()));
+    alpha += PvlKeyword("AlphaLines", toString(icube->getLineCount()));
+    alpha += PvlKeyword("AlphaStartingSample", toString(0.5));
+    alpha += PvlKeyword("AlphaStartingLine", toString(0.5));
+    alpha += PvlKeyword("AlphaEndingSample", toString(icube->getSampleCount() + 0.5));
+    alpha += PvlKeyword("AlphaEndingLine", toString(icube->getLineCount() + 0.5));
+    alpha += PvlKeyword("BetaSamples", toString(icube->getSampleCount()));
+    alpha += PvlKeyword("BetaLines", toString(icube->getLineCount()));
     ocube->putGroup(alpha);
   }
 
@@ -378,7 +378,7 @@ void IsisMain() {
       startLine -= offset;
     }
 
-    if ((IString((string)instGrp["Framelets"])).UpCase() == "EVEN") {
+    if (((QString)instGrp["Framelets"]).toUpper() == "EVEN") {
       startLine += frameSize;
     }
 
@@ -570,7 +570,7 @@ void LoadMapRes() {
     ui.PutAsString("PIXRES", "MPP");
   }
   else {
-    string msg = "No resolution value found in [" + ui.GetFileName("MAP") + "]";
+    QString msg = "No resolution value found in [" + ui.GetFileName("MAP") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }
@@ -578,7 +578,7 @@ void LoadMapRes() {
 //Helper function to get camera resolution.
 void LoadCameraRes() {
   UserInterface &ui = Application::GetUserInterface();
-  string file = ui.GetFileName("FROM");
+  QString file = ui.GetFileName("FROM");
 
   // Open the input cube, get the camera object, and the cam map projection
   Cube c;
@@ -632,7 +632,7 @@ void LoadMapRange() {
   ui.PutAsString("DEFAULTRANGE", "MAP");
 
   if(count < 4) {
-    string msg = "One or more of the values for the ground range was not found";
+    QString msg = "One or more of the values for the ground range was not found";
     msg += " in [" + ui.GetFileName("MAP") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -641,7 +641,7 @@ void LoadMapRange() {
 //Helper function to load camera range.
 void LoadCameraRange() {
   UserInterface &ui = Application::GetUserInterface();
-  string file = ui.GetFileName("FROM");
+  QString file = ui.GetFileName("FROM");
 
   // Get the map projection file provided by the user
   Pvl userMap;

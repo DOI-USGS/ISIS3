@@ -8,11 +8,12 @@
 #include "LineManager.h"
 
 using namespace std;
+
 int main(int argc, char *argv[]) {
 
   Isis::Preference::Preferences(true);
 
-  string fname = "$base/testData/isisTruth.cub";
+  QString fname = "$base/testData/isisTruth.cub";
   Isis::Cube cube;
   cube.open(fname);
 

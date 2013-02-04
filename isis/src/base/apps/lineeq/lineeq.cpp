@@ -45,8 +45,8 @@ void IsisMain() {
   }
 
   PvlGroup data("lineeq");
-  data += PvlKeyword("BoxcarSize", boxcarSize, "lines");
-  data += PvlKeyword("OutputCsv", ui.GetBoolean("AVERAGES"));
+  data += PvlKeyword("BoxcarSize", toString(boxcarSize), "lines");
+  data += PvlKeyword("OutputCsv", toString((int)ui.GetBoolean("AVERAGES")));
 
   TextFile *csvOutput = NULL;
   if(ui.GetBoolean("AVERAGES")) {
@@ -84,7 +84,7 @@ void IsisMain() {
       double filteredLine = filter.Average(line);
 
       if(csvOutput != NULL) {
-        csvOutput->PutLine((IString)lineAverages[band][line] + (IString)"," + (IString)filteredLine);
+        csvOutput->PutLine(toString(lineAverages[band][line]) + (QString)"," + toString(filteredLine));
       }
 
       lineAverages[band][line] = filteredLine;

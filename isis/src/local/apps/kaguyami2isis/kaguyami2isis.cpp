@@ -24,15 +24,15 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   FileName inFile = ui.GetFileName("FROM");
-  IString id;
+  QString id;
   Pvl lab(inFile.expanded());
 
   try {
-    id = (string) lab.FindKeyword("DATA_SET_ID");
+    id = (QString) lab.FindKeyword("DATA_SET_ID");
   }
   catch(IException &e) {
-    string msg = "Unable to read [DATA_SET_ID] from input file [" +
-                 inFile.expanded() + "]";
+    QString msg = "Unable to read [DATA_SET_ID] from input file [" +
+                  inFile.expanded() + "]";
     throw IException(e, IException::Unknown, msg, _FILEINFO_);
   }
 
@@ -45,7 +45,7 @@ void IsisMain() {
 
   // Get the directory where the Kaguya MI translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  IString transDir = (string) dataDir["Kaguya"] + "/translations/";
+  QString transDir = (QString) dataDir["Kaguya"] + "/translations/";
   Pvl inputLabel(inFile.expanded());
   Pvl *outputLabel = outcube->getLabel();
   FileName transFile;
@@ -61,23 +61,23 @@ void IsisMain() {
   instrumentXlater.Auto(*(outputLabel));
     //trim trailing z's from the time strings
   PvlGroup &instGroup(outputLabel->FindGroup("Instrument",Pvl::Traverse));
-  IString timeString;
+  QString timeString;
     //StartTime 
   PvlKeyword &startTimeKeyword=instGroup["StartTime"];
   timeString = startTimeKeyword[0];
-  startTimeKeyword.SetValue( timeString.substr(0,timeString.find_last_of("Z")) );
+  startTimeKeyword.SetValue( timeString.mid(0,timeString.lastIndexOf("Z")) );
     //StartTimeRaw
   PvlKeyword &startTimeRawKeyword=instGroup["StartTimeRaw"];
   timeString = startTimeRawKeyword[0];
-  startTimeRawKeyword.SetValue( timeString.substr(0,timeString.find_last_of("Z")) );
+  startTimeRawKeyword.SetValue( timeString.mid(0,timeString.lastIndexOf("Z")) );
     //StopTime
   PvlKeyword &stopTimeKeyword=instGroup["StopTime"];
   timeString = stopTimeKeyword[0];
-  stopTimeKeyword.SetValue( timeString.substr(0,timeString.find_last_of("Z")) );
+  stopTimeKeyword.SetValue( timeString.mid(0,timeString.lastIndexOf("Z")) );
     //StopTimeRaw
   PvlKeyword &stopTimeRawKeyword=instGroup["StopTimeRaw"];
   timeString = stopTimeRawKeyword[0];
-  stopTimeRawKeyword.SetValue( timeString.substr(0,timeString.find_last_of("Z")) );
+  stopTimeRawKeyword.SetValue( timeString.mid(0,timeString.lastIndexOf("Z")) );
 
 
   // Translate the BandBin group
@@ -88,24 +88,24 @@ void IsisMain() {
   //Set up the Kernels group
   PvlGroup kern("Kernels");
   if      (lab.FindKeyword("INSTRUMENT_ID")[0] == "MI-VIS") {
-    kern += PvlKeyword("NaifFrameCode", -131335);
-    kern += PvlKeyword("NaifCkCode", -131330);
+    kern += PvlKeyword("NaifFrameCode", toString(-131335));
+    kern += PvlKeyword("NaifCkCode", toString(-131330));
   }
   else if (lab.FindKeyword("INSTRUMENT_ID")[0] == "MI-NIR") {
-    kern += PvlKeyword("NaifFrameCode", -131341);
-    kern += PvlKeyword("NaifCkCode", -131340);
+    kern += PvlKeyword("NaifFrameCode", toString(-131341));
+    kern += PvlKeyword("NaifCkCode", toString(-131340));
   }
 
   //At the time of this writing there was no expectation that Kaguya ever did any binning
   //  so this is check to make sure an error is thrown if an image was binned
   if (lab.FindKeyword("INSTRUMENT_ID")[0] == "MI-VIS" && outcube->getSampleCount() != 962 ) {
-    string msg = "Input file [" + inFile.expanded() + "]" + " appears to be binned.  Binning was "
-                 "unexpected, and is unsupported by the camera model";
+    QString msg = "Input file [" + inFile.expanded() + "]" + " appears to be binned.  Binning was "
+                  "unexpected, and is unsupported by the camera model";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
   if (lab.FindKeyword("INSTRUMENT_ID")[0] == "MI-NIR" && outcube->getSampleCount() != 320 ) {
-    string msg = "Input file [" + inFile.expanded() + "]" + " appears to be binned.  Binning was "
-                 "unexpected, and is unsupported by the camera model";
+    QString msg = "Input file [" + inFile.expanded() + "]" + " appears to be binned.  Binning was "
+                  "unexpected, and is unsupported by the camera model";
     throw IException(IException::Unknown, msg, _FILEINFO_);
   }
 

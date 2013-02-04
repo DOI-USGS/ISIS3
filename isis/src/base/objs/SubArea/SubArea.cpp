@@ -166,9 +166,9 @@ namespace Isis {
         Projection &proj = *icube->getProjection();
         proj.SetWorld(p_ss - 0.5, p_sl - 0.5);
         PvlGroup &mapgroup = inlabel.FindObject("IsisCube").FindGroup("Mapping", Pvl::Traverse);
-        mapgroup.AddKeyword(PvlKeyword("UpperLeftCornerX", proj.XCoord()),
+        mapgroup.AddKeyword(PvlKeyword("UpperLeftCornerX", toString(proj.XCoord())),
                             Pvl::Replace);
-        mapgroup.AddKeyword(PvlKeyword("UpperLeftCornerY", proj.YCoord()),
+        mapgroup.AddKeyword(PvlKeyword("UpperLeftCornerY", toString(proj.YCoord())),
                             Pvl::Replace);
       }
 
@@ -176,13 +176,13 @@ namespace Isis {
       // mapping scale and resolution.
       if(p_linc == p_sinc && p_linc != 1.0) {
         PvlGroup &mapgroup = inlabel.FindObject("IsisCube").FindGroup("Mapping", Pvl::Traverse);
-        string pixresUnit = mapgroup["PixelResolution"].Unit();
-        double pixres = mapgroup["PixelResolution"];
-        mapgroup["PixelResolution"] = pixres * p_linc;
+        QString pixresUnit = mapgroup["PixelResolution"].Unit();
+        double pixres = toDouble(mapgroup["PixelResolution"][0]);
+        mapgroup["PixelResolution"] = toString(pixres * p_linc);
         mapgroup["PixelResolution"].SetUnits(pixresUnit);
-        string scaleUnit = mapgroup["Scale"].Unit();
+        QString scaleUnit = mapgroup["Scale"].Unit();
         double scale = mapgroup["Scale"];
-        mapgroup["Scale"] = scale / p_linc;
+        mapgroup["Scale"] = toString(scale / p_linc);
         mapgroup["Scale"].SetUnits(scaleUnit);
       }
 

@@ -8,35 +8,36 @@
 #include "Preference.h"
 #include "Statistics.h"
 
+using namespace Isis;
 using namespace std;
 
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   try {
     cout << "UnitTest for Camera Statistics" << endl;
-    Isis::Cube cube;
+    Cube cube;
     cube.open("$Clementine1/testData/lna1391h.cub");
-    Isis::Camera *cam = cube.getCamera();
+    Camera *cam = cube.getCamera();
     cout << setprecision(6);
 
-    Isis::CameraStatistics camStats(cam, 1, 1);
-    Isis::Pvl statsPvl = camStats.toPvl();
+    CameraStatistics camStats(cam, 1, 1);
+    Pvl statsPvl = camStats.toPvl();
     cout << endl;
 
     for (int i = 0; i < statsPvl.Groups(); i++) {
-      Isis::PvlGroup &group = statsPvl.Group(i);
+      PvlGroup &group = statsPvl.Group(i);
       cout << group.Name() << ":" << endl;
 
       for (int j = 0; j < group.Keywords(); j++) {
-        Isis::PvlKeyword &keyword = group[j];
-        cout << "  " << keyword.Name() << " = " << (double) keyword[0] << endl;
+        PvlKeyword &keyword = group[j];
+        cout << "  " << keyword.Name() << " = " << toDouble(keyword[0]) << endl;
       }
 
       cout << endl;
     }
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 }

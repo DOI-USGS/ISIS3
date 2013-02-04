@@ -25,10 +25,6 @@ using namespace std;
 
 #include "Message.h"
 
-string Isis::Message::KeywordBlockStartMissing
-(const string &block, const string &found) {
-  string message;
-  message = "Expecting start of keyword block [" + block + "] " +
-            "but found [" + found + "]";
-  return message;
+QString Isis::Message::KeywordBlockStartMissing(const QString &block, const QString &found) {
+  return "Expecting start of keyword block [" + block + "] but found [" + found + "]";
 }

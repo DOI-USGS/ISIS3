@@ -11,7 +11,7 @@ namespace Isis {
       int group, int param) :
     GuiParameter(grid, ui, group, param) {
 
-    p_checkBox = new QCheckBox((IString)ui.ParamBrief(group, param));
+    p_checkBox = new QCheckBox((QString)ui.ParamBrief(group, param));
 
     grid->addWidget(p_checkBox, param, 2);
 
@@ -29,29 +29,29 @@ namespace Isis {
   GuiBooleanParameter::~GuiBooleanParameter() {}
 
 
-  void GuiBooleanParameter::Set(IString newValue) {
+  void GuiBooleanParameter::Set(QString newValue) {
     p_checkBox->setChecked(p_ui->StringToBool(newValue));
     emit ValueChanged();
   }
 
 
-  IString GuiBooleanParameter::Value() {
+  QString GuiBooleanParameter::Value() {
     return p_checkBox->isChecked() ? "YES" : "NO";
   }
 
-  std::vector<std::string> GuiBooleanParameter::Exclusions() {
-    std::vector<std::string> list;
+  std::vector<QString> GuiBooleanParameter::Exclusions() {
+    std::vector<QString> list;
 
     // Exclude exclusions or inclusions
     if(Value() == "YES") {
       for(int i = 0; i < p_ui->ParamExcludeSize(p_group, p_param); i++) {
-        std::string s = p_ui->ParamExclude(p_group, p_param, i);
+        QString s = p_ui->ParamExclude(p_group, p_param, i);
         list.push_back(s);
       }
     }
     else {
       for(int i = 0; i < p_ui->ParamIncludeSize(p_group, p_param); i++) {
-        std::string s = p_ui->ParamInclude(p_group, p_param, i);
+        QString s = p_ui->ParamInclude(p_group, p_param, i);
         list.push_back(s);
       }
     }
@@ -62,15 +62,14 @@ namespace Isis {
   //! Return if the parameter value is different from the default value
   bool GuiBooleanParameter::IsModified() {
     if(!IsEnabled()) return false;
-    IString value;
+    QString value;
     if(p_ui->ParamDefault(p_group, p_param).size() > 0) {
-      value = p_ui->ParamDefault(p_group, p_param);
+      value = p_ui->ParamDefault(p_group, p_param).toUpper();
     }
     else {
       value = "NO";
     }
 
-    value.UpCase();
     if(value == "0") value = "NO";
     if(value == "FALSE") value = "NO";
     if(value == "N") value = "NO";

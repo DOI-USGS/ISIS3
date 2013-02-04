@@ -76,7 +76,7 @@ namespace Isis {
       double p_interlineDelay;         /**< InterlineDelayDuration keyword value from
                                             the instrument group of the labels, divided by 1000 */
 
-      std::string p_channel;           /**< Channel keyword value from the instrument group of the labels.
+      QString p_channel;           /**< Channel keyword value from the instrument group of the labels.
                                             Possible values are IR or VIS */
       double p_visExp;                 //!< VIS exposure duration, divided by 1000
       double p_irExp;                  //!< IR exposure duration, divided by 1000

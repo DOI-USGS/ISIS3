@@ -952,10 +952,9 @@ isisimportpds: Gathering statistics
 0% Processed10% Processed20% Processed30% Processed40% Processed50% Processed60% Processed70% Processed80% Processed90% Processed100% Processed
 687.556
 282178
-**I/O ERROR** Unable to open OriginalLabel [IsisCube] in file [./unitTest.cub].
-**I/O ERROR** Unable to read OriginalLabel [IsisCube].
-**PROGRAMMER ERROR** Unable to find OriginalLabel [IsisCube].
-
+**I/O ERROR** Unable to open OriginalLabel [] in file [].
+**I/O ERROR** Unable to read OriginalLabel [].
+**PROGRAMMER ERROR** Unable to find OriginalLabel [].
 
 Testing Isis2 file
 isisimportpds: Importing

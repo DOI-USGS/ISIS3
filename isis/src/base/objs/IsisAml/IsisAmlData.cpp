@@ -28,11 +28,6 @@ using namespace std;
 
 // Constructors
 IsisAmlData::IsisAmlData() {
-  name.erase();
-  brief.erase();
-  description.erase();
-  groups.clear();
-  categorys.clear();
 }
 
 IsisAmlData::~IsisAmlData() {
@@ -41,11 +36,6 @@ IsisAmlData::~IsisAmlData() {
 
 // Helper classes
 IsisHelperData::IsisHelperData() {
-  name.erase();
-  icon.erase();
-  brief.erase();
-  description.erase();
-  function.erase();
 }
 
 IsisHelperData::~IsisHelperData() {
@@ -53,7 +43,6 @@ IsisHelperData::~IsisHelperData() {
 
 
 IsisGroupData::IsisGroupData() {
-  name.erase();
 }
 
 IsisGroupData::~IsisGroupData() {
@@ -61,29 +50,6 @@ IsisGroupData::~IsisGroupData() {
 
 
 IsisParameterData::IsisParameterData() {
-  values.clear();
-  name.erase();
-  brief.erase();
-  description.erase();
-  type.erase();
-  internalDefault.erase();
-  count.erase();
-  defaultValues.clear();
-  exclude.clear();
-  include.clear();
-  filter.erase();
-  greaterThan.clear();
-  greaterThanOrEqual.clear();
-  lessThan.clear();
-  lessThanOrEqual.clear();
-  internalDefault.erase();
-  notEqual.clear();
-  maximum.erase();
-  maximum_inclusive.erase();
-  minimum.erase();
-  minimum_inclusive.erase();
-  odd.erase();
-  helpers.clear();
 }
 
 IsisParameterData::~IsisParameterData() {
@@ -91,10 +57,6 @@ IsisParameterData::~IsisParameterData() {
 
 
 IsisListOptionData::IsisListOptionData() {
-  value.erase();
-  brief.erase();
-  description.erase();
-  exclude.clear();
 }
 
 IsisListOptionData::~IsisListOptionData() {
@@ -102,9 +64,6 @@ IsisListOptionData::~IsisListOptionData() {
 
 
 IsisChangeData::IsisChangeData() {
-  name.erase();
-  date.erase();
-  description.erase();
 }
 
 IsisChangeData::~IsisChangeData() {

@@ -26,7 +26,7 @@
 
 #include "tnt/tnt_array2d.h"
 
-#if !defined(__sun__)
+#ifndef __sun__
 #include "gmm/gmm.h"
 #endif
 
@@ -149,7 +149,7 @@ namespace Isis {
       int GetDegreesOfFreedom() { return p_degreesOfFreedom; }
       void Reset ();
 
-#if !defined(__sun__)
+#ifndef __sun__
       void ResetSparse() { Reset(); }
       bool SparseErrorPropagation();
       std::vector<double> GetEpsilons () const { return p_epsilonsSparse; }
@@ -163,7 +163,7 @@ namespace Isis {
       void SolveQRD();
       void SolveCholesky () {}
 
-#if !defined(__sun__)
+#ifndef __sun__
       int SolveSparse();
       void FillSparseA(const std::vector<double> &data);
       bool ApplyParameterWeights();

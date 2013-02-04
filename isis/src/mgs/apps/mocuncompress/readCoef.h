@@ -40,7 +40,7 @@ SCCSID @(#)readCoef.h  1.1 10/04/99
 */
 /* SCCShid @(#)readCoef.h (readCoef.h) 1.2 */
 
-#if !defined(readCoef_h)
+#ifndef readCoef_h
 
 #define readCoef_h
 

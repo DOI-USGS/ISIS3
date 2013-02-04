@@ -316,8 +316,8 @@ namespace Isis {
     }
     catch (IException &e) {
       QString message = "Cannot initialize universal ground map for basemap.\n";
-      string errors = e.toString();
-      message += errors.c_str();
+      QString errors = e.toString();
+      message += errors;
       QMessageBox::critical((QWidget *)parent(), "Error", message);
       return;
     }
@@ -326,8 +326,8 @@ namespace Isis {
     }
     catch (IException &e) {
       QString message = "Cannot initialize universal ground map for match cube.\n";
-      string errors = e.toString();
-      message += errors.c_str();
+      QString errors = e.toString();
+      message += errors;
       QMessageBox::critical((QWidget *)parent(), "Error", message);
       return;
     }
@@ -405,7 +405,7 @@ namespace Isis {
       message += "Latitude = " + QString::number(lat);
       message += "  Longitude = " + QString::number(lon);
       message += "  Radius = " + QString::number(radius.meters()) + "\n";
-      message += e.toString().ToQt();
+      message += e.toString();
       QMessageBox::critical((QWidget *)parent(),"Error",message);
     }
 
@@ -444,8 +444,8 @@ namespace Isis {
     // ???  do we only allow mouse clicks on level1???
     //    If we allow on both, need to find samp,line on level1 if
     //    they clicked on basemap.
-    std::string file = cvp->cube()->getFileName();
-    std::string sn = p_serialNumberList->SerialNumber(file);
+    QString file = cvp->cube()->getFileName();
+    QString sn = p_serialNumberList->SerialNumber(file);
 
     double samp, line;
     cvp->viewportToCube(p.x(), p.y(), samp, line);
@@ -465,7 +465,7 @@ namespace Isis {
       catch (IException &e) {
         QString message = "No points found for editing.  Create points ";
         message += "using the right mouse button.";
-        message += e.toString().ToQt();
+        message += e.toString();
         QMessageBox::critical((QWidget *)parent(), "Error", message);
         return;
       }
@@ -566,9 +566,9 @@ namespace Isis {
       }
       else {
         // Make sure Id doesn't already exist
-        newPoint = new ControlPoint(id.toStdString());
+        newPoint = new ControlPoint(id);
         if (p_controlNet->ContainsPoint(newPoint->GetId())) {
-          IString message = "A ControlPoint with Point Id = [" +
+          QString message = "A ControlPoint with Point Id = [" +
                             newPoint->GetId() +
                             "] already exists.  Re-enter unique Point Id.";
           QMessageBox::warning((QWidget *)parent(), "Unique Point Id", message);
@@ -675,7 +675,7 @@ namespace Isis {
                                    p_matchCube, p_controlPoint->GetId());
 
     //  Write pointId
-    IString ptId = "Point ID:  " + p_controlPoint->GetId();
+    QString ptId = "Point ID:  " + p_controlPoint->GetId();
     p_ptIdValue->setText(ptId);
   }
 
@@ -708,7 +708,7 @@ namespace Isis {
       return;
 
     //  Draw all measures
-    std::string serialNumber = SerialNumber::Compose(*vp->cube(), true);
+    QString serialNumber = SerialNumber::Compose(*vp->cube(), true);
     for (int i = 0; i < p_controlNet->GetNumPoints(); i++) {
       ControlPoint &p = *p_controlNet->GetPoint(i);
       if (p_controlPoint != NULL && p.GetId() == p_controlPoint->GetId()) {
@@ -829,8 +829,8 @@ namespace Isis {
     }
     catch (IException &e) {
       QString message = "Bundle Solution failed.\n";
-      string errors = e.toString();
-      message += errors.c_str();
+      QString errors = e.toString();
+      message += errors;
 //      message += "\n\nMaximum Error = " + QString::number(net.MaximumResiudal());
 //      message += "\nAverage Error = " + QString::number(net.AverageResidual());
       message += "\n\nMaximum Error = " + QString::number(net.GetMaximumResidual());
@@ -863,8 +863,8 @@ namespace Isis {
     catch (IException &e) {
       QString message = "Could not read cube history, "
                         "will not update history.\n";
-      string errors = e.toString();
-      message += errors.c_str();
+      QString errors = e.toString();
+      message += errors;
       QMessageBox::warning((QWidget *)parent(), "Warning", message);
       return;
     }
@@ -927,7 +927,7 @@ namespace Isis {
       // to view and/or edit the template
       PvlEditDialog registrationDialog(templatePvl);
       registrationDialog.setWindowTitle("View or Edit Template File: "
-                                        + QString::fromStdString(templatePvl.FileName()));
+                                        + (templatePvl.FileName()));
       registrationDialog.resize(550, 360);
       registrationDialog.exec();
     }
@@ -971,12 +971,12 @@ namespace Isis {
           net.AddPoint(pt);
         }
 
-        net.Write(fn.toStdString());
+        net.Write(fn);
       }
       catch (IException &e) {
         QString message = "Error saving control network.  \n";
-        string errors = e.toString();
-        message += errors.c_str();
+        QString errors = e.toString();
+        message += errors;
         QMessageBox::information((QWidget *)parent(), "Error", message);
         return;
       }

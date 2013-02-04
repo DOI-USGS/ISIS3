@@ -24,15 +24,15 @@ void IsisMain() {
   Preference::Preferences(true);
   cout << "UnitTest for ControlNetStatistics ...." << endl << endl;
 
-  Isis::UserInterface &ui = Isis::Application::GetUserInterface();
+  UserInterface &ui = Application::GetUserInterface();
 
   cout << "CNET=" << ui.GetAsString("CNET") << endl;
   cout << "Serial File=" << ui.GetAsString("FROMLIST") << endl;
 
-  Isis::ControlNet cnetOrig(ui.GetFileName("CNET"));
-  Isis::ControlNet cnet = cnetOrig;
+  ControlNet cnetOrig(ui.GetFileName("CNET"));
+  ControlNet cnet = cnetOrig;
 
-  std::string sSerialFile = ui.GetFileName("FROMLIST");
+  QString sSerialFile = ui.GetFileName("FROMLIST");
   ControlNetStatistics cnetStats(&cnet, sSerialFile);
 
   PvlGroup statsGrp;

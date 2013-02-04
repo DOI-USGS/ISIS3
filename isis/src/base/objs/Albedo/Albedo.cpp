@@ -1,6 +1,7 @@
 #include "Albedo.h"
 #include "SpecialPixel.h"
 #include "IException.h"
+#include "IString.h"
 
 #define MIN(x,y) (((x) < (y)) ? (x) : (y))
 #define MAX(x,y) (((x) > (y)) ? (x) : (y))
@@ -67,7 +68,7 @@ namespace Isis {
     }
     else {
       if(psurf == 0.0) {
-        std::string msg = "Albedo math divide by zero error";
+        QString msg = "Albedo math divide by zero error";
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
       else {
@@ -90,8 +91,8 @@ namespace Isis {
     */
   void Albedo::SetNormPharef(const double pharef) {
     if(pharef < 0.0 || pharef >= 180.0) {
-      std::string msg = "Invalid value of normalization pharef [" +
-                        IString(pharef) + "]";
+      QString msg = "Invalid value of normalization pharef [" +
+                        toString(pharef) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     p_normPharef = pharef;
@@ -108,8 +109,8 @@ namespace Isis {
     */
   void Albedo::SetNormIncref(const double incref) {
     if(incref < 0.0 || incref >= 90.0) {
-      std::string msg = "Invalid value of normalization incref [" +
-                        IString(incref) + "]";
+      QString msg = "Invalid value of normalization incref [" +
+                        toString(incref) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     p_normIncref = incref;
@@ -126,8 +127,8 @@ namespace Isis {
     */
   void Albedo::SetNormEmaref(const double emaref) {
     if(emaref < 0.0 || emaref >= 90.0) {
-      std::string msg = "Invalid value of normalization emaref [" +
-                        IString(emaref) + "]";
+      QString msg = "Invalid value of normalization emaref [" +
+                        toString(emaref) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     p_normEmaref = emaref;
@@ -141,8 +142,8 @@ namespace Isis {
    */
   void Albedo::SetNormIncmat(const double incmat) {
     if(incmat < 0.0 || incmat >= 90.0) {
-      std::string msg = "Invalid value of normalization incmat [" +
-                        IString(incmat) + "]";
+      QString msg = "Invalid value of normalization incmat [" +
+                        toString(incmat) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     p_normIncmat = incmat;

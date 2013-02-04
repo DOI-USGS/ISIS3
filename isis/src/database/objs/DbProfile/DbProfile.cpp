@@ -25,7 +25,6 @@
 #include <sstream>
 #include <iostream>
 
-using std::string;
 using std::ostringstream;
 
 #include "DbProfile.h"
@@ -73,13 +72,13 @@ namespace Isis {
    * @param prof2  Second profile to merge
    */
   DbProfile::DbProfile(const DbProfile &prof1, const DbProfile &prof2,
-                       const std::string &name) : _name(prof1.Name()),
+                       const QString &name) : _name(prof1.Name()),
     _keys(prof1._keys) {
     for(int nk = 0 ; nk < prof2._keys.size() ; nk++) {
       _keys.add(prof2._keys.key(nk), prof2._keys.getNth(nk));
     }
 
-    if(!name.empty()) {
+    if(!name.isEmpty()) {
       _name = name;
     }
   }
@@ -94,7 +93,7 @@ namespace Isis {
    * @param key   Keyword to add or ammend
    * @param value Value to add to the keyword
    */
-  void DbProfile::add(const std::string &key, const std::string &value) {
+  void DbProfile::add(const QString &key, const QString &value) {
     if(_keys.exists(key)) {
       _keys.get(key).AddValue(value);
     }
@@ -115,7 +114,7 @@ namespace Isis {
    * @param key   Keyword to replace
    * @param value Value to add to the keyword
    */
-  void DbProfile::replace(const std::string &key, const std::string &value) {
+  void DbProfile::replace(const QString &key, const QString &value) {
     _keys.add(key, PvlKeyword(key, value));
   }
 
@@ -125,7 +124,7 @@ namespace Isis {
    *
    * @param key   Keyword to remove
    */
-  void DbProfile::remove(const std::string &key) {
+  void DbProfile::remove(const QString &key) {
     _keys.remove(key);
   }
 
@@ -139,7 +138,7 @@ namespace Isis {
    *
    * @return int Number values in key, or 0 if the key does not exist
    */
-  int DbProfile::count(const std::string &key) const {
+  int DbProfile::count(const QString &key) const {
     if(_keys.exists(key)) {
       return (_keys.get(key).Size());
     }
@@ -156,9 +155,9 @@ namespace Isis {
    *
    * @param nth  Specifies the nth value in the keyword
    *
-   * @return std::string  The requested value in the keyword
+   * @return QString  The requested value in the keyword
    */
-  std::string DbProfile::value(const std::string &key, int nth) const {
+  QString DbProfile::value(const QString &key, int nth) const {
     try {
       return (_keys.get(key)[nth]);
     }
@@ -182,9 +181,9 @@ namespace Isis {
    *
    * @param nth  Specifies the nth value in the keyword
    *
-   * @return std::string  The requested value in the keyword
+   * @return QString  The requested value in the keyword
    */
-  std::string DbProfile::operator()(const std::string &key, int nth) const {
+  QString DbProfile::operator()(const QString &key, int nth) const {
     return (value(key, nth));
   }
 

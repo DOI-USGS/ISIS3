@@ -1,4 +1,4 @@
-#if !defined(TileManager_h)
+#ifndef TileManager_h
 #define TileManager_h
 /**
  * @file

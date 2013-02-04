@@ -26,6 +26,8 @@
 
 #include "ImageExporter.h"
 
+#include "Constants.h"
+
 class QImage;
 
 namespace Isis {
@@ -55,7 +57,7 @@ namespace Isis {
    */
   class QtExporter : public ImageExporter {
     public:
-      QtExporter(IString format);
+      QtExporter(QString format);
       virtual ~QtExporter();
 
       virtual void setGrayscale(ExportDescription &desc);
@@ -64,7 +66,7 @@ namespace Isis {
 
       virtual void write(FileName outputName, int quality=100);
 
-      static bool canWriteFormat(IString format);
+      static bool canWriteFormat(QString format);
 
     protected:
       virtual void writeGrayscale(vector<Buffer *> &in) const;
@@ -78,7 +80,7 @@ namespace Isis {
       QImage *m_qimage;
 
       //! The lowercase abbreviated format of the output image.
-      IString m_format;
+      QString m_format;
   };
 };
 

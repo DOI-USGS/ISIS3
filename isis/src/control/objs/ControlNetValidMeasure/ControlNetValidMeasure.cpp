@@ -89,25 +89,25 @@ namespace Isis {
   void ControlNetValidMeasure::InitStdOptionsGroup(void) {
     mStdOptionsGrp = PvlGroup("StandardOptions");
 
-    mStdOptionsGrp += Isis::PvlKeyword("MinDN",             (mdMinDN == Isis::ValidMinimum ? "NA" : IString(mdMinDN)));
-    mStdOptionsGrp += Isis::PvlKeyword("MaxDN",             (mdMaxDN == Isis::ValidMaximum ? "NA" : IString(mdMaxDN)));
+    mStdOptionsGrp += Isis::PvlKeyword("MinDN",             (mdMinDN == Isis::ValidMinimum ? "NA" : toString(mdMinDN)));
+    mStdOptionsGrp += Isis::PvlKeyword("MaxDN",             (mdMaxDN == Isis::ValidMaximum ? "NA" : toString(mdMaxDN)));
 
-    mStdOptionsGrp += Isis::PvlKeyword("MinEmission",       mdMinEmissionAngle);
-    mStdOptionsGrp += Isis::PvlKeyword("MaxEmission",       mdMaxEmissionAngle);
-    mStdOptionsGrp += Isis::PvlKeyword("MinIncidence",      mdMinIncidenceAngle);
-    mStdOptionsGrp += Isis::PvlKeyword("MaxIncidence",      mdMaxIncidenceAngle);
-    mStdOptionsGrp += Isis::PvlKeyword("MinResolution",     mdMinResolution);
-    mStdOptionsGrp += Isis::PvlKeyword("MaxResolution",     (mdMaxResolution == DBL_MAX ? "NA" : IString(mdSampleResTolerance)));
-    mStdOptionsGrp += Isis::PvlKeyword("PixelsFromEdge",    miPixelsFromEdge);
-    mStdOptionsGrp += Isis::PvlKeyword("MetersFromEdge",    mdMetersFromEdge);
+    mStdOptionsGrp += Isis::PvlKeyword("MinEmission",       toString(mdMinEmissionAngle));
+    mStdOptionsGrp += Isis::PvlKeyword("MaxEmission",       toString(mdMaxEmissionAngle));
+    mStdOptionsGrp += Isis::PvlKeyword("MinIncidence",      toString(mdMinIncidenceAngle));
+    mStdOptionsGrp += Isis::PvlKeyword("MaxIncidence",      toString(mdMaxIncidenceAngle));
+    mStdOptionsGrp += Isis::PvlKeyword("MinResolution",     toString(mdMinResolution));
+    mStdOptionsGrp += Isis::PvlKeyword("MaxResolution",     (mdMaxResolution == DBL_MAX ? "NA" : toString(mdSampleResTolerance)));
+    mStdOptionsGrp += Isis::PvlKeyword("PixelsFromEdge",    toString(miPixelsFromEdge));
+    mStdOptionsGrp += Isis::PvlKeyword("MetersFromEdge",    toString(mdMetersFromEdge));
 
-    mStdOptionsGrp += Isis::PvlKeyword("SampleResidual",    (mdSampleResTolerance   == DBL_MAX ? "NA" : IString(mdSampleResTolerance)));
-    mStdOptionsGrp += Isis::PvlKeyword("LineResidual",      (mdLineResTolerance     == DBL_MAX ? "NA" : IString(mdLineResTolerance)));
-    mStdOptionsGrp += Isis::PvlKeyword("ResidualMagnitude", (mdResidualTolerance    == DBL_MAX ? "NA" : IString(mdResidualTolerance)));
+    mStdOptionsGrp += Isis::PvlKeyword("SampleResidual",    (mdSampleResTolerance   == DBL_MAX ? "NA" : toString(mdSampleResTolerance)));
+    mStdOptionsGrp += Isis::PvlKeyword("LineResidual",      (mdLineResTolerance     == DBL_MAX ? "NA" : toString(mdLineResTolerance)));
+    mStdOptionsGrp += Isis::PvlKeyword("ResidualMagnitude", (mdResidualTolerance    == DBL_MAX ? "NA" : toString(mdResidualTolerance)));
 
-    mStdOptionsGrp += Isis::PvlKeyword("SampleShift",       (m_sampleShiftTolerance == DBL_MAX ? "NA" : IString(m_sampleShiftTolerance)));
-    mStdOptionsGrp += Isis::PvlKeyword("LineShift",         (m_lineShiftTolerance   == DBL_MAX ? "NA" : IString(m_lineShiftTolerance)));
-    mStdOptionsGrp += Isis::PvlKeyword("PixelShift",        (m_pixelShiftTolerance  == DBL_MAX ? "NA" : IString(m_pixelShiftTolerance)));
+    mStdOptionsGrp += Isis::PvlKeyword("SampleShift",       (m_sampleShiftTolerance == DBL_MAX ? "NA" : toString(m_sampleShiftTolerance)));
+    mStdOptionsGrp += Isis::PvlKeyword("LineShift",         (m_lineShiftTolerance   == DBL_MAX ? "NA" : toString(m_lineShiftTolerance)));
+    mStdOptionsGrp += Isis::PvlKeyword("PixelShift",        (m_pixelShiftTolerance  == DBL_MAX ? "NA" : toString(m_pixelShiftTolerance)));
   }
 
   /**
@@ -127,7 +127,7 @@ namespace Isis {
    *
    * @param psSerialNumfile - File with list of Serial Numbers
    */
-  void ControlNetValidMeasure::ReadSerialNumbers(string psSerialNumfile) {
+  void ControlNetValidMeasure::ReadSerialNumbers(QString psSerialNumfile) {
     mSerialNumbers = SerialNumberList(psSerialNumfile, true, &mStatus);
 
     mCubeMgr.SetNumOpenCubes(50);
@@ -181,7 +181,7 @@ namespace Isis {
         measureCamera = pCube->getCamera();
       }
       catch(IException &e) {
-        string msg = "Cannot Create Camera for Image:" + pCube->getFileName();
+        QString msg = "Cannot Create Camera for Image:" + pCube->getFileName();
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
@@ -254,20 +254,20 @@ namespace Isis {
 
     if(pMeasureGrp != NULL) {
       if(mbCameraRequired) {
-        *pMeasureGrp += Isis::PvlKeyword("EmissionAngle",  mdEmissionAngle);
-        *pMeasureGrp += Isis::PvlKeyword("IncidenceAngle", mdIncidenceAngle);
-        *pMeasureGrp += Isis::PvlKeyword("Resolution",     mdResolution);
+        *pMeasureGrp += Isis::PvlKeyword("EmissionAngle",  toString(mdEmissionAngle));
+        *pMeasureGrp += Isis::PvlKeyword("IncidenceAngle", toString(mdIncidenceAngle));
+        *pMeasureGrp += Isis::PvlKeyword("Resolution",     toString(mdResolution));
       }
       if(mbValidateDN) {
-        *pMeasureGrp += Isis::PvlKeyword("DNValue", mdDnValue);
+        *pMeasureGrp += Isis::PvlKeyword("DNValue", toString(mdDnValue));
       }
-      *pMeasureGrp += Isis::PvlKeyword("SampleResidual",    mdSampleResidual);
-      *pMeasureGrp += Isis::PvlKeyword("LineResidual",      mdLineResidual);
-      *pMeasureGrp += Isis::PvlKeyword("ResidualMagnitude", mdResidualMagnitude);
+      *pMeasureGrp += Isis::PvlKeyword("SampleResidual",    toString(mdSampleResidual));
+      *pMeasureGrp += Isis::PvlKeyword("LineResidual",      toString(mdLineResidual));
+      *pMeasureGrp += Isis::PvlKeyword("ResidualMagnitude", toString(mdResidualMagnitude));
 
-      *pMeasureGrp += Isis::PvlKeyword("SampleShift", m_sampleShift);
-      *pMeasureGrp += Isis::PvlKeyword("LineShift", m_lineShift);
-      *pMeasureGrp += Isis::PvlKeyword("PixelShift", m_pixelShift);
+      *pMeasureGrp += Isis::PvlKeyword("SampleShift", toString(m_sampleShift));
+      *pMeasureGrp += Isis::PvlKeyword("LineShift", toString(m_lineShift));
+      *pMeasureGrp += Isis::PvlKeyword("PixelShift", toString(m_pixelShift));
     }
 
     MeasureValidationResults results;
@@ -388,7 +388,7 @@ namespace Isis {
       else {
         mbValidateFromEdge = true;
       }
-      mStdOptionsGrp += Isis::PvlKeyword("PixelsFromEdge", miPixelsFromEdge);
+      mStdOptionsGrp += Isis::PvlKeyword("PixelsFromEdge", toString(miPixelsFromEdge));
     }
     // Parse the Meters from edge
     if(mPvlOpGrp.HasKeyword("MetersFromEdge")) {
@@ -399,7 +399,7 @@ namespace Isis {
       else {
         mbValidateFromEdge = true;
       }
-      mStdOptionsGrp += Isis::PvlKeyword("MetersFromEdge", mdMetersFromEdge);
+      mStdOptionsGrp += Isis::PvlKeyword("MetersFromEdge", toString(mdMetersFromEdge));
     }
   }
 
@@ -418,7 +418,7 @@ namespace Isis {
     else {
       mdMinResolution = 0;
     }
-    mStdOptionsGrp += Isis::PvlKeyword("MinResolution", mdMinResolution);
+    mStdOptionsGrp += Isis::PvlKeyword("MinResolution", toString(mdMinResolution));
 
     if(mPvlOpGrp.HasKeyword("MaxResolution")){
       mdMaxResolution = mPvlOpGrp["MaxResolution"];
@@ -427,15 +427,15 @@ namespace Isis {
     else {
       mdMaxResolution = DBL_MAX;
     }
-    mStdOptionsGrp += Isis::PvlKeyword("MaxResolution", (mdMaxResolution   == DBL_MAX ? "NA" : IString(mdMaxResolution)));
+    mStdOptionsGrp += Isis::PvlKeyword("MaxResolution", (mdMaxResolution   == DBL_MAX ? "NA" : toString(mdMaxResolution)));
 
     if(mdMinResolution < 0 || mdMaxResolution < 0) {
-      string msg = "Invalid Resolution value(s), Resolution must be greater than zero";
+      QString msg = "Invalid Resolution value(s), Resolution must be greater than zero";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
     if(mdMaxResolution < mdMinResolution) {
-      string msg = "MinResolution must be less than MaxResolution";
+      QString msg = "MinResolution must be less than MaxResolution";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -456,7 +456,7 @@ namespace Isis {
     else {
       mdMinDN = Isis::ValidMinimum;
     }
-    mStdOptionsGrp += Isis::PvlKeyword("MinDN", (mdMinDN == Isis::ValidMinimum ? "NA" : IString(mdMinDN)));
+    mStdOptionsGrp += Isis::PvlKeyword("MinDN", (mdMinDN == Isis::ValidMinimum ? "NA" : toString(mdMinDN)));
 
     if(mPvlOpGrp.HasKeyword("MaxDN")) {
       mdMaxDN = mPvlOpGrp["MaxDN"];
@@ -465,10 +465,10 @@ namespace Isis {
     else {
       mdMaxDN = Isis::ValidMaximum;
     }
-    mStdOptionsGrp += Isis::PvlKeyword("MaxDN", (mdMaxDN == Isis::ValidMaximum ? "NA" : IString(mdMaxDN)));
+    mStdOptionsGrp += Isis::PvlKeyword("MaxDN", (mdMaxDN == Isis::ValidMaximum ? "NA" : toString(mdMaxDN)));
 
     if(mdMaxDN < mdMinDN) {
-      string msg = "MinDN must be less than MaxDN";
+      QString msg = "MinDN must be less than MaxDN";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -486,24 +486,24 @@ namespace Isis {
       mdMinEmissionAngle = mPvlOpGrp["MinEmission"];
       mbCameraRequired = true;
       if(mdMinEmissionAngle < 0 || mdMinEmissionAngle > 135) {
-        string msg = "Invalid Min Emission Angle, Valid Range is [0-135]";
+        QString msg = "Invalid Min Emission Angle, Valid Range is [0-135]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
-    mStdOptionsGrp += Isis::PvlKeyword("MinEmission", mdMinEmissionAngle);
+    mStdOptionsGrp += Isis::PvlKeyword("MinEmission", toString(mdMinEmissionAngle));
 
     if(mPvlOpGrp.HasKeyword("MaxEmission")) {
       mdMaxEmissionAngle = mPvlOpGrp["MaxEmission"];
       mbCameraRequired = true;
       if(mdMaxEmissionAngle < 0 || mdMaxEmissionAngle > 135) {
-        string msg = "Invalid Max Emission Angle, Valid Range is [0-135]";
+        QString msg = "Invalid Max Emission Angle, Valid Range is [0-135]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
-    mStdOptionsGrp += Isis::PvlKeyword("MaxEmission", mdMaxEmissionAngle);
+    mStdOptionsGrp += Isis::PvlKeyword("MaxEmission", toString(mdMaxEmissionAngle));
 
     if(mdMaxEmissionAngle < mdMinEmissionAngle) {
-      string msg = "Min EmissionAngle must be less than Max EmissionAngle";
+      QString msg = "Min EmissionAngle must be less than Max EmissionAngle";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -522,24 +522,24 @@ namespace Isis {
       mdMinIncidenceAngle = mPvlOpGrp["MinIncidence"];
       mbCameraRequired = true;
       if(mdMinIncidenceAngle < 0 || mdMinIncidenceAngle > 135) {
-        string msg = "Invalid Min Incidence Angle, Valid Range is [0-135]";
+        QString msg = "Invalid Min Incidence Angle, Valid Range is [0-135]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
-    mStdOptionsGrp += Isis::PvlKeyword("MinIncidence", mdMinIncidenceAngle);
+    mStdOptionsGrp += Isis::PvlKeyword("MinIncidence", toString(mdMinIncidenceAngle));
 
     if(mPvlOpGrp.HasKeyword("MaxIncidence")) {
       mdMaxIncidenceAngle = mPvlOpGrp["MaxIncidence"];
       mbCameraRequired = true;
       if(mdMaxIncidenceAngle < 0 || mdMaxIncidenceAngle > 135) {
-        string msg = "Invalid Max Incidence Angle, Valid Range is [0-135]";
+        QString msg = "Invalid Max Incidence Angle, Valid Range is [0-135]";
         throw IException(IException::User, msg, _FILEINFO_);
       }
     }
-    mStdOptionsGrp += Isis::PvlKeyword("MaxIncidence", mdMaxIncidenceAngle);
+    mStdOptionsGrp += Isis::PvlKeyword("MaxIncidence", toString(mdMaxIncidenceAngle));
 
     if(mdMaxIncidenceAngle < mdMinIncidenceAngle) {
-      string msg = "Min IncidenceAngle must be less than Max IncidenceAngle";
+      QString msg = "Min IncidenceAngle must be less than Max IncidenceAngle";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
@@ -555,35 +555,35 @@ namespace Isis {
     if(mPvlOpGrp.HasKeyword("SampleResidual")) {
       mdSampleResTolerance = mPvlOpGrp["SampleResidual"];
       if(mdSampleResTolerance < 0) {
-        string msg = "Invalid Sample Residual, must be greater than zero";
+        QString msg = "Invalid Sample Residual, must be greater than zero";
         throw IException(IException::User, msg, _FILEINFO_);
       }
       bRes = true;
     }
-    mStdOptionsGrp += Isis::PvlKeyword("SampleResidual", (mdSampleResTolerance   == DBL_MAX ? "NA" : IString(mdSampleResTolerance)));
+    mStdOptionsGrp += Isis::PvlKeyword("SampleResidual", (mdSampleResTolerance   == DBL_MAX ? "NA" : toString(mdSampleResTolerance)));
 
     if(mPvlOpGrp.HasKeyword("LineResidual")) {
       mdLineResTolerance = mPvlOpGrp["LineResidual"];
       if(mdLineResTolerance < 0) {
-        string msg = "Invalid Line Residual, must be greater than zero";
+        QString msg = "Invalid Line Residual, must be greater than zero";
         throw IException(IException::User, msg, _FILEINFO_);
       }
       bRes = true;
     }
-    mStdOptionsGrp += Isis::PvlKeyword("LineResidual", (mdLineResTolerance   == DBL_MAX ? "NA" : IString(mdLineResTolerance)));
+    mStdOptionsGrp += Isis::PvlKeyword("LineResidual", (mdLineResTolerance   == DBL_MAX ? "NA" : toString(mdLineResTolerance)));
 
     if(mPvlOpGrp.HasKeyword("ResidualMagnitude")) {
       mdResidualTolerance = mPvlOpGrp["ResidualMagnitude"];
       if(mdResidualTolerance < 0) {
-        string msg = "Invalid Residual Magnitude Tolerance, must be greater than zero";
+        QString msg = "Invalid Residual Magnitude Tolerance, must be greater than zero";
         throw IException(IException::User, msg, _FILEINFO_);
       }
       bResMag = true;
     }
-    mStdOptionsGrp += Isis::PvlKeyword("ResidualMagnitude", (mdResidualTolerance   == DBL_MAX ? "NA" : IString(mdResidualTolerance)));
+    mStdOptionsGrp += Isis::PvlKeyword("ResidualMagnitude", (mdResidualTolerance   == DBL_MAX ? "NA" : toString(mdResidualTolerance)));
 
     if(bRes && bResMag) {
-      string msg = "Cannot have both Sample/Line Residuals and Residual Magnitude.";
+      QString msg = "Cannot have both Sample/Line Residuals and Residual Magnitude.";
       msg += "\nChoose either Sample/Line Residual or Residual Magnitude";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -599,39 +599,39 @@ namespace Isis {
     if (mPvlOpGrp.HasKeyword("SampleShift")) {
       m_sampleShiftTolerance = mPvlOpGrp["SampleShift"];
       if (m_sampleShiftTolerance < 0) {
-        string msg = "Invalid Sample Shift tolerance:"
+        QString msg = "Invalid Sample Shift tolerance:"
             " must be greater than or equal to zero";
         throw IException(IException::User, msg, _FILEINFO_);
       }
       hasSampleLineShift = true;
     }
-    mStdOptionsGrp += Isis::PvlKeyword("SampleShift", (m_sampleShiftTolerance == DBL_MAX ? "NA" : IString(m_sampleShiftTolerance)));
+    mStdOptionsGrp += Isis::PvlKeyword("SampleShift", (m_sampleShiftTolerance == DBL_MAX ? "NA" : toString(m_sampleShiftTolerance)));
 
     if (mPvlOpGrp.HasKeyword("LineShift")) {
       m_lineShiftTolerance = mPvlOpGrp["LineShift"];
       if (m_lineShiftTolerance < 0) {
-        string msg = "Invalid Line Shift tolerance:"
+        QString msg = "Invalid Line Shift tolerance:"
             " must be greater than or equal to zero";
         throw IException(IException::User, msg, _FILEINFO_);
       }
       hasSampleLineShift = true;
     }
-    mStdOptionsGrp += Isis::PvlKeyword("LineShift", (m_lineShiftTolerance == DBL_MAX ? "NA" : IString(m_lineShiftTolerance)));
+    mStdOptionsGrp += Isis::PvlKeyword("LineShift", (m_lineShiftTolerance == DBL_MAX ? "NA" : toString(m_lineShiftTolerance)));
 
     bool hasPixelShift = false;
     if (mPvlOpGrp.HasKeyword("PixelShift")) {
       m_pixelShiftTolerance = mPvlOpGrp["PixelShift"];
       if (m_pixelShiftTolerance < 0) {
-        string msg = "Invalid Pixel Shift tolerance:"
+        QString msg = "Invalid Pixel Shift tolerance:"
             " must be greater than or equal to zero";
         throw IException(IException::User, msg, _FILEINFO_);
       }
       hasPixelShift = true;
     }
-    mStdOptionsGrp += Isis::PvlKeyword("PixelShift", (m_pixelShiftTolerance == DBL_MAX ? "NA" : IString(m_pixelShiftTolerance)));
+    mStdOptionsGrp += Isis::PvlKeyword("PixelShift", (m_pixelShiftTolerance == DBL_MAX ? "NA" : toString(m_pixelShiftTolerance)));
 
     if (hasSampleLineShift && hasPixelShift) {
-      string msg = "Cannot have both Sample/Line Shift and Pixel Shift";
+      QString msg = "Cannot have both Sample/Line Shift and Pixel Shift";
       msg += " tolerances.\n";
       msg += "Choose either Sample/Line Shift or Pixel Shift to validate on";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -924,7 +924,7 @@ namespace Isis {
       return false;
     }
     catch(IException &e) {
-      string msg = "Cannot Create Camera for Image [" +
+      QString msg = "Cannot Create Camera for Image [" +
           pCube->getFileName() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }

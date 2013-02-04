@@ -1,4 +1,4 @@
-#if !defined(GainTemperature_h)
+#ifndef GainTemperature_h
 #define GainTemperature_h
 /**                                                                       
  * @file                                                                  
@@ -71,7 +71,7 @@ namespace Isis {
       virtual ~GainTemperature() { }
 
     private:
-      std::string _fpaFile;
+      QString _fpaFile;
       double _refTemp;        // Reference temperature
       double _fpaFactor;      // Temperature factor
       double _baseT;          // Base temperature
@@ -86,7 +86,7 @@ namespace Isis {
         _fpaFactor = factor[0];
 
         //  Get temperature parameters
-        _refTemp = ConfKey(prof, "FpaReferenceTemperature", 21.0);
+        _refTemp = toDouble(ConfKey(prof, "FpaReferenceTemperature", toString(21.0)));
 
         double fpa_py_temp = ToDouble(prof("FpaPositiveYTemperature"));
         double fpa_my_temp = ToDouble(prof("FpaNegativeYTemperature"));

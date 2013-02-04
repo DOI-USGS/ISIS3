@@ -276,7 +276,7 @@ namespace Isis {
 
           // save off statistics
           if (graphIterator != graph->end()) {
-            QVector< IString > dataNames(cnet->GetPoint(cpIndex)->
+            QVector< QString > dataNames(cnet->GetPoint(cpIndex)->
                                          GetMeasure(cmIndex)->GetMeasureDataNames());
 
             for (int i = 0; i < dataNames.size(); i++)

@@ -5,9 +5,11 @@
 #include "IString.h"
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
+
 int main(void) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
   try {
 
@@ -39,7 +41,7 @@ int main(void) {
     fStrm << "  END_GROUP = IMAGE_MAP_PROJECTION" << endl;
     fStrm << "END_OBJECT = QUBE" << endl;
     fStrm << "End" << endl;
-    Isis::Pvl fLabel;
+    Pvl fLabel;
     fStrm >> fLabel;
 
     stringstream trnsStrm;
@@ -151,9 +153,9 @@ int main(void) {
 
     trnsStrm << "End" << endl;
 
-    Isis::PvlTranslationManager transMgr(fLabel, trnsStrm);
+    PvlTranslationManager transMgr(fLabel, trnsStrm);
 
-    cout << "Testing Isis::PvlTranslationManager object" << endl;
+    cout << "Testing PvlTranslationManager object" << endl;
 
     cout << "  Testing InputValue member" << endl;
     cout << "    DataFileName    = " << transMgr.InputKeyword("DataFileName")[0] << endl;
@@ -164,14 +166,14 @@ int main(void) {
     try {
       transMgr.InputKeyword("BadGroup");
     }
-    catch(Isis::IException &e) {
+    catch(IException &e) {
       cerr << "    ";
       e.print();
     }
     try {
       transMgr.InputKeyword("GoodGroupBadKey");
     }
-    catch(Isis::IException &e) {
+    catch(IException &e) {
       cerr << "    ";
       e.print();
     }
@@ -184,14 +186,14 @@ int main(void) {
     try {
       transMgr.InputKeyword("BadGroup").Unit();
     }
-    catch(Isis::IException &e) {
+    catch(IException &e) {
       cerr << "    ";
       e.print();
     }
     try {
       transMgr.InputKeyword("GoodGroupBadKey").Unit();
     }
-    catch(Isis::IException &e) {
+    catch(IException &e) {
       cerr << "    ";
       e.print();
     }
@@ -204,14 +206,14 @@ int main(void) {
     try {
       transMgr.InputKeyword("BadGroup").Size();
     }
-    catch(Isis::IException &e) {
+    catch(IException &e) {
       cerr << "    ";
       e.print();
     }
     try {
       transMgr.InputKeyword("GoodGroupBadKey").Size();
     }
-    catch(Isis::IException &e) {
+    catch(IException &e) {
       cerr << "    ";
       e.print();
     }
@@ -234,13 +236,13 @@ int main(void) {
     cout << endl;
 
     cout << "  Testing Auto member" << endl;
-    Isis::Pvl pvl;
+    Pvl pvl;
     transMgr.Auto(pvl);
     cout << pvl << endl;
 
 
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 

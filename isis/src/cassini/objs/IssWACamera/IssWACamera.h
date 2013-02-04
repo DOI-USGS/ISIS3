@@ -43,7 +43,7 @@ namespace Isis {
    *   @history 2007-07-10 Steven Koechle - Removed hardcoding of NAIF
    *                          Instrument number
    *   @history 2007-07-11 Steven Koechle - casted NaifIkCode to int before
-   *                          IString to fix problem on Linux 32bit
+   *                          QString to fix problem on Linux 32bit
    *   @history 2008-08-08 Steven Lambright Now using the new LoadCache(...)
    *                          method instead of CreateCache(...).
    *   @history 2009-01-22 Kris Becker Added new frame rotation to the CK frame

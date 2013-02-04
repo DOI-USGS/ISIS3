@@ -43,7 +43,7 @@ void IsisMain() {
   // Open the FROM cube. It must have a camera model associated with it
   Cube from;
   CubeAttributeInput &attFrom = ui.GetInputAttribute("FROM");
-  vector<string> bandFrom = attFrom.bands();
+  vector<QString> bandFrom = attFrom.bands();
   from.setVirtualBands(bandFrom);
   from.open(ui.GetFileName("FROM"), "r");
   Camera *fcamera = from.getCamera();
@@ -142,14 +142,14 @@ void IsisMain() {
   }
 
   PvlGroup results("Results");
-  results += PvlKeyword("PixelPitch", pp, "millimeters");  
-  results += PvlKeyword("TotalPoints", cn.GetNumPoints());  
-  results += PvlKeyword("ValidPoints", (BigInt) coords.size());
-  results += PvlKeyword("InvalidPoints", badPoint);
-  if (checkForNulls) results += PvlKeyword("NullDNs", nulls);
-  results += PvlKeyword("OldPointNotInImage", oldNotInImage);
-  results += PvlKeyword("NewPointNotInImage", newNotInImage);
-  results += PvlKeyword("ToleranceExceeded", badTol);
+  results += PvlKeyword("PixelPitch", toString(pp), "millimeters");  
+  results += PvlKeyword("TotalPoints", toString(cn.GetNumPoints()));  
+  results += PvlKeyword("ValidPoints", toString((BigInt) coords.size()));
+  results += PvlKeyword("InvalidPoints", toString(badPoint));
+  if (checkForNulls) results += PvlKeyword("NullDNs", toString(nulls));
+  results += PvlKeyword("OldPointNotInImage", toString(oldNotInImage));
+  results += PvlKeyword("NewPointNotInImage", toString(newNotInImage));
+  results += PvlKeyword("ToleranceExceeded", toString(badTol));
 
   // Log it
   Application::Log(results);
@@ -161,9 +161,9 @@ void IsisMain() {
   // The flatfile is comma seperated and can be imported into an excel
   // spreadsheet
   if(ui.WasEntered("TO")) {
-    string fFile = FileName(ui.GetFileName("TO")).expanded();
+    QString fFile = FileName(ui.GetFileName("TO")).expanded();
     ofstream os;
-    os.open(fFile.c_str(), ios::out);
+    os.open(fFile.toAscii().data(), ios::out);
     os << "OldSample,OldLine,NewSample,NewLine," <<
        "X,Y,XC,YC,"<<
        "GoodnessOfFit,Latitude,Longitude" << endl;

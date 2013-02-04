@@ -23,10 +23,11 @@
  *   http://www.usgs.gov/privacy.html.
  */
 
-#include <string>
 #include <vector>
 
-#include "geos/geom/MultiPolygon.h"
+#include <QString>
+
+#include <geos/geom/MultiPolygon.h>
 
 namespace Isis {
 
@@ -55,7 +56,7 @@ namespace Isis {
   class ImageOverlap {
     public:
       ImageOverlap();
-      ImageOverlap(std::string serialNumber, geos::geom::MultiPolygon &polygon);
+      ImageOverlap(QString serialNumber, geos::geom::MultiPolygon &polygon);
       ImageOverlap(std::istream &inputStream);
 
       virtual ~ImageOverlap();
@@ -65,7 +66,7 @@ namespace Isis {
       virtual void SetPolygon(const geos::geom::MultiPolygon *polygon);
 
       // Add a serial number
-      void Add(std::string &sn);
+      void Add(QString &sn);
 
       // Return the number of serial numbers in this overlap area
       int Size() const {
@@ -73,7 +74,7 @@ namespace Isis {
       };
 
       // Return the ith serial number
-      std::string operator[](int index) const {
+      QString operator[](int index) const {
         return p_serialNumbers[index];
       };
 
@@ -89,12 +90,12 @@ namespace Isis {
       bool HasAnySameSerialNumber(ImageOverlap &other) const;
 
       // Does serial number exist in this ImageOverlap
-      bool HasSerialNumber(std::string &sn) const;
+      bool HasSerialNumber(QString &sn) const;
 
       void Write(std::ostream &outputStream);
     private:
 
-      std::vector<std::string> p_serialNumbers;
+      std::vector<QString> p_serialNumbers;
       geos::geom::MultiPolygon *p_polygon;
 
       void Init();

@@ -181,8 +181,8 @@ namespace Isis {
     } /*end try*/
 
     catch(geos::util::IllegalArgumentException *ill) {
-      std::string msg = "ERROR! geos exception 1 [";
-      msg += (IString)ill->what() + "]";
+      QString msg = "ERROR! geos exception 1 [";
+      msg += QString(ill->what()) + "]";
       delete ill;
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }/*end catch*/
@@ -313,8 +313,8 @@ namespace Isis {
     } /*end try*/
 
     catch(geos::util::IllegalArgumentException *ill) {
-      std::string msg = "ERROR! geos exception 1 [";
-      msg += (IString)ill->what() + "]";
+      QString msg = "ERROR! geos exception 1 [";
+      msg += (QString)ill->what() + "]";
       delete ill;
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }/*end catch*/
@@ -351,13 +351,13 @@ namespace Isis {
    *
    * @return Isis::Cube*
    */
-  Isis::Cube *ProcessPolygons::AppendOutputCube(const std::string &avgFileName,
-      const std::string &countFileName) {
+  Isis::Cube *ProcessPolygons::AppendOutputCube(const QString &avgFileName,
+      const QString &countFileName) {
 
     FileName *file = new FileName(avgFileName);
-    std::string path = file->path();
-    std::string filename = file->baseName();
-    std::string extension = file->extension();
+    QString path = file->path();
+    QString filename = file->baseName();
+    QString extension = file->extension();
 
     /*Open the average file with read/write permission*/
     Cube *averageCube = new Cube();
@@ -370,7 +370,7 @@ namespace Isis {
     if(countFileName == "") {
       /*if the countFileName was set to nothing, then we use the default count
       file name.*/
-      std::string openFile = path + "/" + filename + "-count-." + extension;
+      QString openFile = path + "/" + filename + "-count-." + extension;
       countCube->open(openFile, "rw");
 
     }
@@ -391,8 +391,8 @@ namespace Isis {
    * @param nlines
    * @param nbands
    */
-  void ProcessPolygons::SetOutputCube(const std::string &avgFileName, const
-                                      std::string &countFileName,
+  void ProcessPolygons::SetOutputCube(const QString &avgFileName, const
+                                      QString &countFileName,
                                       Isis::CubeAttributeOutput &atts,
                                       const int nsamps, const int nlines,
                                       const int nbands) {
@@ -424,20 +424,20 @@ namespace Isis {
    * @param nlines
    * @param nbands
    */
-  void ProcessPolygons::SetOutputCube(const std::string &parameter,
+  void ProcessPolygons::SetOutputCube(const QString &parameter,
                                       const int nsamps, const int nlines,
                                       const int nbands) {
 
-    std::string avgString =
+    QString avgString =
       Application::GetUserInterface().GetFileName(parameter);
 
     Isis::CubeAttributeOutput atts =
       Application::GetUserInterface().GetOutputAttribute(parameter);
 
     FileName *file = new FileName(avgString);
-    std::string path = file->path();
-    std::string filename = file->baseName();
-    std::string countString = path + "/" + filename + "-count";
+    QString path = file->path();
+    QString filename = file->baseName();
+    QString countString = path + "/" + filename + "-count";
     SetOutputCube(avgString, countString, atts, nsamps, nlines, nbands);
 
   }

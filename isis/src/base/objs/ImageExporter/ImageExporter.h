@@ -26,7 +26,7 @@
 
 #include <vector>
 
-#include "IString.h"
+#include <QString>
 
 using std::vector;
 
@@ -96,13 +96,13 @@ namespace Isis {
        */
       virtual void setRgba(ExportDescription &desc) = 0; 
 
-      static ImageExporter * fromFormat(IString format);
+      static ImageExporter * fromFormat(QString format);
 
     protected:
       //! Friendly alias for a method used to write a particular color channel.
       typedef void (ImageExporter::*WriteChannels)(vector<Buffer *> &in) const;
 
-      void setExtension(IString extension);
+      void setExtension(QString extension);
       Cube * setInput(ExportDescription &desc);
 
       ProcessExport & getProcess() const;
@@ -143,10 +143,10 @@ namespace Isis {
       WriteChannels m_writeMethod;
 
       //! Extension to append to the output image if not already provided.
-      IString m_extension;
+      QString m_extension;
 
       //! Extension to append to the output world file.
-      IString m_world;
+      QString m_world;
 
       //! Number of samples (columns) in the output image.
       int m_samples;

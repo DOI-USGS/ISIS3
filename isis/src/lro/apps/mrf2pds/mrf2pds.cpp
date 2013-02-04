@@ -20,8 +20,8 @@ using namespace std;
 using namespace Isis;
 
 void FixLabel(Pvl &pcPdsLbl, bool &pbLevel2);
-void GetSourceProductID(std::string psSrcListFile, std::string psSrcType, Pvl &pcPdsLabel);
-void GetUserLabel(std::string psUserLbl, Pvl &pdsLabel, bool pbLevel2);
+void GetSourceProductID(QString psSrcListFile, QString psSrcType, Pvl &pcPdsLabel);
+void GetUserLabel(QString psUserLbl, Pvl &pdsLabel, bool pbLevel2);
 
 static unsigned int iCheckSum = 0;
 
@@ -38,7 +38,7 @@ void IsisMain() {
 
   // Get the output label file
   FileName outFile(ui.GetFileName("TO", "lbl"));
-  string outFileName(outFile.expanded());
+  QString outFileName(outFile.expanded());
 
   cProcess.SetDetached(outFileName);
 
@@ -91,8 +91,8 @@ void IsisMain() {
 
     if(cInLabel->FindObject("IsisCube").FindGroup("Instrument").HasKeyword("MissionName")) {
       PvlKeyword &cKeyMissionName = cInLabel->FindObject("IsisCube").FindGroup("Instrument").FindKeyword("MissionName");
-      size_t sFound = cKeyMissionName[0].find("CHANDRAYAAN");
-      if(sFound != string::npos) {
+      int sFound = cKeyMissionName[0].indexOf("CHANDRAYAAN");
+      if(sFound != -1) {
         cCubeLabel2 = PvlTranslationManager(cOrigLabel, "$lro/translations/mrfExportOrigLabelCH1.trn");
         cCubeLabel2.Auto(pdsLabel);
       }
@@ -121,14 +121,14 @@ void IsisMain() {
 
   // Get the Sources Product ID if entered for Level2 only as per example
   if(ui.WasEntered("SRC") && bLevel2) {
-    std::string sSrcFile = ui.GetFileName("SRC");
-    std::string sSrcType = ui.GetString("TYPE");
+    QString sSrcFile = ui.GetFileName("SRC");
+    QString sSrcType = ui.GetString("TYPE");
     GetSourceProductID(sSrcFile, sSrcType, pdsLabel);
   }
 
   // Get the User defined Labels
   if(ui.WasEntered("USERLBL")) {
-    std::string sUserLbl = ui.GetFileName("USERLBL");
+    QString sUserLbl = ui.GetFileName("USERLBL");
     GetUserLabel(sUserLbl, pdsLabel, bLevel2);
   }
 
@@ -148,9 +148,9 @@ void IsisMain() {
     pdsLabel.SetFormatTemplate("$lro/translations/mrfPdsLevel3.pft");
   }
 
-  size_t iFound = outFileName.find(".lbl");
+  int iFound = outFileName.indexOf(".lbl");
   outFileName.replace(iFound, 4, ".img");
-  ofstream oCube(outFileName.c_str());
+  ofstream oCube(outFileName.toAscii().data());
   cProcess.OutputDetachedLabel();
   //cProcess.OutputLabel(oCube);
   cProcess.StartProcess(oCube);
@@ -168,7 +168,7 @@ void IsisMain() {
  * @param psUserLbl - User Label File
  * @param pcPdsLbl  - Output Pds PVL
  */
-void GetUserLabel(std::string psUserLbl, Pvl &pcPdsLbl, bool pbLevel2) {
+void GetUserLabel(QString psUserLbl, Pvl &pcPdsLbl, bool pbLevel2) {
   Pvl cUsrPvl(psUserLbl);
 
   /*if (pbLevel2 &&
@@ -177,7 +177,7 @@ void GetUserLabel(std::string psUserLbl, Pvl &pcPdsLbl, bool pbLevel2) {
        cUsrPvl.HasKeyword("START_TIME") ||
        cUsrPvl.HasKeyword("STOP_TIME"))) {
 
-       std::string msg = "Unsupported User defined keywords for Level2";
+       QString msg = "Unsupported User defined keywords for Level2";
        throw Isis::iException::Message(Isis::iException::User,msg,_FILEINFO_);
   }*/
 
@@ -221,7 +221,7 @@ void GetUserLabel(std::string psUserLbl, Pvl &pcPdsLbl, bool pbLevel2) {
  * @param psSrcListFile - File containing source id's
  * @param pcPdsLbl      - Output PVL
  */
-void GetSourceProductID(std::string psSrcListFile, std::string psSrcType, Pvl &pcPdsLbl) {
+void GetSourceProductID(QString psSrcListFile, QString psSrcType, Pvl &pcPdsLbl) {
   PvlKeyword cKeySrcPrdId;
 
   if(pcPdsLbl.HasKeyword("SOURCE_PRODUCT_ID")) {
@@ -240,7 +240,7 @@ void GetSourceProductID(std::string psSrcListFile, std::string psSrcType, Pvl &p
   // ID's - add directly to the PvlKeyword
   else {
     ifstream inIdFile;
-    inIdFile.open(psSrcListFile.c_str(), std::ios::in);
+    inIdFile.open(psSrcListFile.toAscii().data(), std::ios::in);
     char buff[501];
     inIdFile.getline(buff, 500);
     while(!inIdFile.eof()) {
@@ -332,8 +332,8 @@ void FixLabel(Pvl &pcPdsLbl, bool &pbLevel2) {
   // Update SAMPLE_TYPE from "IEEE_" to "PC_"
   if(cImageObject.HasKeyword("SAMPLE_TYPE")) {
     PvlKeyword &cSampleType = cImageObject.FindKeyword("SAMPLE_TYPE");
-    string sVal = cSampleType[0];
-    int iFound = sVal.find('_');
+    QString sVal = cSampleType[0];
+    int iFound = sVal.indexOf('_');
     if(iFound >= 0) {
       sVal.replace(0, iFound, "PC");
       cSampleType.SetValue(sVal);
@@ -387,13 +387,13 @@ void FixLabel(Pvl &pcPdsLbl, bool &pbLevel2) {
         dLat = atan(z / (sqrt(pow(x, 2) + pow(y, 2)))) * (180 / Isis::PI);
 
         PvlKeyword cKeyRefLon("REFERENCE_LONGITUDE");
-        IString iStr(dLon, 6);
+        QString iStr = toString(dLon, 6);
         iStr += " <DEG>";
-        cKeyRefLon.SetValue((std::string)iStr);
+        cKeyRefLon.SetValue(iStr);
         cProjectionObject.AddKeyword(cKeyRefLon);
 
         PvlKeyword cKeyRefLat("REFERENCE_LATITUDE");
-        iStr = IString(dLat, 6);
+        iStr = toString(dLat, 6);
         iStr += " <DEG>";
         cKeyRefLat.SetValue(iStr);
         cProjectionObject.AddKeyword(cKeyRefLat);
@@ -426,34 +426,30 @@ void FixLabel(Pvl &pcPdsLbl, bool &pbLevel2) {
 
   if(cProjectionObject.HasKeyword("LINE_PROJECTION_OFFSET")) {
     PvlKeyword &cLineProjOffset = cProjectionObject.FindKeyword("LINE_PROJECTION_OFFSET");
-    string sVal = cLineProjOffset[0];
-    int iFound = sVal.find('<');
+    QString sVal = cLineProjOffset[0];
+    int iFound = sVal.indexOf('<');
     if(iFound >= 0) {
-      string::iterator it;
-      it = sVal.begin() + iFound;
-      sVal.erase(it);
+      sVal.remove(iFound, 1);
       cLineProjOffset.SetValue(sVal);
     }
   }
 
   if(cProjectionObject.HasKeyword("SAMPLE_PROJECTION_OFFSET")) {
     PvlKeyword &cSampleProjOffset = cProjectionObject.FindKeyword("SAMPLE_PROJECTION_OFFSET");
-    string sVal = cSampleProjOffset[0];
-    int iFound = sVal.find('<');
+    QString sVal = cSampleProjOffset[0];
+    int iFound = sVal.indexOf('<');
     if(iFound >= 0) {
-      string::iterator it;
-      it = sVal.begin() + iFound;
-      sVal.erase(it);
+      sVal.remove(iFound, 1);
       cSampleProjOffset.SetValue(sVal);
     }
   }
 
   if(cProjectionObject.HasKeyword("MAP_SCALE")) {
     PvlKeyword &cMapScale = cProjectionObject.FindKeyword("MAP_SCALE");
-    string sVal = cMapScale[0];
-    int iFound = sVal.find("EL");
+    QString sVal = cMapScale[0];
+    int iFound = sVal.indexOf("EL");
     if(iFound >= 0) {
-      sVal.erase(iFound, 2);
+      sVal.remove(iFound, 2);
       cMapScale.SetValue(sVal);
     }
   }

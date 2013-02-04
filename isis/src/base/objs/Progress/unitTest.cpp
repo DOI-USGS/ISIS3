@@ -8,7 +8,7 @@ using namespace std;
 int main() {
   Isis::Preference &pref = Isis::Preference::Preferences(true);
   Isis::PvlGroup &uip = pref.FindGroup("UserInterface");
-  uip["ProgressBarPercent"] = 5;
+  uip["ProgressBarPercent"] = "5";
   Isis::Progress p;
 
   // Check normal operation
@@ -42,7 +42,7 @@ int main() {
 
   // Check for error on bad creation
   try {
-    uip["ProgressBarPercent"] = 3;
+    uip["ProgressBarPercent"] = "3";
     Isis::Progress p2;
   }
   catch(Isis::IException &e) {

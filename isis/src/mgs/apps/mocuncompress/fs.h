@@ -53,7 +53,7 @@ SCCSID @(#)fs.h  1.1 10/04/99
 *  such things as arithmetic operations.
 */
 
-#if !defined(fs_h)
+#ifndef fs_h
 
 #define fs_h
 

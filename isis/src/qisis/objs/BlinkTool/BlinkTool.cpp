@@ -175,10 +175,10 @@ namespace Isis {
    *
    */
   void BlinkTool::updateTool() {
-    std::string unlinkedIcon = FileName("$base/icons/unlinked.png").expanded();
-    static QIcon unlinked(unlinkedIcon.c_str());
-    std::string linkedIcon = FileName("$base/icons/linked.png").expanded();
-    static QIcon linked(linkedIcon.c_str());
+    QString unlinkedIcon = FileName("$base/icons/unlinked.png").expanded();
+    static QIcon unlinked(unlinkedIcon);
+    QString linkedIcon = FileName("$base/icons/linked.png").expanded();
+    static QIcon linked(linkedIcon);
     p_listWidget->clear();
     for(int i = 0; i < (int)cubeViewportList()->size(); i++) {
       MdiCubeViewport *d = (*(cubeViewportList()))[i];

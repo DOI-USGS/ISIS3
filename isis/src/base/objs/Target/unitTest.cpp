@@ -29,6 +29,8 @@
 #include "Preference.h"
 
   /**
+   * @file
+   *
    * This application tests the Target class.
    *
    * @author 2012-03-20 Debbie A. Cook
@@ -66,9 +68,9 @@ int main(int argc, char *argv[]) {
   PvlGroup kern1("Kernels");
   FileName f("$base/testData/kernels");
   FileName f2("$base/dems");
-  string dir = f.expanded() + "/";
-  string dir2 = f2.expanded() + "/";
-  kern1 += PvlKeyword("NaifFrameCode", -94031);
+  QString dir = f.expanded() + "/";
+  QString dir2 = f2.expanded() + "/";
+  kern1 += PvlKeyword("NaifFrameCode", toString(-94031));
   kern1 += PvlKeyword("LeapSecond", dir + "naif0007.tls");
   kern1 += PvlKeyword("SpacecraftClock", dir + "MGS_SCLKSCET.00045.tsc");
   kern1 += PvlKeyword("TargetPosition", dir + "de405.bsp");
@@ -80,7 +82,7 @@ int main(int argc, char *argv[]) {
   kern1 += PvlKeyword("Frame", "");
 
   PvlGroup kern2("Kernels");
-  kern2 += PvlKeyword("NaifIkCode", -94031);
+  kern2 += PvlKeyword("NaifIkCode", toString(-94031));
   kern2 += PvlKeyword("LeapSecond", dir + "naif0007.tls");
   kern2 += PvlKeyword("SpacecraftClock", dir + "MGS_SCLKSCET.00045.tsc");
   kern2 += PvlKeyword("TargetPosition", dir + "de405.bsp");
@@ -90,7 +92,7 @@ int main(int argc, char *argv[]) {
   kern2 += PvlKeyword("InstrumentPosition", dir + "moc.bsp");
   kern2 += PvlKeyword("InstrumentPointing", dir + "moc.bc");
   kern2 += PvlKeyword("Frame", "");
-  kern2 += PvlKeyword("NaifBodyCode", 499);
+  kern2 += PvlKeyword("NaifBodyCode", toString(499));
 
   PvlGroup kern3 = kern2;
   kern3 += PvlKeyword("ShapeModel", dir2  + "molaMarsPlanetaryRadius0005.cub");
@@ -100,8 +102,8 @@ int main(int argc, char *argv[]) {
   double endTime = -69382512.0;
   double slope = (endTime - startTime) / (10 - 1);
 
-  kern1 += PvlKeyword("StartPadding", slope);
-  kern1 += PvlKeyword("EndPadding", slope);
+  kern1 += PvlKeyword("StartPadding", toString(slope));
+  kern1 += PvlKeyword("EndPadding", toString(slope));
 
   Pvl lab1;
   lab1.AddGroup(inst1);

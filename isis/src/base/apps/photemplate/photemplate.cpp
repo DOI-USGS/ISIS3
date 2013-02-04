@@ -13,8 +13,8 @@ using namespace Isis;
 void PrintPvl();
 void LoadPvl();
 
-map <string, void *> GuiHelpers() {
-  map <string, void *> helper;
+map <QString, void *> GuiHelpers() {
+  map <QString, void *> helper;
   helper ["PrintPvl"] = (void *) PrintPvl;
   helper ["LoadPvl"] = (void *) LoadPvl;
   return helper;
@@ -29,17 +29,17 @@ void PrintPvl() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Write file out to log
-  string inFile(ui.GetFileName("FROMPVL"));
+  QString inFile(ui.GetFileName("FROMPVL"));
   Pvl inPvl;
   inPvl.Read(ui.GetFileName("FROMPVL"));
-  string Ostring = "***** Output of [" + inFile + "] *****";
-  Application::GuiLog(Ostring);
+  QString OQString = "***** Output of [" + inFile + "] *****";
+  Application::GuiLog(OQString);
   Application::GuiLog(inPvl);
 }
 
-// Load the values from the input PVL to a string to be displayed
+// Load the values from the input PVL to a QString to be displayed
 // onto the UI.
-void LoadKeyValue(const PvlKeyword & key, string & val){
+void LoadKeyValue(const PvlKeyword & key, QString & val){
   int size = key.Size();
   val = "";
   for (int i=0; i<size; i++) {
@@ -51,36 +51,36 @@ void LoadKeyValue(const PvlKeyword & key, string & val){
 }
 
 // Data from the UI is output to a PVL
-// Converts the string into double value
-void OutputKeyValue(PvlKeyword & key, string val){
+// Converts the QString into double value
+void OutputKeyValue(PvlKeyword & key, QString val){
   key.Clear();
-  size_t found = val.find(",");
-  while(found != string::npos) {
-    key += IString(val.substr(0, found)).ToDouble();
-    val = val.substr(found+1);
-    found = val.find(",");
+  int found = val.indexOf(",");
+  while(found != -1) {
+    key += toString(toDouble(val.mid(0, found)));
+    val = val.mid(found+1);
+    found = val.indexOf(",");
   }
-  key += IString(val.substr(0, found)).ToDouble();
+  key += toString(toDouble(val));
 }
 
 // Helper function to load the input pvl file into the GUI
 void LoadPvl() {
   std::stringstream os;
-  string keyVal;
+  QString keyVal;
   UserInterface &ui = Application::GetUserInterface();
-  string inFile(ui.GetFileName("FROMPVL"));
+  QString inFile(ui.GetFileName("FROMPVL"));
   Pvl inPvl;
   inPvl.Read(inFile);
-  IString phtName = ui.GetAsString("PHTNAME");
-  phtName = phtName.UpCase();
-  IString atmName = ui.GetAsString("ATMNAME");
-  atmName = atmName.UpCase();
+  QString phtName = ui.GetAsString("PHTNAME");
+  phtName = phtName.toUpper();
+  QString atmName = ui.GetAsString("ATMNAME");
+  atmName = atmName.toUpper();
 
-  IString phtVal;
+  QString phtVal;
   if (inPvl.HasObject("PhotometricModel")) {
     PvlObject phtObj = inPvl.FindObject("PhotometricModel");
     if (!phtObj.HasGroup("Algorithm")) {
-      string message = "The input PVL does not contain a valid photometric model so you must specify one ";
+      QString message = "The input PVL does not contain a valid photometric model so you must specify one ";
       message += "- the [Algorithm] group is missing in your [PhotometricModel]";
       throw IException(IException::User, message, _FILEINFO_);
     }
@@ -88,15 +88,15 @@ void LoadPvl() {
       PvlObject::PvlGroupIterator phtGrp = phtObj.BeginGroup();
       bool wasFound = false;
       if (phtGrp->HasKeyword("PHTNAME")) {
-        phtVal = (string)phtGrp->FindKeyword("PHTNAME");
+        phtVal = (QString)phtGrp->FindKeyword("PHTNAME");
       } else if (phtGrp->HasKeyword("NAME")) {
-        phtVal = (string)phtGrp->FindKeyword("NAME");
+        phtVal = (QString)phtGrp->FindKeyword("NAME");
       } else {
-        string message = "The input PVL does not contain a valid photometric model so you must specify one ";
+        QString message = "The input PVL does not contain a valid photometric model so you must specify one ";
         message += "- the [Phtname] keyword is missing in your [Algorithm] group";
         throw IException(IException::User, message, _FILEINFO_);
       }
-      phtVal = phtVal.UpCase();
+      phtVal = phtVal.toUpper();
       if (phtName == phtVal || phtName == "NONE" || phtName == "FROMPVL") {
         wasFound = true;
       }
@@ -104,15 +104,15 @@ void LoadPvl() {
         while (phtGrp != phtObj.EndGroup()) {
           if (phtGrp->HasKeyword("PHTNAME") || phtGrp->HasKeyword("NAME")) {
             if (phtGrp->HasKeyword("PHTNAME")) {
-              phtVal = (string)phtGrp->FindKeyword("PHTNAME");
+              phtVal = (QString)phtGrp->FindKeyword("PHTNAME");
             } else if (phtGrp->HasKeyword("NAME")) {
-              phtVal = (string)phtGrp->FindKeyword("NAME");
+              phtVal = (QString)phtGrp->FindKeyword("NAME");
             } else {
-              string message = "The input PVL does not contain a valid photometric model so you must specify one ";
+              QString message = "The input PVL does not contain a valid photometric model so you must specify one ";
               message += "- the [Phtname] keyword is missing in your [Algorithm] group";
               throw IException(IException::User, message, _FILEINFO_);
             }
-            phtVal = phtVal.UpCase();
+            phtVal = phtVal.toUpper();
             if (phtName == phtVal) {
               wasFound = true;
               break;
@@ -160,15 +160,15 @@ void LoadPvl() {
             ui.PutAsString("B0", keyVal);
           }
           if (phtGrp->HasKeyword("ZEROB0STANDARD")) {
-            string zerob0 = (string)phtGrp->FindKeyword("ZEROB0STANDARD");
-            IString izerob0 = zerob0;
-            izerob0 = izerob0.UpCase();
+            QString zerob0 = (QString)phtGrp->FindKeyword("ZEROB0STANDARD");
+            QString izerob0 = zerob0;
+            izerob0 = izerob0.toUpper();
             if (izerob0 == "TRUE") {
               ui.PutString("ZEROB0STANDARD", "TRUE");
             } else if (izerob0 == "FALSE") {
               ui.PutString("ZEROB0STANDARD", "FALSE");
             } else {
-              string message = "The ZEROB0STANDARD value is invalid - must be set to TRUE or FALSE";
+              QString message = "The ZEROB0STANDARD value is invalid - must be set to TRUE or FALSE";
               throw IException(IException::User, message, _FILEINFO_);
             }
           }
@@ -235,7 +235,7 @@ void LoadPvl() {
           }
         } else if (phtVal != "LAMBERT" && phtVal != "LOMMELSEELIGER" &&
                    phtVal != "LUNARLAMBERTMCEWEN") {
-          string message = "Unsupported photometric model [" + phtVal + "].";
+          QString message = "Unsupported photometric model [" + phtVal + "].";
           throw IException(IException::User, message, _FILEINFO_);
         }
         ui.PutAsString("PHTNAME", phtVal);
@@ -243,11 +243,11 @@ void LoadPvl() {
     }
   }
 
-  IString atmVal;
+  QString atmVal;
   if (inPvl.HasObject("AtmosphericModel")) {
     PvlObject atmObj = inPvl.FindObject("AtmosphericModel");
     if (!atmObj.HasGroup("Algorithm")) {
-      string message = "The input PVL does not contain a valid atmospheric model so you must specify one ";
+      QString message = "The input PVL does not contain a valid atmospheric model so you must specify one ";
       message += "- the [Algorithm] group is missing in your [AtmosphericModel]";
       throw IException(IException::User, message, _FILEINFO_);
     }
@@ -255,15 +255,15 @@ void LoadPvl() {
       PvlObject::PvlGroupIterator atmGrp = atmObj.BeginGroup();
       bool wasFound = false;
       if (atmGrp->HasKeyword("ATMNAME")) {
-        atmVal = (string)atmGrp->FindKeyword("ATMNAME");
+        atmVal = (QString)atmGrp->FindKeyword("ATMNAME");
       } else if (atmGrp->HasKeyword("NAME")) {
-        atmVal = (string)atmGrp->FindKeyword("NAME");
+        atmVal = (QString)atmGrp->FindKeyword("NAME");
       } else {
-        string message = "The input PVL does not contain a valid atmospheric model so you must specify one ";
+        QString message = "The input PVL does not contain a valid atmospheric model so you must specify one ";
         message += "- the [Atmname] keyword is missing in your [Algorithm] group";
         throw IException(IException::User, message, _FILEINFO_);
       }
-      atmVal = atmVal.UpCase();
+      atmVal = atmVal.toUpper();
       if (atmName == atmVal || atmName == "NONE" || atmName == "FROMPVL") {
         wasFound = true;
       }
@@ -271,15 +271,15 @@ void LoadPvl() {
         while (atmGrp != atmObj.EndGroup()) {
           if (atmGrp->HasKeyword("ATMNAME") || atmGrp->HasKeyword("NAME")) {
             if (atmGrp->HasKeyword("ATMNAME")) {
-              atmVal = (string)atmGrp->FindKeyword("ATMNAME");
+              atmVal = (QString)atmGrp->FindKeyword("ATMNAME");
             } else if (atmGrp->HasKeyword("NAME")) {
-              atmVal = (string)atmGrp->FindKeyword("NAME");
+              atmVal = (QString)atmGrp->FindKeyword("NAME");
             } else {
-              string message = "The input PVL does not contain a valid atmospheric model so you must specify one ";
+              QString message = "The input PVL does not contain a valid atmospheric model so you must specify one ";
               message += "- the [Atmname] keyword is missing in your [Algorithm] group";
               throw IException(IException::User, message, _FILEINFO_);
             }
-            atmVal = atmVal.UpCase();
+            atmVal = atmVal.toUpper();
             if (atmName == atmVal) {
               wasFound = true;
               break;
@@ -303,34 +303,34 @@ void LoadPvl() {
             double hnorm = atmGrp->FindKeyword("HNORM");
             os.str("");
             os << hnorm;
-            ui.PutAsString("HNORM", os.str());
+            ui.PutAsString("HNORM", os.str().c_str());
           }
           if (atmGrp->HasKeyword("TAU")) {
             double tau = atmGrp->FindKeyword("TAU");
             os.str("");
             os << tau;
-            ui.PutAsString("TAU", os.str());
+            ui.PutAsString("TAU", os.str().c_str());
           }
           if (atmGrp->HasKeyword("TAUREF")) {
             double tauref = atmGrp->FindKeyword("TAUREF");
             os.str("");
             os << tauref;
-            ui.PutAsString("TAUREF", os.str());
+            ui.PutAsString("TAUREF", os.str().c_str());
           }
           if (atmGrp->HasKeyword("WHA")) {
             double wha = atmGrp->FindKeyword("WHA");
             os.str("");
             os << wha;
-            ui.PutAsString("WHA", os.str());
+            ui.PutAsString("WHA", os.str().c_str());
           }
           if (atmGrp->HasKeyword("NULNEG")) {
-            string nulneg = (string)atmGrp->FindKeyword("NULNEG");
+            QString nulneg = (QString)atmGrp->FindKeyword("NULNEG");
             if (nulneg.compare("YES")) {
               ui.PutString("NULNEG", "YES");
             } else if (nulneg.compare("NO")) {
               ui.PutString("NULNEG", "NO");
             } else {
-              string message = "The NULNEG value is invalid - must be set to YES or NO";
+              QString message = "The NULNEG value is invalid - must be set to YES or NO";
               throw IException(IException::User, message, _FILEINFO_);
             }
           }
@@ -340,7 +340,7 @@ void LoadPvl() {
             double bha = atmGrp->FindKeyword("BHA");
             os.str("");
             os << bha;
-            ui.PutAsString("BHA", os.str());
+            ui.PutAsString("BHA", os.str().c_str());
           }
         }
         if (atmVal == "HAPKEATM1" || atmVal == "HAPKEATM2") {
@@ -348,14 +348,14 @@ void LoadPvl() {
             double hga = atmGrp->FindKeyword("HGA");
             os.str("");
             os << hga;
-            ui.PutAsString("HGA", os.str());
+            ui.PutAsString("HGA", os.str().c_str());
           }
         }
 
         if (atmVal != "ANISOTROPIC1" && atmVal != "ANISOTROPIC2" &&
             atmVal != "HAPKEATM1" && atmVal != "HAPKEATM2" &&
             atmVal != "ISOTROPIC1" && atmVal != "ISOTROPIC2") {
-          string message = "Unsupported atmospheric model [" + atmVal + "].";
+          QString message = "Unsupported atmospheric model [" + atmVal + "].";
           throw IException(IException::User, message, _FILEINFO_);
         }
         ui.PutAsString("ATMNAME", atmVal);
@@ -369,7 +369,7 @@ void IsisMain() {
   // to the file. If no extension is given, '.pvl' will be used.
   UserInterface &ui = Application::GetUserInterface();
   FileName out = ui.GetFileName("TOPVL");
-  string output = ui.GetFileName("TOPVL");
+  QString output = ui.GetFileName("TOPVL");
   if(out.extension() == "") {
     output += ".pvl";
   }
@@ -379,13 +379,13 @@ void IsisMain() {
   Pvl op;
 
   if (ui.WasEntered("FROMPVL")) {
-    string input = ui.GetFileName("FROMPVL");
+    QString input = ui.GetFileName("FROMPVL");
     p.Read(input);
   }
 
   //Check to make sure that a model was specified
   if (ui.GetAsString("PHTNAME") == "NONE" && ui.GetAsString("ATMNAME") == "NONE") {
-    string message = "A photometric model or an atmospheric model must be specified before running this program";
+    QString message = "A photometric model or an atmospheric model must be specified before running this program";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
@@ -406,9 +406,9 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
   UserInterface &ui = Application::GetUserInterface();
 
   bool wasFound = false;
-  IString phtName = ui.GetAsString("PHTNAME");
-  phtName = phtName.UpCase();
-  IString phtVal;
+  QString phtName = ui.GetAsString("PHTNAME");
+  phtName = phtName.toUpper();
+  QString phtVal;
   PvlObject pvlObj;
   PvlGroup pvlGrp;
   if (pvl.HasObject("PhotometricModel")) {
@@ -416,13 +416,13 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
     if (pvlObj.HasGroup("Algorithm")) {
       PvlObject::PvlGroupIterator pvlGrp = pvlObj.BeginGroup();
       if (pvlGrp->HasKeyword("PHTNAME")) {
-        phtVal = (string)pvlGrp->FindKeyword("PHTNAME");
+        phtVal = (QString)pvlGrp->FindKeyword("PHTNAME");
       } else if (pvlGrp->HasKeyword("NAME")) {
-        phtVal = (string)pvlGrp->FindKeyword("NAME");
+        phtVal = (QString)pvlGrp->FindKeyword("NAME");
       } else {
         phtVal = "NONE";
       }
-      phtVal = phtVal.UpCase();
+      phtVal = phtVal.toUpper();
       if (phtName == phtVal) {
         wasFound = true;
       }
@@ -430,13 +430,13 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
         while (pvlGrp != pvlObj.EndGroup()) {
           if (pvlGrp->HasKeyword("PHTNAME") || pvlGrp->HasKeyword("NAME")) {
             if (pvlGrp->HasKeyword("PHTNAME")) {
-              phtVal = (string)pvlGrp->FindKeyword("PHTNAME");
+              phtVal = (QString)pvlGrp->FindKeyword("PHTNAME");
             } else if (pvlGrp->HasKeyword("NAME")) {
-              phtVal = (string)pvlGrp->FindKeyword("NAME");
+              phtVal = (QString)pvlGrp->FindKeyword("NAME");
             } else {
               phtVal = "NONE";
             }
-            phtVal = phtVal.UpCase();
+            phtVal = phtVal.toUpper();
             if (phtName == phtVal) {
               wasFound = true;
               break;
@@ -474,7 +474,7 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
     } else {
       if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                   HasKeyword("THETA")) {
-        string message = "The " + phtName + " Photometric model requires a value for the THETA parameter.";
+        QString message = "The " + phtName + " Photometric model requires a value for the THETA parameter.";
         message += "The normal range for THETA is: 0 <= THETA <= 90";
         throw IException(IException::User, message, _FILEINFO_);
       }
@@ -487,7 +487,7 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
     } else {
       if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                   HasKeyword("WH")) {
-        string message = "The " + phtName + " Photometric model requires a value for the WH parameter.";
+        QString message = "The " + phtName + " Photometric model requires a value for the WH parameter.";
         message += "The normal range for WH is: 0 < WH <= 1";
         throw IException(IException::User, message, _FILEINFO_);
       }
@@ -500,7 +500,7 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
     } else {
       if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                   HasKeyword("HH")) {
-        string message = "The " + phtName + " Photometric model requires a value for the HH parameter.";
+        QString message = "The " + phtName + " Photometric model requires a value for the HH parameter.";
         message += "The normal range for HH is: 0 <= HH";
         throw IException(IException::User, message, _FILEINFO_);
       }
@@ -513,7 +513,7 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
     } else {
       if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                   HasKeyword("B0")) {
-        string message = "The " + phtName + " Photometric model requires a value for the B0 parameter.";
+        QString message = "The " + phtName + " Photometric model requires a value for the B0 parameter.";
         message += "The normal range for B0 is: 0 <= B0";
         throw IException(IException::User, message, _FILEINFO_);
       }
@@ -547,7 +547,7 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
       } else {
         if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     HasKeyword("HG1")) {
-          string message = "The " + phtName + " Photometric model requires a value for the HG1 parameter.";
+          QString message = "The " + phtName + " Photometric model requires a value for the HG1 parameter.";
           message += "The normal range for HG1 is: -1 < HG1 < 1";
           throw IException(IException::User, message, _FILEINFO_);
         }
@@ -560,7 +560,7 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
       } else {
         if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     HasKeyword("HG2")) {
-          string message = "The " + phtName + " Photometric model requires a value for the HG2 parameter.";
+          QString message = "The " + phtName + " Photometric model requires a value for the HG2 parameter.";
           message += "The normal range for HG2 is: 0 <= HG2 <= 1";
           throw IException(IException::User, message, _FILEINFO_);
         }
@@ -574,7 +574,7 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
       } else {
         if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     HasKeyword("BH")) {
-          string message = "The " + phtName + " Photometric model requires a value for the BH parameter.";
+          QString message = "The " + phtName + " Photometric model requires a value for the BH parameter.";
           message += "The normal range for BH is: -1 <= BH <= 1";
           throw IException(IException::User, message, _FILEINFO_);
         }
@@ -587,7 +587,7 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
       } else {
         if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     HasKeyword("CH")) {
-          string message = "The " + phtName + " Photometric model requires a value for the CH parameter.";
+          QString message = "The " + phtName + " Photometric model requires a value for the CH parameter.";
           message += "The normal range for CH is: -1 <= CH <= 1";
           throw IException(IException::User, message, _FILEINFO_);
         }
@@ -610,7 +610,7 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
     } else {
       if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     HasKeyword("PHASELIST")) {
-        string message = "The " + phtName + " Photometric model requires a value for the PHASELIST parameter.";
+        QString message = "The " + phtName + " Photometric model requires a value for the PHASELIST parameter.";
         throw IException(IException::User, message, _FILEINFO_);
       }
       phaselistsize = outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
@@ -625,7 +625,7 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
     } else {
       if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                   HasKeyword("PHASECURVELIST")) {
-        string message = "The " + phtName + " Photometric model requires a value for the PHASECURVELIST parameter.";
+        QString message = "The " + phtName + " Photometric model requires a value for the PHASECURVELIST parameter.";
         throw IException(IException::User, message, _FILEINFO_);
       }
       phasecurvelistsize = outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
@@ -641,14 +641,14 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
       } else {
         if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     HasKeyword("LLIST")) {
-          string message = "The " + phtName + " Photometric model requires a value for the LLIST parameter.";
+          QString message = "The " + phtName + " Photometric model requires a value for the LLIST parameter.";
           throw IException(IException::User, message, _FILEINFO_);
         }
         llistsize = outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     FindKeyword("LLIST").Size();
       }
       if (llistsize != phaselistsize || llistsize != phasecurvelistsize) {
-        string message = "The " + phtName + " Photometric model requires that the LLIST, ";
+        QString message = "The " + phtName + " Photometric model requires that the LLIST, ";
         message += "PHASELIST, and PHASECURVELIST  parameters all have the same number of ";
         message += "entries.";
         throw IException(IException::User, message, _FILEINFO_);
@@ -663,14 +663,14 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
       } else {
         if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     HasKeyword("KLIST")) {
-          string message = "The " + phtName + " Photometric model requires a value for the KLIST parameter.";
+          QString message = "The " + phtName + " Photometric model requires a value for the KLIST parameter.";
           throw IException(IException::User, message, _FILEINFO_);
         }
         klistsize = outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                     FindKeyword("KLIST").Size();
       }
       if (klistsize != phaselistsize || klistsize != phasecurvelistsize) {
-        string message = "The " + phtName + " Photometric model requires that the KLIST, ";
+        QString message = "The " + phtName + " Photometric model requires that the KLIST, ";
         message += "PHASELIST, and PHASECURVELIST  parameters all have the same number of ";
         message += "entries.";
         throw IException(IException::User, message, _FILEINFO_);
@@ -687,7 +687,7 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
     } else {
       if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                   HasKeyword("L")) {
-        string message = "The " + phtName + " Photometric model requires a value for the L parameter.";
+        QString message = "The " + phtName + " Photometric model requires a value for the L parameter.";
         message += "The L parameter has no limited range";
         throw IException(IException::User, message, _FILEINFO_);
       }
@@ -703,7 +703,7 @@ void addPhoModel(Pvl &pvl, Pvl &outPvl) {
     } else {
       if (!outPvl.FindObject("PhotometricModel").FindGroup("Algorithm").
                   HasKeyword("K")) {
-        string message = "The " + phtName + " Photometric model requires a value for the K parameter.";
+        QString message = "The " + phtName + " Photometric model requires a value for the K parameter.";
         message += "The normal range for K is: 0 <= K";
         throw IException(IException::User, message, _FILEINFO_);
       }
@@ -716,9 +716,9 @@ void addAtmosModel(Pvl &pvl, Pvl &outPvl) {
   UserInterface &ui = Application::GetUserInterface();
 
   bool wasFound = false;
-  IString atmName = ui.GetAsString("ATMNAME");
-  atmName = atmName.UpCase();
-  IString atmVal;
+  QString atmName = ui.GetAsString("ATMNAME");
+  atmName = atmName.toUpper();
+  QString atmVal;
   PvlObject pvlObj;
   PvlGroup pvlGrp;
   if (pvl.HasObject("AtmosphericModel")) {
@@ -726,13 +726,13 @@ void addAtmosModel(Pvl &pvl, Pvl &outPvl) {
     if (pvlObj.HasGroup("Algorithm")) {
       PvlObject::PvlGroupIterator pvlGrp = pvlObj.BeginGroup();
       if (pvlGrp->HasKeyword("ATMNAME")) {
-        atmVal = (string)pvlGrp->FindKeyword("ATMNAME");
+        atmVal = (QString)pvlGrp->FindKeyword("ATMNAME");
       } else if (pvlGrp->HasKeyword("NAME")) {
-        atmVal = (string)pvlGrp->FindKeyword("NAME");
+        atmVal = (QString)pvlGrp->FindKeyword("NAME");
       } else {
         atmVal = "NONE";
       }
-      atmVal = atmVal.UpCase();
+      atmVal = atmVal.toUpper();
       if (atmName == atmVal) {
         wasFound = true;
       }
@@ -740,13 +740,13 @@ void addAtmosModel(Pvl &pvl, Pvl &outPvl) {
         while (pvlGrp != pvlObj.EndGroup()) {
           if (pvlGrp->HasKeyword("ATMNAME") || pvlGrp->HasKeyword("NAME")) {
             if (pvlGrp->HasKeyword("ATMNAME")) {
-              atmVal = (string)pvlGrp->FindKeyword("ATMNAME");
+              atmVal = (QString)pvlGrp->FindKeyword("ATMNAME");
             } else if (pvlGrp->HasKeyword("NAME")) {
-              atmVal = (string)pvlGrp->FindKeyword("NAME");
+              atmVal = (QString)pvlGrp->FindKeyword("NAME");
             } else {
               atmVal = "NONE";
             }
-            atmVal = atmVal.UpCase();
+            atmVal = atmVal.toUpper();
             if (atmName == atmVal) {
               wasFound = true;
               break;
@@ -785,7 +785,7 @@ void addAtmosModel(Pvl &pvl, Pvl &outPvl) {
     } else {
       if (!outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                   HasKeyword("HNORM")) {
-        string message = "The " + atmName + " Atmospheric model requires a value for the HNORM parameter.";
+        QString message = "The " + atmName + " Atmospheric model requires a value for the HNORM parameter.";
         message += "The normal range for HNORM is: 0 <= HNORM";
         throw IException(IException::User, message, _FILEINFO_);
       }
@@ -798,7 +798,7 @@ void addAtmosModel(Pvl &pvl, Pvl &outPvl) {
     } else {
       if (!outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                   HasKeyword("TAU")) {
-        string message = "The " + atmName + " Atmospheric model requires a value for the TAU parameter.";
+        QString message = "The " + atmName + " Atmospheric model requires a value for the TAU parameter.";
         message += "The normal range for TAU is: 0 <= TAU";
         throw IException(IException::User, message, _FILEINFO_);
       }
@@ -811,7 +811,7 @@ void addAtmosModel(Pvl &pvl, Pvl &outPvl) {
     } else {
       if (!outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                   HasKeyword("TAUREF")) {
-        string message = "The " + atmName + " Atmospheric model requires a value for the TAUREF parameter.";
+        QString message = "The " + atmName + " Atmospheric model requires a value for the TAUREF parameter.";
         message += "The normal range for TAUREF is: 0 <= TAUREF";
         throw IException(IException::User, message, _FILEINFO_);
       }
@@ -824,7 +824,7 @@ void addAtmosModel(Pvl &pvl, Pvl &outPvl) {
     } else {
       if (!outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                   HasKeyword("WHA")) {
-        string message = "The " + atmName + " Atmospheric model requires a value for the WHA parameter.";
+        QString message = "The " + atmName + " Atmospheric model requires a value for the WHA parameter.";
         message += "The normal range for WHA is: 0 < WHA < 1";
         throw IException(IException::User, message, _FILEINFO_);
       }
@@ -838,7 +838,7 @@ void addAtmosModel(Pvl &pvl, Pvl &outPvl) {
                AddKeyword(PvlKeyword("NULNEG","NO"),Pvl::Replace);
     } else if (!outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                   HasKeyword("NULNEG")) {
-        string message = "The " + atmName + " Atmospheric model requires a value for the NULNEG parameter.";
+        QString message = "The " + atmName + " Atmospheric model requires a value for the NULNEG parameter.";
         message += "The valid values for NULNEG are: YES, NO";
         throw IException(IException::User, message, _FILEINFO_);
       }
@@ -853,7 +853,7 @@ void addAtmosModel(Pvl &pvl, Pvl &outPvl) {
     } else {
       if (!outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                   HasKeyword("BHA")) {
-        string message = "The " + atmName + " Atmospheric model requires a value for the BHA parameter.";
+        QString message = "The " + atmName + " Atmospheric model requires a value for the BHA parameter.";
         message += "The normal range for BHA is: -1 <= BHA <= 1";
         throw IException(IException::User, message, _FILEINFO_);
       }
@@ -868,7 +868,7 @@ void addAtmosModel(Pvl &pvl, Pvl &outPvl) {
     } else {
       if (!outPvl.FindObject("AtmosphericModel").FindGroup("Algorithm").
                   HasKeyword("HGA")) {
-        string message = "The " + atmName + " Atmospheric model requires a value for the HGA parameter.";
+        QString message = "The " + atmName + " Atmospheric model requires a value for the HGA parameter.";
         message += "The normal range for HGA is: -1 < HGA < 1";
         throw IException(IException::User, message, _FILEINFO_);
       }

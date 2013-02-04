@@ -40,7 +40,7 @@ SCCSID @(#)limits.h  1.1 10/04/99
 */
 /* SCCShid @(#)limits.h (limits.h) 1.4 */
 
-#if !defined(limits_h)
+#ifndef limits_h
 
 #define limits_h
 

@@ -1,4 +1,4 @@
-#if !defined(Ransac_h)
+#ifndef Ransac_h
 #define Ransac_h
 
 #include <math.h>

@@ -39,7 +39,7 @@ namespace Isis {
    *
    */
   MarciDistortionMap::MarciDistortionMap(Camera *parent, int naifIkCode) : CameraDistortionMap(parent) {
-    std::string odkkey = "INS" + Isis::IString(naifIkCode) + "_DISTORTION_COEFFS";
+    QString odkkey = "INS" + toString(naifIkCode) + "_DISTORTION_COEFFS";
 
     for(int i = 0; i < 4; i++) {
       p_odk.push_back(p_camera->getDouble(odkkey, i));

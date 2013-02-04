@@ -67,7 +67,7 @@ namespace Isis {
 
     // Get the start and end time
     double et;
-    string stime = inst["SpacecraftClockCount"];
+    QString stime = inst["SpacecraftClockCount"];
     et = getClockTime(stime).Et();
 
     double offset = inst["SpacecraftClockOffset"];
@@ -78,7 +78,7 @@ namespace Isis {
     PvlGroup &bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
     PvlKeyword &orgBand = bandBin["OriginalBand"];
     for(int i = 0; i < orgBand.Size(); i++) {
-      p_originalBand.push_back(orgBand[i]);
+      p_originalBand.push_back(toInt(orgBand[i]));
     }
 
     // Setup detector map

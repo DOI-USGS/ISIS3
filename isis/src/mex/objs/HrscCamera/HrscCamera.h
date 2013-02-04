@@ -85,7 +85,7 @@ namespace Isis {
       virtual int SpkReferenceId() const { return (1); }
 
     private:
-      void ReadLineRates(IString filename);
+      void ReadLineRates(QString filename);
 
       std::vector<LineRateChange> p_lineRates;
   };

@@ -400,7 +400,7 @@ namespace Isis {
     else if (format != "") {
       importer = new QtImporter(inputName);
     }
-    else if (JP2Decoder::IsJP2(inputName.expanded())) {
+    else if (JP2Decoder::IsJP2(inputName.expanded().toAscii().data())) {
       importer = new JP2Importer(inputName);
     }
     else {

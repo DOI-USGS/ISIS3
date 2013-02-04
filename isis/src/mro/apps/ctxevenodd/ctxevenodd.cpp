@@ -37,14 +37,14 @@ void IsisMain() {
   Isis::PvlGroup &inst =
     lab.FindGroup("Instrument", Pvl::Traverse);
 
-  std::string instId = inst["InstrumentId"];
+  QString instId = inst["InstrumentId"];
   if(instId != "CTX") {
-    string msg = "This is not a CTX image.  Ctxcevenodd requires a CTX image.";
+    QString msg = "This is not a CTX image.  Ctxcevenodd requires a CTX image.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   int sum = inst["SpatialSumming"];
   if(sum != 1) {
-    string msg = "CTX images do not have even/odd noise problems";
+    QString msg = "CTX images do not have even/odd noise problems";
     msg += " if the SpatialSumming is greater than one.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
@@ -66,7 +66,7 @@ void IsisMain() {
   //
   // throw err if, pixel counts could result in division by zero
   if((oddCount == 0) || (evenCount == 0)) {
-    string msg = "Couldn't compute column averages";
+    QString msg = "Couldn't compute column averages";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 

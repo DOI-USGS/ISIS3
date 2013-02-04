@@ -1,4 +1,4 @@
-#if !defined(DbAccess_h)
+#ifndef DbAccess_h
 #define DbAccess_h
 /**
  * @file
@@ -115,20 +115,20 @@ namespace Isis {
    *
    * @internal
    *   @history 2007-06-05 Brendan George - Modified to work with
-   *                           IString/StringTool merge
+   *                           QString/StringTool merge
    */
   class DbAccess : public DbProfile {
     private:
       /** Define the container for the DbAccess key word list */
-      typedef CollectorMap<std::string, DbProfile, NoCaseStringCompare>
+      typedef CollectorMap<IString, DbProfile, NoCaseStringCompare>
       ProfileList;
 
     public:
       //  Constructors and Destructor
       DbAccess() : DbProfile("Database"), _defProfileName(""), _profiles() { }
-      DbAccess(const std::string &dbaccFile,
-               const std::string &defProfileName = "");
-      DbAccess(PvlObject &pvl, const std::string &defProfileName = "");
+      DbAccess(const QString &dbaccFile,
+               const QString &defProfileName = "");
+      DbAccess(PvlObject &pvl, const QString &defProfileName = "");
 
       /** Destructor ensures everything is cleaned up properly */
       virtual ~DbAccess() { }
@@ -149,11 +149,11 @@ namespace Isis {
        *
        * @return bool  True if the profile exists, false otherwise
        */
-      bool profileExists(const std::string &profile) const {
+      bool profileExists(const QString &profile) const {
         return (_profiles.exists(profile));
       }
 
-      const DbProfile getProfile(const std::string &name = "") const;
+      const DbProfile getProfile(const QString &name = "") const;
       const DbProfile getProfile(int nth) const;
 
 
@@ -170,13 +170,13 @@ namespace Isis {
         _profiles.add(profile.Name(), profile);
       }
 
-      void load(const std::string &filename);
+      void load(const QString &filename);
       void load(PvlObject &pvl);
 
-      std::string getDefaultProfileName() const;
+      QString getDefaultProfileName() const;
 
     private:
-      std::string      _defProfileName;  //!<  Name of default profile
+      QString      _defProfileName;  //!<  Name of default profile
       ProfileList      _profiles;        //!<  List of profiles
   };
 

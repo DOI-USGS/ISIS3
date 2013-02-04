@@ -49,7 +49,7 @@ namespace Isis {
     // have been put in the labels during ingestion (thm2isis).  This is meant
     // to handle a random timing errors which can be up to four pixels
     PvlGroup &inst = lab.FindGroup("Instrument", Pvl::Traverse);
-    string stime = inst["SpacecraftClockCount"];
+    QString stime = inst["SpacecraftClockCount"];
     p_etStart = getClockTime(stime).Et();
 
     double offset = inst["SpacecraftClockOffset"];
@@ -61,7 +61,7 @@ namespace Isis {
     PvlGroup &bandBin = lab.FindGroup("BandBin", Pvl::Traverse);
     PvlKeyword &orgBand = bandBin["FilterNumber"];
     for(int i = 0; i < orgBand.Size(); i++) {
-      p_originalBand.push_back(orgBand[i]);
+      p_originalBand.push_back(toInt(orgBand[i]));
     }
 
     // Themis IR had a summing mode added.  This directly affects the line
@@ -78,7 +78,7 @@ namespace Isis {
     // If the TDI mode is enabled then 16 line in the detector are summed
     // to improve the SNR.  In the SetBand method we will the TDI mode to
     // determine line offset for the band.
-    p_tdiMode = (string) inst["TimeDelayIntegration"];
+    p_tdiMode = (QString) inst["TimeDelayIntegration"];
 
     // The detector map tells us how to convert from image coordinates to
     // detector coordinates.  In our case, a (sample,line) to a (sample,time)

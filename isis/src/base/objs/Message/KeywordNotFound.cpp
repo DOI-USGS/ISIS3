@@ -25,8 +25,6 @@ using namespace std;
 
 #include "Message.h"
 
-string Isis::Message::KeywordNotFound(const string &key) {
-  string message;
-  message = "Keyword [" + key + "] required but was not found";
-  return message;
+QString Isis::Message::KeywordNotFound(const QString &key) {
+  return "Keyword [" + key + "] required but was not found";
 }

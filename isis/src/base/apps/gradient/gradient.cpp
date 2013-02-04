@@ -21,7 +21,7 @@ void IsisMain() {
   p.SetOutputCube("TO");
 
   //  Which gradient?
-  string gradType = ui.GetString("GRADTYPE");
+  QString gradType = ui.GetString("GRADTYPE");
   //  Set boxcar size depending on the gradient type
   if(gradType == "SOBEL") {
     p.SetBoxcarSize(3, 3);

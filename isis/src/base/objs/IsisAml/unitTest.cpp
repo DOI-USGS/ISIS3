@@ -1,5 +1,5 @@
 #include <iostream>
-#include <string>
+#include <QString>
 #include <sstream>
 #include "IsisAml.h"
 
@@ -11,10 +11,10 @@
 #include "TextFile.h"
 
 
+using namespace Isis;
 using namespace std;
 
-
-void ReportError(Isis::IString err);
+void ReportError(QString err);
 
 class Inheritor : public IsisAml {
   public:
@@ -154,22 +154,22 @@ Inheritor::Inheritor(const char *xmlfile): IsisAml(xmlfile) {
       }
     }
   }
-  catch(Isis::IException &error) {
+  catch(IException &error) {
     error.print();
   }
 }
 
 
 int main(void) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
   // Create the aml object
   cout << "Create the aml object" << endl;
   Inheritor *aml;
-  string xmlFile = Isis::FileName("./unitTest.xml").expanded();
+  QString xmlFile = FileName("./unitTest.xml").expanded();
   try {
-    aml = new Inheritor(xmlFile.c_str());
+    aml = new Inheritor(xmlFile.toAscii().data());
   }
-  catch(Isis::IException &error) {
+  catch(IException &error) {
     error.print();
     exit(1);
   }
@@ -316,7 +316,7 @@ int main(void) {
     cout << "  FR's value = " << aml->GetString("fr") << endl;
     cout << endl;
   }
-  catch(Isis::IException &error) {
+  catch(IException &error) {
     error.print();
   }
   cout << endl;
@@ -331,7 +331,7 @@ int main(void) {
       aml->PutAsString("G1P0", "11111");
       aml->PutAsString("G1P0", "22222");
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
     aml->Clear("G1P0");
@@ -341,7 +341,7 @@ int main(void) {
       aml->PutString("G1P0", "G1P0L0");
       aml->PutString("G1P0", "22222");
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
     aml->Clear("G1P0");
@@ -349,7 +349,7 @@ int main(void) {
     try { // PARAMETER NOT STRING
       aml->PutString("G2P4", "xxxxxx");
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
 
@@ -358,7 +358,7 @@ int main(void) {
       aml->PutFileName("G0P0", "xxxxxxx");
       aml->PutFileName("G0P0", "yyyyyyy");
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
     aml->Clear("G0P0");
@@ -366,7 +366,7 @@ int main(void) {
     try { // PARAMETER NOT FILENAME
       aml->PutFileName("G2P4", "xxxxxx");
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
 
@@ -374,23 +374,23 @@ int main(void) {
 
     try { // UNABLE TO GET INPUT CUBE ATTRIBUTES
       aml->PutFileName("CUBE2", "xxxxxxx.cub+1,2-4");
-      Isis::CubeAttributeInput &att = aml->GetInputAttribute("CUBE2");
+      CubeAttributeInput &att = aml->GetInputAttribute("CUBE2");
       cout << "    " << att.toString() << endl;
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
     aml->Clear("CUBE2");
 
     try { // UNABLE TO GET OUTPUT CUBE ATTRIBUTES
       aml->PutFileName("CUBE1", "yyyyyyy.cub+8-bit+BSQ+detached");
-      Isis::CubeAttributeOutput &att = aml->GetOutputAttribute("CUBE1");
-      string strng = att.toString();
-      cout << "    Att string  = " << strng << endl;
+      CubeAttributeOutput &att = aml->GetOutputAttribute("CUBE1");
+      QString strng = att.toString();
+      cout << "    Att QString  = " << strng << endl;
       cout << "    File format = " << att.fileFormatString() << endl;
-      cout << "    Pixel type  = " << Isis::PixelTypeName(att.pixelType()) << endl;
+      cout << "    Pixel type  = " << PixelTypeName(att.pixelType()) << endl;
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
     aml->Clear("CUBE1");
@@ -400,7 +400,7 @@ int main(void) {
       aml->PutInteger("G6P2", 1);
       aml->PutInteger("G6P2", 1);
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
     aml->Clear("G6P2");
@@ -408,7 +408,7 @@ int main(void) {
     try { // PARAMETER NOT INTEGER
       aml->PutInteger("G6P0", 1);
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
 
@@ -417,7 +417,7 @@ int main(void) {
       aml->PutDouble("G1P2", 1.0);
       aml->PutDouble("G1P2", 1.0);
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
     aml->Clear("G1P2");
@@ -425,7 +425,7 @@ int main(void) {
     try { // PARAMETER NOT DOUBLE
       aml->PutDouble("G0P0", 1.0);
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
 
@@ -435,7 +435,7 @@ int main(void) {
       aml->PutBoolean("G6P0", true);
       aml->PutBoolean("G6P0", false);
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
     aml->Clear("G6P0");
@@ -443,65 +443,65 @@ int main(void) {
     try { // PARAMETER NOT BOOLEAN
       aml->PutBoolean("G0P0", false);
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
 
     cout << "  GetAsString:" << endl;
     try { // PARAMETER HAS NO VALUE
-      string s = aml->GetAsString("G2P0");
+      QString s = aml->GetAsString("G2P0");
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
 
     cout << "  GetFileName:" << endl;
     try { // PARAMETER HAS NO VALUE
-      string s = aml->GetFileName("G0P0");
+      QString s = aml->GetFileName("G0P0");
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
 
     try { // PARAMETER NOT FILENAME
-      string s = aml->GetFileName("G2P4");
+      QString s = aml->GetFileName("G2P4");
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
 
 #if 0
     cout << "  GetCube:" << endl;
     try {
-      string s = aml->GetCube("CUBE1");
+      QString s = aml->GetCube("CUBE1");
     }
-    catch(Isis::IException &error) {
-      ReportError(Isis::IString(error.Errors()));
+    catch(IException &error) {
+      ReportError(IString(error.Errors()));
       error.Clear();
     }
 
     cout << endl;
     try {
-      string s = aml->GetCube("G2P4");
+      QString s = aml->GetCube("G2P4");
     }
-    catch(Isis::IException &error) {
-      ReportError(Isis::IString(error.Errors()));
+    catch(IException &error) {
+      ReportError(IString(error.Errors()));
       error.Clear();
     }
 #endif
 
     cout << "  GetString:" << endl;
     try { // PARAMETER HAS NO VALUE
-      string s = aml->GetString("G6P3");
+      QString s = aml->GetString("G6P3");
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
 
     try { // PARAMETER NOT STRING
-      string s = aml->GetString("G2P4");
+      QString s = aml->GetString("G2P4");
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
 
@@ -509,14 +509,14 @@ int main(void) {
     try { // PARAMETER HAS NO VALUE
       aml->GetInteger("G2P0");
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
 
     try { // PARAMETER NOT INTEGER
       aml->GetInteger("G0P0");
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
 
@@ -524,14 +524,14 @@ int main(void) {
     try { // PARAMETER HAS NO VALUE
       aml->GetDouble("G1P3");
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
 
     try { // PARAMETER NOT DOUBLE
       aml->GetDouble("G0P1");
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
 
@@ -539,7 +539,7 @@ int main(void) {
     try { // PARAMETER HAS NO VALUE
       aml->GetBoolean("G6P0");
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
 
@@ -547,7 +547,7 @@ int main(void) {
       aml->PutAsString("G6P0", "cccc");
       aml->GetBoolean("G6P0");
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
     aml->Clear("G6P0");
@@ -555,19 +555,19 @@ int main(void) {
     try { // PARAMETER NOT BOOLEAN
       aml->GetBoolean("G1P1");
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
 
     try { // PARAMETER NOT UNIQUE
-      string s = aml->GetString("F");
+      QString s = aml->GetString("F");
     }
-    catch(Isis::IException &error) {
+    catch(IException &error) {
       ReportError(error.toString());
     }
 
   }
-  catch(Isis::IException &error) {
+  catch(IException &error) {
     error.print();
   }
   // Load up a valid set of parameters
@@ -675,7 +675,7 @@ int main(void) {
   try {
     aml->VerifyAll();
   }
-  catch(Isis::IException &error) {
+  catch(IException &error) {
     error.print();
   }
   cout << endl;
@@ -683,11 +683,11 @@ int main(void) {
   // Test the command line member
   cout << "The current command line:" << endl;
   try {
-    Isis::Pvl lab;
+    Pvl lab;
     aml->CommandLine(lab);
     cout << lab << endl << endl;
   }
-  catch(Isis::IException &error) {
+  catch(IException &error) {
     error.print();
   }
 
@@ -700,7 +700,7 @@ int main(void) {
   try { // PARAMETER MUST BE ENTERED IF OTHER PARAMETER HAS PARTICULAR VALUE
     aml->VerifyAll();
   }
-  catch(Isis::IException &error) {
+  catch(IException &error) {
     ReportError(error.toString());
   }
   aml->Clear("G1P0");
@@ -712,7 +712,7 @@ int main(void) {
   try { // PARAMETER CAN NOT BE ENTERED IF OTHER PARAMETER HAS PARTICULAR VALUE
     aml->VerifyAll();
   }
-  catch(Isis::IException &error) {
+  catch(IException &error) {
     ReportError(error.toString());
   }
   aml->Clear("G2P0");
@@ -721,22 +721,22 @@ int main(void) {
   try { // UNKNOWN PARAMETER
     aml->Clear("xyz");
   }
-  catch(Isis::IException &error) {
+  catch(IException &error) {
     ReportError(error.toString());
   }
 
   cout << "---------- Check errors for user file overwrite preferences ----------" << endl;
   // Create a file
-  string testFile = "junk.txt";
-  string lines[3];
+  QString testFile = "junk.txt";
+  QString lines[3];
   lines[0] = "1";
-  vector<string> strvect;
+  vector<QString> strvect;
   strvect.push_back(lines[0]);
-  Isis::TextFile f1(testFile, "overwrite", strvect);
+  TextFile f1(testFile, "overwrite", strvect);
   aml->Clear("G0P1");
   // set output parameter to equal existing file
   aml->PutAsString("G0P1", "junk.txt");
-  Isis::Preference &testpref = Isis::Preference::Preferences();
+  Preference &testpref = Preference::Preferences();
 
   try {
     // FILE OVERWRITE NOT ALLOWED
@@ -744,7 +744,7 @@ int main(void) {
     cout << "  Overwrite not allowed:" << endl;
     aml->VerifyAll();
   }
-  catch(Isis::IException &error) {
+  catch(IException &error) {
     ReportError(error.toString());
   }
 
@@ -753,7 +753,7 @@ int main(void) {
     cout << "  Invalid Overwrite preference value:" << endl;
     aml->VerifyAll();
   }
-  catch(Isis::IException &error) {
+  catch(IException &error) {
     ReportError(error.toString());
   }
   remove("junk.txt");
@@ -766,41 +766,7 @@ int main(void) {
  * @internal
  *   @history 2010-07-26 Jeannie Walldren - Original version.
  */
-void ReportError(Isis::IString err) {
-  Isis::IString report = ""; // report will be modified error message
-  Isis::IString errorLine = ""; // read message one line at a time
-  Isis::FileName expandedfile;
-  while(err != "") {
-    // pull off first line
-    errorLine = err.Token("\n");
-    while(errorLine != "") {
-      size_t openBrace = errorLine.find('[');
-      if(openBrace != string::npos) {
-        // if open brace is found, look to see if a filename is inside (indicated by '/')
-        if(errorLine.at(openBrace + 1) == '/') {
-          // add message up to and including [
-          report += errorLine.Token("[");
-          report += "[";
-          // read entire path into FileName object
-          expandedfile = errorLine.Token("]");
-          report += expandedfile.name(); // only report base name, rather than fully expanded path
-          report += "]";
-        }
-        else {
-          // not a filename inside braces, add message up to and including ]
-          report += errorLine.Token("]");
-          report += "]";
-          continue;
-        }
-      }
-      else {
-        // no more braces are found, add rest of error message
-        report += errorLine;
-        break;
-      }
-    }
-    report += "\n";
-  }
-  cout << report << endl;
+void ReportError(QString err) {
+  cout << err.replace(QRegExp("\\[/[^\\]]*\\]"), "[]") << endl << endl;
 }
 

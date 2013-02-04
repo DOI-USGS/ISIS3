@@ -36,7 +36,7 @@ using namespace std;
 IsisXMLMultipleValues::IsisXMLMultipleValues(char *PencodingName,
     bool &PexpandNamespaces,
     XERCES::SAX2XMLReader* &Pparser,
-    std::vector<std::string> *PmultipleValues) {
+    std::vector<QString> *PmultipleValues) {
 
   encodingName = PencodingName;
   expandNamespaces = PexpandNamespaces;

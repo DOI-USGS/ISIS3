@@ -95,8 +95,8 @@ namespace Isis {
   void LoHighDistortionMap::SetDistortion(const int naifIkCode) {
     // Get the perspective correction factors for x and y and the distortion
     // center (point of symmetry of distortion)
-    string perskey = "INS" + IString(naifIkCode) + "_PERSPECTIVE_FACTORS";
-    string centkey = "INS" + IString(naifIkCode) + "_POINT_OF_SYMMETRY";
+    QString perskey = "INS" + toString(naifIkCode) + "_PERSPECTIVE_FACTORS";
+    QString centkey = "INS" + toString(naifIkCode) + "_POINT_OF_SYMMETRY";
     p_xPerspective = p_camera->Spice::getDouble(perskey, 0);
     p_yPerspective = p_camera->Spice::getDouble(perskey, 1);
     p_x0 = p_camera->Spice::getDouble(centkey, 0);

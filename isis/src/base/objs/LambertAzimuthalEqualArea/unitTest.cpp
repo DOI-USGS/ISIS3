@@ -24,19 +24,19 @@ int main(int argc, char *argv[]) {
   Pvl lab;
   lab.AddGroup(PvlGroup("Mapping"));
   PvlGroup &mapGroup = lab.FindGroup("Mapping");
-  mapGroup += PvlKeyword("EquatorialRadius", 1.0);
-  mapGroup += PvlKeyword("PolarRadius", 1.0);
+  mapGroup += PvlKeyword("EquatorialRadius", "1.0");
+  mapGroup += PvlKeyword("PolarRadius", "1.0");
   mapGroup += PvlKeyword("LatitudeType", "Planetographic");
   mapGroup += PvlKeyword("LongitudeDirection", "PositiveEast");
-  mapGroup += PvlKeyword("LongitudeDomain", 180);
-  mapGroup += PvlKeyword("MinimumLatitude", 20.0);
-  mapGroup += PvlKeyword("MaximumLatitude", 80.0);
-  mapGroup += PvlKeyword("MinimumLongitude", -180.0);
-  mapGroup += PvlKeyword("MaximumLongitude", 180.0);
+  mapGroup += PvlKeyword("LongitudeDomain", "180");
+  mapGroup += PvlKeyword("MinimumLatitude", "20.0");
+  mapGroup += PvlKeyword("MaximumLatitude", "80.0");
+  mapGroup += PvlKeyword("MinimumLongitude", "-180.0");
+  mapGroup += PvlKeyword("MaximumLongitude", "180.0");
   mapGroup += PvlKeyword("ProjectionName", "LambertAzimuthalEqualArea");
-  mapGroup += PvlKeyword("CenterLatitude", 0);
-  mapGroup += PvlKeyword("CenterLongitude", 0);
-  mapGroup += PvlKeyword("PixelResolution", .001);
+  mapGroup += PvlKeyword("CenterLatitude", "0");
+  mapGroup += PvlKeyword("CenterLongitude", "0");
+  mapGroup += PvlKeyword("PixelResolution", ".001");
 
   try {
     string border = "||||||||||||||||||||||||||||||||||||||||"
@@ -282,10 +282,10 @@ int main(int argc, char *argv[]) {
     cout << "(x,y) = (" << p1->XCoord() << ", " << p1->YCoord() << ")"<< endl;
     cout << endl;
     cout << endl;
-    mapGroup.FindKeyword("MinimumLatitude").SetValue(-90.0);
-    mapGroup.FindKeyword("MaximumLatitude").SetValue(90.0);
-    mapGroup.FindKeyword("MinimumLongitude").SetValue(-179.99999);
-    mapGroup.FindKeyword("MaximumLongitude").SetValue(179.99999);
+    mapGroup.FindKeyword("MinimumLatitude").SetValue("-90.0");
+    mapGroup.FindKeyword("MaximumLatitude").SetValue("90.0");
+    mapGroup.FindKeyword("MinimumLongitude").SetValue("-179.99999");
+    mapGroup.FindKeyword("MaximumLongitude").SetValue("179.99999");
     TProjection *p1a = (TProjection *) ProjectionFactory::Create(lab);
     cout << "Given: " << endl;
     cout << "    Minimum Latitude:  " << p1a->MinimumLatitude() << endl;
@@ -311,8 +311,8 @@ int main(int argc, char *argv[]) {
     p1a->SetCoordinate(0, minY);
     cout << "            SetCoordinate(0,minY) returns lat/lon = " 
          << p1a->Latitude() << " / " << p1a->Longitude()  << endl;
-    mapGroup.FindKeyword("MinimumLongitude").SetValue(-90.0);
-    mapGroup.FindKeyword("MaximumLongitude").SetValue(90.0);
+    mapGroup.FindKeyword("MinimumLongitude").SetValue("-90.0");
+    mapGroup.FindKeyword("MaximumLongitude").SetValue("90.0");
     cout << "Given: " << endl;
     TProjection *p1b = (TProjection *) ProjectionFactory::Create(lab);
     cout << "    Minimum Latitude:  " << p1b->MinimumLatitude() << endl;
@@ -348,13 +348,13 @@ int main(int argc, char *argv[]) {
     cout << border << endl << endl;
     //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     mapGroup.DeleteKeyword("EquatorialRadius");
-    mapGroup += PvlKeyword("EquatorialRadius", 3.0);
-    mapGroup.FindKeyword("PolarRadius").SetValue(3.0);
-    mapGroup.FindKeyword("CenterLatitude").SetValue(40.0);
-    mapGroup.FindKeyword("CenterLongitude").SetValue(-100.0);
-    mapGroup.FindKeyword("MinimumLongitude").SetValue(-279.99999);
-    mapGroup.FindKeyword("MaximumLongitude").SetValue(79.99999);
-    mapGroup.FindKeyword("LongitudeDomain").SetValue(360);
+    mapGroup += PvlKeyword("EquatorialRadius", "3.0");
+    mapGroup.FindKeyword("PolarRadius").SetValue("3.0");
+    mapGroup.FindKeyword("CenterLatitude").SetValue("40.0");
+    mapGroup.FindKeyword("CenterLongitude").SetValue("-100.0");
+    mapGroup.FindKeyword("MinimumLongitude").SetValue("-279.99999");
+    mapGroup.FindKeyword("MaximumLongitude").SetValue("79.99999");
+    mapGroup.FindKeyword("LongitudeDomain").SetValue("360");
     TProjection *p2 = (TProjection *) ProjectionFactory::Create(lab);
     cout << mapGroup["CenterLatitude"] << endl;
     cout << mapGroup["CenterLongitude"] << endl;
@@ -529,8 +529,8 @@ int main(int argc, char *argv[]) {
          << p2->Latitude() << " / " << p2->Longitude()  << endl;
     cout << endl;
     cout << endl;
-    mapGroup.FindKeyword("MinimumLongitude").SetValue(-110.0);
-    mapGroup.FindKeyword("MaximumLongitude").SetValue(70.0);
+    mapGroup.FindKeyword("MinimumLongitude").SetValue("-110.0");
+    mapGroup.FindKeyword("MaximumLongitude").SetValue("70.0");
     TProjection *p2a = (TProjection *) ProjectionFactory::Create(lab);
     cout << std::setprecision(7);
     cout << "Given: " << endl;
@@ -567,9 +567,9 @@ int main(int argc, char *argv[]) {
     cout << "\t\t\t SPHERICAL-PLANETOGRAPHIC-POSITIVEEAST-SOUTH POLAR-180" << endl;
     cout << border << endl << endl;
     //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    mapGroup.FindKeyword("CenterLatitude").SetValue(-90.0);
-    mapGroup.FindKeyword("CenterLongitude").SetValue(-96.0);
-    mapGroup.FindKeyword("LongitudeDomain").SetValue(180);
+    mapGroup.FindKeyword("CenterLatitude").SetValue("-90.0");
+    mapGroup.FindKeyword("CenterLongitude").SetValue("-96.0");
+    mapGroup.FindKeyword("LongitudeDomain").SetValue("180");
     TProjection *p3 = (TProjection *) ProjectionFactory::Create(lab);
     cout << mapGroup["CenterLatitude"] << endl;
     cout << mapGroup["CenterLongitude"] << endl;
@@ -786,10 +786,10 @@ int main(int argc, char *argv[]) {
     cout << "(x,y) = (" << p3->XCoord() << ", " << p3->YCoord() << ")"<< endl;
     cout << endl;
     cout << endl;
-    mapGroup.FindKeyword("MinimumLatitude").SetValue(-90.0);
-    mapGroup.FindKeyword("MaximumLatitude").SetValue(0.0);
-    mapGroup.FindKeyword("MinimumLongitude").SetValue(-336.0);//24
-    mapGroup.FindKeyword("MaximumLongitude").SetValue(-66.0);//294
+    mapGroup.FindKeyword("MinimumLatitude").SetValue("-90.0");
+    mapGroup.FindKeyword("MaximumLatitude").SetValue("0.0");
+    mapGroup.FindKeyword("MinimumLongitude").SetValue("-336.0");//24
+    mapGroup.FindKeyword("MaximumLongitude").SetValue("-66.0");//294
     TProjection *p3a = (TProjection *) ProjectionFactory::Create(lab);
     cout << "Given: " << endl;
     cout << "    Minimum Latitude:  " << p3a->MinimumLatitude() << endl;
@@ -825,8 +825,8 @@ int main(int argc, char *argv[]) {
          << p3a->Latitude() << " / " << p3a->Longitude()  << endl;
     cout << endl;
     cout << endl;
-    mapGroup.FindKeyword("MinimumLongitude").SetValue(-66.0);
-    mapGroup.FindKeyword("MaximumLongitude").SetValue(-51.0);
+    mapGroup.FindKeyword("MinimumLongitude").SetValue("-66.0");
+    mapGroup.FindKeyword("MaximumLongitude").SetValue("-51.0");
     TProjection *p3b = (TProjection *) ProjectionFactory::Create(lab);
     cout << "Given: " << endl;
     cout << "    Minimum Latitude:  " << p3b->MinimumLatitude() << endl;
@@ -869,13 +869,13 @@ int main(int argc, char *argv[]) {
     cout << "\t\t\t SPHERICAL-PLANETOCENTRIC-POSITIVEWEST-NORTH POLAR-180" << endl;
     cout << border << endl << endl;
     //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    mapGroup.FindKeyword("CenterLatitude").SetValue(90.0);
+    mapGroup.FindKeyword("CenterLatitude").SetValue("90.0");
     mapGroup.FindKeyword("LatitudeType").SetValue("Planetocentric");
     mapGroup.FindKeyword("LongitudeDirection").SetValue("PositiveWest");
-    mapGroup.FindKeyword("MinimumLatitude").SetValue(-89.99999);
-    mapGroup.FindKeyword("MaximumLatitude").SetValue(0.0);
-    mapGroup.FindKeyword("MinimumLongitude").SetValue(-51.0);
-    mapGroup.FindKeyword("MaximumLongitude").SetValue(129.0);
+    mapGroup.FindKeyword("MinimumLatitude").SetValue("-89.99999");
+    mapGroup.FindKeyword("MaximumLatitude").SetValue("0.0");
+    mapGroup.FindKeyword("MinimumLongitude").SetValue("-51.0");
+    mapGroup.FindKeyword("MaximumLongitude").SetValue("129.0");
     TProjection *p4 = (TProjection *) ProjectionFactory::Create(lab);
     cout << mapGroup["CenterLatitude"] << endl;
     cout << mapGroup["CenterLongitude"] << endl;
@@ -1077,8 +1077,8 @@ int main(int argc, char *argv[]) {
     p4->SetGround(-90, 90);
     cout << endl;
     cout << endl;
-    mapGroup.FindKeyword("MinimumLongitude").SetValue(-6.0);
-    mapGroup.FindKeyword("MaximumLongitude").SetValue(24.0);
+    mapGroup.FindKeyword("MinimumLongitude").SetValue("-6.0");
+    mapGroup.FindKeyword("MaximumLongitude").SetValue("24.0");
     TProjection *p4a = (TProjection *) ProjectionFactory::Create(lab);
     cout << "Given: " << endl;
     cout << std::setprecision(7);// so all of the 9's are visible for minlat
@@ -1119,7 +1119,7 @@ int main(int argc, char *argv[]) {
          << p4a->Latitude() << " / " << p4a->Longitude()  << endl;
     cout << endl;
     cout << endl;
-    mapGroup.FindKeyword("MinimumLatitude").SetValue(-90.0);
+    mapGroup.FindKeyword("MinimumLatitude").SetValue("-90.0");
     TProjection *p4b = (TProjection *) ProjectionFactory::Create(lab);
     cout << "Given: " << endl;
     cout << std::setprecision(7);
@@ -1163,12 +1163,12 @@ int main(int argc, char *argv[]) {
     mapGroup.FindKeyword("LatitudeType").SetValue("Planetographic");
     mapGroup.FindKeyword("LongitudeDirection").SetValue("PositiveEast");
     mapGroup.DeleteKeyword("EquatorialRadius");
-    mapGroup += PvlKeyword("EquatorialRadius", 6378388.0);
-    mapGroup.FindKeyword("PolarRadius").SetValue(6378388.0*sqrt(1-.00672267));
-    mapGroup.FindKeyword("MinimumLatitude").SetValue(-89.99999);
-    mapGroup.FindKeyword("CenterLongitude").SetValue(-100.0);
-    mapGroup.FindKeyword("MinimumLongitude").SetValue(-100.0);        
-    mapGroup.FindKeyword("MaximumLongitude").SetValue(215.0);         
+    mapGroup += PvlKeyword("EquatorialRadius", "6378388.0");
+    mapGroup.FindKeyword("PolarRadius").SetValue(toString(6378388.0*sqrt(1-.00672267)));
+    mapGroup.FindKeyword("MinimumLatitude").SetValue("-89.99999");
+    mapGroup.FindKeyword("CenterLongitude").SetValue("-100.0");
+    mapGroup.FindKeyword("MinimumLongitude").SetValue("-100.0");        
+    mapGroup.FindKeyword("MaximumLongitude").SetValue("215.0");         
     // we do not have relative scale factor methods in Projection as of 06/2012
     // so these need to be tested with a LambertAzimuthalEqualArea object
     // specifically.  The following values were compared to the table in Snyder
@@ -1383,8 +1383,8 @@ int main(int argc, char *argv[]) {
          p5->Latitude() << " / " << p5->Longitude()  << endl;
     cout << endl;
     cout << endl;
-    mapGroup.FindKeyword("MinimumLongitude").SetValue(-55.0);
-    mapGroup.FindKeyword("MaximumLongitude").SetValue(-10.0);
+    mapGroup.FindKeyword("MinimumLongitude").SetValue("-55.0");
+    mapGroup.FindKeyword("MaximumLongitude").SetValue("-10.0");
     TProjection *p5a = (TProjection *) ProjectionFactory::Create(lab);
     cout << "Given: " << endl;
     cout << std::setprecision(7);// so all of the 9's are visible for minlat
@@ -1431,7 +1431,7 @@ int main(int argc, char *argv[]) {
     cout << "\t\t \t ELLIPSOIDAL-PLANETOGRAPHIC-POSITIVEEAST-SOUTH POLAR-180" <<endl;
     cout << border << endl << endl;
     //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    mapGroup.FindKeyword("CenterLatitude").SetValue(-90.0);
+    mapGroup.FindKeyword("CenterLatitude").SetValue("-90.0");
     TProjection *p6 = (TProjection *) ProjectionFactory::Create(lab);
     cout << std::setprecision(7);
     cout << mapGroup["CenterLatitude"] << endl;
@@ -1614,14 +1614,14 @@ int main(int argc, char *argv[]) {
     cout << border << endl << endl;
     //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     mapGroup.DeleteKeyword("EquatorialRadius");
-    mapGroup += PvlKeyword("EquatorialRadius", 6378206.4);
-    mapGroup.FindKeyword("PolarRadius").SetValue(6378206.4*sqrt(1-.00676866));  
-    mapGroup.FindKeyword("CenterLatitude").SetValue(40.0);                      
-    mapGroup.FindKeyword("CenterLongitude").SetValue(-100.0);                   
-    mapGroup.FindKeyword("MinimumLatitude").SetValue(-50);
-    mapGroup.FindKeyword("MaximumLatitude").SetValue(90.0);
-    mapGroup.FindKeyword("MinimumLongitude").SetValue(-190.0);
-    mapGroup.FindKeyword("MaximumLongitude").SetValue(-10.0);
+    mapGroup += PvlKeyword("EquatorialRadius", "6378206.4");
+    mapGroup.FindKeyword("PolarRadius").SetValue(toString(6378206.4*sqrt(1-.00676866)));  
+    mapGroup.FindKeyword("CenterLatitude").SetValue("40.0");                      
+    mapGroup.FindKeyword("CenterLongitude").SetValue("-100.0");                   
+    mapGroup.FindKeyword("MinimumLatitude").SetValue("-50");
+    mapGroup.FindKeyword("MaximumLatitude").SetValue("90.0");
+    mapGroup.FindKeyword("MinimumLongitude").SetValue("-190.0");
+    mapGroup.FindKeyword("MaximumLongitude").SetValue("-10.0");
     cout << std::setprecision(7);
     TProjection *p7 = (TProjection *) ProjectionFactory::Create(lab);                           
     cout << mapGroup["CenterLatitude"] << endl;                                 
@@ -1814,11 +1814,11 @@ int main(int argc, char *argv[]) {
     cout << "\t\t\t ELLIPSOIDAL-PLANETOGRAPHIC-POSITIVEEAST-EQUATORIAL-180" << endl;
     cout << border << endl << endl;
     //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    mapGroup.FindKeyword("CenterLatitude").SetValue(0);
-    mapGroup.FindKeyword("CenterLongitude").SetValue(0);
-    mapGroup.FindKeyword("MinimumLatitude").SetValue(-90);
-    mapGroup.FindKeyword("MaximumLatitude").SetValue(90.0);
-    mapGroup.FindKeyword("MinimumLongitude").SetValue(-90.0);
+    mapGroup.FindKeyword("CenterLatitude").SetValue("0");
+    mapGroup.FindKeyword("CenterLongitude").SetValue("0");
+    mapGroup.FindKeyword("MinimumLatitude").SetValue("-90");
+    mapGroup.FindKeyword("MaximumLatitude").SetValue("90.0");
+    mapGroup.FindKeyword("MinimumLongitude").SetValue("-90.0");
     TProjection *p8 = (TProjection *) ProjectionFactory::Create(lab);
     cout << mapGroup["CenterLatitude"] << endl;
     cout << mapGroup["CenterLongitude"] << endl << endl;
@@ -1956,7 +1956,7 @@ int main(int argc, char *argv[]) {
     cout << "            SetCoordinate(0,minY) returns lat/lon = " 
          << p8->Latitude() << " / " << p8->Longitude()  << endl;
     cout << endl;
-    mapGroup.FindKeyword("MaximumLongitude").SetValue(90.0);
+    mapGroup.FindKeyword("MaximumLongitude").SetValue("90.0");
     TProjection *p8a = (TProjection *) ProjectionFactory::Create(lab);
     cout << "\t\t\t\t/-----------------------------------------/" << endl;  
     cout << endl;
@@ -1996,7 +1996,7 @@ int main(int argc, char *argv[]) {
     cout << "\t\t\t\t\t TESTING OTHER METHODS          " << endl;
     cout << border << endl << endl;
     //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    mapGroup.FindKeyword("PolarRadius").SetValue(p8->EquatorialRadius());
+    mapGroup.FindKeyword("PolarRadius").SetValue(toString(p8->EquatorialRadius()));
     TProjection *p9 = (TProjection *) ProjectionFactory::Create(lab);
     TProjection *s = p1;
     cout << "Name:                       " << s->Name() << endl;
@@ -2079,25 +2079,25 @@ int main(int argc, char *argv[]) {
     cout << border << endl << endl;
     //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     mapGroup.DeleteKeyword("CenterLongitude");
-    mapGroup.DeleteKeyword("CenterLatitude");
     cout << "Error check: Missing center longitude keyword" << endl;
     try {
       LambertAzimuthalEqualArea p(lab);
     }
     catch(IException &e) {
       e.print();
-      mapGroup += PvlKeyword("CenterLongitude",180);
+      mapGroup += PvlKeyword("CenterLongitude", "180");
     }
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
+    mapGroup.DeleteKeyword("CenterLatitude");
     cout << "Error check: Missing center latitude keyword" << endl;
     try {
       LambertAzimuthalEqualArea p(lab);
     }
     catch(IException &e) {
       e.print();
-      mapGroup += PvlKeyword("CenterLatitude",0);
+      mapGroup += PvlKeyword("CenterLatitude","0");
     }
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
@@ -2105,13 +2105,13 @@ int main(int argc, char *argv[]) {
     cout << "Error check: MinimumLongitude more than 360 degrees "
             "from CenterLongitude" << endl;
     try {
-      mapGroup.FindKeyword("MinimumLongitude").SetValue(-181.0);
-      mapGroup.FindKeyword("MaximumLongitude").SetValue(270.0);
+      mapGroup.FindKeyword("MinimumLongitude").SetValue("-181.0");
+      mapGroup.FindKeyword("MaximumLongitude").SetValue("270.0");
       LambertAzimuthalEqualArea p(lab);
     }
     catch(IException &e) {
       e.print();
-      mapGroup.FindKeyword("MinimumLongitude").SetValue(-180.0);
+      mapGroup.FindKeyword("MinimumLongitude").SetValue("-180.0");
     }
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
@@ -2119,12 +2119,12 @@ int main(int argc, char *argv[]) {
     cout << "Error check: MaximumLongitude more than 360 degrees "
             "from CenterLongitude" << endl;
     try {
-      mapGroup.FindKeyword("MaximumLongitude").SetValue(541.0);
+      mapGroup.FindKeyword("MaximumLongitude").SetValue("541.0");
       LambertAzimuthalEqualArea p(lab);
     }
     catch(IException &e) {
       e.print();
-      mapGroup.FindKeyword("MaximumLongitude").SetValue(270.0);
+      mapGroup.FindKeyword("MaximumLongitude").SetValue("270.0");
     }
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
@@ -2135,31 +2135,31 @@ int main(int argc, char *argv[]) {
     }
     catch(IException &e) {
       e.print();
-      mapGroup.FindKeyword("MinimumLongitude").SetValue(90.0);
+      mapGroup.FindKeyword("MinimumLongitude").SetValue("90.0");
     }
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "Error check: Center longitude out of valid range" << endl;
     try {
-      mapGroup.FindKeyword("CenterLongitude").SetValue(361.0);
+      mapGroup.FindKeyword("CenterLongitude").SetValue("361.0");
       LambertAzimuthalEqualArea p(lab);
     }
     catch(IException &e) {
       e.print();
-      mapGroup.FindKeyword("CenterLongitude").SetValue(180.0);
+      mapGroup.FindKeyword("CenterLongitude").SetValue("180.0");
     }
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
     cout << "Error check: Center latitude out of valid range" << endl;
     try {
-      mapGroup.FindKeyword("CenterLatitude").SetValue(-91.0);
+      mapGroup.FindKeyword("CenterLatitude").SetValue("-91.0");
       LambertAzimuthalEqualArea p(lab);
     }
     catch(IException &e) {
       e.print();
-      mapGroup.FindKeyword("CenterLatitude").SetValue(0.0);
+      mapGroup.FindKeyword("CenterLatitude").SetValue("0.0");
     }
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
@@ -2168,14 +2168,14 @@ int main(int argc, char *argv[]) {
             "antipodal point for equatorial projections." << endl;
     try {
       // non-polar, clat = 0 (equatorial)
-      mapGroup.FindKeyword("CenterLatitude").SetValue(0);
+      mapGroup.FindKeyword("CenterLatitude").SetValue("0");
       // minlat(-90) <= -clat <= maxlat(90)
-      mapGroup.FindKeyword("MinimumLatitude").SetValue(-90);
-      mapGroup.FindKeyword("MaximumLatitude").SetValue(90.0);
+      mapGroup.FindKeyword("MinimumLatitude").SetValue("-90");
+      mapGroup.FindKeyword("MaximumLatitude").SetValue("90.0");
       // minlon(-180) <= clon-180 <= maxlon(90)
-      mapGroup.FindKeyword("CenterLongitude").SetValue(0);
-      mapGroup.FindKeyword("MinimumLongitude").SetValue(-180.0);
-      mapGroup.FindKeyword("MaximumLongitude").SetValue(90.0);
+      mapGroup.FindKeyword("CenterLongitude").SetValue("0");
+      mapGroup.FindKeyword("MinimumLongitude").SetValue("-180.0");
+      mapGroup.FindKeyword("MaximumLongitude").SetValue("90.0");
       LambertAzimuthalEqualArea p(lab);
     }
     catch(IException &e) {
@@ -2188,19 +2188,19 @@ int main(int argc, char *argv[]) {
             "antipodal point for oblique projections." << endl;
     try {
       // non-polar, clat = 10 (oblique)
-      mapGroup.FindKeyword("CenterLatitude").SetValue(10);
+      mapGroup.FindKeyword("CenterLatitude").SetValue("10");
       // minlat(-20) <= -clat(-10) <= maxlat(0)
-      mapGroup.FindKeyword("MinimumLatitude").SetValue(-20);
-      mapGroup.FindKeyword("MaximumLatitude").SetValue(0);
+      mapGroup.FindKeyword("MinimumLatitude").SetValue("-20");
+      mapGroup.FindKeyword("MaximumLatitude").SetValue("0");
       // minlon(180) <= clon+180(190) <= maxlon(200)
-      mapGroup.FindKeyword("CenterLongitude").SetValue(10);
-      mapGroup.FindKeyword("MinimumLongitude").SetValue(180.0);
-      mapGroup.FindKeyword("MaximumLongitude").SetValue(200.0);
+      mapGroup.FindKeyword("CenterLongitude").SetValue("10");
+      mapGroup.FindKeyword("MinimumLongitude").SetValue("180.0");
+      mapGroup.FindKeyword("MaximumLongitude").SetValue("200.0");
       LambertAzimuthalEqualArea p(lab);
     }
     catch(IException &e) {
       e.print();
-      mapGroup.FindKeyword("MaximumLongitude").SetValue(189.0);
+      mapGroup.FindKeyword("MaximumLongitude").SetValue("189.0");
     }
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
@@ -2228,8 +2228,8 @@ int main(int argc, char *argv[]) {
     cout << endl;
     cout << "\t\t\t\t/-----------------------------------------/" << endl;
     cout << endl;
-    mapGroup.FindKeyword("EquatorialRadius").SetValue(2.0);
-    mapGroup.FindKeyword("PolarRadius").SetValue(1.0);
+    mapGroup.FindKeyword("EquatorialRadius").SetValue("2.0");
+    mapGroup.FindKeyword("PolarRadius").SetValue("1.0");
     cout << "Error check: Relative scale factor. "
             "Ellipsoidal oblique aspect projection." << endl;
     LambertAzimuthalEqualArea pp(lab);
@@ -2245,7 +2245,7 @@ int main(int argc, char *argv[]) {
     cout << endl;
     cout << "Error check: Relative scale factor. "
             "Polar aspect projection projected at opposite pole." << endl;
-    mapGroup.FindKeyword("CenterLatitude").SetValue(90);
+    mapGroup.FindKeyword("CenterLatitude").SetValue("90");
     LambertAzimuthalEqualArea nPole(lab);
     nPole.SetGround(-90,0);
     try {
@@ -2254,7 +2254,7 @@ int main(int argc, char *argv[]) {
     catch(IException &e) {
       e.print();
     }
-    mapGroup.FindKeyword("CenterLatitude").SetValue(-90);
+    mapGroup.FindKeyword("CenterLatitude").SetValue("-90");
     LambertAzimuthalEqualArea sPole(lab);
     sPole.SetGround(90,0);
     try {

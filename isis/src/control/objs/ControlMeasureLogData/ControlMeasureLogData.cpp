@@ -51,10 +51,10 @@ namespace Isis {
   ControlMeasureLogData::ControlMeasureLogData(PvlKeyword keywordRep) {
     Init();
 
-    IString name = keywordRep.Name();
+    QString name = keywordRep.Name();
     p_dataType = NameToDataType(name);
     if (p_dataType != InvalidNumericLogDataType)
-      p_numericalValue = keywordRep[0];
+      p_numericalValue = toDouble(keywordRep[0]);
   }
 
 
@@ -188,7 +188,7 @@ namespace Isis {
    */
   PvlKeyword ControlMeasureLogData::ToKeyword() const {
     if(IsValid())
-      return PvlKeyword(DataTypeToName(p_dataType), p_numericalValue);
+      return PvlKeyword(DataTypeToName(p_dataType), toString(p_numericalValue));
     else
       return PvlKeyword();
   }
@@ -223,11 +223,12 @@ namespace Isis {
    * @param name The string to convert to data type
    * @return The data type converted from a string
    */
-  ControlMeasureLogData::NumericLogDataType ControlMeasureLogData::NameToDataType(IString name) const {
+  ControlMeasureLogData::NumericLogDataType ControlMeasureLogData::NameToDataType(
+      QString name) const {
     for (int i = InvalidNumericLogDataType + 1;
          i < MaximumNumericLogDataType; i++) {
       try {
-        IString thisTypeName = DataTypeToName((NumericLogDataType) i);
+        QString thisTypeName = DataTypeToName((NumericLogDataType) i);
 
         if (name == thisTypeName) {
           return (NumericLogDataType) i;
@@ -248,7 +249,7 @@ namespace Isis {
    *
    * @param type The data type to convert to a string
    */
-  IString ControlMeasureLogData::DataTypeToName(NumericLogDataType type) const {
+  QString ControlMeasureLogData::DataTypeToName(NumericLogDataType type) const {
     switch(type) {
       case InvalidNumericLogDataType: {
           IString msg = "Cannot convert an invalid data type to a string";
@@ -280,7 +281,7 @@ namespace Isis {
         return "Obsolete_AverageResidual";
     }
 
-    IString msg = "Unknown data type [" + IString(type) + "]";
+    QString msg = "Unknown data type [" + toString(type) + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 }

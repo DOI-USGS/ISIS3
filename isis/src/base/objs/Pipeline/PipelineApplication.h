@@ -24,10 +24,10 @@
  */
 
 #include <vector>
-#include "IException.h"
-#include "IString.h"
 
-using namespace std;
+#include <QString>
+
+#include "IException.h"
 
 namespace Isis {
   class Pipeline;
@@ -61,8 +61,8 @@ namespace Isis {
    */
   class PipelineApplication {
     public:
-      PipelineApplication(IString appName, Pipeline *pipe);
-      PipelineApplication(IString appName, PipelineApplication *previous);
+      PipelineApplication(QString appName, Pipeline *pipe);
+      PipelineApplication(QString appName, PipelineApplication *previous);
 
       //! This is the destructor
       ~PipelineApplication() {};
@@ -91,19 +91,19 @@ namespace Isis {
       };
 
       //! Get the name of this pipeline application
-      const IString &Name() const {
+      const QString &Name() const {
         return p_name;
       }
       //! Get the parameters for running this program; one element in the vector per run
-      const vector<IString> &ParamString() const {
+      const std::vector<QString> &ParamString() const {
         return p_paramString;
       }
       //! Get the branches this program expects as input
-      const vector<IString> &InputBranches() const {
+      const std::vector<QString> &InputBranches() const {
         return p_inBranches;
       }
       //! Get the branches this program has as output
-      const vector<IString> &OutputBranches() const {
+      const std::vector<QString> &OutputBranches() const {
         if(!Enabled() && Previous()) {
           return Previous()->OutputBranches();
         }
@@ -130,36 +130,36 @@ namespace Isis {
         return p_enabled;
       }
 
-      void SetInputParameter(const IString &inputParamName, bool supportsVirtualBands);
-      void SetInputParameter(const IString &inputParamName, CustomParameterValue value, bool supportsVirtualBands);
+      void SetInputParameter(const QString &inputParamName, bool supportsVirtualBands);
+      void SetInputParameter(const QString &inputParamName, CustomParameterValue value, bool supportsVirtualBands);
 
-      void SetOutputParameter(const IString &outputParamName, const IString &outNameModifier, const IString &outFileExtension = "cub");
-      void SetOutputParameter(const IString &branch, const IString &outputParamName,
-                              const IString &outNameModifier, const IString &outFileExtension);
+      void SetOutputParameter(const QString &outputParamName, const QString &outNameModifier, const QString &outFileExtension = "cub");
+      void SetOutputParameter(const QString &branch, const QString &outputParamName,
+                              const QString &outNameModifier, const QString &outFileExtension);
 
-      void AddBranch(const IString &modString, NameModifierType type);
+      void AddBranch(const QString &modString, NameModifierType type);
 
-      void AddParameter(const IString &inputParamName, const IString &appParamName);
-      void AddParameter(const IString &branch, const IString &inputParamName, const IString &appParamName);
+      void AddParameter(const QString &inputParamName, const QString &appParamName);
+      void AddParameter(const QString &branch, const QString &inputParamName, const QString &appParamName);
 
-      void AddConstParameter(const IString &appParamName, const IString &appParamValue);
-      void AddConstParameter(const IString &branch, const IString &appParamName, const IString &appParamValue);
+      void AddConstParameter(const QString &appParamName, const QString &appParamValue);
+      void AddConstParameter(const QString &branch, const QString &appParamName, const QString &appParamValue);
 
-      void AddParameter(const IString &appParamName, CustomParameterValue value);
-      void AddParameter(const IString &branch, const IString &appParamName, CustomParameterValue value);
+      void AddParameter(const QString &appParamName, CustomParameterValue value);
+      void AddParameter(const QString &branch, const QString &appParamName, CustomParameterValue value);
 
       //! This returns this application's output name modifier
-      IString OutputNameModifier() {
-        return (!p_outputMod.empty() || !Previous()) ? p_outputMod : Previous()->OutputNameModifier();
+      QString OutputNameModifier() {
+        return (!p_outputMod.isEmpty() || !Previous()) ? p_outputMod : Previous()->OutputNameModifier();
       }
       //! This returns this application's output file name's extension
-      IString OutputExtension() {
-        return (!p_outputExtension.empty() || !Previous()) ? p_outputExtension : Previous()->OutputExtension();
+      QString OutputExtension() {
+        return (!p_outputExtension.isEmpty() || !Previous()) ? p_outputExtension : Previous()->OutputExtension();
       }
       //! This returns this application's output files. Only valid after BuildParamString is called.
-      vector<IString> &GetOutputs();
+      std::vector<QString> &GetOutputs();
 
-      vector<IString> TemporaryFiles();
+      std::vector<QString> TemporaryFiles();
 
       /**
        * Link to the next application in the pipeline
@@ -205,7 +205,7 @@ namespace Isis {
       }
 
       bool SupportsVirtualBands();
-      void SetVirtualBands(vector<IString> bands);
+      void SetVirtualBands(std::vector<QString> bands);
       
       /**
        * Enable/Disable Branch given the branch name
@@ -215,9 +215,9 @@ namespace Isis {
        * @param branch - branch name
        * @param flag   - true/false
        */
-      void EnableBranch(IString branch, bool flag) {
+      void EnableBranch(QString branch, bool flag) {
         for(int i=0; i<(int)p_inBranches.size(); i++) {
-          if (p_inBranches[i].rfind(branch) != string::npos)
+          if (p_inBranches[i].contains(branch))
             p_enableBranch[i] = flag;
         }
       }
@@ -286,40 +286,40 @@ namespace Isis {
        * @param from Longer string ("abcdef")
        * @param compare String to compare against ("abc")
        */
-      bool StringStartsWith(IString from, IString compare) {
+      bool StringStartsWith(QString from, QString compare) {
         if(compare.size() > from.size()) return false;
 
-        for(unsigned int index = 0; index < compare.size(); index++)
+        for(int index = 0; index < compare.size(); index++)
           if(from[index] != compare[index]) return false;
 
         return true;
       }
 
-      IString CalculateInputFile(int branch);
-      IString CalculateOutputFile(int branch);
-      IString GetRealLastOutput(bool skipOne = false);
+      QString CalculateInputFile(int branch);
+      QString CalculateOutputFile(int branch);
+      QString GetRealLastOutput(bool skipOne = false);
       PipelineParameter &GetInputParameter(int branch);
 
-      int FindBranch(IString name, bool input = true);
+      int FindBranch(QString name, bool input = true);
 
       bool p_continue;//!< Continue the pipeline execution even if an error is encountered by this app
       bool p_enabled; //!< This application enabled?
       bool p_supportsVirtualBands; //!< This application supports virtual bands?
-      IString p_name; //!< Name of this application
-      vector<IString> p_outputs;     //!< Actual output files
-      vector<IString> p_tempFiles;   //!< Actial temporary files
-      vector<IString> p_paramString; //!< Built parameter strings
-      vector<IString> p_inBranches;  //!< Input branches
-      vector<IString> p_outBranches; //!< Output branches
-      vector<bool>    p_enableBranch; //!< Branch enabled/disabled
+      QString p_name; //!< Name of this application
+      std::vector<QString> p_outputs;     //!< Actual output files
+      std::vector<QString> p_tempFiles;   //!< Actial temporary files
+      std::vector<QString> p_paramString; //!< Built parameter strings
+      std::vector<QString> p_inBranches;  //!< Input branches
+      std::vector<QString> p_outBranches; //!< Output branches
+      std::vector<bool>    p_enableBranch; //!< Branch enabled/disabled
       
-      vector<PipelineParameter> p_output; //!< Output parameters
-      IString p_outputMod; //!< Output file name modifier
-      IString p_outputExtension; //!< Output file name extension
-      vector<IString> p_virtualBands; //!< Virtual bands string to add (empty if none)
+      std::vector<PipelineParameter> p_output; //!< Output parameters
+      QString p_outputMod; //!< Output file name modifier
+      QString p_outputExtension; //!< Output file name extension
+      std::vector<QString> p_virtualBands; //!< Virtual bands string to add (empty if none)
 
-      vector<PipelineParameter> p_input; //!< Input parameters
-      vector<PipelineParameter> p_params; //!< Regular parameters
+      std::vector<PipelineParameter> p_input; //!< Input parameters
+      std::vector<PipelineParameter> p_params; //!< Regular parameters
 
       PipelineApplication *p_previous; //!< Previous pipeline application
       PipelineApplication *p_next; //!< Next pipeline application
@@ -344,7 +344,7 @@ namespace Isis {
        *
        * @param paramName Parameter name
        */
-      PipelineParameter(IString paramName) {
+      PipelineParameter(QString paramName) {
         p_paramName = paramName;
         p_special = (PipelineApplication::CustomParameterValue) - 1;
         p_branch = -1;
@@ -358,7 +358,7 @@ namespace Isis {
        * @param paramName Parameter name
        * @param value Parameter value
        */
-      PipelineParameter(IString paramName, IString value) {
+      PipelineParameter(QString paramName, QString value) {
         p_paramName = paramName;
         p_paramValue = value;
         p_special = (PipelineApplication::CustomParameterValue) - 1;
@@ -373,7 +373,7 @@ namespace Isis {
        * @param branch Branch this parameter affects
        * @param paramName Parameter name
        */
-      PipelineParameter(int branch, IString paramName) {
+      PipelineParameter(int branch, QString paramName) {
         p_branch = branch;
         p_paramName = paramName;
         p_special = (PipelineApplication::CustomParameterValue) - 1;
@@ -388,7 +388,7 @@ namespace Isis {
        * @param paramName Parameter name
        * @param paramValue Special parameter value
        */
-      PipelineParameter(int branch, IString paramName, IString paramValue) {
+      PipelineParameter(int branch, QString paramName, QString paramValue) {
         p_branch = branch;
         p_paramValue = paramValue;
         p_paramName = paramName;
@@ -403,7 +403,7 @@ namespace Isis {
        * @param paramName Parameter name
        * @param special Special value
        */
-      PipelineParameter(IString paramName, PipelineApplication::CustomParameterValue special) {
+      PipelineParameter(QString paramName, PipelineApplication::CustomParameterValue special) {
         p_paramName = paramName;
         p_special = special;
         p_branch = -1;
@@ -418,7 +418,7 @@ namespace Isis {
        * @param paramName Parameter name
        * @param special Special parameter value
        */
-      PipelineParameter(int branch, IString paramName, PipelineApplication::CustomParameterValue special) {
+      PipelineParameter(int branch, QString paramName, PipelineApplication::CustomParameterValue special) {
         p_paramName = paramName;
         p_special = special;
         p_branch = branch;
@@ -437,11 +437,11 @@ namespace Isis {
       }
 
       //! Name of the parameter
-      IString Name() {
+      QString Name() {
         return p_paramName;
       }
       //! Non-special value of the parameter
-      IString Value() {
+      QString Value() {
         return p_paramValue;
       }
       //! True if the parameter value is special
@@ -459,8 +459,8 @@ namespace Isis {
 
     private:
       int p_branch; //!< Branch this affects
-      IString p_paramName; //!< Parameter name
-      IString p_paramValue; //!< Parameter non-special value
+      QString p_paramName; //!< Parameter name
+      QString p_paramValue; //!< Parameter non-special value
       PipelineApplication::CustomParameterValue p_special; //!< Parameter special value
   };
 };

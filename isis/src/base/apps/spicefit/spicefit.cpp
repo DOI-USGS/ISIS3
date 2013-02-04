@@ -23,7 +23,7 @@ void IsisMain() {
     // Get the camera, interpolate to a parabola
     Camera *cam = cube.getCamera();
     if(cam->DetectorMap()->LineRate() == 0.0) {
-      string msg = "[" + ui.GetFileName("FROM") + "] is not a line scan camera";
+      QString msg = "[" + ui.GetFileName("FROM") + "] is not a line scan camera";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     cam->instrumentRotation()->SetPolynomial();
@@ -53,7 +53,7 @@ void IsisMain() {
     cube.close();
   }
   catch(IException &e) {
-    string msg = "Unable to fit pointing for [" + ui.GetFileName("FROM") + "]";
+    QString msg = "Unable to fit pointing for [" + ui.GetFileName("FROM") + "]";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }

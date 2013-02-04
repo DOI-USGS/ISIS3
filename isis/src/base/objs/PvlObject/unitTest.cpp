@@ -185,15 +185,15 @@ int main() {
     PvlObject pvlObject1("Object1");
     PvlObject pvlObject2("Object2");
     PvlGroup pvlGrp("Point_errormagnitude");
-    PvlKeyword pvlKwrd("LessThan", 2);
+    PvlKeyword pvlKwrd("LessThan", "2");
     pvlGrp += pvlKwrd;
       
     pvlKwrd.Clear();
-    pvlKwrd = PvlKeyword("GreaterThan", 3.5);
+    pvlKwrd = PvlKeyword("GreaterThan", "3.5");
     pvlGrp += pvlKwrd;
       
     pvlKwrd.Clear();
-    pvlKwrd = PvlKeyword("GreaterThan", 4.4545);
+    pvlKwrd = PvlKeyword("GreaterThan", "4.4545");
     pvlGrp += pvlKwrd;
     
     pvlObject1 += pvlGrp;

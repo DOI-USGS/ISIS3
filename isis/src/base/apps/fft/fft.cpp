@@ -1,5 +1,9 @@
 #include "Isis.h"
+
 #include <complex>
+
+#include <QFile>
+
 #include "FourierTransform.h"
 #include "ProcessByTile.h"
 #include "Statistics.h"
@@ -13,8 +17,8 @@ void FFT2(vector<Buffer *> &in, vector<Buffer *> &out);
 void getMinMax(Buffer &in);
 
 FourierTransform fft;
-string tmpMagFileName = "Temporary_IFFT_Magnitude.cub";
-string tmpPhaseFileName = "Temporary_IFFT_Phase.cub";
+QString tmpMagFileName = "Temporary_IFFT_Magnitude.cub";
+QString tmpPhaseFileName = "Temporary_IFFT_Phase.cub";
 double HPixel = 0.0, LPixel = 0.0, NPixel = 0.0;
 
 Statistics stats;
@@ -38,7 +42,7 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
 
-  string replacement = ui.GetString("REPLACEMENT");
+  QString replacement = ui.GetString("REPLACEMENT");
   if(replacement == "ZEROES") {
     HPixel = 0.0;
     LPixel = 0.0;
@@ -88,8 +92,8 @@ void IsisMain() {
   // Stop the process and remove the temporary files
   lProc.Finalize();
 
-  remove(tmpMagFileName.c_str());
-  remove(tmpPhaseFileName.c_str());
+  QFile::remove(tmpMagFileName);
+  QFile::remove(tmpPhaseFileName);
 }
 
 // Processing routine for the fft with one input cube

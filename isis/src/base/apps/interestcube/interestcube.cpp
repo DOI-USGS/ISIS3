@@ -36,13 +36,13 @@ void IsisMain() {
     PvlGroup &op = pvl.FindGroup("Operator", Pvl::Traverse);
     boxcarSamples = op["Samples"];
     boxcarLines = op["Lines"];
-    op["DeltaLine"] = 0;
-    op["DeltaSamp"] = 0;
-    op["MinimumInterest"] = 0.0;
+    op["DeltaLine"] = "0";
+    op["DeltaSamp"] = "0";
+    op["MinimumInterest"] = "0.0";
     Application::Log(op);
   }
   catch(IException &e) {
-    std::string msg = "Improper format for InterestOperator PVL [" + pvl.FileName() + "]";
+    QString msg = "Improper format for InterestOperator PVL [" + pvl.FileName() + "]";
     throw IException(e, IException::User, msg, _FILEINFO_);
   }
 

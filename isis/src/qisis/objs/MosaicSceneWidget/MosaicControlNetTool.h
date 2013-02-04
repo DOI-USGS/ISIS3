@@ -41,7 +41,7 @@ namespace Isis {
 
       PvlObject toPvl() const;
       void fromPvl(const PvlObject &obj);
-      IString projectPvlObjectName() const;
+      QString projectPvlObjectName() const;
 
     public slots:
 

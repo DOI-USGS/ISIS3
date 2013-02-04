@@ -21,10 +21,10 @@
 using namespace std;
 using namespace Isis;
 
-inline std::string Quote(const std::string &value, const char qChar = '"') {
-  if(value.empty()) return (value);
+inline QString Quote(const QString &value, const char qChar = '"') {
+  if(value.isEmpty()) return (value);
   if(value[0] == qChar) return (value);
-  return (std::string(qChar + value + qChar));
+  return (QString(qChar + value + qChar));
 }
 
 inline double SetRound(double value, const int precision) {
@@ -33,15 +33,15 @@ inline double SetRound(double value, const int precision) {
   return (value);
 }
 
-inline void ValidateUnit(PvlKeyword &key, const std::string &kunit) {
+inline void ValidateUnit(PvlKeyword &key, const QString &kunit) {
   PvlKeyword temp = key;
   key.Clear();
   for(int i = 0 ; i < temp.Size() ; i++) {
     try {
       //  If this works, check unit, otherwise an exception is thrown
-      (void) temp[i].ToDouble();
-      string unit = temp.Unit(i);
-      if(unit.empty()) unit = kunit;
+      (void) toDouble(temp[i]);
+      QString unit = temp.Unit(i);
+      if(unit.isEmpty()) unit = kunit;
       key.AddValue(temp[i], unit);
     }
     catch(...) {
@@ -51,14 +51,14 @@ inline void ValidateUnit(PvlKeyword &key, const std::string &kunit) {
   return;
 }
 
-inline void FixUnit(PvlObject &obj, const string &key, const string &unit) {
+inline void FixUnit(PvlObject &obj, const QString &key, const QString &unit) {
   if(obj.HasKeyword(key, PvlObject::Traverse)) {
     ValidateUnit(obj.FindKeyword(key, PvlObject::Traverse), unit);
   }
   return;
 }
 
-inline void FixQuotes(PvlContainer &kcont, const string &value = "N/A") {
+inline void FixQuotes(PvlContainer &kcont, const QString &value = "N/A") {
   PvlContainer::PvlKeywordIterator kiter;
   for(kiter = kcont.Begin() ; kiter != kcont.End() ; ++kiter) {
     for(int nv = 0 ; nv < kiter->Size() ; nv++) {
@@ -87,10 +87,10 @@ inline void FixLabels(PvlObject &obj) {
 
 
 void IsisMain() {
-  const std::string mdis2pds_program = "mdis2pds";
-  const std::string mdis2pds_version = "1.0";
-  const std::string mdis2pds_revision = "$Revision$";
-  const std::string mdis2pds_runtime = Application::DateTime();
+  const QString mdis2pds_program = "mdis2pds";
+  const QString mdis2pds_version = "1.0";
+  const QString mdis2pds_revision = "$Revision$";
+  const QString mdis2pds_runtime = Application::DateTime();
 
   UserInterface &ui = Application::GetUserInterface();
   FileName input(ui.GetFileName("FROM"));
@@ -123,7 +123,7 @@ void IsisMain() {
   processPds.SetInputRange(minmin, maxmax);
 
   // Set the output pixel type and the special pixel values
-  string dataSetID = "MESS-E/V/H-MDIS-";
+  QString dataSetID = "MESS-E/V/H-MDIS-";
   int nbits = ui.GetInteger("BITS");
   if(nbits == 8) {
     processPds.SetOutputType(UnsignedByte);
@@ -166,7 +166,7 @@ void IsisMain() {
     dataSetID += "0";
   }
   else {
-    string msg = "[" + IString(nbits) + "] is not a supported bit length.";
+    QString msg = "[" + QString(nbits) + "] is not a supported bit length.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
   dataSetID += "-CDR-CALDATA-V1.0";
@@ -241,12 +241,12 @@ void IsisMain() {
   p.CheckStatus();
 
   // Creates keywords from the input's hist above
-  PvlKeyword minDn("MINIMUM", SetRound(hist->Minimum(), 16));
-  PvlKeyword maxDn("MAXIMUM", SetRound(hist->Maximum(), 16));
-  PvlKeyword meanDn("MEAN", SetRound(hist->Average(), 16));
-  PvlKeyword stddev("STANDARD_DEVIATION", SetRound(hist->StandardDeviation(), 16));
+  PvlKeyword minDn("MINIMUM", toString(SetRound(hist->Minimum(), 16)));
+  PvlKeyword maxDn("MAXIMUM", toString(SetRound(hist->Maximum(), 16)));
+  PvlKeyword meanDn("MEAN", toString(SetRound(hist->Average(), 16)));
+  PvlKeyword stddev("STANDARD_DEVIATION", toString(SetRound(hist->StandardDeviation(), 16)));
 
-  PvlKeyword saturated("SATURATED_PIXEL_COUNT", hist->HisPixels());
+  PvlKeyword saturated("SATURATED_PIXEL_COUNT", toString(hist->HisPixels()));
 
   PvlObject &imageObj = pdsLabel.FindObject("IMAGE");
 
@@ -262,7 +262,7 @@ void IsisMain() {
 
     try {
       if(darkStripMean.Size() > 0) {
-        darkStripMean[0] = IString(SetRound(darkStripMean[0], 16));
+        darkStripMean[0] = toString(SetRound(toDouble(darkStripMean[0]), 16));
       }
     }
     catch(IException &) {
@@ -342,8 +342,8 @@ void IsisMain() {
 
   //  Now address nested keywords in SUBFRAME groups
   for(int i = 1 ; i <= 5 ; i++) {
-    IString n(i);
-    string group = "SUBFRAME" + n + "_PARAMETERS";
+    QString n(toString(i));
+    QString group = "SUBFRAME" + n + "_PARAMETERS";
     if(pdsLabel.HasGroup(group)) {
       PvlGroup &grp = pdsLabel.FindGroup(group);
       ValidateUnit(grp.FindKeyword("RETICLE_POINT_LATITUDE"), "DEG");
@@ -358,7 +358,7 @@ void IsisMain() {
   p.CheckStatus();
 
   // All done...write result.
-  ofstream outstream(output.expanded().c_str());
+  ofstream outstream(output.expanded().toAscii().data());
   processPds.OutputLabel(outstream);
 
   processPds.StartProcess(outstream);

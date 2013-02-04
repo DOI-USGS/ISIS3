@@ -28,12 +28,12 @@ namespace Isis {
           image.getLabel()->FindGroup("Instrument", Pvl::Traverse);
       p_exposureDuration = labelgrp["ExposureDuration"];
       p_instrumentSerialNumber = labelgrp["InstrumentSerialNumber"];
-      p_CCDTemperature = labelgrp["InstrumentTemperature"][6];
-      p_PCBTemperature = labelgrp["InstrumentTemperature"][7];
+      p_CCDTemperature = toDouble(labelgrp["InstrumentTemperature"][6]);
+      p_PCBTemperature = toDouble(labelgrp["InstrumentTemperature"][7]);
       p_OffsetModeId = labelgrp["OffsetModeID"];
-      p_shuttereffectcorrectionflag = (string)labelgrp["ShutterEffectCorrectionFlag"];
-      p_filterName = (string)labelgrp["FilterName"];
-      p_startTime = (string)labelgrp["StartTime"];
+      p_shuttereffectcorrectionflag = (QString)labelgrp["ShutterEffectCorrectionFlag"];
+      p_filterName = (QString)labelgrp["FilterName"];
+      p_startTime = (QString)labelgrp["StartTime"];
     }
     /**
      * Get values from the calibration kernel
@@ -44,7 +44,7 @@ namespace Isis {
      *               entered.
      */
     void MiCalibration::ReadKernel(Pvl &kernel) {
-      string rover = "MI_" + Isis::IString(p_instrumentSerialNumber);
+      QString rover = "MI_" + toString(p_instrumentSerialNumber);
       PvlGroup kernelgrp = kernel.FindGroup(rover, Pvl::Traverse);
       p_DELCCDTa = kernelgrp["DELCCDTa"];
       p_DELCCDTb = kernelgrp["DELCCDTb"];
@@ -62,11 +62,11 @@ namespace Isis {
       p_ACTAREAb = kernelgrp["ACTAREAb"];
       p_temperatureOffset = kernelgrp["TemperatureOffset"];
       p_transfertime = kernelgrp["TransferTime"];
-      p_ReferencePixelImage = (string)kernelgrp["ReferencePixelImage"];
-      p_ZeroExposureImage = (string)kernelgrp["ZeroExposureImage"];
-      p_ActiveAreaImage = (string)kernelgrp["ActiveAreaImage"];
-      p_FlatImageOpen = (string)kernelgrp["FlatImageOpen"];
-      p_FlatImageClosed = (string)kernelgrp["FlatImageClosed"];
+      p_ReferencePixelImage = (QString)kernelgrp["ReferencePixelImage"];
+      p_ZeroExposureImage = (QString)kernelgrp["ZeroExposureImage"];
+      p_ActiveAreaImage = (QString)kernelgrp["ActiveAreaImage"];
+      p_FlatImageOpen = (QString)kernelgrp["FlatImageOpen"];
+      p_FlatImageClosed = (QString)kernelgrp["FlatImageClosed"];
     }
     /**
      * Get the CCD temperature and output a corrected

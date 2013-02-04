@@ -21,12 +21,12 @@ void IsisMain() {
   //Checks if in file is rdr
   Pvl lab(input.expanded());
   if(lab.HasObject("IMAGE_MAP_PROJECTION")) {
-    string msg = "[" + input.name() + "] has already been projected.";
+    QString msg = "[" + input.name() + "] has already been projected.";
     msg += " Use pds2isis.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  IString output;
+  QString output;
   if(ui.WasEntered("TO")) {
     output = ui.GetFileName("TO");
   }
@@ -36,7 +36,7 @@ void IsisMain() {
 
   Pvl inputFile;
 
-  IString paramaters = "FROM=" + input.expanded();
+  QString paramaters = "FROM=" + input.expanded();
   paramaters += " TO=" + output;
 
   ProcessImportPds p;
@@ -54,7 +54,7 @@ void TranslateMerEdrLabels(FileName &labelFile, Cube *ocube) {
 
   // Get the directory where the MER translation tables are.
   PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
-  IString transDir = (string) dataDir["Mer"];
+  QString transDir = (QString) dataDir["Mer"];
   transDir = transDir + "/" + "translations/";
 
   // Get a filename for the MESSENGER EDR label
@@ -109,11 +109,11 @@ void MiFixLab(PvlGroup &instGroup) {
 
   //Code to remove "Z" from the StartTime and StopTime keywords
   //StartTime code
-  IString Newstarttime = (string)instGroup.FindKeyword("StartTime");
-  Newstarttime.Remove("Z");
+  QString Newstarttime = (QString)instGroup.FindKeyword("StartTime");
+  Newstarttime.remove("Z");
   instGroup.FindKeyword("StartTime").SetValue(Newstarttime);
   //StopTime code
-  IString Newstoptime = (string)instGroup.FindKeyword("StopTime");
-  Newstoptime.Remove("Z");
+  QString Newstoptime = (QString)instGroup.FindKeyword("StopTime");
+  Newstoptime.remove("Z");
   instGroup.FindKeyword("StopTime").SetValue(Newstoptime);
 }

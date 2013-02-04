@@ -42,7 +42,7 @@ KernelDb::KernelDb(const unsigned int kernelTypes) {
 
 
 // Create a new KernelDb object using a filename
-KernelDb::KernelDb(const std::string &dbName, const unsigned int kernelTypes) :
+KernelDb::KernelDb(const QString &dbName, const unsigned int kernelTypes) :
   p_kernelData(dbName) {
   p_filename = dbName;
   p_kernelTypes = kernelTypes;
@@ -123,7 +123,7 @@ Kernel KernelDb::Dem(Pvl &lab) {
   return FindLast("Dem", lab);
 }
 
-Kernel KernelDb::FindLast(const std::string &entry, Isis::Pvl &lab) {
+Kernel KernelDb::FindLast(const QString &entry, Isis::Pvl &lab) {
   std::priority_queue< Kernel > all = FindAll(entry, lab);
   Kernel last;
 
@@ -134,7 +134,7 @@ Kernel KernelDb::FindLast(const std::string &entry, Isis::Pvl &lab) {
   return last;
 }
 
-std::priority_queue< Kernel > KernelDb::FindAll(const std::string &entry,
+std::priority_queue< Kernel > KernelDb::FindAll(const QString &entry,
     Isis::Pvl &lab) {
   std::priority_queue< Kernel > filesFound;
   Isis::PvlObject &cube = lab.FindObject("IsisCube");
@@ -144,13 +144,13 @@ std::priority_queue< Kernel > KernelDb::FindAll(const std::string &entry,
   if(!p_kernelData.HasObject(entry)) return filesFound;
 
   // Get the start and end time for the cube
-  iTime start(((string) cube.FindGroup("Instrument")["StartTime"]));
+  iTime start(((QString) cube.FindGroup("Instrument")["StartTime"]));
   iTime end;
   if(cube.FindGroup("Instrument").HasKeyword("StopTime")) {
-    end = ((string) cube.FindGroup("Instrument")["StopTime"]);
+    end = ((QString) cube.FindGroup("Instrument")["StopTime"]);
   }
   else {
-    end = ((string) cube.FindGroup("Instrument")["StartTime"]);
+    end = ((QString) cube.FindGroup("Instrument")["StartTime"]);
   }
 
   // Get the object and search through it's groups
@@ -163,11 +163,11 @@ std::priority_queue< Kernel > KernelDb::FindAll(const std::string &entry,
     // If the group name isn't selection, skip it.
     if(!grp.IsNamed("Selection")) continue;
 
-    IString type = "";
+    QString type = "";
 
     // Make sure the type is better
     if(grp.HasKeyword("Type")) {
-      type = (string) grp["Type"];
+      type = (QString) grp["Type"];
       if(!(spiceInit::kernelTypeEnum(type) & p_kernelTypes)) {
         continue;
       }
@@ -217,8 +217,8 @@ std::priority_queue< Kernel > KernelDb::FindAll(const std::string &entry,
 
           if(!key.IsNamed("Time")) continue;
 
-          iTime timeRangeStart((string)key[0]);
-          iTime timeRangeEnd((string)key[1]);
+          iTime timeRangeStart((QString)key[0]);
+          iTime timeRangeEnd((QString)key[1]);
 
           bool thisEndMatches = Matches(lab, endTimeGrp, timeRangeEnd, cameraVersion);
           endTimesMatch = endTimesMatch && thisEndMatches;
@@ -232,8 +232,8 @@ std::priority_queue< Kernel > KernelDb::FindAll(const std::string &entry,
 
         // No exact match but time ranges overlap, merge the selections
         if(!betterMatch && endTimesMatch) {
-          std::vector< std::string > startMatchFiles = GetFile(grp);
-          std::vector< std::string > endMatchFiles = GetFile(endTimeGrp);
+          std::vector< QString > startMatchFiles = GetFile(grp);
+          std::vector< QString > endMatchFiles = GetFile(endTimeGrp);
 
           while(endMatchFiles.size()) {
             startMatchFiles.push_back(
@@ -281,8 +281,8 @@ const bool KernelDb::Matches(Pvl &lab, PvlGroup &kernelDbGrp,
 
     if(key.IsNamed("Time")) {
       // Pull the selections start and end time out
-      iTime kernelStart = (string) key[0];
-      iTime kernelEnd   = (string) key[1];
+      iTime kernelStart = (QString) key[0];
+      iTime kernelEnd   = (QString) key[1];
 
       // If the kernel times inside of the requested times we
       // set the matchTime to be true.
@@ -292,20 +292,14 @@ const bool KernelDb::Matches(Pvl &lab, PvlGroup &kernelDbGrp,
     }
     else if(key.IsNamed("Match")) {
       try {
-        IString matchGroup = key[0];
-        IString matchKey   = key[1];
-        IString matchValue = key[2];
+        QString matchGroup = key[0];
+        QString matchKey   = key[1];
+        QString matchValue = key[2];
 
-        IString cubeValue = (string)cube.FindGroup(matchGroup)[matchKey];
-        cubeValue.ConvertWhiteSpace();
-        cubeValue.Compress();
-        cubeValue.Trim(" ");
-        cubeValue.UpCase();
+        QString cubeValue = cube.FindGroup(matchGroup)[matchKey];
+        cubeValue = cubeValue.simplified().trimmed().toUpper();
 
-        matchValue.ConvertWhiteSpace();
-        matchValue.Compress();
-        matchValue.Trim(" ");
-        matchValue.UpCase();
+        matchValue = matchValue.simplified().trimmed().toUpper();
 
         // If strings are not the same, match automatically fails
         if(cubeValue.compare(matchValue) != 0) {
@@ -324,11 +318,11 @@ const bool KernelDb::Matches(Pvl &lab, PvlGroup &kernelDbGrp,
             camVersionKeyIndex++) {
 
           bool versionMatch = false;
-          IString val = (std::string)key[camVersionKeyIndex];
+          IString val = (QString)key[camVersionKeyIndex];
           IString commaTok;
 
-          while((commaTok = val.Token(",")).length() > 0) {
-            if(commaTok.find('-') != std::string::npos) {
+          while((commaTok = val.Token(",").ToQt()).length() > 0) {
+            if(commaTok.find('-') != string::npos) {
               IString dashTok;
               int start = commaTok.Token("-").ToInteger();
               int end = commaTok.Token("-").ToInteger();
@@ -367,14 +361,14 @@ const bool KernelDb::Matches(Pvl &lab, PvlGroup &kernelDbGrp,
 }
 
 // Load the DB with the defined BASE and MISSION info for each type of kernel
-void KernelDb::LoadSystemDb(const std::string &mission) {
+void KernelDb::LoadSystemDb(const QString &mission) {
 
   // Get the base DataDirectory
   PvlGroup &datadir = Preference::Preferences().FindGroup("DataDirectory");
-  string baseDir = datadir["Base"];
+  QString baseDir = datadir["Base"];
 
   // Get the mission DataDirectory
-  string missionDir = datadir[mission];
+  QString missionDir = datadir[mission];
 
   // Load the leapsecond DB
   Isis::FileName lsDb(baseDir + "/" + "kernels/lsk/kernels.????.db");
@@ -443,8 +437,8 @@ void KernelDb::LoadSystemDb(const std::string &mission) {
   p_kernelData.Read(iakDb.expanded());
 }
 
-std::vector<std::string> KernelDb::GetFile(PvlGroup &grp) {
-  std::vector<std::string> files;
+std::vector<QString> KernelDb::GetFile(PvlGroup &grp) {
+  std::vector<QString> files;
   //PvlKeyword kfile = grp["File"];
 
   for(int i = 0; i < grp.Keywords(); i++) {
@@ -455,8 +449,8 @@ std::vector<std::string> KernelDb::GetFile(PvlGroup &grp) {
     // indicates an ISIS preference in the DataDirectory section
     // and a filename
     if(kfile.Size() == 2) {
-      string pref = kfile[0];
-      string version = kfile[1];
+      QString pref = kfile[0];
+      QString version = kfile[1];
       Isis::FileName filename("$" + pref + "/" + version);
       if (filename.isVersioned())
         filename = filename.highestVersion();
@@ -470,7 +464,7 @@ std::vector<std::string> KernelDb::GetFile(PvlGroup &grp) {
       files.push_back(filename.originalPath() + "/" + filename.name());
     }
     else {
-      string msg = "Invalid File keyword value in [Group = ";
+      QString msg = "Invalid File keyword value in [Group = ";
       msg += grp.Name() + "] in database file [";
       msg += p_filename + "]";
       throw IException(IException::Unknown, msg, _FILEINFO_);
@@ -480,8 +474,8 @@ std::vector<std::string> KernelDb::GetFile(PvlGroup &grp) {
   return files;
 }
 
-const bool KernelDb::Better(const std::string newType,
-                            const std::string oldType) {
+const bool KernelDb::Better(const QString newType,
+                            const QString oldType) {
   return Better(spiceInit::kernelTypeEnum(newType),
                 spiceInit::kernelTypeEnum(oldType));
 }

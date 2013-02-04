@@ -29,7 +29,7 @@ namespace Isis {
    * @param pUI    - User Interface of parent app
    * @param psFile - File to edit
    */
-  void GuiEditFile::EditFile(UserInterface & pUI, std::string psFile) {
+  void GuiEditFile::EditFile(UserInterface & pUI, QString psFile) {
     if (m_instance == NULL) {
       m_instance = new GuiEditFile(pUI, psFile);
     }
@@ -45,8 +45,8 @@ namespace Isis {
    *
    * @param psFile - File to edit
    */
-  void GuiEditFile::showWindow(std::string psFile) {
-    m_fileName = QString(psFile.c_str());
+  void GuiEditFile::showWindow(QString psFile) {
+    m_fileName = QString(psFile);
     m_editWin->setWindowTitle (m_fileName);
     OpenFile(m_fileName);
     m_editWin->show();
@@ -60,10 +60,10 @@ namespace Isis {
    * @param pUI
    * @param psFile
    */
-  GuiEditFile::GuiEditFile(UserInterface & pUI, std::string psFile) {
+  GuiEditFile::GuiEditFile(UserInterface & pUI, QString psFile) {
     // Init data members
     m_parent   = pUI.TheGui();
-    m_fileName = QString(psFile.c_str());
+    m_fileName = QString(psFile);
     m_editFile=NULL;
 
     // Main Window
@@ -336,7 +336,7 @@ namespace Isis {
    * @param psfile - current file
    */
   void GuiEditFile::windowTitle(QString & psfile) {
-    m_editWin->setWindowTitle(FileName(psfile.toStdString()).name().c_str());
+    m_editWin->setWindowTitle(FileName(psfile).name());
   }
 
 }

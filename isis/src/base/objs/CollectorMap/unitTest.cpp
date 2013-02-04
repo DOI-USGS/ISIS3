@@ -109,14 +109,14 @@ class TestCollector {
   private:
     CollectorMap<int, ClassTest> _list;
     CollectorMap<double, ClassTest, RobustFloatCompare> _flist;
-    CollectorMap<std::string, ClassTest, NoCaseStringCompare> _slist;
+    CollectorMap<IString, ClassTest, NoCaseStringCompare> _slist;
 
 };
 
 int main(int argc, char *argv[]) {
   Isis::Preference::Preferences(true);
 
-  typedef CollectorMap<std::string, double, NoCaseStringCompare> NoCaseStrings;
+  typedef CollectorMap<IString, double, NoCaseStringCompare> NoCaseStrings;
   NoCaseStrings dmap;
 
   cout << "\nSize of double map = " << dmap.size() << endl;
@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
 
 
   cout << "\n\nCreate array of 10 doubles...\n";
-  typedef CollectorMap < std::string, double *,
+  typedef CollectorMap < IString, double *,
           NoCaseStringCompare,
           NoopRemoval,
           DefaultCopy > ArrayMap;
@@ -232,7 +232,7 @@ int main(int argc, char *argv[]) {
 
   //  Test duplicate keys
   cout << "\n\nTesting Duplicate Keys...\n";
-  typedef CollectorMap<int, std::string> IntStr;
+  typedef CollectorMap<int, QString> IntStr;
   IntStr dupstr(IntStr::DuplicateKeys);
   dupstr.add(1, "One");
   dupstr.add(1, "One #2");

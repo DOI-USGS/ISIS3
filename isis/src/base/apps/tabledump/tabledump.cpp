@@ -12,12 +12,12 @@ using namespace Isis;
 using namespace std;
 
 int g_pos = 0;
-string g_previousFile = "";
+QString g_previousFile = "";
 
 void helperButtonGetTableList();
 
-map <string, void *> GuiHelpers() {
-  map <string, void *> helper;
+map <QString, void *> GuiHelpers() {
+  map <QString, void *> helper;
   helper ["helperButtonGetTableList"] = (void *) helperButtonGetTableList;
   return helper;
 }
@@ -26,11 +26,11 @@ void IsisMain() {
   // Gather parameters from the UserInterface
   UserInterface &ui = Application::GetUserInterface();
   FileName file = ui.GetFileName("FROM");
-  string tableName = ui.GetString("NAME");
+  QString tableName = ui.GetString("NAME");
   Table table(tableName, file.expanded());
 
   // Set the character to separate the entries
-  string delimit;
+  QString delimit;
   if (ui.GetString("DELIMIT") == "COMMA") {
     delimit = ",";
   }
@@ -46,12 +46,12 @@ void IsisMain() {
 
   for (int i = 0; i < table[0].Fields(); i++) {
     for (int j = 0; j < table[0][i].size(); j++) {
-      string title = table[0][i].name();
+      QString title = table[0][i].name();
       if (table[0][i].isText()) {
         j += table[0][i].bytes();
       }
       else if (table[0][i].size() > 1) {
-        title += "(" + IString(j) + ")";
+        title += "(" + toString(j) + ")";
       }
       if (i == table[0].Fields() - 1 && j == table[0][i].size() - 1) {
         // We've reached the last field, omit the delimiter
@@ -79,7 +79,7 @@ void IsisMain() {
           ss << IString((double)table[i][j]);
         }
         else if (table[i][j].isText()) {
-          ss << (string)table[i][j];
+          ss << (QString)table[i][j];
         }
         if (j < table[i].Fields() - 1) {
           ss << delimit;
@@ -89,7 +89,7 @@ void IsisMain() {
       // and output them with the delimiter character between
       else {
         if (table[i][j].isText()) {
-          ss << (string)table[i][j] << delimit;
+          ss << (QString)table[i][j] << delimit;
         }
         else if (table[i][j].isInteger()) {
           vector<int> currField = table[i][j];
@@ -126,13 +126,13 @@ void IsisMain() {
 
 
   if (ui.WasEntered("TO")) {
-    string outfile(FileName(ui.GetFileName("TO")).expanded());
-    ofstream outFile(outfile.c_str());
+    QString outfile(FileName(ui.GetFileName("TO")).expanded());
+    ofstream outFile(outfile.toAscii().data());
     outFile << ss.str();
     outFile.close();
   }
   else if (ui.IsInteractive()) {
-    std::string log = ss.str();
+    QString log = ss.str().c_str();
     Application::GuiLog(log);
   }
   else {
@@ -142,11 +142,11 @@ void IsisMain() {
 
 // Function to find the available table names and put them into the GUI
 void helperButtonGetTableList() {
-  string list;
+  QString list;
   bool match = false;
 
   UserInterface &ui = Application::GetUserInterface();
-  string currentFile = ui.GetFileName("FROM");
+  QString currentFile = ui.GetFileName("FROM");
   const Pvl label(FileName(currentFile).expanded());
 
   // Check to see if the "FILE" parameter has changed since last press
@@ -162,7 +162,7 @@ void helperButtonGetTableList() {
     // If we've gone through all objects and found nothing, throw an exception
     if (cnt >= label.Objects()) {
       g_pos = 0;
-      string msg = "Parameter [FROM] has no tables.";
+      QString msg = "Parameter [FROM] has no tables.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     // When the end of the objects is hit, display "NAME" parameter as blank
@@ -173,7 +173,7 @@ void helperButtonGetTableList() {
     }
     // When we find a table, fetch its name to stick in the "NAME" parameter
     else if (label.Object(g_pos).Name() == "Table") {
-      list = label.Object(g_pos)["Name"][0].c_str();
+      list = label.Object(g_pos)["Name"][0];
       match = true;
       g_pos++;
     }

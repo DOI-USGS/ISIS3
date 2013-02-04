@@ -86,8 +86,8 @@ namespace Isis {
 //  QStatusBar *m_statusBar = qobject_cast<QMainWindow *>(parent)->statusBar();
 //  m_statusBar->showMessage("STATUS BAR TEST");
 
-//  std::string warn = "TEST   TEST   TEST";
-//  std::string warn2 = "JUNK";
+//  QString warn = "TEST   TEST   TEST";
+//  QString warn2 = "JUNK";
 //  qobject_cast<ViewportMainWindow *>(parent)->displayWarning(warn,warn2);
     m_parent = parent;
     connect(this, SIGNAL(toolActivated()), this, SLOT(activateTool()));
@@ -190,7 +190,7 @@ namespace Isis {
     m_cnetFileNameLabel->setWhatsThis("Name of opened control network file.");
 
     m_templateFileNameLabel = new QLabel("Template File: " +
-        QString::fromStdString(m_pointEditor->templateFileName()));
+        m_pointEditor->templateFileName());
     m_templateFileNameLabel->setToolTip("Sub-pixel registration template File.");
 //  QString patternMatchDoc =
 //          FileName("$ISISROOT/doc/documents/PatternMatch/PatternMatch.html").fileName();
@@ -642,7 +642,7 @@ namespace Isis {
         //  Attempt to Compose Serial number and see if list already has duplicate.  If so,
         //  use filenames as serial numbers for both cubes.  This needs to be checked because
         //  coreg networks will often have 2 cubes with the same serial number.make cl
-        std::string sn = SerialNumber::Compose(mvp->cube()->getFileName(), true);
+        QString sn = SerialNumber::Compose(mvp->cube()->getFileName(), true);
         if (list.HasSerialNumber(sn)) {
           // TODO  Before removing serial number, make sure current network does not have
           // measures with old serial number.  If it does, now what?  Print error?
@@ -667,9 +667,9 @@ namespace Isis {
 
 
 
-  std::string MatchTool::serialNumber(MdiCubeViewport *mvp) {
+  QString MatchTool::serialNumber(MdiCubeViewport *mvp) {
 
-    std::string serialNumber;
+    QString serialNumber;
     try {
       SerialNumberList list = serialNumberList();
       serialNumber = list.SerialNumber(mvp->cube()->getFileName());
@@ -929,8 +929,8 @@ namespace Isis {
           if (response == QMessageBox::Yes) {
             //  Update measure file combo boxes:  old reference normal font,
             //    new reference bold font
-            IString file = serialNumberList().FileName(m_leftMeasure->GetCubeSerialNumber());
-            QString fname = FileName(file).name().c_str();
+            QString file = serialNumberList().FileName(m_leftMeasure->GetCubeSerialNumber());
+            QString fname = FileName(file).name();
             int iref = m_leftCombo->findText(fname);
 
             //  Save normal font from new reference measure
@@ -940,7 +940,7 @@ namespace Isis {
             m_rightCombo->setItemData(iref,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
 
             file = serialNumberList().FileName(refMeasure->GetCubeSerialNumber());
-            fname = FileName(file).name().c_str();
+            fname = FileName(file).name();
             iref = m_leftCombo->findText(fname);
             m_leftCombo->setItemData(iref,font,Qt::FontRole);
             iref = m_rightCombo->findText(fname);
@@ -992,8 +992,8 @@ namespace Isis {
       if (response == QMessageBox::Yes) {
         //  Update measure file combo boxes:  old reference normal font,
         //    new reference bold font
-        IString file = serialNumberList().FileName(m_leftMeasure->GetCubeSerialNumber());
-        QString fname = FileName(file).name().c_str();
+        QString file = serialNumberList().FileName(m_leftMeasure->GetCubeSerialNumber());
+        QString fname = FileName(file).name();
         int iref = m_leftCombo->findText(fname);
 
         //  Save normal font from new reference measure
@@ -1003,7 +1003,7 @@ namespace Isis {
         m_rightCombo->setItemData(iref,QFont("DejaVu Sans", 12, QFont::Bold), Qt::FontRole);
 
         file = serialNumberList().FileName(refMeasure->GetCubeSerialNumber());
-        fname = FileName(file).name().c_str();
+        fname = FileName(file).name();
         iref = m_leftCombo->findText(fname);
         m_leftCombo->setItemData(iref,font,Qt::FontRole);
         iref = m_rightCombo->findText(fname);
@@ -1293,7 +1293,7 @@ namespace Isis {
     if (!m_cnetFileName.isEmpty()) {
       try {
         Progress progress;
-        m_controlNet = new ControlNet(m_cnetFileName.toStdString(), &progress);
+        m_controlNet = new ControlNet(m_cnetFileName, &progress);
         m_coregNet = false;
         m_coregReferenceSN = "";
         if (m_controlNet->GetNetworkId() == "Coreg") {
@@ -1306,7 +1306,7 @@ namespace Isis {
       catch (IException &e) {
         QApplication::restoreOverrideCursor();
         QString message = "Invalid control network.  \n";
-        message += e.toString().c_str();
+        message += e.toString();
         QMessageBox::critical(m_matchTool, "Error", message);
         m_cnetFileName.clear();
         delete m_controlNet;
@@ -1336,7 +1336,7 @@ namespace Isis {
       return;
     }
     try {
-      m_controlNet->Write(m_cnetFileName.toStdString());
+      m_controlNet->Write(m_cnetFileName);
       m_netChanged = false;
     }
     catch (IException &e) {
@@ -1360,7 +1360,7 @@ namespace Isis {
     //Make sure the filename is valid
     if(!fn.isEmpty()) {
       try {
-        m_controlNet->Write(fn.toStdString());
+        m_controlNet->Write(fn);
         m_netChanged = false;
       }
       catch (IException &e) {
@@ -1398,7 +1398,7 @@ namespace Isis {
    * @history 2012-01-11 Tracie Sucharski - Add error check for invalid lat, lon
    *                          when creating new control point.
    * @history 2012-05-08 Tracie Sucharski - Clear m_leftFile, only set if creating 
-   *                          new point. Change m_leftFile from a std::string to
+   *                          new point. Change m_leftFile from a QString to
    *                          a QString.
    * @history 2012-10-02 Tracie Sucharski - The member variable leftFile was never set. It is now 
    *                          set when a new point is created and cleared after all measures have
@@ -1409,8 +1409,8 @@ namespace Isis {
     MdiCubeViewport *mvp = cubeViewport();
     if (mvp  == NULL) return;
 
-    IString file = mvp->cube()->getFileName();
-    IString sn = serialNumberList().SerialNumber(file);
+    QString file = mvp->cube()->getFileName();
+    QString sn = serialNumberList().SerialNumber(file);
 
     double samp,line;
     mvp->viewportToCube(p.x(),p.y(),samp,line);
@@ -1425,14 +1425,14 @@ namespace Isis {
       }
 
       //  Find closest control point in network
-      IString sn = serialNumberList().SerialNumber(file);
+      QString sn = serialNumberList().SerialNumber(file);
       ControlPoint *point = NULL;
       try {
         point = m_controlNet->FindClosest(sn, samp, line);
       }
       catch (IException &e) {
         QString message = "Cannot find point for editing.";
-        message += e.toString().c_str();
+        message += e.toString();
         QMessageBox::warning(m_matchTool, "Warning", message);
         return;
       }
@@ -1466,11 +1466,11 @@ namespace Isis {
       else {
         try {
           createPoint(mvp, samp, line);
-          m_leftFile = mvp->cube()->getFileName().ToQt();
+          m_leftFile = mvp->cube()->getFileName();
         }
         catch (IException &e) {
           QString message = "Cannot create control point.\n\n";
-          message += e.toString().c_str();
+          message += e.toString();
           QMessageBox::critical(m_matchTool, "Error", message);
           return;
         }
@@ -1510,13 +1510,13 @@ namespace Isis {
     QStringList images;
     for (int i = 0; i < (int)cubeViewportList()->size(); i++) {
       FileName cubeFile = (*(cubeViewportList()))[i]->cube()->getFileName();
-      images<<cubeFile.name().ToQt();
+      images<<cubeFile.name();
     }
     m_newPointDialog->setFiles(images);
     m_newPointDialog->show();
 
     //  Highlight the current cubeViewport
-    QString current = FileName(cvp->cube()->getFileName()).name().ToQt();
+    QString current = FileName(cvp->cube()->getFileName()).name();
     m_newPointDialog->highlightFile(current);
 
     m_newPoint = new ControlPoint();
@@ -1539,7 +1539,7 @@ namespace Isis {
   void MatchTool::addMeasure(MdiCubeViewport *cvp, double sample, double line) {
 
     //  Highlight the current cubeViewport
-    QString current = FileName(cvp->cube()->getFileName()).name().ToQt();
+    QString current = FileName(cvp->cube()->getFileName()).name();
     m_newPointDialog->highlightFile(current);
     m_newPointDialog->raise();
 
@@ -1564,7 +1564,7 @@ namespace Isis {
   void MatchTool::doneWithMeasures() {
 
     m_lastUsedPointId = m_newPointDialog->pointId();
-    m_newPoint->SetId(m_lastUsedPointId.toStdString());
+    m_newPoint->SetId(m_lastUsedPointId);
 //  //  Add new control point to control network
 //  m_controlNet->AddPoint(m_newPoint);
 //  //  Read newly added point
@@ -1576,7 +1576,7 @@ namespace Isis {
     if (m_coregNet) {
       if (!m_newPoint->HasSerialNumber(m_coregReferenceSN)) {
         QString message = "This is a coreg network which needs the cube with serial number " +
-          m_coregReferenceSN.ToQt() + " as the reference measure.  This new control point does "
+          m_coregReferenceSN + " as the reference measure.  This new control point does "
           "not have a measure for that serial number, so this point cannot be created until "
           "the cube listed above is added (Right-click on cube).";
         QMessageBox::critical(m_matchTool, "Error", message);
@@ -1686,19 +1686,19 @@ namespace Isis {
     }
 
     MatchToolDeletePointDialog *deletePointDialog = new MatchToolDeletePointDialog;
-    IString CPId = m_editPoint->GetId();
-    deletePointDialog->pointIdValue->setText(CPId.c_str());
+    QString CPId = m_editPoint->GetId();
+    deletePointDialog->pointIdValue->setText(CPId);
     //  Need all files for this point
     for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*m_editPoint)[i];
-      IString file;
+      QString file;
       if (serialNumberList().HasSerialNumber(m.GetCubeSerialNumber())) {
         file = serialNumberList().FileName(m.GetCubeSerialNumber());
       }
       else {
         file = m.GetCubeSerialNumber();
       }
-      deletePointDialog->fileList->addItem(file.c_str());
+      deletePointDialog->fileList->addItem(file);
     }
 
     if (deletePointDialog->exec()) {
@@ -1762,8 +1762,8 @@ namespace Isis {
           m_matchTool->setShown(true);
           m_matchTool->raise();
 
-          loadTemplateFile(QString::fromStdString(
-              m_pointEditor->templateFileName()));
+          loadTemplateFile(
+              m_pointEditor->templateFileName());
         }
         //  Since the delete point is not loaded into the editor for saving by the user, we need
         //  to save the point.
@@ -1833,8 +1833,8 @@ namespace Isis {
     loadPoint();
     m_matchTool->setShown(true);
     m_matchTool->raise();
-    loadTemplateFile(QString::fromStdString(
-        m_pointEditor->templateFileName()));
+    loadTemplateFile(
+        m_pointEditor->templateFileName());
 
     // emit signal so the nav tool can update edit point
     emit editPointChanged();
@@ -1858,14 +1858,14 @@ namespace Isis {
    *                          ground measure-use AprioriSurface point, not lat,lon
    *                          of reference measure unless there is no apriori
    *                          surface point.
-   *   @history 2012-05-08 Tracie Sucharski - m_leftFile changed from std::string to QString.
+   *   @history 2012-05-08 Tracie Sucharski - m_leftFile changed from QString to QString.
    *   @history 2012-10-02 Tracie Sucharski - When creating a new point, load the cube the user
    *                          clicked on first on the left side, use m_leftFile.
    */
   void MatchTool::loadPoint () {
 
     //  Write pointId
-    IString CPId = m_editPoint->GetId();
+    QString CPId = m_editPoint->GetId();
     QString ptId("Point ID:  ");
     ptId += (QString) CPId;
     m_ptIdValue->setText(ptId);
@@ -1889,9 +1889,9 @@ namespace Isis {
     //  Need all files for this point
     for (int i=0; i<m_editPoint->GetNumMeasures(); i++) {
       ControlMeasure &m = *(*m_editPoint)[i];
-      IString file = serialNumberList().FileName(m.GetCubeSerialNumber());
+      QString file = serialNumberList().FileName(m.GetCubeSerialNumber());
       m_pointFiles<<file;
-      QString tempFileName = FileName(file).name().c_str();
+      QString tempFileName = FileName(file).name();
       m_leftCombo->addItem(tempFileName);
       m_rightCombo->addItem(tempFileName);
       if (m_editPoint->IsReferenceExplicit() &&
@@ -1917,7 +1917,7 @@ namespace Isis {
     }
     else {
       if (!m_leftFile.isEmpty()) {
-        leftIndex = m_leftCombo->findText(FileName(m_leftFile).name().c_str());
+        leftIndex = m_leftCombo->findText(FileName(m_leftFile).name());
         //  Sanity check
         if (leftIndex < 0 ) leftIndex = 0;
         m_leftFile.clear();
@@ -1978,8 +1978,7 @@ namespace Isis {
       int column = 0;
       ControlMeasure &m = *(*m_editPoint)[row];
 
-      QString file = QString::fromStdString(
-                       serialNumberList().FileName(m.GetCubeSerialNumber()));
+      QString file = serialNumberList().FileName(m.GetCubeSerialNumber());
       QTableWidgetItem *tableItem = new QTableWidgetItem(QString(file));
       m_measureTable->setItem(row,column++,tableItem);
 
@@ -2090,8 +2089,8 @@ namespace Isis {
         tableItem = new QTableWidgetItem("False");
       m_measureTable->setItem(row,column++,tableItem);
 
-      tableItem = new QTableWidgetItem(QString::fromStdString(
-                  ControlMeasure::MeasureTypeToString(m.GetType())));
+      tableItem = new QTableWidgetItem(
+                  ControlMeasure::MeasureTypeToString(m.GetType()));
       m_measureTable->setItem(row,column,tableItem);
 
       //  If reference measure set font on this row to bold
@@ -2169,21 +2168,21 @@ namespace Isis {
    *                          make sure old measure is retained. 
    */
   void MatchTool::selectLeftMeasure(int index) {
-    IString file = m_pointFiles[index];
+    QString file = m_pointFiles[index];
 
-    IString serial;
+    QString serial;
     try {
       serial = serialNumberList().SerialNumber(file);
     }
     catch (IException &e) {
       QString message = "Make sure the correct cube is opened.\n\n";
-      message += e.toString().c_str();
+      message += e.toString();
       QMessageBox::critical(m_matchTool, "Error", message);
 
       //  Set index of combo back to what it was before user selected new.  Find the index
       //  of current left measure.
-      IString file = serialNumberList().FileName(m_leftMeasure->GetCubeSerialNumber());
-      int i = m_leftCombo->findText(FileName(file).name().c_str());
+      QString file = serialNumberList().FileName(m_leftMeasure->GetCubeSerialNumber());
+      int i = m_leftCombo->findText(FileName(file).name());
       if (i < 0) i = 0;
       m_leftCombo->setCurrentIndex(i);
       return;
@@ -2225,21 +2224,21 @@ namespace Isis {
    */
   void MatchTool::selectRightMeasure(int index) {
 
-    IString file = m_pointFiles[index];
+    QString file = m_pointFiles[index];
 
-    IString serial;
+    QString serial;
     try {
       serial = serialNumberList().SerialNumber(file);
     }
     catch (IException &e) {
       QString message = "Make sure the correct cube is opened.\n\n";
-      message += e.toString().c_str();
+      message += e.toString();
       QMessageBox::critical(m_matchTool, "Error", message);
 
       //  Set index of combo back to what it was before user selected new.  Find the index
       //  of current left measure.
-      IString file = serialNumberList().FileName(m_rightMeasure->GetCubeSerialNumber());
-      int i = m_rightCombo->findText(FileName(file).name().c_str());
+      QString file = serialNumberList().FileName(m_rightMeasure->GetCubeSerialNumber());
+      int i = m_rightCombo->findText(FileName(file).name());
       if (i < 0) i = 0;
       m_rightCombo->setCurrentIndex(i);
       return;
@@ -2505,8 +2504,8 @@ namespace Isis {
          m_editPoint == NULL)
       return;
 
-    std::string sn = serialNumber(mvp);
-//  std::string serialNumber = SerialNumber::Compose(*vp->cube(), true);
+    QString sn = serialNumber(mvp);
+//  QString serialNumber = SerialNumber::Compose(*vp->cube(), true);
 
     // In the middle of creating a new point
     if (m_newPoint != NULL) {
@@ -2530,7 +2529,7 @@ namespace Isis {
 
     //  If viewport serial number not found in control net, return
     if (!m_controlNet->GetCubeSerials().contains(
-               QString::fromStdString(sn))) return;
+               sn)) return;
 
 //  if (!m_controlNet->GetCubeSerials().contains(
 //                    QString::fromStdString(sn))) return;
@@ -2648,7 +2647,7 @@ namespace Isis {
    */
   void MatchTool::loadTemplateFile(QString fn) {
 
-    QFile file(QString::fromStdString(FileName((IString) fn).expanded()));
+    QFile file(FileName((QString) fn).expanded());
     if (!file.open(QIODevice::ReadOnly)) {
       QString msg = "Failed to open template file \"" + fn + "\"";
       QMessageBox::warning(m_matchTool, "IO Error", msg);
@@ -2683,8 +2682,8 @@ namespace Isis {
     if (!m_templateModified)
       return;
 
-    QString filename = QString::fromStdString(
-        m_pointEditor->templateFileName());
+    QString filename = 
+        m_pointEditor->templateFileName();
 
     writeTemplateFile(filename);
   }
@@ -2717,7 +2716,7 @@ namespace Isis {
 
     // catch errors in Pvl format when populating pvl object
     stringstream ss;
-    ss << contents.toStdString();
+    ss << contents;
     try {
       Pvl pvl;
       ss >> pvl;
@@ -2728,8 +2727,8 @@ namespace Isis {
       return;
     }
 
-    QString expandedFileName(QString::fromStdString(
-        FileName((IString) fn).expanded()));
+    QString expandedFileName(
+        FileName((QString) fn).expanded());
 
     QFile file(expandedFileName);
 
@@ -2775,12 +2774,12 @@ namespace Isis {
       // to view and/or edit the template
       PvlEditDialog registrationDialog(templatePvl);
       registrationDialog.setWindowTitle("View or Edit Template File: "
-                                         + QString::fromStdString(templatePvl.FileName()));
+                                         + templatePvl.FileName());
       registrationDialog.resize(550,360);
       registrationDialog.exec();
     }
     catch (IException &e) {
-      QString message = e.toString().c_str();
+      QString message = e.toString();
       QMessageBox::information(m_matchTool, "Error", message);
     }
   }
@@ -2908,7 +2907,7 @@ namespace Isis {
    *
    * @author 2011-07-06 Tracie Sucharski
    */
-  bool MatchTool::IsMeasureLocked (IString serialNumber) {
+  bool MatchTool::IsMeasureLocked (QString serialNumber) {
 
     if (m_editPoint == NULL) return false;
 
@@ -2933,7 +2932,7 @@ namespace Isis {
    */
   void MatchTool::readSettings() {
     FileName config("$HOME/.Isis/qview/MatchTool.config");
-    QSettings settings(QString::fromStdString(config.expanded()),
+    QSettings settings(config.expanded(),
                        QSettings::NativeFormat);
     QPoint pos = settings.value("pos", QPoint(300, 100)).toPoint();
     QSize size = settings.value("size", QSize(900, 500)).toSize();
@@ -2953,7 +2952,7 @@ namespace Isis {
       visible at the time of closing the application*/
     if (!m_matchTool->isVisible()) return;
     FileName config("$HOME/.Isis/qview/MatchTool.config");
-    QSettings settings(QString::fromStdString(config.expanded()),
+    QSettings settings(config.expanded(),
                        QSettings::NativeFormat);
     settings.setValue("pos", m_matchTool->pos());
     settings.setValue("size", m_matchTool->size());

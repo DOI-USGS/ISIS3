@@ -47,7 +47,7 @@ class MyCamera : public LineScanCamera {
 
 int main() {
   Preference::Preferences(true);
-  string inputFile = "$mgs/testData/ab102401.lev2.cub";
+  QString inputFile = "$mgs/testData/ab102401.lev2.cub";
   Pvl pvl(inputFile);
   MyCamera cam(pvl);
 

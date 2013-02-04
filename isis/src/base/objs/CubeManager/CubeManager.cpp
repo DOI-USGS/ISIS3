@@ -38,7 +38,7 @@ namespace Isis {
    * @return Cube* A pointer to the cube object that CubeManager retains ownership
    *         to and may delete at any time
    */
-  Cube *CubeManager::OpenCube(const std::string &cubeFileName) {
+  Cube *CubeManager::OpenCube(const QString &cubeFileName) {
     CubeAttributeInput attIn(cubeFileName);
     IString attri = attIn.toString();
     IString expName = FileName(cubeFileName).expanded();
@@ -49,7 +49,7 @@ namespace Isis {
     }
 
     IString fullName = expName + attri;
-    QString fileName(fullName);
+    QString fileName(fullName.ToQt());
     QMap<QString, Cube *>::iterator searchResult = p_cubes.find(fileName);
 
     if(searchResult == p_cubes.end()) {
@@ -59,10 +59,10 @@ namespace Isis {
       (*searchResult)->setVirtualBands(attIn.bands());
 
       try {
-        (*searchResult)->open(fileName.toStdString());
+        (*searchResult)->open(fileName);
       }
       catch(IException &e) {
-        CleanCubes(fileName.toStdString());
+        CleanCubes(fileName);
         throw;
       }
     }
@@ -75,7 +75,7 @@ namespace Isis {
     if(p_minimumCubes != 0) {
       while(p_opened.size() > (int)(p_minimumCubes)) {
         QString needsCleaned = p_opened.dequeue();
-        CleanCubes(needsCleaned.toStdString());
+        CleanCubes(needsCleaned);
       }
     }
 
@@ -89,8 +89,8 @@ namespace Isis {
    *
    * @param cubeFileName The filename of the cube to remove from memory
    */
-  void CubeManager::CleanCubes(const std::string &cubeFileName) {
-    QString fileName((IString)FileName(cubeFileName).expanded());
+  void CubeManager::CleanCubes(const QString &cubeFileName) {
+    QString fileName(FileName(cubeFileName).expanded());
     QMap<QString, Cube *>::iterator searchResult = p_cubes.find(fileName);
 
     if(searchResult == p_cubes.end()) {

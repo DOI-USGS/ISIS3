@@ -14,7 +14,7 @@ void IsisMain() {
 
   // Set up the mosaic priority
   UserInterface &ui = Application::GetUserInterface();
-  string combineMethod = ui.GetString("COMBINE");
+  QString combineMethod = ui.GetString("COMBINE");
   ProcessMosaic::ImageOverlay priority;
   if(combineMethod == "PARENT") {
     priority = ProcessMosaic::PlaceImagesBeneath;

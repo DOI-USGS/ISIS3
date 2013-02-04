@@ -25,9 +25,9 @@ using namespace std;
 
 #include "Message.h"
 
-string Isis::Message::KeywordValueNotInList
-(const string &key, const string &value, const vector<string> &list) {
-  string message;
+QString Isis::Message::KeywordValueNotInList(const QString &key, const QString &value,
+                                             const vector<QString> &list) {
+  QString message;
   message = "Keyword [" + key + "=" + value + "] must be one of [";
   for(unsigned int i = 0; i < list.size(); i++) {
     message += list[i];

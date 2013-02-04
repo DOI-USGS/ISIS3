@@ -205,17 +205,17 @@ namespace Isis {
   int Buffer::Index(const int i_samp, const int i_line, const int i_band)
       const {
     if((i_samp < p_sample) || (i_samp > (p_sample + p_nsamps - 1))) {
-      string message = Message::ArraySubscriptNotInRange(i_samp);
+      QString message = Message::ArraySubscriptNotInRange(i_samp);
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     if((i_line < p_line) || (i_line > (p_line + p_nlines - 1))) {
-      string message = Message::ArraySubscriptNotInRange(i_line);
+      QString message = Message::ArraySubscriptNotInRange(i_line);
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
     if((i_band < p_band) || (i_band > (p_band + p_nbands - 1))) {
-      string message = Message::ArraySubscriptNotInRange(i_band);
+      QString message = Message::ArraySubscriptNotInRange(i_band);
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
@@ -237,11 +237,11 @@ namespace Isis {
    */
   double Buffer::at(const int index) const {
     if(index < 0) {
-      string message = Message::ArraySubscriptNotInRange(index);
+      QString message = Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
     else if(index >= p_npixels) {
-      string message = Message::ArraySubscriptNotInRange(index);
+      QString message = Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
 
@@ -327,7 +327,7 @@ namespace Isis {
         p_buf = NULL;
         p_rawbuf = NULL;
       }
-      string message = Message::MemoryAllocationFailed();
+      QString message = Message::MemoryAllocationFailed();
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
   }

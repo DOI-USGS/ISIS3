@@ -1,4 +1,4 @@
-#if !defined(BoxcarManager_h)
+#ifndef BoxcarManager_h
 #define BoxcarManager_h
 /**
  * @file

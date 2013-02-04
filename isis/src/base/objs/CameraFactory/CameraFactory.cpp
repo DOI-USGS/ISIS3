@@ -51,12 +51,12 @@ namespace Isis {
     try {
       // First get the spacecraft and instrument and combine them
       PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
-      IString spacecraft = (string) inst["SpacecraftName"];
-      IString name = (string) inst["InstrumentId"];
-      spacecraft.UpCase();
-      name.UpCase();
-      IString group = spacecraft + "/" + name;
-      group.Remove(" ");
+      QString spacecraft = (QString) inst["SpacecraftName"];
+      QString name = (QString) inst["InstrumentId"];
+      spacecraft = spacecraft.toUpper();
+      name = name.toUpper();
+      QString group = spacecraft + "/" + name;
+      group = group.remove(" ");
 
       PvlGroup &kerns = lab.FindGroup("Kernels", Isis::Pvl::Traverse);
       // Default version 1 for backwards compatibility (spiceinit'd cubes before camera model versioning)
@@ -81,7 +81,7 @@ namespace Isis {
         ptr = m_cameraPlugin.GetPlugin(group);
       }
       catch(IException &e) {
-        string msg = "Unsupported camera model, unable to find plugin for ";
+        QString msg = "Unsupported camera model, unable to find plugin for ";
         msg += "SpacecraftName [" + spacecraft + "] with InstrumentId [";
         msg += name + "]";
         throw IException(e, IException::Unknown, msg, _FILEINFO_);
@@ -129,26 +129,26 @@ namespace Isis {
     try {
       // First get the spacecraft and instrument and combine them
       PvlGroup &inst = lab.FindGroup("Instrument", Isis::Pvl::Traverse);
-      IString spacecraft = (string) inst["SpacecraftName"];
-      IString name = (string) inst["InstrumentId"];
-      spacecraft.UpCase();
-      name.UpCase();
-      IString group = spacecraft + "/" + name;
-      group.Remove(" ");
+      QString spacecraft = (QString) inst["SpacecraftName"];
+      QString name = (QString) inst["InstrumentId"];
+      spacecraft = spacecraft.toUpper();
+      name = name.toUpper();
+      QString group = spacecraft + "/" + name;
+      group = group.remove(" ");
 
       PvlGroup plugin;
       try {
         plugin = m_cameraPlugin.FindGroup(group);
       }
       catch(IException &e) {
-        string msg = "Unsupported camera model, unable to find plugin for ";
+        QString msg = "Unsupported camera model, unable to find plugin for ";
         msg += "SpacecraftName [" + spacecraft + "] with InstrumentId [";
         msg += name + "]";
         throw IException(e, IException::Unknown, msg, _FILEINFO_);
       }
 
       if(!plugin.HasKeyword("Version")) {
-        string msg = "Camera model identified by [" + group + "] does not have a version number";
+        QString msg = "Camera model identified by [" + group + "] does not have a version number";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 

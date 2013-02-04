@@ -23,9 +23,11 @@
 #ifndef INFIXTOPOSTFIX_H_
 #define INFIXTOPOSTFIX_H_
 
-#include "IString.h"
 #include <stack>
 #include <iostream>
+
+#include <QList>
+#include <QString>
 
 namespace Isis {
   class InfixOperator;
@@ -57,26 +59,27 @@ namespace Isis {
       InfixToPostfix();
       virtual ~InfixToPostfix();
 
-      IString convert(const IString &infix);
-      IString tokenizeEquation(const IString &equation);
+      QString convert(const QString &infix);
+      QString tokenizeEquation(const QString &equation);
 
     protected:
 
-      virtual bool isKnownSymbol(IString representation);
-      virtual InfixOperator *findOperator(IString representation);
+      virtual bool isKnownSymbol(QString representation);
+      virtual InfixOperator *findOperator(QString representation);
 
       QList<InfixOperator *> p_operators;
+
     private:
       void initialize();
       void uninitialize();
 
-      IString formatFunctionCalls(IString equation);
-      IString cleanSpaces(IString equation);
+      QString formatFunctionCalls(QString equation);
+      QString cleanSpaces(QString equation);
 
-      void closeParenthesis(IString &postfix, std::stack<InfixOperator> &theStack);
-      void addOperator(IString &postfix, const InfixOperator &op, std::stack<InfixOperator> &theStack);
-      bool isFunction(IString representation);
-      void checkArgument(IString funcName, int argNum, IString argument);
+      void closeParenthesis(QString &postfix, std::stack<InfixOperator> &theStack);
+      void addOperator(QString &postfix, const InfixOperator &op, std::stack<InfixOperator> &theStack);
+      bool isFunction(QString representation);
+      void checkArgument(QString funcName, int argNum, QString argument);
   };
 
   /**
@@ -88,14 +91,14 @@ namespace Isis {
    */
   class InfixOperator {
     public:
-      InfixOperator(int prec, IString inString, bool isFunc = false) {
+      InfixOperator(int prec, QString inString, bool isFunc = false) {
         m_precedence = prec;
         m_inputString = inString;
         m_outputString = inString;
         m_isFunction = isFunc;
       }
 
-      InfixOperator(int prec, IString inString, IString outString,
+      InfixOperator(int prec, QString inString, QString outString,
                     bool isFunc = false) {
         m_precedence = prec;
         m_inputString = inString;
@@ -103,11 +106,11 @@ namespace Isis {
         m_isFunction = isFunc;
       }
 
-      const IString &inputString() const {
+      const QString &inputString() const {
         return m_inputString;
       }
 
-      const IString &outputString() const {
+      const QString &outputString() const {
         return m_outputString;
       }
 
@@ -122,8 +125,8 @@ namespace Isis {
 
     private:
       int m_precedence;
-      IString m_inputString;
-      IString m_outputString;
+      QString m_inputString;
+      QString m_outputString;
       bool m_isFunction;
   };
 
@@ -137,12 +140,12 @@ namespace Isis {
    */
   class InfixFunction : public InfixOperator {
     public:
-      InfixFunction(IString inString, int argCount) :
+      InfixFunction(QString inString, int argCount) :
         InfixOperator(-1, inString, true) {
         m_numArguments = argCount;
       }
 
-      InfixFunction(IString inString, IString outString, int argCount) :
+      InfixFunction(QString inString, QString outString, int argCount) :
         InfixOperator(-1, inString, outString, true) {
         m_numArguments = argCount;
       }

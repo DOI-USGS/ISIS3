@@ -29,9 +29,9 @@ namespace Isis {
    *
    * @return Calculated SerialNumber or FileName
   */
-  std::string SerialNumber::Compose(Pvl &label, bool def2filename) {
+  QString SerialNumber::Compose(Pvl &label, bool def2filename) {
 
-    std::string sn;
+    QString sn;
     try {
       PvlGroup snGroup = FindSerialTranslation(label);
       sn = CreateSerialNumber(snGroup, (int)snGroup["ObservationKeys"]);
@@ -40,8 +40,8 @@ namespace Isis {
       if(def2filename) {
         //  Try to return the filename if it exists in the label, otherwise use
         //  "Unknown" as a last resort.
-        std::string snTemp = label.FileName();
-        if(!snTemp.empty()) {
+        QString snTemp = label.FileName();
+        if(!snTemp.isEmpty()) {
           sn = FileName(snTemp).name();
         }
         else {
@@ -64,7 +64,7 @@ namespace Isis {
    *
    * @return Calculated SerialNumber or FileName
   */
-  std::string SerialNumber::Compose(Cube &cube, bool def2filename) {
+  QString SerialNumber::Compose(Cube &cube, bool def2filename) {
     return Compose(*cube.getLabel(), def2filename);
   }
 
@@ -77,7 +77,7 @@ namespace Isis {
    *
    * @return Calculated SerialNumber or FileName
   */
-  std::string SerialNumber::Compose(const std::string &filename, bool def2filename) {
+  QString SerialNumber::Compose(const QString &filename, bool def2filename) {
     Pvl p(filename);
     return Compose(p, def2filename);
   }
@@ -93,16 +93,16 @@ namespace Isis {
     static PvlGroup dataDir(Preference::Preferences().FindGroup("DataDirectory"));
 
     // Get the mission name
-    static std::string missionTransFile = (std::string) dataDir["base"] + "/translations/MissionName2DataDir.trn";
+    static QString missionTransFile = (QString) dataDir["base"] + "/translations/MissionName2DataDir.trn";
     static PvlTranslationManager missionXlater(missionTransFile);
     missionXlater.SetLabel(label);
-    std::string mission = missionXlater.Translate("MissionName");
+    QString mission = missionXlater.Translate("MissionName");
 
     // Get the instrument name
-    static std::string instTransFile = (std::string) dataDir["base"] + "/translations/Instruments.trn";
+    static QString instTransFile = (QString) dataDir["base"] + "/translations/Instruments.trn";
     static PvlTranslationManager instrumentXlater(instTransFile);
     instrumentXlater.SetLabel(label);
-    std::string instrument = instrumentXlater.Translate("InstrumentName");
+    QString instrument = instrumentXlater.Translate("InstrumentName");
 
     // We want to use this instrument's translation manager. It's much faster for
     //   SerialNumberList if we keep the translation manager in memory, so re-reading
@@ -111,24 +111,24 @@ namespace Isis {
     //   needs to have the mission name and the instrument name.
 
     //  Create the static map to keep the translation managers in memory
-    static std::map<std::string, PvlTranslationManager> missionTranslators;
+    static std::map<QString, PvlTranslationManager> missionTranslators;
 
     // Determine the key for this translation manager - must have both mission and instrument
-    std::string key = mission + "_" + instrument;
+    QString key = mission + "_" + instrument;
 
     // Try to find an existing translation manager with the key
-    std::map<std::string, PvlTranslationManager>::iterator translationIterator = missionTranslators.find(key);
+    std::map<QString, PvlTranslationManager>::iterator translationIterator = missionTranslators.find(key);
 
     // If we don't succeed, create one
     if(translationIterator == missionTranslators.end()) {
       // Get the file
-      FileName snFile((std::string) dataDir[mission] + "/translations/" +
+      FileName snFile((QString) dataDir[mission] + "/translations/" +
                                     instrument + "SerialNumber????.trn");
       snFile = snFile.highestVersion();
 
       // use the translation file to generate keywords
       missionTranslators.insert(
-        std::pair<std::string, PvlTranslationManager>(key, PvlTranslationManager(snFile.expanded()))
+        std::pair<QString, PvlTranslationManager>(key, PvlTranslationManager(snFile.expanded()))
       );
 
       translationIterator = missionTranslators.find(key);
@@ -138,7 +138,7 @@ namespace Isis {
     translationIterator->second.Auto(outLabel);
 
     PvlGroup snGroup = outLabel.FindGroup("SerialNumberKeywords");
-    snGroup += PvlKeyword("ObservationKeys", snGroup.Keywords());
+    snGroup += PvlKeyword("ObservationKeys", toString(snGroup.Keywords()));
 
     return snGroup;
   }
@@ -150,10 +150,10 @@ namespace Isis {
    * @param snGroup A PvlGroup containing the keywords to concatenate
    * @param keys the number of strings to contatenate
    */
-  std::string SerialNumber::CreateSerialNumber(PvlGroup &snGroup, int keys) {
-    std::string sn = snGroup["Keyword1"][0];
+  QString SerialNumber::CreateSerialNumber(PvlGroup &snGroup, int keys) {
+    QString sn = snGroup["Keyword1"][0];
     for(int i = 2; i <= keys; i++) {
-      IString keyword = "Keyword" + (IString)i;
+      QString keyword = QString("Keyword%1").arg(i);
       sn += "/" + snGroup[keyword][0];
     }
     return sn;
@@ -171,8 +171,8 @@ namespace Isis {
    *
    * @return Calculated SerialNumber or FileName
   */
-  std::string SerialNumber::ComposeObservation(const std::string &sn, SerialNumberList &list, bool def2filename) {
-    std::string filename = list.FileName(sn);
+  QString SerialNumber::ComposeObservation(const QString &sn, SerialNumberList &list, bool def2filename) {
+    QString filename = list.FileName(sn);
     return ObservationNumber::Compose(filename, def2filename);
   }
 }

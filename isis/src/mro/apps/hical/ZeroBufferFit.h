@@ -1,4 +1,4 @@
-#if !defined(ZeroBufferFit_h)
+#ifndef ZeroBufferFit_h
 #define ZeroBufferFit_h
 /**                                                                       
  * @file                                                                  

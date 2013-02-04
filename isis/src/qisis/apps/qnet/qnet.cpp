@@ -58,13 +58,13 @@ int main(int argc, char *argv[]) {
     PvlGroup &uiPref = Preference::Preferences().FindGroup(
         "UserInterface");
     if (uiPref.HasKeyword("GuiStyle")) {
-      string style = uiPref["GuiStyle"];
-      QApplication::setStyle((IString) style);
+      QString style = uiPref["GuiStyle"];
+      QApplication::setStyle((QString) style);
     }
 
     // Add the Qt plugin directory to the library path
     FileName qtpluginpath("$ISISROOT/3rdParty/plugins");
-    QCoreApplication::addLibraryPath(qtpluginpath.expanded().c_str());
+    QCoreApplication::addLibraryPath(qtpluginpath.expanded());
 
     Qnet::g_vpMainWindow = new ViewportMainWindow("qnet");
 

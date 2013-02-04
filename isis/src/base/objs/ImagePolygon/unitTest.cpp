@@ -26,7 +26,7 @@ int main() {
   */
 
   //   simple MOC image
-  string inFile = "$mgs/testData/ab102401.cub";
+  QString inFile = "$mgs/testData/ab102401.cub";
 
   // Open the cube
   Cube cube;
@@ -38,14 +38,14 @@ int main() {
     poly.Create(cube);
   }
   catch(IException &e) {
-    std::string msg = "Cannot create polygon for [" + cube.getFileName() + "]";
+    QString msg = "Cannot create polygon for [" + cube.getFileName() + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
 
   //  write poly as WKT
-  ProgramLauncher::RunSystemCommand("echo \"" + poly.Polys()->toString()
-    + "\" | sed "
+  ProgramLauncher::RunSystemCommand("echo \"" + QString(poly.Polys()->toString().c_str()) +
+      "\" | sed "
       "'s/\\([0-9][0-9]*\\.[0-9][0-9][0-9][0-9][0-9]\\)\\([0-9]*\\)/\\1/g'"
     );
 
@@ -54,13 +54,13 @@ int main() {
     poly.Create(cube, 12, 1, 384, 640, 385);
   }
   catch(IException &e) {
-    std::string msg = "Cannot create sub-polygon for [" + cube.getFileName() + "]";
+    QString msg = "Cannot create sub-polygon for [" + cube.getFileName() + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 
   //  write poly as WKT
-  ProgramLauncher::RunSystemCommand("echo \"" + poly.Polys()->toString()
-    + "\" | sed "
+  ProgramLauncher::RunSystemCommand("echo \"" + QString(poly.Polys()->toString().c_str()) +
+      "\" | sed "
       "'s/\\([0-9][0-9]*\\.[0-9][0-9][0-9][0-9][0-9][0-9]\\)\\([0-9]*\\)/\\1/g'"
     );
 
@@ -70,13 +70,13 @@ int main() {
     poly.Create(cube, 10, 12, 1, 384, 640, 385);
   }
   catch(IException &e) {
-    std::string msg = "Cannot create lower quality polygon for [" +
+    QString msg = "Cannot create lower quality polygon for [" +
         cube.getFileName() + "]";
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
   //  write poly as WKT
-  ProgramLauncher::RunSystemCommand("echo \"" + poly.Polys()->toString()
-    + "\" | sed "
+  ProgramLauncher::RunSystemCommand("echo \"" + QString(poly.Polys()->toString().c_str()) +
+      "\" | sed "
       "'s/\\([0-9][0-9]*\\.[0-9][0-9][0-9][0-9][0-9][0-9]\\)\\([0-9]*\\)/\\1/g'"
     );
 

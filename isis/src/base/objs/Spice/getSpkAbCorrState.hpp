@@ -50,15 +50,15 @@ namespace Isis {
       abcorr = "";
 
       //  Retrieve list of loaded SPKs from Kernel object
-      std::vector<std::string> spks = kernels.getKernelList("SPK");
-      for ( unsigned int k = 0 ; k < spks.size() ; k++ ) {
-        std::string spkFile = spks[k];
+      QStringList spks = kernels.getKernelList("SPK");
+      for ( int k = 0 ; k < spks.size() ; k++ ) {
+        QString spkFile = spks[k];
         SpiceChar ktype[32];
         SpiceChar source[128];
         SpiceInt  handle;
         SpiceBoolean found;
         //  Get info on SPK kernel mainly the NAIF handle for comment parsing
-        kinfo_c(spkFile.c_str(), sizeof(ktype), sizeof(source), ktype,
+        kinfo_c(spkFile.toAscii().data(), sizeof(ktype), sizeof(source), ktype,
                 source, &handle, &found);
         if (found == SPICETRUE) {
           // SPK is open so read and parse all the comments.

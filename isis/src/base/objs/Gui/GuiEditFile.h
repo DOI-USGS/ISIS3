@@ -50,10 +50,10 @@ namespace Isis {
     Q_OBJECT
     public:
       //! Creates a single instance of the GuiEditFile
-      static void EditFile(UserInterface & pUI, std::string psFile="");
+      static void EditFile(UserInterface & pUI, QString psFile="");
 
       //! If there is already an instance of this object, then display the window
-      void showWindow(std::string psFile="");
+      void showWindow(QString psFile="");
       
       //! Destructor
       ~GuiEditFile();
@@ -73,7 +73,7 @@ namespace Isis {
 
     private:
       //! Constructor
-      GuiEditFile(UserInterface & pUI, std::string psFile="");
+      GuiEditFile(UserInterface & pUI, QString psFile="");
       void windowTitle(QString & psfile); //!< display only the file base name
       
       static GuiEditFile* m_instance; //!< Instance of this object - singleton

@@ -52,8 +52,8 @@ int main(int argc, char *argv[]) {
   cout << "IsReal    = " << textField.isReal() << endl;
   cout << "Size      = " << textField.size() << endl;
   cout << "Bytes     = " << textField.bytes() << endl;
-  textField = (string) "Bah humbug";
-  cout << "Value     = " << (string)textField << endl;
+  textField = (QString) "Bah humbug";
+  cout << "Value     = " << (QString)textField << endl;
   g = textField.pvlGroup();
   cout << g << endl;
   cout << "----------------------------------------" << endl << endl;
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
 
   group1 += PvlKeyword("name", "Test");
   group1 += PvlKeyword("type", "Integer");
-  group1 += PvlKeyword("size", 20);
+  group1 += PvlKeyword("size", toString(20));
 
   TableField intVectorField20(group1);
   g = intVectorField20.pvlGroup();
@@ -153,7 +153,7 @@ int main(int argc, char *argv[]) {
 
   group2 += PvlKeyword("name", "Test");
   group2 += PvlKeyword("type", "Double");
-  group2 += PvlKeyword("size", 20);
+  group2 += PvlKeyword("size", toString(20));
 
   TableField dblVectorField20(group2);
   g = dblVectorField20.pvlGroup();
@@ -165,7 +165,7 @@ int main(int argc, char *argv[]) {
 
   group3 += PvlKeyword("name", "Test");
   group3 += PvlKeyword("type", "Text");
-  group3 += PvlKeyword("size", 20);
+  group3 += PvlKeyword("size", toString(20));
 
   TableField textField20(group3);
   g = textField20.pvlGroup();
@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
 
   group4 += PvlKeyword("name", "Test");
   group4 += PvlKeyword("type", "Real");
-  group4 += PvlKeyword("size", 20);
+  group4 += PvlKeyword("size", toString(20));
 
   TableField realVectorField20(group4);
   g = realVectorField20.pvlGroup();
@@ -190,7 +190,7 @@ int main(int argc, char *argv[]) {
 
     group5 += PvlKeyword("name", "Test");
     group5 += PvlKeyword("type", "BLAH");
-    group5 += PvlKeyword("size", 20);
+    group5 += PvlKeyword("size", toString(20));
 
     TableField unknownTypeField(group5);
     g = unknownTypeField.pvlGroup();
@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) {
 
     group6 += PvlKeyword("name", "Test");
     group6 += PvlKeyword("type", "Integer");
-    group6 += PvlKeyword("size", -7.3);
+    group6 += PvlKeyword("size", toString(-7.3));
 
     TableField invalidSizeField(group6);
     g = invalidSizeField.pvlGroup();
@@ -252,7 +252,7 @@ int main(int argc, char *argv[]) {
   cout << endl;
   cout << "     operator std::string() " << endl;
   try {
-    cout << std::string(realSingletonField); // try to cast a non-Text type
+    cout << QString(realSingletonField); // try to cast a non-Text type
   }
   catch (IException e) {
     e.print();
@@ -334,7 +334,7 @@ int main(int argc, char *argv[]) {
   cout << endl;
   cout << "     operator=(const std::string &value)" << endl;
   try {
-    dblSingletonField = std::string("Error"); // try to set Double type to non-double value
+    dblSingletonField = "Error"; // try to set Double type to non-double value
   }
   catch (IException e) {
     e.print();

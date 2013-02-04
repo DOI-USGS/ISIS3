@@ -2,7 +2,7 @@
 
 #include "Isis.h"
 
-#include <string>
+#include <QString>
 #include <sstream>
 #include "Process.h"
 #include "Pvl.h"
@@ -14,11 +14,12 @@ using namespace Isis;
 //helper button functins in the code
 void helperButtonLog();
 
-map <string, void *> GuiHelpers() {
-  map <string, void *> helper;
+map <QString, void *> GuiHelpers() {
+  map <QString, void *> helper;
   helper ["helperButtonLog"] = (void *) helperButtonLog;
   return helper;
 }
+
 void IsisMain() {
   // Set Preferences to always turn off Terminal Output
   PvlGroup &grp = Isis::Preference::Preferences().FindGroup("SessionLog", Isis::Pvl::Traverse);
@@ -29,7 +30,7 @@ void IsisMain() {
 
   // Get the input file from the user interface
   UserInterface &ui = Application::GetUserInterface();
-  string labelFile = ui.GetFileName("FROM");
+  QString labelFile = ui.GetFileName("FROM");
 
   // Open the file ... it must be a label-type file
   Pvl lab;
@@ -39,12 +40,12 @@ void IsisMain() {
   // Set up the requested object
   PvlKeyword key;
   if(ui.WasEntered("OBJNAME")) {
-    string obj = ui.GetString("OBJNAME");
+    QString obj = ui.GetString("OBJNAME");
 
     // Get the keyword from the entered group
     if(ui.WasEntered("GRPNAME")) {
       PvlObject object = lab.FindObject(obj, Pvl::Traverse);
-      string grp = ui.GetString("GRPNAME");
+      QString grp = ui.GetString("GRPNAME");
       key = object.FindGroup(grp, Pvl::Traverse)[ui.GetString("KEYWORD")];
     }
     // Find the keyword in the object
@@ -60,7 +61,7 @@ void IsisMain() {
 
   // Set up the requested group
   else if(ui.WasEntered("GRPNAME")) {
-    string grp = ui.GetString("GRPNAME");
+    QString grp = ui.GetString("GRPNAME");
     key = lab.FindGroup(grp, Pvl::Traverse)[ui.GetString("KEYWORD")];
   }
 
@@ -74,13 +75,13 @@ void IsisMain() {
     }
   }
 
-  IString value;
+  QString value;
   if(ui.WasEntered("KEYINDEX")) {
     int i = ui.GetInteger("KEYINDEX");
 
     // Make sure they requested a value inside the range of the list
     if(key.Size() < i) {
-      string msg = "The value entered for [KEYINDEX] is out of the array ";
+      QString msg = "The value entered for [KEYINDEX] is out of the array ";
       msg += "bounds for the keyword [" + ui.GetString("KEYWORD") + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -92,17 +93,14 @@ void IsisMain() {
     if(key.Size() > 1) {
       ostringstream os;
       os << key;
-      IString temp = os.str();
-      temp.Token("(");
-      value = temp.Token(")");
-      value = value.ConvertWhiteSpace();
-      value = value.Compress();
+      QString temp = os.str().c_str();
+      value = temp.mid(temp.indexOf("("), temp.indexOf(")" - temp.indexOf("("))).simplified();
     }
     // Just get the keyword value since it isnt a list
-    else value = (string)key;
+    else value = (QString)key;
   }
 
-  if(ui.GetBoolean("UPPER")) value.UpCase();
+  if(ui.GetBoolean("UPPER")) value = value.toUpper();
 
   // Construct a label with the results
   PvlGroup results("Results");
@@ -121,7 +119,7 @@ void IsisMain() {
 //Helper function to output the input file to log.
 void helperButtonLog() {
   UserInterface &ui = Application::GetUserInterface();
-  string file(ui.GetFileName("FROM"));
+  QString file(ui.GetFileName("FROM"));
   Pvl p;
   p.Read(file);
   Application::GuiLog(p);

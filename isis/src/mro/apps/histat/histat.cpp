@@ -11,8 +11,8 @@
 using namespace std;
 using namespace Isis;
 
-PvlGroup PvlStats(Statistics &stats, const string &name);
-void ThrowException(int, int, int, string);
+PvlGroup PvlStats(Statistics &stats, const QString &name);
+void ThrowException(int, int, int, QString);
 
 const int LINES_POSTRAMP = 30;
 
@@ -57,7 +57,7 @@ void IsisMain() {
 
   //Check to make sure we got the cube properly
   if(!inputCube.isOpen()) {
-    string msg = "Could not open FROM cube" + fromFile.expanded();
+    QString msg = "Could not open FROM cube " + fromFile.expanded();
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
@@ -305,28 +305,28 @@ void IsisMain() {
 }
 
 // Return a PVL group containing the statistical information
-PvlGroup PvlStats(Statistics &stats, const string &name) {
+PvlGroup PvlStats(Statistics &stats, const QString &name) {
   // Construct a label with the results
   PvlGroup results(name);
   if(stats.ValidPixels() != 0) {
-    results += PvlKeyword("Average", stats.Average());
-    results += PvlKeyword("StandardDeviation", stats.StandardDeviation());
-    results += PvlKeyword("Variance", stats.Variance());
-    results += PvlKeyword("Minimum", stats.Minimum());
-    results += PvlKeyword("Maximum", stats.Maximum());
+    results += PvlKeyword("Average", toString(stats.Average()));
+    results += PvlKeyword("StandardDeviation", toString(stats.StandardDeviation()));
+    results += PvlKeyword("Variance", toString(stats.Variance()));
+    results += PvlKeyword("Minimum", toString(stats.Minimum()));
+    results += PvlKeyword("Maximum", toString(stats.Maximum()));
   }
-  results += PvlKeyword("TotalPixels", stats.TotalPixels());
-  results += PvlKeyword("ValidPixels", stats.ValidPixels());
-  results += PvlKeyword("NullPixels", stats.NullPixels());
-  results += PvlKeyword("LisPixels", stats.LisPixels());
-  results += PvlKeyword("LrsPixels", stats.LrsPixels());
-  results += PvlKeyword("HisPixels", stats.HisPixels());
-  results += PvlKeyword("HrsPixels", stats.HrsPixels());
+  results += PvlKeyword("TotalPixels", toString(stats.TotalPixels()));
+  results += PvlKeyword("ValidPixels", toString(stats.ValidPixels()));
+  results += PvlKeyword("NullPixels", toString(stats.NullPixels()));
+  results += PvlKeyword("LisPixels", toString(stats.LisPixels()));
+  results += PvlKeyword("LrsPixels", toString(stats.LrsPixels()));
+  results += PvlKeyword("HisPixels", toString(stats.HisPixels()));
+  results += PvlKeyword("HrsPixels", toString(stats.HrsPixels()));
   return results;
 }
 
-void ThrowException(int vectorSize, int left, int right, string name) {
-  string err;
+void ThrowException(int vectorSize, int left, int right, QString name) {
+  QString err;
   err = "You are trying to skip as many or more samples of the " + name +
         " than exist";
   throw IException(IException::User, err, _FILEINFO_);

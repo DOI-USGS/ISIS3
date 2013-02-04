@@ -1,4 +1,4 @@
-#if !defined(DbProfile_h)
+#ifndef DbProfile_h
 #define DbProfile_h
 /**
  * @file
@@ -66,14 +66,14 @@ namespace Isis {
 
     protected:
       /* Container for multi-valued keywords in profiles */
-      typedef CollectorMap<std::string, PvlKeyword, NoCaseStringCompare> KeyList;
+      typedef CollectorMap<IString, PvlKeyword, NoCaseStringCompare> KeyList;
 
     public:
       //  Constructors and Destructor
       DbProfile() : _name("Profile"), _keys() { }
-      DbProfile(const std::string &name) : _name(name), _keys() { }
+      DbProfile(const QString &name) : _name(name), _keys() { }
       DbProfile(const DbProfile &prof1, const DbProfile &prof2,
-                const std::string &name = "");
+                const QString &name = "");
       DbProfile(PvlContainer &pvl);
 
 
@@ -104,18 +104,18 @@ namespace Isis {
       /**
        * Set the name of this profile
        *
-       * @param name IString used to set the name of this profile
+       * @param name QString used to set the name of this profile
        */
-      void setName(const std::string &name) {
+      void setName(const QString &name) {
         _name = name;
       }
 
       /**
        * @brief Returns the name of this property
        *
-       * @return std::string Name of this property
+       * @return QString Name of this property
        */
-      std::string Name() const {
+      QString Name() const {
         return (_name);
       }
 
@@ -126,15 +126,15 @@ namespace Isis {
        *
        * @return bool True if it exists, false if it doesn't
        */
-      bool exists(const std::string &key) const {
+      bool exists(const QString &key) const {
         return (_keys.exists(key));
       }
 
       //  Convenience methods for adding keys
-      void add(const std::string &key, const std::string &value = "");
-      void replace(const std::string &key, const std::string &value = "");
-      void remove(const std::string &key);
-      int  count(const std::string &key) const;
+      void add(const QString &key, const QString &value = "");
+      void replace(const QString &key, const QString &value = "");
+      void remove(const QString &key);
+      int  count(const QString &key) const;
 
       /**
        * Returns the nth key in the profile
@@ -148,15 +148,15 @@ namespace Isis {
        *
        * @param nth Specifies the nth key in the profile
        *
-       * @return std::string Name of nth keyword in the profile.
+       * @return QString Name of nth keyword in the profile.
        *
        * @throws Out-of-range exception if the nth keyword does not exist
        */
-      std::string key(int nth) const {
-        return (_keys.key(nth));
+      QString key(int nth) const {
+        return (_keys.key(nth).ToQt());
       }
-      std::string value(const std::string &key, int nth = 0) const;
-      std::string operator()(const std::string &key, int nth = 0) const;
+      QString value(const QString &key, int nth = 0) const;
+      QString operator()(const QString &key, int nth = 0) const;
 
     protected:
       void loadkeys(PvlContainer &pvl);
@@ -175,7 +175,7 @@ namespace Isis {
       }
 
     private:
-      std::string _name;     //!<  Name of this profile
+      QString _name;     //!<  Name of this profile
       KeyList _keys;         //!<  List of keys in profile
   };
 }

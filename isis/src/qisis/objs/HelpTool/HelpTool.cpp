@@ -58,15 +58,15 @@ namespace Isis {
    * @author  2007-06-12 Tracie Sucharski
    */
   void HelpTool::aboutProgram() {
-    FileName file((std::string)
-                        "$ISISROOT/doc/Application/presentation/PrinterFriendly/" +
-                        QApplication::applicationName().toStdString() + "/" +
-                        QApplication::applicationName().toStdString() + ".html");
+    FileName file(
+                  "$ISISROOT/doc/Application/presentation/PrinterFriendly/" +
+                  QApplication::applicationName() + "/" +
+                  QApplication::applicationName() + ".html");
 
     PvlGroup &uig = Preference::Preferences().FindGroup("UserInterface");
-    std::string command = (std::string) uig["GuiHelpBrowser"] +
-                          (std::string)" file:" + file.expanded() + " &";
-    if(system(command.c_str()) != 0) {
+    QString command = (QString) uig["GuiHelpBrowser"] +
+                      (QString)" file:" + file.expanded() + " &";
+    if(system(command.toAscii().data()) != 0) {
       IString msg = "Failed to execute [" + command + "]";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }

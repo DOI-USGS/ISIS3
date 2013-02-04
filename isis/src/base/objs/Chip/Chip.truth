@@ -176,21 +176,21 @@ Try to set chip size with input parameter equal to 0:
 **USER ERROR** Unable to set chip size to [0, 1].  Samples and lines must be greater than zero.
 
 Try to load a cube that is not camera or map projection:
-**USER ERROR** Can not geom chip.  Chip cube [junk.cub] is not a camera or map projection.
-**ERROR** Unable to initialize cube projection from file [junk.cub].
-**ERROR** Unable to find PVL group [Mapping] in file [junk.cub].
+**USER ERROR** Can not geom chip.  Chip cube [] is not a camera or map projection.
+**ERROR** Unable to initialize cube projection from file [].
+**ERROR** Unable to find PVL group [Mapping] in file [].
 **ERROR** Unable to initialize camera model from group [Instrument].
-**ERROR** Unable to find PVL group [Instrument] in file [junk.cub].
+**ERROR** Unable to find PVL group [Instrument] in file [].
 
 Try to load a cube with a match cube that is not camera or map projection:
-**USER ERROR** Can not geom chip.  Match chip cube [junk.cub] is not a camera or map projection.
-**ERROR** Unable to initialize cube projection from file [junk.cub].
-**ERROR** Unable to find PVL group [Mapping] in file [junk.cub].
+**USER ERROR** Can not geom chip.  Match chip cube [] is not a camera or map projection.
+**ERROR** Unable to initialize cube projection from file [].
+**ERROR** Unable to find PVL group [Mapping] in file [].
 **ERROR** Unable to initialize camera model from group [Instrument].
-**ERROR** Unable to find PVL group [Instrument] in file [junk.cub].
+**ERROR** Unable to find PVL group [Instrument] in file [].
 
 Try to load a cube with match chip and cube that can not find at least 3 points for Affine Transformation:
-**USER ERROR** Cannot find enough points to perform Affine transformation.  Unable to load chip from [ab102401_ideal.cub] to match chip from [f319b18_ideal.cub].
+**USER ERROR** Cannot find enough points to perform Affine transformation.  Unable to load chip from [] to match chip from [].
 
 Try to set valid range with larger number passed in as first parameter:
 **PROGRAMMER ERROR** Unable to set valid chip range to [4.0, 3.0].  First parameter must be smaller than the second.

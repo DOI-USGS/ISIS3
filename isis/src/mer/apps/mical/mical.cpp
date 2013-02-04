@@ -19,8 +19,8 @@ using namespace Isis;
 //helper button functions in the code
 void  helperButtonLogCalKernel();
 
-map <string, void *> GuiHelpers() {
-  map <string, void *> helper;
+map <QString, void *> GuiHelpers() {
+  map <QString, void *> helper;
   helper ["helperButtonLogCalKernel"] = (void *) helperButtonLogCalKernel;
   return helper;
 }
@@ -39,7 +39,7 @@ namespace gbl {
 }
 
 PvlGroup calgrp;
-string stagestop;
+QString stagestop;
 
 void IsisMain() {
   //We will be processing by line
@@ -54,13 +54,13 @@ void IsisMain() {
 
   //check if the image is calibrated
   if(pack->hasGroup("Radiometry")) {
-    string msg = "The MI image [" + pack->getFileName() + "] has already "
+    QString msg = "The MI image [" + pack->getFileName() + "] has already "
                  "been radiometrically calibrated";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   //Open the calibration kernel that contains constrnts for each camera
-  string calKernelFile;
+  QString calKernelFile;
   if(ui.WasEntered("CALKERNEL")) {
     calKernelFile = ui.GetFileName("CALKERNEL");
     cout << "use the user kernel" << endl;
@@ -87,17 +87,17 @@ void IsisMain() {
   double ETstartTime = startTime.Et();
   //Get the distance between Mars and the Sun at the given time in
   // Astronomical Units (AU)
-  string bspKernel = p.MissionData("base", "/kernels/spk/de???.bsp", true);
-  furnsh_c(bspKernel.c_str());
-  string pckKernel = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
-  furnsh_c(pckKernel.c_str());
+  QString bspKernel = p.MissionData("base", "/kernels/spk/de???.bsp", true);
+  furnsh_c(bspKernel.toAscii().data());
+  QString pckKernel = p.MissionData("base", "/kernels/pck/pck?????.tpc", true);
+  furnsh_c(pckKernel.toAscii().data());
   double sunpos[6], lt;
   spkezr_c("sun", ETstartTime, "iau_mars", "LT+S", "mars", sunpos, &lt);
   double dist = vnorm_c(sunpos);
   double kmperAU = 1.4959787066E8;
   gbl::sunAU = dist / kmperAU;
-  unload_c(bspKernel.c_str());
-  unload_c(pckKernel.c_str());
+  unload_c(bspKernel.toAscii().data());
+  unload_c(pckKernel.toAscii().data());
 
 
   //See what calibtation values the user wants to apply
@@ -111,7 +111,7 @@ void IsisMain() {
   if(!ui.GetBoolean("RPCORRECTION") || gbl::mi->ShutterEffectCorrectionFlag() == "TRUE") {
     gbl::useReferenceValue = 0;
     calgrp += PvlKeyword("ReferencePixelValueSource", "N/A");
-    calgrp += PvlKeyword("ReferencePixelValue", 0);
+    calgrp += PvlKeyword("ReferencePixelValue", "0");
     calgrp += PvlKeyword("ReferencePixelImage", "NoCorrection");
   }
   //  find out if user entered a ERP file.  If yes then get the AVG for the
@@ -133,22 +133,22 @@ void IsisMain() {
 
     calgrp += PvlKeyword("ReferencePixelValueSource", "ERPImage");
     calgrp += PvlKeyword("ReferencePixelValueImage", ui.GetFileName("REFPIXIMAGE"));
-    calgrp += PvlKeyword("ReferencePixelValue", gbl::ReferencePixelValue);
+    calgrp += PvlKeyword("ReferencePixelValue", toString(gbl::ReferencePixelValue));
   }
   else {
     gbl::ReferencePixelValue = gbl::mi->ReferencePixelModel();
     calgrp += PvlKeyword("ReferencePixelValueSource", "ERPModel");
-    calgrp += PvlKeyword("ReferenceModel", gbl::ReferencePixelValue);
+    calgrp += PvlKeyword("ReferenceModel", toString(gbl::ReferencePixelValue));
   }
   // if user wants NO zero exposure or if shutter effect correction is true
   // set the user value to zero and set label output to reflect no correction
   if(!ui.GetBoolean("ZECORRECTION") || gbl::mi->ShutterEffectCorrectionFlag() == "TRUE") {
     gbl::useZeroExposureValue = 0;
-    calgrp += PvlKeyword("ZeroExposureValue", 0);
+    calgrp += PvlKeyword("ZeroExposureValue", "0");
     calgrp += PvlKeyword("ZeroExposureImage", "NoCorrection");
   }
   else {
-    calgrp += PvlKeyword("ZeroExposureValue", gbl::mi->ZeroExposureValue());
+    calgrp += PvlKeyword("ZeroExposureValue", toString(gbl::mi->ZeroExposureValue()));
     calgrp += PvlKeyword("ZeroExposureImage", gbl::mi->ZeroExposureImage());
   }
   // If user wants NO active area set user value to zero and set the label
@@ -159,7 +159,7 @@ void IsisMain() {
     calgrp += PvlKeyword("ActiveAreaImage", "NoCorrection");
   }
   else {
-    calgrp += PvlKeyword("ActiveAreaValue", gbl::mi->ActiveAreaValue());
+    calgrp += PvlKeyword("ActiveAreaValue", toString(gbl::mi->ActiveAreaValue()));
     calgrp += PvlKeyword("ActiveAreaImage", gbl::mi->ActiveAreaImage());
   }
 
@@ -200,14 +200,14 @@ void IsisMain() {
   double fullModel = gbl::mi->ReferencePixelModel() +
                      gbl::mi->ZeroExposureValue() +
                      gbl::mi->ActiveAreaValue();
-  calgrp += PvlKeyword("DarkCurrentFullModel", fullModel);
+  calgrp += PvlKeyword("DarkCurrentFullModel", toString(fullModel));
 
   //Add temperature values to the radiometry group
-  calgrp += PvlKeyword("CCDTemperture", gbl::mi->CCDTemperatureCorrect());
-  calgrp += PvlKeyword("PCBTemperature", gbl::mi->PCBTemperature());
+  calgrp += PvlKeyword("CCDTemperture", toString(gbl::mi->CCDTemperatureCorrect()));
+  calgrp += PvlKeyword("PCBTemperature", toString(gbl::mi->PCBTemperature()));
   if(stagestop == "IOF") {
-    calgrp += PvlKeyword("OmegaNaught", gbl::mi->OmegaNaught());
-    calgrp += PvlKeyword("SunAU", gbl::sunAU);
+    calgrp += PvlKeyword("OmegaNaught", toString(gbl::mi->OmegaNaught()));
+    calgrp += PvlKeyword("SunAU", toString(gbl::sunAU));
   }
 
 //write Radiometry group to the output cube.
@@ -302,7 +302,7 @@ void gbl::Calibrate(vector<Buffer *>&in, vector<Buffer *>&out) {
 //Helper Button Function to display cal Kernel in the log area
 void helperButtonLogCalKernel() {
   UserInterface &ui = Application::GetUserInterface();
-  string calKernelFile;
+  QString calKernelFile;
   if(ui.WasEntered("CALKERNEL")) {
     calKernelFile = ui.GetFileName("CALKERNEL");
   }
@@ -313,8 +313,8 @@ void helperButtonLogCalKernel() {
 
   Pvl p;
   p.Read(calKernelFile);
-  string Ostring = "********** Output of [" + calKernelFile + "] *********";
-  Application::GuiLog(Ostring);
+  QString OQString = "********** Output of [" + calKernelFile + "] *********";
+  Application::GuiLog(OQString);
   Application::GuiLog(p);
 }
 

@@ -41,8 +41,8 @@ namespace Isis {
     bool printPercent;
     Isis::PvlGroup &group = Isis::Preference::Preferences().FindGroup("UserInterface");
     percent = group["ProgressBarPercent"];
-    Isis::IString temp = (string) group["ProgressBar"];
-    printPercent = temp.UpCase() == "ON";
+    QString temp = (QString) group["ProgressBar"];
+    printPercent = temp.toUpper() == "ON";
 
     // Check for an error
     if((percent != 1) && (percent != 2) &&
@@ -73,7 +73,7 @@ namespace Isis {
    *
    * @param text Text to output.
    */
-  void Progress::SetText(const std::string &text) {
+  void Progress::SetText(const QString &text) {
     p_text = text;
   }
 
@@ -84,7 +84,7 @@ namespace Isis {
    *
    * @return string
    */
-  string Progress::Text() const {
+  QString Progress::Text() const {
     return p_text;
   }
 

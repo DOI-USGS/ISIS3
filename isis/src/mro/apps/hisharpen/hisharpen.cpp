@@ -25,28 +25,28 @@ void IsisMain() {
 
   // This is the equation that hisharpen needs to perform
   // Final magnitude/phase equations
-  IString magniEq = "sqrt( oreal^2 + oimag^2 )";
-  IString phaseEq = "atan2( oimag , oreal )";
+  QString magniEq = "sqrt( oreal^2 + oimag^2 )";
+  QString phaseEq = "atan2( oimag , oreal )";
 
   // Insert oreal/oimag
-  magniEq.Replace("oreal", "((real*freal + imag*fimag)/(freal*freal + fimag*fimag))");
-  phaseEq.Replace("oreal", "((real*freal + imag*fimag)/(freal*freal + fimag*fimag))");
-  magniEq.Replace("oimag", "((imag*freal - real*fimag)/(freal*freal + fimag*fimag))");
-  phaseEq.Replace("oimag", "((imag*freal - real*fimag)/(freal*freal + fimag*fimag))");
+  magniEq.replace("oreal", "((real*freal + imag*fimag)/(freal*freal + fimag*fimag))");
+  phaseEq.replace("oreal", "((real*freal + imag*fimag)/(freal*freal + fimag*fimag))");
+  magniEq.replace("oimag", "((imag*freal - real*fimag)/(freal*freal + fimag*fimag))");
+  phaseEq.replace("oimag", "((imag*freal - real*fimag)/(freal*freal + fimag*fimag))");
 
   // Insert real/freal (real/psf real), imag/fimag (imaginary/psf imaginary)
-  magniEq.Replace("freal", "(f2*cos(f3))");
-  phaseEq.Replace("freal", "(f2*cos(f3))");
-  magniEq.Replace("real",  "(f1*cos(f4))");
-  phaseEq.Replace("real",  "(f1*cos(f4))");
-  magniEq.Replace("fimag", "(f2*sin(f3))");
-  phaseEq.Replace("fimag", "(f2*sin(f3))");
-  magniEq.Replace("imag",  "(f1*sin(f4))");
-  phaseEq.Replace("imag",  "(f1*sin(f4))");
+  magniEq.replace("freal", "(f2*cos(f3))");
+  phaseEq.replace("freal", "(f2*cos(f3))");
+  magniEq.replace("real",  "(f1*cos(f4))");
+  phaseEq.replace("real",  "(f1*cos(f4))");
+  magniEq.replace("fimag", "(f2*sin(f3))");
+  phaseEq.replace("fimag", "(f2*sin(f3))");
+  magniEq.replace("imag",  "(f1*sin(f4))");
+  phaseEq.replace("imag",  "(f1*sin(f4))");
 
   // Strip spaces
-  phaseEq.Replace(" ", "");
-  magniEq.Replace(" ", "");
+  phaseEq.replace(" ", "");
+  magniEq.replace(" ", "");
 
   Pipeline p;
 
@@ -124,7 +124,7 @@ void CreatePsf(Pipeline &p) {
   UserInterface &ui = Application::GetUserInterface();
 
   // calculate the temp file filename
-  IString tmpFile = p.TemporaryFolder() + "/";
+  QString tmpFile = p.TemporaryFolder() + "/";
   tmpFile += FileName(ui.GetAsString("TO")).baseName();
   tmpFile += ".psf.cub";
 
@@ -135,42 +135,42 @@ void CreatePsf(Pipeline &p) {
   // Verify the image looks like a hirise image
   try {
     const PvlGroup &instGrp = fromCube.getLabel()->FindGroup("Instrument", Pvl::Traverse);
-    IString instrument = (std::string)instGrp["InstrumentId"];
+    QString instrument = (QString)instGrp["InstrumentId"];
 
     if(instrument != "HIRISE") {
-      IString message = "This program is meant to be run on HiRISE images only, found "
+      QString message = "This program is meant to be run on HiRISE images only, found "
                         "[InstrumentId] to be [" + instrument + "] and was expecting [HIRISE]";
       throw IException(IException::User, message, _FILEINFO_);
     }
   }
   catch(IException &e) {
-    IString message = "The [FROM] file is not a valid HIRISE cube. "
+    QString message = "The [FROM] file is not a valid HIRISE cube. "
                       "Please make sure it was imported using hi2isis.";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
   if(fromCube.getLineCount() != fromCube.getSampleCount()) {
-    IString message = "This program only works on square cubes, the number of samples [" +
-                      IString(fromCube.getSampleCount()) + "] must match the number of lines [" +
-                      IString(fromCube.getLineCount()) + "]";
+    QString message = "This program only works on square cubes, the number of samples [" +
+                      QString(fromCube.getSampleCount()) + "] must match the number of lines [" +
+                      QString(fromCube.getLineCount()) + "]";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
   // Let's figure out which point spread function we're supposed to be using
-  IString psfFile = "$mro/calibration/psf/PSF_";
-  IString filter = (std::string)fromCube.getLabel()->FindGroup("Instrument", Pvl::Traverse)["CcdId"];
+  QString psfFile = "$mro/calibration/psf/PSF_";
+  QString filter = (QString)fromCube.getLabel()->FindGroup("Instrument", Pvl::Traverse)["CcdId"];
 
-  if(filter.find("RED") != string::npos) {
+  if(filter.contains("RED")) {
     psfFile += "RED";
   }
-  else if(filter.find("BG") != string::npos) {
+  else if(filter.contains("BG")) {
     psfFile += "BG";
   }
-  else if(filter.find("IR") != string::npos) {
+  else if(filter.contains("IR")) {
     psfFile += "IR";
   }
   else {
-    IString message = "The filter [" + filter + "] does not have a default point spread function. Please provide one using the [PSF] parameter.";
+    QString message = "The filter [" + filter + "] does not have a default point spread function. Please provide one using the [PSF] parameter.";
     throw IException(IException::Programmer, message, _FILEINFO_);
   }
 
@@ -180,14 +180,14 @@ void CreatePsf(Pipeline &p) {
   psfCube.open(psfFile);
 
   if(psfCube.getLineCount() > fromCube.getLineCount()) {
-    IString message = "The input cube dimensions must be at least [" + IString(psfCube.getLineCount());
+    QString message = "The input cube dimensions must be at least [" + QString(psfCube.getLineCount());
     message += "] pixels in the line and sample dimensions";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
   if(!IsPowerOf2(fromCube.getLineCount())) {
-    IString message = "The input cube dimensions must be a power of 2 (found [" +
-                      IString(fromCube.getLineCount()) + "])";
+    QString message = "The input cube dimensions must be a power of 2 (found [" +
+                      QString(fromCube.getLineCount()) + "])";
     throw IException(IException::User, message, _FILEINFO_);
   }
 
@@ -244,10 +244,10 @@ void CleanPsf() {
   UserInterface &ui = Application::GetUserInterface();
 
   if(!manualPsf) {
-    IString psfTempFile = FileName(ui.GetAsString("PSF")).expanded();
+    QString psfTempFile = FileName(ui.GetAsString("PSF")).expanded();
 
     if(ui.GetBoolean("CLEANUP")) {
-      remove(psfTempFile.c_str());
+      remove(psfTempFile.toAscii().data());
     }
 
     ui.Clear("PSF");

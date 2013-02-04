@@ -93,14 +93,14 @@ int NonLinearLSQ::curvefit() {
 }
 
 
-void NonLinearLSQ::Terminate(const std::string &message) {
+void NonLinearLSQ::Terminate(const QString &message) {
   _userMessage = message;
   _userTerminated = true;
   _status = GSL_SUCCESS;
   return;
 }
 
-void NonLinearLSQ::Abort(const std::string &reason) {
+void NonLinearLSQ::Abort(const QString &reason) {
   _userMessage = reason;
   _userTerminated = true;
   _status = GSL_FAILURE;

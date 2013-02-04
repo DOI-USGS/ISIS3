@@ -32,9 +32,6 @@ class QWidget;
 namespace Isis {
   class ControlNet;
   class ControlPoint;
-}
-
-namespace Isis {
 
   /**
    * @brief Qnet File operations

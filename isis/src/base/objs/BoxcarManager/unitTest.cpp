@@ -6,18 +6,19 @@
 #include "Cube.h"
 #include "BoxcarManager.h"
 
+using namespace Isis;
 using namespace std;
 
 int main(int argc, char *argv[]) {
 
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
-  string fname = "$base/testData/isisTruth.cub";
-  Isis::Cube cube;
+  QString fname = "$base/testData/isisTruth.cub";
+  Cube cube;
   cube.open(fname);
 
   //  Test 5x5 boxcar
-  Isis::BoxcarManager box5x5(cube, 5, 5);
+  BoxcarManager box5x5(cube, 5, 5);
   cout << "Buffer (Boxcar) Size:  " <<
        box5x5.SampleDimension() << " " <<
        box5x5.LineDimension() << " " <<
@@ -35,7 +36,7 @@ int main(int argc, char *argv[]) {
   cout << endl;
 
   //  Test 4x4 boxcar
-  Isis::BoxcarManager box4x4(cube, 4, 4);
+  BoxcarManager box4x4(cube, 4, 4);
   cout << "Buffer (Boxcar) Size:  " <<
        box4x4.SampleDimension() << " " <<
        box4x4.LineDimension() << " " <<

@@ -40,9 +40,9 @@
 
 namespace Isis {
   //! Convenience access to dialog
-  int GuiOutputAttribute::GetAttributes(const std::string &defaultAttribute,
-                                        std::string &newAttribute,
-                                        const std::string &title,
+  int GuiOutputAttribute::GetAttributes(const QString &defaultAttribute,
+                                        QString &newAttribute,
+                                        const QString &title,
                                         bool allowProp,
                                         QWidget *parent) {
     // Construct dialog if necessary
@@ -50,7 +50,7 @@ namespace Isis {
     if(p_dialog == 0) {
       p_dialog = new GuiOutputAttribute(parent);
     }
-    p_dialog->setWindowTitle((IString)title);
+    p_dialog->setWindowTitle(title);
     p_dialog->SetPropagation(allowProp);
 
     // Load default attributes and then get the new ones
@@ -192,8 +192,8 @@ namespace Isis {
 
 
   // Return the attributes in the dialog
-  std::string GuiOutputAttribute::GetAttributes() {
-    std::string att;
+  QString GuiOutputAttribute::GetAttributes() {
+    QString att;
     if(p_lsb->isChecked()) att += "+Lsb";
     if(p_msb->isChecked()) att += "+Msb";
 
@@ -210,19 +210,19 @@ namespace Isis {
     if(p_unsignedByte->isChecked() || p_signedWord->isChecked()) {
       if((p_minEdit->text() != "") && (p_maxEdit->text() != "")) {
         att += "+";
-        att += p_minEdit->text().toStdString();
+        att += p_minEdit->text();
         att += ":";
-        att += p_maxEdit->text().toStdString();
+        att += p_maxEdit->text();
       }
     }
 
     Isis::CubeAttributeOutput catt(att);
-    std::string s = catt.toString();
+    QString s = catt.toString();
     return s;
   }
 
   // Set the attributes in the dialog
-  void GuiOutputAttribute::SetAttributes(const std::string &value) {
+  void GuiOutputAttribute::SetAttributes(const QString &value) {
     Isis::CubeAttributeOutput att(value);
     if(att.fileFormat() == Cube::Tile) {
       p_tiled->setChecked(true);

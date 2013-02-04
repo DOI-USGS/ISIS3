@@ -3,12 +3,13 @@
 #include "IException.h"
 #include "Preference.h"
 
+using namespace Isis;
 using namespace std;
 
 int main(int argc, char *argv[]) {
-  Isis::Preference::Preferences(true);
+  Preference::Preferences(true);
 
-  Isis::PvlToken dog("Dog");
+  PvlToken dog("Dog");
   dog.AddValue("drools");
 
   cout << "Info on dog" << endl;
@@ -36,14 +37,14 @@ int main(int argc, char *argv[]) {
   try {
     dog.GetValue(-1);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 
   try {
     dog.GetValue(1);
   }
-  catch(Isis::IException &e) {
+  catch(IException &e) {
     e.print();
   }
 

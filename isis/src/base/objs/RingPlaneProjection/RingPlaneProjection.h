@@ -178,14 +178,14 @@ namespace Isis {
        *
        * @return string The name of the map projection.
        */
-      virtual std::string Name() const = 0;
+      virtual QString Name() const = 0;
       /**
        * This method returns the Version of the map projection.  It is a pure 
        * virtual method (requires all subclasses to override).
        *
        * @return string The Version number of the map projection.
        */
-      virtual std::string Version() const = 0;
+      virtual QString Version() const = 0;
       virtual double TrueScaleRadius() const;
 
       /**

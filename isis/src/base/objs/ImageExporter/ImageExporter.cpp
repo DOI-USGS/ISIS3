@@ -154,13 +154,13 @@ namespace Isis {
    *
    * @param extension The extension for the output image
    */
-  void ImageExporter::setExtension(IString extension) {
+  void ImageExporter::setExtension(QString extension) {
     m_extension = extension;
 
     // World file extension is the first and last characters of the extension
     // with an added 'w' at the end
     int last = extension.length() - 1;
-    m_world = extension.substr(0, 1) + extension.substr(last) + "w";
+    m_world = extension.mid(0, 1) + extension.mid(last) + "w";
   }
 
 
@@ -187,7 +187,7 @@ namespace Isis {
         break;
       default:
         throw IException(IException::Programmer,
-            "Cannot export an image with [" + IString(desc.channelCount()) +
+            "Cannot export an image with [" + QString(desc.channelCount()) +
             "] channels",
             _FILEINFO_);
     }
@@ -284,10 +284,10 @@ namespace Isis {
    *
    * @return A pointer to the instantiated exporter owned by the caller
    */
-  ImageExporter * ImageExporter::fromFormat(IString format) {
+  ImageExporter * ImageExporter::fromFormat(QString format) {
     ImageExporter *exporter = NULL;
 
-    format.DownCase();
+    format = format.toLower();
     if (TiffExporter::canWriteFormat(format)) {
       exporter = new TiffExporter();
     }

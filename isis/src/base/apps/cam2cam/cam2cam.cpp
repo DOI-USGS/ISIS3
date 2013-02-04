@@ -39,7 +39,7 @@ void IsisMain() {
   // Set the reference band we want to match
   PvlGroup instgrp = mcube->getGroup("Instrument");
   if(!outcam->IsBandIndependent()) {
-    PvlKeyword rBand("ReferenceBand", referenceBand);
+    PvlKeyword rBand("ReferenceBand", toString(referenceBand));
     rBand.AddComment("# All bands are aligned to reference band");
     instgrp += rBand;
     mcube->putGroup(instgrp);

@@ -1,4 +1,4 @@
-#if !defined(SpiceKernel_h)
+#ifndef SpiceKernel_h
 #define SpiceKernel_h
 /**                                                                       
  * @file                                                                  

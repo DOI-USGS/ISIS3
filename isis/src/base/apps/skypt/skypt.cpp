@@ -13,13 +13,13 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Get input cube and get camera model for it
-  string channel = ui.GetFileName("FROM");
+  QString channel = ui.GetFileName("FROM");
   Cube cube;
   cube.open(channel);
   Camera *cam = cube.getCamera();
 
   // Get the type of conversion that we are doing
-  string type = ui.GetString("TYPE");
+  QString type = ui.GetString("TYPE");
   double samp, line;
 
   // Do conversion from samp/line to ra/dec
@@ -34,7 +34,7 @@ void IsisMain() {
     double ra = ui.GetDouble("RA");
     double dec = ui.GetDouble("DEC");
     if(!cam->SetRightAscensionDeclination(ra, dec)) {
-      string msg = "Invalid Ra/Dec coordinate";
+      QString msg = "Invalid Ra/Dec coordinate";
       throw IException(IException::User, msg, _FILEINFO_);
     }
     samp = cam->Sample();
@@ -52,11 +52,11 @@ void IsisMain() {
   PvlGroup sp("SkyPoint");
   {
     sp += PvlKeyword("Filename", FileName(channel).expanded());
-    sp += PvlKeyword("Sample", cam->Sample());
-    sp += PvlKeyword("Line", cam->Line());
-    sp += PvlKeyword("RightAscension", cam->RightAscension());
-    sp += PvlKeyword("Declination", cam->Declination());
-    sp += PvlKeyword("EphemerisTime", cam->time().Et());
+    sp += PvlKeyword("Sample", toString(cam->Sample()));
+    sp += PvlKeyword("Line", toString(cam->Line()));
+    sp += PvlKeyword("RightAscension", toString(cam->RightAscension()));
+    sp += PvlKeyword("Declination", toString(cam->Declination()));
+    sp += PvlKeyword("EphemerisTime", toString(cam->time().Et()));
     sp += PvlKeyword("PixelValue", PixelToString(b[0]));
   }
   //Write the group to the screen
@@ -65,7 +65,7 @@ void IsisMain() {
   // Write an output label file if necessary
   if(ui.WasEntered("TO")) {
     // Get user params from ui
-    string outFile = FileName(ui.GetFileName("TO")).expanded();
+    QString outFile = FileName(ui.GetFileName("TO")).expanded();
     bool exists = FileName(outFile).fileExists();
     bool append = ui.GetBoolean("APPEND");
 
@@ -87,13 +87,13 @@ void IsisMain() {
       ofstream os;
       bool writeHeader = false;
       if(append) {
-        os.open(outFile.c_str(), ios::app);
+        os.open(outFile.toAscii().data(), ios::app);
         if(!exists) {
           writeHeader = true;
         }
       }
       else {
-        os.open(outFile.c_str(), ios::out);
+        os.open(outFile.toAscii().data(), ios::out);
         writeHeader = true;
       }
 
@@ -109,7 +109,7 @@ void IsisMain() {
       }
 
       for(int i = 0; i < sp.Keywords(); i++) {
-        os << (string)sp[i];
+        os << (QString)sp[i];
 
         if(i < sp.Keywords() - 1) {
           os << ",";
@@ -119,7 +119,7 @@ void IsisMain() {
     }
   }
   else if(ui.GetString("FORMAT") == "FLAT") {
-    string msg = "Flat file must have a name.";
+    QString msg = "Flat file must have a name.";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 }

@@ -1,4 +1,4 @@
-#if !defined(Application_h)
+#ifndef Application_h
 #define Application_h
 
 /**
@@ -114,31 +114,31 @@ namespace Isis {
 
       static UserInterface &GetUserInterface();
       static void Log(PvlGroup &results);
-      static void GuiLog(Pvl &results);
-      static void GuiLog(PvlGroup &results);
-      static void GuiLog(std::string &results);
-      static IString Name();
+      static void GuiLog(const Pvl &results);
+      static void GuiLog(const PvlGroup &results);
+      static void GuiLog(const QString &results);
+      static QString Name();
 
       /**
        * @param helpers
        */
-      void RegisterGuiHelpers(std::map<std::string, void *> helpers) {
+      void RegisterGuiHelpers(std::map<QString, void *> helpers) {
         p_guiHelpers = helpers;
       };
 
       /**
        * @param helper
        */
-      void *GetGuiHelper(std::string helper) {
+      void *GetGuiHelper(QString helper) {
         return p_guiHelpers[helper];
       };
 
       void GuiReportError(IException &e);
 
-      static IString UserName();
-      static IString HostName();
-      static IString DateTime(time_t *curtime = 0);
-      static IString Version();
+      static QString UserName();
+      static QString HostName();
+      static QString DateTime(time_t *curtime = 0);
+      static QString Version();
 
       static bool HasParent();
 
@@ -151,7 +151,7 @@ namespace Isis {
       QLocalSocket *p_connectionToParent; //!<
       time_t p_startTime;                 //!<
       clock_t p_startClock;               //!<
-      std::string p_datetime;             //!<
+      QString p_datetime;             //!<
       int p_startDirectIO;                //!<
       int p_startPageFaults;              //!<
       int p_startProcessSwaps;            //!<
@@ -160,13 +160,13 @@ namespace Isis {
 
       UserInterface *p_ui;  //!< Pointer to a User Interface object
 
-      void SendParentData(std::string, const std::string &);
-      void SendParentErrors(Isis::PvlObject &errors);
+      void SendParentData(QString, const QString &);
+      void SendParentErrors(PvlObject &errors);
 
-      static Isis::PvlGroup GetUnameInfo();
-      static Isis::PvlGroup GetEnviromentInfo();
-      static Isis::IString GetSystemDiskSpace();
-      static Isis::IString GetLibraryDependencies(IString file);
+      static PvlGroup GetUnameInfo();
+      static PvlGroup GetEnviromentInfo();
+      static QString GetSystemDiskSpace();
+      static QString GetLibraryDependencies(QString file);
 
       friend class Gui;
       void FunctionCleanup();
@@ -174,7 +174,7 @@ namespace Isis {
 
       friend class Progress;
       friend class ProgramLauncher;
-      void UpdateProgress(const std::string &text, bool print);
+      void UpdateProgress(const QString &text, bool print);
       void UpdateProgress(int percent, bool print);
       void ProcessGuiEvents();
 
@@ -188,8 +188,8 @@ namespace Isis {
       void WaitForCommand(int childSocket);
 
       pid_t p_pid;                                //!<
-      std::map<std::string, void *> p_guiHelpers; //!<
-      static IString p_appName;                   //!<
+      std::map<QString, void *> p_guiHelpers; //!<
+      static QString p_appName;                   //!<
   };
 
   extern Application *iApp;

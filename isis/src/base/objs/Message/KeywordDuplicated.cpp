@@ -25,8 +25,6 @@ using namespace std;
 
 #include "Message.h"
 
-string Isis::Message::KeywordDuplicated(const string &key) {
-  string message;
-  message = "Keyword [" + key + "] duplicated";
-  return message;
+QString Isis::Message::KeywordDuplicated(const QString &key) {
+  return "Keyword [" + key + "] duplicated";
 }

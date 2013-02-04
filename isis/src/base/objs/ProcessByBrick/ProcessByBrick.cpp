@@ -67,7 +67,7 @@ namespace Isis {
    *
    * @throws iException::Message
    */
-  Cube *ProcessByBrick::SetInputCube(const std::string &parameter,
+  Cube *ProcessByBrick::SetInputCube(const QString &parameter,
                                      int requirements) {
     int allRequirements = AllMatchOrOne;
     allRequirements |= requirements;
@@ -95,7 +95,7 @@ namespace Isis {
     *
     * @throws iException::Message
     */
-  Cube *ProcessByBrick::SetInputCube(const std::string &file,
+  Cube *ProcessByBrick::SetInputCube(const QString &file,
                                      const CubeAttributeInput &att,
                                      int requirements) {
     int allRequirements = AllMatchOrOne;

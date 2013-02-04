@@ -24,7 +24,7 @@ namespace Isis {
    * @param sinc Sample increment for gathering statistics
    * @param linc Line increment for gathering statistics
    */
-  CameraStatistics::CameraStatistics(std::string filename, int sinc, int linc) {
+  CameraStatistics::CameraStatistics(QString filename, int sinc, int linc) {
     Cube cube;
     cube.open(filename);
     Camera *cam = cube.getCamera();
@@ -66,7 +66,7 @@ namespace Isis {
    * @param filename String filename of the Cube whose Camera is being used
    */
   CameraStatistics::CameraStatistics(Camera *cam, int sinc, int linc,
-      std::string filename) {
+      QString filename) {
     init(cam, sinc, linc, filename);
   }
 
@@ -84,7 +84,7 @@ namespace Isis {
    * @param filename String filename of the Cube whose Camera is being used
    */
   void CameraStatistics::init(Camera *cam, int sinc, int linc,
-      std::string filename) {
+      QString filename) {
 
     m_filename = filename;
     m_sinc = sinc;
@@ -236,14 +236,14 @@ namespace Isis {
    *
    * @return PvlKeyword Keyword constructed from input parameters
    */
-  PvlKeyword CameraStatistics::constructKeyword(std::string keyname,
-      double value, std::string unit="") const {
+  PvlKeyword CameraStatistics::constructKeyword(QString keyname,
+      double value, QString unit="") const {
 
     if(IsSpecial(value)) {
       return (PvlKeyword(keyname, "NULL"));
     }
     else {
-      return (PvlKeyword(keyname, value, unit));
+      return (PvlKeyword(keyname, toString(value), unit));
     }
   }
 
@@ -327,8 +327,8 @@ namespace Isis {
     // object
     PvlGroup pUser("User Parameters");
     if (m_filename != "") pUser += PvlKeyword("Filename", m_filename);
-    pUser += PvlKeyword("Linc", m_linc);
-    pUser += PvlKeyword("Sinc", m_sinc);
+    pUser += PvlKeyword("Linc", toString(m_linc));
+    pUser += PvlKeyword("Sinc", toString(m_sinc));
 
     PvlGroup pLat("Latitude");
     pLat += constructKeyword("LatitudeMinimum", m_latStat->Minimum());

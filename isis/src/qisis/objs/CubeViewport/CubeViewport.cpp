@@ -174,8 +174,8 @@ namespace Isis {
 
 
     // Setup context sensitive help
-    string cubeFileName = p_cube->getFileName();
-    p_whatsThisText = QString("<b>Function: </b>Viewport to ") + cubeFileName.c_str();
+    QString cubeFileName = p_cube->getFileName();
+    p_whatsThisText = QString("<b>Function: </b>Viewport to ") + cubeFileName;
 
     p_cubeWhatsThisText =
       "<p><b>Cube Dimensions:</b> \
@@ -518,7 +518,7 @@ namespace Isis {
       // Enter == button 0, Escape == button 2
       switch(QMessageBox::information(this, tr("Confirm Save"),
         tr("The cube [<font color='red'>%1</font>] contains unsaved changes. "
-           "Do you want to save the changes before exiting?").arg(cube()->getFileName().ToQt()),
+           "Do you want to save the changes before exiting?").arg(cube()->getFileName()),
            QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel)) {
         //Save changes and close viewport
         case QMessageBox::Save:
@@ -978,8 +978,8 @@ namespace Isis {
    *
    */
   void CubeViewport::setCaption() {
-    string cubeFileName = p_cube->getFileName();
-    QString str = QFileInfo(cubeFileName.c_str()).fileName();
+    QString cubeFileName = p_cube->getFileName();
+    QString str = QFileInfo(cubeFileName).fileName();
     str += QString(" @ ");
     str += QString::number(p_scale * 100.0);
     str += QString("% ");
@@ -1363,15 +1363,15 @@ namespace Isis {
     whatsThisObj += PvlKeyword("Cube", p_cube->getFileName());
 
     PvlGroup cubeGrp("CubeDimensions");
-    cubeGrp += PvlKeyword("Samples", p_cube->getSampleCount());
-    cubeGrp += PvlKeyword("Lines",   p_cube->getLineCount());
-    cubeGrp += PvlKeyword("Bands",   p_cube->getBandCount());
+    cubeGrp += PvlKeyword("Samples", toString(p_cube->getSampleCount()));
+    cubeGrp += PvlKeyword("Lines",   toString(p_cube->getLineCount()));
+    cubeGrp += PvlKeyword("Bands",   toString(p_cube->getBandCount()));
     whatsThisObj += cubeGrp;
 
     // Get Viewport Info
     PvlGroup viewportGrp("ViewportDimensions");
-    viewportGrp += PvlKeyword("Samples", viewport()->width());
-    viewportGrp += PvlKeyword("Lines",   viewport()->height());
+    viewportGrp += PvlKeyword("Samples", toString(viewport()->width()));
+    viewportGrp += PvlKeyword("Lines",   toString(viewport()->height()));
     whatsThisObj += viewportGrp;
 
     // Get Cube area Info
@@ -1391,14 +1391,14 @@ namespace Isis {
 
       bandGrp += PvlKeyword("Color", "RGB");
 
-      virtualKey = iRedBand;
-      virtualKey += iGreenBand;
-      virtualKey += iBlueBand;
+      virtualKey = toString(iRedBand);
+      virtualKey += toString(iGreenBand);
+      virtualKey += toString(iBlueBand);
       bandGrp   += virtualKey;
 
-      physicalKey =  p_cube->getPhysicalBand(iRedBand);
-      physicalKey += p_cube->getPhysicalBand(iGreenBand);
-      physicalKey += p_cube->getPhysicalBand(iBlueBand);
+      physicalKey =  toString(p_cube->getPhysicalBand(iRedBand));
+      physicalKey += toString(p_cube->getPhysicalBand(iGreenBand));
+      physicalKey += toString(p_cube->getPhysicalBand(iBlueBand));
       bandGrp += physicalKey;
 
       if(iFilterSize) {
@@ -1430,8 +1430,8 @@ namespace Isis {
 
       bandGrp  += PvlKeyword("Color", "Gray");
 
-      bandGrp  += PvlKeyword("Virtual", iGrayBand);
-      bandGrp  += PvlKeyword("Physical", p_cube->getPhysicalBand(iGrayBand));
+      bandGrp  += PvlKeyword("Virtual", toString(iGrayBand));
+      bandGrp  += PvlKeyword("Physical", toString(p_cube->getPhysicalBand(iGrayBand)));
 
       if(iFilterSize && iGrayBand <= iFilterSize) {
         bandGrp  += PvlKeyword("FilterName", filterName[iGrayBand-1]);
@@ -1441,10 +1441,10 @@ namespace Isis {
     //start, end  line and sample
     double sl, ss, es, el;
     getCubeArea(ss, es, sl, el);
-    cubeAreaPvl += PvlKeyword("StartSample", int(ss + 0.5));
-    cubeAreaPvl += PvlKeyword("EndSample",   int(es + 0.5));
-    cubeAreaPvl += PvlKeyword("StartLine",   int(sl + 0.5));
-    cubeAreaPvl += PvlKeyword("EndLine",     int(el + 0.5));
+    cubeAreaPvl += PvlKeyword("StartSample", toString(int(ss + 0.5)));
+    cubeAreaPvl += PvlKeyword("EndSample",   toString(int(es + 0.5)));
+    cubeAreaPvl += PvlKeyword("StartLine",   toString(int(sl + 0.5)));
+    cubeAreaPvl += PvlKeyword("EndLine",     toString(int(el + 0.5)));
     cubeAreaPvl += bandGrp;
     whatsThisObj += cubeAreaPvl;
     pWhatsThisPvl += whatsThisObj;
@@ -2077,7 +2077,7 @@ namespace Isis {
    */
   void CubeViewport::stretchGray(const QString &string) {
     Stretch stretch;
-    stretch.Parse(string.toStdString());
+    stretch.Parse(string);
     stretchGray(stretch);
   }
 
@@ -2089,7 +2089,7 @@ namespace Isis {
    */
   void CubeViewport::stretchRed(const QString &string) {
     Stretch stretch;
-    stretch.Parse(string.toStdString());
+    stretch.Parse(string);
     stretchRed(stretch);
   }
 
@@ -2101,7 +2101,7 @@ namespace Isis {
    */
   void CubeViewport::stretchGreen(const QString &string) {
     Stretch stretch;
-    stretch.Parse(string.toStdString());
+    stretch.Parse(string);
     stretchGreen(stretch);
   }
 
@@ -2113,7 +2113,7 @@ namespace Isis {
    */
   void CubeViewport::stretchBlue(const QString &string) {
     Stretch stretch;
-    stretch.Parse(string.toStdString());
+    stretch.Parse(string);
     stretchBlue(stretch);
   }
 

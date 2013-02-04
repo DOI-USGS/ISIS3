@@ -20,7 +20,7 @@ void IsisMain() {
 
   UserInterface &ui = Application::GetUserInterface();
 
-  string pairs;
+  QString pairs;
 
   // first just get the pairs from where ever and worry about
   // whether they are dn values or %'s later
@@ -31,7 +31,7 @@ void IsisMain() {
     pairsFile.Open(pairsFileName.expanded());
 
     // concat all non-comment lines into one string (pairs)
-    string line = "";
+    QString line = "";
     while(pairsFile.GetLine(line, true)) {
       pairs += " " + line;
     }

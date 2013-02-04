@@ -220,10 +220,10 @@ namespace Isis {
       p_blueDisplay->setVisible(true);
 
       for(int i = 0; i < bandBin.Keywords(); i++) {
-        if(bandBin[i].Name() == p_comboBox->currentText().toStdString()) {
+        if(bandBin[i].Name() == p_comboBox->currentText()) {
           p_lineEditValueList.clear();
           for(int j = 0; j < bandBin[i].Size(); j++) {
-            p_lineEditValueList.push_back(QString(bandBin[i][j].c_str()));
+            p_lineEditValueList.push_back(QString(bandBin[i][j]));
           }
         }
       }
@@ -281,8 +281,8 @@ namespace Isis {
       for(int i = 0; i < bandBin.Keywords(); i++) {
         //only add band bin keywords have a size that equals the number of bands
         if(bandBin[i].Size() == p_bands) {
-          std::string bandBinName = bandBin[i].Name();
-          p_comboBox->addItem(QString(bandBinName.c_str()));
+          QString bandBinName = bandBin[i].Name();
+          p_comboBox->addItem(QString(bandBinName));
         }
 
       }

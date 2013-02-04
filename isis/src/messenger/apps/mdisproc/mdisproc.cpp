@@ -26,7 +26,7 @@ void IsisMain() {
   //---------------------------------------------------------------------------
   // Set up the ingestion run if requested
   if(ui.GetBoolean("INGESTION")) {
-    string app = "mdis2isis";
+    QString app = "mdis2isis";
     p.AddToPipeline(app);
     p.Application(app).SetInputParameter("FROM", false);
     p.Application(app).SetOutputParameter("TO", "raw");
@@ -35,7 +35,7 @@ void IsisMain() {
   //---------------------------------------------------------------------------
   // Set up the calibration run if requested
   if(ui.GetBoolean("CALIBRATION")) {
-    string app = "mdiscal";
+    QString app = "mdiscal";
     p.AddToPipeline(app);
     p.Application(app).SetInputParameter("FROM", true);
     p.Application(app).SetOutputParameter("TO", "lev1");
@@ -58,7 +58,7 @@ void IsisMain() {
   //---------------------------------------------------------------------------
   // Set up the calibrated run when asked
   if(ui.GetBoolean("CDR")) {
-    string app = "mdis2pds";
+    QString app = "mdis2pds";
     p.AddToPipeline(app);
     p.Application(app).SetInputParameter("FROM", true);
     p.Application(app).SetOutputParameter("TO", "cdr", "IMG");

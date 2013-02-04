@@ -31,20 +31,19 @@ namespace Isis {
    *
    * @param k Value of the keyword
    */
-  PvlToken::PvlToken(const std::string &k) {
+  PvlToken::PvlToken(const QString &k) {
     SetKey(k);
     ValueClear();
   }
 
   //! Constructs a Token with NULL for both the keyword and value list.
   PvlToken::PvlToken() {
-    key.erase();
     ValueClear();
   }
 
   //! Destroys the Token object
   PvlToken::~PvlToken() {
-    key.erase();
+    key.clear();
     ValueClear();
   }
 
@@ -53,31 +52,27 @@ namespace Isis {
    *
    * @param k IString to load into the token keyword
    */
-  void PvlToken::SetKey(const std::string &k) {
+  void PvlToken::SetKey(const QString &k) {
     key = k;
   };
 
   /**
    * Returns the token keyword
    *
-   * @return string
+   * @return QString
    */
-  string PvlToken::GetKey() const {
+  QString PvlToken::GetKey() const {
     return key;
   };
 
   /**
    * Returns the token keyword in all uppercase characters
    *
-   * @return string
+   * @return QString
    */
-  string PvlToken::GetKeyUpper() const {
-    string upperkey = key;
-    for(int i = 0; i < (int)upperkey.size(); i++) {
-      upperkey[i] = toupper(upperkey[i]);
-    }
-    return upperkey;
-  };
+  QString PvlToken::GetKeyUpper() const {
+    return key.toUpper();
+  }
 
   //! Removes all elements from the value-vector
   void PvlToken::ValueClear() {
@@ -99,7 +94,7 @@ namespace Isis {
    *
    * @param v IString add to the value-vector list
    */
-  void PvlToken::AddValue(const std::string &v) {
+  void PvlToken::AddValue(const QString &v) {
     value.push_back(v);
   }
 
@@ -108,13 +103,13 @@ namespace Isis {
    *
    * @param index Zero-based index of vector element to return. Defaults to 0
    *
-   * @return string
+   * @return QString
    *
    * @throws Isis::IException::Programmer
    */
-  string PvlToken::GetValue(const int index) const {
+  QString PvlToken::GetValue(const int index) const {
     if((index < 0) || (index >= (int) value.size())) {
-      string message = Isis::Message::ArraySubscriptNotInRange(index);
+      QString message = Isis::Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
     return value[index];
@@ -125,19 +120,16 @@ namespace Isis {
    *
    * @param index Zero-based index of vector element to return. Defaults to 0
    *
-   * @return string
+   * @return QString
    *
    * @throws Isis::IException::Programmer
    */
-  string PvlToken::GetValueUpper(const int index) const {
+  QString PvlToken::GetValueUpper(int index) const {
     if((index < 0) || (index >= (int) value.size())) {
-      string message = Isis::Message::ArraySubscriptNotInRange(index);
+      QString message = Isis::Message::ArraySubscriptNotInRange(index);
       throw IException(IException::Programmer, message, _FILEINFO_);
     }
-    string upper = value[index];
-    for(int i = 0; i < (int)upper.size(); i++) {
-      upper[i] = toupper(upper[i]);
-    }
-    return upper;
+
+    return value[index].toUpper();
   }
 } // end namespace isis

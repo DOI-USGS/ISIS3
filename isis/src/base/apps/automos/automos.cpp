@@ -14,8 +14,8 @@ using namespace Isis;
 void calcRange(double &minLat, double &maxLat, double &minLon, double &maxLon);
 void helperButtonCalcRange();
 
-map <string, void *> GuiHelpers() {
-  map <string, void *> helper;
+map <QString, void *> GuiHelpers() {
+  map <QString, void *> helper;
   helper ["helperButtonCalcRange"] = (void *) helperButtonCalcRange;
   return helper;
 }
@@ -27,16 +27,16 @@ void IsisMain() {
   // Get the list of cubes to mosaic
   list.read(FileName(ui.GetFileName("FROMLIST")));
   if(list.size() < 1) {
-    string msg = "The list file [" + ui.GetFileName("FROMLIST") +"does not contain any data";
+    QString msg = "The list file [" + ui.GetFileName("FROMLIST") +"does not contain any data";
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
   fstream os;
   bool olistFlag = false;
   if (ui.WasEntered("TOLIST")){
-    string olist = ui.GetFileName("TOLIST");
+    QString olist = ui.GetFileName("TOLIST");
     olistFlag = true;
-    os.open(olist.c_str(), std::ios::out);
+    os.open(olist.toAscii().data(), std::ios::out);
   }
 
   ProcessMapMosaic m;
@@ -144,8 +144,8 @@ void calcRange(double &minLat, double &maxLat, double &minLon, double &maxLon) {
       firstProj = proj;
     }
     else if(*proj != *firstProj) {
-      string msg = "Mapping groups do not match between cubes [" + list[0].toString() +
-                   "] and [" + list[i].toString() + "]";
+      QString msg = "Mapping groups do not match between cubes [" + list[0].toString() +
+                    "] and [" + list[i].toString() + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -175,7 +175,7 @@ void helperButtonCalcRange() {
   calcRange(minLat, maxLat, minLon, maxLon);
 
   // Write ranges to the GUI
-  string use = "USER";
+  QString use = "USER";
   ui.Clear("GRANGE");
   ui.PutAsString("GRANGE", use);
   ui.Clear("MINLAT");

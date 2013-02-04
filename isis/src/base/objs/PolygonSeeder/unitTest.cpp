@@ -17,10 +17,10 @@ int main() {
   try {
     PvlGroup alg("PolygonSeederAlgorithm");
     alg += PvlKeyword("Name", "Grid");
-    alg += PvlKeyword("MinimumThickness", 0.5);
-    alg += PvlKeyword("MinimumArea", 10);
-    alg += PvlKeyword("XSpacing", 11);
-    alg += PvlKeyword("YSpacing", 11);
+    alg += PvlKeyword("MinimumThickness", "0.5");
+    alg += PvlKeyword("MinimumArea", "10");
+    alg += PvlKeyword("XSpacing", "11");
+    alg += PvlKeyword("YSpacing", "11");
 
     PvlObject o("AutoSeed");
     o.AddGroup(alg);

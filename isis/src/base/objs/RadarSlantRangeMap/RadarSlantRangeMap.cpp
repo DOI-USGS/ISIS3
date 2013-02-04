@@ -201,14 +201,14 @@ namespace Isis {
     seq = keyword;
     for(int i = 0; i < seq.Size(); i++) {
       // TODO:  Test array size to be 4 if not throw error
-      std::vector<IString> array = seq[i];
+      std::vector<QString> array = seq[i];
       double et;
-      utc2et_c(array[0].c_str(), &et);
+      utc2et_c(array[0].toAscii().data(), &et);
       p_time.push_back(et);
-      p_a0.push_back(array[1].ToDouble());
-      p_a1.push_back(array[2].ToDouble());
-      p_a2.push_back(array[3].ToDouble());
-      p_a3.push_back(array[4].ToDouble());
+      p_a0.push_back(toDouble(array[1]));
+      p_a1.push_back(toDouble(array[2]));
+      p_a2.push_back(toDouble(array[3]));
+      p_a3.push_back(toDouble(array[4]));
       // TODO:  Test that times are ordered if not throw error
       // Make the mrf2isis program sort them if necessary
     }

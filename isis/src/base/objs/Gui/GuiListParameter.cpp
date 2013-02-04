@@ -29,7 +29,7 @@ namespace Isis {
     // Create a button for each list item and add each to a button group and
     // to the layout
     for(int item = 0; item < ui.ParamListSize(group, param); item++) {
-      IString btext = ui.ParamListBrief(group, param, item);
+      QString btext = ui.ParamListBrief(group, param, item);
       btext += " (";
       btext += ui.ParamListValue(group, param, item);
       btext += ")";
@@ -42,7 +42,7 @@ namespace Isis {
         lo->addLayout(hlo);
 
         // Create radio button & add to horizontal layout
-        QRadioButton *rb = new QRadioButton((IString)btext);
+        QRadioButton *rb = new QRadioButton(btext);
         hlo->addWidget(rb);
         p_buttonGroup->addButton(rb);
 
@@ -54,7 +54,7 @@ namespace Isis {
         RememberWidget(helper);
       }
       else {
-        QRadioButton *rb = new QRadioButton((IString)btext);
+        QRadioButton *rb = new QRadioButton(btext);
         lo->addWidget(rb);
         p_buttonGroup->addButton(rb);
         RememberWidget(rb);
@@ -72,14 +72,12 @@ namespace Isis {
   }
 
 
-  void GuiListParameter::Set(IString newValue) {
-    IString value = newValue;
-    value.UpCase();
+  void GuiListParameter::Set(QString newValue) {
+    QString value = newValue.toUpper();
 
     int foundAtButton = -1;
     for(int i = 0; i < p_ui->ParamListSize(p_group, p_param); i++) {
-      IString option = p_ui->ParamListValue(p_group, p_param, i);
-      option.UpCase();
+      QString option = p_ui->ParamListValue(p_group, p_param, i).toUpper();
       //if(option.compare(0, value.size(), value) == 0) foundAtButton = i;
       if(option == value) foundAtButton = i;
     }
@@ -92,23 +90,23 @@ namespace Isis {
   }
 
 
-  IString GuiListParameter::Value() {
+  QString GuiListParameter::Value() {
     if(p_buttonGroup->checkedButton() == 0) {
       return "";
     }
 
-    return (IString)p_ui->ParamListValue(p_group, p_param,
-                                         p_buttonGroup->buttons().indexOf(p_buttonGroup->checkedButton()));
+    return p_ui->ParamListValue(p_group, p_param,
+                                p_buttonGroup->buttons().indexOf(p_buttonGroup->checkedButton()));
   }
 
-  std::vector<std::string> GuiListParameter::Exclusions() {
-    std::vector<std::string> list;
+  std::vector<QString> GuiListParameter::Exclusions() {
+    std::vector<QString> list;
 
     if(p_buttonGroup->checkedButton() == 0) return list;
     int index = p_buttonGroup->buttons().indexOf(p_buttonGroup->checkedButton());
 
     for(int i = 0; i < p_ui->ParamListExcludeSize(p_group, p_param, index); i++) {
-      std::string s = p_ui->ParamListExclude(p_group, p_param, index, i);
+      QString s = p_ui->ParamListExclude(p_group, p_param, index, i);
       list.push_back(s);
     }
 

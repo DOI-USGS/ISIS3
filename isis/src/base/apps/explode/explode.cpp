@@ -15,17 +15,17 @@ void IsisMain() {
   int samps = icube->getSampleCount();
   int lines = icube->getLineCount();
   int bands = icube->getBandCount();
-  string infile = icube->getFileName();
+  QString infile = icube->getFileName();
 
   // We the output filename so we can add attributes and extensions
   UserInterface &ui = Application::GetUserInterface();
-  string outbase = ui.GetFileName("TO");
+  QString outbase = ui.GetFileName("TO");
   CubeAttributeOutput &outatt = ui.GetOutputAttribute("TO");
 
   // Loop and extract each band
   for(int band = 1; band <= bands; band++) {
     int pband = icube->getPhysicalBand(band);
-    IString sband(pband);
+    QString sband(toString(pband));
 
     ProcessByLine p2;
     Progress *prog = p2.Progress();
@@ -34,7 +34,7 @@ void IsisMain() {
     CubeAttributeInput inatt("+" + sband);
     p2.SetInputCube(infile, inatt);
 
-    string outfile = outbase + ".band";
+    QString outfile = outbase + ".band";
     if(pband / 1000 == 0) {
       outfile += "0";
       if(pband / 100 == 0) {

@@ -246,11 +246,11 @@ namespace Isis {
 
       void LoadCache(Table &table);
 
-      Table LineCache(const std::string &tableName);
+      Table LineCache(const QString &tableName);
 
       void ReloadCache();
 
-      Table Cache(const std::string &tableName);
+      Table Cache(const QString &tableName);
       void CacheLabel(Table &table);
 
       void LoadTimeCache();
