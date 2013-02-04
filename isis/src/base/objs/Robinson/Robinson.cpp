@@ -364,7 +364,7 @@ namespace Isis {
    * @return PvlGroup The keywords that this projection uses
    */
   PvlGroup Robinson::Mapping()  {
-    PvlGroup mapping = Projection::Mapping();
+    PvlGroup mapping = TProjection::Mapping();
 
     mapping += m_mappingGrp["CenterLongitude"];
 
