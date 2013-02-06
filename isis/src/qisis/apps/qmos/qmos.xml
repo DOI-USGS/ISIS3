@@ -18,8 +18,8 @@
     jigsaw has moved control points.
 
     <p/>qmos only supports files which have latitude and longitude information
-    associated with them. Global projections are also not supported. If your 
-    files meet these requirements, it is beneficial to run a couple of Isis 
+    associated with them. Global projections are also not supported. If your
+    files meet these requirements, it is beneficial to run a couple of Isis
     programs on your files before loading them into qmos. The programs you
     should run are:
     <ul>
@@ -84,6 +84,10 @@
       Added some color coding options for the jigsaw movement arrows in the control network
       tool. You can now color code this arrows on the number of measures in a point or on the
       maximum residual magnitude of the measures in the point. Fixes #479.
+    </change>
+    <change name="Steven Lambright" date="2013-02-01">
+      Fixed a bug that caused qmos to sometimes freeze, in the grid tool, when the maximum longitude
+      was set to a negative value. Fixes #1060.
     </change>
   </history>
 </application>

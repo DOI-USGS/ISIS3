@@ -39,19 +39,19 @@ namespace Isis {
 
     if (getWidget())
       m_previousBoundingRect = getWidget()->cubesBoundingRect();
-    
+
     m_shouldCheckBoxes = true;
-    
+
     m_baseLat = Latitude(0, Angle::Degrees);
     m_baseLon = Longitude(0, Angle::Degrees);
-    
+
     m_latInc = Angle(45, Angle::Degrees);
     m_lonInc = Angle(45, Angle::Degrees);
-    
+
     m_latExtents = Cubes;
     m_minLat = Latitude(-50.0, Angle::Degrees);
     m_maxLat = Latitude(50.0, Angle::Degrees);
-    
+
     m_lonExtents = Cubes;
     m_minLon = Longitude(0.0, Angle::Degrees);
     m_maxLon = Longitude(360.0, Angle::Degrees);
@@ -67,8 +67,8 @@ namespace Isis {
    */
   void MosaicGridTool::addToMenu(QMenu *menu) {
   }
-  
-  
+
+
   /**
    * True if checked
    *
@@ -81,38 +81,38 @@ namespace Isis {
 
   /**
    * The base latitude.
-   * 
+   *
    * @return The base latitude
    */
   Latitude MosaicGridTool::baseLat() {
     return m_baseLat;
   }
 
-  
+
   /**
    * The base longitude.
-   * 
+   *
    * @return The base longitude
    */
   Longitude MosaicGridTool::baseLon() {
     return m_baseLon;
   }
 
-  
+
   /**
    * The density or resolution of the grid. The number of straight lines
    *   used to draw the grid.
-   * 
+   *
    * @return The density
    */
   int MosaicGridTool::density() {
     return m_density;
   }
-  
+
 
   /**
    * The angle of the latitude increment.
-   * 
+   *
    * @return The latitude increment angle.
    */
   Angle MosaicGridTool::latInc() {
@@ -141,7 +141,7 @@ namespace Isis {
       result = getWidget()->getProjection()->LatitudeTypeString();
     return result;
   }
-  
+
 
   /**
    * The longitude domain of the projection of the scene.
@@ -165,17 +165,17 @@ namespace Isis {
     return m_lonExtents;
   }
 
-  
+
   /**
    * The angle of the longitude increment.
-   * 
+   *
    * @return The longitude increment angle.
    */
   Angle MosaicGridTool::lonInc() {
     return m_lonInc;
   }
 
-  
+
   /**
    * The maximum latitude used to determine the grid's extents and increments
    *
@@ -185,7 +185,7 @@ namespace Isis {
     return m_maxLat;
   }
 
-  
+
   /**
    * The maximum longitude used to determine the grid's extents and increments
    *
@@ -194,11 +194,11 @@ namespace Isis {
   Longitude MosaicGridTool::maxLon() {
     return m_maxLon;
   }
-  
+
 
   /**
    * The minimum latitude used to determine the grid's extents and increments
-   * 
+   *
    * @return The minimum latitude of the grid range.
    */
   Latitude MosaicGridTool::minLat() {
@@ -235,7 +235,7 @@ namespace Isis {
     return m_drawGridCheckBox->isChecked();
   }
 
-  
+
   /**
    * Modify the check state of the checkbox.
    *
@@ -245,7 +245,7 @@ namespace Isis {
     m_autoGridCheckBox->setChecked(checked);
   }
 
-  
+
   /**
    * Modify the base latitude.
    *
@@ -265,7 +265,7 @@ namespace Isis {
     m_baseLon = baseLon;
   }
 
-  
+
   /**
    * Modify the density.
    *
@@ -275,7 +275,7 @@ namespace Isis {
     m_density = density;
   }
 
-  
+
   /**
    * Set the maximum and minimum latitude of the grid.
    *
@@ -378,17 +378,19 @@ namespace Isis {
     }
   }
 
-  
+
   /**
    * Modify the latitude increment.
    *
    * @param latInc the new increment angle.
    */
   void MosaicGridTool::setLatInc(Angle latInc) {
-    m_latInc = latInc;
+    if (latInc > Angle(0.0, Angle::Degrees)) {
+      m_latInc = latInc;
+    }
   }
 
-  
+
   /**
    * Set the maximum and minimum longitude of the grid.
    *
@@ -489,7 +491,7 @@ namespace Isis {
       }
     }
   }
-  
+
 
   /**
    * Modify the longitude increment.
@@ -497,9 +499,11 @@ namespace Isis {
    * @param lonInc the new lonitude increment.
    */
   void MosaicGridTool::setLonInc(Angle lonInc) {
-    if (lonInc > Angle(m_maxLon.degrees(), Angle::Degrees))
-      m_lonInc = Angle(m_maxLon.degrees(), Angle::Degrees);
-    else
+    Angle lonRange = m_maxLon - m_minLon;
+
+    if (lonInc > lonRange)
+      m_lonInc = lonRange;
+    else if (lonInc > Angle(0.0, Angle::Degrees))
       m_lonInc = lonInc;
   }
 
@@ -600,7 +604,7 @@ namespace Isis {
     return "MosaicGridTool";
   }
 
-  
+
   /**
    * Store the tool information in a pvl object.
    *
@@ -610,30 +614,30 @@ namespace Isis {
     PvlObject obj(projectPvlObjectName());
 
     obj += PvlKeyword("ShouldCheckBoxes", toString(m_shouldCheckBoxes));
-    
+
     obj += PvlKeyword("BaseLatitude", toString(m_baseLat.degrees()));
     obj += PvlKeyword("BaseLongitude", toString(m_baseLon.degrees()));
-    
+
     obj += PvlKeyword("LatitudeIncrement", toString(m_latInc.degrees()));
     obj += PvlKeyword("LongitudeIncrement", toString(m_lonInc.degrees()));
-    
+
     obj += PvlKeyword("LatitudeExtentType", toString(m_latExtents));
     obj += PvlKeyword("MaximumLatitude", toString(m_maxLat.degrees()));
     obj += PvlKeyword("MinimumLongitude", toString(m_minLon.degrees()));
-  
+
     obj += PvlKeyword("LongitudeExtentType", toString(m_lonExtents));
     obj += PvlKeyword("MinimumLatitude", toString(m_minLat.degrees()));
     obj += PvlKeyword("MaximumLongitude", toString(m_maxLon.degrees()));
-    
+
     obj += PvlKeyword("Density", toString(m_density));
     obj += PvlKeyword("Visible", toString((m_gridItem)));
 
     return obj;
   }
- 
+
 
   /**
-   * Calculates the lat/lon increments from the bounding rectangle of the open cubes. 
+   * Calculates the lat/lon increments from the bounding rectangle of the open cubes.
    *
    * @param draw True if lat/lon increments need to be calculated.
    */
@@ -643,7 +647,7 @@ namespace Isis {
       QRectF boundingRect = getWidget()->cubesBoundingRect();
 
       if (!boundingRect.isNull()) {
-        
+
         setLatExtents(m_latExtents, m_minLat, m_maxLat);
         setLonExtents(m_lonExtents, m_minLon, m_maxLon);
 
@@ -668,10 +672,10 @@ namespace Isis {
          *     Range = 10   --> Inc = 1
          *     Range = 100  --> Inc = 10
          *     Range = 5000 --> Inc = 500
-         * 
+         *
          *   inc = round[(range/10) / 10^floor(log(range) - 1)] * 10^floor(log(range) - 1)
          */
-        
+
         double latOffsetMultiplier = pow(10, qFloor(log10(latRange) - 1));
         double lonOffsetMultiplier = pow(10, qFloor(log10(lonRange) - 1));
 
@@ -719,14 +723,13 @@ namespace Isis {
     configDialog->show();
   }
 
-  
+
   /**
    * Creates the GridGraphicsItem that will draw the grid. If there is no grid item the grid
    *   is cleared and redrawn with a new item.
    *
    */
   void MosaicGridTool::drawGrid() {
-
     if(m_gridItem != NULL) {
       m_drawGridCheckBox->setChecked(false);
       m_autoGridCheckBox->setEnabled(true);
@@ -743,11 +746,11 @@ namespace Isis {
                     "will be calculated) or set the projection explicitly";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-        
+
     if (m_minLon.degrees() < m_maxLon.degrees() && m_minLat.degrees() < m_maxLat.degrees()) {
       m_gridItem = new GridGraphicsItem(m_baseLat, m_baseLon, m_latInc, m_lonInc, getWidget(),
                                         m_density, m_minLat, m_maxLat, m_minLon, m_maxLon);
-    } 
+    }
 
     connect(getWidget(), SIGNAL(projectionChanged(Projection *)),
             this, SLOT(drawGrid()), Qt::UniqueConnection);
@@ -759,7 +762,7 @@ namespace Isis {
       getWidget()->getScene()->addItem(m_gridItem);
   }
 
-  
+
   /**
    * Determines whether the grid should be drawn or not.
    *
@@ -827,7 +830,7 @@ namespace Isis {
     return widget;
   }
 
-  
+
   /**
    * Adds the action to the toolpad.
    *

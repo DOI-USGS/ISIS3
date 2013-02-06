@@ -47,6 +47,8 @@ namespace Isis {
    *                           operators to make sure they do not return true if the
    *                           two operands are the same. Updated the unitTest to exercise
    *                           this change. References #604.
+   *   @history 2013-02-01 Steven Lambright - Added QDebug() printout capabilities.
+   *                           References #1060.
    */
   class Angle {
 
@@ -265,5 +267,7 @@ namespace Isis {
     double m_radians;
   };
 }
+
+QDebug operator<<(QDebug dbg, const Isis::Angle &angleToPrint);
 
 #endif
