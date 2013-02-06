@@ -79,13 +79,29 @@
       <p>
         This program defaults to solving the least-squares system using the 
         SPARSE matrix method. This method is able to find valid solutions, even
-        when no hold list is provided. Two other solution methods are also 
+        when no hold list is provided. 
+
+      <!-- The following is commented out since SVD is not currently
+           implemented:
+
+        Two other solution methods are also 
         available, a QR decomposition (QRD) method or single value decompostion
-        (SVD) method. The QRD method is fairly accurate and fast, but does not
+        (SVD) method. 
+
+      -->
+
+        The QRD method is fairly accurate and fast, but does not
         produce valid results in all cases, especially if no images are held. 
-        Previous versions of equalizer used this method to solve. The SVD method
+        Previous versions of equalizer used this method to solve. 
+
+      <!-- The following is commented out since SVD is not currently
+           implemented:
+
+        The SVD method
         tends to be slower than QRD, but it tends to return more accurate results
         and will sometimes produce valid results when no hold list is provided. 
+
+      -->
       </p>
   </description>
 
@@ -95,7 +111,6 @@
 
 <oldName>
     <item>b4equal</item>
-    <item>equalizer</item>
 </oldName>
 
   <history>
@@ -162,6 +177,14 @@
       from implementation file, now use xml to require OUTSTATS when 
       PROCESS=CALCULATE and require the PERCENT enterend to be in the interval
       (0, 100]. Improve test coverage to 100%. Fixes #962. 
+     </change>
+     <change name="Jeannie Backer" date="2013-02-04">
+      Removed SVD option from the  SOLVEMETHOD parameter since this option is
+      not producing correct results on MAC OS, see mantis ticket #1472.
+      If this bug is fixed and the option is reimplemented, the noHoldCalculateSparse
+      test data can be used to test the SVD method. Also, the documentation about 
+      this method should be uncommented in the general description of the program,
+      in the QRD description. References #962. 
      </change>
   </history>
 
@@ -345,11 +368,22 @@
                     </brief>
                     <description>
                      Solve the least-squares system using QR decomposition. 
+
+                     <!-- The following is commented out since SVD is not currently
+                          implemented:
+
                      This solve method is faster than SVD and good to use when
                      the user can provide a hold list. However, it is likely to 
                      result in invalid values when no hold list is provided.
+                     -->
+                      This method is likely to result in invalid values when no 
+                      hold list is provided
                     </description>
                 </option>
+
+                <!-- The following is commented out since SVD is not currently
+                     implemented:
+
                 <option value="SVD">
                     <brief>
                      The SV Decomposition method is more accurate than QRD when
@@ -364,6 +398,8 @@
                       values.
                     </description>
                 </option>
+                -->
+
                 <option value="SPARSE">
                     <brief>
                      The SPARSE is the most accurate when no hold list is provided.
