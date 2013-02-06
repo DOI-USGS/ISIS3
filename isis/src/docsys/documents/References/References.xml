@@ -5,9 +5,9 @@
       <body>
 
         <p>
-          We appreciate the acknowledgement of the authors and the USGS in publications that result from the use of the
-          Isis software package or in products that include this software in whole or in part.  Samples of the correct way
-          to acknowledge and reference the appropriate parties follows. 
+          We appreciate the acknowledgement of the authors and the USGS in publications and products that 
+          result from the use of the ISIS software package in whole or in part.  Here are examples of the 
+          correct way to acknowledge and reference the appropriate parties.
         </p>
 
         <h2>Acknowledgement</h2>
@@ -15,64 +15,64 @@
           The correct acknowledgement for the ISIS software package is as follows: 
         </p>
         <pre>
-        This research has made use of the USGS Integrated Software for Imagers and Spectometers (ISIS). 
+        This research has made use of the USGS Integrated Software for Imagers and Spectrometers (ISIS). 
         </pre>
 
         <h2>References</h2>
         <p>
-          The following publications (aranged with the most recent first) are available for referencing ISIS:
+          The following publications (arranged with the most recent first) are available for referencing ISIS:
         </p>
         <pre>
-Anderson, J.A., et al., (2013) Analysis of Light Time and Stellar Aberration Corrections in ISIS Using Lunar 
+Anderson, J.A., et al., (2013), Analysis of Light Time and Stellar Aberration Corrections in ISIS Using Lunar 
     Reconnaissance Orbiter Narrow Angle Camera Images, Lunar Planet. Sci. XLIV, Houston, Texas, Abstract #2318.
 
-Anderson, J.A., (2013) Comparing Patch Orthorectification Algorithms in ISIS Based on Camera Type,
+Anderson, J.A., (2013), Comparing Patch Orthorectification Algorithms in ISIS Based on Camera Type,
     Lunar Planet. Sci. XLIV, Houston, Texas, Abstract #2069.
 
-Becker, K.J., et al., (2013) ISIS Support for NASA Mission Instrument Ground Data Processing Systems,
+Becker, K.J., et al., (2013), ISIS Support for NASA Mission Instrument Ground Data Processing Systems,
     Lunar Planet. Sci. XLIV, Houston, Texas, Abstract #2829.
 
-Becker, K.J. and Anderson, J.A., (2013) ISIS Support for the MRO/CRISM Instrument,
+Becker, K.J. and Anderson, J.A., (2013), ISIS Support for the MRO/CRISM Instrument,
     Lunar Planet. Sci. XLIV, Houston, Texas, Abstract #2366.
 
-Keszthelyi, L., et al., (2013) Support and Future Vision for the Integrated Software for Imagers and 
+Keszthelyi, L., et al., (2013), Support and Future Vision for the Integrated Software for Imagers and 
     Spectrometers (ISIS), Lunar Planet. Sci. XLIV, Houston, Texas, Abstract #2546.
 
-Sides, S.C., et al., (2013) Mobile, Instructor-Led Workshops with the Integrated Software for Imagers and 
+Sides, S.C., et al., (2013), Mobile, Instructor-Led Workshops with the Integrated Software for Imagers and 
     Spectrometers (ISIS), Lunar Planet. Sci. XLIV, Houston, Texas, Abstract #1746.
 
-Edmundson, K.L., et. al., (2012) Jigsaw: The ISIS3 Bundle Adjustment for Extraterrestrial Photogrammetry,
-    International Annals of Photogrammetry, Remote Sensing, and Spatial Information Sciences, I-4, 203-208.   
+Edmundson, K.L., et al., (2012), Jigsaw: The ISIS3 Bundle Adjustment for Extraterrestrial Photogrammetry,
+    International Annals of Photogrammetry, Remote Sensing, and Spatial Information Sciences, Vol. I-4, pp. 203-208.   
 
-Anderson, J.A., et al., (2011) Isis Cartographic Tools for the Dawn Framing Camera and Visual and Infrared Spectrometer,
+Anderson, J.A., et al., (2011), Isis Cartographic Tools for the Dawn Framing Camera and Visual and Infrared Spectrometer,
     American Geophysical Union, Fall Meeting, Abstract #U31A-0009.
 
-Anderson, J.A., et al., (2008) ISIS Camera Model Design,
+Anderson, J.A., et al., (2008), ISIS Camera Model Design,
     Lunar Planet. Sci. XXXIX, Houston, Texas, Abstract #2159.
 
-Anderson, J.A., et al., (2004) Modernization of the Integrated Software for Imagers and Spectrometers,
+Anderson, J.A., et al., (2004), Modernization of the Integrated Software for Imagers and Spectrometers,
     Lunar Planet. Sci. XXXV, Houston, Texas, Abstract #2039.
 
-Anderson, J.A., et al., (2002) Rapid Geometric Software Development for Scientific Analysis and Cartographic 
+Anderson, J.A., et al., (2002), Rapid Geometric Software Development for Scientific Analysis and Cartographic 
     Processing of Planetary Images, Lunar Planet. Sci. XXXIII, Houston, Texas, Abstract #1853.
 
-Eliason, E.M., et al., (2001) ISIS Image Processing Capabilities for MGS/MOC Imaging Data,
+Eliason, E.M., et al., (2001), ISIS Image Processing Capabilities for MGS/MOC Imaging Data,
     Lunar Planet. Sci. XXXII, Houston, Texas, Abstract #2081.
 
-Eliason, E.M., (1997) Production of Digital Image Models Using the ISIS System,
+Eliason, E.M., (1997), Production of Digital Image Models Using the ISIS System,
     Lunar Planet. Sci. XXVIII, Houston, Texas, Abstract #1198.
 
-Gaddis, L.R., et al., (1997) An Overview of the Integrated Software for Imaging Spectrometers, 
+Gaddis, L.R., et al., (1997), An Overview of the Integrated Software for Imaging Spectrometers, 
     Lunar Planet. Sci. XXVIII, Houston, Texas, Abstract #1226.
 
-Torson, J.M., and Becker, K.J., (1997) ISIS - A Software Architecture for Processing Planetary Images, 
+Torson, J.M., and Becker, K.J., (1997), ISIS - A Software Architecture for Processing Planetary Images, 
     Lunar Planet. Sci. XXVIII, Houston, Texas, Abstract #1219. 
 
-Gaddis, L., et al., (1996) Use of ISIS for Processing and Analysis of Planetary Remote Sensing Data,
+Gaddis, L., et al., (1996), Use of ISIS for Processing and Analysis of Planetary Remote Sensing Data,
     Geol. Soc. Am. Abstr. Programs, 287, A-386.
 
 Edwards, E., (1987), Geometric Processing of Digital Images of the Planets,
-    Photogrammetric Engineering and Remote Sensing, Vol. 53, No. 9.
+    Photogrammetric Engineering and Remote Sensing, Vol. 53, No. 9, pp. 1219-1222.
 
         </pre>
 
