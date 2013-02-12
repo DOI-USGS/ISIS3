@@ -291,7 +291,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
 
 <pre>
         <b>
-        <u>Example for Fedora 16 Linux x86 64-bit Intel compatible systems:</u>
+        <u>Example for Fedora 18 Linux x86 64-bit Intel compatible systems:</u>
         </b>
         rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::x86-64_linux_FEDORA/isis .
 </pre>
@@ -621,6 +621,7 @@ you must <em>not</em> upgrade the Isis Data Files!!!
     <change name="Steven Lambright" date="2012-08-14">Replaced Open Suse with SLES</change>
     <change name="Jeff Anderson" date="2012-08-24">Reorganized document format</change>
     <change name="Steven Lambright and Mathew Eis" date="2013-01-09">Updated Mac OSX support to reflect new versions: 10.7 and 10.8</change>
+    <change name="Steven Lambright" date="2013-02-12">Updated Fedora support to reflect version upgrade: 16 to 18</change>
   </history>
 
   <bibliography>

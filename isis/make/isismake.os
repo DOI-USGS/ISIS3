@@ -51,7 +51,7 @@ ifeq ($(testFile), /etc/SuSE-release)
 else
   testFile = $(wildcard /etc/redhat-release)
   ifeq ($(testFile), /etc/redhat-release)
-    HOST_OS = $(shell cut -d ' ' -f 1,2,7 /etc/redhat-release | sed 's/ //g' | sed 's/\./_/g')
+    HOST_OS = $(shell cut -d ' ' -f 1,2,3,7 /etc/redhat-release | sed 's/release//' | sed 's/ //g' | sed 's/\./_/g')
   else
     testFile = $(wildcard /usr/bin/sw_vers)
     ifeq ($(testFile), /usr/bin/sw_vers)
