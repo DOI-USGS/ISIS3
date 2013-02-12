@@ -13,10 +13,6 @@
     how images overlap, where control points lie on the images, and how
     jigsaw has moved control points.
 
-    <p/>qmos is designed specifically for visualizing large amounts of images,
-    how images overlap, where control points lie on the images, and how
-    jigsaw has moved control points.
-
     <p/>qmos only supports files which have latitude and longitude information
     associated with them. Global projections are also not supported. If your
     files meet these requirements, it is beneficial to run a couple of Isis
@@ -88,6 +84,10 @@
     <change name="Steven Lambright" date="2013-02-01">
       Fixed a bug that caused qmos to sometimes freeze, in the grid tool, when the maximum longitude
       was set to a negative value. Fixes #1060.
+    </change>
+    <change name="Steven Lambright" date="2013-02-12">
+      Improved map file capabilities. Please see the help pages inside of qmos (Help -> qmos Help)
+      for descriptions and explanations of the new functionality. Fixes #1034.
     </change>
   </history>
 </application>

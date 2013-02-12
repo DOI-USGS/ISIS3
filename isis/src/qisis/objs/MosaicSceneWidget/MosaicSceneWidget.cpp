@@ -2,6 +2,7 @@
 
 #include <QAction>
 #include <QBuffer>
+#include <QCoreApplication>
 #include <QDataStream>
 #include <QEvent>
 #include <QFileDialog>
@@ -11,18 +12,21 @@
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLabel>
+#include <QMenu>
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QRubberBand>
 #include <QScrollBar>
 #include <QStatusBar>
 #include <QToolBar>
+#include <QToolButton>
 #include <QToolTip>
 
 #include "Camera.h"
 #include "Cube.h"
 #include "CubeDisplayProperties.h"
 #include "Distance.h"
+#include "FileName.h"
 #include "GraphicsView.h"
 #include "Latitude.h"
 #include "Longitude.h"
@@ -38,6 +42,7 @@
 #include "MosaicZoomTool.h"
 #include "ProgressBar.h"
 #include "Projection.h"
+#include "ProjectionConfigDialog.h"
 #include "ProjectionFactory.h"
 #include "PvlObject.h"
 #include "Pvl.h"
@@ -67,7 +72,8 @@ namespace Isis {
     setLayout(sceneLayout);
 
     m_projection = NULL;
-    m_mapAction = NULL;
+    m_mapButton = NULL;
+    m_quickMapAction = NULL;
 
 //     m_projectionFootprint = new QGraphicsPolygonItem();
 //     m_projectionFootprint->hide();
@@ -158,10 +164,10 @@ namespace Isis {
   void MosaicSceneWidget::setProjection(Projection *proj) {
     PvlGroup mapping(proj->Mapping());
 
-    if(m_mapAction) {
+    if (m_mapButton) {
       PvlKeyword projectionKeyword = mapping.FindKeyword("ProjectionName");
       QString projName = projectionKeyword[0];
-      m_mapAction->setText(projName);
+      m_mapButton->setText(tr("View/Edit %1 Projection").arg(projName));
     }
 
     Projection *old = m_projection;
@@ -264,27 +270,35 @@ namespace Isis {
 
 
   void MosaicSceneWidget::addToPermanent(QToolBar *perm) {
-    if(!m_mapAction) {
-      m_mapAction = new QAction(this);
-      m_mapAction->setToolTip("Select Map File");
-      m_mapAction->setText("Select Map File");
-      m_mapAction->setWhatsThis("This is the projection used by the mosaic "
-          "scene. Cubes can not be shown in the scene without a projection, so "
-          "if one is not selected, a default of Equirectangular will be used. "
-          "The selected file should be a map file, examples are available in "
-          "$base/templates/maps.");
+    m_mapButton = new QToolButton(this);
+    m_mapButton->setText(tr("View/Edit/Load Map File"));
+    m_mapButton->setToolTip(tr("View/Edit/Load Map File"));
+    m_mapButton->setIcon(QIcon(FileName("$base/icons/ographic.png").expanded()));
+    m_mapButton->setWhatsThis(tr("This is the projection used by the mosaic "
+        "scene. Cubes can not be shown in the scene without a projection, so "
+        "if one is not selected, a default of Equirectangular will be used. "
+        "The selected file should be a map file, examples are available in "
+        "$base/templates/maps."));
+    m_mapButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    connect(m_mapButton, SIGNAL(clicked()), this, SLOT(configProjectionParameters()));
 
-      if(m_projection) {
-        PvlKeyword projectionKeyword =
-            m_projection->Mapping().FindKeyword("ProjectionName");
-        QString projName = projectionKeyword[0];
-        m_mapAction->setText(projName);
-      }
+    if(m_projection) {
+      PvlKeyword projectionKeyword =
+          m_projection->Mapping().FindKeyword("ProjectionName");
+      QString projName = projectionKeyword[0];
+      m_mapButton->setText(projName);
     }
 
-    perm->addAction(m_mapAction);
+    m_quickMapAction = new QAction(tr("Quick Load Map"), this);
+    m_quickMapAction->setToolTip(tr("Quick Load Map"));
+    m_quickMapAction->setIcon(QIcon(FileName("$base/icons/quickopen.png").expanded()));
+    m_quickMapAction->setWhatsThis(tr("This is the projection used by the mosaic "
+        "scene. Cubes can not be shown in the scene without a projection, so "
+        "if one is not selected, a default of Equirectangular will be used."));
+    connect(m_quickMapAction, SIGNAL(triggered()), this, SLOT(quickConfigProjectionParameters()));
 
-    connect(m_mapAction, SIGNAL(triggered()), this, SLOT(askNewProjection()));
+    perm->addWidget(m_mapButton);
+    perm->addAction(m_quickMapAction);
   }
 
 
@@ -776,7 +790,7 @@ namespace Isis {
     QVBoxLayout *mapHelpLayout = new QVBoxLayout;
     mapHelpWidget->setLayout(mapHelpLayout);
 
-    QLabel *title = new QLabel("<h2>Map File</h2>");
+    QLabel *title = new QLabel(tr("<h2>Map File</h2>"));
     mapHelpLayout->addWidget(title);
 
     if (mapContainer) {
@@ -788,30 +802,136 @@ namespace Isis {
       mapHelpLayout->addWidget(previewWrapper);
     }
 
-    QLabel *overview = new QLabel("The mosaic scene's projection is defined by "
-        "the map file/template. The default map file defines the "
-        "equirectangular projection, planetocentric latitude, positive "
-        "longitude east, latitude range=90S-90N, longitude range=0-360E. The "
-        "radius will default to the IAU standards (ellipsoid or sphere) for "
-        "the specific target body.<br><br>Please refer to Isis applications "
-        "such as 'maptemplate' or 'mosrange' for more details on creating a "
-        "custom map template file that can define the desired projection, "
-        "latitude system, longitude direction and domain. qmos will use the "
-        "latitude range and longitude range if they exist in the loaded map "
-        "file. A choice of map templates that can be used as a starting point "
-        "for supported map projections can be found in $base/templates/maps "
-        "(refer to maptemplate or mosrange for more details and information on "
-        "the required parameters for a projection).<br><br>"
-        "The footprints and image data that are displayed in the mosaic scene "
-        "are defined by the loaded \"Map template\" File.  Regardless of "
-        "whether the opened cubes are Level1 (raw camera space) or Level2 "
-        "(map projected), their associated footprint polygons will be "
-        "displayed in qmos as defined by the loaded Map File (i.e. Level2 cube "
-        "footprints are re-mapped). Refer to the Map File documenation for "
-        "more information on how to redefine the map projection that will be "
-        "used to display in the 'mosaic scene.'");
-    overview->setWordWrap(true);
-    mapHelpLayout->addWidget(overview);
+    QLabel *overviewMapIcon = new QLabel;
+
+    overviewMapIcon->setPixmap(
+        QIcon(FileName("$base/icons/ographic.png").expanded()).pixmap(32, 32));
+    mapHelpLayout->addWidget(overviewMapIcon);
+
+    QLabel *defaultMapFile = new QLabel(tr(
+        "<h3>Default Map File</h3>"
+        "The mosaic scene's projection is defined by a \"Map File\" that consists of keywords "
+        "that describe the map layout to be used. If a cube or a list of cubes are "
+        "loaded before a map file is selected, the default map file defines the "
+        "equirectangular projection, planetocentric latitude, positive longitude east, 360 "
+        "longitude domain, latitude range=90S-90N, longitude range=0-360E. The radius will "
+        "default to the IAU standards (ellipsoid or sphere) for the specific planetary body "
+        "defined for the \"TargetName\" in the labels of the image cube(s)."));
+
+    defaultMapFile->setWordWrap(true);
+    mapHelpLayout->addWidget(defaultMapFile);
+
+    QLabel *userDefinedMapFileOverview = new QLabel(tr(
+        "<h3>User Defined Map File</h3>"
+        "You can load an existing \"Map File\" before loading images into %1 by selecting the "
+        "\"View/Edit/Load Map File\" option. You will be greeted with a dialog box that will "
+        "enable you to select an existing map file by clicking on \"Load Map File.\" Once "
+        "the map file is selected, the contents is displayed in the dialog box where "
+        "modifications can be made as well. If the modified map file is to be used later, "
+        "save the map file by clicking on \"Save Map File\" button.")
+        .arg(QCoreApplication::applicationName()));
+
+    userDefinedMapFileOverview->setWordWrap(true);
+    mapHelpLayout->addWidget(userDefinedMapFileOverview);
+
+    QLabel *userDefinedMapFileQuickLoad = new QLabel(tr(
+        "The \"Quick Load Map\" option (lightning icon) allows you to efficiently select a "
+        "prepared \"Map File\" without an immediate need to view or edit the contents."));
+
+    userDefinedMapFileQuickLoad->setWordWrap(true);
+    mapHelpLayout->addWidget(userDefinedMapFileQuickLoad);
+
+    QLabel *userDefinedMapFileAnyTime = new QLabel(tr(
+        "At any point, you have access to the \"View/Edit\" functionality to modify or load a "
+        "different map file."));
+
+    userDefinedMapFileAnyTime->setWordWrap(true);
+    mapHelpLayout->addWidget(userDefinedMapFileAnyTime);
+
+    QString mapProjWorkshopUrl("http://isis.astrogeology.usgs.gov/IsisWorkshop/"
+        "index.php/Learning_About_Map_Projections");
+    QLabel *preparingMapFile = new QLabel(tr(
+        "<h3>Preparing a Map File</h3>"
+        "Please refer to Isis applications such as 'maptemplate' or 'mosrange' for more details "
+        "on creating a custom map file that defines the desired projection, latitude "
+        "system, and longitude direction and domain. This program will use the latitude range "
+        "and longitude range if they exist in the loaded file. A choice of map templates that can be used as "
+        "a starting point for supported map projections can be found in $base/templates/maps (refer "
+        "to maptemplate or mosrange for more details and information on the required parameters "
+        "for a projection). Note that through the file name selection box, $base will need "
+        "to be replaced with the specific Isis3 system path. The website: "
+        "<a href='%1'>%1</a> also provides useful information about map projections.")
+        .arg(mapProjWorkshopUrl));
+
+    preparingMapFile->setOpenExternalLinks(true);
+    preparingMapFile->setWordWrap(true);
+    mapHelpLayout->addWidget(preparingMapFile);
+
+    QLabel *mapFileDisplayResults = new QLabel(tr(
+        "<h3>Display Results with the Map File</h3>"
+        "The footprints and image data that are displayed in the mosaic scene are defined by the "
+        "loaded \"Map File\" regardless of whether the opened cubes are Level1 (raw "
+        "camera space) or Level2 (map projected). The associated footprint polygons for "
+        "Level2 cubes will be re-mapped as needed based on the loaded map file."));
+
+    mapFileDisplayResults->setWordWrap(true);
+    mapHelpLayout->addWidget(mapFileDisplayResults);
+
+    QLabel *editingMapFileOverview = new QLabel(tr(
+        "<h3>Editing a Map File</h3>"
+        "Editing a map file is possible through the dialog box displayed by %1. The edits are "
+        "applied to the current session and will be included with a 'Saved Project' (refer to "
+        "the help under File-Save Project or Save Project as)."));
+
+    editingMapFileOverview->setWordWrap(true);
+    mapHelpLayout->addWidget(editingMapFileOverview);
+
+    QLabel *saveMapFileToDiskBullet = new QLabel(tr(
+        "<ul>"
+          "<li>"
+            "To save or write the changes to a map file on disk, choose 'Save Map File' button. "
+            "Map files can be saved to an existing map file (overwrites) or to a new file. This "
+            "program always saves <strong>exactly</strong> what you see, the text, in the dialog "
+            "box."
+          "</li>"
+        "</ul>"));
+
+    saveMapFileToDiskBullet->setWordWrap(true);
+    mapHelpLayout->addWidget(saveMapFileToDiskBullet);
+
+    QLabel *mapFileValidityBullet = new QLabel(tr(
+        "<ul>"
+          "<li>"
+            "As you modify the contents of a loaded map file in the dialog box, the entry is "
+            "verified as you type with a bold black indicator message displaying whether the "
+            "text is valid or is not valid. If you want to see the actual error messages, "
+            "select the 'Show Errors' box and the errors will be displayed in red font "
+            "along with the black bolded message. The errors will update "
+            "as you type."
+          "</li>"
+        "</ul>"));
+
+    mapFileValidityBullet->setWordWrap(true);
+    mapHelpLayout->addWidget(mapFileValidityBullet);
+
+    QLabel *mapFileCommentsBullet = new QLabel(tr(
+        "<ul>"
+          "<li>"
+            "Map files may contain 'commented-out' lines (text that starts with \"#\" at "
+            "the beginning of the line). These are referred to as \"unnecessary\""
+            "or \"unknown\" keywords, they are simply ignored. If these lines are to be saved to "
+            "the output map file on disk, click 'Save Map File' BEFORE clicking 'Ok' or 'Apply.' "
+            "The comments are removed from the dialog box when you hit 'Ok' or 'Apply,' if they "
+            "are just above \"End_Group\" or follow \"End_Group\" or \"End\".<br/><br/>"
+
+            "If you want these comments retained, make sure they are immediately above a valid "
+            "keyword inside of \"Group = Mapping.\" Note that any lines (commented or not) will "
+            "not be saved if they are placed outside of \"Group = Mapping\" and \"End_Group\"."
+          "</li>"
+        "</ul>"));
+
+    mapFileCommentsBullet->setWordWrap(true);
+    mapHelpLayout->addWidget(mapFileCommentsBullet);
 
     mapHelpWidgetScrollArea->setWidget(mapHelpWidget);
 
@@ -1150,46 +1270,20 @@ namespace Isis {
   }
 
 
-  void MosaicSceneWidget::askNewProjection() {
-    QString mapFile = QFileDialog::getOpenFileName(this,
-            "Select Map File",
-            ".",
-            "Map Files (*.map);;All Files (*)");
-    if(mapFile.isEmpty()) return;
+  /**
+   * This happens when the user clicks on the map action (the button that is named after the
+   *   current projection). This method pops up a modal configuration dialog for the map file.
+   */
+  void MosaicSceneWidget::configProjectionParameters() {
+    ProjectionConfigDialog configDialog(this);
+    configDialog.exec();
+  }
 
-    try {
-      Pvl pvl;
-      pvl.Read(mapFile);
 
-      PvlGroup &mapping = pvl.FindGroup("Mapping", Pvl::Traverse);
-
-      if(!mapping.HasKeyword("MinimumLatitude"))
-        mapping += PvlKeyword("MinimumLatitude", toString(-90));
-
-      if(!mapping.HasKeyword("MaximumLatitude"))
-        mapping += PvlKeyword("MaximumLatitude", toString(90));
-
-      if(!mapping.HasKeyword("MinimumLongitude")) {
-        if(mapping["LongitudeDomain"][0] == "360")
-          mapping += PvlKeyword("MinimumLongitude", toString(0));
-        else
-          mapping += PvlKeyword("MinimumLongitude", toString(-180));
-      }
-
-      if(!mapping.HasKeyword("MaximumLongitude")) {
-        if(mapping["LongitudeDomain"][0] == "360")
-          mapping += PvlKeyword("MaximumLongitude", toString(360));
-        else
-          mapping += PvlKeyword("MaximumLongitude", toString(180));
-      }
-
-      setProjection(mapping);
-    }
-    catch(IException &e) {
-      QString msg = e.toString();
-      QMessageBox::information(this, "Error", msg, QMessageBox::Ok);
-      return;
-    }
+  void MosaicSceneWidget::quickConfigProjectionParameters() {
+    ProjectionConfigDialog configDialog(this);
+    configDialog.setQuickConfig(true);
+    configDialog.exec();
   }
 
 
