@@ -126,5 +126,10 @@
     <change name="Steven Lambright" date="2013-01-31">
       Improved upon the accuracy of the find tool's sync scale option. Fixes #953.
     </change>
+    <change name="Steven Lambright" date="2013-02-12">
+      The red boxes that indicate the current selection (i.e. the rubber band) shown
+      while creating plots, updating stretches, and other actions should now only draw
+      on cubes (viewports) that are relevant to the action being performed. Fixes #1035.
+    </change>
   </history>
 </application>

@@ -70,6 +70,7 @@ namespace Isis {
     m_rubberBandCombo->reset();
     m_rubberBandCombo->setVisible(true);
     m_rubberBandCombo->setEnabled(true);
+    RubberBandTool::drawActiveViewportOnly(false);
   }
 
 

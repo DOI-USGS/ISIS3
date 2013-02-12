@@ -131,6 +131,7 @@
 :qview_QSpinBox_3	{occurrence='3' type='QSpinBox' unnamed='1' visible='0' window=':qview_Isis::ViewportMainWindow'}
 :qview_QStackedWidget	{type='QStackedWidget' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
 :qview_QStackedWidget_2	{occurrence='3' type='QStackedWidget' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
+:qview_QToolButton	{occurrence='19' type='QToolButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
 :qview_QWidget	{occurrence='2' type='QWidget' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
 :qview_bandToolButton	{toolTip='Band Selection (B)' type='QToolButton' unnamed='1' visible='1' window=':qview_Isis::ViewportMainWindow'}
 :qview_statisticsToolButton	{toolTip='Statistics' type='QToolButton' visible='1' window=':qview_Isis::ViewportMainWindow'}

@@ -352,8 +352,8 @@ namespace Isis {
   }
 
   /**
-   * This called to set whether rubber band is drawn on active viewport only 
-   * rather than all linked viewports.  
+   * This called to set whether rubber band is drawn on active viewport only
+   * rather than all linked viewports.
    */
   void RubberBandTool::setDrawActiveViewportOnly(bool activeOnly) {
     p_drawActiveOnly = activeOnly;
@@ -502,7 +502,7 @@ namespace Isis {
       *p_mouseLoc = snapMouse(p);
     else
       *p_mouseLoc = p;
-      
+
     p_mouseButton = s;
 
     if((s & Qt::LeftButton) == Qt::LeftButton || p_allClicks) {
@@ -556,8 +556,8 @@ namespace Isis {
     }
 
     p_doubleClicking = false; // If we were in a double click, it's over now.
-    
-    
+
+
     MdiCubeViewport * activeViewport = cubeViewport();
     for (int i = 0; i < (int) cubeViewportList()->size(); i++) {
       MdiCubeViewport * curViewport = cubeViewportList()->at(i);
@@ -567,8 +567,8 @@ namespace Isis {
       }
     }
   }
-  
-  
+
+
   /**
    * moves the mouse's location p to the nearest axis
    *
@@ -577,21 +577,21 @@ namespace Isis {
    * @returns The snapped point
    */
   QPoint RubberBandTool::snapMouse(QPoint p) {
-    if (p_vertices->size()) {      
+    if (p_vertices->size()) {
       QPoint lastVertex = p_vertices->at(p_vertices->size() - 1);
-      
+
       int deltaX = abs(p.x() - lastVertex.x());
       int deltaY = abs(p.y() - lastVertex.y());
-      
+
       if (deltaX > deltaY)
         p.setY(lastVertex.y());
       else
         p.setX(lastVertex.x());
     }
-      
+
     return p;
   }
-  
+
 
   /**
    * If tracking is not enabled, this does nothing.
@@ -943,7 +943,7 @@ namespace Isis {
       case Line: {
           if(vertices.size() != 2)
             break;
-          
+
           geos::geom::CoordinateSequence *points = new geos::geom::CoordinateArraySequence();
           points->add(geos::geom::Coordinate(vertices[0].x(), vertices[0].y()));
           points->add(geos::geom::Coordinate(vertices[1].x(), vertices[1].y()));

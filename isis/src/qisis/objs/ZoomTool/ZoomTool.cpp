@@ -593,6 +593,7 @@ namespace Isis {
     RubberBandTool::enable(RubberBandTool::Rectangle);
     RubberBandTool::allowPoints();
     RubberBandTool::allowAllClicks();
+    RubberBandTool::drawActiveViewportOnly(false);
   }
 
   /**

@@ -308,6 +308,7 @@ namespace Isis {
   void MeasureTool::enableRubberBandTool() {
     if (m_rubberBand) {
       m_rubberBand->reset();
+      RubberBandTool::drawActiveViewportOnly(false);
     }
   }
 

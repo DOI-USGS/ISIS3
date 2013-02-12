@@ -929,9 +929,11 @@ m_container = container;
     int index = p_shapeComboBox->currentIndex();
     if (index == 3) {
       RubberBandTool::enable(RubberBandTool::Line);
+      RubberBandTool::drawActiveViewportOnly(true);
     }
     else if (index == 4) {
       RubberBandTool::enable(RubberBandTool::Rectangle);
+      RubberBandTool::drawActiveViewportOnly(true);
     }
     else {
       RubberBandTool::disable();
