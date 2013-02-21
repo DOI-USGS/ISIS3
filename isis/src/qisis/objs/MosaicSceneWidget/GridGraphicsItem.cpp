@@ -27,11 +27,11 @@ namespace Isis {
       int density, Latitude latMin, Latitude latMax,
       Longitude lonMin, Longitude lonMax) {
     setZValue(DBL_MAX);
-    Projection::ProjectionType pType = proj->projectionType();
 
     if (latInc > Angle(0.0, Angle::Degrees) && lonInc > Angle(0.0, Angle::Degrees)) {
       // Walk the grid, creating a QGraphicsLineItem for each line segment.
       Projection *proj = projectionSrc->getProjection();
+      Projection::ProjectionType pType = proj->projectionType();
 
       if (proj && pType == Projection::Triaxial && lonMin < lonMax && latMin < latMax) {
         TProjection *tproj = (TProjection *) proj;
@@ -183,25 +183,13 @@ namespace Isis {
                 atMaxLon = true;
               }
 
-<<<<<<< .working
-            double x = 0;
-            double y = 0;            
-            bool valid = tproj->SetUniversalGround(lat.degrees(), lon.degrees());
-=======
               double x = 0;
               double y = 0;
-              bool valid = proj->SetUniversalGround(lat.degrees(), lon.degrees());
->>>>>>> .merge-right.r5008
+              bool valid = tproj->SetUniversalGround(lat.degrees(), lon.degrees());
 
-<<<<<<< .working
-            if (valid) {
-              x = tproj->XCoord();
-              y = -1 * tproj->YCoord();
-=======
               if (valid) {
-                x = proj->XCoord();
-                y = -1 * proj->YCoord();
->>>>>>> .merge-right.r5008
+                x = tproj->XCoord();
+                y = -1 * tproj->YCoord();
 
                 if(havePrevious) {
                   if(previousX != x || previousY != y) {
@@ -272,27 +260,15 @@ namespace Isis {
               atMaxLon = true;
             }
 
-<<<<<<< .working
-          Latitude lat =  minLat;
-          while (!atMaxLat) {
-            double x = 0;
-            double y = 0;
-            bool valid = tproj->SetUniversalGround(lat.degrees(), lon.degrees());
-            
-            if (valid) {
-              x = tproj->XCoord();
-              y = -1 * tproj->YCoord();
-=======
             double previousX = 0;
             double previousY = 0;
             bool havePrevious = false;
->>>>>>> .merge-right.r5008
 
             Latitude lat =  minLat;
             while (!atMaxLat) {
               double x = 0;
               double y = 0;
-              bool valid = proj->SetUniversalGround(lat.degrees(), lon.degrees());
+              bool valid = tproj->SetUniversalGround(lat.degrees(), lon.degrees());
 
               if (valid) {
                 x = tproj->XCoord();
