@@ -99,8 +99,8 @@ bool map2cam::Xform(double &inSample, double &inLine,
 
   // Make sure the point is inside the input image
   if(p_inmap->WorldX() < 0.5) return false;
-  if(p_inmap->WorldX() < 0.5) return false;
-  if(p_inmap->WorldY() > p_inputSamples + 0.5) return false;
+  if(p_inmap->WorldY() < 0.5) return false;
+  if(p_inmap->WorldX() > p_inputSamples + 0.5) return false;
   if(p_inmap->WorldY() > p_inputLines + 0.5) return false;
 
   // Everything is good
