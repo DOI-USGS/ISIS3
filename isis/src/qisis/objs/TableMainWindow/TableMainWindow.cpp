@@ -35,10 +35,19 @@ namespace Isis {
   void TableMainWindow::clear() {
     writeSettings();
     p_table->clear();
-    p_itemList.clear();
     p_listWidget->clear();
     p_table->setRowCount(0);
     p_table->setColumnCount(0);
+  }
+
+
+  QList<QListWidgetItem *> TableMainWindow::itemList() {
+    QList<QListWidgetItem *> result;
+
+    if (p_listWidget)
+      result = p_listWidget->findItems(QString("*"), Qt::MatchWrap | Qt::MatchWildcard);
+
+    return result;
   }
 
 
@@ -175,7 +184,7 @@ namespace Isis {
 
       int destinationColumn = insertAt;
 
-      if(insertAt >= 0) {
+      if (insertAt >= 0) {
         p_table->insertColumn(insertAt);
       }
       else {
@@ -183,9 +192,9 @@ namespace Isis {
         p_table->insertColumn(startCol + i);
       }
       QTableWidgetItem *header = new QTableWidgetItem(htext);
-      if(insertAt >= 0) {
+      if (insertAt >= 0) {
 
-        if(o == Qt::Horizontal) {
+        if (o == Qt::Horizontal) {
           p_table->setHorizontalHeaderItem(insertAt, header);
         }
         else {
@@ -194,7 +203,7 @@ namespace Isis {
       }
       else {
 
-        if(o == Qt::Horizontal) {
+        if (o == Qt::Horizontal) {
           p_table->setHorizontalHeaderItem(startCol + i, header);
         }
         else {
@@ -209,18 +218,18 @@ namespace Isis {
     int endCol = p_table->columnCount() - 1;
 
     // Insert the column name into the columns dock area
-    if(!menuText.isEmpty()) {
+    if (!menuText.isEmpty()) {
       QListWidgetItem *item = new QListWidgetItem();
 
       item->setText(menuText);
-      if(toolTip.isEmpty()) {
+      if (toolTip.isEmpty()) {
         item->setToolTip(heading);
       }
       else {
         item->setToolTip(toolTip);
       }
 
-      if(insertAt >= 0) {
+      if (insertAt >= 0) {
         p_listWidget->insertItem(insertAt, item);
       }
       else {
@@ -231,7 +240,6 @@ namespace Isis {
 
       readItemSettings(menuText, item, setOn);
 
-      p_itemList.push_back(item);
       p_startColumn.push_back(startCol);
       p_endColumn.push_back(endCol);
 
@@ -246,20 +254,19 @@ namespace Isis {
    * side list. (dock area)
    */
   void TableMainWindow::syncColumns() {
-    if(this->isHidden()) {
+    if (this->isHidden()) {
       return;
     }
 
     p_visibleColumns = 0;
     for(int i = 0; i < p_listWidget->count(); i++) {
       QListWidgetItem *item = p_listWidget->item(i);
-      int index = p_itemList.indexOf(item);
+      int index = itemList().indexOf(item);
 
-      if(index != -1) {
-
+      if (index != -1) {
         for(int col = p_startColumn[index]; col <= p_endColumn[index]; col++) {
 
-          if(item->checkState() == Qt::Checked) {
+          if (item->checkState() == Qt::Checked) {
             p_table->setColumnHidden(col, false);
             p_visibleColumns++;
           }
@@ -283,7 +290,7 @@ namespace Isis {
       p_visibleColumns = 0;
       for (int i = 0; i < p_listWidget->count(); i++) {
         QListWidgetItem *item = p_listWidget->item(i);
-        int index = p_itemList.indexOf(item);
+        int index = itemList().indexOf(item);
 
         if (index != -1) {
 
@@ -312,16 +319,15 @@ namespace Isis {
    * @param item
    */
   void TableMainWindow::deleteColumn(int item) {
-    if(p_table != NULL) {
-      p_itemList.removeAt(item);
+    if (p_table != NULL) {
       p_table->setColumnCount(p_table->columnCount() - 1);
-      p_itemList.clear();
+
       bool vis = p_table->isVisible();
       p_table = NULL;
       p_listWidget = NULL;
       close();
 
-      if(vis) showTable();
+      if (vis) showTable();
     }
   }
 
@@ -333,7 +339,7 @@ namespace Isis {
    */
   void TableMainWindow::showTable() {
     syncColumns();
-    if(p_table == NULL) createTable();
+    if (p_table == NULL) createTable();
     this->show();
   }
 
@@ -343,7 +349,7 @@ namespace Isis {
    *
    */
   void TableMainWindow::clearTable() {
-    if(p_table->rowCount() == 0) return;
+    if (p_table->rowCount() == 0) return;
     for(int r = 0; r < p_table->rowCount(); r++) {
       for(int c = 0; c < p_table->columnCount(); c++) {
         p_table->item(r, c)->setText("");
@@ -367,10 +373,10 @@ namespace Isis {
     QList<int> selectedRows;
 
     for(int i = 0; i < list.size(); i++) {
-      if(selectedRows.size() == 0) {
+      if (selectedRows.size() == 0) {
         selectedRows.push_back(p_table->row(list[i]));
       }
-      else if(!selectedRows.contains(p_table->row(list[i]))) {
+      else if (!selectedRows.contains(p_table->row(list[i]))) {
         selectedRows.push_back(p_table->row(list[i]));
       }
     }
@@ -384,7 +390,7 @@ namespace Isis {
     int filledRows = 0;
     for(int r = 0; r <  p_table->rowCount(); r++) {
       for(int c = 0; c < p_table->columnCount(); c++) {
-        if(!p_table->item(r, c) || p_table->item(r, c)->text() != "") {
+        if (!p_table->item(r, c) || p_table->item(r, c)->text() != "") {
           filledRows++;
           break;
         }
@@ -401,7 +407,7 @@ namespace Isis {
    * @param row
    */
   void TableMainWindow::clearRow(int row) {
-    if(!this->isVisible()) return;
+    if (!this->isVisible()) return;
 
     for(int c = 0; c < p_table->columnCount(); c++) {
       p_table->item(row, c)->setText("");
@@ -421,8 +427,8 @@ namespace Isis {
     QString filename;
 
     //Make sure the filename is valid
-    if(!fn.isEmpty()) {
-      if(!fn.endsWith(".txt")) {
+    if (!fn.isEmpty()) {
+      if (!fn.endsWith(".txt")) {
         filename = fn + ".txt";
       }
       else {
@@ -445,11 +451,11 @@ namespace Isis {
    * table to the current file.
    */
   void TableMainWindow::saveTable() {
-    if(p_currentFile.fileName().isEmpty()) return;
+    if (p_currentFile.fileName().isEmpty()) return;
 
-    //if(p_currentFile.exists()) p_currentFile.remove();
+    //if (p_currentFile.exists()) p_currentFile.remove();
     bool success = p_currentFile.open(QIODevice::WriteOnly);
-    if(!success) {
+    if (!success) {
       QMessageBox::critical((QWidget *)parent(),
                             "Error", "Cannot open file, please check permissions");
       p_currentFile.setFileName("");
@@ -464,11 +470,11 @@ namespace Isis {
 
     //Write each column's header to the first line in CSV format
     for(int i = 0; i < p_table->columnCount(); i++) {
-      if(!p_table->isColumnHidden(i)) {
+      if (!p_table->isColumnHidden(i)) {
         QTableWidgetItem *header = p_table->horizontalHeaderItem(i);
         QString temp = header->text();
         temp.replace("\n", " ");
-        if(first) {
+        if (first) {
           line = line + "\"" + temp + "\"";
           first = false;
         }
@@ -488,11 +494,11 @@ namespace Isis {
       //Add each column to the line
       for(int j = 0; j < p_table->columnCount(); j++) {
 
-        if(!p_table->isColumnHidden(j)) {
-          if(p_table->item(i, j) == 0) break;
+        if (!p_table->isColumnHidden(j)) {
+          if (p_table->item(i, j) == 0) break;
           currentText = p_table->item(i, j)->text();
 
-          if(first) {
+          if (first) {
             line = line + currentText;
             first = false;
           }
@@ -502,7 +508,7 @@ namespace Isis {
         }
       }
       //If the line is not empty, add it to the file
-      if(line.split(",", QString::SkipEmptyParts).count() != 0)
+      if (line.split(",", QString::SkipEmptyParts).count() != 0)
         t << line << endl;
     }
     p_currentFile.close();
@@ -539,11 +545,13 @@ namespace Isis {
    *
    */
   void TableMainWindow::writeSettings() {
-    QSettings settings(settingsFileName(), QSettings::NativeFormat);
+    if (p_listWidget) {
+      QSettings settings(settingsFileName(), QSettings::NativeFormat);
 
-    foreach (QListWidgetItem *item, p_itemList) {
-      QString itemTitle = "item-" + item->text();
-      settings.setValue(itemTitle, item->checkState());
+      foreach (QListWidgetItem *item, itemList()) {
+        QString itemTitle = "item-" + item->text();
+        settings.setValue(itemTitle, item->checkState());
+      }
     }
   }
 
@@ -559,13 +567,13 @@ namespace Isis {
                  "Text Files (*.txt)");
 
     //If the user cancelled or the filename is empty return
-    if(fn.isEmpty()) return;
+    if (fn.isEmpty()) return;
 
     p_currentFile.setFileName(fn);
     p_save->setEnabled(true);
 
     bool success = p_currentFile.open(QIODevice::ReadOnly);
-    if(!success) {
+    if (!success) {
       QMessageBox::critical((QWidget *)parent(),
                             "Error", "Cannot open file, please check permissions");
       p_currentFile.setFileName("");
@@ -591,72 +599,73 @@ namespace Isis {
 
     // Loop through checking header names and setting relevant columns visible
     for(int i = 0; i < list.count(); i++) {
-      for(int j = 0; j < p_itemList.size(); j++) {
+      for(int j = 0; j < itemList().size(); j++) {
+        QListWidgetItem *item = itemList()[j];
 
         //Special cases
-        if(p_itemList[j]->text() == "Ground Range" && (list[i] == "Start Latitude" || list[i] == "Start Longitude" ||
+        if (item->text() == "Ground Range" && (list[i] == "Start Latitude" || list[i] == "Start Longitude" ||
             list[i] == "End Latitude" || list[i] == "End Longitude")) {
-          p_itemList[j]->setCheckState(Qt::Checked);
+          item->setCheckState(Qt::Checked);
           break;
         }
-        if(p_itemList[j]->text() == "Pixel Range" && (list[i] == "Start Sample" || list[i] == "Start Line" ||
+        if (item->text() == "Pixel Range" && (list[i] == "Start Sample" || list[i] == "Start Line" ||
             list[i] == "End Sample" || list[i] == "End Line")) {
-          p_itemList[j]->setCheckState(Qt::Checked);
+          item->setCheckState(Qt::Checked);
           break;
         }
-        if(p_itemList[j]->text() == "Pixel Range" && (list[i] == "Sample" || list[i] == "Line")) {
-          p_itemList[j]->setCheckState(Qt::Checked);
+        if (item->text() == "Pixel Range" && (list[i] == "Sample" || list[i] == "Line")) {
+          item->setCheckState(Qt::Checked);
           break;
         }
-        if(p_itemList[j]->text() == "Sample:Line" && (list[i] == "Sample" || list[i] == "Line")) {
-          p_itemList[j]->setCheckState(Qt::Checked);
+        if (item->text() == "Sample:Line" && (list[i] == "Sample" || list[i] == "Line")) {
+          item->setCheckState(Qt::Checked);
           break;
         }
-        if(p_itemList[j]->text() == "Planetocentric Lat" && list[i] == "Planetocentric Latitude") {
-          p_itemList[j]->setCheckState(Qt::Checked);
+        if (item->text() == "Planetocentric Lat" && list[i] == "Planetocentric Latitude") {
+          item->setCheckState(Qt::Checked);
           break;
         }
-        if(p_itemList[j]->text() == "Planetographic Lat" && list[i] == "Planetographic Latitude") {
-          p_itemList[j]->setCheckState(Qt::Checked);
+        if (item->text() == "Planetographic Lat" && list[i] == "Planetographic Latitude") {
+          item->setCheckState(Qt::Checked);
           break;
         }
-        if(p_itemList[j]->text() == "Projected X:Projected Y" && (list[i] == "Projected X" || list[i] == "Projected Y")) {
-          p_itemList[j]->setCheckState(Qt::Checked);
+        if (item->text() == "Projected X:Projected Y" && (list[i] == "Projected X" || list[i] == "Projected Y")) {
+          item->setCheckState(Qt::Checked);
           break;
         }
-        if(p_itemList[j]->text() == "Radius" && list[i] == "Local Radius") {
-          p_itemList[j]->setCheckState(Qt::Checked);
+        if (item->text() == "Radius" && list[i] == "Local Radius") {
+          item->setCheckState(Qt::Checked);
           break;
         }
-        if(p_itemList[j]->text() == "XYZ" && (list[i] == "Point X" || list[i] == "Point Y" || list[i] == "Point Z")) {
-          p_itemList[j]->setCheckState(Qt::Checked);
+        if (item->text() == "XYZ" && (list[i] == "Point X" || list[i] == "Point Y" || list[i] == "Point Z")) {
+          item->setCheckState(Qt::Checked);
           break;
         }
-        if(p_itemList[j]->text() == "Ra:Dec" && (list[i] == "Right Ascension" || list[i] == "Declination")) {
-          p_itemList[j]->setCheckState(Qt::Checked);
+        if (item->text() == "Ra:Dec" && (list[i] == "Right Ascension" || list[i] == "Declination")) {
+          item->setCheckState(Qt::Checked);
           break;
         }
-        if(p_itemList[j]->text() == "Spacecraft Position" && (list[i] == "Spacecraft X" || list[i] == "Spacecraft Y" || list[i] == "Spacecraft Z")) {
-          p_itemList[j]->setCheckState(Qt::Checked);
+        if (item->text() == "Spacecraft Position" && (list[i] == "Spacecraft X" || list[i] == "Spacecraft Y" || list[i] == "Spacecraft Z")) {
+          item->setCheckState(Qt::Checked);
           break;
         }
-        if(p_itemList[j]->text() == "Ephemeris iTime" && list[i] == "Ephemeris Time") {
-          p_itemList[j]->setCheckState(Qt::Checked);
+        if (item->text() == "Ephemeris Time" && list[i] == "Ephemeris Time") {
+          item->setCheckState(Qt::Checked);
           break;
         }
-        if(p_itemList[j]->text() == "Local Solar iTime" && list[i] == "Local Solar Time") {
-          p_itemList[j]->setCheckState(Qt::Checked);
+        if (item->text() == "Local Solar Time" && list[i] == "Local Solar Time") {
+          item->setCheckState(Qt::Checked);
           break;
         }
-        if(p_itemList[j]->text() == "Segments Sum" && list[i] == "Segments Sum km") {
-          p_itemList[j]->setCheckState(Qt::Checked);
+        if (item->text() == "Segments Sum" && list[i] == "Segments Sum km") {
+          item->setCheckState(Qt::Checked);
           break;
         }
         //End special cases
 
 
-        if(p_itemList[j]->text() == list[i]) {
-          p_itemList[j]->setCheckState(Qt::Checked);
+        if (item->text() == list[i]) {
+          item->setCheckState(Qt::Checked);
           break;
         }
       }
@@ -672,14 +681,14 @@ namespace Isis {
 
         list[i].remove(" ");
 
-        if(header == list[i]) {
+        if (header == list[i]) {
           column.push_back(cols);
           match = true;
           break;
 
         }
       }
-      if(!match) column.push_back(-1);
+      if (!match) column.push_back(-1);
     }
 
     // Read data into table
@@ -687,12 +696,12 @@ namespace Isis {
 
     while(str.count() != 0) {
       // Do we need more rows?
-      if(p_currentRow + 1 > p_table->rowCount()) {
+      if (p_currentRow + 1 > p_table->rowCount()) {
         p_table->insertRow(p_currentRow);
         for(int c = 0; c < p_table->columnCount(); c++) {
           QTableWidgetItem *item = new QTableWidgetItem("");
           p_table->setItem(p_currentRow, c, item);
-          if(c == 0) p_table->scrollToItem(item);
+          if (c == 0) p_table->scrollToItem(item);
         }
       }
 
@@ -702,7 +711,7 @@ namespace Isis {
 
       for(int i = 0; i < column.size(); i++) {
         QTableWidgetItem *newItem = new QTableWidgetItem(list[i]);
-        if(column[i] != -1) {
+        if (column[i] != -1) {
           p_table->setItem(p_currentRow, column[i], newItem);
         }
       }

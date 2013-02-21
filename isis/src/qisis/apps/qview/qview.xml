@@ -131,5 +131,9 @@
       while creating plots, updating stretches, and other actions should now only draw
       on cubes (viewports) that are relevant to the action being performed. Fixes #1035.
     </change>
+    <change name="Steven Lambright" date="2013-02-07">
+      The plot tables should no longer have multiple rows with the same X value. Also, fixed a crash
+      related to closing the plot table windows. Fixes #710. Fixes #818.
+    </change>
   </history>
 </application>
