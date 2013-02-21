@@ -64,7 +64,7 @@ namespace Isis {
       double CenterAzimuth() const;
       double CenterRadius() const;
 
-      bool SetGround(const double radius, const double lon);
+      bool SetGround(const double radius, const double az);
       bool SetCoordinate(const double x, const double y);
       bool XYRange(double &minX, double &maxX, double &minY, double &maxY);
 

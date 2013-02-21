@@ -596,7 +596,7 @@ namespace Isis {
    */
   double RingPlaneProjection::UniversalAzimuth() {
     double az = m_azimuth;
-    if (m_azimuthDirection == CounterClockwise) az = -az;
+    if (m_azimuthDirection == Clockwise) az = -az;
     az = To360Domain(az);
     return az;
   }
@@ -616,6 +616,7 @@ namespace Isis {
     if (m_mapper != NULL) {
       double localRadius = TrueScaleRadius();
       return localRadius / m_mapper->Resolution() * DEG2RAD;
+     // return localRadius / m_mapper->Resolution();
     }
     else {
       return 1.0;
@@ -624,7 +625,10 @@ namespace Isis {
 
 
   /**
-   * This method is used to determine the x/y range which completely covers the
+   * This method is u
+
+
+sed to determine the x/y range which completely covers the
    * area of interest specified by the rad/az range. The radius/azimuth
    * range may be obtained from the labels. This method should not be used if
    * HasGroundRange is false. The purpose of this method is to return the x/y

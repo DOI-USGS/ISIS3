@@ -24,6 +24,7 @@
 #include "iTime.h"
 #include "Latitude.h"
 #include "Longitude.h"
+#include "Target.h"
 
 using namespace std;
 
@@ -344,6 +345,7 @@ namespace Isis {
         p_camera->SetFocalLength(p_slantRange * 1000.0); // p_slantRange is km so focal length is in m
         p_focalPlaneX = p_slantRange * 1000.0 / p_rangeSigma; // km to meters and scaled to focal plane
         p_focalPlaneY = 0.0;
+        p_camera->target()->shape()->setSurfacePoint(surfacePoint); // Added 2-11-2013 by DAC
         return true;
       }
     }

@@ -386,11 +386,10 @@ namespace Isis {
     // not distorted
     //DON'T THINK THIS IS NEEDED FOR RING PLANE PROJECTIONS
     Isis::RingPlaneProjection *proj = (Isis::RingPlaneProjection *) RingsCreate(label, true);
-//    double trueScaleLat = proj->TrueScaleLatitude();
-//    double localRadius = proj->LocalRadius(trueScaleLat);
+    double localRadius = proj->TrueScaleRadius();
 //    delete proj;
 
-    double localRadius = 1.0;
+    // double localRadius = 1.0;
 
     IException errors;
     try {
@@ -409,13 +408,13 @@ namespace Isis {
         scale = mapGroup["Scale"];
         pixelResolution = (2.0 * Isis::PI * localRadius) / (360.0 * scale);
       }
-      // Write out the scale and resolution with units and truescale latitude
+      // Write out the scale and resolution with units and truescale radius
       mapGroup.AddKeyword(Isis::PvlKeyword("PixelResolution", toString(pixelResolution),
                                            "meters/pixel"),
                           Isis::Pvl::Replace);
       mapGroup.AddKeyword(Isis::PvlKeyword("Scale", toString(scale), "pixels/degree"),
                           Isis::Pvl::Replace);
-      //mapGroup.AddKeyword(Isis::PvlKeyword ("TrueScaleLatitude", trueScaleLat),
+      //mapGroup.AddKeyword(Isis::PvlKeyword ("TrueScaleRadius", trueScaleRadius),
       //                                    Isis::Pvl::Replace);
 
       // Get the upper left corner from the labels if possible
@@ -586,7 +585,7 @@ namespace Isis {
       mapGroup.AddKeyword(Isis::PvlKeyword("PixelResolution", toString(pixelResolution), "meters/pixel"),
                           Isis::Pvl::Replace);
       mapGroup.AddKeyword(Isis::PvlKeyword("Scale", toString(scale), "pixels/degree"), Isis::Pvl::Replace);
-      //mapGroup.AddKeyword(Isis::PvlKeyword ("TrueScaleLatitude", trueScaleLat),
+      //mapGroup.AddKeyword(Isis::PvlKeyword ("TrueScaleLatitude", trueScaleLatitude),
       //                                    Isis::Pvl::Replace);
 
       // Initialize the rest of the projection
@@ -806,11 +805,10 @@ namespace Isis {
 
     // Create a temporary projection
     Isis::RingPlaneProjection *proj = (Isis::RingPlaneProjection *) RingsCreate(label, true);
-//    double trueScaleLat = proj->TrueScaleLatitude();
-//    double localRadius = proj->LocalRadius(trueScaleLat);
+    double localRadius = proj->TrueScaleRadius();
 //    delete proj;
 
-    double localRadius = 1.0;
+    // double localRadius = 1.0;
 
     try {
       // Try to get the pixel resolution and then compute the scale
@@ -819,6 +817,7 @@ namespace Isis {
       try {
         pixelResolution = mapGroup["PixelResolution"];
         scale = (2.0 * Isis::PI * localRadius) / (360.0 * pixelResolution);
+        // scale = proj->Scale();
       }
 
       // If not get the scale and then compute the pixel resolution
@@ -826,7 +825,7 @@ namespace Isis {
         scale = mapGroup["Scale"];
         pixelResolution = (2.0 * Isis::PI * localRadius) / (360.0 * scale);
       }
-      // Write out the scale and resolution with units and truescale latitude
+      // Write out the scale and resolution with units and truescale radius
       mapGroup.AddKeyword(Isis::PvlKeyword("PixelResolution", toString(pixelResolution),
                                            "meters/pixel"), Isis::Pvl::Replace);
       mapGroup.AddKeyword(Isis::PvlKeyword("Scale", toString(scale), "pixels/degree"),
@@ -853,8 +852,8 @@ namespace Isis {
           for(samp = 0; samp <= cam.Samples(); samp++) {
             if(cam.SetImage((double)samp + 0.5, (double)line + 0.5)) {
               double radius = cam.LocalRadius().meters();
-              double lon = cam.UniversalLongitude();
-              proj->SetGround(radius, lon);
+              double az = cam.UniversalLongitude();
+              proj->SetGround(radius, az);
               if(proj->IsGood()) {
                 if(proj->XCoord() < minX) minX = proj->XCoord();
                 if(proj->XCoord() > maxX) maxX = proj->XCoord();
@@ -870,8 +869,8 @@ namespace Isis {
             for(samp = cam.Samples(); samp >= 0; samp--) {
               if(cam.SetImage((double)samp + 0.5, (double)line + 0.5)) {
                 double radius = cam.LocalRadius().meters();
-                double lon = cam.UniversalLongitude();
-                proj->SetGround(radius, lon);
+                double az = cam.UniversalLongitude();
+                proj->SetGround(radius, az);
                 if(proj->IsGood()) {
                   if(proj->XCoord() < minX) minX = proj->XCoord();
                   if(proj->XCoord() > maxX) maxX = proj->XCoord();
@@ -923,12 +922,12 @@ namespace Isis {
         // Another special test for ground range as we could have the
         // 0-360 seam running right through the image so
         // test it as well (the increment may not be fine enough !!!)
-        for(double lat = p_minlat; lat <= p_maxlat; lat += (p_maxlat - p_minlat) / 10.0) {
-          if(SetUniversalGround(lat, 0.0)) {
+        for(double rad = p_minRadius; rad <= p_maxRadius; rad += (p_maxRadius - p_minRadius) / 10.0) {
+          if(SetUniversalGround(rad, 0.0)) {
             if(Sample() >= 0.5 && Line() >= 0.5 &&
                 Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
-              p_minlon = 0.0;
-              p_maxlon = 360.0;
+              p_minaz = 0.0;
+              p_maxaz = 360.0;
               break;
             }
           }

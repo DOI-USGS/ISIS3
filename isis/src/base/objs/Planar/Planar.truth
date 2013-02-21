@@ -8,6 +8,22 @@ Test missing CenterRadius keyword ...
 **I/O ERROR** Invalid label group [Mapping].
 **ERROR** PVL Keyword [CenterRadius] does not exist in [Group = Mapping].
 
+Projection 1 parameters...
+Projection version   = 1.0
+  Projection name    =  Planar
+  Target name          =  Saturn
+  Azimuth direction  = Clockwise
+  Azimuth domain    = 180
+  Minimum radius     = 0
+  Maximum radius     = 2e+06
+  Minimum azimuth   = -20
+  Maximum azimuth  = 130
+  Center radius         = 200000
+  Center azimuth      = 0
+
+Test TrueScaleRadius method...
+TrueScaleRadius = 200000
+
 Test SetGround method ... 
 Setting ground to (1000.0,45.0)
 Radius:               1000
@@ -22,11 +38,17 @@ Azimuth:              -73.30075576600629
 XCoord:                 0.2617993877991494
 YCoord:                 -0.8726646259971648
 
+Test XYRange method ... 
+Minimum X:  734582.660909393
+Maximum X:  -734582.660909393
+Minimum Y:  1860211.900373524
+Maximum Y:  -1860211.900373524
+
 Test Name and comparision methods ... 
 Name:       Planar
 operator==  1
 
-Testing default option ... 
+Testing default options in constructor with Projection 2 ... 
 Group = Mapping
   ProjectionName   = Planar
   TargetName       = Saturn
@@ -40,8 +62,55 @@ Group = Mapping
   CenterRadius     = 1000000.0
 End_Group
 End
+Default projection parameters == Original projection ?0
+
+
+Testing more SetGround conditions...AzimuthDirection = CounterClockwise and AzimuthDomain = 360
+Projection 3 parameters...
+  Projection name    =  Planar
+  Target name          =  Saturn
+  Azimuth direction  = CounterClockwise
+  Azimuth domain    = 360
+  Minimum radius     = 0
+  Maximum radius     = 2000000
+  Minimum azimuth   = -20
+  Maximum azimuth  = 130
+  Center radius         = 1000000
+  Center azimuth      = -0.9599310885968813
+
+  Setting ground to (1000.0,45.0)
+    Radius:             =  1000
+    Azimuth:          =  45
+    XCoord:           =  984.807753012208
+    YCoord:           =  173.6481776669304
+
+Testing SetGround error condition...
+  Setting ground to (-1000.0,45.0)
+**ERROR** Unable to set radius. The given radius value [-1000.0] is invalid.
+
+Testing more SetCoordinate method ... 
+Setting coordinate to (0.2617993877991494,-0.8726646259971648)
+Radius:               0.9110886174894191
+Azimuth:              73.30075576600632
+XCoord:                 0.2617993877991494
+YCoord:                 -0.8726646259971648
+
+Setting coordinate to (0.2617993877991494,0.8726646259971648)
+Radius:               0.9110886174894191
+Azimuth:              286.6992442339937
+XCoord:                 0.2617993877991494
+YCoord:                 0.8726646259971648
+
 
 Testing Mapping() methods ... 
+Projection 4 parameters...No range
+  Projection name    =  Planar
+  Target name          =  Saturn
+  Azimuth direction  = CounterClockwise
+  Azimuth domain    = 360
+  Center radius         = 1000000
+  Center azimuth      = -0.9599310885968813
+
 Mapping() = 
 Group = Mapping
   TargetName       = Saturn
@@ -56,3 +125,18 @@ Group = Mapping
   CenterAzimuth    = 0.0
 End_Group
 End
+MappingRadii() = 
+Group = Mapping
+  MinimumRadius = 0.0
+  MaximumRadius = 2000000.0
+  CenterRadius  = 200000.0
+End_Group
+End
+MappingAzimuths() = 
+Group = Mapping
+  MinimumAzimuth = -20.0
+  MaximumAzimuth = 130.0
+  CenterAzimuth  = 0.0
+End_Group
+End
+

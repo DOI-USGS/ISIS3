@@ -262,8 +262,8 @@ namespace Isis {
 
       bool GroundRange(double &minlat, double &maxlat, double &minlon,
                        double &maxlon, Pvl &pvl);
-      bool ringRange(double &minradius, double &maxradius, double &minlon,
-                     double &maxlon, Pvl &pvl);
+      bool ringRange(double &minradius, double &maxradius, double &minaz,
+                     double &maxaz, Pvl &pvl);
       bool IntersectsLongitudeDomain(Pvl &pvl);
 
       double PixelResolution();
@@ -474,15 +474,11 @@ namespace Isis {
       double p_maxlat;                       //!< The maximum latitude
       double p_minlon;                       //!< The minimum longitude
       double p_maxlon;                       //!< The maximum longitude
-      double p_minRingRadius;                //!< The minimum ring radius
-      double p_maxRingRadius;                //!< The maximum ring radius
       double p_minres;                       //!< The minimum resolution
       double p_maxres;                       //!< The maximum resolution
       double p_minlon180;                    //!< The minimum longitude in the 180 domain
       double p_maxlon180;                    //!< The maximum longitude in the 180 domain
       bool p_groundRangeComputed;            /**!< Flag showing if ground range
-                                                  was computed successfully.*/
-      bool p_ringRangeComputed;              /**!< Flag showing if ring range
                                                   was computed successfully.*/
 
       bool p_pointComputed;                  //!< Flag showing if Sample/Line has been computed
@@ -504,6 +500,15 @@ namespace Isis {
       double p_maxra180;                     //!< The maximum right ascension in the 180 domain
       bool p_raDecRangeComputed;             /**!< Flag showing if the raDec range
                                                   has been computed successfully.*/
+
+      double p_minRadius;                //!< The minimum ring radius
+      double p_maxRadius;                //!< The maximum ring radius
+      double p_minaz;                       //!< The minimum azimuth
+      double p_maxaz;                       //!< The maximum azimuth
+      double p_minaz180;                    //!< The minimum azimuth in the 180 domain
+      double p_maxaz180;                    //!< The maximum azimuth in the 180 domain
+      bool p_ringRangeComputed;              /**!< Flag showing if ring range
+                                                  was computed successfully.*/
 
       AlphaCube *p_alphaCube;          //!< A pointer to the AlphaCube
       double p_childSample;                  //!< Sample value for child

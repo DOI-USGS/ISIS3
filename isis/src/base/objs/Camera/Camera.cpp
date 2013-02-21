@@ -105,6 +105,7 @@ namespace Isis {
 
     p_groundRangeComputed = false;
     p_raDecRangeComputed = false;
+    p_ringRangeComputed = false;
     p_pointComputed = false;
   }
 
@@ -229,9 +230,9 @@ namespace Isis {
       else { // shape is Plane
         if(p_projection->SetWorld(sample, line)) {
           RingPlaneProjection *rproj = (RingPlaneProjection *) p_projection;
-          Latitude lat(0.0, Angle::Degrees);
-          Longitude lon(rproj->UniversalAzimuth(), Angle::Degrees);
-          Distance rad(rproj->UniversalRadius(),Distance::Kilometers);
+          lat = Latitude(0.0, Angle::Degrees);
+          lon = Longitude(rproj->UniversalAzimuth(), Angle::Degrees);
+          rad = Distance(rproj->UniversalRadius(),Distance::Kilometers);
 
           if (!rad.isValid()) {
             shape->setHasIntersection(false);
@@ -727,8 +728,7 @@ namespace Isis {
   void Camera::ringRangeResolution() {
 
     // Have we already done this
-    if (p_ringRangeComputed)
-      return;
+    if (p_ringRangeComputed) return;
 
     p_ringRangeComputed = true;
 
@@ -738,12 +738,12 @@ namespace Isis {
     int originalBand = Band();
 
     // Initializations
-    p_minRingRadius = DBL_MAX;
-    p_minlon        = DBL_MAX;
-    p_minlon180     = DBL_MAX;
-    p_maxRingRadius = -DBL_MAX;
-    p_maxlon        = -DBL_MAX;
-    p_maxlon180     = -DBL_MAX;
+    p_minRadius = DBL_MAX;
+    p_minaz        = DBL_MAX;
+    p_minaz180     = DBL_MAX;
+    p_maxRadius = -DBL_MAX;
+    p_maxaz        = -DBL_MAX;
+    p_maxaz180     = -DBL_MAX;
     p_minres        = DBL_MAX;
     p_maxres        = -DBL_MAX;
 
@@ -758,22 +758,22 @@ namespace Isis {
       // Loop for each line testing the left and right sides of the image
       for (int line = 1; line <= p_lines + 1; line++) {
 
-        // Look for the first good radius/lon on the left edge of the image
+        // Look for the first good radius/az on the left edge of the image
         // If it is the first or last line then test the whole line
         int samp;
         for (samp = 1; samp <= p_samples + 1; samp++) {
 
           if (SetImage((double)samp - 0.5, (double)line - 0.5)) {
-              double rad = LocalRadius().meters();
-            double lon = UniversalLongitude();
-            if (rad < p_minRingRadius) p_minRingRadius = rad;
-            if (rad > p_maxRingRadius) p_maxRingRadius = rad;
-            if (lon < p_minlon) p_minlon = lon;
-            if (lon > p_maxlon) p_maxlon = lon;
+            double rad = LocalRadius().meters();
+            double az = UniversalLongitude();
+            if (rad < p_minRadius) p_minRadius = rad;
+            if (rad > p_maxRadius) p_maxRadius = rad;
+            if (az < p_minaz) p_minaz = az;
+            if (az > p_maxaz) p_maxaz = az;
 
-            if (lon > 180.0) lon -= 360.0;
-            if (lon < p_minlon180) p_minlon180 = lon;
-            if (lon > p_maxlon180) p_maxlon180 = lon;
+            if (az > 180.0) az -= 360.0;
+            if (az < p_minaz180) p_minaz180 = az;
+            if (az > p_maxaz180) p_maxaz180 = az;
 
             double res = PixelResolution();
             if (res > 0.0) {
@@ -783,25 +783,24 @@ namespace Isis {
             if ((line != 1) && (line != p_lines + 1)) break;
           }
         }
-
         //We've already checked the first and last lines.
         if (line == 1) continue;
         if (line == p_lines + 1) continue;
 
-        // Look for the first good lat/lon on the right edge of the image
+        // Look for the first good rad/az on the right edge of the image
         if (samp < p_samples + 1) {
           for(samp = p_samples + 1; samp >= 1; samp--) {
             if (SetImage((double)samp - 0.5, (double)line - 0.5)) {
                 double rad = LocalRadius().meters();
-              double lon = UniversalLongitude();
-              if (rad < p_minRingRadius) p_minRingRadius = rad;
-              if (rad > p_maxRingRadius) p_maxRingRadius = rad;
-              if (lon < p_minlon) p_minlon = lon;
-              if (lon > p_maxlon) p_maxlon = lon;
+              double az = UniversalLongitude();
+              if (rad < p_minRadius) p_minRadius = rad;
+              if (rad > p_maxRadius) p_maxRadius = rad;
+              if (az < p_minaz) p_minaz = az;
+              if (az > p_maxaz) p_maxaz = az;
 
-              if (lon > 180.0) lon -= 360.0;
-              if (lon < p_minlon180) p_minlon180 = lon;
-              if (lon > p_maxlon180) p_maxlon180 = lon;
+              if (az > 180.0) az -= 360.0;
+              if (az < p_minaz180) p_minaz180 = az;
+              if (az > p_maxaz180) p_maxaz180 = az;
 
               double res = PixelResolution();
               if (res > 0.0) {
@@ -844,26 +843,37 @@ namespace Isis {
       // Another special test for ring range as we could have the
       // 0-360 seam running right through the image so
       // test it as well (the increment may not be fine enough !!!)
-      for (Latitude lat = Latitude(p_minlat, Angle::Degrees);
-                   lat <= Latitude(p_maxlat, Angle::Degrees);
-                   lat += Angle((p_maxlat - p_minlat) / 10.0, Angle::Degrees)) {
-        if (SetGround(lat, Longitude(0.0, Angle::Degrees))) {
+      for (Distance rad = Distance(p_minRadius, Distance::Meters);
+                   rad <= Distance(p_maxRadius, Distance::Meters);
+                   rad += Distance((p_maxRadius - p_minRadius) / 10.0, Distance::Meters)) {
+        if (SetGround(SurfacePoint(Latitude(0.0, Angle::Degrees), Longitude(0.0, Angle::Degrees), rad))) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
-            p_minlon = 0.0;
-            p_maxlon = 360.0;
+            p_minaz = 0.0;
+            p_maxaz = 360.0;
             break;
           }
         }
+      // for (Latitude lat = Latitude(p_minlat, Angle::Degrees);
+      //              lat <= Latitude(p_maxlat, Angle::Degrees);
+      //              lat += Angle((p_maxlat - p_minlat) / 10.0, Angle::Degrees)) {
+      //   if (SetGround(lat, Longitude(0.0, Angle::Degrees))) {
+      //     if (Sample() >= 0.5 && Line() >= 0.5 &&
+      //         Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
+      //       p_minlon = 0.0;
+      //       p_maxlon = 360.0;
+      //       break;
+      //     }
+      //   }
 
         // Another special test for ring range as we could have the
         // -180-180 seam running right through the image so
         // test it as well (the increment may not be fine enough !!!)
-        if (SetGround(lat, Longitude(180.0, Angle::Degrees))) {
+        if (SetGround(Latitude(0.0, Angle::Degrees), Longitude(180.0, Angle::Degrees))) {
           if (Sample() >= 0.5 && Line() >= 0.5 &&
               Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
-            p_minlon180 = -180.0;
-            p_maxlon180 = 180.0;
+            p_minaz180 = -180.0;
+            p_maxaz180 = 180.0;
             break;
           }
         }
@@ -881,7 +891,7 @@ namespace Isis {
     }
 
     // Checks for invalid radius/lon ranges
-    if (p_minRingRadius == DBL_MAX  ||  p_minRingRadius == DBL_MAX  || p_minlon == DBL_MAX  ||  p_maxlon == -DBL_MAX) {
+    if (p_minRadius == DBL_MAX  ||  p_minRadius == DBL_MAX  || p_minlon == DBL_MAX  ||  p_maxlon == -DBL_MAX) {
       string message = "RingPlane ShapeModel - Camera missed plane or SPICE data off.";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
@@ -1017,64 +1027,67 @@ namespace Isis {
    * @return @b bool Returns true if it crosses the longitude domain boundary and
    *              false if it does not
    */
-  bool Camera::ringRange(double &minrad, double &maxrad, double &minlon,
-                         double &maxlon, Pvl &pvl) {
-
+  bool Camera::ringRange(double &minrad, double &maxrad, double &minaz,
+                         double &maxaz, Pvl &pvl) {
     // Compute the ring range and resolution
     ringRangeResolution();
 
-    // See if the PVL overrides the radii
+    // Get the mapping group
     PvlGroup map = pvl.FindGroup("Mapping", Pvl::Traverse);
 
+    // Get the ring radius range
+    minrad = p_minRadius;
+    maxrad = p_maxRadius;
+
     // Assume 0 to 360 domain but change it if necessary
-    minlon = p_minlon;
-    maxlon = p_maxlon;
+    minaz = p_minaz;
+    maxaz = p_maxaz;
     bool domain360 = true;
-    if (map.HasKeyword("LongitudeDomain")) {
-      QString lonDomain = (QString) map["LongitudeDomain"];
-      if (lonDomain == "180") {
-        minlon = p_minlon180;
-        maxlon = p_maxlon180;
+    if (map.HasKeyword("AzimuthDomain")) {
+      QString azDomain = (QString) map["AzimuthDomain"];
+      if (azDomain == "180") {
+        minaz = p_minaz180;
+        maxaz = p_maxaz180;
         domain360 = false;
       }
     }
 
-    // Convert to the proper longitude direction
-    if (map.HasKeyword("LongitudeDirection")) {
-      QString lonDirection = (QString) map["LongitudeDirection"];
-      if (lonDirection.toUpper() == "POSITIVEWEST") {
-        double swap = minlon;
-        minlon = -maxlon;
-        maxlon = -swap;
+    // Convert to the proper azimuth direction
+    if (map.HasKeyword("AzimuthDirection")) {
+      QString azDirection = (QString) map["AzimuthDirection"];
+      if (azDirection.toUpper() == "CounterClockwise") {
+        double swap = minaz;
+        minaz = -maxaz;
+        maxaz = -swap;
       }
     }
 
-    // Convert to the proper longitude domain
+    // Convert to the proper azimuth domain
     if (domain360) {
-      while (minlon < 0.0) {
-        minlon += 360.0;
-        maxlon += 360.0;
+      while (minaz < 0.0) {
+        minaz += 360.0;
+        maxaz += 360.0;
       }
-      while (minlon > 360.0) {
-        minlon -= 360.0;
-        maxlon -= 360.0;
+      while (minaz > 360.0) {
+        minaz -= 360.0;
+        maxaz -= 360.0;
       }
     }
     else {
-      while (minlon < -180.0) {
-        minlon += 360.0;
-        maxlon += 360.0;
+      while (minaz < -180.0) {
+        minaz += 360.0;
+        maxaz += 360.0;
       }
-      while (minlon > 180.0) {
-        minlon -= 360.0;
-        maxlon -= 360.0;
+      while (minaz > 180.0) {
+        minaz -= 360.0;
+        maxaz -= 360.0;
       }
     }
 
-    // Now return if it crosses the longitude domain boundary
-    if ((maxlon - minlon) > 359.0)
+    // Now return if it crosses the azimuth domain boundary
+    if ((maxaz - minaz) > 359.0) {
       return true;
-
+    }
     return false;
   }
 
@@ -1117,14 +1130,14 @@ namespace Isis {
     PvlGroup map("Mapping");
     map += PvlKeyword("TargetName", target()->name());
 
-    map += PvlKeyword("LongitudeDirection", "PositiveEast");
-    map += PvlKeyword("LongitudeDomain", "360");
+    map += PvlKeyword("AzimuthDirection", "Clockwise");
+    map += PvlKeyword("AzimuthDomain", "360");
 
     ringRangeResolution();
-    map += PvlKeyword("MinimumRingRadius", toString(p_minRingRadius));
-    map += PvlKeyword("MaximumRingRadius", toString(p_maxRingRadius));
-    map += PvlKeyword("MinimumAzimuth", toString(p_minlon));
-    map += PvlKeyword("MaximumAzimuth", toString(p_maxlon));
+    map += PvlKeyword("MinimumRadius", toString(p_minRadius));
+    map += PvlKeyword("MaximumRadius", toString(p_maxRadius));
+    map += PvlKeyword("MinimumAzimuth", toString(p_minaz));
+    map += PvlKeyword("MaximumAzimuth", toString(p_maxaz));
     map += PvlKeyword("PixelResolution", toString(p_minres));
 
     map += PvlKeyword("ProjectionName", "Planar");

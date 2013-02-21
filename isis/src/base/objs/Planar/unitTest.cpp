@@ -157,7 +157,7 @@ int main(int argc, char *argv[]) {
     }
     cout << endl;
 
-    cout << "Testing more SetCoordinate method ... " << endl;
+    cout << "Testing more SetCoordinate methods ... " << endl;
     cout << "Setting coordinate to (0.2617993877991494,-0.8726646259971648)" << endl;
     p3.SetCoordinate(0.2617993877991494, -0.8726646259971648);
     cout << "Radius:               " << p3.LocalRadius() << endl;

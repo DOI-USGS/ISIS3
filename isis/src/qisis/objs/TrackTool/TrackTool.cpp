@@ -305,7 +305,6 @@ namespace Isis {
     }
   }
 
-
   /**
    * Clears the labels.
    *

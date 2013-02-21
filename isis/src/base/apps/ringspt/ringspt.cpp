@@ -52,8 +52,8 @@ void IsisMain() {
   else {
     if(ui.WasEntered("RADIUS")) {
       double radius = ui.GetDouble("RADIUS");
-      double lon = ui.GetDouble("LONGITUDE");
-      point = ringspt.SetGround(radius, lon, outsideAllowed);
+      double az = ui.GetDouble("AZIMUTH");
+      point = ringspt.SetGround(radius, az, outsideAllowed);
     }
     else {
       double lat = ui.GetDouble("LATITUDE");

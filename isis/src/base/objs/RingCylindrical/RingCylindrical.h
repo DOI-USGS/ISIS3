@@ -33,17 +33,7 @@ namespace Isis {
    * This class provides methods for the forward and inverse equations of a 
    * Ring Cylindrical map projection (for a sphere). 
    *  
-   * The Ring Cylindrical projection is an Equidistant Cylindrical projection 
-   * with the standard parallel at the equator of the target planet. Poles, 
-   * latitudes and longitudes are represented as straight lines.  The longitudes 
-   * and latitudes are  equally spaced and intersect at right angles. 
-   *  
-   * The code was converted to C++ from the Fortran version of the USGS General 
-   * Cartographic Transformation Package (GCTP). In particular it was modified 
-   * from the Equidistant Cylindrical code. This class inherits Projection and 
-   * provides the two virtual methods SetGround (forward) and SetCoordinate 
-   * (inverse) and a third virtual method, XYRange, for obtaining projection 
-   * coordinate coverage for a latitude/longitude window. 
+   * The Ring Cylindrical projection is an
    *  
    * Please see the Projection class for a full accounting of all the methods 
    * available. 
@@ -51,36 +41,9 @@ namespace Isis {
    * @ingroup MapProjection
    * @see Equirectangular
    *
-   * @author 2003-01-29 Jeff Anderson
+   * @author 2003-01-29 Debbie A. Cook
    *
    * @internal
-   *   @history 2003-01-30 Jeff Anderson - Removed IsisWorldMapper argument from
-   *                           the constructor
-   *   @history 2003-05-16 Stuart Sides - Modified schema from astrogeology...
-   *                           isis.astrogeology...
-   *   @history 2003-06-05 Jeff Anderson - Changed SetCoordinate method so it
-   *                           did not adjust longitude into the longitude
-   *                           domain
-   *   @history 2003-09-26 Jeff Anderson - Provided virtual methods for Name and
-   *                           operator==
-   *   @history 2003-11-13 Jeff Anderson - Modified constructor to allow for
-   *                           computation for default value for CenterLongitude
-   *                           keyword.
-   *   @history 2005-02-15 Elizabeth Ribelin - Modified file to support Doxygen
-   *                           documentation
-   *   @history 2007-06-29 Steven Lambright - Added Mapping, MappingLatitudes
-   *                           and MappingLongitudes methods.
-   *   @history 2008-05-09 Steven Lambright - Added Name, Version,
-   *                           IsEquatorialCylindrical methods
-   *   @history 2012-06-15 Jeannie Backer - Added documentation.  Added forward
-   *                           declaration of Pvl, PvlGroup to header file.
-   *                           Ordered includes in implementation file.  Moved
-   *                           Name, Version, IsEquatorialCylindrical to the
-   *                           implementation file. Minor modifications to
-   *                           comply with some coding standards. References
-   *                           #928.
-   *   @history 2012-11-10 Debbie A. Cook - Modified for new RingCylindrical projection for mapping
-   *                            ring bodies.
    */
   // or Rectilinear projection?? scale azimuth with 1/(2*pi) * radius maybe
   class RingCylindrical : public RingPlaneProjection {
@@ -91,29 +54,24 @@ namespace Isis {
 
       QString Name() const;
       QString Version() const;
-      bool IsEquatorialCylindrical();
+      double TrueScaleRadius() const;
 
-      bool SetGround(const double lat, const double lon);
+      double CenterAzimuth() const;
+      double CenterRadius() const;
+
+      bool SetGround(const double radius, const double az);
       bool SetCoordinate(const double x, const double y);
       bool XYRange(double &minX, double &maxX, double &minY, double &maxY);
 
       PvlGroup Mapping();
-      //      PvlGroup MappingLatitudes();
       PvlGroup MappingRadii();
-      PvlGroup MappingLongitudes();
+      PvlGroup MappingAzimuths();
 
     protected:
-      //      double m_radius;
-      //      double m_azimuth;
-      double m_minimumRingRadius;   /**< Contains minimum radius for entire ring
-                                       range. Only usable if m_ringRangeGood is
-                                       true.*/
-      double m_maximumRingRadius;   /**< Contains maximum radius for entire ring
-                                       range. Only usable if m_ringRangeGood is
-                                       true.*/
 
     private:
-      double m_centerAzimuth; //!< The center longitude for the map projection
+      double m_centerAzimuth; //!< The center azimuth for the map projection in radians
+      double m_centerRadius;    //!< The center radius for the map projection
   };
 };
 

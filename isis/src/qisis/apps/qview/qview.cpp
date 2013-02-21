@@ -1,5 +1,6 @@
 #include "IsisDebug.h"
 
+#include <iomanip>
 #include <iostream>
 #include <QApplication>
 #include <QWorkspace>
@@ -88,7 +89,6 @@ int main(int argc, char *argv[]) {
           }
           else {
             QString msg = "Unable to write to socket";
-            std::cout << msg << std::endl;
             remove(p_socketFile.toAscii().data());
           }
         }
@@ -102,7 +102,6 @@ int main(int argc, char *argv[]) {
       }
       else {
         QString msg = "Unable to create socket";
-        std::cout << msg << std::endl;
         remove(p_socketFile.toAscii().data());
       }
     }

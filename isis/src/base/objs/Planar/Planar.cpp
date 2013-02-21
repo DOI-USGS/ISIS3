@@ -82,7 +82,7 @@ namespace Isis {
 
       // convert to radians, adjust for azimuth direction
       m_centerAzimuth *= DEG2RAD;
-      if (m_azimuthDirection == CounterClockwise) m_centerAzimuth *= -1.0;
+      if (m_azimuthDirection == Clockwise) m_centerAzimuth *= -1.0;
     }
     catch(IException &e) {
       string message = "Invalid label group [Mapping]";
@@ -136,6 +136,7 @@ namespace Isis {
     */
   double Planar::TrueScaleRadius() const {
     return m_centerRadius;
+    // return 60268000.0;
   }
 
 
@@ -184,17 +185,21 @@ namespace Isis {
    */
   bool Planar::SetGround(const double radius, const double az) {
 
-    // Convert azimuth to radians & clean up
+    // Convert azimuth to radians & adjust
     m_azimuth = az;
     double azRadians = az * DEG2RAD;
-    if (m_azimuthDirection == CounterClockwise) azRadians *= -1.0;
+    if (m_azimuthDirection == Clockwise) azRadians *= -1.0;
 
     // Check to make sure radius is valid
     if (radius < 0) {
-      throw IException(IException::Unknown,
-                       "Unable to set radius. The given radius value ["
-                       + IString(radius) + "] is invalid.",
-                       _FILEINFO_);
+      m_good = false;
+      cout << "Unable to set radius. The given radius value ["
+           << IString(radius) << "] is invalid." << endl;
+      // throw IException(IException::Unknown,
+      //                  "Unable to set radius. The given radius value ["
+      //                  + IString(radius) + "] is invalid.",
+      //                  _FILEINFO_);
+      return m_good;
     }
     m_radius = radius;
 
@@ -246,15 +251,16 @@ namespace Isis {
       m_azimuth += 360.0;
 
     // Cleanup the azimuth
-    if (m_azimuthDirection == CounterClockwise) m_azimuth *= -1.0;
+    if (m_azimuthDirection == Clockwise) m_azimuth *= -1.0;
 
     // These need to be done for circular type projections
     m_azimuth = To360Domain(m_azimuth);
+
     if (m_azimuthDomain == 180)
       m_azimuth = To180Domain(m_azimuth);
 
     m_good = true;
-    return m_good;
+   return m_good;
   }
 
   /**

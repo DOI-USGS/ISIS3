@@ -1690,7 +1690,7 @@ namespace Isis {
         case QEvent::MouseMove: {
           QMouseEvent *m = (QMouseEvent *) e;
           emit mouseMove(m->pos());
-          emit mouseMove(m->pos(), (Qt::MouseButton)(m->button() +
+         emit mouseMove(m->pos(), (Qt::MouseButton)(m->button() +
                                     m->modifiers()));
           return true;
         }
