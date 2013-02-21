@@ -287,7 +287,7 @@ namespace Isis {
       obj += PvlKeyword("Latitude", m_latLineEdit->text());
       obj += PvlKeyword("Longitude", m_lonLineEdit->text());
       obj += PvlKeyword("Area", m_areaLineEdit->text());
-      obj += PvlKeyword("Visible", toString((m_box != NULL)));
+      obj += PvlKeyword("Visible", toString((int)(m_box != NULL)));
     }
 
     return obj;

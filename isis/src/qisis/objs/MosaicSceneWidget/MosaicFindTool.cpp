@@ -167,7 +167,7 @@ namespace Isis {
 
     obj += PvlKeyword("Latitude", p_latLineEdit->text());
     obj += PvlKeyword("Longitude", p_lonLineEdit->text());
-    obj += PvlKeyword("Visible", toString(p_findSpot != NULL));
+    obj += PvlKeyword("Visible", toString((int)(p_findSpot != NULL)));
 
     return obj;
   }

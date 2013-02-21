@@ -613,7 +613,7 @@ namespace Isis {
   PvlObject MosaicGridTool::toPvl() const {
     PvlObject obj(projectPvlObjectName());
 
-    obj += PvlKeyword("ShouldCheckBoxes", toString(m_shouldCheckBoxes));
+    obj += PvlKeyword("ShouldCheckBoxes", toString((int)m_shouldCheckBoxes));
 
     obj += PvlKeyword("BaseLatitude", toString(m_baseLat.degrees()));
     obj += PvlKeyword("BaseLongitude", toString(m_baseLon.degrees()));
@@ -630,7 +630,7 @@ namespace Isis {
     obj += PvlKeyword("MaximumLongitude", toString(m_maxLon.degrees()));
 
     obj += PvlKeyword("Density", toString(m_density));
-    obj += PvlKeyword("Visible", toString((m_gridItem)));
+    obj += PvlKeyword("Visible", toString((int)(m_gridItem != NULL)));
 
     return obj;
   }
