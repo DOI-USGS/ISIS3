@@ -131,7 +131,7 @@ namespace Isis {
 
     obj += PvlKeyword("FileName", m_controlNetFile);
     obj += PvlKeyword("Visible",
-        Isis::toString(m_controlNetGraphics && m_controlNetGraphics->isVisible()));
+        Isis::toString((int)(m_controlNetGraphics && m_controlNetGraphics->isVisible())));
     obj += PvlKeyword("Movement", toString(m_movementArrowColorSource));
 
     if (maxMovementColorMeasureCount() != -1) {

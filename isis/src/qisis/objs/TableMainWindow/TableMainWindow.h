@@ -31,9 +31,12 @@ namespace Isis {
   *                          user does not have to reselect the file to save the table to.
   *  @history 2012-06-18 Steven Lambright - Gave the mac toolbar an object name for
   *                          saving and restoring state. Fixes #851."
+  *  @history 2013-02-21 Steven Lambright - Fixed a seg fault on destruction. This happened because
+  *                          the item list was being saved off independently; the items would be
+  *                          destroyed in the table widget but our copies of the pointers were not
+  *                          yet cleared. This has been fixed by adding the method itemList()
+  *                          instead of storing p_itemList. References #710.
   */
-
-
   class TableMainWindow : public MainWindow {
       Q_OBJECT
     public:
@@ -51,15 +54,9 @@ namespace Isis {
         return p_table;
       };
 
-      /**
-       *
-       * Returns the item list
-       *
-       * @return QList<QListWidgetItem*>
-       */
-      QList<QListWidgetItem *> itemList() const {
-        return p_itemList;
-      };
+
+      QList<QListWidgetItem *> itemList();
+
 
       /**
        *
@@ -148,8 +145,7 @@ namespace Isis {
       QFile p_currentFile; //!< The current file
 
       QTableWidget *p_table; //!< The table
-      QList<QListWidgetItem *> p_itemList; //!< List of widget items
-      QListWidget *p_listWidget; //!< List widget
+      QPointer<QListWidget> p_listWidget; //!< List widget
       int p_selectedRows; //!< Number of selected rows
       int p_currentIndex; //!< Current index
       int p_currentRow; //!< Current row

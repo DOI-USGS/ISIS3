@@ -23,6 +23,8 @@
 
 #include <cmath>
 
+#include <QDebug>
+
 #include "Constants.h"
 #include "IString.h"
 #include "IException.h"
@@ -67,7 +69,7 @@ namespace Isis {
     m_radians = Null;
   }
 
-  
+
   /**
    * This indicates whether we have a legitimate angle stored or are in an
    *   unset, or invalid, state.
@@ -78,7 +80,7 @@ namespace Isis {
     return m_radians != Null;
   }
 
-  
+
   /**
    * Makes an angle to represent a full rotation (0-360 or 0-2pi).
    *
@@ -330,3 +332,21 @@ namespace Isis {
 
 }
 
+
+/**
+ * Display an Angle for a debugging statement.
+ *
+ * Example:
+ * @code
+ *   qDebug() << Angle(90, Angle::Degrees);
+ * @endcode
+ *
+ * @param dbg The QDebug we're printing into
+ * @param angleToPrint The Angle to display
+ */
+QDebug operator<<(QDebug dbg, const Isis::Angle &angleToPrint) {
+  dbg.nospace() << angleToPrint.radians() << " <radians> ("
+                << angleToPrint.degrees() << " <degrees>)";
+
+  return dbg.space();
+}

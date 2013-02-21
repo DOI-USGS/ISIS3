@@ -21,7 +21,7 @@ class QToolButton;
 
 namespace Isis {
   /**
-   * @brief This controls the 'Grid' abilities in the MosaicSceneWidget 
+   * @brief This controls the 'Grid' abilities in the MosaicSceneWidget
    *
    * @ingroup Visualization Tools
    *
@@ -40,6 +40,9 @@ namespace Isis {
    *                           support for a new options dialog that lets the user configure the
    *                           grid. Changed the draw/clear grid buttons to a show grid checkbox.
    *                           Fixes #604.
+   *   @history 2013-02-01 Steven Lambright - Fixed a problem with setLonInc() bounding the maximum
+   *                           longitude increment incorrectly, which caused a bad increment. This
+   *                           resulted in freezing or an invalid grid. Fixes #1060.
    */
   class MosaicGridTool : public MosaicTool {
       Q_OBJECT
@@ -60,7 +63,7 @@ namespace Isis {
          */
         Manual
       };
-      
+
       MosaicGridTool(MosaicSceneWidget *);
       void addToMenu(QMenu *menu);
 
@@ -81,7 +84,7 @@ namespace Isis {
       Longitude minLon();
       MosaicSceneWidget* sceneWidget();
       bool showGrid();
-      
+
       //Mutators
       void setAutoGridCheckBox(bool checked);
       void setBaseLat(Latitude baseLat);
@@ -100,7 +103,7 @@ namespace Isis {
 
     signals:
       void boundingRectChanged();
-      
+
 
     public slots:
       void autoGrid(bool draw);
@@ -121,23 +124,23 @@ namespace Isis {
       QPointer<QCheckBox> m_autoGridCheckBox; //!< True if grid properties come from the open cubes
       QPointer<QCheckBox> m_drawGridCheckBox; //!< True if grid properties come from the open cubes
       bool m_shouldCheckBoxes; //!< True when the tool is first opened to check the checkboxes.
-      
+
       Latitude m_baseLat; //!< Base latitude for drawing the grid.
       Longitude m_baseLon; //!< Base longitude for drawing the grid.
-      
+
       Angle m_latInc; //!< Latitude increment for drawing the grid.
       Angle m_lonInc; //!< Longitude increment for drawing the grid.
-      
+
       GridExtentSource m_latExtents; //!< Used for the state of the options dialog.
       Latitude m_maxLat; //!< Maximum latitude of the grid.
       Latitude m_minLat; //!< Minimum latitude of the grid.
-      
+
       GridExtentSource m_lonExtents; //!< Used for the state of the options dialog.
       Longitude m_maxLon; //!< Maximum longitude of the grid.
       Longitude m_minLon; //!< Minimum longitude of the grid.
-      
+
       int m_density; //!< Grid density for drawing the grid.
-      
+
       QAction *m_action;
       QGraphicsItem *m_gridItem;
       QRectF m_previousBoundingRect; //!< The bounding rectangle of the previous set of open cubes.

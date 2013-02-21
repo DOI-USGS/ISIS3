@@ -30,6 +30,8 @@ namespace Isis {
    *                           cubes, manually entered). Also modified the constructor so it can
    *                           handle drawing grids for both planetocentric and planetographic
    *                           latitudes. Fixes #604.
+   *   @history 2013-02-06 Steven Lambright - Added a safety check to make sure the increments
+   *                           aren't zero or negative. References #1060.
    */
   class GridGraphicsItem : public QGraphicsItem {
     public:

@@ -66,6 +66,8 @@ namespace Isis {
    *                           configure curve dialog. Fixes #203.
    *   @history 2012-07-03 Steven Lambright - Added labels for Meters/Kilometers
    *                           units.
+   *   @history 2013-02-21 Steven Lambright - Added methods requestFillTable(), scheduleFillTable()
+   *                           in order to increase performance. References #710.
    */
   class PlotWindow : public MainWindow {
       Q_OBJECT
@@ -194,6 +196,8 @@ namespace Isis {
       //! Emitted every time there is a change to the plot window.
       void plotChanged();
 
+      void requestFillTable();
+
     public slots:
       void clearPlot();
       void createBestFitLine();
@@ -212,6 +216,7 @@ namespace Isis {
       void switchBackground();
       void trackerEnabled();
 
+      void scheduleFillTable();
       void fillTable();
 
     protected:
@@ -233,6 +238,7 @@ namespace Isis {
 
     private:
       QPair<double, double> findDataRange(int axisId) const;
+      static bool numericStringLessThan(QString left, QString right);
       bool userCanAddCurve(const QMimeData *curve);
       void updateVisibility(PlotCurve *curve);
       void setupDefaultMenu(MenuOptions optionsToProvide);
@@ -296,6 +302,8 @@ namespace Isis {
       QwtPlot *m_plot;//!< The plot in this window
       TableMainWindow *m_tableWindow;//!< Table window
       QToolBar *m_toolBar;//!< Tool bar on the plot window
+
+      bool m_scheduledFillTable;
    };
 };
 

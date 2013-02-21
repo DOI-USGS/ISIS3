@@ -129,7 +129,7 @@ namespace Isis {
       key = key.replace(" ", "_");
       bool visible = !p_tree->isColumnHidden(col);
 
-      output += PvlKeyword(key, toString(visible));
+      output += PvlKeyword(key, toString((int)visible));
       col = (MosaicTreeWidgetItem::TreeColumn)(col + 1);
     }
 

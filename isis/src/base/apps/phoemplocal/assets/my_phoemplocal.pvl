@@ -1,0 +1,30 @@
+# NOTE DESCRIBING DATA IN THE FOLLOWING RESULTS SECTION
+Group = Note
+  NOTE = "This is a test, wh.52, hh=.17 b0=.025 theta=30 hg1=.213 hg2=1 for
+          lunarlambert empirical model and no atmosphere"
+End_Group
+
+Group = Results
+  # EMPIRICAL PHOTOMETRIC PARAMETER AND PHASE CURVES CREATED BY PHO_EMP_LOCAL
+  # HAPKE PARAMETERS:
+  WH                       = 0.52
+  THETA                    = 30
+  HH                       = 0.17
+  B0                       = 0.025
+
+  # SINGLE PARTICLE PHASE FUNCTION IS HENYEY-GREENSTEIN WITH:
+  HG1                      = 0.213
+  HG2                      = 1
+  GRID_POINTS              = 51
+  INCIDENCE_ANGLE_TO_DATUM = 30
+  EMISSION_ANGLE_TO_DATUM  = 15
+  PHASE_ANGLE              = 30
+  RMS_SLOPE                = 0.5
+
+  # FITTED EMPIRICAL FUNCTION IS LUNAR-LAMBERT: LIMB-DARKENING PARAMETER IS L
+  # FIT INCLUDES MULTIPLIER ONLY
+  LIMB_DARKENING_PARAMETER = 0.732347
+  BEST_FIT_MULTIPLIER      = 0.14526
+  RMS_ERROR_OF_FIT         = 2.04791e-05
+End_Group
+End

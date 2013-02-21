@@ -40,6 +40,7 @@ namespace Isis {
     if(m_rubberBandCombo) {
       m_rubberBandCombo->reset();
       m_rubberBandCombo->setEnabled(true);
+      RubberBandTool::drawActiveViewportOnly(true);
     }
   }
 

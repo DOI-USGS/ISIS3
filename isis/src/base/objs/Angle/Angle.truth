@@ -18,6 +18,7 @@ Testing mutators
   setRadians:  3.14159265 radians
 
 Testing operators
+  QDebug operator:   0.785398 <radians> (45 <degrees>) 
   Assignment operator:  45 degrees
   + and - operators...
     angle + angle: 90 degrees

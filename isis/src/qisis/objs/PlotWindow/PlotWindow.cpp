@@ -81,7 +81,9 @@ namespace Isis {
     connect(QApplication::clipboard(), SIGNAL(changed(QClipboard::Mode)),
             this, SLOT(onClipboardChanged()));
     connect(this, SIGNAL(plotChanged()),
-            this, SLOT(fillTable()));
+            this, SLOT(scheduleFillTable()));
+    connect(this, SIGNAL(requestFillTable()),
+            this, SLOT(fillTable()), Qt::QueuedConnection);
 
     QMap<PlotCurve::Units, QString> unitLabels;
     unitLabels.insert(PlotCurve::Band, "Band");
@@ -1323,9 +1325,25 @@ namespace Isis {
 
   /**
    * Fills in the table with the data from the current curves
-   * in the plotWindow
+   *   in the plotWindow once all current actions/activations are done. This is provided for
+   *   performance reasons - re-plotting 4 curves only requires one fillTable at the end, instead
+   *   of after each curve change.
+   */
+  void PlotWindow::scheduleFillTable() {
+    if (!m_scheduledFillTable) {
+      m_scheduledFillTable = true;
+      emit requestFillTable();
+    }
+  }
+
+
+  /**
+   * Fills in the table with the data from the current curves
+   * in the plotWindow immediately.
    */
   void PlotWindow::fillTable() {
+    m_scheduledFillTable = false;
+
     if (m_tableWindow == NULL) return;
     m_tableWindow->listWidget()->clear();
     m_tableWindow->table()->clear();
@@ -1352,46 +1370,77 @@ namespace Isis {
     // QwtScaleDiv *xAxisScaleDiv = m_plot->axisScaleDiv(QwtPlot::xBottom);
     // QList<double> xAxisPoints = xAxisScaleDiv->ticks(QwtScaleDiv::MajorTick);
     //
-    // Also, QSet<double> does not work (Qt can't do it as of version 4.6).
-    QList<double> xAxisPoints;
+    // We're going to keep xAxisPoints in standard text sort order until we're done populating it,
+    //   then we'll re-sort numerically. That enables us to effectively use binary searches and
+    //   insertion sort-like capabilities for speed.
+    QList<QString> xAxisPoints;
 
-    foreach (CubePlotCurve *curve, curves) {
+    QProgressDialog progress(tr("Re-calculating Table"), tr(""), 0, 1000, this);
+    double percentPerCurve = 0.5 * 1.0 / curves.count();
+
+    for (int curveIndex = 0; curveIndex < curves.count(); curveIndex++) {
+      progress.setValue(qRound(curveIndex * percentPerCurve * 1000.0));
+
+      CubePlotCurve *curve = curves[curveIndex];
+
+      double percentPerDataIndex = (1.0 / curve->data()->size()) * percentPerCurve;
+
       // Loop backwards because our insertion sort will have a much better
       //   chance of success on it's first try this way.
       for (int dataIndex = (int)curve->data()->size() - 1;
             dataIndex >= 0;
             dataIndex--) {
         double xValue = curve->data()->sample(dataIndex).x();
+        QString xValueString = toString(xValue);
+
+        int inverseDataIndex = (curve->data()->size() - 1) - dataIndex;
+        progress.setValue(
+            qRound( ((curveIndex * percentPerCurve) +
+                     (inverseDataIndex * percentPerDataIndex)) * 1000.0));
 
         // It turns out that qBinaryFind(container, value) is NOT the same as
         //   qBinaryFind(container.begin(), container.end(), value). Use the one
         //   that works right.
-        QList<double>::const_iterator foundPos =
-            qBinaryFind(xAxisPoints.begin(), xAxisPoints.end(), xValue);
+        QList<QString>::const_iterator foundPos =
+            qBinaryFind(xAxisPoints.begin(), xAxisPoints.end(), xValueString);
 
         if (foundPos == xAxisPoints.end()) {
           bool inserted = false;
+
           for (int searchIndex = 0;
              searchIndex < xAxisPoints.size() && !inserted;
              searchIndex++) {
-            if (xAxisPoints[searchIndex] > xValue) {
+            if (xAxisPoints[searchIndex] > xValueString) {
               inserted = true;
-              xAxisPoints.insert(searchIndex, xValue);
+              xAxisPoints.insert(searchIndex, xValueString);
             }
           }
+
           if (!inserted)
-            xAxisPoints.prepend(xValue);
+            xAxisPoints.append(xValueString);
         }
       }
     }
 
+    qSort(xAxisPoints.begin(), xAxisPoints.end(), &numericStringLessThan);
+
     m_tableWindow->table()->setRowCount(xAxisPoints.size());
 
-    for (int row = 0; row < m_tableWindow->table()->rowCount(); row++) {
-      double xAxisValue = xAxisPoints[row];
+    QList<int> lastSuccessfulSamples;
 
-      QTableWidgetItem *xAxisItem = new QTableWidgetItem(
-          IString(xAxisValue).ToQt());
+    for (int i = 0; i < curves.count(); i++) {
+      lastSuccessfulSamples.append(-1);
+    }
+
+    double progressPerRow = 0.5 * 1.0 / m_tableWindow->table()->rowCount();
+
+    for (int row = 0; row < m_tableWindow->table()->rowCount(); row++) {
+      progress.setValue(500 + qRound(row * progressPerRow * 1000.0));
+
+      QString xValueString = xAxisPoints[row];
+      double xValue = toDouble(xValueString);
+
+      QTableWidgetItem *xAxisItem = new QTableWidgetItem(xValueString);
       m_tableWindow->table()->setItem(row, 0, xAxisItem);
 
       if (row == m_tableWindow->table()->rowCount() - 1) {
@@ -1403,12 +1452,25 @@ namespace Isis {
         CubePlotCurve *curve = curves[col - 1];
 
         double y = Null;
+        bool tooFar = false;
 
-        for (int dataIndex = 0;
-             dataIndex < (int)curve->data()->size() && y == Null;
+        for (int dataIndex = lastSuccessfulSamples[col - 1] + 1;
+             dataIndex < (int)curve->data()->size() && y == Null && !tooFar;
              dataIndex++) {
-          if (curve->data()->sample(dataIndex).x() == xAxisValue) {
+
+          if (toString(curve->data()->sample(dataIndex).x()) == xValueString) {
+            // Try to compensate for decreasing x values by not performing this optimization
+            if (dataIndex > 0 &&
+                curve->data()->sample(dataIndex - 1).x() < curve->data()->sample(dataIndex).x()) {
+              lastSuccessfulSamples[col - 1] = dataIndex;
+            }
             y = curve->data()->sample(dataIndex).y();
+          }
+          // Try to compensate for decreasing X values in the too far computation
+          else if (dataIndex > 0 &&
+              curve->data()->sample(dataIndex - 1).x() < curve->data()->sample(dataIndex).x() &&
+              curve->data()->sample(dataIndex).x() > xValue) {
+            tooFar = true;
           }
         }
 
@@ -1417,7 +1479,7 @@ namespace Isis {
         if (IsSpecial(y))
           item = new QTableWidgetItem(QString("N/A"));
         else
-          item = new QTableWidgetItem(IString(y).ToQt());
+          item = new QTableWidgetItem(toString(y));
 
         m_tableWindow->table()->setItem(row, col, item);
 
@@ -1633,6 +1695,19 @@ namespace Isis {
     }
 
     return rangeMinMax;
+  }
+
+
+  bool PlotWindow::numericStringLessThan(QString left, QString right) {
+    bool result = false;
+
+    try {
+      result = toDouble(left) < toDouble(right);
+    }
+    catch (IException &) {
+    }
+
+    return result;
   }
 
 

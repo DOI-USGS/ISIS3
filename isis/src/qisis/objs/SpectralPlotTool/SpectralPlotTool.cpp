@@ -81,6 +81,7 @@ namespace Isis {
   void SpectralPlotTool::enableRubberBandTool() {
     if (m_rubberBandCombo) {
       m_rubberBandCombo->reset();
+      RubberBandTool::drawActiveViewportOnly(false);
 
       m_rubberBandCombo->setEnabled(true);
       m_rubberBandCombo->setVisible(true);

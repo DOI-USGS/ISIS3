@@ -895,6 +895,7 @@ namespace Isis {
    */
   void StretchTool::enableRubberBandTool() {
     RubberBandTool::enable(RubberBandTool::Rectangle);
+    RubberBandTool::drawActiveViewportOnly(true);
   }
 
 
