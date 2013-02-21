@@ -403,7 +403,6 @@ namespace Isis
         trackBuffer(grayBuffer(), p, dn))
     {
       bool camSucceeds = camera() && camera()->SetImage(sample, line);
-      std::cout << "IndependentCubeViewport->track... camSucceeds, projection() = " << camSucceeds << ", " << projection() << endl;
       bool projSucceeds = !camSucceeds && projection() &&
           projection()->SetWorld(sample, line);
 
