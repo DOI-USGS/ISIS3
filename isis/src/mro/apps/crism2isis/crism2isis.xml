@@ -5,8 +5,11 @@
   <brief>Import MRO CRISM PDS image cube into Isis format cube</brief>
 
   <description>
-    This program will import an MRO CRISM PDS image into an Isis cube. The 
-    following CRISM formats are supported:
+    This program will import an MRO CRISM PDS image into an Isis cube. Each
+    time this program is run, the user should get a warning that the 
+    nearest-neighbor interpolation should be used if cam2map or cam2cam is run
+    on the imported image due to gimble jitter. The following CRISM formats are
+    supported:
     <ul>
       <li>
         DDR
@@ -26,6 +29,9 @@
     </change>
     <change name="Jeannie Walldren" date="2009-06-02">
       Moved from base directory to mro directory.
+    </change>
+    <change name="Jeannie Backer" date="2013-02-22">
+      Added output log containing warning. Fixes #1502.
     </change>
   </history>
 

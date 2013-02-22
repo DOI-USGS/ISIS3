@@ -27,7 +27,7 @@ void IsisMain() {
 
   QString prodType;
 
-  if(labelPvl.HasKeyword("PRODUCT_TYPE")) {
+  if (labelPvl.HasKeyword("PRODUCT_TYPE")) {
     prodType = (QString)labelPvl.FindKeyword("PRODUCT_TYPE");
   }
   else {
@@ -35,9 +35,9 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  if(prodType.toUpper() == "MAP_PROJECTED_MULTISPECTRAL_RDR") {
+  if (prodType.toUpper() == "MAP_PROJECTED_MULTISPECTRAL_RDR") {
     QString prodId;
-    if(labelPvl.HasKeyword("PRODUCT_ID")) {
+    if (labelPvl.HasKeyword("PRODUCT_ID")) {
       prodId = (QString)labelPvl.FindKeyword("PRODUCT_ID");
       prodId = prodId.mid(prodId.indexOf("_") + 1, prodId.indexOf("_"));
     }
@@ -49,9 +49,9 @@ void IsisMain() {
     //If the product type is AL (Lambert albedo) or IF (I/F)
     //Read the wavelength table and put the corresponding
     //widths in the band bin group
-    if(prodId.toUpper() == "MRRAL" || prodId.toUpper() == "MRRIF") {
+    if (prodId.toUpper() == "MRRAL" || prodId.toUpper() == "MRRIF") {
       //If the wavelength file is specified in the label
-      if(labelPvl.HasKeyword("MRO:WAVELENGTH_FILE_NAME")) {
+      if (labelPvl.HasKeyword("MRO:WAVELENGTH_FILE_NAME")) {
         PvlGroup bandBin = PvlGroup("BandBin");
         PvlKeyword origBand = PvlKeyword("OriginalBand");
         PvlKeyword widths = PvlKeyword("Width");
@@ -59,10 +59,10 @@ void IsisMain() {
         tablePath = tablePath.toLower();
         FileName tableFile(inFile.path() + "/" + tablePath);
         //Check if the wavelength file exists
-        if(tableFile.fileExists()) {
+        if (tableFile.fileExists()) {
           TextFile *fin = new TextFile(tableFile.expanded());
           // Open table file
-          if(!fin->OpenChk()) {
+          if (!fin->OpenChk()) {
             QString msg = "Cannot open wavelength table [" + tableFile.expanded() + "]";
             throw IException(IException::Io, msg, _FILEINFO_);
           }
@@ -71,7 +71,7 @@ void IsisMain() {
           //The band bin group
           QString st;
           int band = 1;
-          while(fin->GetLine(st)) {
+          while (fin->GetLine(st)) {
             st = st.simplified().trimmed();
             QStringList cols = st.split(",");
 
@@ -95,12 +95,12 @@ void IsisMain() {
     //If the product type is DE (Derived products for I/F) or DL
     //(Derived products for Lambert albedo) write the band names
     //to the band bin group
-    else if(prodId.toUpper() == "MRRDE" || prodId.toUpper() == "MRRDL") {
+    else if (prodId.toUpper() == "MRRDE" || prodId.toUpper() == "MRRDL") {
       PvlGroup bandBin = PvlGroup("BandBin");
       PvlKeyword origBand = PvlKeyword("OriginalBand");
       PvlKeyword bandName = PvlKeyword("BandName");
       PvlKeyword bandNames = labelPvl.FindObject("IMAGE").FindKeyword("BAND_NAME");
-      for(int i = 0; i < bandNames.Size(); i++) {
+      for (int i = 0; i < bandNames.Size(); i++) {
         origBand += toString(i + 1);
         bandName += bandNames[i];
       }
@@ -112,14 +112,14 @@ void IsisMain() {
     p.TranslatePdsProjection(outLabel);
     ocube->putGroup(outLabel.FindGroup("Mapping", Pvl::Traverse));
   }
-  else if(prodType.toUpper() == "TARGETED_RDR") {
+  else if (prodType.toUpper() == "TARGETED_RDR") {
   }
-  else if(prodType.toUpper() == "DDR") {
+  else if (prodType.toUpper() == "DDR") {
     PvlGroup bandBin = PvlGroup("BandBin");
     PvlKeyword origBand = PvlKeyword("OriginalBand");
     PvlKeyword bandName = PvlKeyword("BandName");
     PvlKeyword bandNames = labelPvl.FindObject("FILE").FindObject("IMAGE").FindKeyword("BAND_NAME");
-    for(int i = 0; i < bandNames.Size(); i++) {
+    for (int i = 0; i < bandNames.Size(); i++) {
       origBand += toString(i + 1);
       bandName += bandNames[i];
     }
@@ -148,5 +148,12 @@ void IsisMain() {
   p.StartProcess();
   p.EndProcess();
 
+  PvlGroup results("Results");
+  results += PvlKeyword("Warning", 
+                        "When using cam2map or cam2cam, images imported into "
+                        "Isis3 using crism2isis should only be interpolated "
+                        "using the nearest-neighbor algorithm due to gimble "
+                        "jitter of the MRO CRISM instrument.");
+  Application::Log(results);
   return;
 }
