@@ -44,6 +44,7 @@
  * @internal
  *   @history 2010-04-27 Stuart Sides - Modified Direct member to use a vector
  *                           of filters instead of a single QString
+ *   @history 2013-02-15 Steven Lambright - Added support for extra kernel dependencies
  *
  */
 class SpiceDbGen {
@@ -51,8 +52,10 @@ class SpiceDbGen {
   public:
     SpiceDbGen(QString type);
     Isis::PvlObject Direct(QString quality, QString location,
-                     std::vector<QString> & filter);
-    void FurnishDependencies(QString sclk, QString fk);
+                           std::vector<QString> & filter);
+    void FurnishDependencies(QList<Isis::FileName> sclks, QList<Isis::FileName> fks,
+                             QList<Isis::FileName> extras);
+
   private:
     QStringList GetFiles(Isis::FileName location, QString filter);
     Isis::PvlGroup AddSelection(Isis::FileName fileIn);

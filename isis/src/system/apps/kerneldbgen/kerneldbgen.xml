@@ -53,11 +53,11 @@
     </p>
     <p><pre>
       For example, using the pure string expression:
-      
+
       "m01_sc_ext??_rec_nadir.bc ; m01_sc_ext??.bc"
-      
+
       would result in the listing:
-      
+
       m01_sc_ext10.bc
       m01_sc_ext10_rec_nadir.bc
       m01_sc_ext11.bc
@@ -66,13 +66,13 @@
       m01_sc_ext12_rec_nadir.bc
       m01_sc_ext13.bc
       m01_sc_ext13_rec_nadir.bc
-	  
-	  while using the ISIS array expression:
-	  
-	  ("m01_sc_ext??_rec_nadir.bc", "m01_sc_ext??.bc")
-	  
-	  would result in the listing:
-	  
+
+          while using the ISIS array expression:
+
+          ("m01_sc_ext??_rec_nadir.bc", "m01_sc_ext??.bc")
+
+          would result in the listing:
+
       m01_sc_ext10_rec_nadir.bc
       m01_sc_ext11_rec_nadir.bc
       m01_sc_ext12_rec_nadir.bc
@@ -105,7 +105,7 @@
       Added examples
     </change>
     <change name="Elizabeth Miller" date="2005-10-05">
-        Moved from Geometry category to System
+      Moved from Geometry category to System
     </change>
     <change name="Brendan George" date="2005-11-03">
       Added application test
@@ -117,8 +117,8 @@
       Made changes to SpiceDbGen to comply with changes in KernelDb
     </change>
     <change name="Brendan George" date="2006-10-05">
-        Modified call to retrieve current time to refer to Time class, instead
-        of Application class
+      Modified call to retrieve current time to refer to Time class, instead
+      of Application class
     </change>
     <change name="Jeff Anderson" date="2006-10-24">
       Removed spaces between Spacecraft Clock Count and Leapsecond Kernel
@@ -134,11 +134,15 @@
       user instead of a dump to the terminal window when a problem occurs.
     </change>
     <change name="Stuart Sides" date="2010-04-27">
-      Modified to use a vector of filters for each quality of kernel instead of 
-      a single string 
+      Modified to use a vector of filters for each quality of kernel instead of
+      a single string
     </change>
     <change name="Christopher Austin" date="2011-05-06">
       Added documentation for ISIS array input.
+    </change>
+    <change name="Steven Lambright" date="2013-02-15">
+      Added the EXTRA option. Also, added basic support for kerneldb files being specified for
+      SCLK/LSK parameters. Fixes #1023.
     </change>
   </history>
 
@@ -150,14 +154,14 @@
           <item>./kernels.????.db</item>
         </default>
         <brief>
-    Location of the output file
+          Location of the output file
         </brief>
         <description>
-	  This parameter may be used as a relative pathname to specify the
-	  location of an output PVL database containing data on all of kernels
-	  matched by kerneldbgen. It should be noted that version sequences
-	  may be included in the pathname, in which case a new version will be
-	  created.
+          This parameter may be used as a relative pathname to specify the
+          location of an output PVL database containing data on all of kernels
+          matched by kerneldbgen. It should be noted that version sequences
+          may be included in the pathname, in which case a new version will be
+          created.
         </description>
       </parameter>
     </group>
@@ -168,35 +172,35 @@
           <item>CK</item>
         </default>
         <brief>
-        Kernel type
+          Kernel type
         </brief>
         <description>
-	  The kernel type specifies what sort of information the kernel contains.
-	  Since kerneldbgen is intended for use only in situations where the most
-	  recent kernel does not eclipse the content of previous kernels, there
-	  are only two options: Spacecraft pointing kernels (CK) and Spacecraft
-	  position kernels (SPK).
+          The kernel type specifies what sort of information the kernel contains.
+          Since kerneldbgen is intended for use only in situations where the most
+          recent kernel does not eclipse the content of previous kernels, there
+          are only two options: Spacecraft pointing kernels (CK) and Spacecraft
+          position kernels (SPK).
         </description>
         <list>
           <option value="CK">
             <brief>
-        Spacecraft pointing kernels
+              Spacecraft pointing kernels
             </brief>
             <description>
               The kernels to be listed in the output database will include
-	      spacecraft pointing data. In order to properly calculate times, a
-	      spacecraft clock kernel (SCLK)  and leapsecond kernel (LSK)
-	      must also be furnished via the dependency kernel group below.
+              spacecraft pointing data. In order to properly calculate times, a
+              spacecraft clock kernel (SCLK)  and leapsecond kernel (LSK)
+              must also be furnished via the dependency kernel group below.
             </description>
           </option>
           <option value="SPK">
             <brief>
-        Spacecraft position kernels
+              Spacecraft position kernels
             </brief>
             <description>
               The kernels to be listed in the output database will include
-	      spacecraft position data. Unlike calculations for pointing data,
-	      only the leapsecond kernel (LSK) needs to be provided.
+              spacecraft position data. Unlike calculations for pointing data,
+              only the leapsecond kernel (LSK) needs to be provided.
             </description>
             <exclusions>
               <item>SCLK</item>
@@ -216,12 +220,12 @@
           Directory where the predict quality kernels are located
         </brief>
         <description>
-      	  This parameter specifies the path upon which the regular expression in
-      	  "PREDICTFILTER" will operate. Since this parameter will be used
-      	  explicitly in the "File" keyword of the generated database, it is
-      	  recommended that only shortcuts known to the ISIS system and absolute
-      	  pathnames are used. If left as "none" no predicted kernels will be
-      	  included in the database
+          This parameter specifies the path upon which the regular expression in
+          "PREDICTFILTER" will operate. Since this parameter will be used
+          explicitly in the "File" keyword of the generated database, it is
+          recommended that only shortcuts known to the ISIS system and absolute
+          pathnames are used. If left as "none" no predicted kernels will be
+          included in the database
         </description>
         <default>
           <item>none</item>
@@ -236,12 +240,12 @@
           <item>none</item>
         </default>
         <description>
-      	  This parameter is used to specify the kernel or kernels to be 
-      	  identified as predicted. Any combination of kernel file names or 
-          regular expression may be specified. The value of "PREDICTDIR" is 
-          prepended to each element before being expanded. Each regular 
-          expression is evaluated then the results are sorted according 
-          to ASCII order and added to the list of available kernels. 
+          This parameter is used to specify the kernel or kernels to be
+          identified as predicted. Any combination of kernel file names or
+          regular expression may be specified. The value of "PREDICTDIR" is
+          prepended to each element before being expanded. Each regular
+          expression is evaluated then the results are sorted according
+          to ASCII order and added to the list of available kernels.
         </description>
       </parameter>
     </group>
@@ -252,12 +256,12 @@
           Directory where the reconstructed quality kernels are located
         </brief>
         <description>
-        	  This parameter specifies the path upon which the regular expression in
-        	  "RECONFILTER" will operate. Since this parameter will be used
-        	  explicitly in the "File" keyword of the generated database, it is
-        	  recommended that only shortcuts known to the ISIS system and absolute
-        	  pathnames are used. If left as "none" no reconstructed kernels will be
-        	  included in the database. 
+          This parameter specifies the path upon which the regular expression in
+          "RECONFILTER" will operate. Since this parameter will be used
+          explicitly in the "File" keyword of the generated database, it is
+          recommended that only shortcuts known to the ISIS system and absolute
+          pathnames are used. If left as "none" no reconstructed kernels will be
+          included in the database.
         </description>
         <default>
           <item>none</item>
@@ -269,12 +273,12 @@
           Filter to identify reconstructed quality kernels
         </brief>
         <description>
-      	  This parameter is used to specify the kernel or kernels to be 
-      	  identified as reconstructed. Any combination of kernel file names or 
-          regular expression may be specified. The value of "RECONDIR" is 
-          prepended to each element before being expanded. Each regular 
-          expression is evaluated then the results are sorted according to ASCII 
-          order and added to the list of available kernels. 
+          This parameter is used to specify the kernel or kernels to be
+          identified as reconstructed. Any combination of kernel file names or
+          regular expression may be specified. The value of "RECONDIR" is
+          prepended to each element before being expanded. Each regular
+          expression is evaluated then the results are sorted according to ASCII
+          order and added to the list of available kernels.
         </description>
         <default>
           <item>none</item>
@@ -288,12 +292,12 @@
           Directory where the smithed quality kernels are located
         </brief>
         <description>
-        	  This parameter specifies the path upon which the regular expression in
-        	  "SMITHEDFILTER" will operate. Since this parameter will be used
-        	  explicitly in the "File" keyword of the generated database, it is
-        	  recommended that only shortcuts known to the ISIS system and absolute
-        	  pathnames are used. If left as "none" no smithed kernels will be
-        	  included in the database
+          This parameter specifies the path upon which the regular expression in
+          "SMITHEDFILTER" will operate. Since this parameter will be used
+          explicitly in the "File" keyword of the generated database, it is
+          recommended that only shortcuts known to the ISIS system and absolute
+          pathnames are used. If left as "none" no smithed kernels will be
+          included in the database
         </description>
         <default>
           <item>none</item>
@@ -305,12 +309,12 @@
            Filter to identify smithed quality kernels
         </brief>
         <description>
-      	  This parameter is used to specify the kernel or kernels to be 
-      	  identified as smithed. Any combination of kernel file names or regular 
-          expression may be specified. The value of "SMITHED"DIR" is prepended 
-          to each element before being expanded. Each regular expression is 
-          evaluated then the results are sorted according to ASCII order and 
-          added to the list of available kernels. 
+          This parameter is used to specify the kernel or kernels to be
+          identified as smithed. Any combination of kernel file names or regular
+          expression may be specified. The value of "SMITHED"DIR" is prepended
+          to each element before being expanded. Each regular expression is
+          evaluated then the results are sorted according to ASCII order and
+          added to the list of available kernels.
         </description>
         <default>
           <item>none</item>
@@ -325,12 +329,12 @@
           Directory where the nadir quality kernels are located
         </brief>
         <description>
-        	  This parameter specifies the path upon which the regular expression in
-        	  "NADIRFILTER" will operate. Since this parameter will be used
-        	  explicitly in the "File" keyword of the generated database, it is
-        	  recommended that only shortcuts known to the ISIS system and absolute
-        	  pathnames are used. If left as "none" no nadir kernels will be
-        	  included in the database.
+          This parameter specifies the path upon which the regular expression in
+          "NADIRFILTER" will operate. Since this parameter will be used
+          explicitly in the "File" keyword of the generated database, it is
+          recommended that only shortcuts known to the ISIS system and absolute
+          pathnames are used. If left as "none" no nadir kernels will be
+          included in the database.
         </description>
         <default>
           <item>none</item>
@@ -342,25 +346,25 @@
           Filter to identify nadir quality kernels
         </brief>
         <description>
-      	  This parameter is used to specify the kernel or kernels to be 
-      	  identified as predicted. Any combination of kernel file names or 
-          regular expression may be specified. The value of "PREDICTDIR" is 
-          prepended to each element before being expanded. Each regular 
-          expression is evaluated then the results are sorted according 
-          to ASCII order and added to the list of available kernels. 
+          This parameter is used to specify the kernel or kernels to be
+          identified as predicted. Any combination of kernel file names or
+          regular expression may be specified. The value of "PREDICTDIR" is
+          prepended to each element before being expanded. Each regular
+          expression is evaluated then the results are sorted according
+          to ASCII order and added to the list of available kernels.
 
-          
+
           This parameter can be used to specify a single kernel, but the intent
-      	  is to specify a simple regular expression which, when expanded, will
-      	  list all of the predicted kernels in the directory specified by
-      	  "NADIRDIR"
+          is to specify a simple regular expression which, when expanded, will
+          list all of the predicted kernels in the directory specified by
+          "NADIRDIR"
         </description>
         <default>
           <item>none</item>
         </default>
       </parameter>
     </group>
-    -->    
+    -->
     <group name="Dependency Kernels">
       <parameter name="SCLK">
         <type>filename</type>
@@ -368,10 +372,10 @@
           Spacecraft clock kernel
         </brief>
         <description>
-        	  This parameter specifies a spacecraft clock kernel for use in
-        	  determining spacecraft pointing data. An actual kernel may be used, or
-        	  a pvl file of the form kernels.????.db that specifies SCLK data may
-        	  be used, where ???? is the version sequence.
+          This parameter specifies a spacecraft clock kernel for use in
+          determining spacecraft pointing data. An actual kernel may be used, or
+          a pvl file of the form kernels.????.db that specifies SCLK data may
+          be used, where ???? is the version sequence.
         </description>
       </parameter>
       <parameter name= "LSK">
@@ -380,11 +384,23 @@
           Leapsecond kernel
         </brief>
         <description>
-      	  This parameter specifies a leapsecond kernel for use in
-      	  determining spacecraft data. An actual kernel may be used, or
-      	  a pvl file of the form kernels.????.db that specifies LSK data may
-      	  be used, where ???? is the version sequence.
+          This parameter specifies a leapsecond kernel for use in
+          determining spacecraft data. An actual kernel may be used, or
+          a pvl file of the form kernels.????.db that specifies LSK data may
+          be used, where ???? is the version sequence.
         </description>
+      </parameter>
+      <parameter name= "EXTRA">
+        <type>filename</type>
+        <brief>
+          Other kernels
+        </brief>
+        <description>
+          This parameter specifies additional kernels required to fully vet the CK/SPK kernels.
+          An actual kernel may be used, or a pvl file of the form kernels.????.db that specifies
+          LSK data may be used, where ???? is the version sequence.
+        </description>
+        <internalDefault>none</internalDefault>
       </parameter>
     </group>
   </groups>
@@ -393,29 +409,29 @@
       <brief>
          Messenger ck kernels
       </brief>
-      <description> 
-        Use the ck option to create a database of spacecraft pointing kernels. 
-        In this example, a database is being created for the pivot kernels 
+      <description>
+        Use the ck option to create a database of spacecraft pointing kernels.
+        In this example, a database is being created for the pivot kernels
         pertaining to the Messenger spacecraft.
       </description>
       <terminalInterface>
         <commandLine>
-	  'to=pivot_kernels.????.db
-	  type = ck
-	  recondir = $Messenger/kernels/ck
-	  reconfilter= *_mdis_pivot.bc
-	  lsk = $Base/kernels/lsk/naif0008.tls
-	  sclk = $Messenger/kernels/sclk/messenger_167.tsc'
+          'to=pivot_kernels.????.db
+          type = ck
+          recondir = $Messenger/kernels/ck
+          reconfilter= *_mdis_pivot.bc
+          lsk = $Base/kernels/lsk/naif0008.tls
+          sclk = $Messenger/kernels/sclk/messenger_167.tsc'
         </commandLine>
         <description>
-	  This command line argument will create the database pivot_kernels.0002.db,
-	  assuming "0001" is the highest version in the target directory. Note the
-	  use of single quotes around the invocation of kerneldbgen. This is
-	  done because this particular run uses several characters such as the
-	  wildcard (*) that would be interpreted by the shell.
+          This command line argument will create the database pivot_kernels.0002.db,
+          assuming "0001" is the highest version in the target directory. Note the
+          use of single quotes around the invocation of kerneldbgen. This is
+          done because this particular run uses several characters such as the
+          wildcard (*) that would be interpreted by the shell.
         </description>
       </terminalInterface>
-      
+
 
 
 
@@ -423,51 +439,51 @@
         <guiInterface>
           <image width="440" height="625" src="assets/images/messengerCk.jpg">
             <brief>
-        Example GUI
+              Example GUI
             </brief>
             <description>
-	      Screenshot of the GUI with parameters set to create a kernel database
-	      of Messenger pivot kernels. Unlike running from the command line, the
-	      program need not go through the shell. Consequently, the input does
-	      not need to include escape sequences or quotes.
+              Screenshot of the GUI with parameters set to create a kernel database
+              of Messenger pivot kernels. Unlike running from the command line, the
+              program need not go through the shell. Consequently, the input does
+              not need to include escape sequences or quotes.
             </description>
             <thumbnail width="220" height="312" caption="kerneldbgen gui"
              src="assets/thumbs/messengerCk.jpg" />
           </image>
         </guiInterface>
       </guiInterfaces>
-      
+
 
 
 
       <inputImages>
         <image width="600" height="323" src="assets/images/terminalBefore.jpg">
           <brief>
-	    List of files before kerneldbgen has been run
+            List of files before kerneldbgen has been run
           </brief>
           <description>
-	    As seen in this terminal snapshot, there are a number of files that will
-	    match the reconfilter in the directory specified by the recondir. The
-	    highest pivot_kernels version is 0001.
+            As seen in this terminal snapshot, there are a number of files that will
+            match the reconfilter in the directory specified by the recondir. The
+            highest pivot_kernels version is 0001.
           </description>
           <thumbnail caption= "The directory before kerneldbgen"
            src="assets/thumbs/terminalBefore.jpg" width="200" height="108"/>
           <parameterName>RECONDIR</parameterName>
         </image>
       </inputImages>
-      
+
 
 
 
       <outputImages>
         <image width="600" height="323" src="assets/images/terminalAfter.jpg">
           <brief>
-	    List of files after kerneldbgen has been run
+            List of files after kerneldbgen has been run
           </brief>
           <description>
-	    None of the original files have been altered, but the versioning system
-	    has created a new version of the pivot_kernels database named
-	    pivot_kernels.0002.db. The content of this file is listed below.
+            None of the original files have been altered, but the versioning system
+            has created a new version of the pivot_kernels database named
+            pivot_kernels.0002.db. The content of this file is listed below.
           </description>
           <thumbnail caption= "The directory after kerneldbgen"
           src="assets/thumbs/terminalAfter.jpg" width="200" height="108"/>
@@ -475,14 +491,14 @@
         </image>
         <image width="750" height="483" src="assets/images/pivotDb.jpg">
           <brief>
-	    The database created by kerneldbgen
+            The database created by kerneldbgen
           </brief>
           <description>
-	    As seen here, the database has picked up all of the files that match the
-	    filter specified. Each time coverage interval is listed as a selection,
-	    and the dependency kernels is listed in a "dependency" group. Note that
-	    since the only type of filter specified was for Reconstructed kernels,
-	    that is the only type of kernel to appear in the database.
+            As seen here, the database has picked up all of the files that match the
+            filter specified. Each time coverage interval is listed as a selection,
+            and the dependency kernels is listed in a "dependency" group. Note that
+            since the only type of filter specified was for Reconstructed kernels,
+            that is the only type of kernel to appear in the database.
           </description>
           <thumbnail caption= "The database file"
           src="assets/thumbs/pivotDb.jpg" width="200" height="132"/>
@@ -504,24 +520,24 @@
       </description>
       <terminalInterface>
         <commandLine>
-	  'to=kernels.????.db
-	  type = ck
-	  <!--nadirdir = $Odyssey/kernels/ck -->
-	  reconfilter= *_nadir.bc
-	  recondir = $Odyssey/kernels/ck
-	  reconfilter= m01_sc_ab*.bc;m01_sc_ext?.bc;m01_sc_map.bc;m01_sc_map?.bc;m01_sc_map??.bc;m01_sc_map?_v2.bc'
-	  lsk = $Base/kernels/lsk/naif0008.tls
-	  sclk = $Odyssey/kernels/sclk/ORB1_SCLKSCET.00113.tsc'
+          'to=kernels.????.db
+          type = ck
+          <!--nadirdir = $Odyssey/kernels/ck -->
+          reconfilter= *_nadir.bc
+          recondir = $Odyssey/kernels/ck
+          reconfilter= m01_sc_ab*.bc;m01_sc_ext?.bc;m01_sc_map.bc;m01_sc_map?.bc;m01_sc_map??.bc;m01_sc_map?_v2.bc'
+          lsk = $Base/kernels/lsk/naif0008.tls
+          sclk = $Odyssey/kernels/sclk/ORB1_SCLKSCET.00113.tsc'
         </commandLine>
         <description>
-	  This command line argument will create the database kernels.0001.db,
-	  assuming that file does not already exist in the target directory. As in the
-	  previous example, the command line argument is surrounded by single quotes
-	  in order to escape characters that would otherwise be considered special by
-	  the shell.
+          This command line argument will create the database kernels.0001.db,
+          assuming that file does not already exist in the target directory. As in the
+          previous example, the command line argument is surrounded by single quotes
+          in order to escape characters that would otherwise be considered special by
+          the shell.
         </description>
       </terminalInterface>
-      
+
 
 
 
@@ -529,49 +545,49 @@
         <guiInterface>
           <image width="440" height="625" src="assets/images/odysseyCk.jpg">
             <brief>
-	    Example GUI
+            Example GUI
             </brief>
             <description>
-	      Screenshot of the GUI with parameters set to create a kernel database
-	      mixed with nadir kernels and reconstructed kernels.
+              Screenshot of the GUI with parameters set to create a kernel database
+              mixed with nadir kernels and reconstructed kernels.
             </description>
             <thumbnail width="220" height="312" caption="kerneldbgen gui"
              src="assets/thumbs/odysseyCk.jpg" />
           </image>
         </guiInterface>
       </guiInterfaces>
-      
+
 
 
 
       <inputImages>
         <image width="702" height="468" src="assets/images/odysseyBefore.jpg">
           <brief>
-	    List of files before kerneldbgen has been run
+            List of files before kerneldbgen has been run
           </brief>
           <description>
-	    As seen in this terminal snapshot, there are a number of files that will
-	    match the reconfilter in the directory specified by the recondir. The
-	    highest pivot_kernels version is 0001.
+            As seen in this terminal snapshot, there are a number of files that will
+            match the reconfilter in the directory specified by the recondir. The
+            highest pivot_kernels version is 0001.
           </description>
           <thumbnail caption= "The directory before kerneldbgen"
            src="assets/thumbs/odysseyBefore.jpg" width="200" height="133"/>
           <parameterName>RECONDIR</parameterName>
         </image>
       </inputImages>
-      
+
 
 
 
       <outputImages>
         <image width="702" height="468" src="assets/images/odysseyAfter.jpg">
           <brief>
-	    List of files after kerneldbgen has been run
+            List of files after kerneldbgen has been run
           </brief>
           <description>
-	    None of the original files have been altered, but the versioning system
-	    has created the first version of the kernel database, kernels.0001.db.
-	    The content of this file is listed as well.
+            None of the original files have been altered, but the versioning system
+            has created the first version of the kernel database, kernels.0001.db.
+            The content of this file is listed as well.
           </description>
           <thumbnail caption= "The directory after kerneldbgen"
           src="assets/thumbs/odysseyAfter.jpg" width="200" height="108"/>
@@ -581,18 +597,18 @@
       <dataFiles>
         <dataFile path="assets/cumindex.tab">
           <brief>
-	    kernels.0001.db
+            kernels.0001.db
           </brief>
           <description>
             Here one can examine the results of the datafile. Note the ascending
-	    order of kernel quality.
+            order of kernel quality.
           </description>
           <parameterName>TO</parameterName>
         </dataFile>
       </dataFiles>
     </example>
-    
-    
+
+
 
 
 
