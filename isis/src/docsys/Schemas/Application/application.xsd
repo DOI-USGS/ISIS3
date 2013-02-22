@@ -406,6 +406,7 @@
       <xs:enumeration value="Radiometric and Photometric Correction"/>
       <xs:enumeration value="Registration and Pattern Matching"/>
       <xs:enumeration value="Scripting"/>
+      <xs:enumeration value="SOCET Set Translation"/>
       <xs:enumeration value="System"/>
       <xs:enumeration value="Topography"/>
       <xs:enumeration value="Trim and Mask"/>

@@ -41,7 +41,10 @@ namespace Isis {
    * @internal
    *   @history 2009-03-07 Debbie A. Cook Removed reference to obsolute CameraDetectorMap methods
    *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *                          coding standards. References #972.
+   *                           coding standards. References #972.
+   *   @history 2013-02-11 E. Howington-Kraus - Added accessor method  StartTime().
+   *                           This is tested by application socetlinescankeywords since no
+   *                           unitTest exists. References #1490.
    *
    */
   class LineScanCameraDetectorMap : public CameraDetectorMap {
@@ -98,6 +101,8 @@ namespace Isis {
       virtual bool SetParent(const double sample, const double line);
 
       virtual bool SetDetector(const double sample, const double line);
+
+      double StartTime() const;
 
     private:
       double p_etStart;     //!< Starting time at the top of the 1st parent line

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="socetlinescankeywords" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Create the Line Scanner Sensor section of a SOCET Set Line Scanner support file
+  </brief>
+
+  <description>
+    This is an ISIS to SOCET Set (trademark BAE Systems) translation program for Line Scanner
+    images.  It calculates keyword values specific to SOCET Set's USGSAstro Line Scanner sensor
+    model and generates the USGSAstro Line Scanner section of a SOCET Set Support file for input
+    to the USGSAstro SOCET Set program 'import_pushbroom.' <br/>
+    <br/>
+    <i>With the exception of HiRISE jitter corrected images, the input cube must be a "level 1"
+    image <b>with SPICE data attached to the label</b> (see spiceinit).</i>  HiRISE jitter
+    corrected images (see hijitter) do not have Spacecraft Position Kernel (SPK) data attached
+    to the label, so these are handled as a special case in the program.<br/>
+    <br/>
+    The following are supported instruments and derived products:
+    <pre>
+       MRO-HiRISE
+       MRO-HiRISE IDEAL (i.e., noproj'ed images)
+       MRO-HiRISE IDEAL Jitter Corrected (i.e., hijitter'ed images)
+       MRO-CTX
+       LRO-NACL
+       LRO-NACR
+<!--
+       MEX-HRSC
+       MGS-MOC
+-->
+    </pre>
+  </description>
+
+  <category>
+    <categoryItem>SOCET Set Translation</categoryItem>
+  </category>
+
+    <seeAlso>
+    <applications>
+      <item>spiceinit</item>
+      <item>hijitter</item>
+    </applications>
+  </seeAlso>
+
+  <history>
+    <change name="E. Howington-Kraus" date="2008-10-23">
+      Original version
+    </change>
+    <change name="K. Edmundson" date="2011-05-13">
+      Added NADIR_CENTER_TIME parameter
+    </change>
+    <change name="E. Howington-Kraus" date="2011-08-04">
+      Changed default NADIR_CENTER_TIME from None to 0.0
+    </change>
+    <change name="E. Howington-Kraus" date="2012-04-26">
+      Added MOUNT_ANG_TBL option
+    </change>
+    <change name="O. Thomas" date="2012-08-23">
+      Renamed program from calc_pushbroom_keywords to socetlinescankeywords, added quaternions, made
+      changes from SOCET Set Generic Pushbroom sensor model to the USGSAsro Line Scanner sensor
+      model, and removed the MOUNT_ANG_TBL option.  Started modifications to meet ISIS coding
+      standards.
+    </change>
+    <change name="E. Howington-Kraus" date="2013-02-20">
+      Completed modifications to meet ISIS coding standards for formal installation into ISIS3.
+      Added support for HiRISE jitter-corrected images created at U of A.  Added check for needed
+      SPICE data (blobs) attached to the cube label. Renamed parameter PUSHKEY to TO.  Temporarily
+      removed support for MEX-HSRC and MGS-MOC sensors until they are tested and working under the
+      SOCET Set USGSAstro Line Scanner sensor model.  References #1490.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Filename of a cube
+        </brief>
+        <description>
+          Level 1 Input Line Scanner cube with SPICE data attached. Supported instruments and
+          derived products are MRO-HiRISE, MRO-HiRISE IDEAL, MRO-HiRISE IDEAL Jitter Corrected,
+          MRO-CTX, LRO-NACL, and LRO-NACR.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>filename</type>
+        <fileMode>output</fileMode>
+        <brief>SOCET Set Support file keywords</brief>
+        <internalDefault>None</internalDefault>
+        <description>
+          Output text file of the SOCET Set USGSAstro Line Scaner section of a SOCET Set support
+          file. This output file is one of the input files to USGSAstro SOCET Set program
+          'import_pushbroom.'
+        </description>
+      </parameter>
+
+<!--
+Commented this parameter out until HRSC is supported in SS
+      <parameter name="HRSC_NADIRCENTERTIME">
+        <brief>Ephemeris time at center of HRSC nadir image 
+        </brief>
+        <description>
+          Ephemeris time at center of HRSC nadir image.  This is
+          used so that the SOCET Set keyword T0_CENTER value references
+          the same absolute ephemeris time in an HRSC image set.
+        </description>
+        <type>double</type>
+        <default><item>0.0</item></default>
+      </parameter>
+-->
+    </group>
+  </groups>
+</application>

@@ -186,5 +186,16 @@ namespace Isis {
     p_focalPlaneY = uy / (1.0 - drOverR);
     return true;
   }
+
+  //! Return optical distortion polynomial coefficients
+  std::vector<double> CameraDistortionMap::OpticalDistortionCoefficients() const {
+    return p_odk;
+  }
+
+  //! Return the direction of the focal plane Z-axis
+  double CameraDistortionMap::ZDirection() const {
+    return p_zDirection;
+  }
+
 }
 

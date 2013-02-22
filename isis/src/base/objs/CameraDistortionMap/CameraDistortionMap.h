@@ -39,12 +39,16 @@ namespace Isis {
    * @author 2005-02-01 Jeff Anderson
    *
    * @internal
-   * @history 2008-02-05 Jeff Anderson - Modified to allow for variable focal
-   *                                     length
-   * @history 2008-02-21 Steven Lambright - Fixed a problem that resulted in infinities
-   *                                      and NaNs
-   * @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
-   *                                      coding standards. References #972.
+   *   @history 2008-02-05 Jeff Anderson - Modified to allow for variable focal length
+   *   @history 2008-02-21 Steven Lambright - Fixed a problem that resulted in infinities
+   *                           and NaNs
+   *   @history 2012-07-06 Debbie A. Cook, Updated Spice members to be more compliant with Isis 
+   *                           coding standards. References #972.
+   *   @history 2013-02-11 E. Howington-Kraus - Added accessor methods
+   *                           OpticalDistortionCoefficients() and ZDirection().
+   *                           These are tested by application socetlinescankeywords
+   *                           since no unitTest exists. Fixed indentation
+   *                           of history entries.  References #1490.
    *
    */
   class CameraDistortionMap {
@@ -54,36 +58,40 @@ namespace Isis {
       void SetDistortion(int naifIkCode);
 
       //! Destructor
-      virtual ~CameraDistortionMap() {};
+      virtual ~CameraDistortionMap() {}
 
       virtual bool SetFocalPlane(double dx, double dy);
 
       virtual bool SetUndistortedFocalPlane(double ux, double uy);
 
+      std::vector<double> OpticalDistortionCoefficients() const;
+
+      double ZDirection() const;
+
       //! Return distorted focal plane x
       inline double FocalPlaneX() const {
         return p_focalPlaneX;
-      };
+      }
 
       //! Return distorted focal plane y
       inline double FocalPlaneY() const {
         return p_focalPlaneY;
-      };
+      }
 
       //! Return undistorted focal plane x
       inline double UndistortedFocalPlaneX() const {
         return p_undistortedFocalPlaneX;
-      };
+      }
 
       //! Return undistorted focal plane y
       inline double UndistortedFocalPlaneY() const {
         return p_undistortedFocalPlaneY;
-      };
+      }
 
       //! Return undistorted focal plane z
       inline double UndistortedFocalPlaneZ() const {
         return p_zDirection * p_camera->FocalLength();
-      };
+      }
 
     protected:
       Camera *p_camera;

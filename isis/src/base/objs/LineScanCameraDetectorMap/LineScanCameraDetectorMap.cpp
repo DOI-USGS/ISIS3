@@ -65,4 +65,10 @@ namespace Isis {
     p_camera->setTime(etLine);
     return true;
   }
+
+  //! Return the starting time at the top edge of the first line in the parent image
+  double LineScanCameraDetectorMap::StartTime() const {
+    return p_etStart;
+  }
+
 }
