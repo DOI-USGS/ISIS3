@@ -74,6 +74,9 @@ namespace Isis {
    *  @history 2012-11-08 Janet Barrett - Modified the AddParameter method to
    *                         only update exclusions for list and combobox widgets.
    *                         Fixes #624.
+   *  @history 2013-01-28 Janet Barrett - Modified the AddParameter method to
+   *                         also update exclusions for boolean widgets. References
+   *                         #1452.
    */
 
   class Gui : public QMainWindow {

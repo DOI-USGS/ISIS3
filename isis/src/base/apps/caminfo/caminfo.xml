@@ -15,7 +15,7 @@
     of all bands, this will be put in the "Common" object of the PVL.  Other 
     infomation will be for a given band and placed in the "BandSet" object. the 
     user can use the "output options" check boxes to control the infomation that 
-    will be output.  if the polygon option is chosen, the image polygon is 
+    will be output.  If the POLYGON or USELABEL option is chosen, the image polygon is 
     output in well known text format.  
      <br/> <br/>The output file can be in PVL or CSV (Comma Separated Value) 
     format. There is an option "APPEND" to allow appending to the output file. 
@@ -352,6 +352,11 @@ End
         not properly implemented. Updated documentation with a new example. 
         Fixes #1296.
     </change>
+    <change name="Janet Barrett" date="2013-01-29">
+      Added the USELABEL option. This will allow the user to request that the
+      footprint be read from the labels of the input image file rather than
+      regenerating the footprint. Fixes #1452.
+    </change>
   </history>
 
   <category>
@@ -415,6 +420,7 @@ End
                <item>ISISLABEL</item>
                <item>ORIGINALLABEL</item>
                <item>POLYGON</item>
+               <item>USELABEL</item>
              </exclusions>
            </option>
          </list>
@@ -604,6 +610,27 @@ End
     </group>
       
     <group name="Polygon Output  Options">
+      <parameter name="USELABEL">
+        <type>boolean</type>
+        <default><item>FALSE</item></default>
+        <brief>
+          Get footprint blob from label
+        </brief>
+        <description>
+          Read the footprint blob from the image label instead of creating the
+          footprint.
+        </description>
+        <exclusions>
+          <item>POLYGON</item>
+          <item>INCTYPE</item>
+          <item>INCREASEPRECISION</item>
+          <item>NUMVERTICES</item>
+          <item>POLYLINC</item>
+          <item>POLYSINC</item>
+          <item>MAXEMISSION</item>
+          <item>MAXINCIDENCE</item>
+        </exclusions>
+      </parameter>
       <parameter name="POLYGON">
         <type>boolean</type>
         <default><item>FALSE</item></default>
@@ -626,6 +653,9 @@ End
               <LI>GisFootprint</LI>
             </UL>
         </description>
+        <exclusions>
+          <item>USELABEL</item>
+        </exclusions>
         <inclusions>
           <item>INCTYPE</item>
           <item>INCREASEPRECISION</item>

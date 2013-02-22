@@ -158,7 +158,8 @@ namespace Isis {
   }
 
   void BandGeometry::collect(Camera &camera, Cube &cube, bool doGeometry,
-                             bool doPolygon, bool increasePrecision) {
+                             bool doPolygon, bool getFootBlob,
+                             bool increasePrecision) {
     destruct();
 
     _nLines  = cube.lineCount();
@@ -326,14 +327,31 @@ namespace Isis {
         _mapping = getProjGeometry(camera, multiP, g);
       }
 
+      if (getFootBlob && band == 0) {
+        // Read the footprint from the image labels
+        ImagePolygon poly;
+        try {
+          cube.read(poly);
+        }
+        catch (IException &e) {
+          QString msg = "Error reading footprint blob from image labels";
+          throw IException(e, IException::User, msg, _FILEINFO_);
+        }
+        geos::geom::MultiPolygon *multiP = poly.Polys();
+        _polys.push_back(multiP->clone());
+        _combined = multiP->clone();
+        _mapping = getProjGeometry(camera, multiP, g);
+      }
+
       // Save off this band geometry property
       _gBandList.push_back(g);
     }
 
+
     //  Compute the remainder of the summary bands since some of the operations
     //  need the camera model
     _summary = getGeometrySummary();
-    if((size() != 1) && (doPolygon)) {
+    if((size() != 1) && doPolygon) {
       geos::geom::MultiPolygon *multiP = makeMultiPolygon(_combined);
       _mapping = getProjGeometry(camera, multiP, _summary);
       delete multiP;

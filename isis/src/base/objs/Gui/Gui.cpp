@@ -510,7 +510,8 @@ namespace Isis {
 
     GuiParameter *p = GuiParameterFactory::Create(gridLayout, ui, group, param);
 
-    if (p->Type() == GuiParameter::ListWidget || p->Type() == GuiParameter::ComboWidget) {
+    if (p->Type() == GuiParameter::ListWidget || p->Type() == GuiParameter::ComboWidget ||
+        p->Type() == GuiParameter::BooleanWidget) {
       connect(p, SIGNAL(ValueChanged()), this, SLOT(UpdateExclusions()));
     }
 

@@ -142,6 +142,8 @@ namespace Isis {
    *                          tickets #775 and #1114.
    *   @history 2012-11-23 Kris Becker Corrected computations for parallaxx,
    *                          parallaxy, shadowx, shadowy.  Fixes #1296
+   *   @history 2013-02-22 Janet Barrett, Modified the CamTools::collect method to allow a
+   *                          footprint blob option. Fixes #1452.
    */
   class BandGeometry {
 
@@ -182,7 +184,7 @@ namespace Isis {
       bool hasCenterGeometry() const;
       bool hasLimb() const;
       void collect(Camera &camera, Cube &cube, bool doGeometry, bool doPolygon,
-          bool increasePrecision);
+          bool getFootBlob, bool increasePrecision);
       void generateGeometryKeys(PvlObject &pband);
       void generatePolygonKeys(PvlObject &pband);
 

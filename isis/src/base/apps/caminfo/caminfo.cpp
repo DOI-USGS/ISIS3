@@ -7,6 +7,7 @@
 #include "CameraStatistics.h"
 #include "CamTools.h"
 #include "FileName.h"
+#include "History.h"
 #include "IException.h"
 #include "ImagePolygon.h"
 #include "IString.h"
@@ -152,9 +153,10 @@ void IsisMain() {
     statistics->append(MakePair("TotalPixels", toString(stats.TotalPixels())));
   }
 
+  bool getFootBlob = ui.GetBoolean("USELABEL");
   bool doGeometry = ui.GetBoolean("GEOMETRY");
   bool doPolygon = ui.GetBoolean("POLYGON");
-  if(doGeometry || doPolygon) {
+  if(doGeometry || doPolygon || getFootBlob) {
     Camera *cam = incube->camera();
 
     QString incType = ui.GetString("INCTYPE");
@@ -192,9 +194,62 @@ void IsisMain() {
     bandGeom->setLineInc(polyLinc);
     bandGeom->setMaxIncidence(ui.GetDouble("MAXINCIDENCE"));
     bandGeom->setMaxEmission(ui.GetDouble("MAXEMISSION"));
-
     bool precision = ui.GetBoolean("INCREASEPRECISION");
-    bandGeom->collect(*cam, *incube, doGeometry, doPolygon, precision);
+
+    if (getFootBlob) {
+      // Need to read history to obtain parameters that were used to
+      // create the footprint
+      History hist("IsisCube", in.expanded());
+      Pvl pvl = hist.ReturnHist();
+      PvlObject::PvlObjectIterator objIter;
+      bool found = false;
+      PvlGroup fpgrp;
+      for (objIter=pvl.EndObject()-1; objIter>=pvl.BeginObject(); objIter--) {
+        if (objIter->Name().toUpper() == "FOOTPRINTINIT") {
+          found = true;
+          fpgrp = objIter->FindGroup("UserParameters");
+          break;
+        }
+      }
+      if (!found) {
+        QString msg = "Footprint blob was not found in input image history";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      QString prec = (QString)fpgrp.FindKeyword("INCREASEPRECISION");
+      prec = prec.toUpper();
+      if (prec == "TRUE") {
+        precision = true;
+      }
+      else {
+        precision = false;
+      }
+      QString inctype = (QString)fpgrp.FindKeyword("INCTYPE");
+      inctype = inctype.toUpper();
+      if (inctype == "LINCSINC") {
+        int linc = fpgrp.FindKeyword("LINC");
+        int sinc = fpgrp.FindKeyword("SINC");
+        bandGeom->setSampleInc(sinc);
+        bandGeom->setLineInc(linc);
+      }
+      else {
+        int vertices = fpgrp.FindKeyword("NUMVERTICES");
+        int lincsinc = (int)(0.5 + (((incube->sampleCount() * 2) +
+                       (incube->lineCount() * 2) - 3.0) /
+                       vertices));
+        bandGeom->setSampleInc(lincsinc);
+        bandGeom->setLineInc(lincsinc);
+      }
+      if (fpgrp.HasKeyword("MAXINCIDENCE")) {
+        double maxinc = fpgrp.FindKeyword("MAXINCIDENCE");
+        bandGeom->setMaxIncidence(maxinc);
+      }
+      if (fpgrp.HasKeyword("MAXEMISSION")) {
+        double maxema = fpgrp.FindKeyword("MAXEMISSION");
+        bandGeom->setMaxEmission(maxema);
+      }
+    }
+    
+    bandGeom->collect(*cam, *incube, doGeometry, doPolygon, getFootBlob, precision);
 
     // Check if the user requires valid image center geometry
     if(ui.GetBoolean("VCAMERA") && (!bandGeom->hasCenterGeometry())) {
@@ -292,7 +347,7 @@ void GeneratePVLOutput(Cube *incube,
       params.AddObject(ggroup);
     }
 
-    if(ui.GetBoolean("POLYGON")) {
+    if(ui.GetBoolean("POLYGON") || ui.GetBoolean("USELABEL")) {
       PvlObject ggroup("Polygon");
       bandGeom->generatePolygonKeys(ggroup);
       params.AddObject(ggroup);
