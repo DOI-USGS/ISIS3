@@ -1,0 +1,6 @@
+Group = MarsReconnaissanceOrbiter/CRISM
+  Version = 1
+  Library = CrismCamera
+  Routine = CrismCameraPlugin
+EndGroup
+ 
