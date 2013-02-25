@@ -29,7 +29,20 @@ void IsisMain() {
   // is selected
   QString processOpt = ui.GetString("PROCESS");
 
-  Equalization equalizer(ui.GetFileName("FROMLIST"));
+  // Determine whether to calculate gains or offsets
+  QString adjust = ui.GetString("ADJUST");
+  OverlapNormalization::SolutionType sType = OverlapNormalization::Both;
+  if (adjust == "CONTRAST") {
+    sType = OverlapNormalization::Gains;
+  }
+  else if (adjust == "BRIGHTNESS") {
+    sType = OverlapNormalization::Offsets;
+  }
+  else if (adjust == "GAIN") {
+    sType = OverlapNormalization::GainsWithoutNormalization;
+  }
+
+  Equalization equalizer(sType, ui.GetFileName("FROMLIST"));
 
   // Read hold list if one was entered
   if (ui.WasEntered("HOLD")) {
@@ -43,16 +56,6 @@ void IsisMain() {
     int mincnt = ui.GetInteger("MINCOUNT");
     bool wtopt = ui.GetBoolean("WEIGHT");
 
-    // Determine whether to calculate gains or offsets
-    QString adjust = ui.GetString("ADJUST");
-    OverlapNormalization::SolutionType sType = OverlapNormalization::Both;
-    if (adjust == "CONTRAST") {
-      sType = OverlapNormalization::Gains;
-    }
-    else if (adjust == "BRIGHTNESS") {
-      sType = OverlapNormalization::Offsets;
-    }
-
     LeastSquares::SolveMethod methodType = LeastSquares::QRD;
     if (ui.GetString("SOLVEMETHOD") == "SVD") {
       methodType = LeastSquares::SVD;
@@ -60,7 +63,7 @@ void IsisMain() {
     else if (ui.GetString("SOLVEMETHOD") == "SPARSE") {
       methodType = LeastSquares::SPARSE;
     }
-    equalizer.calculateStatistics(sampPercent, mincnt, wtopt, sType, methodType);
+    equalizer.calculateStatistics(sampPercent, mincnt, wtopt, methodType);
 
     // Write the results to the log
     PvlGroup results = equalizer.getResults();

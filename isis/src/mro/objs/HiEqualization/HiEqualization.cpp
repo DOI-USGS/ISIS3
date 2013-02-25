@@ -77,7 +77,7 @@ namespace Isis {
 
     clearAdjustments();
     for (int img = 0; img < imageList.size(); img++) {
-      ImageAdjustment *adjustment = new ImageAdjustment();
+      ImageAdjustment *adjustment = new ImageAdjustment(OverlapNormalization::Both);
       adjustment->addGain(oNorm.Gain(img));
       adjustment->addOffset(oNorm.Offset(img));
       adjustment->addAverage(oNorm.Average(img));

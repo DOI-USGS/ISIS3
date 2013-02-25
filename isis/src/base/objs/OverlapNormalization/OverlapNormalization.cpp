@@ -147,11 +147,11 @@ namespace Isis {
   }
 
   /**
-   * Attempts to solve the least squares equation for all data sets. 
+   * Attempts to solve the least squares equation for all data sets.
    *
-   * @param type The enumeration clarifying whether the offset, gain, or both 
+   * @param type The enumeration clarifying whether the offset, gain, or both
    *             should be solved here
-   * @param method The enumeration clarifying the LeastSquares::SolveMethod to 
+   * @param method The enumeration clarifying the LeastSquares::SolveMethod to
    *             be used.
    *
    * @return bool Is the least squares equation now solved
@@ -160,7 +160,7 @@ namespace Isis {
    *             holds must be greater than the number of data
    *             sets
    */
-  void OverlapNormalization::Solve(SolutionType type, 
+  void OverlapNormalization::Solve(SolutionType type,
                                    LeastSquares::SolveMethod method) {
     // Make sure that there is at least one overlap
     if (m_overlapList.size() == 0) {
@@ -193,7 +193,7 @@ namespace Isis {
     }
 
     // Calculate offsets
-    if (type != Gains) {
+    if (type != Gains && type != GainsWithoutNormalization) {
       // Add knowns to least squares for each overlap
       for (int overlap = 0; overlap < (int)m_overlapList.size(); overlap++) {
         Overlap curOverlap = m_overlapList[overlap];
@@ -245,12 +245,22 @@ namespace Isis {
 
         double tanp;
 
-        if (curOverlap.area1.StandardDeviation() == 0.0) {
-          tanp = 0.0;    // Set gain to 1.0
+        if (type != GainsWithoutNormalization) {
+          if (curOverlap.area1.StandardDeviation() == 0.0) {
+            tanp = 0.0;    // Set gain to 1.0
+          }
+          else {
+            tanp = curOverlap.area2.StandardDeviation()
+                   / curOverlap.area1.StandardDeviation();
+          }
         }
         else {
-          tanp = curOverlap.area2.StandardDeviation()
-                 / curOverlap.area1.StandardDeviation();
+          if (curOverlap.area1.Average() == 0.0) {
+            tanp = 0.0;
+          }
+          else {
+            tanp = curOverlap.area2.Average() / curOverlap.area1.Average();
+          }
         }
 
         if (tanp > 0.0) {

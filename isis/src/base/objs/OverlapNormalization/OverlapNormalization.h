@@ -68,6 +68,8 @@ namespace Isis {
    *   @history 2013-12-29 Jeannie Backer - Added LeastSquares::SolveMethod
    *                           input parameter to Solve() method. Improved error
    *                           message. Fixes #962,
+   *   @history 2013-02-14 Steven Lambright - Added SolutionType GainsWithoutNormalization. Fixes
+   *                           #911.
    */
 
   class OverlapNormalization {
@@ -123,7 +125,7 @@ namespace Isis {
       enum SolutionType {
 
         /**
-         * Calculate only the gains
+         * Calculate only the gains.
          */
         Gains,
 
@@ -135,10 +137,19 @@ namespace Isis {
         /**
          * Calculate both gains and offsets
          */
-        Both
+        Both,
+
+        /**
+         * The equation being solved for Gains, Offsets, and Both is
+         * output = (input - average) * gain + offset + average
+         *
+         * This solution type is for the equation
+         * output = input * gain
+         */
+         GainsWithoutNormalization
       };
 
-      void Solve(SolutionType type = Both, 
+      void Solve(SolutionType type = Both,
                  LeastSquares::SolveMethod method=LeastSquares::QRD);
 
       double Average(const unsigned index) const;

@@ -27,8 +27,14 @@ namespace Isis {
   }
 
 
-  Equalization::Equalization(QString fromListName) {
+  /**
+   * @param sType An integer value corresponding to the enumerated value of the
+   *              OverlapNormalization::SolutionType to be used.
+   */
+  Equalization::Equalization(OverlapNormalization::SolutionType sType, QString fromListName) {
     init();
+
+    m_sType = sType;
     loadInputs(fromListName);
   }
 
@@ -73,20 +79,17 @@ namespace Isis {
   }
 
 
-  /** 
-   * @param percent Percentage of the lines to consider when gathering overall 
-   *            cube statistics and overlap statistics 
-   * @param mincnt Minimum number of points in overlapping area required to be 
-   *            used in the solution 
+  /**
+   * @param percent Percentage of the lines to consider when gathering overall
+   *            cube statistics and overlap statistics
+   * @param mincnt Minimum number of points in overlapping area required to be
+   *            used in the solution
    * @param wtopt Indicates whether overlaps should be weighted
-   * @param sType An integer value corresponding to the enumerated value of the 
-   *              OverlapNormalization::SolutionType to be used.
-   * @param methodType An integer value corresponding to the enumerated value of 
+   * @param methodType An integer value corresponding to the enumerated value of
    *            the desired LeastSquares::SolveMethod to be used.
    */
   void Equalization::calculateStatistics(double percent, int mincnt,
-      bool wtopt, OverlapNormalization::SolutionType sType, 
-      LeastSquares::SolveMethod methodType) {
+      bool wtopt, LeastSquares::SolveMethod methodType) {
 
     clearAdjustments();
 
@@ -135,7 +138,7 @@ namespace Isis {
     // each band shared amongst cubes
     vector<OverlapStatistics> overlapList;
     for (int i = 0; i < m_imageList.size(); i++) {
-      addAdjustment(new ImageAdjustment());
+      addAdjustment(new ImageAdjustment(m_sType));
 
       Cube cube1;
       cube1.open(m_imageList[i].toString());
@@ -195,7 +198,7 @@ namespace Isis {
     // Loop through each band making all necessary calculations
     try {
       for (int band = 0; band < m_maxBand; band++) {
-        oNormList[band]->Solve(sType, methodType);
+        oNormList[band]->Solve(m_sType, methodType);
 
         for (unsigned int img = 0; img < m_adjustments.size(); img++) {
           m_adjustments[img]->addGain(oNormList[band]->Gain(img));
@@ -203,7 +206,7 @@ namespace Isis {
 cout << img << endl;
 cout << band << endl;
 cout << oNormList[band]->Gain(img) << endl;
-            throw IException(IException::Unknown, 
+            throw IException(IException::Unknown,
                              "Calculation for equalization statistics failed. Gain = 0.",
                              _FILEINFO_);
           }
@@ -295,7 +298,7 @@ cout << oNormList[band]->Gain(img) << endl;
 
       // TODO should we also get the valid and invalid count?
 
-      ImageAdjustment *adjustment = new ImageAdjustment();
+      ImageAdjustment *adjustment = new ImageAdjustment(m_sType);
 
       // Get and store the modifiers for each band
       for (int band = 1; band < normalization.Keywords(); band++) {
@@ -520,6 +523,8 @@ cout << oNormList[band]->Gain(img) << endl;
 
     m_maxCube = 0;
     m_maxBand = 0;
+
+    m_sType = OverlapNormalization::Both;
 
     m_results = NULL;
   }
