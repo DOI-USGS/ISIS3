@@ -58,18 +58,17 @@ int main(int argc, char *argv[]) {
     Equalization equalizerNoFromList();
 
     cout << "Create object using fromlist file." << endl;
-    Equalization equalizer(fromList);
+    Equalization equalizer(OverlapNormalization::Both, fromList);
     cout << "     Add hold list..." << endl;
     equalizer.addHolds(holdList);
 
     double percent = 100.0;
     int mincount = 1000;
     bool weight = false;
-    OverlapNormalization::SolutionType adjust = OverlapNormalization::Both;
     LeastSquares::SolveMethod solvemethod = LeastSquares::QRD;
 
     cout << "     Calculate statistics for contrast and brightness using QRD method..." << endl;
-    equalizer.calculateStatistics(percent, mincount, weight, adjust, solvemethod);
+    equalizer.calculateStatistics(percent, mincount, weight, solvemethod);
 
     PvlGroup results = equalizer.getResults();
     cout << "Results:" << endl;
