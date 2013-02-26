@@ -7,25 +7,34 @@
   </brief>
 
   <description>
-    This program requires the user supply a "level 1" cube.  That is, a cube in raw camera geometry.
-    The user can choose to run spiceinit on the input cube.  Spiceinit will use the system kernels,
-    so any user updates to SPICE information will be lost.  The default is to <b>not</b> run spiceinit.
-    This program will output various spacecraft and instrument related 
-    information.  Some of the output information will be a compilation 
-    of all bands, this will be put in the "Common" object of the PVL.  Other 
-    infomation will be for a given band and placed in the "BandSet" object. the 
-    user can use the "output options" check boxes to control the infomation that 
-    will be output.  If the POLYGON or USELABEL option is chosen, the image polygon is 
-    output in well known text format.  
-     <br/> <br/>The output file can be in PVL or CSV (Comma Separated Value) 
-    format. There is an option "APPEND" to allow appending to the output file. 
-    This is especially useful for CSV file format. If the CSV format is chosen, 
-    only Camstats, Statistics and Geometry options are allowed. Isis Label, 
-    Original Label and Polygon options are disabled for CSV format. 
-     <br/> <br/>
-    
-      The following is an example of the output given when caminfo is ran in  
-      PVL Format: 
+  <p>
+    This program compiles and outputs various spacecraft and instrument-related information such as 
+    geometric, polygon, and mapping information.
+  </p>
+  <p>
+    The user must supply a <def>Level1</def> cube. If the supplied cube does not have SPICE information
+    associated with it, then caminfo can be used to generate the SPICE information by running the
+    spiceinit program on the cube. Caminfo will not run spiceinit by default. If the input cube already
+    has SPICE information associated with it, then any user updates to the SPICE information will be
+    lost when the option to run spiceinit is chosen. This results from using system defaults when
+    running the spiceinit program from within caminfo.
+  </p>
+  <p>
+    Some information in the output PVL file will consist of a compilation of information for all the 
+    bands in the cube and will be listed in the "Common" object of the PVL. Other information for a given 
+    band will be placed in the "BandSet" object of the PVL. The user can select the check boxes to control
+    the information that will be output to the PVL file. If the POLYGON or USELABEL option is chosen, 
+    the image polygon is output in Well-Known Text format (WKT).
+  </p>
+  <p>  
+    The output file can be in PVL or CSV (Comma Separated Value) format. The "APPEND" option allows
+    the new generated information to be appended to the output file. This is especially useful for 
+    CSV file format. If the CSV format is chosen, only Camstats, Statistics and Geometry options 
+    are allowed. Isis Label, Original Label and Polygon options are disabled for CSV format. 
+  </p>
+  <p> 
+    The following is an example of caminfo output generated when in PVL format:
+  </p>
 <pre> 
 Object = Caminfo
   Object = Parameters
@@ -186,24 +195,17 @@ End
 
 </pre>
 
-    <p>
-    Output values that are not a range are calculated at the center of the 
-    image.  The <b> SubSpacecraftLatitude</b> and 
-    <b>SubSpacecraftLongitude</b> make up the subspacecraft point, which is 
-    the point on a body which lies directly beneath the spacecraft.  The 
-    <b>SubSolarLatitude</b> and <b>SubSolarLongitude</b> make up the subsolar 
-    point, which is the point on a body's reference surface where a line from 
-    the body center to the sun center intersects that surface.  The 
-    <b>NorthAzimuth, SpacecraftAzimuth</b> and <b>SubSolarAzimuth</b> are the 
-    values of the angle between a line from the image center to the relative 
-    point (North pole, SubSpacecraftLatitude/Longitude, SubSolar 
-    Latitude/Longitude respectively) and a reference line in the image plane.  
-    The reference line is a horizontal line from the image center to the 
-    middle right edge of the image.  The angles increase in a clockwise 
-    direction.  The <b>LocalTime</b> is the time at the current longitude 
-    relative to the subsolar longitude, which has a time of 12 o'clock.  The 
-    <b>SolarLongitude</b> is LSubS, or the seasonal angle.  
-    </p>
+  <p>
+    Output values that do not have a minimum/maximum range associated with them
+    are calculated at the center of the image.  
+  </p>
+  <p>
+    Definitions for most of the values output in the PVL file can be found in
+    the ISIS 3 documentation glossary including: <def><b>SubSpacecraftLatitude</b></def>,
+    <def><b>SubSpacecraftLongitude</b></def>, <def><b>SubSolarLatitude</b></def>,
+    <def><b>SubSolarLongitude</b></def>, <def><b>NorthAzimuth</b></def>, 
+    <def><b>SpacecraftAzimuth</b></def>, and <def><b>SubSolarAzimuth</b></def>, 
+  </p>
   </description>
 
   <history>
@@ -288,7 +290,7 @@ End
      </change>
      <change name="Kris Becker" date="2009-05-29"> 
        Added PIXINC parameter to allow user to specify number of pixels to 
-       skip around the perimiter of the image to compute the polygon.
+       skip around the perimeter of the image to compute the polygon.
      </change>
      <change name="Kris Becker" date="2009-05-29"> 
        Fixed bug where image was a 0 longitude boundary crosser.  It would 
@@ -348,7 +350,7 @@ End
        one as used by "footprintinit".
     </change>
     <change name="Kris Becker" date="2012-11-23">
-        The computation of ParallaxX/ParallaxY and ShadowX/ShadowY values were 
+        The computation of ParallaxX/ParallaxY and ShadowX/ShadowY values was
         not properly implemented. Updated documentation with a new example. 
         Fixes #1296.
     </change>
@@ -356,6 +358,9 @@ End
       Added the USELABEL option. This will allow the user to request that the
       footprint be read from the labels of the input image file rather than
       regenerating the footprint. Fixes #1452.
+    </change>
+    <change name="Janet Richie" date="2013-02-25">
+      Reviewed documentation. References #1452.
     </change>
   </history>
 
@@ -408,13 +413,13 @@ End
            <option value="PVL">
             <brief>Create PVL output</brief>
             <description>
-               Cam info data to be generated in PVL format
+               Caminfo data to be generated in PVL format
             </description>
             </option>
            <option value="FLAT">
             <brief> Create CSV output </brief>
             <description>
-            Cam info data to be generated in Comma Separated Value (CSV) format
+              Caminfo data to be generated in Comma Separated Value (CSV) format
             </description> 
              <exclusions>
                <item>ISISLABEL</item>
@@ -429,21 +434,22 @@ End
       <parameter name="APPEND">
         <type>boolean</type>
         <default><item>false</item></default>
-        <brief>Append CamInfo to existing data</brief>
-        <description> Append CamInfo to existing data. This will append the 
-          caminfo data in a new line.
+        <brief>Append caminfo information to existing data file</brief>
+        <description> Append caminfo information to existing file. This will append the 
+          caminfo data to the filename specified for the TO parameter beginning at a 
+          new line. 
          </description>
       </parameter>
       
       <parameter name="GEOMETRY">
         <type>boolean</type>
         <brief>
-          Include Geometry Information
+          Include geometry information
         </brief>
         <description>
           Get geometry information from the camera at the center of the image.  
-          These data are contained in the Geometry Object.  The keyword/values 
-          contained there are:
+          These data are listed under the Geometry Object heading.  The keyword/values 
+          contained therein are listed here:
           
           <UL>
             <LI>BandsUsed</LI>
@@ -505,7 +511,7 @@ End
       <parameter name="ISISLABEL">
         <type>boolean</type>
         <brief>
-          Include ISIS Label 
+          Include ISIS label 
         </brief>
         <description>
           This option will extract the ISIS label and write it to the output PVL
@@ -517,7 +523,7 @@ End
       <parameter name="ORIGINALLABEL">
         <type>boolean</type>
         <brief>
-          Include the Original Label 
+          Include the original label 
         </brief>
         <description>
           Include the original labels of the cube in the PVL.
@@ -528,16 +534,16 @@ End
       <parameter name="STATISTICS">
         <type>boolean</type>
         <brief>
-          Include DN Statistics.
+          Include DN statistics
         </brief>
         <description>
-          Include DN statistics for all band within the cube.  These data are
+          Include DN statistics for all bands within the cube.  These data are
           contained in the Statistics object.  The keyword/values contained 
           therein are:
           <UL>
             <LI>MeanValue</LI>
-            <LI>StandardDeviationi</LI>
-            <LI>MinimumValue </LI>
+            <LI>StandardDeviation</LI>
+            <LI>MinimumValue</LI>
             <LI>MaximumValue</LI>
             <LI>PercentHIS</LI>
             <LI>PercentHRS</LI>
@@ -553,12 +559,12 @@ End
       <parameter name="CAMSTATS">
         <type>boolean</type>
         <brief>
-          Get Camera Statistics Information
+          Get camera statistics information
         </brief>
         <description>
           Run camstats to get camera information that can be expressed as a range.  
-          Camstats will run on the entire cube (common object), and  then for each band(bandset object).
-          The default linc and sinc for camstats will is "1", the user can select a different linc and sinc.
+          Camstats will run on the entire cube (common object), and for each band (bandset object).
+          The default linc and sinc for camstats is "1". The user can select a different linc and sinc.
           Output values are:
           <UL>
             <LI>MinimumLatitude</LI>
@@ -567,7 +573,7 @@ End
             <LI>MaximumLongitude</LI>
             <LI>MinimumResolution</LI>
             <LI>MaximumResolution</LI>
-            <LI>MinimumPhase </LI>
+            <LI>MinimumPhase</LI>
             <LI>MaximumPhase</LI>
             <LI>MinimumEmission</LI>
             <LI>MaximumEmission</LI>
@@ -587,7 +593,7 @@ End
       <parameter name="LINC">
         <type>integer</type>
         <brief>
-          LINC for camstats
+          LINC line increments for camstats
         </brief>
         <description>
           This is the line increment used by camstats.
@@ -599,7 +605,7 @@ End
       <parameter name="SINC">
         <type>integer</type>
         <brief>
-          SINC for camstats
+          SINC sample increments for camstats
         </brief>
         <description>
           This is the sample increment used by camstats.
@@ -639,7 +645,7 @@ End
         </brief>
         <description>
           Use the imagePolygon class to gather polygon information.  The output 
-          polygon will be in well known text format (WKT).  These data are 
+          polygon will be in well-known text format (WKT).  These data are 
           contained within the Polygon object.   The keyword/values contained 
           therein are:
             <UL>
@@ -676,7 +682,7 @@ End
         <description>
           When true, use NUMVERTICES to set an approximate number of steps for
           the footprint. Otherwise use POLYLINC and POLYSINC to create the
-          polygon based on the dimentions of the cube.
+          polygon based on the dimensions of the cube.
         </description>
         <list>
           <option value="LINCSINC">
@@ -713,7 +719,7 @@ End
         <default><item>FALSE</item></default>
         <brief>Allow automatic adjustments to fix invalid polygons</brief>
         <description>
-          Enabeling this option will allow the automatic reduction of the SINC
+          Enabling this option will allow the automatic reduction of the SINC
           and LINC parameters whenever their current values result in an invalid
           polygon. In addition, a results group will be created with the
           keywords SINC/LINC which reveal what SINC/LINC values were actually
@@ -787,12 +793,10 @@ End
                 at the limb while sacrificing some (very oblique) data.
             </p>
             <p>
-                Note the images spiceinit'ed with a DEM, the emission angle 
-                may need to shorted.  The DEM at the limb will also cause 
-                additional spiking.
-            </p>
-            <p>
-                The default value assumes no DEM is associated with movie.
+                Note: For images that have been run through spiceinit with a DEM, the 
+                emission angle range may need to be decreased. This will avoid the
+                instability that occurs at the limb and will avoid spiking of the
+                data.
             </p>
         </description>
         <default><item>89.5</item></default>
@@ -806,7 +810,7 @@ End
         <description>
             Specifies the maximum incidence angle that a polygon point is 
             allowed to have.  This limit is useful for eliminating 
-            terminator data that may will typically be lost in photometric 
+            terminator data that will typically be lost in photometric 
             corrections.  This parameter restricts the incidence angle to 
             create more data relevant polygons at the terminator while 
             sacrificing some (non-photometric) data.
@@ -840,9 +844,9 @@ End
         </brief>
         <description>
           If the user sets this parameter to true, a test will determine if a 
-          valid camera can be created at the center of the image band.  if a 
-          valid camera cannot be created the program will end.  The default is
-          to not test the camera and output any available information.
+          valid camera can be created at the center of the image band.  If a 
+          valid camera cannot be created the program will end.  The default is to
+          output any available information without testing the camera.
         </description>
       </parameter>
     </group>
