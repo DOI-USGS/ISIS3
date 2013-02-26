@@ -45,7 +45,7 @@
 
       <p>
 	Please note that the dollar sign ($) still requires a backslash for batchlist 
-	variables.  Array values, for programs such as <def>spiceinit</def>, will be the same. 
+	variables.  Array values, for programs such as <i>spiceinit</i>, will be the same. 
       </p>
 
       <p>
@@ -124,9 +124,8 @@
       </p>
 
       <p>
-	For additional information see <a 
-	href="http://isis.astrogeology.usgs.gov/documents/CommandLine/CommandLine.html">
-	<b>Command Line Usage</b></a><br /> 
+	For additional information see <b>Command Line Usage</b> under the User 
+	Documentation web pages for ISIS 3.<br />
 
 	Note: Some instructions may be outdated.
       </p>
@@ -141,11 +140,10 @@
       AND, and OR operators are not implemented yet.  Functions 
       such as pha, ina, ema, lat, lon, radius, and resolution require a
       <def>Level1</def> input file with <def>SPICE</def> information in the
-      image labels.  That is, the program "spiceinit" should be executed on the 
+      image labels.  That is, the program <i>spiceinit</i> should be executed on the 
       input files before using these functions.  For <def>Level2</def> images, 
       the backplanes containing the photometric and spatial information must be 
-      present.  This is normally performed with the program "<a href=
-      "http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/phocube/phocube.html">phocube</a>" 
+      present.  This is normally performed with the program <i>phocube</i> 
       before the image is projected to a <def>map projection</def>.
     </p>
 
@@ -207,8 +205,8 @@
      </blockquote>
     </p>
     <p>
-      In order to use the operators below, images must be processed through <def>
-      spiceinit</def> so that the NAIF camera model information is stored in the image 
+      In order to use the operators below, images must be processed through <i>
+      spiceinit</i> so that the NAIF camera model information is stored in the image 
       labels: 
     </p>
     <p>
@@ -657,6 +655,7 @@
   <seeAlso>
     <applications>
       <item>algebra</item>
+      <item>spiceinit</item>
     </applications>
   </seeAlso>
 
@@ -690,6 +689,12 @@
     <change name="Ella Mae Lee" date="2012-10-22">
       Improved documentation and added examples, reference Mantis issue #977
       and #992
+    </change>
+    <change name="Lynn Weller" date="2013-02-25">
+       Removed links to applications imbedded in text and replaced with
+       italicized application name.  Added application links to the
+       "Related Objects and Documents" section of the documentation.
+       Fixes mantis ticket #1525.
     </change>
   </history>
 
@@ -917,7 +922,7 @@
             <description>Screenshot of GUI with parameters filled in to perform a 
 	      calculation on the input image. 
 	    </description>
-            <thumbnail width="200" height="246" caption="Fx GUI" src="assets/thumb/fxgui.jpg" />
+            <thumbnail width="200" height="246" caption="fx GUI" src="assets/thumb/fxgui.jpg" />
           </image>
         </guiInterface>
       </guiInterfaces>
@@ -997,7 +1002,7 @@
           <image width="725" height="968" src="assets/image/fx_gui_cosine_line.jpg">
             <brief>Example GUI</brief>
             <description>Screenshot of GUI with parameters filled in to perform a calculation to create an output image. </description>
-            <thumbnail width="300" height="401" caption="Fx GUI" src="assets/thumb/thumb_fx_gui_cosine_line.jpg" />
+            <thumbnail width="300" height="401" caption="fx GUI" src="assets/thumb/thumb_fx_gui_cosine_line.jpg" />
           </image>
         </guiInterface>
       </guiInterfaces>
@@ -1046,7 +1051,7 @@
 	       Screenshot of GUI with parameters filled in to perform a 
 	       calculation to create an output image. 
 	     </description>
-            <thumbnail width="300" height="272" caption="Fx GUI" src="assets/thumb/fx_gui_cosine_line_deg_thumb.jpg" />
+            <thumbnail width="300" height="272" caption="fx GUI" src="assets/thumb/fx_gui_cosine_line_deg_thumb.jpg" />
           </image>
         </guiInterface>
       </guiInterfaces>
@@ -1105,7 +1110,7 @@
           <image width="728" height="1036" src="assets/image/fx_gui_gammast_reduced.jpg">
             <brief>Example GUI</brief>
             <description>Screenshot of GUI with parameters filled in to perform a calculation on the input image. </description>
-            <thumbnail width="375" height="342" caption="Fx GUI" src="assets/thumb/thumb_fx_gui_gammast.jpg" />
+            <thumbnail width="375" height="342" caption="fx GUI" src="assets/thumb/thumb_fx_gui_gammast.jpg" />
           </image>
         </guiInterface>
       </guiInterfaces>
@@ -1160,7 +1165,7 @@
           <image width="726" height="811" src="assets/image/fx_gui_mask_full.jpg">
             <brief>Example GUI</brief>
             <description>Screenshot of GUI with parameters filled in to perform a calculation on the input image. </description>
-            <thumbnail width="300" height="270" caption="Fx GUI" src="assets/thumb/fx_gui_mask_thumb.jpg" />
+            <thumbnail width="300" height="270" caption="fx GUI" src="assets/thumb/fx_gui_mask_thumb.jpg" />
           </image>
         </guiInterface>
       </guiInterfaces>
@@ -1215,7 +1220,7 @@
           <image width="726" height="813" src="assets/image/fx_gui_extract_full.jpg">
             <brief>Example GUI</brief>
             <description>Screenshot of GUI with parameters filled in to perform a calculation on the input image. </description>
-            <thumbnail width="300" height="271" caption="Fx GUI" src="assets/thumb/fx_gui_extract_thumb.jpg" />
+            <thumbnail width="300" height="271" caption="fx GUI" src="assets/thumb/fx_gui_extract_thumb.jpg" />
           </image>
         </guiInterface>
       </guiInterfaces>

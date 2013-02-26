@@ -9,13 +9,11 @@
   <description>
     <p>
      This program creates a <def>PVL</def> template file to be used in 
-     photometry-based applications, such as 
-     <a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/photomet/photomet.html">
-     <b>photomet</b></a>.  Each planet has different surface and atmospheric 
-     properties requiring different model specifications. It is important to 
-     set up the models with unique parameter values that apply to a specific 
-     planetary body.  There are two types of correction models that can be 
-     specified in this program:
+     photometry-based applications, such as <i>photomet</i>.  Each planet 
+     has different surface and atmospheric properties requiring different 
+     model specifications. It is important to set up the models with unique 
+     parameter values that apply to a specific planetary body.  There are 
+     two types of correction models that can be specified in this program:
      </p>
      <ol>
      <li> Photometric - describes the planetary surface of an image </li>
@@ -25,7 +23,7 @@
      The normalization models are not specified in this program, but only three 
      models (albedoatm, shadeatm, and topoatm) apply atmosperheric correction.  
      Choose an atmospheric model only if one of the three normalization models
-     listed above will be applied with the photomet program.  
+     listed above will be applied with the <i>photomet</i> program.  
      </p>
      <p>
      This program allows the use of a PVL file that contains preset parameter names for 
@@ -185,8 +183,7 @@ Kirk, R. L., Thompson, K. T., Becker, T. L., and Lee, E. M., 2000.
 </pre>
 
 <p>
-See <a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/photomet/photomet.html">
-     <b>photomet</b></a> documetation for additional information.
+See <i>photomet</i> documetation for additional information.
 </p>
   </description>
 
@@ -235,11 +232,18 @@ See <a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/p
     <change name="Ella Mae Lee" date="2012-11-16">
       Improved the documentation, fixes #452.
     </change>
+    <change name="Lynn Weller" date="2013-02-25">
+      Removed links to applications imbedded in text and replaced with
+      italicized application name.  Added application links to the
+      "Related Objects and Documents" section of the documentation.
+       Fixes mantis ticket #1525.
+    </change>
+
   </history>
 
   <seeAlso>
     <applications>
-      <item>Photomet</item>
+      <item>photomet</item>
     </applications>
   </seeAlso>
 
@@ -1237,12 +1241,12 @@ See <a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/p
       <guiInterfaces>
         <guiInterface>
           <image src="assets/images/photemplate_gui.png" width="716" height="969">
-            <brief>Photemplate GUI</brief>
+            <brief>photemplate GUI</brief>
             <description>
               Screenshot of GUI version of the application.  The parameter values
 	      have been loaded and edited for the output PVL file.
             </description>
-            <thumbnail src="assets/thumbs/photemplate_gui_thumb.png" caption="Photemplate GUI" width="222" height="300"/>
+            <thumbnail src="assets/thumbs/photemplate_gui_thumb.png" caption="photemplate GUI" width="222" height="300"/>
           </image>
         </guiInterface>
       </guiInterfaces>

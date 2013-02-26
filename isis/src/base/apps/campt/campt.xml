@@ -17,13 +17,9 @@
     <p>
     Note the input image cube has preliminary requirements:
     <ul>
-      <li>The input image requires <def>SPICE</def> information (see <a href=
-      "http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/spiceinit/spiceinit.html"
-      ><i>Spiceinit</i></a>).</li>
+      <li>The input image requires <def>SPICE</def> information (see <i>spiceinit</i>).</li>
       <li>The input image cube must be a <def>Level0</def>  or a <def>Level1</def> ISIS cube.</li>
-      <li>To use a <def>Level2</def> file as the input image (see <a href=
-      "http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/mappt/mappt.html"
-      ><i>Mappt</i></a>).</li>
+      <li>To use a <def>Level2</def> file as the input image (see <i>mappt</i>).</li>
     </ul>
     </p>
     <p>
@@ -36,7 +32,7 @@
     Coordinates.    
     </p>
     <p> 
-    The following is a partial list of coordinates computed in the campt application:<br />
+    The following is a partial list of coordinates computed in the <i>campt</i> application:<br />
     <br />
     <b>Geometric Information</b>: <def>Latitude</def>, <def>Longitude</def>, <def 
     link="Line Resolution">Resolution</def> <br />
@@ -57,10 +53,10 @@
     a choice of a <def>PVL</def> file or a flat file. A PVL file is a text 
     file in label format, while the flat file is a comma-delimited text file 
     that is easily imported into most databases and digital spreadsheets 
-    such as Microsoft Excel. Below is an example of campt output in <def>PVL</def>
+    such as Microsoft Excel. Below is an example of <i>campt</i> output in <def>PVL</def>
     format. You can skim the left column of this PVL-formatted output file for 
     a thorough listing of the types of coordinates, sun and instrument-related 
-    information computed when using campt.
+    information computed when using <i>campt</i>.
     </p>
     
     <pre>
@@ -182,6 +178,12 @@ End_Group
     <change name="Janet Richie, Ella Mae Lee" date="2012-11-20">
       Modified the documentation, fixes #1173
     </change>
+    <change name="Lynn Weller" date="2013-02-25">
+      Removed links to applications imbedded in text and replaced with 
+      italicized application name.  Added application links to the 
+      "Related Objects and Documents" section of the documentation.
+       Fixes mantis ticket #1525.
+    </change>
   </history>
 
   <oldName>
@@ -189,6 +191,14 @@ End_Group
     <item>lev1pt</item>
     <item>photostat</item>
   </oldName>
+
+  <seeAlso>
+    <applications>
+      <item>spiceinit</item>
+      <item>mappt</item>
+      <item>getkey</item>
+    </applications>
+  </seeAlso>
 
   <groups>
     <group name="Files">
@@ -199,7 +209,7 @@ End_Group
           Input cube filename
         </brief>
         <description>
-          Input image, which requires <def>SPICE</def> (see <i>Spiceinit</i>)
+          Input image, which requires <def>SPICE</def> (see <i>spiceinit</i>)
 	  and must be a <def>Level0</def> or a <def>Level1</def> ISIS cube.
         </description>
         <filter>
@@ -215,11 +225,9 @@ End_Group
         <description>
           A text file in label format (<def>PVL</def>) which will 
           contain the results of <i>campt</i>.  This file can
-          be used in conjunction with the 
-	  <a href=
-         "http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/getkey/getkey.html"
-         ><i>getkey</i></a> application in order to pass the results to another 
-	 program when developing scripts.
+          be used in conjunction with the <i>getkey</i> application 
+          in order to pass the results to another program when developing 
+          scripts.
         </description>
       </parameter>
 

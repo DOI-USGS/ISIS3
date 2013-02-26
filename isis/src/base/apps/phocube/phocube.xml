@@ -36,11 +36,11 @@
     </p>
     <p>
     This program requires a <def>Level1</def> file that has a successful 
-    "<a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/spiceinit/spiceinit.html"><b>spiceinit</b></a>" 
-    applied to it, or a <def>Level2</def> image cube file.  For every valid
-    input pixel, an output pixel is computed based on either the <def>SPICE</def> 
-    information, or the <def link="Map Projection">map projected</def> spatial 
-    information, or a pre-defined equation.   
+    "<i>spiceinit</i>" applied to it, or a <def>Level2</def> image 
+    cube file.  For every valid input pixel, an output pixel is computed 
+    based on either the <def>SPICE</def> information, or the 
+    <def link="Map Projection">map projected</def> spatial information, 
+    or a pre-defined equation.   
   </p>
   <p> 
     The parameters "morphology" and "albedo" are specifically designed to be used
@@ -63,7 +63,7 @@
   </blockquote>
   </p>  
   <p>
-    All the options in phocube are applicable if the input file is a Level1 
+    All the options in <i>phocube</i> are applicable if the input file is a Level1 
     image and has a camera model associated with the file.  If the input file 
     is a map-projected Level2 image, only a few options are appropriate 
     and available for selection. <br /><br />
@@ -105,9 +105,9 @@
     shown below, is populated with the name of each option selected by the 
     user as bands.  These bands can be referenced by their names in 
     applications such as 
-    "<a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/mapmos/mapmos.html"><b>mapmos</b></a>"
+    "<i>mapmos</i>"
     and 
-    "<a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/qview/qview.html"><b>qview</b></a>." 
+    "<i>qview</i>." 
     <blockquote>
     <pre>
     <b>Example:</b>
@@ -142,9 +142,9 @@
     programs and the mosaic requires the input image pixel, the "DN" 
     parameter name must be set to "true" in phocube.  When backplane 
     bands are used in the
-    "<a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/fx/fx.html"><b>fx</b></a>" 
+    "<i>fx</i>" 
     or 
-    "<a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/photomet/photomet.html"><b>photomet</b></a>" 
+    "<i>photomet</i>" 
     program, it is not necessary to propagate the input image to the output 
     file.
   </p>
@@ -155,6 +155,17 @@
     <item>levgeoplane</item>
     <item>geoback</item>
   </oldName>
+
+  <seeAlso>
+    <applications>
+      <item>spiceinit</item>
+      <item>mapmos</item>
+      <item>qview</item>
+      <item>fx</item>
+      <item>photomet</item>
+      <item>automos</item>
+    </applications>
+  </seeAlso>
 
   <liens>
     <item>Add resolution to possible outputs</item>
@@ -246,7 +257,13 @@
     <change name="Tracie Sucharski" date="2013-01-10">
       Allow input cubes without the BandBin label group.  Fixes #929.
     </change>
-</history>
+    <change name="Lynn Weller" date="2013-02-25">
+      Removed links to applications imbedded in text and replaced with
+      italicized application name.  Added application links to the
+      "Related Objects and Documents" section of the documentation.
+      Fixes mantis ticket #1525.
+    </change>
+  </history>
 
   <category>
     <categoryItem>Radiometric and Photometric Correction</categoryItem>
@@ -558,7 +575,7 @@
             This band is computed from the <def link="Pixel Resolution">pixel resolution</def>
             and <def link="Emission Angle">emission angle</def> using the following formula:<br />  
             <br />Morphology = PixelResolution / cos(EmissionAngle)<br /> <br />
-            The resulting output band can be used by "automos" to create a 
+            The resulting output band can be used by <i>automos</i> to create a 
             morphology-based mosaic product.  This option uses the 
             <def link="Local Emission Angle">local emission angle</def> if the input file
             is initialized (spiceinit) with an elevation model (DEM); otherwise, it  
@@ -569,14 +586,13 @@
           <p>
  	    <dl>
 	    <dt>
-              Append the following parameters to the "automos" command line to utilize this backplane band:
+              Append the following parameters to the <i>automos</i> command line to utilize this backplane band:
 	    </dt>
             <dd>
 	      <b>priority=band type=keyword keyname=Name keyvalue=morphology criteria=lesser</b>.
 	    </dd>
 	    </dl>  
-            See <a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/automos/automos.html">"<b>automos</b>"</a> 
-	    documentation for further details.
+            See <i>automos</i> documentation for further details.
           </p>
         </description>
       </parameter>
@@ -590,7 +606,7 @@
             <def link="Incidence Angle">incidence angle</def> and <def link="Emission Angle">emission angle</def> 
             using the following formula:<br /><br /> 
 	    Albedo = PixelResolution * [(1 / cos(EmissionAngle)) + (1 / cos(IncidenceAngle))]<br /><br />
-	    The resulting output band can be used by "automos" to create an albedo-based
+	    The resulting output band can be used by <i>automos</i> to create an albedo-based
 	    mosaic product.  This option always uses the  
 	    <def link="Local Emission Angle">local emission angle</def>  and 
 	    <def link="Local Incidence Angle">local incidence angle</def> if the input file
@@ -602,15 +618,14 @@
           <p>
  	    <dl>
 	    <dt>
-              Append the following parameters to the "automos" command line to utilize this backplane band:
+              Append the following parameters to the <i>automos</i> command line to utilize this backplane band:
 	    </dt>
             <dd>
             <b>priority=band type=keyword keyname=Name keyvalue=albedo 
               criteria=lesser</b>.  
 	    </dd>
 	    </dl>  
-            See <a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/automos/automos.html">"<b>automos</b>"</a> 
-	    documentation for further details.
+            See <i>automos</i> documentation for further details.
           </p>
         </description>
       </parameter>
@@ -621,12 +636,12 @@
     <example>
       <brief>Create latitude and morphology backplane bands</brief>
       <description>
-        Within this example, phocube creates an output file with two bands 
+        Within this example, <i>phocube</i> creates an output file with two bands 
 	that contain latitude information and computed morphology 
 	values, which are shown below as separate snapshots under "Output 
 	Images."  The input image file shown below under "Input Image" was 
-	not propagated to the phocube output file because DN is set to 
-	false.  If the phocube output file is projected and mosaicked, 
+	not propagated to the <i>phocube</i> output file because DN is set to 
+	false.  If the <i>phocube</i> output file is projected and mosaicked, 
 	the mosaic file will contain the latitude information for the first 
 	band and the "morphology" values for the second band, but no image 
 	information from the input image will be included.  The "DN" 
@@ -638,7 +653,7 @@
 	 from=EW0131773041G_cal.cub to=EW0131773041G_cal.pho.cub phase=no emission=no incidence=no 
 	 longitude=no morphology=yes
         </commandLine>
-        <description>Run phocube to create latitude and morphology bands.</description>
+        <description>Run <i>phocube</i> to create latitude and morphology bands.</description>
       </terminalInterface>
       <guiInterfaces>
         <guiInterface>
@@ -650,7 +665,7 @@
 	      options "PHASE," "EMISSION," "INCIDENCE," and "LONGITUDE" are 
 	      deselected to avoid creating these unwanted backplanes. 
             </description>
-            <thumbnail src="assets/thumbs/thumb_phocube_gui.jpg" caption="Phocube GUI" width="147" height="243"/>
+            <thumbnail src="assets/thumbs/thumb_phocube_gui.jpg" caption="phocube GUI" width="147" height="243"/>
           </image>
         </guiInterface>
       </guiInterfaces>

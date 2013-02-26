@@ -10,7 +10,7 @@
   <p>
     This program fits the Lunar-Lambert or Minnaert photometric function to the 
     complex Hapke (1981; 1984; 1986) model at several <def link="Phase Angle">phase 
-    angles</def>. Phoempglobal adjusts the limb-darkening and the overall brightness 
+    angles</def>. <i>phoempglobal</i> adjusts the limb-darkening and the overall brightness 
     so that the sum-squared-residual between the two is minimized and results in 
     a tight fit to the new empirical model.  The resulting best fit limb-darkening 
     Minnaert K or Lunar-Lambert L and brightness values that is normalized as
@@ -22,26 +22,22 @@
   </p>
   <p>
     Note: The fit is calculated for a portion of the visible hemisphere of an 
-    idealized spherical and uniform planet such as Mars and the Earth. Phoempglobal 
+    idealized spherical and uniform planet such as Mars and the Earth. <i>phoempglobal</i> 
     is considered an advanced program and may not be suitable for the ISIS-user novice.
   </p>
   <p>
-    <b>Phoempglobal Companion Programs and Uses:</b>
+    <b><i>phoempglobal</i> Companion Programs and Uses:</b>
   </p>
   <p>
-    The programs listed below can utilize the output file of Phoempglobal as input:
+    The programs listed below can utilize the output file of <i>phoempglobal</i> as input:
     <blockquote>
     <ul>
     <li>   
-      <a href=
-      "http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/photemplate/photemplate.html"
-      >Photemplate</a> - used to create a template file consisting of parameter 
+      <i>photemplate</i> - used to create a template file consisting of parameter 
       values for a selected photometric function to normalize images
     </li>
     <li>
-      <a href=
-      "http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/photomet/photomet.html"
-      >Photomet</a> - used to apply photometric normalization to an image
+      <i>photomet</i> - used to apply photometric normalization to an image
     </li>
     </ul>
     </blockquote>
@@ -179,38 +175,34 @@
   </blockquote>
   </p>
   <p>
-    <b>If result of Phoempglobal will be used in Photomet:</b> 
+    <b>If result of <i>phoempglobal</i> will be used in <i>photomet</i>:</b> 
   </p>
   <p>
-    All the options available in Phoempglobal are also available in the <a href=
-    "http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/photomet/photomet.html"
-    >Photomet</a> program.  So, the best option is to forgo the atmospheric 
-    correction in Phoempglobal, and instead apply the atmospheric correction in 
-    Photomet.  Set the parameters ATMNAME=NONE and ADDOFFSET=NO to obtain the
+    All the options available in <i>phoempglobal</i> are also available in the 
+    <i>photomet</i> program.  So, the best option is to forgo the atmospheric 
+    correction in <i>phoempglobal</i>, and instead apply the atmospheric correction in 
+    <i>photomet</i>.  Set the parameters ATMNAME=NONE and ADDOFFSET=NO to obtain the
     empirical model for the surface alone.  The brightness and limb-darkening 
-    values output by Phoempglobal and the LunarLambertEmpirical or 
-    MinnaertEmpirical photometric function are applied with Photomet to correct 
+    values output by <i>phoempglobal</i> and the LunarLambertEmpirical or 
+    MinnaertEmpirical photometric function are applied with <i>photomet</i> to correct 
     the image.  If a correction for atmospheric scattering is desired, one of the 
     atmospheric models can also be selected when the parameters are defined.  The 
     photometrically normalized images can then be equalized and mosaicked together.
   </p>
 
   <p>
-    <b>If result of Phoempglobal will be used to support photoclinometry application:</b>
+    <b>If result of <i>phoempglobal</i> will be used to support photoclinometry application:</b>
   </p>
 
   <p>
     Fitting with an atmospheric model and setting the parameter ADDOFFSET=YES in 
-    Phoempglobal is more useful for the photoclinometry application, where images are 
+    <i>phoempglobal</i> is more useful for the photoclinometry application, where images are 
     normally corrected by subtracting a uniform haze estimate rather than by applying 
     a full atmospheric scattering model.  The parameter EMAMAX should be set to a 
     relatively small value that represents the typical range of surface slopes, and 
     the fit will apply to images with vertical viewing.  The table of fits at multiple 
-    <def link="Phase Angle">phase angles</def> output by Phoempglobal can be 
-    interpolated, and used as input to <a href=
-    "http://isis.astrogeology.usgs.gov/Isis2/isis-bin/pdfs2.cgi?pc2d"
-    >Pc2d</a> program for any given image.  <b>NOTE: Pc2d is only available in ISIS2
-    and is no longer supported.</b><br/>
+    <def link="Phase Angle">phase angles</def> output by <i>phoempglobal</i> can be 
+    interpolated, and used as input to a photoclinometry application for any given image.
   </p>
 <p>
 <br/>
@@ -252,6 +244,13 @@ Tomasko, M.G., et al., 1999, Properties of Dust in the Martian Atmosphere from
     <item>pho_emp_global</item>
   </oldName>
 
+  <seeAlso>
+    <applications>
+      <item>photemplate</item>
+      <item>photomet</item>
+    </applications>
+  </seeAlso>
+
   <history>
     <change name="Randy Kirk" date= "1999-11-16">
       USGS Flagstaff Original Version
@@ -270,6 +269,12 @@ Tomasko, M.G., et al., 1999, Properties of Dust in the Martian Atmosphere from
     <change name="Ella Mae Lee" date="2013-01-25">
       Updated documentation, and added links to the glossary and an
       example, fixes #451.
+    </change>
+    <change name="Lynn Weller" date="2013-02-25">
+      Removed links to applications imbedded in text and replaced with
+      italicized application name.  Added application links to the
+      "Related Objects and Documents" section of the documentation.
+      Fixes mantis ticket #1525.
     </change>
   </history>
 
@@ -290,11 +295,9 @@ Tomasko, M.G., et al., 1999, Properties of Dust in the Martian Atmosphere from
 	  <li>KList or LList - list of best fit limb-darkening values</li>
           <li>PhaseCurveList - list of brightness values</li>
 	  </ul>
-	  The output file is formatted so it can be used by the program  <a 
-	  href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/photemplate/photemplate.html"
-          >Photemplate</a> (used to edit the parameters) or <a 
-	  href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/photomet/photomet.html"
-	  >Photomet</a> (used to apply photometric normalization to an image).
+	  The output file is formatted so it can be used by the program <i>photemplate</i> 
+	  (used to edit the parameters) or <i>photomet</i> (used to apply photometric 
+	  normalization to an image).
         </description>
         <filter>
           *.txt *.pvl
@@ -506,9 +509,7 @@ Tomasko, M.G., et al., 1999, Properties of Dust in the Martian Atmosphere from
           Specify a photometric function to fit to the Hapke model. The 
 	  lists of brightness and limb-darkening values can be used with the 
 	  LunarLambertEmpirical or MinnaertEmpirical photometric functions in 
-	  the photometric normalization program <a href=
-    "http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/photomet/photomet.html"
-          >Photomet</a>.
+	  the photometric normalization program <i>photomet</i>.
         </description>
         <list>
           <option value="LUNARLAMBERT">
@@ -519,7 +520,7 @@ Tomasko, M.G., et al., 1999, Properties of Dust in the Martian Atmosphere from
               Fit the LunarLambert photometric function to the Hapke Model to
 	      derive the parameters for the LunarLambertEmpirical photometric
 	      function. The LunarLambertEmpirical model as defined by
-              McEwen (1991) and used by the program Photomet is
+              McEwen (1991) and used by the program <i>photomet</i> is
 	      <blockquote>
                 func=b(phase) * ((1-l(phase))*u0 + 2*l(phase)*u0/(u0+u))
 	      </blockquote>
@@ -537,9 +538,7 @@ Tomasko, M.G., et al., 1999, Properties of Dust in the Martian Atmosphere from
               Fit the Minnaert photometric function to the Hapke Model to
 	      derive the parameters for the MinnaertEmpirical photometric
 	      function. The MinnaertEmpirical model as defined by
-              McEwen (1991) and used by the program <a href=
-    "http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/photomet/photomet.html"
-          >Photomet</a> is
+              McEwen (1991) and used by the program <i>photomet</i> is
 	      <blockquote>
               func=b(phase) * u0**k(phase) * u**(k(phase)-1)
 	      </blockquote>
@@ -566,12 +565,10 @@ Tomasko, M.G., et al., 1999, Properties of Dust in the Martian Atmosphere from
         <description>
           <p>
           Phoempglobal incorporates all the same atmospheric scattering models in 
-	  the program <a 
-	  href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/photomet/photomet.html"
-	  >Photomet</a> that is used to make photometric corrections to images. 
-	  The empirical model for the surface alone is obtained by setting 
-	  ATMNAME=NONE and ADDOFFSET=NO in Phoempglobal, and then the atmospheric 
-	  scattering parameters are applied in Photomet.
+	  the program <i>photomet</i> that is used to make photometric corrections 
+	  to images.  The empirical model for the surface alone is obtained by setting 
+	  ATMNAME=NONE and ADDOFFSET=NO in <i>phoempglobal</i>, and then the atmospheric 
+	  scattering parameters are applied in <i>photomet</i>.
 	  </p>
 	  <p>
 	  If an option other than NONE is selected, an atmospheric scattering 
@@ -839,16 +836,14 @@ Tomasko, M.G., et al., 1999, Properties of Dust in the Martian Atmosphere from
           phase angle.
 	  </p>
 	  <p>
-	  Because the program <a 
-	  href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/photomet/photomet.html"
-	  >Photomet</a> incorporates all the same atmospheric scattering models as
-          Phoempglobal, one would normally set ATMNAME=NONE and ADDOFFSET=NO to 
-          obtain an empirical model for the surface alone, and then apply the 
-          atmospheric scattering parameters in Photomet. Fitting with an
-          atmospheric model and ADDOFFSET=YES in Phoempglobal is more useful for
-          application to photoclinometry, where images are normally corrected
-          by subtracting a uniform haze estimate rather than by applying a
-          full atmospheric scattering model.
+	  Because the program <i>photomet</i> incorporates all the same 
+	  atmospheric scattering models as Phoempglobal, one would normally 
+	  set ATMNAME=NONE and ADDOFFSET=NO to obtain an empirical model for 
+	  the surface alone, and then apply the atmospheric scattering parameters 
+	  in <i>photomet</i>. Fitting with an atmospheric model and ADDOFFSET=YES 
+	  in <i>phoempglobal</i> is more useful for application to photoclinometry, 
+	  where images are normally corrected by subtracting a uniform haze 
+	  estimate rather than by applying a full atmospheric scattering model.
 	  </p>
         </description>
       </parameter>
@@ -1022,15 +1017,15 @@ Tomasko, M.G., et al., 1999, Properties of Dust in the Martian Atmosphere from
   </groups>
   <examples>
      <example>
-      <brief>Create a PVL file with Phoempglobal</brief>
+      <brief>Create a PVL file with <i>phoempglobal</i></brief>
       <description>
         This example shows the GUI and the input setting for each parameter name
-	in the Phoempglobal program.  
+	in the <i>phoempglobal</i> program.  
       </description>
       <terminalInterface>
         <commandLine>
- 	  to=new_test.pvl note="Phoempglobal test using photometric settings for 
-	  Mercury provided by BrettD. Parameters: to=new_test.pvl wh=0.249831313 
+ 	  to=new_test.pvl note="phoempglobal test using photometric settings for 
+	  Mercury provided by Brett D. Parameters: to=new_test.pvl wh=0.249831313 
 	  hh=0.075 b0=2.3 theta=7.717173828 hg1=0.247542306 hg2=0.57542686 
 	  model=lunarlambert emamin=0 emamax=90 emamax_pcoeff=1 incmin=0 incmax=90 
 	  phmin=0 phmax=180 nph=20" wh=0.249831313 hh=0.075 b0=2.3 theta=7.717173828 
@@ -1038,19 +1033,19 @@ Tomasko, M.G., et al., 1999, Properties of Dust in the Martian Atmosphere from
 	  emamax_pcoeff=1 incmin=0 incmax=90 phmin=0 phmax=180 nph=20
         </commandLine>
         <description>
-         Run Phoempglobal to generate a PVL file with the parameter values for the
+         Run <i>phoempglobal</i> to generate a PVL file with the parameter values for the
          LunarLambertEmpirical photometric model.
         </description>
       </terminalInterface>
       <guiInterfaces>
         <guiInterface>
           <image src="assets/images/phoempglobal_gui_image.png" width="595" height="975">
-            <brief>Phoempglobal GUI</brief>
+            <brief><i>phoempglobal</i> GUI</brief>
             <description>
               Screenshot of GUI version of the application.  The parameter values
               are entered by the user, and the results are output to a text file.
             </description>
-            <thumbnail src="assets/thumbs/phoempglobal_gui_thumb.png" caption="Phoempglobal GUI" width="156" height="255"/>
+            <thumbnail src="assets/thumbs/phoempglobal_gui_thumb.png" caption="phoemglobal GUI" width="156" height="255"/>
           </image>
         </guiInterface>
       </guiInterfaces>
@@ -1060,12 +1055,10 @@ Tomasko, M.G., et al., 1999, Properties of Dust in the Martian Atmosphere from
           <description>
             The output <def>PVL</def> file contains the photometric parameter settings
 	    for the LunarLambertEmpirical photometric function.  This file can be used
-	    as input to the <a 
-	  href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/photomet/photomet.html"
-	  >Photomet</a> program with the FROMPVL parameter name. <br/> <br/>
-	  Note:  The phase angles listed in the PVL file is not in 10 degree increments.  
-	  The setting for EMAMAX_PCOEFF influences the phase angle values that are 
-	  output.  Use EMAMAC_PCOEFF=0.1111 to output phase angles at 10 degree increments.
+	    as input to the <i>photomet</i> program with the FROMPVL parameter name. <br/> <br/>
+	    Note:  The phase angles listed in the PVL file is not in 10 degree increments.  
+	    The setting for EMAMAX_PCOEFF influences the phase angle values that are 
+	    output.  Use EMAMAC_PCOEFF=0.1111 to output phase angles at 10 degree increments.
           </description>
           <parameterName>
             TO

@@ -14,7 +14,7 @@
     conditions.  The photometric correction is applied to each pixel by computing
     a photometric model based on local photometric angles and a set of parameters 
     that defines the model.  Currently, no default values are assigned for any 
-    parameter names in the ISIS3 version of photomet.
+    parameter names in the ISIS3 version of <i>photomet</i>.
     </p>
     <p>    
     Photometric angles can be computed from the following:
@@ -190,10 +190,8 @@
     albedo=1.0 instead.
     </p>
     <p>
-    The program "<a href=
-    "http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/photemplate/photemplate.html"
-    >photemplate</a>" can be used to set up the PVL file containing the selected options
-    for photomet.  
+    The program <i>photemplate</i> can be used to set up the PVL file 
+    containing the selected options for <i>photomet</i>.  
     </p>
     <p>
     The tables below show the models and their related parameter requirements 
@@ -994,12 +992,26 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
       Support for aliases (deprecated values) must be fully implemented in ISIS before the shorter
       parameter name (ZEROB0ST) will be available. Fixes #1288.
     </change>
+    <change name="Lynn Weller" date="2013-02-25">
+      Removed links to applications imbedded in text and replaced with
+      italicized application name.  Added application links to the
+      "Related Objects and Documents" section of the documentation.
+      Fixes mantis ticket #1525.
+    </change>
   </history>
   
   <category>
     <categoryItem>Radiometric and Photometric Correction</categoryItem>
     <categoryItem>Cameras</categoryItem>
   </category>
+
+  <seeAlso>
+    <applications>
+      <item>photemplate</item>
+      <item>fx</item>
+      <item>stats</item>
+    </applications>
+  </seeAlso>
 
   <groups>
     <group name="Files">
@@ -1190,9 +1202,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
 	    each time for every pixel.  This option is also used for images that 
 	    do not have a camera model associated with them. If no camera model is
 	    available, then create files that contain the photometric angle 
-	    information for each pixel in the input file with 
-	    <a href="http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/fx/fx.html"
-	    ><b>fx</b></a> or another 
+	    information for each pixel in the input file with <i>fx</i> or another 
 	    program.  It is very important that the new files have the same 
 	    number of samples and lines as the input file.
           </dd>
@@ -2901,9 +2911,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
 	  defined for incref and zero phase) used to simulate a shaded relief image 
 	  when shade or shadeatm normalization models are used.  For the other modes, 
 	  it is the albedo that the image will be normalized to have.  The program 
-	  "<a href=
-	  "http://isis.astrogeology.usgs.gov/Application/presentation/Tabbed/stats/stats.html"
-	  >stats</a>" can be run to get  the average albedo of an input image, but 
+	  <i>stats</i> can be run to get  the average albedo of an input image, but 
 	  for constructing mosaics the same value of albedo should be used for all 
 	  images in order to achieve a uniform result.
         </description>
@@ -3067,7 +3075,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
 	      The parameter values were loaded into the appropriate parameter 
 	      names using the drop-down menu for the "FROMPVL" parameter name.
             </description>
-            <thumbnail src="assets/thumbs/photomet_ex1_gui_thumb.png" caption="Photomet GUI" width="183" height="300"/>
+            <thumbnail src="assets/thumbs/photomet_ex1_gui_thumb.png" caption="photomet GUI" width="183" height="300"/>
           </image>
         </guiInterface>
       </guiInterfaces>
@@ -3142,7 +3150,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
               value for MAXEMISSION and MAXINCIDENCE parameters is 90.0, 
 	      but the INCMAT parameter is set to 75 degrees.
             </description>
-            <thumbnail src="assets/thumbs/photomet_ex2_gui_thumb.png" caption="Photomet GUI" width="183" height="300"/>
+            <thumbnail src="assets/thumbs/photomet_ex2_gui_thumb.png" caption="photomet GUI" width="183" height="300"/>
           </image>
         </guiInterface>
       </guiInterfaces>
@@ -3217,7 +3225,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
               Screenshot of GUI version of the application.  The MAXEMISSION is set
 	      to 90.0; the MAXINCIDENCE and INCMAT parameters are set to 75.0 degrees.
             </description>
-            <thumbnail src="assets/thumbs/photomet_ex3_gui_thumb.png" caption="Photomet GUI settings" width="183" height="300"/>
+            <thumbnail src="assets/thumbs/photomet_ex3_gui_thumb.png" caption="photomet GUI settings" width="183" height="300"/>
           </image>
         </guiInterface>
       </guiInterfaces>
@@ -3292,7 +3300,7 @@ incidence</def> and <def link="Emission Angle">emission angles</def>, respective
               MAXEMISSION and MAXINCIDENCE parameters are changed from the 
               default value of 90.0.
             </description>
-            <thumbnail src="assets/thumbs/photomet_ex4_gui_thumb.png" caption="Photomet GUI" width="183" height="300"/>
+            <thumbnail src="assets/thumbs/photomet_ex4_gui_thumb.png" caption="photomet GUI" width="183" height="300"/>
           </image>
         </guiInterface>
       </guiInterfaces>
