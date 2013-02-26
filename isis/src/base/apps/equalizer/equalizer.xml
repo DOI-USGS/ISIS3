@@ -26,7 +26,7 @@
 
     <p>
       The actual equation to be used for equalization, for ADJUST=BRIGHTNESS, CONTRAST or BOTH, on
-      each band in each cube is:
+      each band in each cube is
       <pre>
         newdn(s,l,b)   =   (olddn(s,l,b) - avg(b)) * GAIN(b) + (avg(b) + OFFSET(b))
       </pre>
@@ -38,7 +38,7 @@
       </pre>
 
       The actual equation to be used for equalization, for ADJUST=GAIN, on
-      each band in each cube is:
+      each band in each cube is
       <pre>
         newdn(s,l,b)   =   olddn(s,l,b) * GAIN(b)
       </pre>
@@ -73,7 +73,7 @@
     </p>
 
     <p>
-      If the the user chooses to apply correction to the images, then a list
+      If the user chooses to apply correction to the images, then a list
       of output file names can be specified with the TOLIST parameter.  If no
       TOLIST is specified, the equalized cubes will be named the same as the
       input cubes with the addition of a '.equ' prior to the '.cub'
@@ -134,10 +134,10 @@
       Original version
     </change>
     <change name="Elizabeth Ribelin" date="2005-06-25">
-      Ported to Isis 3.0
+      Ported to Isis 3.0.
     </change>
     <change name="Elizabeth Ribelin" date="2005-10-04">
-      Changed categoryItem to Photometry and Radiometry
+      Changed categoryItem to Photometry and Radiometry.
     </change>
     <change name="Brendan George" date="2005-11-07">
       Added application test
@@ -161,14 +161,14 @@
     <change name="Travis Addair" date="2009-03-12">
       Added user feedback during statistic gathering, modified existing progress
       information, and moved error checking on number of bands and projection
-      parameters to be done prior to statistic gathering
+      parameters to be done prior to statistic gathering.
     </change>
     <change name="Travis Addair" date="2009-06-24">
       Refactored for use with the new OverlapNormalization class, thus removing
       the option to use the broken PCA contrast mode; the PVL output has been
       modified to print all normalization information for a cube in one group
       with OverlapStatistics information coming last in the file; added an
-      option to decrease the percentage of lines sampled in statistic gathering
+      option to decrease the percentage of lines sampled in statistic gathering.
     </change>
     <change name="Travis Addair" date="2009-07-17">
       Added a TOLIST parameter, allowing the user to specify a unique output
@@ -288,7 +288,7 @@
           statistics, used for applying correction
         </brief>
         <description>
-          This file must contain the statistics of all of the overlapping
+          This file must contain the statistics of all the overlapping
           areas in every band along with the computed equalizing factors
           (OFFSET and GAIN) for every image in the FROMLIST.
         </description>
@@ -371,7 +371,7 @@
       <parameter name="SOLVEMETHOD">
         <type>string</type>
         <brief>
-          The solve method to be used to calculate the equalization statistics.
+          The solve method to be used to calculate the equalization statistics
         </brief>
         <description>
           This option allows the user to choose the solve method for the least-squares system.
@@ -424,7 +424,7 @@
             </brief>
             <description>
               Solve the least-squares system using a sparse matrix
-              formuation of the LU decomposition. This is the best method
+              formulation of the LU decomposition. This is the best method
               to use if no hold list is provided.
             </description>
           </option>
@@ -436,7 +436,7 @@
       <parameter name="ADJUST">
         <type>string</type>
         <brief>
-          Algorithm type used to adjust the pixel values.
+          Algorithm type used to adjust the pixel values
         </brief>
         <description>
           Choose the fit option to select the algorithm to use to
@@ -488,7 +488,7 @@
             <description>
               This option will use an algorithm that only equalizes
               the contrast of the images by calculating the gain for
-              each.  This option should only be used if the brightness
+              each.  This option should only be used if the brightnesses
               of the images are already close.
 
               The equation this option uses is:
@@ -506,7 +506,7 @@
               the contrast of the images by calculating the gain for
               each. No offsets will be applied; the resulting image will
               only have a gain adjustment and no normalization. This option
-              should only be used if the brightness of the images are already
+              should only be used if the brightnesses of the images are already
               close.
 
               The equation this option uses is:
@@ -527,7 +527,7 @@
         <description>
           If the number of points in the overlapping area meets or exceeds
           this value, the area will go into the least-squares solution as
-          a "known".  Otherwise it will not be included in the
+          a "known."  Otherwise it will not be included in the
           calculations.
         </description>
         <default><item>1000</item></default>
@@ -593,12 +593,12 @@
             </brief>
             <description>
               Screenshot of the GUI with parameters set to calculate the gain
-              and offset, and then apply corrections.  Because the TOLIST
+              and offset and then to apply corrections.  Because the TOLIST
               parameter is set to its default value of "Automatic", each output
               image will be placed into the directory of its corresponding input
               image.  Also, because the OUTSTATS parameter is set to its default
-              value of "None", a record of the calculations performed will not
-              be written anywhere but to the print file.
+              value of "None", a record of the calculations performed will only be
+              written to the print file.
             </description>
             <thumbnail width="164" height="200" caption="equalizer gui" src="assets/thumbs/bothGui.jpg" />
           </image>
@@ -609,7 +609,7 @@
         <image src="assets/images/nonEqualizedMosaic.jpg" width="512" height="512">
           <brief> Mosaic of the input images for equalizer</brief>
           <description>
-            This is a a small section of the input images for the equalizer example mosaicked together.
+            This is a small section of the input images for the equalizer example mosaicked together.
           </description>
           <thumbnail caption=" Mosaic of unequalized input images" src="assets/thumbs/nonEqualizedMosaic.jpg" width="200" height="200"/>
           <parameterName>FROMLIST</parameterName>
@@ -677,7 +677,7 @@
               Screenshot of the GUI with parameters set to calculate
               equalization statistics on a set of input images.
             </description>
-            <thumbnail width="164" height="200" caption="equalizer gui" src="assets/thumbs/calcGui.jpg" />
+            <thumbnail width="164" height="200" caption="Equalizer GUI" src="assets/thumbs/calcGui.jpg" />
           </image>
         </guiInterface>
       </guiInterfaces>
@@ -686,7 +686,7 @@
         <image src="assets/images/nonEqualizedMosaic.jpg" width="512" height="512">
           <brief> Mosaic of the input images for equalizer</brief>
           <description>
-            This is a a small section of the input images for the equalizer example mosaicked together.
+            This is a small section of the input images for the equalizer example mosaicked together.
           </description>
           <thumbnail caption=" Mosaic of unequalized input images" src="assets/thumbs/nonEqualizedMosaic.jpg" width="200" height="200"/>
           <parameterName>FROMLIST</parameterName>
