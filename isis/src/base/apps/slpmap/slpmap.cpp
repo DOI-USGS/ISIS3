@@ -65,23 +65,40 @@ void IsisMain() {
   }
 
   // Create output cube
-  p.SetOutputCube("TO");
+  Cube *ocube = p.SetOutputCube("TO");
+
+
+  PvlObject &lblCubeObj = ocube->label()->FindObject("IsisCube");
+  lblCubeObj.AddGroup(PvlGroup("BandBin"));
+  PvlGroup &bbGroup = lblCubeObj.FindGroup("BandBin");
 
   g_groundMap = 0;
   if(g_outputType == Aspect) {
     p.StartProcess(createAspectCube);
-  }
-  else if (ui.GetString("PIXRES") == "AUTOMATIC") {
-    g_upperLeft = g_lowerLeft = SurfacePoint();
-    g_groundMap = new UniversalGroundMap(*icube);
-    g_conversionFactor = ui.GetDouble("CONVERSION");
-    p.StartProcess(createSlpCubeAutomatic);
+    bbGroup.AddKeyword(PvlKeyword("Name", "Aspect", ui.GetString("UNITS").toLower()));
   }
   else {
-    g_resolution = ui.GetDouble("RESOLUTION");
-    g_conversionFactor = ui.GetDouble("CONVERSION");
-    p.StartProcess(createSlpCube);
+    if (ui.GetString("PIXRES") == "AUTOMATIC") {
+      g_upperLeft = g_lowerLeft = SurfacePoint();
+      g_groundMap = new UniversalGroundMap(*icube);
+      p.StartProcess(createSlpCubeAutomatic);
+    }
+    else {
+      g_resolution = ui.GetDouble("RESOLUTION");
+      g_conversionFactor = ui.GetDouble("CONVERSION");
+      p.StartProcess(createSlpCube);
+    }
+
+    if (g_outputType == PercentSlope) {
+      bbGroup.AddKeyword(PvlKeyword("Name", "Slope", "percent"));
+    }
+    else {
+      bbGroup.AddKeyword(PvlKeyword("Name", "Slope", ui.GetString("UNITS").toLower()));
+    }
   }
+
+
+
 
   // Cleanup
   delete g_groundMap;
@@ -101,7 +118,8 @@ void IsisMain() {
  *  cell. The lower the slope value, the flatter the terrain; the higher the
  *  slope value, the steeper the terrain."
  *
- * @param in Input cube data (3x3 matrix)
+ * @param in Input cube data (3x3 matrix) represented as a one 
+ *           deminsional array.
  * @param v Output value
  */
 void createSlpCubeAutomatic(Buffer &in, double &v) {
@@ -112,39 +130,57 @@ void createSlpCubeAutomatic(Buffer &in, double &v) {
     return;
   }
 
+  // Save off the radius at the center of the current 3x3
+  Distance centerRadius;
+  try {
+    Distance(in[4], Distance::Meters);
+  }
+  catch (IException &e) {
+    QString msg = QString("The input cube contains a negative DN at (sample,line,band) "
+        "[(%1,%2,%3)]. The automatic pixel resolution option requires the input cube contain "
+        "raduis values. It is possible the input cube contains elevation or other data.").
+        arg(in.Sample(4)).arg(in.Line(4)).arg(in.Band(4));
+    throw IException(e, IException::User, msg, _FILEINFO_);
+  }
+
   // Get the lat/lons of the four corners of the pixel
   if (!g_upperLeft.Valid()) {
     if (g_groundMap->SetImage(in.Sample(4)-0.5,in.Line(4)-0.5)) {
-      g_upperLeft.SetSphericalCoordinates(Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
-                                          Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
-                                          Distance(in[4],Distance::Meters));
+      g_upperLeft.SetSphericalCoordinates(
+           Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
+           Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
+           Distance(in[4],Distance::Meters));
     }  
   }
 
   if (!g_lowerLeft.Valid()) {
     if (g_groundMap->SetImage(in.Sample(4)-0.5,in.Line(4)+0.5)) {
-      g_lowerLeft.SetSphericalCoordinates(Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
-                                          Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
-                                          Distance(in[4],Distance::Meters));
+      g_lowerLeft.SetSphericalCoordinates(
+           Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
+           Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
+           Distance(in[4],Distance::Meters));
     }  
   }
 
   SurfacePoint upperRight;
   if (g_groundMap->SetImage(in.Sample(4)+0.5,in.Line(4)-0.5)) {
-    upperRight.SetSphericalCoordinates(Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
-                                       Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
-                                       Distance(in[4],Distance::Meters));
+    upperRight.SetSphericalCoordinates(
+         Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
+         Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
+         Distance(in[4],Distance::Meters));
   }  
 
   SurfacePoint lowerRight;
   if (g_groundMap->SetImage(in.Sample(4)+0.5,in.Line(4)+0.5)) {
-    lowerRight.SetSphericalCoordinates(Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
-                                       Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
-                                       Distance(in[4],Distance::Meters));
+    lowerRight.SetSphericalCoordinates(
+         Latitude(g_groundMap->UniversalLatitude(), Angle::Degrees),
+         Longitude(g_groundMap->UniversalLongitude(), Angle::Degrees),
+         Distance(in[4],Distance::Meters));
   }  
 
   // Are all four corners good?
-  if (!g_upperLeft.Valid() || !g_lowerLeft.Valid() || !upperRight.Valid() || !lowerRight.Valid()) {
+  if (!g_upperLeft.Valid() || !g_lowerLeft.Valid() || 
+      !upperRight.Valid() || !lowerRight.Valid()) {
     g_upperLeft = upperRight;
     g_lowerLeft = lowerRight;
     v = Isis::Null;
@@ -152,34 +188,35 @@ void createSlpCubeAutomatic(Buffer &in, double &v) {
   }
 
   // Have four good corners so compute the resolutions
+  // Do not apply the conversion factor to the resolutions because the projection/camera
+  // has already been used and the Z value (DN) was assumed to be meters.
   double xResolution = ((g_upperLeft.GetDistanceToPoint(upperRight)).meters() + 
                         (g_lowerLeft.GetDistanceToPoint(lowerRight)).meters()) / 2.0;
   double yResolution = ((g_upperLeft.GetDistanceToPoint(g_lowerLeft)).meters() + 
                         (upperRight.GetDistanceToPoint(lowerRight)).meters()) / 2.0;
-
-  // Convert the resolutions to meters
-  xResolution /= g_conversionFactor;
-  yResolution /= g_conversionFactor;
 
   // Pull height values out of 3x3 buffer (in)
   const double &a = in[0];
   const double &b = in[1];
   const double &c = in[2];
   const double &d = in[3];
-  //const double &e = in[4];
+  // The middle pixel isn't needed: const double &e = in[4];
   const double &f = in[5];
   const double &g = in[6];
   const double &h = in[7];
   const double &i = in[8];
 
   // If anything we're actually calculating with is special, fail
+  // NOTE: When the 3x3 kernel wraps from the right edge of one line to the left edge of the next
+  // line this test will fail due to the 3x3 having NULL pixels from sample zero (Outside the cube
+  // boundries)
   if(Isis::IsSpecial(a) ||
-      Isis::IsSpecial(b) ||
-      Isis::IsSpecial(c) ||
-      Isis::IsSpecial(f) ||
-      Isis::IsSpecial(g) ||
-      Isis::IsSpecial(h) ||
-      Isis::IsSpecial(i)) {
+     Isis::IsSpecial(b) ||
+     Isis::IsSpecial(c) ||
+     Isis::IsSpecial(f) ||
+     Isis::IsSpecial(g) ||
+     Isis::IsSpecial(h) ||
+     Isis::IsSpecial(i)) {
     g_upperLeft = upperRight;
     g_lowerLeft = lowerRight;
 

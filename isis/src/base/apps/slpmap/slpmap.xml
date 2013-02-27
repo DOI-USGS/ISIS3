@@ -7,12 +7,14 @@
   </brief>
 
   <description>
-    This program will compute the slope or aspect of a cube.  Typically a digital terrian model is given as the input but other non-elevation datasets can be provided.  
-    Horne's algorithm is used to compute the slope/aspect.   That is, given a 3x3 kernel:<pre>
+    This program will compute the slope or aspect of a cube.  Typically a digital terrain model with DN
+    values representing the radius of a target body is
+    given as the input but other non-radius datasets can be provided. Horne's algorithm is used
+    to compute the slope or aspect. A 3x3 kernel:<pre>
    A  B  C
    D  E  F
    G  H  I</pre>
-   it is convolved through the image and each output pixel is computed as follows:
+   is convolved through the image and each output pixel is computed as follows:
 <pre>
   <b>SLOPE EQUATION</b>
    [dz/dx] = ((C + 2F + I) - (A + 2D + G)) / (8 * X_PIXEL_RESOLUTION) 
@@ -28,21 +30,29 @@
    aspect = 90 - ATAN2 ([dz/dy], -[dz/dx])
    if (aspect &lt; 0) then aspect = aspect + 360
 </pre>
-  Therefore slope is typically a number betwen 0 and 90 degrees which is flat to vertical slope, respectively.  The aspect represents the direction (0 to 360) of the slope in pixel space.  
-  From the center pixel E, 0 degrees is straight towards B, 45 towards C, 90 is towards F, 135 towards I, 180 towards H, and so on.  The user has the opportunity to output the slope in
-  radians, degrees, or percent slope.  The aspect can be in degrees or radians.
+  Slope is typically betwen 0 and 90 degrees, flat to vertical slope,
+  respectively. The aspect represents the direction (0 to 360) of the slope in pixel space.  
+  From the center pixel (E), 0 degrees is straight towards B, 45 is towards C, 90 is towards F,
+  135 is towards I, 180 is towards H, and so on.  The may choose to output the slope in
+  radians, degrees, or percent slope, the aspect in degrees or radians.
 
   <p>
-    The above slope equation assume the pixels are not square; hence X_PIXEL_RESOLUTION and Y_PIXEL_RESOLUTION.  That is, the x distance across the pixel is not equal to the y distance 
-    from top to 
-    the bottom of the pixel.   By default the program will attempt to remove any scaling difference by using the map projection information (PIXRES=AUTOMATIC).  This computation is done at
-    every pixel so that the correct x-to-y ratio is computed.  This is important for global maps where the ratio deviates as you move away from the latitude and/or longitude of true scale in the 
-    map projection.    If the image lacks a map projection then the user must provide the pixel resolution, assumed to be square via PIXRES=USER.  The user then provides a single value 
-    (RESOLUTION) that will be applied to all pixels in the image and in both directions.  
+    The slope equation above assumes the pixels are not square: hence X_PIXEL_RESOLUTION and
+    Y_PIXEL_RESOLUTION.  That is, the x distance across the pixel is not equal to the y distance 
+    from top to the bottom of the pixel.   By default the program will attempt to remove any
+    scaling differences by using the map projection information (PIXRES=AUTOMATIC).  This
+    computation is done at every pixel so the correct x-to-y ratio is computed.  This
+    is important for global maps where the x/y ratio deviates with distance from the latitude
+    and/or longitude of true scale in the map projection. If the image lacks a map projection
+    then the user must provide the pixel resolution via PIXRES=USER. For this option the pixels are
+    assumed to be square.
+    The user then provides a single value (RESOLUTION) that will be applied to all pixels in the
+    image and in both directions.  
   </p>
   <p>
-    The second assumption is that the xy units are the same as the z (pixel) units.   By default the program assumes the units are the same but allows the user to scale the z units to the xy units
-    using the CONVERSIONFACTOR parameter.
+    The second assumption is the xy units are the same as the z (pixel) units. By default
+    the program assumes the units are the same, but allows the user to scale the z units to the xy
+    units using the CONVERSIONFACTOR parameter if the PIXRES=USER option is being used.
   </p>
   
   </description>
@@ -55,11 +65,20 @@
       Changed slope and aspect algorithms
     </change>
     <change name="Jeff Anderson" date="2012-08-02">
-     Changed the slope algorithm to compute the sample and line resolution
-     at each pixel.  Previously the algorithm used the resolution at the
-     center of the image. In projected images the resolution varies as you
-     move away from the latitude and/or longitude of true scale.   Also, improved the
-     documentation and added user options to output percent slope.
+      Changed the slope algorithm to compute the sample and line resolution
+      at each pixel.  Previously the algorithm used the resolution at the
+      center of the image. In projected images the resolution varies as you
+      move away from the latitude and/or longitude of true scale.   Also, improved the
+      documentation and added user options to output percent slope.
+    </change>
+    <change name="Stuart Sides" date="2013-01-30">
+      Backward Compatibility Issue: Changed the default output to be slope rather than percent
+      slope.
+      Backward Compatibility Issue: Removed ability to supply a conversion factor when using
+      the automatic resolution option (CONVERSION=AUTOMATIC). AUTOMATIC, assumes the DNs in 
+      the cube have units of meters.
+      Added a test to the CONVERSION=AUTOMATIC option so DNs in the cube with negative values
+      will cause a better error to be shown. Added a BANDBIN group to the output cube labels.
     </change>
   </history>
 
@@ -76,7 +95,7 @@
           Input cube
         </brief>
         <description>
-          Use this parameter to select input cube. All bands of the cube within the file
+          Use this parameter to select the input cube. All bands of the cube within the file
           will have the algorithm applied.
         </description>
         <filter>
@@ -101,9 +120,10 @@
       <parameter name="OUTPUT">
         <type>string</type>
         <brief>Type of output requested, slope, aspect, or percent slope</brief>
-        <default><item>PERCENTSLOPE</item></default>
+        <default><item>SLOPE</item></default>
         <description>
-          This determines the type of output pixels that will be created.  One of slope, aspect, or percent slope.
+          This determines the type of output pixels that will be created. The output file will
+          contain either slope, aspect, or, percent slope.
         </description>
       	<list>
       	  <option value="SLOPE">
@@ -126,7 +146,8 @@
           <option value="PERCENTSLOPE">
             <brief>Create percent slope cube</brief>
             <description>
-              This creates a slope cube whose pixel values are percentages (slope/90) instead of angles.
+              This creates a slope cube whose pixel values are percentages (slope/90) instead of
+              angles.
             </description>
             <exclusions>
               <item>UNITS</item>
@@ -146,13 +167,15 @@
           <option value="RADIANS">
             <brief>Output pixels in radians</brief>
             <description>
-              The output pixels will be in radians, between 0 and PI/2 for slope and 0 and 2PI for aspect.
+              The output pixels will be in radians, between 0 and PI/2 for slope and 0 and
+              2PI for aspect.
             </description>
           </option>
           <option value="DEGREES">
             <brief>Output pixels in degrees</brief>
             <description>
-              The output pixels wiil be in degrees, between 0 and 90 for slope and 0 and 360 for aspect
+              The output pixels will be in degrees, between 0 and 90 for slope and 0 and 360
+              for aspect.
             </description>
           </option>
         </list>
@@ -160,58 +183,61 @@
     </group>
 
     <group name="Scaling Options">
+      <parameter name="PIXRES">
+        <type>string</type>
+        <brief>Defines the pixel resolution (width and height) </brief>
+        <default><item>AUTOMATIC</item></default>
+        <description>
+          This determines how the resolution of the input pixels will be defined.
+        </description>
+        <list>
+          <option value="AUTOMATIC">
+            <brief>Automatically compute the resolution using the map projection</brief>
+            <description>
+              The program will use the map projection to automatically compute the resolution
+              (X and Y) of each pixel in order to ensure the slope is computed properly.
+            </description>
+            <exclusions>
+              <item>RESOLUTION</item>
+              <item>CONVERSION</item>
+            </exclusions>
+          </option>
+          <option value="USER">
+            <brief>User defined pixel resolution</brief>
+            <description>
+              If the input cube does not have a map projection this option can be used to
+              define the resolution which is assumed to be square. A single resolution is used
+              for the entire image in both the X and Y directions. Note:  If the pixel height
+              varies significantly from the width, the slope will not be computed correctly.
+            </description>
+          </option>
+        </list>
+      </parameter>
+
       <parameter name="CONVERSION">
         <type>double</type>
         <brief>Conversion from z units to spatial units</brief>
         <default><item>1.0</item></default>
         <description>
           Since the slope algorithm depends on cancelling out the units, the
-          conversion factor from the z (input pixel) units to the xy (spatial) units needs to be considered.
+          conversion factor from the z vertical (input pixel) units to the xy horizontal (spatial)
+          units needs to be considered.
 
           For example, if the
-          xy units are meters and the z units are in kilometers the unit conversion factor should be 1000
-          as we are converting z units to xy units.  
+          xy units are in meters and the z units are in kilometers the unit conversion factor
+          should be 1000 as we are converting z kilometers to xy meters.  
 
-          The default is one which presumes the units are the same. 
+          The default presumes the units are the same.
         </description>
-      </parameter>
-
-      <parameter name="PIXRES">
-        <type>string</type>
-        <brief>Defines the pixel resolution (width and height) </brief>
-        <default><item>AUTOMATIC</item></default>
-        <description>
-          This determines the how the resolution of the input pixels will be defined.
-        </description>
-        <list>
-          <option value="AUTOMATIC">
-            <brief>Automatically compute the resolution using the map projection</brief>
-            <description>
-              The program will use the map projection to automatically compute the resolution (X and Y) of each pixel in
-              order to ensure the slope is computed properly.
-            </description>
-            <exclusions>
-              <item>RESOLUTION</item>
-            </exclusions>
-          </option>
-          <option value="USER">
-            <brief>User defined pixel resolution</brief>
-            <description>
-              If the input cube does not have a map projection then this option can be used to define the
-              resolution which is assumed to be square.   A single resolution is used for the entire image in both the
-              X and Y directions.  Note:  If the pixel height varies significantly from the width,
-              the slope will not be computed correctly.
-            </description>
-          </option>
-        </list>
       </parameter>
 
       <parameter name="RESOLUTION">
         <type>double</type>
         <brief>Pixel resolution</brief>
         <description>
-          Defines both the X and Y pixel resolution to be used across the entire image.  Note that if the pixel height varies significantly from the width, the slope
-          will not be computed correctly.
+          Defines both the X and Y pixel resolution to be used across the entire image.  Note that
+          if the pixel height varies significantly from the width, the slope will not be computed
+          correctly.
          </description>
       </parameter>
 
