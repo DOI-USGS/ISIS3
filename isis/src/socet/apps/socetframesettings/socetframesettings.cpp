@@ -1,0 +1,572 @@
+#include "Isis.h"
+
+#include <cstdlib>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <math.h>
+#include <sstream>
+#include <stdlib.h>
+
+#include <QFileInfo>
+
+#include "Camera.h"
+#include "CameraDetectorMap.h"
+#include "CameraDistortionMap.h"
+#include "CameraFocalPlaneMap.h"
+#include "CameraGroundMap.h"
+#include "Constants.h"
+#include "FileName.h"
+#include "IException.h"
+#include "IString.h"
+#include "iTime.h"
+#include "NaifStatus.h"
+#include "Process.h"
+#include "Projection.h"
+#include "Pvl.h"
+#include "PvlObject.h"
+#include "Spice.h"
+
+using namespace std;
+using namespace Isis;
+
+void getCamPosOPK(Spice &spice, QString spacecraftName, double et, Camera *cam,
+                  double ographicCamPos[3], double omegaPhiKappa[3],
+                  double isisFocalPlane2SocetPlateTranspose[3][3]);
+      
+void IsisMain() {
+
+  // Use a regular Process
+  Process p;
+
+  UserInterface &ui = Application::GetUserInterface();
+  QString from = ui.GetFileName("FROM");
+  QString to = FileName(ui.GetFileName("TO")).expanded();
+  QString socetProject = ui.GetString("SS_PROJECT");
+  QString socetImageLocation = ui.GetString("SS_IMG_LOC");
+  QString socetInputDataPath = ui.GetString("SS_INPUT_PATH");
+  QString socetCameraCalibrationPath = ui.GetString("SS_CAM_CALIB_PATH");
+
+  // Open input cube and make sure this is a lev1 image (ie, not map projected)
+  Cube cube;
+  cube.open(from);
+
+  if (cube.isProjected()) {
+    QString msg = QString("You can only create a SOCET Set Framing Camera or FrameOffAxis settings "
+                          "file for level 1 images. The input image [%1] is a map projected, level "
+                          "2, cube.").arg(from);
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+
+  // Initialize the camera
+  Cube *input = p.SetInputCube("FROM");
+  Camera *cam = input->camera();
+  CameraDetectorMap *detectorMap = cam->DetectorMap();
+  CameraFocalPlaneMap *focalMap = cam->FocalPlaneMap();
+
+  // Make sure the image contains the SPICE blobs/tables
+  PvlGroup test = cube.label()->FindGroup("Kernels", Pvl::Traverse);
+  QString instrumentPointing = (QString) test["InstrumentPointing"];
+  if (instrumentPointing != "Table") {
+    QString msg = QString("Input image [%1] does not contain needed SPICE blobs.  Please run "
+                          "spiceinit on the image with attach=yes.").arg(from);
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+
+  // Set the image at the boresight pixel to get the ephemeris time and SPICE data at that image
+  // location
+  double detectorSampleOrigin = focalMap->DetectorSampleOrigin();
+  double detectorLineOrigin = focalMap->DetectorSampleOrigin();
+  cam->SetImage(detectorSampleOrigin, detectorLineOrigin);
+  double et = cam->time().Et();
+
+  Pvl *cubeHeader = input->label();
+  Spice spice(*cubeHeader);
+  spice.setTime(et);
+
+  // Get required keywords from instrument and band groups
+  PvlGroup inst = cube.label()->FindGroup("Instrument", Pvl::Traverse);
+  QString instrumentId = (QString) inst["InstrumentId"];
+  QString spacecraftName = (QString) inst["SpacecraftName"];
+
+  // Compensate for noproj altering cube labels
+  if (instrumentId == "IdealCamera") {
+    PvlGroup orig = cube.label()->FindGroup("OriginalInstrument", Pvl::Traverse);
+    instrumentId = (QString) orig["InstrumentId"];
+    spacecraftName = (QString) orig["SpacecraftName"];
+  }
+     
+  // Get sensor position and orientation (opk) angles
+  double ographicCamPos[3] = {0.0, 0.0, 0.0};
+  double omegaPhiKappa[3] = {0.0, 0.0, 0.0};
+  double isisFocalPlane2SocetPlateTranspose[3][3] =
+                                              {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+  getCamPosOPK(spice, spacecraftName, et, cam, ographicCamPos, omegaPhiKappa,
+               isisFocalPlane2SocetPlateTranspose);
+  
+  // Determine the SOCET Set camera calibration file
+  QString socetCamFile = socetCameraCalibrationPath;
+
+  if (spacecraftName == "VIKING_ORBITER_1") {
+    if (instrumentId == "VISUAL_IMAGING_SUBSYSTEM_CAMERA_A") {
+      socetCamFile += "VIK1A.cam";
+    }
+    else {
+      socetCamFile += "VIK1B.cam";
+    }
+  }
+  else if (spacecraftName == "VIKING_ORBITER_2") {
+    if (instrumentId == "VISUAL_IMAGING_SUBSYSTEM_CAMERA_A") {
+      socetCamFile += "VIK2A.cam";
+    }
+    else {
+      socetCamFile += "VIK2B.cam";
+    }
+  }
+//----------------------------------------.-------------
+//TO DO: Uncomment these lines when MEX SRC is supported
+//----------------------------------------.-------------
+//  // Mars Express  
+//  else if (spacecraftName == "MARS_EXPRESS") {
+//    socetCamFile += "SRC.cam";
+//  }
+//-----------------------------------------------------
+//TO DO: Uncomment these lines when Themis is supported
+//-----------------------------------------------------
+//  // THEMIS VIS images (MARS Odyssey)
+//  else if (spacecraftName == "MARS_ODYSSEY") {
+//    socetCamFile += "THEMIS_VIS_F3.cam";
+//  } 
+//-----------------------------------------------------
+//TO DO: Uncomment these lines when Apollo is supported
+//-----------------------------------------------------
+//  else if (spacecraftName == "APOLLO 15") {
+//    socetCamFile += "Apollo15_M_ASU.cam";
+//  } 
+//  else if (spacecraftName == "APOLLO 16") {
+//    socetCamFile += "Apollo16_M_ASU.cam";
+//  } 
+//  else if (spacecraftName == "APOLLO 17") {
+//    socetCamFile += "Apollo17_M_ASU.cam";
+//  } 
+  else if (spacecraftName == "Galileo Orbiter") {
+    //Check if this image was aquired with the cover on or off
+    iTime removeCoverDate("1994/04/01 00:00:00");
+    iTime imageDate((QString) inst["StartTime"]);
+
+    if (imageDate < removeCoverDate) {
+      socetCamFile += "Galileo_SSI_Cover.cam";
+    }
+    else {
+      socetCamFile += "Galileo_SSI.cam";
+    }
+  } 
+  else if (spacecraftName == "Cassini-Huygens") {
+    // Get the image filter and replace "/" with "_"
+    PvlGroup bandBin = cube.label()->FindGroup("BandBin", Pvl::Traverse);
+    QString filter = (QString) bandBin["FilterName"];
+    filter.replace("/", "_");
+    
+    socetCamFile += "Cassini_ISSNA_";
+    socetCamFile += filter;
+    socetCamFile += ".cam";
+  }
+  else if (spacecraftName == "Messenger") {
+    if (instrumentId == "MDIS-NAC") {
+      socetCamFile += "MDIS_NAC.cam";
+    }
+    else {
+      socetCamFile += "MDIS_WAC.cam";
+    }
+  }
+  // Throw exception for unsupported camera
+  else {
+    QString msg = QString("The ISIS to SOCET Set translation of input image [%1] is currently "
+                          "not supported for instrument [%2].").arg(from).arg(instrumentId);
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+
+  // For THEMIS VIS, Galileo SSI, Cassini ISS get the image summation mode
+  int summation = 1;
+//-----------------------------------------------------
+//TO DO: Uncomment these lines when Themis is supported
+//-----------------------------------------------------
+//  if (spacecraftName == "MARS_ODYSSEY") {
+//    try {
+//      summation = (int) detectorMap->SampleScaleFactor();
+//    }
+//    catch (IException &e) {
+//      QString msg = "Error reading SpatialSumming from Instrument label";
+//      throw IException(IException::User, msg, _FILEINFO_);
+//    }
+//  }
+
+  if (spacecraftName == "Galileo Orbiter") {
+    try {
+      summation = (int) detectorMap->SampleScaleFactor();
+    }
+    catch (IException &e) {
+      QString msg = "Error reading Summing from Instrument label";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+  }
+
+  if (spacecraftName == "Cassini-Huygens") {
+    try {
+      summation = (int) detectorMap->SampleScaleFactor();
+    }
+    catch (IException &e) {
+      QString msg = "Error reading Summing from Instrument label";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+  }
+
+  // Get NL/NS of image and calculate the size in x/y dimensions, in mm
+  // Note: for THEMIS VIS, Galileo SSI and Cassini ISS summed images, calculate the size of the full
+  // resolution image because our "isis2socet" scripts will enlarge the summed image for import into
+  // Socet Set
+  double pixelSize = 1.0 / cam->PixelPitch();
+  int numLines = cube.lineCount();
+  int numSamples = cube.sampleCount();
+  if (summation > 1) {
+    // For Themis VIS, Galileo SSI, Cassini ISS:
+    numLines *= summation;
+    numSamples *= summation;
+  }
+  double sizeX = numSamples / pixelSize;
+  double sizeY = numLines / pixelSize;
+  
+  // Make sure the Socet Set project name has the .prj extension
+  if (socetProject.endsWith(".prj", Qt::CaseInsensitive) == FALSE)  socetProject += ".prj";
+  
+  // Find cube base name w/o extensions & establish the Socet Set support file name 
+  // Note: I'm using the QFileInfo class because the baseName method in the ISIS
+  // FileName class only strips the last extension, and we need the core name
+  // of the file without any extensions, or path
+  QString baseName = QFileInfo(from).baseName();
+  QString socetSupFile = baseName + ".sup";
+
+  //  Open and write to the SOCET Set Framing Camera settings file keywords and values
+  //  If this is a Messenger image, add the temperature-dependent focal length so as to overrride
+  //  the nominal focal lenghth stored in the SOCET Set camera calibration files
+  ofstream toStrm;
+
+  toStrm.open (to.toAscii().data(), ios::trunc);
+  if (toStrm.bad()) {
+    QString msg = "Unable to open output settings file";
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+
+  toStrm << "setting_file                        1.1\n";
+  toStrm << "multi_frame.project                 " << socetProject << endl;
+  toStrm << "multi_frame.cam_calib_filename      " << socetCamFile << endl;
+  toStrm << "multi_frame.create_files            IMAGE_AND_SUPPORT\n";
+  toStrm << "multi_frame.atmos_ref               0\n";
+  toStrm << "multi_frame.auto_min                YES\n";
+  toStrm << "multi_frame.digital_cam             NO\n";
+  toStrm << "multi_frame.input_image_filename    " << socetInputDataPath + baseName +
+                                                 ".raw" << endl;
+  toStrm << "multi_frame.output_format           img_type_vitec\n";
+  toStrm << "multi_frame.output_name             " << socetSupFile << endl;
+  toStrm << "multi_frame.output_location         " << socetImageLocation << endl;
+  toStrm << "multi_frame.cam_loc_ang_sys         OPK\n";
+  toStrm << "multi_frame.cam_loc_ang_units       UNIT_DEGREES\n";
+  toStrm << "multi_frame.cam_loc_xy_units        UNIT_DEGREES\n";
+
+  if (spacecraftName == "Messenger") {
+    // Overide the nominal focal length in the SOCET SET camera calibration file with the
+    // Temperature Dependent Focal Length used in ISIS
+    double focalLength = cam->FocalLength();
+    toStrm << "multi_frame.cam_loc_focal           " << setprecision(17) << focalLength
+                                                                 << endl;
+  }
+  toStrm << "multi_frame.cam_loc_y_or_lat        " << setprecision(17) <<
+                                                       ographicCamPos[0] << endl;
+  toStrm << "multi_frame.cam_loc_x_or_lon        " << ographicCamPos[1] << endl;
+  toStrm << "multi_frame.cam_loc_elev            " << ographicCamPos[2] << endl;
+  toStrm << "multi_frame.cam_loc_omega           " << omegaPhiKappa[0] << endl;
+  toStrm << "multi_frame.cam_loc_phi             " << omegaPhiKappa[1] << endl;
+  toStrm << "multi_frame.cam_loc_kappa           " << omegaPhiKappa[2] << endl;
+  toStrm << "multi_frame.img_size_lines          " << numLines << endl;
+  toStrm << "multi_frame.img_size_samps          " << numSamples << endl;
+  toStrm << "multi_frame.sizex                   " << setprecision(6) << sizeX << endl;
+  toStrm << "multi_frame.sizey                   " << sizeY << endl;
+  toStrm << "multi_frame.orientation             1\n";
+
+  // Furthermore, if this is a Messenger image, get the needed keywords values needed for the
+  // USGSAstro FrameOffAxis *support* file, and add them to the output settings file.
+  // During frame import in SOCET Set, these values will be ignored, but then later accessed by
+  // the USGSAstro import_frame SOCET Set program.
+  //
+  // Note: Summed Messenger images are handled in the FrameOffAxis sensor model, so no need to
+  // account for enlarging Messenger images in the "socet2isis" scripts
+
+  if (spacecraftName == "Messenger") {
+    double originalHalfLines = numLines / 2.0;
+    double originalHalfSamples = numSamples / 2.0;
+
+    // Set the lens distortion coefficients
+    // Note: These values were calculated for SOCET Set by Orrin Thomas in an MSExcel spreadsheet,
+    // and are hardcoded here
+    QString lenscoX;
+    QString lenscoY;
+    if (instrumentId == "MDIS-WAC") {
+      lenscoX = QString("1.0913499678359500E-06 1.0000181809155400E+00 5.2705094712778700E-06 "
+                        "7.3086112844249500E-05 -2.1503011755973800E-06 -3.5311655893430800E-08 "
+                        "-5.3312743384716000E-06 -1.4642661005550900E-07 -5.4770856997706100E-06 "
+                        "-1.2364567692453900E-07 0.0000000000000000E+00 0.0000000000000000E+00 "
+                        "0.0000000000000000E+00 0.0000000000000000E+00 0.0000000000000000E+00");
+
+      lenscoY = QString("-4.8524316760252900E-08 -5.2704844291112000E-06 1.0000181808487100E+00 "
+                        "2.4702140905559800E-09 7.3084305868732200E-05 -2.1478354889239300E-06 "
+                        "1.2364567791040000E-07 -5.4663905009059100E-06 1.4516772126792600E-07 "
+                        "-5.3419626374895400E-06 0.0000000000000000E+00 0.0000000000000000E+00 "
+                        "0.0000000000000000E+00 0.0000000000000000E+00 0.0000000000000000E+00");
+    }
+    else {
+      //MDIS-NAC lens distortion coefficients:
+      lenscoX = QString("-0.000000000000005 0.997948053760188 0.000000000000000 0.000000000000000 "
+                        "0.000542184519158 0.000000000000000 -0.000007008182254 0.000000000000000 "
+                        "-0.000006526474815 0.000000000000000 0.000000000000000 0.000000000000000 "
+                        "0.000000000000000 0.000000000000000 0.000000000000000");
+
+      lenscoY = QString("-0.000003746900328 0.000000000000000 0.999999575428613 -0.000880501428960 "
+                        "0.000000000000000 -0.000332760373453 0.000000000000000 -0.000008067196812 "
+                        "0.000000000000000 -0.000007553955548  0.000000000000000  0.000000000000000 "
+                        "0.000000000000000  0.000000000000000  0.000000000000000");
+    }
+
+    // Get the image summation
+    double sampleSumming = (int) detectorMap->SampleScaleFactor();
+    double lineSumming = (int) detectorMap->LineScaleFactor();
+
+    // Get the Starting Detector Line/Sample 
+    double startingSample = detectorMap->AdjustedStartingSample();
+    double startingLine = detectorMap->AdjustedStartingLine();
+
+    // Get the image plane corrdinates to pixel coordinates transformation matrices
+    const double *iTransS = focalMap->TransS();
+    const double *iTransL = focalMap->TransL();
+
+    // Because of the options for applying light-time correction, capture the pertinent
+    // ISIS keywords as a record to be stored in the settingsfile
+    // Note: these values will not go into the Socet Set support file)
+    QString ikCode;
+    QString swapObserverTarget;
+    QString lightTimeCorrection;
+    QString ltSurfaceCorrect;
+    PvlObject naifKeywordsObject = cube.label()->FindObject("NaifKeywords");
+    if (instrumentId == "MDIS-NAC") {
+      ikCode = "236820";
+      swapObserverTarget = (QString) naifKeywordsObject["INS-236820_SWAP_OBSERVER_TARGET"];
+      lightTimeCorrection = (QString) naifKeywordsObject["INS-236820_LIGHTTIME_CORRECTION"];
+      ltSurfaceCorrect = (QString) naifKeywordsObject["INS-236820_LT_SURFACE_CORRECT"];
+    }
+    else {
+      ikCode = "236800";
+      swapObserverTarget = (QString) naifKeywordsObject["INS-236800_SWAP_OBSERVER_TARGET"];
+      lightTimeCorrection = (QString) naifKeywordsObject["INS-236800_LIGHTTIME_CORRECTION"];
+      ltSurfaceCorrect = (QString) naifKeywordsObject["INS-236800_LT_SURFACE_CORRECT"];
+    }
+
+    toStrm << "\nSENSOR_TYPE FrameOffAxis" << endl;
+    toStrm << "USE_LENS_DISTORTION 1" << endl;
+    toStrm << "ORIGINAL_HALF_LINES " <<  originalHalfLines << endl;
+    toStrm << "ORIGINAL_HALF_SAMPLES " << originalHalfSamples << endl;
+    toStrm << "LENSCOX " << lenscoX << endl;
+    toStrm << "LENSCOY " << lenscoY << endl;
+    toStrm << "SAMPLE_SUMMING  " << sampleSumming << endl;
+    toStrm << "LINE_SUMMING  " << lineSumming << endl;
+    toStrm << "STARTING_DETECTOR_SAMPLE " << setprecision(17) << startingSample << endl;
+    toStrm << "STARTING_DETECTOR_LINE " << startingLine << endl;
+    toStrm << "SAMPLE_BORESIGHT " << detectorSampleOrigin << endl;
+    toStrm << "LINE_BORESIGHT " << detectorLineOrigin << endl;
+    toStrm << "INS_ITRANSS";
+    for (int i = 0; i < 3; i++)
+      toStrm << " " << setprecision(14) << iTransS[i];
+    toStrm << endl;
+    toStrm << "INS_ITRANSL";
+    for (int i = 0; i < 3; i++)
+      toStrm << " " << iTransL[i];
+    toStrm << endl;
+    toStrm << "M_SOCET2ISIS_FOCALPLANE " << setprecision(2) <<
+                         isisFocalPlane2SocetPlateTranspose[0][0] << " " <<
+                         isisFocalPlane2SocetPlateTranspose[0][1] << " " <<
+                         isisFocalPlane2SocetPlateTranspose[0][2] << endl;
+    toStrm << "                         " <<
+                         isisFocalPlane2SocetPlateTranspose[1][0] << " " <<
+                         isisFocalPlane2SocetPlateTranspose[1][1] << " " <<
+                         isisFocalPlane2SocetPlateTranspose[1][2] << endl;
+    toStrm << "                         " <<
+                         isisFocalPlane2SocetPlateTranspose[2][0] << " " <<
+                         isisFocalPlane2SocetPlateTranspose[2][1] << " " <<
+                         isisFocalPlane2SocetPlateTranspose[2][2] << endl;
+    toStrm << "INS-" << ikCode << "_SWAP_OBSERVER_TARGET = '" << swapObserverTarget << "'\n";
+    toStrm << "INS-" << ikCode << "_LIGHTTIME_CORRECTION = '" << lightTimeCorrection << "'\n";
+    toStrm << "INS-" << ikCode << "_LT_SURFACE_CORRECT = '" << ltSurfaceCorrect <<"'\n";
+  }
+
+} //End IsisMain
+
+
+// getCamPosOPK converts NAIF SPICE into camera positions (lon, lat, height) and camera attitude
+// angles (omega, phi, kappa) understood by SOCET Set.  camera positions are in the ographic
+// latitude - positive East longitude system, with longitudes in the 180 degree domain.
+// For the USGSAstro FrameOffAxis sensor model, the transpose of the rotation matrix from
+// isis to socet set focal plane coordinates is also returned.
+void getCamPosOPK(Spice &spice, QString spacecraftName, double et, Camera *cam,
+                 double ographicCamPos[3], double omegaPhiKappa[3],
+                 double isisFocalPlane2SocetPlateTranspose[3][3]) {
+
+  // Initialize the isisFocalPlane2SocetPlate matrix based on mission.
+  //
+  // isisCam2SocetPlate is the Rotation matrix from ISIS focal plane coordinates
+  // to Socet Set plate/focal plane coordinates
+  // For Socet, we need +x = along flight direction
+  //                     +y = left of +x
+  //                     +z = up
+
+  double isisFocalPlane2SocetPlate[3][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+//-----------------------------------------------------
+//TO DO: Uncomment these lines when Apollo is supported
+//-----------------------------------------------------
+//  if (spacecraftName == "APOLLO 15" || spacecraftName == "APOLLO 16") {
+//    isisFocalPlane2SocetPlate[0][0] = 1.0;
+//    isisFocalPlane2SocetPlate[1][1] = -1.0;
+//    isisFocalPlane2SocetPlate[2][2] = -1.0;
+//  }
+//  else if (spacecraftName == "APOLLO 17") {
+//    isisFocalPlane2SocetPlate[0][0] = -1.0;
+//    isisFocalPlane2SocetPlate[1][1] = 1.0;
+//    isisFocalPlane2SocetPlate[2][2] = -1.0;
+//  }
+//-----------------------------------------------------
+//TO DO: Uncomment these lines when MEX-SRC is supported
+//-----------------------------------------------------
+//  else if (spacecraftName == "VIKING_ORBITER_1" || spacecraftName == "VIKING_ORBITER_2" ||
+//           spacecraftName == "MARS_EXPRESS") {
+//-----------------------------------------------------
+//TO DO: Delete this next line when MEX-SRC is supported
+//-----------------------------------------------------
+  if (spacecraftName == "VIKING_ORBITER_1" || spacecraftName == "VIKING_ORBITER_2") {
+    isisFocalPlane2SocetPlate[1][0] = -1.0;
+    isisFocalPlane2SocetPlate[0][1] = -1.0;
+    isisFocalPlane2SocetPlate[2][2] = -1.0;
+  }
+//-----------------------------------------------------
+//TO DO: Uncomment these lines when Themis-VIS is supported
+//-----------------------------------------------------
+//  else if (spacecraftName == "MARS_ODYSSEY" || spacecraftName == "Galileo Orbiter" ||
+//          spacecraftName == "Cassini-Huygens" || spacecraftName == "Messenger" ) {
+//-----------------------------------------------------
+//TO DO: Delete this next line when Themis-VIS is supported
+//-----------------------------------------------------
+  else if (spacecraftName == "Galileo Orbiter" || spacecraftName == "Cassini-Huygens" ||
+      spacecraftName == "Messenger" ) {
+    isisFocalPlane2SocetPlate[0][0] = 1.0;
+    isisFocalPlane2SocetPlate[1][1] = -1.0;
+    isisFocalPlane2SocetPlate[2][2] = -1.0;
+  }
+
+  // Fetch Bodyfixed -> Camera matrix w cspice
+  vector<double>  j2000ToBodyFixedMatrixVector = cam->bodyRotation()->Matrix();
+  vector<double>  j2000ToCameraMatrixVector = cam->instrumentRotation()->Matrix();
+
+  // Reformat vector-matrices to 3x3 rotation matricies
+  double j2000ToBodyFixedRotationMatrix[3][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+  double j2000ToCameraRotationMatrix[3][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+
+  for (int j = 0; j < 3; j++) {
+    for (int k = 0; k < 3; k++) {
+      j2000ToBodyFixedRotationMatrix[j][k] = j2000ToBodyFixedMatrixVector[3 * j + k];
+      j2000ToCameraRotationMatrix[j][k] = j2000ToCameraMatrixVector[3 * j + k];
+    }
+  }
+
+  // Compute Camera to Body Fixed rotation matrix
+  double cameraToBodyFixedRotationMatrix[3][3] =
+                                              {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+  mxmt_c(j2000ToBodyFixedRotationMatrix, j2000ToCameraRotationMatrix,
+         cameraToBodyFixedRotationMatrix);
+
+  // get instrumemt position vector and planet radii in meters
+  double instrumentPosition[3] = {0.0, 0.0, 0.0};
+  spice.instrumentPosition(instrumentPosition);
+  for (int i = 0; i < 3; i++) {
+    instrumentPosition[i] *= 1000.0;
+  }
+
+  Distance dRadii[3];
+  spice.radii(dRadii);
+  double radii[3] = {0.0, 0.0, 0.0};
+  radii[0] = dRadii[0].meters();
+  radii[1] = dRadii[1].meters();
+  radii[2] = dRadii[2].meters();
+
+  // Calculate ographic coordinates of spacecraft position vector
+  double xyzLength = instrumentPosition[0] * instrumentPosition[0] +
+                instrumentPosition[1] * instrumentPosition[1];
+  double xyLength = sqrt(xyzLength);
+  xyzLength = sqrt (xyzLength + instrumentPosition[2] * instrumentPosition[2]);
+  double flattening = (radii[0] - radii[2]) / radii[0];
+  double lon = 0.0;
+  double lat = 0.0;
+  double height = 0.0;
+  recgeo_c (instrumentPosition, radii[0], flattening, &lon, &lat, &height);
+
+  // Calculate rotation matrix from Socet Set plate to ocentric ground coordinates
+  double socetPlateToOcentricGroundRotationMatrix[3][3] =
+                                                {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+  mxmt_c (isisFocalPlane2SocetPlate, cameraToBodyFixedRotationMatrix,
+          socetPlateToOcentricGroundRotationMatrix);
+
+  // Populate the ocentric to ographic rotation matrix
+  double ocentricToOgraphicRotationMatrix[3][3] =
+                                               {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+  double sinLon = instrumentPosition[1] / xyLength;
+  double cosLon = instrumentPosition[0] / xyLength;
+  double sinLat = instrumentPosition[2] / xyzLength;
+  double cosLat = xyLength / xyzLength;
+  ocentricToOgraphicRotationMatrix[0][0] = -sinLon;
+  ocentricToOgraphicRotationMatrix[1][0] = cosLon;
+  ocentricToOgraphicRotationMatrix[2][0] = 0.0;
+  ocentricToOgraphicRotationMatrix[0][1] = -sinLat * cosLon;
+  ocentricToOgraphicRotationMatrix[1][1] = -sinLat * sinLon;
+  ocentricToOgraphicRotationMatrix[2][1] = cosLat;
+  ocentricToOgraphicRotationMatrix[0][2] = cosLat * cosLon;
+  ocentricToOgraphicRotationMatrix[1][2] = cosLat * sinLon;
+  ocentricToOgraphicRotationMatrix[2][2] = sinLat;
+
+  // Compute the Rotation matrix from Socet Set plate to ographic ground coordinates
+  // and extract the euler angles to get omega-phi-kappa attidude angles
+  double socetPlateToOgrphicGroundRotationMatrix[3][3] =
+                                               {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+  mxm_c (socetPlateToOcentricGroundRotationMatrix, ocentricToOgraphicRotationMatrix,
+         socetPlateToOgrphicGroundRotationMatrix);
+
+  double omega = 0.0;
+  double phi = 0.0;
+  double kappa = 0.0;
+  m2eul_c (socetPlateToOgrphicGroundRotationMatrix, 3, 2, 1, &kappa, &phi, &omega);
+
+  // Return resulting geographic lat, lon, omega, phi, kappa in decimal degrees
+  // height in meters
+  ographicCamPos[0] = lat * RAD2DEG;
+  ographicCamPos[1] = lon * RAD2DEG;
+  ographicCamPos[2] = height;
+
+  omegaPhiKappa[0] = omega * RAD2DEG;
+  omegaPhiKappa[1] = phi * RAD2DEG;
+  omegaPhiKappa[2] = kappa * RAD2DEG;
+
+  if (spacecraftName == "VIKING_ORBITER_1" || spacecraftName == "VIKING_ORBITER_2" ||
+      spacecraftName == "MARS_EXPRESS") {
+    omegaPhiKappa[2] -= 90.0;
+  }
+
+  // Return the transpose of the isisFocalPlane2SocetPlate matrix for the FrameOffAxis sensor model
+  xpose_c(isisFocalPlane2SocetPlate, isisFocalPlane2SocetPlateTranspose);
+  
+  return;
+}
+
