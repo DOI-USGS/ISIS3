@@ -13,8 +13,9 @@ commands:
 	$(MV) I02609002RDR.lev2.equ.cub $(OUTPUT)/equalizerTruth3.cub; 
 	$(LS) $(INPUT)/EN*.cub > $(OUTPUT)/files.lis;
 	$(LS) $(INPUT)/EN*top*.cub > $(OUTPUT)/hold.lis;
-	$(ECHO) -e "$(OUTPUT)/equalizerTruth4.cub\n$(OUTPUT)/equalizerTruth5.cub\n$(OUTPUT)/equalizerTruth6.cub" \
-	  > $(OUTPUT)/tolist.lis
+	$(ECHO) "$(OUTPUT)/equalizerTruth4.cub" > $(OUTPUT)/tolist.lis
+	$(ECHO) "$(OUTPUT)/equalizerTruth5.cub" >> $(OUTPUT)/tolist.lis
+	$(ECHO) "$(OUTPUT)/equalizerTruth6.cub" >> $(OUTPUT)/tolist.lis
 	$(APPNAME) fromlist=$(OUTPUT)/files.lis holdlist=$(OUTPUT)/hold.lis \
 	  adjust=gain tolist=$(OUTPUT)/tolist.lis > /dev/null;
 	$(RM) $(OUTPUT)/files.lis $(OUTPUT)/hold.lis $(OUTPUT)/tolist.lis;
