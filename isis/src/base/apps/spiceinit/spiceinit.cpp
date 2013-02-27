@@ -1,11 +1,18 @@
 #include "Isis.h"
 
 #include <iomanip>
+#include <queue>
+
+#include <QList>
+#include <QString>
+#include <QStringList>
+#include <QVector>
 
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "FileName.h"
 #include "IException.h"
+#include "Kernel.h"
 #include "KernelDb.h"
 #include "Longitude.h"
 #include "Process.h"
@@ -17,7 +24,8 @@
 using namespace std;
 using namespace Isis;
 
-bool TryKernels(Cube *icube, Process &p,
+void getUserEnteredKernel(const QString &param, Kernel &kernel);
+bool tryKernels(Cube *icube, Process &p,
                 Kernel lk, Kernel pck,
                 Kernel targetSpk, Kernel ck,
                 Kernel fk, Kernel ik,
@@ -25,8 +33,7 @@ bool TryKernels(Cube *icube, Process &p,
                 Kernel iak, Kernel dem,
                 Kernel exk);
 
-void RequestSpice(Cube *icube, Pvl &labels, QString missionName);
-void GetUserEnteredKernel(const QString &param, Kernel &kernel);
+void requestSpice(Cube *icube, Pvl &labels, QString missionName);
 
 void IsisMain() {
   // Open the input cube
@@ -34,7 +41,6 @@ void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   CubeAttributeInput cai;
   Cube *icube = p.SetInputCube(ui.GetFileName("FROM"), cai, ReadWrite);
-
   // Make sure at least one CK & SPK quality was selected
   if (!ui.GetBoolean("CKPREDICTED") && !ui.GetBoolean("CKRECON") &&
      !ui.GetBoolean("CKSMITHED") && !ui.GetBoolean("CKNADIR")) {
@@ -80,7 +86,7 @@ void IsisMain() {
   QString mission = missionXlater.Translate("MissionName");
 
   if (ui.GetBoolean("WEB")) {
-    RequestSpice(icube, *icube->label(), mission);
+    requestSpice(icube, *icube->label(), mission);
   }
   else {
     // Get system base kernels
@@ -89,90 +95,142 @@ void IsisMain() {
     unsigned int allowedSPK = 0;
 
     if (ui.GetBoolean("CKPREDICTED"))
-      allowedCK |= spiceInit::kernelTypeEnum("PREDICTED");
+      allowedCK |= Kernel::typeEnum("PREDICTED");
     if (ui.GetBoolean("CKRECON"))
-      allowedCK |= spiceInit::kernelTypeEnum("RECONSTRUCTED");
+      allowedCK |= Kernel::typeEnum("RECONSTRUCTED");
     if (ui.GetBoolean("CKSMITHED"))
-      allowedCK |= spiceInit::kernelTypeEnum("SMITHED");
+      allowedCK |= Kernel::typeEnum("SMITHED");
     if (ui.GetBoolean("CKNADIR"))
-      allowedCK |= spiceInit::kernelTypeEnum("NADIR");
+      allowedCK |= Kernel::typeEnum("NADIR");
     if (ui.GetBoolean("SPKPREDICTED"))
-      allowedSPK |= spiceInit::kernelTypeEnum("PREDICTED");
+      allowedSPK |= Kernel::typeEnum("PREDICTED");
     if (ui.GetBoolean("SPKRECON"))
-      allowedSPK |= spiceInit::kernelTypeEnum("RECONSTRUCTED");
+      allowedSPK |= Kernel::typeEnum("RECONSTRUCTED");
     if (ui.GetBoolean("SPKSMITHED"))
-      allowedSPK |= spiceInit::kernelTypeEnum("SMITHED");
+      allowedSPK |= Kernel::typeEnum("SMITHED");
 
     KernelDb baseKernels(allowed);
     KernelDb ckKernels(allowedCK);
     KernelDb spkKernels(allowedSPK);
 
-    baseKernels.LoadSystemDb(mission);
-    ckKernels.LoadSystemDb(mission);
-    spkKernels.LoadSystemDb(mission);
+    baseKernels.loadSystemDb(mission, lab);
+    ckKernels.loadSystemDb(mission, lab);
+    spkKernels.loadSystemDb(mission, lab);
 
     Kernel lk, pck, targetSpk, fk, ik, sclk, spk, iak, dem, exk;
-    priority_queue< Kernel > ck;
-    lk        = baseKernels.LeapSecond(lab);
-    pck       = baseKernels.TargetAttitudeShape(lab);
-    targetSpk = baseKernels.TargetPosition(lab);
-    ik        = baseKernels.Instrument(lab);
-    sclk      = baseKernels.SpacecraftClock(lab);
-    iak       = baseKernels.InstrumentAddendum(lab);
-    fk        = ckKernels.Frame(lab);
-    ck        = ckKernels.SpacecraftPointing(lab);
-    spk       = spkKernels.SpacecraftPosition(lab);
+    QList< priority_queue<Kernel> > ck;
+    lk        = baseKernels.leapSecond(lab);
+    pck       = baseKernels.targetAttitudeShape(lab);
+    targetSpk = baseKernels.targetPosition(lab);
+    ik        = baseKernels.instrument(lab);
+    sclk      = baseKernels.spacecraftClock(lab);
+    iak       = baseKernels.instrumentAddendum(lab);
+    fk        = ckKernels.frame(lab);
+    ck        = ckKernels.spacecraftPointing(lab);
+    spk       = spkKernels.spacecraftPosition(lab);
 
     if (ui.GetBoolean("CKNADIR")) {
-      // Only add nadir if no spacecraft pointing found
-      vector<QString> kernels;
-      kernels.push_back("Nadir");
-      ck.push(Kernel((spiceInit::kernelTypes)0, kernels));
+      // Only add nadir if no spacecraft pointing found, so we will set (priority) type to 0.
+      QStringList nadirCk;
+      nadirCk.push_back("Nadir");
+      // if a priority queue already exists, add Nadir with low priority of 0
+      if (ck.size() > 0) {
+        ck[0].push(Kernel((Kernel::Type)0, nadirCk));
+      }
+      // if no queue exists, create a nadir queue
+      else {
+        priority_queue<Kernel> nadirQueue;
+        nadirQueue.push(Kernel((Kernel::Type)0, nadirCk));
+        ck.push_back(nadirQueue);
+      }
     }
 
     // Get user defined kernels and override ones already found
-    GetUserEnteredKernel("LS", lk);
-    GetUserEnteredKernel("PCK", pck);
-    GetUserEnteredKernel("TSPK", targetSpk);
-    GetUserEnteredKernel("FK", fk);
-    GetUserEnteredKernel("IK", ik);
-    GetUserEnteredKernel("SCLK", sclk);
-    GetUserEnteredKernel("SPK", spk);
-    GetUserEnteredKernel("IAK", iak);
-    GetUserEnteredKernel("EXTRA", exk);
+    getUserEnteredKernel("LS", lk);
+    getUserEnteredKernel("PCK", pck);
+    getUserEnteredKernel("TSPK", targetSpk);
+    getUserEnteredKernel("FK", fk);
+    getUserEnteredKernel("IK", ik);
+    getUserEnteredKernel("SCLK", sclk);
+    getUserEnteredKernel("SPK", spk);
+    getUserEnteredKernel("IAK", iak);
+    getUserEnteredKernel("EXTRA", exk);
 
     // Get shape kernel
-    if (ui.GetString("SHAPE") == "USER")
-      GetUserEnteredKernel("MODEL", dem);
-    else if (ui.GetString("SHAPE") == "SYSTEM")
-      dem = baseKernels.Dem(lab);
+    if (ui.GetString("SHAPE") == "USER") {
+      getUserEnteredKernel("MODEL", dem);
+    }
+    else if (ui.GetString("SHAPE") == "SYSTEM") {
+      dem = baseKernels.dem(lab);
+    }
 
     bool kernelSuccess = false;
 
-    if (ck.size() == 0 && !ui.WasEntered("CK")) {
+    if ((ck.size() == 0 || ck.at(0).size() == 0) && !ui.WasEntered("CK")) {
+      // no ck was found in system and user did not enter ck, throw error
       throw IException(IException::Unknown,
-                       "No Camera Kernel found for the image [" + ui.GetFileName("FROM")
+                       "No Camera Kernels found for the image [" + ui.GetFileName("FROM")
                        + "]",
                        _FILEINFO_);
     }
     else if (ui.WasEntered("CK")) {
-      // ck needs to be array size 1 and empty kernel objects
-      while (ck.size()) ck.pop();
-      ck.push(Kernel());
+      // if user entered ck 
+      // empty ck queue list found in system
+      while (ck.size()) {
+        ck.pop_back();
+      }
+      // create queue with empty kernel so ck[0].size() != 0,
+      // this allows us to get into the coming while loop
+      priority_queue< Kernel > emptyKernelQueue;
+      emptyKernelQueue.push(Kernel());
+      ck.push_back(emptyKernelQueue);
     }
 
-    while (ck.size() != 0 && !kernelSuccess) {
-      Kernel realCkKernel = ck.top();
-      ck.pop();
+    // while the first queue is not empty, loop through it until tryKernels() succeeds
+    while (ck.at(0).size() != 0 && !kernelSuccess) {
+      // create an empty kernel 
+      Kernel realCkKernel;
+      QStringList ckKernelList;
 
-      if (ui.WasEntered("CK"))
-        ui.GetAsString("CK", realCkKernel.kernels);
+      // if the user entered ck kernels, populate the ck kernel list with the
+      // user entered files
+      if (ui.WasEntered("CK")) {
+        vector<QString> userEnteredCks;
+        ui.GetAsString("CK", userEnteredCks);
+        // convert user entered std vector to QStringList and add to ckKernelList
+        ckKernelList = QVector<QString>::fromStdVector(userEnteredCks).toList();
+      }
+      else {// loop through cks found in the system
+
+        // Add the list of cks from each Kernel object at the top of each
+        // priority queue. If multiple priority queues exist, we will not
+        // pop of the top priority from any of the queues except for the
+        // first one.  So each time tryKernels() fails, the same files
+        // will be loaded with the next priority from the first queue.
+        for (int i = ck.size() - 1; i >= 0; i--) {
+          if (ck.at(i).size() != 0) {
+            Kernel topPriority = ck.at(i).top();
+            ckKernelList.append(topPriority.kernels());
+            // set the type to equal the type of the to priority of the first
+            //queue 
+            realCkKernel.setType(topPriority.type()); 
+          }
+        }
+
+      }
+      // pop the top priority ck off only the first queue so that the next 
+      // iteration will test the next highest priority of the first queue with
+      // the top priority of each of the other queues.
+      ck[0].pop();
 
       // Merge SpacecraftPointing and Frame into ck
-      for (int i = 0; i < fk.size(); i++)
-        realCkKernel.push_back(fk[i]);
+      for (int i = 0; i < fk.size(); i++) {
+        ckKernelList.push_back(fk[i]);
+      }
 
-      kernelSuccess = TryKernels(icube, p, lk, pck, targetSpk,
+      realCkKernel.setKernels(ckKernelList);
+
+      kernelSuccess = tryKernels(icube, p, lk, pck, targetSpk,
                                  realCkKernel, fk, ik, sclk, spk, iak, dem, exk);
     }
 
@@ -186,24 +244,27 @@ void IsisMain() {
 }
 
 /**
- * If the user entered the parameter param, then
- * kernel is replaced by the user's values and
- * quality is reset to 0.
+ * If the user entered the parameter param, then kernel is replaced by the 
+ * user's values and quality is reset to 0. Otherwise, the kernels loaded by the
+ * KernelDb class will be kept.
  *
- * @param param
- * @param kernel
+ * @param param Name of the kernel input parameter
+ *  
+ * @param kernel Kernel object to be overwritten if the specified user parameter 
+ *               was entered. 
  */
-void GetUserEnteredKernel(const QString &param, Kernel &kernel) {
+void getUserEnteredKernel(const QString &param, Kernel &kernel) {
   UserInterface &ui = Application::GetUserInterface();
-
   if (ui.WasEntered(param)) {
     kernel = Kernel();
     // NOTE: This is using GetAsString so that vars like $mgs can be used.
-    ui.GetAsString(param, kernel.kernels);
+    vector<QString> kernels;
+    ui.GetAsString(param, kernels);
+    kernel.setKernels(QVector<QString>::fromStdVector(kernels).toList());
   }
 }
 
-bool TryKernels(Cube *icube, Process &p,
+bool tryKernels(Cube *icube, Process &p,
                 Kernel lk, Kernel pck,
                 Kernel targetSpk, Kernel ck,
                 Kernel fk, Kernel ik, Kernel sclk,
@@ -268,11 +329,11 @@ bool TryKernels(Cube *icube, Process &p,
 
   // report qualities
   PvlKeyword spkQuality("InstrumentPositionQuality");
-  spkQuality.AddValue(spiceInit::kernelTypeEnum(spk.kernelType));
+  spkQuality.AddValue(Kernel::typeEnum(spk.type()));
   currentKernels.AddKeyword(spkQuality, Pvl::Replace);
 
   PvlKeyword ckQuality("InstrumentPointingQuality");
-  ckQuality.AddValue(spiceInit::kernelTypeEnum(ck.kernelType));
+  ckQuality.AddValue(Kernel::typeEnum(ck.type()));
   currentKernels.AddKeyword(ckQuality, Pvl::Replace);
 
   if (!exkKeyword.IsNull()) {
@@ -447,7 +508,7 @@ bool TryKernels(Cube *icube, Process &p,
   return true;
 }
 
-void RequestSpice(Cube *icube, Pvl &labels, QString missionName) {
+void requestSpice(Cube *icube, Pvl &labels, QString missionName) {
   UserInterface &ui = Application::GetUserInterface();
 
   QString instrumentId =

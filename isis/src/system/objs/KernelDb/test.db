@@ -23,7 +23,7 @@ EndObject
 Object = SpacecraftPointing
   Group = Selection
     Time = ("2005 JAN 01 01:00:00.000 TDB", "2006 JAN 01 01:00:00.000 TDB")
-    File = ("base", "ckIncorrect")
+    File = ("base", "ckIncorrect1")
     Type = Reconstructed
   EndGroup
   
@@ -35,7 +35,7 @@ Object = SpacecraftPointing
   
   Group = Selection
     Time = ("2004 JAN 01 01:00:00.000 TDB", "2005 JAN 01 01:00:00.000 TDB")
-    File = ("base", "ckIncorrect")
+    File = ("base", "ckIncorrect2")
     Type = Reconstructed
   EndGroup
   

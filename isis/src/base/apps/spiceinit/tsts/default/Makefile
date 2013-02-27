@@ -1,3 +1,4 @@
+# run spice init with default parameters only
 APPNAME = spiceinit
 
 include $(ISISROOT)/make/isismake.tsts

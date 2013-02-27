@@ -229,7 +229,13 @@
       service.
     </change>
     <change name="Debbie A. Cook" date="2012-07-06">
-       Updated Spice members to be more compliant with Isis coding standards. References #972.
+       Updated Spice members to be more compliant with Isis coding standards. 
+       References #972.
+    </change>
+    <change name="Jeannie Backer" date="2013-02-26">
+      Added ability to load multiple ck database files from the system using a 
+      conf file. Changed methods to lower camel case to comply with Isis3 
+      standards. Added web example. References #924.
     </change>
   </history>
 
@@ -464,9 +470,14 @@
         <description>
           Naif kernel file to be used for the leap second in place of the
           automated leap second kernel. The LS kernel will be referenced in the
-          keyword LeapSecond by the resulting Kernel group.
+          keyword LeapSecond by the resulting Kernel group. If none is 
+          specified, spiceinit will use the latest kernel config file or kernel
+          database file to find the appropriate kernel(s) for the given input 
+          file.
         </description>
-        <defaultPath>$base/kernels/lsk/</defaultPath>
+        <defaultPath>
+          $base/kernels/lsk/
+        </defaultPath>
         <filter>*.tls</filter>
       </parameter>
 
@@ -481,10 +492,12 @@
           Naif kernel file to be used for the target attitude and shape in place
           of the automated attitude and shape kernel. The PCK kernel will be
           referenced in the keyword TargetAttitudeShape by the resulting Kernel
-          group.
+          group.  If none is specified, spiceinit will use the latest kernel 
+          config file or kernel database file to find the appropriate kernel(s) 
+          for the given input file.
         </description>
         <defaultPath>
-          $BASE/kernels/pck/
+          $base/kernels/pck/
         </defaultPath>
         <filter>*.tpc</filter>
       </parameter>
@@ -499,10 +512,13 @@
         <description>
           Naif kernel file to be used for the target position in place of the
           automated position kernel. The TSPK kernel will be referenced in the
-          keyword TargetPosition by the resulting Kernel group.
+          keyword TargetPosition by the resulting Kernel group.  If none is 
+          specified, spiceinit will use the latest kernel config file or kernel
+          database file to find the appropriate kernel(s) for the given input 
+          file.
         </description>
         <defaultPath>
-          $BASE/kernels/spk/
+          $base/kernels/spk/
         </defaultPath>
         <filter>*.bsp</filter>
       </parameter>
@@ -517,10 +533,15 @@
         <description>
           Naif kernel file to be used for the instrument in place of the
           automated instrument kernel. The IK kernel will be referenced in the
-          keyword Instrument by the resulting Kernel group.
+          keyword Instrument by the resulting Kernel group.  If none is 
+          specified, spiceinit will use the latest kernel config file or kernel
+          database file to find the appropriate kernel(s) for the given input 
+          file.
         </description>
+        <defaultPath>
+          $ISIS3DATA
+        </defaultPath>
         <filter>*.ti</filter>
-        <defaultPath>$ISIS3DATA</defaultPath>
       </parameter>
 
       <parameter name="SCLK">
@@ -533,10 +554,15 @@
         <description>
           Naif kernel file to be used for the spacecraft clock in place of the
           automated spacecraft clock kernel. The SCLK kernel will be referenced
-          in the keyword Instrument by the resulting Kernel group.
+          in the keyword Instrument by the resulting Kernel group.  If none is 
+          specified, spiceinit will use the latest kernel config file or kernel
+          database file to find the appropriate kernel(s) for the given input 
+          file.
         </description>
+        <defaultPath>
+          $ISIS3DATA
+        </defaultPath>
         <filter>*.tsc</filter>
-        <defaultPath>$ISIS3DATA</defaultPath>
       </parameter>
 
       <parameter name="CK">
@@ -548,11 +574,16 @@
         </brief>
         <description>
           Naif kernel file to be used for the spacecraft pointing in place of
-          the automated spacecraft pointing kernel. The CK kernel will be referenced
-          in the keyword InstrumentPointing by the resulting Kernel group.
+          the automated spacecraft pointing kernel. The CK kernel will be 
+          referenced in the keyword InstrumentPointing by the resulting Kernel 
+          group. If none is specified, spiceinit will use the latest kernel 
+          config file or kernel database file to find the appropriate kernel(s)
+          for the given input file.
         </description>
+        <defaultPath>
+          $ISIS3DATA
+        </defaultPath>
         <filter>*.bc</filter>
-        <defaultPath>$ISIS3DATA</defaultPath>
       </parameter>
 
        <parameter name="FK">
@@ -567,10 +598,14 @@
            automated frames kernel. The FK kernel will be referenced in the
            keyword InstrumentPointing by the resulting Kernel group.
            Note: If you enter a filename for CK some instruments may require a
-           frame kernel as well.
+           frame kernel as well. If none is specified, spiceinit will use the 
+           latest kernel config file or kernel database file to find the 
+           appropriate kernel(s) for the given input file.
          </description>
+         <defaultPath>
+           $ISIS3DATA
+         </defaultPath>
          <filter>*.tf</filter>
-         <defaultPath>$ISIS3DATA</defaultPath>
        </parameter>
 
 
@@ -585,10 +620,14 @@
           Naif kernel file to be used for the spacecraft position in place of
           the automated spacecraft position kernel. The SPK kernel will be
           referenced in the keyword InstrumentPosition by the resulting Kernel
-          group.
+          group. If none is specified, spiceinit will use the latest kernel 
+          config file or kernel database file to find the appropriate kernel(s)
+          for the given input file.
         </description>
+        <defaultPath>
+          $ISIS3DATA
+        </defaultPath>
         <filter>*.bsp</filter>
-        <defaultPath>$ISIS3DATA</defaultPath>
       </parameter>
 
       <parameter name="IAK">
@@ -602,10 +641,14 @@
           Naif formatted kernel file to be used for the ISIS specific instrument
           addendum kernel, in place of the automated. The IAK kernel will be
           referenced in the keyword InstrumentAddendum by the resulting Kernel
-          group.
+          group. If none is specified, spiceinit will use the latest kernel 
+          config file or kernel database file to find the appropriate kernel(s) 
+          for the given input file.
         </description>
+        <defaultPath>
+          $ISIS3DATA
+        </defaultPath>
         <filter>*.ti</filter>
-        <defaultPath>$ISIS3DATA</defaultPath>
       </parameter>
 
       <parameter name="EXTRA">
@@ -619,7 +662,9 @@
           Optional extra naif formatted kernel file. The EXTRA kernel will be
           referenced in the keyword Extra by the resulting Kernel group.
         </description>
-        <defaultPath>$ISIS3DATA</defaultPath>
+        <defaultPath>
+          $ISIS3DATA
+        </defaultPath>
       </parameter>
     </group>
 
@@ -728,4 +773,72 @@
       </parameter>
     </group>
   </groups>
+
+  <examples>
+    <example>
+      <brief>
+        Example of spiceinit using default parameters.
+      </brief>
+
+      <description>
+        This example shows how to use spiceinit using the default parameters. 
+        That is, the SPICE data will be attached to the cube labels (attach=yes), 
+        Only reconstructed kernel types will be allowed for ck and spk kernels,
+        the default system kernels will be found in the kernel database files, 
+        a default shape model will be looked for in the system, and 
+        no time parameters will be set.
+      </description>
+
+      <terminalInterface>
+        <commandLine>
+          from=inputCube.cub 
+        </commandLine>
+        <description>
+          An example of how to run this program from the command line. 
+        </description>
+      </terminalInterface>
+
+      <guiInterfaces>
+        <guiInterface>
+          <image width="535" height="550" src="assets/images/spiceinit_440w_550h.jpg">
+          <brief>
+            Example GUI
+          </brief>
+            <description>
+              An example of how to run this program using the GUI. Note that 
+              Kernel data that has been found can be seen in the log window.  
+            </description>
+            <thumbnail width="195" height="200" src="assets/thumbs/spiceinit_160w_200h.jpg" caption="Example of GUI command"/>
+          </image>
+        </guiInterface>
+      </guiInterfaces>
+
+      <dataFiles>
+        <dataFile path="assets/dataFiles/inputCubeLabel.pvl">
+          <brief>
+            Cube labels before spiceinit.
+          </brief>
+          <description>
+            This is the cube labels of the input cube before spiceinit is run. 
+          </description>
+          <parameterName>
+            FROM
+          </parameterName>
+        </dataFile>
+        <dataFile path="assets/dataFiles/spiceinitCubeLabel.pvl">
+          <brief>
+            Cube labels after spiceinit.
+          </brief>
+          <description>
+            This is the cube labels of the input cube after spiceinit has been 
+            run.
+          </description>
+          <parameterName>
+            FROM
+          </parameterName>
+        </dataFile>
+      </dataFiles>    
+    </example>
+  </examples>
+
 </application>

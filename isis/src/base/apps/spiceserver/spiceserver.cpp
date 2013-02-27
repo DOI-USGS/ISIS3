@@ -7,11 +7,14 @@
 #include <QDomElement>
 #include <QDomNode>
 #include <QFile>
+#include <QString>
+#include <QStringList>
 
 #include "Camera.h"
 #include "CameraFactory.h"
 #include "Cube.h"
 #include "IString.h"
+#include "Kernel.h"
 #include "KernelDb.h"
 #include "Longitude.h"
 #include "Process.h"
@@ -23,18 +26,18 @@
 using namespace std;
 using namespace Isis;
 
-bool ckSmithed = false;
-bool ckRecon = false;
-bool ckPredicted = false;
-bool ckNadir = false;
-bool spkSmithed = false;
-bool spkRecon = false;
-bool spkPredicted = false;
-double startPad = 0.0;
-double endPad = 0.0;
-QString shapeKernelStr;
+bool g_ckSmithed = false;
+bool g_ckRecon = false;
+bool g_ckPredicted = false;
+bool g_ckNadir = false;
+bool g_spkSmithed = false;
+bool g_spkRecon = false;
+bool g_spkPredicted = false;
+double g_startPad = 0.0;
+double g_endPad = 0.0;
+QString g_shapeKernelStr;
 
-bool TryKernels(Pvl &labels, Process &p,
+bool tryKernels(Pvl &labels, Process &p,
                 Kernel lk, Kernel pck,
                 Kernel targetSpk, Kernel ck,
                 Kernel fk, Kernel ik,
@@ -43,13 +46,13 @@ bool TryKernels(Pvl &labels, Process &p,
                 Kernel exk);
 
 //! Combines all the temp files into one final output file
-void PackageKernels(QString toFile);
+void packageKernels(QString toFile);
 
 //! Read the spiceinit parameters
-void ParseParameters(QDomElement parametersElement);
+void parseParameters(QDomElement parametersElement);
 
 //! Convert a table into an xml tag
-QString TableToXml(QString tableName, QString file);
+QString tableToXml(QString tableName, QString file);
 
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
@@ -57,16 +60,16 @@ void IsisMain() {
   try {
     Process p;
 
-    ckSmithed = false;
-    ckRecon = false;
-    ckPredicted = false;
-    ckNadir = false;
-    spkSmithed = false;
-    spkRecon = false;
-    spkPredicted = false;
-    shapeKernelStr = "";
-    startPad = 0.0;
-    endPad = 0.0;
+    g_ckSmithed = false;
+    g_ckRecon = false;
+    g_ckPredicted = false;
+    g_ckNadir = false;
+    g_spkSmithed = false;
+    g_spkRecon = false;
+    g_spkPredicted = false;
+    g_shapeKernelStr = "";
+    g_startPad = 0.0;
+    g_endPad = 0.0;
 
     // Get the single line of encoded XML from the input file that the client,
     //   spiceinit, sent us.
@@ -88,8 +91,7 @@ void IsisMain() {
       QDomDocument document;
       QString error;
       int errorLine, errorCol;
-      if (document.setContent(QString(xml), &error,
-                              &errorLine, &errorCol)) {
+      if (document.setContent(QString(xml), &error, &errorLine, &errorCol)) {
         QDomElement rootElement = document.firstChild().toElement();
 
         for (QDomNode node = rootElement.firstChild();
@@ -105,7 +107,7 @@ void IsisMain() {
           }
           else if (element.tagName() == "parameters") {
             // Read the spiceinit parameters
-            ParseParameters(element);
+            parseParameters(element);
           }
           else if (element.tagName() == "label") {
             // Get the cube label
@@ -156,48 +158,57 @@ void IsisMain() {
     unsigned int allowed = 0;
     unsigned int allowedCK = 0;
     unsigned int allowedSPK = 0;
-    if (ckPredicted)  allowedCK |= spiceInit::kernelTypeEnum("PREDICTED");
-    if (ckRecon)      allowedCK |= spiceInit::kernelTypeEnum("RECONSTRUCTED");
-    if (ckSmithed)    allowedCK |= spiceInit::kernelTypeEnum("SMITHED");
-    if (ckNadir)      allowedCK |= spiceInit::kernelTypeEnum("NADIR");
-    if (spkPredicted) allowedSPK |= spiceInit::kernelTypeEnum("PREDICTED");
-    if (spkRecon)     allowedSPK |= spiceInit::kernelTypeEnum("RECONSTRUCTED");
-    if (spkSmithed)   allowedSPK |= spiceInit::kernelTypeEnum("SMITHED");
+    if (g_ckPredicted)  allowedCK |= Kernel::typeEnum("PREDICTED");
+    if (g_ckRecon)      allowedCK |= Kernel::typeEnum("RECONSTRUCTED");
+    if (g_ckSmithed)    allowedCK |= Kernel::typeEnum("SMITHED");
+    if (g_ckNadir)      allowedCK |= Kernel::typeEnum("NADIR");
+    if (g_spkPredicted) allowedSPK |= Kernel::typeEnum("PREDICTED");
+    if (g_spkRecon)     allowedSPK |= Kernel::typeEnum("RECONSTRUCTED");
+    if (g_spkSmithed)   allowedSPK |= Kernel::typeEnum("SMITHED");
 
     KernelDb baseKernels(allowed);
     KernelDb ckKernels(allowedCK);
     KernelDb spkKernels(allowedSPK);
 
-    baseKernels.LoadSystemDb(mission);
-    ckKernels.LoadSystemDb(mission);
-    spkKernels.LoadSystemDb(mission);
+    baseKernels.loadSystemDb(mission, label);
+    ckKernels.loadSystemDb(mission, label);
+    spkKernels.loadSystemDb(mission, label);
 
     Kernel lk, pck, targetSpk, fk, ik, sclk, spk, iak, dem, exk;
-    std::priority_queue< Kernel > ck;
-    lk        = baseKernels.LeapSecond(label);
-    pck       = baseKernels.TargetAttitudeShape(label);
-    targetSpk = baseKernels.TargetPosition(label);
-    ik        = baseKernels.Instrument(label);
-    sclk      = baseKernels.SpacecraftClock(label);
-    iak       = baseKernels.InstrumentAddendum(label);
-    fk        = ckKernels.Frame(label);
-    ck        = ckKernels.SpacecraftPointing(label);
-    spk       = spkKernels.SpacecraftPosition(label);
+    QList< priority_queue<Kernel> > ck;
+    lk        = baseKernels.leapSecond(label);
+    pck       = baseKernels.targetAttitudeShape(label);
+    targetSpk = baseKernels.targetPosition(label);
+    ik        = baseKernels.instrument(label);
+    sclk      = baseKernels.spacecraftClock(label);
+    iak       = baseKernels.instrumentAddendum(label);
+    fk        = ckKernels.frame(label);
+    ck        = ckKernels.spacecraftPointing(label);
+    spk       = spkKernels.spacecraftPosition(label);
 
-    if (ckNadir) {
+    if (g_ckNadir) {
       // Only add nadir if no spacecraft pointing found
-      std::vector<QString> kernels;
-      kernels.push_back("Nadir");
-      ck.push(Kernel((spiceInit::kernelTypes)0, kernels));
+      QStringList nadirCk;
+      nadirCk.push_back("Nadir");
+      // if a priority queue already exists, add Nadir with low priority of 0
+      if (ck.size() > 0) {
+        ck[0].push(Kernel((Kernel::Type)0, nadirCk));
+      }
+      // if no queue exists, create a nadir queue
+      else {
+        priority_queue<Kernel> nadirQueue;
+        nadirQueue.push(Kernel((Kernel::Type)0, nadirCk));
+        ck.push_back(nadirQueue);
+      }
     }
 
     // Get shape kernel
-    if (shapeKernelStr == "system") {
-      dem = baseKernels.Dem(label);
+    if (g_shapeKernelStr == "system") {
+      dem = baseKernels.dem(label);
     }
-    else if (shapeKernelStr != "ellipsoid") {
+    else if (g_shapeKernelStr != "ellipsoid") {
       stringstream demPvlKeyStream;
-      demPvlKeyStream << "ShapeModel = " + shapeKernelStr;
+      demPvlKeyStream << "ShapeModel = " + g_shapeKernelStr;
       PvlKeyword key;
       demPvlKeyStream >> key;
 
@@ -208,23 +219,42 @@ void IsisMain() {
 
     bool kernelSuccess = false;
 
-    if (ck.size() == 0) {
+    if (ck.size() == 0 || ck.at(0).size() == 0) {
       throw IException(IException::Unknown,
                        "No Camera Kernel found for the image [" +
                         ui.GetFileName("FROM") + "]",
                        _FILEINFO_);
     }
 
-    while (ck.size() != 0 && !kernelSuccess) {
-      Kernel realCkKernel = ck.top();
-      ck.pop();
+    while (ck.at(0).size() != 0 && !kernelSuccess) {
+      // create an empty kernel 
+      Kernel realCkKernel;
+      QStringList ckKernelList;
+
+      // if multiple priority queues exist, then add the top priority ck
+      // from each queue to the list of kernels to be loaded.
+      if (ck.size() > 1) {
+        for (unsigned int i = ck.size() - 1; i >= 0; i--) {
+          if (ck.at(i).size() != 0) {
+            Kernel topPriority = ck.at(i).top();
+            ckKernelList.append(topPriority.kernels());
+            // set the type to equal the type of the to priority of the first
+            //queue 
+            realCkKernel.setType(topPriority.type()); 
+          }
+        }
+      }
+      // pop the top priority ck off only the first queue so that the next 
+      // iteration will test the next highest priority of the first queue with
+      // the top priority of each of the other queues.
+      ck[0].pop();
 
       // Merge SpacecraftPointing and Frame into ck
       for (int i = 0; i < fk.size(); i++) {
         realCkKernel.push_back(fk[i]);
       }
 
-      kernelSuccess = TryKernels(label, p, lk, pck, targetSpk,
+      kernelSuccess = tryKernels(label, p, lk, pck, targetSpk,
                                  realCkKernel, fk, ik, sclk, spk,
                                  iak, dem, exk);
     }
@@ -235,7 +265,7 @@ void IsisMain() {
                        _FILEINFO_);
     }
     else {
-      PackageKernels(ui.GetFileName("TO"));
+      packageKernels(ui.GetFileName("TO"));
     }
 
     p.EndProcess();
@@ -259,7 +289,7 @@ void IsisMain() {
   }
 }
 
-bool TryKernels(Pvl &label, Process &p,
+bool tryKernels(Pvl &label, Process &p,
                 Kernel lk, Kernel pck,
                 Kernel targetSpk, Kernel ck,
                 Kernel fk, Kernel ik, Kernel sclk,
@@ -328,11 +358,11 @@ bool TryKernels(Pvl &label, Process &p,
 
   // report qualities
   PvlKeyword spkQuality("InstrumentPositionQuality");
-  spkQuality.AddValue(spiceInit::kernelTypeEnum(spk.kernelType));
+  spkQuality.AddValue(Kernel::typeEnum(spk.type()));
   currentKernels.AddKeyword(spkQuality, Pvl::Replace);
 
   PvlKeyword ckQuality("InstrumentPointingQuality");
-  ckQuality.AddValue(spiceInit::kernelTypeEnum(ck.kernelType));
+  ckQuality.AddValue(Kernel::typeEnum(ck.type()));
   currentKernels.AddKeyword(ckQuality, Pvl::Replace);
 
   if (!exkKeyword.IsNull())
@@ -360,11 +390,11 @@ bool TryKernels(Pvl &label, Process &p,
     currentKernels.DeleteKeyword("EndPadding");
 
   // Add any time padding the user specified to the spice group
-  if (startPad > DBL_EPSILON)
-    currentKernels.AddKeyword(PvlKeyword("StartPadding", toString(startPad), "seconds"));
+  if (g_startPad > DBL_EPSILON)
+    currentKernels.AddKeyword(PvlKeyword("StartPadding", toString(g_startPad), "seconds"));
 
-  if (endPad > DBL_EPSILON)
-    currentKernels.AddKeyword(PvlKeyword("EndPadding", toString(endPad), "seconds"));
+  if (g_endPad > DBL_EPSILON)
+    currentKernels.AddKeyword(PvlKeyword("EndPadding", toString(g_endPad), "seconds"));
 
   currentKernels.AddKeyword(
       PvlKeyword("CameraVersion", toString(CameraFactory::CameraVersion(lab))),
@@ -462,7 +492,7 @@ bool TryKernels(Pvl &label, Process &p,
 }
 
 
-QString TableToXml(QString tableName, QString file) {
+QString tableToXml(QString tableName, QString file) {
   QString xml;
   xml += "    <" + tableName + ">\n";
 
@@ -483,7 +513,7 @@ QString TableToXml(QString tableName, QString file) {
 }
 
 
-void ParseParameters(QDomElement parametersElement) {
+void parseParameters(QDomElement parametersElement) {
   for (QDomNode node = parametersElement.firstChild();
        !node .isNull();
        node = node.nextSibling()) {
@@ -492,58 +522,58 @@ void ParseParameters(QDomElement parametersElement) {
     if (element.tagName() == "cksmithed") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      ckSmithed = (attribute.value() == "yes");
+      g_ckSmithed = (attribute.value() == "yes");
     }
     else if (element.tagName() == "ckrecon") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      ckRecon = (attribute.value() == "yes");
+      g_ckRecon = (attribute.value() == "yes");
     }
     else if (element.tagName() == "ckpredicted") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      ckPredicted = (attribute.value() == "yes");
+      g_ckPredicted = (attribute.value() == "yes");
     }
     else if (element.tagName() == "cknadir") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      ckNadir = (attribute.value() == "yes");
+      g_ckNadir = (attribute.value() == "yes");
     }
     else if (element.tagName() == "spksmithed") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      spkSmithed = (attribute.value() == "yes");
+      g_spkSmithed = (attribute.value() == "yes");
     }
     else if (element.tagName() == "spkrecon") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      spkRecon = (attribute.value() == "yes");
+      g_spkRecon = (attribute.value() == "yes");
     }
     else if (element.tagName() == "spkpredicted") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      spkPredicted = (attribute.value() == "yes");
+      g_spkPredicted = (attribute.value() == "yes");
     }
     else if (element.tagName() == "shape") {
       QDomNode node = element.attributes().namedItem("value");
       QDomAttr attribute = *((QDomAttr *)&node);
-      shapeKernelStr = attribute.value();
+      g_shapeKernelStr = attribute.value();
     }
     else if (element.tagName() == "startpad") {
       QDomNode node = element.attributes().namedItem("time");
       QDomAttr attribute = *((QDomAttr *)&node);
-      startPad = attribute.value().toDouble();
+      g_startPad = attribute.value().toDouble();
     }
     else if (element.tagName() == "endpad") {
       QDomNode node = element.attributes().namedItem("time");
       QDomAttr attribute = *((QDomAttr *)&node);
-      endPad = attribute.value().toDouble();
+      g_endPad = attribute.value().toDouble();
     }
   }
 }
 
 
-void PackageKernels(QString toFile) {
+void packageKernels(QString toFile) {
   QString xml;
   xml += "<spice_data>\n";
 
@@ -572,10 +602,10 @@ void PackageKernels(QString toFile) {
   xml += "  </kernels_label>\n";
 
   xml += "  <tables>\n";
-  xml += TableToXml("instrument_pointing", toFile + ".pointing");
-  xml += TableToXml("instrument_position", toFile + ".position");
-  xml += TableToXml("body_rotation", toFile + ".bodyrot");
-  xml += TableToXml("sun_position", toFile + ".sun");
+  xml += tableToXml("instrument_pointing", toFile + ".pointing");
+  xml += tableToXml("instrument_position", toFile + ".position");
+  xml += tableToXml("body_rotation", toFile + ".bodyrot");
+  xml += tableToXml("sun_position", toFile + ".sun");
 
   xml += "  </tables>\n";
   xml += "</spice_data>\n";
