@@ -26,7 +26,7 @@
 
     <p>
       The actual equation to be used for equalization, for ADJUST=BRIGHTNESS, CONTRAST or BOTH, on
-      each band in each cube is
+      each band in each cube is as follows:
       <pre>
         newdn(s,l,b)   =   (olddn(s,l,b) - avg(b)) * GAIN(b) + (avg(b) + OFFSET(b))
       </pre>
@@ -52,7 +52,7 @@
 
     <p>
       Prior to equalizing, the user can choose whether to adjust the
-      brightness and/or contrast of the cubes. The default is to adjust both,
+      brightness and/or contrast of the cubes. The default is to adjust both;
       however, if the brightness (average) of all the cubes is the same,
       then simply adjusting the contrast may suffice.   Likewise, if the
       standard deviation of all the cubes is similar, then a contrast
@@ -131,7 +131,7 @@
 
   <history>
     <change name="Kay Edwards" date="1994-05-24">
-      Original version
+      Original version.
     </change>
     <change name="Elizabeth Ribelin" date="2005-06-25">
       Ported to Isis 3.0.
@@ -140,19 +140,19 @@
       Changed categoryItem to Photometry and Radiometry.
     </change>
     <change name="Brendan George" date="2005-11-07">
-      Added application test
+      Added application test.
     </change>
     <change name="Elizabeth Miller" date="2006-01-12">
-      Made SD default contrast mode (PCA may have errors)
+      Made SD default contrast mode (PCA may have errors).
     </change>
     <change name="Jeff Anderson" date="2007-07-16">
-      Fixed memory leak
+      Fixed memory leak.
     </change>
     <change name="Jeff Anderson" date="2008-04-09">
-      Modified to solve system using QRD which is faster the SVD
+      Modified to solve system using QRD which is faster the SVD.
     </change>
     <change name="Steven Lambright" date="2008-05-12">
-      Removed references to CubeInfo
+      Removed references to CubeInfo.
     </change>
     <change name="Tracie Sucharski" date="2008-06-12">
       Modified call LeastSquares Solve due to change to LeastSquares
@@ -191,7 +191,7 @@
       Added parameter SOLVEMETHOD to allow user to choose the method in which
       the system of equations will be solved. Removed unnecessary error throws
       from implementation file, now use xml to require OUTSTATS when
-      PROCESS=CALCULATE and require the PERCENT enterend to be in the interval
+      PROCESS=CALCULATE and require the PERCENT entered to be in the interval
       (0, 100]. Improve test coverage to 100%. Fixes #962.
     </change>
     <change name="Jeannie Backer" date="2013-02-04">
@@ -203,7 +203,11 @@
       in the QRD description. References #962.
     </change>
     <change name="Steven Lambright" date="2013-02-06">
-      Added the option "ADJUST=GAIN" based on a prototype developed by Jeff Anderson. Fixes #911.
+      Added the option "ADJUST=GAIN" based on a prototype developed by Jeff 
+      Anderson. Fixes #911.
+    </change>
+    <change name="Jeannie Backer" date="2013-02-27">
+      Fixed user documentation. References #962.
     </change>
   </history>
 
@@ -257,7 +261,7 @@
           this list is not specified, but the APPLY option is still selected,
           the output files will be placed in the directories of their input
           files, and named the same with the exception of an added ".equ"
-          extension (e.g. "foobar.cub" becomes "foobar.equ.cub").
+          extension (e.g., "foobar.cub" becomes "foobar.equ.cub").
         </description>
         <internalDefault>Automatic</internalDefault>
       </parameter>
@@ -307,7 +311,7 @@
         <description>
           This option allows the user to decide whether they want to do the
           equalization calculations and then go on to apply correction
-          afterwards, apply correction to the images off of previously
+          afterwards, apply correction to the images off previously
           gathered statistics, or do the calculations but not apply
           correction.  If the APPLY option is not selected, you must
           specify an OUTSTATS file.  If it is selected you can still
@@ -322,8 +326,8 @@
               Calculate statistics and apply correction
             </brief>
             <description>
-              This option will calculate statistics on the images,
-              then apply correction off of those results.
+              This option will calculate image statistics and then apply 
+              corrections from the results.
             </description>
             <exclusions>
               <item>INSTATS</item>
@@ -334,8 +338,8 @@
               Calculate statistics only
             </brief>
             <description>
-              This option will calculate statistics on the images and
-              print them to an output PVL file, but not correct them.
+              This option will calculate image statistics and print them to an 
+              output PVL file, but image corrections will not be applied.
             </description>
             <inclusions>
               <item>OUTSTATS</item>
@@ -439,8 +443,8 @@
           Algorithm type used to adjust the pixel values
         </brief>
         <description>
-          Choose the fit option to select the algorithm to use to
-          adjust the pixel values.  The BRIGHTNESS mode will equalize
+          This option allows the user  to select the algorithm that will be 
+          used to adjust the pixel values.  The BRIGHTNESS mode will equalize
           using only an offset (the gain will be set to 1.0), and the
           CONTRAST mode will equalize using only a gain (the offset will
           be set to 0.0) but keeping the images around their current
@@ -453,7 +457,7 @@
         <list>
           <option value="BOTH">
             <brief>
-              Adjust the Brightness and Contrast of the images.
+              Adjust the brightness and contrast of the images.
             </brief>
             <description>
               This option will use an algorithm that equalizes
@@ -542,7 +546,7 @@
           This option allows the user to decide whether they want to
           weight the least squares solution based on how large the overlap
           area is, or if they want no weighting at all.  If this parameter
-          is set to "true", then larger overlapping areas will have more
+          is set to "true," then larger overlapping areas will have more
           of an impact on the corrective factors than smaller overlaps.
         </description>
         <default><item>FALSE</item></default>
@@ -594,13 +598,13 @@
             <description>
               Screenshot of the GUI with parameters set to calculate the gain
               and offset and then to apply corrections.  Because the TOLIST
-              parameter is set to its default value of "Automatic", each output
+              parameter is set to its default value of "Automatic," each output
               image will be placed into the directory of its corresponding input
               image.  Also, because the OUTSTATS parameter is set to its default
               value of "None", a record of the calculations performed will only be
               written to the print file.
             </description>
-            <thumbnail width="164" height="200" caption="equalizer gui" src="assets/thumbs/bothGui.jpg" />
+            <thumbnail width="164" height="200" caption="Equalizer Gui" src="assets/thumbs/bothGui.jpg" />
           </image>
         </guiInterface>
       </guiInterfaces>
@@ -650,9 +654,9 @@
     <example>
       <brief>Calculate Statistics</brief>
       <description>
-        This example shows the use of the equalizer application for calculating
-        equalization statistics and writing them to a file, and not applying the
-        correction to the input images.
+        This example shows how to use the equalizer application to calculate
+        equalization statistics and write them to a file, without applying the
+        corrections to the input images.
       </description>
       <terminalInterface>
         <commandLine> fromlist= FromList.lst holdlist=/HoldList.lst
@@ -661,8 +665,8 @@
         <description>
           In addition to specifying a fromlist and a holdlist, we must also
           specify a location to write the output statistics pvl, and set the
-          process type to "calculate".  Since no output images will be created,
-          we do not (and can not), specify a tolist.  All other options are at
+          process type to "calculate."  Since no output images will be created,
+          we do not (and cannot), specify a tolist.  All other options are at
           default values.
         </description>
       </terminalInterface>
@@ -688,7 +692,7 @@
           <description>
             This is a small section of the input images for the equalizer example mosaicked together.
           </description>
-          <thumbnail caption=" Mosaic of unequalized input images" src="assets/thumbs/nonEqualizedMosaic.jpg" width="200" height="200"/>
+          <thumbnail caption=" Mosaic of unequalized input images." src="assets/thumbs/nonEqualizedMosaic.jpg" width="200" height="200"/>
           <parameterName>FROMLIST</parameterName>
         </image>
       </inputImages>
@@ -738,7 +742,7 @@
           specified, and since we want to place the output images in a specific
           location with specific names, a tolist is specified. Finally, we set
           the value of the instats parameter to be the output statistics file
-          generated in Example 2, and set the process to "apply".  All other
+          generated in Example 2, and set the process to "apply."  All other
           options are at default values.
         </description>
       </terminalInterface>
@@ -754,7 +758,7 @@
               subset of the images used to produce a specified input statistics
               file.
             </description>
-            <thumbnail width="164" height="200" caption="equalizer gui" src="assets/thumbs/applyGui.jpg" />
+            <thumbnail width="164" height="200" caption="Equalizer Gui" src="assets/thumbs/applyGui.jpg" />
           </image>
         </guiInterface>
       </guiInterfaces>
