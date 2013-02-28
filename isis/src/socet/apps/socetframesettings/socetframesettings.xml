@@ -85,7 +85,7 @@
         <internalDefault>None</internalDefault>
         <description>
           Output SOCET Set Framing Camera Settings file. This is a text file and should have a file
-          extension of ".set". This file is one of the input files to USGSAstro SOCET Set program
+          extension of ".set." This file is one of the input files to USGSAstro SOCET Set program
           'import_frame.'
         </description>
       </parameter>
@@ -136,12 +136,12 @@
           For SOCET Set running on Windows, an example input path would be E:\images\test.
 
           To enter a path in the dialog box, enter the path as it normally appears. For this
-          example, enter:
+          example, enter
 
           E:\images\test\
 
           To enter a path on the command line, or in a script, use the escape character (which is a
-          back-slash) to pass the delimiters to the program.  For this example, enter:
+          back-slash) to pass the delimiters to the program.  For this example, enter
 
           SS_INPUT_PATH=E:\\IMAGES\\TEST\\ </pre>
         </description>
@@ -156,16 +156,16 @@
           Full path to SOCET Set's internal database camera calibration directory, <b><i>with the
           ending file path delimeter included.</i></b> 
           <pre>
-          For SOCET Set running on Windows, an example path would be:
+          For SOCET Set running on Windows, an example path would be
           C:\SOCET_SET_5.6.0\internal_dbs\CAM
 
           To enter a path in the dialog box, enter the path as it normally appears. For this
-          example, enter:
+          example, enter
 
           C:\SOCET_SET_5.6.0\internal_dbs\CAM\
 
           To enter a path on the command line, or in a script, use the escape character (which is a
-          back-slash) to pass the delimiters to the program.  For this example, enter:
+          back-slash) to pass the delimiters to the program.  For this example, enter
 
           SS_CAM_CALIB_PATH=C:\\SOCET_SET_5.6.0\\internal_dbs\\CAM\\ </pre>
         </description>
