@@ -38,7 +38,7 @@ extern int errno;
 #include <sstream>
 #include <locale.h>
 
-#include <QCoreApplication>
+#include <QApplication>
 #include <QLocalSocket>
 #include <QString>
 
@@ -135,7 +135,7 @@ namespace Isis {
         p_datetime = DateTime(&p_startTime);
         p_startClock = clock();
 
-        new QCoreApplication(argc, argv);
+        new QApplication(argc, argv, QApplication::Tty);
         QCoreApplication::setApplicationName(FileName(p_appName).baseName());
       }
     }

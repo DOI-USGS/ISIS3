@@ -102,6 +102,10 @@ namespace Isis {
    *                          $temporary variable instead of /tmp
    *                          directory.  Added some documentation to
    *                          methods.
+   *   @history 2013-02-27 Janet Barrett - Needed to instantiate a QApplication
+   *                          in the constructor instead of a QCoreApplication
+   *                          so that QFonts can be used outside of a GUI 
+   *                          environment. References #575.
    */
   class Application : public Environment {
     public:
