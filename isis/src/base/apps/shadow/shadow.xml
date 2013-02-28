@@ -9,17 +9,16 @@
     This program will create a shaded-relief cube from a DEM and match cube.<br/><br/>
 
     This program operates much like 'shade' but instead of an azimuth/elevation input, we use the
-      sun position at the center of the given a cube or at a given time and, by default, factor in
+      sun's position at the center of the given cube or at a given time and, by default, factor in
       shadows cast by features.<br/><br/>
 
     Using the sun's position allows much higher precision shading and enables the possibility of
-    computing shadowed areas. It is necessary to understand the algorithm in order to understand the
-    optimization settings discussed below.<br/><br/>
+    computing shadowed areas. The algorithm description below is provided to help understand the
+    optimization settings.<br/><br/>
 
     <strong>User-Requirements</strong><br/>
-      This program requires the user to supply an elevation model (DEM). In addition to the
-      elevation model, either a time or a cube a cube with raw camera geometry, which refers to the
-      viewing geometry of an observation, needs to be provided.<br/><br/>
+      The user must supply an elevation model (DEM) and either an observation time or a cube
+      with raw camera geometry (see spiceinit).<br/><br/>
 
     <strong>Understanding the Algorithm</strong><br/>
     The shade program's algorithm is called 'hillshade' in this algorithm description.
@@ -35,26 +34,26 @@
       </li>
       <ol>
         <li>
-          Compute the hillshade value for the pixel
+          Compute the hillshade value for the pixel, and
         </li>
         <li>
-          If the hillshade value is negative the result is an LRS
+          if the hillshade result is positive (facing towards the sun) then estimate if the pixel is
+          in shadow;
         </li>
         <li>
-          If the hillshade result is positive (facing towards the sun) then estimate if the pixel is
-          in shadow
+          if the hillshade value is positive and the pixel is in shadow then the result is an LRS;
         </li>
         <li>
-          If the hillshade value is positive and the pixel is in shadow then the result is an LRS
+          if the hillshade value is positive and the pixel is not in shadow then the result is the
+          hillshade result and
         </li>
         <li>
-          If the hillshade value is positive and the pixel is not in shadow then the result is the
-          hillshade result.
+          if the hillshade value is negative the result is an LRS
         </li>
       </ol>
     </ol>
 
-    The algorithm to estimate if a pixel is in shadow is
+    The algorithm to estimate if a pixel is in shadow
     <ol>
       <li>
         <b>Optimization: If SHADOW, and this elevation model pixel is known to be shadowed,
@@ -73,17 +72,17 @@
         to the center (or edge) of the sun.
       </li>
       <li>
-        Until a solution is found
+        Iterate until a solution is found:
       </li>
       <ol>
         <li>
-          Step the current estimate of PRECISION pixels along the 3D ray
+          Step along the 3D ray the current estimate of PRECISION pixels
         </li>
         <li>
           Project the ray back onto the elevation model to find the equivalent radius
         </li>
         <li>
-          Update estimate of how far along the 3D ray is equivalent to full resolution of the
+          Update estimate of how far along the 3D ray is equivalent to the full resolution of the
           elevation model.<br/>
           <b>Optimization: Multiply the step by PRECISION</b>.<br/>
           <b>Optimization : If SKIPOVERSHADOW, while the next linearly-extrapolated elevation
@@ -136,10 +135,10 @@
     to around BASELIGHTCACHESIZE entries and the shadow map cache is shrunk down to around
     BASESHADOWCACHESIZE entries. Each cache entry is approximately 24 bytes for the light
     cache, and 16 bytes for the shadow cache, but the caches are hash-based causing a large amount
-    of potential overhead. Basically, caches are not limited to their specified sizes, only reduced
-    to them periodically, and larger the cache sizes result in this program consuming more memory.
-    Although the larger the cache, the longer it will take to lookup a single value (which happens a
-    lot), generally speaking larger caches mean less CPU time for the cost of memory.
+    of potential overhead. The caches are not limited to their specified sizes, only reduced
+    to them periodically, and larger cache sizes result in this program consuming more memory.
+    Although the larger the cache, the longer takes to lookup a single value (which happens often),
+    in general larger caches mean less CPU time for the cost of memory.
   </description>
 
   <category>
@@ -147,7 +146,7 @@
   </category>
 
   <history>
-    <change name="Steven Lambright" date= "2012-12-20">
+    <change name="Steven Lambright" date= "2013-02-28">
       Original version.
     </change>
   </history>
@@ -277,7 +276,7 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Cube, with camera information, to get sun position from
+          Get sun position from this cube
         </brief>
         <description>
         </description>
@@ -339,8 +338,8 @@
                 BASELIGHTCACHESIZE=1 million
 
                 PRECISION=1.0
-                CACHEINTERPOLATEDVALUES=false *Since precision is 1, we'd be unlikely to have
-                                               any interpolated values to even cache.
+                CACHEINTERPOLATEDVALUES=false *Since precision is 1, interpolated values are
+                                               unlikely
                 SKIPOVERSHADOW=true
                 MAXSKIPOVERSHADOWSTEPS=5
             </description>
@@ -361,7 +360,7 @@
             <description>
               This doesn't guarantee perfect accuracy; however this should be more than reasonable
               for any products. If you want absolute perfection, try lowering the precision to about
-              0.5 (two ray-DEM intersection checks per DEM pixel walked) and using the other
+              0.5 (two ray-DEM intersection checks per DEM pixel walked) and use the other
               settings described here. This setting ought to be well within a pixel of accuracy.
               These presets cause very heavy CPU usage but low memory usage.
 
@@ -372,12 +371,7 @@
                 LIGHTCURTAIN=false
                 BASELIGHTCACHESIZE=N/A
 
-                PRECISION=0.98 *Slightly higher accuracy than 1 pixel
-
-                LOWERLIGHTCURTAIN=N/A *This doesn't apply without a light curtain
-                CACHEINTERPOLATEDVALUES=N/A *Since there are no caches enabled, this doesn't apply
-                SKIPOVERSHADOW=N/A *This doesn't apply without a shadow map
-                MAXSKIPOVERSHADOWSTEPS=N/A *This doesn't apply without a shadow map
+                PRECISION=0.98 (results in a slightly higher accuracy than 1 pixel)
             </description>
             <exclusions>
               <item>SHADOWMAP</item>
@@ -419,7 +413,7 @@
           Consider pixels below a shadowed ray in shadow
         </brief>
         <description>
-          When a ray is determined to be in shadow, evey DEM pixel between the original position and
+          When a ray is determined to be in shadow, every DEM pixel between the original position and
           the point at which the DEM intersected the ray will be marked as in shadow. We then don't
           have to do any significant work when processing a pixel we previously determined was in
           shadow. This also helps avoid unnecessary ray-DEM intersection checks (because surfaces
@@ -438,10 +432,10 @@
           The number of items in the shadow map after shrinking
         </brief>
         <description>
-          The shadow cache is allowed to grow to unlimited size while the shadowing algorithm is
+          The shadow cache is allowed to grow to an unlimited size while the shadowing algorithm is
           processing. However, periodically the caches are shrunk - this is the approximate number
-          of elements to shrink the shadow cache to. The shrinking is optimized in a way that this
-          is mostly respected, but not guaranteed to be.
+          of elements to shrink the shadow cache to. The shrinking is optimized in a way that
+          is mostly respected, but not guaranteed.
         </description>
         <minimum inclusive="yes">0</minimum>
       </parameter>
@@ -469,7 +463,7 @@
         </brief>
         <description>
           This adjusts light curtain elevation values to their theoretical minimum (the lowest
-          elevation the ray could have been at and still been in light) instead of using the
+          elevation the ray could have been and still been in light) instead of using the
           actual ray elevation values in the light cache. This is done by subtracting the
           minimum difference found between the ray and DEM when doing ray-DEM intersection tests.
           Please see the program description for more information.
@@ -482,10 +476,10 @@
           Number of elements to restrain the light cache to
         </brief>
         <description>
-          The light curtain cache is allowed to grow to unlimited size while the shadowing algorithm
-          is processing. However, periodically the caches are shrunk - this is the approximate
-          number of elements to shrink the light caches to. The shrinking is optimized in a way that
-          this is mostly respected, but not guaranteed to be.
+          The light curtain cache is allowed to grow to an unlimited size while the shadowing
+          algorithm is processing. However, periodically the caches are shrunk - this is the
+          approximate number of elements to shrink the light caches to. The shrinking is optimized
+          in a way that this is mostly respected, but not guaranteed.
         </description>
         <minimum inclusive="yes">0</minimum>
       </parameter>
@@ -505,9 +499,9 @@
           Interpolate cache entries between actual ray-DEM intersection checks
         </brief>
         <description>
-          Add interpolated cache entries between actual ray-DEM intersection checks. This won't have
-          any significant effect if your precision is 1 or less. Please see the program description
-          for more information.
+          Add interpolated cache entries between actual ray-DEM intersection checks. This will not
+          have any significant effect if your precision is 1 or less. Please see the program
+          description for more information.
         </description>
       </parameter>
       <parameter name="SKIPOVERSHADOW">
@@ -517,7 +511,7 @@
           Try to avoid intersecting shadowed areas
         </brief>
         <description>
-          This is a means to lessening the number of ray-DEM intersection checks by guessing the
+          This is a means to lessen the number of ray-DEM intersection checks by guessing the
           next ray-DEM intersection location and checking if it's in shadow. If it is, the ray
           is stepped farther before the next intersection test (up to MAXSKIPOVERSHADOWSTEPS
           farther).
@@ -535,7 +529,7 @@
         <description>
           Since the ray won't make a perfectly straight line across the DEM (DEMs are
           projected onto a flat surface) a linear guess as to the next intersection point degrades
-          in accuracy (depending on a number of factors, such as ray elevation, projection type,
+          in accuracy (depending on a number of factors, such as ray elevation, projection type, and
           DEM accuracy). This controls how far the algorithm can guess the next intersection point
           for SKIPOVERSHADOW using linear extrapolations.
         </description>
@@ -559,7 +553,7 @@
         </pre>
       </description>
       <terminalInterface>
-        <commandLine>shadow from=localdem.cub match=ab102401.cub to=shadowed.cub</commandLine>
+        <commandLine>from=localdem.cub match=ab102401.cub to=shadowed.cub</commandLine>
         <description>
           Run this program given a high resolution DEM 'localdem.cub' and the lighting
           characteristics from 'ab102401.cub' to create 'shadowed.cub'
@@ -639,7 +633,7 @@
         This example will cover running this program in balanced mode with a lunar DEM and a time.
       </description>
       <terminalInterface>
-        <commandLine>shadow from=dem.cub time=2012-03-01T00:00:00.000 to=shadowed_dem.cub
+        <commandLine>from=dem.cub time=2012-03-01T00:00:00.000 to=shadowed_dem.cub
                      preset=ACCURATE</commandLine>
         <description>
           Run this program given a global lunar DEM 'dem.cub', with the lighting
