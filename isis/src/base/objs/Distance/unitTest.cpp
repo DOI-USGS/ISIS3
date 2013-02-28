@@ -46,6 +46,15 @@ int main(int argc, char *argv[]) {
   }
 
   try {
+    cerr << "Constructor given a value in solar radius" << endl;
+    Distance dist(2, Distance::SolarRadii);
+    cerr << dist.meters() << " meters" << endl;
+  }
+  catch(IException &e) {
+    e.print();
+  }
+
+  try {
     cerr << "Copy constructor" << endl;
     Distance dist(1500.5, Distance::Meters);
     Distance copiedDist(dist);
@@ -70,6 +79,15 @@ int main(int argc, char *argv[]) {
     cerr << "Kilometers" << endl;
     Distance dist(1, Distance::Kilometers);
     cerr << dist.kilometers() << " kilometers" << endl;
+  }
+  catch(IException &e) {
+    e.print();
+  }
+
+  try {
+    cerr << "Solar Radius" << endl;
+    Distance dist(1, Distance::SolarRadii);
+    cerr << dist.solarRadii() << " solar radii" << endl;
   }
   catch(IException &e) {
     e.print();

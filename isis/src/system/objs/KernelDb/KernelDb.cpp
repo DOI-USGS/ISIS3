@@ -379,7 +379,13 @@ namespace Isis {
 
     QList< priority_queue<Kernel> > queues;
     PvlObject &cube = lab.FindObject("IsisCube");
-    int cameraVersion = CameraFactory::CameraVersion(lab);
+    int cameraVersion = -1;
+    
+    try {
+      cameraVersion = CameraFactory::CameraVersion(lab);
+    }
+    catch (IException &) {
+    }
 
     // Make sure the entry has been loaded into memory
     if (!m_kernelData.HasObject(entry)) {
@@ -390,13 +396,18 @@ namespace Isis {
     }
 
     // Get the start and end time for the cube
-    iTime start(((QString) cube.FindGroup("Instrument")["StartTime"]));
+    iTime start;
     iTime end;
-    if (cube.FindGroup("Instrument").HasKeyword("StopTime")) {
-      end = ((QString) cube.FindGroup("Instrument")["StopTime"]);
-    }
-    else {
-      end = ((QString) cube.FindGroup("Instrument")["StartTime"]);
+    
+    if (cube.HasGroup("Instrument")) {
+      start = (QString) cube.FindGroup("Instrument")["StartTime"];
+
+      if (cube.FindGroup("Instrument").HasKeyword("StopTime")) {
+        end = ((QString) cube.FindGroup("Instrument")["StopTime"]);
+      }
+      else {
+        end = ((QString) cube.FindGroup("Instrument")["StartTime"]);
+      }
     }
 
     // Loop through the objects to look for all matches to the entry value

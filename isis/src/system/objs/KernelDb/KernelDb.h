@@ -104,6 +104,11 @@ namespace Isis {
    *                           variable prefix to m_ to comply with Isis3
    *                           standards. Documented methods, member variables.
    *                           Added cases to unitTest.Fixes #924.
+   *   @history 2013-02-27 Steven Lambright - This class no longer requires the Instrument group (or
+   *                           camera version information) to be present in order to enumerate
+   *                           kernels. This was done so that the 'shadow' program could find a
+   *                           PCK and SPK to load despite not having a cube with camera
+   *                           information. References #1232.
    */
   class KernelDb {
   
@@ -165,4 +170,5 @@ namespace Isis {
                              and whenever the loadSystemDb() method is called.*/
   };
 };
+
 #endif

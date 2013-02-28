@@ -1,0 +1,45 @@
+Default constructed: Hillshade[ azimuth =  zenith =  resolution = Null ] 
+Empty constructed: Hillshade[ azimuth =  zenith =  resolution = Null ] 
+Copied empty: Hillshade[ azimuth =  zenith =  resolution = Null ] 
+Assigned empty: Hillshade[ azimuth =  zenith =  resolution = Null ] 
+Valid: Hillshade[ azimuth = 0.0 degrees zenith = 15.0 degrees resolution = 5.0 ] 
+Copied valid: Hillshade[ azimuth = 0.0 degrees zenith = 15.0 degrees resolution = 5.0 ] 
+Assigned valid: Hillshade[ azimuth = 0.0 degrees zenith = 15.0 degrees resolution = 5.0 ] 
+
+
+Test computations
+Shaded value (flat surface, sun directly up): 0.5
+Shaded value (rotated sun's direction):       0.5
+Shaded value (lowered solar elevation):       0.49617287
+Shaded value (sun is next to the horizon):    0.017153045
+Shaded value (solar elevation is 45):         0.41421356
+Shaded value (surface tilted towards sun):    0.63708941
+Shaded value (surface folded inwards):        0.63708941
+Shaded value (surface folded outwards):       0.63708941
+Shaded value (surface facing away):          -0.43701602
+Shaded value special (special pixel in surface): 1
+
+Test error handling
+
+Test no resolution
+**ERROR** Hillshade requires a pixel resolution (meters/pixel) to operate.
+Test zero resolution
+**ERROR** Hillshade requires a non-zero pixel resolution (meters/pixel) to operate.
+Test no zenith
+**ERROR** Hillshade requires a valid zenith angle (solar elevation) to operate.
+Test no azimuth
+**ERROR** Hillshade requires a valid azimuth angle (sun direction) to operate.
+Test out of range azimuth 1
+**ERROR** Hillshade azimuth angle [-90.0 degrees] must be between 0 and 360 degrees.
+Test out of range azimuth 2
+**ERROR** Hillshade azimuth angle [380.0 degrees] must be between 0 and 360 degrees.
+Test out of range zenith 1
+**ERROR** Hillshade zenith angle [-45.0 degrees] must be between 0 and 90 degrees.
+Test out of range zenith 2
+**ERROR** Hillshade zenith angle [95.0 degrees] must be between 0 and 90 degrees.
+Test bad buffer 1
+**PROGRAMMER ERROR** Hillshade requires a 3x3x1 portal of data, but a 1x2x3 portal of data was provided instead.
+Test bad buffer 2
+**PROGRAMMER ERROR** Hillshade requires a 3x3x1 portal of data, but a 3x2x3 portal of data was provided instead.
+Test bad buffer 3
+**PROGRAMMER ERROR** Hillshade requires a 3x3x1 portal of data, but a 3x3x3 portal of data was provided instead.

@@ -571,6 +571,7 @@ namespace Isis {
           m_shadowHeightLineEdit->setText(
               toString(m_shadowHeight->kilometers()));
           break;
+        case Distance::SolarRadii:
         case Distance::Pixels:
           m_shadowHeightLineEdit->setText("Not Supported");
           break;

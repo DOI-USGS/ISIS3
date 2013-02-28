@@ -279,6 +279,41 @@ namespace Isis {
   }
 
   /**
+   * Allows copying of the buffer contents of a larger buffer to another same size or smaller
+   *   Buffer, using their base positions to relate data. This does not copy the raw buffer.
+   *
+   * @param in The Buffer to be copied.
+   * @return The operation was successful (the buffers overlapped)
+   */
+  bool Buffer::CopyOverlapFrom(const Buffer &in) {
+    bool isSubareaOfIn = (p_npixels <= in.size());
+    isSubareaOfIn &= (p_sample >= in.p_sample);
+    isSubareaOfIn &= (p_line >= in.p_line);
+    isSubareaOfIn &= (p_band >= in.p_band);
+
+    int endSample = p_sample + p_nsamps - 1;
+    int otherEndSample = in.p_sample + in.p_nsamps - 1;
+
+    int endLine = p_line + p_nlines - 1;
+    int otherEndLine = in.p_line + in.p_nlines - 1;
+
+    int endBand = p_band + p_nbands - 1;
+    int otherEndBand = in.p_band + in.p_nbands - 1;
+
+    isSubareaOfIn &= (endSample <= otherEndSample);
+    isSubareaOfIn &= (endLine <= otherEndLine);
+    isSubareaOfIn &= (endBand <= otherEndBand);
+
+    if (isSubareaOfIn) {
+      for (int i = 0; i < size(); i++) {
+        (*this)[i] = in[in.Index(Sample(i), Line(i), Band(i))];
+      }
+    }
+
+    return isSubareaOfIn;
+  }
+
+  /**
    * The copy constructor. Allows a new Buffer object to be created using
    * an existing Buffer object.
    *
