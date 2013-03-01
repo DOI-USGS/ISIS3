@@ -114,6 +114,12 @@ int main(int argc, char *argv[]) {
   signal(SIGINT, InterruptSignal);
 #endif
 
+  Isis::Application::p_applicationForceGuiApp  = false;
+
+#ifdef USE_GUI_QAPP
+  Isis::Application::p_applicationForceGuiApp = true;
+#endif
+
   Isis::Application *app = new Isis::Application(argc, argv);
   app->RegisterGuiHelpers(GuiHelpers());
   int status = app->Run(APPLICATION);

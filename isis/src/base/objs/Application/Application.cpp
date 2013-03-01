@@ -63,6 +63,7 @@ using namespace std;
 
 namespace Isis {
   Application *iApp = NULL;
+  bool Application::p_applicationForceGuiApp = false;
 
   /**
    * Constuctor for the Application object
@@ -134,8 +135,14 @@ namespace Isis {
         // Get the starting wall clock time
         p_datetime = DateTime(&p_startTime);
         p_startClock = clock();
+        
+        if (p_applicationForceGuiApp) {
+          new QApplication(argc, argv, QApplication::Tty);
+        }
+        else {
+          new QCoreApplication(argc, argv);
+        }
 
-        new QApplication(argc, argv, QApplication::Tty);
         QCoreApplication::setApplicationName(FileName(p_appName).baseName());
       }
     }

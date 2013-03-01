@@ -84,7 +84,7 @@
   </p>
   <p>
     <u>1)</u> Set the PADIMAGE option to false if the bar scale should be placed on the image at a 
-    specified line and sample. The CORNERLINE and CORNERSAMPLE parameters need to be set to the lower 
+    specified line and sample. The CORNERLINE and CORNERSAMPLE parameters need to be set to the upper 
     left corner at the bar scale's insertion point.
   </p>
   <p>
@@ -269,9 +269,9 @@
 
       <parameter name="CORNERLINE">
         <type>integer</type>
-        <brief>Line location of lower left corner of scale in image</brief>
+        <brief>Line location of upper left corner of scale in image</brief>
         <description>
-          This is the line in the input image file where the lower left
+          This is the line in the input image file where the upper left
           corner of the bar scale will be placed.
         </description>
         <internalDefault>None</internalDefault>
@@ -279,9 +279,9 @@
 
       <parameter name="CORNERSAMPLE">
         <type>integer</type>
-        <brief>Sample location of lower left corner of scale in image</brief>
+        <brief>Sample location of upper left corner of scale in image</brief>
         <description>
-          This is the sample in the input image file where the lower left
+          This is the sample in the input image file where the upper left
           corner of the bar scale will be placed.
         </description>
         <internalDefault>None</internalDefault>
@@ -369,7 +369,7 @@
           Determines if the bar scale will be written directly on the 
           image file at the line,sample specified, or if the bar scale
           will be written and appended to the bottom of the image file.
-          The user will still need to specify the lower left sample of
+          The user will still need to specify the upper left sample of
           the bar scale. 
         </description>
         <exclusions>

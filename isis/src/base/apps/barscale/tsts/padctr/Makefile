@@ -18,11 +18,10 @@ commands:
 	  padimage=yes \
 	  placement=center \
 	  barheight=20 \
-	  textheight=10 > /dev/null; \
+	  textheight=15 >& /dev/null; \
 	crop from=$(OUTPUT)/padctr.cub \
 	  to=$(OUTPUT)/padctr_crop.cub \
 	  sample=1 nsamples=512 sinc=1 \
-	  line=1 nlines=540 linc=1 \
+	  line=1 nlines=541 linc=1 \
 	  > /dev/null; \
-	$(MV) $(OUTPUT)/padctr_crop.cub \
-	  $(OUTPUT)/padctr.cub;
+	$(MV) $(OUTPUT)/padctr_crop.cub $(OUTPUT)/padctr.cub;

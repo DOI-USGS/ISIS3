@@ -102,10 +102,12 @@ namespace Isis {
    *                          $temporary variable instead of /tmp
    *                          directory.  Added some documentation to
    *                          methods.
-   *   @history 2013-02-27 Janet Barrett - Needed to instantiate a QApplication
+   *   @history 2013-02-28 Janet Barrett - Needed to instantiate a QApplication
    *                          in the constructor instead of a QCoreApplication
-   *                          so that QFonts can be used outside of a GUI 
-   *                          environment. References #575.
+   *                          so that Qt Gui is accessible by the command line.
+   *                          Also needed to define a compiler directive,
+   *                          USE_GUI_QAPP, to bypass a problem the Macs have
+   *                          with using QApplication. References #575.
    */
   class Application : public Environment {
     public:
@@ -122,6 +124,8 @@ namespace Isis {
       static void GuiLog(const PvlGroup &results);
       static void GuiLog(const QString &results);
       static QString Name();
+
+      static bool p_applicationForceGuiApp;
 
       /**
        * @param helpers
@@ -194,6 +198,7 @@ namespace Isis {
       pid_t p_pid;                                //!<
       std::map<QString, void *> p_guiHelpers; //!<
       static QString p_appName;                   //!<
+
   };
 
   extern Application *iApp;

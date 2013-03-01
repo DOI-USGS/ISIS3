@@ -1,3 +1,5 @@
+#define USE_GUI_QAPP
+
 #include "Isis.h"
 
 #include "Camera.h"
@@ -32,7 +34,7 @@ void IsisMain() {
   // projection information
   Process p1;
   Cube *icube = p1.SetInputCube("FROM");
-  FileName sfile = "$TEMPORARY/barscale.tif";
+  FileName sfile = FileName::createTempFile("barscale.tif");
   QString scaletif = sfile.expanded();
 
   noCamera = true;
@@ -126,7 +128,7 @@ void IsisMain() {
   }
   else {
     if (!ui.WasEntered("CORNERLINE") || !ui.WasEntered("CORNERSAMPLE")) {
-      QString msg = "The lower left placement of the scale bar must be specified ";
+      QString msg = "The upper left placement of the scale bar must be specified ";
       msg = msg + "if you are not padding the image.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -182,11 +184,22 @@ void IsisMain() {
   int textht = ui.GetInteger("TEXTHEIGHT");
   QString textloc = ui.GetString("TEXTLOC").toUpper();
 
+  QFont font;
+  font.setPixelSize(textht);
+  font.setStyleStrategy(QFont::NoAntialias);
+  QFontMetrics metric(font);
+  int fheight = metric.height();
+  int totalheight = barheight + fheight + 16;
+
+  // If there is no left side to the scale bar, then "0"
+  // will be the text character that occurs at the left side
+  // of the scale bar - set cornersample in slightly to make
+  // room for the digit "0" plus some space between the left
+  // edge and the "0"
   cornersample = (textht+1)/2 + 10;
   int imgsamps;
   spacing = (textht + 6) / 7;
   if (spacing < 1) spacing = 1;
-  int totalheight = barheight + spacing + textht + .25*barheight;
   int totalwidth = barwidth + (textht+1)/2 + 10;
 
   if (padimage) {
@@ -201,15 +214,20 @@ void IsisMain() {
       cornersample = (textht+1)/2 + 10;
     }
     else if (padloc == "CENTER") {
-      cornersample = imgsamps/2 - totalwidth/2;
+      cornersample = imgsamps/2 - barwidth/2;
     }
   }
 
-  QFont font;
-  font.setPixelSize(textht);
-  font.setStyleStrategy(QFont::NoAntialias);
-  QFontMetrics metric(font);
-  int fascent = metric.ascent();
+  // Center line of text area is calculated help in placing
+  // the text display area rectangles
+  int textctrline = (fheight + 8) / 2;
+  if (textloc == "BELOW") {
+    textctrline = textctrline + barheight + 8;
+  } 
+
+  QRect ctrdisplayarea;
+  QRect leftdisplayarea;
+  QRect rightdisplayarea;
   QString lblstr;
   int lblstrwidth;
   if (llimit > 0) {
@@ -217,7 +235,13 @@ void IsisMain() {
     lblstrwidth = metric.width(lblstr);
     totalwidth = totalwidth + lblstrwidth/2;
     cornersample = cornersample + lblstrwidth/2;
+    leftdisplayarea.setRect(cornersample-lblstrwidth/2,textctrline-fheight/2-2,
+                            lblstrwidth+10,fheight+8);
   }
+  lblstrwidth = metric.width("0");
+  ctrdisplayarea.setRect(cornersample+llimit*scunit/resolution+.5-lblstrwidth/2,textctrline-fheight/2-2,
+                         lblstrwidth+10,fheight+8);
+
   lblstr.setNum(rlimit);
   QString unitstr;
   if (units == "KILOMETER") {
@@ -232,20 +256,42 @@ void IsisMain() {
       unitstr = "METERS";
     }
   }
+  lblstr = lblstr + " " + unitstr;
   lblstrwidth = metric.width(lblstr);
-  totalwidth = totalwidth + lblstrwidth/2 + metric.width(unitstr) + metric.width(" ") + (textht+1)/2 + 10;
+  totalwidth = totalwidth + lblstrwidth + (textht+1)/2 + 10;
+  rightdisplayarea.setRect(barwidth+cornersample-lblstrwidth/2,textctrline-fheight/2-2,lblstrwidth+30,fheight+8);
+
+  // Make sure text does not overlap
+  if (llimit > 0) {
+    if (leftdisplayarea.right() > ctrdisplayarea.left()) {
+      int diff = leftdisplayarea.right() - ctrdisplayarea.left();
+      leftdisplayarea.setRect(leftdisplayarea.left()-diff,leftdisplayarea.top(),
+                              leftdisplayarea.width(),leftdisplayarea.height());
+    }
+  }
+  if (ctrdisplayarea.right() > rightdisplayarea.left()) {
+    int diff = ctrdisplayarea.right() - rightdisplayarea.left();
+    rightdisplayarea.setRect(rightdisplayarea.left()+diff,rightdisplayarea.top(),
+                             rightdisplayarea.width(),rightdisplayarea.height());
+  }
+  if (llimit > 0) {
+    totalwidth = rightdisplayarea.right() - leftdisplayarea.left() + 12;
+  }
+  else {
+    totalwidth = rightdisplayarea.right() - ctrdisplayarea.left() + 12;
+  }
 
   if (padimage) {
     if (padloc == "RIGHT") {
-      cornersample = imgsamps - 10 - totalwidth;
+      cornersample = nsamps - 10 - totalwidth;
     }
   }
 
   if (textloc == "ABOVE") {
-    cornerline = totalheight - .25*barheight;
+    cornerline = totalheight - 8;
   }
   else {
-    cornerline = barheight + .25*barheight;
+    cornerline = barheight + 8;
   }
 
   QImage myQImage;
@@ -256,21 +302,22 @@ void IsisMain() {
     myQImage = QImage(imgsamps, totalheight, QImage::Format_RGB32);
   }
   if (bkgrnd == "WHITE") {
-    myQImage.fill(Qt::white);
+    myQImage.fill(qRgb(255, 255, 255));
   }
   else {
-    myQImage.fill(Qt::black);
+    myQImage.fill(qRgb(0, 0, 0));
   }
+
   QPainter painter(&myQImage);
 
   painter.setRenderHint(QPainter::Antialiasing, false);
 
   QPen pen;
   if (bkgrnd == "WHITE") {
-    pen.setColor(Qt::black);
+    pen.setColor(qRgb(0, 0, 0));
   }
   else {
-    pen.setColor(Qt::white);
+    pen.setColor(qRgb(255, 255, 255));
   }
   pen.setStyle(Qt::SolidLine);
   pen.setWidth(1);
@@ -311,7 +358,7 @@ void IsisMain() {
     pt2.setX(barwidth+cornersample+i);
     painter.drawLine(pt1,pt2);
   }
-  // Draw major segment marks
+  // Draw center line of barscale (only for left limit)
   if (llimit > 0.0) {
     vertline.insert(1, cornersample+llimit*scunit/resolution+.5);
     pt1.setY(cornerline-barheight+1);
@@ -322,7 +369,7 @@ void IsisMain() {
       painter.drawLine(pt1,pt2);
     }
   }
-  // Draw minor segment marks
+  // Draw segment marks in left and right sides of bar scale
   if (llimit > 0.0 && lsegs > 0) {
     double ticspace = (llimit*scunit/resolution)/lsegs;
     pt1.setY(cornerline-barheight+1);
@@ -363,7 +410,6 @@ void IsisMain() {
       painter.drawLine(pt1,pt2);
     }
   }
-  double midsample = cornersample + (llimit*scunit/resolution) + (bndline+1)/2;
   int starttic = 0;
   if ((lsegs%2)*2 != lsegs && (lsegs%2) != 0) {
     starttic = 1;
@@ -382,33 +428,21 @@ void IsisMain() {
   font.setStyleStrategy(QFont::NoAntialias);
   painter.setFont(font);
   painter.setLayoutDirection(Qt::LeftToRight);
-  int bottomoftext;
-  if (textloc == "ABOVE") {
-    bottomoftext = cornerline - barheight - spacing;
-  }
-  else {
-    bottomoftext = cornerline + spacing + fascent - .2*textht;
-  } 
-  pt1.setY(bottomoftext);
   if (llimit > 0) {
     lblstr.setNum(llimit);
     lblstrwidth = metric.width(lblstr);
-    pt1.setX(cornersample+bndline/2-lblstrwidth/2);
-    painter.drawText(pt1,lblstr);
+    painter.drawText(leftdisplayarea,lblstr);
   }
   lblstr.setNum(0);
   lblstrwidth = metric.width(lblstr);
-  pt1.setX(midsample+bndline/2-lblstrwidth/2);
-  painter.drawText(pt1,lblstr);
+  painter.drawText(ctrdisplayarea,lblstr);
   lblstr.setNum(rlimit);
-  lblstrwidth = metric.width(lblstr);
-  pt1.setX(cornersample+barwidth+bndline/2-lblstrwidth/2);
   lblstr = lblstr + " " + unitstr;
-  painter.drawText(pt1,lblstr);
+  painter.drawText(rightdisplayarea,lblstr);
 
   QString infile = ui.GetFileName("FROM");
   QString outfile = ui.GetFileName("TO");
-  sfile = "$TEMPORARY/barscale.cub";
+  sfile = FileName::createTempFile("barscale.cub");
   QString scalecub = sfile.expanded();
   myQImage.save(scaletif,"TIFF",100);
 
@@ -418,7 +452,7 @@ void IsisMain() {
   Cube scube;
   scube.open(scalecub, "r");
   Statistics *stats = scube.statistics(1);
-  sfile = "$TEMPORARY/barscalestr.cub";
+  sfile = FileName::createTempFile("barscalestr.cub");
   QString scalestrcub = sfile.expanded();
   if (stats->ValidPixels() > 0) {
     parameters = "FROM=" + scalecub + " TO=" + scalestrcub + " NULLMIN=0 NULLMAX=130" +
@@ -433,7 +467,7 @@ void IsisMain() {
 
   if (!padimage) {
     // Paste bar scale onto image
-    int pasteline = placeline - totalheight;
+    int pasteline = placeline;
     for (int i=1; i<=nbands; i++) {
       if (i == 1) {
         parameters = "FROM=" + infile + " MOSAIC=" + outfile + " PRIORITY=ONTOP OUTSAMPLE=1" +
