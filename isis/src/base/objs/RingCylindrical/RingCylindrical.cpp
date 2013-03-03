@@ -27,7 +27,6 @@
 
 #include "Constants.h"
 #include "IException.h"
-#include "Projection.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
 #include "PvlKeyword.h"
@@ -77,8 +76,8 @@ namespace Isis {
       m_centerRadius = mapGroup["CenterRadius"];
 
       //  Convert to radians, adjust for azimuth direction
-      m_centerAzimuth *= PI / 180.0;
-      if (m_azimuthDirection == CounterClockwise) m_centerAzimuth *= -1.0;
+      m_centerAzimuth *= DEG2RAD;
+      if (m_azimuthDirection == Clockwise) m_centerAzimuth *= -1.0;
     }
     catch(IException &e) {
       string message = "Invalid label group [Mapping]";
@@ -181,21 +180,29 @@ namespace Isis {
     // Convert to azimuth to radians and adjust
     m_azimuth = az;
     double azRadians = az * DEG2RAD;
-    if (m_azimuthDirection == CounterClockwise) azRadians *= -1.0;
+    if (m_azimuthDirection == Clockwise) azRadians *= -1.0;
 
     // Check to make sure radius is valid
     if (radius < 0) {
-      throw IException(IException::Unknown,
-                       "Unable to set radius. The given radius value ["
-                       + IString(radius) + "] is invalid.",
-                       _FILEINFO_);
+      m_good = false;
+      cout << "Unable to set radius. The given radius value ["
+           << IString(radius) << "] is invalid." << endl;
+      // throw IException(IException::Unknown,
+      //                  "Unable to set radius. The given radius value ["
+      //                  + IString(radius) + "] is invalid.",
+      //                  _FILEINFO_);
+      return m_good;
     }
     m_radius = radius;
 
-    // Compute the coordinate
+    // Compute helper variable
     double deltaAz = (azRadians - m_centerAzimuth);
+
+    // Compute the coordinates
     double x = m_centerRadius * deltaAz;
     double y = radius - m_centerRadius;
+    // double x = deltaAz;
+    // double y = atan2(m_radius, m_centerRadius);
     SetComputedXY(x, y);
     m_good = true;
     return m_good;
@@ -220,6 +227,11 @@ namespace Isis {
 
     // Compute radius and make sure it is valid
     m_radius = GetY() + m_centerRadius;
+    // if (GetY() != 0.)
+    //   m_radius = m_centerRadius * tan(GetY()) ;
+    // else
+    //   m_radius = 0.;
+
     if (m_radius < m_minimumRadius || m_radius > m_maximumRadius) {
       m_good = false;
       return m_good;
@@ -227,12 +239,13 @@ namespace Isis {
 
     // Compute azimuth
     m_azimuth = m_centerAzimuth + GetX() / m_centerRadius;
+    // m_azimuth = m_centerAzimuth + GetX();
 
     // Convert to degrees
     m_azimuth *= 180.0 / PI;
 
     // Cleanup the azimuth
-    if (m_azimuthDirection == CounterClockwise) m_azimuth *= -1.0;
+    if (m_azimuthDirection == Clockwise) m_azimuth *= -1.0;
     // Do these if the projection is circular
      m_azimuth = To360Domain (m_azimuth);
      if (m_azimuthDomain == 180) m_azimuth = To180Domain(m_azimuth);

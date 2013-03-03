@@ -509,6 +509,13 @@ namespace Isis {
    * Computes the ground range and min/max resolution
    */
   void Camera::GroundRangeResolution() {
+    // Software adjustment is needed if we get here -- call RingRangeResolution instead
+    if (target()->shape()->name() != "Plane") {
+      IString msg = "Images with plane targets should use Camera method RingRangeResolution ";
+      msg += "instead of GroundRangeResolution";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
     // Have we already done this
     if (p_groundRangeComputed) return;
     p_groundRangeComputed = true;
@@ -660,30 +667,27 @@ namespace Isis {
       // Another special test for ground range as we could have the
       // 0-360 seam running right through the image so
       // test it as well (the increment may not be fine enough !!!)
-      // TODO: KLUGE - skip for the moment if using plane shape model
-      if (target()->shape()->name() != "Plane") {
-        for(Latitude lat = Latitude(p_minlat, Angle::Degrees);
-                     lat <= Latitude(p_maxlat, Angle::Degrees);
-                     lat += Angle((p_maxlat - p_minlat) / 10.0, Angle::Degrees)) {
-          if(SetGround(lat, Longitude(0.0, Angle::Degrees))) {
-            if(Sample() >= 0.5 && Line() >= 0.5 &&
-                Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
-              p_minlon = 0.0;
-              p_maxlon = 360.0;
-              break;
-            }
+      for(Latitude lat = Latitude(p_minlat, Angle::Degrees);
+                   lat <= Latitude(p_maxlat, Angle::Degrees);
+                   lat += Angle((p_maxlat - p_minlat) / 10.0, Angle::Degrees)) {
+        if(SetGround(lat, Longitude(0.0, Angle::Degrees))) {
+          if(Sample() >= 0.5 && Line() >= 0.5 &&
+              Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
+            p_minlon = 0.0;
+            p_maxlon = 360.0;
+            break;
           }
+        }
 
-          // Another special test for ground range as we could have the
-          // -180-180 seam running right through the image so
-          // test it as well (the increment may not be fine enough !!!)
-          if(SetGround(lat, Longitude(180.0, Angle::Degrees))) {
-            if(Sample() >= 0.5 && Line() >= 0.5 &&
-                Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
-              p_minlon180 = -180.0;
-              p_maxlon180 = 180.0;
-              break;
-            }
+        // Another special test for ground range as we could have the
+        // -180-180 seam running right through the image so
+        // test it as well (the increment may not be fine enough !!!)
+        if(SetGround(lat, Longitude(180.0, Angle::Degrees))) {
+          if(Sample() >= 0.5 && Line() >= 0.5 &&
+              Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
+            p_minlon180 = -180.0;
+            p_maxlon180 = 180.0;
+            break;
           }
         }
       }
@@ -699,17 +703,9 @@ namespace Isis {
       p_pointComputed = false;
     }
 
-    if (target()->shape()->name() == "Plane") {
-      if (p_minlon == DBL_MAX  ||  p_maxlon == -DBL_MAX) {
-        string message = "RingPlane ShapeModel - Camera missed planet or SPICE data off.";
-        throw IException(IException::Unknown, message, _FILEINFO_);
-      }
-    }
-    else {
-      if (p_minlon == DBL_MAX  ||  p_minlat == DBL_MAX  ||  p_maxlon == -DBL_MAX  ||  p_maxlat == -DBL_MAX) {
-        string message = "Camera missed planet or SPICE data off.";
-        throw IException(IException::Unknown, message, _FILEINFO_);
-      }
+    if (p_minlon == DBL_MAX  ||  p_minlat == DBL_MAX  ||  p_maxlon == -DBL_MAX  ||  p_maxlat == -DBL_MAX) {
+      string message = "Camera missed planet or SPICE data off.";
+      throw IException(IException::Unknown, message, _FILEINFO_);
     }
 
 
@@ -791,7 +787,7 @@ namespace Isis {
         if (samp < p_samples + 1) {
           for(samp = p_samples + 1; samp >= 1; samp--) {
             if (SetImage((double)samp - 0.5, (double)line - 0.5)) {
-                double rad = LocalRadius().meters();
+              double rad = LocalRadius().meters();
               double az = UniversalLongitude();
               if (rad < p_minRadius) p_minRadius = rad;
               if (rad > p_maxRadius) p_maxRadius = rad;
@@ -854,6 +850,7 @@ namespace Isis {
             break;
           }
         }
+
       // for (Latitude lat = Latitude(p_minlat, Angle::Degrees);
       //              lat <= Latitude(p_maxlat, Angle::Degrees);
       //              lat += Angle((p_maxlat - p_minlat) / 10.0, Angle::Degrees)) {
@@ -878,7 +875,6 @@ namespace Isis {
           }
         }
       }
-
     } // end loop over bands
 
     SetBand(originalBand);
@@ -891,7 +887,7 @@ namespace Isis {
     }
 
     // Checks for invalid radius/lon ranges
-    if (p_minRadius == DBL_MAX  ||  p_minRadius == DBL_MAX  || p_minlon == DBL_MAX  ||  p_maxlon == -DBL_MAX) {
+    if (p_minRadius == DBL_MAX  ||  p_minRadius == DBL_MAX  || p_minaz == DBL_MAX  ||  p_maxaz == -DBL_MAX) {
       string message = "RingPlane ShapeModel - Camera missed plane or SPICE data off.";
       throw IException(IException::Unknown, message, _FILEINFO_);
     }
@@ -1055,7 +1051,7 @@ namespace Isis {
     // Convert to the proper azimuth direction
     if (map.HasKeyword("AzimuthDirection")) {
       QString azDirection = (QString) map["AzimuthDirection"];
-      if (azDirection.toUpper() == "CounterClockwise") {
+      if (azDirection.toUpper() == "Clockwise") {
         double swap = minaz;
         minaz = -maxaz;
         maxaz = -swap;
@@ -1130,7 +1126,7 @@ namespace Isis {
     PvlGroup map("Mapping");
     map += PvlKeyword("TargetName", target()->name());
 
-    map += PvlKeyword("AzimuthDirection", "Clockwise");
+    map += PvlKeyword("AzimuthDirection", "CounterClockwise");
     map += PvlKeyword("AzimuthDomain", "360");
 
     ringRangeResolution();

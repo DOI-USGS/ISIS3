@@ -10,9 +10,10 @@
     This program projects an ISIS <def link="Level0">level0</def> or <def link="Level1">level1</def> 
     <def link="Cube">cube</def> to a <def link="MAP">map</def> (ISIS <def link="Level2">level2</def> cube).  
     The input cube requires <def>SPICE</def> data and therefore the program <i>spiceinit</i> should be run on it 
-    prior to <i>ringscam2map</i>.  The <def link="Map Projection">map projection</def> is defined using a 
-    <def>PVL</def> file specified with the MAP parameter.  The system default is to use the Sinusoidal projection 
-    ($ISIS3DATA/base/templates/maps/sinusoidal.map).  To learn more about using map projections in ISIS, 
+    with shape set to RingPlane prior to <i>ringscam2map</i>.  The 
+    <def link="Map Projection">map projection</def> is defined using a <def>PVL</def> file 
+    specified with the MAP parameter.  The system default is to use the Planar projection 
+    ($ISIS3DATA/base/templates/maps/planar.map).  To learn more about using map projections in ISIS, 
     refer to the ISIS Workshop 
     <a href="http://isis.astrogeology.usgs.gov/IsisWorkshop/index.php/Learning_About_Map_Projections">
     "Learning About Map Projections"</a>.
@@ -35,17 +36,17 @@
       </tr>
 
       <tr>
-        <td><def link="Longitude Direction">LongitudeDirection</def></td>
-        <td><def link="Positive East Longitude">PositiveEast</def></td>
+        <td>AzimuthDirection</td>
+        <td>CounterClockwise</td>
       </tr>
 
       <tr>
-        <td><def link="Longitude Domain">LongitudeDomain</def></td>
+        <td>AzimuthDomain</td>
         <td>Normally, 360.  However, if the 180 domain causes less area to need to be projected then 180.</td>
       </tr>
 
       <tr>
-        <td>Minimum<def>Latitude</def><br />MaximumLatitude<br />Minimum<def>Longitude</def><br />MaximumLongitude</td>
+        <td>Minimum Radius<br />MaximumRadius<br />MinimumAzimuth<br />MaximumAzimuth</td>
         <td>Computed from the input cube or read from the map file.   However, any combination of the 
         four values can then be overridden by the user.  The values the user specifies are expected 
         to be in the coodinate system of the projection.</td>
@@ -65,20 +66,17 @@
     <pre>
   Group = Mapping
     TargetName             = Obtained from the Instrument group
-    EquatorialRadius       = Obtained from TargetAttitudeShape kernel
-    PolarRadius            = Obtained from TargetAttitudeShape kernel
 
-    LatitudeType           = Planetocentric
-    LongitudeDirection     = PositiveEast
-    LongitudeDomain        = 360 (Could be automatically adjusted to 180 by AZSEAM)
+    AzimuthDirection     = CounterClockwise
+    AzimuthDomain        = 360 (Could be automatically adjusted to 180 by AZSEAM)
 
-    MinimumLatitude        = Computed from the input camera cube
-    MaximumLatitude        = Computed from the input camera cube
-    MinimumLongitude       = Computed from the input camera cube
-    MaximumLongitude       = Computed from the input camera cube
+    MinimumRadius          = Computed from the input camera cube
+    MaximumRadius           = Computed from the input camera cube
+    MinimumAzimuth          = Computed from the input camera cube
+    MaximumAzimuth          = Computed from the input camera cube
 
-    ProjectionName         = Sinusoidal
-    CenterLongitude        = Average of MinimumLongitude and MaximumLongitude
+    ProjectionName         = Planar
+    CenterAzimuth        = Average of MinimumAzimuth and MaximumAzimuth
     PixelResolution        = Computed from the input camera cube
   EndGroup
     </pre>
@@ -94,29 +92,29 @@
    computed from the FROM cube.
    
 
-   <p>If you are attempting to construct a mosaic, it is important that the PixelResolution, EquatorialRadius, 
-   PolarRadius, LatitudeType, LongitudeDirection, LongitudeDomain, ProjectionName, and projection 
-   specific parameters (e.g., CenterLongitude, CenterLatitude) are the same for all cubes.  That is, 
-   you should create one map file and use it as input for all the cubes in your mosaic.  By letting the 
-   minimum and maximum latitude and longitude values default, the application will determine the coverage of each image.  
-   However, if the mosaic Latiude and Longitude range is entered, each output image will be projected to the full 
-   size of the mosaic resulting in large file sizes and images with many <def>NULL</def> pixels.  
+   <p>If you are attempting to construct a mosaic, it is important that the PixelResolution, 
+   AzimuthDirection,  AzimuthDomain, ProjectionName, and projection specific parameters
+   (e.g., CenterAzimuth, CenterRadius) are the same for all cubes. That is,  you should create one
+   map file and use it as input for all the cubes in your mosaic.  By letting the minimum and 
+   maximum radius and azimuth values default, the application will determine the coverage of 
+   each image.  However, if the mosaic Radius and Azimuth range is entered, each output image will
+   be projected to the full  size of the mosaic resulting in large file sizes and images with many <def>NULL</def> pixels.  
 
    The following Mapping group could be used for mosaicking:
    </p>
    <pre>
  Group = Mapping
-   ProjectionName         = Sinusoidal
-   CenterLongitude        = 0
-   PixelResolution        = 100 &lt;meters&gt;
+   ProjectionName         = Planar
+   CenterAzimuth        = 0
+   PixelResolution        = 10000 &lt;meters&gt;
  EndGroup
    </pre>
 
    <p>
      Finally, depending on the projection, problems can occur with cubes that fall on the projection 
-     longitude seam.  For example, if you are making a mosaic with LongitudeDomain = 360 and your 
-     cube crosses 0/360 seam, this program would compute the default longitude range of the cube to 
-     MinimumLongitude = 0 and MaximumLongitude = 360.  A very large output image could be created 
+     azimuth seam.  For example, if you are making a mosaic with AzimuthDomain = 360 and your 
+     cube crosses 0/360 seam, this program would compute the default azimuth range of the cube to 
+     MinimumAzimuth = 0 and MaximumAzimuth = 360.  A very large output image could be created 
      depending on the pixel resolution.  The AZSEAM parameter allows you to selectively handle this case.  
      If you are making mosaics near the seam you will need to understand and alter the default for this parameter.
      <a href="http://isis.astrogeology.usgs.gov/IsisWorkshop/index.php/Learning_About_Map_Projections#Problems_at_the_Longitude_Seams">
@@ -245,9 +243,13 @@
      <change name="Debbie A. Cook" date="2012-07-06">
        Updated Spice members to be more compliant with Isis coding standards. References #972.
      </change>
+     <change name="Ken Edmundson and Debbie A. Cook" date="2013-03-06">
+       Revised to work with ring data. References #975.
+     </change>
   </history>
 
   <oldName>
+    <item>cam2map</item>
     <item>lev1tolev2</item>
     <item>plansinu</item>
     <item>planorth</item>
@@ -265,7 +267,8 @@
         </brief>
         <description>
           The specification of the input cube to be projected.  The cube must
-          have been initialized using the <i>spiceinit</i> program.
+          have been initialized using the <i>spiceinit</i> program
+          with shape set to RingPlane.
         </description>
         <filter>
           *.cub
@@ -279,7 +282,7 @@
           File containing mapping parameters
         </brief>
         <defaultPath>$base/templates/maps</defaultPath>
-        <default><item>$base/templates/maps/sinusoidal.map</item></default>
+        <default><item>$base/templates/maps/planar.map</item></default>
         <description>
           A file containing the desired output mapping parameters in PVL.  This
           file can be a simple label file, hand produced, or created via
@@ -706,7 +709,8 @@
 
   </groups>
 
-  <examples>
+<!-- 
+ <examples>
     <example>
       <brief> Demonstrates the AUTO AZSEAM option </brief>
        <description>
@@ -1091,4 +1095,5 @@
       </outputImages>
     </example> 
    </examples>
+   -->
 </application>

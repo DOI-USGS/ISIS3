@@ -1,8 +1,8 @@
 #define GUIHELPERS
 
 #include "Isis.h"
+#include "Distance.h"
 #include "Camera.h"
-#include "Planar.h"
 #include "ProjectionFactory.h"
 #include "ProcessRubberSheet.h"
 #include "IException.h"
@@ -59,11 +59,10 @@ void IsisMain() {
     throw IException(IException::User, msg, _FILEINFO_);
   }
 
-  // Get the mapping group
+  // Get the mapping group from the camera
   Pvl camMap;
   incam->basicRingMapping(camMap);
   PvlGroup &camGrp = camMap.FindGroup("Mapping");
-  cout << camGrp << endl;
 
   // Make the target info match the user mapfile
   double minrad, maxrad, minaz, maxaz;
@@ -121,12 +120,12 @@ void IsisMain() {
   }
 
   // If they want the res. from the mapfile, delete it from the camera so
-  // nothing gets overriden
+  // nothing gets overridden
   if(ui.GetString("PIXRES") == "MAP" || ui.GetBoolean("MATCHMAP")) {
     camGrp.DeleteKeyword("PixelResolution");
   }
   // Otherwise, delete any resolution keywords from the mapfile so the camera
-  // info is propgated over
+  // info is propagated over
   else if(ui.GetString("PIXRES") == "CAMERA") {
     if(userGrp.HasKeyword("Scale")) {
       userGrp.DeleteKeyword("Scale");
@@ -164,7 +163,7 @@ void IsisMain() {
   // See if the user want us to handle the azimuth seam
   if((ui.GetString("DEFAULTRANGE") == "CAMERA" || ui.GetString("DEFAULTRANGE") == "MINIMIZE") &&
       !ui.GetBoolean("MATCHMAP")) {
-    //TODO This camera method will need attention for rings*****
+    //TODO This camera method will need attention for rings***** Solution:  just call ringRange directly
     // if(incam->IntersectsLongitudeDomain(userMap)) {
     if (incam->ringRange(minrad, maxrad, minaz, maxaz, userMap)) {
       if(ui.GetString("AZSEAM") == "AUTO") {
@@ -219,8 +218,7 @@ void IsisMain() {
   RingPlaneProjection *outmap;
   bool trim;
 
-  // first consider case of ring planes
-  // TODO: likely only a temporary solution
+  // Make sure shape model is  ring plane
   if (incam->target()->shape()->name() == "Plane") {
     // Determine the image size
     if(ui.GetString("DEFAULTRANGE") == "MINIMIZE" && !ui.GetBoolean("MATCHMAP")) {
@@ -238,20 +236,9 @@ void IsisMain() {
     }
   }
   else {
-    // Determine the image size
-    if(ui.GetString("DEFAULTRANGE") == "MINIMIZE" && !ui.GetBoolean("MATCHMAP")) {
-      outmap =  (RingPlaneProjection *) ProjectionFactory::CreateForCube(userMap, samples, lines, *incam);
-      trim = false;
-    }
-    else if(ui.GetString("DEFAULTRANGE") == "CAMERA" && !ui.GetBoolean("MATCHMAP")) {
-      outmap =  (RingPlaneProjection *) ProjectionFactory::CreateForCube(userMap, samples, lines, false);
-      trim = ui.GetBoolean("TRIM");
-    }
-    else { // DEFAULTRANGE = MAP
-      outmap =  (RingPlaneProjection *) ProjectionFactory::CreateForCube(userMap, samples, lines,
-               ui.GetBoolean("MATCHMAP"));
-      trim = ui.GetBoolean("TRIM");
-    }
+    QString msg = "The image [" + ui.GetFileName("FROM") + " does not have a plane shape. " +
+                     " Run spiceinit with shape=ringplane";
+        throw IException(IException::User, msg, _FILEINFO_);
   }
 
   // Output the mapping group used to the Gui session log
@@ -287,7 +274,9 @@ void IsisMain() {
   double centerLine = icube->lineCount() / 2.;
   if(incam->SetImage(centerSamp, centerLine)) {
     // Force rings data into Isis by returning radius for latitude and azimuth for longitude
-    if(outmap->SetUniversalGround(incam->UniversalLatitude(),
+    // if(outmap->SetUniversalGround(incam->UniversalLatitude(),
+    //                               incam->UniversalLongitude())) {
+    if(outmap->SetUniversalGround(incam->LocalRadius().meters(),
                                   incam->UniversalLongitude())) {
       p.ForceTile(outmap->WorldX(), outmap->WorldY());
     }
@@ -314,7 +303,8 @@ void IsisMain() {
   if (ui.GetString("WARPALGORITHM") == "FORWARDPATCH") {
     transform = new ringscam2mapForward(icube->sampleCount(),
                                    icube->lineCount(), incam, samples,lines,
-                                   (Planar*)outmap, trim);
+                                   outmap, trim);
+                                   // (Planar*)outmap, trim);
 
     if (ui.WasEntered("PATCHSIZE")) {
       int patchSize = ui.GetInteger("PATCHSIZE");
@@ -329,7 +319,8 @@ void IsisMain() {
   else if (ui.GetString("WARPALGORITHM") == "REVERSEPATCH") {
     transform = new ringscam2mapReverse(icube->sampleCount(),
                                    icube->lineCount(), incam, samples,lines,
-                                   (Planar*)outmap, trim);
+                                   outmap, trim);
+                                   // (Planar*)outmap, trim);
 
     if (ui.WasEntered("PATCHSIZE")) {
       int patchSize = ui.GetInteger("PATCHSIZE");
@@ -347,7 +338,8 @@ void IsisMain() {
   else if (incam->GetCameraType() == Camera::Framing) {
     transform = new ringscam2mapReverse(icube->sampleCount(),
                                    icube->lineCount(), incam, samples,lines,
-                                   (Planar*)outmap, trim);
+                                   outmap, trim);
+                                   // (Planar*)outmap, trim);
     p.SetTiling(4, 4);
     p.StartProcess(*transform, *interp);
   }
@@ -362,7 +354,8 @@ void IsisMain() {
   else if (incam->GetCameraType() == Camera::LineScan) {
     transform = new ringscam2mapForward(icube->sampleCount(),
                                    icube->lineCount(), incam, samples,lines,
-                                   (Planar*)outmap, trim);
+                                   outmap, trim);
+                                   // (Planar*)outmap, trim);
 
     p.processPatchTransform(*transform, *interp);
   }
@@ -379,7 +372,8 @@ void IsisMain() {
   else if (incam->GetCameraType() == Camera::PushFrame) {
     transform = new ringscam2mapForward(icube->sampleCount(),
                                    icube->lineCount(), incam, samples,lines,
-                                   (Planar*)outmap, trim);
+                                   outmap, trim);
+                                   // (Planar*)outmap, trim);
 
     // Get the frame height
     PushFrameCameraDetectorMap *dmap = (PushFrameCameraDetectorMap *) incam->DetectorMap();
@@ -418,7 +412,8 @@ void IsisMain() {
   else {
     transform = new ringscam2mapReverse(icube->sampleCount(),
                                    icube->lineCount(), incam, samples,lines,
-                                   (Planar*)outmap, trim);
+                                   outmap, trim);
+                                   // (Planar*)outmap, trim);
 
     int tileStart, tileEnd;
     incam->GetGeometricTilingHint(tileStart, tileEnd);
@@ -444,7 +439,8 @@ ringscam2mapForward::ringscam2mapForward(const int inputSamples,
                                          const int inputLines,
                                          Camera *incam, const int outputSamples,
                                          const int outputLines,
-                                         Planar *outmap, bool trim) {
+                                         RingPlaneProjection *outmap, bool trim) {
+                                         // Planar *outmap, bool trim) {
   p_inputSamples = inputSamples;
   p_inputLines = inputLines;
   p_incam = incam;
@@ -505,7 +501,8 @@ ringscam2mapReverse::ringscam2mapReverse(const int inputSamples,
                                          const int inputLines, Camera *incam,
                                          const int outputSamples,
                                          const int outputLines,
-                                         Planar *outmap, bool trim) {
+                                         RingPlaneProjection *outmap, bool trim) {
+                                         // Planar *outmap, bool trim) {
 
   p_inputSamples = inputSamples;
   p_inputLines = inputLines;
@@ -518,27 +515,25 @@ ringscam2mapReverse::ringscam2mapReverse(const int inputSamples,
   p_trim = trim;
 }
 
-// Transform method mapping output line/samps to lat/lons to input line/samps
+// Transform method mapping output line/samps to rads/azs to input line/samps
 bool ringscam2mapReverse::Xform(double &inSample, double &inLine,
                            const double outSample, const double outLine) {
   // See if the output image coordinate converts to lat/lon
   if(!p_outmap->SetWorld(outSample, outLine)) return false;
 
   // See if we should trim
-//  if((p_trim) && (p_outmap->HasGroundRange())) {
-//    if(p_outmap->Latitude() < p_outmap->MinimumLatitude()) return false;
-//    if(p_outmap->Latitude() > p_outmap->MaximumLatitude()) return false;
-//    if(p_outmap->Longitude() < p_outmap->MinimumLongitude()) return false;
-//    if(p_outmap->Longitude() > p_outmap->MaximumLongitude()) return false;
-//  }
+ if((p_trim) && (p_outmap->HasGroundRange())) {
+   if(p_outmap->Radius() < p_outmap->MinimumRadius()) return false;
+   if(p_outmap->Radius() > p_outmap->MaximumRadius()) return false;
+   if(p_outmap->Azimuth() < p_outmap->MinimumAzimuth()) return false;
+   if(p_outmap->Azimuth() > p_outmap->MaximumAzimuth()) return false;
+ }
 
-  // Get the universal lat/lon and see if it can be converted to input line/samp
-//  double lat = p_outmap->UniversalLatitude();
+  // Get the universal rad/az and see if it can be converted to input line/samp
   double radius = p_outmap->Radius();
-  double lon = p_outmap->UniversalAzimuth();
+  double az = p_outmap->UniversalAzimuth();
 
-//  if(!p_incam->SetUniversalGround(lat, lon)) return false;
-  if(!p_incam->SetUniversalGround(radius, lon)) return false;
+  if(!p_incam->SetUniversalGround(radius, az)) return false;
 
   // Make sure the point is inside the input image
   if(p_incam->Sample() < 0.5) return false;
@@ -572,6 +567,7 @@ void PrintMap() {
   // Get mapping group from map file
   Pvl userMap;
   userMap.Read(ui.GetFileName("MAP"));
+
   PvlGroup &userGrp = userMap.FindGroup("Mapping", Pvl::Traverse);
 
   //Write map file out to the log
@@ -580,7 +576,6 @@ void PrintMap() {
 
 // Helper function to get mapping resolution.
 void LoadMapRes() {
-  std::cout << "In res helper function" << std::endl;
   UserInterface &ui = Application::GetUserInterface();
 
   // Get mapping group from map file
@@ -643,7 +638,7 @@ void LoadMapRange() {
   ui.Clear("MINAZ");
   ui.Clear("MAXAZ");
   if(userGrp.HasKeyword("MinimumRadius")) {
-    ui.PutDouble("MINLAT", userGrp["MinimumRadius"]);
+    ui.PutDouble("MINRAD", userGrp["MinimumRadius"]);
     count++;
   }
   if(userGrp.HasKeyword("MaximumRadius")) {
@@ -686,7 +681,7 @@ void LoadCameraRange() {
 
   // Make the target info match the user mapfile
   double minrad, maxrad, minaz, maxaz;
-  cam->GroundRange(minrad, maxrad, minaz, maxaz, userMap);
+  cam->ringRange(minrad, maxrad, minaz, maxaz, userMap);
 
   // Set ground range parameters in UI
   ui.Clear("MINRAD");

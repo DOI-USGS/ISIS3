@@ -193,8 +193,8 @@ namespace Isis {
     // Check to make sure radius is valid
     if (radius < 0) {
       m_good = false;
-      cout << "Unable to set radius. The given radius value ["
-           << IString(radius) << "] is invalid." << endl;
+      // cout << "Unable to set radius. The given radius value ["
+      //      << IString(radius) << "] is invalid." << endl;
       // throw IException(IException::Unknown,
       //                  "Unable to set radius. The given radius value ["
       //                  + IString(radius) + "] is invalid.",
@@ -387,43 +387,45 @@ namespace Isis {
    */
   bool Planar::XYRange(double &minX, double &maxX,
                              double &minY, double &maxY) {
-    /*
-    double lat, lon;
+    
+    double rad, az;
 
-    // Check the corners of the lat/lon range
-    XYRangeCheck(m_minimumLatitude, m_minimumLongitude);
-    XYRangeCheck(m_maximumLatitude, m_minimumLongitude);
-    XYRangeCheck(m_minimumLatitude, m_maximumLongitude);
-    XYRangeCheck(m_maximumLatitude, m_maximumLongitude);
+    // Check the corners of the rad/az range
+    XYRangeCheck(m_minimumRadius, m_minimumAzimuth);
+    XYRangeCheck(m_maximumRadius, m_minimumAzimuth);
+    XYRangeCheck(m_minimumRadius, m_maximumAzimuth);
+    XYRangeCheck(m_maximumRadius, m_maximumAzimuth);
 
-//cout << " ************ WALK LATITUDE ******************\n";
-//cout << "MIN LAT: " << m_minimumLatitude << " MAX LAT: " << m_maximumLatitude << "\n";
-    // Walk top and bottom edges
-    for (lat = m_minimumLatitude; lat <= m_maximumLatitude; lat += 0.01) {
-//cout << "WALKED A STEP - lat: " << lat << "\n";
-      lat = lat;
-      lon = m_minimumLongitude;
-      XYRangeCheck(lat, lon);
+//cout << " ************ WALK RADIUS ******************\n";
+//cout << "MIN RAD: " << m_minimumRadius << " MAX LAT: " << m_maximumRadius << "\n";
+    // Walk top and bottom edges in half pixel increments
+    double radiusInc = 2. * (m_maximumRadius - m_minimumRadius) / PixelResolution();
+    for (rad = m_minimumRadius; rad <= m_maximumRadius; rad += radiusInc) {
+//cout << "WALKED A STEP - rad: " << rad << "\n";
+      rad = rad;
+      az = m_minimumAzimuth;
+      XYRangeCheck(rad, az);
 
-      lat = lat;
-      lon = m_maximumLongitude;
-      XYRangeCheck(lat, lon);
-//cout << "MIN LAT: " << m_minimumLatitude << " MAX LAT: " << m_maximumLatitude << "\n";
+      rad = rad;
+      az = m_maximumAzimuth;
+      XYRangeCheck(rad, az);
+//cout << "MIN RAD: " << m_minimumRadius << " MAX RAD: " << m_maximumRadius << "\n";
     }
 
-//cout << " ************ WALK LONGITUDE ******************\n";
+//cout << " ************ WALK AZIMUTH ******************\n";
     // Walk left and right edges
-    for (lon = m_minimumLongitude; lon <= m_maximumLongitude; lon += 0.01) {
-      lat = m_minimumLatitude;
-      lon = lon;
-      XYRangeCheck(lat, lon);
+    for (az = m_minimumAzimuth; az <= m_maximumAzimuth; az += 0.01) {
+      rad = m_minimumRadius;
+      az = az;
+      XYRangeCheck(rad, az);
 
-      lat = m_maximumLatitude;
-      lon = lon;
-      XYRangeCheck(lat, lon);
+      rad = m_maximumRadius;
+      az = az;
+      XYRangeCheck(rad, az);
     }
 
-    // Walk the limb
+    // Walk the limb 
+/*
     for (double angle = 0.0; angle <= 360.0; angle += 0.01) {
       double x = m_equatorialRadius * cos(angle * PI / 180.0);
       double y = m_equatorialRadius * sin(angle * PI / 180.0);
@@ -431,13 +433,13 @@ namespace Isis {
         if (m_latitude > m_maximumLatitude) {
           continue;
         }
-        if (m_longitude > m_maximumLongitude) {
+        if (m_longitude > m_maximumAzimuth) {
           continue;
         }
         if (m_latitude < m_minimumLatitude) {
           continue;
         }
-        if (m_longitude < m_minimumLongitude) {
+        if (m_longitude < m_minimumAzimuth) {
           continue;
         }
 
@@ -447,19 +449,17 @@ namespace Isis {
         if (m_maximumY < y) m_maximumY = y;
         XYRangeCheck(m_latitude, m_longitude);
       }
-    }
+    } */
 
     // Make sure everything is ordered
     if (m_minimumX >= m_maximumX) return false;
     if (m_minimumY >= m_maximumY) return false;
-*/
-    // Return X/Y min/maxs
-    // TODO: get rid of hard-coding
 
-    m_maximumX = m_maximumRadius*cos(m_maximumAzimuth);
-    m_minimumX = -m_maximumX;
-    m_maximumY = m_maximumRadius*sin(m_maximumAzimuth);
-    m_minimumY = -m_maximumY;
+    // Return X/Y min/maxs
+    // m_maximumX = m_maximumRadius*cos(m_maximumAzimuth);
+    // m_minimumX = -m_maximumX;
+    // m_maximumY = m_maximumRadius*sin(m_maximumAzimuth);
+    // m_minimumY = -m_maximumY;
 
     minX = m_minimumX;
     maxX = m_maximumX;
