@@ -598,7 +598,7 @@ namespace Isis {
 
   const ControlMeasure *ControlPoint::GetMeasure(int index) const {
     if (index < 0 || index >= cubeSerials->size()) {
-      QString msg = "Index [" + QString(index) + "] out of range";
+      QString msg = "Index [" + toString(index) + "] out of range";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -608,7 +608,7 @@ namespace Isis {
 
   ControlMeasure *ControlPoint::GetMeasure(int index) {
     if (index < 0 || index >= cubeSerials->size()) {
-      QString msg = "Index [" + QString(index) + "] out of range";
+      QString msg = "Index [" + toString(index) + "] out of range";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
@@ -748,7 +748,7 @@ namespace Isis {
 
     if (index < 0 || index >= cubeSerials->size()) {
       QString msg = "Index [";
-      msg += index + "] out of range";
+      msg += toString(index) + "] out of range";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 

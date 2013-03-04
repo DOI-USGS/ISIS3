@@ -1576,8 +1576,9 @@ namespace Isis {
       QString::number(int(el + 0.5)) + "<br> " +
       sBandInfo + "</blockQuote></p>";
 
-    viewport()->setWhatsThis(p_whatsThisText + area + p_cubeWhatsThisText +
-                         p_viewportWhatsThisText);
+    QString fullWhatsThis = p_whatsThisText + area + p_cubeWhatsThisText + p_viewportWhatsThisText;
+    setWhatsThis(fullWhatsThis);
+    viewport()->setWhatsThis(fullWhatsThis);
   }
 
   /**

@@ -22,10 +22,11 @@ def main():
 
     snooze(3)
     
-    clickButton(waitForObject(":qmos_QToolButton_2"))
     
-    
+    clickButton(waitForObject(":qmos_GridToolButton"))
     clickButton(waitForObject(":qmos.Grid Options_QPushButton"))
+
+
     clickButton(waitForObject(":Auto Grid_QCheckBox"))
     mouseClick(waitForObject(":Grid Options.Latitude Range_QComboBox"), 127, 3, 0, Qt.LeftButton)
     mouseClick(waitForObjectItem(":Grid Options.Latitude Range_QComboBox", "Manual"), 53, 3, 0, Qt.LeftButton)

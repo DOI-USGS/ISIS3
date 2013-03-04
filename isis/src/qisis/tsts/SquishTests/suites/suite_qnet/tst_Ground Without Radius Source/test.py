@@ -1,4 +1,5 @@
 import os
+import re
 
 def main():
     try:
@@ -22,7 +23,7 @@ def main():
 
     # Open control net
     snooze(0.5)
-    mouseClick(waitForObject(":stackedWidget.treeView_QTreeView_2"), 95, 13, 0, Qt.LeftButton)
+    mouseClick(waitForObject(":fileNameEdit_QLineEdit_7"), 38, 13, 0, Qt.LeftButton)
     waitForObjectItem(":stackedWidget.treeView_QTreeView_2", "Mini\\.net")
     doubleClickItem(":stackedWidget.treeView_QTreeView_2", "Mini\\.net", 58, 5, 0, Qt.LeftButton)
     
@@ -112,11 +113,15 @@ def main():
     clickButton(waitForObject(":Delete ControlPoint.OK_QPushButton"))
     sendEvent("QMouseEvent", waitForObject(":qnet.viewport_QWidget_4"), QEvent.MouseButtonPress, 251, 323, Qt.MidButton, 4, 0)
     sendEvent("QMouseEvent", waitForObject(":qnet.viewport_QWidget_4"), QEvent.MouseButtonRelease, 251, 323, Qt.MidButton, 0, 0)
-    waitForObjectItem(":Delete ControlPoint.fileList_QListWidget", "/work/projects/themis\\_control/lweller/Lunae\\_Palus/DayIR/RDR/I18337016RDR\\.cub")
-    clickItem(":Delete ControlPoint.fileList_QListWidget", "/work/projects/themis\\_control/lweller/Lunae\\_Palus/DayIR/RDR/I18337016RDR\\.cub", 147, 8, 0, Qt.LeftButton)
+    
+    listItemI18337016RDR= re.sub("([._ ])", "\\\\\\1", os.path.expandvars('$ISISROOT/src/qisis/tsts/SquishTests/input/Ground/Extracted_AllOverlaps/I18337016RDR.cub'))
+    listItemI06281019RDR= re.sub("([._ ])", "\\\\\\1", os.path.expandvars('$ISISROOT/src/qisis/tsts/SquishTests/input/Ground/Extracted_AllOverlaps/I06281019RDR.cub'))
+    
+    waitForObjectItem(":Delete ControlPoint.fileList_QListWidget",  listItemI18337016RDR)
+    clickItem(":Delete ControlPoint.fileList_QListWidget", listItemI18337016RDR, 147, 8, 0, Qt.LeftButton)
     type(waitForObject(":Delete ControlPoint.fileList_QListWidget"), "<Control>")
-    waitForObjectItem(":Delete ControlPoint.fileList_QListWidget", "/work/projects/themis\\_control/lweller/Lunae\\_Palus/DayIR/RDR/I06281019RDR\\.cub")
-    clickItem(":Delete ControlPoint.fileList_QListWidget", "/work/projects/themis\\_control/lweller/Lunae\\_Palus/DayIR/RDR/I06281019RDR\\.cub", 135, 9, 67108864, Qt.LeftButton)
+    waitForObjectItem(":Delete ControlPoint.fileList_QListWidget", listItemI06281019RDR)
+    clickItem(":Delete ControlPoint.fileList_QListWidget", listItemI06281019RDR, 135, 9, 67108864, Qt.LeftButton)
     clickButton(waitForObject(":Delete ControlPoint.OK_QPushButton"))
     clickButton(waitForObject(":Delete Reference measure?.Yes_QPushButton"))
     clickButton(waitForObject(":Error.OK_QPushButton"))
@@ -128,6 +133,7 @@ def main():
     snooze(0.5)
     mouseClick(waitForObject(":fileNameEdit_QLineEdit_3"), 95, 13, 0, Qt.LeftButton)
     type(waitForObject(":fileNameEdit_QLineEdit_3"), "src/qisis/tsts/SquishTests/output/GroundWithoutRadiusSourceOutput.net")
+    snooze(1)
     type(waitForObject(":fileNameEdit_QLineEdit_3"), "<Return>")
 
     activateItem(waitForObjectItem(":qnet_QMenuBar", "File"))
