@@ -445,13 +445,6 @@ void CorrectNonlinearity(Buffer &in) {
     if(!IsSpecial(in[i])) {
       in[i] += g_linearOffsetLine[i];
 
-      double sign = 1.0;
-      if(in[i] < 0.0) {
-        sign = -1.0;
-      }
-
-      in[i] *= sign;
-
       if(in[i] < MAXNONLIN) {
         if(g_summed)
           in[i] -= (1.0 / (g_linearityCoefficients[2* i ][0] * pow(g_linearityCoefficients[2* i ][1], in[i])
@@ -461,8 +454,6 @@ void CorrectNonlinearity(Buffer &in) {
           in[i] -= 1.0 / (g_linearityCoefficients[i][0] * pow(g_linearityCoefficients[i][1], in[i])
                           + g_linearityCoefficients[i][2]);
       }
-
-      in[i] *= sign;
     }
     else
       in[i] = Isis::Null;

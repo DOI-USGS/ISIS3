@@ -9,7 +9,7 @@
   <description>
     <p>
     lronaccal performs radiometric corrections to images acquired by the Narrow Angle
-    Camera aboard the Lunar Reconnaissance Orbiter spacecraft.  The LROC NAC camera
+    Camera aboard the Lunar Reconnaissance Orbiter spacecraft.  The LRO NAC camera
     will make observations simulteously with the HiRise camera.
     </p>
 
@@ -51,6 +51,9 @@
   <history>
     <change name="Jacob Danton" date="2008-11-02">
       Original version
+    </change>
+    <change name="Adam Licht" date="2013-02-28">
+      No longer treat negative DNs differently in the Non-linearity correction.
     </change>
   </history>
 
