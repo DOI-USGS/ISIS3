@@ -61,6 +61,9 @@
       these have been removed. A new test was added to ensure that this doesn't
       happen again. Fixes #1360.
     </change>
+    <change name="Ra'ad Saleh" date="2013-02-04">
+      Fixed error in printing PVL values caused by line continuations. Fixes #1017.
+    </change>
   </history>
 
   <groups>
