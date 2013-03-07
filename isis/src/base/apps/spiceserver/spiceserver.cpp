@@ -185,7 +185,6 @@ void IsisMain() {
     fk        = ckKernels.frame(label);
     ck        = ckKernels.spacecraftPointing(label);
     spk       = spkKernels.spacecraftPosition(label);
-
     if (g_ckNadir) {
       // Only add nadir if no spacecraft pointing found
       QStringList nadirCk;
@@ -231,19 +230,21 @@ void IsisMain() {
       Kernel realCkKernel;
       QStringList ckKernelList;
 
-      // if multiple priority queues exist, then add the top priority ck
-      // from each queue to the list of kernels to be loaded.
-      if (ck.size() > 1) {
-        for (unsigned int i = ck.size() - 1; i >= 0; i--) {
-          if (ck.at(i).size() != 0) {
-            Kernel topPriority = ck.at(i).top();
-            ckKernelList.append(topPriority.kernels());
-            // set the type to equal the type of the to priority of the first
-            //queue 
-            realCkKernel.setType(topPriority.type()); 
-          }
+      // Add the list of cks from each Kernel object at the top of each
+      // priority queue. If multiple priority queues exist, we will not
+      // pop of the top priority from any of the queues except for the
+      // first one.  So each time tryKernels() fails, the same files
+      // will be loaded with the next priority from the first queue.
+      for (int i = ck.size() - 1; i >= 0; i--) {
+        if (ck.at(i).size() != 0) {
+          Kernel topPriority = ck.at(i).top();
+          ckKernelList.append(topPriority.kernels());
+          // set the type to equal the type of the to priority of the first
+          //queue 
+          realCkKernel.setType(topPriority.type()); 
         }
       }
+
       // pop the top priority ck off only the first queue so that the next 
       // iteration will test the next highest priority of the first queue with
       // the top priority of each of the other queues.
@@ -251,8 +252,10 @@ void IsisMain() {
 
       // Merge SpacecraftPointing and Frame into ck
       for (int i = 0; i < fk.size(); i++) {
-        realCkKernel.push_back(fk[i]);
+        ckKernelList.push_back(fk[i]);
       }
+
+      realCkKernel.setKernels(ckKernelList);
 
       kernelSuccess = tryKernels(label, p, lk, pck, targetSpk,
                                  realCkKernel, fk, ik, sclk, spk,
