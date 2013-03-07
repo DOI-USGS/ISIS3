@@ -74,15 +74,19 @@ app:
 	$(MAKE) $(BINS)
 
 $(BINS): $(UIHEADERS) $(QTRESOURCEFILES) protos $(OBJS)
+	export PATH="$(CODE_COVERAGE_PATH_DIR):$$PATH"; \
 	$(CXX) $(ALLLIBDIRS) $(ISISLDFLAGS) $(ISISLDRPATH) -o $@ $(OBJS) $(ALLLIBS)
 
 .cpp.o: qtmoc
+	export PATH="$(CODE_COVERAGE_PATH_DIR):$$PATH"; \
 	$(CXX) $(ALLINCDIRS) $(ISISCPPFLAGS) $(CPPFLAGS) -c -o $@ $?
 
 .c.o :
+	export PATH="$(CODE_COVERAGE_PATH_DIR):$$PATH"; \
 	$(CC) $(ALLINCDIRS) $(ISISCFLAGS) $(CFLAGS) -c -o $@ $?
 
 .cc.o: 
+	export PATH="$(CODE_COVERAGE_PATH_DIR):$$PATH"; \
 	$(CXX) $(ALLINCDIRS) $(ISISCPPFLAGS) -c -o $@ $?
 
 .xml.html :

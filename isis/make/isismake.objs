@@ -80,9 +80,11 @@ object: $(UIHEADERS) protos
 	fi
 
 .cpp.o: protos qtmoc
+	export PATH="$(CODE_COVERAGE_PATH_DIR):$$PATH"; \
 	$(CXX) $(ALLINCDIRS) $(ISISCPPFLAGS) -c -o $@ $?
 
 .cc.o:
+	export PATH="$(CODE_COVERAGE_PATH_DIR):$$PATH"; \
 	$(CXX) $(ALLINCDIRS) $(ISISCPPFLAGS) -c -o $@ $?
 
 ui_%.h: %.ui
@@ -307,6 +309,7 @@ test: unitTest
 # The .a file is copied in Darwin because the ar command does not like
 #   to extract the same archive twice, regardless of permissions or symlink
 unitTest: $(OBJS) unitTest.o
+	export PATH="$(CODE_COVERAGE_PATH_DIR):$$PATH"; \
 	if [ "$(HOST_ARCH)" == "Linux" ]; then                                       \
 	  $(CP) $(ISISROOT)/lib/libisis$(ISISLIBVERSION).a                           \
 	      libisis$(ISISLIBVERSION).a;                                            \
