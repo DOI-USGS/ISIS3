@@ -271,6 +271,7 @@ namespace Isis {
 
   void MosaicSceneWidget::addToPermanent(QToolBar *perm) {
     m_mapButton = new QToolButton(this);
+    connect(this, SIGNAL(destroyed()), m_mapButton, SLOT(deleteLater()));
     m_mapButton->setText(tr("View/Edit/Load Map File"));
     m_mapButton->setToolTip(tr("View/Edit/Load Map File"));
     m_mapButton->setIcon(QIcon(FileName("$base/icons/ographic.png").expanded()));

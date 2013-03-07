@@ -89,5 +89,9 @@
       Improved map file capabilities. Please see the help pages inside of qmos (Help -> qmos Help)
       for descriptions and explanations of the new functionality. Fixes #1034.
     </change>
+    <change name="Steven Lambright" date="2013-03-06">
+      The grid tool should no longer crash when it cannot compute image extents automatically.
+      Fixes #1547.
+    </change>
   </history>
 </application>
