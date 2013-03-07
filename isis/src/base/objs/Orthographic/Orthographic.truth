@@ -84,6 +84,12 @@ Group = Mapping
 End_Group
 End
 
+Test XYRange method (not boundary conditions)
+Minimum X:  -0.984807753
+Maximum X:  0.984807753
+Minimum Y:  -1
+Maximum Y:  0.6076045
+
 Unit test was obtained from:
 
   Map Projections - A Working Manual

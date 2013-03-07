@@ -22,8 +22,11 @@
 
 #include "Orthographic.h"
 
-#include <cmath>
 #include <cfloat>
+#include <cmath>
+#include <iomanip>
+
+#include <QDebug>
 
 #include "Constants.h"
 #include "IException.h"
@@ -56,15 +59,19 @@ namespace Isis {
       // Try to read the mapping group
       PvlGroup &mapGroup = label.FindGroup("Mapping", Pvl::Traverse);
 
-      // Compute and write the default center longitude if allowed and
-      // necessary
+      /*
+       * Compute and write the default center longitude if allowed and
+       * necessary.
+       */
       if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLongitude"))) {
         double lon = (m_minimumLongitude + m_maximumLongitude) / 2.0;
         mapGroup += PvlKeyword("CenterLongitude", toString(lon));
       }
 
-      // Compute and write the default center latitude if allowed and
-      // necessary
+      /*
+       * Compute and write the default center latitude if allowed and
+       * necessary
+       */
       if ((allowDefaults) && (!mapGroup.HasKeyword("CenterLatitude"))) {
         double lat = (m_minimumLatitude + m_maximumLatitude) / 2.0;
         mapGroup += PvlKeyword("CenterLatitude", toString(lat));
@@ -86,35 +93,39 @@ namespace Isis {
       m_sinph0 = sin(m_centerLatitude);
       m_cosph0 = cos(m_centerLatitude);
 
-      // This projection has a limited lat/lon range (can't do the world)
-      //   So let's make sure that our lat/lon range is properly restricted!
-      // The equation: m_sinph0 * sinphi + m_cosph0 * cosphi * coslon tells us
-      // if we are inside of the projection.
-      //
-      // m_sinph0 = sin(center lat)
-      // sinphi = sin(lat)
-      // m_cosph0 = cos(center lat)
-      // cosphi = cos(lat)
-      // coslon = cos(lon - centerLon)
-      //
-      // Let's apply this equation at the extremes to minimize our lat/lon range
+      /*
+       * This projection has a limited lat/lon range (can't do the world)
+       * So let's make sure that our lat/lon range is properly restricted!
+       * The equation: m_sinph0 * sinphi + m_cosph0 * cosphi * coslon tells us
+       * if we are inside of the projection.
+       *
+       * m_sinph0 = sin(center lat)
+       * sinphi = sin(lat)
+       * m_cosph0 = cos(center lat)
+       * cosphi = cos(lat)
+       * coslon = cos(lon - centerLon)
+       *
+       * Let's apply this equation at the extremes to minimize our lat/lon range
+       */
       double sinphi, cosphi, coslon;
 
-      // Can we project at the minlat, center lon? If not, then we should move
-      // up the min lat to be inside the image.
+      /* Can we project at the minlat, center lon? If not, then we should move
+       * up the min lat to be inside the image.
+       */
       sinphi = sin(m_minimumLatitude * PI / 180.0);
       cosphi = cos(m_minimumLatitude * PI / 180.0);
       coslon = 1.0; // at lon=centerLon: cos(lon-centerLon) = cos(0) = 1
       if (m_sinph0 * sinphi + m_cosph0 * cosphi * coslon < 1E-10) {
-        // solve for x: a * sin(x) + b * cos(x) * 1 = 0
-        // a * sin(x) + b * cos(x) = 0
-        // a * sin(x) = - b * cos(x)
-        // -(a * sin(x)) / b = cos(x)
-        // -(a / b) = cos(x) / sin(x)
-        // -(b / a) = sin(x) / cos(x)
-        // -(b / a) = tan(x)
-        // arctan(-(b / a)) = x
-        // arctan(-(m_cosph0 / m_sinph0)) = x
+        /*solve for x: a * sin(x) + b * cos(x) * 1 = 0
+         *      a * sin(x) + b * cos(x) = 0
+         *      a * sin(x) = - b * cos(x)
+         *      -(a * sin(x)) / b = cos(x)
+         *      -(a / b) = cos(x) / sin(x)
+         *      -(b / a) = sin(x) / cos(x)
+         *      -(b / a) = tan(x)
+         *      arctan(-(b / a)) = x
+         *      arctan(-(m_cosph0 / m_sinph0)) = x
+         */
         double newMin = atan2(- m_cosph0, m_sinph0) * 180.0 / PI;
         if (newMin > m_minimumLatitude) {
           m_minimumLatitude = newMin;
@@ -124,8 +135,9 @@ namespace Isis {
       sinphi = sin(m_minimumLatitude * PI / 180.0);
       cosphi = cos(m_minimumLatitude * PI / 180.0);
 
-      // Can we project at the maxlat, center lon? If not, then we should move
-      // down the max lat to be inside the image.
+      /* Can we project at the maxlat, center lon? If not, then we should move
+       * down the max lat to be inside the image.
+       */
       sinphi = sin(m_maximumLatitude * PI / 180.0);
       cosphi = cos(m_maximumLatitude * PI / 180.0);
       coslon = 1.0; // at lon=centerLon: cos(lon-centerLon) = cos(0) = 1
@@ -137,8 +149,9 @@ namespace Isis {
         } // else something else is off (i.e. longitude range)
       }
 
-      // If we are looking at the side of the planet (clat = 0), then make sure
-      // the longitude range is limited to 90 degrees to either direction
+      /* If we are looking at the side of the planet (clat = 0), then make sure
+       * the longitude range is limited to 90 degrees to either direction
+       */
       if (m_centerLatitude == 0.0) {
         if (m_maximumLongitude - m_centerLongitude * 180.0 / PI > 90) {
           m_maximumLongitude = (m_centerLongitude * 180.0 / PI) + 90;
@@ -170,7 +183,6 @@ namespace Isis {
   bool Orthographic::operator== (const Projection &proj) {
     if (!Projection::operator==(proj)) return false;
     // dont do the below it is a recusive plunge
-    //  if (Projection::operator!=(proj)) return false;
     Orthographic *ortho = (Orthographic *) &proj;
     if ((ortho->m_centerLongitude != m_centerLongitude) ||
         (ortho->m_centerLatitude != m_centerLatitude)) return false;
@@ -209,7 +221,6 @@ namespace Isis {
      //Snyder pg. 45
      // no distortion at center of projection (centerLatitude, centerLongitude)
      return m_centerLatitude * 180.0 / PI;// Change to true scale 
-                                                //coordinate method ???
    }
 
   /**
@@ -280,8 +291,13 @@ namespace Isis {
     const double epsilon = 1.0e-10;
     rho = sqrt(GetX() * GetX() + GetY() * GetY());
 
-    // Error calculating rho - should be less than equatorial radius
-    if (fabs(rho - m_equatorialRadius) < 1E-10 || rho > m_equatorialRadius) {
+    /* Error calculating rho - should be less than equatorial radius.
+     * 
+     * This if statement included "fabs(rho - m_equatorialRadius) < 1E-10 ||"
+     * to make the method more stable for limbs but this caused a false failure
+     * for some images when rho == m_equatorialRadius.
+     */
+    if (rho > m_equatorialRadius) {
       m_good = false;
       return m_good;
     }
@@ -331,7 +347,7 @@ namespace Isis {
 
     // Cleanup the latitude
     if (IsPlanetocentric()) m_latitude = ToPlanetocentric(m_latitude);
-
+    
     m_good = true;
     return m_good;
   }
@@ -369,11 +385,8 @@ namespace Isis {
     XYRangeCheck(m_minimumLatitude, m_maximumLongitude);
     XYRangeCheck(m_maximumLatitude, m_maximumLongitude);
 
-//cout << " ************ WALK LATITUDE ******************\n";
-//cout << "MIN LAT: " << m_minimumLatitude << " MAX LAT: " << m_maximumLatitude << "\n";
     // Walk top and bottom edges
     for (lat = m_minimumLatitude; lat <= m_maximumLatitude; lat += 0.01) {
-//cout << "WALKED A STEP - lat: " << lat << "\n";
       lat = lat;
       lon = m_minimumLongitude;
       XYRangeCheck(lat, lon);
@@ -381,10 +394,8 @@ namespace Isis {
       lat = lat;
       lon = m_maximumLongitude;
       XYRangeCheck(lat, lon);
-//cout << "MIN LAT: " << m_minimumLatitude << " MAX LAT: " << m_maximumLatitude << "\n";
     }
 
-//cout << " ************ WALK LONGITUDE ******************\n";
     // Walk left and right edges
     for (lon = m_minimumLongitude; lon <= m_maximumLongitude; lon += 0.01) {
       lat = m_minimumLatitude;
@@ -396,41 +407,65 @@ namespace Isis {
       XYRangeCheck(lat, lon);
     }
 
-    // Walk the limb
+    
+    /*
+     * Walk the limb.
+     * When the pair is valid and within the correct range, reassign min/max x/y.
+     *
+     *                      , - ~ ~ ~ - ,
+     *                  , '               ' ,
+     *               ,       _______         ,
+     *               ,       |       |         , <----- Walking the limb would not affect an
+     *              ,        |       |          ,       image that does not extend to the
+                    ,        |_______|          ,       limits of the projection.
+     *              ,   ________________________,_
+     *               , |                        , |
+     *                ,|                       ,  |
+     *                 |,___________________,_'___| <-- This corner would wrap around.
+                          ' - , _ _ _ ,  '              The image would rotate because the
+     *                                                  center lat was closer to the pole.
+     *                                                  This would allow for a more completely
+     *                                                  longitude range.
+     *                           _o__o__
+     *                         o|       |o <------------This is the rotated view. If the image
+     *                        o |_______| o             limits extend over the pole (due to the
+     *                        o     *     o             offset of the center lat) it is possible
+     *                         o         o              to have a lon range that is larger than
+     *                            o  o                  180 degrees.
+     *
+     *
+     *
+     *
+     */
     for (double angle = 0.0; angle <= 360.0; angle += 0.01) {
       double x = m_equatorialRadius * cos(angle * PI / 180.0);
       double y = m_equatorialRadius * sin(angle * PI / 180.0);
-      if (SetCoordinate(x, y) == 0) {
-        if (m_latitude > m_maximumLatitude) {
-          continue;
-        }
-        if (m_longitude > m_maximumLongitude) {
-          continue;
-        }
-        if (m_latitude < m_minimumLatitude) {
-          continue;
-        }
-        if (m_longitude < m_minimumLongitude) {
-          continue;
-        }
 
-        if (m_minimumX > x) m_minimumX = x;
-        if (m_maximumX < x) m_maximumX = x;
-        if (m_minimumY > y) m_minimumY = y;
-        if (m_maximumY < y) m_maximumY = y;
+      if (SetCoordinate(x, y) &&
+         (m_latitude <= m_maximumLatitude &&
+          m_longitude <= m_maximumLongitude &&
+          m_latitude >= m_minimumLatitude &&
+          m_longitude >= m_minimumLongitude)) {
+
+        m_minimumX = qMin(x, m_minimumX);
+        m_maximumX = qMax(x, m_maximumX);
+        m_minimumY = qMin(y, m_minimumY);
+        m_maximumY = qMax(y, m_maximumY);
         XYRangeCheck(m_latitude, m_longitude);
       }
     }
 
     // Make sure everything is ordered
-    if (m_minimumX >= m_maximumX) return false;
-    if (m_minimumY >= m_maximumY) return false;
+    if (m_minimumX >= m_maximumX ||
+        m_minimumY >= m_maximumY)
+      return false;
 
     // Return X/Y min/maxs
     minX = m_minimumX;
     maxX = m_maximumX;
     minY = m_minimumY;
     maxY = m_maximumY;
+
     return true;
   }
 
@@ -456,7 +491,6 @@ namespace Isis {
    */
   PvlGroup Orthographic::MappingLatitudes() {
     PvlGroup mapping = Projection::MappingLatitudes();
-
     mapping += m_mappingGrp["CenterLatitude"];
 
     return mapping;

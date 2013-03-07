@@ -1,9 +1,10 @@
-#include <iostream>
 #include <iomanip>
-#include "Orthographic.h"
+#include <iostream>
+
 #include "IException.h"
-#include "ProjectionFactory.h"
+#include "Orthographic.h"
 #include "Preference.h"
+#include "ProjectionFactory.h"
 
 using namespace Isis;
 using namespace std;
@@ -51,7 +52,6 @@ int main(int argc, char *argv[]) {
 
   try {
     Projection &p = *ProjectionFactory::Create(lab);
-    //  Orthographic p(lab);
 
     cout << "Test TrueScaleLatitude method... " << endl;
     cout << "TrueScaleLatitude = " << p.TrueScaleLatitude() << endl;
@@ -116,10 +116,32 @@ int main(int argc, char *argv[]) {
     cout << tmp3 << endl;
     cout << endl;
 
+    mapGroup.FindKeyword("MinimumLatitude").SetValue("-60.0");
+    mapGroup.FindKeyword("MaximumLatitude").SetValue("60.0");
+    mapGroup.FindKeyword("MinimumLongitude").SetValue("-80.0");
+    mapGroup.FindKeyword("MaximumLongitude").SetValue("80.0");
+
+    mapGroup.FindKeyword("CenterLatitude").SetValue("40.0");
+    mapGroup.FindKeyword("CenterLongitude").SetValue("0.0");
+
+    cout << "Test XYRange method (not boundary conditions)" << endl;
+    Projection &m = *ProjectionFactory::Create(lab);
+    minX = 0;
+    maxX = 0;
+    minY = 0;
+    maxY = 0;
+    m.XYRange(minX, maxX, minY, maxY);
+    cout << "Minimum X:  " << minX << endl;
+    cout << "Maximum X:  " << maxX << endl;
+    cout << "Minimum Y:  " << minY << endl;
+    cout << "Maximum Y:  " << maxY << endl;
+    cout << endl;
+
     cout << "Unit test was obtained from:" << endl << endl;
     cout << "  Map Projections - A Working Manual" << endl;
     cout << "  USGS Professional Paper 1395 by John P. Snyder" << endl;
     cout << "  Pages 311-312" << endl;
+
   }
   catch(IException &e) {
     e.print();
