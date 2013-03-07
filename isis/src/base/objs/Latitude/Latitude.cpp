@@ -25,6 +25,7 @@
 #include "Distance.h"
 #include "IException.h"
 #include "IString.h"
+#include "Projection.h"
 #include "PvlGroup.h"
 #include "SpecialPixel.h"
 
@@ -95,10 +96,20 @@ namespace Isis {
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
 
-    m_equatorialRadius = new Distance(toDouble(mapping["EquatorialRadius"][0]),
-        Distance::Meters);
-    m_polarRadius = new Distance(toDouble(mapping["PolarRadius"][0]),
-        Distance::Meters);
+    if (mapping.HasKeyword("EquatorialRadius") && mapping.HasKeyword("PolarRadius")) {
+      m_equatorialRadius = new Distance(toDouble(mapping["EquatorialRadius"][0]),
+          Distance::Meters);
+      m_polarRadius = new Distance(toDouble(mapping["PolarRadius"][0]),
+          Distance::Meters);
+    }
+    else {
+      PvlGroup radiiGrp = Projection::TargetRadii(mapping["TargetName"]);
+
+      m_equatorialRadius = new Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
+          Distance::Meters);
+      m_polarRadius = new Distance(toDouble(radiiGrp["PolarRadius"][0]),
+          Distance::Meters);
+    }
 
     m_errors = errors;
 
@@ -135,10 +146,21 @@ namespace Isis {
     m_equatorialRadius = NULL;
     m_polarRadius = NULL;
 
-    m_equatorialRadius = new Distance(toDouble(mapping["EquatorialRadius"][0]),
-        Distance::Meters);
-    m_polarRadius = new Distance(toDouble(mapping["PolarRadius"][0]),
-        Distance::Meters);
+    if (mapping.HasKeyword("EquatorialRadius") && mapping.HasKeyword("PolarRadius")) {
+      m_equatorialRadius = new Distance(toDouble(mapping["EquatorialRadius"][0]),
+          Distance::Meters);
+      m_polarRadius = new Distance(toDouble(mapping["PolarRadius"][0]),
+          Distance::Meters);
+    }
+    else {
+      std::cout << mapping << std::endl;
+      PvlGroup radiiGrp = Projection::TargetRadii(mapping["TargetName"]);
+      std::cout << radiiGrp << std::endl;
+      m_equatorialRadius = new Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
+          Distance::Meters);
+      m_polarRadius = new Distance(toDouble(radiiGrp["PolarRadius"][0]),
+          Distance::Meters);
+    }
 
     m_errors = errors;
 
@@ -408,8 +430,23 @@ namespace Isis {
   Latitude Latitude::add(Angle angleToAdd, PvlGroup mapping) {
 
     CoordinateType latType;
-    Distance equatorialRadius(toDouble(mapping["EquatorialRadius"][0]), Distance::Meters);
-    Distance polarRadius(toDouble(mapping["PolarRadius"][0]), Distance::Meters);
+
+    Distance equatorialRadius;
+    Distance polarRadius;
+    if (mapping.HasKeyword("EquatorialRadius") && mapping.HasKeyword("PolarRadius")) {
+      equatorialRadius = Distance(toDouble(mapping["EquatorialRadius"][0]),
+          Distance::Meters);
+      polarRadius = Distance(toDouble(mapping["PolarRadius"][0]),
+          Distance::Meters);
+    }
+    else {
+      PvlGroup radiiGrp = Projection::TargetRadii(mapping["TargetName"]);
+
+      equatorialRadius = Distance(toDouble(radiiGrp["EquatorialRadius"][0]),
+          Distance::Meters);
+      polarRadius = Distance(toDouble(radiiGrp["PolarRadius"][0]),
+          Distance::Meters);
+    }
 
     if(mapping["LatitudeType"][0] == "Planetocentric")
       latType = Planetocentric;

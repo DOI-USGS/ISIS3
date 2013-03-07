@@ -292,9 +292,9 @@ namespace Isis {
     if (proj) {
       PvlGroup mappingGroup(proj->Mapping());
 
-      Distance equatorialRadius(toDouble(proj->Mapping()["EquatorialRadius"][0]),
+      Distance equatorialRadius(proj->EquatorialRadius(),
                                 Distance::Meters);
-      Distance polarRadius(toDouble(proj->Mapping()["PolarRadius"][0]), Distance::Meters);
+      Distance polarRadius(proj->PolarRadius(), Distance::Meters);
 
       QRectF boundingRect = getWidget()->cubesBoundingRect();
 
@@ -527,11 +527,11 @@ namespace Isis {
 
     if (getWidget()->getProjection()) {
       Distance equatorialRadius(
-          toDouble(getWidget()->getProjection()->Mapping()["EquatorialRadius"][0]),
-                                Distance::Meters);
+          getWidget()->getProjection()->EquatorialRadius(),
+          Distance::Meters);
       Distance polarRadius(
-          toDouble(getWidget()->getProjection()->Mapping()["PolarRadius"][0]),
-                                Distance::Meters);
+          getWidget()->getProjection()->PolarRadius(),
+          Distance::Meters);
 
       if (obj["BaseLatitude"][0] != "Null")
         m_baseLat = Latitude(toDouble(obj["BaseLatitude"][0]), equatorialRadius, polarRadius,

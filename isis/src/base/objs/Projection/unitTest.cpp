@@ -701,6 +701,10 @@ int main(int argc, char *argv[]) {
   cout << "Rotation Tests" << endl;
   mg += PvlKeyword("Rotation", toString(90.0));
   mg["LongitudeDirection"] = "PositiveEast";
+  mg.DeleteKeyword("EquatorialRadius");
+  mg.DeleteKeyword("PolarRadius");
+  mg.DeleteKeyword("PolarRadius");
+  mg["TargetName"] = "Moon";
   MyProjection p4(lab);
   cout << "Rotation:     " << p4.Rotation() << endl;
   cout << "Testing Ground coordinate routines" << endl;
@@ -714,8 +718,8 @@ int main(int argc, char *argv[]) {
   cout << "Longitude:                      " << p4.Longitude() << endl;
   cout << "XCoord:                         " << p4.XCoord() << endl;
   cout << "YCoord:                         " << p4.YCoord() << endl;
-  cout << "UniversalLatitude:              " << p4.UniversalLatitude() << endl;
-  cout << "UniversalLongitude:             " << p4.UniversalLongitude() << endl;
+  cout << "UniversalLatitude:              " << qRound(p4.UniversalLatitude()) << endl;
+  cout << "UniversalLongitude:             " << qRound(p4.UniversalLongitude()) << endl;
   cout << endl;
 
   cout << "Testing projection coordinate routines" << endl;
@@ -725,7 +729,7 @@ int main(int argc, char *argv[]) {
   cout << "Longitude:                           " << p4.Longitude() << endl;
   cout << "XCoord:                              " << p4.XCoord() << endl;
   cout << "YCoord:                              " << p4.YCoord() << endl;
-  cout << "UniversalLatitude:                   " << p4.UniversalLatitude() << endl;
+  cout << "UniversalLatitude:                   " << qRound(p4.UniversalLatitude()) << endl;
   cout << "UniversalLongitude:                  " << p4.UniversalLongitude() << endl;
   cout << "WorldX:                              " << p4.WorldX() << endl;
   cout << "WorldY:                              " << p4.WorldY() << endl;

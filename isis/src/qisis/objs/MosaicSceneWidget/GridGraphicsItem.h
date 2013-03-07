@@ -32,6 +32,9 @@ namespace Isis {
    *                           latitudes. Fixes #604.
    *   @history 2013-02-06 Steven Lambright - Added a safety check to make sure the increments
    *                           aren't zero or negative. References #1060.
+   *   @history 2013-03-06 Steven Lambright - Added support for getting target radii from the
+   *                           TargetName mapping keyword if the target radii keywords are missing.
+   *                           References #1534.
    */
   class GridGraphicsItem : public QGraphicsItem {
     public:

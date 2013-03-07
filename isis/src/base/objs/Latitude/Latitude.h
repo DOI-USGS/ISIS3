@@ -44,6 +44,8 @@ namespace Isis {
    *                           Pvl mapping group to determine the latitude type and add accordingly.
    *                           The second takes the angle to add, the equatorial and polar radii,
    *                           and the latitude type. References #604.
+   *   @history 2013-03-06 Steven Lambright - Added support for getting Radii from TargetName
+   *                           keyword. References #1534.
    */
   class Latitude : public Angle {
     public:

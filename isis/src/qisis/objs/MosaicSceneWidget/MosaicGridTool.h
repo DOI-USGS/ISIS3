@@ -43,6 +43,8 @@ namespace Isis {
    *   @history 2013-02-01 Steven Lambright - Fixed a problem with setLonInc() bounding the maximum
    *                           longitude increment incorrectly, which caused a bad increment. This
    *                           resulted in freezing or an invalid grid. Fixes #1060.
+   *   @history 2013-03-06 Steven Lambright - Added support for getting target radii from TargetName
+   *                           if the mapping radii keywords are missing.
    */
   class MosaicGridTool : public MosaicTool {
       Q_OBJECT

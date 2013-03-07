@@ -343,7 +343,7 @@ Latitude:                       60
 Longitude:                      -5
 XCoord:                         150
 YCoord:                         50
-UniversalLatitude:              57.39200572938
+UniversalLatitude:              60
 UniversalLongitude:             355
 
 Testing projection coordinate routines
@@ -353,7 +353,7 @@ Latitude:                            60
 Longitude:                           -5
 XCoord:                              150
 YCoord:                              50
-UniversalLatitude:                   57.39200572938
+UniversalLatitude:                   60
 UniversalLongitude:                  355
 WorldX:                              150
 WorldY:                              50
@@ -361,10 +361,8 @@ WorldY:                              50
 Testing Mapping() methods
 Mapping() = 
 Group = Mapping
-  TargetName         = SKY
+  TargetName         = Moon
   ProjectionName     = MyProjection
-  EquatorialRadius   = 1.0
-  PolarRadius        = 0.95
   LatitudeType       = Planetographic
   LongitudeDirection = PositiveEast
   LongitudeDomain    = 180

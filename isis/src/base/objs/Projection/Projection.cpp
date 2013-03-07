@@ -434,43 +434,51 @@ namespace Isis {
    */
 
   PvlGroup Projection::TargetRadii(QString target) {
-    // Convert the target name to a NAIF code
-    SpiceInt code;
-    SpiceBoolean found;
-    bodn2c_c(target.toAscii().data(), &code, &found);
-    if (!found) {
-      QString msg = "Could not convert target name [" + target +"] to NAIF code";
-      throw IException(IException::Io, msg, _FILEINFO_);
-    }
-
-    // Load the most recent target attitude and shape kernel for NAIF
-    FileName kern("$Base/kernels/pck/pck?????.tpc");
-    kern = kern.highestVersion();
-    QString kernName(kern.expanded());
-    furnsh_c(kernName.toAscii().data());
-
-    // Get the radii from NAIF
-    NaifStatus::CheckErrors();
-    SpiceInt n;
-    SpiceDouble radii[3];
-    bodvar_c(code, "RADII", &n, radii);
-    unload_c(kernName.toAscii().data());
-
-    try {
-      NaifStatus::CheckErrors();
-    }
-    catch (IException &e) {
-      throw IException(e,
-                       IException::Unknown,
-                       QObject::tr("The target name [%1] does not correspond to a target body "
-                                   "with known radii").arg(target),
-                       _FILEINFO_);
-    }
+    static QMap<QString, PvlGroup> cachedResults;
 
     PvlGroup mapping("Mapping");
-    mapping += PvlKeyword("TargetName",  target);
-    mapping += PvlKeyword("EquatorialRadius",  toString(radii[0] * 1000.0), "meters");
-    mapping += PvlKeyword("PolarRadius", toString(radii[2] * 1000.0), "meters");
+    if (!cachedResults.contains(target)) {
+      // Convert the target name to a NAIF code
+      SpiceInt code;
+      SpiceBoolean found;
+      bodn2c_c(target.toAscii().data(), &code, &found);
+      if (!found) {
+        QString msg = "Could not convert target name [" + target +"] to NAIF code";
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+
+      // Load the most recent target attitude and shape kernel for NAIF
+      FileName kern("$Base/kernels/pck/pck?????.tpc");
+      kern = kern.highestVersion();
+      QString kernName(kern.expanded());
+      furnsh_c(kernName.toAscii().data());
+
+      // Get the radii from NAIF
+      NaifStatus::CheckErrors();
+      SpiceInt n;
+      SpiceDouble radii[3];
+      bodvar_c(code, "RADII", &n, radii);
+      unload_c(kernName.toAscii().data());
+
+      try {
+        NaifStatus::CheckErrors();
+      }
+      catch (IException &e) {
+        throw IException(e,
+                         IException::Unknown,
+                         QObject::tr("The target name [%1] does not correspond to a target body "
+                                     "with known radii").arg(target),
+                         _FILEINFO_);
+      }
+
+      mapping += PvlKeyword("TargetName",  target);
+      mapping += PvlKeyword("EquatorialRadius",  toString(radii[0] * 1000.0), "meters");
+      mapping += PvlKeyword("PolarRadius", toString(radii[2] * 1000.0), "meters");
+      cachedResults[target] = mapping;
+    }
+    else {
+      mapping = cachedResults[target];
+    }
 
     return mapping;
   }
@@ -2161,39 +2169,17 @@ namespace Isis {
   PvlGroup Projection::Mapping() {
     PvlGroup mapping("Mapping");
 
-    if (m_mappingGrp.HasKeyword("TargetName")) {
-      mapping += m_mappingGrp["TargetName"];
-    }
+    QStringList keyNames;
+    keyNames << "TargetName" << "ProjectionName" << "EquatorialRadius" << "PolarRadius"
+             << "LatitudeType" << "LongitudeDirection" << "LongitudeDomain"
+             << "PixelResolution" << "Scale" << "UpperLeftCornerX" << "UpperLeftCornerY"
+             << "MinimumLatitude" << "MaximumLatitude" << "MinimumLongitude" << "MaximumLongitude"
+             << "Rotation";
 
-    mapping += m_mappingGrp["ProjectionName"];
-    mapping += m_mappingGrp["EquatorialRadius"];
-    mapping += m_mappingGrp["PolarRadius"];
-    mapping += m_mappingGrp["LatitudeType"];
-    mapping += m_mappingGrp["LongitudeDirection"];
-    mapping += m_mappingGrp["LongitudeDomain"];
-
-    if (m_mappingGrp.HasKeyword("PixelResolution")) {
-      mapping += m_mappingGrp["PixelResolution"];
-    }
-    if (m_mappingGrp.HasKeyword("Scale")) {
-      mapping += m_mappingGrp["Scale"];
-    }
-    if (m_mappingGrp.HasKeyword("UpperLeftCornerX")) {
-      mapping += m_mappingGrp["UpperLeftCornerX"];
-    }
-    if (m_mappingGrp.HasKeyword("UpperLeftCornerY")) {
-      mapping += m_mappingGrp["UpperLeftCornerY"];
-    }
-
-    if (HasGroundRange()) {
-      mapping += m_mappingGrp["MinimumLatitude"];
-      mapping += m_mappingGrp["MaximumLatitude"];
-      mapping += m_mappingGrp["MinimumLongitude"];
-      mapping += m_mappingGrp["MaximumLongitude"];
-    }
-
-    if (m_mappingGrp.HasKeyword("Rotation")) {
-      mapping += m_mappingGrp["Rotation"];
+    foreach (QString keyName, keyNames) {
+      if (m_mappingGrp.HasKeyword(keyName)) {
+        mapping += m_mappingGrp[keyName];
+      }
     }
 
     return mapping;
