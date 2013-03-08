@@ -106,6 +106,9 @@
     <change name="Janet Richie" date="2013-02-22">
       Documentation review.
     </change>
+    <change name="Janet Barrett" date="2013-03-07">
+      Updated code to meet standards. References #575.
+    </change>
   </history>
 
   <category>

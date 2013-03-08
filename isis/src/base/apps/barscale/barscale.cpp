@@ -4,12 +4,13 @@
 
 #include "Camera.h"
 #include "Cube.h"
+#include "IException.h"
+#include "Process.h"
 #include "ProgramLauncher.h"
 #include "Projection.h"
 #include "ProjectionFactory.h"
-#include "Process.h"
 #include "SpecialPixel.h"
-#include "IException.h"
+#include "UniversalGroundMap.h"
 
 #include <cmath>
 
@@ -22,302 +23,301 @@
 using namespace std;
 using namespace Isis;
 
-// Global variables
-Camera *cam;
-Projection *proj;
-bool noCamera;
-
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
 
   // Get the camera information if this is not a mosaic. Otherwise, get the
   // projection information
-  Process p1;
-  Cube *icube = p1.SetInputCube("FROM");
-  FileName sfile = FileName::createTempFile("barscale.tif");
-  QString scaletif = sfile.expanded();
-
-  noCamera = true;
-  try {
-    proj = icube->projection();
-  }
-  catch(IException &e) {
-    noCamera = false;
-    try {
-      cam = icube->camera();
-    }
-    catch(IException &e) {
-      QString msg = "Input file needs to have spiceinit run on it";
-      throw IException(e, IException::User, msg, _FILEINFO_);
-    }
-  } 
+  Process p;
+  Cube icube;
+  icube.open(ui.GetFileName("FROM") );
 
   // Determine where in image to get resolution from and get it
-  int nsamps = icube->sampleCount();
-  int nlines = icube->lineCount();
-  int nbands = icube->bandCount();
-  double samp, line;
+  int numSamps = icube.sampleCount();
+  int numLines = icube.lineCount();
+  int numBands = icube.bandCount();
+  double sampForResolution, lineForResolution;
   if (ui.GetString("PIXRES").toUpper() == "USER") {
-    samp = ui.GetDouble("SAMPLE");
-    line = ui.GetDouble("LINE");
+    sampForResolution = ui.GetDouble("SAMPLE");
+    lineForResolution = ui.GetDouble("LINE");
   }
   else {
-    samp = nsamps / 2.0;
-    line = nlines / 2.0;
+    sampForResolution = (numSamps / 2.0) + .5;
+    lineForResolution = (numLines / 2.0) + .5;
   }
 
-  bool isGood = false;
-  double resolution;
-  if (noCamera) {
-    proj->SetWorld(samp, line);
-    if (proj->IsGood()) {
-      isGood = true;
-      resolution = proj->Resolution();
-    }
-  }
-  else {
-    cam->SetImage(samp, line);
-    if (cam->HasSurfaceIntersection()) {
-      isGood = true;
-      resolution = cam->PixelResolution();
-    }
-  }
-  if (!isGood) {
-    QString msg = "Unable to obtain resolution from input image at location specified";
-    throw IException(IException::User, msg, _FILEINFO_);
-  }
+  UniversalGroundMap groundMap(icube);
+  groundMap.SetImage(sampForResolution, lineForResolution);
+  double resolution = groundMap.Resolution();
 
   // Determine the unit of measure used to create the scale and the limit for the
   // right and left sides of the scale
   QString units = ui.GetString("UNITS").toUpper();
-  double rlimit = ui.GetInteger("RIGHTLIMIT");
-  double llimit = ui.GetInteger("LEFTLIMIT");
+  double rightLimit = ui.GetInteger("RIGHTLIMIT");
+  double leftLimit = ui.GetInteger("LEFTLIMIT");
 
   // Determine how many segments will be in right and left sides of the scale
-  int rsegs = ui.GetInteger("RIGHTSEGS");
-  int lsegs = 0;
-  if (llimit > 0) {
-    if (ui.WasEntered("LEFTSEGS")) {
-      lsegs = ui.GetInteger("LEFTSEGS");
+  int rightSegs = ui.GetInteger("RIGHTSEGS");
+  int leftSegs = 0;
+  if (leftLimit > 0) {
+    if (ui.WasEntered("LEFTSEGS") ) {
+      leftSegs = ui.GetInteger("LEFTSEGS");
     }
     else {
-      QString msg = "Number of segments was not specified for left side of scale - must be at least 1";
+      QString msg = "Number of segments was not specified for left side of scale - "
+                    "must be at least 1";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
 
-  // Determine the units of measurement for the scale bar
-  double scunit;
+  // Determine the units of measurement for the scale bar - the resolution provided
+  // by ISIS is in meters/pixel.
+  double scaleUnit;
   if (units == "KILOMETER") {
-    scunit = 1000.0;
+    scaleUnit = 1000.0;
   }
   else {
-    scunit = 1.0;
+    scaleUnit = 1.0;
   }
 
-  // Determine where the bar scale will be placed in the image
-  bool padimage = false;
-  QString padloc;
-  int cornerline = 0;
-  int cornersample = 0;
-  int placeline = 0;
-  int placesample = 0;
-  if (ui.GetBoolean("PADIMAGE")) {
-    padimage = true;
-    padloc = ui.GetString("PLACEMENT").toUpper();  
+  // Determine where the bar scale will be placed in the image.
+  // cornerLine,cornerSample keep track of lower left corner of bar scale
+  // placeLine,placeSample keep track of upper left corner of bar scale
+  bool padImage = false;
+  QString padLocation;
+  int cornerLine = 0;
+  int cornerSample = 0;
+  int placeLine = 0;
+  int placeSample = 0;
+  if (ui.GetBoolean("PADIMAGE") ) {
+    padImage = true;
+    padLocation = ui.GetString("PLACEMENT").toUpper();  
   }
   else {
-    if (!ui.WasEntered("CORNERLINE") || !ui.WasEntered("CORNERSAMPLE")) {
+    if (!ui.WasEntered("CORNERLINE") || !ui.WasEntered("CORNERSAMPLE") ) {
       QString msg = "The upper left placement of the scale bar must be specified ";
       msg = msg + "if you are not padding the image.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
-    placeline = ui.GetInteger("CORNERLINE");
-    placesample = ui.GetInteger("CORNERSAMPLE");
+    placeLine = ui.GetInteger("CORNERLINE");
+    placeSample = ui.GetInteger("CORNERSAMPLE");
   }
 
   // Determine width/height of the scale based on the resolution that the bar 
   // scale will be printed at
-  int barheight = ui.GetInteger("BARHEIGHT");
-  if (barheight < 5) {
+  int barHeight = ui.GetInteger("BARHEIGHT");
+  if (barHeight < 5) {
     QString msg = "Requested BARHEIGHT is too small to produce a bar scale";
     throw IException(IException::User, msg, _FILEINFO_);
   }
-  int barwidth = ((rlimit + llimit) * scunit) / resolution + .5;
+  int barWidth = ( (rightLimit + leftLimit) * scaleUnit) / resolution + .5;
 
   // Determine how many pixels are needed to make up each component of the bar
   // scale. The amount of pixels available are determined by height. Each 
   // component takes up a specified percentage of the available pixels. Extra
   // pixels need to be divided between the horizontal measurement line and the
   // space around it.
-  int bndline = .083 * barheight;
-  if (bndline < 1) bndline = 1;
-  int midline = .166 * barheight;
-  if (midline < 1) midline = 1;
-  int spacing = .333 * barheight;
+  //
+  // The following measurements for the line weights making up the bar scale
+  // were taken from the http://pubs.usgs.gov/of/1999/of99-430/of99-430_sec35.pdf
+  // document of USGS standards:
+  //
+  //                 --  |--------------------|--------------------| <--  8.3%
+  //               33.3% |                    |                    |  "
+  //           16.6% --> |====================|                    | 83.4%
+  //               33.3% |                    |                    |  "
+  //                 --  |--------------------|--------------------| <--  8.3%
+  //                                          ^
+  //                                          |
+  //                                         8.3%
+  //
+  // Each exterior horizontal line takes up 8.3% of the total height of the bar
+  // scale. All vertical lines have the same weight as the exterior horizontal lines.
+  // Interior horizontal lines take up 16.6% of the total height of the bar
+  // scale. The remaining 66.6% of the total height of the bar scale is evenly
+  // divided among the space between the interior horizontal line and the exterior 
+  // horizontal lines.
+  //
+  int bndLine = .083 * barHeight;
+  if (bndLine < 1) bndLine = 1;
+  int midLine = .166 * barHeight;
+  if (midLine < 1) midLine = 1;
+  int spacing = .333 * barHeight;
   if (spacing < 1) spacing = 1;
-  int topspace = spacing;
-  int botspace = spacing;
-  int total = 2*bndline + midline + 2*spacing;
-  if (spacing > 2*midline) {
-    while (spacing > 2*midline && total < barheight) {
-      midline = midline + 1;
+  int topSpace = spacing;
+  int botSpace = spacing;
+  int total = 2 * bndLine + midLine + 2 * spacing;
+  if (spacing > (2 * midLine) ) {
+    while (spacing > (2 * midLine) && total < barHeight) {
+      midLine = midLine + 1;
       total = total + 1; 
     }
-    if (total < barheight) {
-      while (total < barheight) {
-        topspace = topspace + 1;
+    if (total < barHeight) {
+      while (total < barHeight) {
+        topSpace = topSpace + 1;
         total = total + 1;
-        if (total < barheight) {
-          botspace = botspace + 1;
+        if (total < barHeight) {
+          botSpace = botSpace + 1;
           total = total + 1;
         }
-        if (total < barheight && topspace > 2*midline) {
-          midline = midline + 1;
+        if (total < barHeight && topSpace > (2 * midLine) ) {
+          midLine = midLine + 1;
           total = total + 1;
         }
       }
     }
   }
 
-  QString bkgrnd = ui.GetString("BACKGROUND").toUpper();
-  int textht = ui.GetInteger("TEXTHEIGHT");
-  QString textloc = ui.GetString("TEXTLOC").toUpper();
+  // Get user's preferences for background color and text size and
+  // location
+  QString backGround = ui.GetString("BACKGROUND").toUpper();
+  int textHt = ui.GetInteger("TEXTHEIGHT");
+  QString textLoc = ui.GetString("TEXTLOC").toUpper();
 
+  // Try to force text to have no anti aliasing. This may not be
+  // possible, so a check is made later on to determine if the data
+  // needs to be stretched to force it into a non anti aliased state.
   QFont font;
-  font.setPixelSize(textht);
+  font.setPixelSize(textHt);
   font.setStyleStrategy(QFont::NoAntialias);
   QFontMetrics metric(font);
-  int fheight = metric.height();
-  int totalheight = barheight + fheight + 16;
+  int fontHeight = metric.height();
+
+  // There are 8 pixels between the bar scale and the edge of the
+  // image, 4 pixels between the bar scale and the text, and 4 pixels
+  // between the text and the edge of the image. This accounts for the
+  // 16 extra pixels used in the totalHeight calculation.
+  int totalHeight = barHeight + fontHeight + 16;
 
   // If there is no left side to the scale bar, then "0"
   // will be the text character that occurs at the left side
-  // of the scale bar - set cornersample in slightly to make
+  // of the scale bar - set cornerSample in slightly to make
   // room for the digit "0" plus some space between the left
-  // edge and the "0"
-  cornersample = (textht+1)/2 + 10;
-  int imgsamps;
-  spacing = (textht + 6) / 7;
-  if (spacing < 1) spacing = 1;
-  int totalwidth = barwidth + (textht+1)/2 + 10;
+  // edge and the "0". 
+  // A starting totalWidth is calculated, but will be updated
+  // to account for text on left and right sides of bar scale.
+  cornerSample = (textHt + 1) / 2 + 10;
+  int totalWidth = barWidth + cornerSample;
+  int imgSamps = 0;
 
-  if (padimage) {
-    imgsamps = nsamps;
-  }
-  else {
-    imgsamps = totalwidth;
+  if (padImage) {
+    imgSamps = numSamps;
   }
 
-  if (padimage) {
-    if (padloc == "LEFT") {
-      cornersample = (textht+1)/2 + 10;
-    }
-    else if (padloc == "CENTER") {
-      cornersample = imgsamps/2 - barwidth/2;
+  if (padImage) {
+    if (padLocation == "CENTER") {
+      cornerSample = numSamps / 2 - barWidth / 2;
     }
   }
 
-  // Center line of text area is calculated help in placing
-  // the text display area rectangles
-  int textctrline = (fheight + 8) / 2;
-  if (textloc == "BELOW") {
-    textctrline = textctrline + barheight + 8;
+  // Center line of text area is calculated to help in placing
+  // the text display area rectangles - allow for 4 pixels above
+  // and below the text
+  int textCtrLine = (fontHeight + 8) / 2;
+  if (textLoc == "BELOW") {
+    textCtrLine = textCtrLine + barHeight + 8;
   } 
 
-  QRect ctrdisplayarea;
-  QRect leftdisplayarea;
-  QRect rightdisplayarea;
-  QString lblstr;
-  int lblstrwidth;
-  if (llimit > 0) {
-    lblstr.setNum(llimit);
-    lblstrwidth = metric.width(lblstr);
-    totalwidth = totalwidth + lblstrwidth/2;
-    cornersample = cornersample + lblstrwidth/2;
-    leftdisplayarea.setRect(cornersample-lblstrwidth/2,textctrline-fheight/2-2,
-                            lblstrwidth+10,fheight+8);
+  // Define rectangles to contain text at left, center, and right locations in bar scale
+  QRect ctrDisplayRect;
+  QRect leftDisplayRect;
+  QRect rightDisplayRect;
+  QString lblStr;
+  int lblStrWidth;
+  if (leftLimit > 0) {
+    lblStr.setNum(leftLimit);
+    lblStrWidth = metric.width(lblStr);
+    totalWidth = totalWidth + lblStrWidth / 2;
+    cornerSample = cornerSample + lblStrWidth / 2;
+    leftDisplayRect.setRect( ( cornerSample - lblStrWidth / 2), (textCtrLine - fontHeight / 2 - 2),
+                            (lblStrWidth + 10), (fontHeight + 8) );
   }
-  lblstrwidth = metric.width("0");
-  ctrdisplayarea.setRect(cornersample+llimit*scunit/resolution+.5-lblstrwidth/2,textctrline-fheight/2-2,
-                         lblstrwidth+10,fheight+8);
+  lblStrWidth = metric.width("0");
+  ctrDisplayRect.setRect( (cornerSample + leftLimit * scaleUnit / resolution + .5 - lblStrWidth / 2),
+                         (textCtrLine - fontHeight / 2 - 2), (lblStrWidth + 10), (fontHeight + 8) );
 
-  lblstr.setNum(rlimit);
-  QString unitstr;
+  lblStr.setNum(rightLimit);
+  QString unitStr;
   if (units == "KILOMETER") {
-    unitstr = "KILOMETER";
-    if (rlimit > 1) {
-      unitstr = "KILOMETERS";
+    unitStr = "KILOMETER";
+    if (rightLimit > 1) {
+      unitStr = "KILOMETERS";
     }
   }
   else {
-    unitstr = "METER";
-    if (rlimit > 1) {
-      unitstr = "METERS";
+    unitStr = "METER";
+    if (rightLimit > 1) {
+      unitStr = "METERS";
     }
   }
-  lblstr = lblstr + " " + unitstr;
-  lblstrwidth = metric.width(lblstr);
-  totalwidth = totalwidth + lblstrwidth + (textht+1)/2 + 10;
-  rightdisplayarea.setRect(barwidth+cornersample-lblstrwidth/2,textctrline-fheight/2-2,lblstrwidth+30,fheight+8);
+  lblStr = lblStr + " " + unitStr;
+  lblStrWidth = metric.width(lblStr);
+  totalWidth = totalWidth + lblStrWidth + (textHt + 1) / 2 + 10;
+  rightDisplayRect.setRect( (barWidth + cornerSample - lblStrWidth / 2), 
+                           (textCtrLine - fontHeight / 2 - 2),
+                           (lblStrWidth + 30), (fontHeight + 8) );
 
   // Make sure text does not overlap
-  if (llimit > 0) {
-    if (leftdisplayarea.right() > ctrdisplayarea.left()) {
-      int diff = leftdisplayarea.right() - ctrdisplayarea.left();
-      leftdisplayarea.setRect(leftdisplayarea.left()-diff,leftdisplayarea.top(),
-                              leftdisplayarea.width(),leftdisplayarea.height());
+  if (leftLimit > 0) {
+    if (leftDisplayRect.right() > ctrDisplayRect.left() ) {
+      int diff = leftDisplayRect.right() - ctrDisplayRect.left();
+      leftDisplayRect.setRect( (leftDisplayRect.left() - diff), leftDisplayRect.top(),
+                              leftDisplayRect.width(), leftDisplayRect.height() );
     }
   }
-  if (ctrdisplayarea.right() > rightdisplayarea.left()) {
-    int diff = ctrdisplayarea.right() - rightdisplayarea.left();
-    rightdisplayarea.setRect(rightdisplayarea.left()+diff,rightdisplayarea.top(),
-                             rightdisplayarea.width(),rightdisplayarea.height());
-  }
-  if (llimit > 0) {
-    totalwidth = rightdisplayarea.right() - leftdisplayarea.left() + 12;
-  }
-  else {
-    totalwidth = rightdisplayarea.right() - ctrdisplayarea.left() + 12;
+  if (ctrDisplayRect.right() > rightDisplayRect.left() ) {
+    int diff = ctrDisplayRect.right() - rightDisplayRect.left();
+    rightDisplayRect.setRect( (rightDisplayRect.left() + diff), rightDisplayRect.top(),
+                             rightDisplayRect.width(), rightDisplayRect.height());
   }
 
-  if (padimage) {
-    if (padloc == "RIGHT") {
-      cornersample = nsamps - 10 - totalwidth;
+  // Define total width of bar scale including the text. Add 6 pixels of padding on
+  // each side.
+  if (leftLimit > 0) {
+    totalWidth = rightDisplayRect.right() - leftDisplayRect.left() + 12;
+  }
+  else {
+    totalWidth = rightDisplayRect.right() - ctrDisplayRect.left() + 12;
+  }
+
+  if (padImage) {
+    if (padLocation == "RIGHT") {
+      cornerSample = numSamps - 10 - totalWidth;
     }
   }
 
-  if (textloc == "ABOVE") {
-    cornerline = totalheight - 8;
+  if (textLoc == "ABOVE") {
+    cornerLine = totalHeight - 8;
   }
   else {
-    cornerline = barheight + 8;
+    cornerLine = barHeight + 8;
   }
 
-  QImage myQImage;
-  if (totalwidth > imgsamps) {
-    myQImage = QImage(totalwidth, totalheight, QImage::Format_RGB32);
+  // Set up the image that will contain the bar scale.
+  QImage barScaleQImage;
+  if (totalWidth > imgSamps) {
+    barScaleQImage = QImage(totalWidth, totalHeight, QImage::Format_RGB32);
   }
   else {
-    myQImage = QImage(imgsamps, totalheight, QImage::Format_RGB32);
+    barScaleQImage = QImage(imgSamps, totalHeight, QImage::Format_RGB32);
   }
-  if (bkgrnd == "WHITE") {
-    myQImage.fill(qRgb(255, 255, 255));
+  if (backGround == "WHITE") {
+    barScaleQImage.fill(qRgb(255, 255, 255) );
   }
   else {
-    myQImage.fill(qRgb(0, 0, 0));
+    barScaleQImage.fill(qRgb(0, 0, 0) );
   }
 
-  QPainter painter(&myQImage);
+  QPainter painter(&barScaleQImage);
 
   painter.setRenderHint(QPainter::Antialiasing, false);
 
   QPen pen;
-  if (bkgrnd == "WHITE") {
-    pen.setColor(qRgb(0, 0, 0));
+  if (backGround == "WHITE") {
+    pen.setColor(qRgb(0, 0, 0) );
   }
   else {
-    pen.setColor(qRgb(255, 255, 255));
+    pen.setColor(qRgb(255, 255, 255) );
   }
   pen.setStyle(Qt::SolidLine);
   pen.setWidth(1);
@@ -326,175 +326,186 @@ void IsisMain() {
   // Need to keep track of location of vertical division
   // lines so horizontal lines can be drawn without 
   // overshooting them
-  QVector<int> vertline;
-  vertline.push_back(cornersample);
+  QVector<int> vertLine;
+  vertLine.push_back(cornerSample);
 
-  // Draw outline
-  QPoint pt1(cornersample,cornerline);
-  QPoint pt2(barwidth+cornersample,cornerline);
-  for (int i=0; i<bndline; i++) {
-    pt1.setY(cornerline-i);
-    pt2.setY(cornerline-i);
-    painter.drawLine(pt1,pt2);
+  // Draw outline of the bar scale
+  QPoint pt1(cornerSample, cornerLine);
+  QPoint pt2( (barWidth + cornerSample), cornerLine);
+  for (int i = 0; i < bndLine; i++) {
+    pt1.setY(cornerLine - i);
+    pt2.setY(cornerLine - i);
+    painter.drawLine(pt1, pt2);
   }
-  pt1.setY(cornerline);
-  pt2.setY(cornerline-barheight+1);
-  for (int i=0; i<bndline; i++) {
-    pt1.setX(cornersample+i);
-    pt2.setX(cornersample+i);
-    painter.drawLine(pt1,pt2);
+  pt1.setY(cornerLine);
+  pt2.setY(cornerLine - barHeight + 1);
+  for (int i = 0; i < bndLine; i++) {
+    pt1.setX(cornerSample + i);
+    pt2.setX(cornerSample + i);
+    painter.drawLine(pt1, pt2);
   }
-  pt1.setX(barwidth+cornersample);
-  pt2.setX(cornersample);
-  for (int i=0; i<bndline; i++) {
-    pt1.setY(cornerline-barheight+1+i);
-    pt2.setY(cornerline-barheight+1+i);
-    painter.drawLine(pt1,pt2);
+  pt1.setX(barWidth + cornerSample);
+  pt2.setX(cornerSample);
+  for (int i = 0; i < bndLine; i++) {
+    pt1.setY(cornerLine - barHeight + 1 + i);
+    pt2.setY(cornerLine - barHeight + 1 + i);
+    painter.drawLine(pt1, pt2);
   }
-  pt1.setY(cornerline-barheight+1);
-  pt2.setY(cornerline);
-  for (int i=0; i<bndline; i++) {
-    pt1.setX(barwidth+cornersample+i);
-    pt2.setX(barwidth+cornersample+i);
-    painter.drawLine(pt1,pt2);
+  pt1.setY(cornerLine - barHeight + 1);
+  pt2.setY(cornerLine);
+  for (int i = 0; i < bndLine; i++) {
+    pt1.setX(barWidth + cornerSample + i);
+    pt2.setX(barWidth + cornerSample +i);
+    painter.drawLine(pt1, pt2);
   }
   // Draw center line of barscale (only for left limit)
-  if (llimit > 0.0) {
-    vertline.insert(1, cornersample+llimit*scunit/resolution+.5);
-    pt1.setY(cornerline-barheight+1);
-    pt2.setY(cornerline);
-    for (int i=0; i<bndline; i++) {
-      pt1.setX(cornersample+llimit*scunit/resolution+.5+i);
-      pt2.setX(cornersample+llimit*scunit/resolution+.5+i);
-      painter.drawLine(pt1,pt2);
+  if (leftLimit > 0.0) {
+    vertLine.insert(1, (cornerSample + leftLimit * scaleUnit / resolution + .5) );
+    pt1.setY(cornerLine - barHeight + 1);
+    pt2.setY(cornerLine);
+    for (int i = 0; i < bndLine; i++) {
+      pt1.setX(cornerSample + leftLimit * scaleUnit / resolution + .5 + i);
+      pt2.setX(cornerSample + leftLimit * scaleUnit / resolution + .5 + i);
+      painter.drawLine(pt1, pt2);
     }
   }
   // Draw segment marks in left and right sides of bar scale
-  if (llimit > 0.0 && lsegs > 0) {
-    double ticspace = (llimit*scunit/resolution)/lsegs;
-    pt1.setY(cornerline-barheight+1);
-    pt2.setY(cornerline);
-    for (int i=1; i<lsegs; i++) {
-      vertline.insert(i, cornersample+ticspace*i);
-      for (int j=0; j<bndline; j++) {
-        pt1.setX(cornersample+ticspace*i+j);
-        pt2.setX(cornersample+ticspace*i+j);
-        painter.drawLine(pt1,pt2);
+  if (leftLimit > 0.0 && leftSegs > 0) {
+    double ticSpace = (leftLimit * scaleUnit / resolution) / leftSegs;
+    pt1.setY(cornerLine - barHeight + 1);
+    pt2.setY(cornerLine);
+    for (int i = 1; i < leftSegs; i++) {
+      vertLine.insert(i, (cornerSample + ticSpace * i) );
+      for (int j = 0; j < bndLine; j++) {
+        pt1.setX(cornerSample + ticSpace * i + j);
+        pt2.setX(cornerSample + ticSpace * i + j);
+        painter.drawLine(pt1, pt2);
       }
     }
   }
-  if (rsegs > 0) {
-    double ticspace = (rlimit*scunit/resolution)/rsegs;
-    pt1.setY(cornerline-barheight+1);
-    pt2.setY(cornerline);
-    for (int i=1; i<rsegs; i++) {
-      vertline.insert(vertline.size(), cornersample+llimit*scunit/resolution+ticspace*i);
-      for (int j=0; j<bndline; j++) {
-        pt1.setX(cornersample+llimit*scunit/resolution+ticspace*i+j);
-        pt2.setX(cornersample+llimit*scunit/resolution+ticspace*i+j);
-        painter.drawLine(pt1,pt2);
+  if (rightSegs > 0) {
+    double ticSpace = (rightLimit * scaleUnit / resolution) / rightSegs;
+    pt1.setY(cornerLine - barHeight + 1);
+    pt2.setY(cornerLine);
+    for (int i = 1; i < rightSegs; i++) {
+      vertLine.insert(vertLine.size(), 
+                      (cornerSample + leftLimit * scaleUnit / resolution + ticSpace * i) );
+      for (int j = 0; j < bndLine; j++) {
+        pt1.setX(cornerSample + leftLimit * scaleUnit / resolution + ticSpace * i + j);
+        pt2.setX(cornerSample + leftLimit * scaleUnit / resolution + ticSpace * i + j);
+        painter.drawLine(pt1, pt2);
       }
     }
   }
 
-  vertline.push_back(cornersample+barwidth);
+  vertLine.push_back(cornerSample + barWidth);
   // Draw horizontal measurement lines
-  int vertlineidx = 0;
-  for (int i=0; i<lsegs; i+=2) {
-    pt1.setX(vertline[i]);
-    pt2.setX(vertline[i+1]);
-    vertlineidx = i + 2;
-    for (int j=0; j<midline; j++) {
-      pt1.setY(cornerline-bndline-botspace-j);
-      pt2.setY(cornerline-bndline-botspace-j);
-      painter.drawLine(pt1,pt2);
+  int vertLineIdx = 0;
+  for (int i = 0; i < leftSegs; i+=2) {
+    pt1.setX(vertLine[i]);
+    pt2.setX(vertLine[i + 1]);
+    vertLineIdx = i + 2;
+    for (int j = 0; j < midLine; j++) {
+      pt1.setY(cornerLine - bndLine - botSpace - j);
+      pt2.setY(cornerLine - bndLine - botSpace - j);
+      painter.drawLine(pt1, pt2);
     }
   }
-  int starttic = 0;
-  if ((lsegs%2)*2 != lsegs && (lsegs%2) != 0) {
-    starttic = 1;
+  int startTic = 0;
+  if ( ( (leftSegs % 2)* 2) != leftSegs && (leftSegs % 2) != 0) {
+    startTic = 1;
   }
-  for (int i=starttic; i<rsegs; i+=2) {
-    pt1.setX(vertline[vertlineidx]);
-    pt2.setX(vertline[vertlineidx+1]);
-    vertlineidx = vertlineidx + 2;
-    for (int j=0; j<midline; j++) {
-      pt1.setY(cornerline-bndline-botspace-j);
-      pt2.setY(cornerline-bndline-botspace-j);
-      painter.drawLine(pt1,pt2);
+  for (int i = startTic; i < rightSegs; i+=2) {
+    pt1.setX(vertLine[vertLineIdx]);
+    pt2.setX(vertLine[vertLineIdx + 1]);
+    vertLineIdx = vertLineIdx + 2;
+    for (int j = 0; j < midLine; j++) {
+      pt1.setY(cornerLine - bndLine - botSpace - j);
+      pt2.setY(cornerLine - bndLine - botSpace - j);
+      painter.drawLine(pt1, pt2);
     }
   }
 
+  // Write text that goes with the bar scale
   font.setStyleStrategy(QFont::NoAntialias);
   painter.setFont(font);
   painter.setLayoutDirection(Qt::LeftToRight);
-  if (llimit > 0) {
-    lblstr.setNum(llimit);
-    lblstrwidth = metric.width(lblstr);
-    painter.drawText(leftdisplayarea,lblstr);
+  if (leftLimit > 0) {
+    lblStr.setNum(leftLimit);
+    lblStrWidth = metric.width(lblStr);
+    painter.drawText(leftDisplayRect, lblStr);
   }
-  lblstr.setNum(0);
-  lblstrwidth = metric.width(lblstr);
-  painter.drawText(ctrdisplayarea,lblstr);
-  lblstr.setNum(rlimit);
-  lblstr = lblstr + " " + unitstr;
-  painter.drawText(rightdisplayarea,lblstr);
+  lblStr.setNum(0);
+  lblStrWidth = metric.width(lblStr);
+  painter.drawText(ctrDisplayRect, lblStr);
+  lblStr.setNum(rightLimit);
+  lblStr = lblStr + " " + unitStr;
+  painter.drawText(rightDisplayRect, lblStr);
 
-  QString infile = ui.GetFileName("FROM");
-  QString outfile = ui.GetFileName("TO");
-  sfile = FileName::createTempFile("barscale.cub");
-  QString scalecub = sfile.expanded();
-  myQImage.save(scaletif,"TIFF",100);
+  QString inFile = ui.GetFileName("FROM");
+  QString outFile = ui.GetFileName("TO");
+  FileName tmpBarFile = FileName::createTempFile("barscale.tif");
+  QString scaleTif = tmpBarFile.expanded();
+  tmpBarFile = FileName::createTempFile("barscale.cub");
+  QString scaleCub = tmpBarFile.expanded();
+  barScaleQImage.save(scaleTif, "TIFF", 100);
 
   // Convert bar scale to ISIS cube
-  QString parameters = "FROM=" + scaletif + " TO=" + scalecub + " MODE=GRAYSCALE";
+  QString parameters = "FROM=" + scaleTif + " TO=" + scaleCub + " MODE=GRAYSCALE";
   ProgramLauncher::RunIsisProgram("std2isis", parameters);
-  Cube scube;
-  scube.open(scalecub, "r");
-  Statistics *stats = scube.statistics(1);
-  sfile = FileName::createTempFile("barscalestr.cub");
-  QString scalestrcub = sfile.expanded();
+
+  // When this program is run from the command line, it cannot alter the default
+  // font used by the Qt Gui interface. As a result, it is possible to get a font
+  // that is antialiased. The following code stretches the antialiased font so that
+  // it is no longer antialiased.
+  Cube tmpCube;
+  tmpCube.open(scaleCub, "r");
+  Statistics *stats = tmpCube.statistics(1);
+  tmpBarFile = FileName::createTempFile("barscalestr.cub");
+  QString scaleStrCub = tmpBarFile.expanded();
   if (stats->ValidPixels() > 0) {
-    parameters = "FROM=" + scalecub + " TO=" + scalestrcub + " NULLMIN=0 NULLMAX=130" +
+    parameters = "FROM=" + scaleCub + " TO=" + scaleStrCub + " NULLMIN=0 NULLMAX=130" +
                  " HRSMIN=131 HRSMAX=255"; 
   }
   else {
-    parameters = "FROM=" + scalecub + " TO=" + scalestrcub + " NULLMIN=0 NULLMAX=0" +
+    parameters = "FROM=" + scaleCub + " TO=" + scaleStrCub + " NULLMIN=0 NULLMAX=0" +
                  " HRSMIN=255 HRSMAX=255";
   }
   delete stats;
   ProgramLauncher::RunIsisProgram("specpix", parameters);
 
-  if (!padimage) {
+  // Need to mosaic the bar scale on top of the image if requested
+  if (!padImage) {
     // Paste bar scale onto image
-    int pasteline = placeline;
-    for (int i=1; i<=nbands; i++) {
+    for (int i = 1; i <= numBands; i++) {
       if (i == 1) {
-        parameters = "FROM=" + infile + " MOSAIC=" + outfile + " PRIORITY=ONTOP OUTSAMPLE=1" +
+        parameters = "FROM=" + inFile + " MOSAIC=" + outFile + " PRIORITY=ONTOP OUTSAMPLE=1" +
                      " OUTLINE=1" + " OUTBAND=1" + " MATCHBANDBIN=NO CREATE=YES" +
-                     " NSAMPLES=" + toString(nsamps) + " NLINES=" + toString(nlines) +
-                     " NBANDS=" + toString(nbands);
+                     " NSAMPLES=" + toString(numSamps) + " NLINES=" + toString(numLines) +
+                     " NBANDS=" + toString(numBands);
         ProgramLauncher::RunIsisProgram("handmos", parameters);
       }
-      parameters = "FROM=" + scalestrcub + " MOSAIC=" + outfile + " PRIORITY=ONTOP OUTSAMPLE=" +
-                   toString(placesample) + " OUTLINE=" + toString(pasteline) + " OUTBAND=" + 
+      parameters = "FROM=" + scaleStrCub + " MOSAIC=" + outFile + " PRIORITY=ONTOP OUTSAMPLE=" +
+                   toString(placeSample) + " OUTLINE=" + toString(placeLine) + " OUTBAND=" + 
                    toString(i) + " MATCHBANDBIN=NO NULL=YES HIGHSATURATION=YES";
       ProgramLauncher::RunIsisProgram("handmos", parameters);
     }
   }
 
-  // Pad image with bar scale
-  if (padimage) {
-    parameters = "FROM=" + infile + " TO=" + outfile + " BOTTOM=" + toString(totalheight);
+  // Need to pad the image with bar scale if requested
+  if (padImage) {
+    parameters = "FROM=" + inFile + " TO=" + outFile + " BOTTOM=" + toString(totalHeight);
     ProgramLauncher::RunIsisProgram("pad", parameters);
-    for (int i=1; i<=nbands; i++) {
-      parameters = "FROM=" + scalestrcub + " MOSAIC=" + outfile + " PRIORITY=ONTOP OUTSAMPLE=1" +
-                   " OUTLINE=" + toString(nlines+1) + " OUTBAND=" + toString(i) + " MATCHBANDBIN=NO " +
-                   " NULL=YES HIGHSATURATION=YES";
+    for (int i = 1; i <= numBands; i++) {
+      parameters = "FROM=" + scaleStrCub + " MOSAIC=" + outFile + " PRIORITY=ONTOP OUTSAMPLE=1" +
+                   " OUTLINE=" + toString(numLines+1) + " OUTBAND=" + toString(i) + 
+                   " MATCHBANDBIN=NO " + " NULL=YES HIGHSATURATION=YES";
       ProgramLauncher::RunIsisProgram("handmos", parameters);
     }
   }
-  QFile::remove(scaletif);
-  QFile::remove(scalecub);
-  QFile::remove(scalestrcub);
+
+  // Remove the temporary files
+  QFile::remove(scaleTif);
+  QFile::remove(scaleCub);
+  QFile::remove(scaleStrCub);
 }
