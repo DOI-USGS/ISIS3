@@ -146,7 +146,9 @@ namespace Isis {
     * @return double The center azimuth.
     */
   double Planar::CenterAzimuth() const {
-    return m_centerAzimuth;
+    double dir = 1.0;
+    if (m_azimuthDirection == Clockwise) dir = -1.0;
+    return m_centerAzimuth * RAD2DEG * dir;;
   }
 
 
@@ -218,8 +220,6 @@ namespace Isis {
     // Compute the coordinates
     double x = radius * cos(deltaAz);
     double y = radius * sin(deltaAz);
-//    double x = radius;
-//    double y = deltaLon;
 
     SetComputedXY(x, y);
     m_good = true;
@@ -244,11 +244,18 @@ namespace Isis {
     // Save the coordinate
     SetXY(x, y);
 
-    // compute radius and azimuth
+    // compute radius and azimuth in degrees
     m_radius = sqrt(x*x + y*y);
-    m_azimuth = atan2(y,x) * RAD2DEG;
-    if ( m_azimuth < 0.0 )
-      m_azimuth += 360.0;
+
+    if (y == 0.0) 
+      m_azimuth = m_azimuth;
+    else
+      m_azimuth = atan2(y,x)  + m_centerAzimuth;
+
+    m_azimuth *= RAD2DEG;
+
+    // if ( m_azimuth < 0.0 )
+    //   m_azimuth += 360.0;
 
     // Cleanup the azimuth
     if (m_azimuthDirection == Clockwise) m_azimuth *= -1.0;
@@ -400,6 +407,7 @@ namespace Isis {
 //cout << "MIN RAD: " << m_minimumRadius << " MAX LAT: " << m_maximumRadius << "\n";
     // Walk top and bottom edges in half pixel increments
     double radiusInc = 2. * (m_maximumRadius - m_minimumRadius) / PixelResolution();
+
     for (rad = m_minimumRadius; rad <= m_maximumRadius; rad += radiusInc) {
 //cout << "WALKED A STEP - rad: " << rad << "\n";
       rad = rad;
@@ -479,7 +487,10 @@ namespace Isis {
     PvlGroup mapping = RingPlaneProjection::Mapping();
 
     mapping += PvlKeyword("CenterRadius", toString(m_centerRadius));
-    mapping += PvlKeyword("CenterAzimuth", toString(m_centerAzimuth));
+    double dir = 1.0;
+    if (m_azimuthDirection == Clockwise) dir = -1.0;
+    double azDegrees = m_centerAzimuth*RAD2DEG*dir;
+    mapping += PvlKeyword("CenterAzimuth", toString(azDegrees));
 
     return mapping;
   }

@@ -41,7 +41,7 @@ namespace Isis {
    * @ingroup MapProjection
    * @see Equirectangular
    *
-   * @author 2003-01-29 Debbie A. Cook
+   * @author 2013-03-10 Debbie A. Cook
    *
    * @internal
    */
@@ -54,6 +54,7 @@ namespace Isis {
 
       QString Name() const;
       QString Version() const;
+      bool IsEquatorialCylindrical();
       double TrueScaleRadius() const;
 
       double CenterAzimuth() const;

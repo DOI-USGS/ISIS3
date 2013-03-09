@@ -625,10 +625,7 @@ namespace Isis {
 
 
   /**
-   * This method is u
-
-
-sed to determine the x/y range which completely covers the
+   * This method is used to determine the x/y range which completely covers the
    * area of interest specified by the rad/az range. The radius/azimuth
    * range may be obtained from the labels. This method should not be used if
    * HasGroundRange is false. The purpose of this method is to return the x/y

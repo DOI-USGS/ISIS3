@@ -75,7 +75,7 @@ namespace Isis {
    *   @history 2011-05-23 Jannet Barrett and Steven Lambright -
    *                         Added m_projPlugin to reduce cost of instantiating
    *                         Projections.
-   *   @history 2012-11-23 Debbie A. Cook - Modified to differentiate between
+   *   @history 2013-03-13 Debbie A. Cook - Modified to differentiate between
    *                         Project subclasses:  TProjection and RingPlaneProjection.
    */
   class ProjectionFactory {
@@ -83,7 +83,9 @@ namespace Isis {
       static Isis::Projection *Create(Isis::Pvl &label, bool allowDefaults = false);
       static Isis::Projection *RingsCreate(Isis::Pvl &label, bool allowDefaults = false);
       static Isis::Projection *CreateFromCube(Isis::Cube &cube);
+      static Isis::Projection *RingsCreateFromCube(Isis::Cube &cube);
       static Isis::Projection *CreateFromCube(Isis::Pvl &label); // Load Method in cm
+      static Isis::Projection *RingsCreateFromCube(Isis::Pvl &label); // Load Method in cm
       static Isis::Projection *CreateForCube(Isis::Pvl &label, int &ns, int &nl,
                                              bool sizeMatch = true); // Create method in cm
       static Isis::Projection *RingsCreateForCube(Isis::Pvl &label,

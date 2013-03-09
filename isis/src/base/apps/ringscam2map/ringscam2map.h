@@ -13,7 +13,8 @@ using namespace Isis;
 class ringscam2mapReverse : public Transform {
   private:
     Camera *p_incam;
-    Planar *p_outmap;
+    RingPlaneProjection *p_outmap;
+    //    Planar *p_outmap;
     int p_inputSamples;
     int p_inputLines;
     bool p_trim;
@@ -25,8 +26,10 @@ class ringscam2mapReverse : public Transform {
     ringscam2mapReverse(const int inputSamples, const int inputLines,
                    Camera *incam,
                    const int outputSamples, const int outputLines, 
-                   Planar *outmap,
+                   RingPlaneProjection *outmap,
                    bool trim);
+    //                   Planar *outmap,
+    //                   bool trim);
 
     // destructor
     ~ringscam2mapReverse() {};
@@ -46,7 +49,8 @@ class ringscam2mapReverse : public Transform {
 class ringscam2mapForward : public Transform {
   private:
     Camera *p_incam;
-    Planar *p_outmap;
+    RingPlaneProjection *p_outmap;
+    //    Planar *p_outmap;
     int p_inputSamples;
     int p_inputLines;
     bool p_trim;
@@ -58,8 +62,10 @@ class ringscam2mapForward : public Transform {
     ringscam2mapForward(const int inputSamples, const int inputLines,
                    Camera *incam,
                    const int outputSamples, const int outputLines, 
-                   Planar *outmap,
+                   RingPlaneProjection *outmap,
                    bool trim);
+    //                   Planar *outmap,
+    //                   bool trim);
 
     // destructor
     ~ringscam2mapForward() {};

@@ -232,8 +232,8 @@ namespace Isis {
       double UniversalAzimuth();
 
       // convert from world coordinate to projected coordinate
-      double ToProjectionX(const double worldX) const;
-      double ToProjectionY(const double worldY) const;
+      //      double ToProjectionX(const double worldX) const;
+      //      double ToProjectionY(const double worldY) const;
 
       // get resolution and scale for mapping world coordinates
       double Scale() const;

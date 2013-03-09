@@ -19,7 +19,7 @@ Projection version   = 1.0
   Minimum azimuth   = -20
   Maximum azimuth  = 130
   Center radius         = 200000
-  Center azimuth      = 0
+  Center azimuth      = -0
 
 Test TrueScaleRadius method...
 TrueScaleRadius = 200000
@@ -29,20 +29,20 @@ Setting ground to (1000.0,45.0)
 Radius:               1000
 Azimuth:              45
 XCoord:                 707.1067811865476
-YCoord:                 707.1067811865474
+YCoord:                 -707.1067811865474
 
 Test SetCoordinate method ... 
 Setting coordinate to (0.2617993877991494,-0.8726646259971648)
 Radius:               0.9110886174894191
-Azimuth:              -73.30075576600629
+Azimuth:              73.30075576600632
 XCoord:                 0.2617993877991494
 YCoord:                 -0.8726646259971648
 
 Test XYRange method ... 
-Minimum X:  734582.660909393
-Maximum X:  -734582.660909393
-Minimum Y:  1860211.900373524
-Maximum Y:  -1860211.900373524
+Minimum X:  -1285575.219373079
+Maximum X:  2000000
+Minimum Y:  -2000000
+Maximum Y:  684040.2866513374
 
 Test Name and comparision methods ... 
 Name:       Planar
@@ -76,28 +76,27 @@ Projection 3 parameters...
   Minimum azimuth   = -20
   Maximum azimuth  = 130
   Center radius         = 1000000
-  Center azimuth      = -0.9599310885968813
+  Center azimuth      = 0.9599310885968813
 
   Setting ground to (1000.0,45.0)
     Radius:             =  1000
     Azimuth:          =  45
     XCoord:           =  984.807753012208
-    YCoord:           =  173.6481776669304
+    YCoord:           =  -173.6481776669304
 
 Testing SetGround error condition...
   Setting ground to (-1000.0,45.0)
-**ERROR** Unable to set radius. The given radius value [-1000.0] is invalid.
 
-Testing more SetCoordinate method ... 
+Testing more SetCoordinate methods ... 
 Setting coordinate to (0.2617993877991494,-0.8726646259971648)
 Radius:               0.9110886174894191
-Azimuth:              73.30075576600632
+Azimuth:              286.6992442339936
 XCoord:                 0.2617993877991494
 YCoord:                 -0.8726646259971648
 
 Setting coordinate to (0.2617993877991494,0.8726646259971648)
 Radius:               0.9110886174894191
-Azimuth:              286.6992442339937
+Azimuth:              73.30075576600639
 XCoord:                 0.2617993877991494
 YCoord:                 0.8726646259971648
 
@@ -109,7 +108,7 @@ Projection 4 parameters...No range
   Azimuth direction  = CounterClockwise
   Azimuth domain    = 360
   Center radius         = 1000000
-  Center azimuth      = -0.9599310885968813
+  Center azimuth      = 0.9599310885968813
 
 Mapping() = 
 Group = Mapping

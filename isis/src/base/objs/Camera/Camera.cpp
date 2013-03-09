@@ -227,7 +227,7 @@ namespace Isis {
           }
         }
       }
-      else { // shape is Plane
+      else { // shape is ring plane
         if(p_projection->SetWorld(sample, line)) {
           RingPlaneProjection *rproj = (RingPlaneProjection *) p_projection;
           lat = Latitude(0.0, Angle::Degrees);
@@ -391,8 +391,9 @@ namespace Isis {
               return true;
             }
           }
-          else { // this should work for rings too
-            // TODO change UniversalLongitude to azimuth???
+          else { // ring plane
+            // UniversalLongitude should return azimuth in this case TODO: when we make the change to real azimuths
+            // this value may need to be adjusted or code changed in the shapemodel or surfacepoint class.
             if (p_projection->SetUniversalGround(LocalRadius().kilometers(), UniversalLongitude())) {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
@@ -510,7 +511,7 @@ namespace Isis {
    */
   void Camera::GroundRangeResolution() {
     // Software adjustment is needed if we get here -- call RingRangeResolution instead
-    if (target()->shape()->name() != "Plane") {
+    if (target()->shape()->name() == "Plane") {
       IString msg = "Images with plane targets should use Camera method RingRangeResolution ";
       msg += "instead of GroundRangeResolution";
       throw IException(IException::Programmer, msg, _FILEINFO_);

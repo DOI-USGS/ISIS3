@@ -125,6 +125,21 @@ namespace Isis {
     return "1.0";
   }
 
+
+  /**
+   * This method returns true if the projection is
+   *   equatorial cylindrical. In other words, if the
+   *   projection is cylindrical and an image projected at 0 is
+   *   the same as an image projected at 360.
+   *
+   *
+   * @return bool true if the projection is equatorial cylindrical
+   */
+  bool RingCylindrical::IsEquatorialCylindrical() {
+    return true;
+  }
+
+
    /**
     * Returns the center radius, in meters.
     *
@@ -242,7 +257,7 @@ namespace Isis {
     // m_azimuth = m_centerAzimuth + GetX();
 
     // Convert to degrees
-    m_azimuth *= 180.0 / PI;
+    m_azimuth *= RAD2DEG;
 
     // Cleanup the azimuth
     if (m_azimuthDirection == Clockwise) m_azimuth *= -1.0;
@@ -293,17 +308,87 @@ namespace Isis {
    */
   bool RingCylindrical::XYRange(double &minX, double &maxX, 
                            double &minY, double &maxY) {
-    if (minX == Null || maxX == Null || minY == Null || maxY == Null) {
-      return false;
+    
+    double rad, az;
+
+    // Check the corners of the rad/az range
+    XYRangeCheck(m_minimumRadius, m_minimumAzimuth);
+    XYRangeCheck(m_maximumRadius, m_minimumAzimuth);
+    XYRangeCheck(m_minimumRadius, m_maximumAzimuth);
+    XYRangeCheck(m_maximumRadius, m_maximumAzimuth);
+
+//cout << " ************ WALK RADIUS ******************\n";
+//cout << "MIN RAD: " << m_minimumRadius << " MAX LAT: " << m_maximumRadius << "\n";
+    // Walk top and bottom edges in half pixel increments
+    double radiusInc = 2. * (m_maximumRadius - m_minimumRadius) / PixelResolution();
+
+    for (rad = m_minimumRadius; rad <= m_maximumRadius; rad += radiusInc) {
+//cout << "WALKED A STEP - rad: " << rad << "\n";
+      rad = rad;
+      az = m_minimumAzimuth;
+      XYRangeCheck(rad, az);
+
+      rad = rad;
+      az = m_maximumAzimuth;
+      XYRangeCheck(rad, az);
+//cout << "MIN RAD: " << m_minimumRadius << " MAX RAD: " << m_maximumRadius << "\n";
     }
-    if (m_groundRangeGood) {
-      minX = m_minimumAzimuth;
-      maxX = m_maximumAzimuth;
-      minY = m_minimumRadius;
-      maxY = m_maximumRadius;
-      return true;
+
+//cout << " ************ WALK AZIMUTH ******************\n";
+    // Walk left and right edges
+    for (az = m_minimumAzimuth; az <= m_maximumAzimuth; az += 0.01) {
+      rad = m_minimumRadius;
+      az = az;
+      XYRangeCheck(rad, az);
+
+      rad = m_maximumRadius;
+      az = az;
+      XYRangeCheck(rad, az);
     }
-    return false;
+
+    // Walk the limb 
+/*
+    for (double angle = 0.0; angle <= 360.0; angle += 0.01) {
+      double x = m_equatorialRadius * cos(angle * PI / 180.0);
+      double y = m_equatorialRadius * sin(angle * PI / 180.0);
+      if (SetCoordinate(x, y) == 0) {
+        if (m_latitude > m_maximumLatitude) {
+          continue;
+        }
+        if (m_longitude > m_maximumAzimuth) {
+          continue;
+        }
+        if (m_latitude < m_minimumLatitude) {
+          continue;
+        }
+        if (m_longitude < m_minimumAzimuth) {
+          continue;
+        }
+
+        if (m_minimumX > x) m_minimumX = x;
+        if (m_maximumX < x) m_maximumX = x;
+        if (m_minimumY > y) m_minimumY = y;
+        if (m_maximumY < y) m_maximumY = y;
+        XYRangeCheck(m_latitude, m_longitude);
+      }
+    } */
+
+    // Make sure everything is ordered
+    if (m_minimumX >= m_maximumX) return false;
+    if (m_minimumY >= m_maximumY) return false;
+
+    // Return X/Y min/maxs
+    // m_maximumX = m_maximumRadius*cos(m_maximumAzimuth);
+    // m_minimumX = -m_maximumX;
+    // m_maximumY = m_maximumRadius*sin(m_maximumAzimuth);
+    // m_minimumY = -m_maximumY;
+
+    minX = m_minimumX;
+    maxX = m_maximumX;
+    minY = m_minimumY;
+    maxY = m_maximumY;
+
+    return true;
   }
 
 

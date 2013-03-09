@@ -109,6 +109,9 @@ namespace Isis {
   }
 
 
+
+
+
   /**
    * This method returns a pointer to a RingPlaneProjection object. The projection is
    * intialized using information contained in a Label object. The information
@@ -169,7 +172,7 @@ namespace Isis {
       return (Projection *) (*plugin)(label, allowDefaults);
     }
     catch(IException &e) {
-      string message = "Unable to initialize Projection information ";
+      QString message = "Unable to initialize Projection information ";
       message += "from group [Mapping]";
       throw IException(e, IException::Io, message, _FILEINFO_);
     }
@@ -381,21 +384,19 @@ namespace Isis {
   Isis::Projection *ProjectionFactory::RingsCreateForCube(Isis::Pvl &label,
       int &samples, int &lines, bool sizeMatch) {
 
-    // Create a temporary projection and get the radius at the special latitude
-    // NOTE: by "special latitude" we mean that latitude where the projection is
+    // Create a temporary projection and get the radius at the special radius
+    // NOTE: by "special radius" we mean that radius where the projection is
     // not distorted
-    //DON'T THINK THIS IS NEEDED FOR RING PLANE PROJECTIONS
     Isis::RingPlaneProjection *proj = (Isis::RingPlaneProjection *) RingsCreate(label, true);
     double localRadius = proj->TrueScaleRadius();
-//    delete proj;
-
-    // double localRadius = 1.0;
+    delete proj;
 
     IException errors;
     try {
       // Try to get the pixel resolution and then compute the scale
       double scale, pixelResolution;
       Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
+
       try {
         pixelResolution = mapGroup["PixelResolution"];
         scale = (2.0 * Isis::PI * localRadius) / (360.0 * pixelResolution);
@@ -414,6 +415,7 @@ namespace Isis {
                           Isis::Pvl::Replace);
       mapGroup.AddKeyword(Isis::PvlKeyword("Scale", toString(scale), "pixels/degree"),
                           Isis::Pvl::Replace);
+
       //mapGroup.AddKeyword(Isis::PvlKeyword ("TrueScaleRadius", trueScaleRadius),
       //                                    Isis::Pvl::Replace);
 
@@ -421,7 +423,7 @@ namespace Isis {
       // This forces an exact match of projection parameters for
       // output cubes
       bool sizeFound = false;
-      double upperLeftX, upperLeftY;
+      double upperLeftX = Null, upperLeftY = Null;
       if (label.HasObject("IsisCube")) {
         Isis::PvlGroup &dims = label.FindGroup("Dimensions", Isis::Pvl::Traverse);
         samples = dims["Samples"];
@@ -435,20 +437,20 @@ namespace Isis {
         sizeFound = false;
 
       // Initialize the rest of the projection
-//      proj = Create(label, true);
+      proj = (Isis::RingPlaneProjection *) RingsCreate(label, true);
 
       // Couldn't find the cube size from the labels so compute it
       if (!sizeFound) {
         if (!proj->HasGroundRange()) {
-          string msg = "Invalid ring range [MinimumRadius,MaximumRadius,";
-          msg += "MinimumLongitude,MaximumLongitude] missing or invalid";
+          QString msg = "Invalid ring range [MinimumRadius,MaximumRadius,";
+          msg += "MinimumAzimuth,MaximumAzimuth] missing or invalid";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
 
         double minX, maxX, minY, maxY;
         if (!proj->XYRange(minX, maxX, minY, maxY)) {
-          string msg = "Invalid ring range [MinimumRadius,MaximumRadius,";
-          msg += "MinimumLongitude,MaximumLongitude] cause invalid computation ";
+          QString msg = "Invalid ring range [MinimumRadius,MaximumRadius,";
+          msg += "MinimumAzimuth,MaximumAzimuth] cause invalid computation ";
           msg += "of image size";
           throw IException(IException::Unknown, msg, _FILEINFO_);
         }
@@ -806,10 +808,9 @@ namespace Isis {
     // Create a temporary projection
     Isis::RingPlaneProjection *proj = (Isis::RingPlaneProjection *) RingsCreate(label, true);
     double localRadius = proj->TrueScaleRadius();
-//    delete proj;
+    delete proj;
 
-    // double localRadius = 1.0;
-
+    IException errors;
     try {
       // Try to get the pixel resolution and then compute the scale
       double scale, pixelResolution;
@@ -821,7 +822,8 @@ namespace Isis {
       }
 
       // If not get the scale and then compute the pixel resolution
-      catch(IException &) {
+      catch(IException &e) {
+        errors.append(e);
         scale = mapGroup["Scale"];
         pixelResolution = (2.0 * Isis::PI * localRadius) / (360.0 * scale);
       }
@@ -846,7 +848,7 @@ namespace Isis {
 
         // Loop for each line testing the left and right sides of the image
         for(int line = 0; line <= cam.Lines(); line++) {
-          // Look for the first good lat/lon on the left edge of the image
+          // Look for the first good rad/az on the left edge of the image
           // If it is the first or last line then test the whole line
           int samp;
           for(samp = 0; samp <= cam.Samples(); samp++) {
@@ -864,7 +866,7 @@ namespace Isis {
             }
           }
 
-          // Look for the first good lat/lon on the right edge of the image
+          // Look for the first good rad/az on the right edge of the image
           if(samp < cam.Samples()) {
             for(samp = cam.Samples(); samp >= 0; samp--) {
               if(cam.SetImage((double)samp + 0.5, (double)line + 0.5)) {
@@ -882,42 +884,7 @@ namespace Isis {
             }
           }
         }
-/*
-        // Special test for ground range to see if either pole is in the image
-        if(cam.SetUniversalGround(90.0, 0.0)) {
-          if(cam.Sample() >= 0.5 && cam.Line() >= 0.5 &&
-              cam.Sample() <= cam.Samples() + 0.5 && cam.Line() <= cam.Lines() + 0.5) {
-            double radius = cam.LocalRadius().meters();
-//          double lat = cam.UniversalLatitude();
-            double lon = cam.UniversalLongitude();
-            proj->SetGround(radius, lon);
-//          proj->SetUniversalGround(lat, lon);
-            if(proj->IsGood()) {
-              if(proj->XCoord() < minX) minX = proj->XCoord();
-              if(proj->XCoord() > maxX) maxX = proj->XCoord();
-              if(proj->YCoord() < minY) minY = proj->YCoord();
-              if(proj->YCoord() > maxY) maxY = proj->YCoord();
-            }
-          }
-        }
 
-        if(cam.SetUniversalGround(-90.0, 0.0)) {
-          if(cam.Sample() >= 0.5 && cam.Line() >= 0.5 &&
-              cam.Sample() <= cam.Samples() + 0.5 && cam.Line() <= cam.Lines() + 0.5) {
-            double radius = cam.LocalRadius().meters();
-//          double lat = cam.UniversalLatitude();
-            double lon = cam.UniversalLongitude();
-            proj->SetGround(radius, lon);
-//          proj->SetUniversalGround(lat, lon);
-            if(proj->IsGood()) {
-              if(proj->XCoord() < minX) minX = proj->XCoord();
-              if(proj->XCoord() > maxX) maxX = proj->XCoord();
-              if(proj->YCoord() < minY) minY = proj->YCoord();
-              if(proj->YCoord() > maxY) maxY = proj->YCoord();
-            }
-          }
-        }
-*/
 #if 0
         // Another special test for ground range as we could have the
         // 0-360 seam running right through the image so
@@ -936,12 +903,12 @@ namespace Isis {
         // Another special test for ground range as we could have the
         // -180-180 seam running right through the image so
         // test it as well (the increment may not be fine enough !!!)
-        for(double lat = p_minlat; lat <= p_maxlat; lat += (p_maxlat - p_minlat) / 10.0) {
-          if(SetUniversalGround(lat, 180.0)) {
+        for(double rad = p_minrad; rad <= p_maxrad; rad += (p_maxrad - p_minrad) / 10.0) {
+          if(SetUniversalGround(rad, 180.0)) {
             if(Sample() >= 0.5 && Line() >= 0.5 &&
                 Sample() <= p_samples + 0.5 && Line() <= p_lines + 0.5) {
-              p_minlon180 = -180.0;
-              p_maxlon180 = 180.0;
+              p_minaz180 = -180.0;
+              p_maxaz180 = 180.0;
               break;
             }
           }
@@ -1026,6 +993,19 @@ namespace Isis {
     return CreateFromCube(*cube.label());
   }
 
+
+  /**
+   * This method is a helper method. See RingsCreateFromCube(Pvl).
+   *
+   * @param cube A cube containing valid map projection information
+   *
+   * @return A pointer to a Projection object
+   */
+  Isis::Projection *ProjectionFactory::RingsCreateFromCube(Isis::Cube &cube) {
+    return RingsCreateFromCube(*cube.label());
+  }
+
+
   /**
    * This method loads a map projection from a cube returning a pointer to a
    * Projection object.
@@ -1048,6 +1028,45 @@ namespace Isis {
 
       // Initialize the rest of the projection
       proj = (Isis::TProjection *) Create(label, true);
+
+      // Create a mapper to transform pixels into projection x/y and vice versa
+      PFPixelMapper *pixelMapper = new PFPixelMapper(pixelResolution, upperLeftX, upperLeftY);
+      proj->SetWorldMapper(pixelMapper);
+
+      proj->SetUpperLeftCorner(Displacement(upperLeftX, Displacement::Meters),
+                               Displacement(upperLeftY, Displacement::Meters));
+    }
+    catch (IException &e) {
+      QString msg = "Unable to initialize cube projection";
+      if(label.FileName() != "") msg += " from file [" + label.FileName() + "]";
+      throw IException(e, IException::Unknown, msg, _FILEINFO_);
+    }
+    return (Isis::Projection *) proj;
+  }
+
+
+  /**
+   * This method loads a map projection from a cube returning a pointer to a
+   * Projection object.
+   *
+   * @param label A label containing valid map projection information for a
+   * cube.
+   *
+   * @return (Isis::Projection) A pointer to a Projection object.
+   */
+  Isis::Projection *ProjectionFactory::RingsCreateFromCube(Isis::Pvl &label) {
+    Isis::RingPlaneProjection *proj;
+    try {
+      // Get the pixel resolution
+      Isis::PvlGroup &mapGroup = label.FindGroup("Mapping", Isis::Pvl::Traverse);
+      double pixelResolution = mapGroup["PixelResolution"];
+
+      // Get the upper left corner
+      double upperLeftX = mapGroup["UpperLeftCornerX"];
+      double upperLeftY = mapGroup["UpperLeftCornerY"];
+
+      // Initialize the rest of the projection
+      proj = (Isis::RingPlaneProjection *) RingsCreate(label, true);
 
       // Create a mapper to transform pixels into projection x/y and vice versa
       PFPixelMapper *pixelMapper = new PFPixelMapper(pixelResolution, upperLeftX, upperLeftY);

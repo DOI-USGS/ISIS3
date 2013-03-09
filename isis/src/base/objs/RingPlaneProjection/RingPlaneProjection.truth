@@ -87,7 +87,7 @@ Azimuth:                      -5
 XCoord:                         -50
 YCoord:                         150
 UniversalRadius:              60
-UniversalAzimuth:             355
+UniversalAzimuth:             5
 
 Testing Universal Ground coordinate routines
 Setting position to (57.3920057293825,  355):  1
@@ -97,7 +97,7 @@ Azimuth:                                     355
 XCoord:                                        3550
 YCoord:                                        147.3920057294
 UniversalRadius:                             57.39200572938
-UniversalAzimuth:                            355
+UniversalAzimuth:                            5
 Setting bad position...0
 
 Planar Projection Specifications
@@ -118,7 +118,7 @@ Azimuth:                                     0
 XCoord:                                        9000
 YCoord:                                        0
 UniversalRadius:                             9000
-UniversalAzimuth:                            0
+UniversalAzimuth:                            -0
 
 Setting position to (9000.0, 360.0)
 Is Good:                                       1
@@ -127,7 +127,7 @@ Azimuth:                                     0
 XCoord:                                        9000
 YCoord:                                        0
 UniversalRadius:                             9000
-UniversalAzimuth:                            0
+UniversalAzimuth:                            -0
 
 Testing == operator Projection conditions...None
 Projection 1 name and resolution = None 1
@@ -144,7 +144,7 @@ Azimuth:                           -9
 XCoord:                              -90
 YCoord:                              15
 UniversalRadius:                   -75
-UniversalAzimuth:                  351
+UniversalAzimuth:                  9
 WorldX:                              -90
 WorldY:                              15
 
@@ -156,7 +156,7 @@ Azimuth:                                 -2.25
 XCoord:                                    -22.5
 YCoord:                                    15
 UniversalRadius:                         -75
-UniversalAzimuth:                        357.75
+UniversalAzimuth:                        2.25
 WorldX:                                    -45
 WorldY:                                    45
 Resolution:                                0.5
@@ -242,7 +242,7 @@ Azimuth:                      -5
 XCoord:                         150
 YCoord:                         50
 UniversalRadius:              60
-UniversalAzimuth:             355
+UniversalAzimuth:             5
 
 Testing projection coordinate routines
 Setting x/y position to (150,50):  1
@@ -252,7 +252,7 @@ Azimuth:                           -5
 XCoord:                              150
 YCoord:                              50
 UniversalRadius:                   60
-UniversalAzimuth:                  355
+UniversalAzimuth:                  5
 WorldX:                              150
 WorldY:                              50
 
